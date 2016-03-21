@@ -1,0 +1,38 @@
+{
+	"version": "0.0.9",
+	"compilationOptions": {
+		"emitEntryPoint": false,
+		"debugType": "portable"
+	},
+
+	"dependencies": {
+		"NETStandard.Library": "1.0.0-rc2-23811",
+		"Java2Dotnet.Spider.Common": "0.0.9",
+		"Java2Dotnet.Spider.JLog": "0.0.9",
+		"Newtonsoft.Json": "0.0.9",
+		"HtmlAgilityPack": "0.0.9",
+		"HtmlAgilityPack.Css": "0.0.9",
+		"Java2Dotnet.Spider.Redial": "0.0.9"
+	},
+
+	"frameworks": {
+		"dnxcore50": {
+			"dependencies": {
+				"System.Security.Cryptography.Algorithms": "4.0.0-beta-23225",
+				"System.Security.Cryptography.Primitives": "4.0.0-beta-23225",
+				"System.Threading.Thread": "4.0.0-rc2-23811",
+				"System.Dynamic.Runtime": "4.0.11-rc2-23811",
+				"System.Collections.NonGeneric": "4.0.0",
+				"System.Threading.Tasks.Parallel": "4.0.1-beta-23409",
+				"System.Net.Http": "4.0.0",
+				"System.Runtime.Extensions": "4.0.10",
+				"Microsoft.CSharp": "4.0.1-beta-23516",
+				"System.IO.Compression": "4.0.0",
+				"System.Net.Requests": "4.0.11-beta-23516"
+			},
+			"compilationOptions": {
+				"define": [ "NET_CORE" ]
+			}
+		}
+	}
+}

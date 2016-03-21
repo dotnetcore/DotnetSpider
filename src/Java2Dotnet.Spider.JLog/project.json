@@ -1,0 +1,23 @@
+{
+	"version": "0.0.9",
+	"compilationOptions": {
+		"emitEntryPoint": false,
+		"debugType": "portable"
+	},
+
+	"dependencies": {
+		"NETStandard.Library": "1.0.0-rc2-23811",
+		"System.IO": "4.0.10"
+	},
+
+	"frameworks": {
+		"dnxcore50": {
+			"dependencies": {
+				"System.Runtime.Extensions": "4.0.10"
+			},
+			"compilationOptions": {
+				"define": [ "NET_CORE" ]
+			}
+		}
+	}
+}

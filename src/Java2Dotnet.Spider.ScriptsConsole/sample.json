@@ -1,0 +1,245 @@
+﻿{
+	"SpiderName": "Tmall Gmv 2016_03_01",
+	"ThreadNum": 1,
+	"Deep": 2147483647,
+	"EmptySleepTime": 15000,
+	"CachedSize": 1,
+	"Scheduler": {
+		"Host": "192.168.3.33",
+		"Port": 6379,
+		"Password": null,
+		"Type": 1
+	},
+	"Downloader": {
+		"Type": 1,
+		"DownloadValidation": {
+			"ContainsString": "anti_Spider",
+			"Result": 1,
+			"Type": 0
+		}
+	},
+	"Site": {
+		"Headers": { },
+		"ContentType": 0,
+		"UserAgent": null,
+		"Accept": null,
+		"Domain": null,
+		"EncodingName": "UTF-8",
+		"Timeout": 5000,
+		"AcceptStatCode": [ 200 ],
+		"StartRequests": [ ],
+		"SleepTime": 500,
+		"RetryTimes": 5,
+		"CycleRetryTimes": 20,
+		"Cookie": null,
+		"HttpProxy": null,
+		"IsUseGzip": false,
+		"HttpProxyPoolEnable": false
+	},
+	"NeedRedial": true,
+	"NetworkValidater": 1,
+	"Redialer": {
+		"Interface": "宽带连接",
+		"Account": "051689023882616",
+		"Password": "320322",
+		"Type": 0
+	},
+	"PrepareStartUrls": {
+		"Type": 0,
+		"Source": 0,
+		"ConnectString": "Database='mysql';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306",
+		"TableName": "taobao.tmall_shop_gmvorder",
+		"Filters": null,
+		"Columns": [ "name" ],
+		"Limit": 0,
+		"FormateString": "https://s.taobao.com/search?q={0}&ie=utf8&sort=sale-desc&bcoffset=-4&ntoffset=-4&p4plefttype=3%2C1&p4pleftnum=1%2C3&filter_tianmao=tmall&s=0",
+		"CustomizeFormaters": [ ]
+	},
+	"StartUrls": [ ],
+	"Pipeline": { "Type": 4 },
+	"Entities": [
+		{
+			"TargetUrls": [ ],
+			"Multi": true,
+			"Selector": {
+				"Type": 3,
+				"Expression": "$.mods.itemlist.data.auctions[*]"
+			},
+			"Schema": {
+				"Database": "taobao",
+				"TableName": "tmall_product_item",
+				"Suffix": 2,
+				"TypeId": "Java2Dotnet.Spider.Extension.DbSupport.Schema, Java2Dotnet.Spider.Extension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+			},
+			"Identity": "Spider.TmallGmv3Spider+TmallProductItem",
+			"Indexes": null,
+			"Uniques": null,
+			"AutoIncrement": "id",
+			"Primary": [ "id" ],
+			"Fields": [
+				{
+					"DataType": "String(100)",
+					"Selector": {
+						"Type": 3,
+						"Expression": "$.title"
+					},
+					"Multi": false,
+					"Name": "name",
+					"Formatters": [
+						{
+							"Name": "RemoveHtmlTagFormater",
+							"TypeId": "Java2Dotnet.Spider.Extension.Model.Formatter.RemoveHtmlTagFormater, Java2Dotnet.Spider.Extension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+						}
+					]
+				},
+				{
+					"DataType": "Float(11)",
+					"Selector": {
+						"Type": 3,
+						"Expression": "$.view_price"
+					},
+					"Multi": false,
+					"Name": "price",
+					"Formatters": [
+						{
+							"Name": "ReplaceFormatter",
+							"OldValue": "¥",
+							"NewValue": "",
+							"TypeId": "Java2Dotnet.Spider.Extension.Model.Formatter.ReplaceFormatter, Java2Dotnet.Spider.Extension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+						}
+					]
+				},
+				{
+					"DataType": "BigInt(11)",
+					"Selector": {
+						"Type": 3,
+						"Expression": "$.view_sales"
+					},
+					"Multi": false,
+					"Name": "sold",
+					"Formatters": [
+						{
+							"Name": "ReplaceFormatter",
+							"OldValue": "人收货",
+							"NewValue": "",
+							"TypeId": "Java2Dotnet.Spider.Extension.Model.Formatter.ReplaceFormatter, Java2Dotnet.Spider.Extension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+						},
+						{
+							"Name": "ReplaceFormatter",
+							"OldValue": "万笔",
+							"NewValue": "",
+							"TypeId": "Java2Dotnet.Spider.Extension.Model.Formatter.ReplaceFormatter, Java2Dotnet.Spider.Extension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+						},
+						{
+							"Name": "ReplaceFormatter",
+							"OldValue": "笔",
+							"NewValue": "",
+							"TypeId": "Java2Dotnet.Spider.Extension.Model.Formatter.ReplaceFormatter, Java2Dotnet.Spider.Extension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+						}
+					]
+				},
+				{
+					"DataType": "text",
+					"Selector": {
+						"Type": 3,
+						"Expression": "$.detail_url"
+					},
+					"Multi": false,
+					"Name": "url",
+					"Formatters": [ ]
+				},
+				{
+					"DataType": "text",
+					"Selector": {
+						"Type": 3,
+						"Expression": "$.category"
+					},
+					"Multi": false,
+					"Name": "cat_id",
+					"Formatters": [ ]
+				},
+				{
+					"DataType": "String(50)",
+					"Selector": {
+						"Type": 4,
+						"Expression": "brand"
+					},
+					"Multi": false,
+					"Name": "brand",
+					"Formatters": [ ]
+				},
+				{
+					"DataType": "String(100)",
+					"Selector": {
+						"Type": 4,
+						"Expression": "uid"
+					},
+					"Multi": false,
+					"Name": "uid",
+					"Formatters": [ ]
+				},
+				{
+					"DataType": "String(100)",
+					"Selector": {
+						"Type": 3,
+						"Expression": "$.nid"
+					},
+					"Multi": false,
+					"Name": "item_id",
+					"Formatters": [ ]
+				},
+				{
+					"DataType": "date",
+					"Selector": {
+						"Type": 4,
+						"Expression": "Today"
+					},
+					"Multi": false,
+					"Name": "run_id",
+					"Formatters": [ ]
+				},
+				{
+					"DataType": "date",
+					"Selector": {
+						"Type": 4,
+						"Expression": "Now"
+					},
+					"Multi": false,
+					"Name": "cdate",
+					"Formatters": [ ]
+				},
+				{
+					"DataType": "BigInt(11)",
+					"Selector": null,
+					"Multi": false,
+					"Name": "id",
+					"Formatters": [ ]
+				}
+			],
+			"Stopping": {
+				"PropertyName": "sold",
+				"Operate": 0,
+				"CompareValue": "0",
+				"TypeId": "Java2Dotnet.Spider.Extension.Model.Attribute.Stopping, Java2Dotnet.Spider.Extension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+			}
+		}
+	],
+	"Corporation": null,
+	"ValidationReportTo": null,
+	"CustomizePage": {
+		"StartString": "{\"pageName\":",
+		"EndString": "g_srp_loadCss();",
+		"StartOffset": 0,
+		"EndOffset": 6,
+		"Type": 0
+	},
+	"CustomizeTargetUrls": {
+		"Type": 0,
+		"PageIndexString": "&s=0",
+		"Interval": 44,
+		"CurrenctPageSelector": {
+			"Type": 3,
+			"Expression": "$.mods.pager.data.currentPage"
+		}
+	}
+}

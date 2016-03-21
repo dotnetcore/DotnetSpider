@@ -1,0 +1,25 @@
+{
+	"version": "0.0.9",
+	"compilationOptions": {
+		"emitEntryPoint": false,
+		"debugType": "portable"
+	},
+
+	"dependencies": {
+		"NETStandard.Library": "1.0.0-rc2-23811"
+	},
+	"frameworks": {
+		"dnxcore50": {
+			"dependencies": {
+				"System.Security.Cryptography.Algorithms": "4.0.0-beta-23225",
+				"System.Security.Cryptography.Primitives": "4.0.0-beta-23225",
+				"System.Threading.Thread": "4.0.0-rc2-23811",
+				"System.Threading.ThreadPool": "4.0.10-rc2-23811",
+				"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-beta-23516"
+			},
+			"compilationOptions": {
+				"define": [ "NET_CORE" ]
+			}
+		}
+	}
+}

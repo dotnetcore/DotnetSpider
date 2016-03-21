@@ -1,0 +1,31 @@
+{
+	"version": "0.0.9",
+	"compilationOptions": {
+		"emitEntryPoint": false,
+		"debugType": "portable"
+	},
+
+	"dependencies": {
+		"NETStandard.Library": "1.0.0-rc2-23811",
+		"Java2Dotnet.Spider.Common": "0.0.9",
+		"Java2Dotnet.Spider.Core": "0.0.9",
+		"Java2Dotnet.Spider.JLog": "0.0.9",
+		"Newtonsoft.Json": "0.0.9",
+		"HtmlAgilityPack": "0.0.9",
+		"HtmlAgilityPack.Css": "0.0.9",
+		"MySql.Data": "0.0.9",
+		"Dapper": "1.50.0-beta8",
+		"Java2Dotnet.Spider.Redial": "0.0.9",
+		"System.Data.Common": "4.0.0",
+		"Java2Dotnet.Spider.Validation": "0.0.9",
+		"StackExchange.Redis": "1.1.572-alpha"
+	},
+
+	"frameworks": {
+		"dnxcore50": {
+			"compilationOptions": {
+				"define": [ "NET_CORE" ]
+			}
+		}
+	}
+}

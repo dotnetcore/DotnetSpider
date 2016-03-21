@@ -1,0 +1,26 @@
+{
+	"version": "0.0.9",
+	"compilationOptions": {
+		"emitEntryPoint": false
+	},
+
+	"dependencies": {
+		"NETStandard.Library": "1.0.0-rc2-23811",
+		"System.Security.Cryptography.Algorithms": "4.0.0-beta-23516",
+		"System.Data.Common": "4.0.0",
+		"System.Net.NameResolution": "4.0.0-beta-23516",
+		"System.Security.Cryptography.X509Certificates": "4.0.0-beta-23516",
+		"System.Security.Principal.Windows": "4.0.0-rc2-23811",
+		"System.Diagnostics.Process": "4.1.0-beta-23516",
+		"System.ComponentModel.TypeConverter": "4.0.1-beta-23516",
+		"System.Net.Security": "4.0.0-beta-23516"
+	},
+
+	"frameworks": {
+		"dnxcore50": {
+			"compilationOptions": {
+				"define": [ "DNXCore" ]
+			}
+		}
+	}
+}

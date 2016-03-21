@@ -1,0 +1,22 @@
+{
+	"version": "0.0.9",
+	"compilationOptions": {
+		"emitEntryPoint": false
+	},
+
+	"dependencies": {
+		"NETStandard.Library": "1.0.0-rc2-23811"
+	},
+
+	"frameworks": {
+		"dnxcore50": {
+			"dependencies": {
+				"System.Xml.XmlDocument": "4.0.0",
+				"System.Xml.ReaderWriter": "4.0.0",
+				"System.Xml.XPath": "4.0.0",
+				"System.Xml.XPath.XDocument": "4.0.0",
+				"System.Diagnostics.StackTrace": "4.0.0"
+			}
+		}
+	}
+}
