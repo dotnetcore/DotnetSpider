@@ -332,7 +332,7 @@ namespace MySql.Data.MySqlClient
 				}
 			}
 			catch (Exception ex)
-			{Console.WriteLine("Exception:-> after end pool.GetConnection"+State);
+			{
 				SetState(ConnectionState.Closed, true);
 				throw;
 			}

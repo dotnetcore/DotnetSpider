@@ -1,7 +1,7 @@
 {
   "profiles": {
     "Console": {
-      "executablePath": "C:\\Users\\Lewis\\Documents\\GitHub\\DotnetSpider2\\src\\Java2Dotnet.Spider.Test\\bin\\Debug\\dnxcore50\\win7-x64\\Java2Dotnet.Spider.Test.exe"
+      "executablePath": "C:\\Users\\Lewis\\Documents\\GitHub\\DotnetSpider\\src\\Java2Dotnet.Spider.Test\\bin\\Debug\\dnxcore50\\win7-x64\\Java2Dotnet.Spider.Test.exe"
     }
   }
 }

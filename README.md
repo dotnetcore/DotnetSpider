@@ -1,2 +1,2 @@
 # DotnetSpider
-donet spider
+This is a cross platfrom spider develop by C#.
