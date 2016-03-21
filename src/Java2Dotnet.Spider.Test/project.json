@@ -2,8 +2,9 @@
 	"version": "1.0.0-*",
 	"compilationOptions": {
 		"emitEntryPoint": true,
-        "debugType": "portable"
+		"debugType": "full"
 	},
+ 
 	"dependencies": {
 		"NETStandard.Library": "1.0.0-rc2-23811",
 		"Java2Dotnet.Spider.Core": "0.0.9",
