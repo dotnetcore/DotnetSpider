@@ -14,11 +14,11 @@
 		"HtmlAgilityPack": "0.0.9",
 		"HtmlAgilityPack.Css": "0.0.9",
 		"MySql.Data": "0.0.9",
-		"Dapper": "1.50.0-beta8",
 		"Java2Dotnet.Spider.Redial": "0.0.9",
-		"System.Data.Common": "4.0.0",
+		"System.Data.Common": "4.0.0-*",
 		"Java2Dotnet.Spider.Validation": "0.0.9",
-		"StackExchange.Redis": "1.1.572-alpha"
+		"StackExchange.Redis": "0.0.9",
+		"Microsoft.CSharp": "4.0.0-*"
 	},
 
 	"frameworks": {

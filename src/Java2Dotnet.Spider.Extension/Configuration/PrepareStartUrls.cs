@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Model;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
@@ -78,11 +78,32 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 			using (var conn = new MySqlConnection(ConnectString))
 			{
-				var data = conn.Query(GetSelectQueryString());
+				List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
+				string sql = GetSelectQueryString();
+				conn.Open();
+				var command = conn.CreateCommand();
+				command.CommandText = sql;
+				command.CommandType = CommandType.Text;
 
-				Parallel.ForEach(data, new ParallelOptions { MaxDegreeOfParallelism = 1 }, brand =>
+				var reader = command.ExecuteReader();
+
+				while (reader.Read())
 				{
-					IDictionary<string, object> tmp = (IDictionary<string, object>)brand;
+					Dictionary<string, object> values = new Dictionary<string, object>();
+					int count = reader.FieldCount;
+					for (int i = 0; i < count; ++i)
+					{
+						string name = reader.GetName(i);
+						values.Add(name, reader.GetValue(i));
+					}
+					datas.Add(values);
+				}
+
+				reader.Close();
+
+				Parallel.ForEach(datas, new ParallelOptions { MaxDegreeOfParallelism = 1 }, brand =>
+				{
+					Dictionary<string, object> tmp = brand;
 					List<string> arguments = new List<string>();
 					foreach (var column in Columns)
 					{

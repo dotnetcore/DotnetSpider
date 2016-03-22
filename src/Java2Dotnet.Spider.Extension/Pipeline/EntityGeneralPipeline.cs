@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using Java2Dotnet.Spider.Core;
 using Newtonsoft.Json.Linq;
-using Dapper;
+
 using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Utils;
 using Java2Dotnet.Spider.Common;
 
 #if !NET_CORE
 using log4net;
+//using Dapper;
 #else
 using Java2Dotnet.Spider.JLog; 
 #endif
@@ -46,9 +49,10 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		protected abstract string GetInsertSql();
 		protected abstract string GetCreateTableSql();
 		protected abstract string GetCreateSchemaSql();
+		protected abstract DbParameter CreateDbParameter();
 		protected readonly Schema Schema;
 
-		protected readonly Type Type;
+		//protected readonly Type Type;
 
 		protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
 		protected List<List<string>> Uniques { get; set; } = new List<List<string>>();
@@ -79,9 +83,6 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			{
 				Uniques.Add(index.ToObject<List<string>>());
 			}
-
-			Type = GenerateType(schema, Columns);
-			Logger.Info($"TYPE-> Name: {Type.Name} Properties: [{Type.GetProperties().Select(p=>p.Name)}]");
 		}
 
 		private Schema GenerateSchema(Schema schema)
@@ -106,8 +107,16 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		{
 			using (DbConnection conn = CreateConnection())
 			{
-				conn.Execute(GetCreateSchemaSql());
-				conn.Execute(GetCreateTableSql());
+				conn.Open();
+				var command = conn.CreateCommand();
+				command.CommandText = GetCreateSchemaSql();
+				command.CommandType = CommandType.Text;
+				command.ExecuteNonQuery();
+
+				command.CommandText = GetCreateTableSql();
+				command.CommandType = CommandType.Text;
+				command.ExecuteNonQuery();
+				conn.Close();
 			}
 		}
 
@@ -115,12 +124,30 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		{
 			using (var conn = CreateConnection())
 			{
-				List<object> results=new List<object>();
+				var cmd = conn.CreateCommand();
+				cmd.CommandText = GetInsertSql();
+				cmd.CommandType = CommandType.Text;
+				conn.Open();
+
 				foreach (var data in datas)
 				{
-					results.Add(data.ToObject(Type));
+					cmd.Parameters.Clear();
+
+					List<DbParameter> parameters = new List<DbParameter>();
+					foreach (var column in Columns)
+					{
+						var parameter = CreateDbParameter();
+						parameter.ParameterName = $"@{column.Name}";
+						parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+						parameter.DbType = Convert(column.DataType);
+						parameters.Add(parameter);
+					}
+
+					cmd.Parameters.AddRange(parameters.ToArray());
+					cmd.ExecuteNonQuery();
 				}
-				conn.Execute(GetInsertSql(), results);
+
+				conn.Close();
 			}
 		}
 
@@ -128,111 +155,112 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		{
 		}
 
-#if !NET_CORE
-		private Type GenerateType(Schema schema, List<Column> columns)
+
+		//private void GenerateType(Schema schema, List<Column> columns)
+		//{
+		//	AppDomain currentAppDomain = AppDomain.CurrentDomain;
+		//	AssemblyName assyName = new AssemblyName("DotnetSpiderAss_" + schema.TableName);
+
+		//	AssemblyBuilder assyBuilder = currentAppDomain.DefineDynamicAssembly(assyName, AssemblyBuilderAccess.Run);
+
+		//	ModuleBuilder modBuilder = assyBuilder.DefineDynamicModule("DotnetSpiderMod_" + schema.TableName);
+
+		//	TypeBuilder typeBuilder = modBuilder.DefineType("type_" + schema.TableName, TypeAttributes.Class | TypeAttributes.Public);
+
+		//	foreach (var column in columns)
+		//	{
+		//		AddProperty(typeBuilder, column.Name, Convert(column.DataType.ToLower()));
+		//	}
+
+		//	return (typeBuilder.CreateType());
+		//}
+
+		//private Type GenerateType(Schema schema, List<Column> columns)
+		//{
+		//	AssemblyName assyName = new AssemblyName("DotnetSpiderAss_" + schema.TableName);
+
+		//	AssemblyBuilder assyBuilder = AssemblyBuilder.DefineDynamicAssembly(assyName, AssemblyBuilderAccess.Run);
+
+		//	ModuleBuilder modBuilder = assyBuilder.DefineDynamicModule("DotnetSpiderMod_" + schema.TableName);
+
+		//	TypeBuilder typeBuilder = modBuilder.DefineType("type_" + schema.TableName, TypeAttributes.Class | TypeAttributes.Public);
+
+		//	foreach (var column in columns)
+		//	{
+		//		AddProperty(typeBuilder, column.Name, Convert(column.DataType.ToLower()));
+		//	}
+
+		//	return (typeBuilder.CreateTypeInfo().AsType());
+		//}
+
+
+		//private void AddProperty(TypeBuilder tb, string name, Type type)
+		//{
+		//	var property = tb.DefineProperty(name, PropertyAttributes.HasDefault, type, null);
+
+		//	FieldBuilder field = tb.DefineField($"_{name}", type, FieldAttributes.Private);
+
+		//	MethodAttributes getOrSetAttribute = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
+
+		//	MethodBuilder getAccessor = tb.DefineMethod($"get_{name}", getOrSetAttribute, type, Type.EmptyTypes);
+
+		//	ILGenerator getIl = getAccessor.GetILGenerator();
+		//	getIl.Emit(OpCodes.Ldarg_0);
+		//	getIl.Emit(OpCodes.Ldfld, field);
+		//	getIl.Emit(OpCodes.Ret);
+
+		//	MethodBuilder setAccessor = tb.DefineMethod($"set_{name}", getOrSetAttribute, null, new[] { type });
+
+		//	ILGenerator setIl = setAccessor.GetILGenerator();
+		//	setIl.Emit(OpCodes.Ldarg_0);
+		//	setIl.Emit(OpCodes.Ldarg_1);
+		//	setIl.Emit(OpCodes.Stfld, field);
+		//	setIl.Emit(OpCodes.Ret);
+
+		//	property.SetGetMethod(getAccessor);
+		//	property.SetSetMethod(setAccessor);
+		//}
+
+		private DbType Convert(string  type)
 		{
-			AppDomain currentAppDomain = AppDomain.CurrentDomain;
-			AssemblyName assyName = new AssemblyName("DotnetSpiderAss_" + schema.TableName);
-
-			AssemblyBuilder assyBuilder = currentAppDomain.DefineDynamicAssembly(assyName, AssemblyBuilderAccess.Run);
-
-			ModuleBuilder modBuilder = assyBuilder.DefineDynamicModule("DotnetSpiderMod_" + schema.TableName);
-
-			TypeBuilder typeBuilder = modBuilder.DefineType("type_" + schema.TableName, TypeAttributes.Class | TypeAttributes.Public);
-
-			foreach (var column in columns)
-			{
-				AddProperty(typeBuilder, column.Name, Convert(column.DataType.ToLower()));
-			}
-
-			return (typeBuilder.CreateType());
-		}
-#else
-		private Type GenerateType(Schema schema, List<Column> columns)
-		{
-			AssemblyName assyName = new AssemblyName("DotnetSpiderAss_" + schema.TableName);
-
-			AssemblyBuilder assyBuilder = AssemblyBuilder.DefineDynamicAssembly(assyName, AssemblyBuilderAccess.Run);
-
-			ModuleBuilder modBuilder = assyBuilder.DefineDynamicModule("DotnetSpiderMod_" + schema.TableName);
-
-			TypeBuilder typeBuilder = modBuilder.DefineType("type_" + schema.TableName, TypeAttributes.Class | TypeAttributes.Public);
-
-			foreach (var column in columns)
-			{
-				AddProperty(typeBuilder, column.Name, Convert(column.DataType.ToLower()));
-			}
-
-			return (typeBuilder.CreateTypeInfo().AsType());
-		}
-#endif
-
-		private void AddProperty(TypeBuilder tb, string name, Type type)
-		{
-			var property = tb.DefineProperty(name, PropertyAttributes.HasDefault, type, null);
-
-			FieldBuilder field = tb.DefineField($"_{name}", type, FieldAttributes.Private);
-
-			MethodAttributes getOrSetAttribute = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig;
-
-			MethodBuilder getAccessor = tb.DefineMethod($"get_{name}", getOrSetAttribute, type, Type.EmptyTypes);
-
-			ILGenerator getIl = getAccessor.GetILGenerator();
-			getIl.Emit(OpCodes.Ldarg_0);
-			getIl.Emit(OpCodes.Ldfld, field);
-			getIl.Emit(OpCodes.Ret);
-
-			MethodBuilder setAccessor = tb.DefineMethod($"set_{name}", getOrSetAttribute, null, new[] { type });
-
-			ILGenerator setIl = setAccessor.GetILGenerator();
-			setIl.Emit(OpCodes.Ldarg_0);
-			setIl.Emit(OpCodes.Ldarg_1);
-			setIl.Emit(OpCodes.Stfld, field);
-			setIl.Emit(OpCodes.Ret);
-
-			property.SetGetMethod(getAccessor);
-			property.SetSetMethod(setAccessor);
-		}
-
-		private Type Convert(string datatype)
-		{
+			string datatype = type?.ToLower();
 			if (RegexUtil.StringTypeRegex.IsMatch(datatype))
 			{
-				return typeof(string);
+				return DbType.String;
 			}
 
 			if (RegexUtil.IntTypeRegex.IsMatch(datatype))
 			{
-				return typeof(int);
+				return DbType.Int32;
 			}
 
 			if (RegexUtil.BigIntTypeRegex.IsMatch(datatype))
 			{
-				return typeof(long);
+				return DbType.Int64;
 			}
 
 			if (RegexUtil.FloatTypeRegex.IsMatch(datatype))
 			{
-				return typeof(float);
+				return DbType.Double;
 			}
 
 			if (RegexUtil.DoubleTypeRegex.IsMatch(datatype))
 			{
-				return typeof(double);
+				return DbType.Double;
 			}
 			if (RegexUtil.DateTypeRegex.IsMatch(datatype) || RegexUtil.TimeStampTypeRegex.IsMatch(datatype))
 			{
-				return typeof(DateTime);
+				return DbType.DateTime;
 			}
 
 			if (RegexUtil.TimeStampTypeRegex.IsMatch(datatype) || RegexUtil.DateTypeRegex.IsMatch(datatype))
 			{
-				return typeof(DateTime);
+				return DbType.DateTime;
 			}
 
 			if ("text" == datatype)
 			{
-				return typeof(string);
+				return DbType.String;
 			}
 
 			throw new SpiderExceptoin("Unsport datatype: " + datatype);

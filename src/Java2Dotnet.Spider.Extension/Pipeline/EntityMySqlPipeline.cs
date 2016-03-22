@@ -78,6 +78,11 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			return $"CREATE SCHEMA IF NOT EXISTS `{Schema.Database}` DEFAULT CHARACTER SET utf8mb4 ;";
 		}
 
+		protected override DbParameter CreateDbParameter()
+		{
+			return new MySqlParameter();
+		}
+
 		protected override string ConvertToDbType(string datatype)
 		{
 			var match = RegexUtil.NumRegex.Match(datatype);

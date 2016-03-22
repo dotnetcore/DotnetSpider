@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using Dapper;
+using System.Runtime.InteropServices;
 
 namespace Java2Dotnet.Spider.Validation
 {
@@ -15,7 +15,7 @@ namespace Java2Dotnet.Spider.Validation
 		public string Description { get; }
 		public ValidateLevel Level { get; }
 
-		protected AbstractValidate(DbConnection conn, string sql, string arguments,  string description, ValidateLevel level)
+		protected AbstractValidate(DbConnection conn, string sql, string arguments, string description, ValidateLevel level)
 		{
 			Sql = sql;
 			Arguments = arguments;
@@ -40,8 +40,23 @@ namespace Java2Dotnet.Spider.Validation
 			{
 				Connection.Open();
 			}
-			var result = Connection.Query<Value>(Sql).ToList().FirstOrDefault();
-			return result?.Result;
+
+			var command = Connection.CreateCommand();
+			command.CommandText = Sql;
+			command.CommandType = CommandType.Text;
+			var reader = command.ExecuteReader();
+			object result = new object();
+			while (reader.Read())
+			{
+				result = reader["result"];
+			}
+#if !NET_CORE
+			reader.Close();
+#else
+			reader.Dispose();
+#endif
+			Connection.Close();
+			return result?.ToString();
 		}
 
 		protected List<Value> GetValueList()
@@ -50,7 +65,27 @@ namespace Java2Dotnet.Spider.Validation
 			{
 				Connection.Open();
 			}
-			return Connection.Query<Value>(Sql).ToList();
+			List<Value> values = new List<Value>();
+			var command = Connection.CreateCommand();
+			command.CommandText = Sql;
+			command.CommandType = CommandType.Text;
+			var reader = command.ExecuteReader();
+
+			while (reader.Read())
+			{
+				var result = reader["result"];
+				if (result != null)
+				{
+					values.Add(new Value() { Result = result.ToString() });
+				}
+			}
+#if !NET_CORE
+			reader.Close();
+#else
+			reader.Dispose();
+#endif
+			Connection.Close();
+			return values;
 		}
 
 		public class Value

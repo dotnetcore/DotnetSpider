@@ -1,0 +1,33 @@
+{
+	"version": "0.0.9",
+	"description": "High performance Redis client, incorporating both synchronous and asynchronous usage.",
+	"requireLicenseAcceptance": false,
+	"summary": "Redis client library",
+	"dependencies": {
+	},
+	"compilationOptions": {
+		"allowUnsafe": true
+	},
+	"frameworks": {
+
+		"dnxcore50": {
+			"compilationOptions": {
+				"define": [ "PLAT_SAFE_CONTINUATIONS", "CORE_CLR" ]
+			},
+			"dependencies": {
+				"NETStandard.Library": "1.0.0-rc2-23811",
+				"System.IO.Compression": "4.0.0-*",
+				"System.Security.Cryptography.Algorithms": "4.0.0-*",
+				"System.Security.Cryptography.X509Certificates": "4.0.0-*",
+				"System.Reflection.Emit": "4.0.1-*",
+				"System.Reflection.Emit.Lightweight": "4.0.1-*",
+				"System.Collections.NonGeneric": "4.0.1-*",
+				"System.Threading.Thread": "4.0.0-*",
+				"System.Threading.ThreadPool": "4.0.10-*",
+				"System.Net.Primitives": "4.0.11-*",
+				"System.Net.NameResolution": "4.0.0-*",
+				"System.Reflection.TypeExtensions":"4.1.0-*"
+			}
+		}
+	}
+}

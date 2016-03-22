@@ -6,14 +6,12 @@
 	},
 
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc2-23811",
-		"System.IO": "4.0.10"
+		"NETStandard.Library": "1.0.0-rc2-23811"
 	},
 
 	"frameworks": {
 		"dnxcore50": {
 			"dependencies": {
-				"System.Runtime.Extensions": "4.0.10"
 			},
 			"compilationOptions": {
 				"define": [ "NET_CORE" ]
