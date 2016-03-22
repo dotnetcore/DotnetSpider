@@ -96,7 +96,6 @@ namespace Newtonsoft.Json.Linq
         /// Initializes a new instance of the <see cref="JValue"/> class with the given value.
         /// </summary>
         /// <param name="value">The value.</param>
-        [CLSCompliant(false)]
         public JValue(ulong value)
             : this(value, JTokenType.Integer)
         {

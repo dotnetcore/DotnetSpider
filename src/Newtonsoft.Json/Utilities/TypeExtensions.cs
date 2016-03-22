@@ -37,7 +37,7 @@ namespace Newtonsoft.Json.Utilities
     internal static class TypeExtensions
     {
 		#if NET_CORE || NETFX_CORE||PORTABLE
-		 private static BindingFlags DefaultFlags = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
+private static System.Reflection.BindingFlags DefaultFlags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance;
 		
 		#endif
 #if NETFX_CORE || PORTABLE

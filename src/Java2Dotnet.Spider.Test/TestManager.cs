@@ -17,7 +17,7 @@ namespace Java2Dotnet.Spider.Test
 
 				Console.WriteLine($"Fetch: {type.FullName} ...");
 
-				var allMethods = type.GetMethods(BindingFlags.Public);
+				var allMethods = type.GetTypeInfo().DeclaredMethods;
 				var methods = allMethods.Where(m => m.GetCustomAttribute<TestMethod>() != null);
 
 				var initMethod = allMethods.FirstOrDefault(m => m.GetCustomAttribute<TestInitialize>() != null);
