@@ -86,6 +86,7 @@ namespace Java2Dotnet.Spider.JLog
 						}
 					case Level.Info:
 						{
+                            Console.ForegroundColor = ConsoleColor.Magenta;
 							break;
 						}
 					case Level.Warning:

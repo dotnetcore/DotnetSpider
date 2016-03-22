@@ -396,7 +396,7 @@ namespace Java2Dotnet.Spider.Core
 			_runningExit = false;
 
 #if !NET_CORE
-			// 必须开启多线程限制
+			// 锟斤拷锟诫开锟斤拷锟斤拷锟竭筹拷锟斤拷锟斤拷
 			System.Net.ServicePointManager.DefaultConnectionLimit = int.MaxValue;
 #endif
 			Logger.Info("Spider " + Identity + " InitComponent...");
@@ -480,7 +480,7 @@ namespace Java2Dotnet.Spider.Core
 			ThreadPool.WaitToExit();
 			FinishedTime = DateTime.Now;
 
-			// Pipeline中有可能有缓存数据, 需要清理/保存后才能安全退出/暂停
+			// Pipeline锟斤拷锟叫匡拷锟斤拷锟叫伙拷锟斤拷锟斤拷锟斤拷, 锟斤拷要锟斤拷锟斤拷/锟斤拷锟斤拷锟斤拷锟斤拷锟杰帮拷全锟剿筹拷/锟斤拷停
 			foreach (IPipeline pipeline in Pipelines)
 			{
 				SafeDestroy(pipeline);
@@ -535,7 +535,7 @@ namespace Java2Dotnet.Spider.Core
 		public void Stop()
 		{
 			Stat = Status.Stopped;
-			Console.WriteLine("Trying to stop Spider " + Identity + "...");
+            Logger.Warn("Trying to stop Spider " + Identity + "...");
 		}
 
 		protected void OnClose()
@@ -557,7 +557,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			lock (this)
 			{
-				//写入文件中, 用户从最终的结果可以知道有多少个Request没有跑. 提供ReRun, Spider可以重新载入错误的Request重新跑过
+				//写锟斤拷锟侥硷拷锟斤拷, 锟矫伙拷锟斤拷锟斤拷锟秸的斤拷锟斤拷锟斤拷锟斤拷知锟斤拷锟叫讹拷锟劫革拷Request没锟斤拷锟斤拷. 锟结供ReRun, Spider锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷Request锟斤拷锟斤拷锟杰癸拷
 				FileInfo file = FilePersistentBase.PrepareFile(Path.Combine(DataRootDirectory, "ErrorRequests.txt"));
 				File.AppendAllText(file.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
 			}
@@ -576,7 +576,7 @@ namespace Java2Dotnet.Spider.Core
 			dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);
 			if (cycleTriedTimesObject == null)
 			{
-				// 把自己加到目标Request中(无法控制主线程再加载此Request), 传到主线程后会把TargetRequest加到Pool中
+				// 锟斤拷锟皆硷拷锟接碉拷目锟斤拷Request锟斤拷(锟睫凤拷锟斤拷锟斤拷锟斤拷锟竭筹拷锟劫硷拷锟截达拷Request), 锟斤拷锟斤拷锟斤拷锟竭程猴拷锟斤拷锟斤拷TargetRequest锟接碉拷Pool锟斤拷
 				request.Priority = 0;
 				page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, 1));
 			}
@@ -586,7 +586,7 @@ namespace Java2Dotnet.Spider.Core
 				cycleTriedTimes++;
 				if (cycleTriedTimes >= site.CycleRetryTimes)
 				{
-					// 超过最大尝试次数, 返回空.
+					// 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟皆达拷锟斤拷, 锟斤拷锟截匡拷.
 					return null;
 				}
 				request.Priority = 0;
@@ -605,7 +605,7 @@ namespace Java2Dotnet.Spider.Core
 				try
 				{
 
-					// 下载页面
+					// 锟斤拷锟斤拷页锟斤拷
 					page = Downloader.Download(request, this);
 
 					if (page.IsSkip)
@@ -613,11 +613,11 @@ namespace Java2Dotnet.Spider.Core
 						return;
 					}
 
-					// 修正Page数据
+					// 锟斤拷锟斤拷Page锟斤拷锟斤拷
 					CustomizePage?.Invoke(page);
 
-					// 解析页面数据
-					// PageProcess中2种错误：1 下载的HTML有误 2是实现的IPageProcessor有误
+					// 锟斤拷锟斤拷页锟斤拷锟斤拷锟斤拷
+					// PageProcess锟斤拷2锟街达拷锟斤拷锟斤拷1 锟斤拷锟截碉拷HTML锟斤拷锟斤拷 2锟斤拷实锟街碉拷IPageProcessor锟斤拷锟斤拷
 					PageProcessor.Process(page);
 
 					break;
@@ -643,8 +643,8 @@ namespace Java2Dotnet.Spider.Core
 				return;
 			}
 
-			// for cycle retry, 这个下载出错时, 会把自身Request扔回TargetUrls中做重复任务。所以此时，targetRequests只有本身
-			// 而不需要考虑 MissTargetUrls的情况
+			// for cycle retry, 锟斤拷锟斤拷锟斤拷锟截筹拷锟斤拷时, 锟斤拷锟斤拷锟斤拷锟斤拷Request锟接伙拷TargetUrls锟斤拷锟斤拷锟截革拷锟斤拷锟斤拷锟斤拷锟斤拷锟皆达拷时锟斤拷targetRequests只锟叫憋拷锟斤拷
+			// 锟斤拷锟斤拷锟斤拷要锟斤拷锟斤拷 MissTargetUrls锟斤拷锟斤拷锟斤拷
 			if (page.IsNeedCycleRetry)
 			{
 				ExtractAndAddRequests(page, true);
@@ -663,7 +663,7 @@ namespace Java2Dotnet.Spider.Core
 				ExtractAndAddRequests(page, SpawnUrl);
 			}
 
-			// Pipeline是做最后的数据保存等工作, 是不允许出任何差错的, 如果出错,数据存一半肯定也是脏数据, 因此直接挂掉Spider比较好。
+			// Pipeline锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟捷憋拷锟斤拷锟饺癸拷锟斤拷, 锟角诧拷锟斤拷锟斤拷锟斤拷锟轿何诧拷锟斤拷锟斤拷, 锟斤拷锟斤拷锟斤拷锟斤拷,锟斤拷锟捷达拷一锟斤拷锟较讹拷也锟斤拷锟斤拷锟斤拷锟斤拷, 锟斤拷锟斤拷直锟接挂碉拷Spider锟饺较好★拷
 			if (!page.ResultItems.IsSkip)
 			{
 				foreach (IPipeline pipeline in Pipelines)
