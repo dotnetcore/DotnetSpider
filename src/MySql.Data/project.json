@@ -6,15 +6,15 @@
 
 	"dependencies": {
 		"NETStandard.Library": "1.0.0-rc3-23829",
-		"System.Security.Cryptography.Algorithms": "4.1.0-*",
-		"System.Data.Common": "4.0.1-*",
-		"System.Net.NameResolution": "4.0.0-*",
-		"System.Security.Cryptography.X509Certificates": "4.1.0-*",
-		"System.Security.Principal.Windows": "4.0.0-*",
-		"System.Diagnostics.Process": "4.1.0-*",
-		"System.ComponentModel.TypeConverter": "4.0.1-*",
-		"System.Net.Security": "4.0.0-*",
-        "System.Collections.NonGeneric": "4.0.0-*"
+		"System.Security.Cryptography.Algorithms": "4.0.0-rc3-23829",
+		"System.Data.Common": "4.0.1-rc3-23829",
+		"System.Net.NameResolution": "4.0.0-rc3-23829",
+		"System.Security.Cryptography.X509Certificates": "4.0.0-rc3-23829",
+		"System.Security.Principal.Windows": "4.0.0-rc3-23829",
+		"System.Diagnostics.Process": "4.1.0-rc3-23829",
+		"System.ComponentModel.TypeConverter": "4.0.1-rc3-23829",
+		"System.Net.Security": "4.0.0-rc3-23829",
+        "System.Collections.NonGeneric": "4.0.1-rc3-23829"
 	},
 
 	"frameworks": {

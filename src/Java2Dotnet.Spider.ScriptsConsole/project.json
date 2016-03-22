@@ -5,7 +5,7 @@
 	},
 
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc2-23811",
+		"NETStandard.Library": "1.0.0-rc3-23829",
 		"Java2Dotnet.Spider.Core": "0.0.9",
 		"Java2Dotnet.Spider.Common": "0.0.9",
 		"Java2Dotnet.Spider.Extension": "0.0.9"

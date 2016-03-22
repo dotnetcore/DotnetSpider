@@ -11,11 +11,11 @@
 	"frameworks": {
 		"dnxcore50": {
 			"dependencies": {
-				"System.Security.Cryptography.Algorithms": "4.0.0-*",
-				"System.Security.Cryptography.Primitives": "4.0.0-*",
-				"System.Threading.Thread": "4.0.0-*",
-				"System.Threading.ThreadPool": "4.0.0-*",
-				"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-*"
+				"System.Security.Cryptography.Algorithms": "4.0.0-rc3-23829",
+				"System.Security.Cryptography.Primitives": "4.0.0-rc3-23829",
+				"System.Threading.Thread": "4.0.0-rc3-23829",
+				"System.Threading.ThreadPool": "4.0.0-rc3-23829",
+				"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc3-23829"
 			},
 			"compilationOptions": {
 				"define": [ "NET_CORE" ]

@@ -15,10 +15,10 @@
 		"HtmlAgilityPack.Css": "0.0.9",
 		"MySql.Data": "0.0.9",
 		"Java2Dotnet.Spider.Redial": "0.0.9",
-		"System.Data.Common": "4.0.1-*",
+		"System.Data.Common": "4.0.1-rc3-23829",
 		"Java2Dotnet.Spider.Validation": "0.0.9",
 		"StackExchange.Redis": "0.0.9",
-		"Microsoft.CSharp": "4.0.0-*"
+		"Microsoft.CSharp": "4.0.1-rc3-23829"
 	},
 
 	"frameworks": {
