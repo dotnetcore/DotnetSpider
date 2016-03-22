@@ -110,7 +110,7 @@ private static System.Reflection.BindingFlags DefaultFlags = System.Reflection.B
             else if (memberInfo is MethodInfo)
                 return MemberTypes.Method;
             else
-                return MemberTypes.Other;
+                throw new Exception("UNSPORT HAHAHAHA");
 #endif
         }
 

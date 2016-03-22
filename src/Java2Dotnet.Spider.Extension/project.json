@@ -6,7 +6,7 @@
 	},
 
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc2-23811",
+		"NETStandard.Library": "1.0.0-rc3-23829",
 		"Java2Dotnet.Spider.Common": "0.0.9",
 		"Java2Dotnet.Spider.Core": "0.0.9",
 		"Java2Dotnet.Spider.JLog": "0.0.9",
@@ -15,7 +15,7 @@
 		"HtmlAgilityPack.Css": "0.0.9",
 		"MySql.Data": "0.0.9",
 		"Java2Dotnet.Spider.Redial": "0.0.9",
-		"System.Data.Common": "4.0.0-*",
+		"System.Data.Common": "4.0.1-*",
 		"Java2Dotnet.Spider.Validation": "0.0.9",
 		"StackExchange.Redis": "0.0.9",
 		"Microsoft.CSharp": "4.0.0-*"

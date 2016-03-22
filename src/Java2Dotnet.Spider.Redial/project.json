@@ -4,7 +4,7 @@
 		"debugType": "portable"
 	},
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc2-23811",
+		"NETStandard.Library": "1.0.0-rc3-23829",
 		"System.Threading.Thread": "4.0.0-*",
 		"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-*",
 		"Java2Dotnet.Spider.JLog": "0.0.9",
@@ -14,7 +14,7 @@
 		"System.Net.NameResolution": "4.0.0-*"
 	},
 	"frameworks": {
-		"dotnet54": {
+		"dnxcore50": {
 			"dependencies": {
 			},
 			"compilationOptions": { "define": [ "NET_CORE" ] }

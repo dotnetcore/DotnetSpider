@@ -6,13 +6,14 @@
 	},
 
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc2-23811",
+		"NETStandard.Library": "1.0.0-rc3-23829",
 		"Java2Dotnet.Spider.Common": "0.0.9",
 		"Java2Dotnet.Spider.JLog": "0.0.9",
 		"Newtonsoft.Json": "0.0.9",
 		"HtmlAgilityPack": "0.0.9",
 		"HtmlAgilityPack.Css": "0.0.9",
-		"Java2Dotnet.Spider.Redial": "0.0.9"
+		"Java2Dotnet.Spider.Redial": "0.0.9",
+        "StackExchange.Redis": "0.0.9"
 	},
 
 	"frameworks": {
@@ -21,13 +22,13 @@
 				"System.Security.Cryptography.Algorithms": "4.0.0-*",
 				"System.Security.Cryptography.Primitives": "4.0.0-*",
 				"System.Threading.Thread": "4.0.0-*",
-				"System.Dynamic.Runtime": "4.0.0-*",
-				"System.Collections.NonGeneric": "4.0.0-*",
+				"System.Dynamic.Runtime": "4.0.11-*",
+				"System.Collections.NonGeneric": "4.0.1-*",
 				"System.Threading.Tasks.Parallel": "4.0.0-*",
 				"System.Net.Http": "4.0.0-*",
-				"System.Runtime.Extensions": "4.0.0-*",
+				"System.Runtime.Extensions": "4.1.0-*",
 				"Microsoft.CSharp": "4.0.0-*",
-				"System.IO.Compression": "4.0.0",
+				"System.IO.Compression": "4.1.0-*",
 				"System.Net.Requests": "4.0.0-*"
 			},
 			"compilationOptions": {

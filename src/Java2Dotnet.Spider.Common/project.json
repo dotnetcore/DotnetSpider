@@ -6,10 +6,10 @@
 	},
 
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc2-23811"
+		"NETStandard.Library": "1.0.0-rc3-23829"
 	},
 	"frameworks": {
-		"dotnet5.5": {
+		"dnxcore50": {
 			"dependencies": {
 				"System.Security.Cryptography.Algorithms": "4.0.0-*",
 				"System.Security.Cryptography.Primitives": "4.0.0-*",

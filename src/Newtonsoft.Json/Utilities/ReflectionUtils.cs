@@ -42,7 +42,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Newtonsoft.Json.Utilities
 {
-#if (NETFX_CORE || PORTABLE || PORTABLE40 || NET_CORE)
+#if (NETFX_CORE || PORTABLE || PORTABLE40 )
     internal enum MemberTypes
     {
         Property = 0,

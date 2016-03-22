@@ -5,18 +5,17 @@
 	},
 
 	"dependencies": {
-		  "NETStandard.Library": "1.0.0-rc2-23811",
-		  "System.Text.RegularExpressions": "4.0.12-rc2-23811"
+		"NETStandard.Library": "1.0.0-rc3-23829"
 	},
 
 	"frameworks": {
-		"dotnet54": {
+		"dnxcore50": {
 			"dependencies": {
-				"System.Xml.XmlDocument": "4.0.0-rc2-23811",
-				"System.Xml.ReaderWriter": "4.0.0-*",
-				"System.Xml.XPath": "4.0.0-*",
-				"System.Xml.XPath.XDocument": "4.0.0-*",
-				"System.Diagnostics.StackTrace": "4.0.0-*"
+                "System.Xml.XmlDocument": "4.0.1-*",
+				"System.Xml.ReaderWriter": "4.0.11-*",
+				"System.Xml.XPath": "4.0.1-*",
+				"System.Xml.XPath.XDocument": "4.0.1-*",
+				"System.Diagnostics.StackTrace": "4.0.1-*"
 			}
 		}
 	}

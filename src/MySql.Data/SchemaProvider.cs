@@ -27,7 +27,6 @@ using System.Reflection;
 using System.Text;
 using MySql.Data.Common;
 using MySql.Data.Types;
-using System.Collections.Specialized;
 using System.Collections;
 using System.Text.RegularExpressions;
 

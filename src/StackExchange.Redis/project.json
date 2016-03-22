@@ -15,7 +15,7 @@
 				"define": [ "PLAT_SAFE_CONTINUATIONS", "CORE_CLR" ]
 			},
 			"dependencies": {
-				"NETStandard.Library": "1.0.0-rc2-23811",
+				"NETStandard.Library": "1.0.0-rc3-23829",
 				"System.IO.Compression": "4.0.0-*",
 				"System.Security.Cryptography.Algorithms": "4.0.0-*",
 				"System.Security.Cryptography.X509Certificates": "4.0.0-*",

@@ -29,7 +29,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				{
 					Source = GeneralDbPrepareStartUrls.DataSource.MySql,
 					TableName = "jd.category",
-					ConnectString = "Database='jd';Data Source= 127.0.0.1;User ID=root;Password=;Port=3306",
+					ConnectString = "Database='jd';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306",
 					Columns = new List<GeneralDbPrepareStartUrls.Column>() { new GeneralDbPrepareStartUrls.Column()
 					{
 						Name = "url",
@@ -48,14 +48,14 @@ namespace Java2Dotnet.Spider.Test.Example
 				//}.ToJObject(),
 				Pipeline = new MysqlPipeline()
 				{
-					ConnectString = "Database='jd';Data Source= 127.0.0.1;User ID=root;Password=;Port=3306"
+					ConnectString = "Database='jd';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
 				}.ToJObject()
 			};
 		}
 
 		public override HashSet<Type> EntiTypes => new HashSet<Type>() { typeof(Product) };
 
-		[Schema("test", "sku", TableSuffix.Monday)]
+		[Schema("test", "sku", TableSuffix.Today)]
 		[TargetUrl(new[] { @"page=[0-9]+" }, "//*[@id=\"J_bottomPage\"]")]
 		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
 		[Indexes(Index = new[] { "category" }, Primary = "id", Unique = new[] { "category,sku", "sku" }, AutoIncrement = "id")]
