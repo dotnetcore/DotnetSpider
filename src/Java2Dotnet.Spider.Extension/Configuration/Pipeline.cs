@@ -1,4 +1,5 @@
-﻿using Java2Dotnet.Spider.Core;
+﻿using System;
+using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Pipeline;
 using Newtonsoft.Json.Linq;
@@ -7,6 +8,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public abstract class Pipeline : IJobject
 	{
+		[Flags]
 		public enum Types
 		{
 			MongoDb,

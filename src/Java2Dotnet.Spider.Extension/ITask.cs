@@ -8,31 +8,31 @@ using Java2Dotnet.Spider.Extension.Model;
 using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Java2Dotnet.Spider.Extension.ORM;
-using Java2Dotnet.Spider.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Extension
 {
-	public abstract class BaseTask : ITask
+	public abstract class SpiderContextBuilder : ISpiderContext
 	{
 		private SpiderContext _context;
 
 		protected abstract SpiderContext CreateSpiderContext();
 
-		public abstract HashSet<Type> EntiTypes { get; }
+		protected abstract HashSet<Type> EntiTypes { get; }
 
-		public SpiderContext Context => _context ?? (_context = CreateSpiderContext());
-
-		public void Run(params string[] args)
+		public SpiderContext GetContext()
 		{
+			_context = CreateSpiderContext();
+			if (_context == null)
+			{
+				throw new SpiderExceptoin("SpiderContext is null.");
+			}
 			Build();
-
-			ScriptSpider spider = new ScriptSpider(Context);
-			spider.Run(args);
+			return _context;
 		}
 
-		public void Build()
+		protected void Build()
 		{
 			foreach (var entiType in EntiTypes)
 			{
@@ -53,16 +53,14 @@ namespace Java2Dotnet.Spider.Extension
 #else
 				JObject entity = JsonConvert.DeserializeObject(ConvertToJson(entiType.GetTypeInfo())) as JObject;
 #endif
-				Context.Entities.Add(entity);
+				_context.Entities.Add(entity);
 			}
 
-			foreach (var url in Context.StartUrls)
+			foreach (var url in _context.StartUrls)
 			{
-				Context.Site.AddStartUrl(url);
+				_context.Site.AddStartUrl(url.Key, url.Value);
 			}
-
 		}
-
 
 #if !NET_CORE
 		public static string ConvertToJson(Type entityType)
@@ -186,33 +184,30 @@ namespace Java2Dotnet.Spider.Extension
 
 			switch (storedAs.Type)
 			{
-				case StoredAs.ValueType.Bool:
+				case DataType.Bool:
 					{
 						reslut = "bool";
 						break;
 					}
-				case StoredAs.ValueType.Date:
+				case DataType.Date:
 					{
 						reslut = "date";
 						break;
 					}
-				case StoredAs.ValueType.Time:
+				case DataType.Time:
 					{
-						reslut = "timestamp(11)";
+						reslut = "time";
 						break;
 					}
-				case StoredAs.ValueType.Text:
+				case DataType.Text:
 					{
 						reslut = "text";
 						break;
 					}
-				case StoredAs.ValueType.Double:
-				case StoredAs.ValueType.Float:
-				case StoredAs.ValueType.Int:
-				case StoredAs.ValueType.String:
-				case StoredAs.ValueType.BigInt:
+
+				case DataType.String:
 					{
-						reslut = $"{storedAs.Type}({storedAs.Lenth})";
+						reslut = $"{storedAs.Type.ToString().ToLower()}({storedAs.Lenth})";
 						break;
 					}
 			}
@@ -246,8 +241,8 @@ namespace Java2Dotnet.Spider.Extension
 		public List<Formatter> Formatters { get; set; } = new List<Formatter>();
 	}
 
-	public interface ITask
+	public interface ISpiderContext
 	{
-		SpiderContext Context { get; }
+		SpiderContext GetContext();
 	}
 }

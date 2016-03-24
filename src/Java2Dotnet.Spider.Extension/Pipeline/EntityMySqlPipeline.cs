@@ -41,9 +41,9 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		protected override string GetCreateTableSql()
 		{
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS  `{Schema.Database }`.`{Schema.TableName}`  (");
-			string columNames = string.Join(", ", Columns.Select(p => $"`{p.Name}` {ConvertToDbType(p.DataType.ToLower())} {GetAutoIncrementString(p.Name)}"));
+			string columNames = string.Join(", ", Columns.Select(p => $"`{p.Name}` {ConvertToDbType(p.DataType.ToLower())} "));
 			builder.Append(columNames.Substring(0, columNames.Length));
-
+			builder.Append(Primary == null || Primary.Count == 0 ? ",`__id` bigint AUTO_INCREMENT" : "");
 			foreach (var index in Indexs)
 			{
 				string name = string.Join("_", index.Select(c => c));
@@ -58,13 +58,12 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames.Substring(0, uniqueColumNames.Length)})");
 			}
 
-
-			string primaryColumNames = string.Join(", ", Primary.Select(c => $"`{c}`"));
+			string primaryColumNames = Primary == null || Primary.Count == 0 ? "`__id` " : string.Join(", ", Primary.Select(c => $"`{c}`"));
 			builder.Append($", PRIMARY KEY ({primaryColumNames.Substring(0, primaryColumNames.Length)})");
 
 			builder.Append(") ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
-            string sql=builder.ToString();
-            Logger.Info(sql);
+			string sql = builder.ToString();
+			Logger.Info(sql);
 			return sql;
 		}
 
@@ -93,37 +92,19 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				return length == 0 ? "varchar(100)" : $"varchar({length})";
 			}
 
-			if (RegexUtil.IntTypeRegex.IsMatch(datatype))
+			if ("date" == datatype)
 			{
-				return length == 0 ? "int(11)" : $"int({length})";
+				return "date ";
 			}
 
-			if (RegexUtil.BigIntTypeRegex.IsMatch(datatype))
+			if ("bool" == datatype)
 			{
-				return length == 0 ? "bigint(11)" : $"bigint({length})";
+				return "tinyint(1) ";
 			}
 
-			if (RegexUtil.FloatTypeRegex.IsMatch(datatype))
+			if ("time" == datatype)
 			{
-				return length == 0 ? "float(11)" : $"float({length})";
-			}
-
-			if (RegexUtil.DateTypeRegex.IsMatch(datatype))
-			{
-				return length == 0 ? "date " : $"date({length})";
-			}
-
-			if (RegexUtil.TimeStampTypeRegex.IsMatch(datatype))
-			{
-				length = length > 6 ? 6 : length;
-				//return length == 0 ? "timestamp " : $"timestamp({length})";
-                // mysql5.5 not support set length                
-                return "timestamp";
-			}
-
-			if (RegexUtil.DoubleTypeRegex.IsMatch(datatype))
-			{
-				return length == 0 ? "double(11)" : $"double({length})";
+				return "timestamp";
 			}
 
 			if ("text" == datatype)

@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Test.Example
 {
-	public class JdSkuSampleSpider : BaseTask
+	public class JdSkuSampleSpider : SpiderContextBuilder
 	{
 		protected override SpiderContext CreateSpiderContext()
 		{
@@ -53,13 +53,13 @@ namespace Java2Dotnet.Spider.Test.Example
 			};
 		}
 
-		public override HashSet<Type> EntiTypes => new HashSet<Type>() { typeof(Product) };
+		protected override HashSet<Type> EntiTypes => new HashSet<Type>() { typeof(Product) };
 
 		[Schema("test", "sku", TableSuffix.Today)]
 		[TargetUrl(new[] { @"page=[0-9]+" }, "//*[@id=\"J_bottomPage\"]")]
 		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
 		[Indexes(Index = new[] { "category" }, Primary = "id", Unique = new[] { "category,sku", "sku" }, AutoIncrement = "id")]
-		public class Product : BaseEntity
+		public class Product : ISpiderEntity
 		{
 			public Product()
 			{
@@ -67,48 +67,48 @@ namespace Java2Dotnet.Spider.Test.Example
 				RunId = new DateTime(dt.Year, dt.Month, 1);
 			}
 
-			[StoredAs("category", StoredAs.ValueType.String, 20)]
+			[StoredAs("category", DataType.String, 20)]
 			[PropertyExtractBy(Expression = "name", Type = ExtractType.Enviroment)]
 			public string CategoryName { get; set; }
 
-			[StoredAs("cat3", StoredAs.ValueType.String, 20)]
+			[StoredAs("cat3", DataType.String, 20)]
 			[PropertyExtractBy(Expression = "cat3", Type = ExtractType.Enviroment)]
 			public int CategoryId { get; set; }
 
-			[StoredAs("url", StoredAs.ValueType.Text)]
+			[StoredAs("url", DataType.Text)]
 			[PropertyExtractBy(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[StoredAs("sku", StoredAs.ValueType.String, 25)]
+			[StoredAs("sku", DataType.String, 25)]
 			[PropertyExtractBy(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 
-			[StoredAs("commentscount", StoredAs.ValueType.BigInt)]
+			[StoredAs("commentscount", DataType.String, 32)]
 			[PropertyExtractBy(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
-			[StoredAs("shopname", StoredAs.ValueType.String, 100)]
+			[StoredAs("shopname", DataType.String, 100)]
 			[PropertyExtractBy(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
-			[StoredAs("name", StoredAs.ValueType.String, 50)]
+			[StoredAs("name", DataType.String, 50)]
 			[PropertyExtractBy(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
 
-			[StoredAs("venderid", StoredAs.ValueType.String, 25)]
+			[StoredAs("venderid", DataType.String, 25)]
 			[PropertyExtractBy(Expression = "./@venderid")]
 			public string VenderId { get; set; }
 
-			[StoredAs("jdzy_shop_id", StoredAs.ValueType.String, 25)]
+			[StoredAs("jdzy_shop_id", DataType.String, 25)]
 			[PropertyExtractBy(Expression = "./@jdzy_shop_id")]
 			public string JdzyShopId { get; set; }
 
-			[StoredAs("run_id", StoredAs.ValueType.Date)]
+			[StoredAs("run_id", DataType.Date)]
 			[PropertyExtractBy(Expression = "Monday", Type = ExtractType.Enviroment)]
 			public DateTime RunId { get; }
 
 			[PropertyExtractBy(Expression = "Now", Type = ExtractType.Enviroment)]
-			[StoredAs("cdate", StoredAs.ValueType.Time)]
+			[StoredAs("cdate", DataType.Time)]
 			public DateTime CDate { get; set; }
 		}
 	}

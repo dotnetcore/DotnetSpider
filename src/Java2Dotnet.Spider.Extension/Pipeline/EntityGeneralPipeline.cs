@@ -70,7 +70,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			ConnectString = connectString;
 
 			Schema = GenerateSchema(schema);
-			Columns = entityDefine.SelectTokens("$.Fields[*]").Select(j => j.ToObject<Column>()).ToList();
+			Columns = entityDefine.SelectTokens("$.Fields[*]").Select(j => j.ToObject<Column>()).Where(c => !string.IsNullOrEmpty(c.DataType)).ToList();
 
 			Primary = entityDefine.SelectToken("$.Primary").ToObject<List<string>>();
 			AutoIncrement = entityDefine.SelectToken("$.AutoIncrement")?.ToString();
@@ -221,47 +221,28 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		//	property.SetSetMethod(setAccessor);
 		//}
 
-		private DbType Convert(string  type)
+		private DbType Convert(string type)
 		{
-			string datatype = type?.ToLower();
-			if (RegexUtil.StringTypeRegex.IsMatch(datatype))
+			if (string.IsNullOrEmpty(type))
+			{
+				throw new SpiderExceptoin("TYPE can not be null");
+			}
+
+			string datatype = type.ToLower();
+			if (RegexUtil.StringTypeRegex.IsMatch(datatype) || "text" == datatype)
 			{
 				return DbType.String;
 			}
-
-			if (RegexUtil.IntTypeRegex.IsMatch(datatype))
+			if ("bool" == datatype)
 			{
-				return DbType.Int32;
+				return DbType.Boolean;
 			}
 
-			if (RegexUtil.BigIntTypeRegex.IsMatch(datatype))
-			{
-				return DbType.Int64;
-			}
-
-			if (RegexUtil.FloatTypeRegex.IsMatch(datatype))
-			{
-				return DbType.Double;
-			}
-
-			if (RegexUtil.DoubleTypeRegex.IsMatch(datatype))
-			{
-				return DbType.Double;
-			}
-			if (RegexUtil.DateTypeRegex.IsMatch(datatype) || RegexUtil.TimeStampTypeRegex.IsMatch(datatype))
+			if ("date" == datatype || "time" == datatype)
 			{
 				return DbType.DateTime;
 			}
 
-			if (RegexUtil.TimeStampTypeRegex.IsMatch(datatype) || RegexUtil.DateTypeRegex.IsMatch(datatype))
-			{
-				return DbType.DateTime;
-			}
-
-			if ("text" == datatype)
-			{
-				return DbType.String;
-			}
 
 			throw new SpiderExceptoin("Unsport datatype: " + datatype);
 		}

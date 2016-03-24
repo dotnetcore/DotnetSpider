@@ -27,7 +27,7 @@ using Java2Dotnet.Spider.JLog;
 #endif
 
 using Newtonsoft.Json.Linq;
- 
+
 namespace Java2Dotnet.Spider.Extension
 {
 	public class ScriptSpider
@@ -257,7 +257,14 @@ namespace Java2Dotnet.Spider.Extension
 						finally
 						{
 							Console.WriteLine("Release locker.");
-							db.LockRelease(key, 0);
+							try
+							{
+								db.LockRelease(key, 0);
+							}
+							catch
+							{
+								// ignored
+							}
 						}
 					}
 			}
@@ -267,6 +274,10 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void PrepareSite()
 		{
+			if (_spiderContext.PrepareStartUrls == null)
+			{
+				return;
+			}
 			var type = _spiderContext.PrepareStartUrls.SelectToken("$.Type").ToObject<PrepareStartUrls.Types>();
 			PrepareStartUrls prepareStartUrls = null;
 			switch (type)

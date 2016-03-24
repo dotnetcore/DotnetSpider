@@ -7,13 +7,6 @@ namespace Java2Dotnet.Spider.Extension.Model
 	{
 	}
 
-	[Indexes(AutoIncrement = "id", Primary = "id")]
-	public class BaseEntity: ISpiderEntity
-	{
-		[StoredAs("id", StoredAs.ValueType.BigInt)]
-		public long Id { get; set; }
-	}
-
 	//public static class SpiderEntityExtensions
 	//{
 	//	public static Dictionary<string, object> ToDictionary(this ISpiderEntity entity)

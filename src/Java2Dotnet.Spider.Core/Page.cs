@@ -46,6 +46,8 @@ namespace Java2Dotnet.Spider.Core
 
 		public int StatusCode { get; set; }
 
+		public string Padding { get; set; }
+
 		public string Content
 		{
 			get { return _content; }
@@ -92,7 +94,7 @@ namespace Java2Dotnet.Spider.Core
 		/// Get html content of page
 		/// </summary>
 		/// <returns></returns>
-		public Selectable Selectable => _selectable ?? (_selectable = new Selectable(Content, Request.Url.ToString(), ContentType));
+		public Selectable Selectable => _selectable ?? (_selectable = new Selectable(Content, ContentType == ContentType.Json ? Padding : Request.Url.ToString(), ContentType));
 
 		/// <summary>
 		/// Add urls to fetch
@@ -167,7 +169,7 @@ namespace Java2Dotnet.Spider.Core
 
 		public override string ToString()
 		{
-			return $"Page{{request='{Request}', resultItems='{ResultItems}', content='{Content}', url={Url}, statusCode={StatusCode}, targetRequests={TargetRequests}}}";
+			return $"Page{{request='{Request}',padding='{Padding}' resultItems='{ResultItems}', content='{Content}', url={Url}, statusCode={StatusCode}, targetRequests={TargetRequests}}}";
 		}
 	}
 }

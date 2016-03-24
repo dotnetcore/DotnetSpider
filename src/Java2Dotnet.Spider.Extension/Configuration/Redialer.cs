@@ -1,9 +1,11 @@
-﻿using Java2Dotnet.Spider.Redial.Redialer;
+﻿using System;
+using Java2Dotnet.Spider.Redial.Redialer;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public abstract class Redialer : IJobject
 	{
+		[Flags]
 		public enum Types
 		{
 			Adsl,

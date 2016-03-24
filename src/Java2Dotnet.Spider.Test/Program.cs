@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using Java2Dotnet.Spider.Extension;
 using Java2Dotnet.Spider.Test.Example;
 using Java2Dotnet.Spider.Test.Pipeline;
 
@@ -12,8 +13,9 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			JdSkuSampleSpider spider=new JdSkuSampleSpider();
-			spider.Run();
+			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			ScriptSpider spider = new ScriptSpider(spiderBuilder.GetContext());
+			spider.Run(args);
 			//Run(() =>
 			//{
 			//	FilePipelineTest test1 = new FilePipelineTest();

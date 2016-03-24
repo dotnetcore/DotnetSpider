@@ -11,6 +11,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public abstract class Loginer : IJobject
 	{
+		[Flags]
 		public enum Types
 		{
 			Common

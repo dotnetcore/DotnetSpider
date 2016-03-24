@@ -1,47 +1,50 @@
-﻿//using System.Collections.Generic;
-//using Java2Dotnet.Spider.Core;
-//using Java2Dotnet.Spider.Extension.ORM;
-//using MongoDB.Bson;
-//using MongoDB.Driver;
-//using Newtonsoft.Json.Linq;
+﻿#if NET_45
 
-//namespace Java2Dotnet.Spider.Extension.Pipeline
-//{
-//	public class EntityMongoDbPipeline : IEntityPipeline
-//	{
-//		private readonly IMongoCollection<BsonDocument> _collection;
+using System.Collections.Generic;
+using Java2Dotnet.Spider.Core;
+using Java2Dotnet.Spider.Extension.ORM;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 
-//		public EntityMongoDbPipeline(Schema schema, string host, int port, string password)
-//		{
-//			MongoClient client = new MongoClient(host);
-//			var db = client.GetDatabase(schema.Database);
+namespace Java2Dotnet.Spider.Extension.Pipeline
+{
+	public class EntityMongoDbPipeline : IEntityPipeline
+	{
+		private readonly IMongoCollection<BsonDocument> _collection;
 
-//			_collection = db.GetCollection<BsonDocument>(schema.TableName);
-//		}
+		public EntityMongoDbPipeline(Schema schema, string host, int port, string password)
+		{
+			MongoClient client = new MongoClient(host);
+			var db = client.GetDatabase(schema.Database);
 
-//		public void Initialize()
-//		{
-//		}
+			_collection = db.GetCollection<BsonDocument>(schema.TableName);
+		}
 
-//		public void Process(List<JObject> datas, ISpider spider)
-//		{
-//			List<BsonDocument> reslut = new List<BsonDocument>();
-//			foreach (var data in datas)
-//			{
-//				BsonDocument item = BsonDocument.Parse(data.ToString());
+		public void Initialize()
+		{
+		}
 
-//				reslut.Add(item);
-//			}
-//			_collection.InsertMany(reslut);
-//		}
+		public void Process(List<JObject> datas, ISpider spider)
+		{
+			List<BsonDocument> reslut = new List<BsonDocument>();
+			foreach (var data in datas)
+			{
+				BsonDocument item = BsonDocument.Parse(data.ToString());
 
-//		public class Person
-//		{
-//			public string Name { get; set; }
-//		}
+				reslut.Add(item);
+			}
+			_collection.InsertMany(reslut);
+		}
 
-//		public void Dispose()
-//		{
-//		}
-//	}
-//}
+		public class Person
+		{
+			public string Name { get; set; }
+		}
+
+		public void Dispose()
+		{
+		}
+	}
+}
+#endif

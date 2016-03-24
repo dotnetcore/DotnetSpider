@@ -11,14 +11,14 @@ namespace Java2Dotnet.Spider.Test
 	[TestClass]
 	public class SpiderEntityTest
 	{
-		public class Entity1 : BaseEntity
+		public class Entity1 : ISpiderEntity
 		{
 		}
 
 		[Indexes(Index = new[] { "name" }, Primary = "name")]
-		public class Entity2 : BaseEntity
+		public class Entity2 : ISpiderEntity
 		{
-			[StoredAs("name", StoredAs.ValueType.String)]
+			[StoredAs("name", DataType.String, 10)]
 			public string Name { get; set; }
 		}
 

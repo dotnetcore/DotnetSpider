@@ -1,4 +1,5 @@
-﻿using Java2Dotnet.Spider.Core.Scheduler;
+﻿using System;
+using Java2Dotnet.Spider.Core.Scheduler;
 #if NET_CORE
 using Java2Dotnet.Spider.JLog;
 #endif
@@ -10,7 +11,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 #if NET_CORE
 		protected static ILog Logger = LogManager.GetLogger();
 #endif
-
+		[Flags]
 		public enum Types
 		{
 			Queue,

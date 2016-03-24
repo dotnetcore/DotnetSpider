@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public abstract class PrepareStartUrls : IJobject
 	{
+		[Flags]
 		public enum Types
 		{
 			GeneralDb,

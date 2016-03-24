@@ -5,6 +5,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public abstract class CustomizePage : IJobject
 	{
+		[Flags]
 		public enum Types
 		{
 			Sub

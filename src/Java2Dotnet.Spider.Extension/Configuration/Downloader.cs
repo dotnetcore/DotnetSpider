@@ -1,4 +1,5 @@
-﻿using Java2Dotnet.Spider.Extension.Downloader.WebDriver;
+﻿using System;
+using Java2Dotnet.Spider.Extension.Downloader.WebDriver;
 using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
@@ -9,6 +10,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	/// </summary>
 	public abstract class Downloader : IJobject
 	{
+		[Flags]
 		public enum Types
 		{
 			WebDriverDownloader,

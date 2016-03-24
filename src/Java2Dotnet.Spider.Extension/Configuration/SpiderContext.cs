@@ -18,7 +18,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public NetworkValidater NetworkValidater { get; set; }
 		public JObject Redialer { get; set; }
 		public JObject PrepareStartUrls { get; set; }
-		public List<string> StartUrls { get; set; } = new List<string>();
+		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
 		public JObject Pipeline { get; set; }
 		public List<JObject> Entities { get; set; } = new List<JObject>();
 		public string Corporation { get; set; }
