@@ -33,13 +33,13 @@ namespace Java2Dotnet.Spider.Test.Example
 					Columns = new List<GeneralDbPrepareStartUrls.Column>() { new GeneralDbPrepareStartUrls.Column()
 					{
 						Name = "url",
-						Formatters = new List<JObject>() { new ReplaceFormatter() { OldValue = ".html", NewValue = "" } .ToJObject()}
+						Formatters = new List<Formatter>  { new ReplaceFormatter() { OldValue = ".html", NewValue = "" } }
 					} },
 					Limit = 1000,
 					FormateString = "{0}&page=1&JL=6_0_0",
 
-				}.ToJObject(),
-				Scheduler = new QueueScheduler().ToJObject(),
+				},
+				Scheduler = new QueueScheduler(),
 				//Scheduler = new RedisScheduler()
 				//{
 				//	Host = "127.0.0.1",
@@ -49,7 +49,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				Pipeline = new MysqlPipeline()
 				{
 					ConnectString = "Database='jd';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
-				}.ToJObject()
+				}
 			};
 		}
 

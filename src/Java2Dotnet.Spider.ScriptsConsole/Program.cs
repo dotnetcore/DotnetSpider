@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Java2Dotnet.Spider.Extension;
 using Java2Dotnet.Spider.Extension.Configuration;
+using Java2Dotnet.Spider.Extension.Configuration.Json;
 using Newtonsoft.Json;
 
 namespace Java2Dotnet.Spider.ScriptsConsole
@@ -18,13 +19,13 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			//{
 			//	StartSpider(param);
 			//}
-			string json = File.ReadAllText("mysqlsample.json");
+			string json = File.ReadAllText("sample.json");
 			json = Macros.Replace(json);
-			SpiderContext spiderContext = JsonConvert.DeserializeObject<SpiderContext>(json);
+			JsonSpiderContext spiderContext = JsonConvert.DeserializeObject<JsonSpiderContext>(json);
 			List<string> errorMessages;
 			if (SpiderContextValidation.Validate(spiderContext, out errorMessages))
 			{
-				ScriptSpider spider = new ScriptSpider(spiderContext);
+				ScriptSpider spider = new ScriptSpider(spiderContext.ToRuntimeContext());
 				spider.Run(args);
 			}
 			else

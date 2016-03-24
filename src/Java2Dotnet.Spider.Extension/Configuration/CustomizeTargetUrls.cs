@@ -6,7 +6,7 @@ using Java2Dotnet.Spider.Extension.Utils;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
-	public abstract class CustomizeTargetUrls : IJobject
+	public abstract class CustomizeTargetUrls
 	{
 		[Flags]
 		public enum Types

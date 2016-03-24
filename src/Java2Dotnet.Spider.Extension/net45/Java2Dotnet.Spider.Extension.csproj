@@ -97,8 +97,8 @@
     <Compile Include="..\Configuration\DownloadValidation.cs">
       <Link>Configuration\DownloadValidation.cs</Link>
     </Compile>
-    <Compile Include="..\Configuration\IJObject.cs">
-      <Link>Configuration\IJObject.cs</Link>
+    <Compile Include="..\Configuration\Json\JsonSpiderContext.cs">
+      <Link>Configuration\Json\JsonSpiderContext.cs</Link>
     </Compile>
     <Compile Include="..\Configuration\Login.cs">
       <Link>Configuration\Login.cs</Link>

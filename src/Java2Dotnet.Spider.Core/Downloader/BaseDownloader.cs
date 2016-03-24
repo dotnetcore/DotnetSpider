@@ -44,17 +44,17 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				{
 					case DownloadValidationResult.Failed:
 						{
-							throw new SpiderExceptoin("Customize validate failed.");
+							throw new RedialException("Customize validate failed.");
 						}
 					case DownloadValidationResult.FailedAndNeedRedial:
 						{
 							if (RedialManagerUtils.RedialManager == null)
 							{
-								throw new SpiderExceptoin("RedialManager is null.");
+								throw new RedialException("RedialManager is null.");
 							}
 
 							RedialManagerUtils.RedialManager?.Redial();
-							throw new SpiderExceptoin("Download failed and Redial already.");
+							throw new RedialException("Download failed and Redial already.");
 						}
 					case DownloadValidationResult.Success:
 						{
@@ -66,7 +66,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 							{
 								CustomizeCookie?.Invoke();
 							});
-							throw new SpiderExceptoin("Cookie validate failed.");
+							throw new RedialException("Cookie validate failed.");
 						}
 					case DownloadValidationResult.Miss:
 						{

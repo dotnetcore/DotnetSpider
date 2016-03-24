@@ -6,7 +6,7 @@ using Java2Dotnet.Spider.JLog;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
-	public abstract class Scheduler : IJobject
+	public abstract class Scheduler
 	{
 #if NET_CORE
 		protected static ILog Logger = LogManager.GetLogger();

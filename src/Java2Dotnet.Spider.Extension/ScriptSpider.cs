@@ -71,7 +71,7 @@ namespace Java2Dotnet.Spider.Extension
 				RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
 #endif
 				RedialManagerUtils.RedialManager.NetworkValidater = GetNetworValidater(_spiderContext.NetworkValidater);
-				RedialManagerUtils.RedialManager.Redialer = GetRedialer(_spiderContext.Redialer);
+				RedialManagerUtils.RedialManager.Redialer = _spiderContext.Redialer.GetRedialer();
 			}
 		}
 
@@ -172,23 +172,22 @@ namespace Java2Dotnet.Spider.Extension
 
 		private Core.Spider PrepareSpider(params string[] args)
 		{
-			var schedulerType = _spiderContext.Scheduler.SelectToken("$.Type").ToObject<Configuration.Scheduler.Types>();
+			var schedulerType = _spiderContext.Scheduler.Type;
 
 			switch (schedulerType)
 			{
 				case Configuration.Scheduler.Types.Queue:
 					{
-						var schedulerConfig = _spiderContext.Scheduler.ToObject<QueueScheduler>();
 						PrepareSite();
-						var spider = GenerateSpider(schedulerConfig.GetScheduler());
+						var spider = GenerateSpider(_spiderContext.Scheduler.GetScheduler());
 						spider.InitComponent();
 						return spider;
 
 					}
 				case Configuration.Scheduler.Types.Redis:
 					{
-						var schedulerConfig = _spiderContext.Scheduler.ToObject<RedisScheduler>();
-						var scheduler = (Scheduler.RedisScheduler)schedulerConfig.GetScheduler();
+
+						var scheduler = (Scheduler.RedisScheduler)(_spiderContext.Scheduler.GetScheduler());
 
 						IDatabase db = scheduler.Redis.GetDatabase(0);
 						string key = "locker-" + Name;
@@ -274,28 +273,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void PrepareSite()
 		{
-			if (_spiderContext.PrepareStartUrls == null)
-			{
-				return;
-			}
-			var type = _spiderContext.PrepareStartUrls.SelectToken("$.Type").ToObject<PrepareStartUrls.Types>();
-			PrepareStartUrls prepareStartUrls = null;
-			switch (type)
-			{
-				case PrepareStartUrls.Types.GeneralDb:
-					{
-						var tmp = _spiderContext.PrepareStartUrls.ToObject<GeneralDbPrepareStartUrls>();
-						prepareStartUrls = tmp;
-						break;
-					}
-				case PrepareStartUrls.Types.Cycle:
-					{
-						prepareStartUrls = _spiderContext.PrepareStartUrls.ToObject<CyclePrepareStartUrls>();
-						break;
-					}
-			}
-
-			prepareStartUrls?.Build(_spiderContext.Site);
+			_spiderContext.PrepareStartUrls?.Build(_spiderContext.Site);
 		}
 
 		private Core.Spider GenerateSpider(IScheduler scheduler)
@@ -312,29 +290,26 @@ namespace Java2Dotnet.Spider.Extension
 			foreach (var entity in _spiderContext.Entities)
 			{
 				string entiyName = entity.SelectToken("$.Identity")?.ToString();
-				var pipelineType = _spiderContext.Pipeline.SelectToken("$.Type").ToObject<Configuration.Pipeline.Types>();
+
 				var schema = entity.SelectToken("$.Schema")?.ToObject<Schema>();
 
-				switch (pipelineType)
+				switch (_spiderContext.Pipeline.Type)
 				{
 					case Configuration.Pipeline.Types.MongoDb:
 						{
-							var mongoDbPipelineConfig = _spiderContext.Pipeline.ToObject<MongoDbPipeline>();
-							spider.AddPipeline(new EntityPipeline(entiyName, mongoDbPipelineConfig.GetPipeline(schema, entity)));
+
+							spider.AddPipeline(new EntityPipeline(entiyName, _spiderContext.Pipeline.GetPipeline(schema, entity)));
 
 							break;
 						}
 					case Configuration.Pipeline.Types.MySql:
 						{
-							var mysqlPipelineConfig = _spiderContext.Pipeline.ToObject<MysqlPipeline>();
-							spider.AddPipeline(new EntityPipeline(entiyName, mysqlPipelineConfig.GetPipeline(schema, entity)));
+							spider.AddPipeline(new EntityPipeline(entiyName, _spiderContext.Pipeline.GetPipeline(schema, entity)));
 							break;
 						}
 					case Configuration.Pipeline.Types.MySqlFile:
 						{
-							var mysqlFilePipelineConfig = _spiderContext.Pipeline.ToObject<MysqlFilePipeline>();
-
-							spider.AddPipeline(new EntityPipeline(entiyName, mysqlFilePipelineConfig.GetPipeline(schema, entity)));
+							spider.AddPipeline(new EntityPipeline(entiyName, _spiderContext.Pipeline.GetPipeline(schema, entity)));
 							break;
 						}
 				}
@@ -343,136 +318,23 @@ namespace Java2Dotnet.Spider.Extension
 			spider.SetEmptySleepTime(_spiderContext.EmptySleepTime);
 			spider.SetThreadNum(_spiderContext.ThreadNum);
 			spider.Deep = _spiderContext.Deep;
-			spider.SetDownloader(GenerateDownloader());
+			spider.SetDownloader(_spiderContext.Downloader.GetDownloader());
 
 			if (_spiderContext.CustomizePage != null)
 			{
-				var customizePageType = _spiderContext.CustomizePage.SelectToken("$.Type").ToObject<CustomizePage.Types>();
-				switch (customizePageType)
-				{
-					case CustomizePage.Types.Sub:
-						{
-							var customizePage = _spiderContext.CustomizePage.ToObject<SubCustomizePage>();
-							spider.CustomizePage = customizePage.Customize;
-							break;
-						}
-				}
+				spider.CustomizePage = _spiderContext.CustomizePage.Customize;
 			}
 
 			if (_spiderContext.CustomizeTargetUrls != null)
 			{
-				var customizeTargetUrlsType = _spiderContext.CustomizeTargetUrls.SelectToken("$.Type").ToObject<CustomizeTargetUrls.Types>();
-				switch (customizeTargetUrlsType)
-				{
-					case CustomizeTargetUrls.Types.IncreasePageNumber:
-						{
-							var customizeTargetUrls = _spiderContext.CustomizeTargetUrls.ToObject<IncreasePageNumberCustomizeTargetUrls>();
-							spider.SetCustomizeTargetUrls(customizeTargetUrls.Customize);
-							break;
-						}
-				}
+				spider.SetCustomizeTargetUrls(_spiderContext.CustomizeTargetUrls.Customize);
 			}
 
 			return spider;
 		}
 
-		private IDownloader GenerateDownloader()
-		{
-			IDownloader downloader = new HttpClientDownloader();
-
-			if (_spiderContext.Downloader != null)
-			{
-				var downloaderType = _spiderContext.Downloader.SelectToken("$.Type").ToObject<Configuration.Downloader.Types>();
-				switch (downloaderType)
-				{
-					case Configuration.Downloader.Types.WebDriverDownloader:
-						{
-#if !NET_CORE
-							var webDriverDownloaderConfig = _spiderContext.Downloader.ToObject<Configuration.WebDriverDownloader>();
-							Browser browser;
-							if (Enum.TryParse(webDriverDownloaderConfig.Browser.ToString(), out browser))
-							{
-								var webDriverDownloader = new Downloader.WebDriver.WebDriverDownloader(browser);
-
-								var loginerType = webDriverDownloaderConfig.Login.SelectToken("$.Type")?.ToObject<Loginer.Types>();
-
-								switch (loginerType)
-								{
-									case Loginer.Types.Common:
-										{
-											var login = webDriverDownloaderConfig.Login.ToObject<CommonLoginer>();
-											webDriverDownloader.Login = login.Login;
-											break;
-										}
-								}
-
-								downloader = webDriverDownloader;
-							}
-
-#else
-							throw new SpiderExceptoin("UNSPORT WEBDRIVER DOWNLOADER.");
-#endif
-							break;
-						}
-					case Configuration.Downloader.Types.HttpClientDownloader:
-						{
-							downloader = new HttpClientDownloader();
-							break;
-						}
-					case Configuration.Downloader.Types.FileDownloader:
-						{
-							downloader = new FileDownloader();
-							break;
-						}
-				}
-
-				var downloadValidationType = _spiderContext.Downloader.SelectToken("$.DownloadValidation.Type")?.ToObject<Configuration.DownloadValidation.Types>();
-
-				if (downloadValidationType != null)
-				{
-					switch (downloadValidationType)
-					{
-						case Configuration.DownloadValidation.Types.Contains:
-							{
-								var validation = _spiderContext.Downloader.SelectToken("$.DownloadValidation").ToObject<ContainsDownloadValidation>();
-								downloader.DownloadValidation = validation.Validate;
-								break;
-							}
-						default:
-							{
-								throw new SpiderExceptoin("Unspodrt validation type: " + downloadValidationType);
-							}
-					}
-				}
-			}
-			return downloader;
-		}
-
 		protected void RunAfterSpiderFinished()
 		{
-		}
-
-		private IRedialer GetRedialer(JObject redialer)
-		{
-			var type = redialer.SelectToken("$.Type").ToObject<Redialer.Types>();
-			switch (type)
-			{
-				case Redialer.Types.Adsl:
-					{
-						var adslRedialerConfig = redialer.ToObject<Configuration.AdslRedialer>();
-						return adslRedialerConfig.GetRedialer();
-
-					}
-				case Redialer.Types.H3C:
-					{
-#if !NET_CORE
-						return new H3CSshAdslRedialer();
-#else
-						throw new SpiderExceptoin("UNSPORT H3C ADSL NOW.");
-#endif
-					}
-			}
-			return null;
 		}
 
 		private INetworkValidater GetNetworValidater(NetworkValidater networkValidater)

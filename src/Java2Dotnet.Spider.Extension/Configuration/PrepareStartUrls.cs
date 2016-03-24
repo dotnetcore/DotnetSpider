@@ -7,11 +7,12 @@ using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Model;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
-	public abstract class PrepareStartUrls : IJobject
+	public abstract class PrepareStartUrls
 	{
 		[Flags]
 		public enum Types
@@ -30,7 +31,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public class Column
 		{
 			public string Name { get; set; }
-			public List<JObject> Formatters { get; set; }
+
+			public List<Formatter> Formatters { get; set; } = new List<Formatter>();
 		}
 
 		public enum DataSource
@@ -59,7 +61,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		/// <summary>
 		/// 用于拼接Url所需要的列
 		/// </summary>
-		public List<Column> Columns { get; set; }
+		public List<Column> Columns { get; set; } = new List<Column>();
 
 		public int Limit { get; set; }
 
@@ -71,13 +73,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override void Build(Site site)
 		{
-			Dictionary<Column, List<Formatter>> dic = new Dictionary<Column, List<Formatter>>();
-			foreach (var column in Columns)
-			{
-				List<Formatter> formatters = EntityExtractor.GenerateFormatter(column.Formatters);
-				dic.Add(column, formatters);
-			}
-
 			using (var conn = new MySqlConnection(ConnectString))
 			{
 				List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
@@ -111,7 +106,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					{
 						string value = tmp[column.Name]?.ToString();
 
-						foreach (var formatter in dic[column])
+						foreach (var formatter in column.Formatters)
 						{
 							value = formatter.Formate(value);
 						}

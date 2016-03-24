@@ -119,15 +119,15 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				//正常结果在上面已经Return了, 到此处必然是下载失败的值.
 				//throw new SpiderExceptoin("Download failed.");
 			}
+			catch (RedialException)
+			{
+				throw;
+			}
 			catch (Exception e)
 			{
-				if (!(e is RedialException))
-				{
-					Page page = new Page(request, site.ContentType) { Exception = e };
+				Page page = new Page(request, site.ContentType) { Exception = e };
 
-					ValidatePage(page);
-				}
-
+				ValidatePage(page);
 				throw;
 			}
 			finally
@@ -217,7 +217,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			}
 			httpWebRequest.Headers["Cookie"] = site.Cookie;
 
-			
+
 			httpWebRequest.ContinueTimeout = site.Timeout;
 
 #if !NET_CORE

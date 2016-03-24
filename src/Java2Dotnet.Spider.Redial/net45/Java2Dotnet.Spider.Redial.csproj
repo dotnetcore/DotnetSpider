@@ -53,10 +53,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="ZooKeeperNet, Version=3.4.6.1, Culture=neutral, PublicKeyToken=fefd2c046da35b56, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\ZooKeeper.Net.3.4.6.2\lib\net40\ZooKeeperNet.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AtomicExecutor\FileLockerAtomicExecutor.cs">
@@ -135,6 +131,10 @@
     <ProjectReference Include="..\..\Java2Dotnet.Spider.Common\net45\Java2Dotnet.Spider.Common.csproj">
       <Project>{43dd7a01-fbde-4a22-bf6e-758f721dde77}</Project>
       <Name>Java2Dotnet.Spider.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ZooKeeperNet\ZooKeeperNet.csproj">
+      <Project>{5c6774fb-2350-46b2-b1df-1ccc757c7727}</Project>
+      <Name>ZooKeeperNet</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

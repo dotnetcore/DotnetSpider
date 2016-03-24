@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
-	public abstract class Pipeline : IJobject
+	public abstract class Pipeline
 	{
 		[Flags]
 		public enum Types

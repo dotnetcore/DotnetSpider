@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5C6774FB-2350-46B2-B1DF-1CCC757C7727}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ZooKeeperNet</RootNamespace>
+    <AssemblyName>ZooKeeperNet</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\ZooKeeperKey.snk</AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\log4net.2.0.5\lib\net40-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ClientConnection.cs" />
+    <Compile Include="ClientConnectionRequestProducer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClientWatchManager.cs" />
+    <Compile Include="RetryPolicy.cs" />
+    <Compile Include="ZKPaths.cs" />
+    <Compile Include="CreateMode.cs" />
+    <Compile Include="DataTree.cs" />
+    <Compile Include="ClientConnectionEventConsumer.cs" />
+    <Compile Include="EventType.cs" />
+    <Compile Include="Generate\ACL.cs" />
+    <Compile Include="Generate\AuthPacket.cs" />
+    <Compile Include="Generate\CheckVersionRequest.cs" />
+    <Compile Include="Generate\CheckVersionTxn.cs" />
+    <Compile Include="Generate\ConnectRequest.cs" />
+    <Compile Include="Generate\ConnectResponse.cs" />
+    <Compile Include="Generate\CreateRequest.cs" />
+    <Compile Include="Generate\CreateResponse.cs" />
+    <Compile Include="Generate\CreateSessionTxn.cs" />
+    <Compile Include="Generate\CreateTxn.cs" />
+    <Compile Include="Generate\CreateTxnV0.cs" />
+    <Compile Include="Generate\DeleteRequest.cs" />
+    <Compile Include="Generate\DeleteTxn.cs" />
+    <Compile Include="Generate\ErrorResponse.cs" />
+    <Compile Include="Generate\ErrorTxn.cs" />
+    <Compile Include="Generate\ExistsRequest.cs" />
+    <Compile Include="Generate\ExistsResponse.cs" />
+    <Compile Include="Generate\FileHeader.cs" />
+    <Compile Include="Generate\GetACLRequest.cs" />
+    <Compile Include="Generate\GetACLResponse.cs" />
+    <Compile Include="Generate\GetChildren2Request.cs" />
+    <Compile Include="Generate\GetChildren2Response.cs" />
+    <Compile Include="Generate\GetChildrenRequest.cs" />
+    <Compile Include="Generate\GetChildrenResponse.cs" />
+    <Compile Include="Generate\GetDataRequest.cs" />
+    <Compile Include="Generate\GetDataResponse.cs" />
+    <Compile Include="Generate\GetMaxChildrenRequest.cs" />
+    <Compile Include="Generate\GetMaxChildrenResponse.cs" />
+    <Compile Include="Generate\GetSASLRequest.cs" />
+    <Compile Include="Generate\Id.cs" />
+    <Compile Include="Generate\LearnerInfo.cs" />
+    <Compile Include="Generate\MultiHeader.cs" />
+    <Compile Include="Generate\MultiTxn.cs" />
+    <Compile Include="Generate\QuorumPacket.cs" />
+    <Compile Include="Generate\ReplyHeader.cs" />
+    <Compile Include="Generate\RequestHeader.cs" />
+    <Compile Include="Generate\SetACLRequest.cs" />
+    <Compile Include="Generate\SetACLResponse.cs" />
+    <Compile Include="Generate\SetACLTxn.cs" />
+    <Compile Include="Generate\SetDataRequest.cs" />
+    <Compile Include="Generate\SetDataResponse.cs" />
+    <Compile Include="Generate\SetDataTxn.cs" />
+    <Compile Include="Generate\SetMaxChildrenRequest.cs" />
+    <Compile Include="Generate\SetMaxChildrenTxn.cs" />
+    <Compile Include="Generate\SetSASLRequest.cs" />
+    <Compile Include="Generate\SetSASLResponse.cs" />
+    <Compile Include="Generate\SetWatches.cs" />
+    <Compile Include="Generate\Stat.cs" />
+    <Compile Include="Generate\StatPersisted.cs" />
+    <Compile Include="Generate\StatPersistedV1.cs" />
+    <Compile Include="Generate\SyncRequest.cs" />
+    <Compile Include="Generate\SyncResponse.cs" />
+    <Compile Include="Generate\Txn.cs" />
+    <Compile Include="Generate\TxnHeader.cs" />
+    <Compile Include="Generate\WatcherEvent.cs" />
+    <Compile Include="IClientConnection.cs" />
+    <Compile Include="Ids.cs" />
+    <Compile Include="IO\BigEndianBitConverter.cs" />
+    <Compile Include="IO\EndianBinaryReader.cs" />
+    <Compile Include="IO\EndianBinaryWriter.cs" />
+    <Compile Include="IO\EndianBitConverter.cs" />
+    <Compile Include="IO\Endianness.cs" />
+    <Compile Include="IO\LittleEndianBitConverter.cs" />
+    <Compile Include="IStartable.cs" />
+    <Compile Include="IZooKeeper.cs" />
+    <Compile Include="Jute\BinaryInputArchive.cs" />
+    <Compile Include="Jute\BinaryOutputArchive.cs" />
+    <Compile Include="Jute\IIndex.cs" />
+    <Compile Include="Jute\IInputArchive.cs" />
+    <Compile Include="Jute\IOutputArchive.cs" />
+    <Compile Include="Jute\IRecord.cs" />
+    <Compile Include="Jute\JuteEx.cs" />
+    <Compile Include="Jute\RecordReader.cs" />
+    <Compile Include="Jute\RecordWriter.cs" />
+    <Compile Include="KeeperException.cs" />
+    <Compile Include="KeeperState.cs" />
+    <Compile Include="OpCode.cs" />
+    <Compile Include="Packet.cs" />
+    <Compile Include="PathUtils.cs" />
+    <Compile Include="Perms.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Quotas.cs" />
+    <Compile Include="SafeThreadStart.cs" />
+    <Compile Include="SessionExpiredException.cs" />
+    <Compile Include="SessionTimeoutException.cs" />
+    <Compile Include="WatchedEvent.cs" />
+    <Compile Include="IWatcher.cs" />
+    <Compile Include="ZKWatchManager.cs" />
+    <Compile Include="ZooKeeper.cs" />
+    <Compile Include="ZooKeeperEndpoint.cs" />
+    <Compile Include="ZooKeeperEndpoints.cs" />
+    <Compile Include="ZooKeeperEx.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

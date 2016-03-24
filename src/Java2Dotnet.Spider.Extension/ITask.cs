@@ -216,7 +216,6 @@ namespace Java2Dotnet.Spider.Extension
 		}
 	}
 
-
 	public class EntityType
 	{
 		public List<TargetUrl> TargetUrls { get; set; } = new List<TargetUrl>();

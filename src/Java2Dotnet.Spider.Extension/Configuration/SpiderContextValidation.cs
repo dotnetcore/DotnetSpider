@@ -6,7 +6,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public class SpiderContextValidation
 	{
-		public static bool Validate(SpiderContext spiderContext, out List<string> messages)
+		public static bool Validate(Java2Dotnet.Spider.Extension.Configuration.Json.JsonSpiderContext spiderContext, out List<string> messages)
 		{
 			bool correct = true;
 			messages = new List<string>();

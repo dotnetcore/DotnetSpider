@@ -343,7 +343,7 @@ namespace Java2Dotnet.Spider.Core
 #if NET_CORE
 				Logger.Info("Push Request to Scheduler success.", true);
 #else
-				Logger.Info("Push Request to Scheduler success.");
+					Logger.Info("Push Request to Scheduler success.");
 #endif
 
 				}
@@ -352,7 +352,7 @@ namespace Java2Dotnet.Spider.Core
 #if NET_CORE
 				Logger.Info("Push Zero Request to Scheduler.", true);
 #else
-				Logger.Info("Push Request to Scheduler success.");
+					Logger.Info("Push Request to Scheduler success.");
 #endif
 
 				}
@@ -535,7 +535,7 @@ namespace Java2Dotnet.Spider.Core
 		public void Stop()
 		{
 			Stat = Status.Stopped;
-            Logger.Warn("Trying to stop Spider " + Identity + "...");
+			Logger.Warn("Trying to stop Spider " + Identity + "...");
 		}
 
 		protected void OnClose()
@@ -545,8 +545,6 @@ namespace Java2Dotnet.Spider.Core
 			{
 				SafeDestroy(pipeline);
 			}
-
-			(Scheduler as DuplicateRemovedScheduler)?.ResetDuplicateCheck(this);
 
 			SafeDestroy(Scheduler);
 			SafeDestroy(PageProcessor);

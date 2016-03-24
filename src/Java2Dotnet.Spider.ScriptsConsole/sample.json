@@ -5,9 +5,9 @@
 	"EmptySleepTime": 15000,
 	"CachedSize": 1,
 	"Scheduler": {
-		"Host": "192.168.3.33",
+		"Host": "dc01.86research.cn",
 		"Port": 6379,
-		"Password": null,
+		"Password": "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
 		"Type": 1
 	},
 	"Downloader": {
@@ -50,12 +50,11 @@
 		"ConnectString": "Database='mysql';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306",
 		"TableName": "taobao.tmall_shop_gmvorder",
 		"Filters": null,
-		"Columns": [ "name" ],
-		"Limit": 0,
+		"Columns": [ { "Name": "name" } ],
+		"Limit": 100,
 		"FormateString": "https://s.taobao.com/search?q={0}&ie=utf8&sort=sale-desc&bcoffset=-4&ntoffset=-4&p4plefttype=3%2C1&p4pleftnum=1%2C3&filter_tianmao=tmall&s=0",
 		"CustomizeFormaters": [ ]
 	},
-	"StartUrls": [ ],
 	"Pipeline": { "Type": 4 },
 	"Entities": [
 		{
