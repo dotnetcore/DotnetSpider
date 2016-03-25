@@ -1,11 +1,12 @@
-﻿#if !NET_CORE
-
-using System;
+﻿using System;
 using System.Threading;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Model;
+
+#if !NET_CORE
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
+#endif
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
@@ -20,9 +21,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public abstract Types Type { get; internal set; }
 
 
-		public abstract bool Login(RemoteWebDriver webDriver);
+		public abstract bool Login(dynamic obj);
 	}
 
+#if !NET_CORE
 	public class CommonLoginer : Loginer
 	{
 		public override Types Type { get; internal set; } = Types.Common;
@@ -39,7 +41,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public Selector SubmitSelector { get; set; }
 
-		public override bool Login(RemoteWebDriver webDriver)
+		public override bool Login(dynamic webDriver)
 		{
 
 			try
@@ -81,5 +83,5 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			throw new SpiderExceptoin("Unsport findy: " + element.Type);
 		}
 	}
-}
 #endif
+}

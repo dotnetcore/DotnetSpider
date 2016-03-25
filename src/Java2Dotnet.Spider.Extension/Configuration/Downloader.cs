@@ -60,6 +60,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
+#if !NET_CORE
 	public class WebDriverDownloader : Downloader
 	{
 		public override Types Type { get; internal set; } = Types.WebDriverDownloader;
@@ -82,4 +83,5 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public Loginer Login { get; set; }
 	}
+#endif
 }

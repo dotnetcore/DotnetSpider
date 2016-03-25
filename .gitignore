@@ -10,6 +10,8 @@
 .vscode
 project.lock.json
 
+nugetpack.sh
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
