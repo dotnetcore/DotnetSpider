@@ -15,7 +15,7 @@ nugetpack.sh
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-[Pp]rojects/
+[Ss]piders/
 
 # Build results
 [Dd]ebug/
