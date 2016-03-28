@@ -73,6 +73,10 @@ namespace Java2Dotnet.Spider.Extension
 				RedialManagerUtils.RedialManager.NetworkValidater = GetNetworValidater(_spiderContext.NetworkValidater);
 				RedialManagerUtils.RedialManager.Redialer = _spiderContext.Redialer.GetRedialer();
 			}
+            
+            if(_spiderContext.Downloader==null){
+                _spiderContext.Downloader=new HttpDownloader();
+            }
 		}
 
 		public void Run(params string[] args)

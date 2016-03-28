@@ -14,9 +14,9 @@ namespace Java2Dotnet.Spider.Test
 		public static void Main(string[] args)
 		{
             Console.WriteLine("Start Program...");
-			//TransactionIndexLeafIdSpider spiderBuilder = new TransactionIndexLeafIdSpider();
-			//ScriptSpider spider = new ScriptSpider(spiderBuilder.GetContext());
-			//spider.Run(args);
+			TransactionIndexLeafIdSpider spiderBuilder = new TransactionIndexLeafIdSpider();
+			ScriptSpider spider = new ScriptSpider(spiderBuilder.GetContext());
+			spider.Run(args);
 			//Run(() =>
 			//{
 			//	FilePipelineTest test1 = new FilePipelineTest();
