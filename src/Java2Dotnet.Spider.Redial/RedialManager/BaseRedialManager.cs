@@ -24,7 +24,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		public abstract void WaitforRedialFinish();
 		public abstract RedialResult Redial();
 
-		public INetworkValidater NetworkValidater { get; set; } = new DefalutNetworkValidater();
+		public INetworkValidater NetworkValidater { get; set; } = new DefaultNetworkValidater();
 
 #if !NET_CORE
 		public IRedialer Redialer { get; set; } = new H3CSshAdslRedialer();

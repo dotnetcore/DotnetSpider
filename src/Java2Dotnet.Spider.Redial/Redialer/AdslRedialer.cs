@@ -16,7 +16,9 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 		public override void Redial()
 		{
 			Console.WriteLine($"Try to redial: {Interface} {User} {Password}");
-			AdslUtil.Connect(Interface, User, Password);
+			RasDisplay ras = new RasDisplay();
+			ras.Disconnect();//断开连接
+			ras.Connect(Interface);//重新拨号
 		}
 	}
 }

@@ -30,6 +30,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public int Interval { get; set; }
 
+		public Selector TotalPageSelector { get; set; }
+
 		public Selector CurrenctPageSelector { get; set; }
 
 		public override IList<string> Customize(Page page)
@@ -41,6 +43,20 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int nextIndex = currentIndex + Interval;
 			string next = RegexUtil.NumRegex.Replace(PageIndexString, nextIndex.ToString());
 
+			int totalPage = -2;
+			if (TotalPageSelector != null)
+			{
+				totalPage = int.Parse(page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).Value);
+			}
+			int currentPage = -1;
+			if (CurrenctPageSelector != null)
+			{
+				currentPage = int.Parse(page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).Value);
+			}
+			if (currentPage == totalPage)
+			{
+				return new List<string>();
+			}
 			return new List<string> { page.Url.Replace(current, next) };
 		}
 	}

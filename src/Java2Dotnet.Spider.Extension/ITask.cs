@@ -54,6 +54,15 @@ namespace Java2Dotnet.Spider.Extension
 				JObject entity = JsonConvert.DeserializeObject(ConvertToJson(entiType.GetTypeInfo())) as JObject;
 #endif
 				_context.Entities.Add(entity);
+				_context.EnviromentValues = entiType.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new EnviromentValue
+				{
+					Name = e.Name,
+					Selector = new Selector
+					{
+						Expression = e.Expression,
+						Type = e.Type
+					}
+				}).ToList();
 			}
 
 			foreach (var url in _context.StartUrls)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Java2Dotnet.Spider.Redial.NetworkValidater
 {
-	public class DefalutNetworkValidater : INetworkValidater
+	public class DefaultNetworkValidater : INetworkValidater
 	{
 		public void Wait()
 		{

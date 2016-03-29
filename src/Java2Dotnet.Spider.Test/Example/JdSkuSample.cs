@@ -25,7 +25,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				{
 					EncodingName = "UTF-8"
 				},
-				PrepareStartUrls = new GeneralDbPrepareStartUrls()
+				PrepareStartUrls = new List<PrepareStartUrls>{new GeneralDbPrepareStartUrls()
 				{
 					Source = GeneralDbPrepareStartUrls.DataSource.MySql,
 					TableName = "jd.category",
@@ -36,9 +36,8 @@ namespace Java2Dotnet.Spider.Test.Example
 						Formatters = new List<Formatter>  { new ReplaceFormatter() { OldValue = ".html", NewValue = "" } }
 					} },
 					Limit = 1000,
-					FormateString = "{0}&page=1&JL=6_0_0",
-
-				},
+					FormateStrings = new List<string> { "{0}&page=1&JL=6_0_0" }
+				}},
 				Scheduler = new QueueScheduler(),
 				//Scheduler = new RedisScheduler()
 				//{

@@ -25,7 +25,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 		protected override string GetInsertSql()
 		{
-			string columNames = string.Join(", ", Columns.Select(p => $"{p.Name}"));
+			string columNames = string.Join(", ", Columns.Select(p => $"`{p.Name}`"));
 			string values = string.Join(", ", Columns.Select(p => $"@{p.Name}"));
 
 			var sqlBuilder = new StringBuilder();

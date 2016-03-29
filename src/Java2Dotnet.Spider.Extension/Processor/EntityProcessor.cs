@@ -14,10 +14,12 @@ namespace Java2Dotnet.Spider.Extension.Processor
 	{
 		protected readonly IList<IEntityExtractor> EntityExtractorList = new List<IEntityExtractor>();
 		public Func<Page, IList<string>> GetCustomizeTargetUrls;
+		private readonly SpiderContext _spiderContext;
 
-		public EntityProcessor(Site site)
+		public EntityProcessor(SpiderContext spiderContext)
 		{
-			Site = site;
+			Site = spiderContext.Site;
+			_spiderContext = spiderContext;
 		}
 
 		public void AddEntity(JObject entityDefine)
@@ -27,7 +29,7 @@ namespace Java2Dotnet.Spider.Extension.Processor
 
 		private IEntityExtractor GenerateExtractor(JObject entityDefine)
 		{
-			return new EntityExtractor(entityDefine.SelectToken("$.Identity").ToString(), entityDefine);
+			return new EntityExtractor(entityDefine.SelectToken("$.Identity").ToString(), _spiderContext.EnviromentValues, entityDefine);
 		}
 
 		public void Process(Page page)

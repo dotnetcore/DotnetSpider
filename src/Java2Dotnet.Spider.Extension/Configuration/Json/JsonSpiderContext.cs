@@ -15,13 +15,11 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		public JObject Scheduler { get; set; }
 		public JObject Downloader { get; set; }
 		public Site Site { get; set; }
-		public bool NeedRedial { get; set; }
 		public NetworkValidater NetworkValidater { get; set; }
 		public JObject Redialer { get; set; }
-		public JObject PrepareStartUrls { get; set; }
-
-		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } =
-			new Dictionary<string, Dictionary<string, object>>();
+		public List<JObject> PrepareStartUrls { get; set; }
+		public List<EnviromentValue> EnviromentValues { get; set; }
+		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
 
 		public JObject Pipeline { get; set; }
 		public List<JObject> Entities { get; set; } = new List<JObject>();
@@ -41,7 +39,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.Downloader = GetDownloader(Downloader);
 			context.EmptySleepTime = EmptySleepTime;
 			context.Entities = Entities;
-			context.NeedRedial = NeedRedial;
 			context.NetworkValidater = NetworkValidater;
 			context.Pipeline = GetPipepine(Pipeline);
 			context.PrepareStartUrls = GetPrepareStartUrls(PrepareStartUrls);
@@ -52,6 +49,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.SpiderName = SpiderName;
 			context.ThreadNum = ThreadNum;
 			context.ValidationReportTo = ValidationReportTo;
+			context.EnviromentValues = EnviromentValues;
 			return context;
 		}
 
@@ -112,55 +110,62 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			return null;
 		}
 
-		private PrepareStartUrls GetPrepareStartUrls(JObject jobject)
+		private List<PrepareStartUrls> GetPrepareStartUrls(List<JObject> jobjects)
 		{
-			if (jobject == null)
+			if (jobjects == null || jobjects.Count == 0)
 			{
 				return null;
 			}
 
-			var type = jobject.SelectToken("$.Type")?.ToObject<PrepareStartUrls.Types>();
-
-			if (type == null)
+			var list = new List<PrepareStartUrls>();
+			foreach (var jobject in jobjects)
 			{
-				throw new SpiderExceptoin("Missing PrepareStartUrls type: " + jobject);
-			}
+				var type = jobject.SelectToken("$.Type")?.ToObject<PrepareStartUrls.Types>();
 
-			switch (type)
-			{
-				case Configuration.PrepareStartUrls.Types.GeneralDb:
-					{
-						GeneralDbPrepareStartUrls generalDbPrepareStartUrls = new GeneralDbPrepareStartUrls();
-						generalDbPrepareStartUrls.ConnectString = jobject.SelectToken("$.ConnectString")?.ToString();
-						generalDbPrepareStartUrls.Filters = jobject.SelectToken("$.Filters")?.ToObject<List<string>>();
-						generalDbPrepareStartUrls.FormateString = jobject.SelectToken("$.FormateString")?.ToString();
-						var limit = jobject.SelectToken("$.Limit");
-						generalDbPrepareStartUrls.Limit = limit?.ToObject<int>() ?? int.MaxValue;
-						generalDbPrepareStartUrls.TableName = jobject.SelectToken("$.TableName")?.ToString();
-						generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<GeneralDbPrepareStartUrls.DataSource>();
-						foreach (var column in jobject.SelectTokens("$.Columns[*]"))
+				if (type == null)
+				{
+					throw new SpiderExceptoin("Missing PrepareStartUrls type: " + jobject);
+				}
+
+				switch (type)
+				{
+					case Configuration.PrepareStartUrls.Types.GeneralDb:
 						{
-							var c = new GeneralDbPrepareStartUrls.Column()
+							GeneralDbPrepareStartUrls generalDbPrepareStartUrls = new GeneralDbPrepareStartUrls();
+							generalDbPrepareStartUrls.ConnectString = jobject.SelectToken("$.ConnectString")?.ToString();
+							generalDbPrepareStartUrls.Filters = jobject.SelectToken("$.Filters")?.ToObject<List<string>>();
+							generalDbPrepareStartUrls.FormateStrings = jobject.SelectToken("$.FormateStrings")?.ToObject<List<string>>();
+							var limit = jobject.SelectToken("$.Limit");
+							generalDbPrepareStartUrls.Limit = limit?.ToObject<int>() ?? int.MaxValue;
+							generalDbPrepareStartUrls.TableName = jobject.SelectToken("$.TableName")?.ToString();
+							generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<GeneralDbPrepareStartUrls.DataSource>();
+							foreach (var column in jobject.SelectTokens("$.Columns[*]"))
 							{
-								Name = column.SelectToken("$.Name").ToString()
-							};
-							foreach (var format in column.SelectTokens("$.Formatters[*]"))
-							{
-								var name = format.SelectToken("$.Name").ToString();
-								var formatterType = FormatterFactory.GetFormatterType(name);
-								c.Formatters.Add((Formatter)format.ToObject(formatterType));
+								var c = new GeneralDbPrepareStartUrls.Column()
+								{
+									Name = column.SelectToken("$.Name").ToString()
+								};
+								foreach (var format in column.SelectTokens("$.Formatters[*]"))
+								{
+									var name = format.SelectToken("$.Name").ToString();
+									var formatterType = FormatterFactory.GetFormatterType(name);
+									c.Formatters.Add((Formatter)format.ToObject(formatterType));
+								}
+								generalDbPrepareStartUrls.Columns.Add(c);
 							}
-							generalDbPrepareStartUrls.Columns.Add(c);
-						}
 
-						return generalDbPrepareStartUrls;
-					}
-				case Configuration.PrepareStartUrls.Types.Cycle:
-					{
-						return jobject.ToObject<CyclePrepareStartUrls>();
-					}
+							list.Add(generalDbPrepareStartUrls);
+							break;
+						}
+					case Configuration.PrepareStartUrls.Types.Cycle:
+						{
+							list.Add(jobject.ToObject<CyclePrepareStartUrls>());
+							break;
+						}
+				}
 			}
-			throw new SpiderExceptoin("UNSPORT PrepareStartUrls: " + jobject);
+
+			return list;
 		}
 
 		private Pipeline GetPipepine(JObject pipeline)

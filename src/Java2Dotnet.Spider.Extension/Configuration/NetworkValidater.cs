@@ -1,8 +1,28 @@
-﻿namespace Java2Dotnet.Spider.Extension.Configuration
+﻿using System;
+
+namespace Java2Dotnet.Spider.Extension.Configuration
 {
-	public enum NetworkValidater
+	public abstract class NetworkValidater
 	{
-		DefalutNetworkValidater,
-		VpsNetworkValidater
+		[Flags]
+		public enum Types
+		{
+			Defalut,
+			Vps
+		}
+
+		public abstract Types Type { get; internal set; }
+	}
+
+	public class DefaultNetworkValidater : NetworkValidater
+	{
+		public override Types Type { get; internal set; } = Types.Defalut;
+	}
+
+	public class VpsNetworkValidater : NetworkValidater
+	{
+		public override Types Type { get; internal set; } = Types.Vps;
+
+		public int InterfaceNum { get; set; } = 2;
 	}
 }

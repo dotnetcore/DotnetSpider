@@ -8,6 +8,7 @@ using Java2Dotnet.Spider.Extension.Configuration;
 using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Java2Dotnet.Spider.Common;
+using Java2Dotnet.Spider.Extension.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Extension.Model
@@ -15,12 +16,14 @@ namespace Java2Dotnet.Spider.Extension.Model
 	public class EntityExtractor : IEntityExtractor
 	{
 		private readonly JObject _entityDefine;
+		private readonly List<EnviromentValue> _enviromentValues;
 
-		public EntityExtractor(string entityName, JObject entityDefine)
+		public EntityExtractor(string entityName, List<EnviromentValue> enviromentValues, JObject entityDefine)
 		{
 			_entityDefine = entityDefine;
 			TargetUrlExtractInfos = GenerateTargetUrlExtractInfos(entityDefine);
 			EntityName = entityName;
+			_enviromentValues = enviromentValues;
 		}
 
 		private List<TargetUrlExtractInfo> GenerateTargetUrlExtractInfos(JObject entityDefine)
@@ -43,9 +46,18 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 		public dynamic Process(Page page)
 		{
+			if (_enviromentValues != null && _enviromentValues.Count > 0)
+			{
+				foreach (var enviromentValue in _enviromentValues)
+				{
+					string name = enviromentValue.Name;
+					var value = page.Selectable.Select(SelectorUtil.GetSelector(enviromentValue.Selector)).Value;
+					page.Request.PutExtra(name, value);
+				}
+			}
 			bool isMulti = _entityDefine.SelectToken("$.Multi").ToObject<bool>();
 
-			ISelector selector = GetSelector(_entityDefine.SelectToken("$.Selector").ToObject<Selector>());
+			ISelector selector = SelectorUtil.GetSelector(_entityDefine.SelectToken("$.Selector").ToObject<Selector>());
 
 			if (isMulti)
 			{
@@ -129,7 +141,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 			foreach (var field in entityDefine.SelectTokens("$.Fields[*]"))
 			{
-				ISelector selector = GetSelector(field.SelectToken("$.Selector").ToObject<Selector>());
+				ISelector selector = SelectorUtil.GetSelector(field.SelectToken("$.Selector").ToObject<Selector>());
 				if (selector == null)
 				{
 					continue;
@@ -283,40 +295,5 @@ namespace Java2Dotnet.Spider.Extension.Model
 		/// </summary>
 		public List<TargetUrlExtractInfo> TargetUrlExtractInfos { get; }
 		public string EntityName { get; }
-
-		private static ISelector GetSelector(Selector selector)
-		{
-			if (string.IsNullOrEmpty(selector?.Expression))
-			{
-				return null;
-			}
-
-			string expression = selector.Expression;
-
-			switch (selector.Type)
-			{
-				case ExtractType.Css:
-					{
-						return new CssHtmlSelector(expression);
-					}
-				case ExtractType.Enviroment:
-					{
-						return new EnviromentSelector(expression);
-					}
-				case ExtractType.JsonPath:
-					{
-						return new JsonPathSelector(expression);
-					}
-				case ExtractType.Regex:
-					{
-						return new RegexSelector(expression);
-					}
-				case ExtractType.XPath:
-					{
-						return new XPathSelector(expression);
-					}
-			}
-			throw new SpiderExceptoin("Not support selector: " + selector);
-		}
 	}
 }

@@ -450,6 +450,7 @@ namespace Java2Dotnet.Spider.Core
 							{
 								OnError(request1);
 								Logger.Error("Request " + request1.Url + " failed.", e);
+								Console.WriteLine("ERROR: " + e.ToString());
 							}
 							finally
 							{

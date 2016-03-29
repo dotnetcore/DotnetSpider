@@ -27,6 +27,8 @@ using Java2Dotnet.Spider.JLog;
 #endif
 
 using Newtonsoft.Json.Linq;
+using DefaultNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.DefaultNetworkValidater;
+using VpsNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.VpsNetworkValidater;
 
 namespace Java2Dotnet.Spider.Extension
 {
@@ -63,7 +65,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void InitEnvoriment()
 		{
-			if (_spiderContext.NeedRedial)
+			if (_spiderContext.Redialer != null)
 			{
 #if !NET_CORE
 				RedialManagerUtils.RedialManager = ZookeeperRedialManager.Default;
@@ -73,10 +75,11 @@ namespace Java2Dotnet.Spider.Extension
 				RedialManagerUtils.RedialManager.NetworkValidater = GetNetworValidater(_spiderContext.NetworkValidater);
 				RedialManagerUtils.RedialManager.Redialer = _spiderContext.Redialer.GetRedialer();
 			}
-            
-            if(_spiderContext.Downloader==null){
-                _spiderContext.Downloader=new HttpDownloader();
-            }
+
+			if (_spiderContext.Downloader == null)
+			{
+				_spiderContext.Downloader = new HttpDownloader();
+			}
 		}
 
 		public void Run(params string[] args)
@@ -277,13 +280,19 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void PrepareSite()
 		{
-			_spiderContext.PrepareStartUrls?.Build(_spiderContext.Site);
+			if (_spiderContext.PrepareStartUrls != null)
+			{
+				foreach (var prepareStartUrl in _spiderContext.PrepareStartUrls)
+				{
+					prepareStartUrl.Build(_spiderContext.Site);
+				}
+			}
 		}
 
 		private Core.Spider GenerateSpider(IScheduler scheduler)
 		{
 			Site site = _spiderContext.Site;
-			EntityProcessor processor = new EntityProcessor(site);
+			EntityProcessor processor = new EntityProcessor(_spiderContext);
 			foreach (var entity in _spiderContext.Entities)
 			{
 				processor.AddEntity(entity);
@@ -343,15 +352,15 @@ namespace Java2Dotnet.Spider.Extension
 
 		private INetworkValidater GetNetworValidater(NetworkValidater networkValidater)
 		{
-			switch (networkValidater)
+			switch (networkValidater.Type)
 			{
-				case NetworkValidater.VpsNetworkValidater:
+				case NetworkValidater.Types.Vps:
 					{
-						return new VpsNetworkValidater();
+						return new VpsNetworkValidater(((Configuration.VpsNetworkValidater)networkValidater).InterfaceNum);
 					}
-				case NetworkValidater.DefalutNetworkValidater:
+				case NetworkValidater.Types.Defalut:
 					{
-						return new DefalutNetworkValidater();
+						return new Java2Dotnet.Spider.Redial.NetworkValidater.DefaultNetworkValidater();
 					}
 			}
 			return null;

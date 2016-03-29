@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Model;
@@ -47,6 +48,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string ConnectString { get; set; }
 
+		public string GroupBy { get; set; }
+
 		/// <summary>
 		/// 数据来源表名, 需要Schema/数据库名
 		/// </summary>
@@ -69,7 +72,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		/// 拼接Url的方式, 会把Columns对应列的数据传入
 		/// https://s.taobao.com/search?q={0},s=0;
 		/// </summary>
-		public string FormateString { get; set; }
+		public List<string> FormateStrings { get; set; }
 
 		public override void Build(Site site)
 		{
@@ -98,7 +101,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 				reader.Close();
 
-				Parallel.ForEach(datas, new ParallelOptions { MaxDegreeOfParallelism = 1 }, brand =>
+				Parallel.ForEach(datas, new ParallelOptions { MaxDegreeOfParallelism = 5 }, brand =>
 				{
 					Dictionary<string, object> tmp = brand;
 					List<string> arguments = new List<string>();
@@ -113,10 +116,11 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 						arguments.Add(value);
 					}
 
-					string tmpUrl = string.Format(FormateString, arguments.Cast<object>().ToArray());
-
-
-					site.AddStartUrl(tmpUrl, tmp);
+					foreach (var formate in FormateStrings)
+					{
+						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
+						site.AddStartUrl(tmpUrl, tmp);
+					}
 				});
 			}
 		}
@@ -127,7 +131,30 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			{
 				case DataSource.MySql:
 					{
-						return $"select * from {TableName} {(Filters == null || Filters.Count == 0 ? "" : "where " + Filters.Select(f => $"and {f}"))} " + (Limit > 0 ? $"limit {Limit}" : "");
+						StringBuilder builder = new StringBuilder($"SELECT * FROM {TableName}");
+						if (Filters != null && Filters.Count > 0)
+						{
+							builder.Append(" WHERE " + Filters.First());
+							if (Filters.Count > 1)
+							{
+								for (int i = 1; i < Filters.Count; ++i)
+								{
+									builder.Append(" AND " + Filters[i]);
+								}
+							}
+						}
+
+						if (!string.IsNullOrEmpty(GroupBy))
+						{
+							builder.Append($" {GroupBy} ");
+						}
+
+						if (Limit > 0)
+						{
+							builder.Append($" LIMIT {Limit} ");
+						}
+
+						return builder.ToString();
 					}
 			}
 			throw new SpiderExceptoin($"Unsport Source: {Source}");

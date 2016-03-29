@@ -97,6 +97,9 @@
     <Compile Include="..\Configuration\DownloadValidation.cs">
       <Link>Configuration\DownloadValidation.cs</Link>
     </Compile>
+    <Compile Include="..\Configuration\EnviromentValue.cs">
+      <Link>Configuration\EnviromentValue.cs</Link>
+    </Compile>
     <Compile Include="..\Configuration\Json\JsonSpiderContext.cs">
       <Link>Configuration\Json\JsonSpiderContext.cs</Link>
     </Compile>
@@ -340,6 +343,10 @@
     <Compile Include="..\Utils\RegexUtil.cs">
       <Link>Utils\RegexUtil.cs</Link>
     </Compile>
+    <Compile Include="..\Utils\SelectorUtil.cs">
+      <Link>Utils\SelectorUtil.cs</Link>
+    </Compile>
+    <Compile Include="Model\Attribute\EnviromentValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
