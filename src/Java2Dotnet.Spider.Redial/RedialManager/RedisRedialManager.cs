@@ -60,12 +60,6 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				}
 			});
 
-			var redialSetting = GetRedialStatus();
-			if (redialSetting == null)
-			{
-				SetRedialStatus(RunningRedialStatus);
-			}
-
 			AtomicExecutor = new RedisAtomicExecutor(this);
 		}
 
