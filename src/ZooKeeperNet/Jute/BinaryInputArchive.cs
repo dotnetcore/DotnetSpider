@@ -16,6 +16,7 @@
  *
  */
 
+using System;
 using System.IO;
 using System.Text;
 using ZooKeeperNet.IO;
@@ -117,7 +118,7 @@ namespace ZooKeeperNet.Jute
             if (len == -1) return null;
             if (len < 0 || len > ClientConnection.MaximumPacketLength)
             {
-                throw new IOException(new StringBuilder("Unreasonable length = ").Append(len).ToString());
+                throw new Exception(new StringBuilder("Unreasonable length = ").Append(len).ToString());
             }
             var arr = reader.ReadBytesOrThrow(len);
             return arr;

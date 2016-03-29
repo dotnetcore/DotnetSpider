@@ -4,19 +4,23 @@ using ZooKeeperNet.Generate;
 using ZooKeeperNet.IO;
 using ZooKeeperNet.Jute;
 
+using System.IO;
+using System.Linq;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+#if !NET_CORE
+using log4net;
+#endif
+using System.Collections.Generic;
+    
 namespace ZooKeeperNet
 {
-    using System.IO;
-    using System.Linq;
-    using System.Net.Sockets;
-    using System.Text;
-    using System.Threading;
-    using log4net;
-    using System.Collections.Generic;
-
     public class ClientConnectionRequestProducer : IStartable, IDisposable
     {
+        #if !NET_CORE
         private static readonly ILog LOG = LogManager.GetLogger(typeof(ClientConnectionRequestProducer));
+        #endif
         private const string RETRY_CONN_MSG = ", closing socket connection and attempting reconnect";
 
         private readonly ClientConnection conn;
@@ -91,8 +95,10 @@ namespace ZooKeeperNet
 
             if (!zooKeeper.State.IsAlive() || closing || Interlocked.CompareExchange(ref isDisposed, 0, 0) == 1)
             {
+                #if !NET_CORE
                 if(LOG.IsDebugEnabled)
                     LOG.DebugFormat("Connection closing. Sending ConLossPacket. IsAlive: {0}, closing: {1}", zooKeeper.State.IsAlive(), closing);
+                #endif
                 ConLossPacket(p);
             }
             else
@@ -174,16 +180,19 @@ namespace ZooKeeperNet
                 {
                     if (conn.IsClosed || closing)
                     {
+                        #if !NET_CORE
                         if (LOG.IsDebugEnabled)
                         {
                             // closing so this is expected
                             LOG.DebugFormat("An exception was thrown while closing send thread for session 0x{0:X} : {1}", conn.SessionId, e.Message);
                         }
+                        #endif
                         break;
                     }
                     else
                     {
                         // this is ugly, you have a better way speak up
+                        #if !NET_CORE
                         if (e is KeeperException.SessionExpiredException)
                             LOG.InfoFormat("{0}, closing socket connection", e.Message);
                         else if (e is SessionTimeoutException)
@@ -192,6 +201,7 @@ namespace ZooKeeperNet
                             LOG.InfoFormat("{0}{1}", e.Message, RETRY_CONN_MSG);
                         else
                             LOG.InfoFormat("Session 0x{0:X} for server {1}, unexpected error{2}, detail:{3}-{4}", conn.SessionId, null, RETRY_CONN_MSG, e.Message, e.StackTrace);
+                        #endif
                         // a safe-net ...there's a packet about to send when an exception happen
                         if (packet != null)
                             ConLossPacket(packet);
@@ -211,9 +221,10 @@ namespace ZooKeeperNet
             // i don't think this is necessary, when we reached this block ....the state is surely not alive
             if (zooKeeper.State.IsAlive())
                 conn.consumer.QueueEvent(new WatchedEvent(KeeperState.Disconnected, EventType.None, null));
-                
+            #if !NET_CORE    
             if (LOG.IsDebugEnabled)
                 LOG.Debug("SendThread exitedloop.");
+            #endif
         }
 
         private void Cleanup(TcpClient tcpClient)
@@ -223,13 +234,25 @@ namespace ZooKeeperNet
                 try
                 {
                     // close the connection
+                    #if NET_CORE
+                    tcpClient.Dispose();
+                    #endif
+                    #if NET_45
                     tcpClient.Close();
+                    #endif
                 }
+                #if !NET_CORE
                 catch (IOException e)
-                {
+                {                   
                     if (LOG.IsDebugEnabled)
-                        LOG.Debug("Ignoring exception during channel close", e);
+                        LOG.Debug("Ignoring exception during channel close", e);                    
                 }
+                #endif
+                #if NET_CORE
+                catch (Exception e)
+                {                                      
+                }
+                #endif
             }
 
             lock (outgoingQueue)
@@ -266,10 +289,17 @@ namespace ZooKeeperNet
                     {
                         Thread.Sleep(new TimeSpan(0, 0, 0, 0, random.Next(0, 50)));
                     }
-                    catch (ThreadInterruptedException e1)
-                    {
-                        LOG.Warn("Unexpected exception", e1);
+                    #if !NET_CORE
+                    catch (ThreadInterruptedException e)
+                    {              
+                       LOG.Error("Event thread exiting due to interruption", e);               
                     }
+                    #endif
+                    #if NET_CORE
+                    catch (Exception e)
+                    {                             
+                    }
+                    #endif
                     if (!zkEndpoints.IsNextEndPointAvailable)
                     {
                         try
@@ -277,10 +307,17 @@ namespace ZooKeeperNet
                             // Try not to spin too fast!
                             Thread.Sleep(1000);
                         }
+                        #if !NET_CORE
                         catch (ThreadInterruptedException e)
-                        {
-                            LOG.Warn("Unexpected exception", e);
+                        {              
+                            LOG.Error("Event thread exiting due to interruption", e);               
                         }
+                        #endif
+                        #if NET_CORE
+                        catch (Exception e)
+                        {                             
+                        }
+                        #endif
                     }
                 }
 
@@ -288,7 +325,10 @@ namespace ZooKeeperNet
                 zkEndpoints.GetNextAvailableEndpoint();
 
                 Cleanup(tempClient);
+                Console.WriteLine("Opening socket connection to server {0}", zkEndpoints.CurrentEndPoint.ServerAddress);
+                #if !NET_CORE
                 LOG.InfoFormat("Opening socket connection to server {0}", zkEndpoints.CurrentEndPoint.ServerAddress);
+                #endif
                 tempClient = new TcpClient();
                 tempClient.LingerState = new LingerOption(false, 0);
                 tempClient.NoDelay = true; 
@@ -298,20 +338,27 @@ namespace ZooKeeperNet
 
                 try
                 {
-                    IAsyncResult ar = tempClient.BeginConnect(zkEndpoints.CurrentEndPoint.ServerAddress.Address,
-                                                          zkEndpoints.CurrentEndPoint.ServerAddress.Port,
-                                                          null,
-                                                          null);
+                    IAsyncResult ar = tempClient.ConnectAsync(zkEndpoints.CurrentEndPoint.ServerAddress.Address,
+                                                          zkEndpoints.CurrentEndPoint.ServerAddress.Port);
 
                     wh = ar.AsyncWaitHandle;
+                    #if !NET_CORE
                     if (!ar.AsyncWaitHandle.WaitOne(conn.ConnectionTimeout, false))
                     {
                         Cleanup(tempClient);
                         tempClient = null;
                         throw new TimeoutException();
+                    }             
+                    #else
+                    if (!ar.AsyncWaitHandle.WaitOne(conn.ConnectionTimeout))
+                    {
+                        Cleanup(tempClient);
+                        tempClient = null;
+                        throw new TimeoutException();
                     }
+                    #endif
 
-                    tempClient.EndConnect(ar);
+                    //tempClient.EndConnect(ar);
 
                     zkEndpoints.CurrentEndPoint.SetAsSuccess();
 
@@ -324,10 +371,11 @@ namespace ZooKeeperNet
                         Cleanup(tempClient);
                         tempClient = null;
                         zkEndpoints.CurrentEndPoint.SetAsFailure();
-
+                        #if !NET_CORE
                         LOG.WarnFormat(string.Format("Failed to connect to {0}:{1}.",
                             zkEndpoints.CurrentEndPoint.ServerAddress.Address.ToString(),
                             zkEndpoints.CurrentEndPoint.ServerAddress.Port.ToString()));
+                        #endif
                     }
                     else
                     {
@@ -336,7 +384,12 @@ namespace ZooKeeperNet
                 }
                 finally
                 {
+                    #if !NET_CORE
                     wh.Close();
+                    #endif
+                    #if NET_CORE
+                    wh.Dispose();
+                    #endif
                 }
             }
             while(zkEndpoints.IsNextEndPointAvailable);
@@ -347,7 +400,19 @@ namespace ZooKeeperNet
             }
 
             client = tempClient;
+            #if !NET_CORE
             client.GetStream().BeginRead(incomingBuffer, 0, incomingBuffer.Length, ReceiveAsynch, incomingBuffer);
+            #endif
+            
+            #if NET_CORE
+            byte[] byteData = incomingBuffer;
+            var tokenSource = new CancellationTokenSource();
+            var token = tokenSource.Token;
+            client.GetStream().ReadAsync(incomingBuffer, 0, incomingBuffer.Length, token);
+            tokenSource.Cancel();
+            MyReceiveAsynch(-1,byteData);
+            #endif
+            
             PrimeConnection();
         }
 
@@ -355,6 +420,7 @@ namespace ZooKeeperNet
 
         private int currentLen;
 
+        #if !NET_CORE
         /// <summary>
         /// process the receiving mechanism in asynchronous manner.
         /// Zookeeper server sent data in two main parts
@@ -380,14 +446,18 @@ namespace ZooKeeperNet
 
                 try
                 {
+                    #if !NET_CORE
                     len = stream.EndRead(ar);
+                    #endif
                 }
                 catch
                 {
                 }
                 if (len == 0) //server closed the connection...
                 {
+                    #if !NET_CORE
                     LOG.Debug("TcpClient connection lost.");
+                    #endif
                     zooKeeper.State = ZooKeeper.States.NOT_CONNECTED;
                     IsConnectionClosedByServer = true;
                     return;
@@ -429,14 +499,100 @@ namespace ZooKeeperNet
                 }
             }
             catch (Exception ex)
-            {
-                LOG.Error(ex);
+            {              
+                LOG.Error(ex);               
             }
         }
+        #endif
+        
+        #if NET_CORE
+        private void MyReceiveAsynch(int length, byte[] byteData)
+        {
+            if (Interlocked.CompareExchange(ref isDisposed, 0, 0) == 1)
+            {
+                return;
+            }
+            int len = 0;
+            try
+            {
+                if (client == null)
+                    return;
+                NetworkStream stream = client.GetStream();   
+                len = length;
+                if (len == 0) //server closed the connection...
+                {
+                    zooKeeper.State = ZooKeeper.States.NOT_CONNECTED;
+                    IsConnectionClosedByServer = true;
+                    return;
+                }
+                recvCount++;
+
+                if (byteData == incomingBuffer) // if bData is incoming then surely it is a length information
+                {                    
+                    currentLen = 0;
+                    juteBuffer = null;
+                    // get the length information from the stream
+                    juteBuffer = new byte[ReadLength(byteData)];
+                    // try getting other info from the stream
+                    byteData = incomingBuffer;
+                    var tokenSource = new CancellationTokenSource();
+                    var token = tokenSource.Token;
+                    client.GetStream().ReadAsync(incomingBuffer, 0, incomingBuffer.Length, token);
+                    tokenSource.Cancel();
+                    MyReceiveAsynch(length,byteData);
+                }
+                else // not an incoming buffer then it is surely a zookeeper process information
+                {
+                    if (Interlocked.CompareExchange(ref initialized,1,0) == 0)
+                    {
+                        // haven't been initialized so read the authentication negotiation result
+                        ReadConnectResult(byteData);
+                        // reading length information
+                        byteData = incomingBuffer;
+                        var tokenSource = new CancellationTokenSource();
+                        var token = tokenSource.Token;
+                        client.GetStream().ReadAsync(incomingBuffer, 0, incomingBuffer.Length, token);
+                        tokenSource.Cancel();
+                        MyReceiveAsynch(length,byteData);
+                    }
+                    else
+                    {
+                        currentLen += len;
+                        if (juteBuffer.Length > currentLen) // stream haven't been completed so read any left bytes
+                        {
+                             byteData = incomingBuffer;
+                            var tokenSource = new CancellationTokenSource();
+                            var token = tokenSource.Token;
+                            client.GetStream().ReadAsync(juteBuffer, currentLen, juteBuffer.Length - currentLen, token);
+                            tokenSource.Cancel();
+                            MyReceiveAsynch(length,byteData);
+                        }
+                        else
+                        {
+                            // stream is complete so read the response
+                            ReadResponse(byteData);
+                            // everything is fine, now read the stream again for length information
+                            byteData = incomingBuffer;
+                            var tokenSource = new CancellationTokenSource();
+                            var token = tokenSource.Token;
+                            client.GetStream().ReadAsync(incomingBuffer, 0, incomingBuffer.Length, token);
+                            tokenSource.Cancel();
+                            MyReceiveAsynch(length,byteData);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+        #endif
 
         private void PrimeConnection()
         {
+            #if !NET_CORE
             LOG.InfoFormat("Socket connection established to {0}, initiating session", client.Client.RemoteEndPoint);
+            #endif
             ConnectRequest conReq = new ConnectRequest(0, lastZxid, Convert.ToInt32(conn.SessionTimeout.TotalMilliseconds), conn.SessionId, conn.SessionPassword);
 
             lock (outgoingQueue)
@@ -460,8 +616,10 @@ namespace ZooKeeperNet
                 
             }
             packetAre.Set();
+            #if !NET_CORE
             if (LOG.IsDebugEnabled)
                 LOG.DebugFormat("Session establishment request sent on {0}",client.Client.RemoteEndPoint);
+            #endif
         }
 
         private void SendPing()
@@ -496,7 +654,7 @@ namespace ZooKeeperNet
             {
                 int len = reader.ReadInt32();
                 if (len < 0 || len >= ClientConnection.MaximumPacketLength)
-                    throw new IOException(new StringBuilder("Packet len ").Append(len).Append("is out of range!").ToString());
+                    throw new Exception(new StringBuilder("Packet len ").Append(len).Append("is out of range!").ToString());
                 return len;
             }
         }
@@ -521,7 +679,9 @@ namespace ZooKeeperNet
                 conn.SessionId = conRsp.SessionId;
                 conn.SessionPassword = conRsp.Passwd;
                 zooKeeper.State = ZooKeeper.States.CONNECTED;
+                #if !NET_CORE
                 LOG.InfoFormat("Session establishment complete on server {0:X}, negotiated timeout = {1}", conn.SessionId, negotiatedSessionTimeout);
+                #endif
                 conn.consumer.QueueEvent(new WatchedEvent(KeeperState.SyncConnected, EventType.None, null));
             }
         }
@@ -537,23 +697,29 @@ namespace ZooKeeperNet
                 if (replyHdr.Xid == -2)
                 {
                     // -2 is the xid for pings
+                    #if !NET_CORE
                     if (LOG.IsDebugEnabled)
                         LOG.DebugFormat("Got ping response for sessionid: 0x{0:X} after {1}ms", conn.SessionId, (DateTime.UtcNow.Nanos() - lastPingSentNs) / 1000000);
+                    #endif
                     return;
                 }
                 if (replyHdr.Xid == -4)
                 {
                     // -2 is the xid for AuthPacket
                     // TODO: process AuthPacket here
+                    #if !NET_CORE
                     if (LOG.IsDebugEnabled)
                         LOG.DebugFormat("Got auth sessionid:0x{0:X}", conn.SessionId);
+                    #endif
                     return;
                 }
                 if (replyHdr.Xid == -1)
                 {
                     // -1 means notification
+                    #if !NET_CORE
                     if (LOG.IsDebugEnabled)
                         LOG.DebugFormat("Got notification sessionid:0x{0}", conn.SessionId);
+                    #endif
 
                     WatcherEvent @event = new WatcherEvent();
                     @event.Deserialize(bbia, "response");
@@ -569,8 +735,10 @@ namespace ZooKeeperNet
                     }
 
                     WatchedEvent we = new WatchedEvent(@event);
+                    #if !NET_CORE
                     if (LOG.IsDebugEnabled)
                         LOG.DebugFormat("Got {0} for sessionid 0x{1:X}", we, conn.SessionId);
+                    #endif
 
                     conn.consumer.QueueEvent(we);
                     return;
@@ -587,7 +755,7 @@ namespace ZooKeeperNet
                         if (packet.header.Xid != replyHdr.Xid)
                         {
                             packet.replyHeader.Err = (int)KeeperException.Code.CONNECTIONLOSS;
-                            throw new IOException(new StringBuilder("Xid out of order. Got ").Append(replyHdr.Xid).Append(" expected ").Append(packet.header.Xid).ToString());
+                            throw new Exception(new StringBuilder("Xid out of order. Got ").Append(replyHdr.Xid).Append(" expected ").Append(packet.header.Xid).ToString());
                         }
 
                         packet.replyHeader.Xid = replyHdr.Xid;
@@ -599,8 +767,10 @@ namespace ZooKeeperNet
                         if (packet.response != null && replyHdr.Err == 0)
                             packet.response.Deserialize(bbia, "response");
 
+                        #if !NET_CORE
                         if (LOG.IsDebugEnabled)
                             LOG.DebugFormat("Reading reply sessionid:0x{0:X}, packet:: {1}", conn.SessionId, packet);
+                        #endif
                     }
                     finally
                     {
@@ -609,7 +779,7 @@ namespace ZooKeeperNet
                 }
                 else
                 {
-                    throw new IOException(new StringBuilder("Nothing in the queue, but got ").Append(replyHdr.Xid).ToString());
+                    throw new Exception(new StringBuilder("Nothing in the queue, but got ").Append(replyHdr.Xid).ToString());
                 }
             }
         }        
@@ -652,7 +822,9 @@ namespace ZooKeeperNet
                 }
                 catch (Exception ex)
                 {
+                    #if !NET_CORE
                     LOG.WarnFormat("Error disposing {0} : {1}", this.GetType().FullName, ex.Message);
+                    #endif
                 }
                 
                 incomingBuffer = juteBuffer = null;

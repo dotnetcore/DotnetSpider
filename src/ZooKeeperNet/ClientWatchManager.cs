@@ -15,10 +15,9 @@
  *  limitations under the License.
  *
  */
+using System.Collections.Generic;
 namespace ZooKeeperNet
 {
-    using System.Collections.Generic;
-
     public interface IClientWatchManager
     {
         /**

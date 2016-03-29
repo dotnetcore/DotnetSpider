@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NET_CORE
+using System;
 using System.Runtime.InteropServices;
 
 namespace Java2Dotnet.Spider.Redial.Utils
@@ -226,3 +227,4 @@ namespace Java2Dotnet.Spider.Redial.Utils
 		}
 	}
 }
+#endif

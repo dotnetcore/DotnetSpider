@@ -15,12 +15,14 @@
  *  limitations under the License.
  *
  */
+using System.IO;
+using System;
 namespace ZooKeeperNet
-{
-    using System.IO;
-    using System;
+{    
+    #if !NET_CORE
     [Serializable]
-    internal class SessionExpiredException : IOException
+    #endif
+    internal class SessionExpiredException : Exception //IOException
     {
         public SessionExpiredException(string msg) : base(msg)
         {

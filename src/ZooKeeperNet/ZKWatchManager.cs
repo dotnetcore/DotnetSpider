@@ -15,18 +15,21 @@
  *  limitations under the License.
  *
  */
-﻿namespace ZooKeeperNet
+using System;
+using System.Collections.Generic;
+#if !NET_CORE
+using log4net;
+#endif
+using System.Text;
+using System.Collections.Concurrent;
+using System.Threading;
+namespace ZooKeeperNet
 {
-    using System;
-    using System.Collections.Generic;
-    using log4net;
-    using System.Text;
-    using System.Collections.Concurrent;
-    using System.Threading;
-
     public class ZKWatchManager : IClientWatchManager 
     {
+        #if !NET_CORE
         private static readonly ILog LOG = LogManager.GetLogger(typeof(ZKWatchManager));
+        #endif
 
         internal readonly ConcurrentDictionary<string, HashSet<IWatcher>> dataWatches = new ConcurrentDictionary<string, HashSet<IWatcher>>();
         internal readonly ConcurrentDictionary<string, HashSet<IWatcher>> existWatches = new ConcurrentDictionary<string, HashSet<IWatcher>>();
@@ -91,13 +94,17 @@
                         HashSet<IWatcher> list = existWatches.GetAndRemove(clientPath);
                         if (list != null) {
                             AddTo(existWatches.GetAndRemove(clientPath), result);
+                            #if !NET_CORE
                             LOG.Warn("We are triggering an exists watch for delete! Shouldn't happen!");
+                            #endif
                         }
                         AddTo(childWatches.GetAndRemove(clientPath), result);
                     break;
                 default:
                     var msg = new StringBuilder("Unhandled watch event type ").Append(type).Append(" with state ").Append(state).Append(" on path ").Append(clientPath).ToString();
+                    #if !NET_CORE
                     LOG.Error(msg);
+                    #endif
                     throw new InvalidOperationException(msg);
             }
 

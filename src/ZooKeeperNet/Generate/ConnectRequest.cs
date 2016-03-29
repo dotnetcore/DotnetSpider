@@ -18,14 +18,18 @@
 */
 
 using System;
+#if !NET_CORE
 using log4net;
+#endif
 using ZooKeeperNet.Jute;
 
 namespace ZooKeeperNet.Generate
 {
 public class ConnectRequest : IRecord, IComparable 
 {
+    #if !NET_CORE
 private static ILog log = LogManager.GetLogger(typeof(ConnectRequest));
+#endif
   public ConnectRequest() {
   }
   public ConnectRequest(
@@ -85,7 +89,9 @@ Passwd=passwd;
       ms.Position = 0;
       return System.Text.Encoding.UTF8.GetString(ms.ToArray());
     }    } catch (Exception ex) {
+        #if !NET_CORE
       log.Error(ex);
+      #endif
     }
     return "ERROR";
   }

@@ -15,7 +15,8 @@
  *  limitations under the License.
  *
  */
-
+using System;
+using System.Text;
 using ZooKeeperNet.Generate;
 
 namespace ZooKeeperNet

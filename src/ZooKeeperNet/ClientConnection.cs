@@ -18,21 +18,26 @@
 
 using ZooKeeperNet.Generate;
 using ZooKeeperNet.Jute;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+#if !NET_CORE
+using log4net;
+#endif
 
 namespace ZooKeeperNet
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Text;
-    using System.Threading;
-    using log4net;
+   
 
 	public class ClientConnection : IClientConnection
     {
+        #if !NET_CORE
         private static readonly ILog LOG = LogManager.GetLogger(typeof(ClientConnection));
+        #endif
 
         private static readonly TimeSpan DefaultConnectTimeout = TimeSpan.FromMilliseconds(500);        
         private static bool disableAutoWatchReset = false;
@@ -267,7 +272,7 @@ namespace ZooKeeperNet
             }
             else
             {
-                IPHostEntry hostEntry = Dns.GetHostEntry(host);
+                IPHostEntry hostEntry = Dns.GetHostEntryAsync(host).Result;
                 IEnumerable<IPAddress> addresses = hostEntry.AddressList.Where(IsAllowedAddressFamily);
                 foreach (IPAddress address in addresses)
                 {
@@ -368,8 +373,10 @@ namespace ZooKeeperNet
             if(Interlocked.CompareExchange(ref isClosed,1,0) == 0)
             {
                 //closing = true;
+                #if !NET_CORE
                 if (LOG.IsDebugEnabled)
                     LOG.DebugFormat("Closing client for session: 0x{0:X}", SessionId);
+                #endif
 
                 try
                 {
@@ -390,13 +397,17 @@ namespace ZooKeeperNet
                         }
                     }
                 }
+                #if !NET_CORE
                 catch (ThreadInterruptedException)
                 {
                     // ignore, close the send/event threads
                 }
+                #endif
                 catch (Exception ex)
                 {
+                    #if !NET_CORE
                     LOG.WarnFormat("Error disposing {0} : {1}", this.GetType().FullName, ex.Message);
+                    #endif
                 }
                 finally
                 {

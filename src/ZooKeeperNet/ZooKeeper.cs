@@ -17,21 +17,26 @@
  */
 
 using ZooKeeperNet.Generate;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Diagnostics;
+#if !NET_CORE
+using log4net;
+#endif   
+using System.Threading;
+using System.Text;
 
 namespace ZooKeeperNet
 {
-    using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using log4net;
-    using System.Threading;
-    using System.Text;
+    
 
     [DebuggerDisplay("Id = {Id}")]
     public class ZooKeeper : IDisposable, IZooKeeper
     {
+        #if !NET_CORE
         private static readonly ILog LOG = LogManager.GetLogger(typeof(ZooKeeper));
+        #endif
 
         private readonly ZKWatchManager watchManager = new ZKWatchManager();
 
@@ -267,7 +272,9 @@ namespace ZooKeeperNet
         /// </param>
         public ZooKeeper(string connectstring, TimeSpan sessionTimeout, IWatcher watcher)
         {
+            #if !NET_CORE
             LOG.InfoFormat("Initiating client connection, connectstring={0} sessionTimeout={1} watcher={2}", connectstring, sessionTimeout, watcher);
+            #endif
 
             watchManager.DefaultWatcher = watcher;
             cnxn = new ClientConnection(connectstring, sessionTimeout, this, watchManager);
@@ -276,7 +283,9 @@ namespace ZooKeeperNet
 
         public ZooKeeper(string connectstring, TimeSpan sessionTimeout, IWatcher watcher, long sessionId, byte[] sessionPasswd)
         {
+            #if !NET_CORE
             LOG.InfoFormat("Initiating client connection, connectstring={0} sessionTimeout={1} watcher={2} sessionId={3} sessionPasswd={4}", connectstring, sessionTimeout, watcher, sessionId, (sessionPasswd == null ? "<null>" : "<hidden>"));
+            #endif
 
             watchManager.DefaultWatcher = watcher;
             cnxn = new ClientConnection(connectstring, sessionTimeout, this, watchManager, sessionId, sessionPasswd);
@@ -388,17 +397,21 @@ namespace ZooKeeperNet
             var connectionState = State;
             if (null != connectionState && !connectionState.IsAlive())
             {
+                #if !NET_CORE
                 if (LOG.IsDebugEnabled)
                 {
                     LOG.Debug("Close called on already closed client");
                 }
+                #endif
                 return;
             }
 
+            #if !NET_CORE
             if (LOG.IsDebugEnabled)
             {
                 LOG.DebugFormat("Closing session: 0x{0:X}", SessionId);
             }
+            #endif
 
             try
             {
@@ -406,13 +419,17 @@ namespace ZooKeeperNet
             }
             catch (Exception e)
             {
+                #if !NET_CORE
                 if (LOG.IsDebugEnabled)
                 {
                     LOG.Debug("Ignoring unexpected exception during close", e);
                 }
+                #endif
             }
-
+            
+            #if !NET_CORE
             LOG.DebugFormat("Session: 0x{0:X} closed", SessionId);
+            #endif
         }
 
         public void Dispose()
@@ -503,6 +520,7 @@ namespace ZooKeeperNet
             h.Type = (int)OpCode.Create;
             CreateRequest request = new CreateRequest(serverPath,data,acl,createMode.Flag);
             CreateResponse response = new CreateResponse();
+            var rst=response.ToString();
             ReplyHeader r = cnxn.SubmitRequest(h, request, response, null);
             if (r.Err != 0)
             {

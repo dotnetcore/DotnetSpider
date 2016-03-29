@@ -16,12 +16,11 @@
  *
  */
 
+using System.Collections.Generic;
 using ZooKeeperNet.Generate;
 
 namespace ZooKeeperNet
 {
-    using System.Collections.Generic;
-
 	public sealed class Ids
     {
         private Ids() { }

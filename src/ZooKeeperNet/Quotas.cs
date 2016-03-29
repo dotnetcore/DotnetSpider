@@ -15,7 +15,7 @@
  *  limitations under the License.
  *
  */
-﻿using System.Text;
+using System.Text;
 namespace ZooKeeperNet
 {
     public sealed class Quotas

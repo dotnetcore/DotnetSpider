@@ -15,12 +15,14 @@
  *  limitations under the License.
  *
  */
-﻿namespace ZooKeeperNet
-{
-    using System;
-    using System.Text;
+using System;
+using System.Text;
 
-     [Serializable]
+namespace ZooKeeperNet
+{
+    #if !NET_CORE
+    [Serializable]
+    #endif
     public abstract class KeeperException : Exception
     {
 
@@ -288,7 +290,9 @@
         /**
          *  @see Code#AUTHFAILED
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class AuthFailedException : KeeperException
         {
             public AuthFailedException()
@@ -300,7 +304,9 @@
         /**
          *  @see Code#BADARGUMENTS
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class BadArgumentsException : KeeperException
         {
             public BadArgumentsException()
@@ -316,7 +322,9 @@
         /**
          * @see Code#BADVERSION
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class BadVersionException : KeeperException
         {
             public BadVersionException()
@@ -332,7 +340,9 @@
         /**
          * @see Code#CONNECTIONLOSS
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class ConnectionLossException : KeeperException
         {
             public ConnectionLossException()
@@ -344,7 +354,9 @@
         /**
          * @see Code#DATAINCONSISTENCY
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class DataInconsistencyException : KeeperException
         {
             public DataInconsistencyException()
@@ -356,7 +368,9 @@
         /**
          * @see Code#INVALIDACL
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class InvalidACLException : KeeperException
         {
             public InvalidACLException()
@@ -372,7 +386,9 @@
         /**
          * @see Code#INVALIDCALLBACK
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class InvalidCallbackException : KeeperException
         {
             public InvalidCallbackException()
@@ -384,7 +400,9 @@
         /**
          * @see Code#MARSHALLINGERROR
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class MarshallingErrorException : KeeperException
         {
             public MarshallingErrorException()
@@ -396,7 +414,9 @@
         /**
          * @see Code#NOAUTH
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class NoAuthException : KeeperException
         {
             public NoAuthException()
@@ -408,7 +428,9 @@
         /**
          * @see Code#NOCHILDRENFOREPHEMERALS
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class NoChildrenForEphemeralsException : KeeperException
         {
             public NoChildrenForEphemeralsException()
@@ -424,7 +446,9 @@
         /**
          * @see Code#NODEEXISTS
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class NodeExistsException : KeeperException
         {
             public NodeExistsException()
@@ -440,7 +464,9 @@
         /**
          * @see Code#NONODE
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class NoNodeException : KeeperException
         {
             public NoNodeException()
@@ -456,7 +482,9 @@
         /**
          * @see Code#NOTEMPTY
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class NotEmptyException : KeeperException
         {
             public NotEmptyException()
@@ -472,7 +500,9 @@
         /**
          * @see Code#OPERATIONTIMEOUT
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class OperationTimeoutException : KeeperException
         {
             public OperationTimeoutException()
@@ -484,7 +514,9 @@
         /**
          * @see Code#RUNTIMEINCONSISTENCY
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class RuntimeInconsistencyException : KeeperException
         {
             public RuntimeInconsistencyException()
@@ -496,7 +528,9 @@
         /**
          * @see Code#SESSIONEXPIRED
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class SessionExpiredException : KeeperException
         {
             public SessionExpiredException()
@@ -508,7 +542,9 @@
         /**
          * @see Code#SESSIONMOVED
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class SessionMovedException : KeeperException
         {
             public SessionMovedException()
@@ -520,7 +556,9 @@
         /**
          * @see Code#SYSTEMERROR
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class SystemErrorException : KeeperException
         {
             public SystemErrorException()
@@ -532,7 +570,9 @@
         /**
          * @see Code#UNIMPLEMENTED
          */
+         #if !NET_CORE
          [Serializable]
+         #endif
         public class UnimplementedException : KeeperException
         {
             public UnimplementedException()

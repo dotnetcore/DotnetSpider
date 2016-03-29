@@ -6,6 +6,7 @@ using System.Text;
 using Java2Dotnet.Spider.Extension;
 using Java2Dotnet.Spider.Test.Example;
 using Java2Dotnet.Spider.Test.Pipeline;
+using Java2Dotnet.Spider.Test.ZooKeeperTest;
 
 namespace Java2Dotnet.Spider.Test
 {
@@ -13,32 +14,9 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-            Console.WriteLine("Start Program...");
-			//TransactionIndexLeafIdSpider spiderBuilder = new TransactionIndexLeafIdSpider();
-			//ScriptSpider spider = new ScriptSpider(spiderBuilder.GetContext());
-			//spider.Run(args);
-			//Run(() =>
-			//{
-			//	FilePipelineTest test1 = new FilePipelineTest();
-			//	test1.Before();
-			//	test1.TestProcess();
-			//}, "FilePipelineTest", "TestProcess");
-
-
-			//Run(() =>
-			//{
-			//	ResultItemsCollectorsPipelineTest test = new ResultItemsCollectorsPipelineTest();
-			//	test.TestCollectorPipeline();
-			//}, "ResultItemsCollectorsPipelineTest", "TestCollectorPipeline");
-
-
-			//Run(() =>
-			//{
-			//	SpiderTest test = new SpiderTest();
-			//	test.TestStartAndStop();
-			//}, "SpiderTest", "TestStartAndStop");
-			Console.ForegroundColor = ConsoleColor.DarkRed;
-			Console.WriteLine("Hello World!");
+            JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			ScriptSpider spider = new ScriptSpider(spiderBuilder.GetContext());
+			spider.Run(args);
 		}
 
 		static void Run(Action a, string type, string name)

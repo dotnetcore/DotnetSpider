@@ -19,18 +19,21 @@
 using ZooKeeperNet.Generate;
 using ZooKeeperNet.IO;
 using ZooKeeperNet.Jute;
+using System.IO;
+using System.Text;
+using System.Threading;
+#if !NET_CORE
+using log4net;
+#endif
+using System;
 
 namespace ZooKeeperNet
 {
-    using System.IO;
-    using System.Text;
-    using System.Threading;
-    using log4net;
-    using System;
-
     public class Packet
     {
+        #if !NET_CORE
         private static readonly ILog LOG = LogManager.GetLogger(typeof(Packet));
+        #endif
 
         internal RequestHeader header;
         private string serverPath;
@@ -81,10 +84,17 @@ namespace ZooKeeperNet
                         this.data = ms.ToArray();
                     }
                 }
+                #if !NET_CORE
                 catch (IOException e)
-                {
-                    LOG.Warn("Ignoring unexpected exception", e);
+                {                   
+                    LOG.Warn("Ignoring unexpected exception", e);                 
                 }
+                #endif
+                #if NET_CORE
+                catch (Exception e)
+                {                                      
+                }
+                #endif
             }
             this.watchRegistration = watchRegistration;
         }

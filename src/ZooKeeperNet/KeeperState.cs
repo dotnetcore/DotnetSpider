@@ -15,7 +15,7 @@
  *  limitations under the License.
  *
  */
-﻿namespace ZooKeeperNet
+namespace ZooKeeperNet
 {
     public enum KeeperState
     {

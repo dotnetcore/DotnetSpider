@@ -493,7 +493,7 @@ namespace ZooKeeperNet.IO
 				}
 			}
 			// Still haven't seen a byte with the high bit unset? Dodgy data.
-			throw new IOException("Invalid 7-bit encoded integer in stream.");
+			throw new Exception("Invalid 7-bit encoded integer in stream.");
 		}
 
 		/// <summary>
@@ -522,7 +522,7 @@ namespace ZooKeeperNet.IO
 				}
 			}
 			// Still haven't seen a byte with the high bit unset? Dodgy data.
-			throw new IOException("Invalid 7-bit encoded integer in stream.");
+			throw new Exception("Invalid 7-bit encoded integer in stream.");
 		}
 
 		/// <summary>

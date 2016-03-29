@@ -39,6 +39,13 @@ namespace Java2Dotnet.Spider.Test.Example
 					FormateStrings = new List<string> { "{0}&page=1&JL=6_0_0" }
 				}},
 				Scheduler = new QueueScheduler(),
+                Redialer = new AdslRedialer
+				{
+					//Account = "CDAEF120",
+					//Password = "12340987",
+					Interface = "宽带连接"
+				},
+				NetworkValidater = new DefaultNetworkValidater(),
 				//Scheduler = new RedisScheduler()
 				//{
 				//	Host = "127.0.0.1",
@@ -57,7 +64,7 @@ namespace Java2Dotnet.Spider.Test.Example
 		[Schema("test", "sku", TableSuffix.Today)]
 		[TargetUrl(new[] { @"page=[0-9]+" }, "//*[@id=\"J_bottomPage\"]")]
 		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
-		[Indexes(Index = new[] { "category" }, Primary = "id", Unique = new[] { "category,sku", "sku" }, AutoIncrement = "id")]
+		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
 		public class Product : ISpiderEntity
 		{
 			public Product()

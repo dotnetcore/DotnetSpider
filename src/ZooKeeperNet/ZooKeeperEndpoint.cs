@@ -15,12 +15,12 @@
  *  limitations under the License.
  *
  */
+using System;
+using System.Net;
 
 namespace ZooKeeperNet
 {
-    using System;
-    using System.Net;
-
+    
     public class ZooKeeperEndpoint
     {
         private const int retryCeiling = 10;

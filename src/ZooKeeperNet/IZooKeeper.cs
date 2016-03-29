@@ -17,11 +17,12 @@
  */
 
 using ZooKeeperNet.Generate;
-
+using System;
+using System.Collections.Generic;
+    
 namespace ZooKeeperNet
 {
-    using System;
-    using System.Collections.Generic;
+    
 
 	public interface IZooKeeper
     {

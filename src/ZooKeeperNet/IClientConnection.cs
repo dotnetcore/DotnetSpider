@@ -15,14 +15,12 @@
  *  limitations under the License.
  *
  */
-
+using System;
 using ZooKeeperNet.Generate;
 using ZooKeeperNet.Jute;
 
 namespace ZooKeeperNet
 {
-    using System;
-
 	public interface IClientConnection : IStartable, IDisposable
     {
         /// <summary>

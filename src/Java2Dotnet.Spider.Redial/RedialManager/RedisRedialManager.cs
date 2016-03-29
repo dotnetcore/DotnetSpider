@@ -1,7 +1,9 @@
-﻿#if !NET_CORE
-
+﻿
 using System;
+#if !NET_CORE
 using System.Configuration;
+#endif
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
@@ -22,12 +24,22 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		private const string RunningRedialStatus = "Running";
 		private const string DialingRedialStatus = "Dialing";
 		private ConnectionMultiplexer redis;
+        
+        public static string SetPrefix { get; set; } = DateTime.Now.ToString() + "| ";
+        public static string HostName { get; set; } = Dns.GetHostName();
 
 		public override IAtomicExecutor AtomicExecutor { get; }
 
 		private RedisRedialManager()
 		{
+            #if !NET_CORE
 			var tmpRedisHost = ConfigurationManager.AppSettings["redialRedisServer"];
+            #endif
+            
+            #if NET_CORE
+            var tmpRedisHost = "192.168.199.202";
+            #endif
+            
 			if (!string.IsNullOrEmpty(tmpRedisHost))
 			{
 				RedisHost = tmpRedisHost;
@@ -54,7 +66,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				SetRedialStatus(RunningRedialStatus);
 			}
 
-			AtomicExecutor = new FileLockerAtomicExecutor(this);
+			AtomicExecutor = new RedisAtomicExecutor(this);
 		}
 
 		public static RedisRedialManager Default
@@ -68,29 +80,43 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				return _instanse;
 			}
 		}
-
-		[MethodImpl(MethodImplOptions.Synchronized)]
+        
 		public override void WaitforRedialFinish()
-		{
+		{            
 			if (Skip)
 			{
 				return;
 			}
 
-			var redialSetting = GetRedialStatus();
-
-			if (RunningRedialStatus != redialSetting)
+            IDatabase db = redis.GetDatabase(0);
+            RedisValue[] values = db.SetMembers(GetSetKey());
+		    foreach (var v in values)
 			{
-				while (true)
+				string key = v.ToString();
+                
+				//string dateTime = key.Split('|')[0];
+				//string date = dateTime.Split(' ')[0];
+				//string time = dateTime.Split(' ')[1];
+				//int year = Convert.ToInt32(date.Split('-')[0]);
+				//int month = Convert.ToInt32(date.Split('-')[1]);
+				//int day = Convert.ToInt32(date.Split('-')[2]);
+				//int hour = Convert.ToInt32(time.Split(':')[0]);
+				//int minute = Convert.ToInt32(time.Split(':')[1]);
+				//int second = Convert.ToInt32(time.Split(':')[2]);
+                
+				DateTime dt = DateTime.Parse(key);
+				var ts = DateTime.Now - dt;
+				double h = ts.TotalHours;
+				if (h > 1)
 				{
-					Thread.Sleep(50);
-					var redialSetting1 = GetRedialStatus();
-					if (redialSetting1 == RunningRedialStatus)
-					{
-						break;
-					}
+    				db.HashDelete(GetSetKey(),key);
 				}
 			}
+            
+			while (db.SetContains(GetSetKey(),"redial-lock"))
+            {
+                Thread.Sleep(50);
+            }
 		}
 
 		private string GetRedialStatus()
@@ -106,7 +132,6 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 		}
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		public override RedialResult Redial()
 		{
 			if (Skip)
@@ -114,14 +139,13 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				return RedialResult.Skip;
 			}
 
-			var redialSetting = GetRedialStatus();
-			if (RunningRedialStatus != redialSetting)
+            IDatabase db = redis.GetDatabase(0);
+			if (db.SetContains(GetSetKey(),"redial-lock"))
 			{
 				while (true)
 				{
 					Thread.Sleep(50);
-					var redialSetting1 = GetRedialStatus();
-					if (redialSetting1 == RunningRedialStatus)
+					if (!db.SetContains(GetSetKey(),"redial-lock"))
 					{
 						return RedialResult.OtherRedialed;
 					}
@@ -129,7 +153,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			}
 			else
 			{
-				SetRedialStatus(DialingRedialStatus);
+				db.HashSet(GetSetKey(),"redial-lock","redialing");
 
 				// wait all operation stop.
 				Thread.Sleep(5000);
@@ -140,7 +164,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 				RedialInternet();
 
-				SetRedialStatus(RunningRedialStatus);
+				db.HashDelete(GetSetKey(),"redial-lock");
 
 				Logger.Warn("Redial finished.");
 				return RedialResult.Sucess;
@@ -151,6 +175,15 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		{
 			redis?.Dispose();
 		}
+        
+        public static string GetSetKey()
+		{
+			return HostName;
+		}
+
+		public static string GetFieldKey(string identity)
+		{
+			return SetPrefix + identity;
+		}
 	}
 }
-#endif

@@ -15,19 +15,22 @@
  *  limitations under the License.
  *
  */
-﻿using System.Collections.Generic;
-﻿using log4net;
+using System.Collections.Generic;
+#if !NET_CORE
+using log4net;
+#endif
 
+using System;
+using System.Text;
+using System.Threading;
+using System.Linq;
 namespace ZooKeeperNet
 {
-    using System;
-    using System.Text;
-    using System.Threading;
-    using System.Linq;
-
     public static class ZooKeeperEx
     {
+        #if !NET_CORE
         private static readonly ILog LOG = LogManager.GetLogger(typeof(ZooKeeperEx));
+        #endif
 
         public static TValue GetAndRemove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
@@ -98,7 +101,9 @@ namespace ZooKeeperNet
                 }
                 catch (Exception ex)
                 {
+                    #if !NET_CORE
                     LOG.WarnFormat("Error disposing {0} : {1}", this.GetType().FullName, ex.Message);
+                    #endif
                 }
                 
             }

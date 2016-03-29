@@ -16,7 +16,8 @@
 			"dependencies": {
 				"System.Diagnostics.Process": "4.1.0-rc3-23829",
 				"System.Net.Http": "4.0.1-rc3-23829",
-				"System.Text.Encoding.CodePages": "4.0.1-rc3-23829"
+				"System.Text.Encoding.CodePages": "4.0.1-rc3-23829",
+                "ZooKeeperNet": "0.0.9"
 			},
 			"compilationOptions": {
 				"define": [ "NET_CORE" ]

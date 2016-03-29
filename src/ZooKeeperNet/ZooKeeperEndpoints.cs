@@ -15,13 +15,12 @@
  *  limitations under the License.
  *
  */
-
+using System.Net;
+using System;
+using System.Collections.Generic;
+    
 namespace ZooKeeperNet
 {
-	using System.Net;
-    using System;
-    using System.Collections.Generic;
-
 	public class ZooKeeperEndpoints:IEnumerable<ZooKeeperEndpoint>
     {
         private static readonly TimeSpan defaultBackoffInterval = new TimeSpan(0,2,0); 
@@ -65,7 +64,10 @@ namespace ZooKeeperNet
 
         public void AddRange(List<IPEndPoint> endPoints)
         {
-            AddRange(endPoints.ConvertAll(e => new ZooKeeperEndpoint(e, backoffInterval)));
+            foreach (var e in endPoints)
+            {
+                this.Add(new ZooKeeperEndpoint(e, backoffInterval));
+            }
         }
 
         public ZooKeeperEndpoint CurrentEndPoint

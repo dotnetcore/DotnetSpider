@@ -15,16 +15,20 @@
  *  limitations under the License.
  *
  */
-﻿using System;
+using System;
 
 namespace ZooKeeperNet
 {
+    #if !NET_CORE
     using log4net;
+    #endif
 
     public class SafeThreadStart
     {
         private readonly Action action;
+        #if !NET_CORE
         private static readonly ILog LOG = LogManager.GetLogger(typeof(SafeThreadStart));
+        #endif
 
         public SafeThreadStart(Action action)
         {
@@ -39,7 +43,9 @@ namespace ZooKeeperNet
             }
             catch (Exception e)
             {
+                #if !NET_CORE
                 LOG.Error("Unhandled exception in background thread", e);
+                #endif
             }            
         }
     }

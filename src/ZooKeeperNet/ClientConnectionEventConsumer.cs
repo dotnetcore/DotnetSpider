@@ -15,19 +15,22 @@
  *  limitations under the License.
  *
  */
-﻿namespace ZooKeeperNet
+using System;
+using System.Collections.Concurrent;
+using System.Threading;  
+#if !NET_CORE
+using log4net;
+#endif   
+using System.Text;
+using System.Collections.Generic;
+    
+namespace ZooKeeperNet
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Threading;
-    using log4net;
-    using System.Text;
-    using System.Collections.Generic;
-
     public class ClientConnectionEventConsumer : IStartable, IDisposable
     {
+#if !NET_CORE
         private static readonly ILog LOG = LogManager.GetLogger(typeof(ClientConnectionEventConsumer));
-
+#endif
         private readonly ClientConnection conn;
         private readonly Thread eventThread;
         //ConcurrentQueue gives us the non-blocking way of processing, it reduced the contention so much
@@ -63,7 +66,9 @@
                 }
                 catch (Exception t)
                 {
+                    #if !NET_CORE
                     LOG.Error("Error while calling watcher ", t);
+                    #endif
                 }
             }
         }
@@ -94,16 +99,26 @@
                     }
                     catch (Exception t)
                     {
+                        #if !NET_CORE
                         LOG.Error("Caught unexpected throwable", t);
+                        #endif
                     }
                 }
             }
+            #if !NET_CORE
             catch (ThreadInterruptedException e)
-            {
-                LOG.Error("Event thread exiting due to interruption", e);
+            {              
+                LOG.Error("Event thread exiting due to interruption", e);               
             }
-
+            #endif
+            #if NET_CORE
+            catch (Exception e)
+            {                             
+            }
+            #endif
+            #if !NET_CORE
             LOG.Info("EventThread shut down");
+            #endif
         }
 
         public void QueueEvent(WatchedEvent @event)
@@ -137,7 +152,9 @@
                 }
                 catch (Exception ex)
                 {
+                    #if !NET_CORE
                     LOG.WarnFormat("Error disposing {0} : {1}", this.GetType().FullName, ex.Message);
+                    #endif
                 }
             }
         }

@@ -18,14 +18,18 @@
 */
 
 using System;
+#if !NET_CORE
 using log4net;
+#endif
 using ZooKeeperNet.Jute;
 
 namespace ZooKeeperNet.Generate
 {
 public class GetDataResponse : IRecord, IComparable 
 {
+    #if !NET_CORE
 private static ILog log = LogManager.GetLogger(typeof(GetDataResponse));
+#endif
   public GetDataResponse() {
   }
   public GetDataResponse(
@@ -65,7 +69,9 @@ Stat=stat;
       ms.Position = 0;
       return System.Text.Encoding.UTF8.GetString(ms.ToArray());
     }    } catch (Exception ex) {
+        #if !NET_CORE
       log.Error(ex);
+      #endif
     }
     return "ERROR";
   }

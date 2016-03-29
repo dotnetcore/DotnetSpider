@@ -18,19 +18,24 @@
 
 using ZooKeeperNet.Generate;
 using ZooKeeperNet.Jute;
+using System;
+using System.Collections.Generic;
+#if !NET_CORE
+using log4net;
+#endif
+using System.Text;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace ZooKeeperNet
 {
-    using System;
-    using System.Collections.Generic;
-    using log4net;
-    using System.Text;
-    using System.Collections.Concurrent;
-    using System.Threading;
+    
 
     public class DataTree
     {
+        #if !NET_CORE
         private static readonly ILog LOG = LogManager.GetLogger(typeof(DataTree));
+        #endif
 
         private readonly Dictionary<string, DataNode> nodes = new Dictionary<string, DataNode>();
 
@@ -119,7 +124,9 @@ namespace ZooKeeperNet
             List<ACL> acls;
             if (!longKeyMap.TryGetValue(longVal, out acls))
             {
+                #if !NET_CORE
                 LOG.ErrorFormat("ERROR: ACL not available for long {0}", longVal);
+                #endif
                 throw new InvalidOperationException(new StringBuilder("Failed to fetch acls for ").Append(longVal).ToString());
             }
             return acls;

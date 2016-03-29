@@ -29,7 +29,9 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("0ee34fd6-195e-4912-906a-44062ecaffad")]
+#if !NET_CORE
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
+#endif
 
 [assembly: AssemblyDescription("ZooKeeper Client for .NET http://zookeeper.apache.org")]
 [assembly: AssemblyProduct("ZooKeeperNet")]

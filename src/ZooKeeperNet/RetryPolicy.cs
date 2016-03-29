@@ -15,8 +15,8 @@
  *  limitations under the License.
  *
  */
- using System;
- using System.Threading;
+using System;
+using System.Threading;
 
 namespace ZooKeeperNet
 {
@@ -47,7 +47,7 @@ namespace ZooKeeperNet
                 {
                     effectiveSleeper(GetSleepTime(retryCount, elapsedTime));
                 }
-                catch (ThreadInterruptedException)
+                catch (Exception)
                 {
                     // Handle gracefully and don't allow retries
                 }
