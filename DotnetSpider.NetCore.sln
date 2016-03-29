@@ -36,11 +36,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "StackExchange.Redis", "src\StackExchange.Redis\StackExchange.Redis.xproj", "{88142F61-C57F-4616-93FB-0EA431DE736E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Spiders", "projects\data-tracking\Spiders\Spiders.xproj", "{E31FFC5F-8697-4DF2-9A59-801278410654}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{78EB8CD5-AC6F-4DF4-870A-EA8086BA2F57}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Portal.Console", "projects\data-tracking\Portal.Console\Portal.Console.xproj", "{E5DF45B0-EF2A-4301-BA6E-7A7FB21A09DB}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Spiders", "..\data-tracking\Spiders\Spiders.xproj", "{E31FFC5F-8697-4DF2-9A59-801278410654}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Portal.Console", "..\data-tracking\Portal.Console\Portal.Console.xproj", "{E5DF45B0-EF2A-4301-BA6E-7A7FB21A09DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

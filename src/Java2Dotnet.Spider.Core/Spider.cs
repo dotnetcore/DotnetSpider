@@ -315,7 +315,7 @@ namespace Java2Dotnet.Spider.Core
 
 			if (Downloader == null)
 			{
-				//Downloader = new HttpClientDownloader();
+				Downloader = new HttpClientDownloader();
 			}
 
 			Downloader.ThreadNum = ThreadNum;

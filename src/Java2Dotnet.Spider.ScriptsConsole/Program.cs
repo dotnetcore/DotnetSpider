@@ -19,7 +19,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			//{
 			//	StartSpider(param);
 			//}
-			string json = File.ReadAllText("sample.json");
+			string json = File.ReadAllText(args[0]);
 			json = Macros.Replace(json);
 			JsonSpiderContext spiderContext = JsonConvert.DeserializeObject<JsonSpiderContext>(json);
 			List<string> errorMessages;

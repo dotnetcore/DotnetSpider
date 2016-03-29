@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Utils;
 using Java2Dotnet.Spider.Common;
-
+using Java2Dotnet.Spider.Redial;
 #if !NET_CORE
 using log4net;
 //using Dapper;
@@ -105,50 +105,56 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 		public virtual void Initialize()
 		{
-			using (DbConnection conn = CreateConnection())
+			RedialManagerUtils.Execute("db-init", () =>
 			{
-				conn.Open();
-				var command = conn.CreateCommand();
-				command.CommandText = GetCreateSchemaSql();
-				command.CommandType = CommandType.Text;
-				command.ExecuteNonQuery();
+				using (DbConnection conn = CreateConnection())
+				{
+					conn.Open();
+					var command = conn.CreateCommand();
+					command.CommandText = GetCreateSchemaSql();
+					command.CommandType = CommandType.Text;
+					command.ExecuteNonQuery();
 
-				command.CommandText = GetCreateTableSql();
-				command.CommandType = CommandType.Text;
-				command.ExecuteNonQuery();
-				conn.Close();
-			}
+					command.CommandText = GetCreateTableSql();
+					command.CommandType = CommandType.Text;
+					command.ExecuteNonQuery();
+					conn.Close();
+				}
+			});
 		}
 
 		public void Process(List<JObject> datas, ISpider spider)
 		{
-			using (var conn = CreateConnection())
+			RedialManagerUtils.Execute("db-insert", () =>
 			{
-				var cmd = conn.CreateCommand();
-				cmd.CommandText = GetInsertSql();
-				cmd.CommandType = CommandType.Text;
-				conn.Open();
-
-				foreach (var data in datas)
+				using (var conn = CreateConnection())
 				{
-					cmd.Parameters.Clear();
+					var cmd = conn.CreateCommand();
+					cmd.CommandText = GetInsertSql();
+					cmd.CommandType = CommandType.Text;
+					conn.Open();
 
-					List<DbParameter> parameters = new List<DbParameter>();
-					foreach (var column in Columns)
+					foreach (var data in datas)
 					{
-						var parameter = CreateDbParameter();
-						parameter.ParameterName = $"@{column.Name}";
-						parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-						parameter.DbType = Convert(column.DataType);
-						parameters.Add(parameter);
+						cmd.Parameters.Clear();
+
+						List<DbParameter> parameters = new List<DbParameter>();
+						foreach (var column in Columns)
+						{
+							var parameter = CreateDbParameter();
+							parameter.ParameterName = $"@{column.Name}";
+							parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+							parameter.DbType = Convert(column.DataType);
+							parameters.Add(parameter);
+						}
+
+						cmd.Parameters.AddRange(parameters.ToArray());
+						cmd.ExecuteNonQuery();
 					}
 
-					cmd.Parameters.AddRange(parameters.ToArray());
-					cmd.ExecuteNonQuery();
+					conn.Close();
 				}
-
-				conn.Close();
-			}
+			});
 		}
 
 		public void Dispose()
