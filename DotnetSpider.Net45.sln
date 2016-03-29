@@ -19,13 +19,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.ScriptsC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{E6A464D0-5F36-46FE-AE8D-343A254CDB05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spiders", "projects\data-tracking\Spiders\net45\Spiders.csproj", "{C3DEE32A-70F1-41FD-B323-6536CC773D56}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal.Console", "projects\data-tracking\Portal.Console\net45\Portal.Console.csproj", "{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.Monitor", "src\Java2Dotnet.Spider.Monitor\Java2Dotnet.Spider.Monitor.csproj", "{0029BE7D-75C8-401D-84C9-97CC8BAD6791}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZooKeeperNet", "src\ZooKeeperNet\ZooKeeperNet.csproj", "{5C6774FB-2350-46B2-B1DF-1CCC757C7727}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spiders", "..\data-tracking\Spiders\net45\Spiders.csproj", "{C3DEE32A-70F1-41FD-B323-6536CC773D56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portal.Console", "..\data-tracking\Portal.Console\net45\Portal.Console.csproj", "{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,14 +61,6 @@ Global
 		{D3212A72-CD85-421C-830F-53757C3ACDC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3212A72-CD85-421C-830F-53757C3ACDC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3212A72-CD85-421C-830F-53757C3ACDC3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C3DEE32A-70F1-41FD-B323-6536CC773D56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C3DEE32A-70F1-41FD-B323-6536CC773D56}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C3DEE32A-70F1-41FD-B323-6536CC773D56}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C3DEE32A-70F1-41FD-B323-6536CC773D56}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0029BE7D-75C8-401D-84C9-97CC8BAD6791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0029BE7D-75C8-401D-84C9-97CC8BAD6791}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0029BE7D-75C8-401D-84C9-97CC8BAD6791}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -77,6 +69,14 @@ Global
 		{5C6774FB-2350-46B2-B1DF-1CCC757C7727}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C6774FB-2350-46B2-B1DF-1CCC757C7727}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C6774FB-2350-46B2-B1DF-1CCC757C7727}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3DEE32A-70F1-41FD-B323-6536CC773D56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3DEE32A-70F1-41FD-B323-6536CC773D56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3DEE32A-70F1-41FD-B323-6536CC773D56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3DEE32A-70F1-41FD-B323-6536CC773D56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A086E2FF-94D4-480E-B0BB-24B6F76ACC79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
