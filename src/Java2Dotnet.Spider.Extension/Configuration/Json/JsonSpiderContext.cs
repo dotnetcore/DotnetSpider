@@ -15,7 +15,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		public JObject Scheduler { get; set; }
 		public JObject Downloader { get; set; }
 		public Site Site { get; set; }
-		public NetworkValidater NetworkValidater { get; set; }
+		public JObject NetworkValidater { get; set; }
 		public JObject Redialer { get; set; }
 		public List<JObject> PrepareStartUrls { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
@@ -39,7 +39,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.Downloader = GetDownloader(Downloader);
 			context.EmptySleepTime = EmptySleepTime;
 			context.Entities = Entities;
-			context.NetworkValidater = NetworkValidater;
+			context.NetworkValidater = GetNetworkValidater(NetworkValidater);
 			context.Pipeline = GetPipepine(Pipeline);
 			context.PrepareStartUrls = GetPrepareStartUrls(PrepareStartUrls);
 			context.Redialer = GetRedialer(Redialer);
@@ -51,6 +51,33 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.ValidationReportTo = ValidationReportTo;
 			context.EnviromentValues = EnviromentValues;
 			return context;
+		}
+
+		private NetworkValidater GetNetworkValidater(JObject networkValidater)
+		{
+			if (networkValidater == null)
+			{
+				return null;
+			}
+
+			var type = networkValidater.SelectToken("$.Type")?.ToObject<NetworkValidater.Types>();
+			if (type == null)
+			{
+				throw new SpiderExceptoin("Missing NetworkValidater type: " + networkValidater);
+			}
+
+			switch (type)
+			{
+				case Configuration.NetworkValidater.Types.Vps:
+					{
+						return networkValidater.ToObject<VpsNetworkValidater>();
+					}
+				case Configuration.NetworkValidater.Types.Defalut:
+					{
+						return new DefaultNetworkValidater();
+					}
+			}
+			throw new SpiderExceptoin("Can't convert NetworkValidater: " + networkValidater);
 		}
 
 		private Scheduler GetScheduler(JObject jobject)
@@ -186,15 +213,15 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			{
 				case Configuration.Pipeline.Types.MongoDb:
 					{
-						return new MongoDbPipeline();
+						return pipeline.ToObject<MongoDbPipeline>();
 					}
 				case Configuration.Pipeline.Types.MySql:
 					{
-						return new MysqlPipeline();
+						return pipeline.ToObject<MysqlPipeline>();
 					}
 				case Configuration.Pipeline.Types.MySqlFile:
 					{
-						return new MysqlFilePipeline();
+						return pipeline.ToObject<MysqlFilePipeline>();
 					}
 			}
 

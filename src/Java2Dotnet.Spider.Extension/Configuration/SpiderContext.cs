@@ -10,7 +10,7 @@ namespace Java2Dotnet.Spider.Extension
 	public class SpiderContext
 	{
 		// build it internal
-		internal List<JObject> Entities { get; set; } = new List<JObject>();
+		public List<JObject> Entities { get; internal set; } = new List<JObject>();
 
 		public string SpiderName { get; set; }
 		public int ThreadNum { get; set; } = 1;
