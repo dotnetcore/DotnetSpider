@@ -165,23 +165,7 @@
 		{
 			"Type": 0,
 			"Source": 0,
-			"ConnectString": "Database='test';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306",
-			"GroupBy": "group by `name`",
-			"TableName": "taobao.brand_rank",
-			"Filters": null,
-			"Columns": [
-				{
-					"Name": "name",
-					"Formatters": [ ]
-				}
-			],
-			"Limit": 0,
-			"FormateStrings": [ "https://shopsearch.taobao.com/search?app=shopsearch&ie=utf8&js=1&q={0}&suggest=0_1&_input_charset=utf-8&wq={0}&suggest_query={0}&source=suggest&s=20" ]
-		},
-		{
-			"Type": 0,
-			"Source": 0,
-			"ConnectString": "Database='test';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306",
+			"ConnectString": "Database='test';Data Source= localhost;User ID=root;Password=1qazZAQ!;Port=3306",
 			"GroupBy": "group by `name`",
 			"TableName": "taobao.transaction_brand_rank",
 			"Filters": null,
@@ -191,14 +175,14 @@
 					"Formatters": [ ]
 				}
 			],
-			"Limit": 0,
+			"Limit": 100,
 			"FormateStrings": [ "https://shopsearch.taobao.com/search?app=shopsearch&ie=utf8&js=1&q={0}&suggest=0_1&_input_charset=utf-8&wq={0}&suggest_query={0}&source=suggest&s=20" ]
 		}
 	],
 	"StartUrls": { },
 	"Pipeline": {
 		"Type": 1,
-		"ConnectString": "Database='test';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
+		"ConnectString": "Database='test';Data Source= localhost;User ID=root;Password=1qazZAQ!;Port=3306"
 	},
 	"Corporation": null,
 	"ValidationReportTo": null,

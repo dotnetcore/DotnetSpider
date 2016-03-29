@@ -12,81 +12,81 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 	{
 		private static ConnectionMultiplexer _redis;
 		private static IDatabase _db;
-        
-        public static string SetPrefix { get; set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "| ";
-        public static string HostName { get; set; } = Dns.GetHostName();
-        
-        public static string RedisHost { get; set;} = "192.168.199.202";
+
+		public static string SetPrefix { get; set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "| ";
+		public static string HostName { get; set; } = Dns.GetHostName();
+
+		public static string RedisHost { get; set; } = "localhost";
 
 		public void Execute(string name, Action action)
 		{
 			WaitforRedial.WaitforRedialFinish();
-            string setKey = GetSetKey();
-            string fieldKey = GetFieldKey(name);
+			string setKey = GetSetKey();
+			string fieldKey = GetFieldKey(name);
 
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-                Db.HashSet(setKey,fieldKey,"OK");
+				Db.HashSet(setKey, fieldKey, "OK");
 				action();
 			}
 			finally
 			{
-				Db.HashDelete(setKey,fieldKey);
+				Db.HashDelete(setKey, fieldKey);
 			}
 		}
 
 		public void Execute(string name, Action<object> action, object obj)
 		{
 			WaitforRedial.WaitforRedialFinish();
-            string setKey = GetSetKey();
-            string fieldKey = GetFieldKey(name);
+			string setKey = GetSetKey();
+			string fieldKey = GetFieldKey(name);
 
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-                Db.HashSet(setKey,fieldKey,"OK");
+				Db.HashSet(setKey, fieldKey, "OK");
 				action(obj);
 			}
 			finally
 			{
-				Db.HashDelete(setKey,fieldKey);
+				Db.HashDelete(setKey, fieldKey);
 			}
 		}
 
 		public T Execute<T>(string name, Func<object, T> func, object obj)
 		{
 			WaitforRedial.WaitforRedialFinish();
-            string setKey = GetSetKey();
-            string fieldKey = GetFieldKey(name);
+			string setKey = GetSetKey();
+			string fieldKey = GetFieldKey(name);
 
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-                Db.HashSet(setKey,fieldKey,"OK");
+				Db.HashSet(setKey, fieldKey, "OK");
 				return func(obj);
 			}
 			finally
 			{
-				Db.HashDelete(setKey,fieldKey);
+				Db.HashDelete(setKey, fieldKey);
 			}
 		}
 
 		public T Execute<T>(string name, Func<T> func)
 		{
 			WaitforRedial.WaitforRedialFinish();
-            string setKey = GetSetKey();
-            string fieldKey = GetFieldKey(name);
+			string setKey = GetSetKey();
+			string fieldKey = GetFieldKey(name);
 
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-                Db.HashSet(setKey,fieldKey,"OK");
+				Db.HashSet(setKey, fieldKey, "OK");
 				return func();
 			}
 			finally
 			{
-				Db.HashDelete(setKey,fieldKey);
+				Db.HashDelete(setKey, fieldKey);
 			}
 		}
 
@@ -103,8 +103,8 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 				Thread.Sleep(1);
 			}
 		}
-        
-        public static string GetSetKey()
+
+		public static string GetSetKey()
 		{
 			return HostName;
 		}
@@ -123,27 +123,27 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 				if (_redis == null)
 				{
 					_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
-			        {
-				        ServiceName = RedisHost,
-				        ConnectTimeout = 5000,
-				        KeepAlive = 8,
-				        EndPoints =
-				        {
-					        { RedisHost, 6379 }
-				        }
-			        });
+					{
+						ServiceName = RedisHost,
+						ConnectTimeout = 5000,
+						KeepAlive = 8,
+						EndPoints =
+						{
+							{ RedisHost, 6379 }
+						}
+					});
 				}
 				return _redis;
 			}
 		}
-        
-        private static IDatabase Db
+
+		private static IDatabase Db
 		{
 			get
 			{
 				if (_db == null)
-				{                        
-			        _db = Redis.GetDatabase(0);
+				{
+					_db = Redis.GetDatabase(0);
 				}
 				return _db;
 			}
