@@ -6,6 +6,7 @@ using System.Text;
 using Java2Dotnet.Spider.Extension;
 using Java2Dotnet.Spider.Test.Example;
 using Java2Dotnet.Spider.Test.Pipeline;
+using Newtonsoft.Json;
 
 namespace Java2Dotnet.Spider.Test
 {
@@ -13,8 +14,10 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-            JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
-			ScriptSpider spider = new ScriptSpider(spiderBuilder.GetContext());
+			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			var context = spiderBuilder.GetContext();
+			string json = JsonConvert.SerializeObject(context);
+			ScriptSpider spider = new ScriptSpider(context);
 			spider.Run(args);
 		}
 

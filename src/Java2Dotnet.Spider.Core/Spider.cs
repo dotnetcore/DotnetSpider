@@ -358,32 +358,32 @@ namespace Java2Dotnet.Spider.Core
 				}
 			}
 
-			Task.Factory.StartNew(() =>
-			{
-				if (ShowConsoleStatus)
-				{
-					IMonitorableScheduler monitor = Scheduler as IMonitorableScheduler;
-					if (monitor != null)
-					{
-						while (true)
-						{
-							try
-							{
-								if (Stat == Status.Running && !_waitingToExit)
-								{
-									Console.WriteLine(
-										$"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
-								}
-							}
-							catch
-							{
-								// ignored
-							}
-							Thread.Sleep(2000);
-						}
-					}
-				}
-			});
+			//Task.Factory.StartNew(() =>
+			//{
+			//	if (ShowConsoleStatus)
+			//	{
+			//		IMonitorableScheduler monitor = Scheduler as IMonitorableScheduler;
+			//		if (monitor != null)
+			//		{
+			//			while (true)
+			//			{
+			//				try
+			//				{
+			//					if (Stat == Status.Running && !_waitingToExit)
+			//					{
+			//						Console.WriteLine(
+			//							$"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
+			//					}
+			//				}
+			//				catch
+			//				{
+			//					// ignored
+			//				}
+			//				Thread.Sleep(2000);
+			//			}
+			//		}
+			//	}
+			//});
 
 			_init = true;
 		}
@@ -405,6 +405,8 @@ namespace Java2Dotnet.Spider.Core
 			Logger.Info("Spider " + Identity + " Started!");
 
 			bool firstTask = false;
+
+			IMonitorableScheduler monitor = (IMonitorableScheduler)Scheduler;
 
 			while (Stat == Status.Running)
 			{
@@ -430,6 +432,8 @@ namespace Java2Dotnet.Spider.Core
 					{
 						StartTime = DateTime.Now;
 					}
+
+					Console.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
 
 					_waitCount = 0;
 
@@ -490,6 +494,7 @@ namespace Java2Dotnet.Spider.Core
 			if (Stat == Status.Finished)
 			{
 				OnClose();
+				Console.WriteLine($"Spider {Identity} Finished.");
 			}
 
 			if (Stat == Status.Stopped)
@@ -603,7 +608,6 @@ namespace Java2Dotnet.Spider.Core
 			{
 				try
 				{
-
 					// ����ҳ��
 					page = Downloader.Download(request, this);
 
@@ -805,7 +809,6 @@ namespace Java2Dotnet.Spider.Core
 				//{
 				//	return;
 				//}
-
 				Thread.Sleep(WaitInterval);
 				++_waitCount;
 			}

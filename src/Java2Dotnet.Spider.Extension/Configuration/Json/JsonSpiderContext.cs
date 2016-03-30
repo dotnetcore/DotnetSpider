@@ -310,6 +310,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 
 		private CustomizeTargetUrls GetCustomizeTargetUrls(JObject jobject)
 		{
+			if (jobject == null)
+			{
+				return null;
+			}
 			var customizeTargetUrlsType = jobject.SelectToken("$.Type")?.ToObject<CustomizeTargetUrls.Types>();
 			if (customizeTargetUrlsType == null)
 			{
@@ -327,6 +331,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 
 		private CustomizePage GetCustomziePage(JObject jobject)
 		{
+			if (jobject == null)
+			{
+				return null;
+			}
 			var customizePageType = jobject.SelectToken("$.Type").ToObject<CustomizePage.Types>();
 			switch (customizePageType)
 			{

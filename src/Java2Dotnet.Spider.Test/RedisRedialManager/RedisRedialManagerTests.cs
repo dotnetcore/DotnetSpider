@@ -6,12 +6,47 @@ using System.Threading.Tasks;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
 using Java2Dotnet.Spider.Redial.Redialer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StackExchange.Redis;
+
 #endif
 namespace Java2Dotnet.Spider.Test.RedisRedialManager
 {
 	[TestClass]
 	public class RedisRedialManagerTests
 	{
+		[TestMethod]
+		public void SubPubTest()
+		{
+			var redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
+			{
+				ServiceName = "localhost",
+				ConnectTimeout = 5000,
+				KeepAlive = 8,
+#if !RELEASE
+				AllowAdmin = true,
+#endif
+				EndPoints =
+				{
+					{ "localhost", 6379 }
+				}
+			});
+			//redis.PreserveAsyncOrder = false;
+			var sub = redis.GetSubscriber();
+
+			string result = "";
+			sub.Subscribe("messages", (channel, message) =>
+			{
+				result = message;
+			});
+
+			sub.Publish("messages", "hello");
+
+			Thread.Sleep(2000);
+
+			Assert.AreEqual("hello", result);
+			redis.Dispose();
+		}
+
 		[TestMethod]
 		public void AtomicCommonTest()
 		{

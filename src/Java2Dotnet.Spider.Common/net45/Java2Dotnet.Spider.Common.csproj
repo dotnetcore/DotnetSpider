@@ -70,6 +70,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -146,6 +147,9 @@
     </Compile>
     <Compile Include="..\SynchronizedList.cs">
       <Link>SynchronizedList.cs</Link>
+    </Compile>
+    <Compile Include="..\SystemInfo.cs">
+      <Link>SystemInfo.cs</Link>
     </Compile>
     <Compile Include="..\WindowsFormUtil.cs">
       <Link>WindowsFormUtil.cs</Link>

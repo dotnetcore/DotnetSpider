@@ -25,36 +25,20 @@ namespace Java2Dotnet.Spider.Test.Example
 				{
 					EncodingName = "UTF-8"
 				},
-				PrepareStartUrls = new List<PrepareStartUrls>{new GeneralDbPrepareStartUrls()
+				StartUrls = new Dictionary<string, Dictionary<string, object>>
 				{
-					Source = GeneralDbPrepareStartUrls.DataSource.MySql,
-					TableName = "jd.category",
-					ConnectString = "Database='jd';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306",
-					Columns = new List<GeneralDbPrepareStartUrls.Column>() { new GeneralDbPrepareStartUrls.Column()
-					{
-						Name = "url",
-						Formatters = new List<Formatter>  { new ReplaceFormatter() { OldValue = ".html", NewValue = "" } }
-					} },
-					Limit = 1000,
-					FormateStrings = new List<string> { "{0}&page=1&JL=6_0_0" }
-				}},
-				Scheduler = new QueueScheduler(),
-                Redialer = new AdslRedialer
-				{
-					//Account = "CDAEF120",
-					//Password = "12340987",
-					Interface = "宽带连接"
+					{"http://list.jd.com/list.html?cat=9987,653,655&page=1&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
+					{"http://list.jd.com/list.html?cat=9987,653,655&page=2&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
+					{"http://list.jd.com/list.html?cat=9987,653,655&page=3&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
 				},
-				NetworkValidater = new DefaultNetworkValidater(),
-				//Scheduler = new RedisScheduler()
-				//{
-				//	Host = "127.0.0.1",
-				//	Port = 6379,
-				//	Password = ""
-				//}.ToJObject(),
-				Pipeline = new MysqlPipeline()
+				Scheduler = new RedisScheduler
 				{
-					ConnectString = "Database='jd';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
+					Host = "localhost",
+					Port = 6379
+				},
+				Pipeline = new MysqlPipeline
+				{
+					ConnectString = "Database='mysql';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
 				}
 			};
 		}
