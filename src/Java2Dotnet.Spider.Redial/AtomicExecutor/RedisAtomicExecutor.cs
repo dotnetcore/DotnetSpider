@@ -1,22 +1,15 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using Java2Dotnet.Spider.Redial.RedialManager;
-using Java2Dotnet.Spider.Redial.Utils;
-using StackExchange.Redis;
 
 namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 {
-	internal class RedisAtomicExecutor : IAtomicExecutor
+	public class RedisAtomicExecutor : IAtomicExecutor
 	{
-		private static ConnectionMultiplexer _redis;
-		private static IDatabase _db;
+		private readonly RedisRedialManager _redisRedialManager;
 
-		public static string SetPrefix { get; set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "| ";
 		public static string HostName { get; set; } = Dns.GetHostName();
-
-		public static string RedisHost { get; set; } = "localhost";
 
 		public void Execute(string name, Action action)
 		{
@@ -26,13 +19,12 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 			try
 			{
-				//Db.SetAdd(setKey,fieldKey);
-				Db.HashSet(setKey, fieldKey, "OK");
+				_redisRedialManager.Db.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
 				action();
 			}
 			finally
 			{
-				Db.HashDelete(setKey, fieldKey);
+				_redisRedialManager.Db.HashDelete(setKey, fieldKey);
 			}
 		}
 
@@ -44,13 +36,12 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 			try
 			{
-				//Db.SetAdd(setKey,fieldKey);
-				Db.HashSet(setKey, fieldKey, "OK");
+				_redisRedialManager.Db.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
 				action(obj);
 			}
 			finally
 			{
-				Db.HashDelete(setKey, fieldKey);
+				_redisRedialManager.Db.HashDelete(setKey, fieldKey);
 			}
 		}
 
@@ -63,12 +54,12 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-				Db.HashSet(setKey, fieldKey, "OK");
+				_redisRedialManager.Db.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
 				return func(obj);
 			}
 			finally
 			{
-				Db.HashDelete(setKey, fieldKey);
+				_redisRedialManager.Db.HashDelete(setKey, fieldKey);
 			}
 		}
 
@@ -80,22 +71,21 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 			try
 			{
-				//Db.SetAdd(setKey,fieldKey);
-				Db.HashSet(setKey, fieldKey, "OK");
+				_redisRedialManager.Db.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
 				return func();
 			}
 			finally
 			{
-				Db.HashDelete(setKey, fieldKey);
+				_redisRedialManager.Db.HashDelete(setKey, fieldKey);
 			}
 		}
 
 		public void WaitAtomicAction()
 		{
-			// 等待数据库等操作完成
 			while (true)
 			{
-				if (Db.SetLength(GetSetKey()) == 1)
+				ClearTimeoutAction();
+				if (_redisRedialManager.Db.HashLength(GetSetKey()) == 1)
 				{
 					break;
 				}
@@ -104,58 +94,55 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			}
 		}
 
+		private void ClearTimeoutAction()
+		{
+#if RELEASE
+			try
+			{
+#endif
+			foreach (var entry in _redisRedialManager.Db.HashGetAll(GetSetKey()))
+			{
+				string key = entry.Name;
+				string value = entry.Value;
+
+				DateTime dt = DateTime.Parse(value);
+				var minutes = (DateTime.Now - dt).TotalMinutes;
+
+				if (minutes > 5)
+				{
+					_redisRedialManager.Db.HashDelete(GetSetKey(), key);
+				}
+			}
+#if RELEASE
+			}
+			catch (Exception)
+			{
+				
+				throw;
+			}
+#endif
+		}
+
 		public static string GetSetKey()
 		{
 			return HostName;
 		}
 
-		public static string GetFieldKey(string identity)
+		private string GetFieldKey(string identity)
 		{
-			return SetPrefix + identity;
+			return identity + "_" + Guid.NewGuid();
 		}
 
 		public IWaitforRedial WaitforRedial { get; }
 
-		private static ConnectionMultiplexer Redis
-		{
-			get
-			{
-				if (_redis == null)
-				{
-					_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
-					{
-						ServiceName = RedisHost,
-						ConnectTimeout = 5000,
-						KeepAlive = 8,
-						EndPoints =
-						{
-							{ RedisHost, 6379 }
-						}
-					});
-				}
-				return _redis;
-			}
-		}
-
-		private static IDatabase Db
-		{
-			get
-			{
-				if (_db == null)
-				{
-					_db = Redis.GetDatabase(0);
-				}
-				return _db;
-			}
-		}
-
-		internal RedisAtomicExecutor(IWaitforRedial waitforRedial)
+		public RedisAtomicExecutor(RedisRedialManager waitforRedial)
 		{
 			if (waitforRedial == null)
 			{
 				throw new RedialException("IWaitforRedial can't be null.");
 			}
 			WaitforRedial = waitforRedial;
+			_redisRedialManager = waitforRedial;
 		}
 	}
 }
