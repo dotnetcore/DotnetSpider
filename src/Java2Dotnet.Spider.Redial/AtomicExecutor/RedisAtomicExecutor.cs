@@ -27,11 +27,8 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-<<<<<<< HEAD
+
                 Db.HashSet(setKey,fieldKey, DateTime.Now.ToString());
-=======
-				Db.HashSet(setKey, fieldKey, "OK");
->>>>>>> 227e16e9a3c4628ed684a7803fa499eca4f05b37
 				action();
 			}
 			finally
@@ -49,11 +46,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-<<<<<<< HEAD
                 Db.HashSet(setKey,fieldKey, DateTime.Now.ToString());
-=======
-				Db.HashSet(setKey, fieldKey, "OK");
->>>>>>> 227e16e9a3c4628ed684a7803fa499eca4f05b37
 				action(obj);
 			}
 			finally
@@ -71,11 +64,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-<<<<<<< HEAD
                 Db.HashSet(setKey,fieldKey, DateTime.Now.ToString());
-=======
-				Db.HashSet(setKey, fieldKey, "OK");
->>>>>>> 227e16e9a3c4628ed684a7803fa499eca4f05b37
 				return func(obj);
 			}
 			finally
@@ -93,11 +82,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-<<<<<<< HEAD
                 Db.HashSet(setKey,fieldKey, DateTime.Now.ToString());
-=======
-				Db.HashSet(setKey, fieldKey, "OK");
->>>>>>> 227e16e9a3c4628ed684a7803fa499eca4f05b37
 				return func();
 			}
 			finally
