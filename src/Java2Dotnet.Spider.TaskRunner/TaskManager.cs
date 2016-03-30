@@ -16,7 +16,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 {
 	public class TaskManager
 	{
-		public const string TestTaskId = "TestTask";
+		public const string TestTaskId = "15db56c44a6844ccaabc5caf735a6944";
 
 #if !NET_CORE
 		private readonly ILog _logger = LogManager.GetLogger(typeof(ScriptSpider));

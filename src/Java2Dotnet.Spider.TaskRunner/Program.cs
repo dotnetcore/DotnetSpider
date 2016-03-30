@@ -12,11 +12,11 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 {
 	public class Program
 	{
-		private static string TestUserId;
+		private static string TaskJson = "{\"Entities\":[{\"Multi\":true,\"Selector\":{\"Type\":0,\"Expression\":\"//li[@class='gl-item']/div[contains(@class,'j-sku-item')]\"},\"Schema\":{\"Database\":\"84a06575a6218730\",\"TableName\":\"sku\",\"Suffix\":1,\"TypeId\":\"Java2Dotnet.Spider.Extension.ORM.Schema,Java2Dotnet.Spider.Extension,Version=1.0.0.0,Culture=neutral,PublicKeyToken=null\"},\"Identity\":\"Java2Dotnet.Spider.Test.Example.JdSkuSampleSpider+Product\",\"Indexes\":[[\"category\"]],\"Uniques\":[[\"category\",\"sku\"],[\"sku\"]],\"AutoIncrement\":null,\"Primary\":null,\"Fields\":[{\"DataType\":\"string(20)\",\"Selector\":{\"Type\":4,\"Expression\":\"name\"},\"Multi\":false,\"Name\":\"category\",\"Formatters\":[]},{\"DataType\":\"string(20)\",\"Selector\":{\"Type\":4,\"Expression\":\"cat3\"},\"Multi\":false,\"Name\":\"cat3\",\"Formatters\":[]},{\"DataType\":\"text\",\"Selector\":{\"Type\":0,\"Expression\":\"./div[1]/a/@href\"},\"Multi\":false,\"Name\":\"url\",\"Formatters\":[]},{\"DataType\":\"string(25)\",\"Selector\":{\"Type\":0,\"Expression\":\"./@data-sku\"},\"Multi\":false,\"Name\":\"sku\",\"Formatters\":[]},{\"DataType\":\"string(32)\",\"Selector\":{\"Type\":0,\"Expression\":\"./div[5]/strong/a\"},\"Multi\":false,\"Name\":\"commentscount\",\"Formatters\":[]},{\"DataType\":\"string(100)\",\"Selector\":{\"Type\":0,\"Expression\":\".//div[@class='p-shop']/@data-shop_name\"},\"Multi\":false,\"Name\":\"shopname\",\"Formatters\":[]},{\"DataType\":\"string(50)\",\"Selector\":{\"Type\":0,\"Expression\":\".//div[@class='p-name']/a/em\"},\"Multi\":false,\"Name\":\"name\",\"Formatters\":[]},{\"DataType\":\"string(25)\",\"Selector\":{\"Type\":0,\"Expression\":\"./@venderid\"},\"Multi\":false,\"Name\":\"venderid\",\"Formatters\":[]},{\"DataType\":\"string(25)\",\"Selector\":{\"Type\":0,\"Expression\":\"./@jdzy_shop_id\"},\"Multi\":false,\"Name\":\"jdzy_shop_id\",\"Formatters\":[]},{\"DataType\":\"date\",\"Selector\":{\"Type\":4,\"Expression\":\"Monday\"},\"Multi\":false,\"Name\":\"run_id\",\"Formatters\":[]},{\"DataType\":\"time\",\"Selector\":{\"Type\":4,\"Expression\":\"Now\"},\"Multi\":false,\"Name\":\"cdate\",\"Formatters\":[]}],\"Stopping\":null}],\"SpiderName\":\"84a06575a6218730JDsku/storetest{MACROS_TODAY}\",\"ThreadNum\":1,\"Deep\":2147483647,\"EmptySleepTime\":15000,\"CachedSize\":1,\"Scheduler\":{\"Host\":\"127.0.0.1\",\"Port\":6379,\"Password\":null,\"Type\":1},\"Downloader\":null,\"Site\":{\"Headers\":{},\"ContentType\":0,\"UserAgent\":null,\"Accept\":null,\"Domain\":\"list.jd.com\",\"EncodingName\":\"UTF-8\",\"Encoding\":null,\"Timeout\":5000,\"AcceptStatCode\":[200],\"StartRequests\":[{\"Depth\":1,\"NextDepth\":2,\"Referer\":null,\"Origin\":null,\"Priority\":0,\"Extras\":{\"name\":\"手机\",\"cat3\":\"655\"},\"Method\":null,\"PostBody\":null,\"Url\":\"http://list.jd.com/list.html?cat=9987,653,655&page=1&ext=57050::1943^^&go=0&JL=6_0_0\",\"Identity\":\"eacb7577e2b1d7ec60caffce1a9cb83\"},{\"Depth\":1,\"NextDepth\":2,\"Referer\":null,\"Origin\":null,\"Priority\":0,\"Extras\":{\"name\":\"手机\",\"cat3\":\"655\"},\"Method\":null,\"PostBody\":null,\"Url\":\"http://list.jd.com/list.html?cat=9987,653,655&page=2&ext=57050::1943^^&go=0&JL=6_0_0\",\"Identity\":\"25e974b5ba736be361e33b345ccbec1\"},{\"Depth\":1,\"NextDepth\":2,\"Referer\":null,\"Origin\":null,\"Priority\":0,\"Extras\":{\"name\":\"手机\",\"cat3\":\"655\"},\"Method\":null,\"PostBody\":null,\"Url\":\"http://list.jd.com/list.html?cat=9987,653,655&page=3&ext=57050::1943^^&go=0&JL=6_0_0\",\"Identity\":\"4f17dc46e8571ef4ae15a441af4ad44\"}],\"SleepTime\":500,\"RetryTimes\":5,\"CycleRetryTimes\":20,\"Cookie\":null,\"HttpProxy\":null,\"IsUseGzip\":false,\"HttpProxyPoolEnable\":false},\"NetworkValidater\":null,\"Redialer\":null,\"PrepareStartUrls\":null,\"StartUrls\":{\"http://list.jd.com/list.html?cat=9987,653,655&page=1&ext=57050::1943^^&go=0&JL=6_0_0\":{\"name\":\"手机\",\"cat3\":\"655\"},\"http://list.jd.com/list.html?cat=9987,653,655&page=2&ext=57050::1943^^&go=0&JL=6_0_0\":{\"name\":\"手机\",\"cat3\":\"655\"},\"http://list.jd.com/list.html?cat=9987,653,655&page=3&ext=57050::1943^^&go=0&JL=6_0_0\":{\"name\":\"手机\",\"cat3\":\"655\"}},\"Pipeline\":{\"Type\":1,\"ConnectString\":\"Database='mysql';DataSource=86research.imwork.net;UserID=root;Password=1qazZAQ!;Port=4306\"},\"Corporation\":null,\"ValidationReportTo\":null,\"CustomizePage\":null,\"CustomizeTargetUrls\":null,\"EnviromentValues\":[]}";
 
 		public static void Main(string[] args)
 		{
-            TestUserId=GuidTo16String();
+		    string TestUserId = Guid.NewGuid().ToString("N");
 			Core.Spider.PrintInfo();
 			string hostName = Dns.GetHostName();
 			Console.WriteLine($"HostName: {hostName} UserId: {TestUserId} Time: {DateTime.Now}");
@@ -27,7 +27,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 
 			// Test
 			TaskManager manager = new TaskManager();
-			manager.AddTestTask(TestUserId, File.ReadAllText("sample.json").Replace("\t","").Replace("\r","").Replace("\n","").Replace("USER_ID", TestUserId));
+			manager.AddTestTask(TestUserId, TaskJson);
 			manager.TriggerTask(hostName, TestUserId, TaskManager.TestTaskId);
 
 			while (true)
@@ -35,13 +35,5 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 				Thread.Sleep(1000);
 			}
 		}
-        
-        public static string GuidTo16String()  
-        {  
-            long i = 1;  
-            foreach (byte b in Guid.NewGuid().ToByteArray())  
-                i *= ((int)b + 1);  
-            return string.Format("{0:x}", i - DateTime.Now.Ticks);  
-        }
 	}
 }
