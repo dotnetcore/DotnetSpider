@@ -27,7 +27,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-                Db.HashSet(setKey,fieldKey,"OK");
+                Db.HashSet(setKey,fieldKey, DateTime.Now.ToString());
 				action();
 			}
 			finally
@@ -45,7 +45,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-                Db.HashSet(setKey,fieldKey,"OK");
+                Db.HashSet(setKey,fieldKey, DateTime.Now.ToString());
 				action(obj);
 			}
 			finally
@@ -63,7 +63,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-                Db.HashSet(setKey,fieldKey,"OK");
+                Db.HashSet(setKey,fieldKey, DateTime.Now.ToString());
 				return func(obj);
 			}
 			finally
@@ -81,7 +81,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-                Db.HashSet(setKey,fieldKey,"OK");
+                Db.HashSet(setKey,fieldKey, DateTime.Now.ToString());
 				return func();
 			}
 			finally
@@ -111,7 +111,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 		public static string GetFieldKey(string identity)
 		{
-			return SetPrefix + identity;
+			return identity + Guid.NewGuid().ToString();
 		}
 
 		public IWaitforRedial WaitforRedial { get; }

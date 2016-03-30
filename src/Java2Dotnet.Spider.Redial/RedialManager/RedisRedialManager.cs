@@ -98,7 +98,8 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				//int minute = Convert.ToInt32(time.Split(':')[1]);
 				//int second = Convert.ToInt32(time.Split(':')[2]);
                 
-				DateTime dt = DateTime.Parse(key);
+                string hashValue = db.HashGet(GetSetKey(),key);
+				DateTime dt = DateTime.Parse(hashValue);
 				var ts = DateTime.Now - dt;
 				double h = ts.TotalHours;
 				if (h > 1)
