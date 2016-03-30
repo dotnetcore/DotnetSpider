@@ -231,7 +231,7 @@
 	},
 	"Pipeline": {
 		"Type": 1,
-		"ConnectString": "Database='mysql';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
+		"ConnectString": "Database='mysql';Data Source= office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"
 	},
 	"Corporation": null,
 	"ValidationReportTo": null,
