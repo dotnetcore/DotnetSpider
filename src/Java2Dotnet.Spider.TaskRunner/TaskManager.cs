@@ -4,7 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Extension;
+#if !NET_CORE
 using log4net;
+#else
+using Java2Dotnet.Spider.JLog;
+#endif
 using Newtonsoft.Json;
 using StackExchange.Redis;
 
@@ -12,7 +16,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 {
 	public class TaskManager
 	{
-		public const string TestTaskId = "1b18f77c-99da-4a28-a5f3-dc23725b1618";
+		public const string TestTaskId = "TestTask";
 
 #if !NET_CORE
 		private readonly ILog _logger = LogManager.GetLogger(typeof(ScriptSpider));
@@ -21,27 +25,28 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 #endif
 
 		private readonly ConnectionMultiplexer _redis;
-		private readonly IDatabase _db;
+		private IDatabase _db;
 
 		public TaskManager()
 		{
 			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
 			{
-				//ServiceName = "118.126.11.168",
-				ServiceName = "localhost",
+				ServiceName = "127.0.0.1",
 				ConnectTimeout = 5000,
 				//Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
 				KeepAlive = 8,
+                SyncTimeout=50000,
+                ResponseTimeout=50000,
 #if !RELEASE
 				AllowAdmin = true,
 #endif
 				EndPoints =
 				{
-					//{ "118.126.11.168", 6379 }
-					{ "localhost", 6379 }
+					{ "127.0.0.1", 6379 }
 				}
 			});
-			_db = _redis.GetDatabase(2);
+            _redis.PreserveAsyncOrder = false;
+		   _db = _redis.GetDatabase(2);
 		}
 
 		public void TriggerTask(string hostName, string userId, string taskId)
@@ -55,6 +60,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			string id = Guid.NewGuid().ToString();
 			// todo: step 1 Map to user
 			// step 2 Add to cache
+
 			_db.HashSet(userId, id, spiderScript);
 		}
 

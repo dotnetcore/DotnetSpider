@@ -10,6 +10,8 @@ using Java2Dotnet.Spider.Extension.Configuration;
 using Java2Dotnet.Spider.Extension.Configuration.Json;
 #if !NET_CORE
 using log4net;
+#else
+using Java2Dotnet.Spider.JLog;
 #endif
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -25,8 +27,8 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 #endif
 		private const string SpiderRegistKey = "spider_nodes";
 		public bool IsConnected { get; private set; }
-		private readonly ConnectionMultiplexer _redis;
-		private readonly IDatabase _db;
+		public readonly ConnectionMultiplexer _redis;
+		public readonly IDatabase _db;
 		private readonly string _hostName;
 
 		private readonly Dictionary<string, ScriptSpider> _spiderCache = new Dictionary<string, ScriptSpider>();
@@ -36,8 +38,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			_hostName = Dns.GetHostName();
 			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
 			{
-				//ServiceName = "118.126.11.168",
-				ServiceName = "localhost",
+				ServiceName = "127.0.0.1",
 				ConnectTimeout = 5000,
 				//Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
 				KeepAlive = 8,
@@ -46,8 +47,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 #endif
 				EndPoints =
 				{
-					//{ "118.126.11.168", 6379 }
-					{ "localhost", 6379 }
+					{ "127.0.0.1", 6379 }
 				}
 			});
 			_db = _redis.GetDatabase(2);

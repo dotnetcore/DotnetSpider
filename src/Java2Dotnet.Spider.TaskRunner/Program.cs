@@ -12,10 +12,11 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 {
 	public class Program
 	{
-		private readonly static string TestUserId = Guid.NewGuid().ToString();
+		private static string TestUserId;
 
 		public static void Main(string[] args)
 		{
+            TestUserId=GuidTo16String();
 			Core.Spider.PrintInfo();
 			string hostName = Dns.GetHostName();
 			Console.WriteLine($"HostName: {hostName} UserId: {TestUserId} Time: {DateTime.Now}");
@@ -26,7 +27,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 
 			// Test
 			TaskManager manager = new TaskManager();
-			manager.AddTestTask(TestUserId, File.ReadAllText("sample.json").Replace("USER_ID", TestUserId));
+			manager.AddTestTask(TestUserId, File.ReadAllText("sample.json").Replace("\t","").Replace("\r","").Replace("\n","").Replace("USER_ID", TestUserId));
 			manager.TriggerTask(hostName, TestUserId, TaskManager.TestTaskId);
 
 			while (true)
@@ -34,5 +35,13 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 				Thread.Sleep(1000);
 			}
 		}
+        
+        public static string GuidTo16String()  
+        {  
+            long i = 1;  
+            foreach (byte b in Guid.NewGuid().ToByteArray())  
+                i *= ((int)b + 1);  
+            return string.Format("{0:x}", i - DateTime.Now.Ticks);  
+        }
 	}
 }
