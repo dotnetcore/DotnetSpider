@@ -6,7 +6,6 @@ using System.Text;
 using Java2Dotnet.Spider.Extension;
 using Java2Dotnet.Spider.Test.Example;
 using Java2Dotnet.Spider.Test.Pipeline;
-using Java2Dotnet.Spider.Test.ZooKeeperTest;
 
 namespace Java2Dotnet.Spider.Test
 {

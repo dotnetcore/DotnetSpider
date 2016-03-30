@@ -67,12 +67,9 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			if (_spiderContext.Redialer != null)
 			{
-#if !NET_CORE
-				RedialManagerUtils.RedialManager = ZookeeperRedialManager.Default;
-#else
 				//RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
-                RedialManagerUtils.RedialManager = RedisRedialManager.Default;
-#endif
+				RedialManagerUtils.RedialManager = RedisRedialManager.Default;
+
 				RedialManagerUtils.RedialManager.NetworkValidater = GetNetworValidater(_spiderContext.NetworkValidater);
 				RedialManagerUtils.RedialManager.Redialer = _spiderContext.Redialer.GetRedialer();
 			}

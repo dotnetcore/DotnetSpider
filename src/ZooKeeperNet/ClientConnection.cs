@@ -272,7 +272,7 @@ namespace ZooKeeperNet
             }
             else
             {
-                IPHostEntry hostEntry = Dns.GetHostEntryAsync(host).Result;
+	            IPHostEntry hostEntry = Dns.GetHostEntry(host);
                 IEnumerable<IPAddress> addresses = hostEntry.AddressList.Where(IsAllowedAddressFamily);
                 foreach (IPAddress address in addresses)
                 {

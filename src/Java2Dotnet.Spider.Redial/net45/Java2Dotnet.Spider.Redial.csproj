@@ -61,6 +61,9 @@
     <Compile Include="..\AtomicExecutor\IAtomicExecutor.cs">
       <Link>AtomicExecutor\IAtomicExecutor.cs</Link>
     </Compile>
+    <Compile Include="..\AtomicExecutor\RedisAtomicExecutor.cs">
+      <Link>AtomicExecutor\RedisAtomicExecutor.cs</Link>
+    </Compile>
     <Compile Include="..\AtomicExecutor\ZookeeperAtomicExecutor.cs">
       <Link>AtomicExecutor\ZookeeperAtomicExecutor.cs</Link>
     </Compile>
