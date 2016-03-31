@@ -31,22 +31,21 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 		{
 			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
 			{
-				ServiceName = "127.0.0.1",
+				ServiceName = "redis_primary",
 				ConnectTimeout = 5000,
-				//Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
 				KeepAlive = 8,
-                SyncTimeout=50000,
-                ResponseTimeout=50000,
+                		SyncTimeout=50000,
+        			ResponseTimeout=50000,
 #if !RELEASE
 				AllowAdmin = true,
 #endif
 				EndPoints =
 				{
-					{ "127.0.0.1", 6379 }
+					{ "redis_primary", 6379 }
 				}
 			});
-            _redis.PreserveAsyncOrder = false;
-		   _db = _redis.GetDatabase(2);
+            			_redis.PreserveAsyncOrder = false;
+				_db = _redis.GetDatabase(2);
 		}
 
 		public void TriggerTask(string hostName, string userId, string taskId)
