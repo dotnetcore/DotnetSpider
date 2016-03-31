@@ -41,6 +41,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 				ServiceName = "redis_primary",
 				ConnectTimeout = 5000,
 				KeepAlive = 8,
+				Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
 #if !RELEASE
 				AllowAdmin = true,
 #endif
