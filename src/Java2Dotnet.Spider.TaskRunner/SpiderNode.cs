@@ -66,39 +66,41 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			var subscriber = _redis.GetSubscriber(_hostName);
 			subscriber.Subscribe($"{_hostName}", (channel, message) =>
 			{
-				if (!IsConnected)
-				{
-					_logger.Warn($" SpiderNode: {_hostName} is disconnected OR there is another same name node exits.");
-					return;
-				}
-				try
-				{
-					var taskInfo = JsonConvert.DeserializeObject<TaskInfo>(message);
-
-					string value = _db.HashGet(taskInfo.UserId, taskInfo.TaskId);
-
-					string json = Macros.Replace(value);
-
-					JsonSpiderContext spiderContext = JsonConvert.DeserializeObject<JsonSpiderContext>(json);
-
-					List<string> errorMessages;
-					if (SpiderContextValidation.Validate(spiderContext, out errorMessages))
+				Task.Factory.StartNew(()=>{
+					if (!IsConnected)
 					{
-						ScriptSpider spider = new ScriptSpider(spiderContext.ToRuntimeContext());
-						spider.Run(taskInfo.Arguments);
+						_logger.Warn($" SpiderNode: {_hostName} is disconnected OR there is another same name node exits.");
+						return;
 					}
-					else
+					try
 					{
-						foreach (var errorMessage in errorMessages)
+						var taskInfo = JsonConvert.DeserializeObject<TaskInfo>(message);
+
+						string value = _db.HashGet(taskInfo.UserId, taskInfo.TaskId);
+
+						string json = Macros.Replace(value);
+
+						JsonSpiderContext spiderContext = JsonConvert.DeserializeObject<JsonSpiderContext>(json);
+
+						List<string> errorMessages;
+						if (SpiderContextValidation.Validate(spiderContext, out errorMessages))
 						{
-							Console.WriteLine(errorMessage);
+							ScriptSpider spider = new ScriptSpider(spiderContext.ToRuntimeContext());
+							spider.Run(taskInfo.Arguments);
+						}
+						else
+						{
+							foreach (var errorMessage in errorMessages)
+							{
+								Console.WriteLine(errorMessage);
+							}
 						}
 					}
-				}
-				catch (Exception e)
-				{
-					_logger.Error($"Execute spider: {message} failed. Details:" + e);
-				}
+					catch (Exception e)
+					{
+						_logger.Error($"Execute spider: {message} failed. Details:" + e);
+					}
+				});
 			});
 		}
 
