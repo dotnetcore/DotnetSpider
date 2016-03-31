@@ -34,7 +34,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 		{
 			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
 			{
-				ServiceName = "dc01.86research.cn",
+				ServiceName = "redis_primary",
 				ConnectTimeout = 5000,
 				KeepAlive = 8,
                 		SyncTimeout=50000,
@@ -45,7 +45,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 #endif
 				EndPoints =
 				{
-					{ "dc01.86research.cn", 6379 }
+					{ "redis_primary", 6379 }
 				}
 			});
             			_redis.PreserveAsyncOrder = false;

@@ -40,7 +40,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			_hostName = Dns.GetHostName();
 			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
 			{
-				ServiceName = "dc01.86research.cn",
+				ServiceName = "redis_primary",
 				ConnectTimeout = 5000,
 				KeepAlive = 8,
 				Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
@@ -49,7 +49,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 #endif
 				EndPoints =
 				{
-					{ "dc01.86research.cn", 6379 }
+					{ "redis_primary", 6379 }
 				}
 			});
 			_db = _redis.GetDatabase(2);
