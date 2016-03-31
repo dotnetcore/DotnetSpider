@@ -36,6 +36,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 				KeepAlive = 8,
                 		SyncTimeout=50000,
         			ResponseTimeout=50000,
+        			Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
 #if !RELEASE
 				AllowAdmin = true,
 #endif
