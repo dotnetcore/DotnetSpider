@@ -38,16 +38,15 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			_hostName = Dns.GetHostName();
 			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
 			{
-				ServiceName = "127.0.0.1",
+				ServiceName = "redis_primary",
 				ConnectTimeout = 5000,
-				//Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
 				KeepAlive = 8,
 #if !RELEASE
 				AllowAdmin = true,
 #endif
 				EndPoints =
 				{
-					{ "127.0.0.1", 6379 }
+					{ "redis_primary", 6379 }
 				}
 			});
 			_db = _redis.GetDatabase(2);
