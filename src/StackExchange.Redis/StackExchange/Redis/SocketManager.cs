@@ -181,7 +181,10 @@ namespace StackExchange.Redis
 
 #if CORE_CLR
                     multiplexer.LogLocked(log, "BeginConnect: {0}", formattedEndpoint);
-                    socket.ConnectAsync(dnsEndpoint.Host, dnsEndpoint.Port).ContinueWith(t =>
+                    
+                    var ip=Dns.GetHostEntryAsync(dnsEndpoint.Host).Result.AddressList[0];                    
+
+                    socket.ConnectAsync(ip, dnsEndpoint.Port).ContinueWith(t =>
                     {
                         multiplexer.LogLocked(log, "EndConnect: {0}", formattedEndpoint);
                         EndConnectImpl(t, multiplexer, log, tuple);
