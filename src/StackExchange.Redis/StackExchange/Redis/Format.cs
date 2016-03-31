@@ -47,7 +47,9 @@ namespace StackExchange.Redis
         {
             IPAddress ip;
             if (IPAddress.TryParse(host, out ip)) return new IPEndPoint(ip, port);
-            return new DnsEndPoint(host, port);
+            
+            ip = Dns.GetHostEntryAsync(host).Result.AddressList[0];
+            return new IPEndPoint(ip, port);
         }
         internal static EndPoint TryParseEndPoint(string host, string port)
         {
