@@ -10,7 +10,10 @@ using log4net;
 using Java2Dotnet.Spider.JLog;
 #endif
 using Newtonsoft.Json;
+using System.Data.Common;
 using StackExchange.Redis;
+using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Java2Dotnet.Spider.ScriptsConsole
 {
@@ -31,7 +34,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 		{
 			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
 			{
-				ServiceName = "redis_primary",
+				ServiceName = "dc01.86research.cn",
 				ConnectTimeout = 5000,
 				KeepAlive = 8,
                 		SyncTimeout=50000,
@@ -42,7 +45,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 #endif
 				EndPoints =
 				{
-					{ "redis_primary", 6379 }
+					{ "dc01.86research.cn", 6379 }
 				}
 			});
             			_redis.PreserveAsyncOrder = false;
@@ -55,19 +58,51 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			subscriber.Publish(hostName, JsonConvert.SerializeObject(new TaskInfo { UserId = userId, TaskId = taskId }));
 		}
 
-		public void AddTask(string userId, string spiderScript)
+		public void AddTask(string userId, string taskId, string spiderScript)
 		{
-			string id = Guid.NewGuid().ToString();
+			//string id = Guid.NewGuid().ToString();
 			// todo: step 1 Map to user
 			// step 2 Add to cache
 
-			_db.HashSet(userId, id, spiderScript);
+            using (var conn = new MySqlConnection("Database='mysql';Data Source=office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"))
+			{
+				List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
+				string sql = "INSERT IGNORE INTO `java2dotnet.spider`.`spider_scripts` (`user_id`,`task_id`,`script`) values(@user_id,@task_id,@script)";
+				conn.Open();
+				var command = conn.CreateCommand();
+				command.CommandText = sql;
+				command.CommandType = CommandType.Text;
+			 
+				List<DbParameter> parameters = new List<DbParameter>();
+
+				var parameter1 = new MySqlParameter();
+				parameter1.ParameterName =  "@user_id";
+				parameter1.Value =  userId;
+				parameter1.DbType =  DbType.String;
+				parameters.Add(parameter1);
+
+				var parameter2 = new MySqlParameter();
+				parameter2.ParameterName =  "@task_id";
+				parameter2.Value =  taskId;
+				parameter2.DbType =  DbType.String;
+				parameters.Add(parameter2);
+                
+                var parameter3 = new MySqlParameter();
+				parameter3.ParameterName =  "@script";
+				parameter3.Value =  spiderScript;
+				parameter3.DbType =  DbType.String;
+				parameters.Add(parameter3);
+                
+				command.Parameters.AddRange(parameters.ToArray());
+				command.ExecuteNonQuery();
+            }
+            
 		}
 
 		public void AddTestTask(string userId, string spiderScript)
 		{
 			// step 2 Add to cache
-			_db.HashSet(userId, TestTaskId, spiderScript);
+			AddTask(userId, TestTaskId, spiderScript);
 		}
 
 		//public void Start()

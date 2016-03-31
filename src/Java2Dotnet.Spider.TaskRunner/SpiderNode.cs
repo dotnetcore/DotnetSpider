@@ -15,6 +15,8 @@ using Java2Dotnet.Spider.JLog;
 #endif
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Java2Dotnet.Spider.ScriptsConsole
 {
@@ -38,7 +40,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			_hostName = Dns.GetHostName();
 			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
 			{
-				ServiceName = "redis_primary",
+				ServiceName = "dc01.86research.cn",
 				ConnectTimeout = 5000,
 				KeepAlive = 8,
 				Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
@@ -47,7 +49,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 #endif
 				EndPoints =
 				{
-					{ "redis_primary", 6379 }
+					{ "dc01.86research.cn", 6379 }
 				}
 			});
 			_db = _redis.GetDatabase(2);
@@ -76,8 +78,28 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 					try
 					{
 						var taskInfo = JsonConvert.DeserializeObject<TaskInfo>(message);
+                        string value=null;
+                        using (var conn = new MySqlConnection("Database='mysql';Data Source=office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"))
+			            {
+                           	conn.Open();
+				            var command = conn.CreateCommand();
+                            string sql=$"SELECT `script` FROM `java2dotnet.spider`.`spider_scripts` where user_id='{taskInfo.UserId}' and task_id='{taskInfo.TaskId}'";
+                            command.CommandText = sql;
+				            command.CommandType = CommandType.Text;
+                            var reader = command.ExecuteReader();
+                        
+				            if(reader.Read())
+				            {				        	 
+						        value = reader.GetString(0);
+				            }
 
-						string value = _db.HashGet(taskInfo.UserId, taskInfo.TaskId);
+				            reader.Close();
+                        }
+                        
+                        if(string.IsNullOrEmpty(value)){
+                            _logger.Warn($"USERID: {taskInfo.UserId} TASKID: {taskInfo.TaskId} Script is NULL.");
+                            return;
+                        }
 
 						string json = Macros.Replace(value);
 
