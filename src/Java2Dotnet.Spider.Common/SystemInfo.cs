@@ -1,57 +1,46 @@
-﻿#if !NET_CORE
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Management;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net;
+#if NET_CORE
+using System.Text.RegularExpressions;
+#endif
 
 namespace Java2Dotnet.Spider.Common
 {
 	public class SystemInfo
 	{
-		private readonly int _processorCount;   //CPU个数
-		private readonly PerformanceCounter _pcCpuLoad;   //CPU计数器
-		private readonly long _physicalMemory;   //物理内存
+		public string Name { get; set; }
+		public int CpuLoad { get; set; }
+		public int CpuCount { get; set; }
+		public int FreeMemory { get; set; }
+		public int TotalMemory { get; set; }
+		public string IpAddress { get; set; }
+		public DateTime Timestamp { get; set; }
+		public string Os { get; set; }
 
-		private const int GwHwndfirst = 0;
-		private const int GwHwndnext = 2;
-		private const int GwlStyle = (-16);
-		private const int WsVisible = 268435456;
-		private const int WsBorder = 8388608;
+#if !NET_CORE
+		private static readonly PerformanceCounter PcCpuLoad; //CPU计数器
+#else
+		private static readonly object Locker = new object();
+		private static readonly int CoreCount;
+		private static readonly Regex ProcessorRegex = new Regex("processor");
+#endif
+		public static readonly int PhysicalMemory;
+		public static readonly string HostName;
+		public static readonly string Ip4Address;
 
-		#region AIP声明
-		[DllImport("IpHlpApi.dll")]
-		extern static public uint GetIfTable(byte[] pIfTable, ref uint pdwSize, bool bOrder);
-
-		[DllImport("User32")]
-		private extern static int GetWindow(int hWnd, int wCmd);
-
-		[DllImport("User32")]
-		private extern static int GetWindowLongA(int hWnd, int wIndx);
-
-		[DllImport("user32.dll")]
-		private static extern bool GetWindowText(int hWnd, StringBuilder title, int maxBufSize);
-
-		[DllImport("user32", CharSet = CharSet.Auto)]
-		private extern static int GetWindowTextLength(IntPtr hWnd);
-		#endregion
-
-		#region 构造函数
-		/// <summary>
-		/// 构造函数，初始化计数器等
-		/// </summary>
-		public SystemInfo()
+		static SystemInfo()
 		{
-			//初始化CPU计数器
-			_pcCpuLoad = new PerformanceCounter("Processor", "% Processor Time", "_Total") { MachineName = "." };
-			_pcCpuLoad.NextValue();
+			HostName = Dns.GetHostName();
 
-			//CPU个数
-			_processorCount = Environment.ProcessorCount;
+			// docker 化后只会有一个IP
+			Ip4Address = Dns.GetHostAddressesAsync(HostName).Result[0].ToString();
+
+#if !NET_CORE
+			//初始化CPU计数器
+			PcCpuLoad = new PerformanceCounter("Processor", "% Processor Time", "_Total") { MachineName = "." };
+			PcCpuLoad.NextValue();
 
 			//获得物理内存
 			ManagementClass mc = new ManagementClass("Win32_ComputerSystem");
@@ -61,118 +50,87 @@ namespace Java2Dotnet.Spider.Common
 				var mo = (ManagementObject)o;
 				if (mo["TotalPhysicalMemory"] != null)
 				{
-					_physicalMemory = long.Parse(mo["TotalPhysicalMemory"].ToString());
+					var physicalMemory = long.Parse(mo["TotalPhysicalMemory"].ToString());
+					PhysicalMemory = (int)(physicalMemory / (1024 * 1024));
 				}
 			}
+
+#else
+
+			// cpu count
+			string cpuInfo = RunCommand("cat", "/proc/cpuinfo");
+			CoreCount = ProcessorRegex.Matches(cpuInfo).Count;
+
+			var memInfo = RunCommand("free", "-m").Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+			int totalMem = int.Parse(memInfo[6]);
+			PhysicalMemory = totalMem;
+#endif
 		}
-		#endregion
 
-		#region CPU个数
-		/// <summary>
-		/// 获取CPU个数
-		/// </summary>
-		public int ProcessorCount => _processorCount;
-
-		#endregion
-
-		#region CPU占用率
-		/// <summary>
-		/// 获取CPU占用率
-		/// </summary>
-		public float CpuLoad => _pcCpuLoad.NextValue();
-
-		#endregion
-
-		#region 可用内存
-		/// <summary>
-		/// 获取可用内存
-		/// </summary>
-		public long MemoryAvailable
+		public static SystemInfo GetSystemInfo()
 		{
-			get
+			SystemInfo systemInfo = new SystemInfo();
+
+			systemInfo.CpuCount = Environment.ProcessorCount;
+			systemInfo.TotalMemory = PhysicalMemory;
+			systemInfo.Name = HostName;
+			systemInfo.Timestamp = DateTime.Now;
+			systemInfo.IpAddress = Ip4Address;
+
+#if !NET_CORE
+			long availablebytes = 0;
+
+			ManagementClass mos = new ManagementClass("Win32_OperatingSystem");
+			foreach (var o in mos.GetInstances())
 			{
-				long availablebytes = 0;
-				//ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT * FROM Win32_PerfRawData_PerfOS_Memory");
-				//foreach (ManagementObject mo in mos.Get())
-				//{
-				//    availablebytes = long.Parse(mo["Availablebytes"].ToString());
-				//}
-				ManagementClass mos = new ManagementClass("Win32_OperatingSystem");
-				foreach (var o in mos.GetInstances())
+				var mo = (ManagementObject)o;
+				if (mo["FreePhysicalMemory"] != null)
 				{
-					var mo = (ManagementObject)o;
-					if (mo["FreePhysicalMemory"] != null)
-					{
-						availablebytes = 1024 * long.Parse(mo["FreePhysicalMemory"].ToString());
-					}
+					availablebytes = 1024 * long.Parse(mo["FreePhysicalMemory"].ToString());
 				}
-				return availablebytes;
 			}
+
+			systemInfo.CpuLoad = (int)(PcCpuLoad.NextValue());
+			systemInfo.FreeMemory = (int)(availablebytes / (1024 * 1024));
+			systemInfo.Os = "Windows";
+#else
+
+			// cpu load 
+			string loadAvg = RunCommand("cat", "/proc/loadavg");
+			systemInfo.CpuLoad = (int)(float.Parse(loadAvg.Split(' ')[2]) * 100);
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				var memInfo = RunCommand("free", "-m").Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+	 
+				int usedMem = int.Parse(memInfo[7]);
+ 
+				systemInfo.FreeMemory = (PhysicalMemory - usedMem);
+				systemInfo.Os = "Linux";
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			{
+				//todo:
+				systemInfo.Os = "OSX";
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				//todo:
+				systemInfo.Os = "Windows";
+			}
+#endif
+			return systemInfo;
 		}
-		#endregion
 
-		#region 物理内存
-		/// <summary>
-		/// 获取物理内存
-		/// </summary>
-		public long PhysicalMemory => _physicalMemory;
-
-		#endregion
-
-		#region 结束指定进程
-		/// <summary>
-		/// 结束指定进程
-		/// </summary>
-		/// <param name="pid">进程的 Process ID</param>
-		public static void EndProcess(int pid)
+		public static string RunCommand(string command, string arguments)
 		{
-			try
-			{
-				Process process = Process.GetProcessById(pid);
-				process.Kill();
-			}
-			catch
-			{
-				// ignored
-			}
+			ProcessStartInfo startInfo = new ProcessStartInfo(command, arguments);
+			startInfo.RedirectStandardOutput = true;
+			Process process = new Process();
+			process.StartInfo = startInfo;
+			process.Start();
+			process.WaitForExit(1500);
+			return process.StandardOutput.ReadToEnd();
 		}
-		#endregion
-
-		#region 查找所有应用程序标题
-		/// <summary>
-		/// 查找所有应用程序标题
-		/// </summary>
-		/// <returns>应用程序标题范型</returns>
-		public static List<string> FindAllApps(int handle)
-		{
-			List<string> apps = new List<string>();
-
-			int hwCurr;
-			hwCurr = GetWindow(handle, GwHwndfirst);
-
-			while (hwCurr > 0)
-			{
-				int isTask = (WsVisible | WsBorder);
-				int lngStyle = GetWindowLongA(hwCurr, GwlStyle);
-				bool taskWindow = ((lngStyle & isTask) == isTask);
-				if (taskWindow)
-				{
-					int length = GetWindowTextLength(new IntPtr(hwCurr));
-					StringBuilder sb = new StringBuilder(2 * length + 1);
-					GetWindowText(hwCurr, sb, sb.Capacity);
-					string strTitle = sb.ToString();
-					if (!string.IsNullOrEmpty(strTitle))
-					{
-						apps.Add(strTitle);
-					}
-				}
-				hwCurr = GetWindow(hwCurr, GwHwndnext);
-			}
-
-			return apps;
-		}
-		#endregion
 	}
 }
-
-#endif

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Common;
-using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension;
 using Java2Dotnet.Spider.Extension.Configuration;
 using Java2Dotnet.Spider.Extension.Configuration.Json;
@@ -18,7 +16,7 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using MySql.Data.MySqlClient;
 using System.Data;
- 
+
 namespace Java2Dotnet.Spider.ScriptsConsole
 {
 	public class SpiderNode
@@ -30,16 +28,14 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 #endif
 		private const string SpiderRegistKey = "spider_nodes";
 		public bool IsConnected { get; private set; }
-		public readonly ConnectionMultiplexer _redis;
-		public readonly IDatabase _db;
-		private readonly string _hostName;
-
-		private readonly Dictionary<string, ScriptSpider> _spiderCache = new Dictionary<string, ScriptSpider>();
+		public readonly ConnectionMultiplexer Redis;
+		public readonly IDatabase Db;
+ 
+		//private readonly Dictionary<string, ScriptSpider> _spiderCache = new Dictionary<string, ScriptSpider>();
 
 		public SpiderNode()
 		{
-			_hostName = Dns.GetHostName();
-			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
+			Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
 			{
 				ServiceName = "redis_primary",
 				ConnectTimeout = 5000,
@@ -53,7 +49,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 					{ "redis_primary", 6379 }
 				}
 			});
-			_db = _redis.GetDatabase(2);
+			Db = Redis.GetDatabase(2);
 		}
 
 		public void Run()
@@ -67,40 +63,42 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 
 		private void Subscrib()
 		{
-			var subscriber = _redis.GetSubscriber(_hostName);
-			subscriber.Subscribe($"{_hostName}", (channel, message) =>
+			var subscriber = Redis.GetSubscriber(SystemInfo.HostName);
+			subscriber.Subscribe($"{SystemInfo.HostName}", (channel, commandInfo) =>
 			{
-				Task.Factory.StartNew(()=>{
+				Task.Factory.StartNew(() =>
+				{
 					if (!IsConnected)
 					{
-						_logger.Warn($" SpiderNode: {_hostName} is disconnected OR there is another same name node exits.");
+						_logger.Warn($" SpiderNode: {SystemInfo.HostName} is disconnected OR there is another same name node exits.");
 						return;
 					}
 					try
 					{
-						var taskInfo = JsonConvert.DeserializeObject<TaskInfo>(message);
-                        string value=null;
-                        using (var conn = new MySqlConnection("Database='mysql';Data Source=office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"))
-			            {
-                           	conn.Open();
-				            var command = conn.CreateCommand();
-                            string sql=$"SELECT `script` FROM `java2dotnet.spider`.`spider_scripts` where user_id='{taskInfo.UserId}' and task_id='{taskInfo.TaskId}'";
-                            command.CommandText = sql;
-				            command.CommandType = CommandType.Text;
-                            var reader = command.ExecuteReader();
-                        
-				            if(reader.Read())
-				            {				        	 
-						        value = reader.GetString(0);
-				            }
+						var taskInfo = JsonConvert.DeserializeObject<TaskInfo>(commandInfo);
+						string value = null;
+						using (var conn = new MySqlConnection("Database='mysql';Data Source=office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"))
+						{
+							conn.Open();
+							var command = conn.CreateCommand();
+							string sql = $"SELECT `script` FROM `java2dotnet.spider`.`spider_scripts` where user_id='{taskInfo.UserId}' and task_id='{taskInfo.TaskId}'";
+							command.CommandText = sql;
+							command.CommandType = CommandType.Text;
+							var reader = command.ExecuteReader();
 
-				            reader.Close();
-                        }
-                        
-                        if(string.IsNullOrEmpty(value)){
-                            _logger.Warn($"USERID: {taskInfo.UserId} TASKID: {taskInfo.TaskId} Script is NULL.");
-                            return;
-                        }
+							if (reader.Read())
+							{
+								value = reader.GetString(0);
+							}
+
+							reader.Close();
+						}
+
+						if (string.IsNullOrEmpty(value))
+						{
+							_logger.Warn($"USERID: {taskInfo.UserId} TASKID: {taskInfo.TaskId} Script is NULL.");
+							return;
+						}
 
 						string json = Macros.Replace(value);
 
@@ -122,7 +120,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 					}
 					catch (Exception e)
 					{
-						_logger.Error($"Execute spider: {message} failed. Details:" + e);
+						_logger.Error($"Execute spider: {commandInfo} failed. Details:" + e);
 					}
 				});
 			});
@@ -130,10 +128,6 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 
 		private void RegistNode()
 		{
-#if !NET_CORE
-			SystemInfo systemInfo = new SystemInfo();
-#endif
-
 			Task.Factory.StartNew(() =>
 			{
 				while (true)
@@ -150,43 +144,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 					//}
 					//else
 					{
-#if !NET_CORE
-                NodeInfo nodeInfo= new NodeInfo()
-						{
-							Name = Dns.GetHostName(),
-
-							CpuLoad = (int)systemInfo.CpuLoad,
-							TotalMemory = (int)(systemInfo.PhysicalMemory / (1024 * 1024)),
-							FreeMemory = (int)((systemInfo.PhysicalMemory - systemInfo.MemoryAvailable) / (1024 * 1024)),
-                             OS="Windows",
-							Timestamp = DateTime.Now
-						};
-#else
-                        NodeInfo nodeInfo=new NodeInfo();
-                        nodeInfo.Name=Dns.GetHostName();                        
-                        nodeInfo.Timestamp=DateTime.Now;
-                        
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-			{
-				var info= LinuxSystemInfo.GetSystemInfo();
-                nodeInfo.CpuLoad=(int)(info.LoadAvg*100);
-                nodeInfo.TotalMemory=info.TotalMemory;
-                nodeInfo.FreeMemory=info.FreeMemory;
-                nodeInfo.OS="Linux";
-			}
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-			{
- //todo:
-  nodeInfo.OS="OSX";
-			}
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
- //todo:
-   nodeInfo.OS="Windows";
-			}
-#endif
-                        
-						_db.HashSet(SpiderRegistKey, _hostName, JsonConvert.SerializeObject(nodeInfo));
+						Db.HashSet(SpiderRegistKey, SystemInfo.HostName, JsonConvert.SerializeObject(SystemInfo.GetSystemInfo()));
 						IsConnected = true;
 					}
 

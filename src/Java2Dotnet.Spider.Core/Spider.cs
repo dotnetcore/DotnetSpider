@@ -13,6 +13,7 @@ using Java2Dotnet.Spider.Core.Pipeline;
 using Java2Dotnet.Spider.Core.Processor;
 using Java2Dotnet.Spider.Core.Proxy;
 using Java2Dotnet.Spider.Core.Scheduler;
+using Java2Dotnet.Spider.Core.Scheduler.Component;
 using Java2Dotnet.Spider.Core.Utils;
 #if !NET_CORE
 using log4net;
@@ -551,6 +552,17 @@ namespace Java2Dotnet.Spider.Core
 			{
 				SafeDestroy(pipeline);
 			}
+
+			try
+			{
+				var scheduler = Scheduler as IDuplicateRemover;
+				scheduler?.ResetDuplicateCheck(this);
+			}
+			catch
+			{
+				// ignored
+			}
+
 
 			SafeDestroy(Scheduler);
 			SafeDestroy(PageProcessor);
