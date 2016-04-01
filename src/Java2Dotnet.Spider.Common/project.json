@@ -15,7 +15,9 @@
 				"System.Security.Cryptography.Primitives": "4.0.0-rc3-23829",
 				"System.Threading.Thread": "4.0.0-rc3-23829",
 				"System.Threading.ThreadPool": "4.0.0-rc3-23829",
-				"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc3-23829"
+				"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc3-23829",
+                "System.Diagnostics.Process":"4.0.0-rc3-23829"    ,
+                "System.Text.RegularExpressions":"4.0.0-rc3-23829"
 			},
 			"compilationOptions": {
 				"define": [ "NET_CORE" ]

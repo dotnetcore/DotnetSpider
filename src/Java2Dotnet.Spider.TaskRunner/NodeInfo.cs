@@ -10,5 +10,6 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 		public int TotalMemory { get; set; }
 		public string IpAddress { get; set; }
 		public DateTime Timestamp { get; set; }
+        public string OS{get;set;}
 	}
 }

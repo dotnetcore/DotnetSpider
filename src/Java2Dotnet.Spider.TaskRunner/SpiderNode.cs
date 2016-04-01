@@ -12,12 +12,13 @@ using Java2Dotnet.Spider.Extension.Configuration.Json;
 using log4net;
 #else
 using Java2Dotnet.Spider.JLog;
+using System.Runtime.InteropServices;
 #endif
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using MySql.Data.MySqlClient;
 using System.Data;
-
+ 
 namespace Java2Dotnet.Spider.ScriptsConsole
 {
 	public class SpiderNode
@@ -149,16 +150,43 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 					//}
 					//else
 					{
-						_db.HashSet(SpiderRegistKey, _hostName, JsonConvert.SerializeObject(new NodeInfo()
+#if !NET_CORE
+                NodeInfo nodeInfo= new NodeInfo()
 						{
 							Name = Dns.GetHostName(),
-#if !NET_CORE
+
 							CpuLoad = (int)systemInfo.CpuLoad,
 							TotalMemory = (int)(systemInfo.PhysicalMemory / (1024 * 1024)),
 							FreeMemory = (int)((systemInfo.PhysicalMemory - systemInfo.MemoryAvailable) / (1024 * 1024)),
-#endif
+                             OS="Windows",
 							Timestamp = DateTime.Now
-						}));
+						};
+#else
+                        NodeInfo nodeInfo=new NodeInfo();
+                        nodeInfo.Name=Dns.GetHostName();                        
+                        nodeInfo.Timestamp=DateTime.Now;
+                        
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				var info= LinuxSystemInfo.GetSystemInfo();
+                nodeInfo.CpuLoad=(int)(info.LoadAvg*100);
+                nodeInfo.TotalMemory=info.TotalMemory;
+                nodeInfo.FreeMemory=info.FreeMemory;
+                nodeInfo.OS="Linux";
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			{
+ //todo:
+  nodeInfo.OS="OSX";
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+ //todo:
+   nodeInfo.OS="Windows";
+			}
+#endif
+                        
+						_db.HashSet(SpiderRegistKey, _hostName, JsonConvert.SerializeObject(nodeInfo));
 						IsConnected = true;
 					}
 
