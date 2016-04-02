@@ -66,7 +66,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void InitEnvoriment()
 		{
-			redis = RedisProvider.GetProvider();
+			redis = new RedisServer("redis_primary", 6379, "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w");
 
 			if (_spiderContext.Redialer != null)
 			{

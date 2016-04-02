@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Management;
 using System.Net;
 #if NET_CORE
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
+#else
+using System.Management;
 #endif
 
 namespace Java2Dotnet.Spider.Common

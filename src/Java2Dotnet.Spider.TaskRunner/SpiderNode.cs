@@ -81,7 +81,8 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 					{
 						var taskInfo = JsonConvert.DeserializeObject<TaskInfo>(commandInfo);
 						string value = null;
-						using (var conn = new MySqlConnection("Database='mysql';Data Source=office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"))
+						/*
+                        using (var conn = new MySqlConnection("Database='mysql';Data Source=office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"))
 						{
 							conn.Open();
 							var command = conn.CreateCommand();
@@ -97,6 +98,8 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 
 							reader.Close();
 						}
+                        */
+                        value=_redisClient.HashGet(taskInfo.UserId,taskInfo.TaskId);
 
 						if (string.IsNullOrEmpty(value))
 						{
@@ -147,10 +150,10 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 					//	}
 					//}
 					//else
-					{
+					//{
 						_redisClient.HashSet(SpiderRegistKey, SystemInfo.HostName, JsonConvert.SerializeObject(SystemInfo.GetSystemInfo()));
 						IsConnected = true;
-					}
+					//}
 
 					Thread.Sleep(3000);
 				}

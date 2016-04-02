@@ -17,7 +17,11 @@
 				"System.Threading.ThreadPool": "4.0.0-rc3-23829",
 				"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc3-23829",
                 "System.Diagnostics.Process":"4.0.0-rc3-23829"    ,
-                "System.Text.RegularExpressions":"4.0.0-rc3-23829"
+                "System.Text.RegularExpressions":"4.0.0-rc3-23829",
+                "System.Dynamic.Runtime":"4.0.0-rc3-23829",
+                "System.Net.NameResolution":"4.0.0-rc3-23829" ,
+                "Microsoft.CSharp": "4.0.1-rc3-23829",  
+                "System.Collections.NonGeneric":"4.0.0-rc3-23829"           
 			},
 			"compilationOptions": {
 				"define": [ "NET_CORE","RELEASE" ]

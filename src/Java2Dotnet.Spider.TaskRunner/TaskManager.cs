@@ -63,6 +63,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			// todo: step 1 Map to user
 			// step 2 Add to cache
 
+/*
 			using (var conn = new MySqlConnection("Database='mysql';Data Source=office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{
 				List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
@@ -95,7 +96,8 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 				command.Parameters.AddRange(parameters.ToArray());
 				command.ExecuteNonQuery();
 			}
-
+            */
+_redisClient.HashSet(userId,taskId,spiderScript);
 		}
 
 		public void AddTestTask(string userId, string spiderScript)

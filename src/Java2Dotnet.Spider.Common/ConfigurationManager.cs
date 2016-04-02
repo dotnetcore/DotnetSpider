@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
 
 namespace Java2Dotnet.Spider.Common
 {
@@ -9,10 +10,10 @@ namespace Java2Dotnet.Spider.Common
 		static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
 
 		static ConfigurationManager()
-		{
-			if (File.Exists("app.json"))
+		{            
+			if (File.Exists("app.conf"))
 			{
-				string[] lines = File.ReadAllLines("app.json");
+				string[] lines = File.ReadAllLines("app.conf");
 				foreach (var line in lines)
 				{
 					int firstSplitIndex = line.IndexOf(':');

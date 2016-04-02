@@ -9,7 +9,7 @@ using Java2Dotnet.Spider.Redial.Redialer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RedisSharp;
 
-#endif
+
 namespace Java2Dotnet.Spider.Test.RedisRedialManager
 {
 	[TestClass]
@@ -203,3 +203,4 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		}
 	}
 }
+#endif

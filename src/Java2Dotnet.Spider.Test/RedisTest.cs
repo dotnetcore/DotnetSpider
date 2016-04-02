@@ -1,3 +1,5 @@
+#if !NET_CORE
+
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -207,3 +209,5 @@ namespace RedisSharp
 		}
 	}
 }
+
+#endif
