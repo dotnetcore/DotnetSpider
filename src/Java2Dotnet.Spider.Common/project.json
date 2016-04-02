@@ -20,7 +20,7 @@
                 "System.Text.RegularExpressions":"4.0.0-rc3-23829"
 			},
 			"compilationOptions": {
-				"define": [ "NET_CORE" ]
+				"define": [ "NET_CORE","RELEASE" ]
 			}
 		}
 	}

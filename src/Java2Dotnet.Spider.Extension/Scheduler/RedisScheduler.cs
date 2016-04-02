@@ -7,7 +7,7 @@ using Java2Dotnet.Spider.Core.Utils;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
 using Newtonsoft.Json;
-using StackExchange.Redis;
+using RedisSharp;
 
 namespace Java2Dotnet.Spider.Extension.Scheduler
 {
@@ -22,28 +22,16 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		public static readonly string TaskList = "task";
 		public static readonly string ItemPrefix = "item-";
 
-		public ConnectionMultiplexer Redis { get; }
+		public RedisServer Redis { get; }
 
-		private readonly IDatabase _db;
-
-		public RedisScheduler(string host, string password = null, int port = 6379) : this(ConnectionMultiplexer.Connect(new ConfigurationOptions()
-		{
-			ServiceName = host,
-			Password = password,
-			ConnectTimeout = 5000,
-			KeepAlive = 8,
-			EndPoints =
-				{
-					{ host, port }
-				}
-		}))
+		public RedisScheduler(string host, string password = null, int port = 6379) : this(new RedisServer(host, port, password))
 		{
 		}
 
-		public RedisScheduler(ConnectionMultiplexer redis) : this()
+		public RedisScheduler(RedisServer redis) : this()
 		{
 			Redis = redis;
-			_db = Redis.GetDatabase(0);
+			Redis.Db = 0;
 		}
 
 		private RedisScheduler()
@@ -55,7 +43,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			RedialManagerUtils.Execute("rds-init", () =>
 			{
-				_db.SortedSetAdd(TaskList, spider.Identity, DateTimeUtils.GetCurrentTimeStamp());
+				Redis.SortedSetAdd(TaskList, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
 			});
 		}
 
@@ -63,7 +51,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			RedialManagerUtils.Execute("rds-reset", () =>
 			{
-				_db.KeyDelete(GetSetKey(spider.Identity));
+				Redis.KeyDelete(GetSetKey(spider.Identity));
 			});
 		}
 
@@ -82,10 +70,10 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 			return SafeExecutor.Execute(30, () =>
 			{
 				string key = GetSetKey(spider.Identity);
-				bool isDuplicate = _db.SetContains(key, request.Identity);
+				bool isDuplicate = Redis.SetContains(key, request.Identity);
 				if (!isDuplicate)
 				{
-					_db.SetAdd(key, request.Identity);
+					Redis.SetAdd(key, request.Identity);
 				}
 				return isDuplicate;
 			});
@@ -96,11 +84,11 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			SafeExecutor.Execute(30, () =>
 			{
-				_db.ListRightPush(GetQueueKey(spider.Identity), request.Identity);
+				Redis.ListRightPush(GetQueueKey(spider.Identity), request.Identity);
 				string field = request.Identity;
 				string value = JsonConvert.SerializeObject(request);
 
-				_db.HashSet(ItemPrefix + spider.Identity, field, value);
+				Redis.HashSet(ItemPrefix + spider.Identity, field, value);
 			});
 		}
 
@@ -114,7 +102,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			return RedialManagerUtils.Execute("rds-getleftcount", () =>
 			{
-				long size = _db.ListLength(GetQueueKey(spider.Identity));
+				long size = Redis.ListLength(GetQueueKey(spider.Identity));
 				return (int)size;
 			});
 		}
@@ -123,7 +111,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			return RedialManagerUtils.Execute("rds-gettotalcount", () =>
 			{
-				long size = _db.SetLength(GetSetKey(spider.Identity));
+				long size = Redis.SetLength(GetSetKey(spider.Identity));
 
 				return (int)size;
 			});
@@ -138,8 +126,8 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			return SafeExecutor.Execute(30, () =>
 			{
-				var value = _db.ListRightPop(GetQueueKey(spider.Identity));
-				if (!value.HasValue)
+				var value = Redis.ListRightPop(GetQueueKey(spider.Identity));
+				if (value == null)
 				{
 					return null;
 				}
@@ -149,7 +137,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 				string json = null;
 
 				//redis 有可能取数据失败
-				for (int i = 0; i < 10 && string.IsNullOrEmpty(json = _db.HashGet(hashId, field)); ++i)
+				for (int i = 0; i < 10 && string.IsNullOrEmpty(json = Redis.HashGet(hashId, field)); ++i)
 				{
 					Thread.Sleep(150);
 				}
@@ -157,7 +145,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 				if (!string.IsNullOrEmpty(json))
 				{
 					var result = JsonConvert.DeserializeObject<Request>(json);
-					_db.HashDelete(hashId, field);
+					Redis.HashDelete(hashId, field);
 					return result;
 				}
 

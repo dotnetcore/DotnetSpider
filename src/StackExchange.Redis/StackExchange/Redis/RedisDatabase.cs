@@ -114,7 +114,7 @@ namespace StackExchange.Redis
 
         public RedisValue HashGet(RedisKey key, RedisValue hashField, CommandFlags flags = CommandFlags.None)
         {
-            var msg = Message.Create(Db, flags, RedisCommand.HGET, key, hashField);
+            var msg = Message.Create(Db, flags, RedisCommand.SortedSetRemove, key, hashField);
             return ExecuteSync(msg, ResultProcessor.RedisValue);
         }
 

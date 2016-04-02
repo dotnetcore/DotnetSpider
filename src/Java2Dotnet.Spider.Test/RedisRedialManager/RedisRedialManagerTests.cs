@@ -1,12 +1,13 @@
 ﻿#if !NET_CORE
 using System;
+using System.Diagnostics.Contracts;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
 using Java2Dotnet.Spider.Redial.Redialer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using StackExchange.Redis;
+using RedisSharp;
 
 #endif
 namespace Java2Dotnet.Spider.Test.RedisRedialManager
@@ -17,29 +18,16 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		[TestMethod]
 		public void SubPubTest()
 		{
-			var redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
-			{
-				ServiceName = "localhost",
-				ConnectTimeout = 5000,
-				KeepAlive = 8,
-#if !RELEASE
-				AllowAdmin = true,
-#endif
-				EndPoints =
-				{
-					{ "localhost", 6379 }
-				}
-			});
+			var redis = new RedisServer();
 			//redis.PreserveAsyncOrder = false;
-			var sub = redis.GetSubscriber();
 
 			string result = "";
-			sub.Subscribe("messages", (channel, message) =>
+			redis.Subscribe("messages", (channel, message) =>
 			{
 				result = message;
 			});
 
-			sub.Publish("messages", "hello");
+			bool reslut = redis.Publish("messages", "hello");
 
 			Thread.Sleep(2000);
 
@@ -50,10 +38,10 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		[TestMethod]
 		public void AtomicCommonTest()
 		{
-			var manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
-			manager.Redis.GetServer(manager.Redis.GetEndPoints()[0]).FlushDatabase(1);
-
+			Redial.RedialManager.RedisRedialManager manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
+			manager.Redis.FlushDb();
 			RedisAtomicExecutor executor = new RedisAtomicExecutor(manager);
+
 			Task.Factory.StartNew(() =>
 			{
 				executor.Execute("test", () =>
@@ -65,11 +53,11 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 				});
 			});
 			Thread.Sleep(500);
-			var result = manager.Db.HashGetAll(RedisAtomicExecutor.GetSetKey());
+			var result = manager.Redis.HashGetAll(RedisAtomicExecutor.GetSetKey());
 			Assert.IsTrue(result.Length == 1);
-			Assert.IsTrue(result[0].ToString().StartsWith("test"));
+			Assert.IsTrue(result[0].Key.StartsWith("test"));
 			Thread.Sleep(5 * 1000);
-			result = manager.Db.HashGetAll(RedisAtomicExecutor.GetSetKey());
+			result = manager.Redis.HashGetAll(RedisAtomicExecutor.GetSetKey());
 			Assert.IsTrue(result.Length == 0);
 		}
 
@@ -77,9 +65,10 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		public void RedialTest()
 		{
 			var manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
-			manager.Redis.GetServer(manager.Redis.GetEndPoints()[0]).FlushDatabase(1);
+			manager.Redis.FlushDb();
 			manager.Redialer = new TestRedial();
 			RedisAtomicExecutor executor = new RedisAtomicExecutor(manager);
+ 
 			Task.Factory.StartNew(() =>
 			{
 				executor.Execute("test1", () =>
@@ -120,9 +109,9 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		public void ClearTimeoutTest1()
 		{
 			var manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
-			manager.Redis.GetServer(manager.Redis.GetEndPoints()[0]).FlushDatabase(1);
+			manager.Redis.FlushDb();
 			manager.Redialer = new TestRedial();
-			manager.Db.HashSet(RedisAtomicExecutor.GetSetKey(), "test-timeout", DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd hh:mm"));
+			manager.Redis.HashSet(RedisAtomicExecutor.GetSetKey(), "test-timeout", DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd hh:mm"));
 			RedisAtomicExecutor executor = new RedisAtomicExecutor(manager);
 			Task.Factory.StartNew(() =>
 			{
@@ -164,9 +153,10 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		public void ClearTimeoutTest2()
 		{
 			var manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
-			manager.Redis.GetServer(manager.Redis.GetEndPoints()[0]).FlushDatabase(1);
+			manager.Redis.FlushDb();
 			manager.Redialer = new TestRedial();
-			manager.Db.HashSet(RedisAtomicExecutor.GetSetKey(), Redial.RedialManager.RedisRedialManager.Locker, DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd hh:mm"));
+			manager.Redis.HashSet(RedisAtomicExecutor.GetSetKey(), Redial.RedialManager.RedisRedialManager.Locker, DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd hh:mm"));
+		 
 			RedisAtomicExecutor executor = new RedisAtomicExecutor(manager);
 			Task.Factory.StartNew(() =>
 			{

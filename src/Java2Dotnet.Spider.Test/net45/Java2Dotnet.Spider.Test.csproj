@@ -130,6 +130,9 @@
     <Compile Include="..\RedisSchedulerTest.cs">
       <Link>RedisSchedulerTest.cs</Link>
     </Compile>
+    <Compile Include="..\RedisTest.cs">
+      <Link>RedisTest.cs</Link>
+    </Compile>
     <Compile Include="..\RequestTests.cs">
       <Link>RequestTests.cs</Link>
     </Compile>

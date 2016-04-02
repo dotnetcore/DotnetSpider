@@ -11,9 +11,9 @@ using Java2Dotnet.Spider.JLog;
 #endif
 using Newtonsoft.Json;
 using System.Data.Common;
-using StackExchange.Redis;
 using MySql.Data.MySqlClient;
 using System.Data;
+using RedisSharp;
 
 namespace Java2Dotnet.Spider.ScriptsConsole
 {
@@ -27,35 +27,34 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 		private readonly ILog _logger = LogManager.GetLogger();
 #endif
 
-		private readonly ConnectionMultiplexer _redis;
-		private IDatabase _db;
+		private readonly RedisServer _redisClient;
 
 		public TaskManager()
 		{
-			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
-			{
-				ServiceName = "redis_primary",
-				ConnectTimeout = 5000,
-				KeepAlive = 8,
-                		SyncTimeout=50000,
-        			ResponseTimeout=50000,
-        			Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
-#if !RELEASE
-				AllowAdmin = true,
-#endif
-				EndPoints =
-				{
-					{ "redis_primary", 6379 }
-				}
-			});
-            			_redis.PreserveAsyncOrder = false;
-				_db = _redis.GetDatabase(2);
+			//			_redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
+			//			{
+			//				ServiceName = "redis_primary",
+			//				ConnectTimeout = 5000,
+			//				KeepAlive = 8,
+			//                		SyncTimeout=50000,
+			//        			ResponseTimeout=50000,
+			//        			Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
+			//#if !RELEASE
+			//				AllowAdmin = true,
+			//#endif
+			//				EndPoints =
+			//				{
+			//					{ "redis_primary", 6379 }
+			//				}
+			//			});
+
+			_redisClient = new RedisServer("ooodata.com", 6379, "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w");
+			_redisClient.Db = 2;
 		}
 
 		public void TriggerTask(string hostName, string userId, string taskId)
 		{
-			var subscriber = _redis.GetSubscriber(hostName);
-			subscriber.Publish(hostName, JsonConvert.SerializeObject(new TaskInfo { UserId = userId, TaskId = taskId }));
+			_redisClient.Publish(hostName, JsonConvert.SerializeObject(new TaskInfo { UserId = userId, TaskId = taskId }));
 		}
 
 		public void AddTask(string userId, string taskId, string spiderScript)
@@ -64,7 +63,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 			// todo: step 1 Map to user
 			// step 2 Add to cache
 
-            using (var conn = new MySqlConnection("Database='mysql';Data Source=office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"))
+			using (var conn = new MySqlConnection("Database='mysql';Data Source=office.86research.cn;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{
 				List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
 				string sql = "INSERT IGNORE INTO `java2dotnet.spider`.`spider_scripts` (`user_id`,`task_id`,`script`) values(@user_id,@task_id,@script)";
@@ -72,31 +71,31 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 				var command = conn.CreateCommand();
 				command.CommandText = sql;
 				command.CommandType = CommandType.Text;
-			 
+
 				List<DbParameter> parameters = new List<DbParameter>();
 
 				var parameter1 = new MySqlParameter();
-				parameter1.ParameterName =  "@user_id";
-				parameter1.Value =  userId;
-				parameter1.DbType =  DbType.String;
+				parameter1.ParameterName = "@user_id";
+				parameter1.Value = userId;
+				parameter1.DbType = DbType.String;
 				parameters.Add(parameter1);
 
 				var parameter2 = new MySqlParameter();
-				parameter2.ParameterName =  "@task_id";
-				parameter2.Value =  taskId;
-				parameter2.DbType =  DbType.String;
+				parameter2.ParameterName = "@task_id";
+				parameter2.Value = taskId;
+				parameter2.DbType = DbType.String;
 				parameters.Add(parameter2);
-                
-                var parameter3 = new MySqlParameter();
-				parameter3.ParameterName =  "@script";
-				parameter3.Value =  spiderScript;
-				parameter3.DbType =  DbType.String;
+
+				var parameter3 = new MySqlParameter();
+				parameter3.ParameterName = "@script";
+				parameter3.Value = spiderScript;
+				parameter3.DbType = DbType.String;
 				parameters.Add(parameter3);
-                
+
 				command.Parameters.AddRange(parameters.ToArray());
 				command.ExecuteNonQuery();
-            }
-            
+			}
+
 		}
 
 		public void AddTestTask(string userId, string spiderScript)

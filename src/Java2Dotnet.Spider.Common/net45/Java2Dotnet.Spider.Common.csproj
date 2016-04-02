@@ -130,6 +130,9 @@
     <Compile Include="..\PriorityBlockingQueue.cs">
       <Link>PriorityBlockingQueue.cs</Link>
     </Compile>
+    <Compile Include="..\RedisSharp.cs">
+      <Link>RedisSharp.cs</Link>
+    </Compile>
     <Compile Include="..\SafeExecutor.cs">
       <Link>SafeExecutor.cs</Link>
     </Compile>

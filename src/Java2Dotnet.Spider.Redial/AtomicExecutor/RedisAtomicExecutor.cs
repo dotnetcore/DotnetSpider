@@ -19,12 +19,12 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 			try
 			{
-				_redisRedialManager.Db.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
+				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
 				action();
 			}
 			finally
 			{
-				_redisRedialManager.Db.HashDelete(setKey, fieldKey);
+				_redisRedialManager.Redis.HashDelete(setKey, fieldKey);
 			}
 		}
 
@@ -36,12 +36,12 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 			try
 			{
-				_redisRedialManager.Db.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
+				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
 				action(obj);
 			}
 			finally
 			{
-				_redisRedialManager.Db.HashDelete(setKey, fieldKey);
+				_redisRedialManager.Redis.HashDelete(setKey, fieldKey);
 			}
 		}
 
@@ -54,12 +54,12 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-				_redisRedialManager.Db.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
+				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
 				return func(obj);
 			}
 			finally
 			{
-				_redisRedialManager.Db.HashDelete(setKey, fieldKey);
+				_redisRedialManager.Redis.HashDelete(setKey, fieldKey);
 			}
 		}
 
@@ -71,12 +71,12 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 			try
 			{
-				_redisRedialManager.Db.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
+				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
 				return func();
 			}
 			finally
 			{
-				_redisRedialManager.Db.HashDelete(setKey, fieldKey);
+				_redisRedialManager.Redis.HashDelete(setKey, fieldKey);
 			}
 		}
 
@@ -85,7 +85,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			while (true)
 			{
 				ClearTimeoutAction();
-				if (_redisRedialManager.Db.HashLength(GetSetKey()) == 1)
+				if (_redisRedialManager.Redis.HashLength(GetSetKey()) <= 1)
 				{
 					break;
 				}
@@ -100,9 +100,9 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 #endif
-			foreach (var entry in _redisRedialManager.Db.HashGetAll(GetSetKey()))
+			foreach (var entry in _redisRedialManager.Redis.HashGetAll(GetSetKey()))
 			{
-				string key = entry.Name;
+				string key = entry.Key;
 				string value = entry.Value;
 
 				DateTime dt = DateTime.Parse(value);
@@ -110,7 +110,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 				if (minutes > 5)
 				{
-					_redisRedialManager.Db.HashDelete(GetSetKey(), key);
+					_redisRedialManager.Redis.HashDelete(GetSetKey(), key);
 				}
 			}
 #if RELEASE
@@ -130,7 +130,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 		private string GetFieldKey(string identity)
 		{
-			return identity + "_" + Guid.NewGuid();
+			return identity + "_" + Guid.NewGuid().ToString("N");
 		}
 
 		public IWaitforRedial WaitforRedial { get; }

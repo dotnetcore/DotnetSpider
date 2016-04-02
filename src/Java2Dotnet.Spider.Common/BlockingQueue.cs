@@ -4,11 +4,11 @@ using System.Threading;
 
 namespace Java2Dotnet.Spider.Common
 {
-	public sealed class BlockingQueue : ICollection
+	public sealed class BlockingQueue<T> : ICollection
 	{
 		#region Fields
 		// Buffer used to store queue objects with max "Size".
-		private object[] buffer;
+		private T[] buffer;
 		// Current number of elements in the queue.
 		private int _count;
 		// Max number of elements queue can hold without blocking.
@@ -38,7 +38,7 @@ namespace Java2Dotnet.Spider.Common
 									 + " be greater then zero.");
 			_syncRoot = new object();
 			_size = size;
-			buffer = new object[size];
+			buffer = new T[size];
 			_count = 0;
 			_head = 0;
 			_tail = 0;
@@ -91,7 +91,7 @@ namespace Java2Dotnet.Spider.Common
 		/// "Timeout.Infinite" until queue has a free slot.
 		/// </summary>
 		/// <param name="value"></param>
-		public void Enqueue(object value)
+		public void Enqueue(T value)
 		{
 			Enqueue(value, Timeout.Infinite);
 		}
@@ -105,7 +105,7 @@ namespace Java2Dotnet.Spider.Common
 		/// </summary>
 		/// <param name="value"></param>
 		/// <param name="millisecondsTimeout"></param>
-		public void Enqueue(object value, int millisecondsTimeout)
+		public void Enqueue(T value, int millisecondsTimeout)
 		{
 			lock (_syncRoot)
 			{
@@ -144,7 +144,7 @@ namespace Java2Dotnet.Spider.Common
 		/// <param name="value"></param>
 		/// <returns>true if successfull,
 		/// otherwise false.</returns>
-		public bool TryEnqueue(object value)
+		public bool TryEnqueue(T value)
 		{
 			lock (_syncRoot)
 			{
@@ -170,7 +170,7 @@ namespace Java2Dotnet.Spider.Common
 		/// thread Enqueues and object.
 		/// </summary>
 		/// <returns></returns>
-		public object Dequeue()
+		public T Dequeue()
 		{
 			return Dequeue(Timeout.Infinite);
 		}
@@ -185,9 +185,9 @@ namespace Java2Dotnet.Spider.Common
 		/// </summary>
 		/// <returns>The object that is removed from
 		/// the beginning of the Queue.</returns>
-		public object Dequeue(int millisecondsTimeout)
+		public T Dequeue(int millisecondsTimeout)
 		{
-			object value;
+			T value;
 			lock (_syncRoot)
 			{
 				while (_count == 0)
@@ -204,7 +204,7 @@ namespace Java2Dotnet.Spider.Common
 					}
 				}
 				value = buffer[_head];
-				buffer[_head] = null;
+				buffer[_head] = default(T);
 				_head = (_head + 1) % _size;
 				_count--;
 				if (_count == (_size - 1))
@@ -223,17 +223,17 @@ namespace Java2Dotnet.Spider.Common
 		/// <param name="value">The object that is removed from
 		///     the beginning of the Queue or null if empty.</param>
 		/// <returns>true if successfull, otherwise false.</returns>
-		public bool TryDequeue(out object value)
+		public bool TryDequeue(out T value)
 		{
 			lock (_syncRoot)
 			{
 				if (_count == 0)
 				{
-					value = null;
+					value = default(T);
 					return false;
 				}
 				value = buffer[_head];
-				buffer[_head] = null;
+				buffer[_head] = default(T);
 				_head = (_head + 1) % _size;
 				_count--;
 				if (_count == (_size - 1))
@@ -262,14 +262,14 @@ namespace Java2Dotnet.Spider.Common
 		///                The queue is empty.
 		///     <cref>InvalidOpertionException</cref>
 		/// </exception>
-		public object Peek()
+		public T Peek()
 		{
 			lock (_syncRoot)
 			{
 				if (_count == 0)
 					throw new InvalidOperationException("The Queue is empty.");
 
-				object value = buffer[_head];
+				T value = buffer[_head];
 				return value;
 			}
 		}
@@ -284,13 +284,13 @@ namespace Java2Dotnet.Spider.Common
 		/// <param name="value">The object at the beginning
 		///          of the Queue or null if empty.</param>
 		/// <returns>The object at the beginning of the Queue.</returns>
-		public bool TryPeek(out object value)
+		public bool TryPeek(out T value)
 		{
 			lock (_syncRoot)
 			{
 				if (_count == 0)
 				{
-					value = null;
+					value = default(T);
 					return false;
 				}
 				value = buffer[_head];
@@ -313,7 +313,7 @@ namespace Java2Dotnet.Spider.Common
 				_tail = 0;
 				for (int i = 0; i < buffer.Length; i++)
 				{
-					buffer[i] = null;
+					buffer[i] = default(T);
 				}
 			}
 		}

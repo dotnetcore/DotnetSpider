@@ -15,11 +15,8 @@ using Java2Dotnet.Spider.JLog;
 #endif
 
 using Newtonsoft.Json;
-
-#if !NET_CORE
-using StackExchange.Redis;
-#else
-#endif
+using RedisSharp;
+ 
 
 namespace Java2Dotnet.Spider.Extension.Monitor
 {
@@ -87,21 +84,19 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 						RedisScheduler scheduler = spider.Scheduler as RedisScheduler;
 						if (scheduler != null)
 						{
-							ConnectionMultiplexer redis = scheduler.Redis;
-
-							IDatabase db = redis.GetDatabase(0);
-
+							var redis = scheduler.Redis;
+ 
 							while (true)
 							{
 								try
 								{
 									if (Closed)
 									{
-										UpdateStatus(db);
+										UpdateStatus(redis);
 										break;
 									}
 
-									UpdateStatus(db);
+									UpdateStatus(redis);
 								}
 								catch (Exception)
 								{
@@ -116,7 +111,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 				}
 			}
 #if !NET_CORE
-			private void UpdateStatus(IDatabase db)
+			private void UpdateStatus(RedisServer redis)
 			{
 				var status = new
 				{
@@ -132,7 +127,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					TotalPageCount,
 					AliveThreadCount
 				};
-				db.HashSet(RedisScheduler.TaskStatus, _spider.Identity, JsonConvert.SerializeObject(status));
+				redis.HashSet(RedisScheduler.TaskStatus, _spider.Identity, JsonConvert.SerializeObject(status));
 			}
 
 #endif

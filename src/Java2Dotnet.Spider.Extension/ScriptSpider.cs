@@ -19,7 +19,7 @@ using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.Redialer;
 using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
-using StackExchange.Redis;
+
 #if !NET_CORE
 using log4net;
 #else
@@ -27,6 +27,7 @@ using Java2Dotnet.Spider.JLog;
 #endif
 
 using Newtonsoft.Json.Linq;
+using RedisSharp;
 using DefaultNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.DefaultNetworkValidater;
 using VpsNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.VpsNetworkValidater;
 
@@ -45,7 +46,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		private readonly List<IValidate> _validations = new List<IValidate>();
 		private readonly SpiderContext _spiderContext;
-
+		private RedisServer redis;
 		public string Name { get; }
 
 		public ScriptSpider(SpiderContext spiderContext)
@@ -114,19 +115,18 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void DoValidate()
 		{
-			var redis = RedisProvider.GetProvider();
-			IDatabase db = redis.GetDatabase(0);
+			redis = RedisProvider.GetProvider();
 
 			string key = "locker-validate-" + Name;
 			try
 			{
 				Console.WriteLine($"Lock: {key} to keep only one validate process.");
-				while (!db.LockTake(key, 0, TimeSpan.FromMinutes(10)))
+				while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 				{
 					Thread.Sleep(1000);
 				}
 
-				var lockerValue = db.HashGet(ValidateStatusName, Name).ToString();
+				var lockerValue = redis.HashGet(ValidateStatusName, Name).ToString();
 				bool needInitStartRequest = lockerValue != "validate finished";
 
 				if (needInitStartRequest)
@@ -160,7 +160,7 @@ namespace Java2Dotnet.Spider.Extension
 
 				if (needInitStartRequest)
 				{
-					db.HashSet(ValidateStatusName, Name, "validate finished");
+					redis.HashSet(ValidateStatusName, Name, "validate finished");
 				}
 			}
 			catch (Exception e)
@@ -171,7 +171,7 @@ namespace Java2Dotnet.Spider.Extension
 			finally
 			{
 				Console.WriteLine("Release locker.");
-				db.LockRelease(key, 0);
+				redis.LockRelease(key, 0);
 			}
 		}
 
@@ -194,34 +194,33 @@ namespace Java2Dotnet.Spider.Extension
 
 						var scheduler = (Scheduler.RedisScheduler)(_spiderContext.Scheduler.GetScheduler());
 
-						IDatabase db = scheduler.Redis.GetDatabase(0);
 						string key = "locker-" + Name;
 						if (args != null && args.Length == 1)
 						{
 							if (args[0] == "rerun")
 							{
-								db.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
-								db.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
-								db.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
-								db.KeyDelete(Scheduler.RedisScheduler.ItemPrefix + Name);
-								db.KeyDelete(Name);
-								db.KeyDelete(key);
-								db.SortedSetRemove(Scheduler.RedisScheduler.TaskList, Name);
-								db.HashDelete("init-status", Name);
-								db.HashDelete("validate-status", Name);
-								db.KeyDelete("set-" + Encrypt.Md5Encrypt(Name));
+								redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
+								redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
+								redis.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
+								redis.KeyDelete(Scheduler.RedisScheduler.ItemPrefix + Name);
+								redis.KeyDelete(Name);
+								redis.KeyDelete(key);
+								redis.SortedSetRemove(Scheduler.RedisScheduler.TaskList, Name);
+								redis.HashDelete("init-status", Name);
+								redis.HashDelete("validate-status", Name);
+								redis.KeyDelete("set-" + Encrypt.Md5Encrypt(Name));
 							}
 						}
 
 						try
 						{
 							Console.WriteLine($"Lock: {key} to keep only one prepare process.");
-							while (!db.LockTake(key, 0, TimeSpan.FromMinutes(10)))
+							while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 							{
 								Thread.Sleep(1000);
 							}
 
-							var lockerValue = db.HashGet(InitStatusSetName, Name);
+							var lockerValue = redis.HashGet(InitStatusSetName, Name);
 							bool needInitStartRequest = lockerValue != "init finished";
 
 							if (needInitStartRequest)
@@ -245,7 +244,7 @@ namespace Java2Dotnet.Spider.Extension
 
 							if (needInitStartRequest)
 							{
-								db.HashSet(InitStatusSetName, Name, "init finished");
+								redis.HashSet(InitStatusSetName, Name, "init finished");
 							}
 
 							Console.WriteLine("Creating Spider finished.");
@@ -263,7 +262,7 @@ namespace Java2Dotnet.Spider.Extension
 							Console.WriteLine("Release locker.");
 							try
 							{
-								db.LockRelease(key, 0);
+								redis.LockRelease(key, 0);
 							}
 							catch
 							{

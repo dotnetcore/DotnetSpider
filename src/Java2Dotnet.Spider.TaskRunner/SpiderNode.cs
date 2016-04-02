@@ -13,9 +13,10 @@ using Java2Dotnet.Spider.JLog;
 using System.Runtime.InteropServices;
 #endif
 using Newtonsoft.Json;
-using StackExchange.Redis;
+//using StackExchange.Redis;
 using MySql.Data.MySqlClient;
 using System.Data;
+using RedisSharp;
 
 namespace Java2Dotnet.Spider.ScriptsConsole
 {
@@ -28,28 +29,29 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 #endif
 		private const string SpiderRegistKey = "spider_nodes";
 		public bool IsConnected { get; private set; }
-		public readonly ConnectionMultiplexer Redis;
-		public readonly IDatabase Db;
- 
+		public readonly RedisServer _redisClient;
+
 		//private readonly Dictionary<string, ScriptSpider> _spiderCache = new Dictionary<string, ScriptSpider>();
 
 		public SpiderNode()
 		{
-			Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
-			{
-				ServiceName = "redis_primary",
-				ConnectTimeout = 5000,
-				KeepAlive = 8,
-				Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
-#if !RELEASE
-				AllowAdmin = true,
-#endif
-				EndPoints =
-				{
-					{ "redis_primary", 6379 }
-				}
-			});
-			Db = Redis.GetDatabase(2);
+			//			Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions
+			//			{
+			//				ServiceName = "redis_primary",
+			//				ConnectTimeout = 5000,
+			//				KeepAlive = 8,
+			//				Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
+			//#if !RELEASE
+			//				AllowAdmin = true,
+			//#endif
+			//				EndPoints =
+			//				{
+			//					{ "redis_primary", 6379 }
+			//				}
+			//			});
+			_redisClient = new RedisServer("ooodata.com", 6379, "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w");
+			_redisClient.Db = 2;
+			//Db = Redis.GetDatabase(2);
 		}
 
 		public void Run()
@@ -63,8 +65,10 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 
 		private void Subscrib()
 		{
-			var subscriber = Redis.GetSubscriber(SystemInfo.HostName);
-			subscriber.Subscribe($"{SystemInfo.HostName}", (channel, commandInfo) =>
+			var redis = new RedisServer("ooodata.com", 6379,"#frAiI^MtFxh3Ks&swrnVyzAtRTq%w");
+			redis.Db = 2;
+			//var subscriber = Redis.GetSubscriber(SystemInfo.HostName);
+			redis.Subscribe($"{SystemInfo.HostName}", (chanel, commandInfo) =>
 			{
 				Task.Factory.StartNew(() =>
 				{
@@ -144,7 +148,7 @@ namespace Java2Dotnet.Spider.ScriptsConsole
 					//}
 					//else
 					{
-						Db.HashSet(SpiderRegistKey, SystemInfo.HostName, JsonConvert.SerializeObject(SystemInfo.GetSystemInfo()));
+						_redisClient.HashSet(SpiderRegistKey, SystemInfo.HostName, JsonConvert.SerializeObject(SystemInfo.GetSystemInfo()));
 						IsConnected = true;
 					}
 
