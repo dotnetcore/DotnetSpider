@@ -109,6 +109,11 @@ namespace RedisSharp
 
 			#endregion
 
+			#region locker
+
+			r.LockTake("locker", DateTime.Now.ToString(), new TimeSpan(0, 0, 0, 30));
+			#endregion
+
 			r.FlushDb();
 			r.Dispose();
 		}
@@ -128,7 +133,7 @@ namespace RedisSharp
 				}
 			});
 			var r = context.GetDatabase(3);
- 
+
 			DateTime start1 = DateTime.Now;
 
 			Parallel.For(0, 100000, new ParallelOptions() { MaxDegreeOfParallelism = 20 }, j =>

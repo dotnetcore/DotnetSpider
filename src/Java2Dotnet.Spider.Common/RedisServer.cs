@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -772,7 +771,13 @@ namespace RedisSharp
 		{
 			lock (this)
 			{
-				return StringSet(key, value, expiry);
+				long milliseconds = expiry.Ticks / TimeSpan.TicksPerMillisecond;
+				var results = SendCommand("SET", key, value, "PX", milliseconds);
+				if (results.Exeption != null)
+				{
+					throw results.Exeption;
+				}
+				return true;
 			}
 		}
 
@@ -929,11 +934,11 @@ namespace RedisSharp
 		{
 			lock (this)
 			{
-				SendCommand("SMEMBERS", key);
-				byte[][] results = ReadData();
+				var result = SendCommand("SMEMBERS", key);
+
 				List<string> list = new List<string>();
 
-				foreach (var item in results)
+				foreach (var item in result.Result)
 				{
 					list.Add(Encoding.UTF8.GetString(item));
 				}
@@ -945,9 +950,13 @@ namespace RedisSharp
 		{
 			lock (this)
 			{
-				SendCommand("SPOP", key);
+				var result = SendCommand("SPOP", key);
+				if (result.Exeption != null)
+				{
+					throw result.Exeption;
+				}
+				var results = result.Result;
 
-				var results = ReadData();
 				return results == null ? null : Encoding.UTF8.GetString(results);
 			}
 		}
@@ -985,8 +994,12 @@ namespace RedisSharp
 			lock (this)
 			{
 				Dictionary<string, string> dic = new Dictionary<string, string>();
-				SendCommand("HGETALL", key);
-				var results = ReadData();
+				var result = SendCommand("HGETALL", key);
+				if (result.Exeption != null)
+				{
+					throw result.Exeption;
+				}
+				var results = result.Result;
 				if (results == null)
 				{
 					return new KeyValuePair<string, string>[0];
@@ -1067,8 +1080,13 @@ namespace RedisSharp
 		{
 			lock (this)
 			{
-				SendCommand("HGET", key, field);
-				var results = ReadData();
+				var result = SendCommand("HGET", key, field);
+				if (result.Exeption != null)
+				{
+					throw result.Exeption;
+				}
+				var results = result.Result;
+
 				return results == null ? null : Encoding.UTF8.GetString(results);
 			}
 		}
@@ -1087,9 +1105,14 @@ namespace RedisSharp
 
 		public void Subscribe(string chanel, Action<string, string> action)
 		{
-			SendExpectDataArray("SUBSCRIBE", chanel);
 			Task.Factory.StartNew(() =>
 			{
+				var results = SendCommand("SUBSCRIBE", chanel);
+				if (results.Exeption != null)
+				{
+					throw results.Exeption;
+				}
+
 				while (true)
 				{
 					if (_isClosing)
@@ -1097,9 +1120,12 @@ namespace RedisSharp
 						break;
 					}
 
-					dynamic r = ReadData();
-
-					action(Encoding.UTF8.GetString(r[1]), Encoding.UTF8.GetString(r[2]));
+					results = GetResult();
+					if (results.Exeption != null)
+					{
+						throw results.Exeption;
+					}
+					action(Encoding.UTF8.GetString(results.Result[1]), Encoding.UTF8.GetString(results.Result[2]));
 				}
 			});
 		}
@@ -1136,9 +1162,13 @@ namespace RedisSharp
 		{
 			lock (this)
 			{
-				SendCommand("LPOP", key);
-				var result = ReadData();
-				return result == null ? null : Encoding.UTF8.GetString(result);
+				var result = SendCommand("LPOP", key);
+				if (result.Exeption != null)
+				{
+					throw result.Exeption;
+				}
+
+				return result.Result == null ? null : Encoding.UTF8.GetString(result.Result);
 			}
 		}
 
@@ -1146,9 +1176,13 @@ namespace RedisSharp
 		{
 			lock (this)
 			{
-				SendCommand("RPOP", key);
-				var result = ReadData();
-				return result == null ? null : Encoding.UTF8.GetString(result);
+				var results = SendCommand("RPOP", key);
+				if (results.Exeption != null)
+				{
+					throw results.Exeption;
+				}
+
+				return results.Result == null ? null : Encoding.UTF8.GetString(results.Result);
 			}
 		}
 
@@ -1184,17 +1218,6 @@ namespace RedisSharp
 		}
 
 		#region utils
-
-		private bool StringSet(string key, string value, TimeSpan? expiry = null)
-		{
-			bool status = SendCommand("SET", key, value);
-			if (expiry != null && status)
-			{
-				long milliseconds = expiry.Value.Ticks / TimeSpan.TicksPerMillisecond;
-				return SendCommand("PEXPIRE ", key, milliseconds);
-			}
-			return false;
-		}
 
 		private string ReadLine()
 		{
@@ -1278,13 +1301,6 @@ namespace RedisSharp
 			return socket;
 		}
 
-#if !RELEASE
-		void Log(string id, string message)
-		{
-			Console.WriteLine(id + ": " + message.Trim().Replace("\r\n", " "));
-		}
-#endif
-
 		private string[] SendExpectStringArray(string cmd, params object[] args)
 		{
 			byte[][] reply = SendExpectDataArray(cmd, args);
@@ -1298,58 +1314,51 @@ namespace RedisSharp
 
 		private byte[][] SendExpectDataArray(string cmd, params object[] args)
 		{
-			if (!SendCommand(cmd, args))
+			var result = SendCommand(cmd, args);
+
+			if (result.Exeption != null)
 			{
-				throw new Exception("Unable to connect");
+				throw result.Exeption;
 			}
 
-			int c = _bstream.ReadByte();
-			string s = ReadLine();
+			return result.Result;
 
-			if (c == -1)
-			{
-				throw new ResponseException("No more data");
-			}
+			//int c = _bstream.ReadByte();
+			//string s = ReadLine();
 
-			Log("S", (char)c + s);
-			if (c == '-')
-			{
-				throw new ResponseException(s.StartsWith("ERR ") ? s.Substring(4) : s);
-			}
-			if (c == '*')
-			{
-				int count;
-				if (int.TryParse(s, out count))
-				{
-					byte[][] result = new byte[count][];
+			//if (c == -1)
+			//{
+			//	throw new ResponseException("No more data");
+			//}
 
-					for (int i = 0; i < count; i++)
-						result[i] = ReadData();
+			//Log("S", (char)c + s);
+			//if (c == '-')
+			//{
+			//	throw new ResponseException(s.StartsWith("ERR ") ? s.Substring(4) : s);
+			//}
+			//if (c == '*')
+			//{
+			//	int count;
+			//	if (int.TryParse(s, out count))
+			//	{
+			//		byte[][] result = new byte[count][];
 
-					return result;
-				}
-			}
-			throw new ResponseException("Unknown reply on multi-request: " + c + s);
+			//		for (int i = 0; i < count; i++)
+			//			result[i] = ReadData();
+
+			//		return result;
+			//	}
+			//}
+			//throw new ResponseException("Unknown reply on multi-request: " + c + s);
 		}
 
 		private void SendExpectSuccess(string cmd, params object[] args)
 		{
-			if (!SendCommand(cmd, args))
-			{
-				throw new Exception("Unable to connect");
-			}
+			var result = SendCommand(cmd, args);
 
-			int c = _bstream.ReadByte();
-			string s = ReadLine();
-
-			if (c == -1)
+			if (result.Exeption != null)
 			{
-				throw new ResponseException("No more data");
-			}
-			Log("S", (char)c + s);
-			if (c == '-')
-			{
-				throw new ResponseException(s.StartsWith("ERR ") ? s.Substring(4) : s);
+				throw result.Exeption;
 			}
 		}
 
@@ -1362,192 +1371,135 @@ namespace RedisSharp
 
 		private int SendDataExpectInt(byte[] data, string cmd, params object[] args)
 		{
-			if (!SendDataCommand(data, cmd, args))
-				throw new Exception("Unable to connect");
+			var result = SendDataCommand(data, cmd, args);
 
-			int c = _bstream.ReadByte();
-			string s = ReadLine();
-
-			if (c == -1)
+			if (result.Exeption != null)
 			{
-				throw new ResponseException("No more data");
+				throw result.Exeption;
 			}
-
-			if (c == ':')
+			else
 			{
-				int i;
-				if (int.TryParse(s, out i))
-					return i;
+				return (result.Result is string) ? int.Parse(result.Result) : result.Result;
 			}
-
-			throw new ResponseException("Unknown reply on integer request: " + c + s);
 		}
 
 		private void SendDataExpectSuccess(byte[] data, string cmd, params object[] args)
 		{
-			if (!SendDataCommand(data, cmd, args))
-				throw new Exception("Unable to connect");
+			var result = SendDataCommand(data, cmd, args);
 
-			int c = _bstream.ReadByte();
-			string s = ReadLine();
-
-			if (c == -1)
+			if (result.Exeption != null)
 			{
-				throw new ResponseException("No more data");
-			}
-			Log("S", (char)c + s);
-			if (c == '-')
-			{
-				throw new ResponseException(s.StartsWith("ERR ") ? s.Substring(4) : s);
+				throw result.Exeption;
 			}
 		}
 
 		private int SendExpectInt(string cmd, params object[] args)
 		{
-			if (!SendCommand(cmd, args))
-				throw new Exception("Unable to connect");
+			var result = SendCommand(cmd, args);
 
-			int c = _bstream.ReadByte();
-			string s = ReadLine();
-
-			if (c == -1)
+			if (result.Exeption != null)
 			{
-				throw new ResponseException("No more data");
+				throw result.Exeption;
 			}
-
-			Log("S", (char)c + s);
-			if (c == '-')
-				throw new ResponseException(s.StartsWith("ERR ") ? s.Substring(4) : s);
-			if (c == ':')
+			else
 			{
-				int i;
-				if (int.TryParse(s, out i))
-					return i;
+				return (int)result.Result;
 			}
-			throw new ResponseException("Unknown reply on integer request: " + c + s);
 		}
 
 		private long SendExpectLong(string cmd, params object[] args)
 		{
-			if (!SendCommand(cmd, args))
-			{
-				throw new Exception("Unable to connect");
-			}
+			var result = SendCommand(cmd, args);
 
-			int c = _bstream.ReadByte();
-			string s = ReadLine();
-			if (c == -1)
+			if (result.Exeption != null)
 			{
-				throw new ResponseException("No more data");
+				throw result.Exeption;
 			}
-
-			Log("S", (char)c + s);
-			if (c == '-')
+			else
 			{
-				throw new ResponseException(s.StartsWith("ERR ") ? s.Substring(4) : s);
+				return (result.Result is string) ? long.Parse(result.Result) : result.Result;
 			}
-			if (c == ':')
-			{
-				long i;
-				if (long.TryParse(s, out i))
-					return i;
-			}
-			throw new ResponseException("Unknown reply on integer request: " + c + s);
 		}
 
 		private string SendExpectString(string cmd, params object[] args)
 		{
-			if (!SendCommand(cmd, args))
-			{
-				throw new Exception("Unable to connect");
-			}
+			var result = SendCommand(cmd, args);
 
-			int c = _bstream.ReadByte();
-			string s = ReadLine();
-
-			if (c == -1)
+			if (result.Exeption != null)
 			{
-				throw new ResponseException("No more data");
+				throw result.Exeption;
 			}
-
-			Log("S", (char)c + s);
-			if (c == '-')
+			else
 			{
-				throw new ResponseException(s.StartsWith("ERR ") ? s.Substring(4) : s);
+				return result.Result;
 			}
-			if (c == '+')
-			{
-				return s;
-			}
-
-			throw new ResponseException("Unknown reply on integer request: " + c + s);
 		}
 
-		private dynamic ReadData()
-		{
-			string s = ReadLine();
+		//private dynamic ReadData()
+		//{
+		//	string s = ReadLine();
 
-			Log("S", s);
-			if (s.Length == 0)
-				throw new ResponseException("Zero length respose");
+		//	Log("S", s);
+		//	if (s.Length == 0)
+		//		throw new ResponseException("Zero length respose");
 
-			char c = s[0];
-			if (c == '-')
-				throw new ResponseException(s.StartsWith("-ERR ") ? s.Substring(5) : s.Substring(1));
+		//	char c = s[0];
+		//	if (c == '-')
+		//		throw new ResponseException(s.StartsWith("-ERR ") ? s.Substring(5) : s.Substring(1));
 
-			if (c == ':')
-			{
-				int i;
-				if (int.TryParse(s.Substring(1), out i))
-				{
-					return new[] { (byte)i };
-				}
-			}
+		//	if (c == ':')
+		//	{
+		//		int i;
+		//		if (int.TryParse(s.Substring(1), out i))
+		//		{
+		//			return new[] { (byte)i };
+		//		}
+		//	}
 
-			if (c == '$')
-			{
-				if (s == "$-1")
-					return null;
-				int n;
+		//	if (c == '$')
+		//	{
+		//		if (s == "$-1")
+		//			return null;
+		//		int n;
 
-				if (Int32.TryParse(s.Substring(1), out n))
-				{
-					byte[] retbuf = new byte[n];
+		//		if (Int32.TryParse(s.Substring(1), out n))
+		//		{
+		//			byte[] retbuf = new byte[n];
 
-					int bytesRead = 0;
-					do
-					{
-						int read = _bstream.Read(retbuf, bytesRead, n - bytesRead);
-						if (read < 1)
-							throw new ResponseException("Invalid termination mid stream");
-						bytesRead += read;
-					}
-					while (bytesRead < n);
-					if (_bstream.ReadByte() != '\r' || _bstream.ReadByte() != '\n')
-						throw new ResponseException("Invalid termination");
-					return retbuf;
-				}
-				throw new ResponseException("Invalid length");
-			}
+		//			int bytesRead = 0;
+		//			do
+		//			{
+		//				int read = _bstream.Read(retbuf, bytesRead, n - bytesRead);
+		//				if (read < 1)
+		//					throw new ResponseException("Invalid termination mid stream");
+		//				bytesRead += read;
+		//			}
+		//			while (bytesRead < n);
+		//			if (_bstream.ReadByte() != '\r' || _bstream.ReadByte() != '\n')
+		//				throw new ResponseException("Invalid termination");
+		//			return retbuf;
+		//		}
+		//		throw new ResponseException("Invalid length");
+		//	}
 
-			if (c == '*')
-			{
-				int count;
-				if (int.TryParse(s.Substring(1), out count))
-				{
-					byte[][] result = new byte[count][];
+		//	if (c == '*')
+		//	{
+		//		int count;
+		//		if (int.TryParse(s.Substring(1), out count))
+		//		{
+		//			byte[][] result = new byte[count][];
 
-					for (int i = 0; i < count; i++)
-						result[i] = ReadData();
+		//			for (int i = 0; i < count; i++)
+		//				result[i] = ReadData();
 
-					return result;
-				}
-			}
+		//			return result;
+		//		}
+		//	}
 
-			throw new ResponseException("Unexpected reply: ");
-		}
+		//	throw new ResponseException("Unexpected reply: ");
+		//}
 
-		private bool SendDataCommand(byte[] data, string cmd, params object[] args)
+		private RedisResult SendDataCommand(byte[] data, string cmd, params object[] args)
 		{
 			string resp = "*" + (1 + args.Length + 1) + "\r\n";
 			resp += "$" + cmd.Length + "\r\n" + cmd + "\r\n";
@@ -1564,7 +1516,7 @@ namespace RedisSharp
 			return SendDataResp(data, resp);
 		}
 
-		private bool SendDataResp(byte[] data, string resp)
+		private RedisResult SendDataResp(byte[] data, string resp)
 		{
 			if (_socket == null)
 			{
@@ -1573,30 +1525,27 @@ namespace RedisSharp
 
 			if (_socket == null)
 			{
-				return false;
+				return new RedisResult() { Exeption = new Exception("Socket is null.") };
 			}
 
 			byte[] r = Encoding.UTF8.GetBytes(resp);
 			try
 			{
-				Log("C", resp);
 				_socket.Send(r);
-				if (data != null)
-				{
-					_socket.Send(data);
-					_socket.Send(_endData);
-				}
+				_socket.Send(data);
+				_socket.Send(_endData);
+
+				return GetResult();
 			}
-			catch (SocketException)
+			catch (SocketException s)
 			{
 				// timeout;
 				_socket.Dispose();
-				return false;
+				return new RedisResult() { Exeption = s };
 			}
-			return true;
 		}
 
-		private bool SendCommand(string cmd, params object[] args)
+		private RedisResult SendCommand(string cmd, params object[] args)
 		{
 			if (_socket == null)
 			{
@@ -1605,7 +1554,7 @@ namespace RedisSharp
 
 			if (_socket == null)
 			{
-				return false;
+				return new RedisResult() { Exeption = new Exception("Socket is null.") };
 			}
 
 			string resp = "*" + (1 + args.Length) + "\r\n";
@@ -1626,23 +1575,110 @@ namespace RedisSharp
 			{
 				_socket.Send(r);
 
-				//RedisResult result = GetResult();
+				return GetResult();
 			}
-			catch (SocketException)
+			catch (SocketException s)
 			{
-				// timeout;
 				_socket.Dispose();
 				_socket = null;
-				return false;
+				return new RedisResult() { Exeption = s };
 			}
-
-			return true;
 		}
 
-		//private RedisResult GetResult()
-		//{
-			
-		//}
+		private RedisResult GetResult()
+		{
+			RedisResult redisResult = new RedisResult();
+			redisResult.Flag = _bstream.ReadByte();
+
+			string msg = ReadLine();
+
+			if (redisResult.Flag == '-')
+			{
+				redisResult.Exeption = new ResponseException(msg.StartsWith("-ERR ") ? msg.Substring(5) : msg.Substring(1));
+				return redisResult;
+			}
+
+			if (redisResult.Flag == ':')
+			{
+				int i;
+				if (int.TryParse(msg, out i))
+				{
+					redisResult.Result = i;
+					return redisResult;
+				}
+			}
+
+			if (redisResult.Flag == '$')
+			{
+				if (msg == "-1")
+				{
+					return redisResult;
+				}
+				int n;
+
+				if (int.TryParse(msg, out n))
+				{
+					byte[] retbuf = new byte[n];
+
+					int bytesRead = 0;
+					do
+					{
+						int read = _bstream.Read(retbuf, bytesRead, n - bytesRead);
+						if (read < 1)
+						{
+							redisResult.Exeption = new ResponseException("Invalid termination mid stream");
+							return redisResult;
+						}
+						bytesRead += read;
+					}
+					while (bytesRead < n);
+					if (_bstream.ReadByte() != '\r' || _bstream.ReadByte() != '\n')
+					{
+						redisResult.Exeption = new ResponseException("Invalid termination");
+						return redisResult;
+					}
+					redisResult.Result = retbuf;
+					return redisResult;
+				}
+
+				redisResult.Exeption = new ResponseException("Invalid length");
+				return redisResult;
+			}
+
+			if (redisResult.Flag == '*')
+			{
+				int count;
+				if (int.TryParse(msg, out count))
+				{
+					byte[][] result = new byte[count][];
+
+					for (int i = 0; i < count; i++)
+					{
+						var tmp = GetResult();
+						if (tmp.Exeption == null)
+						{
+							result[i] = (tmp.Result is byte[]) ? tmp.Result : new [] { (byte)tmp.Result };
+						}
+						else
+						{
+							redisResult.Exeption = tmp.Exeption;
+							return redisResult;
+						}
+					}
+
+					redisResult.Result = result;
+					return redisResult;
+				}
+			}
+
+			if (redisResult.Flag == '+')
+			{
+				redisResult.Result = msg;
+				return redisResult;
+			}
+			redisResult.Exeption = new ResponseException("Unexpected reply: ");
+			return redisResult;
+		}
 
 		#endregion
 

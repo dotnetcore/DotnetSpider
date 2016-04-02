@@ -27,7 +27,7 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 				result = message;
 			});
 
-			bool reslut = redis.Publish("messages", "hello");
+			redis.Publish("messages", "hello");
 
 			Thread.Sleep(2000);
 

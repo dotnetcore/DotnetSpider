@@ -18,7 +18,7 @@ namespace Java2Dotnet.Spider.Test.Example
 		{
 			return new SpiderContext
 			{
-				SpiderName = "JD sku/store test " + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy-MM-dd"),
+				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd"),
 				CachedSize = 1,
 				ThreadNum = 1,
 				Site = new Site
@@ -46,7 +46,6 @@ namespace Java2Dotnet.Spider.Test.Example
 		protected override HashSet<Type> EntiTypes => new HashSet<Type>() { typeof(Product) };
 
 		[Schema("test", "sku", TableSuffix.Today)]
-		[TargetUrl(new[] { @"page=[0-9]+" }, "//*[@id=\"J_bottomPage\"]")]
 		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
 		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
 		public class Product : ISpiderEntity

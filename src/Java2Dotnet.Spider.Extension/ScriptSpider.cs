@@ -66,6 +66,8 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void InitEnvoriment()
 		{
+			redis = RedisProvider.GetProvider();
+
 			if (_spiderContext.Redialer != null)
 			{
 				//RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
@@ -115,8 +117,6 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void DoValidate()
 		{
-			redis = RedisProvider.GetProvider();
-
 			string key = "locker-validate-" + Name;
 			try
 			{
