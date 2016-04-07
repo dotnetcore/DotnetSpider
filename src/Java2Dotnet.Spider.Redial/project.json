@@ -11,7 +11,7 @@
 		"Java2Dotnet.Spider.JLog": "0.0.9",
 		"Java2Dotnet.Spider.Common": "0.0.9",
 		"System.Diagnostics.Process": "4.1.0-rc3-23829",
-		"System.Net.Http": "4.0.0-rc3-23829"
+		"System.Net.Http": "4.0.1-rc3-23829"
 	},
 	"frameworks": {
 		"dnxcore50": {

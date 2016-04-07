@@ -6,22 +6,21 @@
 	},
 
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc3-23829"
+		"NETStandard.Library": "1.0.0-rc3-23829",
+        		"System.Security.Cryptography.Algorithms": "4.0.0-rc3-23829",
+				"System.Security.Cryptography.Primitives": "4.0.0-rc3-23829",
+				"System.Threading.Thread": "4.0.0-rc3-23829",
+				"System.Threading.ThreadPool": "4.0.10-rc3-23829",
+				"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc3-23829",
+                "System.Diagnostics.Process":"4.1.0-rc3-23829"    ,
+                "System.Dynamic.Runtime":"4.0.11-rc3-23829",
+                "System.Net.NameResolution":"4.0.0-rc3-23829" ,
+                "Microsoft.CSharp": "4.0.1-rc3-23829",  
+                "System.Collections.NonGeneric":"4.0.1-rc3-23829" 
 	},
 	"frameworks": {
 		"dnxcore50": {
-			"dependencies": {
-				"System.Security.Cryptography.Algorithms": "4.0.0-rc3-23829",
-				"System.Security.Cryptography.Primitives": "4.0.0-rc3-23829",
-				"System.Threading.Thread": "4.0.0-rc3-23829",
-				"System.Threading.ThreadPool": "4.0.0-rc3-23829",
-				"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc3-23829",
-                "System.Diagnostics.Process":"4.0.0-rc3-23829"    ,
-                "System.Text.RegularExpressions":"4.0.0-rc3-23829",
-                "System.Dynamic.Runtime":"4.0.0-rc3-23829",
-                "System.Net.NameResolution":"4.0.0-rc3-23829" ,
-                "Microsoft.CSharp": "4.0.1-rc3-23829",  
-                "System.Collections.NonGeneric":"4.0.0-rc3-23829"           
+			"dependencies": {          
 			},
 			"compilationOptions": {
 				"define": [ "NET_CORE","RELEASE" ]

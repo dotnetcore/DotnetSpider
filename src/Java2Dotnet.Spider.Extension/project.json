@@ -15,13 +15,15 @@
 		"HtmlAgilityPack.Css": "0.0.9",
 		"MySql.Data": "0.0.9",
 		"Java2Dotnet.Spider.Redial": "0.0.9",
-		"System.Data.Common": "4.0.1-rc3-23829",
-		"Java2Dotnet.Spider.Validation": "0.0.9",
+        "Java2Dotnet.Spider.Validation": "0.0.9",
+        "System.Data.Common": "4.0.1-rc3-23829",	
 		"Microsoft.CSharp": "4.0.1-rc3-23829"
 	},
 
 	"frameworks": {
 		"dnxcore50": {
+            "dependencies": {
+            },
 			"compilationOptions": {
 				"define": [ "NET_CORE" ]
 			}

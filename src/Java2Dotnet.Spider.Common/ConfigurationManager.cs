@@ -11,9 +11,10 @@ namespace Java2Dotnet.Spider.Common
 
 		static ConfigurationManager()
 		{            
-			if (File.Exists("app.conf"))
+            string configPath=Directory.GetCurrentDirectory()+"/app.conf";
+			if (File.Exists(configPath))
 			{
-				string[] lines = File.ReadAllLines("app.conf");
+				string[] lines = File.ReadAllLines(configPath);
 				foreach (var line in lines)
 				{
 					int firstSplitIndex = line.IndexOf(':');

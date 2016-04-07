@@ -6,13 +6,8 @@
 	},
 
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc3-23829"
-	},
-
-	"frameworks": {
-		"dnxcore50": {
-			"dependencies": {
-				"System.Xml.XmlDocument": "4.0.1-rc3-23829",
+		"NETStandard.Library": "1.0.0-rc3-23829",
+        				"System.Xml.XmlDocument": "4.0.1-rc3-23829",
 				"System.Xml.XDocument": "4.0.11-rc3-23829",
 				"System.Dynamic.Runtime": "4.0.11-rc3-23829",
 				"System.Runtime.Serialization.Primitives": "4.1.0-rc3-23829",
@@ -23,6 +18,12 @@
 				"System.Reflection.Emit.Lightweight": "4.0.1-rc3-23829",
 				"System.ComponentModel.TypeConverter": "4.0.1-rc3-23829",
 				"System.ObjectModel": "4.0.12-rc3-23829"
+	},
+
+	"frameworks": {
+		"dnxcore50": {
+			"dependencies": {
+
 			},
 			"compilationOptions": {
 				"define": [ "CODE_ANALYSIS", "CODE_ANALYSIS", "NET_CORE" ]

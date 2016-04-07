@@ -10,14 +10,15 @@
 		"Java2Dotnet.Spider.Core": "0.0.9",
 		"Java2Dotnet.Spider.Common": "0.0.9",
 		"Java2Dotnet.Spider.Extension": "0.0.9",
-        "Java2Dotnet.Spider.Redial":"0.0.9"
+        "Java2Dotnet.Spider.Redial":"0.0.9",
+        "System.Diagnostics.Process": "4.1.0-rc3-23829",
+		"System.Net.Http": "4.0.1-rc3-23829",
+		"System.Text.Encoding.CodePages": "4.0.1-rc3-23829"
 	},
 	"frameworks": {
 		"dnxcore50": {
 			"dependencies": {
-				"System.Diagnostics.Process": "4.1.0-rc3-23829",
-				"System.Net.Http": "4.0.1-rc3-23829",
-				"System.Text.Encoding.CodePages": "4.0.1-rc3-23829"
+
 			},
 			"compilationOptions": {
 				"define": [ "NET_CORE" ]

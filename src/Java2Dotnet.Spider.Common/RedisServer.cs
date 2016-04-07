@@ -14,8 +14,7 @@ namespace RedisSharp
 	public class RedisServer : IDisposable
 	{
 		private readonly BlockingQueue<RedisClient> _redisClientQueue;
-		private readonly SynchronizedList<RedisClient> _allClients = new SynchronizedList<RedisClient>();
-		private readonly AtomicInteger _currentQueryCount = new AtomicInteger(0);
+		private readonly AtomicInteger _clientCount = new AtomicInteger(0);
 		public string Host { get; }
 		public int Port { get; }
 		public int RetryTimeout { get; set; }
@@ -23,16 +22,14 @@ namespace RedisSharp
 		public int SendTimeout { get; set; }
 		public string Password { get; }
 		public int MaxThreadNum { get; }
-		public float RateOfQueryAndClient { get; }
 		public int Db { get; set; }
 		private bool _isDisposing;
 
-		public RedisServer(string host, int port, string pass, int maxThreadNum = 10, float rateOfQueryAndClient = 1F)
+		public RedisServer(string host, int port, string pass, int maxThreadNum = 10)
 		{
 			Host = host;
 			Port = port;
 			Password = pass;
-			RateOfQueryAndClient = rateOfQueryAndClient;
 			if (maxThreadNum > 150)
 			{
 				throw new Exception("We strongly suggest you don't open too much thread.");
@@ -40,23 +37,6 @@ namespace RedisSharp
 			MaxThreadNum = maxThreadNum;
 
 			_redisClientQueue = new BlockingQueue<RedisClient>(maxThreadNum);
-
-			var client = CreateRedisClinet();
-			_allClients.Add(client);
-			_redisClientQueue.Enqueue(client);
-
-			Task.Factory.StartNew(() =>
-			{
-				while (true)
-				{
-					if (_isDisposing)
-					{
-						break;
-					}
-					CaculateRedisClientNum();
-					Thread.Sleep(10);
-				}
-			});
 		}
 
 		public RedisServer(string host, int port) : this(host, port, null)
@@ -71,31 +51,10 @@ namespace RedisSharp
 		{
 		}
 
-		private void CaculateRedisClientNum()
-		{
-			int currentQueryCount = _currentQueryCount.Value;
-			int threadCount = _allClients.Count();
-			float rate = (currentQueryCount / (float)threadCount);
-			if (rate > RateOfQueryAndClient)
-			{
-				var client = CreateRedisClinet();
-				_allClients.Add(client);
-				_redisClientQueue.Enqueue(client);
-
-				Console.WriteLine($"Query: {currentQueryCount} RedisClient: {threadCount}");
-			}
-			else if (rate < 1 && currentQueryCount > 0)
-			{
-				var client = _redisClientQueue.Dequeue();
-				_allClients.Remove(client);
-				client.Dispose();
-			}
-		}
-
 		public bool KeyDelete(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -104,19 +63,26 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		private RedisClient CreateRedisClinet()
 		{
-			return new RedisClient(Host, Port) { Password = Password, RetryCount = RetryCount, RetryTimeout = RetryTimeout };
+            if(_clientCount.Value<MaxThreadNum && _redisClientQueue.Count==0)
+            {
+			    return new RedisClient(Host, Port) { Password = Password, RetryCount = RetryCount, RetryTimeout = RetryTimeout };
+            }
+            else
+            {
+               return  _redisClientQueue.Dequeue();
+            }
 		}
 
 		public bool ContainsKey(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -124,15 +90,14 @@ namespace RedisSharp
 			}
 			finally
 			{
-				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				_redisClientQueue.Enqueue(client);				
 			}
 		}
 
 		public bool LockTake(string key, string value, TimeSpan expiry)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -141,7 +106,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
@@ -149,8 +114,8 @@ namespace RedisSharp
 		{
 			get
 			{
-				_currentQueryCount.Inc();
-				RedisClient client = _redisClientQueue.Dequeue();
+				
+				RedisClient client = CreateRedisClinet();
 				try
 				{
 					client.Db = Db;
@@ -159,15 +124,15 @@ namespace RedisSharp
 				finally
 				{
 					_redisClientQueue.Enqueue(client);
-					_currentQueryCount.Dec();
+					
 				}
 			}
 		}
 
 		public void Save()
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -176,14 +141,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public void BackgroundSave()
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -192,14 +157,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public void FlushAll()
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -208,14 +173,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public void FlushDb()
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -224,7 +189,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
@@ -232,8 +197,8 @@ namespace RedisSharp
 		{
 			get
 			{
-				_currentQueryCount.Inc();
-				RedisClient client = _redisClientQueue.Dequeue();
+				
+				RedisClient client = CreateRedisClinet();
 				try
 				{
 					client.Db = Db;
@@ -242,15 +207,15 @@ namespace RedisSharp
 				finally
 				{
 					_redisClientQueue.Enqueue(client);
-					_currentQueryCount.Dec();
+					
 				}
 			}
 		}
 
 		public bool LockRelease(string key, int value)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -259,14 +224,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public KeyType TypeOf(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -275,7 +240,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
@@ -297,8 +262,8 @@ namespace RedisSharp
 
 		public int SetAdd(string key, string value)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -307,14 +272,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public bool SetContains(string key, string value)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -323,14 +288,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public long SetLength(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -339,14 +304,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public List<string> SetMembers(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -355,14 +320,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public string SetPop(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -371,14 +336,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public bool SetRemove(string key, string value)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -387,7 +352,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
@@ -397,8 +362,8 @@ namespace RedisSharp
 
 		public bool HashExists(string key, string field)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -407,14 +372,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public void HashDelete(string key, string field)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -423,14 +388,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public KeyValuePair<string, string>[] HashGetAll(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -439,14 +404,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public string HashGet(string key, string field)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -455,14 +420,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public long HashLength(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -471,14 +436,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public void HashSet(string set, string field, string value)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -487,7 +452,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
@@ -497,8 +462,8 @@ namespace RedisSharp
 
 		public string[] SortedSetRangeByRank(string key, int start, int stop)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -507,14 +472,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public void SortedSetRemove(string key, string value)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -523,14 +488,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public bool SortedSetAdd(string key, string value, long score)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -539,14 +504,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public long SortedSetLength(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -555,7 +520,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
@@ -565,8 +530,8 @@ namespace RedisSharp
 
 		public bool Publish(string chanel, string message)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				return client.Publish(chanel, message);
@@ -574,7 +539,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
@@ -596,8 +561,8 @@ namespace RedisSharp
 
 		public void ListLeftPush(string key, string value)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -606,14 +571,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public void ListRightPush(string key, dynamic value)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -622,14 +587,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public int ListLength(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -638,14 +603,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public string ListLeftPop(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -654,14 +619,14 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				
 			}
 		}
 
 		public string ListRightPop(string key)
 		{
-			_currentQueryCount.Inc();
-			RedisClient client = _redisClientQueue.Dequeue();
+			
+			RedisClient client = CreateRedisClinet();
 			try
 			{
 				client.Db = Db;
@@ -669,8 +634,7 @@ namespace RedisSharp
 			}
 			finally
 			{
-				_redisClientQueue.Enqueue(client);
-				_currentQueryCount.Dec();
+				_redisClientQueue.Enqueue(client);				
 			}
 		}
 
