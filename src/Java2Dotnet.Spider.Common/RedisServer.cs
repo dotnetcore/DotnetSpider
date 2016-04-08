@@ -1231,7 +1231,7 @@ namespace RedisSharp
 			}
 			_bstream = new BufferedStream(new NetworkStream(_socket), 16 * 1024);
 
-			if (Password != null)
+			if (!string.IsNullOrEmpty(Password))
 			{
 				SendExpectSuccess("AUTH", Password);
 			}
