@@ -27,6 +27,7 @@ namespace RedisSharp
 
 		public RedisServer(string host, int port, string pass, int maxThreadNum = 10)
 		{
+            Console.WriteLine($"Redis Server: {host} {port}");
 			Host = host;
 			Port = port;
 			Password = pass;
@@ -54,7 +55,7 @@ namespace RedisSharp
 		public bool KeyDelete(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -67,7 +68,7 @@ namespace RedisSharp
 			}
 		}
 
-		private RedisClient CreateRedisClinet()
+		private RedisClient CreateRedisClient()
 		{
             if(_clientCount.Value<MaxThreadNum && _redisClientQueue.Count==0)
             {
@@ -82,7 +83,7 @@ namespace RedisSharp
 		public bool ContainsKey(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -97,7 +98,7 @@ namespace RedisSharp
 		public bool LockTake(string key, string value, TimeSpan expiry)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -115,7 +116,7 @@ namespace RedisSharp
 			get
 			{
 				
-				RedisClient client = CreateRedisClinet();
+				RedisClient client = CreateRedisClient();
 				try
 				{
 					client.Db = Db;
@@ -132,7 +133,7 @@ namespace RedisSharp
 		public void Save()
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -148,7 +149,7 @@ namespace RedisSharp
 		public void BackgroundSave()
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -164,7 +165,7 @@ namespace RedisSharp
 		public void FlushAll()
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -180,7 +181,7 @@ namespace RedisSharp
 		public void FlushDb()
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -198,7 +199,7 @@ namespace RedisSharp
 			get
 			{
 				
-				RedisClient client = CreateRedisClinet();
+				RedisClient client = CreateRedisClient();
 				try
 				{
 					client.Db = Db;
@@ -215,7 +216,7 @@ namespace RedisSharp
 		public bool LockRelease(string key, int value)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -231,7 +232,7 @@ namespace RedisSharp
 		public KeyType TypeOf(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -263,7 +264,7 @@ namespace RedisSharp
 		public int SetAdd(string key, string value)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -279,7 +280,7 @@ namespace RedisSharp
 		public bool SetContains(string key, string value)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -295,7 +296,7 @@ namespace RedisSharp
 		public long SetLength(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -311,7 +312,7 @@ namespace RedisSharp
 		public List<string> SetMembers(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -327,7 +328,7 @@ namespace RedisSharp
 		public string SetPop(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -343,7 +344,7 @@ namespace RedisSharp
 		public bool SetRemove(string key, string value)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -363,7 +364,7 @@ namespace RedisSharp
 		public bool HashExists(string key, string field)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -379,7 +380,7 @@ namespace RedisSharp
 		public void HashDelete(string key, string field)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -395,7 +396,7 @@ namespace RedisSharp
 		public KeyValuePair<string, string>[] HashGetAll(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -411,7 +412,7 @@ namespace RedisSharp
 		public string HashGet(string key, string field)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -427,7 +428,7 @@ namespace RedisSharp
 		public long HashLength(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -443,7 +444,7 @@ namespace RedisSharp
 		public void HashSet(string set, string field, string value)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -463,7 +464,7 @@ namespace RedisSharp
 		public string[] SortedSetRangeByRank(string key, int start, int stop)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -479,7 +480,7 @@ namespace RedisSharp
 		public void SortedSetRemove(string key, string value)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -495,7 +496,7 @@ namespace RedisSharp
 		public bool SortedSetAdd(string key, string value, long score)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -511,7 +512,7 @@ namespace RedisSharp
 		public long SortedSetLength(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -531,7 +532,7 @@ namespace RedisSharp
 		public bool Publish(string chanel, string message)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				return client.Publish(chanel, message);
@@ -562,7 +563,7 @@ namespace RedisSharp
 		public void ListLeftPush(string key, string value)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -578,7 +579,7 @@ namespace RedisSharp
 		public void ListRightPush(string key, dynamic value)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -594,7 +595,7 @@ namespace RedisSharp
 		public int ListLength(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -610,7 +611,7 @@ namespace RedisSharp
 		public string ListLeftPop(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -626,7 +627,7 @@ namespace RedisSharp
 		public string ListRightPop(string key)
 		{
 			
-			RedisClient client = CreateRedisClinet();
+			RedisClient client = CreateRedisClient();
 			try
 			{
 				client.Db = Db;
@@ -764,7 +765,7 @@ namespace RedisSharp
 					case "list":
 						return KeyType.List;
 				}
-				throw new ResponseException("Invalid value");
+				throw new Exception("Invalid value");
 			}
 		}
 
@@ -1558,7 +1559,7 @@ namespace RedisSharp
 
 			if (redisResult.Flag == '-')
 			{
-				redisResult.Exeption = new ResponseException(msg.StartsWith("-ERR ") ? msg.Substring(5) : msg.Substring(1));
+				redisResult.Exeption = new Exception(msg.StartsWith("-ERR ") ? msg.Substring(5) : msg.Substring(1));
 				return redisResult;
 			}
 
@@ -1590,7 +1591,7 @@ namespace RedisSharp
 						int read = _bstream.Read(retbuf, bytesRead, n - bytesRead);
 						if (read < 1)
 						{
-							redisResult.Exeption = new ResponseException("Invalid termination mid stream");
+							redisResult.Exeption = new Exception("Invalid termination mid stream");
 							return redisResult;
 						}
 						bytesRead += read;
@@ -1598,14 +1599,14 @@ namespace RedisSharp
 					while (bytesRead < n);
 					if (_bstream.ReadByte() != '\r' || _bstream.ReadByte() != '\n')
 					{
-						redisResult.Exeption = new ResponseException("Invalid termination");
+						redisResult.Exeption = new Exception("Invalid termination");
 						return redisResult;
 					}
 					redisResult.Result = retbuf;
 					return redisResult;
 				}
 
-				redisResult.Exeption = new ResponseException("Invalid length");
+				redisResult.Exeption = new Exception("Invalid length");
 				return redisResult;
 			}
 
@@ -1640,7 +1641,7 @@ namespace RedisSharp
 				redisResult.Result = msg;
 				return redisResult;
 			}
-			redisResult.Exeption = new ResponseException("Unexpected reply: ");
+			redisResult.Exeption = new Exception("Unexpected reply: ");
 			return redisResult;
 		}
 
@@ -1661,17 +1662,7 @@ namespace RedisSharp
 			{
 				// ignored
 			}
-		}
-
-		public class ResponseException : Exception
-		{
-			public ResponseException(string code) : base("Response error")
-			{
-				Code = code;
-			}
-
-			public string Code { get; private set; }
-		}
+        }
 	}
 
 	public class SortOptions

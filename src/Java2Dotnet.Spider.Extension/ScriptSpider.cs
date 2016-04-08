@@ -66,7 +66,6 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void InitEnvoriment()
 		{
-            _logger.Info($"Redis Host: {ConfigurationManager.Get("redisHost")} ");
 			redis = new RedisServer(ConfigurationManager.Get("redisHost"), 6379, ConfigurationManager.Get("redisPassword"));
 
 			if (_spiderContext.Redialer != null)
