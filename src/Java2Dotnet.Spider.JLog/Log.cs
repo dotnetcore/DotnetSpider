@@ -1,20 +1,40 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Net;
 
 namespace Java2Dotnet.Spider.JLog
 {
+    internal class LogInfo
+    {
+        public string Type { get; set; }
+        public string Time { get; set; }
+        public string Message { get; set; }
+        public string Machine = Log.Machine;
+        public string UserId = Log.UserId;
+        public string TaskId = Log.TaskId;
+        
+        public override string ToString()
+        {
+            return $"[{Type}] {Time} {Machine}-{UserId}-{TaskId} {Message}";    
+        }
+    }
+    
 	public class Log : ILog
 	{
 		private static readonly object WriteToConsoleLocker = new object();
 		private static readonly object WriteToLogFileLocker = new object();
 		private static readonly string LogFile;
-
+        public static string UserId { get; set; }
+        public static string TaskId { get; set; }
+        public static string Machine;
 		public string Name { get; }
 
 		static Log()
 		{
+            Machine = Dns.GetHostName();
 			LogFile = Path.Combine(AppContext.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
+            string mongodbConn=ConfigurationManager.Get("mongodbConn");
 		}
 
 		public Log(string name)
@@ -24,13 +44,11 @@ namespace Java2Dotnet.Spider.JLog
 
 		public void Warn(string message, Exception e, bool showToConsole)
 		{
-			// TODO: save to database
-			string time = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-			string msg = $"[WARNING] {time} {message + Environment.NewLine} {e}";
-			WriteToLogFile(msg);
+            var log = CreateLogInfo("WARNING", message, e);
+			WriteToLogFile(log);
 			if (showToConsole)
 			{
-				WriteToConsole(msg, Level.Warning);
+				WriteToConsole(log);
 			}
 		}
 
@@ -41,13 +59,11 @@ namespace Java2Dotnet.Spider.JLog
 
 		public void Info(string message, Exception e, bool showToConsole)
 		{
-			// TODO: save to database
-			string time = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-			string msg = $"[INFO] {time} {message + Environment.NewLine} {e}";
-			WriteToLogFile(msg);
+            var log = CreateLogInfo("INFO", message, e);
+			WriteToLogFile(log);
 			if (showToConsole)
 			{
-				WriteToConsole(msg, Level.Info);
+				WriteToConsole(log);
 			}
 		}
 
@@ -58,13 +74,11 @@ namespace Java2Dotnet.Spider.JLog
 
 		public void Error(string message, Exception e, bool showToConsole)
 		{
-			// TODO: save to database
-			string time = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-			string msg = $"[ERROR] {time} {message + Environment.NewLine} {e}";
-			WriteToLogFile(msg);
+            var log = CreateLogInfo("ERROR", message, e);
+			WriteToLogFile(log);
 			if (showToConsole)
 			{
-				WriteToConsole(msg, Level.Error);
+				WriteToConsole(log);
 			}
 		}
 
@@ -73,38 +87,51 @@ namespace Java2Dotnet.Spider.JLog
 			Error(message, null, showToConsole);
 		}
 
-		private static void WriteToConsole(string message, Level level)
+		private static void WriteToConsole(LogInfo log)
 		{
 			lock (WriteToConsoleLocker)
 			{
-				switch (level)
+				switch (log.Type)
 				{
-					case Level.Error:
+					case "ERROR":
 						{
 							Console.ForegroundColor = ConsoleColor.Red;
 							break;
 						}
-					case Level.Info:
+					case "INFO":
 						{
                             Console.ForegroundColor = ConsoleColor.Magenta;
 							break;
 						}
-					case Level.Warning:
+					case "WARNING":
 						{
 							Console.ForegroundColor = ConsoleColor.Yellow;
 							break;
 						}
 				}
-				Console.WriteLine(message);
+
+				Console.WriteLine(log.ToString());
 				Console.ForegroundColor = ConsoleColor.White;
 			}
 		}
 
-		private static void WriteToLogFile(string message)
-		{
+        private LogInfo CreateLogInfo(string type, string message, Exception e)
+        {
+            string time = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+            var log=new LogInfo()
+            {
+                Type=type,
+                Time=time,
+                Message = message + Environment.NewLine + e
+            };
+            return log;
+        }
+        
+		private static void WriteToLogFile(LogInfo log)
+		{           
 			lock (WriteToLogFileLocker)
 			{
-				File.AppendAllText(LogFile, message,Encoding.UTF8);
+				File.AppendAllText(LogFile, log.ToString(),Encoding.UTF8);
 			}
 		}
 	}

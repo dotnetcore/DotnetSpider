@@ -12,6 +12,7 @@
 	"frameworks": {
 		"dnxcore50": {
 			"dependencies": {
+                "System.Net.NameResolution":"4.0.0-rc3-23829"
 			},
 			"compilationOptions": {
 				"define": [ "NET_CORE" ]
