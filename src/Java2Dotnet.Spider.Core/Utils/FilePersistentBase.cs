@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using Java2Dotnet.Spider.Core.Downloader;
+using System;
 #if !NET_CORE
 using log4net;
-using System;
 #else
 using Java2Dotnet.Spider.JLog;
 #endif
