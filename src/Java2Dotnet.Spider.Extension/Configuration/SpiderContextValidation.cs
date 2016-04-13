@@ -37,7 +37,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 							{
 								correct = false;
 							}
-							messages.Add($"Error 003: Entity: {entityName} is null.");
+							messages.Add($"Error 003: Entity.Identity is null.");
 						}
 
 						if (fieldTokens == null || fieldTokens.Count == 0)
@@ -47,7 +47,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 								correct = false;
 							}
 
-							messages.Add($"Error 003: Entity: {entityName} has no field.");
+							messages.Add($"Error 004: Entity: {entityName} has no field.");
 						}
 
 						if (fieldTokens != null)
@@ -57,7 +57,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 								string fieldName = fieldToken.SelectToken("$.Name")?.ToString();
 								if (string.IsNullOrEmpty(fieldName))
 								{
-									messages.Add($"Error 003: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} has no name.");
+									messages.Add($"Error 005: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} has no name.");
 								}
 
 								var dataTypeToken = fieldToken.SelectToken("$.DataType");
@@ -67,7 +67,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 									{
 										correct = false;
 									}
-									messages.Add($"Error 003: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} has no datatype.");
+									messages.Add($"Error 006: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} has no datatype.");
 								}
 								else
 								{
@@ -77,7 +77,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 										{
 											correct = false;
 										}
-										messages.Add($"Error 003: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} is a class, when data entity is a loop type, pipeline should be mongodb only.");
+										messages.Add($"Error 007: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} is a class, when data entity is a loop type, pipeline should be mongodb only.");
 									}
 								}
 							}
