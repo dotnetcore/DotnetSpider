@@ -33,7 +33,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				},
 				Scheduler = new RedisScheduler
 				{
-					Host = "redis_primary",
+					Host = "redis",
                     Password="#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
 					Port = 6379
 				},

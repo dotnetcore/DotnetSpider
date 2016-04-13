@@ -11,7 +11,7 @@ namespace Java2Dotnet.Spider.Extension
 #if !NET_CORE
 			string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", spider.Identity);
 #else
-			string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "data", spider.Identity);
+			string folderPath = Path.Combine(AppContext.BaseDirectory, "data", spider.Identity);
 #endif
 			if (!Directory.Exists(folderPath))
 			{

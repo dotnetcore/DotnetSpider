@@ -141,7 +141,7 @@ namespace Java2Dotnet.Spider.Core
 
 			DataRootDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\data\\" + Identity;
 #else
-			DataRootDirectory = Path.Combine(Directory.GetCurrentDirectory(), Path.Combine("data", Identity));
+			DataRootDirectory = Path.Combine(AppContext.BaseDirectory, Path.Combine("data", Identity));
 #endif
 		}
 

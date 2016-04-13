@@ -37,7 +37,7 @@ namespace Java2Dotnet.Spider.Core.Utils
 #if !NET_CORE
 			BasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
 #else
-			BasePath = Path.Combine(Directory.GetCurrentDirectory(), path);
+			BasePath = Path.Combine(AppContext.BaseDirectory, path);
 #endif
 		}
 

@@ -227,13 +227,14 @@ namespace MySql.Data.MySqlClient
 					if (Pool != null && Settings.CacheServerProperties)
 					{
 						if (Pool.ServerProperties == null)
-							Pool.ServerProperties = LoadServerProperties(connection);
+						{
+                            Pool.ServerProperties = LoadServerProperties(connection);
+                        }
 						serverProps = Pool.ServerProperties;
 					}
-					else{
-						Console.WriteLine("LoadServerProperties");
-						serverProps = LoadServerProperties(connection);
-						
+					else
+                    {
+						serverProps = LoadServerProperties(connection);						
 					}
 
 					LoadCharacterSets(connection);

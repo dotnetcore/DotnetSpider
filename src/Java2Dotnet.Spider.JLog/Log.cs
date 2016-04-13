@@ -14,7 +14,7 @@ namespace Java2Dotnet.Spider.JLog
 
 		static Log()
 		{
-			LogFile = Path.Combine(Directory.GetCurrentDirectory(), DateTime.Now.ToString("yyyy-MM-dd") + ".log");
+			LogFile = Path.Combine(AppContext.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
 		}
 
 		public Log(string name)

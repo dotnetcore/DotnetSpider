@@ -1641,7 +1641,7 @@ namespace RedisSharp
 				redisResult.Result = msg;
 				return redisResult;
 			}
-			redisResult.Exeption = new Exception("Unexpected reply: ");
+			redisResult.Exeption = new Exception($"Unexpected reply: {redisResult.Flag} {msg}");
 			return redisResult;
 		}
 

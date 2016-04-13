@@ -232,6 +232,7 @@ namespace Java2Dotnet.Spider.Extension
 							else
 							{
 								Console.WriteLine("No need to prepare site because other process did it.");
+                                _spiderContext.Site.ClearStartRequests();
 							}
 
 							Console.WriteLine("Start creating Spider...");

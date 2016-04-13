@@ -11,7 +11,7 @@ namespace Java2Dotnet.Spider.Common
 
 		static ConfigurationManager()
 		{            
-            string configPath=Directory.GetCurrentDirectory()+"/app.conf";
+            string configPath= Path.Combine(AppContext.BaseDirectory,"app.conf");
 			if (File.Exists(configPath))
 			{
 				string[] lines = File.ReadAllLines(configPath);
