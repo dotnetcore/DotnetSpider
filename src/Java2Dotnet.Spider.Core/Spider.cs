@@ -334,6 +334,11 @@ namespace Java2Dotnet.Spider.Core
 			{
 				if (StartRequests.Count > 0)
 				{
+#if NET_CORE
+				Logger.Info($"Start push Request to queque...", true);
+#else
+					Logger.Info("Start push Request to queque...");
+#endif
 					Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 100 }, request =>
 					{
 						Scheduler.Push((Request)request.Clone(), this);
@@ -342,7 +347,7 @@ namespace Java2Dotnet.Spider.Core
 					ClearStartRequests();
 
 #if NET_CORE
-				Logger.Info("Push Request to Scheduler success.", true);
+				Logger.Info($"Push Request: {StartRequests.Count} to Scheduler success.", true);
 #else
 					Logger.Info("Push Request to Scheduler success.");
 #endif
