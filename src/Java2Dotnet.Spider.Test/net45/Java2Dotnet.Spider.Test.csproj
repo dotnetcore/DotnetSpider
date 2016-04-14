@@ -128,7 +128,7 @@
       <Link>RedisRedialManager\RedisRedialManagerTests.cs</Link>
     </Compile>
     <Compile Include="..\RedisSchedulerTest.cs">
-      <Link>RedisSchedulerTest.cs</Link>
+      <Link>Scheduler\RedisSchedulerTest.cs</Link>
     </Compile>
     <Compile Include="..\RedisTest.cs">
       <Link>RedisTest.cs</Link>
@@ -199,6 +199,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app.conf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>

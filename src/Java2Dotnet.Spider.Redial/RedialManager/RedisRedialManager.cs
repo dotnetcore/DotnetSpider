@@ -34,8 +34,8 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				RedisHost = "localhost";
 			}
 
-			Redis = new RedisServer(host) ;
-			Redis.Db = 2;
+			Redis = new RedisServer(Common.ConfigurationManager.Get("redisHost"), 6379, Common.ConfigurationManager.Get("redisPassword"));
+			Redis.Db = 3;
 			AtomicExecutor = new RedisAtomicExecutor(this);
 		}
 

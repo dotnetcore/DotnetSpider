@@ -1,9 +1,7 @@
-
 using System.Threading;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Core.Scheduler.Component;
-using Java2Dotnet.Spider.Core.Utils;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
 using Newtonsoft.Json;
