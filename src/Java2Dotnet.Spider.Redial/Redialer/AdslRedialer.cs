@@ -1,6 +1,9 @@
 ﻿using System;
 using Java2Dotnet.Spider.Redial.Utils;
 using System.Diagnostics;
+#if NET_CORE
+using System.Runtime.InteropServices;
+#endif
 
 namespace Java2Dotnet.Spider.Redial.Redialer
 {
