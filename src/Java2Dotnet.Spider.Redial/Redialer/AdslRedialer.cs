@@ -3,6 +3,7 @@ using Java2Dotnet.Spider.Redial.Utils;
 using System.Diagnostics;
 #if NET_CORE
 using System.Runtime.InteropServices;
+using Java2Dotnet.Spider.JLog;
 #endif
 
 namespace Java2Dotnet.Spider.Redial.Redialer
@@ -19,12 +20,14 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 
 		public override void Redial()
 		{
-			Console.WriteLine($"Try to redial: {Interface} {User} {Password}");
+
 #if !NET_CORE
+			Console.WriteLine($"Try to redial: {Interface} {User} {Password}");
 			RasDisplay ras = new RasDisplay();
 			ras.Disconnect();//断开连接
 			ras.Connect(Interface);//重新拨号
 #else
+			Log.WriteLine($"Try to redial: {Interface} {User} {Password}");
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
 				Process process = Process.Start("adsl-stop");
