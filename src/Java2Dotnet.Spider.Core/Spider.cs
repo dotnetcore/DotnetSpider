@@ -532,7 +532,9 @@ namespace Java2Dotnet.Spider.Core
 			{
 				Logger.Info("Spider " + Identity + " stop success!");
 			}
-
+#if NET_CORE
+            Log.WaitForExit();
+#endif
 			_runningExit = true;
 		}
 

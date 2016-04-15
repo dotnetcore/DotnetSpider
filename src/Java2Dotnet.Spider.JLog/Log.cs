@@ -3,6 +3,8 @@ using System.IO;
 using System.Text;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Java2Dotnet.Spider.JLog
 {
@@ -32,6 +34,7 @@ namespace Java2Dotnet.Spider.JLog
         public static bool NoConsole = false;
         public string Name { get; }
         private static string LogServer;
+        private static SynchronizedList<Task<HttpResponseMessage>> LogUpLoadTasks = new SynchronizedList<Task<HttpResponseMessage>>();
 
         static Log()
         {
@@ -40,6 +43,18 @@ namespace Java2Dotnet.Spider.JLog
             LogServer = ConfigurationManager.Get("logserver");
         }
 
+        public void WaitForExit()
+        {
+            while (true)
+            {
+                if(LogUpLoadTasks.Count() ==0)
+                {
+                    break;
+                }
+                Thread.Sleep(500);
+            }
+        }
+        
         public Log(string name)
         {
             Name = name;
@@ -157,10 +172,13 @@ namespace Java2Dotnet.Spider.JLog
                 StringBuilder builder = new StringBuilder("{ \"Type\": \"");
                 builder.Append(log.Type).Append("\", \"Time\": \"").Append(log.Time).Append("\", \"Message\": \"").Append(log.Message);
                 builder.Append("\", \"Machine\": \"").Append(log.Machine);
-                builder.Append("\", \"UserId\": \"").Append(log.UserId);
-                builder.Append("\", \"TaskId\": \"").Append(log.TaskId);
+                builder.Append("\", \"UserId\": \"").Append(string.IsNullOrEmpty(log.UserId)?"UNKONW":log.UserId);
+                builder.Append("\", \"TaskId\": \"").Append(string.IsNullOrEmpty(log.TaskId)?"UNKONW":log.TaskId);
                 builder.Append("\" }");
-                HttpResponseMessage response = client.PostAsync(LogServer, new StringContent(builder.ToString())).Result;
+                
+                var task = client.PostAsync(LogServer, new StringContent(builder.ToString().Replace("\n","\\n").Replace("\t","\\t").Replace("\r","\\r")));
+                LogUpLoadTasks.Add(task);
+                task.ContinueWith((t)=>{ LogUpLoadTasks.Remove(t);});               
             }
             lock (WriteToLogFileLocker)
             {
