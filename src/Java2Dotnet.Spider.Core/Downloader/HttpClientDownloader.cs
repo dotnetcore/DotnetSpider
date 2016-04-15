@@ -26,7 +26,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 	public class HttpClientDownloader : BaseDownloader
 	{
 		//private static AutomicLong _exceptionCount = new AutomicLong(0);
-		public Action<Request> CustomizeRequestBeforeGenerate;
+		public Action<Site, Request> GeneratePostBody;
 		public bool DecodeContentAsUrl;
 
 		public override Page Download(Request request, ISpider spider)
@@ -48,11 +48,11 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			HttpWebResponse response = null;
 			try
 			{
-				if (CustomizeRequestBeforeGenerate != null)
+				if (GeneratePostBody != null)
 				{
 					SingleExecutor.Execute(() =>
 					{
-						CustomizeRequestBeforeGenerate(request);
+						GeneratePostBody(spider.Site, request);
 					});
 				}
 

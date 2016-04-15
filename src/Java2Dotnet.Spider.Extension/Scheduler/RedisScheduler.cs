@@ -6,6 +6,8 @@ using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
 using Newtonsoft.Json;
 using RedisSharp;
+using System;
+using System.Collections.Generic;
 
 namespace Java2Dotnet.Spider.Extension.Scheduler
 {
@@ -152,6 +154,44 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 				return null;
 			});
+		}
+
+		public override void Load(HashSet<Request> requests, ISpider spider)
+		{
+			lock (this)
+			{
+				List<string> identities = new List<string>();
+				Dictionary<string, string> jsonDic = new Dictionary<string, string>();
+				foreach (var request in requests)
+				{
+					identities.Add(request.Identity);
+					jsonDic.Add(request.Identity, JsonConvert.SerializeObject(request));
+				}
+
+				Redis.SetAddManay(GetSetKey(spider.Identity), identities);
+
+				Redis.ListRightPushMany(GetQueueKey(spider.Identity), identities);
+
+				Redis.HashSetMany(ItemPrefix + spider.Identity, jsonDic);
+			}
+		}
+
+		public override HashSet<Request> ToList(ISpider spider)
+		{
+			HashSet<Request> requests = new HashSet<Request>();
+			Request request;
+			while ((request = Poll(spider)) != null)
+			{
+				requests.Add(request);
+			}
+			return requests;
+		}
+
+		public void Clear(ISpider spider)
+		{
+			Redis.KeyDelete(GetQueueKey(spider.Identity));
+			Redis.KeyDelete(GetSetKey(spider.Identity));
+			Redis.KeyDelete(ItemPrefix + spider.Identity);
 		}
 	}
 }

@@ -10,6 +10,8 @@ using Java2Dotnet.Spider.Extension.Model.Formatter;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
@@ -21,6 +23,14 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			GeneralDb,
 			Cycle
 		}
+
+		public string Method { get; set; } = "GET";
+
+		public string Referer { get; set; }
+
+		public string PostBody { get; set; }
+
+		public string Origin { get; set; }
 
 		public abstract Types Type { get; internal set; }
 
@@ -101,7 +111,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 				reader.Close();
 
-				Parallel.ForEach(datas, new ParallelOptions { MaxDegreeOfParallelism = 5 }, brand =>
+				Parallel.ForEach(datas, new ParallelOptions { MaxDegreeOfParallelism = 1 }, brand =>
 				{
 					Dictionary<string, object> tmp = brand;
 					List<string> arguments = new List<string>();
@@ -119,10 +129,32 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					foreach (var formate in FormateStrings)
 					{
 						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-						site.AddStartUrl(tmpUrl, tmp);
+						site.AddStartRequest(new Request(tmpUrl, 0, tmp)
+						{
+							Method = Method,
+							Origin = Origin,
+							PostBody = GetPostBody(tmp),
+							Referer = Referer
+						});
 					}
 				});
 			}
+		}
+
+		private string GetPostBody(Dictionary<string, object> datas)
+		{
+			Regex regex = new Regex(@"__URLENCODE\('(\w|\d)+'\)");
+			foreach (Match match in regex.Matches(PostBody))
+			{
+				string tmp = match.Value;
+				int startIndex = tmp.IndexOf("__URLENCODE('");
+				int endIndex = tmp.IndexOf("')", startIndex);
+				string arg = tmp.Substring(startIndex + 13, endIndex - startIndex - 13);
+				PostBody = PostBody.Replace(tmp, HttpUtility.UrlEncode(datas[arg].ToString()));
+			}
+
+			// implement more rules
+			return PostBody;
 		}
 
 		private string GetSelectQueryString()

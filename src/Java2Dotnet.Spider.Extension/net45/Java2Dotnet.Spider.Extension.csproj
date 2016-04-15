@@ -96,6 +96,9 @@
     <Compile Include="..\Configuration\EnviromentValue.cs">
       <Link>Configuration\EnviromentValue.cs</Link>
     </Compile>
+    <Compile Include="..\Configuration\GeneratePostBody.cs">
+      <Link>Configuration\GeneratePostBody.cs</Link>
+    </Compile>
     <Compile Include="..\Configuration\Json\JsonSpiderContext.cs">
       <Link>Configuration\Json\JsonSpiderContext.cs</Link>
     </Compile>

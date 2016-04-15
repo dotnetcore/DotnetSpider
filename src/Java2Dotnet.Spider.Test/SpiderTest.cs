@@ -26,7 +26,7 @@ namespace Java2Dotnet.Spider.Test
 			HttpClientDownloader downloader = new HttpClientDownloader();
 
 			Core.Spider spider = Core.Spider.Create(new SimplePageProcessor("http://www.oschina.net/", "http://www.oschina.net/*")).AddPipeline(new TestPipeline()).SetThreadNum(1);
-			spider.Site = new Site() { Encoding = Encoding.UTF8 };
+			spider.Site = new Site() { EncodingName = "UTF-8" };
 			Page p = downloader.Download(new Request("http://www.baidu.com/", 2, new Dictionary<string, dynamic>()), spider);
 			Console.WriteLine(p.Content);
 			spider.Start();
@@ -101,6 +101,16 @@ namespace Java2Dotnet.Spider.Test
 
 			public void Dispose()
 			{
+			}
+
+			public void Load(HashSet<Request> requests, ISpider spider)
+			{
+				throw new NotImplementedException();
+			}
+
+			public HashSet<Request> ToList(ISpider spider)
+			{
+				throw new NotImplementedException();
 			}
 		}
 

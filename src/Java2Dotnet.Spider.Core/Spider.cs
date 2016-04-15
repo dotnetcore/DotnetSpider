@@ -339,10 +339,22 @@ namespace Java2Dotnet.Spider.Core
 #else
 					Logger.Info("Start push Request to queque...");
 #endif
-					Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 100 }, request =>
+					if (Scheduler is QueueDuplicateRemovedScheduler)
 					{
-						Scheduler.Push((Request)request.Clone(), this);
-					});
+						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 10 }, request =>
+						{
+							Scheduler.Push((Request)request.Clone(), this);
+						});
+					}
+					else
+					{
+						QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
+						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 10 }, request =>
+						{
+							Scheduler.Push((Request)request.Clone(), this);
+						});
+						Scheduler.Load(scheduler.ToList(this), this);
+					}
 
 					ClearStartRequests();
 

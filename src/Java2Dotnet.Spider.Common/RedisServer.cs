@@ -27,7 +27,7 @@ namespace RedisSharp
 
 		public RedisServer(string host, int port, string pass, int maxThreadNum = 10)
 		{
-            Console.WriteLine($"Redis Server: {host} {port}");
+			Console.WriteLine($"Redis Server: {host} {port}");
 			Host = host;
 			Port = port;
 			Password = pass;
@@ -54,7 +54,7 @@ namespace RedisSharp
 
 		public bool KeyDelete(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -64,25 +64,25 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		private RedisClient CreateRedisClient()
 		{
-            if(_clientCount.Value<MaxThreadNum && _redisClientQueue.Count==0)
-            {
-			    return new RedisClient(Host, Port) { Password = Password, RetryCount = RetryCount, RetryTimeout = RetryTimeout };
-            }
-            else
-            {
-               return  _redisClientQueue.Dequeue();
-            }
+			if (_clientCount.Value < MaxThreadNum && _redisClientQueue.Count == 0)
+			{
+				return new RedisClient(Host, Port) { Password = Password, RetryCount = RetryCount, RetryTimeout = RetryTimeout };
+			}
+			else
+			{
+				return _redisClientQueue.Dequeue();
+			}
 		}
 
 		public bool ContainsKey(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -91,13 +91,13 @@ namespace RedisSharp
 			}
 			finally
 			{
-				_redisClientQueue.Enqueue(client);				
+				_redisClientQueue.Enqueue(client);
 			}
 		}
 
 		public bool LockTake(string key, string value, TimeSpan expiry)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -107,7 +107,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
@@ -115,7 +115,7 @@ namespace RedisSharp
 		{
 			get
 			{
-				
+
 				RedisClient client = CreateRedisClient();
 				try
 				{
@@ -125,14 +125,14 @@ namespace RedisSharp
 				finally
 				{
 					_redisClientQueue.Enqueue(client);
-					
+
 				}
 			}
 		}
 
 		public void Save()
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -142,13 +142,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public void BackgroundSave()
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -158,13 +158,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public void FlushAll()
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -174,13 +174,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public void FlushDb()
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -190,7 +190,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
@@ -198,7 +198,7 @@ namespace RedisSharp
 		{
 			get
 			{
-				
+
 				RedisClient client = CreateRedisClient();
 				try
 				{
@@ -208,14 +208,14 @@ namespace RedisSharp
 				finally
 				{
 					_redisClientQueue.Enqueue(client);
-					
+
 				}
 			}
 		}
 
 		public bool LockRelease(string key, int value)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -225,13 +225,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public KeyType TypeOf(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -241,7 +241,49 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
+			}
+		}
+
+		public void SetAddManay(string key, List<string> values)
+		{
+			RedisClient client = CreateRedisClient();
+			try
+			{
+				client.Db = Db;
+				client.SetAddManay(key, values);
+			}
+			finally
+			{
+				_redisClientQueue.Enqueue(client);
+			}
+		}
+
+		public void ListRightPushMany(string key, List<string> values)
+		{
+			RedisClient client = CreateRedisClient();
+			try
+			{
+				client.Db = Db;
+				client.ListRightPushMany(key, values);
+			}
+			finally
+			{
+				_redisClientQueue.Enqueue(client);
+			}
+		}
+
+		public void HashSetMany(string key, Dictionary<string, string> values)
+		{
+			RedisClient client = CreateRedisClient();
+			try
+			{
+				client.Db = Db;
+				client.HashSetMany(key, values);
+			}
+			finally
+			{
+				_redisClientQueue.Enqueue(client);
 			}
 		}
 
@@ -263,7 +305,7 @@ namespace RedisSharp
 
 		public int SetAdd(string key, string value)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -273,13 +315,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public bool SetContains(string key, string value)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -289,13 +331,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public long SetLength(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -305,13 +347,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public List<string> SetMembers(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -321,13 +363,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public string SetPop(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -337,13 +379,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public bool SetRemove(string key, string value)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -353,7 +395,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
@@ -363,7 +405,7 @@ namespace RedisSharp
 
 		public bool HashExists(string key, string field)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -373,13 +415,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public void HashDelete(string key, string field)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -389,13 +431,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public KeyValuePair<string, string>[] HashGetAll(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -405,13 +447,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public string HashGet(string key, string field)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -421,13 +463,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public long HashLength(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -437,13 +479,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public void HashSet(string set, string field, string value)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -453,7 +495,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
@@ -463,7 +505,7 @@ namespace RedisSharp
 
 		public string[] SortedSetRangeByRank(string key, int start, int stop)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -473,13 +515,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public void SortedSetRemove(string key, string value)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -489,13 +531,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public bool SortedSetAdd(string key, string value, long score)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -505,13 +547,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public long SortedSetLength(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -521,7 +563,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
@@ -531,7 +573,7 @@ namespace RedisSharp
 
 		public bool Publish(string chanel, string message)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -540,7 +582,7 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
@@ -562,7 +604,7 @@ namespace RedisSharp
 
 		public void ListLeftPush(string key, string value)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -572,13 +614,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public void ListRightPush(string key, dynamic value)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -588,13 +630,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public int ListLength(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -604,13 +646,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public string ListLeftPop(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -620,13 +662,13 @@ namespace RedisSharp
 			finally
 			{
 				_redisClientQueue.Enqueue(client);
-				
+
 			}
 		}
 
 		public string ListRightPop(string key)
 		{
-			
+
 			RedisClient client = CreateRedisClient();
 			try
 			{
@@ -635,7 +677,7 @@ namespace RedisSharp
 			}
 			finally
 			{
-				_redisClientQueue.Enqueue(client);				
+				_redisClientQueue.Enqueue(client);
 			}
 		}
 
@@ -704,7 +746,7 @@ namespace RedisSharp
 				if (value > 0 && _db != value)
 				{
 					_db = value;
-					SendExpectSuccess("SELECT", _db);
+					SendExpectSuccess("SELECT", _db.ToString());
 				}
 			}
 		}
@@ -737,7 +779,7 @@ namespace RedisSharp
 			lock (this)
 			{
 				long milliseconds = expiry.Ticks / TimeSpan.TicksPerMillisecond;
-				var results = SendCommand("SET", key, value, "PX", milliseconds);
+				var results = SendCommand("SET", key, value, "PX", milliseconds.ToString());
 				if (results.Exeption != null)
 				{
 					throw results.Exeption;
@@ -842,20 +884,6 @@ namespace RedisSharp
 
 		#region Set
 
-		//public int SetAdd(string key, string[] values)
-		//{
-		//	if (string.IsNullOrEmpty(key))
-		//	{
-		//		throw new ArgumentException("Key is null or empty");
-		//	}
-		//	if (values == null || values.Length == 0)
-		//	{
-		//		throw new ArgumentException("Value is null or empty");
-		//	}
-
-		//	return SendExpectInt("SADD", key, values);
-		//}
-
 		public int SetAdd(string key, string value)
 		{
 			lock (this)
@@ -868,14 +896,8 @@ namespace RedisSharp
 				{
 					throw new ArgumentException("Value is null");
 				}
-				var bytes = Encoding.UTF8.GetBytes(value);
 
-				if (bytes.Length > 1073741824)
-				{
-					throw new ArgumentException("value exceeds 1G");
-				}
-
-				return SendDataExpectInt(bytes, "SADD", key);
+				return SendExpectInt("SADD", key, value);
 			}
 		}
 
@@ -1013,7 +1035,7 @@ namespace RedisSharp
 		{
 			lock (this)
 			{
-				return SendExpectStringArray("ZRANGE", key, start, stop);
+				return SendExpectStringArray("ZRANGE", key, start.ToString(), stop.ToString());
 			}
 		}
 
@@ -1029,7 +1051,7 @@ namespace RedisSharp
 		{
 			lock (this)
 			{
-				return SendExpectInt("ZADD", key, score, value) > 0;
+				return SendExpectInt("ZADD", key, score.ToString(), value) > 0;
 			}
 		}
 
@@ -1103,15 +1125,15 @@ namespace RedisSharp
 		{
 			lock (this)
 			{
-				SendDataExpectSuccess(Encoding.UTF8.GetBytes(value), "LPUSH", key);
+				SendExpectSuccess("LPUSH", key, value);
 			}
 		}
 
-		public void ListRightPush(string key, dynamic value)
+		public void ListRightPush(string key, string value)
 		{
 			lock (this)
 			{
-				SendDataExpectSuccess(Encoding.UTF8.GetBytes(value.ToString()), "RPUSH", key);
+				SendExpectSuccess("RPUSH", key, value);
 			}
 		}
 
@@ -1158,7 +1180,7 @@ namespace RedisSharp
 			return Sort(options.Key, options.StoreInKey, options.ToArgs());
 		}
 
-		private byte[][] Sort(string key, string destination, params object[] options)
+		private byte[][] Sort(string key, string destination, params string[] options)
 		{
 			if (string.IsNullOrEmpty(key))
 			{
@@ -1166,7 +1188,7 @@ namespace RedisSharp
 			}
 
 			int offset = string.IsNullOrEmpty(destination) ? 1 : 3;
-			object[] args = new object[offset + options.Length];
+			string[] args = new string[offset + options.Length];
 
 			args[0] = key;
 			Array.Copy(options, 0, args, offset, options.Length);
@@ -1174,7 +1196,8 @@ namespace RedisSharp
 			{
 				return SendExpectDataArray("SORT", args);
 			}
-			else {
+			else
+			{
 				args[1] = "STORE";
 				args[2] = destination;
 				int n = SendExpectInt("SORT", args);
@@ -1266,7 +1289,7 @@ namespace RedisSharp
 			return socket;
 		}
 
-		private string[] SendExpectStringArray(string cmd, params object[] args)
+		private string[] SendExpectStringArray(string cmd, params string[] args)
 		{
 			byte[][] reply = SendExpectDataArray(cmd, args);
 			string[] keys = new string[reply.Length];
@@ -1277,7 +1300,7 @@ namespace RedisSharp
 			return keys;
 		}
 
-		private byte[][] SendExpectDataArray(string cmd, params object[] args)
+		private byte[][] SendExpectDataArray(string cmd, params string[] args)
 		{
 			var result = SendCommand(cmd, args);
 
@@ -1317,7 +1340,12 @@ namespace RedisSharp
 			//throw new ResponseException("Unknown reply on multi-request: " + c + s);
 		}
 
-		private void SendExpectSuccess(string cmd, params object[] args)
+		private void SendExpectSuccess(string cmd, params string[] args)
+		{
+			SendExpectSuccess(cmd, new List<string>(args));
+		}
+
+		private void SendExpectSuccess(string cmd, List<string> args)
 		{
 			var result = SendCommand(cmd, args);
 
@@ -1334,31 +1362,8 @@ namespace RedisSharp
 			public Exception Exeption { get; set; }
 		}
 
-		private int SendDataExpectInt(byte[] data, string cmd, params object[] args)
-		{
-			var result = SendDataCommand(data, cmd, args);
 
-			if (result.Exeption != null)
-			{
-				throw result.Exeption;
-			}
-			else
-			{
-				return (result.Result is string) ? int.Parse(result.Result) : result.Result;
-			}
-		}
-
-		private void SendDataExpectSuccess(byte[] data, string cmd, params object[] args)
-		{
-			var result = SendDataCommand(data, cmd, args);
-
-			if (result.Exeption != null)
-			{
-				throw result.Exeption;
-			}
-		}
-
-		private int SendExpectInt(string cmd, params object[] args)
+		private int SendExpectInt(string cmd, params string[] args)
 		{
 			var result = SendCommand(cmd, args);
 
@@ -1372,7 +1377,7 @@ namespace RedisSharp
 			}
 		}
 
-		private long SendExpectLong(string cmd, params object[] args)
+		private long SendExpectLong(string cmd, params string[] args)
 		{
 			var result = SendCommand(cmd, args);
 
@@ -1386,7 +1391,7 @@ namespace RedisSharp
 			}
 		}
 
-		private string SendExpectString(string cmd, params object[] args)
+		private string SendExpectString(string cmd, params string[] args)
 		{
 			var result = SendCommand(cmd, args);
 
@@ -1464,24 +1469,12 @@ namespace RedisSharp
 		//	throw new ResponseException("Unexpected reply: ");
 		//}
 
-		private RedisResult SendDataCommand(byte[] data, string cmd, params object[] args)
+		private RedisResult SendCommand(string cmd, params string[] args)
 		{
-			string resp = "*" + (1 + args.Length + 1) + "\r\n";
-			resp += "$" + cmd.Length + "\r\n" + cmd + "\r\n";
-			foreach (object arg in args)
-			{
-				string argStr = arg.ToString();
-				int argStrLength = Encoding.UTF8.GetByteCount(argStr);
-				resp += "$" + argStrLength + "\r\n" + argStr + "\r\n";
-			}
-			if (data != null)
-			{
-				resp += "$" + data.Length + "\r\n";
-			}
-			return SendDataResp(data, resp);
+			return SendCommand(cmd, new List<string>(args));
 		}
 
-		private RedisResult SendDataResp(byte[] data, string resp)
+		private RedisResult SendCommand(string cmd, List<string> args)
 		{
 			if (_socket == null)
 			{
@@ -1492,50 +1485,21 @@ namespace RedisSharp
 			{
 				return new RedisResult() { Exeption = new Exception("Socket is null.") };
 			}
-
-			byte[] r = Encoding.UTF8.GetBytes(resp);
-			try
-			{
-				_socket.Send(r);
-				_socket.Send(data);
-				_socket.Send(_endData);
-
-				return GetResult();
-			}
-			catch (SocketException s)
-			{
-				// timeout;
-				_socket.Dispose();
-				return new RedisResult() { Exeption = s };
-			}
-		}
-
-		private RedisResult SendCommand(string cmd, params object[] args)
-		{
-			if (_socket == null)
-			{
-				Connect();
-			}
-
-			if (_socket == null)
-			{
-				return new RedisResult() { Exeption = new Exception("Socket is null.") };
-			}
-
-			string resp = "*" + (1 + args.Length) + "\r\n";
-			resp += "$" + cmd.Length + "\r\n" + cmd + "\r\n";
-			foreach (object arg in args)
+			StringBuilder builder = new StringBuilder();
+			builder.Append("*" + (1 + args.Count) + "\r\n");
+			builder.Append("$" + cmd.Length + "\r\n" + cmd + "\r\n");
+			foreach (string arg in args)
 			{
 				if (arg == null)
 				{
 					continue;
 				}
-				string argStr = arg.ToString();
-				int argStrLength = Encoding.UTF8.GetByteCount(argStr);
-				resp += "$" + argStrLength + "\r\n" + argStr + "\r\n";
+				int argStrLength = Encoding.UTF8.GetByteCount(arg);
+				builder.Append("$").Append(argStrLength).Append("\r\n").Append(arg).Append("\r\n");
+				//resp += "$" + argStrLength + "\r\n" + arg + "\r\n";
 			}
 
-			byte[] r = Encoding.UTF8.GetBytes(resp);
+			byte[] r = Encoding.UTF8.GetBytes(builder.ToString());
 			try
 			{
 				_socket.Send(r);
@@ -1622,7 +1586,7 @@ namespace RedisSharp
 						var tmp = GetResult();
 						if (tmp.Exeption == null)
 						{
-							result[i] = (tmp.Result is byte[]) ? tmp.Result : new [] { (byte)tmp.Result };
+							result[i] = (tmp.Result is byte[]) ? tmp.Result : new[] { (byte)tmp.Result };
 						}
 						else
 						{
@@ -1662,7 +1626,62 @@ namespace RedisSharp
 			{
 				// ignored
 			}
-        }
+		}
+
+		internal void ListRightPushMany(string key, List<string> values)
+		{
+			lock (this)
+			{
+				List<string> arguments = new List<string>();
+				arguments.Add(key);
+				arguments.AddRange(values);
+				SendExpectSuccess("RPUSH", arguments);
+			}
+		}
+
+		internal void HashSetMany(string key, Dictionary<string, string> values)
+		{
+			lock (this)
+			{
+				if (string.IsNullOrEmpty(key))
+				{
+					throw new ArgumentException("Key is null or empty.");
+				}
+				if (values == null)
+				{
+					throw new ArgumentException("values is null or empty.");
+				}
+
+				List<string> arguments = new List<string>();
+				arguments.Add(key);
+				foreach (var entry in values)
+				{
+					arguments.Add(entry.Key);
+					arguments.Add(entry.Value);
+				}
+				SendExpectSuccess("HMSET", arguments);
+			}
+		}
+
+		internal void SetAddManay(string key, List<string> values)
+		{
+			lock (this)
+			{
+				if (string.IsNullOrEmpty(key))
+				{
+					throw new ArgumentException("Key is null or empty.");
+				}
+				if (values == null)
+				{
+					throw new ArgumentException("values is null or empty.");
+				}
+
+				List<string> arguments = new List<string>();
+				arguments.Add(key);
+				arguments.AddRange(values);
+				SendExpectSuccess("SADD", arguments);
+			}
+		}
 	}
 
 	public class SortOptions
@@ -1676,15 +1695,15 @@ namespace RedisSharp
 		public string StoreInKey { get; set; }
 		public string Get { get; set; }
 
-		public object[] ToArgs()
+		public string[] ToArgs()
 		{
-			System.Collections.ArrayList args = new System.Collections.ArrayList();
+			List<string> args = new List<string>();
 
 			if (LowerLimit != 0 || UpperLimit != 0)
 			{
 				args.Add("LIMIT");
-				args.Add(LowerLimit);
-				args.Add(UpperLimit);
+				args.Add(LowerLimit.ToString());
+				args.Add(UpperLimit.ToString());
 			}
 			if (Lexographically)
 				args.Add("ALPHA");

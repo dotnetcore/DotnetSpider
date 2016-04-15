@@ -305,6 +305,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 					}
 			}
 
+			var generatePostBody = jobject.SelectToken("$.GeneratePostBody")?.ToObject<GeneratePostBody>();
+			if (generatePostBody != null)
+			{
+				downloader.GeneratePostBody = generatePostBody;
+			}
+
 			return downloader;
 		}
 

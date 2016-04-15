@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Java2Dotnet.Spider.Core.Scheduler
 {
@@ -25,5 +26,9 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		/// <param name="spider"></param>
 		/// <returns></returns>
 		Request Poll(ISpider spider);
+
+		void Load(HashSet<Request> requests, ISpider spider);
+
+		HashSet<Request> ToList(ISpider spider);
 	}
 }

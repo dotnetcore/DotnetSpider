@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Scheduler;
+using Java2Dotnet.Spider.Core.Scheduler;
+using System;
 #if !NET_CORE
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 #endif
@@ -29,7 +31,7 @@ namespace Java2Dotnet.Spider.Test
 			Assert.IsNull(result1);
 			redisScheduler.Dispose();
 
-			
+
 			m.RemoveTask(spider.Identity);
 		}
 
@@ -56,6 +58,52 @@ namespace Java2Dotnet.Spider.Test
 
 			RedisSchedulerManager m = new RedisSchedulerManager("localhost");
 			m.RemoveTask(spider.Identity);
+		}
+
+		[TestMethod]
+		public void SchedulerLoadPerformaceTest()
+		{
+			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
+			ISpider spider = new DefaultSpider("test", new Site());
+			var start = DateTime.Now;
+			for (int i = 0; i < 40000; i++)
+			{
+				scheduler.Push(new Request("http://www.a.com/" + i, 1, null), spider);
+			}
+
+			RedisScheduler redisScheduler = new RedisScheduler("localhost", "");
+			redisScheduler.Load(scheduler.ToList(spider), spider);
+			var end = DateTime.Now;
+			double seconds = (end - start).TotalSeconds;
+			redisScheduler.Clear(spider);
+
+			var start1 = DateTime.Now;
+			for (int i = 0; i < 40000; i++)
+			{
+				redisScheduler.Push(new Request("http://www.a.com/" + i, 1, null), spider);
+			}
+			var end1 = DateTime.Now;
+			double seconds1 = (end1 - start1).TotalSeconds;
+			Assert.IsTrue((seconds1 / seconds) > 6);
+		}
+
+		[TestMethod]
+		public void SchedulerLoadTest()
+		{
+			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
+			ISpider spider = new DefaultSpider("test", new Site());
+			scheduler.Push(new Request("http://www.a.com/", 1, null), spider);
+			scheduler.Push(new Request("http://www.b.com/", 1, null), spider);
+			scheduler.Push(new Request("http://www.c.com/", 1, null), spider);
+			scheduler.Push(new Request("http://www.d.com/", 1, null), spider);
+
+			RedisScheduler redisScheduler = new RedisScheduler("localhost", "");
+			redisScheduler.Load(scheduler.ToList(spider), spider);
+
+			Assert.AreEqual("http://www.d.com/", redisScheduler.Poll(spider).Url.ToString());
+			Assert.AreEqual("http://www.c.com/", redisScheduler.Poll(spider).Url.ToString());
+			Assert.AreEqual("http://www.b.com/", redisScheduler.Poll(spider).Url.ToString());
+			Assert.AreEqual("http://www.a.com/", redisScheduler.Poll(spider).Url.ToString());
 		}
 	}
 

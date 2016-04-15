@@ -20,6 +20,42 @@ namespace RedisSharp
 		private static int nFailed = 0;
 
 		[TestMethod]
+		public void RedisInsertManyTest()
+		{
+			RedisServer r = new RedisServer("localhost");
+
+			r.Db = 3;
+			r.KeyDelete("hash");
+			r.HashSetMany("hash", new Dictionary<string, string> { { "1", "2" }, { "2", "3" } });
+			var hash = r.HashGetAll("hash");
+			Assert.AreEqual(hash.Length, 2);
+			Assert.AreEqual("2", r.HashGet("hash", "1"));
+			Assert.AreEqual("3", r.HashGet("hash", "2"));
+			r.KeyDelete("hash");
+
+			r.KeyDelete("set");
+			r.SetAddManay("set", new List<string> { "1", "2", "3" });
+			var set = r.SetMembers("set");
+			Assert.AreEqual(set.Count, 3);
+			Assert.AreEqual("1", set[0]);
+			Assert.AreEqual("2", set[1]);
+			Assert.AreEqual("3", set[2]);
+			r.KeyDelete("set");
+
+
+			r.KeyDelete("list");
+			r.ListRightPushMany("list", new List<string> { "1", "2", "3", "4", "5" });
+			Assert.AreEqual(5, r.ListLength("list"));
+			Assert.AreEqual("1", r.ListLeftPop("list"));
+			Assert.AreEqual("5", r.ListRightPop("list"));
+			Assert.AreEqual("4", r.ListRightPop("list"));
+			Assert.AreEqual("2", r.ListLeftPop("list"));
+			r.KeyDelete("list");
+
+			r.Dispose();
+		}
+
+		[TestMethod]
 		public void RedisBaseTest()
 		{
 			RedisServer r = new RedisServer("localhost");
@@ -46,8 +82,8 @@ namespace RedisSharp
 			Assert.IsTrue(r.SetContains("bar", "foo"));
 
 			var mems = r.SetMembers("foo");
-			Assert.AreEqual("bar", mems[1]);
-			Assert.AreEqual("bär foo", mems[0]);
+			Assert.AreEqual("bar", mems[0]);
+			Assert.AreEqual("bär foo", mems[1]);
 
 			r.SetRemove("foo", "bar");
 			mems = r.SetMembers("foo");

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -9,7 +10,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	/// </summary>
 	public class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler, IMonitorableScheduler
 	{
-		private readonly Queue<Request> _queue = new Queue<Request>();
+		private Queue<Request> _queue = new Queue<Request>();
 
 		protected override void PushWhenNoDuplicate(Request request, ISpider spider)
 		{
@@ -18,7 +19,10 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 
 		public override void ResetDuplicateCheck(ISpider spider)
 		{
-			_queue.Clear();
+			lock (this)
+			{
+				_queue.Clear();
+			}
 		}
 
 		public override Request Poll(ISpider spider)
@@ -31,12 +35,31 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 
 		public int GetLeftRequestsCount(ISpider spider)
 		{
-			return _queue.Count;
+			lock (this)
+			{
+				return _queue.Count;
+			}
 		}
 
 		public int GetTotalRequestsCount(ISpider spider)
 		{
 			return DuplicateRemover.GetTotalRequestsCount(spider);
+		}
+
+		public override void Load(HashSet<Request> requests, ISpider spider)
+		{
+			lock (this)
+			{
+				_queue = new Queue<Request>(requests);
+			}
+		}
+
+		public override HashSet<Request> ToList(ISpider spider)
+		{
+			lock (this)
+			{
+				return new HashSet<Request>(_queue.ToArray());
+			}
 		}
 	}
 }

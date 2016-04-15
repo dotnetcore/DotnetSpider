@@ -176,11 +176,11 @@ namespace Java2Dotnet.Spider.Extension
 		}
 
 		private Core.Spider PrepareSpider(params string[] args)
-		{            
+		{
 #if NET_CORE
 				_logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}", true);
 #else
-					_logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}");
+			_logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}");
 #endif
 
 			var schedulerType = _spiderContext.Scheduler.Type;
@@ -208,7 +208,7 @@ namespace Java2Dotnet.Spider.Extension
 #if NET_CORE
 				_logger.Info($"Starting execute command: rerun", true);
 #else
-					_logger.Info($"Starting execute command: rerun");
+								_logger.Info($"Starting execute command: rerun");
 #endif
 								redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
 								redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
@@ -223,7 +223,7 @@ namespace Java2Dotnet.Spider.Extension
 #if NET_CORE
 				_logger.Info($"Execute command: rerun finished.", true);
 #else
-					_logger.Info($"Execute command: rerun finished.");
+								_logger.Info($"Execute command: rerun finished.");
 #endif
 							}
 						}

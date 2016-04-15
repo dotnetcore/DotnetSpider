@@ -17,11 +17,13 @@ namespace Java2Dotnet.Spider.Core
 		private ProxyPool _httpProxyPool = new ProxyPool();
 #endif
 		private string _domain;
-		private Encoding _encoding = System.Text.Encoding.ASCII;
+		private Encoding _encoding = System.Text.Encoding.UTF8;
 
 		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 
 		public ContentType ContentType { get; set; } = ContentType.Html;
+
+		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
 
 		/// <summary>
 		/// User agent
@@ -59,7 +61,13 @@ namespace Java2Dotnet.Spider.Core
 		/// </summary>
 		public string EncodingName { get; set; } = "UTF-8";
 
-		public Encoding Encoding { get; set; }
+		internal Encoding Encoding
+		{
+			get
+			{
+				return Encoding.GetEncoding(EncodingName);
+			}
+		}
 
 		/// <summary>
 		/// Set or Get timeout for downloader in ms

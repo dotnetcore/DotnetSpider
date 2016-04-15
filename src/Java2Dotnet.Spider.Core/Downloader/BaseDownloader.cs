@@ -68,6 +68,10 @@ namespace Java2Dotnet.Spider.Core.Downloader
 							});
 							throw new RedialException("Cookie validate failed.");
 						}
+					case DownloadValidationResult.FailedAndNeedRetryOrWait:
+						{
+							throw new SpiderExceptoin("Need retry.");
+						}
 					case DownloadValidationResult.Miss:
 						{
 							page.IsSkip = true;

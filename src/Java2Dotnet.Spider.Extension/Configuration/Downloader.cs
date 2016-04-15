@@ -1,6 +1,7 @@
 ﻿using System;
 using Java2Dotnet.Spider.Core.Downloader;
 using Java2Dotnet.Spider.Extension.Downloader.WebDriver;
+using System.Collections.Generic;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
@@ -28,6 +29,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public DownloadValidation DownloadValidation { get; set; }
 
 		public abstract IDownloader GetDownloader();
+
+		public GeneratePostBody GeneratePostBody { get; set; }
 	}
 
 	public class HttpDownloader : Downloader
@@ -40,6 +43,19 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			if (DownloadValidation != null)
 			{
 				downloader.DownloadValidation = DownloadValidation.Validate;
+			}
+			if (GeneratePostBody != null)
+			{
+				downloader.GeneratePostBody = (s, r) =>
+				{
+					List<string> arguments = new List<string>();
+					foreach (var arg in GeneratePostBody.ArgumnetNames)
+					{
+						var tmp = s.Arguments.ContainsKey(arg) ? s.Arguments[arg] : "";
+						arguments.Add(tmp);
+					}
+					r.PostBody = string.Format(r.PostBody, arguments.ToArray());
+				};
 			}
 			return downloader;
 		}

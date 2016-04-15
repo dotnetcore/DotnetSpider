@@ -1,6 +1,8 @@
 
+using System;
 using Java2Dotnet.Spider.Core.Scheduler.Component;
 using Java2Dotnet.Spider.Redial;
+using System.Collections.Generic;
 #if !NET_CORE
 using log4net;
 #else
@@ -77,5 +79,9 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		{
 			DuplicateRemover.Dispose();
 		}
+
+		public abstract void Load(HashSet<Request> requests, ISpider spider);
+
+		public abstract HashSet<Request> ToList(ISpider spider);
 	}
 }

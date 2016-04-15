@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Java2Dotnet.Spider.Common;
@@ -64,6 +65,16 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		public int GetTotalRequestsCount(ISpider spider)
 		{
 			return DuplicateRemover.GetTotalRequestsCount(spider);
+		}
+
+		public override void Load(HashSet<Request> requests, ISpider spider)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override HashSet<Request> ToList(ISpider spider)
+		{
+			throw new NotImplementedException();
 		}
 
 		private class Comparator : IComparer<Request>

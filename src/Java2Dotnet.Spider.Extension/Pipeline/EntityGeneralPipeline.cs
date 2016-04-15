@@ -99,6 +99,11 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 						schema.TableName += "_" + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy_MM_dd");
 						break;
 					}
+				case TableSuffix.Today:
+					{
+						schema.TableName += "_" + DateTime.Now.ToString("yyyy_MM_dd");
+						break;
+					}
 			}
 			return schema;
 		}

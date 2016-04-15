@@ -6,7 +6,8 @@
 		FailedAndNeedRedial,
 		Failed,
 		FailedAndNeedUpdateCookie,
-		Miss
+		Miss,
+		FailedAndNeedRetryOrWait
 	}
 
 	public delegate DownloadValidationResult DownloadValidation(Page page);
