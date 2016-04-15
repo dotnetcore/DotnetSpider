@@ -180,7 +180,7 @@ namespace Java2Dotnet.Spider.Extension
 #if !NET_CORE                
 				Console.WriteLine(e);
 #else
-				Log.WriteLine(e);
+				Log.WriteLine(e.ToString());
 #endif                
 				_logger.Error(e.Message, e);
 			}
