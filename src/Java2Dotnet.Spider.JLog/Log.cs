@@ -28,6 +28,7 @@ namespace Java2Dotnet.Spider.JLog
         public static string UserId { get; set; }
         public static string TaskId { get; set; }
         public static string Machine;
+        public static bool NoConsole = false;
 		public string Name { get; }
 
 		static Log()
@@ -89,6 +90,11 @@ namespace Java2Dotnet.Spider.JLog
 
 		public static void WriteLine(string message)
 		{
+            if(NoConsole)
+            {
+                return;    
+            }
+            
 			lock (WriteToConsoleLocker)
 			{				 
 				try

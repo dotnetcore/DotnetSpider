@@ -226,6 +226,13 @@ namespace Java2Dotnet.Spider.Extension
 								_logger.Info($"Execute command: rerun finished.");
 #endif
 							}
+                            
+                            if (args[0] == "noconsole")
+							{
+#if NET_CORE
+                                Log.NoConsole = true;
+#endif
+                            }
 						}
 
 						try
