@@ -67,7 +67,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 
 				var list = page.Selectable.SelectList(selector).Nodes();
-				if(list==null or list.Count == 0)
+				if(list==null || list.Count == 0)
 				{
 					return null;
 				}

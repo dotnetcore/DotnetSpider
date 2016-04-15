@@ -4,6 +4,9 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Common;
+#if NET_CORE
+using System.Runtime.InteropServices;
+#endif
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -20,8 +23,16 @@ namespace Java2Dotnet.Spider.Core
 		public CountableThreadPool(int threadNum = 5)
 		{
 			ThreadNum = threadNum;
+            
+#if !NET_CORE            
 			_cachedSize = ThreadNum * 2;
+#else
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				 _cachedSize = ThreadNum;
+			}
 
+#endif
 			_factory = new TaskFactory(new LimitedConcurrencyLevelTaskScheduler(ThreadNum));
 
 			Task.Factory.StartNew(() =>
@@ -60,7 +71,7 @@ namespace Java2Dotnet.Spider.Core
 					throw new SpiderExceptoin("Pool is exit.");
 				}
 
-				// ListÖÐ±£Áô±È×î´óÏß³ÌÊý¶à5¸ö
+				// Listï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½ï¿½5ï¿½ï¿½
 				while (_tasks.Count() > _cachedSize)
 				{
 					Thread.Sleep(10);
