@@ -120,7 +120,11 @@ namespace Java2Dotnet.Spider.Extension
 			string key = "locker-validate-" + Name;
 			try
 			{
+#if !NET_CORE                
 				Console.WriteLine($"Lock: {key} to keep only one validate process.");
+#else
+				Log.WriteLine($"Lock: {key} to keep only one validate process.");
+#endif
 				while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 				{
 					Thread.Sleep(1000);
@@ -131,8 +135,11 @@ namespace Java2Dotnet.Spider.Extension
 
 				if (needInitStartRequest)
 				{
+#if !NET_CORE
 					Console.WriteLine("Start validate ...");
-
+#else
+				    Log.WriteLine("Start validate ...");
+#endif
 					if (_validations != null && _validations.Count > 0)
 					{
 						MailBodyBuilder builder = new MailBodyBuilder(Name,
@@ -155,7 +162,12 @@ namespace Java2Dotnet.Spider.Extension
 				}
 				else
 				{
+#if !NET_CORE
 					Console.WriteLine("No need to validate on this process because other process did.");
+#else
+					Log.WriteLine("No need to validate on this process because other process did.");
+#endif                    
+
 				}
 
 				if (needInitStartRequest)
@@ -165,12 +177,21 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			catch (Exception e)
 			{
+#if !NET_CORE                
 				Console.WriteLine(e);
+#else
+				Log.WriteLine(e);
+#endif                
 				_logger.Error(e.Message, e);
 			}
 			finally
 			{
+#if !NET_CORE                
 				Console.WriteLine("Release locker.");
+#else
+				Log.WriteLine("Release locker.");
+#endif                   
+
 				redis.LockRelease(key, 0);
 			}
 		}

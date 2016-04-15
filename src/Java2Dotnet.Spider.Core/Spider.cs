@@ -540,6 +540,17 @@ namespace Java2Dotnet.Spider.Core
 		{
 			if (!_printedInfo)
 			{
+#if NET_CORE
+				Log.WriteLine("=============================================================");
+				Log.WriteLine("== DotnetSpider is an open source .Net spider              ==");
+				Log.WriteLine("== It's a light, stable, high performce spider             ==");
+				Log.WriteLine("== Support multi thread, ajax page, http                   ==");
+				Log.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
+				Log.WriteLine("== License: LGPL3.0                                        ==");
+				Log.WriteLine("== Version: 0.9.10                                         ==");
+				Log.WriteLine("== Author: zlzforever@163.com                              ==");
+				Log.WriteLine("=============================================================");
+#else
 				Console.WriteLine("=============================================================");
 				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
 				Console.WriteLine("== It's a light, stable, high performce spider             ==");
@@ -549,6 +560,7 @@ namespace Java2Dotnet.Spider.Core
 				Console.WriteLine("== Version: 0.9.10                                         ==");
 				Console.WriteLine("== Author: zlzforever@163.com                              ==");
 				Console.WriteLine("=============================================================");
+#endif
 				_printedInfo = true;
 			}
 		}
