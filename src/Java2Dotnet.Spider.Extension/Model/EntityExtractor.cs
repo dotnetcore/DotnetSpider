@@ -67,6 +67,10 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 
 				var list = page.Selectable.SelectList(selector).Nodes();
+				if(list==null or list.Count == 0)
+				{
+					return null;
+				}
 				var countToken = _entityDefine.SelectToken("$.Count");
 				if (countToken != null)
 				{
