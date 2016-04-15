@@ -451,7 +451,11 @@ namespace Java2Dotnet.Spider.Core
 						StartTime = DateTime.Now;
 					}
 
+#if NET_CORE
+					Log.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
+#else
 					Console.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
+#endif
 
 					_waitCount = 0;
 
@@ -472,7 +476,11 @@ namespace Java2Dotnet.Spider.Core
 							{
 								OnError(request1);
 								Logger.Error("Request " + request1.Url + " failed.", e);
+#if NET_CORE
+								Log.WriteLine("ERROR: " + e.ToString());
+#else
 								Console.WriteLine("ERROR: " + e.ToString());
+#endif
 							}
 							finally
 							{
@@ -512,7 +520,12 @@ namespace Java2Dotnet.Spider.Core
 			if (Stat == Status.Finished)
 			{
 				OnClose();
+
+#if NET_CORE
+				Log.WriteLine($"Spider {Identity} Finished.");
+#else
 				Console.WriteLine($"Spider {Identity} Finished.");
+#endif
 			}
 
 			if (Stat == Status.Stopped)
@@ -702,12 +715,16 @@ namespace Java2Dotnet.Spider.Core
 				{
 					pipeline.Process(page.ResultItems, this);
 				}
+
+#if NET_CORE
+				Log.WriteLine($"Request: {request.Url} Sucess.");
+#else
 				Console.WriteLine($"Request: {request.Url} Sucess.");
+#endif
 			}
 			else
 			{
 				var message = $"Request {request.Url} 's result count is zero.";
-				Console.WriteLine(message);
 				Logger.Warn(message);
 			}
 		}

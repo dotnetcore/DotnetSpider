@@ -11,7 +11,11 @@ using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
+#if !NET_CORE
 using System.Web;
+#else
+using System.Net;
+#endif
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
@@ -150,7 +154,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				int startIndex = tmp.IndexOf("__URLENCODE('");
 				int endIndex = tmp.IndexOf("')", startIndex);
 				string arg = tmp.Substring(startIndex + 13, endIndex - startIndex - 13);
-				PostBody = PostBody.Replace(tmp, HttpUtility.UrlEncode(datas[arg].ToString()));
+#if !NET_CORE
+				var value = HttpUtility.UrlEncode(datas[arg].ToString());
+#else
+				var value = WebUtility.UrlEncode(datas[arg].ToString());
+#endif
+				PostBody = PostBody.Replace(tmp, value);
 			}
 
 			// implement more rules

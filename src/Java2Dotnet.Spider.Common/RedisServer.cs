@@ -27,7 +27,6 @@ namespace RedisSharp
 
 		public RedisServer(string host, int port, string pass, int maxThreadNum = 10)
 		{
-			Console.WriteLine($"Redis Server: {host} {port}");
 			Host = host;
 			Port = port;
 			Password = pass;

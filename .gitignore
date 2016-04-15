@@ -16,7 +16,7 @@ nugetpack.sh
 *.userprefs
 [Oo]utput/
 [Ss]piders/
-
+[Pp]ackages/
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

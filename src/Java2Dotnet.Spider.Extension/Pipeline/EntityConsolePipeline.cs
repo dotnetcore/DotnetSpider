@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Core;
 using Newtonsoft.Json.Linq;
+#if NET_CORE
+using Java2Dotnet.Spider.JLog;
+#endif
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
@@ -23,7 +26,12 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		{
 			foreach (var data in datas)
 			{
-				Console.WriteLine(data);
+#if NET_CORE
+				Log.WriteLine(data.ToString());
+#else
+				Console.WriteLine(data.ToString());
+#endif
+
 			}
 		}
 	}

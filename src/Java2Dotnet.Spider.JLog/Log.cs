@@ -87,6 +87,20 @@ namespace Java2Dotnet.Spider.JLog
 			Error(message, null, showToConsole);
 		}
 
+		public static void WriteLine(string message)
+		{
+			lock (WriteToConsoleLocker)
+			{				 
+				try
+				{
+					Console.WriteLine(message);
+				}
+				catch
+				{
+				}
+			}
+		}
+		
 		private static void WriteToConsole(LogInfo log)
 		{
 			lock (WriteToConsoleLocker)
@@ -109,8 +123,8 @@ namespace Java2Dotnet.Spider.JLog
 							break;
 						}
 				}
-
-				Console.WriteLine(log.ToString());
+				
+				WriteLine(log.ToString());
 				Console.ForegroundColor = ConsoleColor.White;
 			}
 		}
