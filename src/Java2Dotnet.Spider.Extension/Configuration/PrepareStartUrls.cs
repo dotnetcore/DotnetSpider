@@ -147,6 +147,11 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		private string GetPostBody(Dictionary<string, object> datas)
 		{
+			if (string.IsNullOrEmpty(PostBody))
+			{
+				return null;
+			}
+
 			Regex regex = new Regex(@"__URLENCODE\('(\w|\d)+'\)");
 			foreach (Match match in regex.Matches(PostBody))
 			{
