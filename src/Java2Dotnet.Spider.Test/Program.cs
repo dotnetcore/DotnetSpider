@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using Java2Dotnet.Spider.Extension;
+using Java2Dotnet.Spider.JLog;
 using Java2Dotnet.Spider.Test.Example;
 using Java2Dotnet.Spider.Test.Pipeline;
 using Newtonsoft.Json;
@@ -14,11 +15,15 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
-			var context = spiderBuilder.GetContext();
-			string json = JsonConvert.SerializeObject(context);
-			ScriptSpider spider = new ScriptSpider(context);
-			spider.Run(args);
+			//JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			//var context = spiderBuilder.GetContext();
+			//string json = JsonConvert.SerializeObject(context);
+			//ScriptSpider spider = new ScriptSpider(context);
+			//spider.Run(args);
+            Log.NoConsole = true;
+            Log log = new Log("test");
+            log.Info("oooooooodata.com",true);
+            Console.Read();
 		}
 
 		static void Run(Action a, string type, string name)

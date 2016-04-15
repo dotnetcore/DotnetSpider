@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Net;
+using System.Net.Http;
 
 namespace Java2Dotnet.Spider.JLog
 {
@@ -30,12 +31,13 @@ namespace Java2Dotnet.Spider.JLog
         public static string Machine;
         public static bool NoConsole = false;
 		public string Name { get; }
+        private static string LogServer;
 
 		static Log()
 		{
             Machine = Dns.GetHostName();
 			LogFile = Path.Combine(AppContext.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
-            string mongodbConn=ConfigurationManager.Get("mongodbConn");
+            LogServer = ConfigurationManager.Get("logserver");
 		}
 
 		public Log(string name)
@@ -148,7 +150,12 @@ namespace Java2Dotnet.Spider.JLog
         }
         
 		private static void WriteToLogFile(LogInfo log)
-		{           
+		{   
+            if(NoConsole && !string.IsNullOrEmpty(LogServer))
+            {
+                HttpClient client = new HttpClient();
+                HttpResponseMessage response = client.PostAsync(LogServer, new StringContent($"{ \"Type\": \"{log.Type}\", \"Time\": \"{log.Time}\", \"Message\": \"{log.Message}\" }")).Result;
+            }        
 			lock (WriteToLogFileLocker)
 			{
 				File.AppendAllText(LogFile, log.ToString(),Encoding.UTF8);
