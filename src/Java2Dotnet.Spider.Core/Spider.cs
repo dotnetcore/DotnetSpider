@@ -351,7 +351,7 @@ namespace Java2Dotnet.Spider.Core
 						QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
 						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 10 }, request =>
 						{
-							Scheduler.Push((Request)request.Clone(), this);
+							scheduler.Push((Request)request.Clone(), this);
 						});
 						Scheduler.Load(scheduler.ToList(this), this);
 					}
