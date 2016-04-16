@@ -10,7 +10,10 @@ namespace Java2Dotnet.Spider.Core
 	/// Object contains url to crawl. 
 	/// It contains some additional information. 
 	/// </summary>
-	public class Request : IDisposable, ICloneable
+	public class Request : IDisposable
+#if !NET_CORE	
+	, ICloneable
+#endif
 	{
 		public const string CycleTriedTimes = "983009ae-baee-467b-92cd-44188da2b021";
 		public const string StatusCode = "02d71099-b897-49dd-a180-55345fe9abfc";

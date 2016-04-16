@@ -341,22 +341,21 @@ namespace Java2Dotnet.Spider.Core
 #endif
 					if (Scheduler is QueueDuplicateRemovedScheduler)
 					{
-						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 10 }, request =>
+						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
 						{
-							Scheduler.Push((Request)request.Clone(), this);
+							Scheduler.Push(request, this);
 						});
 					}
 					else
 					{
 						QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 10 }, request =>
+						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
 						{
-							scheduler.Push((Request)request.Clone(), this);
+							scheduler.Push(request, this);
 						});
 						Scheduler.Load(scheduler.ToList(this), this);
+						ClearStartRequests();
 					}
-
-					ClearStartRequests();
 
 #if NET_CORE
 				Logger.Info($"Push Request: {StartRequests.Count} to Scheduler success.", true);
@@ -414,7 +413,7 @@ namespace Java2Dotnet.Spider.Core
 			_runningExit = false;
 
 #if !NET_CORE
-			// ���뿪�����߳�����
+			// 开启多线程支持
 			System.Net.ServicePointManager.DefaultConnectionLimit = int.MaxValue;
 #endif
 			Logger.Info("Spider " + Identity + " InitComponent...");
@@ -511,7 +510,6 @@ namespace Java2Dotnet.Spider.Core
 			ThreadPool.WaitToExit();
 			FinishedTime = DateTime.Now;
 
-			// Pipeline���п����л�������, ��Ҫ����/���������ܰ�ȫ�˳�/��ͣ
 			foreach (IPipeline pipeline in Pipelines)
 			{
 				SafeDestroy(pipeline);
@@ -617,7 +615,6 @@ namespace Java2Dotnet.Spider.Core
 		{
 			lock (this)
 			{
-				//д���ļ���, �û������յĽ�������֪���ж��ٸ�Requestû����. �ṩReRun, Spider������������������Request�����ܹ�
 				FileInfo file = FilePersistentBase.PrepareFile(Path.Combine(DataRootDirectory, "ErrorRequests.txt"));
 				File.AppendAllText(file.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
 			}
@@ -636,7 +633,6 @@ namespace Java2Dotnet.Spider.Core
 			dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);
 			if (cycleTriedTimesObject == null)
 			{
-				// ���Լ��ӵ�Ŀ��Request��(�޷��������߳��ټ��ش�Request), �������̺߳�����TargetRequest�ӵ�Pool��
 				request.Priority = 0;
 				page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, 1));
 			}
@@ -646,7 +642,6 @@ namespace Java2Dotnet.Spider.Core
 				cycleTriedTimes++;
 				if (cycleTriedTimes >= site.CycleRetryTimes)
 				{
-					// �����������Դ���, ���ؿ�.
 					return null;
 				}
 				request.Priority = 0;
@@ -664,7 +659,6 @@ namespace Java2Dotnet.Spider.Core
 			{
 				try
 				{
-					// ����ҳ��
 					page = Downloader.Download(request, this);
 
 					if (page.IsSkip)
@@ -672,11 +666,8 @@ namespace Java2Dotnet.Spider.Core
 						return;
 					}
 
-					// ����Page����
 					CustomizePage?.Invoke(page);
 
-					// ����ҳ������
-					// PageProcess��2�ִ�����1 ���ص�HTML���� 2��ʵ�ֵ�IPageProcessor����
 					PageProcessor.Process(page);
 
 					break;
@@ -702,8 +693,6 @@ namespace Java2Dotnet.Spider.Core
 				return;
 			}
 
-			// for cycle retry, �������س���ʱ, ��������Request�ӻ�TargetUrls�����ظ����������Դ�ʱ��targetRequestsֻ�б���
-			// ������Ҫ���� MissTargetUrls������
 			if (page.IsNeedCycleRetry)
 			{
 				ExtractAndAddRequests(page, true);
@@ -722,7 +711,6 @@ namespace Java2Dotnet.Spider.Core
 				ExtractAndAddRequests(page, SpawnUrl);
 			}
 
-			// Pipeline�������������ݱ����ȹ���, �ǲ��������κβ�����, ��������,���ݴ�һ���϶�Ҳ��������, ����ֱ�ӹҵ�Spider�ȽϺá�
 			if (!page.ResultItems.IsSkip)
 			{
 				foreach (IPipeline pipeline in Pipelines)
