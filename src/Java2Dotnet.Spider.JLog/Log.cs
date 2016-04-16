@@ -43,7 +43,7 @@ namespace Java2Dotnet.Spider.JLog
             LogServer = ConfigurationManager.Get("logserver");
         }
 
-        public void WaitForExit()
+        public static void WaitForExit()
         {
             while (true)
             {
