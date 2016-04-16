@@ -339,7 +339,7 @@ namespace Java2Dotnet.Spider.Core
 #else
 					Logger.Info("Start push Request to queque...");
 #endif
-					if (Scheduler is QueueDuplicateRemovedScheduler)
+					if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 					{
 						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
 						{
