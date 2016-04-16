@@ -4,9 +4,11 @@ using System.Net.Http;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using Java2Dotnet.Spider.Extension;
-using Java2Dotnet.Spider.JLog;
 using Java2Dotnet.Spider.Test.Example;
 using Java2Dotnet.Spider.Test.Pipeline;
+#if NET_CORE
+using Java2Dotnet.Spider.JLog;
+#endif
 using Newtonsoft.Json;
 
 namespace Java2Dotnet.Spider.Test
@@ -20,9 +22,11 @@ namespace Java2Dotnet.Spider.Test
 			//string json = JsonConvert.SerializeObject(context);
 			//ScriptSpider spider = new ScriptSpider(context);
 			//spider.Run(args);
+#if NET_CORE			
             Log.NoConsole = true;
             Log log = new Log("test");
             log.Info("oooooooodata.com",true);
+#endif			
             Console.Read();
 		}
 
