@@ -8,7 +8,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	/// Basic Scheduler implementation. 
 	/// Store urls to fetch in LinkedBlockingQueue and remove duplicate urls by HashMap.
 	/// </summary>
-	public class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler, IMonitorableScheduler
+	public sealed class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler, IMonitorableScheduler
 	{
 		private Queue<Request> _queue = new Queue<Request>();
 

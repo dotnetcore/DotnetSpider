@@ -14,7 +14,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 	/// <summary>
 	/// Use Redis as url scheduler for distributed crawlers.
 	/// </summary>
-	public class RedisScheduler : DuplicateRemovedScheduler, IMonitorableScheduler, IDuplicateRemover
+	public sealed class RedisScheduler : DuplicateRemovedScheduler, IMonitorableScheduler, IDuplicateRemover
 	{
 		public static readonly string QueuePrefix = "queue-";
 		public static readonly string TaskStatus = "task-status";
@@ -136,7 +136,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 				string json = null;
 
-				//redis ÓÐ¿ÉÄÜÈ¡Êý¾ÝÊ§°Ü
+				//redis ï¿½Ð¿ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½
 				for (int i = 0; i < 10 && string.IsNullOrEmpty(json = Redis.HashGet(hashId, field)); ++i)
 				{
 					Thread.Sleep(150);
@@ -149,8 +149,8 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 					return result;
 				}
 
-				// ÑÏ¸ñÒâÒåÉÏËµ²»»á×ßµ½ÕâÀï, Ò»¶¨»áÓÐJSONÊý¾Ý,ÏêÇé¿´Push·½·¨
-				// ÊÇ·ñÓ¦¸ÃÉèÎª1¼¶£¿
+				// ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ßµï¿½ï¿½ï¿½ï¿½ï¿½, Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½JSONï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½é¿´Pushï¿½ï¿½ï¿½ï¿½
+				// ï¿½Ç·ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Îª1ï¿½ï¿½ï¿½ï¿½
 
 				return null;
 			});
