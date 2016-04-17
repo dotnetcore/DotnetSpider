@@ -26,8 +26,9 @@ namespace Java2Dotnet.Spider.Test
             Log.NoConsole = true;
             Log log = new Log("test");
             log.Info("oooooooodata.com",true);
+			Log.WaitForExit();
+			Console.WriteLine("OK");
 #endif			
-            Console.Read();
 		}
 
 		static void Run(Action a, string type, string name)

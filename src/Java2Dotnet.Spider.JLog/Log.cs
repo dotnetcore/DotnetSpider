@@ -166,19 +166,21 @@ namespace Java2Dotnet.Spider.JLog
 
         private static void WriteToLogFile(LogInfo log)
         {
-            if (NoConsole && !string.IsNullOrEmpty(LogServer))
+            if (!string.IsNullOrEmpty(LogServer))
             {
                 HttpClient client = new HttpClient();
                 StringBuilder builder = new StringBuilder("{ \"Type\": \"");
                 builder.Append(log.Type).Append("\", \"Time\": \"").Append(log.Time).Append("\", \"Message\": \"").Append(log.Message);
                 builder.Append("\", \"Machine\": \"").Append(log.Machine);
-                builder.Append("\", \"UserId\": \"").Append(string.IsNullOrEmpty(log.UserId)?"UNKONW":log.UserId);
+                builder.Append("\", \"UserId\": \"").Append(string.IsNullOrEmpty(log.UserId)?"DotnetSpider":log.UserId);
                 builder.Append("\", \"TaskId\": \"").Append(string.IsNullOrEmpty(log.TaskId)?"UNKONW":log.TaskId);
                 builder.Append("\" }");
                 
                 var task = client.PostAsync(LogServer, new StringContent(builder.ToString().Replace("\n","\\n").Replace("\t","\\t").Replace("\r","\\r")));
                 LogUpLoadTasks.Add(task);
-                task.ContinueWith((t)=>{ LogUpLoadTasks.Remove(t);});               
+                task.ContinueWith((t)=>{
+                     LogUpLoadTasks.Remove(t);
+                });               
             }
             lock (WriteToLogFileLocker)
             {
