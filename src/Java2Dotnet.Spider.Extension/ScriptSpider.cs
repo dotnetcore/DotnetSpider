@@ -251,6 +251,7 @@ namespace Java2Dotnet.Spider.Extension
                             if (args[0] == "noconsole")
 							{
 #if NET_CORE
+								Log.WriteLine("No console log info.");
                                 Log.NoConsole = true;
 #endif
                             }

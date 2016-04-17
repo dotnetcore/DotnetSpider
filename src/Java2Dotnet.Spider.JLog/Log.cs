@@ -126,8 +126,13 @@ namespace Java2Dotnet.Spider.JLog
 
         private static void WriteToConsole(LogInfo log)
         {
-            lock (WriteToConsoleLocker)
+            if (NoConsole)
             {
+                return;
+            }
+            
+            lock (WriteToConsoleLocker)
+            {                
                 switch (log.Type)
                 {
                     case "ERROR":
