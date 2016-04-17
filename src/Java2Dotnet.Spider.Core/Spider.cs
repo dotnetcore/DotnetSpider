@@ -678,8 +678,7 @@ namespace Java2Dotnet.Spider.Core
 					{
 						page = AddToCycleRetry(request, Site);
 					}
-
-					Logger.Warn("Download page " + request.Url + " failed:" + e.Message);
+					Logger.Warn("Download or parse page " + request.Url + " failed:" + e);
 					break;
 				}
 			}
