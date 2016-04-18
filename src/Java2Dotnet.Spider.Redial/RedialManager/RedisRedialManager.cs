@@ -19,7 +19,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		public string RedisHost { get; set; }
 		public override IAtomicExecutor AtomicExecutor { get; }
 
-		private string HostName { get; }
+		private string HostName { get; } = Dns.GetHostName();
 		private string Password { get; }
 
 		public const string Locker = "redial-locker";

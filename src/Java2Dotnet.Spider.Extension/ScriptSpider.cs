@@ -279,9 +279,14 @@ namespace Java2Dotnet.Spider.Extension
 
 							var spider = GenerateSpider(scheduler);
 
+							Console.WriteLine("Creat spider finished.");
+							
 							spider.SaveStatusToRedis = true;
 							SpiderMonitor.Default.Register(spider);
+							
+							Console.WriteLine("Start init component...");
 							spider.InitComponent();
+							Console.WriteLine("Init component finished.");
 
 							if (needInitStartRequest)
 							{
