@@ -66,7 +66,7 @@ namespace Java2Dotnet.Spider.Extension
 			if (_spiderContext.Redialer != null)
 			{
 				//RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
-				RedialManagerUtils.RedialManager = RedisRedialManager.Create(ConfigurationManager.Get("redisHost"));
+				RedialManagerUtils.RedialManager = new RedisRedialManager();
 
 				RedialManagerUtils.RedialManager.NetworkValidater = GetNetworValidater(_spiderContext.NetworkValidater);
 				RedialManagerUtils.RedialManager.Redialer = _spiderContext.Redialer.GetRedialer();
@@ -115,7 +115,7 @@ namespace Java2Dotnet.Spider.Extension
 			string key = "locker-validate-" + Name;
 			try
 			{
-#if !NET_CORE                
+#if !NET_CORE
 				Console.WriteLine($"Lock: {key} to keep only one validate process.");
 #else
 				Log.WriteLine($"Lock: {key} to keep only one validate process.");
@@ -161,7 +161,7 @@ namespace Java2Dotnet.Spider.Extension
 					Console.WriteLine("No need to validate on this process because other process did.");
 #else
 					Log.WriteLine("No need to validate on this process because other process did.");
-#endif                    
+#endif
 
 				}
 
@@ -172,20 +172,20 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			catch (Exception e)
 			{
-#if !NET_CORE                
+#if !NET_CORE
 				Console.WriteLine(e);
 #else
 				Log.WriteLine(e.ToString());
-#endif                
+#endif
 				_logger.Error(e.Message, e);
 			}
 			finally
 			{
-#if !NET_CORE                
+#if !NET_CORE
 				Console.WriteLine("Release locker.");
 #else
 				Log.WriteLine("Release locker.");
-#endif                   
+#endif
 
 				redis.LockRelease(key, 0);
 			}
@@ -242,14 +242,14 @@ namespace Java2Dotnet.Spider.Extension
 								_logger.Info($"Execute command: rerun finished.");
 #endif
 							}
-                            
-                            if (args[0] == "noconsole")
+
+							if (args[0] == "noconsole")
 							{
 #if NET_CORE
 								Log.WriteLine("No console log info.");
                                 Log.NoConsole = true;
 #endif
-                            }
+							}
 						}
 
 						try

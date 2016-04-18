@@ -19,11 +19,13 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		public string RedisHost { get; set; }
 		public override IAtomicExecutor AtomicExecutor { get; }
 
-		private string HostName { get; } = Dns.GetHostName();
+		private string HostName { get; }
+		private string Password { get; }
+
 		public const string Locker = "redial-locker";
 		public RedisServer Redis { get; }
 
-		private RedisRedialManager(string host)
+		public RedisRedialManager(string host, string password)
 		{
 			if (!string.IsNullOrEmpty(host))
 			{
@@ -34,14 +36,31 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				RedisHost = "localhost";
 			}
 
-			Redis = new RedisServer(Common.ConfigurationManager.Get("redisHost"), 6379, Common.ConfigurationManager.Get("redisPassword"));
+			if (!string.IsNullOrEmpty(password))
+			{
+				Password = password;
+			}
+			else
+			{
+				Password = null;
+			}
+			Redis = new RedisServer(host, 6379, password);
 			Redis.Db = 3;
 			AtomicExecutor = new RedisAtomicExecutor(this);
 		}
 
+		public RedisRedialManager() : this(Common.ConfigurationManager.Get("redialRedisHost"), Common.ConfigurationManager.Get("redialRedisPassword"))
+		{
+		}
+
 		public static RedisRedialManager Create(string host)
 		{
-			return new RedisRedialManager(host);
+			return new RedisRedialManager(host, null);
+		}
+
+		public static RedisRedialManager Create(string host, string password)
+		{
+			return new RedisRedialManager(host, password);
 		}
 
 		public override void WaitforRedialFinish()
