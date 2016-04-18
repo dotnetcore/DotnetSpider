@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using log4net;
+using Java2Dotnet.Spider.JLog;
 
 namespace Java2Dotnet.Spider.Core.Proxy
 {
@@ -11,7 +11,8 @@ namespace Java2Dotnet.Spider.Core.Proxy
 	{
 		// TODO 改为单例
 		private static IPAddress _localAddr;
-		private static readonly ILog Logger = LogManager.GetLogger(typeof(ProxyUtil));
+		//private static readonly ILog Logger = LogManager.GetLogger(typeof(ProxyUtil));
+		protected static readonly ILog Logger = LogManager.GetLogger();
 
 		static ProxyUtil()
 		{
@@ -60,7 +61,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 				socket.ReceiveTimeout = 3000;
 				socket.Connect(address, p.Port);
 
-				Logger.Debug("SUCCESS - connection established! Local: " + _localAddr + " remote: " + p);
+				Logger.Info("SUCCESS - connection established! Local: " + _localAddr + " remote: " + p);
 				isReachable = true;
 			}
 			catch (IOException)

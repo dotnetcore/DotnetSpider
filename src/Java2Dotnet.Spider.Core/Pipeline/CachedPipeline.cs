@@ -1,12 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-
-#if NET_CORE
 using Java2Dotnet.Spider.JLog;
-#else
-using log4net;
-#endif
 
 namespace Java2Dotnet.Spider.Core.Pipeline
 {
@@ -20,7 +15,8 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 #if NET_CORE
 		protected static readonly ILog Logger = LogManager.GetLogger();
 #else
-		protected static readonly ILog Logger = LogManager.GetLogger(typeof(CachedPipeline));
+		protected static readonly ILog Logger = LogManager.GetLogger();
+		//protected static readonly ILog Logger = LogManager.GetLogger(typeof(CachedPipeline));
 #endif
 
 		public int CachedSize { get; set; } = 1;

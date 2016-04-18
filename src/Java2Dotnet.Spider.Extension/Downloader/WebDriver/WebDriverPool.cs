@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core;
-using log4net;
+using Java2Dotnet.Spider.JLog;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
@@ -16,8 +16,8 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 {
 	public class WebDriverPool
 	{
-		private readonly ILog _logger = LogManager.GetLogger(typeof(WebDriverPool));
-
+		//private readonly ILog _logger = LogManager.GetLogger(typeof(WebDriverPool));
+		protected static readonly ILog _logger = LogManager.GetLogger();
 		private static int DEFAULT_CAPACITY = 5;
 
 		private readonly int _capacity;

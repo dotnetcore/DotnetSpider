@@ -1,11 +1,7 @@
 ﻿using System;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
-#if !NET_CORE
-using log4net;
-#else
 using Java2Dotnet.Spider.JLog;
-#endif
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {
@@ -15,7 +11,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		public int ThreadNum { set; get; }
 
 #if !NET_CORE
-		protected static readonly ILog Logger = LogManager.GetLogger(typeof(BaseDownloader));
+		//protected static readonly ILog Logger = LogManager.GetLogger(typeof(BaseDownloader));
+		protected static readonly ILog Logger = LogManager.GetLogger();
 #else
 		protected static readonly ILog Logger = LogManager.GetLogger();
 #endif

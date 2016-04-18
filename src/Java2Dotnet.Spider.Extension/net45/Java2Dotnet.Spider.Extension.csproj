@@ -36,10 +36,6 @@
       <HintPath>..\..\..\packages\HtmlAgilityPack.1.4.9\lib\Net45\HtmlAgilityPack.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="MongoDB.Bson, Version=2.2.3.3, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\MongoDB.Bson.2.2.3\lib\net45\MongoDB.Bson.dll</HintPath>
       <Private>True</Private>
@@ -357,6 +353,10 @@
     <ProjectReference Include="..\..\Java2Dotnet.Spider.Core\net45\Java2Dotnet.Spider.Core.csproj">
       <Project>{28dadca2-9053-4222-a813-a73dd0fe7f2f}</Project>
       <Name>Java2Dotnet.Spider.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Java2Dotnet.Spider.JLog\net45\Java2Dotnet.Spider.JLog.csproj">
+      <Project>{acda398b-a5f3-4cae-bdca-fb172736919c}</Project>
+      <Name>Java2Dotnet.Spider.JLog</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Java2Dotnet.Spider.Redial\net45\Java2Dotnet.Spider.Redial.csproj">
       <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>

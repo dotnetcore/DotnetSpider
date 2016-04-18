@@ -19,13 +19,7 @@ using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.Redialer;
 using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
-
-#if !NET_CORE
-using log4net;
-#else
 using Java2Dotnet.Spider.JLog;
-#endif
-
 using Newtonsoft.Json.Linq;
 using RedisSharp;
 using DefaultNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.DefaultNetworkValidater;
@@ -38,7 +32,8 @@ namespace Java2Dotnet.Spider.Extension
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
 #if !NET_CORE
-		private readonly ILog _logger = LogManager.GetLogger(typeof(ScriptSpider));
+		//private readonly ILog _logger = LogManager.GetLogger(typeof(ScriptSpider));
+		protected static readonly ILog _logger = LogManager.GetLogger();
 #else
 		private readonly ILog _logger = LogManager.GetLogger();
 #endif

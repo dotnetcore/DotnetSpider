@@ -8,12 +8,7 @@ using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Core.Utils;
 using Java2Dotnet.Spider.Extension.Scheduler;
-#if !NET_CORE
-using log4net;
-#else
 using Java2Dotnet.Spider.JLog;
-#endif
-
 using Newtonsoft.Json;
 using RedisSharp;
  
@@ -63,7 +58,8 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 		public class MonitorSpiderListener : ISpiderStatus
 		{
 #if !NET_CORE
-			protected static readonly ILog Logger = LogManager.GetLogger(typeof(MonitorSpiderListener));
+			//protected static readonly ILog Logger = LogManager.GetLogger(typeof(MonitorSpiderListener));
+			protected static readonly ILog Logger = LogManager.GetLogger();
 #else
 			protected static readonly ILog Logger = LogManager.GetLogger();
 #endif

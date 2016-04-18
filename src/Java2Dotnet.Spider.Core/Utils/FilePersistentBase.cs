@@ -1,11 +1,7 @@
 ﻿using System.IO;
 using Java2Dotnet.Spider.Core.Downloader;
 using System;
-#if !NET_CORE
-using log4net;
-#else
 using Java2Dotnet.Spider.JLog;
-#endif
 
 namespace Java2Dotnet.Spider.Core.Utils
 {
@@ -17,7 +13,8 @@ namespace Java2Dotnet.Spider.Core.Utils
 		public DownloadValidation DownloadValidation { get; set; }
 
 #if !NET_CORE
-		protected readonly ILog Logger = LogManager.GetLogger(typeof(FilePersistentBase));
+		//protected readonly ILog Logger = LogManager.GetLogger(typeof(FilePersistentBase));
+		protected static readonly ILog Logger = LogManager.GetLogger();
 #else
 		protected readonly ILog Logger = LogManager.GetLogger();
 #endif

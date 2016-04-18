@@ -8,13 +8,14 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using Java2Dotnet.Spider.Common;
-using log4net;
+using Java2Dotnet.Spider.JLog;
 
 namespace Java2Dotnet.Spider.Core.Proxy
 {
 	public class ProxyPool
 	{
-		private static readonly ILog Logger = LogManager.GetLogger(typeof(ProxyPool));
+		//private static readonly ILog Logger = LogManager.GetLogger(typeof(ProxyPool));
+		protected static readonly ILog Logger = LogManager.GetLogger();
 
 		private readonly ConcurrentQueue<Proxy> _proxyQueue = new ConcurrentQueue<Proxy>();
 		private readonly ConcurrentDictionary<string, Proxy> _allProxy = new ConcurrentDictionary<string, Proxy>();
@@ -66,7 +67,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			}
 			catch (IOException e)
 			{
-				Logger.Error(e);
+				Logger.Error(e.ToString());
 			}
 		}
 
@@ -97,7 +98,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			}
 			catch (IOException e)
 			{
-				Logger.Error(e);
+				Logger.Error(e.ToString());
 			}
 		}
 
@@ -309,11 +310,11 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			}
 			catch (FileNotFoundException e)
 			{
-				Logger.Error(e);
+				Logger.Error(e.ToString());
 			}
 			catch (IOException e)
 			{
-				Logger.Error(e);
+				Logger.Error(e.ToString());
 			}
 			return proxyList;
 		}

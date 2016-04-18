@@ -17,10 +17,7 @@
  */
 using System;
 using System.Collections.Concurrent;
-using System.Threading;  
-#if !NET_CORE
-using log4net;
-#endif   
+using System.Threading;   
 using System.Text;
 using System.Collections.Generic;
     

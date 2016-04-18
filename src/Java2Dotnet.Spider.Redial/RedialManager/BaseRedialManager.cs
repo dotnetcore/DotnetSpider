@@ -1,21 +1,17 @@
 ﻿using System.Threading;
-
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.Redialer;
-
-#if !NET_CORE
-using log4net;
-#else
 using Java2Dotnet.Spider.JLog;
-#endif
+
 
 namespace Java2Dotnet.Spider.Redial.RedialManager
 {
 	public abstract class BaseRedialManager : IRedialManager
 	{
 #if !NET_CORE
-		protected static readonly ILog Logger = LogManager.GetLogger(typeof(BaseRedialManager));
+		//protected static readonly ILog Logger = LogManager.GetLogger(typeof(BaseRedialManager));
+		protected static readonly ILog Logger = LogManager.GetLogger();
 #else
 		protected static readonly ILog Logger = LogManager.GetLogger();
 #endif

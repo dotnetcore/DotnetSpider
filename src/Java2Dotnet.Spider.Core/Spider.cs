@@ -15,11 +15,7 @@ using Java2Dotnet.Spider.Core.Proxy;
 using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Core.Scheduler.Component;
 using Java2Dotnet.Spider.Core.Utils;
-#if !NET_CORE
-using log4net;
-#else
 using Java2Dotnet.Spider.JLog;
-#endif
 
 using Newtonsoft.Json;
 
@@ -32,7 +28,8 @@ namespace Java2Dotnet.Spider.Core
 	{
 
 #if !NET_CORE
-		protected static readonly ILog Logger = LogManager.GetLogger(typeof(Spider));
+		//protected static readonly ILog Logger = LogManager.GetLogger(typeof(Spider));
+		protected static readonly ILog Logger = LogManager.GetLogger();
 #else
 		protected static readonly ILog Logger = LogManager.GetLogger();
 #endif

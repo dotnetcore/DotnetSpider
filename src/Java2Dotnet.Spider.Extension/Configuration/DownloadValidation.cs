@@ -25,7 +25,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override DownloadValidationResult Validate(Page page)
 		{
 			string rawText = page.Content;
-			if(string.IsNulOrEmpty(rawText))
+			if(string.IsNullOrEmpty(rawText))
 			{
 				throw new SpiderExceptoin("Download failed or response is null.");
 			}

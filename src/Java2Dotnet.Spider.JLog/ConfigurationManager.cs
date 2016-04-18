@@ -10,9 +10,13 @@ namespace Java2Dotnet.Spider.JLog
 		static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
 
 		static ConfigurationManager()
-		{            
+		{
+#if NET_CORE
             string configPath= Path.Combine(AppContext.BaseDirectory,"app.conf");
-			if (File.Exists(configPath))
+#else
+            string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.conf");
+#endif
+            if (File.Exists(configPath))
 			{
 				string[] lines = File.ReadAllLines(configPath);
 				foreach (var line in lines)

@@ -3,10 +3,10 @@ using System;
 using Java2Dotnet.Spider.Core.Scheduler.Component;
 using Java2Dotnet.Spider.Redial;
 using System.Collections.Generic;
-#if !NET_CORE
-using log4net;
-#else
 using Java2Dotnet.Spider.JLog;
+#if !NET_CORE
+#else
+
 using System.Runtime.CompilerServices;
 #endif
 
@@ -18,7 +18,8 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	public abstract class DuplicateRemovedScheduler : IScheduler
 	{
 #if !NET_CORE
-		protected static readonly ILog Logger = LogManager.GetLogger(typeof(DuplicateRemovedScheduler));
+		//protected static readonly ILog Logger = LogManager.GetLogger(typeof(DuplicateRemovedScheduler));
+		protected static readonly ILog Logger = LogManager.GetLogger();
 #else
 		protected static readonly ILog Logger = LogManager.GetLogger();
 #endif

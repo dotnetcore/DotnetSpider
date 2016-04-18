@@ -7,17 +7,11 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Java2Dotnet.Spider.Core;
 using Newtonsoft.Json.Linq;
-
+using Java2Dotnet.Spider.JLog; 
 using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Utils;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
-#if !NET_CORE
-using log4net;
-//using Dapper;
-#else
-using Java2Dotnet.Spider.JLog; 
-#endif
 using PropertyAttributes = System.Reflection.PropertyAttributes;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
@@ -25,7 +19,8 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	public abstract class EntityGeneralPipeline : IEntityPipeline
 	{
 #if !NET_CORE
-		protected static ILog Logger = LogManager.GetLogger(typeof(EntityGeneralPipeline));
+		//protected static ILog Logger = LogManager.GetLogger(typeof(EntityGeneralPipeline));
+		protected static readonly ILog Logger = LogManager.GetLogger();
 #else
 		protected static ILog Logger = LogManager.GetLogger();
 #endif

@@ -1,20 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HtmlAgilityPack;
-
-
-#if !NET_CORE
-using log4net;
-#else
 using Java2Dotnet.Spider.JLog;
-#endif
 
 namespace Java2Dotnet.Spider.Core.Selector
 {
 	public abstract class BaseSelectable : ISelectable
 	{
 #if !NET_CORE
-		protected static readonly ILog Logger = LogManager.GetLogger("BaseSelectable");
+		//protected static readonly ILog Logger = LogManager.GetLogger("BaseSelectable");
+		protected static readonly ILog Logger = LogManager.GetLogger();
 #else
 		protected static readonly ILog Logger = LogManager.GetLogger();
 #endif

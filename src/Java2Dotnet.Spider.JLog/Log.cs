@@ -8,189 +8,196 @@ using System.Threading;
 
 namespace Java2Dotnet.Spider.JLog
 {
-    internal class LogInfo
-    {
-        public string Type { get; set; }
-        public string Time { get; set; }
-        public string Message { get; set; }
-        public string Machine = Log.Machine;
-        public string UserId = Log.UserId;
-        public string TaskId = Log.TaskId;
+	internal class LogInfo
+	{
+		public string Type { get; set; }
+		public string Time { get; set; }
+		public string Message { get; set; }
+		public string Machine = Log.Machine;
+		public string UserId = Log.UserId;
+		public string TaskId = Log.TaskId;
 
-        public override string ToString()
-        {
-            return $"[{Type}] {Time} {Machine}-{UserId}-{TaskId} {Message}";
-        }
-    }
+		public override string ToString()
+		{
+			return $"[{Type}] {Time} {Machine}-{UserId}-{TaskId} {Message}";
+		}
+	}
 
-    public class Log : ILog
-    {
-        private static readonly object WriteToConsoleLocker = new object();
-        private static readonly object WriteToLogFileLocker = new object();
-        private static readonly string LogFile;
-        public static string UserId { get; set; }
-        public static string TaskId { get; set; }
-        public static string Machine;
-        public static bool NoConsole = false;
-        public string Name { get; }
-        private static string LogServer;
-        private static SynchronizedList<Task<HttpResponseMessage>> LogUpLoadTasks = new SynchronizedList<Task<HttpResponseMessage>>();
-
-        static Log()
-        {
-            Machine = Dns.GetHostName();
+	public class Log : ILog
+	{
+		private static readonly object WriteToConsoleLocker = new object();
+		private static readonly object WriteToLogFileLocker = new object();
+		private static readonly string LogFile;
+		public static string UserId { get; set; }
+		public static string TaskId { get; set; }
+		public static string Machine;
+		public static bool NoConsole = false;
+		public string Name { get; }
+		private static string LogServer;
+		private static SynchronizedList<Task<HttpResponseMessage>> LogUpLoadTasks = new SynchronizedList<Task<HttpResponseMessage>>();
+		private static StreamWriter Writter;
+		static Log()
+		{
+			Machine = Dns.GetHostName();
+#if NET_CORE
             LogFile = Path.Combine(AppContext.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
-            LogServer = ConfigurationManager.Get("logserver");
-        }
+#else
+			LogFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
+#endif
+			Writter = File.AppendText(LogFile);
+			LogServer = ConfigurationManager.Get("logserver");
+		}
 
-        public static void WaitForExit()
-        {
-            while (true)
-            {
-                if(LogUpLoadTasks.Count() ==0)
-                {
-                    break;
-                }
-                Thread.Sleep(500);
-            }
-        }
-        
-        public Log(string name)
-        {
-            Name = name;
-        }
+		public static void WaitForExit()
+		{
+			while (true)
+			{
+				if (LogUpLoadTasks.Count() == 0)
+				{
+					break;
+				}
+				Thread.Sleep(500);
+			}
+		}
 
-        public void Warn(string message, Exception e, bool showToConsole)
-        {
-            var log = CreateLogInfo("WARNING", message, e);
-            WriteToLogFile(log);
-            if (showToConsole)
-            {
-                WriteToConsole(log);
-            }
-        }
+		public Log(string name)
+		{
+			Name = name;
+		}
 
-        public void Warn(string message, bool showToConsole)
-        {
-            Warn(message, null, showToConsole);
-        }
+		public void Warn(string message, Exception e, bool showToConsole)
+		{
+			var log = CreateLogInfo("WARNING", message, e);
+			WriteToLogFile(log);
+			if (showToConsole)
+			{
+				WriteToConsole(log);
+			}
+		}
 
-        public void Info(string message, Exception e, bool showToConsole)
-        {
-            var log = CreateLogInfo("INFO", message, e);
-            WriteToLogFile(log);
-            if (showToConsole)
-            {
-                WriteToConsole(log);
-            }
-        }
+		public void Warn(string message, bool showToConsole)
+		{
+			Warn(message, null, showToConsole);
+		}
 
-        public void Info(string message, bool showToConsole)
-        {
-            Info(message, null, showToConsole);
-        }
+		public void Info(string message, Exception e, bool showToConsole)
+		{
+			var log = CreateLogInfo("INFO", message, e);
+			WriteToLogFile(log);
+			if (showToConsole)
+			{
+				WriteToConsole(log);
+			}
+		}
 
-        public void Error(string message, Exception e, bool showToConsole)
-        {
-            var log = CreateLogInfo("ERROR", message, e);
-            WriteToLogFile(log);
-            if (showToConsole)
-            {
-                WriteToConsole(log);
-            }
-        }
+		public void Info(string message, bool showToConsole)
+		{
+			Info(message, null, showToConsole);
+		}
 
-        public void Error(string message, bool showToConsole)
-        {
-            Error(message, null, showToConsole);
-        }
+		public void Error(string message, Exception e, bool showToConsole)
+		{
+			var log = CreateLogInfo("ERROR", message, e);
+			WriteToLogFile(log);
+			if (showToConsole)
+			{
+				WriteToConsole(log);
+			}
+		}
 
-        public static void WriteLine(string message)
-        {
-            if (NoConsole)
-            {
-                return;
-            }
+		public void Error(string message, bool showToConsole)
+		{
+			Error(message, null, showToConsole);
+		}
 
-            lock (WriteToConsoleLocker)
-            {
-                try
-                {
-                    Console.WriteLine(message);
-                }
-                catch
-                {
-                }
-            }
-        }
+		public static void WriteLine(string message)
+		{
+			if (NoConsole)
+			{
+				return;
+			}
 
-        private static void WriteToConsole(LogInfo log)
-        {
-            if (NoConsole)
-            {
-                return;
-            }
-            
-            lock (WriteToConsoleLocker)
-            {                
-                switch (log.Type)
-                {
-                    case "ERROR":
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            break;
-                        }
-                    case "INFO":
-                        {
-                            Console.ForegroundColor = ConsoleColor.Magenta;
-                            break;
-                        }
-                    case "WARNING":
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            break;
-                        }
-                }
+			lock (WriteToConsoleLocker)
+			{
+				try
+				{
+					Console.WriteLine(message);
+				}
+				catch
+				{
+				}
+			}
+		}
 
-                WriteLine(log.ToString());
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-        }
+		private static void WriteToConsole(LogInfo log)
+		{
+			if (NoConsole)
+			{
+				return;
+			}
 
-        private LogInfo CreateLogInfo(string type, string message, Exception e)
-        {
-            string time = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-            var log = new LogInfo()
-            {
-                Type = type,
-                Time = time,
-                Message = message + Environment.NewLine + e
-            };
-            return log;
-        }
+			lock (WriteToConsoleLocker)
+			{
+				switch (log.Type)
+				{
+					case "ERROR":
+						{
+							Console.ForegroundColor = ConsoleColor.Red;
+							break;
+						}
+					case "INFO":
+						{
+							Console.ForegroundColor = ConsoleColor.Magenta;
+							break;
+						}
+					case "WARNING":
+						{
+							Console.ForegroundColor = ConsoleColor.Yellow;
+							break;
+						}
+				}
 
-        private static void WriteToLogFile(LogInfo log)
-        {
-            if (!string.IsNullOrEmpty(LogServer))
-            {
-                HttpClient client = new HttpClient();
-                StringBuilder builder = new StringBuilder("{ \"Type\": \"");
-                builder.Append(log.Type).Append("\", \"Time\": \"").Append(log.Time).Append("\", \"Message\": \"").Append(log.Message);
-                builder.Append("\", \"Machine\": \"").Append(log.Machine);
-                builder.Append("\", \"UserId\": \"").Append(string.IsNullOrEmpty(log.UserId)?"DotnetSpider":log.UserId);
-                builder.Append("\", \"TaskId\": \"").Append(string.IsNullOrEmpty(log.TaskId)?"UNKONW":log.TaskId);
-                builder.Append("\" }");
-                
-                var task = client.PostAsync(LogServer, new StringContent(builder.ToString().Replace("\n","\\n").Replace("\t","\\t").Replace("\r","\\r")));
-                LogUpLoadTasks.Add(task);
-                task.ContinueWith((t)=>{
-                     LogUpLoadTasks.Remove(t);
-                });               
-            }
-            lock (WriteToLogFileLocker)
-            {
-                File.AppendAllText(LogFile, log.ToString(), Encoding.UTF8);
-            }
-        }
-    }
+				WriteLine(log.ToString());
+				Console.ForegroundColor = ConsoleColor.White;
+			}
+		}
+
+		private LogInfo CreateLogInfo(string type, string message, Exception e)
+		{
+			string time = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+			var log = new LogInfo()
+			{
+				Type = type,
+				Time = time,
+				Message = message + Environment.NewLine + e
+			};
+			return log;
+		}
+
+		private static void WriteToLogFile(LogInfo log)
+		{
+			if (!string.IsNullOrEmpty(LogServer))
+			{
+				HttpClient client = new HttpClient();
+				StringBuilder builder = new StringBuilder("{ \"Type\": \"");
+				builder.Append(log.Type).Append("\", \"Time\": \"").Append(log.Time).Append("\", \"Message\": \"").Append(log.Message);
+				builder.Append("\", \"Machine\": \"").Append(log.Machine);
+				builder.Append("\", \"UserId\": \"").Append(string.IsNullOrEmpty(log.UserId) ? "DotnetSpider" : log.UserId);
+				builder.Append("\", \"TaskId\": \"").Append(string.IsNullOrEmpty(log.TaskId) ? "UNKONW" : log.TaskId);
+				builder.Append("\" }");
+
+				var task = client.PostAsync(LogServer, new StringContent(builder.ToString().Replace("\n", "\\n").Replace("\t", "\\t").Replace("\r", "\\r")));
+				LogUpLoadTasks.Add(task);
+				task.ContinueWith((t) =>
+				{
+					LogUpLoadTasks.Remove(t);
+				});
+			}
+
+			lock (WriteToLogFileLocker)
+			{
+				Writter.WriteLine(log.ToString(), Encoding.UTF8);
+			}
+		}
+	}
 }
