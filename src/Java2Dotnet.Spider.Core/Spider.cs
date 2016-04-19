@@ -42,7 +42,7 @@ namespace Java2Dotnet.Spider.Core
 		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		public Site Site { get; set; }
 		public Action<Page> CustomizePage;
-		public bool SaveStatusToRedis { get; set; }
+		public bool SaveStatus { get; set; }
 		public string Identity { get; }
 		public bool ShowConsoleStatus { get; set; } = true;
 		public List<IPipeline> Pipelines { get; private set; } = new List<IPipeline>();

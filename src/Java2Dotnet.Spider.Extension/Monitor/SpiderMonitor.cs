@@ -11,7 +11,9 @@ using Java2Dotnet.Spider.Extension.Scheduler;
 using Java2Dotnet.Spider.JLog;
 using Newtonsoft.Json;
 using RedisSharp;
- 
+using System.Net.Http;
+using System.Text;
+using System.Net;
 
 namespace Java2Dotnet.Spider.Extension.Monitor
 {
@@ -67,66 +69,92 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			private readonly AutomicLong _errorCount = new AutomicLong(0);
 			private readonly List<string> _errorUrls = new List<string>();
 			private readonly Core.Spider _spider;
+			private static SynchronizedList<Task<HttpResponseMessage>> StatusUpLoadTasks = new SynchronizedList<Task<HttpResponseMessage>>();
+			private static string StatusServer;
+
+
+			static MonitorSpiderListener()
+			{
+				StatusServer = ConfigurationManager.Get("statusHost");
+			}
 
 			public MonitorSpiderListener(Core.Spider spider)
 			{
 				_spider = spider;
 
-				if (spider.SaveStatusToRedis)
+				if (spider.SaveStatus && !string.IsNullOrEmpty(StatusServer))
 				{
 					Task.Factory.StartNew(() =>
 					{
-#if !NET_CORE
-						RedisScheduler scheduler = spider.Scheduler as RedisScheduler;
-						if (scheduler != null)
+						while (true)
 						{
-							var redis = scheduler.Redis;
- 
-							while (true)
+							try
 							{
-								try
+								if (Closed)
 								{
-									if (Closed)
-									{
-										UpdateStatus(redis);
-										break;
-									}
-
-									UpdateStatus(redis);
-								}
-								catch (Exception)
-								{
-									// ignored
+									UpdateStatus();
+									break;
 								}
 
-								Thread.Sleep(3000);
+								UpdateStatus();
 							}
+							catch (Exception)
+							{
+								// ignored
+							}
+
+							Thread.Sleep(5000);
 						}
-#endif
 					});
 				}
 			}
-#if !NET_CORE
-			private void UpdateStatus(RedisServer redis)
+
+			public void UpdateStatus()
 			{
 				var status = new
 				{
+					Message = new
+					{
+						ErrorPageCount,
+						LeftPageCount,
+						PagePerSecond,
+						StartTime,
+						EndTime,
+						Status,
+						SuccessPageCount,
+						ThreadCount,
+						TotalPageCount,
+						AliveThreadCount
+					},
 					Name,
-					ErrorPageCount,
-					LeftPageCount,
-					PagePerSecond,
-					StartTime,
-					EndTime,
-					Status,
-					SuccessPageCount,
-					ThreadCount,
-					TotalPageCount,
-					AliveThreadCount
+					Machine = Log.Machine,
+					UserId = Log.UserId,
+					TaskId = Log.TaskId
 				};
-				redis.HashSet(RedisScheduler.TaskStatus, _spider.Identity, JsonConvert.SerializeObject(status));
+
+
+				HttpClient client = new HttpClient();
+
+				var task = client.PostAsync(StatusServer, new StringContent(JsonConvert.SerializeObject(status), Encoding.UTF8, "application/json"));
+				StatusUpLoadTasks.Add(task);
+				task.ContinueWith((t) =>
+				{
+					StatusUpLoadTasks.Remove(t);
+				});
 			}
 
-#endif
+			public static void WaitForExit()
+			{
+				while (true)
+				{
+					if (StatusUpLoadTasks.Count() == 0)
+					{
+						break;
+					}
+					Thread.Sleep(500);
+				}
+			}
+
 			public void OnSuccess(Request request)
 			{
 				_successCount.Inc();

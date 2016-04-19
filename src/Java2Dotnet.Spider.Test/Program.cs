@@ -21,11 +21,52 @@ namespace Java2Dotnet.Spider.Test
 			//ScriptSpider spider = new ScriptSpider(context);
 			//spider.Run(args);
 
-			Log.NoConsole = true;
-			Log log = new Log("test");
-			log.Info("oooooooodata.com", true);
-			Log.WaitForExit();
+			TestStatusServer();
 			Console.WriteLine("OK");
+		}
+
+		private static void TestStatusServer()
+		{
+			Log.UserId = "86Research-DotnetSpider-log";
+			Log.TaskId = "test status";
+
+			var ErrorPageCount = 10;
+			var LeftPageCount = 10;
+			var PagePerSecond = 10;
+			var StartTime = new DateTime(2016, 4, 19);
+			var EndTime = DateTime.Now;
+			var Status = "running";
+			var SuccessPageCount = 100;
+			var ThreadCount = 5;
+			var TotalPageCount = 1000;
+			var AliveThreadCount = 5;
+			var Name = Log.TaskId + DateTime.Now.ToString("yyyy-MM-dd");
+
+			var status = new
+			{
+				Message = new
+				{
+					ErrorPageCount,
+					LeftPageCount,
+					PagePerSecond,
+					StartTime,
+					EndTime,
+					Status,
+					SuccessPageCount,
+					ThreadCount,
+					TotalPageCount,
+					AliveThreadCount
+				},
+				Name,
+				Machine = Log.Machine,
+				UserId = Log.UserId,
+				TaskId = Log.TaskId
+			};
+
+			HttpClient client = new HttpClient();
+
+			var task = client.PostAsync("http://localhost:62823/api/status/uploadstatus", new StringContent(JsonConvert.SerializeObject(status), Encoding.UTF8, "application/json"));
+			var r = task.Result;
 		}
 
 		static void Run(Action a, string type, string name)

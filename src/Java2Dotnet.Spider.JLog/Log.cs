@@ -33,9 +33,10 @@ namespace Java2Dotnet.Spider.JLog
 		public static string Machine;
 		public static bool NoConsole = false;
 		public string Name { get; }
-		private static string LogServer;
+		public static string LogServer;
 		private static SynchronizedList<Task<HttpResponseMessage>> LogUpLoadTasks = new SynchronizedList<Task<HttpResponseMessage>>();
 		private static StreamWriter Writter;
+
 		static Log()
 		{
 			Machine = Dns.GetHostName();
@@ -45,7 +46,7 @@ namespace Java2Dotnet.Spider.JLog
 			LogFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
 #endif
 			Writter = File.AppendText(LogFile);
-			LogServer = ConfigurationManager.Get("logserver");
+			LogServer = ConfigurationManager.Get("logHost");
 		}
 
 		public static void WaitForExit()

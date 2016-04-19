@@ -24,6 +24,7 @@ using Newtonsoft.Json.Linq;
 using RedisSharp;
 using DefaultNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.DefaultNetworkValidater;
 using VpsNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.VpsNetworkValidater;
+using static Java2Dotnet.Spider.Extension.Monitor.SpiderMonitor;
 
 namespace Java2Dotnet.Spider.Extension
 {
@@ -95,6 +96,7 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			finally
 			{
+				MonitorSpiderListener.WaitForExit();
 				spider?.Dispose();
 			}
 		}
@@ -281,7 +283,7 @@ namespace Java2Dotnet.Spider.Extension
 
 							Console.WriteLine("Creat spider finished.");
 							
-							spider.SaveStatusToRedis = true;
+							spider.SaveStatus = true;
 							SpiderMonitor.Default.Register(spider);
 							
 							Console.WriteLine("Start init component...");
