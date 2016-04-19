@@ -186,7 +186,7 @@ namespace Java2Dotnet.Spider.JLog
 				builder.Append("\", \"TaskId\": \"").Append(string.IsNullOrEmpty(log.TaskId) ? "UNKONW" : log.TaskId);
 				builder.Append("\" }");
 
-				var task = client.PostAsync(LogServer, new StringContent(builder.ToString().Replace("\n", "\\n").Replace("\t", "\\t").Replace("\r", "\\r")));
+				var task = client.PostAsync(LogServer, new StringContent(builder.ToString().Replace("\n", "\\n").Replace("\t", "\\t").Replace("\r", "\\r"), Encoding.UTF8, "application/json"));
 				LogUpLoadTasks.Add(task);
 				task.ContinueWith((t) =>
 				{
