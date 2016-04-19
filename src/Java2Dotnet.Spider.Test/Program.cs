@@ -28,7 +28,7 @@ namespace Java2Dotnet.Spider.Test
 		private static void TestStatusServer()
 		{
 			Log.UserId = "86Research-DotnetSpider-log";
-			Log.TaskId = "test status";
+			Log.TaskId = "Tmall Gmv Monthly";
 
 			var ErrorPageCount = 10;
 			var LeftPageCount = 10;
