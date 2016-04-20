@@ -129,6 +129,9 @@
     <Compile Include="..\Configuration\SpiderContextValidation.cs">
       <Link>Configuration\SpiderContextValidation.cs</Link>
     </Compile>
+    <Compile Include="..\ContextSpider.cs">
+      <Link>ContextSpider.cs</Link>
+    </Compile>
     <Compile Include="..\Downloader\FiddlerDownloader.cs">
       <Link>Downloader\FiddlerDownloader.cs</Link>
     </Compile>
@@ -156,8 +159,8 @@
     <Compile Include="..\Environment.cs">
       <Link>Environment.cs</Link>
     </Compile>
-    <Compile Include="..\ITask.cs">
-      <Link>ITask.cs</Link>
+    <Compile Include="..\ISpiderContext.cs">
+      <Link>ISpiderContext.cs</Link>
     </Compile>
     <Compile Include="..\Model\AfterExtractor.cs">
       <Link>Model\AfterExtractor.cs</Link>
@@ -324,8 +327,8 @@
     <Compile Include="..\Scheduler\SpiderStatus.cs">
       <Link>Scheduler\SpiderStatus.cs</Link>
     </Compile>
-    <Compile Include="..\ScriptSpider.cs">
-      <Link>ScriptSpider.cs</Link>
+    <Compile Include="..\SpiderContextBuilder.cs">
+      <Link>SpiderContextBuilder.cs</Link>
     </Compile>
     <Compile Include="..\Utils\CommonLoginUtil.cs">
       <Link>Utils\CommonLoginUtil.cs</Link>

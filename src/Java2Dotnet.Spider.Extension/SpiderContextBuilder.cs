@@ -13,28 +13,35 @@ using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Extension
 {
-	public abstract class SpiderContextBuilder : ISpiderContext
+	public class SpiderContextBuilder
 	{
-		private SpiderContext _context;
+		public SpiderContext Context { get; }
 
-		protected abstract SpiderContext CreateSpiderContext();
+		protected HashSet<Type> EntiTypes { get; }
 
-		protected abstract HashSet<Type> EntiTypes { get; }
-
-		public SpiderContext GetContext()
+		public SpiderContextBuilder(SpiderContext context, List<Type> entiTypes)
 		{
-			_context = CreateSpiderContext();
-			if (_context == null)
+			if (context == null)
 			{
 				throw new SpiderExceptoin("SpiderContext is null.");
 			}
-			Build();
-			return _context;
+
+			if (entiTypes == null || entiTypes.Count == 0)
+			{
+				throw new SpiderExceptoin("EntiTypes is null.");
+			}
+			Context = context;
+
+			Build(entiTypes);
 		}
 
-		protected void Build()
+		public SpiderContextBuilder(SpiderContext context, params Type[] entiTypes) : this(context, entiTypes.ToList())
 		{
-			foreach (var entiType in EntiTypes)
+		}
+
+		protected void Build(List<Type> entiTypes)
+		{
+			foreach (var entiType in entiTypes)
 			{
 				if (typeof(ISpiderEntity).IsAssignableFrom(entiType))
 				{
@@ -53,8 +60,8 @@ namespace Java2Dotnet.Spider.Extension
 #else
 				JObject entity = JsonConvert.DeserializeObject(ConvertToJson(entiType.GetTypeInfo())) as JObject;
 #endif
-				_context.Entities.Add(entity);
-				_context.EnviromentValues = entiType.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new EnviromentValue
+				Context.Entities.Add(entity);
+				Context.EnviromentValues = entiType.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new EnviromentValue
 				{
 					Name = e.Name,
 					Selector = new Selector
@@ -65,9 +72,9 @@ namespace Java2Dotnet.Spider.Extension
 				}).ToList();
 			}
 
-			foreach (var url in _context.StartUrls)
+			foreach (var url in Context.StartUrls)
 			{
-				_context.Site.AddStartUrl(url.Key, url.Value);
+				Context.Site.AddStartUrl(url.Key, url.Value);
 			}
 		}
 
@@ -225,7 +232,7 @@ namespace Java2Dotnet.Spider.Extension
 		}
 	}
 
-	public class EntityType
+	internal class EntityType
 	{
 		public List<TargetUrl> TargetUrls { get; set; } = new List<TargetUrl>();
 		public bool Multi { get; set; }
@@ -240,17 +247,12 @@ namespace Java2Dotnet.Spider.Extension
 		public Stopping Stopping { get; set; }
 	}
 
-	public class Field
+	internal class Field
 	{
 		public string DataType { get; set; }
 		public Selector Selector { get; set; }
 		public bool Multi => false;
 		public string Name { get; set; }
 		public List<Formatter> Formatters { get; set; } = new List<Formatter>();
-	}
-
-	public interface ISpiderContext
-	{
-		SpiderContext GetContext();
 	}
 }

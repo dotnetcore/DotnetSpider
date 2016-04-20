@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Java2Dotnet.Spider.Core.Proxy;
-using Newtonsoft.Json;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -17,13 +15,19 @@ namespace Java2Dotnet.Spider.Core
 		private ProxyPool _httpProxyPool = new ProxyPool();
 #endif
 		private string _domain;
-		private Encoding _encoding = System.Text.Encoding.UTF8;
+		private Encoding _encoding = Encoding.UTF8;
+		private string _encodingName = "UTF-8";
 
 		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 
 		public ContentType ContentType { get; set; } = ContentType.Html;
 
 		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
+
+		public Site()
+		{
+			EncodingName = "UTF-8";
+		}
 
 		/// <summary>
 		/// User agent
@@ -59,13 +63,27 @@ namespace Java2Dotnet.Spider.Core
 		/// Set charset of page manually. 
 		/// When charset is not set or set to null, it can be auto detected by Http header.
 		/// </summary>
-		public string EncodingName { get; set; } = "UTF-8";
+		public string EncodingName
+		{
+			get
+			{
+				return _encodingName;
+			}
+			set
+			{
+				if (_encodingName != value)
+				{
+					_encodingName = value;
+					_encoding = Encoding.GetEncoding(_encodingName);
+				}
+			}
+		}
 
 		internal Encoding Encoding
 		{
 			get
 			{
-				return Encoding.GetEncoding(EncodingName);
+				return _encoding;
 			}
 		}
 

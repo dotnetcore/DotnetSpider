@@ -28,7 +28,7 @@ using static Java2Dotnet.Spider.Extension.Monitor.SpiderMonitor;
 
 namespace Java2Dotnet.Spider.Extension
 {
-	public class ScriptSpider
+	public class ContextSpider
 	{
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
@@ -45,7 +45,7 @@ namespace Java2Dotnet.Spider.Extension
 		private RedisServer redis;
 		public string Name { get; }
 
-		public ScriptSpider(SpiderContext spiderContext)
+		public ContextSpider(SpiderContext spiderContext)
 		{
 			_spiderContext = spiderContext;
 

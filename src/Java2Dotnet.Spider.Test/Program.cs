@@ -15,11 +15,10 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			//JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
-			//var context = spiderBuilder.GetContext();
-			//string json = JsonConvert.SerializeObject(context);
-			//ScriptSpider spider = new ScriptSpider(context);
-			//spider.Run(args);
+			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			var context = spiderBuilder.GetBuilder().Context;
+			ContextSpider spider = new ContextSpider(context);
+			spider.Run(args);
 
 			TestStatusServer();
 			Console.WriteLine("OK");

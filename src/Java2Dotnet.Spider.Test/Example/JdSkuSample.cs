@@ -12,11 +12,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Test.Example
 {
-	public class JdSkuSampleSpider : SpiderContextBuilder
+	public class JdSkuSampleSpider : ISpiderContext
 	{
-		protected override SpiderContext CreateSpiderContext()
+		public SpiderContextBuilder GetBuilder()
 		{
-			return new SpiderContext
+			return new SpiderContextBuilder(new SpiderContext
 			{
 				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd"),
 				CachedSize = 1,
@@ -41,10 +41,8 @@ namespace Java2Dotnet.Spider.Test.Example
 				{
 					ConnectString = "Database='mysql';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
 				}
-			};
+			}, typeof(Product));
 		}
-
-		protected override HashSet<Type> EntiTypes => new HashSet<Type>() { typeof(Product) };
 
 		[Schema("test", "sku", TableSuffix.Today)]
 		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
