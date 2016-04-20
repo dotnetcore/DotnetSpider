@@ -52,7 +52,15 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 
-				HttpClient httpClient = new HttpClient(new MyHttpMessageHandler(proxy));
+				HttpClient httpClient = new HttpClient(new HttpClientHandler()
+				{
+					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+#if !NET_CORE
+					Proxy = proxy == null ? null : new WebProxy(proxy.Host, proxy.Port),
+#endif
+					AllowAutoRedirect = true,
+					UseCookies = string.IsNullOrEmpty(site.Cookie)
+				});
 
 				response = RedialManagerUtils.Execute("downloader-download", (m) =>
 				{
@@ -270,36 +278,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 		}
 
-		private byte[] GetContentBytes(HttpResponseMessage response)
-		{
-			Stream stream = null;
-			bool isGizp = false;
-
-
-			//isGizp = response.Headers.GetValues("ContentEncoding").Contains("gzip");
-
-			////GZIIP处理  
-			//if (isGizp)
-			//{
-			//开始读取流并设置编码方式
-			//	var tempStream = response.Content.ReadAsStreamAsync().Result;
-			//	if (tempStream != null) stream = new GZipStream(tempStream, CompressionMode.Decompress);
-			//}
-			//else
-			{
-				//开始读取流并设置编码方式  
-				stream = response.Content.ReadAsStreamAsync().Result;
-			}
-
-			MemoryStream resultStream = new MemoryStream();
-			if (stream != null)
-			{
-				stream.CopyTo(resultStream);
-				return resultStream.StreamToBytes();
-			}
-			return null;
-		}
-
 		private Encoding GetHtmlCharset(byte[] contentBytes)
 		{
 			//// charset
@@ -352,18 +330,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			{
 				return Encoding.UTF8;
 			}
-		}
-	}
-
-	internal class MyHttpMessageHandler : HttpClientHandler
-	{
-		public MyHttpMessageHandler(HttpHost proxy = null, bool useCookies = true)
-		{
-			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-#if !NET_CORE
-			Proxy = proxy == null ? null : new WebProxy(proxy.Host, proxy.Port);
-#endif
-			UseCookies = useCookies;
 		}
 	}
 }
