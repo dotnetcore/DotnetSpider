@@ -12,6 +12,7 @@ using Java2Dotnet.Spider.Core.Downloader;
 using System.Threading.Tasks;
 using System.Threading;
 using Java2Dotnet.Spider.Core;
+using System.Collections.Generic;
 
 namespace Java2Dotnet.Spider.Test
 {
@@ -23,18 +24,33 @@ namespace Java2Dotnet.Spider.Test
 			//var context = spiderBuilder.GetBuilder().Context;
 			//ContextSpider spider = new ContextSpider(context);
 			//spider.Run(args);
+			System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
 			CountableThreadPool pool = new CountableThreadPool(1);
-			for (int i = 0; i < 100; ++i)
+			DateTime t1 = DateTime.Now;
+			List<Task> list = new List<Task>();
+			TaskFactory f = new TaskFactory();
+			for (int i = 0; i < 50; ++i)
 			{
-				pool.Push(o =>
+				list.Add(f.StartNew(o =>
 				{
 					HttpClient client = new HttpClient();
-					var str = client.GetStringAsync("http://www.baidu.com").Result;
+					string str = client.GetStringAsync("http://www.baidu.com").Result;
 					Console.WriteLine(o);
-				}, i);
-
+				}, i));
 			}
+			//pool.WaitToExit();
+			DateTime t2 = DateTime.Now;
+			double s1 = (t2 - t1).TotalSeconds;
+			DateTime t3 = DateTime.Now;
+			for (int i = 0; i < 50; ++i)
+			{
 
+				HttpClient client = new HttpClient();
+				var str = client.GetStringAsync("http://www.baidu.com").Result;
+				Console.WriteLine(i);
+			}
+			DateTime t4 = DateTime.Now;
+			double s2 = (t4 - t3).TotalSeconds;
 			while (true)
 			{
 				Thread.Sleep(10);

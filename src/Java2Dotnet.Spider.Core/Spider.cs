@@ -73,7 +73,6 @@ namespace Java2Dotnet.Spider.Core
 		private bool _runningExit;
 		private static readonly Regex IdentifyRegex = new Regex(@"^[\{\}\d\w\s-/]+$");
 		private static bool _printedInfo;
-		private bool _waitingToExit;
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -412,97 +411,87 @@ namespace Java2Dotnet.Spider.Core
 
 #if !NET_CORE
 			// 开启多线程支持
-			System.Net.ServicePointManager.DefaultConnectionLimit = int.MaxValue;
+			System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
 			Logger.Info("Spider " + Identity + " InitComponent...");
 			InitComponent();
 
 			Logger.Info("Spider " + Identity + " Started!");
 
-			bool firstTask = false;
 
 			IMonitorableScheduler monitor = (IMonitorableScheduler)Scheduler;
 
-			while (Stat == Status.Running)
+			if (StartTime == DateTime.MinValue)
 			{
-				Request request = Scheduler.Poll(this);
-
-				if (request == null)
-				{
-					if (ThreadPool.ThreadAlive == 0)
-					{
-						if (_waitCount > _waitCountLimit && IsExitWhenComplete)
-						{
-							Stat = Status.Finished;
-							break;
-						}
-					}
-
-					// wait until new url added
-					WaitNewUrl();
-				}
-				else
-				{
-					if (StartTime == DateTime.MinValue)
-					{
-						StartTime = DateTime.Now;
-					}
-
-#if NET_CORE
-					Log.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
-#else
-					Console.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
-#endif
-
-					_waitCount = 0;
-
-					ThreadPool.Push(obj =>
-					{
-						var request1 = obj as Request;
-						if (request1 != null)
-						{
-							try
-							{
-								ProcessRequest(request1);
-
-								Thread.Sleep(Site.SleepTime);
-
-								OnSuccess(request1);
-							}
-							catch (Exception e)
-							{
-								OnError(request1);
-								Logger.Error("Request " + request1.Url + " failed.", e);
-#if NET_CORE
-								Log.WriteLine("ERROR: " + e.ToString());
-#else
-								Console.WriteLine("ERROR: " + e.ToString());
-#endif
-							}
-							finally
-							{
-#if !NET_CORE
-								if (Site.HttpProxyPoolEnable && request1.GetExtra(Request.Proxy) != null)
-								{
-									Site.ReturnHttpProxyToPool((HttpHost)request1.GetExtra(Request.Proxy), (int)request1.GetExtra(Request.StatusCode));
-								}
-#endif
-								FinishedPageCount.Inc();
-							}
-						}
-					}, request);
-
-					if (!firstTask)
-					{
-						Thread.Sleep(3000);
-						firstTask = true;
-					}
-				}
+				StartTime = DateTime.Now;
 			}
 
-			_waitingToExit = true;
+			Parallel.For(0, ThreadNum, new ParallelOptions
+			{
+				MaxDegreeOfParallelism = ThreadNum
+			}, i =>
+			{
+				int waitCount = 0;
+				bool firstTask = false;
 
-			ThreadPool.WaitToExit();
+				while (Stat == Status.Running)
+				{
+					Request request = Scheduler.Poll(this);
+
+					if (request == null)
+					{
+						if (ThreadPool.ThreadAlive == 0)
+						{
+							if (waitCount > _waitCountLimit && IsExitWhenComplete)
+							{
+								Stat = Status.Finished;
+								break;
+							}
+						}
+
+							// wait until new url added
+							WaitNewUrl(ref waitCount);
+					}
+					else
+					{
+#if !NET_CORE
+							Console.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
+#endif
+							waitCount = 0;
+
+						try
+						{
+							ProcessRequest(request);
+
+							Thread.Sleep(Site.SleepTime);
+
+							OnSuccess(request);
+						}
+						catch (Exception e)
+						{
+							OnError(request);
+							Logger.Error("Request " + request.Url + " failed.", e);
+						}
+						finally
+						{
+#if !NET_CORE
+								if (Site.HttpProxyPoolEnable && request.GetExtra(Request.Proxy) != null)
+							{
+								Site.ReturnHttpProxyToPool((HttpHost)request.GetExtra(Request.Proxy), (int)request.GetExtra(Request.StatusCode));
+							}
+#endif
+								FinishedPageCount.Inc();
+						}
+
+						if (!firstTask)
+						{
+							Thread.Sleep(3000);
+							firstTask = true;
+						}
+					}
+				}
+			});
+
 			FinishedTime = DateTime.Now;
 
 			foreach (IPipeline pipeline in Pipelines)
@@ -514,20 +503,16 @@ namespace Java2Dotnet.Spider.Core
 			{
 				OnClose();
 
-#if NET_CORE
-				Log.WriteLine($"Spider {Identity} Finished.");
-#else
-				Console.WriteLine($"Spider {Identity} Finished.");
-#endif
+				Logger.Info($"Spider {Identity} Finished.");
 			}
 
 			if (Stat == Status.Stopped)
 			{
 				Logger.Info("Spider " + Identity + " stop success!");
 			}
-#if NET_CORE
-            Log.WaitForExit();
-#endif
+
+			Log.WaitForExit();
+
 			_runningExit = true;
 		}
 
@@ -840,6 +825,12 @@ namespace Java2Dotnet.Spider.Core
 		private void AddStartRequest(Request request)
 		{
 			Scheduler.Push(request, this);
+		}
+
+		private void WaitNewUrl(ref int waitCount)
+		{
+			Thread.Sleep(WaitInterval);
+			++waitCount;
 		}
 
 		private void WaitNewUrl()

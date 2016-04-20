@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -15,20 +15,37 @@ namespace Java2Dotnet.Spider.Core
 	/// </summary>
 	public class CountableThreadPool
 	{
+		private readonly SynchronizedList<Task> _tasks = new SynchronizedList<Task>();
+		private readonly int _cachedSize;
 		private bool _exit;
-		private AtomicInteger _threadCount = new AtomicInteger(0);
 
 		public CountableThreadPool(int threadNum = 5)
 		{
 			ThreadNum = threadNum;
+
+			Task.Factory.StartNew(() =>
+			{
+				while (true)
+				{
+					if (_exit)
+					{
+						break;
+					}
+
+					var finishedTasks = _tasks.Where(t => t.IsCompleted).ToList();
+					foreach (var finishedTask in finishedTasks)
+					{
+						_tasks.Remove(finishedTask);
+					}
+
+					Thread.Sleep(10);
+				}
+			});
 		}
 
 		public int ThreadAlive
 		{
-			get
-			{
-				return _threadCount.Value;
-			}
+			get { return _tasks.Where(t => t.Status == TaskStatus.Running).Count; }
 		}
 
 		public int ThreadNum { get; }
@@ -39,20 +56,16 @@ namespace Java2Dotnet.Spider.Core
 			{
 				if (_exit)
 				{
-					throw new SpiderExceptoin("Pool already exit.");
+					throw new SpiderExceptoin("Pool is exit.");
 				}
 
-				while (ThreadAlive >= ThreadNum)
+				while (_tasks.Count() > _cachedSize)
 				{
-					Thread.Sleep(100);
+					Thread.Sleep(10);
 				}
 
-				_threadCount.Inc();
-				ThreadPool.QueueUserWorkItem(new WaitCallback((o) =>
-				{
-					func(o);
-					_threadCount.Dec();
-				}), obj);
+				Task task = Task.Factory.StartNew((o) => { func(o); }, obj);
+				_tasks.Add(task);
 			}
 		}
 
@@ -60,10 +73,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			lock (this)
 			{
-				while (ThreadAlive > 0)
-				{
-					Thread.Sleep(500);
-				}
+				Task.WaitAll(_tasks.GetAll().ToArray());
 				_exit = true;
 			}
 		}
