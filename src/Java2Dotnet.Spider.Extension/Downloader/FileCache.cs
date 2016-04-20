@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -125,6 +126,11 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 
 		public void Dispose()
 		{
+		}
+
+		public IDownloader Clone()
+		{
+			return (IDownloader)MemberwiseClone();
 		}
 	}
 }

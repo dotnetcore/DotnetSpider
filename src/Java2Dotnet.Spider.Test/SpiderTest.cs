@@ -136,6 +136,11 @@ namespace Java2Dotnet.Spider.Test
 			}
 
 			public int ThreadNum { get; set; }
+
+			public IDownloader Clone()
+			{
+				return (IDownloader)MemberwiseClone();
+			}
 		}
 	}
 }

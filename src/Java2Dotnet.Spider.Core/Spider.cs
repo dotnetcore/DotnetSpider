@@ -433,6 +433,8 @@ namespace Java2Dotnet.Spider.Core
 				int waitCount = 0;
 				bool firstTask = false;
 
+				var downloader = Downloader.Clone();
+
 				while (Stat == Status.Running)
 				{
 					Request request = Scheduler.Poll(this);
@@ -457,10 +459,8 @@ namespace Java2Dotnet.Spider.Core
 
 						try
 						{
-							ProcessRequest(request);
-
+							ProcessRequest(request, downloader);
 							Thread.Sleep(Site.SleepTime);
-
 #if DEBUG
 							System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 							sw.Reset();
@@ -637,7 +637,7 @@ namespace Java2Dotnet.Spider.Core
 			return page;
 		}
 
-		protected void ProcessRequest(Request request)
+		protected void ProcessRequest(Request request,IDownloader downloader)
 		{
 			Page page = null;
 #if DEBUG
@@ -651,7 +651,7 @@ namespace Java2Dotnet.Spider.Core
 					sw.Reset();
 					sw.Start();
 #endif
-					page = Downloader.Download(request, this);
+					page = downloader.Download(request, this);
 
 #if DEBUG
 					sw.Stop();

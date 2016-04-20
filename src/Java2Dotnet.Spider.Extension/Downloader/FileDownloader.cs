@@ -23,5 +23,10 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 		}
 
 		public int ThreadNum { get; set; }
+
+		public IDownloader Clone()
+		{
+			return (IDownloader)MemberwiseClone();
+		}
 	}
 }

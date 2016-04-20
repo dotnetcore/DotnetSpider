@@ -25,6 +25,20 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		public Action<Site, Request> GeneratePostBody;
 		public bool DecodeContentAsUrl;
 
+#if !NET_CORE
+		private HttpClient httpClient = new HttpClient(new HttpClientHandler()
+		{
+			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+		})
+		{
+		};
+#else
+		HttpClient httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler()
+		{
+			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip
+		}));
+#endif
+
 		public override Page Download(Request request, ISpider spider)
 		{
 			if (spider.Site == null)
@@ -52,29 +66,11 @@ namespace Java2Dotnet.Spider.Core.Downloader
 					});
 				}
 
-
 				var httpMessage = GenerateHttpRequestMessage(request, site);
-#if !NET_CORE
-				HttpClient httpClient = new HttpClient(new HttpClientHandler()
-				{
-					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-
-					Proxy = proxy == null ? null : new WebProxy(proxy.Host, proxy.Port),
-					UseCookies = string.IsNullOrEmpty(site.Cookie)
-				});
-#else
-				HttpClient httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler()
-				{
-					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-					AllowAutoRedirect = true,
-					UseCookies = string.IsNullOrEmpty(site.Cookie)
-				}));
-#endif
 
 				response = RedialManagerUtils.Execute("downloader-download", (m) =>
 				{
 					var message = (HttpRequestMessage)m;
-					httpClient.Timeout = new TimeSpan(0, 0, site.Timeout);
 					return httpClient.SendAsync(message).Result;
 				}, httpMessage);
 

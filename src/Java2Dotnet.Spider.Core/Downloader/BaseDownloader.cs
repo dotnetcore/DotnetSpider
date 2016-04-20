@@ -77,5 +77,10 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				}
 			}
 		}
+
+		public virtual IDownloader Clone()
+		{
+			return (IDownloader)MemberwiseClone();
+		}
 	}
 }
