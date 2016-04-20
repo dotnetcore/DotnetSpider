@@ -111,7 +111,7 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public string Identity => "1";
 
-		public Site Site => null;
+		public Site Site => new Site { EncodingName = "UTF-8" };
 		public void Start()
 		{
 		}

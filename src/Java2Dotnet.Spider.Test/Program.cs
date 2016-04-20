@@ -8,6 +8,7 @@ using Java2Dotnet.Spider.Test.Example;
 using Java2Dotnet.Spider.Test.Pipeline;
 using Java2Dotnet.Spider.JLog;
 using Newtonsoft.Json;
+using Java2Dotnet.Spider.Core.Downloader;
 
 namespace Java2Dotnet.Spider.Test
 {
@@ -15,12 +16,15 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
-			var context = spiderBuilder.GetBuilder().Context;
-			ContextSpider spider = new ContextSpider(context);
-			spider.Run(args);
+			//JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			//var context = spiderBuilder.GetBuilder().Context;
+			//ContextSpider spider = new ContextSpider(context);
+			//spider.Run(args);
 
-			TestStatusServer();
+
+			//TestStatusServer();
+			HttpClientDownloader downloader = new HttpClientDownloader();
+			downloader.Download(new Core.Request("https://top.etao.com/index.php?topId=TR_M&leafId=50013618", 0, null), new TestSpider());
 			Console.WriteLine("OK");
 		}
 
