@@ -21,7 +21,6 @@ namespace Java2Dotnet.Spider.Core
 		public CountableThreadPool(int threadNum = 5)
 		{
 			ThreadNum = threadNum;
-			ThreadPool.SetMaxThreads(ThreadNum, ThreadNum);
 		}
 
 		public int ThreadAlive
