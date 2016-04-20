@@ -25,16 +25,16 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		public List<JObject> Entities { get; set; } = new List<JObject>();
 		public string Corporation { get; set; }
 		public string ValidationReportTo { get; set; }
-		public JObject CustomizePage { get; set; }
-		public JObject CustomizeTargetUrls { get; set; }
+		public JObject PageHandler { get; set; }
+		public JObject TargetUrlsHandler { get; set; }
 
 		public SpiderContext ToRuntimeContext()
 		{
 			SpiderContext context = new SpiderContext();
 			context.CachedSize = CachedSize;
 			context.Corporation = Corporation;
-			context.CustomizePage = GetCustomziePage(CustomizePage);
-			context.CustomizeTargetUrls = GetCustomizeTargetUrls(CustomizeTargetUrls);
+			context.PageHandler = GetCustomziePage(PageHandler);
+			context.TargetUrlsHandler = GetCustomizeTargetUrls(TargetUrlsHandler);
 			context.Deep = Deep;
 			context.Downloader = GetDownloader(Downloader);
 			context.EmptySleepTime = EmptySleepTime;
@@ -314,37 +314,37 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			return downloader;
 		}
 
-		private CustomizeTargetUrls GetCustomizeTargetUrls(JObject jobject)
+		private TargetUrlsHandler GetCustomizeTargetUrls(JObject jobject)
 		{
 			if (jobject == null)
 			{
 				return null;
 			}
-			var customizeTargetUrlsType = jobject.SelectToken("$.Type")?.ToObject<CustomizeTargetUrls.Types>();
+			var customizeTargetUrlsType = jobject.SelectToken("$.Type")?.ToObject<TargetUrlsHandler.Types>();
 			if (customizeTargetUrlsType == null)
 			{
 				throw new SpiderExceptoin("Missing CustomizeTargetUrls Type: " + jobject);
 			}
 			switch (customizeTargetUrlsType)
 			{
-				case Configuration.CustomizeTargetUrls.Types.IncreasePageNumber:
+				case Configuration.TargetUrlsHandler.Types.IncreasePageNumber:
 					{
-						return jobject.ToObject<IncreasePageNumberCustomizeTargetUrls>();
+						return jobject.ToObject<IncreasePageNumberTargetUrlsHandler>();
 					}
 			}
 			throw new SpiderExceptoin("UNSPORT or JSON string is incorrect: " + jobject);
 		}
 
-		private CustomizePage GetCustomziePage(JObject jobject)
+		private PageHandler GetCustomziePage(JObject jobject)
 		{
 			if (jobject == null)
 			{
 				return null;
 			}
-			var customizePageType = jobject.SelectToken("$.Type").ToObject<CustomizePage.Types>();
+			var customizePageType = jobject.SelectToken("$.Type").ToObject<PageHandler.Types>();
 			switch (customizePageType)
 			{
-				case Configuration.CustomizePage.Types.Sub:
+				case Configuration.PageHandler.Types.Sub:
 					{
 						return jobject.ToObject<SubCustomizePage>();
 

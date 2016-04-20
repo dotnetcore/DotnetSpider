@@ -21,7 +21,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 	/// </summary>
 	public class HttpClientDownloader : BaseDownloader
 	{
-		//private static AutomicLong _exceptionCount = new AutomicLong(0);
 		public Action<Site, Request> GeneratePostBody;
 		public bool DecodeContentAsUrl;
 

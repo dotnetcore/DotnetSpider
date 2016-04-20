@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -16,9 +15,7 @@ using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Core.Scheduler.Component;
 using Java2Dotnet.Spider.Core.Utils;
 using Java2Dotnet.Spider.JLog;
-
 using Newtonsoft.Json;
-using System.Net.Http;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -27,22 +24,16 @@ namespace Java2Dotnet.Spider.Core
 	/// </summary>
 	public class Spider : ISpider
 	{
-
-#if !NET_CORE
-		//protected static readonly ILog Logger = LogManager.GetLogger(typeof(Spider));
 		protected static readonly ILog Logger = LogManager.GetLogger();
-#else
-		protected static readonly ILog Logger = LogManager.GetLogger();
-#endif
 
-		public int ThreadNum { get; set; } = 1;
+		public int ThreadNum { get; private set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
 		public AutomicLong FinishedPageCount { get; set; } = new AutomicLong(0);
 		public bool SpawnUrl { get; set; } = true;
 		public DateTime StartTime { get; private set; }
 		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		public Site Site { get; set; }
-		public Action<Page> CustomizePage;
+		public Action<Page> PageHandler;
 		public bool SaveStatus { get; set; }
 		public string Identity { get; }
 		public bool ShowConsoleStatus { get; set; } = true;
@@ -51,11 +42,9 @@ namespace Java2Dotnet.Spider.Core
 		public bool IsExitWhenComplete { get; set; } = true;
 		public Status StatusCode => Stat;
 		public IScheduler Scheduler { get; }
-		//public IList<ISpiderListener> SpiderListeners { get; set; } = new List<ISpiderListener>();
-		public event RequestSuccessed RequestSuccessedEvent;
-		public event RequestFailed RequestFailedEvent;
+		public event SpiderEvent RequestedSuccessEvent;
+		public event SpiderEvent RequestedFailEvent;
 		public event SpiderClosing SpiderClosingEvent;
-		public int ThreadAliveCount => ThreadPool.ThreadAlive;
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 
 		protected readonly string DataRootDirectory;
@@ -64,8 +53,6 @@ namespace Java2Dotnet.Spider.Core
 		protected List<Request> StartRequests { get; set; }
 		protected static readonly int WaitInterval = 8;
 		protected Status Stat = Status.Init;
-		protected CountableThreadPool ThreadPool { get; set; }
-		//protected bool DestroyWhenExit { get; set; } = true;
 
 		private int _waitCountLimit = 20;
 		private int _waitCount;
@@ -151,12 +138,12 @@ namespace Java2Dotnet.Spider.Core
 		/// <returns></returns>
 		public virtual Spider SetThreadNum(int threadNum)
 		{
+			CheckIfRunning();
+
 			if (threadNum <= 0)
 			{
 				throw new ArgumentException("threadNum should be more than one!");
 			}
-
-			CheckIfRunning();
 
 			ThreadNum = threadNum;
 			if (Downloader != null)
@@ -300,11 +287,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			if (_init)
 			{
-#if NET_CORE
-				Logger.Info($"Component already init.", true);
-#else
 				Logger.Info("Component already init.");
-#endif
 
 				return;
 			}
@@ -324,20 +307,12 @@ namespace Java2Dotnet.Spider.Core
 			{
 				Pipelines.Add(new FilePipeline());
 			}
-			if (ThreadPool == null)
-			{
-				ThreadPool = new CountableThreadPool(ThreadNum);
-			}
 
 			if (StartRequests != null)
 			{
 				if (StartRequests.Count > 0)
 				{
-#if NET_CORE
-				Logger.Info($"Start push Request to queque...", true);
-#else
 					Logger.Info("Start push Request to queque...");
-#endif
 					if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 					{
 						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
@@ -356,49 +331,13 @@ namespace Java2Dotnet.Spider.Core
 						ClearStartRequests();
 					}
 
-#if NET_CORE
-					Logger.Info($"Push Request: {StartRequests.Count} to Scheduler success.", true);
-#else
 					Logger.Info("Push Request to Scheduler success.");
-#endif
 				}
 				else
 				{
-#if NET_CORE
-				Logger.Info("Push Zero Request to Scheduler.", true);
-#else
-					Logger.Info("Push Request to Scheduler success.");
-#endif
-
+					Logger.Info("Push Zero Request to Scheduler.", true);
 				}
 			}
-
-			//Task.Factory.StartNew(() =>
-			//{
-			//	if (ShowConsoleStatus)
-			//	{
-			//		IMonitorableScheduler monitor = Scheduler as IMonitorableScheduler;
-			//		if (monitor != null)
-			//		{
-			//			while (true)
-			//			{
-			//				try
-			//				{
-			//					if (Stat == Status.Running && !_waitingToExit)
-			//					{
-			//						Console.WriteLine(
-			//							$"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
-			//					}
-			//				}
-			//				catch
-			//				{
-			//					// ignored
-			//				}
-			//				Thread.Sleep(2000);
-			//			}
-			//		}
-			//	}
-			//});
 
 			_init = true;
 		}
@@ -453,9 +392,8 @@ namespace Java2Dotnet.Spider.Core
 					}
 					else
 					{
-#if !NET_CORE
-						Console.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
-#endif
+						Log.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} Thread: {ThreadNum}");
+
 						waitCount = 0;
 
 						try
@@ -605,12 +543,12 @@ namespace Java2Dotnet.Spider.Core
 				File.AppendAllText(_errorRequestFile.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
 			}
 
-			RequestFailedEvent?.Invoke(request);
+			RequestedFailEvent?.Invoke(request);
 		}
 
 		protected void OnSuccess(Request request)
 		{
-			RequestSuccessedEvent?.Invoke(request);
+			RequestedSuccessEvent?.Invoke(request);
 		}
 
 		protected Page AddToCycleRetry(Request request, Site site)
@@ -662,7 +600,7 @@ namespace Java2Dotnet.Spider.Core
 						return;
 					}
 
-					CustomizePage?.Invoke(page);
+					PageHandler?.Invoke(page);
 
 #if TEST
 					sw.Reset();
@@ -822,7 +760,10 @@ namespace Java2Dotnet.Spider.Core
 
 		public void Dispose()
 		{
-			OnClose();
+			if (!_exited)
+			{
+				OnClose();
+			}
 		}
 	}
 }

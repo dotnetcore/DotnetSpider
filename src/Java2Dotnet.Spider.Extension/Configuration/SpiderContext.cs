@@ -27,8 +27,8 @@ namespace Java2Dotnet.Spider.Extension
 		public Configuration.Pipeline Pipeline { get; set; }
 		public string Corporation { get; set; }
 		public string ValidationReportTo { get; set; }
-		public CustomizePage CustomizePage { get; set; }
-		public CustomizeTargetUrls CustomizeTargetUrls { get; set; }
+		public PageHandler PageHandler { get; set; }
+		public TargetUrlsHandler TargetUrlsHandler { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
 	}
 }

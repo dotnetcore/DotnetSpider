@@ -339,14 +339,14 @@ namespace Java2Dotnet.Spider.Extension
 			spider.Deep = _spiderContext.Deep;
 			spider.SetDownloader(_spiderContext.Downloader.GetDownloader());
 
-			if (_spiderContext.CustomizePage != null)
+			if (_spiderContext.PageHandler != null)
 			{
-				spider.CustomizePage = _spiderContext.CustomizePage.Customize;
+				spider.PageHandler = _spiderContext.PageHandler.Customize;
 			}
 
-			if (_spiderContext.CustomizeTargetUrls != null)
+			if (_spiderContext.TargetUrlsHandler != null)
 			{
-				spider.SetCustomizeTargetUrls(_spiderContext.CustomizeTargetUrls.Customize);
+				spider.SetCustomizeTargetUrls(_spiderContext.TargetUrlsHandler.Handle);
 			}
 
 			return spider;

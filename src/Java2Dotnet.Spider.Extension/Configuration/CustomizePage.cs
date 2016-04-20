@@ -3,7 +3,7 @@ using Java2Dotnet.Spider.Core;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
-	public abstract class CustomizePage
+	public abstract class PageHandler
 	{
 		[Flags]
 		public enum Types
@@ -16,7 +16,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public abstract void Customize(Page page);
 	}
 
-	public class SubCustomizePage : CustomizePage
+	public class SubCustomizePage : PageHandler
 	{
 		public string StartString { get; set; }
 		public string EndString { get; set; }

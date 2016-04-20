@@ -6,7 +6,7 @@ using Java2Dotnet.Spider.Extension.Utils;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
-	public abstract class CustomizeTargetUrls
+	public abstract class TargetUrlsHandler
 	{
 		[Flags]
 		public enum Types
@@ -16,10 +16,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public abstract Types Type { get; internal set; }
 
-		public abstract IList<string> Customize(Page page);
+		public abstract IList<string> Handle(Page page);
 	}
 
-	public class IncreasePageNumberCustomizeTargetUrls : CustomizeTargetUrls
+	public class IncreasePageNumberTargetUrlsHandler : TargetUrlsHandler
 	{
 		public override Types Type { get; internal set; } = Types.IncreasePageNumber;
 
@@ -34,7 +34,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public Selector CurrenctPageSelector { get; set; }
 
-		public override IList<string> Customize(Page page)
+		public override IList<string> Handle(Page page)
 		{
 			string pattern = $"{RegexUtil.NumRegex.Replace(PageIndexString, @"\d+")}";
 			Regex regex = new Regex(pattern);

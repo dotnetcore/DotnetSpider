@@ -86,14 +86,11 @@
     <Compile Include="..\ISpiderListener.cs">
       <Link>ISpiderListener.cs</Link>
     </Compile>
-    <Compile Include="..\Monitor\RequestFailed.cs">
-      <Link>Monitor\RequestFailed.cs</Link>
+    <Compile Include="..\Monitor\SpiderClosingEvent.cs">
+      <Link>Monitor\SpiderClosingEvent.cs</Link>
     </Compile>
-    <Compile Include="..\Monitor\RequestSuccessed.cs">
-      <Link>Monitor\RequestSuccessed.cs</Link>
-    </Compile>
-    <Compile Include="..\Monitor\SpiderClosing.cs">
-      <Link>Monitor\SpiderClosing.cs</Link>
+    <Compile Include="..\Monitor\SpiderEvent.cs">
+      <Link>Monitor\SpiderEvent.cs</Link>
     </Compile>
     <Compile Include="..\Page.cs">
       <Link>Page.cs</Link>

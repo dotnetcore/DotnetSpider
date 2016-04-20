@@ -76,8 +76,8 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 				if (spider.SaveStatus && !string.IsNullOrEmpty(StatusServer))
 				{
-					spider.RequestFailedEvent += OnError;
-					spider.RequestSuccessedEvent += OnSuccess;
+					spider.RequestedFailEvent += OnError;
+					spider.RequestedSuccessEvent += OnSuccess;
 					spider.SpiderClosingEvent += OnClose;
 
 					Task.Factory.StartNew(() =>
