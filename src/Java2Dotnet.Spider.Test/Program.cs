@@ -24,7 +24,7 @@ namespace Java2Dotnet.Spider.Test
 
 			//TestStatusServer();
 			HttpClientDownloader downloader = new HttpClientDownloader();
-			downloader.Download(new Core.Request("https://top.etao.com/index.php?topId=TR_M&leafId=50013618", 0, null), new TestSpider());
+			var page = downloader.Download(new Core.Request("https://top.etao.com/index.php?topId=TR_M&leafId=50013618", 0, null), new TestSpider());
 			Console.WriteLine("OK");
 		}
 

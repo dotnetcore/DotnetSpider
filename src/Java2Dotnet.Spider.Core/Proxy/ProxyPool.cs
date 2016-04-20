@@ -200,7 +200,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			}
 			if (proxy == null)
 			{
-				throw new Exception("Can't get proxy.");
+				return null;
 			}
 			return proxy.GetHttpHost();
 		}

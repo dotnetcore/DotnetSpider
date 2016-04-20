@@ -9,6 +9,8 @@ using HtmlAgilityPack;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
 using System.Net.Http;
+using System.Net;
+using Java2Dotnet.Spider.Core.Proxy;
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {
@@ -35,7 +37,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			//Logger.InfoFormat("Downloading page {0}", request.Url);
 
 			HttpResponseMessage response = null;
-
+			var proxy = site.GetHttpProxyFromPool();
+			int statusCode = 200;
 			try
 			{
 				if (GeneratePostBody != null)
@@ -47,7 +50,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				}
 
 				var httpMessage = GenerateHttpRequestMessage(request, site);
-				HttpClient httpClient = new HttpClient();
+
+				HttpClient httpClient = new HttpClient(new MyHttpMessageHandler(proxy));
 
 				response = RedialManagerUtils.Execute("downloader-download", (m) =>
 				{
@@ -57,7 +61,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				}, httpMessage);
 
 				response.EnsureSuccessStatusCode();
-				int statusCode = (int)response.StatusCode;
+				statusCode = (int)response.StatusCode;
 				request.PutExtra(Request.StatusCode, statusCode);
 
 				Page page = HandleResponse(request, response, statusCode, site);
@@ -99,6 +103,10 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				// 先Close Response, 避免前面语句异常导致没有关闭.
 				try
 				{
+					if (proxy != null)
+					{
+						site.ReturnHttpProxyToPool(proxy, statusCode);
+					}
 					//ensure the connection is released back to pool
 					//check:
 					//EntityUtils.consume(httpResponse.getEntity());
@@ -185,7 +193,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			//	httpWebRequest.Proxy = null;
 			//}
 #else
-			httpWebRequest.Proxy = null;
+			//httpWebRequest.Proxy = null;
 #endif
 			return httpWebRequest;
 		}
@@ -350,135 +358,13 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		}
 	}
 
-	internal class MyHttpMessageHandler
+	internal class MyHttpMessageHandler : HttpClientHandler
 	{
-
+		public MyHttpMessageHandler(HttpHost proxy = null, bool useCookies = true)
+		{
+			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+			Proxy = proxy == null ? null : new WebProxy(proxy.Host, proxy.Port);
+			UseCookies = useCookies;
+		}
 	}
-
-	//	public static class HttpClientExtensions
-	//	{
-	//#if NETNative
-	//        internal static readonly Version DefaultRequestVersion = HttpVersion.Version20;
-	//#else
-	//		internal static readonly Version DefaultRequestVersion = HttpVersion.Version11;
-	//#endif
-	//		internal static readonly Version DefaultResponseVersion = HttpVersion.Version11;
-
-	//		internal static bool IsHttpUri(Uri uri)
-	//		{
-	//			Debug.Assert(uri != null);
-
-	//			string scheme = uri.Scheme;
-	//			return string.Equals("http", scheme, StringComparison.OrdinalIgnoreCase) ||
-	//				string.Equals("https", scheme, StringComparison.OrdinalIgnoreCase);
-	//		}
-
-	//		// Returns true if the task was faulted or canceled and sets tcs accordingly.
-	//		internal static bool HandleFaultsAndCancelation<T>(Task task, TaskCompletionSource<T> tcs)
-	//		{
-	//			Debug.Assert(task.IsCompleted); // Success, faulted, or cancelled
-	//			if (task.IsFaulted)
-	//			{
-	//				tcs.TrySetException(task.Exception.GetBaseException());
-	//				return true;
-	//			}
-	//			else if (task.IsCanceled)
-	//			{
-	//				tcs.TrySetCanceled();
-	//				return true;
-	//			}
-	//			return false;
-	//		}
-
-	//		// Always specify TaskScheduler.Default to prevent us from using a user defined TaskScheduler.Current.
-	//		// 
-	//		// Since we're not doing any CPU and/or I/O intensive operations, continue on the same thread.
-	//		// This results in better performance since the continuation task doesn't get scheduled by the
-	//		// scheduler and there are no context switches required.
-	//		internal static Task ContinueWithStandard(this Task task, Action<Task> continuation)
-	//		{
-	//			return task.ContinueWith(continuation, CancellationToken.None,
-	//				TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-	//		}
-
-	//		internal static Task ContinueWithStandard(this Task task, object state, Action<Task, object> continuation)
-	//		{
-	//			return task.ContinueWith(continuation, state, CancellationToken.None,
-	//				TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-	//		}
-
-	//		internal static Task ContinueWithStandard<T>(this Task<T> task, Action<Task<T>> continuation)
-	//		{
-	//			return task.ContinueWith(continuation, CancellationToken.None,
-	//				TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-	//		}
-
-	//		internal static Task ContinueWithStandard<T>(this Task<T> task, object state, Action<Task<T>, object> continuation)
-	//		{
-	//			return task.ContinueWith(continuation, state, CancellationToken.None,
-	//				TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-	//		}
-
-	//		private static bool HandleRequestFaultsAndCancelation<T>(Task<HttpResponseMessage> task,
-	//	TaskCompletionSource<T> tcs)
-	//		{
-	//			if (HandleFaultsAndCancelation(task, tcs))
-	//			{
-	//				return true;
-	//			}
-
-	//			HttpResponseMessage response = task.Result;
-	//			if (!response.IsSuccessStatusCode)
-	//			{
-	//				if (response.Content != null)
-	//				{
-	//					response.Content.Dispose();
-	//				}
-
-	//				tcs.TrySetException(new HttpRequestException(
-	//					string.Format(System.Globalization.CultureInfo.InvariantCulture,
-	//						"Response status code does not indicate success: {0} ({1}).", (int)response.StatusCode,
-	//						response.ReasonPhrase)));
-	//				return true;
-	//			}
-	//			return false;
-	//		}
-
-	//		public static Task<T> GetContentAsync<T>(this HttpClient client, Uri requestUri, HttpCompletionOption completionOption, T defaultValue,
-	// Func<HttpContent, Task<T>> readAs)
-	//		{
-	//			TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
-
-	//			client.GetAsync(requestUri, completionOption).ContinueWithStandard(requestTask =>
-	//			{
-	//				if (HandleRequestFaultsAndCancelation(requestTask, tcs))
-	//				{
-	//					return;
-	//				}
-	//				HttpResponseMessage response = requestTask.Result;
-	//				if (response.Content == null)
-	//				{
-	//					tcs.TrySetResult(defaultValue);
-	//					return;
-	//				}
-
-	//				try
-	//				{
-	//					readAs(response.Content).ContinueWithStandard(contentTask =>
-	//					{
-	//						if (!HandleFaultsAndCancelation(contentTask, tcs))
-	//						{
-	//							tcs.TrySetResult(contentTask.Result);
-	//						}
-	//					});
-	//				}
-	//				catch (Exception ex)
-	//				{
-	//					tcs.TrySetException(ex);
-	//				}
-	//			});
-
-	//			return tcs.Task;
-	//		}
-	//	}
 }
