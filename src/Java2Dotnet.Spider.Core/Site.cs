@@ -16,7 +16,7 @@ namespace Java2Dotnet.Spider.Core
 #endif
 		private string _domain;
 		private Encoding _encoding = Encoding.UTF8;
-		private string _encodingName = "UTF-8";
+		private string _encodingName;
 
 		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 

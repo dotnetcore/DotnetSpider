@@ -42,7 +42,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			Site site = spider.Site;
 
 			ICollection<int> acceptStatCode = site.AcceptStatCode;
-			var charset = site.Encoding;
 
 			//Logger.InfoFormat("Downloading page {0}", request.Url);
 
@@ -181,7 +180,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 			if (httpWebRequest.Method == HttpMethod.Post)
 			{
-				var data = site.Encoding.GetBytes(request.PostBody);
+				var data = string.IsNullOrEmpty(site.EncodingName) ? Encoding.UTF8.GetBytes(request.PostBody) : site.Encoding.GetBytes(request.PostBody);
 				httpWebRequest.Content = new StreamContent(new MemoryStream(data));
 			}
 #if !NET_CORE
