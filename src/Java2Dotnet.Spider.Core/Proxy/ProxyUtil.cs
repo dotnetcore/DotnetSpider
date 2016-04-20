@@ -1,5 +1,4 @@
-﻿#if !NET_CORE
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -25,7 +24,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			{
 				string hostName = Dns.GetHostName();//本机名   
 
-				IPAddress[] addressList = Dns.GetHostAddresses(hostName);//会返回所有地址，包括IPv4和IPv6   
+				IPAddress[] addressList = Dns.GetHostAddressesAsync(hostName).Result;//会返回所有地址，包括IPv4和IPv6   
 				foreach (IPAddress ip in addressList)
 				{
 					if (ip.AddressFamily == AddressFamily.InterNetwork)
@@ -38,7 +37,6 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			catch (Exception e)
 			{
 				Logger.Error("Failure when init ProxyUtil", e);
-				//logger.Error("choose NetworkInterface\n" + getNetworkInterface());
 			}
 		}
 
@@ -69,18 +67,19 @@ namespace Java2Dotnet.Spider.Core.Proxy
 				Logger.Warn("FAILRE - CAN not connect! Local: " + _localAddr + " remote: " + p);
 			}
 			finally
-			{
-				if (socket != null)
-				{
+			{				 
 					try
 					{
-						socket.Close();
+#if !NET_CORE					
+						socket?.Close();
+#else
+						socket?.Dispose();
+#endif						
 					}
 					catch (IOException e)
 					{
 						Logger.Warn("Error occurred while closing socket of validating proxy", e);
 					}
-				}
 			}
 			return isReachable;
 		}
@@ -111,4 +110,3 @@ namespace Java2Dotnet.Spider.Core.Proxy
 		//}
 	}
 }
-#endif

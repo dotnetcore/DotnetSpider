@@ -481,7 +481,7 @@ namespace Java2Dotnet.Spider.Core
 							finally
 							{
 #if !NET_CORE
-								if (Site.HttpProxyPoolEnable)
+								if (Site.HttpProxyPoolEnable&&request1.GetExtra(Request.Proxy)!=null)
 								{
 									Site.ReturnHttpProxyToPool((HttpHost)request1.GetExtra(Request.Proxy), (int)request1.GetExtra(Request.StatusCode));
 								}

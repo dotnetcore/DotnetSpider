@@ -38,6 +38,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 			HttpResponseMessage response = null;
 			var proxy = site.GetHttpProxyFromPool();
+			request.PutExtra(Request.Proxy, proxy);
 			int statusCode = 200;
 			try
 			{
@@ -103,10 +104,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				// 先Close Response, 避免前面语句异常导致没有关闭.
 				try
 				{
-					if (proxy != null)
-					{
-						site.ReturnHttpProxyToPool(proxy, statusCode);
-					}
 					//ensure the connection is released back to pool
 					//check:
 					//EntityUtils.consume(httpResponse.getEntity());
@@ -363,7 +360,9 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		public MyHttpMessageHandler(HttpHost proxy = null, bool useCookies = true)
 		{
 			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+#if !NET_CORE
 			Proxy = proxy == null ? null : new WebProxy(proxy.Host, proxy.Port);
+#endif
 			UseCookies = useCookies;
 		}
 	}

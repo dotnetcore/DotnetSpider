@@ -11,9 +11,7 @@ namespace Java2Dotnet.Spider.Core
 	public class Site
 	{
 		private readonly List<Request> _startRequests = new List<Request>();
-#if !NET_CORE
 		private ProxyPool _httpProxyPool = new ProxyPool();
-#endif
 		private string _domain;
 		private Encoding _encoding = Encoding.UTF8;
 		private string _encodingName;
@@ -233,8 +231,6 @@ namespace Java2Dotnet.Spider.Core
 					'}';
 		}
 
-
-#if !NET_CORE
 		/// <summary>
 		/// add http proxy , string[0]:ip, string[1]:port
 		/// </summary>
@@ -268,6 +264,5 @@ namespace Java2Dotnet.Spider.Core
 			_httpProxyPool.SetReuseInterval(reuseInterval);
 			return this;
 		}
-#endif
 	}
 }
