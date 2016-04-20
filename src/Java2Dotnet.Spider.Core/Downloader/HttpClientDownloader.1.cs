@@ -1,25 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
-using System.Net;
 #if !NET_CORE
-using System.Runtime.Remoting.Contexts;
 using System.Web;
 #endif
 using System.Text;
 using HtmlAgilityPack;
 using Java2Dotnet.Spider.Common;
-using Java2Dotnet.Spider.Core.Proxy;
-using Java2Dotnet.Spider.Core.Utils;
 using Java2Dotnet.Spider.Redial;
 using System.Net.Http;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Net.Http.Headers;
-using System.Threading;
-using System.Linq;
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {
