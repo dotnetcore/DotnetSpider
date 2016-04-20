@@ -29,6 +29,9 @@ namespace Java2Dotnet.Spider.JLog
 		private static readonly object WriteToLogFileLocker = new object();
 		private static readonly string LogFile;
 		public static string UserId { get; set; }
+		/// <summary>
+		/// TaskId 并不是指任务的Identity, 仅是TaskName. 如：Jd Sku Spider, 由于任务会多次执行，所有会加时间后缀：Jd Sku Spider 2016-04 这才是Identity.
+		/// </summary>
 		public static string TaskId { get; set; }
 		public static string Machine;
 		public static bool NoConsole = false;
