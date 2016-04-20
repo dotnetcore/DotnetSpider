@@ -418,7 +418,6 @@ namespace Java2Dotnet.Spider.Core
 
 			Logger.Info("Spider " + Identity + " Started!");
 
-
 			IMonitorableScheduler monitor = (IMonitorableScheduler)Scheduler;
 
 			if (StartTime == DateTime.MinValue)
@@ -440,24 +439,21 @@ namespace Java2Dotnet.Spider.Core
 
 					if (request == null)
 					{
-						if (ThreadPool.ThreadAlive == 0)
+						if (waitCount > _waitCountLimit && IsExitWhenComplete)
 						{
-							if (waitCount > _waitCountLimit && IsExitWhenComplete)
-							{
-								Stat = Status.Finished;
-								break;
-							}
+							Stat = Status.Finished;
+							break;
 						}
 
-							// wait until new url added
-							WaitNewUrl(ref waitCount);
+						// wait until new url added
+						WaitNewUrl(ref waitCount);
 					}
 					else
 					{
 #if !NET_CORE
-							Console.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
+						Console.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} AliveThread: {ThreadPool.ThreadAlive} ThreadNum: {ThreadPool.ThreadNum}");
 #endif
-							waitCount = 0;
+						waitCount = 0;
 
 						try
 						{
@@ -465,7 +461,17 @@ namespace Java2Dotnet.Spider.Core
 
 							Thread.Sleep(Site.SleepTime);
 
+#if DEBUG
+							System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+							sw.Reset();
+							sw.Start();
+#endif
+
 							OnSuccess(request);
+#if DEBUG
+							sw.Stop();
+							Console.WriteLine("OnSuccess:" + (sw.ElapsedMilliseconds).ToString());
+#endif
 						}
 						catch (Exception e)
 						{
@@ -475,12 +481,12 @@ namespace Java2Dotnet.Spider.Core
 						finally
 						{
 #if !NET_CORE
-								if (Site.HttpProxyPoolEnable && request.GetExtra(Request.Proxy) != null)
+							if (Site.HttpProxyPoolEnable && request.GetExtra(Request.Proxy) != null)
 							{
 								Site.ReturnHttpProxyToPool((HttpHost)request.GetExtra(Request.Proxy), (int)request.GetExtra(Request.StatusCode));
 							}
 #endif
-								FinishedPageCount.Inc();
+							FinishedPageCount.Inc();
 						}
 
 						if (!firstTask)
@@ -634,13 +640,23 @@ namespace Java2Dotnet.Spider.Core
 		protected void ProcessRequest(Request request)
 		{
 			Page page = null;
-
+#if DEBUG
+			System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+#endif
 			while (true)
 			{
 				try
 				{
+#if DEBUG
+					sw.Reset();
+					sw.Start();
+#endif
 					page = Downloader.Download(request, this);
 
+#if DEBUG
+					sw.Stop();
+					Console.WriteLine("Download:" + (sw.ElapsedMilliseconds).ToString());
+#endif
 					if (page.IsSkip)
 					{
 						return;
@@ -648,8 +664,15 @@ namespace Java2Dotnet.Spider.Core
 
 					CustomizePage?.Invoke(page);
 
+#if DEBUG
+					sw.Reset();
+					sw.Start();
+#endif
 					PageProcessor.Process(page);
-
+#if DEBUG
+					sw.Stop();
+					Console.WriteLine("Process:" + (sw.ElapsedMilliseconds).ToString());
+#endif
 					break;
 				}
 				catch (Exception e)
@@ -690,6 +713,10 @@ namespace Java2Dotnet.Spider.Core
 				ExtractAndAddRequests(page, SpawnUrl);
 			}
 
+#if DEBUG
+			sw.Reset();
+			sw.Start();
+#endif
 			if (!page.ResultItems.IsSkip)
 			{
 				foreach (IPipeline pipeline in Pipelines)
@@ -708,6 +735,10 @@ namespace Java2Dotnet.Spider.Core
 				var message = $"Request {request.Url} 's result count is zero.";
 				Logger.Warn(message);
 			}
+#if DEBUG
+			sw.Stop();
+			Console.WriteLine("IPipeline:" + (sw.ElapsedMilliseconds).ToString());
+#endif
 		}
 
 		protected void ExtractAndAddRequests(Page page, bool spawnUrl)
