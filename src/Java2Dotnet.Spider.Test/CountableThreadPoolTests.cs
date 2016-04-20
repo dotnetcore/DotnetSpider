@@ -19,7 +19,6 @@ namespace Java2Dotnet.Spider.Test
 				threadPool.Push((obj) =>
 				{
 					Thread.Sleep(1000 * 30);
-					return true;
 				}, "");
 			}
 			Thread.Sleep(1000 * 10);

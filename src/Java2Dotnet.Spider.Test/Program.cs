@@ -9,6 +9,9 @@ using Java2Dotnet.Spider.Test.Pipeline;
 using Java2Dotnet.Spider.JLog;
 using Newtonsoft.Json;
 using Java2Dotnet.Spider.Core.Downloader;
+using System.Threading.Tasks;
+using System.Threading;
+using Java2Dotnet.Spider.Core;
 
 namespace Java2Dotnet.Spider.Test
 {
@@ -20,11 +23,24 @@ namespace Java2Dotnet.Spider.Test
 			//var context = spiderBuilder.GetBuilder().Context;
 			//ContextSpider spider = new ContextSpider(context);
 			//spider.Run(args);
+			CountableThreadPool pool = new CountableThreadPool(1);
+			for (int i = 0; i < 100; ++i)
+			{
+				pool.Push(o =>
+				{
+					HttpClient client = new HttpClient();
+					var str = client.GetStringAsync("http://www.baidu.com").Result;
+					Console.WriteLine(o);
+				}, i);
 
+			}
 
+			while (true)
+			{
+				Thread.Sleep(10);
+			}
 			//TestStatusServer();
-			HttpClientDownloader downloader = new HttpClientDownloader();
-			var page = downloader.Download(new Core.Request("https://top.etao.com/index.php?topId=TR_M&leafId=50013618", 0, null), new TestSpider());
+
 			Console.WriteLine("OK");
 		}
 

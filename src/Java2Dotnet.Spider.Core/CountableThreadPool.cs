@@ -15,70 +15,45 @@ namespace Java2Dotnet.Spider.Core
 	/// </summary>
 	public class CountableThreadPool
 	{
-		private readonly SynchronizedList<Task> _tasks = new SynchronizedList<Task>();
-		private readonly int _cachedSize;
 		private bool _exit;
-		private readonly TaskFactory _factory;
+		private AtomicInteger _threadCount = new AtomicInteger(0);
 
 		public CountableThreadPool(int threadNum = 5)
 		{
 			ThreadNum = threadNum;
-            
-#if !NET_CORE            
-			_cachedSize = ThreadNum * 2;
-#else
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				 _cachedSize = ThreadNum;
-			}
-
-#endif
-			_factory = new TaskFactory(new LimitedConcurrencyLevelTaskScheduler(ThreadNum));
-
-			Task.Factory.StartNew(() =>
-			{
-				while (true)
-				{
-					if (_exit)
-					{
-						break;
-					}
-
-					var finishedTasks = _tasks.Where(t => t.IsCompleted).ToList();
-					foreach (var finishedTask in finishedTasks)
-					{
-						_tasks.Remove(finishedTask);
-					}
-
-					Thread.Sleep(10);
-				}
-			});
+			ThreadPool.SetMaxThreads(ThreadNum, ThreadNum);
 		}
 
 		public int ThreadAlive
 		{
-			get { return _tasks.Where(t => t.Status == TaskStatus.Running).Count; }
+			get
+			{
+				return _threadCount.Value;
+			}
 		}
 
 		public int ThreadNum { get; }
 
-		public void Push(Func<object, bool> func, object obj)
+		public void Push(Action<object> func, object obj)
 		{
 			lock (this)
 			{
 				if (_exit)
 				{
-					throw new SpiderExceptoin("Pool is exit.");
+					throw new SpiderExceptoin("Pool already exit.");
 				}
 
-				// List�б����������߳�����5��
-				while (_tasks.Count() > _cachedSize)
+				while (ThreadAlive >= ThreadNum)
 				{
-					Thread.Sleep(10);
+					Thread.Sleep(100);
 				}
 
-				Task task = _factory.StartNew((o) => { func(o); }, obj);
-				_tasks.Add(task);
+				_threadCount.Inc();
+				ThreadPool.QueueUserWorkItem(new WaitCallback((o) =>
+				{
+					func(o);
+					_threadCount.Dec();
+				}), obj);
 			}
 		}
 
@@ -86,7 +61,10 @@ namespace Java2Dotnet.Spider.Core
 		{
 			lock (this)
 			{
-				Task.WaitAll(_tasks.GetAll().ToArray());
+				while (ThreadAlive > 0)
+				{
+					Thread.Sleep(500);
+				}
 				_exit = true;
 			}
 		}

@@ -52,6 +52,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 					});
 				}
 
+
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 #if !NET_CORE
 				HttpClient httpClient = new HttpClient(new HttpClientHandler()
@@ -59,8 +60,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
 
 					Proxy = proxy == null ? null : new WebProxy(proxy.Host, proxy.Port),
-
-					AllowAutoRedirect = true,
 					UseCookies = string.IsNullOrEmpty(site.Cookie)
 				});
 #else

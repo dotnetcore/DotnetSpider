@@ -18,6 +18,7 @@ using Java2Dotnet.Spider.Core.Utils;
 using Java2Dotnet.Spider.JLog;
 
 using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -481,17 +482,14 @@ namespace Java2Dotnet.Spider.Core
 							finally
 							{
 #if !NET_CORE
-								if (Site.HttpProxyPoolEnable&&request1.GetExtra(Request.Proxy)!=null)
+								if (Site.HttpProxyPoolEnable && request1.GetExtra(Request.Proxy) != null)
 								{
 									Site.ReturnHttpProxyToPool((HttpHost)request1.GetExtra(Request.Proxy), (int)request1.GetExtra(Request.StatusCode));
 								}
 #endif
 								FinishedPageCount.Inc();
 							}
-							return true;
 						}
-
-						return false;
 					}, request);
 
 					if (!firstTask)
