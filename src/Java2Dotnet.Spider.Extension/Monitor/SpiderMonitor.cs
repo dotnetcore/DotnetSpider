@@ -36,9 +36,6 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					if (!_data.ContainsKey(spider))
 					{
 						MonitorSpiderListener monitorSpiderListener = new MonitorSpiderListener(spider);
-						spider.RequestFailedEvent += monitorSpiderListener.OnError;
-						spider.RequestSuccessedEvent += monitorSpiderListener.OnSuccess;
-						spider.SpiderClosingEvent += monitorSpiderListener.OnClose;
 						_data.Add(spider, monitorSpiderListener);
 					}
 				}
@@ -59,19 +56,14 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 		public class MonitorSpiderListener : ISpiderStatus
 		{
-#if !NET_CORE
-			//protected static readonly ILog Logger = LogManager.GetLogger(typeof(MonitorSpiderListener));
 			protected static readonly ILog Logger = LogManager.GetLogger();
-#else
-			protected static readonly ILog Logger = LogManager.GetLogger();
-#endif
 			private readonly AutomicLong _successCount = new AutomicLong(0);
 			private readonly AutomicLong _errorCount = new AutomicLong(0);
 			private readonly List<string> _errorUrls = new List<string>();
 			private readonly Core.Spider _spider;
 			private static SynchronizedList<Task<HttpResponseMessage>> StatusUpLoadTasks = new SynchronizedList<Task<HttpResponseMessage>>();
 			private static string StatusServer;
-
+			private static HttpClient _client = new HttpClient();
 
 			static MonitorSpiderListener()
 			{
@@ -84,19 +76,17 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 				if (spider.SaveStatus && !string.IsNullOrEmpty(StatusServer))
 				{
+					spider.RequestFailedEvent += OnError;
+					spider.RequestSuccessedEvent += OnSuccess;
+					spider.SpiderClosingEvent += OnClose;
+
 					Task.Factory.StartNew(() =>
 					{
 						while (true)
 						{
 							try
 							{
-								if (Closed)
-								{
-									UpdateStatus();
-									break;
-								}
-
-								UpdateStatus();
+								PostStatus();
 							}
 							catch (Exception)
 							{
@@ -109,7 +99,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 				}
 			}
 
-			public void UpdateStatus()
+			public void PostStatus()
 			{
 				var status = new
 				{
@@ -117,14 +107,13 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					{
 						ErrorPageCount,
 						LeftPageCount,
-						PagePerSecond,
+						Speed,
 						StartTime,
 						EndTime,
 						Status,
 						SuccessPageCount,
 						ThreadCount,
-						TotalPageCount,
-						AliveThreadCount
+						TotalPageCount
 					},
 					Name,
 					Machine = Log.Machine,
@@ -132,10 +121,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					TaskId = Log.TaskId
 				};
 
-
-				HttpClient client = new HttpClient();
-
-				var task = client.PostAsync(StatusServer, new StringContent(JsonConvert.SerializeObject(status), Encoding.UTF8, "application/json"));
+				var task = _client.PostAsync(StatusServer, new StringContent(JsonConvert.SerializeObject(status), Encoding.UTF8, "application/json"));
 				StatusUpLoadTasks.Add(task);
 				task.ContinueWith((t) =>
 				{
@@ -143,7 +129,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 				});
 			}
 
-			public static void WaitForExit()
+			private  void WaitForExit()
 			{
 				while (true)
 				{
@@ -151,7 +137,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					{
 						break;
 					}
-					Thread.Sleep(500);
+					Thread.Sleep(100);
 				}
 			}
 
@@ -168,7 +154,9 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 			public void OnClose()
 			{
-				Closed = true;
+				PostStatus();
+
+				WaitForExit();
 			}
 
 			public long SuccessPageCount => _successCount.Value;
@@ -176,8 +164,6 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			public long ErrorPageCount => _errorCount.Value;
 
 			public List<string> ErrorPages => _errorUrls;
-
-			public bool Closed { get; set; }
 
 			public string Name => _spider.Identity;
 
@@ -211,29 +197,17 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 			public string Status => _spider.StatusCode.ToString();
 
-			public int AliveThreadCount => _spider.ThreadAliveCount;
-
 			public int ThreadCount => _spider.ThreadNum;
-
-			public void Start()
-			{
-				_spider.Run();
-			}
-
-			public void Stop()
-			{
-				_spider.Stop();
-			}
 
 			public DateTime StartTime => _spider.StartTime;
 
 			public DateTime EndTime => _spider.FinishedTime == DateTime.MinValue ? DateTime.Now : _spider.FinishedTime;
 
-			public double PagePerSecond
+			public double Speed
 			{
 				get
 				{
-					double runSeconds = (EndTime - StartTime).TotalSeconds;
+					double runSeconds = (DateTime.Now - StartTime).TotalSeconds;
 					if (runSeconds > 0)
 					{
 						return SuccessPageCount / runSeconds;
@@ -241,8 +215,6 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					return 0;
 				}
 			}
-
-			public Core.Spider Spider => _spider;
 		}
 	}
 }

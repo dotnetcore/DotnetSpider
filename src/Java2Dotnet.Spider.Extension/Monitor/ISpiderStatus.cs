@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-
 namespace Java2Dotnet.Spider.Extension.Monitor
 {
 	public interface ISpiderStatus
@@ -8,8 +6,6 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 		string Name { get; }
 
 		string Status { get; }
-
-		int AliveThreadCount { get; }
 
 		int ThreadCount { get; }
 
@@ -21,18 +17,10 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 		long ErrorPageCount { get; }
 
-		List<string> ErrorPages { get; }
-
-		void Start();
-
-		void Stop();
-
 		DateTime StartTime { get; }
 
 		DateTime EndTime { get; }
 
-		double PagePerSecond { get; }
-
-		 Core.Spider Spider { get; }
+		double Speed { get; }
 	}
 }

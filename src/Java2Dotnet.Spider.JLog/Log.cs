@@ -151,7 +151,7 @@ namespace Java2Dotnet.Spider.JLog
 						}
 					case "INFO":
 						{
-							Console.ForegroundColor = ConsoleColor.Magenta;
+							Console.ForegroundColor = ConsoleColor.White;
 							break;
 						}
 					case "WARNING":

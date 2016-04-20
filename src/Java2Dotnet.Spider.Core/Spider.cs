@@ -70,9 +70,10 @@ namespace Java2Dotnet.Spider.Core
 		private int _waitCountLimit = 20;
 		private int _waitCount;
 		private bool _init;
-		private bool _runningExit;
+		private bool _exited;
 		private static readonly Regex IdentifyRegex = new Regex(@"^[\{\}\d\w\s-/]+$");
 		private static bool _printedInfo;
+		private FileInfo _errorRequestFile;
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -138,8 +139,9 @@ namespace Java2Dotnet.Spider.Core
 
 			DataRootDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\data\\" + Identity;
 #else
-			DataRootDirectory = Path.Combine(AppContext.BaseDirectory, Path.Combine("data", Identity));
+			DataRootDirectory = Path.Combine(AppContext.BaseDirectory,"data", Identity);
 #endif
+			_errorRequestFile = FilePersistentBase.PrepareFile(Path.Combine(DataRootDirectory, "errorRequests.txt"));
 		}
 
 		/// <summary>
@@ -355,11 +357,10 @@ namespace Java2Dotnet.Spider.Core
 					}
 
 #if NET_CORE
-				Logger.Info($"Push Request: {StartRequests.Count} to Scheduler success.", true);
+					Logger.Info($"Push Request: {StartRequests.Count} to Scheduler success.", true);
 #else
 					Logger.Info("Push Request to Scheduler success.");
 #endif
-
 				}
 				else
 				{
@@ -407,7 +408,7 @@ namespace Java2Dotnet.Spider.Core
 			CheckIfRunning();
 
 			Stat = Status.Running;
-			_runningExit = false;
+			_exited = false;
 
 #if !NET_CORE
 			// 开启多线程支持
@@ -461,14 +462,14 @@ namespace Java2Dotnet.Spider.Core
 						{
 							ProcessRequest(request, downloader);
 							Thread.Sleep(Site.SleepTime);
-#if DEBUG
+#if TEST
 							System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 							sw.Reset();
 							sw.Start();
 #endif
 
 							OnSuccess(request);
-#if DEBUG
+#if TEST
 							sw.Stop();
 							Console.WriteLine("OnSuccess:" + (sw.ElapsedMilliseconds).ToString());
 #endif
@@ -517,9 +518,11 @@ namespace Java2Dotnet.Spider.Core
 				Logger.Info("Spider " + Identity + " stop success!");
 			}
 
+			SpiderClosingEvent?.Invoke();
+
 			Log.WaitForExit();
 
-			_runningExit = true;
+			_exited = true;
 		}
 
 		public static void PrintInfo()
@@ -575,7 +578,6 @@ namespace Java2Dotnet.Spider.Core
 
 		protected void OnClose()
 		{
-			SpiderClosingEvent?.Invoke();
 			foreach (var pipeline in Pipelines)
 			{
 				SafeDestroy(pipeline);
@@ -591,7 +593,6 @@ namespace Java2Dotnet.Spider.Core
 				// ignored
 			}
 
-
 			SafeDestroy(Scheduler);
 			SafeDestroy(PageProcessor);
 			SafeDestroy(Downloader);
@@ -601,8 +602,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			lock (this)
 			{
-				FileInfo file = FilePersistentBase.PrepareFile(Path.Combine(DataRootDirectory, "ErrorRequests.txt"));
-				File.AppendAllText(file.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
+				File.AppendAllText(_errorRequestFile.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
 			}
 
 			RequestFailedEvent?.Invoke(request);
@@ -637,23 +637,23 @@ namespace Java2Dotnet.Spider.Core
 			return page;
 		}
 
-		protected void ProcessRequest(Request request,IDownloader downloader)
+		protected void ProcessRequest(Request request, IDownloader downloader)
 		{
 			Page page = null;
-#if DEBUG
+#if TEST
 			System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 #endif
 			while (true)
 			{
 				try
 				{
-#if DEBUG
+#if TEST
 					sw.Reset();
 					sw.Start();
 #endif
 					page = downloader.Download(request, this);
 
-#if DEBUG
+#if TEST
 					sw.Stop();
 					Console.WriteLine("Download:" + (sw.ElapsedMilliseconds).ToString());
 #endif
@@ -664,12 +664,12 @@ namespace Java2Dotnet.Spider.Core
 
 					CustomizePage?.Invoke(page);
 
-#if DEBUG
+#if TEST
 					sw.Reset();
 					sw.Start();
 #endif
 					PageProcessor.Process(page);
-#if DEBUG
+#if TEST
 					sw.Stop();
 					Console.WriteLine("Process:" + (sw.ElapsedMilliseconds).ToString());
 #endif
@@ -713,7 +713,7 @@ namespace Java2Dotnet.Spider.Core
 				ExtractAndAddRequests(page, SpawnUrl);
 			}
 
-#if DEBUG
+#if TEST
 			sw.Reset();
 			sw.Start();
 #endif
@@ -735,7 +735,7 @@ namespace Java2Dotnet.Spider.Core
 				var message = $"Request {request.Url} 's result count is zero.";
 				Logger.Warn(message);
 			}
-#if DEBUG
+#if TEST
 			sw.Stop();
 			Console.WriteLine("IPipeline:" + (sw.ElapsedMilliseconds).ToString());
 #endif
@@ -760,94 +760,10 @@ namespace Java2Dotnet.Spider.Core
 			}
 		}
 
-		//protected virtual List<ICollectorPipeline> GetCollectorPipeline(params Type[] types)
-		//{
-		//	return new List<ICollectorPipeline>() { new ResultItemsCollectorPipeline() };
-		//}
-
-		///// <summary>
-		///// Download urls synchronizing.
-		///// </summary>
-		///// <typeparam name="T"></typeparam>
-		///// <param name="urls"></param>
-		///// <returns></returns>
-		//public IList<T> GetAll<T>(params string[] urls)
-		//{
-		//	DestroyWhenExit = false;
-		//	SpawnUrl = false;
-
-		//	foreach (Request request in UrlUtils.ConvertToRequests(urls, 1))
-		//	{
-		//		AddRequest(request);
-		//	}
-		//	ICollectorPipeline collectorPipeline = GetCollectorPipeline<T>();
-		//	Pipelines.Clear();
-		//	Pipelines.Add(collectorPipeline);
-		//	Run();
-		//	SpawnUrl = true;
-		//	DestroyWhenExit = true;
-
-		//	ICollection collection = collectorPipeline.GetCollected();
-
-		//	try
-		//	{
-		//		return (from object current in collection select (T)current).ToList();
-		//	}
-		//	catch (Exception)
-		//	{
-		//		throw new SpiderExceptoin($"Your pipeline didn't extract data to model: {typeof(T).FullName}");
-		//	}
-		//}
-
-		//[MethodImpl(MethodImplOptions.Synchronized)]
-		//public Dictionary<Type, List<dynamic>> GetAll(Type[] types, params string[] urls)
-		//{
-		//	//DestroyWhenExit = false;
-		//	SpawnUrl = false;
-
-		//	foreach (Request request in UrlUtils.ConvertToRequests(urls, 1))
-		//	{
-		//		AddRequest(request);
-		//	}
-		//	List<ICollectorPipeline> collectorPipelineList = GetCollectorPipeline(types);
-		//	Pipelines.Clear();
-		//	Pipelines.AddRange(collectorPipelineList);
-		//	Run();
-		//	SpawnUrl = true;
-		//	//DestroyWhenExit = true;
-
-		//	Dictionary<Type, List<dynamic>> result = new Dictionary<Type, List<dynamic>>();
-		//	foreach (var collectorPipeline in collectorPipelineList)
-		//	{
-		//		ICollection collection = collectorPipeline.GetCollected();
-
-		//		foreach (var entry in collection)
-		//		{
-		//			var de = (KeyValuePair<Type, List<dynamic>>)entry;
-
-		//			if (result.ContainsKey(de.Key))
-		//			{
-		//				result[de.Key].AddRange(de.Value);
-		//			}
-		//			else
-		//			{
-		//				result.Add(de.Key, new List<dynamic>(de.Value));
-		//			}
-		//		}
-		//	}
-
-		//	return result;
-		//}
-
 		private void ClearStartRequests()
 		{
 			lock (this)
 			{
-				//Request tmpTequest;
-				//while (StartRequests.TryTake(out tmpTequest))
-				//{
-				//	tmpTequest.Dispose();
-				//}
 				StartRequests.Clear();
 				GC.Collect();
 			}
@@ -868,12 +784,13 @@ namespace Java2Dotnet.Spider.Core
 		{
 			lock (this)
 			{
-				//double check
-				//if (ThreadPool.GetThreadAlive() == 0 && ExitWhenComplete)
-				//{
-				//	return;
-				//}
 				Thread.Sleep(WaitInterval);
+
+				if (!IsExitWhenComplete)
+				{
+					return;
+				}
+
 				++_waitCount;
 			}
 		}
@@ -897,7 +814,7 @@ namespace Java2Dotnet.Spider.Core
 		private void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
 		{
 			Stop();
-			while (!_runningExit)
+			while (!_exited)
 			{
 				Thread.Sleep(1500);
 			}

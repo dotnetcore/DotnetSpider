@@ -93,7 +93,6 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			finally
 			{
-				MonitorSpiderListener.WaitForExit();
 				spider?.Dispose();
 			}
 		}
