@@ -11,6 +11,8 @@ using Java2Dotnet.Spider.Redial;
 using System.Net.Http;
 using System.Net;
 using Java2Dotnet.Spider.Core.Proxy;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {
@@ -51,16 +53,24 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				}
 
 				var httpMessage = GenerateHttpRequestMessage(request, site);
-
+#if !NET_CORE
 				HttpClient httpClient = new HttpClient(new HttpClientHandler()
 				{
 					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-#if !NET_CORE
+
 					Proxy = proxy == null ? null : new WebProxy(proxy.Host, proxy.Port),
-#endif
+
 					AllowAutoRedirect = true,
 					UseCookies = string.IsNullOrEmpty(site.Cookie)
 				});
+#else
+				HttpClient httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler()
+				{
+					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+					AllowAutoRedirect = true,
+					UseCookies = string.IsNullOrEmpty(site.Cookie)
+				}));
+#endif
 
 				response = RedialManagerUtils.Execute("downloader-download", (m) =>
 				{
@@ -332,4 +342,82 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			}
 		}
 	}
+
+#if NET_CORE
+	public class GlobalRedirectHandler : DelegatingHandler
+	{
+		public GlobalRedirectHandler(HttpMessageHandler innerHandler)
+		{
+			InnerHandler = innerHandler;
+		}
+
+		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+		{
+			var tcs = new TaskCompletionSource<HttpResponseMessage>();
+
+			base.SendAsync(request, cancellationToken)
+				.ContinueWith(t =>
+				{
+					HttpResponseMessage response;
+					try
+					{
+						response = t.Result;
+					}
+					catch (Exception e)
+					{
+						response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+						response.ReasonPhrase = e.Message;
+					}
+					if (response.StatusCode == HttpStatusCode.MovedPermanently
+						|| response.StatusCode == HttpStatusCode.Moved
+						|| response.StatusCode == HttpStatusCode.Redirect
+						|| response.StatusCode == HttpStatusCode.Found
+						|| response.StatusCode == HttpStatusCode.SeeOther
+						|| response.StatusCode == HttpStatusCode.RedirectKeepVerb
+						|| response.StatusCode == HttpStatusCode.TemporaryRedirect
+
+						|| (int)response.StatusCode == 308)
+					{
+
+						var newRequest = CopyRequest(response.RequestMessage);
+
+						if (response.StatusCode == HttpStatusCode.Redirect
+							|| response.StatusCode == HttpStatusCode.Found
+							|| response.StatusCode == HttpStatusCode.SeeOther)
+						{
+							newRequest.Content = null;
+							newRequest.Method = HttpMethod.Get;
+
+						}
+						newRequest.RequestUri = response.Headers.Location;
+
+						base.SendAsync(newRequest, cancellationToken)
+							.ContinueWith(t2 => tcs.SetResult(t2.Result));
+					}
+					else
+					{
+						tcs.SetResult(response);
+					}
+				});
+
+			return tcs.Task;
+		}
+
+		private static HttpRequestMessage CopyRequest(HttpRequestMessage oldRequest)
+		{
+			var newrequest = new HttpRequestMessage(oldRequest.Method, oldRequest.RequestUri);
+
+			foreach (var header in oldRequest.Headers)
+			{
+				newrequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
+			}
+			foreach (var property in oldRequest.Properties)
+			{
+				newrequest.Properties.Add(property);
+			}
+			if (oldRequest.Content != null) newrequest.Content = new StreamContent(oldRequest.Content.ReadAsStreamAsync().Result);
+			return newrequest;
+		}
+	}
+#endif
 }
