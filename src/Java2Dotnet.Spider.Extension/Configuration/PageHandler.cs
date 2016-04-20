@@ -16,7 +16,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public abstract void Customize(Page page);
 	}
 
-	public class SubCustomizePage : PageHandler
+	public class SubPageHandler : PageHandler
 	{
 		public string StartString { get; set; }
 		public string EndString { get; set; }

@@ -78,12 +78,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Compile Include="..\Configuration\CustomizePage.cs">
-      <Link>Configuration\CustomizePage.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\CustomizeTargetUrls.cs">
-      <Link>Configuration\CustomizeTargetUrls.cs</Link>
-    </Compile>
     <Compile Include="..\Configuration\Downloader.cs">
       <Link>Configuration\Downloader.cs</Link>
     </Compile>
@@ -108,6 +102,9 @@
     <Compile Include="..\Configuration\NetworkValidater.cs">
       <Link>Configuration\NetworkValidater.cs</Link>
     </Compile>
+    <Compile Include="..\Configuration\PageHandler.cs">
+      <Link>Configuration\PageHandler.cs</Link>
+    </Compile>
     <Compile Include="..\Configuration\Pipeline.cs">
       <Link>Configuration\Pipeline.cs</Link>
     </Compile>
@@ -128,6 +125,9 @@
     </Compile>
     <Compile Include="..\Configuration\SpiderContextValidation.cs">
       <Link>Configuration\SpiderContextValidation.cs</Link>
+    </Compile>
+    <Compile Include="..\Configuration\TargetUrlsHandler.cs">
+      <Link>Configuration\TargetUrlsHandler.cs</Link>
     </Compile>
     <Compile Include="..\ContextSpider.cs">
       <Link>ContextSpider.cs</Link>

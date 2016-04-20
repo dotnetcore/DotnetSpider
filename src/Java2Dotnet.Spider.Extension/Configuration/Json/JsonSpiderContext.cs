@@ -346,7 +346,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			{
 				case Configuration.PageHandler.Types.Sub:
 					{
-						return jobject.ToObject<SubCustomizePage>();
+						return jobject.ToObject<SubPageHandler>();
 
 					}
 			}
