@@ -1,16 +1,12 @@
 ﻿using System;
 using Java2Dotnet.Spider.Core.Scheduler;
-#if NET_CORE
 using Java2Dotnet.Spider.JLog;
-#endif
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public abstract class Scheduler
 	{
-#if NET_CORE
 		protected static ILog Logger = LogManager.GetLogger();
-#endif
 		[Flags]
 		public enum Types
 		{
@@ -32,9 +28,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override IScheduler GetScheduler()
 		{
-#if NET_CORE
-			Logger.Info($"Redis Info: {Host} {Port} {Password}",true);
-#endif
+			Logger.Info($"Redis Info: {Host} {Port} {(string.IsNullOrEmpty(Password) ? "No Password" : "Password")}", true);
 			return new Extension.Scheduler.RedisScheduler(Host, Password, Port);
 		}
 	}

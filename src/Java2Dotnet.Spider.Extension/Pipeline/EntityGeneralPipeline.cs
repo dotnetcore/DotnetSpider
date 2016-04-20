@@ -57,10 +57,6 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 		protected EntityGeneralPipeline(Schema schema, JObject entityDefine, string connectString)
 		{
-#if NET_CORE
-			Logger.Info($"Db ConnectString: {connectString}", true);
-#endif
-
 			ConnectString = connectString;
 
 			Schema = GenerateSchema(schema);
