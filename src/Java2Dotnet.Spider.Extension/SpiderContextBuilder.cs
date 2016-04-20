@@ -17,7 +17,7 @@ namespace Java2Dotnet.Spider.Extension
 	{
 		public SpiderContext Context { get; }
 
-		protected HashSet<Type> EntiTypes { get; }
+		protected HashSet<Type> EntiTypes { get; } = new HashSet<Type>();
 
 		public SpiderContextBuilder(SpiderContext context, List<Type> entiTypes)
 		{
