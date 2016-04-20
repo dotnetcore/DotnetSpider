@@ -21,6 +21,7 @@ using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
 using Java2Dotnet.Spider.JLog;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 using RedisSharp;
 using DefaultNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.DefaultNetworkValidater;
 using VpsNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.VpsNetworkValidater;
@@ -32,12 +33,8 @@ namespace Java2Dotnet.Spider.Extension
 	{
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
-#if !NET_CORE
-		//private readonly ILog _logger = LogManager.GetLogger(typeof(ScriptSpider));
 		protected static readonly ILog _logger = LogManager.GetLogger();
-#else
-		private readonly ILog _logger = LogManager.GetLogger();
-#endif
+ 
 		private readonly string _validateReportTo;
 
 		private readonly List<IValidate> _validations = new List<IValidate>();
@@ -117,11 +114,8 @@ namespace Java2Dotnet.Spider.Extension
 			string key = "locker-validate-" + Name;
 			try
 			{
-#if !NET_CORE
-				Console.WriteLine($"Lock: {key} to keep only one validate process.");
-#else
-				Log.WriteLine($"Lock: {key} to keep only one validate process.");
-#endif
+				_logger.Info($"Lock: {key} to keep only one validate process.");
+
 				while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 				{
 					Thread.Sleep(1000);
@@ -132,11 +126,8 @@ namespace Java2Dotnet.Spider.Extension
 
 				if (needInitStartRequest)
 				{
-#if !NET_CORE
-					Console.WriteLine("Start validate ...");
-#else
-				    Log.WriteLine("Start validate ...");
-#endif
+					_logger.Info("Start validate ...");
+
 					if (_validations != null && _validations.Count > 0)
 					{
 						MailBodyBuilder builder = new MailBodyBuilder(Name,
@@ -159,12 +150,7 @@ namespace Java2Dotnet.Spider.Extension
 				}
 				else
 				{
-#if !NET_CORE
-					Console.WriteLine("No need to validate on this process because other process did.");
-#else
-					Log.WriteLine("No need to validate on this process because other process did.");
-#endif
-
+					_logger.Info("No need to validate on this process because other process did.");
 				}
 
 				if (needInitStartRequest)
@@ -174,20 +160,11 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			catch (Exception e)
 			{
-#if !NET_CORE
-				Console.WriteLine(e);
-#else
-				Log.WriteLine(e.ToString());
-#endif
 				_logger.Error(e.Message, e);
 			}
 			finally
 			{
-#if !NET_CORE
-				Console.WriteLine("Release locker.");
-#else
-				Log.WriteLine("Release locker.");
-#endif
+				_logger.Info("Release locker.");
 
 				redis.LockRelease(key, 0);
 			}
@@ -195,11 +172,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		private Core.Spider PrepareSpider(params string[] args)
 		{
-#if NET_CORE
-				_logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}", true);
-#else
 			_logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}");
-#endif
 
 			var schedulerType = _spiderContext.Scheduler.Type;
 
@@ -219,15 +192,12 @@ namespace Java2Dotnet.Spider.Extension
 						var scheduler = (Scheduler.RedisScheduler)(_spiderContext.Scheduler.GetScheduler());
 
 						string key = "locker-" + Name;
-						if (args != null && args.Length == 1)
+						if (args != null && args.Length > 0)
 						{
-							if (args[0] == "rerun")
+							if (args.Contains("rerun"))
 							{
-#if NET_CORE
-				_logger.Info($"Starting execute command: rerun", true);
-#else
 								_logger.Info($"Starting execute command: rerun");
-#endif
+
 								redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
 								redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
 								redis.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
@@ -238,25 +208,18 @@ namespace Java2Dotnet.Spider.Extension
 								redis.HashDelete("init-status", Name);
 								redis.HashDelete("validate-status", Name);
 								redis.KeyDelete("set-" + Encrypt.Md5Encrypt(Name));
-#if NET_CORE
-				_logger.Info($"Execute command: rerun finished.", true);
-#else
 								_logger.Info($"Execute command: rerun finished.");
-#endif
 							}
-
-							if (args[0] == "noconsole")
+							if (args.Contains("noconsole"))
 							{
-#if NET_CORE
 								Log.WriteLine("No console log info.");
-                                Log.NoConsole = true;
-#endif
+								Log.NoConsole = true;
 							}
 						}
 
 						try
 						{
-							Console.WriteLine($"Lock: {key} to keep only one prepare process.");
+							_logger.Info($"Lock: {key} to keep only one prepare process.");
 							while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 							{
 								Thread.Sleep(1000);
@@ -267,47 +230,46 @@ namespace Java2Dotnet.Spider.Extension
 
 							if (needInitStartRequest)
 							{
-								Console.WriteLine("Preparing site...");
+								_logger.Info("Preparing site...");
 
 								PrepareSite();
 							}
 							else
 							{
-								Console.WriteLine("No need to prepare site because other process did it.");
+								_logger.Info("No need to prepare site because other process did it.");
 								_spiderContext.Site.ClearStartRequests();
 							}
 
-							Console.WriteLine("Start creating Spider...");
+							_logger.Info("Start creating Spider...");
 
 							var spider = GenerateSpider(scheduler);
 
-							Console.WriteLine("Creat spider finished.");
-							
+							_logger.Info("Creat spider finished.");
+
 							spider.SaveStatus = true;
 							SpiderMonitor.Default.Register(spider);
-							
-							Console.WriteLine("Start init component...");
+
+							_logger.Info("Start init component...");
 							spider.InitComponent();
-							Console.WriteLine("Init component finished.");
+							_logger.Info("Init component finished.");
 
 							if (needInitStartRequest)
 							{
 								redis.HashSet(InitStatusSetName, Name, "init finished");
 							}
 
-							Console.WriteLine("Creating Spider finished.");
+							_logger.Info("Creating Spider finished.");
 
 							return spider;
 						}
 						catch (Exception e)
 						{
-							Console.WriteLine(e);
 							_logger.Error(e.Message, e);
 							return null;
 						}
 						finally
 						{
-							Console.WriteLine("Release locker.");
+							_logger.Info("Release locker.");
 							try
 							{
 								redis.LockRelease(key, 0);
