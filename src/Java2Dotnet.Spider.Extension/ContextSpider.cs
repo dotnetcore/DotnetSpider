@@ -20,13 +20,9 @@ using Java2Dotnet.Spider.Redial.Redialer;
 using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
 using Java2Dotnet.Spider.JLog;
-using Newtonsoft.Json.Linq;
 using System.Linq;
 using RedisSharp;
-using DefaultNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.DefaultNetworkValidater;
-using VpsNetworkValidater = Java2Dotnet.Spider.Redial.NetworkValidater.VpsNetworkValidater;
-using static Java2Dotnet.Spider.Extension.Monitor.SpiderMonitor;
-
+ 
 namespace Java2Dotnet.Spider.Extension
 {
 	public class ContextSpider
@@ -34,10 +30,7 @@ namespace Java2Dotnet.Spider.Extension
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
 		protected static readonly ILog _logger = LogManager.GetLogger();
- 
-		private readonly string _validateReportTo;
 
-		private readonly List<IValidate> _validations = new List<IValidate>();
 		private readonly SpiderContext _spiderContext;
 		private RedisServer redis;
 		public string Name { get; }
@@ -45,12 +38,6 @@ namespace Java2Dotnet.Spider.Extension
 		public ContextSpider(SpiderContext spiderContext)
 		{
 			_spiderContext = spiderContext;
-
-			_validateReportTo = _spiderContext.ValidationReportTo;
-			if (!string.IsNullOrEmpty(_validateReportTo))
-			{
-				CheckValidations();
-			}
 
 			Name = _spiderContext.SpiderName;
 
@@ -86,27 +73,13 @@ namespace Java2Dotnet.Spider.Extension
 
 				RunAfterSpiderFinished();
 
-				if (!string.IsNullOrEmpty(_validateReportTo))
-				{
-					DoValidate();
-				}
+				DoValidate();
 			}
 			finally
 			{
 				spider?.Dispose();
-				
-				Log.WaitForExit();
-			}
-		}
 
-		private void CheckValidations()
-		{
-			if (_validations != null && _validations.Count > 0)
-			{
-				foreach (var validation in _validations)
-				{
-					validation.CheckArguments();
-				}
+				Log.WaitForExit();
 			}
 		}
 
@@ -115,6 +88,22 @@ namespace Java2Dotnet.Spider.Extension
 			string key = "locker-validate-" + Name;
 			try
 			{
+				string _validateReportTo = _spiderContext.ValidationReportTo;
+				if (string.IsNullOrEmpty(_validateReportTo))
+				{
+					return;
+				}
+
+				var _validations = _spiderContext.Validations.GetValidations();
+
+				if (_validations != null && _validations.Count > 0)
+				{
+					foreach (var validation in _validations)
+					{
+						validation.CheckArguments();
+					}
+				}
+
 				_logger.Info($"Lock: {key} to keep only one validate process.");
 
 				while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
@@ -364,7 +353,7 @@ namespace Java2Dotnet.Spider.Extension
 			{
 				case NetworkValidater.Types.Vps:
 					{
-						return new VpsNetworkValidater(((Configuration.VpsNetworkValidater)networkValidater).InterfaceNum);
+						return new Redial.NetworkValidater.VpsNetworkValidater(((Configuration.VpsNetworkValidater)networkValidater).InterfaceNum);
 					}
 				case NetworkValidater.Types.Defalut:
 					{

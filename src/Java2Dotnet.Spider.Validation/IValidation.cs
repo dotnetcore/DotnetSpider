@@ -1,6 +1,6 @@
 ﻿namespace Java2Dotnet.Spider.Validation
 {
-	public interface IValidate
+	public interface IValidation
 	{
 		ValidateResult Validate();
 		void CheckArguments();

@@ -129,6 +129,9 @@
     <Compile Include="..\Configuration\TargetUrlsHandler.cs">
       <Link>Configuration\TargetUrlsHandler.cs</Link>
     </Compile>
+    <Compile Include="..\Configuration\Validation.cs">
+      <Link>Configuration\Validation.cs</Link>
+    </Compile>
     <Compile Include="..\ContextSpider.cs">
       <Link>ContextSpider.cs</Link>
     </Compile>

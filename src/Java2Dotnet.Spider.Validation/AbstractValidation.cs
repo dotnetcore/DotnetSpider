@@ -6,16 +6,16 @@ using System.Runtime.InteropServices;
 
 namespace Java2Dotnet.Spider.Validation
 {
-	public abstract class AbstractValidate : IValidate
+	public abstract class AbstractValidation : IValidation
 	{
-		protected string Arguments;
+		public string Arguments { get; set; }
+		public string Sql { get; set; }
+		public string Description { get; set; }
+		public ValidateLevel Level { get; set; }
+
 		protected DbConnection Connection;
 
-		public string Sql { get; }
-		public string Description { get; }
-		public ValidateLevel Level { get; }
-
-		protected AbstractValidate(DbConnection conn, string sql, string arguments, string description, ValidateLevel level)
+		protected AbstractValidation(DbConnection conn, string sql, string arguments, string description, ValidateLevel level)
 		{
 			Sql = sql;
 			Arguments = arguments;

@@ -4,9 +4,9 @@ using System.Data.Common;
 
 namespace Java2Dotnet.Spider.Validation
 {
-	public class RangeValidate : AbstractValidate
+	public class RangeValidation : AbstractValidation
 	{
-		public RangeValidate(DbConnection conn, string sql, string arguments, string description, ValidateLevel level = ValidateLevel.Error) : base(conn, sql, arguments, description, level)
+		public RangeValidation(DbConnection conn, string sql, string arguments, string description, ValidateLevel level = ValidateLevel.Error) : base(conn, sql, arguments, description, level)
 		{
 		}
 

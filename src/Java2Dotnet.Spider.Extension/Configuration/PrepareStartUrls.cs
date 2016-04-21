@@ -11,6 +11,8 @@ using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
+using System.Data.SqlClient;
+using System.Data.Common;
 #if !NET_CORE
 using System.Web;
 #else
@@ -19,6 +21,32 @@ using System.Net;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
+	public enum DataSource
+	{
+		MySql,
+		MsSql
+	}
+
+	public class DataSourceUtil
+	{
+		public static DbConnection GetConnection(DataSource source, string connectString)
+		{
+			switch (source)
+			{
+				case DataSource.MySql:
+					{
+						return new MySqlConnection(connectString);
+					}
+				case DataSource.MsSql:
+					{
+						return new SqlConnection(connectString);
+					}
+			}
+
+			throw new SpiderExceptoin($"Unsported datasource: {source}");
+		}
+	}
+
 	public abstract class PrepareStartUrls
 	{
 		[Flags]
@@ -50,15 +78,9 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			public List<Formatter> Formatters { get; set; } = new List<Formatter>();
 		}
 
-		public enum DataSource
-		{
-			MySql,
-			MsSql
-		}
-
 		public override Types Type { get; internal set; } = Types.GeneralDb;
 
-		public DataSource Source { get; set; }
+		public DataSource Source { get; set; } = DataSource.MySql;
 
 		public string ConnectString { get; set; }
 
@@ -90,7 +112,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override void Build(Site site)
 		{
-			using (var conn = new MySqlConnection(ConnectString))
+			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
 			{
 				List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
 				string sql = GetSelectQueryString();

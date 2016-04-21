@@ -30,5 +30,6 @@ namespace Java2Dotnet.Spider.Extension
 		public PageHandler PageHandler { get; set; }
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
+		public Validations Validations { get; set; }
 	}
 }

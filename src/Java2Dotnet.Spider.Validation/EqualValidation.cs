@@ -8,9 +8,9 @@ using System.Net;
 
 namespace Java2Dotnet.Spider.Validation
 {
-	public class EqualValidate : AbstractValidate
+	public class EqualValidation : AbstractValidation
 	{
-		public EqualValidate(DbConnection conn, string sql, string arguments, string description, ValidateLevel level = ValidateLevel.Error) : base(conn, sql, arguments, description, level)
+		public EqualValidation(DbConnection conn, string sql, string arguments, string description, ValidateLevel level = ValidateLevel.Error) : base(conn, sql, arguments, description, level)
 		{
 		}
 

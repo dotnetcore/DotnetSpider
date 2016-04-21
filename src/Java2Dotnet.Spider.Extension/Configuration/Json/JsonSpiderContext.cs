@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Newtonsoft.Json.Linq;
+using Java2Dotnet.Spider.Validation;
 
 namespace Java2Dotnet.Spider.Extension.Configuration.Json
 {
@@ -27,6 +29,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		public string ValidationReportTo { get; set; }
 		public JObject PageHandler { get; set; }
 		public JObject TargetUrlsHandler { get; set; }
+		public JObject Validations { get; set; }
 
 		public SpiderContext ToRuntimeContext()
 		{
@@ -50,7 +53,68 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.ThreadNum = ThreadNum;
 			context.ValidationReportTo = ValidationReportTo;
 			context.EnviromentValues = EnviromentValues;
+			context.Validations = GetValidations(Validations);
 			return context;
+		}
+
+		private Validations GetValidations(JObject validations)
+		{
+			if (validations == null)
+			{
+				return null;
+			}
+
+			Validations result = new Validations();
+			var dataSource = validations.SelectToken("$.DataSource")?.ToObject<DataSource>();
+			var connectString = validations.SelectToken("$.ConnectString")?.ToString();
+
+			if (dataSource == null || string.IsNullOrEmpty(connectString))
+			{
+				return null;
+			}
+			result.Source = dataSource.Value;
+			result.ConnectString = connectString;
+
+			foreach (var validation in validations.SelectTokens("$.Rules[*]"))
+			{
+				var type = validation.SelectToken("$.Type")?.ToObject<Validation.Types>();
+				if (type == null)
+				{
+					continue;
+				}
+				var arguments = validations.SelectToken("$.Arguments")?.ToString();
+				var sql = validations.SelectToken("$.Sql")?.ToString();
+				var description = validations.SelectToken("$.Description")?.ToString();
+				var level = validations.SelectToken("$.Level")?.ToObject<ValidateLevel>();
+
+				result.Rules.Add(GetValidation(type.Value, arguments, sql, description, level.Value));
+			}
+
+			if (result.Rules.Count == 0)
+			{
+				return null;
+			}
+			else
+			{
+				return result;
+			}
+		}
+
+		private Validation GetValidation(Validation.Types type, string arguments, string sql, string description, ValidateLevel level)
+		{
+			switch (type)
+			{
+				case Validation.Types.Equal:
+					{
+						return new EqualValidation { Arguments = arguments, Sql = sql, Description = description, Level = level };
+					}
+				case Validation.Types.Range:
+					{
+						return new RangeValidation { Arguments = arguments, Sql = sql, Description = description, Level = level };
+					}
+			}
+
+			throw new SpiderExceptoin($"Unsported validation type: {type}");
 		}
 
 		private NetworkValidater GetNetworkValidater(JObject networkValidater)
@@ -165,7 +229,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 							var limit = jobject.SelectToken("$.Limit");
 							generalDbPrepareStartUrls.Limit = limit?.ToObject<int>() ?? int.MaxValue;
 							generalDbPrepareStartUrls.TableName = jobject.SelectToken("$.TableName")?.ToString();
-							generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<GeneralDbPrepareStartUrls.DataSource>();
+							generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<DataSource>();
 							foreach (var column in jobject.SelectTokens("$.Columns[*]"))
 							{
 								var c = new GeneralDbPrepareStartUrls.Column()

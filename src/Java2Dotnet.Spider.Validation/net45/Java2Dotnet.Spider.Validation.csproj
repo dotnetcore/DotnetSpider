@@ -44,20 +44,20 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Compile Include="..\AbstractValidate.cs">
-      <Link>AbstractValidate.cs</Link>
+    <Compile Include="..\AbstractValidation.cs">
+      <Link>AbstractValidation.cs</Link>
     </Compile>
-    <Compile Include="..\EqualValidate.cs">
-      <Link>EqualValidate.cs</Link>
+    <Compile Include="..\EqualValidation.cs">
+      <Link>EqualValidation.cs</Link>
     </Compile>
-    <Compile Include="..\IValidate.cs">
-      <Link>IValidate.cs</Link>
+    <Compile Include="..\IValidation.cs">
+      <Link>IValidation.cs</Link>
     </Compile>
     <Compile Include="..\MailBodyBuilder.cs">
       <Link>MailBodyBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\RangeValidate.cs">
-      <Link>RangeValidate.cs</Link>
+    <Compile Include="..\RangeValidation.cs">
+      <Link>RangeValidation.cs</Link>
     </Compile>
     <Compile Include="..\ValidateLevel.cs">
       <Link>ValidateLevel.cs</Link>

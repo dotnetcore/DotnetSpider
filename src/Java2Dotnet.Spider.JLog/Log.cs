@@ -51,9 +51,9 @@ namespace Java2Dotnet.Spider.JLog
 			Writter = File.AppendText(LogFile);
 			LogServer = ConfigurationManager.Get("logHost");
 			var noConsoleProperty = ConfigurationManager.Get("noConsoleLog");
-			if(!string.IsNullOrEmpty(noConsoleProperty))
+			if (!string.IsNullOrEmpty(noConsoleProperty))
 			{
-				NoConsole = bool.Parse(noConsoleProperty);	
+				NoConsole = bool.Parse(noConsoleProperty);
 			}
 		}
 
@@ -89,7 +89,7 @@ namespace Java2Dotnet.Spider.JLog
 			Warn(message, null, showToConsole);
 		}
 
-		public void Info(string message, Exception e, bool showToConsole) = true
+		public void Info(string message, Exception e, bool showToConsole = true)
 		{
 			var log = CreateLogInfo("INFO", message, e);
 			WriteToLogFile(log);
