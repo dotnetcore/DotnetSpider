@@ -146,7 +146,8 @@ Content-Type: {4};
 
 		private void Connect(string host, int port)
 		{
-			tcpClient = new TcpClient(host, port);
+			tcpClient = new TcpClient();
+            tcpClient.ConnectAsync(host,port);
 			stream = tcpClient.GetStream();
 		}
 
