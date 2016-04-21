@@ -61,19 +61,26 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			}
 
 			Validations result = new Validations();
-			var dataSource = validations.SelectToken("$.DataSource")?.ToObject<DataSource>();
-			var connectString = validations.SelectToken("$.ConnectString")?.ToString();
-			var reportTo = validations.SelectToken("$.ReportTo")?.ToString();
-			var corporation = validations.SelectToken("$.Corporation")?.ToString();
-			if (dataSource == null || string.IsNullOrEmpty(connectString) || string.IsNullOrEmpty(reportTo))
+			var source = validations.SelectToken("$.DataSource");
+			if (source == null)
 			{
 				return null;
 			}
-			result.Source = dataSource.Value;
-			result.ConnectString = connectString;
-			result.Corporation = corporation;
-			result.ReportTo = reportTo;
+			result.Source = source.ToObject<DataSource>();
+			result.ConnectString = validations.SelectToken("$.ConnectString")?.ToString();
+			result.EmailTo = validations.SelectToken("$.ReportTo")?.ToString();
+			result.Corporation = validations.SelectToken("$.Corporation")?.ToString();
+			result.EmailPassword = validations.SelectToken("$.EmailPassword")?.ToString();
+			var port = validations.SelectToken("$.EmailSmtpPort");
+			result.EmailSmtpPort = port == null ? 25 : int.Parse(port.ToString());
+			result.EmailSmtpServer = validations.SelectToken("$.EmailSmtpServer")?.ToString();
+			result.EmailUser = validations.SelectToken("$.EmailUser")?.ToString();
 
+			if (string.IsNullOrEmpty(result.ConnectString) || string.IsNullOrEmpty(result.EmailTo) || string.IsNullOrEmpty(result.EmailPassword) || string.IsNullOrEmpty(result.EmailSmtpServer) || string.IsNullOrEmpty(result.EmailUser))
+			{
+				return null;
+			}
+ 
 			foreach (var validation in validations.SelectTokens("$.Rules[*]"))
 			{
 				var type = validation.SelectToken("$.Type")?.ToObject<Validation.Types>();
@@ -329,7 +336,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 						break;
 #else
 						throw new SpiderExceptoin("UNSPORT WEBDRIVER DOWNLOADER.");
-#endif						
+#endif
 					}
 				case Configuration.Downloader.Types.HttpClientDownloader:
 					{

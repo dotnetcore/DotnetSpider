@@ -28,10 +28,9 @@ namespace Java2Dotnet.Spider.Test
 			//spider.Run(args);
 
 
-			Regex regex = new Regex(@"\d");
-			var m = regex.Match("6");
-
-			Console.WriteLine("OK");
+			EmailClient client = new EmailClient("smtp.163.com", "modestmt@163.com", "zousong.88");
+			var msg = new EmaillMessage("test", "test", "zlzforever@163.com" );
+			client.SendMail(msg);
 		}
 
 		private static void TestStatusServer()

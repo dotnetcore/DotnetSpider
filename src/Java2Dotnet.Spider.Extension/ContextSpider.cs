@@ -126,7 +126,10 @@ namespace Java2Dotnet.Spider.Extension
 						}
 						string mailBody = builder.Build();
 
-						EmailUtil2.Send($"{Name} " + "validation report", _spiderContext.Validations.ReportTo, mailBody);
+						using (EmailClient client = new EmailClient(_spiderContext.Validations.EmailSmtpServer, _spiderContext.Validations.EmailUser, _spiderContext.Validations.EmailPassword, _spiderContext.Validations.EmailSmtpPort))
+						{
+							client.SendMail(new EmaillMessage($"{Name} " + "validation report", mailBody, _spiderContext.Validations.EmailTo) { IsHtml = true });
+						}
 					}
 				}
 				else

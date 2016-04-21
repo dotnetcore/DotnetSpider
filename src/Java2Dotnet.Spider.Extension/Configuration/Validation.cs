@@ -8,13 +8,22 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	public class Validations
 	{
 		public string Corporation { get; set; }
+		public string EmailUser { get; set; }
+		public string EmailPassword { get; set; }
+		public string EmailSmtpServer { get; set; }
+		public int EmailSmtpPort { get; set; } = 25;
+		public string EmailTo { get; set; }
 		public string ConnectString { get; set; }
 		public DataSource Source { get; set; } = DataSource.MySql;
-		public string ReportTo { get; set; }
 		public List<Validation> Rules { get; set; }
 
 		internal List<IValidation> GetValidations()
 		{
+			if (string.IsNullOrEmpty(ConnectString) || string.IsNullOrEmpty(EmailTo) || string.IsNullOrEmpty(EmailPassword) || string.IsNullOrEmpty(EmailSmtpServer) || string.IsNullOrEmpty(EmailUser))
+			{
+				return null;
+			}
+
 			var conn = DataSourceUtil.GetConnection(Source, ConnectString);
 			List<IValidation> results = new List<IValidation>();
 			foreach (var rule in Rules)
