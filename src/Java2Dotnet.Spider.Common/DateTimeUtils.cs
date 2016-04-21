@@ -19,8 +19,8 @@ namespace Java2Dotnet.Spider.Common
 		private static readonly DateTimeOffset Epoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 		private const long TicksPerMicrosecond = 10;
 
-		public static string TODAY_RUN_ID = DateTime.Now.Date.ToString("yyyy-MM-dd");
-		public static string MONTHLY_RUN_ID = DateTime.Now.ToString("yyyy-MM");
+		public static string TODAY_RUN_ID = DateTime.Now.ToString("yyyy-MM-dd");
+		public static string MONTHLY_RUN_ID = FirstDayofThisMonth.ToString("yyyy-MM");
 		public static string MONDAY_RUN_ID = FirstDayofThisWeek.ToString("yyyy-MM-dd");
 
 		static DateTimeUtils()

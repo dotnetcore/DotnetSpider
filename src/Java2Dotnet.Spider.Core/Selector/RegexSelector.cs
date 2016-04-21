@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Java2Dotnet.Spider.Common;
 using StringUtils = Java2Dotnet.Spider.Common.StringUtils;
 
 namespace Java2Dotnet.Spider.Core.Selector
