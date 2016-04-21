@@ -107,6 +107,9 @@
     <Compile Include="..\EmailUtil.cs">
       <Link>EmailUtil.cs</Link>
     </Compile>
+    <Compile Include="..\EmailUtil2.cs">
+      <Link>EmailUtil2.cs</Link>
+    </Compile>
     <Compile Include="..\Encrypt.cs">
       <Link>Encrypt.cs</Link>
     </Compile>

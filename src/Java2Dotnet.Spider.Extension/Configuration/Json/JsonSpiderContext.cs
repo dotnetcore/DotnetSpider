@@ -25,8 +25,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 
 		public JObject Pipeline { get; set; }
 		public List<JObject> Entities { get; set; } = new List<JObject>();
-		public string Corporation { get; set; }
-		public string ValidationReportTo { get; set; }
 		public JObject PageHandler { get; set; }
 		public JObject TargetUrlsHandler { get; set; }
 		public JObject Validations { get; set; }
@@ -35,7 +33,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		{
 			SpiderContext context = new SpiderContext();
 			context.CachedSize = CachedSize;
-			context.Corporation = Corporation;
 			context.PageHandler = GetCustomziePage(PageHandler);
 			context.TargetUrlsHandler = GetCustomizeTargetUrls(TargetUrlsHandler);
 			context.Deep = Deep;
@@ -51,7 +48,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.StartUrls = StartUrls;
 			context.SpiderName = SpiderName;
 			context.ThreadNum = ThreadNum;
-			context.ValidationReportTo = ValidationReportTo;
 			context.EnviromentValues = EnviromentValues;
 			context.Validations = GetValidations(Validations);
 			return context;
@@ -67,13 +63,16 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			Validations result = new Validations();
 			var dataSource = validations.SelectToken("$.DataSource")?.ToObject<DataSource>();
 			var connectString = validations.SelectToken("$.ConnectString")?.ToString();
-
-			if (dataSource == null || string.IsNullOrEmpty(connectString))
+			var reportTo = validations.SelectToken("$.ReportTo")?.ToString();
+			var corporation = validations.SelectToken("$.Corporation")?.ToString();
+			if (dataSource == null || string.IsNullOrEmpty(connectString) || string.IsNullOrEmpty(reportTo))
 			{
 				return null;
 			}
 			result.Source = dataSource.Value;
 			result.ConnectString = connectString;
+			result.Corporation = corporation;
+			result.ReportTo = reportTo;
 
 			foreach (var validation in validations.SelectTokens("$.Rules[*]"))
 			{

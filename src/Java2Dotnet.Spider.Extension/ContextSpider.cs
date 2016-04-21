@@ -22,7 +22,7 @@ using Java2Dotnet.Spider.Validation;
 using Java2Dotnet.Spider.JLog;
 using System.Linq;
 using RedisSharp;
- 
+
 namespace Java2Dotnet.Spider.Extension
 {
 	public class ContextSpider
@@ -88,8 +88,7 @@ namespace Java2Dotnet.Spider.Extension
 			string key = "locker-validate-" + Name;
 			try
 			{
-				string _validateReportTo = _spiderContext.ValidationReportTo;
-				if (string.IsNullOrEmpty(_validateReportTo))
+				if (_spiderContext.Validations == null)
 				{
 					return;
 				}
@@ -111,7 +110,7 @@ namespace Java2Dotnet.Spider.Extension
 					Thread.Sleep(1000);
 				}
 
-				var lockerValue = redis.HashGet(ValidateStatusName, Name).ToString();
+				var lockerValue = redis.HashGet(ValidateStatusName, Name);
 				bool needInitStartRequest = lockerValue != "validate finished";
 
 				if (needInitStartRequest)
@@ -120,22 +119,14 @@ namespace Java2Dotnet.Spider.Extension
 
 					if (_validations != null && _validations.Count > 0)
 					{
-						MailBodyBuilder builder = new MailBodyBuilder(Name,
-#if !NET_CORE
-							System.Configuration.ConfigurationManager.AppSettings["corporation"]
-#else
-							"ooodata.com"
-#endif
-							);
+						MailBodyBuilder builder = new MailBodyBuilder(Name, _spiderContext.Validations.Corporation);
 						foreach (var validation in _validations)
 						{
 							builder.AddValidateResult(validation.Validate());
 						}
 						string mailBody = builder.Build();
 
-#if !NET_CORE
-						EmailUtil.Send($"{Name} " + "validation report", _validateReportTo, mailBody);
-#endif
+						EmailUtil2.Send($"{Name} " + "validation report", _spiderContext.Validations.ReportTo, mailBody);
 					}
 				}
 				else

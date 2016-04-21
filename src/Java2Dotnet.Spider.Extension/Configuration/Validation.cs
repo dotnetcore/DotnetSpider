@@ -7,9 +7,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public class Validations
 	{
+		public string Corporation { get; set; }
 		public string ConnectString { get; set; }
 		public DataSource Source { get; set; } = DataSource.MySql;
-
+		public string ReportTo { get; set; }
 		public List<Validation> Rules { get; set; }
 
 		internal List<IValidation> GetValidations()
