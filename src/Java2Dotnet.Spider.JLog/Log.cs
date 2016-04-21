@@ -50,6 +50,11 @@ namespace Java2Dotnet.Spider.JLog
 #endif
 			Writter = File.AppendText(LogFile);
 			LogServer = ConfigurationManager.Get("logHost");
+			var noConsoleProperty = ConfigurationManager.Get("noConsoleLog");
+			if(!string.IsNullOrEmpty(noConsoleProperty))
+			{
+				NoConsole = bool.Parse(noConsoleProperty);	
+			}
 		}
 
 		public static void WaitForExit()
@@ -69,7 +74,7 @@ namespace Java2Dotnet.Spider.JLog
 			Name = name;
 		}
 
-		public void Warn(string message, Exception e, bool showToConsole)
+		public void Warn(string message, Exception e, bool showToConsole = true)
 		{
 			var log = CreateLogInfo("WARNING", message, e);
 			WriteToLogFile(log);
@@ -79,12 +84,12 @@ namespace Java2Dotnet.Spider.JLog
 			}
 		}
 
-		public void Warn(string message, bool showToConsole)
+		public void Warn(string message, bool showToConsole = true)
 		{
 			Warn(message, null, showToConsole);
 		}
 
-		public void Info(string message, Exception e, bool showToConsole)
+		public void Info(string message, Exception e, bool showToConsole) = true
 		{
 			var log = CreateLogInfo("INFO", message, e);
 			WriteToLogFile(log);
@@ -94,12 +99,12 @@ namespace Java2Dotnet.Spider.JLog
 			}
 		}
 
-		public void Info(string message, bool showToConsole)
+		public void Info(string message, bool showToConsole = true)
 		{
 			Info(message, null, showToConsole);
 		}
 
-		public void Error(string message, Exception e, bool showToConsole)
+		public void Error(string message, Exception e, bool showToConsole = true)
 		{
 			var log = CreateLogInfo("ERROR", message, e);
 			WriteToLogFile(log);
@@ -109,7 +114,7 @@ namespace Java2Dotnet.Spider.JLog
 			}
 		}
 
-		public void Error(string message, bool showToConsole)
+		public void Error(string message, bool showToConsole = true)
 		{
 			Error(message, null, showToConsole);
 		}

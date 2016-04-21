@@ -94,6 +94,8 @@ namespace Java2Dotnet.Spider.Extension
 			finally
 			{
 				spider?.Dispose();
+				
+				Log.WaitForExit();
 			}
 		}
 
