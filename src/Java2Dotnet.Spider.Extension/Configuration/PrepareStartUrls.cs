@@ -69,7 +69,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public abstract void Build(Site site);
 	}
 
-	public class GeneralDbPrepareStartUrls : PrepareStartUrls
+	public class DbPrepareStartUrls : PrepareStartUrls
 	{
 		public class Column
 		{

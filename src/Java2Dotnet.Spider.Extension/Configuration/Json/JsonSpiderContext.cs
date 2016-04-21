@@ -221,7 +221,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				{
 					case Configuration.PrepareStartUrls.Types.GeneralDb:
 						{
-							GeneralDbPrepareStartUrls generalDbPrepareStartUrls = new GeneralDbPrepareStartUrls();
+							DbPrepareStartUrls generalDbPrepareStartUrls = new DbPrepareStartUrls();
 							generalDbPrepareStartUrls.ConnectString = jobject.SelectToken("$.ConnectString")?.ToString();
 							generalDbPrepareStartUrls.Filters = jobject.SelectToken("$.Filters")?.ToObject<List<string>>();
 							generalDbPrepareStartUrls.FormateStrings = jobject.SelectToken("$.FormateStrings")?.ToObject<List<string>>();
@@ -231,7 +231,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 							generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<DataSource>();
 							foreach (var column in jobject.SelectTokens("$.Columns[*]"))
 							{
-								var c = new GeneralDbPrepareStartUrls.Column()
+								var c = new DbPrepareStartUrls.Column()
 								{
 									Name = column.SelectToken("$.Name").ToString()
 								};

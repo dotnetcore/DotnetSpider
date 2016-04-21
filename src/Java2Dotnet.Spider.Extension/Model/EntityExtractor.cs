@@ -128,12 +128,12 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 			if (field.ToLower() == "monday")
 			{
-				return DateTimeUtils.FirstDayofThisWeek.ToString("yyyy-MM-dd");
+				return DateTimeUtils.MONDAY_RUN_ID;
 			}
 
 			if (field.ToLower() == "today")
 			{
-				return DateTimeUtils.TodayRunId;
+				return DateTimeUtils.TODAY_RUN_ID;
 			}
 
 			return page.Request.GetExtra(field);
