@@ -14,6 +14,7 @@ using System.Threading;
 using Java2Dotnet.Spider.Core;
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
+using System.Text.RegularExpressions;
 
 namespace Java2Dotnet.Spider.Test
 {
@@ -27,7 +28,8 @@ namespace Java2Dotnet.Spider.Test
 			//spider.Run(args);
 
 
-			EmailUtil2.Send("lewis@86research.com", "test", "test");
+			Regex regex = new Regex(@"\d");
+			var m = regex.Match("6");
 
 			Console.WriteLine("OK");
 		}

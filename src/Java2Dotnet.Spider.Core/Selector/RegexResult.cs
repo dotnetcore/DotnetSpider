@@ -20,11 +20,11 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public string Get(int groupId)
 		{
-			if (_groups.Count > groupId)
+			if (_groups != null && _groups.Count > groupId)
 			{
 				return _groups?[groupId];
 			}
-			throw new SpiderExceptoin($"Regex: {_regexString} can't match data, please verify your regex or the page's source html.");
+			return null;
 		}
 	}
 }

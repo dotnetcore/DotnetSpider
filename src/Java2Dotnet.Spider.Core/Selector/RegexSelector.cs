@@ -33,7 +33,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 		}
 
 		public RegexSelector(string regexStr)
-			: this(regexStr, 1)
+			: this(regexStr, 0)
 		{
 		}
 
@@ -51,7 +51,14 @@ namespace Java2Dotnet.Spider.Core.Selector
 		private RegexResult SelectGroup(string text)
 		{
 			var match = _regex.Match(text);
-			return new RegexResult(_regex.ToString(), (from Group g in match.Groups select g.Value).ToList());
+			if (match.Success)
+			{
+				return new RegexResult(_regex.ToString(), (from Group g in match.Groups select g.Value).ToList());
+			}
+			else
+			{
+				return new RegexResult(null, null);
+			}
 		}
 
 		private List<RegexResult> SelectGroupList(string text)
