@@ -134,9 +134,11 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					}
 					datas.Add(values);
 				}
-
+#if !NET_CORE
 				reader.Close();
-
+#else
+				reader.Dispose();
+#endif
 				Parallel.ForEach(datas, new ParallelOptions { MaxDegreeOfParallelism = 1 }, brand =>
 				{
 					Dictionary<string, object> tmp = brand;
