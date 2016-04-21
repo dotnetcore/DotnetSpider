@@ -326,10 +326,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 							}
 						}
 						downloader = webDriverDownloader;
-#else
-							throw new SpiderExceptoin("UNSPORT WEBDRIVER DOWNLOADER.");
-#endif
 						break;
+#else
+						throw new SpiderExceptoin("UNSPORT WEBDRIVER DOWNLOADER.");
+#endif						
 					}
 				case Configuration.Downloader.Types.HttpClientDownloader:
 					{
