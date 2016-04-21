@@ -64,7 +64,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 		/// <returns></returns>
 		public override ISelectable Links()
 		{
-			return XPath(".//a/@href");
+			return XPath(".//a/@href").Regex("");
 		}
 
 		public override ISelectable XPath(string xpath)

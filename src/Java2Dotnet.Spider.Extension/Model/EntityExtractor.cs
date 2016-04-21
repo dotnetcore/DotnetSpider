@@ -67,7 +67,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 
 				var list = page.Selectable.SelectList(selector).Nodes();
-				if(list==null || list.Count == 0)
+				if (list == null || list.Count == 0)
 				{
 					return null;
 				}
@@ -79,13 +79,15 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 
 				List<JObject> result = new List<JObject>();
+				int index = 0;
 				foreach (var item in list)
 				{
-					JObject obj = ProcessSingle(page, item, _entityDefine);
+					JObject obj = ProcessSingle(page, item, _entityDefine, index);
 					if (obj != null)
 					{
 						result.Add(obj);
 					}
+					index++;
 				}
 				return result;
 			}
@@ -105,11 +107,11 @@ namespace Java2Dotnet.Spider.Extension.Model
 					}
 				}
 
-				return ProcessSingle(page, select, _entityDefine);
+				return ProcessSingle(page, select, _entityDefine, 0);
 			}
 		}
 
-		private string GetEnviromentValue(string field, Page page)
+		private string GetEnviromentValue(string field, Page page, int index)
 		{
 			if (field.ToLower() == "url")
 			{
@@ -136,10 +138,15 @@ namespace Java2Dotnet.Spider.Extension.Model
 				return DateTimeUtils.TODAY_RUN_ID;
 			}
 
+			if (field.ToLower() == "index")
+			{
+				return index.ToString();
+			}
+
 			return page.Request.GetExtra(field);
 		}
 
-		private JObject ProcessSingle(Page page, ISelectable item, JToken entityDefine)
+		private JObject ProcessSingle(Page page, ISelectable item, JToken entityDefine, int index)
 		{
 			JObject dataItem = new JObject();
 
@@ -167,7 +174,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 					if (selector is EnviromentSelector)
 					{
 						var enviromentSelector = selector as EnviromentSelector;
-						tmpValue = GetEnviromentValue(enviromentSelector.Field, page);
+						tmpValue = GetEnviromentValue(enviromentSelector.Field, page, index);
 						foreach (var formatter in formatters)
 						{
 							tmpValue = formatter.Formate(tmpValue);
@@ -219,13 +226,15 @@ namespace Java2Dotnet.Spider.Extension.Model
 						}
 
 						List<JObject> result = new List<JObject>();
+						int index1 = 0;
 						foreach (var entity in propertyValues)
 						{
-							JObject obj = ProcessSingle(page, entity, datatype);
+							JObject obj = ProcessSingle(page, entity, datatype, index1);
 							if (obj != null)
 							{
 								result.Add(obj);
 							}
+							index1++;
 						}
 						dataItem.Add(propertyName, new JArray(result));
 					}
@@ -236,7 +245,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 						{
 							return null;
 						}
-						var propertyValue = ProcessSingle(page, select, datatype);
+						var propertyValue = ProcessSingle(page, select, datatype, 0);
 						dataItem.Add(propertyName, new JObject(propertyValue));
 					}
 				}
