@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <title>
+        86Research View Logs
+    </title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+    <link href="stylesheets/style.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="header">
+        <a class="h1" href="default.htm">86Research Data Center</a>
+    </div>
+    <div id="side">
+        <input id="userid" type="text" value="86Research-DotnetSpider-Log" />
+        <input id="refresh" type="button" onclick="refreshtasks()" value="Refresh" />
+        <div id="tasks">
+            <!--<a class="taska" href="#" onclick="searchlogs('userid','taskid');">task01</a>
+            <br />-->
+        </div>
+    </div>
+    <div id="content">
+        <div id="content_inner">
+            <span>No Log</span>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+    <div id="footer"> </div>
+    <script src="/javascripts/viewlogs.js"></script>
+</body>
+</html>

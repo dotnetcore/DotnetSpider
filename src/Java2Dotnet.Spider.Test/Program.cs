@@ -26,10 +26,10 @@ namespace Java2Dotnet.Spider.Test
 			//var context = spiderBuilder.GetBuilder().Context;
 			//ContextSpider spider = new ContextSpider(context);
 			//spider.Run(args);
-
+			var a = DateTimeUtils.MONTHLY_RUN_ID;
 
 			EmailClient client = new EmailClient("smtp.163.com", "modestmt@163.com", "zousong.88");
-			var msg = new EmaillMessage("test", "test", "zlzforever@163.com" );
+			var msg = new EmaillMessage("test", "test", "zlzforever@163.com");
 			client.SendMail(msg);
 		}
 
