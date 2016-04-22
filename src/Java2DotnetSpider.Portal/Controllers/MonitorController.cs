@@ -19,12 +19,13 @@ namespace Java2DotnetSpider.Portal.Controllers
 	{
 		private static ConnectionMultiplexer context = ConnectionMultiplexer.Connect(new ConfigurationOptions
 		{
-			ServiceName = "dc01.86research.cn",
-			Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
+			ServiceName = Startup.Configuration.GetSection("AppSetting").Get<string>("redisHost"),
+			Password = Startup.Configuration.GetSection("AppSetting").Get<string>("redisPassword"),
 			EndPoints = {
-							{ "dc01.86research.cn", 6379 }
+							{ Startup.Configuration.GetSection("AppSetting").Get<string>("redisHost"), 6379 }
 						}
 		});
+
 		private static IDatabase db = context.GetDatabase(4);
 
 		[HttpGet("{userid}/{id}")]
