@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core;
+using Java2Dotnet.Spider.Core.Downloader;
 using Java2Dotnet.Spider.Extension;
 using Java2Dotnet.Spider.Extension.Configuration;
 using Java2Dotnet.Spider.Extension.Model;
@@ -9,6 +10,7 @@ using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Java2Dotnet.Spider.Extension.ORM;
 using Newtonsoft.Json.Linq;
+using DownloadValidation = Java2Dotnet.Spider.Extension.Configuration.DownloadValidation;
 
 namespace Java2Dotnet.Spider.Test.Example
 {
@@ -33,13 +35,24 @@ namespace Java2Dotnet.Spider.Test.Example
 				},
 				Scheduler = new RedisScheduler
 				{
-					Host = "redis",
-					Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
+					Host = "127.0.0.1",
+					Password = "",
 					Port = 6379
 				},
 				Pipeline = new MysqlPipeline
 				{
 					ConnectString = "Database='mysql';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
+				},
+				Downloader = new HttpDownloader()
+				{
+					DownloadValidations = new List<DownloadValidation>
+					{
+						new ContainsDownloadValidation
+						{
+							ContainsString = "京东",
+							Result = DownloadValidationResult.Miss
+						}
+					}
 				}
 			}, typeof(Product));
 		}

@@ -26,7 +26,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		/// Contains("anti_Spider")
 		/// UrlContains("anti_Spider")
 		/// </summary>
-		public DownloadValidation DownloadValidation { get; set; }
+		public List<DownloadValidation> DownloadValidations { get; set; }
 
 		public abstract IDownloader GetDownloader();
 
@@ -40,9 +40,22 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override IDownloader GetDownloader()
 		{
 			var downloader = new HttpClientDownloader();
-			if (DownloadValidation != null)
+			if (DownloadValidations != null)
 			{
-				downloader.DownloadValidation = DownloadValidation.Validate;
+				downloader.DownloadValidation = page =>
+				{
+					DownloadValidationResult result = DownloadValidationResult.Success;
+					foreach (var downloadValidation in DownloadValidations)
+					{
+						var r = downloadValidation.Validate(page, out result);
+						if(!r)
+						{
+							break;
+						}
+					}
+
+					return result;
+				};
 			}
 			if (GeneratePostBody != null)
 			{
@@ -68,9 +81,22 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override IDownloader GetDownloader()
 		{
 			var downloader = new Extension.Downloader.FileDownloader();
-			if (DownloadValidation != null)
+			if (DownloadValidations != null)
 			{
-				downloader.DownloadValidation = DownloadValidation.Validate;
+				downloader.DownloadValidation = page =>
+				{
+					DownloadValidationResult result = DownloadValidationResult.Success;
+					foreach (var downloadValidation in DownloadValidations)
+					{
+						var r = downloadValidation.Validate(page, out result);
+						if (!r)
+						{
+							break;
+						}
+					}
+
+					return result;
+				};
 			}
 			return downloader;
 		}
@@ -88,9 +114,22 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			{
 				downloader.Login = Login.Login;
 			}
-			if (DownloadValidation != null)
+			if (DownloadValidations != null)
 			{
-				downloader.DownloadValidation = DownloadValidation.Validate;
+				downloader.DownloadValidation = page =>
+				{
+					DownloadValidationResult result = DownloadValidationResult.Success;
+					foreach (var downloadValidation in DownloadValidations)
+					{
+						var r = downloadValidation.Validate(page, out result);
+						if(!r)
+						{
+							break;
+						}
+					}
+
+					return result;
+				};
 			}
 			return downloader;
 		}
