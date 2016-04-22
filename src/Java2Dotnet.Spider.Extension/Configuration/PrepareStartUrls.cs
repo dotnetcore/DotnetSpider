@@ -242,7 +242,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override void Build(Site site)
 		{
-			for (int i = 1; i <= 50; ++i)
+			for (int i = From; i <= To; ++i)
 			{
 				site.AddStartUrl(string.Format(FormateString, i));
 			}

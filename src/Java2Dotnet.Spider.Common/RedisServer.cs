@@ -585,7 +585,7 @@ namespace RedisSharp
 			}
 		}
 
-		public void Subscribe(string chanel, Action<string, string> action)
+		public RedisClient Subscribe(string chanel, Action<string, string> action)
 		{
 			var redis = new RedisClient(Host, Port)
 			{
@@ -595,6 +595,7 @@ namespace RedisSharp
 				RetryTimeout = RetryTimeout
 			};
 			redis.Subscribe(chanel, action);
+			return redis;
 		}
 
 		#endregion
@@ -693,7 +694,7 @@ namespace RedisSharp
 		None, String, List, Set
 	}
 
-	internal class RedisClient : IDisposable
+	public class RedisClient : IDisposable
 	{
 		public string Host { get; }
 		public int Port { get; }

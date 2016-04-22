@@ -66,6 +66,27 @@ function del(uid,id) {
     request.send(null);
 }
 
+function start(uid, name) {
+    var request = new XMLHttpRequest();
+    request.open("GET", "/api/monitor/start?userid=" + encodeURI(uid) + "&name=" + encodeURI(name), true);
+    request.onreadystatechange = function () {
+        if (request.readyState == 4 && request.status == 200) {
+            generateStatus();
+        }
+    };
+    request.send(null);
+}
+
+function exit(uid, name) {
+    var request = new XMLHttpRequest();
+    request.open("GET", "/api/monitor/exit?userid=" + encodeURI(uid) + "&name=" + encodeURI(name), true);
+    request.onreadystatechange = function () {
+        if (request.readyState == 4 && request.status == 200) {
+            generateStatus();
+        }
+    };
+    request.send(null);
+}
 
 refreshtasks();
 setInterval(generateStatus, 5000);

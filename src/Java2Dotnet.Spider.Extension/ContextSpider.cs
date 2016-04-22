@@ -22,6 +22,7 @@ using Java2Dotnet.Spider.Validation;
 using Java2Dotnet.Spider.JLog;
 using System.Linq;
 using RedisSharp;
+using System.Threading.Tasks;
 
 namespace Java2Dotnet.Spider.Extension
 {
@@ -69,7 +70,55 @@ namespace Java2Dotnet.Spider.Extension
 			try
 			{
 				spider = PrepareSpider(args);
-				spider?.Run();
+				if (spider == null)
+				{
+					return;
+				}
+
+				var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
+				if (redisScheduler != null)
+				{
+					try
+					{
+						var client = redisScheduler.Redis.Subscribe($"{Log.UserId}-{spider.Identity}", (c, m) =>
+						{
+							try
+							{
+								switch (m)
+								{
+									case "stop":
+										{
+											spider.Stop();
+											break;
+										}
+									case "start":
+										{
+											spider.Start();
+											break;
+										}
+									case "exit":
+										{
+											spider.Exit();
+											break;
+										}
+								}
+							}
+							catch
+							{
+							}
+						});
+					}
+					catch
+					{
+					}
+				}
+
+				spider.Start();
+
+				while (spider.StatusCode == Status.Stopped || spider.StatusCode == Status.Running || spider.StatusCode == Status.Init)
+				{
+					Thread.Sleep(1000);
+				}
 
 				RunAfterSpiderFinished();
 

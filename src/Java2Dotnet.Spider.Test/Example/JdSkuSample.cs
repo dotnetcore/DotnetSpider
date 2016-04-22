@@ -33,10 +33,17 @@ namespace Java2Dotnet.Spider.Test.Example
 					{"http://list.jd.com/list.html?cat=9987,653,655&page=2&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
 					{"http://list.jd.com/list.html?cat=9987,653,655&page=3&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
 				},
+				PrepareStartUrls = new List<PrepareStartUrls> {
+					new CyclePrepareStartUrls {
+						From=0,
+						To=10000,
+						FormateString="http://list.jd.com/list.html?cat=9987,653,655&page=1&ext=57050::{0}^^&go=0&JL=6_0_0"
+					}
+				},
 				Scheduler = new RedisScheduler
 				{
-					Host = "127.0.0.1",
-					Password = "",
+					Host = "redis",
+					Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w",
 					Port = 6379
 				},
 				Pipeline = new MysqlPipeline
@@ -45,14 +52,6 @@ namespace Java2Dotnet.Spider.Test.Example
 				},
 				Downloader = new HttpDownloader()
 				{
-					DownloadValidations = new List<DownloadValidation>
-					{
-						new ContainsDownloadValidation
-						{
-							ContainsString = "京东",
-							Result = DownloadValidationResult.Miss
-						}
-					}
 				}
 			}, typeof(Product));
 		}

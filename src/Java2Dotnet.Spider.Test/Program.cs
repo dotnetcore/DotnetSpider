@@ -22,6 +22,8 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
+			Log.UserId = "86Research-DotnetSpider-Log";
+			Log.TaskId = "JD SKU TEST";
 			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			var context = spiderBuilder.GetBuilder().Context;
 			ContextSpider spider = new ContextSpider(context);

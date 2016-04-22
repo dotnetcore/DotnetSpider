@@ -492,9 +492,9 @@ namespace Java2Dotnet.Spider.Core
 			}
 		}
 
-		public void RunAsync()
+		public Task RunAsync()
 		{
-			Task.Factory.StartNew(Run).ContinueWith(t =>
+			return Task.Factory.StartNew(Run).ContinueWith(t =>
 			{
 				if (t.Exception != null)
 				{
@@ -503,15 +503,22 @@ namespace Java2Dotnet.Spider.Core
 			});
 		}
 
-		public void Start()
+		public Task Start()
 		{
-			RunAsync();
+			return RunAsync();
 		}
 
 		public void Stop()
 		{
 			Stat = Status.Stopped;
 			Logger.Warn("Trying to stop Spider " + Identity + "...");
+		}
+
+		public void Exit()
+		{
+			Stat = Status.Exited;
+			Logger.Warn("Trying to exit Spider " + Identity + "...");
+			SpiderClosingEvent?.Invoke();
 		}
 
 		protected void OnClose()
