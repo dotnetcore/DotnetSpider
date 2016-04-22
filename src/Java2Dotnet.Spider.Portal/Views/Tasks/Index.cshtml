@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>86Research Task Center</h2>
+<div>
+    <input id="userid" type="text" value="86Research-DotnetSpider-Log" />
+    <input id="refresh" type="button" onclick="refreshtasks()" value="Refresh" />
+    <div id="tasks">
+    </div>
+</div>
+<div>
+    <div id="content_inner">
+        <span>No Status</span>
+    </div>
+</div>
+<script src="Scripts/viewtaskstatus.js"></script>
+

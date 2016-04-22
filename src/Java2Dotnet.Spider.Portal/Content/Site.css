@@ -1,0 +1,152 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+
+#header {
+    height: 50px;
+    /*color: #fff;*/
+    margin-bottom: 2px;
+}
+
+#content {
+    width: 100%;
+    float: left;
+}
+
+#status {
+    border: solid;
+    border-width: 1px;
+    margin-right: 342px;
+}
+
+#content_inner {
+    border: solid;
+    border-width: 1px;
+    margin-top: 2px;
+}
+
+#footer {
+    height: 50px;
+    margin-top: 10px;
+}
+
+.clear {
+    clear: both;
+}
+
+.h1 {
+    font-size: 40px;
+    font-weight: bold;
+    color: #333399;
+}
+
+.taska {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.taskname {
+    margin-left:0px;
+    font-size: 18px;
+    font-weight: bold;
+}
+#control {
+    float:none 
+}
+.action{
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#userid {
+    margin-top: 2px;
+    margin-left: 2px;
+    float: left;
+    width: 250px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#refresh {
+    margin-top: 1px;
+    margin-left: 2px;
+    float: left;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.running {
+    background-color: #10d51a;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.stopped {
+    background-color: red;
+}
+
+.finished {
+    background-color: blue;
+}
+
+.init {
+    background-color: aquamarine;
+}
+
+.unknow {
+    background-color: darkgray;
+}
+
+.bold {
+    font-size: 14px;
+}
+
+.value {
+    font-size: 14px;
+    font-weight: bold;
+    color: brown;
+}
+
+.log {
+    font-size: 13px;
+    color: black;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.warning {
+    font-size: 13px;
+    font-weight: bold;
+    background-color:yellow;
+}
+
+.error {
+    font-size: 13px;
+    font-weight: bold;
+    background-color: red;
+}
+
+.info {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.time {
+    font-size: 13px;
+    font-weight: bold;
+    color:#7db22f
+}

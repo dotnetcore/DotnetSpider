@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.Monitor"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.JLog", "src\Java2Dotnet.Spider.JLog\net45\Java2Dotnet.Spider.JLog.csproj", "{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Java2DotnetSpider.Portal", "src\Java2DotnetSpider.Portal\Java2DotnetSpider.Portal.xproj", "{3B75EE83-3231-4FD9-ABB7-6F1E0AE4CDDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.Portal", "src\Java2Dotnet.Spider.Portal\Java2Dotnet.Spider.Portal.csproj", "{78547691-52A5-4AA7-9E6A-255A9C1721F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,10 +59,10 @@ Global
 		{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3B75EE83-3231-4FD9-ABB7-6F1E0AE4CDDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3B75EE83-3231-4FD9-ABB7-6F1E0AE4CDDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3B75EE83-3231-4FD9-ABB7-6F1E0AE4CDDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3B75EE83-3231-4FD9-ABB7-6F1E0AE4CDDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78547691-52A5-4AA7-9E6A-255A9C1721F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78547691-52A5-4AA7-9E6A-255A9C1721F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78547691-52A5-4AA7-9E6A-255A9C1721F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78547691-52A5-4AA7-9E6A-255A9C1721F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
