@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
 using Java2Dotnet.Spider.JLog;

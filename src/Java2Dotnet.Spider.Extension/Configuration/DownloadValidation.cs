@@ -13,16 +13,17 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 
 		public abstract Types Type { get; internal set; }
-		public abstract DownloadValidationResult Validate(Page page);
+		public DownloadValidationResult Result { get; set; }
+		public abstract bool Validate(Page page, out DownloadValidationResult result);
 	}
 
 	public class ContainsDownloadValidation : DownloadValidation
 	{
 		public string ContainsString { get; set; }
-		public DownloadValidationResult Result { get; set; }
 
 		public override Types Type { get; internal set; } = Types.Contains;
-		public override DownloadValidationResult Validate(Page page)
+
+		public override bool Validate(Page page, out DownloadValidationResult result)
 		{
 			string rawText = page.Content;
 			if(string.IsNullOrEmpty(rawText))
@@ -31,11 +32,13 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 			if (rawText.Contains(ContainsString))
 			{
-				return Result;
+				result = Result;
+				return false;
 			}
 			else
 			{
-				return DownloadValidationResult.Success;
+				result = DownloadValidationResult.Success;
+				return true;
 			}
 		}
 	}

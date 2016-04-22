@@ -22,15 +22,15 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			//JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
-			//var context = spiderBuilder.GetBuilder().Context;
-			//ContextSpider spider = new ContextSpider(context);
-			//spider.Run(args);
-			var a = DateTimeUtils.MONTHLY_RUN_ID;
+			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			var context = spiderBuilder.GetBuilder().Context;
+			ContextSpider spider = new ContextSpider(context);
+			spider.Run(args);
 
-			EmailClient client = new EmailClient("smtp.163.com", "modestmt@163.com", "zousong.88");
-			var msg = new EmaillMessage("test", "test", "zlzforever@163.com");
-			client.SendMail(msg);
+
+			//EmailClient client = new EmailClient("smtp.163.com", "modestmt@163.com", "zousong.88");
+			//var msg = new EmaillMessage("test", "test", "zlzforever@163.com" );
+			//client.SendMail(msg);
 		}
 
 		private static void TestStatusServer()

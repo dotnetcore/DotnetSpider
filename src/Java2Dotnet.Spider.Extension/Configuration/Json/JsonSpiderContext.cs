@@ -80,7 +80,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			{
 				return null;
 			}
- 
+
 			foreach (var validation in validations.SelectTokens("$.Rules[*]"))
 			{
 				var type = validation.SelectToken("$.Type")?.ToObject<Validation.Types>();
@@ -355,24 +355,31 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 					}
 			}
 
-			var downloadValidationType = jobject.SelectToken("$.DownloadValidation.Type")?.ToObject<DownloadValidation.Types>();
-			if (downloadValidationType == null)
+			var validations = jobject.SelectToken("$.DownloadValidations");
+			if (validations != null)
 			{
-				throw new SpiderExceptoin("Missing DownloadValidation Type: " + jobject);
-			}
+				foreach (var validation in validations)
+				{
+					var downloadValidationType = validation.SelectToken("$.Type")?.ToObject<DownloadValidation.Types>();
+					if (downloadValidationType == null)
+					{
+						throw new SpiderExceptoin("Missing DownloadValidation Type: " + jobject);
+					}
 
-			switch (downloadValidationType)
-			{
-				case DownloadValidation.Types.Contains:
+					switch (downloadValidationType)
 					{
-						var validation = jobject.SelectToken("$.DownloadValidation").ToObject<ContainsDownloadValidation>();
-						downloader.DownloadValidation = validation;
-						break;
+						case DownloadValidation.Types.Contains:
+							{
+								downloader.DownloadValidations.Add(validation.ToObject<ContainsDownloadValidation>());
+
+								break;
+							}
+						default:
+							{
+								throw new SpiderExceptoin("Unspodrt validation type: " + downloadValidationType);
+							}
 					}
-				default:
-					{
-						throw new SpiderExceptoin("Unspodrt validation type: " + downloadValidationType);
-					}
+				}
 			}
 
 			var generatePostBody = jobject.SelectToken("$.GeneratePostBody")?.ToObject<GeneratePostBody>();
