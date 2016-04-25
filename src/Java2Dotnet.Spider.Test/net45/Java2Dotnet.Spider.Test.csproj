@@ -101,6 +101,9 @@
     <Compile Include="..\Example\JdSkuSample.cs">
       <Link>Example\JdSkuSample.cs</Link>
     </Compile>
+    <Compile Include="..\Example\LinkSpiderExample.cs">
+      <Link>Example\LinkSpiderExample.cs</Link>
+    </Compile>
     <Compile Include="..\Example\OschinaBlog.cs">
       <Link>Example\OschinaBlog.cs</Link>
     </Compile>

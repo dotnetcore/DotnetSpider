@@ -1,7 +1,4 @@
-﻿using Java2Dotnet.Spider.Extension.Model.Attribute;
-using Java2Dotnet.Spider.Extension.ORM;
-
-namespace Java2Dotnet.Spider.Extension.Model
+﻿namespace Java2Dotnet.Spider.Extension.Model
 {
 	public interface ISpiderEntity
 	{

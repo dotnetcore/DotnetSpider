@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Configuration;
-using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Extension
@@ -29,5 +27,15 @@ namespace Java2Dotnet.Spider.Extension
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
 		public Validations Validations { get; set; }
+
+		public ISpider ToDefaultSpider()
+		{
+			return new DefaultSpider("", new Site());
+		}
+	}
+
+	public class LinkSpiderContext : SpiderContext
+	{
+		public Dictionary<string, SpiderContext> NextSpiderContexts { get; set; }
 	}
 }

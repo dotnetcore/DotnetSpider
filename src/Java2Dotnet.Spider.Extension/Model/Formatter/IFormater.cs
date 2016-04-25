@@ -1,5 +1,4 @@
 ﻿using System;
-using Java2Dotnet.Spider.Extension.Configuration;
 
 namespace Java2Dotnet.Spider.Extension.Model.Formatter
 {

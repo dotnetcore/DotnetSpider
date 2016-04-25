@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Core.Scheduler.Component;
@@ -6,7 +6,6 @@ using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
 using Newtonsoft.Json;
 using RedisSharp;
-using System;
 using System.Collections.Generic;
 
 namespace Java2Dotnet.Spider.Extension.Scheduler
