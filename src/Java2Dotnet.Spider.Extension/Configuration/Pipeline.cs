@@ -52,11 +52,13 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	{
 		public override Types Type { get; internal set; } = Types.MySql;
 
+		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
+
 		public string ConnectString { get; set; }
 
 		public override IEntityPipeline GetPipeline(Schema schema, JObject entityDefine)
 		{
-			return new EntityMySqlPipeline(schema, entityDefine, ConnectString);
+			return new EntityMySqlPipeline(schema, entityDefine, ConnectString, Mode);
 		}
 	}
 }

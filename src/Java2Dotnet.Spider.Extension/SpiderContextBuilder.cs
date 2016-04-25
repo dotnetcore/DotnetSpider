@@ -101,6 +101,12 @@ namespace Java2Dotnet.Spider.Extension
 				json.AutoIncrement = indexes.AutoIncrement;
 			}
 
+			var updates = entityType.GetCustomAttribute<Update>();
+			if (updates != null)
+			{
+				json.Updates = updates.Columns;
+			}
+
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{
@@ -158,6 +164,11 @@ namespace Java2Dotnet.Spider.Extension
 				json.AutoIncrement = indexes.AutoIncrement;
 			}
 
+			var updates = entityType.GetCustomAttribute<Update>();
+			if (updates != null)
+			{
+				json.Updates = updates.Columns;
+			}
 			var properties = entityType.AsType().GetProperties();
 			foreach (var propertyInfo in properties)
 			{
@@ -245,6 +256,7 @@ namespace Java2Dotnet.Spider.Extension
 		public string[] Primary { get; set; }
 		public List<Field> Fields { get; set; } = new List<Field>();
 		public Stopping Stopping { get; set; }
+		public string[] Updates { get; internal set; }
 	}
 
 	internal class Field

@@ -7,6 +7,7 @@ using Java2Dotnet.Spider.Extension.ORM;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
 using Java2Dotnet.Spider.Extension.Utils;
+using System;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
@@ -14,7 +15,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	{
 		private string _autoIncrementString = "AUTO_INCREMENT";
 
-		public EntityMySqlPipeline(Schema schema, JObject entityDefine, string connectString) : base(schema, entityDefine, connectString)
+		public EntityMySqlPipeline(Schema schema, JObject entityDefine, string connectString, PipelineMode mode) : base(schema, entityDefine, connectString, mode)
 		{
 		}
 
@@ -34,6 +35,20 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				Schema.TableName,
 				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
 				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
+
+			return sqlBuilder.ToString();
+		}
+
+		protected override string GetUpdateSql()
+		{
+			string setParamenters = string.Join(", ", UpdateColumns.Select(p => $"`{p.Name}`=@{p.Name}"));
+			string primaryParamenters = string.Join(", ", Primary.Select(p => $"`{p.Name}`=@{p.Name}"));
+
+			var sqlBuilder = new StringBuilder();
+			sqlBuilder.AppendFormat("UPDATE `{0}`.`{1}` SET {2} WHERE {3};",
+				Schema.Database,
+				Schema.TableName,
+				setParamenters, primaryParamenters);
 
 			return sqlBuilder.ToString();
 		}

@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Java2Dotnet.Spider.Core;
 using Newtonsoft.Json.Linq;
-using Java2Dotnet.Spider.JLog; 
+using Java2Dotnet.Spider.JLog;
 using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Utils;
 using Java2Dotnet.Spider.Common;
@@ -37,41 +37,116 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 		protected string ConnectString { get; set; }
 		protected readonly List<Column> Columns;
+		protected readonly List<Column> UpdateColumns = new List<Column>();
 
 		protected abstract DbConnection CreateConnection();
 
 		protected abstract string GetInsertSql();
+		protected abstract string GetUpdateSql();
 		protected abstract string GetCreateTableSql();
 		protected abstract string GetCreateSchemaSql();
 		protected abstract DbParameter CreateDbParameter();
 		protected readonly Schema Schema;
+		protected PipelineMode Mode { get; set; } = PipelineMode.Insert;
 
 		//protected readonly Type Type;
 
 		protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
 		protected List<List<string>> Uniques { get; set; } = new List<List<string>>();
-		protected List<string> Primary { get; set; }
+		protected List<Column> Primary { get; set; } = new List<Column>();
 		protected string AutoIncrement { get; set; }
 
 		protected abstract string ConvertToDbType(string datatype);
 
-		protected EntityGeneralPipeline(Schema schema, JObject entityDefine, string connectString)
+		protected EntityGeneralPipeline(Schema schema, JObject entityDefine, string connectString, PipelineMode mode = PipelineMode.Insert)
 		{
+			Mode = mode;
 			ConnectString = connectString;
 
 			Schema = GenerateSchema(schema);
 			Columns = entityDefine.SelectTokens("$.Fields[*]").Select(j => j.ToObject<Column>()).Where(c => !string.IsNullOrEmpty(c.DataType)).ToList();
-
-			Primary = entityDefine.SelectToken("$.Primary").ToObject<List<string>>();
-			AutoIncrement = entityDefine.SelectToken("$.AutoIncrement")?.ToString();
-			foreach (var index in entityDefine.SelectTokens("$.Indexs[*]"))
+			var primary = entityDefine.SelectToken("$.Primary").ToObject<List<string>>();
+			foreach (var p in primary)
 			{
-				Indexs.Add(index.ToObject<List<string>>());
+				var col = Columns.Where(c => c.Name == p).FirstOrDefault();
+				if (col == null)
+				{
+					throw new SpiderExceptoin("Columns set as primary is not a property of your entity.");
+				}
+				else
+				{
+					Primary.Add(col);
+				}
 			}
 
-			foreach (var index in entityDefine.SelectTokens("$.Uniques[*]"))
+			if (mode == PipelineMode.Update)
 			{
-				Uniques.Add(index.ToObject<List<string>>());
+				var tmpUpdateColumns = entityDefine.SelectTokens("$.Update[*]").Select(u => u.ToString()).ToList();
+				foreach (var column in tmpUpdateColumns)
+				{
+					var col = Columns.Where(c => c.Name == column).FirstOrDefault();
+					if (col == null)
+					{
+						throw new SpiderExceptoin("Columns set as update is not a property of your entity.");
+					}
+					else
+					{
+						UpdateColumns.Add(col);
+					}
+				}
+				if (UpdateColumns == null || UpdateColumns.Count == 0)
+				{
+					UpdateColumns = Columns;
+					UpdateColumns.RemoveAll(c => Primary.Contains(c));
+				}
+				if (Primary == null || Primary.Count == 0)
+				{
+					throw new SpiderExceptoin("Do you forget set the Primary in IndexesAttribute for your entity class.");
+				}
+			}
+
+			AutoIncrement = entityDefine.SelectToken("$.AutoIncrement")?.ToString();
+
+			foreach (var index in entityDefine.SelectTokens("$.Indexs[*]"))
+			{
+				List<string> tmpIndex = new List<string>();
+				foreach (var i in index.ToObject<List<string>>())
+				{
+					var col = Columns.Where(c => c.Name == i).FirstOrDefault();
+					if (col == null)
+					{
+						throw new SpiderExceptoin("Columns set as index is not a property of your entity.");
+					}
+					else
+					{
+						tmpIndex.Add(col.Name);
+					}
+				}
+				if (tmpIndex.Count != 0)
+				{
+					Indexs.Add(tmpIndex);
+				}
+			}
+
+			foreach (var unique in entityDefine.SelectTokens("$.Uniques[*]"))
+			{
+				List<string> tmpUnique = new List<string>();
+				foreach (var i in unique.ToObject<List<string>>())
+				{
+					var col = Columns.Where(c => c.Name == i).FirstOrDefault();
+					if (col == null)
+					{
+						throw new SpiderExceptoin("Columns set as unique is not a property of your entity.");
+					}
+					else
+					{
+						tmpUnique.Add(col.Name);
+					}
+				}
+				if (tmpUnique.Count != 0)
+				{
+					Uniques.Add(tmpUnique);
+				}
 			}
 		}
 
@@ -100,6 +175,10 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 		public virtual void Initialize()
 		{
+			if (Mode == PipelineMode.Update)
+			{
+				return;
+			}
 			RedialManagerUtils.Execute("db-init", () =>
 			{
 				using (DbConnection conn = CreateConnection())
@@ -120,35 +199,83 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 		public void Process(List<JObject> datas, ISpider spider)
 		{
-			RedialManagerUtils.Execute("db-insert", () =>
+			RedialManagerUtils.Execute("pipeline-", () =>
 			{
-				using (var conn = CreateConnection())
+				switch (Mode)
 				{
-					var cmd = conn.CreateCommand();
-					cmd.CommandText = GetInsertSql();
-					cmd.CommandType = CommandType.Text;
-					conn.Open();
-
-					foreach (var data in datas)
-					{
-						cmd.Parameters.Clear();
-
-						List<DbParameter> parameters = new List<DbParameter>();
-						foreach (var column in Columns)
+					case PipelineMode.Insert:
 						{
-							var parameter = CreateDbParameter();
-							parameter.ParameterName = $"@{column.Name}";
-							parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-							parameter.DbType = Convert(column.DataType);
-							parameters.Add(parameter);
+							using (var conn = CreateConnection())
+							{
+								var cmd = conn.CreateCommand();
+								cmd.CommandText = GetInsertSql();
+								cmd.CommandType = CommandType.Text;
+								conn.Open();
+
+								foreach (var data in datas)
+								{
+									cmd.Parameters.Clear();
+
+									List<DbParameter> parameters = new List<DbParameter>();
+									foreach (var column in Columns)
+									{
+										var parameter = CreateDbParameter();
+										parameter.ParameterName = $"@{column.Name}";
+										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+										parameter.DbType = Convert(column.DataType);
+										parameters.Add(parameter);
+									}
+
+									cmd.Parameters.AddRange(parameters.ToArray());
+									cmd.ExecuteNonQuery();
+								}
+
+								conn.Close();
+							}
+							break;
 						}
+					case PipelineMode.Update:
+						{
+							using (var conn = CreateConnection())
+							{
+								var cmd = conn.CreateCommand();
+								cmd.CommandText = GetUpdateSql();
+								cmd.CommandType = CommandType.Text;
+								conn.Open();
 
-						cmd.Parameters.AddRange(parameters.ToArray());
-						cmd.ExecuteNonQuery();
-					}
+								foreach (var data in datas)
+								{
+									cmd.Parameters.Clear();
 
-					conn.Close();
+									List<DbParameter> parameters = new List<DbParameter>();
+									foreach (var column in UpdateColumns)
+									{
+										var parameter = CreateDbParameter();
+										parameter.ParameterName = $"@{column.Name}";
+										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+										parameter.DbType = Convert(column.DataType);
+										parameters.Add(parameter);
+									}
+
+									foreach(var column in Primary)
+									{
+										var parameter = CreateDbParameter();
+										parameter.ParameterName = $"@{column.Name}";
+										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+										parameter.DbType = Convert(column.DataType);
+										parameters.Add(parameter);
+									}
+
+									cmd.Parameters.AddRange(parameters.ToArray());
+									cmd.ExecuteNonQuery();
+								}
+
+								conn.Close();
+							}
+							break;
+						}
 				}
+
 			});
 		}
 

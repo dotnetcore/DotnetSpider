@@ -350,9 +350,7 @@ namespace Java2Dotnet.Spider.Extension
 				{
 					case Configuration.Pipeline.Types.MongoDb:
 						{
-
 							spider.AddPipeline(new EntityPipeline(entiyName, _spiderContext.Pipeline.GetPipeline(schema, entity)));
-
 							break;
 						}
 					case Configuration.Pipeline.Types.MySql:

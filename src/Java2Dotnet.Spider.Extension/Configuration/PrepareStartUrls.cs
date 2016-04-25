@@ -53,6 +53,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public enum Types
 		{
 			GeneralDb,
+			DbCycle,
 			Cycle
 		}
 
@@ -85,6 +86,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public string ConnectString { get; set; }
 
 		public string GroupBy { get; set; }
+
+		public string OrderBy { get; set; }
 
 		/// <summary>
 		/// 数据来源表名, 需要Schema/数据库名
@@ -139,9 +142,9 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 #else
 				reader.Dispose();
 #endif
-				Parallel.ForEach(datas, new ParallelOptions { MaxDegreeOfParallelism = 1 }, brand =>
+				Parallel.ForEach(datas, new ParallelOptions { MaxDegreeOfParallelism = 1 }, data =>
 				{
-					Dictionary<string, object> tmp = brand;
+					Dictionary<string, object> tmp = data;
 					List<string> arguments = new List<string>();
 					foreach (var column in Columns)
 					{
@@ -169,7 +172,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 		}
 
-		private string GetPostBody(Dictionary<string, object> datas)
+		protected string GetPostBody(Dictionary<string, object> datas)
 		{
 			if (string.IsNullOrEmpty(PostBody))
 			{
@@ -195,7 +198,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			return PostBody;
 		}
 
-		private string GetSelectQueryString()
+		protected string GetSelectQueryString()
 		{
 			switch (Source)
 			{
@@ -219,10 +222,16 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 							builder.Append($" {GroupBy} ");
 						}
 
+						if (!string.IsNullOrEmpty(OrderBy))
+						{
+							builder.Append($" {OrderBy} ");
+						}
+
 						if (Limit > 0)
 						{
 							builder.Append($" LIMIT {Limit} ");
 						}
+
 
 						return builder.ToString();
 					}
@@ -245,6 +254,102 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			for (int i = From; i <= To; ++i)
 			{
 				site.AddStartUrl(string.Format(FormateString, i));
+			}
+		}
+	}
+
+	public class DbCyclePrepareStartUrls : DbPrepareStartUrls
+	{
+		public override Types Type { get; internal set; } = Types.DbCycle;
+
+		public int Interval { get; set; }
+		public string ColumnSeparator { get; set; }
+		public string RowSeparator { get; set; }
+
+		public string FormateString { get; set; }
+
+		public override void Build(Site site)
+		{
+			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
+			{
+				List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
+				string sql = GetSelectQueryString();
+				conn.Open();
+				var command = conn.CreateCommand();
+				command.CommandText = sql;
+				command.CommandType = CommandType.Text;
+
+				var reader = command.ExecuteReader();
+				while (reader.Read())
+				{
+					Dictionary<string, object> values = new Dictionary<string, object>();
+					int count = reader.FieldCount;
+					for (int i = 0; i < count; ++i)
+					{
+						string name = reader.GetName(i);
+						values.Add(name, reader.GetValue(i));
+					}
+					datas.Add(values);
+				}
+#if !NET_CORE
+				reader.Close();
+#else
+				reader.Dispose();
+#endif
+				int interval = 0;
+				StringBuilder formatBuilder = new StringBuilder();
+				foreach (var data in datas)
+				{
+					if (interval == Interval)
+					{
+						foreach (var formate in FormateStrings)
+						{
+							string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - (string.IsNullOrEmpty(RowSeparator) ? 0 : RowSeparator.Length)));
+							site.AddStartRequest(new Request(tmpUrl, 0, null)
+							{
+								Method = Method,
+								Origin = Origin,
+								Referer = Referer
+							});
+						}
+
+						interval = 0;
+						formatBuilder = new StringBuilder();
+					}
+
+					Dictionary<string, object> tmp = data;
+
+					StringBuilder argumentsBuilder = new StringBuilder();
+					foreach (var column in Columns)
+					{
+						string value = tmp[column.Name]?.ToString();
+
+						foreach (var formatter in column.Formatters)
+						{
+							value = formatter.Formate(value);
+						}
+						argumentsBuilder.Append(value).Append(ColumnSeparator);
+					}
+					formatBuilder.Append(argumentsBuilder.ToString(0, argumentsBuilder.Length - (string.IsNullOrEmpty(ColumnSeparator) ? 0 : ColumnSeparator.Length))).Append(RowSeparator);
+					interval++;
+				};
+
+				if (interval != 0)
+				{
+					foreach (var formate in FormateStrings)
+					{
+						string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - 1));
+						site.AddStartRequest(new Request(tmpUrl, 0, null)
+						{
+							Method = Method,
+							Origin = Origin,
+							Referer = Referer
+						});
+					}
+
+					interval = 0;
+					formatBuilder = new StringBuilder();
+				}
 			}
 		}
 	}

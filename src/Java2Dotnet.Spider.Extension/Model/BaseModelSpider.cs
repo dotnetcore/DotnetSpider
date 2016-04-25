@@ -37,10 +37,5 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 			}
 		}
-
-		public void SetPipelineModel(PipelineModel model)
-		{
-			Settings.Add(PipelineModel, model);
-		}
 	}
 }

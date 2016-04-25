@@ -200,6 +200,9 @@
     <Compile Include="..\Model\Attribute\TypeExtractBy.cs">
       <Link>Model\Attribute\TypeExtractBy.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Attribute\Update.cs">
+      <Link>Model\Attribute\Update.cs</Link>
+    </Compile>
     <Compile Include="..\Model\BaseModelSpider.cs">
       <Link>Model\BaseModelSpider.cs</Link>
     </Compile>
@@ -317,8 +320,8 @@
     <Compile Include="..\Pipeline\MultiPagePipeline.cs">
       <Link>Pipeline\MultiPagePipeline.cs</Link>
     </Compile>
-    <Compile Include="..\Pipeline\PipelineModel.cs">
-      <Link>Pipeline\PipelineModel.cs</Link>
+    <Compile Include="..\Pipeline\PipelineMode.cs">
+      <Link>Pipeline\PipelineMode.cs</Link>
     </Compile>
     <Compile Include="..\Processor\EntityProcessor.cs">
       <Link>Processor\EntityProcessor.cs</Link>
