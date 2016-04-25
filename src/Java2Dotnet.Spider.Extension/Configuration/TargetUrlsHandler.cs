@@ -43,20 +43,29 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int nextIndex = currentIndex + Interval;
 			string next = RegexUtil.NumRegex.Replace(PageIndexString, nextIndex.ToString());
 
-			int totalPage = -2;
+			int totalPage = -2000;
 			if (TotalPageSelector != null)
 			{
-				totalPage = int.Parse(page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).Value);
+				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).Value;
+				if (!string.IsNullOrEmpty(totalStr))
+				{
+					totalPage = int.Parse(totalStr);
+				}
 			}
-			int currentPage = -1;
+			int currentPage = -1000;
 			if (CurrenctPageSelector != null)
 			{
-				currentPage = int.Parse(page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).Value);
+				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).Value;
+				if (!string.IsNullOrEmpty(currentStr))
+				{
+					currentPage = int.Parse(currentStr);
+				}
 			}
 			if (currentPage == totalPage)
 			{
 				return new List<string>();
 			}
+
 			return new List<string> { page.Url.Replace(current, next) };
 		}
 	}
