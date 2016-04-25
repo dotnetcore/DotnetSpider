@@ -48,7 +48,20 @@ namespace Java2Dotnet.Spider.JLog
 #else
 			LogFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
 #endif
-			Writter = File.AppendText(LogFile);
+			int i = 1;
+			while (true)
+			{
+				try
+				{
+					Writter = File.AppendText(LogFile);
+					break;
+				}
+				catch
+				{
+					LogFile += $".{i}";
+				}
+			}
+
 			LogServer = ConfigurationManager.Get("logHost");
 			var noConsoleProperty = ConfigurationManager.Get("noConsoleLog");
 			if (!string.IsNullOrEmpty(noConsoleProperty))
