@@ -63,16 +63,19 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			Schema = GenerateSchema(schema);
 			Columns = entityDefine.SelectTokens("$.Fields[*]").Select(j => j.ToObject<Column>()).Where(c => !string.IsNullOrEmpty(c.DataType)).ToList();
 			var primary = entityDefine.SelectToken("$.Primary").ToObject<List<string>>();
-			foreach (var p in primary)
+			if (primary != null)
 			{
-				var col = Columns.FirstOrDefault(c => c.Name == p);
-				if (col == null)
+				foreach (var p in primary)
 				{
-					throw new SpiderExceptoin("Columns set as primary is not a property of your entity.");
-				}
-				else
-				{
-					Primary.Add(col);
+					var col = Columns.FirstOrDefault(c => c.Name == p);
+					if (col == null)
+					{
+						throw new SpiderExceptoin("Columns set as primary is not a property of your entity.");
+					}
+					else
+					{
+						Primary.Add(col);
+					}
 				}
 			}
 
