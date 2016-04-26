@@ -38,6 +38,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				begin += StartOffset;
 				length -= StartOffset;
 				length -= EndOffset;
+				length += EndString.Length;
 
 				string newRawText = rawText.Substring(begin, length).Trim();
 				p.Content = newRawText;
