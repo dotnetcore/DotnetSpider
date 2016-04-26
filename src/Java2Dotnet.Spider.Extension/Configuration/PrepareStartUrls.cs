@@ -5,10 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Core;
-using Java2Dotnet.Spider.Extension.Model;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using System.Data.SqlClient;
@@ -54,7 +52,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		{
 			GeneralDb,
 			DbCycle,
-			Cycle
+			Cycle,
+			LinkSpider
 		}
 
 		public string Method { get; set; } = "GET";
@@ -67,7 +66,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public abstract Types Type { get; internal set; }
 
-		public abstract void Build(Site site);
+		public abstract void Build(Site site, dynamic obj);
 	}
 
 	public class DbPrepareStartUrls : PrepareStartUrls
@@ -113,7 +112,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		/// </summary>
 		public List<string> FormateStrings { get; set; }
 
-		public override void Build(Site site)
+		public override void Build(Site site, dynamic obj)
 		{
 			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
 			{
@@ -156,7 +155,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 						}
 						arguments.Add(value);
 					}
-
+ 
 					foreach (var formate in FormateStrings)
 					{
 						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
@@ -164,7 +163,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 						{
 							Method = Method,
 							Origin = Origin,
-							PostBody = GetPostBody(tmp),
+							PostBody = GetPostBody(PostBody, tmp),
 							Referer = Referer
 						});
 					}
@@ -172,15 +171,16 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 		}
 
-		protected string GetPostBody(Dictionary<string, object> datas)
+		public static string GetPostBody(string postBody, Dictionary<string, object> datas)
 		{
-			if (string.IsNullOrEmpty(PostBody))
+			if (string.IsNullOrEmpty(postBody))
 			{
 				return null;
 			}
 
 			Regex regex = new Regex(@"__URLENCODE\('(\w|\d)+'\)");
-			foreach (Match match in regex.Matches(PostBody))
+			string tmpPostBody = postBody;
+			foreach (Match match in regex.Matches(postBody))
 			{
 				string tmp = match.Value;
 				int startIndex = tmp.IndexOf("__URLENCODE('");
@@ -191,11 +191,11 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 #else
 				var value = WebUtility.UrlEncode(datas[arg].ToString());
 #endif
-				PostBody = PostBody.Replace(tmp, value);
+				tmpPostBody = postBody.Replace(tmp, value);
 			}
 
 			// implement more rules
-			return PostBody;
+			return tmpPostBody;
 		}
 
 		protected string GetSelectQueryString()
@@ -249,7 +249,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string FormateString { get; set; }
 
-		public override void Build(Site site)
+		public override void Build(Site site, dynamic obj)
 		{
 			for (int i = From; i <= To; ++i)
 			{
@@ -268,7 +268,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string FormateString { get; set; }
 
-		public override void Build(Site site)
+		public override void Build(Site site, dynamic obj)
 		{
 			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
 			{
@@ -324,10 +324,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					{
 						string value = tmp[column.Name]?.ToString();
 
-						foreach (var formatter in column.Formatters)
-						{
-							value = formatter.Formate(value);
-						}
+						value = column.Formatters.Aggregate(value, (current, formatter) => formatter.Formate(current));
+
 						argumentsBuilder.Append(value).Append(ColumnSeparator);
 					}
 					formatBuilder.Append(argumentsBuilder.ToString(0, argumentsBuilder.Length - (string.IsNullOrEmpty(ColumnSeparator) ? 0 : ColumnSeparator.Length))).Append(RowSeparator);
@@ -349,6 +347,55 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 					interval = 0;
 					formatBuilder = new StringBuilder();
+				}
+			}
+		}
+	}
+
+	public class LinkSpiderPrepareStartUrls : PrepareStartUrls
+	{
+		public override Types Type { get; internal set; } = Types.LinkSpider;
+
+		/// <summary>
+		/// 用于拼接Url所需要的列
+		/// </summary>
+		public List<DbPrepareStartUrls.Column> Columns { get; set; } = new List<DbPrepareStartUrls.Column>();
+
+		/// <summary>
+		/// 拼接Url的方式, 会把Columns对应列的数据传入
+		/// https://s.taobao.com/search?q={0},s=0;
+		/// </summary>
+		public List<string> FormateStrings { get; set; }
+
+		public override void Build(Site site, dynamic obj)
+		{
+			foreach (JObject jobject in obj)
+			{
+				Dictionary<string, object> tmp = obj;
+				foreach (var node in jobject.Children())
+				{
+					tmp.Add("", node.ToString());
+				}
+
+				List<string> arguments = new List<string>();
+				foreach (var column in Columns)
+				{
+					string value = tmp[column.Name]?.ToString();
+
+					value = column.Formatters.Aggregate(value, (current, formatter) => formatter.Formate(current));
+					arguments.Add(value);
+				}
+
+				foreach (var formate in FormateStrings)
+				{
+					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
+					site.AddStartRequest(new Request(tmpUrl, 0, tmp)
+					{
+						Method = Method,
+						Origin = Origin,
+						PostBody = DbPrepareStartUrls.GetPostBody(PostBody, tmp),
+						Referer = Referer
+					});
 				}
 			}
 		}

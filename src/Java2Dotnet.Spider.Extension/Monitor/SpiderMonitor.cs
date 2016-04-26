@@ -1,19 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Core.Scheduler;
-using Java2Dotnet.Spider.Core.Utils;
-using Java2Dotnet.Spider.Extension.Scheduler;
 using Java2Dotnet.Spider.JLog;
 using Newtonsoft.Json;
-using RedisSharp;
 using System.Net.Http;
 using System.Text;
-using System.Net;
 
 namespace Java2Dotnet.Spider.Extension.Monitor
 {

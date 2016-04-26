@@ -2,21 +2,16 @@
 using System.Collections.Generic;
 using System.Threading;
 using Java2Dotnet.Spider.Core;
-using Java2Dotnet.Spider.Core.Downloader;
 using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Extension.Configuration;
-using Java2Dotnet.Spider.Extension.Downloader;
-using Java2Dotnet.Spider.Extension.Downloader.WebDriver;
 using Java2Dotnet.Spider.Extension.Model;
 using Java2Dotnet.Spider.Extension.Monitor;
 using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Pipeline;
 using Java2Dotnet.Spider.Extension.Processor;
-using Java2Dotnet.Spider.Extension.Utils;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
-using Java2Dotnet.Spider.Redial.Redialer;
 using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
 using Java2Dotnet.Spider.JLog;
@@ -30,41 +25,41 @@ namespace Java2Dotnet.Spider.Extension
 	{
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
-		protected static readonly ILog _logger = LogManager.GetLogger();
+		protected static readonly ILog Logger = LogManager.GetLogger();
 
-		private readonly SpiderContext _spiderContext;
-		private RedisServer redis;
+		protected readonly SpiderContext SpiderContext;
+		private RedisServer _redis;
 		public string Name { get; }
 
 		public ContextSpider(SpiderContext spiderContext)
 		{
-			_spiderContext = spiderContext;
+			SpiderContext = spiderContext;
 
-			Name = _spiderContext.SpiderName;
+			Name = SpiderContext.SpiderName;
 
 			InitEnvoriment();
 		}
 
 		private void InitEnvoriment()
 		{
-			redis = new RedisServer(ConfigurationManager.Get("redisHost"), 6379, ConfigurationManager.Get("redisPassword"));
+			_redis = new RedisServer(ConfigurationManager.Get("redisHost"), 6379, ConfigurationManager.Get("redisPassword"));
 
-			if (_spiderContext.Redialer != null)
+			if (SpiderContext.Redialer != null)
 			{
 				//RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
 				RedialManagerUtils.RedialManager = new RedisRedialManager();
 
-				RedialManagerUtils.RedialManager.NetworkValidater = GetNetworValidater(_spiderContext.NetworkValidater);
-				RedialManagerUtils.RedialManager.Redialer = _spiderContext.Redialer.GetRedialer();
+				RedialManagerUtils.RedialManager.NetworkValidater = GetNetworValidater(SpiderContext.NetworkValidater);
+				RedialManagerUtils.RedialManager.Redialer = SpiderContext.Redialer.GetRedialer();
 			}
 
-			if (_spiderContext.Downloader == null)
+			if (SpiderContext.Downloader == null)
 			{
-				_spiderContext.Downloader = new HttpDownloader();
+				SpiderContext.Downloader = new HttpDownloader();
 			}
 		}
 
-		public void Run(params string[] args)
+		public virtual void Run(params string[] args)
 		{
 			Core.Spider spider = null;
 			try
@@ -80,36 +75,31 @@ namespace Java2Dotnet.Spider.Extension
 				{
 					try
 					{
-						var client = redisScheduler.Redis.Subscribe($"{Log.UserId}-{spider.Identity}", (c, m) =>
+						redisScheduler.Redis.Subscribe($"{Log.UserId}-{spider.Identity}", (c, m) =>
 						{
-							try
+							switch (m)
 							{
-								switch (m)
-								{
-									case "stop":
-										{
-											spider.Stop();
-											break;
-										}
-									case "start":
-										{
-											spider.Start();
-											break;
-										}
-									case "exit":
-										{
-											spider.Exit();
-											break;
-										}
-								}
-							}
-							catch
-							{
+								case "stop":
+									{
+										spider.Stop();
+										break;
+									}
+								case "start":
+									{
+										spider.Start();
+										break;
+									}
+								case "exit":
+									{
+										spider.Exit();
+										break;
+									}
 							}
 						});
 					}
 					catch
 					{
+						// ignored
 					}
 				}
 
@@ -137,84 +127,84 @@ namespace Java2Dotnet.Spider.Extension
 			string key = "locker-validate-" + Name;
 			try
 			{
-				if (_spiderContext.Validations == null)
+				if (SpiderContext.Validations == null)
 				{
 					return;
 				}
 
-				var _validations = _spiderContext.Validations.GetValidations();
+				var validations = SpiderContext.Validations.GetValidations();
 
-				if (_validations != null && _validations.Count > 0)
+				if (validations != null && validations.Count > 0)
 				{
-					foreach (var validation in _validations)
+					foreach (var validation in validations)
 					{
 						validation.CheckArguments();
 					}
 				}
 
-				_logger.Info($"Lock: {key} to keep only one validate process.");
+				Logger.Info($"Lock: {key} to keep only one validate process.");
 
-				while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+				while (!_redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 				{
 					Thread.Sleep(1000);
 				}
 
-				var lockerValue = redis.HashGet(ValidateStatusName, Name);
+				var lockerValue = _redis.HashGet(ValidateStatusName, Name);
 				bool needInitStartRequest = lockerValue != "validate finished";
 
 				if (needInitStartRequest)
 				{
-					_logger.Info("Start validate ...");
+					Logger.Info("Start validate ...");
 
-					if (_validations != null && _validations.Count > 0)
+					if (validations != null && validations.Count > 0)
 					{
-						MailBodyBuilder builder = new MailBodyBuilder(Name, _spiderContext.Validations.Corporation);
-						foreach (var validation in _validations)
+						MailBodyBuilder builder = new MailBodyBuilder(Name, SpiderContext.Validations.Corporation);
+						foreach (var validation in validations)
 						{
 							builder.AddValidateResult(validation.Validate());
 						}
 						string mailBody = builder.Build();
 
-						using (EmailClient client = new EmailClient(_spiderContext.Validations.EmailSmtpServer, _spiderContext.Validations.EmailUser, _spiderContext.Validations.EmailPassword, _spiderContext.Validations.EmailSmtpPort))
+						using (EmailClient client = new EmailClient(SpiderContext.Validations.EmailSmtpServer, SpiderContext.Validations.EmailUser, SpiderContext.Validations.EmailPassword, SpiderContext.Validations.EmailSmtpPort))
 						{
-							client.SendMail(new EmaillMessage($"{Name} " + "validation report", mailBody, _spiderContext.Validations.EmailTo) { IsHtml = true });
+							client.SendMail(new EmaillMessage($"{Name} " + "validation report", mailBody, SpiderContext.Validations.EmailTo) { IsHtml = true });
 						}
 					}
 				}
 				else
 				{
-					_logger.Info("No need to validate on this process because other process did.");
+					Logger.Info("No need to validate on this process because other process did.");
 				}
 
 				if (needInitStartRequest)
 				{
-					redis.HashSet(ValidateStatusName, Name, "validate finished");
+					_redis.HashSet(ValidateStatusName, Name, "validate finished");
 				}
 			}
 			catch (Exception e)
 			{
-				_logger.Error(e.Message, e);
+				Logger.Error(e.Message, e);
 			}
 			finally
 			{
-				_logger.Info("Release locker.");
+				Logger.Info("Release locker.");
 
-				redis.LockRelease(key, 0);
+				_redis.LockRelease(key, 0);
 			}
 		}
 
 		private Core.Spider PrepareSpider(params string[] args)
 		{
-			_logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}");
+			Logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}");
 
-			var schedulerType = _spiderContext.Scheduler.Type;
+			var schedulerType = SpiderContext.Scheduler.Type;
 
 			switch (schedulerType)
 			{
 				case Configuration.Scheduler.Types.Queue:
 					{
 						PrepareSite();
-						var spider = GenerateSpider(_spiderContext.Scheduler.GetScheduler());
+						var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler());
 						spider.InitComponent();
 						return spider;
 
@@ -222,26 +212,26 @@ namespace Java2Dotnet.Spider.Extension
 				case Configuration.Scheduler.Types.Redis:
 					{
 
-						var scheduler = (Scheduler.RedisScheduler)(_spiderContext.Scheduler.GetScheduler());
+						var scheduler = (Scheduler.RedisScheduler)(SpiderContext.Scheduler.GetScheduler());
 
 						string key = "locker-" + Name;
 						if (args != null && args.Length > 0)
 						{
 							if (args.Contains("rerun"))
 							{
-								_logger.Info($"Starting execute command: rerun");
+								Logger.Info($"Starting execute command: rerun");
 
-								redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
-								redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
-								redis.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
-								redis.KeyDelete(Scheduler.RedisScheduler.ItemPrefix + Name);
-								redis.KeyDelete(Name);
-								redis.KeyDelete(key);
-								redis.SortedSetRemove(Scheduler.RedisScheduler.TaskList, Name);
-								redis.HashDelete("init-status", Name);
-								redis.HashDelete("validate-status", Name);
-								redis.KeyDelete("set-" + Encrypt.Md5Encrypt(Name));
-								_logger.Info($"Execute command: rerun finished.");
+								_redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
+								_redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
+								_redis.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
+								_redis.KeyDelete(Scheduler.RedisScheduler.ItemPrefix + Name);
+								_redis.KeyDelete(Name);
+								_redis.KeyDelete(key);
+								_redis.SortedSetRemove(Scheduler.RedisScheduler.TaskList, Name);
+								_redis.HashDelete("init-status", Name);
+								_redis.HashDelete("validate-status", Name);
+								_redis.KeyDelete("set-" + Encrypt.Md5Encrypt(Name));
+								Logger.Info($"Execute command: rerun finished.");
 							}
 							if (args.Contains("noconsole"))
 							{
@@ -252,60 +242,60 @@ namespace Java2Dotnet.Spider.Extension
 
 						try
 						{
-							_logger.Info($"Lock: {key} to keep only one prepare process.");
-							while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+							Logger.Info($"Lock: {key} to keep only one prepare process.");
+							while (!_redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 							{
 								Thread.Sleep(1000);
 							}
 
-							var lockerValue = redis.HashGet(InitStatusSetName, Name);
+							var lockerValue = _redis.HashGet(InitStatusSetName, Name);
 							bool needInitStartRequest = lockerValue != "init finished";
 
 							if (needInitStartRequest)
 							{
-								_logger.Info("Preparing site...");
+								Logger.Info("Preparing site...");
 
 								PrepareSite();
 							}
 							else
 							{
-								_logger.Info("No need to prepare site because other process did it.");
-								_spiderContext.Site.ClearStartRequests();
+								Logger.Info("No need to prepare site because other process did it.");
+								SpiderContext.Site.ClearStartRequests();
 							}
 
-							_logger.Info("Start creating Spider...");
+							Logger.Info("Start creating Spider...");
 
 							var spider = GenerateSpider(scheduler);
 
-							_logger.Info("Creat spider finished.");
+							Logger.Info("Creat spider finished.");
 
 							spider.SaveStatus = true;
 							SpiderMonitor.Default.Register(spider);
 
-							_logger.Info("Start init component...");
+							Logger.Info("Start init component...");
 							spider.InitComponent();
-							_logger.Info("Init component finished.");
+							Logger.Info("Init component finished.");
 
 							if (needInitStartRequest)
 							{
-								redis.HashSet(InitStatusSetName, Name, "init finished");
+								_redis.HashSet(InitStatusSetName, Name, "init finished");
 							}
 
-							_logger.Info("Creating Spider finished.");
+							Logger.Info("Creating Spider finished.");
 
 							return spider;
 						}
 						catch (Exception e)
 						{
-							_logger.Error(e.Message, e);
+							Logger.Error(e.Message, e);
 							return null;
 						}
 						finally
 						{
-							_logger.Info("Release locker.");
+							Logger.Info("Release locker.");
 							try
 							{
-								redis.LockRelease(key, 0);
+								_redis.LockRelease(key, 0);
 							}
 							catch
 							{
@@ -320,65 +310,64 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void PrepareSite()
 		{
-			if (_spiderContext.PrepareStartUrls != null)
+			if (SpiderContext.PrepareStartUrls != null)
 			{
-				foreach (var prepareStartUrl in _spiderContext.PrepareStartUrls)
+				foreach (var prepareStartUrl in SpiderContext.PrepareStartUrls)
 				{
-					prepareStartUrl.Build(_spiderContext.Site);
+					prepareStartUrl.Build(SpiderContext.Site, null);
 				}
 			}
 		}
 
-		private Core.Spider GenerateSpider(IScheduler scheduler)
+		protected virtual Core.Spider GenerateSpider(IScheduler scheduler)
 		{
-			Site site = _spiderContext.Site;
-			EntityProcessor processor = new EntityProcessor(_spiderContext);
-			foreach (var entity in _spiderContext.Entities)
+			EntityProcessor processor = new EntityProcessor(SpiderContext);
+			foreach (var entity in SpiderContext.Entities)
 			{
 				processor.AddEntity(entity);
 			}
 
-			EntityGeneralSpider spider = new EntityGeneralSpider(_spiderContext.SpiderName, processor, scheduler);
+			EntityGeneralSpider spider = new EntityGeneralSpider(SpiderContext.SpiderName, processor, scheduler);
 
-			foreach (var entity in _spiderContext.Entities)
+			foreach (var entity in SpiderContext.Entities)
 			{
 				string entiyName = entity.SelectToken("$.Identity")?.ToString();
 
 				var schema = entity.SelectToken("$.Schema")?.ToObject<Schema>();
 
-				switch (_spiderContext.Pipeline.Type)
+				switch (SpiderContext.Pipeline.Type)
 				{
 					case Configuration.Pipeline.Types.MongoDb:
 						{
-							spider.AddPipeline(new EntityPipeline(entiyName, _spiderContext.Pipeline.GetPipeline(schema, entity)));
+							spider.AddPipeline(new EntityPipeline(entiyName, SpiderContext.Pipeline.GetPipeline(schema, entity)));
 							break;
 						}
 					case Configuration.Pipeline.Types.MySql:
 						{
-							spider.AddPipeline(new EntityPipeline(entiyName, _spiderContext.Pipeline.GetPipeline(schema, entity)));
+							spider.AddPipeline(new EntityPipeline(entiyName, SpiderContext.Pipeline.GetPipeline(schema, entity)));
 							break;
 						}
 					case Configuration.Pipeline.Types.MySqlFile:
 						{
-							spider.AddPipeline(new EntityPipeline(entiyName, _spiderContext.Pipeline.GetPipeline(schema, entity)));
+							spider.AddPipeline(new EntityPipeline(entiyName, SpiderContext.Pipeline.GetPipeline(schema, entity)));
 							break;
 						}
 				}
 			}
-			spider.SetCachedSize(_spiderContext.CachedSize);
-			spider.SetEmptySleepTime(_spiderContext.EmptySleepTime);
-			spider.SetThreadNum(_spiderContext.ThreadNum);
-			spider.Deep = _spiderContext.Deep;
-			spider.SetDownloader(_spiderContext.Downloader.GetDownloader());
+			spider.SetCachedSize(SpiderContext.CachedSize);
+			spider.SetEmptySleepTime(SpiderContext.EmptySleepTime);
+			spider.SetThreadNum(SpiderContext.ThreadNum);
+			spider.Deep = SpiderContext.Deep;
+			spider.SetDownloader(SpiderContext.Downloader.GetDownloader());
 
-			if (_spiderContext.PageHandler != null)
+			if (SpiderContext.PageHandler != null)
 			{
-				spider.PageHandler = _spiderContext.PageHandler.Customize;
+				spider.PageHandler = SpiderContext.PageHandler.Customize;
 			}
 
-			if (_spiderContext.TargetUrlsHandler != null)
+			if (SpiderContext.TargetUrlsHandler != null)
 			{
-				spider.SetCustomizeTargetUrls(_spiderContext.TargetUrlsHandler.Handle);
+				spider.SetCustomizeTargetUrls(SpiderContext.TargetUrlsHandler.Handle);
 			}
 
 			return spider;
@@ -398,7 +387,7 @@ namespace Java2Dotnet.Spider.Extension
 					}
 				case NetworkValidater.Types.Defalut:
 					{
-						return new Java2Dotnet.Spider.Redial.NetworkValidater.DefaultNetworkValidater();
+						return new Redial.NetworkValidater.DefaultNetworkValidater();
 					}
 			}
 			return null;

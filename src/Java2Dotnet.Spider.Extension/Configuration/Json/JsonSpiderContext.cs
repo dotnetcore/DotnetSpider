@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Newtonsoft.Json.Linq;

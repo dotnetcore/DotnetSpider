@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core;

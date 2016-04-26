@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Linq;
 using System.Text;
 using Java2Dotnet.Spider.Core;
@@ -7,7 +6,6 @@ using Java2Dotnet.Spider.Extension.ORM;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
 using Java2Dotnet.Spider.Extension.Utils;
-using System;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {

@@ -167,8 +167,14 @@
     <Compile Include="..\Environment.cs">
       <Link>Environment.cs</Link>
     </Compile>
+    <Compile Include="..\ILinkSpiderContext.cs">
+      <Link>ILinkSpiderContext.cs</Link>
+    </Compile>
     <Compile Include="..\ISpiderContext.cs">
       <Link>ISpiderContext.cs</Link>
+    </Compile>
+    <Compile Include="..\LinkContextSpider.cs">
+      <Link>LinkContextSpider.cs</Link>
     </Compile>
     <Compile Include="..\Model\AfterExtractor.cs">
       <Link>Model\AfterExtractor.cs</Link>
@@ -316,6 +322,9 @@
     </Compile>
     <Compile Include="..\Pipeline\ImagePipeline.cs">
       <Link>Pipeline\ImagePipeline.cs</Link>
+    </Compile>
+    <Compile Include="..\Pipeline\LinkSpiderPipeline.cs">
+      <Link>Pipeline\LinkSpiderPipeline.cs</Link>
     </Compile>
     <Compile Include="..\Pipeline\MultiPagePipeline.cs">
       <Link>Pipeline\MultiPagePipeline.cs</Link>

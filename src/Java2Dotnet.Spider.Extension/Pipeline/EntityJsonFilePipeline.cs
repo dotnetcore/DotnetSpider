@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Core.Utils;

@@ -1,7 +1,6 @@
 ﻿using System;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core;
-using Java2Dotnet.Spider.Core.Utils;
 
 namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 {
