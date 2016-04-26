@@ -127,14 +127,37 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 				while (reader.Read())
 				{
-					Dictionary<string, object> values = new Dictionary<string, object>();
+					Dictionary<string, object> data = new Dictionary<string, object>();
 					int count = reader.FieldCount;
 					for (int i = 0; i < count; ++i)
 					{
 						string name = reader.GetName(i);
-						values.Add(name, reader.GetValue(i));
+						data.Add(name, reader.GetValue(i));
 					}
-					datas.Add(values);
+
+					List<string> arguments = new List<string>();
+					foreach (var column in Columns)
+					{
+						string value = data[column.Name]?.ToString();
+
+						foreach (var formatter in column.Formatters)
+						{
+							value = formatter.Formate(value);
+						}
+						arguments.Add(value);
+					}
+
+					foreach (var formate in FormateStrings)
+					{
+						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
+						site.AddStartRequest(new Request(tmpUrl, 0, data)
+						{
+							Method = Method,
+							Origin = Origin,
+							PostBody = GetPostBody(PostBody, data),
+							Referer = Referer
+						});
+					}
 				}
 #if NET_CORE && TEST
 				foreach (var data in datas)
@@ -151,33 +174,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 #else
 				reader.Dispose();
 #endif
-				Parallel.ForEach(datas, new ParallelOptions { MaxDegreeOfParallelism = 1 }, data =>
-				{
-					Dictionary<string, object> tmp = data;
-					List<string> arguments = new List<string>();
-					foreach (var column in Columns)
-					{
-						string value = tmp[column.Name]?.ToString();
-
-						foreach (var formatter in column.Formatters)
-						{
-							value = formatter.Formate(value);
-						}
-						arguments.Add(value);
-					}
-
-					foreach (var formate in FormateStrings)
-					{
-						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-						site.AddStartRequest(new Request(tmpUrl, 0, tmp)
-						{
-							Method = Method,
-							Origin = Origin,
-							PostBody = GetPostBody(PostBody, tmp),
-							Referer = Referer
-						});
-					}
-				});
 			}
 		}
 
@@ -282,7 +278,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		{
 			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
 			{
-				List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
+				//List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
 				string sql = GetSelectQueryString();
 				conn.Open();
 				var command = conn.CreateCommand();
@@ -290,26 +286,18 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				command.CommandType = CommandType.Text;
 
 				var reader = command.ExecuteReader();
+				int interval = 0;
+				StringBuilder formatBuilder = new StringBuilder();
 				while (reader.Read())
 				{
-					Dictionary<string, object> values = new Dictionary<string, object>();
+					Dictionary<string, object> data = new Dictionary<string, object>();
 					int count = reader.FieldCount;
 					for (int i = 0; i < count; ++i)
 					{
 						string name = reader.GetName(i);
-						values.Add(name, reader.GetValue(i));
+						data.Add(name, reader.GetValue(i));
 					}
-					datas.Add(values);
-				}
-#if !NET_CORE
-				reader.Close();
-#else
-				reader.Dispose();
-#endif
-				int interval = 0;
-				StringBuilder formatBuilder = new StringBuilder();
-				foreach (var data in datas)
-				{
+
 					if (interval == Interval)
 					{
 						foreach (var formate in FormateStrings)
@@ -340,8 +328,9 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					}
 					formatBuilder.Append(argumentsBuilder.ToString(0, argumentsBuilder.Length - (string.IsNullOrEmpty(ColumnSeparator) ? 0 : ColumnSeparator.Length))).Append(RowSeparator);
 					interval++;
-				};
-
+					//datas.Add(values);
+				}
+ 
 				if (interval != 0)
 				{
 					foreach (var formate in FormateStrings)
@@ -358,6 +347,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					interval = 0;
 					formatBuilder = new StringBuilder();
 				}
+
+#if !NET_CORE
+				reader.Close();
+#else
+				reader.Dispose();
+#endif
 			}
 		}
 	}
