@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+#if NET_CORE
+using System.Reflection;
+#endif
 
 namespace Java2Dotnet.Spider.Extension.Model.Formatter
 {

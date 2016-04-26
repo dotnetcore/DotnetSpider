@@ -23,10 +23,6 @@ namespace Java2Dotnet.Spider.Test.Example
 				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd"),
 				CachedSize = 1,
 				ThreadNum = 1,
-				Site = new Site
-				{
-					EncodingName = "UTF-8"
-				},
 				StartUrls = new Dictionary<string, Dictionary<string, object>>
 				{
 					{"http://list.jd.com/list.html?cat=9987,653,655&page=1&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
