@@ -7,7 +7,6 @@
 *.userosscache
 *.sln.docstates
 
-.vscode
 project.lock.json
 
 nugetpack.sh

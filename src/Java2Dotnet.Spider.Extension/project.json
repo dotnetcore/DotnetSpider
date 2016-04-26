@@ -29,7 +29,7 @@
             "dependencies": {
             },
 			"compilationOptions": {
-				"define": [ "NET_CORE" ]
+				"define": [ "NET_CORE","TEST" ]
 			}
 		}
 	}

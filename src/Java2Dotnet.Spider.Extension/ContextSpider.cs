@@ -216,7 +216,6 @@ namespace Java2Dotnet.Spider.Extension
 					}
 				case Configuration.Scheduler.Types.Redis:
 					{
-
 						var scheduler = (Scheduler.RedisScheduler)(SpiderContext.Scheduler.GetScheduler());
 
 						string key = "locker-" + Name;
