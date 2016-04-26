@@ -90,7 +90,7 @@ namespace Java2Dotnet.Spider.Validation
 			}
 
 			builder.Append("</table><br/>");
-			builder.Append("<span>Any question please ask for help from Lewis@86research.com</span></div></div></body></html>");
+			builder.Append("<span>Any question please ask for help from zlzforever@163.com</span></div></div></body></html>");
 
 			return builder.ToString();
 		}

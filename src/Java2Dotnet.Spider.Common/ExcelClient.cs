@@ -145,7 +145,7 @@ namespace Java2Dotnet.Spider.Common
 
 		//public string ExportContent<T>(List<T> data, string path)
 		//{
-		//	DirectoryInfo diretory = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "86ResearchReport"));
+		//	DirectoryInfo diretory = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Report"));
 		//	if (!diretory.Exists)
 		//	{
 		//		diretory.Create();

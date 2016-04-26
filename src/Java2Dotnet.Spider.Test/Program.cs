@@ -22,7 +22,7 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			Log.UserId = "86Research-DotnetSpider-Log";
+			Log.UserId = "DotnetSpider";
 			Log.TaskId = "JD SKU TEST";
 			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			var context = spiderBuilder.GetBuilder().Context;
@@ -37,7 +37,7 @@ namespace Java2Dotnet.Spider.Test
 
 		private static void TestStatusServer()
 		{
-			Log.UserId = "86Research-DotnetSpider-log";
+			Log.UserId = "DotnetSpider";
 			Log.TaskId = "Tmall Gmv Monthly";
 
 			var ErrorPageCount = 10;
