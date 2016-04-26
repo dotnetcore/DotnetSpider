@@ -136,6 +136,16 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					}
 					datas.Add(values);
 				}
+#if NET_CORE && TEST
+				foreach (var data in datas)
+				{
+					foreach (var entry in data)
+					{
+						Console.WriteLine(entry.Key + ":" + entry.Value);
+					}
+				}
+#endif
+
 #if !NET_CORE
 				reader.Close();
 #else
@@ -155,7 +165,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 						}
 						arguments.Add(value);
 					}
- 
+
 					foreach (var formate in FormateStrings)
 					{
 						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
