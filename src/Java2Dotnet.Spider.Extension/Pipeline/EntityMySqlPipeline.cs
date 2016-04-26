@@ -71,7 +71,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames.Substring(0, uniqueColumNames.Length)})");
 			}
 
-			string primaryColumNames = Primary == null || Primary.Count == 0 ? "`__id` " : string.Join(", ", Primary.Select(c => $"`{c}`"));
+			string primaryColumNames = Primary == null || Primary.Count == 0 ? "`__id` " : string.Join(", ", Primary.Select(c => $"`{c.Name}`"));
 			builder.Append($", PRIMARY KEY ({primaryColumNames.Substring(0, primaryColumNames.Length)})");
 
 			builder.Append(") ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
