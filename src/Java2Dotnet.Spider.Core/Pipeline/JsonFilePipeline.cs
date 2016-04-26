@@ -11,12 +11,9 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 	/// </summary>
 	public class JsonFilePipeline : FilePersistentBase, IPipeline
 	{
-		/// <summary>
-		/// New JsonFilePageModelPipeline with default path "/data/webmagic/"
-		/// </summary>
 		public JsonFilePipeline()
 		{
-			SetPath("/data/dotnetspider");
+			SetPath("/data/files");
 		}
 
 		public JsonFilePipeline(string path)
@@ -26,10 +23,10 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 
 		public void Process(ResultItems resultItems, ISpider spider)
 		{
-			string path = BasePath + "/" + spider.Identity + "/";
+			string path = $"{BasePath}{PathSeperator}{ spider.Identity}{PathSeperator}{Encrypt.Md5Encrypt(resultItems.Request.Url.ToString())}.json";  
 			try
 			{
-				FileInfo file = PrepareFile(path + Encrypt.Md5Encrypt(resultItems.Request.Url.ToString()) + ".json");
+				FileInfo file = PrepareFile(path);
 				using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
 				{
 					printWriter.WriteLine(JsonConvert.SerializeObject(resultItems.Results));

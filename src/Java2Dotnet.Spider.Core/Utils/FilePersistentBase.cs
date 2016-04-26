@@ -22,8 +22,11 @@ namespace Java2Dotnet.Spider.Core.Utils
 
 		protected string BasePath;
 
+#if !NET_CORE
 		protected static string PathSeperator = "\\";
-
+#else
+		protected static string PathSeperator = "/";
+#endif
 		protected void SetPath(string path)
 		{
 			if (!path.EndsWith(PathSeperator))

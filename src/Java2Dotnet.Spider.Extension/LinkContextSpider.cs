@@ -51,7 +51,6 @@ namespace Java2Dotnet.Spider.Extension
 						}
 					}
 				}
-
 			}
 
 			return spider;

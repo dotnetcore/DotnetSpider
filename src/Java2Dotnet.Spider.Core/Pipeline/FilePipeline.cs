@@ -17,7 +17,7 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 		/// </summary>
 		public FilePipeline()
 		{
-			SetPath(@"\data\dotnetspider\");
+			SetPath(@"\data\files\");
 		}
 
 		public FilePipeline(string path)
@@ -27,10 +27,11 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 
 		public void Process(ResultItems resultItems, ISpider spider)
 		{
-			string filePath = BasePath + PathSeperator + spider.Identity + PathSeperator;
+			StringBuilder builer = new StringBuilder(BasePath);
+			string filePath = $"{BasePath}{PathSeperator}{spider.Identity}{PathSeperator}{Encrypt.Md5Encrypt(resultItems.Request.Url.ToString())}.fd";
 			try
 			{
-				FileInfo file = PrepareFile(filePath + Encrypt.Md5Encrypt(resultItems.Request.Url.ToString()) + ".html");
+				FileInfo file = PrepareFile(filePath);
 				using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
 				{
 					printWriter.WriteLine("url:\t" + resultItems.Request.Url);

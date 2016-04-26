@@ -98,6 +98,9 @@
     <Compile Include="..\CountableThreadPoolTests.cs">
       <Link>CountableThreadPoolTests.cs</Link>
     </Compile>
+    <Compile Include="..\Example\BaseSpiderExample.cs">
+      <Link>Example\BaseSpiderExample.cs</Link>
+    </Compile>
     <Compile Include="..\Example\JdSkuSample.cs">
       <Link>Example\JdSkuSample.cs</Link>
     </Compile>
