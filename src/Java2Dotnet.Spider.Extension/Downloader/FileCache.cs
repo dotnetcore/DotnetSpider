@@ -6,6 +6,9 @@ using Java2Dotnet.Spider.Core.Downloader;
 using Java2Dotnet.Spider.Core.Pipeline;
 using Java2Dotnet.Spider.Core.Processor;
 using Java2Dotnet.Spider.Core.Utils;
+#if NET_CORE
+using System.Reflection;
+#endif
 
 namespace Java2Dotnet.Spider.Extension.Downloader
 {

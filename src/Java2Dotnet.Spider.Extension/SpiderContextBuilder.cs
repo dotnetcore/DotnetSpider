@@ -10,6 +10,9 @@ using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Java2Dotnet.Spider.Extension.ORM;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+#if NET_CORE
+using System.Reflection;
+#endif
 
 namespace Java2Dotnet.Spider.Extension
 {
@@ -82,8 +85,9 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			return type.FullName;
 		}
-
+		
 #if !NET_CORE
+		
 		public static string ConvertToJson(Type entityType)
 		{
 			EntityType json = new EntityType();
@@ -146,11 +150,11 @@ namespace Java2Dotnet.Spider.Extension
 
 			return JsonConvert.SerializeObject(json);
 		}
-#else
+#else		
 		public static string ConvertToJson(TypeInfo entityType)
 		{
 			EntityType json = new EntityType();
-			json.Identity = GetEntityName(entityType);
+			json.Identity = GetEntityName(entityType.AsType());
 			json.TargetUrls = entityType.GetCustomAttributes<TargetUrl>().ToList();
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
