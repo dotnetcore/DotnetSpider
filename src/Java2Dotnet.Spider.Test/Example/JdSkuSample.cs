@@ -48,7 +48,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				},
 				Pipeline = new MysqlPipeline
 				{
-					ConnectString = "Database='mysql';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
+					ConnectString = ""
 				},
 				Downloader = new HttpDownloader()
 				{
