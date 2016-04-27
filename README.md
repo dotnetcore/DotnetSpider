@@ -2,7 +2,7 @@
 This is a cross platfrom spider develop by C#.
 
 # Design
-Spider need 3 parts to work: Scheduler, Downloader, Pipeline.
+Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
 
 # Base use
 

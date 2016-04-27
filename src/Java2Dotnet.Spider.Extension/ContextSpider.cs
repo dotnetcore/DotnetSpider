@@ -129,6 +129,8 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void DoValidate()
 		{
+			_redis = new RedisServer(ConfigurationManager.Get("redisHost"), 6379, ConfigurationManager.Get("redisPassword"));
+
 			string key = "locker-validate-" + Name;
 			try
 			{
