@@ -11,7 +11,7 @@ dotnet pack src/Java2Dotnet.Spider.Validation/project.json -o spider_nuget_packa
 dotnet pack src/Java2Dotnet.Spider.Core/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Extension/project.json -o spider_nuget_packages
 ftp -n<<!
-open dc01.86research.cn
+open redis
 user nuget 1qazZAQ!
 binary
 hash
