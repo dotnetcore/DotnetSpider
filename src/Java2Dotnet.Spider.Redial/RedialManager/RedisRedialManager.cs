@@ -33,7 +33,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			}
 			else
 			{
-				RedisHost = "localhost";
+				throw new RedialException("Redis host should not be null.");
 			}
 
 			if (!string.IsNullOrEmpty(password))
@@ -44,6 +44,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			{
 				Password = null;
 			}
+
 			Redis = new RedisServer(host, 6379, password);
 			Redis.Db = 3;
 			AtomicExecutor = new RedisAtomicExecutor(this);

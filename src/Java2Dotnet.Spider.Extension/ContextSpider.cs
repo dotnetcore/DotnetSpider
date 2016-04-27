@@ -28,7 +28,6 @@ namespace Java2Dotnet.Spider.Extension
 		protected static readonly ILog Logger = LogManager.GetLogger();
 
 		protected readonly SpiderContext SpiderContext;
-		private RedisServer _redis;
 		public string Name { get; }
 
 		public ContextSpider(SpiderContext spiderContext)
@@ -42,8 +41,6 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void InitEnvoriment()
 		{
-			_redis = new RedisServer(ConfigurationManager.Get("redisHost"), 6379, ConfigurationManager.Get("redisPassword"));
-
 			if (SpiderContext.Redialer != null)
 			{
 				//RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
@@ -129,7 +126,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void DoValidate()
 		{
-			_redis = new RedisServer(ConfigurationManager.Get("redisHost"), 6379, ConfigurationManager.Get("redisPassword"));
+			RedisServer redis = new RedisServer(ConfigurationManager.Get("redisHost"), 6379, ConfigurationManager.Get("redisPassword"));
 
 			string key = "locker-validate-" + Name;
 			try
@@ -149,14 +146,17 @@ namespace Java2Dotnet.Spider.Extension
 					}
 				}
 
-				Logger.Info($"Lock: {key} to keep only one validate process.");
-
-				while (!_redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+				if (redis != null)
 				{
-					Thread.Sleep(1000);
+					Logger.Info($"Lock: {key} to keep only one validate process.");
+
+					while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+					{
+						Thread.Sleep(1000);
+					}
 				}
 
-				var lockerValue = _redis.HashGet(ValidateStatusName, Name);
+				var lockerValue = redis?.HashGet(ValidateStatusName, Name);
 				bool needInitStartRequest = lockerValue != "validate finished";
 
 				if (needInitStartRequest)
@@ -185,7 +185,7 @@ namespace Java2Dotnet.Spider.Extension
 
 				if (needInitStartRequest)
 				{
-					_redis.HashSet(ValidateStatusName, Name, "validate finished");
+					redis?.HashSet(ValidateStatusName, Name, "validate finished");
 				}
 			}
 			catch (Exception e)
@@ -196,12 +196,14 @@ namespace Java2Dotnet.Spider.Extension
 			{
 				Logger.Info("Release locker.");
 
-				_redis.LockRelease(key, 0);
+				redis?.LockRelease(key, 0);
 			}
 		}
 
 		private Core.Spider PrepareSpider(params string[] args)
 		{
+			RedisServer redis = GetManageRedisServer();
+
 			Logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}");
 
 			var schedulerType = SpiderContext.Scheduler.Type;
@@ -227,16 +229,19 @@ namespace Java2Dotnet.Spider.Extension
 							{
 								Logger.Info($"Starting execute command: rerun");
 
-								_redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
-								_redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
-								_redis.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
-								_redis.KeyDelete(Scheduler.RedisScheduler.ItemPrefix + Name);
-								_redis.KeyDelete(Name);
-								_redis.KeyDelete(key);
-								_redis.SortedSetRemove(Scheduler.RedisScheduler.TaskList, Name);
-								_redis.HashDelete("init-status", Name);
-								_redis.HashDelete("validate-status", Name);
-								_redis.KeyDelete("set-" + Encrypt.Md5Encrypt(Name));
+								if (redis != null)
+								{
+									redis.KeyDelete(key);
+									redis.HashDelete("init-status", Name);
+									redis.HashDelete("validate-status", Name);
+									redis.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
+									redis.SortedSetRemove(Scheduler.RedisScheduler.TaskList, Name);
+								}
+
+								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
+								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
+								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetItemKey(Name));
+
 								Logger.Info($"Execute command: rerun finished.");
 							}
 							if (args.Contains("noconsole"))
@@ -248,13 +253,16 @@ namespace Java2Dotnet.Spider.Extension
 
 						try
 						{
-							Logger.Info($"Lock: {key} to keep only one prepare process.");
-							while (!_redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+							if (redis != null)
 							{
-								Thread.Sleep(1000);
+								Logger.Info($"Lock: {key} to keep only one prepare process.");
+								while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+								{
+									Thread.Sleep(1000);
+								}
 							}
 
-							var lockerValue = _redis.HashGet(InitStatusSetName, Name);
+							var lockerValue = redis?.HashGet(InitStatusSetName, Name);
 							bool needInitStartRequest = lockerValue != "init finished";
 
 							if (needInitStartRequest)
@@ -284,7 +292,7 @@ namespace Java2Dotnet.Spider.Extension
 
 							if (needInitStartRequest)
 							{
-								_redis.HashSet(InitStatusSetName, Name, "init finished");
+								redis?.HashSet(InitStatusSetName, Name, "init finished");
 							}
 
 							Logger.Info("Creating Spider finished.");
@@ -301,7 +309,7 @@ namespace Java2Dotnet.Spider.Extension
 							Logger.Info("Release locker.");
 							try
 							{
-								_redis.LockRelease(key, 0);
+								redis?.LockRelease(key, 0);
 							}
 							catch
 							{
@@ -312,6 +320,18 @@ namespace Java2Dotnet.Spider.Extension
 			}
 
 			throw new SpiderExceptoin("Prepare spider failed.");
+		}
+
+		private RedisServer GetManageRedisServer()
+		{
+			var host = ConfigurationManager.Get("redisHost");
+			var portStr = ConfigurationManager.Get("redisPort");
+			if (string.IsNullOrEmpty(host))
+			{
+				return null;
+			}
+			int port = string.IsNullOrEmpty(portStr) ? 6379 : int.Parse(portStr);
+			return new RedisServer(host, port, ConfigurationManager.Get("redisPassword"));
 		}
 
 		private void PrepareSite()

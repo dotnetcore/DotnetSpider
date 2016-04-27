@@ -64,6 +64,11 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 			return QueuePrefix + Encrypt.Md5Encrypt(identity);
 		}
 
+		public static string GetItemKey(string identity)
+		{
+			return ItemPrefix + Encrypt.Md5Encrypt(identity);
+		}
+
 		public bool IsDuplicate(Request request, ISpider spider)
 		{
 			return SafeExecutor.Execute(30, () =>
@@ -87,7 +92,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 				string field = request.Identity;
 				string value = JsonConvert.SerializeObject(request);
 
-				Redis.HashSet(ItemPrefix + spider.Identity, field, value);
+				Redis.HashSet(GetItemKey(spider.Identity), field, value);
 			});
 		}
 
@@ -131,11 +136,10 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 					return null;
 				}
 				string field = value.ToString();
-				string hashId = ItemPrefix + spider.Identity;
+				string hashId = GetItemKey(spider.Identity);
 
 				string json = null;
 
-				//redis �п���ȡ����ʧ��
 				for (int i = 0; i < 10 && string.IsNullOrEmpty(json = Redis.HashGet(hashId, field)); ++i)
 				{
 					Thread.Sleep(150);
@@ -147,9 +151,6 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 					Redis.HashDelete(hashId, field);
 					return result;
 				}
-
-				// �ϸ�������˵�����ߵ�����, һ������JSON����,���鿴Push����
-				// �Ƿ�Ӧ����Ϊ1����
 
 				return null;
 			});
@@ -171,7 +172,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 				Redis.ListRightPushMany(GetQueueKey(spider.Identity), identities);
 
-				Redis.HashSetMany(ItemPrefix + spider.Identity, jsonDic);
+				Redis.HashSetMany(GetItemKey(spider.Identity), jsonDic);
 			}
 		}
 
@@ -190,7 +191,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			Redis.KeyDelete(GetQueueKey(spider.Identity));
 			Redis.KeyDelete(GetSetKey(spider.Identity));
-			Redis.KeyDelete(ItemPrefix + spider.Identity);
+			Redis.KeyDelete(GetItemKey(spider.Identity));
 		}
 	}
 }
