@@ -11,7 +11,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		[Flags]
 		public enum Types
 		{
-			IncreasePageNumber
+			IncreasePageNumber,
+			IncreasePageNumberWithStopper,
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -66,7 +67,21 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				return new List<string>();
 			}
 
-			return new List<string> { page.Url.Replace(current, next) };
+			return new List<string> {page.Url.Replace(current, next)};
+		}
+	}
+
+	public class IncreasePageNumberWithStopperTargetUrlsHandler : IncreasePageNumberTargetUrlsHandler
+	{
+		public override Types Type { get; internal set; } = Types.IncreasePageNumber;
+
+		public string Stopper { get; set; } = "Spider Custom Stopper";
+
+		public override IList<string> Handle(Page page)
+		{
+			var urls = base.Handle(page);
+
+			return page.Content.Contains(Stopper) ? new List<string>() : urls;
 		}
 	}
 }

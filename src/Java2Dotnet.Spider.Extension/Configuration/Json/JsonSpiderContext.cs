@@ -407,6 +407,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 					{
 						return jobject.ToObject<IncreasePageNumberTargetUrlsHandler>();
 					}
+				case Configuration.TargetUrlsHandler.Types.IncreasePageNumberWithStopper:
+					{
+						return jobject.ToObject<IncreasePageNumberWithStopperTargetUrlsHandler>();
+					}
 			}
 			throw new SpiderExceptoin("UNSPORT or JSON string is incorrect: " + jobject);
 		}
