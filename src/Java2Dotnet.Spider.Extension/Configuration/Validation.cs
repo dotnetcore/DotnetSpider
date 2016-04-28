@@ -65,7 +65,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 	public class RangeValidation : Validation
 	{
-		public override Types Type { get; internal set; } = Types.Equal;
+		public override Types Type { get; internal set; } = Types.Range;
 
 		public override IValidation GetValidation(DbConnection conn)
 		{

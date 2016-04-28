@@ -20,7 +20,7 @@ namespace Java2Dotnet.Spider.Test.Example
 		{
 			return new SpiderContextBuilder(new SpiderContext
 			{
-				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd"),
+				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
 				CachedSize = 1,
 				ThreadNum = 1,
 				Site = new Site
@@ -33,13 +33,14 @@ namespace Java2Dotnet.Spider.Test.Example
 					{"http://list.jd.com/list.html?cat=9987,653,655&page=2&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
 					{"http://list.jd.com/list.html?cat=9987,653,655&page=3&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
 				},
-				PrepareStartUrls = new List<PrepareStartUrls> {
-					new CyclePrepareStartUrls {
-						From=0,
-						To=10000,
-						FormateString="http://list.jd.com/list.html?cat=9987,653,655&page=1&ext=57050::{0}^^&go=0&JL=6_0_0"
-					}
-				},
+				PrepareStartUrls = new List<PrepareStartUrls>{ new DbPrepareStartUrls()
+				{
+					Source = DataSource.MySql,
+					ConnectString = "Database='test';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306",
+					TableName = "jd.category",
+					Columns = new List<DbPrepareStartUrls.Column> { new DbPrepareStartUrls.Column { Name = "url", Formatters=new List<Formatter> { new ReplaceFormatter{ OldValue= ".html",NewValue="" } } } },
+					FormateStrings = new List<string> { "{0}&page=1&JL=6_0_0" }
+				}},
 				Scheduler = new RedisScheduler
 				{
 					Host = "redis",
@@ -48,7 +49,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				},
 				Pipeline = new MysqlPipeline
 				{
-					ConnectString = ""
+					ConnectString = "Database='eightsix';Data Source=86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
 				},
 				Downloader = new HttpDownloader()
 				{
