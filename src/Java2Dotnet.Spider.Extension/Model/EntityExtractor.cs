@@ -125,7 +125,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 			if (field.ToLower() == "now")
 			{
-				return DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+				return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 			}
 
 			if (field.ToLower() == "monday")

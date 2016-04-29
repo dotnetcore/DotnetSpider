@@ -111,7 +111,7 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 			var manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
 			manager.Redis.FlushDb();
 			manager.Redialer = new TestRedial();
-			manager.Redis.HashSet(RedisAtomicExecutor.GetSetKey(), "test-timeout", DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd hh:mm"));
+			manager.Redis.HashSet(RedisAtomicExecutor.GetSetKey(), "test-timeout", DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd HH:mm"));
 			RedisAtomicExecutor executor = new RedisAtomicExecutor(manager);
 			Task.Factory.StartNew(() =>
 			{
@@ -155,7 +155,7 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 			var manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
 			manager.Redis.FlushDb();
 			manager.Redialer = new TestRedial();
-			manager.Redis.HashSet(RedisAtomicExecutor.GetSetKey(), Redial.RedialManager.RedisRedialManager.Locker, DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd hh:mm"));
+			manager.Redis.HashSet(RedisAtomicExecutor.GetSetKey(), Redial.RedialManager.RedisRedialManager.Locker, DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd HH:mm"));
 		 
 			RedisAtomicExecutor executor = new RedisAtomicExecutor(manager);
 			Task.Factory.StartNew(() =>

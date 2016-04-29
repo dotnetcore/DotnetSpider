@@ -119,7 +119,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			}
 			else
 			{
-				Redis.HashSet(GetSetKey(), Locker, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
+				Redis.HashSet(GetSetKey(), Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 
 				// wait all operation stop.
 				Thread.Sleep(5000);

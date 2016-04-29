@@ -186,7 +186,7 @@ namespace Java2Dotnet.Spider.JLog
 
 		private LogInfo CreateLogInfo(string type, string message, Exception e)
 		{
-			string time = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+			string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 			var log = new LogInfo()
 			{
 				Type = type,
