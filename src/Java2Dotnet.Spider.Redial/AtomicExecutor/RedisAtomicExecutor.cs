@@ -19,7 +19,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 			try
 			{
-				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
+				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 				action();
 			}
 			finally
@@ -36,7 +36,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 			try
 			{
-				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
+				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 				action(obj);
 			}
 			finally
@@ -54,7 +54,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 			try
 			{
 				//Db.SetAdd(setKey,fieldKey);
-				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
+				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 				return func(obj);
 			}
 			finally
@@ -71,7 +71,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 
 			try
 			{
-				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd hh:mm"));
+				_redisRedialManager.Redis.HashSet(setKey, fieldKey, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 				return func();
 			}
 			finally
