@@ -343,6 +343,13 @@ namespace Java2Dotnet.Spider.Extension
 					prepareStartUrl.Build(SpiderContext.Site, null);
 				}
 			}
+
+			foreach (var request in SpiderContext.StartUrls)
+			{
+				SpiderContext.Site.AddStartRequest(new Request(request.Key, 0, request.Value)
+				{
+				});
+			}
 		}
 
 		protected virtual Core.Spider GenerateSpider(IScheduler scheduler)

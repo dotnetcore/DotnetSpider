@@ -21,7 +21,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	public class RedisScheduler : Scheduler
 	{
 		public string Host { get; set; }
-		public int Port { get; set; }
+		public int Port { get; set; } = 6379;
 		public string Password { get; set; }
 
 		public override Types Type { get; internal set; } = Types.Redis;

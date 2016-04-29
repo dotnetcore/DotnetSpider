@@ -85,14 +85,14 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			return type.FullName;
 		}
-		
+
 #if !NET_CORE
-		
+
 		public static string ConvertToJson(Type entityType)
 		{
 			EntityType json = new EntityType();
 			json.Identity = GetEntityName(entityType);
-            json.TargetUrls = entityType.GetCustomAttributes<TargetUrl>().ToList();
+			json.TargetUrls = entityType.GetCustomAttributes<TargetUrl>().ToList();
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
 			{
@@ -150,7 +150,7 @@ namespace Java2Dotnet.Spider.Extension
 
 			return JsonConvert.SerializeObject(json);
 		}
-#else		
+#else
 		public static string ConvertToJson(TypeInfo entityType)
 		{
 			EntityType json = new EntityType();

@@ -62,7 +62,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 			Schema = GenerateSchema(schema);
 			Columns = entityDefine.SelectTokens("$.Fields[*]").Select(j => j.ToObject<Column>()).Where(c => !string.IsNullOrEmpty(c.DataType)).ToList();
-			var primary = entityDefine.SelectToken("$.Primary").ToObject<List<string>>();
+			var primary = entityDefine.SelectToken("$.Primary")?.ToObject<List<string>>();
 			if (primary != null)
 			{
 				foreach (var p in primary)
