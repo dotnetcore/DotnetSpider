@@ -1654,7 +1654,6 @@ namespace RedisSharp
 
 				List<string> arguments = new List<string>();
 
-
 				int i = 0;
 				foreach (var entry in values)
 				{
@@ -1666,6 +1665,7 @@ namespace RedisSharp
 					{
 						SendExpectSuccess("HMSET", arguments);
 						arguments.Clear();
+						arguments.Add(key);
 						i = 0;
 					}
 					arguments.Add(entry.Key);
