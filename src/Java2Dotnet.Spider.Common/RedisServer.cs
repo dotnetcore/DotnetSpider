@@ -1670,6 +1670,7 @@ namespace RedisSharp
 					}
 					arguments.Add(entry.Key);
 					arguments.Add(entry.Value);
+					i++;
 				}
 
 				if (i > 0)
