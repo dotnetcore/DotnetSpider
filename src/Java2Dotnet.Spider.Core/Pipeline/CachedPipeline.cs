@@ -11,14 +11,6 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 	public abstract class CachedPipeline : IPipeline
 	{
 		private readonly ConcurrentDictionary<ISpider, List<ResultItems>> _cached = new ConcurrentDictionary<ISpider, List<ResultItems>>();
-
-#if NET_CORE
-		protected static readonly ILog Logger = LogManager.GetLogger();
-#else
-		protected static readonly ILog Logger = LogManager.GetLogger();
-		//protected static readonly ILog Logger = LogManager.GetLogger(typeof(CachedPipeline));
-#endif
-
 		public int CachedSize { get; set; } = 1;
 
 		protected abstract void Process(List<ResultItems> resultItemsList, ISpider spider);

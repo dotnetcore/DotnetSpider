@@ -10,8 +10,6 @@ namespace Java2Dotnet.Spider.Core.Proxy
 	{
 		// TODO 改为单例
 		private static IPAddress _localAddr;
-		//private static readonly ILog Logger = LogManager.GetLogger(typeof(ProxyUtil));
-		protected static readonly ILog Logger = LogManager.GetLogger();
 
 		static ProxyUtil()
 		{
@@ -36,7 +34,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			}
 			catch (Exception e)
 			{
-				Logger.Error("Failure when init ProxyUtil", e);
+				//Logger.Error("Failure when init ProxyUtil", e);
 			}
 		}
 
@@ -44,7 +42,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 		{
 			if (_localAddr == null)
 			{
-				Logger.Error("cannot get local ip");
+				//Logger.Error("cannot get local ip");
 				return false;
 			}
 			bool isReachable = false;
@@ -59,12 +57,12 @@ namespace Java2Dotnet.Spider.Core.Proxy
 				socket.ReceiveTimeout = 3000;
 				socket.Connect(address, p.Port);
 
-				Logger.Info("SUCCESS - connection established! Local: " + _localAddr + " remote: " + p);
+				//Logger.Info("SUCCESS - connection established! Local: " + _localAddr + " remote: " + p);
 				isReachable = true;
 			}
 			catch (IOException)
 			{
-				Logger.Warn("FAILRE - CAN not connect! Local: " + _localAddr + " remote: " + p);
+				//Logger.Warn("FAILRE - CAN not connect! Local: " + _localAddr + " remote: " + p);
 			}
 			finally
 			{				 
@@ -78,7 +76,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 					}
 					catch (IOException e)
 					{
-						Logger.Warn("Error occurred while closing socket of validating proxy", e);
+						//Logger.Warn("Error occurred while closing socket of validating proxy", e);
 					}
 			}
 			return isReachable;

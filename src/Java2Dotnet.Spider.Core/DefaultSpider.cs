@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -43,6 +44,10 @@ namespace Java2Dotnet.Spider.Core
 		}
 
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
+
+		public string UserId { get; } = "";
+
+		public string TaskGroup { get; } = "";
 
 		public void Dispose()
 		{

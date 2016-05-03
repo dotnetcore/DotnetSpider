@@ -44,6 +44,11 @@ namespace Java2Dotnet.Spider.Test.Pipeline
 
 			public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 
+			public string UserId { get; } = "";
+
+			public string TaskGroup { get; } = "";
+
+
 			public void Dispose()
 			{
 			}

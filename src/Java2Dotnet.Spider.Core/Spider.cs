@@ -24,7 +24,7 @@ namespace Java2Dotnet.Spider.Core
 	/// </summary>
 	public class Spider : ISpider
 	{
-		protected static readonly ILog Logger = LogManager.GetLogger();
+		protected readonly ILog Logger;
 
 		public int ThreadNum { get; private set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
@@ -46,7 +46,8 @@ namespace Java2Dotnet.Spider.Core
 		public event SpiderEvent RequestedFailEvent;
 		public event SpiderClosing SpiderClosingEvent;
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
-
+		public string UserId { get; }
+		public string TaskGroup { get; }
 		protected readonly string DataRootDirectory;
 
 		protected IPageProcessor PageProcessor { get; set; }
@@ -69,7 +70,7 @@ namespace Java2Dotnet.Spider.Core
 		/// <returns></returns>
 		public static Spider Create(IPageProcessor pageProcessor)
 		{
-			return new Spider(Guid.NewGuid().ToString(), pageProcessor, new QueueDuplicateRemovedScheduler());
+			return new Spider(Guid.NewGuid().ToString(), null, null, pageProcessor, new QueueDuplicateRemovedScheduler());
 		}
 
 		/// <summary>
@@ -80,7 +81,7 @@ namespace Java2Dotnet.Spider.Core
 		/// <returns></returns>
 		public static Spider Create(IPageProcessor pageProcessor, IScheduler scheduler)
 		{
-			return new Spider(Guid.NewGuid().ToString(), pageProcessor, scheduler);
+			return new Spider(Guid.NewGuid().ToString(), null, null, pageProcessor, scheduler);
 		}
 
 		/// <summary>
@@ -90,37 +91,41 @@ namespace Java2Dotnet.Spider.Core
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
 		/// <returns></returns>
-		public static Spider Create(string identify, IPageProcessor pageProcessor, IScheduler scheduler)
+		public static Spider Create(string identify, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
 		{
-			return new Spider(identify, pageProcessor, scheduler);
+			return new Spider(identify, userid, taskGroup, pageProcessor, scheduler);
 		}
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
 		/// </summary>
-		/// <param name="identify"></param>
+		/// <param name="identity"></param>
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
-		protected Spider(string identify, IPageProcessor pageProcessor, IScheduler scheduler)
+		protected Spider(string identity, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
 		{
-			_waitCount = 0;
-			PageProcessor = pageProcessor;
-			Site = pageProcessor.Site;
-			StartRequests = Site.StartRequests;
-
-			Scheduler = scheduler ?? new QueueDuplicateRemovedScheduler();
-			if (string.IsNullOrWhiteSpace(identify))
+			if (string.IsNullOrWhiteSpace(identity))
 			{
 				Identity = string.IsNullOrEmpty(Site.Domain) ? Guid.NewGuid().ToString() : Site.Domain;
 			}
 			else
 			{
-				if (!IdentifyRegex.IsMatch(identify))
+				if (!IdentifyRegex.IsMatch(identity))
 				{
 					throw new SpiderExceptoin("Task Identify only can contains A-Z a-z 0-9 _ -");
 				}
-				Identity = identify;
+				Identity = identity;
 			}
+
+			UserId = string.IsNullOrEmpty(userid) ? "DotnetSpider" : userid;
+			TaskGroup = string.IsNullOrEmpty(taskGroup) ? "DotnetSpider" : taskGroup;
+			Logger = LogManager.GetLogger($"{identity}&{userid}&{taskGroup}");
+
+			_waitCount = 0;
+			PageProcessor = pageProcessor;
+			Site = pageProcessor.Site;
+			StartRequests = Site.StartRequests;
+			Scheduler = scheduler ?? new QueueDuplicateRemovedScheduler();
 
 #if !NET_CORE
 
@@ -683,6 +688,7 @@ namespace Java2Dotnet.Spider.Core
 #if TEST
 			sw.Stop();
 			Console.WriteLine("IPipeline:" + (sw.ElapsedMilliseconds).ToString());
+			Logger.Info($"Request: {request.Url} Sucess.");
 #endif
 		}
 

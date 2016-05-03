@@ -10,14 +10,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 	{
 		public DownloadValidation DownloadValidation { get; set; }
 		public int ThreadNum { set; get; }
-
-#if !NET_CORE
-		//protected static readonly ILog Logger = LogManager.GetLogger(typeof(BaseDownloader));
-		protected static readonly ILog Logger = LogManager.GetLogger();
-#else
-		protected static readonly ILog Logger = LogManager.GetLogger();
-#endif
-
 		protected SingleExecutor SingleExecutor = new SingleExecutor();
 
 		public Action CustomizeCookie;
@@ -31,7 +23,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		{
 		}
 
-		protected void ValidatePage(Page page)
+		protected void ValidatePage(Page page, ISpider spider)
 		{
 			//customer verify
 			if (DownloadValidation != null)

@@ -6,7 +6,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public abstract class Scheduler
 	{
-		protected static ILog Logger = LogManager.GetLogger();
 		[Flags]
 		public enum Types
 		{
@@ -28,7 +27,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override IScheduler GetScheduler()
 		{
-			Logger.Info($"Redis Info: {Host} {Port} {(string.IsNullOrEmpty(Password) ? "No Password" : "Password")}", true);
 			return new Extension.Scheduler.RedisScheduler(Host, Password, Port);
 		}
 	}

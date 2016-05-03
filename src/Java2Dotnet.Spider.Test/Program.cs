@@ -22,8 +22,6 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			Log.UserId = "DotnetSpider";
-			Log.TaskId = "JD SKU TEST";
 			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			var context = spiderBuilder.GetBuilder().Context;
 			ContextSpider spider = new ContextSpider(context);
@@ -37,9 +35,6 @@ namespace Java2Dotnet.Spider.Test
 
 		private static void TestStatusServer()
 		{
-			Log.UserId = "DotnetSpider";
-			Log.TaskId = "Tmall Gmv Monthly";
-
 			var ErrorPageCount = 10;
 			var LeftPageCount = 10;
 			var PagePerSecond = 10;
@@ -50,7 +45,7 @@ namespace Java2Dotnet.Spider.Test
 			var ThreadCount = 5;
 			var TotalPageCount = 1000;
 			var AliveThreadCount = 5;
-			var Name = Log.TaskId + DateTime.Now.ToString("yyyy-MM-dd");
+			var Name = "Tmall Gmv Monthly " + DateTime.Now.ToString("yyyy-MM-dd");
 
 			var status = new
 			{
@@ -69,8 +64,8 @@ namespace Java2Dotnet.Spider.Test
 				},
 				Name,
 				Machine = Log.Machine,
-				UserId = Log.UserId,
-				TaskId = Log.TaskId
+				UserId = "DotnetSpider",
+				TaskGroup = "Tmall Gmv Monthly"
 			};
 
 			HttpClient client = new HttpClient();

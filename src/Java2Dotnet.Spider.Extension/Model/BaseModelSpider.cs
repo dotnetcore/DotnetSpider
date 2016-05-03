@@ -12,7 +12,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 	{
 		public const string PipelineModel = "PipelineModel";
 
-		protected BaseModelSpider(string identify, IPageProcessor pageProcessor, IScheduler scheduler) : base(identify, pageProcessor, scheduler)
+		protected BaseModelSpider(string identify, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler) : base(identify, userid, taskGroup, pageProcessor, scheduler)
 		{
 		}
 

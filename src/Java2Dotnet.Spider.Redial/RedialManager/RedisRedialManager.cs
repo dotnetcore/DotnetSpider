@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
 using RedisSharp;
+using Java2Dotnet.Spider.JLog;
 
 namespace Java2Dotnet.Spider.Redial.RedialManager
 {
@@ -25,8 +26,9 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		public const string Locker = "redial-locker";
 		public RedisServer Redis { get; }
 
-		public RedisRedialManager(string host, string password)
+		public RedisRedialManager(string host, string password, ILog logger)
 		{
+			Logger = logger;
 			if (!string.IsNullOrEmpty(host))
 			{
 				RedisHost = host;
@@ -50,18 +52,8 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			AtomicExecutor = new RedisAtomicExecutor(this);
 		}
 
-		public RedisRedialManager() : this(Common.ConfigurationManager.Get("redialRedisHost"), Common.ConfigurationManager.Get("redialRedisPassword"))
+		public RedisRedialManager(ILog logger) : this(Common.ConfigurationManager.Get("redialRedisHost"), Common.ConfigurationManager.Get("redialRedisPassword"), logger)
 		{
-		}
-
-		public static RedisRedialManager Create(string host)
-		{
-			return new RedisRedialManager(host, null);
-		}
-
-		public static RedisRedialManager Create(string host, string password)
-		{
-			return new RedisRedialManager(host, password);
 		}
 
 		public override void WaitforRedialFinish()
@@ -126,13 +118,13 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 				AtomicExecutor.WaitAtomicAction();
 
-				Logger.Warn("Try to redial network...");
+				Logger?.Warn("Try to redial network...");
 
 				RedialInternet();
 
 				Redis.HashDelete(GetSetKey(), Locker);
 
-				Logger.Warn("Redial finished.");
+				Logger?.Warn("Redial finished.");
 				return RedialResult.Sucess;
 			}
 		}

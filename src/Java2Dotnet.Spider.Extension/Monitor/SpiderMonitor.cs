@@ -51,7 +51,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 		public class MonitorSpiderListener : ISpiderStatus
 		{
-			protected static readonly ILog Logger = LogManager.GetLogger();
+			protected readonly ILog Logger;
 			private readonly AutomicLong _successCount = new AutomicLong(0);
 			private readonly AutomicLong _errorCount = new AutomicLong(0);
 			private readonly List<string> _errorUrls = new List<string>();
@@ -59,6 +59,8 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			private static SynchronizedList<Task<HttpResponseMessage>> StatusUpLoadTasks = new SynchronizedList<Task<HttpResponseMessage>>();
 			private static string StatusServer;
 			private static HttpClient _client = new HttpClient();
+			private string _userId;
+			private string _taskGroup;
 
 			static MonitorSpiderListener()
 			{
@@ -68,6 +70,9 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			public MonitorSpiderListener(Core.Spider spider)
 			{
 				_spider = spider;
+
+				_userId = spider.UserId;
+				_taskGroup = spider.TaskGroup;
 
 				if (spider.SaveStatus && !string.IsNullOrEmpty(StatusServer))
 				{
@@ -112,8 +117,8 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					},
 					Name,
 					Machine = Log.Machine,
-					UserId = Log.UserId,
-					TaskId = Log.TaskId
+					UserId = _userId,
+					TaskGroup = _taskGroup
 				};
 
 				var task = _client.PostAsync(StatusServer, new StringContent(JsonConvert.SerializeObject(status), Encoding.UTF8, "application/json"));
@@ -124,7 +129,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 				});
 			}
 
-			private  void WaitForExit()
+			private void WaitForExit()
 			{
 				while (true)
 				{

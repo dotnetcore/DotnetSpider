@@ -106,7 +106,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 				page.TargetUrl = driverService.WebDriver.Url;
 				page.Title = driverService.WebDriver.Title;
 
-				ValidatePage(page);
+				ValidatePage(page, spider);
 
 				// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
 				request.PutExtra(Request.CycleTriedTimes, null);

@@ -11,13 +11,12 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.PhantomJS;
+using Java2Dotnet.Spider.Core.Utils;
 
 namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 {
 	public class WebDriverPool
 	{
-		//private readonly ILog _logger = LogManager.GetLogger(typeof(WebDriverPool));
-		protected static readonly ILog _logger = LogManager.GetLogger();
 		private static int DEFAULT_CAPACITY = 5;
 
 		private readonly int _capacity;
@@ -186,7 +185,6 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 
 				foreach (WebDriverItem webDriver in _webDriverList)
 				{
-					_logger.Info("Quit webDriver" + webDriver);
 					Close(webDriver);
 				}
 			}

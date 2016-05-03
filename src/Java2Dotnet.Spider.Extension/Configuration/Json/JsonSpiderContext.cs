@@ -9,6 +9,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 	public class JsonSpiderContext
 	{
 		public string SpiderName { get; set; }
+		public string UserId { get; set; }
+		public string TaskGroup { get; set; }
 		public int ThreadNum { get; set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
 		public int EmptySleepTime { get; set; } = 15000;
@@ -49,6 +51,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.ThreadNum = ThreadNum;
 			context.EnviromentValues = EnviromentValues;
 			context.Validations = GetValidations(Validations);
+			context.UserId = UserId;
+			context.TaskGroup = TaskGroup;
 			return context;
 		}
 

@@ -14,12 +14,12 @@ namespace Java2Dotnet.Spider.JLog
 		public string Time { get; set; }
 		public string Message { get; set; }
 		public string Machine = Log.Machine;
-		public string UserId = Log.UserId;
-		public string TaskId = Log.TaskId;
+		public string TaskGroup { get; set; }
+		public string UserId { get; set; }
 
 		public override string ToString()
 		{
-			return $"[{Type}] {Time} {Machine}-{UserId}-{TaskId} {Message}";
+			return $"[{Type}] {Time} {Machine}-{UserId}-{TaskGroup} {Message}";
 		}
 	}
 
@@ -28,23 +28,20 @@ namespace Java2Dotnet.Spider.JLog
 		private static readonly object WriteToConsoleLocker = new object();
 		private static readonly object WriteToLogFileLocker = new object();
 		private static readonly string LogFile;
-		public static string UserId { get; set; }
-		/// <summary>
-		/// TaskId 并不是指任务的Identity, 仅是TaskName. 如：Jd Sku Spider, 由于任务会多次执行，所有会加时间后缀：Jd Sku Spider 2016-04 这才是Identity.
-		/// </summary>
-		public static string TaskId { get; set; }
 		public static string Machine;
 		public static bool NoConsole = false;
 		public string Name { get; }
 		public static string LogServer;
 		private static SynchronizedList<Task<HttpResponseMessage>> LogUpLoadTasks = new SynchronizedList<Task<HttpResponseMessage>>();
 		private static StreamWriter Writter;
-
+		private string UserId { get; }
+		private string TaskGroup { get; }
+		private bool _saveToLogService = false;
 		static Log()
 		{
 			Machine = Dns.GetHostName();
 #if NET_CORE
-            LogFile = Path.Combine(AppContext.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
+			LogFile = Path.Combine(AppContext.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
 #else
 			LogFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
 #endif
@@ -85,6 +82,19 @@ namespace Java2Dotnet.Spider.JLog
 		public Log(string name)
 		{
 			Name = name;
+
+			if (name.Contains("&"))
+			{
+				//"dotnetspider&dotnetspider&task1 weekly"
+				var arguments = name.Split(new string[] { "&" }, StringSplitOptions.RemoveEmptyEntries);
+				UserId = arguments[1];
+				TaskGroup = arguments[2];
+
+				if (!string.IsNullOrEmpty(LogServer))
+				{
+					_saveToLogService = true;
+				}
+			}
 		}
 
 		public void Warn(string message, Exception e, bool showToConsole = true)
@@ -94,6 +104,10 @@ namespace Java2Dotnet.Spider.JLog
 			if (showToConsole)
 			{
 				WriteToConsole(log);
+			}
+			if (_saveToLogService)
+			{
+				WriteToLogService(log);
 			}
 		}
 
@@ -110,6 +124,10 @@ namespace Java2Dotnet.Spider.JLog
 			{
 				WriteToConsole(log);
 			}
+			if (_saveToLogService)
+			{
+				WriteToLogService(log);
+			}
 		}
 
 		public void Info(string message, bool showToConsole = true)
@@ -124,6 +142,10 @@ namespace Java2Dotnet.Spider.JLog
 			if (showToConsole)
 			{
 				WriteToConsole(log);
+			}
+			if (_saveToLogService)
+			{
+				WriteToLogService(log);
 			}
 		}
 
@@ -191,6 +213,8 @@ namespace Java2Dotnet.Spider.JLog
 			{
 				Type = type,
 				Time = time,
+				TaskGroup = TaskGroup,
+				UserId = UserId,
 				Message = message + Environment.NewLine + e
 			};
 			return log;
@@ -198,28 +222,28 @@ namespace Java2Dotnet.Spider.JLog
 
 		private static void WriteToLogFile(LogInfo log)
 		{
-			if (!string.IsNullOrEmpty(LogServer))
-			{
-				HttpClient client = new HttpClient();
-				StringBuilder builder = new StringBuilder("{ \"Type\": \"");
-				builder.Append(log.Type).Append("\", \"Time\": \"").Append(log.Time).Append("\", \"Message\": \"").Append(log.Message);
-				builder.Append("\", \"Machine\": \"").Append(log.Machine);
-				builder.Append("\", \"UserId\": \"").Append(string.IsNullOrEmpty(log.UserId) ? "DotnetSpider" : log.UserId);
-				builder.Append("\", \"TaskId\": \"").Append(string.IsNullOrEmpty(log.TaskId) ? "UNKONW" : log.TaskId);
-				builder.Append("\" }");
-
-				var task = client.PostAsync(LogServer, new StringContent(builder.ToString().Replace("\n", "\\n").Replace("\t", "\\t").Replace("\r", "\\r"), Encoding.UTF8, "application/json"));
-				LogUpLoadTasks.Add(task);
-				task.ContinueWith((t) =>
-				{
-					LogUpLoadTasks.Remove(t);
-				});
-			}
-
 			lock (WriteToLogFileLocker)
 			{
 				Writter.WriteLine(log.ToString(), Encoding.UTF8);
 			}
+		}
+
+		private static void WriteToLogService(LogInfo log)
+		{
+			HttpClient client = new HttpClient();
+			StringBuilder builder = new StringBuilder("{ \"Type\": \"");
+			builder.Append(log.Type).Append("\", \"Time\": \"").Append(log.Time).Append("\", \"Message\": \"").Append(log.Message);
+			builder.Append("\", \"Machine\": \"").Append(log.Machine);
+			builder.Append("\", \"UserId\": \"").Append(string.IsNullOrEmpty(log.UserId) ? "DotnetSpider" : log.UserId);
+			builder.Append("\", \"TaskGroup\": \"").Append(string.IsNullOrEmpty(log.TaskGroup) ? "UNKONW" : log.TaskGroup);
+			builder.Append("\" }");
+
+			var task = client.PostAsync(LogServer, new StringContent(builder.ToString().Replace("\n", "\\n").Replace("\t", "\\t").Replace("\r", "\\r"), Encoding.UTF8, "application/json"));
+			LogUpLoadTasks.Add(task);
+			task.ContinueWith((t) =>
+			{
+				LogUpLoadTasks.Remove(t);
+			});
 		}
 	}
 }

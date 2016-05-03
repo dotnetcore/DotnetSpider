@@ -64,11 +64,11 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 				if (typeof(FileNotFoundException).GetTypeInfo().IsAssignableFrom(e.GetType().GetTypeInfo()))
 #endif
 				{
-					Logger.Info("File not exist for url " + request.Url);
+					LogUtils.GetLogger(spider).Info("File not exist for url " + request.Url);
 				}
 				else
 				{
-					Logger.Warn("File read error for url " + request.Url, e);
+					LogUtils.GetLogger(spider).Warn("File read error for url " + request.Url, e);
 				}
 			}
 			page = DownloadWhenMiss(request, spider);
@@ -89,7 +89,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 			}
 			catch (IOException e)
 			{
-				Logger.Warn("write file error", e);
+				LogUtils.GetLogger(spider).Warn("write file error", e);
 			}
 		}
 

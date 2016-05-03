@@ -38,7 +38,7 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		[TestMethod]
 		public void AtomicCommonTest()
 		{
-			Redial.RedialManager.RedisRedialManager manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
+			Redial.RedialManager.RedisRedialManager manager = new Redial.RedialManager.RedisRedialManager("localhost", "", null);
 			manager.Redis.FlushDb();
 			RedisAtomicExecutor executor = new RedisAtomicExecutor(manager);
 
@@ -64,11 +64,11 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		[TestMethod]
 		public void RedialTest()
 		{
-			var manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
+			var manager = new Redial.RedialManager.RedisRedialManager("localhost", null, null);
 			manager.Redis.FlushDb();
 			manager.Redialer = new TestRedial();
 			RedisAtomicExecutor executor = new RedisAtomicExecutor(manager);
- 
+
 			Task.Factory.StartNew(() =>
 			{
 				executor.Execute("test1", () =>
@@ -108,7 +108,7 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		[TestMethod]
 		public void ClearTimeoutTest1()
 		{
-			var manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
+			var manager = new Redial.RedialManager.RedisRedialManager("localhost", null, null);
 			manager.Redis.FlushDb();
 			manager.Redialer = new TestRedial();
 			manager.Redis.HashSet(RedisAtomicExecutor.GetSetKey(), "test-timeout", DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd HH:mm"));
@@ -152,11 +152,11 @@ namespace Java2Dotnet.Spider.Test.RedisRedialManager
 		[TestMethod]
 		public void ClearTimeoutTest2()
 		{
-			var manager = Redial.RedialManager.RedisRedialManager.Create("localhost");
+			var manager = new Redial.RedialManager.RedisRedialManager("localhost", null, null);
 			manager.Redis.FlushDb();
 			manager.Redialer = new TestRedial();
 			manager.Redis.HashSet(RedisAtomicExecutor.GetSetKey(), Redial.RedialManager.RedisRedialManager.Locker, DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd HH:mm"));
-		 
+
 			RedisAtomicExecutor executor = new RedisAtomicExecutor(manager);
 			Task.Factory.StartNew(() =>
 			{

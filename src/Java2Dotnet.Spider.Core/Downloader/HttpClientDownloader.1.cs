@@ -13,6 +13,7 @@ using System.Net;
 using Java2Dotnet.Spider.Core.Proxy;
 using System.Threading.Tasks;
 using System.Threading;
+using Java2Dotnet.Spider.Core.Utils;
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {
@@ -86,7 +87,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 				// 这里只要是遇上登录的, 则在拨号成功之后, 全部抛异常在Spider中加入Scheduler调度
 				// 因此如果使用多线程遇上多个Warning Custom Validate Failed不需要紧张, 可以考虑用自定义Exception分开
-				ValidatePage(page);
+				ValidatePage(page, spider);
 
 				// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
 				request.PutExtra(Request.CycleTriedTimes, null);
@@ -108,7 +109,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			{
 				Page page = new Page(request, site.ContentType) { Exception = e };
 
-				ValidatePage(page);
+				ValidatePage(page,spider);
 				throw;
 			}
 			finally
@@ -123,7 +124,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.Warn("Close response fail.", e);
+					var logger = LogUtils.GetLogger(spider);
+					logger.Warn("Close response fail.", e);
 				}
 			}
 		}

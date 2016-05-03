@@ -15,12 +15,6 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 {
 	public abstract class EntityGeneralPipeline : IEntityPipeline
 	{
-#if !NET_CORE
-		//protected static ILog Logger = LogManager.GetLogger(typeof(EntityGeneralPipeline));
-		protected static readonly ILog Logger = LogManager.GetLogger();
-#else
-		protected static ILog Logger = LogManager.GetLogger();
-#endif
 		public class Column
 		{
 			public string Name { get; set; }
@@ -257,7 +251,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 										parameters.Add(parameter);
 									}
 
-									foreach(var column in Primary)
+									foreach (var column in Primary)
 									{
 										var parameter = CreateDbParameter();
 										parameter.ParameterName = $"@{column.Name}";

@@ -13,9 +13,6 @@ namespace Java2Dotnet.Spider.Core.Proxy
 {
 	public class ProxyPool
 	{
-		//private static readonly ILog Logger = LogManager.GetLogger(typeof(ProxyPool));
-		protected static readonly ILog Logger = LogManager.GetLogger();
-
 		private readonly ConcurrentQueue<Proxy> _proxyQueue = new ConcurrentQueue<Proxy>();
 		private readonly ConcurrentDictionary<string, Proxy> _allProxy = new ConcurrentDictionary<string, Proxy>();
 
@@ -42,7 +39,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			new Timer(o =>
 			{
 				SaveProxyList();
-				Logger.Info(AllProxyStatus());
+				//Logger.Info(AllProxyStatus());
 			}, null, 10 * 60 * 1000, (10 * 60 * 1000));
 		}
 
@@ -56,15 +53,15 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			try
 			{
 				File.WriteAllText(_proxyFile, JsonConvert.SerializeObject(_allProxy));
-				Logger.Info("Save proxy");
+				//Logger.Info("Save proxy");
 			}
 			catch (FileNotFoundException e)
 			{
-				Logger.Error("Proxy file not found", e);
+				//Logger.Error("Proxy file not found", e);
 			}
 			catch (IOException e)
 			{
-				Logger.Error(e.ToString());
+				//Logger.Error(e.ToString());
 			}
 		}
 
@@ -78,11 +75,11 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			}
 			catch (FileNotFoundException e)
 			{
-				Logger.Error("Proxy file not found", e);
+				//Logger.Error("Proxy file not found", e);
 			}
 			catch (IOException e)
 			{
-				Logger.Error(e.ToString());
+				//Logger.Error(e.ToString());
 			}
 		}
 
@@ -110,10 +107,10 @@ namespace Java2Dotnet.Spider.Core.Proxy
 				}
 				catch (Exception e)
 				{
-					Logger.Error("HttpHost init error:", e);
+					//Logger.Error("HttpHost init error:", e);
 				}
 			}
-			Logger.Info("proxy pool size>>>>" + _allProxy.Count);
+			//Logger.Info("proxy pool size>>>>" + _allProxy.Count);
 		}
 
 		public HttpHost GetProxy()
@@ -128,7 +125,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 					double costTime = (DateTimeUtils.GetCurrentTimeStamp() - time) / 1000.0;
 					if (costTime > _reuseInterval)
 					{
-						Logger.Info("get proxy time >>>> " + costTime);
+						//Logger.Info("get proxy time >>>> " + costTime);
 					}
 					Proxy p;
 					if (_allProxy.TryGetValue(proxy.GetHttpHost().Host, out p))
@@ -140,7 +137,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			}
 			catch (Exception e)
 			{
-				Logger.Error("Get proxy error", e);
+				//Logger.Error("Get proxy error", e);
 			}
 			if (proxy == null)
 			{
@@ -168,13 +165,13 @@ namespace Java2Dotnet.Spider.Core.Proxy
 				case Proxy.Error403:
 					p.Fail(Proxy.Error403);
 					p.SetReuseTimeInterval(_reuseInterval * p.FailedNum);
-					Logger.Info(host + " >>>> reuseTimeInterval is >>>> " + p.GetReuseTimeInterval() / 1000.0);
+					//Logger.Info(host + " >>>> reuseTimeInterval is >>>> " + p.GetReuseTimeInterval() / 1000.0);
 					break;
 				case Proxy.ErrorBanned:
 					p.Fail(Proxy.ErrorBanned);
 					p.SetReuseTimeInterval(10 * 60 * 1000 * p.FailedNum);
-					Logger.Warn("this proxy is banned >>>> " + p.GetHttpHost());
-					Logger.Info(host + " >>>> reuseTimeInterval is >>>> " + p.GetReuseTimeInterval() / 1000.0);
+					//Logger.Warn("this proxy is banned >>>> " + p.GetHttpHost());
+					//Logger.Info(host + " >>>> reuseTimeInterval is >>>> " + p.GetReuseTimeInterval() / 1000.0);
 					break;
 				case Proxy.Error404:
 					p.Fail(Proxy.Error404);
@@ -188,7 +185,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			{
 				// allProxy.remove(host.getAddress().getHostAddress());
 				p.SetReuseTimeInterval(_reviveTime);
-				Logger.Error($"Remove proxy {host}: p.GetFailedType(). Remain proxy: { _proxyQueue.Count}");
+				//Logger.Error($"Remove proxy {host}: p.GetFailedType(). Remain proxy: { _proxyQueue.Count}");
 				return;
 			}
 			if (p.FailedNum % 5 == 0)
@@ -197,7 +194,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 				{
 					// allProxy.remove(host.getAddress().getHostAddress());
 					p.SetReuseTimeInterval(_reviveTime);
-					Logger.Error("remove proxy >>>> " + host + ">>>>" + p.GetFailedType() + " >>>> remain proxy >>>> " + _proxyQueue.Count);
+					//Logger.Error("remove proxy >>>> " + host + ">>>>" + p.GetFailedType() + " >>>> remain proxy >>>> " + _proxyQueue.Count);
 					return;
 				}
 			}
@@ -207,7 +204,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			}
 			catch (Exception e)
 			{
-				Logger.Warn("proxyQueue return proxy error", e);
+				//Logger.Warn("proxyQueue return proxy error", e);
 			}
 		}
 
@@ -249,11 +246,11 @@ namespace Java2Dotnet.Spider.Core.Proxy
 			}
 			catch (FileNotFoundException e)
 			{
-				Logger.Error(e.ToString());
+				//Logger.Error(e.ToString());
 			}
 			catch (IOException e)
 			{
-				Logger.Error(e.ToString());
+				//Logger.Error(e.ToString());
 			}
 			return proxyList;
 		}
@@ -274,7 +271,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 					HttpHost httphost = proxyPool.GetProxy();
 					httphostList.Add(httphost);
 					// proxyPool.proxyPool.use(httphost);
-					Logger.Info("borrow object>>>>" + i + ">>>>" + httphostList[i]);
+					//Logger.Info("borrow object>>>>" + i + ">>>>" + httphostList[i]);
 					i++;
 				}
 				Console.WriteLine(proxyPool.AllProxyStatus());
@@ -282,7 +279,7 @@ namespace Java2Dotnet.Spider.Core.Proxy
 				for (i = 0; i < httphostList.Count; i++)
 				{
 					proxyPool.ReturnProxy(httphostList[i], 200);
-					Logger.Info("return object>>>>" + i + ">>>>" + httphostList[i]);
+					//Logger.Info("return object>>>>" + i + ">>>>" + httphostList[i]);
 				}
 				Console.WriteLine(proxyPool.AllProxyStatus());
 				Console.Read();

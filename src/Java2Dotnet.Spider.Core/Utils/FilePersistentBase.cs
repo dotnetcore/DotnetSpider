@@ -12,14 +12,6 @@ namespace Java2Dotnet.Spider.Core.Utils
 	{
 		public DownloadValidation DownloadValidation { get; set; }
 
-#if !NET_CORE
-		//protected readonly ILog Logger = LogManager.GetLogger(typeof(FilePersistentBase));
-		protected static readonly ILog Logger = LogManager.GetLogger();
-#else
-		protected readonly ILog Logger = LogManager.GetLogger();
-#endif
-
-
 		protected string BasePath;
 
 #if !NET_CORE

@@ -126,6 +126,11 @@ namespace Java2Dotnet.Spider.Test
 
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 
+		public string UserId { get; } = "";
+
+		public string TaskGroup { get; } = "";
+
+
 		public void Exit()
 		{
 

@@ -11,6 +11,8 @@ namespace Java2Dotnet.Spider.Extension
 		public List<JObject> Entities { get; internal set; } = new List<JObject>();
 
 		public string SpiderName { get; set; }
+		public string UserId { get; set; }
+		public string TaskGroup { get; set; }
 		public int ThreadNum { get; set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
 		public int EmptySleepTime { get; set; } = 15000;

@@ -76,7 +76,6 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 			builder.Append(") ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
 			string sql = builder.ToString();
-			Logger.Info(sql);
 			return sql;
 		}
 

@@ -18,6 +18,7 @@ using Java2Dotnet.Spider.JLog;
 using System.Linq;
 using RedisSharp;
 using System.Threading.Tasks;
+using Java2Dotnet.Spider.Core.Utils;
 
 namespace Java2Dotnet.Spider.Extension
 {
@@ -25,7 +26,7 @@ namespace Java2Dotnet.Spider.Extension
 	{
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
-		protected static readonly ILog Logger = LogManager.GetLogger();
+		protected readonly ILog Logger;
 
 		protected readonly SpiderContext SpiderContext;
 		public string Name { get; }
@@ -33,8 +34,9 @@ namespace Java2Dotnet.Spider.Extension
 		public ContextSpider(SpiderContext spiderContext)
 		{
 			SpiderContext = spiderContext;
-
 			Name = SpiderContext.SpiderName;
+
+			Logger = LogUtils.GetLogger(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup);
 
 			InitEnvoriment();
 		}
@@ -43,8 +45,7 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			if (SpiderContext.Redialer != null)
 			{
-				//RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
-				RedialManagerUtils.RedialManager = new RedisRedialManager();
+				RedialManagerUtils.RedialManager = new RedisRedialManager(Logger);
 
 				RedialManagerUtils.RedialManager.NetworkValidater = GetNetworValidater(SpiderContext.NetworkValidater);
 				RedialManagerUtils.RedialManager.Redialer = SpiderContext.Redialer.GetRedialer();
@@ -77,7 +78,7 @@ namespace Java2Dotnet.Spider.Extension
 				{
 					try
 					{
-						redisScheduler.Redis.Subscribe($"{Log.UserId}-{spider.Identity}", (c, m) =>
+						redisScheduler.Redis.Subscribe($"{spider.UserId}-{spider.Identity}", (c, m) =>
 						{
 							switch (m)
 							{
@@ -360,7 +361,7 @@ namespace Java2Dotnet.Spider.Extension
 				processor.AddEntity(entity);
 			}
 
-			EntityGeneralSpider spider = new EntityGeneralSpider(SpiderContext.SpiderName, processor, scheduler);
+			EntityGeneralSpider spider = new EntityGeneralSpider(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup, processor, scheduler);
 
 			foreach (var entity in SpiderContext.Entities)
 			{

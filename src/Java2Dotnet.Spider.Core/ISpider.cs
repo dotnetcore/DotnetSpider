@@ -13,6 +13,10 @@ namespace Java2Dotnet.Spider.Core
 		/// </summary>
 		string Identity { get; }
 
+		string UserId { get; }
+
+		string TaskGroup { get; }
+
 		/// <summary>
 		/// Site of a task
 		/// </summary>

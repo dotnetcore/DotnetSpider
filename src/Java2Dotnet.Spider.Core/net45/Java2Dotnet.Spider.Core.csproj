@@ -222,6 +222,9 @@
     <Compile Include="..\Utils\FilePersistentBase.cs">
       <Link>Utils\FilePersistentBase.cs</Link>
     </Compile>
+    <Compile Include="..\Utils\LogUtils.cs">
+      <Link>Utils\LogUtils.cs</Link>
+    </Compile>
     <Compile Include="..\Utils\UrlUtils.cs">
       <Link>Utils\UrlUtils.cs</Link>
     </Compile>

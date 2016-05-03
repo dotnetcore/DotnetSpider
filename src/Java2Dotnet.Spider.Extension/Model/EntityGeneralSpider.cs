@@ -5,7 +5,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 {
 	public class EntityGeneralSpider : BaseModelSpider
 	{
-		public EntityGeneralSpider(string identify, IPageProcessor pageProcessor, IScheduler scheduler) : base(identify, pageProcessor, scheduler)
+		public EntityGeneralSpider(string identify, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler) : base(identify, userid, taskGroup, pageProcessor, scheduler)
 		{
 		}
 	}
