@@ -24,7 +24,6 @@ namespace Java2Dotnet.Spider.Core
 
 		public Site()
 		{
-			EncodingName = "UTF-8";
 		}
 
 		/// <summary>
