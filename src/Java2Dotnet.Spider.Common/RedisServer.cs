@@ -1653,13 +1653,29 @@ namespace RedisSharp
 				}
 
 				List<string> arguments = new List<string>();
-				arguments.Add(key);
+
+
+				int i = 0;
 				foreach (var entry in values)
 				{
+					if (i == 0)
+					{
+						arguments.Add(key);
+					}
+					else if (i == 10000)
+					{
+						SendExpectSuccess("HMSET", arguments);
+						arguments.Clear();
+						i = 0;
+					}
 					arguments.Add(entry.Key);
 					arguments.Add(entry.Value);
 				}
-				SendExpectSuccess("HMSET", arguments);
+
+				if (i > 0)
+				{
+					SendExpectSuccess("HMSET", arguments);
+				}
 			}
 		}
 

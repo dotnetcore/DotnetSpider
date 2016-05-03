@@ -88,8 +88,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string OrderBy { get; set; }
 
-		public string EncodingName { get; set; }
-
 		/// <summary>
 		/// 数据来源表名, 需要Schema/数据库名
 		/// </summary>
@@ -152,18 +150,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					foreach (var formate in FormateStrings)
 					{
 						var argArray = arguments.Cast<object>().ToArray();
-						if (!string.IsNullOrEmpty(EncodingName))
-						{
-							for (int i =0;i<argArray.Length;++i)
-							{
-								argArray[i] =Encoding.GetEncoding(EncodingName).GetString(Encoding.Convert(Encoding.Default, Encoding.GetEncoding(EncodingName),Encoding.Default.GetBytes(argArray[i].ToString())));
-
-								if (EncodingName == "Unicode")
-								{
-									argArray[i] = argArray[i].ToString().Replace("\\", "%");
-								}
-							}
-						}
 						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
 						site.AddStartRequest(new Request(tmpUrl, 0, data)
 						{
