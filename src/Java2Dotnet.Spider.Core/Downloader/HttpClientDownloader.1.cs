@@ -29,6 +29,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		private HttpClient httpClient = new HttpClient(new HttpClientHandler()
 		{
 			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+			UseCookies = false
 		})
 		{
 		};
@@ -109,7 +110,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			{
 				Page page = new Page(request, site.ContentType) { Exception = e };
 
-				ValidatePage(page,spider);
+				ValidatePage(page, spider);
 				throw;
 			}
 			finally
@@ -152,16 +153,29 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			if (site == null) return null;
 
 			HttpRequestMessage httpWebRequest = CreateRequestMessage(request);
-			httpWebRequest.Headers.Add("ContentType", "application /x-www-form-urlencoded; charset=UTF-8");
-			httpWebRequest.Headers.Add("UserAgent", site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0Mozilla/5.0 (Windows NT 10.0; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0");
-
+			if (!site.Headers.ContainsKey("Content-Type"))
+			{
+				httpWebRequest.Headers.Add("ContentType", "application /x-www-form-urlencoded; charset=UTF-8");
+			}
+			else
+			{
+				//httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
+			}
+			if (!site.Headers.ContainsKey("User-Agent"))
+			{
+				httpWebRequest.Headers.Add("UserAgent", site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0Mozilla/5.0 (Windows NT 10.0; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0");
+			}
+			else
+			{
+				httpWebRequest.Headers.Add("User-Agent", site.Headers["User-Agent"]);
+			}
 			if (!string.IsNullOrEmpty(request.Referer))
 			{
 				httpWebRequest.Headers.Add("Referer", request.Referer);
 			}
 
 			httpWebRequest.Headers.Add("Accept", site.Accept ?? "application/json, text/javascript, */*; q=0.01");
-			//httpWebRequest.Headers.Add("",);
+			httpWebRequest.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
 
 			if (site.IsUseGzip)
 			{
@@ -178,7 +192,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			{
 				foreach (var header in site.Headers)
 				{
-					if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value))
+					if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) && header.Key != "Content-Type" && header.Key != "User-Agent")
 					{
 						httpWebRequest.Headers.Add(header.Key, header.Value);
 					}
@@ -190,6 +204,11 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			{
 				var data = string.IsNullOrEmpty(site.EncodingName) ? Encoding.UTF8.GetBytes(request.PostBody) : site.Encoding.GetBytes(request.PostBody);
 				httpWebRequest.Content = new StreamContent(new MemoryStream(data));
+
+				if (site.Headers.ContainsKey("Content-Type"))
+				{
+					httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
+				}
 			}
 #if !NET_CORE
 			//if (site.HttpProxyPoolEnable)
