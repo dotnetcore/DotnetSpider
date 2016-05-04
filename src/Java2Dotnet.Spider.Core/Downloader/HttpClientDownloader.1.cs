@@ -298,9 +298,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				}
 
 				return Encoding.UTF8.GetString(contentBytes);
-				;
 			}
-
 		}
 
 		private Encoding GetHtmlCharset(byte[] contentBytes)

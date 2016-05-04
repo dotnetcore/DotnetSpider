@@ -24,7 +24,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				TaskGroup = "JD sku/store test",
 				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
 				CachedSize = 1,
-				ThreadNum = 1,
+				ThreadNum = 10,
 				Site = new Site
 				{
 					EncodingName = "UTF-8"

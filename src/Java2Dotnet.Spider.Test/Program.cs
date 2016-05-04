@@ -25,7 +25,7 @@ namespace Java2Dotnet.Spider.Test
 			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			var context = spiderBuilder.GetBuilder().Context;
 			ContextSpider spider = new ContextSpider(context);
-			spider.Run(args);
+			spider.Run("rerun");
 
 
 			//EmailClient client = new EmailClient("smtp.163.com", "modestmt@163.com", "zousong.88");
