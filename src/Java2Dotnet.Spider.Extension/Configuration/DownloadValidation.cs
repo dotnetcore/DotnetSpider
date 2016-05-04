@@ -9,7 +9,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		[Flags]
 		public enum Types
 		{
-			Contains
+			Contains,
+			Exception
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -26,7 +27,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override bool Validate(Page page, out DownloadValidationResult result)
 		{
 			string rawText = page.Content;
-			if(string.IsNullOrEmpty(rawText))
+			if (string.IsNullOrEmpty(rawText))
 			{
 				throw new SpiderExceptoin("Download failed or response is null.");
 			}
@@ -40,6 +41,37 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				result = DownloadValidationResult.Success;
 				return true;
 			}
+		}
+	}
+
+	public class ExceptionDownloadValidation : DownloadValidation
+	{
+		public override Types Type { get; internal set; } = Types.Exception;
+
+		public string ExceptionMessage { get; set; } = string.Empty;
+
+		public override bool Validate(Page page, out DownloadValidationResult result)
+		{
+			string rawText = page.Content;
+			if (string.IsNullOrEmpty(rawText))
+			{
+				throw new SpiderExceptoin("Download failed or response is null.");
+			}
+			if (page.Exception != null)
+			{
+				if (string.IsNullOrEmpty(ExceptionMessage))
+				{
+					result = Result;
+					return false;
+				}
+				if (page.Exception.Message.Contains(ExceptionMessage))
+				{
+					result = Result;
+					return false;
+				}
+			}
+			result = DownloadValidationResult.Success;
+			return true;
 		}
 	}
 }
