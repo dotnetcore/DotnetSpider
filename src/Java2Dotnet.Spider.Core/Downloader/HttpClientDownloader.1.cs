@@ -25,20 +25,12 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		public Action<Site, Request> GeneratePostBody;
 		public bool DecodeContentAsUrl;
 
-#if !NET_CORE
-		private HttpClient httpClient = new HttpClient(new HttpClientHandler()
-		{
-			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-			UseCookies = false
-		})
-		{
-		};
-#else
 		HttpClient httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler()
 		{
-			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip
+			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+			UseCookies = false,
+			UseProxy = false,
 		}));
-#endif
 
 		public override Page Download(Request request, ISpider spider)
 		{
@@ -356,7 +348,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		}
 	}
 
-#if NET_CORE
 	public class GlobalRedirectHandler : DelegatingHandler
 	{
 		public GlobalRedirectHandler(HttpMessageHandler innerHandler)
@@ -432,5 +423,4 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			return newrequest;
 		}
 	}
-#endif
 }

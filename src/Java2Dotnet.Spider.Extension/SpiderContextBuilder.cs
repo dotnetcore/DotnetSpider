@@ -10,9 +10,6 @@ using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Java2Dotnet.Spider.Extension.ORM;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-#if !NET_CORE
-using System.Reflection;
-#endif
 
 namespace Java2Dotnet.Spider.Extension
 {
@@ -34,6 +31,11 @@ namespace Java2Dotnet.Spider.Extension
 				throw new SpiderExceptoin("EntiTypes is null.");
 			}
 			Context = context;
+
+			if (context.Site == null)
+			{
+				context.Site = new Site();
+			}
 
 			Build(entiTypes);
 		}

@@ -251,6 +251,9 @@
     <Compile Include="..\Model\Formatter\ReplaceFormater.cs">
       <Link>Model\Formatter\ReplaceFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\SplitFormater.cs">
+      <Link>Model\Formatter\SplitFormater.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\Types.cs">
       <Link>Model\Formatter\Types.cs</Link>
     </Compile>

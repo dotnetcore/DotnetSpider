@@ -55,11 +55,6 @@ namespace Java2Dotnet.Spider.Extension
 			{
 				SpiderContext.Downloader = new HttpDownloader();
 			}
-
-			if (SpiderContext.Site == null)
-			{
-				SpiderContext.Site = new Site();
-			}
 		}
 
 		public virtual void Run(params string[] args)
