@@ -16,7 +16,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 		{
 		}
 
-		public void SetCustomizeTargetUrls(Func<Page, IList<string>> getCustomizeTargetUrls)
+		public void SetCustomizeTargetUrls(Func<Page, IList<Request>> getCustomizeTargetUrls)
 		{
 			var processor = PageProcessor as EntityProcessor;
 			if (processor != null)

@@ -14,7 +14,7 @@ namespace Java2Dotnet.Spider.Extension.Processor
 	public class EntityProcessor : IPageProcessor
 	{
 		protected readonly IList<IEntityExtractor> EntityExtractorList = new List<IEntityExtractor>();
-		public Func<Page, IList<string>> GetCustomizeTargetUrls;
+		public Func<Page, IList<Request>> GetCustomizeTargetUrls;
 		private readonly SpiderContext _spiderContext;
 
 		public EntityProcessor(SpiderContext spiderContext)
@@ -117,7 +117,9 @@ namespace Java2Dotnet.Spider.Extension.Processor
 					{
 						if (targetUrlPattern.IsMatch(link))
 						{
-							page.AddTargetRequest(new Request(link, page.Request.NextDepth, page.Request.Extras));
+							page.AddTargetRequest(new Request(link, page.Request.NextDepth, page.Request.Extras)
+							{
+							});
 						}
 					}
 				}

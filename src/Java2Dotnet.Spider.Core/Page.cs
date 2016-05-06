@@ -120,6 +120,21 @@ namespace Java2Dotnet.Spider.Core
 		/// Add urls to fetch
 		/// </summary>
 		/// <param name="requests"></param>
+		public void AddTargetRequests(IList<Request> requests)
+		{
+			lock (this)
+			{
+				foreach (var r in requests)
+				{
+					TargetRequests.Add(r);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Add urls to fetch
+		/// </summary>
+		/// <param name="requests"></param>
 		/// <param name="priority"></param>
 		public void AddTargetRequests(IList<string> requests, int priority)
 		{

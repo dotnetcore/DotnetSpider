@@ -17,7 +17,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public abstract Types Type { get; internal set; }
 
-		public abstract IList<string> Handle(Page page);
+		public abstract IList<Request> Handle(Page page);
 	}
 
 	public class IncreasePageNumberTargetUrlsHandler : TargetUrlsHandler
@@ -35,7 +35,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public Selector CurrenctPageSelector { get; set; }
 
-		public override IList<string> Handle(Page page)
+		public override IList<Request> Handle(Page page)
 		{
 			string pattern = $"{RegexUtil.NumRegex.Replace(PageIndexString, @"\d+")}";
 			Regex regex = new Regex(pattern);
@@ -64,10 +64,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 			if (currentPage == totalPage)
 			{
-				return new List<string>();
+				return new List<Request>();
 			}
 
-			return new List<string> {page.Url.Replace(current, next)};
+			return new List<Request> { new Request(page.Url.Replace(current, next), page.Request.Depth, page.Request.Extras) };
 		}
 	}
 
@@ -77,11 +77,11 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string Stopper { get; set; } = "Spider Custom Stopper";
 
-		public override IList<string> Handle(Page page)
+		public override IList<Request> Handle(Page page)
 		{
 			var urls = base.Handle(page);
 
-			return page.Content.Contains(Stopper) ? new List<string>() : urls;
+			return page.Content.Contains(Stopper) ? new List<Request>() : urls;
 		}
 	}
 }
