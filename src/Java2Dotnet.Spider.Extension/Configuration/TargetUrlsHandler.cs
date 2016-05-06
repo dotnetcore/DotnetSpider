@@ -13,6 +13,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		{
 			IncreasePageNumber,
 			IncreasePageNumberWithStopper,
+			IncreasePostPageNumberWithStopper
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -82,6 +83,60 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			var urls = base.Handle(page);
 
 			return page.Content.Contains(Stopper) ? new List<Request>() : urls;
+		}
+	}
+
+	public class IncreasePostPageNumberWithStopperTargetUrlsHandler : IncreasePageNumberWithStopperTargetUrlsHandler
+	{
+		public override Types Type { get; internal set; } = Types.IncreasePostPageNumberWithStopper;
+
+		public override IList<Request> Handle(Page page)
+		{
+			if (page.Content.Contains(Stopper))
+			{
+				return new List<Request>();
+			}
+
+			string pattern = $"{RegexUtil.NumRegex.Replace(PageIndexString, @"\d+")}";
+			Regex regex = new Regex(pattern);
+			string current = regex.Match(page.Request.PostBody).Value;
+			int currentIndex = int.Parse(RegexUtil.NumRegex.Match(current).Value);
+			int nextIndex = currentIndex + Interval;
+			string next = RegexUtil.NumRegex.Replace(PageIndexString, nextIndex.ToString());
+
+			int totalPage = -2000;
+			if (TotalPageSelector != null)
+			{
+				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).Value;
+				if (!string.IsNullOrEmpty(totalStr))
+				{
+					totalPage = int.Parse(totalStr);
+				}
+			}
+			int currentPage = -1000;
+			if (CurrenctPageSelector != null)
+			{
+				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).Value;
+				if (!string.IsNullOrEmpty(currentStr))
+				{
+					currentPage = int.Parse(currentStr);
+				}
+			}
+			if (currentPage == totalPage)
+			{
+				return new List<Request>();
+			}
+
+			return new List<Request>
+			{
+				new Request(page.Url, page.Request.Depth, page.Request.Extras)
+				{
+					Method = page.Request.Method,
+					Origin = page.Request.Origin,
+					PostBody = page.Request.PostBody.Replace(current, next),
+					Referer = page.Request.Referer
+				}
+			};
 		}
 	}
 }

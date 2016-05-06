@@ -29,6 +29,7 @@ namespace Java2Dotnet.Spider.Extension
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
 		public Validations Validations { get; set; }
+		public CookieTrapper GetCookie { get; set; }
 
 		public ISpider ToDefaultSpider()
 		{

@@ -19,6 +19,10 @@ using System.Linq;
 using RedisSharp;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Core.Utils;
+#if NET_45
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Remote;
+#endif
 
 namespace Java2Dotnet.Spider.Extension
 {
@@ -339,6 +343,22 @@ namespace Java2Dotnet.Spider.Extension
 					prepareStartUrl.Build(SpiderContext.Site, null);
 				}
 			}
+
+#if NET_45
+			if (SpiderContext.GetCookie != null)
+			{
+				ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
+				cds.HideCommandPromptWindow = true;
+				ChromeOptions opt = new ChromeOptions();
+				opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
+				RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
+				string cookie = SpiderContext.GetCookie.GetCookie(webDriver);
+				if (cookie != "Exception!!!")
+				{
+					SpiderContext.Site.Cookie = cookie;
+				}
+			}
+#endif
 
 			foreach (var request in SpiderContext.StartUrls)
 			{
