@@ -48,60 +48,65 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override string GetCookie()
 		{
-			try
+			string cookie = string.Empty;
+			while (string.IsNullOrEmpty(cookie))
 			{
-				ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
-				cds.HideCommandPromptWindow = true;
-				ChromeOptions opt = new ChromeOptions();
-				opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
-				RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
-
-				webDriver.Navigate().GoToUrl(Url);
-				Thread.Sleep(5000);
-
-				if (LoginAreaSelector != null)
+				try
 				{
-					var loginArea = FindElement(webDriver, LoginAreaSelector);
-					loginArea.Click();
-					Thread.Sleep(1000);
-				}
+					ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
+					cds.HideCommandPromptWindow = true;
+					ChromeOptions opt = new ChromeOptions();
+					opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
+					RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
 
-				var user = FindElement(webDriver, UserSelector);
-
-				user.Clear();
-				user.SendKeys(User);
-				Thread.Sleep(1500);
-				var pass = FindElement(webDriver, PassSelector);
-				pass.SendKeys(Pass);
-				Thread.Sleep(1500);
-				var submit = FindElement(webDriver, SubmitSelector);
-				submit.Click();
-				Thread.Sleep(5000);
-
-				if (!string.IsNullOrEmpty(AfterLoginUrl))
-				{
-					webDriver.Navigate().GoToUrl(AfterLoginUrl);
+					webDriver.Navigate().GoToUrl(Url);
 					Thread.Sleep(5000);
-				}
 
-				string cookie = string.Empty;
-                var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
-
-				if (cookieList.Count > 0)
-				{
-					foreach (var cookieItem in cookieList)
+					if (LoginAreaSelector != null)
 					{
-						cookie += cookieItem.Name + "=" + cookieItem.Value + "; ";
+						var loginArea = FindElement(webDriver, LoginAreaSelector);
+						loginArea.Click();
+						Thread.Sleep(1000);
 					}
-				}
 
-				webDriver.Dispose();
-                return cookie;
+					var user = FindElement(webDriver, UserSelector);
+
+					user.Clear();
+					user.SendKeys(User);
+					Thread.Sleep(1500);
+					var pass = FindElement(webDriver, PassSelector);
+					pass.SendKeys(Pass);
+					Thread.Sleep(1500);
+					var submit = FindElement(webDriver, SubmitSelector);
+					submit.Click();
+					Thread.Sleep(5000);
+
+					if (!string.IsNullOrEmpty(AfterLoginUrl))
+					{
+						webDriver.Navigate().GoToUrl(AfterLoginUrl);
+						Thread.Sleep(5000);
+					}
+
+					var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
+
+					if (cookieList.Count > 0)
+					{
+						foreach (var cookieItem in cookieList)
+						{
+							cookie += cookieItem.Name + "=" + cookieItem.Value + "; ";
+						}
+					}
+
+					webDriver.Dispose();
+				}
+				catch (Exception e)
+				{
+					webDriver.Dispose();
+					cookie = null;
+				}
 			}
-			catch (Exception e)
-			{
-				return "Exception!!!";
-			}
+
+			return cookie;
 		}
 
 		private IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
