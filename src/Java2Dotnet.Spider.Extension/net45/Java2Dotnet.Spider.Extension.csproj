@@ -95,6 +95,9 @@
     <Compile Include="..\Configuration\GeneratePostBody.cs">
       <Link>Configuration\GeneratePostBody.cs</Link>
     </Compile>
+    <Compile Include="..\Configuration\GetCookie.cs">
+      <Link>Configuration\GetCookie.cs</Link>
+    </Compile>
     <Compile Include="..\Configuration\Json\JsonSpiderContext.cs">
       <Link>Configuration\Json\JsonSpiderContext.cs</Link>
     </Compile>

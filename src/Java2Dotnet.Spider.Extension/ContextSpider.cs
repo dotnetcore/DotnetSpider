@@ -344,15 +344,10 @@ namespace Java2Dotnet.Spider.Extension
 				}
 			}
 
-#if NET_45
+#if !NET_CORE
 			if (SpiderContext.GetCookie != null)
 			{
-				ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
-				cds.HideCommandPromptWindow = true;
-				ChromeOptions opt = new ChromeOptions();
-				opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
-				RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
-				string cookie = SpiderContext.GetCookie.GetCookie(webDriver);
+				string cookie = SpiderContext.GetCookie.GetCookie();
 				if (cookie != "Exception!!!")
 				{
 					SpiderContext.Site.Cookie = cookie;

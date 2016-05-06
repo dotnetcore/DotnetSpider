@@ -1,9 +1,10 @@
 using System;
+using System.Linq;
 using System.Threading;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Model;
-
 #if !NET_CORE
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 #endif
@@ -21,7 +22,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public abstract Types Type { get; internal set; }
 
 
-		public abstract string GetCookie(dynamic obj);
+		public abstract string GetCookie();
 	}
 
 #if !NET_CORE
@@ -41,11 +42,16 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public Selector SubmitSelector { get; set; }
 
-		public override string GetCookie(dynamic webDriver)
+		public override string GetCookie()
 		{
-
 			try
 			{
+				ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
+				cds.HideCommandPromptWindow = true;
+				ChromeOptions opt = new ChromeOptions();
+				opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
+				RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
+
 				webDriver.Navigate().GoToUrl(Url);
 				var user = FindElement(webDriver, UserSelector);
 
