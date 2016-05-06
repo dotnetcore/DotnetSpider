@@ -7,6 +7,7 @@ using Java2Dotnet.Spider.Core.Processor;
 using Java2Dotnet.Spider.Extension.Model;
 using Newtonsoft.Json.Linq;
 using Site = Java2Dotnet.Spider.Core.Site;
+using System.Web;
 
 namespace Java2Dotnet.Spider.Extension.Processor
 {
@@ -82,7 +83,6 @@ namespace Java2Dotnet.Spider.Extension.Processor
 					return;
 				}
 
-
 				// check: 仔细考虑是放在前面, 还是在后面做 formatter, 我倾向于在前面. 对targetUrl做formatter则表示Start Url也应该是要符合这个规则的。
 				if (formatter != null)
 				{
@@ -93,6 +93,17 @@ namespace Java2Dotnet.Spider.Extension.Processor
 					}
 					links = tmp;
 				}
+
+				List<string> tmpLinks = new List<string>();
+				foreach (var link in links)
+				{
+#if !NET_CORE
+					tmpLinks.Add(HttpUtility.UrlDecode(link));
+#else
+					tmpLinks.Add(WebUtility.UrlDecode(link));
+#endif
+				}
+				links = tmpLinks;
 
 				if (urlPatterns == null || urlPatterns.Count == 0)
 				{
