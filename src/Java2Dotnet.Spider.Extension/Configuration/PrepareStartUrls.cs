@@ -64,6 +64,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string Origin { get; set; }
 
+		public Dictionary<string,object> Extras { get; set; }
+
 		public abstract Types Type { get; internal set; }
 
 		public abstract void Build(Site site, dynamic obj);
@@ -128,6 +130,15 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				while (reader.Read())
 				{
 					Dictionary<string, object> data = new Dictionary<string, object>();
+
+					if (Extras != null)
+					{
+						foreach (var extra in Extras)
+						{
+							data.Add(extra.Key,extra.Value);
+						}
+					}
+
 					int count = reader.FieldCount;
 					for (int i = 0; i < count; ++i)
 					{
@@ -260,7 +271,17 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		{
 			for (int i = From; i <= To; ++i)
 			{
-				site.AddStartRequest(new Request(string.Format(FormateString, i), 1, null)
+				Dictionary<string, object> data = new Dictionary<string, object>();
+
+				if (Extras != null)
+				{
+					foreach (var extra in Extras)
+					{
+						data.Add(extra.Key, extra.Value);
+					}
+				}
+
+				site.AddStartRequest(new Request(string.Format(FormateString, i), 1, data)
 				{
 					PostBody = PostBody,
 					Origin = Origin,
@@ -298,6 +319,15 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				while (reader.Read())
 				{
 					Dictionary<string, object> data = new Dictionary<string, object>();
+
+					if (Extras != null)
+					{
+						foreach (var extra in Extras)
+						{
+							data.Add(extra.Key, extra.Value);
+						}
+					}
+
 					int count = reader.FieldCount;
 					for (int i = 0; i < count; ++i)
 					{
@@ -384,6 +414,15 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			foreach (JObject jobject in obj)
 			{
 				Dictionary<string, object> tmp = obj;
+
+				if (Extras != null)
+				{
+					foreach (var extra in Extras)
+					{
+						tmp.Add(extra.Key, extra.Value);
+					}
+				}
+
 				foreach (var node in jobject.Children())
 				{
 					tmp.Add("", node.ToString());
