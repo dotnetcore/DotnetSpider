@@ -32,10 +32,10 @@ namespace Java2Dotnet.Spider.Core.Scheduler.Component
 
 		public bool IsDuplicate(Request request, ISpider spider)
 		{
-			bool isDuplicate = _bloomFilter.Contains(request.Url);
+			bool isDuplicate = _bloomFilter.Contains(request.Identity);
 			if (!isDuplicate)
 			{
-				_bloomFilter.Add(request.Url);
+				_bloomFilter.Add(request.Identity);
 				_counter.Inc();
 			}
 			return isDuplicate;

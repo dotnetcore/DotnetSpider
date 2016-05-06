@@ -145,7 +145,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 			var value = page.Request.GetExtra(field)?.ToString();
 
-			return string.IsNullOrEmpty(value) ? field : value;
+			return value == "Key Not In The Dictionary" ? field : value;
 		}
 
 		private JObject ProcessSingle(Page page, ISelectable item, JToken entityDefine, int index)
