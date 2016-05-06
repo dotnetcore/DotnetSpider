@@ -7,7 +7,11 @@ using Java2Dotnet.Spider.Core.Processor;
 using Java2Dotnet.Spider.Extension.Model;
 using Newtonsoft.Json.Linq;
 using Site = Java2Dotnet.Spider.Core.Site;
+#if !NET_CORE
 using System.Web;
+#else
+using System.Net;
+#endif
 
 namespace Java2Dotnet.Spider.Extension.Processor
 {
