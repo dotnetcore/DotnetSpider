@@ -32,6 +32,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string Url { get; set; }
 
+		public string AfterLoginUrl { get; set; }
+
 		public Selector UserSelector { get; set; }
 
 		public string User { get; set; }
@@ -41,6 +43,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public string Pass { get; set; }
 
 		public Selector SubmitSelector { get; set; }
+
+		public Selector LoginAreaSelector { get; set; }
 
 		public override string GetCookie()
 		{
@@ -53,6 +57,15 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
 
 				webDriver.Navigate().GoToUrl(Url);
+				Thread.Sleep(5000);
+
+				if (LoginAreaSelector != null)
+				{
+					var loginArea = FindElement(webDriver, LoginAreaSelector);
+					loginArea.Click();
+					Thread.Sleep(1000);
+				}
+
 				var user = FindElement(webDriver, UserSelector);
 
 				user.Clear();
@@ -65,19 +78,27 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				submit.Click();
 				Thread.Sleep(5000);
 
+				if (!string.IsNullOrEmpty(AfterLoginUrl))
+				{
+					webDriver.Navigate().GoToUrl(AfterLoginUrl);
+					Thread.Sleep(5000);
+				}
+
 				string cookie = string.Empty;
                 var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
 
-				if (cookieList.Count > 5)
+				if (cookieList.Count > 0)
 				{
 					foreach (var cookieItem in cookieList)
 					{
 						cookie += cookieItem.Name + "=" + cookieItem.Value + "; ";
 					}
 				}
-				return cookie;
+
+				webDriver.Dispose();
+                return cookie;
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 				return "Exception!!!";
 			}
