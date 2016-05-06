@@ -51,14 +51,13 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			string cookie = string.Empty;
 			while (string.IsNullOrEmpty(cookie))
 			{
+				ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
+				cds.HideCommandPromptWindow = true;
+				ChromeOptions opt = new ChromeOptions();
+				opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
+				RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
 				try
 				{
-					ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
-					cds.HideCommandPromptWindow = true;
-					ChromeOptions opt = new ChromeOptions();
-					opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
-					RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
-
 					webDriver.Navigate().GoToUrl(Url);
 					Thread.Sleep(5000);
 
