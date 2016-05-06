@@ -260,7 +260,13 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		{
 			for (int i = From; i <= To; ++i)
 			{
-				site.AddStartUrl(string.Format(FormateString, i));
+				site.AddStartRequest(new Request(string.Format(FormateString, i), 1, null)
+				{
+					PostBody = PostBody,
+					Origin = Origin,
+					Method = Method,
+					Referer = Referer
+				});
 			}
 		}
 	}
