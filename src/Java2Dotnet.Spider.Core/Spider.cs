@@ -317,7 +317,7 @@ namespace Java2Dotnet.Spider.Core
 			{
 				if (StartRequests.Count > 0)
 				{
-					Logger.Info("Start push Request to queque...");
+					Logger.Info($"Start push Request to queque,Count:{StartRequests.Count}");
 					if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 					{
 						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
