@@ -330,7 +330,7 @@ namespace Java2Dotnet.Spider.Core
 						QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
 						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
 						{
-							scheduler.Push(request, this);
+							scheduler.PushWithoutRedialManager(request, this);
 						});
 						Scheduler.Load(scheduler.ToList(this), this);
 						ClearStartRequests();

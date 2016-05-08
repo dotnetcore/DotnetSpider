@@ -21,13 +21,19 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		{
 			lock (this)
 			{
-
 				RedialManagerUtils.Execute("scheduler-push", () =>
 				{
 					DoPush(request, spider);
 				});
 			}
+		}
 
+		internal void PushWithoutRedialManager(Request request, ISpider spider)
+		{
+			lock (this)
+			{
+				DoPush(request, spider);
+			}
 		}
 
 		public virtual void Init(ISpider spider)
@@ -52,9 +58,15 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		/// <returns></returns>
 		private bool ShouldReserved(Request request)
 		{
-			var cycleTriedTimes = (int?)request.GetExtra(Request.CycleTriedTimes);
-
-			return cycleTriedTimes > 0;
+			var cycleTriedTimes = request.GetExtra(Request.CycleTriedTimes);
+			if (cycleTriedTimes == null)
+			{
+				return false;
+			}
+			else
+			{
+				return cycleTriedTimes > 0;
+			}
 		}
 
 		private void DoPush(Request request, ISpider spider)

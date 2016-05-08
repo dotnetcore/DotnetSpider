@@ -82,7 +82,7 @@ namespace Java2Dotnet.Spider.Core
 				{
 					return Extras[key];
 				}
-				return "Key Not In The Dictionary";
+				return null;
 			}
 		}
 
