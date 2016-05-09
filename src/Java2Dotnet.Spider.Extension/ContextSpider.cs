@@ -404,9 +404,13 @@ namespace Java2Dotnet.Spider.Extension
 			spider.Deep = SpiderContext.Deep;
 			spider.SetDownloader(SpiderContext.Downloader.GetDownloader());
 
-			if (SpiderContext.PageHandler != null)
+			if (SpiderContext.PageHandlers != null)
 			{
-				spider.PageHandler = SpiderContext.PageHandler.Customize;
+				spider.PageHandlers = new List<Action<Page>>();
+				foreach (var pageHandler in SpiderContext.PageHandlers)
+				{
+					spider.PageHandlers.Add(pageHandler.Customize);
+                }
 			}
 
 			if (SpiderContext.TargetUrlsHandler != null)
