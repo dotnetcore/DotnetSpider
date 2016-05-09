@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -57,7 +58,9 @@ namespace Java2Dotnet.Spider.Core.Selector
 				}
 				else
 				{
-					JObject o = text as JObject;
+					var node = text as HtmlNode;
+					dynamic realText = node != null ? JsonConvert.DeserializeObject<JObject>(node.InnerText) : text;
+					JObject o = realText as JObject;
 
 					if (o != null)
 					{
