@@ -102,9 +102,9 @@ namespace Java2Dotnet.Spider.Extension.Processor
 				foreach (var link in links)
 				{
 #if !NET_CORE
-					tmpLinks.Add(HttpUtility.UrlDecode(link));
+					tmpLinks.Add(HttpUtility.HtmlDecode(HttpUtility.UrlDecode(link)));
 #else
-					tmpLinks.Add(WebUtility.UrlDecode(link));
+					tmpLinks.Add(WebUtility.HtmlDecode(WebUtility.UrlDecode(link)));
 #endif
 				}
 				links = tmpLinks;
