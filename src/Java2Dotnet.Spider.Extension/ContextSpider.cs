@@ -59,6 +59,11 @@ namespace Java2Dotnet.Spider.Extension
 			{
 				SpiderContext.Downloader = new HttpDownloader();
 			}
+
+			if (SpiderContext.Site == null)
+			{
+				SpiderContext.Site = new Site();
+			}
 		}
 
 		public virtual void Run(params string[] args)
@@ -410,7 +415,7 @@ namespace Java2Dotnet.Spider.Extension
 				foreach (var pageHandler in SpiderContext.PageHandlers)
 				{
 					spider.PageHandlers.Add(pageHandler.Customize);
-                }
+				}
 			}
 
 			if (SpiderContext.TargetUrlsHandler != null)

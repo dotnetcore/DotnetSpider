@@ -12,10 +12,10 @@ namespace Java2Dotnet.Spider.JLog
 	{
 		public string Type { get; set; }
 		public string Time { get; set; }
-		public string Message { get; set; }
+		public string Message { get; set; } = "";
 		public string Machine = Log.Machine;
-		public string TaskGroup { get; set; }
-		public string UserId { get; set; }
+		public string TaskGroup { get; set; } = "";
+		public string UserId { get; set; } = "ooodata";
 
 		public override string ToString()
 		{
