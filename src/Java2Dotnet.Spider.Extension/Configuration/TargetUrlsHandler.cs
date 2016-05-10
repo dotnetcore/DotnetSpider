@@ -106,7 +106,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					currentPage = int.Parse(currentStr);
 				}
 			}
-			if (currentPage == totalPage || currentIndex > To)
+			if (currentPage == totalPage || currentIndex == To)
 			{
 				return new List<Request>();
 			}
