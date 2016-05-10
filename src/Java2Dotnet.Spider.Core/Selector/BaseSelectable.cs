@@ -42,29 +42,33 @@ namespace Java2Dotnet.Spider.Core.Selector
 			return Select(regexSelector);
 		}
 
-		public dynamic Value
+		public dynamic GetValue(bool isPlainText)
 		{
-			get
+			if (Elements == null || Elements.Count == 0)
 			{
-				if (Elements == null || Elements.Count == 0)
-				{
-					return null;
-				}
+				return null;
+			}
 
-				if (Elements.Count == 1)
+			if (Elements.Count == 1)
+			{
+				if (Elements[0] is HtmlNode)
 				{
-					if (Elements[0] is HtmlNode)
+					if (!isPlainText)
 					{
 						return Elements[0].InnerHtml;
 					}
 					else
 					{
-						return Elements[0].ToString();
+						return Elements[0].InnerText;
 					}
 				}
-
-				return Elements.Select(selectedNode => selectedNode is HtmlNode ? Elements[0].InnerHtml : selectedNode.ToString()).ToList();
+				else
+				{
+					return Elements[0].ToString();
+				}
 			}
+
+			return Elements.Select(selectedNode => selectedNode is HtmlNode ? Elements[0].InnerHtml : selectedNode.ToString()).ToList();
 		}
 
 		public abstract ISelectable Select(ISelector selector);

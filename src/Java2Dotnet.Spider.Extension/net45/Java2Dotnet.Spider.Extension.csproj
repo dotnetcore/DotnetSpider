@@ -257,6 +257,9 @@
     <Compile Include="..\Model\Formatter\SplitFormater.cs">
       <Link>Model\Formatter\SplitFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\SubStringFormater.cs">
+      <Link>Model\Formatter\SubStringFormater.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\Types.cs">
       <Link>Model\Formatter\Types.cs</Link>
     </Compile>

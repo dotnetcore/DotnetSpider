@@ -53,8 +53,8 @@ namespace Java2Dotnet.Spider.Test.Example
 				foreach (var videoElement in totalVideoElements)
 				{
 					var video = new YoukuVideo();
-					video.Name = videoElement.Select(Selectors.XPath("/div[4]/div[1]/a")).Value;
-					video.Click = int.Parse(videoElement.Select(Selectors.Css("p-num")).Value.ToString());
+					video.Name = videoElement.Select(Selectors.XPath("/div[4]/div[1]/a")).GetValue();
+					video.Click = int.Parse(videoElement.Select(Selectors.Css("p-num")).GetValue().ToString());
 					results.Add(video);
 				}
 				page.AddResultItem("VideoResult", results);

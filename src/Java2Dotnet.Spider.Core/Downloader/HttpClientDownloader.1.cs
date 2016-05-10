@@ -149,7 +149,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			if (site == null) return null;
 
 			HttpRequestMessage httpWebRequest = CreateRequestMessage(request);
-			if (!site.Headers.ContainsKey("Content-Type"))
+			if (!site.Headers.ContainsKey("Content-Type") && (site.Headers.ContainsKey("Content-Type") && site.Headers["Content-Type"]!="NULL"))
 			{
 				httpWebRequest.Headers.Add("ContentType", "application /x-www-form-urlencoded; charset=UTF-8");
 			}
@@ -159,7 +159,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			}
 			if (!site.Headers.ContainsKey("User-Agent"))
 			{
-				httpWebRequest.Headers.Add("UserAgent", site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0Mozilla/5.0 (Windows NT 10.0; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0");
+				httpWebRequest.Headers.Add("User-Agent", site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36");
 			}
 			else
 			{

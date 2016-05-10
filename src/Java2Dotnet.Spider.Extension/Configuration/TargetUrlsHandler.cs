@@ -49,7 +49,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int totalPage = -2000;
 			if (TotalPageSelector != null)
 			{
-				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).Value;
+				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).GetValue();
 				if (!string.IsNullOrEmpty(totalStr))
 				{
 					totalPage = int.Parse(totalStr);
@@ -58,7 +58,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int currentPage = -1000;
 			if (CurrenctPageSelector != null)
 			{
-				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).Value;
+				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).GetValue();
 				if (!string.IsNullOrEmpty(currentStr))
 				{
 					currentPage = int.Parse(currentStr);
@@ -91,7 +91,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int totalPage = -2000;
 			if (TotalPageSelector != null)
 			{
-				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).Value;
+				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).GetValue();
 				if (!string.IsNullOrEmpty(totalStr))
 				{
 					totalPage = int.Parse(totalStr);
@@ -100,7 +100,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int currentPage = -1000;
 			if (CurrenctPageSelector != null)
 			{
-				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).Value;
+				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).GetValue();
 				if (!string.IsNullOrEmpty(currentStr))
 				{
 					currentPage = int.Parse(currentStr);
@@ -150,7 +150,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int totalPage = -2000;
 			if (TotalPageSelector != null)
 			{
-				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).Value;
+				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).GetValue();
 				if (!string.IsNullOrEmpty(totalStr))
 				{
 					totalPage = int.Parse(totalStr);
@@ -159,7 +159,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int currentPage = -1000;
 			if (CurrenctPageSelector != null)
 			{
-				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).Value;
+				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).GetValue();
 				if (!string.IsNullOrEmpty(currentStr))
 				{
 					currentPage = int.Parse(currentStr);

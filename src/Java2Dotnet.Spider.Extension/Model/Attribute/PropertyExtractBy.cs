@@ -10,5 +10,7 @@ namespace Java2Dotnet.Spider.Extension.Model.Attribute
 		/// If set to 'true' and the extractor get no result, the entire class will be discarded.
 		/// </summary>
 		public bool NotNull { get; set; }
+
+		public bool IsPlainText { get; set; } = false;
 	}
 }
