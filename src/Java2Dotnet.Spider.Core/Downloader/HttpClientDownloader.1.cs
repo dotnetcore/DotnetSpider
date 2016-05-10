@@ -157,14 +157,15 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			{
 				//httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
 			}
-			if (!site.Headers.ContainsKey("User-Agent"))
+			if (site.Headers.ContainsKey("UserAgent"))
 			{
-				httpWebRequest.Headers.Add("User-Agent", site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36");
+				httpWebRequest.Headers.Add("UserAgent", site.Headers["UserAgent"]);
 			}
 			else
 			{
-				httpWebRequest.Headers.Add("User-Agent", site.Headers["User-Agent"]);
+				httpWebRequest.Headers.Add("User-Agent", site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36");
 			}
+
 			if (!string.IsNullOrEmpty(request.Referer))
 			{
 				httpWebRequest.Headers.Add("Referer", request.Referer);
