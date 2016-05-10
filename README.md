@@ -157,10 +157,8 @@ Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
 			[PropertyExtractBy(Expression = "./@jdzy_shop_id")]
 			public string JdzyShopId { get; set; }
 
-			[StoredAs("run_id", DataType.Date)]
-			public string RunId => DateTimeUtils.MONDAY_RUN_ID;
-
 			[StoredAs("cdate", DataType.Time)]
+			[PropertyExtractBy(Expression = "now", Type = ExtractType.Enviroment)]
 			public DateTime CDate => DateTime.Now;
 		}
 	}
