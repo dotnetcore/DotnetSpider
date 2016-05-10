@@ -12,7 +12,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public enum Types
 		{
 			IncreasePageNumber,
-			IncreasePageNumberWithStopper,
+			CustomLimitIncreasePageNumber,
+            IncreasePageNumberWithStopper,
 			IncreasePostPageNumberWithStopper
 		}
 
@@ -64,6 +65,48 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				}
 			}
 			if (currentPage == totalPage)
+			{
+				return new List<Request>();
+			}
+
+			return new List<Request> { new Request(page.Url.Replace(current, next), page.Request.Depth, page.Request.Extras) };
+		}
+	}
+
+	public class CustomLimitIncreasePageNumberTargetUrlsHandler : IncreasePageNumberTargetUrlsHandler
+	{
+		public override Types Type { get; internal set; } = Types.CustomLimitIncreasePageNumber;
+
+		public int To { get; set; }
+
+		public override IList<Request> Handle(Page page)
+		{
+			string pattern = $"{RegexUtil.NumRegex.Replace(PageIndexString, @"\d+")}";
+			Regex regex = new Regex(pattern);
+			string current = regex.Match(page.Url).Value;
+			int currentIndex = int.Parse(RegexUtil.NumRegex.Match(current).Value);
+			int nextIndex = currentIndex + Interval;
+			string next = RegexUtil.NumRegex.Replace(PageIndexString, nextIndex.ToString());
+
+			int totalPage = -2000;
+			if (TotalPageSelector != null)
+			{
+				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).Value;
+				if (!string.IsNullOrEmpty(totalStr))
+				{
+					totalPage = int.Parse(totalStr);
+				}
+			}
+			int currentPage = -1000;
+			if (CurrenctPageSelector != null)
+			{
+				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).Value;
+				if (!string.IsNullOrEmpty(currentStr))
+				{
+					currentPage = int.Parse(currentStr);
+				}
+			}
+			if (currentPage == totalPage || currentIndex > To)
 			{
 				return new List<Request>();
 			}

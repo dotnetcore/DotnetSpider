@@ -29,7 +29,11 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		{
 			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
 			UseCookies = false,
-			UseProxy = false,
+#if TEST
+			UseProxy = true,
+#else
+			UseProxy = false
+#endif
 		}));
 
 		public override Page Download(Request request, ISpider spider)
