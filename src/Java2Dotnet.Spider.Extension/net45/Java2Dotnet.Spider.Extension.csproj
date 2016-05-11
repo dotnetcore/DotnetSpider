@@ -203,9 +203,6 @@
     <Compile Include="..\Model\Attribute\TargetUrl.cs">
       <Link>Model\Attribute\TargetUrl.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\TargetUrlFormatter.cs">
-      <Link>Model\Attribute\TargetUrlFormatter.cs</Link>
-    </Compile>
     <Compile Include="..\Model\Attribute\TypeExtractBy.cs">
       <Link>Model\Attribute\TypeExtractBy.cs</Link>
     </Compile>
@@ -224,29 +221,11 @@
     <Compile Include="..\Model\ExtractType.cs">
       <Link>Model\ExtractType.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Formatter\AppendFormatter.cs">
-      <Link>Model\Formatter\AppendFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Formatter\BasicTypeFormatter.cs">
-      <Link>Model\Formatter\BasicTypeFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Formatter\CustomizeFormatter.cs">
-      <Link>Model\Formatter\CustomizeFormatter.cs</Link>
-    </Compile>
     <Compile Include="..\Model\Formatter\FormatterFactory.cs">
       <Link>Model\Formatter\FormatterFactory.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\IFormater.cs">
       <Link>Model\Formatter\IFormater.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Formatter\IObjectFormatter.cs">
-      <Link>Model\Formatter\IObjectFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Formatter\PrefixFormatter.cs">
-      <Link>Model\Formatter\PrefixFormatter.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Formatter\RegexFormatter.cs">
-      <Link>Model\Formatter\RegexFormatter.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\RemoveHtmlTagFormater.cs">
       <Link>Model\Formatter\RemoveHtmlTagFormater.cs</Link>
@@ -259,9 +238,6 @@
     </Compile>
     <Compile Include="..\Model\Formatter\SubStringFormater.cs">
       <Link>Model\Formatter\SubStringFormater.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Formatter\Types.cs">
-      <Link>Model\Formatter\Types.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\UrlEncodeFormater.cs">
       <Link>Model\Formatter\UrlEncodeFormater.cs</Link>
@@ -374,7 +350,6 @@
     <Compile Include="..\Utils\SelectorUtil.cs">
       <Link>Utils\SelectorUtil.cs</Link>
     </Compile>
-    <Compile Include="Model\Attribute\EnviromentValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
