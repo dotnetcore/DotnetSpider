@@ -20,7 +20,7 @@ namespace Java2Dotnet.Spider.Test.Example
 		{
 			return new SpiderContextBuilder(new SpiderContext
 			{
-				UserId = "ooodata",
+				UserId = "dotnetspider",
 				TaskGroup = "JD sku/store test",
 				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
 				CachedSize = 1,
@@ -38,20 +38,20 @@ namespace Java2Dotnet.Spider.Test.Example
 				PrepareStartUrls = new List<PrepareStartUrls>{ new DbPrepareStartUrls()
 				{
 					Source = DataSource.MySql,
-					ConnectString = "Database='test';Data Source= ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306",
+					ConnectString = "Database='test';Data Source= myRedis;User ID=root;Password=1qazZAQ!123456;Port=4306",
 					TableName = "jd.category",
 					Columns = new List<DbPrepareStartUrls.Column> { new DbPrepareStartUrls.Column { Name = "url", Formatters=new List<Formatter> { new ReplaceFormatter{ OldValue= ".html",NewValue="" } } } },
 					FormateStrings = new List<string> { "{0}&page=1&JL=6_0_0" }
 				}},
 				Scheduler = new RedisScheduler
 				{
-					Host = "ooodata.com",
+					Host = "myRedis",
 					Password = "Ayw3WLBt2h#^eE9XVU9$gDFs",
 					Port = 6379
 				},
 				Pipeline = new MysqlPipeline
 				{
-					ConnectString = "Database='test';Data Source=ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306"
+					ConnectString = "Database='test';Data Source=myRedis;User ID=root;Password=1qazZAQ!123456;Port=4306"
 				},
 				Downloader = new HttpDownloader()
 				{

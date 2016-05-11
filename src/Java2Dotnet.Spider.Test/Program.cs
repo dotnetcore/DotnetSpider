@@ -32,12 +32,7 @@ namespace Java2Dotnet.Spider.Test
 
 			//EmailClient client = new EmailClient("smtp.163.com", "modestmt@163.com", "zousong.88");
 			//var msg = new EmaillMessage("test", "test", "zlzforever@163.com" );
-			//client.SendMail(msg);
-			using (var conn = new MySql.Data.MySqlClient.MySqlConnection("Database='test';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"))
-			{
-				List<TmallShop> shops = conn.Query<TmallShop>("SELECT `name`,shopid,uid,url,is_tmall,run_id,brand,category,cdate from taobao.tmall_shop where is_tmall=1 or is_tmall='True'", null).ToList();
-				conn.Execute("insert ignore into taobao.tmall_shop_weekly_v2 (`name`,shopid,uid,url,is_tmall,run_id,brand,category,cdate) values(@Name,@ShopId,@UserId,@Url,@Is_Tmall,@Run_Id,@Brand,@Category,@CDate)", shops);
-			}
+			//client.SendMail(msg); 
 		}
 
 		public class TmallShop
