@@ -188,6 +188,9 @@
     <Compile Include="..\Model\Attribute\Downloader.cs">
       <Link>Model\Attribute\Downloader.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Attribute\EnviromentExtractBy.cs">
+      <Link>Model\Attribute\EnviromentExtractBy.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Attribute\Formatter.cs">
       <Link>Model\Attribute\Formatter.cs</Link>
     </Compile>
