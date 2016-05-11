@@ -26,7 +26,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 
 		public JObject Pipeline { get; set; }
 		public List<JObject> Entities { get; set; } = new List<JObject>();
-		public JObject PageHandler { get; set; }
+		public List<JObject> PageHandlers { get; set; }
 		public JObject TargetUrlsHandler { get; set; }
 		public JObject Validations { get; set; }
 
@@ -34,7 +34,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		{
 			SpiderContext context = new SpiderContext();
 			context.CachedSize = CachedSize;
-			context.PageHandler = GetCustomziePage(PageHandler);
+			context.PageHandlers = GetCustomziePage(PageHandlers);
 			context.TargetUrlsHandler = GetCustomizeTargetUrls(TargetUrlsHandler);
 			context.Deep = Deep;
 			context.Downloader = GetDownloader(Downloader);
@@ -419,22 +419,32 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			throw new SpiderExceptoin("UNSPORT or JSON string is incorrect: " + jobject);
 		}
 
-		private PageHandler GetCustomziePage(JObject jobject)
+		private List<PageHandler> GetCustomziePage(List<JObject> jobjects)
 		{
-			if (jobject == null)
+			if (jobjects == null)
 			{
 				return null;
 			}
-			var customizePageType = jobject.SelectToken("$.Type").ToObject<PageHandler.Types>();
-			switch (customizePageType)
+			List<PageHandler> list = new List<PageHandler>();
+			foreach (var jobject in jobjects)
 			{
-				case Configuration.PageHandler.Types.Sub:
-					{
-						return jobject.ToObject<SubPageHandler>();
-
-					}
+				var customizePageType = jobject.SelectToken("$.Type").ToObject<PageHandler.Types>();
+				switch (customizePageType)
+				{
+					case PageHandler.Types.Sub:
+						{
+							list.Add(jobject.ToObject<SubPageHandler>());
+							break;
+						}
+					case PageHandler.Types.CustomTarget:
+						{
+							list.Add(jobject.ToObject<CustomTargetHandler>());
+							break;
+						}
+				}
 			}
-			throw new SpiderExceptoin("UNSPORT or JSON string is incorrect: " + jobject);
+			return list;
+			//throw new SpiderExceptoin("UNSPORT or JSON string is incorrect: " + jobject);
 		}
 	}
 }

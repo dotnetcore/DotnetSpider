@@ -8,7 +8,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		[Flags]
 		public enum Types
 		{
-			Sub
+			Sub,
+			CustomTarget
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -42,6 +43,47 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 				string newRawText = rawText.Substring(begin, length).Trim();
 				p.Content = newRawText;
+			}
+			catch
+			{
+				throw new SpiderExceptoin("Rawtext Invalid.");
+			}
+		}
+	}
+
+	public class CustomTargetHandler : PageHandler
+	{
+		public bool DisableNewLine { get; set; } = false;
+		public string StartString { get; set; }
+		public string EndString { get; set; }
+		public int StartOffset { get; set; } = 0;
+		public int EndOffset { get; set; } = 0;
+		public string TargetTag { get; set; } = "my_target";
+
+		public override Types Type { get; internal set; } = Types.CustomTarget;
+
+		public override void Customize(Page p)
+		{
+			try
+			{
+				string rawText = p.Content;
+				rawText = rawText.Replace("script", "div");
+				if (DisableNewLine)
+				{
+					rawText = rawText.Replace("\r", "").Replace("\n", "").Replace("\t", "");
+				}
+				int start = 0;
+				while (rawText.IndexOf(StartString, start, StringComparison.Ordinal) != -1)
+				{
+					int begin = rawText.IndexOf(StartString, start, StringComparison.Ordinal) + StartOffset;
+					int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal) + EndOffset;
+					start = end;
+
+					rawText = rawText.Insert(begin, "<div class=\"" + TargetTag + "\">");
+					rawText = rawText.Insert(end, @"</div>");
+				}
+
+				p.Content = rawText;
 			}
 			catch
 			{

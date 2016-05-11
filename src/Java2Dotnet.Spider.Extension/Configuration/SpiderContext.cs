@@ -25,7 +25,7 @@ namespace Java2Dotnet.Spider.Extension
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; }
 		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
 		public Configuration.Pipeline Pipeline { get; set; }
-		public PageHandler PageHandler { get; set; }
+		public List<PageHandler> PageHandlers { get; set; }
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
 		public Validations Validations { get; set; }

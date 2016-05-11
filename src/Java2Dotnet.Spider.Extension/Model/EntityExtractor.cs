@@ -51,7 +51,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				foreach (var enviromentValue in _enviromentValues)
 				{
 					string name = enviromentValue.Name;
-					var value = page.Selectable.Select(SelectorUtil.GetSelector(enviromentValue.Selector)).Value;
+					var value = page.Selectable.Select(SelectorUtil.GetSelector(enviromentValue.Selector)).GetValue();
 					page.Request.PutExtra(name, value);
 				}
 			}
@@ -166,6 +166,9 @@ namespace Java2Dotnet.Spider.Extension.Model
 				var multiToken = field.SelectToken("$.Multi");
 				bool isMulti = multiToken?.ToObject<bool>() ?? false;
 
+				var plainTextToken = field.SelectToken("$.IsPlainText");
+				bool isPlainText = plainTextToken?.ToObject<bool>() ?? false;
+
 				string propertyName = field.SelectToken("$.Name").ToString();
 
 				List<Formatter.Formatter> formatters = GenerateFormatter(field.SelectTokens("$.Formatters[*]"));
@@ -187,7 +190,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 					{
 						if (isMulti)
 						{
-							var propertyValues = item.SelectList(selector).Value;
+							var propertyValues = item.SelectList(selector).GetValue();
 							var countToken = _entityDefine.SelectToken("$.Count");
 							if (countToken != null)
 							{
@@ -208,7 +211,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 						}
 						else
 						{
-							tmpValue = item.Select(selector)?.Value;
+							tmpValue = item.Select(selector)?.GetValue(isPlainText);
 							tmpValue = formatters.Aggregate(tmpValue, (current, formatter) => formatter.Formate(current));
 							dataItem.Add(propertyName, tmpValue);
 						}

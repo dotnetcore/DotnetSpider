@@ -33,7 +33,7 @@ namespace Java2Dotnet.Spider.Core
 		public DateTime StartTime { get; private set; }
 		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		public Site Site { get; set; }
-		public Action<Page> PageHandler;
+		public List<Action<Page>> PageHandlers;
 		public bool SaveStatus { get; set; }
 		public string Identity { get; }
 		public bool ShowConsoleStatus { get; set; } = true;
@@ -612,7 +612,13 @@ namespace Java2Dotnet.Spider.Core
 						return;
 					}
 
-					PageHandler?.Invoke(page);
+					if (PageHandlers != null)
+					{
+						foreach (var pageHandler in PageHandlers)
+						{
+							pageHandler?.Invoke(page);
+						}
+					}
 
 #if TEST
 					sw.Reset();

@@ -29,7 +29,11 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		{
 			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
 			UseCookies = false,
-			UseProxy = false,
+#if TEST
+			UseProxy = true,
+#else
+			UseProxy = false
+#endif
 		}));
 
 		public override Page Download(Request request, ISpider spider)
@@ -145,7 +149,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			if (site == null) return null;
 
 			HttpRequestMessage httpWebRequest = CreateRequestMessage(request);
-			if (!site.Headers.ContainsKey("Content-Type"))
+			if (!site.Headers.ContainsKey("Content-Type") && (site.Headers.ContainsKey("Content-Type") && site.Headers["Content-Type"]!="NULL"))
 			{
 				httpWebRequest.Headers.Add("ContentType", "application /x-www-form-urlencoded; charset=UTF-8");
 			}
@@ -153,14 +157,15 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			{
 				//httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
 			}
-			if (!site.Headers.ContainsKey("User-Agent"))
+			if (site.Headers.ContainsKey("UserAgent"))
 			{
-				httpWebRequest.Headers.Add("UserAgent", site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0Mozilla/5.0 (Windows NT 10.0; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0");
+				httpWebRequest.Headers.Add("UserAgent", site.Headers["UserAgent"]);
 			}
 			else
 			{
-				httpWebRequest.Headers.Add("User-Agent", site.Headers["User-Agent"]);
+				httpWebRequest.Headers.Add("User-Agent", site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36");
 			}
+
 			if (!string.IsNullOrEmpty(request.Referer))
 			{
 				httpWebRequest.Headers.Add("Referer", request.Referer);
