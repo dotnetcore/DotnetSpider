@@ -42,12 +42,6 @@ namespace Java2Dotnet.Spider.Extension.Processor
 			foreach (IEntityExtractor pageModelExtractor in EntityExtractorList)
 			{
 				dynamic process = pageModelExtractor.Process(page);
-				if (process == null || (process is IEnumerable && !((IEnumerable)process).GetEnumerator().MoveNext()))
-				{
-					continue;
-				}
-
-				page.AddResultItem(pageModelExtractor.EntityName, process);
 
 				if (!page.MissTargetUrls)
 				{
@@ -60,6 +54,13 @@ namespace Java2Dotnet.Spider.Extension.Processor
 						page.AddTargetRequests(GetCustomizeTargetUrls(page));
 					}
 				}
+
+				if (process == null || (process is IEnumerable && !((IEnumerable)process).GetEnumerator().MoveNext()))
+				{
+					continue;
+				}
+
+				page.AddResultItem(pageModelExtractor.EntityName, process);
 			}
 
 			if (page.ResultItems.Results.Count == 0)
