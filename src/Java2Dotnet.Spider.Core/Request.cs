@@ -11,7 +11,7 @@ namespace Java2Dotnet.Spider.Core
 	/// It contains some additional information. 
 	/// </summary>
 	public class Request : IDisposable
-#if !NET_CORE	
+#if !NET_CORE
 	, ICloneable
 #endif
 	{
@@ -63,7 +63,7 @@ namespace Java2Dotnet.Spider.Core
 		/// <summary>
 		/// The http method of the request. Get for default.
 		/// </summary>
-		public string Method { get; set; }
+		public string Method { get; set; } = "GET";
 
 		public string PostBody { get; set; }
 
@@ -82,7 +82,7 @@ namespace Java2Dotnet.Spider.Core
 				{
 					return Extras[key];
 				}
-				return null;
+				return "NULL";
 			}
 		}
 

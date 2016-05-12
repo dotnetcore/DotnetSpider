@@ -15,14 +15,24 @@ namespace Java2Dotnet.Spider.Extension.Model.Formatter
 		public override string Formate(string value)
 		{
 			int begin = value.IndexOf(StartString, StringComparison.Ordinal);
-			int end = value.IndexOf(EndString, begin, StringComparison.Ordinal);
-			int length = end - begin;
+			int length;
+			if (!string.IsNullOrEmpty(EndString))
+			{
+				int end = value.IndexOf(EndString, begin, StringComparison.Ordinal);
+				length = end - begin;
+			}
+			else
+			{
+				length = value.Length - begin;
+			}
 
 			begin += StartOffset;
 			length -= StartOffset;
 			length -= EndOffset;
-			length += EndString.Length;
-
+			if (!string.IsNullOrEmpty(EndString))
+			{
+				length += EndString.Length;
+			}
 			return value.Substring(begin, length);
 		}
 	}
