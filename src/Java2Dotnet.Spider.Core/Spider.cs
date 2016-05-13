@@ -119,7 +119,7 @@ namespace Java2Dotnet.Spider.Core
 
 			UserId = string.IsNullOrEmpty(userid) ? "DotnetSpider" : userid;
 			TaskGroup = string.IsNullOrEmpty(taskGroup) ? "DotnetSpider" : taskGroup;
-			Logger = LogManager.GetLogger($"{identity}&{userid}&{taskGroup}");
+			Logger = LogManager.GetLogger($"{Identity}&{UserId}&{TaskGroup}");
 
 			_waitCount = 0;
 			PageProcessor = pageProcessor;
