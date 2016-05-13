@@ -145,7 +145,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 			var value = page.Request.GetExtra(field)?.ToString();
 
-			return value == "NULL" ? field : value;
+			return value == null ? field : value;
 		}
 
 		private JObject ProcessSingle(Page page, ISelectable item, JToken entityDefine, int index)
