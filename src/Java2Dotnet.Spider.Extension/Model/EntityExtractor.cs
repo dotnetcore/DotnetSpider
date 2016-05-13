@@ -143,9 +143,14 @@ namespace Java2Dotnet.Spider.Extension.Model
 				return index.ToString();
 			}
 
-			var value = page.Request.GetExtra(field)?.ToString();
-
-			return value == "NULL" ? field : value;
+			if (!page.Request.ExistExtra(field))
+			{
+				return field;
+			}
+			else
+			{
+				return page.Request.GetExtra(field)?.ToString();
+			}
 		}
 
 		private JObject ProcessSingle(Page page, ISelectable item, JToken entityDefine, int index)
