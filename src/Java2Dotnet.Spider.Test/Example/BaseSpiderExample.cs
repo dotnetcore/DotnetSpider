@@ -14,16 +14,20 @@ namespace Java2Dotnet.Spider.Test.Example
 		public static void Run
 			()
 		{
-			HttpClientDownloader downloader = new HttpClientDownloader();
-
-			Core.Spider spider = Core.Spider.Create(new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
 			var site = new Site() { EncodingName = "UTF-8" };
 			for (int i = 1; i < 5; ++i)
 			{
-				site.AddStartUrl("http://www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_1.html");
+				site.AddStartUrl("http://www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
 			}
-			spider.Site = site;
+
+			var processor = new MyPageProcessor();
+			processor.Site = site;
+			Core.Spider spider = Core.Spider.Create(processor, new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
+
+
+			//spider.SetDownloader(downloader);
 			spider.Start();
+			Console.Read();
 		}
 
 		private class MyPipeline : IPipeline
@@ -32,7 +36,7 @@ namespace Java2Dotnet.Spider.Test.Example
 			{
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
-					Console.WriteLine($"{entry.Name}:{entry.Click}");
+					Console.WriteLine($"{entry.Name}");
 				}
 
 				//May be you want to save to database
@@ -53,20 +57,18 @@ namespace Java2Dotnet.Spider.Test.Example
 				foreach (var videoElement in totalVideoElements)
 				{
 					var video = new YoukuVideo();
-					video.Name = videoElement.Select(Selectors.XPath("/div[4]/div[1]/a")).GetValue();
-					video.Click = int.Parse(videoElement.Select(Selectors.Css("p-num")).GetValue().ToString());
+					video.Name = videoElement.Select(Selectors.XPath("./div/div[4]/div[1]/a")).GetValue();
 					results.Add(video);
 				}
 				page.AddResultItem("VideoResult", results);
 			}
 
-			public Site Site => new Site { SleepTime = 0 };
+			public Site Site { get; set; }
 		}
 
 		public class YoukuVideo
 		{
 			public string Name { get; set; }
-			public string Click { get; set; }
 		}
 	}
 }

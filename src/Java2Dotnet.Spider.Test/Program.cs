@@ -24,6 +24,7 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
+			SpiderExample.Run();
 			//JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			//var context = spiderBuilder.GetBuilder().Context;
 			//ContextSpider spider = new ContextSpider(context);
