@@ -17,7 +17,7 @@ namespace Java2Dotnet.Spider.Test.Example
 			var site = new Site() { EncodingName = "UTF-8" };
 			for (int i = 1; i < 5; ++i)
 			{
-				site.AddStartUrl("http://www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
+				site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
 			}
 
 			var processor = new MyPageProcessor();
