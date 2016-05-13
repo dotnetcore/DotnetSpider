@@ -32,7 +32,7 @@ namespace Java2Dotnet.Spider.Core
 		public bool SpawnUrl { get; set; } = true;
 		public DateTime StartTime { get; private set; }
 		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
-		public Site Site { get; set; }
+		public Site Site { get; private set; }
 		public List<Action<Page>> PageHandlers;
 		public bool SaveStatus { get; set; }
 		public string Identity { get; }
@@ -68,9 +68,9 @@ namespace Java2Dotnet.Spider.Core
 		/// </summary>
 		/// <param name="pageProcessor"></param>
 		/// <returns></returns>
-		public static Spider Create(IPageProcessor pageProcessor)
+		public static Spider Create(Site site, IPageProcessor pageProcessor)
 		{
-			return new Spider(Guid.NewGuid().ToString(), null, null, pageProcessor, new QueueDuplicateRemovedScheduler());
+			return new Spider(site, Guid.NewGuid().ToString(), null, null, pageProcessor, new QueueDuplicateRemovedScheduler());
 		}
 
 		/// <summary>
@@ -79,9 +79,9 @@ namespace Java2Dotnet.Spider.Core
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
 		/// <returns></returns>
-		public static Spider Create(IPageProcessor pageProcessor, IScheduler scheduler)
+		public static Spider Create(Site site, IPageProcessor pageProcessor, IScheduler scheduler)
 		{
-			return new Spider(Guid.NewGuid().ToString(), null, null, pageProcessor, scheduler);
+			return new Spider(site, Guid.NewGuid().ToString(), null, null, pageProcessor, scheduler);
 		}
 
 		/// <summary>
@@ -91,9 +91,9 @@ namespace Java2Dotnet.Spider.Core
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
 		/// <returns></returns>
-		public static Spider Create(string identify, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
+		public static Spider Create(Site site, string identify, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
 		{
-			return new Spider(identify, userid, taskGroup, pageProcessor, scheduler);
+			return new Spider(site, identify, userid, taskGroup, pageProcessor, scheduler);
 		}
 
 		/// <summary>
@@ -102,7 +102,7 @@ namespace Java2Dotnet.Spider.Core
 		/// <param name="identity"></param>
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
-		protected Spider(string identity, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
+		protected Spider(Site site, string identity, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
 		{
 			if (string.IsNullOrWhiteSpace(identity))
 			{
@@ -122,8 +122,17 @@ namespace Java2Dotnet.Spider.Core
 			Logger = LogManager.GetLogger($"{Identity}&{UserId}&{TaskGroup}");
 
 			_waitCount = 0;
+			if (pageProcessor == null)
+			{
+				throw new SpiderExceptoin("PageProcessor should not be null.");
+			}
 			PageProcessor = pageProcessor;
-			Site = pageProcessor.Site;
+			Site = site;
+			if (Site == null)
+			{
+				throw new SpiderExceptoin("Site should not be null.");
+			}
+			PageProcessor.Site = site;
 			StartRequests = Site.StartRequests;
 			Scheduler = scheduler ?? new QueueDuplicateRemovedScheduler();
 

@@ -25,8 +25,7 @@ namespace Java2Dotnet.Spider.Test
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
 
-			Core.Spider spider = Core.Spider.Create(new SimplePageProcessor("http://www.oschina.net/", "http://www.oschina.net/*")).AddPipeline(new TestPipeline()).SetThreadNum(1);
-			spider.Site = new Site() { EncodingName = "UTF-8" };
+			Core.Spider spider = Core.Spider.Create(new Site() { EncodingName = "UTF-8" }, new SimplePageProcessor("http://www.oschina.net/", "http://www.oschina.net/*")).AddPipeline(new TestPipeline()).SetThreadNum(1);
 			Page p = downloader.Download(new Request("http://www.baidu.com/", 2, new Dictionary<string, dynamic>()), spider);
 			Console.WriteLine(p.Content);
 			spider.Start();
@@ -65,7 +64,7 @@ namespace Java2Dotnet.Spider.Test
 
 		private void TestRound()
 		{
-			Core.Spider spider = Core.Spider.Create(new TestPageProcessor(), new TestScheduler()).SetThreadNum(10);
+			Core.Spider spider = Core.Spider.Create(new Site { SleepTime = 0 }, new TestPageProcessor(), new TestScheduler()).SetThreadNum(10);
 			spider.Run();
 		}
 
@@ -116,12 +115,15 @@ namespace Java2Dotnet.Spider.Test
 
 		private class TestPageProcessor : IPageProcessor
 		{
+			public Site Site
+			{
+				get; set;
+			}
+
 			public void Process(Page page)
 			{
 				page.IsSkip = true;
 			}
-
-			public Site Site => new Site { SleepTime = 0 };
 		}
 
 		public class TestDownloader : IDownloader

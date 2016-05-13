@@ -131,6 +131,6 @@ namespace Java2Dotnet.Spider.Extension.Processor
 			}
 		}
 
-		public Site Site { get; }
+		public Site Site { get; set; }
 	}
 }

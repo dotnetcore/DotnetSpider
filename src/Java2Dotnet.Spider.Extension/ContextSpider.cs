@@ -376,7 +376,7 @@ namespace Java2Dotnet.Spider.Extension
 				processor.AddEntity(entity);
 			}
 
-			EntityGeneralSpider spider = new EntityGeneralSpider(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup, processor, scheduler);
+			EntityGeneralSpider spider = new EntityGeneralSpider(SpiderContext.Site, SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup, processor, scheduler);
 
 			foreach (var entity in SpiderContext.Entities)
 			{

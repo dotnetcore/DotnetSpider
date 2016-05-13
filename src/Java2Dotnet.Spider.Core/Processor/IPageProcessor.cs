@@ -18,6 +18,6 @@ namespace Java2Dotnet.Spider.Core.Processor
 		/// <summary>
 		/// Get the site settings
 		/// </summary>
-		Site Site { get; }
+		Site Site { get; set; }
 	}
 }

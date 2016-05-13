@@ -20,7 +20,12 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 		private IDownloader _downloaderWhenFileMiss;
 		private readonly IPageProcessor _pageProcessor;
 
-		public Site Site => _pageProcessor.Site;
+		public Site Site
+		{
+			get { return _pageProcessor.Site; }
+			set { _pageProcessor.Site = value; }
+		}
+
 		public int ThreadNum { get; set; }
 		public FileCache(string startUrl, string urlPattern, string path = "/data/dotnetspider/temp/")
 		{

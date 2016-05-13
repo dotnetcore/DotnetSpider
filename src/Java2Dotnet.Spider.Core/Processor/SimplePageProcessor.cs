@@ -35,6 +35,6 @@ namespace Java2Dotnet.Spider.Core.Processor
 		/// <summary>
 		/// Get the site settings
 		/// </summary>
-		public Site Site { get; }
+		public Site Site { get; set; }
 	}
 }
