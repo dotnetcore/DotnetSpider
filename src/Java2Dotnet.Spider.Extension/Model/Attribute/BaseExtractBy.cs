@@ -12,6 +12,8 @@
 		/// </summary>
 		public ExtractType Type { get; set; } = ExtractType.XPath;
 
+		public object Argument { get; set; }
+
 		public long Count { get; set; } = long.MaxValue;
 	}
 }

@@ -27,7 +27,6 @@ namespace Java2Dotnet.Spider.Test.Example
 				ThreadNum = 10,
 				Site = new Site
 				{
-					EncodingName = "UTF-8"
 				},
 				StartUrls = new Dictionary<string, Dictionary<string, object>>
 				{
@@ -63,13 +62,7 @@ namespace Java2Dotnet.Spider.Test.Example
 		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
 		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
 		public class Product : ISpiderEntity
-		{
-			public Product()
-			{
-				DateTime dt = DateTime.Now;
-				RunId = new DateTime(dt.Year, dt.Month, 1);
-			}
-
+		{ 
 			[StoredAs("category", DataType.String, 20)]
 			[PropertyExtractBy(Expression = "name", Type = ExtractType.Enviroment)]
 			public string CategoryName { get; set; }
@@ -108,7 +101,7 @@ namespace Java2Dotnet.Spider.Test.Example
 
 			[StoredAs("run_id", DataType.Date)]
 			[PropertyExtractBy(Expression = "Monday", Type = ExtractType.Enviroment)]
-			public DateTime RunId { get; }
+			public DateTime RunId { get; set; }
 
 			[PropertyExtractBy(Expression = "Now", Type = ExtractType.Enviroment)]
 			[StoredAs("cdate", DataType.Time)]

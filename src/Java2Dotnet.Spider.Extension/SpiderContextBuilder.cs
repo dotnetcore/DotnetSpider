@@ -128,7 +128,7 @@ namespace Java2Dotnet.Spider.Extension
 				if (extractBy != null)
 				{
 					field.IsPlainText = extractBy.IsPlainText;
-					field.Selector = new Selector() { Expression = extractBy.Expression, Type = extractBy.Type };
+					field.Selector = new Selector() { Expression = extractBy.Expression, Type = extractBy.Type, Argument = extractBy.Argument };
 				}
 
 				if (storeAs != null)

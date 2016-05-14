@@ -11,6 +11,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		[Flags]
 		public enum Types
 		{
+			Console,
 			MongoDb,
 			MySql,
 			MsSql,
@@ -59,6 +60,16 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override IEntityPipeline GetPipeline(Schema schema, JObject entityDefine)
 		{
 			return new EntityMySqlPipeline(schema, entityDefine, ConnectString, Mode);
+		}
+	}
+
+	public class ConslePipeline : Pipeline
+	{
+		public override Types Type { get; internal set; } = Types.Console;
+ 
+		public override IEntityPipeline GetPipeline(Schema schema, JObject entityDefine)
+		{
+			return new EntityConsolePipeline();
 		}
 	}
 }

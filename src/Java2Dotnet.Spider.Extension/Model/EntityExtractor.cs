@@ -221,7 +221,6 @@ namespace Java2Dotnet.Spider.Extension.Model
 							dataItem.Add(propertyName, tmpValue);
 						}
 					}
-
 				}
 				else
 				{

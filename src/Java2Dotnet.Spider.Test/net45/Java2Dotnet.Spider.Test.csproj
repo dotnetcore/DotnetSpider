@@ -118,6 +118,9 @@
     <Compile Include="..\Example\OschinaBlog.cs">
       <Link>Example\OschinaBlog.cs</Link>
     </Compile>
+    <Compile Include="..\Example\RegexTestSpider.cs">
+      <Link>Example\RegexTestSpider.cs</Link>
+    </Compile>
     <Compile Include="..\HtmlTest.cs">
       <Link>HtmlTest.cs</Link>
     </Compile>

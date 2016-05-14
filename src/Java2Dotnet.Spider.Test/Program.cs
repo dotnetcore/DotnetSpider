@@ -24,11 +24,16 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			//SpiderExample.Run();
-			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			RegexTestSpider spiderBuilder = new RegexTestSpider();
 			var context = spiderBuilder.GetBuilder().Context;
 			ContextSpider spider = new ContextSpider(context);
-			spider.Run("rerun");
+			spider.Run();
+
+			//SpiderExample.Run();
+			//JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			//var context = spiderBuilder.GetBuilder().Context;
+			//ContextSpider spider = new ContextSpider(context);
+			//spider.Run("rerun");
 
 
 			//EmailClient client = new EmailClient("smtp.163.com", "modestmt@163.com", "zousong.88");

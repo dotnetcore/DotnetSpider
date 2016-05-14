@@ -38,12 +38,14 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public dynamic Select(dynamic text)
 		{
-			return SelectGroup(text).Get(_group);
+			var tmp = text is HtmlAgilityPack.HtmlNode ? (HtmlAgilityPack.HtmlNode)text.InnerHtml: text;
+			return SelectGroup(tmp).Get(_group);
 		}
 
 		public List<dynamic> SelectList(dynamic text)
 		{
-			IList<RegexResult> results = SelectGroupList(text);
+			var tmp = text is HtmlAgilityPack.HtmlNode ? (HtmlAgilityPack.HtmlNode)text.InnerHtml : text;
+			IList<RegexResult> results = SelectGroupList(tmp);
 			return results.Select(result => result.Get(_group)).Cast<dynamic>().ToList();
 		}
 

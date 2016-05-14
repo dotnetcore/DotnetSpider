@@ -384,24 +384,7 @@ namespace Java2Dotnet.Spider.Extension
 
 				var schema = entity.SelectToken("$.Schema")?.ToObject<Schema>();
 
-				switch (SpiderContext.Pipeline.Type)
-				{
-					case Configuration.Pipeline.Types.MongoDb:
-						{
-							spider.AddPipeline(new EntityPipeline(entiyName, SpiderContext.Pipeline.GetPipeline(schema, entity)));
-							break;
-						}
-					case Configuration.Pipeline.Types.MySql:
-						{
-							spider.AddPipeline(new EntityPipeline(entiyName, SpiderContext.Pipeline.GetPipeline(schema, entity)));
-							break;
-						}
-					case Configuration.Pipeline.Types.MySqlFile:
-						{
-							spider.AddPipeline(new EntityPipeline(entiyName, SpiderContext.Pipeline.GetPipeline(schema, entity)));
-							break;
-						}
-				}
+				spider.AddPipeline(new EntityPipeline(entiyName, SpiderContext.Pipeline.GetPipeline(schema, entity)));
 			}
 			spider.SetCachedSize(SpiderContext.CachedSize);
 			spider.SetEmptySleepTime(SpiderContext.EmptySleepTime);

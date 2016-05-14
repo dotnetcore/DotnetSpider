@@ -32,7 +32,19 @@ namespace Java2Dotnet.Spider.Extension.Utils
 					}
 				case ExtractType.Regex:
 					{
-						return new RegexSelector(expression);
+						if (string.IsNullOrEmpty(selector.Argument?.ToString()))
+						{
+							return new RegexSelector(expression);
+						}
+						else
+						{
+							int group;
+							if (int.TryParse(selector.Argument.ToString(), out group))
+							{
+								return new RegexSelector(expression, group);
+							}
+							throw new SpiderExceptoin("Regex argument shoulb be a number set to group: " + selector);
+						}
 					}
 				case ExtractType.XPath:
 					{
