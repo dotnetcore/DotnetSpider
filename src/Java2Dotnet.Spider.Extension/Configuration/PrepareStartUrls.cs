@@ -50,8 +50,9 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		[Flags]
 		public enum Types
 		{
+			CommonDb,
 			GeneralDb,
-			DbCycle,
+			DbList,
 			Cycle,
 			LinkSpider
 		}
@@ -64,14 +65,50 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string Origin { get; set; }
 
-		public Dictionary<string,object> Extras { get; set; }
+		public Dictionary<string, object> Extras { get; set; }
 
 		public abstract Types Type { get; internal set; }
 
 		public abstract void Build(Site site, dynamic obj);
 	}
 
-	public class DbPrepareStartUrls : PrepareStartUrls
+	public class CyclePrepareStartUrls : PrepareStartUrls
+	{
+		public override Types Type { get; internal set; } = Types.Cycle;
+
+		public int From { get; set; }
+		public int To { get; set; }
+
+		public int Interval { get; set; } = 1;
+
+		public string FormateString { get; set; }
+
+		public override void Build(Site site, dynamic obj)
+		{
+			Dictionary<string, object> data = new Dictionary<string, object>();
+
+			if (Extras != null)
+			{
+				foreach (var extra in Extras)
+				{
+					data.Add(extra.Key, extra.Value);
+				}
+			}
+
+			for (int i = From; i <= To; i += Interval)
+			{
+				site.AddStartRequest(new Request(string.Format(FormateString, i), 1, data)
+				{
+					PostBody = PostBody,
+					Origin = Origin,
+					Method = Method,
+					Referer = Referer
+				});
+			}
+		}
+	}
+
+	public abstract class AbstractDbPrepareStartUrls : PrepareStartUrls
 	{
 		public class Column
 		{
@@ -80,7 +117,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			public List<Formatter> Formatters { get; set; } = new List<Formatter>();
 		}
 
-		public override Types Type { get; internal set; } = Types.GeneralDb;
+		public override Types Type { get; internal set; }
 
 		public DataSource Source { get; set; } = DataSource.MySql;
 
@@ -113,108 +150,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		/// https://s.taobao.com/search?q={0},s=0;
 		/// </summary>
 		public List<string> FormateStrings { get; set; }
-
-		public override void Build(Site site, dynamic obj)
-		{
-			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
-			{
-				List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
-				string sql = GetSelectQueryString();
-				conn.Open();
-				var command = conn.CreateCommand();
-				command.CommandText = sql;
-				command.CommandType = CommandType.Text;
-
-				var reader = command.ExecuteReader();
-
-				while (reader.Read())
-				{
-					Dictionary<string, object> data = new Dictionary<string, object>();
-
-					if (Extras != null)
-					{
-						foreach (var extra in Extras)
-						{
-							data.Add(extra.Key,extra.Value);
-						}
-					}
-
-					int count = reader.FieldCount;
-					for (int i = 0; i < count; ++i)
-					{
-						string name = reader.GetName(i);
-						data.Add(name, reader.GetValue(i));
-					}
-
-					List<string> arguments = new List<string>();
-					foreach (var column in Columns)
-					{
-						string value = data[column.Name]?.ToString();
-
-						foreach (var formatter in column.Formatters)
-						{
-							value = formatter.Formate(value);
-						}
-						arguments.Add(value);
-					}
-
-					foreach (var formate in FormateStrings)
-					{
-						var argArray = arguments.Cast<object>().ToArray();
-						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-						site.AddStartRequest(new Request(tmpUrl, 0, data)
-						{
-							Method = Method,
-							Origin = Origin,
-							PostBody = GetPostBody(PostBody, data),
-							Referer = Referer
-						});
-					}
-				}
-#if NET_CORE && TEST
-				foreach (var data in datas)
-				{
-					foreach (var entry in data)
-					{
-						Console.WriteLine(entry.Key + ":" + entry.Value);
-					}
-				}
-#endif
-
-#if !NET_CORE
-				reader.Close();
-#else
-				reader.Dispose();
-#endif
-			}
-		}
-
-		public static string GetPostBody(string postBody, Dictionary<string, object> datas)
-		{
-			if (string.IsNullOrEmpty(postBody))
-			{
-				return null;
-			}
-
-			Regex regex = new Regex(@"__URLENCODE\('(\w|\d)+'\)");
-			string tmpPostBody = postBody;
-			foreach (Match match in regex.Matches(postBody))
-			{
-				string tmp = match.Value;
-				int startIndex = tmp.IndexOf("__URLENCODE('");
-				int endIndex = tmp.IndexOf("')", startIndex);
-				string arg = tmp.Substring(startIndex + 13, endIndex - startIndex - 13);
-#if !NET_CORE
-				var value = HttpUtility.UrlEncode(datas[arg].ToString());
-#else
-				var value = WebUtility.UrlEncode(datas[arg].ToString());
-#endif
-				tmpPostBody = postBody.Replace(tmp, value);
-			}
-
-			// implement more rules
-			return tmpPostBody;
-		}
 
 		protected string GetSelectQueryString()
 		{
@@ -256,45 +191,174 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 			throw new SpiderExceptoin($"Unsport Source: {Source}");
 		}
-	}
 
-	public class CyclePrepareStartUrls : PrepareStartUrls
-	{
-		public override Types Type { get; internal set; } = Types.Cycle;
-
-		public int From { get; set; }
-		public int To { get; set; }
-
-		public string FormateString { get; set; }
-
-		public override void Build(Site site, dynamic obj)
+		protected List<Dictionary<string, object>> PrepareDatas()
 		{
-			for (int i = From; i <= To; ++i)
+			List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
+			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
 			{
-				Dictionary<string, object> data = new Dictionary<string, object>();
+				string sql = GetSelectQueryString();
+				conn.Open();
+				var command = conn.CreateCommand();
+				command.CommandText = sql;
+				command.CommandType = CommandType.Text;
 
-				if (Extras != null)
+				var reader = command.ExecuteReader();
+				
+				while (reader.Read())
 				{
-					foreach (var extra in Extras)
+					Dictionary<string, object> data = new Dictionary<string, object>();
+					int count = reader.FieldCount;
+					for (int i = 0; i < count; ++i)
 					{
-						data.Add(extra.Key, extra.Value);
+						string name = reader.GetName(i);
+						data.Add(name, reader.GetValue(i));
 					}
-				}
 
-				site.AddStartRequest(new Request(string.Format(FormateString, i), 1, data)
-				{
-					PostBody = PostBody,
-					Origin = Origin,
-					Method = Method,
-					Referer = Referer
-				});
+					if (Extras != null)
+					{
+						foreach (var extra in Extras)
+						{
+							data.Add(extra.Key, extra.Value);
+						}
+					}
+					list.Add(data);
+				}
+#if !NET_CORE
+				reader.Close();
+#else
+				reader.Dispose();
+#endif
 			}
+			return list;
+		}
+
+		protected List<string> PrepareArguments(Dictionary<string, object> data)
+		{
+			List<string> arguments = new List<string>();
+			foreach (var column in Columns)
+			{
+				string value = data[column.Name]?.ToString();
+
+				foreach (var formatter in column.Formatters)
+				{
+					value = formatter.Formate(value);
+				}
+				arguments.Add(value);
+			}
+			return arguments;
 		}
 	}
 
-	public class DbCyclePrepareStartUrls : DbPrepareStartUrls
+	public class DbCommonPrepareStartUrls : AbstractDbPrepareStartUrls
 	{
-		public override Types Type { get; internal set; } = Types.DbCycle;
+		public override Types Type { get; internal set; } = Types.CommonDb;
+
+		public int From { get; set; }
+		public int To { get; set; }
+		public int Interval { get; set; } = 1;
+
+		public int PostInterval { get; set; } = 1;
+		public int PostFrom { get; set; }
+		public int PostTo { get; set; }
+
+		public override void Build(Site site, dynamic obj)
+		{
+			var datas = PrepareDatas();
+			foreach (var data in datas)
+			{
+				for (int i = From; i <= To; i += Interval)
+				{
+					var arguments = PrepareArguments(data);
+					arguments.Add(i.ToString());
+
+					for (int j = PostFrom; j <= PostTo; j += PostInterval)
+					{
+						foreach (var formate in FormateStrings)
+						{
+							string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
+							site.AddStartRequest(new Request(tmpUrl, 0, data)
+							{
+								Method = Method,
+								Origin = Origin,
+								PostBody = GetPostBody(PostBody, data, j),
+								Referer = Referer
+							});
+						}
+					}
+				}
+			}
+		}
+
+		private string GetPostBody(string postBody, Dictionary<string, object> data, int i)
+		{
+			if (!string.IsNullOrEmpty(postBody))
+			{
+				var arguments = PrepareArguments(data);
+				arguments.Add(i.ToString());
+				string s = string.Format(postBody, arguments.Cast<object>().ToArray());
+				return s;
+			}
+			return null;
+		}
+	}
+
+	public class DbPrepareStartUrls : AbstractDbPrepareStartUrls
+	{
+		public override Types Type { get; internal set; } = Types.GeneralDb;
+
+		public override void Build(Site site, dynamic obj)
+		{
+			var datas = PrepareDatas();
+			foreach (var data in datas)
+			{
+				var arguments = PrepareArguments(data);
+
+				foreach (var formate in FormateStrings)
+				{
+					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
+					site.AddStartRequest(new Request(tmpUrl, 0, data)
+					{
+						Method = Method,
+						Origin = Origin,
+						PostBody = GetPostBody(PostBody, data),
+						Referer = Referer
+					});
+				}
+			}
+		}
+
+		public static string GetPostBody(string postBody, Dictionary<string, object> datas)
+		{
+			if (string.IsNullOrEmpty(postBody))
+			{
+				return null;
+			}
+
+			Regex regex = new Regex(@"__URLENCODE\('(\w|\d)+'\)");
+			string tmpPostBody = postBody;
+			foreach (Match match in regex.Matches(postBody))
+			{
+				string tmp = match.Value;
+				int startIndex = tmp.IndexOf("__URLENCODE('");
+				int endIndex = tmp.IndexOf("')", startIndex);
+				string arg = tmp.Substring(startIndex + 13, endIndex - startIndex - 13);
+#if !NET_CORE
+				var value = HttpUtility.UrlEncode(datas[arg].ToString());
+#else
+				var value = WebUtility.UrlEncode(datas[arg].ToString());
+#endif
+				tmpPostBody = postBody.Replace(tmp, value);
+			}
+
+			// implement more rules
+			return tmpPostBody;
+		}
+	}
+
+	public class DbListPrepareStartUrls : AbstractDbPrepareStartUrls
+	{
+		public override Types Type { get; internal set; } = Types.GeneralDb;
 
 		public int Interval { get; set; }
 		public string ColumnSeparator { get; set; }
@@ -304,69 +368,43 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override void Build(Site site, dynamic obj)
 		{
-			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
+			int interval = 0;
+			StringBuilder formatBuilder = new StringBuilder();
+
+			var datas = PrepareDatas();
+
+			foreach (var data in datas)
 			{
-				//List<Dictionary<string, object>> datas = new List<Dictionary<string, object>>();
-				string sql = GetSelectQueryString();
-				conn.Open();
-				var command = conn.CreateCommand();
-				command.CommandText = sql;
-				command.CommandType = CommandType.Text;
-
-				var reader = command.ExecuteReader();
-				int interval = 0;
-				StringBuilder formatBuilder = new StringBuilder();
-				while (reader.Read())
+				if (interval == Interval)
 				{
-					Dictionary<string, object> data = new Dictionary<string, object>();
-
-					if (Extras != null)
+					foreach (var formate in FormateStrings)
 					{
-						foreach (var extra in Extras)
+						string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - (string.IsNullOrEmpty(RowSeparator) ? 0 : RowSeparator.Length)));
+						site.AddStartRequest(new Request(tmpUrl, 0, null)
 						{
-							data.Add(extra.Key, extra.Value);
-						}
+							Method = Method,
+							Origin = Origin,
+							Referer = Referer
+						});
 					}
 
-					int count = reader.FieldCount;
-					for (int i = 0; i < count; ++i)
-					{
-						string name = reader.GetName(i);
-						data.Add(name, reader.GetValue(i));
-					}
-
-					if (interval == Interval)
-					{
-						foreach (var formate in FormateStrings)
-						{
-							string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - (string.IsNullOrEmpty(RowSeparator) ? 0 : RowSeparator.Length)));
-							site.AddStartRequest(new Request(tmpUrl, 0, null)
-							{
-								Method = Method,
-								Origin = Origin,
-								Referer = Referer
-							});
-						}
-
-						interval = 0;
-						formatBuilder = new StringBuilder();
-					}
-
-					Dictionary<string, object> tmp = data;
-
-					StringBuilder argumentsBuilder = new StringBuilder();
-					foreach (var column in Columns)
-					{
-						string value = tmp[column.Name]?.ToString();
-
-						value = column.Formatters.Aggregate(value, (current, formatter) => formatter.Formate(current));
-
-						argumentsBuilder.Append(value).Append(ColumnSeparator);
-					}
-					formatBuilder.Append(argumentsBuilder.ToString(0, argumentsBuilder.Length - (string.IsNullOrEmpty(ColumnSeparator) ? 0 : ColumnSeparator.Length))).Append(RowSeparator);
-					interval++;
-					//datas.Add(values);
+					interval = 0;
+					formatBuilder = new StringBuilder();
 				}
+
+				Dictionary<string, object> tmp = data;
+
+				StringBuilder argumentsBuilder = new StringBuilder();
+				foreach (var column in Columns)
+				{
+					string value = tmp[column.Name]?.ToString();
+
+					value = column.Formatters.Aggregate(value, (current, formatter) => formatter.Formate(current));
+
+					argumentsBuilder.Append(value).Append(ColumnSeparator);
+				}
+				formatBuilder.Append(argumentsBuilder.ToString(0, argumentsBuilder.Length - (string.IsNullOrEmpty(ColumnSeparator) ? 0 : ColumnSeparator.Length))).Append(RowSeparator);
+				interval++;
 
 				if (interval != 0)
 				{
@@ -380,16 +418,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 							Referer = Referer
 						});
 					}
-
-					interval = 0;
-					formatBuilder = new StringBuilder();
 				}
-
-#if !NET_CORE
-				reader.Close();
-#else
-				reader.Dispose();
-#endif
 			}
 		}
 	}
@@ -401,7 +430,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		/// <summary>
 		/// 用于拼接Url所需要的列
 		/// </summary>
-		public List<DbPrepareStartUrls.Column> Columns { get; set; } = new List<DbPrepareStartUrls.Column>();
+		public List<AbstractDbPrepareStartUrls.Column> Columns { get; set; } = new List<AbstractDbPrepareStartUrls.Column>();
 
 		/// <summary>
 		/// 拼接Url的方式, 会把Columns对应列的数据传入
@@ -451,4 +480,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 		}
 	}
+
+
 }
