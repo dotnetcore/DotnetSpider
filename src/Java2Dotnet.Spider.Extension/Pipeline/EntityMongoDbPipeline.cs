@@ -13,9 +13,9 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	{
 		private readonly IMongoCollection<BsonDocument> _collection;
 
-		public EntityMongoDbPipeline(Schema schema, string host, int port, string password)
+		public EntityMongoDbPipeline(Schema schema, string connectString)
 		{
-			MongoClient client = new MongoClient(host);
+			MongoClient client = new MongoClient(connectString);
 			var db = client.GetDatabase(schema.Database);
 
 			_collection = db.GetCollection<BsonDocument>(schema.TableName);

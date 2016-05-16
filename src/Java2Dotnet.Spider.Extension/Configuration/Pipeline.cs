@@ -24,20 +24,19 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public abstract IEntityPipeline GetPipeline(Schema schema, JObject entityDefine);
 	}
 
+#if !NET_CORE
 	public class MongoDbPipeline : Pipeline
 	{
 		public override Types Type { get; internal set; } = Types.MongoDb;
 
-		public string Host { get; set; }
-		public int Port { get; set; }
-		public string Password { get; set; }
+		public string ConnectString { get; set; }
 
 		public override IEntityPipeline GetPipeline(Schema schema, JObject entityDefine)
 		{
-			//return new EntityMongoDbPipeline(schema, Host, Port, Password);
-			throw new SpiderExceptoin("UNSPORT");
+			return new EntityMongoDbPipeline(schema, ConnectString);
 		}
 	}
+#endif
 
 	public class MysqlFilePipeline : Pipeline
 	{
@@ -66,7 +65,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	public class ConslePipeline : Pipeline
 	{
 		public override Types Type { get; internal set; } = Types.Console;
- 
+
 		public override IEntityPipeline GetPipeline(Schema schema, JObject entityDefine)
 		{
 			return new EntityConsolePipeline();

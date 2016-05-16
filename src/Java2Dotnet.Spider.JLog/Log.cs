@@ -19,7 +19,7 @@ namespace Java2Dotnet.Spider.JLog
 
 		public override string ToString()
 		{
-			return $"[{Type}] {Time} {Machine}-{UserId}-{TaskGroup} {Message}";
+			return $"[{Type}] {Time} [{Machine}][{UserId}][{TaskGroup}] {Message}";
 		}
 	}
 

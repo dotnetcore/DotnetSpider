@@ -71,7 +71,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 								}
 								else
 								{
-									if (dataTypeToken.Type != JTokenType.String && spiderContext.Pipeline.SelectToken("$.Type").ToString() != Pipeline.Types.MongoDb.ToString())
+									if (dataTypeToken.Type != JTokenType.String && spiderContext.Pipeline.SelectToken("$.Type").ToString() != "1")
 									{
 										if (correct)
 										{

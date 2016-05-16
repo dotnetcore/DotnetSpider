@@ -27,6 +27,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				ThreadNum = 10,
 				Site = new Site
 				{
+					Headers=new Dictionary<string, string> { }
 				},
 				StartUrls = new Dictionary<string, Dictionary<string, object>>
 				{

@@ -33,6 +33,7 @@ namespace Java2Dotnet.Spider.Test.Example
 
 		public class HomePage : ISpiderEntity
 		{
+			//jQuery(".yk-rank div:1")
 			[PropertyExtractBy(Expression = "<a.*?т╟вс</a>", Type = ExtractType.Regex, Argument = 1)]
 			public string Category { get; set; }
 		}
