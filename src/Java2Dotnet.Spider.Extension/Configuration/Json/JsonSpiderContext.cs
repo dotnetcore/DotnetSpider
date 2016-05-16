@@ -231,28 +231,24 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				{
 					case Configuration.PrepareStartUrls.Types.GeneralDb:
 						{
-							DbPrepareStartUrls generalDbPrepareStartUrls = new DbPrepareStartUrls();
-							generalDbPrepareStartUrls.ConnectString = jobject.SelectToken("$.ConnectString")?.ToString();
-							generalDbPrepareStartUrls.Filters = jobject.SelectToken("$.Filters")?.ToObject<List<string>>();
-							generalDbPrepareStartUrls.FormateStrings = jobject.SelectToken("$.FormateStrings")?.ToObject<List<string>>();
-							var limit = jobject.SelectToken("$.Limit");
-							generalDbPrepareStartUrls.Limit = limit?.ToObject<int>() ?? int.MaxValue;
-							generalDbPrepareStartUrls.TableName = jobject.SelectToken("$.TableName")?.ToString();
-							generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<DataSource>();
-							foreach (var column in jobject.SelectTokens("$.Columns[*]"))
-							{
-								var c = new DbPrepareStartUrls.Column()
-								{
-									Name = column.SelectToken("$.Name").ToString()
-								};
-								foreach (var format in column.SelectTokens("$.Formatters[*]"))
-								{
-									var name = format.SelectToken("$.Name").ToString();
-									var formatterType = FormatterFactory.GetFormatterType(name);
-									c.Formatters.Add((Formatter)format.ToObject(formatterType));
-								}
-								generalDbPrepareStartUrls.Columns.Add(c);
-							}
+							var generalDbPrepareStartUrls = new DbPrepareStartUrls();
+							SetDbPrepareStartUrls(generalDbPrepareStartUrls, jobject);
+
+							list.Add(generalDbPrepareStartUrls);
+							break;
+						}
+					case Configuration.PrepareStartUrls.Types.DbList:
+						{
+							var generalDbPrepareStartUrls = new DbListPrepareStartUrls();
+							SetDbPrepareStartUrls(generalDbPrepareStartUrls, jobject);
+
+							list.Add(generalDbPrepareStartUrls);
+							break;
+						}
+					case Configuration.PrepareStartUrls.Types.CommonDb:
+						{
+							var generalDbPrepareStartUrls = new DbCommonPrepareStartUrls();
+							SetDbPrepareStartUrls(generalDbPrepareStartUrls, jobject);
 
 							list.Add(generalDbPrepareStartUrls);
 							break;
@@ -262,10 +258,40 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 							list.Add(jobject.ToObject<CyclePrepareStartUrls>());
 							break;
 						}
+					case Configuration.PrepareStartUrls.Types.LinkSpider:
+						{
+							list.Add(jobject.ToObject<LinkSpiderPrepareStartUrls>());
+							break;
+						}
 				}
 			}
 
 			return list;
+		}
+
+		private void SetDbPrepareStartUrls(AbstractDbPrepareStartUrls generalDbPrepareStartUrls, JObject jobject)
+		{
+			generalDbPrepareStartUrls.ConnectString = jobject.SelectToken("$.ConnectString")?.ToString();
+			generalDbPrepareStartUrls.Filters = jobject.SelectToken("$.Filters")?.ToObject<List<string>>();
+			generalDbPrepareStartUrls.FormateStrings = jobject.SelectToken("$.FormateStrings")?.ToObject<List<string>>();
+			var limit = jobject.SelectToken("$.Limit");
+			generalDbPrepareStartUrls.Limit = limit?.ToObject<int>() ?? int.MaxValue;
+			generalDbPrepareStartUrls.TableName = jobject.SelectToken("$.TableName")?.ToString();
+			generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<DataSource>();
+			foreach (var column in jobject.SelectTokens("$.Columns[*]"))
+			{
+				var c = new AbstractDbPrepareStartUrls.Column()
+				{
+					Name = column.SelectToken("$.Name").ToString()
+				};
+				foreach (var format in column.SelectTokens("$.Formatters[*]"))
+				{
+					var name = format.SelectToken("$.Name").ToString();
+					var formatterType = FormatterFactory.GetFormatterType(name);
+					c.Formatters.Add((Formatter)format.ToObject(formatterType));
+				}
+				generalDbPrepareStartUrls.Columns.Add(c);
+			}
 		}
 
 		private Pipeline GetPipepine(JObject pipeline)
