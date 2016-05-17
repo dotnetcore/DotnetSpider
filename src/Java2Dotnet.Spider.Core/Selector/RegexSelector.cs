@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -38,13 +39,50 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public dynamic Select(dynamic text)
 		{
-			var tmp = text is HtmlAgilityPack.HtmlNode ? (HtmlAgilityPack.HtmlNode)text.InnerHtml: text;
+			if (text == null)
+			{
+				return null;
+			}
+
+			var type = (Type)text.GetType();
+			string tmp = "";
+
+			if (typeof(IEnumerable).IsAssignableFrom(type))
+			{
+				foreach (var l in (IEnumerable)text)
+				{
+					tmp += l.ToString();
+				}
+			}
+			else
+			{
+				tmp = text.ToSting();
+			}
 			return SelectGroup(tmp).Get(_group);
 		}
 
 		public List<dynamic> SelectList(dynamic text)
 		{
-			var tmp = text is HtmlAgilityPack.HtmlNode ? (HtmlAgilityPack.HtmlNode)text.InnerHtml : text;
+			if (text == null)
+			{
+				return null;
+			}
+
+			var type = (Type)text.GetType();
+			string tmp = "";
+
+			if (typeof(IEnumerable).IsAssignableFrom(type))
+			{
+				foreach (var l in (IEnumerable)text)
+				{
+					tmp += l.ToString();
+				}
+			}
+			else
+			{
+				tmp = text.ToSting();
+			}
+
 			IList<RegexResult> results = SelectGroupList(tmp);
 			return results.Select(result => result.Get(_group)).Cast<dynamic>().ToList();
 		}
