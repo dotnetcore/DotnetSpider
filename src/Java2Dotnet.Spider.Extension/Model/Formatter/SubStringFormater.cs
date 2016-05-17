@@ -14,6 +14,11 @@ namespace Java2Dotnet.Spider.Extension.Model.Formatter
 
 		public override string Formate(string value)
 		{
+			if (string.IsNullOrEmpty(value))
+			{
+				return null;
+			}
+
 			int begin = value.IndexOf(StartString, StringComparison.Ordinal);
 			int length;
 			if (!string.IsNullOrEmpty(EndString))
