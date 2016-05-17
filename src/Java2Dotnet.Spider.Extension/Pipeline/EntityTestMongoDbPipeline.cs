@@ -9,16 +9,18 @@ using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
-	public class EntityMongoDbPipeline : IEntityPipeline
+	public class EntityTestMongoDbPipeline : IEntityPipeline
 	{
 		private readonly IMongoCollection<BsonDocument> _collection;
+		private readonly string _id;
 
-		public EntityMongoDbPipeline(Schema schema, string connectString)
+		public EntityTestMongoDbPipeline(string id, Schema schema, string connectString)
 		{
 			MongoClient client = new MongoClient(connectString);
-			var db = client.GetDatabase(schema.Database);
+			var db = client.GetDatabase("test_data");
 
-			_collection = db.GetCollection<BsonDocument>(schema.TableName);
+			_collection = db.GetCollection<BsonDocument>("testData");
+			_id = id;
 		}
 
 		public void Initialize()
@@ -30,7 +32,11 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			List<BsonDocument> reslut = new List<BsonDocument>();
 			foreach (var data in datas)
 			{
-				BsonDocument item = BsonDocument.Parse(data.ToString());
+				JObject obj = new JObject();
+
+				obj.Add("taskId", _id);
+				obj.Add("data", data);
+				BsonDocument item = BsonDocument.Parse(obj.ToString());
 
 				reslut.Add(item);
 			}

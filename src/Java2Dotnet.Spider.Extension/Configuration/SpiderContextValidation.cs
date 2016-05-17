@@ -71,7 +71,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 								}
 								else
 								{
-									if (dataTypeToken.Type != JTokenType.String && spiderContext.Pipeline.SelectToken("$.Type").ToString() != "1")
+									if (dataTypeToken.Type != JTokenType.String && !(spiderContext.Pipeline.SelectToken("$.Type").ToString() == "2" || spiderContext.Pipeline.SelectToken("$.Type").ToString() == "3"))
 									{
 										if (correct)
 										{

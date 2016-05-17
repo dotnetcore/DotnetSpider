@@ -32,9 +32,9 @@ namespace Java2Dotnet.Spider.Extension
 			}
 		}
 
-		protected override Core.Spider GenerateSpider(IScheduler scheduler)
+		protected override Core.Spider GenerateSpider(IScheduler scheduler, bool isTest)
 		{
-			var spider = base.GenerateSpider(scheduler);
+			var spider = base.GenerateSpider(scheduler, isTest);
 
 			foreach (var entity in SpiderContext.Entities)
 			{

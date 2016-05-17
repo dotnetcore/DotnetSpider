@@ -10,7 +10,6 @@ namespace Java2Dotnet.Spider.Core
 	/// </summary>
 	public class Site
 	{
-		private readonly List<Request> _startRequests = new List<Request>();
 		private ProxyPool _httpProxyPool = new ProxyPool();
 		private string _domain;
 		private Encoding _encoding = Encoding.UTF8;
@@ -97,7 +96,7 @@ namespace Java2Dotnet.Spider.Core
 		/// </summary>
 		public HashSet<int> AcceptStatCode { get; set; } = new HashSet<int> { 200 };
 
-		public List<Request> StartRequests => _startRequests;
+		public List<Request> StartRequests { get; set; } = new List<Request>();
 
 		/// <summary>
 		/// Set the interval between the processing of two pages. 
@@ -133,7 +132,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			lock (this)
 			{
-				_startRequests.Clear();
+				StartRequests.Clear();
 				GC.Collect();
 			}
 		}
@@ -188,7 +187,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			lock (this)
 			{
-				_startRequests.Add(startRequest);
+				StartRequests.Add(startRequest);
 				if (Domain == null)
 				{
 					Domain = startRequest.Url.Host;
@@ -220,7 +219,7 @@ namespace Java2Dotnet.Spider.Core
 					", userAgent='" + UserAgent + '\'' +
 					", cookies=" + Cookie +
 					", charset='" + Encoding + '\'' +
-					", startRequests=" + _startRequests +
+					", startRequests=" + StartRequests +
 					", sleepTime=" + SleepTime +
 					", retryTimes=" + RetryTimes +
 					", cycleRetryTimes=" + CycleRetryTimes +

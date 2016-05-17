@@ -312,12 +312,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 
 			switch (pipelineType)
 			{
-				#if !NET_CORE
+#if !NET_CORE
 				case Configuration.Pipeline.Types.MongoDb:
 					{
 						return pipeline.ToObject<MongoDbPipeline>();
 					}
-					#endif
+#endif
 				case Configuration.Pipeline.Types.MySql:
 					{
 						return pipeline.ToObject<MysqlPipeline>();
@@ -325,6 +325,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				case Configuration.Pipeline.Types.MySqlFile:
 					{
 						return pipeline.ToObject<MysqlFilePipeline>();
+					}
+				case Configuration.Pipeline.Types.TestMongoDb:
+					{
+						return pipeline.ToObject<TestMongoDbPipeline>();
 					}
 			}
 

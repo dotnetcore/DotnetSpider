@@ -212,7 +212,7 @@ namespace Java2Dotnet.Spider.Extension
 				case Configuration.Scheduler.Types.Queue:
 					{
 						PrepareSite();
-						var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler());
+						var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler(), args != null && args.Contains("test"));
 						spider.InitComponent();
 						return spider;
 
@@ -275,12 +275,19 @@ namespace Java2Dotnet.Spider.Extension
 
 							Logger.Info("Start creating Spider...");
 
-							var spider = GenerateSpider(scheduler);
+							var spider = GenerateSpider(scheduler, args != null && args.Contains("test"));
 
 							spider.SaveStatus = true;
 							SpiderMonitor.Default.Register(spider);
 
 							Logger.Info("Start init component...");
+
+							if (args != null && args.Contains("test") && spider.Site.StartRequests.Count > 0)
+							{
+								spider.Site.StartRequests = new List<Request> { spider.Site.StartRequests[0] };
+
+							}
+
 							spider.InitComponent();
 
 							if (needInitStartRequest)
@@ -353,7 +360,7 @@ namespace Java2Dotnet.Spider.Extension
 			}
 		}
 
-		protected virtual Core.Spider GenerateSpider(IScheduler scheduler)
+		protected virtual Core.Spider GenerateSpider(IScheduler scheduler, bool isTest)
 		{
 			EntityProcessor processor = new EntityProcessor(SpiderContext);
 			foreach (var entity in SpiderContext.Entities)
