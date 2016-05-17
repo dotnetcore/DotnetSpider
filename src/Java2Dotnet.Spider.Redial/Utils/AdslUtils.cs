@@ -48,7 +48,7 @@ namespace Java2Dotnet.Spider.Redial.Utils
 		//  public string szPhonebookPath;
 		//#endif
 	}
- 
+
 
 	public enum DelCacheType //要删除的类型。
 	{
@@ -118,7 +118,6 @@ namespace Java2Dotnet.Spider.Redial.Utils
 		{
 			_mConnected = true;
 
-		//RasRedialer lpras = new RasRedialer();
 			Rasconn lprasConn = new Rasconn();
 
 			lprasConn.DwSize = Marshal.SizeOf(typeof(Rasconn));
