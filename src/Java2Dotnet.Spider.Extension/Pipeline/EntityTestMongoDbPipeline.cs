@@ -19,7 +19,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			MongoClient client = new MongoClient(connectString);
 			var db = client.GetDatabase("test_data");
 
-			_collection = db.GetCollection<BsonDocument>("testData");
+			_collection = db.GetCollection<BsonDocument>("data");
 			_id = id;
 		}
 
