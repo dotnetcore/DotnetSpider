@@ -6,6 +6,7 @@ using Java2Dotnet.Spider.Extension.ORM;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
@@ -30,15 +31,15 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		public void Process(List<JObject> datas, ISpider spider)
 		{
 			List<BsonDocument> reslut = new List<BsonDocument>();
+			var time = DateTime.Now;
 			foreach (var data in datas)
 			{
-				JObject obj = new JObject();
-
-				obj.Add("taskId", _id);
-				obj.Add("data", data);
-				BsonDocument item = BsonDocument.Parse(obj.ToString());
-
-				reslut.Add(item);
+				reslut.Add(new BsonDocument
+				{
+					{"TaskId",_id},
+					{"Timestamp",time},
+					{"Data", data.ToString()}
+				});
 			}
 			_collection.InsertMany(reslut);
 		}

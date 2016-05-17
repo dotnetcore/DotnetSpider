@@ -17,6 +17,7 @@ using Java2Dotnet.Spider.Common;
 using System.Text.RegularExpressions;
 using Dapper;
 using System.Linq;
+using Java2Dotnet.Spider.Extension.Configuration.Json;
 
 namespace Java2Dotnet.Spider.Test
 {
@@ -24,9 +25,10 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			RegexTestSpider spiderBuilder = new RegexTestSpider();
+			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			var context = spiderBuilder.GetBuilder().Context;
-			ContextSpider spider = new ContextSpider(context);
+			string json = JsonConvert.SerializeObject(context);
+			ContextSpider spider = new ContextSpider(JsonConvert.DeserializeObject<JsonSpiderContext>(json).ToRuntimeContext());
 			spider.Run();
 
 			//SpiderExample.Run();

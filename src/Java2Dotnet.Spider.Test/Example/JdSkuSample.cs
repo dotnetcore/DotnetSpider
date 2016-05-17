@@ -24,10 +24,14 @@ namespace Java2Dotnet.Spider.Test.Example
 				TaskGroup = "JD sku/store test",
 				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
 				CachedSize = 1,
-				ThreadNum = 10,
-				Site = new Site
+				ThreadNum = 1,
+				TargetUrlExtractInfos = new List<Extension.Configuration.TargetUrlExtractor>
 				{
-					Headers=new Dictionary<string, string> { }
+					new Extension.Configuration.TargetUrlExtractor
+					{
+						Region =new Extension.Configuration.Selector {  Type= ExtractType.XPath, Expression="//span[@class=\"p-num\"]"},
+						Patterns=new List<string> { @"&page=[0-9]+&" }
+					}
 				},
 				StartUrls = new Dictionary<string, Dictionary<string, object>>
 				{
@@ -38,7 +42,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				PrepareStartUrls = new List<PrepareStartUrls>{ new DbPrepareStartUrls()
 				{
 					Source = DataSource.MySql,
-					ConnectString = "Database='test';Data Source= myRedis;User ID=root;Password=1qazZAQ!123456;Port=4306",
+					ConnectString = "Database='test';Data Source= ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306",
 					TableName = "jd.category",
 					Columns = new List<DbPrepareStartUrls.Column> { new DbPrepareStartUrls.Column { Name = "url", Formatters=new List<Formatter> { new ReplaceFormatter{ OldValue= ".html",NewValue="" } } } },
 					FormateStrings = new List<string> { "{0}&page=1&JL=6_0_0" }
@@ -51,10 +55,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				},
 				Pipeline = new MysqlPipeline
 				{
-					ConnectString = "Database='test';Data Source=myRedis;User ID=root;Password=1qazZAQ!123456;Port=4306"
-				},
-				Downloader = new HttpDownloader()
-				{
+					ConnectString = "Database='test';Data Source=ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306"
 				}
 			}, typeof(Product));
 		}
@@ -63,7 +64,7 @@ namespace Java2Dotnet.Spider.Test.Example
 		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
 		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
 		public class Product : ISpiderEntity
-		{ 
+		{
 			[StoredAs("category", DataType.String, 20)]
 			[PropertyExtractBy(Expression = "name", Type = ExtractType.Enviroment)]
 			public string CategoryName { get; set; }

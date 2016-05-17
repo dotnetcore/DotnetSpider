@@ -175,13 +175,13 @@ namespace Java2Dotnet.Spider.Core
 		/// <param name="emptySleepTime"></param>
 		public void SetEmptySleepTime(int emptySleepTime)
 		{
-			if (emptySleepTime >= 10000)
+			if (emptySleepTime >= 1000)
 			{
 				_waitCountLimit = emptySleepTime / WaitInterval;
 			}
 			else
 			{
-				throw new SpiderExceptoin("Sleep time should be large than 10000.");
+				throw new SpiderExceptoin("Sleep time should be large than 1000.");
 			}
 		}
 

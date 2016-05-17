@@ -226,8 +226,6 @@ namespace Java2Dotnet.Spider.Extension
 						{
 							if (args.Contains("rerun"))
 							{
-								Logger.Info($"Starting execute command: rerun");
-
 								if (redis != null)
 								{
 									redis.KeyDelete(key);
@@ -240,8 +238,6 @@ namespace Java2Dotnet.Spider.Extension
 								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
 								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
 								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetItemKey(Name));
-
-								Logger.Info($"Execute command: rerun finished.");
 							}
 							if (args.Contains("noconsole"))
 							{
@@ -363,6 +359,7 @@ namespace Java2Dotnet.Spider.Extension
 		protected virtual Core.Spider GenerateSpider(IScheduler scheduler, bool isTest)
 		{
 			EntityProcessor processor = new EntityProcessor(SpiderContext);
+			processor.TargetUrlExtractInfos = SpiderContext.TargetUrlExtractInfos.Select(t => t.GetTargetUrlExtractInfo()).ToList();
 			foreach (var entity in SpiderContext.Entities)
 			{
 				processor.AddEntity(entity);
