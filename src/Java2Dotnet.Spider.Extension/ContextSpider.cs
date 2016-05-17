@@ -153,8 +153,6 @@ namespace Java2Dotnet.Spider.Extension
 
 				if (redis != null)
 				{
-					Logger.Info($"Lock: {key} to keep only one validate process.");
-
 					while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 					{
 						Thread.Sleep(1000);
@@ -199,8 +197,6 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			finally
 			{
-				Logger.Info("Release locker.");
-
 				redis?.LockRelease(key, 0);
 			}
 		}
@@ -208,8 +204,6 @@ namespace Java2Dotnet.Spider.Extension
 		private Core.Spider PrepareSpider(params string[] args)
 		{
 			RedisServer redis = GetManageRedisServer();
-
-			Logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}");
 
 			var schedulerType = SpiderContext.Scheduler.Type;
 
@@ -260,7 +254,6 @@ namespace Java2Dotnet.Spider.Extension
 						{
 							if (redis != null)
 							{
-								Logger.Info($"Lock: {key} to keep only one prepare process.");
 								while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 								{
 									Thread.Sleep(1000);
@@ -272,8 +265,6 @@ namespace Java2Dotnet.Spider.Extension
 
 							if (needInitStartRequest)
 							{
-								Logger.Info("Preparing site...");
-
 								PrepareSite();
 							}
 							else
@@ -286,21 +277,16 @@ namespace Java2Dotnet.Spider.Extension
 
 							var spider = GenerateSpider(scheduler);
 
-							Logger.Info("Creat spider finished.");
-
 							spider.SaveStatus = true;
 							SpiderMonitor.Default.Register(spider);
 
 							Logger.Info("Start init component...");
 							spider.InitComponent();
-							Logger.Info("Init component finished.");
 
 							if (needInitStartRequest)
 							{
 								redis?.HashSet(InitStatusSetName, Name, "init finished");
 							}
-
-							Logger.Info("Creating Spider finished.");
 
 							return spider;
 						}
@@ -311,7 +297,6 @@ namespace Java2Dotnet.Spider.Extension
 						}
 						finally
 						{
-							Logger.Info("Release locker.");
 							try
 							{
 								redis?.LockRelease(key, 0);
