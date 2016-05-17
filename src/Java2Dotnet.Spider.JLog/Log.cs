@@ -225,6 +225,7 @@ namespace Java2Dotnet.Spider.JLog
 			lock (WriteToLogFileLocker)
 			{
 				Writter.WriteLine(log.ToString());
+				Writter.Flush();
 			}
 		}
 

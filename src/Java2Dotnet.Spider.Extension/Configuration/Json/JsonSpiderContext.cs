@@ -310,10 +310,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 
 			switch (pipelineType)
 			{
+				#if !NET_CORE
 				case Configuration.Pipeline.Types.MongoDb:
 					{
 						return pipeline.ToObject<MongoDbPipeline>();
 					}
+					#endif
 				case Configuration.Pipeline.Types.MySql:
 					{
 						return pipeline.ToObject<MysqlPipeline>();
