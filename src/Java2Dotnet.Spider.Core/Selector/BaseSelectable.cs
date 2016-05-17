@@ -68,7 +68,24 @@ namespace Java2Dotnet.Spider.Core.Selector
 				}
 			}
 
-			return Elements.Select(selectedNode => selectedNode is HtmlNode ? Elements[0].InnerHtml : selectedNode.ToString()).ToList();
+			return Elements.Select((selectedNode) =>
+			{
+				if (selectedNode is HtmlNode)
+				{
+					if (!isPlainText)
+					{
+						return ((HtmlNode)selectedNode).InnerHtml;
+					}
+					else
+					{
+						return ((HtmlNode)selectedNode).InnerText;
+					}
+				}
+				else
+				{
+					return selectedNode.ToString();
+				}
+			}).ToList();
 		}
 
 		public abstract ISelectable Select(ISelector selector);

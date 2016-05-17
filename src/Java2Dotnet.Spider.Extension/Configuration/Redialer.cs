@@ -15,8 +15,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public abstract Types Type { get; internal set; }
 
 		public abstract IRedialer GetRedialer();
-
-		public string RedisRedialManangeServer { get; set; }
 	}
 
 	public class AdslRedialer : Redialer

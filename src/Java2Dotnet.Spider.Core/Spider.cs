@@ -30,6 +30,7 @@ namespace Java2Dotnet.Spider.Core
 		public int Deep { get; set; } = int.MaxValue;
 		public AutomicLong FinishedPageCount { get; set; } = new AutomicLong(0);
 		public bool SpawnUrl { get; set; } = true;
+		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public DateTime StartTime { get; private set; }
 		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		public Site Site { get; private set; }
@@ -669,15 +670,13 @@ namespace Java2Dotnet.Spider.Core
 			//watch.Stop();
 			//Logger.Info("process cost time:" + watch.ElapsedMilliseconds);
 
-			if (page.MissTargetUrls)
+			if (!page.MissTargetUrls)
 			{
-				//Logger.Info("Stoper trigger worked on this page.");
+				if(!(SkipWhenResultIsEmpty&& page.ResultItems.IsSkip))
+				{
+					ExtractAndAddRequests(page, SpawnUrl);
+				}
 			}
-			else
-			{
-				ExtractAndAddRequests(page, SpawnUrl);
-			}
-
 #if TEST
 			sw.Reset();
 			sw.Start();

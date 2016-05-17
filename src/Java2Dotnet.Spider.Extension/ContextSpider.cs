@@ -391,7 +391,7 @@ namespace Java2Dotnet.Spider.Extension
 			spider.SetThreadNum(SpiderContext.ThreadNum);
 			spider.Deep = SpiderContext.Deep;
 			spider.SetDownloader(SpiderContext.Downloader.GetDownloader());
-
+			spider.SkipWhenResultIsEmpty = SpiderContext.SkipWhenResultIsEmpty;
 			if (SpiderContext.PageHandlers != null)
 			{
 				spider.PageHandlers = new List<Action<Page>>();

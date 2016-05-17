@@ -14,6 +14,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		public int ThreadNum { get; set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
 		public int EmptySleepTime { get; set; } = 15000;
+		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public int CachedSize { get; set; } = 1;
 		public JObject Scheduler { get; set; }
 		public JObject Downloader { get; set; }
@@ -40,6 +41,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.Downloader = GetDownloader(Downloader);
 			context.EmptySleepTime = EmptySleepTime;
 			context.Entities = Entities;
+			context.SkipWhenResultIsEmpty = SkipWhenResultIsEmpty;
 			context.NetworkValidater = GetNetworkValidater(NetworkValidater);
 			context.Pipeline = GetPipepine(Pipeline);
 			context.PrepareStartUrls = GetPrepareStartUrls(PrepareStartUrls);
