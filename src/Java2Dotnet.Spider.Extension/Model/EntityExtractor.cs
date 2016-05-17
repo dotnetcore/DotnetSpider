@@ -171,8 +171,8 @@ namespace Java2Dotnet.Spider.Extension.Model
 				var multiToken = field.SelectToken("$.Multi");
 				bool isMulti = multiToken?.ToObject<bool>() ?? false;
 
-				var plainTextToken = field.SelectToken("$.IsPlainText");
-				bool isPlainText = plainTextToken?.ToObject<bool>() ?? false;
+				var optionToken = field.SelectToken("$.Option");
+				var option = optionToken?.ToObject<PropertyExtractBy.ValueOption>() ?? PropertyExtractBy.ValueOption.None;
 
 				string propertyName = field.SelectToken("$.Name").ToString();
 
@@ -195,30 +195,44 @@ namespace Java2Dotnet.Spider.Extension.Model
 					{
 						if (isMulti)
 						{
-							var propertyValues = item.SelectList(selector).GetValue();
-							var countToken = _entityDefine.SelectToken("$.Count");
-							if (countToken != null)
+							var propertyValues = item.SelectList(selector).GetValue(option == PropertyExtractBy.ValueOption.PlainText);
+							if (option == PropertyExtractBy.ValueOption.Count)
 							{
-								int count = countToken.ToObject<int>();
-								propertyValues = propertyValues.Take(count).ToList();
+								dataItem.Add(propertyName, propertyValues.Count);
 							}
-							List<string> results = new List<string>();
-							foreach (var propertyValue in propertyValues)
+							else
 							{
-								string tmp = propertyValue;
-								foreach (var formatter in formatters)
+								var countToken = _entityDefine.SelectToken("$.Count");
+								if (countToken != null)
 								{
-									tmp = formatter.Formate(tmp);
+									int count = countToken.ToObject<int>();
+									propertyValues = propertyValues.Take(count).ToList();
 								}
-								results.Add(tmp);
+								List<string> results = new List<string>();
+								foreach (var propertyValue in propertyValues)
+								{
+									string tmp = propertyValue;
+									foreach (var formatter in formatters)
+									{
+										tmp = formatter.Formate(tmp);
+									}
+									results.Add(tmp);
+								}
+								dataItem.Add(propertyName, new JArray(results));
 							}
-							dataItem.Add(propertyName, new JArray(results));
 						}
 						else
 						{
-							tmpValue = item.Select(selector)?.GetValue(isPlainText);
-							tmpValue = formatters.Aggregate(tmpValue, (current, formatter) => formatter.Formate(current));
-							dataItem.Add(propertyName, tmpValue);
+							tmpValue = item.Select(selector)?.GetValue(option == PropertyExtractBy.ValueOption.PlainText);
+							if (option == PropertyExtractBy.ValueOption.Count)
+							{
+								dataItem.Add(propertyName, tmpValue == null ? 0 : 1);
+							}
+							else
+							{
+								tmpValue = formatters.Aggregate(tmpValue, (current, formatter) => formatter.Formate(current));
+								dataItem.Add(propertyName, tmpValue);
+							}
 						}
 					}
 				}

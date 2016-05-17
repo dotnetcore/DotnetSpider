@@ -127,7 +127,8 @@ namespace Java2Dotnet.Spider.Extension
 
 				if (extractBy != null)
 				{
-					field.IsPlainText = extractBy.IsPlainText;
+					field.Multi = extractBy.Multi;
+					field.Option = extractBy.Option;
 					field.Selector = new Selector() { Expression = extractBy.Expression, Type = extractBy.Type, Argument = extractBy.Argument };
 				}
 
@@ -275,8 +276,8 @@ namespace Java2Dotnet.Spider.Extension
 	{
 		public string DataType { get; set; }
 		public Selector Selector { get; set; }
-		public bool Multi => false;
-		public bool IsPlainText { get; set; }
+		public bool Multi { get; set; }
+		public PropertyExtractBy.ValueOption Option { get; set; }
 		public string Name { get; set; }
 		public List<Formatter> Formatters { get; set; } = new List<Formatter>();
 	}
