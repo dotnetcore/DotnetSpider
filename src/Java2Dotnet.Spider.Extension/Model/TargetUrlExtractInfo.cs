@@ -4,10 +4,10 @@ using Java2Dotnet.Spider.Core.Selector;
 
 namespace Java2Dotnet.Spider.Extension.Model
 {
-	public class TargetUrlExtractInfo
+	public class TargetUrlExtractor
 	{
 		public List<Regex> Patterns { get; set; } = new List<Regex>();
-		public Formatter.Formatter TargetUrlFormatter { get; set; }
-		public ISelector TargetUrlRegionSelector { get; set; }
+		public List<Formatter.Formatter> Formatters { get; set; }
+		public ISelector Region { get; set; }
 	}
 }

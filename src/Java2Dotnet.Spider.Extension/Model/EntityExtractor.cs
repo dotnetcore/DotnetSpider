@@ -21,27 +21,9 @@ namespace Java2Dotnet.Spider.Extension.Model
 		public EntityExtractor(string entityName, List<EnviromentValue> enviromentValues, JObject entityDefine)
 		{
 			_entityDefine = entityDefine;
-			TargetUrlExtractInfos = GenerateTargetUrlExtractInfos(entityDefine);
+
 			EntityName = entityName;
 			_enviromentValues = enviromentValues;
-		}
-
-		private List<TargetUrlExtractInfo> GenerateTargetUrlExtractInfos(JObject entityDefine)
-		{
-			List<TargetUrlExtractInfo> results = new List<TargetUrlExtractInfo>();
-			var targetUrlTokens = entityDefine.SelectTokens("$.TargetUrls[*]");
-			foreach (var targetUrlToken in targetUrlTokens)
-			{
-				var patterns = targetUrlToken.SelectToken("$.Values")?.ToObject<HashSet<string>>();
-				var sourceregionToken = targetUrlToken.SelectToken("$.SourceRegion");
-				results.Add(new TargetUrlExtractInfo()
-				{
-					Patterns = patterns == null || patterns.Count == 0 ? new List<Regex>() { new Regex("(.*)") } : patterns.Select(p => new Regex(p)).ToList(),
-					TargetUrlRegionSelector = string.IsNullOrEmpty(sourceregionToken?.Value<string>()) ? null : Selectors.XPath(sourceregionToken.ToString())
-				});
-			}
-
-			return results;
 		}
 
 		public dynamic Process(Page page)
@@ -326,10 +308,6 @@ namespace Java2Dotnet.Spider.Extension.Model
 			return datatype.Type == JTokenType.Object;
 		}
 
-		/// <summary>
-		/// 注意: 只有在Html页面中才能取得目标链接, 如果是Json数据, 一般是不会出现目标页面(下一页...）
-		/// </summary>
-		public List<TargetUrlExtractInfo> TargetUrlExtractInfos { get; }
 		public string EntityName { get; }
 	}
 }

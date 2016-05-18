@@ -175,13 +175,13 @@ namespace Java2Dotnet.Spider.Core
 		/// <param name="emptySleepTime"></param>
 		public void SetEmptySleepTime(int emptySleepTime)
 		{
-			if (emptySleepTime >= 10000)
+			if (emptySleepTime >= 1000)
 			{
 				_waitCountLimit = emptySleepTime / WaitInterval;
 			}
 			else
 			{
-				throw new SpiderExceptoin("Sleep time should be large than 10000.");
+				throw new SpiderExceptoin("Sleep time should be large than 1000.");
 			}
 		}
 
@@ -302,8 +302,6 @@ namespace Java2Dotnet.Spider.Core
 		{
 			if (_init)
 			{
-				Logger.Info("Component already init.");
-
 				return;
 			}
 
@@ -368,10 +366,8 @@ namespace Java2Dotnet.Spider.Core
 			// 开启多线程支持
 			System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
-			Logger.Info("Spider " + Identity + " InitComponent...");
-			InitComponent();
 
-			Logger.Info("Spider " + Identity + " Started!");
+			InitComponent();
 
 			IMonitorableScheduler monitor = (IMonitorableScheduler)Scheduler;
 

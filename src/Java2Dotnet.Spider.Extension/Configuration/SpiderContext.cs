@@ -2,6 +2,7 @@
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Configuration;
 using Newtonsoft.Json.Linq;
+using Java2Dotnet.Spider.Extension.Model;
 
 namespace Java2Dotnet.Spider.Extension
 {
@@ -28,6 +29,7 @@ namespace Java2Dotnet.Spider.Extension
 		public Configuration.Pipeline Pipeline { get; set; }
 		public List<PageHandler> PageHandlers { get; set; }
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
+		public List<Configuration.TargetUrlExtractor> TargetUrlExtractInfos { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
 		public Validations Validations { get; set; }
 		public CookieTrapper GetCookie { get; set; }

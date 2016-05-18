@@ -153,8 +153,6 @@ namespace Java2Dotnet.Spider.Extension
 
 				if (redis != null)
 				{
-					Logger.Info($"Lock: {key} to keep only one validate process.");
-
 					while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 					{
 						Thread.Sleep(1000);
@@ -199,8 +197,6 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			finally
 			{
-				Logger.Info("Release locker.");
-
 				redis?.LockRelease(key, 0);
 			}
 		}
@@ -209,9 +205,8 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			RedisServer redis = GetManageRedisServer();
 
-			Logger.Info($"Spider Name Md5Encrypt: {Encrypt.Md5Encrypt(Name)}");
-
 			var schedulerType = SpiderContext.Scheduler.Type;
+			bool isTestSpider = args != null && args.Contains("test");
 
 			switch (schedulerType)
 			{
@@ -219,9 +214,12 @@ namespace Java2Dotnet.Spider.Extension
 					{
 						PrepareSite();
 						var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler());
+						if (isTestSpider && spider.Site.StartRequests.Count > 0)
+						{
+							spider.Site.StartRequests = new List<Request> { spider.Site.StartRequests[0] };
+						}
 						spider.InitComponent();
 						return spider;
-
 					}
 				case Configuration.Scheduler.Types.Redis:
 					{
@@ -232,8 +230,6 @@ namespace Java2Dotnet.Spider.Extension
 						{
 							if (args.Contains("rerun"))
 							{
-								Logger.Info($"Starting execute command: rerun");
-
 								if (redis != null)
 								{
 									redis.KeyDelete(key);
@@ -246,8 +242,6 @@ namespace Java2Dotnet.Spider.Extension
 								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
 								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
 								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetItemKey(Name));
-
-								Logger.Info($"Execute command: rerun finished.");
 							}
 							if (args.Contains("noconsole"))
 							{
@@ -260,7 +254,6 @@ namespace Java2Dotnet.Spider.Extension
 						{
 							if (redis != null)
 							{
-								Logger.Info($"Lock: {key} to keep only one prepare process.");
 								while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 								{
 									Thread.Sleep(1000);
@@ -272,8 +265,6 @@ namespace Java2Dotnet.Spider.Extension
 
 							if (needInitStartRequest)
 							{
-								Logger.Info("Preparing site...");
-
 								PrepareSite();
 							}
 							else
@@ -286,21 +277,22 @@ namespace Java2Dotnet.Spider.Extension
 
 							var spider = GenerateSpider(scheduler);
 
-							Logger.Info("Creat spider finished.");
-
 							spider.SaveStatus = true;
 							SpiderMonitor.Default.Register(spider);
 
 							Logger.Info("Start init component...");
+
+							if (isTestSpider && spider.Site.StartRequests.Count > 0)
+							{
+								spider.Site.StartRequests = new List<Request> { spider.Site.StartRequests[0] };
+							}
+
 							spider.InitComponent();
-							Logger.Info("Init component finished.");
 
 							if (needInitStartRequest)
 							{
 								redis?.HashSet(InitStatusSetName, Name, "init finished");
 							}
-
-							Logger.Info("Creating Spider finished.");
 
 							return spider;
 						}
@@ -311,7 +303,6 @@ namespace Java2Dotnet.Spider.Extension
 						}
 						finally
 						{
-							Logger.Info("Release locker.");
 							try
 							{
 								redis?.LockRelease(key, 0);
@@ -371,6 +362,7 @@ namespace Java2Dotnet.Spider.Extension
 		protected virtual Core.Spider GenerateSpider(IScheduler scheduler)
 		{
 			EntityProcessor processor = new EntityProcessor(SpiderContext);
+			processor.TargetUrlExtractInfos = SpiderContext.TargetUrlExtractInfos.Select(t => t.GetTargetUrlExtractInfo()).ToList();
 			foreach (var entity in SpiderContext.Entities)
 			{
 				processor.AddEntity(entity);
