@@ -12,6 +12,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public enum Types
 		{
 			IncreasePageNumber,
+			IncreasePostPageNumber,
 			CustomLimitIncreasePageNumber,
 			IncreasePageNumberWithStopper,
 			IncreasePostPageNumberWithStopper,
@@ -91,6 +92,31 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			var canStop = CanStop(page);
 
 			return canStop ? new List<Request>() : new List<Request> { new Request(newUrl, page.Request.Depth, page.Request.Extras) };
+		}
+	}
+
+	public class IncreasePostPageNumberTargetUrlsHandler : IncreasePageNumberTargetUrlsHandler
+	{
+		public override Types Type { get; internal set; } = Types.IncreasePostPageNumber;
+
+		public override IList<Request> Handle(Page page)
+		{
+			string current;
+			string next;
+			IncreasePageNum(page.Request.PostBody, out current, out next);
+
+			var canStop = CanStop(page);
+
+			var newUrlList = new List<Request>{
+				new Request(page.Url, page.Request.Depth, page.Request.Extras)
+				{
+					Method = page.Request.Method,
+					Origin = page.Request.Origin,
+					PostBody = page.Request.PostBody.Replace(current, next),
+					Referer = page.Request.Referer
+				}
+			};
+			return canStop ? new List<Request>() : newUrlList;
 		}
 	}
 
