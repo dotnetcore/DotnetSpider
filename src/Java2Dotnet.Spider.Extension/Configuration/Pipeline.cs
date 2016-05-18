@@ -11,12 +11,13 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		[Flags]
 		public enum Types
 		{
-			Console,
-			MongoDb,
-			MySql,
-			MsSql,
-			JsonFile,
-			MySqlFile
+			Console = 1,
+			TestMongoDb = 2,
+			MongoDb = 3,
+			MySql = 4,
+			MsSql = 5,
+			JsonFile = 6,
+			MySqlFile = 7
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -34,6 +35,20 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override IEntityPipeline GetPipeline(Schema schema, JObject entityDefine)
 		{
 			return new EntityMongoDbPipeline(schema, ConnectString);
+		}
+	}
+
+	public class TestMongoDbPipeline : Pipeline
+	{
+		public override Types Type { get; internal set; } = Types.TestMongoDb;
+
+		public string ConnectString { get; set; }
+
+		public string TaskId { get; set; }
+
+		public override IEntityPipeline GetPipeline(Schema schema, JObject entityDefine)
+		{
+			return new EntityTestMongoDbPipeline(TaskId, schema, ConnectString);
 		}
 	}
 #endif

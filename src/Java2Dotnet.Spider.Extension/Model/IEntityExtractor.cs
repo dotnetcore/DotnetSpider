@@ -7,6 +7,5 @@ namespace Java2Dotnet.Spider.Extension.Model
 	{
 		dynamic Process(Page page);
 		string EntityName { get; }
-		List<TargetUrlExtractInfo> TargetUrlExtractInfos { get; }
 	}
 }

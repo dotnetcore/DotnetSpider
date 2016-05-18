@@ -6,19 +6,22 @@ using Java2Dotnet.Spider.Extension.ORM;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
-	public class EntityMongoDbPipeline : IEntityPipeline
+	public class EntityTestMongoDbPipeline : IEntityPipeline
 	{
 		private readonly IMongoCollection<BsonDocument> _collection;
+		private readonly string _id;
 
-		public EntityMongoDbPipeline(Schema schema, string connectString)
+		public EntityTestMongoDbPipeline(string id, Schema schema, string connectString)
 		{
 			MongoClient client = new MongoClient(connectString);
-			var db = client.GetDatabase(schema.Database);
+			var db = client.GetDatabase("test_data");
 
-			_collection = db.GetCollection<BsonDocument>(schema.TableName);
+			_collection = db.GetCollection<BsonDocument>("data");
+			_id = id;
 		}
 
 		public void Initialize()
@@ -28,11 +31,15 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		public void Process(List<JObject> datas, ISpider spider)
 		{
 			List<BsonDocument> reslut = new List<BsonDocument>();
+			var time = DateTime.Now;
 			foreach (var data in datas)
 			{
-				BsonDocument item = BsonDocument.Parse(data.ToString());
-
-				reslut.Add(item);
+				reslut.Add(new BsonDocument
+				{
+					{"TaskId",_id},
+					{"Timestamp",time},
+					{"Data", data.ToString()}
+				});
 			}
 			_collection.InsertMany(reslut);
 		}

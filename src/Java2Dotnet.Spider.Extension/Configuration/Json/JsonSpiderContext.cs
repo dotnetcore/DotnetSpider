@@ -3,6 +3,7 @@ using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Newtonsoft.Json.Linq;
 using Java2Dotnet.Spider.Validation;
+using System.Linq;
 
 namespace Java2Dotnet.Spider.Extension.Configuration.Json
 {
@@ -24,6 +25,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		public List<JObject> PrepareStartUrls { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
 		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
+		public List<JObject> TargetUrlExtractInfos { get; set; }
 
 		public JObject Pipeline { get; set; }
 		public List<JObject> Entities { get; set; } = new List<JObject>();
@@ -55,7 +57,27 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.Validations = GetValidations(Validations);
 			context.UserId = UserId;
 			context.TaskGroup = TaskGroup;
+			context.TargetUrlExtractInfos = GetTargetUrlExtractInfos(TargetUrlExtractInfos);
 			return context;
+		}
+
+		private List<TargetUrlExtractor> GetTargetUrlExtractInfos(List<JObject> targetUrlExtractInfos)
+		{
+			List<TargetUrlExtractor> list = new List<TargetUrlExtractor>();
+			foreach (var obj in targetUrlExtractInfos)
+			{
+				TargetUrlExtractor t = new TargetUrlExtractor();
+				t.Patterns = obj.SelectTokens("$.Patterns[*]").Select(p => p.ToString()).ToList();
+				t.Region = obj.SelectToken("$.Region").ToObject<Selector>();
+				foreach (var format in obj.SelectTokens("$.Formatters[*]"))
+				{
+					var name = format.SelectToken("$.Name").ToString();
+					var formatterType = FormatterFactory.GetFormatterType(name);
+					t.Formatters.Add((Formatter)format.ToObject(formatterType));
+				}
+				list.Add(t);
+			}
+			return list;
 		}
 
 		private Validations GetValidations(JObject validations)
@@ -312,12 +334,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 
 			switch (pipelineType)
 			{
-				#if !NET_CORE
+#if !NET_CORE
 				case Configuration.Pipeline.Types.MongoDb:
 					{
 						return pipeline.ToObject<MongoDbPipeline>();
 					}
-					#endif
+#endif
 				case Configuration.Pipeline.Types.MySql:
 					{
 						return pipeline.ToObject<MysqlPipeline>();
@@ -325,6 +347,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				case Configuration.Pipeline.Types.MySqlFile:
 					{
 						return pipeline.ToObject<MysqlFilePipeline>();
+					}
+				case Configuration.Pipeline.Types.TestMongoDb:
+					{
+						return pipeline.ToObject<TestMongoDbPipeline>();
 					}
 			}
 

@@ -94,7 +94,6 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			EntityType json = new EntityType();
 			json.Identity = GetEntityName(entityType);
-			json.TargetUrls = entityType.GetCustomAttributes<TargetUrl>().ToList();
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
 			{
@@ -258,7 +257,6 @@ namespace Java2Dotnet.Spider.Extension
 
 	internal class EntityType
 	{
-		public List<TargetUrl> TargetUrls { get; set; } = new List<TargetUrl>();
 		public bool Multi { get; set; }
 		public Selector Selector { get; set; }
 		public Schema Schema { get; set; }
