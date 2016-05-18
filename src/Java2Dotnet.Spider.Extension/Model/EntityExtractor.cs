@@ -180,7 +180,12 @@ namespace Java2Dotnet.Spider.Extension.Model
 							var propertyValues = item.SelectList(selector).GetValue(option == PropertyExtractBy.ValueOption.PlainText);
 							if (option == PropertyExtractBy.ValueOption.Count)
 							{
-								dataItem.Add(propertyName, propertyValues.Count);
+								var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "ERROR";
+								if (tempValue == "ERROR")
+								{
+									
+								}
+                                dataItem.Add(propertyName, tempValue);
 							}
 							else
 							{
