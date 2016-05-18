@@ -60,7 +60,7 @@ namespace Java2Dotnet.Spider.Core
 		private int _waitCount;
 		private bool _init;
 		private bool _exited;
-		private static readonly Regex IdentifyRegex = new Regex(@"^[\{\}\d\w\s-/]+$");
+		private static readonly Regex IdentifyRegex = new Regex(@"^[\{\}\u2E80-\u9FFF\d\w\s-/]+$");
 		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
 
