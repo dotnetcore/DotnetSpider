@@ -47,7 +47,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 			var type = (Type)text.GetType();
 			string tmp = "";
 
-			if (typeof(IEnumerable).IsAssignableFrom(type))
+			if (typeof(ICollection).IsAssignableFrom(type))
 			{
 				foreach (var l in (IEnumerable)text)
 				{
@@ -56,7 +56,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 			}
 			else
 			{
-				tmp = text.ToSting();
+				tmp = text is string ? text : text.ToSting();
 			}
 			return SelectGroup(tmp).Get(_group);
 		}
