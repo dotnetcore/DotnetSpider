@@ -33,7 +33,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				string rawText = p.Content;
 
 				int begin = rawText.IndexOf(StartString, StringComparison.Ordinal);
-				int end = rawText.IndexOf(EndString, StringComparison.Ordinal);
+				int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal);
 				int length = end - begin;
 
 				begin += StartOffset;
@@ -42,6 +42,40 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				length += EndString.Length;
 
 				string newRawText = rawText.Substring(begin, length).Trim();
+				p.Content = newRawText;
+			}
+			catch
+			{
+				throw new SpiderExceptoin("Rawtext Invalid.");
+			}
+		}
+	}
+
+	public class RemovePageHandler : PageHandler
+	{
+		public string StartString { get; set; }
+		public string EndString { get; set; }
+		public int StartOffset { get; set; } = 0;
+		public int EndOffset { get; set; } = 0;
+
+		public override Types Type { get; internal set; } = Types.Sub;
+
+		public override void Customize(Page p)
+		{
+			try
+			{
+				string rawText = p.Content;
+
+				int begin = rawText.IndexOf(StartString, StringComparison.Ordinal);
+				int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal);
+				int length = end - begin;
+
+				begin += StartOffset;
+				length -= StartOffset;
+				length -= EndOffset;
+				length += EndString.Length;
+
+				string newRawText = rawText.Remove(begin, length);
 				p.Content = newRawText;
 			}
 			catch

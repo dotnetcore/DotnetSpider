@@ -78,7 +78,7 @@ namespace Java2Dotnet.Spider.Extension
 				}
 
 				var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
-				if (redisScheduler != null)
+                if (redisScheduler != null)
 				{
 					try
 					{
