@@ -206,16 +206,20 @@ namespace Java2Dotnet.Spider.Extension
 			RedisServer redis = GetManageRedisServer();
 
 			var schedulerType = SpiderContext.Scheduler.Type;
+			bool isTestSpider = args != null && args.Contains("test");
 
 			switch (schedulerType)
 			{
 				case Configuration.Scheduler.Types.Queue:
 					{
 						PrepareSite();
-						var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler(), args != null && args.Contains("test"));
+						var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler());
+						if (isTestSpider && spider.Site.StartRequests.Count > 0)
+						{
+							spider.Site.StartRequests = new List<Request> { spider.Site.StartRequests[0] };
+						}
 						spider.InitComponent();
 						return spider;
-
 					}
 				case Configuration.Scheduler.Types.Redis:
 					{
@@ -271,17 +275,16 @@ namespace Java2Dotnet.Spider.Extension
 
 							Logger.Info("Start creating Spider...");
 
-							var spider = GenerateSpider(scheduler, args != null && args.Contains("test"));
+							var spider = GenerateSpider(scheduler);
 
 							spider.SaveStatus = true;
 							SpiderMonitor.Default.Register(spider);
 
 							Logger.Info("Start init component...");
 
-							if (args != null && args.Contains("test") && spider.Site.StartRequests.Count > 0)
+							if (isTestSpider && spider.Site.StartRequests.Count > 0)
 							{
 								spider.Site.StartRequests = new List<Request> { spider.Site.StartRequests[0] };
-
 							}
 
 							spider.InitComponent();
@@ -356,7 +359,7 @@ namespace Java2Dotnet.Spider.Extension
 			}
 		}
 
-		protected virtual Core.Spider GenerateSpider(IScheduler scheduler, bool isTest)
+		protected virtual Core.Spider GenerateSpider(IScheduler scheduler)
 		{
 			EntityProcessor processor = new EntityProcessor(SpiderContext);
 			processor.TargetUrlExtractInfos = SpiderContext.TargetUrlExtractInfos.Select(t => t.GetTargetUrlExtractInfo()).ToList();
