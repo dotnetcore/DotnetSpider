@@ -6,16 +6,12 @@ namespace Java2Dotnet.Spider.Core
 	/// <summary>
 	/// Interface for identifying different tasks.
 	/// </summary>
-	public interface ISpider : IDisposable
+	public interface ISpider : IDisposable, ITask
 	{
 		/// <summary>
 		/// Unique id for a task.
 		/// </summary>
 		string Identity { get; }
-
-		string UserId { get; }
-
-		string TaskGroup { get; }
 
 		/// <summary>
 		/// Site of a task

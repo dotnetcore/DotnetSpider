@@ -668,7 +668,7 @@ namespace Java2Dotnet.Spider.Core
 
 			if (!page.MissTargetUrls)
 			{
-				if(!(SkipWhenResultIsEmpty&& page.ResultItems.IsSkip))
+				if (!(SkipWhenResultIsEmpty && page.ResultItems.IsSkip))
 				{
 					ExtractAndAddRequests(page, SpawnUrl);
 				}

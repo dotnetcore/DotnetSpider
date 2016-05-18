@@ -87,6 +87,9 @@
     <Compile Include="..\ISpiderListener.cs">
       <Link>ISpiderListener.cs</Link>
     </Compile>
+    <Compile Include="..\ITask.cs">
+      <Link>ITask.cs</Link>
+    </Compile>
     <Compile Include="..\Monitor\SpiderClosingEvent.cs">
       <Link>Monitor\SpiderClosingEvent.cs</Link>
     </Compile>
