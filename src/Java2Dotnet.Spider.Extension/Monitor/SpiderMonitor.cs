@@ -118,7 +118,8 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					Name,
 					Machine = Log.Machine,
 					UserId = _userId,
-					TaskGroup = _taskGroup
+					TaskGroup = _taskGroup,
+					Timestamp = DateTime.Now
 				};
 
 				var task = _client.PostAsync(StatusServer, new StringContent(JsonConvert.SerializeObject(status), Encoding.UTF8, "application/json"));
