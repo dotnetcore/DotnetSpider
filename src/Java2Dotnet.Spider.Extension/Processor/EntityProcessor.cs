@@ -80,6 +80,11 @@ namespace Java2Dotnet.Spider.Extension.Processor
 		/// <param name="targetUrlExtractInfos"></param>
 		private void ExtractLinks(Page page, List<TargetUrlExtractor> targetUrlExtractInfos)
 		{
+			if (targetUrlExtractInfos == null)
+			{
+				return;
+			}
+
 			foreach (var targetUrlExtractInfo in targetUrlExtractInfos)
 			{
 				var urlRegionSelector = targetUrlExtractInfo.Region;

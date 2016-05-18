@@ -359,10 +359,10 @@ namespace Java2Dotnet.Spider.Extension
 			}
 		}
 
-		protected virtual Core.Spider GenerateSpider(IScheduler scheduler)
+		protected virtual Core.Spider  GenerateSpider(IScheduler scheduler)
 		{
 			EntityProcessor processor = new EntityProcessor(SpiderContext);
-			processor.TargetUrlExtractInfos = SpiderContext.TargetUrlExtractInfos.Select(t => t.GetTargetUrlExtractInfo()).ToList();
+			processor.TargetUrlExtractInfos = SpiderContext.TargetUrlExtractInfos?.Select(t => t.GetTargetUrlExtractInfo()).ToList();
 			foreach (var entity in SpiderContext.Entities)
 			{
 				processor.AddEntity(entity);
