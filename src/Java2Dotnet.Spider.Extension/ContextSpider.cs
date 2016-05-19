@@ -164,7 +164,7 @@ namespace Java2Dotnet.Spider.Extension
 
 				if (needInitStartRequest)
 				{
-					Logger.Info("Start validate ...");
+					Logger.Info("开始数据验证 ...");
 
 					if (validations != null && validations.Count > 0)
 					{
@@ -183,7 +183,7 @@ namespace Java2Dotnet.Spider.Extension
 				}
 				else
 				{
-					Logger.Info("No need to validate on this process because other process did.");
+					Logger.Info("有其他线程执行了数据验证.");
 				}
 
 				if (needInitStartRequest)
@@ -269,7 +269,7 @@ namespace Java2Dotnet.Spider.Extension
 							}
 							else
 							{
-								Logger.Info("No need to prepare site because other process did it.");
+								Logger.Info("Site 已经初始化");
 								SpiderContext.Site.ClearStartRequests();
 							}
 

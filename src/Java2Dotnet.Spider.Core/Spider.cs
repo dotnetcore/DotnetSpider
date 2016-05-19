@@ -685,12 +685,6 @@ namespace Java2Dotnet.Spider.Core
 				{
 					pipeline.Process(page.ResultItems, this);
 				}
-
-#if NET_CORE
-				Log.WriteLine($"Request: {request.Url} Sucess.");
-#else
-				Console.WriteLine($"Request: {request.Url} Sucess.");
-#endif
 			}
 			else
 			{
