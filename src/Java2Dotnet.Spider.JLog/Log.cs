@@ -99,7 +99,7 @@ namespace Java2Dotnet.Spider.JLog
 
 		public void Warn(string message, Exception e, bool showToConsole = true)
 		{
-			var log = CreateLogInfo("WARNING", message, e);
+			var log = CreateLogInfo("警告", message, e);
 			WriteToLogFile(log);
 			if (showToConsole)
 			{
@@ -118,7 +118,7 @@ namespace Java2Dotnet.Spider.JLog
 
 		public void Info(string message, Exception e, bool showToConsole = true)
 		{
-			var log = CreateLogInfo("INFO", message, e);
+			var log = CreateLogInfo("信息", message, e);
 			WriteToLogFile(log);
 			if (showToConsole)
 			{
@@ -137,7 +137,7 @@ namespace Java2Dotnet.Spider.JLog
 
 		public void Error(string message, Exception e, bool showToConsole = true)
 		{
-			var log = CreateLogInfo("ERROR", message, e);
+			var log = CreateLogInfo("错误", message, e);
 			WriteToLogFile(log);
 			if (showToConsole)
 			{
@@ -184,17 +184,17 @@ namespace Java2Dotnet.Spider.JLog
 			{
 				switch (log.Type)
 				{
-					case "ERROR":
+					case "错误":
 						{
 							Console.ForegroundColor = ConsoleColor.Red;
 							break;
 						}
-					case "INFO":
+					case "信息":
 						{
 							Console.ForegroundColor = ConsoleColor.White;
 							break;
 						}
-					case "WARNING":
+					case "警告":
 						{
 							Console.ForegroundColor = ConsoleColor.Yellow;
 							break;
