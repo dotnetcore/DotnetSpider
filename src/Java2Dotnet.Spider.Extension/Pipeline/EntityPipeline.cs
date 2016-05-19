@@ -41,7 +41,11 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 					}
 				}
 			}
-			_pipeline.Process(list, spider);
+
+			if (list.Count > 0)
+			{
+				_pipeline.Process(list, spider);
+			}
 		}
 	}
 }
