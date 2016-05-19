@@ -325,7 +325,7 @@ namespace Java2Dotnet.Spider.Core
 			{
 				if (StartRequests.Count > 0)
 				{
-					Logger.Info($"Start push Request to queque,Count:{StartRequests.Count}");
+					Logger.Info($"添加网址到调度中心,数量: {StartRequests.Count}");
 					if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 					{
 						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
@@ -343,12 +343,10 @@ namespace Java2Dotnet.Spider.Core
 						Scheduler.Load(scheduler.ToList(this), this);
 						ClearStartRequests();
 					}
-
-					Logger.Info("Push Request to Scheduler success.");
 				}
 				else
 				{
-					Logger.Info("Push Zero Request to Scheduler.", true);
+					Logger.Info("不需要添加网址到调度中心.", true);
 				}
 			}
 
