@@ -113,7 +113,7 @@ namespace Java2Dotnet.Spider.Core
 		/// <summary>
 		/// When cycleRetryTimes is more than 0, it will add back to scheduler and try download again. 
 		/// </summary>
-		public int CycleRetryTimes { get; set; } = 20;
+		public int CycleRetryTimes { get; set; } = 5;
 
 		public string Cookie { get; set; }
 

@@ -643,7 +643,7 @@ namespace Java2Dotnet.Spider.Core
 					{
 						page = AddToCycleRetry(request, Site);
 					}
-					Logger.Warn("Download or parse page " + request.Url + " failed:" + e);
+					Logger.Warn("Download or Process page " + request.Url + " failed.");
 					break;
 				}
 			}
