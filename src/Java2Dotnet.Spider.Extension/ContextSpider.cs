@@ -82,7 +82,7 @@ namespace Java2Dotnet.Spider.Extension
 				{
 					try
 					{
-						redisScheduler.Redis.Subscribe($"{spider.UserId}-{spider.Identity}", (c, m) =>
+						redisScheduler.Redis.Subscribe($"{spider.Identity}", (c, m) =>
 						{
 							switch (m)
 							{
