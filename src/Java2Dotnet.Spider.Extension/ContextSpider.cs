@@ -78,7 +78,7 @@ namespace Java2Dotnet.Spider.Extension
 				}
 
 				var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
-                if (redisScheduler != null)
+				if (redisScheduler != null)
 				{
 					try
 					{
@@ -359,7 +359,7 @@ namespace Java2Dotnet.Spider.Extension
 			}
 		}
 
-		protected virtual Core.Spider  GenerateSpider(IScheduler scheduler)
+		protected virtual Core.Spider GenerateSpider(IScheduler scheduler)
 		{
 			EntityProcessor processor = new EntityProcessor(SpiderContext);
 			processor.TargetUrlExtractInfos = SpiderContext.TargetUrlExtractInfos?.Select(t => t.GetTargetUrlExtractInfo()).ToList();
