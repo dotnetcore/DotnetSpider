@@ -6,6 +6,13 @@ using Java2Dotnet.Spider.JLog;
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {
+	public class DownloadException : Exception
+	{
+		public DownloadException(string message) : base(message)
+		{
+		}
+	}
+
 	public class BaseDownloader : IDownloader, IDisposable
 	{
 		public DownloadValidation DownloadValidation { get; set; }

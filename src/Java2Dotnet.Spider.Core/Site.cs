@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Java2Dotnet.Spider.Core.Proxy;
+using System.Net;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -94,7 +95,7 @@ namespace Java2Dotnet.Spider.Core
 		/// {200} by default. 
 		/// It is not necessarily to be set.
 		/// </summary>
-		public HashSet<int> AcceptStatCode { get; set; } = new HashSet<int> { 200 };
+		public HashSet<HttpStatusCode> AcceptStatCode { get; set; } = new HashSet<HttpStatusCode> { HttpStatusCode.OK };
 
 		public List<Request> StartRequests { get; set; } = new List<Request>();
 

@@ -426,7 +426,7 @@ namespace Java2Dotnet.Spider.Core
 						catch (Exception e)
 						{
 							OnError(request);
-							Logger.Error("Request " + request.Url + " failed.", e);
+							Logger.Error("采集失败: " + request.Url + ".", e);
 						}
 						finally
 						{
@@ -459,12 +459,12 @@ namespace Java2Dotnet.Spider.Core
 			{
 				OnClose();
 
-				Logger.Info($"Spider {Identity} Finished.");
+				Logger.Info($"任务 {Identity} 结束.");
 			}
 
 			if (Stat == Status.Stopped)
 			{
-				Logger.Info("Spider " + Identity + " stop success!");
+				Logger.Info("任务 " + Identity + " 停止成功!");
 			}
 
 			SpiderClosingEvent?.Invoke();
@@ -522,13 +522,13 @@ namespace Java2Dotnet.Spider.Core
 		public void Stop()
 		{
 			Stat = Status.Stopped;
-			Logger.Warn("Trying to stop Spider " + Identity + "...");
+			Logger.Warn("停止任务中 " + Identity + "...");
 		}
 
 		public void Exit()
 		{
 			Stat = Status.Exited;
-			Logger.Warn("Trying to exit Spider " + Identity + "...");
+			Logger.Warn("退出任务中 " + Identity + "...");
 			SpiderClosingEvent?.Invoke();
 		}
 
@@ -599,53 +599,57 @@ namespace Java2Dotnet.Spider.Core
 #if TEST
 			System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 #endif
-			while (true)
+
+			try
 			{
-				try
+#if TEST
+				sw.Reset();
+				sw.Start();
+#endif
+				page = downloader.Download(request, this);
+
+#if TEST
+				sw.Stop();
+				Console.WriteLine("Download:" + (sw.ElapsedMilliseconds).ToString());
+#endif
+				if (page.IsSkip)
 				{
-#if TEST
-					sw.Reset();
-					sw.Start();
-#endif
-					page = downloader.Download(request, this);
-
-#if TEST
-					sw.Stop();
-					Console.WriteLine("Download:" + (sw.ElapsedMilliseconds).ToString());
-#endif
-					if (page.IsSkip)
-					{
-						return;
-					}
-
-					if (PageHandlers != null)
-					{
-						foreach (var pageHandler in PageHandlers)
-						{
-							pageHandler?.Invoke(page);
-						}
-					}
-
-#if TEST
-					sw.Reset();
-					sw.Start();
-#endif
-					PageProcessor.Process(page);
-#if TEST
-					sw.Stop();
-					Console.WriteLine("Process:" + (sw.ElapsedMilliseconds).ToString());
-#endif
-					break;
+					return;
 				}
-				catch (Exception e)
+
+				if (PageHandlers != null)
 				{
-					if (Site.CycleRetryTimes > 0)
+					foreach (var pageHandler in PageHandlers)
 					{
-						page = AddToCycleRetry(request, Site);
+						pageHandler?.Invoke(page);
 					}
-					Logger.Warn("Download or Process page " + request.Url + " failed.");
-					break;
 				}
+
+#if TEST
+				sw.Reset();
+				sw.Start();
+#endif
+				PageProcessor.Process(page);
+#if TEST
+				sw.Stop();
+				Console.WriteLine("Process:" + (sw.ElapsedMilliseconds).ToString());
+#endif
+			}
+			catch (DownloadException de)
+			{
+				if (Site.CycleRetryTimes > 0)
+				{
+					page = AddToCycleRetry(request, Site);
+				}
+				Logger.Warn(de.Message);
+			}
+			catch (Exception e)
+			{
+				if (Site.CycleRetryTimes > 0)
+				{
+					page = AddToCycleRetry(request, Site);
+				}
+				Logger.Warn("解析页数数据失败: " + request.Url+", 请检查您的数据抽取设置.");
 			}
 
 			//watch.Stop();
@@ -692,13 +696,13 @@ namespace Java2Dotnet.Spider.Core
 			}
 			else
 			{
-				var message = $"Request {request.Url} 's result count is zero.";
+				var message = $"页面 {request.Url} 解析结果为 0.";
 				Logger.Warn(message);
 			}
+			Logger.Info($"采集: {request.Url} 成功.");
 #if TEST
 			sw.Stop();
 			Console.WriteLine("IPipeline:" + (sw.ElapsedMilliseconds).ToString());
-			Logger.Info($"Request: {request.Url} Sucess.");
 #endif
 		}
 

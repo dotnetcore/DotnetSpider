@@ -273,14 +273,14 @@ namespace Java2Dotnet.Spider.Extension
 								SpiderContext.Site.ClearStartRequests();
 							}
 
-							Logger.Info("Start creating Spider...");
+							Logger.Info("创建爬虫...");
 
 							var spider = GenerateSpider(scheduler);
 
 							spider.SaveStatus = true;
 							SpiderMonitor.Default.Register(spider);
 
-							Logger.Info("Start init component...");
+							Logger.Info("构建内部模块...");
 
 							if (isTestSpider && spider.Site.StartRequests.Count > 0)
 							{
@@ -315,7 +315,7 @@ namespace Java2Dotnet.Spider.Extension
 					}
 			}
 
-			throw new SpiderExceptoin("Prepare spider failed.");
+			throw new SpiderExceptoin("初始化失败.");
 		}
 
 		private RedisServer GetManageRedisServer()

@@ -45,7 +45,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 			Site site = spider.Site;
 
-			ICollection<int> acceptStatCode = site.AcceptStatCode;
+			var acceptStatCodes = site.AcceptStatCode;
 
 			//Logger.InfoFormat("Downloading page {0}", request.Url);
 
@@ -72,6 +72,10 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				}, httpMessage);
 
 				response.EnsureSuccessStatusCode();
+				if (!site.AcceptStatCode.Contains(response.StatusCode))
+				{
+					throw new DownloadException($"下载 {request.Url} 失败. Code: {response.StatusCode}");
+				}
 				statusCode = (int)response.StatusCode;
 				request.PutExtra(Request.StatusCode, statusCode);
 
@@ -86,8 +90,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				// 因此如果使用多线程遇上多个Warning Custom Validate Failed不需要紧张, 可以考虑用自定义Exception分开
 				ValidatePage(page, spider);
 
-				// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
-				request.PutExtra(Request.CycleTriedTimes, null);
+				// 结束后要置空, 这个值存到Redis会导致无限循环跑单个任务
+				//request.PutExtra(Request.CycleTriedTimes, null);
 
 				//#if !NET_CORE
 				//					httpWebRequest.ServicePoint.ConnectionLimit = int.MaxValue;
@@ -149,7 +153,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			if (site == null) return null;
 
 			HttpRequestMessage httpWebRequest = CreateRequestMessage(request);
-			if (!site.Headers.ContainsKey("Content-Type") && (site.Headers.ContainsKey("Content-Type") && site.Headers["Content-Type"]!="NULL"))
+			if (!site.Headers.ContainsKey("Content-Type") && (site.Headers.ContainsKey("Content-Type") && site.Headers["Content-Type"] != "NULL"))
 			{
 				httpWebRequest.Headers.Add("ContentType", "application /x-www-form-urlencoded; charset=UTF-8");
 			}
