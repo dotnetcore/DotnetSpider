@@ -17,7 +17,10 @@ namespace Java2Dotnet.Spider.Extension.Model.Formatter
 			{
 				return result[Index];
 			}
-			return null;
+			else
+			{
+				return result[result.Length - 1];
+			}
 		}
 	}
 }
