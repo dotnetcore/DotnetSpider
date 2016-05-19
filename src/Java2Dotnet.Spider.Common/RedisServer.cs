@@ -272,6 +272,34 @@ namespace RedisSharp
 			}
 		}
 
+		public void Increment(string key)
+		{
+			RedisClient client = CreateRedisClient();
+			try
+			{
+				client.Db = Db;
+				client.Increment(key);
+			}
+			finally
+			{
+				_redisClientQueue.Enqueue(client);
+			}
+		}
+
+		public void ResetCounter(string key)
+		{
+			RedisClient client = CreateRedisClient();
+			try
+			{
+				client.Db = Db;
+				client.ResetCounter(key);
+			}
+			finally
+			{
+				_redisClientQueue.Enqueue(client);
+			}
+		}
+
 		public void HashSetMany(string key, Dictionary<string, string> values)
 		{
 			RedisClient client = CreateRedisClient();
@@ -279,6 +307,20 @@ namespace RedisSharp
 			{
 				client.Db = Db;
 				client.HashSetMany(key, values);
+			}
+			finally
+			{
+				_redisClientQueue.Enqueue(client);
+			}
+		}
+
+		public string StringGet(string key)
+		{
+			RedisClient client = CreateRedisClient();
+			try
+			{
+				client.Db = Db;
+				return client.StringGet(key);
 			}
 			finally
 			{
@@ -1697,6 +1739,50 @@ namespace RedisSharp
 				arguments.Add(key);
 				arguments.AddRange(values);
 				SendExpectSuccess("SADD", arguments);
+			}
+		}
+
+		internal void Increment(string key)
+		{
+			lock (this)
+			{
+				if (string.IsNullOrEmpty(key))
+				{
+					throw new ArgumentException("Key is null or empty.");
+				}
+
+				List<string> arguments = new List<string>();
+				arguments.Add(key);
+				SendExpectSuccess("INCR", arguments);
+			}
+		}
+
+		internal void ResetCounter(string key)
+		{
+			lock (this)
+			{
+				if (string.IsNullOrEmpty(key))
+				{
+					throw new ArgumentException("Key is null or empty.");
+				}
+
+				List<string> arguments = new List<string>();
+				arguments.Add(key);
+				arguments.Add("0");
+				SendExpectSuccess("GETSET", arguments);
+			}
+		}
+
+		internal string StringGet(string key)
+		{
+			lock (this)
+			{
+				if (string.IsNullOrEmpty(key))
+				{
+					throw new ArgumentException("Key is null or empty.");
+				}
+
+				return SendExpectString("GET", key);
 			}
 		}
 	}

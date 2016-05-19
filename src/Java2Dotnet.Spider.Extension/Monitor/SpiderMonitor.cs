@@ -9,6 +9,8 @@ using Java2Dotnet.Spider.JLog;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text;
+using MongoDB.Driver;
+using System.Linq;
 
 namespace Java2Dotnet.Spider.Extension.Monitor
 {
@@ -61,10 +63,15 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			private static HttpClient _client = new HttpClient();
 			private string _userId;
 			private string _taskGroup;
+			private static string MongoConnectString;
+			private MongoClient _mongoClient;
+			private string _errorRequestCollection;
+			private string _mongoDatabaseName;
 
 			static MonitorSpiderListener()
 			{
 				StatusServer = ConfigurationManager.Get("statusHost");
+				MongoConnectString = ConfigurationManager.Get("dataMongo");
 			}
 
 			public MonitorSpiderListener(Core.Spider spider)
@@ -73,6 +80,8 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 				_userId = spider.UserId;
 				_taskGroup = spider.TaskGroup;
+				_errorRequestCollection = Encrypt.Md5Encrypt(_taskGroup) + "_error_request";
+				_mongoDatabaseName = "db_" + Encrypt.Md5Encrypt(_userId);
 
 				if (spider.SaveStatus && !string.IsNullOrEmpty(StatusServer))
 				{
@@ -97,6 +106,11 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 						}
 					});
 				}
+
+				if (spider.SaveStatus && !string.IsNullOrEmpty(MongoConnectString))
+				{
+					_mongoClient = new MongoClient(MongoConnectString);
+				}
 			}
 
 			public void PostStatus()
@@ -109,7 +123,6 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 						LeftPageCount,
 						Speed,
 						StartTime,
-						EndTime,
 						Status,
 						SuccessPageCount,
 						ThreadCount,
@@ -151,6 +164,9 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			{
 				_errorUrls.Add(request.Url.ToString());
 				_errorCount.Inc();
+
+				var collection = _mongoClient.GetDatabase(_mongoDatabaseName).GetCollection<Request>(_errorRequestCollection);
+				collection.InsertOne(request);
 			}
 
 			public void OnClose()
@@ -164,7 +180,21 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 			public long ErrorPageCount => _errorCount.Value;
 
-			public List<string> ErrorPages => _errorUrls;
+			public List<string> ErrorPages
+			{
+				get
+				{
+					if (_mongoClient == null)
+					{
+						return _errorUrls;
+					}
+					else
+					{
+						var collection = _mongoClient.GetDatabase(_mongoDatabaseName).GetCollection<Request>(_errorRequestCollection);
+						return collection.Find(r => r.Url != null).ToList().Select(r => r.Url.ToString()).ToList();
+					}
+				}
+			}
 
 			public string Name => _spider.Identity;
 
@@ -201,8 +231,6 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			public int ThreadCount => _spider.ThreadNum;
 
 			public DateTime StartTime => _spider.StartTime;
-
-			public DateTime EndTime => _spider.FinishedTime == DateTime.MinValue ? DateTime.Now : _spider.FinishedTime;
 
 			public double Speed
 			{

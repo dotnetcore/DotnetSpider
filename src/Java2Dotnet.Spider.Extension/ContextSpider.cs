@@ -38,7 +38,7 @@ namespace Java2Dotnet.Spider.Extension
 		public ContextSpider(SpiderContext spiderContext)
 		{
 			SpiderContext = spiderContext;
-			Name = SpiderContext.SpiderName;
+			Name = $"{SpiderContext.UserId}-{SpiderContext.SpiderName}";
 
 			Logger = LogUtils.GetLogger(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup);
 
@@ -117,14 +117,14 @@ namespace Java2Dotnet.Spider.Extension
 					Thread.Sleep(1000);
 				}
 
+				spider?.Dispose();
+
 				RunAfterSpiderFinished();
 
 				DoValidate();
 			}
 			finally
 			{
-				spider?.Dispose();
-
 				Log.WaitForExit();
 			}
 		}
@@ -368,7 +368,7 @@ namespace Java2Dotnet.Spider.Extension
 				processor.AddEntity(entity);
 			}
 
-			EntityGeneralSpider spider = new EntityGeneralSpider(SpiderContext.Site, SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup, processor, scheduler);
+			EntityGeneralSpider spider = new EntityGeneralSpider(SpiderContext.Site, Name, SpiderContext.UserId, SpiderContext.TaskGroup, processor, scheduler);
 
 			foreach (var entity in SpiderContext.Entities)
 			{

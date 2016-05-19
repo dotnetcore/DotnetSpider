@@ -49,6 +49,7 @@ namespace Java2Dotnet.Spider.Core
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 		public string UserId { get; }
 		public string TaskGroup { get; }
+		public bool IsExited { get; private set; }
 		protected readonly string DataRootDirectory;
 
 		protected IPageProcessor PageProcessor { get; set; }
@@ -59,8 +60,7 @@ namespace Java2Dotnet.Spider.Core
 		private int _waitCountLimit = 20;
 		private int _waitCount;
 		private bool _init;
-		private bool _exited;
-		private static readonly Regex IdentifyRegex = new Regex(@"^[\{\}\u2E80-\u9FFF\d\w\s-/]+$");
+		private static readonly Regex IdentifyRegex = new Regex(@"^[\S]+$");
 		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
 
@@ -113,7 +113,7 @@ namespace Java2Dotnet.Spider.Core
 			{
 				if (!IdentifyRegex.IsMatch(identity))
 				{
-					throw new SpiderExceptoin("Task Identify only can contains A-Z a-z 0-9 _ -");
+					throw new SpiderExceptoin("任务ID不能有空字符.");
 				}
 				Identity = identity;
 			}
@@ -358,7 +358,7 @@ namespace Java2Dotnet.Spider.Core
 			CheckIfRunning();
 
 			Stat = Status.Running;
-			_exited = false;
+			IsExited = false;
 
 #if !NET_CORE
 			// 开启多线程支持
@@ -469,7 +469,12 @@ namespace Java2Dotnet.Spider.Core
 
 			Log.WaitForExit();
 
-			_exited = true;
+			if (Stat == Status.Exited)
+			{
+				Logger.Info("任务 " + Identity + " 退出成功!");
+			}
+
+			IsExited = true;
 		}
 
 		public static void PrintInfo()
@@ -529,6 +534,8 @@ namespace Java2Dotnet.Spider.Core
 			Logger.Warn("退出任务中 " + Identity + "...");
 			SpiderClosingEvent?.Invoke();
 		}
+
+		public bool IsExit { get; private set; }
 
 		protected void OnClose()
 		{
@@ -647,7 +654,7 @@ namespace Java2Dotnet.Spider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				Logger.Warn("解析页数数据失败: " + request.Url+", 请检查您的数据抽取设置.");
+				Logger.Warn("解析页数数据失败: " + request.Url + ", 请检查您的数据抽取设置.");
 			}
 
 			//watch.Stop();
@@ -771,7 +778,7 @@ namespace Java2Dotnet.Spider.Core
 		private void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
 		{
 			Stop();
-			while (!_exited)
+			while (!IsExited)
 			{
 				Thread.Sleep(1500);
 			}
@@ -779,10 +786,12 @@ namespace Java2Dotnet.Spider.Core
 
 		public void Dispose()
 		{
-			if (!_exited)
+			while (!IsExited)
 			{
-				OnClose();
+				Thread.Sleep(500);
 			}
+
+			OnClose();
 		}
 	}
 }

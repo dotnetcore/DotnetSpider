@@ -19,8 +19,6 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 
 		DateTime StartTime { get; }
 
-		DateTime EndTime { get; }
-
 		double Speed { get; }
 	}
 }
