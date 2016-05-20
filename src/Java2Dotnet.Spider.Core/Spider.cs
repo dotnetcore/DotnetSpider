@@ -60,7 +60,7 @@ namespace Java2Dotnet.Spider.Core
 		private int _waitCountLimit = 20;
 		private int _waitCount;
 		private bool _init;
-		private static readonly Regex IdentifyRegex = new Regex(@"^[\S]+$");
+		//private static readonly Regex IdentifyRegex = new Regex(@"^[\S]+$");
 		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
 
@@ -111,10 +111,10 @@ namespace Java2Dotnet.Spider.Core
 			}
 			else
 			{
-				if (!IdentifyRegex.IsMatch(identity))
-				{
-					throw new SpiderExceptoin("任务ID不能有空字符.");
-				}
+				//if (!IdentifyRegex.IsMatch(identity))
+				//{
+				//	throw new SpiderExceptoin("任务ID不能有空字符.");
+				//}
 				Identity = identity;
 			}
 
