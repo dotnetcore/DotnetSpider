@@ -64,7 +64,6 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			private string _userId;
 			private string _taskGroup;
 			private static string MongoConnectString;
-			private MongoClient _mongoClient;
 			private string _errorRequestCollection;
 			private string _mongoDatabaseName;
 
@@ -105,11 +104,6 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 							Thread.Sleep(5000);
 						}
 					});
-				}
-
-				if (spider.SaveStatus && !string.IsNullOrEmpty(MongoConnectString))
-				{
-					_mongoClient = new MongoClient(MongoConnectString);
 				}
 			}
 
@@ -165,8 +159,12 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 				_errorUrls.Add(request.Url.ToString());
 				_errorCount.Inc();
 
-				var collection = _mongoClient.GetDatabase(_mongoDatabaseName).GetCollection<Request>(_errorRequestCollection);
-				collection.InsertOne(request);
+				if (_spider.SaveStatus && !string.IsNullOrEmpty(MongoConnectString))
+				{
+					MongoClient _mongoClient = new MongoClient(MongoConnectString);
+					var collection = _mongoClient.GetDatabase(_mongoDatabaseName).GetCollection<Request>(_errorRequestCollection);
+					collection.InsertOne(request);
+				}
 			}
 
 			public void OnClose()
@@ -184,12 +182,13 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			{
 				get
 				{
-					if (_mongoClient == null)
+					if (string.IsNullOrEmpty(MongoConnectString))
 					{
 						return _errorUrls;
 					}
 					else
 					{
+						MongoClient _mongoClient = new MongoClient(MongoConnectString);
 						var collection = _mongoClient.GetDatabase(_mongoDatabaseName).GetCollection<Request>(_errorRequestCollection);
 						return collection.Find(r => r.Url != null).ToList().Select(r => r.Url.ToString()).ToList();
 					}
