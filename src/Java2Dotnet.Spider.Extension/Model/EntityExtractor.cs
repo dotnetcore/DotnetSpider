@@ -37,17 +37,19 @@ namespace Java2Dotnet.Spider.Extension.Model
 					page.Request.PutExtra(name, value);
 				}
 			}
-			bool isMulti = _entityDefine.SelectToken("$.Multi").ToObject<bool>();
-
+			bool isMulti = false;
 			ISelector selector = SelectorUtil.GetSelector(_entityDefine.SelectToken("$.Selector").ToObject<Selector>());
 
+			if (selector == null)
+			{
+				isMulti = false;
+			}
+			else
+			{
+				isMulti = _entityDefine.SelectToken("$.Multi").ToObject<bool>();
+			}
 			if (isMulti)
 			{
-				if (selector == null)
-				{
-					throw new SpiderExceptoin("Selector can't be null when set isMulti true.");
-				}
-
 				var list = page.Selectable.SelectList(selector).Nodes();
 				if (list == null || list.Count == 0)
 				{

@@ -34,6 +34,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		protected readonly SpiderContext SpiderContext;
 		public string Name { get; }
+		protected Core.Spider spider = null;
 
 		public ContextSpider(SpiderContext spiderContext)
 		{
@@ -68,7 +69,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		public virtual void Run(params string[] args)
 		{
-			Core.Spider spider = null;
+
 			try
 			{
 				spider = PrepareSpider(args);
@@ -126,6 +127,15 @@ namespace Java2Dotnet.Spider.Extension
 			finally
 			{
 				Log.WaitForExit();
+			}
+		}
+
+		public void Clear()
+		{
+			var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
+			if (redisScheduler != null)
+			{
+				redisScheduler.Clear(spider);
 			}
 		}
 
