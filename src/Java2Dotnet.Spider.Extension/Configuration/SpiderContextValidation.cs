@@ -28,8 +28,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					// 2. 如果数据实体有嵌套或者属性是List, 则Pipeline只能选择mongodb.
 					foreach (var entity in spiderContext.Entities)
 					{
-						var fieldTokens = entity.SelectTokens("$.Fields[*]")?.ToList();
-						string entityName = entity.SelectToken("$.Identity")?.ToString();
+						var fieldTokens = entity.Fields;
+						string entityName = entity.Identity;
 
 						if (string.IsNullOrEmpty(entityName))
 						{
@@ -54,13 +54,13 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 						{
 							foreach (var fieldToken in fieldTokens)
 							{
-								string fieldName = fieldToken.SelectToken("$.Name")?.ToString();
+								string fieldName = fieldToken.Name;
 								if (string.IsNullOrEmpty(fieldName))
 								{
 									messages.Add($"Error 005: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} has no name.");
 								}
 
-								var dataTypeToken = fieldToken.SelectToken("$.DataType");
+								var dataTypeToken = fieldToken.DataType;
 								if (dataTypeToken == null)
 								{
 									if (correct)

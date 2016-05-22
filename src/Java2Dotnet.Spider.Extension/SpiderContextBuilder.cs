@@ -60,12 +60,7 @@ namespace Java2Dotnet.Spider.Extension
 
 			foreach (var entiType in EntiTypes)
 			{
-#if !NET_CORE
-				JObject entity = JsonConvert.DeserializeObject(ConvertToJson(entiType)) as JObject;
-#else
-				JObject entity = JsonConvert.DeserializeObject(ConvertToJson(entiType.GetTypeInfo())) as JObject;
-#endif
-				Context.Entities.Add(entity);
+				Context.Entities.Add(ConvertToEntity(entiType));
 				Context.EnviromentValues = entiType.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new EnviromentValue
 				{
 					Name = e.Name,
@@ -90,31 +85,31 @@ namespace Java2Dotnet.Spider.Extension
 
 #if !NET_CORE
 
-		public static string ConvertToJson(Type entityType)
+		public static Entity ConvertToEntity(Type entityType)
 		{
-			EntityType json = new EntityType();
-			json.Identity = GetEntityName(entityType);
+			Entity entity = new Entity();
+			entity.Identity = GetEntityName(entityType);
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
 			{
-				json.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-				json.Multi = extractByAttribute.Multi;
+				entity.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+				entity.Multi = extractByAttribute.Multi;
 			}
-			json.Schema = entityType.GetCustomAttribute<Schema>();
+			entity.Schema = entityType.GetCustomAttribute<Schema>();
 			var indexes = entityType.GetCustomAttribute<Indexes>();
 			if (indexes != null)
 			{
-				json.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				json.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				json.Primary = indexes.Primary?.Split(',');
+				entity.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
+				entity.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
+				entity.Primary = indexes.Primary?.Split(',');
 
-				json.AutoIncrement = indexes.AutoIncrement;
+				entity.AutoIncrement = indexes.AutoIncrement;
 			}
 
 			var updates = entityType.GetCustomAttribute<Update>();
 			if (updates != null)
 			{
-				json.Updates = updates.Columns;
+				entity.Updates = updates.Columns;
 			}
 
 			var properties = entityType.GetProperties();
@@ -143,18 +138,18 @@ namespace Java2Dotnet.Spider.Extension
 
 				foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
 				{
-					field.Formatters.Add(formatter);
+					field.Formatters.Add((JObject)JsonConvert.SerializeObject(formatter));
 				}
 
-				json.Fields.Add(field);
+				entity.Fields.Add(field);
 			}
 
-			json.Stopping = entityType.GetCustomAttribute<Stopping>();
+			entity.Stopping = entityType.GetCustomAttribute<Stopping>();
 
-			return JsonConvert.SerializeObject(json);
+			return entity;
 		}
 #else
-		public static string ConvertToJson(TypeInfo entityType)
+		public static Entity ConvertToEntity(TypeInfo entityType)
 		{
 			EntityType json = new EntityType();
 			json.Identity = GetEntityName(entityType.AsType());
@@ -205,7 +200,7 @@ namespace Java2Dotnet.Spider.Extension
 
 				foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
 				{
-					field.Formatters.Add(formatter);
+					field.Formatters.Add((JObject)JsonConvert.SerializeObject(formatter));
 				}
 
 				json.Fields.Add(field);
@@ -213,7 +208,7 @@ namespace Java2Dotnet.Spider.Extension
 
 			json.Stopping = entityType.GetCustomAttribute<Stopping>();
 
-			return JsonConvert.SerializeObject(json);
+			return json;
 		}
 #endif
 
@@ -253,30 +248,5 @@ namespace Java2Dotnet.Spider.Extension
 
 			return reslut;
 		}
-	}
-
-	internal class EntityType
-	{
-		public bool Multi { get; set; }
-		public Selector Selector { get; set; }
-		public Schema Schema { get; set; }
-		public string Identity { get; set; }
-		public List<string[]> Indexes { get; set; }
-		public List<string[]> Uniques { get; set; }
-		public string AutoIncrement { get; set; }
-		public string[] Primary { get; set; }
-		public List<Field> Fields { get; set; } = new List<Field>();
-		public Stopping Stopping { get; set; }
-		public string[] Updates { get; internal set; }
-	}
-
-	internal class Field
-	{
-		public string DataType { get; set; }
-		public Selector Selector { get; set; }
-		public bool Multi { get; set; }
-		public PropertyExtractBy.ValueOption Option { get; set; }
-		public string Name { get; set; }
-		public List<Formatter> Formatters { get; set; } = new List<Formatter>();
 	}
 }

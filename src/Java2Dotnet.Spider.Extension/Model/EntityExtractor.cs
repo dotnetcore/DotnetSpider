@@ -15,10 +15,10 @@ namespace Java2Dotnet.Spider.Extension.Model
 {
 	public class EntityExtractor : IEntityExtractor
 	{
-		private readonly JObject _entityDefine;
+		private readonly Entity _entityDefine;
 		private readonly List<EnviromentValue> _enviromentValues;
 
-		public EntityExtractor(string entityName, List<EnviromentValue> enviromentValues, JObject entityDefine)
+		public EntityExtractor(string entityName, List<EnviromentValue> enviromentValues, Entity entityDefine)
 		{
 			_entityDefine = entityDefine;
 
@@ -38,7 +38,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 			}
 			bool isMulti = false;
-			ISelector selector = SelectorUtil.GetSelector(_entityDefine.SelectToken("$.Selector").ToObject<Selector>());
+			ISelector selector = SelectorUtil.GetSelector(_entityDefine.Selector);
 
 			if (selector == null)
 			{
@@ -46,7 +46,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 			}
 			else
 			{
-				isMulti = _entityDefine.SelectToken("$.Multi").ToObject<bool>();
+				isMulti = _entityDefine.Multi;
 			}
 			if (isMulti)
 			{
@@ -55,11 +55,10 @@ namespace Java2Dotnet.Spider.Extension.Model
 				{
 					return null;
 				}
-				var countToken = _entityDefine.SelectToken("$.Count");
+				var countToken = _entityDefine.Limit;
 				if (countToken != null)
 				{
-					int count = countToken.ToObject<int>();
-					list = list.Take(count).ToList();
+					list = list.Take(countToken.Value).ToList();
 				}
 
 				List<JObject> result = new List<JObject>();
@@ -137,30 +136,28 @@ namespace Java2Dotnet.Spider.Extension.Model
 			}
 		}
 
-		private JObject ProcessSingle(Page page, ISelectable item, JToken entityDefine, int index)
+		private JObject ProcessSingle(Page page, ISelectable item, Entity entityDefine, int index)
 		{
 			JObject dataItem = new JObject();
 
-			foreach (var field in entityDefine.SelectTokens("$.Fields[*]"))
+			foreach (var field in entityDefine.Fields)
 			{
-				ISelector selector = SelectorUtil.GetSelector(field.SelectToken("$.Selector").ToObject<Selector>());
+				ISelector selector = SelectorUtil.GetSelector(field.Selector);
 				if (selector == null)
 				{
 					continue;
 				}
 
-				var datatype = field.SelectToken("$.DataType");
+				var datatype = field.DataType;
 				bool isEntity = VerifyIfEntity(datatype);
 
-				var multiToken = field.SelectToken("$.Multi");
-				bool isMulti = multiToken?.ToObject<bool>() ?? false;
+				bool isMulti = field.Multi;
 
-				var optionToken = field.SelectToken("$.Option");
-				var option = optionToken?.ToObject<PropertyExtractBy.ValueOption>() ?? PropertyExtractBy.ValueOption.None;
+				var option = field.Option;
 
-				string propertyName = field.SelectToken("$.Name").ToString();
+				string propertyName = field.Name;
 
-				List<Formatter.Formatter> formatters = GenerateFormatter(field.SelectTokens("$.Formatters[*]"));
+				List<Formatter.Formatter> formatters = GenerateFormatter(field.Formatters);
 
 				if (!isEntity)
 				{
@@ -185,17 +182,16 @@ namespace Java2Dotnet.Spider.Extension.Model
 								var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "ERROR";
 								if (tempValue == "ERROR")
 								{
-									
+
 								}
-                                dataItem.Add(propertyName, tempValue);
+								dataItem.Add(propertyName, tempValue);
 							}
 							else
 							{
-								var countToken = _entityDefine.SelectToken("$.Count");
+								var countToken = _entityDefine.Limit;
 								if (countToken != null)
 								{
-									int count = countToken.ToObject<int>();
-									propertyValues = propertyValues.Take(count).ToList();
+									propertyValues = propertyValues.Take(countToken.Value).ToList();
 								}
 								List<string> results = new List<string>();
 								foreach (var propertyValue in propertyValues)
@@ -230,11 +226,10 @@ namespace Java2Dotnet.Spider.Extension.Model
 					if (isMulti)
 					{
 						var propertyValues = item.SelectList(selector).Nodes();
-						var countToken = _entityDefine.SelectToken("$.Count");
+						var countToken = _entityDefine.Limit;
 						if (countToken != null)
 						{
-							int count = countToken.ToObject<int>();
-							propertyValues = propertyValues.Take(count).ToList();
+							propertyValues = propertyValues.Take(countToken.Value).ToList();
 						}
 
 						List<JObject> result = new List<JObject>();
@@ -262,13 +257,12 @@ namespace Java2Dotnet.Spider.Extension.Model
 					}
 				}
 			}
-			var stoppingJobject = entityDefine.SelectToken("$.Stopping");
-			var stopping = stoppingJobject?.ToObject<Stopping>();
-
+			var stopping = entityDefine.Stopping;
+ 
 			if (stopping != null)
 			{
-				var field = entityDefine.SelectToken($"$.Fields[?(@.Name == '{stopping.PropertyName}')]");
-				var datatype = field.SelectToken("$.DataType");
+				var field = entityDefine.Fields.First(f => f.Name == stopping.PropertyName);
+				var datatype = field.DataType;
 				bool isEntity = VerifyIfEntity(datatype);
 				if (isEntity)
 				{
@@ -310,9 +304,9 @@ namespace Java2Dotnet.Spider.Extension.Model
 			return results;
 		}
 
-		private bool VerifyIfEntity(JToken datatype)
+		private bool VerifyIfEntity(dynamic datatype)
 		{
-			return datatype.Type == JTokenType.Object;
+			return datatype.GetType() != typeof(string);
 		}
 
 		public string EntityName { get; }

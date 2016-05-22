@@ -89,6 +89,9 @@
     <Compile Include="..\Configuration\DownloadValidation.cs">
       <Link>Configuration\DownloadValidation.cs</Link>
     </Compile>
+    <Compile Include="..\Configuration\Entity.cs">
+      <Link>Configuration\Entity.cs</Link>
+    </Compile>
     <Compile Include="..\Configuration\EnviromentValue.cs">
       <Link>Configuration\EnviromentValue.cs</Link>
     </Compile>

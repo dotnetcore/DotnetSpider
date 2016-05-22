@@ -19,6 +19,8 @@ using System.Linq;
 using RedisSharp;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Core.Utils;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 #if NET_45
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -382,9 +384,9 @@ namespace Java2Dotnet.Spider.Extension
 
 			foreach (var entity in SpiderContext.Entities)
 			{
-				string entiyName = entity.SelectToken("$.Identity")?.ToString();
+				string entiyName = entity.Identity;
 
-				var schema = entity.SelectToken("$.Schema")?.ToObject<Schema>();
+				var schema = entity.Schema;
 
 				spider.AddPipeline(new EntityPipeline(entiyName, SpiderContext.Pipeline.GetPipeline(schema, entity)));
 			}

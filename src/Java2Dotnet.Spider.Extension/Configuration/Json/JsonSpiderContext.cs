@@ -28,7 +28,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		public List<JObject> TargetUrlExtractInfos { get; set; }
 
 		public JObject Pipeline { get; set; }
-		public List<JObject> Entities { get; set; } = new List<JObject>();
+		public List<Entity> Entities { get; set; } = new List<Entity>();
 		public List<JObject> PageHandlers { get; set; }
 		public JObject TargetUrlsHandler { get; set; }
 		public JObject Validations { get; set; }

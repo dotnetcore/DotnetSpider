@@ -9,6 +9,7 @@ using Java2Dotnet.Spider.Extension.Model;
 using Newtonsoft.Json.Linq;
 using Site = Java2Dotnet.Spider.Core.Site;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
+using Java2Dotnet.Spider.Extension.Configuration;
 #if !NET_CORE
 using System.Web;
 #else
@@ -21,7 +22,7 @@ namespace Java2Dotnet.Spider.Extension.Processor
 	{
 		protected readonly IList<IEntityExtractor> EntityExtractorList = new List<IEntityExtractor>();
 		public Func<Page, IList<Request>> GetCustomizeTargetUrls;
-		public List<TargetUrlExtractor> TargetUrlExtractInfos { get; set; }
+		public List<Model.TargetUrlExtractor> TargetUrlExtractInfos { get; set; }
 
 		private readonly SpiderContext _spiderContext;
 
@@ -31,14 +32,14 @@ namespace Java2Dotnet.Spider.Extension.Processor
 			_spiderContext = spiderContext;
 		}
 
-		public void AddEntity(JObject entityDefine)
+		public void AddEntity(Entity entityDefine)
 		{
 			EntityExtractorList.Add(GenerateExtractor(entityDefine));
 		}
 
-		private IEntityExtractor GenerateExtractor(JObject entityDefine)
+		private IEntityExtractor GenerateExtractor(Entity entityDefine)
 		{
-			return new EntityExtractor(entityDefine.SelectToken("$.Identity").ToString(), _spiderContext.EnviromentValues, entityDefine);
+			return new EntityExtractor(entityDefine.Identity, _spiderContext.EnviromentValues, entityDefine);
 		}
 
 		public void Process(Page page)
@@ -78,7 +79,7 @@ namespace Java2Dotnet.Spider.Extension.Processor
 		/// </summary>
 		/// <param name="page"></param>
 		/// <param name="targetUrlExtractInfos"></param>
-		private void ExtractLinks(Page page, List<TargetUrlExtractor> targetUrlExtractInfos)
+		private void ExtractLinks(Page page, List<Model.TargetUrlExtractor> targetUrlExtractInfos)
 		{
 			if (targetUrlExtractInfos == null)
 			{

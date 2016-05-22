@@ -6,6 +6,7 @@ using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Core.Utils;
 using Java2Dotnet.Spider.Extension.ORM;
 using Newtonsoft.Json.Linq;
+using Java2Dotnet.Spider.Extension.Configuration;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
@@ -15,13 +16,13 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	public class EntityMySqlFilePipeline : FilePersistentBase, IEntityPipeline
 	{
 		protected readonly Schema Schema;
-		protected readonly List<EntityGeneralPipeline.Column> Columns;
+		protected readonly List<Field> Columns;
 
-		public EntityMySqlFilePipeline(Schema schema, JObject entityDefine)
+		public EntityMySqlFilePipeline(Schema schema, Entity entityDefine)
 		{
 			Schema = schema;
 
-			Columns = entityDefine.SelectTokens("$.Fields[*]").Select(j => j.ToObject<EntityGeneralPipeline.Column>()).ToList();
+			Columns = entityDefine.Fields;
 			SetPath("DataFiles");
 		}
 

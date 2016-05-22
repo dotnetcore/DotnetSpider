@@ -6,6 +6,7 @@ using Java2Dotnet.Spider.Extension.ORM;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
 using Java2Dotnet.Spider.Extension.Utils;
+using Java2Dotnet.Spider.Extension.Configuration;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
@@ -13,7 +14,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	{
 		private string _autoIncrementString = "AUTO_INCREMENT";
 
-		public EntityMySqlPipeline(Schema schema, JObject entityDefine, string connectString, PipelineMode mode) : base(schema, entityDefine, connectString, mode)
+		public EntityMySqlPipeline(Schema schema, Entity entityDefine, string connectString, PipelineMode mode) : base(schema, entityDefine, connectString, mode)
 		{
 		}
 
