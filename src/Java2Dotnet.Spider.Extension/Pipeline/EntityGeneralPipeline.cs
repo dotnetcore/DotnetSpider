@@ -56,7 +56,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			ConnectString = connectString;
 
 			Schema = GenerateSchema(schema);
-			Columns = entityDefine.Fields.Where(f =>   f.DataType != null).ToList();
+			Columns = entityDefine.Fields.Where(f => f.DataType != null).ToList();
 			var primary = entityDefine.Primary;
 			if (primary != null)
 			{
@@ -74,10 +74,9 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				}
 			}
 
-			if (mode == PipelineMode.Update)
+			if (mode == PipelineMode.Update && entityDefine.Updates != null)
 			{
-				var tmpUpdateColumns = entityDefine.Updates;
-				foreach (var column in tmpUpdateColumns)
+				foreach (var column in entityDefine.Updates)
 				{
 					var col = Columns.FirstOrDefault(c => c.Name == column);
 					if (col == null)
@@ -102,45 +101,50 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 			AutoIncrement = entityDefine.AutoIncrement;
 
-			foreach (var index in entityDefine.Indexes)
+			if (entityDefine.Indexes != null)
 			{
-				List<string> tmpIndex = new List<string>();
-				foreach (var i in index)
+				foreach (var index in entityDefine.Indexes)
 				{
-					var col = Columns.FirstOrDefault(c => c.Name == i);
-					if (col == null)
+					List<string> tmpIndex = new List<string>();
+					foreach (var i in index)
 					{
-						throw new SpiderExceptoin("Columns set as index is not a property of your entity.");
+						var col = Columns.FirstOrDefault(c => c.Name == i);
+						if (col == null)
+						{
+							throw new SpiderExceptoin("Columns set as index is not a property of your entity.");
+						}
+						else
+						{
+							tmpIndex.Add(col.Name);
+						}
 					}
-					else
+					if (tmpIndex.Count != 0)
 					{
-						tmpIndex.Add(col.Name);
+						Indexs.Add(tmpIndex);
 					}
-				}
-				if (tmpIndex.Count != 0)
-				{
-					Indexs.Add(tmpIndex);
 				}
 			}
-
-			foreach (var unique in entityDefine.Uniques)
+			if (entityDefine.Uniques != null)
 			{
-				List<string> tmpUnique = new List<string>();
-				foreach (var i in unique)
+				foreach (var unique in entityDefine.Uniques)
 				{
-					var col = Columns.FirstOrDefault(c => c.Name == i);
-					if (col == null)
+					List<string> tmpUnique = new List<string>();
+					foreach (var i in unique)
 					{
-						throw new SpiderExceptoin("Columns set as unique is not a property of your entity.");
+						var col = Columns.FirstOrDefault(c => c.Name == i);
+						if (col == null)
+						{
+							throw new SpiderExceptoin("Columns set as unique is not a property of your entity.");
+						}
+						else
+						{
+							tmpUnique.Add(col.Name);
+						}
 					}
-					else
+					if (tmpUnique.Count != 0)
 					{
-						tmpUnique.Add(col.Name);
+						Uniques.Add(tmpUnique);
 					}
-				}
-				if (tmpUnique.Count != 0)
-				{
-					Uniques.Add(tmpUnique);
 				}
 			}
 		}

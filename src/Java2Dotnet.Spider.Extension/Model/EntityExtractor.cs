@@ -258,7 +258,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 			}
 			var stopping = entityDefine.Stopping;
- 
+
 			if (stopping != null)
 			{
 				var field = entityDefine.Fields.First(f => f.Name == stopping.PropertyName);
@@ -306,7 +306,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 		private bool VerifyIfEntity(dynamic datatype)
 		{
-			return datatype.GetType() != typeof(string);
+			return datatype != null && datatype.GetType() != typeof(string);
 		}
 
 		public string EntityName { get; }

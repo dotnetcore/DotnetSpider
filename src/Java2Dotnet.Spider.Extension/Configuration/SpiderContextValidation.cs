@@ -61,15 +61,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 								}
 
 								var dataTypeToken = fieldToken.DataType;
-								if (dataTypeToken == null)
-								{
-									if (correct)
-									{
-										correct = false;
-									}
-									messages.Add($"Error 006: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} has no datatype.");
-								}
-								else
+								if (dataTypeToken != null)
 								{
 									if (dataTypeToken.Type != JTokenType.String && !(spiderContext.Pipeline.SelectToken("$.Type").ToString() == "2" || spiderContext.Pipeline.SelectToken("$.Type").ToString() == "3"))
 									{

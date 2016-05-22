@@ -138,7 +138,7 @@ namespace Java2Dotnet.Spider.Extension
 
 				foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
 				{
-					field.Formatters.Add((JObject)JsonConvert.SerializeObject(formatter));
+					field.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
 				}
 
 				entity.Fields.Add(field);
