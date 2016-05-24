@@ -11,6 +11,8 @@ using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using System.Data.SqlClient;
 using System.Data.Common;
+using static Java2Dotnet.Spider.Extension.Configuration.BaseDbPrepareStartUrls;
+using Newtonsoft.Json;
 #if !NET_CORE
 using System.Web;
 #else
@@ -50,6 +52,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		[Flags]
 		public enum Types
 		{
+			Base,
 			CommonDb,
 			GeneralDb,
 			DbList,
@@ -67,9 +70,9 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public Dictionary<string, object> Extras { get; set; }
 
-		public abstract Types Type { get; internal set; }
-
 		public abstract void Build(Site site, dynamic obj);
+
+		public abstract Types Type { get; internal set; }
 	}
 
 	public class CyclePrepareStartUrls : PrepareStartUrls
@@ -108,7 +111,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
-	public abstract class AbstractDbPrepareStartUrls : PrepareStartUrls
+	public class BaseDbPrepareStartUrls : PrepareStartUrls
 	{
 		public class Column
 		{
@@ -117,33 +120,18 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			public List<Formatter> Formatters { get; set; } = new List<Formatter>();
 		}
 
-		public override Types Type { get; internal set; }
+		public override Types Type { get; internal set; } = Types.Base;
 
 		public DataSource Source { get; set; } = DataSource.MySql;
 
 		public string ConnectString { get; set; }
 
-		public string GroupBy { get; set; }
-
-		public string OrderBy { get; set; }
-
-		/// <summary>
-		/// 数据来源表名, 需要Schema/数据库名
-		/// </summary>
-		public string TableName { get; set; }
-
-		/// <summary>
-		/// 对表的筛选
-		/// 如: cdate='2016-03-01', isUsed=true
-		/// </summary>
-		public List<string> Filters { get; set; }
+		public string QueryString { get; set; }
 
 		/// <summary>
 		/// 用于拼接Url所需要的列
 		/// </summary>
 		public List<Column> Columns { get; set; } = new List<Column>();
-
-		public int Limit { get; set; }
 
 		/// <summary>
 		/// 拼接Url的方式, 会把Columns对应列的数据传入
@@ -151,60 +139,20 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		/// </summary>
 		public List<string> FormateStrings { get; set; }
 
-		protected string GetSelectQueryString()
-		{
-			switch (Source)
-			{
-				case DataSource.MySql:
-					{
-						StringBuilder builder = new StringBuilder($"SELECT * FROM {TableName}");
-						if (Filters != null && Filters.Count > 0)
-						{
-							builder.Append(" WHERE " + Filters.First());
-							if (Filters.Count > 1)
-							{
-								for (int i = 1; i < Filters.Count; ++i)
-								{
-									builder.Append(" AND " + Filters[i]);
-								}
-							}
-						}
-
-						if (!string.IsNullOrEmpty(GroupBy))
-						{
-							builder.Append($" {GroupBy} ");
-						}
-
-						if (!string.IsNullOrEmpty(OrderBy))
-						{
-							builder.Append($" {OrderBy} ");
-						}
-
-						if (Limit > 0)
-						{
-							builder.Append($" LIMIT {Limit} ");
-						}
-
-
-						return builder.ToString();
-					}
-			}
-			throw new SpiderExceptoin($"Unsport Source: {Source}");
-		}
-
 		protected List<Dictionary<string, object>> PrepareDatas()
 		{
 			List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
 			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
 			{
-				string sql = GetSelectQueryString();
+				string sql = QueryString;
 				conn.Open();
 				var command = conn.CreateCommand();
 				command.CommandText = sql;
+				command.CommandTimeout = 60000;
 				command.CommandType = CommandType.Text;
 
 				var reader = command.ExecuteReader();
-				
+
 				while (reader.Read())
 				{
 					Dictionary<string, object> data = new Dictionary<string, object>();
@@ -248,9 +196,100 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 			return arguments;
 		}
+
+		protected virtual void BuildQueryString()
+		{
+		}
+
+		public override void Build(Site site, dynamic obj)
+		{
+			var datas = PrepareDatas();
+			foreach (var data in datas)
+			{
+				var arguments = PrepareArguments(data);
+
+				foreach (var formate in FormateStrings)
+				{
+					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
+					site.AddStartRequest(new Request(tmpUrl, 0, data)
+					{
+						Method = Method,
+						Origin = Origin,
+						PostBody = DbPrepareStartUrls.GetPostBody(PostBody, data),
+						Referer = Referer
+					});
+				}
+			}
+		}
 	}
 
-	public class DbCommonPrepareStartUrls : AbstractDbPrepareStartUrls
+	public class ConfigurableDbPrepareStartUrls : BaseDbPrepareStartUrls
+	{
+		/// <summary>
+		/// 数据来源表名, 需要Schema/数据库名
+		/// </summary>
+		public string TableName { get; set; }
+
+		/// <summary>
+		/// 对表的筛选
+		/// 如: cdate='2016-03-01', isUsed=true
+		/// </summary>
+		public List<string> Filters { get; set; }
+
+		public int Limit { get; set; }
+
+		public string GroupBy { get; set; }
+
+		public string OrderBy { get; set; }
+
+		protected override void BuildQueryString()
+		{
+			switch (Source)
+			{
+				case DataSource.MySql:
+					{
+						StringBuilder builder = new StringBuilder($"SELECT * FROM {TableName}");
+						if (Filters != null && Filters.Count > 0)
+						{
+							builder.Append(" WHERE " + Filters.First());
+							if (Filters.Count > 1)
+							{
+								for (int i = 1; i < Filters.Count; ++i)
+								{
+									builder.Append(" AND " + Filters[i]);
+								}
+							}
+						}
+
+						if (!string.IsNullOrEmpty(GroupBy))
+						{
+							builder.Append($" {GroupBy} ");
+						}
+
+						if (!string.IsNullOrEmpty(OrderBy))
+						{
+							builder.Append($" {OrderBy} ");
+						}
+
+						if (Limit > 0)
+						{
+							builder.Append($" LIMIT {Limit} ");
+						}
+
+						QueryString = builder.ToString();
+						return;
+					}
+			}
+
+			throw new SpiderExceptoin($"Unsport Source: {Source}");
+		}
+
+		public override void Build(Site site, dynamic obj)
+		{
+		}
+	}
+
+	public class DbCommonPrepareStartUrls : ConfigurableDbPrepareStartUrls
 	{
 		public override Types Type { get; internal set; } = Types.CommonDb;
 
@@ -303,7 +342,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
-	public class DbPrepareStartUrls : AbstractDbPrepareStartUrls
+	public class DbPrepareStartUrls : ConfigurableDbPrepareStartUrls
 	{
 		public override Types Type { get; internal set; } = Types.GeneralDb;
 
@@ -356,9 +395,9 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
-	public class DbListPrepareStartUrls : AbstractDbPrepareStartUrls
+	public class DbListPrepareStartUrls : ConfigurableDbPrepareStartUrls
 	{
-		public override Types Type { get; internal set; } = Types.GeneralDb;
+		public override Types Type { get; internal set; } = Types.DbList;
 
 		public int Interval { get; set; }
 		public string ColumnSeparator { get; set; }
@@ -430,7 +469,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		/// <summary>
 		/// 用于拼接Url所需要的列
 		/// </summary>
-		public List<AbstractDbPrepareStartUrls.Column> Columns { get; set; } = new List<AbstractDbPrepareStartUrls.Column>();
+		public List<Column> Columns { get; set; } = new List<Column>();
 
 		/// <summary>
 		/// 拼接Url的方式, 会把Columns对应列的数据传入
@@ -480,6 +519,4 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 		}
 	}
-
-
 }

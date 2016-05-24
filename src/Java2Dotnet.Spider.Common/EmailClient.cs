@@ -140,6 +140,7 @@ Content-Type: {4};
 				}
 				catch (Exception e)
 				{
+					Console.WriteLine(e);
 				}
 			}
 		}
@@ -190,7 +191,11 @@ Content-Type: {4};
 				responseData = Encoding.UTF8.GetString(data, 0, bytes);
 				return responseData;
 			}
-			catch { return null; }
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				return null;
+			}
 		}
 
 		private void Send(string s)

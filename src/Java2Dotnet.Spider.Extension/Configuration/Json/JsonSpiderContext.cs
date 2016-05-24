@@ -287,13 +287,33 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 							list.Add(jobject.ToObject<LinkSpiderPrepareStartUrls>());
 							break;
 						}
+					case Configuration.PrepareStartUrls.Types.Base:
+						{
+							var generalDbPrepareStartUrls = new BaseDbPrepareStartUrls();
+							foreach (var column in jobject.SelectTokens("$.Columns[*]"))
+							{
+								var c = new ConfigurableDbPrepareStartUrls.Column()
+								{
+									Name = column.SelectToken("$.Name").ToString()
+								};
+								foreach (var format in column.SelectTokens("$.Formatters[*]"))
+								{
+									var name = format.SelectToken("$.Name").ToString();
+									var formatterType = FormatterFactory.GetFormatterType(name);
+									c.Formatters.Add((Formatter)format.ToObject(formatterType));
+								}
+								generalDbPrepareStartUrls.Columns.Add(c);
+							}
+							list.Add(generalDbPrepareStartUrls);
+							break;
+						}
 				}
 			}
 
 			return list;
 		}
 
-		private void SetDbPrepareStartUrls(AbstractDbPrepareStartUrls generalDbPrepareStartUrls, JObject jobject)
+		private void SetDbPrepareStartUrls(ConfigurableDbPrepareStartUrls generalDbPrepareStartUrls, JObject jobject)
 		{
 			generalDbPrepareStartUrls.ConnectString = jobject.SelectToken("$.ConnectString")?.ToString();
 			generalDbPrepareStartUrls.Filters = jobject.SelectToken("$.Filters")?.ToObject<List<string>>();
@@ -304,7 +324,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<DataSource>();
 			foreach (var column in jobject.SelectTokens("$.Columns[*]"))
 			{
-				var c = new AbstractDbPrepareStartUrls.Column()
+				var c = new ConfigurableDbPrepareStartUrls.Column()
 				{
 					Name = column.SelectToken("$.Name").ToString()
 				};
