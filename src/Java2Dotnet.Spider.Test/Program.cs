@@ -15,7 +15,6 @@ using Java2Dotnet.Spider.Core;
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
 using System.Text.RegularExpressions;
-using Dapper;
 using System.Linq;
 using Java2Dotnet.Spider.Extension.Configuration.Json;
 
