@@ -15,13 +15,34 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		[Flags]
 		public enum Types
 		{
-			Common
+			Common,
+			Manual,
 		}
 
 		public abstract Types Type { get; internal set; }
 
-
 		public abstract bool Login(dynamic obj);
+	}
+
+	public class VerifyCode
+	{
+		public bool Verify(dynamic webDriver)
+		{
+
+			try
+			{
+				IWebDriver driver = webDriver;
+				while (!driver.Url.Contains("baidu.com"))
+				{
+					Thread.Sleep(1000);
+				}
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
 	}
 
 #if !NET_CORE
@@ -81,6 +102,32 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					}
 			}
 			throw new SpiderExceptoin("Unsport findy: " + element.Type);
+		}
+	}
+
+	public class ManualLoginer : Loginer
+	{
+		public override Types Type { get; internal set; } = Types.Manual;
+
+		public string Url { get; set; }
+
+		public override bool Login(dynamic webDriver)
+		{
+
+			try
+			{
+				IWebDriver driver = webDriver;
+				driver.Navigate().GoToUrl(Url);
+				while (!driver.Url.Contains("baidu.com"))
+				{
+					Thread.Sleep(1000);
+				}
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 	}
 #endif

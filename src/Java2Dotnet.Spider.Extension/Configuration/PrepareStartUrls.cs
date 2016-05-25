@@ -203,6 +203,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override void Build(Site site, dynamic obj)
 		{
+			BuildQueryString();
+
 			var datas = PrepareDatas();
 			foreach (var data in datas)
 			{
@@ -215,11 +217,38 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					{
 						Method = Method,
 						Origin = Origin,
-						PostBody = DbPrepareStartUrls.GetPostBody(PostBody, data),
+						PostBody = GetPostBody(PostBody, data),
 						Referer = Referer
 					});
 				}
 			}
+		}
+
+		public static string GetPostBody(string postBody, Dictionary<string, object> datas)
+		{
+			if (string.IsNullOrEmpty(postBody))
+			{
+				return null;
+			}
+
+			Regex regex = new Regex(@"__URLENCODE\('(\w|\d)+'\)");
+			string tmpPostBody = postBody;
+			foreach (Match match in regex.Matches(postBody))
+			{
+				string tmp = match.Value;
+				int startIndex = tmp.IndexOf("__URLENCODE('");
+				int endIndex = tmp.IndexOf("')", startIndex);
+				string arg = tmp.Substring(startIndex + 13, endIndex - startIndex - 13);
+#if !NET_CORE
+				var value = HttpUtility.UrlEncode(datas[arg].ToString());
+#else
+				var value = WebUtility.UrlEncode(datas[arg].ToString());
+#endif
+				tmpPostBody = postBody.Replace(tmp, value);
+			}
+
+			// implement more rules
+			return tmpPostBody;
 		}
 	}
 
@@ -284,9 +313,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			throw new SpiderExceptoin($"Unsport Source: {Source}");
 		}
 
-		public override void Build(Site site, dynamic obj)
-		{
-		}
 	}
 
 	public class DbCommonPrepareStartUrls : ConfigurableDbPrepareStartUrls
@@ -303,6 +329,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override void Build(Site site, dynamic obj)
 		{
+			BuildQueryString();
+
 			var datas = PrepareDatas();
 			foreach (var data in datas)
 			{
@@ -341,60 +369,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			return null;
 		}
 	}
-
-	public class DbPrepareStartUrls : ConfigurableDbPrepareStartUrls
-	{
-		public override Types Type { get; internal set; } = Types.GeneralDb;
-
-		public override void Build(Site site, dynamic obj)
-		{
-			var datas = PrepareDatas();
-			foreach (var data in datas)
-			{
-				var arguments = PrepareArguments(data);
-
-				foreach (var formate in FormateStrings)
-				{
-					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					site.AddStartRequest(new Request(tmpUrl, 0, data)
-					{
-						Method = Method,
-						Origin = Origin,
-						PostBody = GetPostBody(PostBody, data),
-						Referer = Referer
-					});
-				}
-			}
-		}
-
-		public static string GetPostBody(string postBody, Dictionary<string, object> datas)
-		{
-			if (string.IsNullOrEmpty(postBody))
-			{
-				return null;
-			}
-
-			Regex regex = new Regex(@"__URLENCODE\('(\w|\d)+'\)");
-			string tmpPostBody = postBody;
-			foreach (Match match in regex.Matches(postBody))
-			{
-				string tmp = match.Value;
-				int startIndex = tmp.IndexOf("__URLENCODE('");
-				int endIndex = tmp.IndexOf("')", startIndex);
-				string arg = tmp.Substring(startIndex + 13, endIndex - startIndex - 13);
-#if !NET_CORE
-				var value = HttpUtility.UrlEncode(datas[arg].ToString());
-#else
-				var value = WebUtility.UrlEncode(datas[arg].ToString());
-#endif
-				tmpPostBody = postBody.Replace(tmp, value);
-			}
-
-			// implement more rules
-			return tmpPostBody;
-		}
-	}
-
+ 
 	public class DbListPrepareStartUrls : ConfigurableDbPrepareStartUrls
 	{
 		public override Types Type { get; internal set; } = Types.DbList;
@@ -407,6 +382,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override void Build(Site site, dynamic obj)
 		{
+			BuildQueryString();
+
 			int interval = 0;
 			StringBuilder formatBuilder = new StringBuilder();
 
@@ -512,7 +489,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					{
 						Method = Method,
 						Origin = Origin,
-						PostBody = DbPrepareStartUrls.GetPostBody(PostBody, tmp),
+						PostBody = GetPostBody(PostBody, tmp),
 						Referer = Referer
 					});
 				}

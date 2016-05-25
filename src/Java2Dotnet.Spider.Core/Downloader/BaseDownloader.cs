@@ -69,6 +69,10 @@ namespace Java2Dotnet.Spider.Core.Downloader
 						{
 							throw new SpiderExceptoin("Need retry.");
 						}
+					case DownloadValidationResult.FailedAndNeedWaitToVerifyCode:
+						{
+							throw new SpiderExceptoin("Need Verify Code.");
+						}
 					case DownloadValidationResult.Miss:
 						{
 							page.IsSkip = true;

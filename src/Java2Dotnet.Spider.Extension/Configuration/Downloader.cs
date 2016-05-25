@@ -131,12 +131,18 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					return result;
 				};
 			}
+			if (VerifyCode != null)
+			{
+				downloader.VerifyCode = VerifyCode.Verify;
+			}
 			return downloader;
 		}
 
 		public Browser Browser { get; set; }
 
 		public Loginer Login { get; set; }
+
+		public VerifyCode VerifyCode { get; set; }
 	}
 #endif
 }

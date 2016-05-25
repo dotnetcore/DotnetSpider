@@ -20,6 +20,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 		private static bool _isLogined;
 
 		public Func<RemoteWebDriver, bool> Login { get; set; }
+		public Func<RemoteWebDriver, bool> VerifyCode { get; set; }
 		public Func<string, string> UrlFormat;
 		public Func<RemoteWebDriver, bool> AfterNavigate;
 
@@ -77,8 +78,6 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 					}
 				}
 
-				//Logger.Info("Downloading page " + request.Url);
-
 				//中文乱码URL
 				Uri uri = request.Url;
 				string query = uri.Query;
@@ -112,6 +111,15 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 				request.PutExtra(Request.CycleTriedTimes, null);
 
 				return page;
+			}
+			catch (Exception e)
+			{
+				if (e.Message == "Need Verify Code.")
+				{
+					VerifyCode?.Invoke(driverService.WebDriver as RemoteWebDriver);
+				}
+
+				throw e;
 			}
 			finally
 			{
