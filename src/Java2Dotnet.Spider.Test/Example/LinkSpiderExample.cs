@@ -70,7 +70,7 @@ namespace Java2Dotnet.Spider.Test.Example
 					{
 						new LinkSpiderPrepareStartUrls
 						{
-							Columns = new List<DbPrepareStartUrls.Column> { new DbPrepareStartUrls.Column { Name = "token"} },
+							Columns = new List<BaseDbPrepareStartUrls.Column> { new BaseDbPrepareStartUrls.Column { Name = "token"} },
 							FormateStrings = new List<string>
 							{
 								"http://asdfasdfasd"

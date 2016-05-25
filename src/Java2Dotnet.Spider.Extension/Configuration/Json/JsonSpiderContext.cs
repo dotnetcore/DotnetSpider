@@ -253,9 +253,9 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 
 				switch (type)
 				{
-					case Configuration.PrepareStartUrls.Types.GeneralDb:
+					case Configuration.PrepareStartUrls.Types.ConfigDb:
 						{
-							var generalDbPrepareStartUrls = new DbPrepareStartUrls();
+							var generalDbPrepareStartUrls = new ConfigurableDbPrepareStartUrls();
 							SetDbPrepareStartUrls(generalDbPrepareStartUrls, jobject);
 
 							list.Add(generalDbPrepareStartUrls);

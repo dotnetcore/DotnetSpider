@@ -39,12 +39,12 @@ namespace Java2Dotnet.Spider.Test.Example
 					{"http://list.jd.com/list.html?cat=9987,653,655&page=2&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
 					{"http://list.jd.com/list.html?cat=9987,653,655&page=3&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
 				},
-				PrepareStartUrls = new List<PrepareStartUrls>{ new DbPrepareStartUrls()
+				PrepareStartUrls = new List<PrepareStartUrls>{ new ConfigurableDbPrepareStartUrls()
 				{
 					Source = DataSource.MySql,
 					ConnectString = "Database='test';Data Source= ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306",
 					TableName = "jd.category",
-					Columns = new List<DbPrepareStartUrls.Column> { new DbPrepareStartUrls.Column { Name = "url", Formatters=new List<Formatter> { new ReplaceFormatter{ OldValue= ".html",NewValue="" } } } },
+					Columns = new List<BaseDbPrepareStartUrls.Column> { new BaseDbPrepareStartUrls.Column { Name = "url", Formatters=new List<Formatter> { new ReplaceFormatter{ OldValue= ".html",NewValue="" } } } },
 					FormateStrings = new List<string> { "{0}&page=1&JL=6_0_0" }
 				}},
 				Scheduler = new RedisScheduler

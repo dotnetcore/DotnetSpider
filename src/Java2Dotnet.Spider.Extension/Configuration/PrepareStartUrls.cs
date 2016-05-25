@@ -54,7 +54,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		{
 			Base,
 			CommonDb,
-			GeneralDb,
+			ConfigDb,
 			DbList,
 			Cycle,
 			LinkSpider
@@ -254,6 +254,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 	public class ConfigurableDbPrepareStartUrls : BaseDbPrepareStartUrls
 	{
+		public override Types Type { get; internal set; } = Types.ConfigDb;
 		/// <summary>
 		/// 数据来源表名, 需要Schema/数据库名
 		/// </summary>
