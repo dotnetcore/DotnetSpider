@@ -40,6 +40,14 @@ namespace Java2Dotnet.Spider.Extension
 
 		public ContextSpider(SpiderContext spiderContext)
 		{
+			try
+			{
+				Console.OutputEncoding = System.Text.Encoding.UTF8;
+			}
+			catch
+			{
+			}
+			
 			SpiderContext = spiderContext;
 			Name = $"{SpiderContext.UserId}-{SpiderContext.SpiderName}";
 
