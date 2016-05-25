@@ -23,7 +23,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public abstract bool Login(dynamic obj);
 	}
-
+	
+#if !NET_CORE
 	public class VerifyCode
 	{
 		public bool Verify(dynamic webDriver)
@@ -45,7 +46,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
-#if !NET_CORE
 	public class CommonLoginer : Loginer
 	{
 		public override Types Type { get; internal set; } = Types.Common;

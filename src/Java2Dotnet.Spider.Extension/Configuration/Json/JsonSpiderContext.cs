@@ -370,7 +370,11 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 					}
 				case Configuration.Pipeline.Types.TestMongoDb:
 					{
+#if !NET_CORE
 						return pipeline.ToObject<TestMongoDbPipeline>();
+#else
+						throw new SpiderExceptoin("DOTNET CORE 暂时不支持 MongoDb.");						
+#endif						
 					}
 			}
 
