@@ -9,10 +9,10 @@ using Java2Dotnet.Spider.JLog;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text;
+using System.Linq;
 #if !NET_CORE
 using MongoDB.Driver;
 #endif
-using System.Linq;
 
 namespace Java2Dotnet.Spider.Extension.Monitor
 {
@@ -170,7 +170,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					var collection = _mongoClient.GetDatabase(_mongoDatabaseName).GetCollection<Request>(_errorRequestCollection);
 					collection.InsertOne(request);
 				}
-#endif				
+#endif
 			}
 
 			public void OnClose()
@@ -188,21 +188,21 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			{
 				get
 				{
-#if !NET_CORE					
+#if !NET_CORE
 					if (string.IsNullOrEmpty(MongoConnectString))
 					{
 						return _errorUrls;
 					}
 					else
 					{
-						
+
 						MongoClient _mongoClient = new MongoClient(MongoConnectString);
 						var collection = _mongoClient.GetDatabase(_mongoDatabaseName).GetCollection<Request>(_errorRequestCollection);
 						return collection.Find(r => r.Url != null).ToList().Select(r => r.Url.ToString()).ToList();
-#else
-					return _errorUrls;	
-#endif						
 					}
+#else
+					return _errorUrls;
+#endif
 				}
 			}
 
