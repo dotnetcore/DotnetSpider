@@ -21,6 +21,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 
 		public abstract Types Type { get; internal set; }
+		public abstract int RedialLimit { get; set; }
 
 		/// <summary>
 		/// Contains("anti_Spider")
@@ -36,10 +37,11 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	public class HttpDownloader : Downloader
 	{
 		public override Types Type { get; internal set; } = Types.HttpClientDownloader;
+		public override int RedialLimit { get; set; } = 0;
 
 		public override IDownloader GetDownloader()
 		{
-			var downloader = new HttpClientDownloader();
+			var downloader = new HttpClientDownloader() { RedialLimit = RedialLimit };
 			if (DownloadValidations != null)
 			{
 				downloader.DownloadValidation = page =>
@@ -77,6 +79,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	public class FileDownloader : Downloader
 	{
 		public override Types Type { get; internal set; } = Types.FileDownloader;
+		public override int RedialLimit { get; set; } = 0;
 
 		public override IDownloader GetDownloader()
 		{
@@ -106,6 +109,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	public class WebDriverDownloader : Downloader
 	{
 		public override Types Type { get; internal set; } = Types.WebDriverDownloader;
+		public override int RedialLimit { get; set; } = 0;
 
 		public override IDownloader GetDownloader()
 		{
