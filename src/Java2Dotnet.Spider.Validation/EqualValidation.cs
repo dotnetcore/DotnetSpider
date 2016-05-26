@@ -19,9 +19,18 @@ namespace Java2Dotnet.Spider.Validation
 			try
 			{
 				string value = GetValue();
+				string result = "";
+				if (Arguments.Contains("select") && Arguments.Contains("from") && Arguments.Contains("as result"))
+				{
+					result = GetValue(Arguments);
+				}
+				else
+				{
+					result = Arguments;
+				}
 				return new ValidateResult
 				{
-					IsPass = value == Arguments,
+					IsPass = value == result,
 					Arguments = Arguments,
 					Description = Description,
 					Sql = Sql,

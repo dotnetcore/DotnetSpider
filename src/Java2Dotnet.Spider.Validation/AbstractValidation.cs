@@ -36,13 +36,18 @@ namespace Java2Dotnet.Spider.Validation
 
 		protected string GetValue()
 		{
+			return GetValue(Sql);
+		}
+
+		protected string GetValue(string query)
+		{
 			if (Connection.State != ConnectionState.Open)
 			{
 				Connection.Open();
 			}
 
 			var command = Connection.CreateCommand();
-			command.CommandText = Sql;
+			command.CommandText = query;
 			command.CommandType = CommandType.Text;
 			var reader = command.ExecuteReader();
 			object result = new object();
