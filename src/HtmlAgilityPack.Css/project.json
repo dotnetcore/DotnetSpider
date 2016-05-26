@@ -17,6 +17,7 @@
 			"dependencies": {},
 			"buildOptions": {
 				"define": [
+					"NET_CORE",
 					"RELEASE"
 				]
 			}
