@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using StringUtils = Java2Dotnet.Spider.Common.StringUtils;
+#if NET_CORE
+using System.Reflection;
+#endif
 
 namespace Java2Dotnet.Spider.Core.Selector
 {
@@ -46,8 +49,11 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 			var type = (Type)text.GetType();
 			string tmp = "";
-
+#if NET_CORE
+			if (typeof(ICollection).GetTypeInfo().IsAssignableFrom(type))
+#else
 			if (typeof(ICollection).IsAssignableFrom(type))
+#endif			
 			{
 				foreach (var l in (IEnumerable)text)
 				{

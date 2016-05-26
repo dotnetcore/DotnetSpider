@@ -9,6 +9,14 @@ namespace Java2Dotnet.Spider.JLog
 
 		public static ILog GetLogger(string name = null)
 		{
+			try
+			{
+				System.Console.OutputEncoding = System.Text.Encoding.UTF8;
+			}
+			catch
+			{
+			}
+			
 			if (string.IsNullOrEmpty(name))
 			{
 				name = "DEFAULT";

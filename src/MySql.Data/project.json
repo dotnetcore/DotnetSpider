@@ -1,26 +1,32 @@
 {
 	"version": "0.0.9",
-	"compilationOptions": {
-		"emitEntryPoint": false
+	"buildOptions": {
+		"emitEntryPoint": false,
+		"debugType": "portable"
 	},
-
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc3-23829",
-		"System.Security.Cryptography.Algorithms": "4.0.0-rc3-23829",
-		"System.Data.Common": "4.0.1-rc3-23829",
-		"System.Net.NameResolution": "4.0.0-rc3-23829",
-		"System.Security.Cryptography.X509Certificates": "4.0.0-rc3-23829",
-		"System.Security.Principal.Windows": "4.0.0-rc3-23829",
-		"System.Diagnostics.Process": "4.1.0-rc3-23829",
-		"System.ComponentModel.TypeConverter": "4.0.1-rc3-23829",
-		"System.Net.Security": "4.0.0-rc3-23829",
-        "System.Collections.NonGeneric": "4.0.1-rc3-23829"
+		"Microsoft.NETCore.App": {
+			"type": "platform",
+			"version": "1.0.0-rc2-*"
+		},
+		"System.Security.Cryptography.Algorithms": "4.1.0-rc2-*",
+		"System.Data.Common": "4.0.1-rc2-*",
+		"System.Net.NameResolution": "4.0.0-rc2-*",
+		"System.Security.Cryptography.X509Certificates": "4.1.0-rc2-*",
+		"System.Security.Principal.Windows": "4.0.0-rc2-*",
+		"System.Diagnostics.Process": "4.1.0-rc2-*",
+		"System.ComponentModel.TypeConverter": "4.0.1-rc2-*",
+		"System.Net.Security": "4.0.0-rc2-*",
+        "System.Collections.NonGeneric": "4.0.1-rc2-*"
 	},
-
 	"frameworks": {
-		"dnxcore50": {
-			"compilationOptions": {
-				"define": [ "DNXCore" ]
+		"netcoreapp1.0": {
+			"imports": "dnxcore50",
+			"dependencies": {},
+			"buildOptions": {
+				"define": [
+					"RELEASE","NET_CORE"
+				]
 			}
 		}
 	}

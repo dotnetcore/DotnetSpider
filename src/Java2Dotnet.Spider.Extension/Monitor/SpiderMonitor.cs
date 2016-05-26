@@ -9,8 +9,10 @@ using Java2Dotnet.Spider.JLog;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text;
-using MongoDB.Driver;
 using System.Linq;
+#if !NET_CORE
+using MongoDB.Driver;
+#endif
 
 namespace Java2Dotnet.Spider.Extension.Monitor
 {
@@ -70,7 +72,9 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			static MonitorSpiderListener()
 			{
 				StatusServer = ConfigurationManager.Get("statusHost");
+#if !NET_CORE
 				MongoConnectString = ConfigurationManager.Get("dataMongo");
+#endif
 			}
 
 			public MonitorSpiderListener(Core.Spider spider)
@@ -159,12 +163,14 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 				_errorUrls.Add(request.Url.ToString());
 				_errorCount.Inc();
 
+#if !NET_CORE
 				if (_spider.SaveStatus && !string.IsNullOrEmpty(MongoConnectString))
 				{
 					MongoClient _mongoClient = new MongoClient(MongoConnectString);
 					var collection = _mongoClient.GetDatabase(_mongoDatabaseName).GetCollection<Request>(_errorRequestCollection);
 					collection.InsertOne(request);
 				}
+#endif
 			}
 
 			public void OnClose()
@@ -182,16 +188,21 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			{
 				get
 				{
+#if !NET_CORE
 					if (string.IsNullOrEmpty(MongoConnectString))
 					{
 						return _errorUrls;
 					}
 					else
 					{
+
 						MongoClient _mongoClient = new MongoClient(MongoConnectString);
 						var collection = _mongoClient.GetDatabase(_mongoDatabaseName).GetCollection<Request>(_errorRequestCollection);
 						return collection.Find(r => r.Url != null).ToList().Select(r => r.Url.ToString()).ToList();
 					}
+#else
+					return _errorUrls;
+#endif
 				}
 			}
 

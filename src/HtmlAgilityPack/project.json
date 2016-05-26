@@ -1,21 +1,28 @@
 {
 	"version": "0.0.9",
-	"compilationOptions": {
-		"emitEntryPoint": false
+	"buildOptions": {
+		"emitEntryPoint": false,
+		"debugType": "portable"
 	},
-
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc3-23829",
-        "System.Xml.XmlDocument": "4.0.1-rc3-23829",
-		"System.Xml.ReaderWriter": "4.0.11-rc3-23829",
-		"System.Xml.XPath": "4.0.1-rc3-23829",
-		"System.Xml.XPath.XDocument": "4.0.1-rc3-23829",
-		"System.Diagnostics.StackTrace": "4.0.1-rc3-23829"
+		"Microsoft.NETCore.App": {
+			"type": "platform",
+			"version": "1.0.0-rc2-*"
+		},
+		"System.Xml.XmlDocument": "4.0.1-rc2-*",
+		"System.Xml.ReaderWriter": "4.0.11-rc2-*",
+		"System.Xml.XPath": "4.0.1-rc2-*",
+		"System.Xml.XPath.XDocument": "4.0.1-rc2-*",
+		"System.Diagnostics.StackTrace": "4.0.1-rc2-*"
 	},
-
 	"frameworks": {
-		"dnxcore50": {
-			"dependencies": {
+		"netcoreapp1.0": {
+			"imports": "dnxcore50",
+			"dependencies": {},
+			"buildOptions": {
+				"define": [
+					"RELEASE"
+				]
 			}
 		}
 	}

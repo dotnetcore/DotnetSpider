@@ -60,7 +60,11 @@ namespace Java2Dotnet.Spider.Extension
 
 			foreach (var entiType in EntiTypes)
 			{
+#if NET_CORE
+				Context.Entities.Add(ConvertToEntity(entiType.GetTypeInfo()));
+#else
 				Context.Entities.Add(ConvertToEntity(entiType));
+#endif				
 				Context.EnviromentValues = entiType.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new EnviromentValue
 				{
 					Name = e.Name,
@@ -151,9 +155,8 @@ namespace Java2Dotnet.Spider.Extension
 #else
 		public static Entity ConvertToEntity(TypeInfo entityType)
 		{
-			EntityType json = new EntityType();
+			Entity json = new Entity();
 			json.Identity = GetEntityName(entityType.AsType());
-			json.TargetUrls = entityType.GetCustomAttributes<TargetUrl>().ToList();
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
 			{

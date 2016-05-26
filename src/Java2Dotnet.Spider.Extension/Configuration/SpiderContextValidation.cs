@@ -63,7 +63,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 								var dataTypeToken = fieldToken.DataType;
 								if (dataTypeToken != null)
 								{
-									if (dataTypeToken.Type != JTokenType.String && !(spiderContext.Pipeline.SelectToken("$.Type").ToString() == "2" || spiderContext.Pipeline.SelectToken("$.Type").ToString() == "3"))
+									if ("字符串" != dataTypeToken && dataTypeToken.Type != JTokenType.String && !(spiderContext.Pipeline.SelectToken("$.Type").ToString() == "2" || spiderContext.Pipeline.SelectToken("$.Type").ToString() == "3"))
 									{
 										if (correct)
 										{

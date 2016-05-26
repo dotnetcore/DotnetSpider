@@ -104,7 +104,7 @@ namespace Java2Dotnet.Spider.Extension.Processor
 					List<string> tmp = new List<string>();
 					foreach (string link in links)
 					{
-						var url = link.Clone().ToString();
+						var url = new String(link.ToCharArray());
 						foreach (Formatter f in formatters)
 						{
 							url = f.Formate(url);

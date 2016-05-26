@@ -1,15 +1,25 @@
 {
 	"version": "0.0.9",
-	"compilationOptions": {
-		"emitEntryPoint": false
+	"buildOptions": {
+		"emitEntryPoint": false,
+		"debugType": "portable"
 	},
-
 	"dependencies": {
-		"NETStandard.Library": "1.0.0-rc3-23829",
+		"Microsoft.NETCore.App": {
+			"type": "platform",
+			"version": "1.0.0-rc2-*"
+		},
 		"HtmlAgilityPack": "0.0.9"
 	},
-
 	"frameworks": {
-		"dnxcore50": { }
+		"netcoreapp1.0": {
+			"imports": "dnxcore50",
+			"dependencies": {},
+			"buildOptions": {
+				"define": [
+					"RELEASE"
+				]
+			}
+		}
 	}
 }
