@@ -65,12 +65,20 @@ namespace Java2Dotnet.Spider.Extension.Model
 				int index = 0;
 				foreach (var item in list)
 				{
-					JObject obj = ProcessSingle(page, item, _entityDefine, index);
-					if (obj != null)
+					try
 					{
-						result.Add(obj);
+						JObject obj = ProcessSingle(page, item, _entityDefine, index);
+						if (obj != null)
+						{
+							result.Add(obj);
+						}
+						index++;
 					}
-					index++;
+					catch(Exception e)
+					{
+
+					}
+
 				}
 				return result;
 			}
@@ -176,14 +184,10 @@ namespace Java2Dotnet.Spider.Extension.Model
 					{
 						if (isMulti)
 						{
-							var propertyValues = item.SelectList(selector).GetValue(option == PropertyExtractBy.ValueOption.PlainText);
+							var propertyValues = item.SelectList(selector).Nodes();
 							if (option == PropertyExtractBy.ValueOption.Count)
 							{
-								var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "ERROR";
-								if (tempValue == "ERROR")
-								{
-
-								}
+								var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "-1";
 								dataItem.Add(propertyName, tempValue);
 							}
 							else
@@ -196,7 +200,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 								List<string> results = new List<string>();
 								foreach (var propertyValue in propertyValues)
 								{
-									string tmp = propertyValue;
+									string tmp = propertyValue.GetValue(option == PropertyExtractBy.ValueOption.PlainText);
 									foreach (var formatter in formatters)
 									{
 										tmp = formatter.Formate(tmp);
@@ -236,7 +240,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 						int index1 = 0;
 						foreach (var entity in propertyValues)
 						{
-							JObject obj = ProcessSingle(page, entity, datatype, index1);
+							JObject obj = ProcessSingle(page, entity, datatype.ToObject<Entity>(), index1);
 							if (obj != null)
 							{
 								result.Add(obj);

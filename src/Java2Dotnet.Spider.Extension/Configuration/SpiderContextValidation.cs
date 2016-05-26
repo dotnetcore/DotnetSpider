@@ -60,18 +60,19 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 									messages.Add($"Error 005: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} has no name.");
 								}
 
-								var dataTypeToken = fieldToken.DataType;
-								if (dataTypeToken != null)
-								{
-									if ("字符串" != dataTypeToken && dataTypeToken.Type != JTokenType.String && !(spiderContext.Pipeline.SelectToken("$.Type").ToString() == "2" || spiderContext.Pipeline.SelectToken("$.Type").ToString() == "3"))
-									{
-										if (correct)
-										{
-											correct = false;
-										}
-										messages.Add($"Error 007: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} is a class, when data entity is a loop type, pipeline should be mongodb only.");
-									}
-								}
+								//var dataTypeToken = fieldToken.DataType;
+								//if (dataTypeToken != null)
+								//{
+								//	var tmpJobj = dataTypeToken as JObject;
+								//	if ("字符串" != dataTypeToken && (tmpJobj != null && tmpJobj.Type != JTokenType.String) && !(spiderContext.Pipeline.SelectToken("$.Type").ToString() == "2" || spiderContext.Pipeline.SelectToken("$.Type").ToString() == "3"))
+								//	{
+								//		if (correct)
+								//		{
+								//			correct = false;
+								//		}
+								//		messages.Add($"Error 007: Entity: {entityName}, Field index: {fieldTokens.IndexOf(fieldToken)} is a class, when data entity is a loop type, pipeline should be mongodb only.");
+								//	}
+								//}
 							}
 						}
 					}
