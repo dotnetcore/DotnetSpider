@@ -1,7 +1,7 @@
 {
 	"version": "1.0.0-*",
 	"buildOptions": {
-		"emitEntryPoint": false,
+		"emitEntryPoint": true,
 		"debugType": "portable"
 	},
 	"dependencies": {
@@ -15,7 +15,7 @@
 		"Java2Dotnet.Spider.Redial": "0.0.9",
 		"Java2Dotnet.Spider.JLog": "0.0.9",
 		"System.Diagnostics.Process": "4.1.0-rc2-*",
-		"System.Net.Http": "4.0.1-rc2-23829",
+		"System.Net.Http": "4.0.1-rc2-*",
 		"System.Text.Encoding.CodePages": "4.0.1-rc2-*"
 	},
 	"content": "app.conf",
