@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System.Text;
 
 namespace Java2Dotnet.Spider.JLog
 {
@@ -9,13 +10,7 @@ namespace Java2Dotnet.Spider.JLog
 
 		public static ILog GetLogger(string name = null)
 		{
-			try
-			{
-				System.Console.OutputEncoding = System.Text.Encoding.UTF8;
-			}
-			catch
-			{
-			}
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			
 			if (string.IsNullOrEmpty(name))
 			{
