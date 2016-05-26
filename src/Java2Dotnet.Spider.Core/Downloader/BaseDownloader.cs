@@ -89,13 +89,13 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			lock (this)
 			{
 				++RequestCount;
-			}
-			
-			if (RedialLimit > 0 && RequestCount%RedialLimit == 0)
-			{
-				if (RedialManagerUtils.RedialManager != null)
+
+				if (RedialLimit > 0 && RequestCount % RedialLimit == 0)
 				{
-					RedialManagerUtils.RedialManager.Redial();
+					if (RedialManagerUtils.RedialManager != null)
+					{
+						RedialManagerUtils.RedialManager.Redial();
+					}
 				}
 			}
 		}
