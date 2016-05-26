@@ -142,13 +142,8 @@ namespace Java2Dotnet.Spider.Core
 			DataRootDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\data\\" + Identity;
 #else
 			DataRootDirectory = Path.Combine(AppContext.BaseDirectory,"data", Identity);
-			try
-			{
-				Console.OutputEncoding = System.Text.Encoding.UTF8;
-			}
-			catch
-			{
-			}
+
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 			_errorRequestFile = FilePersistentBase.PrepareFile(Path.Combine(DataRootDirectory, "errorRequests.txt"));
 		}

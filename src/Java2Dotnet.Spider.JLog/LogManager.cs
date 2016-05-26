@@ -1,22 +1,18 @@
 ﻿
 using System.Collections.Generic;
+using System.Text;
 
 namespace Java2Dotnet.Spider.JLog
 {
 	public static class LogManager
 	{
-		private static readonly Dictionary<string,ILog> LoggerCahced=new Dictionary<string, ILog>();
+		private static readonly Dictionary<string, ILog> LoggerCahced = new Dictionary<string, ILog>();
 
 		public static ILog GetLogger(string name = null)
 		{
-			try
-			{
-				System.Console.OutputEncoding = System.Text.Encoding.UTF8;
-			}
-			catch
-			{
-			}
-			
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
 			if (string.IsNullOrEmpty(name))
 			{
 				name = "DEFAULT";
@@ -29,7 +25,7 @@ namespace Java2Dotnet.Spider.JLog
 			else
 			{
 				var logger = new Log(name);
-				LoggerCahced.Add(name,logger);
+				LoggerCahced.Add(name, logger);
 				return logger;
 			}
 		}
