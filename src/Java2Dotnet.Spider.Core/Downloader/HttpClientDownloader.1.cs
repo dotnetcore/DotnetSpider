@@ -71,6 +71,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 					return httpClient.SendAsync(message).Result;
 				}, httpMessage);
 
+				AddRequestCount();
+
 				response.EnsureSuccessStatusCode();
 				if (!site.AcceptStatCode.Contains(response.StatusCode))
 				{
