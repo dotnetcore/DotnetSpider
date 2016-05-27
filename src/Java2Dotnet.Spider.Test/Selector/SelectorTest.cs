@@ -15,10 +15,10 @@ namespace Java2Dotnet.Spider.Test.Selector
 		public void TestChain()
 		{
 			Selectable selectable = new Selectable(_html, "", ContentType.Html);
-			var linksWithoutChain = selectable.Links().GetValue();
+			var linksWithoutChain = selectable.Links().GetValues();
 			ISelectable xpath = selectable.XPath("//div");
-			var linksWithChainFirstCall = xpath.Links().GetValue();
-			var linksWithChainSecondCall = xpath.Links().GetValue();
+			var linksWithChainFirstCall = xpath.Links().GetValues();
+			var linksWithChainSecondCall = xpath.Links().GetValues();
 			Assert.AreEqual(linksWithoutChain.Count, linksWithChainFirstCall.Count);
 			Assert.AreEqual(linksWithChainFirstCall.Count, linksWithChainSecondCall.Count);
 		}

@@ -92,7 +92,7 @@ namespace Java2Dotnet.Spider.Extension.Processor
 				var formatters = targetUrlExtractInfo.Formatters;
 				var urlPatterns = targetUrlExtractInfo.Patterns;
 
-				var links = urlRegionSelector == null ? page.Selectable.Links().GetValue() : (page.Selectable.SelectList(urlRegionSelector)).Links().GetValue();
+				var links = urlRegionSelector == null ? page.Selectable.Links().GetValues() : (page.Selectable.SelectList(urlRegionSelector)).Links().GetValues();
 				if (links == null)
 				{
 					return;

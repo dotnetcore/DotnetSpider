@@ -248,43 +248,14 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override bool CanStop(Page page)
 		{
-			var current = page.Selectable.SelectList(SelectorUtil.GetSelector(CurrenctPageSelector)).GetValue();
+			var current = page.Selectable.SelectList(SelectorUtil.GetSelector(CurrenctPageSelector)).GetValues();
 			if (current == null)
 			{
 				return true;
 			}
-			if (current is IEnumerable<object>)
+			foreach (var c in (List<string>)current)
 			{
-				foreach (var c in (List<object>)current)
-				{
-					var dt = DateTime.Parse(c.ToString());
-					if (IsBefore)
-					{
-						foreach (var stopper in Stoppers)
-						{
-							var stopDate = DateTime.Parse(stopper);
-							if (dt < stopDate)
-							{
-								return true;
-							}
-						}
-					}
-					else
-					{
-						foreach (var stopper in Stoppers)
-						{
-							var stopDate = DateTime.Parse(stopper);
-							if (dt > stopDate)
-							{
-								return true;
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				var dt = DateTime.Parse(current.ToString());
+				var dt = DateTime.Parse(c.ToString());
 				if (IsBefore)
 				{
 					foreach (var stopper in Stoppers)
