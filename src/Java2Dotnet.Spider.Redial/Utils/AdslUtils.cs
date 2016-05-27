@@ -74,6 +74,9 @@ namespace Java2Dotnet.Spider.Redial.Utils
 			uint dwReserved
 			);
 
+
+		[DllImport("Rasapi32.dll", EntryPoint = "RasEnumConnectionsA",
+			 SetLastError = true)]
 		internal static extern int RasEnumConnections
 			(
 			ref Rasconn lprasconn, // buffer to receive connections data

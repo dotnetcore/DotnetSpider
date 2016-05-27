@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Threading;
 using Java2Dotnet.Spider.Core;
@@ -40,14 +41,10 @@ namespace Java2Dotnet.Spider.Extension
 
 		public ContextSpider(SpiderContext spiderContext)
 		{
-			try
-			{
-				Console.OutputEncoding = System.Text.Encoding.UTF8;
-			}
-			catch
-			{
-			}
 			
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
 			SpiderContext = spiderContext;
 			Name = $"{SpiderContext.UserId}-{SpiderContext.SpiderName}";
 
@@ -370,13 +367,6 @@ namespace Java2Dotnet.Spider.Extension
 				}
 			}
 #endif
-
-			foreach (var request in SpiderContext.StartUrls)
-			{
-				SpiderContext.Site.AddStartRequest(new Request(request.Key, 0, request.Value)
-				{
-				});
-			}
 		}
 
 		protected virtual Core.Spider GenerateSpider(IScheduler scheduler)

@@ -11,7 +11,8 @@
 		},
 		"System.Net.NameResolution": "4.0.0-rc2-*",
 		"System.Net.Http": "4.0.1-rc2-*",
-		"System.Threading.Thread": "4.0.0-rc2-*"
+		"System.Threading.Thread": "4.0.0-rc2-*",
+		"System.Text.Encoding.CodePages":  "4.0.1-rc2-*"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {

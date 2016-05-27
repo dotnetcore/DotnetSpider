@@ -15,6 +15,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 	public class BaseDownloader : IDownloader, IDisposable
 	{
+		public int RedialLimit { get; set; }
+		public static int RequestCount { get; set; } = 0;
 		public DownloadValidation DownloadValidation { get; set; }
 		public int ThreadNum { set; get; }
 		protected SingleExecutor SingleExecutor = new SingleExecutor();
@@ -78,6 +80,23 @@ namespace Java2Dotnet.Spider.Core.Downloader
 							page.IsSkip = true;
 							break;
 						}
+				}
+			}
+		}
+
+		public void AddRequestCount()
+		{
+			lock (this)
+			{
+				++RequestCount;
+
+				if (RedialLimit > 0 && RequestCount == RedialLimit)
+				{
+					RequestCount = 0;
+					if (RedialManagerUtils.RedialManager != null)
+					{
+						RedialManagerUtils.RedialManager.Redial();
+					}
 				}
 			}
 		}

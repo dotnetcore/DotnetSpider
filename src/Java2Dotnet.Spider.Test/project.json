@@ -2,7 +2,8 @@
 	"version": "1.0.0-*",
 	"buildOptions": {
 		"emitEntryPoint": true,
-		"debugType": "portable"
+		"debugType": "portable",
+		"copyToOutput": "app.conf"
 	},
 	"dependencies": {
 		"Microsoft.NETCore.App": {
@@ -18,7 +19,6 @@
 		"System.Net.Http": "4.0.1-rc2-*",
 		"System.Text.Encoding.CodePages": "4.0.1-rc2-*"
 	},
-	"content": "app.conf",
 	"frameworks": {
 		"netcoreapp1.0": {
 			"imports": "dnxcore50",
