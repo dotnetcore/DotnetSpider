@@ -124,9 +124,6 @@
     <Compile Include="..\HtmlTest.cs">
       <Link>HtmlTest.cs</Link>
     </Compile>
-    <Compile Include="..\Model\ModelPageProcessorTest.cs">
-      <Link>Model\ModelPageProcessorTest.cs</Link>
-    </Compile>
     <Compile Include="..\PageExtract2MultiTypesTests.cs">
       <Link>PageExtract2MultiTypesTests.cs</Link>
     </Compile>
