@@ -181,9 +181,6 @@
     <Compile Include="..\SiteTest.cs">
       <Link>SiteTest.cs</Link>
     </Compile>
-    <Compile Include="..\SpiderEntityTest.cs">
-      <Link>SpiderEntityTest.cs</Link>
-    </Compile>
     <Compile Include="..\SpiderTest.cs">
       <Link>SpiderTest.cs</Link>
     </Compile>

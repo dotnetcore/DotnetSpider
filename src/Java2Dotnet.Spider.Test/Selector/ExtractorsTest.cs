@@ -18,7 +18,7 @@ namespace Java2Dotnet.Spider.Test.Selector
 			Assert.AreEqual(Selectors.Css("div h1 a", "href").Select(_html), "xxx");
 			Assert.AreEqual(Selectors.Css("div h1 a").Select(_html).InnerHtml, "aabbcc");
 			Assert.AreEqual(Selectors.XPath("//a/@href").Select(_html), "xxx");
-			Assert.AreEqual(Selectors.Regex("a href=\"(.*)\"").Select(_html), "xxx");
+			Assert.AreEqual(Selectors.Regex("a href=\"(.*)\"").Select(_html), "a href=\"xxx\"");
 			Assert.AreEqual(Selectors.Regex("(a href)=\"(.*)\"", 2).Select(_html), "xxx");
 		}
 	}

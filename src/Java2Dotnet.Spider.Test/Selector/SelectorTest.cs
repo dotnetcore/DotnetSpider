@@ -31,7 +31,7 @@ namespace Java2Dotnet.Spider.Test.Selector
 			Assert.AreEqual(links[0].GetValue(), "http://whatever.com/aaa");
 
 			var links1 = selectable.XPath(".//a/@href").GetValue();
-			Assert.AreEqual(links1[0], "http://whatever.com/aaa");
+			Assert.AreEqual(links1, "http://whatever.com/aaa");
 		}
 	}
 }

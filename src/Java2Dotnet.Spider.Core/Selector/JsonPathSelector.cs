@@ -40,7 +40,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 					if (o != null)
 					{
-						var items = o.SelectTokens(_jsonPathStr).ToList();
+						var items = o.SelectTokens(_jsonPathStr).Select(t=>t.ToString()).ToList();
 						if (items.Count > 0)
 						{
 							list.AddRange(items);
@@ -49,7 +49,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 					else
 					{
 						JArray array = JsonConvert.DeserializeObject(text) as JArray;
-						var items = array?.SelectTokens(_jsonPathStr).ToList();
+						var items = array?.SelectTokens(_jsonPathStr).Select(t => t.ToString()).ToList();
 						if (items != null && items.Count > 0)
 						{
 							list.AddRange(items);
@@ -64,7 +64,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 					if (o != null)
 					{
-						var items = o.SelectTokens(_jsonPathStr).ToList();
+						var items = o.SelectTokens(_jsonPathStr).Select(t => t.ToString()).ToList();
 						if (items.Count > 0)
 						{
 							list.AddRange(items);
@@ -73,7 +73,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 					else
 					{
 						JArray array = text as JArray;
-						var items = array?.SelectTokens(_jsonPathStr).ToList();
+						var items = array?.SelectTokens(_jsonPathStr).Select(t => t.ToString()).ToList();
 						if (items != null && items.Count > 0)
 						{
 							list.AddRange(items);
