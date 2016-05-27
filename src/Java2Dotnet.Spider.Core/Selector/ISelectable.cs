@@ -75,7 +75,9 @@ namespace Java2Dotnet.Spider.Core.Selector
 		/// <summary>
 		/// Single string result
 		/// </summary>
-		dynamic GetValue(bool isPlainText = false);
+		string GetValue(bool isPlainText = false);
+
+		List<string> GetValues(bool isPlainText = false);
 
 		///// <summary>
 		///// If result exist for select

@@ -176,14 +176,10 @@ namespace Java2Dotnet.Spider.Extension.Model
 					{
 						if (isMulti)
 						{
-							var propertyValues = item.SelectList(selector).GetValue(option == PropertyExtractBy.ValueOption.PlainText);
+							var propertyValues = item.SelectList(selector).GetValues(field.Option == PropertyExtractBy.ValueOption.PlainText);
 							if (option == PropertyExtractBy.ValueOption.Count)
 							{
-								var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "ERROR";
-								if (tempValue == "ERROR")
-								{
-
-								}
+								var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "-1";
 								dataItem.Add(propertyName, tempValue);
 							}
 							else

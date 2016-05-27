@@ -42,14 +42,14 @@ namespace Java2Dotnet.Spider.Core.Selector
 			return Select(regexSelector);
 		}
 
-		public dynamic GetValue(bool isPlainText)
+		public string GetValue(bool isPlainText)
 		{
 			if (Elements == null || Elements.Count == 0)
 			{
 				return null;
 			}
 
-			if (Elements.Count == 1)
+			if (Elements.Count > 0)
 			{
 				if (Elements[0] is HtmlNode)
 				{
@@ -67,25 +67,31 @@ namespace Java2Dotnet.Spider.Core.Selector
 					return Elements[0].ToString();
 				}
 			}
+			return null;
+		}
 
-			return Elements.Select((selectedNode) =>
+		public List<string> GetValues(bool isPlainText)
+		{
+			List<string> result = new List<string>();
+			foreach (var el in Elements)
 			{
-				if (selectedNode is HtmlNode)
+				if (el is HtmlNode)
 				{
 					if (!isPlainText)
 					{
-						return ((HtmlNode)selectedNode).InnerHtml;
+						result.Add(((HtmlNode)el).InnerHtml);
 					}
 					else
 					{
-						return ((HtmlNode)selectedNode).InnerText;
+						result.Add(((HtmlNode)el).InnerText);
 					}
 				}
 				else
 				{
-					return selectedNode.ToString();
+					result.Add(el.ToString());
 				}
-			}).ToList();
+			}
+			return result;
 		}
 
 		public abstract ISelectable Select(ISelector selector);
