@@ -29,19 +29,19 @@ namespace Java2Dotnet.Spider.Common
 			_partUrl = partUrl;
 		}
 
-		public void StartCapture()
+		public void StartCapture(bool asSystemProxy = false, bool decryptSsl = true)
 		{
 			FiddlerApplication.Shutdown();
 
 			try
 			{
 				FiddlerApplication.oDefaultClientCertificate = new X509Certificate(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FiddlerRoot.cer"));
-				FiddlerApplication.Startup(Port, false, true, true);
+				FiddlerApplication.Startup(Port, asSystemProxy, decryptSsl, true);
 			}
 			catch (Exception)
 			{
 				FiddlerApplication.Shutdown();
-				FiddlerApplication.Startup(Port, false, true, true);
+				FiddlerApplication.Startup(Port, asSystemProxy, decryptSsl, true);
 			}
 			FiddlerApplication.AfterSessionComplete += FiddlerApplication_AfterSessionComplete;
 			FiddlerApplication.BeforeRequest += FiddlerApplication_BeforeRequest;

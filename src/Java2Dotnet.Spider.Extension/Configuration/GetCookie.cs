@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
+using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Extension.Model;
 #if !NET_CORE
@@ -17,7 +19,9 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public enum Types
 		{
 			Common,
-			Login
+			Login,
+			Fiddler,
+			FiddlerLogin
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -115,6 +119,74 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				}
 			}
 
+			return cookie;
+		}
+	}
+
+	public class FiddlerCookieTrapper : CommonCookieTrapper
+	{
+		public override Types Type { get; internal set; } = Types.Fiddler;
+		public int ProxyPort { get; set; } = 30000;
+		public string Pattern { get; set; }
+
+		public override string GetCookie()
+		{
+			if (string.IsNullOrEmpty(Pattern))
+			{
+				throw new Exception("Fiddler CookieTrapper: Pattern cannot be null!");
+			}
+
+			string cookie = string.Empty;
+			using (FiddlerClient fiddlerWrapper = new FiddlerClient(ProxyPort, Pattern))
+			{
+				fiddlerWrapper.StartCapture(true);
+				try
+				{
+					base.GetCookie();
+					var header = fiddlerWrapper.Headers;
+					const string cookiesPattern = @"Cookie: (.*?)\r\n";
+					cookie = Regex.Match(header, cookiesPattern).Groups[1].Value;
+				}
+				catch
+				{
+					// ignored
+				}
+				fiddlerWrapper.StopCapture();
+			}
+			return cookie;
+		}
+	}
+
+	public class FiddlerLoginCookieTrapper : LoginCookieTrapper
+	{
+		public override Types Type { get; internal set; } = Types.FiddlerLogin;
+		public int ProxyPort { get; set; } = 30000;
+		public string Pattern { get; set; }
+
+		public override string GetCookie()
+		{
+			if (string.IsNullOrEmpty(Pattern))
+			{
+				throw new Exception("Fiddler CookieTrapper: Pattern cannot be null!");
+			}
+
+			string cookie = string.Empty;
+			using (FiddlerClient fiddlerWrapper = new FiddlerClient(ProxyPort, Pattern))
+			{
+				fiddlerWrapper.StartCapture(true);
+				try
+				{
+					base.GetCookie();
+					var header = fiddlerWrapper.Headers;
+					const string cookiesPattern = @"Cookie: (.*?)\r\n";
+					cookie = Regex.Match(header, cookiesPattern).Groups[1].Value;
+				}
+				catch
+				{
+					// ignored
+				}
+				fiddlerWrapper.StopCapture();
+			}
 			return cookie;
 		}
 	}
