@@ -9,7 +9,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public enum Types
 		{
 			Adsl,
-			H3C
+			H3C,
+			Vpn
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -47,6 +48,24 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override IRedialer GetRedialer()
 		{
 			return new H3CSshAdslRedialer(Sshhost, Sshport, Sshuser, Sshpass, SshInterface, Account, Password);
+		}
+	}
+#endif
+
+#if !NET_CORE
+	public class VpnRedialer : Redialer
+	{
+		public string NetInterface { get; set; } = null;
+		public string VpnInterface { get; set; }
+		public string VpnIp { get; set; }
+		public string Account { get; set; }
+		public string Password { get; set; }
+
+		public override Types Type { get; internal set; } = Types.Vpn;
+
+		public override IRedialer GetRedialer()
+		{
+			return new Redial.Redialer.VpnRedialer(VpnInterface, VpnIp, Account, Password, NetInterface);
 		}
 	}
 #endif

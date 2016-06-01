@@ -8,7 +8,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public enum Types
 		{
 			Defalut,
-			Vps
+			Vps,
+			Vpn
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -24,5 +25,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override Types Type { get; internal set; } = Types.Vps;
 
 		public int InterfaceNum { get; set; } = 2;
+	}
+
+	public class VpnNetworkValidater : NetworkValidater
+	{
+		public override Types Type { get; internal set; } = Types.Vpn;
+
+		public string VpnName { get; set; } = "VPN连接";
 	}
 }

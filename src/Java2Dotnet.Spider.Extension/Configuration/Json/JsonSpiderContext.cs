@@ -173,6 +173,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 					{
 						return new DefaultNetworkValidater();
 					}
+				case Configuration.NetworkValidater.Types.Vpn:
+					{
+						return new VpnNetworkValidater();
+					}
 			}
 			throw new SpiderExceptoin("Can't convert NetworkValidater: " + networkValidater);
 		}
@@ -227,6 +231,14 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 						return redialer.ToObject<H3CRedialer>();
 #else
 						throw new SpiderExceptoin("UNSPORT H3C ADSL NOW.");
+#endif
+					}
+				case Configuration.Redialer.Types.Vpn:
+					{
+#if !NET_CORE
+						return redialer.ToObject<VpnRedialer>();
+#else
+						throw new SpiderExceptoin("UNSPORT VPN NOW.");
 #endif
 					}
 			}

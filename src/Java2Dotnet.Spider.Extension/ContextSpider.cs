@@ -41,7 +41,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		public ContextSpider(SpiderContext spiderContext)
 		{
-			
+
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
@@ -426,6 +426,10 @@ namespace Java2Dotnet.Spider.Extension
 				case NetworkValidater.Types.Defalut:
 					{
 						return new Redial.NetworkValidater.DefaultNetworkValidater();
+					}
+				case NetworkValidater.Types.Vpn:
+					{
+						return new Redial.NetworkValidater.VpnNetworkValidater(((Configuration.VpnNetworkValidater)networkValidater).VpnName);
 					}
 			}
 			return null;
