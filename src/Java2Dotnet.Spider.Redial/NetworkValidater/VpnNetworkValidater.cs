@@ -19,19 +19,21 @@ namespace Java2Dotnet.Spider.Redial.NetworkValidater
 
 		public void Wait()
 		{
-			bool stop = false;
-			while (!stop)
-			{
-				try
-				{
-					VpnUtils util = new VpnUtils();
-					stop = util.GetCurrentConnectingVpnNames().Contains(_vpnInterface);
-				}
-				catch
-				{
-					// ignored
-				}
-			}
+			//在VpnRedialer中实现，因为操作Vpn断开和连接不那么稳定，所以在重拨过程中实现了重试，到Validate阶段已经保证网络通畅
+
+			//bool stop = false;
+			//while (!stop)
+			//{
+			//	try
+			//	{
+			//		VpnUtils util = new VpnUtils();
+			//		stop = util.GetCurrentConnectingVpnNames().Contains(_vpnInterface);
+			//	}
+			//	catch
+			//	{
+			//		// ignored
+			//	}
+			//}
 		}
 	}
 }

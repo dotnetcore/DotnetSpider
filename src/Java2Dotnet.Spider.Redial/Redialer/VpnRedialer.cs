@@ -19,6 +19,21 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 			_util.TryDisConnectVpn();
 			Thread.Sleep(2000);
 
+			bool disConnected = !_util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
+			while (!disConnected)
+			{
+				try
+				{
+					_util.TryConnectVpn();
+					disConnected = !_util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
+					Thread.Sleep(2000);
+				}
+				catch
+				{
+					// ignored
+				}
+			}
+
 			//在NAT下使用VPN，断开VPN时会导致原网络断开，需要重启网卡，暂时没有找到更好的解决方法
 			if (!string.IsNullOrEmpty(NetInterface))
 			{
@@ -30,6 +45,21 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 
 			_util.TryConnectVpn();
 			Thread.Sleep(2000);
+
+			bool connected = _util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
+			while (!connected)
+			{
+				try
+				{
+					_util.TryConnectVpn();
+					connected = _util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
+					Thread.Sleep(2000);
+				}
+				catch
+				{
+					// ignored
+				}
+			}
 		}
 	}
 }
