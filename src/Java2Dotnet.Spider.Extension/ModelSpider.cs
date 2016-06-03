@@ -37,11 +37,9 @@ namespace Java2Dotnet.Spider.Extension
 
 		protected readonly SpiderContext SpiderContext;
 		public string Name { get; }
-		protected Core.Spider spider = null;
 
 		public ModelSpider(SpiderContext spiderContext)
 		{
-
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
@@ -81,47 +79,16 @@ namespace Java2Dotnet.Spider.Extension
 
 		public virtual void Run(params string[] args)
 		{
-
 			try
 			{
-				spider = PrepareSpider(args);
+				Core.Spider spider = PrepareSpider(args);
+
 				if (spider == null)
 				{
 					return;
 				}
 
-				var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
-				if (redisScheduler != null)
-				{
-					try
-					{
-						redisScheduler.Redis.Subscribe($"{spider.Identity}", (c, m) =>
-						{
-							switch (m)
-							{
-								case "stop":
-									{
-										spider.Stop();
-										break;
-									}
-								case "start":
-									{
-										spider.Start();
-										break;
-									}
-								case "exit":
-									{
-										spider.Exit();
-										break;
-									}
-							}
-						});
-					}
-					catch
-					{
-						// ignored
-					}
-				}
+				RegisterControl(spider);
 
 				spider.Start();
 
@@ -132,8 +99,6 @@ namespace Java2Dotnet.Spider.Extension
 
 				spider?.Dispose();
 
-				RunAfterSpiderFinished();
-
 				DoValidate();
 			}
 			finally
@@ -142,14 +107,50 @@ namespace Java2Dotnet.Spider.Extension
 			}
 		}
 
-		public void Clear()
+		private void RegisterControl(Core.Spider spider)
 		{
 			var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
 			if (redisScheduler != null)
 			{
-				redisScheduler.Clear(spider);
+				try
+				{
+					redisScheduler.Redis.Subscribe($"{spider.Identity}", (c, m) =>
+					{
+						switch (m)
+						{
+							case "stop":
+								{
+									spider.Stop();
+									break;
+								}
+							case "start":
+								{
+									spider.Start();
+									break;
+								}
+							case "exit":
+								{
+									spider.Exit();
+									break;
+								}
+						}
+					});
+				}
+				catch
+				{
+					// ignored
+				}
 			}
 		}
+
+		//public void Clear()
+		//{
+		//	var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
+		//	if (redisScheduler != null)
+		//	{
+		//		redisScheduler.Clear(spider);
+		//	}
+		//}
 
 		private void DoValidate()
 		{
@@ -420,10 +421,6 @@ namespace Java2Dotnet.Spider.Extension
 			}
 
 			return spider;
-		}
-
-		protected void RunAfterSpiderFinished()
-		{
 		}
 
 		private INetworkValidater GetNetworValidater(NetworkValidater networkValidater)
