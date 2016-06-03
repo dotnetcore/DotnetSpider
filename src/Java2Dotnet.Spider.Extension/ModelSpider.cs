@@ -440,7 +440,11 @@ namespace Java2Dotnet.Spider.Extension
 					}
 				case NetworkValidater.Types.Vpn:
 					{
+#if !NET_CORE
 						return new Redial.NetworkValidater.VpnNetworkValidater(((Configuration.VpnNetworkValidater)networkValidater).VpnName);
+#else
+						throw new SpiderExceptoin("unsport vpn redial on linux.");
+#endif
 					}
 			}
 			return null;

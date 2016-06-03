@@ -122,7 +122,7 @@ namespace Java2Dotnet.Spider.Extension
 			if (typeof(ISpiderEntity).IsAssignableFrom(type))
 			{
 #if NET_CORE
-				Entities.Add(ConvertToEntity(entiType.GetTypeInfo()));
+				Entities.Add(ConvertToEntity(type.GetTypeInfo()));
 #else
 				Entities.Add(ConvertToEntity(type));
 #endif
