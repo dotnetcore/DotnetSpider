@@ -20,7 +20,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		public JObject Scheduler { get; set; }
 		public JObject Downloader { get; set; }
 		public Site Site { get; set; }
-		public JObject NetworkValidater { get; set; }
 		public JObject Redialer { get; set; }
 		public List<JObject> PrepareStartUrls { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
@@ -44,7 +43,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.EmptySleepTime = EmptySleepTime;
 			context.Entities = Entities;
 			context.SkipWhenResultIsEmpty = SkipWhenResultIsEmpty;
-			context.NetworkValidater = GetNetworkValidater(NetworkValidater);
 			context.Pipelines = GetPipepines(Pipelines);
 			context.PrepareStartUrls = GetPrepareStartUrls(PrepareStartUrls);
 			context.Redialer = GetRedialer(Redialer);
@@ -173,10 +171,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 					{
 						return new DefaultNetworkValidater();
 					}
+#if !NET_CORE
 				case Configuration.NetworkValidater.Types.Vpn:
 					{
 						return new VpnNetworkValidater();
 					}
+#endif
 			}
 			throw new SpiderExceptoin("Can't convert NetworkValidater: " + networkValidater);
 		}
@@ -219,16 +219,19 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				throw new SpiderExceptoin("Missing redialer type: " + redialer);
 			}
 
+			Redialer result = null;
 			switch (type)
 			{
 				case Configuration.Redialer.Types.Adsl:
 					{
-						return redialer.ToObject<AdslRedialer>();
+						result = redialer.ToObject<AdslRedialer>();
+						break;
 					}
 				case Configuration.Redialer.Types.H3C:
 					{
 #if !NET_CORE
-						return redialer.ToObject<H3CRedialer>();
+						result= redialer.ToObject<H3CRedialer>();
+						break;
 #else
 						throw new SpiderExceptoin("UNSPORT H3C ADSL NOW.");
 #endif
@@ -236,14 +239,17 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				case Configuration.Redialer.Types.Vpn:
 					{
 #if !NET_CORE
-						return redialer.ToObject<VpnRedialer>();
+						result= redialer.ToObject<VpnRedialer>();
+						break;
 #else
 						throw new SpiderExceptoin("UNSPORT VPN NOW.");
 #endif
 					}
 			}
+			var validater = (JObject)redialer.SelectToken("$.NetworkValidater");
+			result.NetworkValidater = GetNetworkValidater(validater);
 
-			return null;
+			return result;
 		}
 
 		private List<PrepareStartUrls> GetPrepareStartUrls(List<JObject> jobjects)

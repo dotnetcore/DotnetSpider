@@ -1,5 +1,6 @@
 ﻿using System;
 using Java2Dotnet.Spider.Redial.Redialer;
+using Newtonsoft.Json;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
@@ -12,6 +13,9 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			H3C,
 			Vpn
 		}
+
+		[JsonIgnore]
+		public NetworkValidater NetworkValidater { get; set; }
 
 		public abstract Types Type { get; internal set; }
 

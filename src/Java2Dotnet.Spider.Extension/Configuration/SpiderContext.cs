@@ -31,7 +31,6 @@ namespace Java2Dotnet.Spider.Extension
 		public Configuration.Downloader Downloader { get; set; }
 		public Site Site { get; set; }
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
-		public NetworkValidater NetworkValidater { get; set; }
 		public Redialer Redialer { get; set; }
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
 		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();

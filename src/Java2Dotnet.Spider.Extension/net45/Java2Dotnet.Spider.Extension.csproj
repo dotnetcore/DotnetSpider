@@ -176,9 +176,6 @@
     <Compile Include="..\ILinkSpiderContext.cs">
       <Link>ILinkSpiderContext.cs</Link>
     </Compile>
-    <Compile Include="..\ISpiderBuilder.cs">
-      <Link>ISpiderBuilder.cs</Link>
-    </Compile>
     <Compile Include="..\LinkContextSpider.cs">
       <Link>LinkContextSpider.cs</Link>
     </Compile>
@@ -346,6 +343,9 @@
     </Compile>
     <Compile Include="..\Scheduler\SpiderStatus.cs">
       <Link>Scheduler\SpiderStatus.cs</Link>
+    </Compile>
+    <Compile Include="..\SpiderBuilder.cs">
+      <Link>SpiderBuilder.cs</Link>
     </Compile>
     <Compile Include="..\Utils\CommonLoginUtil.cs">
       <Link>Utils\CommonLoginUtil.cs</Link>

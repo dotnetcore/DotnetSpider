@@ -64,8 +64,7 @@ namespace Java2Dotnet.Spider.Extension
 			if (SpiderContext.Redialer != null)
 			{
 				RedialManagerUtils.RedialManager = new RedisRedialManager(Logger);
-
-				RedialManagerUtils.RedialManager.NetworkValidater = GetNetworValidater(SpiderContext.NetworkValidater);
+				RedialManagerUtils.RedialManager.NetworkValidater = SpiderContext.Redialer.NetworkValidater.GetNetworkValidater();
 				RedialManagerUtils.RedialManager.Redialer = SpiderContext.Redialer.GetRedialer();
 			}
 
@@ -154,16 +153,17 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void DoValidate()
 		{
+			if (SpiderContext.Validations == null)
+			{
+				return;
+			}
+
 			RedisServer redis = new RedisServer(ConfigurationManager.Get("redisHost"), 6379, ConfigurationManager.Get("redisPassword"));
 
 			string key = "locker-validate-" + Name;
+
 			try
 			{
-				if (SpiderContext.Validations == null)
-				{
-					return;
-				}
-
 				var validations = SpiderContext.Validations.GetValidations();
 
 				if (validations != null && validations.Count > 0)
