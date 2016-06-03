@@ -8,27 +8,17 @@ using Java2Dotnet.Spider.Extension.Model.Attribute;
 
 namespace Java2Dotnet.Spider.Test.Example
 {
-	public class RegexTestSpider : ISpiderContext
+	public class RegexTestSpider : SpiderBuilder
 	{
-		public SpiderContextBuilder GetBuilder()
+		protected override SpiderContext GetSpiderContext()
 		{
-			return new SpiderContextBuilder(new SpiderContext
-			{
-				UserId = "dotnetspider",
-				TaskGroup = "cnblogs homepage",
-				SpiderName = "cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
-				ThreadNum = 1,
-				Site = new Site
-				{
-				},
-				StartUrls = new Dictionary<string, Dictionary<string, object>>
-				{
-					{"http://www.cnblogs.com", null},
-				},
-
-				Scheduler = new QueueScheduler(),
-				Pipeline = new ConslePipeline(),
-			}, typeof(HomePage));
+			SpiderContext context = new SpiderContext();
+			context.SetTaskGroup("cnblogs homepage");
+			context.SetSpiderName("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			context.AddStartUrl("http://www.cnblogs.com");
+			context.AddPipeline(new ConslePipeline());
+			context.AddEntityType(typeof(HomePage));
+			return context;
 		}
 
 		public class HomePage : ISpiderEntity

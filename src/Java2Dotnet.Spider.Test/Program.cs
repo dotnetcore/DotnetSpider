@@ -25,10 +25,7 @@ namespace Java2Dotnet.Spider.Test
 		public static void Main(string[] args)
 		{
 			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
-			var context = spiderBuilder.GetBuilder().Context;
-			string json = JsonConvert.SerializeObject(context);
-			ContextSpider spider = new ContextSpider(JsonConvert.DeserializeObject<JsonSpiderContext>(json).ToRuntimeContext());
-			spider.Run();
+			spiderBuilder.Run("rerun");
 
 			//SpiderExample.Run();
 			//JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();

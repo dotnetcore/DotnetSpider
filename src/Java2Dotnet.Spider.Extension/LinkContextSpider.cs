@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Java2Dotnet.Spider.Extension
 {
-	public class LinkContextSpider : ContextSpider
+	public class LinkContextSpider : ModelSpider
 	{
 		public LinkContextSpider(SpiderContext spiderContext) : base(spiderContext)
 		{

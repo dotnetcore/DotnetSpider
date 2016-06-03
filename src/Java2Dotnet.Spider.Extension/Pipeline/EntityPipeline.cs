@@ -7,14 +7,17 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 {
 	public class EntityPipeline : CachedPipeline
 	{
-		private readonly IEntityPipeline _pipeline;
+		private readonly List<IEntityPipeline> _pipelines;
 		private readonly string _entityName;
 
-		public EntityPipeline(string entityName, IEntityPipeline pipeline)
+		public EntityPipeline(string entityName, List<IEntityPipeline> pipelines)
 		{
 			_entityName = entityName;
-			_pipeline = pipeline;
-			pipeline.Initialize();
+			_pipelines = pipelines;
+			foreach (var pipeline in pipelines)
+			{
+				pipeline.Initialize();
+			}
 		}
 
 		protected override void Process(List<ResultItems> resultItemsList, ISpider spider)
@@ -44,7 +47,10 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 			if (list.Count > 0)
 			{
-				_pipeline.Process(list, spider);
+				foreach (var pipeline in _pipelines)
+				{
+					pipeline.Process(list, spider);
+				}
 			}
 		}
 	}

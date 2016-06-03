@@ -4,8 +4,8 @@ namespace Java2Dotnet.Spider.Extension
 {
 	public interface ILinkSpiderContext
 	{
-		SpiderContextBuilder GetBuilder();
+		SpiderContext GetBuilder();
 
-		Dictionary<string, SpiderContextBuilder> GetNextSpiders();
+		Dictionary<string, SpiderContext> GetNextSpiders();
 	}
 }

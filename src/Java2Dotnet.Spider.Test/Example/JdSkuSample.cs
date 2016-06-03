@@ -14,50 +14,39 @@ using DownloadValidation = Java2Dotnet.Spider.Extension.Configuration.DownloadVa
 
 namespace Java2Dotnet.Spider.Test.Example
 {
-	public class JdSkuSampleSpider : ISpiderContext
+	public class JdSkuSampleSpider : SpiderBuilder
 	{
-		public SpiderContextBuilder GetBuilder()
+		protected override SpiderContext GetSpiderContext()
 		{
-			return new SpiderContextBuilder(new SpiderContext
+			SpiderContext context = new SpiderContext();
+			context.SetTaskGroup("JD sku/store test");
+			context.SetSpiderName("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
 			{
-				UserId = "dotnetspider",
-				TaskGroup = "JD sku/store test",
-				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
-				CachedSize = 1,
-				ThreadNum = 1,
-				TargetUrlExtractInfos = new List<Extension.Configuration.TargetUrlExtractor>
-				{
-					new Extension.Configuration.TargetUrlExtractor
-					{
-						Region =new Extension.Configuration.Selector {  Type= ExtractType.XPath, Expression="//span[@class=\"p-num\"]"},
-						Patterns=new List<string> { @"&page=[0-9]+&" }
-					}
-				},
-				StartUrls = new Dictionary<string, Dictionary<string, object>>
-				{
-					{"http://list.jd.com/list.html?cat=9987,653,655&page=1&ext=57050::1943^^&go=0&JL=6_0_0",null},
-					//{"http://list.jd.com/list.html?cat=9987,653,655&page=2&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
-					//{"http://list.jd.com/list.html?cat=9987,653,655&page=3&ext=57050::1943^^&go=0&JL=6_0_0",new Dictionary<string, object> { { "name", "手机"}, { "cat3", "655" } } },
-				},
-				PrepareStartUrls = new List<PrepareStartUrls>{ new ConfigurableDbPrepareStartUrls()
-				{
-					Source = DataSource.MySql,
-					ConnectString = "Database='test';Data Source= ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306",
-					TableName = "jd.category",
-					Columns = new List<BaseDbPrepareStartUrls.Column> { new BaseDbPrepareStartUrls.Column { Name = "url", Formatters=new List<Formatter> { new ReplaceFormatter{ OldValue= ".html",NewValue="" } } } },
-					FormateStrings = new List<string> { "{0}&page=1&JL=6_0_0" }
-				}},
-				Scheduler = new RedisScheduler
-				{
-					Host = "myRedis",
-					Password = "Ayw3WLBt2h#^eE9XVU9$gDFs",
-					Port = 6379
-				},
-				Pipeline = new MysqlPipeline
-				{
-					ConnectString = "Database='test';Data Source=ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306"
-				}
-			}, typeof(Product));
+				Region = new Extension.Configuration.Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
+				Patterns = new List<string> { @"&page=[0-9]+&" }
+			});
+			context.AddPipeline(new MysqlPipeline
+			{
+				ConnectString = "Database='test';Data Source=ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306"
+			});
+			context.SetScheduler(new RedisScheduler
+			{
+				Host = "ooodata.com",
+				Password = "Ayw3WLBt2h#^eE9XVU9$gDFs",
+				Port = 6379
+			});
+			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=1", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			context.AddPrepareStartUrls(new ConfigurableDbPrepareStartUrls()
+			{
+				Source = DataSource.MySql,
+				ConnectString = "Database='test';Data Source= ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306",
+				TableName = "jd.category",
+				Columns = new List<BaseDbPrepareStartUrls.Column> { new BaseDbPrepareStartUrls.Column { Name = "url", Formatters = new List<Formatter> { new ReplaceFormatter { OldValue = ".html", NewValue = "" } } } },
+				FormateStrings = new List<string> { "{0}&page=1&JL=6_0_0" }
+			});
+			context.AddEntityType(typeof(Product));
+			return context;
 		}
 
 		[Schema("test", "sku", TableSuffix.Today)]

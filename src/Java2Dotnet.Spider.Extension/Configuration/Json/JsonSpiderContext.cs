@@ -27,7 +27,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
 		public List<JObject> TargetUrlExtractInfos { get; set; }
 
-		public JObject Pipeline { get; set; }
+		public List<JObject> Pipelines { get; set; }
 		public List<Entity> Entities { get; set; } = new List<Entity>();
 		public List<JObject> PageHandlers { get; set; }
 		public JObject TargetUrlsHandler { get; set; }
@@ -45,7 +45,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			context.Entities = Entities;
 			context.SkipWhenResultIsEmpty = SkipWhenResultIsEmpty;
 			context.NetworkValidater = GetNetworkValidater(NetworkValidater);
-			context.Pipeline = GetPipepine(Pipeline);
+			context.Pipelines = GetPipepines(Pipelines);
 			context.PrepareStartUrls = GetPrepareStartUrls(PrepareStartUrls);
 			context.Redialer = GetRedialer(Redialer);
 			context.Scheduler = GetScheduler(Scheduler);
@@ -350,47 +350,64 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			}
 		}
 
-		private Pipeline GetPipepine(JObject pipeline)
+		private List<Pipeline> GetPipepines(List<JObject> pipelines)
 		{
-			if (pipeline == null)
+			if (pipelines == null || pipelines.Count == 0)
 			{
 				throw new SpiderExceptoin("Missing Pipeline.");
 			}
 
-			var pipelineType = pipeline.SelectToken("$.Type")?.ToObject<Pipeline.Types>();
-
-			if (pipelineType == null)
+			List<Pipeline> results = new List<Pipeline>();
+			foreach (var pipeline in pipelines)
 			{
-				throw new SpiderExceptoin("Missing PrepareStartUrls type: " + pipeline);
-			}
+				Pipeline tmp = null;
+				var pipelineType = pipeline.SelectToken("$.Type")?.ToObject<Pipeline.Types>();
 
-			switch (pipelineType)
-			{
+				if (pipelineType == null)
+				{
+					throw new SpiderExceptoin("Missing PrepareStartUrls type: " + pipeline);
+				}
+
+				switch (pipelineType)
+				{
 #if !NET_CORE
-				case Configuration.Pipeline.Types.MongoDb:
-					{
-						return pipeline.ToObject<MongoDbPipeline>();
-					}
+					case Configuration.Pipeline.Types.MongoDb:
+						{
+							tmp = (pipeline.ToObject<MongoDbPipeline>());
+							break;
+						}
 #endif
-				case Configuration.Pipeline.Types.MySql:
-					{
-						return pipeline.ToObject<MysqlPipeline>();
-					}
-				case Configuration.Pipeline.Types.MySqlFile:
-					{
-						return pipeline.ToObject<MysqlFilePipeline>();
-					}
-				case Configuration.Pipeline.Types.TestMongoDb:
-					{
+					case Configuration.Pipeline.Types.MySql:
+						{
+							tmp = (pipeline.ToObject<MysqlPipeline>());
+							break;
+						}
+					case Configuration.Pipeline.Types.MySqlFile:
+						{
+							tmp = (pipeline.ToObject<MysqlFilePipeline>());
+							break;
+						}
+					case Configuration.Pipeline.Types.TestMongoDb:
+						{
 #if !NET_CORE
-						return pipeline.ToObject<TestMongoDbPipeline>();
+							tmp = (pipeline.ToObject<TestMongoDbPipeline>());
+							break;
 #else
-						throw new SpiderExceptoin("DOTNET CORE 暂时不支持 MongoDb.");						
-#endif						
-					}
-			}
+							throw new SpiderExceptoin("DOTNET CORE 暂时不支持 MongoDb.");
+#endif
+						}
+				}
 
-			throw new SpiderExceptoin("UNSPORT PIPELINE: " + pipeline);
+				if (tmp == null)
+				{
+					throw new SpiderExceptoin("UNSPORT PIPELINE: " + pipeline);
+				}
+				else
+				{
+					results.Add(tmp);
+				}
+			}
+			return results;
 		}
 
 		private Downloader GetDownloader(JObject jobject)

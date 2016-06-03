@@ -29,7 +29,7 @@ using OpenQA.Selenium.Remote;
 
 namespace Java2Dotnet.Spider.Extension
 {
-	public class ContextSpider
+	public class ModelSpider
 	{
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
@@ -39,13 +39,19 @@ namespace Java2Dotnet.Spider.Extension
 		public string Name { get; }
 		protected Core.Spider spider = null;
 
-		public ContextSpider(SpiderContext spiderContext)
+		public ModelSpider(SpiderContext spiderContext)
 		{
 
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 			SpiderContext = spiderContext;
+
+			if (!SpiderContext.IsBuilt)
+			{
+				SpiderContext.Build();
+			}
+
 			Name = $"{SpiderContext.UserId}-{SpiderContext.SpiderName}";
 
 			Logger = LogUtils.GetLogger(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup);
@@ -386,7 +392,12 @@ namespace Java2Dotnet.Spider.Extension
 
 				var schema = entity.Schema;
 
-				spider.AddPipeline(new EntityPipeline(entiyName, SpiderContext.Pipeline.GetPipeline(schema, entity)));
+				List<IEntityPipeline> pipelines = new List<IEntityPipeline>();
+				foreach (var pipeline in SpiderContext.Pipelines)
+				{
+					pipelines.Add(pipeline.GetPipeline(schema, entity));
+				}
+				spider.AddPipeline(new EntityPipeline(entiyName, pipelines));
 			}
 			spider.SetCachedSize(SpiderContext.CachedSize);
 			spider.SetEmptySleepTime(SpiderContext.EmptySleepTime);
