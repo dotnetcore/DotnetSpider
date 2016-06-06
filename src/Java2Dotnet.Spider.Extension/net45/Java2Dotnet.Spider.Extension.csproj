@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\output\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_45</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_45;Publish</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -227,11 +227,20 @@
     <Compile Include="..\Model\ExtractType.cs">
       <Link>Model\ExtractType.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\BoolFormater.cs">
+      <Link>Model\Formatter\BoolFormater.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Formatter\ClassifyFormater.cs">
+      <Link>Model\Formatter\ClassifyFormater.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\FormatterFactory.cs">
       <Link>Model\Formatter\FormatterFactory.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\IFormater.cs">
       <Link>Model\Formatter\IFormater.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Formatter\RegexMatchFormater.cs">
+      <Link>Model\Formatter\RegexMatchFormater.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\RemoveHtmlTagFormater.cs">
       <Link>Model\Formatter\RemoveHtmlTagFormater.cs</Link>

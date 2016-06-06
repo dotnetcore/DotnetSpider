@@ -551,6 +551,26 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 					{
 						return jobject.ToObject<IncreasePageNumberWithStopperTargetUrlsHandler>();
 					}
+				case Configuration.TargetUrlsHandler.Types.CustomLimitIncreasePageNumber:
+					{
+						return jobject.ToObject<CustomLimitIncreasePageNumberTargetUrlsHandler>();
+					}
+				case Configuration.TargetUrlsHandler.Types.IncreasePageNumberTimeStopper:
+					{
+						return jobject.ToObject<IncreasePageNumbeTimeStopperTargetUrlsHandler>();
+					}
+				case Configuration.TargetUrlsHandler.Types.IncreasePostPageNumber:
+					{
+						return jobject.ToObject<IncreasePostPageNumberTargetUrlsHandler>();
+					}
+				case Configuration.TargetUrlsHandler.Types.IncreasePostPageNumberWithStopper:
+					{
+						return jobject.ToObject<IncreasePostPageNumberWithStopperTargetUrlsHandler>();
+					}
+				case Configuration.TargetUrlsHandler.Types.IncreasePostPageNumberTimeStopper:
+					{
+						return jobject.ToObject<IncreasePostPageNumberTimeStopperTargetUrlsHandler>();
+					}
 			}
 			throw new SpiderExceptoin("UNSPORT or JSON string is incorrect: " + jobject);
 		}

@@ -57,6 +57,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			ChromeOptions opt = new ChromeOptions();
 			opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
 			RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
+
+			webDriver.Manage().Window.Maximize();
 			return webDriver;
 		}
 	}
@@ -81,7 +83,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				var webDriver = GetWebDriver();
 				try
 				{
-					webDriver.Navigate().GoToUrl(Url);
+                    webDriver.Navigate().GoToUrl(Url);
 					Thread.Sleep(5000);
 
 					if (InputSelector != null)
