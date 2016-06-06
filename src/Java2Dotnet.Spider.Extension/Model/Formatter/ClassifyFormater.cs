@@ -13,7 +13,9 @@ namespace Java2Dotnet.Spider.Extension.Model.Formatter
 		}
 		public override string Name { get; internal set; } = "ClassifyFormatter";
 
-		public Dictionary<List<string>, string> MatchPatterns { get; set; } = new Dictionary<List<string>, string>();
+		public string[] Patterns { get; set; }
+		public string[] Values { get; set; }
+		public Dictionary<string, string> MatchPatterns { get; internal set; } = new Dictionary<string, string>();
 
 		public JudgementOption Judgement { get; set; } = JudgementOption.Equal;
 		public string FalseString { get; set; } = "";
@@ -26,25 +28,34 @@ namespace Java2Dotnet.Spider.Extension.Model.Formatter
 				return NullString;
 			}
 
+			if (Patterns.Length != Values.Length)
+			{
+				throw new Exception("Patterns' Count Must Equal to Values' Count!");
+			}
+
+			for (int i = 0; i < Patterns.Length; ++i)
+			{
+				MatchPatterns.Add(Patterns[i], Values[i]);
+			}
+
 			foreach (var pair in MatchPatterns)
 			{
-				foreach (var s in pair.Key)
+
+				if (Judgement == JudgementOption.Equal)
 				{
-					if (Judgement == JudgementOption.Equal)
+					if (pair.Key == value)
 					{
-						if (s == value)
-						{
-							return pair.Value;
-						}
-					}
-					else if (Judgement == JudgementOption.Contain)
-					{
-						if (value.Contains(s))
-						{
-							return pair.Value;
-						}
+						return pair.Value;
 					}
 				}
+				else if (Judgement == JudgementOption.Contain)
+				{
+					if (value.Contains(pair.Key))
+					{
+						return pair.Value;
+					}
+				}
+
 			}
 			return string.Empty;
 		}
