@@ -4,6 +4,7 @@ using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Newtonsoft.Json.Linq;
 using Java2Dotnet.Spider.Validation;
 using System.Linq;
+using Java2Dotnet.Spider.Extension.Downloader.WebDriver;
 
 namespace Java2Dotnet.Spider.Extension.Configuration.Json
 {
@@ -230,7 +231,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				case Configuration.Redialer.Types.H3C:
 					{
 #if !NET_CORE
-						result= redialer.ToObject<H3CRedialer>();
+						result = redialer.ToObject<H3CRedialer>();
 						break;
 #else
 						throw new SpiderExceptoin("UNSPORT H3C ADSL NOW.");
@@ -239,7 +240,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				case Configuration.Redialer.Types.Vpn:
 					{
 #if !NET_CORE
-						result= redialer.ToObject<VpnRedialer>();
+						result = redialer.ToObject<VpnRedialer>();
 						break;
 #else
 						throw new SpiderExceptoin("UNSPORT VPN NOW.");
@@ -320,8 +321,18 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 									var formatterType = FormatterFactory.GetFormatterType(name);
 									c.Formatters.Add((Formatter)format.ToObject(formatterType));
 								}
+
 								generalDbPrepareStartUrls.Columns.Add(c);
 							}
+							generalDbPrepareStartUrls.ConnectString = jobject.SelectToken("$.ConnectString").ToString();
+							generalDbPrepareStartUrls.FormateStrings = jobject.SelectToken("$.FormateStrings").ToObject<List<string>>();
+							generalDbPrepareStartUrls.Method = jobject.SelectToken("$.Method").ToString();
+							generalDbPrepareStartUrls.Origin = jobject.SelectToken("$.Origin").ToString();
+							generalDbPrepareStartUrls.PostBody = jobject.SelectToken("$.PostBody").ToString();
+							generalDbPrepareStartUrls.QueryString = jobject.SelectToken("$.QueryString").ToString();
+							generalDbPrepareStartUrls.Referer = jobject.SelectToken("$.Referer").ToString();
+							generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<DataSource>();
+							generalDbPrepareStartUrls.Extras = jobject.SelectToken("$.Extras").ToObject<Dictionary<string, object>>();
 							list.Add(generalDbPrepareStartUrls);
 							break;
 						}
@@ -436,7 +447,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				case Configuration.Downloader.Types.WebDriverDownloader:
 					{
 #if !NET_CORE
-						var webDriverDownloader = jobject.ToObject<WebDriverDownloader>();
+						var webDriverDownloader = new WebDriverDownloader();
 						var loginType = jobject.SelectToken("$.Login.Type");
 						if (loginType != null)
 						{
@@ -448,8 +459,18 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 										webDriverDownloader.Login = login;
 										break;
 									}
+								case Loginer.Types.Manual:
+									{
+										webDriverDownloader.Login = jobject.SelectToken("$.Login").ToObject<ManualLoginer>();
+										break;
+									}
 							}
 						}
+						webDriverDownloader.Browser = jobject.SelectToken("$.Browser").ToObject<Browser>();
+						webDriverDownloader.RedialLimit = jobject.SelectToken("$.RedialLimit").ToObject<int>();
+						webDriverDownloader.GeneratePostBody = jobject.SelectToken("$.GeneratePostBody").ToObject<GeneratePostBody>();
+						webDriverDownloader.VerifyCode = jobject.SelectToken("$.VerifyCode").ToObject<VerifyCode>();
+
 						downloader = webDriverDownloader;
 						break;
 #else

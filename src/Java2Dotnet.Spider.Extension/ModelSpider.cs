@@ -62,7 +62,7 @@ namespace Java2Dotnet.Spider.Extension
 			if (SpiderContext.Redialer != null)
 			{
 				RedialManagerUtils.RedialManager = new RedisRedialManager(Logger);
-				RedialManagerUtils.RedialManager.NetworkValidater = SpiderContext.Redialer.NetworkValidater.GetNetworkValidater();
+				RedialManagerUtils.RedialManager.NetworkValidater = SpiderContext.Redialer.NetworkValidater?.GetNetworkValidater();
 				RedialManagerUtils.RedialManager.Redialer = SpiderContext.Redialer.GetRedialer();
 			}
 

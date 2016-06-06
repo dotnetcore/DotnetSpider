@@ -2,6 +2,7 @@
 using Java2Dotnet.Spider.Core.Downloader;
 using Java2Dotnet.Spider.Extension.Downloader.WebDriver;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
@@ -23,10 +24,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public abstract Types Type { get; internal set; }
 		public abstract int RedialLimit { get; set; }
 
-		/// <summary>
-		/// Contains("anti_Spider")
-		/// UrlContains("anti_Spider")
-		/// </summary>
+		[JsonIgnore]
 		public List<DownloadValidation> DownloadValidations { get; set; }
 
 		public abstract IDownloader GetDownloader();
@@ -50,7 +48,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					foreach (var downloadValidation in DownloadValidations)
 					{
 						var r = downloadValidation.Validate(page, out result);
-						if(!r)
+						if (!r)
 						{
 							break;
 						}
@@ -126,7 +124,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					foreach (var downloadValidation in DownloadValidations)
 					{
 						var r = downloadValidation.Validate(page, out result);
-						if(!r)
+						if (!r)
 						{
 							break;
 						}
