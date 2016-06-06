@@ -83,7 +83,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 					}
 					else
 					{
-						result.Add(((HtmlNode)el).InnerText);
+						result.Add(((HtmlNode)el).InnerText.Trim());
 					}
 				}
 				else
