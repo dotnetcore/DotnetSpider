@@ -8,7 +8,7 @@ using Java2Dotnet.Spider.Redial.Utils;
 
 namespace Java2Dotnet.Spider.Redial.NetworkValidater
 {
-	public class VpnNetworkValidater : INetworkValidater
+	public class VpnNetworkValidater : BaseNetworkValidater
 	{
 		private readonly string _vpnInterface;
 
@@ -17,23 +17,11 @@ namespace Java2Dotnet.Spider.Redial.NetworkValidater
 			_vpnInterface = vpnInterface;
 		}
 
-		public void Wait()
-		{
-			//在VpnRedialer中实现，因为操作Vpn断开和连接不那么稳定，所以在重拨过程中实现了重试，到Validate阶段已经保证网络通畅
 
-			//bool stop = false;
-			//while (!stop)
-			//{
-			//	try
-			//	{
-			//		VpnUtils util = new VpnUtils();
-			//		stop = util.GetCurrentConnectingVpnNames().Contains(_vpnInterface);
-			//	}
-			//	catch
-			//	{
-			//		// ignored
-			//	}
-			//}
+		public override bool DoValidate()
+		{
+			//已经在VpnRedialer中实现验证，推荐Vpn拨号使用DefaultNetworkValidater
+			return true;
 		}
 	}
 }

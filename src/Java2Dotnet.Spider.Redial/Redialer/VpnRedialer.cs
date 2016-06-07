@@ -16,9 +16,6 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 
 		public void Redial()
 		{
-			_util.TryDisConnectVpn();
-			Thread.Sleep(2000);
-
 			bool disConnected = !_util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
 			while (!disConnected)
 			{
@@ -53,7 +50,7 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 				{
 					_util.TryConnectVpn();
 					connected = _util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
-					Thread.Sleep(2000);
+					Thread.Sleep(10000);
 				}
 				catch
 				{

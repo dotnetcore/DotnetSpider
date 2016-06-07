@@ -5,6 +5,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public abstract class NetworkValidater
 	{
+		public int MaxWaitTime { get; set; } = 10;
 		[Flags]
 		public enum Types
 		{
@@ -24,7 +25,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override INetworkValidater GetNetworkValidater()
 		{
-			return new  Redial.NetworkValidater.DefaultNetworkValidater();
+			return new Redial.NetworkValidater.DefaultNetworkValidater(MaxWaitTime);
 		}
 	}
 
@@ -36,7 +37,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override INetworkValidater GetNetworkValidater()
 		{
-			return new Redial.NetworkValidater.VpsNetworkValidater(InterfaceNum);
+			return new Redial.NetworkValidater.VpsNetworkValidater(InterfaceNum, MaxWaitTime);
 		}
 	}
 

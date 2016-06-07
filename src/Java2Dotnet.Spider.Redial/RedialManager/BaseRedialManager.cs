@@ -37,10 +37,22 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 		protected void RedialInternet()
 		{
-			Redialer?.Redial();
+			if (Redialer == null)
+			{
+				return;
+			}
 
-			NetworkValidater?.Wait();
+			Redialer.Redial();
 
+			if (NetworkValidater == null)
+			{
+				return;
+			}
+
+			while (!NetworkValidater.Wait())
+			{
+				Redialer.Redial();
+			}
 			Thread.Sleep(2000);
 		}
 	}

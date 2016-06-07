@@ -2,6 +2,7 @@
 {
 	public interface INetworkValidater
 	{
-		void Wait();
+		int MaxWaitTime { get; set; }
+		bool Wait();
 	}
 }

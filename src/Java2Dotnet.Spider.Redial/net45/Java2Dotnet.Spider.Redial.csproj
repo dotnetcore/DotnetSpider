@@ -66,6 +66,9 @@
     <Compile Include="..\AtomicExecutor\ZookeeperAtomicExecutor.cs">
       <Link>AtomicExecutor\ZookeeperAtomicExecutor.cs</Link>
     </Compile>
+    <Compile Include="..\NetworkValidater\BaseNetworkValidater.cs">
+      <Link>NetworkValidater\BaseNetworkValidater.cs</Link>
+    </Compile>
     <Compile Include="..\NetworkValidater\DefalutNetworkValidater.cs">
       <Link>NetworkValidater\DefalutNetworkValidater.cs</Link>
     </Compile>

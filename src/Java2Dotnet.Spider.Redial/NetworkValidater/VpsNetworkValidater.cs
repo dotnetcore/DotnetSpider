@@ -9,29 +9,30 @@ namespace Java2Dotnet.Spider.Redial.NetworkValidater
 	/// <summary>
 	/// VPS 有多根线路, 其中几根是用于稳定远程, 另几根是IP拨号, 所以不能用PING baidu.com这种形式判断是否拨号成功.
 	/// </summary>
-	public class VpsNetworkValidater : INetworkValidater
+	public class VpsNetworkValidater : BaseNetworkValidater
 	{
 		private readonly int _networkCount;
+
+		public VpsNetworkValidater()
+		{
+			_networkCount = 2;
+			MaxWaitTime = 100;
+		}
+		public VpsNetworkValidater(int networkCount, int maxWaitTime)
+		{
+			_networkCount = networkCount;
+			MaxWaitTime = maxWaitTime;
+		}
 
 		public VpsNetworkValidater(int networkCount = 2)
 		{
 			_networkCount = networkCount;
-
-			// add static router 
+			MaxWaitTime = 100;
 		}
 
-		public void Wait()
+		public override bool DoValidate()
 		{
-			while (true)
-			{
-				if (GetIp4Count() == _networkCount)
-				{
-					break;
-				}
-
-				Console.WriteLine("VPS Waiter is waiting...");
-				Thread.Sleep(200);
-			}
+			return GetIp4Count() == _networkCount;
 		}
 
 		private int GetIp4Count()
