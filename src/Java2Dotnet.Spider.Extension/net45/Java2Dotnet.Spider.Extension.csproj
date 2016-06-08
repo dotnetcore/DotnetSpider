@@ -257,6 +257,9 @@
     <Compile Include="..\Model\Formatter\TimeStampFormater.cs">
       <Link>Model\Formatter\TimeStampFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\TrimFormater.cs">
+      <Link>Model\Formatter\TrimFormater.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\UrlEncodeFormater.cs">
       <Link>Model\Formatter\UrlEncodeFormater.cs</Link>
     </Compile>
