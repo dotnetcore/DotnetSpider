@@ -86,16 +86,19 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 		public void AddRequestCount()
 		{
-			lock (this)
+			if (RedialLimit != 0)
 			{
-				++RequestCount;
-
-				if (RedialLimit > 0 && RequestCount == RedialLimit)
+				lock (this)
 				{
-					RequestCount = 0;
-					if (RedialManagerUtils.RedialManager != null)
+					++RequestCount;
+
+					if (RedialLimit > 0 && RequestCount == RedialLimit)
 					{
-						RedialManagerUtils.RedialManager.Redial();
+						RequestCount = 0;
+						if (RedialManagerUtils.RedialManager != null)
+						{
+							RedialManagerUtils.RedialManager.Redial();
+						}
 					}
 				}
 			}

@@ -103,8 +103,7 @@ namespace Java2Dotnet.Spider.Redial.Utils
 				myProcess.CreateNoWindow = true;
 				myProcess.UseShellExecute = false;
 				Process.Start(myProcess);
-
-			}
+            }
 			catch (Exception ex)
 			{
 				Debug.Assert(false, ex.ToString());

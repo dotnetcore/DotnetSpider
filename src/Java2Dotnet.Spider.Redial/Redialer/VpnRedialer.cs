@@ -16,19 +16,13 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 
 		public void Redial()
 		{
-			bool disConnected = !_util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
-			while (!disConnected)
+			_util.TryDisConnectVpn();
+			Thread.Sleep(1000);
+
+			while (_util.GetCurrentConnectingVpnNames().Contains(_util.VpnName))
 			{
-				try
-				{
-					_util.TryConnectVpn();
-					disConnected = !_util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
-					Thread.Sleep(2000);
-				}
-				catch
-				{
-					// ignored
-				}
+				_util.TryDisConnectVpn();
+				Thread.Sleep(2000);
 			}
 
 			//在NAT下使用VPN，断开VPN时会导致原网络断开，需要重启网卡，暂时没有找到更好的解决方法
@@ -41,15 +35,13 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 			}
 
 			_util.TryConnectVpn();
-			Thread.Sleep(2000);
+			Thread.Sleep(1000);
 
-			bool connected = _util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
-			while (!connected)
+			while (!_util.GetCurrentConnectingVpnNames().Contains(_util.VpnName))
 			{
 				try
 				{
 					_util.TryConnectVpn();
-					connected = _util.GetCurrentConnectingVpnNames().Contains(_util.VpnName);
 					Thread.Sleep(10000);
 				}
 				catch
