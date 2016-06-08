@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using DotRas;
 using System.Text.RegularExpressions;
+using System.Threading;
+
 namespace Java2Dotnet.Spider.Redial.Utils
 {
 	public class VpnUtils
@@ -83,11 +85,22 @@ namespace Java2Dotnet.Spider.Redial.Utils
 				ProcessStartInfo myProcess = new ProcessStartInfo(Vpnprocess, args);
 				myProcess.CreateNoWindow = true;
 				myProcess.UseShellExecute = false;
-				Process.Start(myProcess);
+				var result = Process.Start(myProcess);
+				if (result != null)
+				{
+					Console.WriteLine("Wait for process to exit.....");
+					while (!result.HasExited)
+					{
+						Thread.Sleep(100);
+					}
+					result.Close();
+					Console.WriteLine("Process closed.....");
+				}
 			}
 			catch (Exception ex)
 			{
-				Debug.Assert(false, ex.ToString());
+				Console.WriteLine(ex);
+				//Debug.Assert(false, ex.ToString());
 			}
 		}
 		/// <summary>
@@ -102,12 +115,22 @@ namespace Java2Dotnet.Spider.Redial.Utils
 				ProcessStartInfo myProcess = new ProcessStartInfo(Vpnprocess, args);
 				myProcess.CreateNoWindow = true;
 				myProcess.UseShellExecute = false;
-				Process.Start(myProcess);
-
+				var result = Process.Start(myProcess);
+				if (result != null)
+				{
+					Console.WriteLine("Wait for process to exit.....");
+					while (!result.HasExited)
+					{
+						Thread.Sleep(100);
+					}
+					result.Close();
+					Console.WriteLine("Process closed.....");
+				}
 			}
 			catch (Exception ex)
 			{
-				Debug.Assert(false, ex.ToString());
+				Console.WriteLine(ex);
+				//Debug.Assert(false, ex.ToString());
 			}
 		}
 		/// <summary>

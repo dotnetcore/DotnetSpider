@@ -22,6 +22,7 @@ namespace Java2Dotnet.Spider.Redial.NetworkValidater
 					{
 						return true;
 					}
+					Thread.Sleep(2000);
 				}
 				catch
 				{
