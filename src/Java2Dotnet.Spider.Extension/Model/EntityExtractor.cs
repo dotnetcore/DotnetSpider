@@ -74,7 +74,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 						}
 						index++;
 					}
-					catch(Exception e)
+					catch (Exception e)
 					{
 
 					}
@@ -146,121 +146,17 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 		private JObject ProcessSingle(Page page, ISelectable item, Entity entityDefine, int index)
 		{
-			JObject dataItem = new JObject();
+			JObject dataObject = new JObject();
 
 			foreach (var field in entityDefine.Fields)
 			{
-				ISelector selector = SelectorUtil.GetSelector(field.Selector);
-				if (selector == null)
+				var fieldValue = ExtractField(item, page, field, index);
+				if (fieldValue != null)
 				{
-					continue;
-				}
-
-				var datatype = field.DataType;
-				bool isEntity = VerifyIfEntity(datatype);
-
-				bool isMulti = field.Multi;
-
-				var option = field.Option;
-
-				string propertyName = field.Name;
-
-				List<Formatter.Formatter> formatters = GenerateFormatter(field.Formatters);
-
-				if (!isEntity)
-				{
-					string tmpValue;
-					if (selector is EnviromentSelector)
-					{
-						var enviromentSelector = selector as EnviromentSelector;
-						tmpValue = GetEnviromentValue(enviromentSelector.Field, page, index);
-						foreach (var formatter in formatters)
-						{
-							tmpValue = formatter.Formate(tmpValue);
-						}
-						dataItem.Add(propertyName, tmpValue);
-					}
-					else
-					{
-						if (isMulti)
-						{
-							var propertyValues = item.SelectList(selector).Nodes();
-							if (option == PropertyExtractBy.ValueOption.Count)
-							{
-								var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "-1";
-								dataItem.Add(propertyName, tempValue);
-							}
-							else
-							{
-								var countToken = _entityDefine.Limit;
-								if (countToken != null)
-								{
-									propertyValues = propertyValues.Take(countToken.Value).ToList();
-								}
-								List<string> results = new List<string>();
-								foreach (var propertyValue in propertyValues)
-								{
-									string tmp = propertyValue.GetValue(option == PropertyExtractBy.ValueOption.PlainText);
-									foreach (var formatter in formatters)
-									{
-										tmp = formatter.Formate(tmp);
-									}
-									results.Add(tmp);
-								}
-								dataItem.Add(propertyName, new JArray(results));
-							}
-						}
-						else
-						{
-							tmpValue = item.Select(selector)?.GetValue(option == PropertyExtractBy.ValueOption.PlainText);
-							if (option == PropertyExtractBy.ValueOption.Count)
-							{
-								dataItem.Add(propertyName, tmpValue == null ? 0 : 1);
-							}
-							else
-							{
-								tmpValue = formatters.Aggregate(tmpValue, (current, formatter) => formatter.Formate(current));
-								dataItem.Add(propertyName, tmpValue);
-							}
-						}
-					}
-				}
-				else
-				{
-					if (isMulti)
-					{
-						var propertyValues = item.SelectList(selector).Nodes();
-						var countToken = _entityDefine.Limit;
-						if (countToken != null)
-						{
-							propertyValues = propertyValues.Take(countToken.Value).ToList();
-						}
-
-						List<JObject> result = new List<JObject>();
-						int index1 = 0;
-						foreach (var entity in propertyValues)
-						{
-							JObject obj = ProcessSingle(page, entity, datatype.ToObject<Entity>(), index1);
-							if (obj != null)
-							{
-								result.Add(obj);
-							}
-							index1++;
-						}
-						dataItem.Add(propertyName, new JArray(result));
-					}
-					else
-					{
-						var select = item.Select(selector);
-						if (select == null)
-						{
-							return null;
-						}
-						var propertyValue = ProcessSingle(page, select, datatype, 0);
-						dataItem.Add(propertyName, new JObject(propertyValue));
-					}
+					dataObject.Add(field.Name, fieldValue);
 				}
 			}
+
 			var stopping = entityDefine.Stopping;
 
 			if (stopping != null)
@@ -273,7 +169,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 					throw new SpiderExceptoin("Can't compare with object.");
 				}
 				stopping.DataType = datatype.ToString().ToLower();
-				string value = dataItem.SelectToken($"$.{stopping.PropertyName}")?.ToString();
+				string value = dataObject.SelectToken($"$.{stopping.PropertyName}")?.ToString();
 				if (string.IsNullOrEmpty(value))
 				{
 					page.MissTargetUrls = true;
@@ -287,7 +183,95 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 			}
 
-			return dataItem;
+			return dataObject.Children().Count() > 0 ? dataObject : null;
+		}
+
+		private dynamic ExtractField(ISelectable item, Page page, Field field, int index)
+		{
+			ISelector selector = SelectorUtil.GetSelector(field.Selector);
+			if (selector == null)
+			{
+				return null;
+			}
+
+			List<Formatter.Formatter> formatters = GenerateFormatter(field.Formatters);
+
+			bool isEntity = field.Fields != null && field.Fields.Count > 0;
+
+			if (!isEntity)
+			{
+				string tmpValue;
+				if (selector is EnviromentSelector)
+				{
+					var enviromentSelector = selector as EnviromentSelector;
+					tmpValue = GetEnviromentValue(enviromentSelector.Field, page, index);
+					foreach (var formatter in formatters)
+					{
+						tmpValue = formatter.Formate(tmpValue);
+					}
+					return tmpValue;
+				}
+				else
+				{
+					if (field.Multi)
+					{
+						var propertyValues = item.SelectList(selector).Nodes();
+						if (field.Option == PropertyExtractBy.ValueOption.Count)
+						{
+							var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "-1";
+							return tempValue;
+						}
+						else
+						{
+							List<string> results = new List<string>();
+							foreach (var propertyValue in propertyValues)
+							{
+								string tmp = propertyValue.GetValue(field.Option == PropertyExtractBy.ValueOption.PlainText);
+								foreach (var formatter in formatters)
+								{
+									tmp = formatter.Formate(tmp);
+								}
+								results.Add(tmp);
+							}
+							return new JArray(results);
+						}
+					}
+					else
+					{
+						tmpValue = item.Select(selector)?.GetValue(field.Option == PropertyExtractBy.ValueOption.PlainText);
+						if (field.Option == PropertyExtractBy.ValueOption.Count)
+						{
+							return tmpValue == null ? 0 : 1;
+						}
+						else
+						{
+							tmpValue = formatters.Aggregate(tmpValue, (current, formatter) => formatter.Formate(current));
+							return tmpValue;
+						}
+					}
+				}
+			}
+			else
+			{
+				JObject dataObject = new JObject();
+				foreach (var child in field.Fields)
+				{
+					if (child.Multi)
+					{
+						var childItems = item.SelectList(SelectorUtil.GetSelector(child.Selector)).Nodes();
+						foreach (var childItem in childItems)
+						{
+							dataObject.Add(child.Name, ExtractField(childItem, page, child, childItems.IndexOf(childItem)));
+						}
+					}
+					else
+					{
+						var childItem = item.Select(SelectorUtil.GetSelector(child.Selector));
+						dataObject.Add(child.Name, ExtractField(childItem, page, child, 0));
+					}
+				}
+				return dataObject;
+			}
 		}
 
 		public static List<Formatter.Formatter> GenerateFormatter(IEnumerable<JToken> selectTokens)

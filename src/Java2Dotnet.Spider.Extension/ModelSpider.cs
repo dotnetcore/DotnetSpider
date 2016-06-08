@@ -34,7 +34,7 @@ namespace Java2Dotnet.Spider.Extension
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
 		protected readonly ILog Logger;
-
+		Core.Spider spider;
 		protected readonly SpiderContext SpiderContext;
 		public string Name { get; }
 
@@ -81,7 +81,7 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			try
 			{
-				Core.Spider spider = PrepareSpider(args);
+				spider = PrepareSpider(args);
 
 				if (spider == null)
 				{
@@ -104,6 +104,15 @@ namespace Java2Dotnet.Spider.Extension
 			finally
 			{
 				Log.WaitForExit();
+			}
+		}
+
+		public void Clear()
+		{
+			var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
+			if (redisScheduler != null)
+			{
+				redisScheduler.Clear(spider);
 			}
 		}
 

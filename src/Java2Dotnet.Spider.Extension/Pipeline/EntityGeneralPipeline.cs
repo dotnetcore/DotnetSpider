@@ -56,7 +56,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			ConnectString = connectString;
 
 			Schema = GenerateSchema(schema);
-			Columns = entityDefine.Fields.Where(f => f.DataType != null).ToList();
+			Columns = entityDefine.Fields.Where(f => !string.IsNullOrEmpty(f.DataType)).ToList();
 			var primary = entityDefine.Primary;
 			if (primary != null)
 			{

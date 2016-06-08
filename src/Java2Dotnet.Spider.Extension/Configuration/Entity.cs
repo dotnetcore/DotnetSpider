@@ -24,7 +24,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 	public class Field
 	{
-		public dynamic DataType { get; set; }
+		public List<Field> Fields { get; set; }
+		public string DataType { get; set; }
 		public Selector Selector { get; set; }
 		public bool Multi { get; set; }
 		public PropertyExtractBy.ValueOption Option { get; set; }
