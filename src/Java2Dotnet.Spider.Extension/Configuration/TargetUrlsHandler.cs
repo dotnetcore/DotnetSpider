@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Java2Dotnet.Spider.Core;
+using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Java2Dotnet.Spider.Extension.Utils;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
@@ -53,8 +54,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override Types Type { get; internal set; } = Types.IncreasePageNumber;
 
 		public Selector TotalPageSelector { get; set; }
+		public Formatter TotalPageFormatter { get; set; }
 
 		public Selector CurrenctPageSelector { get; set; }
+		public Formatter CurrnetPageFormatter { get; set; }
 
 		public override bool CanStop(Page page)
 		{
@@ -62,6 +65,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			if (TotalPageSelector != null)
 			{
 				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).GetValue();
+				if (TotalPageFormatter != null)
+				{
+					totalStr = TotalPageFormatter.Formate(totalStr);
+				}
 				if (!string.IsNullOrEmpty(totalStr))
 				{
 					totalPage = int.Parse(totalStr);
@@ -71,6 +78,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			if (CurrenctPageSelector != null)
 			{
 				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).GetValue();
+				if (CurrnetPageFormatter != null)
+				{
+					currentStr = CurrnetPageFormatter.Formate(currentStr);
+				}
 				if (!string.IsNullOrEmpty(currentStr))
 				{
 					currentPage = int.Parse(currentStr);

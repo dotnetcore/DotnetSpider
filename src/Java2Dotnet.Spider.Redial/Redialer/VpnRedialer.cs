@@ -1,4 +1,6 @@
 ﻿#if !NET_CORE
+using System;
+using System.Runtime.ConstrainedExecution;
 using Java2Dotnet.Spider.Redial.Utils;
 using System.Threading;
 
@@ -16,14 +18,10 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 
 		public void Redial()
 		{
+			Console.WriteLine("Trying to disconnect Vpn:" + _util.VpnName);
 			_util.TryDisConnectVpn();
 			Thread.Sleep(1000);
-
-			while (_util.GetCurrentConnectingVpnNames().Contains(_util.VpnName))
-			{
-				_util.TryDisConnectVpn();
-				Thread.Sleep(2000);
-			}
+			Console.WriteLine("Finish disconnect:" + _util.VpnName);
 
 			//在NAT下使用VPN，断开VPN时会导致原网络断开，需要重启网卡，暂时没有找到更好的解决方法
 			if (!string.IsNullOrEmpty(NetInterface))
@@ -34,21 +32,10 @@ namespace Java2Dotnet.Spider.Redial.Redialer
 				Thread.Sleep(2000);
 			}
 
+			Console.WriteLine("Trying to connect Vpn:" + _util.VpnName);
 			_util.TryConnectVpn();
 			Thread.Sleep(1000);
-
-			while (!_util.GetCurrentConnectingVpnNames().Contains(_util.VpnName))
-			{
-				try
-				{
-					_util.TryConnectVpn();
-					Thread.Sleep(10000);
-				}
-				catch
-				{
-					// ignored
-				}
-			}
+			Console.WriteLine("Finish connect:" + _util.VpnName);
 		}
 	}
 }
