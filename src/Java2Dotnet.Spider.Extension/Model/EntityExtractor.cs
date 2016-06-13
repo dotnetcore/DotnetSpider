@@ -253,24 +253,33 @@ namespace Java2Dotnet.Spider.Extension.Model
 			}
 			else
 			{
-				JObject dataObject = new JObject();
-				foreach (var child in field.Fields)
+				if (field.Multi)
 				{
-					if (child.Multi)
+					var propertyValues = item.SelectList(selector).Nodes();
+					JArray objs = new JArray();
+					var selectables = item.SelectList(selector).Nodes();
+					foreach (var selectable in selectables)
 					{
-						var childItems = item.SelectList(SelectorUtil.GetSelector(child.Selector)).Nodes();
-						foreach (var childItem in childItems)
+						JObject obj = new JObject();
+
+						foreach (var child in field.Fields)
 						{
-							dataObject.Add(child.Name, ExtractField(childItem, page, child, childItems.IndexOf(childItem)));
+							obj.Add(child.Name, ExtractField(selectable, page, child, 0));
 						}
+						objs.Add(obj);
 					}
-					else
-					{
-						var childItem = item.Select(SelectorUtil.GetSelector(child.Selector));
-						dataObject.Add(child.Name, ExtractField(childItem, page, child, 0));
-					}
+					return objs;
 				}
-				return dataObject;
+				else
+				{
+					JObject obj = new JObject();
+					var selectable = item.Select(selector);
+					foreach (var child in field.Fields)
+					{
+						obj.Add(child.Name, ExtractField(selectable, page, field, 0));
+					}
+					return obj;
+				}
 			}
 		}
 
