@@ -36,6 +36,7 @@ namespace Java2Dotnet.Spider.Extension
 		protected readonly ILog Logger;
 		Core.Spider spider;
 		protected readonly SpiderContext SpiderContext;
+		public Action AfterSpiderFinished { get; set; }
 		public string Name { get; }
 
 		public ModelSpider(SpiderContext spiderContext)
@@ -98,6 +99,8 @@ namespace Java2Dotnet.Spider.Extension
 				}
 
 				spider?.Dispose();
+
+				AfterSpiderFinished?.Invoke();
 
 				DoValidate();
 			}
