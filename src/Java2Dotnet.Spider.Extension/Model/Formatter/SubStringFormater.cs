@@ -2,7 +2,7 @@
 
 namespace Java2Dotnet.Spider.Extension.Model.Formatter
 {
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class SubStringFormatter : Formatter
 	{
 		public override string Name { get; internal set; } = "SubStringFormatter";

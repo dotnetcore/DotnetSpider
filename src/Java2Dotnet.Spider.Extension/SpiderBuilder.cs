@@ -7,7 +7,7 @@ namespace Java2Dotnet.Spider.Extension
 {
 	public abstract class SpiderBuilder
 	{
-		protected virtual Action AfterSpiderFinished { get; }
+		protected virtual Action AfterSpiderFinished { get; set; }
 
 		protected abstract SpiderContext GetSpiderContext();
 
