@@ -174,8 +174,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal) + EndOffset;
 					start = end;
 
-					rawText = rawText.Insert(begin, "<div class=\"" + TargetTag + "\">");
 					rawText = rawText.Insert(end, @"</div>");
+					rawText = rawText.Insert(begin, "<div class=\"" + TargetTag + "\">");
 				}
 
 				p.Content = rawText;
