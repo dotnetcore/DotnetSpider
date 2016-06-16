@@ -148,6 +148,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 	public class CustomTargetHandler : PageHandler
 	{
+		public bool Loop { get; set; } = true;
 		public bool DisableNewLine { get; set; } = false;
 		public string StartString { get; set; }
 		public string EndString { get; set; }
@@ -168,14 +169,16 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					rawText = rawText.Replace("\r", "").Replace("\n", "").Replace("\t", "");
 				}
 				int start = 0;
-				while (rawText.IndexOf(StartString, start, StringComparison.Ordinal) != -1)
+				if (Loop)
 				{
-					int begin = rawText.IndexOf(StartString, start, StringComparison.Ordinal) + StartOffset;
-					int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal) + EndOffset;
-					start = end;
-
-					rawText = rawText.Insert(end, @"</div>");
-					rawText = rawText.Insert(begin, "<div class=\"" + TargetTag + "\">");
+					while (rawText.IndexOf(StartString, start, StringComparison.Ordinal) != -1)
+					{
+						rawText = AmendRawText(rawText, ref start);
+					}
+				}
+				else
+				{
+					rawText = AmendRawText(rawText, ref start);
 				}
 
 				p.Content = rawText;
@@ -184,6 +187,18 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			{
 				throw new SpiderExceptoin("Rawtext Invalid.");
 			}
+		}
+
+		private string AmendRawText(string rawText,ref int start)
+		{
+			int begin = rawText.IndexOf(StartString, start, StringComparison.Ordinal) + StartOffset;
+			int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal) + EndOffset;
+			start = end;
+
+			rawText = rawText.Insert(end, @"</div>");
+			rawText = rawText.Insert(begin, "<div class=\"" + TargetTag + "\">");
+
+			return rawText;
 		}
 	}
 }
