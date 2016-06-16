@@ -401,7 +401,7 @@ namespace Java2Dotnet.Spider.Extension
 
 			foreach (var entity in SpiderContext.Entities)
 			{
-				string entiyName = entity.Identity;
+				string entiyName = entity.Name;
 
 				var schema = entity.Schema;
 

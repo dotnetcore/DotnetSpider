@@ -212,7 +212,7 @@ namespace Java2Dotnet.Spider.Extension
 		private static Entity ConvertToEntity(Type entityType)
 		{
 			Entity entity = new Entity();
-			entity.Identity = GetEntityName(entityType);
+			entity.Name = GetEntityName(entityType);
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
 			{
@@ -239,7 +239,7 @@ namespace Java2Dotnet.Spider.Extension
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{
-				Field field = new Field();
+				FieldMetadata field = new FieldMetadata();
 				var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
 				var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
 
@@ -265,7 +265,7 @@ namespace Java2Dotnet.Spider.Extension
 					field.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
 				}
 
-				entity.Fields.Add(field);
+				entity.EntityMetadata.Fields.Add(field);
 			}
 
 			entity.Stopping = entityType.GetCustomAttribute<Stopping>();

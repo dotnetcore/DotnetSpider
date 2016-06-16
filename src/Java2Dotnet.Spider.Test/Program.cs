@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
 using System.Text.RegularExpressions;
 using System.Linq;
+using Java2Dotnet.Spider.Extension.Configuration;
 using Java2Dotnet.Spider.Extension.Configuration.Json;
 
 namespace Java2Dotnet.Spider.Test

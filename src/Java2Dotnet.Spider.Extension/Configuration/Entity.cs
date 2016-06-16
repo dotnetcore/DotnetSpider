@@ -8,28 +8,36 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 {
 	public class Entity
 	{
-		public bool Multi { get; set; }
 		public Selector Selector { get; set; }
+		public bool Multi { get; set; }
+		public string Name { get; set; }
 		public Schema Schema { get; set; }
-		public string Identity { get; set; }
 		public List<string[]> Indexes { get; set; }
 		public List<string[]> Uniques { get; set; }
 		public string AutoIncrement { get; set; }
 		public string[] Primary { get; set; }
-		public List<Field> Fields { get; set; } = new List<Field>();
+		public EntityMetadata EntityMetadata { get; set; } = new EntityMetadata();
 		public Stopping Stopping { get; set; }
 		public string[] Updates { get; internal set; }
 		public int? Limit { get; set; }
 	}
 
-	public class Field
+	public class EntityMetadata : DataToken
 	{
-		public List<Field> Fields { get; set; }
+		public List<DataToken> Fields { get; set; } = new List<DataToken>();
+	}
+
+	public class FieldMetadata : DataToken
+	{
 		public string DataType { get; set; }
+		public PropertyExtractBy.ValueOption Option { get; set; }
+		public List<JObject> Formatters { get; set; } = new List<JObject>();
+	}
+
+	public abstract class DataToken
+	{
 		public Selector Selector { get; set; }
 		public bool Multi { get; set; }
-		public PropertyExtractBy.ValueOption Option { get; set; }
 		public string Name { get; set; }
-		public List<JObject> Formatters { get; set; } = new List<JObject>();
 	}
 }

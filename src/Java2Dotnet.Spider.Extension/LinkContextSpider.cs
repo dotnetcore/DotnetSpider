@@ -38,7 +38,7 @@ namespace Java2Dotnet.Spider.Extension
 
 			foreach (var entity in SpiderContext.Entities)
 			{
-				string name = entity.Identity;
+				string name = entity.Name;
 				if (NextSpiders.Keys.Contains(name))
 				{
 					var nextScheduler = NextSpiders[name].Scheduler.GetScheduler();

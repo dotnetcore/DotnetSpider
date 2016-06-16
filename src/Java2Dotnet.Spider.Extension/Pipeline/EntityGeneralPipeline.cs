@@ -28,8 +28,8 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		//}
 
 		protected string ConnectString { get; set; }
-		protected readonly List<Field> Columns;
-		protected readonly List<Field> UpdateColumns = new List<Field>();
+		protected readonly List<FieldMetadata> Columns = new List<FieldMetadata>();
+		protected readonly List<FieldMetadata> UpdateColumns = new List<FieldMetadata>();
 
 		protected abstract DbConnection CreateConnection();
 
@@ -45,7 +45,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 		protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
 		protected List<List<string>> Uniques { get; set; } = new List<List<string>>();
-		protected List<Field> Primary { get; set; } = new List<Field>();
+		protected List<FieldMetadata> Primary { get; set; } = new List<FieldMetadata>();
 		protected string AutoIncrement { get; set; }
 
 		protected abstract string ConvertToDbType(string datatype);
@@ -56,7 +56,13 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			ConnectString = connectString;
 
 			Schema = GenerateSchema(schema);
-			Columns = entityDefine.Fields.Where(f => !string.IsNullOrEmpty(f.DataType)).ToList();
+			foreach (var f in entityDefine.EntityMetadata.Fields)
+			{
+				if (!string.IsNullOrEmpty(((FieldMetadata) f).DataType))
+				{
+					Columns.Add((FieldMetadata)f);
+				}
+			}
 			var primary = entityDefine.Primary;
 			if (primary != null)
 			{
