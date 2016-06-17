@@ -64,7 +64,7 @@ namespace Java2Dotnet.Spider.Test
 
 		private void TestRound()
 		{
-			Core.Spider spider = Core.Spider.Create(new Site { SleepTime = 0 }, new TestPageProcessor(), new TestScheduler()).SetThreadNum(10);
+			Core.Spider spider = Core.Spider.Create(new Site { }, new TestPageProcessor(), new TestScheduler()).SetThreadNum(10);
 			spider.Run();
 		}
 
