@@ -39,7 +39,7 @@ namespace Java2Dotnet.Spider.Extension.Processor
 
 		private IEntityExtractor GenerateExtractor(Entity entityDefine)
 		{
-			return new EntityExtractor(entityDefine.Identity, _spiderContext.EnviromentValues, entityDefine);
+			return new EntityExtractor(entityDefine.Name, _spiderContext.EnviromentValues, entityDefine);
 		}
 
 		public void Process(Page page)

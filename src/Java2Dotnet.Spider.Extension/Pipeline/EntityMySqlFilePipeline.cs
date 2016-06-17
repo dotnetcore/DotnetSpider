@@ -16,13 +16,13 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	public class EntityMySqlFilePipeline : FilePersistentBase, IEntityPipeline
 	{
 		protected readonly Schema Schema;
-		protected readonly List<Field> Columns;
+		protected readonly List<DataToken> Columns;
 
 		public EntityMySqlFilePipeline(Schema schema, Entity entityDefine)
 		{
 			Schema = schema;
 
-			Columns = entityDefine.Fields;
+			Columns = entityDefine.EntityMetadata.Fields;
 			SetPath("DataFiles");
 		}
 

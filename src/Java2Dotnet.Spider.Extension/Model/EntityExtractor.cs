@@ -148,7 +148,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 		{
 			JObject dataObject = new JObject();
 
-			foreach (var field in entityDefine.Fields)
+			foreach (var field in entityDefine.EntityMetadata.Fields)
 			{
 				var fieldValue = ExtractField(item, page, field, index);
 				if (fieldValue != null)
@@ -161,32 +161,39 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 			if (stopping != null)
 			{
-				var field = entityDefine.Fields.First(f => f.Name == stopping.PropertyName);
-				var datatype = field.DataType;
-				bool isEntity = VerifyIfEntity(datatype);
-				if (isEntity)
+				var field = entityDefine.EntityMetadata.Fields.First(f => f.Name == stopping.PropertyName) as FieldMetadata;
+				if (field != null)
 				{
-					throw new SpiderExceptoin("Can't compare with object.");
-				}
-				stopping.DataType = datatype.ToString().ToLower();
-				string value = dataObject.SelectToken($"$.{stopping.PropertyName}")?.ToString();
-				if (string.IsNullOrEmpty(value))
-				{
-					page.MissTargetUrls = true;
-				}
-				else
-				{
-					if (stopping.NeedStop(value))
+					var datatype = field.DataType;
+					bool isEntity = VerifyIfEntity(datatype);
+					if (isEntity)
+					{
+						throw new SpiderExceptoin("Can't compare with object.");
+					}
+					stopping.DataType = datatype.ToString().ToLower();
+					string value = dataObject.SelectToken($"$.{stopping.PropertyName}")?.ToString();
+					if (string.IsNullOrEmpty(value))
 					{
 						page.MissTargetUrls = true;
 					}
+					else
+					{
+						if (stopping.NeedStop(value))
+						{
+							page.MissTargetUrls = true;
+						}
+					}
+				}
+				else
+				{
+					throw new SpiderExceptoin("Stopping cannot be EntityMetaData.");
 				}
 			}
 
 			return dataObject.Children().Count() > 0 ? dataObject : null;
 		}
 
-		private dynamic ExtractField(ISelectable item, Page page, Field field, int index)
+		private dynamic ExtractField(ISelectable item, Page page, DataToken field, int index)
 		{
 			ISelector selector = SelectorUtil.GetSelector(field.Selector);
 			if (selector == null)
@@ -194,13 +201,14 @@ namespace Java2Dotnet.Spider.Extension.Model
 				return null;
 			}
 
-			List<Formatter.Formatter> formatters = GenerateFormatter(field.Formatters);
+			var f = field as FieldMetadata;
+			List<Formatter.Formatter> formatters = GenerateFormatter(f?.Formatters);
 
-			bool isEntity = field.Fields != null && field.Fields.Count > 0;
+			bool isEntity = field is EntityMetadata;
 
 			if (!isEntity)
 			{
-				string tmpValue;
+                string tmpValue;
 				if (selector is EnviromentSelector)
 				{
 					var enviromentSelector = selector as EnviromentSelector;
@@ -216,7 +224,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 					if (field.Multi)
 					{
 						var propertyValues = item.SelectList(selector).Nodes();
-						if (field.Option == PropertyExtractBy.ValueOption.Count)
+						if (((FieldMetadata)field).Option == PropertyExtractBy.ValueOption.Count)
 						{
 							var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "-1";
 							return tempValue;
@@ -226,7 +234,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 							List<string> results = new List<string>();
 							foreach (var propertyValue in propertyValues)
 							{
-								string tmp = propertyValue.GetValue(field.Option == PropertyExtractBy.ValueOption.PlainText);
+								string tmp = propertyValue.GetValue(((FieldMetadata)field).Option == PropertyExtractBy.ValueOption.PlainText);
 								foreach (var formatter in formatters)
 								{
 									tmp = formatter.Formate(tmp);
@@ -238,8 +246,8 @@ namespace Java2Dotnet.Spider.Extension.Model
 					}
 					else
 					{
-						tmpValue = item.Select(selector)?.GetValue(field.Option == PropertyExtractBy.ValueOption.PlainText);
-						if (field.Option == PropertyExtractBy.ValueOption.Count)
+						tmpValue = item.Select(selector)?.GetValue(((FieldMetadata)field).Option == PropertyExtractBy.ValueOption.PlainText);
+						if (((FieldMetadata)field).Option == PropertyExtractBy.ValueOption.Count)
 						{
 							return tmpValue == null ? 0 : 1;
 						}
@@ -262,7 +270,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 					{
 						JObject obj = new JObject();
 
-						foreach (var child in field.Fields)
+						foreach (var child in ((EntityMetadata)field).Fields)
 						{
 							obj.Add(child.Name, ExtractField(selectable, page, child, 0));
 						}
@@ -274,7 +282,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				{
 					JObject obj = new JObject();
 					var selectable = item.Select(selector);
-					foreach (var child in field.Fields)
+					foreach (var child in ((EntityMetadata)field).Fields)
 					{
 						obj.Add(child.Name, ExtractField(selectable, page, field, 0));
 					}
