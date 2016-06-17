@@ -222,6 +222,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				else
 				{
 					bool needCount = (field is Field) && (((Field)field).Option == PropertyExtractBy.ValueOption.Count);
+					bool needPlainText = (field is Field) && (((Field)field).Option == PropertyExtractBy.ValueOption.PlainText);
 					if (field.Multi)
 					{
 						var propertyValues = item.SelectList(selector).Nodes();
@@ -229,7 +230,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 							List<string> results = new List<string>();
 							foreach (var propertyValue in propertyValues)
 							{
-								string tmp = propertyValue.GetValue(needCount);
+								string tmp = propertyValue.GetValue(needPlainText);
 								foreach (var formatter in formatters)
 								{
 									tmp = formatter.Formate(tmp);
@@ -247,7 +248,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 						}
 						else
 						{
-							tmpValue = item.Select(selector)?.GetValue();
+							tmpValue = item.Select(selector)?.GetValue(needPlainText);
 							tmpValue = formatters.Aggregate(tmpValue, (current, formatter) => formatter.Formate(current));
 							return tmpValue;
 						}
