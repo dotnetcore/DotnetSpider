@@ -253,33 +253,40 @@ namespace Java2Dotnet.Spider.Extension
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{
-				if (propertyInfo.PropertyType.IsAssignableFrom(typeof(ISpiderEntity)) || propertyInfo.PropertyType.IsAssignableFrom(typeof(List<ISpiderEntity>)))
+				var type = propertyInfo.PropertyType;
+				TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
+
+				if (extractByAttribute != null)
 				{
-					Entity token = new Entity();
-					if (propertyInfo.PropertyType.IsAssignableFrom(typeof (IEnumerable)))
+					if (typeof(ISpiderEntity).IsAssignableFrom(type) || typeof(List<ISpiderEntity>).IsAssignableFrom(type))
 					{
-						token.Multi = true;
+						Entity token = new Entity();
+						if (typeof(IEnumerable).IsAssignableFrom(type))
+						{
+							token.Multi = true;
+						}
+						else
+						{
+							token.Multi = false;
+						}
+						token.Name = GetEntityName(propertyInfo.PropertyType);
+
+						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+						token.Fields.Add(ConvertToEntiyMetaData(propertyInfo.PropertyType));
 					}
 					else
 					{
-						token.Multi = false;
+						throw new SpiderExceptoin("Wrong Entity Type !!!");
 					}
-					token.Name = GetEntityName(propertyInfo.PropertyType);
-					TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
-					if (extractByAttribute != null)
-					{
-						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-					}
-					token.Fields.Add(ConvertToEntiyMetaData(propertyInfo.PropertyType));
 				}
 				else
 				{
 					Field token = new Field();
-					
-					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
-				var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
 
-					if (propertyInfo.PropertyType.IsAssignableFrom(typeof(IEnumerable)))
+					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
+
+					if (typeof(IEnumerable).IsAssignableFrom(type))
 					{
 						token.Multi = true;
 					}
@@ -288,8 +295,8 @@ namespace Java2Dotnet.Spider.Extension
 						token.Multi = false;
 					}
 
-				if (extractBy != null)
-				{
+					if (extractBy != null)
+					{
 						token.Option = extractBy.Option;
 						token.Selector = new Selector()
 						{
@@ -297,22 +304,22 @@ namespace Java2Dotnet.Spider.Extension
 							Type = extractBy.Type,
 							Argument = extractBy.Argument
 						};
-				}
+					}
 
-				if (storeAs != null)
-				{
+					if (storeAs != null)
+					{
 						token.Name = storeAs.Name;
 						token.DataType = ConvertDataTypeToString(storeAs);
-				}
-				else
-				{
+					}
+					else
+					{
 						token.Name = propertyInfo.Name;
-				}
+					}
 
-				foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
-				{
+					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
+					{
 						token.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
-				}
+					}
 
 					entity.Fields.Add(token);
 				}

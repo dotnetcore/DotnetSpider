@@ -221,8 +221,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 				else
 				{
-					bool needCount = (field is Field) && (((Field)field).Option == PropertyExtractBy.ValueOption.Count);
-					bool needPlainText = (field is Field) && (((Field)field).Option == PropertyExtractBy.ValueOption.PlainText);
+					bool needPlainText = (((Field)field).Option == PropertyExtractBy.ValueOption.PlainText);
 					if (field.Multi)
 					{
 						var propertyValues = item.SelectList(selector).Nodes();
@@ -241,6 +240,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 						}
 					else
 					{
+						bool needCount = (((Field)field).Option == PropertyExtractBy.ValueOption.Count);
 						if (needCount)
 						{
 							var propertyValues = item.SelectList(selector).Nodes();
