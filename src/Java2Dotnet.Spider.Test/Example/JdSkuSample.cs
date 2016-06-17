@@ -19,7 +19,6 @@ namespace Java2Dotnet.Spider.Test.Example
 		protected override SpiderContext GetSpiderContext()
 		{
 			SpiderContext context = new SpiderContext();
-			context.SetTaskGroup("JD sku/store test");
 			context.SetSpiderName("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
 			{
@@ -29,12 +28,6 @@ namespace Java2Dotnet.Spider.Test.Example
 			context.AddPipeline(new MysqlPipeline
 			{
 				ConnectString = "Database='test';Data Source=ooodata.com;User ID=root;Password=1qazZAQ!123456;Port=4306"
-			});
-			context.SetScheduler(new RedisScheduler
-			{
-				Host = "ooodata.com",
-				Password = "Ayw3WLBt2h#^eE9XVU9$gDFs",
-				Port = 6379
 			});
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));

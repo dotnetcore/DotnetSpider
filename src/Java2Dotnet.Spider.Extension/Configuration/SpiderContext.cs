@@ -18,7 +18,7 @@ namespace Java2Dotnet.Spider.Extension
 		private HashSet<Type> Types { get; set; }
 
 		// build it internal
-		public List<Entity> Entities { get; internal set; } = new List<Entity>();
+		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 
 		public string SpiderName { get; set; }
 		public string UserId { get; set; } = "DOTNETSPIDER";
@@ -209,9 +209,9 @@ namespace Java2Dotnet.Spider.Extension
 
 #if !NET_CORE
 
-		private static Entity ConvertToEntity(Type entityType)
+		private static EntityMetadata ConvertToEntity(Type entityType)
 		{
-			Entity entity = new Entity();
+			EntityMetadata entity = new EntityMetadata();
 			entity.Name = GetEntityName(entityType);
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
@@ -239,7 +239,7 @@ namespace Java2Dotnet.Spider.Extension
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{
-				FieldMetadata field = new FieldMetadata();
+				Field field = new Field();
 				var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
 				var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
 
@@ -265,7 +265,7 @@ namespace Java2Dotnet.Spider.Extension
 					field.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
 				}
 
-				entity.EntityMetadata.Fields.Add(field);
+				entity.Entity.Fields.Add(field);
 			}
 
 			entity.Stopping = entityType.GetCustomAttribute<Stopping>();

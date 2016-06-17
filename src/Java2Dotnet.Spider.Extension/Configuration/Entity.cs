@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
-	public class Entity
+	public class EntityMetadata
 	{
 		public Selector Selector { get; set; }
 		public bool Multi { get; set; }
@@ -16,18 +16,18 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public List<string[]> Uniques { get; set; }
 		public string AutoIncrement { get; set; }
 		public string[] Primary { get; set; }
-		public EntityMetadata EntityMetadata { get; set; } = new EntityMetadata();
+		public Entity Entity { get; set; } = new Entity();
 		public Stopping Stopping { get; set; }
 		public string[] Updates { get; internal set; }
 		public int? Limit { get; set; }
 	}
 
-	public class EntityMetadata : DataToken
+	public class Entity : DataToken
 	{
 		public List<DataToken> Fields { get; set; } = new List<DataToken>();
 	}
 
-	public class FieldMetadata : DataToken
+	public class Field : DataToken
 	{
 		public string DataType { get; set; }
 		public PropertyExtractBy.ValueOption Option { get; set; }

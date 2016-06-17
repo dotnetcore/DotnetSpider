@@ -15,10 +15,10 @@ namespace Java2Dotnet.Spider.Extension.Model
 {
 	public class EntityExtractor : IEntityExtractor
 	{
-		private readonly Entity _entityDefine;
+		private readonly EntityMetadata _entityDefine;
 		private readonly List<EnviromentValue> _enviromentValues;
 
-		public EntityExtractor(string entityName, List<EnviromentValue> enviromentValues, Entity entityDefine)
+		public EntityExtractor(string entityName, List<EnviromentValue> enviromentValues, EntityMetadata entityDefine)
 		{
 			_entityDefine = entityDefine;
 
@@ -144,11 +144,11 @@ namespace Java2Dotnet.Spider.Extension.Model
 			}
 		}
 
-		private JObject ProcessSingle(Page page, ISelectable item, Entity entityDefine, int index)
+		private JObject ProcessSingle(Page page, ISelectable item, EntityMetadata entityDefine, int index)
 		{
 			JObject dataObject = new JObject();
 
-			foreach (var field in entityDefine.EntityMetadata.Fields)
+			foreach (var field in entityDefine.Entity.Fields)
 			{
 				var fieldValue = ExtractField(item, page, field, index);
 				if (fieldValue != null)
@@ -161,7 +161,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 			if (stopping != null)
 			{
-				var field = entityDefine.EntityMetadata.Fields.First(f => f.Name == stopping.PropertyName) as FieldMetadata;
+				var field = entityDefine.Entity.Fields.First(f => f.Name == stopping.PropertyName) as Field;
 				if (field != null)
 				{
 					var datatype = field.DataType;
@@ -201,14 +201,14 @@ namespace Java2Dotnet.Spider.Extension.Model
 				return null;
 			}
 
-			var f = field as FieldMetadata;
+			var f = field as Field;
 			List<Formatter.Formatter> formatters = GenerateFormatter(f?.Formatters);
 
-			bool isEntity = field is EntityMetadata;
+			bool isEntity = field is Entity;
 
 			if (!isEntity)
 			{
-                string tmpValue;
+				string tmpValue;
 				if (selector is EnviromentSelector)
 				{
 					var enviromentSelector = selector as EnviromentSelector;
@@ -224,7 +224,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 					if (field.Multi)
 					{
 						var propertyValues = item.SelectList(selector).Nodes();
-						if (((FieldMetadata)field).Option == PropertyExtractBy.ValueOption.Count)
+						if (((Field)field).Option == PropertyExtractBy.ValueOption.Count)
 						{
 							var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "-1";
 							return tempValue;
@@ -234,7 +234,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 							List<string> results = new List<string>();
 							foreach (var propertyValue in propertyValues)
 							{
-								string tmp = propertyValue.GetValue(((FieldMetadata)field).Option == PropertyExtractBy.ValueOption.PlainText);
+								string tmp = propertyValue.GetValue(((Field)field).Option == PropertyExtractBy.ValueOption.PlainText);
 								foreach (var formatter in formatters)
 								{
 									tmp = formatter.Formate(tmp);
@@ -246,8 +246,8 @@ namespace Java2Dotnet.Spider.Extension.Model
 					}
 					else
 					{
-						tmpValue = item.Select(selector)?.GetValue(((FieldMetadata)field).Option == PropertyExtractBy.ValueOption.PlainText);
-						if (((FieldMetadata)field).Option == PropertyExtractBy.ValueOption.Count)
+						tmpValue = item.Select(selector)?.GetValue(((Field)field).Option == PropertyExtractBy.ValueOption.PlainText);
+						if (((Field)field).Option == PropertyExtractBy.ValueOption.Count)
 						{
 							return tmpValue == null ? 0 : 1;
 						}
@@ -270,7 +270,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 					{
 						JObject obj = new JObject();
 
-						foreach (var child in ((EntityMetadata)field).Fields)
+						foreach (var child in ((Entity)field).Fields)
 						{
 							obj.Add(child.Name, ExtractField(selectable, page, child, 0));
 						}
@@ -282,7 +282,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				{
 					JObject obj = new JObject();
 					var selectable = item.Select(selector);
-					foreach (var child in ((EntityMetadata)field).Fields)
+					foreach (var child in ((Entity)field).Fields)
 					{
 						obj.Add(child.Name, ExtractField(selectable, page, field, 0));
 					}

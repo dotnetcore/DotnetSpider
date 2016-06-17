@@ -32,12 +32,12 @@ namespace Java2Dotnet.Spider.Extension.Processor
 			_spiderContext = spiderContext;
 		}
 
-		public void AddEntity(Entity entityDefine)
+		public void AddEntity(EntityMetadata entityDefine)
 		{
 			EntityExtractorList.Add(GenerateExtractor(entityDefine));
 		}
 
-		private IEntityExtractor GenerateExtractor(Entity entityDefine)
+		private IEntityExtractor GenerateExtractor(EntityMetadata entityDefine)
 		{
 			return new EntityExtractor(entityDefine.Name, _spiderContext.EnviromentValues, entityDefine);
 		}

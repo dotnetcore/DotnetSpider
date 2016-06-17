@@ -22,7 +22,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public abstract Types Type { get; internal set; }
 
-		public abstract IEntityPipeline GetPipeline(Schema schema, Entity entityDefine);
+		public abstract IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine);
 	}
 
 #if !NET_CORE
@@ -32,7 +32,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string ConnectString { get; set; }
 
-		public override IEntityPipeline GetPipeline(Schema schema, Entity entityDefine)
+		public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
 		{
 			return new EntityMongoDbPipeline(schema, ConnectString);
 		}
@@ -46,7 +46,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string TaskId { get; set; }
 
-		public override IEntityPipeline GetPipeline(Schema schema, Entity entityDefine)
+		public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
 		{
 			return new EntityTestMongoDbPipeline(TaskId, schema, ConnectString);
 		}
@@ -57,7 +57,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	{
 		public override Types Type { get; internal set; } = Types.MySqlFile;
 
-		public override IEntityPipeline GetPipeline(Schema schema, Entity entityDefine)
+		public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
 		{
 			return new EntityMySqlFilePipeline(schema, entityDefine);
 		}
@@ -71,7 +71,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public string ConnectString { get; set; }
 
-		public override IEntityPipeline GetPipeline(Schema schema, Entity entityDefine)
+		public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
 		{
 			return new EntityMySqlPipeline(schema, entityDefine, ConnectString, Mode);
 		}
@@ -81,7 +81,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	{
 		public override Types Type { get; internal set; } = Types.Console;
 
-		public override IEntityPipeline GetPipeline(Schema schema, Entity entityDefine)
+		public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
 		{
 			return new EntityConsolePipeline();
 		}
