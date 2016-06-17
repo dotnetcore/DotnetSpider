@@ -4,6 +4,8 @@ using Java2Dotnet.Spider.Extension.Configuration;
 using Newtonsoft.Json.Linq;
 using Java2Dotnet.Spider.Extension.Model;
 using System;
+using System.CodeDom;
+using System.Collections;
 using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.ORM;
 using System.Reflection;
@@ -236,41 +238,86 @@ namespace Java2Dotnet.Spider.Extension
 				entity.Updates = updates.Columns;
 			}
 
-			var properties = entityType.GetProperties();
-			foreach (var propertyInfo in properties)
-			{
-				FieldMetadata field = new FieldMetadata();
-				var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
-				var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+			EntityMetadata entityMetadata = ConvertToEntiyMetaData(entityType);
 
-				if (extractBy != null)
-				{
-					field.Multi = extractBy.Multi;
-					field.Option = extractBy.Option;
-					field.Selector = new Selector() { Expression = extractBy.Expression, Type = extractBy.Type, Argument = extractBy.Argument };
-				}
-
-				if (storeAs != null)
-				{
-					field.Name = storeAs.Name;
-					field.DataType = ConvertDataTypeToString(storeAs);
-				}
-				else
-				{
-					field.Name = propertyInfo.Name;
-				}
-
-				foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
-				{
-					field.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
-				}
-
-				entity.EntityMetadata.Fields.Add(field);
-			}
-
+			entity.EntityMetadata = entityMetadata;
+			
 			entity.Stopping = entityType.GetCustomAttribute<Stopping>();
 
 			return entity;
+		}
+
+		private static EntityMetadata ConvertToEntiyMetaData(Type entityType)
+		{
+			EntityMetadata entityMetadata = new EntityMetadata();
+			var properties = entityType.GetProperties();
+			foreach (var propertyInfo in properties)
+			{
+				if (propertyInfo.PropertyType.IsAssignableFrom(typeof(ISpiderEntity)) || propertyInfo.PropertyType.IsAssignableFrom(typeof(List<ISpiderEntity>)))
+				{
+					EntityMetadata token = new EntityMetadata();
+					if (propertyInfo.PropertyType.IsAssignableFrom(typeof (IEnumerable)))
+					{
+						token.Multi = true;
+					}
+					else
+					{
+						token.Multi = false;
+					}
+					token.Name = GetEntityName(propertyInfo.PropertyType);
+					TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
+					if (extractByAttribute != null)
+					{
+						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+					}
+					token.Fields.Add(ConvertToEntiyMetaData(propertyInfo.PropertyType));
+				}
+				else
+				{
+					FieldMetadata token = new FieldMetadata();
+					
+					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
+
+					if (propertyInfo.PropertyType.IsAssignableFrom(typeof(IEnumerable)))
+					{
+						token.Multi = true;
+					}
+					else
+					{
+						token.Multi = false;
+					}
+
+					if (extractBy != null)
+					{
+						token.Option = extractBy.Option;
+						token.Selector = new Selector()
+						{
+							Expression = extractBy.Expression,
+							Type = extractBy.Type,
+							Argument = extractBy.Argument
+						};
+					}
+
+					if (storeAs != null)
+					{
+						token.Name = storeAs.Name;
+						token.DataType = ConvertDataTypeToString(storeAs);
+					}
+					else
+					{
+						token.Name = propertyInfo.Name;
+					}
+
+					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
+					{
+						token.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
+					}
+
+					entityMetadata.Fields.Add(token);
+				}
+			}
+			return entityMetadata;
 		}
 #else
 		private static Entity ConvertToEntity(TypeInfo entityType)
