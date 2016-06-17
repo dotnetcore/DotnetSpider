@@ -18,11 +18,11 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		protected readonly Schema Schema;
 		protected readonly List<DataToken> Columns;
 
-		public EntityMySqlFilePipeline(Schema schema, Entity entityDefine)
+		public EntityMySqlFilePipeline(Schema schema, EntityMetadata entityDefine)
 		{
 			Schema = schema;
 
-			Columns = entityDefine.EntityMetadata.Fields;
+			Columns = entityDefine.Entity.Fields;
 			SetPath("DataFiles");
 		}
 

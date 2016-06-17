@@ -24,7 +24,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public abstract Types Type { get; internal set; }
 		public abstract int RedialLimit { get; set; }
 
-		[JsonIgnore]
+		//[JsonIgnore]
 		public List<DownloadValidation> DownloadValidations { get; set; }
 
 		public abstract IDownloader GetDownloader();

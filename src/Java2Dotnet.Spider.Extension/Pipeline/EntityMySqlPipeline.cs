@@ -14,7 +14,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	{
 		private string _autoIncrementString = "AUTO_INCREMENT";
 
-		public EntityMySqlPipeline(Schema schema, Entity entityDefine, string connectString, PipelineMode mode) : base(schema, entityDefine, connectString, mode)
+		public EntityMySqlPipeline(Schema schema, EntityMetadata entityDefine, string connectString, PipelineMode mode) : base(schema, entityDefine, connectString, mode)
 		{
 		}
 

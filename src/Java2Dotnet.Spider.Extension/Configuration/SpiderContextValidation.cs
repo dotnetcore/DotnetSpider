@@ -28,7 +28,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					// 2. 如果数据实体有嵌套或者属性是List, 则Pipeline只能选择mongodb.
 					foreach (var entity in spiderContext.Entities)
 					{
-						var fieldTokens = entity.EntityMetadata.Fields;
+						var fieldTokens = entity.Entity.Fields;
 						string entityName = entity.Name;
 
 						if (string.IsNullOrEmpty(entityName))

@@ -63,6 +63,7 @@ namespace Java2Dotnet.Spider.Core
 		//private static readonly Regex IdentifyRegex = new Regex(@"^[\S]+$");
 		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
+		private Random _random = new Random();
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -410,7 +411,7 @@ namespace Java2Dotnet.Spider.Core
 						try
 						{
 							ProcessRequest(request, downloader);
-							Thread.Sleep(Site.SleepTime);
+							Thread.Sleep(_random.Next(Site.MinSleepTime, Site.MaxSleepTime));
 #if TEST
 							System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 							sw.Reset();

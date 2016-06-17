@@ -20,7 +20,7 @@ namespace Java2Dotnet.Spider.Extension
 		private HashSet<Type> Types { get; set; }
 
 		// build it internal
-		public List<Entity> Entities { get; internal set; } = new List<Entity>();
+		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 
 		public string SpiderName { get; set; }
 		public string UserId { get; set; } = "DOTNETSPIDER";
@@ -211,51 +211,51 @@ namespace Java2Dotnet.Spider.Extension
 
 #if !NET_CORE
 
-		private static Entity ConvertToEntity(Type entityType)
+		private static EntityMetadata ConvertToEntity(Type entityType)
 		{
-			Entity entity = new Entity();
-			entity.Name = GetEntityName(entityType);
+			EntityMetadata entityMetadata = new EntityMetadata();
+			entityMetadata.Name = GetEntityName(entityType);
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
 			{
-				entity.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-				entity.Multi = extractByAttribute.Multi;
+				entityMetadata.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+				entityMetadata.Multi = extractByAttribute.Multi;
 			}
-			entity.Schema = entityType.GetCustomAttribute<Schema>();
+			entityMetadata.Schema = entityType.GetCustomAttribute<Schema>();
 			var indexes = entityType.GetCustomAttribute<Indexes>();
 			if (indexes != null)
 			{
-				entity.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				entity.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				entity.Primary = indexes.Primary?.Split(',');
+				entityMetadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
+				entityMetadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
+				entityMetadata.Primary = indexes.Primary?.Split(',');
 
-				entity.AutoIncrement = indexes.AutoIncrement;
+				entityMetadata.AutoIncrement = indexes.AutoIncrement;
 			}
 
 			var updates = entityType.GetCustomAttribute<Update>();
 			if (updates != null)
 			{
-				entity.Updates = updates.Columns;
+				entityMetadata.Updates = updates.Columns;
 			}
 
-			EntityMetadata entityMetadata = ConvertToEntiyMetaData(entityType);
+			Entity entity = ConvertToEntiyMetaData(entityType);
 
-			entity.EntityMetadata = entityMetadata;
-			
-			entity.Stopping = entityType.GetCustomAttribute<Stopping>();
+			entityMetadata.Entity = entity;
 
-			return entity;
+			entityMetadata.Stopping = entityType.GetCustomAttribute<Stopping>();
+
+			return entityMetadata;
 		}
 
-		private static EntityMetadata ConvertToEntiyMetaData(Type entityType)
+		private static Entity ConvertToEntiyMetaData(Type entityType)
 		{
-			EntityMetadata entityMetadata = new EntityMetadata();
+			Entity entity = new Entity();
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{
 				if (propertyInfo.PropertyType.IsAssignableFrom(typeof(ISpiderEntity)) || propertyInfo.PropertyType.IsAssignableFrom(typeof(List<ISpiderEntity>)))
 				{
-					EntityMetadata token = new EntityMetadata();
+					Entity token = new Entity();
 					if (propertyInfo.PropertyType.IsAssignableFrom(typeof (IEnumerable)))
 					{
 						token.Multi = true;
@@ -274,10 +274,10 @@ namespace Java2Dotnet.Spider.Extension
 				}
 				else
 				{
-					FieldMetadata token = new FieldMetadata();
+					Field token = new Field();
 					
 					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
-					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
+				var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
 
 					if (propertyInfo.PropertyType.IsAssignableFrom(typeof(IEnumerable)))
 					{
@@ -288,8 +288,8 @@ namespace Java2Dotnet.Spider.Extension
 						token.Multi = false;
 					}
 
-					if (extractBy != null)
-					{
+				if (extractBy != null)
+				{
 						token.Option = extractBy.Option;
 						token.Selector = new Selector()
 						{
@@ -297,27 +297,27 @@ namespace Java2Dotnet.Spider.Extension
 							Type = extractBy.Type,
 							Argument = extractBy.Argument
 						};
-					}
+				}
 
-					if (storeAs != null)
-					{
+				if (storeAs != null)
+				{
 						token.Name = storeAs.Name;
 						token.DataType = ConvertDataTypeToString(storeAs);
-					}
-					else
-					{
+				}
+				else
+				{
 						token.Name = propertyInfo.Name;
-					}
+				}
 
-					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
-					{
+				foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
+				{
 						token.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
-					}
+				}
 
-					entityMetadata.Fields.Add(token);
+					entity.Fields.Add(token);
 				}
 			}
-			return entityMetadata;
+			return entity;
 		}
 #else
 		private static Entity ConvertToEntity(TypeInfo entityType)

@@ -25,7 +25,7 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			DDengSpider spiderBuilder = new DDengSpider();
 			spiderBuilder.Run("rerun");
 
 			//SpiderExample.Run();

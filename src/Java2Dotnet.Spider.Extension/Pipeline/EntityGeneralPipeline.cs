@@ -28,8 +28,8 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		//}
 
 		protected string ConnectString { get; set; }
-		protected readonly List<FieldMetadata> Columns = new List<FieldMetadata>();
-		protected readonly List<FieldMetadata> UpdateColumns = new List<FieldMetadata>();
+		protected readonly List<Field> Columns = new List<Field>();
+		protected readonly List<Field> UpdateColumns = new List<Field>();
 
 		protected abstract DbConnection CreateConnection();
 
@@ -45,22 +45,22 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 		protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
 		protected List<List<string>> Uniques { get; set; } = new List<List<string>>();
-		protected List<FieldMetadata> Primary { get; set; } = new List<FieldMetadata>();
+		protected List<Field> Primary { get; set; } = new List<Field>();
 		protected string AutoIncrement { get; set; }
 
 		protected abstract string ConvertToDbType(string datatype);
 
-		protected EntityGeneralPipeline(Schema schema, Entity entityDefine, string connectString, PipelineMode mode = PipelineMode.Insert)
+		protected EntityGeneralPipeline(Schema schema, EntityMetadata entityDefine, string connectString, PipelineMode mode = PipelineMode.Insert)
 		{
 			Mode = mode;
 			ConnectString = connectString;
 
 			Schema = GenerateSchema(schema);
-			foreach (var f in entityDefine.EntityMetadata.Fields)
+			foreach (var f in entityDefine.Entity.Fields)
 			{
-				if (!string.IsNullOrEmpty(((FieldMetadata) f).DataType))
+				if (!string.IsNullOrEmpty(((Field) f).DataType))
 				{
-					Columns.Add((FieldMetadata)f);
+					Columns.Add((Field)f);
 				}
 			}
 			var primary = entityDefine.Primary;
