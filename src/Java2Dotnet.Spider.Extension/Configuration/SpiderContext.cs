@@ -125,7 +125,7 @@ namespace Java2Dotnet.Spider.Extension
 #if NET_CORE
 				Entities.Add(ConvertToEntity(type.GetTypeInfo()));
 #else
-				Entities.Add(ConvertToEntity(type));
+				Entities.Add(ConvertToEntityMetaData(type));
 #endif
 				EnviromentValues = type.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new EnviromentValue
 				{
@@ -210,8 +210,7 @@ namespace Java2Dotnet.Spider.Extension
 		}
 
 #if !NET_CORE
-
-		private static EntityMetadata ConvertToEntity(Type entityType)
+		private static EntityMetadata ConvertToEntityMetaData(Type entityType)
 		{
 			EntityMetadata entityMetadata = new EntityMetadata();
 			entityMetadata.Name = GetEntityName(entityType);
@@ -238,7 +237,7 @@ namespace Java2Dotnet.Spider.Extension
 				entityMetadata.Updates = updates.Columns;
 			}
 
-			Entity entity = ConvertToEntiyMetaData(entityType);
+			Entity entity = ConvertToEntity(entityType);
 
 			entityMetadata.Entity = entity;
 
@@ -247,37 +246,166 @@ namespace Java2Dotnet.Spider.Extension
 			return entityMetadata;
 		}
 
-		private static Entity ConvertToEntiyMetaData(Type entityType)
+		private static Entity ConvertToEntity(Type entityType)
 		{
 			Entity entity = new Entity();
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{
 				var type = propertyInfo.PropertyType;
-				TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 
-				if (extractByAttribute != null)
+				if (typeof(ISpiderEntity).IsAssignableFrom(type) || typeof(List<ISpiderEntity>).IsAssignableFrom(type))
 				{
-					if (typeof(ISpiderEntity).IsAssignableFrom(type) || typeof(List<ISpiderEntity>).IsAssignableFrom(type))
+					Entity token = new Entity();
+					if (typeof(IEnumerable).IsAssignableFrom(type))
 					{
-						Entity token = new Entity();
-						if (typeof(IEnumerable).IsAssignableFrom(type))
-						{
-							token.Multi = true;
-						}
-						else
-						{
-							token.Multi = false;
-						}
-						token.Name = GetEntityName(propertyInfo.PropertyType);
-
-						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-						token.Fields.Add(ConvertToEntiyMetaData(propertyInfo.PropertyType));
+						token.Multi = true;
 					}
 					else
 					{
-						throw new SpiderExceptoin("Wrong Entity Type !!!");
+						token.Multi = false;
 					}
+					token.Name = GetEntityName(propertyInfo.PropertyType);
+					TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
+					if (extractByAttribute != null)
+					{
+						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+					}
+					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					if (extractBy != null)
+					{
+						token.Selector = new Selector()
+						{
+							Expression = extractBy.Expression,
+							Type = extractBy.Type,
+							Argument = extractBy.Argument
+						};
+					}
+
+					token.Fields.Add(ConvertToEntity(propertyInfo.PropertyType));
+				}
+				else
+				{
+					Field token = new Field();
+
+					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
+
+					if (typeof(IList).IsAssignableFrom(type))
+					{
+						token.Multi = true;
+					}
+					else
+					{
+						token.Multi = false;
+					}
+
+					if (extractBy != null)
+					{
+						token.Option = extractBy.Option;
+						token.Selector = new Selector()
+						{
+							Expression = extractBy.Expression,
+							Type = extractBy.Type,
+							Argument = extractBy.Argument
+						};
+					}
+
+					if (storeAs != null)
+					{
+						token.Name = storeAs.Name;
+						token.DataType = ConvertDataTypeToString(storeAs);
+					}
+					else
+					{
+						token.Name = propertyInfo.Name;
+					}
+
+					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
+					{
+						token.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
+					}
+
+					entity.Fields.Add(token);
+				}
+			}
+			return entity;
+		}
+#else
+		private static EntityMetadata ConvertToEntityMetaData(TypeInfo entityType)
+		{
+			EntityMetadata json = new EntityMetadata();
+			json.Name = GetEntityName(entityType.AsType());
+			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
+			if (extractByAttribute != null)
+			{
+				json.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+				json.Multi = extractByAttribute.Multi;
+			}
+			json.Schema = entityType.GetCustomAttribute<Schema>();
+			var indexes = entityType.GetCustomAttribute<Indexes>();
+			if (indexes != null)
+			{
+				json.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
+				json.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
+				json.Primary = indexes.Primary?.Split(',');
+
+				json.AutoIncrement = indexes.AutoIncrement;
+			}
+
+			var updates = entityType.GetCustomAttribute<Update>();
+			if (updates != null)
+			{
+				json.Updates = updates.Columns;
+			}
+			
+
+			Entity entity = ConvertToEntity(entityType);
+
+			json.Entity = entity;
+
+			json.Stopping = entityType.GetCustomAttribute<Stopping>();
+
+			return json;
+		}
+
+		private static Entity ConvertToEntity(TypeInfo entityType)
+		{
+			Entity entity = new Entity();
+			var properties = entityType.AsType().GetProperties();
+			foreach (var propertyInfo in properties)
+			{
+				var type = propertyInfo.PropertyType;
+
+				if (typeof(ISpiderEntity).IsAssignableFrom(type) || typeof(List<ISpiderEntity>).IsAssignableFrom(type))
+				{
+					Entity token = new Entity();
+					if (typeof(IEnumerable).IsAssignableFrom(type))
+					{
+						token.Multi = true;
+					}
+					else
+					{
+						token.Multi = false;
+					}
+					token.Name = GetEntityName(propertyInfo.PropertyType);
+					TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
+					if (extractByAttribute != null)
+					{
+						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+					}
+					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					if (extractBy != null)
+					{
+						token.Selector = new Selector()
+						{
+							Expression = extractBy.Expression,
+							Type = extractBy.Type,
+							Argument = extractBy.Argument
+						};
+					}
+
+					token.Fields.Add(ConvertToEntity((TypeInfo)propertyInfo.PropertyType));
 				}
 				else
 				{
@@ -325,67 +453,6 @@ namespace Java2Dotnet.Spider.Extension
 				}
 			}
 			return entity;
-		}
-#else
-		private static Entity ConvertToEntity(TypeInfo entityType)
-		{
-			Entity json = new Entity();
-			json.Identity = GetEntityName(entityType.AsType());
-			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
-			if (extractByAttribute != null)
-			{
-				json.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-				json.Multi = extractByAttribute.Multi;
-			}
-			json.Schema = entityType.GetCustomAttribute<Schema>();
-			var indexes = entityType.GetCustomAttribute<Indexes>();
-			if (indexes != null)
-			{
-				json.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				json.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				json.Primary = indexes.Primary?.Split(',');
-
-				json.AutoIncrement = indexes.AutoIncrement;
-			}
-
-			var updates = entityType.GetCustomAttribute<Update>();
-			if (updates != null)
-			{
-				json.Updates = updates.Columns;
-			}
-			var properties = entityType.AsType().GetProperties();
-			foreach (var propertyInfo in properties)
-			{
-				Field field = new Field();
-				var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
-				var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
-
-				if (extractBy != null)
-				{
-					field.Selector = new Selector() { Expression = extractBy.Expression, Type = extractBy.Type };
-				}
-
-				if (storeAs != null)
-				{
-					field.Name = storeAs.Name;
-					field.DataType = ConvertDataTypeToString(storeAs);
-				}
-				else
-				{
-					field.Name = propertyInfo.Name;
-				}
-
-				foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
-				{
-					field.Formatters.Add((JObject)JsonConvert.SerializeObject(formatter));
-				}
-
-				json.Fields.Add(field);
-			}
-
-			json.Stopping = entityType.GetCustomAttribute<Stopping>();
-
-			return json;
 		}
 #endif
 
