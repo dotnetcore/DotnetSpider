@@ -54,10 +54,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public override Types Type { get; internal set; } = Types.IncreasePageNumber;
 
 		public Selector TotalPageSelector { get; set; }
-		public Formatter TotalPageFormatter { get; set; }
+		public List<Formatter> TotalPageFormatters { get; set; }
 
 		public Selector CurrenctPageSelector { get; set; }
-		public Formatter CurrnetPageFormatter { get; set; }
+		public List<Formatter> CurrnetPageFormatters { get; set; }
 
 		public override bool CanStop(Page page)
 		{
@@ -65,9 +65,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			if (TotalPageSelector != null)
 			{
 				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).GetValue();
-				if (TotalPageFormatter != null)
+				if (TotalPageFormatters != null)
 				{
-					totalStr = TotalPageFormatter.Formate(totalStr);
+					foreach (var formatter in TotalPageFormatters)
+					{
+						totalStr = formatter.Formate(totalStr);
+					}
 				}
 				if (!string.IsNullOrEmpty(totalStr))
 				{
@@ -78,9 +81,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			if (CurrenctPageSelector != null)
 			{
 				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).GetValue();
-				if (CurrnetPageFormatter != null)
+				if (CurrnetPageFormatters != null)
 				{
-					currentStr = CurrnetPageFormatter.Formate(currentStr);
+					foreach (var formatter in CurrnetPageFormatters)
+					{
+						currentStr = formatter.Formate(currentStr);
+					}
 				}
 				if (!string.IsNullOrEmpty(currentStr))
 				{
@@ -245,6 +251,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		public bool IsBefore { get; set; } = true;
 		public List<string> Stoppers { get; set; } = new List<string>();
 		public Selector CurrenctPageSelector { get; set; }
+		public List<Formatter> CurrenctPageFormatters { get; set; }
 
 		public override IList<Request> Handle(Page page)
 		{
@@ -264,7 +271,22 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			{
 				return true;
 			}
-			foreach (var c in (List<string>)current)
+
+			List<string> timeStrings = new List<string>();
+			foreach (var c in current)
+			{
+				var s = c;
+				if (CurrenctPageFormatters != null)
+				{
+					foreach (var formatter in CurrenctPageFormatters)
+					{
+						s = formatter.Formate(s);
+					}
+				}
+				timeStrings.Add(s);
+			}
+
+			foreach (var c in timeStrings)
 			{
 				var dt = DateTime.Parse(c.ToString());
 				if (IsBefore)
