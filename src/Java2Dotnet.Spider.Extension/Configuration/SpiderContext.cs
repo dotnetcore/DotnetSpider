@@ -123,7 +123,7 @@ namespace Java2Dotnet.Spider.Extension
 			if (typeof(ISpiderEntity).IsAssignableFrom(type))
 			{
 #if NET_CORE
-				Entities.Add(ConvertToEntity(type.GetTypeInfo()));
+				Entities.Add(ConvertToEntityMetaData(type.GetTypeInfo()));
 #else
 				Entities.Add(ConvertToEntityMetaData(type));
 #endif
@@ -405,7 +405,7 @@ namespace Java2Dotnet.Spider.Extension
 						};
 					}
 
-					token.Fields.Add(ConvertToEntity((TypeInfo)propertyInfo.PropertyType));
+					token.Fields.Add(ConvertToEntity(propertyInfo.PropertyType.GetTypeInfo()));
 				}
 				else
 				{
