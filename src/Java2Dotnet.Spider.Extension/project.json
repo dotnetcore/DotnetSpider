@@ -33,7 +33,7 @@
 			"buildOptions": {
 				"define": [
 					"RELEASE",
-					"NET_CORE"£¬
+					"NET_CORE",
 					"Publish"
 				]
 			}
