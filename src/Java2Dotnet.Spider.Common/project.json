@@ -9,16 +9,16 @@
 			"type": "platform",
 			"version": "1.0.0-rc2-3002702"
 		},
-		"System.Security.Cryptography.Algorithms": "4.1.0-rc2-*",
-		"System.Security.Cryptography.Primitives": "4.0.0-rc2-*",
-		"System.Threading.Thread": "4.0.0-rc2-*",
-		"System.Threading.ThreadPool": "4.0.10-rc2-*",
-		"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc2-*",
-		"System.Diagnostics.Process": "4.1.0-rc2-*",
-		"System.Dynamic.Runtime": "4.0.11-rc2-*",
-		"System.Net.NameResolution": "4.0.0-rc2-*",
-		"Microsoft.CSharp": "4.0.1-rc2-*",
-		"System.Collections.NonGeneric": "4.0.1-rc2-*"
+		"System.Security.Cryptography.Algorithms": "4.2.0",
+		"System.Security.Cryptography.Primitives": "4.0.0",
+		"System.Threading.Thread": "4.0.0",
+		"System.Threading.ThreadPool": "4.0.10",
+		"System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
+		"System.Diagnostics.Process": "4.1.0",
+		"System.Dynamic.Runtime": "4.0.11",
+		"System.Net.NameResolution": "4.0.0",
+		"Microsoft.CSharp": "4.0.1",
+		"System.Collections.NonGeneric": "4.0.1"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {

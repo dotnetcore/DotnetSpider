@@ -7,17 +7,17 @@
 	"dependencies": {
 		"Microsoft.NETCore.App": {
 			"type": "platform",
-			"version": "1.0.0-rc2-*"
+			"version": "1.0.0-rc2-3002702"
 		},
-		"System.Security.Cryptography.Algorithms": "4.1.0-rc2-*",
-		"System.Data.Common": "4.0.1-rc2-*",
-		"System.Net.NameResolution": "4.0.0-rc2-*",
-		"System.Security.Cryptography.X509Certificates": "4.1.0-rc2-*",
-		"System.Security.Principal.Windows": "4.0.0-rc2-*",
-		"System.Diagnostics.Process": "4.1.0-rc2-*",
-		"System.ComponentModel.TypeConverter": "4.0.1-rc2-*",
-		"System.Net.Security": "4.0.0-rc2-*",
-        "System.Collections.NonGeneric": "4.0.1-rc2-*"
+		"System.Security.Cryptography.Algorithms": "4.2.0",
+		"System.Data.Common": "4.1.0",
+		"System.Net.NameResolution": "4.0.0",
+		"System.Security.Cryptography.X509Certificates": "4.1.0",
+		"System.Security.Principal.Windows": "4.0.0",
+		"System.Diagnostics.Process": "4.1.0",
+		"System.ComponentModel.TypeConverter": "4.1.0",
+		"System.Net.Security": "4.0.0",
+        "System.Collections.NonGeneric": "4.0.1"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {

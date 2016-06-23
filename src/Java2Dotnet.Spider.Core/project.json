@@ -7,28 +7,28 @@
 	"dependencies": {
 		"Microsoft.NETCore.App": {
 			"type": "platform",
-			"version": "1.0.0-rc2-*"
+			"version": "1.0.0-rc2-3002702"
 		},
 		"Java2Dotnet.Spider.Common": "0.0.9",
 		"Java2Dotnet.Spider.JLog": "0.0.9",
 		"HtmlAgilityPack": "0.0.9",
 		"HtmlAgilityPack.Css": "0.0.9",
 		"Java2Dotnet.Spider.Redial": "0.0.9",
-		"System.Security.Cryptography.Algorithms": "4.1.0-rc2-*",
-		"System.Security.Cryptography.Primitives": "4.0.0-rc2-*",
-		"System.Threading.Thread": "4.0.0-rc2-*",
-		"System.Dynamic.Runtime": "4.0.11-rc2-*",
-		"System.Collections.NonGeneric": "4.0.1-rc2-*",
-		"System.Threading.Tasks.Parallel": "4.0.1-rc2-*",
-		"System.Net.Http": "4.0.1-rc2-*",
-		"System.Runtime.Extensions": "4.1.0-rc2-*",
-		"Microsoft.CSharp": "4.0.1-rc2-*",
-		"System.IO.Compression": "4.1.0-rc2-*",
-		"System.Net.Requests": "4.0.11-rc2-*",
+		"System.Security.Cryptography.Algorithms": "4.2.0",
+		"System.Security.Cryptography.Primitives": "4.0.0",
+		"System.Threading.Thread": "4.0.0",
+		"System.Dynamic.Runtime": "4.0.11",
+		"System.Collections.NonGeneric": "4.0.1",
+		"System.Threading.Tasks.Parallel": "4.0.1",
+		"System.Net.Http": "4.1.0",
+		"System.Runtime.Extensions": "4.1.0",
+		"Microsoft.CSharp": "4.0.1",
+		"System.IO.Compression": "4.1.0",
+		"System.Net.Requests": "4.0.11",
 		"Newtonsoft.Json": "7.0.1",
-		"System.Runtime.Serialization.Primitives": "4.1.1-rc2-*",
-		"System.Xml.XDocument": "4.0.11-rc2-*",
-		"System.Net.NameResolution": "4.0.0-rc2-*"
+		"System.Runtime.Serialization.Primitives": "4.1.1",
+		"System.Xml.XDocument": "4.0.11",
+		"System.Net.NameResolution": "4.0.0"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {

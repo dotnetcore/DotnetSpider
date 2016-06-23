@@ -6,15 +6,15 @@
 	"dependencies": {
 		"Microsoft.NETCore.App": {
 			"type": "platform",
-			"version": "1.0.0-rc2-*"
+			"version": "1.0.0-rc2-3002702"
 		},
-		"System.Threading.Thread": "4.0.0-rc2-*",
-		"System.Net.NameResolution": "4.0.0-rc2-*",
-		"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc2-*",
+		"System.Threading.Thread": "4.0.0",
+		"System.Net.NameResolution": "4.0.0",
+		"System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
 		"Java2Dotnet.Spider.JLog": "0.0.9",
 		"Java2Dotnet.Spider.Common": "0.0.9",
-		"System.Diagnostics.Process": "4.1.0-rc2-*",
-		"System.Net.Http": "4.0.1-rc2-*"
+		"System.Diagnostics.Process": "4.1.0",
+		"System.Net.Http": "4.1.0"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {
