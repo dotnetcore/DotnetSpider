@@ -32,7 +32,7 @@
 	},
 	"frameworks": {
 		"netcoreapp1.0": {
-			"imports": "dnxcore50",
+			"imports": "portable-net45+win8+dnxcore50",
 			"dependencies": {},
 			"buildOptions": {
 				"define": [
