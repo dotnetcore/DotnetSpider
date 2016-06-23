@@ -414,7 +414,7 @@ namespace Java2Dotnet.Spider.Extension
 					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
 					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
 
-					if (typeof(IEnumerable).IsAssignableFrom(type))
+					if (typeof(IList).IsAssignableFrom(type))
 					{
 						token.Multi = true;
 					}

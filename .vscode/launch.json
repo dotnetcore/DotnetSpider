@@ -2,14 +2,14 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": ".NET Core Launch (console)",
-			"type": "coreclr",
-			"request": "launch",
-			"preLaunchTask": "build",
-			"program": "${workspaceRoot}/src/Java2Dotnet.Spider.Test/bin/Debug/dnxcore50/ubuntu.14.04-x64/Java2Dotnet.Spider.Test",
-			"args": ["rerun"],
-			"cwd": "${workspaceRoot}",
-			"stopAtEntry": false
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceRoot}/src/Java2Dotnet.Spider.Test/bin/Debug/netcoreapp1.0/Java2Dotnet.Spider.Test.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "stopAtEntry": false,
+            "externalConsole": false
 		},
 		{
 			"name": ".NET Core Launch (web)",
