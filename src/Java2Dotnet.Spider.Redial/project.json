@@ -8,13 +8,13 @@
 			"type": "platform",
 			"version": "1.0.0-rc2-3002702"
 		},
-		"System.Threading.Thread": "4.0.0",
-		"System.Net.NameResolution": "4.0.0",
-		"System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
+		"System.Threading.Thread": "*",
+		"System.Net.NameResolution": "*",
+		"System.Runtime.InteropServices.RuntimeInformation": "*",
 		"Java2Dotnet.Spider.JLog": "0.0.9",
 		"Java2Dotnet.Spider.Common": "0.0.9",
-		"System.Diagnostics.Process": "4.1.0",
-		"System.Net.Http": "4.1.0"
+		"System.Diagnostics.Process": "*",
+		"System.Net.Http": "4.0.1-rc2-24027"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {

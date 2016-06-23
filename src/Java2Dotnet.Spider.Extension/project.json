@@ -17,18 +17,18 @@
 		"MySql.Data": "0.0.9",
 		"Java2Dotnet.Spider.Redial": "0.0.9",
 		"Java2Dotnet.Spider.Validation": "0.0.9",
-		"System.Data.Common": "4.1.0",
-		"Microsoft.CSharp": "4.0.1",
-		"Newtonsoft.Json": "7.0.1",
-		"System.Dynamic.Runtime": "4.0.11",
-		"System.Runtime.Serialization.Primitives": "4.1.1",
-		"System.Xml.XDocument": "4.0.11",
-		"System.Data.SqlClient": "4.1.0",
-		"System.Runtime.Extensions": "4.1.0"
+		"System.Data.Common": "*",
+		"Microsoft.CSharp": "*",
+		"Newtonsoft.Json": "*",
+		"System.Dynamic.Runtime": "*",
+		"System.Runtime.Serialization.Primitives": "*",
+		"System.Xml.XDocument": "*",
+		"System.Data.SqlClient": "*",
+		"System.Runtime.Extensions": "*"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {
-			"imports": "portable-net45+win8+dnxcore50",
+			"imports": "dnxcore50",
 			"dependencies": {},
 			"buildOptions": {
 				"define": [

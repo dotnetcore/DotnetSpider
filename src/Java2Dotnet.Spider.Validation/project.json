@@ -9,7 +9,7 @@
 			"type": "platform",
 			"version": "1.0.0-rc2-3002702"
 		},
-		"System.Data.Common": "4.1.0"
+		"System.Data.Common": "*"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {
