@@ -7,13 +7,13 @@
 	"dependencies": {
 		"Microsoft.NETCore.App": {
 			"type": "platform",
-			"version": "1.0.0-rc2-*"
+			"version": "1.0.0-rc2-3002702"
 		},
-		"System.Data.Common": "4.0.1-rc2-*"
+		"System.Data.Common": "*"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {
-			"imports": "dnxcore50",
+			"imports": "portable-net45+win8+dnxcore50",
 			"dependencies": {},
 			"buildOptions": {
 				"define": [

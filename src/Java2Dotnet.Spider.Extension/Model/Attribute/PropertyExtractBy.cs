@@ -20,6 +20,6 @@ namespace Java2Dotnet.Spider.Extension.Model.Attribute
 
 		public ValueOption Option { get; set; } = ValueOption.None;
 
-		public bool Multi { get; set; } = false;
+		//public bool Multi { get; set; } = false;
 	}
 }

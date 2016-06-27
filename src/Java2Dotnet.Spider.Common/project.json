@@ -9,20 +9,20 @@
 			"type": "platform",
 			"version": "1.0.0-rc2-3002702"
 		},
-		"System.Security.Cryptography.Algorithms": "4.1.0-rc2-*",
-		"System.Security.Cryptography.Primitives": "4.0.0-rc2-*",
-		"System.Threading.Thread": "4.0.0-rc2-*",
-		"System.Threading.ThreadPool": "4.0.10-rc2-*",
-		"System.Runtime.InteropServices.RuntimeInformation": "4.0.0-rc2-*",
-		"System.Diagnostics.Process": "4.1.0-rc2-*",
-		"System.Dynamic.Runtime": "4.0.11-rc2-*",
-		"System.Net.NameResolution": "4.0.0-rc2-*",
-		"Microsoft.CSharp": "4.0.1-rc2-*",
-		"System.Collections.NonGeneric": "4.0.1-rc2-*"
+		"System.Security.Cryptography.Algorithms": "*",
+		"System.Security.Cryptography.Primitives": "*",
+		"System.Threading.Thread": "*",
+		"System.Threading.ThreadPool": "*",
+		"System.Runtime.InteropServices.RuntimeInformation": "*",
+		"System.Diagnostics.Process": "*",
+		"System.Dynamic.Runtime": "*",
+		"System.Net.NameResolution": "*",
+		"Microsoft.CSharp": "*",
+		"System.Collections.NonGeneric": "*"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {
-			"imports": "dnxcore50",
+			"imports": "portable-net45+win8+dnxcore50",
 			"dependencies": {},
 			"buildOptions": {
 				"define": [

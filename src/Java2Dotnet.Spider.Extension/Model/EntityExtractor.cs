@@ -208,7 +208,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 			if (!isEntity)
 			{
-				string tmpValue;
+                string tmpValue;
 				if (selector is EnviromentSelector)
 				{
 					var enviromentSelector = selector as EnviromentSelector;
@@ -221,20 +221,15 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 				else
 				{
+					bool needPlainText = (((Field)field).Option == PropertyExtractBy.ValueOption.PlainText);
 					if (field.Multi)
 					{
 						var propertyValues = item.SelectList(selector).Nodes();
-						if (((Field)field).Option == PropertyExtractBy.ValueOption.Count)
-						{
-							var tempValue = propertyValues != null ? propertyValues.Count.ToString() : "-1";
-							return tempValue;
-						}
-						else
-						{
+
 							List<string> results = new List<string>();
 							foreach (var propertyValue in propertyValues)
 							{
-								string tmp = propertyValue.GetValue(((Field)field).Option == PropertyExtractBy.ValueOption.PlainText);
+								string tmp = propertyValue.GetValue(needPlainText);
 								foreach (var formatter in formatters)
 								{
 									tmp = formatter.Formate(tmp);
@@ -243,16 +238,17 @@ namespace Java2Dotnet.Spider.Extension.Model
 							}
 							return new JArray(results);
 						}
-					}
 					else
 					{
-						tmpValue = item.Select(selector)?.GetValue(((Field)field).Option == PropertyExtractBy.ValueOption.PlainText);
-						if (((Field)field).Option == PropertyExtractBy.ValueOption.Count)
+						bool needCount = (((Field)field).Option == PropertyExtractBy.ValueOption.Count);
+						if (needCount)
 						{
-							return tmpValue == null ? 0 : 1;
+							var propertyValues = item.SelectList(selector).Nodes();
+							return propertyValues != null ? propertyValues.Count.ToString() : "-1";
 						}
 						else
 						{
+							tmpValue = item.Select(selector)?.GetValue(needPlainText);
 							tmpValue = formatters.Aggregate(tmpValue, (current, formatter) => formatter.Formate(current));
 							return tmpValue;
 						}

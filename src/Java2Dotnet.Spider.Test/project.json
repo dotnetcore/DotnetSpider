@@ -8,20 +8,20 @@
 	"dependencies": {
 		"Microsoft.NETCore.App": {
 			"type": "platform",
-			"version": "1.0.0-rc2-*"
+			"version": "1.0.0-rc2-3002702"
 		},
 		"Java2Dotnet.Spider.Core": "0.0.9",
 		"Java2Dotnet.Spider.Common": "0.0.9",
 		"Java2Dotnet.Spider.Extension": "0.0.9",
 		"Java2Dotnet.Spider.Redial": "0.0.9",
 		"Java2Dotnet.Spider.JLog": "0.0.9",
-		"System.Diagnostics.Process": "4.1.0-rc2-*",
-		"System.Net.Http": "4.0.1-rc2-*",
-		"System.Text.Encoding.CodePages": "4.0.1-rc2-*"
+		"System.Diagnostics.Process": "*",
+		"System.Net.Http": "4.0.1-rc2-24027",
+		"System.Text.Encoding.CodePages": "*"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {
-			"imports": "dnxcore50",
+			"imports": "portable-net45+win8+dnxcore50",
 			"dependencies": {},
 			"buildOptions": {
 				"define": [

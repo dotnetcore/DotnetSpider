@@ -7,17 +7,17 @@
 	"dependencies": {
 		"Microsoft.NETCore.App": {
 			"type": "platform",
-			"version": "1.0.0-rc2-*"
+			"version": "1.0.0-rc2-3002702"
 		},
-		"System.Xml.XmlDocument": "4.0.1-rc2-*",
-		"System.Xml.ReaderWriter": "4.0.11-rc2-*",
-		"System.Xml.XPath": "4.0.1-rc2-*",
-		"System.Xml.XPath.XDocument": "4.0.1-rc2-*",
-		"System.Diagnostics.StackTrace": "4.0.1-rc2-*"
+		"System.Xml.XmlDocument": "*",
+		"System.Xml.ReaderWriter": "*",
+		"System.Xml.XPath": "*",
+		"System.Xml.XPath.XDocument": "*",
+		"System.Diagnostics.StackTrace": "*"
 	},
 	"frameworks": {
 		"netcoreapp1.0": {
-			"imports": "dnxcore50",
+			"imports": "portable-net45+win8+dnxcore50",
 			"dependencies": {},
 			"buildOptions": {
 				"define": [
