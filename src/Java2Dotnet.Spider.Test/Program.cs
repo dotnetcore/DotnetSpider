@@ -25,9 +25,12 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			DDengSpider spiderBuilder = new DDengSpider();
+			var start = DateTime.Now;
+			CnblogsSpider spiderBuilder = new CnblogsSpider();
 			spiderBuilder.Run("rerun");
-
+			var end = DateTime.Now;
+			Console.WriteLine((end - start).TotalMilliseconds);
+			Console.Read();
 			//SpiderExample.Run();
 			//JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			//var context = spiderBuilder.GetBuilder().Context;
