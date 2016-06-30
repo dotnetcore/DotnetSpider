@@ -13,7 +13,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			Remove,
 			LoopRemove,
 			RemoveHtml,
-			CustomTarget
+			CustomTarget,
+			Replace
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -199,6 +200,25 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			rawText = rawText.Insert(begin, "<div class=\"" + TargetTag + "\">");
 
 			return rawText;
+		}
+	}
+
+	public class ReplacePageHandler : PageHandler
+	{
+		public override Types Type { get; internal set; } = Types.Replace;
+		public string OldValue { get; set; }
+		public string NewValue { get; set; }
+
+		public override void Customize(Page p)
+		{
+			try
+			{
+				p.Content = p.Content?.Replace(OldValue, NewValue);
+			}
+			catch (Exception e)
+			{
+				throw new SpiderExceptoin("Rawtext Invalid.");
+			}
 		}
 	}
 }
