@@ -239,6 +239,8 @@ namespace Java2Dotnet.Spider.Extension
 
 		private Core.Spider PrepareSpider(params string[] args)
 		{
+			Logger.Info("创建爬虫...");
+
 			RedisServer redis = GetManageRedisServer();
 
 			var schedulerType = SpiderContext.Scheduler.Type;
@@ -309,8 +311,6 @@ namespace Java2Dotnet.Spider.Extension
 								SpiderContext.Site.ClearStartRequests();
 							}
 
-							Logger.Info("创建爬虫...");
-
 							var spider = GenerateSpider(scheduler);
 
 							spider.SaveStatus = true;
@@ -368,6 +368,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void PrepareSite()
 		{
+			Logger.Info("准备爬虫数据...");
 			if (SpiderContext.PrepareStartUrls != null)
 			{
 				foreach (var prepareStartUrl in SpiderContext.PrepareStartUrls)
