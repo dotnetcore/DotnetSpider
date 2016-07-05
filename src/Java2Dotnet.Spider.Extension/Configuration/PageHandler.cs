@@ -14,7 +14,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			LoopRemove,
 			RemoveHtml,
 			CustomTarget,
-			Replace
+			Replace,
+			Case
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -139,6 +140,31 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				var htmlDocument = new HtmlDocument();
 				htmlDocument.LoadHtml(p.Content);
 				p.Content = htmlDocument.DocumentNode.InnerText;
+			}
+			catch (Exception e)
+			{
+				throw new SpiderExceptoin("Rawtext Invalid.");
+			}
+		}
+	}
+
+	public class CharacterCasePageHandler : PageHandler
+	{
+		public override Types Type { get; internal set; } = Types.Case;
+		public bool ToUpper { get; set; } = false;
+
+		public override void Customize(Page p)
+		{
+			try
+			{
+				if (ToUpper)
+				{
+					p.Content = p.Content.ToUpper();
+				}
+				else
+				{
+					p.Content = p.Content.ToLower();
+				}
 			}
 			catch (Exception e)
 			{
