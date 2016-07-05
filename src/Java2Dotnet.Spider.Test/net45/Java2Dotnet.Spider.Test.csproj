@@ -190,6 +190,7 @@
     <Compile Include="..\UrlUtils\UrlUtilsTest.cs">
       <Link>UrlUtils\UrlUtilsTest.cs</Link>
     </Compile>
+    <Compile Include="Example\Class1.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
