@@ -26,8 +26,7 @@ namespace Java2Dotnet.Spider.Test
 		public static void Main(string[] args)
 		{
 			var start = DateTime.Now;
-			CnblogsSpider spiderBuilder = new CnblogsSpider();
-			spiderBuilder.Run("rerun");
+	 
 			var end = DateTime.Now;
 			Console.WriteLine((end - start).TotalMilliseconds);
 			Console.Read();
