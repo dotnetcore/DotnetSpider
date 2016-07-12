@@ -109,9 +109,6 @@
     <Compile Include="..\Example\BaseSpiderExample.cs">
       <Link>Example\BaseSpiderExample.cs</Link>
     </Compile>
-    <Compile Include="..\Example\CnblogsSpider.cs">
-      <Link>Example\CnblogsSpider.cs</Link>
-    </Compile>
     <Compile Include="..\Example\DDengSpider.cs">
       <Link>Example\DDengSpider.cs</Link>
     </Compile>
@@ -190,7 +187,6 @@
     <Compile Include="..\UrlUtils\UrlUtilsTest.cs">
       <Link>UrlUtils\UrlUtilsTest.cs</Link>
     </Compile>
-    <Compile Include="Example\Class1.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
