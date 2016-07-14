@@ -93,7 +93,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				ValidatePage(page, spider);
 
 				// 结束后要置空, 这个值存到Redis会导致无限循环跑单个任务
-				//request.PutExtra(Request.CycleTriedTimes, null);
+				request.PutExtra(Request.CycleTriedTimes, null);
 
 				//#if !NET_CORE
 				//					httpWebRequest.ServicePoint.ConnectionLimit = int.MaxValue;
