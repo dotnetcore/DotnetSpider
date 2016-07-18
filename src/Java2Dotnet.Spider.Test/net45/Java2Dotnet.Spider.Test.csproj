@@ -142,9 +142,6 @@
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="..\RedisRedialManager\RedisRedialManagerTests.cs">
-      <Link>RedisRedialManager\RedisRedialManagerTests.cs</Link>
-    </Compile>
     <Compile Include="..\RedisSchedulerTest.cs">
       <Link>Scheduler\RedisSchedulerTest.cs</Link>
     </Compile>

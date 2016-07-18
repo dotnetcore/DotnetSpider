@@ -166,6 +166,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 				{
 					identities[i] = request.Identity;
 					items[i] = new HashEntry(request.Identity, JsonConvert.SerializeObject(request));
+					++i;
 				}
 
 				Db.SetAdd(SetKey, identities);

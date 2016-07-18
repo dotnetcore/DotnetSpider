@@ -65,6 +65,10 @@
       <HintPath>..\..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="StackExchange.Redis, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\StackExchange.Redis.1.1.603\lib\net45\StackExchange.Redis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -350,9 +354,6 @@
     <Compile Include="..\Scheduler\RedisScheduler.cs">
       <Link>Scheduler\RedisScheduler.cs</Link>
     </Compile>
-    <Compile Include="..\Scheduler\RedisSchedulerManager.cs">
-      <Link>Scheduler\RedisSchedulerManager.cs</Link>
-    </Compile>
     <Compile Include="..\Scheduler\SpiderStatus.cs">
       <Link>Scheduler\SpiderStatus.cs</Link>
     </Compile>
@@ -364,9 +365,6 @@
     </Compile>
     <Compile Include="..\Utils\DoubleKeyDictionary.cs">
       <Link>Utils\DoubleKeyDictionary.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\RedisProvider.cs">
-      <Link>Utils\RedisProvider.cs</Link>
     </Compile>
     <Compile Include="..\Utils\RegexUtil.cs">
       <Link>Utils\RegexUtil.cs</Link>

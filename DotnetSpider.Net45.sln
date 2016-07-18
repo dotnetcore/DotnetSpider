@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.Common", "src\Java2Dotnet.Spider.Common\net45\Java2Dotnet.Spider.Common.csproj", "{43DD7A01-FBDE-4A22-BF6E-758F721DDE77}"
 EndProject
@@ -14,8 +14,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.Extension", "src\Java2Dotnet.Spider.Extension\net45\Java2Dotnet.Spider.Extension.csproj", "{DDB5A085-6219-4A95-8CD8-DDCF3A54B962}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.Test", "src\Java2Dotnet.Spider.Test\net45\Java2Dotnet.Spider.Test.csproj", "{5806BCBB-08FF-46A5-AC63-40B4CF48A7F5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.Monitor", "src\Java2Dotnet.Spider.Monitor\Java2Dotnet.Spider.Monitor.csproj", "{0029BE7D-75C8-401D-84C9-97CC8BAD6791}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.JLog", "src\Java2Dotnet.Spider.JLog\net45\Java2Dotnet.Spider.JLog.csproj", "{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}"
 EndProject
@@ -49,10 +47,6 @@ Global
 		{5806BCBB-08FF-46A5-AC63-40B4CF48A7F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5806BCBB-08FF-46A5-AC63-40B4CF48A7F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5806BCBB-08FF-46A5-AC63-40B4CF48A7F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0029BE7D-75C8-401D-84C9-97CC8BAD6791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0029BE7D-75C8-401D-84C9-97CC8BAD6791}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0029BE7D-75C8-401D-84C9-97CC8BAD6791}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0029BE7D-75C8-401D-84C9-97CC8BAD6791}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}.Release|Any CPU.ActiveCfg = Release|Any CPU

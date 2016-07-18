@@ -16,7 +16,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public static ISelector Regex(string expr)
 		{
-			if (_cache.ContainsKey(expr))
+			if (!_cache.ContainsKey(expr))
 			{
 				_cache.Add(expr, new RegexSelector(expr));
 			}
@@ -25,7 +25,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public static ISelector Css(string expr)
 		{
-			if (_cache.ContainsKey(expr))
+			if (!_cache.ContainsKey(expr))
 			{
 				_cache.Add(expr, new CssHtmlSelector(expr));
 			}
@@ -34,16 +34,16 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public static ISelector Css(string expr, string attrName)
 		{
-			if (_cache.ContainsKey(expr))
+			if (!_cache.ContainsKey(expr + attrName))
 			{
-				_cache.Add(expr, new CssHtmlSelector(expr, attrName));
+				_cache.Add(expr + attrName, new CssHtmlSelector(expr, attrName));
 			}
-			return _cache[expr];
+			return _cache[expr + attrName];
 		}
 
 		public static ISelector Regex(string expr, int group)
 		{
-			if (_cache.ContainsKey(expr))
+			if (!_cache.ContainsKey(expr))
 			{
 				_cache.Add(expr, new RegexSelector(expr, group));
 			}
@@ -57,7 +57,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public static ISelector XPath(string expr)
 		{
-			if (_cache.ContainsKey(expr))
+			if (!_cache.ContainsKey(expr))
 			{
 				_cache.Add(expr, new XPathSelector(expr));
 			}

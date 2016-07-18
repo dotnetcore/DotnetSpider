@@ -58,7 +58,7 @@ namespace Java2Dotnet.Spider.Test
 		[TestMethod]
 		public void SchedulerLoadPerformaceTest()
 		{
-			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
+			RedisScheduler scheduler = new RedisScheduler("localhost", "");
 			ISpider spider = new DefaultSpider("test", new Site());
 			var start = DateTime.Now;
 			for (int i = 0; i < 40000; i++)
@@ -66,20 +66,20 @@ namespace Java2Dotnet.Spider.Test
 				scheduler.Push(new Request("http://www.a.com/" + i, 1, null));
 			}
 
-			RedisScheduler redisScheduler = new RedisScheduler("localhost", "");
-			redisScheduler.Load(scheduler.ToList());
 			var end = DateTime.Now;
 			double seconds = (end - start).TotalSeconds;
-			redisScheduler.Clear();
+			scheduler.Clear();
 
 			var start1 = DateTime.Now;
+			HashSet<Request> list = new HashSet<Request>();
 			for (int i = 0; i < 40000; i++)
 			{
-				redisScheduler.Push(new Request("http://www.a.com/" + i, 1, null));
+				list.Add(new Request("http://www.a.com/" + i, 1, null));
 			}
+			scheduler.Load(list);
 			var end1 = DateTime.Now;
 			double seconds1 = (end1 - start1).TotalSeconds;
-			Assert.IsTrue((seconds1 / seconds) > 6);
+			Assert.IsTrue(seconds1 < seconds);
 		}
 
 		[TestMethod]
