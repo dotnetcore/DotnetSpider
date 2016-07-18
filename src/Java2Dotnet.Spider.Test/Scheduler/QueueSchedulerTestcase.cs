@@ -18,22 +18,22 @@ namespace Java2Dotnet.Spider.Test.Scheduler
 
 			Parallel.For(0, 1000, new ParallelOptions() { MaxDegreeOfParallelism = 30 }, i =>
 			{
-				scheduler.Push(new Request("http://www.a.com", 1, null), spider);
-				scheduler.Push(new Request("http://www.a.com", 1, null), spider);
-				scheduler.Push(new Request("http://www.a.com", 1, null), spider);
+				scheduler.Push(new Request("http://www.a.com", 1, null));
+				scheduler.Push(new Request("http://www.a.com", 1, null));
+				scheduler.Push(new Request("http://www.a.com", 1, null));
 
-				scheduler.Push(new Request("http://www.b.com", 1, null), spider);
+				scheduler.Push(new Request("http://www.b.com", 1, null));
 
-				scheduler.Push(new Request($"http://www.{i.ToString()}.com", 1, null), spider);
+				scheduler.Push(new Request($"http://www.{i.ToString()}.com", 1, null));
 			});
 
 			Parallel.For(0, 1000, new ParallelOptions() { MaxDegreeOfParallelism = 30 }, i =>
 			{
-				scheduler.Poll(spider);
+				scheduler.Poll();
 			});
 
-			int left = scheduler.GetLeftRequestsCount(spider);
-			int total = scheduler.GetTotalRequestsCount(spider);
+			int left = scheduler.GetLeftRequestsCount();
+			int total = scheduler.GetTotalRequestsCount();
 
 			Assert.AreEqual(left, 2);
 			Assert.AreEqual(total, 1002);
@@ -44,13 +44,13 @@ namespace Java2Dotnet.Spider.Test.Scheduler
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
 			ISpider spider = new DefaultSpider("test", new Site());
-			scheduler.Push(new Request("http://www.a.com", 1, null), spider);
-			scheduler.Push(new Request("http://www.a.com", 1, null), spider);
-			scheduler.Push(new Request("http://www.a.com", 1, null), spider);
+			scheduler.Push(new Request("http://www.a.com", 1, null));
+			scheduler.Push(new Request("http://www.a.com", 1, null));
+			scheduler.Push(new Request("http://www.a.com", 1, null));
 
-			scheduler.Push(new Request("http://www.b.com", 1, null), spider);
-			int left = scheduler.GetLeftRequestsCount(spider);
-			int total = scheduler.GetTotalRequestsCount(spider);
+			scheduler.Push(new Request("http://www.b.com", 1, null));
+			int left = scheduler.GetLeftRequestsCount();
+			int total = scheduler.GetTotalRequestsCount();
 
 			Assert.AreEqual(left, 2);
 			Assert.AreEqual(total, 2);
@@ -62,17 +62,17 @@ namespace Java2Dotnet.Spider.Test.Scheduler
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
 			ISpider spider = new DefaultSpider("test", new Site());
-			scheduler.Push(new Request("http://www.a.com", 1, null), spider);
-			scheduler.Push(new Request("http://www.a.com", 1, null), spider);
-			scheduler.Push(new Request("http://www.a.com", 1, null), spider);
+			scheduler.Push(new Request("http://www.a.com", 1, null));
+			scheduler.Push(new Request("http://www.a.com", 1, null));
+			scheduler.Push(new Request("http://www.a.com", 1, null));
 
-			scheduler.Push(new Request("http://www.b.com", 1, null), spider);
+			scheduler.Push(new Request("http://www.b.com", 1, null));
 
-			var request = scheduler.Poll(spider);
+			var request = scheduler.Poll();
 			Assert.AreEqual(request.Url, "http://www.a.com");
 
-			int left = scheduler.GetLeftRequestsCount(spider);
-			int total = scheduler.GetTotalRequestsCount(spider);
+			int left = scheduler.GetLeftRequestsCount();
+			int total = scheduler.GetTotalRequestsCount();
 
 			Assert.AreEqual(left, 1);
 			Assert.AreEqual(total, 2);

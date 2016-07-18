@@ -42,8 +42,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public override ISelectable Css(string selector)
 		{
-			CssHtmlSelector cssHtmlSelector = Selectors.Css(selector);
-			return Select(cssHtmlSelector);
+			return Select(Selectors.Css(selector));
 		}
 
 		public override ISelectable Css(string selector, string attrName)
@@ -54,8 +53,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public override ISelectable SmartContent()
 		{
-			SmartContentSelector smartContentSelector = Selectors.SmartContent();
-			return Select(smartContentSelector);
+			return Select(Selectors.SmartContent());
 		}
 
 		/// <summary>
@@ -69,8 +67,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public override ISelectable XPath(string xpath)
 		{
-			XPathSelector xpathSelector = Selectors.XPath(xpath);
-			return SelectList(xpathSelector);
+			return SelectList(Selectors.XPath(xpath));
 		}
 
 		public override ISelectable Select(ISelector selector)

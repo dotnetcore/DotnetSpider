@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Java2Dotnet.Spider.Core.Selector
 {
 	/// <summary>
@@ -5,34 +7,61 @@ namespace Java2Dotnet.Spider.Core.Selector
 	/// </summary>
 	public class Selectors
 	{
-		public static RegexSelector Regex(string expr)
+		private static Dictionary<string, ISelector> _cache = new Dictionary<string, ISelector>();
+
+		static Selectors()
 		{
-			return new RegexSelector(expr);
+			_cache.Add("SmartContentSelector", new SmartContentSelector());
 		}
 
-		public static CssHtmlSelector Css(string expr)
+		public static ISelector Regex(string expr)
 		{
-			return new CssHtmlSelector(expr);
+			if (_cache.ContainsKey(expr))
+			{
+				_cache.Add(expr, new RegexSelector(expr));
+			}
+			return _cache[expr];
 		}
 
-		public static CssHtmlSelector Css(string expr, string attrName)
+		public static ISelector Css(string expr)
 		{
-			return new CssHtmlSelector(expr, attrName);
+			if (_cache.ContainsKey(expr))
+			{
+				_cache.Add(expr, new CssHtmlSelector(expr));
+			}
+			return _cache[expr];
 		}
 
-		public static RegexSelector Regex(string expr, int group)
+		public static ISelector Css(string expr, string attrName)
 		{
-			return new RegexSelector(expr, group);
+			if (_cache.ContainsKey(expr))
+			{
+				_cache.Add(expr, new CssHtmlSelector(expr, attrName));
+			}
+			return _cache[expr];
 		}
 
-		public static SmartContentSelector SmartContent()
+		public static ISelector Regex(string expr, int group)
 		{
-			return new SmartContentSelector();
+			if (_cache.ContainsKey(expr))
+			{
+				_cache.Add(expr, new RegexSelector(expr, group));
+			}
+			return _cache[expr];
 		}
 
-		public static XPathSelector XPath(string expr)
+		public static ISelector SmartContent()
 		{
-			return new XPathSelector(expr);
+			return _cache["SmartContentSelector"];
+		}
+
+		public static ISelector XPath(string expr)
+		{
+			if (_cache.ContainsKey(expr))
+			{
+				_cache.Add(expr, new XPathSelector(expr));
+			}
+			return _cache[expr];
 		}
 
 		//public static AndSelector And(params ISelector[] selectors)

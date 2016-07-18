@@ -16,38 +16,40 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	public abstract class DuplicateRemovedScheduler : IScheduler
 	{
 		protected IDuplicateRemover DuplicateRemover { get; set; } = new HashSetDuplicateRemover();
+		public ISpider Spider { get; protected set; }
 
-		public void Push(Request request, ISpider spider)
+		public void Push(Request request)
 		{
 			lock (this)
 			{
 				RedialManagerUtils.Execute("scheduler-push", () =>
 				{
-					DoPush(request, spider);
+					DoPush(request);
 				});
 			}
 		}
 
-		internal void PushWithoutRedialManager(Request request, ISpider spider)
+		internal void PushWithoutRedialManager(Request request)
 		{
 			lock (this)
 			{
-				DoPush(request, spider);
+				DoPush(request);
 			}
 		}
 
 		public virtual void Init(ISpider spider)
 		{
+			Spider = spider;
 		}
 
-		public abstract void ResetDuplicateCheck(ISpider spider);
+		public abstract void ResetDuplicateCheck();
 
-		public virtual Request Poll(ISpider spider)
+		public virtual Request Poll()
 		{
 			return null;
 		}
 
-		protected virtual void PushWhenNoDuplicate(Request request, ISpider spider)
+		protected virtual void PushWhenNoDuplicate(Request request)
 		{
 		}
 
@@ -69,11 +71,11 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		private void DoPush(Request request, ISpider spider)
+		private void DoPush(Request request)
 		{
-			if (!DuplicateRemover.IsDuplicate(request, spider) || ShouldReserved(request))
+			if (!DuplicateRemover.IsDuplicate(request) || ShouldReserved(request))
 			{
-				PushWhenNoDuplicate(request, spider);
+				PushWhenNoDuplicate(request);
 			}
 		}
 
@@ -82,8 +84,8 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			DuplicateRemover.Dispose();
 		}
 
-		public abstract void Load(HashSet<Request> requests, ISpider spider);
+		public abstract void Load(HashSet<Request> requests);
 
-		public abstract HashSet<Request> ToList(ISpider spider);
+		public abstract HashSet<Request> ToList();
 	}
 }

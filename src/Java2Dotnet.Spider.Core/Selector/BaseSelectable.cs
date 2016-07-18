@@ -32,14 +32,12 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public ISelectable Regex(string regex)
 		{
-			RegexSelector regexSelector = Selectors.Regex(regex);
-			return Select(regexSelector);
+			return Select(Selectors.Regex(regex));
 		}
 
 		public ISelectable Regex(string regex, int group)
 		{
-			RegexSelector regexSelector = Selectors.Regex(regex, group);
-			return Select(regexSelector);
+			return Select(Selectors.Regex(regex, group));
 		}
 
 		public string GetValue(bool isPlainText)

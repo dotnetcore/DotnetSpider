@@ -17,11 +17,11 @@ using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
 using Java2Dotnet.Spider.JLog;
 using System.Linq;
-using RedisSharp;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Core.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using StackExchange.Redis;
 #if NET_45
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -34,7 +34,9 @@ namespace Java2Dotnet.Spider.Extension
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
 		protected readonly ILog Logger;
-		Core.Spider spider;
+		protected ConnectionMultiplexer Redis;
+		protected IDatabase Db;
+		protected Core.Spider spider;
 		protected readonly SpiderContext SpiderContext;
 		public Action AfterSpiderFinished { get; set; }
 		public string Name { get; }
@@ -76,6 +78,16 @@ namespace Java2Dotnet.Spider.Extension
 			{
 				SpiderContext.Site = new Site();
 			}
+			Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+			{
+				ServiceName = "DotnetSpider",
+				Password = ConfigurationManager.Get("redisPassword"),
+				ConnectTimeout = 5000,
+				KeepAlive = 8,
+				EndPoints =
+				{ ConfigurationManager.Get("redisHost"), "6379" }
+			});
+			Db = Redis.GetDatabase(1);
 		}
 
 		public virtual void Run(params string[] args)
@@ -110,15 +122,6 @@ namespace Java2Dotnet.Spider.Extension
 			}
 		}
 
-		public void Clear()
-		{
-			var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
-			if (redisScheduler != null)
-			{
-				redisScheduler.Clear(spider);
-			}
-		}
-
 		private void RegisterControl(Core.Spider spider)
 		{
 			var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
@@ -126,7 +129,7 @@ namespace Java2Dotnet.Spider.Extension
 			{
 				try
 				{
-					redisScheduler.Redis.Subscribe($"{spider.Identity}", (c, m) =>
+					Redis.GetSubscriber().Subscribe($"{spider.Identity}", (c, m) =>
 					{
 						switch (m)
 						{
@@ -155,23 +158,12 @@ namespace Java2Dotnet.Spider.Extension
 			}
 		}
 
-		//public void Clear()
-		//{
-		//	var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
-		//	if (redisScheduler != null)
-		//	{
-		//		redisScheduler.Clear(spider);
-		//	}
-		//}
-
 		private void DoValidate()
 		{
 			if (SpiderContext.Validations == null)
 			{
 				return;
 			}
-
-			RedisServer redis = new RedisServer(ConfigurationManager.Get("redisHost"), 6379, ConfigurationManager.Get("redisPassword"));
 
 			string key = "locker-validate-" + Name;
 
@@ -187,15 +179,15 @@ namespace Java2Dotnet.Spider.Extension
 					}
 				}
 
-				if (redis != null)
+				if (Redis != null)
 				{
-					while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+					while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 					{
 						Thread.Sleep(1000);
 					}
 				}
 
-				var lockerValue = redis?.HashGet(ValidateStatusName, Name);
+				var lockerValue = Db.HashGet(ValidateStatusName, Name);
 				bool needInitStartRequest = lockerValue != "validate finished";
 
 				if (needInitStartRequest)
@@ -224,7 +216,7 @@ namespace Java2Dotnet.Spider.Extension
 
 				if (needInitStartRequest)
 				{
-					redis?.HashSet(ValidateStatusName, Name, "validate finished");
+					Db.HashSet(ValidateStatusName, Name, "validate finished");
 				}
 			}
 			catch (Exception e)
@@ -233,15 +225,13 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			finally
 			{
-				redis?.LockRelease(key, 0);
+				Db.LockRelease(key, 0);
 			}
 		}
 
 		private Core.Spider PrepareSpider(params string[] args)
 		{
 			Logger.Info("创建爬虫...");
-
-			RedisServer redis = GetManageRedisServer();
 
 			var schedulerType = SpiderContext.Scheduler.Type;
 			bool isTestSpider = args != null && args.Contains("test");
@@ -264,41 +254,18 @@ namespace Java2Dotnet.Spider.Extension
 						var scheduler = (Scheduler.RedisScheduler)(SpiderContext.Scheduler.GetScheduler());
 
 						string key = "locker-" + Name;
-						if (args != null && args.Length > 0)
-						{
-							if (args.Contains("rerun"))
-							{
-								if (redis != null)
-								{
-									redis.KeyDelete(key);
-									redis.HashDelete("init-status", Name);
-									redis.HashDelete("validate-status", Name);
-									redis.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
-									redis.SortedSetRemove(Scheduler.RedisScheduler.TaskList, Name);
-								}
-
-								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetQueueKey(Name));
-								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetSetKey(Name));
-								scheduler.Redis.KeyDelete(Scheduler.RedisScheduler.GetItemKey(Name));
-							}
-							if (args.Contains("noconsole"))
-							{
-								Log.WriteLine("No console log info.");
-								Log.NoConsole = true;
-							}
-						}
 
 						try
 						{
-							if (redis != null)
+							if (Db != null)
 							{
-								while (!redis.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+								while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 								{
 									Thread.Sleep(1000);
 								}
 							}
 
-							var lockerValue = redis?.HashGet(InitStatusSetName, Name);
+							var lockerValue = Db.HashGet(InitStatusSetName, Name);
 							bool needInitStartRequest = lockerValue != "init finished";
 
 							if (needInitStartRequest)
@@ -312,6 +279,27 @@ namespace Java2Dotnet.Spider.Extension
 							}
 
 							var spider = GenerateSpider(scheduler);
+
+							if (args != null && args.Length > 0)
+							{
+								if (args.Contains("rerun"))
+								{
+									if (Db != null)
+									{
+										Db.KeyDelete(key);
+										Db.HashDelete("init-status", Name);
+										Db.HashDelete("validate-status", Name);
+										Db.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
+										Db.SortedSetRemove(Scheduler.RedisScheduler.TaskList, Name);
+									}
+									scheduler.Clear();
+								}
+								if (args.Contains("noconsole"))
+								{
+									Log.WriteLine("No console log info.");
+									Log.NoConsole = true;
+								}
+							}
 
 							spider.SaveStatus = true;
 							SpiderMonitor.Default.Register(spider);
@@ -327,7 +315,7 @@ namespace Java2Dotnet.Spider.Extension
 
 							if (needInitStartRequest)
 							{
-								redis?.HashSet(InitStatusSetName, Name, "init finished");
+								Db.HashSet(InitStatusSetName, Name, "init finished");
 							}
 
 							return spider;
@@ -341,7 +329,7 @@ namespace Java2Dotnet.Spider.Extension
 						{
 							try
 							{
-								redis?.LockRelease(key, 0);
+								Db.LockRelease(key, 0);
 							}
 							catch
 							{
@@ -352,18 +340,6 @@ namespace Java2Dotnet.Spider.Extension
 			}
 
 			throw new SpiderExceptoin("初始化失败.");
-		}
-
-		private RedisServer GetManageRedisServer()
-		{
-			var host = ConfigurationManager.Get("redisHost");
-			var portStr = ConfigurationManager.Get("redisPort");
-			if (string.IsNullOrEmpty(host))
-			{
-				return null;
-			}
-			int port = string.IsNullOrEmpty(portStr) ? 6379 : int.Parse(portStr);
-			return new RedisServer(host, port, ConfigurationManager.Get("redisPassword"));
 		}
 
 		private void PrepareSite()

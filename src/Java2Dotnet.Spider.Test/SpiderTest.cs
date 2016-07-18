@@ -73,16 +73,22 @@ namespace Java2Dotnet.Spider.Test
 			private AtomicInteger _count = new AtomicInteger();
 			private Random _random = new Random();
 
+			public ISpider Spider
+			{
+				get; set;
+			}
+
 			public void Init(ISpider spider)
 			{
+				Spider = spider;
 			}
 
-			public void Push(Request request, ISpider spider)
+			public void Push(Request request)
 			{
 			}
 
 
-			public Request Poll(ISpider spider)
+			public Request Poll()
 			{
 				lock (this)
 				{
@@ -102,12 +108,12 @@ namespace Java2Dotnet.Spider.Test
 			{
 			}
 
-			public void Load(HashSet<Request> requests, ISpider spider)
+			public void Load(HashSet<Request> requests)
 			{
 				throw new NotImplementedException();
 			}
 
-			public HashSet<Request> ToList(ISpider spider)
+			public HashSet<Request> ToList()
 			{
 				throw new NotImplementedException();
 			}

@@ -16,7 +16,6 @@ using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
 using Java2Dotnet.Spider.JLog;
 using System.Linq;
-using RedisSharp;
 using System.Threading.Tasks;
 
 namespace Java2Dotnet.Spider.Extension

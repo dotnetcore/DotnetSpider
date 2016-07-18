@@ -215,7 +215,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					IMonitorableScheduler scheduler = _spider.Scheduler as IMonitorableScheduler;
 					if (scheduler != null)
 					{
-						return scheduler.GetLeftRequestsCount(_spider);
+						return scheduler.GetLeftRequestsCount();
 					}
 					Logger.Warn("Get leftPageCount fail, try to use a Scheduler implement MonitorableScheduler for monitor count!");
 					return -1;
@@ -229,7 +229,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 					IMonitorableScheduler scheduler = _spider.Scheduler as IMonitorableScheduler;
 					if (scheduler != null)
 					{
-						return scheduler.GetTotalRequestsCount(_spider);
+						return scheduler.GetTotalRequestsCount();
 					}
 					Logger.Warn("Get totalPageCount fail, try to use a Scheduler implement MonitorableScheduler for monitor count!");
 					return -1;

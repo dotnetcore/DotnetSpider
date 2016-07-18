@@ -16,7 +16,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		private readonly PriorityBlockingQueue<Request> _priorityQueuePlus = new PriorityBlockingQueue<Request>(InitialCapacity);
 		private readonly PriorityBlockingQueue<Request> _priorityQueueMinus = new PriorityBlockingQueue<Request>(InitialCapacity, new Comparator());
 
-		protected override void PushWhenNoDuplicate(Request request, ISpider spider)
+		protected override void PushWhenNoDuplicate(Request request)
 		{
 			if (request.Priority == 0)
 			{
@@ -32,14 +32,14 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		public override void ResetDuplicateCheck(ISpider spider)
+		public override void ResetDuplicateCheck()
 		{
 			_noPriorityQueue.Clear();
 			_priorityQueuePlus.Clear();
 			_priorityQueueMinus.Clear();
 		}
 
-		public override Request Poll(ISpider spider)
+		public override Request Poll()
 		{
 			lock (this)
 			{
@@ -57,22 +57,22 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		public int GetLeftRequestsCount(ISpider spider)
+		public int GetLeftRequestsCount()
 		{
 			return _noPriorityQueue.Count;
 		}
 
-		public int GetTotalRequestsCount(ISpider spider)
+		public int GetTotalRequestsCount()
 		{
-			return DuplicateRemover.GetTotalRequestsCount(spider);
+			return DuplicateRemover.GetTotalRequestsCount();
 		}
 
-		public override void Load(HashSet<Request> requests, ISpider spider)
+		public override void Load(HashSet<Request> requests)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override HashSet<Request> ToList(ISpider spider)
+		public override HashSet<Request> ToList()
 		{
 			throw new NotImplementedException();
 		}

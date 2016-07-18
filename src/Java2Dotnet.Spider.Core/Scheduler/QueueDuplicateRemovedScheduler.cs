@@ -12,12 +12,12 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	{
 		private Queue<Request> _queue = new Queue<Request>();
 
-		protected override void PushWhenNoDuplicate(Request request, ISpider spider)
+		protected override void PushWhenNoDuplicate(Request request)
 		{
 			_queue.Enqueue(request);
 		}
 
-		public override void ResetDuplicateCheck(ISpider spider)
+		public override void ResetDuplicateCheck()
 		{
 			lock (this)
 			{
@@ -25,7 +25,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		public override Request Poll(ISpider spider)
+		public override Request Poll()
 		{
 			lock (this)
 			{
@@ -33,7 +33,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		public int GetLeftRequestsCount(ISpider spider)
+		public int GetLeftRequestsCount()
 		{
 			lock (this)
 			{
@@ -41,12 +41,12 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		public int GetTotalRequestsCount(ISpider spider)
+		public int GetTotalRequestsCount()
 		{
-			return DuplicateRemover.GetTotalRequestsCount(spider);
+			return DuplicateRemover.GetTotalRequestsCount();
 		}
 
-		public override void Load(HashSet<Request> requests, ISpider spider)
+		public override void Load(HashSet<Request> requests)
 		{
 			lock (this)
 			{
@@ -54,7 +54,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		public override HashSet<Request> ToList(ISpider spider)
+		public override HashSet<Request> ToList()
 		{
 			lock (this)
 			{

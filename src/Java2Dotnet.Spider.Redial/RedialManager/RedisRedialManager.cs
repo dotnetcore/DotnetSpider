@@ -7,8 +7,8 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
-using RedisSharp;
 using Java2Dotnet.Spider.JLog;
+using StackExchange.Redis;
 
 namespace Java2Dotnet.Spider.Redial.RedialManager
 {
@@ -24,7 +24,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		private string Password { get; }
 
 		public const string Locker = "redial-locker";
-		public RedisServer Redis { get; }
+		public IDatabase Db { get; }
 
 		public RedisRedialManager(string host, string password, ILog logger)
 		{
@@ -47,8 +47,16 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				Password = null;
 			}
 
-			Redis = new RedisServer(host, 6379, password);
-			Redis.Db = 3;
+			var Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+			{
+				ServiceName = "DotnetSpider",
+				Password = password,
+				ConnectTimeout = 5000,
+				KeepAlive = 8,
+				EndPoints =
+				{ host, "6379" }
+			});
+			Db = Redis.GetDatabase(3);
 			AtomicExecutor = new RedisAtomicExecutor(this);
 		}
 
@@ -63,7 +71,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				return;
 			}
 
-			while (Redis.HashExists(GetSetKey(), Locker))
+			while (Db.HashExists(GetSetKey(), Locker))
 			{
 				ClearTimeoutLocker();
 				Thread.Sleep(50);
@@ -72,8 +80,8 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 		private void ClearTimeoutLocker()
 		{
-			var result = Redis.HashGet(GetSetKey(), Locker);
-			if (result == null)
+			var result = Db.HashGet(GetSetKey(), Locker);
+			if (!result.HasValue)
 			{
 				return;
 			}
@@ -84,7 +92,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 				if (minutes > 5)
 				{
-					Redis.HashDelete(GetSetKey(), Locker);
+					Db.HashDelete(GetSetKey(), Locker);
 				}
 			}
 		}
@@ -98,12 +106,12 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 			ClearTimeoutLocker();
 
-			if (Redis.HashExists(GetSetKey(), Locker))
+			if (Db.HashExists(GetSetKey(), Locker))
 			{
 				while (true)
 				{
 					Thread.Sleep(50);
-					if (!Redis.HashExists(GetSetKey(), Locker))
+					if (!Db.HashExists(GetSetKey(), Locker))
 					{
 						return RedialResult.OtherRedialed;
 					}
@@ -111,7 +119,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			}
 			else
 			{
-				Redis.HashSet(GetSetKey(), Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+				Db.HashSet(GetSetKey(), Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 
 				// wait all operation stop.
 				Thread.Sleep(5000);
@@ -122,7 +130,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 				RedialInternet();
 
-				Redis.HashDelete(GetSetKey(), Locker);
+				Db.HashDelete(GetSetKey(), Locker);
 
 				Logger?.Warn("Redial finished.");
 				return RedialResult.Sucess;
@@ -131,7 +139,6 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 		public void Dispose()
 		{
-			Redis?.Dispose();
 		}
 
 		private string GetSetKey()

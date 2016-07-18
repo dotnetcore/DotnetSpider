@@ -32,7 +32,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 			foreach (var startRequest in spider.Site.StartRequests)
 			{
-				NextSpiderScheduler.Push(startRequest, NextSpider);
+				NextSpiderScheduler.Push(startRequest);
 			}
 		}
 

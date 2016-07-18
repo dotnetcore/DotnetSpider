@@ -30,7 +30,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler.Component
 			return new BloomFilter(_fpp, _expectedInsertions);
 		}
 
-		public bool IsDuplicate(Request request, ISpider spider)
+		public bool IsDuplicate(Request request)
 		{
 			bool isDuplicate = _bloomFilter.Contains(request.Identity);
 			if (!isDuplicate)
@@ -41,12 +41,12 @@ namespace Java2Dotnet.Spider.Core.Scheduler.Component
 			return isDuplicate;
 		}
 
-		public void ResetDuplicateCheck(ISpider spider)
+		public void ResetDuplicateCheck()
 		{
 			RebuildBloomFilter();
 		}
 
-		public int GetTotalRequestsCount(ISpider spider)
+		public int GetTotalRequestsCount()
 		{
 			return _counter.Value;
 		}

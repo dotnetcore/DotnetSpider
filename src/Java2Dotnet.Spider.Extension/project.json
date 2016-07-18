@@ -1,42 +1,43 @@
 {
-	"version": "0.0.9",
-	"buildOptions": {
-		"emitEntryPoint": false,
-		"debugType": "portable"
-	},
-	"dependencies": {
-		"Microsoft.NETCore.App": {
-			"type": "platform",
-			"version": "1.0.0-rc2-3002702"
-		},
-		"Java2Dotnet.Spider.Common": "0.0.9",
-		"Java2Dotnet.Spider.Core": "0.0.9",
-		"Java2Dotnet.Spider.JLog": "0.0.9",
-		"HtmlAgilityPack": "0.0.9",
-		"HtmlAgilityPack.Css": "0.0.9",
-		"MySql.Data": "0.0.9",
-		"Java2Dotnet.Spider.Redial": "0.0.9",
-		"Java2Dotnet.Spider.Validation": "0.0.9",
-		"System.Data.Common": "*",
-		"Microsoft.CSharp": "*",
-		"Newtonsoft.Json": "*",
-		"System.Dynamic.Runtime": "*",
-		"System.Runtime.Serialization.Primitives": "*",
-		"System.Xml.XDocument": "*",
-		"System.Data.SqlClient": "*",
-		"System.Runtime.Extensions": "*"
-	},
-	"frameworks": {
-		"netcoreapp1.0": {
-			"imports": "portable-net45+win8+dnxcore50",
-			"dependencies": {},
-			"buildOptions": {
-				"define": [
-					"RELEASE",
-					"NET_CORE",
-					"Publish"
-				]
-			}
-		}
-	}
+  "version": "0.0.9",
+  "buildOptions": {
+    "emitEntryPoint": false,
+    "debugType": "portable"
+  },
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0-rc2-3002702"
+    },
+    "Java2Dotnet.Spider.Common": "0.0.9",
+    "Java2Dotnet.Spider.Core": "0.0.9",
+    "Java2Dotnet.Spider.JLog": "0.0.9",
+    "HtmlAgilityPack": "0.0.9",
+    "HtmlAgilityPack.Css": "0.0.9",
+    "MySql.Data": "0.0.9",
+    "Java2Dotnet.Spider.Redial": "0.0.9",
+    "Java2Dotnet.Spider.Validation": "0.0.9",
+    "System.Data.Common": "*",
+    "Microsoft.CSharp": "*",
+    "Newtonsoft.Json": "*",
+    "System.Dynamic.Runtime": "*",
+    "System.Runtime.Serialization.Primitives": "*",
+    "System.Xml.XDocument": "*",
+    "System.Data.SqlClient": "*",
+    "System.Runtime.Extensions": "*",
+    "StackExchange.Redis": "1.1.604-alpha"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": "portable-net45+win8+dnxcore50",
+      "dependencies": {},
+      "buildOptions": {
+        "define": [
+          "RELEASE",
+          "NET_CORE",
+          "Publish"
+        ]
+      }
+    }
+  }
 }

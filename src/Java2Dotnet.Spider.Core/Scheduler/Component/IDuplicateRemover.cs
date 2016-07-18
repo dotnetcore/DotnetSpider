@@ -14,19 +14,19 @@ namespace Java2Dotnet.Spider.Core.Scheduler.Component
 		/// <param name="request"></param>
 		/// <param name="spider"></param>
 		/// <returns></returns>
-		bool IsDuplicate(Request request, ISpider spider);
+		bool IsDuplicate(Request request);
 
 		/// <summary>
 		/// Reset duplicate check.
 		/// </summary>
 		/// <param name="spider"></param>
-		void ResetDuplicateCheck(ISpider spider);
+		void ResetDuplicateCheck();
 
 		/// <summary>
 		/// Get TotalRequestsCount for monitor.
 		/// </summary>
 		/// <param name="spider"></param>
 		/// <returns></returns>
-		int GetTotalRequestsCount(ISpider spider);
+		int GetTotalRequestsCount();
 	}
 }

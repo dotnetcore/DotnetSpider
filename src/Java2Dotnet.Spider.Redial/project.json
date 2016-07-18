@@ -3,19 +3,20 @@
 		"emitEntryPoint": false,
 		"debugType": "portable"
 	},
-	"dependencies": {
-		"Microsoft.NETCore.App": {
-			"type": "platform",
-			"version": "1.0.0-rc2-3002702"
-		},
-		"System.Threading.Thread": "*",
-		"System.Net.NameResolution": "*",
-		"System.Runtime.InteropServices.RuntimeInformation": "*",
-		"Java2Dotnet.Spider.JLog": "0.0.9",
-		"Java2Dotnet.Spider.Common": "0.0.9",
-		"System.Diagnostics.Process": "*",
-		"System.Net.Http": "4.0.1-rc2-24027"
-	},
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0-rc2-3002702"
+    },
+    "System.Threading.Thread": "*",
+    "System.Net.NameResolution": "*",
+    "System.Runtime.InteropServices.RuntimeInformation": "*",
+    "Java2Dotnet.Spider.JLog": "0.0.9",
+    "Java2Dotnet.Spider.Common": "0.0.9",
+    "System.Diagnostics.Process": "*",
+    "System.Net.Http": "4.0.1-rc2-24027",
+    "StackExchange.Redis": "1.1.604-alpha"
+  },
 	"frameworks": {
 		"netcoreapp1.0": {
 			"imports": "portable-net45+win8+dnxcore50",

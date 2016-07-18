@@ -13,22 +13,24 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	{
 		void Init(ISpider spider);
 
+		ISpider Spider { get; }
+
 		/// <summary>
 		/// Add a url to fetch
 		/// </summary>
 		/// <param name="request"></param>
 		/// <param name="spider"></param>
-		void Push(Request request, ISpider spider);
+		void Push(Request request);
 
 		/// <summary>
 		/// Get an url to crawl
 		/// </summary>
 		/// <param name="spider"></param>
 		/// <returns></returns>
-		Request Poll(ISpider spider);
+		Request Poll();
 
-		void Load(HashSet<Request> requests, ISpider spider);
+		void Load(HashSet<Request> requests);
 
-		HashSet<Request> ToList(ISpider spider);
+		HashSet<Request> ToList();
 	}
 }

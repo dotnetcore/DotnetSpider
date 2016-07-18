@@ -28,7 +28,6 @@ namespace Java2Dotnet.Spider.Core
 
 		public int ThreadNum { get; private set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
-		public AutomicLong FinishedPageCount { get; set; } = new AutomicLong(0);
 		public bool SpawnUrl { get; set; } = true;
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public DateTime StartTime { get; private set; }
@@ -137,12 +136,13 @@ namespace Java2Dotnet.Spider.Core
 			PageProcessor.Site = site;
 			StartRequests = Site.StartRequests;
 			Scheduler = scheduler ?? new QueueDuplicateRemovedScheduler();
+			Scheduler.Init(this);
 
 #if !NET_CORE
 
 			DataRootDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\data\\" + Identity;
 #else
-			DataRootDirectory = Path.Combine(AppContext.BaseDirectory,"data", Identity);
+			DataRootDirectory = Path.Combine(AppContext.BaseDirectory, "data", Identity);
 
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
@@ -310,8 +310,6 @@ namespace Java2Dotnet.Spider.Core
 
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 
-			Scheduler.Init(this);
-
 			if (Downloader == null)
 			{
 				Downloader = new HttpClientDownloader();
@@ -333,7 +331,7 @@ namespace Java2Dotnet.Spider.Core
 					{
 						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
 						{
-							Scheduler.Push(request, this);
+							Scheduler.Push(request);
 						});
 					}
 					else
@@ -341,9 +339,9 @@ namespace Java2Dotnet.Spider.Core
 						QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
 						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
 						{
-							scheduler.PushWithoutRedialManager(request, this);
+							scheduler.PushWithoutRedialManager(request);
 						});
-						Scheduler.Load(scheduler.ToList(this), this);
+						Scheduler.Load(scheduler.ToList());
 						ClearStartRequests();
 					}
 				}
@@ -389,7 +387,7 @@ namespace Java2Dotnet.Spider.Core
 
 				while (Stat == Status.Running)
 				{
-					Request request = Scheduler.Poll(this);
+					Request request = Scheduler.Poll();
 
 					if (request == null)
 					{
@@ -404,7 +402,7 @@ namespace Java2Dotnet.Spider.Core
 					}
 					else
 					{
-						Log.WriteLine($"Left: {monitor.GetLeftRequestsCount(this)} Total: {monitor.GetTotalRequestsCount(this)} Thread: {ThreadNum}");
+						Log.WriteLine($"Left: {monitor.GetLeftRequestsCount()} Total: {monitor.GetTotalRequestsCount()} Thread: {ThreadNum}");
 
 						waitCount = 0;
 
@@ -437,7 +435,6 @@ namespace Java2Dotnet.Spider.Core
 								Site.ReturnHttpProxyToPool((HttpHost)request.GetExtra(Request.Proxy), (int)request.GetExtra(Request.StatusCode));
 							}
 #endif
-							FinishedPageCount.Inc();
 						}
 
 						if (!firstTask)
@@ -550,7 +547,7 @@ namespace Java2Dotnet.Spider.Core
 			try
 			{
 				var scheduler = Scheduler as IDuplicateRemover;
-				scheduler?.ResetDuplicateCheck(this);
+				scheduler?.ResetDuplicateCheck();
 			}
 			catch
 			{
@@ -695,13 +692,14 @@ namespace Java2Dotnet.Spider.Core
 				{
 					pipeline.Process(page.ResultItems, this);
 				}
+				Logger.Info($"采集: {request.Url} 成功.");
 			}
 			else
 			{
-				var message = $"页面 {request.Url} 解析结果为 0.";
+				var message = $"采集: {request.Url} 成功, 解析结果为 0.";
 				Logger.Warn(message);
 			}
-			Logger.Info($"采集: {request.Url} 成功.");
+			
 #if TEST
 			sw.Stop();
 			Console.WriteLine("IPipeline:" + (sw.ElapsedMilliseconds).ToString());
@@ -738,7 +736,7 @@ namespace Java2Dotnet.Spider.Core
 
 		private void AddStartRequest(Request request)
 		{
-			Scheduler.Push(request, this);
+			Scheduler.Push(request);
 		}
 
 		private void WaitNewUrl(ref int waitCount)
