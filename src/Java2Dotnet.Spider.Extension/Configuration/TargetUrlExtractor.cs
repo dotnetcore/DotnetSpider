@@ -20,7 +20,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			var t = new Model.TargetUrlExtractor
 			{
 				Formatters = Formatters,
-				Region = SelectorUtil.GetSelector(Region)
+				Region = SelectorUtil.Parse(Region)
 			};
 			foreach (var p in Patterns)
 			{

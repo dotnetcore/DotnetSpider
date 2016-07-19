@@ -7,7 +7,7 @@ namespace Java2Dotnet.Spider.Extension.Utils
 {
 	public class SelectorUtil
 	{
-		public static ISelector GetSelector(Selector selector)
+		public static ISelector Parse(Selector selector)
 		{
 			if (string.IsNullOrEmpty(selector?.Expression))
 			{
@@ -20,35 +20,35 @@ namespace Java2Dotnet.Spider.Extension.Utils
 			{
 				case ExtractType.Css:
 					{
-						return new CssHtmlSelector(expression);
+						return Selectors.Css(expression);
 					}
 				case ExtractType.Enviroment:
 					{
-						return new EnviromentSelector(expression);
+						return Selectors.Enviroment (expression);
 					}
 				case ExtractType.JsonPath:
 					{
-						return new JsonPathSelector(expression);
+						return Selectors.JsonPath(expression);
 					}
 				case ExtractType.Regex:
 					{
 						if (string.IsNullOrEmpty(selector.Argument?.ToString()))
 						{
-							return new RegexSelector(expression);
+							return Selectors.Regex(expression);
 						}
 						else
 						{
 							int group;
 							if (int.TryParse(selector.Argument.ToString(), out group))
 							{
-								return new RegexSelector(expression, group);
+								return Selectors.Regex(expression, group);
 							}
 							throw new SpiderExceptoin("Regex argument shoulb be a number set to group: " + selector);
 						}
 					}
 				case ExtractType.XPath:
 					{
-						return new XPathSelector(expression);
+						return Selectors.XPath(expression);
 					}
 			}
 			throw new SpiderExceptoin("Not support selector: " + selector);

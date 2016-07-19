@@ -64,7 +64,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int totalPage = -2000;
 			if (TotalPageSelector != null)
 			{
-				string totalStr = page.Selectable.Select(SelectorUtil.GetSelector(TotalPageSelector)).GetValue();
+				string totalStr = page.Selectable.Select(SelectorUtil.Parse(TotalPageSelector)).GetValue();
 				if (TotalPageFormatters != null)
 				{
 					foreach (var formatter in TotalPageFormatters)
@@ -80,7 +80,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			int currentPage = -1000;
 			if (CurrenctPageSelector != null)
 			{
-				string currentStr = page.Selectable.Select(SelectorUtil.GetSelector(CurrenctPageSelector)).GetValue();
+				string currentStr = page.Selectable.Select(SelectorUtil.Parse(CurrenctPageSelector)).GetValue();
 				if (CurrnetPageFormatters != null)
 				{
 					foreach (var formatter in CurrnetPageFormatters)
@@ -266,7 +266,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override bool CanStop(Page page)
 		{
-			var current = page.Selectable.SelectList(SelectorUtil.GetSelector(CurrenctPageSelector)).GetValues();
+			var current = page.Selectable.SelectList(SelectorUtil.Parse(CurrenctPageSelector)).GetValues();
 			if (current == null)
 			{
 				return true;

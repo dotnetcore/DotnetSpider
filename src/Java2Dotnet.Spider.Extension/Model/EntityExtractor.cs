@@ -33,12 +33,12 @@ namespace Java2Dotnet.Spider.Extension.Model
 				foreach (var enviromentValue in _enviromentValues)
 				{
 					string name = enviromentValue.Name;
-					var value = page.Selectable.Select(SelectorUtil.GetSelector(enviromentValue.Selector)).GetValue();
+					var value = page.Selectable.Select(SelectorUtil.Parse(enviromentValue.Selector)).GetValue();
 					page.Request.PutExtra(name, value);
 				}
 			}
 			bool isMulti = false;
-			ISelector selector = SelectorUtil.GetSelector(_entityDefine.Selector);
+			ISelector selector = SelectorUtil.Parse(_entityDefine.Selector);
 
 			if (selector == null)
 			{
@@ -65,20 +65,12 @@ namespace Java2Dotnet.Spider.Extension.Model
 				int index = 0;
 				foreach (var item in list)
 				{
-					try
+					JObject obj = ProcessSingle(page, item, _entityDefine, index);
+					if (obj != null)
 					{
-						JObject obj = ProcessSingle(page, item, _entityDefine, index);
-						if (obj != null)
-						{
-							result.Add(obj);
-						}
-						index++;
+						result.Add(obj);
 					}
-					catch (Exception e)
-					{
-
-					}
-
+					index++;
 				}
 				return result;
 			}
@@ -195,7 +187,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 		private dynamic ExtractField(ISelectable item, Page page, DataToken field, int index)
 		{
-			ISelector selector = SelectorUtil.GetSelector(field.Selector);
+			ISelector selector = SelectorUtil.Parse(field.Selector);
 			if (selector == null)
 			{
 				return null;
@@ -208,7 +200,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 
 			if (!isEntity)
 			{
-                string tmpValue;
+				string tmpValue;
 				if (selector is EnviromentSelector)
 				{
 					var enviromentSelector = selector as EnviromentSelector;
@@ -226,18 +218,18 @@ namespace Java2Dotnet.Spider.Extension.Model
 					{
 						var propertyValues = item.SelectList(selector).Nodes();
 
-							List<string> results = new List<string>();
-							foreach (var propertyValue in propertyValues)
+						List<string> results = new List<string>();
+						foreach (var propertyValue in propertyValues)
+						{
+							string tmp = propertyValue.GetValue(needPlainText);
+							foreach (var formatter in formatters)
 							{
-								string tmp = propertyValue.GetValue(needPlainText);
-								foreach (var formatter in formatters)
-								{
-									tmp = formatter.Formate(tmp);
-								}
-								results.Add(tmp);
+								tmp = formatter.Formate(tmp);
 							}
-							return new JArray(results);
+							results.Add(tmp);
 						}
+						return new JArray(results);
+					}
 					else
 					{
 						bool needCount = (((Field)field).Option == PropertyExtractBy.ValueOption.Count);

@@ -64,6 +64,23 @@ namespace Java2Dotnet.Spider.Core.Selector
 			return _cache[expr];
 		}
 
+		public static ISelector Enviroment(string expr)
+		{
+			if (!_cache.ContainsKey(expr))
+			{
+				_cache.Add(expr, new EnviromentSelector(expr));
+			}
+			return _cache[expr];
+		}
+
+		public static ISelector JsonPath(string expr)
+		{
+			if (!_cache.ContainsKey(expr))
+			{
+				_cache.Add(expr, new JsonPathSelector(expr));
+			}
+			return _cache[expr];
+		}
 		//public static AndSelector And(params ISelector[] selectors)
 		//{
 		//	return new AndSelector(selectors);
