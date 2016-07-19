@@ -11,10 +11,11 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	public class PriorityScheduler : DuplicateRemovedScheduler, IMonitorableScheduler
 	{
 		public static int InitialCapacity = 5;
-
 		private readonly Queue<Request> _noPriorityQueue = new Queue<Request>();
 		private readonly PriorityBlockingQueue<Request> _priorityQueuePlus = new PriorityBlockingQueue<Request>(InitialCapacity);
 		private readonly PriorityBlockingQueue<Request> _priorityQueueMinus = new PriorityBlockingQueue<Request>(InitialCapacity, new Comparator());
+		private AutomicLong _successCounter = new AutomicLong(0);
+		private AutomicLong _errorCounter = new AutomicLong(0);
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{
@@ -57,14 +58,34 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		public int GetLeftRequestsCount()
+		public long GetLeftRequestsCount()
 		{
 			return _noPriorityQueue.Count;
 		}
 
-		public int GetTotalRequestsCount()
+		public long GetTotalRequestsCount()
 		{
 			return DuplicateRemover.GetTotalRequestsCount();
+		}
+
+		public long GetSuccessRequestsCount()
+		{
+			return _successCounter.Value;
+		}
+
+		public long GetErrorRequestsCount()
+		{
+			return _errorCounter.Value;
+		}
+
+		public void IncreaseSuccessCounter()
+		{
+			_successCounter.Inc();
+		}
+
+		public void IncreaseErrorCounter()
+		{
+			_errorCounter.Inc();
 		}
 
 		public override void Load(HashSet<Request> requests)

@@ -57,7 +57,7 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 			}
 			catch (Exception e)
 			{
-				LogUtils.GetLogger(spider).Warn("Write file error.", e);
+				spider.Logger.Warn("Write file error.", e);
 				throw;
 			}
 		}

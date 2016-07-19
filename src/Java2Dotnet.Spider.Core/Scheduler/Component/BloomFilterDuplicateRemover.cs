@@ -46,7 +46,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler.Component
 			RebuildBloomFilter();
 		}
 
-		public int GetTotalRequestsCount()
+		public long GetTotalRequestsCount()
 		{
 			return _counter.Value;
 		}

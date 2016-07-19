@@ -14,8 +14,8 @@ using Java2Dotnet.Spider.Core.Proxy;
 using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Core.Scheduler.Component;
 using Java2Dotnet.Spider.Core.Utils;
-using Java2Dotnet.Spider.JLog;
 using Newtonsoft.Json;
+using Java2Dotnet.Spider.Log;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -24,8 +24,7 @@ namespace Java2Dotnet.Spider.Core
 	/// </summary>
 	public class Spider : ISpider
 	{
-		protected readonly ILog Logger;
-
+		public ILogService Logger { get; set; }
 		public int ThreadNum { get; private set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
 		public bool SpawnUrl { get; set; } = true;
@@ -34,9 +33,7 @@ namespace Java2Dotnet.Spider.Core
 		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		public Site Site { get; private set; }
 		public List<Action<Page>> PageHandlers;
-		public bool SaveStatus { get; set; }
 		public string Identity { get; }
-		public bool ShowConsoleStatus { get; set; } = true;
 		public List<IPipeline> Pipelines { get; private set; } = new List<IPipeline>();
 		public IDownloader Downloader { get; private set; }
 		public bool IsExitWhenComplete { get; set; } = true;
@@ -120,7 +117,7 @@ namespace Java2Dotnet.Spider.Core
 
 			UserId = string.IsNullOrEmpty(userid) ? "DotnetSpider" : userid;
 			TaskGroup = string.IsNullOrEmpty(taskGroup) ? "DotnetSpider" : taskGroup;
-			Logger = LogManager.GetLogger($"{Identity}&{UserId}&{TaskGroup}");
+			Logger = new Logger(Identity, UserId, TaskGroup);
 
 			_waitCount = 0;
 			if (pageProcessor == null)
@@ -322,33 +319,25 @@ namespace Java2Dotnet.Spider.Core
 				Pipelines.Add(new FilePipeline());
 			}
 
-			if (StartRequests != null)
+			if (StartRequests != null && StartRequests.Count > 0)
 			{
-				if (StartRequests.Count > 0)
+				Logger.Info($"添加链接到调度中心, 数量: {StartRequests.Count}.");
+				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
-					Logger.Info($"添加网址到调度中心,数量: {StartRequests.Count}");
-					if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
+					Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
 					{
-						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
-						{
-							Scheduler.Push(request);
-						});
-					}
-					else
-					{
-						QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-						Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
-						{
-							scheduler.PushWithoutRedialManager(request);
-						});
-						Scheduler.Load(scheduler.ToList());
-						ClearStartRequests();
-					}
+						Scheduler.Push(request);
+					});
 				}
 				else
 				{
-					Logger.Info("不需要添加网址到调度中心.", true);
+					Scheduler.Load(new HashSet<Request>(StartRequests));
+					ClearStartRequests();
 				}
+			}
+			else
+			{
+				Logger.Info("添加链接到调度中心, 数量: 0.");
 			}
 
 			_init = true;
@@ -402,8 +391,6 @@ namespace Java2Dotnet.Spider.Core
 					}
 					else
 					{
-						Log.WriteLine($"Left: {monitor.GetLeftRequestsCount()} Total: {monitor.GetTotalRequestsCount()} Thread: {ThreadNum}");
-
 						waitCount = 0;
 
 						try
@@ -448,6 +435,8 @@ namespace Java2Dotnet.Spider.Core
 
 			FinishedTime = DateTime.Now;
 
+			SpiderClosingEvent?.Invoke();
+
 			foreach (IPipeline pipeline in Pipelines)
 			{
 				SafeDestroy(pipeline);
@@ -456,24 +445,19 @@ namespace Java2Dotnet.Spider.Core
 			if (Stat == Status.Finished)
 			{
 				OnClose();
-
-				Logger.Info($"任务 {Identity} 结束.");
+				Logger.Info($"任务 {Identity} 结束, 运行时间: " + (FinishedTime - StartTime).TotalSeconds + " 秒.");
 			}
 
 			if (Stat == Status.Stopped)
 			{
-				Logger.Info("任务 " + Identity + " 停止成功!");
+				Logger.Info("任务 " + Identity + " 停止成功, 运行时间: " + (FinishedTime - StartTime).TotalSeconds + " 秒.");
 			}
-
-			SpiderClosingEvent?.Invoke();
-
-			Log.WaitForExit();
 
 			if (Stat == Status.Exited)
 			{
-				Logger.Info("任务 " + Identity + " 退出成功!");
+				Logger.Info("任务 " + Identity + " 退出成功, 运行时间: " + (FinishedTime - StartTime).TotalSeconds + " 秒.");
 			}
-
+			Logger.Dispose();
 			IsExited = true;
 		}
 
@@ -482,15 +466,15 @@ namespace Java2Dotnet.Spider.Core
 			if (!_printedInfo)
 			{
 #if NET_CORE
-				Log.WriteLine("=============================================================");
-				Log.WriteLine("== DotnetSpider is an open source .Net spider              ==");
-				Log.WriteLine("== It's a light, stable, high performce spider             ==");
-				Log.WriteLine("== Support multi thread, ajax page, http                   ==");
-				Log.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
-				Log.WriteLine("== License: LGPL3.0                                        ==");
-				Log.WriteLine("== Version: 0.9.10                                         ==");
-				Log.WriteLine("== Author: zlzforever@163.com                              ==");
-				Log.WriteLine("=============================================================");
+				Console.WriteLine("=============================================================");
+				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
+				Console.WriteLine("== It's a light, stable, high performce spider             ==");
+				Console.WriteLine("== Support multi thread, ajax page, http                   ==");
+				Console.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
+				Console.WriteLine("== License: LGPL3.0                                        ==");
+				Console.WriteLine("== Version: 0.9.10                                         ==");
+				Console.WriteLine("== Author: zlzforever@163.com                              ==");
+				Console.WriteLine("=============================================================");
 #else
 				Console.WriteLine("=============================================================");
 				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
@@ -542,16 +526,6 @@ namespace Java2Dotnet.Spider.Core
 			foreach (var pipeline in Pipelines)
 			{
 				SafeDestroy(pipeline);
-			}
-
-			try
-			{
-				var scheduler = Scheduler as IDuplicateRemover;
-				scheduler?.ResetDuplicateCheck();
-			}
-			catch
-			{
-				// ignored
 			}
 
 			SafeDestroy(Scheduler);
@@ -654,7 +628,7 @@ namespace Java2Dotnet.Spider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				Logger.Warn("解析页数数据失败: " + request.Url + ", 请检查您的数据抽取设置.");
+				Logger.Warn("解析页数数据失败: " + request.Url + ", 请检查您的数据抽取设置: " + e.Message);
 			}
 
 			//watch.Stop();
@@ -699,7 +673,7 @@ namespace Java2Dotnet.Spider.Core
 				var message = $"采集: {request.Url} 成功, 解析结果为 0.";
 				Logger.Warn(message);
 			}
-			
+
 #if TEST
 			sw.Stop();
 			Console.WriteLine("IPipeline:" + (sw.ElapsedMilliseconds).ToString());

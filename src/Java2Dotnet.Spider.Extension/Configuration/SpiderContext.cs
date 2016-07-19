@@ -42,7 +42,7 @@ namespace Java2Dotnet.Spider.Extension
 		public List<Configuration.TargetUrlExtractor> TargetUrlExtractInfos { get; set; } = new List<Configuration.TargetUrlExtractor>();
 		public List<EnviromentValue> EnviromentValues { get; set; } = new List<EnviromentValue>();
 		public Validations Validations { get; set; }
-		public CookieTrapper GetCookie { get; set; }
+		public CookieThief GetCookie { get; set; }
 
 		internal bool IsBuilt { get; set; }
 

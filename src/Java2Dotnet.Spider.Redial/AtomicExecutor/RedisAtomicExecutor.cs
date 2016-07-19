@@ -102,7 +102,7 @@ namespace Java2Dotnet.Spider.Redial.AtomicExecutor
 #endif
 			foreach (var entry in _redisRedialManager.Db.HashGetAll(GetSetKey()))
 			{
-				string key = entry.Key;
+				string key = entry.Name;
 				string value = entry.Value;
 
 				DateTime dt = DateTime.Parse(value);

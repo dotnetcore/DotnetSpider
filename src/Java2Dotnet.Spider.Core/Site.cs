@@ -103,9 +103,9 @@ namespace Java2Dotnet.Spider.Core
 		/// Set the interval between the processing of two pages. 
 		/// Time unit is micro seconds. 
 		/// </summary>
-		public int MaxSleepTime { get; set; } = 1000;
+		public int MaxSleepTime { get; set; } = 10;
 
-		public int MinSleepTime { get; set; } = 500;
+		public int MinSleepTime { get; set; } = 1;
 
 		/// <summary>
 		/// Get or Set retry times immediately when download fail, 5 by default.

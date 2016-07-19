@@ -29,7 +29,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public abstract IDownloader GetDownloader();
 
-		public GeneratePostBody GeneratePostBody { get; set; }
+		public PostBodyGenerator PostBodyGenerator { get; set; }
 	}
 
 	public class HttpDownloader : Downloader
@@ -57,12 +57,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					return result;
 				};
 			}
-			if (GeneratePostBody != null)
+			if (PostBodyGenerator != null)
 			{
-				downloader.GeneratePostBody = (s, r) =>
+				downloader.PostBodyGenerator = (s, r) =>
 				{
 					List<string> arguments = new List<string>();
-					foreach (var arg in GeneratePostBody.ArgumnetNames)
+					foreach (var arg in PostBodyGenerator.ArgumnetNames)
 					{
 						var tmp = s.Arguments.ContainsKey(arg) ? s.Arguments[arg] : "";
 						arguments.Add(tmp);

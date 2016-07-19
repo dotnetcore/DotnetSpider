@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}</ProjectGuid>
+    <ProjectGuid>{0047A89F-61E8-4369-A75C-81E7AB431ADD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Java2Dotnet.Spider.JLog</RootNamespace>
-    <AssemblyName>Java2Dotnet.Spider.JLog</AssemblyName>
+    <RootNamespace>Java2Dotnet.Spider.Ioc</RootNamespace>
+    <AssemblyName>Java2Dotnet.Spider.Ioc</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,16 +20,14 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\output\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -43,20 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ConfigurationManager.cs">
-      <Link>ConfigurationManager.cs</Link>
+    <Compile Include="..\IService.cs">
+      <Link>IService.cs</Link>
     </Compile>
-    <Compile Include="..\ILog.cs">
-      <Link>ILog.cs</Link>
-    </Compile>
-    <Compile Include="..\Log.cs">
-      <Link>Log.cs</Link>
-    </Compile>
-    <Compile Include="..\LogManager.cs">
-      <Link>LogManager.cs</Link>
-    </Compile>
-    <Compile Include="..\SynchronizedList.cs">
-      <Link>SynchronizedList.cs</Link>
+    <Compile Include="..\ServiceProvider.cs">
+      <Link>ServiceProvider.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

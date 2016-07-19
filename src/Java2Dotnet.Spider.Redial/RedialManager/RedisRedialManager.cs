@@ -7,8 +7,10 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 using StackExchange.Redis;
+using Java2Dotnet.Spider.Redial.NetworkValidater;
+using Java2Dotnet.Spider.Redial.Redialer;
 
 namespace Java2Dotnet.Spider.Redial.RedialManager
 {
@@ -19,14 +21,12 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 	{
 		public string RedisHost { get; set; }
 		public override IAtomicExecutor AtomicExecutor { get; }
-
 		private string HostName { get; } = Dns.GetHostName();
 		private string Password { get; }
-
 		public const string Locker = "redial-locker";
 		public IDatabase Db { get; }
 
-		public RedisRedialManager(string host, string password, ILog logger)
+		public RedisRedialManager(string host, string password, INetworkValidater validater, IRedialer redialer, ILogService logger)
 		{
 			Logger = logger;
 			if (!string.IsNullOrEmpty(host))
@@ -58,10 +58,18 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			});
 			Db = Redis.GetDatabase(3);
 			AtomicExecutor = new RedisAtomicExecutor(this);
+			NetworkValidater = validater;
+			Redialer = redialer;
 		}
 
-		public RedisRedialManager(ILog logger) : this(Common.ConfigurationManager.Get("redialRedisHost"), Common.ConfigurationManager.Get("redialRedisPassword"), logger)
+		public RedisRedialManager(IDatabase db, INetworkValidater validater, IRedialer redialer, ILogService logger)
 		{
+			Logger = logger;
+ 
+			Db = db;
+			AtomicExecutor = new RedisAtomicExecutor(this);
+			NetworkValidater = validater;
+			Redialer = redialer;
 		}
 
 		public override void WaitforRedialFinish()

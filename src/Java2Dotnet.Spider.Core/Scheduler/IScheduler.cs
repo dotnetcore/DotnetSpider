@@ -29,6 +29,8 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		/// <returns></returns>
 		Request Poll();
 
+		void Clear();
+
 		void Load(HashSet<Request> requests);
 
 		HashSet<Request> ToList();

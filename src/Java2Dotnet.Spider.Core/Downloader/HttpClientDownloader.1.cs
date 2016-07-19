@@ -22,7 +22,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 	/// </summary>
 	public class HttpClientDownloader : BaseDownloader
 	{
-		public Action<Site, Request> GeneratePostBody;
+		public Action<Site, Request> PostBodyGenerator;
 		public bool DecodeContentAsUrl;
 
 		HttpClient httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler()
@@ -55,11 +55,11 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			int statusCode = 200;
 			try
 			{
-				if (GeneratePostBody != null)
+				if (PostBodyGenerator != null)
 				{
 					SingleExecutor.Execute(() =>
 					{
-						GeneratePostBody(spider.Site, request);
+						PostBodyGenerator(spider.Site, request);
 					});
 				}
 
@@ -127,8 +127,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					var logger = LogUtils.GetLogger(spider);
-					logger.Warn("Close response fail.", e);
+					spider.Logger.Warn("Close response fail.", e);
 				}
 			}
 		}

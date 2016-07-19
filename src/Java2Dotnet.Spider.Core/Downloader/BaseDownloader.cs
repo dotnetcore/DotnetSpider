@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {

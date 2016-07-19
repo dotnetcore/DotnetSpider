@@ -22,18 +22,10 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		{
 			lock (this)
 			{
-				RedialManagerUtils.Execute("scheduler-push", () =>
+				RedialManagerUtils.Execute("sp", () =>
 				{
 					DoPush(request);
 				});
-			}
-		}
-
-		internal void PushWithoutRedialManager(Request request)
-		{
-			lock (this)
-			{
-				DoPush(request);
 			}
 		}
 
@@ -87,5 +79,10 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		public abstract void Load(HashSet<Request> requests);
 
 		public abstract HashSet<Request> ToList();
+
+		public virtual void Clear()
+		{
+			DuplicateRemover.ResetDuplicateCheck();
+		}
 	}
 }

@@ -6,7 +6,7 @@ using System.Text;
 using Java2Dotnet.Spider.Extension;
 using Java2Dotnet.Spider.Test.Example;
 using Java2Dotnet.Spider.Test.Pipeline;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 using Newtonsoft.Json;
 using Java2Dotnet.Spider.Core.Downloader;
 using System.Threading.Tasks;
@@ -18,6 +18,9 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Java2Dotnet.Spider.Extension.Configuration;
 using Java2Dotnet.Spider.Extension.Configuration.Json;
+using Java2Dotnet.Spider.Ioc;
+using Java2Dotnet.Spider.Core.Monitor;
+using Java2Dotnet.Spider.Extension.Monitor;
 
 namespace Java2Dotnet.Spider.Test
 {
@@ -25,9 +28,14 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
+			ServiceProvider.Add<ILogService>(new ConsoleLog());
+			ServiceProvider.Add<ILogService>(new FileLog());
+			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
+			ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
+
 			//var start = DateTime.Now;
-			//CnblogsSpider spiderBuilder = new CnblogsSpider();
-			//spiderBuilder.Run("rerun");
+			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+			spiderBuilder.Run("rerun");
 			//var end = DateTime.Now;
 			//Console.WriteLine((end - start).TotalMilliseconds);
 			//Console.Read();
@@ -94,7 +102,7 @@ namespace Java2Dotnet.Spider.Test
 					AliveThreadCount
 				},
 				Name,
-				Machine = Log.Machine,
+				Machine = SystemInfo.HostName,
 				UserId = "DotnetSpider",
 				TaskGroup = "Tmall Gmv Monthly"
 			};

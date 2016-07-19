@@ -27,6 +27,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 		}
 
 		public int ThreadNum { get; set; }
+
 		public FileCache(string startUrl, string urlPattern, string path = "/data/dotnetspider/temp/")
 		{
 			_pageProcessor = new SimplePageProcessor(startUrl, urlPattern);
@@ -39,8 +40,6 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 			_downloaderWhenFileMiss = downloaderWhenFileMiss;
 			return this;
 		}
-
-
 
 		public Page Download(Request request, ISpider spider)
 		{
@@ -69,11 +68,11 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 				if (typeof(FileNotFoundException).GetTypeInfo().IsAssignableFrom(e.GetType().GetTypeInfo()))
 #endif
 				{
-					LogUtils.GetLogger(spider).Info("File not exist for url " + request.Url);
+					spider.Logger.Info("File not exist for url: " + request.Url);
 				}
 				else
 				{
-					LogUtils.GetLogger(spider).Warn("File read error for url " + request.Url, e);
+					spider.Logger.Warn("File read error for url " + request.Url, e);
 				}
 			}
 			page = DownloadWhenMiss(request, spider);
@@ -94,7 +93,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 			}
 			catch (IOException e)
 			{
-				LogUtils.GetLogger(spider).Warn("write file error", e);
+				spider.Logger.Warn("Write file error.", e);
 			}
 		}
 

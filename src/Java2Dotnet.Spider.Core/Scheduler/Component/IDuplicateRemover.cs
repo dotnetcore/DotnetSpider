@@ -27,6 +27,6 @@ namespace Java2Dotnet.Spider.Core.Scheduler.Component
 		/// </summary>
 		/// <param name="spider"></param>
 		/// <returns></returns>
-		int GetTotalRequestsCount();
+		long GetTotalRequestsCount();
 	}
 }

@@ -32,9 +32,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 		private FileLockerRedialManager()
 		{
-
 			_lockerFilePath = Path.Combine(SpiderEnviroment.GlobalDirectory, "redialer.lock");
-
 			AtomicExecutor = new FileLockerAtomicExecutor(this);
 		}
 

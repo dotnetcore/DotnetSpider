@@ -21,7 +21,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler.Component
 			_urls.Clear();
 		}
 
-		public int GetTotalRequestsCount()
+		public long GetTotalRequestsCount()
 		{
 			return _urls.Count;
 		}

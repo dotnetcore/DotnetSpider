@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HtmlAgilityPack;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 
 namespace Java2Dotnet.Spider.Core.Selector
 {

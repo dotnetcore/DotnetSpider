@@ -2,7 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 
 namespace Java2Dotnet.Spider.Core.Proxy
 {

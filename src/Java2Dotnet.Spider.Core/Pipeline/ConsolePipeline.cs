@@ -1,7 +1,7 @@
 namespace Java2Dotnet.Spider.Core.Pipeline
 {
 #if NET_CORE
-	using Java2Dotnet.Spider.JLog;
+	using Java2Dotnet.Spider.Log;
 #endif
 
 	/// <summary>
@@ -14,11 +14,7 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 		{
 			foreach (var entry in resultItems.Results)
 			{
-#if NET_CORE
-				Log.WriteLine(entry.Key + ":\t" + entry.Value);
-#else
 				System.Console.WriteLine(entry.Key + ":\t" + entry.Value);
-#endif
 			}
 		}
 

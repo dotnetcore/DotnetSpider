@@ -1,6 +1,6 @@
 ﻿using System;
 using Java2Dotnet.Spider.Core.Scheduler;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {

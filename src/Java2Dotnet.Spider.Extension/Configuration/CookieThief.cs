@@ -13,7 +13,7 @@ using OpenQA.Selenium.Remote;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
-	public abstract class CookieTrapper
+	public abstract class CookieThief
 	{
 		[Flags]
 		public enum Types
@@ -31,7 +31,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	}
 
 #if !NET_CORE
-	public abstract class WebDriverCookieTrapper : CookieTrapper
+	public abstract class WebDriverCookieThief : CookieThief
 	{
 		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
 		{
@@ -63,7 +63,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
-	public class CommonCookieTrapper : WebDriverCookieTrapper
+	public class CommonCookieThief : WebDriverCookieThief
 	{
 		public override Types Type { get; internal set; } = Types.Common;
 
@@ -83,7 +83,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				var webDriver = GetWebDriver();
 				try
 				{
-                    webDriver.Navigate().GoToUrl(Url);
+					webDriver.Navigate().GoToUrl(Url);
 					Thread.Sleep(5000);
 
 					if (InputSelector != null)
@@ -125,7 +125,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
-	public class FiddlerCookieTrapper : CommonCookieTrapper
+	public class FiddlerCookieThief : CommonCookieThief
 	{
 		public override Types Type { get; internal set; } = Types.Fiddler;
 		public int ProxyPort { get; set; } = 30000;
@@ -159,7 +159,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
-	public class FiddlerLoginCookieTrapper : LoginCookieTrapper
+	public class FiddlerLoginCookieThief : LoginCookieThief
 	{
 		public override Types Type { get; internal set; } = Types.FiddlerLogin;
 		public int ProxyPort { get; set; } = 30000;
@@ -193,7 +193,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
-	public class LoginCookieTrapper : WebDriverCookieTrapper
+	public class LoginCookieThief : WebDriverCookieThief
 	{
 		public override Types Type { get; internal set; } = Types.Login;
 

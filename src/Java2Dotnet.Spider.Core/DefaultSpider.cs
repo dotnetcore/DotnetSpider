@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Java2Dotnet.Spider.Core.Scheduler;
+using Java2Dotnet.Spider.Log;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -10,6 +12,11 @@ namespace Java2Dotnet.Spider.Core
 	public class DefaultSpider : ISpider
 	{
 		private static readonly Regex IdentifyRegex = new Regex(@"^[0-9A-Za-z_-]+$");
+
+		public DefaultSpider() : this(Guid.NewGuid().ToString(), new Site())
+		{
+		}
+
 		public DefaultSpider(string uuid, Site site)
 		{
 			if (!IdentifyRegex.IsMatch(uuid))
@@ -18,13 +25,13 @@ namespace Java2Dotnet.Spider.Core
 			}
 			Identity = uuid;
 			Site = site;
+			Logger = new Logger(Identity, UserId, TaskGroup);
 		}
 
 		/// <summary>
 		/// Unique id for a task.
 		/// </summary>
 		public string Identity { get; }
-
 
 		/// <summary>
 		/// Site of a task
@@ -45,9 +52,24 @@ namespace Java2Dotnet.Spider.Core
 
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 
-		public string UserId { get; } = "";
+		public string UserId { get; } = "Default";
 
-		public string TaskGroup { get; } = "";
+		public string TaskGroup { get; } = "Default";
+
+		public ILogService Logger
+		{
+			get; set;
+		}
+
+		public IScheduler Scheduler
+		{
+			get;set;
+		}
+
+		public int ThreadNum
+		{
+			get;set;
+		}
 
 		public void Dispose()
 		{

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;

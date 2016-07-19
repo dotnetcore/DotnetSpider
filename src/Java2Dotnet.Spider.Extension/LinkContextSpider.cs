@@ -14,7 +14,7 @@ using Java2Dotnet.Spider.Redial;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 using System.Linq;
 using System.Threading.Tasks;
 

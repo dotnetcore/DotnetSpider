@@ -1,3 +1,4 @@
+using Java2Dotnet.Spider.Common;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -11,6 +12,8 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	public sealed class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler, IMonitorableScheduler
 	{
 		private Queue<Request> _queue = new Queue<Request>();
+		private AutomicLong _successCounter = new AutomicLong(0);
+		private AutomicLong _errorCounter = new AutomicLong(0);
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{
@@ -33,7 +36,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		public int GetLeftRequestsCount()
+		public long GetLeftRequestsCount()
 		{
 			lock (this)
 			{
@@ -41,9 +44,29 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 			}
 		}
 
-		public int GetTotalRequestsCount()
+		public long GetTotalRequestsCount()
 		{
 			return DuplicateRemover.GetTotalRequestsCount();
+		}
+
+		public long GetSuccessRequestsCount()
+		{
+			return _successCounter.Value;
+		}
+
+		public long GetErrorRequestsCount()
+		{
+			return _errorCounter.Value;
+		}
+
+		public void IncreaseSuccessCounter()
+		{
+			_successCounter.Inc();
+		}
+
+		public void IncreaseErrorCounter()
+		{
+			_errorCounter.Inc();
 		}
 
 		public override void Load(HashSet<Request> requests)

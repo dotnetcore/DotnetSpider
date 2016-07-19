@@ -153,9 +153,13 @@
       <Project>{43dd7a01-fbde-4a22-bf6e-758f721dde77}</Project>
       <Name>Java2Dotnet.Spider.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Java2Dotnet.Spider.JLog\net45\Java2Dotnet.Spider.JLog.csproj">
+    <ProjectReference Include="..\..\Java2Dotnet.Spider.Ioc\net45\Java2Dotnet.Spider.Ioc.csproj">
+      <Project>{0047a89f-61e8-4369-a75c-81e7ab431add}</Project>
+      <Name>Java2Dotnet.Spider.Ioc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Java2Dotnet.Spider.Log\net45\Java2Dotnet.Spider.Log.csproj">
       <Project>{acda398b-a5f3-4cae-bdca-fb172736919c}</Project>
-      <Name>Java2Dotnet.Spider.JLog</Name>
+      <Name>Java2Dotnet.Spider.Log</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

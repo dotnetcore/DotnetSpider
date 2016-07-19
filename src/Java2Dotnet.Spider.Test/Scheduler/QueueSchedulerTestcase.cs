@@ -32,8 +32,8 @@ namespace Java2Dotnet.Spider.Test.Scheduler
 				scheduler.Poll();
 			});
 
-			int left = scheduler.GetLeftRequestsCount();
-			int total = scheduler.GetTotalRequestsCount();
+			long left = scheduler.GetLeftRequestsCount();
+			long total = scheduler.GetTotalRequestsCount();
 
 			Assert.AreEqual(left, 2);
 			Assert.AreEqual(total, 1002);
@@ -49,8 +49,8 @@ namespace Java2Dotnet.Spider.Test.Scheduler
 			scheduler.Push(new Request("http://www.a.com", 1, null));
 
 			scheduler.Push(new Request("http://www.b.com", 1, null));
-			int left = scheduler.GetLeftRequestsCount();
-			int total = scheduler.GetTotalRequestsCount();
+			long left = scheduler.GetLeftRequestsCount();
+			long total = scheduler.GetTotalRequestsCount();
 
 			Assert.AreEqual(left, 2);
 			Assert.AreEqual(total, 2);
@@ -71,8 +71,8 @@ namespace Java2Dotnet.Spider.Test.Scheduler
 			var request = scheduler.Poll();
 			Assert.AreEqual(request.Url, "http://www.a.com");
 
-			int left = scheduler.GetLeftRequestsCount();
-			int total = scheduler.GetTotalRequestsCount();
+			long left = scheduler.GetLeftRequestsCount();
+			long total = scheduler.GetTotalRequestsCount();
 
 			Assert.AreEqual(left, 1);
 			Assert.AreEqual(total, 2);

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.Redialer;
@@ -33,7 +33,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		/// </summary>
 		public bool Skip { get; set; } = false;
 
-		public ILog Logger { get; protected set; }
+		public ILogService Logger { get; set; }
 
 		protected void RedialInternet()
 		{
@@ -41,7 +41,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			{
 				return;
 			}
-
+			Logger.Info("Redialing...");
 			Redialer.Redial();
 
 			if (NetworkValidater == null)

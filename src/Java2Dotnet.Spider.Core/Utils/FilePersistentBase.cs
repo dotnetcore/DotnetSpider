@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Java2Dotnet.Spider.Core.Downloader;
 using System;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 
 namespace Java2Dotnet.Spider.Core.Utils
 {

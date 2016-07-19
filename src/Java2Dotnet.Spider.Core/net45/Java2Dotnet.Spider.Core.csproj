@@ -81,6 +81,9 @@
     <Compile Include="..\Downloader\IDownloader.cs">
       <Link>Downloader\IDownloader.cs</Link>
     </Compile>
+    <Compile Include="..\ILogable.cs">
+      <Link>ILogable.cs</Link>
+    </Compile>
     <Compile Include="..\ISpider.cs">
       <Link>ISpider.cs</Link>
     </Compile>
@@ -89,6 +92,12 @@
     </Compile>
     <Compile Include="..\ITask.cs">
       <Link>ITask.cs</Link>
+    </Compile>
+    <Compile Include="..\Logger.cs">
+      <Link>Logger.cs</Link>
+    </Compile>
+    <Compile Include="..\LogInfo.cs">
+      <Link>LogInfo.cs</Link>
     </Compile>
     <Compile Include="..\Monitor\SpiderClosingEvent.cs">
       <Link>Monitor\SpiderClosingEvent.cs</Link>
@@ -241,9 +250,13 @@
       <Project>{43dd7a01-fbde-4a22-bf6e-758f721dde77}</Project>
       <Name>Java2Dotnet.Spider.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Java2Dotnet.Spider.JLog\net45\Java2Dotnet.Spider.JLog.csproj">
+    <ProjectReference Include="..\..\Java2Dotnet.Spider.Ioc\net45\Java2Dotnet.Spider.Ioc.csproj">
+      <Project>{0047a89f-61e8-4369-a75c-81e7ab431add}</Project>
+      <Name>Java2Dotnet.Spider.Ioc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Java2Dotnet.Spider.Log\net45\Java2Dotnet.Spider.Log.csproj">
       <Project>{acda398b-a5f3-4cae-bdca-fb172736919c}</Project>
-      <Name>Java2Dotnet.Spider.JLog</Name>
+      <Name>Java2Dotnet.Spider.Log</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Java2Dotnet.Spider.Redial\net45\Java2Dotnet.Spider.Redial.csproj">
       <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>

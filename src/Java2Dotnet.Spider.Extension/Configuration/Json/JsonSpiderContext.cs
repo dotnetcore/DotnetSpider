@@ -468,7 +468,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 						}
 						webDriverDownloader.Browser = jobject.SelectToken("$.Browser").ToObject<Browser>();
 						webDriverDownloader.RedialLimit = jobject.SelectToken("$.RedialLimit").ToObject<int>();
-						webDriverDownloader.GeneratePostBody = jobject.SelectToken("$.GeneratePostBody").ToObject<GeneratePostBody>();
+						webDriverDownloader.PostBodyGenerator = jobject.SelectToken("$.PostBodyGenerator").ToObject<PostBodyGenerator>();
 						webDriverDownloader.VerifyCode = jobject.SelectToken("$.VerifyCode").ToObject<VerifyCode>();
 
 						downloader = webDriverDownloader;
@@ -521,10 +521,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 				}
 			}
 
-			var generatePostBody = jobject.SelectToken("$.GeneratePostBody")?.ToObject<GeneratePostBody>();
-			if (generatePostBody != null)
+			var postBodyGenerator = jobject.SelectToken("$.PostBodyGenerator")?.ToObject<PostBodyGenerator>();
+			if (postBodyGenerator != null)
 			{
-				downloader.GeneratePostBody = generatePostBody;
+				downloader.PostBodyGenerator = postBodyGenerator;
 			}
 
 			return downloader;

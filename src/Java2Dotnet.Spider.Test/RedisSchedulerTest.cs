@@ -18,7 +18,7 @@ namespace Java2Dotnet.Spider.Test
 
 			RedisScheduler redisScheduler = new RedisScheduler("localhost", "");
 
-			ISpider spider = new TestSpider();
+			ISpider spider = new DefaultSpider();
 			redisScheduler.Clear();
 
 			Request request = new Request("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", 1, null);
@@ -38,7 +38,7 @@ namespace Java2Dotnet.Spider.Test
 		{
 			RedisScheduler redisScheduler = new RedisScheduler("localhost", "");
 
-			ISpider spider = new TestSpider();
+			ISpider spider = new DefaultSpider();
 			Request request1 = new Request("http://www.ibm.com/1", 1, null);
 			Request request2 = new Request("http://www.ibm.com/2", 1, null);
 			Request request3 = new Request("http://www.ibm.com/3", 1, null);
@@ -99,40 +99,6 @@ namespace Java2Dotnet.Spider.Test
 			Assert.AreEqual("http://www.c.com/", redisScheduler.Poll().Url.ToString());
 			Assert.AreEqual("http://www.b.com/", redisScheduler.Poll().Url.ToString());
 			Assert.AreEqual("http://www.a.com/", redisScheduler.Poll().Url.ToString());
-		}
-	}
-
-	internal class TestSpider : ISpider
-	{
-		public string Identity => "1";
-
-		public Site Site => new Site { EncodingName = "UTF-8" };
-		public void Start()
-		{
-		}
-
-		public void Run()
-		{
-		}
-
-		public void Stop()
-		{
-		}
-
-		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
-
-		public string UserId { get; } = "";
-
-		public string TaskGroup { get; } = "";
-
-
-		public void Exit()
-		{
-
-		}
-
-		public void Dispose()
-		{
 		}
 	}
 }

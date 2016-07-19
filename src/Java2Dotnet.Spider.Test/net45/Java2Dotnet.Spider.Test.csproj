@@ -201,9 +201,13 @@
       <Project>{ddb5a085-6219-4a95-8cd8-ddcf3a54b962}</Project>
       <Name>Java2Dotnet.Spider.Extension</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Java2Dotnet.Spider.JLog\net45\Java2Dotnet.Spider.JLog.csproj">
+    <ProjectReference Include="..\..\Java2Dotnet.Spider.Ioc\net45\Java2Dotnet.Spider.Ioc.csproj">
+      <Project>{0047a89f-61e8-4369-a75c-81e7ab431add}</Project>
+      <Name>Java2Dotnet.Spider.Ioc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Java2Dotnet.Spider.Log\net45\Java2Dotnet.Spider.Log.csproj">
       <Project>{acda398b-a5f3-4cae-bdca-fb172736919c}</Project>
-      <Name>Java2Dotnet.Spider.JLog</Name>
+      <Name>Java2Dotnet.Spider.Log</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Java2Dotnet.Spider.Redial\net45\Java2Dotnet.Spider.Redial.csproj">
       <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>

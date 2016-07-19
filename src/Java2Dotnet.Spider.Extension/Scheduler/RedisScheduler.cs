@@ -7,6 +7,7 @@ using Java2Dotnet.Spider.Redial;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using StackExchange.Redis;
+using System;
 
 namespace Java2Dotnet.Spider.Extension.Scheduler
 {
@@ -20,9 +21,9 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		private string QueueKey = "queue-";
 		private string SetKey = "set-";
 		private string ItemKey = "item-";
-		private string ErrorCountKey = "error-count-";
-		private string ErrorRequestsKey = "error-requests-";
-		private string SuccessCountKey = "success-count-";
+		private string ErrorCountKey = "error-record";
+		private string SuccessCountKey = "success-record";
+		private string IdentityMd5;
 
 		public IDatabase Db;
 		public ConnectionMultiplexer Redis;
@@ -60,8 +61,9 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 			QueueKey = md5;
 			ErrorCountKey += md5;
 			SuccessCountKey += md5;
+			IdentityMd5 = md5;
 
-			RedialManagerUtils.Execute("rds-init", () =>
+			RedialManagerUtils.Execute("rds-in", () =>
 			{
 				Db.SortedSetAdd(TaskList, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
 			});
@@ -69,7 +71,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public override void ResetDuplicateCheck()
 		{
-			RedialManagerUtils.Execute("rds-reset", () =>
+			RedialManagerUtils.Execute("rds-rs", () =>
 			{
 				Db.KeyDelete(SetKey);
 			});
@@ -104,25 +106,77 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		//[MethodImpl(MethodImplOptions.Synchronized)]
 		public override Request Poll()
 		{
-			return RedialManagerUtils.Execute("rds-poll", () => DoPoll());
-		}
-
-		public int GetLeftRequestsCount()
-		{
-			return RedialManagerUtils.Execute("rds-getleftcount", () =>
+			return RedialManagerUtils.Execute("rds-pl", () =>
 			{
-				long size = Db.ListLength(QueueKey);
-				return (int)size;
+				return SafeExecutor.Execute(30, () =>
+				{
+					var value = Db.ListRightPop(QueueKey);
+					if (!value.HasValue)
+					{
+						return null;
+					}
+					string field = value.ToString();
+
+					string json = Db.HashGet(ItemKey, field);
+
+					if (!string.IsNullOrEmpty(json))
+					{
+						var result = JsonConvert.DeserializeObject<Request>(json);
+						Db.HashDelete(ItemKey, field);
+						return result;
+					}
+					return null;
+				});
 			});
 		}
 
-		public int GetTotalRequestsCount()
+		public long GetLeftRequestsCount()
 		{
-			return RedialManagerUtils.Execute("rds-gettotalcount", () =>
+			return RedialManagerUtils.Execute("rds-lc", () =>
 			{
-				long size = Db.SetLength(SetKey);
+				return Db.ListLength(QueueKey);
+			});
+		}
 
-				return (int)size;
+		public long GetTotalRequestsCount()
+		{
+			return RedialManagerUtils.Execute("rds-tc", () =>
+			{
+				return Db.SetLength(SetKey);
+			});
+		}
+
+		public long GetSuccessRequestsCount()
+		{
+			return RedialManagerUtils.Execute("rds-src", () =>
+			{
+				var result = Db.HashGet(SuccessCountKey, IdentityMd5);
+				return result.HasValue ? (long)result : 0;
+			});
+		}
+
+		public long GetErrorRequestsCount()
+		{
+			return RedialManagerUtils.Execute("rds-erc", () =>
+			{
+				var result = Db.HashGet(ErrorCountKey, IdentityMd5); ;
+				return result.HasValue ? (long)result : 0;
+			});
+		}
+
+		public void IncreaseSuccessCounter()
+		{
+			RedialManagerUtils.Execute("rds-isc", () =>
+			{
+				Db.HashIncrement(SuccessCountKey, IdentityMd5, 1);
+			});
+		}
+
+		public void IncreaseErrorCounter()
+		{
+			RedialManagerUtils.Execute("rds-iec", () =>
+			{
+				Db.HashIncrement(ErrorCountKey, IdentityMd5, 1);
 			});
 		}
 
@@ -130,29 +184,6 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			Db.KeyDelete(SuccessCountKey);
 			Db.KeyDelete(ErrorCountKey);
-		}
-
-		private Request DoPoll()
-		{
-			return SafeExecutor.Execute(30, () =>
-			{
-				var value = Db.ListRightPop(QueueKey);
-				if (!value.HasValue)
-				{
-					return null;
-				}
-				string field = value.ToString();
-
-				string json = Db.HashGet(ItemKey, field);
-
-				if (!string.IsNullOrEmpty(json))
-				{
-					var result = JsonConvert.DeserializeObject<Request>(json);
-					Db.HashDelete(ItemKey, field);
-					return result;
-				}
-				return null;
-			});
 		}
 
 		public override void Load(HashSet<Request> requests)
@@ -186,14 +217,15 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 			return requests;
 		}
 
-		public void Clear()
+		public override void Clear()
 		{
+			base.Clear();
+
 			Db.KeyDelete(QueueKey);
 			Db.KeyDelete(SetKey);
 			Db.KeyDelete(ItemKey);
 			Db.KeyDelete(SuccessCountKey);
 			Db.KeyDelete(ErrorCountKey);
-			Db.KeyDelete(ErrorRequestsKey);
 		}
 	}
 }

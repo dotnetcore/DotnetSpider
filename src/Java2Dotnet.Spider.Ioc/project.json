@@ -1,18 +1,14 @@
-{
+﻿{
 	"version": "0.0.9",
 	"buildOptions": {
 		"emitEntryPoint": false,
 		"debugType": "portable"
 	},
 	"dependencies": {
-		"Microsoft.NETCore.App": {
-			"type": "platform",
-			"version": "1.0.0-rc2-3002702"
-		},
-		"System.Net.NameResolution": "*",
-		"System.Net.Http": "4.0.1-rc2-24027",
-		"System.Threading.Thread": "*",
-		"System.Text.Encoding.CodePages":  "*"
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0-rc2-3002702"
+    },
 	},
 	"frameworks": {
 		"netcoreapp1.0": {

@@ -7,8 +7,16 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	/// </summary>
 	public interface IMonitorableScheduler : IScheduler
 	{
-		int GetLeftRequestsCount();
+		long GetLeftRequestsCount();
 
-		int GetTotalRequestsCount();
+		long GetTotalRequestsCount();
+
+		long GetSuccessRequestsCount();
+
+		long GetErrorRequestsCount();
+
+		void IncreaseSuccessCounter();
+
+		void IncreaseErrorCounter();
 	}
 }

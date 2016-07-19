@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using Java2Dotnet.Spider.Core;
 using Newtonsoft.Json.Linq;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Utils;
 using Java2Dotnet.Spider.Common;

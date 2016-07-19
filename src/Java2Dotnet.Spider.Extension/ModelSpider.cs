@@ -15,13 +15,14 @@ using Java2Dotnet.Spider.Redial;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
-using Java2Dotnet.Spider.JLog;
+using Java2Dotnet.Spider.Log;
 using System.Linq;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Core.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
+using Java2Dotnet.Spider.Core.Monitor;
 #if NET_45
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -33,7 +34,7 @@ namespace Java2Dotnet.Spider.Extension
 	{
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
-		protected readonly ILog Logger;
+		protected readonly ILogService Logger;
 		protected ConnectionMultiplexer Redis;
 		protected IDatabase Db;
 		protected Core.Spider spider;
@@ -55,7 +56,7 @@ namespace Java2Dotnet.Spider.Extension
 
 			Name = $"{SpiderContext.UserId}-{SpiderContext.SpiderName}";
 
-			Logger = LogUtils.GetLogger(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup);
+			Logger = new Logger(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup);
 
 			InitEnvoriment();
 		}
@@ -64,9 +65,17 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			if (SpiderContext.Redialer != null)
 			{
-				RedialManagerUtils.RedialManager = new RedisRedialManager(Logger);
-				RedialManagerUtils.RedialManager.NetworkValidater = SpiderContext.Redialer.NetworkValidater?.GetNetworkValidater();
-				RedialManagerUtils.RedialManager.Redialer = SpiderContext.Redialer.GetRedialer();
+				if (Db != null)
+				{
+					RedialManagerUtils.RedialManager = new RedisRedialManager(Db, SpiderContext.Redialer.NetworkValidater.GetNetworkValidater(), SpiderContext.Redialer.GetRedialer(), Logger);
+				}
+				else
+				{
+					RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
+					RedialManagerUtils.RedialManager.Logger = Logger;
+					RedialManagerUtils.RedialManager.NetworkValidater = SpiderContext.Redialer.NetworkValidater.GetNetworkValidater();
+					RedialManagerUtils.RedialManager.Redialer = SpiderContext.Redialer.GetRedialer();
+				}
 			}
 
 			if (SpiderContext.Downloader == null)
@@ -78,16 +87,19 @@ namespace Java2Dotnet.Spider.Extension
 			{
 				SpiderContext.Site = new Site();
 			}
-			Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+			if (!string.IsNullOrEmpty(ConfigurationManager.Get("redisHost")) && string.IsNullOrWhiteSpace(ConfigurationManager.Get("redisHost")))
 			{
-				ServiceName = "DotnetSpider",
-				Password = ConfigurationManager.Get("redisPassword"),
-				ConnectTimeout = 5000,
-				KeepAlive = 8,
-				EndPoints =
+				Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+				{
+					ServiceName = "DotnetSpider",
+					Password = ConfigurationManager.Get("redisPassword"),
+					ConnectTimeout = 5000,
+					KeepAlive = 8,
+					EndPoints =
 				{ ConfigurationManager.Get("redisHost"), "6379" }
-			});
-			Db = Redis.GetDatabase(1);
+				});
+				Db = Redis.GetDatabase(1);
+			}
 		}
 
 		public virtual void Run(params string[] args)
@@ -105,12 +117,12 @@ namespace Java2Dotnet.Spider.Extension
 
 				spider.Start();
 
-				while (spider.StatusCode == Status.Stopped || spider.StatusCode == Status.Running || spider.StatusCode == Status.Init)
+				while (spider.StatusCode == Status.Running || spider.StatusCode == Status.Init)
 				{
 					Thread.Sleep(1000);
 				}
 
-				spider?.Dispose();
+				spider.Dispose();
 
 				AfterSpiderFinished?.Invoke();
 
@@ -118,14 +130,13 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			finally
 			{
-				Log.WaitForExit();
+				SpiderMonitor.Default.Dispose();
 			}
 		}
 
 		private void RegisterControl(Core.Spider spider)
 		{
-			var redisScheduler = spider.Scheduler as Scheduler.RedisScheduler;
-			if (redisScheduler != null)
+			if (Redis != null)
 			{
 				try
 				{
@@ -178,18 +189,17 @@ namespace Java2Dotnet.Spider.Extension
 						validation.CheckArguments();
 					}
 				}
-
+				bool needInitStartRequest = true;
 				if (Redis != null)
 				{
 					while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 					{
 						Thread.Sleep(1000);
 					}
+
+					var lockerValue = Db.HashGet(ValidateStatusName, Name);
+					needInitStartRequest = lockerValue != "validate finished";
 				}
-
-				var lockerValue = Db.HashGet(ValidateStatusName, Name);
-				bool needInitStartRequest = lockerValue != "validate finished";
-
 				if (needInitStartRequest)
 				{
 					Logger.Info("开始数据验证 ...");
@@ -214,7 +224,7 @@ namespace Java2Dotnet.Spider.Extension
 					Logger.Info("有其他线程执行了数据验证.");
 				}
 
-				if (needInitStartRequest)
+				if (needInitStartRequest && Redis != null)
 				{
 					Db.HashSet(ValidateStatusName, Name, "validate finished");
 				}
@@ -225,121 +235,44 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			finally
 			{
-				Db.LockRelease(key, 0);
+				if (Redis != null)
+				{
+					Db.LockRelease(key, 0);
+				}
 			}
 		}
 
 		private Core.Spider PrepareSpider(params string[] args)
 		{
 			Logger.Info("创建爬虫...");
-
-			var schedulerType = SpiderContext.Scheduler.Type;
-			bool isTestSpider = args != null && args.Contains("test");
-
-			switch (schedulerType)
+			bool needInitStartRequest = true;
+			string key = "locker-" + Name;
+			if (Db != null)
 			{
-				case Configuration.Scheduler.Types.Queue:
-					{
-						PrepareSite();
-						var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler());
-						if (isTestSpider && spider.Site.StartRequests.Count > 0)
-						{
-							spider.Site.StartRequests = new List<Request> { spider.Site.StartRequests[0] };
-						}
-						spider.InitComponent();
-						return spider;
-					}
-				case Configuration.Scheduler.Types.Redis:
-					{
-						var scheduler = (Scheduler.RedisScheduler)(SpiderContext.Scheduler.GetScheduler());
-
-						string key = "locker-" + Name;
-
-						try
-						{
-							if (Db != null)
-							{
-								while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
-								{
-									Thread.Sleep(1000);
-								}
-							}
-
-							var lockerValue = Db.HashGet(InitStatusSetName, Name);
-							bool needInitStartRequest = lockerValue != "init finished";
-
-							if (needInitStartRequest)
-							{
-								PrepareSite();
-							}
-							else
-							{
-								Logger.Info("Site 已经初始化");
-								SpiderContext.Site.ClearStartRequests();
-							}
-
-							var spider = GenerateSpider(scheduler);
-
-							if (args != null && args.Length > 0)
-							{
-								if (args.Contains("rerun"))
-								{
-									if (Db != null)
-									{
-										Db.KeyDelete(key);
-										Db.HashDelete("init-status", Name);
-										Db.HashDelete("validate-status", Name);
-										Db.HashDelete(Scheduler.RedisScheduler.TaskStatus, Name);
-										Db.SortedSetRemove(Scheduler.RedisScheduler.TaskList, Name);
-									}
-									scheduler.Clear();
-								}
-								if (args.Contains("noconsole"))
-								{
-									Log.WriteLine("No console log info.");
-									Log.NoConsole = true;
-								}
-							}
-
-							spider.SaveStatus = true;
-							SpiderMonitor.Default.Register(spider);
-
-							Logger.Info("构建内部模块...");
-
-							if (isTestSpider && spider.Site.StartRequests.Count > 0)
-							{
-								spider.Site.StartRequests = new List<Request> { spider.Site.StartRequests[0] };
-							}
-
-							spider.InitComponent();
-
-							if (needInitStartRequest)
-							{
-								Db.HashSet(InitStatusSetName, Name, "init finished");
-							}
-
-							return spider;
-						}
-						catch (Exception e)
-						{
-							Logger.Error(e.Message, e);
-							return null;
-						}
-						finally
-						{
-							try
-							{
-								Db.LockRelease(key, 0);
-							}
-							catch
-							{
-								// ignored
-							}
-						}
-					}
+				while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+				{
+					Thread.Sleep(1000);
+				}
+				var lockerValue = Db.HashGet(InitStatusSetName, Name);
+				needInitStartRequest = lockerValue != "init finished";
 			}
 
-			throw new SpiderExceptoin("初始化失败.");
+			if (needInitStartRequest)
+			{
+				PrepareSite();
+			}
+
+			var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler());
+			Logger.Info("构建内部模块...");
+			SpiderMonitor.Default.Register(spider);
+			spider.InitComponent();
+
+			if (Db != null)
+			{
+				Db.LockRelease(key, 0);
+			}
+
+			return spider;
 		}
 
 		private void PrepareSite()

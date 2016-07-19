@@ -11,7 +11,7 @@
     "System.Threading.Thread": "*",
     "System.Net.NameResolution": "*",
     "System.Runtime.InteropServices.RuntimeInformation": "*",
-    "Java2Dotnet.Spider.JLog": "0.0.9",
+    "Java2Dotnet.Spider.Log": "0.0.9",
     "Java2Dotnet.Spider.Common": "0.0.9",
     "System.Diagnostics.Process": "*",
     "System.Net.Http": "4.0.1-rc2-24027",
