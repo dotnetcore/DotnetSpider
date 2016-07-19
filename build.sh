@@ -5,7 +5,8 @@ dotnet pack src/HtmlAgilityPack.Css/project.json -o spider_nuget_packages
 dotnet pack src/MySql.Data/project.json -o spider_nuget_packages
 dotnet pack src/Newtonsoft.Json/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Common/project.json -o spider_nuget_packages
-dotnet pack src/Java2Dotnet.Spider.JLog/project.json -o spider_nuget_packages
+dotnet pack src/Java2Dotnet.Spider.Ioc/project.json -o spider_nuget_packages
+dotnet pack src/Java2Dotnet.Spider.Log/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Redial/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Validation/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Core/project.json -o spider_nuget_packages
@@ -32,9 +33,12 @@ rmdir /Newtonsoft.Json
 mdelete /Java2Dotnet.Spider.Common/0.0.9/*
 rmdir /Java2Dotnet.Spider.Common/0.0.9
 rmdir /Java2Dotnet.Spider.Common
-mdelete /Java2Dotnet.Spider.JLog/0.0.9/*
-rmdir /Java2Dotnet.Spider.JLog/0.0.9
-rmdir /Java2Dotnet.Spider.JLog
+mdelete /Java2Dotnet.Spider.Ioc/0.0.9/*
+rmdir /Java2Dotnet.Spider.Ioc/0.0.9
+rmdir /Java2Dotnet.Spider.Ioc
+mdelete /Java2Dotnet.Spider.Log/0.0.9/*
+rmdir /Java2Dotnet.Spider.Log/0.0.9
+rmdir /Java2Dotnet.Spider.Log
 mdelete /Java2Dotnet.Spider.Redial/0.0.9/*
 rmdir /Java2Dotnet.Spider.Redial/0.0.9
 rmdir /Java2Dotnet.Spider.Redial
