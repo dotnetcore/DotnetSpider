@@ -1,12 +1,15 @@
 # DotnetSpider
-This is a cross platfrom spider develop by C#.
+=================
 
-# Design
-Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
+This is a cross platfrom, ligth spider develop by C#.
 
-# Base use
+### DESIGN
+ 
+![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
 
-		public static void Main()
+### BASE USAGE
+
+    	public static void Main()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
 
@@ -63,14 +66,7 @@ Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
 			public string Click { get; set; }
 		}
 	
-#Object Auto Extractor
-
-###1. Add config file: app.conf to your project
-    
-	redisServer: your redis server
-	redisPassword:your redis password
-
-###2. Add spider contentx class
+###Addtional Usage
 
 	public class JdSkuSpider : ISpiderContext
 	{
@@ -88,16 +84,16 @@ Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
 				},
 				Scheduler = new RedisScheduler()
 				{
-					Host = "redis",
-					Port = 6379,
-					Password = ""
+					Host = "{Your host}",
+					Port = {Your port},
+					Password = "{Your password}"
 				},
 				StartUrls=new Dictionary<string, Dictionary<string, object>> {
 					{ "http://list.jd.com/list.html?cat=9987,653,655&page=1&go=0&JL=6_0_0&ms=5", new Dictionary<string, object> { { "name","手机" }, { "cat3","9987" } } },
 				},
 				Pipeline = new MysqlPipeline()
 				{
-					ConnectString = ""
+					ConnectString = "{Your mysql connect string}"
 				},
 				Downloader = new HttpDownloader()
 			};
@@ -162,4 +158,6 @@ Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
 			public DateTime CDate => DateTime.Now;
 		}
 	}
-
+    
+    JdSkuSpider spider = new JdSkuSpider();
+    spider.Run();
