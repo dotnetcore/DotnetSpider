@@ -286,9 +286,9 @@ namespace Java2Dotnet.Spider.Extension
 			}
 
 #if !NET_CORE
-			if (SpiderContext.GetCookie != null)
+			if (SpiderContext.CookieThief != null)
 			{
-				string cookie = SpiderContext.GetCookie.GetCookie();
+				string cookie = SpiderContext.CookieThief.GetCookie();
 				if (cookie != "Exception!!!")
 				{
 					SpiderContext.Site.Cookie = cookie;
