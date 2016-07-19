@@ -68,52 +68,103 @@ This is a cross platfrom, ligth spider develop by C#.
 	
 ###Addtional Usage
 
-	public class JdSkuSpider : ISpiderContext
-	{
-		public SpiderContextBuilder GetBuilder()
+# DotnetSpider
+=================
+
+This is a cross platfrom, ligth spider develop by C#.
+
+### DESIGN
+ 
+![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
+
+### BASE USAGE
+
+    	public static void Main()
 		{
-			Log.TaskId = "JD SKU Weekly";
-			SpiderContext context = new SpiderContext
+			HttpClientDownloader downloader = new HttpClientDownloader();
+
+			Core.Spider spider = Core.Spider.Create(new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
+			var site = new Site() { EncodingName = "UTF-8" };
+			for (int i = 1; i < 5; ++i)
 			{
-				SpiderName = "JD SKU " + DateTimeUtils.MONDAY_RUN_ID,
-				CachedSize = 1,
-				ThreadNum = 8,
-				Site = new Site
-				{
-					EncodingName = "UTF-8"
-				},
-				Scheduler = new RedisScheduler()
-				{
-					Host = "{Your host}",
-					Port = {Your port},
-					Password = "{Your password}"
-				},
-				StartUrls=new Dictionary<string, Dictionary<string, object>> {
-					{ "http://list.jd.com/list.html?cat=9987,653,655&page=1&go=0&JL=6_0_0&ms=5", new Dictionary<string, object> { { "name","手机" }, { "cat3","9987" } } },
-				},
-				Pipeline = new MysqlPipeline()
-				{
-					ConnectString = "{Your mysql connect string}"
-				},
-				Downloader = new HttpDownloader()
-			};
-			return new SpiderContextBuilder(context, typeof(Product));
+				site.AddStartUrl("http://www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_1.html");
+			}
+			spider.Site = site;
+			spider.Start();
 		}
 
-		[Schema("jd", "sku_v2", Suffix = TableSuffix.Monday)]
-		[TargetUrl(new[] { @"page=[0-9]+" }, "//*[@id=\"J_bottomPage\"]")]
-		[TypeExtractBy(Expression = "//div[contains(@class,'j-sku-item')]", Multi = true)]
-		[Indexes(Primary = "sku")]
-		public class Product : ISpiderEntity
+		private class MyPipeline : IPipeline
 		{
-			private static readonly DateTime runId;
-
-			static Product()
+			public void Process(ResultItems resultItems, ISpider spider)
 			{
-				DateTime dt = DateTime.Now;
-				runId = new DateTime(dt.Year, dt.Month, 1);
+				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
+				{
+					Console.WriteLine($"{entry.Name}:{entry.Click}");
+				}
+
+				//May be you want to save to database
+				// 
 			}
 
+			public void Dispose()
+			{
+			}
+		}
+
+		private class MyPageProcessor : IPageProcessor
+		{
+			public void Process(Page page)
+			{
+				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='yk-col3']")).Nodes();
+				List<YoukuVideo> results = new List<YoukuVideo>();
+				foreach (var videoElement in totalVideoElements)
+				{
+					var video = new YoukuVideo();
+					video.Name = videoElement.Select(Selectors.XPath("/div[4]/div[1]/a")).Value;
+					video.Click = int.Parse(videoElement.Select(Selectors.Css("p-num")).Value.ToString());
+					results.Add(video);
+				}
+				page.AddResultItem("VideoResult", results);
+			}
+
+			public Site Site => new Site { SleepTime = 0 };
+		}
+
+		public class YoukuVideo
+		{
+			public string Name { get; set; }
+			public string Click { get; set; }
+		}
+	
+###Addtional Usage
+
+        public class JdSkuSpider : SpiderBuilder
+	{
+		protected override SpiderContext GetSpiderContext()
+		{
+			SpiderContext context = new SpiderContext();
+			context.SetThreadNum(8);
+			context.SetSpiderName("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
+			{
+				Region = new Extension.Configuration.Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
+				Patterns = new List<string> { @"&page=[0-9]+&" }
+			});
+			context.AddPipeline(new MysqlPipeline
+			{
+				ConnectString = "Database='test';Data Source=86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
+			});
+			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			context.AddEntityType(typeof(Product));
+			
+			return context;
+		}
+
+		[Schema("test", "sku", TableSuffix.Today)]
+		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
+		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
+		public class Product : ISpiderEntity
+		{
 			[StoredAs("category", DataType.String, 20)]
 			[PropertyExtractBy(Expression = "name", Type = ExtractType.Enviroment)]
 			public string CategoryName { get; set; }
@@ -130,20 +181,17 @@ This is a cross platfrom, ligth spider develop by C#.
 			[PropertyExtractBy(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 
-			[StoredAs("commentscount", DataType.String, 20)]
-			[PropertyExtractBy(Expression = "./div[@class='p-commit']/strong/a")]
+			[StoredAs("commentscount", DataType.String, 32)]
+			[PropertyExtractBy(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
 			[StoredAs("shopname", DataType.String, 100)]
-			[PropertyExtractBy(Expression = "./div[@class='p-shop hide']/span[1]/a[1]")]
+			[PropertyExtractBy(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
 			[StoredAs("name", DataType.String, 50)]
-			[PropertyExtractBy(Expression = "./div[@class='p-name']/a/em")]
+			[PropertyExtractBy(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
-
-			[StoredAs("shopid", DataType.String, 25)]
-			public string ShopId { get; set; }
 
 			[StoredAs("venderid", DataType.String, 25)]
 			[PropertyExtractBy(Expression = "./@venderid")]
@@ -153,9 +201,13 @@ This is a cross platfrom, ligth spider develop by C#.
 			[PropertyExtractBy(Expression = "./@jdzy_shop_id")]
 			public string JdzyShopId { get; set; }
 
+			[StoredAs("run_id", DataType.Date)]
+			[PropertyExtractBy(Expression = "Monday", Type = ExtractType.Enviroment)]
+			public DateTime RunId { get; set; }
+
+			[PropertyExtractBy(Expression = "Now", Type = ExtractType.Enviroment)]
 			[StoredAs("cdate", DataType.Time)]
-			[PropertyExtractBy(Expression = "now", Type = ExtractType.Enviroment)]
-			public DateTime CDate => DateTime.Now;
+			public DateTime CDate { get; set; }
 		}
 	}
     
