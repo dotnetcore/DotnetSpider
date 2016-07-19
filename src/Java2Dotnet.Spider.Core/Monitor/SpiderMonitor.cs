@@ -12,9 +12,7 @@ using System.Text;
 using System.Linq;
 using Java2Dotnet.Spider.Ioc;
 using Java2Dotnet.Spider.Core.Monitor;
-#if !NET_CORE
-using MongoDB.Driver;
-#endif
+
 
 namespace Java2Dotnet.Spider.Core.Monitor
 {

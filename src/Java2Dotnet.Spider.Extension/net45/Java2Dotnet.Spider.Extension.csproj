@@ -282,11 +282,8 @@
     <Compile Include="..\Model\TargetUrlExtractInfo.cs">
       <Link>Model\TargetUrlExtractInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Monitor\ISpiderStatus.cs">
-      <Link>Monitor\ISpiderStatus.cs</Link>
-    </Compile>
-    <Compile Include="..\Monitor\SpiderMonitor.cs">
-      <Link>Monitor\SpiderMonitor.cs</Link>
+    <Compile Include="..\Monitor\HttpMonitor.cs">
+      <Link>Monitor\HttpMonitor.cs</Link>
     </Compile>
     <Compile Include="..\ORM\Dapper\SqlMapperExtention.cs">
       <Link>ORM\Dapper\SqlMapperExtention.cs</Link>

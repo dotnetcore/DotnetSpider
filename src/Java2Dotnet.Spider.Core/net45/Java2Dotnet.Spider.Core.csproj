@@ -99,11 +99,20 @@
     <Compile Include="..\LogInfo.cs">
       <Link>LogInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Monitor\ConsoleMonitor.cs">
+      <Link>Monitor\ConsoleMonitor.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitor\IMonitorService.cs">
+      <Link>Monitor\IMonitorService.cs</Link>
+    </Compile>
     <Compile Include="..\Monitor\SpiderClosingEvent.cs">
       <Link>Monitor\SpiderClosingEvent.cs</Link>
     </Compile>
     <Compile Include="..\Monitor\SpiderEvent.cs">
       <Link>Monitor\SpiderEvent.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitor\SpiderMonitor.cs">
+      <Link>Monitor\SpiderMonitor.cs</Link>
     </Compile>
     <Compile Include="..\Page.cs">
       <Link>Page.cs</Link>

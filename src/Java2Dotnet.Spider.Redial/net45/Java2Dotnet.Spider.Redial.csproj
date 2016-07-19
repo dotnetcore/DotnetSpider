@@ -67,9 +67,6 @@
     <Compile Include="..\AtomicExecutor\RedisAtomicExecutor.cs">
       <Link>AtomicExecutor\RedisAtomicExecutor.cs</Link>
     </Compile>
-    <Compile Include="..\AtomicExecutor\ZookeeperAtomicExecutor.cs">
-      <Link>AtomicExecutor\ZookeeperAtomicExecutor.cs</Link>
-    </Compile>
     <Compile Include="..\NetworkValidater\BaseNetworkValidater.cs">
       <Link>NetworkValidater\BaseNetworkValidater.cs</Link>
     </Compile>
@@ -106,9 +103,6 @@
     <Compile Include="..\RedialManagerUtils.cs">
       <Link>RedialManagerUtils.cs</Link>
     </Compile>
-    <Compile Include="..\RedialManager\AtomicType.cs">
-      <Link>RedialManager\AtomicType.cs</Link>
-    </Compile>
     <Compile Include="..\RedialManager\BaseRedialManager.cs">
       <Link>RedialManager\BaseRedialManager.cs</Link>
     </Compile>
@@ -120,9 +114,6 @@
     </Compile>
     <Compile Include="..\RedialManager\RedisRedialManager.cs">
       <Link>RedialManager\RedisRedialManager.cs</Link>
-    </Compile>
-    <Compile Include="..\RedialManager\ZookeeperRedialManager.cs">
-      <Link>RedialManager\ZookeeperRedialManager.cs</Link>
     </Compile>
     <Compile Include="..\RedialResult.cs">
       <Link>RedialResult.cs</Link>

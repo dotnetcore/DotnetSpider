@@ -51,12 +51,12 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 				{
 					Error = spider.Scheduler.GetErrorRequestsCount(),
 					Left = spider.Scheduler.GetLeftRequestsCount(),
-					Status = spider.Stas,
+					Status = spider.StatusCode,
 					Success = spider.Scheduler.GetSuccessRequestsCount(),
 					Thread = spider.ThreadNum,
 					Total = spider.Scheduler.GetTotalRequestsCount()
 				},
-				Name = spider.Name,
+				Name = spider.Identity,
 				Machine = SystemInfo.HostName,
 				UserId = spider.UserId,
 				TaskGroup = spider.TaskGroup,

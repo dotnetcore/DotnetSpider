@@ -6,7 +6,6 @@ using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Extension.Configuration;
 using Java2Dotnet.Spider.Extension.Model;
-using Java2Dotnet.Spider.Extension.Monitor;
 using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Pipeline;
 using Java2Dotnet.Spider.Extension.Processor;
