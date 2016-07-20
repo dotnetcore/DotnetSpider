@@ -144,6 +144,13 @@ This is a cross platfrom, ligth spider develop by C#.
     JdSkuSpider spider = new JdSkuSpider();
     spider.Run();
 
+### NOTICE
+
+1. when you use redis scheduler, please update your redis config: 
+	timeout 30 
+	tcp-keepalive 60
+
+
 ### UPDATES
 
 1.0.0.0-PRE
