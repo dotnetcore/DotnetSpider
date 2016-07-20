@@ -93,7 +93,10 @@ namespace Java2Dotnet.Spider.Extension
 					ServiceName = "DotnetSpider",
 					Password = ConfigurationManager.Get("redisPassword"),
 					ConnectTimeout = 65530,
-					KeepAlive = 20,
+					KeepAlive = 8,
+					ConnectRetry = 20,
+					SyncTimeout = 65530,
+					ResponseTimeout = 65530,
 					EndPoints =
 				{ ConfigurationManager.Get("redisHost"), "6379" }
 				});
@@ -255,13 +258,18 @@ namespace Java2Dotnet.Spider.Extension
 				var lockerValue = Db.HashGet(InitStatusSetName, Name);
 				needInitStartRequest = lockerValue != "init finished";
 			}
+			var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler());
+
+			if (args.Contains("rerun"))
+			{
+				spider.Scheduler.Clear();
+				needInitStartRequest = true;
+			}
 
 			if (needInitStartRequest)
 			{
 				PrepareSite();
 			}
-
-			var spider = GenerateSpider(SpiderContext.Scheduler.GetScheduler());
 			Logger.Info("构建内部模块...");
 			SpiderMonitor.Default.Register(spider);
 			spider.InitComponent();

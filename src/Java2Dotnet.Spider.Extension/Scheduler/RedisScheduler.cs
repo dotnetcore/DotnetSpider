@@ -33,7 +33,10 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 			ServiceName = "DotnetSpider",
 			Password = password,
 			ConnectTimeout = 65530,
-			KeepAlive = 25,
+			KeepAlive = 8,
+			ConnectRetry = 20,
+			SyncTimeout = 65530,
+			ResponseTimeout = 65530,
 			EndPoints =
 				{ host, port.ToString() }
 		}))

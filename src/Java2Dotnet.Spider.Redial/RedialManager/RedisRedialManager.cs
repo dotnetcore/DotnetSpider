@@ -52,7 +52,10 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				ServiceName = "DotnetSpider",
 				Password = password,
 				ConnectTimeout = 65530,
-				KeepAlive = 20,
+				KeepAlive = 8,
+				ConnectRetry = 20,
+				SyncTimeout = 65530,
+				ResponseTimeout = 65530,
 				EndPoints =
 				{ host, "6379" }
 			});
@@ -65,7 +68,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		public RedisRedialManager(IDatabase db, INetworkValidater validater, IRedialer redialer, ILogService logger)
 		{
 			Logger = logger;
- 
+
 			Db = db;
 			AtomicExecutor = new RedisAtomicExecutor(this);
 			NetworkValidater = validater;
