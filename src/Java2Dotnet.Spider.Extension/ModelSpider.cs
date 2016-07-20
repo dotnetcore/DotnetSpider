@@ -92,8 +92,8 @@ namespace Java2Dotnet.Spider.Extension
 				{
 					ServiceName = "DotnetSpider",
 					Password = ConfigurationManager.Get("redisPassword"),
-					ConnectTimeout = 5000,
-					KeepAlive = 8,
+					ConnectTimeout = 65530,
+					KeepAlive = 20,
 					EndPoints =
 				{ ConfigurationManager.Get("redisHost"), "6379" }
 				});
