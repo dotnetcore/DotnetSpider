@@ -5,10 +5,10 @@
 		"debugType": "portable"
 	},
 	"dependencies": {
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.0-rc2-3002702"
-    },
+		"Microsoft.NETCore.App": {
+			"type": "platform",
+			"version": "1.0.0-rc2-3002702"
+		}
 	},
 	"frameworks": {
 		"netcoreapp1.0": {

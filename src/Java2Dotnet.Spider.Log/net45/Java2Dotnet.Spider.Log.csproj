@@ -7,8 +7,8 @@
     <ProjectGuid>{ACDA398B-A5F3-4CAE-BDCA-FB172736919C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Java2Dotnet.Spider.JLog</RootNamespace>
-    <AssemblyName>Java2Dotnet.Spider.JLog</AssemblyName>
+    <RootNamespace>Java2Dotnet.Spider.Log</RootNamespace>
+    <AssemblyName>Java2Dotnet.Spider.Log</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
