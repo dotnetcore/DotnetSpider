@@ -51,8 +51,8 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			{
 				ServiceName = "DotnetSpider",
 				Password = password,
-				ConnectTimeout = 5000,
-				KeepAlive = 8,
+				ConnectTimeout = 65530,
+				KeepAlive = 20,
 				EndPoints =
 				{ host, "6379" }
 			});
