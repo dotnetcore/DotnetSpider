@@ -15,7 +15,7 @@
     "Java2Dotnet.Spider.Common": "0.0.9",
     "System.Diagnostics.Process": "*",
     "System.Net.Http": "4.0.1-rc2-24027",
-    "StackExchange.Redis": "1.1.604-alpha"
+    "StackExchange.Redis": "0.0.9"
   },
 	"frameworks": {
 		"netcoreapp1.0": {

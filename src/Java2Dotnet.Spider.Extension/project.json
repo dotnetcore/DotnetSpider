@@ -25,7 +25,7 @@
     "System.Xml.XDocument": "*",
     "System.Data.SqlClient": "*",
     "System.Runtime.Extensions": "*",
-    "StackExchange.Redis": "1.1.604-alpha"
+    "StackExchange.Redis": "0.0.9"
   },
   "frameworks": {
     "netcoreapp1.0": {

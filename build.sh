@@ -30,6 +30,9 @@ rmdir /MySql.Data
 mdelete /Newtonsoft.Json/0.0.9/*
 rmdir /Newtonsoft.Json/0.0.9
 rmdir /Newtonsoft.Json
+mdelete /StackExchange.Redis/0.0.9/*
+rmdir /StackExchange.Redis/0.0.9
+rmdir /StackExchange.Redis
 mdelete /Java2Dotnet.Spider.Common/0.0.9/*
 rmdir /Java2Dotnet.Spider.Common/0.0.9
 rmdir /Java2Dotnet.Spider.Common
