@@ -1,12 +1,15 @@
 # DotnetSpider
-This is a cross platfrom spider develop by C#.
+=================
 
-# Design
-Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
+This is a cross platfrom, ligth spider develop by C#.
 
-# Base use
+### DESIGN
+ 
+![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
 
-		public static void Main()
+### BASE USAGE
+
+    	public static void Main()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
 
@@ -63,61 +66,35 @@ Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
 			public string Click { get; set; }
 		}
 	
-#Object Auto Extractor
+### ADDITIONAL USAGE
 
-###1. Add config file: app.conf to your project
-    
-	redisServer: your redis server
-	redisPassword:your redis password
-
-###2. Add spider contentx class
-
-	public class JdSkuSpider : ISpiderContext
+        public class JdSkuSpider : SpiderBuilder
 	{
-		public SpiderContextBuilder GetBuilder()
+		protected override SpiderContext GetSpiderContext()
 		{
-			Log.TaskId = "JD SKU Weekly";
-			SpiderContext context = new SpiderContext
+			SpiderContext context = new SpiderContext();
+			context.SetThreadNum(8);
+			context.SetSpiderName("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
 			{
-				SpiderName = "JD SKU " + DateTimeUtils.MONDAY_RUN_ID,
-				CachedSize = 1,
-				ThreadNum = 8,
-				Site = new Site
-				{
-					EncodingName = "UTF-8"
-				},
-				Scheduler = new RedisScheduler()
-				{
-					Host = "redis",
-					Port = 6379,
-					Password = ""
-				},
-				StartUrls=new Dictionary<string, Dictionary<string, object>> {
-					{ "http://list.jd.com/list.html?cat=9987,653,655&page=1&go=0&JL=6_0_0&ms=5", new Dictionary<string, object> { { "name","手机" }, { "cat3","9987" } } },
-				},
-				Pipeline = new MysqlPipeline()
-				{
-					ConnectString = ""
-				},
-				Downloader = new HttpDownloader()
-			};
-			return new SpiderContextBuilder(context, typeof(Product));
+				Region = new Extension.Configuration.Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
+				Patterns = new List<string> { @"&page=[0-9]+&" }
+			});
+			context.AddPipeline(new MysqlPipeline
+			{
+				ConnectString = "Database='test';Data Source=86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
+			});
+			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			context.AddEntityType(typeof(Product));
+			
+			return context;
 		}
 
-		[Schema("jd", "sku_v2", Suffix = TableSuffix.Monday)]
-		[TargetUrl(new[] { @"page=[0-9]+" }, "//*[@id=\"J_bottomPage\"]")]
-		[TypeExtractBy(Expression = "//div[contains(@class,'j-sku-item')]", Multi = true)]
-		[Indexes(Primary = "sku")]
+		[Schema("test", "sku", TableSuffix.Today)]
+		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
+		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
 		public class Product : ISpiderEntity
 		{
-			private static readonly DateTime runId;
-
-			static Product()
-			{
-				DateTime dt = DateTime.Now;
-				runId = new DateTime(dt.Year, dt.Month, 1);
-			}
-
 			[StoredAs("category", DataType.String, 20)]
 			[PropertyExtractBy(Expression = "name", Type = ExtractType.Enviroment)]
 			public string CategoryName { get; set; }
@@ -134,20 +111,17 @@ Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
 			[PropertyExtractBy(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 
-			[StoredAs("commentscount", DataType.String, 20)]
-			[PropertyExtractBy(Expression = "./div[@class='p-commit']/strong/a")]
+			[StoredAs("commentscount", DataType.String, 32)]
+			[PropertyExtractBy(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
 			[StoredAs("shopname", DataType.String, 100)]
-			[PropertyExtractBy(Expression = "./div[@class='p-shop hide']/span[1]/a[1]")]
+			[PropertyExtractBy(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
 			[StoredAs("name", DataType.String, 50)]
-			[PropertyExtractBy(Expression = "./div[@class='p-name']/a/em")]
+			[PropertyExtractBy(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
-
-			[StoredAs("shopid", DataType.String, 25)]
-			public string ShopId { get; set; }
 
 			[StoredAs("venderid", DataType.String, 25)]
 			[PropertyExtractBy(Expression = "./@venderid")]
@@ -157,9 +131,23 @@ Spider need 4 parts to work: Scheduler, Downloader, Processor, Pipeline.
 			[PropertyExtractBy(Expression = "./@jdzy_shop_id")]
 			public string JdzyShopId { get; set; }
 
+			[StoredAs("run_id", DataType.Date)]
+			[PropertyExtractBy(Expression = "Monday", Type = ExtractType.Enviroment)]
+			public DateTime RunId { get; set; }
+
+			[PropertyExtractBy(Expression = "Now", Type = ExtractType.Enviroment)]
 			[StoredAs("cdate", DataType.Time)]
-			[PropertyExtractBy(Expression = "now", Type = ExtractType.Enviroment)]
-			public DateTime CDate => DateTime.Now;
+			public DateTime CDate { get; set; }
 		}
 	}
+    
+    JdSkuSpider spider = new JdSkuSpider();
+    spider.Run();
 
+### UPDATES
+
+1.0.0.0-PRE
+
+### AREAS FOR IMPROVEMENTS
+
+QQ: 477731655
