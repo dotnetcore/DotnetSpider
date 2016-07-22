@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Java2Dotnet.Spider.Core;
 
@@ -15,7 +16,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			RemoveHtml,
 			CustomTarget,
 			Replace,
-			Case
+			Case,
+			Regex
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -240,6 +242,32 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			try
 			{
 				p.Content = p.Content?.Replace(OldValue, NewValue);
+			}
+			catch (Exception e)
+			{
+				throw new SpiderExceptoin("Rawtext Invalid.");
+			}
+		}
+	}
+
+	public class RegexPageHandler : PageHandler
+	{
+		public override Types Type { get; internal set; } = Types.Regex;
+
+		public string Pattern { get; set; }
+
+		public override void Customize(Page p)
+		{
+			try
+			{
+				string textValue = string.Empty;
+				MatchCollection collection = Regex.Matches(p.Content, Pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase);
+				
+				foreach (Match item in collection)
+				{
+					textValue += item.Value;
+				}
+				p.Content = textValue;
 			}
 			catch (Exception e)
 			{
