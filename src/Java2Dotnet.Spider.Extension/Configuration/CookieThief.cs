@@ -222,7 +222,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 				try
 				{
 					webDriver.Navigate().GoToUrl(Url);
-					Thread.Sleep(5000);
+					Thread.Sleep(10000);
 
 					if (LoginAreaSelector != null)
 					{
@@ -241,12 +241,12 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 					Thread.Sleep(1500);
 					var submit = FindElement(webDriver, SubmitSelector);
 					submit.Click();
-					Thread.Sleep(5000);
+					Thread.Sleep(10000);
 
 					if (!string.IsNullOrEmpty(AfterLoginUrl))
 					{
 						webDriver.Navigate().GoToUrl(AfterLoginUrl);
-						Thread.Sleep(5000);
+						Thread.Sleep(10000);
 					}
 
 					var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();

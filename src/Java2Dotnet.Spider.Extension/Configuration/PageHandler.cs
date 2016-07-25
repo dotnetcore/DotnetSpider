@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using System.Web;
 using HtmlAgilityPack;
 using Java2Dotnet.Spider.Core;
 
@@ -17,7 +18,8 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			CustomTarget,
 			Replace,
 			Case,
-			Regex
+			Regex,
+			Unicode
 		}
 
 		public abstract Types Type { get; internal set; }
@@ -218,7 +220,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 		}
 
-		private string AmendRawText(string rawText,ref int start)
+		private string AmendRawText(string rawText, ref int start)
 		{
 			int begin = rawText.IndexOf(StartString, start, StringComparison.Ordinal) + StartOffset;
 			int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal) + EndOffset;
@@ -250,6 +252,23 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 	}
 
+	public class UnicodePageHandler : PageHandler
+	{
+		public override Types Type { get; internal set; } = Types.Unicode;
+
+		public override void Customize(Page p)
+		{
+			try
+			{
+				p.Content = Regex.Unescape(p.Content);
+			}
+			catch (Exception e)
+			{
+				throw new SpiderExceptoin("Rawtext Invalid.");
+			}
+		}
+	}
+
 	public class RegexPageHandler : PageHandler
 	{
 		public override Types Type { get; internal set; } = Types.Regex;
@@ -262,7 +281,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			{
 				string textValue = string.Empty;
 				MatchCollection collection = Regex.Matches(p.Content, Pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase);
-				
+
 				foreach (Match item in collection)
 				{
 					textValue += item.Value;
