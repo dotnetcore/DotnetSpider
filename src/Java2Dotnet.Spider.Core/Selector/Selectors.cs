@@ -11,75 +11,102 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		static Selectors()
 		{
-			_cache.Add("SmartContentSelector", new SmartContentSelector());
+			lock (_cache)
+			{
+				_cache.Add("SmartContentSelector", new SmartContentSelector());
+			}
 		}
 
 		public static ISelector Regex(string expr)
 		{
-			if (!_cache.ContainsKey(expr))
+			lock (_cache)
 			{
-				_cache.Add(expr, new RegexSelector(expr));
+				if (!_cache.ContainsKey(expr))
+				{
+					_cache.Add(expr, new RegexSelector(expr));
+				}
+				return _cache[expr];
 			}
-			return _cache[expr];
 		}
 
 		public static ISelector Css(string expr)
 		{
-			if (!_cache.ContainsKey(expr))
+			lock (_cache)
 			{
-				_cache.Add(expr, new CssHtmlSelector(expr));
+				if (!_cache.ContainsKey(expr))
+				{
+					_cache.Add(expr, new CssHtmlSelector(expr));
+				}
+				return _cache[expr];
 			}
-			return _cache[expr];
 		}
 
 		public static ISelector Css(string expr, string attrName)
 		{
-			if (!_cache.ContainsKey(expr + attrName))
+			lock (_cache)
 			{
-				_cache.Add(expr + attrName, new CssHtmlSelector(expr, attrName));
+				if (!_cache.ContainsKey(expr + attrName))
+				{
+					_cache.Add(expr + attrName, new CssHtmlSelector(expr, attrName));
+				}
+				return _cache[expr + attrName];
 			}
-			return _cache[expr + attrName];
 		}
 
 		public static ISelector Regex(string expr, int group)
 		{
-			if (!_cache.ContainsKey(expr))
+			lock (_cache)
 			{
-				_cache.Add(expr, new RegexSelector(expr, group));
+				if (!_cache.ContainsKey(expr))
+				{
+					_cache.Add(expr, new RegexSelector(expr, group));
+				}
+				return _cache[expr];
 			}
-			return _cache[expr];
 		}
 
 		public static ISelector SmartContent()
 		{
-			return _cache["SmartContentSelector"];
+			lock (_cache)
+			{
+				return _cache["SmartContentSelector"];
+			}
 		}
 
 		public static ISelector XPath(string expr)
 		{
-			if (!_cache.ContainsKey(expr))
+			lock (_cache)
 			{
-				_cache.Add(expr, new XPathSelector(expr));
+				if (!_cache.ContainsKey(expr))
+				{
+					_cache.Add(expr, new XPathSelector(expr));
+				}
+				return _cache[expr];
 			}
-			return _cache[expr];
 		}
 
 		public static ISelector Enviroment(string expr)
 		{
-			if (!_cache.ContainsKey(expr))
+			lock (_cache)
 			{
-				_cache.Add(expr, new EnviromentSelector(expr));
+				if (!_cache.ContainsKey(expr))
+				{
+					_cache.Add(expr, new EnviromentSelector(expr));
+				}
+				return _cache[expr];
 			}
-			return _cache[expr];
 		}
 
 		public static ISelector JsonPath(string expr)
 		{
-			if (!_cache.ContainsKey(expr))
+			lock (_cache)
 			{
-				_cache.Add(expr, new JsonPathSelector(expr));
+				if (!_cache.ContainsKey(expr))
+				{
+					_cache.Add(expr, new JsonPathSelector(expr));
+				}
+				return _cache[expr];
 			}
-			return _cache[expr];
 		}
 		//public static AndSelector And(params ISelector[] selectors)
 		//{

@@ -57,6 +57,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			ConfigDb,
 			DbList,
 			Cycle,
+			DateCycle,
 			LinkSpider
 		}
 
@@ -101,6 +102,42 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			for (int i = From; i <= To; i += Interval)
 			{
 				site.AddStartRequest(new Request(string.Format(FormateString, i), 1, data)
+				{
+					PostBody = PostBody,
+					Origin = Origin,
+					Method = Method,
+					Referer = Referer
+				});
+			}
+		}
+	}
+
+	public class DateCyclePrepareStartUrls : PrepareStartUrls
+	{
+		public override Types Type { get; internal set; } = Types.DateCycle;
+
+		public DateTime From { get; set; }
+		public DateTime To { get; set; }
+
+		public int IntervalDay { get; set; } = 1;
+		public string DateFormate { get; set; } = "yyyy-MM-dd";
+		public string FormateString { get; set; }
+
+		public override void Build(Site site, dynamic obj)
+		{
+			Dictionary<string, object> data = new Dictionary<string, object>();
+
+			if (Extras != null)
+			{
+				foreach (var extra in Extras)
+				{
+					data.Add(extra.Key, extra.Value);
+				}
+			}
+
+			for (DateTime i = From; i <= To; i = i.AddDays(IntervalDay))
+			{
+				site.AddStartRequest(new Request(string.Format(FormateString, i.ToString(DateFormate)), 1, data)
 				{
 					PostBody = PostBody,
 					Origin = Origin,
