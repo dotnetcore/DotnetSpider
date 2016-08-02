@@ -19,6 +19,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.Log", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Java2Dotnet.Spider.Ioc", "src\Java2Dotnet.Spider.Ioc\net45\Java2Dotnet.Spider.Ioc.csproj", "{0047A89F-61E8-4369-A75C-81E7AB431ADD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2825D0D3-8DB8-4450-AC2E-004FB4161997}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		build.sh = build.sh
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

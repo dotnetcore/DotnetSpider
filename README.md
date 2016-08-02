@@ -9,7 +9,7 @@ This is a cross platfrom, ligth spider develop by C#.
 
 ### BASE USAGE
 
-    	public static void Main()
+		public static void Main()
 		{
 			ServiceProvider.Add<ILogService>(new ConsoleLog());
 			ServiceProvider.Add<ILogService>(new FileLog());
@@ -73,8 +73,10 @@ This is a cross platfrom, ligth spider develop by C#.
 	
 ### ADDITIONAL USAGE
 
-        public class JdSkuSpider : SpiderBuilder
-        	{
+#### Configurable Entity Spider
+
+		public class JdSkuSpider : SpiderBuilder
+		{
 			protected override SpiderContext GetSpiderContext()
 			{
 				SpiderContext context = new SpiderContext();
@@ -145,17 +147,32 @@ This is a cross platfrom, ligth spider develop by C#.
 				public DateTime CDate { get; set; }
 			}
 		}
-    
-    		public static void Main()
-    		{
-    			ServiceProvider.Add<ILogService>(new ConsoleLog());
+
+		public static void Main()
+		{
+			ServiceProvider.Add<ILogService>(new ConsoleLog());
 			ServiceProvider.Add<ILogService>(new FileLog());
 			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
 			//ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
 		
 			JdSkuSpider spider = new JdSkuSpider();
-    			spider.Run();
-    		}
+			spider.Run();
+		}
+
+#### WebDriver Support
+
+	When you want to collect a page JS loaded, there is only one thing you need to do is set the downloader to WebDriverDownloader.
+		
+			context.SetDownloader(new WebDriverDownloader
+			{
+				Browser = Extension.Downloader.WebDriver.Browser.Chrome
+			});
+	See the complete sample https://github.com/zlzforever/DotnetSpider/blob/master/src/Java2Dotnet.Spider.Test/Example/JdSkuSample.WebDriver.cs
+
+	NOTE:
+	1. Make sure there is a  ChromeDriver.exe in bin forlder when you set Browser to Chrome. You can contain it to your project via NUGET manager: Chromium.ChromeDriver
+	2. Make sure you already add a *.webdriver Firefox profile when you set Browser to Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
+	3. Make sure there is a PhantomJS.exe in bin folder when you set Browser to PhantomJS. You can contain it to your project via NUGET manager: PhantomJS
 
 ### NOTICE
 
