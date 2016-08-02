@@ -234,6 +234,9 @@
     <Compile Include="..\Model\Formatter\BoolFormater.cs">
       <Link>Model\Formatter\BoolFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\CharacterCaseFormater.cs">
+      <Link>Model\Formatter\CharacterCaseFormater.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\ClassifyFormater.cs">
       <Link>Model\Formatter\ClassifyFormater.cs</Link>
     </Compile>
