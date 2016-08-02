@@ -21,6 +21,11 @@ using Java2Dotnet.Spider.Extension.Configuration.Json;
 using Java2Dotnet.Spider.Ioc;
 using Java2Dotnet.Spider.Core.Monitor;
 using Java2Dotnet.Spider.Extension.Monitor;
+using System.Net;
+using Java2Dotnet.Spider.Extension.ORM;
+using Java2Dotnet.Spider.Extension.Model.Attribute;
+using Java2Dotnet.Spider.Extension.Model;
+using static Java2Dotnet.Spider.Extension.Configuration.BaseDbPrepareStartUrls;
 
 namespace Java2Dotnet.Spider.Test
 {
