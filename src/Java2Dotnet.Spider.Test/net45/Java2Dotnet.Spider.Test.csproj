@@ -184,6 +184,7 @@
     <Compile Include="..\UrlUtils\UrlUtilsTest.cs">
       <Link>UrlUtils\UrlUtilsTest.cs</Link>
     </Compile>
+    <Compile Include="Example\JdSkuSample.WebDriver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -219,6 +220,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\..\packages\Chromium.ChromeDriver.2.22\content\chromedriver.exe">
+      <Link>chromedriver.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="app.conf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
