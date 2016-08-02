@@ -13,10 +13,11 @@ dotnet pack src/Java2Dotnet.Spider.Core/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Extension/project.json -o spider_nuget_packages
 ftp -n<<!
 open redis
-user nuget 1qazZAQ!
+user ftpuser 1qazZAQ!
 binary
 hash
 lcd ~/solutions/DotnetSpider/spider_nuget_packages
+cd /nuget
 prompt
 mdelete /HtmlAgilityPack/0.0.9/*
 rmdir /HtmlAgilityPack/0.0.9
