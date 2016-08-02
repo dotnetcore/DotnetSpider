@@ -27,7 +27,7 @@ namespace Java2Dotnet.Spider.Test.Example
 			});
 			context.AddPipeline(new MysqlPipeline
 			{
-				ConnectString = "Database='test';Data Source=192.168.199.211;User ID=root;Password=1qazZAQ!;Port=4306"
+				ConnectString = "Database='mysql';Data Source=192.168.199.211;User ID=root;Password=1qazZAQ!;Port=3306"
 			});
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));
