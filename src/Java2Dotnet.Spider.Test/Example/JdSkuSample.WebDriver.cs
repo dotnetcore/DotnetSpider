@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !NET_CORE
+
+using System;
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core;
@@ -89,3 +91,4 @@ namespace Java2Dotnet.Spider.Test.Example
 		}
 	}
 }
+#endif
