@@ -162,24 +162,24 @@ This is a cross platfrom, ligth spider develop by C#.
 #### WebDriver Support
 
 When you want to collect a page JS loaded, there is only one thing you need to do is set the downloader to WebDriverDownloader.	
-			
-			context.SetDownloader(new WebDriverDownloader
-			{
-				Browser = Extension.Downloader.WebDriver.Browser.Chrome
-			});
+
+    context.SetDownloader(new WebDriverDownloader
+	{
+		Browser = Extension.Downloader.WebDriver.Browser.Chrome
+	});
 
 See the complete sample https://github.com/zlzforever/DotnetSpider/blob/master/src/Java2Dotnet.Spider.Test/Example/JdSkuSample.WebDriver.cs
 
 NOTE:
 
-1. Make sure there is a  ChromeDriver.exe in bin forlder when you set Browser to Chrome. You can contain it to your project via NUGET manager: Chromium.ChromeDriver
-2. Make sure you already add a *.webdriver Firefox profile when you set Browser to Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
-3. Make sure there is a PhantomJS.exe in bin folder when you set Browser to PhantomJS. You can contain it to your project via NUGET manager: PhantomJS
+	1. Make sure there is a  ChromeDriver.exe in bin forlder when you set Browser to Chrome. You can contain it to your project via NUGET manager: Chromium.ChromeDriver
+	2. Make sure you already add a *.webdriver Firefox profile when you set Browser to Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
+	3. Make sure there is a PhantomJS.exe in bin folder when you set Browser to PhantomJS. You can contain it to your project via NUGET manager: PhantomJS
 
 ### NOTICE
 
-1. when you use redis scheduler, please update your redis config: 
-	timeout 30 
+#### when you use redis scheduler, please update your redis config: 
+	timeout 0 
 	tcp-keepalive 60
 
 
