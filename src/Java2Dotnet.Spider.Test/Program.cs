@@ -39,7 +39,7 @@ namespace Java2Dotnet.Spider.Test
 			ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
 
 			//var start = DateTime.Now;
-			JdSkuWebDriverSampleSpider spiderBuilder = new JdSkuWebDriverSampleSpider();
+			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			spiderBuilder.Run("rerun");
 			//var end = DateTime.Now;
 			//Console.WriteLine((end - start).TotalMilliseconds);
