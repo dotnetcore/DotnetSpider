@@ -196,6 +196,9 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 				RedisValue[] identities = new RedisValue[10000];
 				HashEntry[] items = new HashEntry[10000];
 				int i = 0;
+				int j = requests.Count % 10000;
+				int n = requests.Count / 10000;
+
 				foreach (var request in requests)
 				{
 					identities[i] = request.Identity;
@@ -203,13 +206,23 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 					++i;
 					if (i == 10000)
 					{
+						--n;
+
 						Db.SetAdd(SetKey, identities);
 						Db.ListRightPush(QueueKey, identities);
 						Db.HashSet(ItemKey, items);
 
 						i = 0;
-						identities = new RedisValue[10000];
-						items = new HashEntry[10000];
+						if (n != 0)
+						{
+							identities = new RedisValue[10000];
+							items = new HashEntry[10000];
+						}
+						else
+						{
+							identities = new RedisValue[j];
+							items = new HashEntry[j];
+						}
 					}
 				}
 
