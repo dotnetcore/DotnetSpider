@@ -11,6 +11,7 @@ dotnet pack src/Java2Dotnet.Spider.Redial/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Validation/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Core/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Extension/project.json -o spider_nuget_packages
+rm -rf ~/solutions/DotnetSpider/spider_nuget_packages
 ftp -n<<!
 open redis
 user ftpuser 1qazZAQ!
@@ -25,15 +26,9 @@ rmdir /HtmlAgilityPack
 mdelete /HtmlAgilityPack.Css/0.0.9/*
 rmdir /HtmlAgilityPack.Css/0.0.9
 rmdir /HtmlAgilityPack.Css
-mdelete /MySql.Data/0.0.9/*
-rmdir /MySql.Data/0.0.9
-rmdir /MySql.Data
 mdelete /Newtonsoft.Json/0.0.9/*
 rmdir /Newtonsoft.Json/0.0.9
 rmdir /Newtonsoft.Json
-mdelete /StackExchange.Redis/0.0.9/*
-rmdir /StackExchange.Redis/0.0.9
-rmdir /StackExchange.Redis
 mdelete /Java2Dotnet.Spider.Common/0.0.9/*
 rmdir /Java2Dotnet.Spider.Common/0.0.9
 rmdir /Java2Dotnet.Spider.Common

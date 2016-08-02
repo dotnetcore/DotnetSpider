@@ -14,7 +14,7 @@
     "Java2Dotnet.Spider.Log": "0.0.9",
     "HtmlAgilityPack": "0.0.9",
     "HtmlAgilityPack.Css": "0.0.9",
-    "MySql.Data": "0.0.9",
+    "SapientGuardian.MySql.Data": "6.9.812",
     "Java2Dotnet.Spider.Redial": "0.0.9",
     "Java2Dotnet.Spider.Validation": "0.0.9",
     "System.Data.Common": "*",
@@ -25,7 +25,7 @@
     "System.Xml.XDocument": "*",
     "System.Data.SqlClient": "*",
     "System.Runtime.Extensions": "*",
-    "StackExchange.Redis": "0.0.9"
+    "StackExchange.Redis": "1.1.604-alpha"
   },
   "frameworks": {
     "netcoreapp1.0": {
