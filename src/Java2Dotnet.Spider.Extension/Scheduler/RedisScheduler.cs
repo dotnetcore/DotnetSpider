@@ -193,19 +193,32 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			lock (this)
 			{
-				RedisValue[] identities = new RedisValue[requests.Count];
-				HashEntry[] items = new HashEntry[requests.Count];
+				RedisValue[] identities = new RedisValue[10000];
+				HashEntry[] items = new HashEntry[10000];
 				int i = 0;
 				foreach (var request in requests)
 				{
 					identities[i] = request.Identity;
 					items[i] = new HashEntry(request.Identity, JsonConvert.SerializeObject(request));
 					++i;
+					if (i == 10000)
+					{
+						Db.SetAdd(SetKey, identities);
+						Db.ListRightPush(QueueKey, identities);
+						Db.HashSet(ItemKey, items);
+
+						i = 0;
+						identities = new RedisValue[10000];
+						items = new HashEntry[10000];
+					}
 				}
 
-				Db.SetAdd(SetKey, identities);
-				Db.ListRightPush(QueueKey, identities);
-				Db.HashSet(ItemKey, items);
+				if (i > 0)
+				{
+					Db.SetAdd(SetKey, identities);
+					Db.ListRightPush(QueueKey, identities);
+					Db.HashSet(ItemKey, items);
+				}
 			}
 		}
 
