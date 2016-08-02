@@ -1,4 +1,5 @@
 #!/bin/sh
+rm -rf ~/solutions/DotnetSpider/spider_nuget_packages
 dotnet restore
 dotnet pack src/HtmlAgilityPack/project.json -o spider_nuget_packages 
 dotnet pack src/HtmlAgilityPack.Css/project.json -o spider_nuget_packages
@@ -11,7 +12,6 @@ dotnet pack src/Java2Dotnet.Spider.Redial/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Validation/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Core/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Extension/project.json -o spider_nuget_packages
-rm -rf ~/solutions/DotnetSpider/spider_nuget_packages
 ftp -n<<!
 open redis
 user ftpuser 1qazZAQ!
