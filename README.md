@@ -11,6 +11,11 @@ This is a cross platfrom, ligth spider develop by C#.
 
     	public static void Main()
 		{
+			ServiceProvider.Add<ILogService>(new ConsoleLog());
+			ServiceProvider.Add<ILogService>(new FileLog());
+			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
+			//ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
+			
 			HttpClientDownloader downloader = new HttpClientDownloader();
 
 			Core.Spider spider = Core.Spider.Create(new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
@@ -141,8 +146,16 @@ This is a cross platfrom, ligth spider develop by C#.
 		}
 	}
     
-    JdSkuSpider spider = new JdSkuSpider();
-    spider.Run();
+    	public static void Main()
+    	{
+    		ServiceProvider.Add<ILogService>(new ConsoleLog());
+		ServiceProvider.Add<ILogService>(new FileLog());
+		ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
+		//ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
+		
+		JdSkuSpider spider = new JdSkuSpider();
+    		spider.Run();
+    	}
 
 ### NOTICE
 
