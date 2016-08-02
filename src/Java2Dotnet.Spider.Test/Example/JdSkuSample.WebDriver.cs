@@ -14,12 +14,11 @@ using DownloadValidation = Java2Dotnet.Spider.Extension.Configuration.DownloadVa
 
 namespace Java2Dotnet.Spider.Test.Example
 {
-	public class JdSkuSampleSpider : SpiderBuilder
+	public class JdSkuWebDriverSampleSpider : SpiderBuilder
 	{
 		protected override SpiderContext GetSpiderContext()
 		{
 			SpiderContext context = new SpiderContext();
-			context.SetThreadNum(8);
 			context.SetSpiderName("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
 			{
@@ -28,11 +27,14 @@ namespace Java2Dotnet.Spider.Test.Example
 			});
 			context.AddPipeline(new MysqlPipeline
 			{
-				ConnectString = "Database='test';Data Source=mysqlserver;User ID=root;Password=1qazZAQ!;Port=4306"
+				ConnectString = "Database='mysql';Data Source=192.168.199.211;User ID=root;Password=1qazZAQ!;Port=3306"
 			});
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));
-			
+			context.SetDownloader(new WebDriverDownloader
+			{
+				Browser = Extension.Downloader.WebDriver.Browser.Chrome
+			});
 			return context;
 		}
 

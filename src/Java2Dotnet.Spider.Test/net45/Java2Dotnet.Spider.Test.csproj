@@ -115,6 +115,9 @@
     <Compile Include="..\Example\JdSkuSample.cs">
       <Link>Example\JdSkuSample.cs</Link>
     </Compile>
+    <Compile Include="..\Example\JdSkuSample.WebDriver.cs">
+      <Link>Example\JdSkuSample.WebDriver.cs</Link>
+    </Compile>
     <Compile Include="..\Example\LinkSpiderExample.cs">
       <Link>Example\LinkSpiderExample.cs</Link>
     </Compile>
@@ -184,7 +187,6 @@
     <Compile Include="..\UrlUtils\UrlUtilsTest.cs">
       <Link>UrlUtils\UrlUtilsTest.cs</Link>
     </Compile>
-    <Compile Include="Example\JdSkuSample.WebDriver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
