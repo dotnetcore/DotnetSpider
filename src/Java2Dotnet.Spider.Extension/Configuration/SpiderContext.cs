@@ -157,6 +157,12 @@ namespace Java2Dotnet.Spider.Extension
 			return this;
 		}
 
+		public SpiderContext AddStartRequest(Request request)
+		{
+			Site.AddStartRequest(request);
+			return this;
+		}
+
 		public SpiderContext AddStartUrl(string url, Dictionary<string, object> extras)
 		{
 			StartUrls.Add(url, extras);
