@@ -48,30 +48,38 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			{
 				Password = null;
 			}
+
+			var confiruation = new ConfigurationOptions()
+			{
+				ServiceName = "DotnetSpider",
+				Password = password,
+				ConnectTimeout = 5000,
+				KeepAlive = 8,
+				ConnectRetry = 20,
+				SyncTimeout = 65530,
+				ResponseTimeout = 65530
+			};
 #if NET_CORE
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
-				host = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault()?.ToString();
-				if (string.IsNullOrEmpty(host))
+				var address = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault();
+				if (address == null)
 				{
 					throw new Exception("Can't resovle your host: " + host);
 				}
+				confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
 			}
-#endif
-			var Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+			else
 			{
-				ServiceName = "DotnetSpider",
-				Password = password,
-				ConnectTimeout = 65530,
-				KeepAlive = 8,
-				ConnectRetry = 20,
-				SyncTimeout = 65530,
-				ResponseTimeout = 65530,
-				EndPoints =
-				{ host, "6379" }
-			});
-			Db = Redis.GetDatabase(3);
+				confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+			}
+#else
+			confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+#endif
+			var redis = ConnectionMultiplexer.Connect(confiruation);
+
+			Db = redis.GetDatabase(3);
 			AtomicExecutor = new RedisAtomicExecutor(this);
 			NetworkValidater = validater;
 			Redialer = redialer;

@@ -33,30 +33,35 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public RedisScheduler(string host, string password = null, int port = 6379)
 		{
+			var confiruation = new ConfigurationOptions()
+			{
+				ServiceName = "DotnetSpider",
+				Password = password,
+				ConnectTimeout = 5000,
+				KeepAlive = 8,
+				ConnectRetry = 20,
+				SyncTimeout = 65530,
+				ResponseTimeout = 65530
+			};
 #if NET_CORE
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
-				host = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault()?.ToString();
-				if (string.IsNullOrEmpty(host))
+				var address = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault();
+				if (address == null)
 				{
 					throw new SpiderExceptoin("Can't resovle your host: " + host);
 				}
+				confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
 			}
-#endif
-
-			Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+			else
 			{
-				ServiceName = "DotnetSpider",
-				Password = password,
-				ConnectTimeout = 8000,
-				KeepAlive = 8,
-				ConnectRetry = 20,
-				SyncTimeout = 65530,
-				ResponseTimeout = 65530,
-				EndPoints =
-				{ host, port.ToString() }
-			});
+				confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+			}
+#else
+			confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+#endif
+			Redis = ConnectionMultiplexer.Connect(confiruation);
 			Db = Redis.GetDatabase(0);
 		}
 
