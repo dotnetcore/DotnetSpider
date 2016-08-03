@@ -10,7 +10,7 @@ using System;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
-	public class EntityTestMongoDbPipeline : IEntityPipeline
+	public class EntityTestMongoDbPipeline : EntityBasePipeline
 	{
 		private readonly IMongoCollection<BsonDocument> _collection;
 		private readonly string _id;
@@ -24,11 +24,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			_id = id;
 		}
 
-		public void Initialize()
-		{
-		}
-
-		public void Process(List<JObject> datas, ISpider spider)
+		public override void Process(List<JObject> datas)
 		{
 			List<BsonDocument> reslut = new List<BsonDocument>();
 			var time = DateTime.Now;
@@ -42,10 +38,6 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				});
 			}
 			_collection.InsertMany(reslut);
-		}
-
-		public void Dispose()
-		{
 		}
 	}
 }

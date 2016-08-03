@@ -14,13 +14,20 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		{
 			_entityName = entityName;
 			_pipelines = pipelines;
-			foreach (var pipeline in pipelines)
+
+		}
+
+		public override void InitPipeline(ISpider spider)
+		{
+			base.InitPipeline(spider);
+
+			foreach (var pipeline in _pipelines)
 			{
-				pipeline.Initialize();
+				pipeline.InitPipeline(spider);
 			}
 		}
 
-		protected override void Process(List<ResultItems> resultItemsList, ISpider spider)
+		protected override void Process(List<ResultItems> resultItemsList)
 		{
 			if (resultItemsList == null || resultItemsList.Count == 0)
 			{
@@ -49,7 +56,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			{
 				foreach (var pipeline in _pipelines)
 				{
-					pipeline.Process(list, spider);
+					pipeline.Process(list);
 				}
 			}
 		}

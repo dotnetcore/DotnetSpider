@@ -14,12 +14,12 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	/// Used for news and articles containing more than one web page. 
 	/// MultiPagePipeline will store parts of object and output them when all parts are extracted.
 	/// </summary>
-	public class MultiPagePipeline : IPipeline
+	public class MultiPagePipeline : BasePipeline
 	{
 		private DoubleKeyMap<string, string, bool> _pageMap = new DoubleKeyMap<string, string, bool>();
 		private DoubleKeyMap<string, string, IMultiPageModel> _objectMap = new DoubleKeyMap<string, string, IMultiPageModel>();
 
-		public void Process(ResultItems resultItems, ISpider spider)
+		public override void Process(ResultItems resultItems)
 		{
 			IDictionary resultItemsAll = resultItems.Results;
 			List<object> deleteList = new List<object>();

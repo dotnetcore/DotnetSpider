@@ -22,21 +22,17 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			_entityName = entityName;
 		}
 
-		public void Initialize()
+		private void Process(List<JObject> datas)
 		{
-		}
+			_prepareStartUrls.Build(Spider.Site, datas);
 
-		private void Process(List<JObject> datas, ISpider spider)
-		{
-			_prepareStartUrls.Build(spider.Site, datas);
-
-			foreach (var startRequest in spider.Site.StartRequests)
+			foreach (var startRequest in Spider.Site.StartRequests)
 			{
 				NextSpiderScheduler.Push(startRequest);
 			}
 		}
 
-		protected override void Process(List<ResultItems> resultItemsList, ISpider spider)
+		protected override void Process(List<ResultItems> resultItemsList)
 		{
 			if (resultItemsList == null || resultItemsList.Count == 0)
 			{
@@ -60,7 +56,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 					}
 				}
 			}
-			Process(list, spider);
+			Process(list);
 		}
 	}
 }

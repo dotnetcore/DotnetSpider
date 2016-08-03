@@ -1,3 +1,5 @@
+using Java2Dotnet.Spider.Core.Pipeline;
+using Java2Dotnet.Spider.Core.Processor;
 using Java2Dotnet.Spider.Core.Scheduler;
 using System;
 using System.Collections.Generic;
@@ -9,10 +11,6 @@ namespace Java2Dotnet.Spider.Core
 	/// </summary>
 	public interface ISpider : IDisposable, ITask, ILogable
 	{
-		IScheduler Scheduler { get; }
-
-		int ThreadNum { get; }
-
 		/// <summary>
 		/// Unique id for a task.
 		/// </summary>
@@ -23,10 +21,20 @@ namespace Java2Dotnet.Spider.Core
 		/// </summary>
 		Site Site { get; }
 
+		int ThreadNum { get; }
+
+		Dictionary<string, dynamic> Settings { get; }
+
+		IScheduler Scheduler { get; }
+
+		List<IPipeline> Pipelines { get; }
+
+		IPageProcessor PageProcessor { get; }
+
 		void Run();
 
 		void Stop();
 
-		Dictionary<string, dynamic> Settings { get; }
+		void Exit();
 	}
 }

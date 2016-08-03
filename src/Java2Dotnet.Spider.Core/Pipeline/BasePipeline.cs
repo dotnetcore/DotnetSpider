@@ -1,24 +1,33 @@
-﻿using System.IO;
-using Java2Dotnet.Spider.Core.Downloader;
+﻿using Java2Dotnet.Spider.Core.Downloader;
 using System;
-using Java2Dotnet.Spider.Log;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Java2Dotnet.Spider.Core.Utils
+namespace Java2Dotnet.Spider.Core.Pipeline
 {
-	/// <summary>
-	/// Base object of file persistence.
-	/// </summary>
-	public class FilePersistentBase
+	public abstract class BasePipeline : IPipeline
 	{
 		public DownloadValidation DownloadValidation { get; set; }
 
-		protected string BasePath;
+		protected string BasePath { get; set; }
+
+		public ISpider Spider { get; protected set; }
 
 #if !NET_CORE
-		protected static string PathSeperator = "\\";
+		public static string PathSeperator = "\\";
 #else
-		protected static string PathSeperator = "/";
+		public static string PathSeperator = "/";
 #endif
+
+		public virtual void InitPipeline(ISpider spider)
+		{
+			Spider = spider;
+		}
+
+		public abstract void Process(ResultItems resultItems);
+
 		protected void SetPath(string path)
 		{
 			if (!path.EndsWith(PathSeperator))
@@ -31,6 +40,10 @@ namespace Java2Dotnet.Spider.Core.Utils
 #else
 			BasePath = Path.Combine(AppContext.BaseDirectory, path);
 #endif
+		}
+
+		public virtual void Dispose()
+		{
 		}
 
 		public static FileInfo PrepareFile(string fullName)

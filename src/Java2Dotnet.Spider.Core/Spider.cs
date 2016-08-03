@@ -46,9 +46,8 @@ namespace Java2Dotnet.Spider.Core
 		public string UserId { get; }
 		public string TaskGroup { get; }
 		public bool IsExited { get; private set; }
-		protected readonly string DataRootDirectory;
 
-		protected IPageProcessor PageProcessor { get; set; }
+		public IPageProcessor PageProcessor { get; set; }
 		protected List<Request> StartRequests { get; set; }
 		protected static readonly int WaitInterval = 8;
 		protected Status Stat = Status.Init;
@@ -134,16 +133,12 @@ namespace Java2Dotnet.Spider.Core
 			StartRequests = Site.StartRequests;
 			Scheduler = scheduler ?? new QueueDuplicateRemovedScheduler();
 			Scheduler.Init(this);
-
 #if !NET_CORE
-
-			DataRootDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\data\\" + Identity;
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Identity, "error_requests.txt"));
 #else
-			DataRootDirectory = Path.Combine(AppContext.BaseDirectory, "data", Identity);
-
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppContext.BaseDirectory, Identity, "error_requests.txt"));
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-			_errorRequestFile = FilePersistentBase.PrepareFile(Path.Combine(DataRootDirectory, "errorRequests.txt"));
 		}
 
 		/// <summary>
@@ -319,6 +314,11 @@ namespace Java2Dotnet.Spider.Core
 				Pipelines.Add(new FilePipeline());
 			}
 
+			foreach (var pipeline in Pipelines)
+			{
+				pipeline.InitPipeline(this);
+			}
+
 			if (StartRequests != null && StartRequests.Count > 0)
 			{
 				Logger.Info($"添加链接到调度中心, 数量: {StartRequests.Count}.");
@@ -356,8 +356,6 @@ namespace Java2Dotnet.Spider.Core
 #endif
 
 			InitComponent();
-
-			IMonitorableScheduler monitor = (IMonitorableScheduler)Scheduler;
 
 			if (StartTime == DateTime.MinValue)
 			{
@@ -664,7 +662,7 @@ namespace Java2Dotnet.Spider.Core
 			{
 				foreach (IPipeline pipeline in Pipelines)
 				{
-					pipeline.Process(page.ResultItems, this);
+					pipeline.Process(page.ResultItems);
 				}
 				Logger.Info($"采集: {request.Url} 成功.");
 			}

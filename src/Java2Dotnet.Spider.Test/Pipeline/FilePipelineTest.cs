@@ -29,7 +29,7 @@ namespace Java2Dotnet.Spider.Test.Pipeline
 		public void TestProcess()
 		{
 			FilePipeline filePipeline = new FilePipeline();
-			filePipeline.Process(_resultItems, _spider);
+			filePipeline.Process(_resultItems);
 		}
 	}
 }

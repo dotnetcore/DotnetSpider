@@ -11,28 +11,24 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 	/// </summary>
 	public interface IScheduler : IDisposable
 	{
-		void Init(ISpider spider);
-
 		ISpider Spider { get; }
+
+		void Init(ISpider spider);
 
 		/// <summary>
 		/// Add a url to fetch
 		/// </summary>
 		/// <param name="request"></param>
-		/// <param name="spider"></param>
 		void Push(Request request);
 
 		/// <summary>
 		/// Get an url to crawl
 		/// </summary>
-		/// <param name="spider"></param>
 		/// <returns></returns>
 		Request Poll();
 
 		void Clear();
 
 		void Load(HashSet<Request> requests);
-
-		HashSet<Request> ToList();
 	}
 }

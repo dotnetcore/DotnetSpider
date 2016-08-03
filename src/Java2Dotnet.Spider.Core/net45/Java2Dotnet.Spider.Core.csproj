@@ -60,9 +60,6 @@
     <Compile Include="..\ContentType.cs">
       <Link>ContentType.cs</Link>
     </Compile>
-    <Compile Include="..\CountableThreadPool.cs">
-      <Link>CountableThreadPool.cs</Link>
-    </Compile>
     <Compile Include="..\DefaultSpider.cs">
       <Link>DefaultSpider.cs</Link>
     </Compile>
@@ -86,9 +83,6 @@
     </Compile>
     <Compile Include="..\ISpider.cs">
       <Link>ISpider.cs</Link>
-    </Compile>
-    <Compile Include="..\ISpiderListener.cs">
-      <Link>ISpiderListener.cs</Link>
     </Compile>
     <Compile Include="..\ITask.cs">
       <Link>ITask.cs</Link>
@@ -117,6 +111,9 @@
     <Compile Include="..\Page.cs">
       <Link>Page.cs</Link>
     </Compile>
+    <Compile Include="..\Pipeline\BasePipeline.cs">
+      <Link>Pipeline\BasePipeline.cs</Link>
+    </Compile>
     <Compile Include="..\Pipeline\CachedPipeline.cs">
       <Link>Pipeline\CachedPipeline.cs</Link>
     </Compile>
@@ -134,9 +131,6 @@
     </Compile>
     <Compile Include="..\Pipeline\JsonFilePipeline.cs">
       <Link>Pipeline\JsonFilePipeline.cs</Link>
-    </Compile>
-    <Compile Include="..\Pipeline\ResultItemsCollectorPipeline.cs">
-      <Link>Pipeline\ResultItemsCollectorPipeline.cs</Link>
     </Compile>
     <Compile Include="..\Processor\IPageProcessor.cs">
       <Link>Processor\IPageProcessor.cs</Link>
@@ -185,9 +179,6 @@
     </Compile>
     <Compile Include="..\Scheduler\QueueDuplicateRemovedScheduler.cs">
       <Link>Scheduler\QueueDuplicateRemovedScheduler.cs</Link>
-    </Compile>
-    <Compile Include="..\Scheduler\QueueScheduler.cs">
-      <Link>Scheduler\QueueScheduler.cs</Link>
     </Compile>
     <Compile Include="..\Selector\BaseHtmlSelector.cs">
       <Link>Selector\BaseHtmlSelector.cs</Link>
@@ -239,12 +230,6 @@
     </Compile>
     <Compile Include="..\Status.cs">
       <Link>Status.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\FilePersistentBase.cs">
-      <Link>Utils\FilePersistentBase.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\LogUtils.cs">
-      <Link>Utils\LogUtils.cs</Link>
     </Compile>
     <Compile Include="..\Utils\UrlUtils.cs">
       <Link>Utils\UrlUtils.cs</Link>

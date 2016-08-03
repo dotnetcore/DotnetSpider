@@ -153,9 +153,6 @@
     <Compile Include="..\Downloader\FiddlerDownloader.cs">
       <Link>Downloader\FiddlerDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\FileCache.cs">
-      <Link>Downloader\FileCache.cs</Link>
-    </Compile>
     <Compile Include="..\Downloader\FileDownloader.cs">
       <Link>Downloader\FileDownloader.cs</Link>
     </Compile>
@@ -296,6 +293,9 @@
     </Compile>
     <Compile Include="..\ORM\TableSuffix.cs">
       <Link>ORM\TableSuffix.cs</Link>
+    </Compile>
+    <Compile Include="..\Pipeline\EntityBasePipeline.cs">
+      <Link>Pipeline\EntityBasePipeline.cs</Link>
     </Compile>
     <Compile Include="..\Pipeline\EntityCollectorPipeline.cs">
       <Link>Pipeline\EntityCollectorPipeline.cs</Link>

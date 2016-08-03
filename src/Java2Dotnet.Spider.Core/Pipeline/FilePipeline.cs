@@ -4,20 +4,32 @@ using System.IO;
 using System.Text;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core.Utils;
+using System.Runtime.InteropServices;
 
 namespace Java2Dotnet.Spider.Core.Pipeline
 {
 	/// <summary>
 	/// Store results in files.
 	/// </summary>
-	public sealed class FilePipeline : FilePersistentBase, IPipeline
+	public sealed class FilePipeline : BasePipeline
 	{
 		/// <summary>
 		/// create a FilePipeline with default path"/data/dotnetspider/"
 		/// </summary>
 		public FilePipeline()
 		{
-			SetPath(@"\data\files\");
+#if NET_CORE
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				SetPath("\\data\\files");
+			}
+			else
+			{
+				SetPath("/data/files");
+			}
+#else
+			SetPath("\\data\\files");
+#endif
 		}
 
 		public FilePipeline(string path)
@@ -25,12 +37,11 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 			SetPath(path);
 		}
 
-		public void Process(ResultItems resultItems, ISpider spider)
+		public override void Process(ResultItems resultItems )
 		{
-			StringBuilder builer = new StringBuilder(BasePath);
-			string filePath = $"{BasePath}{PathSeperator}{spider.Identity}{PathSeperator}{Encrypt.Md5Encrypt(resultItems.Request.Url.ToString())}.fd";
 			try
 			{
+				string filePath = $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}{Encrypt.Md5Encrypt(resultItems.Request.Url.ToString())}.fd";
 				FileInfo file = PrepareFile(filePath);
 				using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
 				{
@@ -57,13 +68,9 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 			}
 			catch (Exception e)
 			{
-				spider.Logger.Warn("Write file error.", e);
+				Spider.Logger.Warn("Write file error.", e);
 				throw;
 			}
-		}
-
-		public void Dispose()
-		{
 		}
 	}
 }

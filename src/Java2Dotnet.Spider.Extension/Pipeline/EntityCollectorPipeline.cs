@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Java2Dotnet.Spider.Core;
 using Newtonsoft.Json.Linq;
 
@@ -7,6 +8,8 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	public class EntityCollectorPipeline : IEntityCollectorPipeline
 	{
 		private readonly List<JObject> _collector = new List<JObject>();
+
+		public ISpider Spider { get; protected set; }
 
 		public void Dispose()
 		{
@@ -18,11 +21,12 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			return _collector;
 		}
 
-		public void Initialize()
+		public void InitPipeline(ISpider spider)
 		{
+			Spider = spider;
 		}
 
-		public void Process(List<JObject> datas, ISpider spider)
+		public void Process(List<JObject> datas)
 		{
 			lock (this)
 			{
