@@ -174,9 +174,6 @@
     <Compile Include="..\Downloader\WebDriver\WebDriverPool.cs">
       <Link>Downloader\WebDriver\WebDriverPool.cs</Link>
     </Compile>
-    <Compile Include="..\Environment.cs">
-      <Link>Environment.cs</Link>
-    </Compile>
     <Compile Include="..\ILinkSpiderContext.cs">
       <Link>ILinkSpiderContext.cs</Link>
     </Compile>
