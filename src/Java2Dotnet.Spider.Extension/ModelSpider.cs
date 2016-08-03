@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using Java2Dotnet.Spider.Core.Monitor;
+using System.Net;
 #if NET_45
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -88,6 +89,11 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			if (!string.IsNullOrEmpty(ConfigurationManager.Get("redisHost")) && string.IsNullOrWhiteSpace(ConfigurationManager.Get("redisHost")))
 			{
+				string realHost = Dns.GetHostAddresses(ConfigurationManager.Get("redisHost")).FirstOrDefault()?.ToString();
+				if (string.IsNullOrEmpty(realHost))
+				{
+					throw new SpiderExceptoin("Can't resovle your host: " + ConfigurationManager.Get("redisHost"));
+				}
 				Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
 				{
 					ServiceName = "DotnetSpider",
@@ -98,7 +104,7 @@ namespace Java2Dotnet.Spider.Extension
 					SyncTimeout = 65530,
 					ResponseTimeout = 65530,
 					EndPoints =
-				{ ConfigurationManager.Get("redisHost"), "6379" }
+				{ realHost, "6379" }
 				});
 				Db = Redis.GetDatabase(1);
 			}

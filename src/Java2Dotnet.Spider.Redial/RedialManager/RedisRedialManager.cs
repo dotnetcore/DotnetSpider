@@ -11,6 +11,7 @@ using Java2Dotnet.Spider.Log;
 using StackExchange.Redis;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.Redialer;
+using System.Linq;
 
 namespace Java2Dotnet.Spider.Redial.RedialManager
 {
@@ -46,7 +47,11 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			{
 				Password = null;
 			}
-
+			string realHost = Dns.GetHostAddresses(host).FirstOrDefault()?.ToString();
+			if (string.IsNullOrEmpty(realHost))
+			{
+				throw new Exception("Can't resovle your host: " + host);
+			}
 			var Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
 			{
 				ServiceName = "DotnetSpider",
@@ -57,7 +62,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				SyncTimeout = 65530,
 				ResponseTimeout = 65530,
 				EndPoints =
-				{ host, "6379" }
+				{ realHost, "6379" }
 			});
 			Db = Redis.GetDatabase(3);
 			AtomicExecutor = new RedisAtomicExecutor(this);
