@@ -215,6 +215,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				{
 					httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
 				}
+
+				httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
 			}
 #if !NET_CORE
 			//if (site.HttpProxyPoolEnable)

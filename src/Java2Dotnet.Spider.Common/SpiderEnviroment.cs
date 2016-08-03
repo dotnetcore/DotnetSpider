@@ -9,12 +9,15 @@ namespace Java2Dotnet.Spider.Common
 	public class SpiderEnviroment
 	{
 		public static string GlobalDirectory;
+		public static string BaseDirectory;
 
 		static SpiderEnviroment()
 		{
 #if !NET_CORE
-			GlobalDirectory=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DotnetSpider"); 
+			GlobalDirectory=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DotnetSpider");
+			BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #else
+			BaseDirectory = AppContext.BaseDirectory;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
 				GlobalDirectory = Path.Combine("/usr/dotnetspider");

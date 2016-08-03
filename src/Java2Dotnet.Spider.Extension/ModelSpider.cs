@@ -22,6 +22,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using Java2Dotnet.Spider.Core.Monitor;
+using System.Net;
+using System.Runtime.InteropServices;
 #if NET_45
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -88,7 +90,9 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			if (!string.IsNullOrEmpty(ConfigurationManager.Get("redisHost")) && string.IsNullOrWhiteSpace(ConfigurationManager.Get("redisHost")))
 			{
-				Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+				var host = ConfigurationManager.Get("redisHost");
+
+				var confiruation = new ConfigurationOptions()
 				{
 					ServiceName = "DotnetSpider",
 					Password = ConfigurationManager.Get("redisPassword"),
@@ -96,10 +100,27 @@ namespace Java2Dotnet.Spider.Extension
 					KeepAlive = 8,
 					ConnectRetry = 20,
 					SyncTimeout = 65530,
-					ResponseTimeout = 65530,
-					EndPoints =
-				{ ConfigurationManager.Get("redisHost"), "6379" }
-				});
+					ResponseTimeout = 65530
+				};
+#if NET_CORE
+				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
+					var address = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault();
+					if (address == null)
+					{
+						throw new SpiderExceptoin("Can't resovle your host: " + host);
+					}
+					confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
+				}
+				else
+				{
+					confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+				}
+#else
+				confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+#endif
+				Redis = ConnectionMultiplexer.Connect(confiruation);
 				Db = Redis.GetDatabase(1);
 			}
 		}

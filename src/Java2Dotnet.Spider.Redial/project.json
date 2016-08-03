@@ -1,8 +1,8 @@
 {
-	"buildOptions": {
-		"emitEntryPoint": false,
-		"debugType": "portable"
-	},
+  "buildOptions": {
+    "emitEntryPoint": false,
+    "debugType": "portable"
+  },
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
@@ -15,19 +15,19 @@
     "Java2Dotnet.Spider.Common": "0.0.9",
     "System.Diagnostics.Process": "*",
     "System.Net.Http": "4.0.1-rc2-24027",
-    "StackExchange.Redis": "0.0.9"
+    "StackExchange.Redis": "1.1.604-alpha"
   },
-	"frameworks": {
-		"netcoreapp1.0": {
-			"imports": "portable-net45+win8+dnxcore50",
-			"dependencies": {},
-			"buildOptions": {
-				"define": [
-					"RELEASE",
-					"NET_CORE"
-				]
-			}
-		}
-	},
-	"version": "0.0.9"
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": "portable-net45+win8+dnxcore50",
+      "dependencies": {},
+      "buildOptions": {
+        "define": [
+          "RELEASE",
+          "NET_CORE"
+        ]
+      }
+    }
+  },
+  "version": "0.0.9"
 }
