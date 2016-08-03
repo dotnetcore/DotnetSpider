@@ -12,6 +12,7 @@ using StackExchange.Redis;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.Redialer;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Java2Dotnet.Spider.Redial.RedialManager
 {
@@ -47,11 +48,17 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			{
 				Password = null;
 			}
-			string realHost = Dns.GetHostAddresses(host).FirstOrDefault()?.ToString();
-			if (string.IsNullOrEmpty(realHost))
+#if NET_CORE
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				throw new Exception("Can't resovle your host: " + host);
+				// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
+				host = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault()?.ToString();
+				if (string.IsNullOrEmpty(host))
+				{
+					throw new Exception("Can't resovle your host: " + host);
+				}
 			}
+#endif
 			var Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
 			{
 				ServiceName = "DotnetSpider",
@@ -62,7 +69,7 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 				SyncTimeout = 65530,
 				ResponseTimeout = 65530,
 				EndPoints =
-				{ realHost, "6379" }
+				{ host, "6379" }
 			});
 			Db = Redis.GetDatabase(3);
 			AtomicExecutor = new RedisAtomicExecutor(this);

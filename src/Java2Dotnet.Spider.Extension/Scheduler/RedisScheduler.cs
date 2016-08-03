@@ -10,6 +10,7 @@ using StackExchange.Redis;
 using System;
 using System.Net;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Java2Dotnet.Spider.Extension.Scheduler
 {
@@ -32,12 +33,17 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public RedisScheduler(string host, string password = null, int port = 6379)
 		{
-			// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
-			string realHost = Dns.GetHostAddresses(host).FirstOrDefault()?.ToString();
-			if (string.IsNullOrEmpty(realHost))
+#if NET_CORE
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				throw new SpiderExceptoin("Can't resovle your host: " + host);
+				// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
+				host = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault()?.ToString();
+				if (string.IsNullOrEmpty(host))
+				{
+					throw new SpiderExceptoin("Can't resovle your host: " + host);
+				}
 			}
+#endif
 
 			Redis = ConnectionMultiplexer.Connect(new ConfigurationOptions()
 			{
@@ -49,7 +55,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 				SyncTimeout = 65530,
 				ResponseTimeout = 65530,
 				EndPoints =
-				{ realHost, port.ToString() }
+				{ host, port.ToString() }
 			});
 			Db = Redis.GetDatabase(0);
 		}
