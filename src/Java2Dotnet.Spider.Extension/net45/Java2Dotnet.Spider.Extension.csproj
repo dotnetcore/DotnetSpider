@@ -348,14 +348,8 @@
     <Compile Include="..\Processor\EntityProcessor.cs">
       <Link>Processor\EntityProcessor.cs</Link>
     </Compile>
-    <Compile Include="..\Scheduler\ISchedulerManager.cs">
-      <Link>Scheduler\ISchedulerManager.cs</Link>
-    </Compile>
     <Compile Include="..\Scheduler\RedisScheduler.cs">
       <Link>Scheduler\RedisScheduler.cs</Link>
-    </Compile>
-    <Compile Include="..\Scheduler\SpiderStatus.cs">
-      <Link>Scheduler\SpiderStatus.cs</Link>
     </Compile>
     <Compile Include="..\SpiderBuilder.cs">
       <Link>SpiderBuilder.cs</Link>
