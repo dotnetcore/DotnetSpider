@@ -3,6 +3,14 @@
 
 This is a cross platfrom, ligth spider develop by C#.
 
+### DEVELOP ENVIROMENT
+
+	1. Visual Studio 2015 or later, becuase I used lots of C# 6.0
+	2. What to try .NET CORE? Install 2 packages
+		+ ![Visual Studio 2015 Update 3](https://go.microsoft.com/fwlink/?LinkId=691129)
+		+ ![.NET Core 1.0.0 - VS 2015 Tooling Preview 2](https://go.microsoft.com/fwlink/?LinkId=817245)
+		+ More details https://www.microsoft.com/net/core#windows
+
 ### DESIGN
  
 ![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
@@ -14,6 +22,7 @@ This is a cross platfrom, ligth spider develop by C#.
 			ServiceProvider.Add<ILogService>(new ConsoleLog());
 			ServiceProvider.Add<ILogService>(new FileLog());
 			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
+			ServiceProvider.Add<IMonitorService>(new FileMonitor());
 			//ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
 			
 			HttpClientDownloader downloader = new HttpClientDownloader();
@@ -30,7 +39,7 @@ This is a cross platfrom, ligth spider develop by C#.
 
 		private class MyPipeline : IPipeline
 		{
-			public void Process(ResultItems resultItems, ISpider spider)
+			public void Process(ResultItems resultItems)
 			{
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
@@ -153,6 +162,7 @@ This is a cross platfrom, ligth spider develop by C#.
 			ServiceProvider.Add<ILogService>(new ConsoleLog());
 			ServiceProvider.Add<ILogService>(new FileLog());
 			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
+			ServiceProvider.Add<IMonitorService>(new FileMonitor());
 			//ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
 		
 			JdSkuSpider spider = new JdSkuSpider();
@@ -163,7 +173,7 @@ This is a cross platfrom, ligth spider develop by C#.
 
 When you want to collect a page JS loaded, there is only one thing you need to do is set the downloader to WebDriverDownloader.	
 
-    context.SetDownloader(new WebDriverDownloader
+	context.SetDownloader(new WebDriverDownloader
 	{
 		Browser = Extension.Downloader.WebDriver.Browser.Chrome
 	});
