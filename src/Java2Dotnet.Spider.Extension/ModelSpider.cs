@@ -66,17 +66,11 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			if (SpiderContext.Redialer != null)
 			{
-				if (Db != null)
+				if (SpiderContext.Redialer.RedialManager == null)
 				{
-					RedialManagerUtils.RedialManager = new RedisRedialManager(Db, SpiderContext.Redialer.NetworkValidater.GetNetworkValidater(), SpiderContext.Redialer.GetRedialer(), Logger);
+					SpiderContext.Redialer.RedialManager = new FileRedialManager();
 				}
-				else
-				{
-					RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
-					RedialManagerUtils.RedialManager.Logger = Logger;
-					RedialManagerUtils.RedialManager.NetworkValidater = SpiderContext.Redialer.NetworkValidater.GetNetworkValidater();
-					RedialManagerUtils.RedialManager.Redialer = SpiderContext.Redialer.GetRedialer();
-				}
+				SpiderContext.Redialer.RedialManager.SetRedialManager(SpiderContext.Redialer.NetworkValidater.GetNetworkValidater(), SpiderContext.Redialer.GetRedialer());
 			}
 
 			if (SpiderContext.Downloader == null)
@@ -354,16 +348,9 @@ namespace Java2Dotnet.Spider.Extension
 			spider.SetEmptySleepTime(SpiderContext.EmptySleepTime);
 			spider.SetThreadNum(SpiderContext.ThreadNum);
 			spider.Deep = SpiderContext.Deep;
-			spider.SetDownloader(SpiderContext.Downloader.GetDownloader());
+			var downloader = SpiderContext.Downloader.GetDownloader();
+			spider.SetDownloader(downloader);
 			spider.SkipWhenResultIsEmpty = SpiderContext.SkipWhenResultIsEmpty;
-			if (SpiderContext.PageHandlers != null)
-			{
-				spider.PageHandlers = new List<Action<Page>>();
-				foreach (var pageHandler in SpiderContext.PageHandlers)
-				{
-					spider.PageHandlers.Add(pageHandler.Customize);
-				}
-			}
 
 			if (SpiderContext.TargetUrlsHandler != null)
 			{

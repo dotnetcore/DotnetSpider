@@ -186,7 +186,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			{
 				return;
 			}
-			RedialManagerUtils.Execute("db-init", () =>
+			NetworkProxyManager.Current.Execute("db-init", () =>
 			{
 				using (DbConnection conn = CreateConnection())
 				{
@@ -206,7 +206,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 
 		public override void Process(List<JObject> datas)
 		{
-			RedialManagerUtils.Execute("pipeline-", () =>
+			NetworkProxyManager.Current.Execute("pipeline-", () =>
 			{
 				switch (Mode)
 				{

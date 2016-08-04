@@ -90,7 +90,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 					realUrl = UrlFormat(realUrl);
 				}
 
-				RedialManagerUtils.Execute("webdriverdownloader-download", () =>
+				NetworkProxyManager.Current.Execute("wd-d", () =>
 				{
 					driverService.WebDriver.Navigate().GoToUrl(realUrl);
 				});
@@ -105,7 +105,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 				page.TargetUrl = driverService.WebDriver.Url;
 				page.Title = driverService.WebDriver.Title;
 
-				ValidatePage(page, spider);
+				Handle(page, spider);
 
 				// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
 				request.PutExtra(Request.CycleTriedTimes, null);

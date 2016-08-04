@@ -4,22 +4,24 @@
 		"emitEntryPoint": false,
 		"debugType": "portable"
 	},
-	"dependencies": {
-		"Microsoft.NETCore.App": {
-			"type": "platform",
-			"version": "1.0.0-rc2-3002702"
-		},
-		"System.Security.Cryptography.Algorithms": "*",
-		"System.Security.Cryptography.Primitives": "*",
-		"System.Threading.Thread": "*",
-		"System.Threading.ThreadPool": "*",
-		"System.Runtime.InteropServices.RuntimeInformation": "*",
-		"System.Diagnostics.Process": "*",
-		"System.Dynamic.Runtime": "*",
-		"System.Net.NameResolution": "*",
-		"Microsoft.CSharp": "*",
-		"System.Collections.NonGeneric": "*"
-	},
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0-rc2-3002702"
+    },
+    "System.Security.Cryptography.Algorithms": "*",
+    "System.Security.Cryptography.Primitives": "*",
+    "System.Threading.Thread": "*",
+    "System.Threading.ThreadPool": "*",
+    "System.Runtime.InteropServices.RuntimeInformation": "*",
+    "System.Diagnostics.Process": "*",
+    "System.Dynamic.Runtime": "*",
+    "System.Net.NameResolution": "*",
+    "Microsoft.CSharp": "*",
+    "System.Collections.NonGeneric": "*",
+    "Microsoft.Extensions.Configuration.Ini": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Configuration.Binder": "1.0.0-rc2-final"
+  },
 	"frameworks": {
 		"netcoreapp1.0": {
 			"imports": "portable-net45+win8+dnxcore50",

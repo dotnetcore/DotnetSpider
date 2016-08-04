@@ -16,7 +16,7 @@ namespace Java2Dotnet.Spider.Redial.NetworkValidater
 			while (currentWaitTime < MaxWaitTime)
 			{
 				currentWaitTime++;
-                try
+				try
 				{
 					if (DoValidate())
 					{

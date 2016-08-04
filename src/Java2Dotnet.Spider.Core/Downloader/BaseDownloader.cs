@@ -1,26 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
-using Java2Dotnet.Spider.Redial;
 using Java2Dotnet.Spider.Log;
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {
-	public class DownloadException : Exception
-	{
-		public DownloadException(string message) : base(message)
-		{
-		}
-	}
-
 	public class BaseDownloader : IDownloader, IDisposable
 	{
-		public int RedialLimit { get; set; }
-		public static int RequestCount { get; set; } = 0;
-		public DownloadValidation DownloadValidation { get; set; }
+		public List<IDownloadHandler> DownloadHandlers=new List<IDownloadHandler>();
 		public int ThreadNum { set; get; }
-		protected SingleExecutor SingleExecutor = new SingleExecutor();
-
 		public Action CustomizeCookie;
 
 		public virtual Page Download(Request request, ISpider spider)
@@ -32,74 +20,13 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		{
 		}
 
-		protected void ValidatePage(Page page, ISpider spider)
+		protected void Handle(Page page, ISpider spider)
 		{
-			//customer verify
-			if (DownloadValidation != null)
+			if (DownloadHandlers != null)
 			{
-				var validatResult = DownloadValidation(page);
-
-				switch (validatResult)
+				foreach (var handler in DownloadHandlers)
 				{
-					case DownloadValidationResult.Failed:
-						{
-							throw new RedialException("Customize validate failed.");
-						}
-					case DownloadValidationResult.FailedAndNeedRedial:
-						{
-							if (RedialManagerUtils.RedialManager == null)
-							{
-								throw new RedialException("RedialManager is null.");
-							}
-
-							RedialManagerUtils.RedialManager?.Redial();
-							throw new RedialException("Download failed and Redial already.");
-						}
-					case DownloadValidationResult.Success:
-						{
-							break;
-						}
-					case DownloadValidationResult.FailedAndNeedUpdateCookie:
-						{
-							SingleExecutor.Execute(() =>
-							{
-								CustomizeCookie?.Invoke();
-							});
-							throw new RedialException("Cookie validate failed.");
-						}
-					case DownloadValidationResult.FailedAndNeedRetryOrWait:
-						{
-							throw new SpiderExceptoin("Need retry.");
-						}
-					case DownloadValidationResult.FailedAndNeedWaitToVerifyCode:
-						{
-							throw new SpiderExceptoin("Need Verify Code.");
-						}
-					case DownloadValidationResult.Miss:
-						{
-							page.IsSkip = true;
-							break;
-						}
-				}
-			}
-		}
-
-		public void AddRequestCount()
-		{
-			if (RedialLimit != 0)
-			{
-				lock (this)
-				{
-					++RequestCount;
-
-					if (RedialLimit > 0 && RequestCount == RedialLimit)
-					{
-						RequestCount = 0;
-						if (RedialManagerUtils.RedialManager != null)
-						{
-							RedialManagerUtils.RedialManager.Redial();
-						}
-					}
+					handler.Handle(page);
 				}
 			}
 		}

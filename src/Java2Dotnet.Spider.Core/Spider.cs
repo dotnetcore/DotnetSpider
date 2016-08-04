@@ -32,7 +32,6 @@ namespace Java2Dotnet.Spider.Core
 		public DateTime StartTime { get; private set; }
 		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		public Site Site { get; private set; }
-		public List<Action<Page>> PageHandlers;
 		public string Identity { get; }
 		public List<IPipeline> Pipelines { get; private set; } = new List<IPipeline>();
 		public IDownloader Downloader { get; private set; }
@@ -463,7 +462,6 @@ namespace Java2Dotnet.Spider.Core
 		{
 			if (!_printedInfo)
 			{
-#if NET_CORE
 				Console.WriteLine("=============================================================");
 				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
 				Console.WriteLine("== It's a light, stable, high performce spider             ==");
@@ -473,17 +471,6 @@ namespace Java2Dotnet.Spider.Core
 				Console.WriteLine("== Version: 0.9.10                                         ==");
 				Console.WriteLine("== Author: zlzforever@163.com                              ==");
 				Console.WriteLine("=============================================================");
-#else
-				Console.WriteLine("=============================================================");
-				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
-				Console.WriteLine("== It's a light, stable, high performce spider             ==");
-				Console.WriteLine("== Support multi thread, ajax page, http                   ==");
-				Console.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
-				Console.WriteLine("== License: LGPL3.0                                        ==");
-				Console.WriteLine("== Version: 0.9.10                                         ==");
-				Console.WriteLine("== Author: zlzforever@163.com                              ==");
-				Console.WriteLine("=============================================================");
-#endif
 				_printedInfo = true;
 			}
 		}
@@ -594,14 +581,6 @@ namespace Java2Dotnet.Spider.Core
 					return;
 				}
 
-				if (PageHandlers != null)
-				{
-					foreach (var pageHandler in PageHandlers)
-					{
-						pageHandler?.Invoke(page);
-					}
-				}
-
 #if TEST
 				sw.Reset();
 				sw.Start();
@@ -612,6 +591,14 @@ namespace Java2Dotnet.Spider.Core
 				Console.WriteLine("Process:" + (sw.ElapsedMilliseconds).ToString());
 #endif
 			}
+			//catch (Redial.RedialException re)
+			//{
+			//	if (Site.CycleRetryTimes > 0)
+			//	{
+			//		page = AddToCycleRetry(request, Site);
+			//	}
+			//	Logger.Warn(re.Message);
+			//}
 			catch (DownloadException de)
 			{
 				if (Site.CycleRetryTimes > 0)

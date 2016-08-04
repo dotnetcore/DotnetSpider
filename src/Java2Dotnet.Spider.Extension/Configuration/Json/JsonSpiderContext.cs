@@ -37,7 +37,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 		{
 			SpiderContext context = new SpiderContext();
 			context.CachedSize = CachedSize;
-			context.PageHandlers = GetCustomziePage(PageHandlers);
 			context.TargetUrlsHandler = GetCustomizeTargetUrls(TargetUrlsHandler);
 			context.Deep = Deep;
 			context.Downloader = GetDownloader(Downloader);
@@ -467,7 +466,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 							}
 						}
 						webDriverDownloader.Browser = jobject.SelectToken("$.Browser").ToObject<Browser>();
-						webDriverDownloader.RedialLimit = jobject.SelectToken("$.RedialLimit").ToObject<int>();
+						//webDriverDownloader.RedialLimit = jobject.SelectToken("$.RedialLimit").ToObject<int>();
 						webDriverDownloader.PostBodyGenerator = jobject.SelectToken("$.PostBodyGenerator").ToObject<PostBodyGenerator>();
 						webDriverDownloader.VerifyCode = jobject.SelectToken("$.VerifyCode").ToObject<VerifyCode>();
 
@@ -494,32 +493,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 					}
 			}
 
-			var validations = jobject.SelectToken("$.DownloadValidations");
-			if (validations != null)
-			{
-				foreach (var validation in validations)
-				{
-					var downloadValidationType = validation.SelectToken("$.Type")?.ToObject<DownloadValidation.Types>();
-					if (downloadValidationType == null)
-					{
-						throw new SpiderExceptoin("Missing DownloadValidation Type: " + jobject);
-					}
-
-					switch (downloadValidationType)
-					{
-						case DownloadValidation.Types.Contains:
-							{
-								downloader.DownloadValidations.Add(validation.ToObject<ContainsDownloadValidation>());
-
-								break;
-							}
-						default:
-							{
-								throw new SpiderExceptoin("Unspodrt validation type: " + downloadValidationType);
-							}
-					}
-				}
-			}
+			downloader.Handlers = GetDownloadHandlers(jobject.SelectTokens("$.Handlers[*]"));
 
 			var postBodyGenerator = jobject.SelectToken("$.PostBodyGenerator")?.ToObject<PostBodyGenerator>();
 			if (postBodyGenerator != null)
@@ -575,30 +549,88 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			throw new SpiderExceptoin("UNSPORT or JSON string is incorrect: " + jobject);
 		}
 
-		private List<PageHandler> GetCustomziePage(List<JObject> jobjects)
+		private List<DownloadHandler> GetDownloadHandlers(IEnumerable<JToken> jobjects)
 		{
 			if (jobjects == null)
 			{
 				return null;
 			}
-			List<PageHandler> list = new List<PageHandler>();
-			foreach (var jobject in jobjects)
+			List<DownloadHandler> list = new List<DownloadHandler>();
+			if (jobjects != null)
 			{
-				var customizePageType = jobject.SelectToken("$.Type").ToObject<PageHandler.Types>();
-				switch (customizePageType)
+				foreach (var handler in jobjects)
 				{
-					case PageHandler.Types.Sub:
-						{
-							list.Add(jobject.ToObject<SubPageHandler>());
-							break;
-						}
-					case PageHandler.Types.CustomTarget:
-						{
-							list.Add(jobject.ToObject<CustomTargetHandler>());
-							break;
-						}
+					var handlerType = handler.SelectToken("$.Type")?.ToObject<DownloadHandler.Types>();
+					if (handlerType == null)
+					{
+						throw new SpiderExceptoin("Missing handler Type for " + handler);
+					}
+
+					switch (handlerType)
+					{
+						case DownloadHandler.Types.RedialWhenContainsIllegalString:
+							{
+								list.Add(handler.ToObject<RedialWhenContainsIllegalStringHandler>());
+								break;
+							}
+						case DownloadHandler.Types.SubContent:
+							{
+								list.Add(handler.ToObject<SubContentHandler>());
+								break;
+							}
+						case DownloadHandler.Types.CustomTarget:
+							{
+								list.Add(handler.ToObject<CustomTargetHandler>());
+								break;
+							}
+						case DownloadHandler.Types.ContentToUpperOrLower:
+							{
+								list.Add(handler.ToObject<ContentToUpperOrLowerHandler>());
+								break;
+							}
+						case DownloadHandler.Types.RedialWhenExceptionThrow:
+							{
+								list.Add(handler.ToObject<RedialWhenExceptionThrowHandler>());
+								break;
+							}
+						case DownloadHandler.Types.RegexMatchContent:
+							{
+								list.Add(handler.ToObject<RegexMatchContentHandler>());
+								break;
+							}
+						case DownloadHandler.Types.RemoveContent:
+							{
+								list.Add(handler.ToObject<RemoveContentHandler>());
+								break;
+							}
+						case DownloadHandler.Types.RemoveContentHtmlTag:
+							{
+								list.Add(handler.ToObject<RemoveContentHtmlTagHandler>());
+								break;
+							}
+						case DownloadHandler.Types.ReplaceContent:
+							{
+								list.Add(handler.ToObject<ReplaceContentHandler>());
+								break;
+							}
+						case DownloadHandler.Types.TrimContent:
+							{
+								list.Add(handler.ToObject<TrimContentHandler>());
+								break;
+							}
+						case DownloadHandler.Types.UnescapeContent:
+							{
+								list.Add(handler.ToObject<UnescapeContentHandler>());
+								break;
+							}
+						default:
+							{
+								throw new SpiderExceptoin("Unspodrt handler type: " + handlerType);
+							}
+					}
 				}
 			}
+
 			return list;
 			//throw new SpiderExceptoin("UNSPORT or JSON string is incorrect: " + jobject);
 		}

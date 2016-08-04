@@ -93,8 +93,8 @@
     <Compile Include="..\Configuration\Downloader.cs">
       <Link>Configuration\Downloader.cs</Link>
     </Compile>
-    <Compile Include="..\Configuration\DownloadValidation.cs">
-      <Link>Configuration\DownloadValidation.cs</Link>
+    <Compile Include="..\Configuration\DownloadHandler.cs">
+      <Link>Configuration\DownloadHandler.cs</Link>
     </Compile>
     <Compile Include="..\Configuration\Entity.cs">
       <Link>Configuration\Entity.cs</Link>
@@ -113,9 +113,6 @@
     </Compile>
     <Compile Include="..\Configuration\NetworkValidater.cs">
       <Link>Configuration\NetworkValidater.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\PageHandler.cs">
-      <Link>Configuration\PageHandler.cs</Link>
     </Compile>
     <Compile Include="..\Configuration\Pipeline.cs">
       <Link>Configuration\Pipeline.cs</Link>

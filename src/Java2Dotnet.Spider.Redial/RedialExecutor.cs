@@ -1,13 +1,24 @@
-﻿using Java2Dotnet.Spider.Redial.RedialManager;
+﻿using Java2Dotnet.Spider.Core;
+using Java2Dotnet.Spider.Redial.RedialManager;
 using System;
 
 namespace Java2Dotnet.Spider.Redial
 {
-	public static class RedialManagerUtils
+	public class RedialExecutor : INetworkProxy
 	{
-		public static IRedialManager RedialManager;
+		public IRedialManager RedialManager;
 
-		public static void Execute(string name, Action action)
+		public RedialExecutor(IRedialManager redialManager)
+		{
+			RedialManager = redialManager;
+		}
+
+		public void Redial()
+		{
+			RedialManager.Redial();
+		}
+
+		public void Execute(string name, Action action)
 		{
 			if (RedialManager != null)
 			{
@@ -19,7 +30,7 @@ namespace Java2Dotnet.Spider.Redial
 			}
 		}
 
-		public static void Execute(string name, Action<object> action, object obj)
+		public void Execute(string name, Action<object> action, object obj)
 		{
 			if (RedialManager != null)
 			{
@@ -31,7 +42,7 @@ namespace Java2Dotnet.Spider.Redial
 			}
 		}
 
-		public static T Execute<T>(string name, Func<object, T> func, object obj)
+		public T Execute<T>(string name, Func<object, T> func, object obj)
 		{
 			if (RedialManager != null)
 			{
@@ -43,7 +54,7 @@ namespace Java2Dotnet.Spider.Redial
 			}
 		}
 
-		public static T Execute<T>(string name, Func<T> func)
+		public T Execute<T>(string name, Func<T> func)
 		{
 			if (RedialManager != null)
 			{

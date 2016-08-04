@@ -100,8 +100,8 @@
     <Compile Include="..\RedialException.cs">
       <Link>RedialException.cs</Link>
     </Compile>
-    <Compile Include="..\RedialManagerUtils.cs">
-      <Link>RedialManagerUtils.cs</Link>
+    <Compile Include="..\RedialExecutor.cs">
+      <Link>RedialExecutor.cs</Link>
     </Compile>
     <Compile Include="..\RedialManager\BaseRedialManager.cs">
       <Link>RedialManager\BaseRedialManager.cs</Link>
@@ -118,9 +118,6 @@
     <Compile Include="..\RedialResult.cs">
       <Link>RedialResult.cs</Link>
     </Compile>
-    <Compile Include="..\SafeRedisManagerPool.cs">
-      <Link>SafeRedisManagerPool.cs</Link>
-    </Compile>
     <Compile Include="..\Utils\AdslUtils.cs">
       <Link>Utils\AdslUtils.cs</Link>
     </Compile>
@@ -133,9 +130,6 @@
     <Compile Include="..\Utils\VpnUtils.cs">
       <Link>Utils\VpnUtils.cs</Link>
     </Compile>
-    <Compile Include="..\Utils\ZookeeperUtils.cs">
-      <Link>Utils\ZookeeperUtils.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
@@ -143,6 +137,10 @@
     <ProjectReference Include="..\..\Java2Dotnet.Spider.Common\net45\Java2Dotnet.Spider.Common.csproj">
       <Project>{43dd7a01-fbde-4a22-bf6e-758f721dde77}</Project>
       <Name>Java2Dotnet.Spider.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Java2Dotnet.Spider.Core\net45\Java2Dotnet.Spider.Core.csproj">
+      <Project>{28dadca2-9053-4222-a813-a73dd0fe7f2f}</Project>
+      <Name>Java2Dotnet.Spider.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Java2Dotnet.Spider.Ioc\net45\Java2Dotnet.Spider.Ioc.csproj">
       <Project>{0047a89f-61e8-4369-a75c-81e7ab431add}</Project>

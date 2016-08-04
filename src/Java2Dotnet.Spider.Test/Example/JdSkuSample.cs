@@ -10,7 +10,6 @@ using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Java2Dotnet.Spider.Extension.ORM;
 using Newtonsoft.Json.Linq;
-using DownloadValidation = Java2Dotnet.Spider.Extension.Configuration.DownloadValidation;
 
 namespace Java2Dotnet.Spider.Test.Example
 {
@@ -28,7 +27,7 @@ namespace Java2Dotnet.Spider.Test.Example
 			});
 			context.AddPipeline(new MysqlPipeline
 			{
-				ConnectString = "Database='test';Data Source=mysqlserver;User ID=root;Password=1qazZAQ!;Port=4306"
+				ConnectString = "Database='test';Data Source=86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
 			});
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));

@@ -32,7 +32,6 @@ namespace Java2Dotnet.Spider.Core.Selector
 						break;
 					}
 			}
-
 		}
 
 		public Selectable(List<dynamic> nodes)

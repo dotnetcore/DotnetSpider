@@ -37,7 +37,6 @@ namespace Java2Dotnet.Spider.Extension
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
 		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
 		public List<Configuration.Pipeline> Pipelines { get; set; } = new List<Configuration.Pipeline>();
-		public List<PageHandler> PageHandlers { get; set; } = new List<PageHandler>();
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
 		public List<Configuration.TargetUrlExtractor> TargetUrlExtractInfos { get; set; } = new List<Configuration.TargetUrlExtractor>();
 		public List<EnviromentValue> EnviromentValues { get; set; } = new List<EnviromentValue>();

@@ -9,7 +9,7 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 {
 	public abstract class BasePipeline : IPipeline
 	{
-		public DownloadValidation DownloadValidation { get; set; }
+		public IDownloadHandler DownloadValidation { get; set; }
 
 		protected string BasePath { get; set; }
 

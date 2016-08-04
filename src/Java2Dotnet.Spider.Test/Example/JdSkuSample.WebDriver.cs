@@ -12,7 +12,6 @@ using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Java2Dotnet.Spider.Extension.ORM;
 using Newtonsoft.Json.Linq;
-using DownloadValidation = Java2Dotnet.Spider.Extension.Configuration.DownloadValidation;
 
 namespace Java2Dotnet.Spider.Test.Example
 {

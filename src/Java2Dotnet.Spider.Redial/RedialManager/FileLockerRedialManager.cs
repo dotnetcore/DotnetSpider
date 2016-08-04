@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
+using Java2Dotnet.Spider.Redial.NetworkValidater;
+using Java2Dotnet.Spider.Redial.Redialer;
 
 namespace Java2Dotnet.Spider.Redial.RedialManager
 {
@@ -18,22 +20,12 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 
 		public override IAtomicExecutor AtomicExecutor { get; }
 
-		public static FileLockerRedialManager Default
-		{
-			get
-			{
-				if (_instanse == null)
-				{
-					_instanse = new FileLockerRedialManager();
-				}
-				return _instanse;
-			}
-		}
-
-		private FileLockerRedialManager()
+		public FileLockerRedialManager(INetworkValidater networkValidater, IRedialer redialer)
 		{
 			_lockerFilePath = Path.Combine(SpiderEnviroment.GlobalDirectory, "redialer.lock");
 			AtomicExecutor = new FileLockerAtomicExecutor(this);
+			NetworkValidater = networkValidater;
+			Redialer = redialer;
 		}
 
 		public override void WaitforRedialFinish()
