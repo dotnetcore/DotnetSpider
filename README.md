@@ -4,12 +4,11 @@
 This is a cross platfrom, ligth spider develop by C#.
 
 ### DEVELOP ENVIROMENT
-
-	1. Visual Studio 2015 or later, becuase I used lots of C# 6.0
-	2. What to try .NET CORE? Install 2 packages
-		+ ![Visual Studio 2015 Update 3](https://go.microsoft.com/fwlink/?LinkId=691129)
-		+ ![.NET Core 1.0.0 - VS 2015 Tooling Preview 2](https://go.microsoft.com/fwlink/?LinkId=817245)
-		+ More details https://www.microsoft.com/net/core#windows
+- Visual Studio 2015 or later, becuase I used lots of C# 6.0
+- What to try .NET CORE? Install 2 packages
+    1. [Visual studio 2015 update 3](https://go.microsoft.com/fwlink/?LinkId=691129)	
+	2. [.NET Core 1.0.0 - VS 2015 Tooling Preview 2](https://go.microsoft.com/fwlink/?LinkId=817245)
+    3. [More details](https://www.microsoft.com/net/core#windows)
 
 ### DESIGN
  
