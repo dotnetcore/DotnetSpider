@@ -127,7 +127,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			}
 			catch (Exception e)
 			{
-				throw new SpiderExceptoin("Rawtext Invalid.");
+				throw new SpiderException("Rawtext Invalid.");
 			}
 		}
 	}
@@ -268,7 +268,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			{
 				if (string.IsNullOrEmpty(ExceptionMessage))
 				{
-					throw new SpiderExceptoin("ExceptionMessage should not be empty/null.");
+					throw new SpiderException("ExceptionMessage should not be empty/null.");
 				}
 				if (page.Exception.Message.Contains(ExceptionMessage))
 				{

@@ -47,7 +47,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 						return webDriver.FindElementByCssSelector(element.Expression);
 					}
 			}
-			throw new SpiderExceptoin("Unsport findy: " + element.Type);
+			throw new SpiderException("Unsport findy: " + element.Type);
 		}
 
 		protected RemoteWebDriver GetWebDriver()

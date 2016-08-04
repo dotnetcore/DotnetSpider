@@ -120,13 +120,13 @@ namespace Java2Dotnet.Spider.Core
 			_waitCount = 0;
 			if (pageProcessor == null)
 			{
-				throw new SpiderExceptoin("PageProcessor should not be null.");
+				throw new SpiderException("PageProcessor should not be null.");
 			}
 			PageProcessor = pageProcessor;
 			Site = site;
 			if (Site == null)
 			{
-				throw new SpiderExceptoin("Site should not be null.");
+				throw new SpiderException("Site should not be null.");
 			}
 			PageProcessor.Site = site;
 			StartRequests = Site.StartRequests;
@@ -155,10 +155,6 @@ namespace Java2Dotnet.Spider.Core
 			}
 
 			ThreadNum = threadNum;
-			if (Downloader != null)
-			{
-				Downloader.ThreadNum = threadNum;
-			}
 
 			return this;
 		}
@@ -175,7 +171,7 @@ namespace Java2Dotnet.Spider.Core
 			}
 			else
 			{
-				throw new SpiderExceptoin("Sleep time should be large than 1000.");
+				throw new SpiderException("Sleep time should be large than 1000.");
 			}
 		}
 
@@ -288,7 +284,6 @@ namespace Java2Dotnet.Spider.Core
 		{
 			CheckIfRunning();
 			Downloader = downloader;
-			Downloader.ThreadNum = ThreadNum == 0 ? 1 : ThreadNum;
 			return this;
 		}
 
@@ -305,8 +300,6 @@ namespace Java2Dotnet.Spider.Core
 			{
 				Downloader = new HttpClientDownloader();
 			}
-
-			Downloader.ThreadNum = ThreadNum;
 
 			if (Pipelines.Count == 0)
 			{
@@ -680,7 +673,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			if (Stat == Status.Running)
 			{
-				throw new SpiderExceptoin("Spider is already running!");
+				throw new SpiderException("Spider is already running!");
 			}
 		}
 

@@ -39,12 +39,12 @@
 
 				if (type != DataType.String && length != 0)
 				{
-					throw new SpiderExceptoin("Only String can set length.");
+					throw new SpiderException("Only String can set length.");
 				}
 
 				if (type == DataType.String && length == 0)
 				{
-					throw new SpiderExceptoin("Length can not be 0.");
+					throw new SpiderException("Length can not be 0.");
 				}
 			}
 		}

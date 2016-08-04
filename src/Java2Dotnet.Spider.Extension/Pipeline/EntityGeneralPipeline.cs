@@ -71,7 +71,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 					var col = Columns.FirstOrDefault(c => c.Name == p);
 					if (col == null)
 					{
-						throw new SpiderExceptoin("Columns set as primary is not a property of your entity.");
+						throw new SpiderException("Columns set as primary is not a property of your entity.");
 					}
 					else
 					{
@@ -87,7 +87,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 					var col = Columns.FirstOrDefault(c => c.Name == column);
 					if (col == null)
 					{
-						throw new SpiderExceptoin("Columns set as update is not a property of your entity.");
+						throw new SpiderException("Columns set as update is not a property of your entity.");
 					}
 					else
 					{
@@ -101,7 +101,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				}
 				if (Primary == null || Primary.Count == 0)
 				{
-					throw new SpiderExceptoin("Do you forget set the Primary in IndexesAttribute for your entity class.");
+					throw new SpiderException("Do you forget set the Primary in IndexesAttribute for your entity class.");
 				}
 			}
 
@@ -117,7 +117,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 						var col = Columns.FirstOrDefault(c => c.Name == i);
 						if (col == null)
 						{
-							throw new SpiderExceptoin("Columns set as index is not a property of your entity.");
+							throw new SpiderException("Columns set as index is not a property of your entity.");
 						}
 						else
 						{
@@ -140,7 +140,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 						var col = Columns.FirstOrDefault(c => c.Name == i);
 						if (col == null)
 						{
-							throw new SpiderExceptoin("Columns set as unique is not a property of your entity.");
+							throw new SpiderException("Columns set as unique is not a property of your entity.");
 						}
 						else
 						{
@@ -295,7 +295,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 		{
 			if (string.IsNullOrEmpty(type))
 			{
-				throw new SpiderExceptoin("TYPE can not be null");
+				throw new SpiderException("TYPE can not be null");
 			}
 
 			string datatype = type.ToLower();
@@ -313,7 +313,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				return DbType.DateTime;
 			}
 
-			throw new SpiderExceptoin("Unsport datatype: " + datatype);
+			throw new SpiderException("Unsport datatype: " + datatype);
 		}
 	}
 }

@@ -8,8 +8,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 	public class BaseDownloader : IDownloader, IDisposable
 	{
 		public List<IDownloadHandler> DownloadHandlers=new List<IDownloadHandler>();
-		public int ThreadNum { set; get; }
-		public Action CustomizeCookie;
 
 		public virtual Page Download(Request request, ISpider spider)
 		{

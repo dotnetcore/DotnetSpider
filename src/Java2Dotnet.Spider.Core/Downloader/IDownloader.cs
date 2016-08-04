@@ -15,8 +15,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		/// <returns></returns>
 		Page Download(Request request, ISpider spider);
 
-		int ThreadNum { get; set; }
-
 		IDownloader Clone();
 	}
 }

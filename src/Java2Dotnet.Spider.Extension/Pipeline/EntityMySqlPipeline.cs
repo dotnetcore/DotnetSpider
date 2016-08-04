@@ -127,7 +127,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				return "text";
 			}
 
-			throw new SpiderExceptoin("Unsport datatype: " + datatype);
+			throw new SpiderException("Unsport datatype: " + datatype);
 		}
 	}
 }

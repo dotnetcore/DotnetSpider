@@ -84,7 +84,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 				}
 				return new Selectable(resluts);
 			}
-			throw new SpiderExceptoin("Selector is null.");
+			throw new SpiderException("Selector is null.");
 		}
 
 		public override ISelectable SelectList(ISelector selector)
@@ -103,7 +103,7 @@ namespace Java2Dotnet.Spider.Core.Selector
 				return new Selectable(resluts);
 			}
 
-			throw new SpiderExceptoin("Selector is null.");
+			throw new SpiderException("Selector is null.");
 		}
 
 		public override IList<ISelectable> Nodes()

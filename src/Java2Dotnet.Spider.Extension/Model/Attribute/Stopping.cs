@@ -53,7 +53,7 @@ namespace Java2Dotnet.Spider.Extension.Model.Attribute
 				}
 				else
 				{
-					throw new SpiderExceptoin($"Can't parse to DateTime: Value-{value}, CompareValue-{CompareValue}");
+					throw new SpiderException($"Can't parse to DateTime: Value-{value}, CompareValue-{CompareValue}");
 				}
 			}
 
@@ -91,7 +91,7 @@ namespace Java2Dotnet.Spider.Extension.Model.Attribute
 				}
 			}
 
-			throw new SpiderExceptoin($"Can't parse to double: Value-{value}, CompareValue-{CompareValue}");
+			throw new SpiderException($"Can't parse to double: Value-{value}, CompareValue-{CompareValue}");
 		}
 
 		public override string ToString()

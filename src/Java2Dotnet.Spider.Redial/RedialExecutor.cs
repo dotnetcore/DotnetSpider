@@ -10,6 +10,10 @@ namespace Java2Dotnet.Spider.Redial
 
 		public RedialExecutor(IRedialManager redialManager)
 		{
+			if (redialManager == null)
+			{
+				throw new SpiderException("RedialManager should not be null.");
+			}
 			RedialManager = redialManager;
 		}
 

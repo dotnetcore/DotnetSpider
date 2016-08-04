@@ -43,7 +43,7 @@ namespace Java2Dotnet.Spider.Extension.Utils
 							{
 								return Selectors.Regex(expression, group);
 							}
-							throw new SpiderExceptoin("Regex argument shoulb be a number set to group: " + selector);
+							throw new SpiderException("Regex argument shoulb be a number set to group: " + selector);
 						}
 					}
 				case ExtractType.XPath:
@@ -51,7 +51,7 @@ namespace Java2Dotnet.Spider.Extension.Utils
 						return Selectors.XPath(expression);
 					}
 			}
-			throw new SpiderExceptoin("Not support selector: " + selector);
+			throw new SpiderException("Not support selector: " + selector);
 		}
 	}
 }

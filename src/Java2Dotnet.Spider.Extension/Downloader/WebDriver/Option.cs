@@ -40,7 +40,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 						}
 					}
 
-					throw new SpiderExceptoin("Proxy string should be like 192.168.1.100:8080.");
+					throw new SpiderException("Proxy string should be like 192.168.1.100:8080.");
 				}
 			}
 		}

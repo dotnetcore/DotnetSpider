@@ -43,7 +43,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
                     }
             }
 
-            throw new SpiderExceptoin($"Unsported datasource: {source}");
+            throw new SpiderException($"Unsported datasource: {source}");
         }
     }
 
@@ -348,7 +348,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
                     }
             }
 
-            throw new SpiderExceptoin($"Unsport Source: {Source}");
+            throw new SpiderException($"Unsport Source: {Source}");
         }
 
     }

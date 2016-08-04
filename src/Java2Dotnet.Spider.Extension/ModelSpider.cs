@@ -103,7 +103,7 @@ namespace Java2Dotnet.Spider.Extension
 					var address = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault();
 					if (address == null)
 					{
-						throw new SpiderExceptoin("Can't resovle your host: " + host);
+						throw new SpiderException("Can't resovle your host: " + host);
 					}
 					confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
 				}
@@ -377,7 +377,7 @@ namespace Java2Dotnet.Spider.Extension
 #if !NET_CORE
 						return new Redial.NetworkValidater.VpnNetworkValidater(((Configuration.VpnNetworkValidater)networkValidater).VpnName);
 #else
-						throw new SpiderExceptoin("unsport vpn redial on linux.");
+						throw new SpiderException("unsport vpn redial on linux.");
 #endif
 					}
 			}

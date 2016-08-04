@@ -162,11 +162,8 @@
     <Compile Include="..\Downloader\WebDriver\WebDriverDownloader.cs">
       <Link>Downloader\WebDriver\WebDriverDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\WebDriver\WebDriverItem.cs">
-      <Link>Downloader\WebDriver\WebDriverItem.cs</Link>
-    </Compile>
-    <Compile Include="..\Downloader\WebDriver\WebDriverPool.cs">
-      <Link>Downloader\WebDriver\WebDriverPool.cs</Link>
+    <Compile Include="..\Downloader\WebDriver\WebDriverUtil.cs">
+      <Link>Downloader\WebDriver\WebDriverUtil.cs</Link>
     </Compile>
     <Compile Include="..\ILinkSpiderContext.cs">
       <Link>ILinkSpiderContext.cs</Link>
@@ -347,9 +344,6 @@
     </Compile>
     <Compile Include="..\SpiderBuilder.cs">
       <Link>SpiderBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\CommonLoginUtil.cs">
-      <Link>Utils\CommonLoginUtil.cs</Link>
     </Compile>
     <Compile Include="..\Utils\DoubleKeyDictionary.cs">
       <Link>Utils\DoubleKeyDictionary.cs</Link>

@@ -23,7 +23,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			if (!IdentifyRegex.IsMatch(uuid))
 			{
-				throw new SpiderExceptoin("Task Identify only can contains A-Z a-z 0-9 _ - [SPACE]");
+				throw new SpiderException("Task Identify only can contains A-Z a-z 0-9 _ - [SPACE]");
 			}
 			Identity = uuid;
 			Site = site;

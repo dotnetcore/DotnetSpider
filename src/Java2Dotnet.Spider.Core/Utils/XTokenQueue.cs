@@ -146,13 +146,13 @@ namespace Java2Dotnet.Spider.Core.Utils
 		{
 			if (!Matches(seq))
 			{
-				throw new SpiderExceptoin("Queue did not match expected sequence");
+				throw new SpiderException("Queue did not match expected sequence");
 			}
 
 			int len = seq.Length;
 			if (len > RemainingLength())
 			{
-				throw new SpiderExceptoin("Queue not long enough to consume sequence");
+				throw new SpiderException("Queue not long enough to consume sequence");
 			}
 
 			_pos += len;

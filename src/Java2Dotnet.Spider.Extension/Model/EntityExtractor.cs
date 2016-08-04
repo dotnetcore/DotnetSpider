@@ -160,7 +160,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 					bool isEntity = VerifyIfEntity(datatype);
 					if (isEntity)
 					{
-						throw new SpiderExceptoin("Can't compare with object.");
+						throw new SpiderException("Can't compare with object.");
 					}
 					stopping.DataType = datatype.ToString().ToLower();
 					string value = dataObject.SelectToken($"$.{stopping.PropertyName}")?.ToString();
@@ -178,7 +178,7 @@ namespace Java2Dotnet.Spider.Extension.Model
 				}
 				else
 				{
-					throw new SpiderExceptoin("Stopping cannot be EntityMetaData.");
+					throw new SpiderException("Stopping cannot be EntityMetaData.");
 				}
 			}
 

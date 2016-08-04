@@ -138,7 +138,7 @@ namespace Java2Dotnet.Spider.Extension
 			}
 			else
 			{
-				throw new SpiderExceptoin($"Type: {type.FullName} is not a ISpiderEntity.");
+				throw new SpiderException($"Type: {type.FullName} is not a ISpiderEntity.");
 			}
 
 			return this;
