@@ -18,8 +18,8 @@ namespace Java2Dotnet.Spider.Test.Example
 		protected override SpiderContext GetSpiderContext()
 		{
 			SpiderContext context = new SpiderContext();
-			context.SetThreadNum(8);
-			context.SetSpiderName("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			context.SetThreadNum(2);
+			context.SetSpiderName("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 			context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
 			{
 				Region = new Extension.Configuration.Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
@@ -27,7 +27,7 @@ namespace Java2Dotnet.Spider.Test.Example
 			});
 			context.AddPipeline(new MysqlPipeline
 			{
-				ConnectString = "Database='test';Data Source=86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
+				ConnectString = "Database='test';Data Source=mysqlserver;User ID=root;Password=1qazZAQ!;Port=4306"
 			});
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));

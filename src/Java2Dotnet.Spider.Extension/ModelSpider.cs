@@ -55,7 +55,7 @@ namespace Java2Dotnet.Spider.Extension
 				SpiderContext.Build();
 			}
 
-			Name = $"{SpiderContext.UserId}-{SpiderContext.SpiderName}";
+			Name = SpiderContext.SpiderName;
 
 			Logger = new Logger(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup);
 

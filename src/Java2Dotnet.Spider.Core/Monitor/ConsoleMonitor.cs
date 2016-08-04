@@ -8,7 +8,7 @@ namespace Java2Dotnet.Spider.Core.Monitor
 {
 	public class ConsoleMonitor : IMonitorService
 	{
-		public bool IsValid
+		public bool IsEnable
 		{
 			get
 			{
@@ -20,9 +20,11 @@ namespace Java2Dotnet.Spider.Core.Monitor
 		{
 		}
 
-		public void SaveStatus(dynamic spider)
+		public void Watch(SpiderStatus status)
 		{
-			spider.Logger.Warn($"Left: {spider.Scheduler.GetLeftRequestsCount()} Total: {spider.Scheduler.GetTotalRequestsCount()} Thread: {spider.ThreadNum}");
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine($"Status: Left {status.Left}, Success {status.Success}, Error: {status.Error}, Total {status.Total}, Thread {status.ThreadNum}");
+			Console.ResetColor();
 		}
 	}
 }

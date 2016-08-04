@@ -36,6 +36,7 @@ namespace Java2Dotnet.Spider.Test
 			ServiceProvider.Add<ILogService>(new ConsoleLog());
 			ServiceProvider.Add<ILogService>(new FileLog());
 			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
+			ServiceProvider.Add<IMonitorService>(new FileMonitor());
 			ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
 
 			//var start = DateTime.Now;

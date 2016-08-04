@@ -38,9 +38,8 @@ namespace Java2Dotnet.Spider.Core
 		public bool IsExitWhenComplete { get; set; } = true;
 		public Status StatusCode => Stat;
 		public IScheduler Scheduler { get; }
-		public event SpiderEvent RequestedSuccessEvent;
-		public event SpiderEvent RequestedFailEvent;
-		public event SpiderClosing SpiderClosingEvent;
+		public event SpiderEvent OnSuccess;
+		public event SpiderClosingHandler SpiderClosing;
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 		public string UserId { get; }
 		public string TaskGroup { get; }
@@ -133,9 +132,9 @@ namespace Java2Dotnet.Spider.Core
 			Scheduler = scheduler ?? new QueueDuplicateRemovedScheduler();
 			Scheduler.Init(this);
 #if !NET_CORE
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Identity, "error_requests.txt"));
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 #else
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppContext.BaseDirectory, Identity, "error_requests.txt"));
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppContext.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 		}
@@ -393,7 +392,7 @@ namespace Java2Dotnet.Spider.Core
 							sw.Start();
 #endif
 
-							OnSuccess(request);
+							_OnSuccess(request);
 #if TEST
 							sw.Stop();
 							Console.WriteLine("OnSuccess:" + (sw.ElapsedMilliseconds).ToString());
@@ -425,7 +424,7 @@ namespace Java2Dotnet.Spider.Core
 
 			FinishedTime = DateTime.Now;
 
-			SpiderClosingEvent?.Invoke();
+			SpiderClosing?.Invoke();
 
 			foreach (IPipeline pipeline in Pipelines)
 			{
@@ -494,7 +493,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			Stat = Status.Exited;
 			Logger.Warn("退出任务中 " + Identity + "...");
-			SpiderClosingEvent?.Invoke();
+			SpiderClosing?.Invoke();
 		}
 
 		public bool IsExit { get; private set; }
@@ -517,13 +516,13 @@ namespace Java2Dotnet.Spider.Core
 			{
 				File.AppendAllText(_errorRequestFile.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
 			}
-
-			RequestedFailEvent?.Invoke(request);
+			(Scheduler as IMonitorableScheduler).IncreaseErrorCounter();
 		}
 
-		protected void OnSuccess(Request request)
+		protected void _OnSuccess(Request request)
 		{
-			RequestedSuccessEvent?.Invoke(request);
+			(Scheduler as IMonitorableScheduler).IncreaseSuccessCounter();
+			OnSuccess?.Invoke(request);
 		}
 
 		protected Page AddToCycleRetry(Request request, Site site)

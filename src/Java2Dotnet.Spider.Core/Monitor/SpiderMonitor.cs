@@ -33,7 +33,7 @@ namespace Java2Dotnet.Spider.Core.Monitor
 				{
 					if (!_data.ContainsKey(spider))
 					{
-						Timer timer = new Timer(new TimerCallback(SaveStatus), spider, 0, 2000);
+						Timer timer = new Timer(new TimerCallback(WatchStatus), spider, 0, 2000);
 						_data.Add(spider, timer);
 					}
 				}
@@ -41,13 +41,28 @@ namespace Java2Dotnet.Spider.Core.Monitor
 			}
 		}
 
-		private void SaveStatus(object obj)
+		private void WatchStatus(object obj)
 		{
 			foreach (var service in ServiceProvider.Get<IMonitorService>())
 			{
-				if (service.IsValid)
+				if (service.IsEnable)
 				{
-					service.SaveStatus(obj);
+					var spider = obj as Spider;
+					var monitor = spider.Scheduler as IMonitorableScheduler;
+					service.Watch(new SpiderStatus
+					{
+						Code = spider.StatusCode.ToString(),
+						Error = monitor.GetErrorRequestsCount(),
+						Identity = spider.Identity,
+						Left = monitor.GetLeftRequestsCount(),
+						Machine = SystemInfo.HostName,
+						Success = monitor.GetSuccessRequestsCount(),
+						TaskGroup = spider.TaskGroup,
+						ThreadNum = spider.ThreadNum,
+						Total = monitor.GetTotalRequestsCount(),
+						UserId = spider.UserId,
+						Timestamp = DateTime.Now.ToString()
+					});
 				}
 			}
 		}
