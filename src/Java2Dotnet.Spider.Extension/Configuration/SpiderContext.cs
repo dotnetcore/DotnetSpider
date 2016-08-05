@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace Java2Dotnet.Spider.Extension
 {
-	public class SpiderContext
+	public class SpiderContext : ITask
 	{
 		private HashSet<Type> Types { get; set; }
 

@@ -33,7 +33,8 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			ServiceProvider.Add<ILogService>(new LogService(new ConsoleLog(), new FileLog()));
+			var log = new LogService(new ConsoleLog(), new FileLog());
+			ServiceProvider.Add<ILogService>(log);
 			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
 			ServiceProvider.Add<IMonitorService>(new FileMonitor());
 			ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));

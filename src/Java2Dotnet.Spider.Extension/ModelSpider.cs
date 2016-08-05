@@ -220,7 +220,7 @@ namespace Java2Dotnet.Spider.Extension
 				}
 				if (needInitStartRequest)
 				{
-					Logger.Info("开始数据验证 ...");
+					Logger.Info(LogInfo.Create("开始数据验证 ...", SpiderContext));
 
 					if (validations != null && validations.Count > 0)
 					{
@@ -239,7 +239,7 @@ namespace Java2Dotnet.Spider.Extension
 				}
 				else
 				{
-					Logger.Info("有其他线程执行了数据验证.");
+					Logger.Info(LogInfo.Create("有其他线程执行了数据验证.", SpiderContext));
 				}
 
 				if (needInitStartRequest && Redis != null)
@@ -262,7 +262,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		private Core.Spider PrepareSpider(params string[] args)
 		{
-			Logger.Info("创建爬虫...");
+			Logger.Info(LogInfo.Create("创建爬虫...", SpiderContext));
 			bool needInitStartRequest = true;
 			string key = "locker-" + Name;
 			if (Db != null)
@@ -286,7 +286,7 @@ namespace Java2Dotnet.Spider.Extension
 			{
 				PrepareSite();
 			}
-			Logger.Info("构建内部模块...");
+			Logger.Info(LogInfo.Create("构建内部模块...", SpiderContext));
 			SpiderMonitor.Default.Register(spider);
 			spider.InitComponent();
 
@@ -300,7 +300,7 @@ namespace Java2Dotnet.Spider.Extension
 
 		private void PrepareSite()
 		{
-			Logger.Info("准备爬虫数据...");
+			Logger.Info(LogInfo.Create("准备爬虫数据...", SpiderContext));
 			if (SpiderContext.PrepareStartUrls != null)
 			{
 				foreach (var prepareStartUrl in SpiderContext.PrepareStartUrls)

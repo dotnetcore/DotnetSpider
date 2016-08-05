@@ -6,14 +6,14 @@ namespace Java2Dotnet.Spider.Log
 {
 	public class LogService : ILogService, IService
 	{
-		private static List<ILogService> Services = ServiceProvider.Get<ILogService>();
+		private List<ILogService> Services { get; set; } = new List<ILogService>();
 		private string SpiderName { get; set; }
 		private string UserId { get; set; }
 		private string TaskGroup { get; set; }
 
 		public LogService(params ILogService[] logServices)
 		{
-			foreach(var logService in logServices)
+			foreach (var logService in logServices)
 			{
 				if ((logService as LogService) != null)
 				{
