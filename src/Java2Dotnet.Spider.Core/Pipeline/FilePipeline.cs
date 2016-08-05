@@ -5,6 +5,9 @@ using System.Text;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core.Utils;
 using System.Runtime.InteropServices;
+using Java2Dotnet.Spider.Log;
+using Java2Dotnet.Spider.Ioc;
+using System.Linq;
 
 namespace Java2Dotnet.Spider.Core.Pipeline
 {
@@ -30,6 +33,7 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 #else
 			SetPath("\\data\\files");
 #endif
+			Logger = ServiceProvider.Get<ILogService>().First();
 		}
 
 		public FilePipeline(string path)
@@ -37,7 +41,7 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 			SetPath(path);
 		}
 
-		public override void Process(ResultItems resultItems )
+		public override void Process(ResultItems resultItems)
 		{
 			try
 			{
@@ -68,7 +72,7 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 			}
 			catch (Exception e)
 			{
-				Spider.Logger.Warn("Write file error.", e);
+				Logger.Warn(LogInfo.Create("Write file error.", Spider), e);
 				throw;
 			}
 		}

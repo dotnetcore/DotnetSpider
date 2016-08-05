@@ -3,13 +3,13 @@ using System;
 
 namespace Java2Dotnet.Spider.Log
 {
-	public interface ILogService : IService,IDisposable
+	public interface ILogService : IService, IDisposable
 	{
-		void Warn(dynamic message, Exception e);
-		void Warn(dynamic message);
-		void Info(dynamic message, Exception e);
-		void Info(dynamic message);
-		void Error(dynamic message, Exception e);
-		void Error(dynamic message);
+		void Warn(string message, Exception e);
+		void Warn(string message);
+		void Info(string message, Exception e);
+		void Info(string message);
+		void Error(string message, Exception e);
+		void Error(string message);
 	}
 }

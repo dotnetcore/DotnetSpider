@@ -33,32 +33,32 @@ namespace Java2Dotnet.Spider.Log
 			}
 		}
 
-		public void Error(dynamic message)
+		public void Error(string message)
 		{
 			WriteToFileLog("[错误] " + message);
 		}
 
-		public void Error(dynamic message, Exception e)
+		public void Error(string message, Exception e)
 		{
 			WriteToFileLog("[错误] " + message + ": " + e);
 		}
 
-		public void Info(dynamic message)
+		public void Info(string message)
 		{
 			WriteToFileLog("[信息] " + message);
 		}
 
-		public void Info(dynamic message, Exception e)
+		public void Info(string message, Exception e)
 		{
 			WriteToFileLog("[信息] " + message + ": " + e);
 		}
 
-		public void Warn(dynamic message)
+		public void Warn(string message)
 		{
 			WriteToFileLog("[警告] " + message);
 		}
 
-		public void Warn(dynamic message, Exception e)
+		public void Warn(string message, Exception e)
 		{
 			WriteToFileLog("[警告]" + message + ": " + e);
 		}

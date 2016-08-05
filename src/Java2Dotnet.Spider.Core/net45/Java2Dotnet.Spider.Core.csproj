@@ -81,9 +81,6 @@
     <Compile Include="..\Downloader\IDownloader.cs">
       <Link>Downloader\IDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\ILogable.cs">
-      <Link>ILogable.cs</Link>
-    </Compile>
     <Compile Include="..\INetworkProxy.cs">
       <Link>INetworkProxy.cs</Link>
     </Compile>
