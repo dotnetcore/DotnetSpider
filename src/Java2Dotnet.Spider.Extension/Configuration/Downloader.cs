@@ -25,7 +25,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		//public abstract int RedialLimit { get; set; }
 
 		//[JsonIgnore]
-		public List<DownloadHandler> Handlers { get; set; }
+		public List<IDownloadHandler> Handlers { get; set; }
 
 		public abstract IDownloader GetDownloader();
 

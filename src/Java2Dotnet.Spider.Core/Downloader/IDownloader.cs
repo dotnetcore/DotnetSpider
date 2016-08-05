@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Java2Dotnet.Spider.Core.Downloader
 {
 	/// <summary>
@@ -14,6 +16,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		/// <param name="spider"></param>
 		/// <returns></returns>
 		Page Download(Request request, ISpider spider);
+
+		List<IDownloadHandler> Handlers { get; set; }
 
 		IDownloader Clone();
 	}

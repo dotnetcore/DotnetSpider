@@ -10,7 +10,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 	public class BaseDownloader : IDownloader, IDisposable
 	{
 		protected ILogService Logger { get; set; }
-		public List<IDownloadHandler> DownloadHandlers=new List<IDownloadHandler>();
+		public List<IDownloadHandler> Handlers { get; set; } = new List<IDownloadHandler>();
 
 		public BaseDownloader()
 		{
@@ -28,9 +28,9 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 		protected void Handle(Page page, ISpider spider)
 		{
-			if (DownloadHandlers != null)
+			if (Handlers != null)
 			{
-				foreach (var handler in DownloadHandlers)
+				foreach (var handler in Handlers)
 				{
 					handler.Handle(page);
 				}

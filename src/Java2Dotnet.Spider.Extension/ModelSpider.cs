@@ -350,6 +350,7 @@ namespace Java2Dotnet.Spider.Extension
 			spider.SetThreadNum(SpiderContext.ThreadNum);
 			spider.Deep = SpiderContext.Deep;
 			var downloader = SpiderContext.Downloader.GetDownloader();
+			downloader.Handlers = SpiderContext.Downloader.Handlers;
 			spider.SetDownloader(downloader);
 			spider.SkipWhenResultIsEmpty = SpiderContext.SkipWhenResultIsEmpty;
 

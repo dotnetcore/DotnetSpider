@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using Java2Dotnet.Spider.Validation;
 using System.Linq;
 using Java2Dotnet.Spider.Extension.Downloader.WebDriver;
+using Java2Dotnet.Spider.Core.Downloader;
 
 namespace Java2Dotnet.Spider.Extension.Configuration.Json
 {
@@ -549,13 +550,13 @@ namespace Java2Dotnet.Spider.Extension.Configuration.Json
 			throw new SpiderException("UNSPORT or JSON string is incorrect: " + jobject);
 		}
 
-		private List<DownloadHandler> GetDownloadHandlers(IEnumerable<JToken> jobjects)
+		private List<IDownloadHandler> GetDownloadHandlers(IEnumerable<JToken> jobjects)
 		{
 			if (jobjects == null)
 			{
 				return null;
 			}
-			List<DownloadHandler> list = new List<DownloadHandler>();
+			List<IDownloadHandler> list = new List<IDownloadHandler>();
 			if (jobjects != null)
 			{
 				foreach (var handler in jobjects)

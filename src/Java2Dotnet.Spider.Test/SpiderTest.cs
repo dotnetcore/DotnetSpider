@@ -133,7 +133,7 @@ namespace Java2Dotnet.Spider.Test
 			}
 		}
 
-		public class TestDownloader : IDownloader
+		public class TestDownloader : BaseDownloader
 		{
 			public IDownloadHandler DownloadValidation { get; set; }
 
