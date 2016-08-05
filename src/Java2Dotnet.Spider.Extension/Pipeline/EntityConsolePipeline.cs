@@ -12,17 +12,9 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 	/// Print page model in console
 	/// Usually used in test.
 	/// </summary>
-	public class EntityConsolePipeline : IEntityPipeline
+	public class EntityConsolePipeline : EntityBasePipeline
 	{
-		public void Dispose()
-		{
-		}
-
-		public void Initialize()
-		{
-		}
-
-		public void Process(List<JObject> datas, ISpider spider)
+		public override void Process(List<JObject> datas)
 		{
 			foreach (var data in datas)
 			{

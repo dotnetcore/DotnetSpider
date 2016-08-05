@@ -8,11 +8,15 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 	/// </summary>
 	public interface IPipeline : IDisposable
 	{
+		ISpider Spider { get; }
+
+		void InitPipeline(ISpider spider);
+
 		/// <summary>
 		/// Process extracted results.
 		/// </summary>
 		/// <param name="resultItems"></param>
 		/// <param name="spider"></param>
-		void Process(ResultItems resultItems, ISpider spider);
+		void Process(ResultItems resultItems);
 	}
 }

@@ -93,8 +93,8 @@
     <Compile Include="..\Configuration\Downloader.cs">
       <Link>Configuration\Downloader.cs</Link>
     </Compile>
-    <Compile Include="..\Configuration\DownloadValidation.cs">
-      <Link>Configuration\DownloadValidation.cs</Link>
+    <Compile Include="..\Configuration\DownloadHandler.cs">
+      <Link>Configuration\DownloadHandler.cs</Link>
     </Compile>
     <Compile Include="..\Configuration\Entity.cs">
       <Link>Configuration\Entity.cs</Link>
@@ -113,9 +113,6 @@
     </Compile>
     <Compile Include="..\Configuration\NetworkValidater.cs">
       <Link>Configuration\NetworkValidater.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\PageHandler.cs">
-      <Link>Configuration\PageHandler.cs</Link>
     </Compile>
     <Compile Include="..\Configuration\Pipeline.cs">
       <Link>Configuration\Pipeline.cs</Link>
@@ -153,9 +150,6 @@
     <Compile Include="..\Downloader\FiddlerDownloader.cs">
       <Link>Downloader\FiddlerDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\FileCache.cs">
-      <Link>Downloader\FileCache.cs</Link>
-    </Compile>
     <Compile Include="..\Downloader\FileDownloader.cs">
       <Link>Downloader\FileDownloader.cs</Link>
     </Compile>
@@ -168,11 +162,8 @@
     <Compile Include="..\Downloader\WebDriver\WebDriverDownloader.cs">
       <Link>Downloader\WebDriver\WebDriverDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\WebDriver\WebDriverItem.cs">
-      <Link>Downloader\WebDriver\WebDriverItem.cs</Link>
-    </Compile>
-    <Compile Include="..\Downloader\WebDriver\WebDriverPool.cs">
-      <Link>Downloader\WebDriver\WebDriverPool.cs</Link>
+    <Compile Include="..\Downloader\WebDriver\WebDriverUtil.cs">
+      <Link>Downloader\WebDriver\WebDriverUtil.cs</Link>
     </Compile>
     <Compile Include="..\ILinkSpiderContext.cs">
       <Link>ILinkSpiderContext.cs</Link>
@@ -297,6 +288,9 @@
     <Compile Include="..\ORM\TableSuffix.cs">
       <Link>ORM\TableSuffix.cs</Link>
     </Compile>
+    <Compile Include="..\Pipeline\EntityBasePipeline.cs">
+      <Link>Pipeline\EntityBasePipeline.cs</Link>
+    </Compile>
     <Compile Include="..\Pipeline\EntityCollectorPipeline.cs">
       <Link>Pipeline\EntityCollectorPipeline.cs</Link>
     </Compile>
@@ -350,9 +344,6 @@
     </Compile>
     <Compile Include="..\SpiderBuilder.cs">
       <Link>SpiderBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\CommonLoginUtil.cs">
-      <Link>Utils\CommonLoginUtil.cs</Link>
     </Compile>
     <Compile Include="..\Utils\DoubleKeyDictionary.cs">
       <Link>Utils\DoubleKeyDictionary.cs</Link>

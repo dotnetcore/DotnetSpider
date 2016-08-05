@@ -1,6 +1,10 @@
 ﻿using System;
 using Java2Dotnet.Spider.Redial.Redialer;
 using Newtonsoft.Json;
+using Java2Dotnet.Spider.Redial.RedialManager;
+using Java2Dotnet.Spider.Redial;
+using Java2Dotnet.Spider.Redial.NetworkValidater;
+using Java2Dotnet.Spider.Core;
 
 namespace Java2Dotnet.Spider.Extension.Configuration
 {
@@ -17,9 +21,48 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		[JsonIgnore]
 		public NetworkValidater NetworkValidater { get; set; }
 
+		public RedialManager RedialManager { get; set; }
+
 		public abstract Types Type { get; internal set; }
 
 		public abstract IRedialer GetRedialer();
+	}
+
+	public abstract class RedialManager
+	{
+		[Flags]
+		public enum Types
+		{
+			Redis,
+			File
+		}
+
+		public abstract Types Type { get; internal set; }
+		public abstract void SetRedialManager(INetworkValidater networkValidater, IRedialer redialer);
+	}
+
+	public class FileRedialManager : RedialManager
+	{
+		public override Types Type { get; internal set; } = Types.File;
+
+		public override void SetRedialManager(INetworkValidater networkValidater, IRedialer redialer)
+		{
+			NetworkProxyManager.Current.Register(new RedialExecutor(new FileLockerRedialManager(networkValidater, redialer)));
+		}
+	}
+
+	public class RedisRedialManager : RedialManager
+	{
+		public string Host { get; set; }
+		public string Password { get; set; }
+		public int Port { get; set; }
+
+		public override Types Type { get; internal set; } = Types.Redis;
+
+		public override void SetRedialManager(INetworkValidater networkValidater, IRedialer redialer)
+		{
+			NetworkProxyManager.Current.Register(new RedialExecutor(new Redial.RedialManager.RedisRedialManager(Host, Password, networkValidater, redialer, null)));
+		}
 	}
 
 	public class AdslRedialer : Redialer

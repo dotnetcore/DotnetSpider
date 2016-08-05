@@ -22,7 +22,7 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			_server = server;
 		}
 
-		public bool IsValid
+		public bool IsEnable
 		{
 			get
 			{
@@ -43,24 +43,24 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 			}
 		}
 
-		public void SaveStatus(dynamic spider)
+		public void Watch(SpiderStatus status)
 		{
-			var status = new
+			var tmp = new
 			{
 				Message = new
 				{
-					Error = spider.Scheduler.GetErrorRequestsCount(),
-					Left = spider.Scheduler.GetLeftRequestsCount(),
-					Status = spider.StatusCode,
-					Success = spider.Scheduler.GetSuccessRequestsCount(),
-					Thread = spider.ThreadNum,
-					Total = spider.Scheduler.GetTotalRequestsCount()
+					Error = status.Error,
+					Left = status.Left,
+					Status = status.Code,
+					Success = status.Success,
+					Thread = status.ThreadNum,
+					Total = status.Total
 				},
-				Name = spider.Identity,
-				Machine = SystemInfo.HostName,
-				UserId = spider.UserId,
-				TaskGroup = spider.TaskGroup,
-				Timestamp = DateTime.Now
+				Name = status.Identity,
+				Machine = status.Machine,
+				UserId = status.UserId,
+				TaskGroup = status.TaskGroup,
+				Timestamp = status.Timestamp
 			};
 			_postCounter.Inc();
 			var task = _client.PostAsync(_server, new StringContent(JsonConvert.SerializeObject(status), Encoding.UTF8, "application/json"));

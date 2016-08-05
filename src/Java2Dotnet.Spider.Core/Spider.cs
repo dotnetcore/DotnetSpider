@@ -32,23 +32,20 @@ namespace Java2Dotnet.Spider.Core
 		public DateTime StartTime { get; private set; }
 		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		public Site Site { get; private set; }
-		public List<Action<Page>> PageHandlers;
 		public string Identity { get; }
 		public List<IPipeline> Pipelines { get; private set; } = new List<IPipeline>();
 		public IDownloader Downloader { get; private set; }
 		public bool IsExitWhenComplete { get; set; } = true;
 		public Status StatusCode => Stat;
 		public IScheduler Scheduler { get; }
-		public event SpiderEvent RequestedSuccessEvent;
-		public event SpiderEvent RequestedFailEvent;
-		public event SpiderClosing SpiderClosingEvent;
+		public event SpiderEvent OnSuccess;
+		public event SpiderClosingHandler SpiderClosing;
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 		public string UserId { get; }
 		public string TaskGroup { get; }
 		public bool IsExited { get; private set; }
-		protected readonly string DataRootDirectory;
 
-		protected IPageProcessor PageProcessor { get; set; }
+		public IPageProcessor PageProcessor { get; set; }
 		protected List<Request> StartRequests { get; set; }
 		protected static readonly int WaitInterval = 8;
 		protected Status Stat = Status.Init;
@@ -122,28 +119,24 @@ namespace Java2Dotnet.Spider.Core
 			_waitCount = 0;
 			if (pageProcessor == null)
 			{
-				throw new SpiderExceptoin("PageProcessor should not be null.");
+				throw new SpiderException("PageProcessor should not be null.");
 			}
 			PageProcessor = pageProcessor;
 			Site = site;
 			if (Site == null)
 			{
-				throw new SpiderExceptoin("Site should not be null.");
+				throw new SpiderException("Site should not be null.");
 			}
 			PageProcessor.Site = site;
 			StartRequests = Site.StartRequests;
 			Scheduler = scheduler ?? new QueueDuplicateRemovedScheduler();
 			Scheduler.Init(this);
-
 #if !NET_CORE
-
-			DataRootDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\data\\" + Identity;
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 #else
-			DataRootDirectory = Path.Combine(AppContext.BaseDirectory, "data", Identity);
-
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppContext.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-			_errorRequestFile = FilePersistentBase.PrepareFile(Path.Combine(DataRootDirectory, "errorRequests.txt"));
 		}
 
 		/// <summary>
@@ -161,10 +154,6 @@ namespace Java2Dotnet.Spider.Core
 			}
 
 			ThreadNum = threadNum;
-			if (Downloader != null)
-			{
-				Downloader.ThreadNum = threadNum;
-			}
 
 			return this;
 		}
@@ -181,7 +170,7 @@ namespace Java2Dotnet.Spider.Core
 			}
 			else
 			{
-				throw new SpiderExceptoin("Sleep time should be large than 1000.");
+				throw new SpiderException("Sleep time should be large than 1000.");
 			}
 		}
 
@@ -294,7 +283,6 @@ namespace Java2Dotnet.Spider.Core
 		{
 			CheckIfRunning();
 			Downloader = downloader;
-			Downloader.ThreadNum = ThreadNum == 0 ? 1 : ThreadNum;
 			return this;
 		}
 
@@ -312,11 +300,14 @@ namespace Java2Dotnet.Spider.Core
 				Downloader = new HttpClientDownloader();
 			}
 
-			Downloader.ThreadNum = ThreadNum;
-
 			if (Pipelines.Count == 0)
 			{
 				Pipelines.Add(new FilePipeline());
+			}
+
+			foreach (var pipeline in Pipelines)
+			{
+				pipeline.InitPipeline(this);
 			}
 
 			if (StartRequests != null && StartRequests.Count > 0)
@@ -356,8 +347,6 @@ namespace Java2Dotnet.Spider.Core
 #endif
 
 			InitComponent();
-
-			IMonitorableScheduler monitor = (IMonitorableScheduler)Scheduler;
 
 			if (StartTime == DateTime.MinValue)
 			{
@@ -403,7 +392,7 @@ namespace Java2Dotnet.Spider.Core
 							sw.Start();
 #endif
 
-							OnSuccess(request);
+							_OnSuccess(request);
 #if TEST
 							sw.Stop();
 							Console.WriteLine("OnSuccess:" + (sw.ElapsedMilliseconds).ToString());
@@ -435,7 +424,7 @@ namespace Java2Dotnet.Spider.Core
 
 			FinishedTime = DateTime.Now;
 
-			SpiderClosingEvent?.Invoke();
+			SpiderClosing?.Invoke();
 
 			foreach (IPipeline pipeline in Pipelines)
 			{
@@ -465,7 +454,6 @@ namespace Java2Dotnet.Spider.Core
 		{
 			if (!_printedInfo)
 			{
-#if NET_CORE
 				Console.WriteLine("=============================================================");
 				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
 				Console.WriteLine("== It's a light, stable, high performce spider             ==");
@@ -475,17 +463,6 @@ namespace Java2Dotnet.Spider.Core
 				Console.WriteLine("== Version: 0.9.10                                         ==");
 				Console.WriteLine("== Author: zlzforever@163.com                              ==");
 				Console.WriteLine("=============================================================");
-#else
-				Console.WriteLine("=============================================================");
-				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
-				Console.WriteLine("== It's a light, stable, high performce spider             ==");
-				Console.WriteLine("== Support multi thread, ajax page, http                   ==");
-				Console.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
-				Console.WriteLine("== License: LGPL3.0                                        ==");
-				Console.WriteLine("== Version: 0.9.10                                         ==");
-				Console.WriteLine("== Author: zlzforever@163.com                              ==");
-				Console.WriteLine("=============================================================");
-#endif
 				_printedInfo = true;
 			}
 		}
@@ -516,7 +493,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			Stat = Status.Exited;
 			Logger.Warn("退出任务中 " + Identity + "...");
-			SpiderClosingEvent?.Invoke();
+			SpiderClosing?.Invoke();
 		}
 
 		public bool IsExit { get; private set; }
@@ -539,13 +516,13 @@ namespace Java2Dotnet.Spider.Core
 			{
 				File.AppendAllText(_errorRequestFile.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
 			}
-
-			RequestedFailEvent?.Invoke(request);
+			(Scheduler as IMonitorableScheduler).IncreaseErrorCounter();
 		}
 
-		protected void OnSuccess(Request request)
+		protected void _OnSuccess(Request request)
 		{
-			RequestedSuccessEvent?.Invoke(request);
+			(Scheduler as IMonitorableScheduler).IncreaseSuccessCounter();
+			OnSuccess?.Invoke(request);
 		}
 
 		protected Page AddToCycleRetry(Request request, Site site)
@@ -596,14 +573,6 @@ namespace Java2Dotnet.Spider.Core
 					return;
 				}
 
-				if (PageHandlers != null)
-				{
-					foreach (var pageHandler in PageHandlers)
-					{
-						pageHandler?.Invoke(page);
-					}
-				}
-
 #if TEST
 				sw.Reset();
 				sw.Start();
@@ -614,6 +583,14 @@ namespace Java2Dotnet.Spider.Core
 				Console.WriteLine("Process:" + (sw.ElapsedMilliseconds).ToString());
 #endif
 			}
+			//catch (Redial.RedialException re)
+			//{
+			//	if (Site.CycleRetryTimes > 0)
+			//	{
+			//		page = AddToCycleRetry(request, Site);
+			//	}
+			//	Logger.Warn(re.Message);
+			//}
 			catch (DownloadException de)
 			{
 				if (Site.CycleRetryTimes > 0)
@@ -664,7 +641,7 @@ namespace Java2Dotnet.Spider.Core
 			{
 				foreach (IPipeline pipeline in Pipelines)
 				{
-					pipeline.Process(page.ResultItems, this);
+					pipeline.Process(page.ResultItems);
 				}
 				Logger.Info($"采集: {request.Url} 成功.");
 			}
@@ -695,7 +672,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			if (Stat == Status.Running)
 			{
-				throw new SpiderExceptoin("Spider is already running!");
+				throw new SpiderException("Spider is already running!");
 			}
 		}
 

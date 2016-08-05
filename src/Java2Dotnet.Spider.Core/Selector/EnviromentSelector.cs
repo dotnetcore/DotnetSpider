@@ -13,12 +13,12 @@ namespace Java2Dotnet.Spider.Core.Selector
 
 		public dynamic Select(dynamic text)
 		{
-			throw new SpiderExceptoin("EnviromentSelector does not support SelectList method now.");
+			throw new SpiderException("EnviromentSelector does not support SelectList method now.");
 		}
 
 		public List<dynamic> SelectList(dynamic text)
 		{
-			throw new SpiderExceptoin("EnviromentSelector does not support SelectList method now.");
+			throw new SpiderException("EnviromentSelector does not support SelectList method now.");
 		}
 	}
 }

@@ -10,7 +10,6 @@ using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.Model.Formatter;
 using Java2Dotnet.Spider.Extension.ORM;
 using Newtonsoft.Json.Linq;
-using DownloadValidation = Java2Dotnet.Spider.Extension.Configuration.DownloadValidation;
 
 namespace Java2Dotnet.Spider.Test.Example
 {
@@ -19,8 +18,8 @@ namespace Java2Dotnet.Spider.Test.Example
 		protected override SpiderContext GetSpiderContext()
 		{
 			SpiderContext context = new SpiderContext();
-			context.SetThreadNum(8);
-			context.SetSpiderName("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			context.SetThreadNum(2);
+			context.SetSpiderName("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 			context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
 			{
 				Region = new Extension.Configuration.Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },

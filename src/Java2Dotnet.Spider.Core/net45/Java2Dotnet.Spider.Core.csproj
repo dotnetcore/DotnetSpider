@@ -60,17 +60,17 @@
     <Compile Include="..\ContentType.cs">
       <Link>ContentType.cs</Link>
     </Compile>
-    <Compile Include="..\CountableThreadPool.cs">
-      <Link>CountableThreadPool.cs</Link>
-    </Compile>
     <Compile Include="..\DefaultSpider.cs">
       <Link>DefaultSpider.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\BaseDownloader.cs">
       <Link>Downloader\BaseDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\DownloadValidation.cs">
-      <Link>Downloader\DownloadValidation.cs</Link>
+    <Compile Include="..\Downloader\DownloadException.cs">
+      <Link>Downloader\DownloadException.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\DownloadHandler.cs">
+      <Link>Downloader\DownloadHandler.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\HttpClientDownloader.1.cs">
       <Link>Downloader\HttpClientDownloader.1.cs</Link>
@@ -84,11 +84,11 @@
     <Compile Include="..\ILogable.cs">
       <Link>ILogable.cs</Link>
     </Compile>
+    <Compile Include="..\INetworkProxy.cs">
+      <Link>INetworkProxy.cs</Link>
+    </Compile>
     <Compile Include="..\ISpider.cs">
       <Link>ISpider.cs</Link>
-    </Compile>
-    <Compile Include="..\ISpiderListener.cs">
-      <Link>ISpiderListener.cs</Link>
     </Compile>
     <Compile Include="..\ITask.cs">
       <Link>ITask.cs</Link>
@@ -102,11 +102,14 @@
     <Compile Include="..\Monitor\ConsoleMonitor.cs">
       <Link>Monitor\ConsoleMonitor.cs</Link>
     </Compile>
+    <Compile Include="..\Monitor\FileMonitor.cs">
+      <Link>Monitor\FileMonitor.cs</Link>
+    </Compile>
     <Compile Include="..\Monitor\IMonitorService.cs">
       <Link>Monitor\IMonitorService.cs</Link>
     </Compile>
-    <Compile Include="..\Monitor\SpiderClosingEvent.cs">
-      <Link>Monitor\SpiderClosingEvent.cs</Link>
+    <Compile Include="..\Monitor\SpiderClosingHandler.cs">
+      <Link>Monitor\SpiderClosingHandler.cs</Link>
     </Compile>
     <Compile Include="..\Monitor\SpiderEvent.cs">
       <Link>Monitor\SpiderEvent.cs</Link>
@@ -114,8 +117,14 @@
     <Compile Include="..\Monitor\SpiderMonitor.cs">
       <Link>Monitor\SpiderMonitor.cs</Link>
     </Compile>
+    <Compile Include="..\Monitor\SpiderStatus.cs">
+      <Link>Monitor\SpiderStatus.cs</Link>
+    </Compile>
     <Compile Include="..\Page.cs">
       <Link>Page.cs</Link>
+    </Compile>
+    <Compile Include="..\Pipeline\BasePipeline.cs">
+      <Link>Pipeline\BasePipeline.cs</Link>
     </Compile>
     <Compile Include="..\Pipeline\CachedPipeline.cs">
       <Link>Pipeline\CachedPipeline.cs</Link>
@@ -134,9 +143,6 @@
     </Compile>
     <Compile Include="..\Pipeline\JsonFilePipeline.cs">
       <Link>Pipeline\JsonFilePipeline.cs</Link>
-    </Compile>
-    <Compile Include="..\Pipeline\ResultItemsCollectorPipeline.cs">
-      <Link>Pipeline\ResultItemsCollectorPipeline.cs</Link>
     </Compile>
     <Compile Include="..\Processor\IPageProcessor.cs">
       <Link>Processor\IPageProcessor.cs</Link>
@@ -185,9 +191,6 @@
     </Compile>
     <Compile Include="..\Scheduler\QueueDuplicateRemovedScheduler.cs">
       <Link>Scheduler\QueueDuplicateRemovedScheduler.cs</Link>
-    </Compile>
-    <Compile Include="..\Scheduler\QueueScheduler.cs">
-      <Link>Scheduler\QueueScheduler.cs</Link>
     </Compile>
     <Compile Include="..\Selector\BaseHtmlSelector.cs">
       <Link>Selector\BaseHtmlSelector.cs</Link>
@@ -240,12 +243,6 @@
     <Compile Include="..\Status.cs">
       <Link>Status.cs</Link>
     </Compile>
-    <Compile Include="..\Utils\FilePersistentBase.cs">
-      <Link>Utils\FilePersistentBase.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\LogUtils.cs">
-      <Link>Utils\LogUtils.cs</Link>
-    </Compile>
     <Compile Include="..\Utils\UrlUtils.cs">
       <Link>Utils\UrlUtils.cs</Link>
     </Compile>
@@ -266,10 +263,6 @@
     <ProjectReference Include="..\..\Java2Dotnet.Spider.Log\net45\Java2Dotnet.Spider.Log.csproj">
       <Project>{acda398b-a5f3-4cae-bdca-fb172736919c}</Project>
       <Name>Java2Dotnet.Spider.Log</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Java2Dotnet.Spider.Redial\net45\Java2Dotnet.Spider.Redial.csproj">
-      <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>
-      <Name>Java2Dotnet.Spider.Redial</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

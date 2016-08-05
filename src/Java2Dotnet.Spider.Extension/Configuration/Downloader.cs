@@ -22,10 +22,10 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 		}
 
 		public abstract Types Type { get; internal set; }
-		public abstract int RedialLimit { get; set; }
+		//public abstract int RedialLimit { get; set; }
 
 		//[JsonIgnore]
-		public List<DownloadValidation> DownloadValidations { get; set; }
+		public List<DownloadHandler> Handlers { get; set; }
 
 		public abstract IDownloader GetDownloader();
 
@@ -35,28 +35,27 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	public class HttpDownloader : Downloader
 	{
 		public override Types Type { get; internal set; } = Types.HttpClientDownloader;
-		public override int RedialLimit { get; set; } = 0;
 
 		public override IDownloader GetDownloader()
 		{
-			var downloader = new HttpClientDownloader() { RedialLimit = RedialLimit };
-			if (DownloadValidations != null)
-			{
-				downloader.DownloadValidation = page =>
-				{
-					DownloadValidationResult result = DownloadValidationResult.Success;
-					foreach (var downloadValidation in DownloadValidations)
-					{
-						var r = downloadValidation.Validate(page, out result);
-						if (!r)
-						{
-							break;
-						}
-					}
+			var downloader = new HttpClientDownloader();
+			//if (DownloadValidations != null)
+			//{
+				//downloader.DownloadValidation = page =>
+				//{
+				//	DownloadValidationResult result = DownloadValidationResult.Success;
+				//	foreach (var downloadValidation in DownloadValidations)
+				//	{
+				//		var r = downloadValidation.Validate(page, out result);
+				//		if (!r)
+				//		{
+				//			break;
+				//		}
+				//	}
 
-					return result;
-				};
-			}
+				//	return result;
+				//};
+			//}
 			if (PostBodyGenerator != null)
 			{
 				downloader.PostBodyGenerator = (s, r) =>
@@ -77,28 +76,21 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	public class FileDownloader : Downloader
 	{
 		public override Types Type { get; internal set; } = Types.FileDownloader;
-		public override int RedialLimit { get; set; } = 0;
+		//public override int RedialLimit { get; set; } = 0;
 
 		public override IDownloader GetDownloader()
 		{
 			var downloader = new Extension.Downloader.FileDownloader();
-			if (DownloadValidations != null)
-			{
-				downloader.DownloadValidation = page =>
-				{
-					DownloadValidationResult result = DownloadValidationResult.Success;
-					foreach (var downloadValidation in DownloadValidations)
-					{
-						var r = downloadValidation.Validate(page, out result);
-						if (!r)
-						{
-							break;
-						}
-					}
-
-					return result;
-				};
-			}
+			//if (DownloadValidations != null)
+			//{
+				//downloader.DownloadValidation += (page) =>
+				//{
+				//	foreach (var downloadValidation in DownloadValidations)
+				//	{
+				//		downloadValidation.Validate(page);
+				//	}
+				//};
+			//}
 			return downloader;
 		}
 	}
@@ -107,7 +99,6 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 	public class WebDriverDownloader : Downloader
 	{
 		public override Types Type { get; internal set; } = Types.WebDriverDownloader;
-		public override int RedialLimit { get; set; } = 0;
 
 		public override IDownloader GetDownloader()
 		{
@@ -116,23 +107,23 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 			{
 				downloader.Login = Login.Login;
 			}
-			if (DownloadValidations != null)
-			{
-				downloader.DownloadValidation = page =>
-				{
-					DownloadValidationResult result = DownloadValidationResult.Success;
-					foreach (var downloadValidation in DownloadValidations)
-					{
-						var r = downloadValidation.Validate(page, out result);
-						if (!r)
-						{
-							break;
-						}
-					}
+			//if (DownloadValidations != null)
+			//{
+				//downloader.DownloadValidation = page =>
+				//{
+				//	DownloadValidationResult result = DownloadValidationResult.Success;
+				//	foreach (var downloadValidation in DownloadValidations)
+				//	{
+				//		var r = downloadValidation.Validate(page, out result);
+				//		if (!r)
+				//		{
+				//			break;
+				//		}
+				//	}
 
-					return result;
-				};
-			}
+				//	return result;
+				//};
+			//}
 			if (VerifyCode != null)
 			{
 				downloader.VerifyCode = VerifyCode.Verify;

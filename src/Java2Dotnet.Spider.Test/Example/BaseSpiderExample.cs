@@ -27,9 +27,9 @@ namespace Java2Dotnet.Spider.Test.Example
 			Console.Read();
 		}
 
-		private class MyPipeline : IPipeline
+		private class MyPipeline : BasePipeline
 		{
-			public void Process(ResultItems resultItems, ISpider spider)
+			public override void Process(ResultItems resultItems)
 			{
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
@@ -38,10 +38,6 @@ namespace Java2Dotnet.Spider.Test.Example
 
 				//May be you want to save to database
 				// 
-			}
-
-			public void Dispose()
-			{
 			}
 		}
 

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Java2Dotnet.Spider.Core.Pipeline;
+using Java2Dotnet.Spider.Core.Processor;
 using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Log;
 
@@ -21,7 +23,7 @@ namespace Java2Dotnet.Spider.Core
 		{
 			if (!IdentifyRegex.IsMatch(uuid))
 			{
-				throw new SpiderExceptoin("Task Identify only can contains A-Z a-z 0-9 _ - [SPACE]");
+				throw new SpiderException("Task Identify only can contains A-Z a-z 0-9 _ - [SPACE]");
 			}
 			Identity = uuid;
 			Site = site;
@@ -63,12 +65,22 @@ namespace Java2Dotnet.Spider.Core
 
 		public IScheduler Scheduler
 		{
-			get;set;
+			get; set;
 		}
 
 		public int ThreadNum
 		{
-			get;set;
+			get; set;
+		}
+
+		public List<IPipeline> Pipelines
+		{
+			get; protected set;
+		}
+
+		public IPageProcessor PageProcessor
+		{
+			get; protected set;
 		}
 
 		public void Dispose()

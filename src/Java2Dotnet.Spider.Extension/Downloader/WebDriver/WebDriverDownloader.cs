@@ -8,27 +8,27 @@ using Java2Dotnet.Spider.Core.Downloader;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Redial;
 using OpenQA.Selenium.Remote;
+using OpenQA.Selenium;
 
 namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 {
 	public class WebDriverDownloader : BaseDownloader
 	{
-		private volatile WebDriverPool _webDriverPool;
+		private IWebDriver _webDriver;
 		private readonly int _webDriverWaitTime;
-		private readonly Browser _browser;
-		protected Option Option;
 		private static bool _isLogined;
-
+		private Browser _browser;
+		private Option _option;
 		public Func<RemoteWebDriver, bool> Login { get; set; }
 		public Func<RemoteWebDriver, bool> VerifyCode { get; set; }
 		public Func<string, string> UrlFormat;
 		public Func<RemoteWebDriver, bool> AfterNavigate;
 
-		public WebDriverDownloader(Browser browser = Browser.Phantomjs, int webDriverWaitTime = 200, Option option = null)
+		public WebDriverDownloader(Browser browser = Browser.Chrome, int webDriverWaitTime = 200, Option option = null)
 		{
-			Option = option ?? new Option();
 			_webDriverWaitTime = webDriverWaitTime;
 			_browser = browser;
+			_option = option ?? new Option();
 
 			if (browser == Browser.Firefox)
 			{
@@ -60,20 +60,22 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 
 		public override Page Download(Request request, ISpider spider)
 		{
-			WebDriverItem driverService = null;
-
+			Site site = spider.Site;
 			try
 			{
-				driverService = Pool.Get();
-
 				lock (this)
 				{
+					if (_webDriver == null)
+					{
+						_webDriver = WebDriverUtil.Open(_browser, _option);
+					}
+
 					if (!_isLogined && Login != null)
 					{
-						_isLogined = Login.Invoke(driverService.WebDriver as RemoteWebDriver);
+						_isLogined = Login.Invoke(_webDriver as RemoteWebDriver);
 						if (!_isLogined)
 						{
-							throw new SpiderExceptoin("Login failed. Please check your login codes.");
+							throw new SpiderException("Login failed. Please check your login codes.");
 						}
 					}
 				}
@@ -90,58 +92,45 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 					realUrl = UrlFormat(realUrl);
 				}
 
-				RedialManagerUtils.Execute("webdriverdownloader-download", () =>
+				NetworkProxyManager.Current.Execute("wd-d", () =>
 				{
-					driverService.WebDriver.Navigate().GoToUrl(realUrl);
+					_webDriver.Navigate().GoToUrl(realUrl);
 				});
 
 				Thread.Sleep(_webDriverWaitTime);
 
-				AfterNavigate?.Invoke((RemoteWebDriver)driverService.WebDriver);
+				AfterNavigate?.Invoke((RemoteWebDriver)_webDriver);
 
 				Page page = new Page(request, spider.Site.ContentType);
-				page.Content = driverService.WebDriver.PageSource;
+				page.Content = _webDriver.PageSource;
 				page.Url = request.Url.ToString();
-				page.TargetUrl = driverService.WebDriver.Url;
-				page.Title = driverService.WebDriver.Title;
-
-				ValidatePage(page, spider);
+				page.TargetUrl = _webDriver.Url;
+				page.Title = _webDriver.Title;
 
 				// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
 				request.PutExtra(Request.CycleTriedTimes, null);
 
+				Handle(page, spider);
+
 				return page;
+			}
+			catch (DownloadException)
+			{
+				throw;
 			}
 			catch (Exception e)
 			{
-				if (e.Message == "Need Verify Code.")
-				{
-					VerifyCode?.Invoke(driverService.WebDriver as RemoteWebDriver);
-				}
+				Page page = new Page(request, site.ContentType) { Exception = e };
 
-				throw e;
-			}
-			finally
-			{
-				Pool.ReturnToPool(driverService);
+				Handle(page, spider);
+				throw;
 			}
 		}
 
 		public override void Dispose()
 		{
-			Pool?.CloseAll();
-		}
-
-		private WebDriverPool Pool
-		{
-			get
-			{
-				if (_webDriverPool == null)
-				{
-					_webDriverPool = new WebDriverPool(_browser, ThreadNum, Option);
-				}
-				return _webDriverPool;
-			}
+			_webDriver.Quit();
+			_webDriver.Close();
 		}
 	}
 }

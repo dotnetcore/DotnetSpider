@@ -4,46 +4,51 @@ using System.Text;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Core.Utils;
 using Newtonsoft.Json.Linq;
+using System;
+using Java2Dotnet.Spider.Core.Pipeline;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
-	public class EntityJsonFilePipeline : FilePersistentBase, IEntityPipeline
+	public class EntityJsonFilePipeline : EntityBasePipeline
 	{
-		public class JsonFilePipelineArgument
-		{
-			public string Directory { get; set; }
-		}
+		protected string DataFolder;
+		protected StreamWriter Writer;
 
 		private readonly string _entityName;
 
-		public EntityJsonFilePipeline(JObject entityDefine, JObject argument)
+		public EntityJsonFilePipeline(JObject entityDefine)
 		{
 			_entityName = entityDefine.SelectToken("$.Identity").ToString();
-			SetPath(argument.ToObject<JsonFilePipelineArgument>()?.Directory);
 		}
 
-		public void Initialize()
+		public override void InitPipeline(ISpider spider)
 		{
+			base.InitPipeline(spider);
+
+#if !NET_CORE
+			DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, spider.Identity, "entityJson");
+#else
+			DataFolder = Path.Combine(AppContext.BaseDirectory, spider.Identity, "entityJson");
+#endif
+			Writer = BasePipeline.PrepareFile(Path.Combine(DataFolder, $"{_entityName}.data")).AppendText();
+			Writer.AutoFlush = true;
 		}
 
-		public void Process(List<JObject> datas, ISpider spider)
+		public override void Process(List<JObject> datas)
 		{
 			lock (this)
 			{
-				FileInfo file = PrepareFile(_entityName);
-
-				using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
+				foreach (var entry in datas)
 				{
-					foreach (var entry in datas)
-					{
-						printWriter.WriteLine(entry);
-					}
+					Writer.WriteLine(entry);
 				}
 			}
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
+			Writer.Dispose();
 		}
 	}
 }

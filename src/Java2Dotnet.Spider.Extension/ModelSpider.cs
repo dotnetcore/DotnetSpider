@@ -55,7 +55,7 @@ namespace Java2Dotnet.Spider.Extension
 				SpiderContext.Build();
 			}
 
-			Name = $"{SpiderContext.UserId}-{SpiderContext.SpiderName}";
+			Name = SpiderContext.SpiderName;
 
 			Logger = new Logger(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup);
 
@@ -66,17 +66,11 @@ namespace Java2Dotnet.Spider.Extension
 		{
 			if (SpiderContext.Redialer != null)
 			{
-				if (Db != null)
+				if (SpiderContext.Redialer.RedialManager == null)
 				{
-					RedialManagerUtils.RedialManager = new RedisRedialManager(Db, SpiderContext.Redialer.NetworkValidater.GetNetworkValidater(), SpiderContext.Redialer.GetRedialer(), Logger);
+					SpiderContext.Redialer.RedialManager = new FileRedialManager();
 				}
-				else
-				{
-					RedialManagerUtils.RedialManager = FileLockerRedialManager.Default;
-					RedialManagerUtils.RedialManager.Logger = Logger;
-					RedialManagerUtils.RedialManager.NetworkValidater = SpiderContext.Redialer.NetworkValidater.GetNetworkValidater();
-					RedialManagerUtils.RedialManager.Redialer = SpiderContext.Redialer.GetRedialer();
-				}
+				SpiderContext.Redialer.RedialManager.SetRedialManager(SpiderContext.Redialer.NetworkValidater.GetNetworkValidater(), SpiderContext.Redialer.GetRedialer());
 			}
 
 			if (SpiderContext.Downloader == null)
@@ -109,7 +103,7 @@ namespace Java2Dotnet.Spider.Extension
 					var address = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault();
 					if (address == null)
 					{
-						throw new SpiderExceptoin("Can't resovle your host: " + host);
+						throw new SpiderException("Can't resovle your host: " + host);
 					}
 					confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
 				}
@@ -354,16 +348,9 @@ namespace Java2Dotnet.Spider.Extension
 			spider.SetEmptySleepTime(SpiderContext.EmptySleepTime);
 			spider.SetThreadNum(SpiderContext.ThreadNum);
 			spider.Deep = SpiderContext.Deep;
-			spider.SetDownloader(SpiderContext.Downloader.GetDownloader());
+			var downloader = SpiderContext.Downloader.GetDownloader();
+			spider.SetDownloader(downloader);
 			spider.SkipWhenResultIsEmpty = SpiderContext.SkipWhenResultIsEmpty;
-			if (SpiderContext.PageHandlers != null)
-			{
-				spider.PageHandlers = new List<Action<Page>>();
-				foreach (var pageHandler in SpiderContext.PageHandlers)
-				{
-					spider.PageHandlers.Add(pageHandler.Customize);
-				}
-			}
 
 			if (SpiderContext.TargetUrlsHandler != null)
 			{
@@ -390,7 +377,7 @@ namespace Java2Dotnet.Spider.Extension
 #if !NET_CORE
 						return new Redial.NetworkValidater.VpnNetworkValidater(((Configuration.VpnNetworkValidater)networkValidater).VpnName);
 #else
-						throw new SpiderExceptoin("unsport vpn redial on linux.");
+						throw new SpiderException("unsport vpn redial on linux.");
 #endif
 					}
 			}

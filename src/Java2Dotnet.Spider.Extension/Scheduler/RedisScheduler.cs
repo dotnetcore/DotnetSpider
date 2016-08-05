@@ -50,7 +50,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 				var address = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault();
 				if (address == null)
 				{
-					throw new SpiderExceptoin("Can't resovle your host: " + host);
+					throw new SpiderException("Can't resovle your host: " + host);
 				}
 				confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
 			}
@@ -88,7 +88,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 			SuccessCountKey += md5;
 			IdentityMd5 = md5;
 
-			RedialManagerUtils.Execute("rds-in", () =>
+			NetworkProxyManager.Current.Execute("rds-in", () =>
 			{
 				Db.SortedSetAdd(TaskList, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
 			});
@@ -96,7 +96,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public override void ResetDuplicateCheck()
 		{
-			RedialManagerUtils.Execute("rds-rs", () =>
+			NetworkProxyManager.Current.Execute("rds-rs", () =>
 			{
 				Db.KeyDelete(SetKey);
 			});
@@ -131,7 +131,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		//[MethodImpl(MethodImplOptions.Synchronized)]
 		public override Request Poll()
 		{
-			return RedialManagerUtils.Execute("rds-pl", () =>
+			return NetworkProxyManager.Current.Execute("rds-pl", () =>
 			{
 				return SafeExecutor.Execute(30, () =>
 				{
@@ -157,7 +157,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public long GetLeftRequestsCount()
 		{
-			return RedialManagerUtils.Execute("rds-lc", () =>
+			return NetworkProxyManager.Current.Execute("rds-lc", () =>
 			{
 				return Db.ListLength(QueueKey);
 			});
@@ -165,7 +165,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public long GetTotalRequestsCount()
 		{
-			return RedialManagerUtils.Execute("rds-tc", () =>
+			return NetworkProxyManager.Current.Execute("rds-tc", () =>
 			{
 				return Db.SetLength(SetKey);
 			});
@@ -173,7 +173,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public long GetSuccessRequestsCount()
 		{
-			return RedialManagerUtils.Execute("rds-src", () =>
+			return NetworkProxyManager.Current.Execute("rds-src", () =>
 			{
 				var result = Db.HashGet(SuccessCountKey, IdentityMd5);
 				return result.HasValue ? (long)result : 0;
@@ -182,7 +182,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public long GetErrorRequestsCount()
 		{
-			return RedialManagerUtils.Execute("rds-erc", () =>
+			return NetworkProxyManager.Current.Execute("rds-erc", () =>
 			{
 				var result = Db.HashGet(ErrorCountKey, IdentityMd5); ;
 				return result.HasValue ? (long)result : 0;
@@ -191,7 +191,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public void IncreaseSuccessCounter()
 		{
-			RedialManagerUtils.Execute("rds-isc", () =>
+			NetworkProxyManager.Current.Execute("rds-isc", () =>
 			{
 				Db.HashIncrement(SuccessCountKey, IdentityMd5, 1);
 			});
@@ -199,7 +199,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public void IncreaseErrorCounter()
 		{
-			RedialManagerUtils.Execute("rds-iec", () =>
+			NetworkProxyManager.Current.Execute("rds-iec", () =>
 			{
 				Db.HashIncrement(ErrorCountKey, IdentityMd5, 1);
 			});

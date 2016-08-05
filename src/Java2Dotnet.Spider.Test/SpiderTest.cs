@@ -36,18 +36,14 @@ namespace Java2Dotnet.Spider.Test
 			Thread.Sleep(10000);
 		}
 
-		private class TestPipeline : IPipeline
+		private class TestPipeline : BasePipeline
 		{
-			public void Process(ResultItems resultItems, ISpider spider)
+			public override void Process(ResultItems resultItems)
 			{
 				foreach (var entry in resultItems.Results)
 				{
 					Console.WriteLine($"{entry.Key}:{entry.Value}");
 				}
-			}
-
-			public void Dispose()
-			{
 			}
 		}
 
@@ -139,7 +135,7 @@ namespace Java2Dotnet.Spider.Test
 
 		public class TestDownloader : IDownloader
 		{
-			public DownloadValidation DownloadValidation { get; set; }
+			public IDownloadHandler DownloadValidation { get; set; }
 
 			public Page Download(Request request, ISpider spider)
 			{

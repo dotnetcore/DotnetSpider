@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
-	public class EntityMongoDbPipeline : IEntityPipeline
+	public class EntityMongoDbPipeline : EntityBasePipeline
 	{
 		private readonly IMongoCollection<BsonDocument> _collection;
 
@@ -21,11 +21,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 			_collection = db.GetCollection<BsonDocument>(schema.TableName);
 		}
 
-		public void Initialize()
-		{
-		}
-
-		public void Process(List<JObject> datas, ISpider spider)
+		public override void Process(List<JObject> datas)
 		{
 			List<BsonDocument> reslut = new List<BsonDocument>();
 			foreach (var data in datas)
@@ -35,10 +31,6 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				reslut.Add(item);
 			}
 			_collection.InsertMany(reslut);
-		}
-
-		public void Dispose()
-		{
 		}
 	}
 }

@@ -9,7 +9,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader
 	/// </summary>
 	public class FileDownloader : IDownloader
 	{
-		public DownloadValidation DownloadValidation { get; set; }
+		public IDownloadHandler DownloadValidation { get; set; }
 
 		public Page Download(Request request, ISpider spider)
 		{

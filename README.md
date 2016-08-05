@@ -3,6 +3,13 @@
 
 This is a cross platfrom, ligth spider develop by C#.
 
+### DEVELOP ENVIROMENT
+- Visual Studio 2015 or later, becuase I used lots of C# 6.0
+- Want to try .NET CORE? Install 2 packages
+	1. [Visual studio 2015 update 3](https://go.microsoft.com/fwlink/?LinkId=691129)	
+	2. [.NET Core 1.0.0 - VS 2015 Tooling Preview 2](https://go.microsoft.com/fwlink/?LinkId=817245)
+	3. [More details](https://www.microsoft.com/net/core#windows)
+
 ### DESIGN
  
 ![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
@@ -14,6 +21,7 @@ This is a cross platfrom, ligth spider develop by C#.
 			ServiceProvider.Add<ILogService>(new ConsoleLog());
 			ServiceProvider.Add<ILogService>(new FileLog());
 			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
+			ServiceProvider.Add<IMonitorService>(new FileMonitor());
 			//ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
 			
 			HttpClientDownloader downloader = new HttpClientDownloader();
@@ -30,7 +38,7 @@ This is a cross platfrom, ligth spider develop by C#.
 
 		private class MyPipeline : IPipeline
 		{
-			public void Process(ResultItems resultItems, ISpider spider)
+			public void Process(ResultItems resultItems)
 			{
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
@@ -153,6 +161,7 @@ This is a cross platfrom, ligth spider develop by C#.
 			ServiceProvider.Add<ILogService>(new ConsoleLog());
 			ServiceProvider.Add<ILogService>(new FileLog());
 			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
+			ServiceProvider.Add<IMonitorService>(new FileMonitor());
 			//ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
 		
 			JdSkuSpider spider = new JdSkuSpider();
@@ -163,7 +172,7 @@ This is a cross platfrom, ligth spider develop by C#.
 
 When you want to collect a page JS loaded, there is only one thing you need to do is set the downloader to WebDriverDownloader.	
 
-    context.SetDownloader(new WebDriverDownloader
+	context.SetDownloader(new WebDriverDownloader
 	{
 		Browser = Extension.Downloader.WebDriver.Browser.Chrome
 	});
@@ -172,9 +181,9 @@ See the complete sample https://github.com/zlzforever/DotnetSpider/blob/master/s
 
 NOTE:
 
-	1. Make sure there is a  ChromeDriver.exe in bin forlder when you set Browser to Chrome. You can contain it to your project via NUGET manager: Chromium.ChromeDriver
-	2. Make sure you already add a *.webdriver Firefox profile when you set Browser to Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
-	3. Make sure there is a PhantomJS.exe in bin folder when you set Browser to PhantomJS. You can contain it to your project via NUGET manager: PhantomJS
+1. Make sure there is a  ChromeDriver.exe in bin forlder when you set Browser to Chrome. You can contain it to your project via NUGET manager: Chromium.ChromeDriver
+2. Make sure you already add a *.webdriver Firefox profile when you set Browser to Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
+3. Make sure there is a PhantomJS.exe in bin folder when you set Browser to PhantomJS. You can contain it to your project via NUGET manager: PhantomJS
 
 ### NOTICE
 

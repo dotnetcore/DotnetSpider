@@ -1,7 +1,6 @@
 
 using System;
 using Java2Dotnet.Spider.Core.Scheduler.Component;
-using Java2Dotnet.Spider.Redial;
 using System.Collections.Generic;
 #if !NET_CORE
 #else
@@ -22,7 +21,7 @@ namespace Java2Dotnet.Spider.Core.Scheduler
 		{
 			lock (this)
 			{
-				RedialManagerUtils.Execute("sp", () =>
+				NetworkProxyManager.Current.Execute("sp", () =>
 				{
 					DoPush(request);
 				});

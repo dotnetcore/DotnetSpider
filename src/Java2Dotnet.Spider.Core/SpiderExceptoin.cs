@@ -2,8 +2,8 @@
 
 namespace Java2Dotnet.Spider.Core
 {
-	public class SpiderExceptoin : Exception
+	public class SpiderException : Exception
 	{
-		public SpiderExceptoin(string msg) : base(msg) { }
+		public SpiderException(string msg) : base(msg) { }
 	}
 }

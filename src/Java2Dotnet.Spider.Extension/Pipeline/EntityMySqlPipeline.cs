@@ -7,6 +7,8 @@ using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
 using Java2Dotnet.Spider.Extension.Utils;
 using Java2Dotnet.Spider.Extension.Configuration;
+using System;
+using System.Collections.Generic;
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {
@@ -125,7 +127,7 @@ namespace Java2Dotnet.Spider.Extension.Pipeline
 				return "text";
 			}
 
-			throw new SpiderExceptoin("Unsport datatype: " + datatype);
+			throw new SpiderException("Unsport datatype: " + datatype);
 		}
 	}
 }

@@ -8,47 +8,40 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 	/// <summary>
 	/// 
 	/// </summary>
-	public abstract class CachedPipeline : IPipeline
+	public abstract class CachedPipeline : BasePipeline
 	{
-		private readonly ConcurrentDictionary<ISpider, List<ResultItems>> _cached = new ConcurrentDictionary<ISpider, List<ResultItems>>();
+		private readonly List<ResultItems> _cached = new List<ResultItems>();
 		public int CachedSize { get; set; } = 1;
 
-		protected abstract void Process(List<ResultItems> resultItemsList, ISpider spider);
+		protected abstract void Process(List<ResultItems> resultItemsList);
 
-		public void Process(ResultItems resultItems, ISpider spider)
+		public override void Process(ResultItems resultItems)
 		{
-			if (_cached.ContainsKey(spider))
+			lock (this)
 			{
-				_cached[spider].Add(resultItems);
-			}
-			else
-			{
-				while (!_cached.TryAdd(spider, new List<ResultItems>() { resultItems }))
+				_cached.Add(resultItems);
+
+				if (_cached.Count >= CachedSize)
 				{
+					List<ResultItems> result = new List<ResultItems>();
+
+					result.AddRange(_cached);
+					_cached.Clear();
+
+					// 做成异步
+					Process(result);
 				}
-			}
-
-			if (_cached[spider].Count >= CachedSize)
-			{
-				List<ResultItems> result = new List<ResultItems>();
-
-				result.AddRange(_cached[spider]);
-				_cached.Clear();
-
-				// 做成异步
-				Process(result.ToList(), spider);
 			}
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
-			foreach (var entry in _cached)
+			base.Dispose();
+
+			if (_cached.Count > 0)
 			{
-				if (entry.Value.Count > 0)
-				{
-					Process(entry.Value, entry.Key);
-					_cached.Clear();
-				}
+				Process(_cached);
+				_cached.Clear();
 			}
 		}
 	}

@@ -7,8 +7,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 	/// </summary>
 	public interface IDownloader
 	{
-		DownloadValidation DownloadValidation { get; set; }
-
 		/// <summary>
 		/// Downloads web pages and store in Page object.
 		/// </summary>
@@ -16,8 +14,6 @@ namespace Java2Dotnet.Spider.Core.Downloader
 		/// <param name="spider"></param>
 		/// <returns></returns>
 		Page Download(Request request, ISpider spider);
-
-		int ThreadNum { get; set; }
 
 		IDownloader Clone();
 	}

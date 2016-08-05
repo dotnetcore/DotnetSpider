@@ -7,7 +7,6 @@ using System.Web;
 using System.Text;
 using HtmlAgilityPack;
 using Java2Dotnet.Spider.Common;
-using Java2Dotnet.Spider.Redial;
 using System.Net.Http;
 using System.Net;
 using Java2Dotnet.Spider.Core.Proxy;
@@ -55,23 +54,15 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			int statusCode = 200;
 			try
 			{
-				if (PostBodyGenerator != null)
-				{
-					SingleExecutor.Execute(() =>
-					{
-						PostBodyGenerator(spider.Site, request);
-					});
-				}
+				PostBodyGenerator?.Invoke(spider.Site, request);
 
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 
-				response = RedialManagerUtils.Execute("downloader-download", (m) =>
+				response = NetworkProxyManager.Current.Execute("http", (m) =>
 				{
 					var message = (HttpRequestMessage)m;
 					return httpClient.SendAsync(message).Result;
 				}, httpMessage);
-
-				AddRequestCount();
 
 				response.EnsureSuccessStatusCode();
 				if (!site.AcceptStatCode.Contains(response.StatusCode))
@@ -90,7 +81,8 @@ namespace Java2Dotnet.Spider.Core.Downloader
 
 				// 这里只要是遇上登录的, 则在拨号成功之后, 全部抛异常在Spider中加入Scheduler调度
 				// 因此如果使用多线程遇上多个Warning Custom Validate Failed不需要紧张, 可以考虑用自定义Exception分开
-				ValidatePage(page, spider);
+
+				Handle(page, spider);
 
 				// 结束后要置空, 这个值存到Redis会导致无限循环跑单个任务
 				request.PutExtra(Request.CycleTriedTimes, null);
@@ -104,7 +96,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				//正常结果在上面已经Return了, 到此处必然是下载失败的值.
 				//throw new SpiderExceptoin("Download failed.");
 			}
-			catch (RedialException)
+			catch (DownloadException)
 			{
 				throw;
 			}
@@ -112,7 +104,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 			{
 				Page page = new Page(request, site.ContentType) { Exception = e };
 
-				ValidatePage(page, spider);
+				Handle(page, spider);
 				throw;
 			}
 			finally
