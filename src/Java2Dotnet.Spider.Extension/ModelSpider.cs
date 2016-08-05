@@ -24,6 +24,7 @@ using StackExchange.Redis;
 using Java2Dotnet.Spider.Core.Monitor;
 using System.Net;
 using System.Runtime.InteropServices;
+using Java2Dotnet.Spider.Ioc;
 #if NET_45
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -57,7 +58,7 @@ namespace Java2Dotnet.Spider.Extension
 
 			Name = SpiderContext.SpiderName;
 
-			Logger = new Logger(SpiderContext.SpiderName, SpiderContext.UserId, SpiderContext.TaskGroup);
+			Logger = ServiceProvider.Get<ILogService>().First();
 
 			InitEnvoriment();
 		}

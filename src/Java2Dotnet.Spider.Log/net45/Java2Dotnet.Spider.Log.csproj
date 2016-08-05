@@ -55,6 +55,9 @@
     <Compile Include="..\ILogService.cs">
       <Link>ILogService.cs</Link>
     </Compile>
+    <Compile Include="..\LogService.cs">
+      <Link>LogService.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

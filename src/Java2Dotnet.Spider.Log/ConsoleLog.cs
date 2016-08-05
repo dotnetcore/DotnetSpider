@@ -9,32 +9,32 @@ namespace Java2Dotnet.Spider.Log
 	{
 		private static readonly object WriteToConsoleLocker = new object();
 
-		public void Error(dynamic message)
+		public void Error(string message)
 		{
 			WriteToConsole("错误", message.ToString());
 		}
 
-		public void Error(dynamic message, Exception e)
+		public void Error(string message, Exception e)
 		{
 			WriteToConsole("错误", message + ": " + e);
 		}
 
-		public void Info(dynamic message)
+		public void Info(string message)
 		{
 			WriteToConsole("信息", message.ToString());
 		}
 
-		public void Info(dynamic message, Exception e)
+		public void Info(string message, Exception e)
 		{
 			WriteToConsole("信息", message + ": " + e);
 		}
 
-		public void Warn(dynamic message)
+		public void Warn(string message)
 		{
 			WriteToConsole("警告", message.ToString());
 		}
 
-		public void Warn(dynamic message, Exception e)
+		public void Warn(string message, Exception e)
 		{
 			WriteToConsole("警告", message + ": " + e);
 		}

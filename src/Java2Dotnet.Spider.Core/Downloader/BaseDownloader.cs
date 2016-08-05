@@ -2,12 +2,20 @@
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Log;
+using Java2Dotnet.Spider.Ioc;
+using System.Linq;
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {
 	public class BaseDownloader : IDownloader, IDisposable
 	{
+		protected ILogService Logger { get; set; }
 		public List<IDownloadHandler> DownloadHandlers=new List<IDownloadHandler>();
+
+		public BaseDownloader()
+		{
+			Logger = ServiceProvider.Get<ILogService>().First();
+		}
 
 		public virtual Page Download(Request request, ISpider spider)
 		{

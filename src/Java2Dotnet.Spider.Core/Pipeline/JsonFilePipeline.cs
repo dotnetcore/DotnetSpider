@@ -76,7 +76,7 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 			}
 			catch (IOException e)
 			{
-				Spider.Logger.Warn("Write data to json file failed.", e);
+				Logger.Warn(LogInfo.Create("Write data to json file failed.", Spider), e);
 				throw;
 			}
 		}

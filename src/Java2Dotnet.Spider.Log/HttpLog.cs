@@ -19,32 +19,32 @@ namespace Java2Dotnet.Spider.Log
 			Server = server;
 		}
 
-		public void Error(dynamic message)
+		public void Error(string message)
 		{
 			WriteToServer("[错误] " + message);
 		}
 
-		public void Error(dynamic message, Exception e)
+		public void Error(string message, Exception e)
 		{
 			WriteToServer("[错误] " + message + ": " + e);
 		}
 
-		public void Info(dynamic message)
+		public void Info(string message)
 		{
 			WriteToServer("[信息] " + message);
 		}
 
-		public void Info(dynamic message, Exception e)
+		public void Info(string message, Exception e)
 		{
 			WriteToServer("[信息] " + message + ": " + e);
 		}
 
-		public void Warn(dynamic message)
+		public void Warn(string message)
 		{
 			WriteToServer("[警告] " + message);
 		}
 
-		public void Warn(dynamic message, Exception e)
+		public void Warn(string message, Exception e)
 		{
 			WriteToServer("[警告]" + message + ": " + e);
 		}

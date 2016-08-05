@@ -5,6 +5,8 @@ using Java2Dotnet.Spider.Core.Pipeline;
 using Java2Dotnet.Spider.Core.Processor;
 using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Log;
+using Java2Dotnet.Spider.Ioc;
+using System.Linq;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -27,7 +29,7 @@ namespace Java2Dotnet.Spider.Core
 			}
 			Identity = uuid;
 			Site = site;
-			Logger = new Logger(Identity, UserId, TaskGroup);
+			Logger = ServiceProvider.Get<ILogService>().First();
 		}
 
 		/// <summary>

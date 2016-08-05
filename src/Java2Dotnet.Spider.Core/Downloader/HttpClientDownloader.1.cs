@@ -119,7 +119,7 @@ namespace Java2Dotnet.Spider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					spider.Logger.Warn("Close response fail.", e);
+					Logger.Warn(LogInfo.Create("Close response fail.", spider), e);
 				}
 			}
 		}

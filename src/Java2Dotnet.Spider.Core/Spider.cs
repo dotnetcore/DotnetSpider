@@ -16,6 +16,8 @@ using Java2Dotnet.Spider.Core.Scheduler.Component;
 using Java2Dotnet.Spider.Core.Utils;
 using Newtonsoft.Json;
 using Java2Dotnet.Spider.Log;
+using Java2Dotnet.Spider.Ioc;
+using System.Linq;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -114,7 +116,7 @@ namespace Java2Dotnet.Spider.Core
 
 			UserId = string.IsNullOrEmpty(userid) ? "DotnetSpider" : userid;
 			TaskGroup = string.IsNullOrEmpty(taskGroup) ? "DotnetSpider" : taskGroup;
-			Logger = new Logger(Identity, UserId, TaskGroup);
+			Logger = ServiceProvider.Get<ILogService>().First();
 
 			_waitCount = 0;
 			if (pageProcessor == null)
@@ -312,7 +314,7 @@ namespace Java2Dotnet.Spider.Core
 
 			if (StartRequests != null && StartRequests.Count > 0)
 			{
-				Logger.Info($"添加链接到调度中心, 数量: {StartRequests.Count}.");
+				Logger.Info(LogInfo.Create($"添加链接到调度中心, 数量: {StartRequests.Count}.", this));
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
 					Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
@@ -328,7 +330,7 @@ namespace Java2Dotnet.Spider.Core
 			}
 			else
 			{
-				Logger.Info("添加链接到调度中心, 数量: 0.");
+				Logger.Info(LogInfo.Create("添加链接到调度中心, 数量: 0.", this));
 			}
 
 			_init = true;
@@ -401,7 +403,7 @@ namespace Java2Dotnet.Spider.Core
 						catch (Exception e)
 						{
 							OnError(request);
-							Logger.Error("采集失败: " + request.Url + ".", e);
+							Logger.Error(LogInfo.Create($"采集失败: {request.Url}.", this), e);
 						}
 						finally
 						{
@@ -434,17 +436,17 @@ namespace Java2Dotnet.Spider.Core
 			if (Stat == Status.Finished)
 			{
 				OnClose();
-				Logger.Info($"任务 {Identity} 结束, 运行时间: " + (FinishedTime - StartTime).TotalSeconds + " 秒.");
+				Logger.Info(LogInfo.Create($"任务 {Identity} 结束, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", this));
 			}
 
 			if (Stat == Status.Stopped)
 			{
-				Logger.Info("任务 " + Identity + " 停止成功, 运行时间: " + (FinishedTime - StartTime).TotalSeconds + " 秒.");
+				Logger.Info(LogInfo.Create($"任务 {Identity} 停止成功, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", this));
 			}
 
 			if (Stat == Status.Exited)
 			{
-				Logger.Info("任务 " + Identity + " 退出成功, 运行时间: " + (FinishedTime - StartTime).TotalSeconds + " 秒.");
+				Logger.Info(LogInfo.Create($"任务 {Identity} 退出成功, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", this));
 			}
 			Logger.Dispose();
 			IsExited = true;
@@ -486,13 +488,13 @@ namespace Java2Dotnet.Spider.Core
 		public void Stop()
 		{
 			Stat = Status.Stopped;
-			Logger.Warn("停止任务中 " + Identity + "...");
+			Logger.Warn(LogInfo.Create($"停止任务中 {Identity} ...", this));
 		}
 
 		public void Exit()
 		{
 			Stat = Status.Exited;
-			Logger.Warn("退出任务中 " + Identity + "...");
+			Logger.Warn(LogInfo.Create($"退出任务中 {Identity} ...", this));
 			SpiderClosing?.Invoke();
 		}
 
@@ -605,7 +607,7 @@ namespace Java2Dotnet.Spider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				Logger.Warn("解析页数数据失败: " + request.Url + ", 请检查您的数据抽取设置: " + e.Message);
+				Logger.Warn(LogInfo.Create($"解析页数数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}", this));
 			}
 
 			//watch.Stop();
@@ -643,12 +645,11 @@ namespace Java2Dotnet.Spider.Core
 				{
 					pipeline.Process(page.ResultItems);
 				}
-				Logger.Info($"采集: {request.Url} 成功.");
+				Logger.Info(LogInfo.Create($"采集: {request.Url} 成功.", this));
 			}
 			else
 			{
-				var message = $"采集: {request.Url} 成功, 解析结果为 0.";
-				Logger.Warn(message);
+				Logger.Warn(LogInfo.Create($"采集: {request.Url} 成功, 解析结果为 0.", this));
 			}
 
 #if TEST
