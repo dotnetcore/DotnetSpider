@@ -14,7 +14,6 @@ using Java2Dotnet.Spider.Redial;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.RedialManager;
 using Java2Dotnet.Spider.Validation;
-using Java2Dotnet.Spider.Log;
 using System.Linq;
 using System.Threading.Tasks;
 using Java2Dotnet.Spider.Core.Utils;
@@ -24,7 +23,9 @@ using StackExchange.Redis;
 using Java2Dotnet.Spider.Core.Monitor;
 using System.Net;
 using System.Runtime.InteropServices;
-using Java2Dotnet.Spider.Ioc;
+
+using Microsoft.Extensions.DependencyInjection;
+using NLog;
 #if NET_45
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -36,7 +37,7 @@ namespace Java2Dotnet.Spider.Extension
 	{
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
-		protected readonly ILogService Logger;
+		protected readonly ILogger Logger;
 		protected ConnectionMultiplexer Redis;
 		protected IDatabase Db;
 		protected Core.Spider spider;
@@ -58,7 +59,7 @@ namespace Java2Dotnet.Spider.Extension
 
 			Name = SpiderContext.SpiderName;
 
-			Logger = ServiceProvider.Get<ILogService>().First();
+			Logger = LogManager.GetCurrentClassLogger();
 
 			InitEnvoriment();
 		}

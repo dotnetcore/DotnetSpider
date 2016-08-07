@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Core;
 using Newtonsoft.Json.Linq;
-#if NET_CORE
-using Java2Dotnet.Spider.Log;
-#endif
 
 namespace Java2Dotnet.Spider.Extension.Pipeline
 {

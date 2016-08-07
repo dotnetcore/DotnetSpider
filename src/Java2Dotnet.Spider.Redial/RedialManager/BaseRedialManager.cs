@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
-using Java2Dotnet.Spider.Log;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.Redialer;
+using NLog;
 
 namespace Java2Dotnet.Spider.Redial.RedialManager
 {
@@ -33,7 +33,12 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		/// </summary>
 		public bool Skip { get; set; } = false;
 
-		public ILogService Logger { get; set; }
+		public ILogger Logger { get; set; }
+
+		public BaseRedialManager()
+		{
+			Logger = LogManager.GetCurrentClassLogger();
+		}
 
 		protected void RedialInternet()
 		{

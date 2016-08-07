@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using Java2Dotnet.Spider.Common;
-using Java2Dotnet.Spider.Log;
-using Java2Dotnet.Spider.Ioc;
+
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using NLog;
 
 namespace Java2Dotnet.Spider.Core.Downloader
 {
 	public class BaseDownloader : IDownloader, IDisposable
 	{
-		protected ILogService Logger { get; set; }
+		protected ILogger Logger { get; set; }
 		public List<IDownloadHandler> Handlers { get; set; } = new List<IDownloadHandler>();
 
 		public BaseDownloader()
 		{
-			Logger = ServiceProvider.Get<ILogService>().First();
+			Logger = LogManager.GetCurrentClassLogger();
 		}
 
 		public virtual Page Download(Request request, ISpider spider)

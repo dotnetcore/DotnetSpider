@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Java2Dotnet.Spider.Log;
 
 namespace Java2Dotnet.Spider.Core.Pipeline
 {

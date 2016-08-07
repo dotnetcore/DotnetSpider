@@ -41,8 +41,20 @@
       <HintPath>..\..\..\packages\HtmlAgilityPack.CssSelectors.1.0.2\lib\net45\HtmlAgilityPack.CssSelectors.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Extensions.DependencyInjection.1.0.0\lib\netstandard1.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NLog.4.3.7\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -84,26 +96,23 @@
     <Compile Include="..\INetworkProxy.cs">
       <Link>INetworkProxy.cs</Link>
     </Compile>
+    <Compile Include="..\IocExtension.cs">
+      <Link>IocExtension.cs</Link>
+    </Compile>
     <Compile Include="..\ISpider.cs">
       <Link>ISpider.cs</Link>
     </Compile>
     <Compile Include="..\ITask.cs">
       <Link>ITask.cs</Link>
     </Compile>
-    <Compile Include="..\Logger.cs">
-      <Link>Logger.cs</Link>
-    </Compile>
     <Compile Include="..\LogInfo.cs">
       <Link>LogInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Monitor\ConsoleMonitor.cs">
-      <Link>Monitor\ConsoleMonitor.cs</Link>
-    </Compile>
-    <Compile Include="..\Monitor\FileMonitor.cs">
-      <Link>Monitor\FileMonitor.cs</Link>
-    </Compile>
     <Compile Include="..\Monitor\IMonitorService.cs">
       <Link>Monitor\IMonitorService.cs</Link>
+    </Compile>
+    <Compile Include="..\Monitor\NLogMonitor.cs">
+      <Link>Monitor\NLogMonitor.cs</Link>
     </Compile>
     <Compile Include="..\Monitor\SpiderClosingHandler.cs">
       <Link>Monitor\SpiderClosingHandler.cs</Link>
@@ -252,14 +261,6 @@
     <ProjectReference Include="..\..\Java2Dotnet.Spider.Common\net45\Java2Dotnet.Spider.Common.csproj">
       <Project>{43dd7a01-fbde-4a22-bf6e-758f721dde77}</Project>
       <Name>Java2Dotnet.Spider.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Java2Dotnet.Spider.Ioc\net45\Java2Dotnet.Spider.Ioc.csproj">
-      <Project>{0047a89f-61e8-4369-a75c-81e7ab431add}</Project>
-      <Name>Java2Dotnet.Spider.Ioc</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Java2Dotnet.Spider.Log\net45\Java2Dotnet.Spider.Log.csproj">
-      <Project>{acda398b-a5f3-4cae-bdca-fb172736919c}</Project>
-      <Name>Java2Dotnet.Spider.Log</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

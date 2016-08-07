@@ -14,13 +14,12 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 	/// </summary>
 	public class FileLockerRedialManager : BaseRedialManager
 	{
-		private static FileLockerRedialManager _instanse;
 		private readonly string _lockerFilePath;
 		private readonly int RedialTimeout = 120 * 1000 / 50;
 
 		public override IAtomicExecutor AtomicExecutor { get; }
 
-		public FileLockerRedialManager(INetworkValidater networkValidater, IRedialer redialer)
+		public FileLockerRedialManager(INetworkValidater networkValidater, IRedialer redialer) : base()
 		{
 			_lockerFilePath = Path.Combine(SpiderEnviroment.GlobalDirectory, "redialer.lock");
 			AtomicExecutor = new FileLockerAtomicExecutor(this);

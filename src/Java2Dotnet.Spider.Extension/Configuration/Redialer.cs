@@ -61,7 +61,7 @@ namespace Java2Dotnet.Spider.Extension.Configuration
 
 		public override void SetRedialManager(INetworkValidater networkValidater, IRedialer redialer)
 		{
-			NetworkProxyManager.Current.Register(new RedialExecutor(new Redial.RedialManager.RedisRedialManager(Host, Password, networkValidater, redialer, null)));
+			NetworkProxyManager.Current.Register(new RedialExecutor(new Redial.RedialManager.RedisRedialManager(Host, Password, networkValidater, redialer)));
 		}
 	}
 

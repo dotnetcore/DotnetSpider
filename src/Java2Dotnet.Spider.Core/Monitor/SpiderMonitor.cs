@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core;
 using Java2Dotnet.Spider.Core.Scheduler;
-using Java2Dotnet.Spider.Log;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text;
 using System.Linq;
-using Java2Dotnet.Spider.Ioc;
 using Java2Dotnet.Spider.Core.Monitor;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Java2Dotnet.Spider.Core.Monitor
 {
@@ -20,9 +19,11 @@ namespace Java2Dotnet.Spider.Core.Monitor
 		private static SpiderMonitor _instanse;
 		private static readonly object Locker = new object();
 		private readonly Dictionary<ISpider, Timer> _data = new Dictionary<ISpider, Timer>();
+		private List<IMonitorService> monitorServices;
 
 		private SpiderMonitor()
 		{
+			monitorServices = IocExtension.ServiceProvider.GetServices<IMonitorService>().ToList();
 		}
 
 		public SpiderMonitor Register(params Spider[] spiders)
@@ -43,9 +44,9 @@ namespace Java2Dotnet.Spider.Core.Monitor
 
 		private void WatchStatus(object obj)
 		{
-			foreach (var service in ServiceProvider.Get<IMonitorService>())
+			foreach (var service in monitorServices)
 			{
-				if (service.IsEnable)
+				if (service.IsEnabled)
 				{
 					var spider = obj as Spider;
 					var monitor = spider.Scheduler as IMonitorableScheduler;
@@ -69,7 +70,7 @@ namespace Java2Dotnet.Spider.Core.Monitor
 
 		public void Dispose()
 		{
-			foreach (var service in ServiceProvider.Get<IMonitorService>())
+			foreach (var service in monitorServices)
 			{
 				service.Dispose();
 			}

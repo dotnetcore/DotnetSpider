@@ -17,12 +17,12 @@ namespace Java2Dotnet.Spider.Extension.Monitor
 		private AutomicLong _postCounter = new AutomicLong(0);
 		private string _server;
 
-		public HttpMonitor(string server)
+		public HttpMonitor()
 		{
-			_server = server;
+			_server = ConfigurationManager.Get("statusHttpServer");
 		}
 
-		public bool IsEnable
+		public bool IsEnabled
 		{
 			get
 			{

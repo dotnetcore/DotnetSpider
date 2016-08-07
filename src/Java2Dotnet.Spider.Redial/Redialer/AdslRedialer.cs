@@ -3,7 +3,6 @@ using Java2Dotnet.Spider.Redial.Utils;
 using System.Diagnostics;
 #if NET_CORE
 using System.Runtime.InteropServices;
-using Java2Dotnet.Spider.Log;
 #endif
 
 namespace Java2Dotnet.Spider.Redial.Redialer

@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Java2Dotnet.Spider.Common;
-using Java2Dotnet.Spider.Log;
 using Newtonsoft.Json;
 
 namespace Java2Dotnet.Spider.Core.Proxy

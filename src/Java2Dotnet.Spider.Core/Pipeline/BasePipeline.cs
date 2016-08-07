@@ -1,17 +1,18 @@
 ﻿using Java2Dotnet.Spider.Core.Downloader;
-using Java2Dotnet.Spider.Ioc;
-using Java2Dotnet.Spider.Log;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using NLog;
 
 namespace Java2Dotnet.Spider.Core.Pipeline
 {
 	public abstract class BasePipeline : IPipeline
 	{
-		protected ILogService Logger { get; set; }
+		protected ILogger Logger { get; set; }
 		protected string BasePath { get; set; }
 
 		public ISpider Spider { get; protected set; }
@@ -24,7 +25,7 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 
 		public virtual void InitPipeline(ISpider spider)
 		{
-			Logger = ServiceProvider.Get<ILogService>().First();
+			Logger = LogManager.GetCurrentClassLogger();
 			Spider = spider;
 		}
 

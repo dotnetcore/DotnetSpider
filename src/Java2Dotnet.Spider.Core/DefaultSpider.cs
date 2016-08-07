@@ -4,9 +4,10 @@ using System.Text.RegularExpressions;
 using Java2Dotnet.Spider.Core.Pipeline;
 using Java2Dotnet.Spider.Core.Processor;
 using Java2Dotnet.Spider.Core.Scheduler;
-using Java2Dotnet.Spider.Log;
-using Java2Dotnet.Spider.Ioc;
+
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using NLog;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -29,7 +30,7 @@ namespace Java2Dotnet.Spider.Core
 			}
 			Identity = uuid;
 			Site = site;
-			Logger = ServiceProvider.Get<ILogService>().First();
+			Logger = LogManager.GetCurrentClassLogger();
 		}
 
 		/// <summary>
@@ -60,7 +61,7 @@ namespace Java2Dotnet.Spider.Core
 
 		public string TaskGroup { get; } = "Default";
 
-		public ILogService Logger
+		public ILogger Logger
 		{
 			get; set;
 		}

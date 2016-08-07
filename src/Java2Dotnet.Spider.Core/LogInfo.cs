@@ -9,7 +9,7 @@ namespace Java2Dotnet.Spider.Core
 
 		public static string Create(string message, ITask task)
 		{
-			return $"[{DateTime.Now}] [{_machine}][{task.UserId}][{task.TaskGroup}] {message}";
+			return $"[{task.UserId}][{task.TaskGroup}] {message}";
 		}
 	}
 }

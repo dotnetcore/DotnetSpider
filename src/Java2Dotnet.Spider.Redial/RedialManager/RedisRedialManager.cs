@@ -7,7 +7,6 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Java2Dotnet.Spider.Redial.AtomicExecutor;
-using Java2Dotnet.Spider.Log;
 using StackExchange.Redis;
 using Java2Dotnet.Spider.Redial.NetworkValidater;
 using Java2Dotnet.Spider.Redial.Redialer;
@@ -28,9 +27,8 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 		public const string Locker = "redial-locker";
 		public IDatabase Db { get; }
 
-		public RedisRedialManager(string host, string password, INetworkValidater validater, IRedialer redialer, ILogService logger)
+		public RedisRedialManager(string host, string password, INetworkValidater validater, IRedialer redialer) : base()
 		{
-			Logger = logger;
 			if (!string.IsNullOrEmpty(host))
 			{
 				RedisHost = host;
@@ -85,10 +83,8 @@ namespace Java2Dotnet.Spider.Redial.RedialManager
 			Redialer = redialer;
 		}
 
-		public RedisRedialManager(IDatabase db, INetworkValidater validater, IRedialer redialer, ILogService logger)
+		public RedisRedialManager(IDatabase db, INetworkValidater validater, IRedialer redialer) : base()
 		{
-			Logger = logger;
-
 			Db = db;
 			AtomicExecutor = new RedisAtomicExecutor(this);
 			NetworkValidater = validater;

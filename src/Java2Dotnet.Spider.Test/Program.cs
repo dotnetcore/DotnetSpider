@@ -6,7 +6,6 @@ using System.Text;
 using Java2Dotnet.Spider.Extension;
 using Java2Dotnet.Spider.Test.Example;
 using Java2Dotnet.Spider.Test.Pipeline;
-using Java2Dotnet.Spider.Log;
 using Newtonsoft.Json;
 using Java2Dotnet.Spider.Core.Downloader;
 using System.Threading.Tasks;
@@ -18,14 +17,14 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Java2Dotnet.Spider.Extension.Configuration;
 using Java2Dotnet.Spider.Extension.Configuration.Json;
-using Java2Dotnet.Spider.Ioc;
+
 using Java2Dotnet.Spider.Core.Monitor;
 using Java2Dotnet.Spider.Extension.Monitor;
 using System.Net;
 using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.Model;
-using static Java2Dotnet.Spider.Extension.Configuration.BaseDbPrepareStartUrls;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Java2Dotnet.Spider.Test
 {
@@ -33,11 +32,8 @@ namespace Java2Dotnet.Spider.Test
 	{
 		public static void Main(string[] args)
 		{
-			ServiceProvider.Add<ILogService>(new LogService(new ConsoleLog(), new FileLog()));
-			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
-			ServiceProvider.Add<IMonitorService>(new FileMonitor());
-			ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
-
+			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
+			IocExtension.ServiceCollection.AddSingleton<IMonitorService, HttpMonitor>();
 			//var start = DateTime.Now;
 			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			spiderBuilder.Run("rerun");

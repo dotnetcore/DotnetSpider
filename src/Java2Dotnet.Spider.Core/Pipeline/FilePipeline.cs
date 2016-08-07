@@ -5,8 +5,7 @@ using System.Text;
 using Java2Dotnet.Spider.Common;
 using Java2Dotnet.Spider.Core.Utils;
 using System.Runtime.InteropServices;
-using Java2Dotnet.Spider.Log;
-using Java2Dotnet.Spider.Ioc;
+
 using System.Linq;
 
 namespace Java2Dotnet.Spider.Core.Pipeline
@@ -33,7 +32,6 @@ namespace Java2Dotnet.Spider.Core.Pipeline
 #else
 			SetPath("\\data\\files");
 #endif
-			Logger = ServiceProvider.Get<ILogService>().First();
 		}
 
 		public FilePipeline(string path)

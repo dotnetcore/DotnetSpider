@@ -5,6 +5,7 @@ using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.Configuration;
 using Java2Dotnet.Spider.Extension.ORM;
 using System.Collections.Generic;
+using Java2Dotnet.Spider.Core.Downloader;
 
 namespace Java2Dotnet.Spider.Test.Example
 {
@@ -28,7 +29,7 @@ namespace Java2Dotnet.Spider.Test.Example
 				SkipWhenResultIsEmpty = true,
 				Downloader = new HttpDownloader()
 				{
-					Handlers = new List<DownloadHandler>
+					Handlers = new List<IDownloadHandler>
 					{
 						new SubContentHandler {
 							StartString="sales[\"hotsite_yixing\"] = [",

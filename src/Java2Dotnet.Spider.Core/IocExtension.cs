@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Java2Dotnet.Spider.Ioc
+namespace Java2Dotnet.Spider.Core
 {
 	public class IocExtension
 	{

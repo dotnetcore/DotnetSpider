@@ -16,7 +16,7 @@
     "Java2Dotnet.Spider.Redial": "0.0.9",
     "Java2Dotnet.Spider.Log": "0.0.9",
     "System.Diagnostics.Process": "*",
-    "System.Net.Http": "4.0.1-rc2-24027",
+    "System.Net.Http": "4.1.0",
     "System.Text.Encoding.CodePages": "*"
   },
 	"frameworks": {

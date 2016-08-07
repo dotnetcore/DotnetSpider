@@ -15,9 +15,10 @@ using Java2Dotnet.Spider.Core.Scheduler;
 using Java2Dotnet.Spider.Core.Scheduler.Component;
 using Java2Dotnet.Spider.Core.Utils;
 using Newtonsoft.Json;
-using Java2Dotnet.Spider.Log;
-using Java2Dotnet.Spider.Ioc;
+
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using NLog;
 
 namespace Java2Dotnet.Spider.Core
 {
@@ -26,7 +27,7 @@ namespace Java2Dotnet.Spider.Core
 	/// </summary>
 	public class Spider : ISpider
 	{
-		public ILogService Logger { get; set; }
+		public ILogger Logger { get; set; }
 		public int ThreadNum { get; private set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
 		public bool SpawnUrl { get; set; } = true;
@@ -116,7 +117,7 @@ namespace Java2Dotnet.Spider.Core
 
 			UserId = string.IsNullOrEmpty(userid) ? "DotnetSpider" : userid;
 			TaskGroup = string.IsNullOrEmpty(taskGroup) ? "DotnetSpider" : taskGroup;
-			Logger = ServiceProvider.Get<ILogService>().First();
+			Logger = LogManager.GetCurrentClassLogger();
 
 			_waitCount = 0;
 			if (pageProcessor == null)
@@ -448,7 +449,7 @@ namespace Java2Dotnet.Spider.Core
 			{
 				Logger.Info(LogInfo.Create($"任务 {Identity} 退出成功, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", this));
 			}
-			Logger.Dispose();
+			//Logger.Dispose();
 			IsExited = true;
 		}
 
