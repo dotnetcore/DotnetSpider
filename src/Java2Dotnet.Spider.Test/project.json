@@ -3,7 +3,7 @@
 	"buildOptions": {
 		"emitEntryPoint": true,
 		"debugType": "portable",
-		"copyToOutput": "app.conf"
+		"copyToOutput": "config.ini"
 	},
   "dependencies": {
     "Microsoft.NETCore.App": {
