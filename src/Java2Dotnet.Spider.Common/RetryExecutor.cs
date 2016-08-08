@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Java2Dotnet.Spider.Common
 {
-	public static class SafeExecutor
+	public static class RetryExecutor
 	{
 		public static void Execute(int retryNumber, Action action)
 		{

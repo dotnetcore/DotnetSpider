@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using StringUtils = Java2Dotnet.Spider.Common.StringUtils;
+using StringExtensions = Java2Dotnet.Spider.Common.StringExtensions;
 #if NET_CORE
 using System.Reflection;
 #endif
@@ -24,8 +24,8 @@ namespace Java2Dotnet.Spider.Core.Selector
 			}
 			// Check bracket for regex group. Add default group 1 if there is no group.
 			// Only check if there exists the valid left parenthesis, leave regexp validation for Pattern.
-			if (StringUtils.CountMatches(regexStr, "(") - StringUtils.CountMatches(regexStr, "\\(") ==
-					StringUtils.CountMatches(regexStr, "(?:") - StringUtils.CountMatches(regexStr, "\\(?:"))
+			if (StringExtensions.CountMatches(regexStr, "(") - StringExtensions.CountMatches(regexStr, "\\(") ==
+					StringExtensions.CountMatches(regexStr, "(?:") - StringExtensions.CountMatches(regexStr, "\\(?:"))
 			{
 				regexStr = "(" + regexStr + ")";
 			}

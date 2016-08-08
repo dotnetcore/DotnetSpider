@@ -1,4 +1,4 @@
-namespace Java2Dotnet.Spider.Common
+namespace Java2Dotnet.Spider.Core.Downloader
 {
 	/// <summary>
 	/// Some constants of Http protocal.

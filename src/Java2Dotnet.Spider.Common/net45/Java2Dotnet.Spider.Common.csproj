@@ -120,29 +120,20 @@
     <Compile Include="..\FiddlerClient.cs">
       <Link>FiddlerClient.cs</Link>
     </Compile>
-    <Compile Include="..\HttpConstant.cs">
-      <Link>HttpConstant.cs</Link>
-    </Compile>
     <Compile Include="..\HttpUtils.cs">
       <Link>HttpUtils.cs</Link>
     </Compile>
     <Compile Include="..\LimitedConcurrencyLevelTaskScheduler.cs">
       <Link>LimitedConcurrencyLevelTaskScheduler.cs</Link>
     </Compile>
-    <Compile Include="..\NetUtils.cs">
-      <Link>NetUtils.cs</Link>
-    </Compile>
     <Compile Include="..\PriorityBlockingQueue.cs">
       <Link>PriorityBlockingQueue.cs</Link>
     </Compile>
-    <Compile Include="..\RedisServer.cs">
-      <Link>RedisServer.cs</Link>
+    <Compile Include="..\RegexUtils.cs">
+      <Link>RegexUtils.cs</Link>
     </Compile>
-    <Compile Include="..\SafeExecutor.cs">
-      <Link>SafeExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\SingleExecutor.cs">
-      <Link>SingleExecutor.cs</Link>
+    <Compile Include="..\RetryExecutor.cs">
+      <Link>RetryExecutor.cs</Link>
     </Compile>
     <Compile Include="..\SpiderEnviroment.cs">
       <Link>SpiderEnviroment.cs</Link>
@@ -150,11 +141,8 @@
     <Compile Include="..\StreamExtensions.cs">
       <Link>StreamExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\StringUtils.cs">
-      <Link>StringUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\SynchronizedList.cs">
-      <Link>SynchronizedList.cs</Link>
+    <Compile Include="..\StringExtensions.cs">
+      <Link>StringExtensions.cs</Link>
     </Compile>
     <Compile Include="..\SystemInfo.cs">
       <Link>SystemInfo.cs</Link>

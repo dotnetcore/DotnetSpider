@@ -90,6 +90,9 @@
     <Compile Include="..\Downloader\HttpClientDownloader.cs">
       <Link>Downloader\HttpClientDownloader.cs</Link>
     </Compile>
+    <Compile Include="..\Downloader\HttpConstant.cs">
+      <Link>Downloader\HttpConstant.cs</Link>
+    </Compile>
     <Compile Include="..\Downloader\IDownloader.cs">
       <Link>Downloader\IDownloader.cs</Link>
     </Compile>

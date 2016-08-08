@@ -2,7 +2,7 @@ using System;
 
 namespace Java2Dotnet.Spider.Common
 {
-	public static class StringUtils
+	public static class StringExtensions
 	{
 		public static string GetRandomString(this string value, int count)
 		{

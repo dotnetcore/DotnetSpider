@@ -33,7 +33,7 @@ namespace Java2Dotnet.Spider.Extension.Downloader.WebDriver
 					if (tmp.Length == 2)
 					{
 						int port;
-						if (NetUtils.IpAddressRegex.IsMatch(tmp[0]) && int.TryParse(tmp[1], out port))
+						if (RegexUtils.IpAddressRegex.IsMatch(tmp[0]) && int.TryParse(tmp[1], out port))
 						{
 							_proxy = v;
 							return;

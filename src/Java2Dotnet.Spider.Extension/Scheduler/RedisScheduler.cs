@@ -104,7 +104,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 
 		public bool IsDuplicate(Request request)
 		{
-			return SafeExecutor.Execute(30, () =>
+			return RetryExecutor.Execute(30, () =>
 			{
 				bool isDuplicate = Db.SetContains(SetKey, request.Identity);
 				if (!isDuplicate)
@@ -118,7 +118,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		//[MethodImpl(MethodImplOptions.Synchronized)]
 		protected override void PushWhenNoDuplicate(Request request)
 		{
-			SafeExecutor.Execute(30, () =>
+			RetryExecutor.Execute(30, () =>
 			{
 				Db.ListRightPush(QueueKey, request.Identity);
 				string field = request.Identity;
@@ -133,7 +133,7 @@ namespace Java2Dotnet.Spider.Extension.Scheduler
 		{
 			return NetworkProxyManager.Current.Execute("rds-pl", () =>
 			{
-				return SafeExecutor.Execute(30, () =>
+				return RetryExecutor.Execute(30, () =>
 				{
 					var value = Db.ListRightPop(QueueKey);
 					if (!value.HasValue)
