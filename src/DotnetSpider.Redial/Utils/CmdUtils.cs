@@ -24,7 +24,7 @@ namespace DotnetSpider.Redial.Utils
 			p.BeginOutputReadLine();
 			Thread.Sleep(2000);
 			p.StandardInput.WriteLine("exit");
-			string result = p.StandardOutput.ReadToEnd();
+			p.StandardOutput.ReadToEnd();
 			return p;
 		}
 

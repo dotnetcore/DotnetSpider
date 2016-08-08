@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Selector
@@ -10,24 +9,17 @@ namespace DotnetSpider.Core.Selector
 
 		public abstract ISelectable XPath(string xpath);
 
-
 		public abstract ISelectable Css(string selector);
-
 
 		public abstract ISelectable Css(string selector, string attrName);
 
-
 		public abstract ISelectable SmartContent();
-
 
 		public abstract ISelectable Links();
 
-
 		public abstract IList<ISelectable> Nodes();
 
-
 		public abstract ISelectable JsonPath(string path);
-
 
 		public ISelectable Regex(string regex)
 		{

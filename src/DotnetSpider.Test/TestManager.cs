@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Test
 {
@@ -18,9 +15,10 @@ namespace DotnetSpider.Test
 				Console.WriteLine($"Fetch: {type.FullName} ...");
 
 				var allMethods = type.GetTypeInfo().DeclaredMethods;
-				var methods = allMethods.Where(m => m.GetCustomAttribute<TestMethod>() != null);
+				var methodInfos = allMethods as MethodInfo[] ?? allMethods.ToArray();
+				var methods = methodInfos.Where(m => m.GetCustomAttribute<TestMethod>() != null);
 
-				var initMethod = allMethods.FirstOrDefault(m => m.GetCustomAttribute<TestInitialize>() != null);
+				var initMethod = methodInfos.FirstOrDefault(m => m.GetCustomAttribute<TestInitialize>() != null);
 				foreach (var methodInfo in methods)
 				{
 					var obj = Activator.CreateInstance(type);

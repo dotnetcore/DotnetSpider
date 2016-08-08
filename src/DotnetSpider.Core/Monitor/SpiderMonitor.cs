@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
-using System.Threading.Tasks;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Core;
 using DotnetSpider.Core.Scheduler;
-using Newtonsoft.Json;
-using System.Net.Http;
-using System.Text;
 using System.Linq;
-using DotnetSpider.Core.Monitor;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Core.Monitor
@@ -19,11 +14,11 @@ namespace DotnetSpider.Core.Monitor
 		private static SpiderMonitor _instanse;
 		private static readonly object Locker = new object();
 		private readonly Dictionary<ISpider, Timer> _data = new Dictionary<ISpider, Timer>();
-		private List<IMonitorService> monitorServices;
+		private readonly List<IMonitorService> _monitorServices;
 
 		private SpiderMonitor()
 		{
-			monitorServices = IocExtension.ServiceProvider.GetServices<IMonitorService>().ToList();
+			_monitorServices = IocExtension.ServiceProvider.GetServices<IMonitorService>().ToList();
 		}
 
 		public SpiderMonitor Register(params Spider[] spiders)
@@ -34,7 +29,7 @@ namespace DotnetSpider.Core.Monitor
 				{
 					if (!_data.ContainsKey(spider))
 					{
-						Timer timer = new Timer(new TimerCallback(WatchStatus), spider, 0, 2000);
+						Timer timer = new Timer(WatchStatus, spider, 0, 2000);
 						_data.Add(spider, timer);
 					}
 				}
@@ -44,12 +39,12 @@ namespace DotnetSpider.Core.Monitor
 
 		private void WatchStatus(object obj)
 		{
-			foreach (var service in monitorServices)
+			foreach (var service in _monitorServices)
 			{
 				if (service.IsEnabled)
 				{
-					var spider = obj as Spider;
-					var monitor = spider.Scheduler as IMonitorableScheduler;
+					var spider = (Spider)obj;
+					var monitor = (IMonitorableScheduler)spider.Scheduler ;
 					service.Watch(new SpiderStatus
 					{
 						Code = spider.StatusCode.ToString(),
@@ -62,7 +57,7 @@ namespace DotnetSpider.Core.Monitor
 						ThreadNum = spider.ThreadNum,
 						Total = monitor.GetTotalRequestsCount(),
 						UserId = spider.UserId,
-						Timestamp = DateTime.Now.ToString()
+						Timestamp = DateTime.Now.ToString(CultureInfo.InvariantCulture)
 					});
 				}
 			}
@@ -70,7 +65,7 @@ namespace DotnetSpider.Core.Monitor
 
 		public void Dispose()
 		{
-			foreach (var service in monitorServices)
+			foreach (var service in _monitorServices)
 			{
 				service.Dispose();
 			}

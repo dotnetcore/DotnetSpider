@@ -1,11 +1,12 @@
 using System;
+using NLog;
+#if !NET_CORE
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
-#if !NET_CORE
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
@@ -15,6 +16,8 @@ namespace DotnetSpider.Extension.Configuration
 {
 	public abstract class CookieThief
 	{
+		protected readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
 		[Flags]
 		public enum Types
 		{
@@ -116,6 +119,7 @@ namespace DotnetSpider.Extension.Configuration
 				}
 				catch (Exception e)
 				{
+					Logger.Error(e,"Get cookie failed.");
 					webDriver.Dispose();
 					cookie = null;
 				}
@@ -263,6 +267,7 @@ namespace DotnetSpider.Extension.Configuration
 				}
 				catch (Exception e)
 				{
+					Logger.Error(e, "Get cookie failed.");
 					webDriver.Dispose();
 					cookie = null;
 				}

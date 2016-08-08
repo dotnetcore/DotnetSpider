@@ -53,34 +53,20 @@ namespace DotnetSpider.Validation
 				switch (i.Level)
 				{
 					case ValidateLevel.Error:
-						{
-							if (i.IsPass)
-							{
-								builder.Append($"<td class=\"sucess\">Pass</td>");
-							}
-							else
-							{
-								builder.Append($"<td class=\"error\">Error</td>");
-							}
+					{
+						builder.Append(i.IsPass ? "<td class=\"sucess\">Pass</td>" : "<td class=\"error\">Error</td>");
 
-							break;
-						}
+						break;
+					}
 					case ValidateLevel.Warning:
-						{
-							if (i.IsPass)
-							{
-								builder.Append($"<td class=\"sucess\">Pass</td>");
-							}
-							else
-							{
-								builder.Append($"<td class=\"warning\">Warning</td>");
-							}
+					{
+						builder.Append(i.IsPass ? "<td class=\"sucess\">Pass</td>" : "<td class=\"warning\">Warning</td>");
 
-							break;
-						}
+						break;
+					}
 					case ValidateLevel.Info:
 						{
-							builder.Append($"<td>Info</td>");
+							builder.Append("<td>Info</td>");
 							break;
 						}
 				}

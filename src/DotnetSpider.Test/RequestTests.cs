@@ -11,8 +11,7 @@ namespace DotnetSpider.Test
 	{
 		public static Request GetRequest()
 		{
-			var extras = new Dictionary<string, dynamic>();
-			extras.Add("Test", "Forever");
+			var extras = new Dictionary<string, dynamic> {{"Test", "Forever"}};
 			var request = new Request("http://www.taobao.com", 2, extras)
 			{
 				Method = "get",

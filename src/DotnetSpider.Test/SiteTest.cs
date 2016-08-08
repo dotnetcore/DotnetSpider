@@ -9,11 +9,11 @@ namespace DotnetSpider.Test
 	public class SiteTest
 	{
 
-		private const string wName = "WebSite";
-		private const string wValue = "12580emall";
-		private const string wDomain = "www.12580emall.com"; // 沪动商城
-		private const string URL = @"http://www.12580emall.com/emall/mall/index.html";
-		private Site Site = new Site() { Domain = wDomain, EncodingName = "UTF-8", Timeout = 3000, };
+		private const string WName = "WebSite";
+		private const string WValue = "12580emall";
+		private const string WDomain = "www.12580emall.com"; // 沪动商城
+		private const string Url = @"http://www.12580emall.com/emall/mall/index.html";
+		private readonly Site _site = new Site() { Domain = WDomain, EncodingName = "UTF-8", Timeout = 3000, };
 
 		[TestMethod]
 		public void TestAddCookies()
@@ -28,19 +28,19 @@ namespace DotnetSpider.Test
 		[TestMethod]
 		public void TestAddRequests()
 		{
-			Site.ClearStartRequests();
-			Site.AddStartUrl(URL);
-			Site.AddStartRequest(new Request(URL, 1, null));
-			Assert.AreEqual(Site.Domain, wDomain);
-			Assert.IsTrue(Site.StartRequests.Contains(new Request(URL, 1, null)));
+			_site.ClearStartRequests();
+			_site.AddStartUrl(Url);
+			_site.AddStartRequest(new Request(Url, 1, null));
+			Assert.AreEqual(_site.Domain, WDomain);
+			Assert.IsTrue(_site.StartRequests.Contains(new Request(Url, 1, null)));
 		}
 
 		[TestMethod]
 		public void TestAddHeaders()
 		{
-			Site.AddHeader(wName, wValue);
-			Assert.IsNotNull(Site.Headers);
-			Assert.IsTrue(Site.Headers.Count > 0);
+			_site.AddHeader(WName, WValue);
+			Assert.IsNotNull(_site.Headers);
+			Assert.IsTrue(_site.Headers.Count > 0);
 		}
 	}
 }

@@ -118,14 +118,7 @@ namespace DotnetSpider.Extension.Configuration
 			{
 				return;
 			}
-			if (ToUpper)
-			{
-				p.Content = p.Content.ToUpper();
-			}
-			else
-			{
-				p.Content = p.Content.ToLower();
-			}
+			p.Content = ToUpper ? p.Content.ToUpper() : p.Content.ToLower();
 		}
 	}
 
@@ -281,7 +274,7 @@ namespace DotnetSpider.Extension.Configuration
 		public override Types Type { get; internal set; } = Types.CycleRedial;
 
 		public int RedialLimit { get; set; }
-		public static int RequestedCount { get; set; } = 0;
+		public static int RequestedCount { get; set; }
 
 		public override void Handle(Page page)
 		{

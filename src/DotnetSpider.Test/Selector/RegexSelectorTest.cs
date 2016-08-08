@@ -1,7 +1,7 @@
-﻿using System;
-using DotnetSpider.Core.Selector;
+﻿using DotnetSpider.Core.Selector;
 #if !NET_CORE
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 #endif
 
 namespace DotnetSpider.Test.Selector

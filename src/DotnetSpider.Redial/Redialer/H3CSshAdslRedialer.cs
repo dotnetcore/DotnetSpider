@@ -41,7 +41,7 @@ namespace DotnetSpider.Redial.Redialer
 				client.Connect();
 
 				var shell = client.CreateShellStream("redialer", 120, 120, 120, 120, 1024);
-				shell.DataReceived += Shell_DataReceived; ;
+				shell.DataReceived += Shell_DataReceived;
 
 				shell.WriteLine("system-view");
 				Thread.Sleep(1000);

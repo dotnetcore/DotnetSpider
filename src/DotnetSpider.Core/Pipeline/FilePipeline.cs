@@ -3,10 +3,9 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Core.Utils;
+#if NET_CORE
 using System.Runtime.InteropServices;
-
-using System.Linq;
+#endif
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -21,14 +20,7 @@ namespace DotnetSpider.Core.Pipeline
 		public FilePipeline()
 		{
 #if NET_CORE
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				SetPath("\\data\\files");
-			}
-			else
-			{
-				SetPath("/data/files");
-			}
+			SetPath(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\data\\files" : "/data/files");
 #else
 			SetPath("\\data\\files");
 #endif

@@ -2,20 +2,15 @@
 using System.Linq;
 using System.Text;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.ORM;
 using MySql.Data.MySqlClient;
-using Newtonsoft.Json.Linq;
-using DotnetSpider.Extension.Utils;
 using DotnetSpider.Extension.Configuration;
-using System;
-using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public class EntityMySqlPipeline : EntityGeneralPipeline
 	{
-		private string _autoIncrementString = "AUTO_INCREMENT";
-
 		public EntityMySqlPipeline(Schema schema, EntityMetadata entityDefine, string connectString, PipelineMode mode) : base(schema, entityDefine, connectString, mode)
 		{
 		}
@@ -80,11 +75,6 @@ namespace DotnetSpider.Extension.Pipeline
 			builder.Append(") ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
 			string sql = builder.ToString();
 			return sql;
-		}
-
-		private string GetAutoIncrementString(string name)
-		{
-			return name == AutoIncrement ? _autoIncrementString : "";
 		}
 
 		protected override string GetCreateSchemaSql()

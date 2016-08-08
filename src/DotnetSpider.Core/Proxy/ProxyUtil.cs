@@ -1,6 +1,5 @@
 ﻿using NLog;
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 
@@ -8,9 +7,8 @@ namespace DotnetSpider.Core.Proxy
 {
 	public class ProxyUtil
 	{
-		// TODO 改为单例
 		private static IPAddress _localAddr;
-		private static ILogger Logger = LogManager.GetCurrentClassLogger();
+		private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
 		static ProxyUtil()
 		{

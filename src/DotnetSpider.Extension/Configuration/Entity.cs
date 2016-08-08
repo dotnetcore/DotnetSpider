@@ -1,5 +1,4 @@
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;

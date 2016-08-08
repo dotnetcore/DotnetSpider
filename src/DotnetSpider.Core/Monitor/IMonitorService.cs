@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core.Scheduler;
-using System;
+﻿using System;
 namespace DotnetSpider.Core.Monitor
 {
 	public interface IMonitorService : IDisposable

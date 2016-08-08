@@ -1,8 +1,10 @@
 ﻿using System;
 using DotnetSpider.Core.Downloader;
-using DotnetSpider.Extension.Downloader.WebDriver;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Linq;
+#if !NET_CORE
+using DotnetSpider.Extension.Downloader.WebDriver;
+#endif
 
 namespace DotnetSpider.Extension.Configuration
 {
@@ -41,20 +43,20 @@ namespace DotnetSpider.Extension.Configuration
 			var downloader = new HttpClientDownloader();
 			//if (DownloadValidations != null)
 			//{
-				//downloader.DownloadValidation = page =>
-				//{
-				//	DownloadValidationResult result = DownloadValidationResult.Success;
-				//	foreach (var downloadValidation in DownloadValidations)
-				//	{
-				//		var r = downloadValidation.Validate(page, out result);
-				//		if (!r)
-				//		{
-				//			break;
-				//		}
-				//	}
+			//downloader.DownloadValidation = page =>
+			//{
+			//	DownloadValidationResult result = DownloadValidationResult.Success;
+			//	foreach (var downloadValidation in DownloadValidations)
+			//	{
+			//		var r = downloadValidation.Validate(page, out result);
+			//		if (!r)
+			//		{
+			//			break;
+			//		}
+			//	}
 
-				//	return result;
-				//};
+			//	return result;
+			//};
 			//}
 			if (PostBodyGenerator != null)
 			{
@@ -66,7 +68,7 @@ namespace DotnetSpider.Extension.Configuration
 						var tmp = s.Arguments.ContainsKey(arg) ? s.Arguments[arg] : "";
 						arguments.Add(tmp);
 					}
-					r.PostBody = string.Format(r.PostBody, arguments.ToArray());
+					r.PostBody = string.Format(r.PostBody, arguments.Select(a => (object)a));
 				};
 			}
 			return downloader;
@@ -83,13 +85,13 @@ namespace DotnetSpider.Extension.Configuration
 			var downloader = new Extension.Downloader.FileDownloader();
 			//if (DownloadValidations != null)
 			//{
-				//downloader.DownloadValidation += (page) =>
-				//{
-				//	foreach (var downloadValidation in DownloadValidations)
-				//	{
-				//		downloadValidation.Validate(page);
-				//	}
-				//};
+			//downloader.DownloadValidation += (page) =>
+			//{
+			//	foreach (var downloadValidation in DownloadValidations)
+			//	{
+			//		downloadValidation.Validate(page);
+			//	}
+			//};
 			//}
 			return downloader;
 		}
@@ -109,20 +111,20 @@ namespace DotnetSpider.Extension.Configuration
 			}
 			//if (DownloadValidations != null)
 			//{
-				//downloader.DownloadValidation = page =>
-				//{
-				//	DownloadValidationResult result = DownloadValidationResult.Success;
-				//	foreach (var downloadValidation in DownloadValidations)
-				//	{
-				//		var r = downloadValidation.Validate(page, out result);
-				//		if (!r)
-				//		{
-				//			break;
-				//		}
-				//	}
+			//downloader.DownloadValidation = page =>
+			//{
+			//	DownloadValidationResult result = DownloadValidationResult.Success;
+			//	foreach (var downloadValidation in DownloadValidations)
+			//	{
+			//		var r = downloadValidation.Validate(page, out result);
+			//		if (!r)
+			//		{
+			//			break;
+			//		}
+			//	}
 
-				//	return result;
-				//};
+			//	return result;
+			//};
 			//}
 			if (VerifyCode != null)
 			{

@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Scheduler.Component
 {
@@ -12,20 +11,17 @@ namespace DotnetSpider.Core.Scheduler.Component
 		/// Check whether the request is duplicate.
 		/// </summary>
 		/// <param name="request"></param>
-		/// <param name="spider"></param>
 		/// <returns></returns>
 		bool IsDuplicate(Request request);
 
 		/// <summary>
 		/// Reset duplicate check.
 		/// </summary>
-		/// <param name="spider"></param>
 		void ResetDuplicateCheck();
 
 		/// <summary>
 		/// Get TotalRequestsCount for monitor.
 		/// </summary>
-		/// <param name="spider"></param>
 		/// <returns></returns>
 		long GetTotalRequestsCount();
 	}

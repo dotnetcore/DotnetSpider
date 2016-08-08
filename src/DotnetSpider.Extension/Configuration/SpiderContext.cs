@@ -1,24 +1,20 @@
-﻿using System.Collections.Generic;
-using DotnetSpider.Core;
-using DotnetSpider.Extension.Configuration;
-using Newtonsoft.Json.Linq;
-using DotnetSpider.Extension.Model;
-using System;
-using System.CodeDom;
+﻿using System;
 using System.Collections;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using DotnetSpider.Core;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
+using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace DotnetSpider.Extension
+namespace DotnetSpider.Extension.Configuration
 {
 	public class SpiderContext : ITask
 	{
-		private HashSet<Type> Types { get; set; }
-
 		// build it internal
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 
@@ -29,16 +25,16 @@ namespace DotnetSpider.Extension
 		public int Deep { get; set; } = int.MaxValue;
 		public int EmptySleepTime { get; set; } = 15000;
 		public int CachedSize { get; set; } = 1;
-		public Configuration.Scheduler Scheduler { get; set; }
-		public Configuration.Downloader Downloader { get; set; }
+		public Scheduler Scheduler { get; set; }
+		public Downloader Downloader { get; set; }
 		public Site Site { get; set; }
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public Redialer Redialer { get; set; }
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
 		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
-		public List<Configuration.Pipeline> Pipelines { get; set; } = new List<Configuration.Pipeline>();
+		public List<Pipeline> Pipelines { get; set; } = new List<Pipeline>();
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
-		public List<Configuration.TargetUrlExtractor> TargetUrlExtractInfos { get; set; } = new List<Configuration.TargetUrlExtractor>();
+		public List<TargetUrlExtractor> TargetUrlExtractInfos { get; set; } = new List<TargetUrlExtractor>();
 		public List<EnviromentValue> EnviromentValues { get; set; } = new List<EnviromentValue>();
 		public Validations Validations { get; set; }
 		public CookieThief CookieThief { get; set; }
@@ -87,13 +83,13 @@ namespace DotnetSpider.Extension
 			return this;
 		}
 
-		public SpiderContext SetScheduler(Configuration.Scheduler scheduler)
+		public SpiderContext SetScheduler(Scheduler scheduler)
 		{
 			Scheduler = scheduler;
 			return this;
 		}
 
-		public SpiderContext SetDownloader(Configuration.Downloader downloader)
+		public SpiderContext SetDownloader(Downloader downloader)
 		{
 			Downloader = downloader;
 			return this;
@@ -111,7 +107,7 @@ namespace DotnetSpider.Extension
 			return this;
 		}
 
-		public SpiderContext AddPipeline(Configuration.Pipeline pipeline)
+		public SpiderContext AddPipeline(Pipeline pipeline)
 		{
 			Pipelines.Add(pipeline);
 			return this;
@@ -144,7 +140,7 @@ namespace DotnetSpider.Extension
 			return this;
 		}
 
-		public SpiderContext AddTargetUrlExtractor(Configuration.TargetUrlExtractor targetUrlExtractor)
+		public SpiderContext AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
 		{
 			TargetUrlExtractInfos.Add(targetUrlExtractor);
 			return this;

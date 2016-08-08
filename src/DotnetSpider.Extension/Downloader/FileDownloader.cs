@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 
@@ -15,11 +13,13 @@ namespace DotnetSpider.Extension.Downloader
 
 		public override Page Download(Request request, ISpider spider)
 		{
-			Page page = new Page(request, spider.Site.ContentType);
-			page.Content = File.ReadAllText(request.Url.LocalPath);
-			page.TargetUrl = request.Url.ToString();
-			page.Url = request.Url.ToString();
-			page.StatusCode = 200;
+			Page page = new Page(request, spider.Site.ContentType)
+			{
+				Content = File.ReadAllText(request.Url.LocalPath),
+				TargetUrl = request.Url.ToString(),
+				Url = request.Url.ToString(),
+				StatusCode = 200
+			};
 
 			return page;
 		}

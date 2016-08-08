@@ -59,7 +59,7 @@ namespace DotnetSpider.Core.Proxy
 			}
 			catch (FileNotFoundException e)
 			{
-				Logger.Error("Proxy file not found", e);
+				Logger.Error(e, "Proxy file not found");
 			}
 			catch (IOException e)
 			{
@@ -77,7 +77,7 @@ namespace DotnetSpider.Core.Proxy
 			}
 			catch (FileNotFoundException e)
 			{
-				Logger.Error("Proxy file not found", e);
+				Logger.Error(e, "Proxy file not found");
 			}
 			catch (IOException e)
 			{

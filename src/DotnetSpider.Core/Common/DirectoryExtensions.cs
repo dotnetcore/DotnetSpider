@@ -18,8 +18,7 @@ namespace DotnetSpider.Core.Common
 				FileInfo file = atom as FileInfo;
 				if (file == null)
 				{
-					DirectoryInfo directory = atom as DirectoryInfo;
-
+					DirectoryInfo directory = (DirectoryInfo)atom;
 					Directory.CreateDirectory(directory.FullName.Replace(sourcepath, copytopath));
 					foreach (FileSystemInfo fi in directory.GetFileSystemInfos())
 						copyfolders.Enqueue(fi);

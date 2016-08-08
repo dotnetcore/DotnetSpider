@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using DotnetSpider.Core.Common;
-using Newtonsoft.Json;
 
 namespace DotnetSpider.Core
 {

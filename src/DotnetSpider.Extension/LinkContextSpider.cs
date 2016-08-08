@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using DotnetSpider.Core;
+﻿using System.Collections.Generic;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Extension.Configuration;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Processor;
-using DotnetSpider.Core.Common;
-using DotnetSpider.Redial;
-using DotnetSpider.Redial.NetworkValidater;
-using DotnetSpider.Redial.RedialManager;
-using DotnetSpider.Validation;
 using System.Linq;
 using System.Threading.Tasks;
 

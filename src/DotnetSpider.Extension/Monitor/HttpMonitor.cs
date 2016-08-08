@@ -1,34 +1,24 @@
 ﻿using DotnetSpider.Core.Common;
 using DotnetSpider.Core.Monitor;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension.Monitor
 {
 	public class HttpMonitor : IMonitorService
 	{
-		private HttpClient _client = new HttpClient();
-		private AutomicLong _postCounter = new AutomicLong(0);
-		private string _server;
+		private readonly HttpClient _client = new HttpClient();
+		private readonly AutomicLong _postCounter = new AutomicLong(0);
+		private readonly string _server;
 
 		public HttpMonitor()
 		{
 			_server = ConfigurationManager.Get("statusHttpServer");
 		}
 
-		public bool IsEnabled
-		{
-			get
-			{
-				return !string.IsNullOrEmpty(_server) && !string.IsNullOrWhiteSpace(_server);
-			}
-		}
+		public bool IsEnabled => !string.IsNullOrEmpty(_server) && !string.IsNullOrWhiteSpace(_server);
 
 		public void Dispose()
 		{
@@ -49,23 +39,16 @@ namespace DotnetSpider.Extension.Monitor
 			{
 				Message = new
 				{
-					Error = status.Error,
-					Left = status.Left,
-					Status = status.Code,
-					Success = status.Success,
-					Thread = status.ThreadNum,
-					Total = status.Total
+					status.Error, status.Left,
+					Status = status.Code, status.Success,
+					Thread = status.ThreadNum, status.Total
 				},
-				Name = status.Identity,
-				Machine = status.Machine,
-				UserId = status.UserId,
-				TaskGroup = status.TaskGroup,
-				Timestamp = status.Timestamp
+				Name = status.Identity, status.Machine, status.UserId, status.TaskGroup, status.Timestamp
 			};
 			_postCounter.Inc();
-			var task = _client.PostAsync(_server, new StringContent(JsonConvert.SerializeObject(status), Encoding.UTF8, "application/json"));
+			var task = _client.PostAsync(_server, new StringContent(JsonConvert.SerializeObject(tmp), Encoding.UTF8, "application/json"));
 
-			task.ContinueWith((t) =>
+			task.ContinueWith(t =>
 			{
 				_postCounter.Dec();
 			});

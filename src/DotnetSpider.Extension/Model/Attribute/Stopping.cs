@@ -1,6 +1,6 @@
 ﻿using System;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Utils;
+using DotnetSpider.Core.Common;
 
 namespace DotnetSpider.Extension.Model.Attribute
 {
@@ -70,8 +70,8 @@ namespace DotnetSpider.Extension.Model.Attribute
 			}
 
 
-			double realValue = 0;
-			double compareValue = 0;
+			double realValue;
+			double compareValue;
 			if (double.TryParse(value, out realValue) && double.TryParse(CompareValue, out compareValue))
 			{
 				switch (Operate)

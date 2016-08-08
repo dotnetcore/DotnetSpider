@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Redial.AtomicExecutor;
@@ -15,11 +14,11 @@ namespace DotnetSpider.Redial.RedialManager
 	public class FileLockerRedialManager : BaseRedialManager
 	{
 		private readonly string _lockerFilePath;
-		private readonly int RedialTimeout = 120 * 1000 / 50;
+		private readonly int _redialTimeout = 120 * 1000 / 50;
 
 		public override IAtomicExecutor AtomicExecutor { get; }
 
-		public FileLockerRedialManager(INetworkValidater networkValidater, IRedialer redialer) : base()
+		public FileLockerRedialManager(INetworkValidater networkValidater, IRedialer redialer)
 		{
 			_lockerFilePath = Path.Combine(SpiderEnviroment.GlobalDirectory, "redialer.lock");
 			AtomicExecutor = new FileLockerAtomicExecutor(this);
@@ -38,7 +37,7 @@ namespace DotnetSpider.Redial.RedialManager
 
 				if (File.Exists(_lockerFilePath))
 				{
-					for (int i = 0; i < RedialTimeout; ++i)
+					for (int i = 0; i < _redialTimeout; ++i)
 					{
 						Thread.Sleep(50);
 						if (!File.Exists(_lockerFilePath))

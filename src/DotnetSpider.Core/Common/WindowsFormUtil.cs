@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Common
 	public static class WindowsFormUtil
 	{
 		[DllImport("User32.dll", EntryPoint = "FindWindow")]
-		public extern static IntPtr FindWindow(string lpClassName, string lpWindowName);
+		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
 		[DllImport("User32.dll", EntryPoint = "FindWindowEx")]
 		public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpClassName, string lpWindowName);

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Extension.Utils;
+using DotnetSpider.Extension.Common;
 using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Model
@@ -37,18 +36,8 @@ namespace DotnetSpider.Extension.Model
 					page.Request.PutExtra(name, value);
 				}
 			}
-			bool isMulti = false;
 			ISelector selector = SelectorUtil.Parse(_entityDefine.Selector);
-
-			if (selector == null)
-			{
-				isMulti = false;
-			}
-			else
-			{
-				isMulti = _entityDefine.Multi;
-			}
-			if (isMulti)
+			if (selector != null && _entityDefine.Multi)
 			{
 				var list = page.Selectable.SelectList(selector).Nodes();
 				if (list == null || list.Count == 0)
@@ -113,12 +102,12 @@ namespace DotnetSpider.Extension.Model
 
 			if (field.ToLower() == "monday")
 			{
-				return DateTimeUtils.MONDAY_RUN_ID;
+				return DateTimeUtils.MondayRunId;
 			}
 
 			if (field.ToLower() == "today")
 			{
-				return DateTimeUtils.TODAY_RUN_ID;
+				return DateTimeUtils.TodayRunId;
 			}
 
 			if (field.ToLower() == "index")
@@ -162,7 +151,7 @@ namespace DotnetSpider.Extension.Model
 					{
 						throw new SpiderException("Can't compare with object.");
 					}
-					stopping.DataType = datatype.ToString().ToLower();
+					stopping.DataType = datatype.ToLower();
 					string value = dataObject.SelectToken($"$.{stopping.PropertyName}")?.ToString();
 					if (string.IsNullOrEmpty(value))
 					{
@@ -182,7 +171,7 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 
-			return dataObject.Children().Count() > 0 ? dataObject : null;
+			return dataObject.Children().Any() ? dataObject : null;
 		}
 
 		private dynamic ExtractField(ISelectable item, Page page, DataToken field, int index)
@@ -236,7 +225,7 @@ namespace DotnetSpider.Extension.Model
 						if (needCount)
 						{
 							var propertyValues = item.SelectList(selector).Nodes();
-							return propertyValues != null ? propertyValues.Count.ToString() : "-1";
+							return propertyValues?.Count.ToString() ?? "-1";
 						}
 						else
 						{
@@ -251,7 +240,6 @@ namespace DotnetSpider.Extension.Model
 			{
 				if (field.Multi)
 				{
-					var propertyValues = item.SelectList(selector).Nodes();
 					JArray objs = new JArray();
 					var selectables = item.SelectList(selector).Nodes();
 					foreach (var selectable in selectables)

@@ -6,14 +6,13 @@ namespace DotnetSpider.Core.Common
 	{
 		public static string GetRandomString(this string value, int count)
 		{
-			int number;
 			string checkCode = String.Empty; //存放随机码的字符串   
 
 			Random random = new Random();
 
 			for (int i = 0; i < count; i++) //产生4位校验码   
 			{
-				number = random.Next();
+				var number = random.Next();
 				number = number%36;
 				if (number < 10)
 				{

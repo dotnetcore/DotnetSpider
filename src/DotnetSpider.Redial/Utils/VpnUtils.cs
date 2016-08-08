@@ -81,10 +81,12 @@ namespace DotnetSpider.Redial.Utils
 		{
 			try
 			{
-				string args = string.Format("{0} {1} {2}", connVpnName, connUserName, connPassWord);
-				ProcessStartInfo myProcess = new ProcessStartInfo(Vpnprocess, args);
-				myProcess.CreateNoWindow = true;
-				myProcess.UseShellExecute = false;
+				string args = $"{connVpnName} {connUserName} {connPassWord}";
+				ProcessStartInfo myProcess = new ProcessStartInfo(Vpnprocess, args)
+				{
+					CreateNoWindow = true,
+					UseShellExecute = false
+				};
 				var result = Process.Start(myProcess);
 				if (result != null)
 				{
@@ -112,9 +114,11 @@ namespace DotnetSpider.Redial.Utils
 			try
 			{
 				string args = $@"{disConnVpnName} /d";
-				ProcessStartInfo myProcess = new ProcessStartInfo(Vpnprocess, args);
-				myProcess.CreateNoWindow = true;
-				myProcess.UseShellExecute = false;
+				ProcessStartInfo myProcess = new ProcessStartInfo(Vpnprocess, args)
+				{
+					CreateNoWindow = true,
+					UseShellExecute = false
+				};
 				var result = Process.Start(myProcess);
 				if (result != null)
 				{
@@ -164,7 +168,6 @@ namespace DotnetSpider.Redial.Utils
 		/// <param name="delVpnName"></param>
 		public void TryDeleteVpn(string delVpnName)
 		{
-			RasDialer dialer = new RasDialer();
 			RasPhoneBook allUsersPhoneBook = new RasPhoneBook();
 			allUsersPhoneBook.Open();
 			if (allUsersPhoneBook.Entries.Contains(delVpnName))
@@ -196,7 +199,7 @@ namespace DotnetSpider.Redial.Utils
 			// 如果匹配，则说有正在连接的Vpn
 			if (regger.IsMatch(strResult))
 			{
-				string[] list = regger.Match(strResult).Value.ToString().Split('\n');
+				string[] list = regger.Match(strResult).Value.Split('\n');
 				for (int index = 0; index < list.Length; index++)
 				{
 					if (list[index] != string.Empty)

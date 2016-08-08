@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
-namespace DotnetSpider.Core.Utils
+namespace DotnetSpider.Core.Common
 {
 	/// <summary>
 	/// url and html utils.
 	/// </summary>
 	public class UrlUtils
 	{
-		private static readonly Regex PatternForCharset = new Regex("charset\\s*=\\s*['\"]*([^\\s;'\"]*)");
-
 		/// <summary>
 		///  
 		/// </summary>

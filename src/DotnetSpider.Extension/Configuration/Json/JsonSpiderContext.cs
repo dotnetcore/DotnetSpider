@@ -4,8 +4,10 @@ using DotnetSpider.Extension.Model.Formatter;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Validation;
 using System.Linq;
-using DotnetSpider.Extension.Downloader.WebDriver;
 using DotnetSpider.Core.Downloader;
+#if !NET_CORE
+using DotnetSpider.Extension.Downloader.WebDriver;
+#endif
 
 namespace DotnetSpider.Extension.Configuration.Json
 {
@@ -36,27 +38,29 @@ namespace DotnetSpider.Extension.Configuration.Json
 
 		public SpiderContext ToRuntimeContext()
 		{
-			SpiderContext context = new SpiderContext();
-			context.CachedSize = CachedSize;
-			context.TargetUrlsHandler = GetCustomizeTargetUrls(TargetUrlsHandler);
-			context.Deep = Deep;
-			context.Downloader = GetDownloader(Downloader);
-			context.EmptySleepTime = EmptySleepTime;
-			context.Entities = Entities;
-			context.SkipWhenResultIsEmpty = SkipWhenResultIsEmpty;
-			context.Pipelines = GetPipepines(Pipelines);
-			context.PrepareStartUrls = GetPrepareStartUrls(PrepareStartUrls);
-			context.Redialer = GetRedialer(Redialer);
-			context.Scheduler = GetScheduler(Scheduler);
-			context.Site = Site;
-			context.StartUrls = StartUrls;
-			context.SpiderName = SpiderName;
-			context.ThreadNum = ThreadNum;
-			context.EnviromentValues = EnviromentValues;
-			context.Validations = GetValidations(Validations);
-			context.UserId = UserId;
-			context.TaskGroup = TaskGroup;
-			context.TargetUrlExtractInfos = GetTargetUrlExtractInfos(TargetUrlExtractInfos);
+			SpiderContext context = new SpiderContext
+			{
+				CachedSize = CachedSize,
+				TargetUrlsHandler = GetCustomizeTargetUrls(TargetUrlsHandler),
+				Deep = Deep,
+				Downloader = GetDownloader(Downloader),
+				EmptySleepTime = EmptySleepTime,
+				Entities = Entities,
+				SkipWhenResultIsEmpty = SkipWhenResultIsEmpty,
+				Pipelines = GetPipepines(Pipelines),
+				PrepareStartUrls = GetPrepareStartUrls(PrepareStartUrls),
+				Redialer = GetRedialer(Redialer),
+				Scheduler = GetScheduler(Scheduler),
+				Site = Site,
+				StartUrls = StartUrls,
+				SpiderName = SpiderName,
+				ThreadNum = ThreadNum,
+				EnviromentValues = EnviromentValues,
+				Validations = GetValidations(Validations),
+				UserId = UserId,
+				TaskGroup = TaskGroup,
+				TargetUrlExtractInfos = GetTargetUrlExtractInfos(TargetUrlExtractInfos)
+			};
 			return context;
 		}
 
@@ -65,9 +69,11 @@ namespace DotnetSpider.Extension.Configuration.Json
 			List<TargetUrlExtractor> list = new List<TargetUrlExtractor>();
 			foreach (var obj in targetUrlExtractInfos)
 			{
-				TargetUrlExtractor t = new TargetUrlExtractor();
-				t.Patterns = obj.SelectTokens("$.Patterns[*]").Select(p => p.ToString()).ToList();
-				t.Region = obj.SelectToken("$.Region").ToObject<Selector>();
+				TargetUrlExtractor t = new TargetUrlExtractor
+				{
+					Patterns = obj.SelectTokens("$.Patterns[*]").Select(p => p.ToString()).ToList(),
+					Region = obj.SelectToken("$.Region").ToObject<Selector>()
+				};
 				foreach (var format in obj.SelectTokens("$.Formatters[*]"))
 				{
 					var name = format.SelectToken("$.Name").ToString();
@@ -120,7 +126,7 @@ namespace DotnetSpider.Extension.Configuration.Json
 				var description = validations.SelectToken("$.Description")?.ToString();
 				var level = validations.SelectToken("$.Level")?.ToObject<ValidateLevel>();
 
-				result.Rules.Add(GetValidation(type.Value, arguments, sql, description, level.Value));
+				if (level != null) result.Rules.Add(GetValidation(type.Value, arguments, sql, description, level.Value));
 			}
 
 			if (result.Rules.Count == 0)
@@ -165,16 +171,16 @@ namespace DotnetSpider.Extension.Configuration.Json
 
 			switch (type)
 			{
-				case Configuration.NetworkValidater.Types.Vps:
+				case NetworkValidater.Types.Vps:
 					{
 						return networkValidater.ToObject<VpsNetworkValidater>();
 					}
-				case Configuration.NetworkValidater.Types.Defalut:
+				case NetworkValidater.Types.Defalut:
 					{
 						return new DefaultNetworkValidater();
 					}
 #if !NET_CORE
-				case Configuration.NetworkValidater.Types.Vpn:
+				case NetworkValidater.Types.Vpn:
 					{
 						return new VpnNetworkValidater();
 					}
@@ -248,9 +254,12 @@ namespace DotnetSpider.Extension.Configuration.Json
 #endif
 					}
 			}
-			var validater = (JObject)redialer.SelectToken("$.NetworkValidater");
-			result.NetworkValidater = GetNetworkValidater(validater);
 
+			if (result != null)
+			{
+				var validater = (JObject)redialer.SelectToken("$.NetworkValidater");
+				result.NetworkValidater = GetNetworkValidater(validater);
+			}
 			return result;
 		}
 
@@ -312,7 +321,7 @@ namespace DotnetSpider.Extension.Configuration.Json
 							var generalDbPrepareStartUrls = new BaseDbPrepareStartUrls();
 							foreach (var column in jobject.SelectTokens("$.Columns[*]"))
 							{
-								var c = new ConfigurableDbPrepareStartUrls.Column()
+								var c = new BaseDbPrepareStartUrls.Column()
 								{
 									Name = column.SelectToken("$.Name").ToString()
 								};
@@ -354,7 +363,7 @@ namespace DotnetSpider.Extension.Configuration.Json
 			generalDbPrepareStartUrls.Source = jobject.SelectToken("$.Source").ToObject<DataSource>();
 			foreach (var column in jobject.SelectTokens("$.Columns[*]"))
 			{
-				var c = new ConfigurableDbPrepareStartUrls.Column()
+				var c = new BaseDbPrepareStartUrls.Column()
 				{
 					Name = column.SelectToken("$.Name").ToString()
 				};
@@ -389,30 +398,21 @@ namespace DotnetSpider.Extension.Configuration.Json
 				switch (pipelineType)
 				{
 #if !NET_CORE
-					case Configuration.Pipeline.Types.MongoDb:
+					case Pipeline.Types.MongoDb:
 						{
 							tmp = (pipeline.ToObject<MongoDbPipeline>());
 							break;
 						}
 #endif
-					case Configuration.Pipeline.Types.MySql:
+					case Pipeline.Types.MySql:
 						{
 							tmp = (pipeline.ToObject<MysqlPipeline>());
 							break;
 						}
-					case Configuration.Pipeline.Types.MySqlFile:
+					case Pipeline.Types.MySqlFile:
 						{
-							tmp = (pipeline.ToObject<MysqlFilePipeline>());
+							tmp = pipeline.ToObject<MysqlFilePipeline>();
 							break;
-						}
-					case Configuration.Pipeline.Types.TestMongoDb:
-						{
-#if !NET_CORE
-							tmp = (pipeline.ToObject<TestMongoDbPipeline>());
-							break;
-#else
-							throw new SpiderException("DOTNET CORE 暂时不支持 MongoDb.");
-#endif
 						}
 				}
 
@@ -558,78 +558,76 @@ namespace DotnetSpider.Extension.Configuration.Json
 				return null;
 			}
 			List<IDownloadHandler> list = new List<IDownloadHandler>();
-			if (jobjects != null)
-			{
-				foreach (var handler in jobjects)
-				{
-					var handlerType = handler.SelectToken("$.Type")?.ToObject<DownloadHandler.Types>();
-					if (handlerType == null)
-					{
-						throw new SpiderException("Missing handler Type for " + handler);
-					}
 
-					switch (handlerType)
-					{
-						case DownloadHandler.Types.RedialWhenContainsIllegalString:
-							{
-								list.Add(handler.ToObject<RedialWhenContainsIllegalStringHandler>());
-								break;
-							}
-						case DownloadHandler.Types.SubContent:
-							{
-								list.Add(handler.ToObject<SubContentHandler>());
-								break;
-							}
-						case DownloadHandler.Types.CustomTarget:
-							{
-								list.Add(handler.ToObject<CustomTargetHandler>());
-								break;
-							}
-						case DownloadHandler.Types.ContentToUpperOrLower:
-							{
-								list.Add(handler.ToObject<ContentToUpperOrLowerHandler>());
-								break;
-							}
-						case DownloadHandler.Types.RedialWhenExceptionThrow:
-							{
-								list.Add(handler.ToObject<RedialWhenExceptionThrowHandler>());
-								break;
-							}
-						case DownloadHandler.Types.RegexMatchContent:
-							{
-								list.Add(handler.ToObject<RegexMatchContentHandler>());
-								break;
-							}
-						case DownloadHandler.Types.RemoveContent:
-							{
-								list.Add(handler.ToObject<RemoveContentHandler>());
-								break;
-							}
-						case DownloadHandler.Types.RemoveContentHtmlTag:
-							{
-								list.Add(handler.ToObject<RemoveContentHtmlTagHandler>());
-								break;
-							}
-						case DownloadHandler.Types.ReplaceContent:
-							{
-								list.Add(handler.ToObject<ReplaceContentHandler>());
-								break;
-							}
-						case DownloadHandler.Types.TrimContent:
-							{
-								list.Add(handler.ToObject<TrimContentHandler>());
-								break;
-							}
-						case DownloadHandler.Types.UnescapeContent:
-							{
-								list.Add(handler.ToObject<UnescapeContentHandler>());
-								break;
-							}
-						default:
-							{
-								throw new SpiderException("Unspodrt handler type: " + handlerType);
-							}
-					}
+			foreach (var handler in jobjects)
+			{
+				var handlerType = handler.SelectToken("$.Type")?.ToObject<DownloadHandler.Types>();
+				if (handlerType == null)
+				{
+					throw new SpiderException("Missing handler Type for " + handler);
+				}
+
+				switch (handlerType)
+				{
+					case DownloadHandler.Types.RedialWhenContainsIllegalString:
+						{
+							list.Add(handler.ToObject<RedialWhenContainsIllegalStringHandler>());
+							break;
+						}
+					case DownloadHandler.Types.SubContent:
+						{
+							list.Add(handler.ToObject<SubContentHandler>());
+							break;
+						}
+					case DownloadHandler.Types.CustomTarget:
+						{
+							list.Add(handler.ToObject<CustomTargetHandler>());
+							break;
+						}
+					case DownloadHandler.Types.ContentToUpperOrLower:
+						{
+							list.Add(handler.ToObject<ContentToUpperOrLowerHandler>());
+							break;
+						}
+					case DownloadHandler.Types.RedialWhenExceptionThrow:
+						{
+							list.Add(handler.ToObject<RedialWhenExceptionThrowHandler>());
+							break;
+						}
+					case DownloadHandler.Types.RegexMatchContent:
+						{
+							list.Add(handler.ToObject<RegexMatchContentHandler>());
+							break;
+						}
+					case DownloadHandler.Types.RemoveContent:
+						{
+							list.Add(handler.ToObject<RemoveContentHandler>());
+							break;
+						}
+					case DownloadHandler.Types.RemoveContentHtmlTag:
+						{
+							list.Add(handler.ToObject<RemoveContentHtmlTagHandler>());
+							break;
+						}
+					case DownloadHandler.Types.ReplaceContent:
+						{
+							list.Add(handler.ToObject<ReplaceContentHandler>());
+							break;
+						}
+					case DownloadHandler.Types.TrimContent:
+						{
+							list.Add(handler.ToObject<TrimContentHandler>());
+							break;
+						}
+					case DownloadHandler.Types.UnescapeContent:
+						{
+							list.Add(handler.ToObject<UnescapeContentHandler>());
+							break;
+						}
+					default:
+						{
+							throw new SpiderException("Unspodrt handler type: " + handlerType);
+						}
 				}
 			}
 

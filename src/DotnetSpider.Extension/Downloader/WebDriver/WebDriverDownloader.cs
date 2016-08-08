@@ -6,7 +6,6 @@ using System.Web;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Redial;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
 
@@ -17,8 +16,8 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 		private IWebDriver _webDriver;
 		private readonly int _webDriverWaitTime;
 		private static bool _isLogined;
-		private Browser _browser;
-		private Option _option;
+		private readonly Browser _browser;
+		private readonly Option _option;
 		public Func<RemoteWebDriver, bool> Login { get; set; }
 		public Func<RemoteWebDriver, bool> VerifyCode { get; set; }
 		public Func<string, string> UrlFormat;

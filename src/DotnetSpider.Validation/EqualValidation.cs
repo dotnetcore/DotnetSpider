@@ -19,7 +19,7 @@ namespace DotnetSpider.Validation
 			try
 			{
 				string value = GetValue();
-				string result = "";
+				string result;
 				if (Arguments.Contains("select") && Arguments.Contains("from") && Arguments.Contains("as result"))
 				{
 					result = GetValue(Arguments);

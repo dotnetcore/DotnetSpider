@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using DotnetSpider.Core.Common;
 
-namespace DotnetSpider.Core.Utils
+namespace DotnetSpider.Core.Common
 {
 	public class XTokenQueue
 	{

@@ -1,9 +1,10 @@
 using System.IO;
 using System.Text;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Core.Utils;
 using Newtonsoft.Json;
+#if NET_CORE
 using System.Runtime.InteropServices;
+#endif
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -12,27 +13,20 @@ namespace DotnetSpider.Core.Pipeline
 	/// </summary>
 	public class JsonFilePipeline : BasePipeline
 	{
-		private string intervalPath = "";
+		private readonly string _intervalPath;
 
 		public JsonFilePipeline()
 		{
 #if NET_CORE
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				intervalPath = "\\data\\json";
-			}
-			else
-			{
-				intervalPath = "/data/json";
-			}
+			_intervalPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\data\\json" : "/data/json";
 #else
-			intervalPath="\\data\\json";
+			_intervalPath="\\data\\json";
 #endif
 		}
 
 		public JsonFilePipeline(string path)
 		{
-			intervalPath = path;
+			_intervalPath = path;
 		}
 
 		public override void InitPipeline(ISpider spider)
@@ -40,24 +34,17 @@ namespace DotnetSpider.Core.Pipeline
 			base.InitPipeline(spider);
 
 			string path;
-			if (string.IsNullOrEmpty(intervalPath))
+			if (string.IsNullOrEmpty(_intervalPath))
 			{
 #if NET_CORE
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				{
-					path = $"\\{spider.Identity}\\data\\json";
-				}
-				else
-				{
-					path = $"/{spider.Identity}/data/json";
-				}
+				path = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"\\{spider.Identity}\\data\\json" : $"/{spider.Identity}/data/json";
 #else
 				path="\\{spider.Identity}\\data\\json";
 #endif
 			}
 			else
 			{
-				path = intervalPath;
+				path = _intervalPath;
 			}
 			SetPath(path);
 		}

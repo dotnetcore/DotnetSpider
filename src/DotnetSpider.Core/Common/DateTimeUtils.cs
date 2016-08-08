@@ -19,9 +19,9 @@ namespace DotnetSpider.Core.Common
 		private static readonly DateTimeOffset Epoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 		private const long TicksPerMicrosecond = 10;
 
-		public static string TODAY_RUN_ID;
-		public static string MONTHLY_RUN_ID;
-		public static string MONDAY_RUN_ID;
+		public static string TodayRunId;
+		public static string MonthlyRunId;
+		public static string MondayRunId;
 
 		static DateTimeUtils()
 		{
@@ -43,9 +43,9 @@ namespace DotnetSpider.Core.Common
 
 			LastDayofLastWeek = FirstDayofThisWeek.AddDays(-1);
 
-			TODAY_RUN_ID = DateTime.Now.ToString("yyyy-MM-dd");
-			MONTHLY_RUN_ID = FirstDayofThisMonth.ToString("yyyy-MM");
-			MONDAY_RUN_ID = FirstDayofThisWeek.ToString("yyyy-MM-dd");
+			TodayRunId = DateTime.Now.ToString("yyyy-MM-dd");
+			MonthlyRunId = FirstDayofThisMonth.ToString("yyyy-MM");
+			MondayRunId = FirstDayofThisWeek.ToString("yyyy-MM-dd");
 		}
 
 		public static DateTime FirstDayofThisMonth { get; }

@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using DotnetSpider.Core.Common;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
-using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Test.Example
 {

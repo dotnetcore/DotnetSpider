@@ -1,11 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using DotnetSpider.Core;
-using DotnetSpider.Extension.Utils;
+using DotnetSpider.Extension.Common;
 using DotnetSpider.Extension.Model.Formatter;
-using System.Linq;
-using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Configuration
 {

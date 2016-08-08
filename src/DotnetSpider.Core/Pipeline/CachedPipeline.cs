@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -39,8 +37,11 @@ namespace DotnetSpider.Core.Pipeline
 
 			if (_cached.Count > 0)
 			{
-				Process(_cached);
-				_cached.Clear();
+				lock (this)
+				{
+					Process(_cached);
+					_cached.Clear();
+				}
 			}
 		}
 	}

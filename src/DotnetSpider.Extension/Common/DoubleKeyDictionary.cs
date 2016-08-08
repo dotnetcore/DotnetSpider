@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DotnetSpider.Extension.Utils
+namespace DotnetSpider.Extension.Common
 {
 	public class DoubleKeyMap<TK1, TK2, TV>
 	{

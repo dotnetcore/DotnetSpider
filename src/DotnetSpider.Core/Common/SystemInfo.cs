@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Net;
 #if NET_CORE
-using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 #else
 using System.Management;
@@ -23,9 +22,6 @@ namespace DotnetSpider.Core.Common
 
 #if !NET_CORE
 		private static readonly PerformanceCounter PcCpuLoad; //CPU计数器
-#else
-		private static readonly object Locker = new object();
-		private static readonly Regex ProcessorRegex = new Regex("processor");
 #endif
 		public static readonly int PhysicalMemory;
 		public static readonly string HostName;
@@ -71,13 +67,15 @@ namespace DotnetSpider.Core.Common
 
 		public static SystemInfo GetSystemInfo()
 		{
-			SystemInfo systemInfo = new SystemInfo();
+			SystemInfo systemInfo = new SystemInfo
+			{
+				CpuCount = Environment.ProcessorCount,
+				TotalMemory = PhysicalMemory,
+				Name = HostName,
+				Timestamp = DateTime.Now,
+				IpAddress = Ip4Address
+			};
 
-			systemInfo.CpuCount = Environment.ProcessorCount;
-			systemInfo.TotalMemory = PhysicalMemory;
-			systemInfo.Name = HostName;
-			systemInfo.Timestamp = DateTime.Now;
-			systemInfo.IpAddress = Ip4Address;
 
 #if !NET_CORE
 			long availablebytes = 0;
@@ -133,8 +131,7 @@ namespace DotnetSpider.Core.Common
 
 		public static string RunCommand(string command, string arguments)
 		{
-			ProcessStartInfo startInfo = new ProcessStartInfo(command, arguments);
-			startInfo.RedirectStandardOutput = true;
+			ProcessStartInfo startInfo = new ProcessStartInfo(command, arguments) {RedirectStandardOutput = true};
 			Process process = new Process();
 			process.StartInfo = startInfo;
 			process.Start();

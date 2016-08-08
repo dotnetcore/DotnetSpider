@@ -141,8 +141,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common\DoubleKeyDictionary.cs">
+      <Link>Common\DoubleKeyDictionary.cs</Link>
+    </Compile>
     <Compile Include="..\Common\FiddlerClient.cs">
       <Link>Common\FiddlerClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\SelectorUtil.cs">
+      <Link>Common\SelectorUtil.cs</Link>
     </Compile>
     <Compile Include="..\Configuration\CookieThief.cs">
       <Link>Configuration\CookieThief.cs</Link>
@@ -372,9 +378,6 @@
     <Compile Include="..\Pipeline\EntityPipeline.cs">
       <Link>Pipeline\EntityPipeline.cs</Link>
     </Compile>
-    <Compile Include="..\Pipeline\EntityTestMongoDbPipeline.cs">
-      <Link>Pipeline\EntityTestMongoDbPipeline.cs</Link>
-    </Compile>
     <Compile Include="..\Pipeline\IEntityCollectorPipeline.cs">
       <Link>Pipeline\IEntityCollectorPipeline.cs</Link>
     </Compile>
@@ -401,15 +404,6 @@
     </Compile>
     <Compile Include="..\SpiderBuilder.cs">
       <Link>SpiderBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\DoubleKeyDictionary.cs">
-      <Link>Utils\DoubleKeyDictionary.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\RegexUtil.cs">
-      <Link>Utils\RegexUtil.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\SelectorUtil.cs">
-      <Link>Utils\SelectorUtil.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

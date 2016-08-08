@@ -7,7 +7,6 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension.Downloader.WebDriver;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Redial;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
 
@@ -26,8 +25,9 @@ namespace DotnetSpider.Extension.Downloader
 		public Func<string, string> UrlFormat;
 		public Func<RemoteWebDriver, bool> AfterNavigate;
 
-		public FiddlerDownloader(string urlParten, int webDriverWaitTime = 200)
+		public FiddlerDownloader(string urlParten, Option option, int webDriverWaitTime = 200)
 		{
+			_option = option;
 			_option.Proxy = "127.0.0.1:30000";
 			_webDriverWaitTime = webDriverWaitTime;
 
@@ -54,12 +54,11 @@ namespace DotnetSpider.Extension.Downloader
 			}
 		}
 
-		public FiddlerDownloader(string urlParten) : this(urlParten, 300)
+		public FiddlerDownloader(string urlParten, Option option) : this(urlParten, option, 300)
 		{
 		}
 
-		public FiddlerDownloader(string urlParten,
-			Func<RemoteWebDriver, bool> login = null) : this(urlParten, 200)
+		public FiddlerDownloader(string urlParten, Option option, Func<RemoteWebDriver, bool> login = null) : this(urlParten, option, 200)
 		{
 			Login = login;
 		}

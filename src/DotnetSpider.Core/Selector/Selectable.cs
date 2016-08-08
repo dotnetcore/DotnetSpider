@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using HtmlAgilityPack;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Core.Utils;
+using HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Selector
 {
@@ -13,8 +12,7 @@ namespace DotnetSpider.Core.Selector
 			{
 				case ContentType.Html:
 					{
-						HtmlDocument document = new HtmlDocument();
-						document.OptionAutoCloseOnEnd = true;
+						HtmlDocument document = new HtmlDocument {OptionAutoCloseOnEnd = true};
 						document.LoadHtml(text);
 
 						if (!string.IsNullOrEmpty(urlOrPadding))

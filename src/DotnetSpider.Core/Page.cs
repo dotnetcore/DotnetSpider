@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using DotnetSpider.Core.Common;
 using DotnetSpider.Core.Selector;
-using DotnetSpider.Core.Utils;
+using DotnetSpider.Core.Common;
 
 namespace DotnetSpider.Core
 {

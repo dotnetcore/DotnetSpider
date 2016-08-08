@@ -10,7 +10,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		public override string Formate(string value)
 		{
 			long timeStamp = long.Parse(value);
-			DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0); ;
+			DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 			switch (value.Length)
 			{
 				case 10:

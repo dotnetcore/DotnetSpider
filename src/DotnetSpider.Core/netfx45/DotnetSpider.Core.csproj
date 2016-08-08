@@ -147,8 +147,14 @@
     <Compile Include="..\Common\SystemInfo.cs">
       <Link>Common\SystemInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Common\UrlUtils.cs">
+      <Link>Common\UrlUtils.cs</Link>
+    </Compile>
     <Compile Include="..\Common\WindowsFormUtil.cs">
       <Link>Common\WindowsFormUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\XTokenQueue.cs">
+      <Link>Common\XTokenQueue.cs</Link>
     </Compile>
     <Compile Include="..\ContentType.cs">
       <Link>ContentType.cs</Link>
@@ -332,12 +338,6 @@
     </Compile>
     <Compile Include="..\Status.cs">
       <Link>Status.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\UrlUtils.cs">
-      <Link>Utils\UrlUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\XTokenQueue.cs">
-      <Link>Utils\XTokenQueue.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

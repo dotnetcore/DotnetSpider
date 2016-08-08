@@ -6,16 +6,16 @@ namespace DotnetSpider.Core.Selector
 	{
 		private readonly List<string> _groups;
 		public static RegexResult EmptyResult = new RegexResult();
-		private readonly string _regexString;
+		public string Expression { get; set; }
 
 		private RegexResult()
 		{
 		}
 
-		public RegexResult(string regexString, List<string> groups)
+		public RegexResult(string expression, List<string> groups)
 		{
 			_groups = groups;
-			_regexString = regexString;
+			Expression = expression;
 		}
 
 		public string Get(int groupId)

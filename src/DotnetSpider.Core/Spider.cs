@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Common;
@@ -10,15 +9,12 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Core.Scheduler.Component;
-using DotnetSpider.Core.Utils;
 using Newtonsoft.Json;
-
-using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using NLog;
+#if !NET_CORE
+using DotnetSpider.Core.Proxy;
+#endif
 
 namespace DotnetSpider.Core
 {
@@ -34,7 +30,7 @@ namespace DotnetSpider.Core
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public DateTime StartTime { get; private set; }
 		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
-		public Site Site { get; private set; }
+		public Site Site { get; }
 		public string Identity { get; }
 		public List<IPipeline> Pipelines { get; private set; } = new List<IPipeline>();
 		public IDownloader Downloader { get; private set; }
@@ -54,16 +50,16 @@ namespace DotnetSpider.Core
 		protected Status Stat = Status.Init;
 
 		private int _waitCountLimit = 20;
-		private int _waitCount;
 		private bool _init;
 		//private static readonly Regex IdentifyRegex = new Regex(@"^[\S]+$");
 		private static bool _printedInfo;
-		private FileInfo _errorRequestFile;
-		private Random _random = new Random();
+		private readonly FileInfo _errorRequestFile;
+		private readonly Random _random = new Random();
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
 		/// </summary>
+		/// <param name="site"></param>
 		/// <param name="pageProcessor"></param>
 		/// <returns></returns>
 		public static Spider Create(Site site, IPageProcessor pageProcessor)
@@ -74,6 +70,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Create a spider with pageProcessor and scheduler
 		/// </summary>
+		/// <param name="site"></param>
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
 		/// <returns></returns>
@@ -85,9 +82,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Create a spider with indentify, pageProcessor, scheduler.
 		/// </summary>
+		/// <param name="site"></param>
 		/// <param name="identify"></param>
+		/// <param name="taskGroup"></param>
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
+		/// <param name="userid"></param>
 		/// <returns></returns>
 		public static Spider Create(Site site, string identify, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
 		{
@@ -97,9 +97,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Create a spider with pageProcessor.
 		/// </summary>
+		/// <param name="site"></param>
 		/// <param name="identity"></param>
+		/// <param name="taskGroup"></param>
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
+		/// <param name="userid"></param>
 		protected Spider(Site site, string identity, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
 		{
 			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config"));
@@ -116,12 +119,11 @@ namespace DotnetSpider.Core
 				//}
 				Identity = identity;
 			}
-
+			IsExit = false;
 			UserId = string.IsNullOrEmpty(userid) ? "DotnetSpider" : userid;
 			TaskGroup = string.IsNullOrEmpty(taskGroup) ? "DotnetSpider" : taskGroup;
 			Logger = LogManager.GetCurrentClassLogger();
 
-			_waitCount = 0;
 			if (pageProcessor == null)
 			{
 				throw new SpiderException("PageProcessor should not be null.");
@@ -408,15 +410,16 @@ namespace DotnetSpider.Core
 							OnError(request);
 							Logger.Error(e, LogInfo.Create($"采集失败: {request.Url}.", this));
 						}
+#if !NET_CORE
 						finally
 						{
-#if !NET_CORE
+
 							if (Site.HttpProxyPoolEnable && request.GetExtra(Request.Proxy) != null)
 							{
 								Site.ReturnHttpProxyToPool((HttpHost)request.GetExtra(Request.Proxy), (int)request.GetExtra(Request.StatusCode));
 							}
-#endif
 						}
+#endif
 
 						if (!firstTask)
 						{
@@ -521,12 +524,12 @@ namespace DotnetSpider.Core
 			{
 				File.AppendAllText(_errorRequestFile.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
 			}
-			(Scheduler as IMonitorableScheduler).IncreaseErrorCounter();
+			(Scheduler as IMonitorableScheduler)?.IncreaseErrorCounter();
 		}
 
 		protected void _OnSuccess(Request request)
 		{
-			(Scheduler as IMonitorableScheduler).IncreaseSuccessCounter();
+			(Scheduler as IMonitorableScheduler)?.IncreaseSuccessCounter();
 			OnSuccess?.Invoke(request);
 		}
 
@@ -698,21 +701,6 @@ namespace DotnetSpider.Core
 		{
 			Thread.Sleep(WaitInterval);
 			++waitCount;
-		}
-
-		private void WaitNewUrl()
-		{
-			lock (this)
-			{
-				Thread.Sleep(WaitInterval);
-
-				if (!IsExitWhenComplete)
-				{
-					return;
-				}
-
-				++_waitCount;
-			}
 		}
 
 		private void SafeDestroy(object obj)

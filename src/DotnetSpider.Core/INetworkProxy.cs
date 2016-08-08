@@ -18,24 +18,14 @@ namespace DotnetSpider.Core
 
 	public class NetworkProxyManager : INetworkProxyManager
 	{
-		private static INetworkProxyManager instance;
+		private static INetworkProxyManager _instance;
 		public INetworkProxy Proxy { get; set; }
 
-		public static INetworkProxyManager Current
-		{
-			get
-			{
-				if (instance == null)
-				{
-					instance = new NetworkProxyManager();
-				}
-				return instance;
-			}
-		}
+		public static INetworkProxyManager Current => _instance ?? (_instance = new NetworkProxyManager());
 
 		public void Register(INetworkProxy proxy)
 		{
-			this.Proxy = proxy;
+			Proxy = proxy;
 		}
 
 		public void Execute(string name, Action action)

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Common;
+using DotnetSpider.Extension.Common;
 using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Extension.Utils;
 
 namespace DotnetSpider.Extension.Configuration
 {
@@ -29,7 +30,6 @@ namespace DotnetSpider.Extension.Configuration
 	public abstract class AbstractIncreasePageNumberTargetUrlsHandler : TargetUrlsHandler
 	{
 		/// <summary>
-		/// Like &s=44 或者 &page=1 或者 o1
 		/// </summary>
 		public string PageIndexString { get; set; }
 
@@ -288,7 +288,7 @@ namespace DotnetSpider.Extension.Configuration
 
 			foreach (var c in timeStrings)
 			{
-				var dt = DateTime.Parse(c.ToString());
+				var dt = DateTime.Parse(c);
 				if (IsBefore)
 				{
 					foreach (var stopper in Stoppers)

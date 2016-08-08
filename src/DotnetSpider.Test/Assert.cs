@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DotnetSpider.Core;
 
 namespace DotnetSpider.Test
 {
@@ -20,7 +16,7 @@ namespace DotnetSpider.Test
 		{
 			if (!v)
 			{
-				throw new Exception($"Not true");
+				throw new Exception("Not true");
 			}
 		}
 
@@ -28,7 +24,7 @@ namespace DotnetSpider.Test
 		{
 			if (null != value)
 			{
-				throw new Exception($"Not true");
+				throw new Exception("Not true");
 			}
 		}
 
@@ -36,7 +32,7 @@ namespace DotnetSpider.Test
 		{
 			if (!value)
 			{
-				throw new Exception($"Not False");
+				throw new Exception("Not False");
 			}
 		}
 
@@ -44,7 +40,7 @@ namespace DotnetSpider.Test
 		{
 			if (result1 != null)
 			{
-				throw new Exception($"Not False");
+				throw new Exception("Not False");
 			}
 		}
 	}

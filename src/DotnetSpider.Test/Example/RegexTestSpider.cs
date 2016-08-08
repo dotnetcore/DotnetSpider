@@ -1,7 +1,5 @@
 using System;
 using DotnetSpider.Extension;
-using DotnetSpider.Core;
-using System.Collections.Generic;
 using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;

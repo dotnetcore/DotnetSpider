@@ -14,7 +14,7 @@ namespace DotnetSpider.Test.Scheduler
 		public void QueueSchedulerPushPollSynchronized()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			ISpider spider = new DefaultSpider("test", new Site());
+			var spider = new DefaultSpider("test", new Site());
 
 			Parallel.For(0, 1000, new ParallelOptions() { MaxDegreeOfParallelism = 30 }, i =>
 			{

@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DotnetSpider.Core.Common;
-
-using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using NLog;
 
 namespace DotnetSpider.Core.Downloader

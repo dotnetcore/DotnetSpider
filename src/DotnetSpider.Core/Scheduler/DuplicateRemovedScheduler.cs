@@ -1,11 +1,5 @@
-
-using System;
 using DotnetSpider.Core.Scheduler.Component;
 using System.Collections.Generic;
-#if !NET_CORE
-#else
-using System.Runtime.CompilerServices;
-#endif
 
 namespace DotnetSpider.Core.Scheduler
 {

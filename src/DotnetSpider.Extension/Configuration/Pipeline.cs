@@ -1,8 +1,6 @@
 ﻿using System;
-using DotnetSpider.Core;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Configuration
 {
@@ -12,7 +10,6 @@ namespace DotnetSpider.Extension.Configuration
 		public enum Types
 		{
 			Console = 1,
-			TestMongoDb = 2,
 			MongoDb = 3,
 			MySql = 4,
 			MsSql = 5,
@@ -38,19 +35,19 @@ namespace DotnetSpider.Extension.Configuration
 		}
 	}
 
-	public class TestMongoDbPipeline : Pipeline
-	{
-		public override Types Type { get; internal set; } = Types.TestMongoDb;
+	//public class TestMongoDbPipeline : Pipeline
+	//{
+	//	public override Types Type { get; internal set; } = Types.TestMongoDb;
 
-		public string ConnectString { get; set; }
+	//	public string ConnectString { get; set; }
 
-		public string TaskId { get; set; }
+	//	public string TaskId { get; set; }
 
-		public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
-		{
-			return new EntityTestMongoDbPipeline(TaskId, schema, ConnectString);
-		}
-	}
+	//	public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
+	//	{
+	//		return new EntityTestMongoDbPipeline(TaskId, schema, ConnectString);
+	//	}
+	//}
 #endif
 
 	public class MysqlFilePipeline : Pipeline

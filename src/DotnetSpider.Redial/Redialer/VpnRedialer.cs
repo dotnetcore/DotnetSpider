@@ -1,6 +1,5 @@
 ﻿#if !NET_CORE
 using System;
-using System.Runtime.ConstrainedExecution;
 using DotnetSpider.Redial.Utils;
 using System.Threading;
 

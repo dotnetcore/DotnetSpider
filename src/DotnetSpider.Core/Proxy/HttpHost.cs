@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DotnetSpider.Core.Proxy
+﻿namespace DotnetSpider.Core.Proxy
 {
 	public class HttpHost
 	{

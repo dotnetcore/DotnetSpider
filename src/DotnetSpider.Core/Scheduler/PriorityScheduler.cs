@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using DotnetSpider.Core.Common;
 
 namespace DotnetSpider.Core.Scheduler
@@ -14,8 +13,8 @@ namespace DotnetSpider.Core.Scheduler
 		private readonly Queue<Request> _noPriorityQueue = new Queue<Request>();
 		private readonly PriorityBlockingQueue<Request> _priorityQueuePlus = new PriorityBlockingQueue<Request>(InitialCapacity);
 		private readonly PriorityBlockingQueue<Request> _priorityQueueMinus = new PriorityBlockingQueue<Request>(InitialCapacity, new Comparator());
-		private AutomicLong _successCounter = new AutomicLong(0);
-		private AutomicLong _errorCounter = new AutomicLong(0);
+		private readonly AutomicLong _successCounter = new AutomicLong(0);
+		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{

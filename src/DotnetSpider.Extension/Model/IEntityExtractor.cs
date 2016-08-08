@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Model
 {

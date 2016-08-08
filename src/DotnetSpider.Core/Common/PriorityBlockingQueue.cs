@@ -14,7 +14,7 @@ namespace DotnetSpider.Core.Common
 		public PriorityBlockingQueue(int capacity) : this(capacity, null) { }
 		public PriorityBlockingQueue(IComparer<T> comparer) : this(16, comparer) { }
 
-		private int _capacity;
+		private readonly int _capacity;
 
 		public PriorityBlockingQueue(int capacity, IComparer<T> comparer)
 		{

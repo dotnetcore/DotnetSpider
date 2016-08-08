@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
-using System.Xml.Linq;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
@@ -25,7 +21,7 @@ namespace DotnetSpider.Test
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
 
-			Core.Spider spider = Core.Spider.Create(new Site() { EncodingName = "UTF-8" }, new SimplePageProcessor("http://www.oschina.net/", "http://www.oschina.net/*")).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site() { EncodingName = "UTF-8" }, new SimplePageProcessor("http://www.oschina.net/", "http://www.oschina.net/*")).AddPipeline(new TestPipeline()).SetThreadNum(1);
 			Page p = downloader.Download(new Request("http://www.baidu.com/", 2, new Dictionary<string, dynamic>()), spider);
 			Console.WriteLine(p.Content);
 			spider.Start();
@@ -58,20 +54,20 @@ namespace DotnetSpider.Test
 		//	}
 		//}
 
-		private void TestRound()
+		public void TestRound()
 		{
-			Core.Spider spider = Core.Spider.Create(new Site { }, new TestPageProcessor(), new TestScheduler()).SetThreadNum(10);
+			Spider spider = Spider.Create(new Site(), new TestPageProcessor(), new TestScheduler()).SetThreadNum(10);
 			spider.Run();
 		}
 
 		private class TestScheduler : IScheduler
 		{
-			private AtomicInteger _count = new AtomicInteger();
-			private Random _random = new Random();
+			private readonly AtomicInteger _count = new AtomicInteger();
+			private readonly Random _random = new Random();
 
 			public ISpider Spider
 			{
-				get; set;
+				get; private set;
 			}
 
 			public void Init(ISpider spider)
@@ -109,11 +105,6 @@ namespace DotnetSpider.Test
 				throw new NotImplementedException();
 			}
 
-			public HashSet<Request> ToList()
-			{
-				throw new NotImplementedException();
-			}
-
 			public void Clear()
 			{
 				throw new NotImplementedException();
@@ -139,8 +130,7 @@ namespace DotnetSpider.Test
 
 			public override Page Download(Request request, ISpider spider)
 			{
-				var page = new Page(request, ContentType.Html);
-				page.Content = "";
+				var page = new Page(request, ContentType.Html) {Content = ""};
 				return page;
 			}
 

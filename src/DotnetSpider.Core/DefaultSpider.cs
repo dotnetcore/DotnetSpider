@@ -4,9 +4,6 @@ using System.Text.RegularExpressions;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
-
-using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using NLog;
 
 namespace DotnetSpider.Core

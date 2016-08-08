@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Property)]
 	public class SplitFormatter : Formatter
 	{
 		public override string Name { get; internal set; } = "SplitFormatter";

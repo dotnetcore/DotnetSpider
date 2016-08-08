@@ -16,9 +16,9 @@ namespace DotnetSpider.Test
 			resultItems.AddOrUpdateResultItem("b", "b");
 			resultItems.AddOrUpdateResultItem("c", "c");
 
-			dynamic a = resultItems.GetResultItem("a");
-			dynamic b = resultItems.GetResultItem("b");
-			dynamic c = resultItems.GetResultItem("c");
+			resultItems.GetResultItem("a");
+			resultItems.GetResultItem("b");
+			resultItems.GetResultItem("c");
 			//Assert.AreEqual(a, "a");
 			//Assert.AreEqual(b, "b");
 			//Assert.AreEqual(c, "c");

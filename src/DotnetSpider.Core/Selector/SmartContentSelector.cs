@@ -15,15 +15,12 @@ namespace DotnetSpider.Core.Selector
 			html = html.Replace("(?is)<style.*?>.*?</style>", "");   // remove css
 			html = html.Replace("&.{2,5};|&#.{2,5};", " ");         // remove special char
 			html = html.Replace("(?is)<.*?>", "");
-			List<string> lines;
 			int blocksWidth = 3;
 			int threshold = 86;
-			int start;
-			int end;
 			StringBuilder text = new StringBuilder();
 			IList<int> indexDistribution = new List<int>();
 
-			lines = new List<string>(html.Split('\n'));
+			var lines = new List<string>(html.Split('\n'));
 
 			for (int i = 0; i < lines.Count - blocksWidth; i++)
 			{
@@ -36,7 +33,7 @@ namespace DotnetSpider.Core.Selector
 				indexDistribution.Add(wordsNum);
 			}
 
-			start = -1; end = -1;
+			var start = -1; var end = -1;
 			bool boolstart = false, boolend = false;
 
 			for (int i = 0; i < indexDistribution.Count - 1; i++)

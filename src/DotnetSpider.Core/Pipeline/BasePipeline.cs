@@ -1,11 +1,5 @@
-﻿using DotnetSpider.Core.Downloader;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using NLog;
 
 namespace DotnetSpider.Core.Pipeline

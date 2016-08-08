@@ -100,24 +100,23 @@ namespace DotnetSpider.Redial.AtomicExecutor
 			try
 			{
 #endif
-			foreach (var entry in _redisRedialManager.Db.HashGetAll(GetSetKey()))
-			{
-				string key = entry.Name;
-				string value = entry.Value;
-
-				DateTime dt = DateTime.Parse(value);
-				var minutes = (DateTime.Now - dt).TotalMinutes;
-
-				if (minutes > 5)
+				foreach (var entry in _redisRedialManager.Db.HashGetAll(GetSetKey()))
 				{
-					_redisRedialManager.Db.HashDelete(GetSetKey(), key);
+					string key = entry.Name;
+					string value = entry.Value;
+
+					DateTime dt = DateTime.Parse(value);
+					var minutes = (DateTime.Now - dt).TotalMinutes;
+
+					if (minutes > 5)
+					{
+						_redisRedialManager.Db.HashDelete(GetSetKey(), key);
+					}
 				}
-			}
 #if RELEASE
 			}
 			catch (Exception)
 			{
-				
 				throw;
 			}
 #endif

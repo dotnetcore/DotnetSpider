@@ -1,8 +1,8 @@
-﻿using System;
-using DotnetSpider.Redial.Utils;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 #if NET_CORE
 using System.Runtime.InteropServices;
+#else
+using DotnetSpider.Redial.Utils;
 #endif
 
 namespace DotnetSpider.Redial.Redialer

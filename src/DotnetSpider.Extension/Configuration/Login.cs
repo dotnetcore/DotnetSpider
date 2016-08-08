@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Threading;
-using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
-
 #if !NET_CORE
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
+using System.Threading;
+using DotnetSpider.Core;
+using DotnetSpider.Extension.Model;
 #endif
 
 namespace DotnetSpider.Extension.Configuration

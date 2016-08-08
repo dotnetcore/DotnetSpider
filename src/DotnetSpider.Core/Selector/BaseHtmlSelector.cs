@@ -11,8 +11,7 @@ namespace DotnetSpider.Core.Selector
 			{
 				if (text is string)
 				{
-					HtmlDocument document = new HtmlDocument();
-					document.OptionAutoCloseOnEnd = true;
+					HtmlDocument document = new HtmlDocument {OptionAutoCloseOnEnd = true};
 					document.LoadHtml(text);
 					return Select(document.DocumentNode);
 				}
@@ -28,15 +27,14 @@ namespace DotnetSpider.Core.Selector
 		{
 			if (text != null)
 			{
-				if (text is HtmlNode)
+				var htmlNode = text as HtmlNode;
+				if (htmlNode != null)
 				{
-					return SelectList(text as HtmlNode);
-
+					return SelectList(htmlNode);
 				}
 				else
 				{
-					HtmlDocument document = new HtmlDocument();
-					document.OptionAutoCloseOnEnd = true;
+					HtmlDocument document = new HtmlDocument {OptionAutoCloseOnEnd = true};
 					document.LoadHtml(text);
 					return SelectList(document.DocumentNode);
 				}

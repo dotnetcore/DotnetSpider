@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace DotnetSpider.Core.Scheduler 
 {
 	/// <summary>

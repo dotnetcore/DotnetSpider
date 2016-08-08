@@ -1,17 +1,14 @@
-﻿
-using System;
-#if !NET_CORE
-using System.Configuration;
+﻿using System;
+#if NET_CORE
+using System.Runtime.InteropServices;
+using System.Linq;
 #endif
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using DotnetSpider.Redial.AtomicExecutor;
 using StackExchange.Redis;
 using DotnetSpider.Redial.NetworkValidater;
 using DotnetSpider.Redial.Redialer;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace DotnetSpider.Redial.RedialManager
 {
@@ -23,11 +20,10 @@ namespace DotnetSpider.Redial.RedialManager
 		public string RedisHost { get; set; }
 		public override IAtomicExecutor AtomicExecutor { get; }
 		private string HostName { get; } = Dns.GetHostName();
-		private string Password { get; }
 		public const string Locker = "redial-locker";
 		public IDatabase Db { get; }
 
-		public RedisRedialManager(string host, string password, INetworkValidater validater, IRedialer redialer) : base()
+		public RedisRedialManager(string host, string password, INetworkValidater validater, IRedialer redialer)
 		{
 			if (!string.IsNullOrEmpty(host))
 			{
@@ -40,11 +36,9 @@ namespace DotnetSpider.Redial.RedialManager
 
 			if (!string.IsNullOrEmpty(password))
 			{
-				Password = password;
 			}
 			else
 			{
-				Password = null;
 			}
 
 			var confiruation = new ConfigurationOptions()
@@ -83,7 +77,7 @@ namespace DotnetSpider.Redial.RedialManager
 			Redialer = redialer;
 		}
 
-		public RedisRedialManager(IDatabase db, INetworkValidater validater, IRedialer redialer) : base()
+		public RedisRedialManager(IDatabase db, INetworkValidater validater, IRedialer redialer)
 		{
 			Db = db;
 			AtomicExecutor = new RedisAtomicExecutor(this);
@@ -108,11 +102,7 @@ namespace DotnetSpider.Redial.RedialManager
 		private void ClearTimeoutLocker()
 		{
 			var result = Db.HashGet(GetSetKey(), Locker);
-			if (!result.HasValue)
-			{
-				return;
-			}
-			else
+			if (result.HasValue)
 			{
 				var value = DateTime.Parse(result.ToString());
 				var minutes = (DateTime.Now - value).TotalMinutes;

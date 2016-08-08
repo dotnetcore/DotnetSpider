@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Extension.Common;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Utils;
 
 namespace DotnetSpider.Extension.Pipeline
 {

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using HtmlAgilityPack;
-
 #if NET_CORE
 using HtmlAgilityPack.Css;
+#else
+using System;
 #endif
 
 namespace DotnetSpider.Core.Selector

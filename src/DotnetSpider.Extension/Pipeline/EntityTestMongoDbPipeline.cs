@@ -1,7 +1,6 @@
 ﻿#if !NET_CORE
 
 using System.Collections.Generic;
-using DotnetSpider.Core;
 using DotnetSpider.Extension.ORM;
 using MongoDB.Bson;
 using MongoDB.Driver;

@@ -6,9 +6,7 @@ using System.Linq;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.ORM;
-using DotnetSpider.Extension.Utils;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Redial;
 using DotnetSpider.Extension.Configuration;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -283,11 +281,6 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 
 			});
-		}
-
-		public override void Dispose()
-		{
-			base.Dispose();
 		}
 
 		private DbType Convert(string type)

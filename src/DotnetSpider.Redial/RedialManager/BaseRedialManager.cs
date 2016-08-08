@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using DotnetSpider.Redial.AtomicExecutor;
 using DotnetSpider.Redial.NetworkValidater;
 using DotnetSpider.Redial.Redialer;
@@ -35,7 +34,7 @@ namespace DotnetSpider.Redial.RedialManager
 
 		public ILogger Logger { get; set; }
 
-		public BaseRedialManager()
+		protected BaseRedialManager()
 		{
 			Logger = LogManager.GetCurrentClassLogger();
 		}

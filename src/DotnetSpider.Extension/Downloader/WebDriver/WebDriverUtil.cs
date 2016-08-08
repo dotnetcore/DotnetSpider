@@ -4,10 +4,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.PhantomJS;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension.Downloader.WebDriver
 {
@@ -30,15 +27,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 				case Browser.Firefox:
 					string path = Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
 					string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
-					FirefoxProfile profile;
-					if (pathsToProfiles.Length == 1)
-					{
-						profile = new FirefoxProfile(pathsToProfiles[0], false);
-					}
-					else
-					{
-						profile = new FirefoxProfile();
-					}
+					var profile = pathsToProfiles.Length == 1 ? new FirefoxProfile(pathsToProfiles[0], false) : new FirefoxProfile();
 					if (!option.AlwaysLoadNoFocusLibrary)
 					{
 						profile.AlwaysLoadNoFocusLibrary = true;

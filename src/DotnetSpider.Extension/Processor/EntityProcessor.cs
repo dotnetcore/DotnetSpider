@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
-using Newtonsoft.Json.Linq;
 using Site = DotnetSpider.Core.Site;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Configuration;
@@ -137,9 +135,7 @@ namespace DotnetSpider.Extension.Processor
 					{
 						if (targetUrlPattern.IsMatch(link))
 						{
-							page.AddTargetRequest(new Request(link, page.Request.NextDepth, page.Request.Extras)
-							{
-							});
+							page.AddTargetRequest(new Request(link, page.Request.NextDepth, page.Request.Extras));
 						}
 					}
 				}

@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Common
 	{
 		#region Fields
 		// Buffer used to store queue objects with max "Size".
-		private T[] buffer;
+		private readonly T[] _buffer;
 		// Current number of elements in the queue.
 		private int _count;
 		// Max number of elements queue can hold without blocking.
@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Common
 									 + " be greater then zero.");
 			_syncRoot = new object();
 			_size = size;
-			buffer = new T[size];
+			_buffer = new T[size];
 			_count = 0;
 			_head = 0;
 			_tail = 0;
@@ -71,7 +71,7 @@ namespace DotnetSpider.Core.Common
 					int pos = _head;
 					for (int i = 0; i < _count; i++)
 					{
-						values[i] = buffer[pos];
+						values[i] = _buffer[pos];
 						pos = (pos + 1) % _size;
 					}
 				}
@@ -128,7 +128,7 @@ namespace DotnetSpider.Core.Common
 						throw;
 					}
 				}
-				buffer[_tail] = value;
+				_buffer[_tail] = value;
 				_tail = (_tail + 1) % _size;
 				_count++;
 				if (_count == 1) // Could have blocking Dequeue thread(s).
@@ -150,7 +150,7 @@ namespace DotnetSpider.Core.Common
 			{
 				if (_count == _size)
 					return false;
-				buffer[_tail] = value;
+				_buffer[_tail] = value;
 				_tail = (_tail + 1) % _size;
 				_count++;
 				if (_count == 1)
@@ -203,8 +203,8 @@ namespace DotnetSpider.Core.Common
 						throw;
 					}
 				}
-				value = buffer[_head];
-				buffer[_head] = default(T);
+				value = _buffer[_head];
+				_buffer[_head] = default(T);
 				_head = (_head + 1) % _size;
 				_count--;
 				if (_count == (_size - 1))
@@ -232,8 +232,8 @@ namespace DotnetSpider.Core.Common
 					value = default(T);
 					return false;
 				}
-				value = buffer[_head];
-				buffer[_head] = default(T);
+				value = _buffer[_head];
+				_buffer[_head] = default(T);
 				_head = (_head + 1) % _size;
 				_count--;
 				if (_count == (_size - 1))
@@ -269,7 +269,7 @@ namespace DotnetSpider.Core.Common
 				if (_count == 0)
 					throw new InvalidOperationException("The Queue is empty.");
 
-				T value = buffer[_head];
+				T value = _buffer[_head];
 				return value;
 			}
 		}
@@ -293,7 +293,7 @@ namespace DotnetSpider.Core.Common
 					value = default(T);
 					return false;
 				}
-				value = buffer[_head];
+				value = _buffer[_head];
 			}
 			return true;
 		}
@@ -311,9 +311,9 @@ namespace DotnetSpider.Core.Common
 				_count = 0;
 				_head = 0;
 				_tail = 0;
-				for (int i = 0; i < buffer.Length; i++)
+				for (int i = 0; i < _buffer.Length; i++)
 				{
-					buffer[i] = default(T);
+					_buffer[i] = default(T);
 				}
 			}
 		}
@@ -325,10 +325,7 @@ namespace DotnetSpider.Core.Common
 		/// Gets a value indicating whether access
 		/// to the Queue is synchronized (thread-safe).
 		/// </summary>
-		public bool IsSynchronized
-		{
-			get { return true; }
-		}
+		public bool IsSynchronized => true;
 
 		/// <summary>
 		/// Returns the max elements allowed
@@ -365,10 +362,8 @@ namespace DotnetSpider.Core.Common
 		/// Gets an object that can be used to synchronize
 		/// access to the Queue.
 		/// </summary>
-		public object SyncRoot
-		{
-			get { return _syncRoot; }
-		}
+		public object SyncRoot => _syncRoot;
+
 		#endregion
 
 		#region IEnumerable Members

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Configuration
 {
@@ -21,7 +19,7 @@ namespace DotnetSpider.Extension.Configuration
 			{
 				if (spiderContext.Entities == null || spiderContext.Entities.Count == 0)
 				{
-					messages.Add($"Error 002: Didn't define any data entity.");
+					messages.Add("Error 002: Didn't define any data entity.");
 				}
 				else
 				{
@@ -37,7 +35,7 @@ namespace DotnetSpider.Extension.Configuration
 							{
 								correct = false;
 							}
-							messages.Add($"Error 003: Entity.Identity is null.");
+							messages.Add("Error 003: Entity.Identity is null.");
 						}
 
 						if (fieldTokens == null || fieldTokens.Count == 0)

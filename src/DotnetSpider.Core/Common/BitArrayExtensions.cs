@@ -6,16 +6,15 @@ namespace DotnetSpider.Core.Common
 	public static class BitArrayExtensions
 	{
 		private const int BitsPerInt32 = 32;
-		private const int BytesPerInt32 = 4;
 		private const int BitsPerByte = 8;
 
 		public static void CopyTo(this BitArray bits, Array array, int index)
 		{
 			if (array == null)
-				throw new ArgumentNullException("array");
+				throw new ArgumentNullException(nameof(array));
 
 			if (index < 0)
-				throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
+				throw new ArgumentOutOfRangeException(nameof(index), "ArgumentOutOfRange_NeedNonNegNum");
 
 			if (array.Rank != 1)
 				throw new ArgumentException("Arg_RankMultiDimNotSupported");

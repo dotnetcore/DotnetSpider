@@ -41,8 +41,8 @@ namespace DotnetSpider.Test.Selector
 			Assert.IsTrue(list.Contains("Evelyn Waugh"));
 
 			jsonPathSelector = new JsonPathSelector("$.store.book[?(@.category == 'reference')]");
-			list = jsonPathSelector.SelectList(_text);
-			select = jsonPathSelector.Select(_text);
+			jsonPathSelector.SelectList(_text);
+			jsonPathSelector.Select(_text);
 
 			//			{
 			//				"category": "reference",

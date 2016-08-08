@@ -1,11 +1,4 @@
 ﻿#if !NET_CORE
-using System;
-using System.Net.Http;
-using System.Net.NetworkInformation;
-using System.Threading;
-using System.Threading.Tasks;
-using DotnetSpider.Redial.Utils;
-
 namespace DotnetSpider.Redial.NetworkValidater
 {
 	public class VpnNetworkValidater : BaseNetworkValidater

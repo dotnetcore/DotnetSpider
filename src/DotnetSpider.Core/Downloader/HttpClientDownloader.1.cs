@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 #if !NET_CORE
 using System.Web;
 #endif
 using System.Text;
-using HtmlAgilityPack;
-using DotnetSpider.Core.Common;
 using System.Net.Http;
 using System.Net;
-using DotnetSpider.Core.Proxy;
 using System.Threading.Tasks;
 using System.Threading;
-using DotnetSpider.Core.Utils;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -24,7 +19,7 @@ namespace DotnetSpider.Core.Downloader
 		public Action<Site, Request> PostBodyGenerator;
 		public bool DecodeContentAsUrl;
 
-		HttpClient httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler()
+		private readonly HttpClient _httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler()
 		{
 			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
 			UseCookies = false,
@@ -44,24 +39,21 @@ namespace DotnetSpider.Core.Downloader
 
 			Site site = spider.Site;
 
-			var acceptStatCodes = site.AcceptStatCode;
-
 			//Logger.InfoFormat("Downloading page {0}", request.Url);
 
 			HttpResponseMessage response = null;
 			var proxy = site.GetHttpProxyFromPool();
 			request.PutExtra(Request.Proxy, proxy);
-			int statusCode = 200;
 			try
 			{
 				PostBodyGenerator?.Invoke(spider.Site, request);
 
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 
-				response = NetworkProxyManager.Current.Execute("http", (m) =>
+				response = NetworkProxyManager.Current.Execute("http", m =>
 				{
 					var message = (HttpRequestMessage)m;
-					return httpClient.SendAsync(message).Result;
+					return _httpClient.SendAsync(message).Result;
 				}, httpMessage);
 
 				response.EnsureSuccessStatusCode();
@@ -69,7 +61,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					throw new DownloadException($"下载 {request.Url} 失败. Code: {response.StatusCode}");
 				}
-				statusCode = (int)response.StatusCode;
+				var statusCode = (int)response.StatusCode;
 				request.PutExtra(Request.StatusCode, statusCode);
 
 				Page page = HandleResponse(request, response, statusCode, site);
@@ -122,11 +114,6 @@ namespace DotnetSpider.Core.Downloader
 					Logger.Warn(e, LogInfo.Create("Close response fail.", spider));
 				}
 			}
-		}
-
-		private bool StatusAccept(ICollection<int> acceptStatCode, int statusCode)
-		{
-			return acceptStatCode.Contains(statusCode);
 		}
 
 		//private HttpWebRequest GeneratorCookie(HttpWebRequest httpWebRequest, Site site)

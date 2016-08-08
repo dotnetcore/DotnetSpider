@@ -1,37 +1,25 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Redial;
-using DotnetSpider.Redial.NetworkValidater;
-using DotnetSpider.Redial.RedialManager;
 using DotnetSpider.Validation;
 using System.Linq;
-using System.Threading.Tasks;
-using DotnetSpider.Core.Utils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using DotnetSpider.Core.Monitor;
 using System.Net;
 using System.Runtime.InteropServices;
-
-using Microsoft.Extensions.DependencyInjection;
 using NLog;
-using System.IO;
 using MimeKit;
 using MailKit.Net.Smtp;
-#if NET_45
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Remote;
+#if NET_CORE
+using System.Text;
 #endif
 
 namespace DotnetSpider.Extension
@@ -43,7 +31,7 @@ namespace DotnetSpider.Extension
 		protected readonly ILogger Logger;
 		protected ConnectionMultiplexer Redis;
 		protected IDatabase Db;
-		protected Core.Spider spider;
+		protected Spider Spider;
 		protected readonly SpiderContext SpiderContext;
 		public Action AfterSpiderFinished { get; set; }
 		public string Name { get; }
@@ -129,23 +117,23 @@ namespace DotnetSpider.Extension
 		{
 			try
 			{
-				spider = PrepareSpider(args);
+				Spider = PrepareSpider(args);
 
-				if (spider == null)
+				if (Spider == null)
 				{
 					return;
 				}
 
-				RegisterControl(spider);
+				RegisterControl(Spider);
 
-				spider.Start();
+				Spider.Start();
 
-				while (spider.StatusCode == Status.Running || spider.StatusCode == Status.Init)
+				while (Spider.StatusCode == Status.Running || Spider.StatusCode == Status.Init)
 				{
 					Thread.Sleep(1000);
 				}
 
-				spider.Dispose();
+				Spider.Dispose();
 
 				AfterSpiderFinished?.Invoke();
 
@@ -157,7 +145,7 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		private void RegisterControl(Core.Spider spider)
+		private void RegisterControl(Spider spider)
 		{
 			if (Redis != null)
 			{
@@ -238,7 +226,7 @@ namespace DotnetSpider.Extension
 
 						var message = new MimeMessage();
 						message.From.Add(new MailboxAddress(SpiderContext.Validations.EmailFrom, SpiderContext.Validations.EmailFrom));
-						foreach (var address in SpiderContext.Validations.EmailTo.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+						foreach (var address in SpiderContext.Validations.EmailTo.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
 						{
 							message.To.Add(new MailboxAddress(address, address));
 						}
@@ -289,7 +277,7 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		private Core.Spider PrepareSpider(params string[] args)
+		private Spider PrepareSpider(params string[] args)
 		{
 			Logger.Info(LogInfo.Create("创建爬虫...", SpiderContext));
 			bool needInitStartRequest = true;
@@ -319,10 +307,7 @@ namespace DotnetSpider.Extension
 			SpiderMonitor.Default.Register(spider);
 			spider.InitComponent();
 
-			if (Db != null)
-			{
-				Db.LockRelease(key, 0);
-			}
+			Db?.LockRelease(key, 0);
 
 			return spider;
 		}
@@ -350,10 +335,12 @@ namespace DotnetSpider.Extension
 #endif
 		}
 
-		protected virtual Core.Spider GenerateSpider(IScheduler scheduler)
+		protected virtual Spider GenerateSpider(IScheduler scheduler)
 		{
-			EntityProcessor processor = new EntityProcessor(SpiderContext);
-			processor.TargetUrlExtractInfos = SpiderContext.TargetUrlExtractInfos?.Select(t => t.GetTargetUrlExtractInfo()).ToList();
+			EntityProcessor processor = new EntityProcessor(SpiderContext)
+			{
+				TargetUrlExtractInfos = SpiderContext.TargetUrlExtractInfos?.Select(t => t.GetTargetUrlExtractInfo()).ToList()
+			};
 			foreach (var entity in SpiderContext.Entities)
 			{
 				processor.AddEntity(entity);
@@ -389,30 +376,6 @@ namespace DotnetSpider.Extension
 			}
 
 			return spider;
-		}
-
-		private INetworkValidater GetNetworValidater(NetworkValidater networkValidater)
-		{
-			switch (networkValidater.Type)
-			{
-				case NetworkValidater.Types.Vps:
-					{
-						return new Redial.NetworkValidater.VpsNetworkValidater(((Configuration.VpsNetworkValidater)networkValidater).InterfaceNum);
-					}
-				case NetworkValidater.Types.Defalut:
-					{
-						return new Redial.NetworkValidater.DefaultNetworkValidater();
-					}
-				case NetworkValidater.Types.Vpn:
-					{
-#if !NET_CORE
-						return new Redial.NetworkValidater.VpnNetworkValidater(((Configuration.VpnNetworkValidater)networkValidater).VpnName);
-#else
-						throw new SpiderException("unsport vpn redial on linux.");
-#endif
-					}
-			}
-			return null;
 		}
 	}
 }

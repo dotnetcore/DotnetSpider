@@ -22,10 +22,6 @@ namespace DotnetSpider.Core
 
 		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
 
-		public Site()
-		{
-		}
-
 		/// <summary>
 		/// User agent
 		/// </summary>
@@ -76,13 +72,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		internal Encoding Encoding
-		{
-			get
-			{
-				return _encoding;
-			}
-		}
+		internal Encoding Encoding => _encoding;
 
 		/// <summary>
 		/// Set or Get timeout for downloader in ms

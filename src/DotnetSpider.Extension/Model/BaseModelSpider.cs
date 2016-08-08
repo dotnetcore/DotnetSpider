@@ -8,7 +8,7 @@ using DotnetSpider.Extension.Processor;
 
 namespace DotnetSpider.Extension.Model
 {
-	public class BaseModelSpider : Core.Spider
+	public class BaseModelSpider : Spider
 	{
 		public const string PipelineModel = "PipelineModel";
 

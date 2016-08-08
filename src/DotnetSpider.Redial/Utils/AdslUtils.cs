@@ -59,21 +59,10 @@ namespace DotnetSpider.Redial.Utils
 	public class RasDisplay
 	{
 		[DllImport("rasapi32.dll", CharSet = CharSet.Auto)]
-		public extern static uint RasHangUp(
-			IntPtr hrasconn  // handle to the RAS connection to hang up
-			);
-
-
+		public static extern uint RasHangUp(IntPtr hrasconn);
 
 		[DllImport("wininet.dll", CharSet = CharSet.Auto)]
-		public extern static int InternetDial(
-			IntPtr hwnd,
-			[In]string lpszConnectoid,
-			uint dwFlags,
-			ref int lpdwConnection,
-			uint dwReserved
-			);
-
+		public static extern int InternetDial(IntPtr hwnd, [In]string lpszConnectoid, uint dwFlags, ref int lpdwConnection, uint dwReserved);
 
 		[DllImport("Rasapi32.dll", EntryPoint = "RasEnumConnectionsA",
 			 SetLastError = true)]
@@ -96,7 +85,7 @@ namespace DotnetSpider.Redial.Utils
 			);
 
 		[DllImport("rasapi32.dll", CharSet = CharSet.Auto)]
-		public extern static uint RasEnumEntries(
+		public static extern uint RasEnumEntries(
 			string reserved,              // reserved, must be NULL
 			string lpszPhonebook,         // pointer to full path and
 										  //  file name of phone-book file
@@ -115,23 +104,21 @@ namespace DotnetSpider.Redial.Utils
 		private readonly bool _mConnected;
 		private readonly IntPtr _mConnectedRasHandle;
 
-		RasStats _status = new RasStats();
-
 		public RasDisplay()
 		{
 			_mConnected = true;
 
-			Rasconn lprasConn = new Rasconn();
+			Rasconn lprasConn = new Rasconn
+			{
+				DwSize = Marshal.SizeOf(typeof(Rasconn)),
+				Hrasconn = IntPtr.Zero
+			};
 
-			lprasConn.DwSize = Marshal.SizeOf(typeof(Rasconn));
-			lprasConn.Hrasconn = IntPtr.Zero;
 
-			int lpcb = 0;
 			int lpcConnections = 0;
-			int nRet = 0;
-			lpcb = Marshal.SizeOf(typeof(Rasconn));
+			var lpcb = Marshal.SizeOf(typeof(Rasconn));
 
-			nRet = RasEnumConnections(ref lprasConn, ref lpcb, ref
+			var nRet = RasEnumConnections(ref lprasConn, ref lpcb, ref
 				lpcConnections);
 
 			if (nRet != 0)
@@ -154,9 +141,9 @@ namespace DotnetSpider.Redial.Utils
 
 				_mConnectionName = lprasConn.SzEntryName;
 
-				var hours = ((stats.dwConnectionDuration / 1000) / 3600);
-				var minutes = ((stats.dwConnectionDuration / 1000) / 60) - (hours * 60);
-				var seconds = ((stats.dwConnectionDuration / 1000)) - (minutes * 60) - (hours * 3600);
+				var hours = stats.dwConnectionDuration / 1000 / 3600;
+				var minutes = stats.dwConnectionDuration / 1000 / 60 - hours * 60;
+				var seconds = stats.dwConnectionDuration / 1000 - minutes * 60 - hours * 3600;
 
 
 				_mDuration = hours + " hours " + minutes + " minutes " + seconds + " secs";
@@ -171,17 +158,14 @@ namespace DotnetSpider.Redial.Utils
 
 
 			int lpNames = 1;
-			var entryNameSize = 0;
-			int lpSize = 0;
-			RasEntryName[] names = null;
 
-			entryNameSize = Marshal.SizeOf(typeof(RasEntryName));
-			lpSize = lpNames * entryNameSize;
+			var entryNameSize = Marshal.SizeOf(typeof(RasEntryName));
+			var lpSize = lpNames * entryNameSize;
 
-			names = new RasEntryName[lpNames];
+			var names = new RasEntryName[lpNames];
 			names[0].dwSize = entryNameSize;
 
-			uint retval = RasEnumEntries(null, null, names, ref lpSize, out lpNames);
+			RasEnumEntries(null, null, names, ref lpSize, out lpNames);
 
 			//if we have more than one connection, we need to do it again
 			if (lpNames > 1)
@@ -192,8 +176,7 @@ namespace DotnetSpider.Redial.Utils
 					names[i].dwSize = entryNameSize;
 				}
 
-				retval = RasEnumEntries(null, null, names, ref lpSize, out lpNames);
-
+				RasEnumEntries(null, null, names, ref lpSize, out lpNames);
 			}
 			_mConnectionNames = new string[names.Length];
 
@@ -220,8 +203,7 @@ namespace DotnetSpider.Redial.Utils
 		{
 			int temp = 0;
 			uint internetAutoDialUnattended = 2;
-			int retVal = InternetDial(IntPtr.Zero, connection, internetAutoDialUnattended, ref temp, 0);
-			return retVal;
+			return InternetDial(IntPtr.Zero, connection, internetAutoDialUnattended, ref temp, 0);
 		}
 		public void Disconnect()
 		{

@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Utils;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.Configuration;
