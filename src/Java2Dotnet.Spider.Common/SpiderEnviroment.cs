@@ -20,16 +20,14 @@ namespace Java2Dotnet.Spider.Common
 			BaseDirectory = AppContext.BaseDirectory;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
-				GlobalDirectory = Path.Combine("/usr/dotnetspider");
+				GlobalDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"),"dotnetspider");
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
-				// 需要管理员帐户
-				GlobalDirectory = Path.Combine("~/dotnetspider");
+				GlobalDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"),"dotnetspider");
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				// 可能需要管理员帐户
 				GlobalDirectory = $"C:\\Users\\{Environment.GetEnvironmentVariable("USERNAME")}\\Documents\\DotnetSpider\\";
 			}
 			else
