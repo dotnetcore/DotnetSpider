@@ -175,7 +175,7 @@ When you want to collect a page JS loaded, there is only one thing you need to d
 		Browser = Extension.Downloader.WebDriver.Browser.Chrome
 	});
 
-See the complete sample https://github.com/zlzforever/DotnetSpider/blob/master/src/Java2Dotnet.Spider.Test/Example/JdSkuSample.WebDriver.cs
+See the complete sample https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Test/Example/JdSkuSample.WebDriver.cs
 
 NOTE:
 

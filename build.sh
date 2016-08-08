@@ -3,12 +3,10 @@ rm -rf ~/solutions/DotnetSpider/spider_nuget_packages
 dotnet restore
 dotnet pack src/HtmlAgilityPack/project.json -o spider_nuget_packages 
 dotnet pack src/HtmlAgilityPack.Css/project.json -o spider_nuget_packages
-dotnet pack src/MySql.Data/project.json -o spider_nuget_packages
-dotnet pack src/Java2Dotnet.Spider.Common/project.json -o spider_nuget_packages
-dotnet pack src/Java2Dotnet.Spider.Validation/project.json -o spider_nuget_packages
-dotnet pack src/Java2Dotnet.Spider.Core/project.json -o spider_nuget_packages
-dotnet pack src/Java2Dotnet.Spider.Extension/project.json -o spider_nuget_packages
-dotnet pack src/Java2Dotnet.Spider.Redial/project.json -o spider_nuget_packages
+dotnet pack src/DotnetSpider.Validation/project.json -o spider_nuget_packages
+dotnet pack src/DotnetSpider.Core/project.json -o spider_nuget_packages
+dotnet pack src/DotnetSpider.Extension/project.json -o spider_nuget_packages
+dotnet pack src/DotnetSpider.Redial/project.json -o spider_nuget_packages
 ftp -n<<!
 open redis
 user ftpuser 1qazZAQ!
@@ -23,21 +21,18 @@ rmdir /nuget/HtmlAgilityPack
 mdelete /nuget/HtmlAgilityPack.Css/0.0.9/*
 rmdir /nuget/HtmlAgilityPack.Css/0.0.9
 rmdir /nuget/HtmlAgilityPack.Css
-mdelete /nuget/Java2Dotnet.Spider.Common/0.0.9/*
-rmdir /nuget/Java2Dotnet.Spider.Common/0.0.9
-rmdir /nuget/Java2Dotnet.Spider.Common
-mdelete /nuget/Java2Dotnet.Spider.Redial/0.0.9/*
-rmdir /nuget/Java2Dotnet.Spider.Redial/0.0.9
-rmdir /nuget/Java2Dotnet.Spider.Redial
-mdelete /nuget/Java2Dotnet.Spider.Validation/0.0.9/*
-rmdir /nuget/Java2Dotnet.Spider.Validation/0.0.9
-rmdir /nuget/Java2Dotnet.Spider.Validation
-mdelete /nuget/Java2Dotnet.Spider.Core/0.0.9/*
-rmdir /nuget/Java2Dotnet.Spider.Core/0.0.9
-rmdir /nuget/Java2Dotnet.Spider.Core
-mdelete /nuget/Java2Dotnet.Spider.Extension/0.0.9/*
-rmdir /nuget/Java2Dotnet.Spider.Extension/0.0.9
-rmdir /nuget/Java2Dotnet.Spider.Extension
+mdelete /nuget/DotnetSpider.Redial/0.0.9/*
+rmdir /nuget/DotnetSpider.Redial/0.0.9
+rmdir /nuget/DotnetSpider.Redial
+mdelete /nuget/DotnetSpider.Validation/0.0.9/*
+rmdir /nuget/DotnetSpider.Validation/0.0.9
+rmdir /nuget/DotnetSpider.Validation
+mdelete /nuget/DotnetSpider.Core/0.0.9/*
+rmdir /nuget/DotnetSpider.Core/0.0.9
+rmdir /nuget/DotnetSpider.Core
+mdelete /nuget/DotnetSpider.Extension/0.0.9/*
+rmdir /nuget/DotnetSpider.Extension/0.0.9
+rmdir /nuget/DotnetSpider.Extension
 mput *
 delete 86research02.cache.bin
 close

@@ -200,4 +200,4 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
-/src/Java2Dotnet.Spider.Test/Example/TestExample.cs
+/src/DotnetSpider.Test/Example/TestExample.cs
