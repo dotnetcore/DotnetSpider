@@ -25,6 +25,8 @@ using Java2Dotnet.Spider.Extension.ORM;
 using Java2Dotnet.Spider.Extension.Model.Attribute;
 using Java2Dotnet.Spider.Extension.Model;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog;
 
 namespace Java2Dotnet.Spider.Test
 {

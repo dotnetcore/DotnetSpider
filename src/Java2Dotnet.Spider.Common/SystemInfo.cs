@@ -25,7 +25,6 @@ namespace Java2Dotnet.Spider.Common
 		private static readonly PerformanceCounter PcCpuLoad; //CPU计数器
 #else
 		private static readonly object Locker = new object();
-		private static readonly int CoreCount;
 		private static readonly Regex ProcessorRegex = new Regex("processor");
 #endif
 		public static readonly int PhysicalMemory;
@@ -56,16 +55,17 @@ namespace Java2Dotnet.Spider.Common
 					PhysicalMemory = (int)(physicalMemory / (1024 * 1024));
 				}
 			}
-
 #else
-
-			// cpu count
-			string cpuInfo = RunCommand("cat", "/proc/cpuinfo");
-			CoreCount = ProcessorRegex.Matches(cpuInfo).Count;
-
-			var memInfo = RunCommand("free", "-m").Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-			int totalMem = int.Parse(memInfo[6]);
-			PhysicalMemory = totalMem;
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				var memInfo = RunCommand("free", "-m").Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+				int totalMem = int.Parse(memInfo[6]);
+				PhysicalMemory = totalMem;
+			}
+			else
+			{
+				// Didnot find dotnet core api now.
+			}
 #endif
 		}
 
@@ -96,27 +96,34 @@ namespace Java2Dotnet.Spider.Common
 			systemInfo.FreeMemory = (int)(availablebytes / (1024 * 1024));
 			systemInfo.Os = "Windows";
 #else
-
-			// cpu load 
-			string loadAvg = RunCommand("cat", "/proc/loadavg");
-			systemInfo.CpuLoad = (int)(float.Parse(loadAvg.Split(' ')[2]) * 100);
-
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
+				// cpu load 
+				string loadAvg = RunCommand("cat", "/proc/loadavg");
+				systemInfo.CpuLoad = (int)(float.Parse(loadAvg.Split(' ')[2]) * 100);
+
 				var memInfo = RunCommand("free", "-m").Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-	 
+
 				int usedMem = int.Parse(memInfo[7]);
- 
+
 				systemInfo.FreeMemory = (PhysicalMemory - usedMem);
 				systemInfo.Os = "Linux";
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
+				// cpu load 
+				string loadAvg = RunCommand("cat", "/proc/loadavg");
+				systemInfo.CpuLoad = (int)(float.Parse(loadAvg.Split(' ')[2]) * 100);
+
 				//todo:
 				systemInfo.Os = "OSX";
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
+				// Didnot find dotnet core api now.
+				//PcCpuLoad = new PerformanceCounter("Processor", "% Processor Time", "_Total") { MachineName = "." };
+				//PcCpuLoad.NextValue();
+
 				//todo:
 				systemInfo.Os = "Windows";
 			}

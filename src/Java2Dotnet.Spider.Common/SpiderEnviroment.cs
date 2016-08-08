@@ -30,7 +30,7 @@ namespace Java2Dotnet.Spider.Common
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				// 可能需要管理员帐户
-				GlobalDirectory = @"C:\Program Files\DotnetSpider";
+				GlobalDirectory = $"C:\\Users\\{Environment.GetEnvironmentVariable("USERNAME")}\\Documents\\DotnetSpider\\";
 			}
 			else
 			{

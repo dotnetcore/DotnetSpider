@@ -102,6 +102,8 @@ namespace Java2Dotnet.Spider.Core
 		/// <param name="scheduler"></param>
 		protected Spider(Site site, string identity, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
 		{
+			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config"));
+
 			if (string.IsNullOrWhiteSpace(identity))
 			{
 				Identity = string.IsNullOrEmpty(Site.Domain) ? Guid.NewGuid().ToString() : Site.Domain;

@@ -26,6 +26,7 @@ using System.Runtime.InteropServices;
 
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
+using System.IO;
 #if NET_45
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -49,6 +50,7 @@ namespace Java2Dotnet.Spider.Extension
 		{
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config"));
 #endif
 			SpiderContext = spiderContext;
 
