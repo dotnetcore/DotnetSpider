@@ -3,10 +3,10 @@ rm -rf ~/solutions/DotnetSpider/spider_nuget_packages
 dotnet restore
 dotnet pack src/HtmlAgilityPack/project.json -o spider_nuget_packages 
 dotnet pack src/HtmlAgilityPack.Css/project.json -o spider_nuget_packages
-dotnet pack src/DotnetSpider.Validation/project.json -o spider_nuget_packages
 dotnet pack src/DotnetSpider.Core/project.json -o spider_nuget_packages
-dotnet pack src/DotnetSpider.Extension/project.json -o spider_nuget_packages
+dotnet pack src/DotnetSpider.Validation/project.json -o spider_nuget_packages
 dotnet pack src/DotnetSpider.Redial/project.json -o spider_nuget_packages
+dotnet pack src/DotnetSpider.Extension/project.json -o spider_nuget_packages
 ftp -n<<!
 open redis
 user ftpuser 1qazZAQ!
