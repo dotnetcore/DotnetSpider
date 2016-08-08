@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <DnxInvisibleFolder Include="net45\" />
+    <DnxInvisibleFolder Include="netfx45\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

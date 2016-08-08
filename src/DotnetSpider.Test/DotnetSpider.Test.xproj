@@ -18,6 +18,7 @@
   <ItemGroup>
     <DnxInvisibleFolder Include="data\" />
     <DnxInvisibleFolder Include="net45\" />
+    <DnxInvisibleFolder Include="netfx45\" />
   </ItemGroup>
   <ItemGroup>
     <DnxInvisibleContent Include="2016-03-20.log" />

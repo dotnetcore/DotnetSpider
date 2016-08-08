@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <DnxInvisibleFolder Include="net45\" />
+    <DnxInvisibleFolder Include="netfx45\" />
   </ItemGroup>
   <ItemGroup>
     <DnxInvisibleCompile Include="RedialException.cs" />
