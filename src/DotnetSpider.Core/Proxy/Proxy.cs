@@ -18,7 +18,7 @@ namespace DotnetSpider.Core.Proxy
 		private double _canReuseTime = 0L;
 		private double _lastBorrowTime = DateTimeUtils.GetCurrentTimeStamp();
 		private double _responseTime = 0L;
-		private long _idleTime = 0L;
+		//private long _idleTime = 0L;
 
 		private int _failedNum = 0;
 		private int _successNum = 0;
