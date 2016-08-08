@@ -107,8 +107,9 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
+			base.Dispose();
 			_pageMap = null;
 			_objectMap = null;
 		}

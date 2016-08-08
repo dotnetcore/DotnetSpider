@@ -14,7 +14,7 @@ namespace DotnetSpider.Core.Common
 					action();
 					return;
 				}
-				catch (Exception e)
+				catch
 				{
 					// ignored
 					Thread.Sleep(500);
@@ -32,7 +32,7 @@ namespace DotnetSpider.Core.Common
 				{
 					return func();
 				}
-				catch (Exception e)
+				catch
 				{
 					Thread.Sleep(500);
 					// ignored

@@ -114,20 +114,17 @@ namespace DotnetSpider.Extension.Configuration
 
 		public override void Handle(Page p)
 		{
-			try
+			if (string.IsNullOrEmpty(p.Content))
 			{
-				if (ToUpper)
-				{
-					p.Content = p.Content.ToUpper();
-				}
-				else
-				{
-					p.Content = p.Content.ToLower();
-				}
+				return;
 			}
-			catch (Exception e)
+			if (ToUpper)
 			{
-				throw new SpiderException("Rawtext Invalid.");
+				p.Content = p.Content.ToUpper();
+			}
+			else
+			{
+				p.Content = p.Content.ToLower();
 			}
 		}
 	}

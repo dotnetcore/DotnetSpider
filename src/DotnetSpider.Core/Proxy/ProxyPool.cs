@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using DotnetSpider.Core.Common;
 using Newtonsoft.Json;
+using NLog;
 
 namespace DotnetSpider.Core.Proxy
 {
@@ -15,6 +16,7 @@ namespace DotnetSpider.Core.Proxy
 		private readonly ConcurrentQueue<Proxy> _proxyQueue = new ConcurrentQueue<Proxy>();
 		private readonly ConcurrentDictionary<string, Proxy> _allProxy = new ConcurrentDictionary<string, Proxy>();
 
+		private ILogger Logger { get; set; }
 		private int _reuseInterval = 1500;// ms
 		private int _reviveTime = 2 * 60 * 60 * 1000;// ms
 
@@ -23,6 +25,7 @@ namespace DotnetSpider.Core.Proxy
 
 		public ProxyPool()
 		{
+			Logger = LogManager.GetCurrentClassLogger();
 		}
 
 		public ProxyPool(List<string[]> httpProxyList)
@@ -56,11 +59,11 @@ namespace DotnetSpider.Core.Proxy
 			}
 			catch (FileNotFoundException e)
 			{
-				//Logger.Error("Proxy file not found", e);
+				Logger.Error("Proxy file not found", e);
 			}
 			catch (IOException e)
 			{
-				//Logger.Error(e.ToString());
+				Logger.Error(e.ToString());
 			}
 		}
 
@@ -74,11 +77,11 @@ namespace DotnetSpider.Core.Proxy
 			}
 			catch (FileNotFoundException e)
 			{
-				//Logger.Error("Proxy file not found", e);
+				Logger.Error("Proxy file not found", e);
 			}
 			catch (IOException e)
 			{
-				//Logger.Error(e.ToString());
+				Logger.Error(e.ToString());
 			}
 		}
 
@@ -106,7 +109,7 @@ namespace DotnetSpider.Core.Proxy
 				}
 				catch (Exception e)
 				{
-					//Logger.Error("HttpHost init error:", e);
+					Logger.Error(e, "HttpHost init error:");
 				}
 			}
 			//Logger.Info("proxy pool size>>>>" + _allProxy.Count);
@@ -136,7 +139,7 @@ namespace DotnetSpider.Core.Proxy
 			}
 			catch (Exception e)
 			{
-				//Logger.Error("Get proxy error", e);
+				Logger.Error(e, "Get proxy error");
 			}
 			if (proxy == null)
 			{
@@ -203,7 +206,7 @@ namespace DotnetSpider.Core.Proxy
 			}
 			catch (Exception e)
 			{
-				//Logger.Warn("proxyQueue return proxy error", e);
+				Logger.Warn(e, "proxyQueue return proxy error");
 			}
 		}
 
@@ -231,26 +234,16 @@ namespace DotnetSpider.Core.Proxy
 		{
 			List<string[]> proxyList = new List<string[]>();
 
-			try
+			using (StreamReader reader = new StreamReader(File.OpenRead("proxy.txt")))
 			{
-				using (StreamReader reader = new StreamReader(File.OpenRead("proxy.txt")))
+				string line;
+				while ((line = reader.ReadLine()) != null)
 				{
-					string line;
-					while ((line = reader.ReadLine()) != null)
-					{
-						var datas = line.Split(new[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
-						proxyList.Add(new[] { datas[0], datas[1] });
-					}
+					var datas = line.Split(new[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+					proxyList.Add(new[] { datas[0], datas[1] });
 				}
 			}
-			catch (FileNotFoundException e)
-			{
-				//Logger.Error(e.ToString());
-			}
-			catch (IOException e)
-			{
-				//Logger.Error(e.ToString());
-			}
+
 			return proxyList;
 		}
 
