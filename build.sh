@@ -4,14 +4,11 @@ dotnet restore
 dotnet pack src/HtmlAgilityPack/project.json -o spider_nuget_packages 
 dotnet pack src/HtmlAgilityPack.Css/project.json -o spider_nuget_packages
 dotnet pack src/MySql.Data/project.json -o spider_nuget_packages
-dotnet pack src/StackExchange.Redis/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Common/project.json -o spider_nuget_packages
-dotnet pack src/Java2Dotnet.Spider.Ioc/project.json -o spider_nuget_packages
-dotnet pack src/Java2Dotnet.Spider.Log/project.json -o spider_nuget_packages
-dotnet pack src/Java2Dotnet.Spider.Redial/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Validation/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Core/project.json -o spider_nuget_packages
 dotnet pack src/Java2Dotnet.Spider.Extension/project.json -o spider_nuget_packages
+dotnet pack src/Java2Dotnet.Spider.Redial/project.json -o spider_nuget_packages
 ftp -n<<!
 open redis
 user ftpuser 1qazZAQ!
@@ -26,18 +23,9 @@ rmdir /nuget/HtmlAgilityPack
 mdelete /nuget/HtmlAgilityPack.Css/0.0.9/*
 rmdir /nuget/HtmlAgilityPack.Css/0.0.9
 rmdir /nuget/HtmlAgilityPack.Css
-mdelete /nuget/Newtonsoft.Json/0.0.9/*
-rmdir /nuget/Newtonsoft.Json/0.0.9
-rmdir /nuget/Newtonsoft.Json
 mdelete /nuget/Java2Dotnet.Spider.Common/0.0.9/*
 rmdir /nuget/Java2Dotnet.Spider.Common/0.0.9
 rmdir /nuget/Java2Dotnet.Spider.Common
-mdelete /nuget/Java2Dotnet.Spider.Ioc/0.0.9/*
-rmdir /nuget/Java2Dotnet.Spider.Ioc/0.0.9
-rmdir /nuget/Java2Dotnet.Spider.Ioc
-mdelete /nuget/Java2Dotnet.Spider.Log/0.0.9/*
-rmdir /nuget/Java2Dotnet.Spider.Log/0.0.9
-rmdir /nuget/Java2Dotnet.Spider.Log
 mdelete /nuget/Java2Dotnet.Spider.Redial/0.0.9/*
 rmdir /nuget/Java2Dotnet.Spider.Redial/0.0.9
 rmdir /nuget/Java2Dotnet.Spider.Redial
