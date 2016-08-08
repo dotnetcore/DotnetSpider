@@ -17,5 +17,8 @@
   <ItemGroup>
     <DnxInvisibleFolder Include="net45\" />
   </ItemGroup>
+  <ItemGroup>
+    <DnxInvisibleCompile Include="RedisServer.cs" />
+  </ItemGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>
