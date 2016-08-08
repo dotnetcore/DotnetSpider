@@ -9,7 +9,7 @@ namespace DotnetSpider.Test.Selector
 	public class ExtractorsTest
 	{
 		string _html = "<div><h1>test<a href=\"xxx\">aabbcc</a></h1></div>";
-		string _html2 = "<title>aabbcc</title>";
+		//string _html2 = "<title>aabbcc</title>";
 
 		[TestMethod]
 		public void TestEach()

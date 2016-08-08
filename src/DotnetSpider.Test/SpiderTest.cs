@@ -137,7 +137,7 @@ namespace DotnetSpider.Test
 		{
 			public IDownloadHandler DownloadValidation { get; set; }
 
-			public Page Download(Request request, ISpider spider)
+			public override Page Download(Request request, ISpider spider)
 			{
 				var page = new Page(request, ContentType.Html);
 				page.Content = "";
@@ -146,7 +146,7 @@ namespace DotnetSpider.Test
 
 			public int ThreadNum { get; set; }
 
-			public IDownloader Clone()
+			public override IDownloader Clone()
 			{
 				return (IDownloader)MemberwiseClone();
 			}
