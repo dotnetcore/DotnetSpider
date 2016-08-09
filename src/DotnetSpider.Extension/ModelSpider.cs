@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Scheduler;
@@ -14,11 +13,12 @@ using System.Linq;
 using StackExchange.Redis;
 using DotnetSpider.Core.Monitor;
 using System.Net;
-using System.Runtime.InteropServices;
 using NLog;
 using MimeKit;
 using MailKit.Net.Smtp;
+using System.IO;
 #if NET_CORE
+using System.Runtime.InteropServices;
 using System.Text;
 #endif
 
@@ -40,8 +40,9 @@ namespace DotnetSpider.Extension
 		{
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config"));
 #endif
+			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config"));
+
 			SpiderContext = spiderContext;
 
 			if (!SpiderContext.IsBuilt)

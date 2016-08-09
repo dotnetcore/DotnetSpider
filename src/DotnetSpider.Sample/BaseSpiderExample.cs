@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
-using System;
-using System.Collections.Generic;
 
-namespace DotnetSpider.Test.Example
+namespace DotnetSpider.Sample
 {
 	public class SpiderExample
 	{

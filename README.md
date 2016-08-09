@@ -14,14 +14,15 @@ This is a cross platfrom, ligth spider develop by C#.
  
 ![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
 
+### SAMPLE
+
+	Please see the Projet: DotnetSpider.Sample, I will update follow this spider's upgrade.
+
 ### BASE USAGE
 
 		public static void Main()
 		{
-			ServiceProvider.Add<ILogService>(new LogService(new ConsoleLog(), new FileLog()));
-			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
-			ServiceProvider.Add<IMonitorService>(new FileMonitor());
-			//ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
+			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
 			
 			HttpClientDownloader downloader = new HttpClientDownloader();
 
@@ -157,10 +158,7 @@ This is a cross platfrom, ligth spider develop by C#.
 
 		public static void Main()
 		{
-			ServiceProvider.Add<ILogService>(new LogService(new ConsoleLog(), new FileLog()));
-			ServiceProvider.Add<IMonitorService>(new ConsoleMonitor());
-			ServiceProvider.Add<IMonitorService>(new FileMonitor());
-			//ServiceProvider.Add<IMonitorService>(new HttpMonitor(ConfigurationManager.Get("statusHost")));
+			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
 		
 			JdSkuSpider spider = new JdSkuSpider();
 			spider.Run();

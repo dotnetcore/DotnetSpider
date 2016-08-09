@@ -4,7 +4,7 @@ using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 
-namespace DotnetSpider.Test.Example
+namespace DotnetSpider.Sample
 {
 	public class RegexTestSpider : SpiderBuilder
 	{

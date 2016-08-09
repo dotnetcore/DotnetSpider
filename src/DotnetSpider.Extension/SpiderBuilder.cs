@@ -5,7 +5,7 @@ namespace DotnetSpider.Extension
 {
 	public abstract class SpiderBuilder
 	{
-		protected virtual Action AfterSpiderFinished { get; set; }
+		protected Action AfterSpiderFinished { get; set; }
 
 		protected abstract SpiderContext GetSpiderContext();
 

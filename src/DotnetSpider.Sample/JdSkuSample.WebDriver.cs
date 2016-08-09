@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NET_CORE
+using System;
 using System.Collections.Generic;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Configuration;
@@ -6,27 +7,29 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 
-namespace DotnetSpider.Test.Example
+namespace DotnetSpider.Sample
 {
-	public class JdSkuSampleSpider : SpiderBuilder
+	public class JdSkuWebDriverSampleSpider : SpiderBuilder
 	{
 		protected override SpiderContext GetSpiderContext()
 		{
 			SpiderContext context = new SpiderContext();
-			context.SetThreadNum(2);
-			context.SetSpiderName("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+			context.SetSpiderName("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
 			{
-				Region = new Extension.Configuration.Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
+				Region = new Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
 				Patterns = new List<string> { @"&page=[0-9]+&" }
 			});
 			context.AddPipeline(new MysqlPipeline
 			{
-				ConnectString = "Database='test';Data Source=MYSQLSERVER;User ID=root;Password=1qazZAQ!;Port=4306"
+				ConnectString = "Database='mysql';Data Source=192.168.199.211;User ID=root;Password=1qazZAQ!;Port=3306"
 			});
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));
-			
+			context.SetDownloader(new WebDriverDownloader
+			{
+				Browser = Extension.Downloader.WebDriver.Browser.Chrome
+			});
 			return context;
 		}
 
@@ -81,3 +84,4 @@ namespace DotnetSpider.Test.Example
 		}
 	}
 }
+#endif

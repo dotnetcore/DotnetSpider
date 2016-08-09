@@ -8,7 +8,7 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 
-namespace DotnetSpider.Test.Example
+namespace DotnetSpider.Sample
 {
 	public class DDengSpider : SpiderBuilder
 	{

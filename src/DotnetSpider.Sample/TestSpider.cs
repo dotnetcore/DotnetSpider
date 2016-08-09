@@ -1,13 +1,13 @@
 ﻿using System;
-using DotnetSpider.Extension;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Configuration;
-using DotnetSpider.Extension.ORM;
 using System.Collections.Generic;
 using DotnetSpider.Core.Downloader;
+using DotnetSpider.Extension;
+using DotnetSpider.Extension.Configuration;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.Model.Attribute;
+using DotnetSpider.Extension.ORM;
 
-namespace DotnetSpider.Test.Example
+namespace DotnetSpider.Sample
 {
 	public class Hao360SpiderInfoBuble : SpiderBuilder
 	{

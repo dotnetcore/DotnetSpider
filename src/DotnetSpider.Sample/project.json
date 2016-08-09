@@ -1,26 +1,24 @@
 {
   "version": "1.0.0-*",
   "buildOptions": {
-    "emitEntryPoint": false,
+    "emitEntryPoint": true,
     "debugType": "portable",
     "copyToOutput": [ "config.ini", "nlog.config" ]
   },
   "publishOptions": {
-    "includeFiles": [ "config.ini","nlog.config" ]
+    "includeFiles": [ "config.ini", "nlog.config" ]
   },
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.0"
-    },
     "DotnetSpider.Core": "0.0.9",
     "DotnetSpider.Extension": "0.0.9",
     "DotnetSpider.Redial": "0.0.9",
-    "System.Diagnostics.Process": "*",
-    "System.Net.Http": "4.1.0",
-    "System.Text.Encoding.CodePages": "*",
+    "DotnetSpider.Validation": "0.0.9",
     "NLog": "4.4.0-betaV15",
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0"
+    }
   },
   "frameworks": {
     "netcoreapp1.0": {

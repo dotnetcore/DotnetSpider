@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5806BCBB-08FF-46A5-AC63-40B4CF48A7F5}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DotnetSpider.Test</RootNamespace>
     <AssemblyName>DotnetSpider.Test</AssemblyName>
@@ -114,27 +114,6 @@
     <Compile Include="..\CountableThreadPoolTests.cs">
       <Link>CountableThreadPoolTests.cs</Link>
     </Compile>
-    <Compile Include="..\Example\BaseSpiderExample.cs">
-      <Link>Example\BaseSpiderExample.cs</Link>
-    </Compile>
-    <Compile Include="..\Example\DDengSpider.cs">
-      <Link>Example\DDengSpider.cs</Link>
-    </Compile>
-    <Compile Include="..\Example\JdSkuSample.cs">
-      <Link>Example\JdSkuSample.cs</Link>
-    </Compile>
-    <Compile Include="..\Example\JdSkuSample.WebDriver.cs">
-      <Link>Example\JdSkuSample.WebDriver.cs</Link>
-    </Compile>
-    <Compile Include="..\Example\LinkSpiderExample.cs">
-      <Link>Example\LinkSpiderExample.cs</Link>
-    </Compile>
-    <Compile Include="..\Example\OschinaBlog.cs">
-      <Link>Example\OschinaBlog.cs</Link>
-    </Compile>
-    <Compile Include="..\Example\RegexTestSpider.cs">
-      <Link>Example\RegexTestSpider.cs</Link>
-    </Compile>
     <Compile Include="..\HtmlTest.cs">
       <Link>HtmlTest.cs</Link>
     </Compile>
@@ -149,9 +128,6 @@
     </Compile>
     <Compile Include="..\Pipeline\ResultItemsCollectorsPipelineTest.cs">
       <Link>Pipeline\ResultItemsCollectorsPipelineTest.cs</Link>
-    </Compile>
-    <Compile Include="..\Program.cs">
-      <Link>Program.cs</Link>
     </Compile>
     <Compile Include="..\RedisSchedulerTest.cs">
       <Link>Scheduler\RedisSchedulerTest.cs</Link>
@@ -229,10 +205,6 @@
     <Content Include="phantomjs-license.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="..\config.ini">
-      <Link>config.ini</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
