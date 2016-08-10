@@ -29,7 +29,7 @@ namespace DotnetSpider.Extension.Configuration
 		public Downloader Downloader { get; set; }
 		public Site Site { get; set; }
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
-		public Redialer Redialer { get; set; }
+		public RedialExecutor RedialExecutor { get; set; }
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
 		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
 		public List<Pipeline> Pipelines { get; set; } = new List<Pipeline>();

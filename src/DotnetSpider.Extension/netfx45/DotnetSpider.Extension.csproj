@@ -174,9 +174,6 @@
     <Compile Include="..\Configuration\Macros.cs">
       <Link>Configuration\Macros.cs</Link>
     </Compile>
-    <Compile Include="..\Configuration\NetworkValidater.cs">
-      <Link>Configuration\NetworkValidater.cs</Link>
-    </Compile>
     <Compile Include="..\Configuration\Pipeline.cs">
       <Link>Configuration\Pipeline.cs</Link>
     </Compile>
@@ -186,8 +183,8 @@
     <Compile Include="..\Configuration\PrepareStartUrls.cs">
       <Link>Configuration\PrepareStartUrls.cs</Link>
     </Compile>
-    <Compile Include="..\Configuration\Redialer.cs">
-      <Link>Configuration\Redialer.cs</Link>
+    <Compile Include="..\Configuration\RedialExecutor.cs">
+      <Link>Configuration\RedialExecutor.cs</Link>
     </Compile>
     <Compile Include="..\Configuration\Scheduler.cs">
       <Link>Configuration\Scheduler.cs</Link>

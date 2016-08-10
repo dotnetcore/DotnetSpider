@@ -1,11 +1,11 @@
 ﻿#if !NET_CORE
-namespace DotnetSpider.Redial.NetworkValidater
+namespace DotnetSpider.Redial.InternetDetector
 {
-	public class VpnNetworkValidater : BaseNetworkValidater
+	public class VpnInternetDetector : BaseInternetDetector
 	{
 		private readonly string _vpnInterface;
 
-		public VpnNetworkValidater(string vpnInterface = "VPN连接")
+		public VpnInternetDetector(string vpnInterface = "VPN连接")
 		{
 			_vpnInterface = vpnInterface;
 		}

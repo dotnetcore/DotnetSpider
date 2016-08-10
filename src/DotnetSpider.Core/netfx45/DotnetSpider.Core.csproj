@@ -183,9 +183,6 @@
     <Compile Include="..\Downloader\IDownloader.cs">
       <Link>Downloader\IDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\INetworkProxy.cs">
-      <Link>INetworkProxy.cs</Link>
-    </Compile>
     <Compile Include="..\IocExtension.cs">
       <Link>IocExtension.cs</Link>
     </Compile>
@@ -215,6 +212,9 @@
     </Compile>
     <Compile Include="..\Monitor\SpiderStatus.cs">
       <Link>Monitor\SpiderStatus.cs</Link>
+    </Compile>
+    <Compile Include="..\NetworkCenter.cs">
+      <Link>NetworkCenter.cs</Link>
     </Compile>
     <Compile Include="..\Page.cs">
       <Link>Page.cs</Link>

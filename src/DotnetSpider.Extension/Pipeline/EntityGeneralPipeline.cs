@@ -183,7 +183,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return;
 			}
-			NetworkProxyManager.Current.Execute("db-init", () =>
+			NetworkCenter.Current.Execute("db-init", () =>
 			{
 				using (DbConnection conn = CreateConnection())
 				{
@@ -203,7 +203,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void Process(List<JObject> datas)
 		{
-			NetworkProxyManager.Current.Execute("pipeline-", () =>
+			NetworkCenter.Current.Execute("pp-", () =>
 			{
 				switch (Mode)
 				{

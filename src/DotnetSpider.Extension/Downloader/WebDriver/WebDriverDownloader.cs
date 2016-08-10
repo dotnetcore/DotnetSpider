@@ -91,7 +91,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 					realUrl = UrlFormat(realUrl);
 				}
 
-				NetworkProxyManager.Current.Execute("wd-d", () =>
+				NetworkCenter.Current.Execute("wd-d", () =>
 				{
 					_webDriver.Navigate().GoToUrl(realUrl);
 				});

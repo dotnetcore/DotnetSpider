@@ -62,29 +62,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\AtomicExecutor\FileLockerAtomicExecutor.cs">
-      <Link>AtomicExecutor\FileLockerAtomicExecutor.cs</Link>
+    <Compile Include="..\BaseRedialExecutor.cs">
+      <Link>BaseRedialExecutor.cs</Link>
     </Compile>
-    <Compile Include="..\AtomicExecutor\IAtomicExecutor.cs">
-      <Link>AtomicExecutor\IAtomicExecutor.cs</Link>
+    <Compile Include="..\FileLockerRedialExecutor.cs">
+      <Link>FileLockerRedialExecutor.cs</Link>
     </Compile>
-    <Compile Include="..\AtomicExecutor\RedisAtomicExecutor.cs">
-      <Link>AtomicExecutor\RedisAtomicExecutor.cs</Link>
+    <Compile Include="..\InternetDetector\BaseInternetDetector.cs">
+      <Link>InternetDetector\BaseInternetDetector.cs</Link>
     </Compile>
-    <Compile Include="..\NetworkValidater\BaseNetworkValidater.cs">
-      <Link>NetworkValidater\BaseNetworkValidater.cs</Link>
+    <Compile Include="..\InternetDetector\DefalutInternetDetector.cs">
+      <Link>InternetDetector\DefalutInternetDetector.cs</Link>
     </Compile>
-    <Compile Include="..\NetworkValidater\DefalutNetworkValidater.cs">
-      <Link>NetworkValidater\DefalutNetworkValidater.cs</Link>
+    <Compile Include="..\InternetDetector\IInternetDetector.cs">
+      <Link>InternetDetector\IInternetDetector.cs</Link>
     </Compile>
-    <Compile Include="..\NetworkValidater\INetworkValidater.cs">
-      <Link>NetworkValidater\INetworkValidater.cs</Link>
+    <Compile Include="..\InternetDetector\VpnInternetDetector.cs">
+      <Link>InternetDetector\VpnInternetDetector.cs</Link>
     </Compile>
-    <Compile Include="..\NetworkValidater\VpnNetworkValidater.cs">
-      <Link>NetworkValidater\VpnNetworkValidater.cs</Link>
+    <Compile Include="..\InternetDetector\VpsInternetDetector.cs">
+      <Link>InternetDetector\VpsInternetDetector.cs</Link>
     </Compile>
-    <Compile Include="..\NetworkValidater\VpsNetworkValidater.cs">
-      <Link>NetworkValidater\VpsNetworkValidater.cs</Link>
+    <Compile Include="..\IRedialExecutor.cs">
+      <Link>IRedialExecutor.cs</Link>
     </Compile>
     <Compile Include="..\Redialer\AdslRedialer.cs">
       <Link>Redialer\AdslRedialer.cs</Link>
@@ -104,23 +104,11 @@
     <Compile Include="..\RedialException.cs">
       <Link>RedialException.cs</Link>
     </Compile>
-    <Compile Include="..\RedialExecutor.cs">
-      <Link>RedialExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\RedialManager\BaseRedialManager.cs">
-      <Link>RedialManager\BaseRedialManager.cs</Link>
-    </Compile>
-    <Compile Include="..\RedialManager\FileLockerRedialManager.cs">
-      <Link>RedialManager\FileLockerRedialManager.cs</Link>
-    </Compile>
-    <Compile Include="..\RedialManager\IRedialManager.cs">
-      <Link>RedialManager\IRedialManager.cs</Link>
-    </Compile>
-    <Compile Include="..\RedialManager\RedisRedialManager.cs">
-      <Link>RedialManager\RedisRedialManager.cs</Link>
-    </Compile>
     <Compile Include="..\RedialResult.cs">
       <Link>RedialResult.cs</Link>
+    </Compile>
+    <Compile Include="..\RedisRedialExecutor.cs">
+      <Link>RedisRedialExecutor.cs</Link>
     </Compile>
     <Compile Include="..\Utils\AdslUtils.cs">
       <Link>Utils\AdslUtils.cs</Link>

@@ -24,7 +24,7 @@ namespace DotnetSpider.Extension.Configuration.Json
 		public JObject Scheduler { get; set; }
 		public JObject Downloader { get; set; }
 		public Site Site { get; set; }
-		public JObject Redialer { get; set; }
+		public JObject RedialExecutor { get; set; }
 		public List<JObject> PrepareStartUrls { get; set; }
 		public List<EnviromentValue> EnviromentValues { get; set; }
 		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension.Configuration.Json
 				SkipWhenResultIsEmpty = SkipWhenResultIsEmpty,
 				Pipelines = GetPipepines(Pipelines),
 				PrepareStartUrls = GetPrepareStartUrls(PrepareStartUrls),
-				Redialer = GetRedialer(Redialer),
+				RedialExecutor = GetRedialExecutor(RedialExecutor),
 				Scheduler = GetScheduler(Scheduler),
 				Site = Site,
 				StartUrls = StartUrls,
@@ -156,14 +156,14 @@ namespace DotnetSpider.Extension.Configuration.Json
 			throw new SpiderException($"Unsported validation type: {type}");
 		}
 
-		private NetworkValidater GetNetworkValidater(JObject networkValidater)
+		private InternetDetector GetNetworkValidater(JToken networkValidater)
 		{
 			if (networkValidater == null)
 			{
 				return null;
 			}
 
-			var type = networkValidater.SelectToken("$.Type")?.ToObject<NetworkValidater.Types>();
+			var type = networkValidater.SelectToken("$.Type")?.ToObject<InternetDetector.Types>();
 			if (type == null)
 			{
 				throw new SpiderException("Missing NetworkValidater type: " + networkValidater);
@@ -171,18 +171,18 @@ namespace DotnetSpider.Extension.Configuration.Json
 
 			switch (type)
 			{
-				case NetworkValidater.Types.Vps:
+				case InternetDetector.Types.Vps:
 					{
-						return networkValidater.ToObject<VpsNetworkValidater>();
+						return networkValidater.ToObject<VpsInternetDetector>();
 					}
-				case NetworkValidater.Types.Defalut:
+				case InternetDetector.Types.Defalut:
 					{
-						return new DefaultNetworkValidater();
+						return new DefaultInternetDetector();
 					}
 #if !NET_CORE
-				case NetworkValidater.Types.Vpn:
+				case InternetDetector.Types.Vpn:
 					{
-						return new VpnNetworkValidater();
+						return new VpnInternetDetector();
 					}
 #endif
 			}
@@ -213,7 +213,44 @@ namespace DotnetSpider.Extension.Configuration.Json
 			throw new SpiderException("Can't convert Scheduler: " + jobject);
 		}
 
-		private Redialer GetRedialer(JObject redialer)
+		private RedialExecutor GetRedialExecutor(JObject redialExecutor)
+		{
+			if (redialExecutor == null)
+			{
+				return null;
+			}
+
+			var type = redialExecutor.SelectToken("$.Type")?.ToObject<RedialExecutor.Types>();
+
+			if (type == null)
+			{
+				throw new SpiderException("Missing redialer type: " + redialExecutor);
+			}
+
+			RedialExecutor result ;
+			switch (type)
+			{
+				case Configuration.RedialExecutor.Types.File:
+					{
+						result = redialExecutor.ToObject<FileRedialExecutor>();
+						break;
+					}
+				case Configuration.RedialExecutor.Types.Redis:
+					{
+						result = redialExecutor.ToObject<RedisRedialExecutor>();
+						break;
+					}
+				default:
+					{
+						throw new SpiderException($"Unsport redial executor: {type}");
+					}
+			}
+			result.Redialer = GetRedialer(redialExecutor.SelectToken("$.Redialer"));
+			result.NetworkValidater = GetNetworkValidater(redialExecutor.SelectToken("$.NetworkValidater"));
+			return result;
+		}
+
+		private Redialer GetRedialer(JToken redialer)
 		{
 			if (redialer == null)
 			{
@@ -230,12 +267,12 @@ namespace DotnetSpider.Extension.Configuration.Json
 			Redialer result = null;
 			switch (type)
 			{
-				case Configuration.Redialer.Types.Adsl:
+				case Redialer.Types.Adsl:
 					{
 						result = redialer.ToObject<AdslRedialer>();
 						break;
 					}
-				case Configuration.Redialer.Types.H3C:
+				case Redialer.Types.H3C:
 					{
 #if !NET_CORE
 						result = redialer.ToObject<H3CRedialer>();
@@ -244,7 +281,7 @@ namespace DotnetSpider.Extension.Configuration.Json
 						throw new SpiderException("UNSPORT H3C ADSL NOW.");
 #endif
 					}
-				case Configuration.Redialer.Types.Vpn:
+				case Redialer.Types.Vpn:
 					{
 #if !NET_CORE
 						result = redialer.ToObject<VpnRedialer>();
@@ -253,12 +290,6 @@ namespace DotnetSpider.Extension.Configuration.Json
 						throw new SpiderException("UNSPORT VPN NOW.");
 #endif
 					}
-			}
-
-			if (result != null)
-			{
-				var validater = (JObject)redialer.SelectToken("$.NetworkValidater");
-				result.NetworkValidater = GetNetworkValidater(validater);
 			}
 			return result;
 		}

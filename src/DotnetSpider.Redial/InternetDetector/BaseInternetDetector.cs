@@ -1,15 +1,15 @@
 ﻿using System.Threading;
 
-namespace DotnetSpider.Redial.NetworkValidater
+namespace DotnetSpider.Redial.InternetDetector
 {
-	public abstract class BaseNetworkValidater : INetworkValidater
+	public abstract class BaseInternetDetector : IInternetDetector
 	{
-		public int MaxWaitTime { get; set; } = 10;
+		public int Timeout { get; set; } = 10;
 
-		public bool Wait()
+		public bool Detect()
 		{
 			int currentWaitTime = 0;
-			while (currentWaitTime < MaxWaitTime)
+			while (currentWaitTime < Timeout)
 			{
 				currentWaitTime++;
 				try

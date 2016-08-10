@@ -50,7 +50,7 @@ namespace DotnetSpider.Core.Downloader
 
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 
-				response = NetworkProxyManager.Current.Execute("http", m =>
+				response = NetworkCenter.Current.Execute("http", m =>
 				{
 					var message = (HttpRequestMessage)m;
 					return _httpClient.SendAsync(message).Result;
@@ -257,10 +257,12 @@ namespace DotnetSpider.Core.Downloader
 #endif
 			}
 
-			Page page = new Page(request, site.ContentType);
-			page.Content = content;
-			page.Url = request.Url.ToString();
-			page.StatusCode = statusCode;
+			Page page = new Page(request, site.ContentType)
+			{
+				Content = content,
+				Url = request.Url.ToString(),
+				StatusCode = statusCode
+			};
 			foreach (var header in response.Headers)
 			{
 				page.Request.PutExtra(header.Key, header.Value);
@@ -325,8 +327,6 @@ namespace DotnetSpider.Core.Downloader
 		//			}
 		//		}
 		//	}
-
-		//	// 3、todo use tools as cpdetector for content decode
 		//	try
 		//	{
 		//		return Encoding.GetEncoding(string.IsNullOrEmpty(charset) ? "UTF-8" : charset);
@@ -359,8 +359,7 @@ namespace DotnetSpider.Core.Downloader
 					}
 					catch (Exception e)
 					{
-						response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
-						response.ReasonPhrase = e.Message;
+						response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable) {ReasonPhrase = e.Message};
 					}
 					if (response.StatusCode == HttpStatusCode.MovedPermanently
 						|| response.StatusCode == HttpStatusCode.Moved
@@ -386,13 +385,13 @@ namespace DotnetSpider.Core.Downloader
 						newRequest.RequestUri = response.Headers.Location;
 
 						base.SendAsync(newRequest, cancellationToken)
-							.ContinueWith(t2 => tcs.SetResult(t2.Result));
+							.ContinueWith(t2 => tcs.SetResult(t2.Result), cancellationToken);
 					}
 					else
 					{
 						tcs.SetResult(response);
 					}
-				});
+				}, cancellationToken);
 
 			return tcs.Task;
 		}

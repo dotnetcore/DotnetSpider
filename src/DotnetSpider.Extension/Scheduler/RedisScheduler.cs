@@ -87,7 +87,7 @@ namespace DotnetSpider.Extension.Scheduler
 			_successCountKey += md5;
 			_identityMd5 = md5;
 
-			NetworkProxyManager.Current.Execute("rds-in", () =>
+			NetworkCenter.Current.Execute("rds-in", () =>
 			{
 				Db.SortedSetAdd(TaskList, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
 			});
@@ -95,7 +95,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void ResetDuplicateCheck()
 		{
-			NetworkProxyManager.Current.Execute("rds-rs", () =>
+			NetworkCenter.Current.Execute("rds-rs", () =>
 			{
 				Db.KeyDelete(_setKey);
 			});
@@ -130,7 +130,7 @@ namespace DotnetSpider.Extension.Scheduler
 		//[MethodImpl(MethodImplOptions.Synchronized)]
 		public override Request Poll()
 		{
-			return NetworkProxyManager.Current.Execute("rds-pl", () =>
+			return NetworkCenter.Current.Execute("rds-pl", () =>
 			{
 				return RetryExecutor.Execute(30, () =>
 				{
@@ -156,17 +156,17 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public long GetLeftRequestsCount()
 		{
-			return NetworkProxyManager.Current.Execute("rds-lc", () => Db.ListLength(_queueKey));
+			return NetworkCenter.Current.Execute("rds-lc", () => Db.ListLength(_queueKey));
 		}
 
 		public long GetTotalRequestsCount()
 		{
-			return NetworkProxyManager.Current.Execute("rds-tc", () => Db.SetLength(_setKey));
+			return NetworkCenter.Current.Execute("rds-tc", () => Db.SetLength(_setKey));
 		}
 
 		public long GetSuccessRequestsCount()
 		{
-			return NetworkProxyManager.Current.Execute("rds-src", () =>
+			return NetworkCenter.Current.Execute("rds-src", () =>
 			{
 				var result = Db.HashGet(_successCountKey, _identityMd5);
 				return result.HasValue ? (long)result : 0;
@@ -175,7 +175,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public long GetErrorRequestsCount()
 		{
-			return NetworkProxyManager.Current.Execute("rds-erc", () =>
+			return NetworkCenter.Current.Execute("rds-erc", () =>
 			{
 				var result = Db.HashGet(_errorCountKey, _identityMd5);
 				return result.HasValue ? (long)result : 0;
@@ -184,7 +184,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public void IncreaseSuccessCounter()
 		{
-			NetworkProxyManager.Current.Execute("rds-isc", () =>
+			NetworkCenter.Current.Execute("rds-isc", () =>
 			{
 				Db.HashIncrement(_successCountKey, _identityMd5);
 			});
@@ -192,7 +192,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public void IncreaseErrorCounter()
 		{
-			NetworkProxyManager.Current.Execute("rds-iec", () =>
+			NetworkCenter.Current.Execute("rds-iec", () =>
 			{
 				Db.HashIncrement(_errorCountKey, _identityMd5);
 			});

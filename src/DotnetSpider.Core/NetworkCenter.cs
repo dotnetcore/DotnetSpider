@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Core
 {
-	public interface INetworkProxy
+	public interface INetworkExecutor
 	{
 		void Execute(string name, Action action);
 		void Execute(string name, Action<object> action, object obj);
@@ -10,29 +10,23 @@ namespace DotnetSpider.Core
 		T Execute<T>(string name, Func<T> func);
 	}
 
-	public interface INetworkProxyManager : INetworkProxy
+	public class NetworkCenter
 	{
-		void Register(INetworkProxy proxy);
-		INetworkProxy Proxy { get; }
-	}
+		private static NetworkCenter _instance;
+		public INetworkExecutor Executor { get; set; }
 
-	public class NetworkProxyManager : INetworkProxyManager
-	{
-		private static INetworkProxyManager _instance;
-		public INetworkProxy Proxy { get; set; }
+		public static NetworkCenter Current => _instance ?? (_instance = new NetworkCenter());
 
-		public static INetworkProxyManager Current => _instance ?? (_instance = new NetworkProxyManager());
-
-		public void Register(INetworkProxy proxy)
+		public void Register(INetworkExecutor executor)
 		{
-			Proxy = proxy;
+			Executor = executor;
 		}
 
 		public void Execute(string name, Action action)
 		{
-			if (Proxy != null)
+			if (Executor != null)
 			{
-				Proxy.Execute(name, action);
+				Executor.Execute(name, action);
 			}
 			else
 			{
@@ -42,9 +36,9 @@ namespace DotnetSpider.Core
 
 		public void Execute(string name, Action<object> action, object obj)
 		{
-			if (Proxy != null)
+			if (Executor != null)
 			{
-				Proxy.Execute(name, action, obj);
+				Executor.Execute(name, action, obj);
 			}
 			else
 			{
@@ -54,9 +48,9 @@ namespace DotnetSpider.Core
 
 		public T Execute<T>(string name, Func<T> func)
 		{
-			if (Proxy != null)
+			if (Executor != null)
 			{
-				return Proxy.Execute(name, func);
+				return Executor.Execute(name, func);
 			}
 			else
 			{
@@ -66,9 +60,9 @@ namespace DotnetSpider.Core
 
 		public T Execute<T>(string name, Func<object, T> func, object obj)
 		{
-			if (Proxy != null)
+			if (Executor != null)
 			{
-				return Proxy.Execute(name, func, obj);
+				return Executor.Execute(name, func, obj);
 			}
 			else
 			{

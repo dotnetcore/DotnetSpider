@@ -59,13 +59,9 @@ namespace DotnetSpider.Extension
 
 		private void InitEnvoriment()
 		{
-			if (SpiderContext.Redialer != null)
+			if (SpiderContext.RedialExecutor != null)
 			{
-				if (SpiderContext.Redialer.RedialManager == null)
-				{
-					SpiderContext.Redialer.RedialManager = new FileRedialManager();
-				}
-				SpiderContext.Redialer.RedialManager.SetRedialManager(SpiderContext.Redialer.NetworkValidater.GetNetworkValidater(), SpiderContext.Redialer.GetRedialer());
+				NetworkCenter.Current.Executor = SpiderContext.RedialExecutor.GetRedialExecutor();
 			}
 
 			if (SpiderContext.Downloader == null)

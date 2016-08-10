@@ -1,23 +1,24 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #if NET_CORE
-using System.Net.Http;
+
 #else
 using System.Net.NetworkInformation;
 #endif
 
-namespace DotnetSpider.Redial.NetworkValidater
+namespace DotnetSpider.Redial.InternetDetector
 {
-	public class DefaultNetworkValidater : BaseNetworkValidater
+	public class DefalutInternetDetector : BaseInternetDetector
 	{
-		public DefaultNetworkValidater()
+		public DefalutInternetDetector()
 		{
-			MaxWaitTime = 100;
+			Timeout = 100;
 		}
-		public DefaultNetworkValidater(int maxWaitTime)
+		public DefalutInternetDetector(int maxWaitTime)
 		{
-			MaxWaitTime = maxWaitTime;
+			Timeout = maxWaitTime;
 		}
 
 		public override bool DoValidate()

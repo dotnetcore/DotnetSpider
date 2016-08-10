@@ -93,7 +93,7 @@ namespace DotnetSpider.Extension.Downloader
 						realUrl = UrlFormat(realUrl);
 					}
 
-					NetworkProxyManager.Current.Execute("fid-d", () =>
+					NetworkCenter.Current.Execute("fid-d", () =>
 					{
 						_webDriver.Navigate().GoToUrl(realUrl);
 					});

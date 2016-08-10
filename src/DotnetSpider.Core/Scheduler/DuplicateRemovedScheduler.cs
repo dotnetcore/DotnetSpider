@@ -15,7 +15,7 @@ namespace DotnetSpider.Core.Scheduler
 		{
 			lock (this)
 			{
-				NetworkProxyManager.Current.Execute("sp", () =>
+				NetworkCenter.Current.Execute("sp", () =>
 				{
 					DoPush(request);
 				});

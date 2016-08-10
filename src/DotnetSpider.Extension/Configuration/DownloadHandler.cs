@@ -240,7 +240,7 @@ namespace DotnetSpider.Extension.Configuration
 			}
 			if (rawText.Contains(ContainsString))
 			{
-				(NetworkProxyManager.Current.Proxy as RedialExecutor)?.Redial();
+				((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
 				throw new DownloadException($"Content downloaded contains illegal string: {ContainsString}.");
 			}
 		}
@@ -262,7 +262,7 @@ namespace DotnetSpider.Extension.Configuration
 				}
 				if (page.Exception.Message.Contains(ExceptionMessage))
 				{
-					(NetworkProxyManager.Current.Proxy as RedialExecutor)?.Redial();
+					((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
 					throw new DownloadException("Download failed and redial finished already.");
 				}
 			}
@@ -288,7 +288,7 @@ namespace DotnetSpider.Extension.Configuration
 					{
 						RequestedCount = 0;
 
-						(NetworkProxyManager.Current.Proxy as RedialExecutor)?.Redial();
+						((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
 					}
 				}
 			}
