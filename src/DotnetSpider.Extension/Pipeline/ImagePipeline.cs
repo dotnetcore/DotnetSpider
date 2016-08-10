@@ -99,7 +99,7 @@
 //						}
 //						catch (Exception)
 //						{
-//							Logger.Warn($"Download image: {fileName} failed.");
+//							Logger.Log($"Download image: {fileName} failed.");
 //						}
 //					}
 //				}

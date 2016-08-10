@@ -17,6 +17,8 @@ using NLog;
 using MimeKit;
 using MailKit.Net.Smtp;
 using System.IO;
+using NLog.Fluent;
+
 #if NET_CORE
 using System.Runtime.InteropServices;
 using System.Text;
@@ -210,7 +212,7 @@ namespace DotnetSpider.Extension
 				}
 				if (needInitStartRequest)
 				{
-					Logger.Info(LogInfo.Create("开始数据验证 ...", SpiderContext));
+					Logger.Log(LogInfo.Create("开始数据验证 ...", Logger.Name, SpiderContext, LogLevel.Info));
 
 					if (validations != null && validations.Count > 0)
 					{
@@ -253,7 +255,7 @@ namespace DotnetSpider.Extension
 				}
 				else
 				{
-					Logger.Info(LogInfo.Create("有其他线程执行了数据验证.", SpiderContext));
+					Logger.Log(LogInfo.Create("有其他线程执行了数据验证.", Logger.Name, SpiderContext, LogLevel.Info));
 				}
 
 				if (needInitStartRequest && Redis != null)
@@ -276,7 +278,7 @@ namespace DotnetSpider.Extension
 
 		private Spider PrepareSpider(params string[] args)
 		{
-			Logger.Info(LogInfo.Create("创建爬虫...", SpiderContext));
+			Logger.Log(LogInfo.Create("创建爬虫...", Logger.Name, SpiderContext, LogLevel.Info));
 			bool needInitStartRequest = true;
 			string key = "locker-" + Name;
 			if (Db != null)
@@ -300,7 +302,7 @@ namespace DotnetSpider.Extension
 			{
 				PrepareSite();
 			}
-			Logger.Info(LogInfo.Create("构建内部模块...", SpiderContext));
+			Logger.Log(LogInfo.Create("构建内部模块...", Logger.Name, SpiderContext, LogLevel.Info));
 			SpiderMonitor.Default.Register(spider);
 			spider.InitComponent();
 
@@ -311,7 +313,7 @@ namespace DotnetSpider.Extension
 
 		private void PrepareSite()
 		{
-			Logger.Info(LogInfo.Create("准备爬虫数据...", SpiderContext));
+			Logger.Log(LogInfo.Create("准备爬虫数据...", Logger.Name, SpiderContext, LogLevel.Info));
 			if (SpiderContext.PrepareStartUrls != null)
 			{
 				foreach (var prepareStartUrl in SpiderContext.PrepareStartUrls)

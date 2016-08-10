@@ -2,6 +2,7 @@
 {
 	public class SpiderStatus
 	{
+		public string Status { get; set; }
 		public long Left { get; set; }
 		public long Total { get; set; }
 		public long Success { get; set; }

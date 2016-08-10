@@ -3,6 +3,8 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using DotnetSpider.Core.Common;
+using NLog;
+
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -62,7 +64,7 @@ namespace DotnetSpider.Core.Pipeline
 			}
 			catch (Exception e)
 			{
-				Logger.Warn(e, LogInfo.Create("Write file error.", Spider));
+				Logger.Log(LogInfo.Create("Write file error.", Logger.Name, Spider, LogLevel.Warn, e));
 				throw;
 			}
 		}
