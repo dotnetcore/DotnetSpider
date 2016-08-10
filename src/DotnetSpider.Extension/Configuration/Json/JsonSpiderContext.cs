@@ -246,7 +246,7 @@ namespace DotnetSpider.Extension.Configuration.Json
 					}
 			}
 			result.Redialer = GetRedialer(redialExecutor.SelectToken("$.Redialer"));
-			result.NetworkValidater = GetNetworkValidater(redialExecutor.SelectToken("$.NetworkValidater"));
+			result.InternetDetector = GetNetworkValidater(redialExecutor.SelectToken("$.NetworkValidater"));
 			return result;
 		}
 

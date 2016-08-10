@@ -12,7 +12,7 @@ using DotnetSpider.Redial.InternetDetector;
 
 namespace DotnetSpider.Extension.Configuration
 {
-#region Redialer
+	#region Redialer
 
 	public abstract class Redialer
 	{
@@ -81,13 +81,14 @@ namespace DotnetSpider.Extension.Configuration
 	}
 #endif
 
-#endregion
+	#endregion
 
-#region InternetDetector
+	#region InternetDetector
 
 	public abstract class InternetDetector
 	{
-		public int MaxWaitTime { get; set; } = 10;
+		public int Timeout { get; set; } = 10;
+
 		[Flags]
 		public enum Types
 		{
@@ -107,7 +108,7 @@ namespace DotnetSpider.Extension.Configuration
 
 		public override IInternetDetector GetInternetDetector()
 		{
-			return new DefalutInternetDetector(MaxWaitTime);
+			return new DefalutInternetDetector(Timeout);
 		}
 	}
 
@@ -119,7 +120,7 @@ namespace DotnetSpider.Extension.Configuration
 
 		public override IInternetDetector GetInternetDetector()
 		{
-			return new Redial.InternetDetector.VpsInternetDetector(InterfaceNum, MaxWaitTime);
+			return new Redial.InternetDetector.VpsInternetDetector(InterfaceNum, Timeout);
 		}
 	}
 
@@ -137,9 +138,9 @@ namespace DotnetSpider.Extension.Configuration
 	}
 #endif
 
-#endregion
+	#endregion
 
-#region RedialExecutor
+	#region RedialExecutor
 	public abstract class RedialExecutor
 	{
 		[Flags]
@@ -149,7 +150,7 @@ namespace DotnetSpider.Extension.Configuration
 			File
 		}
 
-		public InternetDetector NetworkValidater { get; set; }
+		public InternetDetector InternetDetector { get; set; }
 		public Redialer Redialer { get; set; }
 
 		public abstract Types Type { get; internal set; }
@@ -163,7 +164,7 @@ namespace DotnetSpider.Extension.Configuration
 
 		public override INetworkExecutor GetRedialExecutor()
 		{
-			return new FileLockerRedialExecutor(Redialer.GetRedialer(), NetworkValidater.GetInternetDetector());
+			return new FileLockerRedialExecutor(Redialer.GetRedialer(), InternetDetector.GetInternetDetector());
 		}
 	}
 
@@ -171,7 +172,7 @@ namespace DotnetSpider.Extension.Configuration
 	{
 		public string Host { get; set; }
 		public string Password { get; set; }
-		public int Port { get; set; }
+		public int Port { get; set; } = 6379;
 
 		public override Types Type { get; internal set; } = Types.Redis;
 
@@ -208,8 +209,8 @@ namespace DotnetSpider.Extension.Configuration
 			var redis = ConnectionMultiplexer.Connect(confiruation);
 
 			var db = redis.GetDatabase(3);
-			return new Redial.RedisRedialExecutor(db, Redialer.GetRedialer(), NetworkValidater.GetInternetDetector());
+			return new Redial.RedisRedialExecutor(db, Redialer.GetRedialer(), InternetDetector.GetInternetDetector());
 		}
 	}
-#endregion
+	#endregion
 }
