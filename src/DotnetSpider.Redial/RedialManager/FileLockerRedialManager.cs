@@ -78,16 +78,16 @@ namespace DotnetSpider.Redial.RedialManager
 					// wait all operation stop.
 					Thread.Sleep(5000);
 
-					Logger.Warn("Wait atomic action to finish...");
+					//Logger.Log("Wait atomic action to finish...");
 
 					// 等待数据库等操作完成
 					AtomicExecutor.WaitAtomicAction();
 
-					Logger.Warn("Try to redial network...");
+					//Logger.Log("Try to redial network...");
 
 					RedialInternet();
 
-					Logger.Warn("Redial finished.");
+					//Logger.Log("Redial finished.");
 					return RedialResult.Sucess;
 				}
 				catch (IOException)

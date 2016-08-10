@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using NLog;
 
 namespace DotnetSpider.Core
 {
@@ -6,9 +8,14 @@ namespace DotnetSpider.Core
 	{
 		public static string Machine = Dns.GetHostName();
 
-		public static string Create(string message, ITask task)
+		public static LogEventInfo Create(string message, string loggerName, ITask task, LogLevel level, Exception e = null)
 		{
-			return $"[{task.UserId}][{task.TaskGroup}] {message}";
+			LogEventInfo theEvent = new LogEventInfo(level, loggerName, message);
+			theEvent.Exception = e;
+			theEvent.Properties["UserId"] = task.UserId;
+			theEvent.Properties["TaskGroup"] = task.TaskGroup;
+			return theEvent;
+			//return $"[{task.UserId}][{task.TaskGroup}] {message}";
 		}
 	}
 }

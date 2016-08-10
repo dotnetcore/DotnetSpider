@@ -45,8 +45,10 @@ namespace DotnetSpider.Core.Monitor
 				{
 					var spider = (Spider)obj;
 					var monitor = (IMonitorableScheduler)spider.Scheduler ;
+					
 					service.Watch(new SpiderStatus
 					{
+						Status = spider.StatusCode.ToString(),
 						Code = spider.StatusCode.ToString(),
 						Error = monitor.GetErrorRequestsCount(),
 						Identity = spider.Identity,

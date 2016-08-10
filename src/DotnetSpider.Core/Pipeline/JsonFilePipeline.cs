@@ -2,6 +2,8 @@ using System.IO;
 using System.Text;
 using DotnetSpider.Core.Common;
 using Newtonsoft.Json;
+using NLog;
+
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -20,7 +22,7 @@ namespace DotnetSpider.Core.Pipeline
 #if NET_CORE
 			_intervalPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\data\\json" : "/data/json";
 #else
-			_intervalPath="\\data\\json";
+			_intervalPath = "\\data\\json";
 #endif
 		}
 
@@ -39,7 +41,7 @@ namespace DotnetSpider.Core.Pipeline
 #if NET_CORE
 				path = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"\\{spider.Identity}\\data\\json" : $"/{spider.Identity}/data/json";
 #else
-				path="\\{spider.Identity}\\data\\json";
+				path = "\\{spider.Identity}\\data\\json";
 #endif
 			}
 			else
@@ -63,7 +65,7 @@ namespace DotnetSpider.Core.Pipeline
 			}
 			catch (IOException e)
 			{
-				Logger.Warn(LogInfo.Create("Write data to json file failed.", Spider), e);
+				Logger.Log(LogInfo.Create("Write data to json file failed.", Logger.Name, Spider, LogLevel.Warn, e));
 				throw;
 			}
 		}

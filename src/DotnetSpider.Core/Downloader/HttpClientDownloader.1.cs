@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
 using System.Threading;
+using NLog;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -39,7 +40,7 @@ namespace DotnetSpider.Core.Downloader
 
 			Site site = spider.Site;
 
-			//Logger.InfoFormat("Downloading page {0}", request.Url);
+			//Logger.LogFormat("Downloading page {0}", request.Url);
 
 			HttpResponseMessage response = null;
 			var proxy = site.GetHttpProxyFromPool();
@@ -111,7 +112,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.Warn(e, LogInfo.Create("Close response fail.", spider));
+					Logger.Log(LogInfo.Create("Close response fail.", Logger.Name, spider, LogLevel.Warn, e));
 				}
 			}
 		}
