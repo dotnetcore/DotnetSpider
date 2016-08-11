@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace DotnetSpider.Extension
 {
 	public abstract class SpiderBuilder
@@ -16,6 +18,7 @@ namespace DotnetSpider.Extension
 #elif Publish
 				//ModelSpider spider = new ModelSpider(context) {AfterSpiderFinished = AfterSpiderFinished};
 #endif
+				string json = JsonConvert.SerializeObject(GetSpiderContext());
 				spider.Run(args);
 			}
 		}

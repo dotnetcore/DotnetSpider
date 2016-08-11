@@ -34,6 +34,7 @@ namespace DotnetSpider.Extension
 		private const string ValidateStatusName = "validate-status";
 		protected ConnectionMultiplexer Redis;
 		protected IDatabase Db;
+		[JsonIgnore]
 		public Action TaskFinished { get; set; } = () => { };
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 		public RedialExecutor RedialExecutor { get; set; }
@@ -52,7 +53,7 @@ namespace DotnetSpider.Extension
 			{
 				throw new SpiderException("Site should not be null.");
 			}
-			//Site = site;
+			Site = site;
 		}
 
 		public override void Run(params string[] arguments)
