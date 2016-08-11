@@ -8,14 +8,14 @@ using DotnetSpider.Redial;
 
 namespace DotnetSpider.Extension.Downloader
 {
-	public abstract class DownloadHandler : Named, IDownloadHandler
+	public abstract class DownloadCompleteHandler : Named, IDownloadCompleteHandler
 	{
 		public abstract void Handle(Page page);
 	}
 
 	#region Content Handler
 
-	public class SubContentHandler : DownloadHandler
+	public class SubContentHandler : DownloadCompleteHandler
 	{
 		public string StartString { get; set; }
 		public string EndString { get; set; }
@@ -40,7 +40,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class RemoveContentHandler : DownloadHandler
+	public class RemoveContentHandler : DownloadCompleteHandler
 	{
 		public string StartString { get; set; }
 		public string EndString { get; set; }
@@ -72,7 +72,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class RemoveContentHtmlTagHandler : DownloadHandler
+	public class RemoveContentHtmlTagHandler : DownloadCompleteHandler
 	{
 		public override void Handle(Page p)
 		{
@@ -82,7 +82,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class ContentToUpperOrLowerHandler : DownloadHandler
+	public class ContentToUpperOrLowerHandler : DownloadCompleteHandler
 	{
 		public bool ToUpper { get; set; } = false;
 
@@ -96,7 +96,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class CustomTargetHandler : DownloadHandler
+	public class CustomTargetHandler : DownloadCompleteHandler
 	{
 		public bool Loop { get; set; } = true;
 		public bool DisableNewLine { get; set; } = false;
@@ -143,7 +143,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class ReplaceContentHandler : DownloadHandler
+	public class ReplaceContentHandler : DownloadCompleteHandler
 	{
 		public string OldValue { get; set; }
 		public string NewValue { get; set; }
@@ -154,7 +154,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class TrimContentHandler : DownloadHandler
+	public class TrimContentHandler : DownloadCompleteHandler
 	{
 		public override void Handle(Page p)
 		{
@@ -162,7 +162,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class UnescapeContentHandler : DownloadHandler
+	public class UnescapeContentHandler : DownloadCompleteHandler
 	{
 		public override void Handle(Page p)
 		{
@@ -170,7 +170,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class RegexMatchContentHandler : DownloadHandler
+	public class RegexMatchContentHandler : DownloadCompleteHandler
 	{
 		public string Pattern { get; set; }
 
@@ -190,7 +190,7 @@ namespace DotnetSpider.Extension.Downloader
 
 	#region Redial Handler
 
-	public class RedialWhenContainsIllegalStringHandler : DownloadHandler
+	public class RedialWhenContainsIllegalStringHandler : DownloadCompleteHandler
 	{
 		public string ContainsString { get; set; }
 
@@ -209,7 +209,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class RedialWhenExceptionThrowHandler : DownloadHandler
+	public class RedialWhenExceptionThrowHandler : DownloadCompleteHandler
 	{
 		public string ExceptionMessage { get; set; } = string.Empty;
 
@@ -230,7 +230,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class CycleRedialHandler : DownloadHandler
+	public class CycleRedialHandler : DownloadCompleteHandler
 	{
 		public int RedialLimit { get; set; }
 		public static int RequestedCount { get; set; }

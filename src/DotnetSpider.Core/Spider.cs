@@ -35,7 +35,6 @@ namespace DotnetSpider.Core
 		public IDownloader Downloader { get; set; }
 		protected bool IsExitWhenComplete { get; set; } = true;
 		public Status StatusCode => Stat;
-		protected IScheduler Scheduler { get; set; }
 		protected IPageProcessor PageProcessor { get; set; }
 		protected List<IPipeline> Pipelines { get; set; } = new List<IPipeline>();
 		public event SpiderEvent OnSuccess;
@@ -49,6 +48,7 @@ namespace DotnetSpider.Core
 		protected Status Stat = Status.Init;
 		private int _waitCountLimit = 1500;
 		private bool _init;
+		private IScheduler _scheduler;
 		//private static readonly Regex IdentifyRegex = new Regex(@"^[\S]+$");
 		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
@@ -154,6 +154,22 @@ namespace DotnetSpider.Core
 			Scheduler.Init(this);
 		}
 
+		public IScheduler Scheduler
+		{
+			get
+			{
+				return _scheduler;
+			}
+			set
+			{
+				CheckIfRunning();
+				if (_scheduler != value)
+				{
+					_scheduler = value;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Start with more than one threads
 		/// </summary>
@@ -253,7 +269,7 @@ namespace DotnetSpider.Core
 		{
 			foreach (string url in urls)
 			{
-				AddRequest(new Request(url, 1, null));
+				AddStartRequest(new Request(url, 1, null));
 			}
 			return this;
 		}
@@ -265,7 +281,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider AddStartUrl(string url, Dictionary<string, dynamic> extras)
 		{
-			AddRequest(new Request(url, 1, extras));
+			AddStartRequest(new Request(url, 1, extras));
 			return this;
 		}
 
@@ -284,7 +300,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="requests"></param>
 		/// <returns></returns>
-		public Spider AddRequest(params Request[] requests)
+		public Spider AddStartRequest(params Request[] requests)
 		{
 			Site.StartRequests.AddRange(requests);
 			return this;

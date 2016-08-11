@@ -165,11 +165,14 @@
     <Compile Include="..\Downloader\BaseDownloader.cs">
       <Link>Downloader\BaseDownloader.cs</Link>
     </Compile>
+    <Compile Include="..\Downloader\BeforeDownloadHandler.cs">
+      <Link>Downloader\BeforeDownloadHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\DownloadCompleteHandler.cs">
+      <Link>Downloader\DownloadCompleteHandler.cs</Link>
+    </Compile>
     <Compile Include="..\Downloader\DownloadException.cs">
       <Link>Downloader\DownloadException.cs</Link>
-    </Compile>
-    <Compile Include="..\Downloader\DownloadHandler.cs">
-      <Link>Downloader\DownloadHandler.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\HttpClientDownloader.1.cs">
       <Link>Downloader\HttpClientDownloader.1.cs</Link>

@@ -7,12 +7,26 @@ namespace DotnetSpider.Redial.Redialer
 {
 	public class VpnRedialer : IRedialer
 	{
-		public string NetInterface { get; set; }
+		public string NetInterface { get; set; } = null;
+		public string VpnInterface { get; set; }
+		public string VpnIp { get; set; }
+		public string Account { get; set; }
+		public string Password { get; set; }
+
 		private readonly VpnUtils _util;
-		public VpnRedialer(string interface1, string vpnIp, string user, string password, string netInterface = null)
+
+		public VpnRedialer()
 		{
-			_util = new VpnUtils(vpnIp, interface1, user, password);
+		}
+
+		public VpnRedialer(string vpnInterface, string vpnIp, string user, string password, string netInterface = null)
+		{
+			VpnInterface = vpnInterface;
+			VpnIp = vpnIp;
+			Account = user;
+			Password = password;
 			NetInterface = netInterface;
+			_util = new VpnUtils(vpnIp, vpnInterface, user, password);
 		}
 
 		public void Redial()

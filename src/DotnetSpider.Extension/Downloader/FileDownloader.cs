@@ -9,10 +9,11 @@ namespace DotnetSpider.Extension.Downloader
 	/// </summary>
 	public class FileDownloader : BaseDownloader
 	{
-		public IDownloadHandler DownloadValidation { get; set; }
+		public IDownloadCompleteHandler DownloadValidation { get; set; }
 
 		public override Page Download(Request request, ISpider spider)
 		{
+			BeforeDownload(request, spider);
 			Page page = new Page(request, spider.Site.ContentType)
 			{
 				Content = File.ReadAllText(request.Url.LocalPath),

@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <returns></returns>
 		Page Download(Request request, ISpider spider);
 
-		List<IDownloadHandler> Handlers { get; set; }
+		List<IDownloadCompleteHandler> DownloadCompleteHandlers { get; set; }
 
 		IDownloader Clone();
 	}

@@ -7,15 +7,28 @@ namespace DotnetSpider.Core.Downloader
 	public class BaseDownloader : Named, IDownloader, IDisposable
 	{
 		protected ILogger Logger { get; set; }
-		public List<IDownloadHandler> Handlers { get; set; } = new List<IDownloadHandler>();
+		public List<IDownloadCompleteHandler> DownloadCompleteHandlers { get; set; } = new List<IDownloadCompleteHandler>();
+		public List<IBeforeDownloadHandler> BeforeDownloadHandlers { get; set; } = new List<IBeforeDownloadHandler>();
 
 		public BaseDownloader()
 		{
 			Logger = LogManager.GetCurrentClassLogger();
 		}
 
+		protected void BeforeDownload(Request request, ISpider spider)
+		{
+			if (BeforeDownloadHandlers != null)
+			{
+				foreach (var handler in BeforeDownloadHandlers)
+				{
+					handler.Handle(request, spider);
+				}
+			}
+		}
+
 		public virtual Page Download(Request request, ISpider spider)
 		{
+
 			return null;
 		}
 
@@ -23,11 +36,11 @@ namespace DotnetSpider.Core.Downloader
 		{
 		}
 
-		protected void Handle(Page page, ISpider spider)
+		protected void AfterDownloadComplete(Page page, ISpider spider)
 		{
-			if (Handlers != null)
+			if (DownloadCompleteHandlers != null)
 			{
-				foreach (var handler in Handlers)
+				foreach (var handler in DownloadCompleteHandlers)
 				{
 					handler.Handle(page);
 				}

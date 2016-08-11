@@ -168,11 +168,14 @@
     <Compile Include="..\DataSource.cs">
       <Link>DataSource.cs</Link>
     </Compile>
+    <Compile Include="..\Downloader\BeforeDownloadHandler.cs">
+      <Link>Downloader\BeforeDownloadHandler.cs</Link>
+    </Compile>
     <Compile Include="..\Downloader\CookieInterceptor.cs">
       <Link>Downloader\CookieInterceptor.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\DownloadHandler.cs">
-      <Link>Downloader\DownloadHandler.cs</Link>
+    <Compile Include="..\Downloader\DownloadCompleteHandler.cs">
+      <Link>Downloader\DownloadCompleteHandler.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\FiddlerDownloader.cs">
       <Link>Downloader\FiddlerDownloader.cs</Link>
@@ -182,9 +185,6 @@
     </Compile>
     <Compile Include="..\Downloader\Login.cs">
       <Link>Downloader\Login.cs</Link>
-    </Compile>
-    <Compile Include="..\Downloader\PostBodyGenerator.cs">
-      <Link>Downloader\PostBodyGenerator.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\WebDriver\Browser.cs">
       <Link>Downloader\WebDriver\Browser.cs</Link>

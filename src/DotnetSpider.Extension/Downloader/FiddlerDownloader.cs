@@ -66,6 +66,7 @@ namespace DotnetSpider.Extension.Downloader
 		public override Page Download(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
+			BeforeDownload(request, spider);
 			try
 			{
 				lock (this)
@@ -111,7 +112,7 @@ namespace DotnetSpider.Extension.Downloader
 					// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
 					request.PutExtra(Request.CycleTriedTimes, null);
 
-					Handle(page, spider);
+					AfterDownloadComplete(page, spider);
 					return page;
 				}
 			}
@@ -123,7 +124,7 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				Page page = new Page(request, site.ContentType) { Exception = e };
 
-				Handle(page, spider);
+				AfterDownloadComplete(page, spider);
 				throw;
 			}
 		}

@@ -64,7 +64,7 @@ namespace DotnetSpider.Extension.Model
 
 			for (int i = From; i <= To; i += Interval)
 			{
-				site.AddRequest(new Request(string.Format(FormateString, i), 1, data)
+				site.AddStartRequest(new Request(string.Format(FormateString, i), 1, data)
 				{
 					PostBody = PostBody,
 					Origin = Origin,
@@ -98,7 +98,7 @@ namespace DotnetSpider.Extension.Model
 
 			for (DateTime i = From; i <= To; i = i.AddDays(IntervalDay))
 			{
-				site.AddRequest(new Request(string.Format(FormateString, i.ToString(DateFormate)), 1, data)
+				site.AddStartRequest(new Request(string.Format(FormateString, i.ToString(DateFormate)), 1, data)
 				{
 					PostBody = PostBody,
 					Origin = Origin,
@@ -202,7 +202,7 @@ namespace DotnetSpider.Extension.Model
 				foreach (var formate in FormateStrings)
 				{
 					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					site.AddRequest(new Request(tmpUrl, 0, data)
+					site.AddStartRequest(new Request(tmpUrl, 0, data)
 					{
 						Method = Method,
 						Origin = Origin,
@@ -334,7 +334,7 @@ namespace DotnetSpider.Extension.Model
 						foreach (var formate in FormateStrings)
 						{
 							string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-							site.AddRequest(new Request(tmpUrl, 0, data)
+							site.AddStartRequest(new Request(tmpUrl, 0, data)
 							{
 								Method = Method,
 								Origin = Origin,
@@ -384,7 +384,7 @@ namespace DotnetSpider.Extension.Model
 					foreach (var formate in FormateStrings)
 					{
 						string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - (string.IsNullOrEmpty(RowSeparator) ? 0 : RowSeparator.Length)));
-						site.AddRequest(new Request(tmpUrl, 0, null)
+						site.AddStartRequest(new Request(tmpUrl, 0, null)
 						{
 							Method = Method,
 							Origin = Origin,
@@ -415,7 +415,7 @@ namespace DotnetSpider.Extension.Model
 					foreach (var formate in FormateStrings)
 					{
 						string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - 1));
-						site.AddRequest(new Request(tmpUrl, 0, null)
+						site.AddStartRequest(new Request(tmpUrl, 0, null)
 						{
 							Method = Method,
 							Origin = Origin,
@@ -471,7 +471,7 @@ namespace DotnetSpider.Extension.Model
 				foreach (var formate in FormateStrings)
 				{
 					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					site.AddRequest(new Request(tmpUrl, 0, tmp)
+					site.AddStartRequest(new Request(tmpUrl, 0, tmp)
 					{
 						Method = Method,
 						Origin = Origin,

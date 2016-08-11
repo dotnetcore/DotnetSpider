@@ -40,7 +40,7 @@ namespace DotnetSpider.Core.Downloader
 
 			Site site = spider.Site;
 
-			//Logger.LogFormat("Downloading page {0}", request.Url);
+			BeforeDownload(request, spider);
 
 			HttpResponseMessage response = null;
 			var proxy = site.GetHttpProxyFromPool();
@@ -75,7 +75,7 @@ namespace DotnetSpider.Core.Downloader
 				// 这里只要是遇上登录的, 则在拨号成功之后, 全部抛异常在Spider中加入Scheduler调度
 				// 因此如果使用多线程遇上多个Warning Custom Validate Failed不需要紧张, 可以考虑用自定义Exception分开
 
-				Handle(page, spider);
+				AfterDownloadComplete(page, spider);
 
 				// 结束后要置空, 这个值存到Redis会导致无限循环跑单个任务
 				request.PutExtra(Request.CycleTriedTimes, null);
@@ -97,7 +97,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				Page page = new Page(request, site.ContentType) { Exception = e };
 
-				Handle(page, spider);
+				AfterDownloadComplete(page, spider);
 				throw;
 			}
 			finally

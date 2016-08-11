@@ -22,7 +22,7 @@ namespace DotnetSpider.Extension.Downloader
 	}
 
 #if !NET_CORE
-	public abstract class WebDriverCookieThief : CookieInterceptor
+	public abstract class WebDriverCookieInterceptor : CookieInterceptor
 	{
 		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
 		{
@@ -54,7 +54,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class CommonCookieThief : WebDriverCookieThief
+	public class CommonCookieInterceptor : WebDriverCookieInterceptor
 	{
 		public string Url { get; set; }
 
@@ -115,7 +115,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class FiddlerCookieThief : CommonCookieThief
+	public class FiddlerCookieInterceptor : CommonCookieInterceptor
 	{
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
@@ -148,7 +148,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class FiddlerLoginCookieThief : LoginCookieThief
+	public class FiddlerLoginCookieInterceptor : LoginCookieInterceptor
 	{
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
@@ -181,7 +181,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class LoginCookieThief : WebDriverCookieThief
+	public class LoginCookieInterceptor : WebDriverCookieInterceptor
 	{
 		public string Url { get; set; }
 

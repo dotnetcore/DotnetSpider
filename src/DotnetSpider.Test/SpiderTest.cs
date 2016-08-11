@@ -153,7 +153,7 @@ namespace DotnetSpider.Test
 
 		public class TestDownloader : BaseDownloader
 		{
-			public IDownloadHandler DownloadValidation { get; set; }
+			public IDownloadCompleteHandler DownloadValidation { get; set; }
 
 			public override Page Download(Request request, ISpider spider)
 			{

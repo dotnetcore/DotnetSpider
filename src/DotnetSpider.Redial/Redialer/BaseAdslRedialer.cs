@@ -6,9 +6,9 @@ namespace DotnetSpider.Redial.Redialer
 {
 	public abstract class BaseAdslRedialer : IRedialer
 	{
-		protected readonly string Interface;
-		protected readonly string User;
-		protected readonly string Password;
+		public string Interface { get; set; }
+		public string Account { get; set; }
+		public string Password { get; set; }
 
 		protected BaseAdslRedialer()
 		{
@@ -16,15 +16,15 @@ namespace DotnetSpider.Redial.Redialer
 			var interface1 = ConfigurationManager.AppSettings["redialInterface"];
 			Interface = string.IsNullOrEmpty(interface1) ? "宽带连接" : interface1;
 
-			User = ConfigurationManager.AppSettings["redialUser"];
+			Account = ConfigurationManager.AppSettings["redialUser"];
 			Password = ConfigurationManager.AppSettings["redialPassword"];
 #endif
 		}
 
-		protected BaseAdslRedialer(string interface1, string user, string password)
+		protected BaseAdslRedialer(string interface1, string account, string password)
 		{
 			Interface = interface1;
-			User = user;
+			Account = account;
 			Password = password;
 		}
 

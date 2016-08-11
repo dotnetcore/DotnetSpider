@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample
 				SkipWhenResultIsEmpty = true,
 				Downloader = new HttpClientDownloader()
 				{
-					Handlers = new List<IDownloadHandler>
+					DownloadCompleteHandlers = new List<IDownloadCompleteHandler>
 					{
 						new SubContentHandler {
 							StartString="sales[\"hotsite_yixing\"] = [",
