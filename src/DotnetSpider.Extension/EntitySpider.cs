@@ -52,7 +52,7 @@ namespace DotnetSpider.Extension
 			{
 				throw new SpiderException("Site should not be null.");
 			}
-			Site = site;
+			//Site = site;
 		}
 
 		public override void Run(params string[] arguments)

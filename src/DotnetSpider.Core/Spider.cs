@@ -30,7 +30,7 @@ namespace DotnetSpider.Core
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
-		public Site Site { get; protected set; }
+		public Site Site { get; private set; }
 		public string Identity { get; set; }
 		public IDownloader Downloader { get; set; }
 		protected bool IsExitWhenComplete { get; set; } = true;
