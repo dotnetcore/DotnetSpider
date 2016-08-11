@@ -15,9 +15,9 @@ namespace DotnetSpider.Extension.Model
 	public class EntityExtractor : IEntityExtractor
 	{
 		private readonly EntityMetadata _entityDefine;
-		private readonly List<EnviromentValue> _enviromentValues;
+		private readonly List<GlobalValue> _enviromentValues;
 
-		public EntityExtractor(string entityName, List<EnviromentValue> enviromentValues, EntityMetadata entityDefine)
+		public EntityExtractor(string entityName, List<GlobalValue> enviromentValues, EntityMetadata entityDefine)
 		{
 			_entityDefine = entityDefine;
 

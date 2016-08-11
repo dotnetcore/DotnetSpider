@@ -141,77 +141,50 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Common\DataSourceUtil.cs">
+      <Link>Common\DataSourceUtil.cs</Link>
+    </Compile>
     <Compile Include="..\Common\DoubleKeyDictionary.cs">
       <Link>Common\DoubleKeyDictionary.cs</Link>
     </Compile>
     <Compile Include="..\Common\FiddlerClient.cs">
       <Link>Common\FiddlerClient.cs</Link>
     </Compile>
+    <Compile Include="..\Common\Macros.cs">
+      <Link>Common\Macros.cs</Link>
+    </Compile>
     <Compile Include="..\Common\SelectorUtil.cs">
       <Link>Common\SelectorUtil.cs</Link>
     </Compile>
-    <Compile Include="..\Configuration\CookieThief.cs">
-      <Link>Configuration\CookieThief.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\Downloader.cs">
-      <Link>Configuration\Downloader.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\DownloadHandler.cs">
-      <Link>Configuration\DownloadHandler.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\Entity.cs">
-      <Link>Configuration\Entity.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\EnviromentValue.cs">
-      <Link>Configuration\EnviromentValue.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\Json\JsonSpiderContext.cs">
-      <Link>Configuration\Json\JsonSpiderContext.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\Login.cs">
-      <Link>Configuration\Login.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\Macros.cs">
-      <Link>Configuration\Macros.cs</Link>
+    <Compile Include="..\Configuration\JsonSpiderContext.cs">
+      <Link>Configuration\JsonSpiderContext.cs</Link>
     </Compile>
     <Compile Include="..\Configuration\Pipeline.cs">
       <Link>Configuration\Pipeline.cs</Link>
     </Compile>
-    <Compile Include="..\Configuration\PostBodyGenerator.cs">
-      <Link>Configuration\PostBodyGenerator.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\PrepareStartUrls.cs">
-      <Link>Configuration\PrepareStartUrls.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\RedialExecutor.cs">
-      <Link>Configuration\RedialExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\Scheduler.cs">
-      <Link>Configuration\Scheduler.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\Selector.cs">
-      <Link>Configuration\Selector.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\SpiderContext.cs">
-      <Link>Configuration\SpiderContext.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\SpiderContextValidation.cs">
-      <Link>Configuration\SpiderContextValidation.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\TargetUrlExtractor.cs">
-      <Link>Configuration\TargetUrlExtractor.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\TargetUrlsHandler.cs">
-      <Link>Configuration\TargetUrlsHandler.cs</Link>
-    </Compile>
     <Compile Include="..\Configuration\Validation.cs">
       <Link>Configuration\Validation.cs</Link>
+    </Compile>
+    <Compile Include="..\DataSource.cs">
+      <Link>DataSource.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\CookieInterceptor.cs">
+      <Link>Downloader\CookieInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\DownloadHandler.cs">
+      <Link>Downloader\DownloadHandler.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\FiddlerDownloader.cs">
       <Link>Downloader\FiddlerDownloader.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\FileDownloader.cs">
       <Link>Downloader\FileDownloader.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\Login.cs">
+      <Link>Downloader\Login.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\PostBodyGenerator.cs">
+      <Link>Downloader\PostBodyGenerator.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\WebDriver\Browser.cs">
       <Link>Downloader\WebDriver\Browser.cs</Link>
@@ -225,14 +198,14 @@
     <Compile Include="..\Downloader\WebDriver\WebDriverUtil.cs">
       <Link>Downloader\WebDriver\WebDriverUtil.cs</Link>
     </Compile>
+    <Compile Include="..\EntitySpider.cs">
+      <Link>EntitySpider.cs</Link>
+    </Compile>
     <Compile Include="..\ILinkSpiderContext.cs">
       <Link>ILinkSpiderContext.cs</Link>
     </Compile>
     <Compile Include="..\LinkContextSpider.cs">
       <Link>LinkContextSpider.cs</Link>
-    </Compile>
-    <Compile Include="..\ModelSpider.cs">
-      <Link>ModelSpider.cs</Link>
     </Compile>
     <Compile Include="..\Model\AfterExtractor.cs">
       <Link>Model\AfterExtractor.cs</Link>
@@ -276,6 +249,9 @@
     <Compile Include="..\Model\EntityGeneralSpider.cs">
       <Link>Model\EntityGeneralSpider.cs</Link>
     </Compile>
+    <Compile Include="..\Model\EntityMetadata.cs">
+      <Link>Model\EntityMetadata.cs</Link>
+    </Compile>
     <Compile Include="..\Model\ExtractType.cs">
       <Link>Model\ExtractType.cs</Link>
     </Compile>
@@ -318,6 +294,9 @@
     <Compile Include="..\Model\Formatter\UrlEncodeFormater.cs">
       <Link>Model\Formatter\UrlEncodeFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\GlobalValue.cs">
+      <Link>Model\GlobalValue.cs</Link>
+    </Compile>
     <Compile Include="..\Model\IEntityCustomize.cs">
       <Link>Model\IEntityCustomize.cs</Link>
     </Compile>
@@ -330,8 +309,17 @@
     <Compile Include="..\Model\MultiPageModel.cs">
       <Link>Model\MultiPageModel.cs</Link>
     </Compile>
-    <Compile Include="..\Model\TargetUrlExtractInfo.cs">
-      <Link>Model\TargetUrlExtractInfo.cs</Link>
+    <Compile Include="..\Model\PrepareStartUrls.cs">
+      <Link>Model\PrepareStartUrls.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Selector.cs">
+      <Link>Model\Selector.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\TargetUrlExtractor.cs">
+      <Link>Model\TargetUrlExtractor.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\TargetUrlsHandler.cs">
+      <Link>Model\TargetUrlsHandler.cs</Link>
     </Compile>
     <Compile Include="..\Monitor\HttpMonitor.cs">
       <Link>Monitor\HttpMonitor.cs</Link>

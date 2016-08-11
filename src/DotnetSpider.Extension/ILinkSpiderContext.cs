@@ -3,10 +3,10 @@ using DotnetSpider.Extension.Configuration;
 
 namespace DotnetSpider.Extension
 {
-	public interface ILinkSpiderContext
+	public interface ILinkedEntitySpider
 	{
-		SpiderContext GetBuilder();
+		EntitySpider GetSpider();
 
-		Dictionary<string, SpiderContext> GetNextSpiders();
+		Dictionary<string, EntitySpider> GetNextSpider();
 	}
 }

@@ -8,7 +8,7 @@ using DotnetSpider.Redial.InternetDetector;
 
 namespace DotnetSpider.Redial
 {
-	public class FileLockerRedialExecutor : BaseRedialExecutor
+	public class FileLockerRedialExecutor : RedialExecutor
 	{
 		private static readonly string AtomicActionFolder;
 		private static readonly string RedialLockerFile;
@@ -20,7 +20,7 @@ namespace DotnetSpider.Redial
 			RedialLockerFile = Path.Combine(SpiderEnviroment.GlobalDirectory, "redial.lock");
 		}
 
-		public FileLockerRedialExecutor(IRedialer redialer,IInternetDetector validater) : base(redialer, validater)
+		public FileLockerRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{
 		}
 
@@ -80,6 +80,10 @@ namespace DotnetSpider.Redial
 		public override void ReleaseRedialLocker()
 		{
 			File.Delete(RedialLockerFile);
+		}
+
+		public override void Init()
+		{
 		}
 	}
 }

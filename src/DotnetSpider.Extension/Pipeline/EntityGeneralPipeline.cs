@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.Configuration;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -283,24 +284,23 @@ namespace DotnetSpider.Extension.Pipeline
 			});
 		}
 
-		private DbType Convert(string type)
+		private DbType Convert(string datatype)
 		{
-			if (string.IsNullOrEmpty(type))
+			if (string.IsNullOrEmpty(datatype))
 			{
 				throw new SpiderException("TYPE can not be null");
 			}
 
-			string datatype = type.ToLower();
-			if (RegexUtil.StringTypeRegex.IsMatch(datatype) || "text" == datatype)
+			if (datatype.StartsWith("STRING,") || "TEXT" == datatype)
 			{
 				return DbType.String;
 			}
-			if ("bool" == datatype)
+			if ("BOOL" == datatype)
 			{
 				return DbType.Boolean;
 			}
 
-			if ("date" == datatype || "time" == datatype)
+			if ("DATE" == datatype || "TIME" == datatype)
 			{
 				return DbType.DateTime;
 			}

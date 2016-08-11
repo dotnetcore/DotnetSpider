@@ -23,7 +23,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 		public Func<string, string> UrlFormat;
 		public Func<RemoteWebDriver, bool> AfterNavigate;
 
-		public WebDriverDownloader(Browser browser = Browser.Chrome, int webDriverWaitTime = 200, Option option = null)
+		public WebDriverDownloader(Browser browser, int webDriverWaitTime = 200, Option option = null)
 		{
 			_webDriverWaitTime = webDriverWaitTime;
 			_browser = browser;
@@ -47,12 +47,11 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 			}
 		}
 
-		public WebDriverDownloader(Browser browser = Browser.Phantomjs) : this(browser, 300)
+		public WebDriverDownloader(Browser browser) : this(browser, 300)
 		{
 		}
 
-		public WebDriverDownloader(Browser browser = Browser.Phantomjs,
-			Func<RemoteWebDriver, bool> login = null) : this(browser, 200, null)
+		public WebDriverDownloader(Browser browser, Func<RemoteWebDriver, bool> login) : this(browser, 200, null)
 		{
 			Login = login;
 		}

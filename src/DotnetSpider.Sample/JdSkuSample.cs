@@ -5,28 +5,29 @@ using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Sample
 {
 	public class JdSkuSampleSpider : SpiderBuilder
 	{
-		protected override SpiderContext GetSpiderContext()
+		protected override EntitySpider GetSpiderContext()
 		{
-			SpiderContext context = new SpiderContext();
-			context.SetThreadNum(2);
-			context.SetSpiderName("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-			context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
+			EntitySpider context = new EntitySpider(new Site());
+			context.SetThreadNum(1);
+			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+			context.AddTargetUrlExtractor(new TargetUrlExtractor
 			{
 				Region = new Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
 				Patterns = new List<string> { @"&page=[0-9]+&" }
 			});
-			context.AddPipeline(new MysqlPipeline
+			context.AddEntityPipeline(new MysqlPipeline
 			{
 				ConnectString = "Database='test';Data Source=86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
 			});
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));
-			
+
 			return context;
 		}
 

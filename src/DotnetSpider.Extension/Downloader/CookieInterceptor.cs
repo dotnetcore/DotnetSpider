@@ -1,40 +1,28 @@
 using System;
 using NLog;
+using DotnetSpider.Core;
 #if !NET_CORE
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 #endif
 
-namespace DotnetSpider.Extension.Configuration
+namespace DotnetSpider.Extension.Downloader
 {
-	public abstract class CookieThief
+	public abstract class CookieInterceptor : Named
 	{
 		protected readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-
-		[Flags]
-		public enum Types
-		{
-			Common,
-			Login,
-			Fiddler,
-			FiddlerLogin
-		}
-
-		public abstract Types Type { get; internal set; }
-
 
 		public abstract string GetCookie();
 	}
 
 #if !NET_CORE
-	public abstract class WebDriverCookieThief : CookieThief
+	public abstract class WebDriverCookieThief : CookieInterceptor
 	{
 		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
 		{
@@ -68,8 +56,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class CommonCookieThief : WebDriverCookieThief
 	{
-		public override Types Type { get; internal set; } = Types.Common;
-
 		public string Url { get; set; }
 
 		public Selector InputSelector { get; set; }
@@ -131,7 +117,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class FiddlerCookieThief : CommonCookieThief
 	{
-		public override Types Type { get; internal set; } = Types.Fiddler;
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
 
@@ -165,7 +150,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class FiddlerLoginCookieThief : LoginCookieThief
 	{
-		public override Types Type { get; internal set; } = Types.FiddlerLogin;
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
 
@@ -199,8 +183,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class LoginCookieThief : WebDriverCookieThief
 	{
-		public override Types Type { get; internal set; } = Types.Login;
-
 		public string Url { get; set; }
 
 		public string AfterLoginUrl { get; set; }

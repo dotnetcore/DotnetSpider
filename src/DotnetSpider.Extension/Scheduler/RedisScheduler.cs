@@ -16,8 +16,12 @@ namespace DotnetSpider.Extension.Scheduler
 	/// <summary>
 	/// Use Redis as url scheduler for distributed crawlers.
 	/// </summary>
-	public sealed class RedisScheduler : DuplicateRemovedScheduler, IMonitorableScheduler, IDuplicateRemover
+	public sealed class RedisScheduler : DuplicateRemovedScheduler, IDuplicateRemover
 	{
+		public string Host { get; set; }
+		public int Port { get; set; } = 6379;
+		public string Password { get; set; }
+
 		public static string TaskList = "task";
 		public static string TaskStatus = "task-status";
 		private string _queueKey = "queue-";
@@ -27,15 +31,29 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _successCountKey = "success-record";
 		private string _identityMd5;
 
-		public IDatabase Db;
-		public ConnectionMultiplexer Redis;
+		private IDatabase Db;
+		private ConnectionMultiplexer Redis;
 
-		public RedisScheduler(string host, string password = null, int port = 6379)
+		public RedisScheduler()
 		{
+			DuplicateRemover = this;
+		}
+
+		public RedisScheduler(string host, string password = null, int port = 6379) : this()
+		{
+			Host = host;
+			Password = password;
+			Port = port;
+		}
+
+		public override void Init(ISpider spider)
+		{
+			base.Init(spider);
+
 			var confiruation = new ConfigurationOptions()
 			{
 				ServiceName = "DotnetSpider",
-				Password = password,
+				Password = Password,
 				ConnectTimeout = 5000,
 				KeepAlive = 8,
 				ConnectRetry = 20,
@@ -46,38 +64,22 @@ namespace DotnetSpider.Extension.Scheduler
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
-				var address = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault();
+				var address = Dns.GetHostAddressesAsync(Host).Result.FirstOrDefault();
 				if (address == null)
 				{
-					throw new SpiderException("Can't resovle your host: " + host);
+					throw new SpiderException("Can't resovle your host: " + Host);
 				}
-				confiruation.EndPoints.Add(new IPEndPoint(address, port));
+				confiruation.EndPoints.Add(new IPEndPoint(address, Port));
 			}
 			else
 			{
-				confiruation.EndPoints.Add(new DnsEndPoint(host, port));
+				confiruation.EndPoints.Add(new DnsEndPoint(Host, Port));
 			}
 #else
-			confiruation.EndPoints.Add(new DnsEndPoint(host, port));
+			confiruation.EndPoints.Add(new DnsEndPoint(Host, Port));
 #endif
 			Redis = ConnectionMultiplexer.Connect(confiruation);
 			Db = Redis.GetDatabase(0);
-		}
-
-		public RedisScheduler(ConnectionMultiplexer redis) : this()
-		{
-			Redis = redis;
-			Db = redis.GetDatabase(0);
-		}
-
-		private RedisScheduler()
-		{
-			DuplicateRemover = this;
-		}
-
-		public override void Init(ISpider spider)
-		{
-			base.Init(spider);
 
 			var md5 = Encrypt.Md5Encrypt(spider.Identity);
 			_itemKey += md5;
@@ -154,17 +156,17 @@ namespace DotnetSpider.Extension.Scheduler
 			});
 		}
 
-		public long GetLeftRequestsCount()
+		public override long GetLeftRequestsCount()
 		{
 			return NetworkCenter.Current.Execute("rds-lc", () => Db.ListLength(_queueKey));
 		}
 
-		public long GetTotalRequestsCount()
+		public override long GetTotalRequestsCount()
 		{
 			return NetworkCenter.Current.Execute("rds-tc", () => Db.SetLength(_setKey));
 		}
 
-		public long GetSuccessRequestsCount()
+		public override long GetSuccessRequestsCount()
 		{
 			return NetworkCenter.Current.Execute("rds-src", () =>
 			{
@@ -173,7 +175,7 @@ namespace DotnetSpider.Extension.Scheduler
 			});
 		}
 
-		public long GetErrorRequestsCount()
+		public override long GetErrorRequestsCount()
 		{
 			return NetworkCenter.Current.Execute("rds-erc", () =>
 			{
@@ -182,7 +184,7 @@ namespace DotnetSpider.Extension.Scheduler
 			});
 		}
 
-		public void IncreaseSuccessCounter()
+		public override void IncreaseSuccessCounter()
 		{
 			NetworkCenter.Current.Execute("rds-isc", () =>
 			{
@@ -190,7 +192,7 @@ namespace DotnetSpider.Extension.Scheduler
 			});
 		}
 
-		public void IncreaseErrorCounter()
+		public override void IncreaseErrorCounter()
 		{
 			NetworkCenter.Current.Execute("rds-iec", () =>
 			{

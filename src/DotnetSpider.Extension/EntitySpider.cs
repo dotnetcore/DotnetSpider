@@ -10,119 +10,253 @@ using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Core.Downloader;
+using DotnetSpider.Redial;
+using DotnetSpider.Core.Processor;
+using StackExchange.Redis;
+using NLog;
+using DotnetSpider.Core.Common;
+using System.Runtime.InteropServices;
+using System.Net;
+using DotnetSpider.Core.Monitor;
+using System.Threading;
+using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Extension.Downloader;
+using DotnetSpider.Extension.Configuration;
 
-namespace DotnetSpider.Extension.Configuration
+namespace DotnetSpider.Extension
 {
-	public class SpiderContext : ITask
+	public class EntitySpider : Spider
 	{
-		// build it internal
+		private const string InitStatusSetName = "init-status";
+		private const string ValidateStatusName = "validate-status";
+		protected ConnectionMultiplexer Redis;
+		protected IDatabase Db;
+		public Action TaskFinished { get; set; } = new Action(() => { });
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
-
-		public string SpiderName { get; set; }
-		public string UserId { get; set; } = "DOTNETSPIDER";
-		public string TaskGroup { get; set; } = "DOTNETSPIDER";
-		public int ThreadNum { get; set; } = 1;
-		public int Deep { get; set; } = int.MaxValue;
-		public int EmptySleepTime { get; set; } = 15000;
-		public int CachedSize { get; set; } = 1;
-		public Scheduler Scheduler { get; set; }
-		public Downloader Downloader { get; set; }
-		public Site Site { get; set; }
-		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public RedialExecutor RedialExecutor { get; set; }
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
-		public Dictionary<string, Dictionary<string, object>> StartUrls { get; set; } = new Dictionary<string, Dictionary<string, object>>();
-		public List<Pipeline> Pipelines { get; set; } = new List<Pipeline>();
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
-		public List<TargetUrlExtractor> TargetUrlExtractInfos { get; set; } = new List<TargetUrlExtractor>();
-		public List<EnviromentValue> EnviromentValues { get; set; } = new List<EnviromentValue>();
+		public List<TargetUrlExtractor> TargetUrlExtractors { get; set; } = new List<TargetUrlExtractor>();
+		public List<GlobalValue> EnviromentValues { get; set; } = new List<GlobalValue>();
 		public Validations Validations { get; set; }
-		public CookieThief CookieThief { get; set; }
+		public CookieInterceptor CookieInterceptor { get; set; }
+		public List<Configuration.Pipeline> EntityPipelines { get; set; } = new List<Configuration.Pipeline>();
+		public int CachedSize { get; set; }
 
-		internal bool IsBuilt { get; set; }
-
-		public SpiderContext SetSpiderName(string spiderName)
+		public EntitySpider(Site site)
 		{
-			SpiderName = spiderName;
-			return this;
-		}
-
-		public SpiderContext SetUserId(string userId)
-		{
-			UserId = userId;
-			return this;
-		}
-
-		public SpiderContext SetTaskGroup(string taskGroup)
-		{
-			TaskGroup = taskGroup;
-			return this;
-		}
-
-		public SpiderContext SetThreadNum(int threadNum)
-		{
-			ThreadNum = threadNum;
-			return this;
-		}
-
-		public SpiderContext SetDeep(int deep)
-		{
-			Deep = deep;
-			return this;
-		}
-
-		public SpiderContext SetEmptySleepTime(int emptySleepTime)
-		{
-			EmptySleepTime = emptySleepTime;
-			return this;
-		}
-
-		public SpiderContext SetCachedSize(int cachedSize)
-		{
-			CachedSize = cachedSize;
-			return this;
-		}
-
-		public SpiderContext SetScheduler(Scheduler scheduler)
-		{
-			Scheduler = scheduler;
-			return this;
-		}
-
-		public SpiderContext SetDownloader(Downloader downloader)
-		{
-			Downloader = downloader;
-			return this;
-		}
-
-		public SpiderContext SetSite(Site site)
-		{
+			if (site == null)
+			{
+				throw new SpiderException("Site should not be null.");
+			}
 			Site = site;
-			return this;
 		}
 
-		public SpiderContext AddPrepareStartUrls(PrepareStartUrls prepareStartUrls)
+		public override void Run(params string[] arguments)
 		{
-			PrepareStartUrls.Add(prepareStartUrls);
-			return this;
+			InitEnvoriment();
+
+			try
+			{
+#if !NET_CORE
+				if (CookieInterceptor != null)
+				{
+					Logger.Log(LogInfo.Create("尝试获取 Cookie...", Logger.Name, this, LogLevel.Info));
+					string cookie = CookieInterceptor.GetCookie();
+					if (string.IsNullOrEmpty(cookie))
+					{
+						Logger.Log(LogInfo.Create("获取 Cookie 失败, 爬虫无法继续.", Logger.Name, this, LogLevel.Error));
+						return;
+					}
+					else
+					{
+						Site.Cookie = cookie;
+					}
+				}
+#endif
+
+				Logger.Log(LogInfo.Create("创建爬虫...", Logger.Name, this, LogLevel.Info));
+
+				EntityProcessor processor = new EntityProcessor(this);
+				foreach (var t in TargetUrlExtractors)
+				{
+					processor.AddTargetUrlExtractor(t);
+				}
+				foreach (var entity in Entities)
+				{
+					processor.AddEntity(entity);
+				}
+
+				PageProcessor = processor;
+
+				foreach (var entity in Entities)
+				{
+					string entiyName = entity.Name;
+
+					var schema = entity.Schema;
+
+					List<IEntityPipeline> pipelines = new List<IEntityPipeline>();
+					foreach (var pipeline in EntityPipelines)
+					{
+						pipelines.Add(pipeline.GetPipeline(schema, entity));
+					}
+
+					Pipelines.Add(new EntityPipeline(entiyName, pipelines));
+				}
+
+				CheckIfSettingsCorrect();
+
+				bool needInitStartRequest = true;
+				string key = "locker-" + Identity;
+				if (Db != null)
+				{
+					while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+					{
+						Thread.Sleep(1000);
+					}
+					var lockerValue = Db.HashGet(InitStatusSetName, Identity);
+					needInitStartRequest = lockerValue != "init finished";
+				}
+
+				if (TargetUrlsHandler != null)
+				{
+					//SetCustomizeTargetUrls(TargetUrlsHandler.Handle);
+				}
+
+				if (arguments.Contains("rerun"))
+				{
+					Scheduler.Clear();
+					needInitStartRequest = true;
+				}
+
+				Logger.Log(LogInfo.Create("构建内部模块、准备爬虫数据...", Logger.Name, this, LogLevel.Info));
+				SpiderMonitor.Default.Register(this);
+
+				InitComponent();
+
+				if (needInitStartRequest)
+				{
+					if (PrepareStartUrls != null)
+					{
+						foreach (var prepareStartUrl in PrepareStartUrls)
+						{
+							prepareStartUrl.Build(this, null);
+						}
+					}
+				}
+
+				Db?.LockRelease(key, 0);
+
+				RegisterControl(this);
+
+				base.Run();
+
+				TaskFinished();
+
+				//DoValidate();
+			}
+			finally
+			{
+				Dispose();
+				SpiderMonitor.Default.Dispose();
+			}
 		}
 
-		public SpiderContext AddPipeline(Pipeline pipeline)
+		private void RegisterControl(Spider spider)
 		{
-			Pipelines.Add(pipeline);
-			return this;
+			if (Redis != null)
+			{
+				try
+				{
+					Redis.GetSubscriber().Subscribe($"{spider.Identity}", (c, m) =>
+					{
+						switch (m)
+						{
+							case "STOP":
+								{
+									spider.Stop();
+									break;
+								}
+							case "RUNASYNC":
+								{
+									spider.RunAsync();
+									break;
+								}
+							case "EXIT":
+								{
+									spider.Exit();
+									break;
+								}
+						}
+					});
+				}
+				catch
+				{
+					// ignored
+				}
+			}
 		}
 
-		public SpiderContext AddEntityType(Type type)
+		private void InitEnvoriment()
 		{
+			if (RedialExecutor != null)
+			{
+				NetworkCenter.Current.Executor = RedialExecutor;
+			}
+
+			if (!string.IsNullOrEmpty(ConfigurationManager.Get("redisHost")) && string.IsNullOrWhiteSpace(ConfigurationManager.Get("redisHost")))
+			{
+				var host = ConfigurationManager.Get("redisHost");
+
+				var confiruation = new ConfigurationOptions()
+				{
+					ServiceName = "DotnetSpider",
+					Password = ConfigurationManager.Get("redisPassword"),
+					ConnectTimeout = 65530,
+					KeepAlive = 8,
+					ConnectRetry = 20,
+					SyncTimeout = 65530,
+					ResponseTimeout = 65530
+				};
+#if NET_CORE
+				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
+					var address = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault();
+					if (address == null)
+					{
+						throw new SpiderException("Can't resovle your host: " + host);
+					}
+					confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
+				}
+				else
+				{
+					confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+				}
+#else
+				confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+#endif
+				Redis = ConnectionMultiplexer.Connect(confiruation);
+				Db = Redis.GetDatabase(1);
+			}
+		}
+
+		public EntitySpider AddEntityType(Type type)
+		{
+			CheckIfRunning();
+
 			if (typeof(ISpiderEntity).IsAssignableFrom(type))
 			{
 #if NET_CORE
 				Entities.Add(ConvertToEntityMetaData(type.GetTypeInfo()));
 #else
-				Entities.Add(ConvertToEntityMetaData(type));
+				Entities.Add(PaserEntityMetaData(type));
 #endif
-				EnviromentValues = type.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new EnviromentValue
+				EnviromentValues = type.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new GlobalValue
 				{
 					Name = e.Name,
 					Selector = new Selector
@@ -140,69 +274,33 @@ namespace DotnetSpider.Extension.Configuration
 			return this;
 		}
 
-		public SpiderContext AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
+		public EntitySpider AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
 		{
-			TargetUrlExtractInfos.Add(targetUrlExtractor);
+			CheckIfRunning();
+			TargetUrlExtractors.Add(targetUrlExtractor);
 			return this;
 		}
 
-		public SpiderContext AddStartUrl(string url)
+		public EntitySpider AddEntityPipeline(Configuration.Pipeline pipeline)
 		{
-			StartUrls.Add(url, null);
+			CheckIfRunning();
+			EntityPipelines.Add(pipeline);
 			return this;
 		}
 
-		public SpiderContext AddStartRequest(Request request)
+		public override Spider AddPipeline(IPipeline pipeline)
 		{
-			Site.AddStartRequest(request);
-			return this;
+			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
 		}
 
-		public SpiderContext AddStartUrl(string url, Dictionary<string, object> extras)
+		public override Spider AddPipelines(IList<IPipeline> pipelines)
 		{
-			StartUrls.Add(url, extras);
-			return this;
-		}
-
-		public SpiderContext AddStartUrls(IEnumerable<string> urls)
-		{
-			foreach (var url in urls)
-			{
-				StartUrls.Add(url, null);
-			}
-			return this;
-		}
-
-		public SpiderContext AddStartUrls(Dictionary<string, Dictionary<string, object>> urls)
-		{
-			foreach (var pair in urls)
-			{
-				StartUrls.Add(pair.Key, pair.Value);
-			}
-			return this;
+			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
 		}
 
 		public ISpider ToDefaultSpider()
 		{
 			return new DefaultSpider("", new Site());
-		}
-
-		internal void Build()
-		{
-			if (!IsBuilt)
-			{
-				if (Site == null)
-				{
-					Site = new Site();
-				}
-
-				foreach (var url in StartUrls)
-				{
-					Site.AddStartUrl(url.Key, url.Value);
-				}
-
-				IsBuilt = true;
-			}
 		}
 
 		private static string GetEntityName(Type type)
@@ -211,7 +309,7 @@ namespace DotnetSpider.Extension.Configuration
 		}
 
 #if !NET_CORE
-		private static EntityMetadata ConvertToEntityMetaData(Type entityType)
+		private EntityMetadata PaserEntityMetaData(Type entityType)
 		{
 			EntityMetadata entityMetadata = new EntityMetadata();
 			entityMetadata.Name = GetEntityName(entityType);
@@ -238,7 +336,7 @@ namespace DotnetSpider.Extension.Configuration
 				entityMetadata.Updates = updates.Columns;
 			}
 
-			Entity entity = ConvertToEntity(entityType);
+			Entity entity = ParseEntity(entityType);
 
 			entityMetadata.Entity = entity;
 
@@ -247,7 +345,7 @@ namespace DotnetSpider.Extension.Configuration
 			return entityMetadata;
 		}
 
-		private static Entity ConvertToEntity(Type entityType)
+		private Entity ParseEntity(Type entityType)
 		{
 			Entity entity = new Entity();
 			var properties = entityType.GetProperties();
@@ -283,7 +381,7 @@ namespace DotnetSpider.Extension.Configuration
 						};
 					}
 
-					token.Fields.Add(ConvertToEntity(propertyInfo.PropertyType));
+					token.Fields.Add(ParseEntity(propertyInfo.PropertyType));
 				}
 				else
 				{
@@ -315,7 +413,7 @@ namespace DotnetSpider.Extension.Configuration
 					if (storeAs != null)
 					{
 						token.Name = storeAs.Name;
-						token.DataType = ConvertDataTypeToString(storeAs);
+						token.DataType = ParseDataType(storeAs);
 					}
 					else
 					{
@@ -333,7 +431,7 @@ namespace DotnetSpider.Extension.Configuration
 			return entity;
 		}
 #else
-		private static EntityMetadata ConvertToEntityMetaData(TypeInfo entityType)
+		private EntityMetadata ConvertToEntityMetaData(TypeInfo entityType)
 		{
 			EntityMetadata json = new EntityMetadata();
 			json.Name = GetEntityName(entityType.AsType());
@@ -359,7 +457,7 @@ namespace DotnetSpider.Extension.Configuration
 			{
 				json.Updates = updates.Columns;
 			}
-			
+
 
 			Entity entity = ConvertToEntity(entityType);
 
@@ -370,7 +468,7 @@ namespace DotnetSpider.Extension.Configuration
 			return json;
 		}
 
-		private static Entity ConvertToEntity(TypeInfo entityType)
+		private Entity ConvertToEntity(TypeInfo entityType)
 		{
 			Entity entity = new Entity();
 			var properties = entityType.AsType().GetProperties();
@@ -438,7 +536,7 @@ namespace DotnetSpider.Extension.Configuration
 					if (storeAs != null)
 					{
 						token.Name = storeAs.Name;
-						token.DataType = ConvertDataTypeToString(storeAs);
+						token.DataType = ParseDataType(storeAs);
 					}
 					else
 					{
@@ -457,7 +555,7 @@ namespace DotnetSpider.Extension.Configuration
 		}
 #endif
 
-		protected static string ConvertDataTypeToString(StoredAs storedAs)
+		private string ParseDataType(StoredAs storedAs)
 		{
 			string reslut = "";
 
@@ -465,38 +563,33 @@ namespace DotnetSpider.Extension.Configuration
 			{
 				case DataType.Bool:
 					{
-						reslut = "bool";
+						reslut = "BOOL";
 						break;
 					}
 				case DataType.Date:
 					{
-						reslut = "date";
+						reslut = "DATE";
 						break;
 					}
 				case DataType.Time:
 					{
-						reslut = "time";
+						reslut = "TIME";
 						break;
 					}
 				case DataType.Text:
 					{
-						reslut = "text";
+						reslut = "TEXT";
 						break;
 					}
 
 				case DataType.String:
 					{
-						reslut = $"{storedAs.Type.ToString().ToLower()}({storedAs.Lenth})";
+						reslut = $"STRING,{storedAs.Lenth}";
 						break;
 					}
 			}
 
 			return reslut;
 		}
-	}
-
-	public class LinkSpiderContext : SpiderContext
-	{
-		public Dictionary<string, SpiderContext> NextSpiderContexts { get; set; }
 	}
 }

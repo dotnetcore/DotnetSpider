@@ -1,32 +1,18 @@
 ﻿using System;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Configuration
 {
 	public abstract class Pipeline
 	{
-		[Flags]
-		public enum Types
-		{
-			Console = 1,
-			MongoDb = 3,
-			MySql = 4,
-			MsSql = 5,
-			JsonFile = 6,
-			MySqlFile = 7
-		}
-
-		public abstract Types Type { get; internal set; }
-
 		public abstract IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine);
 	}
 
 #if !NET_CORE
 	public class MongoDbPipeline : Pipeline
 	{
-		public override Types Type { get; internal set; } = Types.MongoDb;
-
 		public string ConnectString { get; set; }
 
 		public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
@@ -52,8 +38,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class MysqlFilePipeline : Pipeline
 	{
-		public override Types Type { get; internal set; } = Types.MySqlFile;
-
 		public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
 		{
 			return new EntityMySqlFilePipeline(schema, entityDefine);
@@ -62,8 +46,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class MysqlPipeline : Pipeline
 	{
-		public override Types Type { get; internal set; } = Types.MySql;
-
 		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
 
 		public string ConnectString { get; set; }
@@ -76,8 +58,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class ConslePipeline : Pipeline
 	{
-		public override Types Type { get; internal set; } = Types.Console;
-
 		public override IEntityPipeline GetPipeline(Schema schema, EntityMetadata entityDefine)
 		{
 			return new EntityConsolePipeline();

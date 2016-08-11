@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
@@ -44,7 +45,7 @@ namespace DotnetSpider.Core
 		{
 		}
 
-		public void Run()
+		public void Run(params string[] arguments)
 		{
 		}
 
@@ -85,6 +86,20 @@ namespace DotnetSpider.Core
 
 		public void Dispose()
 		{
+		}
+
+		public Task RunAsync(params string[] arguments)
+		{
+			return Task.Factory.StartNew(() =>
+			{
+				Run(arguments);
+			}).ContinueWith(t =>
+			{
+				if (t.Exception != null)
+				{
+					Logger.Error(t.Exception.Message);
+				}
+			});
 		}
 	}
 }

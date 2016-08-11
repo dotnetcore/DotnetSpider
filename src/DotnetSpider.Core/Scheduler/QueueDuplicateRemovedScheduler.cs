@@ -7,7 +7,7 @@ namespace DotnetSpider.Core.Scheduler
 	/// Basic Scheduler implementation. 
 	/// Store urls to fetch in LinkedBlockingQueue and remove duplicate urls by HashMap.
 	/// </summary>
-	public sealed class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler, IMonitorableScheduler
+	public sealed class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler
 	{
 		private Queue<Request> _queue = new Queue<Request>();
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
@@ -35,7 +35,7 @@ namespace DotnetSpider.Core.Scheduler
 			}
 		}
 
-		public long GetLeftRequestsCount()
+		public override long GetLeftRequestsCount()
 		{
 			lock (this)
 			{
@@ -43,27 +43,27 @@ namespace DotnetSpider.Core.Scheduler
 			}
 		}
 
-		public long GetTotalRequestsCount()
+		public override long GetTotalRequestsCount()
 		{
 			return DuplicateRemover.GetTotalRequestsCount();
 		}
 
-		public long GetSuccessRequestsCount()
+		public override long GetSuccessRequestsCount()
 		{
 			return _successCounter.Value;
 		}
 
-		public long GetErrorRequestsCount()
+		public override long GetErrorRequestsCount()
 		{
 			return _errorCounter.Value;
 		}
 
-		public void IncreaseSuccessCounter()
+		public override void IncreaseSuccessCounter()
 		{
 			_successCounter.Inc();
 		}
 
-		public void IncreaseErrorCounter()
+		public override void IncreaseErrorCounter()
 		{
 			_errorCounter.Inc();
 		}

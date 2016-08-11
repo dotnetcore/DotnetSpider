@@ -4,18 +4,28 @@ using System.Threading;
 using DotnetSpider.Redial.InternetDetector;
 using DotnetSpider.Redial.Redialer;
 using StackExchange.Redis;
+#if NET_CORE
+using System.Linq;
+using System.Runtime.InteropServices;
+#endif
 
 namespace DotnetSpider.Redial
 {
-	public class RedisRedialExecutor : BaseRedialExecutor
+	public class RedisRedialExecutor : RedialExecutor
 	{
-		public IDatabase Db { get; }
+		protected IDatabase Db { get; set; }
 		public static string HostName { get; set; } = Dns.GetHostName();
 		public const string Locker = "redial-locker";
 
-		public RedisRedialExecutor(IDatabase db, IRedialer redialer,   IInternetDetector validater) : base(redialer,  validater)
+		public string Host { get; set; }
+		public string Password { get; set; }
+		public int Port { get; set; } = 6379;
+
+		public RedisRedialExecutor(string host, string password, int port, IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{
-			Db = db;
+			Host = host;
+			Password = password;
+			Port = port;
 		}
 
 		public override void WaitAll()
@@ -98,6 +108,41 @@ namespace DotnetSpider.Redial
 					Db.HashDelete(HostName, Locker);
 				}
 			}
+		}
+
+		public override void Init()
+		{
+			var confiruation = new ConfigurationOptions()
+			{
+				ServiceName = "DotnetSpider",
+				Password = Password,
+				ConnectTimeout = 5000,
+				KeepAlive = 8,
+				ConnectRetry = 20,
+				SyncTimeout = 65530,
+				ResponseTimeout = 65530
+			};
+#if NET_CORE
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
+				var address = Dns.GetHostAddressesAsync(Host).Result.FirstOrDefault();
+				if (address == null)
+				{
+					throw new Exception("Can't resovle your host: " + Host);
+				}
+				confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
+			}
+			else
+			{
+				confiruation.EndPoints.Add(new DnsEndPoint(Host, 6379));
+			}
+#else
+			confiruation.EndPoints.Add(new DnsEndPoint(Host, 6379));
+#endif
+			var redis = ConnectionMultiplexer.Connect(confiruation);
+
+			Db = redis.GetDatabase(3);
 		}
 	}
 }

@@ -3,7 +3,7 @@ using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
-namespace DotnetSpider.Extension.Configuration
+namespace DotnetSpider.Extension.Model
 {
 	public class EntityMetadata
 	{

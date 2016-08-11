@@ -14,11 +14,11 @@
 
 //namespace DotnetSpider.Test.Example
 //{
-//	public class LinkSpiderExample : ILinkSpiderContext
+//	public class LinkSpiderExample : ILinkEntitySpider
 //	{
-//		public SpiderContextBuilder GetBuilder()
+//		public EntitySpiderBuilder GetBuilder()
 //		{
-//			return new SpiderContextBuilder(new SpiderContext
+//			return new EntitySpiderBuilder(new EntitySpider
 //			{
 //				SpiderName = "JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd"),
 //				CachedSize = 1,
@@ -52,12 +52,12 @@
 //			}, typeof(Product));
 //		}
 
-//		public Dictionary<string, SpiderContextBuilder> GetNextSpiders()
+//		public Dictionary<string, EntitySpiderBuilder> GetNextSpiders()
 //		{
-//			SpiderContextBuilder nextBuilder1 = new SpiderContextBuilder(new SpiderContext());
-//			return new Dictionary<string, SpiderContextBuilder>
+//			EntitySpiderBuilder nextBuilder1 = new EntitySpiderBuilder(new EntitySpider());
+//			return new Dictionary<string, EntitySpiderBuilder>
 //			{
-//				{ SpiderContextBuilder.GetEntityName(typeof(Product)),new SpiderContextBuilder(new SpiderContext
+//				{ EntitySpiderBuilder.GetEntityName(typeof(Product)),new EntitySpiderBuilder(new EntitySpider
 //				{
 //					Site = new Site
 //					{

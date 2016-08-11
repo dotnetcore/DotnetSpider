@@ -1,8 +1,6 @@
-﻿using DotnetSpider.Extension.Model;
-
-namespace DotnetSpider.Extension.Configuration
+﻿namespace DotnetSpider.Extension.Model
 {
-	public class Selector
+	public class Selector : System.Attribute
 	{
 		public ExtractType Type { get; set; }
 		public string Expression { get; set; }

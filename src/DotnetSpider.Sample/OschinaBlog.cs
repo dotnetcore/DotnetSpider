@@ -20,9 +20,9 @@
 //			public string Tags { get; set; }
 //		}
 
-//		protected override SpiderContext CreateSpiderContext()
+//		protected override EntitySpider CreateEntitySpider()
 //		{
-//			return new SpiderContext
+//			return new EntitySpider
 //			{
 //				SpiderName = "Oschina Blog Daliy Tracking " + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy-MM-dd"),
 //				Site = new Site

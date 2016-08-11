@@ -1,6 +1,6 @@
-﻿namespace DotnetSpider.Extension.Configuration
+﻿namespace DotnetSpider.Extension.Model
 {
-	public class EnviromentValue
+	public class GlobalValue
 	{
 		public Selector Selector { get; set; }
 		public  string Name { get; set; }

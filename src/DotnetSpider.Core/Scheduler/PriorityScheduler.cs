@@ -7,7 +7,7 @@ namespace DotnetSpider.Core.Scheduler
 	/// <summary>
 	/// Priority scheduler. Request with higher priority will poll earlier.
 	/// </summary>
-	public class PriorityScheduler : DuplicateRemovedScheduler, IMonitorableScheduler
+	public class PriorityScheduler : DuplicateRemovedScheduler
 	{
 		public static int InitialCapacity = 5;
 		private readonly Queue<Request> _noPriorityQueue = new Queue<Request>();
@@ -57,32 +57,32 @@ namespace DotnetSpider.Core.Scheduler
 			}
 		}
 
-		public long GetLeftRequestsCount()
+		public override long GetLeftRequestsCount()
 		{
 			return _noPriorityQueue.Count;
 		}
 
-		public long GetTotalRequestsCount()
+		public override long GetTotalRequestsCount()
 		{
 			return DuplicateRemover.GetTotalRequestsCount();
 		}
 
-		public long GetSuccessRequestsCount()
+		public override long GetSuccessRequestsCount()
 		{
 			return _successCounter.Value;
 		}
 
-		public long GetErrorRequestsCount()
+		public override long GetErrorRequestsCount()
 		{
 			return _errorCounter.Value;
 		}
 
-		public void IncreaseSuccessCounter()
+		public override void IncreaseSuccessCounter()
 		{
 			_successCounter.Inc();
 		}
 
-		public void IncreaseErrorCounter()
+		public override void IncreaseErrorCounter()
 		{
 			_errorCounter.Inc();
 		}

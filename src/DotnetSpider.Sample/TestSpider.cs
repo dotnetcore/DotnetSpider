@@ -6,28 +6,24 @@ using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
+using DotnetSpider.Core;
+using DotnetSpider.Extension.Downloader;
 
 namespace DotnetSpider.Sample
 {
 	public class Hao360SpiderInfoBuble : SpiderBuilder
 	{
-		protected override SpiderContext GetSpiderContext()
+		protected override EntitySpider GetSpiderContext()
 		{
-			SpiderContext context = new SpiderContext()
+			EntitySpider context = new EntitySpider(new Site())
 			{
 				UserId = "86Research",
 				TaskGroup = "HaoBrowser",
-				SpiderName = "HaoBrowser Hao360Spider Buble " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
+				Identity = "HaoBrowser Hao360Spider Buble " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
 				CachedSize = 1,
 				ThreadNum = 1,
-				Scheduler = new RedisScheduler()
-				{
-					Host = "127.0.0.1",
-					Port = 6379,
-					// Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w"
-				},
 				SkipWhenResultIsEmpty = true,
-				Downloader = new HttpDownloader()
+				Downloader = new HttpClientDownloader()
 				{
 					Handlers = new List<IDownloadHandler>
 					{
@@ -44,7 +40,12 @@ namespace DotnetSpider.Sample
 					}
 				}
 			};
-			context.AddPipeline(new MysqlPipeline()
+			context.SetScheduler(new Extension.Scheduler.RedisScheduler {
+				Host = "127.0.0.1",
+				Port = 6379,
+				Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w"
+			});
+			context.AddEntityPipeline(new MysqlPipeline()
 			{
 				ConnectString = "Database='testhao';Data Source= 127.0.0.1;User ID=root;Password=root@123456;Port=4306",
 			});

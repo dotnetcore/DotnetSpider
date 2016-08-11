@@ -6,8 +6,8 @@ namespace DotnetSpider.Extension.Model
 {
 	public class TargetUrlExtractor
 	{
-		public List<Regex> Patterns { get; set; } = new List<Regex>();
+		public List<string> Patterns { get; set; } = new List<string>();
 		public List<Formatter.Formatter> Formatters { get; set; }
-		public ISelector Region { get; set; }
+		public Selector Region { get; set; }
 	}
 }

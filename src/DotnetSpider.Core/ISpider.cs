@@ -1,8 +1,6 @@
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Scheduler;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
 {
@@ -15,26 +13,14 @@ namespace DotnetSpider.Core
 		/// Unique id for a task.
 		/// </summary>
 		string Identity { get; }
-
 		/// <summary>
 		/// Site of a task
 		/// </summary>
 		Site Site { get; }
-
-		int ThreadNum { get; }
-
 		Dictionary<string, dynamic> Settings { get; }
-
-		IScheduler Scheduler { get; }
-
-		List<IPipeline> Pipelines { get; }
-
-		IPageProcessor PageProcessor { get; }
-
-		void Run();
-
+		void Run(params string[] arguments);
+		Task RunAsync(params string[] arguments);
 		void Stop();
-
 		void Exit();
 	}
 }

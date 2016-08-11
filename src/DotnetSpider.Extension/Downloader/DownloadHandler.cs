@@ -6,29 +6,10 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Redial;
 
-namespace DotnetSpider.Extension.Configuration
+namespace DotnetSpider.Extension.Downloader
 {
-	public abstract class DownloadHandler : IDownloadHandler
+	public abstract class DownloadHandler : Named, IDownloadHandler
 	{
-		[Flags]
-		public enum Types
-		{
-			SubContent,
-			RemoveContent,
-			RemoveContentHtmlTag,
-			CustomTarget,
-			ReplaceContent,
-			ContentToUpperOrLower,
-			RegexMatchContent,
-			UnescapeContent,
-			TrimContent,
-			RedialWhenContainsIllegalString,
-			RedialWhenExceptionThrow,
-			CycleRedial
-		}
-
-		public abstract Types Type { get; internal set; }
-
 		public abstract void Handle(Page page);
 	}
 
@@ -40,8 +21,6 @@ namespace DotnetSpider.Extension.Configuration
 		public string EndString { get; set; }
 		public int StartOffset { get; set; } = 0;
 		public int EndOffset { get; set; } = 0;
-
-		public override Types Type { get; internal set; } = Types.SubContent;
 
 		public override void Handle(Page p)
 		{
@@ -69,8 +48,6 @@ namespace DotnetSpider.Extension.Configuration
 		public int EndOffset { get; set; } = 0;
 		public bool RemoveAll { get; set; } = false;
 
-		public override Types Type { get; internal set; } = Types.RemoveContent;
-
 		public override void Handle(Page p)
 		{
 			string rawText = p.Content;
@@ -97,8 +74,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class RemoveContentHtmlTagHandler : DownloadHandler
 	{
-		public override Types Type { get; internal set; } = Types.RemoveContentHtmlTag;
-
 		public override void Handle(Page p)
 		{
 			var htmlDocument = new HtmlDocument();
@@ -109,7 +84,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class ContentToUpperOrLowerHandler : DownloadHandler
 	{
-		public override Types Type { get; internal set; } = Types.ContentToUpperOrLower;
 		public bool ToUpper { get; set; } = false;
 
 		public override void Handle(Page p)
@@ -131,8 +105,6 @@ namespace DotnetSpider.Extension.Configuration
 		public int StartOffset { get; set; } = 0;
 		public int EndOffset { get; set; } = 0;
 		public string TargetTag { get; set; } = "my_target";
-
-		public override Types Type { get; internal set; } = Types.CustomTarget;
 
 		public override void Handle(Page p)
 		{
@@ -173,7 +145,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class ReplaceContentHandler : DownloadHandler
 	{
-		public override Types Type { get; internal set; } = Types.ReplaceContent;
 		public string OldValue { get; set; }
 		public string NewValue { get; set; }
 
@@ -185,8 +156,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class TrimContentHandler : DownloadHandler
 	{
-		public override Types Type { get; internal set; } = Types.TrimContent;
-
 		public override void Handle(Page p)
 		{
 			p.Content = p.Content?.Trim();
@@ -195,8 +164,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class UnescapeContentHandler : DownloadHandler
 	{
-		public override Types Type { get; internal set; } = Types.UnescapeContent;
-
 		public override void Handle(Page p)
 		{
 			p.Content = Regex.Unescape(p.Content);
@@ -205,8 +172,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class RegexMatchContentHandler : DownloadHandler
 	{
-		public override Types Type { get; internal set; } = Types.RegexMatchContent;
-
 		public string Pattern { get; set; }
 
 		public override void Handle(Page p)
@@ -229,8 +194,6 @@ namespace DotnetSpider.Extension.Configuration
 	{
 		public string ContainsString { get; set; }
 
-		public override Types Type { get; internal set; } = Types.RedialWhenContainsIllegalString;
-
 		public override void Handle(Page page)
 		{
 			string rawText = page.Content;
@@ -248,8 +211,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class RedialWhenExceptionThrowHandler : DownloadHandler
 	{
-		public override Types Type { get; internal set; } = Types.RedialWhenExceptionThrow;
-
 		public string ExceptionMessage { get; set; } = string.Empty;
 
 		public override void Handle(Page page)
@@ -271,8 +232,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class CycleRedialHandler : DownloadHandler
 	{
-		public override Types Type { get; internal set; } = Types.CycleRedial;
-
 		public int RedialLimit { get; set; }
 		public static int RequestedCount { get; set; }
 

@@ -5,8 +5,9 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.Common;
 using DotnetSpider.Extension.Model.Formatter;
+using DotnetSpider.Extension.Model;
 
-namespace DotnetSpider.Extension.Configuration
+namespace DotnetSpider.Extension.Model
 {
 	public abstract class TargetUrlsHandler
 	{
@@ -54,10 +55,10 @@ namespace DotnetSpider.Extension.Configuration
 		public override Types Type { get; internal set; } = Types.IncreasePageNumber;
 
 		public Selector TotalPageSelector { get; set; }
-		public List<Formatter> TotalPageFormatters { get; set; }
+		public List<Formatter.Formatter> TotalPageFormatters { get; set; }
 
 		public Selector CurrenctPageSelector { get; set; }
-		public List<Formatter> CurrnetPageFormatters { get; set; }
+		public List<Formatter.Formatter> CurrnetPageFormatters { get; set; }
 
 		public override bool CanStop(Page page)
 		{
@@ -251,7 +252,7 @@ namespace DotnetSpider.Extension.Configuration
 		public bool IsBefore { get; set; } = true;
 		public List<string> Stoppers { get; set; } = new List<string>();
 		public Selector CurrenctPageSelector { get; set; }
-		public List<Formatter> CurrenctPageFormatters { get; set; }
+		public List<Formatter.Formatter> CurrenctPageFormatters { get; set; }
 
 		public override IList<Request> Handle(Page page)
 		{

@@ -183,6 +183,9 @@
     <Compile Include="..\Downloader\IDownloader.cs">
       <Link>Downloader\IDownloader.cs</Link>
     </Compile>
+    <Compile Include="..\INamed.cs">
+      <Link>INamed.cs</Link>
+    </Compile>
     <Compile Include="..\IocExtension.cs">
       <Link>IocExtension.cs</Link>
     </Compile>

@@ -6,6 +6,7 @@ using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.ORM;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Extension.Configuration;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -52,7 +53,7 @@ namespace DotnetSpider.Extension.Pipeline
 		protected override string GetCreateTableSql()
 		{
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS  `{Schema.Database }`.`{Schema.TableName}`  (");
-			string columNames = string.Join(", ", Columns.Select(p => $"`{p.Name}` {ConvertToDbType(p.DataType.ToLower())} "));
+			string columNames = string.Join(", ", Columns.Select(p => $"`{p.Name}` {ConvertToDbType(p.DataType)} "));
 			builder.Append(columNames.Substring(0, columNames.Length));
 			builder.Append(Primary == null || Primary.Count == 0 ? ",`__id` bigint AUTO_INCREMENT" : "");
 			foreach (var index in Indexs)
@@ -87,37 +88,37 @@ namespace DotnetSpider.Extension.Pipeline
 			return new MySqlParameter();
 		}
 
-		protected override string ConvertToDbType(string datatype)
+		protected override string ConvertToDbType(string dataType)
 		{
-			var match = RegexUtil.NumRegex.Match(datatype);
+			var match = RegexUtil.NumRegex.Match(dataType);
 			var length = match.Length == 0 ? 0 : int.Parse(match.Value);
 
-			if (RegexUtil.StringTypeRegex.IsMatch(datatype))
+			if (dataType.StartsWith("STRING,"))
 			{
-				return length == 0 ? "varchar(100)" : $"varchar({length})";
+				return length == 0 ? "VARCHAR(100)" : $"VARCHAR({length})";
 			}
 
-			if ("date" == datatype)
+			if ("DATE" == dataType)
 			{
-				return "date ";
+				return "DATE ";
 			}
 
-			if ("bool" == datatype)
+			if ("BOOL" == dataType)
 			{
-				return "tinyint(1) ";
+				return "TINYINT(1) ";
 			}
 
-			if ("time" == datatype)
+			if ("TIME" == dataType)
 			{
-				return "timestamp";
+				return "TIMESTAMP ";
 			}
 
-			if ("text" == datatype)
+			if ("TEXT" == dataType)
 			{
-				return "text";
+				return "TEXT";
 			}
 
-			throw new SpiderException("Unsport datatype: " + datatype);
+			throw new SpiderException("UNSPORT datatype: " + dataType);
 		}
 	}
 }

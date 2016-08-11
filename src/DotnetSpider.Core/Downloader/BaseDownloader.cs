@@ -4,7 +4,7 @@ using NLog;
 
 namespace DotnetSpider.Core.Downloader
 {
-	public class BaseDownloader : IDownloader, IDisposable
+	public class BaseDownloader : Named, IDownloader, IDisposable
 	{
 		protected ILogger Logger { get; set; }
 		public List<IDownloadHandler> Handlers { get; set; } = new List<IDownloadHandler>();

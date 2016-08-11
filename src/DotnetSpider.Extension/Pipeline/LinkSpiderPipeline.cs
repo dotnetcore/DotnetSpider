@@ -4,6 +4,7 @@ using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Extension.Configuration;
 using Newtonsoft.Json.Linq;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -24,7 +25,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private void Process(List<JObject> datas)
 		{
-			_prepareStartUrls.Build(Spider.Site, datas);
+			_prepareStartUrls.Build((Spider)Spider, datas);
 
 			foreach (var startRequest in Spider.Site.StartRequests)
 			{

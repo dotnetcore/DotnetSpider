@@ -22,7 +22,7 @@ namespace DotnetSpider.Sample
 			Spider spider = Spider.Create(site, new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
 
 			//spider.SetDownloader(downloader);
-			spider.Start();
+			spider.Run();
 			Console.Read();
 		}
 

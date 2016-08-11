@@ -44,8 +44,8 @@ namespace DotnetSpider.Core.Monitor
 				if (service.IsEnabled)
 				{
 					var spider = (Spider)obj;
-					var monitor = (IMonitorableScheduler)spider.Scheduler ;
-					
+					var monitor = spider.GetMonitor();
+
 					service.Watch(new SpiderStatus
 					{
 						Status = spider.StatusCode.ToString(),

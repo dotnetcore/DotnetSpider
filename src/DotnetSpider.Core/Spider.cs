@@ -23,37 +23,35 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Spider : ISpider
 	{
-		public ILogger Logger { get; set; }
-		public int ThreadNum { get; private set; } = 1;
+		protected ILogger Logger { get; set; }
+		public int ThreadNum { get; set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
 		public bool SpawnUrl { get; set; } = true;
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
-		public DateTime StartTime { get; private set; }
-		public DateTime FinishedTime { get; private set; } = DateTime.MinValue;
-		public Site Site { get; }
-		public string Identity { get; }
-		public List<IPipeline> Pipelines { get; private set; } = new List<IPipeline>();
-		public IDownloader Downloader { get; private set; }
-		public bool IsExitWhenComplete { get; set; } = true;
+		protected DateTime StartTime { get; private set; }
+		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
+		public Site Site { get; set; }
+		public string Identity { get; set; }
+		public IDownloader Downloader { get; set; }
+		protected bool IsExitWhenComplete { get; set; } = true;
 		public Status StatusCode => Stat;
-		public IScheduler Scheduler { get; }
+		protected IScheduler Scheduler { get; set; }
+		protected IPageProcessor PageProcessor { get; set; }
+		protected List<IPipeline> Pipelines { get; set; } = new List<IPipeline>();
 		public event SpiderEvent OnSuccess;
 		public event SpiderClosingHandler SpiderClosing;
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
-		public string UserId { get; }
-		public string TaskGroup { get; }
-		public bool IsExited { get; private set; }
-
-		public IPageProcessor PageProcessor { get; set; }
-		protected List<Request> StartRequests { get; set; }
-		protected static readonly int WaitInterval = 8;
+		public string UserId { get; set; }
+		public string TaskGroup { get; set; }
+		public int EmptySleepTime { get; set; } = 15000;
+		protected bool IsExited { get; private set; }
+		protected int WaitInterval = 10;
 		protected Status Stat = Status.Init;
-
-		private int _waitCountLimit = 20;
+		private int _waitCountLimit = 1500;
 		private bool _init;
 		//private static readonly Regex IdentifyRegex = new Regex(@"^[\S]+$");
 		private static bool _printedInfo;
-		private readonly FileInfo _errorRequestFile;
+		private FileInfo _errorRequestFile;
 		private readonly Random _random = new Random();
 
 		/// <summary>
@@ -94,6 +92,16 @@ namespace DotnetSpider.Core
 			return new Spider(site, identify, userid, taskGroup, pageProcessor, scheduler);
 		}
 
+		protected Spider()
+		{
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config"));
+			Logger = LogManager.GetCurrentClassLogger();
+			IsExit = false;
+		}
+
 		/// <summary>
 		/// Create a spider with pageProcessor.
 		/// </summary>
@@ -103,47 +111,47 @@ namespace DotnetSpider.Core
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
 		/// <param name="userid"></param>
-		protected Spider(Site site, string identity, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
+		protected Spider(Site site, string identity, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler) : this()
 		{
-			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config"));
+			Identity = identity;
+			UserId = userid;
+			PageProcessor = pageProcessor;
+			Site = site;
+			TaskGroup = taskGroup;
+			Scheduler = scheduler;
 
-			if (string.IsNullOrWhiteSpace(identity))
+			CheckIfSettingsCorrect();
+		}
+
+		protected void CheckIfSettingsCorrect()
+		{
+			if (string.IsNullOrWhiteSpace(Identity))
 			{
 				Identity = string.IsNullOrEmpty(Site.Domain) ? Guid.NewGuid().ToString() : Site.Domain;
 			}
-			else
-			{
-				//if (!IdentifyRegex.IsMatch(identity))
-				//{
-				//	throw new SpiderExceptoin("任务ID不能有空字符.");
-				//}
-				Identity = identity;
-			}
-			IsExit = false;
-			UserId = string.IsNullOrEmpty(userid) ? "DotnetSpider" : userid;
-			TaskGroup = string.IsNullOrEmpty(taskGroup) ? "DotnetSpider" : taskGroup;
-			Logger = LogManager.GetCurrentClassLogger();
 
-			if (pageProcessor == null)
+			UserId = string.IsNullOrEmpty(UserId) ? "DotnetSpider" : UserId;
+			TaskGroup = string.IsNullOrEmpty(TaskGroup) ? "DotnetSpider" : TaskGroup;
+
+			if (PageProcessor == null)
 			{
 				throw new SpiderException("PageProcessor should not be null.");
 			}
-			PageProcessor = pageProcessor;
-			Site = site;
+
+
+			if (Pipelines == null || Pipelines.Count == 0)
+			{
+				throw new SpiderException("Pipelines should not be null.");
+			}
+
 			if (Site == null)
 			{
-				throw new SpiderException("Site should not be null.");
+				Site = new Site();
 			}
-			PageProcessor.Site = site;
-			StartRequests = Site.StartRequests;
-			Scheduler = scheduler ?? new QueueDuplicateRemovedScheduler();
+			PageProcessor.Site = Site;
+			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
+			Downloader = Downloader ?? new HttpClientDownloader();
 			Scheduler.Init(this);
-#if !NET_CORE
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
-#else
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppContext.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
 		}
 
 		/// <summary>
@@ -165,20 +173,49 @@ namespace DotnetSpider.Core
 			return this;
 		}
 
+		public void SetSite(Site site)
+		{
+			CheckIfRunning();
+
+			Site = site;
+		}
+
+		public void SetIdentity(string identity)
+		{
+			CheckIfRunning();
+
+			Identity = identity;
+		}
+
 		/// <summary>
 		/// Set wait time when no url is polled.
 		/// </summary>
 		/// <param name="emptySleepTime"></param>
 		public void SetEmptySleepTime(int emptySleepTime)
 		{
+			CheckIfRunning();
+
 			if (emptySleepTime >= 1000)
 			{
-				_waitCountLimit = emptySleepTime / WaitInterval;
+				EmptySleepTime = emptySleepTime;
+				_waitCountLimit = EmptySleepTime / WaitInterval;
 			}
 			else
 			{
 				throw new SpiderException("Sleep time should be large than 1000.");
 			}
+		}
+
+		public void SetScheduler(IScheduler scheduler)
+		{
+			CheckIfRunning();
+			Scheduler = scheduler;
+		}
+
+		public void SetTaskGroup(string taskGroup)
+		{
+			CheckIfRunning();
+			TaskGroup = taskGroup;
 		}
 
 		/// <summary>
@@ -190,7 +227,7 @@ namespace DotnetSpider.Core
 		public Spider AddStartUrls(IList<string> startUrls)
 		{
 			CheckIfRunning();
-			StartRequests = new List<Request>(UrlUtils.ConvertToRequests(startUrls, 1));
+			Site.StartRequests.AddRange(UrlUtils.ConvertToRequests(startUrls, 1));
 			return this;
 		}
 
@@ -203,7 +240,7 @@ namespace DotnetSpider.Core
 		public Spider AddStartRequests(IList<Request> startRequests)
 		{
 			CheckIfRunning();
-			StartRequests = new List<Request>(startRequests);
+			Site.StartRequests.AddRange(startRequests);
 			return this;
 		}
 
@@ -216,8 +253,19 @@ namespace DotnetSpider.Core
 		{
 			foreach (string url in urls)
 			{
-				AddStartRequest(new Request(url, 1, null));
+				AddRequest(new Request(url, 1, null));
 			}
+			return this;
+		}
+
+		/// <summary>
+		/// Add urls to crawl.
+		/// </summary>
+		/// <param name="url"></param>
+		/// <returns></returns>
+		public Spider AddStartUrl(string url, Dictionary<string, dynamic> extras)
+		{
+			AddRequest(new Request(url, 1, extras));
 			return this;
 		}
 
@@ -225,8 +273,9 @@ namespace DotnetSpider.Core
 		{
 			foreach (string url in urls)
 			{
-				AddStartRequest(new Request(url, 1, null));
+				Site.StartRequests.Add(new Request(url, 1, null));
 			}
+
 			return this;
 		}
 
@@ -237,10 +286,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider AddRequest(params Request[] requests)
 		{
-			foreach (Request request in requests)
-			{
-				AddStartRequest(request);
-			}
+			Site.StartRequests.AddRange(requests);
 			return this;
 		}
 
@@ -249,7 +295,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="pipeline"></param>
 		/// <returns></returns>
-		public Spider AddPipeline(IPipeline pipeline)
+		public virtual Spider AddPipeline(IPipeline pipeline)
 		{
 			CheckIfRunning();
 			Pipelines.Add(pipeline);
@@ -261,7 +307,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="pipelines"></param>
 		/// <returns></returns>
-		public Spider AddPipelines(IList<IPipeline> pipelines)
+		public virtual Spider AddPipelines(IList<IPipeline> pipelines)
 		{
 			CheckIfRunning();
 			foreach (var pipeline in pipelines)
@@ -300,36 +346,32 @@ namespace DotnetSpider.Core
 				return;
 			}
 
+#if !NET_CORE
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+#else
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppContext.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
-
-			if (Downloader == null)
-			{
-				Downloader = new HttpClientDownloader();
-			}
-
-			if (Pipelines.Count == 0)
-			{
-				Pipelines.Add(new FilePipeline());
-			}
 
 			foreach (var pipeline in Pipelines)
 			{
 				pipeline.InitPipeline(this);
 			}
 
-			if (StartRequests != null && StartRequests.Count > 0)
+			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
-				Logger.Log(LogInfo.Create($"添加链接到调度中心, 数量: {StartRequests.Count}.", Logger.Name, this, LogLevel.Info));
+				Logger.Log(LogInfo.Create($"添加链接到调度中心, 数量: {Site.StartRequests.Count}.", Logger.Name, this, LogLevel.Info));
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
-					Parallel.ForEach(StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
+					Parallel.ForEach(Site.StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
 					{
 						Scheduler.Push(request);
 					});
 				}
 				else
 				{
-					Scheduler.Load(new HashSet<Request>(StartRequests));
+					Scheduler.Load(new HashSet<Request>(Site.StartRequests));
 					ClearStartRequests();
 				}
 			}
@@ -338,12 +380,16 @@ namespace DotnetSpider.Core
 				Logger.Log(LogInfo.Create("添加链接到调度中心, 数量: 0.", Logger.Name, this, LogLevel.Info));
 			}
 
+			_waitCountLimit = EmptySleepTime / WaitInterval;
+
 			_init = true;
 		}
 
-		public void Run()
+		public virtual void Run(params string[] arguments)
 		{
 			CheckIfRunning();
+
+			CheckIfSettingsCorrect();
 
 			Stat = Status.Running;
 			IsExited = false;
@@ -432,12 +478,12 @@ namespace DotnetSpider.Core
 
 			FinishedTime = DateTime.Now;
 
-			SpiderClosing?.Invoke();
-
 			foreach (IPipeline pipeline in Pipelines)
 			{
 				SafeDestroy(pipeline);
 			}
+
+			SpiderClosing?.Invoke();
 
 			if (Stat == Status.Finished)
 			{
@@ -475,20 +521,18 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public Task RunAsync()
+		public Task RunAsync(params string[] arguments)
 		{
-			return Task.Factory.StartNew(Run).ContinueWith(t =>
+			return Task.Factory.StartNew(() =>
+			{
+				Run(arguments);
+			}).ContinueWith(t =>
 			{
 				if (t.Exception != null)
 				{
 					Logger.Error(t.Exception.Message);
 				}
 			});
-		}
-
-		public Task Start()
-		{
-			return RunAsync();
 		}
 
 		public void Stop()
@@ -524,12 +568,12 @@ namespace DotnetSpider.Core
 			{
 				File.AppendAllText(_errorRequestFile.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
 			}
-			(Scheduler as IMonitorableScheduler)?.IncreaseErrorCounter();
+			Scheduler.IncreaseErrorCounter();
 		}
 
 		protected void _OnSuccess(Request request)
 		{
-			(Scheduler as IMonitorableScheduler)?.IncreaseSuccessCounter();
+			Scheduler.IncreaseSuccessCounter();
 			OnSuccess?.Invoke(request);
 		}
 
@@ -670,7 +714,7 @@ namespace DotnetSpider.Core
 			{
 				foreach (Request request in page.TargetRequests)
 				{
-					AddStartRequest(request);
+					Scheduler.Push(request);
 				}
 			}
 		}
@@ -687,14 +731,9 @@ namespace DotnetSpider.Core
 		{
 			lock (this)
 			{
-				StartRequests.Clear();
+				Site.StartRequests.Clear();
 				GC.Collect();
 			}
-		}
-
-		private void AddStartRequest(Request request)
-		{
-			Scheduler.Push(request);
 		}
 
 		private void WaitNewUrl(ref int waitCount)
@@ -726,6 +765,11 @@ namespace DotnetSpider.Core
 			{
 				Thread.Sleep(1500);
 			}
+		}
+
+		public IMonitorable GetMonitor()
+		{
+			return Scheduler;
 		}
 
 		public void Dispose()

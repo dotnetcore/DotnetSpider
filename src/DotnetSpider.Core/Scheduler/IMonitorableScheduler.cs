@@ -1,9 +1,9 @@
-namespace DotnetSpider.Core.Scheduler 
+namespace DotnetSpider.Core.Scheduler
 {
 	/// <summary>
 	/// The scheduler whose requests can be counted for monitor.
 	/// </summary>
-	public interface IMonitorableScheduler : IScheduler
+	public interface IMonitorable
 	{
 		long GetLeftRequestsCount();
 

@@ -1,15 +1,16 @@
 using DotnetSpider.Core.Scheduler.Component;
 using System.Collections.Generic;
+using System;
 
 namespace DotnetSpider.Core.Scheduler
 {
 	/// <summary>
 	/// Remove duplicate urls and only push urls which are not duplicate.
 	/// </summary>
-	public abstract class DuplicateRemovedScheduler : IScheduler
+	public abstract class DuplicateRemovedScheduler : Named, IScheduler
 	{
 		protected IDuplicateRemover DuplicateRemover { get; set; } = new HashSetDuplicateRemover();
-		public ISpider Spider { get; protected set; }
+		protected ISpider Spider { get; set; }
 
 		public void Push(Request request)
 		{
@@ -77,5 +78,17 @@ namespace DotnetSpider.Core.Scheduler
 		{
 			DuplicateRemover.ResetDuplicateCheck();
 		}
+
+		public abstract long GetLeftRequestsCount();
+
+		public abstract long GetTotalRequestsCount();
+
+		public abstract long GetSuccessRequestsCount();
+
+		public abstract long GetErrorRequestsCount();
+
+		public abstract void IncreaseSuccessCounter();
+
+		public abstract void IncreaseErrorCounter();
 	}
 }

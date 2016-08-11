@@ -10,53 +10,22 @@ using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using System.Data.SqlClient;
 using System.Data.Common;
-using static DotnetSpider.Extension.Configuration.BaseDbPrepareStartUrls;
+using DotnetSpider.Extension.Common;
 #if !NET_CORE
 using System.Web;
 #else
 using System.Net;
 #endif
 
-namespace DotnetSpider.Extension.Configuration
+namespace DotnetSpider.Extension.Model
 {
-	public enum DataSource
+	public abstract class PrepareStartUrls : Named
 	{
-		MySql,
-		MsSql
-	}
-
-	public class DataSourceUtil
-	{
-		public static DbConnection GetConnection(DataSource source, string connectString)
+		public class Column
 		{
-			switch (source)
-			{
-				case DataSource.MySql:
-					{
-						return new MySqlConnection(connectString);
-					}
-				case DataSource.MsSql:
-					{
-						return new SqlConnection(connectString);
-					}
-			}
+			public string Name { get; set; }
 
-			throw new SpiderException($"Unsported datasource: {source}");
-		}
-	}
-
-	public abstract class PrepareStartUrls
-	{
-		[Flags]
-		public enum Types
-		{
-			Base,
-			CommonDb,
-			ConfigDb,
-			DbList,
-			Cycle,
-			DateCycle,
-			LinkSpider
+			public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
 		}
 
 		public string Method { get; set; } = "GET";
@@ -69,15 +38,11 @@ namespace DotnetSpider.Extension.Configuration
 
 		public Dictionary<string, object> Extras { get; set; }
 
-		public abstract void Build(Site site, dynamic obj);
-
-		public abstract Types Type { get; internal set; }
+		public abstract void Build(Spider site, dynamic obj);
 	}
 
 	public class CyclePrepareStartUrls : PrepareStartUrls
 	{
-		public override Types Type { get; internal set; } = Types.Cycle;
-
 		public int From { get; set; }
 		public int To { get; set; }
 
@@ -85,7 +50,7 @@ namespace DotnetSpider.Extension.Configuration
 
 		public string FormateString { get; set; }
 
-		public override void Build(Site site, dynamic obj)
+		public override void Build(Spider site, dynamic obj)
 		{
 			Dictionary<string, object> data = new Dictionary<string, object>();
 
@@ -99,7 +64,7 @@ namespace DotnetSpider.Extension.Configuration
 
 			for (int i = From; i <= To; i += Interval)
 			{
-				site.AddStartRequest(new Request(string.Format(FormateString, i), 1, data)
+				site.AddRequest(new Request(string.Format(FormateString, i), 1, data)
 				{
 					PostBody = PostBody,
 					Origin = Origin,
@@ -112,8 +77,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class DateCyclePrepareStartUrls : PrepareStartUrls
 	{
-		public override Types Type { get; internal set; } = Types.DateCycle;
-
 		public DateTime From { get; set; }
 		public DateTime To { get; set; }
 
@@ -121,7 +84,7 @@ namespace DotnetSpider.Extension.Configuration
 		public string DateFormate { get; set; } = "yyyy-MM-dd";
 		public string FormateString { get; set; }
 
-		public override void Build(Site site, dynamic obj)
+		public override void Build(Spider site, dynamic obj)
 		{
 			Dictionary<string, object> data = new Dictionary<string, object>();
 
@@ -135,7 +98,7 @@ namespace DotnetSpider.Extension.Configuration
 
 			for (DateTime i = From; i <= To; i = i.AddDays(IntervalDay))
 			{
-				site.AddStartRequest(new Request(string.Format(FormateString, i.ToString(DateFormate)), 1, data)
+				site.AddRequest(new Request(string.Format(FormateString, i.ToString(DateFormate)), 1, data)
 				{
 					PostBody = PostBody,
 					Origin = Origin,
@@ -148,15 +111,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class BaseDbPrepareStartUrls : PrepareStartUrls
 	{
-		public class Column
-		{
-			public string Name { get; set; }
-
-			public List<Formatter> Formatters { get; set; } = new List<Formatter>();
-		}
-
-		public override Types Type { get; internal set; } = Types.Base;
-
 		public DataSource Source { get; set; } = DataSource.MySql;
 
 		public string ConnectString { get; set; }
@@ -236,7 +190,7 @@ namespace DotnetSpider.Extension.Configuration
 		{
 		}
 
-		public override void Build(Site site, dynamic obj)
+		public override void Build(Spider site, dynamic obj)
 		{
 			BuildQueryString();
 
@@ -248,7 +202,7 @@ namespace DotnetSpider.Extension.Configuration
 				foreach (var formate in FormateStrings)
 				{
 					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					site.AddStartRequest(new Request(tmpUrl, 0, data)
+					site.AddRequest(new Request(tmpUrl, 0, data)
 					{
 						Method = Method,
 						Origin = Origin,
@@ -289,7 +243,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class ConfigurableDbPrepareStartUrls : BaseDbPrepareStartUrls
 	{
-		public override Types Type { get; internal set; } = Types.ConfigDb;
 		/// <summary>
 		/// 数据来源表名, 需要Schema/数据库名
 		/// </summary>
@@ -353,8 +306,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class DbCommonPrepareStartUrls : ConfigurableDbPrepareStartUrls
 	{
-		public override Types Type { get; internal set; } = Types.CommonDb;
-
 		public int From { get; set; }
 		public int To { get; set; }
 		public int Interval { get; set; } = 1;
@@ -363,7 +314,7 @@ namespace DotnetSpider.Extension.Configuration
 		public int PostFrom { get; set; }
 		public int PostTo { get; set; }
 
-		public override void Build(Site site, dynamic obj)
+		public override void Build(Spider site, dynamic obj)
 		{
 			if (string.IsNullOrEmpty(QueryString))
 			{
@@ -383,7 +334,7 @@ namespace DotnetSpider.Extension.Configuration
 						foreach (var formate in FormateStrings)
 						{
 							string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-							site.AddStartRequest(new Request(tmpUrl, 0, data)
+							site.AddRequest(new Request(tmpUrl, 0, data)
 							{
 								Method = Method,
 								Origin = Origin,
@@ -411,15 +362,13 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class DbListPrepareStartUrls : ConfigurableDbPrepareStartUrls
 	{
-		public override Types Type { get; internal set; } = Types.DbList;
-
 		public int Interval { get; set; }
 		public string ColumnSeparator { get; set; }
 		public string RowSeparator { get; set; }
 
 		public string FormateString { get; set; }
 
-		public override void Build(Site site, dynamic obj)
+		public override void Build(Spider site, dynamic obj)
 		{
 			BuildQueryString();
 
@@ -435,7 +384,7 @@ namespace DotnetSpider.Extension.Configuration
 					foreach (var formate in FormateStrings)
 					{
 						string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - (string.IsNullOrEmpty(RowSeparator) ? 0 : RowSeparator.Length)));
-						site.AddStartRequest(new Request(tmpUrl, 0, null)
+						site.AddRequest(new Request(tmpUrl, 0, null)
 						{
 							Method = Method,
 							Origin = Origin,
@@ -466,7 +415,7 @@ namespace DotnetSpider.Extension.Configuration
 					foreach (var formate in FormateStrings)
 					{
 						string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - 1));
-						site.AddStartRequest(new Request(tmpUrl, 0, null)
+						site.AddRequest(new Request(tmpUrl, 0, null)
 						{
 							Method = Method,
 							Origin = Origin,
@@ -480,8 +429,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class LinkSpiderPrepareStartUrls : PrepareStartUrls
 	{
-		public override Types Type { get; internal set; } = Types.LinkSpider;
-
 		/// <summary>
 		/// 用于拼接Url所需要的列
 		/// </summary>
@@ -493,7 +440,7 @@ namespace DotnetSpider.Extension.Configuration
 		/// </summary>
 		public List<string> FormateStrings { get; set; }
 
-		public override void Build(Site site, dynamic obj)
+		public override void Build(Spider site, dynamic obj)
 		{
 			foreach (JObject jobject in obj)
 			{
@@ -524,11 +471,11 @@ namespace DotnetSpider.Extension.Configuration
 				foreach (var formate in FormateStrings)
 				{
 					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					site.AddStartRequest(new Request(tmpUrl, 0, tmp)
+					site.AddRequest(new Request(tmpUrl, 0, tmp)
 					{
 						Method = Method,
 						Origin = Origin,
-						PostBody = GetPostBody(PostBody, tmp),
+						PostBody = BaseDbPrepareStartUrls.GetPostBody(PostBody, tmp),
 						Referer = Referer
 					});
 				}

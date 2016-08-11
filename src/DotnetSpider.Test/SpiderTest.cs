@@ -24,11 +24,11 @@ namespace DotnetSpider.Test
 			Spider spider = Spider.Create(new Site() { EncodingName = "UTF-8" }, new SimplePageProcessor("http://www.oschina.net/", "http://www.oschina.net/*")).AddPipeline(new TestPipeline()).SetThreadNum(1);
 			Page p = downloader.Download(new Request("http://www.baidu.com/", 2, new Dictionary<string, dynamic>()), spider);
 			Console.WriteLine(p.Content);
-			spider.Start();
+			spider.Run();
 			Thread.Sleep(10000);
 			spider.Stop();
 			Thread.Sleep(10000);
-			spider.Start();
+			spider.Run();
 			Thread.Sleep(10000);
 		}
 
@@ -107,7 +107,34 @@ namespace DotnetSpider.Test
 
 			public void Clear()
 			{
-				throw new NotImplementedException();
+			}
+
+			public long GetLeftRequestsCount()
+			{
+				return 0;
+			}
+
+			public long GetTotalRequestsCount()
+			{
+				return 0;
+			}
+
+			public long GetSuccessRequestsCount()
+			{
+				return 0;
+			}
+
+			public long GetErrorRequestsCount()
+			{
+				return 0;
+			}
+
+			public void IncreaseSuccessCounter()
+			{
+			}
+
+			public void IncreaseErrorCounter()
+			{
 			}
 		}
 

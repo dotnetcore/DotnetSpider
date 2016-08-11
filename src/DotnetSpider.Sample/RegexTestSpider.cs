@@ -3,18 +3,19 @@ using DotnetSpider.Extension;
 using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Sample
 {
 	public class RegexTestSpider : SpiderBuilder
 	{
-		protected override SpiderContext GetSpiderContext()
+		protected override EntitySpider GetSpiderContext()
 		{
-			SpiderContext context = new SpiderContext();
+			EntitySpider context = new EntitySpider(new Site());
 			context.SetTaskGroup("cnblogs homepage");
-			context.SetSpiderName("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			context.SetIdentity("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddStartUrl("http://www.cnblogs.com");
-			context.AddPipeline(new ConslePipeline());
+			context.AddEntityPipeline(new ConslePipeline());
 			context.AddEntityType(typeof(HomePage));
 			return context;
 		}

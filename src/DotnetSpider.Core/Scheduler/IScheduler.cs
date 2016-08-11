@@ -9,10 +9,8 @@ namespace DotnetSpider.Core.Scheduler
 	/// manage urls to fetch
 	/// remove duplicate urls
 	/// </summary>
-	public interface IScheduler : IDisposable
+	public interface IScheduler : IDisposable, IMonitorable
 	{
-		ISpider Spider { get; }
-
 		void Init(ISpider spider);
 
 		/// <summary>

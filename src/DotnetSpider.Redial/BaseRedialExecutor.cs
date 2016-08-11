@@ -8,9 +8,9 @@ using NLog;
 
 namespace DotnetSpider.Redial
 {
-	public abstract class BaseRedialExecutor : IRedialExecutor
+	public abstract class RedialExecutor : IRedialExecutor
 	{
-		public ILogger Logger { get; }
+		protected ILogger Logger { get; }
 
 		public IRedialer Redialer { get; }
 		public IInternetDetector InternetDetector { get; }
@@ -20,8 +20,9 @@ namespace DotnetSpider.Redial
 		public abstract void DeleteActionIdentity(string identity);
 		public abstract bool CheckIsRedialing();
 		public abstract void ReleaseRedialLocker();
+		public abstract void Init();
 
-		protected BaseRedialExecutor(IRedialer redialer, IInternetDetector validater)
+		protected RedialExecutor(IRedialer redialer, IInternetDetector validater)
 		{
 			if (redialer == null || validater == null)
 			{

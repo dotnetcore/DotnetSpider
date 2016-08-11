@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotnetSpider.Core;
+using System;
 #if !NET_CORE
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
@@ -9,20 +10,11 @@ using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Configuration
 {
-	public abstract class Loginer
+	public abstract class Loginer : Named
 	{
-		[Flags]
-		public enum Types
-		{
-			Common,
-			Manual,
-		}
-
-		public abstract Types Type { get; internal set; }
-
 		public abstract bool Login(dynamic obj);
 	}
-	
+
 #if !NET_CORE
 	public class VerifyCode
 	{
@@ -47,8 +39,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class CommonLoginer : Loginer
 	{
-		public override Types Type { get; internal set; } = Types.Common;
-
 		public string Url { get; set; }
 
 		public Selector UserSelector { get; set; }
@@ -106,8 +96,6 @@ namespace DotnetSpider.Extension.Configuration
 
 	public class ManualLoginer : Loginer
 	{
-		public override Types Type { get; internal set; } = Types.Manual;
-
 		public string Url { get; set; }
 
 		public override bool Login(dynamic webDriver)
