@@ -14,7 +14,7 @@ namespace HtmlAgilityPack
 
         #region Static Members
 
-        private static uint[] crc_32_tab = // CRC polynomial 0xedb88320 
+        private static uint[] _crc32Tab = // CRC polynomial 0xedb88320 
             {
                 0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
                 0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
@@ -80,7 +80,7 @@ namespace HtmlAgilityPack
         /// </summary>
         /// <param name="bytes">The array of bytes to compute the checksum for.</param>
         /// <returns>The computed checksum.</returns>
-        public static uint CRC32Bytes(byte[] bytes)
+        public static uint Crc32Bytes(byte[] bytes)
         {
             uint oldcrc32;
             oldcrc32 = 0xFFFFFFFF;
@@ -89,7 +89,7 @@ namespace HtmlAgilityPack
             for (int i = 0; len > 0; i++)
             {
                 --len;
-                oldcrc32 = UPDC32(bytes[len], oldcrc32);
+                oldcrc32 = Updc32(bytes[len], oldcrc32);
             }
             return ~oldcrc32;
         }
@@ -99,7 +99,7 @@ namespace HtmlAgilityPack
         /// </summary>
         /// <param name="text">The string to compute the checksum for.</param>
         /// <returns>The computed checksum.</returns>
-        public static uint CRC32String(string text)
+        public static uint Crc32String(string text)
         {
             uint oldcrc32;
             oldcrc32 = 0xFFFFFFFF;
@@ -116,8 +116,8 @@ namespace HtmlAgilityPack
                     lowByte = (byte) (uCharVal & 0x00ff);
                     hiByte = (byte) (uCharVal >> 8);
                 }
-                oldcrc32 = UPDC32(hiByte, oldcrc32);
-                oldcrc32 = UPDC32(lowByte, oldcrc32);
+                oldcrc32 = Updc32(hiByte, oldcrc32);
+                oldcrc32 = Updc32(lowByte, oldcrc32);
             }
 
             return ~oldcrc32;
@@ -137,8 +137,8 @@ namespace HtmlAgilityPack
             byte lowByte, hiByte;
             lowByte = (byte) (c & 0x00ff);
             hiByte = (byte) (c >> 8);
-            _crc32 = UPDC32(hiByte, _crc32);
-            _crc32 = UPDC32(lowByte, _crc32);
+            _crc32 = Updc32(hiByte, _crc32);
+            _crc32 = Updc32(lowByte, _crc32);
             return ~_crc32;
         }
 
@@ -146,9 +146,9 @@ namespace HtmlAgilityPack
 
         #region Private Methods
 
-        private static uint UPDC32(byte octet, uint crc)
+        private static uint Updc32(byte octet, uint crc)
         {
-            return (crc_32_tab[((crc) ^ (octet)) & 0xff] ^ ((crc) >> 8));
+            return (_crc32Tab[((crc) ^ (octet)) & 0xff] ^ ((crc) >> 8));
         }
 
         #endregion

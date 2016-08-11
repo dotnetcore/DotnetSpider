@@ -4,12 +4,8 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Model.Formatter;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
-using System.Data.SqlClient;
-using System.Data.Common;
 using DotnetSpider.Extension.Common;
 #if !NET_CORE
 using System.Web;

@@ -14,7 +14,7 @@ namespace HtmlAgilityPack
 
         internal Dictionary<string, HtmlAttribute> Hashitems = new Dictionary<string, HtmlAttribute>();
         private HtmlNode _ownernode;
-        private List<HtmlAttribute> items = new List<HtmlAttribute>();
+        private List<HtmlAttribute> _items = new List<HtmlAttribute>();
 
         #endregion
 
@@ -55,7 +55,7 @@ namespace HtmlAgilityPack
         /// </summary>
         public int Count
         {
-            get { return items.Count; }
+            get { return _items.Count; }
         }
 
         /// <summary>
@@ -71,8 +71,8 @@ namespace HtmlAgilityPack
         /// </summary>
         public HtmlAttribute this[int index]
         {
-            get { return items[index]; }
-            set { items[index] = value; }
+            get { return _items[index]; }
+            set { _items[index] = value; }
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace HtmlAgilityPack
         /// </summary>
         void ICollection<HtmlAttribute>.Clear()
         {
-            items.Clear();
+            _items.Clear();
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace HtmlAgilityPack
         /// <returns></returns>
         public bool Contains(HtmlAttribute item)
         {
-            return items.Contains(item);
+            return _items.Contains(item);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace HtmlAgilityPack
         /// <param name="arrayIndex"></param>
         public void CopyTo(HtmlAttribute[] array, int arrayIndex)
         {
-            items.CopyTo(array, arrayIndex);
+            _items.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace HtmlAgilityPack
         /// <returns></returns>
         IEnumerator<HtmlAttribute> IEnumerable<HtmlAttribute>.GetEnumerator()
         {
-            return items.GetEnumerator();
+            return _items.GetEnumerator();
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace HtmlAgilityPack
         /// <returns></returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return items.GetEnumerator();
+            return _items.GetEnumerator();
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace HtmlAgilityPack
         /// <returns></returns>
         public int IndexOf(HtmlAttribute item)
         {
-            return items.IndexOf(item);
+            return _items.IndexOf(item);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace HtmlAgilityPack
 
             Hashitems[item.Name] = item;
             item._ownernode = _ownernode;
-            items.Insert(index, item);
+            _items.Insert(index, item);
 
             _ownernode.SetChanged();
         }
@@ -166,7 +166,7 @@ namespace HtmlAgilityPack
         /// <returns></returns>
         bool ICollection<HtmlAttribute>.Remove(HtmlAttribute item)
         {
-            return items.Remove(item);
+            return _items.Remove(item);
         }
 
         /// <summary>
@@ -175,9 +175,9 @@ namespace HtmlAgilityPack
         /// <param name="index">The index of the attribute to remove.</param>
         public void RemoveAt(int index)
         {
-            HtmlAttribute att = items[index];
+            HtmlAttribute att = _items[index];
             Hashitems.Remove(att.Name);
-            items.RemoveAt(index);
+            _items.RemoveAt(index);
 
             _ownernode.SetChanged();
         }
@@ -210,7 +210,7 @@ namespace HtmlAgilityPack
 
             Hashitems[newAttribute.Name] = newAttribute;
             newAttribute._ownernode = _ownernode;
-            items.Add(newAttribute);
+            _items.Add(newAttribute);
 
             _ownernode.SetChanged();
             return newAttribute;
@@ -246,9 +246,9 @@ namespace HtmlAgilityPack
         /// <returns></returns>
         public bool Contains(string name)
         {
-            for (int i = 0; i < items.Count; i++)
+            for (int i = 0; i < _items.Count; i++)
             {
-                if (items[i].Name.Equals(name.ToLower()))
+                if (_items[i].Name.Equals(name.ToLower()))
                     return true;
             }
             return false;
@@ -295,9 +295,9 @@ namespace HtmlAgilityPack
             }
 
             string lname = name.ToLower();
-            for (int i = 0; i < items.Count; i++)
+            for (int i = 0; i < _items.Count; i++)
             {
-                HtmlAttribute att = items[i];
+                HtmlAttribute att = _items[i];
                 if (att.Name == lname)
                 {
                     RemoveAt(i);
@@ -311,7 +311,7 @@ namespace HtmlAgilityPack
         public void RemoveAll()
         {
             Hashitems.Clear();
-            items.Clear();
+            _items.Clear();
 
             _ownernode.SetChanged();
         }
@@ -328,10 +328,10 @@ namespace HtmlAgilityPack
         public IEnumerable<HtmlAttribute> AttributesWithName(string attributeName)
         {
             attributeName = attributeName.ToLower();
-            for (int i = 0; i < items.Count; i++)
+            for (int i = 0; i < _items.Count; i++)
             {
-                if (items[i].Name.Equals(attributeName))
-                    yield return items[i];
+                if (_items[i].Name.Equals(attributeName))
+                    yield return _items[i];
             }
         }
 
@@ -340,7 +340,7 @@ namespace HtmlAgilityPack
         /// </summary>
         public void Remove()
         {
-            foreach (HtmlAttribute item in items)
+            foreach (HtmlAttribute item in _items)
                 item.Remove();
         }
 
@@ -354,7 +354,7 @@ namespace HtmlAgilityPack
         internal void Clear()
         {
             Hashitems.Clear();
-            items.Clear();
+            _items.Clear();
         }
 
         internal int GetAttributeIndex(HtmlAttribute attribute)
@@ -363,9 +363,9 @@ namespace HtmlAgilityPack
             {
                 throw new ArgumentNullException("attribute");
             }
-            for (int i = 0; i < items.Count; i++)
+            for (int i = 0; i < _items.Count; i++)
             {
-                if ((items[i]) == attribute)
+                if ((_items[i]) == attribute)
                     return i;
             }
             return -1;
@@ -378,9 +378,9 @@ namespace HtmlAgilityPack
                 throw new ArgumentNullException("name");
             }
             string lname = name.ToLower();
-            for (int i = 0; i < items.Count; i++)
+            for (int i = 0; i < _items.Count; i++)
             {
-                if ((items[i]).Name == lname)
+                if ((_items[i]).Name == lname)
                     return i;
             }
             return -1;

@@ -432,11 +432,11 @@ namespace HtmlAgilityPack
         /// Gets the value of the HTML attribute with the specified LocalName and NamespaceURI.
         /// </summary>
         /// <param name="localName">The local name of the HTML attribute.</param>
-        /// <param name="namespaceURI">The namespace URI of the attribute. Unsupported with the HtmlNavigator implementation.</param>
+        /// <param name="namespaceUri">The namespace URI of the attribute. Unsupported with the HtmlNavigator implementation.</param>
         /// <returns>The value of the specified HTML attribute. String.Empty or null if a matching attribute is not found or if the navigator is not positioned on an element node.</returns>
-        public override string GetAttribute(string localName, string namespaceURI)
+        public override string GetAttribute(string localName, string namespaceUri)
         {
-            InternalTrace("localName=" + localName + ", namespaceURI=" + namespaceURI);
+            InternalTrace("localName=" + localName + ", namespaceURI=" + namespaceUri);
             HtmlAttribute att = _currentnode.Attributes[localName];
             if (att == null)
             {
@@ -509,11 +509,11 @@ namespace HtmlAgilityPack
         /// Moves to the HTML attribute with matching LocalName and NamespaceURI.
         /// </summary>
         /// <param name="localName">The local name of the HTML attribute.</param>
-        /// <param name="namespaceURI">The namespace URI of the attribute. Unsupported with the HtmlNavigator implementation.</param>
+        /// <param name="namespaceUri">The namespace URI of the attribute. Unsupported with the HtmlNavigator implementation.</param>
         /// <returns>true if the HTML attribute is found, otherwise, false. If false, the position of the navigator does not change.</returns>
-        public override bool MoveToAttribute(string localName, string namespaceURI)
+        public override bool MoveToAttribute(string localName, string namespaceUri)
         {
-            InternalTrace("localName=" + localName + ", namespaceURI=" + namespaceURI);
+            InternalTrace("localName=" + localName + ", namespaceURI=" + namespaceUri);
             int index = _currentnode.Attributes.GetAttributeIndex(localName);
             if (index == -1)
             {

@@ -8,7 +8,6 @@ using System.Linq;
 using DotnetSpider.Extension.Model;
 using Site = DotnetSpider.Core.Site;
 using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Common;
 #if !NET_CORE
@@ -30,7 +29,7 @@ namespace DotnetSpider.Extension.Processor
 
 		protected readonly IList<IEntityExtractor> EntityExtractorList = new List<IEntityExtractor>();
 		public Func<Page, IList<Request>> GetCustomizeTargetUrls;
-		private List<TargetUrlExtractorInfo> _targetUrlExtractors { get; } = new List<TargetUrlExtractorInfo>();
+		private List<TargetUrlExtractorInfo> TargetUrlExtractors { get; } = new List<TargetUrlExtractorInfo>();
 
 		private readonly EntitySpider _spiderContext;
 
@@ -42,7 +41,7 @@ namespace DotnetSpider.Extension.Processor
 
 		public void AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
 		{
-			_targetUrlExtractors.Add(new TargetUrlExtractorInfo
+			TargetUrlExtractors.Add(new TargetUrlExtractorInfo
 			{
 				Patterns = targetUrlExtractor.Patterns.Select(t => new Regex(t)).ToList(),
 				Formatters = targetUrlExtractor.Formatters,
@@ -78,7 +77,7 @@ namespace DotnetSpider.Extension.Processor
 			{
 				if (GetCustomizeTargetUrls == null)
 				{
-					ExtractLinks(page, _targetUrlExtractors);
+					ExtractLinks(page, TargetUrlExtractors);
 				}
 				else
 				{

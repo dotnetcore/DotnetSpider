@@ -79,27 +79,27 @@ namespace HtmlAgilityPack
 
         #region Private Methods
 
-        private static void GetBoolArg(string Arg, string Name, ref bool ArgValue)
+        private static void GetBoolArg(string arg, string name, ref bool argValue)
         {
-            if (Arg.Length < (Name.Length + 1)) // -name is 1 more than name
+            if (arg.Length < (name.Length + 1)) // -name is 1 more than name
                 return;
-            if (('/' != Arg[0]) && ('-' != Arg[0])) // not a param
+            if (('/' != arg[0]) && ('-' != arg[0])) // not a param
                 return;
-            if (Arg.Substring(1, Name.Length).ToLower() == Name.ToLower())
-                ArgValue = true;
+            if (arg.Substring(1, name.Length).ToLower() == name.ToLower())
+                argValue = true;
         }
 
-        private static void GetIntArg(string Arg, string Name, ref int ArgValue)
+        private static void GetIntArg(string arg, string name, ref int argValue)
         {
-            if (Arg.Length < (Name.Length + 3)) // -name:12 is 3 more than name
+            if (arg.Length < (name.Length + 3)) // -name:12 is 3 more than name
                 return;
-            if (('/' != Arg[0]) && ('-' != Arg[0])) // not a param
+            if (('/' != arg[0]) && ('-' != arg[0])) // not a param
                 return;
-            if (Arg.Substring(1, Name.Length).ToLower() == Name.ToLower())
+            if (arg.Substring(1, name.Length).ToLower() == name.ToLower())
             {
                 try
                 {
-                    ArgValue = Convert.ToInt32(Arg.Substring(Name.Length + 2, Arg.Length - Name.Length - 2));
+                    argValue = Convert.ToInt32(arg.Substring(name.Length + 2, arg.Length - name.Length - 2));
                 }
                 catch
                 {
@@ -107,22 +107,22 @@ namespace HtmlAgilityPack
             }
         }
 
-        private static bool GetStringArg(string Arg, ref string ArgValue)
+        private static bool GetStringArg(string arg, ref string argValue)
         {
-            if (('/' == Arg[0]) || ('-' == Arg[0]))
+            if (('/' == arg[0]) || ('-' == arg[0]))
                 return false;
-            ArgValue = Arg;
+            argValue = arg;
             return true;
         }
 
-        private static void GetStringArg(string Arg, string Name, ref string ArgValue)
+        private static void GetStringArg(string arg, string name, ref string argValue)
         {
-            if (Arg.Length < (Name.Length + 3)) // -name:x is 3 more than name
+            if (arg.Length < (name.Length + 3)) // -name:x is 3 more than name
                 return;
-            if (('/' != Arg[0]) && ('-' != Arg[0])) // not a param
+            if (('/' != arg[0]) && ('-' != arg[0])) // not a param
                 return;
-            if (Arg.Substring(1, Name.Length).ToLower() == Name.ToLower())
-                ArgValue = Arg.Substring(Name.Length + 2, Arg.Length - Name.Length - 2);
+            if (arg.Substring(1, name.Length).ToLower() == name.ToLower())
+                argValue = arg.Substring(name.Length + 2, arg.Length - name.Length - 2);
         }
 
         private static void ParseArgs()

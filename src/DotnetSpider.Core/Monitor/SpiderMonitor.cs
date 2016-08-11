@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Core.Scheduler;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 

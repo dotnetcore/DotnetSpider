@@ -4,7 +4,6 @@ using System.Text;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json.Linq;
-using DotnetSpider.Extension.Configuration;
 using System;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Model;

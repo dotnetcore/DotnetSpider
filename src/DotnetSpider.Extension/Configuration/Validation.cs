@@ -1,5 +1,4 @@
 using DotnetSpider.Extension.Common;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Validation;
 using System;
 using System.Collections.Generic;

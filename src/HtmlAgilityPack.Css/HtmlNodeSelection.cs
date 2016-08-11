@@ -17,7 +17,7 @@
     /// </remarks>
     public static class HtmlNodeSelection
     {
-        private static readonly HtmlNodeOps _ops = new HtmlNodeOps();
+        private static readonly HtmlNodeOps Ops = new HtmlNodeOps();
 
         /// <summary>
         /// Similar to <see cref="QuerySelectorAll(HtmlNode,string)" /> 
@@ -81,7 +81,7 @@
         /// </remarks>
         public static Func<HtmlNode, IEnumerable<HtmlNode>> Compile(string selector)
         {
-            var compiled = Parser.Parse(selector, new SelectorGenerator<HtmlNode>(_ops)).Selector;
+            var compiled = Parser.Parse(selector, new SelectorGenerator<HtmlNode>(Ops)).Selector;
             return node => compiled(Enumerable.Repeat(node, 1));
         }
 
@@ -91,7 +91,7 @@
 
         private const int DefaultCacheSize = 60;
 
-        private static LRUCache<string, Func<HtmlNode, IEnumerable<HtmlNode>>> _compilerCache = new LRUCache<string, Func<HtmlNode, IEnumerable<HtmlNode>>>(Compile, DefaultCacheSize);
+        private static LruCache<string, Func<HtmlNode, IEnumerable<HtmlNode>>> _compilerCache = new LruCache<string, Func<HtmlNode, IEnumerable<HtmlNode>>>(Compile, DefaultCacheSize);
         private static Func<string, Func<HtmlNode, IEnumerable<HtmlNode>>> _defaultCachingCompiler = _compilerCache.GetValue;
             
         /// <summary>

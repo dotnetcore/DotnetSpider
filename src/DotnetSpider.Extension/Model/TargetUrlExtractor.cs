@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using DotnetSpider.Core.Selector;
 
 namespace DotnetSpider.Extension.Model
 {

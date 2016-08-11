@@ -4,8 +4,6 @@ using System.Text.RegularExpressions;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.Common;
-using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Model
 {

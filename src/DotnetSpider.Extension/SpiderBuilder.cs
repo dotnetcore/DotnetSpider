@@ -1,6 +1,3 @@
-using DotnetSpider.Extension.Configuration;
-using System;
-
 namespace DotnetSpider.Extension
 {
 	public abstract class SpiderBuilder

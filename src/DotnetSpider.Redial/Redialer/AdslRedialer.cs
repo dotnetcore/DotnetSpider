@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-#if NET_CORE
+﻿#if NET_CORE
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 #else
 using DotnetSpider.Redial.Utils;

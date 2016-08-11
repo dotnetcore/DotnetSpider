@@ -10,14 +10,10 @@ using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Core.Downloader;
 using DotnetSpider.Redial;
-using DotnetSpider.Core.Processor;
 using StackExchange.Redis;
 using NLog;
 using DotnetSpider.Core.Common;
-using System.Runtime.InteropServices;
 using System.Net;
 using DotnetSpider.Core.Monitor;
 using System.Threading;
@@ -26,6 +22,9 @@ using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Configuration;
+#if NET_CORE
+using System.Runtime.InteropServices;
+#endif
 
 namespace DotnetSpider.Extension
 {
@@ -35,7 +34,7 @@ namespace DotnetSpider.Extension
 		private const string ValidateStatusName = "validate-status";
 		protected ConnectionMultiplexer Redis;
 		protected IDatabase Db;
-		public Action TaskFinished { get; set; } = new Action(() => { });
+		public Action TaskFinished { get; set; } = () => { };
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 		public RedialExecutor RedialExecutor { get; set; }
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();

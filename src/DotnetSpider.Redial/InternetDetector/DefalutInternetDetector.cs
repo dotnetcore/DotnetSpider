@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #if NET_CORE
-
+using System.Net.Http;
 #else
 using System.Net.NetworkInformation;
 #endif

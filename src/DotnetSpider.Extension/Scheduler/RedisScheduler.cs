@@ -6,8 +6,8 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using StackExchange.Redis;
 using System.Net;
-using System.Runtime.InteropServices;
 #if NET_CORE
+using System.Runtime.InteropServices;
 using System.Linq;
 #endif
 
@@ -31,8 +31,8 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _successCountKey = "success-record";
 		private string _identityMd5;
 
-		private IDatabase Db;
-		private ConnectionMultiplexer Redis;
+		private IDatabase _db;
+		private ConnectionMultiplexer _redis;
 
 		public RedisScheduler()
 		{
@@ -78,8 +78,8 @@ namespace DotnetSpider.Extension.Scheduler
 #else
 			confiruation.EndPoints.Add(new DnsEndPoint(Host, Port));
 #endif
-			Redis = ConnectionMultiplexer.Connect(confiruation);
-			Db = Redis.GetDatabase(0);
+			_redis = ConnectionMultiplexer.Connect(confiruation);
+			_db = _redis.GetDatabase(0);
 
 			var md5 = Encrypt.Md5Encrypt(spider.Identity);
 			_itemKey += md5;
@@ -91,7 +91,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 			NetworkCenter.Current.Execute("rds-in", () =>
 			{
-				Db.SortedSetAdd(TaskList, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
+				_db.SortedSetAdd(TaskList, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
 			});
 		}
 
@@ -99,7 +99,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			NetworkCenter.Current.Execute("rds-rs", () =>
 			{
-				Db.KeyDelete(_setKey);
+				_db.KeyDelete(_setKey);
 			});
 		}
 
@@ -107,10 +107,10 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			return RetryExecutor.Execute(30, () =>
 			{
-				bool isDuplicate = Db.SetContains(_setKey, request.Identity);
+				bool isDuplicate = _db.SetContains(_setKey, request.Identity);
 				if (!isDuplicate)
 				{
-					Db.SetAdd(_setKey, request.Identity);
+					_db.SetAdd(_setKey, request.Identity);
 				}
 				return isDuplicate;
 			});
@@ -121,11 +121,11 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			RetryExecutor.Execute(30, () =>
 			{
-				Db.ListRightPush(_queueKey, request.Identity);
+				_db.ListRightPush(_queueKey, request.Identity);
 				string field = request.Identity;
 				string value = JsonConvert.SerializeObject(request);
 
-				Db.HashSet(_itemKey, field, value);
+				_db.HashSet(_itemKey, field, value);
 			});
 		}
 
@@ -136,19 +136,19 @@ namespace DotnetSpider.Extension.Scheduler
 			{
 				return RetryExecutor.Execute(30, () =>
 				{
-					var value = Db.ListRightPop(_queueKey);
+					var value = _db.ListRightPop(_queueKey);
 					if (!value.HasValue)
 					{
 						return null;
 					}
 					string field = value.ToString();
 
-					string json = Db.HashGet(_itemKey, field);
+					string json = _db.HashGet(_itemKey, field);
 
 					if (!string.IsNullOrEmpty(json))
 					{
 						var result = JsonConvert.DeserializeObject<Request>(json);
-						Db.HashDelete(_itemKey, field);
+						_db.HashDelete(_itemKey, field);
 						return result;
 					}
 					return null;
@@ -158,19 +158,19 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override long GetLeftRequestsCount()
 		{
-			return NetworkCenter.Current.Execute("rds-lc", () => Db.ListLength(_queueKey));
+			return NetworkCenter.Current.Execute("rds-lc", () => _db.ListLength(_queueKey));
 		}
 
 		public override long GetTotalRequestsCount()
 		{
-			return NetworkCenter.Current.Execute("rds-tc", () => Db.SetLength(_setKey));
+			return NetworkCenter.Current.Execute("rds-tc", () => _db.SetLength(_setKey));
 		}
 
 		public override long GetSuccessRequestsCount()
 		{
 			return NetworkCenter.Current.Execute("rds-src", () =>
 			{
-				var result = Db.HashGet(_successCountKey, _identityMd5);
+				var result = _db.HashGet(_successCountKey, _identityMd5);
 				return result.HasValue ? (long)result : 0;
 			});
 		}
@@ -179,7 +179,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			return NetworkCenter.Current.Execute("rds-erc", () =>
 			{
-				var result = Db.HashGet(_errorCountKey, _identityMd5);
+				var result = _db.HashGet(_errorCountKey, _identityMd5);
 				return result.HasValue ? (long)result : 0;
 			});
 		}
@@ -188,7 +188,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			NetworkCenter.Current.Execute("rds-isc", () =>
 			{
-				Db.HashIncrement(_successCountKey, _identityMd5);
+				_db.HashIncrement(_successCountKey, _identityMd5);
 			});
 		}
 
@@ -196,14 +196,14 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			NetworkCenter.Current.Execute("rds-iec", () =>
 			{
-				Db.HashIncrement(_errorCountKey, _identityMd5);
+				_db.HashIncrement(_errorCountKey, _identityMd5);
 			});
 		}
 
 		public override void Dispose()
 		{
-			Db.KeyDelete(_successCountKey);
-			Db.KeyDelete(_errorCountKey);
+			_db.KeyDelete(_successCountKey);
+			_db.KeyDelete(_errorCountKey);
 		}
 
 		public override void Load(HashSet<Request> requests)
@@ -226,9 +226,9 @@ namespace DotnetSpider.Extension.Scheduler
 					{
 						--n;
 
-						Db.SetAdd(_setKey, identities);
-						Db.ListRightPush(_queueKey, identities);
-						Db.HashSet(_itemKey, items);
+						_db.SetAdd(_setKey, identities);
+						_db.ListRightPush(_queueKey, identities);
+						_db.HashSet(_itemKey, items);
 
 						i = 0;
 						if (n != 0)
@@ -246,9 +246,9 @@ namespace DotnetSpider.Extension.Scheduler
 
 				if (i > 0)
 				{
-					Db.SetAdd(_setKey, identities);
-					Db.ListRightPush(_queueKey, identities);
-					Db.HashSet(_itemKey, items);
+					_db.SetAdd(_setKey, identities);
+					_db.ListRightPush(_queueKey, identities);
+					_db.HashSet(_itemKey, items);
 				}
 			}
 		}
@@ -268,11 +268,11 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			base.Clear();
 
-			Db.KeyDelete(_queueKey);
-			Db.KeyDelete(_setKey);
-			Db.KeyDelete(_itemKey);
-			Db.KeyDelete(_successCountKey);
-			Db.KeyDelete(_errorCountKey);
+			_db.KeyDelete(_queueKey);
+			_db.KeyDelete(_setKey);
+			_db.KeyDelete(_itemKey);
+			_db.KeyDelete(_successCountKey);
+			_db.KeyDelete(_errorCountKey);
 		}
 	}
 }

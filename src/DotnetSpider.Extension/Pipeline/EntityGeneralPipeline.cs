@@ -7,7 +7,6 @@ using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline

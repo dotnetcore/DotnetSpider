@@ -14,7 +14,7 @@ namespace HtmlAgilityPack
     {
         #region Static Members
 
-        private static readonly int _maxEntitySize;
+        private static readonly int MaxEntitySize;
         private static Dictionary<int,string> _entityName;
         private static Dictionary<string, int> _entityValue;
 
@@ -558,7 +558,7 @@ namespace HtmlAgilityPack
             _entityValue.Add("euro", 8364); // euro sign, U+20AC NEW 
             _entityName.Add(8364, "euro");
 
-            _maxEntitySize = 8 + 1; // we add the # char
+            MaxEntitySize = 8 + 1; // we add the # char
 
             #endregion
         }
@@ -669,7 +669,7 @@ namespace HtmlAgilityPack
 
                             default:
                                 entity.Append(text[i]);
-                                if (entity.Length > _maxEntitySize)
+                                if (entity.Length > MaxEntitySize)
                                 {
                                     // unknown stuff, just don't touch it
                                     state = ParseState.Text;

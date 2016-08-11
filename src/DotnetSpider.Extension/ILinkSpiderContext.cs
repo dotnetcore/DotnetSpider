@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using DotnetSpider.Extension.Configuration;
 
 namespace DotnetSpider.Extension
 {

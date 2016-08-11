@@ -5,7 +5,6 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.ORM;
 using MySql.Data.MySqlClient;
-using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline

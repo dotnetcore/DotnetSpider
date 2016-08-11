@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Core.Common;

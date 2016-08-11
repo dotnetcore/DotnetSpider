@@ -2,7 +2,6 @@
 using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Extension.Configuration;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.Model;
 

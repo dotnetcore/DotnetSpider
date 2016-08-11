@@ -8,29 +8,29 @@ using System.Threading;
 
 namespace HtmlAgilityPack.Css
 {
-    public class LRUCache<TInput, TResult> : IDisposable
+    public class LruCache<TInput, TResult> : IDisposable
     {
 
-        private readonly Dictionary<TInput, TResult> data;
-        private readonly IndexedLinkedList<TInput> lruList = new IndexedLinkedList<TInput>();
-        private readonly Func<TInput, TResult> evalutor;
-        private ReaderWriterLockSlim rwl = new ReaderWriterLockSlim();
-        private int capacity;
+        private readonly Dictionary<TInput, TResult> _data;
+        private readonly IndexedLinkedList<TInput> _lruList = new IndexedLinkedList<TInput>();
+        private readonly Func<TInput, TResult> _evalutor;
+        private ReaderWriterLockSlim _rwl = new ReaderWriterLockSlim();
+        private int _capacity;
 
-        public LRUCache(Func<TInput, TResult> evalutor, int capacity)
+        public LruCache(Func<TInput, TResult> evalutor, int capacity)
         {
             if (capacity <= 0)
                 throw new ArgumentOutOfRangeException();
 
-            this.data = new Dictionary<TInput, TResult>(capacity);
-            this.capacity = capacity;
-            this.evalutor = evalutor;
+            this._data = new Dictionary<TInput, TResult>(capacity);
+            this._capacity = capacity;
+            this._evalutor = evalutor;
         }
 
         private bool Remove(TInput key)
         {
-            bool existed = data.Remove(key);
-            lruList.Remove(key);
+            bool existed = _data.Remove(key);
+            _lruList.Remove(key);
             return existed;
         }
 
@@ -40,43 +40,43 @@ namespace HtmlAgilityPack.Css
             TResult value;
             bool found;
 
-            rwl.EnterReadLock();
+            _rwl.EnterReadLock();
             try
             {
-                found = data.TryGetValue(key, out value);
+                found = _data.TryGetValue(key, out value);
             }
             finally
             {
-                rwl.ExitReadLock();
+                _rwl.ExitReadLock();
             }
 
 
-            if (!found) value = evalutor(key);
+            if (!found) value = _evalutor(key);
 
-            rwl.EnterWriteLock();
+            _rwl.EnterWriteLock();
             try
             {
                 if (found)
                 {
-                    lruList.Remove(key);
-                    lruList.Add(key);
+                    _lruList.Remove(key);
+                    _lruList.Add(key);
                 }
                 else
                 {
-                    data[key] = value;
-                    lruList.Add(key);
+                    _data[key] = value;
+                    _lruList.Add(key);
 
-                    if (data.Count > capacity)
+                    if (_data.Count > _capacity)
                     {
-                        Remove(lruList.First);
-                        lruList.RemoveFirst();
+                        Remove(_lruList.First);
+                        _lruList.RemoveFirst();
                     }
                 }
 
             }
             finally
             {
-                rwl.ExitWriteLock();
+                _rwl.ExitWriteLock();
             }
 
 
@@ -87,7 +87,7 @@ namespace HtmlAgilityPack.Css
         {
             get
             {
-                return capacity;
+                return _capacity;
             }
 
             set
@@ -95,19 +95,19 @@ namespace HtmlAgilityPack.Css
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException();
 
-                rwl.EnterWriteLock();
+                _rwl.EnterWriteLock();
                 try
                 {
-                    capacity = value;
-                    while (data.Count > capacity)
+                    _capacity = value;
+                    while (_data.Count > _capacity)
                     {
-                        Remove(lruList.First);
-                        lruList.RemoveFirst();
+                        Remove(_lruList.First);
+                        _lruList.RemoveFirst();
                     }
                 }
                 finally
                 {
-                    rwl.ExitWriteLock();
+                    _rwl.ExitWriteLock();
                 }
 
             }
@@ -119,41 +119,41 @@ namespace HtmlAgilityPack.Css
         private class IndexedLinkedList<T>
         {
 
-            private LinkedList<T> data = new LinkedList<T>();
-            private Dictionary<T, LinkedListNode<T>> index = new Dictionary<T, LinkedListNode<T>>();
+            private LinkedList<T> _data = new LinkedList<T>();
+            private Dictionary<T, LinkedListNode<T>> _index = new Dictionary<T, LinkedListNode<T>>();
 
             public void Add(T value)
             {
-                index[value] = data.AddLast(value);
+                _index[value] = _data.AddLast(value);
             }
 
             public void RemoveFirst()
             {
-                index.Remove(data.First.Value);
-                data.RemoveFirst();
+                _index.Remove(_data.First.Value);
+                _data.RemoveFirst();
             }
 
             public void Remove(T value)
             {
                 LinkedListNode<T> node;
-                if (index.TryGetValue(value, out node))
+                if (_index.TryGetValue(value, out node))
                 {
-                    data.Remove(node);
-                    index.Remove(value);
+                    _data.Remove(node);
+                    _index.Remove(value);
                 }
             }
 
             public void Clear()
             {
-                data.Clear();
-                index.Clear();
+                _data.Clear();
+                _index.Clear();
             }
 
             public T First
             {
                 get
                 {
-                    return data.First.Value;
+                    return _data.First.Value;
                 }
             }
         }
@@ -161,16 +161,16 @@ namespace HtmlAgilityPack.Css
 
         public void Dispose()
         {
-            if (rwl == null) return;
+            if (_rwl == null) return;
             try
             {
-                rwl.Dispose();
+                _rwl.Dispose();
             }
             catch (ObjectDisposedException)
             {
                 // It should ignore duplicate calls to Dispose(), but it doesn't.
             }
-            rwl = null;
+            _rwl = null;
         }
     }
 

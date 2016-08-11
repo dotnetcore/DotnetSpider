@@ -3,7 +3,7 @@ using System.IO;
 
 namespace HtmlAgilityPack
 {
-    internal struct IOLibrary
+    internal struct IoLibrary
     {
         #region Internal Methods
 

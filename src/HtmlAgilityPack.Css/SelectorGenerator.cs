@@ -15,7 +15,7 @@ namespace HtmlAgilityPack.Css
     {
         private readonly IEqualityComparer<TElement> _equalityComparer;
         private readonly Stack<Selector<TElement>> _selectors;
-        private bool anchorToRoot;
+        private bool _anchorToRoot;
 
         public SelectorGenerator(IElementOps<TElement> ops) : this(ops, null) { }
 
@@ -53,7 +53,7 @@ namespace HtmlAgilityPack.Css
         {
             _selectors.Clear();
             Selector = null;
-            anchorToRoot = false;
+            _anchorToRoot = false;
         }
 
         public virtual void OnSelector()
@@ -66,7 +66,7 @@ namespace HtmlAgilityPack.Css
         public virtual void OnClose()
         {
             var sum = GetSelectors().Aggregate((a, b) => (elements => a(elements).Concat(b(elements))));
-            var normalize = anchorToRoot ? (x => x) : Ops.Descendant();
+            var normalize = _anchorToRoot ? (x => x) : Ops.Descendant();
             Selector = elements => sum(normalize(elements)).Distinct(_equalityComparer);
             _selectors.Clear();
         }
@@ -264,7 +264,7 @@ namespace HtmlAgilityPack.Css
 
         public void AnchorToRoot()
         {
-            anchorToRoot = true;
+            _anchorToRoot = true;
         }
 
         public void Last()
