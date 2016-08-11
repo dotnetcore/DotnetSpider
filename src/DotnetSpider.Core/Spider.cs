@@ -30,7 +30,7 @@ namespace DotnetSpider.Core
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
-		public Site Site { get; set; }
+		public Site Site { get; protected set; }
 		public string Identity { get; set; }
 		public IDownloader Downloader { get; set; }
 		protected bool IsExitWhenComplete { get; set; } = true;
@@ -163,10 +163,7 @@ namespace DotnetSpider.Core
 			set
 			{
 				CheckIfRunning();
-				if (_scheduler != value)
-				{
-					_scheduler = value;
-				}
+				_scheduler = value;
 			}
 		}
 
@@ -278,6 +275,7 @@ namespace DotnetSpider.Core
 		/// Add urls to crawl.
 		/// </summary>
 		/// <param name="url"></param>
+		/// <param name="extras"></param>
 		/// <returns></returns>
 		public Spider AddStartUrl(string url, Dictionary<string, dynamic> extras)
 		{
