@@ -4,7 +4,7 @@
 This is a cross platfrom, ligth spider develop by C#.
 
 ### DEVELOP ENVIROMENT
-- Visual Studio 2015 or later, becuase I used lots of C# 6.0
+- Visual Studio 2015 or later
 - Want to try .NET CORE? Install 2 packages
 	1. [Visual studio 2015 update 3](https://go.microsoft.com/fwlink/?LinkId=691129)	
 	2. [.NET Core 1.0.0 - VS 2015 Tooling Preview 2](https://go.microsoft.com/fwlink/?LinkId=817245)
