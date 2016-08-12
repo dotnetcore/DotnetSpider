@@ -12,7 +12,6 @@
     "DotnetSpider.Core": "0.0.9",
     "DotnetSpider.Extension": "0.0.9",
     "DotnetSpider.Redial": "0.0.9",
-    "DotnetSpider.Validation": "0.0.9",
     "NLog": "4.4.0-betaV15",
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
     "Microsoft.NETCore.App": {
