@@ -20,7 +20,7 @@ This is a cross platfrom, ligth spider develop by C#.
 
 ### BASE USAGE
 
-Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Test/Example/BaseUsage.cs
+Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/BaseUsage.cs
 
 		public static void Main()
 		{
@@ -85,7 +85,7 @@ Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.T
 
 #### Configurable Entity Spider
 
-Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Test/Example/JdSkuSample.cs
+Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/JdSkuSampleSpider.cs
 
 		public class JdSkuSampleSpider : EntitySpiderBuilder
 		{
@@ -171,7 +171,7 @@ When you want to collect a page JS loaded, there is only one thing you need to d
 
 	context.SetDownloader(new WebDriverDownloader(Browser.Chrome));
 
-See the complete sample https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Test/Example/JdSkuWebDriverSample.cs
+See the complete sample https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/JdSkuWebDriverSample.cs
 
 NOTE:
 
