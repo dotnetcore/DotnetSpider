@@ -198,12 +198,6 @@
     <Compile Include="..\EntitySpider.cs">
       <Link>EntitySpider.cs</Link>
     </Compile>
-    <Compile Include="..\ILinkSpiderContext.cs">
-      <Link>ILinkSpiderContext.cs</Link>
-    </Compile>
-    <Compile Include="..\LinkContextSpider.cs">
-      <Link>LinkContextSpider.cs</Link>
-    </Compile>
     <Compile Include="..\Model\AfterExtractor.cs">
       <Link>Model\AfterExtractor.cs</Link>
     </Compile>
@@ -312,9 +306,6 @@
     <Compile Include="..\Monitor\HttpMonitor.cs">
       <Link>Monitor\HttpMonitor.cs</Link>
     </Compile>
-    <Compile Include="..\ORM\Dapper\SqlMapperExtention.cs">
-      <Link>ORM\Dapper\SqlMapperExtention.cs</Link>
-    </Compile>
     <Compile Include="..\ORM\Scheme.cs">
       <Link>ORM\Scheme.cs</Link>
     </Compile>
@@ -350,9 +341,6 @@
     </Compile>
     <Compile Include="..\Pipeline\JsonFileEntityPipeline.cs">
       <Link>Pipeline\JsonFileEntityPipeline.cs</Link>
-    </Compile>
-    <Compile Include="..\Pipeline\LinkSpiderPipeline.cs">
-      <Link>Pipeline\LinkSpiderPipeline.cs</Link>
     </Compile>
     <Compile Include="..\Pipeline\MongoDbEntityPipeline.cs">
       <Link>Pipeline\MongoDbEntityPipeline.cs</Link>

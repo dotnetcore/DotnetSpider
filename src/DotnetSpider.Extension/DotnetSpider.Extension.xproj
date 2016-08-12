@@ -18,5 +18,10 @@
     <DnxInvisibleFolder Include="net45\" />
     <DnxInvisibleFolder Include="netfx45\" />
   </ItemGroup>
+  <ItemGroup>
+    <DnxInvisibleCompile Include="ILinkSpiderContext.cs" />
+    <DnxInvisibleCompile Include="LinkContextSpider.cs" />
+    <DnxInvisibleCompile Include="Pipeline\LinkSpiderPipeline.cs" />
+  </ItemGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>
