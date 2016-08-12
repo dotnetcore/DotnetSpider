@@ -3,16 +3,13 @@ using DotnetSpider.Core;
 using DotnetSpider.Extension.Scheduler;
 using DotnetSpider.Core.Scheduler;
 using System;
-#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
-
+using Xunit;
 namespace DotnetSpider.Test
 {
-	[TestClass]
+	
 	public class RedisSchedulerTest
 	{
-		[TestMethod]
+		[Fact]
 		public void RedisTest()
 		{
 
@@ -25,15 +22,15 @@ namespace DotnetSpider.Test
 			request.PutExtra("1", "2");
 			redisScheduler.Push(request);
 			Request result = redisScheduler.Poll();
-			Assert.AreEqual("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", result.Url.ToString());
+			Assert.Equal("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", result.Url.ToString());
 			Request result1 = redisScheduler.Poll();
-			Assert.IsNull(result1);
+			Assert.Null(result1);
 			redisScheduler.Dispose();
 
 			redisScheduler.Clear();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Redis_QueueTest()
 		{
 			RedisScheduler redisScheduler = new RedisScheduler("localhost", "");
@@ -49,13 +46,13 @@ namespace DotnetSpider.Test
 			redisScheduler.Push(request4);
 
 			Request result = redisScheduler.Poll();
-			Assert.AreEqual("http://www.ibm.com/4", result.Url.ToString());
+			Assert.Equal("http://www.ibm.com/4", result.Url.ToString());
 			Request result1 = redisScheduler.Poll();
-			Assert.AreEqual("http://www.ibm.com/3", result1.Url.ToString());
+			Assert.Equal("http://www.ibm.com/3", result1.Url.ToString());
 			redisScheduler.Dispose();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void SchedulerLoadPerformaceTest()
 		{
 			RedisScheduler scheduler = new RedisScheduler("localhost", "");
@@ -79,10 +76,10 @@ namespace DotnetSpider.Test
 			scheduler.Load(list);
 			var end1 = DateTime.Now;
 			double seconds1 = (end1 - start1).TotalSeconds;
-			Assert.IsTrue(seconds1 < seconds);
+			Assert.True(seconds1 < seconds);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void SchedulerLoadTest()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -95,10 +92,10 @@ namespace DotnetSpider.Test
 			RedisScheduler redisScheduler = new RedisScheduler("localhost", "");
 			redisScheduler.Load(scheduler.ToList());
 
-			Assert.AreEqual("http://www.d.com/", redisScheduler.Poll().Url.ToString());
-			Assert.AreEqual("http://www.c.com/", redisScheduler.Poll().Url.ToString());
-			Assert.AreEqual("http://www.b.com/", redisScheduler.Poll().Url.ToString());
-			Assert.AreEqual("http://www.a.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.d.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.c.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.b.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.a.com/", redisScheduler.Poll().Url.ToString());
 		}
 	}
 }

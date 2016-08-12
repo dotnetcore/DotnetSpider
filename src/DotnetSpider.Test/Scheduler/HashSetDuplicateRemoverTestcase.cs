@@ -1,42 +1,39 @@
 ﻿using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Scheduler.Component;
-#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
+using Xunit;
 
 namespace DotnetSpider.Test.Scheduler
 {
-	[TestClass]
 	public class HashSetDuplicateRemoverTestcase
 	{
-		[TestMethod]
+		[Fact]
 		public void HashSetDuplicate()
 		{
 			HashSetDuplicateRemover scheduler = new HashSetDuplicateRemover();
 
 			bool isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", 1, null));
 
-			Assert.IsFalse(isDuplicate);
+			Assert.False(isDuplicate);
 			isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", 1, null));
-			Assert.IsTrue(isDuplicate);
+			Assert.True(isDuplicate);
 			isDuplicate = scheduler.IsDuplicate(new Request("http://www.b.com", 1, null));
-			Assert.IsFalse(isDuplicate);
+			Assert.False(isDuplicate);
 			isDuplicate = scheduler.IsDuplicate(new Request("http://www.b.com", 1, null));
-			Assert.IsTrue(isDuplicate);
+			Assert.True(isDuplicate);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void HashSetDuplicateSynchronized()
 		{
 			HashSetDuplicateRemover scheduler = new HashSetDuplicateRemover();
 			bool isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", 1, null));
 
-			Assert.IsFalse(isDuplicate);
+			Assert.False(isDuplicate);
 			Parallel.For(0, 1000, new ParallelOptions() { MaxDegreeOfParallelism = 30 }, i =>
 			{
 				isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", 1, null));
-				Assert.IsTrue(isDuplicate);
+				Assert.True(isDuplicate);
 			});
 		}
 	}

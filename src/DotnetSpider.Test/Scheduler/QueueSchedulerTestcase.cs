@@ -1,16 +1,14 @@
 ﻿using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Scheduler;
-#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
+using Xunit;
 
 namespace DotnetSpider.Test.Scheduler
 {
-	[TestClass]
+	
 	public class QueueSchedulerTestcase
 	{
-		[TestMethod]
+		[Fact]
 		public void QueueSchedulerPushPollSynchronized()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -35,11 +33,11 @@ namespace DotnetSpider.Test.Scheduler
 			long left = scheduler.GetLeftRequestsCount();
 			long total = scheduler.GetTotalRequestsCount();
 
-			Assert.AreEqual(left, 2);
-			Assert.AreEqual(total, 1002);
+			Assert.Equal(left, 2);
+			Assert.Equal(total, 1002);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void QueueSchedulerPush()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -52,12 +50,12 @@ namespace DotnetSpider.Test.Scheduler
 			long left = scheduler.GetLeftRequestsCount();
 			long total = scheduler.GetTotalRequestsCount();
 
-			Assert.AreEqual(left, 2);
-			Assert.AreEqual(total, 2);
+			Assert.Equal(left, 2);
+			Assert.Equal(total, 2);
 		}
 
 
-		[TestMethod]
+		[Fact]
 		public void QueueSchedulerPoll()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -69,13 +67,13 @@ namespace DotnetSpider.Test.Scheduler
 			scheduler.Push(new Request("http://www.b.com", 1, null));
 
 			var request = scheduler.Poll();
-			Assert.AreEqual(request.Url, "http://www.a.com");
+			Assert.Equal(request.Url.ToString(), "http://www.a.com");
 
 			long left = scheduler.GetLeftRequestsCount();
 			long total = scheduler.GetTotalRequestsCount();
 
-			Assert.AreEqual(left, 1);
-			Assert.AreEqual(total, 2);
+			Assert.Equal(left, 1);
+			Assert.Equal(total, 2);
 		}
 	}
 }

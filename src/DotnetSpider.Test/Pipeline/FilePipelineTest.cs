@@ -1,19 +1,19 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
-#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
+using Xunit;
 
 namespace DotnetSpider.Test.Pipeline
 {
-	[TestClass]
 	public class FilePipelineTest
 	{
 		private ResultItems _resultItems;
 
+		public FilePipelineTest()
+		{
+			Before();
+		}
 
-		[TestInitialize]
-		public void Before()
+		private void Before()
 		{
 			_resultItems = new ResultItems();
 			_resultItems.AddOrUpdateResultItem("content", "爬虫工具");
@@ -21,7 +21,7 @@ namespace DotnetSpider.Test.Pipeline
 			_resultItems.Request = request;
 		}
 
-		[TestMethod]
+		[Fact]
 		public void TestProcess()
 		{
 			FilePipeline filePipeline = new FilePipeline();

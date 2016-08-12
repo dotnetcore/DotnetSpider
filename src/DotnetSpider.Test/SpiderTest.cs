@@ -7,16 +7,13 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
-#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
+using Xunit;
 
 namespace DotnetSpider.Test
 {
-	[TestClass]
 	public class SpiderTest
 	{
-		[TestMethod]
+		[Fact]
 		public void TestStartAndStop()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
@@ -44,7 +41,7 @@ namespace DotnetSpider.Test
 		}
 
 		//[Ignore]
-		//[TestMethod]
+		//[Fact]
 		//public void TestWaitAndNotify()
 		//{
 		//	for (int i = 0; i < 10000; i++)

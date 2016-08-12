@@ -4,7 +4,7 @@
 
 //namespace DotnetSpider.Test.Model
 //{
-//	[TestClass]
+//	
 //	public class ModelPageProcessorTest
 //	{
 //		[TargetUrl(new[] { "http://codecraft.us/foo" })]
@@ -21,7 +21,7 @@
 //			public string Bar { get; set; }
 //		}
 
-//		[TestMethod]
+//		[Fact]
 //		public void testMultiModel_should_not_skip_when_match()
 //		{
 //			Page page = new Page(new Request("http://codecraft.us/foo", 1, null), ContentType.Html);
@@ -36,8 +36,8 @@
 
 //			string result1 = page.ResultItems.GetResultItem(typeof(ModelFoo).FullName).ToString().Replace("\n", "").Replace("\t", "").Replace("\r", "").Replace(" ", "");
 //			string result2 = page.ResultItems.GetResultItem(typeof(ModelBar).FullName).ToString().Replace("\n", "").Replace("\t", "").Replace("\r", "").Replace(" ", "");
-//			Assert.AreEqual("{\"Foo\":\"foo\"}", result1);
-//			Assert.AreEqual("{\"Bar\":\"bar\"}", result2);
+//			Assert.Equal("{\"Foo\":\"foo\"}", result1);
+//			Assert.Equal("{\"Bar\":\"bar\"}", result2);
 //		}
 //	}
 //}

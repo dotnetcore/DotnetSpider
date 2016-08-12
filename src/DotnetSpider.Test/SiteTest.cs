@@ -1,11 +1,9 @@
 ﻿using DotnetSpider.Core;
-#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
+using Xunit;
 
 namespace DotnetSpider.Test
 {
-	[TestClass]
+	
 	public class SiteTest
 	{
 
@@ -15,32 +13,32 @@ namespace DotnetSpider.Test
 		private const string Url = @"http://www.12580emall.com/emall/mall/index.html";
 		private readonly Site _site = new Site() { Domain = WDomain, EncodingName = "UTF-8", Timeout = 3000, };
 
-		[TestMethod]
+		[Fact]
 		public void TestAddCookies()
 		{
 			//Site.AddCookie(wName, wValue);
 			//Site.AddCookie(wDomain, wName, wValue);
 			//Assert.IsNotNull(Site.AllCookies[wDomain]);
 			//Assert.IsNotNull(Site.AllCookies[wDomain][wName]);
-			//Assert.AreEqual(wValue, Site.AllCookies[wDomain][wName]);
+			//Assert.Equal(wValue, Site.AllCookies[wDomain][wName]);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void TestAddRequests()
 		{
 			_site.ClearStartRequests();
 			_site.AddStartUrl(Url);
 			_site.AddStartRequest(new Request(Url, 1, null));
-			Assert.AreEqual(_site.Domain, WDomain);
-			Assert.IsTrue(_site.StartRequests.Contains(new Request(Url, 1, null)));
+			Assert.Equal(_site.Domain, WDomain);
+			Assert.True(_site.StartRequests.Contains(new Request(Url, 1, null)));
 		}
 
-		[TestMethod]
+		[Fact]
 		public void TestAddHeaders()
 		{
 			_site.AddHeader(WName, WValue);
-			Assert.IsNotNull(_site.Headers);
-			Assert.IsTrue(_site.Headers.Count > 0);
+			Assert.NotNull(_site.Headers);
+			Assert.True(_site.Headers.Count > 0);
 		}
 	}
 }

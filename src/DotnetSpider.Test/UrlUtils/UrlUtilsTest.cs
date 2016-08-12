@@ -1,63 +1,61 @@
-﻿#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
+﻿using Xunit;
 
 namespace DotnetSpider.Test.UrlUtils
 {
-	[TestClass]
+	
 	public class UrlUtilsTest
 	{
 
-		[TestMethod]
+		[Fact]
 		public void TestFixRelativeUrl()
 		{
 			string absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("?aa", "http://www.dianping.com/sh/ss/com");
-			Assert.AreEqual(absoluteUrl, "http://www.dianping.com/sh/ss/com?aa");
+			Assert.Equal(absoluteUrl, "http://www.dianping.com/sh/ss/com?aa");
 
 			absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("../aa", "http://www.dianping.com/sh/ss/com");
-			Assert.AreEqual(absoluteUrl, "http://www.dianping.com/sh/aa");
+			Assert.Equal(absoluteUrl, "http://www.dianping.com/sh/aa");
 
 			absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("..aa", "http://www.dianping.com/sh/ss/com");
-			Assert.AreEqual(absoluteUrl, "http://www.dianping.com/sh/ss/..aa");
+			Assert.Equal(absoluteUrl, "http://www.dianping.com/sh/ss/..aa");
 
 			absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com/");
-			Assert.AreEqual(absoluteUrl, "http://www.dianping.com/sh/aa");
+			Assert.Equal(absoluteUrl, "http://www.dianping.com/sh/aa");
 
 			absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com");
-			Assert.AreEqual(absoluteUrl, "http://www.dianping.com/aa");
+			Assert.Equal(absoluteUrl, "http://www.dianping.com/aa");
 		}
 
-		[TestMethod]
+		[Fact]
 		public void TestFixAllRelativeHrefs()
 		{
 			//String originHtml = "<a href=\"/start\">";
 			//String replacedHtml = UrlUtils.FixAllRelativeHrefs(originHtml, "http://www.dianping.com/");
-			//Assert.AreEqual(replacedHtml, "<a href=\"http://www.dianping.com/start\">");
+			//Assert.Equal(replacedHtml, "<a href=\"http://www.dianping.com/start\">");
 
 			//originHtml = "<a href=\"/start a\">";
 			//replacedHtml = UrlUtils.FixAllRelativeHrefs(originHtml, "http://www.dianping.com/");
-			//Assert.AreEqual(replacedHtml, "<a href=\"http://www.dianping.com/start%20a\">");
+			//Assert.Equal(replacedHtml, "<a href=\"http://www.dianping.com/start%20a\">");
 
 			//originHtml = "<a href='/start a'>";
 			//replacedHtml = UrlUtils.FixAllRelativeHrefs(originHtml, "http://www.dianping.com/");
-			//Assert.AreEqual(replacedHtml, "<a href=\"http://www.dianping.com/start%20a\">");
+			//Assert.Equal(replacedHtml, "<a href=\"http://www.dianping.com/start%20a\">");
 
 			//originHtml = "<a href=/start tag>";
 			//replacedHtml = UrlUtils.FixAllRelativeHrefs(originHtml, "http://www.dianping.com/");
-			//Assert.AreEqual(replacedHtml, "<a href=\"http://www.dianping.com/start\" tag>");
+			//Assert.Equal(replacedHtml, "<a href=\"http://www.dianping.com/start\" tag>");
 		}
 
-		[TestMethod]
+		[Fact]
 		public void TestGetDomain()
 		{
 			string url = "http://www.dianping.com/aa/";
-			Assert.AreEqual("www.dianping.com", Core.Common.UrlUtils.GetDomain(url));
+			Assert.Equal("www.dianping.com", Core.Common.UrlUtils.GetDomain(url));
 
 			url = "www.dianping.com/aa/";
-			Assert.AreEqual("www.dianping.com", Core.Common.UrlUtils.GetDomain(url));
+			Assert.Equal("www.dianping.com", Core.Common.UrlUtils.GetDomain(url));
 
 			url = "http://www.dianping.com";
-			Assert.AreEqual("www.dianping.com", Core.Common.UrlUtils.GetDomain(url));
+			Assert.Equal("www.dianping.com", Core.Common.UrlUtils.GetDomain(url));
 		}
 	}
 }

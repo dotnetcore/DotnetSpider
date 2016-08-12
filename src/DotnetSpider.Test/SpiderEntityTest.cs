@@ -2,13 +2,10 @@
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
-#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
+using Xunit;
 
 namespace DotnetSpider.Test
 {
-	[TestClass]
 	public class SpiderEntityTest
 	{
 		public class Entity1 : ISpiderEntity
@@ -22,7 +19,7 @@ namespace DotnetSpider.Test
 			public string Name { get; set; }
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Test1()
 		{
 #if !NET_CORE
@@ -31,8 +28,8 @@ namespace DotnetSpider.Test
 			var indexes = typeof(Entity2).GetTypeInfo().GetCustomAttribute<Indexes>(true);
 #endif
 
-			Assert.AreEqual(indexes.AutoIncrement, "id");
-			Assert.AreEqual(indexes.Primary, "id");
+			Assert.Equal(indexes.AutoIncrement, "id");
+			Assert.Equal(indexes.Primary, "id");
 
 #if !NET_CORE
 			var indexes1 = typeof(Entity2).GetCustomAttribute<Indexes>(true);
@@ -40,9 +37,8 @@ namespace DotnetSpider.Test
 			var indexes1 = typeof(Entity2).GetTypeInfo().GetCustomAttribute<Indexes>(true);
 #endif
 
-
-			Assert.AreEqual(indexes1.AutoIncrement, null);
-			Assert.AreEqual(indexes1.Primary, "name");
+			Assert.Equal(indexes1.AutoIncrement, null);
+			Assert.Equal(indexes1.Primary, "name");
 		}
 	}
 }

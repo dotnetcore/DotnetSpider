@@ -6,11 +6,10 @@
 //using DotnetSpider.Extension.Model;
 //using DotnetSpider.Extension.Model.Attribute;
 //using DotnetSpider.Extension.Pipeline;
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 //namespace DotnetSpider.Extension.Test
 //{
-//	[TestClass]
+//	
 //	public class PageExtract2MultiTypesTests
 //	{
 //		[TypeExtractBy(Expression = "//*[@id='nav_menu']/a[1]")]
@@ -35,7 +34,7 @@
 //			public string Name { get; set; }
 //		}
 
-//		[TestMethod]
+//		[Fact]
 //		public void PageExtract2MultiTypes()
 //		{
 //			ModelCollectorSpider<Yuanzi, Jinghua> spider = new ModelCollectorSpider<Yuanzi, Jinghua>(Guid.NewGuid().ToString(), new Site { SleepTime = 1000, Encoding = Encoding.UTF8 });
@@ -46,12 +45,12 @@
 //			spider.Run();
 //			var results1 = ((CollectorModelPipeline<Yuanzi>)(((ModelPipeline<Yuanzi>)spider.Pipelines[0]).PageModelPipeline)).GetCollected();
 //			var results2 = ((CollectorModelPipeline<Jinghua>)(((ModelPipeline<Jinghua>)spider.Pipelines[1]).PageModelPipeline)).GetCollected();
-//			Assert.AreEqual("园子", results1[0].Name);
-//			Assert.AreEqual("新闻", results2[0].Name);
+//			Assert.Equal("园子", results1[0].Name);
+//			Assert.Equal("新闻", results2[0].Name);
 //		}
 
 
-//		[TestMethod]
+//		[Fact]
 //		public void PageExtract2MultiTypes3()
 //		{
 //			ModelDatabaseSpider<Yuanzi, Jinghua> spider = new ModelDatabaseSpider<Yuanzi, Jinghua>(Guid.NewGuid().ToString(), new Site { SleepTime = 1000, Encoding = Encoding.UTF8 });
@@ -61,7 +60,7 @@
 //			spider.AddStartUrls(new List<string> { "http://www.cnblogs.com/" });
 //			spider.Run();
 //			DataRepository<Jinghua> dataRepository = new DataRepository<Jinghua>();
-//			Assert.AreEqual("新闻", dataRepository.GetWhere("id>0").ToList()[0].Name);
+//			Assert.Equal("新闻", dataRepository.GetWhere("id>0").ToList()[0].Name);
 //			dataRepository.Execute("drop database cnblogs");
 //		}
 //	}

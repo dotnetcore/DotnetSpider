@@ -4,9 +4,7 @@
 //using DotnetSpider.Core.Common;
 //using DotnetSpider.Core;
 //using DotnetSpider.Core.Scheduler.Component;
-//#if !NET_CORE
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
-//#endif
+
 //namespace DotnetSpider.Test.Scheduler
 //{
 //	public struct Memorystatus1 //这个结构用于获得系统信息
@@ -21,23 +19,23 @@
 //		internal uint DwAvailVirtual;
 //	}
 
-//	[TestClass]
+//	
 //	public class BloomFilterDuplicateRemoverTest
 //	{
 //		[DllImport("kernel32.dll ")]//调用系统DLL
 //		public static extern void GlobalMemoryStatus(ref   Memorystatus1 lpBuffer); //获得系统DLL里的函数
 
-//		[TestMethod]
+//		[Fact]
 //		public void TestRemove()
 //		{
 //			BloomFilterDuplicateRemover bloomFilterDuplicateRemover = new BloomFilterDuplicateRemover(10);
 //			bool isDuplicate = bloomFilterDuplicateRemover.IsDuplicate(new Request("a", 1, null));
 
-//			Assert.IsFalse(isDuplicate);
+//			Assert.False(isDuplicate);
 //			isDuplicate = bloomFilterDuplicateRemover.IsDuplicate(new Request("a", 1, null));
 //			Assert.IsTrue(isDuplicate);
 //			isDuplicate = bloomFilterDuplicateRemover.IsDuplicate(new Request("b", 1, null));
-//			Assert.IsFalse(isDuplicate);
+//			Assert.False(isDuplicate);
 //			isDuplicate = bloomFilterDuplicateRemover.IsDuplicate(new Request("b", 1, null));
 //			Assert.IsTrue(isDuplicate);
 //		}
@@ -49,7 +47,7 @@
 //			return (long)usedMemory;
 //		}
 
-//		[TestMethod]
+//		[Fact]
 //		public void TestMemory()
 //		{
 //			int times = 5000000;
@@ -76,7 +74,7 @@
 //			Console.WriteLine("Memory used by hashset:" + (GetProcessUsedMemory() - used));
 //		}
 
-//		[TestMethod]
+//		[Fact]
 //		public void TestMissHit()
 //		{
 //			int times = 5000000;

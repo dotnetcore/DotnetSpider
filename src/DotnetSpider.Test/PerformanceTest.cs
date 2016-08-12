@@ -1,14 +1,13 @@
 ﻿//using System.Diagnostics;
 //using Antlr4.Runtime;
 //using DotnetSpider.Extension.Grammar;
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 //namespace DotnetSpider.Extension.Test
 //{
-//	[TestClass]
+//	
 //	public class PerformanceTest
 //	{
-//		[TestMethod]
+//		[Fact]
 //		public void NewObject()
 //		{
 //			Stopwatch watch = new Stopwatch();

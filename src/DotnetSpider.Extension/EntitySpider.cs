@@ -169,7 +169,7 @@ namespace DotnetSpider.Extension
 			if (typeof(ISpiderEntity).IsAssignableFrom(type))
 			{
 #if NET_CORE
-				Entities.Add(ConvertToEntityMetaData(type.GetTypeInfo()));
+				Entities.Add(PaserEntityMetaData(type.GetTypeInfo()));
 #else
 				Entities.Add(PaserEntityMetaData(type));
 #endif
@@ -363,7 +363,7 @@ namespace DotnetSpider.Extension
 		}
 
 #if !NET_CORE
-		private EntityMetadata PaserEntityMetaData(Type entityType)
+		public static EntityMetadata PaserEntityMetaData(Type entityType)
 		{
 			EntityMetadata entityMetadata = new EntityMetadata();
 			entityMetadata.Name = GetEntityName(entityType);
@@ -399,7 +399,7 @@ namespace DotnetSpider.Extension
 			return entityMetadata;
 		}
 
-		private Entity ParseEntity(Type entityType)
+		private static Entity ParseEntity(Type entityType)
 		{
 			Entity entity = new Entity();
 			var properties = entityType.GetProperties();
@@ -485,7 +485,7 @@ namespace DotnetSpider.Extension
 			return entity;
 		}
 #else
-		private EntityMetadata ConvertToEntityMetaData(TypeInfo entityType)
+		public static EntityMetadata PaserEntityMetaData(TypeInfo entityType)
 		{
 			EntityMetadata json = new EntityMetadata { Name = GetEntityName(entityType.AsType()) };
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
@@ -521,7 +521,7 @@ namespace DotnetSpider.Extension
 			return json;
 		}
 
-		private Entity ConvertToEntity(TypeInfo entityType)
+		private static Entity ConvertToEntity(TypeInfo entityType)
 		{
 			Entity entity = new Entity();
 			var properties = entityType.AsType().GetProperties();
@@ -608,7 +608,7 @@ namespace DotnetSpider.Extension
 		}
 #endif
 
-		private string ParseDataType(StoredAs storedAs)
+		private static string ParseDataType(StoredAs storedAs)
 		{
 			string reslut = "";
 

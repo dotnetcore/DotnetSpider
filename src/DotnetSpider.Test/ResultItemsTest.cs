@@ -1,14 +1,12 @@
 ﻿using DotnetSpider.Core;
-#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
+using  Xunit;
 
 namespace DotnetSpider.Test
 {
-	[TestClass]
+	
 	public class ResultItemsTest
 	{
-		[TestMethod]
+		[Fact]
 		public void TestOrderOfEntries()
 		{
 			ResultItems resultItems = new ResultItems();
@@ -19,9 +17,9 @@ namespace DotnetSpider.Test
 			resultItems.GetResultItem("a");
 			resultItems.GetResultItem("b");
 			resultItems.GetResultItem("c");
-			//Assert.AreEqual(a, "a");
-			//Assert.AreEqual(b, "b");
-			//Assert.AreEqual(c, "c");
+			//Assert.Equal(a, "a");
+			//Assert.Equal(b, "b");
+			//Assert.Equal(c, "c");
 		}
 	}
 }

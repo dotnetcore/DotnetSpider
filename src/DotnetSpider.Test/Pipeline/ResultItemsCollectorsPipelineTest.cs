@@ -1,17 +1,14 @@
 ﻿//using DotnetSpider.Core;
 //using DotnetSpider.Core.Pipeline;
-//#if !NET_CORE
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
-//#endif
 
 //namespace DotnetSpider.Test.Pipeline
 //{
-//	[TestClass]
+//	
 //	public class ResultItemsCollectorsPipelineTest
 //	{
 //		readonly ResultItemsCollectorPipeline _resultItemsCollectorPipeline = new ResultItemsCollectorPipeline();
 
-//		[TestMethod]
+//		[Fact]
 //		public void TestCollectorPipeline()
 //		{
 //			ResultItems resultItems = new ResultItems();
@@ -23,10 +20,10 @@
 //			{
 //				ResultItems items = result as ResultItems;
 				 
-//				Assert.AreEqual(items.Results.Count, 3);
-//				Assert.AreEqual(items.Results["a"], "a");
-//				Assert.AreEqual(items.Results["b"], "b");
-//				Assert.AreEqual(items.Results["c"], "c");
+//				Assert.Equal(items.Results.Count, 3);
+//				Assert.Equal(items.Results["a"], "a");
+//				Assert.Equal(items.Results["b"], "b");
+//				Assert.Equal(items.Results["c"], "c");
 //			}
 //		}
 //	}

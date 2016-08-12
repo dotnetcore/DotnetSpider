@@ -1,18 +1,26 @@
 {
   "version": "1.0.0-*",
+  "testRunner": "xunit",
   "buildOptions": {
     "emitEntryPoint": false,
     "debugType": "portable",
-    "copyToOutput": [ "config.ini", "nlog.config" ]
+    "copyToOutput": [
+      "config.ini",
+      "nlog.config",
+      "xunit.runner.json"
+    ]
   },
   "publishOptions": {
-    "includeFiles": [ "config.ini","nlog.config" ]
+    "includeFiles": [ "config.ini", "nlog.config" ]
   },
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
       "version": "1.0.0"
     },
+    "xunit": "2.2.0-beta2-build3300",
+    "xunit.runner.visualstudio": "2.2.0-beta2-build1149",
+    "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "DotnetSpider.Core": "0.0.9",
     "DotnetSpider.Extension": "0.0.9",
     "DotnetSpider.Redial": "0.0.9",

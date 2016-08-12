@@ -1,32 +1,32 @@
-﻿using DotnetSpider.Core.Selector;
-#if !NET_CORE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-#endif
+﻿using System;
+using System.Security.Authentication;
+using DotnetSpider.Core.Selector;
+using Xunit;
 
 namespace DotnetSpider.Test.Selector
 {
-	[TestClass]
+
 	public class RegexSelectorTest
 	{
 #if !NET_CORE
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void TestRegexWithSingleLeftBracket()
 		{
-			string regex = "\\d+(";
-			new RegexSelector(regex);
+
+			Exception ex = Assert.Throws<ArgumentException>(() => new RegexSelector("\\d+("));
+
+			Assert.NotNull(ex);
 		}
 #endif
 
-		[TestMethod]
+		[Fact]
 		public void TestRegexWithLeftBracketQuoted()
 		{
 			string regex = "\\(.+";
 			string source = "(hello world";
 			RegexSelector regexSelector = new RegexSelector(regex);
 			string select = regexSelector.Select(source);
-			Assert.AreEqual(select, source);
+			Assert.Equal(select, source);
 		}
 	}
 }

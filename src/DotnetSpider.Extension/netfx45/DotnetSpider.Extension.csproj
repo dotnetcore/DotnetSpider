@@ -191,9 +191,6 @@
     <Compile Include="..\EntitySpider.cs">
       <Link>EntitySpider.cs</Link>
     </Compile>
-    <Compile Include="..\Model\AfterExtractor.cs">
-      <Link>Model\AfterExtractor.cs</Link>
-    </Compile>
     <Compile Include="..\Model\Attribute\BaseExtractBy.cs">
       <Link>Model\Attribute\BaseExtractBy.cs</Link>
     </Compile>
