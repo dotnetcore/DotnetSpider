@@ -133,9 +133,8 @@ namespace DotnetSpider.Extension
 				}
 
 				Logger.Log(LogInfo.Create("构建内部模块、准备爬虫数据...", Logger.Name, this, LogLevel.Info));
-				SpiderMonitor.Default.Register(this);
-
 				InitComponent();
+				SpiderMonitor.Default.Register(this);
 
 				if (needInitStartRequest)
 				{
