@@ -1,6 +1,7 @@
 ﻿#if !NET_CORE
 
 using System.Collections.Generic;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.ORM;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -10,11 +11,14 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class EntityMongoDbPipeline : EntityBasePipeline
 	{
-		private readonly IMongoCollection<BsonDocument> _collection;
+		public string ConnectString { get; set; }
+		private IMongoCollection<BsonDocument> _collection;
 
-		public EntityMongoDbPipeline(Schema schema, string connectString)
+		public EntityMongoDbPipeline(string connectString)		{			ConnectString = connectString;		}
+
+		public override void InitiEntity(Schema schema, EntityMetadata metadata)
 		{
-			MongoClient client = new MongoClient(connectString);
+			MongoClient client = new MongoClient(ConnectString);
 			var db = client.GetDatabase(schema.Database);
 
 			_collection = db.GetCollection<BsonDocument>(schema.TableName);

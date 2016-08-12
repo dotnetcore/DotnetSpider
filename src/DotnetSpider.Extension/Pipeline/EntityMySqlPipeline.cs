@@ -11,7 +11,7 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class EntityMySqlPipeline : EntityGeneralPipeline
 	{
-		public EntityMySqlPipeline(Schema schema, EntityMetadata entityDefine, string connectString, PipelineMode mode) : base(schema, entityDefine, connectString, mode)
+		public EntityMySqlPipeline(string connectString, PipelineMode mode = PipelineMode.Insert) : base(connectString, mode)
 		{
 		}
 

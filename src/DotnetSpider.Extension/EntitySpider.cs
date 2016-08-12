@@ -44,7 +44,7 @@ namespace DotnetSpider.Extension
 		public List<GlobalValue> EnviromentValues { get; set; } = new List<GlobalValue>();
 		public Validations Validations { get; set; }
 		public CookieInterceptor CookieInterceptor { get; set; }
-		public List<Configuration.Pipeline> EntityPipelines { get; set; } = new List<Configuration.Pipeline>();
+		public List<EntityBasePipeline> EntityPipelines { get; set; } = new List<EntityBasePipeline>();
 		public int CachedSize { get; set; }
 
 		public EntitySpider(Site site)
@@ -99,13 +99,12 @@ namespace DotnetSpider.Extension
 
 					var schema = entity.Schema;
 
-					List<IEntityPipeline> pipelines = new List<IEntityPipeline>();
 					foreach (var pipeline in EntityPipelines)
 					{
-						pipelines.Add(pipeline.GetPipeline(schema, entity));
+						pipeline.InitiEntity(schema,entity);
 					}
 
-					Pipelines.Add(new EntityPipeline(entiyName, pipelines));
+					Pipelines.Add(new EntityPipeline(entiyName, EntityPipelines));
 				}
 
 				CheckIfSettingsCorrect();
@@ -281,7 +280,7 @@ namespace DotnetSpider.Extension
 			return this;
 		}
 
-		public EntitySpider AddEntityPipeline(Configuration.Pipeline pipeline)
+		public EntitySpider AddEntityPipeline(EntityBasePipeline pipeline)
 		{
 			CheckIfRunning();
 			EntityPipelines.Add(pipeline);
@@ -433,8 +432,7 @@ namespace DotnetSpider.Extension
 #else
 		private EntityMetadata ConvertToEntityMetaData(TypeInfo entityType)
 		{
-			EntityMetadata json = new EntityMetadata();
-			json.Name = GetEntityName(entityType.AsType());
+			EntityMetadata json = new EntityMetadata {Name = GetEntityName(entityType.AsType())};
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
 			{

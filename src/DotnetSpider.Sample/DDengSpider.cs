@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
+using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
@@ -27,10 +27,7 @@ namespace DotnetSpider.Sample
 				UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
 				Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
 			});
-			context.AddEntityPipeline(new MysqlPipeline
-			{
-				ConnectString = "Database='test';Data Source=;User ID=root;Password=;Port=4306"
-			});
+			context.AddEntityPipeline(new EntityMySqlPipeline("Database='test';Data Source=;User ID=root;Password=;Port=4306"));
 			context.AddStartUrl("http://www.ddeng.com/product/967659");
 			context.AddEntityType(typeof(Corp));
 

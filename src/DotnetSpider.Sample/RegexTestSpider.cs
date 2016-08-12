@@ -1,9 +1,9 @@
 using System;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Core;
+using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
@@ -15,7 +15,7 @@ namespace DotnetSpider.Sample
 			context.SetTaskGroup("cnblogs homepage");
 			context.SetIdentity("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddStartUrl("http://www.cnblogs.com");
-			context.AddEntityPipeline(new ConslePipeline());
+			context.AddEntityPipeline(new EntityConsolePipeline());
 			context.AddEntityType(typeof(HomePage));
 			return context;
 		}

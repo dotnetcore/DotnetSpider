@@ -13,20 +13,8 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class EntityGeneralPipeline : EntityBasePipeline
 	{
-		//public class Column
-		//{
-		//	public string Name { get; set; }
-		//	public string DataType { get; set; }
-
-		//	public override string ToString()
-		//	{
-		//		return $"{Name},{DataType}";
-		//	}
-		//}
-
-		protected string ConnectString { get; set; }
-		protected readonly List<Field> Columns = new List<Field>();
-		protected readonly List<Field> UpdateColumns = new List<Field>();
+		public string ConnectString { get; set; }
+		public PipelineMode Mode { get; set; }
 
 		protected abstract DbConnection CreateConnection();
 
@@ -35,23 +23,25 @@ namespace DotnetSpider.Extension.Pipeline
 		protected abstract string GetCreateTableSql();
 		protected abstract string GetCreateSchemaSql();
 		protected abstract DbParameter CreateDbParameter();
-		protected readonly Schema Schema;
-		protected PipelineMode Mode { get; set; }
-
-		//protected readonly Type Type;
 
 		protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
 		protected List<List<string>> Uniques { get; set; } = new List<List<string>>();
 		protected List<Field> Primary { get; set; } = new List<Field>();
 		protected string AutoIncrement { get; set; }
+		protected Schema Schema { get; set; }
+		protected List<Field> Columns { get; set; } = new List<Field>();
+		protected List<Field> UpdateColumns { get; set; } = new List<Field>();
 
 		protected abstract string ConvertToDbType(string datatype);
 
-		protected EntityGeneralPipeline(Schema schema, EntityMetadata entityDefine, string connectString, PipelineMode mode = PipelineMode.Insert)
+		protected EntityGeneralPipeline(string connectString, PipelineMode mode = PipelineMode.Insert)
 		{
 			Mode = mode;
 			ConnectString = connectString;
+		}
 
+		public override void InitiEntity(Schema schema, EntityMetadata entityDefine)
+		{
 			Schema = GenerateSchema(schema);
 			foreach (var f in entityDefine.Entity.Fields)
 			{
@@ -77,7 +67,7 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 
-			if (mode == PipelineMode.Update && entityDefine.Updates != null)
+			if (Mode == PipelineMode.Update && entityDefine.Updates != null)
 			{
 				foreach (var column in entityDefine.Updates)
 				{

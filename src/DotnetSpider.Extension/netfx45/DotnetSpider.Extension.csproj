@@ -159,9 +159,6 @@
     <Compile Include="..\Configuration\JsonSpiderContext.cs">
       <Link>Configuration\JsonSpiderContext.cs</Link>
     </Compile>
-    <Compile Include="..\Configuration\Pipeline.cs">
-      <Link>Configuration\Pipeline.cs</Link>
-    </Compile>
     <Compile Include="..\Configuration\Validation.cs">
       <Link>Configuration\Validation.cs</Link>
     </Compile>

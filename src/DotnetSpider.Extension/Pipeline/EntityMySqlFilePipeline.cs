@@ -15,15 +15,15 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class EntityMySqlFilePipeline : EntityBasePipeline
 	{
-		protected readonly Schema Schema;
-		protected readonly List<DataToken> Columns;
+		protected Schema Schema;
+		protected List<DataToken> Columns;
 		protected string DataFolder;
 		protected StreamWriter Writer;
 
-		public EntityMySqlFilePipeline(Schema schema, EntityMetadata entityDefine)
+		public override void InitiEntity(Schema schema, EntityMetadata metadata)
 		{
 			Schema = schema;
-			Columns = entityDefine.Entity.Fields;
+			Columns = metadata.Entity.Fields;
 		}
 
 		public override void InitPipeline(ISpider spider)
@@ -60,7 +60,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 					}
 				}
-				Writer.Write( builder.ToString());
+				Writer.Write(builder.ToString());
 			}
 		}
 

@@ -4,6 +4,8 @@ using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using System;
 using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.ORM;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -12,11 +14,11 @@ namespace DotnetSpider.Extension.Pipeline
 		protected string DataFolder;
 		protected StreamWriter Writer;
 
-		private readonly string _entityName;
+		private string _entityName;
 
-		public EntityJsonFilePipeline(JObject entityDefine)
+		public override void InitiEntity(Schema schema, EntityMetadata metadata)
 		{
-			_entityName = entityDefine.SelectToken("$.Identity").ToString();
+			_entityName = metadata.Name;
 		}
 
 		public override void InitPipeline(ISpider spider)

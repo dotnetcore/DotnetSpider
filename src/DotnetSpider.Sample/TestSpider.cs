@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Configuration;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Downloader;
+using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
@@ -45,10 +45,7 @@ namespace DotnetSpider.Sample
 				Port = 6379,
 				Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w"
 			});
-			context.AddEntityPipeline(new MysqlPipeline()
-			{
-				ConnectString = "Database='testhao';Data Source= 127.0.0.1;User ID=root;Password=root@123456;Port=4306",
-			});
+			context.AddEntityPipeline(new EntityMySqlPipeline("Database='testhao';Data Source= 127.0.0.1;User ID=root;Password=root@123456;Port=4306"));
 			context.AddStartUrl("https://hao.360.cn/");
 			context.AddEntityType(typeof(UpdateHao360Info));
 			return context;
