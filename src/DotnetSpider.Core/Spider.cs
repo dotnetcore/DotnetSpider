@@ -135,12 +135,6 @@ namespace DotnetSpider.Core
 				throw new SpiderException("PageProcessor should not be null.");
 			}
 
-
-			if (Pipelines == null || Pipelines.Count == 0)
-			{
-				throw new SpiderException("Pipelines should not be null.");
-			}
-
 			if (Site == null)
 			{
 				Site = new Site();
@@ -355,6 +349,12 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
+
+			if (Pipelines == null || Pipelines.Count == 0)
+			{
+				throw new SpiderException("Pipelines should not be null.");
+			}
+
 			Scheduler.Init(this);
 #if !NET_CORE
 			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));

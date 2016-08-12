@@ -12,14 +12,6 @@ namespace DotnetSpider.Sample
 
 			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
 			spiderBuilder.Run("rerun");
-			//var end = DateTime.Now;
-			//Console.WriteLine((end - start).TotalMilliseconds);
-			//Console.Read();
-			//SpiderExample.Run();
-			//JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
-			//var context = spiderBuilder.GetBuilder().Context;
-			//ContextSpider spider = new ContextSpider(context);
-			//spider.Run("rerun");
 		}
 	}
 }
