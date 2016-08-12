@@ -1,5 +1,8 @@
 ﻿#if NET_CORE
+using System;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 #else
 using System.Net.NetworkInformation;
 #endif
