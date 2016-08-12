@@ -1,14 +1,16 @@
+#if Test
 using Newtonsoft.Json;
+#endif
 
 namespace DotnetSpider.Extension
 {
-	public abstract class SpiderBuilder
+	public abstract class EntitySpiderBuilder
 	{
-		protected abstract EntitySpider GetSpiderContext();
+		protected abstract EntitySpider GetEntitySpider();
 
 		public void Run(params string[] args)
 		{
-			var spider = GetSpiderContext();
+			var spider = GetEntitySpider();
 			if (spider != null)
 			{
 #if Test
@@ -18,7 +20,6 @@ namespace DotnetSpider.Extension
 #elif Publish
 				//ModelSpider spider = new ModelSpider(context) {AfterSpiderFinished = AfterSpiderFinished};
 #endif
-				string json = JsonConvert.SerializeObject(GetSpiderContext());
 				spider.Run(args);
 			}
 		}

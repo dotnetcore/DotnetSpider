@@ -11,8 +11,8 @@ namespace DotnetSpider.Sample
 			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
 			//IocExtension.ServiceCollection.AddSingleton<IMonitorService, HttpMonitor>();
 
-			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
-			spiderBuilder.Run("rerun");
+			JdSkuSampleEntitySpider entitySpiderBuilder = new JdSkuSampleEntitySpider();
+			entitySpiderBuilder.Run("rerun");
 			//var end = DateTime.Now;
 			//Console.WriteLine((end - start).TotalMilliseconds);
 			//Console.Read();

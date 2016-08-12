@@ -5,8 +5,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property)]
 	public class SplitFormatter : Formatter
 	{
-		public override string Name { get; internal set; } = "SplitFormatter";
-
 		public string[] Splitors { get; set; }
 		public int Index { get; set; }
 

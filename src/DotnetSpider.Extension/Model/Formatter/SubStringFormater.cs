@@ -5,8 +5,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class SubStringFormatter : Formatter
 	{
-		public override string Name { get; internal set; } = "SubStringFormatter";
-
 		public string StartString { get; set; }
 		public string EndString { get; set; }
 		public int StartOffset { get; set; } = 0;

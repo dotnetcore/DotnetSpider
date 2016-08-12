@@ -10,9 +10,9 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class DDengSpider : SpiderBuilder
+	public class DDengEntitySpider : EntitySpiderBuilder
 	{
-		protected override EntitySpider GetSpiderContext()
+		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());
 			context.SetIdentity("ddeng.com " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));

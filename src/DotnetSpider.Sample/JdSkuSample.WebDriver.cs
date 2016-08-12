@@ -11,9 +11,9 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class JdSkuWebDriverSampleSpider : SpiderBuilder
+	public class JdSkuWebDriverSampleSpider : EntitySpiderBuilder
 	{
-		protected override EntitySpider GetSpiderContext()
+		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());
 			context.SetIdentity("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));

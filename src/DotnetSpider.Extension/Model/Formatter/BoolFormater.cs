@@ -10,7 +10,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 			Equal,
 			Contain
 		}
-		public override string Name { get; internal set; } = "BoolFormatter";
 
 		public string Pattern { get; set; }
 		public JudgementOption Judgement { get; set; } = JudgementOption.Equal;

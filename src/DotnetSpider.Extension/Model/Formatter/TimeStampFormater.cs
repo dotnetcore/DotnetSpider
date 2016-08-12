@@ -5,8 +5,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class TimeStampFormatter : Formatter
 	{
-		public override string Name { get; internal set; } = "TimeStampFormatter";
-
 		public override string Formate(string value)
 		{
 			long timeStamp = long.Parse(value);

@@ -216,9 +216,6 @@
     <Compile Include="..\Model\Attribute\EnviromentExtractBy.cs">
       <Link>Model\Attribute\EnviromentExtractBy.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\Formatter.cs">
-      <Link>Model\Attribute\Formatter.cs</Link>
-    </Compile>
     <Compile Include="..\Model\Attribute\Indexes.cs">
       <Link>Model\Attribute\Indexes.cs</Link>
     </Compile>
@@ -227,9 +224,6 @@
     </Compile>
     <Compile Include="..\Model\Attribute\Stopping.cs">
       <Link>Model\Attribute\Stopping.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Attribute\TargetUrl.cs">
-      <Link>Model\Attribute\TargetUrl.cs</Link>
     </Compile>
     <Compile Include="..\Model\Attribute\TypeExtractBy.cs">
       <Link>Model\Attribute\TypeExtractBy.cs</Link>
@@ -242,9 +236,6 @@
     </Compile>
     <Compile Include="..\Model\EntityExtractor.cs">
       <Link>Model\EntityExtractor.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\EntityGeneralSpider.cs">
-      <Link>Model\EntityGeneralSpider.cs</Link>
     </Compile>
     <Compile Include="..\Model\EntityMetadata.cs">
       <Link>Model\EntityMetadata.cs</Link>

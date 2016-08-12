@@ -10,8 +10,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property)]
 	public class UrlEncodeFormater : Formatter
 	{
-		public override string Name { get; internal set; } = "UrlEncodeFormater";
-
 		public string Encoding { get; set; }
 
 		public override string Formate(string value)

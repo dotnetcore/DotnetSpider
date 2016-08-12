@@ -7,9 +7,9 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class RegexTestSpider : SpiderBuilder
+	public class RegexTestEntitySpider : EntitySpiderBuilder
 	{
-		protected override EntitySpider GetSpiderContext()
+		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());
 			context.SetTaskGroup("cnblogs homepage");

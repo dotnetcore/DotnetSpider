@@ -6,8 +6,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class RegexMatchFormatter : Formatter
 	{
-		public override string Name { get; internal set; } = "RegexMatchFormatter";
-
 		public string Pattern { get; set; }
 
 		public override string Formate(string value)

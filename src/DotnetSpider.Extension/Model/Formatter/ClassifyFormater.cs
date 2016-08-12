@@ -11,7 +11,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 			Equal,
 			Contain
 		}
-		public override string Name { get; internal set; } = "ClassifyFormatter";
 
 		public string[] Patterns { get; set; }
 		public string[] Values { get; set; }

@@ -11,13 +11,13 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class Hao360SpiderInfoBuble : SpiderBuilder
+	public class Hao360EntitySpiderInfoBuble : EntitySpiderBuilder
 	{
-		protected override EntitySpider GetSpiderContext()
+		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site())
 			{
-				UserId = "86Research",
+				UserId = "DotnetSpider",
 				TaskGroup = "HaoBrowser",
 				Identity = "HaoBrowser Hao360Spider Buble " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
 				CachedSize = 1,

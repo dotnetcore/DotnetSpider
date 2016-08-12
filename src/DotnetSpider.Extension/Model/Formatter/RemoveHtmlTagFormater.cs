@@ -6,8 +6,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class RemoveHtmlTagFormater : Formatter
 	{
-		public override string Name { get; internal set; } = "RemoveHtmlTagFormater";
-
 		public override string Formate(string value)
 		{
 			var htmlDocument = new HtmlDocument();
