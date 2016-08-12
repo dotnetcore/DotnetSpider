@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-#if NET_CORE
+﻿#if NET_CORE
 using System.Net.Http;
 #else
 using System.Net.NetworkInformation;

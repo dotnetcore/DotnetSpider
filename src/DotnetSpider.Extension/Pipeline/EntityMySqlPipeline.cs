@@ -3,14 +3,16 @@ using System.Linq;
 using System.Text;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Extension.ORM;
 using MySql.Data.MySqlClient;
-using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public class EntityMySqlPipeline : EntityGeneralPipeline
 	{
+		public EntityMySqlPipeline()
+		{
+		}
+
 		public EntityMySqlPipeline(string connectString, PipelineMode mode = PipelineMode.Insert) : base(connectString, mode)
 		{
 		}

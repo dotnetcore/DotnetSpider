@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Pipeline
 	public abstract class EntityGeneralPipeline : EntityBasePipeline
 	{
 		public string ConnectString { get; set; }
-		public PipelineMode Mode { get; set; }
+		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
 
 		protected abstract DbConnection CreateConnection();
 
@@ -33,6 +33,10 @@ namespace DotnetSpider.Extension.Pipeline
 		protected List<Field> UpdateColumns { get; set; } = new List<Field>();
 
 		protected abstract string ConvertToDbType(string datatype);
+
+		protected EntityGeneralPipeline()
+		{
+		}
 
 		protected EntityGeneralPipeline(string connectString, PipelineMode mode = PipelineMode.Insert)
 		{
