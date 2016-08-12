@@ -20,5 +20,10 @@ namespace DotnetSpider.Core.Downloader
 		List<IDownloadCompleteHandler> DownloadCompleteHandlers { get; set; }
 
 		IDownloader Clone();
-	}
+
+        /// <summary>
+        /// Can be any object as a context instance.
+        /// </summary>
+        dynamic Context { get; set; }
+    }
 }

@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension
 #elif Publish
 				//ModelSpider spider = new ModelSpider(context) {AfterSpiderFinished = AfterSpiderFinished};
 #endif
-				string json = JsonConvert.SerializeObject(GetSpiderContext());
+				//string json = JsonConvert.SerializeObject(GetSpiderContext());
 				spider.Run(args);
 			}
 		}

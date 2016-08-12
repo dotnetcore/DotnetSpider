@@ -8,6 +8,7 @@ using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.Common;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Extension.Model
 {
@@ -26,7 +27,15 @@ namespace DotnetSpider.Extension.Model
 
 		public dynamic Process(Page page)
 		{
-			if (_enviromentValues != null && _enviromentValues.Count > 0)
+            bool isTarget = true;
+            foreach (var url in _entityDefine.TargetUrls)
+            {
+                isTarget = Regex.IsMatch(page.Url, url, RegexOptions.IgnoreCase);
+                if (isTarget) break;
+            }
+            if (!isTarget) return null;
+
+            if (_enviromentValues != null && _enviromentValues.Count > 0)
 			{
 				foreach (var enviromentValue in _enviromentValues)
 				{
@@ -133,11 +142,40 @@ namespace DotnetSpider.Extension.Model
 				var fieldValue = ExtractField(item, page, field, index);
 				if (fieldValue != null)
 				{
-					dataObject.Add(field.Name, fieldValue);
+                    if (!string.IsNullOrEmpty(field.Pattern))
+                    {
+                        if (string.IsNullOrEmpty(field.ReplaceString))
+                        {
+                            fieldValue = Regex.Match(fieldValue, field.Pattern).ToString();
+                        }
+                        else
+                        {
+                            fieldValue = Regex.Replace(fieldValue, field.Pattern, field.ReplaceString);
+                        }
+                    }
+                    dataObject.Add(field.Name, fieldValue);
 				}
 			}
-
-			var stopping = entityDefine.Stopping;
+            List<TargetUrlExtractor> extractors = new List<TargetUrlExtractor>();
+            foreach (var field in entityDefine.Entity.UrlExtras)
+            {
+                TargetUrlExtractor newExt = field.Key.Clone();
+                if (field.Value != null)
+                {
+                    foreach (var p in field.Value)
+                    {
+                        JToken v;
+                        dataObject.TryGetValue(p, StringComparison.InvariantCultureIgnoreCase, out v);
+                        if (v != null)
+                        {
+                            newExt.Extras.Add(p, v);
+                        }
+                    }
+                }
+                extractors.Add(newExt);
+            }
+            SelectorUtil.ExtractLinks(item, page, extractors);
+            var stopping = entityDefine.Stopping;
 
 			if (stopping != null)
 			{

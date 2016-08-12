@@ -23,8 +23,9 @@ namespace DotnetSpider.Sample
 			});
 			context.AddEntityPipeline(new MysqlPipeline
 			{
-				ConnectString = "Database='test';Data Source=86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
-			});
+                //ConnectString = "Database='test';Data Source=86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"
+                ConnectString = "Database='test';Data Source=localhost;User ID=root;Password=pass@word1;Port=4040"
+            });
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));
 

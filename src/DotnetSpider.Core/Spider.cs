@@ -42,7 +42,7 @@ namespace DotnetSpider.Core
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 		public string UserId { get; set; }
 		public string TaskGroup { get; set; }
-		public int EmptySleepTime { get; set; } = 15000;
+		public int EmptySleepTime { get; set; } = 150000;
 		protected bool IsExited { get; private set; }
 		protected int WaitInterval = 10;
 		protected Status Stat = Status.Init;
@@ -350,6 +350,7 @@ namespace DotnetSpider.Core
 		{
 			CheckIfRunning();
 			Downloader = downloader;
+            Downloader.Context = this;
 			return this;
 		}
 

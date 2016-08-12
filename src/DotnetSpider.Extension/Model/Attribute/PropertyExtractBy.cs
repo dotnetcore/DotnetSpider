@@ -20,6 +20,16 @@ namespace DotnetSpider.Extension.Model.Attribute
 
 		public ValueOption Option { get; set; } = ValueOption.None;
 
-		//public bool Multi { get; set; } = false;
-	}
+        //public bool Multi { get; set; } = false;
+
+        /// <summary>
+        /// Get the part matching the pattern from the value extracted.
+        /// </summary>
+        public string Pattern { get; set; }
+        /// <summary>
+        /// Work together with "Pattern", generate a new result string by a regex replacing.
+        /// </summary>
+        public string ReplaceString { get; set; }
+
+    }
 }

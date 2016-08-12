@@ -22,6 +22,7 @@ using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Configuration;
+using System.Text.RegularExpressions;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -46,8 +47,12 @@ namespace DotnetSpider.Extension
 		public CookieInterceptor CookieInterceptor { get; set; }
 		public List<Configuration.Pipeline> EntityPipelines { get; set; } = new List<Configuration.Pipeline>();
 		public int CachedSize { get; set; }
+        /// <summary>
+        /// Key: Url patterns. Value: Until condition generators used by webdriverdownloaders.
+        /// </summary>
+        public Dictionary<string, MethodInfo> UntilConditionMethods { get; set; } = new Dictionary<string, MethodInfo>();
 
-		public EntitySpider(Site site)
+        public EntitySpider(Site site)
 		{
 			if (site == null)
 			{
@@ -66,15 +71,16 @@ namespace DotnetSpider.Extension
 				if (CookieInterceptor != null)
 				{
 					Logger.Log(LogInfo.Create("尝试获取 Cookie...", Logger.Name, this, LogLevel.Info));
-					string cookie = CookieInterceptor.GetCookie();
-					if (string.IsNullOrEmpty(cookie))
+					var cookie = CookieInterceptor.GetCookie();
+					if (string.IsNullOrEmpty(cookie.Item1))
 					{
 						Logger.Log(LogInfo.Create("获取 Cookie 失败, 爬虫无法继续.", Logger.Name, this, LogLevel.Error));
 						return;
 					}
 					else
 					{
-						Site.Cookie = cookie;
+						Site.Cookie = cookie.Item1;
+                        Site.Cookies = cookie.Item2;
 					}
 				}
 #endif
@@ -335,8 +341,33 @@ namespace DotnetSpider.Extension
 			{
 				entityMetadata.Updates = updates.Columns;
 			}
+            var targetUrls = entityType.GetCustomAttributes<TargetUrl>();
 
-			Entity entity = ParseEntity(entityType);
+            var conditionFunc = entityType.GetMethod("UntilCondition", BindingFlags.Static | BindingFlags.Public);
+            if (targetUrls != null)
+            {
+                entityMetadata.TargetUrls = new string[targetUrls.Count()];
+                int i = 0;
+                foreach (var att in targetUrls)
+                {
+                    var url = att.UrlPattern;
+                    url = att.KeepOrigin ? att.UrlPattern : string.Format("({0})", url.Replace(".", "\\.").Replace("*", "[^\"'#]*"));
+                    entityMetadata.TargetUrls[i] = url;
+                    if (conditionFunc != null)
+                    {
+                        this.UntilConditionMethods.Add(url, conditionFunc);
+                    }
+                    i++;
+                }
+            }
+            else if (conditionFunc != null)
+            {
+                if (!UntilConditionMethods.ContainsKey(string.Empty))
+                {
+                    UntilConditionMethods.Add(string.Empty, conditionFunc);
+                }
+            }
+            Entity entity = ParseEntity(entityType);
 
 			entityMetadata.Entity = entity;
 
@@ -408,9 +439,11 @@ namespace DotnetSpider.Extension
 							Type = extractBy.Type,
 							Argument = extractBy.Argument
 						};
-					}
+                        token.Pattern = extractBy.Pattern;
+                        token.ReplaceString = extractBy.ReplaceString;
+                    }
 
-					if (storeAs != null)
+                    if (storeAs != null)
 					{
 						token.Name = storeAs.Name;
 						token.DataType = ParseDataType(storeAs);
@@ -425,7 +458,19 @@ namespace DotnetSpider.Extension
 						token.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
 					}
 
-					entity.Fields.Add(token);
+                    TargetUrl toAddUrl = propertyInfo.GetCustomAttribute<TargetUrl>();
+                    if (toAddUrl != null)
+                    {
+                        var urlExtra = new TargetUrlExtractor();
+                        urlExtra.Region = token.Selector;
+                        if (!string.IsNullOrEmpty(toAddUrl.UrlPattern))
+                        {
+                            urlExtra.Patterns.Add(toAddUrl.UrlPattern);
+                        }
+                        entity.UrlExtras.Add(urlExtra, toAddUrl.OtherPropertiesAsExtras?.ToList());
+                    }
+                    else
+                        entity.Fields.Add(token);
 				}
 			}
 			return entity;
@@ -555,7 +600,19 @@ namespace DotnetSpider.Extension
 		}
 #endif
 
-		private string ParseDataType(StoredAs storedAs)
+        public MethodInfo GetConditionMethodByUrl(string url)
+        {
+            foreach (var item in UntilConditionMethods)
+            {
+                if (Regex.IsMatch(url, item.Key))
+                {
+                    return item.Value;
+                }
+            }
+            return null;
+        }
+
+        private string ParseDataType(StoredAs storedAs)
 		{
 			string reslut = "";
 

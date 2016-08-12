@@ -1,6 +1,7 @@
 using System;
 using NLog;
 using DotnetSpider.Core;
+using System.Collections.Generic;
 #if !NET_CORE
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -18,11 +19,11 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		protected readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-		public abstract string GetCookie();
-	}
+        public abstract Tuple<string, List<Cookie>> GetCookie();
+    }
 
 #if !NET_CORE
-	public abstract class WebDriverCookieInterceptor : CookieInterceptor
+    public abstract class WebDriverCookieInterceptor : CookieInterceptor
 	{
 		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
 		{
@@ -64,10 +65,11 @@ namespace DotnetSpider.Extension.Downloader
 
 		public Selector GotoSelector { get; set; }
 
-		public override string GetCookie()
-		{
-			string cookie = string.Empty;
-			while (string.IsNullOrEmpty(cookie))
+        public override Tuple<string, List<Cookie>> GetCookie()
+        {
+            string cookie = string.Empty;
+            var cookieList = new List<Cookie>();
+            while (string.IsNullOrEmpty(cookie))
 			{
 				var webDriver = GetWebDriver();
 				try
@@ -91,7 +93,7 @@ namespace DotnetSpider.Extension.Downloader
 						Thread.Sleep(2000);
 					}
 
-					var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
+					cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
 
 					if (cookieList.Count > 0)
 					{
@@ -111,18 +113,18 @@ namespace DotnetSpider.Extension.Downloader
 				}
 			}
 
-			return cookie;
-		}
-	}
+            return new Tuple<string, List<Cookie>>(cookie, cookieList);
+        }
+    }
 
 	public class FiddlerCookieInterceptor : CommonCookieInterceptor
 	{
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
 
-		public override string GetCookie()
-		{
-			if (string.IsNullOrEmpty(Pattern))
+        public override Tuple<string, List<Cookie>> GetCookie()
+        {
+            if (string.IsNullOrEmpty(Pattern))
 			{
 				throw new Exception("Fiddler CookieTrapper: Pattern cannot be null!");
 			}
@@ -144,18 +146,19 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				fiddlerWrapper.StopCapture();
 			}
-			return cookie;
-		}
-	}
+            //Item2 not implemented
+            return new Tuple<string, List<Cookie>>(cookie, null);
+        }
+    }
 
 	public class FiddlerLoginCookieInterceptor : LoginCookieInterceptor
 	{
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
 
-		public override string GetCookie()
-		{
-			if (string.IsNullOrEmpty(Pattern))
+        public override Tuple<string, List<Cookie>> GetCookie()
+        {
+            if (string.IsNullOrEmpty(Pattern))
 			{
 				throw new Exception("Fiddler CookieTrapper: Pattern cannot be null!");
 			}
@@ -177,9 +180,10 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				fiddlerWrapper.StopCapture();
 			}
-			return cookie;
-		}
-	}
+            //Item2 not implemented
+            return new Tuple<string, List<Cookie>>(cookie, null);
+        }
+    }
 
 	public class LoginCookieInterceptor : WebDriverCookieInterceptor
 	{
@@ -199,10 +203,11 @@ namespace DotnetSpider.Extension.Downloader
 
 		public Selector LoginAreaSelector { get; set; }
 
-		public override string GetCookie()
-		{
-			string cookie = string.Empty;
-			while (string.IsNullOrEmpty(cookie))
+        public override Tuple<string, List<Cookie>> GetCookie()
+        {
+            string cookie = string.Empty;
+            var cookieList = new List<Cookie>();
+            while (string.IsNullOrEmpty(cookie))
 			{
 				var webDriver = GetWebDriver();
 				try
@@ -235,7 +240,7 @@ namespace DotnetSpider.Extension.Downloader
 						Thread.Sleep(10000);
 					}
 
-					var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
+					cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
 
 					if (cookieList.Count > 0)
 					{
@@ -255,8 +260,8 @@ namespace DotnetSpider.Extension.Downloader
 				}
 			}
 
-			return cookie;
-		}
-	}
+            return new Tuple<string, List<Cookie>>(cookie, cookieList);
+        }
+    }
 #endif
 }

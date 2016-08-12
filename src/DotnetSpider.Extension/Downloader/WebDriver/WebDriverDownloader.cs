@@ -8,6 +8,7 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Common;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace DotnetSpider.Extension.Downloader.WebDriver
 {
@@ -82,11 +83,24 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 				//中文乱码URL
 				Uri uri = request.Url;
 				string query = uri.Query;
-				string realUrl = uri.Scheme + "://" + uri.DnsSafeHost + (uri.Port == 80 ? "" : (":" + uri.Port)) + uri.AbsolutePath + (string.IsNullOrEmpty(query)
-									? ""
-									: ("?" + HttpUtility.UrlPathEncode(uri.Query.Substring(1, uri.Query.Length - 1))));
+                var domainUrl = string.Format("{0}://{1}{2}", uri.Scheme, uri.DnsSafeHost, uri.Port == 80 ? "" : (":" + uri.Port));
+                //       string realUrl = domainUrl + uri.AbsolutePath + (string.IsNullOrEmpty(query)
+                //? ""
+                //: ("?" + HttpUtility.UrlPathEncode(uri.Query.Substring(1, uri.Query.Length - 1))));
+                string realUrl = HttpUtility.UrlPathEncode(request.Url.AbsoluteUri);
 
-				if (UrlFormat != null)
+                var options = _webDriver.Manage();
+                if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies.Count > 0)
+                {
+                    _webDriver.Url = domainUrl;
+                    options.Cookies.DeleteAllCookies();
+                    foreach (var c in spider.Site.Cookies)
+                    {
+                        options.Cookies.AddCookie(c);
+                    }
+                }
+
+                if (UrlFormat != null)
 				{
 					realUrl = UrlFormat(realUrl);
 				}
@@ -96,7 +110,20 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 					_webDriver.Navigate().GoToUrl(realUrl);
 				});
 
-				Thread.Sleep(_webDriverWaitTime);
+                if (Context != null)
+                {
+                    var context = Context as EntitySpider;
+                    var untilMethod = context?.GetConditionMethodByUrl(realUrl);
+                    if (untilMethod != null)
+                    {
+                        dynamic condition;
+                        WebDriverWait wait = new WebDriverWait(_webDriver, TimeSpan.FromSeconds(10));
+                        condition = untilMethod.Invoke(null, null);
+                        wait.Until(condition);
+                    }
+                }
+
+                Thread.Sleep(_webDriverWaitTime);
 
 				AfterNavigate?.Invoke((RemoteWebDriver)_webDriver);
 

@@ -109,11 +109,15 @@ namespace DotnetSpider.Core
 		public int CycleRetryTimes { get; set; } = 5;
 
 		public string Cookie { get; set; }
+        /// <summary>
+        /// Same content as Cookie, but this collection version can be used by webdrivers more handily.
+        /// </summary>
+        public List<OpenQA.Selenium.Cookie> Cookies { get; set; } = new List<OpenQA.Selenium.Cookie>();
 
-		/// <summary>
-		/// Set or Get up httpProxy for this site
-		/// </summary>
-		public string HttpProxy { get; set; }
+        /// <summary>
+        /// Set or Get up httpProxy for this site
+        /// </summary>
+        public string HttpProxy { get; set; }
 
 		/// <summary>
 		/// Whether use gzip.  
