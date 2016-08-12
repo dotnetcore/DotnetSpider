@@ -2,7 +2,6 @@
 //using DotnetSpider.Core;
 //using DotnetSpider.Extension.Model.Formatter;
 //using Newtonsoft.Json.Linq;
-//using DotnetSpider.Validation;
 //using System.Linq;
 //using DotnetSpider.Core.Downloader;
 //using DotnetSpider.Core.Scheduler;

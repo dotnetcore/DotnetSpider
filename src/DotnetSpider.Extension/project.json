@@ -14,7 +14,6 @@
     "HtmlAgilityPack": "0.0.9",
     "HtmlAgilityPack.Css": "0.0.9",
     "SapientGuardian.MySql.Data": "6.9.812",
-    "DotnetSpider.Validation": "0.0.9",
     "System.Data.Common": "*",
     "Microsoft.CSharp": "*",
     "Newtonsoft.Json": "*",
