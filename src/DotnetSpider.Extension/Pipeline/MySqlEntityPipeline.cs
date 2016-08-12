@@ -7,13 +7,13 @@ using MySql.Data.MySqlClient;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class EntityMySqlPipeline : EntityGeneralPipeline
+	public class MySqlEntityPipeline : BaseEntityDbPipeline
 	{
-		public EntityMySqlPipeline()
+		public MySqlEntityPipeline()
 		{
 		}
 
-		public EntityMySqlPipeline(string connectString, PipelineMode mode = PipelineMode.Insert) : base(connectString, mode)
+		public MySqlEntityPipeline(string connectString, PipelineMode mode = PipelineMode.Insert) : base(connectString, mode)
 		{
 		}
 

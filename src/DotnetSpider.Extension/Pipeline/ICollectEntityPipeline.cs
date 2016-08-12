@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public interface IEntityCollectorPipeline : IEntityPipeline
+	public interface ICollectEntityPipeline : IEntityPipeline
 	{
 		IEnumerable<JObject> GetCollected();
 	}

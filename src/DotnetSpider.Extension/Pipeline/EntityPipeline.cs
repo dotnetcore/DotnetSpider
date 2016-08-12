@@ -7,10 +7,10 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class EntityPipeline : CachedPipeline
 	{
-		private readonly List<EntityBasePipeline> _pipelines;
+		private readonly List<BaseEntityPipeline> _pipelines;
 		private readonly string _entityName;
 
-		public EntityPipeline(string entityName, List<EntityBasePipeline> pipelines)
+		public EntityPipeline(string entityName, List<BaseEntityPipeline> pipelines)
 		{
 			_entityName = entityName;
 			_pipelines = pipelines;

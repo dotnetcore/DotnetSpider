@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
@@ -129,10 +128,9 @@ namespace DotnetSpider.Extension.Model
 			List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
 			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
 			{
-				string sql = QueryString;
 				conn.Open();
 				var command = conn.CreateCommand();
-				command.CommandText = sql;
+				command.CommandText = QueryString;
 				command.CommandTimeout = 60000;
 				command.CommandType = CommandType.Text;
 
@@ -182,13 +180,12 @@ namespace DotnetSpider.Extension.Model
 			return arguments;
 		}
 
-		protected virtual void BuildQueryString()
-		{
-		}
-
 		public override void Build(Spider site, dynamic obj)
 		{
-			BuildQueryString();
+			if (string.IsNullOrEmpty(QueryString))
+			{
+				throw new SpiderException("QueryString is null.");
+			}
 
 			var datas = PrepareDatas();
 			foreach (var data in datas)
@@ -237,70 +234,7 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class ConfigurableDbPrepareStartUrls : BaseDbPrepareStartUrls
-	{
-		/// <summary>
-		/// 数据来源表名, 需要Schema/数据库名
-		/// </summary>
-		public string TableName { get; set; }
-
-		/// <summary>
-		/// 对表的筛选
-		/// 如: cdate='2016-03-01', isUsed=true
-		/// </summary>
-		public List<string> Filters { get; set; }
-
-		public int Limit { get; set; }
-
-		public string GroupBy { get; set; }
-
-		public string OrderBy { get; set; }
-
-		protected override void BuildQueryString()
-		{
-			switch (Source)
-			{
-				case DataSource.MySql:
-					{
-						StringBuilder builder = new StringBuilder($"SELECT * FROM {TableName}");
-						if (Filters != null && Filters.Count > 0)
-						{
-							builder.Append(" WHERE " + Filters.First());
-							if (Filters.Count > 1)
-							{
-								for (int i = 1; i < Filters.Count; ++i)
-								{
-									builder.Append(" AND " + Filters[i]);
-								}
-							}
-						}
-
-						if (!string.IsNullOrEmpty(GroupBy))
-						{
-							builder.Append($" {GroupBy} ");
-						}
-
-						if (!string.IsNullOrEmpty(OrderBy))
-						{
-							builder.Append($" {OrderBy} ");
-						}
-
-						if (Limit > 0)
-						{
-							builder.Append($" LIMIT {Limit} ");
-						}
-
-						QueryString = builder.ToString();
-						return;
-					}
-			}
-
-			throw new SpiderException($"Unsport Source: {Source}");
-		}
-
-	}
-
-	public class DbCommonPrepareStartUrls : ConfigurableDbPrepareStartUrls
+	public class CommonDbPrepareStartUrls : BaseDbPrepareStartUrls
 	{
 		public int From { get; set; }
 		public int To { get; set; }
@@ -314,7 +248,7 @@ namespace DotnetSpider.Extension.Model
 		{
 			if (string.IsNullOrEmpty(QueryString))
 			{
-				BuildQueryString();
+				throw new SpiderException("QueryString is null.");
 			}
 
 			var datas = PrepareDatas();
@@ -353,73 +287,6 @@ namespace DotnetSpider.Extension.Model
 				return s;
 			}
 			return null;
-		}
-	}
-
-	public class DbListPrepareStartUrls : ConfigurableDbPrepareStartUrls
-	{
-		public int Interval { get; set; }
-		public string ColumnSeparator { get; set; }
-		public string RowSeparator { get; set; }
-
-		public string FormateString { get; set; }
-
-		public override void Build(Spider site, dynamic obj)
-		{
-			BuildQueryString();
-
-			int interval = 0;
-			StringBuilder formatBuilder = new StringBuilder();
-
-			var datas = PrepareDatas();
-
-			foreach (var data in datas)
-			{
-				if (interval == Interval)
-				{
-					foreach (var formate in FormateStrings)
-					{
-						string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - (string.IsNullOrEmpty(RowSeparator) ? 0 : RowSeparator.Length)));
-						site.AddStartRequest(new Request(tmpUrl, 0, null)
-						{
-							Method = Method,
-							Origin = Origin,
-							Referer = Referer
-						});
-					}
-
-					interval = 0;
-					formatBuilder = new StringBuilder();
-				}
-
-				Dictionary<string, object> tmp = data;
-
-				StringBuilder argumentsBuilder = new StringBuilder();
-				foreach (var column in Columns)
-				{
-					string value = tmp[column.Name]?.ToString();
-
-					value = column.Formatters.Aggregate(value, (current, formatter) => formatter.Formate(current));
-
-					argumentsBuilder.Append(value).Append(ColumnSeparator);
-				}
-				formatBuilder.Append(argumentsBuilder.ToString(0, argumentsBuilder.Length - (string.IsNullOrEmpty(ColumnSeparator) ? 0 : ColumnSeparator.Length))).Append(RowSeparator);
-				interval++;
-
-				if (interval != 0)
-				{
-					foreach (var formate in FormateStrings)
-					{
-						string tmpUrl = string.Format(formate, formatBuilder.ToString(0, formatBuilder.Length - 1));
-						site.AddStartRequest(new Request(tmpUrl, 0, null)
-						{
-							Method = Method,
-							Origin = Origin,
-							Referer = Referer
-						});
-					}
-				}
-			}
 		}
 	}
 

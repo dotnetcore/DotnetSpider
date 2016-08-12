@@ -13,7 +13,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// <summary>
 	/// LOAD DATA LOCAL INFILE '{filePath}' INTO TABLE `{schema}`.`{dababase}` FIELDS TERMINATED BY '$'  ENCLOSED BY '#' LINES TERMINATED BY '@END@' IGNORE 1 LINES;
 	/// </summary>
-	public class EntityMySqlFilePipeline : EntityBasePipeline
+	public class MySqlFileEntityPipeline : BaseEntityPipeline
 	{
 		protected Schema Schema;
 		protected List<DataToken> Columns;

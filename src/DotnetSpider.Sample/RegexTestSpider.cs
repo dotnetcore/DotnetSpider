@@ -15,7 +15,7 @@ namespace DotnetSpider.Sample
 			context.SetTaskGroup("cnblogs homepage");
 			context.SetIdentity("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddStartUrl("http://www.cnblogs.com");
-			context.AddEntityPipeline(new EntityConsolePipeline());
+			context.AddEntityPipeline(new ConsoleEntityPipeline());
 			context.AddEntityType(typeof(HomePage));
 			return context;
 		}

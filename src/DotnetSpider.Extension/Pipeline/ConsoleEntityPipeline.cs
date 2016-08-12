@@ -10,7 +10,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// Print page model in console
 	/// Usually used in test.
 	/// </summary>
-	public class EntityConsolePipeline : EntityBasePipeline
+	public class ConsoleEntityPipeline : BaseEntityPipeline
 	{
 		public override void InitiEntity(Schema schema, EntityMetadata metadata)
 		{

@@ -11,7 +11,7 @@ using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public abstract class EntityGeneralPipeline : EntityBasePipeline
+	public abstract class BaseEntityDbPipeline : BaseEntityPipeline
 	{
 		public string ConnectString { get; set; }
 		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
@@ -34,11 +34,11 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected abstract string ConvertToDbType(string datatype);
 
-		protected EntityGeneralPipeline()
+		protected BaseEntityDbPipeline()
 		{
 		}
 
-		protected EntityGeneralPipeline(string connectString, PipelineMode mode = PipelineMode.Insert)
+		protected BaseEntityDbPipeline(string connectString, PipelineMode mode = PipelineMode.Insert)
 		{
 			Mode = mode;
 			ConnectString = connectString;

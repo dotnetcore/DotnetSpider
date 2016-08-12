@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public abstract class EntityBasePipeline : IEntityPipeline
+	public abstract class BaseEntityPipeline : IEntityPipeline
 	{
 		public ISpider Spider { get; protected set; }
 

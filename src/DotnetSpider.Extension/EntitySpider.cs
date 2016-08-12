@@ -44,7 +44,7 @@ namespace DotnetSpider.Extension
 		public List<GlobalValue> EnviromentValues { get; set; } = new List<GlobalValue>();
 		public Validations Validations { get; set; }
 		public CookieInterceptor CookieInterceptor { get; set; }
-		public List<EntityBasePipeline> EntityPipelines { get; set; } = new List<EntityBasePipeline>();
+		public List<BaseEntityPipeline> EntityPipelines { get; set; } = new List<BaseEntityPipeline>();
 		public int CachedSize { get; set; }
 
 		public EntitySpider(Site site)
@@ -279,7 +279,7 @@ namespace DotnetSpider.Extension
 			return this;
 		}
 
-		public EntitySpider AddEntityPipeline(EntityBasePipeline pipeline)
+		public EntitySpider AddEntityPipeline(BaseEntityPipeline pipeline)
 		{
 			CheckIfRunning();
 			EntityPipelines.Add(pipeline);

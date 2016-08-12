@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class EntityCollectorPipeline : IEntityCollectorPipeline
+	public class CollectEntityPipeline : ICollectEntityPipeline
 	{
 		private readonly List<JObject> _collector = new List<JObject>();
 

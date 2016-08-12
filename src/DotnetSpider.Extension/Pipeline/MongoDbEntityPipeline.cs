@@ -9,12 +9,12 @@ using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class EntityMongoDbPipeline : EntityBasePipeline
+	public class MongoDbEntityPipeline : BaseEntityPipeline
 	{
 		public string ConnectString { get; set; }
 		private IMongoCollection<BsonDocument> _collection;
 
-		public EntityMongoDbPipeline(string connectString)		{			ConnectString = connectString;		}
+		public MongoDbEntityPipeline(string connectString)		{			ConnectString = connectString;		}
 
 		public override void InitiEntity(Schema schema, EntityMetadata metadata)
 		{

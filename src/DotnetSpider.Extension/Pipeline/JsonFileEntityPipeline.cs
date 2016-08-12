@@ -9,7 +9,7 @@ using DotnetSpider.Extension.ORM;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class EntityJsonFilePipeline : EntityBasePipeline
+	public class JsonFileEntityPipeline : BaseEntityPipeline
 	{
 		protected string DataFolder;
 		protected StreamWriter Writer;

@@ -22,7 +22,7 @@ namespace DotnetSpider.Sample
 				Region = new Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
 				Patterns = new List<string> { @"&page=[0-9]+&" }
 			});
-			context.AddEntityPipeline(new EntityMySqlPipeline("Database='mysql';Data Source=192.168.199.211;User ID=root;Password=1qazZAQ!;Port=3306"));
+			context.AddEntityPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=192.168.199.211;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));
 			context.SetDownloader(new WebDriverDownloader(Browser.Chrome));
