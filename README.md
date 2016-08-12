@@ -22,63 +22,82 @@ This is a cross platfrom, ligth spider develop by C#.
 
 Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/BaseUsage.cs
 
-		public static void Main()
+		static void Main(string[] args)
 		{
 			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
-			
-			HttpClientDownloader downloader = new HttpClientDownloader();
 
-			Core.Spider spider = Core.Spider.Create(new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
+			HttpClientDownloader downloader = new HttpClientDownloader();
 			var site = new Site() { EncodingName = "UTF-8" };
-			for (int i = 1; i < 5; ++i)
-			{
-				site.AddStartUrl("http://www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_1.html");
-			}
-			spider.Site = site;
-			spider.Start();
+			site.AddStartUrl("http://www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_1.html");
+			Spider spider = Spider.Create(site, new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline("test.txt")).SetThreadNum(1);
+			spider.SetDownloader(downloader);
+			spider.SetEmptySleepTime(2000);
+
+			SpiderMonitor.Default.Register(spider);
+
+			spider.Run();
+			Console.Read();
 		}
 
-		private class MyPipeline : IPipeline
+		public class MyPipeline : BasePipeline
 		{
-			public void Process(ResultItems resultItems)
+			private readonly string _path;
+
+			public MyPipeline(string path)
+			{
+				if (string.IsNullOrEmpty(path))
+				{
+					throw new Exception("Path should not be null.");
+				}
+
+				_path = path;
+
+				if (!File.Exists(_path))
+				{
+					File.Create(_path);
+				}
+			}
+
+			public override void Process(ResultItems resultItems)
 			{
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
-					Console.WriteLine($"{entry.Name}:{entry.Click}");
+					File.AppendAllLines(_path, new List<string> { entry.ToString() });
 				}
-
-				//May be you want to save to database
-				// 
-			}
-
-			public void Dispose()
-			{
 			}
 		}
 
-		private class MyPageProcessor : IPageProcessor
+		public class MyPageProcessor : IPageProcessor
 		{
 			public void Process(Page page)
 			{
-				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='yk-col3']")).Nodes();
+				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//li[@class='yk-col4 mr1']")).Nodes();
 				List<YoukuVideo> results = new List<YoukuVideo>();
 				foreach (var videoElement in totalVideoElements)
 				{
 					var video = new YoukuVideo();
-					video.Name = videoElement.Select(Selectors.XPath("/div[4]/div[1]/a")).Value;
-					video.Click = int.Parse(videoElement.Select(Selectors.Css("p-num")).Value.ToString());
+					video.Name = videoElement.Select(Selectors.XPath(".//li[@class='title']/a")).GetValue();
 					results.Add(video);
 				}
 				page.AddResultItem("VideoResult", results);
+
+				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
+				{
+					page.AddTargetRequest(new Request(url.GetValue(), 0, null));
+				}
 			}
 
-			public Site Site => new Site { SleepTime = 0 };
+			public Site Site { get; set; }
 		}
 
 		public class YoukuVideo
 		{
 			public string Name { get; set; }
-			public string Click { get; set; }
+
+			public override string ToString()
+			{
+				return Name;
+			}
 		}
 	
 ### ADDITIONAL USAGE
