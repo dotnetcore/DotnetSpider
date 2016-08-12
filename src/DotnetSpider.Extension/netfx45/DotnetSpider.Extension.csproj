@@ -218,9 +218,6 @@
     <Compile Include="..\Model\Attribute\Update.cs">
       <Link>Model\Attribute\Update.cs</Link>
     </Compile>
-    <Compile Include="..\Model\BaseModelSpider.cs">
-      <Link>Model\BaseModelSpider.cs</Link>
-    </Compile>
     <Compile Include="..\Model\EntityExtractor.cs">
       <Link>Model\EntityExtractor.cs</Link>
     </Compile>

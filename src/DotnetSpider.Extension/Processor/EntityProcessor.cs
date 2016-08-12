@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension.Processor
 		}
 
 		protected readonly IList<IEntityExtractor> EntityExtractorList = new List<IEntityExtractor>();
-		public Func<Page, IList<Request>> GetCustomizeTargetUrls;
+		public TargetUrlsHandler TargetUrlsHandler;
 		private List<TargetUrlExtractorInfo> TargetUrlExtractors { get; } = new List<TargetUrlExtractorInfo>();
 
 		private readonly EntitySpider _spiderContext;
@@ -75,13 +75,13 @@ namespace DotnetSpider.Extension.Processor
 
 			if (!page.MissTargetUrls)
 			{
-				if (GetCustomizeTargetUrls == null)
+				if (TargetUrlsHandler == null)
 				{
 					ExtractLinks(page, TargetUrlExtractors);
 				}
 				else
 				{
-					page.AddTargetRequests(GetCustomizeTargetUrls(page));
+					page.AddTargetRequests(TargetUrlsHandler.Handle(page));
 				}
 			}
 

@@ -31,8 +31,10 @@ namespace DotnetSpider.Extension
 	{
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
+
 		protected ConnectionMultiplexer Redis;
 		protected IDatabase Db;
+
 		[JsonIgnore]
 		public Action TaskFinished { get; set; } = () => { };
 		[JsonIgnore]
@@ -90,9 +92,11 @@ namespace DotnetSpider.Extension
 				{
 					processor.AddEntity(entity);
 				}
-
+				if (TargetUrlsHandler != null)
+				{
+					processor.TargetUrlsHandler = TargetUrlsHandler;
+				}
 				PageProcessor = processor;
-
 				foreach (var entity in Entities)
 				{
 					string entiyName = entity.Name;
@@ -119,11 +123,6 @@ namespace DotnetSpider.Extension
 					}
 					var lockerValue = Db.HashGet(InitStatusSetName, Identity);
 					needInitStartRequest = lockerValue != "init finished";
-				}
-
-				if (TargetUrlsHandler != null)
-				{
-					//SetCustomizeTargetUrls(TargetUrlsHandler.Handle);
 				}
 
 				if (arguments.Contains("rerun"))
@@ -163,6 +162,78 @@ namespace DotnetSpider.Extension
 			}
 		}
 
+		public EntitySpider AddEntityType(Type type)
+		{
+			CheckIfRunning();
+
+			if (typeof(ISpiderEntity).IsAssignableFrom(type))
+			{
+#if NET_CORE
+				Entities.Add(ConvertToEntityMetaData(type.GetTypeInfo()));
+#else
+				Entities.Add(PaserEntityMetaData(type));
+#endif
+				EnviromentValues = type.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new GlobalValue
+				{
+					Name = e.Name,
+					Selector = new Selector
+					{
+						Expression = e.Expression,
+						Type = e.Type
+					}
+				}).ToList();
+			}
+			else
+			{
+				throw new SpiderException($"Type: {type.FullName} is not a ISpiderEntity.");
+			}
+
+			return this;
+		}
+
+		public EntitySpider AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
+		{
+			CheckIfRunning();
+			TargetUrlExtractors.Add(targetUrlExtractor);
+			return this;
+		}
+
+		public EntitySpider AddEntityPipeline(BaseEntityPipeline pipeline)
+		{
+			CheckIfRunning();
+			EntityPipelines.Add(pipeline);
+			return this;
+		}
+
+		public void SetCachedSize(int count)
+		{
+			CheckIfRunning();
+			foreach (var pipeline in Pipelines)
+			{
+				((CachedPipeline)pipeline).CachedSize = count;
+			}
+		}
+
+		public override Spider AddPipeline(IPipeline pipeline)
+		{
+			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
+		}
+
+		public override Spider AddPipelines(IList<IPipeline> pipelines)
+		{
+			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
+		}
+
+		public ISpider ToDefaultSpider()
+		{
+			return new DefaultSpider("", new Site());
+		}
+
+		private static string GetEntityName(Type type)
+		{
+			return type.FullName;
+		}
+
 		private void HandleVerifyCollectData()
 		{
 			if (VerifyCollectedData == null)
@@ -186,7 +257,7 @@ namespace DotnetSpider.Extension
 				}
 				if (needInitStartRequest)
 				{
-					Logger.Log(LogInfo.Create("开始执行数据验证...", Logger.Name,this,LogLevel.Info));
+					Logger.Log(LogInfo.Create("开始执行数据验证...", Logger.Name, this, LogLevel.Info));
 
 					VerifyCollectedData();
 				}
@@ -289,69 +360,6 @@ namespace DotnetSpider.Extension
 				Redis = ConnectionMultiplexer.Connect(confiruation);
 				Db = Redis.GetDatabase(1);
 			}
-		}
-
-		public EntitySpider AddEntityType(Type type)
-		{
-			CheckIfRunning();
-
-			if (typeof(ISpiderEntity).IsAssignableFrom(type))
-			{
-#if NET_CORE
-				Entities.Add(ConvertToEntityMetaData(type.GetTypeInfo()));
-#else
-				Entities.Add(PaserEntityMetaData(type));
-#endif
-				EnviromentValues = type.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new GlobalValue
-				{
-					Name = e.Name,
-					Selector = new Selector
-					{
-						Expression = e.Expression,
-						Type = e.Type
-					}
-				}).ToList();
-			}
-			else
-			{
-				throw new SpiderException($"Type: {type.FullName} is not a ISpiderEntity.");
-			}
-
-			return this;
-		}
-
-		public EntitySpider AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
-		{
-			CheckIfRunning();
-			TargetUrlExtractors.Add(targetUrlExtractor);
-			return this;
-		}
-
-		public EntitySpider AddEntityPipeline(BaseEntityPipeline pipeline)
-		{
-			CheckIfRunning();
-			EntityPipelines.Add(pipeline);
-			return this;
-		}
-
-		public override Spider AddPipeline(IPipeline pipeline)
-		{
-			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
-		}
-
-		public override Spider AddPipelines(IList<IPipeline> pipelines)
-		{
-			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
-		}
-
-		public ISpider ToDefaultSpider()
-		{
-			return new DefaultSpider("", new Site());
-		}
-
-		private static string GetEntityName(Type type)
-		{
-			return type.FullName;
 		}
 
 #if !NET_CORE
