@@ -202,6 +202,7 @@ namespace DotnetSpider.Extension
 		{
 			if (RedialExecutor != null)
 			{
+				RedialExecutor.Init();
 				NetworkCenter.Current.Executor = RedialExecutor;
 			}
 
