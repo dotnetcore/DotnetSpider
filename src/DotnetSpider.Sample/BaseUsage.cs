@@ -1,27 +1,28 @@
 using System;
 using System.Collections.Generic;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Sample
 {
-	public class SpiderExample
+	public class BaseUsage
 	{
-		public static void Run
-			()
+		public static void Run()
 		{
-			var site = new Site() { EncodingName = "UTF-8" };
+			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
+
+			var site = new Site { EncodingName = "UTF-8" };
 			for (int i = 1; i < 5; ++i)
 			{
 				site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
 			}
 
 			Spider spider = Spider.Create(site, new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
-
-			//spider.SetDownloader(downloader);
 			spider.Run();
 			Console.Read();
 		}

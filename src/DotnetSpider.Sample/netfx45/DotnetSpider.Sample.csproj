@@ -59,17 +59,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\BaseSpiderExample.cs">
-      <Link>BaseSpiderExample.cs</Link>
+    <Compile Include="..\BaseUsage.cs">
+      <Link>BaseUsage.cs</Link>
     </Compile>
     <Compile Include="..\DDengSpider.cs">
       <Link>DDengSpider.cs</Link>
     </Compile>
-    <Compile Include="..\JdSkuSample.cs">
-      <Link>JdSkuSample.cs</Link>
+    <Compile Include="..\JdSkuSampleSpider.cs">
+      <Link>JdSkuSampleSpider.cs</Link>
     </Compile>
-    <Compile Include="..\JdSkuSample.WebDriver.cs">
-      <Link>JdSkuSample.WebDriver.cs</Link>
+    <Compile Include="..\JdSkuWebDriverSample.cs">
+      <Link>JdSkuWebDriverSample.cs</Link>
     </Compile>
     <Compile Include="..\LinkSpiderExample.cs">
       <Link>LinkSpiderExample.cs</Link>

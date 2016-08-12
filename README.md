@@ -20,6 +20,8 @@ This is a cross platfrom, ligth spider develop by C#.
 
 ### BASE USAGE
 
+Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Test/Example/BaseUsage.cs
+
 		public static void Main()
 		{
 			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
@@ -83,28 +85,27 @@ This is a cross platfrom, ligth spider develop by C#.
 
 #### Configurable Entity Spider
 
-		public class JdSkuSpider : SpiderBuilder
+Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Test/Example/JdSkuSample.cs
+
+		public class JdSkuSampleSpider : EntitySpiderBuilder
 		{
-			protected override SpiderContext GetSpiderContext()
+			protected override EntitySpider GetEntitySpider()
 			{
-				SpiderContext context = new SpiderContext();
-				context.SetThreadNum(8);
-				context.SetSpiderName("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
-				context.AddTargetUrlExtractor(new Extension.Configuration.TargetUrlExtractor
+				EntitySpider context = new EntitySpider(new Site());
+				context.SetThreadNum(1);
+				context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+				context.AddTargetUrlExtractor(new TargetUrlExtractor
 				{
-					Region = new Extension.Configuration.Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
+					Region = new Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
 					Patterns = new List<string> { @"&page=[0-9]+&" }
 				});
-				context.AddPipeline(new MysqlPipeline
-				{
-					ConnectString = "Database='test';Data Source=DBHOST;User ID=root;Password=1qazZAQ!;Port=4306"
-				});
+				context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=MYSQLSERVER;User ID=root;Password=1qazZAQ!;Port=4306"));
 				context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 				context.AddEntityType(typeof(Product));
-			
+	
 				return context;
 			}
-
+	
 			[Schema("test", "sku", TableSuffix.Today)]
 			[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
 			[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
@@ -113,43 +114,43 @@ This is a cross platfrom, ligth spider develop by C#.
 				[StoredAs("category", DataType.String, 20)]
 				[PropertyExtractBy(Expression = "name", Type = ExtractType.Enviroment)]
 				public string CategoryName { get; set; }
-
+	
 				[StoredAs("cat3", DataType.String, 20)]
 				[PropertyExtractBy(Expression = "cat3", Type = ExtractType.Enviroment)]
 				public int CategoryId { get; set; }
-
+	
 				[StoredAs("url", DataType.Text)]
 				[PropertyExtractBy(Expression = "./div[1]/a/@href")]
 				public string Url { get; set; }
-
+	
 				[StoredAs("sku", DataType.String, 25)]
 				[PropertyExtractBy(Expression = "./@data-sku")]
 				public string Sku { get; set; }
-
+	
 				[StoredAs("commentscount", DataType.String, 32)]
 				[PropertyExtractBy(Expression = "./div[5]/strong/a")]
 				public long CommentsCount { get; set; }
-
+	
 				[StoredAs("shopname", DataType.String, 100)]
 				[PropertyExtractBy(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 				public string ShopName { get; set; }
-
+	
 				[StoredAs("name", DataType.String, 50)]
 				[PropertyExtractBy(Expression = ".//div[@class='p-name']/a/em")]
 				public string Name { get; set; }
-
+	
 				[StoredAs("venderid", DataType.String, 25)]
 				[PropertyExtractBy(Expression = "./@venderid")]
 				public string VenderId { get; set; }
-
+	
 				[StoredAs("jdzy_shop_id", DataType.String, 25)]
 				[PropertyExtractBy(Expression = "./@jdzy_shop_id")]
 				public string JdzyShopId { get; set; }
-
+	
 				[StoredAs("run_id", DataType.Date)]
 				[PropertyExtractBy(Expression = "Monday", Type = ExtractType.Enviroment)]
 				public DateTime RunId { get; set; }
-
+	
 				[PropertyExtractBy(Expression = "Now", Type = ExtractType.Enviroment)]
 				[StoredAs("cdate", DataType.Time)]
 				public DateTime CDate { get; set; }
@@ -160,7 +161,7 @@ This is a cross platfrom, ligth spider develop by C#.
 		{
 			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
 		
-			JdSkuSpider spider = new JdSkuSpider();
+			JdSkuSampleSpider spider = new JdSkuSampleSpider();
 			spider.Run();
 		}
 
@@ -168,12 +169,9 @@ This is a cross platfrom, ligth spider develop by C#.
 
 When you want to collect a page JS loaded, there is only one thing you need to do is set the downloader to WebDriverDownloader.	
 
-	context.SetDownloader(new WebDriverDownloader
-	{
-		Browser = Extension.Downloader.WebDriver.Browser.Chrome
-	});
+	context.SetDownloader(new WebDriverDownloader(Browser.Chrome));
 
-See the complete sample https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Test/Example/JdSkuSample.WebDriver.cs
+See the complete sample https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Test/Example/JdSkuWebDriverSample.cs
 
 NOTE:
 

@@ -23,7 +23,7 @@ namespace DotnetSpider.Sample
 				CachedSize = 1,
 				ThreadNum = 1,
 				SkipWhenResultIsEmpty = true,
-				Downloader = new HttpClientDownloader()
+				Downloader = new HttpClientDownloader
 				{
 					DownloadCompleteHandlers = new List<IDownloadCompleteHandler>
 					{
