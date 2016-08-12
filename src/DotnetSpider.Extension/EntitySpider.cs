@@ -35,6 +35,8 @@ namespace DotnetSpider.Extension
 		protected IDatabase Db;
 		[JsonIgnore]
 		public Action TaskFinished { get; set; } = () => { };
+		[JsonIgnore]
+		public Action VerifyCollectedData { get; set; }
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 		public RedialExecutor RedialExecutor { get; set; }
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
@@ -99,7 +101,7 @@ namespace DotnetSpider.Extension
 
 					foreach (var pipeline in EntityPipelines)
 					{
-						pipeline.InitiEntity(schema,entity);
+						pipeline.InitiEntity(schema, entity);
 					}
 
 					Pipelines.Add(new EntityPipeline(entiyName, EntityPipelines));
@@ -143,7 +145,7 @@ namespace DotnetSpider.Extension
 				}
 				InitComponent();
 				SpiderMonitor.Default.Register(this);
-				
+
 				Db?.LockRelease(key, 0);
 
 				RegisterControl(this);
@@ -152,12 +154,61 @@ namespace DotnetSpider.Extension
 
 				TaskFinished();
 
-				//DoValidate();
+				HandleVerifyCollectData();
 			}
 			finally
 			{
 				Dispose();
 				SpiderMonitor.Default.Dispose();
+			}
+		}
+
+		private void HandleVerifyCollectData()
+		{
+			if (VerifyCollectedData == null)
+			{
+				return;
+			}
+			string key = "locker-validate-" + Identity;
+
+			try
+			{
+				bool needInitStartRequest = true;
+				if (Redis != null)
+				{
+					while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+					{
+						Thread.Sleep(1000);
+					}
+
+					var lockerValue = Db.HashGet(ValidateStatusName, Identity);
+					needInitStartRequest = lockerValue != "verify finished";
+				}
+				if (needInitStartRequest)
+				{
+					Logger.Log(LogInfo.Create("开始执行数据验证...", Logger.Name,this,LogLevel.Info));
+
+					VerifyCollectedData();
+				}
+
+				Logger.Log(LogInfo.Create("数据验证已完成.", Logger.Name, this, LogLevel.Info));
+
+				if (needInitStartRequest && Redis != null)
+				{
+					Db.HashSet(ValidateStatusName, Identity, "verify finished");
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.Error(e, e.Message);
+				throw;
+			}
+			finally
+			{
+				if (Redis != null)
+				{
+					Db.LockRelease(key, 0);
+				}
 			}
 		}
 
@@ -428,7 +479,7 @@ namespace DotnetSpider.Extension
 #else
 		private EntityMetadata ConvertToEntityMetaData(TypeInfo entityType)
 		{
-			EntityMetadata json = new EntityMetadata {Name = GetEntityName(entityType.AsType())};
+			EntityMetadata json = new EntityMetadata { Name = GetEntityName(entityType.AsType()) };
 			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
 			if (extractByAttribute != null)
 			{
