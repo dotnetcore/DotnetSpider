@@ -115,10 +115,6 @@
       <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>
       <Name>DotnetSpider.Redial</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DotnetSpider.Validation\netfx45\DotnetSpider.Validation.csproj">
-      <Project>{dbb93d35-6b87-430e-b308-9f2abda1a13e}</Project>
-      <Name>DotnetSpider.Validation</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -21,7 +21,6 @@ using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Downloader;
-using DotnetSpider.Extension.Configuration;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -42,7 +41,6 @@ namespace DotnetSpider.Extension
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
 		public List<TargetUrlExtractor> TargetUrlExtractors { get; set; } = new List<TargetUrlExtractor>();
 		public List<GlobalValue> EnviromentValues { get; set; } = new List<GlobalValue>();
-		public Validations Validations { get; set; }
 		public CookieInterceptor CookieInterceptor { get; set; }
 		public List<BaseEntityPipeline> EntityPipelines { get; set; } = new List<BaseEntityPipeline>();
 		public int CachedSize { get; set; }

@@ -4,7 +4,6 @@ dotnet restore
 dotnet pack src/HtmlAgilityPack/project.json -o spider_nuget_packages 
 dotnet pack src/HtmlAgilityPack.Css/project.json -o spider_nuget_packages
 dotnet pack src/DotnetSpider.Core/project.json -o spider_nuget_packages
-dotnet pack src/DotnetSpider.Validation/project.json -o spider_nuget_packages
 dotnet pack src/DotnetSpider.Redial/project.json -o spider_nuget_packages
 dotnet pack src/DotnetSpider.Extension/project.json -o spider_nuget_packages
 ftp -n<<!
@@ -24,9 +23,6 @@ rmdir /nuget/HtmlAgilityPack.Css
 mdelete /nuget/DotnetSpider.Redial/0.0.9/*
 rmdir /nuget/DotnetSpider.Redial/0.0.9
 rmdir /nuget/DotnetSpider.Redial
-mdelete /nuget/DotnetSpider.Validation/0.0.9/*
-rmdir /nuget/DotnetSpider.Validation/0.0.9
-rmdir /nuget/DotnetSpider.Validation
 mdelete /nuget/DotnetSpider.Core/0.0.9/*
 rmdir /nuget/DotnetSpider.Core/0.0.9
 rmdir /nuget/DotnetSpider.Core
