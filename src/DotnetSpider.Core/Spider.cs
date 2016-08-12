@@ -151,7 +151,6 @@ namespace DotnetSpider.Core
 			PageProcessor.Site = Site;
 			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
 			Downloader = Downloader ?? new HttpClientDownloader();
-			Scheduler.Init(this);
 		}
 
 		public IScheduler Scheduler
@@ -359,7 +358,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-
+			Scheduler.Init(this);
 #if !NET_CORE
 			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 #else
