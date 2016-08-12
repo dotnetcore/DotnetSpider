@@ -130,9 +130,6 @@ namespace DotnetSpider.Core
 				Identity = string.IsNullOrEmpty(Site.Domain) ? Guid.NewGuid().ToString() : Site.Domain;
 			}
 
-			UserId = string.IsNullOrEmpty(UserId) ? "DotnetSpider" : UserId;
-			TaskGroup = string.IsNullOrEmpty(TaskGroup) ? "DotnetSpider" : TaskGroup;
-
 			if (PageProcessor == null)
 			{
 				throw new SpiderException("PageProcessor should not be null.");

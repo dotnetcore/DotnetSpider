@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\output\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_45;TEST</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_45;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>

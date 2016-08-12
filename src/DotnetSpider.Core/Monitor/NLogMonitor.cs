@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Monitor
 		public void Watch(SpiderStatus status)
 		{
 			string msg = $"Left {status.Left} Success {status.Success} Error {status.Error} Total {status.Total} Thread {status.ThreadNum}";
-			LogEventInfo theEvent = new LogEventInfo(LogLevel.Info, "", msg);
+			LogEventInfo theEvent = new LogEventInfo(LogLevel.Warn, "", msg);
 			theEvent.Properties["UserId"] = status.UserId;
 			theEvent.Properties["TaskGroup"] = status.TaskGroup;
 			theEvent.Properties["Identity"] = status.Identity;
