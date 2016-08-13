@@ -56,7 +56,7 @@ namespace DotnetSpider.Redial.Utils
 		Cookie //表示Cookie
 	}
 
-	public class RasDisplay
+	public class Adsl
 	{
 		[DllImport("rasapi32.dll", CharSet = CharSet.Auto)]
 		public static extern uint RasHangUp(IntPtr hrasconn);
@@ -104,7 +104,7 @@ namespace DotnetSpider.Redial.Utils
 		private readonly bool _mConnected;
 		private readonly IntPtr _mConnectedRasHandle;
 
-		public RasDisplay()
+		public Adsl()
 		{
 			_mConnected = true;
 

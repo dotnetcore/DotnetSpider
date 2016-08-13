@@ -7,11 +7,12 @@
     "copyToOutput": [
       "config.ini",
       "nlog.config",
+      "Jd.html",
       "xunit.runner.json"
     ]
   },
   "publishOptions": {
-    "includeFiles": [ "config.ini", "nlog.config" ]
+    "includeFiles": [ "config.ini", "nlog.config", "Jd.html" ]
   },
   "dependencies": {
     "Microsoft.NETCore.App": {

@@ -130,6 +130,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\EntityExtractor.cs">
+      <Link>EntityExtractor.cs</Link>
+    </Compile>
     <Compile Include="..\Html.cs">
       <Link>Html.cs</Link>
     </Compile>
