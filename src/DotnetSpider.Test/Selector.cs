@@ -65,8 +65,8 @@ namespace DotnetSpider.Test
 			var list2 = jsonPathSelector.SelectList(_text);
 			var result2 = jsonPathSelector.Select(_text);
 
-			//Assert.Equal(select, "{\r\n \"category\":\"reference\",\r\n \"author\":\"Nigel Rees\",\r\n \"title\":\"Sayings of the Century\",\r\n \"price\":8.95\r\n }");
-			//Assert.Equal(list, "{\"author\":\"Nigel Rees\",\"title\":\"Sayings of the Century\",\"category\":\"reference\",\"price\":8.95}");
+			Assert.Equal(result2, "{\r\n  \"category\": \"reference\",\r\n  \"author\": \"Nigel Rees\",\r\n  \"title\": \"Sayings of the Century\",\r\n  \"price\": 8.95\r\n}");
+			Assert.Equal(list2[0], "{\r\n  \"category\": \"reference\",\r\n  \"author\": \"Nigel Rees\",\r\n  \"title\": \"Sayings of the Century\",\r\n  \"price\": 8.95\r\n}");
 		}
 
 		[Fact]

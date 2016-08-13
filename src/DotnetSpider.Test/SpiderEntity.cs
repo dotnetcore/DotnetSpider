@@ -133,12 +133,15 @@ namespace DotnetSpider.Test
 			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity7).GetTypeInfo());
 			Assert.Equal("expression", entity1.Entity.Selector.Expression);
 			Assert.Equal(SelectorType.XPath, entity1.Entity.Selector.Type);
+			Assert.True(entity1.Entity.Multi);
 
 			var entity2 = EntitySpider.PaserEntityMetaData(typeof(Entity8).GetTypeInfo());
 			Assert.Equal("expression2", entity2.Entity.Selector.Expression);
 			Assert.Equal(SelectorType.Css, entity2.Entity.Selector.Type);
+			Assert.True(entity2.Entity.Multi);
 
 			var entity3 = EntitySpider.PaserEntityMetaData(typeof(Entity9).GetTypeInfo());
+			Assert.False(entity3.Entity.Multi);
 			Assert.Null(entity3.Entity.Selector);
 			Assert.Equal("DotnetSpider.Test.SpiderEntity+Entity9", entity3.Entity.Name);
 		}
@@ -159,7 +162,7 @@ namespace DotnetSpider.Test
 		public void Formater()
 		{
 			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity11).GetTypeInfo());
-			var formatters = ((Field) entity1.Entity.Fields[1]).Formatters;
+			var formatters = ((Field)entity1.Entity.Fields[1]).Formatters;
 			Assert.Equal(1, formatters.Count);
 			var replaceFormatter = (ReplaceFormatter)formatters[0];
 			Assert.Equal("a", replaceFormatter.NewValue);

@@ -359,31 +359,36 @@ namespace DotnetSpider.Extension
 #if !NET_CORE
 		public static EntityMetadata PaserEntityMetaData(Type entityType)
 		{
-			EntityMetadata entityMetadata = new EntityMetadata();
+			EntityMetadata metadata = new EntityMetadata();
 
-			entityMetadata.Schema = entityType.GetCustomAttribute<Schema>();
+			metadata.Schema = entityType.GetCustomAttribute<Schema>();
 			var indexes = entityType.GetCustomAttribute<Indexes>();
 			if (indexes != null)
 			{
-				entityMetadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				entityMetadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				entityMetadata.Primary = indexes.Primary?.Split(',');
-				entityMetadata.AutoIncrement = indexes.AutoIncrement;
+				metadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
+				metadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
+				metadata.Primary = indexes.Primary?.Split(',');
+				metadata.AutoIncrement = indexes.AutoIncrement;
 			}
 			var updates = entityType.GetCustomAttribute<UpdateColumns>();
 			if (updates != null)
 			{
-				entityMetadata.Updates = updates.Columns;
+				metadata.Updates = updates.Columns;
 			}
 			Entity entity = ParseEntity(entityType);
-			entityMetadata.Entity = entity;
+			metadata.Entity = entity;
 			EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
 			if (extractByAttribute != null)
 			{
-				entityMetadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+				metadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+				metadata.Entity.Multi = true;
+			}
+			else
+			{
+				metadata.Entity.Multi = false;
 			}
 
-			return entityMetadata;
+			return metadata;
 		}
 
 		private static Entity ParseEntity(Type entityType)
@@ -496,6 +501,11 @@ namespace DotnetSpider.Extension
 			if (extractByAttribute != null)
 			{
 				metadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+				metadata.Entity.Multi = true;
+			}
+			else
+			{
+				metadata.Entity.Multi = false;
 			}
 			return metadata;
 		}
