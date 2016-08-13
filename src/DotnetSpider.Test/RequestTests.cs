@@ -18,14 +18,14 @@ namespace DotnetSpider.Test
 		}
 
 		[Fact]
-		public void RequestTest()
+		public void Request()
 		{
 			var request = GetRequest();
 			Assert.Equal(request.Extras.Count, 1);
 			Assert.Equal(request.Extras["Test"], "Forever");
 		}
 		[Fact]
-		public void PutExtraTest()
+		public void PutExtra()
 		{
 			var request = GetRequest();
 			request.PutExtra(null, null);
@@ -40,7 +40,7 @@ namespace DotnetSpider.Test
 		}
 
 		[Fact]
-		public void GetExtraTest()
+		public void GetExtra()
 		{
 			var request = GetRequest();
 			request.PutExtra("One", new { Name = "John" });
@@ -49,7 +49,7 @@ namespace DotnetSpider.Test
 		}
 
 		[Fact]
-		public void DisposeTest()
+		public void Dispose()
 		{
 			var request = GetRequest();
 			Assert.Equal(request.Extras.Count, 1);
@@ -59,7 +59,7 @@ namespace DotnetSpider.Test
 
 
 		[Fact]
-		public void CloneTest()
+		public void Clone()
 		{
 			var request = GetRequest();
 			var clone = (Request)request.Clone();

@@ -9,6 +9,7 @@ namespace DotnetSpider.Core.Downloader
 		protected ILogger Logger { get; set; }
 		public List<IDownloadCompleteHandler> DownloadCompleteHandlers { get; set; } = new List<IDownloadCompleteHandler>();
 		public List<IBeforeDownloadHandler> BeforeDownloadHandlers { get; set; } = new List<IBeforeDownloadHandler>();
+		public dynamic Context { get; set; }
 
 		public BaseDownloader()
 		{
