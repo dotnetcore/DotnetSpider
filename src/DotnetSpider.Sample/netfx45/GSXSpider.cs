@@ -11,6 +11,9 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Sample
 {
+    /// <summary>
+    /// No pipelines, test for TargetUrl, PropertyExtractBy and UntilCondition.
+    /// </summary>
     public class GSXSpider : SpiderBuilder
     {
         protected override EntitySpider GetSpiderContext()
@@ -36,12 +39,9 @@ namespace DotnetSpider.Sample
                     Expression = @"//form[@id=""loginForm""]//button[@class=""btn btn-info btn-block""]"
                 }
             };
-            //var cookie = cookieThief.GetCookie();
 
             EntitySpider context = new EntitySpider(new Core.Site
             {
-                //Cookie = cookie.Item1,
-                //Cookies = cookie.Item2,
                 Headers = new Dictionary<string, string>
                 {
                     { "Cache-Control","max-age=0"},
@@ -55,10 +55,6 @@ namespace DotnetSpider.Sample
                 UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
             }) { CookieInterceptor = cookieThief };
             context.SetIdentity("gsx 订单/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
-            //context.AddPipeline(new MysqlPipeline
-            //{
-            //    ConnectString = "Database='GSX';Data Source=localhost;User ID=root;Password=pass@word1;Port=4040"
-            //});
             context.AddStartUrl("http://i.genshuixue.com/main");
             context.AddEntityType(typeof(主页)).AddEntityType(typeof(订单列表项));
             context.SetDownloader(new WebDriverDownloader(Browser.Chrome, 300));
@@ -92,6 +88,9 @@ namespace DotnetSpider.Sample
             }
         }
 
+        /// <summary>
+        /// Not finished yet.
+        /// </summary>
         [TargetUrl(UrlPattern = "http://www.genshuixue.com/order/teacherOrderDetail?purchase_id=*")]
         [Schema("GSX", "订单", TableSuffix.Today)]
         public class 订单 : ISpiderEntity
