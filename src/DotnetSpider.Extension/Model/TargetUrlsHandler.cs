@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.Common;
+using DotnetSpider.Extension.Model.Attribute;
 
 namespace DotnetSpider.Extension.Model
 {
@@ -36,10 +37,10 @@ namespace DotnetSpider.Extension.Model
 
 	public class IncreasePageNumberTargetUrlsHandler : AbstractIncreasePageNumberTargetUrlsHandler
 	{
-		public Selector TotalPageSelector { get; set; }
+		public BaseSelector TotalPageSelector { get; set; }
 		public List<Formatter.Formatter> TotalPageFormatters { get; set; }
 
-		public Selector CurrenctPageSelector { get; set; }
+		public BaseSelector CurrenctPageSelector { get; set; }
 		public List<Formatter.Formatter> CurrnetPageFormatters { get; set; }
 
 		public override bool CanStop(Page page)
@@ -223,7 +224,7 @@ namespace DotnetSpider.Extension.Model
 	{
 		public bool IsBefore { get; set; } = true;
 		public List<string> Stoppers { get; set; } = new List<string>();
-		public Selector CurrenctPageSelector { get; set; }
+		public BaseSelector CurrenctPageSelector { get; set; }
 		public List<Formatter.Formatter> CurrenctPageFormatters { get; set; }
 
 		public override IList<Request> Handle(Page page)

@@ -1,6 +1,7 @@
 using System;
 using NLog;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Selector;
 #if !NET_CORE
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -29,11 +30,11 @@ namespace DotnetSpider.Extension.Downloader
 			switch (element.Type)
 			{
 
-				case ExtractType.XPath:
+				case SelectorType.XPath:
 					{
 						return webDriver.FindElementByXPath(element.Expression);
 					}
-				case ExtractType.Css:
+				case SelectorType.Css:
 					{
 						return webDriver.FindElementByCssSelector(element.Expression);
 					}

@@ -191,38 +191,32 @@
     <Compile Include="..\EntitySpider.cs">
       <Link>EntitySpider.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\BaseExtractBy.cs">
-      <Link>Model\Attribute\BaseExtractBy.cs</Link>
+    <Compile Include="..\Model\Attribute\BaseSelector.cs">
+      <Link>Model\Attribute\BaseSelector.cs</Link>
     </Compile>
     <Compile Include="..\Model\Attribute\Downloader.cs">
       <Link>Model\Attribute\Downloader.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\EnviromentExtractBy.cs">
-      <Link>Model\Attribute\EnviromentExtractBy.cs</Link>
+    <Compile Include="..\Model\Attribute\EntitySelector.cs">
+      <Link>Model\Attribute\EntitySelector.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Attribute\GlobalValueSelector.cs">
+      <Link>Model\Attribute\GlobalValueSelector.cs</Link>
     </Compile>
     <Compile Include="..\Model\Attribute\Indexes.cs">
       <Link>Model\Attribute\Indexes.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\PropertyExtractBy.cs">
-      <Link>Model\Attribute\PropertyExtractBy.cs</Link>
+    <Compile Include="..\Model\Attribute\PropertySelector.cs">
+      <Link>Model\Attribute\PropertySelector.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\Stopping.cs">
-      <Link>Model\Attribute\Stopping.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Attribute\TypeExtractBy.cs">
-      <Link>Model\Attribute\TypeExtractBy.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Attribute\Update.cs">
-      <Link>Model\Attribute\Update.cs</Link>
+    <Compile Include="..\Model\Attribute\UpdateColumns.cs">
+      <Link>Model\Attribute\UpdateColumns.cs</Link>
     </Compile>
     <Compile Include="..\Model\EntityExtractor.cs">
       <Link>Model\EntityExtractor.cs</Link>
     </Compile>
     <Compile Include="..\Model\EntityMetadata.cs">
       <Link>Model\EntityMetadata.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\ExtractType.cs">
-      <Link>Model\ExtractType.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\BoolFormater.cs">
       <Link>Model\Formatter\BoolFormater.cs</Link>
@@ -233,11 +227,11 @@
     <Compile Include="..\Model\Formatter\ClassifyFormater.cs">
       <Link>Model\Formatter\ClassifyFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\Formatter.cs">
+      <Link>Model\Formatter\Formatter.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\FormatterFactory.cs">
       <Link>Model\Formatter\FormatterFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Formatter\IFormater.cs">
-      <Link>Model\Formatter\IFormater.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\RegexMatchFormater.cs">
       <Link>Model\Formatter\RegexMatchFormater.cs</Link>
@@ -343,6 +337,9 @@
     </Compile>
     <Compile Include="..\Pipeline\PipelineMode.cs">
       <Link>Pipeline\PipelineMode.cs</Link>
+    </Compile>
+    <Compile Include="..\Processor\DataHandler.cs">
+      <Link>Processor\DataHandler.cs</Link>
     </Compile>
     <Compile Include="..\Processor\EntityProcessor.cs">
       <Link>Processor\EntityProcessor.cs</Link>

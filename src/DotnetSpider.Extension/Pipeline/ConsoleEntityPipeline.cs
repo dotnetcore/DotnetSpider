@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -12,7 +11,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class ConsoleEntityPipeline : BaseEntityPipeline
 	{
-		public override void InitiEntity(Schema schema, EntityMetadata metadata)
+		public override void InitiEntity(EntityMetadata metadata)
 		{
 		}
 

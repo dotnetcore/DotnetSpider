@@ -1,5 +1,6 @@
-﻿using DotnetSpider.Core;
-using System;
+﻿using System;
+using DotnetSpider.Core;
+using DotnetSpider.Core.Selector;
 #if !NET_CORE
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
@@ -80,11 +81,11 @@ namespace DotnetSpider.Extension.Configuration
 			switch (element.Type)
 			{
 
-				case ExtractType.XPath:
+				case SelectorType.XPath:
 					{
 						return webDriver.FindElementByXPath(element.Expression);
 					}
-				case ExtractType.Css:
+				case SelectorType.Css:
 					{
 						return webDriver.FindElementByCssSelector(element.Expression);
 					}

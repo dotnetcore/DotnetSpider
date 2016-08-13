@@ -1,10 +1,9 @@
-using System;
+﻿using System;
 
 namespace DotnetSpider.Extension.Model.Attribute
 {
 	[AttributeUsage(AttributeTargets.Class)]
-	public class Update : System.Attribute
+	public class EntitySelector : BaseSelector
 	{
-		public string[] Columns { get; set; }
 	}
 }

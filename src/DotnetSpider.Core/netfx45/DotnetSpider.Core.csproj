@@ -88,7 +88,11 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="..\Resource.resx">
+      <Link>Resource.resx</Link>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Common\AutomicInteger.cs">
       <Link>Common\AutomicInteger.cs</Link>
@@ -267,6 +271,9 @@
     <Compile Include="..\Request.cs">
       <Link>Request.cs</Link>
     </Compile>
+    <Compile Include="..\Resource.Designer.cs">
+      <Link>Resource.Designer.cs</Link>
+    </Compile>
     <Compile Include="..\ResultItems.cs">
       <Link>ResultItems.cs</Link>
     </Compile>
@@ -326,6 +333,9 @@
     </Compile>
     <Compile Include="..\Selector\Selectors.cs">
       <Link>Selector\Selectors.cs</Link>
+    </Compile>
+    <Compile Include="..\Selector\SelectorType.cs">
+      <Link>Selector\SelectorType.cs</Link>
     </Compile>
     <Compile Include="..\Selector\SmartContentSelector.cs">
       <Link>Selector\SmartContentSelector.cs</Link>

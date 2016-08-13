@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -14,7 +13,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 		}
 
-		public abstract void InitiEntity(Schema schema, EntityMetadata metadata);
+		public abstract void InitiEntity(EntityMetadata metadata);
 
 		public virtual void InitPipeline(ISpider spider)
 		{

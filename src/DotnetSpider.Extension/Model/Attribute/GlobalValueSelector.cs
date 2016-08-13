@@ -3,7 +3,7 @@
 namespace DotnetSpider.Extension.Model.Attribute
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-	public class EnviromentExtractBy : BaseExtractBy
+	public class GlobalValueSelector : BaseSelector
 	{
 		public string Name { get; set; }
 	}

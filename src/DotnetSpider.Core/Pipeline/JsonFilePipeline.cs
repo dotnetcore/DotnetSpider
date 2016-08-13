@@ -20,10 +20,15 @@ namespace DotnetSpider.Core.Pipeline
 		public JsonFilePipeline()
 		{
 #if NET_CORE
-			_intervalPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\data\\json" : "/data/json";
+			_intervalPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "data\\json" : "data/json";
 #else
-			_intervalPath = "\\data\\json";
+			_intervalPath = "data\\json";
 #endif
+		}
+
+		public string GetDataForlder()
+		{
+			return $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}";
 		}
 
 		public JsonFilePipeline(string path)
@@ -53,7 +58,6 @@ namespace DotnetSpider.Core.Pipeline
 
 		public override void Process(ResultItems resultItems)
 		{
-
 			try
 			{
 				string path = $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}{Encrypt.Md5Encrypt(resultItems.Request.Url.ToString())}.json";

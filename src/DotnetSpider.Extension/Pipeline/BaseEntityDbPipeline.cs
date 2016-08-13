@@ -44,9 +44,9 @@ namespace DotnetSpider.Extension.Pipeline
 			ConnectString = connectString;
 		}
 
-		public override void InitiEntity(Schema schema, EntityMetadata entityDefine)
+		public override void InitiEntity(EntityMetadata entityDefine)
 		{
-			Schema = GenerateSchema(schema);
+			Schema = GenerateSchema(entityDefine.Schema);
 			foreach (var f in entityDefine.Entity.Fields)
 			{
 				if (!string.IsNullOrEmpty(((Field)f).DataType))
@@ -71,28 +71,44 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 
-			if (Mode == PipelineMode.Update && entityDefine.Updates != null)
+			if (Mode == PipelineMode.Update)
 			{
-				foreach (var column in entityDefine.Updates)
+				if (Primary == null || Primary.Count == 0)
 				{
-					var col = Columns.FirstOrDefault(c => c.Name == column);
-					if (col == null)
+					throw new SpiderException("Set Primary in the Indexex attribute.");
+				}
+
+				if (entityDefine.Updates != null && entityDefine.Updates.Length > 0)
+				{
+					foreach (var column in entityDefine.Updates)
 					{
-						throw new SpiderException("Columns set as update is not a property of your entity.");
+						var col = Columns.FirstOrDefault(c => c.Name == column);
+						if (col == null)
+						{
+							throw new SpiderException("Columns set as update is not a property of your entity.");
+						}
+						else
+						{
+							UpdateColumns.Add(col);
+						}
 					}
-					else
+
+					UpdateColumns.RemoveAll(c => Primary.Contains(c));
+
+					if (UpdateColumns.Count == 0)
 					{
-						UpdateColumns.Add(col);
+						throw new SpiderException("Can't update primary key.");
 					}
 				}
-				if (UpdateColumns == null || UpdateColumns.Count == 0)
+				else
 				{
 					UpdateColumns = Columns;
 					UpdateColumns.RemoveAll(c => Primary.Contains(c));
-				}
-				if (Primary == null || Primary.Count == 0)
-				{
-					throw new SpiderException("Do you forget set the Primary in IndexesAttribute for your entity class.");
+
+					if (UpdateColumns.Count == 0)
+					{
+						throw new SpiderException("Can't update primary key.");
+					}
 				}
 			}
 

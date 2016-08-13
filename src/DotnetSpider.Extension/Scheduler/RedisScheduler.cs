@@ -84,7 +84,7 @@ namespace DotnetSpider.Extension.Scheduler
 			var md5 = Encrypt.Md5Encrypt(spider.Identity);
 			_itemKey += md5;
 			_setKey += md5;
-			_queueKey = md5;
+			_queueKey += md5;
 			_errorCountKey += md5;
 			_successCountKey += md5;
 			_identityMd5 = md5;

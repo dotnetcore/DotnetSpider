@@ -9,7 +9,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using DotnetSpider.Redial;
 using StackExchange.Redis;
 using NLog;
@@ -44,7 +43,7 @@ namespace DotnetSpider.Extension
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
 		public List<TargetUrlExtractor> TargetUrlExtractors { get; set; } = new List<TargetUrlExtractor>();
-		public List<GlobalValue> EnviromentValues { get; set; } = new List<GlobalValue>();
+		public List<GlobalValueSelector> GlobalValues { get; set; } = new List<GlobalValueSelector>();
 		public CookieInterceptor CookieInterceptor { get; set; }
 		public List<BaseEntityPipeline> EntityPipelines { get; set; } = new List<BaseEntityPipeline>();
 		public int CachedSize { get; set; }
@@ -99,13 +98,11 @@ namespace DotnetSpider.Extension
 				PageProcessor = processor;
 				foreach (var entity in Entities)
 				{
-					string entiyName = entity.Name;
-
-					var schema = entity.Schema;
+					string entiyName = entity.Entity.Name;
 
 					foreach (var pipeline in EntityPipelines)
 					{
-						pipeline.InitiEntity(schema, entity);
+						pipeline.InitiEntity(entity);
 					}
 
 					Pipelines.Add(new EntityPipeline(entiyName, EntityPipelines));
@@ -173,14 +170,11 @@ namespace DotnetSpider.Extension
 #else
 				Entities.Add(PaserEntityMetaData(type));
 #endif
-				EnviromentValues = type.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new GlobalValue
+				GlobalValues = type.GetTypeInfo().GetCustomAttributes<GlobalValueSelector>().Select(e => new GlobalValueSelector
 				{
 					Name = e.Name,
-					Selector = new Selector
-					{
-						Expression = e.Expression,
-						Type = e.Type
-					}
+					Expression = e.Expression,
+					Type = e.Type
 				}).ToList();
 			}
 			else
@@ -366,13 +360,7 @@ namespace DotnetSpider.Extension
 		public static EntityMetadata PaserEntityMetaData(Type entityType)
 		{
 			EntityMetadata entityMetadata = new EntityMetadata();
-			entityMetadata.Name = GetEntityName(entityType);
-			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
-			if (extractByAttribute != null)
-			{
-				entityMetadata.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-				entityMetadata.Multi = extractByAttribute.Multi;
-			}
+
 			entityMetadata.Schema = entityType.GetCustomAttribute<Schema>();
 			var indexes = entityType.GetCustomAttribute<Indexes>();
 			if (indexes != null)
@@ -380,28 +368,27 @@ namespace DotnetSpider.Extension
 				entityMetadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
 				entityMetadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
 				entityMetadata.Primary = indexes.Primary?.Split(',');
-
 				entityMetadata.AutoIncrement = indexes.AutoIncrement;
 			}
-
-			var updates = entityType.GetCustomAttribute<Update>();
+			var updates = entityType.GetCustomAttribute<UpdateColumns>();
 			if (updates != null)
 			{
 				entityMetadata.Updates = updates.Columns;
 			}
-
 			Entity entity = ParseEntity(entityType);
-
 			entityMetadata.Entity = entity;
-
-			entityMetadata.Stopping = entityType.GetCustomAttribute<Stopping>();
+			EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
+			if (extractByAttribute != null)
+			{
+				entityMetadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+			}
 
 			return entityMetadata;
 		}
 
 		private static Entity ParseEntity(Type entityType)
 		{
-			Entity entity = new Entity();
+			Entity entity = new Entity {Name = GetEntityName(entityType)};
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{
@@ -419,15 +406,15 @@ namespace DotnetSpider.Extension
 						token.Multi = false;
 					}
 					token.Name = GetEntityName(propertyInfo.PropertyType);
-					TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
+					EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
 					if (extractByAttribute != null)
 					{
-						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+						token.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
 					}
-					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
 					if (extractBy != null)
 					{
-						token.Selector = new Selector()
+						token.Selector = new BaseSelector()
 						{
 							Expression = extractBy.Expression,
 							Type = extractBy.Type,
@@ -441,7 +428,7 @@ namespace DotnetSpider.Extension
 				{
 					Field token = new Field();
 
-					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
 					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
 
 					if (typeof(IList).IsAssignableFrom(type))
@@ -456,7 +443,7 @@ namespace DotnetSpider.Extension
 					if (extractBy != null)
 					{
 						token.Option = extractBy.Option;
-						token.Selector = new Selector()
+						token.Selector = new BaseSelector()
 						{
 							Expression = extractBy.Expression,
 							Type = extractBy.Type,
@@ -476,7 +463,7 @@ namespace DotnetSpider.Extension
 
 					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
 					{
-						token.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
+						token.Formatters.Add(formatter);
 					}
 
 					entity.Fields.Add(token);
@@ -487,43 +474,36 @@ namespace DotnetSpider.Extension
 #else
 		public static EntityMetadata PaserEntityMetaData(TypeInfo entityType)
 		{
-			EntityMetadata json = new EntityMetadata { Name = GetEntityName(entityType.AsType()) };
-			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
-			if (extractByAttribute != null)
-			{
-				json.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-				json.Multi = extractByAttribute.Multi;
-			}
-			json.Schema = entityType.GetCustomAttribute<Schema>();
+			EntityMetadata metadata = new EntityMetadata();
+			metadata.Schema = entityType.GetCustomAttribute<Schema>();
 			var indexes = entityType.GetCustomAttribute<Indexes>();
 			if (indexes != null)
 			{
-				json.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				json.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				json.Primary = indexes.Primary?.Split(',');
-
-				json.AutoIncrement = indexes.AutoIncrement;
+				metadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
+				metadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
+				metadata.Primary = indexes.Primary?.Split(',');
+				metadata.AutoIncrement = indexes.AutoIncrement;
 			}
 
-			var updates = entityType.GetCustomAttribute<Update>();
+			var updates = entityType.GetCustomAttribute<UpdateColumns>();
 			if (updates != null)
 			{
-				json.Updates = updates.Columns;
+				metadata.Updates = updates.Columns;
 			}
 
-
-			Entity entity = ConvertToEntity(entityType);
-
-			json.Entity = entity;
-
-			json.Stopping = entityType.GetCustomAttribute<Stopping>();
-
-			return json;
+			metadata.Entity = ParseEntity(entityType);
+			EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
+			if (extractByAttribute != null)
+			{
+				metadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+			}
+			return metadata;
 		}
 
-		private static Entity ConvertToEntity(TypeInfo entityType)
+		private static Entity ParseEntity(TypeInfo entityType)
 		{
 			Entity entity = new Entity();
+			entity.Name = GetEntityName(entityType.AsType());
 			var properties = entityType.AsType().GetProperties();
 			foreach (var propertyInfo in properties)
 			{
@@ -541,15 +521,15 @@ namespace DotnetSpider.Extension
 						token.Multi = false;
 					}
 					token.Name = GetEntityName(propertyInfo.PropertyType);
-					TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
+					EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
 					if (extractByAttribute != null)
 					{
-						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+						token.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
 					}
-					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
 					if (extractBy != null)
 					{
-						token.Selector = new Selector()
+						token.Selector = new BaseSelector
 						{
 							Expression = extractBy.Expression,
 							Type = extractBy.Type,
@@ -557,13 +537,13 @@ namespace DotnetSpider.Extension
 						};
 					}
 
-					token.Fields.Add(ConvertToEntity(propertyInfo.PropertyType.GetTypeInfo()));
+					token.Fields.Add(ParseEntity(propertyInfo.PropertyType.GetTypeInfo()));
 				}
 				else
 				{
 					Field token = new Field();
 
-					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
 					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
 
 					if (typeof(IList).IsAssignableFrom(type))
@@ -578,7 +558,7 @@ namespace DotnetSpider.Extension
 					if (extractBy != null)
 					{
 						token.Option = extractBy.Option;
-						token.Selector = new Selector()
+						token.Selector = new BaseSelector
 						{
 							Expression = extractBy.Expression,
 							Type = extractBy.Type,
@@ -594,11 +574,12 @@ namespace DotnetSpider.Extension
 					else
 					{
 						token.Name = propertyInfo.Name;
+						token.DataType = "STRING,255";
 					}
 
 					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
 					{
-						token.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
+						token.Formatters.Add(formatter);
 					}
 
 					entity.Fields.Add(token);

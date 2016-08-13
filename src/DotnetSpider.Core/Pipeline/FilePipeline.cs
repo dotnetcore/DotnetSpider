@@ -22,15 +22,20 @@ namespace DotnetSpider.Core.Pipeline
 		public FilePipeline()
 		{
 #if NET_CORE
-			SetPath(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\data\\files" : "/data/files");
+			SetPath(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "data\\files" : "data/files");
 #else
-			SetPath("\\data\\files");
+			SetPath("data\\files");
 #endif
 		}
 
 		public FilePipeline(string path)
 		{
 			SetPath(path);
+		}
+
+		public string GetDataForlder()
+		{
+			return $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}";
 		}
 
 		public override void Process(ResultItems resultItems)

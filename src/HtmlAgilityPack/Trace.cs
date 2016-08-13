@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HtmlAgilityPack
+﻿namespace HtmlAgilityPack
 {
     internal partial class Trace
     {

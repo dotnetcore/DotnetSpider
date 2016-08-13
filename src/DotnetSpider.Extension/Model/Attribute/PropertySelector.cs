@@ -2,9 +2,8 @@
 
 namespace DotnetSpider.Extension.Model.Attribute
 {
-	
 	[AttributeUsage(AttributeTargets.Property)]
-	public class PropertyExtractBy : BaseExtractBy
+	public class PropertySelector : BaseSelector
 	{
 		public enum ValueOption
 		{
@@ -19,7 +18,5 @@ namespace DotnetSpider.Extension.Model.Attribute
 		public bool NotNull { get; set; }
 
 		public ValueOption Option { get; set; } = ValueOption.None;
-
-		//public bool Multi { get; set; } = false;
 	}
 }

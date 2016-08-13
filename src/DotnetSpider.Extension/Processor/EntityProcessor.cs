@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DotnetSpider.Core;
@@ -10,6 +9,7 @@ using Site = DotnetSpider.Core.Site;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Common;
+using Newtonsoft.Json.Linq;
 #if !NET_CORE
 using System.Web;
 #else
@@ -29,6 +29,7 @@ namespace DotnetSpider.Extension.Processor
 
 		protected readonly IList<IEntityExtractor> EntityExtractorList = new List<IEntityExtractor>();
 		public TargetUrlsHandler TargetUrlsHandler;
+		public DataHandler DataHandler;
 		private List<TargetUrlExtractorInfo> TargetUrlExtractors { get; } = new List<TargetUrlExtractorInfo>();
 
 		private readonly EntitySpider _spiderContext;
@@ -56,21 +57,39 @@ namespace DotnetSpider.Extension.Processor
 
 		private IEntityExtractor GenerateExtractor(EntityMetadata entityDefine)
 		{
-			return new EntityExtractor(entityDefine.Name, _spiderContext.EnviromentValues, entityDefine);
+			return new EntityExtractor(entityDefine.Entity.Name, _spiderContext.GlobalValues, entityDefine);
 		}
 
 		public void Process(Page page)
 		{
 			foreach (IEntityExtractor pageModelExtractor in EntityExtractorList)
 			{
-				dynamic process = pageModelExtractor.Process(page);
+				List<JObject> list = pageModelExtractor.Process(page);
 
-				if (process == null || (process is IEnumerable && !((IEnumerable)process).GetEnumerator().MoveNext()))
+				if (list == null || list.Count == 0)
 				{
 					continue;
 				}
 
-				page.AddResultItem(pageModelExtractor.EntityName, process);
+				if (DataHandler != null)
+				{
+					foreach (var data in list)
+					{
+						switch (DataHandler.Handle(data))
+						{
+							case DataHandler.ResultType.MissTargetUrls:
+								{
+									page.MissTargetUrls = true;
+									break;
+								}
+							case DataHandler.ResultType.Ok:
+								{
+									break;
+								}
+						}
+					}
+				}
+				page.AddResultItem(pageModelExtractor.EntityName, list);
 			}
 
 			if (!page.MissTargetUrls)

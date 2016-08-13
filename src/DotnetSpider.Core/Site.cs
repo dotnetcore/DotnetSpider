@@ -72,7 +72,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		internal Encoding Encoding => _encoding;
+		public Encoding Encoding => _encoding;
 
 		/// <summary>
 		/// Set or Get timeout for downloader in ms

@@ -12,6 +12,7 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
 using NLog;
+using NLog.Config;
 #if !NET_CORE
 using DotnetSpider.Core.Proxy;
 #endif
@@ -97,7 +98,12 @@ namespace DotnetSpider.Core
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config"));
+			string nlogConfigPath = Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config");
+			if (!File.Exists(nlogConfigPath))
+			{
+				File.AppendAllText(nlogConfigPath, Resource.nlog);
+			}
+			LogManager.Configuration = new XmlLoggingConfiguration(nlogConfigPath);
 			Logger = LogManager.GetCurrentClassLogger();
 			IsExit = false;
 		}
@@ -277,7 +283,7 @@ namespace DotnetSpider.Core
 		{
 			foreach (string url in urls)
 			{
-				Site.StartRequests.Add(new Request(url, 1, null));
+				AddStartRequest(new Request(url, 1, null));
 			}
 
 			return this;
@@ -290,6 +296,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider AddStartRequest(params Request[] requests)
 		{
+			CheckIfRunning();
 			Site.StartRequests.AddRange(requests);
 			return this;
 		}

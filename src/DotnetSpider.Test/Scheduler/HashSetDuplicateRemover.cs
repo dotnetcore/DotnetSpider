@@ -1,16 +1,15 @@
 ﻿using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Scheduler.Component;
 using Xunit;
 
 namespace DotnetSpider.Test.Scheduler
 {
-	public class HashSetDuplicateRemoverTestcase
+	public class HashSetDuplicateRemover
 	{
 		[Fact]
 		public void HashSetDuplicate()
 		{
-			HashSetDuplicateRemover scheduler = new HashSetDuplicateRemover();
+			Core.Scheduler.Component.HashSetDuplicateRemover scheduler = new Core.Scheduler.Component.HashSetDuplicateRemover();
 
 			bool isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", 1, null));
 
@@ -26,7 +25,7 @@ namespace DotnetSpider.Test.Scheduler
 		[Fact]
 		public void HashSetDuplicateSynchronized()
 		{
-			HashSetDuplicateRemover scheduler = new HashSetDuplicateRemover();
+			Core.Scheduler.Component.HashSetDuplicateRemover scheduler = new Core.Scheduler.Component.HashSetDuplicateRemover();
 			bool isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", 1, null));
 
 			Assert.False(isDuplicate);

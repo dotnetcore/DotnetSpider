@@ -50,8 +50,8 @@
       <HintPath>..\..\..\packages\FiddlerCore.4.6.2.0\lib\net40\CertMaker.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Dapper, Version=1.50.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Dapper.1.50.1\lib\net45\Dapper.dll</HintPath>
+    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Dapper.1.50.2\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FiddlerCore4, Version=4.6.2.0, Culture=neutral, PublicKeyToken=67cb91587178ac5a, processorArchitecture=MSIL">
@@ -130,23 +130,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\HtmlTest.cs">
-      <Link>HtmlTest.cs</Link>
+    <Compile Include="..\Html.cs">
+      <Link>Html.cs</Link>
     </Compile>
-    <Compile Include="..\PageExtract2MultiTypesTests.cs">
-      <Link>PageExtract2MultiTypesTests.cs</Link>
+    <Compile Include="..\Pipeline\FilePipeline.cs">
+      <Link>Pipeline\FilePipeline.cs</Link>
     </Compile>
-    <Compile Include="..\PerformanceTest.cs">
-      <Link>PerformanceTest.cs</Link>
+    <Compile Include="..\Pipeline\JsonFilePipeline.cs">
+      <Link>Pipeline\JsonFilePipeline.cs</Link>
     </Compile>
-    <Compile Include="..\Pipeline\FilePipelineTest.cs">
-      <Link>Pipeline\FilePipelineTest.cs</Link>
-    </Compile>
-    <Compile Include="..\Pipeline\ResultItemsCollectorsPipelineTest.cs">
-      <Link>Pipeline\ResultItemsCollectorsPipelineTest.cs</Link>
-    </Compile>
-    <Compile Include="..\RedisSchedulerTest.cs">
-      <Link>Scheduler\RedisSchedulerTest.cs</Link>
+    <Compile Include="..\Pipeline\MysqlEntityPipeline.cs">
+      <Link>Pipeline\MysqlEntityPipeline.cs</Link>
     </Compile>
     <Compile Include="..\RequestTests.cs">
       <Link>RequestTests.cs</Link>
@@ -154,35 +148,32 @@
     <Compile Include="..\ResultItemsTest.cs">
       <Link>ResultItemsTest.cs</Link>
     </Compile>
-    <Compile Include="..\Scheduler\BloomFilterDuplicateRemoverTest.cs">
-      <Link>Scheduler\BloomFilterDuplicateRemoverTest.cs</Link>
+    <Compile Include="..\Scheduler\BloomFilterDuplicateRemover.cs">
+      <Link>Scheduler\BloomFilterDuplicateRemover.cs</Link>
     </Compile>
-    <Compile Include="..\Scheduler\HashSetDuplicateRemoverTestcase.cs">
-      <Link>Scheduler\HashSetDuplicateRemoverTestcase.cs</Link>
+    <Compile Include="..\Scheduler\HashSetDuplicateRemover.cs">
+      <Link>Scheduler\HashSetDuplicateRemover.cs</Link>
     </Compile>
-    <Compile Include="..\Scheduler\QueueSchedulerTestcase.cs">
-      <Link>Scheduler\QueueSchedulerTestcase.cs</Link>
+    <Compile Include="..\Scheduler\QueueScheduler.cs">
+      <Link>Scheduler\QueueScheduler.cs</Link>
     </Compile>
-    <Compile Include="..\Selector\ExtractorsTest.cs">
-      <Link>Selector\ExtractorsTest.cs</Link>
+    <Compile Include="..\Scheduler\RedisScheduler.cs">
+      <Link>Scheduler\RedisScheduler.cs</Link>
     </Compile>
-    <Compile Include="..\Selector\JsonPathSelectorTest.cs">
-      <Link>Selector\JsonPathSelectorTest.cs</Link>
+    <Compile Include="..\Selector.cs">
+      <Link>Selector.cs</Link>
     </Compile>
-    <Compile Include="..\Selector\RegexSelectorTest.cs">
-      <Link>Selector\RegexSelectorTest.cs</Link>
+    <Compile Include="..\Site.cs">
+      <Link>Site.cs</Link>
     </Compile>
-    <Compile Include="..\Selector\SelectorTest.cs">
-      <Link>Selector\SelectorTest.cs</Link>
+    <Compile Include="..\Spider.cs">
+      <Link>Spider.cs</Link>
     </Compile>
-    <Compile Include="..\SiteTest.cs">
-      <Link>SiteTest.cs</Link>
+    <Compile Include="..\SpiderEntity.cs">
+      <Link>SpiderEntity.cs</Link>
     </Compile>
-    <Compile Include="..\SpiderTest.cs">
-      <Link>SpiderTest.cs</Link>
-    </Compile>
-    <Compile Include="..\UrlUtils\UrlUtilsTest.cs">
-      <Link>UrlUtils\UrlUtilsTest.cs</Link>
+    <Compile Include="..\UrlUtilsTest.cs">
+      <Link>UrlUtilsTest.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

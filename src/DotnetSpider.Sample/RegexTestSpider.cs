@@ -3,6 +3,7 @@ using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
@@ -23,7 +24,7 @@ namespace DotnetSpider.Sample
 		public class HomePage : ISpiderEntity
 		{
 			//jQuery(".yk-rank div:1")
-			[PropertyExtractBy(Expression = "<a.*?т╟вс</a>", Type = ExtractType.Regex, Argument = 1)]
+			[PropertySelector(Expression = "<a.*?т╟вс</a>", Type = SelectorType.Regex, Argument = "1")]
 			public string Category { get; set; }
 		}
 	}

@@ -6,6 +6,7 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader.WebDriver;
 using DotnetSpider.Extension.Pipeline;
 
@@ -19,7 +20,7 @@ namespace DotnetSpider.Sample
 			context.SetIdentity("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddTargetUrlExtractor(new TargetUrlExtractor
 			{
-				Region = new Selector { Type = ExtractType.XPath, Expression = "//span[@class=\"p-num\"]" },
+				Region = new Selector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
 				Patterns = new List<string> { @"&page=[0-9]+&" }
 			});
 			context.AddEntityPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=192.168.199.211;User ID=root;Password=1qazZAQ!;Port=3306"));
@@ -30,51 +31,51 @@ namespace DotnetSpider.Sample
 		}
 
 		[Schema("test", "sku", TableSuffix.Today)]
-		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
+		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
 		public class Product : ISpiderEntity
 		{
 			[StoredAs("category", DataType.String, 20)]
-			[PropertyExtractBy(Expression = "name", Type = ExtractType.Enviroment)]
+			[PropertySelector(Expression = "name", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
 
 			[StoredAs("cat3", DataType.String, 20)]
-			[PropertyExtractBy(Expression = "cat3", Type = ExtractType.Enviroment)]
+			[PropertySelector(Expression = "cat3", Type = SelectorType.Enviroment)]
 			public int CategoryId { get; set; }
 
 			[StoredAs("url", DataType.Text)]
-			[PropertyExtractBy(Expression = "./div[1]/a/@href")]
+			[PropertySelector(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
 			[StoredAs("sku", DataType.String, 25)]
-			[PropertyExtractBy(Expression = "./@data-sku")]
+			[PropertySelector(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 
 			[StoredAs("commentscount", DataType.String, 32)]
-			[PropertyExtractBy(Expression = "./div[5]/strong/a")]
+			[PropertySelector(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
 			[StoredAs("shopname", DataType.String, 100)]
-			[PropertyExtractBy(Expression = ".//div[@class='p-shop']/@data-shop_name")]
+			[PropertySelector(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
 			[StoredAs("name", DataType.String, 50)]
-			[PropertyExtractBy(Expression = ".//div[@class='p-name']/a/em")]
+			[PropertySelector(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
 
 			[StoredAs("venderid", DataType.String, 25)]
-			[PropertyExtractBy(Expression = "./@venderid")]
+			[PropertySelector(Expression = "./@venderid")]
 			public string VenderId { get; set; }
 
 			[StoredAs("jdzy_shop_id", DataType.String, 25)]
-			[PropertyExtractBy(Expression = "./@jdzy_shop_id")]
+			[PropertySelector(Expression = "./@jdzy_shop_id")]
 			public string JdzyShopId { get; set; }
 
 			[StoredAs("run_id", DataType.Date)]
-			[PropertyExtractBy(Expression = "Monday", Type = ExtractType.Enviroment)]
+			[PropertySelector(Expression = "Monday", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 
-			[PropertyExtractBy(Expression = "Now", Type = ExtractType.Enviroment)]
+			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
 			[StoredAs("cdate", DataType.Time)]
 			public DateTime CDate { get; set; }
 		}
