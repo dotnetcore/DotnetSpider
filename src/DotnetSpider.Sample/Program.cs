@@ -9,9 +9,12 @@ namespace DotnetSpider.Sample
 		public static void Main(string[] args)
 		{
 			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
-
-			JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
-			spiderBuilder.Run("rerun");
+#if NET_CORE
+            JdSkuSampleSpider spiderBuilder = new JdSkuSampleSpider();
+#else
+            GSXSpider spiderBuilder = new GSXSpider();
+#endif
+            spiderBuilder.Run("rerun");
 		}
 	}
 }

@@ -347,6 +347,7 @@ namespace DotnetSpider.Core
 		{
 			CheckIfRunning();
 			Downloader = downloader;
+            Downloader.Context = this;
 			return this;
 		}
 

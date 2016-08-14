@@ -2,6 +2,7 @@ using System;
 using NLog;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
+using System.Collections.Generic;
 #if !NET_CORE
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -19,7 +20,7 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		protected readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-		public abstract string GetCookie();
+		public abstract Tuple<string, Dictionary<string, string>> GetCookie();
 	}
 
 #if !NET_CORE
@@ -65,9 +66,10 @@ namespace DotnetSpider.Extension.Downloader
 
 		public Selector GotoSelector { get; set; }
 
-		public override string GetCookie()
+		public override Tuple<string, Dictionary<string, string>> GetCookie()
 		{
 			string cookie = string.Empty;
+            var cookies = new Dictionary<string, string>();
 			while (string.IsNullOrEmpty(cookie))
 			{
 				var webDriver = GetWebDriver();
@@ -99,6 +101,7 @@ namespace DotnetSpider.Extension.Downloader
 						foreach (var cookieItem in cookieList)
 						{
 							cookie += cookieItem.Name + "=" + cookieItem.Value + "; ";
+                            cookies.Add(cookieItem.Name, cookieItem.Value);
 						}
 					}
 
@@ -112,7 +115,7 @@ namespace DotnetSpider.Extension.Downloader
 				}
 			}
 
-			return cookie;
+			return new Tuple<string, Dictionary<string, string>>(cookie, cookies);
 		}
 	}
 
@@ -121,7 +124,7 @@ namespace DotnetSpider.Extension.Downloader
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
 
-		public override string GetCookie()
+		public override Tuple<string, Dictionary<string, string>> GetCookie()
 		{
 			if (string.IsNullOrEmpty(Pattern))
 			{
@@ -145,16 +148,17 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				fiddlerWrapper.StopCapture();
 			}
-			return cookie;
-		}
-	}
+            //Item2 not implemented
+            return new Tuple<string, Dictionary<string, string>>(cookie, null);
+        }
+    }
 
 	public class FiddlerLoginCookieInterceptor : LoginCookieInterceptor
 	{
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
 
-		public override string GetCookie()
+		public override Tuple<string, Dictionary<string, string>> GetCookie()
 		{
 			if (string.IsNullOrEmpty(Pattern))
 			{
@@ -178,9 +182,10 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				fiddlerWrapper.StopCapture();
 			}
-			return cookie;
-		}
-	}
+            //Item2 not implemented
+            return new Tuple<string, Dictionary<string, string>>(cookie, null);
+        }
+    }
 
 	public class LoginCookieInterceptor : WebDriverCookieInterceptor
 	{
@@ -200,9 +205,10 @@ namespace DotnetSpider.Extension.Downloader
 
 		public Selector LoginAreaSelector { get; set; }
 
-		public override string GetCookie()
+		public override Tuple<string, Dictionary<string, string>> GetCookie()
 		{
 			string cookie = string.Empty;
+            var cookies = new Dictionary<string, string>();
 			while (string.IsNullOrEmpty(cookie))
 			{
 				var webDriver = GetWebDriver();
@@ -243,8 +249,9 @@ namespace DotnetSpider.Extension.Downloader
 						foreach (var cookieItem in cookieList)
 						{
 							cookie += cookieItem.Name + "=" + cookieItem.Value + "; ";
-						}
-					}
+                            cookies.Add(cookieItem.Name, cookieItem.Value);
+                        }
+                    }
 
 					webDriver.Dispose();
 				}
@@ -256,8 +263,8 @@ namespace DotnetSpider.Extension.Downloader
 				}
 			}
 
-			return cookie;
-		}
-	}
+            return new Tuple<string, Dictionary<string, string>>(cookie, cookies);
+        }
+    }
 #endif
 }
