@@ -125,6 +125,10 @@
       <HintPath>..\..\..\packages\Selenium.WebDriver.2.53.1\lib\net40\WebDriver.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="WebDriver.Support, Version=2.53.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Selenium.Support.2.53.1\lib\net40\WebDriver.Support.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DotnetSpider.Core\netfx45\DotnetSpider.Core.csproj">
@@ -193,6 +197,9 @@
     </Compile>
     <Compile Include="..\Model\Attribute\BaseSelector.cs">
       <Link>Model\Attribute\BaseSelector.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Attribute\TargetUrl.cs">
+      <Link>Model\Attribute\TargetUrl.cs</Link>
     </Compile>
     <Compile Include="..\Model\Attribute\Download.cs">
       <Link>Model\Attribute\Download.cs</Link>

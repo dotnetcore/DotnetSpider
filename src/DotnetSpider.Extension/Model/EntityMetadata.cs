@@ -14,11 +14,20 @@ namespace DotnetSpider.Extension.Model
 		public Entity Entity { get; set; } = new Entity();
 		public string[] Updates { get; internal set; }
 		public int? Limit { get; set; }
+        /// <summary>
+        /// The corresponding url pattern(s).
+        /// </summary>
+        public string[] TargetUrls { get; set; }
 	}
 
 	public class Entity : DataToken
 	{
 		public List<DataToken> Fields { get; set; } = new List<DataToken>();
+        /// <summary>
+        /// Key: The Url extractors generated from the entity definition. Value: the properties' name from which the extras of the new reuqest with get from.
+        /// </summary>
+        public Dictionary<TargetUrlExtractor, List<string>> UrlExtras { get; set; }
+            = new Dictionary<TargetUrlExtractor, List<string>>();
 	}
 
 	public class Field : DataToken
@@ -33,5 +42,7 @@ namespace DotnetSpider.Extension.Model
 		public BaseSelector Selector { get; set; }
 		public bool Multi { get; set; }
 		public string Name { get; set; }
+        public string Pattern { get; set; }
+        public string ReplaceString { get; set; }
 	}
 }
