@@ -22,7 +22,7 @@ namespace DotnetSpider.Test.Pipeline
 		{
 			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{
-				conn.Execute($"DROP table test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}");
+				conn.Execute($"DROP table IF exists test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}");
 			}
 		}
 
@@ -55,6 +55,8 @@ namespace DotnetSpider.Test.Pipeline
 				Assert.Equal("110", list[0].Sku);
 				Assert.Equal("4C", list[0].Category);
 			}
+
+			ClearDb();
 		}
 
 		[Fact]
@@ -79,6 +81,8 @@ namespace DotnetSpider.Test.Pipeline
 				Assert.Equal("110", list[0].Sku);
 				Assert.Equal("111", list[1].Sku);
 			}
+
+			ClearDb();
 		}
 
 		[Schema("test", "sku", TableSuffix.Today)]

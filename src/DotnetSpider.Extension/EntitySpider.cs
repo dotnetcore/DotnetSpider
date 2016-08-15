@@ -129,6 +129,8 @@ namespace DotnetSpider.Extension
 				}
 
 				Logger.Log(LogInfo.Create("构建内部模块、准备爬虫数据...", Logger.Name, this, LogLevel.Info));
+				InitComponent();
+
 				if (needInitStartRequest)
 				{
 					if (PrepareStartUrls != null)
@@ -139,7 +141,7 @@ namespace DotnetSpider.Extension
 						}
 					}
 				}
-				InitComponent();
+
 				SpiderMonitor.Default.Register(this);
 
 				Db?.LockRelease(key, 0);
