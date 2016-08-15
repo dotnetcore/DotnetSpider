@@ -100,12 +100,14 @@ namespace DotnetSpider.Extension
 				{
 					string entiyName = entity.Entity.Name;
 
+					List<BaseEntityPipeline> pipelines = new List<BaseEntityPipeline>();
 					foreach (var pipeline in EntityPipelines)
 					{
-						pipeline.InitiEntity(entity);
+						var newPipeline = (BaseEntityPipeline)pipeline.Clone();
+						newPipeline.InitiEntity(entity);
+						pipelines.Add(newPipeline);
 					}
-
-					Pipelines.Add(new EntityPipeline(entiyName, EntityPipelines));
+					Pipelines.Add(new EntityPipeline(entiyName, pipelines));
 				}
 
 				CheckIfSettingsCorrect();
@@ -129,6 +131,7 @@ namespace DotnetSpider.Extension
 				}
 
 				Logger.Log(LogInfo.Create("构建内部模块、准备爬虫数据...", Logger.Name, this, LogLevel.Info));
+				InitComponent();
 				if (needInitStartRequest)
 				{
 					if (PrepareStartUrls != null)
@@ -139,7 +142,6 @@ namespace DotnetSpider.Extension
 						}
 					}
 				}
-				InitComponent();
 				SpiderMonitor.Default.Register(this);
 
 				Db?.LockRelease(key, 0);

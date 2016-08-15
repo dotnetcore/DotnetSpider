@@ -15,6 +15,11 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string _entityName;
 
+		public override object Clone()
+		{
+			return new JsonFileEntityPipeline();
+		}
+
 		public override void InitiEntity(EntityMetadata metadata)
 		{
 			_entityName = metadata.Entity.Name;
