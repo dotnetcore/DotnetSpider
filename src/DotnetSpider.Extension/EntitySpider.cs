@@ -67,15 +67,16 @@ namespace DotnetSpider.Extension
 				if (CookieInterceptor != null)
 				{
 					Logger.Log(LogInfo.Create("尝试获取 Cookie...", Logger.Name, this, LogLevel.Info));
-					string cookie = CookieInterceptor.GetCookie();
-					if (string.IsNullOrEmpty(cookie))
+					var cookie = CookieInterceptor.GetCookie();
+					if (cookie == null)
 					{
 						Logger.Log(LogInfo.Create("获取 Cookie 失败, 爬虫无法继续.", Logger.Name, this, LogLevel.Error));
 						return;
 					}
 					else
 					{
-						Site.Cookie = cookie;
+						Site.CookiesStringPart = cookie.CookiesStringPart;
+						Site.Cookies = cookie.CookiesDictionary;
 					}
 				}
 #endif
@@ -99,13 +100,14 @@ namespace DotnetSpider.Extension
 				foreach (var entity in Entities)
 				{
 					string entiyName = entity.Entity.Name;
-
+					var pipelines = new List<BaseEntityPipeline>();
 					foreach (var pipeline in EntityPipelines)
 					{
-						pipeline.InitiEntity(entity);
+						var newPipeline =(BaseEntityPipeline) pipeline.Clone();
+						newPipeline.InitiEntity(entity);
 					}
 
-					Pipelines.Add(new EntityPipeline(entiyName, EntityPipelines));
+					Pipelines.Add(new EntityPipeline(entiyName, pipelines));
 				}
 
 				CheckIfSettingsCorrect();
@@ -395,7 +397,7 @@ namespace DotnetSpider.Extension
 
 		private static Entity ParseEntity(Type entityType)
 		{
-			Entity entity = new Entity {Name = GetEntityName(entityType)};
+			Entity entity = new Entity { Name = GetEntityName(entityType) };
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{

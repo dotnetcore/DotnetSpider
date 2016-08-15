@@ -184,7 +184,7 @@ namespace DotnetSpider.Core.Downloader
 					}
 				}
 			}
-			httpWebRequest.Headers.Add("Cookie", site.Cookie);
+			httpWebRequest.Headers.Add("Cookie", site.GetAllCookiesString());
 
 			if (httpWebRequest.Method == HttpMethod.Post)
 			{
@@ -360,7 +360,7 @@ namespace DotnetSpider.Core.Downloader
 					}
 					catch (Exception e)
 					{
-						response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable) {ReasonPhrase = e.Message};
+						response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable) { ReasonPhrase = e.Message };
 					}
 					if (response.StatusCode == HttpStatusCode.MovedPermanently
 						|| response.StatusCode == HttpStatusCode.Moved

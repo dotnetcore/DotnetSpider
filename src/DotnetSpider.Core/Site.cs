@@ -15,12 +15,39 @@ namespace DotnetSpider.Core
 		private string _domain;
 		private Encoding _encoding = Encoding.UTF8;
 		private string _encodingName;
+		private string _cookiesStringPart;
+		private string _allCookiesString;
+		private Dictionary<string, string> _cookies = new Dictionary<string, string>();
 
 		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
-
+		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
 		public ContentType ContentType { get; set; } = ContentType.Html;
 
-		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
+		public Dictionary<string, string> Cookies
+		{
+			get { return _cookies; }
+			set
+			{
+				if (_cookies != value)
+				{
+					_cookies = value;
+					_allCookiesString = GenerateCookieString();
+				}
+			}
+		}
+
+		public string CookiesStringPart
+		{
+			get { return _cookiesStringPart; }
+			set
+			{
+				if (_cookiesStringPart != value)
+				{
+					_cookiesStringPart = value;
+					_allCookiesString = GenerateCookieString();
+				}
+			}
+		}
 
 		/// <summary>
 		/// User agent
@@ -107,8 +134,6 @@ namespace DotnetSpider.Core
 		/// When cycleRetryTimes is more than 0, it will add back to scheduler and try download again. 
 		/// </summary>
 		public int CycleRetryTimes { get; set; } = 5;
-
-		public string Cookie { get; set; }
 
 		/// <summary>
 		/// Set or Get up httpProxy for this site
@@ -210,7 +235,7 @@ namespace DotnetSpider.Core
 			return "Site{" +
 					"domain='" + Domain + '\'' +
 					", userAgent='" + UserAgent + '\'' +
-					", cookies=" + Cookie +
+					", cookies=" + _allCookiesString +
 					", charset='" + Encoding + '\'' +
 					", startRequests=" + StartRequests +
 					", retryTimes=" + RetryTimes +
@@ -253,6 +278,57 @@ namespace DotnetSpider.Core
 		{
 			_httpProxyPool.SetReuseInterval(reuseInterval);
 			return this;
+		}
+
+		public void SetCookiesStringPart(string cookies)
+		{
+			if (_cookiesStringPart != cookies)
+			{
+				_cookiesStringPart = cookies;
+				_allCookiesString = GenerateCookieString();
+			}
+		}
+
+		public void AddOrUpdateCookie(string key, string value)
+		{
+			if (Cookies == null)
+			{
+				Cookies = new Dictionary<string, string>();
+			}
+
+			if (Cookies.ContainsKey(key))
+			{
+				if (Cookies[key] != value)
+				{
+					Cookies[key] = value;
+					_allCookiesString = GenerateCookieString();
+				}
+			}
+			else
+			{
+				Cookies.Add(key, value);
+				_allCookiesString = GenerateCookieString();
+			}
+		}
+
+		public string GetAllCookiesString()
+		{
+			return _allCookiesString;
+		}
+
+		private string GenerateCookieString()
+		{
+			StringBuilder builder = new StringBuilder("");
+
+			if (Cookies != null)
+			{
+				foreach (var cookie in Cookies)
+				{
+					builder.Append($"{cookie.Key}={cookie.Value};");
+				}
+			}
+			builder.Append(_cookiesStringPart);
+			return builder.ToString();
 		}
 	}
 }
