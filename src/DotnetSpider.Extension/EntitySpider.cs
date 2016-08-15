@@ -67,15 +67,16 @@ namespace DotnetSpider.Extension
 				if (CookieInterceptor != null)
 				{
 					Logger.Log(LogInfo.Create("尝试获取 Cookie...", Logger.Name, this, LogLevel.Info));
-					string cookie = CookieInterceptor.GetCookie();
-					if (string.IsNullOrEmpty(cookie))
+					var cookie = CookieInterceptor.GetCookie();
+					if (cookie == null)
 					{
 						Logger.Log(LogInfo.Create("获取 Cookie 失败, 爬虫无法继续.", Logger.Name, this, LogLevel.Error));
 						return;
 					}
 					else
 					{
-						Site.Cookie = cookie;
+						Site.CookiesStringPart = cookie.CookiesStringPart;
+						Site.Cookies = cookie.CookiesDictionary;
 					}
 				}
 #endif
@@ -99,14 +100,13 @@ namespace DotnetSpider.Extension
 				foreach (var entity in Entities)
 				{
 					string entiyName = entity.Entity.Name;
-
-					List<BaseEntityPipeline> pipelines = new List<BaseEntityPipeline>();
+					var pipelines = new List<BaseEntityPipeline>();
 					foreach (var pipeline in EntityPipelines)
 					{
-						var newPipeline = (BaseEntityPipeline)pipeline.Clone();
+						var newPipeline =(BaseEntityPipeline) pipeline.Clone();
 						newPipeline.InitiEntity(entity);
-						pipelines.Add(newPipeline);
 					}
+
 					Pipelines.Add(new EntityPipeline(entiyName, pipelines));
 				}
 
@@ -132,6 +132,7 @@ namespace DotnetSpider.Extension
 
 				Logger.Log(LogInfo.Create("构建内部模块、准备爬虫数据...", Logger.Name, this, LogLevel.Info));
 				InitComponent();
+
 				if (needInitStartRequest)
 				{
 					if (PrepareStartUrls != null)
@@ -142,6 +143,7 @@ namespace DotnetSpider.Extension
 						}
 					}
 				}
+
 				SpiderMonitor.Default.Register(this);
 
 				Db?.LockRelease(key, 0);
@@ -395,7 +397,7 @@ namespace DotnetSpider.Extension
 
 		private static Entity ParseEntity(Type entityType)
 		{
-			Entity entity = new Entity {Name = GetEntityName(entityType)};
+			Entity entity = new Entity { Name = GetEntityName(entityType) };
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{

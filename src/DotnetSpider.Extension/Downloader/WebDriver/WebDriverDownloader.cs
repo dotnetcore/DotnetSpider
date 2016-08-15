@@ -81,10 +81,20 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 
 				//中文乱码URL
 				Uri uri = request.Url;
-				string query = uri.Query;
-				string realUrl = uri.Scheme + "://" + uri.DnsSafeHost + (uri.Port == 80 ? "" : (":" + uri.Port)) + uri.AbsolutePath + (string.IsNullOrEmpty(query)
-									? ""
-									: ("?" + HttpUtility.UrlPathEncode(uri.Query.Substring(1, uri.Query.Length - 1))));
+				string query = string.IsNullOrEmpty(uri.Query) ? "" : $"?{HttpUtility.UrlPathEncode(uri.Query.Substring(1, uri.Query.Length - 1))}";
+				string realUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}{uri.AbsolutePath}{query}";
+
+				var domainUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}";
+				var options = _webDriver.Manage();
+				if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies.Count > 0)
+				{
+					_webDriver.Url = domainUrl;
+					options.Cookies.DeleteAllCookies();
+					foreach (var c in spider.Site.Cookies)
+					{
+						options.Cookies.AddCookie(new Cookie(c.Key, c.Value));
+					}
+				}
 
 				if (UrlFormat != null)
 				{
@@ -100,11 +110,13 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 
 				AfterNavigate?.Invoke((RemoteWebDriver)_webDriver);
 
-				Page page = new Page(request, spider.Site.ContentType);
-				page.Content = _webDriver.PageSource;
-				page.Url = request.Url.ToString();
-				page.TargetUrl = _webDriver.Url;
-				page.Title = _webDriver.Title;
+				Page page = new Page(request, spider.Site.ContentType)
+				{
+					Content = _webDriver.PageSource,
+					Url = request.Url.ToString(),
+					TargetUrl = _webDriver.Url,
+					Title = _webDriver.Title
+				};
 
 				// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
 				request.PutExtra(Request.CycleTriedTimes, null);

@@ -29,7 +29,6 @@ namespace DotnetSpider.Core.Downloader
 
 		public virtual Page Download(Request request, ISpider spider)
 		{
-
 			return null;
 		}
 
