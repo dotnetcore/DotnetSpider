@@ -27,10 +27,5 @@ namespace DotnetSpider.Extension.Pipeline
 		}
 
 		public abstract void Process(List<JObject> datas);
-
-		public object Clone()
-		{
-			return MemberwiseClone();
-		}
 	}
 }
