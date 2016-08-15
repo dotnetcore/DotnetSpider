@@ -12,6 +12,7 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
 using NLog;
+using NLog.Config;
 #if !NET_CORE
 using DotnetSpider.Core.Proxy;
 #endif
@@ -42,7 +43,7 @@ namespace DotnetSpider.Core
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 		public string UserId { get; set; }
 		public string TaskGroup { get; set; }
-		public int EmptySleepTime { get; set; } = 15000;
+		public int EmptySleepTime { get; set; } = 150000;
 		protected bool IsExited { get; private set; }
 		protected int WaitInterval = 10;
 		protected Status Stat = Status.Init;
@@ -97,7 +98,12 @@ namespace DotnetSpider.Core
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-			LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config"));
+			string nlogConfigPath = Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config");
+			if (!File.Exists(nlogConfigPath))
+			{
+				File.AppendAllText(nlogConfigPath, Resource.nlog);
+			}
+			LogManager.Configuration = new XmlLoggingConfiguration(nlogConfigPath);
 			Logger = LogManager.GetCurrentClassLogger();
 			IsExit = false;
 		}
@@ -130,18 +136,9 @@ namespace DotnetSpider.Core
 				Identity = string.IsNullOrEmpty(Site.Domain) ? Guid.NewGuid().ToString() : Site.Domain;
 			}
 
-			UserId = string.IsNullOrEmpty(UserId) ? "DotnetSpider" : UserId;
-			TaskGroup = string.IsNullOrEmpty(TaskGroup) ? "DotnetSpider" : TaskGroup;
-
 			if (PageProcessor == null)
 			{
 				throw new SpiderException("PageProcessor should not be null.");
-			}
-
-
-			if (Pipelines == null || Pipelines.Count == 0)
-			{
-				throw new SpiderException("Pipelines should not be null.");
 			}
 
 			if (Site == null)
@@ -286,7 +283,7 @@ namespace DotnetSpider.Core
 		{
 			foreach (string url in urls)
 			{
-				Site.StartRequests.Add(new Request(url, 1, null));
+				AddStartRequest(new Request(url, 1, null));
 			}
 
 			return this;
@@ -299,6 +296,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider AddStartRequest(params Request[] requests)
 		{
+			CheckIfRunning();
 			Site.StartRequests.AddRange(requests);
 			return this;
 		}
@@ -358,6 +356,12 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
+
+			if (Pipelines == null || Pipelines.Count == 0)
+			{
+				throw new SpiderException("Pipelines should not be null.");
+			}
+
 			Scheduler.Init(this);
 #if !NET_CORE
 			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));

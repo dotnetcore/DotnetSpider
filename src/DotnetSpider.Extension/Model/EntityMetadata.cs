@@ -1,22 +1,17 @@
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Model
 {
 	public class EntityMetadata
 	{
-		public Selector Selector { get; set; }
-		public bool Multi { get; set; }
-		public string Name { get; set; }
 		public Schema Schema { get; set; }
 		public List<string[]> Indexes { get; set; }
 		public List<string[]> Uniques { get; set; }
 		public string AutoIncrement { get; set; }
 		public string[] Primary { get; set; }
 		public Entity Entity { get; set; } = new Entity();
-		public Stopping Stopping { get; set; }
 		public string[] Updates { get; internal set; }
 		public int? Limit { get; set; }
 	}
@@ -29,13 +24,13 @@ namespace DotnetSpider.Extension.Model
 	public class Field : DataToken
 	{
 		public string DataType { get; set; }
-		public PropertyExtractBy.ValueOption Option { get; set; }
-		public List<JObject> Formatters { get; set; } = new List<JObject>();
+		public PropertySelector.ValueOption Option { get; set; }
+		public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
 	}
 
 	public abstract class DataToken
 	{
-		public Selector Selector { get; set; }
+		public BaseSelector Selector { get; set; }
 		public bool Multi { get; set; }
 		public string Name { get; set; }
 	}

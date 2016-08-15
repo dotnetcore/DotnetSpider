@@ -21,7 +21,7 @@ namespace DotnetSpider.Redial.Redialer
 		{
 
 #if !NET_CORE
-			RasDisplay ras = new RasDisplay();
+			Adsl ras = new Adsl();
 			ras.Disconnect();//断开连接
 			ras.Connect(Interface);//重新拨号
 #else

@@ -1,10 +1,12 @@
-﻿using DotnetSpider.Core;
+﻿using System.Collections.Generic;
+using DotnetSpider.Core;
+using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Model
 {
 	public interface IEntityExtractor
 	{
-		dynamic Process(Page page);
+		List<JObject> Process(Page page);
 		string EntityName { get; }
 	}
 }

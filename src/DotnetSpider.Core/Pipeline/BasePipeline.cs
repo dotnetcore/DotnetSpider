@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using NLog;
+#if NET_CORE
+using System.Runtime.InteropServices;
+#endif
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -11,11 +14,16 @@ namespace DotnetSpider.Core.Pipeline
 
 		public ISpider Spider { get; protected set; }
 
+		public static string PathSeperator;
+
+		static BasePipeline()
+		{
 #if !NET_CORE
-		public static string PathSeperator = "\\";
+			PathSeperator = "\\";
 #else
-		public static string PathSeperator = "/";
+			PathSeperator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/";
 #endif
+		}
 
 		public virtual void InitPipeline(ISpider spider)
 		{

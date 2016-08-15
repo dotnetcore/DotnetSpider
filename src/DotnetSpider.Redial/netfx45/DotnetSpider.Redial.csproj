@@ -110,11 +110,8 @@
     <Compile Include="..\RedisRedialExecutor.cs">
       <Link>RedisRedialExecutor.cs</Link>
     </Compile>
-    <Compile Include="..\Utils\AdslUtils.cs">
-      <Link>Utils\AdslUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\Utils\CmdUtils.cs">
-      <Link>Utils\CmdUtils.cs</Link>
+    <Compile Include="..\Utils\Adsl.cs">
+      <Link>Utils\Adsl.cs</Link>
     </Compile>
     <Compile Include="..\Utils\NetInterfaceUtils.cs">
       <Link>Utils\NetInterfaceUtils.cs</Link>

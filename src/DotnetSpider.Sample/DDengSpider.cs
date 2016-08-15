@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
@@ -38,7 +39,7 @@ namespace DotnetSpider.Sample
 		public class Corp : ISpiderEntity
 		{
 			[StoredAs("name", DataType.String, 20)]
-			[PropertyExtractBy(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong")]
+			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong")]
 			public string Name { get; set; }
 
 			[StoredAs("phone", DataType.String, 100)]
@@ -48,7 +49,7 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "\n")]
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
-			[PropertyExtractBy(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = PropertyExtractBy.ValueOption.PlainText)]
+			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = PropertySelector.ValueOption.PlainText)]
 			public string Phone { get; set; }
 
 			[StoredAs("address", DataType.String, 200)]
@@ -59,10 +60,10 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
 			[ReplaceFormatter(NewValue = "", OldValue = "地址：")]
-			[PropertyExtractBy(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertyExtractBy.ValueOption.PlainText)]
+			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertySelector.ValueOption.PlainText)]
 			public string Address { get; set; }
 
-			[PropertyExtractBy(Expression = "Now", Type = ExtractType.Enviroment)]
+			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
 			[StoredAs("cdate", DataType.Time)]
 			public DateTime CDate { get; set; }
 		}

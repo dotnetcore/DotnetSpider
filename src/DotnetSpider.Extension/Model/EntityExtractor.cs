@@ -4,7 +4,6 @@ using System.Linq;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.Common;
 using Newtonsoft.Json.Linq;
@@ -14,29 +13,29 @@ namespace DotnetSpider.Extension.Model
 	public class EntityExtractor : IEntityExtractor
 	{
 		private readonly EntityMetadata _entityDefine;
-		private readonly List<GlobalValue> _enviromentValues;
+		private readonly List<GlobalValueSelector> _globalValues;
 
-		public EntityExtractor(string entityName, List<GlobalValue> enviromentValues, EntityMetadata entityDefine)
+		public EntityExtractor(string entityName, List<GlobalValueSelector> globalValues, EntityMetadata entityDefine)
 		{
 			_entityDefine = entityDefine;
 
 			EntityName = entityName;
-			_enviromentValues = enviromentValues;
+			_globalValues = globalValues;
 		}
 
-		public dynamic Process(Page page)
+		public List<JObject> Process(Page page)
 		{
-			if (_enviromentValues != null && _enviromentValues.Count > 0)
+			if (_globalValues != null && _globalValues.Count > 0)
 			{
-				foreach (var enviromentValue in _enviromentValues)
+				foreach (var enviromentValue in _globalValues)
 				{
 					string name = enviromentValue.Name;
-					var value = page.Selectable.Select(SelectorUtil.Parse(enviromentValue.Selector)).GetValue();
+					var value = page.Selectable.Select(SelectorUtil.Parse(enviromentValue)).GetValue();
 					page.Request.PutExtra(name, value);
 				}
 			}
-			ISelector selector = SelectorUtil.Parse(_entityDefine.Selector);
-			if (selector != null && _entityDefine.Multi)
+			ISelector selector = SelectorUtil.Parse(_entityDefine.Entity.Selector);
+			if (selector != null && _entityDefine.Entity.Multi)
 			{
 				var list = page.Selectable.SelectList(selector).Nodes();
 				if (list == null || list.Count == 0)
@@ -78,7 +77,8 @@ namespace DotnetSpider.Extension.Model
 					}
 				}
 
-				return ProcessSingle(page, select, _entityDefine, 0);
+				var result = ProcessSingle(page, select, _entityDefine, 0);
+				return result == null ? null : new List<JObject> { result };
 			}
 		}
 
@@ -137,39 +137,6 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 
-			var stopping = entityDefine.Stopping;
-
-			if (stopping != null)
-			{
-				var field = entityDefine.Entity.Fields.First(f => f.Name == stopping.PropertyName) as Field;
-				if (field != null)
-				{
-					var datatype = field.DataType;
-					bool isEntity = VerifyIfEntity(datatype);
-					if (isEntity)
-					{
-						throw new SpiderException("Can't compare with object.");
-					}
-					stopping.DataType = datatype.ToLower();
-					string value = dataObject.SelectToken($"$.{stopping.PropertyName}")?.ToString();
-					if (string.IsNullOrEmpty(value))
-					{
-						page.MissTargetUrls = true;
-					}
-					else
-					{
-						if (stopping.NeedStop(value))
-						{
-							page.MissTargetUrls = true;
-						}
-					}
-				}
-				else
-				{
-					throw new SpiderException("Stopping cannot be EntityMetaData.");
-				}
-			}
-
 			return dataObject.Children().Any() ? dataObject : null;
 		}
 
@@ -182,7 +149,6 @@ namespace DotnetSpider.Extension.Model
 			}
 
 			var f = field as Field;
-			List<Formatter.Formatter> formatters = GenerateFormatter(f?.Formatters);
 
 			bool isEntity = field is Entity;
 
@@ -193,15 +159,18 @@ namespace DotnetSpider.Extension.Model
 				{
 					var enviromentSelector = selector as EnviromentSelector;
 					tmpValue = GetEnviromentValue(enviromentSelector.Field, page, index);
-					foreach (var formatter in formatters)
+					if (f != null)
 					{
-						tmpValue = formatter.Formate(tmpValue);
+						foreach (var formatter in f.Formatters)
+						{
+							tmpValue = formatter.Formate(tmpValue);
+						}
 					}
 					return tmpValue;
 				}
 				else
 				{
-					bool needPlainText = (((Field)field).Option == PropertyExtractBy.ValueOption.PlainText);
+					bool needPlainText = ((Field)field).Option == PropertySelector.ValueOption.PlainText;
 					if (field.Multi)
 					{
 						var propertyValues = item.SelectList(selector).Nodes();
@@ -210,9 +179,12 @@ namespace DotnetSpider.Extension.Model
 						foreach (var propertyValue in propertyValues)
 						{
 							string tmp = propertyValue.GetValue(needPlainText);
-							foreach (var formatter in formatters)
+							if (f != null)
 							{
-								tmp = formatter.Formate(tmp);
+								foreach (var formatter in f.Formatters)
+								{
+									tmp = formatter.Formate(tmp);
+								}
 							}
 							results.Add(tmp);
 						}
@@ -220,7 +192,7 @@ namespace DotnetSpider.Extension.Model
 					}
 					else
 					{
-						bool needCount = (((Field)field).Option == PropertyExtractBy.ValueOption.Count);
+						bool needCount = (((Field)field).Option == PropertySelector.ValueOption.Count);
 						if (needCount)
 						{
 							var propertyValues = item.SelectList(selector).Nodes();
@@ -229,7 +201,13 @@ namespace DotnetSpider.Extension.Model
 						else
 						{
 							tmpValue = item.Select(selector)?.GetValue(needPlainText);
-							tmpValue = formatters.Aggregate(tmpValue, (current, formatter) => formatter.Formate(current));
+							if (f != null)
+							{
+								foreach (var formatter in f.Formatters)
+								{
+									tmpValue = formatter.Formate(tmpValue);
+								}
+							}
 							return tmpValue;
 						}
 					}
@@ -266,28 +244,23 @@ namespace DotnetSpider.Extension.Model
 			}
 		}
 
-		public static List<Formatter.Formatter> GenerateFormatter(IEnumerable<JToken> selectTokens)
-		{
-			if (selectTokens == null)
-			{
-				return new List<Formatter.Formatter>();
-			}
-			var results = new List<Formatter.Formatter>();
-			foreach (var selectToken in selectTokens)
-			{
-				Type type = FormatterFactory.GetFormatterType(selectToken.SelectToken("$.Name")?.ToString());
-				if (type != null)
-				{
-					results.Add(selectToken.ToObject(type) as Formatter.Formatter);
-				}
-			}
-			return results;
-		}
-
-		private bool VerifyIfEntity(dynamic datatype)
-		{
-			return datatype != null && datatype.GetType() != typeof(string);
-		}
+		//public static List<Formatter.Formatter> GenerateFormatter(IEnumerable<JToken> selectTokens)
+		//{
+		//	if (selectTokens == null)
+		//	{
+		//		return new List<Formatter.Formatter>();
+		//	}
+		//	var results = new List<Formatter.Formatter>();
+		//	foreach (var selectToken in selectTokens)
+		//	{
+		//		Type type = FormatterFactory.GetFormatterType(selectToken.SelectToken("$.Name")?.ToString());
+		//		if (type != null)
+		//		{
+		//			results.Add(selectToken.ToObject(type) as Formatter.Formatter);
+		//		}
+		//	}
+		//	return results;
+		//}
 
 		public string EntityName { get; }
 	}

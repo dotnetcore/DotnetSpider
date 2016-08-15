@@ -9,8 +9,6 @@ namespace DotnetSpider.Extension.Downloader
 	/// </summary>
 	public class FileDownloader : BaseDownloader
 	{
-		public IDownloadCompleteHandler DownloadValidation { get; set; }
-
 		public override Page Download(Request request, ISpider spider)
 		{
 			BeforeDownload(request, spider);

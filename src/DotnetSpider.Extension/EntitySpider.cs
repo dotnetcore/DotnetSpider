@@ -9,7 +9,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using DotnetSpider.Redial;
 using StackExchange.Redis;
 using NLog;
@@ -21,7 +20,6 @@ using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Downloader;
-using DotnetSpider.Extension.Configuration;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -32,17 +30,20 @@ namespace DotnetSpider.Extension
 	{
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
+
 		protected ConnectionMultiplexer Redis;
 		protected IDatabase Db;
+
 		[JsonIgnore]
 		public Action TaskFinished { get; set; } = () => { };
+		[JsonIgnore]
+		public Action VerifyCollectedData { get; set; }
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 		public RedialExecutor RedialExecutor { get; set; }
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
 		public TargetUrlsHandler TargetUrlsHandler { get; set; }
 		public List<TargetUrlExtractor> TargetUrlExtractors { get; set; } = new List<TargetUrlExtractor>();
-		public List<GlobalValue> EnviromentValues { get; set; } = new List<GlobalValue>();
-		public Validations Validations { get; set; }
+		public List<GlobalValueSelector> GlobalValues { get; set; } = new List<GlobalValueSelector>();
 		public CookieInterceptor CookieInterceptor { get; set; }
 		public List<BaseEntityPipeline> EntityPipelines { get; set; } = new List<BaseEntityPipeline>();
 		public int CachedSize { get; set; }
@@ -90,18 +91,18 @@ namespace DotnetSpider.Extension
 				{
 					processor.AddEntity(entity);
 				}
-
+				if (TargetUrlsHandler != null)
+				{
+					processor.TargetUrlsHandler = TargetUrlsHandler;
+				}
 				PageProcessor = processor;
-
 				foreach (var entity in Entities)
 				{
-					string entiyName = entity.Name;
-
-					var schema = entity.Schema;
+					string entiyName = entity.Entity.Name;
 
 					foreach (var pipeline in EntityPipelines)
 					{
-						pipeline.InitiEntity(schema,entity);
+						pipeline.InitiEntity(entity);
 					}
 
 					Pipelines.Add(new EntityPipeline(entiyName, EntityPipelines));
@@ -119,11 +120,6 @@ namespace DotnetSpider.Extension
 					}
 					var lockerValue = Db.HashGet(InitStatusSetName, Identity);
 					needInitStartRequest = lockerValue != "init finished";
-				}
-
-				if (TargetUrlsHandler != null)
-				{
-					//SetCustomizeTargetUrls(TargetUrlsHandler.Handle);
 				}
 
 				if (arguments.Contains("rerun"))
@@ -145,7 +141,7 @@ namespace DotnetSpider.Extension
 				}
 				InitComponent();
 				SpiderMonitor.Default.Register(this);
-				
+
 				Db?.LockRelease(key, 0);
 
 				RegisterControl(this);
@@ -154,12 +150,130 @@ namespace DotnetSpider.Extension
 
 				TaskFinished();
 
-				//DoValidate();
+				HandleVerifyCollectData();
 			}
 			finally
 			{
 				Dispose();
 				SpiderMonitor.Default.Dispose();
+			}
+		}
+
+		public EntitySpider AddEntityType(Type type)
+		{
+			CheckIfRunning();
+
+			if (typeof(ISpiderEntity).IsAssignableFrom(type))
+			{
+#if NET_CORE
+				Entities.Add(PaserEntityMetaData(type.GetTypeInfo()));
+#else
+				Entities.Add(PaserEntityMetaData(type));
+#endif
+				GlobalValues = type.GetTypeInfo().GetCustomAttributes<GlobalValueSelector>().Select(e => new GlobalValueSelector
+				{
+					Name = e.Name,
+					Expression = e.Expression,
+					Type = e.Type
+				}).ToList();
+			}
+			else
+			{
+				throw new SpiderException($"Type: {type.FullName} is not a ISpiderEntity.");
+			}
+
+			return this;
+		}
+
+		public EntitySpider AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
+		{
+			CheckIfRunning();
+			TargetUrlExtractors.Add(targetUrlExtractor);
+			return this;
+		}
+
+		public EntitySpider AddEntityPipeline(BaseEntityPipeline pipeline)
+		{
+			CheckIfRunning();
+			EntityPipelines.Add(pipeline);
+			return this;
+		}
+
+		public void SetCachedSize(int count)
+		{
+			CheckIfRunning();
+			foreach (var pipeline in Pipelines)
+			{
+				((CachedPipeline)pipeline).CachedSize = count;
+			}
+		}
+
+		public override Spider AddPipeline(IPipeline pipeline)
+		{
+			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
+		}
+
+		public override Spider AddPipelines(IList<IPipeline> pipelines)
+		{
+			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
+		}
+
+		public ISpider ToDefaultSpider()
+		{
+			return new DefaultSpider("", new Site());
+		}
+
+		private static string GetEntityName(Type type)
+		{
+			return type.FullName;
+		}
+
+		private void HandleVerifyCollectData()
+		{
+			if (VerifyCollectedData == null)
+			{
+				return;
+			}
+			string key = "locker-validate-" + Identity;
+
+			try
+			{
+				bool needInitStartRequest = true;
+				if (Redis != null)
+				{
+					while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+					{
+						Thread.Sleep(1000);
+					}
+
+					var lockerValue = Db.HashGet(ValidateStatusName, Identity);
+					needInitStartRequest = lockerValue != "verify finished";
+				}
+				if (needInitStartRequest)
+				{
+					Logger.Log(LogInfo.Create("开始执行数据验证...", Logger.Name, this, LogLevel.Info));
+
+					VerifyCollectedData();
+				}
+
+				Logger.Log(LogInfo.Create("数据验证已完成.", Logger.Name, this, LogLevel.Info));
+
+				if (needInitStartRequest && Redis != null)
+				{
+					Db.HashSet(ValidateStatusName, Identity, "verify finished");
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.Error(e, e.Message);
+				throw;
+			}
+			finally
+			{
+				if (Redis != null)
+				{
+					Db.LockRelease(key, 0);
+				}
 			}
 		}
 
@@ -243,109 +357,44 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public EntitySpider AddEntityType(Type type)
-		{
-			CheckIfRunning();
-
-			if (typeof(ISpiderEntity).IsAssignableFrom(type))
-			{
-#if NET_CORE
-				Entities.Add(ConvertToEntityMetaData(type.GetTypeInfo()));
-#else
-				Entities.Add(PaserEntityMetaData(type));
-#endif
-				EnviromentValues = type.GetTypeInfo().GetCustomAttributes<EnviromentExtractBy>().Select(e => new GlobalValue
-				{
-					Name = e.Name,
-					Selector = new Selector
-					{
-						Expression = e.Expression,
-						Type = e.Type
-					}
-				}).ToList();
-			}
-			else
-			{
-				throw new SpiderException($"Type: {type.FullName} is not a ISpiderEntity.");
-			}
-
-			return this;
-		}
-
-		public EntitySpider AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
-		{
-			CheckIfRunning();
-			TargetUrlExtractors.Add(targetUrlExtractor);
-			return this;
-		}
-
-		public EntitySpider AddEntityPipeline(BaseEntityPipeline pipeline)
-		{
-			CheckIfRunning();
-			EntityPipelines.Add(pipeline);
-			return this;
-		}
-
-		public override Spider AddPipeline(IPipeline pipeline)
-		{
-			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
-		}
-
-		public override Spider AddPipelines(IList<IPipeline> pipelines)
-		{
-			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
-		}
-
-		public ISpider ToDefaultSpider()
-		{
-			return new DefaultSpider("", new Site());
-		}
-
-		private static string GetEntityName(Type type)
-		{
-			return type.FullName;
-		}
-
 #if !NET_CORE
-		private EntityMetadata PaserEntityMetaData(Type entityType)
+		public static EntityMetadata PaserEntityMetaData(Type entityType)
 		{
-			EntityMetadata entityMetadata = new EntityMetadata();
-			entityMetadata.Name = GetEntityName(entityType);
-			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
-			if (extractByAttribute != null)
-			{
-				entityMetadata.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-				entityMetadata.Multi = extractByAttribute.Multi;
-			}
-			entityMetadata.Schema = entityType.GetCustomAttribute<Schema>();
+			EntityMetadata metadata = new EntityMetadata();
+
+			metadata.Schema = entityType.GetCustomAttribute<Schema>();
 			var indexes = entityType.GetCustomAttribute<Indexes>();
 			if (indexes != null)
 			{
-				entityMetadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				entityMetadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				entityMetadata.Primary = indexes.Primary?.Split(',');
-
-				entityMetadata.AutoIncrement = indexes.AutoIncrement;
+				metadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
+				metadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
+				metadata.Primary = indexes.Primary?.Split(',');
+				metadata.AutoIncrement = indexes.AutoIncrement;
 			}
-
-			var updates = entityType.GetCustomAttribute<Update>();
+			var updates = entityType.GetCustomAttribute<UpdateColumns>();
 			if (updates != null)
 			{
-				entityMetadata.Updates = updates.Columns;
+				metadata.Updates = updates.Columns;
+			}
+			Entity entity = ParseEntity(entityType);
+			metadata.Entity = entity;
+			EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
+			if (extractByAttribute != null)
+			{
+				metadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+				metadata.Entity.Multi = true;
+			}
+			else
+			{
+				metadata.Entity.Multi = false;
 			}
 
-			Entity entity = ParseEntity(entityType);
-
-			entityMetadata.Entity = entity;
-
-			entityMetadata.Stopping = entityType.GetCustomAttribute<Stopping>();
-
-			return entityMetadata;
+			return metadata;
 		}
 
-		private Entity ParseEntity(Type entityType)
+		private static Entity ParseEntity(Type entityType)
 		{
-			Entity entity = new Entity();
+			Entity entity = new Entity {Name = GetEntityName(entityType)};
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{
@@ -363,15 +412,15 @@ namespace DotnetSpider.Extension
 						token.Multi = false;
 					}
 					token.Name = GetEntityName(propertyInfo.PropertyType);
-					TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
+					EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
 					if (extractByAttribute != null)
 					{
-						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+						token.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
 					}
-					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
 					if (extractBy != null)
 					{
-						token.Selector = new Selector()
+						token.Selector = new BaseSelector()
 						{
 							Expression = extractBy.Expression,
 							Type = extractBy.Type,
@@ -385,7 +434,7 @@ namespace DotnetSpider.Extension
 				{
 					Field token = new Field();
 
-					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
 					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
 
 					if (typeof(IList).IsAssignableFrom(type))
@@ -400,7 +449,7 @@ namespace DotnetSpider.Extension
 					if (extractBy != null)
 					{
 						token.Option = extractBy.Option;
-						token.Selector = new Selector()
+						token.Selector = new BaseSelector()
 						{
 							Expression = extractBy.Expression,
 							Type = extractBy.Type,
@@ -420,7 +469,7 @@ namespace DotnetSpider.Extension
 
 					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
 					{
-						token.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
+						token.Formatters.Add(formatter);
 					}
 
 					entity.Fields.Add(token);
@@ -429,45 +478,43 @@ namespace DotnetSpider.Extension
 			return entity;
 		}
 #else
-		private EntityMetadata ConvertToEntityMetaData(TypeInfo entityType)
+		public static EntityMetadata PaserEntityMetaData(TypeInfo entityType)
 		{
-			EntityMetadata json = new EntityMetadata {Name = GetEntityName(entityType.AsType())};
-			TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
-			if (extractByAttribute != null)
-			{
-				json.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-				json.Multi = extractByAttribute.Multi;
-			}
-			json.Schema = entityType.GetCustomAttribute<Schema>();
+			EntityMetadata metadata = new EntityMetadata();
+			metadata.Schema = entityType.GetCustomAttribute<Schema>();
 			var indexes = entityType.GetCustomAttribute<Indexes>();
 			if (indexes != null)
 			{
-				json.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				json.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				json.Primary = indexes.Primary?.Split(',');
-
-				json.AutoIncrement = indexes.AutoIncrement;
+				metadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
+				metadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
+				metadata.Primary = indexes.Primary?.Split(',');
+				metadata.AutoIncrement = indexes.AutoIncrement;
 			}
 
-			var updates = entityType.GetCustomAttribute<Update>();
+			var updates = entityType.GetCustomAttribute<UpdateColumns>();
 			if (updates != null)
 			{
-				json.Updates = updates.Columns;
+				metadata.Updates = updates.Columns;
 			}
 
-
-			Entity entity = ConvertToEntity(entityType);
-
-			json.Entity = entity;
-
-			json.Stopping = entityType.GetCustomAttribute<Stopping>();
-
-			return json;
+			metadata.Entity = ParseEntity(entityType);
+			EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
+			if (extractByAttribute != null)
+			{
+				metadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+				metadata.Entity.Multi = true;
+			}
+			else
+			{
+				metadata.Entity.Multi = false;
+			}
+			return metadata;
 		}
 
-		private Entity ConvertToEntity(TypeInfo entityType)
+		private static Entity ParseEntity(TypeInfo entityType)
 		{
 			Entity entity = new Entity();
+			entity.Name = GetEntityName(entityType.AsType());
 			var properties = entityType.AsType().GetProperties();
 			foreach (var propertyInfo in properties)
 			{
@@ -485,15 +532,15 @@ namespace DotnetSpider.Extension
 						token.Multi = false;
 					}
 					token.Name = GetEntityName(propertyInfo.PropertyType);
-					TypeExtractBy extractByAttribute = entityType.GetCustomAttribute<TypeExtractBy>();
+					EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
 					if (extractByAttribute != null)
 					{
-						token.Selector = new Selector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+						token.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
 					}
-					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
 					if (extractBy != null)
 					{
-						token.Selector = new Selector()
+						token.Selector = new BaseSelector
 						{
 							Expression = extractBy.Expression,
 							Type = extractBy.Type,
@@ -501,13 +548,13 @@ namespace DotnetSpider.Extension
 						};
 					}
 
-					token.Fields.Add(ConvertToEntity(propertyInfo.PropertyType.GetTypeInfo()));
+					token.Fields.Add(ParseEntity(propertyInfo.PropertyType.GetTypeInfo()));
 				}
 				else
 				{
 					Field token = new Field();
 
-					var extractBy = propertyInfo.GetCustomAttribute<PropertyExtractBy>();
+					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
 					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
 
 					if (typeof(IList).IsAssignableFrom(type))
@@ -522,7 +569,7 @@ namespace DotnetSpider.Extension
 					if (extractBy != null)
 					{
 						token.Option = extractBy.Option;
-						token.Selector = new Selector()
+						token.Selector = new BaseSelector
 						{
 							Expression = extractBy.Expression,
 							Type = extractBy.Type,
@@ -538,11 +585,12 @@ namespace DotnetSpider.Extension
 					else
 					{
 						token.Name = propertyInfo.Name;
+						token.DataType = "STRING,255";
 					}
 
 					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
 					{
-						token.Formatters.Add((JObject)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(formatter)));
+						token.Formatters.Add(formatter);
 					}
 
 					entity.Fields.Add(token);
@@ -552,7 +600,7 @@ namespace DotnetSpider.Extension
 		}
 #endif
 
-		private string ParseDataType(StoredAs storedAs)
+		private static string ParseDataType(StoredAs storedAs)
 		{
 			string reslut = "";
 

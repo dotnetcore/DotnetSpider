@@ -5,7 +5,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.ORM;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -16,9 +15,9 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string _entityName;
 
-		public override void InitiEntity(Schema schema, EntityMetadata metadata)
+		public override void InitiEntity(EntityMetadata metadata)
 		{
-			_entityName = metadata.Name;
+			_entityName = metadata.Entity.Name;
 		}
 
 		public override void InitPipeline(ISpider spider)

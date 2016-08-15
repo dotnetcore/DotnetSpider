@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension.Model
 
 		public string FormateString { get; set; }
 
-		public override void Build(Spider site, dynamic obj)
+		public override void Build(Spider spider, dynamic obj)
 		{
 			Dictionary<string, object> data = new Dictionary<string, object>();
 
@@ -59,7 +59,7 @@ namespace DotnetSpider.Extension.Model
 
 			for (int i = From; i <= To; i += Interval)
 			{
-				site.AddStartRequest(new Request(string.Format(FormateString, i), 1, data)
+				spider.Scheduler.Push(new Request(string.Format(FormateString, i), 1, data)
 				{
 					PostBody = PostBody,
 					Origin = Origin,
@@ -79,7 +79,7 @@ namespace DotnetSpider.Extension.Model
 		public string DateFormate { get; set; } = "yyyy-MM-dd";
 		public string FormateString { get; set; }
 
-		public override void Build(Spider site, dynamic obj)
+		public override void Build(Spider spider, dynamic obj)
 		{
 			Dictionary<string, object> data = new Dictionary<string, object>();
 
@@ -93,7 +93,7 @@ namespace DotnetSpider.Extension.Model
 
 			for (DateTime i = From; i <= To; i = i.AddDays(IntervalDay))
 			{
-				site.AddStartRequest(new Request(string.Format(FormateString, i.ToString(DateFormate)), 1, data)
+				spider.Scheduler.Push(new Request(string.Format(FormateString, i.ToString(DateFormate)), 1, data)
 				{
 					PostBody = PostBody,
 					Origin = Origin,
@@ -180,7 +180,7 @@ namespace DotnetSpider.Extension.Model
 			return arguments;
 		}
 
-		public override void Build(Spider site, dynamic obj)
+		public override void Build(Spider spider, dynamic obj)
 		{
 			if (string.IsNullOrEmpty(QueryString))
 			{
@@ -195,7 +195,7 @@ namespace DotnetSpider.Extension.Model
 				foreach (var formate in FormateStrings)
 				{
 					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					site.AddStartRequest(new Request(tmpUrl, 0, data)
+					spider.Scheduler.Push(new Request(tmpUrl, 0, data)
 					{
 						Method = Method,
 						Origin = Origin,
@@ -244,7 +244,7 @@ namespace DotnetSpider.Extension.Model
 		public int PostFrom { get; set; }
 		public int PostTo { get; set; }
 
-		public override void Build(Spider site, dynamic obj)
+		public override void Build(Spider spider, dynamic obj)
 		{
 			if (string.IsNullOrEmpty(QueryString))
 			{
@@ -264,7 +264,7 @@ namespace DotnetSpider.Extension.Model
 						foreach (var formate in FormateStrings)
 						{
 							string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-							site.AddStartRequest(new Request(tmpUrl, 0, data)
+							spider.Scheduler.Push(new Request(tmpUrl, 0, data)
 							{
 								Method = Method,
 								Origin = Origin,
@@ -303,7 +303,7 @@ namespace DotnetSpider.Extension.Model
 		/// </summary>
 		public List<string> FormateStrings { get; set; }
 
-		public override void Build(Spider site, dynamic obj)
+		public override void Build(Spider spider, dynamic obj)
 		{
 			foreach (JObject jobject in obj)
 			{
@@ -334,7 +334,7 @@ namespace DotnetSpider.Extension.Model
 				foreach (var formate in FormateStrings)
 				{
 					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					site.AddStartRequest(new Request(tmpUrl, 0, tmp)
+					spider.Scheduler.Push(new Request(tmpUrl, 0, tmp)
 					{
 						Method = Method,
 						Origin = Origin,

@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Redial", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Core", "src\DotnetSpider.Core\netfx45\DotnetSpider.Core.csproj", "{28DADCA2-9053-4222-A813-A73DD0FE7F2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Validation", "src\DotnetSpider.Validation\netfx45\DotnetSpider.Validation.csproj", "{DBB93D35-6B87-430E-B308-9F2ABDA1A13E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension", "src\DotnetSpider.Extension\netfx45\DotnetSpider.Extension.csproj", "{DDB5A085-6219-4A95-8CD8-DDCF3A54B962}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Test", "src\DotnetSpider.Test\netfx45\DotnetSpider.Test.csproj", "{5806BCBB-08FF-46A5-AC63-40B4CF48A7F5}"
@@ -37,10 +35,6 @@ Global
 		{28DADCA2-9053-4222-A813-A73DD0FE7F2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28DADCA2-9053-4222-A813-A73DD0FE7F2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28DADCA2-9053-4222-A813-A73DD0FE7F2F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DBB93D35-6B87-430E-B308-9F2ABDA1A13E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DBB93D35-6B87-430E-B308-9F2ABDA1A13E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DBB93D35-6B87-430E-B308-9F2ABDA1A13E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DBB93D35-6B87-430E-B308-9F2ABDA1A13E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DDB5A085-6219-4A95-8CD8-DDCF3A54B962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DDB5A085-6219-4A95-8CD8-DDCF3A54B962}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDB5A085-6219-4A95-8CD8-DDCF3A54B962}.Release|Any CPU.ActiveCfg = Release|Any CPU

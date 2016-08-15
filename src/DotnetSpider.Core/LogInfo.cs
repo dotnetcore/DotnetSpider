@@ -10,8 +10,7 @@ namespace DotnetSpider.Core
 
 		public static LogEventInfo Create(string message, string loggerName, ITask task, LogLevel level, Exception e = null)
 		{
-			LogEventInfo theEvent = new LogEventInfo(level, loggerName, message);
-			theEvent.Exception = e;
+			LogEventInfo theEvent = new LogEventInfo(level, loggerName, message) {Exception = e};
 			theEvent.Properties["UserId"] = task.UserId;
 			theEvent.Properties["TaskGroup"] = task.TaskGroup;
 			return theEvent;

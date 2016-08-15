@@ -135,10 +135,6 @@
       <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>
       <Name>DotnetSpider.Redial</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DotnetSpider.Validation\netfx45\DotnetSpider.Validation.csproj">
-      <Project>{dbb93d35-6b87-430e-b308-9f2abda1a13e}</Project>
-      <Name>DotnetSpider.Validation</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Common\DataSourceUtil.cs">
@@ -158,9 +154,6 @@
     </Compile>
     <Compile Include="..\Configuration\JsonSpiderContext.cs">
       <Link>Configuration\JsonSpiderContext.cs</Link>
-    </Compile>
-    <Compile Include="..\Configuration\Validation.cs">
-      <Link>Configuration\Validation.cs</Link>
     </Compile>
     <Compile Include="..\DataSource.cs">
       <Link>DataSource.cs</Link>
@@ -198,44 +191,32 @@
     <Compile Include="..\EntitySpider.cs">
       <Link>EntitySpider.cs</Link>
     </Compile>
-    <Compile Include="..\Model\AfterExtractor.cs">
-      <Link>Model\AfterExtractor.cs</Link>
+    <Compile Include="..\Model\Attribute\BaseSelector.cs">
+      <Link>Model\Attribute\BaseSelector.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\BaseExtractBy.cs">
-      <Link>Model\Attribute\BaseExtractBy.cs</Link>
+    <Compile Include="..\Model\Attribute\Download.cs">
+      <Link>Model\Attribute\Download.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\Downloader.cs">
-      <Link>Model\Attribute\Downloader.cs</Link>
+    <Compile Include="..\Model\Attribute\EntitySelector.cs">
+      <Link>Model\Attribute\EntitySelector.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\EnviromentExtractBy.cs">
-      <Link>Model\Attribute\EnviromentExtractBy.cs</Link>
+    <Compile Include="..\Model\Attribute\GlobalValueSelector.cs">
+      <Link>Model\Attribute\GlobalValueSelector.cs</Link>
     </Compile>
     <Compile Include="..\Model\Attribute\Indexes.cs">
       <Link>Model\Attribute\Indexes.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\PropertyExtractBy.cs">
-      <Link>Model\Attribute\PropertyExtractBy.cs</Link>
+    <Compile Include="..\Model\Attribute\PropertySelector.cs">
+      <Link>Model\Attribute\PropertySelector.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\Stopping.cs">
-      <Link>Model\Attribute\Stopping.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Attribute\TypeExtractBy.cs">
-      <Link>Model\Attribute\TypeExtractBy.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Attribute\Update.cs">
-      <Link>Model\Attribute\Update.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\BaseModelSpider.cs">
-      <Link>Model\BaseModelSpider.cs</Link>
+    <Compile Include="..\Model\Attribute\UpdateColumns.cs">
+      <Link>Model\Attribute\UpdateColumns.cs</Link>
     </Compile>
     <Compile Include="..\Model\EntityExtractor.cs">
       <Link>Model\EntityExtractor.cs</Link>
     </Compile>
     <Compile Include="..\Model\EntityMetadata.cs">
       <Link>Model\EntityMetadata.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\ExtractType.cs">
-      <Link>Model\ExtractType.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\BoolFormater.cs">
       <Link>Model\Formatter\BoolFormater.cs</Link>
@@ -246,11 +227,11 @@
     <Compile Include="..\Model\Formatter\ClassifyFormater.cs">
       <Link>Model\Formatter\ClassifyFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\Formatter.cs">
+      <Link>Model\Formatter\Formatter.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\FormatterFactory.cs">
       <Link>Model\Formatter\FormatterFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Formatter\IFormater.cs">
-      <Link>Model\Formatter\IFormater.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\RegexMatchFormater.cs">
       <Link>Model\Formatter\RegexMatchFormater.cs</Link>
@@ -278,9 +259,6 @@
     </Compile>
     <Compile Include="..\Model\GlobalValue.cs">
       <Link>Model\GlobalValue.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\IEntityCustomize.cs">
-      <Link>Model\IEntityCustomize.cs</Link>
     </Compile>
     <Compile Include="..\Model\IEntityExtractor.cs">
       <Link>Model\IEntityExtractor.cs</Link>
@@ -356,6 +334,9 @@
     </Compile>
     <Compile Include="..\Pipeline\PipelineMode.cs">
       <Link>Pipeline\PipelineMode.cs</Link>
+    </Compile>
+    <Compile Include="..\Processor\DataHandler.cs">
+      <Link>Processor\DataHandler.cs</Link>
     </Compile>
     <Compile Include="..\Processor\EntityProcessor.cs">
       <Link>Processor\EntityProcessor.cs</Link>

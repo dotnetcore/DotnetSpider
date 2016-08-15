@@ -20,9 +20,9 @@ namespace DotnetSpider.Extension.Pipeline
 		protected string DataFolder;
 		protected StreamWriter Writer;
 
-		public override void InitiEntity(Schema schema, EntityMetadata metadata)
+		public override void InitiEntity(EntityMetadata metadata)
 		{
-			Schema = schema;
+			Schema = metadata.Schema;
 			Columns = metadata.Entity.Fields;
 		}
 

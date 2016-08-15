@@ -6,6 +6,7 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Pipeline;
 
@@ -23,7 +24,7 @@ namespace DotnetSpider.Sample
 				CachedSize = 1,
 				ThreadNum = 1,
 				SkipWhenResultIsEmpty = true,
-				Downloader = new HttpClientDownloader()
+				Downloader = new HttpClientDownloader
 				{
 					DownloadCompleteHandlers = new List<IDownloadCompleteHandler>
 					{
@@ -52,19 +53,19 @@ namespace DotnetSpider.Sample
 		}
 
 		[Schema("testhao", "hao360buble")]
-		[TypeExtractBy(Expression = "$.data", Type = ExtractType.JsonPath, Multi = false)]
+		[EntitySelector(Expression = "$.data", Type = SelectorType.JsonPath)]
 		public class UpdateHao360Info : ISpiderEntity
 		{
 			[StoredAs("title", DataType.String, 100)]
-			[PropertyExtractBy(Expression = "$.title", Type = ExtractType.JsonPath)]
+			[PropertySelector(Expression = "$.title", Type = SelectorType.JsonPath)]
 			public string Title { get; set; }
 
 			[StoredAs("url", DataType.String, 200)]
-			[PropertyExtractBy(Expression = "$.link", Type = ExtractType.JsonPath)]
+			[PropertySelector(Expression = "$.link", Type = SelectorType.JsonPath)]
 			public string Url { get; set; }
 
 			[StoredAs("run_id", DataType.Date)]
-			[PropertyExtractBy(Expression = "Now", Type = ExtractType.Enviroment)]
+			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 
 			public string Id { get; set; }
