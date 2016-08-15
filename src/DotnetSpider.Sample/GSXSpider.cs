@@ -5,6 +5,7 @@ using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Downloader.WebDriver;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
+using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
@@ -68,7 +69,6 @@ namespace DotnetSpider.Sample
         public class 主页 : ISpiderEntity
         {
             [TargetUrl]
-            //[PropertySelector(Expression = @"//div[@id=""sidebar""]//li[3]/ul/li[3]")]
             [PropertySelector(Expression = "//a[@ui-sref=\"jigou.orders\"]")]
             public string 订单页面链接 { get; set; }
         }
@@ -77,7 +77,8 @@ namespace DotnetSpider.Sample
         [EntitySelector(Expression = "//div[@id=\"order-wrapper\"]//div[@class=\"orders-table\"]/div[@class=\"table-body ng-scope\"]")]
         public class 订单列表项 : ISpiderEntity
         {
-            [PropertySelector(Expression = ".//a[@class=\"teacher-name\"]/@href", Pattern = "^.*/([0-9]*)", ReplaceString = "$1")]
+            [PropertySelector(Expression = ".//a[@class=\"teacher-name\"]/@href")]
+            [RegexMatchFormatter(Pattern = @"[\d]+")]
             public string 教师ID { get; set; }
 
             [TargetUrl(OtherPropertiesAsExtras = new[] { "教师ID" })]

@@ -42,7 +42,5 @@ namespace DotnetSpider.Extension.Model
 		public BaseSelector Selector { get; set; }
 		public bool Multi { get; set; }
 		public string Name { get; set; }
-        public string Pattern { get; set; }
-        public string ReplaceString { get; set; }
 	}
 }

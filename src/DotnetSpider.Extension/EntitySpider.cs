@@ -524,9 +524,6 @@ namespace DotnetSpider.Extension
                             Type = extractBy.Type,
                             Argument = extractBy.Argument
                         };
-                        token.Pattern = extractBy.Pattern;
-                        token.ReplaceString = extractBy.ReplaceString;
-
                     }
 
                     if (storeAs != null)

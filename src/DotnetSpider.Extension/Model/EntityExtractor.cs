@@ -141,17 +141,6 @@ namespace DotnetSpider.Extension.Model
                 var fieldValue = ExtractField(item, page, field, index);
                 if (fieldValue != null)
                 {
-                    if (!string.IsNullOrEmpty(field.Pattern))
-                    {
-                        if (string.IsNullOrEmpty(field.ReplaceString))
-                        {
-                            fieldValue = Regex.Match(fieldValue, field.Pattern).ToString();
-                        }
-                        else
-                        {
-                            fieldValue = Regex.Replace(fieldValue, field.Pattern, field.ReplaceString);
-                        }
-                    }
                     dataObject.Add(field.Name, fieldValue);
                 }
             }
