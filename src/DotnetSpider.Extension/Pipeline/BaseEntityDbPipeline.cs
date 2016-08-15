@@ -44,123 +44,142 @@ namespace DotnetSpider.Extension.Pipeline
 			ConnectString = connectString;
 		}
 
-		public override void InitiEntity(EntityMetadata entityDefine)
-		{
-			Schema = GenerateSchema(entityDefine.Schema);
-			foreach (var f in entityDefine.Entity.Fields)
-			{
-				if (!string.IsNullOrEmpty(((Field)f).DataType))
-				{
-					Columns.Add((Field)f);
-				}
-			}
-			var primary = entityDefine.Primary;
-			if (primary != null)
-			{
-				foreach (var p in primary)
-				{
-					var col = Columns.FirstOrDefault(c => c.Name == p);
-					if (col == null)
-					{
-						throw new SpiderException("Columns set as primary is not a property of your entity.");
-					}
-					else
-					{
-						Primary.Add(col);
-					}
-				}
-			}
 
-			if (Mode == PipelineMode.Update)
-			{
-				if (Primary == null || Primary.Count == 0)
-				{
-					throw new SpiderException("Set Primary in the Indexex attribute.");
-				}
+        public override BaseEntityPipeline CreateNewByInitEntity(EntityMetadata metadata)
+        {
+            BaseEntityDbPipeline newObject = Activator.CreateInstance(this.GetType()) as BaseEntityDbPipeline;
+            newObject.ConnectString = this.ConnectString;
+            newObject.Mode = this.Mode;
+            newObject.Spider = this.Spider;
+            initEntity(metadata, newObject);
+            return newObject;
+        }
 
-				if (entityDefine.Updates != null && entityDefine.Updates.Length > 0)
-				{
-					foreach (var column in entityDefine.Updates)
-					{
-						var col = Columns.FirstOrDefault(c => c.Name == column);
-						if (col == null)
-						{
-							throw new SpiderException("Columns set as update is not a property of your entity.");
-						}
-						else
-						{
-							UpdateColumns.Add(col);
-						}
-					}
+        public override void InitiEntity(EntityMetadata entityDefine)
+        {
+            initEntity(entityDefine, this);
+        }
 
-					UpdateColumns.RemoveAll(c => Primary.Contains(c));
+        private void initEntity(EntityMetadata entityDefine, BaseEntityDbPipeline newObject)
+        {
+            if (entityDefine.Schema == null)
+                return;
+            newObject.Schema = GenerateSchema(entityDefine.Schema);
+            foreach (var f in entityDefine.Entity.Fields)
+            {
+                if (!string.IsNullOrEmpty(((Field)f).DataType))
+                {
+                    newObject.Columns.Add((Field)f);
+                }
+            }
+            var primary = entityDefine.Primary;
+            if (primary != null)
+            {
+                foreach (var p in primary)
+                {
+                    var col = newObject.Columns.FirstOrDefault(c => c.Name == p);
+                    if (col == null)
+                    {
+                        throw new SpiderException("Columns set as primary is not a property of your entity.");
+                    }
+                    else
+                    {
+                        newObject.Primary.Add(col);
+                    }
+                }
+            }
 
-					if (UpdateColumns.Count == 0)
-					{
-						throw new SpiderException("Can't update primary key.");
-					}
-				}
-				else
-				{
-					UpdateColumns = Columns;
-					UpdateColumns.RemoveAll(c => Primary.Contains(c));
+            if (newObject.Mode == PipelineMode.Update)
+            {
+                if (newObject.Primary == null || newObject.Primary.Count == 0)
+                {
+                    throw new SpiderException("Set Primary in the Indexex attribute.");
+                }
 
-					if (UpdateColumns.Count == 0)
-					{
-						throw new SpiderException("Can't update primary key.");
-					}
-				}
-			}
+                if (entityDefine.Updates != null && entityDefine.Updates.Length > 0)
+                {
+                    foreach (var column in entityDefine.Updates)
+                    {
+                        var col = newObject.Columns.FirstOrDefault(c => c.Name == column);
+                        if (col == null)
+                        {
+                            throw new SpiderException("Columns set as update is not a property of your entity.");
+                        }
+                        else
+                        {
+                            newObject.UpdateColumns.Add(col);
+                        }
+                    }
 
-			AutoIncrement = entityDefine.AutoIncrement;
+                    newObject.UpdateColumns.RemoveAll(c => newObject.Primary.Contains(c));
 
-			if (entityDefine.Indexes != null)
-			{
-				foreach (var index in entityDefine.Indexes)
-				{
-					List<string> tmpIndex = new List<string>();
-					foreach (var i in index)
-					{
-						var col = Columns.FirstOrDefault(c => c.Name == i);
-						if (col == null)
-						{
-							throw new SpiderException("Columns set as index is not a property of your entity.");
-						}
-						else
-						{
-							tmpIndex.Add(col.Name);
-						}
-					}
-					if (tmpIndex.Count != 0)
-					{
-						Indexs.Add(tmpIndex);
-					}
-				}
-			}
-			if (entityDefine.Uniques != null)
-			{
-				foreach (var unique in entityDefine.Uniques)
-				{
-					List<string> tmpUnique = new List<string>();
-					foreach (var i in unique)
-					{
-						var col = Columns.FirstOrDefault(c => c.Name == i);
-						if (col == null)
-						{
-							throw new SpiderException("Columns set as unique is not a property of your entity.");
-						}
-						else
-						{
-							tmpUnique.Add(col.Name);
-						}
-					}
-					if (tmpUnique.Count != 0)
-					{
-						Uniques.Add(tmpUnique);
-					}
-				}
-			}
-		}
+                    if (newObject.UpdateColumns.Count == 0)
+                    {
+                        throw new SpiderException("Can't update primary key.");
+                    }
+                }
+                else
+                {
+                    newObject.UpdateColumns = Columns;
+                    newObject.UpdateColumns.RemoveAll(c => Primary.Contains(c));
+
+                    if (newObject.UpdateColumns.Count == 0)
+                    {
+                        throw new SpiderException("Can't update primary key.");
+                    }
+                }
+            }
+
+            newObject.AutoIncrement = entityDefine.AutoIncrement;
+
+            if (entityDefine.Indexes != null)
+            {
+                foreach (var index in entityDefine.Indexes)
+                {
+                    List<string> tmpIndex = new List<string>();
+                    foreach (var i in index)
+                    {
+                        var col = newObject.Columns.FirstOrDefault(c => c.Name == i);
+                        if (col == null)
+                        {
+                            throw new SpiderException("Columns set as index is not a property of your entity.");
+                        }
+                        else
+                        {
+                            tmpIndex.Add(col.Name);
+                        }
+                    }
+                    if (tmpIndex.Count != 0)
+                    {
+                        newObject.Indexs.Add(tmpIndex);
+                    }
+                }
+            }
+            if (entityDefine.Uniques != null)
+            {
+                foreach (var unique in entityDefine.Uniques)
+                {
+                    List<string> tmpUnique = new List<string>();
+                    foreach (var i in unique)
+                    {
+                        var col = newObject.Columns.FirstOrDefault(c => c.Name == i);
+                        if (col == null)
+                        {
+                            throw new SpiderException("Columns set as unique is not a property of your entity.");
+                        }
+                        else
+                        {
+                            tmpUnique.Add(col.Name);
+                        }
+                    }
+                    if (tmpUnique.Count != 0)
+                    {
+                        newObject.Uniques.Add(tmpUnique);
+                    }
+                }
+            }
+        }
+
 
 		private Schema GenerateSchema(Schema schema)
 		{
@@ -193,6 +212,8 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return;
 			}
+            if (Schema == null)
+                return;
 			NetworkCenter.Current.Execute("db-init", () =>
 			{
 				using (DbConnection conn = CreateConnection())

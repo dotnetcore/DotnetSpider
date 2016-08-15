@@ -105,13 +105,15 @@ namespace DotnetSpider.Extension
                 foreach (var entity in Entities)
                 {
                     string entiyName = entity.Entity.Name;
+                    List<BaseEntityPipeline> pls = new List<BaseEntityPipeline>();
 
                     foreach (var pipeline in EntityPipelines)
                     {
-                        pipeline.InitiEntity(entity);
+                        var newP = pipeline.CreateNewByInitEntity(entity);
+                        pls.Add(newP);
                     }
 
-                    Pipelines.Add(new EntityPipeline(entiyName, EntityPipelines));
+                    Pipelines.Add(new EntityPipeline(entiyName, pls));
                 }
 
                 CheckIfSettingsCorrect();
