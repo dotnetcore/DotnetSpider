@@ -189,6 +189,23 @@ namespace DotnetSpider.Extension.Downloader
 	#endregion
 
 	#region Redial Handler
+	public class SkipWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	{
+		public string ContainsString { get; set; }
+
+		public override void Handle(Page page)
+		{
+			string rawText = page.Content;
+			if (string.IsNullOrEmpty(rawText))
+			{
+				throw new DownloadException("Download failed or response is null.");
+			}
+			if (rawText.Contains(ContainsString))
+			{
+				page.IsSkip = true;
+			}
+		}
+	}
 
 	public class RedialWhenContainsIllegalStringHandler : DownloadCompleteHandler
 	{
