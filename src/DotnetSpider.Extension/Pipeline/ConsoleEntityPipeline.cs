@@ -15,12 +15,6 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 		}
 
-		public override object Clone()
-		{
-			return new ConsoleEntityPipeline();
-		}
-
-
 		public override void Process(List<JObject> datas)
 		{
 			foreach (var data in datas)
