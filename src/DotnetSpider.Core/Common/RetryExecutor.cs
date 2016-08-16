@@ -32,7 +32,7 @@ namespace DotnetSpider.Core.Common
 				{
 					return func();
 				}
-				catch
+				catch(Exception ex)
 				{
 					Thread.Sleep(500);
 					// ignored

@@ -9,6 +9,11 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class MySqlEntityPipeline : BaseEntityDbPipeline
 	{
+		public override object Clone()
+		{
+			return new MySqlEntityPipeline(ConnectString);
+		}
+
 		public MySqlEntityPipeline()
 		{
 		}

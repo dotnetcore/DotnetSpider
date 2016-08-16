@@ -2,6 +2,7 @@ using System;
 using NLog;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
+using System.Collections.Generic;
 #if !NET_CORE
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -15,11 +16,17 @@ using OpenQA.Selenium.Remote;
 
 namespace DotnetSpider.Extension.Downloader
 {
+	public class SiteCookie
+	{
+		public string CookiesStringPart { get; set; }
+		public Dictionary<string, string> CookiesDictionary = new Dictionary<string, string>();
+	}
+
 	public abstract class CookieInterceptor : Named
 	{
 		protected readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-		public abstract string GetCookie();
+		public abstract SiteCookie GetCookie();
 	}
 
 #if !NET_CORE
@@ -55,134 +62,42 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class CommonCookieInterceptor : WebDriverCookieInterceptor
+	public class FiddlerLoginCookieInterceptor : CommonCookieInterceptor
 	{
-		public string Url { get; set; }
+		public int ProxyPort { get; set; } = 30000;
+		public string Pattern { get; set; }
 
-		public Selector InputSelector { get; set; }
-
-		public string InputString { get; set; }
-
-		public Selector GotoSelector { get; set; }
-
-		public override string GetCookie()
+		public override SiteCookie GetCookie()
 		{
-			string cookie = string.Empty;
-			while (string.IsNullOrEmpty(cookie))
+			if (string.IsNullOrEmpty(Pattern))
 			{
-				var webDriver = GetWebDriver();
+				throw new Exception("Fiddler CookieTrapper: Pattern cannot be null!");
+			}
+
+			string cookie = null;
+			using (FiddlerClient fiddlerWrapper = new FiddlerClient(ProxyPort, Pattern))
+			{
+				fiddlerWrapper.StartCapture(true);
 				try
 				{
-					webDriver.Navigate().GoToUrl(Url);
-					Thread.Sleep(5000);
-
-					if (InputSelector != null)
-					{
-						var input = FindElement(webDriver, InputSelector);
-						if (!string.IsNullOrEmpty(InputString))
-						{
-							input.SendKeys(InputString);
-						}
-					}
-
-					if (GotoSelector != null)
-					{
-						var gotoButton = FindElement(webDriver, GotoSelector);
-						gotoButton.Click();
-						Thread.Sleep(2000);
-					}
-
-					var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
-
-					if (cookieList.Count > 0)
-					{
-						foreach (var cookieItem in cookieList)
-						{
-							cookie += cookieItem.Name + "=" + cookieItem.Value + "; ";
-						}
-					}
-
-					webDriver.Dispose();
+					base.GetCookie();
+					var header = fiddlerWrapper.Headers;
+					const string cookiesPattern = @"Cookie: (.*?)\r\n";
+					cookie = Regex.Match(header, cookiesPattern).Groups[1].Value;
 				}
 				catch (Exception e)
 				{
-					Logger.Error(e,"Get cookie failed.");
-					webDriver.Dispose();
-					cookie = null;
-				}
-			}
-
-			return cookie;
-		}
-	}
-
-	public class FiddlerCookieInterceptor : CommonCookieInterceptor
-	{
-		public int ProxyPort { get; set; } = 30000;
-		public string Pattern { get; set; }
-
-		public override string GetCookie()
-		{
-			if (string.IsNullOrEmpty(Pattern))
-			{
-				throw new Exception("Fiddler CookieTrapper: Pattern cannot be null!");
-			}
-
-			string cookie = string.Empty;
-			using (FiddlerClient fiddlerWrapper = new FiddlerClient(ProxyPort, Pattern))
-			{
-				fiddlerWrapper.StartCapture(true);
-				try
-				{
-					base.GetCookie();
-					var header = fiddlerWrapper.Headers;
-					const string cookiesPattern = @"Cookie: (.*?)\r\n";
-					cookie = Regex.Match(header, cookiesPattern).Groups[1].Value;
-				}
-				catch
-				{
-					// ignored
+					Logger.Error(e, "Get cookie failed.");
+					return null;
 				}
 				fiddlerWrapper.StopCapture();
 			}
-			return cookie;
+
+			return new SiteCookie { CookiesStringPart = cookie };
 		}
 	}
 
-	public class FiddlerLoginCookieInterceptor : LoginCookieInterceptor
-	{
-		public int ProxyPort { get; set; } = 30000;
-		public string Pattern { get; set; }
-
-		public override string GetCookie()
-		{
-			if (string.IsNullOrEmpty(Pattern))
-			{
-				throw new Exception("Fiddler CookieTrapper: Pattern cannot be null!");
-			}
-
-			string cookie = string.Empty;
-			using (FiddlerClient fiddlerWrapper = new FiddlerClient(ProxyPort, Pattern))
-			{
-				fiddlerWrapper.StartCapture(true);
-				try
-				{
-					base.GetCookie();
-					var header = fiddlerWrapper.Headers;
-					const string cookiesPattern = @"Cookie: (.*?)\r\n";
-					cookie = Regex.Match(header, cookiesPattern).Groups[1].Value;
-				}
-				catch
-				{
-					// ignored
-				}
-				fiddlerWrapper.StopCapture();
-			}
-			return cookie;
-		}
-	}
-
-	public class LoginCookieInterceptor : WebDriverCookieInterceptor
+	public class CommonCookieInterceptor : WebDriverCookieInterceptor
 	{
 		public string Url { get; set; }
 
@@ -200,63 +115,68 @@ namespace DotnetSpider.Extension.Downloader
 
 		public Selector LoginAreaSelector { get; set; }
 
-		public override string GetCookie()
+		public override SiteCookie GetCookie()
 		{
-			string cookie = string.Empty;
-			while (string.IsNullOrEmpty(cookie))
+			var cookies = new Dictionary<string, string>();
+
+			var webDriver = GetWebDriver();
+			try
 			{
-				var webDriver = GetWebDriver();
-				try
+				webDriver.Navigate().GoToUrl(Url);
+				Thread.Sleep(10000);
+
+				if (LoginAreaSelector != null)
 				{
-					webDriver.Navigate().GoToUrl(Url);
-					Thread.Sleep(10000);
+					var loginArea = FindElement(webDriver, LoginAreaSelector);
+					loginArea.Click();
+					Thread.Sleep(1000);
+				}
 
-					if (LoginAreaSelector != null)
-					{
-						var loginArea = FindElement(webDriver, LoginAreaSelector);
-						loginArea.Click();
-						Thread.Sleep(1000);
-					}
-
+				if (UserSelector != null)
+				{
 					var user = FindElement(webDriver, UserSelector);
-
 					user.Clear();
 					user.SendKeys(User);
 					Thread.Sleep(1500);
+				}
+
+				if (PassSelector != null)
+				{
 					var pass = FindElement(webDriver, PassSelector);
+					pass.Clear();
 					pass.SendKeys(Pass);
 					Thread.Sleep(1500);
-					var submit = FindElement(webDriver, SubmitSelector);
-					submit.Click();
-					Thread.Sleep(10000);
-
-					if (!string.IsNullOrEmpty(AfterLoginUrl))
-					{
-						webDriver.Navigate().GoToUrl(AfterLoginUrl);
-						Thread.Sleep(10000);
-					}
-
-					var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
-
-					if (cookieList.Count > 0)
-					{
-						foreach (var cookieItem in cookieList)
-						{
-							cookie += cookieItem.Name + "=" + cookieItem.Value + "; ";
-						}
-					}
-
-					webDriver.Dispose();
 				}
-				catch (Exception e)
+
+				var submit = FindElement(webDriver, SubmitSelector);
+				submit.Click();
+				Thread.Sleep(10000);
+
+				if (!string.IsNullOrEmpty(AfterLoginUrl))
 				{
-					Logger.Error(e, "Get cookie failed.");
-					webDriver.Dispose();
-					cookie = null;
+					webDriver.Navigate().GoToUrl(AfterLoginUrl);
+					Thread.Sleep(10000);
 				}
+
+				var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
+				if (cookieList.Count > 0)
+				{
+					foreach (var cookieItem in cookieList)
+					{
+						cookies.Add(cookieItem.Name, cookieItem.Value);
+					}
+				}
+
+				webDriver.Dispose();
+			}
+			catch (Exception e)
+			{
+				Logger.Error(e, "Get cookie failed.");
+				webDriver.Dispose();
+				return null;
 			}
 
-			return cookie;
+			return new SiteCookie { CookiesDictionary = cookies };
 		}
 	}
 #endif

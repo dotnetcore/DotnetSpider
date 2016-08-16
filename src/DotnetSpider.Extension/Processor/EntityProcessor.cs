@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
-using System.Linq;
 using DotnetSpider.Extension.Model;
 using Site = DotnetSpider.Core.Site;
 using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Common;
 using Newtonsoft.Json.Linq;
 #if !NET_CORE
 using System.Web;
@@ -20,17 +17,10 @@ namespace DotnetSpider.Extension.Processor
 {
 	public class EntityProcessor : IPageProcessor
 	{
-		private class TargetUrlExtractorInfo
-		{
-			public List<Regex> Patterns { get; set; } = new List<Regex>();
-			public List<Formatter> Formatters { get; set; }
-			public ISelector Region { get; set; }
-		}
-
 		protected readonly IList<IEntityExtractor> EntityExtractorList = new List<IEntityExtractor>();
 		public TargetUrlsHandler TargetUrlsHandler;
 		public DataHandler DataHandler;
-		private List<TargetUrlExtractorInfo> TargetUrlExtractors { get; } = new List<TargetUrlExtractorInfo>();
+		private List<TargetUrlExtractor> TargetUrlExtractors { get; } = new List<TargetUrlExtractor>();
 
 		private readonly EntitySpider _spiderContext;
 
@@ -42,12 +32,7 @@ namespace DotnetSpider.Extension.Processor
 
 		public void AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
 		{
-			TargetUrlExtractors.Add(new TargetUrlExtractorInfo
-			{
-				Patterns = targetUrlExtractor.Patterns.Select(t => new Regex(t)).ToList(),
-				Formatters = targetUrlExtractor.Formatters,
-				Region = SelectorUtil.Parse(targetUrlExtractor.Region)
-			});
+			TargetUrlExtractors.Add(targetUrlExtractor);
 		}
 
 		public void AddEntity(EntityMetadata entityDefine)
@@ -115,7 +100,7 @@ namespace DotnetSpider.Extension.Processor
 		/// </summary>
 		/// <param name="page"></param>
 		/// <param name="targetUrlExtractInfos"></param>
-		private void ExtractLinks(Page page, List<TargetUrlExtractorInfo> targetUrlExtractInfos)
+		private void ExtractLinks(Page page, List<TargetUrlExtractor> targetUrlExtractInfos)
 		{
 			if (targetUrlExtractInfos == null)
 			{
@@ -124,9 +109,9 @@ namespace DotnetSpider.Extension.Processor
 
 			foreach (var targetUrlExtractInfo in targetUrlExtractInfos)
 			{
-				var urlRegionSelector = targetUrlExtractInfo.Region;
+				var urlRegionSelector = targetUrlExtractInfo.RegionSelector;
 				var formatters = targetUrlExtractInfo.Formatters;
-				var urlPatterns = targetUrlExtractInfo.Patterns;
+				var urlPatterns = targetUrlExtractInfo.Regexes;
 
 				var links = urlRegionSelector == null ? page.Selectable.Links().GetValues() : (page.Selectable.SelectList(urlRegionSelector)).Links().GetValues();
 				if (links == null)

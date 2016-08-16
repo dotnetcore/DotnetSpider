@@ -12,6 +12,11 @@ namespace DotnetSpider.Extension.Pipeline
 		public string ConnectString { get; set; }
 		private IMongoCollection<BsonDocument> _collection;
 
+		public override object Clone()
+		{
+			return new MongoDbEntityPipeline(ConnectString);
+		}
+
 		public MongoDbEntityPipeline(string connectString)		{			ConnectString = connectString;		}
 
 		public override void InitiEntity(EntityMetadata metadata)

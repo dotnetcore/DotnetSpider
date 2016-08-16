@@ -16,6 +16,7 @@ namespace DotnetSpider.Test
 	{
 		private class TestPipeline : BaseEntityDbPipeline
 		{
+
 			protected override DbConnection CreateConnection()
 			{
 				throw new System.NotImplementedException();
@@ -47,6 +48,11 @@ namespace DotnetSpider.Test
 			}
 
 			protected override string ConvertToDbType(string datatype)
+			{
+				throw new System.NotImplementedException();
+			}
+
+			public override object Clone()
 			{
 				throw new System.NotImplementedException();
 			}
