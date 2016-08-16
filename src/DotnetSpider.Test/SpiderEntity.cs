@@ -1,5 +1,8 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
 using System.Reflection;
+using Dapper;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
@@ -8,6 +11,7 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
+using MySql.Data.MySqlClient;
 using Xunit;
 
 namespace DotnetSpider.Test
@@ -16,7 +20,6 @@ namespace DotnetSpider.Test
 	{
 		private class TestPipeline : BaseEntityDbPipeline
 		{
-
 			protected override DbConnection CreateConnection()
 			{
 				throw new System.NotImplementedException();
@@ -134,6 +137,22 @@ namespace DotnetSpider.Test
 			public string Name { get; set; }
 		}
 
+		[Schema("db", "table")]
+		public class Entity12 : ISpiderEntity
+		{
+			[PropertySelector(Expression = "Id")]
+			public int Id { get; set; }
+
+			[PropertySelector(Expression = "Name")]
+			public string Name { get; set; }
+		}
+
+		public class Entity13 : ISpiderEntity
+		{
+			[PropertySelector(Expression = "Url")]
+			public string Url { get; set; }
+		}
+
 		[Fact]
 		public void EntitySelector()
 		{
@@ -183,6 +202,9 @@ namespace DotnetSpider.Test
 			Assert.Equal("db", entityMetadata.Schema.Database);
 			Assert.Equal("table", entityMetadata.Schema.TableName);
 			Assert.Equal(TableSuffix.Monday, entityMetadata.Schema.Suffix);
+
+			var entityMetadata1 = EntitySpider.ParseEntityMetaData(typeof(Entity13).GetTypeInfo());
+			Assert.Null(entityMetadata1.Schema);
 		}
 
 		[Fact]
@@ -231,5 +253,62 @@ namespace DotnetSpider.Test
 			});
 			Assert.Equal("Columns set as unique is not a property of your entity.", exception.Message);
 		}
+
+		[Fact]
+		public void MultiEntitiesInitPipelines()
+		{
+			EntitySpider context = new EntitySpider(new Core.Site());
+			context.SetThreadNum(1);
+			context.SetIdentity("test-MultiEntitiesInitPipelines");
+			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			context.AddEntityPipeline(new MySqlFileEntityPipeline());
+			context.AddEntityPipeline(new ConsoleEntityPipeline());
+			context.AddEntityPipeline(new JsonFileEntityPipeline());
+#if !NET_CORE
+			context.AddEntityPipeline(new MongoDbEntityPipeline("mongo"));
+#endif
+			context.AddStartUrl("http://a.com");
+			context.AddEntityType(typeof(Entity13));
+			context.AddEntityType(typeof(Entity12));
+			context.Run("running-test");
+
+			var entityPipelines = context.EntityPipelines;
+#if NET_CORE
+			Assert.Equal(4, entityPipelines.Count);
+#else
+			Assert.Equal(5, entityPipelines.Count);
+#endif
+			var pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
+			Assert.Equal("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", pipeline1.ConnectString);
+
+			Assert.Equal("MySqlFileEntityPipeline", entityPipelines[1].GetType().Name);
+			Assert.Equal("ConsoleEntityPipeline", entityPipelines[2].GetType().Name);
+			Assert.Equal("JsonFileEntityPipeline", entityPipelines[3].GetType().Name);
+#if !NET_CORE
+			Assert.Equal("MongoDbEntityPipeline", entityPipelines[4].GetType().Name);
+			var pipeline2 = (MySqlEntityPipeline)entityPipelines[4];
+			Assert.Equal("mongo", pipeline2.ConnectString);
+
+#endif
+			var pipelines = context.GetPipelines();
+			Assert.Equal(1, pipelines.Count);
+			EntityPipeline pipeline = (EntityPipeline)pipelines[0];
+			entityPipelines = pipeline.GetEntityPipelines();
+			Assert.Equal(4, entityPipelines.Count);
+			pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
+			Assert.Equal("db", pipeline1.GetSchema().Database);
+			Assert.Equal("table", pipeline1.GetSchema().TableName);
+#if !NET_CORE
+			pipeline2 = (MySqlEntityPipeline)entityPipelines[4];
+			Assert.Equal("db", pipeline2.GetSchema().Database);
+			Assert.Equal("table", pipeline2.GetSchema().TableName);
+#endif
+
+			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"))
+			{
+				conn.Execute($"DROP table db.table");
+			}
+		}
+
 	}
 }

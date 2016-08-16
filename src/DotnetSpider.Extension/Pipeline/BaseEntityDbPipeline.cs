@@ -43,22 +43,27 @@ namespace DotnetSpider.Extension.Pipeline
 			ConnectString = connectString;
 		}
 
-		public override void InitiEntity(EntityMetadata entityDefine)
+		public Schema GetSchema()
 		{
-			if (entityDefine.Schema == null)
+			return Schema;
+		}
+
+		public override void InitiEntity(EntityMetadata metadata)
+		{
+			if (metadata.Schema == null)
 			{
 				IsEnabled = false;
 				return;
 			}
-			Schema = GenerateSchema(entityDefine.Schema);
-			foreach (var f in entityDefine.Entity.Fields)
+			Schema = GenerateSchema(metadata.Schema);
+			foreach (var f in metadata.Entity.Fields)
 			{
 				if (!string.IsNullOrEmpty(((Field)f).DataType))
 				{
 					Columns.Add((Field)f);
 				}
 			}
-			var primary = entityDefine.Primary;
+			var primary = metadata.Primary;
 			if (primary != null)
 			{
 				foreach (var p in primary)
@@ -82,9 +87,9 @@ namespace DotnetSpider.Extension.Pipeline
 					throw new SpiderException("Set Primary in the Indexex attribute.");
 				}
 
-				if (entityDefine.Updates != null && entityDefine.Updates.Length > 0)
+				if (metadata.Updates != null && metadata.Updates.Length > 0)
 				{
-					foreach (var column in entityDefine.Updates)
+					foreach (var column in metadata.Updates)
 					{
 						var col = Columns.FirstOrDefault(c => c.Name == column);
 						if (col == null)
@@ -116,11 +121,11 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 
-			AutoIncrement = entityDefine.AutoIncrement;
+			AutoIncrement = metadata.AutoIncrement;
 
-			if (entityDefine.Indexes != null)
+			if (metadata.Indexes != null)
 			{
-				foreach (var index in entityDefine.Indexes)
+				foreach (var index in metadata.Indexes)
 				{
 					List<string> tmpIndex = new List<string>();
 					foreach (var i in index)
@@ -141,9 +146,9 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				}
 			}
-			if (entityDefine.Uniques != null)
+			if (metadata.Uniques != null)
 			{
-				foreach (var unique in entityDefine.Uniques)
+				foreach (var unique in metadata.Uniques)
 				{
 					List<string> tmpUnique = new List<string>();
 					foreach (var i in unique)
@@ -164,29 +169,6 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				}
 			}
-		}
-
-		private Schema GenerateSchema(Schema schema)
-		{
-			switch (schema.Suffix)
-			{
-				case TableSuffix.FirstDayOfThisMonth:
-					{
-						schema.TableName += "_" + DateTimeUtils.FirstDayofThisMonth.ToString("yyyy_MM_dd");
-						break;
-					}
-				case TableSuffix.Monday:
-					{
-						schema.TableName += "_" + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy_MM_dd");
-						break;
-					}
-				case TableSuffix.Today:
-					{
-						schema.TableName += "_" + DateTime.Now.ToString("yyyy_MM_dd");
-						break;
-					}
-			}
-			return schema;
 		}
 
 		public override void InitPipeline(ISpider spider)
@@ -304,6 +286,29 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 
 			});
+		}
+
+		private Schema GenerateSchema(Schema schema)
+		{
+			switch (schema.Suffix)
+			{
+				case TableSuffix.FirstDayOfThisMonth:
+					{
+						schema.TableName += "_" + DateTimeUtils.FirstDayofThisMonth.ToString("yyyy_MM_dd");
+						break;
+					}
+				case TableSuffix.Monday:
+					{
+						schema.TableName += "_" + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy_MM_dd");
+						break;
+					}
+				case TableSuffix.Today:
+					{
+						schema.TableName += "_" + DateTime.Now.ToString("yyyy_MM_dd");
+						break;
+					}
+			}
+			return schema;
 		}
 
 		private DbType Convert(string datatype)

@@ -107,8 +107,10 @@ namespace DotnetSpider.Extension
 							pipelines.Add(newPipeline);
 						}
 					}
-
-					Pipelines.Add(new EntityPipeline(entiyName, pipelines));
+					if (pipelines.Count > 0)
+					{
+						Pipelines.Add(new EntityPipeline(entiyName, pipelines));
+					}
 				}
 
 				CheckIfSettingsCorrect();
@@ -151,7 +153,14 @@ namespace DotnetSpider.Extension
 
 				RegisterControl(this);
 
-				base.Run();
+				if (!arguments.Contains("running-test"))
+				{
+					base.Run();
+				}
+				else
+				{
+					IsExited = true;
+				}
 
 				TaskFinished();
 

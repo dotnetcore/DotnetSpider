@@ -27,6 +27,11 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
+		public List<BaseEntityPipeline> GetEntityPipelines()
+		{
+			return _pipelines;
+		}
+
 		protected override void Process(List<ResultItems> resultItemsList)
 		{
 			if (resultItemsList == null || resultItemsList.Count == 0)

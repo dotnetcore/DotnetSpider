@@ -44,7 +44,7 @@ namespace DotnetSpider.Core
 		public string UserId { get; set; }
 		public string TaskGroup { get; set; }
 		public int EmptySleepTime { get; set; } = 150000;
-		protected bool IsExited { get; private set; }
+		protected bool IsExited { get; set; }
 		protected int WaitInterval = 10;
 		protected Status Stat = Status.Init;
 		private int _waitCountLimit = 1500;
@@ -105,7 +105,7 @@ namespace DotnetSpider.Core
 			}
 			LogManager.Configuration = new XmlLoggingConfiguration(nlogConfigPath);
 			Logger = LogManager.GetCurrentClassLogger();
-			IsExit = false;
+			IsExited = false;
 		}
 
 		/// <summary>
@@ -327,6 +327,11 @@ namespace DotnetSpider.Core
 			}
 			return this;
 		}
+
+		public IList<IPipeline> GetPipelines()
+		{
+			return Pipelines;
+		} 
 
 		/// <summary>
 		/// Clear the pipelines set
@@ -564,8 +569,6 @@ namespace DotnetSpider.Core
 			Logger.SaveLog(LogInfo.Create($"退出任务中 {Identity} ...", Logger.Name, this, LogLevel.Warn));
 			SpiderClosing?.Invoke();
 		}
-
-		public bool IsExit { get; private set; }
 
 		protected void OnClose()
 		{

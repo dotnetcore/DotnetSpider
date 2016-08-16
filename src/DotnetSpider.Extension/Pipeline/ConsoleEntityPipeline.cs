@@ -13,6 +13,10 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		public override void InitiEntity(EntityMetadata metadata)
 		{
+			if (metadata.Schema == null)
+			{
+				IsEnabled = false;
+			}
 		}
 
 		public override void Process(List<JObject> datas)

@@ -22,6 +22,11 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void InitiEntity(EntityMetadata metadata)
 		{
+			if (metadata.Schema == null)
+			{
+				IsEnabled = false;
+				return;
+			}
 			Schema = metadata.Schema;
 			Columns = metadata.Entity.Fields;
 		}

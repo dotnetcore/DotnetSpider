@@ -16,6 +16,12 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void InitiEntity(EntityMetadata metadata)
 		{
+			if (metadata.Schema == null)
+			{
+				IsEnabled = false;
+				return;
+			}
+
 			MongoClient client = new MongoClient(ConnectString);
 			var db = client.GetDatabase(metadata.Schema.Database);
 

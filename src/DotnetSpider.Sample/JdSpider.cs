@@ -27,19 +27,42 @@ namespace DotnetSpider.Sample
 		}
 
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product : ISpiderEntity
+		public class TmpProduct : ISpiderEntity
 		{
 			[PropertySelector(Expression = "CategoryName", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
 
-			[TargetUrl(Extras = new[] { "CategoryName" })]
+			[TargetUrl(Extras = new[] { "CategoryName", "Sku", "Name", "Url" })]
 			[PropertySelector(Expression = "./div[@class='p-name']/a[1]/@href")]
 			public string Url { get; set; }
+
+			[PropertySelector(Expression = ".//div[@class='p-name']/a/em")]
+			public string Name { get; set; }
+
+			[PropertySelector(Expression = "./@data-sku")]
+			public string Sku { get; set; }
 		}
 
-		[Schema("jd", "jdShop")]
-		public class JdShop : ISpiderEntity
+		[Schema("jd", "jd_product")]
+		[Indexes(Index = new[] { "Sku" }, Primary = "Sku")]
+		public class JdProduct : ISpiderEntity
 		{
+			[StoredAs("Name", DataType.String, 50)]
+			[PropertySelector(Expression = "Name", Type = SelectorType.Enviroment)]
+			public string Name { get; set; }
+
+			[StoredAs("Sku", DataType.String, 25)]
+			[PropertySelector(Expression = "Sku", Type = SelectorType.Enviroment)]
+			public string Sku { get; set; }
+
+			[StoredAs("Url", DataType.Text)]
+			[PropertySelector(Expression = "Url", Type = SelectorType.Enviroment)]
+			public string Url { get; set; }
+
+			[StoredAs("CategoryName", DataType.String, 20)]
+			[PropertySelector(Expression = "CategoryName", Type = SelectorType.Enviroment)]
+			public string CategoryName { get; set; }
+
 			[StoredAs("ShopName", DataType.String, 20)]
 			[PropertySelector(Expression = ".//a[@class='name']")]
 			public string ShopName { get; set; }
@@ -56,22 +79,19 @@ namespace DotnetSpider.Sample
 
 		protected override EntitySpider GetEntitySpider()
 		{
-			var entitySpider = new EntitySpider(new Site
-			{
-				EncodingName = "UTF-8"
-			})
+			var entitySpider = new EntitySpider(new Site())
 			{
 				Identity = "Cnblog Daliy Tracking " + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy-MM-dd")
 			};
 
 			entitySpider.AddStartUrl("http://www.jd.com/allSort.aspx");
 			entitySpider.AddEntityType(typeof(Category));
-			entitySpider.AddEntityType(typeof(Product), new TargetUrlExtractor
+			entitySpider.AddEntityType(typeof(TmpProduct), new TargetUrlExtractor
 			{
 				Region = new BaseSelector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
 				Patterns = new List<string> { @"&page=[0-9]+&" }
 			});
-			entitySpider.AddEntityType(typeof(JdShop), new TargetUrlExtractor
+			entitySpider.AddEntityType(typeof(JdProduct), new TargetUrlExtractor
 			{
 				Region = new BaseSelector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
 				Patterns = new List<string> { @"http://item\.jd\.com/[0-9]+\.html" }
