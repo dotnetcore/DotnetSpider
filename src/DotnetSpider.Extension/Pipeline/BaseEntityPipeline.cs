@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension.Pipeline
         /// When there are multiple entities, every original pipeline instance is somehow sort of a "template", for there should be 
         /// every single pipelines created for every single entity definition. That's why we have this method.
         /// Please reference to the Run method of EntitySpider class where this method is called. theoretically all the sub class of this class should override
-        /// this method.
+        /// this method to support multi-entity scenario.
         /// </summary>
         /// <param name="metadata"></param>
         /// <returns>the new created instance.</returns>

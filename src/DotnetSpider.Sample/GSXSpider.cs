@@ -57,13 +57,16 @@ namespace DotnetSpider.Sample
                 },
                 Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
                 UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
-            }) { CookieInterceptor = cookieThief };
+            })
+            { CookieInterceptor = cookieThief };
             context.SetIdentity("gsx 订单/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
             context.AddStartUrl("http://i.genshuixue.com/main");
             context.AddEntityType(typeof(主页)).AddEntityType(typeof(订单列表项)).AddEntityType(typeof(订单));
             context.SetDownloader(new WebDriverDownloader(Browser.Chrome, 300));
             context.SetThreadNum(1);
-            context.AddEntityPipeline(new MySqlEntityPipeline("Database='gsx';Data Source=localhost;User ID=root;Password=pass@word1;Port=3306"));
+            context.AddEntityPipeline(new MySqlEntityPipeline("Database='gsx';Data Source=localhost;User ID=root;Password=pass@word1;Port=4040")
+            //{ Mode = PipelineMode.Update }
+            );
             return context;
         }
 
@@ -98,6 +101,7 @@ namespace DotnetSpider.Sample
         /// </summary>
         [TargetUrl(UrlPattern = @"http://i\.genshuixue\.com/teacher/order\.do\?tid=\d+&purchaseId=\d+", KeepOrigin = true)]
         [Schema("GSX", "订单", TableSuffix.Today)]
+        [Indexes(Primary = "订单编号")]
         public class 订单 : ISpiderEntity
         {
             [StoredAs("订单编号", DataType.String, 20)]

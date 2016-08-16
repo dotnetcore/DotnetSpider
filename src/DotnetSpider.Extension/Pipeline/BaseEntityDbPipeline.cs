@@ -120,8 +120,8 @@ namespace DotnetSpider.Extension.Pipeline
                 }
                 else
                 {
-                    newObject.UpdateColumns = Columns;
-                    newObject.UpdateColumns.RemoveAll(c => Primary.Contains(c));
+                    newObject.UpdateColumns = newObject.Columns;
+                    newObject.UpdateColumns.RemoveAll(c => newObject.Primary.Contains(c));
 
                     if (newObject.UpdateColumns.Count == 0)
                     {
