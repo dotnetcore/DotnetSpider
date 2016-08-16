@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -10,6 +11,9 @@ namespace DotnetSpider.Extension.Pipeline
 	public class MongoDbEntityPipeline : BaseEntityPipeline
 	{
 		public string ConnectString { get; set; }
+		[JsonIgnore]
+		public IUpdateConnectString UpdateConnectString { get; set; }
+
 		private IMongoCollection<BsonDocument> _collection;
 
 		public MongoDbEntityPipeline(string connectString)		{			ConnectString = connectString;		}
@@ -42,7 +46,10 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override BaseEntityPipeline Clone()
 		{
-			return  new MongoDbEntityPipeline(ConnectString);
+			return new MongoDbEntityPipeline(ConnectString)
+			{
+				UpdateConnectString = UpdateConnectString
+			};
 		}
 	}
 }

@@ -124,7 +124,10 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override BaseEntityPipeline Clone()
 		{
-			return new MySqlEntityPipeline(ConnectString);
+			return new MySqlEntityPipeline(ConnectString)
+			{
+				UpdateConnectString = UpdateConnectString
+			};
 		}
 	}
 }

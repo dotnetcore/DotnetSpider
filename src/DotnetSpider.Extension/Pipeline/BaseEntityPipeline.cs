@@ -2,6 +2,7 @@
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
+using NLog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -9,6 +10,8 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		public ISpider Spider { get; protected set; }
 		public bool IsEnabled { get; protected set; } = true;
+
+		protected static ILogger Logger = LogManager.GetCurrentClassLogger();
 
 		public virtual void Dispose()
 		{

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.Model;
+using Newtonsoft.Json;
+using NLog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -15,7 +18,8 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		public string ConnectString { get; set; }
 		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
-
+		[JsonIgnore]
+		public IUpdateConnectString UpdateConnectString { get; set; }
 		protected abstract DbConnection CreateConnection();
 		protected abstract string GetInsertSql();
 		protected abstract string GetUpdateSql();
@@ -178,12 +182,42 @@ namespace DotnetSpider.Extension.Pipeline
 				return;
 			}
 
+			if (string.IsNullOrEmpty(ConnectString))
+			{
+				if (UpdateConnectString == null)
+				{
+					throw new SpiderException("Can't find ConnectString or IUpdateConnectString.");
+				}
+				else
+				{
+					for (int i = 0; i < 5; ++i)
+					{
+						try
+						{
+							ConnectString = UpdateConnectString.GetNew();
+							break;
+						}
+						catch (Exception e)
+						{
+							Logger.SaveLog(LogInfo.Create("Update ConnectString failed.", Logger.Name, spider, LogLevel.Error, e));
+							Thread.Sleep(1000);
+						}
+					}
+
+					if (string.IsNullOrEmpty(ConnectString))
+					{
+						throw new SpiderException("Can't updadate ConnectString via IUpdateConnectString.");
+					}
+				}
+			}
+
 			base.InitPipeline(spider);
 
 			if (Mode == PipelineMode.Update)
 			{
 				return;
 			}
+
 			NetworkCenter.Current.Execute("db-init", () =>
 			{
 				using (DbConnection conn = CreateConnection())
@@ -214,77 +248,142 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					case PipelineMode.Insert:
 						{
-							using (var conn = CreateConnection())
+							int tryCount = 0;
+							while (true)
 							{
-								var cmd = conn.CreateCommand();
-								cmd.CommandText = GetInsertSql();
-								cmd.CommandType = CommandType.Text;
-								conn.Open();
-
-								foreach (var data in datas)
+								try
 								{
-									cmd.Parameters.Clear();
-
-									List<DbParameter> parameters = new List<DbParameter>();
-									foreach (var column in Columns)
+									using (var conn = CreateConnection())
 									{
-										var parameter = CreateDbParameter();
-										parameter.ParameterName = $"@{column.Name}";
-										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-										parameter.DbType = Convert(column.DataType);
-										parameters.Add(parameter);
+										var cmd = conn.CreateCommand();
+										cmd.CommandText = GetInsertSql();
+										cmd.CommandType = CommandType.Text;
+										conn.Open();
+
+										foreach (var data in datas)
+										{
+											cmd.Parameters.Clear();
+
+											List<DbParameter> parameters = new List<DbParameter>();
+											foreach (var column in Columns)
+											{
+												var parameter = CreateDbParameter();
+												parameter.ParameterName = $"@{column.Name}";
+												parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+												parameter.DbType = Convert(column.DataType);
+												parameters.Add(parameter);
+											}
+
+											cmd.Parameters.AddRange(parameters.ToArray());
+											cmd.ExecuteNonQuery();
+										}
+
+										conn.Close();
 									}
-
-									cmd.Parameters.AddRange(parameters.ToArray());
-									cmd.ExecuteNonQuery();
+									break;
 								}
-
-								conn.Close();
+								catch (Exception e)
+								{
+									// mysql authentication error
+									if (e.Message.ToLower().StartsWith("authentication to host"))
+									{
+										Thread.Sleep(1000);
+										if (tryCount > 5)
+										{
+											throw;
+										}
+										if (UpdateConnectString != null)
+										{
+											tryCount++;
+											ConnectString = UpdateConnectString.GetNew();
+										}
+										else
+										{
+											throw;
+										}
+									}
+									else
+									{
+										throw;
+									}
+								}
 							}
 							break;
 						}
 					case PipelineMode.Update:
 						{
-							using (var conn = CreateConnection())
+							int tryCount = 0;
+							while (true)
 							{
-								var cmd = conn.CreateCommand();
-								cmd.CommandText = GetUpdateSql();
-								cmd.CommandType = CommandType.Text;
-								conn.Open();
-
-								foreach (var data in datas)
+								try
 								{
-									cmd.Parameters.Clear();
-
-									List<DbParameter> parameters = new List<DbParameter>();
-									foreach (var column in UpdateColumns)
+									using (var conn = CreateConnection())
 									{
-										var parameter = CreateDbParameter();
-										parameter.ParameterName = $"@{column.Name}";
-										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-										parameter.DbType = Convert(column.DataType);
-										parameters.Add(parameter);
-									}
+										var cmd = conn.CreateCommand();
+										cmd.CommandText = GetUpdateSql();
+										cmd.CommandType = CommandType.Text;
+										conn.Open();
 
-									foreach (var column in Primary)
-									{
-										var parameter = CreateDbParameter();
-										parameter.ParameterName = $"@{column.Name}";
-										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-										parameter.DbType = Convert(column.DataType);
-										parameters.Add(parameter);
-									}
+										foreach (var data in datas)
+										{
+											cmd.Parameters.Clear();
 
-									cmd.Parameters.AddRange(parameters.ToArray());
-									cmd.ExecuteNonQuery();
+											List<DbParameter> parameters = new List<DbParameter>();
+											foreach (var column in UpdateColumns)
+											{
+												var parameter = CreateDbParameter();
+												parameter.ParameterName = $"@{column.Name}";
+												parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+												parameter.DbType = Convert(column.DataType);
+												parameters.Add(parameter);
+											}
+
+											foreach (var column in Primary)
+											{
+												var parameter = CreateDbParameter();
+												parameter.ParameterName = $"@{column.Name}";
+												parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+												parameter.DbType = Convert(column.DataType);
+												parameters.Add(parameter);
+											}
+
+											cmd.Parameters.AddRange(parameters.ToArray());
+											cmd.ExecuteNonQuery();
+										}
+
+										conn.Close();
+									}
+									break;
 								}
-
-								conn.Close();
+								catch (Exception e)
+								{
+									// mysql authentication error
+									if (e.Message.ToLower().StartsWith("authentication to host"))
+									{
+										Thread.Sleep(1000);
+										if (tryCount > 5)
+										{
+											throw;
+										}
+										if (UpdateConnectString != null)
+										{
+											tryCount++;
+											ConnectString = UpdateConnectString.GetNew();
+										}
+										else
+										{
+											throw;
+										}
+									}
+									else
+									{
+										throw;
+									}
+								}
 							}
 							break;
 						}
 				}
-
 			});
 		}
 

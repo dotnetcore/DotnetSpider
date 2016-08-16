@@ -321,6 +321,9 @@
     <Compile Include="..\Pipeline\ConsoleEntityPipeline.cs">
       <Link>Pipeline\ConsoleEntityPipeline.cs</Link>
     </Compile>
+    <Compile Include="..\Pipeline\DbUpdateConnectString.cs">
+      <Link>Pipeline\DbUpdateConnectString.cs</Link>
+    </Compile>
     <Compile Include="..\Pipeline\EntityPipeline.cs">
       <Link>Pipeline\EntityPipeline.cs</Link>
     </Compile>
@@ -332,6 +335,9 @@
     </Compile>
     <Compile Include="..\Pipeline\ImagePipeline.cs">
       <Link>Pipeline\ImagePipeline.cs</Link>
+    </Compile>
+    <Compile Include="..\Pipeline\IUpdateConnectString.cs">
+      <Link>Pipeline\IUpdateConnectString.cs</Link>
     </Compile>
     <Compile Include="..\Pipeline\JsonFileEntityPipeline.cs">
       <Link>Pipeline\JsonFileEntityPipeline.cs</Link>
@@ -364,6 +370,7 @@
       <Link>SpiderBuilder.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
