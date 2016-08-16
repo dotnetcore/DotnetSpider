@@ -102,7 +102,10 @@ namespace DotnetSpider.Extension
 					{
 						var newPipeline = pipeline.Clone();
 						newPipeline.InitiEntity(entity);
-						pipelines.Add(newPipeline);
+						if (newPipeline.IsEnabled)
+						{
+							pipelines.Add(newPipeline);
+						}
 					}
 
 					Pipelines.Add(new EntityPipeline(entiyName, pipelines));

@@ -8,6 +8,7 @@ namespace DotnetSpider.Extension.Pipeline
 	public abstract class BaseEntityPipeline : IEntityPipeline
 	{
 		public ISpider Spider { get; protected set; }
+		public bool IsEnabled { get; protected set; } = true;
 
 		public virtual void Dispose()
 		{

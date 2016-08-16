@@ -16,7 +16,6 @@ namespace DotnetSpider.Extension.Pipeline
 		public string ConnectString { get; set; }
 		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
 
-		protected bool IsEnabled { get; set; } = true;
 		protected abstract DbConnection CreateConnection();
 		protected abstract string GetInsertSql();
 		protected abstract string GetUpdateSql();
