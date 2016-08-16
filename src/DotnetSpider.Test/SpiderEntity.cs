@@ -50,6 +50,11 @@ namespace DotnetSpider.Test
 			{
 				throw new System.NotImplementedException();
 			}
+
+			public override BaseEntityPipeline Clone()
+			{
+				return new TestPipeline();
+			}
 		}
 
 		[Schema("db", "table")]
@@ -124,23 +129,24 @@ namespace DotnetSpider.Test
 		{
 			public int Id { get; set; }
 			[ReplaceFormatter(NewValue = "a", OldValue = "b")]
+			[RegexMatchFormatter(Pattern = "a(*)")]
 			public string Name { get; set; }
 		}
 
 		[Fact]
 		public void EntitySelector()
 		{
-			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity7).GetTypeInfo());
+			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity7).GetTypeInfo());
 			Assert.Equal("expression", entity1.Entity.Selector.Expression);
 			Assert.Equal(SelectorType.XPath, entity1.Entity.Selector.Type);
 			Assert.True(entity1.Entity.Multi);
 
-			var entity2 = EntitySpider.PaserEntityMetaData(typeof(Entity8).GetTypeInfo());
+			var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity8).GetTypeInfo());
 			Assert.Equal("expression2", entity2.Entity.Selector.Expression);
 			Assert.Equal(SelectorType.Css, entity2.Entity.Selector.Type);
 			Assert.True(entity2.Entity.Multi);
 
-			var entity3 = EntitySpider.PaserEntityMetaData(typeof(Entity9).GetTypeInfo());
+			var entity3 = EntitySpider.ParseEntityMetaData(typeof(Entity9).GetTypeInfo());
 			Assert.False(entity3.Entity.Multi);
 			Assert.Null(entity3.Entity.Selector);
 			Assert.Equal("DotnetSpider.Test.SpiderEntity+Entity9", entity3.Entity.Name);
@@ -149,7 +155,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void Indexes()
 		{
-			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity10).GetTypeInfo());
+			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity10).GetTypeInfo());
 			Assert.Equal("Id", entity1.Indexes[0][0]);
 			Assert.Equal("name", entity1.Primary[0]);
 			Assert.Equal(2, entity1.Uniques.Count);
@@ -161,9 +167,9 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void Formater()
 		{
-			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity11).GetTypeInfo());
+			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity11).GetTypeInfo());
 			var formatters = ((Field)entity1.Entity.Fields[1]).Formatters;
-			Assert.Equal(1, formatters.Count);
+			Assert.Equal(2, formatters.Count);
 			var replaceFormatter = (ReplaceFormatter)formatters[0];
 			Assert.Equal("a", replaceFormatter.NewValue);
 			Assert.Equal("b", replaceFormatter.OldValue);
@@ -172,7 +178,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void Schema()
 		{
-			var entityMetadata = EntitySpider.PaserEntityMetaData(typeof(Entity4).GetTypeInfo());
+			var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Entity4).GetTypeInfo());
 			Assert.Equal("db", entityMetadata.Schema.Database);
 			Assert.Equal("table", entityMetadata.Schema.TableName);
 			Assert.Equal(TableSuffix.Monday, entityMetadata.Schema.Suffix);
@@ -181,10 +187,10 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void SetPrimary()
 		{
-			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity5).GetTypeInfo());
+			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity5).GetTypeInfo());
 			Assert.Equal(1, entity1.Entity.Fields.Count);
 			Assert.Equal("Name", entity1.Entity.Fields[0].Name);
-			var entity2 = EntitySpider.PaserEntityMetaData(typeof(Entity6).GetTypeInfo());
+			var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity6).GetTypeInfo());
 			Assert.Equal(1, entity2.Entity.Fields.Count);
 			Assert.Equal("name", entity2.Entity.Fields[0].Name);
 		}
@@ -194,7 +200,7 @@ namespace DotnetSpider.Test
 		{
 			var exception = Assert.Throws<SpiderException>(() =>
 			{
-				var entityMetadata = EntitySpider.PaserEntityMetaData(typeof(Entity1).GetTypeInfo());
+				var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Entity1).GetTypeInfo());
 				TestPipeline pipeline = new TestPipeline();
 				pipeline.InitiEntity(entityMetadata);
 			});
@@ -206,7 +212,7 @@ namespace DotnetSpider.Test
 		{
 			var exception = Assert.Throws<SpiderException>(() =>
 			{
-				var entityMetadata = EntitySpider.PaserEntityMetaData(typeof(Entity2).GetTypeInfo());
+				var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Entity2).GetTypeInfo());
 				TestPipeline pipeline = new TestPipeline();
 				pipeline.InitiEntity(entityMetadata);
 			});
@@ -218,7 +224,7 @@ namespace DotnetSpider.Test
 		{
 			var exception = Assert.Throws<SpiderException>(() =>
 			{
-				var entityMetadata = EntitySpider.PaserEntityMetaData(typeof(Entity3).GetTypeInfo());
+				var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Entity3).GetTypeInfo());
 				TestPipeline pipeline = new TestPipeline();
 				pipeline.InitiEntity(entityMetadata);
 			});

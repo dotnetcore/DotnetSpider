@@ -136,7 +136,15 @@ namespace DotnetSpider.Extension.Scheduler
 			{
 				return RetryExecutor.Execute(30, () =>
 				{
-					var value = _db.ListRightPop(_queueKey);
+					RedisValue value;
+					if (DepthFirst)
+					{
+						value = _db.ListRightPop(_queueKey);
+					}
+					else
+					{
+						value = _db.ListLeftPop(_queueKey);
+					}
 					if (!value.HasValue)
 					{
 						return null;

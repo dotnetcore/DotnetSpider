@@ -14,11 +14,14 @@ namespace DotnetSpider.Extension.Model
 		public Entity Entity { get; set; } = new Entity();
 		public string[] Updates { get; internal set; }
 		public int? Limit { get; set; }
+		public List<TargetUrlExtractor> TargetUrlExtractors = new List<TargetUrlExtractor>();
+		public List<TargetUrlsCreator> TargetUrlsCreators { get; set; }
 	}
 
 	public class Entity : DataToken
 	{
 		public List<DataToken> Fields { get; set; } = new List<DataToken>();
+		public List<TargetUrl> TargetUrls { get; set; } = new List<TargetUrl>();
 	}
 
 	public class Field : DataToken

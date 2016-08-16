@@ -69,7 +69,7 @@ namespace DotnetSpider.Core.Pipeline
 			}
 			catch (IOException e)
 			{
-				Logger.Log(LogInfo.Create("Write data to json file failed.", Logger.Name, Spider, LogLevel.Warn, e));
+				Logger.SaveLog(LogInfo.Create("Write data to json file failed.", Logger.Name, Spider, LogLevel.Warn, e));
 				throw;
 			}
 		}

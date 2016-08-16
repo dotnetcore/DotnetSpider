@@ -41,12 +41,15 @@ namespace DotnetSpider.Extension
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 		public RedialExecutor RedialExecutor { get; set; }
 		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
-		public TargetUrlsHandler TargetUrlsHandler { get; set; }
-		public List<TargetUrlExtractor> TargetUrlExtractors { get; set; } = new List<TargetUrlExtractor>();
 		public List<GlobalValueSelector> GlobalValues { get; set; } = new List<GlobalValueSelector>();
 		public CookieInterceptor CookieInterceptor { get; set; }
 		public List<BaseEntityPipeline> EntityPipelines { get; set; } = new List<BaseEntityPipeline>();
+		public DataHandler DataHandler { get; set; }
 		public int CachedSize { get; set; }
+		/// <summary>
+		/// Key: Url patterns. Value: Until condition generators used by webdriverdownloaders.
+		/// </summary>
+		public Dictionary<string, MethodInfo> UntilConditionMethods { get; set; } = new Dictionary<string, MethodInfo>();
 
 		public EntitySpider(Site site)
 		{
@@ -66,11 +69,11 @@ namespace DotnetSpider.Extension
 #if !NET_CORE
 				if (CookieInterceptor != null)
 				{
-					Logger.Log(LogInfo.Create("尝试获取 Cookie...", Logger.Name, this, LogLevel.Info));
+					Logger.SaveLog(LogInfo.Create("尝试获取 Cookie...", Logger.Name, this, LogLevel.Info));
 					var cookie = CookieInterceptor.GetCookie();
 					if (cookie == null)
 					{
-						Logger.Log(LogInfo.Create("获取 Cookie 失败, 爬虫无法继续.", Logger.Name, this, LogLevel.Error));
+						Logger.SaveLog(LogInfo.Create("获取 Cookie 失败, 爬虫无法继续.", Logger.Name, this, LogLevel.Error));
 						return;
 					}
 					else
@@ -81,21 +84,15 @@ namespace DotnetSpider.Extension
 				}
 #endif
 
-				Logger.Log(LogInfo.Create("创建爬虫...", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create("创建爬虫...", Logger.Name, this, LogLevel.Info));
 
 				EntityProcessor processor = new EntityProcessor(this);
-				foreach (var t in TargetUrlExtractors)
-				{
-					processor.AddTargetUrlExtractor(t);
-				}
+
 				foreach (var entity in Entities)
 				{
 					processor.AddEntity(entity);
 				}
-				if (TargetUrlsHandler != null)
-				{
-					processor.TargetUrlsHandler = TargetUrlsHandler;
-				}
+				processor.DataHandler = DataHandler;
 				PageProcessor = processor;
 				foreach (var entity in Entities)
 				{
@@ -103,8 +100,9 @@ namespace DotnetSpider.Extension
 					var pipelines = new List<BaseEntityPipeline>();
 					foreach (var pipeline in EntityPipelines)
 					{
-						var newPipeline =(BaseEntityPipeline) pipeline.Clone();
+						var newPipeline = pipeline.Clone();
 						newPipeline.InitiEntity(entity);
+						pipelines.Add(newPipeline);
 					}
 
 					Pipelines.Add(new EntityPipeline(entiyName, pipelines));
@@ -130,7 +128,7 @@ namespace DotnetSpider.Extension
 					needInitStartRequest = true;
 				}
 
-				Logger.Log(LogInfo.Create("构建内部模块、准备爬虫数据...", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create("构建内部模块、准备爬虫数据...", Logger.Name, this, LogLevel.Info));
 				InitComponent();
 
 				if (needInitStartRequest)
@@ -163,17 +161,43 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public EntitySpider AddEntityType(Type type)
+		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor = null)
+		{
+			if (targetUrlExtractor != null)
+			{
+				AddEntityType(type, new List<TargetUrlExtractor> { targetUrlExtractor });
+			}
+			else
+			{
+				AddEntityType(type, new List<TargetUrlExtractor>());
+			}
+
+			return this;
+		}
+
+		public EntitySpider AddEntityType(Type type, TargetUrlsCreator creator)
+		{
+			if (creator != null)
+			{
+				AddEntityType(type, new List<TargetUrlsCreator> { creator });
+			}
+			else
+			{
+				AddEntityType(type, new List<TargetUrlsCreator>());
+			}
+
+			return this;
+		}
+
+		public EntitySpider AddEntityType(Type type, List<TargetUrlsCreator> creators)
 		{
 			CheckIfRunning();
 
 			if (typeof(ISpiderEntity).IsAssignableFrom(type))
 			{
-#if NET_CORE
-				Entities.Add(PaserEntityMetaData(type.GetTypeInfo()));
-#else
-				Entities.Add(PaserEntityMetaData(type));
-#endif
+				var entity = ParseEntityMetaData(type.GetTypeInfoCrossPlatform());
+				entity.TargetUrlsCreators = creators;
+				Entities.Add(entity);
 				GlobalValues = type.GetTypeInfo().GetCustomAttributes<GlobalValueSelector>().Select(e => new GlobalValueSelector
 				{
 					Name = e.Name,
@@ -189,10 +213,35 @@ namespace DotnetSpider.Extension
 			return this;
 		}
 
-		public EntitySpider AddTargetUrlExtractor(TargetUrlExtractor targetUrlExtractor)
+		public EntitySpider AddEntityType(Type type, List<TargetUrlExtractor> targetUrlExtractors)
 		{
 			CheckIfRunning();
-			TargetUrlExtractors.Add(targetUrlExtractor);
+
+			if (typeof(ISpiderEntity).IsAssignableFrom(type))
+			{
+				var entity = ParseEntityMetaData(type.GetTypeInfoCrossPlatform());
+				entity.TargetUrlExtractors = targetUrlExtractors;
+				foreach (TargetUrlExtractor targetUrlExtractor in targetUrlExtractors)
+				{
+					for (int i = 0; i < targetUrlExtractor.Patterns.Count; ++i)
+					{
+						targetUrlExtractor.Patterns[i] = targetUrlExtractor.KeepOrigin ? targetUrlExtractor.Patterns[i] :
+							$"({targetUrlExtractor.Patterns[i].Replace(".", "\\.").Replace("*", "[^\"'#]*")})";
+					}
+				}
+				Entities.Add(entity);
+				GlobalValues = type.GetTypeInfo().GetCustomAttributes<GlobalValueSelector>().Select(e => new GlobalValueSelector
+				{
+					Name = e.Name,
+					Expression = e.Expression,
+					Type = e.Type
+				}).ToList();
+			}
+			else
+			{
+				throw new SpiderException($"Type: {type.FullName} is not a ISpiderEntity.");
+			}
+
 			return this;
 		}
 
@@ -255,12 +304,12 @@ namespace DotnetSpider.Extension
 				}
 				if (needInitStartRequest)
 				{
-					Logger.Log(LogInfo.Create("开始执行数据验证...", Logger.Name, this, LogLevel.Info));
+					Logger.SaveLog(LogInfo.Create("开始执行数据验证...", Logger.Name, this, LogLevel.Info));
 
 					VerifyCollectedData();
 				}
 
-				Logger.Log(LogInfo.Create("数据验证已完成.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create("数据验证已完成.", Logger.Name, this, LogLevel.Info));
 
 				if (needInitStartRequest && Redis != null)
 				{
@@ -360,44 +409,60 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-#if !NET_CORE
-		public static EntityMetadata PaserEntityMetaData(Type entityType)
-		{
-			EntityMetadata metadata = new EntityMetadata();
 
-			metadata.Schema = entityType.GetCustomAttribute<Schema>();
+		public static EntityMetadata ParseEntityMetaData(
+#if !NET_CORE
+			Type entityType
+#else
+			TypeInfo entityType
+#endif
+		)
+		{
+			EntityMetadata entityMetadata = new EntityMetadata();
+
+			entityMetadata.Schema = entityType.GetCustomAttribute<Schema>();
 			var indexes = entityType.GetCustomAttribute<Indexes>();
 			if (indexes != null)
 			{
-				metadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				metadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				metadata.Primary = indexes.Primary?.Split(',');
-				metadata.AutoIncrement = indexes.AutoIncrement;
+				entityMetadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
+				entityMetadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
+				entityMetadata.Primary = indexes.Primary?.Split(',');
+				entityMetadata.AutoIncrement = indexes.AutoIncrement;
 			}
 			var updates = entityType.GetCustomAttribute<UpdateColumns>();
 			if (updates != null)
 			{
-				metadata.Updates = updates.Columns;
+				entityMetadata.Updates = updates.Columns;
 			}
+
 			Entity entity = ParseEntity(entityType);
-			metadata.Entity = entity;
+			entityMetadata.Entity = entity;
 			EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
 			if (extractByAttribute != null)
 			{
-				metadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-				metadata.Entity.Multi = true;
+				entityMetadata.Entity.Multi = true;
+				entityMetadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
 			}
 			else
 			{
-				metadata.Entity.Multi = false;
+				entityMetadata.Entity.Multi = false;
 			}
 
-			return metadata;
+			return entityMetadata;
 		}
 
-		private static Entity ParseEntity(Type entityType)
+		public static Entity ParseEntity(
+#if !NET_CORE
+			Type entityType
+#else
+			TypeInfo entityType
+#endif
+		)
 		{
-			Entity entity = new Entity { Name = GetEntityName(entityType) };
+			Entity entity = new Entity
+			{
+				Name = GetEntityName(entityType.GetTypeCrossPlatform())
+			};
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
 			{
@@ -431,7 +496,13 @@ namespace DotnetSpider.Extension
 						};
 					}
 
-					token.Fields.Add(ParseEntity(propertyInfo.PropertyType));
+					var targetUrl = propertyInfo.GetCustomAttribute<TargetUrl>();
+					if (targetUrl != null)
+					{
+						throw new SpiderException("Can not set TargetUrl attribute to a ISpiderEntity property.");
+					}
+
+					token.Fields.Add(ParseEntity(propertyInfo.PropertyType.GetTypeInfoCrossPlatform()));
 				}
 				else
 				{
@@ -475,125 +546,11 @@ namespace DotnetSpider.Extension
 						token.Formatters.Add(formatter);
 					}
 
-					entity.Fields.Add(token);
-				}
-			}
-			return entity;
-		}
-#else
-		public static EntityMetadata PaserEntityMetaData(TypeInfo entityType)
-		{
-			EntityMetadata metadata = new EntityMetadata();
-			metadata.Schema = entityType.GetCustomAttribute<Schema>();
-			var indexes = entityType.GetCustomAttribute<Indexes>();
-			if (indexes != null)
-			{
-				metadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				metadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				metadata.Primary = indexes.Primary?.Split(',');
-				metadata.AutoIncrement = indexes.AutoIncrement;
-			}
-
-			var updates = entityType.GetCustomAttribute<UpdateColumns>();
-			if (updates != null)
-			{
-				metadata.Updates = updates.Columns;
-			}
-
-			metadata.Entity = ParseEntity(entityType);
-			EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
-			if (extractByAttribute != null)
-			{
-				metadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-				metadata.Entity.Multi = true;
-			}
-			else
-			{
-				metadata.Entity.Multi = false;
-			}
-			return metadata;
-		}
-
-		private static Entity ParseEntity(TypeInfo entityType)
-		{
-			Entity entity = new Entity();
-			entity.Name = GetEntityName(entityType.AsType());
-			var properties = entityType.AsType().GetProperties();
-			foreach (var propertyInfo in properties)
-			{
-				var type = propertyInfo.PropertyType;
-
-				if (typeof(ISpiderEntity).IsAssignableFrom(type) || typeof(List<ISpiderEntity>).IsAssignableFrom(type))
-				{
-					Entity token = new Entity();
-					if (typeof(IEnumerable).IsAssignableFrom(type))
+					var targetUrl = propertyInfo.GetCustomAttribute<TargetUrl>();
+					if (targetUrl != null)
 					{
-						token.Multi = true;
-					}
-					else
-					{
-						token.Multi = false;
-					}
-					token.Name = GetEntityName(propertyInfo.PropertyType);
-					EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
-					if (extractByAttribute != null)
-					{
-						token.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-					}
-					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
-					if (extractBy != null)
-					{
-						token.Selector = new BaseSelector
-						{
-							Expression = extractBy.Expression,
-							Type = extractBy.Type,
-							Argument = extractBy.Argument
-						};
-					}
-
-					token.Fields.Add(ParseEntity(propertyInfo.PropertyType.GetTypeInfo()));
-				}
-				else
-				{
-					Field token = new Field();
-
-					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
-					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
-
-					if (typeof(IList).IsAssignableFrom(type))
-					{
-						token.Multi = true;
-					}
-					else
-					{
-						token.Multi = false;
-					}
-
-					if (extractBy != null)
-					{
-						token.Option = extractBy.Option;
-						token.Selector = new BaseSelector
-						{
-							Expression = extractBy.Expression,
-							Type = extractBy.Type,
-							Argument = extractBy.Argument
-						};
-					}
-
-					if (storeAs != null)
-					{
-						token.Name = storeAs.Name;
-						token.DataType = ParseDataType(storeAs);
-					}
-					else
-					{
-						token.Name = propertyInfo.Name;
-						token.DataType = "STRING,255";
-					}
-
-					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
-					{
-						token.Formatters.Add(formatter);
+						targetUrl.PropertyName = token.Name;
+						entity.TargetUrls.Add(targetUrl);
 					}
 
 					entity.Fields.Add(token);
@@ -601,7 +558,6 @@ namespace DotnetSpider.Extension
 			}
 			return entity;
 		}
-#endif
 
 		private static string ParseDataType(StoredAs storedAs)
 		{

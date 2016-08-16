@@ -18,10 +18,10 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 		private static bool _isLogined;
 		private readonly Browser _browser;
 		private readonly Option _option;
-		public Func<RemoteWebDriver, bool> Login { get; set; }
-		public Func<RemoteWebDriver, bool> VerifyCode { get; set; }
-		public Func<string, string> UrlFormat;
-		public Func<RemoteWebDriver, bool> AfterNavigate;
+		public IWebDriverHandler SignIn { get; set; }
+		public IWebDriverHandler VerifyCode { get; set; }
+		public Func<string, string> UrlHandler;
+		public IWebDriverHandler NavigateCompeleted;
 
 		public WebDriverDownloader(Browser browser, int webDriverWaitTime = 200, Option option = null)
 		{
@@ -51,9 +51,9 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 		{
 		}
 
-		public WebDriverDownloader(Browser browser, Func<RemoteWebDriver, bool> login) : this(browser, 200, null)
+		public WebDriverDownloader(Browser browser, IWebDriverHandler siginIn) : this(browser, 200, null)
 		{
-			Login = login;
+			SignIn = siginIn;
 		}
 
 		public override Page Download(Request request, ISpider spider)
@@ -69,9 +69,9 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 						_webDriver = WebDriverUtil.Open(_browser, _option);
 					}
 
-					if (!_isLogined && Login != null)
+					if (!_isLogined && SignIn != null)
 					{
-						_isLogined = Login.Invoke(_webDriver as RemoteWebDriver);
+						_isLogined = SignIn.Handle(_webDriver as RemoteWebDriver);
 						if (!_isLogined)
 						{
 							throw new SpiderException("Login failed. Please check your login codes.");
@@ -96,19 +96,19 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 					}
 				}
 
-				if (UrlFormat != null)
+				if (UrlHandler != null)
 				{
-					realUrl = UrlFormat(realUrl);
+					realUrl = UrlHandler(realUrl);
 				}
 
 				NetworkCenter.Current.Execute("wd-d", () =>
 				{
 					_webDriver.Navigate().GoToUrl(realUrl);
+
+					NavigateCompeleted?.Handle((RemoteWebDriver)_webDriver);
 				});
 
 				Thread.Sleep(_webDriverWaitTime);
-
-				AfterNavigate?.Invoke((RemoteWebDriver)_webDriver);
 
 				Page page = new Page(request, spider.Site.ContentType)
 				{

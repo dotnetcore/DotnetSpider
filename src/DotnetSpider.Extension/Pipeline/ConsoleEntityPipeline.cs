@@ -22,5 +22,10 @@ namespace DotnetSpider.Extension.Pipeline
 				Console.WriteLine(data.ToString());
 			}
 		}
+
+		public override BaseEntityPipeline Clone()
+		{
+			return new ConsoleEntityPipeline();
+		}
 	}
 }

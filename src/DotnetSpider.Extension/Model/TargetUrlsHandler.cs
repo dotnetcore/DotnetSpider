@@ -8,12 +8,12 @@ using DotnetSpider.Extension.Model.Attribute;
 
 namespace DotnetSpider.Extension.Model
 {
-	public abstract class TargetUrlsHandler
+	public abstract class TargetUrlsCreator
 	{
 		public abstract IList<Request> Handle(Page page);
 	}
 
-	public abstract class AbstractIncreasePageNumberTargetUrlsHandler : TargetUrlsHandler
+	public abstract class AbstractIncreasePageNumberTargetUrlsCreator : TargetUrlsCreator
 	{
 		/// <summary>
 		/// </summary>
@@ -35,7 +35,7 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class IncreasePageNumberTargetUrlsHandler : AbstractIncreasePageNumberTargetUrlsHandler
+	public class IncreasePageNumberTargetUrlsCreator : AbstractIncreasePageNumberTargetUrlsCreator
 	{
 		public BaseSelector TotalPageSelector { get; set; }
 		public List<Formatter.Formatter> TotalPageFormatters { get; set; }
@@ -96,7 +96,7 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class IncreasePostPageNumberTargetUrlsHandler : IncreasePageNumberTargetUrlsHandler
+	public class IncreasePostPageNumberTargetUrlsCreator : IncreasePageNumberTargetUrlsCreator
 	{
 		public override IList<Request> Handle(Page page)
 		{
@@ -119,7 +119,7 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class CustomLimitIncreasePageNumberTargetUrlsHandler : AbstractIncreasePageNumberTargetUrlsHandler
+	public class CustomLimitIncreasePageNumberTargetUrlsCreator : AbstractIncreasePageNumberTargetUrlsCreator
 	{
 		public int To { get; set; }
 
@@ -149,7 +149,7 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class IncreasePageNumberWithStopperTargetUrlsHandler : AbstractIncreasePageNumberTargetUrlsHandler
+	public class IncreasePageNumberWithStopperTargetUrlsCreator : AbstractIncreasePageNumberTargetUrlsCreator
 	{
 		public bool IsContain { get; set; } = true;
 		public List<string> Stoppers { get; set; } = new List<string>();
@@ -197,7 +197,7 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class IncreasePostPageNumberWithStopperTargetUrlsHandler : IncreasePageNumberWithStopperTargetUrlsHandler
+	public class IncreasePostPageNumberWithStopperTargetUrlsCreator : IncreasePageNumberWithStopperTargetUrlsCreator
 	{
 		public override IList<Request> Handle(Page page)
 		{
@@ -220,7 +220,7 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class IncreasePageNumbeTimeStopperTargetUrlsHandler : AbstractIncreasePageNumberTargetUrlsHandler
+	public class IncreasePageNumbeTimeStopperTargetUrlsCreator : AbstractIncreasePageNumberTargetUrlsCreator
 	{
 		public bool IsBefore { get; set; } = true;
 		public List<string> Stoppers { get; set; } = new List<string>();
@@ -290,7 +290,7 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class IncreasePostPageNumberTimeStopperTargetUrlsHandler : IncreasePageNumbeTimeStopperTargetUrlsHandler
+	public class IncreasePostPageNumberTimeStopperTargetUrlsCreator : IncreasePageNumbeTimeStopperTargetUrlsCreator
 	{
 		public override IList<Request> Handle(Page page)
 		{

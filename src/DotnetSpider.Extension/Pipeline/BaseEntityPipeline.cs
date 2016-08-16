@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public abstract class BaseEntityPipeline : IEntityPipeline, ICloneable
+	public abstract class BaseEntityPipeline : IEntityPipeline
 	{
 		public ISpider Spider { get; protected set; }
 
@@ -23,9 +22,6 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public abstract void Process(List<JObject> datas);
 
-		public object Clone()
-		{
-			return MemberwiseClone();
-		}
+		public abstract BaseEntityPipeline Clone();
 	}
 }

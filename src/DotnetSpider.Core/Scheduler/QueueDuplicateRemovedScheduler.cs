@@ -1,5 +1,6 @@
 using DotnetSpider.Core.Common;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DotnetSpider.Core.Scheduler
 {
@@ -9,14 +10,14 @@ namespace DotnetSpider.Core.Scheduler
 	/// </summary>
 	public sealed class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler
 	{
-		private Queue<Request> _queue = new Queue<Request>();
+		private List<Request> _queue = new List<Request>();
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{
 			// ReSharper disable once InconsistentlySynchronizedField
-			_queue.Enqueue(request);
+			_queue.Add(request);
 		}
 
 		public override void ResetDuplicateCheck()
@@ -31,7 +32,24 @@ namespace DotnetSpider.Core.Scheduler
 		{
 			lock (this)
 			{
-				return _queue.Count > 0 ? _queue.Dequeue() : null;
+				if (_queue.Count == 0)
+				{
+					return null;
+				}
+				else
+				{
+					Request request;
+					if (DepthFirst)
+					{
+						request = _queue.Last();
+					}
+					else
+					{
+						request = _queue.First();
+					}
+					_queue.Remove(request);
+					return request;
+				}
 			}
 		}
 
@@ -72,7 +90,7 @@ namespace DotnetSpider.Core.Scheduler
 		{
 			lock (this)
 			{
-				_queue = new Queue<Request>(requests);
+				_queue = new List<Request>(requests);
 			}
 		}
 

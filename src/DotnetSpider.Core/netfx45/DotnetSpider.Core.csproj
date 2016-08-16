@@ -151,6 +151,9 @@
     <Compile Include="..\Common\SystemInfo.cs">
       <Link>Common\SystemInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Common\TypeExtentions.cs">
+      <Link>Common\TypeExtentions.cs</Link>
+    </Compile>
     <Compile Include="..\Common\UrlUtils.cs">
       <Link>Common\UrlUtils.cs</Link>
     </Compile>
@@ -201,6 +204,9 @@
     </Compile>
     <Compile Include="..\ITask.cs">
       <Link>ITask.cs</Link>
+    </Compile>
+    <Compile Include="..\LogExtensions.cs">
+      <Link>LogExtensions.cs</Link>
     </Compile>
     <Compile Include="..\LogInfo.cs">
       <Link>LogInfo.cs</Link>

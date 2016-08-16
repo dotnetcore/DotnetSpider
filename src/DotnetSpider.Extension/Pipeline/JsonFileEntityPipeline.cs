@@ -44,6 +44,11 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
+		public override BaseEntityPipeline Clone()
+		{
+			return  new JsonFileEntityPipeline();
+		}
+
 		public override void Dispose()
 		{
 			base.Dispose();

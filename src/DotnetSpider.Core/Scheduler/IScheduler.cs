@@ -11,6 +11,8 @@ namespace DotnetSpider.Core.Scheduler
 	/// </summary>
 	public interface IScheduler : IDisposable, IMonitorable
 	{
+		bool DepthFirst { get; set; }
+
 		void Init(ISpider spider);
 
 		/// <summary>

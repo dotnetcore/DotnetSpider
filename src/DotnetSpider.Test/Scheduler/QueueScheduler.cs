@@ -36,9 +36,32 @@ namespace DotnetSpider.Test.Scheduler
 		}
 
 		[Fact]
-		public void PushAndPoll()
+		public void PushAndPollDepthFirst()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
+			ISpider spider = new DefaultSpider("test", new Core.Site());
+			scheduler.Init(spider);
+
+			scheduler.Push(new Request("http://www.a.com", 1, null));
+			scheduler.Push(new Request("http://www.a.com", 1, null));
+			scheduler.Push(new Request("http://www.a.com", 1, null));
+			scheduler.Push(new Request("http://www.b.com", 1, null));
+
+			var request = scheduler.Poll();
+			Assert.Equal(request.Url.ToString(), "http://www.b.com/");
+
+			long left = scheduler.GetLeftRequestsCount();
+			long total = scheduler.GetTotalRequestsCount();
+
+			Assert.Equal(left, 1);
+			Assert.Equal(total, 2);
+		}
+
+		[Fact]
+		public void PushAndPollBreadthFirst()
+		{
+			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
+			scheduler.DepthFirst = false;
 			ISpider spider = new DefaultSpider("test", new Core.Site());
 			scheduler.Init(spider);
 

@@ -121,5 +121,10 @@ namespace DotnetSpider.Extension.Pipeline
 
 			throw new SpiderException("UNSPORT datatype: " + dataType);
 		}
+
+		public override BaseEntityPipeline Clone()
+		{
+			return new MySqlEntityPipeline(ConnectString);
+		}
 	}
 }

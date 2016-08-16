@@ -71,11 +71,11 @@
     <Compile Include="..\JdSkuWebDriverSample.cs">
       <Link>JdSkuWebDriverSample.cs</Link>
     </Compile>
+    <Compile Include="..\JdSpider.cs">
+      <Link>JdSpider.cs</Link>
+    </Compile>
     <Compile Include="..\LinkSpiderExample.cs">
       <Link>LinkSpiderExample.cs</Link>
-    </Compile>
-    <Compile Include="..\OschinaBlog.cs">
-      <Link>OschinaBlog.cs</Link>
     </Compile>
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>

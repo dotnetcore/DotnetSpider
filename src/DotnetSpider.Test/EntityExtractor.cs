@@ -23,7 +23,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void Extract()
 		{
-			var entityMetadata = EntitySpider.PaserEntityMetaData(typeof(Product).GetTypeInfo());
+			var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo());
 			Extension.Model.EntityExtractor extractor = new Extension.Model.EntityExtractor("test", null, entityMetadata);
 			var results = extractor.Process(new Page(new Request("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", 1, new Dictionary<string, dynamic>
 			{

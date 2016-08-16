@@ -36,7 +36,7 @@ namespace DotnetSpider.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Core.Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306");
-				insertPipeline.InitiEntity(EntitySpider.PaserEntityMetaData(typeof(Product).GetTypeInfo()));
+				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
 				insertPipeline.InitPipeline(spider);
 
 				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -44,7 +44,7 @@ namespace DotnetSpider.Test.Pipeline
 				insertPipeline.Process(new List<JObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306", PipelineMode.Update);
-				updatePipeline.InitiEntity(EntitySpider.PaserEntityMetaData(typeof(Product).GetTypeInfo()));
+				updatePipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
 				updatePipeline.InitPipeline(spider);
 
 				JObject data3 = new JObject { { "sku", "110" }, { "category", "4C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -69,7 +69,7 @@ namespace DotnetSpider.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Core.Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306");
-				insertPipeline.InitiEntity(EntitySpider.PaserEntityMetaData(typeof(Product).GetTypeInfo()));
+				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
 				insertPipeline.InitPipeline(spider);
 
 				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };

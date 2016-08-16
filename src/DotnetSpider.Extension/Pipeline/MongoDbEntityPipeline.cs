@@ -33,6 +33,11 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			_collection.InsertMany(reslut);
 		}
+
+		public override BaseEntityPipeline Clone()
+		{
+			return  new MongoDbEntityPipeline(ConnectString);
+		}
 	}
 }
 #endif

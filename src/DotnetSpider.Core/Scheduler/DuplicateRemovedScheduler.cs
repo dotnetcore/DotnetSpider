@@ -11,6 +11,8 @@ namespace DotnetSpider.Core.Scheduler
 		protected IDuplicateRemover DuplicateRemover { get; set; } = new HashSetDuplicateRemover();
 		protected ISpider Spider { get; set; }
 
+		public bool DepthFirst { get; set; } = true;
+
 		public void Push(Request request)
 		{
 			lock (this)

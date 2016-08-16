@@ -177,11 +177,14 @@
     <Compile Include="..\Downloader\FileDownloader.cs">
       <Link>Downloader\FileDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\Login.cs">
-      <Link>Downloader\Login.cs</Link>
+    <Compile Include="..\Downloader\SignIner.cs">
+      <Link>Downloader\SignIner.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\WebDriver\Browser.cs">
       <Link>Downloader\WebDriver\Browser.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\WebDriver\IWebDriverHandler.cs">
+      <Link>Downloader\WebDriver\IWebDriverHandler.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\WebDriver\Option.cs">
       <Link>Downloader\WebDriver\Option.cs</Link>
@@ -198,9 +201,6 @@
     <Compile Include="..\Model\Attribute\BaseSelector.cs">
       <Link>Model\Attribute\BaseSelector.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\Download.cs">
-      <Link>Model\Attribute\Download.cs</Link>
-    </Compile>
     <Compile Include="..\Model\Attribute\EntitySelector.cs">
       <Link>Model\Attribute\EntitySelector.cs</Link>
     </Compile>
@@ -212,6 +212,9 @@
     </Compile>
     <Compile Include="..\Model\Attribute\PropertySelector.cs">
       <Link>Model\Attribute\PropertySelector.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Attribute\TargetUrl.cs">
+      <Link>Model\Attribute\TargetUrl.cs</Link>
     </Compile>
     <Compile Include="..\Model\Attribute\UpdateColumns.cs">
       <Link>Model\Attribute\UpdateColumns.cs</Link>
@@ -231,11 +234,17 @@
     <Compile Include="..\Model\Formatter\ClassifyFormater.cs">
       <Link>Model\Formatter\ClassifyFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\Download.cs">
+      <Link>Model\Formatter\Download.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\Formatter.cs">
       <Link>Model\Formatter\Formatter.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\FormatterFactory.cs">
       <Link>Model\Formatter\FormatterFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Formatter\RegexAppendFormatter.cs">
+      <Link>Model\Formatter\RegexAppendFormatter.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\RegexMatchFormater.cs">
       <Link>Model\Formatter\RegexMatchFormater.cs</Link>
@@ -248,6 +257,9 @@
     </Compile>
     <Compile Include="..\Model\Formatter\SplitFormater.cs">
       <Link>Model\Formatter\SplitFormater.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Formatter\StringFormatFormater.cs">
+      <Link>Model\Formatter\StringFormatFormater.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\SubStringFormater.cs">
       <Link>Model\Formatter\SubStringFormater.cs</Link>

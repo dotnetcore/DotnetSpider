@@ -68,5 +68,10 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			Writer.Dispose();
 		}
+
+		public override BaseEntityPipeline Clone()
+		{
+			return new MySqlFileEntityPipeline();
+		}
 	}
 }

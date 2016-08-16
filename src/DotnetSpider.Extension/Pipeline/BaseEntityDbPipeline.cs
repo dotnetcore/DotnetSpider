@@ -16,8 +16,8 @@ namespace DotnetSpider.Extension.Pipeline
 		public string ConnectString { get; set; }
 		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
 
+		protected bool IsEnabled { get; set; } = true;
 		protected abstract DbConnection CreateConnection();
-
 		protected abstract string GetInsertSql();
 		protected abstract string GetUpdateSql();
 		protected abstract string GetCreateTableSql();
@@ -46,6 +46,11 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void InitiEntity(EntityMetadata entityDefine)
 		{
+			if (entityDefine.Schema == null)
+			{
+				IsEnabled = false;
+				return;
+			}
 			Schema = GenerateSchema(entityDefine.Schema);
 			foreach (var f in entityDefine.Entity.Fields)
 			{
@@ -187,6 +192,11 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void InitPipeline(ISpider spider)
 		{
+			if (!IsEnabled)
+			{
+				return;
+			}
+
 			base.InitPipeline(spider);
 
 			if (Mode == PipelineMode.Update)
@@ -213,6 +223,10 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void Process(List<JObject> datas)
 		{
+			if (!IsEnabled)
+			{
+				return;
+			}
 			NetworkCenter.Current.Execute("pp-", () =>
 			{
 				switch (Mode)

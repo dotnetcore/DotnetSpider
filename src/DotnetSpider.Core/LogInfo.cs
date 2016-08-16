@@ -10,11 +10,10 @@ namespace DotnetSpider.Core
 
 		public static LogEventInfo Create(string message, string loggerName, ITask task, LogLevel level, Exception e = null)
 		{
-			LogEventInfo theEvent = new LogEventInfo(level, loggerName, message) {Exception = e};
-			theEvent.Properties["UserId"] = task.UserId;
-			theEvent.Properties["TaskGroup"] = task.TaskGroup;
+			LogEventInfo theEvent = new LogEventInfo(level, loggerName, message) { Exception = e };
+			theEvent.Properties["UserId"] = task == null ? "" : task.UserId;
+			theEvent.Properties["TaskGroup"] = task == null ? "" : task.TaskGroup;
 			return theEvent;
-			//return $"[{task.UserId}][{task.TaskGroup}] {message}";
 		}
 	}
 }

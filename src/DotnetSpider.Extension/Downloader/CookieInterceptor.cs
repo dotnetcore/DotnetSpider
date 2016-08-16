@@ -1,9 +1,9 @@
 using System;
 using NLog;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Selector;
 using System.Collections.Generic;
 #if !NET_CORE
+using DotnetSpider.Core.Selector;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -74,7 +74,7 @@ namespace DotnetSpider.Extension.Downloader
 				throw new Exception("Fiddler CookieTrapper: Pattern cannot be null!");
 			}
 
-			string cookie = null;
+			string cookie;
 			using (FiddlerClient fiddlerWrapper = new FiddlerClient(ProxyPort, Pattern))
 			{
 				fiddlerWrapper.StartCapture(true);

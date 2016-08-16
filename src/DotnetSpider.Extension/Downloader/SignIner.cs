@@ -1,21 +1,20 @@
-﻿using System;
+﻿#if !NET_CORE
 using DotnetSpider.Core;
+using DotnetSpider.Extension.Downloader.WebDriver;
+using System;
 using DotnetSpider.Core.Selector;
-#if !NET_CORE
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 using System.Threading;
 using DotnetSpider.Extension.Model;
-#endif
-
-namespace DotnetSpider.Extension.Configuration
+ 
+namespace DotnetSpider.Extension.Downloader
 {
-	public abstract class Loginer : Named
+	public abstract class SignIner : Named, IWebDriverHandler
 	{
-		public abstract bool Login(dynamic obj);
+		public abstract bool Handle(RemoteWebDriver driver);
 	}
 
-#if !NET_CORE
 	public class VerifyCode
 	{
 		public bool Verify(dynamic webDriver)
@@ -37,7 +36,7 @@ namespace DotnetSpider.Extension.Configuration
 		}
 	}
 
-	public class CommonLoginer : Loginer
+	public class CommonSignIner : SignIner
 	{
 		public string Url { get; set; }
 
@@ -51,7 +50,7 @@ namespace DotnetSpider.Extension.Configuration
 
 		public Selector SubmitSelector { get; set; }
 
-		public override bool Login(dynamic webDriver)
+		public override bool Handle(RemoteWebDriver webDriver)
 		{
 
 			try
@@ -94,13 +93,12 @@ namespace DotnetSpider.Extension.Configuration
 		}
 	}
 
-	public class ManualLoginer : Loginer
+	public class ManualLoginer : SignIner
 	{
 		public string Url { get; set; }
 
-		public override bool Login(dynamic webDriver)
+		public override bool Handle(RemoteWebDriver webDriver)
 		{
-
 			try
 			{
 				IWebDriver driver = webDriver;
@@ -117,5 +115,5 @@ namespace DotnetSpider.Extension.Configuration
 			}
 		}
 	}
-#endif
 }
+#endif
