@@ -16,6 +16,7 @@ namespace DotnetSpider.Test
 	{
 		private class TestPipeline : BaseEntityDbPipeline
 		{
+
 			protected override DbConnection CreateConnection()
 			{
 				throw new System.NotImplementedException();

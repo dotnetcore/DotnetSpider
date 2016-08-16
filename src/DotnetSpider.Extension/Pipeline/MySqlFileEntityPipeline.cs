@@ -20,6 +20,11 @@ namespace DotnetSpider.Extension.Pipeline
 		protected string DataFolder;
 		protected StreamWriter Writer;
 
+		public override object Clone()
+		{
+			return new MySqlEntityPipeline();
+		}
+
 		public override void InitiEntity(EntityMetadata metadata)
 		{
 			Schema = metadata.Schema;

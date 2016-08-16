@@ -10,6 +10,11 @@ namespace DotnetSpider.Extension.Pipeline
 		public ISpider Spider { get; protected set; }
 		public bool IsEnabled { get; protected set; } = true;
 
+		public abstract object Clone();
+		//{
+			//return MemberwiseClone();
+		//}
+
 		public virtual void Dispose()
 		{
 		}
