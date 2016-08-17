@@ -6,6 +6,7 @@ using System.Threading;
 using MySql.Data.MySqlClient;
 using NLog;
 using NLog.Config;
+using System.Data.SqlClient;
 #if NET_CORE
 using System.Text;
 using Microsoft.Extensions.Configuration;
