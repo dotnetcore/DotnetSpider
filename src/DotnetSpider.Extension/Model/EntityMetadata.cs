@@ -16,6 +16,7 @@ namespace DotnetSpider.Extension.Model
 		public int? Limit { get; set; }
 		public List<TargetUrlExtractor> TargetUrlExtractors = new List<TargetUrlExtractor>();
 		public List<TargetUrlsCreator> TargetUrlsCreators { get; set; }
+		public DataHandler DataHandler { get; set; }
 	}
 
 	public class Entity : DataToken

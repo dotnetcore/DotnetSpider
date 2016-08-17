@@ -47,18 +47,7 @@ namespace DotnetSpider.Extension.Processor
 				{
 					foreach (var data in list)
 					{
-						switch (DataHandler.Handle(data))
-						{
-							case DataHandler.ResultType.MissTargetUrls:
-								{
-									page.MissTargetUrls = true;
-									break;
-								}
-							case DataHandler.ResultType.Ok:
-								{
-									break;
-								}
-						}
+						DataHandler.Handle(data, page);
 					}
 				}
 

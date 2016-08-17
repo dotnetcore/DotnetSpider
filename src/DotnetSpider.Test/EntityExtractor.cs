@@ -33,7 +33,7 @@ namespace DotnetSpider.Test
 			{
 				Content = File.ReadAllText(Path.Combine(SpiderEnviroment.BaseDirectory, "Jd.html"))
 			});
-			Assert.Equal(60,results.Count);
+			Assert.Equal(60, results.Count);
 			Assert.Equal("手机", results[0].GetValue("CategoryName"));
 			Assert.Equal("110", results[0].GetValue("CategoryId"));
 			Assert.Equal("http://item.jd.com/3031737.html", results[0].GetValue("Url"));

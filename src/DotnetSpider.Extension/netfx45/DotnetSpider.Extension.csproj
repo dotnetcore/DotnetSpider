@@ -219,6 +219,9 @@
     <Compile Include="..\Model\Attribute\UpdateColumns.cs">
       <Link>Model\Attribute\UpdateColumns.cs</Link>
     </Compile>
+    <Compile Include="..\Model\DataHandler.cs">
+      <Link>Model\DataHandler.cs</Link>
+    </Compile>
     <Compile Include="..\Model\EntityExtractor.cs">
       <Link>Model\EntityExtractor.cs</Link>
     </Compile>
@@ -356,9 +359,6 @@
     </Compile>
     <Compile Include="..\Pipeline\PipelineMode.cs">
       <Link>Pipeline\PipelineMode.cs</Link>
-    </Compile>
-    <Compile Include="..\Processor\DataHandler.cs">
-      <Link>Processor\DataHandler.cs</Link>
     </Compile>
     <Compile Include="..\Processor\EntityProcessor.cs">
       <Link>Processor\EntityProcessor.cs</Link>

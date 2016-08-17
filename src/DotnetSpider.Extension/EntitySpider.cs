@@ -173,41 +173,42 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor = null)
+		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor = null, DataHandler dataHandler = null)
 		{
 			if (targetUrlExtractor != null)
 			{
-				AddEntityType(type, new List<TargetUrlExtractor> { targetUrlExtractor });
+				AddEntityType(type, new List<TargetUrlExtractor> { targetUrlExtractor }, dataHandler);
 			}
 			else
 			{
-				AddEntityType(type, new List<TargetUrlExtractor>());
+				AddEntityType(type, new List<TargetUrlExtractor>(), dataHandler);
 			}
 
 			return this;
 		}
 
-		public EntitySpider AddEntityType(Type type, TargetUrlsCreator creator)
+		public EntitySpider AddEntityType(Type type, TargetUrlsCreator creator, DataHandler dataHandler = null)
 		{
 			if (creator != null)
 			{
-				AddEntityType(type, new List<TargetUrlsCreator> { creator });
+				AddEntityType(type, new List<TargetUrlsCreator> { creator }, dataHandler);
 			}
 			else
 			{
-				AddEntityType(type, new List<TargetUrlsCreator>());
+				AddEntityType(type, new List<TargetUrlsCreator>(), dataHandler);
 			}
 
 			return this;
 		}
 
-		public EntitySpider AddEntityType(Type type, List<TargetUrlsCreator> creators)
+		public EntitySpider AddEntityType(Type type, List<TargetUrlsCreator> creators, DataHandler dataHandler)
 		{
 			CheckIfRunning();
 
 			if (typeof(ISpiderEntity).IsAssignableFrom(type))
 			{
 				var entity = ParseEntityMetaData(type.GetTypeInfoCrossPlatform());
+				entity.DataHandler = dataHandler;
 				entity.TargetUrlsCreators = creators;
 				Entities.Add(entity);
 				GlobalValues = type.GetTypeInfo().GetCustomAttributes<GlobalValueSelector>().Select(e => new GlobalValueSelector
@@ -225,7 +226,7 @@ namespace DotnetSpider.Extension
 			return this;
 		}
 
-		public EntitySpider AddEntityType(Type type, List<TargetUrlExtractor> targetUrlExtractors)
+		public EntitySpider AddEntityType(Type type, List<TargetUrlExtractor> targetUrlExtractors, DataHandler dataHandler)
 		{
 			CheckIfRunning();
 
@@ -233,6 +234,7 @@ namespace DotnetSpider.Extension
 			{
 				var entity = ParseEntityMetaData(type.GetTypeInfoCrossPlatform());
 				entity.TargetUrlExtractors = targetUrlExtractors;
+				entity.DataHandler = dataHandler;
 				foreach (TargetUrlExtractor targetUrlExtractor in targetUrlExtractors)
 				{
 					for (int i = 0; i < targetUrlExtractor.Patterns.Count; ++i)

@@ -19,13 +19,14 @@ namespace DotnetSpider.Extension.Model
 	public class EntityExtractor : IEntityExtractor
 	{
 		public EntityMetadata EntityMetadata { get; }
+		public DataHandler DataHandler { get; set; }
 		private readonly List<GlobalValueSelector> _globalValues;
 
 		public EntityExtractor(string entityName, List<GlobalValueSelector> globalValues, EntityMetadata entityDefine)
 		{
 			EntityMetadata = entityDefine;
-
 			EntityName = entityName;
+			DataHandler = entityDefine.DataHandler;
 			_globalValues = globalValues;
 		}
 

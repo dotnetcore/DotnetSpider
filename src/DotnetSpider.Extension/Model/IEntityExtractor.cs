@@ -8,5 +8,6 @@ namespace DotnetSpider.Extension.Model
 	{
 		List<JObject> Process(Page page);
 		EntityMetadata EntityMetadata { get; }
+		DataHandler DataHandler { get; }
 	}
 }
