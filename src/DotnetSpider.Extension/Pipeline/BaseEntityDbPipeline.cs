@@ -222,7 +222,6 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				using (DbConnection conn = CreateConnection())
 				{
-					conn.Open();
 					var command = conn.CreateCommand();
 					command.CommandText = GetCreateSchemaSql();
 					command.CommandType = CommandType.Text;
@@ -248,138 +247,71 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					case PipelineMode.Insert:
 						{
-							int tryCount = 0;
-							while (true)
+							using (var conn = CreateConnection())
 							{
-								try
+								var cmd = conn.CreateCommand();
+								cmd.CommandText = GetInsertSql();
+								cmd.CommandType = CommandType.Text;
+								conn.Open();
+
+								foreach (var data in datas)
 								{
-									using (var conn = CreateConnection())
+									cmd.Parameters.Clear();
+
+									List<DbParameter> parameters = new List<DbParameter>();
+									foreach (var column in Columns)
 									{
-										var cmd = conn.CreateCommand();
-										cmd.CommandText = GetInsertSql();
-										cmd.CommandType = CommandType.Text;
-										conn.Open();
-
-										foreach (var data in datas)
-										{
-											cmd.Parameters.Clear();
-
-											List<DbParameter> parameters = new List<DbParameter>();
-											foreach (var column in Columns)
-											{
-												var parameter = CreateDbParameter();
-												parameter.ParameterName = $"@{column.Name}";
-												parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-												parameter.DbType = Convert(column.DataType);
-												parameters.Add(parameter);
-											}
-
-											cmd.Parameters.AddRange(parameters.ToArray());
-											cmd.ExecuteNonQuery();
-										}
-
-										conn.Close();
+										var parameter = CreateDbParameter();
+										parameter.ParameterName = $"@{column.Name}";
+										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+										parameter.DbType = Convert(column.DataType);
+										parameters.Add(parameter);
 									}
-									break;
+
+									cmd.Parameters.AddRange(parameters.ToArray());
+									cmd.ExecuteNonQuery();
 								}
-								catch (Exception e)
-								{
-									// mysql authentication error
-									if (e.Message.ToLower().StartsWith("authentication to host"))
-									{
-										Thread.Sleep(1000);
-										if (tryCount > 5)
-										{
-											throw;
-										}
-										if (UpdateConnectString != null)
-										{
-											tryCount++;
-											ConnectString = UpdateConnectString.GetNew();
-										}
-										else
-										{
-											throw;
-										}
-									}
-									else
-									{
-										throw;
-									}
-								}
+								conn.Close();
 							}
 							break;
 						}
 					case PipelineMode.Update:
 						{
-							int tryCount = 0;
-							while (true)
+							using (var conn = CreateConnection())
 							{
-								try
+								var cmd = conn.CreateCommand();
+								cmd.CommandText = GetUpdateSql();
+								cmd.CommandType = CommandType.Text;
+								conn.Open();
+
+								foreach (var data in datas)
 								{
-									using (var conn = CreateConnection())
+									cmd.Parameters.Clear();
+
+									List<DbParameter> parameters = new List<DbParameter>();
+									foreach (var column in UpdateColumns)
 									{
-										var cmd = conn.CreateCommand();
-										cmd.CommandText = GetUpdateSql();
-										cmd.CommandType = CommandType.Text;
-										conn.Open();
-
-										foreach (var data in datas)
-										{
-											cmd.Parameters.Clear();
-
-											List<DbParameter> parameters = new List<DbParameter>();
-											foreach (var column in UpdateColumns)
-											{
-												var parameter = CreateDbParameter();
-												parameter.ParameterName = $"@{column.Name}";
-												parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-												parameter.DbType = Convert(column.DataType);
-												parameters.Add(parameter);
-											}
-
-											foreach (var column in Primary)
-											{
-												var parameter = CreateDbParameter();
-												parameter.ParameterName = $"@{column.Name}";
-												parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-												parameter.DbType = Convert(column.DataType);
-												parameters.Add(parameter);
-											}
-
-											cmd.Parameters.AddRange(parameters.ToArray());
-											cmd.ExecuteNonQuery();
-										}
-
-										conn.Close();
+										var parameter = CreateDbParameter();
+										parameter.ParameterName = $"@{column.Name}";
+										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+										parameter.DbType = Convert(column.DataType);
+										parameters.Add(parameter);
 									}
-									break;
+
+									foreach (var column in Primary)
+									{
+										var parameter = CreateDbParameter();
+										parameter.ParameterName = $"@{column.Name}";
+										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+										parameter.DbType = Convert(column.DataType);
+										parameters.Add(parameter);
+									}
+
+									cmd.Parameters.AddRange(parameters.ToArray());
+									cmd.ExecuteNonQuery();
 								}
-								catch (Exception e)
-								{
-									// mysql authentication error
-									if (e.Message.ToLower().StartsWith("authentication to host"))
-									{
-										Thread.Sleep(1000);
-										if (tryCount > 5)
-										{
-											throw;
-										}
-										if (UpdateConnectString != null)
-										{
-											tryCount++;
-											ConnectString = UpdateConnectString.GetNew();
-										}
-										else
-										{
-											throw;
-										}
-									}
-									else
-									{
-										throw;
-									}
-								}
+
+								conn.Close();
 							}
 							break;
 						}

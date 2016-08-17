@@ -1,38 +1,28 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+#if !NET_CORE
+using System;
 using System.Collections.Generic;
 using System.IO;
-#if NET_CORE
-//using Microsoft.Extensions.Configuration.Ini;
 #endif
 
 namespace DotnetSpider.Core.Common
 {
 	public class ConfigurationManager
 	{
+#if NET_CORE
+		private static readonly IConfigurationRoot Configuration;
+#else
 		private static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
-
-		//#if NET_CORE
-		//		private static IniConfigurationProvider provider;
-		//#else
-		//		private static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
-		//#endif
+#endif
 
 		static ConfigurationManager()
 		{
 #if NET_CORE
-			string configPath = Path.Combine(AppContext.BaseDirectory, "config.ini");
-
-			//if (File.Exists(configPath))
-			//{
-			//	provider = new IniConfigurationProvider(new IniConfigurationSource
-			//	{
-			//		Path = configPath
-			//	});
-			//	provider.Load();
-			//}
+			IConfigurationBuilder builder = new ConfigurationBuilder();
+			builder.AddIniFile("config.ini");
+			Configuration = builder.Build();
 #else
 			string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
-#endif
 			if (File.Exists(configPath))
 			{
 				string[] lines = File.ReadAllLines(configPath);
@@ -55,19 +45,16 @@ namespace DotnetSpider.Core.Common
 					}
 				}
 			}
-
+#endif
 		}
 
 		public static string Get(string key)
 		{
-//#if NET_CORE
-//			string value;
-//			provider.TryGet(key, out value);
-//			return value;
-//#else
-//		return Values.ContainsKey(key) ? Values[key] : null;
-//#endif
+#if NET_CORE
+			return Configuration.GetValue<string>(key);
+#else
 			return Values.ContainsKey(key) ? Values[key] : null;
+#endif
 		}
 	}
 }

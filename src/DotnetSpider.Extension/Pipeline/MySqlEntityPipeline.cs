@@ -1,6 +1,8 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
 using MySql.Data.MySqlClient;
@@ -19,7 +21,34 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override DbConnection CreateConnection()
 		{
-			return new MySqlConnection(ConnectString);
+			for (int i = 0; i < 5; ++i)
+			{
+				try
+				{
+					if (string.IsNullOrEmpty(ConnectString))
+					{
+						ConnectString = UpdateConnectString.GetNew();
+					}
+					var conn = new MySqlConnection(ConnectString);
+					conn.Open();
+					return conn;
+				}
+				catch (Exception e)
+				{
+					// mysql authentication error
+					if (e.Message.ToLower().StartsWith("authentication to host"))
+					{
+						Thread.Sleep(1000);
+						ConnectString = UpdateConnectString.GetNew();
+					}
+					else
+					{
+						throw;
+					}
+				}
+			}
+
+			throw new SpiderException("Can't get any connect string.");
 		}
 
 		protected override string GetInsertSql()
