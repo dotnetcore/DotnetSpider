@@ -252,7 +252,6 @@ namespace DotnetSpider.Extension.Pipeline
 								var cmd = conn.CreateCommand();
 								cmd.CommandText = GetInsertSql();
 								cmd.CommandType = CommandType.Text;
-								conn.Open();
 
 								foreach (var data in datas)
 								{
@@ -282,7 +281,6 @@ namespace DotnetSpider.Extension.Pipeline
 								var cmd = conn.CreateCommand();
 								cmd.CommandText = GetUpdateSql();
 								cmd.CommandType = CommandType.Text;
-								conn.Open();
 
 								foreach (var data in datas)
 								{
@@ -319,7 +317,7 @@ namespace DotnetSpider.Extension.Pipeline
 			});
 		}
 
-		private Schema GenerateSchema(Schema schema)
+		public static Schema GenerateSchema(Schema schema)
 		{
 			switch (schema.Suffix)
 			{

@@ -1,6 +1,7 @@
 ﻿#if !NET_CORE
 using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.ORM;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -13,7 +14,7 @@ namespace DotnetSpider.Extension.Pipeline
 		public string ConnectString { get; set; }
 		[JsonIgnore]
 		public IUpdateConnectString UpdateConnectString { get; set; }
-
+		protected Schema Schema { get; set; }
 		private IMongoCollection<BsonDocument> _collection;
 
 		public MongoDbEntityPipeline(string connectString)		{			ConnectString = connectString;		}
@@ -26,6 +27,7 @@ namespace DotnetSpider.Extension.Pipeline
 				return;
 			}
 
+			Schema = BaseEntityDbPipeline.GenerateSchema(metadata.Schema);
 			MongoClient client = new MongoClient(ConnectString);
 			var db = client.GetDatabase(metadata.Schema.Database);
 
@@ -50,6 +52,11 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				UpdateConnectString = UpdateConnectString
 			};
+		}
+
+		public Schema GetSchema()
+		{
+			return Schema;
 		}
 	}
 }

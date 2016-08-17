@@ -384,14 +384,14 @@ namespace DotnetSpider.Extension
 				NetworkCenter.Current.Executor = RedialExecutor;
 			}
 
-			if (!string.IsNullOrEmpty(ConfigurationManager.Get("redisHost")) && string.IsNullOrWhiteSpace(ConfigurationManager.Get("redisHost")))
+			if (!string.IsNullOrEmpty(Configuration.GetValue("redisHost")) && string.IsNullOrWhiteSpace(Configuration.GetValue("redisHost")))
 			{
-				var host = ConfigurationManager.Get("redisHost");
+				var host = Configuration.GetValue("redisHost");
 
 				var confiruation = new ConfigurationOptions()
 				{
 					ServiceName = "DotnetSpider",
-					Password = ConfigurationManager.Get("redisPassword"),
+					Password = Configuration.GetValue("redisPassword"),
 					ConnectTimeout = 65530,
 					KeepAlive = 8,
 					ConnectRetry = 20,

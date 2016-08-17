@@ -2,12 +2,14 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using System.Text;
 using System.Threading;
 using MySql.Data.MySqlClient;
 using NLog;
 using NLog.Config;
+#if NET_CORE
+using System.Text;
+using Microsoft.Extensions.Configuration;
+#endif
 
 namespace DatabasePasswordChanger
 {
@@ -17,8 +19,12 @@ namespace DatabasePasswordChanger
 
 		public static void Main(string[] args)
 		{
+#if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			string nlogConfigPath = Path.Combine(AppContext.BaseDirectory, "nlog.config");
+			var nlogConfigPath = Path.Combine(AppContext.BaseDirectory, "nlog.config");
+#else
+			var nlogConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "nlog.config");
+#endif
 			LogManager.Configuration = new XmlLoggingConfiguration(nlogConfigPath);
 			_logger = LogManager.GetCurrentClassLogger();
 
@@ -26,10 +32,8 @@ namespace DatabasePasswordChanger
 
 			try
 			{
-				IConfigurationBuilder builder = new ConfigurationBuilder();
-				var config = builder.AddIniFile("config.ini").Build();
-				string connectString = config.GetValue<string>("mysql");
-				string targetConnectString = config.GetValue<string>("targetMysql");
+				string connectString = Configuration.GetValue("mysql");
+				string targetConnectString = Configuration.GetValue("targetMysql");
 				using (MySqlConnection conn = new MySqlConnection(targetConnectString))
 				{
 					_logger.Info("STEP 2: Add new mysql account.");
@@ -70,18 +74,18 @@ namespace DatabasePasswordChanger
 
 						if (testNewConnectString)
 						{
-							conn1.Execute(config.GetValue<string>("createDatabase"));
-							conn1.Execute(config.GetValue<string>("creatTable"));
-							var enumerator = conn1.Query(config.GetValue<string>("checkSql")).GetEnumerator();
+							conn1.Execute(Configuration.GetValue("createDatabase"));
+							conn1.Execute(Configuration.GetValue("creatTable"));
+							var enumerator = conn1.Query(Configuration.GetValue("checkSql")).GetEnumerator();
 							enumerator.MoveNext();
 							if (enumerator.Current.Count > 0)
 							{
-								conn1.Execute(string.Format(config.GetValue<string>("updateSql").Replace("\\\"", "\""), newConnectString));
+								conn1.Execute(string.Format(Configuration.GetValue("updateSql").Replace("\\\"", "\""), newConnectString));
 								_logger.Info("STEP 5: Update settings sucess.");
 							}
 							else
 							{
-								conn1.Execute(string.Format(config.GetValue<string>("insertSql").Replace("\\\"", "\""), newConnectString));
+								conn1.Execute(string.Format(Configuration.GetValue("insertSql").Replace("\\\"", "\""), newConnectString));
 								_logger.Info("STEP 5: Add settings sucess.");
 							}
 						}

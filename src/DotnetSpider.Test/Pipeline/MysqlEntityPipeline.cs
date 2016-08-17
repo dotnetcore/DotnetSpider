@@ -94,7 +94,7 @@ namespace DotnetSpider.Test.Pipeline
 			{
 				conn.Execute(Settings.MySqlDatabase);
 				conn.Execute(Settings.MySqlSettingTable);
-				conn.Execute("update `dotnetspider`.`settings` set `value`=\"Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306\" where `type`='ConnectString' and `key`='MySql01';");
+				conn.Execute("INSERT `dotnetspider`.`settings` (`value`,`type`,`key`) VALUES (\"Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306\",'ConnectString','MySql01')");
 				ISpider spider = new DefaultSpider("test", new Core.Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline

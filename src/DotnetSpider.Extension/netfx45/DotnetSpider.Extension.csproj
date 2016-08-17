@@ -366,11 +366,13 @@
     <Compile Include="..\Scheduler\RedisScheduler.cs">
       <Link>Scheduler\RedisScheduler.cs</Link>
     </Compile>
+    <Compile Include="..\Settings.cs">
+      <Link>Settings.cs</Link>
+    </Compile>
     <Compile Include="..\SpiderBuilder.cs">
       <Link>SpiderBuilder.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
