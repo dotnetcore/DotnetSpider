@@ -96,58 +96,6 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class IncreasePageNumberWithStopNumberTargetUrlHandler : AbstractIncreasePageNumberTargetUrlsCreator
-	{
-		public int StopNumber { get; set; }
-
-		public BaseSelector CurrentNumSelector { get; set; }
-		public List<Formatter.Formatter> CurrentNumFormatters { get; set; }
-
-		public override bool CanStop(Page page)
-		{
-			int currentNum = -1000;
-			if (CurrentNumSelector != null)
-			{
-				var currentStr = page.Selectable.SelectList(SelectorUtil.Parse(CurrentNumSelector)).GetValues();
-				if (currentStr == null)
-				{
-					return true;
-				}
-				foreach (var c in currentStr)
-				{
-					var Str = c;
-					if (CurrentNumFormatters != null)
-					{
-						foreach (var formatter in CurrentNumFormatters)
-						{
-							Str = formatter.Formate(Str);
-						}
-					}
-					if (!string.IsNullOrEmpty(Str))
-					{
-						currentNum = int.Parse(Str);
-					}
-					if (currentNum == StopNumber)
-					{
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-
-		public override IList<Request> Handle(Page page)
-		{
-			string current;
-			string next;
-			string newUrl = IncreasePageNum(page.Url, out current, out next);
-
-			var canStop = CanStop(page);
-
-			return canStop ? new List<Request>() : new List<Request> { new Request(newUrl, page.Request.Depth, page.Request.Extras) };
-		}
-	}
-
 	public class IncreasePostPageNumberTargetUrlsCreator : IncreasePageNumberTargetUrlsCreator
 	{
 		public override IList<Request> Handle(Page page)
