@@ -32,14 +32,14 @@ namespace DotnetSpider.Extension.Common
 					}
 				case SelectorType.Regex:
 					{
-						if (string.IsNullOrEmpty(selector.Argument?.ToString()))
+						if (string.IsNullOrEmpty(selector.Argument))
 						{
 							return Selectors.Regex(expression);
 						}
 						else
 						{
 							int group;
-							if (int.TryParse(selector.Argument.ToString(), out group))
+							if (int.TryParse(selector.Argument, out group))
 							{
 								return Selectors.Regex(expression, group);
 							}

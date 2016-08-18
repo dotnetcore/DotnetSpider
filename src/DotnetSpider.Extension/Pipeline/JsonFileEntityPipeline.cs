@@ -15,13 +15,13 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string _entityName;
 
-		public override object Clone()
-		{
-			return new JsonFileEntityPipeline();
-		}
-
 		public override void InitiEntity(EntityMetadata metadata)
 		{
+			if (metadata.Schema == null)
+			{
+				IsEnabled = false;
+				return;
+			}
 			_entityName = metadata.Entity.Name;
 		}
 
@@ -47,6 +47,11 @@ namespace DotnetSpider.Extension.Pipeline
 					Writer.WriteLine(entry);
 				}
 			}
+		}
+
+		public override BaseEntityPipeline Clone()
+		{
+			return  new JsonFileEntityPipeline();
 		}
 
 		public override void Dispose()

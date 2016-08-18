@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.Model;
+using Newtonsoft.Json;
+using NLog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -15,9 +18,9 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		public string ConnectString { get; set; }
 		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
-
+		[JsonIgnore]
+		public IUpdateConnectString UpdateConnectString { get; set; }
 		protected abstract DbConnection CreateConnection();
-
 		protected abstract string GetInsertSql();
 		protected abstract string GetUpdateSql();
 		protected abstract string GetCreateTableSql();
@@ -44,17 +47,27 @@ namespace DotnetSpider.Extension.Pipeline
 			ConnectString = connectString;
 		}
 
-		public override void InitiEntity(EntityMetadata entityDefine)
+		public Schema GetSchema()
 		{
-			Schema = GenerateSchema(entityDefine.Schema);
-			foreach (var f in entityDefine.Entity.Fields)
+			return Schema;
+		}
+
+		public override void InitiEntity(EntityMetadata metadata)
+		{
+			if (metadata.Schema == null)
+			{
+				IsEnabled = false;
+				return;
+			}
+			Schema = GenerateSchema(metadata.Schema);
+			foreach (var f in metadata.Entity.Fields)
 			{
 				if (!string.IsNullOrEmpty(((Field)f).DataType))
 				{
 					Columns.Add((Field)f);
 				}
 			}
-			var primary = entityDefine.Primary;
+			var primary = metadata.Primary;
 			if (primary != null)
 			{
 				foreach (var p in primary)
@@ -78,9 +91,9 @@ namespace DotnetSpider.Extension.Pipeline
 					throw new SpiderException("Set Primary in the Indexex attribute.");
 				}
 
-				if (entityDefine.Updates != null && entityDefine.Updates.Length > 0)
+				if (metadata.Updates != null && metadata.Updates.Length > 0)
 				{
-					foreach (var column in entityDefine.Updates)
+					foreach (var column in metadata.Updates)
 					{
 						var col = Columns.FirstOrDefault(c => c.Name == column);
 						if (col == null)
@@ -112,11 +125,11 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 
-			AutoIncrement = entityDefine.AutoIncrement;
+			AutoIncrement = metadata.AutoIncrement;
 
-			if (entityDefine.Indexes != null)
+			if (metadata.Indexes != null)
 			{
-				foreach (var index in entityDefine.Indexes)
+				foreach (var index in metadata.Indexes)
 				{
 					List<string> tmpIndex = new List<string>();
 					foreach (var i in index)
@@ -137,9 +150,9 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				}
 			}
-			if (entityDefine.Uniques != null)
+			if (metadata.Uniques != null)
 			{
-				foreach (var unique in entityDefine.Uniques)
+				foreach (var unique in metadata.Uniques)
 				{
 					List<string> tmpUnique = new List<string>();
 					foreach (var i in unique)
@@ -162,42 +175,53 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private Schema GenerateSchema(Schema schema)
-		{
-			switch (schema.Suffix)
-			{
-				case TableSuffix.FirstDayOfThisMonth:
-					{
-						schema.TableName += "_" + DateTimeUtils.FirstDayofThisMonth.ToString("yyyy_MM_dd");
-						break;
-					}
-				case TableSuffix.Monday:
-					{
-						schema.TableName += "_" + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy_MM_dd");
-						break;
-					}
-				case TableSuffix.Today:
-					{
-						schema.TableName += "_" + DateTime.Now.ToString("yyyy_MM_dd");
-						break;
-					}
-			}
-			return schema;
-		}
-
 		public override void InitPipeline(ISpider spider)
 		{
+			if (!IsEnabled)
+			{
+				return;
+			}
+
+			if (string.IsNullOrEmpty(ConnectString))
+			{
+				if (UpdateConnectString == null)
+				{
+					throw new SpiderException("Can't find ConnectString or IUpdateConnectString.");
+				}
+				else
+				{
+					for (int i = 0; i < 5; ++i)
+					{
+						try
+						{
+							ConnectString = UpdateConnectString.GetNew();
+							break;
+						}
+						catch (Exception e)
+						{
+							Logger.SaveLog(LogInfo.Create("Update ConnectString failed.", Logger.Name, spider, LogLevel.Error, e));
+							Thread.Sleep(1000);
+						}
+					}
+
+					if (string.IsNullOrEmpty(ConnectString))
+					{
+						throw new SpiderException("Can't updadate ConnectString via IUpdateConnectString.");
+					}
+				}
+			}
+
 			base.InitPipeline(spider);
 
 			if (Mode == PipelineMode.Update)
 			{
 				return;
 			}
+
 			NetworkCenter.Current.Execute("db-init", () =>
 			{
 				using (DbConnection conn = CreateConnection())
 				{
-					conn.Open();
 					var command = conn.CreateCommand();
 					command.CommandText = GetCreateSchemaSql();
 					command.CommandType = CommandType.Text;
@@ -213,6 +237,10 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void Process(List<JObject> datas)
 		{
+			if (!IsEnabled)
+			{
+				return;
+			}
 			NetworkCenter.Current.Execute("pp-", () =>
 			{
 				switch (Mode)
@@ -224,7 +252,6 @@ namespace DotnetSpider.Extension.Pipeline
 								var cmd = conn.CreateCommand();
 								cmd.CommandText = GetInsertSql();
 								cmd.CommandType = CommandType.Text;
-								conn.Open();
 
 								foreach (var data in datas)
 								{
@@ -243,7 +270,6 @@ namespace DotnetSpider.Extension.Pipeline
 									cmd.Parameters.AddRange(parameters.ToArray());
 									cmd.ExecuteNonQuery();
 								}
-
 								conn.Close();
 							}
 							break;
@@ -255,7 +281,6 @@ namespace DotnetSpider.Extension.Pipeline
 								var cmd = conn.CreateCommand();
 								cmd.CommandText = GetUpdateSql();
 								cmd.CommandType = CommandType.Text;
-								conn.Open();
 
 								foreach (var data in datas)
 								{
@@ -289,8 +314,30 @@ namespace DotnetSpider.Extension.Pipeline
 							break;
 						}
 				}
-
 			});
+		}
+
+		public static Schema GenerateSchema(Schema schema)
+		{
+			switch (schema.Suffix)
+			{
+				case TableSuffix.FirstDayOfThisMonth:
+					{
+						schema.TableName += "_" + DateTimeUtils.FirstDayofThisMonth.ToString("yyyy_MM_dd");
+						break;
+					}
+				case TableSuffix.Monday:
+					{
+						schema.TableName += "_" + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy_MM_dd");
+						break;
+					}
+				case TableSuffix.Today:
+					{
+						schema.TableName += "_" + DateTime.Now.ToString("yyyy_MM_dd");
+						break;
+					}
+			}
+			return schema;
 		}
 
 		private DbType Convert(string datatype)

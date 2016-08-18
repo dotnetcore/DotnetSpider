@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using System.Reflection;
+using Dapper;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
@@ -8,6 +9,7 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
+using MySql.Data.MySqlClient;
 using Xunit;
 
 namespace DotnetSpider.Test
@@ -16,7 +18,6 @@ namespace DotnetSpider.Test
 	{
 		private class TestPipeline : BaseEntityDbPipeline
 		{
-
 			protected override DbConnection CreateConnection()
 			{
 				throw new System.NotImplementedException();
@@ -52,9 +53,9 @@ namespace DotnetSpider.Test
 				throw new System.NotImplementedException();
 			}
 
-			public override object Clone()
+			public override BaseEntityPipeline Clone()
 			{
-				throw new System.NotImplementedException();
+				return new TestPipeline();
 			}
 		}
 
@@ -130,23 +131,40 @@ namespace DotnetSpider.Test
 		{
 			public int Id { get; set; }
 			[ReplaceFormatter(NewValue = "a", OldValue = "b")]
+			[RegexMatchFormatter(Pattern = "a(*)")]
 			public string Name { get; set; }
+		}
+
+		[Schema("db", "table")]
+		public class Entity12 : ISpiderEntity
+		{
+			[PropertySelector(Expression = "Id")]
+			public int Id { get; set; }
+
+			[PropertySelector(Expression = "Name")]
+			public string Name { get; set; }
+		}
+
+		public class Entity13 : ISpiderEntity
+		{
+			[PropertySelector(Expression = "Url")]
+			public string Url { get; set; }
 		}
 
 		[Fact]
 		public void EntitySelector()
 		{
-			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity7).GetTypeInfo());
+			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity7).GetTypeInfo());
 			Assert.Equal("expression", entity1.Entity.Selector.Expression);
 			Assert.Equal(SelectorType.XPath, entity1.Entity.Selector.Type);
 			Assert.True(entity1.Entity.Multi);
 
-			var entity2 = EntitySpider.PaserEntityMetaData(typeof(Entity8).GetTypeInfo());
+			var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity8).GetTypeInfo());
 			Assert.Equal("expression2", entity2.Entity.Selector.Expression);
 			Assert.Equal(SelectorType.Css, entity2.Entity.Selector.Type);
 			Assert.True(entity2.Entity.Multi);
 
-			var entity3 = EntitySpider.PaserEntityMetaData(typeof(Entity9).GetTypeInfo());
+			var entity3 = EntitySpider.ParseEntityMetaData(typeof(Entity9).GetTypeInfo());
 			Assert.False(entity3.Entity.Multi);
 			Assert.Null(entity3.Entity.Selector);
 			Assert.Equal("DotnetSpider.Test.SpiderEntity+Entity9", entity3.Entity.Name);
@@ -155,7 +173,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void Indexes()
 		{
-			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity10).GetTypeInfo());
+			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity10).GetTypeInfo());
 			Assert.Equal("Id", entity1.Indexes[0][0]);
 			Assert.Equal("name", entity1.Primary[0]);
 			Assert.Equal(2, entity1.Uniques.Count);
@@ -167,9 +185,9 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void Formater()
 		{
-			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity11).GetTypeInfo());
+			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity11).GetTypeInfo());
 			var formatters = ((Field)entity1.Entity.Fields[1]).Formatters;
-			Assert.Equal(1, formatters.Count);
+			Assert.Equal(2, formatters.Count);
 			var replaceFormatter = (ReplaceFormatter)formatters[0];
 			Assert.Equal("a", replaceFormatter.NewValue);
 			Assert.Equal("b", replaceFormatter.OldValue);
@@ -178,19 +196,22 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void Schema()
 		{
-			var entityMetadata = EntitySpider.PaserEntityMetaData(typeof(Entity4).GetTypeInfo());
+			var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Entity4).GetTypeInfo());
 			Assert.Equal("db", entityMetadata.Schema.Database);
 			Assert.Equal("table", entityMetadata.Schema.TableName);
 			Assert.Equal(TableSuffix.Monday, entityMetadata.Schema.Suffix);
+
+			var entityMetadata1 = EntitySpider.ParseEntityMetaData(typeof(Entity13).GetTypeInfo());
+			Assert.Null(entityMetadata1.Schema);
 		}
 
 		[Fact]
 		public void SetPrimary()
 		{
-			var entity1 = EntitySpider.PaserEntityMetaData(typeof(Entity5).GetTypeInfo());
+			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity5).GetTypeInfo());
 			Assert.Equal(1, entity1.Entity.Fields.Count);
 			Assert.Equal("Name", entity1.Entity.Fields[0].Name);
-			var entity2 = EntitySpider.PaserEntityMetaData(typeof(Entity6).GetTypeInfo());
+			var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity6).GetTypeInfo());
 			Assert.Equal(1, entity2.Entity.Fields.Count);
 			Assert.Equal("name", entity2.Entity.Fields[0].Name);
 		}
@@ -200,7 +221,7 @@ namespace DotnetSpider.Test
 		{
 			var exception = Assert.Throws<SpiderException>(() =>
 			{
-				var entityMetadata = EntitySpider.PaserEntityMetaData(typeof(Entity1).GetTypeInfo());
+				var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Entity1).GetTypeInfo());
 				TestPipeline pipeline = new TestPipeline();
 				pipeline.InitiEntity(entityMetadata);
 			});
@@ -212,7 +233,7 @@ namespace DotnetSpider.Test
 		{
 			var exception = Assert.Throws<SpiderException>(() =>
 			{
-				var entityMetadata = EntitySpider.PaserEntityMetaData(typeof(Entity2).GetTypeInfo());
+				var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Entity2).GetTypeInfo());
 				TestPipeline pipeline = new TestPipeline();
 				pipeline.InitiEntity(entityMetadata);
 			});
@@ -224,11 +245,68 @@ namespace DotnetSpider.Test
 		{
 			var exception = Assert.Throws<SpiderException>(() =>
 			{
-				var entityMetadata = EntitySpider.PaserEntityMetaData(typeof(Entity3).GetTypeInfo());
+				var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Entity3).GetTypeInfo());
 				TestPipeline pipeline = new TestPipeline();
 				pipeline.InitiEntity(entityMetadata);
 			});
 			Assert.Equal("Columns set as unique is not a property of your entity.", exception.Message);
 		}
+
+		[Fact]
+		public void MultiEntitiesInitPipelines()
+		{
+			EntitySpider context = new EntitySpider(new Core.Site());
+			context.SetThreadNum(1);
+			context.SetIdentity("test-MultiEntitiesInitPipelines");
+			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			context.AddEntityPipeline(new MySqlFileEntityPipeline());
+			context.AddEntityPipeline(new ConsoleEntityPipeline());
+			context.AddEntityPipeline(new JsonFileEntityPipeline());
+#if !NET_CORE
+			//context.AddEntityPipeline(new MongoDbEntityPipeline("mongo"));
+#endif
+			context.AddStartUrl("http://a.com");
+			context.AddEntityType(typeof(Entity13));
+			context.AddEntityType(typeof(Entity12));
+			context.Run("running-test");
+
+			var entityPipelines = context.EntityPipelines;
+#if NET_CORE
+			Assert.Equal(4, entityPipelines.Count);
+#else
+			Assert.Equal(4, entityPipelines.Count);
+			//Assert.Equal(5, entityPipelines.Count);
+#endif
+			var pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
+			Assert.Equal("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", pipeline1.ConnectString);
+
+			Assert.Equal("MySqlFileEntityPipeline", entityPipelines[1].GetType().Name);
+			Assert.Equal("ConsoleEntityPipeline", entityPipelines[2].GetType().Name);
+			Assert.Equal("JsonFileEntityPipeline", entityPipelines[3].GetType().Name);
+#if !NET_CORE
+			//Assert.Equal("MongoDbEntityPipeline", entityPipelines[4].GetType().Name);
+			//var pipeline2 = (MySqlEntityPipeline)entityPipelines[4];
+			//Assert.Equal("mongo", pipeline2.ConnectString);
+#endif
+			var pipelines = context.GetPipelines();
+			Assert.Equal(1, pipelines.Count);
+			EntityPipeline pipeline = (EntityPipeline)pipelines[0];
+			entityPipelines = pipeline.GetEntityPipelines();
+			Assert.Equal(4, entityPipelines.Count);
+			pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
+			Assert.Equal("db", pipeline1.GetSchema().Database);
+			Assert.Equal("table", pipeline1.GetSchema().TableName);
+#if !NET_CORE
+			//var pipeline2 = (MongoDbEntityPipeline)entityPipelines[4];
+			//Assert.Equal("db", pipeline2.GetSchema().Database);
+			//Assert.Equal("table", pipeline2.GetSchema().TableName);
+#endif
+
+			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"))
+			{
+				conn.Execute($"DROP table db.table");
+			}
+		}
+
 	}
 }

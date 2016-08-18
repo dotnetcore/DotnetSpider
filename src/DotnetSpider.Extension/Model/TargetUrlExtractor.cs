@@ -10,7 +10,7 @@ namespace DotnetSpider.Extension.Model
 	{
 		private Selector _regionSelector;
 		private List<string> _patterns;
-
+		public bool KeepOrigin { get; set; }
 		public List<string> Patterns
 		{
 			get { return _patterns; }
@@ -21,7 +21,7 @@ namespace DotnetSpider.Extension.Model
 					if (!Equals(value, _patterns))
 					{
 						_patterns = value;
-						Regexes = value.Select(s => new Regex(s)).ToList();
+						Regexes = value.Select(s => new Regex(s, RegexOptions.IgnoreCase)).ToList();
 					}
 				}
 				else

@@ -16,10 +16,10 @@ namespace DotnetSpider.Core.Monitor
 			theEvent.Properties["TaskGroup"] = status.TaskGroup;
 			theEvent.Properties["Identity"] = status.Identity;
 			theEvent.Properties["Status"] = status.Status;
-			_logger.Log(theEvent);
-
-			//string msg = $"[{status.UserId}][{status.TaskGroup}][{status.Identity}]{Environment.NewLine} Left {status.Left} Success {status.Success} Error {status.Error} Total {status.Total} Thread {status.ThreadNum}";
-			//_Logger.Log(msg);
+			NetworkCenter.Current.Execute("nm", () =>
+			{
+				_logger.Log(theEvent);
+			});
 		}
 
 		public void Dispose()

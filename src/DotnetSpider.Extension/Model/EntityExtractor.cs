@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+#if !NET_CORE
+using System.Web;
+#else
+using System.Net;
+#endif
+using System.Text.RegularExpressions;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Attribute;
@@ -12,19 +18,37 @@ namespace DotnetSpider.Extension.Model
 {
 	public class EntityExtractor : IEntityExtractor
 	{
-		private readonly EntityMetadata _entityDefine;
+		public EntityMetadata EntityMetadata { get; }
+		public DataHandler DataHandler { get; set; }
 		private readonly List<GlobalValueSelector> _globalValues;
 
 		public EntityExtractor(string entityName, List<GlobalValueSelector> globalValues, EntityMetadata entityDefine)
 		{
-			_entityDefine = entityDefine;
-
+			EntityMetadata = entityDefine;
 			EntityName = entityName;
+			DataHandler = entityDefine.DataHandler;
 			_globalValues = globalValues;
 		}
 
 		public List<JObject> Process(Page page)
 		{
+			List<JObject> result = new List<JObject>();
+			bool isTarget = true;
+			foreach (var targetUrlExtractor in EntityMetadata.TargetUrlExtractors)
+			{
+				foreach (var regex in targetUrlExtractor.Regexes)
+				{
+					isTarget = regex.IsMatch(page.Url);
+					if (isTarget)
+					{
+						break;
+					}
+				}
+			}
+			if (!isTarget)
+			{
+				return null;
+			}
 			if (_globalValues != null && _globalValues.Count > 0)
 			{
 				foreach (var enviromentValue in _globalValues)
@@ -34,51 +58,131 @@ namespace DotnetSpider.Extension.Model
 					page.Request.PutExtra(name, value);
 				}
 			}
-			ISelector selector = SelectorUtil.Parse(_entityDefine.Entity.Selector);
-			if (selector != null && _entityDefine.Entity.Multi)
+			ISelector selector = SelectorUtil.Parse(EntityMetadata.Entity.Selector);
+			if (selector != null && EntityMetadata.Entity.Multi)
 			{
 				var list = page.Selectable.SelectList(selector).Nodes();
 				if (list == null || list.Count == 0)
 				{
-					return null;
-				}
-				var countToken = _entityDefine.Limit;
-				if (countToken != null)
-				{
-					list = list.Take(countToken.Value).ToList();
-				}
-
-				List<JObject> result = new List<JObject>();
-				int index = 0;
-				foreach (var item in list)
-				{
-					JObject obj = ProcessSingle(page, item, _entityDefine, index);
-					if (obj != null)
-					{
-						result.Add(obj);
-					}
-					index++;
-				}
-				return result;
-			}
-			else
-			{
-				ISelectable select;
-				if (selector == null)
-				{
-					select = page.Selectable;
+					result = null;
 				}
 				else
 				{
-					select = page.Selectable.Select(selector);
-					if (select == null)
+					var countToken = EntityMetadata.Limit;
+					if (countToken != null)
 					{
-						return null;
+						list = list.Take(countToken.Value).ToList();
+					}
+
+					int index = 0;
+					foreach (var item in list)
+					{
+						JObject obj = ProcessSingle(page, item, index);
+						if (obj != null)
+						{
+							result.Add(obj);
+						}
+						index++;
 					}
 				}
+			}
+			else
+			{
+				ISelectable select = selector == null ? page.Selectable : page.Selectable.Select(selector);
 
-				var result = ProcessSingle(page, select, _entityDefine, 0);
-				return result == null ? null : new List<JObject> { result };
+				if (select != null)
+				{
+					var singleResult = ProcessSingle(page, select, 0);
+					result = new List<JObject> { singleResult };
+				}
+				else
+				{
+					result = null;
+				}
+			}
+
+			if (EntityMetadata.TargetUrlsCreators != null && EntityMetadata.TargetUrlExtractors.Count > 0)
+			{
+				foreach (var targetUrlsCreator in EntityMetadata.TargetUrlsCreators)
+				{
+					page.AddTargetRequests(targetUrlsCreator.Handle(page));
+				}
+			}
+			else
+			{
+				ExtractLinks(page, EntityMetadata.TargetUrlExtractors);
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// 如果找不到则不返回URL, 不然返回的URL太多
+		/// </summary>
+		/// <param name="page"></param>
+		/// <param name="targetUrlExtractInfos"></param>
+		private void ExtractLinks(Page page, List<TargetUrlExtractor> targetUrlExtractInfos)
+		{
+			if (targetUrlExtractInfos == null)
+			{
+				return;
+			}
+
+			foreach (var targetUrlExtractInfo in targetUrlExtractInfos)
+			{
+				var urlRegionSelector = targetUrlExtractInfo.RegionSelector;
+				var formatters = targetUrlExtractInfo.Formatters;
+				var urlPatterns = targetUrlExtractInfo.Regexes;
+
+				var links = urlRegionSelector == null ? page.Selectable.Links().GetValues() : (page.Selectable.SelectList(urlRegionSelector)).Links().GetValues();
+				if (links == null)
+				{
+					return;
+				}
+
+				// check: 仔细考虑是放在前面, 还是在后面做 formatter, 我倾向于在前面. 对targetUrl做formatter则表示Start Url也应该是要符合这个规则的。
+				if (formatters != null && formatters.Count > 0)
+				{
+					List<string> tmp = new List<string>();
+					foreach (string link in links)
+					{
+						var url = new String(link.ToCharArray());
+						foreach (Formatter.Formatter f in formatters)
+						{
+							url = f.Formate(url);
+						}
+						tmp.Add(url);
+					}
+					links = tmp;
+				}
+
+				List<string> tmpLinks = new List<string>();
+				foreach (var link in links)
+				{
+#if !NET_CORE
+					tmpLinks.Add(HttpUtility.HtmlDecode(HttpUtility.UrlDecode(link)));
+#else
+					tmpLinks.Add(WebUtility.HtmlDecode(WebUtility.UrlDecode(link)));
+#endif
+				}
+				links = tmpLinks;
+
+				if (urlPatterns == null || urlPatterns.Count == 0)
+				{
+					page.AddTargetRequests(links);
+					return;
+				}
+
+				foreach (Regex targetUrlPattern in urlPatterns)
+				{
+					foreach (string link in links)
+					{
+						if (targetUrlPattern.IsMatch(link))
+						{
+							page.AddTargetRequest(new Request(link, page.Request.NextDepth, page.Request.Extras));
+						}
+					}
+				}
 			}
 		}
 
@@ -124,11 +228,11 @@ namespace DotnetSpider.Extension.Model
 			}
 		}
 
-		private JObject ProcessSingle(Page page, ISelectable item, EntityMetadata entityDefine, int index)
+		private JObject ProcessSingle(Page page, ISelectable item, int index)
 		{
 			JObject dataObject = new JObject();
 
-			foreach (var field in entityDefine.Entity.Fields)
+			foreach (var field in EntityMetadata.Entity.Fields)
 			{
 				var fieldValue = ExtractField(item, page, field, index);
 				if (fieldValue != null)
@@ -137,7 +241,26 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 
-			return dataObject.Children().Any() ? dataObject : null;
+			var result = dataObject.Children().Any() ? dataObject : null;
+			if (result != null)
+			{
+				foreach (var targetUrl in EntityMetadata.Entity.TargetUrls)
+				{
+					Dictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
+					foreach (var extra in targetUrl.Extras)
+					{
+						extras.Add(extra, result.GetValue(extra));
+					}
+					Dictionary<string, dynamic> allExtras = new Dictionary<string, dynamic>();
+					foreach (var extra in page.Request.Extras.Union(extras))
+					{
+						allExtras.Add(extra.Key, extra.Value);
+					}
+					page.AddTargetRequest(new Request(result.GetValue(targetUrl.PropertyName).ToString(), page.Request.NextDepth, allExtras));
+				}
+
+			}
+			return result;
 		}
 
 		private dynamic ExtractField(ISelectable item, Page page, DataToken field, int index)
@@ -243,24 +366,6 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 		}
-
-		//public static List<Formatter.Formatter> GenerateFormatter(IEnumerable<JToken> selectTokens)
-		//{
-		//	if (selectTokens == null)
-		//	{
-		//		return new List<Formatter.Formatter>();
-		//	}
-		//	var results = new List<Formatter.Formatter>();
-		//	foreach (var selectToken in selectTokens)
-		//	{
-		//		Type type = FormatterFactory.GetFormatterType(selectToken.SelectToken("$.Name")?.ToString());
-		//		if (type != null)
-		//		{
-		//			results.Add(selectToken.ToObject(type) as Formatter.Formatter);
-		//		}
-		//	}
-		//	return results;
-		//}
 
 		public string EntityName { get; }
 	}

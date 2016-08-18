@@ -30,7 +30,9 @@
     "System.Xml.XDocument": "*",
     "System.Net.NameResolution": "*",
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
-    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0"
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
+    "Microsoft.Extensions.Configuration.Ini": "1.0.0",
+    "Microsoft.Extensions.Configuration.Binder": "1.0.0"
   },
 	"frameworks": {
 		"netcoreapp1.0": {

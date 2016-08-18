@@ -1,6 +1,8 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
 using MySql.Data.MySqlClient;
@@ -9,11 +11,6 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class MySqlEntityPipeline : BaseEntityDbPipeline
 	{
-		public override object Clone()
-		{
-			return new MySqlEntityPipeline(ConnectString);
-		}
-
 		public MySqlEntityPipeline()
 		{
 		}
@@ -24,7 +21,34 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override DbConnection CreateConnection()
 		{
-			return new MySqlConnection(ConnectString);
+			for (int i = 0; i < 5; ++i)
+			{
+				try
+				{
+					if (string.IsNullOrEmpty(ConnectString))
+					{
+						ConnectString = UpdateConnectString.GetNew();
+					}
+					var conn = new MySqlConnection(ConnectString);
+					conn.Open();
+					return conn;
+				}
+				catch (Exception e)
+				{
+					// mysql authentication error
+					if (e.Message.ToLower().StartsWith("authentication to host"))
+					{
+						Thread.Sleep(1000);
+						ConnectString = UpdateConnectString.GetNew();
+					}
+					else
+					{
+						throw;
+					}
+				}
+			}
+
+			throw new SpiderException("Can't get any connect string.");
 		}
 
 		protected override string GetInsertSql()
@@ -61,7 +85,7 @@ namespace DotnetSpider.Extension.Pipeline
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS  `{Schema.Database }`.`{Schema.TableName}`  (");
 			string columNames = string.Join(", ", Columns.Select(p => $"`{p.Name}` {ConvertToDbType(p.DataType)} "));
 			builder.Append(columNames.Substring(0, columNames.Length));
-			builder.Append(Primary == null || Primary.Count == 0 ? ",`__id` bigint AUTO_INCREMENT" : "");
+			builder.Append(Primary == null || Primary.Count == 0 ? ((string.IsNullOrEmpty(columNames) ? "" : ",") + "`__id` bigint AUTO_INCREMENT") : "");
 			foreach (var index in Indexs)
 			{
 				string name = string.Join("_", index.Select(c => c));
@@ -125,6 +149,14 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 
 			throw new SpiderException("UNSPORT datatype: " + dataType);
+		}
+
+		public override BaseEntityPipeline Clone()
+		{
+			return new MySqlEntityPipeline(ConnectString)
+			{
+				UpdateConnectString = UpdateConnectString
+			};
 		}
 	}
 }

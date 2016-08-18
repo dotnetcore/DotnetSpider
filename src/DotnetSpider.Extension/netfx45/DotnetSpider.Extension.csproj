@@ -177,11 +177,14 @@
     <Compile Include="..\Downloader\FileDownloader.cs">
       <Link>Downloader\FileDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\Login.cs">
-      <Link>Downloader\Login.cs</Link>
+    <Compile Include="..\Downloader\SignIner.cs">
+      <Link>Downloader\SignIner.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\WebDriver\Browser.cs">
       <Link>Downloader\WebDriver\Browser.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\WebDriver\IWebDriverHandler.cs">
+      <Link>Downloader\WebDriver\IWebDriverHandler.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\WebDriver\Option.cs">
       <Link>Downloader\WebDriver\Option.cs</Link>
@@ -198,9 +201,6 @@
     <Compile Include="..\Model\Attribute\BaseSelector.cs">
       <Link>Model\Attribute\BaseSelector.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\Download.cs">
-      <Link>Model\Attribute\Download.cs</Link>
-    </Compile>
     <Compile Include="..\Model\Attribute\EntitySelector.cs">
       <Link>Model\Attribute\EntitySelector.cs</Link>
     </Compile>
@@ -213,8 +213,14 @@
     <Compile Include="..\Model\Attribute\PropertySelector.cs">
       <Link>Model\Attribute\PropertySelector.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Attribute\TargetUrl.cs">
+      <Link>Model\Attribute\TargetUrl.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Attribute\UpdateColumns.cs">
       <Link>Model\Attribute\UpdateColumns.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\DataHandler.cs">
+      <Link>Model\DataHandler.cs</Link>
     </Compile>
     <Compile Include="..\Model\EntityExtractor.cs">
       <Link>Model\EntityExtractor.cs</Link>
@@ -231,11 +237,17 @@
     <Compile Include="..\Model\Formatter\ClassifyFormater.cs">
       <Link>Model\Formatter\ClassifyFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\Download.cs">
+      <Link>Model\Formatter\Download.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\Formatter.cs">
       <Link>Model\Formatter\Formatter.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\FormatterFactory.cs">
       <Link>Model\Formatter\FormatterFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Formatter\RegexAppendFormatter.cs">
+      <Link>Model\Formatter\RegexAppendFormatter.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\RegexMatchFormater.cs">
       <Link>Model\Formatter\RegexMatchFormater.cs</Link>
@@ -248,6 +260,9 @@
     </Compile>
     <Compile Include="..\Model\Formatter\SplitFormater.cs">
       <Link>Model\Formatter\SplitFormater.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Formatter\StringFormatFormater.cs">
+      <Link>Model\Formatter\StringFormatFormater.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\SubStringFormater.cs">
       <Link>Model\Formatter\SubStringFormater.cs</Link>
@@ -309,6 +324,9 @@
     <Compile Include="..\Pipeline\ConsoleEntityPipeline.cs">
       <Link>Pipeline\ConsoleEntityPipeline.cs</Link>
     </Compile>
+    <Compile Include="..\Pipeline\DbUpdateConnectString.cs">
+      <Link>Pipeline\DbUpdateConnectString.cs</Link>
+    </Compile>
     <Compile Include="..\Pipeline\EntityPipeline.cs">
       <Link>Pipeline\EntityPipeline.cs</Link>
     </Compile>
@@ -320,6 +338,9 @@
     </Compile>
     <Compile Include="..\Pipeline\ImagePipeline.cs">
       <Link>Pipeline\ImagePipeline.cs</Link>
+    </Compile>
+    <Compile Include="..\Pipeline\IUpdateConnectString.cs">
+      <Link>Pipeline\IUpdateConnectString.cs</Link>
     </Compile>
     <Compile Include="..\Pipeline\JsonFileEntityPipeline.cs">
       <Link>Pipeline\JsonFileEntityPipeline.cs</Link>
@@ -339,14 +360,14 @@
     <Compile Include="..\Pipeline\PipelineMode.cs">
       <Link>Pipeline\PipelineMode.cs</Link>
     </Compile>
-    <Compile Include="..\Processor\DataHandler.cs">
-      <Link>Processor\DataHandler.cs</Link>
-    </Compile>
     <Compile Include="..\Processor\EntityProcessor.cs">
       <Link>Processor\EntityProcessor.cs</Link>
     </Compile>
     <Compile Include="..\Scheduler\RedisScheduler.cs">
       <Link>Scheduler\RedisScheduler.cs</Link>
+    </Compile>
+    <Compile Include="..\Settings.cs">
+      <Link>Settings.cs</Link>
     </Compile>
     <Compile Include="..\SpiderBuilder.cs">
       <Link>SpiderBuilder.cs</Link>

@@ -13,13 +13,11 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		public override void InitiEntity(EntityMetadata metadata)
 		{
+			if (metadata.Schema == null)
+			{
+				IsEnabled = false;
+			}
 		}
-
-		public override object Clone()
-		{
-			return new ConsoleEntityPipeline();
-		}
-
 
 		public override void Process(List<JObject> datas)
 		{
@@ -27,6 +25,11 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				Console.WriteLine(data.ToString());
 			}
+		}
+
+		public override BaseEntityPipeline Clone()
+		{
+			return new ConsoleEntityPipeline();
 		}
 	}
 }

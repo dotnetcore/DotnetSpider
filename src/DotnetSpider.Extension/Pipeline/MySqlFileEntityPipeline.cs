@@ -20,13 +20,13 @@ namespace DotnetSpider.Extension.Pipeline
 		protected string DataFolder;
 		protected StreamWriter Writer;
 
-		public override object Clone()
-		{
-			return new MySqlEntityPipeline();
-		}
-
 		public override void InitiEntity(EntityMetadata metadata)
 		{
+			if (metadata.Schema == null)
+			{
+				IsEnabled = false;
+				return;
+			}
 			Schema = metadata.Schema;
 			Columns = metadata.Entity.Fields;
 		}
@@ -72,6 +72,11 @@ namespace DotnetSpider.Extension.Pipeline
 		public override void Dispose()
 		{
 			Writer.Dispose();
+		}
+
+		public override BaseEntityPipeline Clone()
+		{
+			return new MySqlFileEntityPipeline();
 		}
 	}
 }

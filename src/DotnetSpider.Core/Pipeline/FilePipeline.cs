@@ -69,7 +69,7 @@ namespace DotnetSpider.Core.Pipeline
 			}
 			catch (Exception e)
 			{
-				Logger.Log(LogInfo.Create("Write file error.", Logger.Name, Spider, LogLevel.Warn, e));
+				Logger.SaveLog(LogInfo.Create("Write file error.", Logger.Name, Spider, LogLevel.Warn, e));
 				throw;
 			}
 		}

@@ -30,10 +30,35 @@ namespace DotnetSpider.Test.Scheduler
 		}
 
 		[Fact]
-		public void PushAndPoll2()
+		public void PushAndPollBreadthFirst()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			scheduler.DepthFirst = false;
+			ISpider spider = new DefaultSpider();
+			scheduler.Init(spider);
+			scheduler.Clear();
+			Request request1 = new Request("http://www.ibm.com/1", 1, null);
+			Request request2 = new Request("http://www.ibm.com/2", 1, null);
+			Request request3 = new Request("http://www.ibm.com/3", 1, null);
+			Request request4 = new Request("http://www.ibm.com/4", 1, null);
+			scheduler.Push(request1);
+			scheduler.Push(request2);
+			scheduler.Push(request3);
+			scheduler.Push(request4);
 
+			Request result = scheduler.Poll();
+			Assert.Equal("http://www.ibm.com/1", result.Url.ToString());
+			Request result1 = scheduler.Poll();
+			Assert.Equal("http://www.ibm.com/2", result1.Url.ToString());
+			scheduler.Dispose();
+			scheduler.Clear();
+		}
+
+		[Fact]
+		public void PushAndPollDepthFirst()
+		{
+			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			scheduler.DepthFirst = true;
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
 			scheduler.Clear();

@@ -112,7 +112,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.Log(LogInfo.Create("Close response fail.", Logger.Name, spider, LogLevel.Warn, e));
+					Logger.SaveLog(LogInfo.Create("Close response fail.", Logger.Name, spider, LogLevel.Warn, e));
 				}
 			}
 		}

@@ -17,14 +17,15 @@ namespace DotnetSpider.Sample
 			EntitySpider context = new EntitySpider(new Site());
 			context.SetThreadNum(1);
 			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-			context.AddTargetUrlExtractor(new TargetUrlExtractor
+			context.AddEntityPipeline(
+				new MySqlEntityPipeline("Database='test';Data Source=MYSQLSERVER;User ID=root;Password=1qazZAQ!;Port=4306"));
+			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main",
+				new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			context.AddEntityType(typeof(Product), new TargetUrlExtractor
 			{
 				Region = new BaseSelector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
 				Patterns = new List<string> { @"&page=[0-9]+&" }
 			});
-			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=MYSQLSERVER;User ID=root;Password=1qazZAQ!;Port=4306"));
-			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-			context.AddEntityType(typeof(Product));
 			return context;
 		}
 
@@ -76,6 +77,32 @@ namespace DotnetSpider.Sample
 			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
 			[StoredAs("cdate", DataType.Time)]
 			public DateTime CDate { get; set; }
+		}
+	}
+
+	public class JdSkuSampleSpider2 : EntitySpiderBuilder
+	{
+		protected override EntitySpider GetEntitySpider()
+		{
+			EntitySpider context = new EntitySpider(new Site());
+			context.SetThreadNum(1);
+			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+			context.AddEntityPipeline(new MySqlEntityPipeline
+			{
+				UpdateConnectString = new DbUpdateConnectString
+				{
+					ConnectString = "Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306",
+					Key = "MySql01"
+				}
+			});
+			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main",
+				new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			context.AddEntityType(typeof(JdSkuSampleSpider.Product), new TargetUrlExtractor
+			{
+				Region = new BaseSelector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
+				Patterns = new List<string> { @"&page=[0-9]+&" }
+			});
+			return context;
 		}
 	}
 }

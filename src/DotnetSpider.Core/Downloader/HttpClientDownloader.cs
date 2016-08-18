@@ -41,7 +41,7 @@
 //			ICollection<int> acceptStatCode = site.AcceptStatCode;
 //			var charset = site.Encoding;
 
-//			//Logger.LogFormat("Downloading page {0}", request.Url);
+//			//Logger.SaveLogFormat("Downloading page {0}", request.Url);
 
 //			int statusCode = 0;
 
@@ -146,7 +146,7 @@
 //				}
 //				catch (Exception e)
 //				{
-//					Logger.Log("Close response fail.", e);
+//					Logger.SaveLog("Close response fail.", e);
 //				}
 //				request.PutExtra(Request.StatusCode, statusCode);
 //			}
