@@ -10,15 +10,19 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		public override string Formate(string value)
 		{
-			var result = value.Split(Splitors, StringSplitOptions.RemoveEmptyEntries);
-			if (result.Length > Index)
+			var result = value?.Split(Splitors, StringSplitOptions.RemoveEmptyEntries);
+			if (result != null)
 			{
-				return result[Index];
+				if (result.Length > Index)
+				{
+					return result[Index];
+				}
+				else
+				{
+					return result[result.Length - 1];
+				}
 			}
-			else
-			{
-				return result[result.Length - 1];
-			}
+			return null;
 		}
 	}
 }
