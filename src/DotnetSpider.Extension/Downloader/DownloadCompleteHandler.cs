@@ -19,6 +19,23 @@ namespace DotnetSpider.Extension.Downloader
 	#endregion
 
 	#region Content Handler
+	public class SkipWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	{
+		public string ContainsString { get; set; }
+
+		public override void Handle(Page page)
+		{
+			string rawText = page.Content;
+			if (string.IsNullOrEmpty(rawText))
+			{
+				throw new DownloadException("Download failed or response is null.");
+			}
+			if (rawText.Contains(ContainsString))
+			{
+				page.IsSkip = true;
+			}
+		}
+	}
 
 	public class SubContentHandler : DownloadCompleteHandler
 	{
@@ -138,12 +155,14 @@ namespace DotnetSpider.Extension.Downloader
 		private string AmendRawText(string rawText, ref int start)
 		{
 			int begin = rawText.IndexOf(StartString, start, StringComparison.Ordinal) + StartOffset;
-			int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal) + EndOffset;
-			start = end;
+			if (begin >= 0)
+			{
+				int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal) + EndOffset;
+				start = end;
 
-			rawText = rawText.Insert(end, @"</div>");
-			rawText = rawText.Insert(begin, "<div class=\"" + TargetTag + "\">");
-
+				rawText = rawText.Insert(end, @"</div>");
+				rawText = rawText.Insert(begin, "<div class=\"" + TargetTag + "\">");
+			}
 			return rawText;
 		}
 	}
@@ -194,6 +213,7 @@ namespace DotnetSpider.Extension.Downloader
 	#endregion
 
 	#region Redial Handler
+	
 
 	public class RedialWhenContainsIllegalStringHandler : DownloadCompleteHandler
 	{
