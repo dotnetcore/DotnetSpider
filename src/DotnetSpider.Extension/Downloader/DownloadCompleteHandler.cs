@@ -13,6 +13,11 @@ namespace DotnetSpider.Extension.Downloader
 		public abstract void Handle(Page page);
 	}
 
+	#region TargetUrl creator
+
+
+	#endregion
+
 	#region Content Handler
 
 	public class SubContentHandler : DownloadCompleteHandler
@@ -96,7 +101,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class CustomTargetHandler : DownloadCompleteHandler
+	public class CustomContentHandler : DownloadCompleteHandler
 	{
 		public bool Loop { get; set; } = true;
 		public bool DisableNewLine { get; set; } = false;

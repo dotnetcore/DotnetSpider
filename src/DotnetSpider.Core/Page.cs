@@ -61,6 +61,8 @@ namespace DotnetSpider.Core
 
 		public bool MissTargetUrls { get; set; }
 
+		public bool MissExtractTargetUrls { get; set; } = false;
+
 		public bool IsSkip
 		{
 			get { return ResultItems.IsSkip; }

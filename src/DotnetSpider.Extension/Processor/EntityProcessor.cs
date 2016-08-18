@@ -13,8 +13,6 @@ namespace DotnetSpider.Extension.Processor
 		protected readonly IList<IEntityExtractor> EntityExtractorList = new List<IEntityExtractor>();
 		private readonly EntitySpider _spiderContext;
 
-		public DataHandler DataHandler { get; set; }
-
 		public EntityProcessor(EntitySpider spiderContext)
 		{
 			Site = spiderContext.Site;
@@ -43,11 +41,11 @@ namespace DotnetSpider.Extension.Processor
 					continue;
 				}
 
-				if (DataHandler != null)
+				if (pageModelExtractor.DataHandler != null)
 				{
 					foreach (var data in list)
 					{
-						DataHandler.Handle(data, page);
+						pageModelExtractor.DataHandler.Handle(data, page);
 					}
 				}
 
