@@ -41,14 +41,17 @@ namespace DotnetSpider.Sample
 						}
 					}
 				},
-				PrepareStartUrls = new List<PrepareStartUrls>{ new BaseDbPrepareStartUrls()
+				PrepareStartUrls = new PrepareStartUrls[]
 				{
-					Source = DataSource.MySql,
-					ConnectString = "Database='test';Data Source= ;User ID=root;Password=1qazZAQ!;Port=4306",
-					QueryString = $"SELECT * FROM jd.sku_v2_{DateTimeUtils.MondayRunId} WHERE shopname is null or shopid is null order by sku",
-					Columns = new List<PrepareStartUrls.Column> {new PrepareStartUrls.Column { Name = "sku"} },
-					FormateStrings = new List<string> { "http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json" }
-				}}
+					new BaseDbPrepareStartUrls()
+					{
+						Source = DataSource.MySql,
+						ConnectString = "Database='test';Data Source= ;User ID=root;Password=1qazZAQ!;Port=4306",
+						QueryString = $"SELECT * FROM jd.sku_v2_{DateTimeUtils.MondayRunId} WHERE shopname is null or shopid is null order by sku",
+						Columns = new List<PrepareStartUrls.Column> {new PrepareStartUrls.Column { Name = "sku"} },
+						FormateStrings = new List<string> { "http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json" }
+					}
+				}
 			};
 			context.AddEntityPipeline(new MySqlEntityPipeline
 			{

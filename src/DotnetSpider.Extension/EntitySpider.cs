@@ -40,10 +40,10 @@ namespace DotnetSpider.Extension
 		public Action VerifyCollectedData { get; set; }
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 		public RedialExecutor RedialExecutor { get; set; }
-		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
-		public List<GlobalValueSelector> GlobalValues { get; set; } = new List<GlobalValueSelector>();
+		public PrepareStartUrls[] PrepareStartUrls { get; set; }
+		public List<GlobalValueSelector> GlobalValues { get; internal set; } = new List<GlobalValueSelector>();
 		public CookieInterceptor CookieInterceptor { get; set; }
-		public List<BaseEntityPipeline> EntityPipelines { get; set; } = new List<BaseEntityPipeline>();
+		public List<BaseEntityPipeline> EntityPipelines { get; internal set; } = new List<BaseEntityPipeline>();
 		public int CachedSize { get; set; }
 		/// <summary>
 		/// Key: Url patterns. Value: Until condition generators used by webdriverdownloaders.
@@ -139,10 +139,10 @@ namespace DotnetSpider.Extension
 				{
 					if (PrepareStartUrls != null)
 					{
-						foreach (var prepareStartUrl in PrepareStartUrls)
+						for (int i = 0; i < PrepareStartUrls.Length; ++i)
 						{
-							int index = PrepareStartUrls.IndexOf(prepareStartUrl) + 2;
-							Logger.SaveLog(LogInfo.Create($"[步骤 {index}] 添加链接到调度中心.", Logger.Name, this, LogLevel.Info));
+							var prepareStartUrl = PrepareStartUrls[i];
+							Logger.SaveLog(LogInfo.Create($"[步骤 {i + 2}] 添加链接到调度中心.", Logger.Name, this, LogLevel.Info));
 							prepareStartUrl.Build(this, null);
 						}
 					}
