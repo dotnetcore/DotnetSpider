@@ -15,7 +15,6 @@ namespace DotnetSpider.Extension.Model
 		public string[] Updates { get; internal set; }
 		public int? Limit { get; set; }
 		public List<TargetUrlExtractor> TargetUrlExtractors = new List<TargetUrlExtractor>();
-		public List<TargetUrlsCreator> TargetUrlsCreators { get; set; }
 		public DataHandler DataHandler { get; set; }
 	}
 

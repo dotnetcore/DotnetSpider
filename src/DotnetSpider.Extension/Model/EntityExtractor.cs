@@ -101,14 +101,7 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 
-			if (EntityMetadata.TargetUrlsCreators != null && EntityMetadata.TargetUrlExtractors.Count > 0)
-			{
-				foreach (var targetUrlsCreator in EntityMetadata.TargetUrlsCreators)
-				{
-					page.AddTargetRequests(targetUrlsCreator.Handle(page));
-				}
-			}
-			else
+			if (!page.MissExtractTargetUrls)
 			{
 				ExtractLinks(page, EntityMetadata.TargetUrlExtractors);
 			}

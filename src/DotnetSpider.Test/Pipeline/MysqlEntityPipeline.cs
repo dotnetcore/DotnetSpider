@@ -108,7 +108,7 @@ namespace DotnetSpider.Test.Pipeline
 					UpdateConnectString = new DbUpdateConnectString
 					{
 						ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306",
-						Key = "MySql01"
+						QueryString = "SELECT value from `dotnetspider`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"
 					}
 				};
 				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
