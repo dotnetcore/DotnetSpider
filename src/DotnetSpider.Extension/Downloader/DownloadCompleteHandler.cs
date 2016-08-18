@@ -113,7 +113,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class CustomContentHandler : DownloadCompleteHandler
+	public class CustomTargetHandler : DownloadCompleteHandler
 	{
 		public bool Loop { get; set; } = true;
 		public bool DisableNewLine { get; set; } = false;

@@ -44,6 +44,7 @@ namespace DotnetSpider.Extension
 		public List<GlobalValueSelector> GlobalValues { get; set; } = new List<GlobalValueSelector>();
 		public CookieInterceptor CookieInterceptor { get; set; }
 		public List<BaseEntityPipeline> EntityPipelines { get; set; } = new List<BaseEntityPipeline>();
+		public DataHandler DataHandler { get; set; }
 		public int CachedSize { get; set; }
 		/// <summary>
 		/// Key: Url patterns. Value: Until condition generators used by webdriverdownloaders.
@@ -91,6 +92,7 @@ namespace DotnetSpider.Extension
 				{
 					processor.AddEntity(entity);
 				}
+				processor.DataHandler = DataHandler;
 				PageProcessor = processor;
 				foreach (var entity in Entities)
 				{
@@ -127,7 +129,6 @@ namespace DotnetSpider.Extension
 
 				if (arguments.Contains("rerun"))
 				{
-					Scheduler.Init(this);
 					Scheduler.Clear();
 					needInitStartRequest = true;
 				}
@@ -172,25 +173,7 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public EntitySpider AddEntityType(Type type)
-		{
-			AddEntityType(type, new List<TargetUrlExtractor>(), null);
-			return this;
-		}
-
-		public EntitySpider AddEntityType(Type type, DataHandler dataHandler)
-		{
-			AddEntityType(type, new List<TargetUrlExtractor>(), dataHandler);
-			return this;
-		}
-
-		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor)
-		{
-			AddEntityType(type, new List<TargetUrlExtractor> { targetUrlExtractor }, null);
-			return this;
-		}
-
-		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor, DataHandler dataHandler)
+		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor = null, DataHandler dataHandler = null)
 		{
 			if (targetUrlExtractor != null)
 			{
@@ -199,6 +182,45 @@ namespace DotnetSpider.Extension
 			else
 			{
 				AddEntityType(type, new List<TargetUrlExtractor>(), dataHandler);
+			}
+
+			return this;
+		}
+
+		public EntitySpider AddEntityType(Type type, TargetUrlsCreator creator, DataHandler dataHandler = null)
+		{
+			if (creator != null)
+			{
+				AddEntityType(type, new List<TargetUrlsCreator> { creator }, dataHandler);
+			}
+			else
+			{
+				AddEntityType(type, new List<TargetUrlsCreator>(), dataHandler);
+			}
+
+			return this;
+		}
+
+		public EntitySpider AddEntityType(Type type, List<TargetUrlsCreator> creators, DataHandler dataHandler)
+		{
+			CheckIfRunning();
+
+			if (typeof(ISpiderEntity).IsAssignableFrom(type))
+			{
+				var entity = ParseEntityMetaData(type.GetTypeInfoCrossPlatform());
+				entity.DataHandler = dataHandler;
+				entity.TargetUrlsCreators = creators;
+				Entities.Add(entity);
+				GlobalValues = type.GetTypeInfo().GetCustomAttributes<GlobalValueSelector>().Select(e => new GlobalValueSelector
+				{
+					Name = e.Name,
+					Expression = e.Expression,
+					Type = e.Type
+				}).ToList();
+			}
+			else
+			{
+				throw new SpiderException($"Type: {type.FullName} is not a ISpiderEntity.");
 			}
 
 			return this;
