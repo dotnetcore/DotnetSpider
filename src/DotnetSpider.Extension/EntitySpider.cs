@@ -141,6 +141,8 @@ namespace DotnetSpider.Extension
 					{
 						foreach (var prepareStartUrl in PrepareStartUrls)
 						{
+							int index = PrepareStartUrls.IndexOf(prepareStartUrl) + 2;
+							Logger.SaveLog(LogInfo.Create($"[步骤 {index}] 添加链接到调度中心.", Logger.Name, this, LogLevel.Info));
 							prepareStartUrl.Build(this, null);
 						}
 					}

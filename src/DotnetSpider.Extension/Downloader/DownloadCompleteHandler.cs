@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-//using System.Web;
 using HtmlAgilityPack;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
@@ -12,11 +11,6 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		public abstract void Handle(Page page);
 	}
-
-	#region TargetUrl creator
-
-
-	#endregion
 
 	#region Content Handler
 	public class SkipWhenContainsIllegalStringHandler : DownloadCompleteHandler

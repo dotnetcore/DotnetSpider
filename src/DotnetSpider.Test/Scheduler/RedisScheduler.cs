@@ -151,7 +151,7 @@ namespace DotnetSpider.Test.Scheduler
 			scheduler.Push(new Request("http://www.d.com/", 1, null));
 
 			Assert.Equal(0, scheduler.GetErrorRequestsCount());
-			Assert.Equal(4,scheduler.GetLeftRequestsCount());
+			Assert.Equal(4, scheduler.GetLeftRequestsCount());
 			Assert.Equal(4, scheduler.GetTotalRequestsCount());
 			scheduler.IncreaseErrorCounter();
 			Assert.Equal(1, scheduler.GetErrorRequestsCount());
@@ -194,6 +194,29 @@ namespace DotnetSpider.Test.Scheduler
 		}
 
 		[Fact]
+		public void MultiInit()
+		{
+			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+
+			ISpider spider = new DefaultSpider();
+			scheduler.Init(spider);
+			string queueKey = scheduler.GetQueueKey();
+			string setKey = scheduler.GetSetKey();
+			string itemKey = scheduler.GetItemKey();
+			string errorCountKey = scheduler.GetErrorCountKey();
+			string successCountKey = scheduler.GetSuccessCountKey();
+			scheduler.Init(spider);
+			Assert.Equal(queueKey, scheduler.GetQueueKey());
+			Assert.Equal(setKey, scheduler.GetSetKey());
+			Assert.Equal(itemKey, scheduler.GetItemKey());
+			Assert.Equal(errorCountKey, scheduler.GetErrorCountKey());
+			Assert.Equal(successCountKey, scheduler.GetSuccessCountKey());
+
+			scheduler.Clear();
+			scheduler.Dispose();
+		}
+
+		[Fact]
 		public void Clear()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
@@ -212,7 +235,7 @@ namespace DotnetSpider.Test.Scheduler
 
 			Request result = scheduler.Poll();
 			Assert.Equal("http://www.ibm.com/4", result.Url.ToString());
- 
+
 			scheduler.Clear();
 			scheduler.Dispose();
 		}

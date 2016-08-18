@@ -383,7 +383,7 @@ namespace DotnetSpider.Core
 
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
-				Logger.SaveLog(LogInfo.Create($"添加链接到调度中心, 数量: {Site.StartRequests.Count}.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create($"[步骤 1] 添加链接到调度中心, 数量: {Site.StartRequests.Count}.", Logger.Name, this, LogLevel.Info));
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
 					Parallel.ForEach(Site.StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
@@ -399,7 +399,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				Logger.SaveLog(LogInfo.Create("添加链接到调度中心, 数量: 0.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create("[步骤 1] 添加链接到调度中心, 数量: 0.", Logger.Name, this, LogLevel.Info));
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
