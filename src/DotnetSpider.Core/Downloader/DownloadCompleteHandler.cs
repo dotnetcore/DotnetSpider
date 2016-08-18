@@ -127,8 +127,8 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public bool Loop { get; set; } = true;
 		public bool DisableNewLine { get; set; } = false;
-		public string StartString { get; set; }
-		public string EndString { get; set; }
+		public string Start { get; set; }
+		public string End { get; set; }
 		public int StartOffset { get; set; } = 0;
 		public int EndOffset { get; set; } = 0;
 		public string TargetTag { get; set; } = "my_target";
@@ -144,7 +144,7 @@ namespace DotnetSpider.Core.Downloader
 			int start = 0;
 			if (Loop)
 			{
-				while (rawText.IndexOf(StartString, start, StringComparison.Ordinal) != -1)
+				while (rawText.IndexOf(Start, start, StringComparison.Ordinal) != -1)
 				{
 					rawText = AmendRawText(rawText, ref start);
 				}
@@ -159,10 +159,10 @@ namespace DotnetSpider.Core.Downloader
 
 		private string AmendRawText(string rawText, ref int start)
 		{
-			int begin = rawText.IndexOf(StartString, start, StringComparison.Ordinal) + StartOffset;
+			int begin = rawText.IndexOf(Start, start, StringComparison.Ordinal) + StartOffset;
 			if (begin >= 0)
 			{
-				int end = rawText.IndexOf(EndString, begin, StringComparison.Ordinal) + EndOffset;
+				int end = rawText.IndexOf(End, begin, StringComparison.Ordinal) + EndOffset;
 				start = end;
 
 				rawText = rawText.Insert(end, @"</div>");

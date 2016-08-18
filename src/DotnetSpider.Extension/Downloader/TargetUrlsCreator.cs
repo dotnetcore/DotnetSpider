@@ -123,10 +123,10 @@ namespace DotnetSpider.Extension.Downloader
 	public class PaggerStopper : ITargetUrlsCreatorStopper
 	{
 		public BaseSelector TotalPageSelector { get; set; }
-		public List<Formatter> TotalPageFormatters { get; set; }
+		public Formatter[] TotalPageFormatters { get; set; }
 
 		public BaseSelector CurrenctPageSelector { get; set; }
-		public List<Formatter> CurrnetPageFormatters { get; set; }
+		public Formatter[] CurrnetPageFormatters { get; set; }
 
 		public bool NeedStop(Page page, BaseTargetUrlsCreator creator)
 		{
