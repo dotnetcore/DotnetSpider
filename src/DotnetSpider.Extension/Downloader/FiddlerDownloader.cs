@@ -63,10 +63,9 @@ namespace DotnetSpider.Extension.Downloader
 			Login = login;
 		}
 
-		public override Page Download(Request request, ISpider spider)
+		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
-			BeforeDownload(request, spider);
 			try
 			{
 				lock (this)
@@ -112,7 +111,6 @@ namespace DotnetSpider.Extension.Downloader
 					// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
 					request.PutExtra(Request.CycleTriedTimes, null);
 
-					AfterDownloadComplete(page, spider);
 					return page;
 				}
 			}
@@ -123,9 +121,7 @@ namespace DotnetSpider.Extension.Downloader
 			catch (Exception e)
 			{
 				Page page = new Page(request, site.ContentType) { Exception = e };
-
-				AfterDownloadComplete(page, spider);
-				throw;
+				return page;
 			}
 		}
 

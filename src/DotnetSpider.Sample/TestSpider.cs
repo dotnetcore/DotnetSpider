@@ -26,11 +26,11 @@ namespace DotnetSpider.Sample
 				SkipWhenResultIsEmpty = true,
 				Downloader = new HttpClientDownloader
 				{
-					DownloadCompleteHandlers = new List<IDownloadCompleteHandler>
+					DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 					{
 						new SubContentHandler {
-							StartString="sales[\"hotsite_yixing\"] = [",
-							EndString="}}",
+							Start="sales[\"hotsite_yixing\"] = [",
+							End="}}",
 							StartOffset=27,
 							EndOffset=0
 						},

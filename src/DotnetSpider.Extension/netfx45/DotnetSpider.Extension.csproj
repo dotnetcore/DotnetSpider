@@ -162,9 +162,6 @@
     <Compile Include="..\DataSource.cs">
       <Link>DataSource.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\BeforeDownloadHandler.cs">
-      <Link>Downloader\BeforeDownloadHandler.cs</Link>
-    </Compile>
     <Compile Include="..\Downloader\CookieInterceptor.cs">
       <Link>Downloader\CookieInterceptor.cs</Link>
     </Compile>

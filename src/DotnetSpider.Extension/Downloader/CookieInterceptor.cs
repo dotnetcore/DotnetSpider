@@ -1,8 +1,8 @@
-using System;
 using NLog;
 using DotnetSpider.Core;
 using System.Collections.Generic;
 #if !NET_CORE
+using System;
 using DotnetSpider.Core.Selector;
 using System.Linq;
 using System.Text.RegularExpressions;

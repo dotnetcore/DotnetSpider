@@ -17,8 +17,9 @@ namespace DotnetSpider.Core.Downloader
 		/// <returns></returns>
 		Page Download(Request request, ISpider spider);
 
-		List<IDownloadCompleteHandler> DownloadCompleteHandlers { get; set; }
+		IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }
 
+		IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }
 		/// <summary>
 		/// Can be any object as a context instance.
 		/// </summary>

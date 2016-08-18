@@ -9,9 +9,8 @@ namespace DotnetSpider.Extension.Downloader
 	/// </summary>
 	public class FileDownloader : BaseDownloader
 	{
-		public override Page Download(Request request, ISpider spider)
+		protected override Page DowloadContent(Request request, ISpider spider)
 		{
-			BeforeDownload(request, spider);
 			Page page = new Page(request, spider.Site.ContentType)
 			{
 				Content = File.ReadAllText(request.Url.LocalPath),
@@ -22,7 +21,5 @@ namespace DotnetSpider.Extension.Downloader
 
 			return page;
 		}
-
-		public int ThreadNum { get; set; }
 	}
 }

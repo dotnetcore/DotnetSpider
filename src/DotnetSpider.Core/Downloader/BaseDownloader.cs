@@ -4,14 +4,16 @@ using NLog;
 
 namespace DotnetSpider.Core.Downloader
 {
-	public class BaseDownloader : Named, IDownloader, IDisposable
+	public abstract class BaseDownloader : Named, IDownloader, IDisposable
 	{
 		protected ILogger Logger { get; set; }
-		public List<IDownloadCompleteHandler> DownloadCompleteHandlers { get; set; } = new List<IDownloadCompleteHandler>();
-		public List<IBeforeDownloadHandler> BeforeDownloadHandlers { get; set; } = new List<IBeforeDownloadHandler>();
+		public IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }  
+		public  IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }  
 		public dynamic Context { get; set; }
 
-		public BaseDownloader()
+		protected abstract Page DowloadContent(Request request, ISpider spider);
+
+		protected BaseDownloader()
 		{
 			Logger = LogManager.GetCurrentClassLogger();
 		}
@@ -27,9 +29,25 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		public virtual Page Download(Request request, ISpider spider)
+		public Page Download(Request request, ISpider spider)
 		{
-			return null;
+			if (spider.Site == null)
+			{
+				return null;
+			}
+
+			BeforeDownload(request, spider);
+
+			var result = DowloadContent(request, spider);
+
+			AfterDownloadComplete(result, spider);
+
+			if (result.Exception != null)
+			{
+				throw result.Exception;
+			}
+
+			return result;
 		}
 
 		public virtual void Dispose()
