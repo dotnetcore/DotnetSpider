@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension.Downloader;
@@ -18,7 +15,7 @@ namespace DotnetSpider.Test.Downloader
 			var spider = new DefaultSpider("test", new Core.Site());
 			TestDownloader downloader = new TestDownloader
 			{
-				DownloadCompleteHandlers = new[]
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 				{
 					new IncrementTargetUrlsCreator("&page=0",2)
 				}
@@ -38,7 +35,7 @@ namespace DotnetSpider.Test.Downloader
 			var spider = new DefaultSpider("test", new Core.Site());
 			TestDownloader downloader = new TestDownloader
 			{
-				DownloadCompleteHandlers = new[]
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 				{
 					new IncrementTargetUrlsCreator("&page=0",2)
 					{

@@ -1,5 +1,4 @@
-﻿using System.IO;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 
 namespace DotnetSpider.Test.Downloader
