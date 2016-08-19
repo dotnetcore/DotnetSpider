@@ -7,7 +7,7 @@ namespace DotnetSpider.Core.Monitor
 		public bool IsEnabled => true;
 
 		private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
- 
+
 		public void Watch(SpiderStatus status)
 		{
 			string msg = $"Left {status.Left} Success {status.Success} Error {status.Error} Total {status.Total} Thread {status.ThreadNum}";
@@ -16,6 +16,7 @@ namespace DotnetSpider.Core.Monitor
 			theEvent.Properties["TaskGroup"] = status.TaskGroup;
 			theEvent.Properties["Identity"] = status.Identity;
 			theEvent.Properties["Status"] = status.Status;
+			theEvent.Properties["Message"] = msg;
 			NetworkCenter.Current.Execute("nm", () =>
 			{
 				_logger.Log(theEvent);
