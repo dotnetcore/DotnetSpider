@@ -190,7 +190,7 @@ namespace DotnetSpider.Extension.Downloader
 	public class ContainContentsStopper : ITargetUrlsCreatorStopper
 	{
 		public List<string> Contents { get; set; }
-		public bool IsContain { get; set; }
+		public bool IsContain { get; set; } = true;
 
 		public bool NeedStop(Page page, BaseTargetUrlsCreator creator)
 		{
