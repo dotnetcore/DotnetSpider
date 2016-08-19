@@ -8,11 +8,12 @@ namespace DotnetSpider.Core
 	{
 		public static string Machine = Dns.GetHostName();
 
-		public static LogEventInfo Create(string message, string loggerName, ITask task, LogLevel level, Exception e = null)
+		public static LogEventInfo Create(string message, string loggerName, ISpider spider, LogLevel level, Exception e = null)
 		{
 			LogEventInfo theEvent = new LogEventInfo(level, loggerName, message) { Exception = e };
-			theEvent.Properties["UserId"] = task == null ? "" : task.UserId;
-			theEvent.Properties["TaskGroup"] = task == null ? "" : task.TaskGroup;
+			theEvent.Properties["UserId"] = spider == null ? "" : spider.UserId;
+			theEvent.Properties["TaskGroup"] = spider == null ? "" : spider.TaskGroup;
+			theEvent.Properties["Identity"] = spider == null ? "" : spider.Identity;
 			return theEvent;
 		}
 	}
