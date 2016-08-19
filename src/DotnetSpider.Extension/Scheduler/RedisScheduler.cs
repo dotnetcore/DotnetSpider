@@ -24,11 +24,11 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public static string TaskList = "task";
 		public static string TaskStatus = "task-status";
-		private string _queueKey = "queue-";
-		private string _setKey = "set-";
-		private string _itemKey = "item-";
-		private string _errorCountKey = "error-record";
-		private string _successCountKey = "success-record";
+		private string _queueKey;
+		private string _setKey;
+		private string _itemKey;
+		private string _errorCountKey;
+		private string _successCountKey;
 		private string _identityMd5;
 
 		private IDatabase _db;
@@ -82,11 +82,11 @@ namespace DotnetSpider.Extension.Scheduler
 			_db = _redis.GetDatabase(0);
 
 			var md5 = Encrypt.Md5Encrypt(spider.Identity);
-			_itemKey += md5;
-			_setKey += md5;
-			_queueKey += md5;
-			_errorCountKey += md5;
-			_successCountKey += md5;
+			_itemKey = "item-" + md5;
+			_setKey = "set-" + md5;
+			_queueKey = "queue-" + md5;
+			_errorCountKey = "error-record" + md5;
+			_successCountKey = "success-record" + md5;
 			_identityMd5 = md5;
 
 			NetworkCenter.Current.Execute("rds-in", () =>
@@ -282,5 +282,34 @@ namespace DotnetSpider.Extension.Scheduler
 			_db.KeyDelete(_successCountKey);
 			_db.KeyDelete(_errorCountKey);
 		}
+
+		#region For Test
+
+		public string GetQueueKey()
+		{
+			return _queueKey;
+		}
+
+		public string GetSetKey()
+		{
+			return _setKey;
+		}
+
+		public string GetItemKey()
+		{
+			return _itemKey;
+		}
+
+		public string GetErrorCountKey()
+		{
+			return _errorCountKey;
+		}
+
+		public string GetSuccessCountKey()
+		{
+			return _successCountKey;
+		}
+
+		#endregion
 	}
 }

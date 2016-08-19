@@ -130,6 +130,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Downloader\DownloadHanlder.cs">
+      <Link>Downloader\DownloadHanlder.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\TestDownloader.cs">
+      <Link>Downloader\TestDownloader.cs</Link>
+    </Compile>
     <Compile Include="..\EntityExtractor.cs">
       <Link>EntityExtractor.cs</Link>
     </Compile>

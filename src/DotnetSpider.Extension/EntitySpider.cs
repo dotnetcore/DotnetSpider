@@ -40,11 +40,10 @@ namespace DotnetSpider.Extension
 		public Action VerifyCollectedData { get; set; }
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 		public RedialExecutor RedialExecutor { get; set; }
-		public List<PrepareStartUrls> PrepareStartUrls { get; set; } = new List<PrepareStartUrls>();
-		public List<GlobalValueSelector> GlobalValues { get; set; } = new List<GlobalValueSelector>();
+		public PrepareStartUrls[] PrepareStartUrls { get; set; }
+		public List<GlobalValueSelector> GlobalValues { get; internal set; } = new List<GlobalValueSelector>();
 		public CookieInterceptor CookieInterceptor { get; set; }
-		public List<BaseEntityPipeline> EntityPipelines { get; set; } = new List<BaseEntityPipeline>();
-		public DataHandler DataHandler { get; set; }
+		public List<BaseEntityPipeline> EntityPipelines { get; internal set; } = new List<BaseEntityPipeline>();
 		public int CachedSize { get; set; }
 		/// <summary>
 		/// Key: Url patterns. Value: Until condition generators used by webdriverdownloaders.
@@ -92,7 +91,6 @@ namespace DotnetSpider.Extension
 				{
 					processor.AddEntity(entity);
 				}
-				processor.DataHandler = DataHandler;
 				PageProcessor = processor;
 				foreach (var entity in Entities)
 				{
@@ -129,6 +127,7 @@ namespace DotnetSpider.Extension
 
 				if (arguments.Contains("rerun"))
 				{
+					Scheduler.Init(this);
 					Scheduler.Clear();
 					needInitStartRequest = true;
 				}
@@ -140,8 +139,10 @@ namespace DotnetSpider.Extension
 				{
 					if (PrepareStartUrls != null)
 					{
-						foreach (var prepareStartUrl in PrepareStartUrls)
+						for (int i = 0; i < PrepareStartUrls.Length; ++i)
 						{
+							var prepareStartUrl = PrepareStartUrls[i];
+							Logger.SaveLog(LogInfo.Create($"[步骤 {i + 2}] 添加链接到调度中心.", Logger.Name, this, LogLevel.Info));
 							prepareStartUrl.Build(this, null);
 						}
 					}
@@ -173,7 +174,25 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor = null, DataHandler dataHandler = null)
+		public EntitySpider AddEntityType(Type type)
+		{
+			AddEntityType(type, new List<TargetUrlExtractor>(), null);
+			return this;
+		}
+
+		public EntitySpider AddEntityType(Type type, DataHandler dataHandler)
+		{
+			AddEntityType(type, new List<TargetUrlExtractor>(), dataHandler);
+			return this;
+		}
+
+		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor)
+		{
+			AddEntityType(type, new List<TargetUrlExtractor> { targetUrlExtractor }, null);
+			return this;
+		}
+
+		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor, DataHandler dataHandler)
 		{
 			if (targetUrlExtractor != null)
 			{
@@ -182,45 +201,6 @@ namespace DotnetSpider.Extension
 			else
 			{
 				AddEntityType(type, new List<TargetUrlExtractor>(), dataHandler);
-			}
-
-			return this;
-		}
-
-		public EntitySpider AddEntityType(Type type, TargetUrlsCreator creator, DataHandler dataHandler = null)
-		{
-			if (creator != null)
-			{
-				AddEntityType(type, new List<TargetUrlsCreator> { creator }, dataHandler);
-			}
-			else
-			{
-				AddEntityType(type, new List<TargetUrlsCreator>(), dataHandler);
-			}
-
-			return this;
-		}
-
-		public EntitySpider AddEntityType(Type type, List<TargetUrlsCreator> creators, DataHandler dataHandler)
-		{
-			CheckIfRunning();
-
-			if (typeof(ISpiderEntity).IsAssignableFrom(type))
-			{
-				var entity = ParseEntityMetaData(type.GetTypeInfoCrossPlatform());
-				entity.DataHandler = dataHandler;
-				entity.TargetUrlsCreators = creators;
-				Entities.Add(entity);
-				GlobalValues = type.GetTypeInfo().GetCustomAttributes<GlobalValueSelector>().Select(e => new GlobalValueSelector
-				{
-					Name = e.Name,
-					Expression = e.Expression,
-					Type = e.Type
-				}).ToList();
-			}
-			else
-			{
-				throw new SpiderException($"Type: {type.FullName} is not a ISpiderEntity.");
 			}
 
 			return this;

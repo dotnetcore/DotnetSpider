@@ -5,8 +5,8 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class SubStringFormatter : Formatter
 	{
-		public string StartString { get; set; }
-		public string EndString { get; set; }
+		public string Start { get; set; }
+		public string End { get; set; }
 		public int StartOffset { get; set; } = 0;
 		public int EndOffset { get; set; } = 0;
 
@@ -17,11 +17,11 @@ namespace DotnetSpider.Extension.Model.Formatter
 				return null;
 			}
 
-			int begin = value.IndexOf(StartString, StringComparison.Ordinal);
+			int begin = value.IndexOf(Start, StringComparison.Ordinal);
 			int length;
-			if (!string.IsNullOrEmpty(EndString))
+			if (!string.IsNullOrEmpty(End))
 			{
-				int end = value.IndexOf(EndString, begin, StringComparison.Ordinal);
+				int end = value.IndexOf(End, begin, StringComparison.Ordinal);
 				length = end - begin;
 			}
 			else
@@ -32,9 +32,9 @@ namespace DotnetSpider.Extension.Model.Formatter
 			begin += StartOffset;
 			length -= StartOffset;
 			length -= EndOffset;
-			if (!string.IsNullOrEmpty(EndString))
+			if (!string.IsNullOrEmpty(End))
 			{
-				length += EndString.Length;
+				length += End.Length;
 			}
 			return value.Substring(begin, length);
 		}

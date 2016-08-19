@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
@@ -7,7 +6,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
@@ -26,11 +24,11 @@ namespace DotnetSpider.Sample
 				SkipWhenResultIsEmpty = true,
 				Downloader = new HttpClientDownloader
 				{
-					DownloadCompleteHandlers = new List<IDownloadCompleteHandler>
+					DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 					{
 						new SubContentHandler {
-							StartString="sales[\"hotsite_yixing\"] = [",
-							EndString="}}",
+							Start="sales[\"hotsite_yixing\"] = [",
+							End="}}",
 							StartOffset=27,
 							EndOffset=0
 						},

@@ -43,7 +43,7 @@ namespace DotnetSpider.Core
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 		public string UserId { get; set; }
 		public string TaskGroup { get; set; }
-		public int EmptySleepTime { get; set; } = 150000;
+		public int EmptySleepTime { get; set; } = 15000;
 		protected bool IsExited { get; set; }
 		protected int WaitInterval = 10;
 		protected Status Stat = Status.Init;
@@ -383,7 +383,7 @@ namespace DotnetSpider.Core
 
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
-				Logger.SaveLog(LogInfo.Create($"添加链接到调度中心, 数量: {Site.StartRequests.Count}.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create($"[步骤 1] 添加链接到调度中心, 数量: {Site.StartRequests.Count}.", Logger.Name, this, LogLevel.Info));
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
 					Parallel.ForEach(Site.StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
@@ -399,7 +399,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				Logger.SaveLog(LogInfo.Create("添加链接到调度中心, 数量: 0.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create("[步骤 1] 添加链接到调度中心, 数量: 0.", Logger.Name, this, LogLevel.Info));
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;

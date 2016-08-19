@@ -65,6 +65,9 @@
     <Compile Include="..\DDengSpider.cs">
       <Link>DDengSpider.cs</Link>
     </Compile>
+    <Compile Include="..\JdShopDetailSpider.cs">
+      <Link>JdShopDetailSpider.cs</Link>
+    </Compile>
     <Compile Include="..\JdSkuSampleSpider.cs">
       <Link>JdSkuSampleSpider.cs</Link>
     </Compile>

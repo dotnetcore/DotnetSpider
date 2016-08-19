@@ -162,9 +162,6 @@
     <Compile Include="..\DataSource.cs">
       <Link>DataSource.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\BeforeDownloadHandler.cs">
-      <Link>Downloader\BeforeDownloadHandler.cs</Link>
-    </Compile>
     <Compile Include="..\Downloader\CookieInterceptor.cs">
       <Link>Downloader\CookieInterceptor.cs</Link>
     </Compile>
@@ -179,6 +176,9 @@
     </Compile>
     <Compile Include="..\Downloader\SignIner.cs">
       <Link>Downloader\SignIner.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\TargetUrlsCreator.cs">
+      <Link>Downloader\TargetUrlsCreator.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\WebDriver\Browser.cs">
       <Link>Downloader\WebDriver\Browser.cs</Link>
@@ -296,9 +296,6 @@
     </Compile>
     <Compile Include="..\Model\TargetUrlExtractor.cs">
       <Link>Model\TargetUrlExtractor.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\TargetUrlsHandler.cs">
-      <Link>Model\TargetUrlsHandler.cs</Link>
     </Compile>
     <Compile Include="..\Monitor\HttpMonitor.cs">
       <Link>Monitor\HttpMonitor.cs</Link>

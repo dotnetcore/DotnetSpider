@@ -40,6 +40,8 @@ namespace DotnetSpider.Core
 
 		public bool IsNeedCycleRetry { get; set; }
 
+		public bool MissExtractTargetUrls { get; set; } = false;
+
 		public ResultItems ResultItems { get; } = new ResultItems();
 
 		public int StatusCode { get; set; }

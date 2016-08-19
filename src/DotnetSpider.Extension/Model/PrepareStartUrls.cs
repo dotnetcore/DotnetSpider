@@ -14,15 +14,15 @@ using System.Net;
 
 namespace DotnetSpider.Extension.Model
 {
+	public class DataColumn
+	{
+		public string Name { get; set; }
+
+		public Formatter.Formatter[] Formatters { get; set; }
+	}
+
 	public abstract class PrepareStartUrls : Named
 	{
-		public class Column
-		{
-			public string Name { get; set; }
-
-			public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
-		}
-
 		public string Method { get; set; } = "GET";
 
 		public string Referer { get; set; }
@@ -115,7 +115,7 @@ namespace DotnetSpider.Extension.Model
 		/// <summary>
 		/// 用于拼接Url所需要的列
 		/// </summary>
-		public List<Column> Columns { get; set; } = new List<Column>();
+		public DataColumn[] Columns { get; set; }
 
 		/// <summary>
 		/// 拼接Url的方式, 会把Columns对应列的数据传入
@@ -167,15 +167,21 @@ namespace DotnetSpider.Extension.Model
 		protected List<string> PrepareArguments(Dictionary<string, object> data)
 		{
 			List<string> arguments = new List<string>();
-			foreach (var column in Columns)
+			if (Columns != null)
 			{
-				string value = data[column.Name]?.ToString();
-
-				foreach (var formatter in column.Formatters)
+				foreach (var column in Columns)
 				{
-					value = formatter.Formate(value);
+					string value = data[column.Name]?.ToString();
+
+					if (column.Formatters != null)
+					{
+						foreach (var formatter in column.Formatters)
+						{
+							value = formatter.Formate(value);
+						}
+					}
+					arguments.Add(value);
 				}
-				arguments.Add(value);
 			}
 			return arguments;
 		}
@@ -295,7 +301,7 @@ namespace DotnetSpider.Extension.Model
 		/// <summary>
 		/// 用于拼接Url所需要的列
 		/// </summary>
-		public List<Column> Columns { get; set; } = new List<Column>();
+		public List<DataColumn> Columns { get; set; } = new List<DataColumn>();
 
 		/// <summary>
 		/// 拼接Url的方式, 会把Columns对应列的数据传入
