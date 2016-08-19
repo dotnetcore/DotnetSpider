@@ -53,7 +53,16 @@ namespace DotnetSpider.Core.Selector
 				}
 				else
 				{
-					return Elements[0].ToString();
+					if (!isPlainText)
+					{
+						return Elements[0].ToString();
+					}
+					else
+					{
+						var document = new HtmlDocument();
+						document.LoadHtml(Elements[0].ToString());
+						return document.DocumentNode.InnerText;
+					}
 				}
 			}
 			return null;
@@ -77,7 +86,16 @@ namespace DotnetSpider.Core.Selector
 				}
 				else
 				{
-					result.Add(el.ToString());
+					if (!isPlainText)
+					{
+						result.Add(el.ToString());
+					}
+					else
+					{
+						var document = new HtmlDocument();
+						document.LoadHtml(el.ToString());
+						result.Add(document.DocumentNode.InnerText);
+					}
 				}
 			}
 			return result;
