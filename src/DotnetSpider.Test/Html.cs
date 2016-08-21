@@ -3,7 +3,7 @@ using DotnetSpider.Core.Selector;
 using Xunit;
 namespace DotnetSpider.Test
 {
-	public class Html
+	public class HtmlTest
 	{
 		[Fact]
 		public void Select()

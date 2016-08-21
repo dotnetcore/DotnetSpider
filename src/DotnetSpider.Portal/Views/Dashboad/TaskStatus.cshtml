@@ -1,0 +1,110 @@
+﻿@model List<DotnetSpider.Portal.Models.TaskStatus>
+@{
+}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">Task Status</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="dataTables_wrapper form-inline dt-bootstrap">
+                    <div class="row">
+                        <div class="col-sm-6">
+                        </div>
+                        <div class="col-sm-6"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table id="taskStatusTable" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="Task Status">
+                                <thead>
+                                    <tr role="row">
+                                        <th tabindex="0" rowspan="1" colspan="1" aria-sort="ascending">Task Group</th>
+                                        <th tabindex="0" rowspan="1" colspan="1">Identity</th>
+                                        <th tabindex="0" rowspan="1" colspan="1">Status</th>
+                                        <th tabindex="0" rowspan="1" colspan="1">Message</th>
+                                        <th tabindex="0" rowspan="1" colspan="1">Control</th>
+                                        <th tabindex="0" rowspan="1" colspan="1">Log</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @*<tr role="row" class="odd">
+                                            <td>YY</td>
+                                            <td>YY Channels 2016-08-19 180001</td>
+                                            <td><span class="badge bg-green" style="width: 60px">Running</span></td>
+                                            <td>Left: 23 Total: 100 Success: 50 Error: 0</td>
+                                            <td>
+                                                <div class="col-sm-4">
+                                                    <a href="#" class="btn-link"><i class="fa fa-play"></i>Run</a>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <a href="#" class="btn-link"><i class="fa fa-stop"></i> Exit</a>
+                                                </div>
+                                            </td>
+                                            <td><a href="javascript:" title="Log" onclick='loadContent(this, "home", "log", "id=YY Channels 2016-08-19 180001")'>View Log</a></td>
+                                        </tr>*@
+                                    @foreach (var task in Model)
+                                    {
+                                        <tr role="row" class="odd">
+                                            <td>@task.TaskGroup</td>
+                                            <td>@task.Identity</td>
+                                            <td><span class="@task.StatusClass" style="width: 60px">@task.Status</span></td>
+                                            <td>@task.Message</td>
+                                            <td>
+                                                <div class="col-sm-4">
+                                                    <a href="#" class="btn-link"><i class="fa fa-play"></i>Run</a>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <a href="#" class="btn-link"><i class="fa fa-stop"></i> Exit</a>
+                                                </div>
+                                            </td>
+                                            <td><a href="javascript:" title="Log" onclick='loadContent(this,"home","log","id=@task.Identity")'>View Log</a></td>
+                                        </tr>}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-5">
+                        </div>
+                        <div class="col-sm-7">
+                            <pager pager-option="ViewBag.PagerOption as MoPagerOption"></pager>
+                            @*<div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
+                                    <ul class="pagination">
+                                        <li class="paginate_button previous disabled" id="example2_previous">
+                                            <a href="#" aria-controls="example2" data-dt-idx="0" tabindex="0">Previous</a>
+                                        </li>
+                                        <li class="paginate_button active">
+                                            <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">1</a>
+                                        </li>
+                                        <li class="paginate_button ">
+                                            <a href="#" aria-controls="example2" data-dt-idx="2" tabindex="0">2</a>
+                                        </li>
+                                        <li class="paginate_button ">
+                                            <a href="#" aria-controls="example2" data-dt-idx="3" tabindex="0">3</a>
+                                        </li>
+                                        <li class="paginate_button ">
+                                            <a href="#" aria-controls="example2" data-dt-idx="4" tabindex="0">4</a>
+                                        </li>
+                                        <li class="paginate_button ">
+                                            <a href="#" aria-controls="example2" data-dt-idx="5" tabindex="0">5</a>
+                                        </li>
+                                        <li class="paginate_button ">
+                                            <a href="#" aria-controls="example2" data-dt-idx="6" tabindex="0">6</a>
+                                        </li>
+                                        <li class="paginate_button next" id="example2_next">
+                                            <a href="#" aria-controls="example2" data-dt-idx="7" tabindex="0">Next</a>
+                                        </li>
+                                    </ul>
+                                </div>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+    <!-- /.col -->
+</div>
