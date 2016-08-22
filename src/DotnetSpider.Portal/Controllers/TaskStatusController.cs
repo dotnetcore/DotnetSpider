@@ -16,7 +16,7 @@ namespace DotnetSpider.Portal.Controllers
 				int no = page ?? 1;
 				int size = pageSize ?? 15;
 
-				List<TaskStatus> list = conn.Query<TaskStatus>($"SELECT * FROM nlog.status LIMIT {(no - 1) * size},{size}").ToList();
+				List<TaskStatus> list = conn.Query<TaskStatus>($"SELECT * FROM nlog.status ORDER BY id DESC LIMIT {(no - 1) * size},{size}").ToList();
 				var totalCount = conn.Query<CountResult>("SELECT COUNT(*) AS Count FROM nlog.status").First();
 				var totalPage = totalCount.Count / size + (totalCount.Count % size > 0 ? 1 : 0);
 				ViewBag.CurrentPage = no;

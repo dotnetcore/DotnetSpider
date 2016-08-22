@@ -1,5 +1,5 @@
 ﻿@model  List<DotnetSpider.Portal.Models.TaskStatus>
-@{    
+@{
 }
 <div class="row">
     <div class="col-xs-12">
@@ -24,6 +24,7 @@
                                         <th tabindex="0" rowspan="1" colspan="1">Identity</th>
                                         <th tabindex="0" rowspan="1" colspan="1">Status</th>
                                         <th tabindex="0" rowspan="1" colspan="1">Message</th>
+                                        <th tabindex="0" rowspan="1" colspan="1">Last Update</th>
                                         <th tabindex="0" rowspan="1" colspan="1">Control</th>
                                         <th tabindex="0" rowspan="1" colspan="1">Log</th>
                                     </tr>
@@ -51,6 +52,7 @@
                                             <td>@task.Identity</td>
                                             <td><span class="@task.StatusClass" style="width: 60px">@task.Status</span></td>
                                             <td>@task.Message</td>
+                                            <td>@task.Logged</td>
                                             <td>
                                                 <div class="col-sm-4">
                                                     <a href="#" class="btn-link"><i class="fa fa-play"></i>Run</a>
@@ -59,7 +61,7 @@
                                                     <a href="#" class="btn-link"><i class="fa fa-stop"></i> Exit</a>
                                                 </div>
                                             </td>
-                                            <td><a href="/log/list/?identity=@task.Identity&page=1&pageSize=15" title="Log">View Log</a></td>
+                                            <td><a href="~/log/list/?identity=@task.Identity&page=1&pageSize=15" title="Log">View Log</a></td>
                                         </tr>}
                                 </tbody>
                             </table>
@@ -70,7 +72,7 @@
                         </div>
                         <div class="col-sm-7">
                             <ul class="pagination">
-                                <pager current-page="@ViewBag.CurrentPage" total-page="@ViewBag.TotalPage"/>
+                                <pager current-page="@ViewBag.CurrentPage" total-page="@ViewBag.TotalPage" />
                             </ul>
                             @*<div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
                                     <ul class="pagination">
