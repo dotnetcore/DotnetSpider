@@ -262,17 +262,23 @@
     <Compile Include="..\Processor\SimplePageProcessor.cs">
       <Link>Processor\SimplePageProcessor.cs</Link>
     </Compile>
-    <Compile Include="..\Proxy\HttpHost.cs">
-      <Link>Proxy\HttpHost.cs</Link>
+    <Compile Include="..\Proxy\HttpProxyPool.cs">
+      <Link>Proxy\HttpProxyPool.cs</Link>
+    </Compile>
+    <Compile Include="..\Proxy\IProxySupplier.cs">
+      <Link>Proxy\IProxySupplier.cs</Link>
+    </Compile>
+    <Compile Include="..\Proxy\KuaidailiProxySupplier.cs">
+      <Link>Proxy\KuaidailiProxySupplier.cs</Link>
     </Compile>
     <Compile Include="..\Proxy\Proxy.cs">
       <Link>Proxy\Proxy.cs</Link>
     </Compile>
-    <Compile Include="..\Proxy\ProxyPool.cs">
-      <Link>Proxy\ProxyPool.cs</Link>
-    </Compile>
     <Compile Include="..\Proxy\ProxyUtil.cs">
       <Link>Proxy\ProxyUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\Proxy\UseSpecifiedUriWebProxy.cs">
+      <Link>Proxy\UseSpecifiedUriWebProxy.cs</Link>
     </Compile>
     <Compile Include="..\Request.cs">
       <Link>Request.cs</Link>

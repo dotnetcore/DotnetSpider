@@ -11,7 +11,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Site
 	{
-		private ProxyPool _httpProxyPool = new ProxyPool();
+		public HttpProxyPool HttpProxyPool { get; set; }
 		private string _domain;
 		private Encoding _encoding = Encoding.UTF8;
 		private string _encodingName;
@@ -246,38 +246,15 @@ namespace DotnetSpider.Core
 					'}';
 		}
 
-		/// <summary>
-		/// add http proxy , string[0]:ip, string[1]:port
-		/// </summary>
-		/// <param name="httpProxyList"></param>
-		/// <returns></returns>
-		public Site AddHttpProxies(List<string[]> httpProxyList)
+ 
+		public UseSpecifiedUriWebProxy GetHttpProxy()
 		{
-			_httpProxyPool = new ProxyPool(httpProxyList);
-			return this;
+			return HttpProxyPool?.GetProxy();
 		}
 
-		public bool HttpProxyPoolEnable => _httpProxyPool.Enable;
-
-		public HttpHost GetHttpProxyFromPool()
+		public void ReturnHttpProxy(UseSpecifiedUriWebProxy proxy, HttpStatusCode statusCode)
 		{
-			return _httpProxyPool.GetProxy();
-		}
-
-		public void ReturnHttpProxyToPool(HttpHost proxy, int statusCode)
-		{
-			_httpProxyPool.ReturnProxy(proxy, statusCode);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="reuseInterval">Re use interval time</param>
-		/// <returns></returns>
-		public Site SetProxyReuseInterval(int reuseInterval)
-		{
-			_httpProxyPool.SetReuseInterval(reuseInterval);
-			return this;
+			HttpProxyPool?.ReturnProxy(proxy, statusCode);
 		}
 
 		public void SetCookiesStringPart(string cookies)

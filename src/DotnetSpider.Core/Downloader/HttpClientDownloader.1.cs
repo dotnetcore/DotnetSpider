@@ -19,31 +19,29 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public bool DecodeContentAsUrl;
 
-		private readonly HttpClient _httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler()
-		{
-			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-			UseCookies = false,
-#if TEST
-			UseProxy = true,
-#else
-			UseProxy = false
-#endif
-		}));
-
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
 			HttpResponseMessage response = null;
-			var proxy = site.GetHttpProxyFromPool();
+			var proxy = site.GetHttpProxy();
 			request.PutExtra(Request.Proxy, proxy);
+			HttpStatusCode httpStatusCode = HttpStatusCode.OK;
 			try
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 
 				response = NetworkCenter.Current.Execute("http", m =>
 				{
+					HttpClient httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler()
+					{
+						AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+						UseCookies = false,
+						UseProxy = true,
+						Proxy = proxy
+					}));
 					var message = (HttpRequestMessage)m;
-					return _httpClient.SendAsync(message).Result;
+
+					return httpClient.SendAsync(message).Result;
 				}, httpMessage);
 
 				response.EnsureSuccessStatusCode();
@@ -51,10 +49,10 @@ namespace DotnetSpider.Core.Downloader
 				{
 					throw new DownloadException($"下载 {request.Url} 失败. Code: {response.StatusCode}");
 				}
-				var statusCode = (int)response.StatusCode;
-				request.PutExtra(Request.StatusCode, statusCode);
+				httpStatusCode = response.StatusCode;
+				request.PutExtra(Request.StatusCode, httpStatusCode);
 
-				Page page = HandleResponse(request, response, statusCode, site);
+				Page page = HandleResponse(request, response, httpStatusCode, site);
 
 				// need update
 				page.TargetUrl = request.Url.ToString();
@@ -230,7 +228,7 @@ namespace DotnetSpider.Core.Downloader
 			throw new ArgumentException("Illegal HTTP Method " + request.Method);
 		}
 
-		private Page HandleResponse(Request request, HttpResponseMessage response, int statusCode, Site site)
+		private Page HandleResponse(Request request, HttpResponseMessage response, HttpStatusCode statusCode, Site site)
 		{
 			string content = GetContent(site, response);
 

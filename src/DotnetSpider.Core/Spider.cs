@@ -12,10 +12,6 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
 using NLog;
-using NLog.Config;
-#if !NET_CORE
-using DotnetSpider.Core.Proxy;
-#endif
 
 namespace DotnetSpider.Core
 {
@@ -98,12 +94,7 @@ namespace DotnetSpider.Core
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-			string nlogConfigPath = Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config");
-			if (!File.Exists(nlogConfigPath))
-			{
-				File.AppendAllText(nlogConfigPath, Resource.nlog);
-			}
-			LogManager.Configuration = new XmlLoggingConfiguration(nlogConfigPath);
+
 			Logger = LogManager.GetCurrentClassLogger();
 			IsExited = false;
 		}
@@ -331,7 +322,7 @@ namespace DotnetSpider.Core
 		public IList<IPipeline> GetPipelines()
 		{
 			return Pipelines;
-		} 
+		}
 
 		/// <summary>
 		/// Clear the pipelines set
@@ -478,16 +469,13 @@ namespace DotnetSpider.Core
 							OnError(request);
 							Logger.SaveLog(LogInfo.Create($"采集失败: {request.Url}.", Logger.Name, this, LogLevel.Error, e));
 						}
-#if !NET_CORE
 						finally
 						{
-
-							if (Site.HttpProxyPoolEnable && request.GetExtra(Request.Proxy) != null)
+							if (request.GetExtra(Request.Proxy) != null)
 							{
-								Site.ReturnHttpProxyToPool((HttpHost)request.GetExtra(Request.Proxy), (int)request.GetExtra(Request.StatusCode));
+								Site.ReturnHttpProxy(request.GetExtra(Request.Proxy), request.GetExtra(Request.StatusCode));
 							}
 						}
-#endif
 
 						if (!firstTask)
 						{

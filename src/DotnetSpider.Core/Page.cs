@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Core.Common;
 
@@ -44,7 +45,7 @@ namespace DotnetSpider.Core
 
 		public ResultItems ResultItems { get; } = new ResultItems();
 
-		public int StatusCode { get; set; }
+		public HttpStatusCode StatusCode { get; set; }
 
 		public string Padding { get; set; }
 

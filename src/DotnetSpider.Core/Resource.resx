@@ -120,7 +120,10 @@
   <data name="nlog" xml:space="preserve">
     <value>&lt;nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" throwExceptions="true"&gt;
   &lt;targets&gt;
-    &lt;target name="console" xsi:type="ColoredConsole"  layout="[${date:format=yyyyMMdd HH\:mm\:ss}][${event-properties:item=UserId}][${event-properties:item=TaskGroup}][${level}] ${message}"/&gt;
+    &lt;target name="console" xsi:type="ColoredConsole" useDefaultRowHighlightingRules="true" layout="[${date:format=yyyyMMdd HH\:mm\:ss}][${event-properties:item=UserId}][${event-properties:item=TaskGroup}][${level}] ${message}"&gt;
+      &lt;highlight-row foregroundColor="Cyan" condition="level == LogLevel.Trace"/&gt;
+      &lt;highlight-row foregroundColor="DarkGray" condition="level == LogLevel.Debug"/&gt;
+    &lt;/target&gt;
     &lt;target name="file" xsi:type="File" maxArchiveFiles="30" layout="[${date:format=yyyyMMdd HH\:mm\:ss}][${event-properties:item=UserId}][${event-properties:item=TaskGroup}][${level}] ${message}" fileName="${basedir}/logs/log${shortdate}.txt" keepFileOpen="false" /&gt;
   &lt;/targets&gt;
   &lt;rules&gt;

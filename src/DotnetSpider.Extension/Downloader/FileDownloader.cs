@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 
@@ -16,7 +17,7 @@ namespace DotnetSpider.Extension.Downloader
 				Content = File.ReadAllText(request.Url.LocalPath),
 				TargetUrl = request.Url.ToString(),
 				Url = request.Url.ToString(),
-				StatusCode = 200
+				StatusCode = HttpStatusCode.OK
 			};
 
 			return page;

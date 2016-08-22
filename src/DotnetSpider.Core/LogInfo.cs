@@ -1,9 +1,31 @@
 ﻿using System;
+using System.IO;
 using System.Net;
+using DotnetSpider.Core.Common;
 using NLog;
+using NLog.Config;
 
 namespace DotnetSpider.Core
 {
+	public class LogManagerHelper
+	{
+		private static bool _init;
+
+		public static void InitLogManager()
+		{
+			if (!_init)
+			{
+				string nlogConfigPath = Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config");
+				if (File.Exists(nlogConfigPath))
+				{
+					File.AppendAllText(nlogConfigPath, Resource.nlog);
+					LogManager.Configuration = new XmlLoggingConfiguration(nlogConfigPath);
+				}
+				_init = true;
+			}
+		}
+	}
+
 	public class LogInfo
 	{
 		public static string Machine = Dns.GetHostName();

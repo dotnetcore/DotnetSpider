@@ -62,8 +62,9 @@ namespace DotnetSpider.Core {
         /// <summary>
         ///    Looks up a localized string similar to  &lt;nlog xmlns=&quot;http://www.nlog-project.org/schemas/NLog.xsd&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; throwExceptions=&quot;true&quot;&gt;
         ///  &lt;targets&gt;
-        ///    &lt;target name=&quot;console&quot; xsi:type=&quot;ColoredConsole&quot;  layout=&quot;[${date:format=yyyyMMdd HH\:mm\:ss}][${event-properties:item=UserId}][${event-properties:item=TaskGroup}][${level}] ${message}&quot;/&gt;
-        ///    &lt;target name=&quot;file&quot; xsi:type=&quot;File&quot; maxArchiveFiles=&quot;30&quot; layout=&quot;[${date:format=yyyyMMdd HH\:mm\:ss}][${event-properties:item=UserId}][${event-properties:item=TaskGrou [rest of string was truncated]&quot;;.
+        ///    &lt;target name=&quot;console&quot; xsi:type=&quot;ColoredConsole&quot; useDefaultRowHighlightingRules=&quot;true&quot; layout=&quot;[${date:format=yyyyMMdd HH\:mm\:ss}][${event-properties:item=UserId}][${event-properties:item=TaskGroup}][${level}] ${message}&quot;&gt;
+        ///      &lt;highlight-row foregroundColor=&quot;Cyan&quot; condition=&quot;level == LogLevel.Trace&quot;/&gt;
+        ///      &lt;highlight-row foregroundColor=&quot;DarkGray&quot; c [rest of string was truncated]&quot;;.
         /// </summary>
         public static string nlog {
             get {
