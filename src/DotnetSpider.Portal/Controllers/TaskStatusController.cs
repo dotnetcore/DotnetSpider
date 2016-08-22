@@ -5,8 +5,6 @@ using Dapper;
 using DotnetSpider.Portal.Models;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
-using Sakura.AspNetCore.Mvc;
-using Sakura.AspNetCore.Mvc.Generators;
 
 namespace DotnetSpider.Portal.Controllers
 {
