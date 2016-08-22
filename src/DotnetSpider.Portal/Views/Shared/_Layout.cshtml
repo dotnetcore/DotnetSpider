@@ -21,8 +21,8 @@
         <link rel="stylesheet" href="~/dist/css/skins/skin-blue.min.css">
     </environment>
     <environment names="Staging,Production">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="~/css/site.css"/>
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
         <!-- Ionicons -->
@@ -31,11 +31,12 @@
         <link rel="stylesheet" href="~/dist/css/AdminLTE.min.css">
         <link rel="stylesheet" href="~/lib/layer/skin/layer.css">
         <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
-          page. However, you can choose any other skin. Make sure you
-          apply the skin class to the body tag so the changes take effect.
-    -->
+        page. However, you can choose any other skin. Make sure you
+        apply the skin class to the body tag so the changes take effect.
+        -->
         <link rel="stylesheet" href="~/dist/css/skins/skin-blue.min.css">
     </environment>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
     @*@Html.ApplicationInsightsJavaScript(TelemetryConfiguration)*@
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
@@ -243,7 +244,7 @@
                     <li class="header">HEADER</li>
                     <!-- Optionally, you can add icons to the links -->
                     <li><a title="Dashboad" href="#"><i class="fa fa-dashboard"></i><span>Dashboad</span></a></li>
-                    <li class="active"><a title="TaskStatus" href="~/taskstatus/list/?page=1&pageSize=15"><i class="fa fa-dashboard"></i><span>TaskStatus</span></a></li>
+                    <li class="active"><a title="TaskStatus" href="~/taskstatus/dashboad/?page=1&pageSize=15"><i class="fa fa-dashboard"></i><span>TaskStatus</span></a></li>
                     <li class="treeview">
                         <a href="#">
                             <i class="fa fa-wrench"></i> <span>Deploy</span>
@@ -384,14 +385,12 @@
             <div class="control-sidebar-bg"></div>*@
     </div>
     <environment names="Development">
-        <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/dist/js/app.min.js"></script>
         <script src="~/lib/layer/layer.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
     </environment>
     <environment names="Staging,Production">
-        <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/dist/js/app.min.js"></script>
         <script src="~/lib/layer/layer.js"></script>

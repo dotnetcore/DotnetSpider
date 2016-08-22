@@ -37,6 +37,7 @@ namespace DotnetSpider.Portal
 				// Use default pager options.
 				options.ConfigureDefault();
 			});
+			
 			services.AddMvc();
 		}
 
@@ -66,7 +67,7 @@ namespace DotnetSpider.Portal
 			{
 				routes.MapRoute(
 					name: "default",
-					template: "{controller=taskstatus}/{action=list}/{id?}");
+					template: "{controller=taskstatus}/{action=dashboad}/{id?}");
 			});
 		}
 	}
