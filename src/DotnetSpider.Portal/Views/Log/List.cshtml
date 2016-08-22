@@ -1,11 +1,11 @@
-﻿@model List<DotnetSpider.Portal.Models.TaskStatus>
-@{
+﻿@model  List<DotnetSpider.Portal.Models.LogInfo>
+@{    
 }
 <div class="row">
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">Task Status</h3>
+                <h3 class="box-title">@ViewBag.Identity</h3>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -20,46 +20,22 @@
                             <table id="taskStatusTable" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="Task Status">
                                 <thead>
                                     <tr role="row">
-                                        <th tabindex="0" rowspan="1" colspan="1" aria-sort="ascending">Task Group</th>
-                                        <th tabindex="0" rowspan="1" colspan="1">Identity</th>
-                                        <th tabindex="0" rowspan="1" colspan="1">Status</th>
-                                        <th tabindex="0" rowspan="1" colspan="1">Message</th>
-                                        <th tabindex="0" rowspan="1" colspan="1">Control</th>
-                                        <th tabindex="0" rowspan="1" colspan="1">Log</th>
+                                        <th class="sorting_asc" tabindex="0" rowspan="1" colspan="1" aria-sort="ascending">Task Group</th>
+                                        <th class="sorting" tabindex="0" rowspan="1" colspan="1">Time</th>
+                                        <th class="sorting" tabindex="0" rowspan="1" colspan="1">Level</th>
+                                        <th class="sorting" tabindex="0" rowspan="1" colspan="1">Message</th>
+                                        <th class="sorting" tabindex="0" rowspan="1" colspan="1">CallSite</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @*<tr role="row" class="odd">
-                                            <td>YY</td>
-                                            <td>YY Channels 2016-08-19 180001</td>
-                                            <td><span class="badge bg-green" style="width: 60px">Running</span></td>
-                                            <td>Left: 23 Total: 100 Success: 50 Error: 0</td>
-                                            <td>
-                                                <div class="col-sm-4">
-                                                    <a href="#" class="btn-link"><i class="fa fa-play"></i>Run</a>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <a href="#" class="btn-link"><i class="fa fa-stop"></i> Exit</a>
-                                                </div>
-                                            </td>
-                                            <td><a href="javascript:" title="Log" onclick='loadContent(this, "home", "log", "id=YY Channels 2016-08-19 180001")'>View Log</a></td>
-                                        </tr>*@
                                     @foreach (var task in Model)
                                     {
                                         <tr role="row" class="odd">
                                             <td>@task.TaskGroup</td>
-                                            <td>@task.Identity</td>
-                                            <td><span class="@task.StatusClass" style="width: 60px">@task.Status</span></td>
+                                            <td>@task.Logged</td>
+                                            <td><span class="@task.LevelClass" style="width: 60px">@task.Level</span></td>
                                             <td>@task.Message</td>
-                                            <td>
-                                                <div class="col-sm-4">
-                                                    <a href="#" class="btn-link"><i class="fa fa-play"></i>Run</a>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <a href="#" class="btn-link"><i class="fa fa-stop"></i> Exit</a>
-                                                </div>
-                                            </td>
-                                            <td><a href="javascript:" title="Log" onclick='loadContent(this,"home","log","id=@task.Identity")'>View Log</a></td>
+                                            <td>@task.CallSite</td>
                                         </tr>}
                                 </tbody>
                             </table>
@@ -69,7 +45,9 @@
                         <div class="col-sm-5">
                         </div>
                         <div class="col-sm-7">
-                            <pager pager-option="ViewBag.PagerOption as MoPagerOption"></pager>
+                            <ul class="pagination">
+                                <pager current-page="@ViewBag.CurrentPage" total-page="@ViewBag.TotalPage" />
+                            </ul>
                             @*<div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
                                     <ul class="pagination">
                                         <li class="paginate_button previous disabled" id="example2_previous">

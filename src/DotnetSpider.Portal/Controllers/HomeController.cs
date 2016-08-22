@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DotnetSpider.Portal.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
-using TaskStatus = DotnetSpider.Portal.Models.TaskStatus;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetSpider.Portal.Controllers
 {
@@ -26,11 +19,6 @@ namespace DotnetSpider.Portal.Controllers
 		}
 
 		public IActionResult Error()
-		{
-			return View();
-		}
-
-		public IActionResult Log(string id)
 		{
 			return View();
 		}

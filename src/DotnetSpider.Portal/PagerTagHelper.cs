@@ -85,29 +85,29 @@ namespace DotnetSpider.Portal
 								PagerOption.RouteUrl,
 								PagerOption.CurrentPage - 1 <= 0 ? 1 : PagerOption.CurrentPage - 1);
 						}
- 
+
 						var spitindex = PagerOption.CurrentPage - 2;
 
 						if (spitindex > 4)
 						{
-							sbPage.AppendFormat("<li><a href=\"{0}/{1}\">1</a></li>", PagerOption.RouteUrl,1);
+							sbPage.AppendFormat("<li><a href=\"{0}/{1}\">1</a></li>", PagerOption.RouteUrl, 1);
 							sbPage.AppendFormat("<li><a href=\"{0}/{1}\">...</a></li>", PagerOption.RouteUrl, spitindex - 1);
 						}
 						else
 						{
-							for (int i = 0; i < spitindex; i++)
+							for (int i = 2; i < spitindex; i++)
 							{
-								sbPage.AppendFormat("<li><a href=\"{0}/{1}\">{1}</a></li>", PagerOption.RouteUrl, i + 1);
+								sbPage.AppendFormat("<li><a href=\"{0}/{1}\">{1}</a></li>", PagerOption.RouteUrl, i);
 							}
 						}
 
-						for (int i = PagerOption.CurrentPage - 1; i < PagerOption.CurrentPage; i++)
+						for (int i = spitindex; i < PagerOption.CurrentPage; i++)
 						{
 							if (i >= PagerOption.CurrentPage || i < 0)
 							{
 								continue;
 							}
-							sbPage.AppendFormat("<li><a href=\"{0}/{1}\">{1}</a></li>", PagerOption.RouteUrl, i + 1);
+							sbPage.AppendFormat("<li><a href=\"{0}/{1}\">{1}</a></li>", PagerOption.RouteUrl, i);
 						}
 
 						sbPage.AppendFormat("<li class='active'><a><b>{0}</b></a></li>", PagerOption.CurrentPage);

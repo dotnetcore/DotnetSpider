@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Sakura.AspNetCore.Mvc;
 
 namespace DotnetSpider.Portal
 {
@@ -35,7 +32,11 @@ namespace DotnetSpider.Portal
 		{
 			// Add framework services.
 			services.AddApplicationInsightsTelemetry(Configuration);
-
+			services.AddBootstrapPagerGenerator(options =>
+			{
+				// Use default pager options.
+				options.ConfigureDefault();
+			});
 			services.AddMvc();
 		}
 
@@ -65,7 +66,7 @@ namespace DotnetSpider.Portal
 			{
 				routes.MapRoute(
 					name: "default",
-					template: "{controller=Dashboad}/{action=TaskStatus}/{id?}");
+					template: "{controller=taskstatus}/{action=list}/{id?}");
 			});
 		}
 	}

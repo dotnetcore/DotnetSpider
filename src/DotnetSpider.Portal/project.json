@@ -23,7 +23,10 @@
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
     "Dapper": "1.50.2",
     "SapientGuardian.MySql.Data": "6.9.812",
-    "Microsoft.Extensions.Configuration.Ini": "1.0.0"
+    "Microsoft.Extensions.Configuration.Ini": "1.0.0",
+    "Sakura.AspNetCore.PagedList": "1.0.2",
+    "Sakura.AspNetCore.Mvc.PagedList": "2.0.2",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0"
   },
 
   "tools": {
