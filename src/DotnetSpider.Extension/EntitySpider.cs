@@ -148,7 +148,7 @@ namespace DotnetSpider.Extension
 					}
 				}
 
-				SpiderMonitor.Default.Register(this);
+				SpiderMonitor.Register(this);
 
 				Db?.LockRelease(key, 0);
 
@@ -166,13 +166,11 @@ namespace DotnetSpider.Extension
 				TaskFinished();
 
 				HandleVerifyCollectData();
-
-				Thread.Sleep(10000);
 			}
 			finally
 			{
 				Dispose();
-				SpiderMonitor.Default.Dispose();
+				SpiderMonitor.Dispose();
 			}
 		}
 
@@ -369,7 +367,7 @@ namespace DotnetSpider.Extension
 				NetworkCenter.Current.Executor = RedialExecutor;
 			}
 
-			if (!string.IsNullOrEmpty(Configuration.GetValue("redisHost")) && string.IsNullOrWhiteSpace(Configuration.GetValue("redisHost")))
+			if (!string.IsNullOrEmpty(Configuration.GetValue("redisHost")) && !string.IsNullOrWhiteSpace(Configuration.GetValue("redisHost")))
 			{
 				var host = Configuration.GetValue("redisHost");
 

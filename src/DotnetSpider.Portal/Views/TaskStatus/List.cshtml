@@ -17,7 +17,7 @@
                     <th tabindex="0" rowspan="1" colspan="1">Status</th>
                     <th tabindex="0" rowspan="1" colspan="1">Message</th>
                     <th tabindex="0" rowspan="1" colspan="1">Last Update</th>
-                    <th tabindex="0" rowspan="1" colspan="1">Run</th>
+                    @*<th tabindex="0" rowspan="1" colspan="1">Run</th>*@
                     <th tabindex="0" rowspan="1" colspan="1">Exit</th>
                     <th tabindex="0" rowspan="1" colspan="1">Log</th>
                 </tr>
@@ -31,8 +31,14 @@
                         <td><span class="@task.StatusClass" style="width: 60px">@task.Status</span></td>
                         <td>@task.Message</td>
                         <td>@task.Logged</td>
-                        <td><a href="#" class="btn-link"><i class="fa fa-play"></i>Run</a></td>
-                        <td><a href="#" class="btn-link"><i class="fa fa-stop"></i> Exit</a></td>
+                        @*<td><a href="#" class="btn-link"><i class="fa fa-play"></i>Run</a></td>*@
+                        @if (task.Status == "Running" || task.Status == "Init")
+                        {
+                            <td><a href="#" class="btn-link" onclick="stopTask('@task.Identity')"><i class="fa fa-stop"></i>Exit</a></td>
+                        }
+                        else
+                        {
+                            <td>Can't Exit</td> }
                         <td><a href="~/log/list/?identity=@task.Identity&page=1&pageSize=15" title="Log">View Log</a></td>
                     </tr>}
             </tbody>

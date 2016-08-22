@@ -28,9 +28,13 @@ namespace DotnetSpider.Portal.Models
 						{
 							return "badge bg-light-blue";
 						}
-					case "Init":
+					case "Stopped":
 						{
 							return "badge bg-yellow";
+						}
+					case "Init":
+						{
+							return "badge bg-gray";
 						}
 				}
 				return "";

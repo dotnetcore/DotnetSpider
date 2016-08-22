@@ -8,4 +8,15 @@ function loadContent(event, controler, action, query) {
         });
 }
 
+function stopTask(id) {
+    $.get("/taskstatus/stop/?identity=" + id,
+        function (data) {
+            if (data === "OK") {
+                layer.alert("停止成功", { icon: 1 });
+            } else {
+                layer.alert("停止失败", { icon: 2 });
+            }
+        });
+}
+
 

@@ -4,45 +4,53 @@ using System.Globalization;
 using System.Threading;
 using DotnetSpider.Core.Common;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Core.Monitor
 {
-	public class SpiderMonitor
-	{
-		private static SpiderMonitor _instanse;
+	public static class SpiderMonitor
+	{ 
 		private static readonly object Locker = new object();
-		private readonly Dictionary<ISpider, Timer> _data = new Dictionary<ISpider, Timer>();
-		private readonly List<IMonitorService> _monitorServices;
+		private static readonly Dictionary<ISpider, Task> MoniteSpiders = new Dictionary<ISpider, Task>();
+		private static readonly List<IMonitorService> MonitorServices;
 
-		private SpiderMonitor()
+		static SpiderMonitor()
 		{
-			_monitorServices = IocExtension.ServiceProvider.GetServices<IMonitorService>().ToList();
+			MonitorServices = IocExtension.ServiceProvider.GetServices<IMonitorService>().ToList();
 		}
 
-		public SpiderMonitor Register(params Spider[] spiders)
+		public static void Register(params Spider[] spiders)
 		{
-			lock (this)
+			lock (Locker)
 			{
-				foreach (Spider spider in spiders)
+				foreach (Spider sp in spiders)
 				{
-					if (!_data.ContainsKey(spider))
+					if (!MoniteSpiders.ContainsKey(sp))
 					{
-						Timer timer = new Timer(WatchStatus, spider, 0, 2000);
-						_data.Add(spider, timer);
+						MoniteSpiders.Add(sp, Task.Factory.StartNew(s =>
+						{
+							var spider = (Spider)s;
+							while (!spider.IfExited())
+							{
+								UpdateStatus(spider);
+
+								Thread.Sleep(2000);
+							}
+
+							UpdateStatus(spider);
+						}, sp));
 					}
 				}
-				return this;
 			}
 		}
 
-		private void WatchStatus(object obj)
+		private static void UpdateStatus(Spider spider)
 		{
-			foreach (var service in _monitorServices)
+			foreach (var service in MonitorServices)
 			{
 				if (service.IsEnabled)
 				{
-					var spider = (Spider)obj;
 					var monitor = spider.GetMonitor();
 
 					service.Watch(new SpiderStatus
@@ -64,22 +72,16 @@ namespace DotnetSpider.Core.Monitor
 			}
 		}
 
-		public void Dispose()
+		public static void Dispose()
 		{
-			foreach (var service in _monitorServices)
+			while (MoniteSpiders.Any(p => !p.Value.IsCompleted))
+			{
+				Thread.Sleep(500);
+			}
+
+			foreach (var service in MonitorServices)
 			{
 				service.Dispose();
-			}
-		}
-
-		public static SpiderMonitor Default
-		{
-			get
-			{
-				lock (Locker)
-				{
-					return _instanse ?? (_instanse = new SpiderMonitor());
-				}
 			}
 		}
 	}

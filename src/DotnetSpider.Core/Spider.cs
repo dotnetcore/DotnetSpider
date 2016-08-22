@@ -10,7 +10,6 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
 using NLog;
@@ -180,6 +179,11 @@ namespace DotnetSpider.Core
 			CheckIfRunning();
 
 			Site = site;
+		}
+
+		public bool IfExited()
+		{
+			return IsExited;
 		}
 
 		public void SetIdentity(string identity)

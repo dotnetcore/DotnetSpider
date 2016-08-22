@@ -17,10 +17,14 @@ namespace DotnetSpider.Sample
 		{
 			EntitySpider context = new EntitySpider(new Site
 			{
-				HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("http://dev.kuaidaili.com/api/getproxy/?orderid=917184806038194&num=999&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_tr=1&an_an=1&an_ha=1&sep=1"))
-			});
+				//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("http://dev.kuaidaili.com/api/getproxy/?orderid=917184806038194&num=999&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_tr=1&an_an=1&an_ha=1&sep=1"))
+			})
+			{
+				UserId = "86Research",
+				TaskGroup = "JdSkuSampleSpider"
+			};
 			context.SetThreadNum(1);
-			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd"));
 			context.AddEntityPipeline(
 				new MySqlEntityPipeline("Database='test';Data Source=redis;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main",

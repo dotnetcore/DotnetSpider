@@ -26,6 +26,7 @@
     "Microsoft.Extensions.Configuration.Ini": "1.0.0",
     "Sakura.AspNetCore.PagedList": "1.0.2",
     "Sakura.AspNetCore.Mvc.PagedList": "2.0.2",
+    "StackExchange.Redis": "1.1.604-alpha",
     "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0"
   },
 
