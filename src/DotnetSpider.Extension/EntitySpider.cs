@@ -167,7 +167,7 @@ namespace DotnetSpider.Extension
 
 				HandleVerifyCollectData();
 
-				Thread.Sleep(4000);
+				Thread.Sleep(10000);
 			}
 			finally
 			{

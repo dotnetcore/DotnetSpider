@@ -96,7 +96,7 @@ namespace DotnetSpider.Core
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-
+			LogManagerHelper.InitLogManager();
 			Logger = LogManager.GetCurrentClassLogger();
 			IsExited = false;
 		}
