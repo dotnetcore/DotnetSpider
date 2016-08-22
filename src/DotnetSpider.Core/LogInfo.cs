@@ -16,11 +16,11 @@ namespace DotnetSpider.Core
 			if (!_init)
 			{
 				string nlogConfigPath = Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config");
-				if (File.Exists(nlogConfigPath))
+				if (!File.Exists(nlogConfigPath))
 				{
 					File.AppendAllText(nlogConfigPath, Resource.nlog);
-					LogManager.Configuration = new XmlLoggingConfiguration(nlogConfigPath);
 				}
+				LogManager.Configuration = new XmlLoggingConfiguration(nlogConfigPath);
 				_init = true;
 			}
 		}

@@ -20,7 +20,7 @@ namespace DotnetSpider.Portal.Models
 						{
 							return "badge bg-green";
 						}
-					case "Exit":
+					case "Exited":
 						{
 							return "badge bg-red";
 						}
