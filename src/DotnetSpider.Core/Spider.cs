@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
 using NLog;
@@ -473,7 +475,8 @@ namespace DotnetSpider.Core
 						{
 							if (request.GetExtra(Request.Proxy) != null)
 							{
-								Site.ReturnHttpProxy(request.GetExtra(Request.Proxy), request.GetExtra(Request.StatusCode));
+								var statusCode = request.GetExtra(Request.StatusCode);
+								Site.ReturnHttpProxy(request.GetExtra(Request.Proxy), statusCode == null ? HttpStatusCode.Found : (HttpStatusCode)statusCode);
 							}
 						}
 

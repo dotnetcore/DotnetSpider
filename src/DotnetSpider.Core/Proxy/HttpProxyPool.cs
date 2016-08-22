@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Proxy
 
 		private ILogger Logger { get; }
 		private readonly int _reuseInterval;
- 
+
 		public HttpProxyPool(IProxySupplier supplier, int reuseInterval = 1500)
 		{
 			if (supplier == null)
@@ -31,7 +31,10 @@ namespace DotnetSpider.Core.Proxy
 
 			var timer = new Timer((a) =>
 			{
-				UpdateProxy();
+				if (_proxyQueue.Count < 50)
+				{
+					UpdateProxy();
+				}
 			}, null, 1, 30000);
 		}
 
@@ -41,7 +44,7 @@ namespace DotnetSpider.Core.Proxy
 
 			Parallel.ForEach(result, new ParallelOptions
 			{
-				MaxDegreeOfParallelism = 1
+				MaxDegreeOfParallelism = 10
 			}, proxy =>
 			{
 				var key = proxy.Key;
@@ -65,22 +68,19 @@ namespace DotnetSpider.Core.Proxy
 
 		public UseSpecifiedUriWebProxy GetProxy()
 		{
-			lock (this)
+			for (int i = 0; i < 60; ++i)
 			{
-				for (int i = 0; i < 60; ++i)
+				var proxy = _proxyQueue.FirstOrDefault(p => DateTimeUtils.GetCurrentTimeStamp() - p.GetLastUseTime() > _reuseInterval);
+				if (proxy != null)
 				{
-					var proxy = _proxyQueue.FirstOrDefault(p => DateTimeUtils.GetCurrentTimeStamp() - p.GetLastUseTime() > _reuseInterval);
-					if (proxy != null)
-					{
-						proxy.SetLastBorrowTime(DateTimeUtils.GetCurrentTimeStamp());
-						_proxyQueue.Remove(proxy);
-						return proxy.GetWebProxy();
-					}
-					Thread.Sleep(1000);
+					proxy.SetLastBorrowTime(DateTimeUtils.GetCurrentTimeStamp());
+					_proxyQueue.Remove(proxy);
+					return proxy.GetWebProxy();
 				}
-
-				throw new SpiderException("Get proxy timeout.");
+				Thread.Sleep(1000);
 			}
+
+			throw new SpiderException("Get proxy timeout.");
 		}
 
 		public void ReturnProxy(UseSpecifiedUriWebProxy host, HttpStatusCode statusCode)
@@ -91,40 +91,37 @@ namespace DotnetSpider.Core.Proxy
 				return;
 			}
 
-			lock (this)
+			Proxy p = _allProxy[key];
+			switch (statusCode)
 			{
-				Proxy p = _allProxy[key];
-				switch (statusCode)
-				{
-					case HttpStatusCode.OK:
-						p.SetFailedNum(0);
-						p.SetReuseTime(_reuseInterval);
-						p.RecordResponse();
-						break;
-					case HttpStatusCode.Forbidden:
-						p.Fail();
-						p.SetReuseTime(_reuseInterval * p.FailedNum);
-						break;
-					case HttpStatusCode.NotFound:
-						p.Fail();
-						p.SetReuseTime(_reuseInterval * p.FailedNum);
-						break;
-					default:
-						p.Fail();
-						p.SetReuseTime(_reuseInterval * p.FailedNum);
-						break;
-				}
-				if (p.FailedNum > 20)
-				{
-					return;
-				}
-				if (p.FailedNum % 3 == 0 && !ProxyUtil.ValidateProxy(p.HttpHost.Uri.Host, p.HttpHost.Uri.Port))
-				{
-					return;
-				}
-
-				_proxyQueue.Add(p);
+				case HttpStatusCode.OK:
+					p.SetFailedNum(0);
+					p.SetReuseTime(_reuseInterval);
+					p.RecordResponse();
+					break;
+				case HttpStatusCode.Forbidden:
+					p.Fail();
+					p.SetReuseTime(_reuseInterval * p.FailedNum);
+					break;
+				case HttpStatusCode.NotFound:
+					p.Fail();
+					p.SetReuseTime(_reuseInterval * p.FailedNum);
+					break;
+				default:
+					p.Fail();
+					p.SetReuseTime(_reuseInterval * p.FailedNum);
+					break;
 			}
+			if (p.FailedNum > 20)
+			{
+				return;
+			}
+			if (p.FailedNum % 3 == 0 && !ProxyUtil.ValidateProxy(p.HttpHost.Uri.Host, p.HttpHost.Uri.Port))
+			{
+				return;
+			}
+
+			_proxyQueue.Add(p);
 		}
 
 		public int GetIdleNum()

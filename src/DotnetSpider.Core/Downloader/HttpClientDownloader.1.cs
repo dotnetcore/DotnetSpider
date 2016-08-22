@@ -25,7 +25,6 @@ namespace DotnetSpider.Core.Downloader
 			HttpResponseMessage response = null;
 			var proxy = site.GetHttpProxy();
 			request.PutExtra(Request.Proxy, proxy);
-			HttpStatusCode httpStatusCode = HttpStatusCode.OK;
 			try
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, site);
@@ -49,7 +48,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					throw new DownloadException($"下载 {request.Url} 失败. Code: {response.StatusCode}");
 				}
-				httpStatusCode = response.StatusCode;
+				var httpStatusCode = response.StatusCode;
 				request.PutExtra(Request.StatusCode, httpStatusCode);
 
 				Page page = HandleResponse(request, response, httpStatusCode, site);
