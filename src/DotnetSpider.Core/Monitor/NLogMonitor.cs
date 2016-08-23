@@ -1,5 +1,4 @@
-﻿using System;
-using NLog;
+﻿using NLog;
 
 namespace DotnetSpider.Core.Monitor
 {
@@ -10,8 +9,7 @@ namespace DotnetSpider.Core.Monitor
 		private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
 		public void Watch(SpiderStatus status)
-		{
-			Console.WriteLine("Logger Name: " + _logger.Name);
+		{ 
 			string msg = $"Left {status.Left} Success {status.Success} Error {status.Error} Total {status.Total} Thread {status.ThreadNum}";
 			LogEventInfo theEvent = new LogEventInfo(LogLevel.Trace, "", msg);
 			theEvent.Properties["UserId"] = status.UserId;
