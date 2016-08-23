@@ -1,8 +1,12 @@
-﻿@model  List<DotnetSpider.Portal.Models.TaskStatus>
+﻿@using Sakura.AspNetCore.Mvc
+@model  List<DotnetSpider.Portal.Models.TaskStatus>
 @{
 }
 <div class="row">
-    <input id="dataUrl" value="@ViewBag.DataUrl" style="display:none;"/>
+    <input id="baseUrl" value="@ViewBag.BaseUrl" style="display: none;" />
+    <input id="updateUrl" value="@ViewBag.UpdateUrl" style="display: none;" />
+    <input id="taskGroup" value="@ViewBag.TaskGroup" style="display: none;" />
+    <input id="date" value="@ViewBag.Date" style="display: none;" />
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
@@ -11,7 +15,32 @@
             <!-- /.box-header -->
             <div class="box-body">
                 <div class="dataTables_wrapper form-inline dt-bootstrap">
-                    <div id="dataList"></div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>
+                                TaskGroup
+                                <select id="taskGroupFilter" class="form-control input-sm">
+                                    <option value="All">All</option>
+                                    @foreach (var taskGroup in ViewBag.TaskGroups)
+                                    {
+                                        <option value="@taskGroup.TaskGroup">@taskGroup.TaskGroup</option>}
+                                </select>
+                            </label>
+                        </div>
+                        <div class="col-md-2">
+                            <label>
+                                日期
+                                <select id="dateFilter" class="form-control input-sm">
+                                    <option value="Today">Today</option>
+                                    <option value="LastThreeDays">Last Three Days</option>
+                                    <option value="LastSevenDays">Last Seven Days</option>
+                                    <option value="All">All</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px" id="dataList">
+                    </div>
                     <div class="row">
                         <div class="col-sm-5">
                         </div>
@@ -22,16 +51,23 @@
                         </div>
                     </div>
                 </div>
+                <!-- /.box-body -->
             </div>
-            <!-- /.box-body -->
+            <!-- /.box -->
         </div>
-        <!-- /.box -->
+        <!-- /.col -->
     </div>
-    <!-- /.col -->
-</div>
 <script type="text/javascript">
+    var taskGroup = $('#taskGroupFilter');
+    taskGroup.val($('#taskGroup').val());
+    taskGroup.attr("onchange", "filterChanged()");
+
+    var date = $('#dateFilter');
+    date.val($('#date').val());
+    date.attr("onchange", "filterChanged()");
+
     function updateTaskStatus() {
-        var url = $('#dataUrl').val();
+        var url = $('#updateUrl').val();
         $.get(url,
             function (data) {
                 var content = $('#dataList');
@@ -39,6 +75,11 @@
             });
     }
 
+    function filterChanged() {
+        var taskGroup = $('#taskGroupFilter').val();
+        var date = $('#dateFilter').val();
+        window.location.href = $('#baseUrl').val() + "taskGroup=" + taskGroup + "&date=" + date;
+    }
     updateTaskStatus();
     setInterval(updateTaskStatus, 5000);
 </script>

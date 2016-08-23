@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net;
+using System.Text;
 using Dapper;
 using DotnetSpider.Portal.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -12,28 +14,157 @@ namespace DotnetSpider.Portal.Controllers
 {
 	public class TaskStatusController : Controller
 	{
-		public IActionResult Dashboad(int? page = 1, int? pageSize = 15)
+		public IActionResult Dashboad(int? page = 1, int? pageSize = 15, string taskGroup = null, string date = null)
 		{
+			bool needRedirect = !HttpContext.Request.Query.ContainsKey("page") || !HttpContext.Request.Query.ContainsKey("pageSize") || !HttpContext.Request.Query.ContainsKey("taskGroup") || !HttpContext.Request.Query.ContainsKey("date");
 			int no = page ?? 1;
 			int size = pageSize ?? 15;
+			taskGroup = taskGroup ?? "All";
+			date = date ?? "All";
+			if (needRedirect)
+			{
+				return Redirect($"/taskstatus/dashboad/?page={no}&pageSize={size}&taskGroup={taskGroup}&date={date}");
+			}
 			using (MySqlConnection conn = new MySqlConnection(Startup.Configuration.GetSection("ConnectionStrings")["MySqlConnectString"]))
 			{
-				var totalCount = conn.Query<CountResult>("SELECT COUNT(*) AS Count FROM nlog.status").First();
+				var totalCount = conn.Query<CountResult>(GetSelectTotalCountSql(taskGroup, date)).First();
 				var totalPage = totalCount.Count / size + (totalCount.Count % size > 0 ? 1 : 0);
-				ViewBag.DataUrl = $"/taskstatus/list/?page={no}&pageSize={size}";
-				ViewBag.CurrentPage = no;
+				ViewBag.UpdateUrl = $"/taskstatus/list/?page={no}&pageSize={size}&taskGroup={taskGroup}&date={date}";
+				ViewBag.BaseUrl = $"/taskstatus/dashboad/?page={no}&pageSize={size}&";
 				ViewBag.TotalPage = (int)totalPage;
+				ViewBag.CurrentPage = no;
+				ViewBag.TaskGroup = taskGroup;
+				ViewBag.Date = date;
+				ViewBag.TaskGroups = conn.Query<TaskStatus>("SELECT taskgroup FROM nlog.status GROUP BY taskgroup").ToList();
 				return View();
 			}
 		}
 
-		public IActionResult List(int? page = 1, int? pageSize = 15)
+		private string GetSelectTotalCountSql(string taskGroup, string date)
 		{
+			string taskGroupFilter = "";
+			if (!string.IsNullOrEmpty(taskGroup))
+			{
+				if (taskGroup == "All")
+				{
+					taskGroupFilter = "";
+				}
+				else
+				{
+					taskGroupFilter = $"`taskGroup`='{taskGroup}'";
+				}
+			}
+			string dateFilter = "";
+			if (!string.IsNullOrEmpty(date))
+			{
+				switch (date)
+				{
+					case "Today":
+					{
+						dateFilter = $"`logged`>='{DateTime.Now.ToString("yyyy-MM-dd")}'";
+						break;
+					}
+					case "All":
+					{
+						dateFilter = "";
+						break;
+					}
+					case "LastThreeDays":
+					{
+						dateFilter = $"`logged`>='{DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd")}'";
+						break;
+					}
+					case "LastSevenDays":
+					{
+						dateFilter = $"`logged`>='{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")}'";
+						break;
+					}
+					default:
+					{
+						dateFilter = "";
+						break;
+					}
+				}
+			}
+			StringBuilder sql = new StringBuilder("SELECT COUNT(*) as Count FROM nlog.status WHERE 1=1 ");
+
+			if (!string.IsNullOrEmpty(taskGroupFilter))
+			{
+				sql.Append($" AND {taskGroupFilter}");
+			}
+			if (!string.IsNullOrEmpty(dateFilter))
+			{
+				sql.Append($" AND {dateFilter}");
+			}
+
+			return sql.ToString();
+		}
+
+		public IActionResult List(int page = 1, int pageSize = 15, string taskGroup = null, string date = null)
+		{
+			string taskGroupFilter = "";
+			if (!string.IsNullOrEmpty(taskGroup))
+			{
+				if (taskGroup == "All")
+				{
+					taskGroupFilter = "";
+				}
+				else
+				{
+					taskGroupFilter = $"`taskGroup`='{taskGroup}'";
+				}
+			}
+			string dateFilter = "";
+			if (!string.IsNullOrEmpty(date))
+			{
+				switch (date)
+				{
+					case "Today":
+						{
+							dateFilter = $"`logged`>='{DateTime.Now.ToString("yyyy-MM-dd")}'";
+							break;
+						}
+					case "All":
+						{
+							dateFilter = "";
+							break;
+						}
+					case "LastThreeDays":
+						{
+							dateFilter = $"`logged`>='{DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd")}'";
+							break;
+						}
+					case "LastSevenDays":
+						{
+							dateFilter = $"`logged`>='{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")}'";
+							break;
+						}
+					default:
+						{
+							dateFilter = "";
+							break;
+						}
+				}
+			}
+
+			StringBuilder sql = new StringBuilder("SELECT * FROM nlog.status WHERE 1=1 ");
+
+			if (!string.IsNullOrEmpty(taskGroupFilter))
+			{
+				sql.Append($" AND {taskGroupFilter}");
+			}
+			if (!string.IsNullOrEmpty(dateFilter))
+			{
+				sql.Append($" AND {dateFilter}");
+			}
+			sql.Append($" ORDER BY id DESC LIMIT {(page - 1) * pageSize},{pageSize}");
+
 			using (MySqlConnection conn = new MySqlConnection(Startup.Configuration.GetSection("ConnectionStrings")["MySqlConnectString"]))
 			{
-				int no = page ?? 1;
-				int size = pageSize ?? 15;
-				List<TaskStatus> list = GetItems(conn, no, size);
+				
+				List<TaskStatus> list =
+					conn.Query<TaskStatus>(sql.ToString())
+						.ToList();
 				return View(list);
 			}
 		}
@@ -85,10 +216,5 @@ namespace DotnetSpider.Portal.Controllers
 			return "REDIS Host is incorrect.";
 		}
 
-
-		private List<TaskStatus> GetItems(IDbConnection conn, int page, int pageSize)
-		{
-			return conn.Query<TaskStatus>($"SELECT * FROM nlog.status ORDER BY id DESC LIMIT {(page - 1) * pageSize},{pageSize}").ToList();
-		}
 	}
 }

@@ -3,11 +3,6 @@
     Layout = null;
 }
 <div class="row">
-    <div class="col-sm-6">
-    </div>
-    <div class="col-sm-6"></div>
-</div>
-<div class="row">
     <div class="col-sm-12">
         <table id="taskStatusTable" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="Task Status">
             <thead>
@@ -35,7 +30,7 @@
                         @if (task.Status == "Running" || task.Status == "Init")
                         {
                             <td><a href="#" class="btn-link" onclick="stopTask('@task.Identity')"><i class="fa fa-stop"></i>Exit</a></td>
-                        }
+}
                         else
                         {
                             <td>Can't Exit</td> }
