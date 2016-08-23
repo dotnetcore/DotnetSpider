@@ -37,7 +37,7 @@ namespace DotnetSpider.Portal.Controllers
 				ViewBag.TaskGroup = taskGroup;
 				ViewBag.Date = date;
 				ViewBag.Status = status;
-				ViewBag.TaskGroups = conn.Query<TaskStatus>("SELECT taskgroup FROM nlog.status GROUP BY taskgroup").ToList();
+				ViewBag.TaskGroups = conn.Query<TaskStatus>("SELECT taskgroup FROM dotnetspider.status GROUP BY taskgroup").ToList();
 				return View();
 			}
 		}
@@ -105,7 +105,7 @@ namespace DotnetSpider.Portal.Controllers
 						}
 				}
 			}
-			StringBuilder sql = new StringBuilder("SELECT COUNT(*) as Count FROM nlog.status WHERE 1=1 ");
+			StringBuilder sql = new StringBuilder("SELECT COUNT(*) as Count FROM dotnetspider.status WHERE 1=1 ");
 
 			if (!string.IsNullOrEmpty(taskGroupFilter))
 			{
@@ -185,7 +185,7 @@ namespace DotnetSpider.Portal.Controllers
 						}
 				}
 			}
-			StringBuilder sql = new StringBuilder("SELECT * FROM nlog.status WHERE 1=1 ");
+			StringBuilder sql = new StringBuilder("SELECT * FROM dotnetspider.status WHERE 1=1 ");
 
 			if (!string.IsNullOrEmpty(taskGroupFilter))
 			{
