@@ -29,7 +29,6 @@ namespace DotnetSpider.Test.Downloader
 			Assert.Equal("http://a.com/?&page=4", request2.Url.ToString());
 		}
 
-		[Fact]
 		public void PaggerStopper()
 		{
 			var spider = new DefaultSpider("test", new Core.Site());

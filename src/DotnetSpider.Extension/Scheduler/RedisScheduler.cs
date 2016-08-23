@@ -54,11 +54,10 @@ namespace DotnetSpider.Extension.Scheduler
 			{
 				ServiceName = "DotnetSpider",
 				Password = Password,
-				ConnectTimeout = 5000,
+				ConnectTimeout = 65530,
 				KeepAlive = 8,
-				ConnectRetry = 20,
-				SyncTimeout = 65530,
-				ResponseTimeout = 65530
+				ConnectRetry = 3,
+				ResponseTimeout = 3000
 			};
 #if NET_CORE
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

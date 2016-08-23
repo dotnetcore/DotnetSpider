@@ -139,6 +139,9 @@
     <Compile Include="..\EntityExtractor.cs">
       <Link>EntityExtractor.cs</Link>
     </Compile>
+    <Compile Include="..\EntitySpiderTest.cs">
+      <Link>EntitySpiderTest.cs</Link>
+    </Compile>
     <Compile Include="..\Html.cs">
       <Link>Html.cs</Link>
     </Compile>
@@ -218,6 +221,14 @@
     <Content Include="phantomjs-license.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="..\config.ini">
+      <Link>config.ini</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\nlog.config">
+      <Link>nlog.config</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>

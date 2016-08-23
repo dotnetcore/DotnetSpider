@@ -34,6 +34,10 @@ namespace DotnetSpider.Extension
 		protected ConnectionMultiplexer Redis;
 		protected IDatabase Db;
 
+		protected string RedisHost { get; set; }
+		protected string RedisPassword { get; set; }
+		protected int RedisPort { get; set; } = 6379;
+
 		[JsonIgnore]
 		public Action TaskFinished { get; set; } = () => { };
 		[JsonIgnore]
@@ -363,37 +367,42 @@ namespace DotnetSpider.Extension
 				NetworkCenter.Current.Executor = RedialExecutor;
 			}
 
-			if (!string.IsNullOrEmpty(Configuration.GetValue("redisHost")) && !string.IsNullOrWhiteSpace(Configuration.GetValue("redisHost")))
+			if (string.IsNullOrEmpty(RedisHost))
 			{
-				var host = Configuration.GetValue("redisHost");
+				RedisHost = Configuration.GetValue("redisHost");
+				RedisPassword = Configuration.GetValue("redisPassword");
+				int port;
+				RedisPort = int.TryParse(Configuration.GetValue("redisPort"), out port) ? port : 6379;
+			}
 
+			if (!string.IsNullOrEmpty(RedisHost))
+			{
 				var confiruation = new ConfigurationOptions()
 				{
 					ServiceName = "DotnetSpider",
-					Password = Configuration.GetValue("redisPassword"),
+					Password = RedisPassword,
 					ConnectTimeout = 65530,
 					KeepAlive = 8,
-					ConnectRetry = 20,
-					SyncTimeout = 65530,
-					ResponseTimeout = 65530
+					ConnectRetry = 3,
+					ResponseTimeout = 3000
 				};
 #if NET_CORE
 				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 				{
 					// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
-					var address = Dns.GetHostAddressesAsync(host).Result.FirstOrDefault();
+					var address = Dns.GetHostAddressesAsync(RedisHost).Result.FirstOrDefault();
 					if (address == null)
 					{
-						throw new SpiderException("Can't resovle your host: " + host);
+						throw new SpiderException("Can't resovle your host: " + RedisHost);
 					}
 					confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
 				}
 				else
 				{
-					confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, 6379));
 				}
 #else
-				confiruation.EndPoints.Add(new DnsEndPoint(host, 6379));
+				confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, 6379));
 #endif
 				Redis = ConnectionMultiplexer.Connect(confiruation);
 				Db = Redis.GetDatabase(1);
