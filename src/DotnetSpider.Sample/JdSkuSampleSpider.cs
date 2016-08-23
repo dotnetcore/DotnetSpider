@@ -5,7 +5,6 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
 

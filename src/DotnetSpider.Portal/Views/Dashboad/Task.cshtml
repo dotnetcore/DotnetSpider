@@ -1,0 +1,62 @@
+﻿@{
+    Layout = null;
+}
+<div class="col-md-3 col-sm-6 col-xs-12">
+    <div class="info-box bg-green">
+        <span class="info-box-icon"><i class="fa fa-thumbs-o-up"></i></span>
+
+        <div class="info-box-content">
+            <span class="info-box-text">Finished</span>
+            <span class="info-box-number">@ViewBag.FinishedCount</span>
+
+            <div class="progress">
+                <div class="progress-bar" style="width: @ViewBag.FinishedPercent%"></div>
+            </div>
+            <span class="progress-description">
+                @ViewBag.FinishedPercent %
+            </span>
+        </div>
+        <!-- /.info-box-content -->
+    </div>
+    <!-- /.info-box -->
+</div>
+<!-- /.col -->
+<div class="col-md-3 col-sm-6 col-xs-12">
+    <div class="info-box bg-aqua">
+        <span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+        <div class="info-box-content">
+            <span class="info-box-text">Running</span>
+            <span class="info-box-number">@ViewBag.RunningCount</span>
+            <div class="progress">
+                <div class="progress-bar" style="width: @ViewBag.RunningPercent%"></div>
+            </div>
+            <span class="progress-description">
+                @ViewBag.RunningPercent %
+            </span>
+        </div>
+        <!-- /.info-box-content -->
+    </div>
+    <!-- /.info-box -->
+</div>
+<!-- /.col -->
+<!-- /.col -->
+<div class="col-md-3 col-sm-6 col-xs-12">
+    <div class="info-box bg-red">
+        <span class="info-box-icon"><i class="fa fa-comments-o"></i></span>
+
+        <div class="info-box-content">
+            <span class="info-box-text">Exception</span>
+            <span class="info-box-number">@ViewBag.ExceptionCount</span>
+
+            <div class="progress">
+                <div class="progress-bar" style="width: @ViewBag.ExceptionPercent%"></div>
+            </div>
+            <span class="progress-description">
+                @ViewBag.ExceptionPercent %
+            </span>
+        </div>
+        <!-- /.info-box-content -->
+    </div>
+    <!-- /.info-box -->
+</div>
+<!-- /.col -->

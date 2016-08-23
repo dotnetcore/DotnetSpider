@@ -5,10 +5,20 @@ namespace DotnetSpider.Portal.Models
 {
 	public class TaskStatus
 	{
+		[Flags]
+		public enum StatusCode
+		{
+			Init = 0,
+			Running = 1,
+			Exited = 2,
+			Stopped = 3,
+			Finished = 4
+		}
+
 		public string TaskGroup { get; set; }
 		public string UserId { get; set; }
 		public string Identity { get; set; }
-		public string Status { get; set; }
+		public StatusCode Status { get; set; }
 
 		public string StatusClass
 		{
@@ -16,23 +26,23 @@ namespace DotnetSpider.Portal.Models
 			{
 				switch (Status)
 				{
-					case "Running":
+					case StatusCode.Running:
 						{
 							return "badge bg-green";
 						}
-					case "Exited":
+					case StatusCode.Exited:
 						{
 							return "badge bg-red";
 						}
-					case "Finished":
+					case StatusCode.Finished:
 						{
 							return "badge bg-light-blue";
 						}
-					case "Stopped":
+					case StatusCode.Stopped:
 						{
 							return "badge bg-yellow";
 						}
-					case "Init":
+					case StatusCode.Init:
 						{
 							return "badge bg-gray";
 						}
@@ -55,7 +65,7 @@ namespace DotnetSpider.Portal.Models
 					TaskGroup = "YY",
 					UserId = "86Research",
 					Identity = "YY Channel " + i,
-					Status = "Finished",
+					Status = StatusCode.Finished,
 					Message = "Left: 0 Total: 100 Success: 100 Error: 0",
 					Logged = DateTime.Now
 				});

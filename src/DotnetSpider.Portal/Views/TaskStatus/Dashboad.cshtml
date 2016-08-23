@@ -1,5 +1,4 @@
-﻿@using Sakura.AspNetCore.Mvc
-@model  List<DotnetSpider.Portal.Models.TaskStatus>
+﻿@model  List<DotnetSpider.Portal.Models.TaskStatus>
 @{
 }
 <div class="row">
@@ -70,34 +69,35 @@
         </div>
         <!-- /.col -->
     </div>
-    <script type="text/javascript">
-        var taskGroup = $('#taskGroupFilter');
-        taskGroup.val($('#taskGroup').val());
-        taskGroup.attr("onchange", "filterChanged()");
+<script type="text/javascript">
+    $('#menu_taskstatus').attr('class', 'active');
+    var taskGroup = $('#taskGroupFilter');
+    taskGroup.val($('#taskGroup').val());
+    taskGroup.attr("onchange", "filterChanged()");
 
-        var status1 = $('#statusFilter');
-        status1.val($('#status').val());
-        status1.attr("onchange", "filterChanged()");
+    var status1 = $('#statusFilter');
+    status1.val($('#status').val());
+    status1.attr("onchange", "filterChanged()");
 
-        var date = $('#dateFilter');
-        date.val($('#date').val());
-        date.attr("onchange", "filterChanged()");
+    var date = $('#dateFilter');
+    date.val($('#date').val());
+    date.attr("onchange", "filterChanged()");
 
-        function updateTaskStatus() {
-            var url = $('#updateUrl').val();
-            $.get(url,
-                function (data) {
-                    var content = $('#dataList');
-                    content.empty().append(data);
-                });
-        }
+    function updateTaskStatus() {
+        var url = $('#updateUrl').val();
+        $.get(url,
+            function (data) {
+                var content = $('#dataList');
+                content.empty().append(data);
+            });
+    }
 
-        function filterChanged() {
-            var taskGroup = $('#taskGroupFilter').val();
-            var date = $('#dateFilter').val();
-            var status1 = $('#statusFilter').val();
-            window.location.href = $('#baseUrl').val() + "taskGroup=" + taskGroup + "&date=" + date + "&status=" + status1;
-        }
-        updateTaskStatus();
-        setInterval(updateTaskStatus, 5000);
-    </script>
+    function filterChanged() {
+        var taskGroup = $('#taskGroupFilter').val();
+        var date = $('#dateFilter').val();
+        var status1 = $('#statusFilter').val();
+        window.location.href = $('#baseUrl').val() + "taskGroup=" + taskGroup + "&date=" + date + "&status=" + status1;
+    }
+    updateTaskStatus();
+    setInterval(updateTaskStatus, 5000);
+</script>

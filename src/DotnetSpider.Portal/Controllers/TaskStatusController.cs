@@ -203,10 +203,8 @@ namespace DotnetSpider.Portal.Controllers
 
 			using (MySqlConnection conn = new MySqlConnection(Startup.Configuration.GetSection("ConnectionStrings")["MySqlConnectString"]))
 			{
-
-				List<TaskStatus> list =
-					conn.Query<TaskStatus>(sql.ToString())
-						.ToList();
+				List<TaskStatus> list = conn.Query<TaskStatus>(sql.ToString()).ToList();
+				list.Sort(new TaskStatusCompare());
 				return View(list);
 			}
 		}
@@ -258,5 +256,12 @@ namespace DotnetSpider.Portal.Controllers
 			return "REDIS Host is incorrect.";
 		}
 
+		private class TaskStatusCompare : IComparer<TaskStatus>
+		{
+			public int Compare(TaskStatus x, TaskStatus y)
+			{
+				return x.Status > y.Status ? 1 : -1;
+			}
+		}
 	}
 }

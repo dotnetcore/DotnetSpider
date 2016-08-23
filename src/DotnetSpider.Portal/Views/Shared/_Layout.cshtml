@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DotnetSpider</title>
+    <title>DotnetSpider</title>
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
         <link rel="stylesheet" href="~/css/site.css" />
@@ -21,8 +21,8 @@
         <link rel="stylesheet" href="~/dist/css/skins/skin-blue.min.css">
     </environment>
     <environment names="Staging,Production">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-        <link rel="stylesheet" href="~/css/site.css"/>
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
         <!-- Ionicons -->
@@ -169,7 +169,6 @@
                                 <!-- The user image in the menu -->
                                 <li class="user-header">
                                     <img src="~/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
-
                                     <p>
                                         Lewis Zou - CTO
                                         <small>Member since Nov. 2015</small>
@@ -243,8 +242,14 @@
                 <ul class="sidebar-menu">
                     <li class="header">HEADER</li>
                     <!-- Optionally, you can add icons to the links -->
-                    <li><a title="Dashboad" href="#"><i class="fa fa-dashboard"></i><span>Dashboad</span></a></li>
-                    <li class="active"><a title="TaskStatus" href="~/taskstatus/dashboad/?page=1&pageSize=15&taskGroup=&date=Today&status=All"><i class="fa fa-dashboard"></i><span>TaskStatus</span></a></li>
+                    <li id="menu_dashboard">
+                        <a title="Dashboad" href="~/dashboad/index"><i class="fa fa-dashboard"></i><span>Dashboad</span></a>
+                    </li>
+                    <li id="menu_taskstatus">
+                        <a title="TaskStatus" href="~/taskstatus/dashboad/?page=1&pageSize=15&taskGroup=&date=Today&status=All">
+                            <i class="fa fa-tasks"></i><span>TaskStatus</span>
+                        </a>
+                    </li>
                     <li class="treeview">
                         <a href="#">
                             <i class="fa fa-wrench"></i> <span>Deploy</span>
@@ -254,7 +259,6 @@
                         </a>
                         <ul class="treeview-menu">
                             <li><a title="Publish" href="javascript:" onclick="loadContent(this, 'deploy', 'setting')">Publish</a></li>
-                            <li><a title="Task Manager" href="javascript:" onclick="loadContent(this, 'deploy', 'task')">Task Manager</a></li>
                         </ul>
                     </li>
                     <li><a href="#"><i class="fa fa-book"></i><span>Document</span></a></li>

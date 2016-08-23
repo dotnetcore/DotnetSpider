@@ -45,10 +45,6 @@ namespace DotnetSpider.Extension
 		public CookieInterceptor CookieInterceptor { get; set; }
 		public List<BaseEntityPipeline> EntityPipelines { get; internal set; } = new List<BaseEntityPipeline>();
 		public int CachedSize { get; set; }
-		/// <summary>
-		/// Key: Url patterns. Value: Until condition generators used by webdriverdownloaders.
-		/// </summary>
-		public Dictionary<string, MethodInfo> UntilConditionMethods { get; set; } = new Dictionary<string, MethodInfo>();
 
 		public EntitySpider(Site site)
 		{

@@ -27,7 +27,7 @@
                         <td>@task.Message</td>
                         <td>@task.Logged</td>
                         @*<td><a href="#" class="btn-link"><i class="fa fa-play"></i>Run</a></td>*@
-                        @if (task.Status == "Running" || task.Status == "Init")
+                        @if (task.Status.ToString() == "Running" || task.Status.ToString() == "Init")
                         {
                             <td><a href="#" class="btn-link" onclick="stopTask('@task.Identity')"><i class="fa fa-stop"></i>Exit</a></td>
 }
