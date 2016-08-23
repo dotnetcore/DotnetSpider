@@ -7,6 +7,7 @@
     <input id="updateUrl" value="@ViewBag.UpdateUrl" style="display: none;" />
     <input id="taskGroup" value="@ViewBag.TaskGroup" style="display: none;" />
     <input id="date" value="@ViewBag.Date" style="display: none;" />
+    <input id="status" value="@ViewBag.Status" style="display: none;" />
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
@@ -26,10 +27,22 @@
                                         <option value="@taskGroup.TaskGroup">@taskGroup.TaskGroup</option>}
                                 </select>
                             </label>
+                        </div><div class="col-md-2">
+                            <label>
+                                Status
+                                <select id="statusFilter" class="form-control input-sm">
+                                    <option value="Finished">Finished</option>
+                                    <option value="Running">Running</option>
+                                    <option value="Exited">Exited</option>
+                                    <option value="Stopped">Stopped</option>
+                                    <option value="Init">Init</option>
+                                    <option value="All">All</option>
+                                </select>
+                            </label>
                         </div>
                         <div class="col-md-2">
                             <label>
-                                日期
+                                Date
                                 <select id="dateFilter" class="form-control input-sm">
                                     <option value="Today">Today</option>
                                     <option value="LastThreeDays">Last Three Days</option>
@@ -57,29 +70,34 @@
         </div>
         <!-- /.col -->
     </div>
-<script type="text/javascript">
-    var taskGroup = $('#taskGroupFilter');
-    taskGroup.val($('#taskGroup').val());
-    taskGroup.attr("onchange", "filterChanged()");
+    <script type="text/javascript">
+        var taskGroup = $('#taskGroupFilter');
+        taskGroup.val($('#taskGroup').val());
+        taskGroup.attr("onchange", "filterChanged()");
 
-    var date = $('#dateFilter');
-    date.val($('#date').val());
-    date.attr("onchange", "filterChanged()");
+        var status1 = $('#statusFilter');
+        status1.val($('#status').val());
+        status1.attr("onchange", "filterChanged()");
 
-    function updateTaskStatus() {
-        var url = $('#updateUrl').val();
-        $.get(url,
-            function (data) {
-                var content = $('#dataList');
-                content.empty().append(data);
-            });
-    }
+        var date = $('#dateFilter');
+        date.val($('#date').val());
+        date.attr("onchange", "filterChanged()");
 
-    function filterChanged() {
-        var taskGroup = $('#taskGroupFilter').val();
-        var date = $('#dateFilter').val();
-        window.location.href = $('#baseUrl').val() + "taskGroup=" + taskGroup + "&date=" + date;
-    }
-    updateTaskStatus();
-    setInterval(updateTaskStatus, 5000);
-</script>
+        function updateTaskStatus() {
+            var url = $('#updateUrl').val();
+            $.get(url,
+                function (data) {
+                    var content = $('#dataList');
+                    content.empty().append(data);
+                });
+        }
+
+        function filterChanged() {
+            var taskGroup = $('#taskGroupFilter').val();
+            var date = $('#dateFilter').val();
+            var status1 = $('#statusFilter').val();
+            window.location.href = $('#baseUrl').val() + "taskGroup=" + taskGroup + "&date=" + date + "&status=" + status1;
+        }
+        updateTaskStatus();
+        setInterval(updateTaskStatus, 5000);
+    </script>
