@@ -31,10 +31,12 @@ namespace DotnetSpider.Extension.Model.Formatter
 			{
 				throw new Exception("Patterns' Count Must Equal to Values' Count!");
 			}
-
-			for (int i = 0; i < Patterns.Length; ++i)
+			if (MatchPatterns.Count == 0)
 			{
-				MatchPatterns.Add(Patterns[i], Values[i]);
+				for (int i = 0; i < Patterns.Length; ++i)
+				{
+					MatchPatterns.Add(Patterns[i], Values[i]);
+				}
 			}
 
 			foreach (var pair in MatchPatterns)
