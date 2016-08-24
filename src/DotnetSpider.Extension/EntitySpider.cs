@@ -129,6 +129,8 @@ namespace DotnetSpider.Extension
 				{
 					Scheduler.Init(this);
 					Scheduler.Clear();
+					//DELETE verify record.
+					Db?.HashDelete(ValidateStatusName, Identity);
 					needInitStartRequest = true;
 				}
 

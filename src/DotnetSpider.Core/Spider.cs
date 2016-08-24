@@ -415,7 +415,7 @@ namespace DotnetSpider.Core
 
 #if !NET_CORE
 			// 开启多线程支持
-			System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
+			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
 
 			InitComponent();
@@ -505,17 +505,17 @@ namespace DotnetSpider.Core
 			if (Stat == Status.Finished)
 			{
 				OnClose();
-				Logger.SaveLog(LogInfo.Create($"任务结束, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create($"采集结束, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
 			}
 
 			if (Stat == Status.Stopped)
 			{
-				Logger.SaveLog(LogInfo.Create($"任务暂停, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create($"采集暂停, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
 			}
 
 			if (Stat == Status.Exited)
 			{
-				Logger.SaveLog(LogInfo.Create($"任务退出, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create($"采集退出, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
 			}
 
 			IsExited = true;
