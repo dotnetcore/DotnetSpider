@@ -91,11 +91,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{
-				conn.Execute(Settings.MySqlDatabase);
-				conn.Execute(Settings.MySqlSettingTable);
+				conn.Execute("CREATE DATABASE IF NOT EXISTS `dotnetspider1` DEFAULT CHARACTER SET utf8;");
+				conn.Execute("CREATE TABLE IF NOT EXISTS `dotnetspider1`.`settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`type` varchar(45) NOT NULL,`key` varchar(45) DEFAULT NULL,`value` text,PRIMARY KEY(`id`),UNIQUE KEY `UNIQUE` (`key`,`type`)) ENGINE=InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8;");
 				try
 				{
-					conn.Execute("INSERT `dotnetspider`.`settings` (`value`,`type`,`key`) VALUES (\"Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306\",'ConnectString','MySql01')");
+					conn.Execute("INSERT `dotnetspider1`.`settings` (`value`,`type`,`key`) VALUES (\"Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306\",'ConnectString','MySql01')");
 				}
 				catch (Exception)
 				{
@@ -107,7 +107,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					UpdateConnectString = new DbUpdateConnectString
 					{
 						ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306",
-						QueryString = "SELECT value from `dotnetspider`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"
+						QueryString = "SELECT value from `dotnetspider1`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"
 					}
 				};
 				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
@@ -121,7 +121,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				Assert.Equal(2, list.Count);
 				Assert.Equal("110", list[0].Sku);
 				Assert.Equal("111", list[1].Sku);
-				conn.Execute(Settings.DropMySqlDatabase);
+				conn.Execute("DROP DATABASE IF EXISTS `dotnetspider1`");
 			}
 
 			ClearDb();

@@ -1,7 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 #if !NET_CORE
 using System;
-using System.Collections.Generic;
 #else
 using Microsoft.Extensions.Configuration;
 #endif
@@ -12,9 +12,8 @@ namespace DotnetSpider.Core.Common
 	{
 #if NET_CORE
 		private static readonly IConfigurationRoot ConfigurationRoot;
-#else
-		private static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
 #endif
+		private static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
 
 		static Configuration()
 		{
@@ -57,10 +56,29 @@ namespace DotnetSpider.Core.Common
 		public static string GetValue(string key)
 		{
 #if NET_CORE
-			return ConfigurationRoot?.GetValue<string>(key);
+			if (Values.ContainsKey(key))
+			{
+				return Values[key];
+			}
+			else
+			{
+				return ConfigurationRoot?.GetValue<string>(key);
+			}
 #else
 			return Values.ContainsKey(key) ? Values[key] : null;
 #endif
+		}
+
+		public static void SetValue(string key, string value)
+		{
+			if (Values.ContainsKey(key))
+			{
+				Values[key] = value;
+			}
+			else
+			{
+				Values.Add(key, value);
+			}
 		}
 	}
 }
