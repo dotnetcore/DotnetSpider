@@ -123,9 +123,19 @@ namespace DotnetSpider.Core
 
 		protected void CheckIfSettingsCorrect()
 		{
-			if (string.IsNullOrWhiteSpace(Identity))
+			if (string.IsNullOrWhiteSpace(Identity) || string.IsNullOrEmpty(Identity))
 			{
 				Identity = string.IsNullOrEmpty(Site.Domain) ? Guid.NewGuid().ToString() : Site.Domain;
+			}
+
+			if (string.IsNullOrEmpty(UserId) || string.IsNullOrWhiteSpace(UserId))
+			{
+				UserId = "DotnetSpider";
+			}
+
+			if (string.IsNullOrEmpty(TaskGroup) || string.IsNullOrWhiteSpace(TaskGroup))
+			{
+				UserId = "Default";
 			}
 
 			if (PageProcessor == null)
@@ -400,6 +410,11 @@ namespace DotnetSpider.Core
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
+
+			if (Site.MinSleepTime > Site.MaxSleepTime)
+			{
+				Site.MaxSleepTime = Site.MinSleepTime;
+			}
 
 			_init = true;
 		}

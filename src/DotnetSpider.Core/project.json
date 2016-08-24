@@ -21,6 +21,7 @@
     "System.Threading.Tasks.Parallel": "*",
     "System.Net.Http": "4.1.0",
     "System.Runtime.Extensions": "*",
+    "SapientGuardian.MySql.Data": "6.9.812",
     "Microsoft.CSharp": "*",
     "System.IO.Compression": "*",
     "System.Net.Requests": "4.0.11",

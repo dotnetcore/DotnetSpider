@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
-using DotnetSpider.Core;
 using Xunit;
 
-namespace DotnetSpider.Test.Scheduler
+namespace DotnetSpider.Core.Test.Scheduler
 {
 	public class HashSetDuplicateRemover
 	{

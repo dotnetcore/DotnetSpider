@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using DotnetSpider.Core;
 using Xunit;
 
-namespace DotnetSpider.Test
+namespace DotnetSpider.Core.Test
 {
 	public class RequestTests
 	{

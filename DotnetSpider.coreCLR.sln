@@ -29,6 +29,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DotnetSpider.Portal", "src\
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DotnetSpider.Agent", "src\DotnetSpider.Agent\DotnetSpider.Agent.xproj", "{D4BF215B-6EB3-48C9-B869-889CFBC25DEC}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DotnetSpider.Core.Test", "src\DotnetSpider.Core.Test\DotnetSpider.Core.Test.xproj", "{870D2790-1766-4628-BB45-9BC88D18E293}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{D4BF215B-6EB3-48C9-B869-889CFBC25DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4BF215B-6EB3-48C9-B869-889CFBC25DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4BF215B-6EB3-48C9-B869-889CFBC25DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{870D2790-1766-4628-BB45-9BC88D18E293}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{870D2790-1766-4628-BB45-9BC88D18E293}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{870D2790-1766-4628-BB45-9BC88D18E293}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{870D2790-1766-4628-BB45-9BC88D18E293}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

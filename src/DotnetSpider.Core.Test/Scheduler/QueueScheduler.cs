@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
-using DotnetSpider.Core;
 using DotnetSpider.Core.Scheduler;
 using Xunit;
 
-namespace DotnetSpider.Test.Scheduler
+namespace DotnetSpider.Core.Test.Scheduler
 {
 	public class QueueScheduler
 	{
@@ -11,7 +10,7 @@ namespace DotnetSpider.Test.Scheduler
 		public void PushAndPollAsync()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			var spider = new DefaultSpider("test", new Core.Site());
+			var spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
 			Parallel.For(0, 1000, new ParallelOptions() { MaxDegreeOfParallelism = 30 }, i =>
@@ -39,7 +38,7 @@ namespace DotnetSpider.Test.Scheduler
 		public void PushAndPollDepthFirst()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			ISpider spider = new DefaultSpider("test", new Core.Site());
+			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
 			scheduler.Push(new Request("http://www.a.com", 1, null));
@@ -62,7 +61,7 @@ namespace DotnetSpider.Test.Scheduler
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
 			scheduler.DepthFirst = false;
-			ISpider spider = new DefaultSpider("test", new Core.Site());
+			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
 			scheduler.Push(new Request("http://www.a.com", 1, null));
@@ -84,7 +83,7 @@ namespace DotnetSpider.Test.Scheduler
 		public void Status()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			ISpider spider = new DefaultSpider("test", new Core.Site());
+			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
 			scheduler.Clear();

@@ -1,0 +1,44 @@
+﻿{
+  "version": "1.0.0",
+  "testRunner": "xunit",
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "debugType": "portable",
+    "copyToOutput": [
+      "config.ini",
+      "nlog.config",
+      "Jd.html",
+      "xunit.runner.json"
+    ]
+  },
+  "publishOptions": {
+    "includeFiles": [ "config.ini", "nlog.config", "Jd.html" ]
+  },
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0"
+    },
+    "xunit": "2.2.0-beta2-build3300",
+    "xunit.runner.visualstudio": "2.2.0-beta2-build1149",
+    "dotnet-test-xunit": "2.2.0-preview2-build1029",
+    "DotnetSpider.Core": "0.0.9",
+    "System.Diagnostics.Process": "*",
+    "System.Net.Http": "4.1.0",
+    "System.Text.Encoding.CodePages": "*",
+    "NLog": "4.4.0-betaV15",
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": "portable-net45+win8+dnxcore50",
+      "dependencies": {},
+      "buildOptions": {
+        "define": [
+          "RELEASE",
+          "NET_CORE"
+        ]
+      }
+    }
+  }
+}

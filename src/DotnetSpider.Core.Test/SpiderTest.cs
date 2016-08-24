@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Threading;
-using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using Xunit;
 
-namespace DotnetSpider.Test
+namespace DotnetSpider.Core.Test
 {
-	public class Spider
+	public class SpiderTest
 	{
 		[Fact]
 		public void RunAsyncAndStop()
 		{
-			Core.Spider spider = Core.Spider.Create(new Core.Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
 			for (int i = 0; i < 10000; i++)
 			{
-				spider.AddStartUrl("http://www.baidu.com");
+				spider.AddStartUrl("http://www.baidu.com/" + i);
 			}
 			spider.RunAsync();
 			Thread.Sleep(5000);
@@ -25,9 +24,9 @@ namespace DotnetSpider.Test
 			Thread.Sleep(5000);
 		}
 
-		private class TestPipeline : BasePipeline
+		public class TestPipeline : BasePipeline
 		{
-			public override void Process(Core.ResultItems resultItems)
+			public override void Process(ResultItems resultItems)
 			{
 				foreach (var entry in resultItems.Results)
 				{
@@ -36,9 +35,9 @@ namespace DotnetSpider.Test
 			}
 		}
 
-		private class TestPageProcessor : IPageProcessor
+		public class TestPageProcessor : IPageProcessor
 		{
-			public Core.Site Site
+			public Site Site
 			{
 				get; set;
 			}

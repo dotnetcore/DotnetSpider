@@ -120,7 +120,7 @@ namespace DotnetSpider.Core
 		/// Set the interval between the processing of two pages. 
 		/// Time unit is micro seconds. 
 		/// </summary>
-		public int MaxSleepTime { get; set; } = 10;
+		public int MaxSleepTime { get; set; } = 100;
 
 		public int MinSleepTime { get; set; } = 1;
 

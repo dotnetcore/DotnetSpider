@@ -23,9 +23,9 @@ namespace DotnetSpider.Sample
 				TaskGroup = "JdSkuSampleSpider"
 			};
 			context.SetThreadNum(1);
-			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd"));
+			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_hhmmss"));
 			context.AddEntityPipeline(
-				new MySqlEntityPipeline("Database='test';Data Source=redis;User ID=root;Password=1qazZAQ!;Port=3306"));
+				new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main",
 				new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product), new TargetUrlExtractor

@@ -28,7 +28,7 @@ namespace DotnetSpider.Sample
 				UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
 				Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
 			});
-			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=;User ID=root;Password=;Port=4306"));
+			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://www.ddeng.com/product/967659");
 			context.AddEntityType(typeof(Corp));
 

@@ -1,9 +1,8 @@
 ﻿using System;
-using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using Xunit;
 
-namespace DotnetSpider.Test
+namespace DotnetSpider.Core.Test
 {
 	public class SelectorTest
 	{

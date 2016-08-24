@@ -46,7 +46,7 @@ namespace DotnetSpider.Sample
 					new BaseDbPrepareStartUrls()
 					{
 						Source = DataSource.MySql,
-						ConnectString = "Database='test';Data Source= ;User ID=root;Password=1qazZAQ!;Port=4306",
+						ConnectString = "Database='test';Data Source= localhost;User ID=root;Password=1qazZAQ!;Port=3306",
 						QueryString = $"SELECT * FROM jd.sku_v2_{DateTimeUtils.MondayRunId} WHERE shopname is null or shopid is null order by sku",
 						Columns = new [] {new DataColumn { Name = "sku"} },
 						FormateStrings = new List<string> { "http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json" }
@@ -55,7 +55,7 @@ namespace DotnetSpider.Sample
 			};
 			context.AddEntityPipeline(new MySqlEntityPipeline
 			{
-				ConnectString = "Database='taobao';Data Source= ;User ID=root;Password=1qazZAQ!;Port=4306",
+				ConnectString = "Database='taobao';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=4306",
 				Mode = PipelineMode.Update
 			});
 			context.AddEntityType(typeof(ProductUpdater), new TargetUrlExtractor

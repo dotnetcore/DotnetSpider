@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Xunit;
 
-namespace DotnetSpider.Test
+namespace DotnetSpider.Core.Test
 {
-	public class ResultItems
+	public class ResultItemsTest
 	{
 		public class A
 		{
@@ -13,7 +13,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void AddOrUpdateOrGet()
 		{
-			Core.ResultItems resultItems = new Core.ResultItems();
+			ResultItems resultItems = new ResultItems();
 			resultItems.AddOrUpdateResultItem("a", "a");
 			resultItems.AddOrUpdateResultItem("b", "b");
 			resultItems.AddOrUpdateResultItem("c", "c");
@@ -29,7 +29,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void AddOrUpdateOrGetAsync()
 		{
-			Core.ResultItems resultItems = new Core.ResultItems();
+			ResultItems resultItems = new ResultItems();
 
 			Parallel.For(1, 10000, new ParallelOptions
 			{

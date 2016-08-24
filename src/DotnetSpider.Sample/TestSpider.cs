@@ -44,7 +44,7 @@ namespace DotnetSpider.Sample
 				Port = 6379,
 				Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w"
 			});
-			context.AddEntityPipeline(new MySqlEntityPipeline("Database='testhao';Data Source= 127.0.0.1;User ID=root;Password=root@123456;Port=4306"));
+			context.AddEntityPipeline(new MySqlEntityPipeline("Database='testhao';Data Source= localhost;User ID=root;Password=root@123456;Port=3306"));
 			context.AddStartUrl("https://hao.360.cn/");
 			context.AddEntityType(typeof(UpdateHao360Info));
 			return context;

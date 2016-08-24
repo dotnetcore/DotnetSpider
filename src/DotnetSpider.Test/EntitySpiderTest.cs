@@ -24,7 +24,6 @@ namespace DotnetSpider.Test
 				MyEntitySpider1 spider = new MyEntitySpider1(new Core.Site());
 				spider.Run("running-test");
 			});
-
 		}
 
 		[Fact]
