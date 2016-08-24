@@ -26,6 +26,7 @@
     "System.Diagnostics.Process": "*",
     "System.Net.Http": "4.1.0",
     "System.Text.Encoding.CodePages": "*",
+    "SapientGuardian.MySql.Data": "6.9.812",
     "NLog": "4.4.0-betaV15",
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
   },
