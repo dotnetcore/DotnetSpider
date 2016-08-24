@@ -410,20 +410,19 @@ namespace DotnetSpider.Extension
 						Logger.SaveLog(LogInfo.Create($"Can't resovle host: {RedisHost}", Logger.Name, this, LogLevel.Error));
 						throw new SpiderException($"Can't resovle host: {RedisHost}");
 					}
-					confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
+					confiruation.EndPoints.Add(new IPEndPoint(address, RedisPort));
 				}
 				else
 				{
-					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, 6379));
+					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
 				}
 #else
-				confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, 6379));
+				confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
 #endif
 				Redis = ConnectionMultiplexer.Connect(confiruation);
 				Db = Redis.GetDatabase(1);
 			}
 		}
-
 
 		public static EntityMetadata ParseEntityMetaData(
 #if !NET_CORE

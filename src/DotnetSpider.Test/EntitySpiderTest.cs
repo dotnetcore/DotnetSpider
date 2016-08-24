@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
@@ -79,6 +81,34 @@ namespace DotnetSpider.Test
 			{
 				Assert.Equal("Need at least one entity pipeline.", exception.Message);
 			}
+		}
+
+		[Fact]
+		public void RedisKeepConnect()
+		{
+			var confiruation = new ConfigurationOptions()
+			{
+				ServiceName = "DotnetSpider",
+				ConnectTimeout = 65530,
+				KeepAlive = 8,
+				ConnectRetry = 3,
+				ResponseTimeout = 3000
+			};
+
+			confiruation.EndPoints.Add(new DnsEndPoint("127.0.0.1", 6379));
+
+			var redis = ConnectionMultiplexer.Connect(confiruation);
+			var db = redis.GetDatabase(1);
+
+			var key = Guid.NewGuid().ToString("N");
+			while (!db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+			{
+				Thread.Sleep(1000);
+			}
+
+			Thread.Sleep(240000);
+
+			db.LockRelease(key, 0);
 		}
 	}
 }
