@@ -5,7 +5,7 @@ using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Model.Attribute;
 using Xunit;
 
-namespace DotnetSpider.Test.Downloader
+namespace DotnetSpider.Extension.Test.Downloader
 {
 	public class TargetUrlsCreatorTest
 	{

@@ -4,7 +4,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Scheduler;
 using Xunit;
 
-namespace DotnetSpider.Test.Scheduler
+namespace DotnetSpider.Extension.Test.Scheduler
 {
 	public class RedisSchedulerTest
 	{

@@ -130,9 +130,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Downloader\DownloadHanlderTest.cs">
-      <Link>Downloader\DownloadHanlderTest.cs</Link>
-    </Compile>
     <Compile Include="..\Downloader\TargetUrlsCreatorTest.cs">
       <Link>Downloader\TargetUrlsCreatorTest.cs</Link>
     </Compile>
@@ -145,50 +142,14 @@
     <Compile Include="..\EntitySpiderTest.cs">
       <Link>EntitySpiderTest.cs</Link>
     </Compile>
-    <Compile Include="..\HtmlTest.cs">
-      <Link>HtmlTest.cs</Link>
-    </Compile>
-    <Compile Include="..\Pipeline\FilePipelineTest.cs">
-      <Link>Pipeline\FilePipelineTest.cs</Link>
-    </Compile>
-    <Compile Include="..\Pipeline\JsonFilePipelineTest.cs">
-      <Link>Pipeline\JsonFilePipelineTest.cs</Link>
-    </Compile>
     <Compile Include="..\Pipeline\MysqlEntityPipelineTest.cs">
       <Link>Pipeline\MysqlEntityPipelineTest.cs</Link>
-    </Compile>
-    <Compile Include="..\RequestTest.cs">
-      <Link>RequestTest.cs</Link>
-    </Compile>
-    <Compile Include="..\ResultItemsTest.cs">
-      <Link>ResultItemsTest.cs</Link>
-    </Compile>
-    <Compile Include="..\Scheduler\BloomFilterDuplicateRemover.cs">
-      <Link>Scheduler\BloomFilterDuplicateRemover.cs</Link>
-    </Compile>
-    <Compile Include="..\Scheduler\HashSetDuplicateRemoverTest.cs">
-      <Link>Scheduler\HashSetDuplicateRemoverTest.cs</Link>
-    </Compile>
-    <Compile Include="..\Scheduler\QueueSchedulerTest.cs">
-      <Link>Scheduler\QueueSchedulerTest.cs</Link>
     </Compile>
     <Compile Include="..\Scheduler\RedisSchedulerTest.cs">
       <Link>Scheduler\RedisSchedulerTest.cs</Link>
     </Compile>
-    <Compile Include="..\SelectorTest.cs">
-      <Link>SelectorTest.cs</Link>
-    </Compile>
-    <Compile Include="..\SiteTest.cs">
-      <Link>SiteTest.cs</Link>
-    </Compile>
     <Compile Include="..\SpiderEntityTest.cs">
       <Link>SpiderEntityTest.cs</Link>
-    </Compile>
-    <Compile Include="..\SpiderTest.cs">
-      <Link>SpiderTest.cs</Link>
-    </Compile>
-    <Compile Include="..\UrlUtilsTest.cs">
-      <Link>UrlUtilsTest.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -197,15 +158,15 @@
   <ItemGroup>
     <ProjectReference Include="..\..\DotnetSpider.Core\netfx45\DotnetSpider.Core.csproj">
       <Project>{28dadca2-9053-4222-a813-a73dd0fe7f2f}</Project>
-      <Name>Java2Dotnet.Spider.Core</Name>
+      <Name>DotnetSpider.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\DotnetSpider.Extension\netfx45\DotnetSpider.Extension.csproj">
       <Project>{ddb5a085-6219-4a95-8cd8-ddcf3a54b962}</Project>
-      <Name>Java2Dotnet.Spider.Extension</Name>
+      <Name>DotnetSpider.Extension</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\DotnetSpider.Redial\netfx45\DotnetSpider.Redial.csproj">
       <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>
-      <Name>Java2Dotnet.Spider.Redial</Name>
+      <Name>DotnetSpider.Redial</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -228,11 +189,8 @@
       <Link>config.ini</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\nlog.config">
-      <Link>nlog.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="app.config" />
+    <None Include="nlog.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

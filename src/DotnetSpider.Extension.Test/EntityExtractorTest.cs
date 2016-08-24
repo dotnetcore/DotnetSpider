@@ -5,13 +5,12 @@ using System.Reflection;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using Xunit;
 
-namespace DotnetSpider.Test
+namespace DotnetSpider.Extension.Test
 {
 	public class EntityExtractorTest
 	{

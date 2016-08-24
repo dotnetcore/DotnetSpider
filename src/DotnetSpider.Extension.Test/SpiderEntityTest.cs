@@ -4,7 +4,6 @@ using System.Reflection;
 using Dapper;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
@@ -13,7 +12,7 @@ using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
 using Xunit;
 
-namespace DotnetSpider.Test
+namespace DotnetSpider.Extension.Test
 {
 	public class SpiderEntityTest
 	{
@@ -168,7 +167,7 @@ namespace DotnetSpider.Test
 			var entity3 = EntitySpider.ParseEntityMetaData(typeof(Entity9).GetTypeInfo());
 			Assert.False(entity3.Entity.Multi);
 			Assert.Null(entity3.Entity.Selector);
-			Assert.Equal("DotnetSpider.Test.SpiderEntityTest+Entity9", entity3.Entity.Name);
+			Assert.Equal("DotnetSpider.Extension.Test.SpiderEntityTest+Entity9", entity3.Entity.Name);
 		}
 
 		[Fact]

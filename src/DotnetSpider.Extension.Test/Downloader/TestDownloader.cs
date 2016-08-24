@@ -1,7 +1,7 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 
-namespace DotnetSpider.Test.Downloader
+namespace DotnetSpider.Extension.Test.Downloader
 {
 	public class TestDownloader : BaseDownloader
 	{

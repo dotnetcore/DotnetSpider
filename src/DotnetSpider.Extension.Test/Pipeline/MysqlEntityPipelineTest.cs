@@ -5,7 +5,6 @@ using System.Reflection;
 using Dapper;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
@@ -14,7 +13,7 @@ using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace DotnetSpider.Test.Pipeline
+namespace DotnetSpider.Extension.Test.Pipeline
 {
 	public class MysqlEntityPipelineTest
 	{
