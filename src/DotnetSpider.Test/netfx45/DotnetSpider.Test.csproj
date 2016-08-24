@@ -130,32 +130,35 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Downloader\DownloadHanlder.cs">
-      <Link>Downloader\DownloadHanlder.cs</Link>
+    <Compile Include="..\Downloader\DownloadHanlderTest.cs">
+      <Link>Downloader\DownloadHanlderTest.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\TargetUrlsCreatorTest.cs">
+      <Link>Downloader\TargetUrlsCreatorTest.cs</Link>
     </Compile>
     <Compile Include="..\Downloader\TestDownloader.cs">
       <Link>Downloader\TestDownloader.cs</Link>
     </Compile>
-    <Compile Include="..\EntityExtractor.cs">
-      <Link>EntityExtractor.cs</Link>
+    <Compile Include="..\EntityExtractorTest.cs">
+      <Link>EntityExtractorTest.cs</Link>
     </Compile>
     <Compile Include="..\EntitySpiderTest.cs">
       <Link>EntitySpiderTest.cs</Link>
     </Compile>
-    <Compile Include="..\Html.cs">
-      <Link>Html.cs</Link>
+    <Compile Include="..\HtmlTest.cs">
+      <Link>HtmlTest.cs</Link>
     </Compile>
-    <Compile Include="..\Pipeline\FilePipeline.cs">
-      <Link>Pipeline\FilePipeline.cs</Link>
+    <Compile Include="..\Pipeline\FilePipelineTest.cs">
+      <Link>Pipeline\FilePipelineTest.cs</Link>
     </Compile>
-    <Compile Include="..\Pipeline\JsonFilePipeline.cs">
-      <Link>Pipeline\JsonFilePipeline.cs</Link>
+    <Compile Include="..\Pipeline\JsonFilePipelineTest.cs">
+      <Link>Pipeline\JsonFilePipelineTest.cs</Link>
     </Compile>
-    <Compile Include="..\Pipeline\MysqlEntityPipeline.cs">
-      <Link>Pipeline\MysqlEntityPipeline.cs</Link>
+    <Compile Include="..\Pipeline\MysqlEntityPipelineTest.cs">
+      <Link>Pipeline\MysqlEntityPipelineTest.cs</Link>
     </Compile>
-    <Compile Include="..\RequestTests.cs">
-      <Link>RequestTests.cs</Link>
+    <Compile Include="..\RequestTest.cs">
+      <Link>RequestTest.cs</Link>
     </Compile>
     <Compile Include="..\ResultItemsTest.cs">
       <Link>ResultItemsTest.cs</Link>
@@ -163,26 +166,26 @@
     <Compile Include="..\Scheduler\BloomFilterDuplicateRemover.cs">
       <Link>Scheduler\BloomFilterDuplicateRemover.cs</Link>
     </Compile>
-    <Compile Include="..\Scheduler\HashSetDuplicateRemover.cs">
-      <Link>Scheduler\HashSetDuplicateRemover.cs</Link>
+    <Compile Include="..\Scheduler\HashSetDuplicateRemoverTest.cs">
+      <Link>Scheduler\HashSetDuplicateRemoverTest.cs</Link>
     </Compile>
-    <Compile Include="..\Scheduler\QueueScheduler.cs">
-      <Link>Scheduler\QueueScheduler.cs</Link>
+    <Compile Include="..\Scheduler\QueueSchedulerTest.cs">
+      <Link>Scheduler\QueueSchedulerTest.cs</Link>
     </Compile>
-    <Compile Include="..\Scheduler\RedisScheduler.cs">
-      <Link>Scheduler\RedisScheduler.cs</Link>
+    <Compile Include="..\Scheduler\RedisSchedulerTest.cs">
+      <Link>Scheduler\RedisSchedulerTest.cs</Link>
     </Compile>
-    <Compile Include="..\Selector.cs">
-      <Link>Selector.cs</Link>
+    <Compile Include="..\SelectorTest.cs">
+      <Link>SelectorTest.cs</Link>
     </Compile>
-    <Compile Include="..\Site.cs">
-      <Link>Site.cs</Link>
+    <Compile Include="..\SiteTest.cs">
+      <Link>SiteTest.cs</Link>
     </Compile>
-    <Compile Include="..\Spider.cs">
-      <Link>Spider.cs</Link>
+    <Compile Include="..\SpiderEntityTest.cs">
+      <Link>SpiderEntityTest.cs</Link>
     </Compile>
-    <Compile Include="..\SpiderEntity.cs">
-      <Link>SpiderEntity.cs</Link>
+    <Compile Include="..\SpiderTest.cs">
+      <Link>SpiderTest.cs</Link>
     </Compile>
     <Compile Include="..\UrlUtilsTest.cs">
       <Link>UrlUtilsTest.cs</Link>

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DotnetSpider.Core.Test.Scheduler
 {
-	public class QueueScheduler
+	public class QueueSchedulerTest
 	{
 		[Fact]
 		public void PushAndPollAsync()
@@ -13,7 +13,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 			var spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
-			Parallel.For(0, 1000, new ParallelOptions() { MaxDegreeOfParallelism = 30 }, i =>
+			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 30 }, i =>
 			{
 				scheduler.Push(new Request("http://www.a.com", 1, null));
 				scheduler.Push(new Request("http://www.a.com", 1, null));
@@ -22,7 +22,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 				scheduler.Push(new Request($"http://www.{i.ToString()}.com", 1, null));
 			});
 
-			Parallel.For(0, 1000, new ParallelOptions() { MaxDegreeOfParallelism = 30 }, i =>
+			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 30 }, i =>
 			{
 				scheduler.Poll();
 			});

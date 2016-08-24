@@ -4,7 +4,7 @@ using Xunit;
 
 namespace DotnetSpider.Core.Test.Downloader
 {
-	public class DownloadHanlder
+	public class DownloadHanlderTest
 	{
 		[Fact]
 		public void GeneratePostBody()

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace DotnetSpider.Core.Test.Scheduler
 {
-	public class HashSetDuplicateRemover
+	public class HashSetDuplicateRemoverTest
 	{
 		[Fact]
 		public void HashSetDuplicate()
@@ -28,7 +28,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 			bool isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", 1, null));
 
 			Assert.False(isDuplicate);
-			Parallel.For(0, 1000, new ParallelOptions() { MaxDegreeOfParallelism = 30 }, i =>
+			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 30 }, i =>
 			{
 				isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", 1, null));
 				Assert.True(isDuplicate);

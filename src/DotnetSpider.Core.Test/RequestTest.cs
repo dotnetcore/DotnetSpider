@@ -3,7 +3,7 @@ using Xunit;
 
 namespace DotnetSpider.Core.Test
 {
-	public class RequestTests
+	public class RequestTest
 	{
 		public static Request GetRequest()
 		{

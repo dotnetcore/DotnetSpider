@@ -61,7 +61,7 @@ namespace DotnetSpider.Extension
 
 		public override void Run(params string[] arguments)
 		{
-			InitEnvoriment();
+			InitEnvorimentAndVerify();
 
 			try
 			{
@@ -129,6 +129,8 @@ namespace DotnetSpider.Extension
 				{
 					Scheduler.Init(this);
 					Scheduler.Clear();
+					//DELETE verify record.
+					Db?.HashDelete(ValidateStatusName, Identity);
 					needInitStartRequest = true;
 				}
 
@@ -359,8 +361,20 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		private void InitEnvoriment()
+		private void InitEnvorimentAndVerify()
 		{
+			if (Entities == null || Entities.Count == 0)
+			{
+				Logger.SaveLog(LogInfo.Create("Count of entity is 0.", Logger.Name, this, LogLevel.Error));
+				throw new SpiderException("Count of entity is 0.");
+			}
+
+			if (EntityPipelines == null || EntityPipelines.Count == 0)
+			{
+				Logger.SaveLog(LogInfo.Create("Need at least one entity pipeline.", Logger.Name, this, LogLevel.Error));
+				throw new SpiderException("Need at least one entity pipeline.");
+			}
+
 			if (RedialExecutor != null)
 			{
 				RedialExecutor.Init();
@@ -393,22 +407,22 @@ namespace DotnetSpider.Extension
 					var address = Dns.GetHostAddressesAsync(RedisHost).Result.FirstOrDefault();
 					if (address == null)
 					{
-						throw new SpiderException("Can't resovle your host: " + RedisHost);
+						Logger.SaveLog(LogInfo.Create($"Can't resovle host: {RedisHost}", Logger.Name, this, LogLevel.Error));
+						throw new SpiderException($"Can't resovle host: {RedisHost}");
 					}
-					confiruation.EndPoints.Add(new IPEndPoint(address, 6379));
+					confiruation.EndPoints.Add(new IPEndPoint(address, RedisPort));
 				}
 				else
 				{
-					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, 6379));
+					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
 				}
 #else
-				confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, 6379));
+				confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
 #endif
 				Redis = ConnectionMultiplexer.Connect(confiruation);
 				Db = Redis.GetDatabase(1);
 			}
 		}
-
 
 		public static EntityMetadata ParseEntityMetaData(
 #if !NET_CORE

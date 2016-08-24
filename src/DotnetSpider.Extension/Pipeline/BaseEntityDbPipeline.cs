@@ -56,6 +56,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.Schema == null)
 			{
+				Logger.SaveLog(LogInfo.Create("Miss pipeline because: Schema is necessary", Logger.Name, Spider, LogLevel.Warn));
 				IsEnabled = false;
 				return;
 			}

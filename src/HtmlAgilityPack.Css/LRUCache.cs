@@ -20,9 +20,9 @@ namespace HtmlAgilityPack.Css
             if (capacity <= 0)
                 throw new ArgumentOutOfRangeException();
 
-            this._data = new Dictionary<TInput, TResult>(capacity);
-            this._capacity = capacity;
-            this._evalutor = evalutor;
+            _data = new Dictionary<TInput, TResult>(capacity);
+            _capacity = capacity;
+            _evalutor = evalutor;
         }
 
         private bool Remove(TInput key)

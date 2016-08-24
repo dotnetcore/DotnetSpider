@@ -430,7 +430,7 @@ namespace DotnetSpider.Core
 
 #if !NET_CORE
 			// 开启多线程支持
-			System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
+			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
 
 			InitComponent();
@@ -520,19 +520,19 @@ namespace DotnetSpider.Core
 			if (Stat == Status.Finished)
 			{
 				OnClose();
-				Logger.SaveLog(LogInfo.Create($"任务 {Identity} 结束, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create($"采集结束, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
 			}
 
 			if (Stat == Status.Stopped)
 			{
-				Logger.SaveLog(LogInfo.Create($"任务 {Identity} 停止成功, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create($"采集暂停, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
 			}
 
 			if (Stat == Status.Exited)
 			{
-				Logger.SaveLog(LogInfo.Create($"任务 {Identity} 退出成功, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
+				Logger.SaveLog(LogInfo.Create($"采集退出, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
 			}
-			//Logger.Dispose();
+
 			IsExited = true;
 		}
 
@@ -570,13 +570,13 @@ namespace DotnetSpider.Core
 		public void Stop()
 		{
 			Stat = Status.Stopped;
-			Logger.SaveLog(LogInfo.Create($"停止任务中 {Identity} ...", Logger.Name, this, LogLevel.Warn));
+			Logger.SaveLog(LogInfo.Create($"停止任务中...", Logger.Name, this, LogLevel.Warn));
 		}
 
 		public void Exit()
 		{
 			Stat = Status.Exited;
-			Logger.SaveLog(LogInfo.Create($"退出任务中 {Identity} ...", Logger.Name, this, LogLevel.Warn));
+			Logger.SaveLog(LogInfo.Create($"退出任务中...", Logger.Name, this, LogLevel.Warn));
 			SpiderClosing?.Invoke();
 		}
 
@@ -804,9 +804,17 @@ namespace DotnetSpider.Core
 
 		public void Dispose()
 		{
+			CheckIfRunning();
+
+			int i = 0;
 			while (!IsExited)
 			{
+				++i;
 				Thread.Sleep(500);
+				if (i > 10)
+				{
+					break;
+				}
 			}
 
 			OnClose();

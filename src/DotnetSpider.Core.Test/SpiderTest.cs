@@ -24,6 +24,29 @@ namespace DotnetSpider.Core.Test
 			Thread.Sleep(5000);
 		}
 
+		[Fact]
+		public void ThrowExceptionWhenNoPipeline()
+		{
+			try
+			{
+				Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new TestPageProcessor());
+				spider.Run();
+			}
+			catch (SpiderException exception)
+			{
+				Assert.Equal("Pipelines should not be null.", exception.Message);
+			}
+		}
+
+		[Fact]
+		public void WhenNoStartUrl()
+		{
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			spider.Run();
+
+			Assert.Equal(Status.Finished, spider.StatusCode);
+		}
+
 		public class TestPipeline : BasePipeline
 		{
 			public override void Process(ResultItems resultItems)

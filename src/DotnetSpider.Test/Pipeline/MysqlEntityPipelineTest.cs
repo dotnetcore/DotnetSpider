@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Dapper;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.ORM;
+using DotnetSpider.Extension.Pipeline;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
 using Xunit;
-using Dapper;
-using DotnetSpider.Core.Selector;
-using MySql.Data.MySqlClient;
 
 namespace DotnetSpider.Test.Pipeline
 {
-	public class MysqlEntityPipeline
+	public class MysqlEntityPipelineTest
 	{
 		private void ClearDb()
 		{
@@ -33,7 +33,7 @@ namespace DotnetSpider.Test.Pipeline
 
 			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{
-				ISpider spider = new DefaultSpider("test", new Core.Site());
+				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306");
 				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
@@ -66,7 +66,7 @@ namespace DotnetSpider.Test.Pipeline
 
 			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{
-				ISpider spider = new DefaultSpider("test", new Core.Site());
+				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306");
 				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
@@ -101,7 +101,7 @@ namespace DotnetSpider.Test.Pipeline
 				catch (Exception)
 				{
 				}
-				ISpider spider = new DefaultSpider("test", new Core.Site());
+				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline
 				{

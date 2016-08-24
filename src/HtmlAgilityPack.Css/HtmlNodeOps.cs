@@ -4,7 +4,7 @@ namespace HtmlAgilityPack.Css
 
     using System;
     using System.Linq;
-    using global::HtmlAgilityPack;
+    using HtmlAgilityPack;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
 
