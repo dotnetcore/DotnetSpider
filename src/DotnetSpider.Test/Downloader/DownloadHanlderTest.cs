@@ -5,12 +5,12 @@ using Xunit;
 
 namespace DotnetSpider.Test.Downloader
 {
-	public class DownloadHanlder
+	public class DownloadHanlderTest
 	{
 		[Fact]
 		public void GeneratePostBody()
 		{
-			var spider = new DefaultSpider("test", new Core.Site
+			var spider = new DefaultSpider("test", new Site
 			{
 				Arguments = new Dictionary<string, string>
 				{
@@ -51,7 +51,7 @@ namespace DotnetSpider.Test.Downloader
 			{
 				PostBody = "{0}{1}"
 			};
-			var spider2 = new DefaultSpider("test", new Core.Site());
+			var spider2 = new DefaultSpider("test", new Site());
 			page = downloader.Download(request1, spider2);
 			Assert.Equal("TEST2", page.Request.PostBody);
 		}
@@ -59,8 +59,8 @@ namespace DotnetSpider.Test.Downloader
 		[Fact]
 		public void SubContentHandler()
 		{
-			var spider = new DefaultSpider("test", new Core.Site());
-			TestDownloader downloader1 = new TestDownloader()
+			var spider = new DefaultSpider("test", new Site());
+			TestDownloader downloader1 = new TestDownloader
 			{
 				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 				{

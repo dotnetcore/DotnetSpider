@@ -6,7 +6,7 @@ using Xunit;
 
 namespace DotnetSpider.Test.Scheduler
 {
-	public class RedisScheduler
+	public class RedisSchedulerTest
 	{
 		[Fact]
 		public void PushAndPoll1()
@@ -83,7 +83,7 @@ namespace DotnetSpider.Test.Scheduler
 		public void LoadPerformace()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
-			ISpider spider = new DefaultSpider("test", new Core.Site());
+			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 			scheduler.Clear();
 			var start = DateTime.Now;
@@ -113,7 +113,7 @@ namespace DotnetSpider.Test.Scheduler
 		public void Load()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			ISpider spider = new DefaultSpider("test", new Core.Site());
+			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
 			scheduler.Push(new Request("http://www.a.com/", 1, null));
@@ -140,7 +140,7 @@ namespace DotnetSpider.Test.Scheduler
 		public void Status()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
-			ISpider spider = new DefaultSpider("test", new Core.Site());
+			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
 			scheduler.Clear();

@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using Xunit;
+
 namespace DotnetSpider.Test
 {
 	public class HtmlTest

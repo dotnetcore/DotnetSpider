@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Model;
+using NLog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -19,6 +20,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.Schema == null)
 			{
+				Logger.SaveLog(LogInfo.Create("Miss pipeline because: Schema is necessary", Logger.Name, Spider, LogLevel.Warn));
 				IsEnabled = false;
 				return;
 			}

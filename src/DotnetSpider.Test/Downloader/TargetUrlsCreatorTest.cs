@@ -7,12 +7,12 @@ using Xunit;
 
 namespace DotnetSpider.Test.Downloader
 {
-	public class TargetUrlsCreator
+	public class TargetUrlsCreatorTest
 	{
 		[Fact]
 		public void IncrementTargetUrls()
 		{
-			var spider = new DefaultSpider("test", new Core.Site());
+			var spider = new DefaultSpider("test", new Site());
 			TestDownloader downloader = new TestDownloader
 			{
 				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
@@ -31,7 +31,7 @@ namespace DotnetSpider.Test.Downloader
 
 		public void PaggerStopper()
 		{
-			var spider = new DefaultSpider("test", new Core.Site());
+			var spider = new DefaultSpider("test", new Site());
 			TestDownloader downloader = new TestDownloader
 			{
 				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
