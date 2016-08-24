@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using DotnetSpider.Core.Common;
+using Xunit;
 
 namespace DotnetSpider.Test
 {
@@ -7,19 +8,19 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void TestFixRelativeUrl()
 		{
-			string absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("?aa", "http://www.dianping.com/sh/ss/com");
+			string absoluteUrl = UrlUtils.CanonicalizeUrl("?aa", "http://www.dianping.com/sh/ss/com");
 			Assert.Equal(absoluteUrl, "http://www.dianping.com/sh/ss/com?aa");
 
-			absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("../aa", "http://www.dianping.com/sh/ss/com");
+			absoluteUrl = UrlUtils.CanonicalizeUrl("../aa", "http://www.dianping.com/sh/ss/com");
 			Assert.Equal(absoluteUrl, "http://www.dianping.com/sh/aa");
 
-			absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("..aa", "http://www.dianping.com/sh/ss/com");
+			absoluteUrl = UrlUtils.CanonicalizeUrl("..aa", "http://www.dianping.com/sh/ss/com");
 			Assert.Equal(absoluteUrl, "http://www.dianping.com/sh/ss/..aa");
 
-			absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com/");
+			absoluteUrl = UrlUtils.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com/");
 			Assert.Equal(absoluteUrl, "http://www.dianping.com/sh/aa");
 
-			absoluteUrl = Core.Common.UrlUtils.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com");
+			absoluteUrl = UrlUtils.CanonicalizeUrl("../../aa", "http://www.dianping.com/sh/ss/com");
 			Assert.Equal(absoluteUrl, "http://www.dianping.com/aa");
 		}
 
@@ -27,13 +28,13 @@ namespace DotnetSpider.Test
 		public void TestGetDomain()
 		{
 			string url = "http://www.dianping.com/aa/";
-			Assert.Equal("www.dianping.com", Core.Common.UrlUtils.GetDomain(url));
+			Assert.Equal("www.dianping.com", UrlUtils.GetDomain(url));
 
 			url = "www.dianping.com/aa/";
-			Assert.Equal("www.dianping.com", Core.Common.UrlUtils.GetDomain(url));
+			Assert.Equal("www.dianping.com", UrlUtils.GetDomain(url));
 
 			url = "http://www.dianping.com";
-			Assert.Equal("www.dianping.com", Core.Common.UrlUtils.GetDomain(url));
+			Assert.Equal("www.dianping.com", UrlUtils.GetDomain(url));
 		}
 	}
 }

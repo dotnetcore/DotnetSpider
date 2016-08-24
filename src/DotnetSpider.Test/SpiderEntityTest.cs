@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using System.Reflection;
 using Dapper;
 using DotnetSpider.Core;
@@ -14,43 +15,43 @@ using Xunit;
 
 namespace DotnetSpider.Test
 {
-	public class SpiderEntity
+	public class SpiderEntityTest
 	{
 		private class TestPipeline : BaseEntityDbPipeline
 		{
 			protected override DbConnection CreateConnection()
 			{
-				throw new System.NotImplementedException();
+				throw new NotImplementedException();
 			}
 
 			protected override string GetInsertSql()
 			{
-				throw new System.NotImplementedException();
+				throw new NotImplementedException();
 			}
 
 			protected override string GetUpdateSql()
 			{
-				throw new System.NotImplementedException();
+				throw new NotImplementedException();
 			}
 
 			protected override string GetCreateTableSql()
 			{
-				throw new System.NotImplementedException();
+				throw new NotImplementedException();
 			}
 
 			protected override string GetCreateSchemaSql()
 			{
-				throw new System.NotImplementedException();
+				throw new NotImplementedException();
 			}
 
 			protected override DbParameter CreateDbParameter()
 			{
-				throw new System.NotImplementedException();
+				throw new NotImplementedException();
 			}
 
 			protected override string ConvertToDbType(string datatype)
 			{
-				throw new System.NotImplementedException();
+				throw new NotImplementedException();
 			}
 
 			public override BaseEntityPipeline Clone()
@@ -167,7 +168,7 @@ namespace DotnetSpider.Test
 			var entity3 = EntitySpider.ParseEntityMetaData(typeof(Entity9).GetTypeInfo());
 			Assert.False(entity3.Entity.Multi);
 			Assert.Null(entity3.Entity.Selector);
-			Assert.Equal("DotnetSpider.Test.SpiderEntity+Entity9", entity3.Entity.Name);
+			Assert.Equal("DotnetSpider.Test.SpiderEntityTest+Entity9", entity3.Entity.Name);
 		}
 
 		[Fact]
@@ -255,7 +256,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void MultiEntitiesInitPipelines()
 		{
-			EntitySpider context = new EntitySpider(new Core.Site());
+			EntitySpider context = new EntitySpider(new Site());
 			context.SetThreadNum(1);
 			context.SetIdentity("test-MultiEntitiesInitPipelines");
 			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));

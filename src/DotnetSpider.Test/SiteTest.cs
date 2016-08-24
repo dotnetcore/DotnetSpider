@@ -5,7 +5,7 @@ using Xunit;
 
 namespace DotnetSpider.Test
 {
-	public class Site
+	public class SiteTest
 	{
 		private string WName = "WebSite";
 		private string WValue = "12580emall";
@@ -15,7 +15,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void SetEncoding()
 		{
-			var site = new Core.Site
+			var site = new Site
 			{
 				EncodingName = "UTF-8"
 			};
@@ -25,7 +25,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void AddRequests()
 		{
-			Core.Site site = new Core.Site { Domain = WDomain, EncodingName = "UTF-8", Timeout = 3000, };
+			Site site = new Site { Domain = WDomain, EncodingName = "UTF-8", Timeout = 3000 };
 			site.ClearStartRequests();
 			site.AddStartUrl(Url);
 			site.AddStartRequest(new Request(Url, 1, null));
@@ -36,7 +36,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void AddRequestsAsync()
 		{
-			Core.Site site = new Core.Site { Domain = WDomain, EncodingName = "UTF-8", Timeout = 3000, };
+			Site site = new Site { Domain = WDomain, EncodingName = "UTF-8", Timeout = 3000 };
 			site.ClearStartRequests();
 
 			Parallel.For(1, 10000, new ParallelOptions
@@ -54,7 +54,7 @@ namespace DotnetSpider.Test
 		[Fact]
 		public void AddHeaders()
 		{
-			Core.Site site = new Core.Site { Domain = WDomain, EncodingName = "UTF-8", Timeout = 3000, };
+			Site site = new Site { Domain = WDomain, EncodingName = "UTF-8", Timeout = 3000 };
 			site.AddHeader(WName, WValue);
 			Assert.NotNull(site.Headers);
 			Assert.True(site.Headers.Count > 0);

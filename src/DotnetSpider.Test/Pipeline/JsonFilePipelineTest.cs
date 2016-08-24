@@ -4,18 +4,18 @@ using Xunit;
 
 namespace DotnetSpider.Test.Pipeline
 {
-	public class JsonFilePipeline
+	public class JsonFilePipelineTest
 	{
-		private Core.ResultItems _resultItems;
+		private ResultItems _resultItems;
 
-		public JsonFilePipeline()
+		public JsonFilePipelineTest()
 		{
 			Before();
 		}
 
 		private void Before()
 		{
-			_resultItems = new Core.ResultItems();
+			_resultItems = new ResultItems();
 			_resultItems.AddOrUpdateResultItem("content", "爬虫工具");
 			Request request = new Request("http://www.baidu.com", 1, null);
 			_resultItems.Request = request;
@@ -25,7 +25,7 @@ namespace DotnetSpider.Test.Pipeline
 		public void Process()
 		{
 			Core.Pipeline.JsonFilePipeline pipeline = new Core.Pipeline.JsonFilePipeline();
-			ISpider spider = new DefaultSpider("test", new Core.Site());
+			ISpider spider = new DefaultSpider("test", new Site());
 			pipeline.InitPipeline(spider);
 			var folder = pipeline.GetDataForlder();
 			if (Directory.Exists(folder))

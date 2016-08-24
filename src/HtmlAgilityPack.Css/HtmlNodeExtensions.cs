@@ -7,7 +7,7 @@ namespace HtmlAgilityPack.Css
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
-    using global::HtmlAgilityPack;
+    using HtmlAgilityPack;
 
     #endregion
 
