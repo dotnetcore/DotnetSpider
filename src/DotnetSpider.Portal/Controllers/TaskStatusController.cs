@@ -199,7 +199,7 @@ namespace DotnetSpider.Portal.Controllers
 			{
 				sql.Append($" AND {statusFilter}");
 			}
-			sql.Append($" ORDER BY id DESC LIMIT {(page - 1) * pageSize},{pageSize}");
+			sql.Append($" ORDER BY logged DESC LIMIT {(page - 1) * pageSize},{pageSize}");
 
 			using (MySqlConnection conn = new MySqlConnection(Startup.Configuration.GetSection("ConnectionStrings")["MySqlConnectString"]))
 			{
