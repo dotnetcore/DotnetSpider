@@ -260,7 +260,7 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			public int Compare(TaskStatus x, TaskStatus y)
 			{
-				return x.Status > y.Status ? 1 : -1;
+				return x.Status >= y.Status ? 1 : -1;
 			}
 		}
 	}
