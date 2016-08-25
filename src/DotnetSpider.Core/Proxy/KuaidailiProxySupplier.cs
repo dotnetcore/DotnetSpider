@@ -5,9 +5,7 @@ namespace DotnetSpider.Core.Proxy
 {
 	public class KuaidailiProxySupplier : IProxySupplier
 	{
-		public string Url { get; } =
-			"http://dev.kuaidaili.com/api/getproxy/?orderid=917184806038194&num=999&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_tr=1&an_an=1&an_ha=1&sep=1"
-			;
+		public string Url { get; }
 		private readonly HttpClient _client = new HttpClient();
 
 		public KuaidailiProxySupplier(string url)
@@ -21,6 +19,10 @@ namespace DotnetSpider.Core.Proxy
 			string result = _client.GetStringAsync(Url).Result;
 			if (!string.IsNullOrEmpty(result))
 			{
+				if (result.Contains("ERROR(-51)"))
+				{
+					return list;
+				}
 				foreach (var proxy in result.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
 				{
 					if (!list.ContainsKey(proxy))
