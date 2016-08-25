@@ -59,6 +59,8 @@ namespace DotnetSpider.Core.Test
 			string userId = Guid.NewGuid().ToString("N");
 			string connectString = "Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306";
 			Configuration.SetValue("logAndStatusConnectString", connectString);
+			Assert.Equal("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", Configuration.GetValue("logAndStatusConnectString"));
+			LogManagerHelper.InitLogManager(true);
 			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
 				id,
 				userId,

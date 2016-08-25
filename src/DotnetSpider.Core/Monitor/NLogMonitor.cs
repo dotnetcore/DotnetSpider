@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Monitor
 	{
 		public bool IsEnabled => true;
 
-		private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+		private readonly ILogger _logger = LogManager.GetLogger("NLogMonitor");
 
 		public void Watch(SpiderStatus status)
 		{ 

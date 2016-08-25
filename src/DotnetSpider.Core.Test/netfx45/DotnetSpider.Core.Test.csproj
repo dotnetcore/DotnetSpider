@@ -122,6 +122,7 @@
     </Compile>
     <None Include="nlog.config">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -13,9 +13,9 @@ namespace DotnetSpider.Core
 	{
 		private static bool _init;
 
-		public static void InitLogManager()
+		public static void InitLogManager(bool forceInit = false)
 		{
-			if (!_init)
+			if (!_init || forceInit)
 			{
 				string nlogConfigPath = Path.Combine(SpiderEnviroment.BaseDirectory, "nlog.config");
 				if (!File.Exists(nlogConfigPath))
