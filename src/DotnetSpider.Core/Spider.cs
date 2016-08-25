@@ -138,6 +138,21 @@ namespace DotnetSpider.Core
 				UserId = "Default";
 			}
 
+			if (Identity.Length > 100)
+			{
+				throw new SpiderException("Length of Identity should less than 100.");
+			}
+
+			if (UserId.Length > 100)
+			{
+				throw new SpiderException("Length of UserId should less than 100.");
+			}
+
+			if (TaskGroup.Length > 100)
+			{
+				throw new SpiderException("Length of TaskGroup should less than 100.");
+			}
+
 			if (PageProcessor == null)
 			{
 				throw new SpiderException("PageProcessor should not be null.");
