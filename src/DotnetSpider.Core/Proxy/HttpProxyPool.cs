@@ -68,7 +68,7 @@ namespace DotnetSpider.Core.Proxy
 
 		public UseSpecifiedUriWebProxy GetProxy()
 		{
-			for (int i = 0; i < 60; ++i)
+			for (int i = 0; i < 3600; ++i)
 			{
 				var proxy = _proxyQueue.FirstOrDefault(p => DateTimeUtils.GetCurrentTimeStamp() - p.GetLastUseTime() > _reuseInterval);
 				if (proxy != null)

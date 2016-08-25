@@ -26,6 +26,7 @@ namespace DotnetSpider.Core
 		public int Deep { get; set; } = int.MaxValue;
 		public bool SpawnUrl { get; set; } = true;
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
+		public bool RetryWhenResultIsEmpty { get; set; } = false;
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		public Site Site { get; protected set; }
@@ -729,7 +730,22 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				Logger.SaveLog(LogInfo.Create($"采集: {request.Url} 成功, 解析结果为 0.", Logger.Name, this, LogLevel.Info));
+				if (RetryWhenResultIsEmpty)
+				{
+					if (Site.CycleRetryTimes > 0)
+					{
+						AddToCycleRetry(request, Site);
+						Logger.SaveLog(LogInfo.Create($"解析: {request.Url} 结果为 0, 重新尝试采集.", Logger.Name, this, LogLevel.Info));
+					}
+					else
+					{
+						Logger.SaveLog(LogInfo.Create($"采集: {request.Url} 成功, 解析结果为 0.", Logger.Name, this, LogLevel.Info));
+					}
+				}
+				else
+				{
+					Logger.SaveLog(LogInfo.Create($"采集: {request.Url} 成功, 解析结果为 0.", Logger.Name, this, LogLevel.Info));
+				}
 			}
 
 #if TEST
