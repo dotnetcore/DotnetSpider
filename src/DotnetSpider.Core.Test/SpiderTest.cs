@@ -21,6 +21,52 @@ namespace DotnetSpider.Core.Test
 	public class SpiderTest
 	{
 		[Fact]
+		public void UserIdAndTaskGroupAndIdentityLengthLimit()
+		{
+			try
+			{
+				Spider.Create(new Site {EncodingName = "UTF-8", MinSleepTime = 1000},
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					new TestPageProcessor(), new QueueDuplicateRemovedScheduler());
+			}
+			catch (SpiderException exception)
+			{
+				Assert.Equal("Length of Identity should less than 100.", exception.Message);
+			}
+
+			try
+			{
+				Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
+					"abc",
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					new TestPageProcessor(), new QueueDuplicateRemovedScheduler());
+			}
+			catch (SpiderException exception)
+			{
+				Assert.Equal("Length of UserId should less than 100.", exception.Message);
+			}
+
+			try
+			{
+				Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
+					"abcd",
+					"abbb",
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					new TestPageProcessor(), new QueueDuplicateRemovedScheduler());
+			}
+			catch (SpiderException exception)
+			{
+				Assert.Equal("Length of TaskGroup should less than 100.", exception.Message);
+				return;
+			}
+
+			throw new Exception("TEST FAILED.");
+		}
+
+		[Fact]
 		public void RunAsyncAndStop()
 		{
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
@@ -47,7 +93,10 @@ namespace DotnetSpider.Core.Test
 			catch (SpiderException exception)
 			{
 				Assert.Equal("Pipelines should not be null.", exception.Message);
+				return;
 			}
+
+			throw new Exception("TEST FAILED.");
 		}
 
 		[Fact]

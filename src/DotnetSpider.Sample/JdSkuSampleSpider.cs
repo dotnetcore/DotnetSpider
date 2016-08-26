@@ -16,10 +16,10 @@ namespace DotnetSpider.Sample
 		{
 			EntitySpider context = new EntitySpider(new Site
 			{
-				//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("http://dev.kuaidaili.com/api/getproxy/?orderid=917184806038194&num=999&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_tr=1&an_an=1&an_ha=1&sep=1"))
+				//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("快代理API"))
 			})
 			{
-				UserId = "86Research",
+				UserId = "DotnetSpider",
 				TaskGroup = "JdSkuSampleSpider"
 			};
 			context.SetThreadNum(1);

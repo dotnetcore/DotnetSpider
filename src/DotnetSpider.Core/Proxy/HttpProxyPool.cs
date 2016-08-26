@@ -18,7 +18,7 @@ namespace DotnetSpider.Core.Proxy
 		private ILogger Logger { get; }
 		private readonly int _reuseInterval;
 
-		public HttpProxyPool(IProxySupplier supplier, int reuseInterval = 1500)
+		public HttpProxyPool(IProxySupplier supplier, int reuseInterval = 500)
 		{
 			if (supplier == null)
 			{
