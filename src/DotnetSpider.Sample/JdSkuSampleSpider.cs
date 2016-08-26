@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample
 				//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("快代理API"))
 			})
 			{
-				UserId = "86Research",
+				UserId = "DotnetSpider",
 				TaskGroup = "JdSkuSampleSpider"
 			};
 			context.SetThreadNum(1);
