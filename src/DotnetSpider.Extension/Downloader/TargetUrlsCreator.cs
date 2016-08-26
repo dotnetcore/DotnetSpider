@@ -4,7 +4,9 @@ using System.Text.RegularExpressions;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Common;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 
@@ -133,33 +135,65 @@ namespace DotnetSpider.Extension.Downloader
 			int totalPage = -2000;
 			if (TotalPageSelector != null)
 			{
-				string totalStr = page.Selectable.Select(SelectorUtil.Parse(TotalPageSelector)).GetValue();
-				if (TotalPageFormatters != null)
+				string totalStr = string.Empty;
+				if (TotalPageSelector.Type == SelectorType.Enviroment)
 				{
-					foreach (var formatter in TotalPageFormatters)
+					var selector = SelectorUtil.Parse(TotalPageSelector) as EnviromentSelector;
+					if (selector != null)
 					{
-						totalStr = formatter.Formate(totalStr);
+						totalStr = EntityExtractor.GetEnviromentValue(selector.Field, page, 0);
 					}
 				}
+				else
+				{
+					totalStr = page.Selectable.Select(SelectorUtil.Parse(TotalPageSelector)).GetValue();
+				}
+
 				if (!string.IsNullOrEmpty(totalStr))
 				{
-					totalPage = int.Parse(totalStr);
+					if (TotalPageFormatters != null)
+					{
+						foreach (var formatter in TotalPageFormatters)
+						{
+							totalStr = formatter.Formate(totalStr);
+						}
+					}
+					if (!string.IsNullOrEmpty(totalStr))
+					{
+						totalPage = int.Parse(totalStr);
+					}
 				}
 			}
 			int currentPage = -1000;
 			if (CurrenctPageSelector != null)
 			{
-				string currentStr = page.Selectable.Select(SelectorUtil.Parse(CurrenctPageSelector)).GetValue();
-				if (CurrnetPageFormatters != null)
+				string currentStr = string.Empty;
+				if (CurrenctPageSelector.Type == SelectorType.Enviroment)
 				{
-					foreach (var formatter in CurrnetPageFormatters)
+					var selector = SelectorUtil.Parse(CurrenctPageSelector) as EnviromentSelector;
+					if (selector != null)
 					{
-						currentStr = formatter.Formate(currentStr);
+						currentStr = EntityExtractor.GetEnviromentValue(selector.Field, page, 0);
 					}
 				}
+				else
+				{
+					currentStr = page.Selectable.Select(SelectorUtil.Parse(CurrenctPageSelector)).GetValue();
+				}
+
 				if (!string.IsNullOrEmpty(currentStr))
 				{
-					currentPage = int.Parse(currentStr);
+					if (CurrnetPageFormatters != null)
+					{
+						foreach (var formatter in CurrnetPageFormatters)
+						{
+							currentStr = formatter.Formate(currentStr);
+						}
+					}
+					if (!string.IsNullOrEmpty(currentStr))
+					{
+						currentPage = int.Parse(currentStr);
+					}
 				}
 			}
 			if (currentPage == totalPage)
