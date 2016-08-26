@@ -187,7 +187,7 @@ namespace DotnetSpider.Extension.Model
 			}
 		}
 
-		private string GetEnviromentValue(string field, Page page, int index)
+		public static string GetEnviromentValue(string field, Page page, int index)
 		{
 			if (field.ToLower() == "url")
 			{
