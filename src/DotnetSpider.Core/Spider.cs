@@ -136,7 +136,7 @@ namespace DotnetSpider.Core
 
 			if (string.IsNullOrEmpty(TaskGroup) || string.IsNullOrWhiteSpace(TaskGroup))
 			{
-				UserId = "Default";
+				TaskGroup = "Default";
 			}
 
 			if (Identity.Length > 100)

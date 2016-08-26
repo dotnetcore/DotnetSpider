@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
@@ -27,7 +28,7 @@ namespace DotnetSpider.Sample
 
 			// 使用内存Scheduler、自定义PageProcessor、自定义Pipeline创建爬虫
 			Spider spider = Spider.Create(site, new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
-
+			spider.EmptySleepTime = 3000;
 			// 注册爬虫到监控服务
 			SpiderMonitor.Register(spider);
 
@@ -42,7 +43,7 @@ namespace DotnetSpider.Sample
 			{
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
-					Console.WriteLine($"{entry.Name}");
+					File.AppendAllLines("test.txt", new[] { entry.Name });
 				}
 
 				// 可以自由实现插入数据库或保存到文件
@@ -54,16 +55,21 @@ namespace DotnetSpider.Sample
 			public void Process(Page page)
 			{
 				// 利用 Selectable 查询并构造自己想要的数据对象
-				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='yk-col3']")).Nodes();
+				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='yk-pack pack-film']")).Nodes();
 				List<YoukuVideo> results = new List<YoukuVideo>();
 				foreach (var videoElement in totalVideoElements)
 				{
 					var video = new YoukuVideo();
-					video.Name = videoElement.Select(Selectors.XPath("./div/div[4]/div[1]/a")).GetValue();
+					video.Name = videoElement.Select(Selectors.XPath(".//img[@class='quic']/@alt")).GetValue();
 					results.Add(video);
 				}
 				// 以自定义KEY存入page对象中供Pipeline调用
 				page.AddResultItem("VideoResult", results);
+
+				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
+				{
+					page.AddTargetRequest(new Request(url.GetValue(), 0, null));
+				}
 			}
 
 			public Site Site { get; set; }

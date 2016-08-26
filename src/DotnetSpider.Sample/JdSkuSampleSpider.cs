@@ -25,8 +25,7 @@ namespace DotnetSpider.Sample
 			context.SetThreadNum(1);
 			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_hhmmss"));
 			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
-			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main",
-				new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product), new TargetUrlExtractor
 			{
 				Region = new BaseSelector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
@@ -40,6 +39,10 @@ namespace DotnetSpider.Sample
 		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
 		public class Product : ISpiderEntity
 		{
+			[StoredAs("sku", DataType.String, 25)]
+			[PropertySelector(Expression = "./@data-sku")]
+			public string Sku { get; set; }
+
 			[StoredAs("category", DataType.String, 20)]
 			[PropertySelector(Expression = "name", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
@@ -51,10 +54,6 @@ namespace DotnetSpider.Sample
 			[StoredAs("url", DataType.Text)]
 			[PropertySelector(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
-
-			[StoredAs("sku", DataType.String, 25)]
-			[PropertySelector(Expression = "./@data-sku")]
-			public string Sku { get; set; }
 
 			[StoredAs("commentscount", DataType.String, 32)]
 			[PropertySelector(Expression = "./div[5]/strong/a")]
