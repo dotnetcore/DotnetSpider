@@ -11,38 +11,38 @@ using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public abstract class BaseEntityDbPipeline : BaseEntityPipeline
-	{
-		public string ConnectString { get; set; }
-		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
+    public abstract class BaseEntityDbPipeline : BaseEntityPipeline
+    {
+        public string ConnectString { get; set; }
+        public PipelineMode Mode { get; set; } = PipelineMode.Insert;
 
-		protected abstract DbConnection CreateConnection();
+        protected abstract DbConnection CreateConnection();
 
-		protected abstract string GetInsertSql();
-		protected abstract string GetUpdateSql();
-		protected abstract string GetCreateTableSql();
-		protected abstract string GetCreateSchemaSql();
-		protected abstract DbParameter CreateDbParameter();
+        protected abstract string GetInsertSql();
+        protected abstract string GetUpdateSql();
+        protected abstract string GetCreateTableSql();
+        protected abstract string GetCreateSchemaSql();
+        protected abstract DbParameter CreateDbParameter();
 
-		protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
-		protected List<List<string>> Uniques { get; set; } = new List<List<string>>();
-		protected List<Field> Primary { get; set; } = new List<Field>();
-		protected string AutoIncrement { get; set; }
-		protected Schema Schema { get; set; }
-		protected List<Field> Columns { get; set; } = new List<Field>();
-		protected List<Field> UpdateColumns { get; set; } = new List<Field>();
+        protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
+        protected List<List<string>> Uniques { get; set; } = new List<List<string>>();
+        protected List<Field> Primary { get; set; } = new List<Field>();
+        protected string AutoIncrement { get; set; }
+        protected Schema Schema { get; set; }
+        protected List<Field> Columns { get; set; } = new List<Field>();
+        protected List<Field> UpdateColumns { get; set; } = new List<Field>();
 
-		protected abstract string ConvertToDbType(string datatype);
+        protected abstract string ConvertToDbType(string datatype);
 
-		protected BaseEntityDbPipeline()
-		{
-		}
+        protected BaseEntityDbPipeline()
+        {
+        }
 
-		protected BaseEntityDbPipeline(string connectString, PipelineMode mode = PipelineMode.Insert)
-		{
-			Mode = mode;
-			ConnectString = connectString;
-		}
+        protected BaseEntityDbPipeline(string connectString, PipelineMode mode = PipelineMode.Insert)
+        {
+            Mode = mode;
+            ConnectString = connectString;
+        }
 
 
         public override BaseEntityPipeline CreateNewByInitEntity(EntityMetadata metadata)
@@ -181,162 +181,167 @@ namespace DotnetSpider.Extension.Pipeline
         }
 
 
-		private Schema GenerateSchema(Schema schema)
-		{
-			switch (schema.Suffix)
-			{
-				case TableSuffix.FirstDayOfThisMonth:
-					{
-						schema.TableName += "_" + DateTimeUtils.FirstDayofThisMonth.ToString("yyyy_MM_dd");
-						break;
-					}
-				case TableSuffix.Monday:
-					{
-						schema.TableName += "_" + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy_MM_dd");
-						break;
-					}
-				case TableSuffix.Today:
-					{
-						schema.TableName += "_" + DateTime.Now.ToString("yyyy_MM_dd");
-						break;
-					}
-			}
-			return schema;
-		}
+        private Schema GenerateSchema(Schema schema)
+        {
+            switch (schema.Suffix)
+            {
+                case TableSuffix.FirstDayOfThisMonth:
+                    {
+                        schema.TableName += "_" + DateTimeUtils.FirstDayofThisMonth.ToString("yyyy_MM_dd");
+                        break;
+                    }
+                case TableSuffix.Monday:
+                    {
+                        schema.TableName += "_" + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy_MM_dd");
+                        break;
+                    }
+                case TableSuffix.Today:
+                    {
+                        schema.TableName += "_" + DateTime.Now.ToString("yyyy_MM_dd");
+                        break;
+                    }
+            }
+            return schema;
+        }
 
-		public override void InitPipeline(ISpider spider)
-		{
-			base.InitPipeline(spider);
+        public override void InitPipeline(ISpider spider)
+        {
+            base.InitPipeline(spider);
 
-			if (Mode == PipelineMode.Update)
-			{
-				return;
-			}
+            if (Mode == PipelineMode.Update)
+            {
+                return;
+            }
             if (Schema == null)
                 return;
-			NetworkCenter.Current.Execute("db-init", () =>
-			{
-				using (DbConnection conn = CreateConnection())
-				{
-					conn.Open();
-					var command = conn.CreateCommand();
-					command.CommandText = GetCreateSchemaSql();
-					command.CommandType = CommandType.Text;
-					command.ExecuteNonQuery();
+            NetworkCenter.Current.Execute("db-init", () =>
+            {
+                using (DbConnection conn = CreateConnection())
+                {
+                    conn.Open();
+                    var command = conn.CreateCommand();
+                    string schemaScript = GetCreateSchemaSql();
+                    if (!string.IsNullOrEmpty(schemaScript))
+                    {
+                        command.CommandText = schemaScript;
+                        command.CommandType = CommandType.Text;
+                        command.ExecuteNonQuery();
+                    }
+                    command.CommandText = GetCreateTableSql();
+                    command.CommandType = CommandType.Text;
+                    command.ExecuteNonQuery();
+                    conn.Close();
+                }
+            });
+        }
 
-					command.CommandText = GetCreateTableSql();
-					command.CommandType = CommandType.Text;
-					command.ExecuteNonQuery();
-					conn.Close();
-				}
-			});
-		}
+        public override void Process(List<JObject> datas)
+        {
+            NetworkCenter.Current.Execute("pp-", () =>
+            {
+                switch (Mode)
+                {
+                    case PipelineMode.Insert:
+                        {
+                            using (var conn = CreateConnection())
+                            {
+                                var cmd = conn.CreateCommand();
+                                cmd.CommandText = GetInsertSql();
+                                cmd.CommandType = CommandType.Text;
+                                conn.Open();
 
-		public override void Process(List<JObject> datas)
-		{
-			NetworkCenter.Current.Execute("pp-", () =>
-			{
-				switch (Mode)
-				{
-					case PipelineMode.Insert:
-						{
-							using (var conn = CreateConnection())
-							{
-								var cmd = conn.CreateCommand();
-								cmd.CommandText = GetInsertSql();
-								cmd.CommandType = CommandType.Text;
-								conn.Open();
+                                foreach (var data in datas)
+                                {
+                                    cmd.Parameters.Clear();
 
-								foreach (var data in datas)
-								{
-									cmd.Parameters.Clear();
+                                    List<DbParameter> parameters = new List<DbParameter>();
+                                    foreach (var column in Columns)
+                                    {
+                                        var parameter = CreateDbParameter();
+                                        parameter.ParameterName = $"@{column.Name}";
+                                        parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+                                        if (parameter.Value == null)
+                                            parameter.Value = DBNull.Value;
+                                        parameter.DbType = Convert(column.DataType);
+                                        parameters.Add(parameter);
+                                    }
 
-									List<DbParameter> parameters = new List<DbParameter>();
-									foreach (var column in Columns)
-									{
-										var parameter = CreateDbParameter();
-										parameter.ParameterName = $"@{column.Name}";
-										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-										parameter.DbType = Convert(column.DataType);
-										parameters.Add(parameter);
-									}
+                                    cmd.Parameters.AddRange(parameters.ToArray());
+                                    cmd.ExecuteNonQuery();
+                                }
 
-									cmd.Parameters.AddRange(parameters.ToArray());
-									cmd.ExecuteNonQuery();
-								}
+                                conn.Close();
+                            }
+                            break;
+                        }
+                    case PipelineMode.Update:
+                        {
+                            using (var conn = CreateConnection())
+                            {
+                                var cmd = conn.CreateCommand();
+                                cmd.CommandText = GetUpdateSql();
+                                cmd.CommandType = CommandType.Text;
+                                conn.Open();
 
-								conn.Close();
-							}
-							break;
-						}
-					case PipelineMode.Update:
-						{
-							using (var conn = CreateConnection())
-							{
-								var cmd = conn.CreateCommand();
-								cmd.CommandText = GetUpdateSql();
-								cmd.CommandType = CommandType.Text;
-								conn.Open();
+                                foreach (var data in datas)
+                                {
+                                    cmd.Parameters.Clear();
 
-								foreach (var data in datas)
-								{
-									cmd.Parameters.Clear();
+                                    List<DbParameter> parameters = new List<DbParameter>();
+                                    foreach (var column in UpdateColumns)
+                                    {
+                                        var parameter = CreateDbParameter();
+                                        parameter.ParameterName = $"@{column.Name}";
+                                        parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+                                        parameter.DbType = Convert(column.DataType);
+                                        parameters.Add(parameter);
+                                    }
 
-									List<DbParameter> parameters = new List<DbParameter>();
-									foreach (var column in UpdateColumns)
-									{
-										var parameter = CreateDbParameter();
-										parameter.ParameterName = $"@{column.Name}";
-										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-										parameter.DbType = Convert(column.DataType);
-										parameters.Add(parameter);
-									}
+                                    foreach (var column in Primary)
+                                    {
+                                        var parameter = CreateDbParameter();
+                                        parameter.ParameterName = $"@{column.Name}";
+                                        parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+                                        parameter.DbType = Convert(column.DataType);
+                                        parameters.Add(parameter);
+                                    }
 
-									foreach (var column in Primary)
-									{
-										var parameter = CreateDbParameter();
-										parameter.ParameterName = $"@{column.Name}";
-										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-										parameter.DbType = Convert(column.DataType);
-										parameters.Add(parameter);
-									}
+                                    cmd.Parameters.AddRange(parameters.ToArray());
+                                    cmd.ExecuteNonQuery();
+                                }
 
-									cmd.Parameters.AddRange(parameters.ToArray());
-									cmd.ExecuteNonQuery();
-								}
+                                conn.Close();
+                            }
+                            break;
+                        }
+                }
 
-								conn.Close();
-							}
-							break;
-						}
-				}
+            });
+        }
 
-			});
-		}
+        private DbType Convert(string datatype)
+        {
+            if (string.IsNullOrEmpty(datatype))
+            {
+                throw new SpiderException("TYPE can not be null");
+            }
 
-		private DbType Convert(string datatype)
-		{
-			if (string.IsNullOrEmpty(datatype))
-			{
-				throw new SpiderException("TYPE can not be null");
-			}
+            if (datatype.StartsWith("STRING,") || "TEXT" == datatype)
+            {
+                return DbType.String;
+            }
+            if ("BOOL" == datatype)
+            {
+                return DbType.Boolean;
+            }
 
-			if (datatype.StartsWith("STRING,") || "TEXT" == datatype)
-			{
-				return DbType.String;
-			}
-			if ("BOOL" == datatype)
-			{
-				return DbType.Boolean;
-			}
+            if ("DATE" == datatype || "TIME" == datatype)
+            {
+                return DbType.DateTime;
+            }
 
-			if ("DATE" == datatype || "TIME" == datatype)
-			{
-				return DbType.DateTime;
-			}
-
-			throw new SpiderException("Unsport datatype: " + datatype);
-		}
-	}
+            throw new SpiderException("Unsport datatype: " + datatype);
+        }
+    }
 }
 

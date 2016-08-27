@@ -300,6 +300,51 @@
     <Compile Include="..\ORM\TableSuffix.cs">
       <Link>ORM\TableSuffix.cs</Link>
     </Compile>
+    <Compile Include="..\SQL\MSSql\Create.cs">
+      <Link>SQL\MSSql\Create.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\MSSql\Delete.cs">
+      <Link>SQL\MSSql\Delete.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\MSSql\Insert.cs">
+      <Link>SQL\MSSql\Insert.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\MSSql\Select.cs">
+      <Link>SQL\MSSql\Select.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\MSSql\SQL.cs">
+      <Link>SQL\MSSql\SQL.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\MSSql\Update.cs">
+      <Link>SQL\MSSql\Update.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\BaseCreate.cs">
+      <Link>SQL\BaseCreate.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\BaseDelete.cs">
+      <Link>SQL\BaseDelete.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\BaseInsert.cs">
+      <Link>SQL\BaseInsert.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\BaseSelect.cs">
+      <Link>SQL\BaseSelect.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\BaseSQL.cs">
+      <Link>SQL\BaseSQL.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\BaseUpdate.cs">
+      <Link>SQL\BaseUpdate.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\Command.cs">
+      <Link>SQL\Command.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\Generatable.cs">
+      <Link>SQL\Generatable.cs</Link>
+    </Compile>
+    <Compile Include="..\SQL\Pair.cs">
+      <Link>SQL\Pair.cs</Link>
+    </Compile>
     <Compile Include="..\Pipeline\BaseEntityDbPipeline.cs">
       <Link>Pipeline\BaseEntityDbPipeline.cs</Link>
     </Compile>
@@ -329,6 +374,9 @@
     </Compile>
     <Compile Include="..\Pipeline\MongoDbEntityPipeline.cs">
       <Link>Pipeline\MongoDbEntityPipeline.cs</Link>
+    </Compile>
+    <Compile Include="..\Pipeline\MSSqlEntityPipeline.cs">
+      <Link>Pipeline\MSSqlEntityPipeline.cs</Link>
     </Compile>
     <Compile Include="..\Pipeline\MultiPagePipeline.cs">
       <Link>Pipeline\MultiPagePipeline.cs</Link>

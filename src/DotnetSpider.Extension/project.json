@@ -26,8 +26,7 @@
     "Microsoft.Extensions.DependencyInjection": "1.0.0",
     "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
     "MailKit": "1.4.1",
-    "DotnetSpider.Redial": "0.0.9"
-  },
+    "DotnetSpider.Redial": "0.0.9"  },
   "frameworks": {
     "netcoreapp1.0": {
       "imports": "portable-net45+win8+dnxcore50",

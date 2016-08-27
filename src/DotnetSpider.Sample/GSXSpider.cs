@@ -64,7 +64,8 @@ namespace DotnetSpider.Sample
             context.AddEntityType(typeof(主页)).AddEntityType(typeof(订单列表项)).AddEntityType(typeof(订单));
             context.SetDownloader(new WebDriverDownloader(Browser.Chrome, 300));
             context.SetThreadNum(1);
-            context.AddEntityPipeline(new MySqlEntityPipeline("Database='gsx';Data Source=localhost;User ID=root;Password=pass@word1;Port=4040")
+            //context.AddEntityPipeline(new MySqlEntityPipeline("Database='gsx';Data Source=localhost;User ID=root;Password=pass@word1;Port=4040")
+            context.AddEntityPipeline(new MSSqlEntityPipeline("Database='YCOMS';Data Source=.;Integrated Security=SSPI;")
             //{ Mode = PipelineMode.Update }
             );
             return context;
@@ -76,6 +77,12 @@ namespace DotnetSpider.Sample
             [TargetUrl]
             [PropertySelector(Expression = "//a[@ui-sref=\"jigou.orders\"]")]
             public string 订单页面链接 { get; set; }
+
+            public static Func<IWebDriver, IWebElement> UntilCondition()
+            {
+                return ExpectedConditions.ElementExists(By.XPath("//a[@ui-sref=\"jigou.orders\"]"));
+            }
+
         }
 
         [TargetUrl(UrlPattern = @"http://i\.genshuixue\.com/main(\?tick=[0-9]*)*#/orders//$", KeepOrigin = true)]
