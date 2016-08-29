@@ -248,9 +248,12 @@ namespace DotnetSpider.Extension.Model
 				foreach (var targetUrl in EntityMetadata.Entity.TargetUrls)
 				{
 					Dictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
-					foreach (var extra in targetUrl.Extras)
+					if (targetUrl.Extras != null)
 					{
-						extras.Add(extra, result.GetValue(extra));
+						foreach (var extra in targetUrl.Extras)
+						{
+							extras.Add(extra, result.GetValue(extra));
+						}
 					}
 					Dictionary<string, dynamic> allExtras = new Dictionary<string, dynamic>();
 					foreach (var extra in page.Request.Extras.Union(extras))
