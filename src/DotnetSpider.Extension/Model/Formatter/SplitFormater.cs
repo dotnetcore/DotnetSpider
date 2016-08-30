@@ -1,5 +1,6 @@
 ﻿using System;
 using DotnetSpider.Core;
+using System.Linq;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
@@ -7,23 +8,21 @@ namespace DotnetSpider.Extension.Model.Formatter
 	public class SplitFormatter : Formatter
 	{
 		public string[] Splitors { get; set; }
-		public int ElementAt { get; set; }
+		public int ElementAt { get; set; } = int.MaxValue;
 
 		protected override dynamic FormateValue(dynamic value)
 		{
-			var result = value.Split(Splitors, StringSplitOptions.RemoveEmptyEntries);
-			if (result != null)
+			string tmp = value.ToString();
+			string[] result = tmp.Split(Splitors, StringSplitOptions.RemoveEmptyEntries);
+
+			if (result.Length > ElementAt)
 			{
-				if (result.Length > ElementAt)
-				{
-					return result[ElementAt];
-				}
-				else
-				{
-					return null;
-				}
+				return result[ElementAt];
 			}
-			return null;
+			else
+			{
+				return ElementAt == int.MaxValue ? result.Last() : null;
+			}
 		}
 
 		protected override void CheckArguments()

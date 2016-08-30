@@ -9,7 +9,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		protected override dynamic FormateValue(dynamic value)
 		{
 			DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-			string tmp = value?.ToString();
+			string tmp = value.ToString();
 			long timeStamp;
 			if (!long.TryParse(tmp, out timeStamp))
 			{

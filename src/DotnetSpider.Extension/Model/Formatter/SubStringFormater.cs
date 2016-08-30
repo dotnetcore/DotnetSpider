@@ -12,21 +12,18 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		protected override dynamic FormateValue(dynamic value)
 		{
-			if (string.IsNullOrEmpty(value))
-			{
-				return null;
-			}
+			string tmp = value.ToString();
 
-			int begin = value.IndexOf(Start, StringComparison.Ordinal);
+			int begin = tmp.IndexOf(Start, StringComparison.Ordinal);
 			int length;
 			if (!string.IsNullOrEmpty(End))
 			{
-				int end = value.IndexOf(End, begin, StringComparison.Ordinal);
+				int end = tmp.IndexOf(End, begin, StringComparison.Ordinal);
 				length = end - begin;
 			}
 			else
 			{
-				length = value.Length - begin;
+				length = tmp.Length - begin;
 			}
 
 			begin += StartOffset;
@@ -36,7 +33,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 			{
 				length += End.Length;
 			}
-			return value.Substring(begin, length);
+			return tmp.Substring(begin, length);
 		}
 
 		protected override void CheckArguments()

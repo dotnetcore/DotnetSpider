@@ -13,9 +13,10 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		protected override dynamic FormateValue(dynamic value)
 		{
-			if (Regex.IsMatch(value, Pattern))
+			string tmp = value.ToString();
+			if (Regex.IsMatch(tmp, Pattern))
 			{
-				return $"{value}{AppendValue}";
+				return $"{tmp}{AppendValue}";
 			}
 			return value;
 		}

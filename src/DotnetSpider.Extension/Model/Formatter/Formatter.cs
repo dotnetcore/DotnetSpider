@@ -17,13 +17,17 @@ namespace DotnetSpider.Extension.Model.Formatter
 		{
 			CheckArguments();
 
-			string tmp = value?.ToString();
+			if (value == null)
+			{
+				return ValueWhenNull;
+			}
+			string tmp = value.ToString();
 			if (string.IsNullOrEmpty(tmp) || string.IsNullOrWhiteSpace(tmp))
 			{
 				return ValueWhenNull;
 			}
 
-			return FormateValue(tmp);
+			return FormateValue(value);
 		}
 	}
 }

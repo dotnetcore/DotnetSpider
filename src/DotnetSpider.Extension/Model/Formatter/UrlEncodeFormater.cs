@@ -15,10 +15,11 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		protected override dynamic FormateValue(dynamic value)
 		{
+			string tmp = value.ToString();
 #if !NET_CORE
-			return HttpUtility.UrlEncode(value, System.Text.Encoding.GetEncoding(Encoding));
+			return HttpUtility.UrlEncode(tmp, System.Text.Encoding.GetEncoding(Encoding));
 #else
-			return WebUtility.UrlEncode(value);
+			return WebUtility.UrlEncode(tmp);
 #endif
 		}
 

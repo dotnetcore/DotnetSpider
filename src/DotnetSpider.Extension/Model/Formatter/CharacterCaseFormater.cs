@@ -9,13 +9,14 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		protected override dynamic FormateValue(dynamic value)
 		{
+			string tmp = value.ToString();
 			if (ToUpper)
 			{
-				return value.ToUpperInvariant();
+				return tmp.ToUpperInvariant();
 			}
 			else
 			{
-				return value.ToLowerInvariant();
+				return tmp.ToLowerInvariant();
 			}
 		}
 

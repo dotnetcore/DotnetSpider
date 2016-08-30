@@ -273,11 +273,11 @@
     <Compile Include="..\Model\EntityMetadata.cs">
       <Link>Model\EntityMetadata.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Formatter\BoolFormater.cs">
-      <Link>Model\Formatter\BoolFormater.cs</Link>
-    </Compile>
     <Compile Include="..\Model\Formatter\CharacterCaseFormater.cs">
       <Link>Model\Formatter\CharacterCaseFormater.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Formatter\DisplaceFormater.cs">
+      <Link>Model\Formatter\DisplaceFormater.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\Download.cs">
       <Link>Model\Formatter\Download.cs</Link>
@@ -296,9 +296,6 @@
     </Compile>
     <Compile Include="..\Model\Formatter\RegexFormater.cs">
       <Link>Model\Formatter\RegexFormater.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\Formatter\RegexMapValueFormatter.cs">
-      <Link>Model\Formatter\RegexMapValueFormatter.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\RemoveHtmlTagFormater.cs">
       <Link>Model\Formatter\RemoveHtmlTagFormater.cs</Link>

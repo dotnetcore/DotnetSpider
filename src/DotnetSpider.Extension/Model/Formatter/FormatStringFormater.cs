@@ -10,7 +10,8 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		protected override dynamic FormateValue(dynamic value)
 		{
-			return string.Format(Format, value);
+			string tmp = value.ToString();
+			return string.Format(Format, tmp);
 		}
 
 		protected override void CheckArguments()

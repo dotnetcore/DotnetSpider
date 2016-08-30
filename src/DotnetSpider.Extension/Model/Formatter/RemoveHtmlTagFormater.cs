@@ -8,8 +8,9 @@ namespace DotnetSpider.Extension.Model.Formatter
 	{
 		protected override dynamic FormateValue(dynamic value)
 		{
+			string tmp = value.ToString();
 			var htmlDocument = new HtmlDocument();
-			htmlDocument.LoadHtml(value);
+			htmlDocument.LoadHtml(tmp);
 			return htmlDocument.DocumentNode.InnerText;
 		}
 
