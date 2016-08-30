@@ -7,7 +7,23 @@ namespace DotnetSpider.Extension.Model.Formatter
 	public abstract class Formatter : System.Attribute, INamed
 	{
 		public string Name => GetType().Name;
+		public string ValueWhenNull { get; set; } = string.Empty;
 
-		public abstract string Formate(string value);
+		protected abstract dynamic FormateValue(dynamic value);
+
+		protected abstract void CheckArguments();
+
+		public dynamic Formate(dynamic value)
+		{
+			CheckArguments();
+
+			string tmp = value?.ToString();
+			if (string.IsNullOrEmpty(tmp) || string.IsNullOrWhiteSpace(tmp))
+			{
+				return ValueWhenNull;
+			}
+
+			return FormateValue(tmp);
+		}
 	}
 }

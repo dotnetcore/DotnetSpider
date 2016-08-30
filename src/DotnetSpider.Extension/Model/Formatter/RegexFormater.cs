@@ -5,22 +5,20 @@ using DotnetSpider.Core;
 namespace DotnetSpider.Extension.Model.Formatter
 {
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-	public class BoolFormatter : Formatter
+	public class RegexFormatter : Formatter
 	{
 		public string Pattern { get; set; }
-		public string True { get; set; } = "T";
-		public string False { get; set; } = "F";
 
 		protected override dynamic FormateValue(dynamic value)
 		{
-			return Regex.Matches(value, Pattern).Count > 0 ? True : False;
+			return Regex.Match(value,Pattern).ToString();
 		}
 
 		protected override void CheckArguments()
 		{
 			if (string.IsNullOrEmpty(Pattern) || string.IsNullOrWhiteSpace(Pattern))
 			{
-				throw new SpiderException("Pattern should not be null.");
+				throw new SpiderException("Pattern should not be null or empty.");
 			}
 		}
 	}

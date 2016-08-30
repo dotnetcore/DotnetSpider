@@ -131,7 +131,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			public int Id { get; set; }
 			[ReplaceFormatter(NewValue = "a", OldValue = "b")]
-			[RegexMatchFormatter(Pattern = "a(*)")]
+			[RegexFormatter(Pattern = "a(*)")]
 			public string Name { get; set; }
 		}
 

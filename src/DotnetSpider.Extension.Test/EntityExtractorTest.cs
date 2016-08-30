@@ -14,11 +14,6 @@ namespace DotnetSpider.Extension.Test
 {
 	public class EntityExtractorTest
 	{
-		public class YoukuVideo
-		{
-			public string Name { get; set; }
-		}
-
 		[Fact]
 		public void Extract()
 		{

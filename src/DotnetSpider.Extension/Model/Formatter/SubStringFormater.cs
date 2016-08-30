@@ -10,7 +10,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		public int StartOffset { get; set; } = 0;
 		public int EndOffset { get; set; } = 0;
 
-		public override string Formate(string value)
+		protected override dynamic FormateValue(dynamic value)
 		{
 			if (string.IsNullOrEmpty(value))
 			{
@@ -37,6 +37,10 @@ namespace DotnetSpider.Extension.Model.Formatter
 				length += End.Length;
 			}
 			return value.Substring(begin, length);
+		}
+
+		protected override void CheckArguments()
+		{
 		}
 	}
 }

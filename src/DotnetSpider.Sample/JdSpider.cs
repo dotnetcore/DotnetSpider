@@ -21,7 +21,7 @@ namespace DotnetSpider.Sample
 			public string CategoryName { get; set; }
 
 			[TargetUrl(Extras = new[] { "CategoryName" })]
-			[RegexAppendFormatter(Pattern = "http://list.jd.com/list.html\\?cat=[0-9]+", Append = "&page=1&trans=1&JL=6_0_0")]
+			[RegexAppendFormatter(Pattern = "http://list.jd.com/list.html\\?cat=[0-9]+", AppendValue = "&page=1&trans=1&JL=6_0_0")]
 			[PropertySelector(Expression = "./@href")]
 			public string Url { get; set; }
 		}
@@ -67,7 +67,7 @@ namespace DotnetSpider.Sample
 			[PropertySelector(Expression = ".//a[@class='name']")]
 			public string ShopName { get; set; }
 
-			[StringFormatFormater(Format = "http:{0}")]
+			[FormatStringFormater(Format = "http:{0}")]
 			[Download]
 			[PropertySelector(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src")]
 			public string Logo { get; set; }

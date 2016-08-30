@@ -151,8 +151,6 @@ namespace DotnetSpider.Extension.Pipeline
 			throw new SpiderException("UNSPORT datatype: " + dataType);
 		}
 
-		public  PipelineMode Mode { get; set; }
-
 		public override BaseEntityPipeline Clone()
 		{
 			return new MySqlEntityPipeline(ConnectString, Mode)

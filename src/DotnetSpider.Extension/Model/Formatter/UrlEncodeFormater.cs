@@ -1,4 +1,5 @@
 ﻿using System;
+using DotnetSpider.Core;
 #if !NET_CORE
 using System.Web;
 #else
@@ -12,13 +13,22 @@ namespace DotnetSpider.Extension.Model.Formatter
 	{
 		public string Encoding { get; set; }
 
-		public override string Formate(string value)
+		protected override dynamic FormateValue(dynamic value)
 		{
 #if !NET_CORE
 			return HttpUtility.UrlEncode(value, System.Text.Encoding.GetEncoding(Encoding));
 #else
 			return WebUtility.UrlEncode(value);
 #endif
+		}
+
+		protected override void CheckArguments()
+		{
+			var encoding = System.Text.Encoding.GetEncoding(Encoding);
+			if (encoding == null)
+			{
+				throw new SpiderException($"Can't get encoding: {Encoding}.");
+			}
 		}
 	}
 }

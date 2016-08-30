@@ -5,9 +5,41 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class TrimFormater : Formatter
 	{
-		public override string Formate(string value)
+		public enum TrimType
 		{
-			return value?.Trim();
+			Right,
+			Left,
+			All
+		}
+
+		public TrimType Type { get; set; } = TrimType.All;
+
+		protected override dynamic FormateValue(dynamic value)
+		{
+			string tmp = value?.ToString();
+			switch (Type)
+			{
+				case TrimType.All:
+					{
+						return tmp?.Trim();
+					}
+				case TrimType.Left:
+					{
+						return tmp?.TrimStart();
+					}
+				case TrimType.Right:
+					{
+						return tmp?.TrimEnd();
+					}
+				default:
+					{
+						return tmp?.Trim();
+					}
+			}
+		}
+
+		protected override void CheckArguments()
+		{
 		}
 	}
 }

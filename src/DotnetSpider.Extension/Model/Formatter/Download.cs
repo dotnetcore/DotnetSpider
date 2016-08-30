@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-		public override string Formate(string value)
+		protected override dynamic FormateValue(dynamic value)
 		{
 			try
 			{
@@ -42,7 +42,10 @@ namespace DotnetSpider.Extension.Model.Formatter
 				Logger.SaveLog(LogInfo.Create($"Download file: {value} failed.", Logger.Name, null, LogLevel.Error, e));
 				throw;
 			}
+		}
 
+		protected override void CheckArguments()
+		{
 		}
 	}
 }

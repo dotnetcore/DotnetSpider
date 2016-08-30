@@ -6,16 +6,21 @@ namespace DotnetSpider.Extension.Model.Formatter
 	public class CharacterCaseFormatter : Formatter
 	{
 		public bool ToUpper { get; set; } = true;
-		public override string Formate(string value)
+
+		protected override dynamic FormateValue(dynamic value)
 		{
 			if (ToUpper)
 			{
-				return value.ToUpper();
+				return value.ToUpperInvariant();
 			}
 			else
 			{
-				return value.ToLower();
+				return value.ToLowerInvariant();
 			}
+		}
+
+		protected override void CheckArguments()
+		{
 		}
 	}
 }

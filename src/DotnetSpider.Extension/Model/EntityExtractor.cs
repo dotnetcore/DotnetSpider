@@ -305,15 +305,14 @@ namespace DotnetSpider.Extension.Model
 						List<string> results = new List<string>();
 						foreach (var propertyValue in propertyValues)
 						{
-							string tmp = propertyValue.GetValue(needPlainText);
-							if (f != null)
+							results.Add(propertyValue.GetValue(needPlainText));
+						}
+						if (f != null)
+						{
+							foreach (var formatter in f.Formatters)
 							{
-								foreach (var formatter in f.Formatters)
-								{
-									tmp = formatter.Formate(tmp);
-								}
+								results = formatter.Formate(results);
 							}
-							results.Add(tmp);
 						}
 						return new JArray(results);
 					}

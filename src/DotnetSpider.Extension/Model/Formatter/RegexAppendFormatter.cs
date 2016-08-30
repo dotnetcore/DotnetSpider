@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
@@ -8,15 +9,28 @@ namespace DotnetSpider.Extension.Model.Formatter
 	{
 		public string Pattern { get; set; }
 
-		public string Append { get; set; }
+		public string AppendValue { get; set; }
 
-		public override string Formate(string value)
+		protected override dynamic FormateValue(dynamic value)
 		{
 			if (Regex.IsMatch(value, Pattern))
 			{
-				return $"{value}{Append}";
+				return $"{value}{AppendValue}";
 			}
 			return value;
+		}
+
+		protected override void CheckArguments()
+		{
+			if (string.IsNullOrEmpty(Pattern) || string.IsNullOrWhiteSpace(Pattern))
+			{
+				throw new SpiderException("Pattern should not be null or empty.");
+			}
+
+			if (string.IsNullOrEmpty(AppendValue) || string.IsNullOrWhiteSpace(AppendValue))
+			{
+				throw new SpiderException("Append should not be null or empty.");
+			}
 		}
 	}
 }

@@ -1,15 +1,22 @@
 ﻿using System;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class TimeStampFormatter : Formatter
 	{
-		public override string Formate(string value)
+		protected override dynamic FormateValue(dynamic value)
 		{
-			long timeStamp = long.Parse(value);
 			DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-			switch (value.Length)
+			string tmp = value?.ToString();
+			long timeStamp;
+			if (!long.TryParse(tmp, out timeStamp))
+			{
+				return dt.ToString("yyyy-MM-dd HH:mm:ss");
+			}
+
+			switch (tmp.Length)
 			{
 				case 10:
 					{
@@ -23,10 +30,14 @@ namespace DotnetSpider.Extension.Model.Formatter
 					}
 				default:
 					{
-						throw new Exception("Wrong input timestamp");
+						throw new SpiderException("Wrong input timestamp");
 					}
 			}
 			return dt.ToString("yyyy-MM-dd HH:mm:ss");
+		}
+
+		protected override void CheckArguments()
+		{
 		}
 	}
 }

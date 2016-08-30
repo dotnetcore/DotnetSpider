@@ -142,6 +142,9 @@
     <Compile Include="..\EntitySpiderTest.cs">
       <Link>EntitySpiderTest.cs</Link>
     </Compile>
+    <Compile Include="..\FormatterTest.cs">
+      <Link>FormatterTest.cs</Link>
+    </Compile>
     <Compile Include="..\Pipeline\MysqlEntityPipelineTest.cs">
       <Link>Pipeline\MysqlEntityPipelineTest.cs</Link>
     </Compile>

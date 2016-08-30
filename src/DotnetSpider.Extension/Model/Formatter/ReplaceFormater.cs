@@ -8,9 +8,13 @@ namespace DotnetSpider.Extension.Model.Formatter
 		public string OldValue { get; set; }
 		public string NewValue { get; set; }
 
-		public override string Formate(string value)
+		protected override dynamic FormateValue(dynamic value)
 		{
 			return value?.Replace(OldValue, NewValue);
+		}
+
+		protected override void CheckArguments()
+		{
 		}
 	}
 }
