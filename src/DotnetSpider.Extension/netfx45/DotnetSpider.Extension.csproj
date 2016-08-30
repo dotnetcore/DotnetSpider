@@ -387,6 +387,9 @@
     <Compile Include="..\Pipeline\MongoDbEntityPipeline.cs">
       <Link>Pipeline\MongoDbEntityPipeline.cs</Link>
     </Compile>
+    <Compile Include="..\Pipeline\MsSqlEntityPipeline.cs">
+      <Link>Pipeline\MsSqlEntityPipeline.cs</Link>
+    </Compile>
     <Compile Include="..\Pipeline\MultiPagePipeline.cs">
       <Link>Pipeline\MultiPagePipeline.cs</Link>
     </Compile>
