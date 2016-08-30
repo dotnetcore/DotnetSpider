@@ -155,7 +155,6 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			return new MySqlEntityPipeline(ConnectString, Mode)
 			{
-				Mode = PipelineMode.Update,
 				UpdateConnectString = UpdateConnectString
 			};
 		}

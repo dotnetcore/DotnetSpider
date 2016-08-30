@@ -19,7 +19,10 @@ namespace DotnetSpider.Extension.Pipeline
 		protected Schema Schema { get; set; }
 		private IMongoCollection<BsonDocument> _collection;
 
-		public MongoDbEntityPipeline(string connectString)		{			ConnectString = connectString;		}
+		public MongoDbEntityPipeline(string connectString)
+		{
+			ConnectString = connectString;
+		}
 
 		public override void InitiEntity(EntityMetadata metadata)
 		{

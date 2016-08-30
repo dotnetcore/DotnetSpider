@@ -105,7 +105,6 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			return new MsSqlEntityPipeline(ConnectString, Mode)
 			{
-				Mode = PipelineMode.Update,
 				UpdateConnectString = UpdateConnectString
 			};
 		}
