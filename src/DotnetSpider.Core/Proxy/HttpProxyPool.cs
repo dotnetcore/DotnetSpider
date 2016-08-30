@@ -29,13 +29,17 @@ namespace DotnetSpider.Core.Proxy
 
 			_reuseInterval = reuseInterval;
 
-			var timer = new Timer((a) =>
+			Task.Factory.StartNew(() =>
 			{
-				if (_proxyQueue.Count < 50)
+				for (long i = 0; i < long.MaxValue; i++)
 				{
-					UpdateProxy();
+					if (_proxyQueue.Count < 50)
+					{
+						UpdateProxy();
+					}
+					Thread.Sleep(30000);
 				}
-			}, null, 1, 30000);
+			});
 		}
 
 		private void UpdateProxy()
