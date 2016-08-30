@@ -65,7 +65,7 @@ namespace DotnetSpider.Sample
             context.SetDownloader(new WebDriverDownloader(Browser.Chrome, 300));
             context.SetThreadNum(1);
             //context.AddEntityPipeline(new MySqlEntityPipeline("Database='gsx';Data Source=localhost;User ID=root;Password=pass@word1;Port=4040")
-            context.AddEntityPipeline(new MSSqlEntityPipeline("Database='YCOMS';Data Source=.;Integrated Security=SSPI;")
+            context.AddEntityPipeline(new MSSqlEntityPipeline("Database='GSXData';Data Source=.;Integrated Security=SSPI;")
             //{ Mode = PipelineMode.Update }
             );
             return context;
@@ -159,6 +159,10 @@ namespace DotnetSpider.Sample
             [PropertySelector(Expression = @"//div[@id=""main""]//a[img[@class=""thumbnail""]]/@href")]
             [RegexMatchFormatter(Pattern = @"\d{2,}")]
             public string 学生ID { get; set; }
+
+            [StoredAs("教师ID", DataType.String, 20)]
+            [PropertySelector(Expression = @"教师ID", Type = SelectorType.Enviroment)]
+            public string 教师ID { get; set; }
 
             [StoredAs("实际收入", DataType.String, 10)]
             [PropertySelector(Expression = @"//div[@id=""main""]//strong[1]")]
