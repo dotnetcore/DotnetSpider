@@ -99,6 +99,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				}
 				catch (Exception)
 				{
+					// ignored
 				}
 				ISpider spider = new DefaultSpider("test", new Site());
 
@@ -125,6 +126,19 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 
 			ClearDb();
+		}
+
+		[Fact]
+		public void Clone()
+		{
+			MySqlEntityPipeline insertipeline = new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306");
+			var newPipeline1 = (MySqlEntityPipeline)insertipeline.Clone();
+			Assert.Equal("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306", newPipeline1.ConnectString);
+			Assert.Equal(PipelineMode.Insert, newPipeline1.Mode);
+
+			MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306", PipelineMode.Update);
+			Assert.Equal("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306", updatePipeline.ConnectString);
+			Assert.Equal(PipelineMode.Update, updatePipeline.Mode);
 		}
 
 		[Schema("test", "sku", TableSuffix.Today)]
