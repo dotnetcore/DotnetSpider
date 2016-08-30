@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using DotnetSpider.Core;
+using System.Linq;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
@@ -10,15 +12,24 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		protected override dynamic FormateValue(dynamic value)
 		{
-			string tmp = value.ToString();
-			return string.Format(Format, tmp);
+			var tmp = value as ICollection;
+
+			if (tmp == null)
+			{
+				return string.Format(Format, value.ToString());
+			}
+			else
+			{
+				ArrayList array =new ArrayList(tmp);
+				return string.Format(Format, array.ToArray());
+			}
 		}
 
 		protected override void CheckArguments()
 		{
 			if (string.IsNullOrEmpty(Format) || string.IsNullOrWhiteSpace(Format))
 			{
-				throw new SpiderException("Format should not be null or empty.");
+				throw new SpiderException("FormatString should not be null or empty.");
 			}
 		}
 	}
