@@ -40,7 +40,7 @@ namespace DotnetSpider.Core.Downloader
 					}));
 					var message = (HttpRequestMessage)m;
 					var requestTask = httpClient.SendAsync(message);
-					requestTask.Wait(site.Timeout / 1000);
+					requestTask.Wait(site.Timeout);
 					if (requestTask.Status == TaskStatus.RanToCompletion)
 					{
 						return requestTask.Result;
