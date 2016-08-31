@@ -37,13 +37,18 @@ namespace DotnetSpider.Core.Downloader
 						UseCookies = false,
 						UseProxy = true,
 						Proxy = proxy
-					}))
-					{
-						Timeout = new TimeSpan(0, 0, site.Timeout / 1000)
-					};
+					}));
 					var message = (HttpRequestMessage)m;
-
-					return httpClient.SendAsync(message).Result;
+					var requestTask = httpClient.SendAsync(message);
+					requestTask.Wait(site.Timeout / 1000);
+					if (requestTask.Status == TaskStatus.RanToCompletion)
+					{
+						return requestTask.Result;
+					}
+					else
+					{
+						return new HttpResponseMessage(HttpStatusCode.RequestTimeout);
+					}
 				}, httpMessage);
 
 				response.EnsureSuccessStatusCode();
