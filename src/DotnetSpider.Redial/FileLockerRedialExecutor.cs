@@ -58,7 +58,7 @@ namespace DotnetSpider.Redial
 		public override string CreateActionIdentity(string name)
 		{
 			string id = Path.Combine(AtomicActionFolder, name + "-" + Guid.NewGuid().ToString("N"));
-			File.Create(id);
+			File.Create(id).Dispose();
 			return id;
 		}
 
@@ -71,7 +71,7 @@ namespace DotnetSpider.Redial
 		{
 			if (File.Exists(RedialLockerFile))
 			{
-				File.Create(RedialLockerFile);
+				File.Create(RedialLockerFile).Dispose();
 				return false;
 			}
 			return true;
