@@ -73,7 +73,7 @@ namespace DotnetSpider.Core.Downloader
 				request.PutExtra(Request.CycleTriedTimes, null);
 
 				//#if !NET_CORE
-				//					httpWebRequest.ServicePoint.ConnectionLimit = int.MaxValue;
+				//	httpWebRequest.ServicePoint.ConnectionLimit = int.MaxValue;
 				//#endif
 
 				return page;
