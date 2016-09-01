@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension.Downloader;
@@ -27,6 +28,26 @@ namespace DotnetSpider.Extension.Test.Downloader
 			page = downloader.Download(request2, spider);
 			request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=4", request2.Url.ToString());
+
+			downloader = new TestDownloader
+			{
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
+				{
+					new IncrementTargetUrlsCreator("&page=0",2)
+					{
+						PageIndexKey = "page_index"
+					}
+				}
+			};
+			page = downloader.Download(request, spider);
+			request2 = page.TargetRequests.First();
+			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());
+
+			request = new Request("http://a.com/?&page=0", 0, new Dictionary<string, object>() { { "page_index", 0 } });
+			page = downloader.Download(request, spider);
+			request2 = page.TargetRequests.First();
+			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());
+			Assert.Equal(2, request2.GetExtra("page_index"));
 		}
 
 		public void PaggerStopper()

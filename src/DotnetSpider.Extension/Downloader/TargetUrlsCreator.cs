@@ -49,6 +49,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// http://a.com?p=40  PaggerString: p=40 Pattern: p=\d+
 		/// </summary>
 		public string PaggerString { get; protected set; }
+		public string PageIndexKey { get; set; }
 
 		public int Interval { get; set; }
 
@@ -79,12 +80,22 @@ namespace DotnetSpider.Extension.Downloader
 			var next = RegexUtil.NumRegex.Replace(PaggerString, nextIndex.ToString());
 			return currentUrl.Replace(current, next);
 		}
+
+		public void IncreasExtraPageIndex(Page page)
+		{
+			if (!string.IsNullOrEmpty(PageIndexKey) && page.Request.Extras.ContainsKey(PageIndexKey))
+			{
+				int pageIndex = page.Request.GetExtra(PageIndexKey);
+				page.Request.PutExtra(PageIndexKey, ++pageIndex);
+			}
+		}
 	}
 
 	public class IncrementTargetUrlsCreator : BaseIncrementTargetUrlsCreator
 	{
 		protected override IList<Request> GenerateRequests(Page page)
 		{
+			IncreasExtraPageIndex(page);
 			string newUrl = IncreasePageNum(page.Url);
 			return new List<Request> { new Request(newUrl, page.Request.Depth, page.Request.Extras) };
 		}
@@ -110,6 +121,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		protected override IList<Request> GenerateRequests(Page page)
 		{
+			IncreasExtraPageIndex(page);
 			return new List<Request>{
 				new Request(page.Url, page.Request.Depth, page.Request.Extras)
 				{
