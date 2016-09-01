@@ -162,5 +162,38 @@ namespace DotnetSpider.Core.Test.Downloader
 			});
 			Assert.Equal("Sub content failed. Please check your settings.", exception.Message);
 		}
+
+		[Fact]
+		public void RetryWhenContainsIllegalStringHandler()
+		{
+			var spider = new DefaultSpider("test", new Site());
+			TestDownloader downloader1 = new TestDownloader()
+			{
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
+				{
+					new RetryWhenContainsIllegalStringHandler
+					{
+						ContainString = "网易"
+					}
+				}
+			};
+			var request1 = new Request("http://www.163.com/", 0, null);
+			Page page = downloader1.Download(request1, spider);
+			Assert.Equal(1, page.TargetRequests.Count);
+
+			downloader1 = new TestDownloader
+			{
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
+				{
+					new RetryWhenContainsIllegalStringHandler
+					{
+						ContainString = "网易倒闭啦"
+					}
+				}
+			};
+
+			page = downloader1.Download(request1, spider);
+			Assert.Equal(0, page.TargetRequests.Count);
+		}
 	}
 }

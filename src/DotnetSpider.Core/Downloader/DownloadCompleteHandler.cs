@@ -216,4 +216,18 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 	#endregion
+
+	public class RetryWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	{
+		public string ContainString { get; set; }
+
+		public override void Handle(Page p)
+		{
+			if (p.Content.Contains(ContainString))
+			{
+				Request r = (Request)p.Request.Clone();
+				p.AddTargetRequest(r);
+			}
+		}
+	}
 }

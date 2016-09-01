@@ -84,6 +84,10 @@ namespace DotnetSpider.Redial
 
 		public override void Init()
 		{
+			if (!Directory.Exists(AtomicActionFolder))
+			{
+				Directory.CreateDirectory(AtomicActionFolder);
+			}
 		}
 	}
 }

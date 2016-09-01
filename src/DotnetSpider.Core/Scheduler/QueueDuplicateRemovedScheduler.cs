@@ -42,12 +42,14 @@ namespace DotnetSpider.Core.Scheduler
 					if (DepthFirst)
 					{
 						request = _queue.Last();
+						_queue.RemoveAt(_queue.Count - 1);
 					}
 					else
 					{
 						request = _queue.First();
+						_queue.RemoveAt(0);
 					}
-					_queue.Remove(request);
+
 					return request;
 				}
 			}
