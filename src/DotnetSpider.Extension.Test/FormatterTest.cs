@@ -115,10 +115,10 @@ namespace DotnetSpider.Extension.Test
 			Assert.Equal("d", formatter1.Formate("a"));
 			Assert.Equal("dd", formatter1.Formate("dd"));
 
-			DisplaceFormater formatter2 = new DisplaceFormater { Displacement = 3, EqualValue = 1 };
-			Assert.Equal(2, formatter2.Formate(2));
-			Assert.Equal(3, formatter2.Formate(1));
-			Assert.Equal("dd", formatter2.Formate("dd"));
+			//DisplaceFormater formatter2 = new DisplaceFormater { Displacement = 3, EqualValue = 1 };
+			//Assert.Equal(2, formatter2.Formate(2));
+			//Assert.Equal(3, formatter2.Formate(1));
+			//Assert.Equal("dd", formatter2.Formate("dd"));
 		}
 
 		[Fact]
