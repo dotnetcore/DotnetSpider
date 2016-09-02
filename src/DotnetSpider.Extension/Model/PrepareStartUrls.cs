@@ -164,7 +164,7 @@ namespace DotnetSpider.Extension.Model
 			return list;
 		}
 
-		protected List<string> PrepareArguments(Dictionary<string, object> data)
+		protected virtual List<string> PrepareArguments(Dictionary<string, object> data)
 		{
 			List<string> arguments = new List<string>();
 			if (Columns != null)
@@ -283,7 +283,7 @@ namespace DotnetSpider.Extension.Model
 			}
 		}
 
-		private string GetPostBody(string postBody, Dictionary<string, object> data, int i)
+		protected string GetPostBody(string postBody, Dictionary<string, object> data, int i)
 		{
 			if (!string.IsNullOrEmpty(postBody))
 			{
@@ -298,9 +298,9 @@ namespace DotnetSpider.Extension.Model
 
 	public class SplitDbPrepareStartUrls : CommonDbPrepareStartUrls
 	{
-		protected new List<string> PrepareArguments(Dictionary<string, object> data)
+		protected new List<dynamic> PrepareArguments(Dictionary<string, object> data)
 		{
-			List<string> arguments = new List<string>();
+			List<dynamic> arguments = new List<dynamic>();
 			if (Columns != null)
 			{
 				foreach (var column in Columns)
@@ -311,19 +311,72 @@ namespace DotnetSpider.Extension.Model
 					{
 						foreach (var formatter in column.Formatters)
 						{
-							var tmpValue = formatter.Formate(value) as List<string>;
-							if (tmpValue != null)
-							{
-								foreach (var v in tmpValue)
-								{
-									arguments.Add(v);
-								}
-							}
+							var tmpValue = formatter.Formate(value);
+							arguments.Add(tmpValue);
 						}
 					}
 				}
 			}
 			return arguments;
+		}
+
+		public override void Build(Spider spider, dynamic obj)
+		{
+			if (string.IsNullOrEmpty(QueryString))
+			{
+				throw new SpiderException("QueryString is null.");
+			}
+
+			var datas = PrepareDatas();
+			foreach (var data in datas)
+			{
+				for (int i = From; i <= To; i += Interval)
+				{
+					var arguments = PrepareArguments(data);
+					arguments.Add(i.ToString());
+
+					for (int j = PostFrom; j <= PostTo; j += PostInterval)
+					{
+						foreach (var formate in FormateStrings)
+						{
+							bool canStop;
+							do
+							{
+								canStop = true;
+								List<string> args = new List<string>();
+								foreach (var argument in arguments)
+								{
+									if (!(argument is List<string>))
+									{
+										args.Add(argument);
+									}
+								}
+
+								foreach (var argument in arguments)
+								{
+									if (argument is List<string>)
+									{
+										args.Add(argument.First());
+										argument.RemoveAt(0);
+										if (argument.Count > 0)
+										{
+											canStop = false;
+										}
+									}
+								}
+								string tmpUrl = string.Format(formate, args.Cast<object>().ToArray());
+								spider.Scheduler.Push(new Request(tmpUrl, 0, data)
+								{
+									Method = Method,
+									Origin = Origin,
+									PostBody = GetPostBody(PostBody, data, j),
+									Referer = Referer
+								});
+							} while (!canStop);
+						}
+					}
+				}
+			}
 		}
 	}
 
