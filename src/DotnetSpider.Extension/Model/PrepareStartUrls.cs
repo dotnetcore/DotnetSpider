@@ -298,6 +298,7 @@ namespace DotnetSpider.Extension.Model
 
 	public class SplitDbPrepareStartUrls : CommonDbPrepareStartUrls
 	{
+		protected bool ListFormatted = false;
 		protected new List<dynamic> PrepareArguments(Dictionary<string, object> data)
 		{
 			List<dynamic> arguments = new List<dynamic>();
@@ -312,6 +313,14 @@ namespace DotnetSpider.Extension.Model
 						foreach (var formatter in column.Formatters)
 						{
 							var tmpValue = formatter.Formate(value);
+							if (tmpValue is List<string>)
+							{
+								if (ListFormatted)
+								{
+									throw new SpiderException("SplitDbPrepareStartUrl Only Supports 1 Column to Be Formatted to List For Now!");
+								}
+								ListFormatted = true;
+							}
 							arguments.Add(tmpValue);
 						}
 					}
