@@ -296,37 +296,6 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
-	public class SplitDbPrepareStartUrls : CommonDbPrepareStartUrls
-	{
-		protected new List<string> PrepareArguments(Dictionary<string, object> data)
-		{
-			List<string> arguments = new List<string>();
-			if (Columns != null)
-			{
-				foreach (var column in Columns)
-				{
-					string value = data[column.Name]?.ToString();
-
-					if (column.Formatters != null)
-					{
-						foreach (var formatter in column.Formatters)
-						{
-							var tmpValue = formatter.Formate(value) as List<string>;
-							if (tmpValue != null)
-							{
-								foreach (var v in tmpValue)
-								{
-									arguments.Add(v);
-								}
-							}
-						}
-					}
-				}
-			}
-			return arguments;
-		}
-	}
-
 	public class LinkSpiderPrepareStartUrls : PrepareStartUrls
 	{
 		/// <summary>
