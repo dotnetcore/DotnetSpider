@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Pipeline;
@@ -22,6 +23,10 @@ namespace DotnetSpider.Core
 
 		public DefaultSpider(string uuid, Site site)
 		{
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+
 			if (!IdentifyRegex.IsMatch(uuid))
 			{
 				throw new SpiderException("Task Identify only can contains A-Z a-z 0-9 _ - [SPACE]");

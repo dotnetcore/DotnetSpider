@@ -324,12 +324,12 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				case TableSuffix.FirstDayOfThisMonth:
 					{
-						schema.TableName += "_" + DateTimeUtils.FirstDayofThisMonth.ToString("yyyy_MM_dd");
+						schema.TableName += "_" + DateTimeUtils.Day1OfThisMonth.ToString("yyyy_MM_dd");
 						break;
 					}
 				case TableSuffix.Monday:
 					{
-						schema.TableName += "_" + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy_MM_dd");
+						schema.TableName += "_" + DateTimeUtils.Day1OfThisWeek.ToString("yyyy_MM_dd");
 						break;
 					}
 				case TableSuffix.Today:

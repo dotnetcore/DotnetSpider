@@ -206,12 +206,12 @@ namespace DotnetSpider.Extension.Model
 
 			if (field.ToLower() == "monday")
 			{
-				return DateTimeUtils.MondayRunId;
+				return DateTimeUtils.RunIdOfMonday;
 			}
 
 			if (field.ToLower() == "today")
 			{
-				return DateTimeUtils.TodayRunId;
+				return DateTimeUtils.RunIdOfToday;
 			}
 
 			if (field.ToLower() == "index")

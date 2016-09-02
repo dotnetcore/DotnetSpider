@@ -5,14 +5,18 @@ This is a cross platfrom, ligth spider develop by C#.
 
 ### DEVELOP ENVIROMENT
 - Visual Studio 2015 or later
-- Want to try .NET CORE? Install 2 packages
+- Make sure installed 2 packages to try .NET CORE, [More details](https://www.microsoft.com/net/core#windows)
 	1. [Visual studio 2015 update 3](https://go.microsoft.com/fwlink/?LinkId=691129)	
 	2. [.NET Core 1.0.0 - VS 2015 Tooling Preview 2](https://go.microsoft.com/fwlink/?LinkId=817245)
-	3. [More details](https://www.microsoft.com/net/core#windows)
 
 ### DESIGN
- 
+
 ![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
+
+### TEST CASE ENVIROMENT
+
+1. Install MySql in local and set account: root password: 1qazZAQ!
+2. Install Redis in local without password
 
 ### SAMPLE
 
@@ -198,6 +202,14 @@ NOTE:
 2. Make sure you already add a *.webdriver Firefox profile when you set Browser to Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
 3. Make sure there is a PhantomJS.exe in bin folder when you set Browser to PhantomJS. You can contain it to your project via NUGET manager: PhantomJS
 
+### Monitor
+
+1. Like the project DotnetSpider.Sample, make sure the logAndStatusConnectString is correct in config.ini
+2. Update MySqlConnectString in appsettings.json in DotnetSpider.Portal project.
+3. Run you spider then you can watch the status on the website
+
+![monitor](https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/images/1.png)
+
 ### NOTICE
 
 #### when you use redis scheduler, please update your redis config: 
@@ -212,3 +224,4 @@ NOTE:
 ### AREAS FOR IMPROVEMENTS
 
 QQ: 477731655
+EMail: zlzforever@163.com
