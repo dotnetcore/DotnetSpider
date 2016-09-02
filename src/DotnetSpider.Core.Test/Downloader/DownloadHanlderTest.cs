@@ -173,7 +173,7 @@ namespace DotnetSpider.Core.Test.Downloader
 				{
 					new RetryWhenContainsIllegalStringHandler
 					{
-						ContainString = "网易"
+						ContainString = "aabbcccdefg下载人数100"
 					}
 				}
 			};
