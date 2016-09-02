@@ -360,15 +360,17 @@ namespace DotnetSpider.Extension.Model
 										}
 									}
 								}
-
-								string tmpUrl = string.Format(formate, args.Cast<object>().ToArray());
-								spider.Scheduler.Push(new Request(tmpUrl, 0, data)
+								if (!canStop)
 								{
-									Method = Method,
-									Origin = Origin,
-									PostBody = GetPostBody(PostBody, data, j),
-									Referer = Referer
-								});
+									string tmpUrl = string.Format(formate, args.Cast<object>().ToArray());
+									spider.Scheduler.Push(new Request(tmpUrl, 0, data)
+									{
+										Method = Method,
+										Origin = Origin,
+										PostBody = GetPostBody(PostBody, data, j),
+										Referer = Referer
+									});
+								}
 							} while (!canStop);
 						}
 					}
