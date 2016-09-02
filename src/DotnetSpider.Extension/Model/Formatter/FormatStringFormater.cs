@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using DotnetSpider.Core;
-using System.Linq;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
