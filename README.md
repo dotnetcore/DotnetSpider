@@ -15,8 +15,8 @@ This is a cross platfrom, ligth spider develop by C#.
 
 ### TEST CASE ENVIROMENT
 
-1. Install MySql in local and set account: root password: 1qazZAQ! [MySql Community Server](http://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-community-5.7.14.0.msi)
-2. Install Redis in local without password [Redis for Windows](https://github.com/MSOpenTech/redis/releases)
+1. Install MySql in local and set account: root password: 1qazZAQ! [[Download MySql Community Server]](http://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-community-5.7.14.0.msi)
+2. Install Redis in local without password [[Download Redis for Windows]](https://github.com/MSOpenTech/redis/releases)
 
 ### SAMPLE
 
