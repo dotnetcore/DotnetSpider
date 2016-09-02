@@ -356,10 +356,10 @@ namespace DotnetSpider.Extension.Model
 								{
 									if (argument is List<string>)
 									{
-										args.Add(argument.First());
-										argument.RemoveAt(0);
 										if (argument.Count > 0)
 										{
+											args.Add(argument[0]);
+											argument.RemoveAt(0);
 											canStop = false;
 										}
 									}
