@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample
 			var context = new EntitySpider(new Site())
 			{
 				TaskGroup = "JD SKU Weekly",
-				Identity = "JD Shop details " + DateTimeUtils.MondayRunId,
+				Identity = "JD Shop details " + DateTimeUtils.RunIdOfMonday,
 				CachedSize = 1,
 				ThreadNum = 8,
 				Scheduler = new RedisScheduler
@@ -47,7 +47,7 @@ namespace DotnetSpider.Sample
 					{
 						Source = DataSource.MySql,
 						ConnectString = "Database='test';Data Source= localhost;User ID=root;Password=1qazZAQ!;Port=3306",
-						QueryString = $"SELECT * FROM jd.sku_v2_{DateTimeUtils.MondayRunId} WHERE shopname is null or shopid is null order by sku",
+						QueryString = $"SELECT * FROM jd.sku_v2_{DateTimeUtils.RunIdOfMonday} WHERE shopname is null or shopid is null order by sku",
 						Columns = new [] {new DataColumn { Name = "sku"} },
 						FormateStrings = new List<string> { "http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json" }
 					}

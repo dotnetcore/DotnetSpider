@@ -75,6 +75,9 @@
     <Compile Include="..\Downloader\DownloadHanlderTest.cs">
       <Link>Downloader\DownloadHanlderTest.cs</Link>
     </Compile>
+    <Compile Include="..\Downloader\HttpClientDownloaderTest.cs">
+      <Link>Downloader\HttpClientDownloaderTest.cs</Link>
+    </Compile>
     <Compile Include="..\Downloader\TestDownloader.cs">
       <Link>Downloader\TestDownloader.cs</Link>
     </Compile>

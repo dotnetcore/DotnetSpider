@@ -81,7 +81,7 @@ namespace DotnetSpider.Sample
 		{
 			var entitySpider = new EntitySpider(new Site())
 			{
-				Identity = "Cnblog Daliy Tracking " + DateTimeUtils.FirstDayofThisWeek.ToString("yyyy-MM-dd")
+				Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Day1OfThisWeek.ToString("yyyy-MM-dd")
 			};
 
 			entitySpider.AddStartUrl("http://www.jd.com/allSort.aspx");
