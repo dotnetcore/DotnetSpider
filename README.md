@@ -202,7 +202,7 @@ NOTE:
 2. Make sure you already add a *.webdriver Firefox profile when you set Browser to Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
 3. Make sure there is a PhantomJS.exe in bin folder when you set Browser to PhantomJS. You can contain it to your project via NUGET manager: PhantomJS
 
-#### Monitor
+### Monitor
 
 1. Like the project DotnetSpider.Sample, make sure the logAndStatusConnectString is correct in config.ini
 2. Update MySqlConnectString in appsettings.json in DotnetSpider.Portal project.
