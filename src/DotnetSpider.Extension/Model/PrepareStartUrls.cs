@@ -350,11 +350,7 @@ namespace DotnetSpider.Extension.Model
 									{
 										args.Add(argument);
 									}
-								}
-
-								foreach (var argument in arguments)
-								{
-									if (argument is List<string>)
+									else
 									{
 										if (argument.Count > 0)
 										{
@@ -364,6 +360,7 @@ namespace DotnetSpider.Extension.Model
 										}
 									}
 								}
+
 								string tmpUrl = string.Format(formate, args.Cast<object>().ToArray());
 								spider.Scheduler.Push(new Request(tmpUrl, 0, data)
 								{
