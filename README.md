@@ -6,8 +6,8 @@ This is a cross platfrom, ligth spider develop by C#.
 ### DEVELOP ENVIROMENT
 - Visual Studio 2015 or later
 - Make sure installed 2 packages to try .NET CORE, [More details](https://www.microsoft.com/net/core#windows)
-	1. [Visual studio 2015 update 3](https://go.microsoft.com/fwlink/?LinkId=691129)	
-	2. [.NET Core 1.0.0 - VS 2015 Tooling Preview 2](https://go.microsoft.com/fwlink/?LinkId=817245)
+	1. [Visual studio 2015 update 3](https://go.microsoft.com/fwlink/?LinkId=691129)
+	2. [.NET Core 1.0.0 - VS 2015 Tooling Preview 2](https://go.microsoft.com/fwlink/?LinkID=824849)
 
 ### DESIGN
 
@@ -17,6 +17,8 @@ This is a cross platfrom, ligth spider develop by C#.
 
 1. Install MySql in local and set account: root password: 1qazZAQ! [[Download MySql Community Server]](http://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-community-5.7.14.0.msi)
 2. Install Redis in local without password [[Download Redis for Windows]](https://github.com/MSOpenTech/redis/releases)
+
+![test](https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/images/test.png)
 
 ### SAMPLE
 
@@ -36,6 +38,7 @@ Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.S
 			Spider spider = Spider.Create(site, new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline("test.txt")).SetThreadNum(1);
 			spider.SetDownloader(downloader);
 			spider.SetEmptySleepTime(2000);
+
 
 			SpiderMonitor.Default.Register(spider);
 
