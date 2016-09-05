@@ -18,6 +18,8 @@ This is a cross platfrom, ligth spider develop by C#.
 1. Install MySql in local and set account: root password: 1qazZAQ! [[Download MySql Community Server]](http://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-community-5.7.14.0.msi)
 2. Install Redis in local without password [[Download Redis for Windows]](https://github.com/MSOpenTech/redis/releases)
 
+![test](https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/images/test.png)
+
 ### SAMPLE
 
 	Please see the Projet: DotnetSpider.Sample, I will update follow spider's upgrade.
@@ -36,6 +38,7 @@ Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.S
 			Spider spider = Spider.Create(site, new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline("test.txt")).SetThreadNum(1);
 			spider.SetDownloader(downloader);
 			spider.SetEmptySleepTime(2000);
+
 
 			SpiderMonitor.Default.Register(spider);
 
