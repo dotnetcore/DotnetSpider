@@ -749,8 +749,7 @@ namespace DotnetSpider.Core
 				{
 					if (Site.CycleRetryTimes > 0)
 					{
-						page=AddToCycleRetry(request, Site);
-						ExtractAndAddRequests(page, true);
+						AddToCycleRetry(request, Site);
 						Logger.SaveLog(LogInfo.Create($"解析: {request.Url} 结果为 0, 重新尝试采集.", Logger.Name, this, LogLevel.Info));
 					}
 					else
