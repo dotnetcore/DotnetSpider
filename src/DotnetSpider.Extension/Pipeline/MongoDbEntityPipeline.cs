@@ -1,5 +1,4 @@
-﻿#if !NET_CORE
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.ORM;
@@ -66,4 +65,3 @@ namespace DotnetSpider.Extension.Pipeline
 		}
 	}
 }
-#endif
