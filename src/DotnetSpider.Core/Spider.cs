@@ -623,10 +623,10 @@ namespace DotnetSpider.Core
 			OnSuccess?.Invoke(request);
 		}
 
-		protected Page AddToCycleRetry(Request request, Site site, bool isResultSkip = false)
+		protected Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
 		{
 			Page page = new Page(request, site.ContentType);
-			if (!isResultSkip)
+			if (!resultIsEmpty)
 			{
 				dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);
 				if (cycleTriedTimesObject == null)
@@ -650,11 +650,11 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				dynamic cycleTriedTimesObject = request.GetExtra(Request.ZeroResultTriedTimes);
+				dynamic cycleTriedTimesObject = request.GetExtra(Request.ResultIsEmptyTriedTimes);
 				if (cycleTriedTimesObject == null)
 				{
 					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.ZeroResultTriedTimes, 1));
+					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, 1));
 				}
 				else
 				{
@@ -665,7 +665,7 @@ namespace DotnetSpider.Core
 						return null;
 					}
 					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.ZeroResultTriedTimes, cycleTriedTimes));
+					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, cycleTriedTimes));
 				}
 				page.IsNeedCycleRetry = true;
 				return page;
