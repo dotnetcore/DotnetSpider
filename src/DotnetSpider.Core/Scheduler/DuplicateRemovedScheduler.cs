@@ -48,13 +48,14 @@ namespace DotnetSpider.Core.Scheduler
 		private bool ShouldReserved(Request request)
 		{
 			var cycleTriedTimes = request.GetExtra(Request.CycleTriedTimes);
-			if (cycleTriedTimes == null)
+			var resultEmptyTriedTimes = request.GetExtra(Request.ZeroResultTriedTimes);
+			if (cycleTriedTimes == null && resultEmptyTriedTimes == null)
 			{
 				return false;
 			}
 			else
 			{
-				return cycleTriedTimes > 0;
+				return (cycleTriedTimes != null && cycleTriedTimes > 0) || (resultEmptyTriedTimes != null && resultEmptyTriedTimes > 0);
 			}
 		}
 

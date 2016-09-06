@@ -16,6 +16,7 @@ namespace DotnetSpider.Core
 		public const string CycleTriedTimes = "983009ae-baee-467b-92cd-44188da2b021";
 		public const string StatusCode = "02d71099-b897-49dd-a180-55345fe9abfc";
 		public const string Proxy = "6f09c4d6-167a-4272-8208-8a59bebdfe33";
+		public const string ZeroResultTriedTimes = "ZeroResultTriedTimes";
 
 		public int Depth { get; set; }
 		public int NextDepth => Depth + 1;

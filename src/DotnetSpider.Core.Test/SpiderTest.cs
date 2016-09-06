@@ -9,6 +9,7 @@ using MySql.Data.MySqlClient;
 using Dapper;
 using System.Linq;
 using DotnetSpider.Core.Monitor;
+using DotnetSpider.Core.Selector;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Core.Test
@@ -162,6 +163,17 @@ namespace DotnetSpider.Core.Test
 			{
 				page.IsSkip = true;
 			}
+		}
+
+		[Fact]
+		public void TestRetryWhenResultIsEmpty()
+		{
+			Spider spider = Spider.Create(new Site {CycleRetryTimes =5,EncodingName = "UTF-8", MinSleepTime = 1000,Timeout = 20000}, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			spider.AddStartUrl("http://taobao.com");
+			spider.RetryWhenResultIsEmpty = true;
+			spider.Run();
+
+			Assert.Equal(Status.Finished, spider.StatusCode);
 		}
 	}
 }

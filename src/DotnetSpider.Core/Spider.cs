@@ -623,28 +623,53 @@ namespace DotnetSpider.Core
 			OnSuccess?.Invoke(request);
 		}
 
-		protected Page AddToCycleRetry(Request request, Site site)
+		protected Page AddToCycleRetry(Request request, Site site, bool isResultSkip = false)
 		{
 			Page page = new Page(request, site.ContentType);
-			dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);
-			if (cycleTriedTimesObject == null)
+			if (!isResultSkip)
 			{
-				request.Priority = 0;
-				page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, 1));
+				dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);
+				if (cycleTriedTimesObject == null)
+				{
+					request.Priority = 0;
+					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, 1));
+				}
+				else
+				{
+					int cycleTriedTimes = (int)cycleTriedTimesObject;
+					cycleTriedTimes++;
+					if (cycleTriedTimes >= site.CycleRetryTimes)
+					{
+						return null;
+					}
+					request.Priority = 0;
+					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, cycleTriedTimes));
+				}
+				page.IsNeedCycleRetry = true;
+				return page;
 			}
 			else
 			{
-				int cycleTriedTimes = (int)cycleTriedTimesObject;
-				cycleTriedTimes++;
-				if (cycleTriedTimes >= site.CycleRetryTimes)
+				dynamic cycleTriedTimesObject = request.GetExtra(Request.ZeroResultTriedTimes);
+				if (cycleTriedTimesObject == null)
 				{
-					return null;
+					request.Priority = 0;
+					page.AddTargetRequest(request.PutExtra(Request.ZeroResultTriedTimes, 1));
 				}
-				request.Priority = 0;
-				page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, cycleTriedTimes));
+				else
+				{
+					int cycleTriedTimes = (int)cycleTriedTimesObject;
+					cycleTriedTimes++;
+					if (cycleTriedTimes >= site.CycleRetryTimes)
+					{
+						return null;
+					}
+					request.Priority = 0;
+					page.AddTargetRequest(request.PutExtra(Request.ZeroResultTriedTimes, cycleTriedTimes));
+				}
+				page.IsNeedCycleRetry = true;
+				return page;
 			}
-			page.IsNeedCycleRetry = true;
-			return page;
 		}
 
 		protected void ProcessRequest(Request request, IDownloader downloader)
@@ -749,8 +774,11 @@ namespace DotnetSpider.Core
 				{
 					if (Site.CycleRetryTimes > 0)
 					{
-						page=AddToCycleRetry(request, Site);
-						ExtractAndAddRequests(page, true);
+						page = AddToCycleRetry(request, Site, true);
+						if (page != null && page.IsNeedCycleRetry)
+						{
+							ExtractAndAddRequests(page, true);
+						}
 						Logger.SaveLog(LogInfo.Create($"解析: {request.Url} 结果为 0, 重新尝试采集.", Logger.Name, this, LogLevel.Info));
 					}
 					else
