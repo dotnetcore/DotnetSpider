@@ -16,7 +16,6 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				Content = File.ReadAllText(request.Url.LocalPath),
 				TargetUrl = request.Url.ToString(),
-				Url = request.Url.ToString(),
 				StatusCode = HttpStatusCode.OK
 			};
 

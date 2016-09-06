@@ -75,10 +75,14 @@ namespace DotnetSpider.Extension.Downloader
 		public string IncreasePageNum(string currentUrl)
 		{
 			var current = GetCurrentPaggerString(currentUrl);
-			int currentIndex = int.Parse(RegexUtil.NumRegex.Match(current).Value);
-			int nextIndex = currentIndex + Interval;
-			var next = RegexUtil.NumRegex.Replace(PaggerString, nextIndex.ToString());
-			return currentUrl.Replace(current, next);
+			int currentIndex;
+			if (int.TryParse(RegexUtil.NumRegex.Match(current).Value, out currentIndex))
+			{
+				int nextIndex = currentIndex + Interval;
+				var next = RegexUtil.NumRegex.Replace(PaggerString, nextIndex.ToString());
+				return currentUrl.Replace(current, next);
+			}
+			return null;
 		}
 
 		public void IncreasExtraPageIndex(Page page)
@@ -97,7 +101,14 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			IncreasExtraPageIndex(page);
 			string newUrl = IncreasePageNum(page.Url);
-			return new List<Request> { new Request(newUrl, page.Request.Depth, page.Request.Extras) };
+			if (!string.IsNullOrEmpty(newUrl))
+			{
+				return new List<Request> { new Request(newUrl, page.Request.Depth, page.Request.Extras) };
+			}
+			else
+			{
+				return null;
+			}
 		}
 
 		public IncrementTargetUrlsCreator(string paggerString, ITargetUrlsCreatorStopper stopper, int interval = 1) : base(paggerString, stopper, interval)

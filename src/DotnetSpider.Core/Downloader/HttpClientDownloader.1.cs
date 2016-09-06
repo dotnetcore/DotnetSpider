@@ -251,7 +251,6 @@ namespace DotnetSpider.Core.Downloader
 			Page page = new Page(request, site.ContentType)
 			{
 				Content = content,
-				Url = request.Url.ToString(),
 				StatusCode = statusCode
 			};
 			foreach (var header in response.Headers)

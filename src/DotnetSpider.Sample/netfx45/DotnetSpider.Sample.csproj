@@ -62,6 +62,9 @@
     <Compile Include="..\BaseUsage.cs">
       <Link>BaseUsage.cs</Link>
     </Compile>
+    <Compile Include="..\CasSpider.cs">
+      <Link>CasSpider.cs</Link>
+    </Compile>
     <Compile Include="..\DDengSpider.cs">
       <Link>DDengSpider.cs</Link>
     </Compile>
