@@ -34,6 +34,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "documents", "documents", "{38B90FF9-E6E1-4066-9373-7966A1FCEC60}"
 	ProjectSection(SolutionItems) = preProject
 		guide.md = guide.md
+		requirement.md = requirement.md
 	EndProjectSection
 EndProject
 Global
