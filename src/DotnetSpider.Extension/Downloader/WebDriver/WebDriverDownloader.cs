@@ -112,7 +112,6 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 				Page page = new Page(request, spider.Site.ContentType)
 				{
 					Content = _webDriver.PageSource,
-					Url = request.Url.ToString(),
 					TargetUrl = _webDriver.Url,
 					Title = _webDriver.Title
 				};

@@ -9,7 +9,6 @@ namespace DotnetSpider.Extension.Test.Downloader
 		{
 			return new Page(request, ContentType.Html)
 			{
-				Url = request.Url.ToString(),
 				Content = "aabbcccdefg下载人数100"
 			};
 		}

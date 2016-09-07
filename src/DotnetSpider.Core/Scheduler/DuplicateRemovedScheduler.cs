@@ -48,7 +48,7 @@ namespace DotnetSpider.Core.Scheduler
 		private bool ShouldReserved(Request request)
 		{
 			var cycleTriedTimes = request.GetExtra(Request.CycleTriedTimes);
-			var resultEmptyTriedTimes = request.GetExtra(Request.ZeroResultTriedTimes);
+			var resultEmptyTriedTimes = request.GetExtra(Request.ResultIsEmptyTriedTimes);
 			if (cycleTriedTimes == null && resultEmptyTriedTimes == null)
 			{
 				return false;

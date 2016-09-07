@@ -21,7 +21,7 @@ namespace DotnetSpider.Core
 		/// Url of current page
 		/// </summary>
 		/// <returns></returns>
-		public string Url { get; set; }
+		public string Url { get; }
 
 		/// <summary>
 		/// Get url of current page
@@ -77,6 +77,7 @@ namespace DotnetSpider.Core
 		public Page(Request request, ContentType contentType)
 		{
 			Request = request;
+			Url = request.Url.ToString();
 			ResultItems.Request = request;
 			ContentType = contentType;
 		}
@@ -103,6 +104,10 @@ namespace DotnetSpider.Core
 		/// <param name="requests"></param>
 		public void AddTargetRequests(IList<string> requests)
 		{
+			if (requests == null || requests.Count == 0)
+			{
+				return;
+			}
 			lock (this)
 			{
 				foreach (string s in requests)
@@ -123,6 +128,10 @@ namespace DotnetSpider.Core
 		/// <param name="requests"></param>
 		public void AddTargetRequests(IList<Request> requests)
 		{
+			if (requests == null || requests.Count == 0)
+			{
+				return;
+			}
 			lock (this)
 			{
 				foreach (var r in requests)
@@ -139,6 +148,10 @@ namespace DotnetSpider.Core
 		/// <param name="priority"></param>
 		public void AddTargetRequests(IList<string> requests, int priority)
 		{
+			if (requests == null || requests.Count == 0)
+			{
+				return;
+			}
 			lock (this)
 			{
 				foreach (string s in requests)
@@ -177,6 +190,10 @@ namespace DotnetSpider.Core
 		/// </summary>		 
 		public void AddTargetRequest(Request request)
 		{
+			if (request==null)
+			{
+				return;
+			}
 			lock (this)
 			{
 				TargetRequests.Add(request);
