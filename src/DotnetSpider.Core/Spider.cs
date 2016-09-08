@@ -512,7 +512,7 @@ namespace DotnetSpider.Core
 							if (request.GetExtra(Request.Proxy) != null)
 							{
 								var statusCode = request.GetExtra(Request.StatusCode);
-								Site.ReturnHttpProxy((UseSpecifiedUriWebProxy)request.GetExtra(Request.Proxy), statusCode == null ? HttpStatusCode.Found : (HttpStatusCode)statusCode);
+								Site.ReturnHttpProxy(request.GetExtra(Request.Proxy) as UseSpecifiedUriWebProxy, statusCode == null ? HttpStatusCode.Found : (HttpStatusCode)statusCode);
 							}
 						}
 
