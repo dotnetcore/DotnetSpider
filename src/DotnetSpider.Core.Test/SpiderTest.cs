@@ -9,6 +9,7 @@ using MySql.Data.MySqlClient;
 using Dapper;
 using System.Linq;
 using DotnetSpider.Core.Monitor;
+using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Selector;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,7 +27,7 @@ namespace DotnetSpider.Core.Test
 		{
 			try
 			{
-				Spider.Create(new Site {EncodingName = "UTF-8", MinSleepTime = 1000},
+				Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -168,9 +169,22 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void TestRetryWhenResultIsEmpty()
 		{
-			Spider spider = Spider.Create(new Site {CycleRetryTimes =5,EncodingName = "UTF-8", MinSleepTime = 1000,Timeout = 20000}, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", MinSleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
 			spider.AddStartUrl("http://taobao.com");
 			spider.RetryWhenResultIsEmpty = true;
+			spider.Run();
+
+			Assert.Equal(Status.Finished, spider.StatusCode);
+		}
+
+		[Fact]
+		public void TestReturnHttpProxy()
+		{
+			Spider spider = Spider.Create(new Site { HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("代理链接")), EncodingName = "UTF-8", MinSleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			for (int i = 0; i < 500; i++)
+			{
+				spider.AddStartUrl("http://www.taobao.com/" + i);
+			}
 			spider.Run();
 
 			Assert.Equal(Status.Finished, spider.StatusCode);

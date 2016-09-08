@@ -374,8 +374,7 @@ namespace DotnetSpider.Core.Downloader
 						}
 						newRequest.RequestUri = response.Headers.Location;
 
-						base.SendAsync(newRequest, cancellationToken)
-							.ContinueWith(t2 => tcs.SetResult(t2.Result), cancellationToken);
+						SendAsync(newRequest, cancellationToken);
 					}
 					else
 					{
