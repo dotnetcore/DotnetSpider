@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
+
 namespace DotnetSpider.Core.Proxy
 {
 	public class KuaidailiProxySupplier : IProxySupplier
@@ -16,19 +18,29 @@ namespace DotnetSpider.Core.Proxy
 		public Dictionary<string, Proxy> GetProxies()
 		{
 			var list = new Dictionary<string, Proxy>();
-			string result = _client.GetStringAsync(Url).Result;
-			if (!string.IsNullOrEmpty(result))
+			while (list.Count == 0)
 			{
-				if (result.Contains("ERROR(-51)"))
+				try
 				{
-					return list;
-				}
-				foreach (var proxy in result.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
-				{
-					if (!list.ContainsKey(proxy))
+					string result = _client.GetStringAsync(Url).Result;
+					if (!string.IsNullOrEmpty(result))
 					{
-						list.Add(proxy, new Proxy(new UseSpecifiedUriWebProxy(new Uri($"http://{proxy}"))));
+						if (result.Contains("ERROR(-51)"))
+						{
+							return list;
+						}
+						foreach (var proxy in result.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
+						{
+							if (!list.ContainsKey(proxy))
+							{
+								list.Add(proxy, new Proxy(new UseSpecifiedUriWebProxy(new Uri($"http://{proxy}"))));
+							}
+						}
 					}
+				}
+				catch (Exception e)
+				{
+					Thread.Sleep(5000);
 				}
 			}
 			return list;
