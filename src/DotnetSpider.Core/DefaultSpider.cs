@@ -39,7 +39,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Unique id for a task.
 		/// </summary>
-		public string Identity { get; }
+		public string Identity { get; set; }
 
 		/// <summary>
 		/// Site of a task

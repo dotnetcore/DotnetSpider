@@ -50,7 +50,9 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override DbConnection CreateConnection()
 		{
-			return new SqlConnection(ConnectString);
+			var conn = new SqlConnection(ConnectString);
+			conn.Open();
+			return conn;
 		}
 
 		protected override DbParameter CreateDbParameter()
@@ -60,7 +62,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override string GetCreateSchemaSql()
 		{
-			return string.Empty;
+			return $"use master; if not exists(select * from sysdatabases where name='{Schema.Database}') create database {Schema.Database};";
 		}
 
 		protected override string GetCreateTableSql()

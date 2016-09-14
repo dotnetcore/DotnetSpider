@@ -10,10 +10,6 @@ namespace DotnetSpider.Core
 	public interface ISpider : IDisposable, ITask
 	{
 		/// <summary>
-		/// Unique id for a task.
-		/// </summary>
-		string Identity { get; }
-		/// <summary>
 		/// Site of a task
 		/// </summary>
 		Site Site { get; }

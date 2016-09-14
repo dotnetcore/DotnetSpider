@@ -23,33 +23,39 @@ namespace DotnetSpider.Core
 	public class Spider : ISpider
 	{
 		protected ILogger Logger { get; set; }
+		protected DateTime StartTime { get; private set; }
+		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
+		protected bool IsExitWhenComplete { get; set; } = true;
+		protected IPageProcessor PageProcessor { get; set; }
+		protected List<IPipeline> Pipelines { get; set; } = new List<IPipeline>();
+		protected bool IsExited { get; set; }
+		protected int WaitInterval = 10;
+		protected Status Stat = Status.Init;
+
+		#region ITask
+
+		public string Identity { get; set; }
+		public string UserId { get; set; }
+		public string TaskGroup { get; set; }
+
+		#endregion
+
 		public int ThreadNum { get; set; } = 1;
 		public int Deep { get; set; } = int.MaxValue;
 		public bool SpawnUrl { get; set; } = true;
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public bool RetryWhenResultIsEmpty { get; set; } = false;
-		protected DateTime StartTime { get; private set; }
-		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		public Site Site { get; protected set; }
-		public string Identity { get; set; }
 		public IDownloader Downloader { get; set; }
-		protected bool IsExitWhenComplete { get; set; } = true;
 		public Status StatusCode => Stat;
-		protected IPageProcessor PageProcessor { get; set; }
-		protected List<IPipeline> Pipelines { get; set; } = new List<IPipeline>();
 		public event SpiderEvent OnSuccess;
 		public event SpiderClosingHandler SpiderClosing;
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
-		public string UserId { get; set; }
-		public string TaskGroup { get; set; }
 		public int EmptySleepTime { get; set; } = 15000;
-		protected bool IsExited { get; set; }
-		protected int WaitInterval = 10;
-		protected Status Stat = Status.Init;
+
 		private int _waitCountLimit = 1500;
 		private bool _init;
 		private IScheduler _scheduler;
-		//private static readonly Regex IdentifyRegex = new Regex(@"^[\S]+$");
 		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
 		private readonly Random _random = new Random();
@@ -587,13 +593,13 @@ namespace DotnetSpider.Core
 		public void Stop()
 		{
 			Stat = Status.Stopped;
-			Logger.SaveLog(LogInfo.Create($"停止任务中...", Logger.Name, this, LogLevel.Warn));
+			Logger.SaveLog(LogInfo.Create("停止任务中...", Logger.Name, this, LogLevel.Warn));
 		}
 
 		public void Exit()
 		{
 			Stat = Status.Exited;
-			Logger.SaveLog(LogInfo.Create($"退出任务中...", Logger.Name, this, LogLevel.Warn));
+			Logger.SaveLog(LogInfo.Create("退出任务中...", Logger.Name, this, LogLevel.Warn));
 			SpiderClosing?.Invoke();
 		}
 
