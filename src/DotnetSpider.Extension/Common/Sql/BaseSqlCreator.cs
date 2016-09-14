@@ -10,29 +10,29 @@
 		where TD : BaseDelete, new()
 		where TC : BaseCreate, new()
 	{
-		public static TS Select(string columns)
+		public static TS Select(string database, string columns)
 		{
-			return new TS { Columns = columns };
+			return new TS { Database = database, Columns = columns };
 		}
 
-		public static TU Update(string table)
+		public static TU Update(string database, string table)
 		{
-			return new TU { Table = table };
+			return new TU { Database = database, Table = table };
 		}
 
-		public static TI Insert(string table)
+		public static TI Insert(string database, string table)
 		{
-			return new TI { Table = table };
+			return new TI { Database = database, Table = table };
 		}
 
-		public static TD Delete(string table)
+		public static TD Delete(string database, string table)
 		{
-			return new TD { Table = table };
+			return new TD { Database = database, Table = table };
 		}
 
-		public static TC CreateTable(string table, bool drop)
+		public static TC CreateTable(string database, string table, bool drop)
 		{
-			return new TC { Table = table, DropIfExists = drop };
+			return new TC { Database = database, Table = table, DropIfExists = drop };
 		}
 	}
 }

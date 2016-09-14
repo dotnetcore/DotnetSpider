@@ -7,21 +7,24 @@ namespace DotnetSpider.Extension.Common.Sql
 		protected List<Pair> Columns = new List<Pair>();
 		protected internal bool DropIfExists;
 
-		public BaseCreate() { }
+		public BaseCreate()
+		{
+		}
 
-		public BaseCreate(string table, bool drop = false)
+		public BaseCreate(string database, string table, bool drop = false)
 		{
 			Table = table;
 			DropIfExists = drop;
+			Database = database;
 		}
 
 		public override Command ToCommand()
 		{
 			if (DropIfExists)
 			{
-				Statement = ($@"IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{Table}') AND type in (N'U')) DROP TABLE {Table}");
+				Statement = ($@"USE {Database}; IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{Table}') AND type in (N'U')) DROP TABLE {Table}");
 			}
-			Statement += $@"CREATE TABLE {Table}({GenerateColumns()}) ON [PRIMARY]";
+			Statement += $@"USE {Database}; CREATE TABLE {Table}({GenerateColumns()}) ON [PRIMARY]";
 			return new Command(Statement, Params);
 		}
 

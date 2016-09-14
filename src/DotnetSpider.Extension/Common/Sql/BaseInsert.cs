@@ -11,8 +11,9 @@ namespace DotnetSpider.Extension.Common.Sql
 		{
 		}
 
-		public BaseInsert(string table)
+		public BaseInsert(string database, string table)
 		{
+			Database = database;
 			Table = table;
 		}
 
@@ -39,7 +40,7 @@ namespace DotnetSpider.Extension.Common.Sql
 
 		public override Command ToCommand()
 		{
-			Statement = $"INSERT INTO {Table}({JoinNames(Pairs)}) VALUES ({JoinQuestionMarks(Pairs)})";
+			Statement = $"USE {Database}; INSERT INTO {Table}({JoinNames(Pairs)}) VALUES ({JoinQuestionMarks(Pairs)})";
 			Params = GetValues(Pairs);
 
 			return new Command(Statement, Params);

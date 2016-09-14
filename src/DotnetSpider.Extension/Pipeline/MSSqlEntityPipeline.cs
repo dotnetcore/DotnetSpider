@@ -67,7 +67,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override string GetCreateTableSql()
 		{
-			var table = SqlCreatorCreator.CreateTable(Schema.TableName, true);
+			var table = SqlCreatorCreator.CreateTable(Schema.Database, Schema.TableName, true);
 			foreach (var col in Columns)
 			{
 				table.AddColumn(col.Name, ConvertToDbType(col.DataType));
@@ -81,7 +81,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override string GetInsertSql()
 		{
-			var table = SqlCreatorCreator.Insert(Schema.TableName);
+			var table = SqlCreatorCreator.Insert(Schema.Database, Schema.TableName);
 			foreach (var col in Columns)
 			{
 				table.Values(col.Name, $"@{col.Name}");
@@ -91,7 +91,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override string GetUpdateSql()
 		{
-			var table = SqlCreatorCreator.Update(Schema.TableName);
+			var table = SqlCreatorCreator.Update(Schema.Database, Schema.TableName);
 			foreach (var col in UpdateColumns)
 			{
 				table.Set(col.Name, $"@{col.Name}");

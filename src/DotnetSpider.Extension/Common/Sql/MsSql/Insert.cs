@@ -4,7 +4,7 @@
 	{
 		public override Command ToCommand()
 		{
-			Statement = $"INSERT INTO {Table}({JoinNames(Pairs)}) VALUES ({JoinValues(Pairs)})";
+			Statement = $"USE {Database}; INSERT INTO {Table}({JoinNames(Pairs)}) VALUES ({JoinValues(Pairs)})";
 			Params = GetValues(Pairs);
 
 			return new Command(Statement, Params);

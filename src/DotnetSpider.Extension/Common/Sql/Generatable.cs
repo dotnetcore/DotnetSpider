@@ -9,6 +9,8 @@ namespace DotnetSpider.Extension.Common.Sql
 	{
 		protected internal string Table;
 
+		protected internal string Database;
+
 		protected internal string Statement;
 
 		protected internal List<string> Params = new List<string>();

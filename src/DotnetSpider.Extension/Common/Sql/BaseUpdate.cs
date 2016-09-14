@@ -10,16 +10,19 @@ namespace DotnetSpider.Extension.Common.Sql
 	{
 		protected List<Pair> Updates = new List<Pair>();
 
-		public BaseUpdate() { }
-
-		public BaseUpdate(string table)
+		public BaseUpdate()
 		{
+		}
+
+		public BaseUpdate(string database,string table)
+		{
+			Database = database;
 			Table = table;
 		}
 
 		public override Command ToCommand()
 		{
-			Statement = $"UPDATE {Table} set {GenerateSetBlock()} {GenerateWhereBlock()}";
+			Statement = $"USE {Database}; UPDATE {Table} set {GenerateSetBlock()} {GenerateWhereBlock()}";
 
 			return new Command(Statement, Params);
 		}
