@@ -89,12 +89,15 @@ namespace DotnetSpider.Core.Proxy
 
 		public void ReturnProxy(UseSpecifiedUriWebProxy host, HttpStatusCode statusCode)
 		{
+			if (host==null)
+			{
+				return;
+			}
 			var key = $"{host.Uri.Host}:{host.Uri.Port}";
 			if (!_allProxy.ContainsKey(key))
 			{
 				return;
 			}
-
 			Proxy p = _allProxy[key];
 			switch (statusCode)
 			{
