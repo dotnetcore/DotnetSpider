@@ -11,7 +11,7 @@
 
 		public override Command ToCommand()
 		{
-			Statement = $"DELETE FROM {Table}{GenerateWhereBlock()}";
+			Statement = $"DELETE FROM {Table}{GenerateWhereBlock()};";
 			return new Command(Statement, Params);
 		}
 	}

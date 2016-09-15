@@ -24,7 +24,9 @@ namespace DotnetSpider.Sample
 			};
 			context.SetThreadNum(1);
 			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_hhmmss"));
-			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			context.AddEntityPipeline(new MsSqlEntityPipeline("Data Source=localhost;Initial Catalog=test;User ID=sa;Password=1234"));
+            
+            //context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product), new TargetUrlExtractor
 			{
@@ -63,7 +65,7 @@ namespace DotnetSpider.Sample
 			[PropertySelector(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
-			[StoredAs("name", DataType.String, 50)]
+			[StoredAs("name", DataType.String, 100)]
 			[PropertySelector(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
 
