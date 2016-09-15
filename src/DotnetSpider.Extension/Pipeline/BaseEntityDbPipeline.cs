@@ -264,7 +264,8 @@ namespace DotnetSpider.Extension.Pipeline
 										var parameter = CreateDbParameter();
 										parameter.ParameterName = $"@{column.Name}";
 										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
-										parameter.DbType = Convert(column.DataType);
+                                        if (parameter.Value == null) parameter.Value = DBNull.Value;
+                                        parameter.DbType = Convert(column.DataType);
 										parameters.Add(parameter);
 									}
 

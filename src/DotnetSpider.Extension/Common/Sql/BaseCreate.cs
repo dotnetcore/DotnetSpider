@@ -22,9 +22,9 @@ namespace DotnetSpider.Extension.Common.Sql
 		{
 			if (DropIfExists)
 			{
-				Statement = ($@"USE {Database}; IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{Table}') AND type in (N'U')) DROP TABLE {Table}");
+				Statement = ($@"USE {Database}; IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{Table}') AND type in (N'U')) DROP TABLE {Table};");
 			}
-			Statement += $@"USE {Database}; CREATE TABLE {Table}({GenerateColumns()}) ON [PRIMARY]";
+			Statement += $@"USE {Database}; CREATE TABLE {Table}({GenerateColumns()}) ON [PRIMARY];";
 			return new Command(Statement, Params);
 		}
 

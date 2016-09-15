@@ -42,7 +42,7 @@
 
 		public override Command ToCommand()
 		{
-			Statement = $"SELECT {Columns} FROM {_from} ";
+			Statement = $"SELECT {Columns} FROM {_from} ;";
 
 			Statement += GenerateWhereBlock();
 

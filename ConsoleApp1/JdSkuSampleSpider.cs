@@ -7,8 +7,9 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Scheduler;
 
-namespace DotnetSpider.Sample
+namespace ConsoleApp1
 {
 	public class JdSkuSampleSpider : EntitySpiderBuilder
 	{
@@ -24,14 +25,21 @@ namespace DotnetSpider.Sample
 			};
 			context.SetThreadNum(1);
 			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_hhmmss"));
-            context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
-			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+            //context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+            context.AddEntityPipeline(new MsSqlEntityPipeline("Data Source=localhost;Initial Catalog=DonetSpider;User ID=sa;Password=1234"));
+            context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product), new TargetUrlExtractor
 			{
 				Region = new BaseSelector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
 				Patterns = new List<string> { @"&page=[0-9]+&" }
 			});
-			return context;
+            context.SetScheduler(new RedisScheduler
+            {
+                Host = "localhost",
+                Password = "",
+                Port = 6379
+            });
+            return context;
 		}
 
 		[Schema("test", "sku", TableSuffix.Today)]
@@ -63,7 +71,7 @@ namespace DotnetSpider.Sample
 			[PropertySelector(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
-			[StoredAs("name", DataType.String, 100)]
+			[StoredAs("name", DataType.String, 50)]
 			[PropertySelector(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
 

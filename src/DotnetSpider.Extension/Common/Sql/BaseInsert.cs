@@ -40,7 +40,7 @@ namespace DotnetSpider.Extension.Common.Sql
 
 		public override Command ToCommand()
 		{
-			Statement = $"USE {Database}; INSERT INTO {Table}({JoinNames(Pairs)}) VALUES ({JoinQuestionMarks(Pairs)})";
+			Statement = $"USE {Database}; INSERT INTO {Table}({JoinNames(Pairs)}) VALUES ({JoinQuestionMarks(Pairs)});";
 			Params = GetValues(Pairs);
 
 			return new Command(Statement, Params);
