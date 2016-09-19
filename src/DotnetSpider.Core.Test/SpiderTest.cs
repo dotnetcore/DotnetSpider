@@ -177,17 +177,17 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(Status.Finished, spider.StatusCode);
 		}
 
-		[Fact]
-		public void TestReturnHttpProxy()
-		{
-			Spider spider = Spider.Create(new Site { HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("代理链接")), EncodingName = "UTF-8", MinSleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
-			for (int i = 0; i < 500; i++)
-			{
-				spider.AddStartUrl("http://www.taobao.com/" + i);
-			}
-			spider.Run();
+		//[Fact]
+		//public void TestReturnHttpProxy()
+		//{
+		//	Spider spider = Spider.Create(new Site { HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("代理链接")), EncodingName = "UTF-8", MinSleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+		//	for (int i = 0; i < 500; i++)
+		//	{
+		//		spider.AddStartUrl("http://www.taobao.com/" + i);
+		//	}
+		//	spider.Run();
 
-			Assert.Equal(Status.Finished, spider.StatusCode);
-		}
+		//	Assert.Equal(Status.Finished, spider.StatusCode);
+		//}
 	}
 }

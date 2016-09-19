@@ -8,7 +8,7 @@ namespace DotnetSpider.Redial.Utils
 		public static bool ChangeNetworkConnectionStatus(bool enable, string networkConnectionName)
 		{
 			uint retRslt = 1;
-			using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter=TRUE AND NetConnectionID='" + networkConnectionName + "'"))
+			using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter=TRUE AND NetConnectionID='" + networkConnectionName + "';"))
 			{
 				foreach (var o in mos.Get())
 				{

@@ -9,10 +9,10 @@ namespace DotnetSpider.Extension.Model
 		public Schema Schema { get; set; }
 		public List<string[]> Indexes { get; set; }
 		public List<string[]> Uniques { get; set; }
-		public string AutoIncrement { get; set; }
-		public string[] Primary { get; set; }
+		public List<string> AutoIncrement { get; set; }
+		public List<string> Primary { get; set; }
 		public Entity Entity { get; set; } = new Entity();
-		public string[] Updates { get; internal set; }
+		public List<string> Updates { get; internal set; }
 		public int? Limit { get; set; }
 		public List<TargetUrlExtractor> TargetUrlExtractors = new List<TargetUrlExtractor>();
 		//public List<TargetUrlsCreator> TargetUrlsCreators { get; set; }

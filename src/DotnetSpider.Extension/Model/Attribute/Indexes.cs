@@ -18,6 +18,6 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// </summary>
 		public string[] Unique { get; set; }
 
-		public string AutoIncrement { get; set; }
+		public string[] AutoIncrement { get; set; }
 	}
 }
