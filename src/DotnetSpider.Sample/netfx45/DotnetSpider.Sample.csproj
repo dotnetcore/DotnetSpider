@@ -89,6 +89,9 @@
     <Compile Include="..\RegexTestSpider.cs">
       <Link>RegexTestSpider.cs</Link>
     </Compile>
+    <Compile Include="..\RuthSpider.cs">
+      <Link>RuthSpider.cs</Link>
+    </Compile>
     <Compile Include="..\TestSpider.cs">
       <Link>TestSpider.cs</Link>
     </Compile>

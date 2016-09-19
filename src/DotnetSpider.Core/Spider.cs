@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -727,7 +728,15 @@ namespace DotnetSpider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				Logger.Warn(de.Message);
+				Logger.SaveLog(LogInfo.Create($"下载{request.Url}失败:{de.Message}", Logger.Name, this, LogLevel.Warn));
+			}
+			catch (HttpRequestException he)
+			{
+				if (Site.CycleRetryTimes > 0)
+				{
+					page = AddToCycleRetry(request, Site);
+				}
+				Logger.SaveLog(LogInfo.Create($"下载{request.Url}失败:{he.Message}", Logger.Name, this, LogLevel.Warn));
 			}
 			catch (Exception e)
 			{
@@ -735,7 +744,7 @@ namespace DotnetSpider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				Logger.SaveLog(LogInfo.Create($"解析页数数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}", Logger.Name, this, LogLevel.Warn));
+				Logger.SaveLog(LogInfo.Create($"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}", Logger.Name, this, LogLevel.Warn));
 			}
 
 			//watch.Stop();

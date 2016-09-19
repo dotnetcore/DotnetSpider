@@ -108,8 +108,8 @@ namespace DotnetSpider.Extension.Model
 			//		page.AddTargetRequests(targetUrlsCreator.Handle(page));
 			//	}
 			//}
-			
-			if(!page.MissExtractTargetUrls)
+
+			if (!page.MissExtractTargetUrls)
 			{
 				ExtractLinks(page, EntityMetadata.TargetUrlExtractors);
 			}
@@ -260,7 +260,11 @@ namespace DotnetSpider.Extension.Model
 					{
 						allExtras.Add(extra.Key, extra.Value);
 					}
-					page.AddTargetRequest(new Request(result.GetValue(targetUrl.PropertyName).ToString(), page.Request.NextDepth, allExtras));
+					var value = result.GetValue(targetUrl.PropertyName);
+					if (value != null)
+					{
+						page.AddTargetRequest(new Request(value.ToString(), page.Request.NextDepth, allExtras));
+					}
 				}
 
 			}
