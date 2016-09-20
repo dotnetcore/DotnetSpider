@@ -5,7 +5,6 @@ using System.Threading;
 using DotnetSpider.Core.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Core.Monitor
 {
@@ -17,7 +16,7 @@ namespace DotnetSpider.Core.Monitor
 
 		static SpiderMonitor()
 		{
-			MonitorServices = IocExtension.ServiceProvider.GetServices<IMonitorService>().ToList();
+			MonitorServices = IocContainer.Default.GetServices<IMonitorService>().ToList();
 		}
 
 		public static void Register(params Spider[] spiders)

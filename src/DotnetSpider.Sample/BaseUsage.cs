@@ -7,7 +7,6 @@ using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Sample
 {
@@ -16,7 +15,7 @@ namespace DotnetSpider.Sample
 		public static void Run()
 		{
 			// 注入监控服务
-			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
+			IocContainer.Default.AddSingleton<IMonitorService, NLogMonitor>();
 
 			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8" };

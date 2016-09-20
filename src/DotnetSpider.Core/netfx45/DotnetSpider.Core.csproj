@@ -179,8 +179,8 @@
     <Compile Include="..\INamed.cs">
       <Link>INamed.cs</Link>
     </Compile>
-    <Compile Include="..\IocExtension.cs">
-      <Link>IocExtension.cs</Link>
+    <Compile Include="..\IocContainer.cs">
+      <Link>IocContainer.cs</Link>
     </Compile>
     <Compile Include="..\ISpider.cs">
       <Link>ISpider.cs</Link>

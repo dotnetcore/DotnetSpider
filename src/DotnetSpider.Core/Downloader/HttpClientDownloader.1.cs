@@ -7,7 +7,6 @@ using System.Text;
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
-using System.Threading;
 using NLog;
 
 namespace DotnetSpider.Core.Downloader

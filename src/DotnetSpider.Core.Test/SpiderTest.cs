@@ -9,7 +9,6 @@ using MySql.Data.MySqlClient;
 using Dapper;
 using System.Linq;
 using DotnetSpider.Core.Monitor;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Core.Test
 {
@@ -102,7 +101,7 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{
-			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
+			IocContainer.Default.AddSingleton<IMonitorService, NLogMonitor>();
 			string id = Guid.NewGuid().ToString("N");
 			string taskGroup = Guid.NewGuid().ToString("N");
 			string userId = Guid.NewGuid().ToString("N");

@@ -9,7 +9,6 @@ using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
-using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Sample
 {

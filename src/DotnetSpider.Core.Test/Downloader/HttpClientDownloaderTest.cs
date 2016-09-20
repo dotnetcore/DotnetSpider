@@ -19,7 +19,8 @@ namespace DotnetSpider.Core.Test.Downloader
 			}
 			catch (Exception e)
 			{
-				Assert.Equal("Response status code does not indicate success: 503 (One or more errors occurred. (An error occurred while sending the request.)).", e.Message);
+				bool r = e.Message == "Response status code does not indicate success: 503 (One or more errors occurred. (An error occurred while sending the request.))." || e.Message == "响应状态代码不指示成功: 503 (发生一个或多个错误。)。";
+				Assert.True(r);
 			}
 			Stopwatch watch = new Stopwatch();
 			watch.Start();
@@ -29,7 +30,8 @@ namespace DotnetSpider.Core.Test.Downloader
 			}
 			catch (Exception e)
 			{
-				Assert.Equal("Response status code does not indicate success: 408 (Request Timeout).", e.Message);
+				bool r = e.Message == "Response status code does not indicate success: 408 (Request Timeout)." || e.Message == "响应状态代码不指示成功: 408 (Request Timeout)。";
+				Assert.True(r);
 			}
 			watch.Stop();
 			Assert.True(watch.ElapsedMilliseconds > 5000);

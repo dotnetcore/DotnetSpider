@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Monitor;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Sample
 {
@@ -8,7 +7,7 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
+			IocContainer.Default.AddSingleton<IMonitorService, NLogMonitor>();
 
 			RuthSpider spiderBuilder = new RuthSpider();
 			spiderBuilder.Run("rerun");
