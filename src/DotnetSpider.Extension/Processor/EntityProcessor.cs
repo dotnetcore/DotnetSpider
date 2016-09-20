@@ -43,10 +43,7 @@ namespace DotnetSpider.Extension.Processor
 
 				if (pageModelExtractor.DataHandler != null)
 				{
-					foreach (var data in list)
-					{
-						pageModelExtractor.DataHandler.Handle(data, page);
-					}
+					list = pageModelExtractor.DataHandler.Handle(list, page);
 				}
 
 				page.AddResultItem(pageModelExtractor.EntityMetadata.Entity.Name, list);

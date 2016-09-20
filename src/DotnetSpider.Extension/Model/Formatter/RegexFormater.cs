@@ -15,6 +15,10 @@ namespace DotnetSpider.Extension.Model.Formatter
 		protected override dynamic FormateValue(dynamic value)
 		{
 			string tmp = value.ToString();
+			if (string.IsNullOrEmpty(tmp))
+			{
+				return ValueWhenNull;
+			}
 			MatchCollection matches = Regex.Matches(tmp, Pattern);
 			return matches.Count > 0 ? (True == ID ? matches[0].Value : True) : (False == ID ? tmp : False);
 		}

@@ -10,6 +10,12 @@ namespace DotnetSpider.Extension.Model.Formatter
 		protected override dynamic FormateValue(dynamic value)
 		{
 			string tmp = value.ToString();
+
+			if (string.IsNullOrEmpty(tmp))
+			{
+				return ValueWhenNull;
+			}
+
 			if (ToUpper)
 			{
 				return tmp.ToUpperInvariant();

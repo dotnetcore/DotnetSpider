@@ -88,8 +88,8 @@ namespace DotnetSpider.Extension.Test
 		{
 			CharacterCaseFormatter formatter1 = new CharacterCaseFormatter();
 			string str1 = "";
-			Assert.Equal("", formatter1.Formate(str1));
-			Assert.Equal(string.Empty, formatter1.Formate(null));
+			Assert.Equal(null, formatter1.Formate(str1));
+			Assert.Equal(null, formatter1.Formate(null));
 
 			string str2 = "a";
 			Assert.Equal("A", formatter1.Formate(str2));
@@ -99,7 +99,7 @@ namespace DotnetSpider.Extension.Test
 
 			string str3 = "A";
 			Assert.Equal("a", formatter2.Formate(str3));
-			Assert.Equal(string.Empty, formatter2.Formate(null));
+			Assert.Equal(null, formatter2.Formate(null));
 
 			CharacterCaseFormatter formatter3 = new CharacterCaseFormatter { ToUpper = false, ValueWhenNull = "OK" };
 			Assert.Equal("OK", formatter3.Formate(null));
