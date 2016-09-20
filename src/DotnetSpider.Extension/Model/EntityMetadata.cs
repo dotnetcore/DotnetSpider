@@ -35,6 +35,7 @@ namespace DotnetSpider.Extension.Model
 	public abstract class DataToken
 	{
 		public BaseSelector Selector { get; set; }
+		public bool NotNull { get; set; }
 		public bool Multi { get; set; }
 		public string Name { get; set; }
 	}

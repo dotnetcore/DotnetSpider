@@ -27,5 +27,20 @@ namespace DotnetSpider.Core.Test.Downloader
 			Assert.True(watch.ElapsedMilliseconds > 5000);
 			Assert.True(watch.ElapsedMilliseconds < 6000);
 		}
+
+		/// <summary>
+		/// 手动执行此测试脚本，运行结束后用netstat -ano 查看端口占用情况。只会占用一个就对了。如果
+		/// </summary>
+		[Fact]
+		public void Ports()
+		{
+			HttpClientDownloader downloader = new HttpClientDownloader();
+			DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
+
+			for (int i = 0; i < 100; i++)
+			{
+				downloader.Download(new Request("http://www.163.com", 0, null), spider);
+			}
+		}
 	}
 }

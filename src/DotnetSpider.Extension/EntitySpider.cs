@@ -508,6 +508,7 @@ namespace DotnetSpider.Extension
 							Type = extractBy.Type,
 							Argument = extractBy.Argument
 						};
+						token.NotNull = extractBy.NotNull;
 					}
 
 					var targetUrl = propertyInfo.GetCustomAttribute<TargetUrl>();
@@ -543,6 +544,7 @@ namespace DotnetSpider.Extension
 							Type = extractBy.Type,
 							Argument = extractBy.Argument
 						};
+						token.NotNull = extractBy.NotNull;
 					}
 
 					if (storeAs != null)

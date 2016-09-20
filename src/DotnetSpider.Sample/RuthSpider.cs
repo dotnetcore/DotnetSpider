@@ -23,20 +23,21 @@ namespace DotnetSpider.Sample
 	/// </summary>
 	public class RuthSpider : EntitySpiderBuilder
 	{
-		public class MyDataHandler : DataHandler
-		{
-			protected override JObject HandleDataOject(JObject data, Page page)
-			{
-				if (string.IsNullOrEmpty(data.SelectToken("$.name").Value<string>()))
-				{
-					return null;
-				}
-				else
-				{
-					return data;
-				}
-			}
-		}
+		//public class MyDataHandler : DataHandler
+		//{
+		//	protected override JObject HandleDataOject(JObject data, Page page)
+		//	{
+		//		var token=data.SelectToken("$.Name");
+		//		if (string.IsNullOrEmpty(token?.Value<string>()))
+		//		{
+		//			return null;
+		//		}
+		//		else
+		//		{
+		//			return data;
+		//		}
+		//	}
+		//}
 
 		protected override EntitySpider GetEntitySpider()
 		{
@@ -62,7 +63,7 @@ namespace DotnetSpider.Sample
 			context.AddEntityType(typeof(Company), new TargetUrlExtractor
 			{
 				Patterns = new List<string> { @"member_info.php\?ID=\d+" }
-			}, new MyDataHandler());
+			});
 			//Config Redis
 			context.SetScheduler(new RedisScheduler
 			{
@@ -108,7 +109,7 @@ namespace DotnetSpider.Sample
 			/// </summary>
 			[TargetUrl(Extras = new[] { "Category" })]
 			[StoredAs("TargetUri", DataType.Text)]
-			[PropertySelector(Expression = ".//td[2]/a/@href")]
+			[PropertySelector(Expression = ".//td[2]/a/@href", NotNull = true)]
 			public String TargetUri { get; set; }
 		}
 

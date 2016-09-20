@@ -233,13 +233,27 @@ namespace DotnetSpider.Extension.Model
 		{
 			JObject dataObject = new JObject();
 
+			bool skip = false;
 			foreach (var field in EntityMetadata.Entity.Fields)
 			{
 				var fieldValue = ExtractField(item, page, field, index);
-				if (fieldValue != null)
+				if (fieldValue == null)
+				{
+					if (field.NotNull)
+					{
+						skip = true;
+						break;
+					}
+				}
+				else
 				{
 					dataObject.Add(field.Name, fieldValue);
 				}
+			}
+
+			if (skip)
+			{
+				return null;
 			}
 
 			var result = dataObject.Children().Any() ? dataObject : null;
