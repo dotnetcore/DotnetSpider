@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
@@ -11,6 +9,7 @@ using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
+using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Sample
 {
@@ -24,6 +23,21 @@ namespace DotnetSpider.Sample
 	/// </summary>
 	public class RuthSpider : EntitySpiderBuilder
 	{
+		public class MyDataHandler : DataHandler
+		{
+			protected override JObject HandleDataOject(JObject data, Page page)
+			{
+				if (string.IsNullOrEmpty(data.SelectToken("$.name").Value<string>()))
+				{
+					return null;
+				}
+				else
+				{
+					return data;
+				}
+			}
+		}
+
 		protected override EntitySpider GetEntitySpider()
 		{
 			//Connecting string
@@ -48,7 +62,7 @@ namespace DotnetSpider.Sample
 			context.AddEntityType(typeof(Company), new TargetUrlExtractor
 			{
 				Patterns = new List<string> { @"member_info.php\?ID=\d+" }
-			});
+			}, new MyDataHandler());
 			//Config Redis
 			context.SetScheduler(new RedisScheduler
 			{

@@ -9,8 +9,6 @@ using MySql.Data.MySqlClient;
 using Dapper;
 using System.Linq;
 using DotnetSpider.Core.Monitor;
-using DotnetSpider.Core.Proxy;
-using DotnetSpider.Core.Selector;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.Core.Test
