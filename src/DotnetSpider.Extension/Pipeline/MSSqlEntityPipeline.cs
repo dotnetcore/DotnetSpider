@@ -13,7 +13,7 @@ namespace DotnetSpider.Extension.Pipeline
 		public MsSqlEntityPipeline()
 		{ }
 
-		public MsSqlEntityPipeline(string connectString, PipelineMode mode = PipelineMode.Insert) : base(connectString, mode)
+		public MsSqlEntityPipeline(string connectString, PipelineMode mode = PipelineMode.Insert, bool checkIfSaveBeforeUpdate = false) : base(connectString, mode, checkIfSaveBeforeUpdate)
 		{
 		}
 

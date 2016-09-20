@@ -97,6 +97,72 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Fact]
+		public void UpdateCheckIfSameBeforeUpdate()
+		{
+			ClearDb();
+
+			using (SqlConnection conn = new SqlConnection(ConnectString))
+			{
+				ISpider spider = new DefaultSpider("test", new Site());
+
+				MsSqlEntityPipeline insertPipeline = new MsSqlEntityPipeline(ConnectString);
+				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
+				insertPipeline.InitPipeline(spider);
+
+				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
+				JObject data2 = new JObject { { "sku", "111" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
+				insertPipeline.Process(new List<JObject> { data1, data2 });
+
+				MsSqlEntityPipeline updatePipeline = new MsSqlEntityPipeline(ConnectString, PipelineMode.Update, true);
+				updatePipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
+				updatePipeline.InitPipeline(spider);
+
+				JObject data3 = new JObject { { "sku", "110" }, { "category", "4C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
+				updatePipeline.Process(new List<JObject> { data3 });
+
+				var list = conn.Query<Product>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("4C", list[0].Category);
+			}
+
+			ClearDb();
+		}
+
+		[Fact]
+		public void UpdateWhenUnionPrimaryCheckIfSameBeforeUpdate()
+		{
+			ClearDb();
+
+			using (SqlConnection conn = new SqlConnection(ConnectString))
+			{
+				ISpider spider = new DefaultSpider("test", new Site());
+
+				MsSqlEntityPipeline insertPipeline = new MsSqlEntityPipeline(ConnectString);
+				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product2).GetTypeInfo()));
+				insertPipeline.InitPipeline(spider);
+
+				JObject data1 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
+				JObject data2 = new JObject { { "sku", "111" }, { "category1", "4C" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
+				insertPipeline.Process(new List<JObject> { data1, data2 });
+
+				MsSqlEntityPipeline updatePipeline = new MsSqlEntityPipeline(ConnectString, PipelineMode.Update, true);
+				updatePipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product2).GetTypeInfo()));
+				updatePipeline.InitPipeline(spider);
+
+				JObject data3 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "AAAA" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
+				updatePipeline.Process(new List<JObject> { data3 });
+
+				var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("AAAA", list[0].Category);
+			}
+
+			ClearDb();
+		}
+
+		[Fact]
 		public void Insert()
 		{
 			ClearDb();

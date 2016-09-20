@@ -19,6 +19,8 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		public string ConnectString { get; set; }
 		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
+		public bool CheckIfSameBeforeUpdate { get; set; }
+
 		[JsonIgnore]
 		public IUpdateConnectString UpdateConnectString { get; set; }
 		protected abstract DbConnection CreateConnection();
@@ -43,10 +45,11 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 		}
 
-		protected BaseEntityDbPipeline(string connectString, PipelineMode mode = PipelineMode.Insert)
+		protected BaseEntityDbPipeline(string connectString, PipelineMode mode = PipelineMode.Insert, bool checkIfSaveBeforeUpdate = false)
 		{
 			Mode = mode;
 			ConnectString = connectString;
+			CheckIfSameBeforeUpdate = checkIfSaveBeforeUpdate;
 		}
 
 		public Schema GetSchema()
@@ -281,47 +284,56 @@ namespace DotnetSpider.Extension.Pipeline
 							{
 								foreach (var data in datas)
 								{
-									var selectCmd = conn.CreateCommand();
-									selectCmd.CommandText = GetSelectSql();
-									selectCmd.CommandType = CommandType.Text;
-									List<DbParameter> selectParameters = new List<DbParameter>();
-									foreach (var column in Primary)
+									bool needUpdate;
+									if (CheckIfSameBeforeUpdate)
 									{
-										var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
-
-										parameter.DbType = Convert(column.DataType);
-										selectParameters.Add(parameter);
-									}
-									selectCmd.Parameters.AddRange(selectParameters.ToArray());
-									var reader = selectCmd.ExecuteReader();
-									JObject old = new JObject();
-									if (reader.Read())
-									{
-										for (int i = 0; i < reader.FieldCount; ++i)
+										var selectCmd = conn.CreateCommand();
+										selectCmd.CommandText = GetSelectSql();
+										selectCmd.CommandType = CommandType.Text;
+										List<DbParameter> selectParameters = new List<DbParameter>();
+										foreach (var column in Primary)
 										{
-											old.Add(reader.GetName(i), reader.GetString(i));
+											var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
+
+											parameter.DbType = Convert(column.DataType);
+											selectParameters.Add(parameter);
 										}
-									}
-									reader.Dispose();
-									selectCmd.Dispose();
+										selectCmd.Parameters.AddRange(selectParameters.ToArray());
+										var reader = selectCmd.ExecuteReader();
+										JObject old = new JObject();
+										if (reader.Read())
+										{
+											for (int i = 0; i < reader.FieldCount; ++i)
+											{
+												old.Add(reader.GetName(i), reader.GetString(i));
+											}
+										}
+										reader.Dispose();
+										selectCmd.Dispose();
 
-									// the primary key is not exists.
-									if (!old.HasValues)
+										// the primary key is not exists.
+										if (!old.HasValues)
+										{
+											continue;
+										}
+
+										string oldValue = string.Join("-", old.PropertyValues());
+
+										StringBuilder newValueBuilder = new StringBuilder();
+										foreach (var updateColumn in UpdateColumns)
+										{
+											var v = data.SelectToken($"$.{updateColumn.Name}");
+											newValueBuilder.Append($"-{v}");
+										}
+										string newValue = newValueBuilder.ToString().Substring(1, newValueBuilder.Length - 1);
+										needUpdate = oldValue != newValue;
+									}
+									else
 									{
-										continue;
+										needUpdate = true;
 									}
 
-									string oldValue = string.Join("-", old.PropertyValues());
-
-									StringBuilder newValueBuilder = new StringBuilder();
-									foreach (var updateColumn in UpdateColumns)
-									{
-										var v = data.SelectToken($"$.{updateColumn.Name}");
-										newValueBuilder.Append($"-{v}");
-									}
-									string newValue = newValueBuilder.ToString().Substring(1, newValueBuilder.Length - 1);
-
-									if (oldValue != newValue)
+									if (needUpdate)
 									{
 										var cmd = conn.CreateCommand();
 										cmd.CommandText = GetUpdateSql();

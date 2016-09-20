@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 		}
 
-		public MySqlEntityPipeline(string connectString, PipelineMode mode = PipelineMode.Insert) : base(connectString, mode)
+		public MySqlEntityPipeline(string connectString, PipelineMode mode = PipelineMode.Insert, bool checkIfSaveBeforeUpdate = false) : base(connectString, mode, checkIfSaveBeforeUpdate)
 		{
 		}
 
@@ -87,7 +87,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("SELECT {0} FROM `{1}`.`{2}` WHERE {3};",
-				selectParamenters, 
+				selectParamenters,
 				Schema.Database,
 				Schema.TableName,
 				primaryParamenters);
