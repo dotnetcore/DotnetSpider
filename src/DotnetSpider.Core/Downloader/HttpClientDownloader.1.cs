@@ -19,7 +19,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public bool DecodeContentAsUrl;
 
-		private readonly HttpClientPool _httpClientPool=new HttpClientPool();
+		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
 
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
@@ -80,6 +80,10 @@ namespace DotnetSpider.Core.Downloader
 			catch (DownloadException)
 			{
 				throw;
+			}
+			catch (HttpRequestException he)
+			{
+				throw new DownloadException(he.Message);
 			}
 			catch (Exception e)
 			{

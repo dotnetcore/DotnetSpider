@@ -13,11 +13,19 @@ namespace DotnetSpider.Core.Test.Downloader
 			HttpClientDownloader downloader = new HttpClientDownloader();
 			DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
 			downloader.Download(new Request("http://www.163.com", 0, null), spider);
+			try
+			{
+				downloader.Download(new Request("http://localhost/abcasdfasdfasdfas", 0, null), spider);
+			}
+			catch (Exception e)
+			{
+				Assert.Equal("Response status code does not indicate success: 503 (One or more errors occurred. (An error occurred while sending the request.)).", e.Message);
+			}
 			Stopwatch watch = new Stopwatch();
 			watch.Start();
 			try
 			{
-				downloader.Download(new Request("http://www.xbxbxbxbxbxbxbxbxbxbxbxbxbxbxbxb.com", 0, null), spider);
+				downloader.Download(new Request("http://google.com/", 0, null), spider);
 			}
 			catch (Exception e)
 			{

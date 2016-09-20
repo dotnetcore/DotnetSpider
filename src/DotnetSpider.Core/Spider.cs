@@ -730,14 +730,6 @@ namespace DotnetSpider.Core
 				}
 				Logger.SaveLog(LogInfo.Create($"下载{request.Url}失败:{de.Message}", Logger.Name, this, LogLevel.Warn));
 			}
-			catch (HttpRequestException he)
-			{
-				if (Site.CycleRetryTimes > 0)
-				{
-					page = AddToCycleRetry(request, Site);
-				}
-				Logger.SaveLog(LogInfo.Create($"下载{request.Url}失败:{he.Message}", Logger.Name, this, LogLevel.Warn));
-			}
 			catch (Exception e)
 			{
 				if (Site.CycleRetryTimes > 0)
