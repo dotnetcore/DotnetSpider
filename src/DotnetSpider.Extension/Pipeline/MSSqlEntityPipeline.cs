@@ -141,6 +141,21 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
+		protected override string GetSelectSql()
+		{
+			string selectParamenters = string.Join(", ", UpdateColumns.Select(p => $"[{p.Name}]"));
+			string primaryParamenters = string.Join(" AND ", Primary.Select(p => $"[{p.Name}]=@{p.Name}"));
+
+			var sqlBuilder = new StringBuilder();
+			sqlBuilder.AppendFormat("USE {0}; SELECT {1} FROM [{2}] WHERE {3};",
+				Schema.Database,
+				selectParamenters,
+				Schema.TableName,
+				primaryParamenters);
+
+			return sqlBuilder.ToString();
+		}
+
 		public override BaseEntityPipeline Clone()
 		{
 			return new MsSqlEntityPipeline(ConnectString, Mode)

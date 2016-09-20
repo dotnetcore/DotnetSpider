@@ -80,6 +80,21 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
+		protected override string GetSelectSql()
+		{
+			string selectParamenters = string.Join(", ", UpdateColumns.Select(p => $"`{p.Name}`"));
+			string primaryParamenters = string.Join(" AND ", Primary.Select(p => $"`{p.Name}`=@{p.Name}"));
+
+			var sqlBuilder = new StringBuilder();
+			sqlBuilder.AppendFormat("SELECT {0} FROM `{1}`.`{2}` WHERE {3};",
+				selectParamenters, 
+				Schema.Database,
+				Schema.TableName,
+				primaryParamenters);
+
+			return sqlBuilder.ToString();
+		}
+
 		protected override string GetCreateTableSql()
 		{
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS  `{Schema.Database }`.`{Schema.TableName}`  (");

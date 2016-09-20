@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
@@ -23,6 +24,7 @@ namespace DotnetSpider.Extension.Pipeline
 		protected abstract DbConnection CreateConnection();
 		protected abstract string GetInsertSql();
 		protected abstract string GetUpdateSql();
+		protected abstract string GetSelectSql();
 		protected abstract string GetCreateTableSql();
 		protected abstract string GetCreateSchemaSql();
 		protected abstract DbParameter CreateDbParameter(string name, object value);
@@ -277,32 +279,73 @@ namespace DotnetSpider.Extension.Pipeline
 						{
 							using (var conn = CreateConnection())
 							{
-								var cmd = conn.CreateCommand();
-								cmd.CommandText = GetUpdateSql();
-								cmd.CommandType = CommandType.Text;
-
 								foreach (var data in datas)
 								{
-									cmd.Parameters.Clear();
-
-									List<DbParameter> parameters = new List<DbParameter>();
-									foreach (var column in UpdateColumns)
-									{
-										var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
-										parameter.DbType = Convert(column.DataType);
-										parameters.Add(parameter);
-									}
-
+									var selectCmd = conn.CreateCommand();
+									selectCmd.CommandText = GetSelectSql();
+									selectCmd.CommandType = CommandType.Text;
+									List<DbParameter> selectParameters = new List<DbParameter>();
 									foreach (var column in Primary)
 									{
 										var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
 
 										parameter.DbType = Convert(column.DataType);
-										parameters.Add(parameter);
+										selectParameters.Add(parameter);
+									}
+									selectCmd.Parameters.AddRange(selectParameters.ToArray());
+									var reader = selectCmd.ExecuteReader();
+									JObject old = new JObject();
+									if (reader.Read())
+									{
+										for (int i = 0; i < reader.FieldCount; ++i)
+										{
+											old.Add(reader.GetName(i), reader.GetString(i));
+										}
+									}
+									reader.Dispose();
+									selectCmd.Dispose();
+
+									// the primary key is not exists.
+									if (!old.HasValues)
+									{
+										continue;
 									}
 
-									cmd.Parameters.AddRange(parameters.ToArray());
-									cmd.ExecuteNonQuery();
+									string oldValue = string.Join("-", old.PropertyValues());
+
+									StringBuilder newValueBuilder = new StringBuilder();
+									foreach (var updateColumn in UpdateColumns)
+									{
+										var v = data.SelectToken($"$.{updateColumn.Name}");
+										newValueBuilder.Append($"-{v}");
+									}
+									string newValue = newValueBuilder.ToString().Substring(1, newValueBuilder.Length - 1);
+
+									if (oldValue != newValue)
+									{
+										var cmd = conn.CreateCommand();
+										cmd.CommandText = GetUpdateSql();
+										cmd.CommandType = CommandType.Text;
+
+										List<DbParameter> parameters = new List<DbParameter>();
+										foreach (var column in UpdateColumns)
+										{
+											var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
+											parameter.DbType = Convert(column.DataType);
+											parameters.Add(parameter);
+										}
+
+										foreach (var column in Primary)
+										{
+											var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
+
+											parameter.DbType = Convert(column.DataType);
+											parameters.Add(parameter);
+										}
+
+										cmd.Parameters.AddRange(parameters.ToArray());
+										cmd.ExecuteNonQuery();
+									}
 								}
 
 								conn.Close();

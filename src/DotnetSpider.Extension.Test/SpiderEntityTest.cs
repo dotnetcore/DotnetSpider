@@ -33,6 +33,11 @@ namespace DotnetSpider.Extension.Test
 				throw new NotImplementedException();
 			}
 
+			protected override string GetSelectSql()
+			{
+				throw new NotImplementedException();
+			}
+
 			protected override string GetCreateTableSql()
 			{
 				throw new NotImplementedException();
