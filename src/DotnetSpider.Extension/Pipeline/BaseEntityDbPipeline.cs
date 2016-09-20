@@ -111,7 +111,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 					if (UpdateColumns.Count == 0)
 					{
-						throw new SpiderException("Can't update primary key.");
+						throw new SpiderException("There is no column need update.");
 					}
 				}
 				else
@@ -121,7 +121,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 					if (UpdateColumns.Count == 0)
 					{
-						throw new SpiderException("Can't update primary key.");
+						throw new SpiderException("There is no column need update.");
 					}
 				}
 			}
@@ -311,6 +311,15 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 				}
 			});
+		}
+
+		/// <summary>
+		/// For test
+		/// </summary>
+		/// <returns></returns>
+		public List<Field> GetUpdateColumns()
+		{
+			return UpdateColumns;
 		}
 
 		public static Schema GenerateSchema(Schema schema)

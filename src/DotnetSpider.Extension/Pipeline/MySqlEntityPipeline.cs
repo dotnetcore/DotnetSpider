@@ -69,7 +69,7 @@ namespace DotnetSpider.Extension.Pipeline
 		protected override string GetUpdateSql()
 		{
 			string setParamenters = string.Join(", ", UpdateColumns.Select(p => $"`{p.Name}`=@{p.Name}"));
-			string primaryParamenters = string.Join(", ", Primary.Select(p => $"`{p.Name}`=@{p.Name}"));
+			string primaryParamenters = string.Join(" AND ", Primary.Select(p => $"`{p.Name}`=@{p.Name}"));
 
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("UPDATE `{0}`.`{1}` SET {2} WHERE {3};",

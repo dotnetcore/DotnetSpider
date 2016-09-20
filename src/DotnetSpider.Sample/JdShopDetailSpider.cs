@@ -69,6 +69,7 @@ namespace DotnetSpider.Sample
 		[Schema("jd", "sku_v2", TableSuffix.Monday)]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
 		[Indexes(Primary = "sku")]
+		[UpdateColumns(new []{""})]
 		public class ProductUpdater : ISpiderEntity
 		{
 			[StoredAs("sku", DataType.String, 25)]
