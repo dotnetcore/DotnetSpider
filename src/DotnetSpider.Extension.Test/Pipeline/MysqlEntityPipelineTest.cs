@@ -15,7 +15,7 @@ using Xunit;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
-	public class MysqlEntityPipelineTest
+	public class MySqlEntityPipelineTest
 	{
 		private void ClearDb()
 		{
@@ -71,14 +71,18 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
 				insertPipeline.InitPipeline(spider);
 
+				// Common data
 				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
 				JObject data2 = new JObject { { "sku", "111" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
-				insertPipeline.Process(new List<JObject> { data1, data2 });
+				// Value is null
+				JObject data3 = new JObject { { "sku", "112" }, { "category", null }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
+				insertPipeline.Process(new List<JObject> { data1, data2, data3 });
 
 				var list = conn.Query<Product>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.Equal(2, list.Count);
+				Assert.Equal(3, list.Count);
 				Assert.Equal("110", list[0].Sku);
 				Assert.Equal("111", list[1].Sku);
+				Assert.Equal(null, list[2].Category);
 			}
 
 			ClearDb();
@@ -116,6 +120,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
 				JObject data2 = new JObject { { "sku", "111" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
+
 				insertPipeline.Process(new List<JObject> { data1, data2 });
 
 				var list = conn.Query<Product>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();

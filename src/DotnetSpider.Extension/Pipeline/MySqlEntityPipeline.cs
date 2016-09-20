@@ -84,8 +84,8 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS  `{Schema.Database }`.`{Schema.TableName}`  (");
 			string columNames = string.Join(", ", Columns.Select(p => $"`{p.Name}` {ConvertToDbType(p.DataType)} "));
-			builder.Append(columNames.Substring(0, columNames.Length));
-			builder.Append(Primary == null || Primary.Count == 0 ? ((string.IsNullOrEmpty(columNames) ? "" : ",") + "`__id` bigint AUTO_INCREMENT") : "");
+			builder.Append(columNames);
+			builder.Append(Primary == null || Primary.Count == 0 ? (string.IsNullOrEmpty(columNames) ? "" : ",") + "`__id` bigint AUTO_INCREMENT" : "");
 			foreach (var index in Indexs)
 			{
 				string name = string.Join("_", index.Select(c => c));
@@ -113,9 +113,9 @@ namespace DotnetSpider.Extension.Pipeline
 			return $"CREATE SCHEMA IF NOT EXISTS `{Schema.Database}` DEFAULT CHARACTER SET utf8mb4 ;";
 		}
 
-		protected override DbParameter CreateDbParameter()
+		protected override DbParameter CreateDbParameter(string name, object value)
 		{
-			return new MySqlParameter();
+			return new MySqlParameter(name, value);
 		}
 
 		protected override string ConvertToDbType(string dataType)

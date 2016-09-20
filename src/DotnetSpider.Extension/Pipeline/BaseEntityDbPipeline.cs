@@ -25,12 +25,12 @@ namespace DotnetSpider.Extension.Pipeline
 		protected abstract string GetUpdateSql();
 		protected abstract string GetCreateTableSql();
 		protected abstract string GetCreateSchemaSql();
-		protected abstract DbParameter CreateDbParameter();
+		protected abstract DbParameter CreateDbParameter(string name, object value);
 
 		protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
 		protected List<List<string>> Uniques { get; set; } = new List<List<string>>();
 		protected List<Field> Primary { get; set; } = new List<Field>();
-		protected string AutoIncrement { get; set; }
+		protected List<string> AutoIncrement { get; set; } = new List<string>();
 		protected Schema Schema { get; set; }
 		protected List<Field> Columns { get; set; } = new List<Field>();
 		protected List<Field> UpdateColumns { get; set; } = new List<Field>();
@@ -92,7 +92,7 @@ namespace DotnetSpider.Extension.Pipeline
 					throw new SpiderException("Set Primary in the Indexex attribute.");
 				}
 
-				if (metadata.Updates != null && metadata.Updates.Length > 0)
+				if (metadata.Updates != null && metadata.Updates.Count > 0)
 				{
 					foreach (var column in metadata.Updates)
 					{
@@ -261,9 +261,7 @@ namespace DotnetSpider.Extension.Pipeline
 									List<DbParameter> parameters = new List<DbParameter>();
 									foreach (var column in Columns)
 									{
-										var parameter = CreateDbParameter();
-										parameter.ParameterName = $"@{column.Name}";
-										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+										var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
 										parameter.DbType = Convert(column.DataType);
 										parameters.Add(parameter);
 									}
@@ -290,18 +288,15 @@ namespace DotnetSpider.Extension.Pipeline
 									List<DbParameter> parameters = new List<DbParameter>();
 									foreach (var column in UpdateColumns)
 									{
-										var parameter = CreateDbParameter();
-										parameter.ParameterName = $"@{column.Name}";
-										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+										var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
 										parameter.DbType = Convert(column.DataType);
 										parameters.Add(parameter);
 									}
 
 									foreach (var column in Primary)
 									{
-										var parameter = CreateDbParameter();
-										parameter.ParameterName = $"@{column.Name}";
-										parameter.Value = data.SelectToken($"{column.Name}")?.Value<string>();
+										var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
+
 										parameter.DbType = Convert(column.DataType);
 										parameters.Add(parameter);
 									}

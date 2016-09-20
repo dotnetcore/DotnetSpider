@@ -440,13 +440,13 @@ namespace DotnetSpider.Extension
 			{
 				entityMetadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
 				entityMetadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				entityMetadata.Primary = indexes.Primary?.Split(',');
-				entityMetadata.AutoIncrement = indexes.AutoIncrement;
+				entityMetadata.Primary = indexes.Primary == null ? new List<string>() : indexes.Primary.Split(',').ToList();
+				entityMetadata.AutoIncrement = indexes.AutoIncrement == null ? new List<string>() : indexes.AutoIncrement.ToList();
 			}
 			var updates = entityType.GetCustomAttribute<UpdateColumns>();
 			if (updates != null)
 			{
-				entityMetadata.Updates = updates.Columns;
+				entityMetadata.Updates = updates.Columns.ToList();
 			}
 
 			Entity entity = ParseEntity(entityType);

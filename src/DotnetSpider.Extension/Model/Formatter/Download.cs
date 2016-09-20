@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Core.Pipeline;
@@ -10,38 +11,41 @@ namespace DotnetSpider.Extension.Model.Formatter
 {
 	public class Download : Formatter
 	{
-		private static readonly HttpClient Client = new HttpClient();
+		private static readonly HttpClient Client = new HttpClient
+		{
+			Timeout = new TimeSpan(0, 0, 2, 0)
+		};
 
 		private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
 		protected override dynamic FormateValue(dynamic value)
 		{
-			try
+			var name = Path.GetFileName(value);
+			if (name != null)
 			{
-				var name = Path.GetFileName(value);
-				if (name != null)
+				Task<byte[]> task = Client.GetByteArrayAsync(value);
+				task.ContinueWith(t =>
 				{
-					var fileData = Client.GetByteArrayAsync(value).Result;
+					if (t.Exception != null)
+					{
+						Logger.SaveLog(LogInfo.Create($"下载文件: {value} 失败.", Logger.Name, null, LogLevel.Warn, t.Exception));
+						return;
+					}
+					var fileData = t.Result;
 					string file = Path.Combine(SpiderEnviroment.GlobalDirectory, "images", name);
-					if (File.Exists(file))
+					if (!File.Exists(file))
 					{
-						return value;
+						var stream = BasePipeline.PrepareFile(file).OpenWrite();
+						foreach (var b in fileData)
+						{
+							stream.WriteByte(b);
+						}
+						stream.Flush();
+						stream.Dispose();
 					}
-					var stream = BasePipeline.PrepareFile(file).OpenWrite();
-					foreach (var b in fileData)
-					{
-						stream.WriteByte(b);
-					}
-					stream.Flush();
-					stream.Dispose();
-				}
-				return value;
+				});
 			}
-			catch (Exception e)
-			{
-				Logger.SaveLog(LogInfo.Create($"Download file: {value} failed.", Logger.Name, null, LogLevel.Error, e));
-				throw;
-			}
+			return name;
 		}
 
 		protected override void CheckArguments()

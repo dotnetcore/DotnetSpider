@@ -156,51 +156,6 @@
     <Compile Include="..\Common\SelectorUtil.cs">
       <Link>Common\SelectorUtil.cs</Link>
     </Compile>
-    <Compile Include="..\Common\Sql\BaseCreate.cs">
-      <Link>Common\Sql\BaseCreate.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\BaseDelete.cs">
-      <Link>Common\Sql\BaseDelete.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\BaseInsert.cs">
-      <Link>Common\Sql\BaseInsert.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\BaseSelect.cs">
-      <Link>Common\Sql\BaseSelect.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\BaseSqlCreator.cs">
-      <Link>Common\Sql\BaseSqlCreator.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\BaseUpdate.cs">
-      <Link>Common\Sql\BaseUpdate.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\Command.cs">
-      <Link>Common\Sql\Command.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\Generatable.cs">
-      <Link>Common\Sql\Generatable.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\MsSql\Create.cs">
-      <Link>Common\Sql\MsSql\Create.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\MsSql\Delete.cs">
-      <Link>Common\Sql\MsSql\Delete.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\MsSql\Insert.cs">
-      <Link>Common\Sql\MsSql\Insert.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\MsSql\Select.cs">
-      <Link>Common\Sql\MsSql\Select.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\MsSql\SqlCreatorCreator.cs">
-      <Link>Common\Sql\MsSql\SqlCreatorCreator.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\MsSql\Update.cs">
-      <Link>Common\Sql\MsSql\Update.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\Sql\Pair.cs">
-      <Link>Common\Sql\Pair.cs</Link>
-    </Compile>
     <Compile Include="..\Configuration\JsonSpiderContext.cs">
       <Link>Configuration\JsonSpiderContext.cs</Link>
     </Compile>

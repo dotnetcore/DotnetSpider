@@ -1,8 +1,10 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using System.Data.SqlClient;
+using System.Text;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Common;
-using DotnetSpider.Extension.Common.Sql.MSSql;
+using System.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -55,52 +57,88 @@ namespace DotnetSpider.Extension.Pipeline
 			return conn;
 		}
 
-		protected override DbParameter CreateDbParameter()
+		protected override DbParameter CreateDbParameter(string name, object value)
 		{
-			return new SqlParameter();
+			return new SqlParameter(name, value ?? DBNull.Value);
 		}
 
 		protected override string GetCreateSchemaSql()
 		{
-			return $"use master; if not exists(select * from sysdatabases where name='{Schema.Database}') create database {Schema.Database};";
+			return $"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database}; USE {Schema.Database};";
 		}
 
 		protected override string GetCreateTableSql()
 		{
-			var table = SqlCreatorCreator.CreateTable(Schema.Database, Schema.TableName, true);
-			foreach (var col in Columns)
+			var identity = "IDENTITY(1,1)";
+			StringBuilder builder = new StringBuilder($"USE {Schema.Database}; IF OBJECT_ID('{Schema.TableName}', 'U') IS NULL CREATE table {Schema.TableName} (");
+			StringBuilder columnNames = new StringBuilder();
+			if (Primary.Count == 0)
 			{
-				table.AddColumn(col.Name, ConvertToDbType(col.DataType));
+				foreach (var p in Columns)
+				{
+					columnNames.Append($",[{p.Name}] {ConvertToDbType(p.DataType)} NULL");
+				}
 			}
-			if (Primary == null || Primary.Count == 0)
+			else
 			{
-				table.AddColumn("__id", "int", "IDENTITY(1,1)", "", false);
+				foreach (var p in Columns)
+				{
+					var identityPart = AutoIncrement.Contains(p.Name) ? identity : "";
+					var nullPart = Primary.Any(k => k.Name == p.Name) ? "NOT NULL" : "NULL";
+
+					columnNames.Append($",[{p.Name}] {ConvertToDbType(p.DataType)} {identityPart} {nullPart}");
+				}
 			}
-			return table.ToCommand().GetStatement();
+
+			builder.Append(columnNames.ToString().Substring(1, columnNames.Length - 1));
+			builder.Append(Primary == null || Primary.Count == 0 ? (columnNames.Length == 0 ? "" : ",") + "[__id] [int] IDENTITY(1,1) NOT NULL," : ",");
+			string primaryKey = Primary == null || Primary.Count == 0 ? "[__id] ASC" : string.Join(", ", Primary.Select(p => $"[{p.Name}] ASC"));
+			builder.Append(
+				$" CONSTRAINT [PK_{Schema.TableName}] PRIMARY KEY CLUSTERED ({primaryKey.Substring(0, primaryKey.Length)})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
+
+			foreach (var index in Indexs)
+			{
+				string name = string.Join("_", index.Select(c => c));
+				string indexColumNames = string.Join(", ", index.Select(c => $"[{c}]"));
+				builder.Append($"CREATE NONCLUSTERED INDEX [index_{name}] ON {Schema.TableName} ({indexColumNames.Substring(0, indexColumNames.Length)});");
+			}
+
+			foreach (var unique in Uniques)
+			{
+				string name = string.Join("_", unique.Select(c => c));
+				string uniqueColumNames = string.Join(", ", unique.Select(c => $"[{c}]"));
+				builder.Append($"CREATE UNIQUE NONCLUSTERED INDEX [unique_{name}] ON {Schema.TableName} ({uniqueColumNames.Substring(0, uniqueColumNames.Length)});");
+			}
+			return builder.ToString();
 		}
 
 		protected override string GetInsertSql()
 		{
-			var table = SqlCreatorCreator.Insert(Schema.Database, Schema.TableName);
-			foreach (var col in Columns)
-			{
-				table.Values(col.Name, $"@{col.Name}");
-			}
-			return table.ToCommand().GetStatement();
+			string columNames = string.Join(", ", Columns.Select(p => $"[{p.Name}]"));
+			string values = string.Join(", ", Columns.Select(p => $"@{p.Name}"));
+
+			var sqlBuilder = new StringBuilder();
+			sqlBuilder.AppendFormat("USE {0}; INSERT INTO [{1}] {2} {3};",
+				Schema.Database,
+				Schema.TableName,
+				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
+				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
+
+			return sqlBuilder.ToString();
 		}
 
 		protected override string GetUpdateSql()
 		{
-			var table = SqlCreatorCreator.Update(Schema.Database, Schema.TableName);
-			foreach (var col in UpdateColumns)
-			{
-				table.Set(col.Name, $"@{col.Name}");
-			}
-			foreach (var col in Primary)
-			{
-				table.Where(col.Name, $"@{col.Name}");
-			}
-			return table.ToCommand().GetStatement();
+			string setParamenters = string.Join(", ", UpdateColumns.Select(p => $"[{p.Name}]=@{p.Name}"));
+			string primaryParamenters = string.Join(", ", Primary.Select(p => $"[{p.Name}]=@{p.Name}"));
+
+			var sqlBuilder = new StringBuilder();
+			sqlBuilder.AppendFormat("USE {0}; UPDATE [{1}] SET {2} WHERE {3};",
+				Schema.Database,
+				Schema.TableName,
+				setParamenters, primaryParamenters);
+
+			return sqlBuilder.ToString();
 		}
 
 		public override BaseEntityPipeline Clone()

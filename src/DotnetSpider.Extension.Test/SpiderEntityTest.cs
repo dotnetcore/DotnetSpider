@@ -43,7 +43,7 @@ namespace DotnetSpider.Extension.Test
 				throw new NotImplementedException();
 			}
 
-			protected override DbParameter CreateDbParameter()
+			protected override DbParameter CreateDbParameter(string name, object value)
 			{
 				throw new NotImplementedException();
 			}
@@ -119,7 +119,7 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[Schema("db", "table")]
-		[Indexes(Primary = "name", AutoIncrement = "Id", Index = new[] { "Id" }, Unique = new[] { "Id,Name", "Id" })]
+		[Indexes(Primary = "name", AutoIncrement = new[] { "Id" }, Index = new[] { "Id" }, Unique = new[] { "Id,Name", "Id" })]
 		public class Entity10 : ISpiderEntity
 		{
 			public int Id { get; set; }

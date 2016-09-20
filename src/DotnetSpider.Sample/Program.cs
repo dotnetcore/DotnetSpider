@@ -10,7 +10,7 @@ namespace DotnetSpider.Sample
 		{
 			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
 
-			CasSpider spiderBuilder = new CasSpider();
+			RuthSpider spiderBuilder = new RuthSpider();
 			spiderBuilder.Run("rerun");
 		}
 	}
