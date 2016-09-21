@@ -1,13 +1,10 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Net.Http;
 
 namespace DotnetSpider.Core.Proxy
 {
 	public class ProxyUtil
 	{
-		private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-
 		public static bool ValidateProxy(string ip, int port)
 		{
 			bool isReachable = false;
@@ -32,7 +29,7 @@ namespace DotnetSpider.Core.Proxy
 			}
 			catch (Exception e)
 			{
-				Logger.Debug(e, "FAILRE - CAN not connect! Proxy: " + http);
+				LogCenter.Log(null, "FAILRE - CAN not connect! Proxy: " + http, LogLevel.Error, e);
 			}
 
 			return isReachable;

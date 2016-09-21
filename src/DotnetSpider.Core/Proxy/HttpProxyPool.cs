@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Common;
-using NLog;
 
 namespace DotnetSpider.Core.Proxy
 {
@@ -15,7 +14,6 @@ namespace DotnetSpider.Core.Proxy
 		private readonly List<Proxy> _proxyQueue = new List<Proxy>();
 		private readonly ConcurrentDictionary<string, Proxy> _allProxy = new ConcurrentDictionary<string, Proxy>();
 
-		private ILogger Logger { get; }
 		private readonly int _reuseInterval;
 
 		public HttpProxyPool(IProxySupplier supplier, int reuseInterval = 500)
@@ -25,7 +23,6 @@ namespace DotnetSpider.Core.Proxy
 				throw new SpiderException("IProxySupplier should not be null.");
 			}
 			_supplier = supplier;
-			Logger = LogManager.GetCurrentClassLogger();
 
 			_reuseInterval = reuseInterval;
 
@@ -60,7 +57,7 @@ namespace DotnetSpider.Core.Proxy
 
 				if (ProxyUtil.ValidateProxy(proxy.Value.HttpHost.Uri.Host, proxy.Value.HttpHost.Uri.Port))
 				{
-					Logger.Debug($"Detect one usefull proxy: {key}");
+					LogCenter.Log(null, $"Detect one usefull proxy: {key}", LogLevel.Debug);
 					value.SetFailedNum(0);
 					value.SetReuseTime(_reuseInterval);
 
@@ -89,7 +86,7 @@ namespace DotnetSpider.Core.Proxy
 
 		public void ReturnProxy(UseSpecifiedUriWebProxy host, HttpStatusCode statusCode)
 		{
-			if (host==null)
+			if (host == null)
 			{
 				return;
 			}

@@ -1,21 +1,14 @@
 ﻿using System;
-using NLog;
 
 namespace DotnetSpider.Core.Downloader
 {
 	public abstract class BaseDownloader : Named, IDownloader, IDisposable
 	{
-		protected ILogger Logger { get; set; }
 		public IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }  
 		public  IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }  
 		public dynamic Context { get; set; }
 
 		protected abstract Page DowloadContent(Request request, ISpider spider);
-
-		protected BaseDownloader()
-		{
-			Logger = LogManager.GetCurrentClassLogger();
-		}
 
 		protected void BeforeDownload(Request request, ISpider spider)
 		{

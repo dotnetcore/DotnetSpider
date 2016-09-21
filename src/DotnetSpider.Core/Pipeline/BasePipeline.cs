@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using NLog;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -9,7 +8,6 @@ namespace DotnetSpider.Core.Pipeline
 {
 	public abstract class BasePipeline : IPipeline
 	{
-		protected ILogger Logger { get; set; }
 		protected string BasePath { get; set; }
 
 		public ISpider Spider { get; protected set; }
@@ -27,7 +25,6 @@ namespace DotnetSpider.Core.Pipeline
 
 		public virtual void InitPipeline(ISpider spider)
 		{
-			Logger = LogManager.GetCurrentClassLogger();
 			Spider = spider;
 		}
 

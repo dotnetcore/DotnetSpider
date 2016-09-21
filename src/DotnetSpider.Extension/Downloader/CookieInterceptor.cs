@@ -1,6 +1,6 @@
-using NLog;
 using DotnetSpider.Core;
 using System.Collections.Generic;
+using LogLevel = DotnetSpider.Core.LogLevel;
 #if !NET_CORE
 using System;
 using DotnetSpider.Core.Selector;
@@ -24,8 +24,6 @@ namespace DotnetSpider.Extension.Downloader
 
 	public abstract class CookieInterceptor : Named
 	{
-		protected readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-
 		public abstract SiteCookie GetCookie();
 	}
 
@@ -87,7 +85,7 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.Error(e, "Get cookie failed.");
+					LogCenter.Log(null, "Get cookie failed.", LogLevel.Error, e);
 					return null;
 				}
 				fiddlerWrapper.StopCapture();
@@ -171,7 +169,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 			catch (Exception e)
 			{
-				Logger.Error(e, "Get cookie failed.");
+				LogCenter.Log(null, "Get cookie failed.", LogLevel.Error, e);
 				webDriver.Dispose();
 				return null;
 			}

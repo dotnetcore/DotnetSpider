@@ -11,7 +11,6 @@ using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json;
 using DotnetSpider.Redial;
 using StackExchange.Redis;
-using NLog;
 using DotnetSpider.Core.Common;
 using System.Net;
 using DotnetSpider.Core.Monitor;
@@ -20,6 +19,7 @@ using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Downloader;
+using LogLevel = DotnetSpider.Core.LogLevel;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -68,11 +68,11 @@ namespace DotnetSpider.Extension
 #if !NET_CORE
 				if (CookieInterceptor != null)
 				{
-					Logger.SaveLog(LogInfo.Create("尝试获取 Cookie...", Logger.Name, this, LogLevel.Info));
+					this.Log("尝试获取 Cookie...", LogLevel.Info);
 					var cookie = CookieInterceptor.GetCookie();
 					if (cookie == null)
 					{
-						Logger.SaveLog(LogInfo.Create("获取 Cookie 失败, 爬虫无法继续.", Logger.Name, this, LogLevel.Error));
+						this.Log("获取 Cookie 失败, 爬虫无法继续.", LogLevel.Warn);
 						return;
 					}
 					else
@@ -83,8 +83,7 @@ namespace DotnetSpider.Extension
 				}
 #endif
 
-				Logger.SaveLog(LogInfo.Create("创建爬虫...", Logger.Name, this, LogLevel.Info));
-
+				this.Log("创建爬虫...", LogLevel.Info);
 				EntityProcessor processor = new EntityProcessor(this);
 
 				foreach (var entity in Entities)
@@ -134,7 +133,7 @@ namespace DotnetSpider.Extension
 					needInitStartRequest = true;
 				}
 
-				Logger.SaveLog(LogInfo.Create("构建内部模块、准备爬虫数据...", Logger.Name, this, LogLevel.Info));
+				this.Log("构建内部模块、准备爬虫数据...", LogLevel.Info);
 				InitComponent();
 
 				if (needInitStartRequest)
@@ -144,13 +143,13 @@ namespace DotnetSpider.Extension
 						for (int i = 0; i < PrepareStartUrls.Length; ++i)
 						{
 							var prepareStartUrl = PrepareStartUrls[i];
-							Logger.SaveLog(LogInfo.Create($"[步骤 {i + 2}] 添加链接到调度中心.", Logger.Name, this, LogLevel.Info));
+							this.Log($"[步骤 {i + 2}] 添加链接到调度中心.", LogLevel.Info);
 							prepareStartUrl.Build(this, null);
 						}
 					}
 				}
 
-				SpiderMonitor.Register(this);
+				MonitorCenter.Register(this);
 
 				Db?.LockRelease(key, 0);
 
@@ -172,7 +171,7 @@ namespace DotnetSpider.Extension
 			finally
 			{
 				Dispose();
-				SpiderMonitor.Dispose();
+				MonitorCenter.Dispose();
 			}
 		}
 
@@ -300,12 +299,10 @@ namespace DotnetSpider.Extension
 				}
 				if (needInitStartRequest)
 				{
-					Logger.SaveLog(LogInfo.Create("开始执行数据验证...", Logger.Name, this, LogLevel.Info));
-
+					this.Log("开始执行数据验证...", LogLevel.Info);
 					VerifyCollectedData();
 				}
-
-				Logger.SaveLog(LogInfo.Create("数据验证已完成.", Logger.Name, this, LogLevel.Info));
+				this.Log("数据验证已完成.", LogLevel.Info);
 
 				if (needInitStartRequest && Redis != null)
 				{
@@ -314,7 +311,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.Error(e, e.Message);
+				this.Log(e.Message, LogLevel.Error, e);
 				throw;
 			}
 			finally
@@ -365,13 +362,13 @@ namespace DotnetSpider.Extension
 		{
 			if (Entities == null || Entities.Count == 0)
 			{
-				Logger.SaveLog(LogInfo.Create("Count of entity is 0.", Logger.Name, this, LogLevel.Error));
+				this.Log("Count of entity is 0.", LogLevel.Error);
 				throw new SpiderException("Count of entity is 0.");
 			}
 
 			if (EntityPipelines == null || EntityPipelines.Count == 0)
 			{
-				Logger.SaveLog(LogInfo.Create("Need at least one entity pipeline.", Logger.Name, this, LogLevel.Error));
+				this.Log("Need at least one entity pipeline.", LogLevel.Error);
 				throw new SpiderException("Need at least one entity pipeline.");
 			}
 
@@ -407,7 +404,7 @@ namespace DotnetSpider.Extension
 					var address = Dns.GetHostAddressesAsync(RedisHost).Result.FirstOrDefault();
 					if (address == null)
 					{
-						Logger.SaveLog(LogInfo.Create($"Can't resovle host: {RedisHost}", Logger.Name, this, LogLevel.Error));
+						this.Log($"Can't resovle host: {RedisHost}", LogLevel.Error);
 						throw new SpiderException($"Can't resovle host: {RedisHost}");
 					}
 					confiruation.EndPoints.Add(new IPEndPoint(address, RedisPort));

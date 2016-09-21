@@ -7,7 +7,7 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			IocContainer.Default.AddSingleton<IMonitorService, NLogMonitor>();
+			IocContainer.Default.AddSingleton<IMonitor, NLogMonitor>();
 
 			RuthSpider spiderBuilder = new RuthSpider();
 			spiderBuilder.Run("rerun");

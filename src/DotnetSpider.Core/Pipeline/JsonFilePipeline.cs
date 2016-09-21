@@ -2,8 +2,6 @@ using System.IO;
 using System.Text;
 using DotnetSpider.Core.Common;
 using Newtonsoft.Json;
-using NLog;
-
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -69,7 +67,7 @@ namespace DotnetSpider.Core.Pipeline
 			}
 			catch (IOException e)
 			{
-				Logger.SaveLog(LogInfo.Create("Write data to json file failed.", Logger.Name, Spider, LogLevel.Warn, e));
+				Spider.Log("Write data to json file failed.", LogLevel.Error, e);
 				throw;
 			}
 		}

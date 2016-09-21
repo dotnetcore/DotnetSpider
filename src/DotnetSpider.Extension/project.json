@@ -10,7 +10,6 @@
       "version": "1.0.0"
     },
     "DotnetSpider.Core": "0.0.9",
-    "NLog": "4.4.0-betaV15",
     "HtmlAgilityPack": "0.0.9",
     "HtmlAgilityPack.Css": "0.0.9",
     "SapientGuardian.MySql.Data": "6.9.812",

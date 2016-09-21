@@ -1,3 +1,5 @@
+using DotnetSpider.Core;
+using DotnetSpider.Core.Monitor;
 #if Test
 using Newtonsoft.Json;
 #endif

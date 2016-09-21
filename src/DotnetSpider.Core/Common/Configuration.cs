@@ -3,6 +3,7 @@ using System.IO;
 #if !NET_CORE
 using System;
 #else
+using System;
 using Microsoft.Extensions.Configuration;
 #endif
 
@@ -10,6 +11,12 @@ namespace DotnetSpider.Core.Common
 {
 	public class Configuration
 	{
+		public const string RedisHost = "redisHost";
+		public const string RredisPassword = "redisPassword";
+		public const string RedialRedisHost = "redialRedisHost";
+		public const string RedialRedisPassword = "redialRedisPassword";
+		public const string LogAndStatusConnectString = "logAndStatusConnectString";
+
 #if NET_CORE
 		private static readonly IConfigurationRoot ConfigurationRoot;
 #endif
@@ -17,7 +24,12 @@ namespace DotnetSpider.Core.Common
 
 		static Configuration()
 		{
-			string configPath = Path.Combine(SpiderEnviroment.BaseDirectory, "config.ini");
+#if !NET_CORE
+			string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+#else
+			string baseDirectory = AppContext.BaseDirectory;
+#endif
+			string configPath = Path.Combine(baseDirectory, "config.ini");
 
 			if (File.Exists(configPath))
 			{

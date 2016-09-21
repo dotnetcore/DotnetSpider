@@ -21,7 +21,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 			{
 				return ValueWhenNull;
 			}
-
 			return FormateValue(value);
 		}
 	}

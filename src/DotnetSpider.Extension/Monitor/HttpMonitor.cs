@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace DotnetSpider.Extension.Monitor
 {
-	public class HttpMonitor : IMonitorService
+	public class HttpMonitor : IMonitor
 	{
 		private readonly HttpClient _client = new HttpClient();
 		private readonly AutomicLong _postCounter = new AutomicLong(0);
@@ -33,7 +33,7 @@ namespace DotnetSpider.Extension.Monitor
 			}
 		}
 
-		public void Watch(SpiderStatus status)
+		public void Report(SpiderStatus status)
 		{
 			var tmp = new
 			{

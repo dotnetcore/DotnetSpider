@@ -12,7 +12,6 @@
     "System.Threading.Thread": "*",
     "System.Net.NameResolution": "*",
     "System.Runtime.InteropServices.RuntimeInformation": "*",
-    "NLog": "4.4.0-betaV15",
     "System.Diagnostics.Process": "*",
     "System.Net.Http": "4.1.0",
     "StackExchange.Redis": "1.1.604-alpha"

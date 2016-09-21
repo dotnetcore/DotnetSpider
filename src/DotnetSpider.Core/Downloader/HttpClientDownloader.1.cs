@@ -7,7 +7,6 @@ using System.Text;
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
-using NLog;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -101,7 +100,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.SaveLog(LogInfo.Create("Close response fail.", Logger.Name, spider, LogLevel.Warn, e));
+					spider.Log("Close response fail.", LogLevel.Warn, e);
 				}
 			}
 		}

@@ -15,7 +15,7 @@ namespace DotnetSpider.Sample
 		public static void Run()
 		{
 			// 注入监控服务
-			IocContainer.Default.AddSingleton<IMonitorService, NLogMonitor>();
+			IocContainer.Default.AddSingleton<IMonitor, NLogMonitor>();
 
 			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8" };
@@ -29,7 +29,7 @@ namespace DotnetSpider.Sample
 			Spider spider = Spider.Create(site, new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
 			spider.EmptySleepTime = 3000;
 			// 注册爬虫到监控服务
-			SpiderMonitor.Register(spider);
+			MonitorCenter.Register(spider);
 
 			// 启动爬虫
 			spider.Run();

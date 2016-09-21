@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Linq;
 using DotnetSpider.Core.Monitor;
 using Xunit;
 
 namespace DotnetSpider.Core.Test
 {
-	public class TestMonitor : IMonitorService
+	public class TestMonitor : IMonitor
 	{
 		public void Dispose()
 		{
 			throw new NotImplementedException();
 		}
 
-		public void Watch(SpiderStatus spider)
+		public void Report(SpiderStatus spider)
 		{
 			throw new NotImplementedException();
 		}
@@ -19,14 +20,14 @@ namespace DotnetSpider.Core.Test
 		public bool IsEnabled { get; }
 	}
 
-	public class TestMonitor2 : IMonitorService
+	public class TestMonitor2 : IMonitor
 	{
 		public void Dispose()
 		{
 			throw new NotImplementedException();
 		}
 
-		public void Watch(SpiderStatus spider)
+		public void Report(SpiderStatus spider)
 		{
 			throw new NotImplementedException();
 		}
@@ -39,25 +40,25 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void Ioc1()
 		{
-			IocContainer.Default.AddSingleton<IMonitorService, NLogMonitor>();
-			var nlogMonitor = IocContainer.Default.GetService<IMonitorService>();
+			IocContainer.Default.AddSingleton<IMonitor, NLogMonitor>();
+			var nlogMonitor = IocContainer.Default.GetService<IMonitor>();
 			Assert.NotNull(nlogMonitor);
 
-			IocContainer.Default.AddSingleton<IMonitorService, TestMonitor>();
-			var monitor = IocContainer.Default.GetService<IMonitorService>();
+			IocContainer.Default.AddSingleton<IMonitor, TestMonitor>();
+			var monitor = IocContainer.Default.GetService<IMonitor>();
 
-			Assert.Equal(typeof(NLogMonitor).FullName,monitor.GetType().FullName);
+			Assert.Equal(typeof(TestMonitor).FullName, monitor.GetType().FullName);
 		}
 
 		[Fact]
 		public void Ioc2()
 		{
-			IocContainer.Default.AddTransient<IMonitorService, NLogMonitor>();
-			var nlogMonitor = IocContainer.Default.GetService<IMonitorService>();
+			IocContainer.Default.AddTransient<IMonitor, NLogMonitor>();
+			var nlogMonitor = IocContainer.Default.GetService<IMonitor>();
 			Assert.NotNull(nlogMonitor);
 
-			IocContainer.Default.AddTransient<IMonitorService, TestMonitor>();
-			var monitor = IocContainer.Default.GetService<IMonitorService>();
+			IocContainer.Default.AddTransient<IMonitor, TestMonitor>();
+			var monitor = IocContainer.Default.GetService<IMonitor>();
 
 			Assert.Equal(typeof(TestMonitor).FullName, monitor.GetType().FullName);
 		}
@@ -73,6 +74,20 @@ namespace DotnetSpider.Core.Test
 			var monitor = IocContainer.Default.GetService<TestMonitor>();
 
 			Assert.Equal(typeof(TestMonitor).FullName, monitor.GetType().FullName);
+		}
+
+		[Fact]
+		public void Ioc4()
+		{
+			IocContainer.Default.AddTransient<IMonitor, NLogMonitor>();
+
+
+			IocContainer.Default.AddTransient<IMonitor, TestMonitor>();
+			var monitors = IocContainer.Default.GetServices<IMonitor>().ToList();
+
+			Assert.Equal(2, monitors.Count);
+			Assert.Equal(typeof(NLogMonitor).FullName, monitors[0].GetType().FullName);
+			Assert.Equal(typeof(TestMonitor).FullName, monitors[1].GetType().FullName);
 		}
 	}
 }

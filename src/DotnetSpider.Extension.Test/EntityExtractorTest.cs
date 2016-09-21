@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Common;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
@@ -25,7 +24,7 @@ namespace DotnetSpider.Extension.Test
 				{ "cat3", "110" }
 			}), ContentType.Html)
 			{
-				Content = File.ReadAllText(Path.Combine(SpiderEnviroment.BaseDirectory, "Jd.html"))
+				Content = File.ReadAllText(Path.Combine(SpiderConsts.BaseDirectory, "Jd.html"))
 			});
 			Assert.Equal(60, results.Count);
 			Assert.Equal("手机", results[0].GetValue("CategoryName"));

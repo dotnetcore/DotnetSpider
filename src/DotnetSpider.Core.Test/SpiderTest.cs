@@ -101,14 +101,13 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{
-			IocContainer.Default.AddSingleton<IMonitorService, NLogMonitor>();
 			string id = Guid.NewGuid().ToString("N");
 			string taskGroup = Guid.NewGuid().ToString("N");
 			string userId = Guid.NewGuid().ToString("N");
 			string connectString = "Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306";
 			Configuration.SetValue("logAndStatusConnectString", connectString);
 			Assert.Equal("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", Configuration.GetValue("logAndStatusConnectString"));
-			LogManagerHelper.InitLogManager(true);
+
 			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
 				id,
 				userId,
@@ -120,7 +119,7 @@ namespace DotnetSpider.Core.Test
 				{
 					spider.AddStartUrl("http://www.baidu.com/" + i);
 				}
-				SpiderMonitor.Register(spider);
+				MonitorCenter.Register(spider);
 				spider.Run();
 			}
 			using (MySqlConnection conn = new MySqlConnection(connectString))

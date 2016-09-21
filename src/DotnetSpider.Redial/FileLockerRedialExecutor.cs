@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using DotnetSpider.Core.Common;
 using DotnetSpider.Redial.Redialer;
 using System.Linq;
+using DotnetSpider.Core;
 using DotnetSpider.Redial.InternetDetector;
 
 namespace DotnetSpider.Redial
@@ -16,8 +16,8 @@ namespace DotnetSpider.Redial
 
 		static FileLockerRedialExecutor()
 		{
-			AtomicActionFolder = Path.Combine(SpiderEnviroment.GlobalDirectory, "atomicaction");
-			RedialLockerFile = Path.Combine(SpiderEnviroment.GlobalDirectory, "redial.lock");
+			AtomicActionFolder = Path.Combine(SpiderConsts.GlobalDirectory, "atomicaction");
+			RedialLockerFile = Path.Combine(SpiderConsts.GlobalDirectory, "redial.lock");
 		}
 
 		public FileLockerRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)

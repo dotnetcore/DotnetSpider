@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
-using NLog;
 
 namespace DotnetSpider.Core
 {
@@ -33,7 +32,6 @@ namespace DotnetSpider.Core
 			}
 			Identity = uuid;
 			Site = site;
-			Logger = LogManager.GetCurrentClassLogger();
 		}
 
 		/// <summary>
@@ -63,11 +61,6 @@ namespace DotnetSpider.Core
 		public string UserId { get; } = "Default";
 
 		public string TaskGroup { get; } = "Default";
-
-		public ILogger Logger
-		{
-			get; set;
-		}
 
 		public IScheduler Scheduler
 		{
@@ -102,7 +95,7 @@ namespace DotnetSpider.Core
 			{
 				if (t.Exception != null)
 				{
-					Logger.Error(t.Exception.Message);
+					this.Log(t.Exception.Message, LogLevel.Error);
 				}
 			});
 		}

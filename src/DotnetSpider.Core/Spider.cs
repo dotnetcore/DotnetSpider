@@ -13,7 +13,6 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
-using NLog;
 
 namespace DotnetSpider.Core
 {
@@ -22,7 +21,6 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Spider : ISpider
 	{
-		protected ILogger Logger { get; set; }
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		protected bool IsExitWhenComplete { get; set; } = true;
@@ -103,8 +101,6 @@ namespace DotnetSpider.Core
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-			LogManagerHelper.InitLogManager();
-			Logger = LogManager.GetCurrentClassLogger();
 			IsExited = false;
 		}
 
@@ -413,7 +409,8 @@ namespace DotnetSpider.Core
 
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
-				Logger.SaveLog(LogInfo.Create($"[步骤 1] 添加链接到调度中心, 数量: {Site.StartRequests.Count}.", Logger.Name, this, LogLevel.Info));
+				this.Log($"[步骤 1] 添加链接到调度中心, 数量: {Site.StartRequests.Count}.", LogLevel.Info);
+				//Logger.SaveLog(LogInfo.Create(, Logger.Name, this, LogLevel.Info));
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
 					Parallel.ForEach(Site.StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 }, request =>
@@ -429,7 +426,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				Logger.SaveLog(LogInfo.Create("[步骤 1] 添加链接到调度中心, 数量: 0.", Logger.Name, this, LogLevel.Info));
+				this.Log("[步骤 1] 添加链接到调度中心, 数量: 0.", LogLevel.Info);
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
@@ -511,7 +508,7 @@ namespace DotnetSpider.Core
 						catch (Exception e)
 						{
 							OnError(request);
-							Logger.SaveLog(LogInfo.Create($"采集失败: {request.Url}.", Logger.Name, this, LogLevel.Error, e));
+							this.Log($"采集失败: {request.Url}.", LogLevel.Error, e);
 						}
 						finally
 						{
@@ -543,17 +540,17 @@ namespace DotnetSpider.Core
 			if (Stat == Status.Finished)
 			{
 				OnClose();
-				Logger.SaveLog(LogInfo.Create($"采集结束, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
+				this.Log($"结束采集, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
 			}
 
 			if (Stat == Status.Stopped)
 			{
-				Logger.SaveLog(LogInfo.Create($"采集暂停, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
+				this.Log($"暂停采集, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
 			}
 
 			if (Stat == Status.Exited)
 			{
-				Logger.SaveLog(LogInfo.Create($"采集退出, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", Logger.Name, this, LogLevel.Info));
+				this.Log($"退出采集, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
 			}
 
 			IsExited = true;
@@ -585,7 +582,7 @@ namespace DotnetSpider.Core
 			{
 				if (t.Exception != null)
 				{
-					Logger.Error(t.Exception.Message);
+					this.Log(t.Exception.Message, LogLevel.Error);
 				}
 			});
 		}
@@ -593,13 +590,13 @@ namespace DotnetSpider.Core
 		public void Stop()
 		{
 			Stat = Status.Stopped;
-			Logger.SaveLog(LogInfo.Create("停止任务中...", Logger.Name, this, LogLevel.Warn));
+			this.Log("停止任务中...", LogLevel.Warn);
 		}
 
 		public void Exit()
 		{
 			Stat = Status.Exited;
-			Logger.SaveLog(LogInfo.Create("退出任务中...", Logger.Name, this, LogLevel.Warn));
+			this.Log("退出任务中...", LogLevel.Warn);
 			SpiderClosing?.Invoke();
 		}
 
@@ -713,21 +710,13 @@ namespace DotnetSpider.Core
 				Console.WriteLine("Process:" + (sw.ElapsedMilliseconds).ToString());
 #endif
 			}
-			//catch (Redial.RedialException re)
-			//{
-			//	if (Site.CycleRetryTimes > 0)
-			//	{
-			//		page = AddToCycleRetry(request, Site);
-			//	}
-			//	Logger.Warn(re.Message);
-			//}
 			catch (DownloadException de)
 			{
 				if (Site.CycleRetryTimes > 0)
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				Logger.SaveLog(LogInfo.Create($"下载{request.Url}失败:{de.Message}", Logger.Name, this, LogLevel.Warn));
+				this.Log($"下载{request.Url}失败:{de.Message}", LogLevel.Warn);
 			}
 			catch (Exception e)
 			{
@@ -735,7 +724,7 @@ namespace DotnetSpider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				Logger.SaveLog(LogInfo.Create($"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}", Logger.Name, this, LogLevel.Warn));
+				this.Log($"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}", LogLevel.Warn);
 			}
 
 			//watch.Stop();
@@ -773,7 +762,7 @@ namespace DotnetSpider.Core
 				{
 					pipeline.Process(page.ResultItems);
 				}
-				Logger.SaveLog(LogInfo.Create($"采集: {request.Url} 成功.", Logger.Name, this, LogLevel.Info));
+				this.Log($"采集: {request.Url} 成功.", LogLevel.Info);
 			}
 			else
 			{
@@ -786,16 +775,16 @@ namespace DotnetSpider.Core
 						{
 							ExtractAndAddRequests(page, true);
 						}
-						Logger.SaveLog(LogInfo.Create($"解析: {request.Url} 结果为 0, 重新尝试采集.", Logger.Name, this, LogLevel.Info));
+						this.Log($"解析: {request.Url} 结果为 0, 重新尝试采集.", LogLevel.Info);
 					}
 					else
 					{
-						Logger.SaveLog(LogInfo.Create($"采集: {request.Url} 成功, 解析结果为 0.", Logger.Name, this, LogLevel.Info));
+						this.Log($"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
 					}
 				}
 				else
 				{
-					Logger.SaveLog(LogInfo.Create($"采集: {request.Url} 成功, 解析结果为 0.", Logger.Name, this, LogLevel.Info));
+					this.Log($"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
 				}
 			}
 
@@ -850,7 +839,7 @@ namespace DotnetSpider.Core
 				}
 				catch (Exception e)
 				{
-					Logger.Warn(e.ToString());
+					this.Log(e.ToString(), LogLevel.Warn);
 				}
 			}
 		}

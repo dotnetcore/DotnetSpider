@@ -11,7 +11,6 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Common;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json;
-using NLog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -61,7 +60,6 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.Schema == null)
 			{
-				Logger.SaveLog(LogInfo.Create("Miss pipeline because: Schema is necessary", Logger.Name, Spider, LogLevel.Warn));
 				IsEnabled = false;
 				return;
 			}
@@ -205,7 +203,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 						catch (Exception e)
 						{
-							Logger.SaveLog(LogInfo.Create("Update ConnectString failed.", Logger.Name, spider, LogLevel.Error, e));
+							spider.Log("Update ConnectString failed.", LogLevel.Error, e);
 							Thread.Sleep(1000);
 						}
 					}

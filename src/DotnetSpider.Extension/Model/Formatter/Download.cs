@@ -3,9 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Common;
 using DotnetSpider.Core.Pipeline;
-using NLog;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
@@ -15,8 +13,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 		{
 			Timeout = new TimeSpan(0, 0, 2, 0)
 		};
-
-		private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
 		protected override dynamic FormateValue(dynamic value)
 		{
@@ -28,11 +24,10 @@ namespace DotnetSpider.Extension.Model.Formatter
 				{
 					if (t.Exception != null)
 					{
-						Logger.SaveLog(LogInfo.Create($"下载文件: {value} 失败.", Logger.Name, null, LogLevel.Warn, t.Exception));
-						return;
+						throw t.Exception;
 					}
 					var fileData = t.Result;
-					string file = Path.Combine(SpiderEnviroment.GlobalDirectory, "images", name);
+					string file = Path.Combine(SpiderConsts.GlobalDirectory, "images", name);
 					if (!File.Exists(file))
 					{
 						var stream = BasePipeline.PrepareFile(file).OpenWrite();

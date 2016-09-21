@@ -110,6 +110,9 @@
     <Compile Include="..\Common\LimitedConcurrencyLevelTaskScheduler.cs">
       <Link>Common\LimitedConcurrencyLevelTaskScheduler.cs</Link>
     </Compile>
+    <Compile Include="..\Common\NLogUtils.cs">
+      <Link>Common\NLogUtils.cs</Link>
+    </Compile>
     <Compile Include="..\Common\PriorityBlockingQueue.cs">
       <Link>Common\PriorityBlockingQueue.cs</Link>
     </Compile>
@@ -118,9 +121,6 @@
     </Compile>
     <Compile Include="..\Common\RetryExecutor.cs">
       <Link>Common\RetryExecutor.cs</Link>
-    </Compile>
-    <Compile Include="..\Common\SpiderEnviroment.cs">
-      <Link>Common\SpiderEnviroment.cs</Link>
     </Compile>
     <Compile Include="..\Common\StreamExtensions.cs">
       <Link>Common\StreamExtensions.cs</Link>
@@ -176,6 +176,9 @@
     <Compile Include="..\Downloader\IDownloader.cs">
       <Link>Downloader\IDownloader.cs</Link>
     </Compile>
+    <Compile Include="..\ILogger.cs">
+      <Link>ILogger.cs</Link>
+    </Compile>
     <Compile Include="..\INamed.cs">
       <Link>INamed.cs</Link>
     </Compile>
@@ -188,14 +191,14 @@
     <Compile Include="..\ITask.cs">
       <Link>ITask.cs</Link>
     </Compile>
-    <Compile Include="..\LogExtensions.cs">
-      <Link>LogExtensions.cs</Link>
+    <Compile Include="..\LogCenter.cs">
+      <Link>LogCenter.cs</Link>
     </Compile>
-    <Compile Include="..\LogInfo.cs">
-      <Link>LogInfo.cs</Link>
+    <Compile Include="..\Monitor\IMonitor.cs">
+      <Link>Monitor\IMonitor.cs</Link>
     </Compile>
-    <Compile Include="..\Monitor\IMonitorService.cs">
-      <Link>Monitor\IMonitorService.cs</Link>
+    <Compile Include="..\Monitor\MonitorCenter.cs">
+      <Link>Monitor\MonitorCenter.cs</Link>
     </Compile>
     <Compile Include="..\Monitor\NLogMonitor.cs">
       <Link>Monitor\NLogMonitor.cs</Link>
@@ -206,14 +209,14 @@
     <Compile Include="..\Monitor\SpiderEvent.cs">
       <Link>Monitor\SpiderEvent.cs</Link>
     </Compile>
-    <Compile Include="..\Monitor\SpiderMonitor.cs">
-      <Link>Monitor\SpiderMonitor.cs</Link>
-    </Compile>
     <Compile Include="..\Monitor\SpiderStatus.cs">
       <Link>Monitor\SpiderStatus.cs</Link>
     </Compile>
     <Compile Include="..\NetworkCenter.cs">
       <Link>NetworkCenter.cs</Link>
+    </Compile>
+    <Compile Include="..\NLogLogger.cs">
+      <Link>NLogLogger.cs</Link>
     </Compile>
     <Compile Include="..\Page.cs">
       <Link>Page.cs</Link>
@@ -343,6 +346,9 @@
     </Compile>
     <Compile Include="..\Spider.cs">
       <Link>Spider.cs</Link>
+    </Compile>
+    <Compile Include="..\SpiderConsts.cs">
+      <Link>SpiderConsts.cs</Link>
     </Compile>
     <Compile Include="..\SpiderExceptoin.cs">
       <Link>SpiderExceptoin.cs</Link>
