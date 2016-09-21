@@ -127,10 +127,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				httpWebRequest.Headers.Add("ContentType", "application /x-www-form-urlencoded; charset=UTF-8");
 			}
-			else
-			{
-				//httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
-			}
+
 			if (site.Headers.ContainsKey("UserAgent"))
 			{
 				httpWebRequest.Headers.Add("UserAgent", site.Headers["UserAgent"]);
@@ -157,11 +154,6 @@ namespace DotnetSpider.Core.Downloader
 				httpWebRequest.Headers.Add("Accept-Encoding", "gzip");
 			}
 
-
-			//httpWebRequest.Timeout = site.Timeout;
-			//httpWebRequest.ReadWriteTimeout = site.Timeout;
-			//httpWebRequest.AllowAutoRedirect = true;
-
 			// headers
 			if (site.Headers != null)
 			{
@@ -187,21 +179,6 @@ namespace DotnetSpider.Core.Downloader
 
 				httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
 			}
-#if !NET_CORE
-			//if (site.HttpProxyPoolEnable)
-			//{
-			//	HttpHost host = site.GetHttpProxyFromPool();
-			//	httpWebRequest.Proxy = new WebProxy(host.Host, host.Port);
-			//	request.PutExtra(Request.Proxy, host);
-			//}
-			//else
-			//{
-			//	// 避开Fiddler之类的代理
-			//	httpWebRequest.Proxy = null;
-			//}
-#else
-			//httpWebRequest.Proxy = null;
-#endif
 			return httpWebRequest;
 		}
 
