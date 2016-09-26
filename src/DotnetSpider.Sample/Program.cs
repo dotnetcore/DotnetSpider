@@ -9,8 +9,8 @@ namespace DotnetSpider.Sample
 		{
 			IocContainer.Default.AddSingleton<IMonitor, NLogMonitor>();
 
-			RuthSpider spiderBuilder = new RuthSpider();
-			spiderBuilder.Run("rerun");
+			JdSkuSampleSpider spider = new JdSkuSampleSpider();
+			spider.Run();
 		}
 	}
 }
