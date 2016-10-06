@@ -2,14 +2,13 @@
 using System.Text;
 #endif
 using DotnetSpider.Core;
-using DotnetSpider.Core.Monitor;
 #if Test
 using Newtonsoft.Json;
 #endif
 
 namespace DotnetSpider.Extension
 {
-	public abstract class EntitySpiderBuilder
+	public abstract class EntitySpiderBuilder : IRunable
 	{
 		protected abstract EntitySpider GetEntitySpider();
 #if NET_CORE

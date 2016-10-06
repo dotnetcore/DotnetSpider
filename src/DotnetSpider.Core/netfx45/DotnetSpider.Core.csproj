@@ -176,6 +176,9 @@
     <Compile Include="..\Downloader\IDownloader.cs">
       <Link>Downloader\IDownloader.cs</Link>
     </Compile>
+    <Compile Include="..\IExitable.cs">
+      <Link>IExitable.cs</Link>
+    </Compile>
     <Compile Include="..\ILogger.cs">
       <Link>ILogger.cs</Link>
     </Compile>
@@ -185,8 +188,14 @@
     <Compile Include="..\IocContainer.cs">
       <Link>IocContainer.cs</Link>
     </Compile>
+    <Compile Include="..\IRunable.cs">
+      <Link>IRunable.cs</Link>
+    </Compile>
     <Compile Include="..\ISpider.cs">
       <Link>ISpider.cs</Link>
+    </Compile>
+    <Compile Include="..\IStopable.cs">
+      <Link>IStopable.cs</Link>
     </Compile>
     <Compile Include="..\ITask.cs">
       <Link>ITask.cs</Link>
