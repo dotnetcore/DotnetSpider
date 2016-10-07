@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+#if NET_CORE
+using DotnetSpider.HtmlAgilityPack;
+#else
 using HtmlAgilityPack;
+#endif
 
 namespace DotnetSpider.Core.Downloader
 {

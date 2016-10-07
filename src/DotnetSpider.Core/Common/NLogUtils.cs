@@ -14,7 +14,11 @@ namespace DotnetSpider.Core.Common
 		{
 			if (!_init || forceInit)
 			{
-				string nlogConfigPath = Path.Combine(SpiderConsts.BaseDirectory, "nlog.config");
+#if NET_CORE
+				string nlogConfigPath = Path.Combine(SpiderConsts.BaseDirectory, "nlog.netcore.config");
+#else
+				string nlogConfigPath = Path.Combine(SpiderConsts.BaseDirectory, "nlog.net45.config");
+#endif
 				if (!File.Exists(nlogConfigPath))
 				{
 					File.AppendAllText(nlogConfigPath, Resource.nlog);

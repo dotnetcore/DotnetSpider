@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+#if NET_CORE
+using DotnetSpider.HtmlAgilityPack;
+#else
 using HtmlAgilityPack;
+#endif
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

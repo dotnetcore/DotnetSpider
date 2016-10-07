@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-
+#if NET_CORE
+using DotnetSpider.HtmlAgilityPack;
+#else
+using HtmlAgilityPack;
+#endif
 namespace DotnetSpider.Core.Selector
 {
 	public class XPathSelector : BaseHtmlSelector
@@ -23,7 +27,7 @@ namespace DotnetSpider.Core.Selector
 			//}
 		}
 
-		public override dynamic Select(HtmlAgilityPack.HtmlNode element)
+		public override dynamic Select(HtmlNode element)
 		{
 			var node = element.SelectSingleNode(_xpath);
 			if (node != null)
@@ -40,7 +44,7 @@ namespace DotnetSpider.Core.Selector
 			return null;
 		}
 
-		public override List<dynamic> SelectList(HtmlAgilityPack.HtmlNode element)
+		public override List<dynamic> SelectList(HtmlNode element)
 		{
 			List<dynamic> result = new List<dynamic>();
 			var nodes = element.SelectNodes(_xpath);

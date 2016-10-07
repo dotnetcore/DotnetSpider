@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Text;
+using System.Threading;
 using DotnetSpider.Core.Monitor;
 
 namespace DotnetSpider.Core.Test
@@ -7,11 +8,14 @@ namespace DotnetSpider.Core.Test
 	{
 		public static void Main(string[] args)
 		{
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
 			IocContainer.Default.AddSingleton<IMonitor, NLogMonitor>();
 
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new SpiderTest.TestPageProcessor()).AddPipeline(new SpiderTest.TestPipeline()).SetThreadNum(1);
 			spider.SetDownloader(new TestDownloader());
-			for (int i = 0; i < 10000; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				spider.AddStartUrl("http://www.baidu.com/" + i);
 			}

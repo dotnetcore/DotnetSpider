@@ -1,8 +1,8 @@
 #!/bin/sh
 rm -rf ~/solutions/DotnetSpider/spider_nuget_packages
 dotnet restore
-dotnet pack src/HtmlAgilityPack/project.json -o spider_nuget_packages 
-dotnet pack src/HtmlAgilityPack.Css/project.json -o spider_nuget_packages
+dotnet pack src/DotnetSpider.HtmlAgilityPack/project.json -o spider_nuget_packages 
+dotnet pack src/DotnetSpider.HtmlAgilityPack.Css/project.json -o spider_nuget_packages
 dotnet pack src/DotnetSpider.Core/project.json -o spider_nuget_packages
 dotnet pack src/DotnetSpider.Redial/project.json -o spider_nuget_packages
 dotnet pack src/DotnetSpider.Extension/project.json -o spider_nuget_packages
@@ -14,12 +14,12 @@ hash
 lcd ~/solutions/DotnetSpider/spider_nuget_packages
 cd /nuget
 prompt
-mdelete /nuget/HtmlAgilityPack/0.0.9/*
-rmdir /nuget/HtmlAgilityPack/0.0.9
-rmdir /nuget/HtmlAgilityPack
-mdelete /nuget/HtmlAgilityPack.Css/0.0.9/*
-rmdir /nuget/HtmlAgilityPack.Css/0.0.9
-rmdir /nuget/HtmlAgilityPack.Css
+mdelete /nuget/DotnetSpider.HtmlAgilityPack/0.0.9/*
+rmdir /nuget/DotnetSpider.HtmlAgilityPack/0.0.9
+rmdir /nuget/DotnetSpider.HtmlAgilityPack
+mdelete /nuget/DotnetSpider.HtmlAgilityPack.Css/0.0.9/*
+rmdir /nuget/DotnetSpider.HtmlAgilityPack.Css/0.0.9
+rmdir /nugetDotnetSpider./HtmlAgilityPack.Css
 mdelete /nuget/DotnetSpider.Redial/0.0.9/*
 rmdir /nuget/DotnetSpider.Redial/0.0.9
 rmdir /nuget/DotnetSpider.Redial

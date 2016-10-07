@@ -5,33 +5,53 @@
     "debugType": "portable"
   },
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.0"
-    },
     "DotnetSpider.Core": "0.0.9",
-    "HtmlAgilityPack": "0.0.9",
-    "HtmlAgilityPack.Css": "0.0.9",
-    "SapientGuardian.MySql.Data": "6.9.812",
-    "System.Data.Common": "*",
-    "Microsoft.CSharp": "*",
-    "Newtonsoft.Json": "*",
-    "System.Dynamic.Runtime": "*",
-    "System.Runtime.Serialization.Primitives": "*",
-    "System.Xml.XDocument": "*",
-    "System.Data.SqlClient": "*",
-    "System.Runtime.Extensions": "*",
-    "StackExchange.Redis": "1.1.604-alpha",
-    "Microsoft.Extensions.DependencyInjection": "1.0.0",
-    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
-    "MailKit": "1.4.1",
     "DotnetSpider.Redial": "0.0.9",
-    "MongoDB.Driver": "2.3.0-rc1"
+    "MongoDB.Driver": "2.3.0",
+    "Newtonsoft.Json": "9.0.1"
   },
   "frameworks": {
+    "net45": {
+      "dependencies": {
+        "HtmlAgilityPack": "1.4.9.5",
+        "HtmlAgilityPack.CssSelectors": "1.0.2",
+        "MySql.Data": "6.9.9",
+        "Selenium.WebDriver": "2.53.1",
+        "FiddlerCore2": "1.0.0"
+      },
+      "frameworkAssemblies": {
+        "System.Data": "4.0.0.0"
+      },
+      "buildOptions": {
+        "define": [
+          "RELEASE",
+          "NET_45",
+          "Publish"
+        ]
+      }
+    },
     "netcoreapp1.0": {
       "imports": "portable-net45+win8+dnxcore50",
-      "dependencies": {},
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        },
+        "DotnetSpider.HtmlAgilityPack": "0.0.9",
+        "DotnetSpider.HtmlAgilityPack.Css": "0.0.9",
+        "SapientGuardian.MySql.Data": "6.9.812",
+        "System.Data.Common": "4.1.0",
+        "Microsoft.CSharp": "4.0.1",
+        "System.Data.SqlClient": "4.1.0",
+        "System.Dynamic.Runtime": "4.0.11",
+        "System.Runtime.Serialization.Primitives": "4.1.1",
+        "System.Xml.XDocument": "4.0.11",
+        "System.Runtime.Extensions": "4.1.0",
+        "StackExchange.Redis": "1.1.608",
+        "Microsoft.Extensions.DependencyInjection": "1.0.0",
+        "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
+        "MailKit": "1.4.1"
+      },
       "buildOptions": {
         "define": [
           "RELEASE",

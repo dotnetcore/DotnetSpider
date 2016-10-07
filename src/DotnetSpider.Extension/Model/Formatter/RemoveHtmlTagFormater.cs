@@ -1,5 +1,9 @@
 ﻿using System;
+#if NET_CORE
+using DotnetSpider.HtmlAgilityPack;
+#else
 using HtmlAgilityPack;
+#endif
 
 namespace DotnetSpider.Extension.Model.Formatter
 {

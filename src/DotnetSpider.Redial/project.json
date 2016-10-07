@@ -4,22 +4,38 @@
     "debugType": "portable"
   },
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.0"
-    },
     "DotnetSpider.Core": "0.0.9",
-    "System.Threading.Thread": "*",
-    "System.Net.NameResolution": "*",
-    "System.Runtime.InteropServices.RuntimeInformation": "*",
-    "System.Diagnostics.Process": "*",
-    "System.Net.Http": "4.1.0",
-    "StackExchange.Redis": "1.1.604-alpha"
+    "StackExchange.Redis": "1.1.608",
+    "SSH.NET": "2016.0.0"
   },
   "frameworks": {
+    "net45": {
+      "dependencies": {
+        "DotRas.for.Win7": "1.3.0"
+      },
+      "frameworkAssemblies": {
+        "System.Configuration": "4.0.0.0"
+      },
+      "buildOptions": {
+        "define": [
+          "RELEASE",
+          "NET_45"
+        ]
+      }
+    },
     "netcoreapp1.0": {
       "imports": "portable-net45+win8+dnxcore50",
-      "dependencies": {},
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        },
+        "System.Threading.Thread": "4.0.0",
+        "System.Net.NameResolution": "4.0.0",
+        "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
+        "System.Diagnostics.Process": "4.1.0",
+        "System.Net.Http": "4.1.0"
+      },
       "buildOptions": {
         "define": [
           "RELEASE",
