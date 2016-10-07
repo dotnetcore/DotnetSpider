@@ -1,11 +1,12 @@
 #!/bin/sh
 rm -rf ~/solutions/DotnetSpider/spider_nuget_packages
 dotnet restore
-dotnet pack src/DotnetSpider.HtmlAgilityPack/project.json -o spider_nuget_packages 
-dotnet pack src/DotnetSpider.HtmlAgilityPack.Css/project.json -o spider_nuget_packages
-dotnet pack src/DotnetSpider.Core/project.json -o spider_nuget_packages
-dotnet pack src/DotnetSpider.Redial/project.json -o spider_nuget_packages
-dotnet pack src/DotnetSpider.Extension/project.json -o spider_nuget_packages
+dotnet build src/DotnetSpider.Extension/project.json -f netcoreapp1.0
+dotnet pack src/DotnetSpider.HtmlAgilityPack/project.json -o spider_nuget_packages --no-build
+dotnet pack src/DotnetSpider.HtmlAgilityPack.Css/project.json -o spider_nuget_packages --no-build
+dotnet pack src/DotnetSpider.Core/project.json -o spider_nuget_packages --no-build
+dotnet pack src/DotnetSpider.Redial/project.json -o spider_nuget_packages --no-build
+dotnet pack src/DotnetSpider.Extension/project.json -o spider_nuget_packages --no-build
 ftp -n<<!
 open redis
 user ftpuser 1qazZAQ!
