@@ -7,7 +7,6 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			BaseUsage.Run();
 			IocContainer.Default.AddSingleton<IMonitor, NLogMonitor>();
 
 			JdSkuSampleSpider spider = new JdSkuSampleSpider();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -19,7 +20,7 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// A spider contains four modules: Downloader, Scheduler, PageProcessor and Pipeline. 
 	/// </summary>
-	public class Spider : ISpider
+	public class Spider : ISpider, ISpeedMonitor
 	{
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
@@ -51,12 +52,19 @@ namespace DotnetSpider.Core
 		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
 		public int EmptySleepTime { get; set; } = 15000;
 
+		public long AvgDownloadSpeed { get; private set; }
+		public long AvgProcessorSpeed { get; private set; }
+		public long AvgPipelineSpeed { get; private set; }
+
 		private int _waitCountLimit = 1500;
 		private bool _init;
 		private IScheduler _scheduler;
 		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
 		private readonly Random _random = new Random();
+		private readonly object _avgDownloadTimeLocker = new object();
+		private readonly object _avgProcessorTimeLocker = new object();
+		private readonly object _avgPipelineTimeLocker = new object();
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -134,12 +142,12 @@ namespace DotnetSpider.Core
 
 			if (string.IsNullOrEmpty(UserId) || string.IsNullOrWhiteSpace(UserId))
 			{
-				UserId = "DotnetSpider";
+				UserId = "";
 			}
 
 			if (string.IsNullOrEmpty(TaskGroup) || string.IsNullOrWhiteSpace(TaskGroup))
 			{
-				TaskGroup = "Default";
+				TaskGroup = "";
 			}
 
 			if (Identity.Length > 100)
@@ -491,19 +499,10 @@ namespace DotnetSpider.Core
 
 						try
 						{
-							ProcessRequest(request, downloader);
+							Stopwatch sw = new Stopwatch();
+							ProcessRequest(sw, request, downloader);
 							Thread.Sleep(_random.Next(Site.MinSleepTime, Site.MaxSleepTime));
-#if TEST
-							System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-							sw.Reset();
-							sw.Start();
-#endif
-
 							_OnSuccess(request);
-#if TEST
-							sw.Stop();
-							Console.WriteLine("OnSuccess:" + (sw.ElapsedMilliseconds).ToString());
-#endif
 						}
 						catch (Exception e)
 						{
@@ -676,39 +675,32 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		protected void ProcessRequest(Request request, IDownloader downloader)
+		protected void ProcessRequest(Stopwatch sw, Request request, IDownloader downloader)
 		{
 			Page page = null;
-#if TEST
-			System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-#endif
 
 			try
 			{
-#if TEST
 				sw.Reset();
 				sw.Start();
-#endif
+
 				page = downloader.Download(request, this);
 
-#if TEST
 				sw.Stop();
-				Console.WriteLine("Download:" + (sw.ElapsedMilliseconds).ToString());
-#endif
+				UpdateDownloadSpeed(sw.ElapsedMilliseconds);
+
 				if (page.IsSkip)
 				{
 					return;
 				}
 
-#if TEST
 				sw.Reset();
 				sw.Start();
-#endif
+
 				PageProcessor.Process(page);
-#if TEST
+
 				sw.Stop();
-				Console.WriteLine("Process:" + (sw.ElapsedMilliseconds).ToString());
-#endif
+				UpdateProcessorSpeed(sw.ElapsedMilliseconds);
 			}
 			catch (DownloadException de)
 			{
@@ -727,9 +719,6 @@ namespace DotnetSpider.Core
 				this.Log($"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}", LogLevel.Warn);
 			}
 
-			//watch.Stop();
-			//Logger.Info("dowloader cost time:" + watch.ElapsedMilliseconds);
-
 			if (page == null)
 			{
 				OnError(request);
@@ -742,9 +731,6 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			//watch.Stop();
-			//Logger.Info("process cost time:" + watch.ElapsedMilliseconds);
-
 			if (!page.MissTargetUrls)
 			{
 				if (!(SkipWhenResultIsEmpty && page.ResultItems.IsSkip))
@@ -752,10 +738,10 @@ namespace DotnetSpider.Core
 					ExtractAndAddRequests(page, SpawnUrl);
 				}
 			}
-#if TEST
+
 			sw.Reset();
 			sw.Start();
-#endif
+
 			if (!page.ResultItems.IsSkip)
 			{
 				foreach (IPipeline pipeline in Pipelines)
@@ -788,10 +774,8 @@ namespace DotnetSpider.Core
 				}
 			}
 
-#if TEST
 			sw.Stop();
-			Console.WriteLine("IPipeline:" + (sw.ElapsedMilliseconds).ToString());
-#endif
+			UpdatePipelineSpeed(sw.ElapsedMilliseconds);
 		}
 
 		protected void ExtractAndAddRequests(Page page, bool spawnUrl)
@@ -874,6 +858,30 @@ namespace DotnetSpider.Core
 			}
 
 			OnClose();
+		}
+
+		private void UpdateDownloadSpeed(long time)
+		{
+			lock (_avgDownloadTimeLocker)
+			{
+				AvgDownloadSpeed = (AvgDownloadSpeed + time) / 2;
+			}
+		}
+
+		private void UpdateProcessorSpeed(long time)
+		{
+			lock (_avgProcessorTimeLocker)
+			{
+				AvgProcessorSpeed = (AvgProcessorSpeed + time) / 2;
+			}
+		}
+
+		private void UpdatePipelineSpeed(long time)
+		{
+			lock (_avgPipelineTimeLocker)
+			{
+				AvgPipelineSpeed = (AvgPipelineSpeed + time) / 2;
+			}
 		}
 	}
 }

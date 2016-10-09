@@ -69,7 +69,10 @@ namespace DotnetSpider.Core.Monitor
 						ThreadNum = spider.ThreadNum,
 						Total = monitor.GetTotalRequestsCount(),
 						UserId = spider.UserId,
-						Timestamp = DateTime.Now.ToString(CultureInfo.InvariantCulture)
+						Timestamp = DateTime.Now.ToString(CultureInfo.InvariantCulture),
+						AvgDownloadSpeed = spider.AvgDownloadSpeed,
+						AvgProcessorSpeed = spider.AvgProcessorSpeed,
+						AvgPipelineSpeed = spider.AvgPipelineSpeed
 					});
 				}
 			}

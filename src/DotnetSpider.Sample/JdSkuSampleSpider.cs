@@ -17,11 +17,7 @@ namespace DotnetSpider.Sample
 			EntitySpider context = new EntitySpider(new Site
 			{
 				//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("快代理API"))
-			})
-			{
-				UserId = "DotnetSpider",
-				TaskGroup = "JdSkuSampleSpider"
-			};
+			});
 			context.SetThreadNum(1);
 			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_hhmmss"));
 			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));

@@ -16,7 +16,7 @@ namespace DotnetSpider.Core.Monitor
 
 		public void Report(SpiderStatus status)
 		{
-			string msg = $"Left {status.Left} Success {status.Success} Error {status.Error} Total {status.Total} Thread {status.ThreadNum}";
+			string msg = $"Left {status.Left} Success {status.Success} Error {status.Error} Total {status.Total} Dowload {status.AvgDownloadSpeed} Extract {status.AvgProcessorSpeed} Pipeline {status.AvgPipelineSpeed}";
 			LogEventInfo theEvent = new LogEventInfo(NLog.LogLevel.Trace, "", msg);
 			theEvent.Properties["UserId"] = status.UserId;
 			theEvent.Properties["TaskGroup"] = status.TaskGroup;
