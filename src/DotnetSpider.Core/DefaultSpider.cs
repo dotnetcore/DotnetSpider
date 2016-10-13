@@ -12,92 +12,10 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// Interface for identifying different tasks.
 	/// </summary>
-	public class DefaultSpider : ISpider
+	public class DefaultSpider : Spider
 	{
-		private static readonly Regex IdentifyRegex = new Regex(@"^[0-9A-Za-z_-]+$");
-
-		public DefaultSpider() : this(Guid.NewGuid().ToString(), new Site())
+		public DefaultSpider(string id, Site site) : base(site, id, "admin", "", new DefaultPageProcessor(), new QueueDuplicateRemovedScheduler())
 		{
-		}
-
-		public DefaultSpider(string uuid, Site site)
-		{
-#if NET_CORE
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
-
-			if (!IdentifyRegex.IsMatch(uuid))
-			{
-				throw new SpiderException("Task Identify only can contains A-Z a-z 0-9 _ - [SPACE]");
-			}
-			Identity = uuid;
-			Site = site;
-		}
-
-		/// <summary>
-		/// Unique id for a task.
-		/// </summary>
-		public string Identity { get; set; }
-
-		/// <summary>
-		/// Site of a task
-		/// </summary>
-		public Site Site { get; }
-
-		public void Exit()
-		{
-		}
-
-		public void Run(params string[] arguments)
-		{
-		}
-
-		public void Stop()
-		{
-		}
-
-		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
-
-		public string UserId { get; } = "Default";
-
-		public string TaskGroup { get; } = "Default";
-
-		public IScheduler Scheduler
-		{
-			get; set;
-		}
-
-		public int ThreadNum
-		{
-			get; set;
-		}
-
-		public List<IPipeline> Pipelines
-		{
-			get; protected set;
-		}
-
-		public IPageProcessor PageProcessor
-		{
-			get; protected set;
-		}
-
-		public void Dispose()
-		{
-		}
-
-		public Task RunAsync(params string[] arguments)
-		{
-			return Task.Factory.StartNew(() =>
-			{
-				Run(arguments);
-			}).ContinueWith(t =>
-			{
-				if (t.Exception != null)
-				{
-					this.Log(t.Exception.Message, LogLevel.Error);
-				}
-			});
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using DotnetSpider.Core.Downloader;
 using Xunit;
@@ -51,6 +52,29 @@ namespace DotnetSpider.Core.Test.Downloader
 			{
 				downloader.Download(new Request("http://www.163.com", 0, null), spider);
 			}
+		}
+
+		[Fact]
+		public void SetContentType()
+		{
+			Site site1 = new Site
+			{
+				Headers = new Dictionary<string, string>()
+				{
+					{"Content-Type","abcd" }
+				}
+			};
+			Site site2 = new Site
+			{
+				Headers = new Dictionary<string, string>()
+				{
+					{"ContentType","abcd" }
+				}
+			};
+			HttpClientDownloader downloader = new HttpClientDownloader();
+			downloader.Download(new Request("http://baidu.com", 0, null), new DefaultSpider("test", site1));
+
+			downloader.Download(new Request("http://baidu.com", 0, null), new DefaultSpider("test", site2));
 		}
 	}
 }

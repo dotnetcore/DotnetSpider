@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 #if !NET_CORE
 using System.Web;
@@ -120,12 +121,12 @@ namespace DotnetSpider.Core.Downloader
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request, Site site)
 		{
 			if (site == null) return null;
+			if (site.Headers == null)
+			{
+				site.Headers = new Dictionary<string, string>();
+			}
 
 			HttpRequestMessage httpWebRequest = CreateRequestMessage(request);
-			if (!site.Headers.ContainsKey("Content-Type") && (site.Headers.ContainsKey("Content-Type") && site.Headers["Content-Type"] != "NULL"))
-			{
-				httpWebRequest.Headers.Add("ContentType", "application /x-www-form-urlencoded; charset=UTF-8");
-			}
 
 			if (site.Headers.ContainsKey("UserAgent"))
 			{
@@ -133,7 +134,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			else
 			{
-				httpWebRequest.Headers.Add("User-Agent", site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36");
+				httpWebRequest.Headers.Add("User-Agent", site.UserAgent);
 			}
 
 			if (!string.IsNullOrEmpty(request.Referer))
@@ -141,11 +142,9 @@ namespace DotnetSpider.Core.Downloader
 				httpWebRequest.Headers.Add("Referer", request.Referer);
 			}
 
-			httpWebRequest.Headers.Add("Accept", site.Accept ?? "application/json, text/javascript, */*; q=0.01");
-
-			if (!site.Headers.ContainsKey("Accept-Language"))
+			if (!string.IsNullOrEmpty(request.Origin))
 			{
-				httpWebRequest.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
+				httpWebRequest.Headers.Add("Origin", request.Origin);
 			}
 
 			if (site.IsUseGzip)
@@ -153,17 +152,14 @@ namespace DotnetSpider.Core.Downloader
 				httpWebRequest.Headers.Add("Accept-Encoding", "gzip");
 			}
 
-			// headers
-			if (site.Headers != null)
+			foreach (var header in site.Headers)
 			{
-				foreach (var header in site.Headers)
+				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) && header.Key != "Content-Type" && header.Key != "User-Agent")
 				{
-					if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) && header.Key != "Content-Type" && header.Key != "User-Agent")
-					{
-						httpWebRequest.Headers.Add(header.Key, header.Value);
-					}
+					httpWebRequest.Headers.Add(header.Key, header.Value);
 				}
 			}
+
 			httpWebRequest.Headers.Add("Cookie", site.GetAllCookiesString());
 
 			if (httpWebRequest.Method == HttpMethod.Post)

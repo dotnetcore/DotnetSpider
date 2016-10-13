@@ -174,6 +174,14 @@ namespace DotnetSpider.Core
 			{
 				Site = new Site();
 			}
+
+			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
+			Site.UserAgent = Site.UserAgent ?? "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
+			if (!Site.Headers.ContainsKey("Accept-Language"))
+			{
+				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
+			}
+
 			PageProcessor.Site = Site;
 			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
 			Downloader = Downloader ?? new HttpClientDownloader();
