@@ -254,6 +254,9 @@
     <Compile Include="..\Pipeline\JsonFilePipeline.cs">
       <Link>Pipeline\JsonFilePipeline.cs</Link>
     </Compile>
+    <Compile Include="..\Processor\DefaultPageProcessor.cs">
+      <Link>Processor\DefaultPageProcessor.cs</Link>
+    </Compile>
     <Compile Include="..\Processor\IPageProcessor.cs">
       <Link>Processor\IPageProcessor.cs</Link>
     </Compile>
