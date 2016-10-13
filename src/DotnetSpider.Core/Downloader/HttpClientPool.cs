@@ -20,7 +20,8 @@ namespace DotnetSpider.Core.Downloader
 		private readonly HttpClient _noProxyHttpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler
 		{
 			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-			UseProxy = false
+			UseProxy = false,
+			UseCookies = false
 		}));
 
 		public HttpClient GetHttpClient(UseSpecifiedUriWebProxy proxy)
@@ -51,6 +52,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
 					UseProxy = true,
+					UseCookies = false,
 					Proxy = proxy
 				}));
 				_pool.Add(key, new HttpClientObj
