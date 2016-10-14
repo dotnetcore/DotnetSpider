@@ -9,6 +9,10 @@ namespace DotnetSpider.Extension.Model.Formatter
 		public string Name => GetType().Name;
 		public string ValueWhenNull { get; set; } = null;
 
+		public bool RetutnDateString { get; set; } = false;
+		public DateTime DateTime { get; set; } = DateTime.Now;
+		public string DateFormat { get; set; }
+
 		protected abstract dynamic FormateValue(dynamic value);
 
 		protected abstract void CheckArguments();

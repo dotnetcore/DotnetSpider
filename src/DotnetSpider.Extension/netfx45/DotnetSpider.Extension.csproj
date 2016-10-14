@@ -231,6 +231,9 @@
     <Compile Include="..\Model\Formatter\CharacterCaseFormater.cs">
       <Link>Model\Formatter\CharacterCaseFormater.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\DigitUnitFormater.cs">
+      <Link>Model\Formatter\DigitUnitFormater.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\DisplaceFormater.cs">
       <Link>Model\Formatter\DisplaceFormater.cs</Link>
     </Compile>
@@ -248,6 +251,9 @@
     </Compile>
     <Compile Include="..\Model\Formatter\RegexFormater.cs">
       <Link>Model\Formatter\RegexFormater.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Formatter\RegexReplaceFormater.cs">
+      <Link>Model\Formatter\RegexReplaceFormater.cs</Link>
     </Compile>
     <Compile Include="..\Model\Formatter\RemoveHtmlTagFormater.cs">
       <Link>Model\Formatter\RemoveHtmlTagFormater.cs</Link>

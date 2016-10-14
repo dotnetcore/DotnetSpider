@@ -172,7 +172,10 @@ namespace DotnetSpider.Core.Downloader
 					httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
 				}
 
-				httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
+				if (!site.Headers.ContainsKey("X-Requested-With") || site.Headers["X-Requested-With"] != "NULL")
+				{
+					httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
+				}
 			}
 			return httpWebRequest;
 		}
