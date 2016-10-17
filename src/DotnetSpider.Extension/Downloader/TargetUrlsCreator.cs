@@ -17,9 +17,39 @@ namespace DotnetSpider.Extension.Downloader
 		bool NeedStop(Page page, BaseTargetUrlsCreator creator);
 	}
 
+	public interface ISetInterval
+	{
+		int? Interval(Page page);
+	}
+
+	public class SelectInterval : ISetInterval
+	{
+		public BaseSelector Selector { get; set; }
+		public Formatter[] IntervalFormatters { get; set; }
+		public int? Interval(Page page)
+		{
+			var intervalStr = page.Selectable.Select(SelectorUtil.Parse(Selector)).GetValue();
+			if (!string.IsNullOrEmpty(intervalStr))
+			{
+				if (IntervalFormatters != null)
+				{
+					foreach (var formatter in IntervalFormatters)
+					{
+						intervalStr = formatter.Formate(intervalStr);
+					}
+				}
+				if (!string.IsNullOrEmpty(intervalStr))
+				{
+					return int.Parse(intervalStr);
+				}
+			}
+			return null;
+		}
+	}
+
 	public abstract class BaseTargetUrlsCreator : IDownloadCompleteHandler
 	{
-		public void Handle(Page page)
+		public virtual void Handle(Page page)
 		{
 			if (Stopper != null)
 			{
@@ -52,6 +82,7 @@ namespace DotnetSpider.Extension.Downloader
 		public string PageIndexKey { get; set; }
 
 		public int Interval { get; set; }
+		public bool DirectlySetOffset { get; set; } = false;
 
 		protected Regex PaggerPattern { get; set; }
 
@@ -67,6 +98,29 @@ namespace DotnetSpider.Extension.Downloader
 			PaggerPattern = new Regex($"{RegexUtil.NumRegex.Replace(PaggerString, @"\d+")}");
 		}
 
+		public override void Handle(Page page)
+		{
+			var i = SetInterval?.Interval(page);
+			if (i != null)
+			{
+				Interval = i.Value;
+			}
+
+			if (Stopper != null)
+			{
+				if (!Stopper.NeedStop(page, this))
+				{
+					page.AddTargetRequests(GenerateRequests(page));
+					page.MissExtractTargetUrls = true;
+				}
+			}
+			else
+			{
+				page.AddTargetRequests(GenerateRequests(page));
+				page.MissExtractTargetUrls = true;
+			}
+		}
+
 		public override string GetCurrentPaggerString(string currentUrl)
 		{
 			return PaggerPattern.Match(currentUrl).Value;
@@ -78,7 +132,15 @@ namespace DotnetSpider.Extension.Downloader
 			int currentIndex;
 			if (int.TryParse(RegexUtil.NumRegex.Match(current).Value, out currentIndex))
 			{
-				int nextIndex = currentIndex + Interval;
+				int nextIndex;
+				if (!DirectlySetOffset)
+				{
+					nextIndex = currentIndex + Interval;
+				}
+				else
+				{
+					nextIndex = Interval;
+				}
 				var next = RegexUtil.NumRegex.Replace(PaggerString, nextIndex.ToString());
 				return currentUrl.Replace(current, next);
 			}
@@ -93,6 +155,8 @@ namespace DotnetSpider.Extension.Downloader
 				page.Request.PutExtra(PageIndexKey, ++pageIndex);
 			}
 		}
+
+		public ISetInterval SetInterval { get; set; }
 	}
 
 	public class IncrementTargetUrlsCreator : BaseIncrementTargetUrlsCreator
@@ -236,7 +300,7 @@ namespace DotnetSpider.Extension.Downloader
 			string current = creator.GetCurrentPaggerString(page.Url);
 			int currentIndex = int.Parse(RegexUtil.NumRegex.Match(current).Value);
 
-			if (currentIndex == Limit)
+			if (currentIndex >= Limit)
 			{
 				return true;
 			}
