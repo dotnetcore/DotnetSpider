@@ -250,6 +250,8 @@ namespace DotnetSpider.Extension.Model
 		public int PostFrom { get; set; }
 		public int PostTo { get; set; }
 
+		public string CookieString { get; set; }
+
 		public override void Build(Spider spider, dynamic obj)
 		{
 			if (string.IsNullOrEmpty(QueryString))
@@ -277,6 +279,10 @@ namespace DotnetSpider.Extension.Model
 								PostBody = GetPostBody(PostBody, data, j),
 								Referer = Referer
 							});
+						}
+						if (!string.IsNullOrEmpty(CookieString))
+						{
+							spider.Site.CookiesStringPart = string.Format(CookieString, arguments.Cast<object>().ToArray());
 						}
 					}
 				}
@@ -317,7 +323,7 @@ namespace DotnetSpider.Extension.Model
 							{
 								if (string.IsNullOrEmpty(ColumnName))
 								{
-									ColumnName = column.Name;									
+									ColumnName = column.Name;
 								}
 								else
 								{

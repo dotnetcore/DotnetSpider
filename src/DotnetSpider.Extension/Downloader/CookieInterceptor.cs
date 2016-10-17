@@ -1,5 +1,8 @@
 using DotnetSpider.Core;
 using System.Collections.Generic;
+using DotnetSpider.Core.Downloader;
+using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using LogLevel = DotnetSpider.Core.LogLevel;
 #if !NET_CORE
 using System;
@@ -25,6 +28,14 @@ namespace DotnetSpider.Extension.Downloader
 	public abstract class CookieInterceptor : Named
 	{
 		public abstract SiteCookie GetCookie();
+	}
+
+	public class DataBaseCookieInterceptor : CookieInterceptor
+	{
+		public override SiteCookie GetCookie()
+		{
+			return new SiteCookie();
+		}
 	}
 
 #if !NET_CORE
