@@ -147,9 +147,14 @@ namespace DotnetSpider.Core.Downloader
 				httpWebRequest.Headers.Add("Origin", request.Origin);
 			}
 
-			if (site.IsUseGzip)
+			if (!string.IsNullOrEmpty(request.Origin))
 			{
-				httpWebRequest.Headers.Add("Accept-Encoding", "gzip");
+				httpWebRequest.Headers.Add("Origin", request.Origin);
+			}
+
+			if (!string.IsNullOrEmpty(site.Accept))
+			{
+				httpWebRequest.Headers.Add("Accept", site.Accept);
 			}
 
 			foreach (var header in site.Headers)
@@ -172,7 +177,11 @@ namespace DotnetSpider.Core.Downloader
 					httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
 				}
 
-				if (!site.Headers.ContainsKey("X-Requested-With") || site.Headers["X-Requested-With"] != "NULL")
+				if (site.Headers.ContainsKey("X-Requested-With") && site.Headers["X-Requested-With"] == "NULL")
+				{
+					httpWebRequest.Content.Headers.Remove("X-Requested-With");
+				}
+				else if (!site.Headers.ContainsKey("X-Requested-With") || site.Headers["X-Requested-With"] != "NULL")
 				{
 					httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
 				}

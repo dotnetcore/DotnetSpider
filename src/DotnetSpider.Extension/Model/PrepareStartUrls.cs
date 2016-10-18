@@ -40,8 +40,11 @@ namespace DotnetSpider.Extension.Model
 	{
 		public int From { get; set; }
 		public int To { get; set; }
+		public int PostFrom { get; set; }
+		public int PostTo { get; set; }
 
 		public int Interval { get; set; } = 1;
+		public int PostInterval { get; set; } = 1;
 
 		public string FormateString { get; set; }
 
@@ -59,13 +62,16 @@ namespace DotnetSpider.Extension.Model
 
 			for (int i = From; i <= To; i += Interval)
 			{
-				spider.Scheduler.Push(new Request(string.Format(FormateString, i), 1, data)
+				for (int j = From; j <= To; j += PostInterval)
 				{
-					PostBody = PostBody,
-					Origin = Origin,
-					Method = Method,
-					Referer = Referer
-				});
+					spider.Scheduler.Push(new Request(string.Format(FormateString, i), 1, data)
+					{
+						PostBody = string.IsNullOrEmpty(PostBody) ? null : string.Format(PostBody, j),
+						Origin = Origin,
+						Method = Method,
+						Referer = Referer
+					});
+				}
 			}
 		}
 	}
@@ -262,29 +268,31 @@ namespace DotnetSpider.Extension.Model
 			var datas = PrepareDatas();
 			foreach (var data in datas)
 			{
+				var arguments = PrepareArguments(data);
+				if (!string.IsNullOrEmpty(CookieString))
+				{
+					spider.Site.CookiesStringPart = string.Format(CookieString, arguments.Cast<object>().ToArray());
+				}
 				for (int i = From; i <= To; i += Interval)
 				{
-					var arguments = PrepareArguments(data);
 					arguments.Add(i.ToString());
-
 					for (int j = PostFrom; j <= PostTo; j += PostInterval)
 					{
+						arguments.Add(j.ToString());
 						foreach (var formate in FormateStrings)
 						{
 							string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
 							spider.Scheduler.Push(new Request(tmpUrl, 0, data)
 							{
 								Method = Method,
-								Origin = Origin,
-								PostBody = GetPostBody(PostBody, data, j),
-								Referer = Referer
+								Origin = !string.IsNullOrEmpty(Origin) ? string.Format(Origin, arguments.Cast<object>().ToArray()) : null,
+								PostBody = !string.IsNullOrEmpty(PostBody) ? string.Format(PostBody, arguments.Cast<object>().ToArray()) : null,
+								Referer = !string.IsNullOrEmpty(Referer) ? string.Format(Referer, arguments.Cast<object>().ToArray()): null
 							});
 						}
-						if (!string.IsNullOrEmpty(CookieString))
-						{
-							spider.Site.CookiesStringPart = string.Format(CookieString, arguments.Cast<object>().ToArray());
-						}
+						arguments.RemoveAt(arguments.Count - 1);
 					}
+					arguments.RemoveAt(arguments.Count - 1);
 				}
 			}
 		}
