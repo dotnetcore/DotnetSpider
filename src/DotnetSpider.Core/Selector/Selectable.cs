@@ -64,7 +64,7 @@ namespace DotnetSpider.Core.Selector
 		public override ISelectable Links()
 		{
 			//Different to ".//a", "./descendant-or-self::a" can get the root(self) element if it is an "a"(hyperlink) element.
-			return XPath("./descendant-or-self::a/@href").Regex(@"((http|ftp|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-,#]*)?");
+			return XPath("./descendant-or-self::a/@href").Regex(@"((http|ftp|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-,#]*)?(\?[a-zA-Z0-9\&%_\./-~-,#]*)?");
 		}
 
 		public override ISelectable XPath(string xpath)

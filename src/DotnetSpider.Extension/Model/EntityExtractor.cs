@@ -138,7 +138,7 @@ namespace DotnetSpider.Extension.Model
 				var links = urlRegionSelector == null ? page.Selectable.Links().GetValues() : (page.Selectable.SelectList(urlRegionSelector)).Links().GetValues();
 				if (links == null)
 				{
-					return;
+					continue;
 				}
 
 				// check: 仔细考虑是放在前面, 还是在后面做 formatter, 我倾向于在前面. 对targetUrl做formatter则表示Start Url也应该是要符合这个规则的。
@@ -171,7 +171,7 @@ namespace DotnetSpider.Extension.Model
 				if (urlPatterns == null || urlPatterns.Count == 0)
 				{
 					page.AddTargetRequests(links);
-					return;
+					continue;
 				}
 
 				foreach (Regex targetUrlPattern in urlPatterns)
