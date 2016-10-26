@@ -65,7 +65,8 @@ namespace DotnetSpider.Redial
 
 		public override bool CheckIsRedialing()
 		{
-			if (Db.HashExists(HostName, Locker))
+			var locker = Db.HashGet(HostName, Locker);
+			if (!locker.HasValue)
 			{
 				Db.HashSet(HostName, Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 				return false;
