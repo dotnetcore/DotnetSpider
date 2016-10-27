@@ -86,6 +86,9 @@
     <Compile Include="..\IRedialExecutor.cs">
       <Link>IRedialExecutor.cs</Link>
     </Compile>
+    <Compile Include="..\Redialer\AdslCommandRedialer.cs">
+      <Link>Redialer\AdslCommandRedialer.cs</Link>
+    </Compile>
     <Compile Include="..\Redialer\AdslRedialer.cs">
       <Link>Redialer\AdslRedialer.cs</Link>
     </Compile>
@@ -112,6 +115,9 @@
     </Compile>
     <Compile Include="..\Utils\Adsl.cs">
       <Link>Utils\Adsl.cs</Link>
+    </Compile>
+    <Compile Include="..\Utils\AdslCommandUtil.cs">
+      <Link>Utils\AdslCommandUtil.cs</Link>
     </Compile>
     <Compile Include="..\Utils\NetInterfaceUtils.cs">
       <Link>Utils\NetInterfaceUtils.cs</Link>
