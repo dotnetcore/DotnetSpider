@@ -8,7 +8,7 @@ using DotnetSpider.Core.Common;
 
 namespace DotnetSpider.Core.Proxy
 {
-	public class HttpProxyPool
+	public class HttpProxyPool : IHttpProxyPool
 	{
 		private readonly IProxySupplier _supplier;
 		private readonly List<Proxy> _proxyQueue = new List<Proxy>();
@@ -126,11 +126,6 @@ namespace DotnetSpider.Core.Proxy
 			}
 
 			_proxyQueue.Add(p);
-		}
-
-		public int GetIdleNum()
-		{
-			return _proxyQueue.Count;
 		}
 	}
 }
