@@ -1,8 +1,5 @@
 using DotnetSpider.Core;
 using System.Collections.Generic;
-using DotnetSpider.Core.Downloader;
-using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Bcpg.OpenPgp;
 using LogLevel = DotnetSpider.Core.LogLevel;
 #if !NET_CORE
 using System;

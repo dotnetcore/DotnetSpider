@@ -11,7 +11,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Site
 	{
-		public HttpProxyPool HttpProxyPool { get; set; }
+		public IHttpProxyPool HttpProxyPool { get; set; }
 		private string _domain;
 		private Encoding _encoding = Encoding.UTF8;
 		private string _encodingName;
