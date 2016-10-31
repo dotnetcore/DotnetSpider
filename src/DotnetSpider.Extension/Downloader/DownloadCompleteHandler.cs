@@ -1,4 +1,5 @@
-﻿using DotnetSpider.Core;
+﻿using System;
+using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Redial;
 
@@ -42,6 +43,46 @@ namespace DotnetSpider.Extension.Downloader
 					((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
 					throw new DownloadException("Download failed and redial finished already.");
 				}
+			}
+		}
+	}
+
+	public class RedialAndUpdateCookieWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	{
+		public string ContainsString { get; set; }
+		public ISpider Spider { get; set; }
+
+		public override void Handle(Page page)
+		{
+			if (Spider == null)
+			{
+				throw new ArgumentNullException();
+			}
+			if (!(Spider is EntitySpider))
+			{
+				throw new ArgumentException("Only Support EntitySpider");
+			}
+			if (((EntitySpider)Spider).CookieInterceptor == null)
+			{
+				throw new ArgumentException("Please Set Cookie Interceptor");
+			}
+
+			string rawText = page.Content;
+			if (string.IsNullOrEmpty(rawText))
+			{
+				throw new DownloadException("Download failed or response is null.");
+			}
+			if (rawText.Contains(ContainsString))
+			{
+				((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
+				var cookie = ((EntitySpider)Spider).CookieInterceptor.GetCookie();
+				if (cookie != null)
+				{
+					Spider.Site.Cookies = cookie.CookiesDictionary;
+					Spider.Site.CookiesStringPart = cookie.CookiesStringPart;
+				}
+
+				throw new DownloadException($"Content downloaded contains illegal string: {ContainsString}.");
 			}
 		}
 	}

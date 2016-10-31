@@ -176,7 +176,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\packages\Chromium.ChromeDriver.2.22\content\chromedriver.exe">
+    <Content Include="..\..\..\packages\Chromium.ChromeDriver.2.25\content\chromedriver.exe">
       <Link>chromedriver.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -39,7 +39,7 @@
         },
         "DotnetSpider.HtmlAgilityPack": "0.0.9",
         "DotnetSpider.HtmlAgilityPack.Css": "0.0.9",
-        "SapientGuardian.MySql.Data": "6.9.812",
+        "MySql.Data": "7.0.5-IR21",
         "System.Data.Common": "4.1.0",
         "Microsoft.CSharp": "4.0.1",
         "System.Data.SqlClient": "4.1.0",
