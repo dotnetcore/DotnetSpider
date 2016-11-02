@@ -1,12 +1,20 @@
 {
-  "version": "0.0.9",
+  "version": "1.0.0-*",
+  "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
+  "description": "This is the offical package.",
+  "packOptions": {
+    "licenseUrl": "https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE",
+    "repository": { "url": "https://github.com/zlzforever/DotnetSpider" },
+    "owners": [ "zlzforever@163.com" ],
+    "tags": [ "DotnetSpider", "Crawler", "Cross Platform", ".Net Core" ]
+  },
   "buildOptions": {
     "emitEntryPoint": false,
     "debugType": "portable"
   },
   "dependencies": {
-    "DotnetSpider.Core": "0.0.9",
-    "DotnetSpider.Redial": "0.0.9",
+    "DotnetSpider.Core": "1.0.0-*",
+    "DotnetSpider.Redial": "1.0.0-*",
     "MongoDB.Driver": "2.3.0",
     "Newtonsoft.Json": "9.0.1"
   },
@@ -33,24 +41,24 @@
     "netcoreapp1.0": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
+        "DotnetSpider.HtmlAgilityPack": "1.0.0-*",
+        "DotnetSpider.HtmlAgilityPack.Css": "1.0.0-*",
+        "MailKit": "1.4.1",
+        "Microsoft.CSharp": "4.0.1",
+        "Microsoft.Extensions.DependencyInjection": "1.0.0",
+        "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.0.0"
         },
-        "DotnetSpider.HtmlAgilityPack": "0.0.9",
-        "DotnetSpider.HtmlAgilityPack.Css": "0.0.9",
         "MySql.Data": "7.0.5-IR21",
+        "StackExchange.Redis": "1.1.608",
         "System.Data.Common": "4.1.0",
-        "Microsoft.CSharp": "4.0.1",
         "System.Data.SqlClient": "4.1.0",
         "System.Dynamic.Runtime": "4.0.11",
-        "System.Runtime.Serialization.Primitives": "4.1.1",
-        "System.Xml.XDocument": "4.0.11",
         "System.Runtime.Extensions": "4.1.0",
-        "StackExchange.Redis": "1.1.608",
-        "Microsoft.Extensions.DependencyInjection": "1.0.0",
-        "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
-        "MailKit": "1.4.1"
+        "System.Runtime.Serialization.Primitives": "4.1.1",
+        "System.Xml.XDocument": "4.3.0"
       },
       "buildOptions": {
         "define": [

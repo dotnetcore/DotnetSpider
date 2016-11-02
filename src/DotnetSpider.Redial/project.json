@@ -1,10 +1,19 @@
 {
+  "version": "1.0.0-*",
+  "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
+  "description": "This is the offical package.",
+  "packOptions": {
+    "licenseUrl": "https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE",
+    "repository": { "url": "https://github.com/zlzforever/DotnetSpider" },
+    "owners": [ "zlzforever@163.com" ],
+    "tags": [ "DotnetSpider", "Crawler", "Cross Platform", ".Net Core" ]
+  },
   "buildOptions": {
     "emitEntryPoint": false,
     "debugType": "portable"
   },
   "dependencies": {
-    "DotnetSpider.Core": "0.0.9",
+    "DotnetSpider.Core": "1.0.0-*",
     "StackExchange.Redis": "1.1.608",
     "SSH.NET": "2016.0.0"
   },
@@ -43,6 +52,6 @@
         ]
       }
     }
-  },
-  "version": "0.0.9"
+  }
+
 }

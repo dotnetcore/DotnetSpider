@@ -1,30 +1,39 @@
 {
-	"version": "0.0.9",
-	"buildOptions": {
-		"emitEntryPoint": false,
-		"debugType": "portable"
-	},
-	"dependencies": {
-		"Microsoft.NETCore.App": {
-			"type": "platform",
-			"version": "1.0.0"
-		},
-		"System.Xml.XmlDocument": "*",
-		"System.Xml.ReaderWriter": "*",
-		"System.Xml.XPath": "*",
-		"System.Xml.XPath.XDocument": "*",
-		"System.Diagnostics.StackTrace": "*"
-	},
-	"frameworks": {
-		"netcoreapp1.0": {
-			"imports": "portable-net45+win8+dnxcore50",
-			"dependencies": {},
-			"buildOptions": {
-				"define": [
-					"NET_CORE",
-					"RELEASE"
-				]
-			}
-		}
-	}
+  "version": "1.0.0-*",
+  "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
+  "description": "This is the offical package.",
+  "packOptions": {
+    "licenseUrl": "https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE",
+    "repository": { "url": "https://github.com/zlzforever/DotnetSpider" },
+    "owners": [ "zlzforever@163.com" ],
+    "tags": [ "DotnetSpider", "Crawler", "Cross Platform", ".Net Core" ]
+  },
+  "language": "C#",
+  "buildOptions": {
+    "emitEntryPoint": false,
+    "debugType": "portable"
+  },
+  "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0"
+    },
+    "System.Xml.XmlDocument": "4.0.1",
+    "System.Xml.ReaderWriter": "4.0.11",
+    "System.Xml.XPath": "4.0.1",
+    "System.Xml.XPath.XDocument": "4.0.1",
+    "System.Diagnostics.StackTrace": "4.0.1"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": "portable-net45+win8+dnxcore50",
+      "dependencies": {},
+      "buildOptions": {
+        "define": [
+          "NET_CORE",
+          "RELEASE"
+        ]
+      }
+    }
+  }
 }

@@ -1,5 +1,13 @@
 {
-  "version": "0.0.9",
+  "version": "1.0.0-*",
+  "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
+  "description": "This is the offical package.",
+  "packOptions": {
+    "licenseUrl": "https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE",
+    "repository": { "url": "https://github.com/zlzforever/DotnetSpider" },
+    "owners": [ "zlzforever@163.com" ],
+    "tags": [ "DotnetSpider", "Crawler", "Cross Platform", ".Net Core" ]
+  },
   "buildOptions": {
     "emitEntryPoint": false,
     "debugType": "portable"
@@ -33,31 +41,31 @@
     "netcoreapp1.0": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
+        "DotnetSpider.HtmlAgilityPack": "1.0.0-rc1",
+        "DotnetSpider.HtmlAgilityPack.Css": "1.0.0-rc1",
+        "Microsoft.CSharp": "4.0.1",
+        "Microsoft.Extensions.Configuration.Binder": "1.0.0",
+        "Microsoft.Extensions.Configuration.Ini": "1.0.0",
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.0.0"
         },
-        "System.Net.Http": "4.1.0",
         "NLog": "4.4.0-betaV15",
-        "DotnetSpider.HtmlAgilityPack": "0.0.9",
-        "DotnetSpider.HtmlAgilityPack.Css": "0.0.9",
+        "System.Collections.NonGeneric": "4.0.1",
+        "System.Dynamic.Runtime": "4.0.11",
+        "System.IO.Compression": "4.1.0",
+        "System.Net.Http": "4.1.0",
+        "System.Net.NameResolution": "4.0.0",
+        "System.Net.Requests": "4.0.11",
+        "System.Runtime.Extensions": "4.1.0",
+        "System.Runtime.Serialization.Primitives": "4.1.1",
         "System.Security.Cryptography.Algorithms": "4.2.0",
         "System.Security.Cryptography.Primitives": "4.0.0",
+        "System.Text.Encoding.CodePages": "4.0.1",
+        "System.Threading.Tasks.Parallel": "4.0.1",
         "System.Threading.Thread": "4.0.0",
         "System.Threading.ThreadPool": "4.0.10",
-        "System.Dynamic.Runtime": "4.0.11",
-        "System.Collections.NonGeneric": "4.0.1",
-        "System.Threading.Tasks.Parallel": "4.0.1",
-        "System.Runtime.Extensions": "4.1.0",
-        "Microsoft.CSharp": "4.0.1",
-        "System.IO.Compression": "4.1.0",
-        "System.Net.Requests": "4.0.11",
-        "System.Text.Encoding.CodePages": "4.0.1",
-        "System.Runtime.Serialization.Primitives": "4.1.1",
-        "System.Xml.XDocument": "4.0.11",
-        "System.Net.NameResolution": "4.0.0",
-        "Microsoft.Extensions.Configuration.Ini": "1.0.0",
-        "Microsoft.Extensions.Configuration.Binder": "1.0.0"
+        "System.Xml.XDocument": "4.0.11"
       },
       "buildOptions": {
         "define": [

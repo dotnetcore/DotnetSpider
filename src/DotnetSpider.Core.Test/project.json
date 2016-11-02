@@ -12,16 +12,15 @@
       "xunit.runner.json"
     ]
   },
-
   "publishOptions": {
     "includeFiles": [ "config.ini", "nlog.netcore.config", "nlog.net45.config", "Jd.html" ]
   },
   "dependencies": {
-    "DotnetSpider.Core": "0.0.9",
     "Dapper": "1.50.2",
+    "DotnetSpider.Core": "1.0.0-*",
     "xunit": "2.2.0-beta3-build3402",
-    "xunit.runner.visualstudio": "2.2.0-beta3-build1187",
-    "xunit.runner.console": "2.2.0-beta3-build3402"
+    "xunit.runner.console": "2.2.0-beta3-build3402",
+    "xunit.runner.visualstudio": "2.2.0-beta3-build1187"
   },
   "frameworks": {
     "netcoreapp1.0": {

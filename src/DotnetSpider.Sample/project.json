@@ -9,10 +9,10 @@
     "includeFiles": [ "config.ini", "nlog.netcore.config", "nlog.net45.config" ]
   },
   "dependencies": {
-    "DotnetSpider.Core": "0.0.9",
-    "DotnetSpider.Extension": "0.0.9",
-    "DotnetSpider.Redial": "0.0.9",
     "Dapper": "1.50.2",
+    "DotnetSpider.Core": "1.0.0-*",
+    "DotnetSpider.Extension": "1.0.0-*",
+    "DotnetSpider.Redial": "1.0.0-*",
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
   },
   "frameworks": {
