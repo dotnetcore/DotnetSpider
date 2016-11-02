@@ -21,8 +21,6 @@ namespace DotnetSpider.Extension.Model.Formatter
 				return ValueWhenNull;
 			}
 			MatchCollection matches = Regex.Matches(tmp, Pattern);
-			return matches.Count > 0 ? (True == Id ? matches[0].Value : True) : (False == Id ? tmp : False);
-
 			if (matches.Count > 0)
 			{
 				if (True == Id)
