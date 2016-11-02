@@ -11,6 +11,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		public string Pattern { get; set; }
 		public string True { get; set; } = Id;
 		public string False { get; set; } = Id;
+		public int Group { get; set; } = -1;
 
 		protected override dynamic FormateValue(dynamic value)
 		{
@@ -21,6 +22,36 @@ namespace DotnetSpider.Extension.Model.Formatter
 			}
 			MatchCollection matches = Regex.Matches(tmp, Pattern);
 			return matches.Count > 0 ? (True == Id ? matches[0].Value : True) : (False == Id ? tmp : False);
+
+			if (matches.Count > 0)
+			{
+				if (True == Id)
+				{
+					if (Group < 0)
+					{
+						return matches[0].Value;
+					}
+					else
+					{
+						return matches[0].Groups[Group];
+					}
+				}
+				else
+				{
+					return True;
+				}
+			}
+			else
+			{
+				if (False == Id)
+				{
+					return tmp;
+				}
+				else
+				{
+					return False;
+				}
+			}
 		}
 
 		protected override void CheckArguments()
