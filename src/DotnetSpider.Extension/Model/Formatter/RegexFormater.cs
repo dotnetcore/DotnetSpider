@@ -31,7 +31,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 					}
 					else
 					{
-						return matches[0].Groups[Group];
+						return matches[0].Groups[Group].Value;
 					}
 				}
 				else
