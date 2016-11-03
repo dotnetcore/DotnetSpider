@@ -9,6 +9,7 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Core.Proxy;
 
 namespace DotnetSpider.Sample
 {
@@ -79,7 +80,9 @@ namespace DotnetSpider.Sample
 
 		protected override EntitySpider GetEntitySpider()
 		{
-			var entitySpider = new EntitySpider(new Site())
+			var entitySpider = new EntitySpider(new Site {
+				HttpProxyPool=new SingleProxyPool(new UseSpecifiedUriWebProxy(new Uri("http://sdfsdf:1234")))
+			})
 			{
 				Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Day1OfThisWeek.ToString("yyyy-MM-dd")
 			};

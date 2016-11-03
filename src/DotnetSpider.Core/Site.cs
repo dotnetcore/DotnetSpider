@@ -136,11 +136,6 @@ namespace DotnetSpider.Core
 		public int CycleRetryTimes { get; set; } = 5;
 
 		/// <summary>
-		/// Set or Get up httpProxy for this site
-		/// </summary>
-		public string HttpProxy { get; set; }
-
-		/// <summary>
 		/// Whether use gzip.  
 		/// Default is true, you can set it to false to disable gzip.
 		/// </summary>

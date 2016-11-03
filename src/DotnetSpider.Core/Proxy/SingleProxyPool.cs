@@ -6,6 +6,11 @@ namespace DotnetSpider.Core.Proxy
 	{
 		private UseSpecifiedUriWebProxy _proxy;
 
+		public SingleProxyPool(string url)
+		{
+			_proxy = new UseSpecifiedUriWebProxy(new System.Uri(url));
+		}
+
 		public SingleProxyPool(UseSpecifiedUriWebProxy proxy)
 		{
 			_proxy = proxy;
