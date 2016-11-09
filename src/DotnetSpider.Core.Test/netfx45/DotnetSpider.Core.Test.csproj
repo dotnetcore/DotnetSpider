@@ -90,6 +90,9 @@
     <Compile Include="..\Pipeline\JsonFilePipelineTest.cs">
       <Link>Pipeline\JsonFilePipelineTest.cs</Link>
     </Compile>
+    <Compile Include="..\Processor\TargetUrlTests.cs">
+      <Link>Processor\TargetUrlTests.cs</Link>
+    </Compile>
     <Compile Include="..\Program.cs">
       <Link>Program.cs</Link>
     </Compile>

@@ -27,8 +27,8 @@ namespace DotnetSpider.Core.Test
 				Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					new TestPageProcessor(), new QueueDuplicateRemovedScheduler());
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new QueueDuplicateRemovedScheduler(),
+					new TestPageProcessor());
 			}
 			catch (SpiderException exception)
 			{
@@ -40,8 +40,8 @@ namespace DotnetSpider.Core.Test
 				Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
 					"abc",
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					new TestPageProcessor(), new QueueDuplicateRemovedScheduler());
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new QueueDuplicateRemovedScheduler(),
+					new TestPageProcessor());
 			}
 			catch (SpiderException exception)
 			{
@@ -53,8 +53,8 @@ namespace DotnetSpider.Core.Test
 				Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
 					"abcd",
 					"abbb",
-					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					new TestPageProcessor(), new QueueDuplicateRemovedScheduler());
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new QueueDuplicateRemovedScheduler(),
+					new TestPageProcessor());
 			}
 			catch (SpiderException exception)
 			{
@@ -111,8 +111,8 @@ namespace DotnetSpider.Core.Test
 			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
 				id,
 				userId,
-				taskGroup,
-				new TestPageProcessor(), new QueueDuplicateRemovedScheduler()))
+				taskGroup, new QueueDuplicateRemovedScheduler(),
+				new TestPageProcessor()))
 			{
 				spider.AddPipeline(new TestPipeline()).SetThreadNum(1);
 				for (int i = 0; i < 5; i++)
@@ -149,14 +149,9 @@ namespace DotnetSpider.Core.Test
 			}
 		}
 
-		public class TestPageProcessor : IPageProcessor
+		public class TestPageProcessor : BasePageProcessor
 		{
-			public Site Site
-			{
-				get; set;
-			}
-
-			public void Process(Page page)
+			protected override void Handle(Page page)
 			{
 				page.IsSkip = true;
 			}

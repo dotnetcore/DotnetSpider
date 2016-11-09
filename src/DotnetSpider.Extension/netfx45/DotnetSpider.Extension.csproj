@@ -206,17 +206,20 @@
     <Compile Include="..\Model\Attribute\EntitySelector.cs">
       <Link>Model\Attribute\EntitySelector.cs</Link>
     </Compile>
-    <Compile Include="..\Model\Attribute\GlobalValueSelector.cs">
-      <Link>Model\Attribute\GlobalValueSelector.cs</Link>
-    </Compile>
     <Compile Include="..\Model\Attribute\Indexes.cs">
       <Link>Model\Attribute\Indexes.cs</Link>
     </Compile>
     <Compile Include="..\Model\Attribute\PropertySelector.cs">
       <Link>Model\Attribute\PropertySelector.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Attribute\SharedValueSelector.cs">
+      <Link>Model\Attribute\SharedValueSelector.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Attribute\TargetUrl.cs">
       <Link>Model\Attribute\TargetUrl.cs</Link>
+    </Compile>
+    <Compile Include="..\Model\Attribute\TargetUrlsSelector.cs">
+      <Link>Model\Attribute\TargetUrlsSelector.cs</Link>
     </Compile>
     <Compile Include="..\Model\Attribute\UpdateColumns.cs">
       <Link>Model\Attribute\UpdateColumns.cs</Link>
@@ -281,9 +284,6 @@
     <Compile Include="..\Model\Formatter\UrlEncodeFormater.cs">
       <Link>Model\Formatter\UrlEncodeFormater.cs</Link>
     </Compile>
-    <Compile Include="..\Model\GlobalValue.cs">
-      <Link>Model\GlobalValue.cs</Link>
-    </Compile>
     <Compile Include="..\Model\IEntityExtractor.cs">
       <Link>Model\IEntityExtractor.cs</Link>
     </Compile>
@@ -298,9 +298,6 @@
     </Compile>
     <Compile Include="..\Model\Selector.cs">
       <Link>Model\Selector.cs</Link>
-    </Compile>
-    <Compile Include="..\Model\TargetUrlExtractor.cs">
-      <Link>Model\TargetUrlExtractor.cs</Link>
     </Compile>
     <Compile Include="..\Monitor\HttpMonitor.cs">
       <Link>Monitor\HttpMonitor.cs</Link>

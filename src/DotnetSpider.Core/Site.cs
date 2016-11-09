@@ -125,12 +125,6 @@ namespace DotnetSpider.Core
 		public int MinSleepTime { get; set; } = 1;
 
 		/// <summary>
-		/// Get or Set retry times immediately when download fail, 5 by default.
-		/// </summary>
-		/// <returns></returns>
-		public int RetryTimes { get; set; } = 5;
-
-		/// <summary>
 		/// When cycleRetryTimes is more than 0, it will add back to scheduler and try download again. 
 		/// </summary>
 		public int CycleRetryTimes { get; set; } = 5;
@@ -233,7 +227,6 @@ namespace DotnetSpider.Core
 					", cookies=" + _allCookiesString +
 					", charset='" + Encoding + '\'' +
 					", startRequests=" + StartRequests +
-					", retryTimes=" + RetryTimes +
 					", cycleRetryTimes=" + CycleRetryTimes +
 					", timeOut=" + Timeout +
 					", acceptStatCode=" + AcceptStatCode +

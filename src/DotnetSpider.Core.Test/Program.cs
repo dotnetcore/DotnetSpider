@@ -11,7 +11,8 @@ namespace DotnetSpider.Core.Test
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-			IocContainer.Default.AddSingleton<IMonitor, NLogMonitor>();
+
+			IocManager.AddSingleton<IMonitor, NLogMonitor>();
 
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new SpiderTest.TestPageProcessor()).AddPipeline(new SpiderTest.TestPipeline()).SetThreadNum(1);
 			spider.SetDownloader(new TestDownloader());

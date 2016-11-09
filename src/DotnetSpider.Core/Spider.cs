@@ -14,6 +14,7 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace DotnetSpider.Core
 {
@@ -25,7 +26,7 @@ namespace DotnetSpider.Core
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 		protected bool IsExitWhenComplete { get; set; } = true;
-		protected IPageProcessor PageProcessor { get; set; }
+		protected List<IPageProcessor> PageProcessors { get; set; }
 		protected List<IPipeline> Pipelines { get; set; } = new List<IPipeline>();
 		protected bool IsExited { get; set; }
 		protected int WaitInterval = 10;
@@ -72,9 +73,9 @@ namespace DotnetSpider.Core
 		/// <param name="site"></param>
 		/// <param name="pageProcessor"></param>
 		/// <returns></returns>
-		public static Spider Create(Site site, IPageProcessor pageProcessor)
+		public static Spider Create(Site site, params IPageProcessor[] pageProcessors)
 		{
-			return new Spider(site, Guid.NewGuid().ToString(), null, null, pageProcessor, new QueueDuplicateRemovedScheduler());
+			return new Spider(site, Guid.NewGuid().ToString(), null, null, new QueueDuplicateRemovedScheduler(), pageProcessors);
 		}
 
 		/// <summary>
@@ -84,9 +85,9 @@ namespace DotnetSpider.Core
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
 		/// <returns></returns>
-		public static Spider Create(Site site, IPageProcessor pageProcessor, IScheduler scheduler)
+		public static Spider Create(Site site, IScheduler scheduler, params IPageProcessor[] pageProcessors)
 		{
-			return new Spider(site, Guid.NewGuid().ToString(), null, null, pageProcessor, scheduler);
+			return new Spider(site, Guid.NewGuid().ToString(), null, null, scheduler, pageProcessors);
 		}
 
 		/// <summary>
@@ -99,9 +100,9 @@ namespace DotnetSpider.Core
 		/// <param name="scheduler"></param>
 		/// <param name="userid"></param>
 		/// <returns></returns>
-		public static Spider Create(Site site, string identify, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler)
+		public static Spider Create(Site site, string identify, string userid, string taskGroup, IScheduler scheduler, params IPageProcessor[] pageProcessors)
 		{
-			return new Spider(site, identify, userid, taskGroup, pageProcessor, scheduler);
+			return new Spider(site, identify, userid, taskGroup, scheduler, pageProcessors);
 		}
 
 		protected Spider()
@@ -121,11 +122,11 @@ namespace DotnetSpider.Core
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
 		/// <param name="userid"></param>
-		protected Spider(Site site, string identity, string userid, string taskGroup, IPageProcessor pageProcessor, IScheduler scheduler) : this()
+		protected Spider(Site site, string identity, string userid, string taskGroup, IScheduler scheduler, params IPageProcessor[] pageProcessor) : this()
 		{
 			Identity = identity;
 			UserId = userid;
-			PageProcessor = pageProcessor;
+			PageProcessors = pageProcessor.ToList();
 			Site = site;
 			TaskGroup = taskGroup;
 			Scheduler = scheduler;
@@ -165,7 +166,7 @@ namespace DotnetSpider.Core
 				throw new SpiderException("Length of TaskGroup should less than 100.");
 			}
 
-			if (PageProcessor == null)
+			if (PageProcessors == null)
 			{
 				throw new SpiderException("PageProcessor should not be null.");
 			}
@@ -182,7 +183,10 @@ namespace DotnetSpider.Core
 				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
 			}
 
-			PageProcessor.Site = Site;
+			foreach (var processor in PageProcessors)
+			{
+				processor.Site = Site;
+			}
 			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
 			Downloader = Downloader ?? new HttpClientDownloader();
 		}
@@ -425,7 +429,7 @@ namespace DotnetSpider.Core
 
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
-				this.Log($"[步骤 1] 添加链接到调度中心, 数量: {Site.StartRequests.Count}.", LogLevel.Info);
+				this.Log($"准备步骤: 添加链接到调度中心, 数量 {Site.StartRequests.Count}.", LogLevel.Info);
 				//Logger.SaveLog(LogInfo.Create(, Logger.Name, this, LogLevel.Info));
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
@@ -442,7 +446,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				this.Log("[步骤 1] 添加链接到调度中心, 数量: 0.", LogLevel.Info);
+				this.Log("准备步骤: 添加链接到调度中心, 数量 0.", LogLevel.Info);
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
@@ -615,7 +619,7 @@ namespace DotnetSpider.Core
 			}
 
 			SafeDestroy(Scheduler);
-			SafeDestroy(PageProcessor);
+			SafeDestroy(PageProcessors);
 			SafeDestroy(Downloader);
 		}
 
@@ -705,7 +709,10 @@ namespace DotnetSpider.Core
 				sw.Reset();
 				sw.Start();
 
-				PageProcessor.Process(page);
+				foreach (var processor in PageProcessors)
+				{
+					processor.Process(page);
+				}
 
 				sw.Stop();
 				UpdateProcessorSpeed(sw.ElapsedMilliseconds);

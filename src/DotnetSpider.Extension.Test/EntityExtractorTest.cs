@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo());
 			EntityExtractor extractor = new EntityExtractor("test", null, entityMetadata);
-			var results = extractor.Process(new Page(new Request("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", 1, new Dictionary<string, dynamic>
+			var results = extractor.Extract(new Page(new Request("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", 1, new Dictionary<string, dynamic>
 			{
 				{ "cat", "手机" },
 				{ "cat3", "110" }

@@ -34,13 +34,17 @@ namespace DotnetSpider.Core.Common
 						dbTarget.ConnectionString = connectString;
 					}
 				}
-
-				var needDeleteRules = configuration.LoggingRules.Where(r => r.Targets.Any(t => t is DatabaseTarget && ((DatabaseTarget)t).ConnectionString == null)).ToList();
-				foreach (var rule in needDeleteRules)
+				else
 				{
-					configuration.LoggingRules.Remove(rule);
+					var needDeleteRules = configuration.LoggingRules.Where(r => r.Targets.Any(t => t is DatabaseTarget && ((DatabaseTarget)t).ConnectionString == null)).ToList();
+					foreach (var rule in needDeleteRules)
+					{
+						configuration.LoggingRules.Remove(rule);
+					}
+					configuration.RemoveTarget("dblog");
+					configuration.RemoveTarget("dbstatus");
 				}
-
+ 
 				configuration.Install(new InstallationContext());
 				LogManager.Configuration = configuration;
 				_init = true;

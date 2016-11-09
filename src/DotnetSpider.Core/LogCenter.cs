@@ -10,7 +10,7 @@ namespace DotnetSpider.Core
 
 		static LogCenter()
 		{
-			Loggers = IocContainer.Default.GetServices<ILogger>().ToList();
+			Loggers = IocManager.GetServices<ILogger>().ToList();
 			if (Loggers.Count == 0)
 			{
 				Loggers = new List<ILogger> { new NLogLogger() };

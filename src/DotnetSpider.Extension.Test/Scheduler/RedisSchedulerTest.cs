@@ -8,10 +8,15 @@ namespace DotnetSpider.Extension.Test.Scheduler
 {
 	public class RedisSchedulerTest
 	{
+		private Extension.Scheduler.RedisScheduler GetRedisScheduler()
+		{
+			return new Extension.Scheduler.RedisScheduler("localhost", "6GS9F2QTkP36GggE0c3XwVwI");
+		}
+
 		[Fact]
 		public void PushAndPoll1()
 		{
-			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
@@ -32,7 +37,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact]
 		public void PushAndPollBreadthFirst()
 		{
-			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 			scheduler.DepthFirst = false;
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
@@ -57,7 +62,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact]
 		public void PushAndPollDepthFirst()
 		{
-			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 			scheduler.DepthFirst = true;
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
@@ -82,7 +87,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact]
 		public void LoadPerformace()
 		{
-			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 			scheduler.Clear();
@@ -121,7 +126,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Push(new Request("http://www.c.com/", 1, null));
 			scheduler.Push(new Request("http://www.d.com/", 1, null));
 
-			Extension.Scheduler.RedisScheduler redisScheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			Extension.Scheduler.RedisScheduler redisScheduler = GetRedisScheduler();
 			redisScheduler.Init(spider);
 
 			redisScheduler.Clear();
@@ -139,7 +144,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact]
 		public void Status()
 		{
-			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
@@ -196,7 +201,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact]
 		public void MultiInit()
 		{
-			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
@@ -219,7 +224,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact]
 		public void Clear()
 		{
-			Extension.Scheduler.RedisScheduler scheduler = new Extension.Scheduler.RedisScheduler("localhost", "");
+			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);

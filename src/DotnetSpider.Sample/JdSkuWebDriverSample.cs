@@ -20,15 +20,12 @@ namespace DotnetSpider.Sample
 			context.SetIdentity("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddEntityPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-			context.AddEntityType(typeof(Product), new TargetUrlExtractor
-			{
-				Region = new Selector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
-				Patterns = new List<string> { @"&page=[0-9]+&" }
-			});
+			context.AddEntityType(typeof(Product));
 			context.SetDownloader(new WebDriverDownloader(Browser.Chrome));
 			return context;
 		}
 
+		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		[Schema("test", "sku", TableSuffix.Today)]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]

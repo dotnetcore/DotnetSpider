@@ -35,7 +35,7 @@
         "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
         "System.Text.Encoding.CodePages": "4.0.1",
         "dotnet-test-xunit": "2.2.0-preview2-build1029",
-        "SapientGuardian.MySql.Data": "6.9.812",
+        "MySql.Data": "7.0.5-IR21",
         "System.Linq": "4.1.0"
       },
       "buildOptions": {

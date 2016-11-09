@@ -49,7 +49,7 @@ namespace DotnetSpider.Core.Downloader
 				response.EnsureSuccessStatusCode();
 				if (!site.AcceptStatCode.Contains(response.StatusCode))
 				{
-					throw new DownloadException($"下载 {request.Url} 失败. Code: {response.StatusCode}");
+					throw new DownloadException($"下载 {request.Url} 失败. Code {response.StatusCode}");
 				}
 				var httpStatusCode = response.StatusCode;
 				request.PutExtra(Request.StatusCode, httpStatusCode);

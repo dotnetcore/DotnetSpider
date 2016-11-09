@@ -6,8 +6,8 @@ namespace DotnetSpider.Extension.Model
 {
 	public interface IEntityExtractor
 	{
-		List<JObject> Process(Page page);
-		EntityMetadata EntityMetadata { get; }
+		List<JObject> Extract(Page page);
 		DataHandler DataHandler { get; }
+		string Name { get; }
 	}
 }

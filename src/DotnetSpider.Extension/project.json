@@ -51,7 +51,7 @@
           "type": "platform",
           "version": "1.0.0"
         },
-        "MySql.Data": "7.0.5-IR21",
+        "MySql.Data": "7.0.6-IR31",
         "StackExchange.Redis": "1.1.608",
         "System.Data.Common": "4.1.0",
         "System.Data.SqlClient": "4.1.0",

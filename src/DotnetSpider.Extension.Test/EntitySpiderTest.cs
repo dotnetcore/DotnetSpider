@@ -28,23 +28,6 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[Fact]
-		public void TestInCorrectRedisSetting()
-		{
-			try
-			{
-				MyEntitySpider1 spider = new MyEntitySpider1(new Site());
-				spider.AddEntityPipeline(new ConsoleEntityPipeline());
-				spider.AddEntityType(typeof(TestEntity));
-				spider.Run("running-test");
-			}
-			catch (RedisConnectionException)
-			{
-				return;
-			}
-			throw new Exception("TEST FAILED.");
-		}
-
-		[Fact]
 		public void TestCorrectRedisSetting()
 		{
 			EntitySpider spider = new EntitySpider(new Site());
@@ -91,7 +74,8 @@ namespace DotnetSpider.Extension.Test
 				ConnectTimeout = 65530,
 				KeepAlive = 8,
 				ConnectRetry = 3,
-				ResponseTimeout = 3000
+				ResponseTimeout = 3000,
+				Password = "6GS9F2QTkP36GggE0c3XwVwI"
 			};
 
 			confiruation.EndPoints.Add(new DnsEndPoint("127.0.0.1", 6379));

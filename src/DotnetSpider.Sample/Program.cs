@@ -10,10 +10,14 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			IocContainer.Default.AddSingleton<IMonitor, NLogMonitor>();
+			IocManager.AddSingleton<IMonitor, NLogMonitor>();
 
-			JdSkuSampleSpider spider = new JdSkuSampleSpider();
-			spider.Run();
+			//BaseUsage.Run();
+
+			//CasSpider casSper = new CasSpider();
+			//casSper.Run();
+
+			Cnblogs.Run();
 		}
 	}
 }

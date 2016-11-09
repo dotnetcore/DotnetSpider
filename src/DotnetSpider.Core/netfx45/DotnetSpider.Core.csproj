@@ -185,8 +185,8 @@
     <Compile Include="..\INamed.cs">
       <Link>INamed.cs</Link>
     </Compile>
-    <Compile Include="..\IocContainer.cs">
-      <Link>IocContainer.cs</Link>
+    <Compile Include="..\IocManager.cs">
+      <Link>IocManager.cs</Link>
     </Compile>
     <Compile Include="..\IRunable.cs">
       <Link>IRunable.cs</Link>
@@ -253,6 +253,9 @@
     </Compile>
     <Compile Include="..\Pipeline\JsonFilePipeline.cs">
       <Link>Pipeline\JsonFilePipeline.cs</Link>
+    </Compile>
+    <Compile Include="..\Processor\BasePageProcessor.cs">
+      <Link>Processor\BasePageProcessor.cs</Link>
     </Compile>
     <Compile Include="..\Processor\DefaultPageProcessor.cs">
       <Link>Processor\DefaultPageProcessor.cs</Link>

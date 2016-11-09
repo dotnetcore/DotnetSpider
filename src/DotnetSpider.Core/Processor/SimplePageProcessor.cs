@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Processor
 	/// <summary>
 	/// A simple PageProcessor.
 	/// </summary>
-	public class SimplePageProcessor : IPageProcessor
+	public class SimplePageProcessor : BasePageProcessor
 	{
 		private readonly string _urlPattern;
 
@@ -18,23 +18,18 @@ namespace DotnetSpider.Core.Processor
 			Site.Domain = url.Host;
 			//compile "*" expression to regex
 			_urlPattern = "(" + urlPattern.Replace(".", "\\.").Replace("*", "[^\"'#]*") + ")";
+
+			// 指定目标URL的筛选条件
+			TargetUrlRegions.Add(Selector.Selectors.XPath(".//a/@href"));
 		}
 
-		public void Process(Page page)
+		protected override void Handle(Page page)
 		{
-			List<string> requests = page.Selectable.XPath(".//a/@href").Regex(_urlPattern).GetValues();
-			//add urls to fetch
-			page.AddTargetRequests(requests);
 			//extract by XPath
 			page.AddResultItem("title", page.Selectable.XPath("//title"));
 			page.AddResultItem("html", page.Selectable.ToString());
 			//extract by Readability
 			page.AddResultItem("content", page.Selectable.SmartContent());
 		}
-
-		/// <summary>
-		/// Get the site settings
-		/// </summary>
-		public Site Site { get; set; }
 	}
 }

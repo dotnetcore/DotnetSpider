@@ -15,7 +15,7 @@ namespace DotnetSpider.Sample
 		public static void Run()
 		{
 			// 注入监控服务
-			IocContainer.Default.AddSingleton<IMonitor, NLogMonitor>();
+			IocManager.AddSingleton<IMonitor, NLogMonitor>();
 
 			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8" };
@@ -26,7 +26,7 @@ namespace DotnetSpider.Sample
 			}
 
 			// 使用内存Scheduler、自定义PageProcessor、自定义Pipeline创建爬虫
-			Spider spider = Spider.Create(site, new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(site, new QueueDuplicateRemovedScheduler(), new MyPageProcessor()).AddPipeline(new MyPipeline()).SetThreadNum(1);
 			spider.EmptySleepTime = 3000;
 			// 注册爬虫到监控服务
 			MonitorCenter.Register(spider);
@@ -38,20 +38,23 @@ namespace DotnetSpider.Sample
 
 		private class MyPipeline : BasePipeline
 		{
+			private static long count = 0;
+
 			public override void Process(ResultItems resultItems)
 			{
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
-					File.AppendAllLines("test.txt", new[] { entry.Name });
+					count++;
+					Console.WriteLine($"[YoukuVideo {count}] {entry.Name}");
 				}
 
 				// 可以自由实现插入数据库或保存到文件
 			}
 		}
 
-		private class MyPageProcessor : IPageProcessor
+		private class MyPageProcessor : BasePageProcessor
 		{
-			public void Process(Page page)
+			protected override void Handle(Page page)
 			{
 				// 利用 Selectable 查询并构造自己想要的数据对象
 				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='yk-pack pack-film']")).Nodes();
@@ -70,8 +73,6 @@ namespace DotnetSpider.Sample
 					page.AddTargetRequest(new Request(url.GetValue(), 0, null));
 				}
 			}
-
-			public Site Site { get; set; }
 		}
 
 		public class YoukuVideo

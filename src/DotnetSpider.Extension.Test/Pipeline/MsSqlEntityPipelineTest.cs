@@ -15,6 +15,9 @@ using Xunit;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
+	/// <summary>
+	/// CREATE database  test firstly
+	/// </summary>
 	public class MsSqlEntityPipelineTest
 	{
 		private const string ConnectString = "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True";
@@ -25,6 +28,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				var tableName = $"sku_{DateTime.Now.ToString("yyyy_MM_dd")}";
 				var tableName2 = $"sku2_{DateTime.Now.ToString("yyyy_MM_dd")}";
+				conn.Execute("if not exists(select * from sys.databases where name = 'test') create database test;");
 				conn.Execute($"USE test; IF OBJECT_ID('{tableName}', 'U') IS NOT NULL DROP table {tableName};");
 				conn.Execute($"USE test; IF OBJECT_ID('{tableName2}', 'U') IS NOT NULL DROP table {tableName2};");
 			}
