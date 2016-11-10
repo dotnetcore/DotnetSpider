@@ -13,7 +13,6 @@ namespace DotnetSpider.Core
 	public class Site
 	{
 		public IHttpProxyPool HttpProxyPool { get; set; }
-		private string _domain;
 		private Encoding _encoding = Encoding.UTF8;
 		private string _encodingName;
 		private string _cookiesStringPart;
