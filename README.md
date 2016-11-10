@@ -30,62 +30,58 @@ Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.S
 
 		static void Main(string[] args)
 		{
-			IocExtension.ServiceCollection.AddSingleton<IMonitorService, NLogMonitor>();
+			// 注入监控服务
+			IocManager.AddSingleton<IMonitor, NLogMonitor>();
 
-			HttpClientDownloader downloader = new HttpClientDownloader();
-			var site = new Site() { EncodingName = "UTF-8" };
-			site.AddStartUrl("http://www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_1.html");
-			Spider spider = Spider.Create(site, new MyPageProcessor(), new QueueDuplicateRemovedScheduler()).AddPipeline(new MyPipeline("test.txt")).SetThreadNum(1);
-			spider.SetDownloader(downloader);
-			spider.SetEmptySleepTime(2000);
+			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
+			var site = new Site { EncodingName = "UTF-8" };
+			for (int i = 1; i < 5; ++i)
+			{
+				// 添加初始采集链接
+				site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
+			}
 
+			// 使用内存Scheduler、自定义PageProcessor、自定义Pipeline创建爬虫
+			Spider spider = Spider.Create(site, new QueueDuplicateRemovedScheduler(), new MyPageProcessor()).AddPipeline(new MyPipeline()).SetThreadNum(1);
+			spider.EmptySleepTime = 3000;
+			// 注册爬虫到监控服务
+			MonitorCenter.Register(spider);
 
-			SpiderMonitor.Default.Register(spider);
-
+			// 启动爬虫
 			spider.Run();
 			Console.Read();
 		}
 
-		public class MyPipeline : BasePipeline
+		private class MyPipeline : BasePipeline
 		{
-			private readonly string _path;
-
-			public MyPipeline(string path)
-			{
-				if (string.IsNullOrEmpty(path))
-				{
-					throw new Exception("Path should not be null.");
-				}
-
-				_path = path;
-
-				if (!File.Exists(_path))
-				{
-					File.Create(_path);
-				}
-			}
+			private static long count = 0;
 
 			public override void Process(ResultItems resultItems)
 			{
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
-					File.AppendAllLines(_path, new List<string> { entry.ToString() });
+					count++;
+					Console.WriteLine($"[YoukuVideo {count}] {entry.Name}");
 				}
+
+				// 可以自由实现插入数据库或保存到文件
 			}
 		}
 
-		public class MyPageProcessor : IPageProcessor
+		private class MyPageProcessor : BasePageProcessor
 		{
-			public void Process(Page page)
+			protected override void Handle(Page page)
 			{
-				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//li[@class='yk-col4 mr1']")).Nodes();
+				// 利用 Selectable 查询并构造自己想要的数据对象
+				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='yk-pack pack-film']")).Nodes();
 				List<YoukuVideo> results = new List<YoukuVideo>();
 				foreach (var videoElement in totalVideoElements)
 				{
 					var video = new YoukuVideo();
-					video.Name = videoElement.Select(Selectors.XPath(".//li[@class='title']/a")).GetValue();
+					video.Name = videoElement.Select(Selectors.XPath(".//img[@class='quic']/@alt")).GetValue();
 					results.Add(video);
 				}
+				// 以自定义KEY存入page对象中供Pipeline调用
 				page.AddResultItem("VideoResult", results);
 
 				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
@@ -93,18 +89,11 @@ Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.S
 					page.AddTargetRequest(new Request(url.GetValue(), 0, null));
 				}
 			}
-
-			public Site Site { get; set; }
 		}
 
 		public class YoukuVideo
 		{
 			public string Name { get; set; }
-
-			public override string ToString()
-			{
-				return Name;
-			}
 		}
 	
 ### ADDITIONAL USAGE
@@ -124,17 +113,14 @@ Codes: https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.S
 					new MySqlEntityPipeline("Database='test';Data Source=MYSQLSERVER;User ID=root;Password=1qazZAQ!;Port=4306"));
 				context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main",
 					new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-				context.AddEntityType(typeof(Product), new TargetUrlExtractor
-				{
-					Region = new BaseSelector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
-					Patterns = new List<string> { @"&page=[0-9]+&" }
-				});
+				context.AddEntityType(typeof(Product));
 				return context;
 			}
 	
 			[Schema("test", "sku", TableSuffix.Today)]
 			[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
 			[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
+			[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 			public class Product : ISpiderEntity
 			{
 				[StoredAs("category", DataType.String, 20)]
