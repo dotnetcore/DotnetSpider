@@ -121,7 +121,7 @@ namespace DotnetSpider.Extension
 					else
 					{
 						Site.CookiesStringPart = cookie.CookiesStringPart;
-						Site.Cookies = cookie.CookiesDictionary;
+						Site.SetCookies(cookie.CookiesDictionary);
 					}
 				}
 #endif

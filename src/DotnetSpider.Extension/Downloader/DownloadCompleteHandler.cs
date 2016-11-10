@@ -78,7 +78,7 @@ namespace DotnetSpider.Extension.Downloader
 				var cookie = ((EntitySpider)Spider).CookieInterceptor.GetCookie();
 				if (cookie != null)
 				{
-					Spider.Site.Cookies = cookie.CookiesDictionary;
+					Spider.Site.SetCookies(cookie.CookiesDictionary);
 					Spider.Site.CookiesStringPart = cookie.CookiesStringPart;
 				}
 

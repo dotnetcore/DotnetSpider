@@ -28,12 +28,25 @@ namespace DotnetSpider.Core.Test
 			"    }\n" +
 			"  }\n" +
 			"}";
+		string _html3 = "<div><h1>test<a href=\"http://a.com\">aabbcc</a><a href=\"http://a.com/bbc\">aabbcc</a><a href=\"http://b.com\">aabbcc</a></h1></div>";
 
 		[Fact]
 		public void Regex()
 		{
 			Assert.Equal(Selectors.Regex("a href=\"(.*)\"").Select(_html), "a href=\"xxx\"");
 			Assert.Equal(Selectors.Regex("(a href)=\"(.*)\"", 2).Select(_html), "xxx");
+		}
+		[Fact]
+		public void RemoveOutboundLinks()
+		{
+			Page page = new Page(new Request("http://a.com", 0, null), ContentType.Html, "a.com")
+			{
+				Content = _html3
+			};
+			var results = page.Selectable.Links().GetValues();
+			Assert.Equal(2, results.Count);
+			Assert.Equal("http://a.com", results[0]);
+			Assert.Equal("http://a.com/bbc", results[1]);
 		}
 
 		[Fact]

@@ -32,7 +32,6 @@ namespace DotnetSpider.Core
 		public Request(Uri url, int grade, IDictionary<string, dynamic> extras)
 		{
 			Url = url;
-
 			if (extras != null)
 			{
 				foreach (var extra in extras)

@@ -109,7 +109,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 
 				Thread.Sleep(_webDriverWaitTime);
 
-				Page page = new Page(request, spider.Site.ContentType)
+				Page page = new Page(request, spider.Site.ContentType, site.RemoveOutboundLinks ? site.Domain : null)
 				{
 					Content = _webDriver.PageSource,
 					TargetUrl = _webDriver.Url,
@@ -126,7 +126,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, site.ContentType) { Exception = e };
+				Page page = new Page(request, site.ContentType, null) { Exception = e };
 				return page;
 			}
 		}

@@ -15,7 +15,6 @@ namespace DotnetSpider.Core.Processor
 			Site = new Site();
 			Site.AddStartUrl(startUrl);
 			Uri url = new Uri(startUrl);
-			Site.Domain = url.Host;
 			//compile "*" expression to regex
 			_urlPattern = "(" + urlPattern.Replace(".", "\\.").Replace("*", "[^\"'#]*") + ")";
 

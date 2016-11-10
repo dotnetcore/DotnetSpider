@@ -26,7 +26,7 @@ namespace DotnetSpider.Core
 	{
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
-	
+
 		protected bool IsExited { get; set; }
 		protected int WaitInterval { get; private set; } = 10;
 		protected Status Stat = Status.Init;
@@ -42,7 +42,7 @@ namespace DotnetSpider.Core
 		public Status StatusCode => Stat;
 		public event SpiderEvent OnSuccess;
 		public event SpiderClosingHandler SpiderClosing;
- 
+
 		public long AvgDownloadSpeed { get; private set; }
 		public long AvgProcessorSpeed { get; private set; }
 		public long AvgPipelineSpeed { get; private set; }
@@ -65,7 +65,7 @@ namespace DotnetSpider.Core
 		private int _emptySleepTime = 15000;
 		private IDownloader _downloader;
 		private List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
-		private List<IPipeline> _pipelines  = new List<IPipeline>();
+		private List<IPipeline> _pipelines = new List<IPipeline>();
 		private Site _site;
 
 		/// <summary>
@@ -142,7 +142,7 @@ namespace DotnetSpider.Core
 		{
 			if (string.IsNullOrWhiteSpace(Identity) || string.IsNullOrEmpty(Identity))
 			{
-				Identity = string.IsNullOrEmpty(Site.Domain) ? Guid.NewGuid().ToString() : Site.Domain;
+				Identity = Guid.NewGuid().ToString();
 			}
 
 			if (string.IsNullOrEmpty(UserId) || string.IsNullOrWhiteSpace(UserId))
@@ -799,7 +799,7 @@ namespace DotnetSpider.Core
 
 		protected Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
 		{
-			Page page = new Page(request, site.ContentType);
+			Page page = new Page(request, site.ContentType, null);
 			if (!resultIsEmpty)
 			{
 				dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);

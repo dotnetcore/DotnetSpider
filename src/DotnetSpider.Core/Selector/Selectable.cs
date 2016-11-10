@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DotnetSpider.Core.Common;
 #if NET_CORE
@@ -10,7 +11,7 @@ namespace DotnetSpider.Core.Selector
 {
 	public class Selectable : BaseSelectable
 	{
-		public Selectable(string text, string urlOrPadding, ContentType contentType)
+		public Selectable(string text, string urlOrPadding, ContentType contentType, string domain = null)
 		{
 			switch (contentType)
 			{
@@ -18,6 +19,11 @@ namespace DotnetSpider.Core.Selector
 					{
 						HtmlDocument document = new HtmlDocument { OptionAutoCloseOnEnd = true };
 						document.LoadHtml(text);
+
+						if (!string.IsNullOrEmpty(domain) && !string.IsNullOrWhiteSpace(domain))
+						{
+							RemoveOutboundLinks(document, domain);
+						}
 
 						if (!string.IsNullOrEmpty(urlOrPadding))
 						{
@@ -157,6 +163,33 @@ namespace DotnetSpider.Core.Selector
 					{
 						node.Attributes["href"].Value = UrlUtils.CanonicalizeUrl(node.Attributes["href"].Value, url);
 					}
+				}
+			}
+		}
+
+		private void RemoveOutboundLinks(HtmlDocument document, string domain)
+		{
+			var nodes = document.DocumentNode.SelectNodes(".//a");
+			if (nodes != null)
+			{
+				List<HtmlNode> deleteNodes = new List<HtmlNode>();
+				foreach (var node in nodes)
+				{
+					if (node.Attributes["href"] != null)
+					{
+						Uri uri;
+						if (Uri.TryCreate(node.Attributes["href"].Value, UriKind.RelativeOrAbsolute, out uri))
+						{
+							if (uri.Host != domain)
+							{
+								deleteNodes.Add(node);
+							}
+						}
+					}
+				}
+				foreach(var node in deleteNodes)
+				{
+					node.Remove();
 				}
 			}
 		}

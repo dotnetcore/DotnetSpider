@@ -74,12 +74,18 @@ namespace DotnetSpider.Core
 
 		public HashSet<Request> TargetRequests { get; } = new HashSet<Request>();
 
-		public Page(Request request, ContentType contentType)
+		public bool RemoveOutboundLinks { get; }
+
+		public string Domain { get; }
+
+		public Page(Request request, ContentType contentType, string domain)
 		{
 			Request = request;
 			Url = request.Url.ToString();
 			ResultItems.Request = request;
 			ContentType = contentType;
+			RemoveOutboundLinks = !string.IsNullOrEmpty(domain);
+			Domain = domain;
 		}
 
 		/// <summary>
@@ -96,7 +102,18 @@ namespace DotnetSpider.Core
 		/// Get html content of page
 		/// </summary>
 		/// <returns></returns>
-		public Selectable Selectable => _selectable ?? (_selectable = new Selectable(Content, ContentType == ContentType.Json ? Padding : Request.Url.ToString(), ContentType));
+		public Selectable Selectable
+		{
+			get
+			{
+				if (_selectable == null)
+				{
+					string urlPadding = ContentType == ContentType.Json ? Padding : Request.Url.ToString();
+					_selectable = new Selectable(Content, urlPadding, ContentType, RemoveOutboundLinks ? Domain : null);
+				}
+				return _selectable;
+			}
+		}
 
 		/// <summary>
 		/// Add urls to fetch
@@ -190,7 +207,7 @@ namespace DotnetSpider.Core
 		/// </summary>		 
 		public void AddTargetRequest(Request request)
 		{
-			if (request==null)
+			if (request == null)
 			{
 				return;
 			}

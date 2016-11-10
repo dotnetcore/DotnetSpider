@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DotnetSpider.Core.Proxy;
 using System.Net;
+using System.Collections.ObjectModel;
 
 namespace DotnetSpider.Core
 {
@@ -22,18 +23,12 @@ namespace DotnetSpider.Core
 		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
 		public ContentType ContentType { get; set; } = ContentType.Html;
+		public bool RemoveOutboundLinks { get; set; }
+		public string Domain { get; private set; }
 
-		public Dictionary<string, string> Cookies
+		public ReadOnlyDictionary<string, string> Cookies
 		{
-			get { return _cookies; }
-			set
-			{
-				if (_cookies != value)
-				{
-					_cookies = value;
-					_allCookiesString = GenerateCookieString();
-				}
-			}
+			get { return new ReadOnlyDictionary<string, string>(_cookies); }
 		}
 
 		public string CookiesStringPart
@@ -58,26 +53,6 @@ namespace DotnetSpider.Core
 		/// User agent
 		/// </summary>
 		public string Accept { get; set; }
-
-		/// <summary>
-		/// Set the domain of site.
-		/// </summary>
-		/// <returns></returns>
-		public string Domain
-		{
-			get
-			{
-				if (_domain == null && StartRequests != null && StartRequests.Count > 0)
-				{
-					_domain = StartRequests[0].Url.Host;
-				}
-				return _domain;
-			}
-			set
-			{
-				_domain = value;
-			}
-		}
 
 		/// <summary>
 		/// Set charset of page manually. 
@@ -222,7 +197,6 @@ namespace DotnetSpider.Core
 		public override string ToString()
 		{
 			return "Site{" +
-					"domain='" + Domain + '\'' +
 					", userAgent='" + UserAgent + '\'' +
 					", cookies=" + _allCookiesString +
 					", charset='" + Encoding + '\'' +
@@ -234,7 +208,7 @@ namespace DotnetSpider.Core
 					'}';
 		}
 
- 
+
 		public UseSpecifiedUriWebProxy GetHttpProxy()
 		{
 			return HttpProxyPool?.GetProxy();
@@ -254,24 +228,30 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		public void SetCookies(Dictionary<string, string> cookies)
+		{
+			_cookies = cookies;
+			_allCookiesString = GenerateCookieString();
+		}
+
 		public void AddOrUpdateCookie(string key, string value)
 		{
 			if (Cookies == null)
 			{
-				Cookies = new Dictionary<string, string>();
+				_cookies = new Dictionary<string, string>();
 			}
 
 			if (Cookies.ContainsKey(key))
 			{
 				if (Cookies[key] != value)
 				{
-					Cookies[key] = value;
+					_cookies[key] = value;
 					_allCookiesString = GenerateCookieString();
 				}
 			}
 			else
 			{
-				Cookies.Add(key, value);
+				_cookies.Add(key, value);
 				_allCookiesString = GenerateCookieString();
 			}
 		}

@@ -86,7 +86,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, site.ContentType) { Exception = e };
+				Page page = new Page(request, site.ContentType, null) { Exception = e };
 				return page;
 			}
 			finally
@@ -231,7 +231,7 @@ namespace DotnetSpider.Core.Downloader
 #endif
 			}
 
-			Page page = new Page(request, site.ContentType)
+			Page page = new Page(request, site.ContentType, site.RemoveOutboundLinks ? site.Domain : null)
 			{
 				Content = content,
 				StatusCode = statusCode
