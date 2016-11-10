@@ -1,5 +1,6 @@
 using DotnetSpider.Core.Scheduler.Component;
 using System.Collections.Generic;
+using System;
 
 namespace DotnetSpider.Core.Scheduler
 {
@@ -72,7 +73,7 @@ namespace DotnetSpider.Core.Scheduler
 			DuplicateRemover.Dispose();
 		}
 
-		public abstract void Load(HashSet<Request> requests);
+		public abstract void Import(HashSet<Request> requests);
 
 		public abstract HashSet<Request> ToList();
 
@@ -92,5 +93,9 @@ namespace DotnetSpider.Core.Scheduler
 		public abstract void IncreaseSuccessCounter();
 
 		public abstract void IncreaseErrorCounter();
+
+		public virtual void Export()
+		{
+		}
 	}
 }

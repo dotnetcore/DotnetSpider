@@ -15,6 +15,7 @@ using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace DotnetSpider.Core
 {
@@ -25,11 +26,9 @@ namespace DotnetSpider.Core
 	{
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
-		protected bool IsExitWhenComplete { get; set; } = true;
-		protected List<IPageProcessor> PageProcessors { get; set; }
-		protected List<IPipeline> Pipelines { get; set; } = new List<IPipeline>();
+	
 		protected bool IsExited { get; set; }
-		protected int WaitInterval = 10;
+		protected int WaitInterval { get; private set; } = 10;
 		protected Status Stat = Status.Init;
 
 		#region ITask
@@ -40,19 +39,10 @@ namespace DotnetSpider.Core
 
 		#endregion
 
-		public int ThreadNum { get; set; } = 1;
-		public int Deep { get; set; } = int.MaxValue;
-		public bool SpawnUrl { get; set; } = true;
-		public bool SkipWhenResultIsEmpty { get; set; } = false;
-		public bool RetryWhenResultIsEmpty { get; set; } = false;
-		public Site Site { get; protected set; }
-		public IDownloader Downloader { get; set; }
 		public Status StatusCode => Stat;
 		public event SpiderEvent OnSuccess;
 		public event SpiderClosingHandler SpiderClosing;
-		public Dictionary<string, dynamic> Settings { get; } = new Dictionary<string, dynamic>();
-		public int EmptySleepTime { get; set; } = 15000;
-
+ 
 		public long AvgDownloadSpeed { get; private set; }
 		public long AvgProcessorSpeed { get; private set; }
 		public long AvgPipelineSpeed { get; private set; }
@@ -66,6 +56,17 @@ namespace DotnetSpider.Core
 		private readonly object _avgDownloadTimeLocker = new object();
 		private readonly object _avgProcessorTimeLocker = new object();
 		private readonly object _avgPipelineTimeLocker = new object();
+		private int _threadNum = 1;
+		private int _deep = int.MaxValue;
+		private bool _spawnUrl = true;
+		private bool _skipWhenResultIsEmpty = false;
+		private bool _retryWhenResultIsEmpty = false;
+		private bool _exitWhenComplete = true;
+		private int _emptySleepTime = 15000;
+		private IDownloader _downloader;
+		private List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
+		private List<IPipeline> _pipelines  = new List<IPipeline>();
+		private Site _site;
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -122,11 +123,14 @@ namespace DotnetSpider.Core
 		/// <param name="pageProcessor"></param>
 		/// <param name="scheduler"></param>
 		/// <param name="userid"></param>
-		protected Spider(Site site, string identity, string userid, string taskGroup, IScheduler scheduler, params IPageProcessor[] pageProcessor) : this()
+		protected Spider(Site site, string identity, string userid, string taskGroup, IScheduler scheduler, params IPageProcessor[] pageProcessors) : this()
 		{
 			Identity = identity;
 			UserId = userid;
-			PageProcessors = pageProcessor.ToList();
+			if (pageProcessors != null)
+			{
+				_pageProcessors = pageProcessors.ToList();
+			}
 			Site = site;
 			TaskGroup = taskGroup;
 			Scheduler = scheduler;
@@ -201,6 +205,145 @@ namespace DotnetSpider.Core
 			{
 				CheckIfRunning();
 				_scheduler = value;
+			}
+		}
+
+		public Site Site
+		{
+			get
+			{
+				return _site;
+			}
+			set
+			{
+				CheckIfRunning();
+				_site = value;
+			}
+		}
+
+		public ReadOnlyCollection<IPageProcessor> PageProcessors
+		{
+			get
+			{
+				return _pageProcessors.AsReadOnly();
+			}
+		}
+
+		public ReadOnlyCollection<IPipeline> Pipelines
+		{
+			get
+			{
+				return _pipelines.AsReadOnly();
+			}
+		}
+
+		public IDownloader Downloader
+		{
+			get
+			{
+				return _downloader;
+			}
+			set
+			{
+				CheckIfRunning();
+				_downloader = value;
+			}
+		}
+
+		public int EmptySleepTime
+		{
+			get
+			{
+				return _emptySleepTime;
+			}
+			set
+			{
+				CheckIfRunning();
+				_emptySleepTime = value;
+			}
+		}
+
+		public bool ExitWhenComplete
+		{
+			get
+			{
+				return _exitWhenComplete;
+			}
+			set
+			{
+				CheckIfRunning();
+				_exitWhenComplete = value;
+			}
+		}
+
+		public int ThreadNum
+		{
+			get
+			{
+				return _threadNum;
+			}
+			set
+			{
+				CheckIfRunning();
+
+				if (value <= 0)
+				{
+					throw new ArgumentException("threadNum should be more than one!");
+				}
+
+				ThreadNum = value;
+			}
+		}
+
+		public int Deep
+		{
+			get
+			{
+				return _deep;
+			}
+			set
+			{
+				CheckIfRunning();
+				_deep = value;
+			}
+		}
+
+		public bool SpawnUrl
+		{
+			get
+			{
+				return _spawnUrl;
+			}
+			set
+			{
+				CheckIfRunning();
+				_spawnUrl = value;
+			}
+		}
+
+		public bool SkipWhenResultIsEmpty
+		{
+			get
+			{
+				return _skipWhenResultIsEmpty;
+			}
+			set
+			{
+				CheckIfRunning();
+				_skipWhenResultIsEmpty = value;
+			}
+		}
+
+		public bool RetryWhenResultIsEmpty
+		{
+			get
+			{
+				return _retryWhenResultIsEmpty;
+			}
+			set
+			{
+				CheckIfRunning();
+				_retryWhenResultIsEmpty = value;
 			}
 		}
 
@@ -354,8 +497,24 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public virtual Spider AddPipeline(IPipeline pipeline)
 		{
-			CheckIfRunning();
-			Pipelines.Add(pipeline);
+			if (pipeline != null)
+			{
+				CheckIfRunning();
+				_pipelines.Add(pipeline);
+			}
+			return this;
+		}
+
+		public virtual Spider AddPageProcessor(params IPageProcessor[] processors)
+		{
+			if (processors != null && processors.Length > 0)
+			{
+				CheckIfRunning();
+				foreach (var processor in processors)
+				{
+					_pageProcessors.Add(processor);
+				}
+			}
 			return this;
 		}
 
@@ -385,7 +544,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider ClearPipeline()
 		{
-			Pipelines = new List<IPipeline>();
+			_pipelines = new List<IPipeline>();
 			return this;
 		}
 
@@ -440,7 +599,7 @@ namespace DotnetSpider.Core
 				}
 				else
 				{
-					Scheduler.Load(new HashSet<Request>(Site.StartRequests));
+					Scheduler.Import(new HashSet<Request>(Site.StartRequests));
 					ClearStartRequests();
 				}
 			}
@@ -496,7 +655,7 @@ namespace DotnetSpider.Core
 
 					if (request == null)
 					{
-						if (waitCount > _waitCountLimit && IsExitWhenComplete)
+						if (waitCount > _waitCountLimit && ExitWhenComplete)
 						{
 							Stat = Status.Finished;
 							break;

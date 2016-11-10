@@ -41,7 +41,7 @@
         "System.Diagnostics.Process": "4.1.0",
         "System.Net.Http": "4.1.0",
         "System.Text.Encoding.CodePages": "4.0.1",
-        "MySql.Data": "7.0.5-IR21",
+        "MySql.Data": "7.0.6-IR31",
         "dotnet-test-xunit": "2.2.0-preview2-build1029"
       },
       "buildOptions": {

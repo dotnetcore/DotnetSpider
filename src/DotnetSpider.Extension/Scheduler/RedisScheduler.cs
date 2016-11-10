@@ -213,7 +213,7 @@ namespace DotnetSpider.Extension.Scheduler
 			_db.KeyDelete(_errorCountKey);
 		}
 
-		public override void Load(HashSet<Request> requests)
+		public override void Import(HashSet<Request> requests)
 		{
 			lock (this)
 			{

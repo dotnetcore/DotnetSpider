@@ -56,7 +56,7 @@
         "System.Data.Common": "4.1.0",
         "System.Data.SqlClient": "4.1.0",
         "System.Dynamic.Runtime": "4.0.11",
-        "System.Runtime.Extensions": "4.1.0",
+        "System.Runtime.Extensions": "4.3.0",
         "System.Runtime.Serialization.Primitives": "4.1.1",
         "System.Xml.XDocument": "4.3.0"
       },

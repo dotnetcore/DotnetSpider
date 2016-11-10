@@ -13,7 +13,6 @@ namespace DotnetSpider.Core
 		/// Site of a task
 		/// </summary>
 		Site Site { get; }
-		Dictionary<string, dynamic> Settings { get; }
 		Task RunAsync(params string[] arguments);
 	}
 }

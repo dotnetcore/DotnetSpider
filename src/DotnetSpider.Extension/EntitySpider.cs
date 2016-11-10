@@ -143,7 +143,7 @@ namespace DotnetSpider.Extension
 					}
 					if (pipelines.Count > 0)
 					{
-						Pipelines.Add(new EntityPipeline(entiyName, pipelines));
+						AddPipeline(new EntityPipeline(entiyName, pipelines));
 					}
 				}
 
@@ -235,14 +235,8 @@ namespace DotnetSpider.Extension
 					Type = e.Type
 				}).ToList();
 				Entities.Add(entity);
-
-				if (PageProcessors == null)
-				{
-					PageProcessors = new List<Core.Processor.IPageProcessor>();
-				}
-
 				EntityProcessor processor = new EntityProcessor(Site, entity);
-				PageProcessors.Add(processor);
+				AddPageProcessor(processor);
 			}
 			else
 			{

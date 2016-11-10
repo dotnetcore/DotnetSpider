@@ -29,6 +29,8 @@ namespace DotnetSpider.Core.Scheduler
 
 		void Clear();
 
-		void Load(HashSet<Request> requests);
+		void Import(HashSet<Request> requests);
+
+		void Export();
 	}
 }

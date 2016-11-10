@@ -35,7 +35,7 @@ namespace DotnetSpider.Sample
 				new NewsProcessor()).
 				AddPipeline(new MyPipeline()).
 				SetThreadNum(1);
-			spider.ThreadNum = 1;
+
 			// 注册爬虫到监控服务
 			MonitorCenter.Register(spider);
 

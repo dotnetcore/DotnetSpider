@@ -41,8 +41,8 @@
     "netcoreapp1.0": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
-        "DotnetSpider.HtmlAgilityPack": "1.0.0-rc1",
-        "DotnetSpider.HtmlAgilityPack.Css": "1.0.0-rc1",
+        "DotnetSpider.HtmlAgilityPack": "1.0.0",
+        "DotnetSpider.HtmlAgilityPack.Css": "1.0.0",
         "Microsoft.CSharp": "4.0.1",
         "Microsoft.Extensions.Configuration.Binder": "1.0.0",
         "Microsoft.Extensions.Configuration.Ini": "1.0.0",

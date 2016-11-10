@@ -107,7 +107,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			{
 				list.Add(new Request("http://www.a.com/" + i, 1, null));
 			}
-			scheduler.Load(list);
+			scheduler.Import(list);
 			var end1 = DateTime.Now;
 			double seconds1 = (end1 - start1).TotalSeconds;
 			Assert.True(seconds1 < seconds);
@@ -131,7 +131,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			redisScheduler.Clear();
 
-			redisScheduler.Load(scheduler.ToList());
+			redisScheduler.Import(scheduler.ToList());
 
 			Assert.Equal("http://www.d.com/", redisScheduler.Poll().Url.ToString());
 			Assert.Equal("http://www.c.com/", redisScheduler.Poll().Url.ToString());
