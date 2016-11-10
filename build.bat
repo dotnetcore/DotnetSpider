@@ -1,4 +1,4 @@
-set version_suffix="rc3"
+set version_suffix=""
 del /q/a/f/s c:\solutions\DotnetSpider\spider_nuget_packages\*.*
 dotnet restore
 dotnet build c:\solutions\DotnetSpider\src\DotnetSpider.Extension\project.json

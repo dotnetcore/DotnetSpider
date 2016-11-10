@@ -41,8 +41,6 @@
     "netcoreapp1.0": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
-        "DotnetSpider.HtmlAgilityPack": "1.0.0-*",
-        "DotnetSpider.HtmlAgilityPack.Css": "1.0.0-*",
         "MailKit": "1.4.1",
         "Microsoft.CSharp": "4.0.1",
         "Microsoft.Extensions.DependencyInjection": "1.0.0",
