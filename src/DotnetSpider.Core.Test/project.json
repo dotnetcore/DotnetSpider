@@ -4,6 +4,7 @@
   "buildOptions": {
     "emitEntryPoint": true,
     "debugType": "portable",
+    "optimize": true,
     "copyToOutput": [
       "config.ini",
       "nlog.netcore.config",
@@ -28,14 +29,14 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.0"
+          "version": "1.0.1"
         },
         "System.Net.Http": "4.1.0",
         "System.Diagnostics.Process": "4.1.0",
         "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
         "System.Text.Encoding.CodePages": "4.0.1",
         "dotnet-test-xunit": "2.2.0-preview2-build1029",
-        "MySql.Data": "7.0.5-IR21",
+        "MySql.Data": "7.0.6-IR31",
         "System.Linq": "4.1.0"
       },
       "buildOptions": {

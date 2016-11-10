@@ -22,8 +22,7 @@
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.0.0"
-        },
-        "MySql.Data": "7.0.6-IR31"
+        }
       },
       "buildOptions": {
         "define": [

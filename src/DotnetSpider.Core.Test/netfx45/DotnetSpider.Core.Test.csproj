@@ -126,7 +126,7 @@
     <Compile Include="..\UrlUtilsTest.cs">
       <Link>UrlUtilsTest.cs</Link>
     </Compile>
-    <None Include="nlog.config">
+    <None Include="nlog.net45.config">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

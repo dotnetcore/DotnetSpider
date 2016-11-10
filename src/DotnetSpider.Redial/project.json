@@ -37,7 +37,7 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.0"
+          "version": "1.0.1"
         },
         "System.Threading.Thread": "4.0.0",
         "System.Net.NameResolution": "4.0.0",

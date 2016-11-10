@@ -49,7 +49,7 @@
         "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.0"
+          "version": "1.0.1"
         },
         "MySql.Data": "7.0.6-IR31",
         "StackExchange.Redis": "1.1.608",
