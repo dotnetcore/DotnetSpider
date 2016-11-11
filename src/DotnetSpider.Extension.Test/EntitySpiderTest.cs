@@ -7,6 +7,16 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using StackExchange.Redis;
 using Xunit;
+using DotnetSpider.Core.Processor;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Core.Selector;
+using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Core.Monitor;
+using DotnetSpider.Core.Downloader;
+using DotnetSpider.Extension.Model.Attribute;
+using DotnetSpider.Extension.Downloader;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -92,6 +102,51 @@ namespace DotnetSpider.Extension.Test
 			Thread.Sleep(240000);
 
 			db.LockRelease(key, 0);
+		}
+
+		[Fact]
+		public void Run()
+		{
+			CasSpider spider = new CasSpider();
+			spider.Run();
+		}
+
+		public class CasSpider : EntitySpiderBuilder
+		{
+			protected override EntitySpider GetEntitySpider()
+			{
+				EntitySpider context = new EntitySpider(new Site());
+				context.SetSite(new Site());
+				context.SetThreadNum(2);
+				context.ThreadNum = 1;
+				context.RetryWhenResultIsEmpty = false;
+				context.Deep = 100;
+				context.EmptySleepTime = 5000;
+				context.SetEmptySleepTime(5000);
+				context.ExitWhenComplete = true;
+				context.SetCachedSize(1);
+				context.SetDownloader(new HttpClientDownloader());		
+				context.SetScheduler(new QueueDuplicateRemovedScheduler());
+			
+				context.SkipWhenResultIsEmpty = true;
+				context.SpawnUrl = true;
+				context.SetIdentity("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+				context.AddEntityPipeline(new CollectEntityPipeline());
+				context.AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
+				context.AddEntityType(typeof(ArticleSummary));
+				return context;
+			}
+
+			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]		
+			public class ArticleSummary : ISpiderEntity
+			{
+				[PropertySelector(Expression = ".//a/@title")]
+				public string Title { get; set; }
+
+				[TargetUrl(Extras = new[] { "Title", "Url" })]
+				[PropertySelector(Expression = ".//a/@href")]
+				public string Url { get; set; }
+			}
 		}
 	}
 }

@@ -158,6 +158,7 @@
     <Compile Include="..\SpiderEntityTest.cs">
       <Link>SpiderEntityTest.cs</Link>
     </Compile>
+    <Compile Include="EntitySpiderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
