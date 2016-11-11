@@ -262,16 +262,6 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public override Spider AddPipeline(IPipeline pipeline)
-		{
-			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
-		}
-
-		public override Spider AddPipelines(IList<IPipeline> pipelines)
-		{
-			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
-		}
-
 		public ISpider ToDefaultSpider()
 		{
 			return new DefaultSpider("", new Site());

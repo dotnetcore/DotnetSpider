@@ -291,7 +291,7 @@ namespace DotnetSpider.Core
 					throw new ArgumentException("threadNum should be more than one!");
 				}
 
-				ThreadNum = value;
+				_threadNum = value;
 			}
 		}
 
@@ -354,8 +354,6 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public virtual Spider SetThreadNum(int threadNum)
 		{
-			CheckIfRunning();
-
 			if (threadNum <= 0)
 			{
 				throw new ArgumentException("threadNum should be more than one!");
@@ -368,8 +366,6 @@ namespace DotnetSpider.Core
 
 		public void SetSite(Site site)
 		{
-			CheckIfRunning();
-
 			Site = site;
 		}
 
@@ -391,8 +387,6 @@ namespace DotnetSpider.Core
 		/// <param name="emptySleepTime"></param>
 		public void SetEmptySleepTime(int emptySleepTime)
 		{
-			CheckIfRunning();
-
 			if (emptySleepTime >= 1000)
 			{
 				EmptySleepTime = emptySleepTime;
@@ -406,7 +400,6 @@ namespace DotnetSpider.Core
 
 		public void SetScheduler(IScheduler scheduler)
 		{
-			CheckIfRunning();
 			Scheduler = scheduler;
 		}
 
