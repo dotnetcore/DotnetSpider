@@ -31,12 +31,12 @@ namespace DotnetSpider.Extension
 		private const string InitStatusSetName = "init-status";
 		private const string ValidateStatusName = "validate-status";
 
-		protected ConnectionMultiplexer Redis;
-		protected IDatabase Db;
+		protected static ConnectionMultiplexer Redis;
+		protected static IDatabase Db;
 
-		protected string RedisHost { get; set; }
-		protected string RedisPassword { get; set; }
-		protected int RedisPort { get; set; } = 6379;
+		protected static string RedisHost { get; set; }
+		protected static string RedisPassword { get; set; }
+		protected static int RedisPort { get; set; } = 6379;
 
 		[JsonIgnore]
 		public Action TaskFinished { get; set; } = () => { };
@@ -45,10 +45,53 @@ namespace DotnetSpider.Extension
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 		public RedialExecutor RedialExecutor { get; set; }
 		public PrepareStartUrls[] PrepareStartUrls { get; set; }
-		public List<GlobalValueSelector> GlobalValues { get; internal set; } = new List<GlobalValueSelector>();
 		public CookieInterceptor CookieInterceptor { get; set; }
 		public List<BaseEntityPipeline> EntityPipelines { get; internal set; } = new List<BaseEntityPipeline>();
 		public int CachedSize { get; set; }
+
+		static EntitySpider()
+		{
+			if (string.IsNullOrEmpty(RedisHost))
+			{
+				RedisHost = Configuration.GetValue("redis.host");
+				RedisPassword = Configuration.GetValue("redis.password");
+				int port;
+				RedisPort = int.TryParse(Configuration.GetValue("redis.port"), out port) ? port : 6379;
+			}
+
+			if (!string.IsNullOrEmpty(RedisHost))
+			{
+				var confiruation = new ConfigurationOptions()
+				{
+					ServiceName = "DotnetSpider",
+					Password = RedisPassword,
+					ConnectTimeout = 65530,
+					KeepAlive = 8,
+					ConnectRetry = 3,
+					ResponseTimeout = 3000
+				};
+#if NET_CORE
+				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
+					var address = Dns.GetHostAddressesAsync(RedisHost).Result.FirstOrDefault();
+					if (address == null)
+					{
+						throw new SpiderException($"Can't resovle host: {RedisHost}");
+					}
+					confiruation.EndPoints.Add(new IPEndPoint(address, RedisPort));
+				}
+				else
+				{
+					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
+				}
+#else
+				confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
+#endif
+				Redis = ConnectionMultiplexer.Connect(confiruation);
+				Db = Redis.GetDatabase(1);
+			}
+		}
 
 		public EntitySpider(Site site)
 		{
@@ -78,19 +121,13 @@ namespace DotnetSpider.Extension
 					else
 					{
 						Site.CookiesStringPart = cookie.CookiesStringPart;
-						Site.Cookies = cookie.CookiesDictionary;
+						Site.SetCookies(cookie.CookiesDictionary);
 					}
 				}
 #endif
 
 				this.Log("创建爬虫...", LogLevel.Info);
-				EntityProcessor processor = new EntityProcessor(this);
 
-				foreach (var entity in Entities)
-				{
-					processor.AddEntity(entity);
-				}
-				PageProcessor = processor;
 				foreach (var entity in Entities)
 				{
 					string entiyName = entity.Entity.Name;
@@ -106,7 +143,7 @@ namespace DotnetSpider.Extension
 					}
 					if (pipelines.Count > 0)
 					{
-						Pipelines.Add(new EntityPipeline(entiyName, pipelines));
+						AddPipeline(new EntityPipeline(entiyName, pipelines));
 					}
 				}
 
@@ -177,60 +214,29 @@ namespace DotnetSpider.Extension
 
 		public EntitySpider AddEntityType(Type type)
 		{
-			AddEntityType(type, new List<TargetUrlExtractor>(), null);
+			AddEntityType(type, null);
 			return this;
 		}
 
 		public EntitySpider AddEntityType(Type type, DataHandler dataHandler)
-		{
-			AddEntityType(type, new List<TargetUrlExtractor>(), dataHandler);
-			return this;
-		}
-
-		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor)
-		{
-			AddEntityType(type, new List<TargetUrlExtractor> { targetUrlExtractor }, null);
-			return this;
-		}
-
-		public EntitySpider AddEntityType(Type type, TargetUrlExtractor targetUrlExtractor, DataHandler dataHandler)
-		{
-			if (targetUrlExtractor != null)
-			{
-				AddEntityType(type, new List<TargetUrlExtractor> { targetUrlExtractor }, dataHandler);
-			}
-			else
-			{
-				AddEntityType(type, new List<TargetUrlExtractor>(), dataHandler);
-			}
-
-			return this;
-		}
-
-		public EntitySpider AddEntityType(Type type, List<TargetUrlExtractor> targetUrlExtractors, DataHandler dataHandler)
 		{
 			CheckIfRunning();
 
 			if (typeof(ISpiderEntity).IsAssignableFrom(type))
 			{
 				var entity = ParseEntityMetaData(type.GetTypeInfoCrossPlatform());
-				entity.TargetUrlExtractors = targetUrlExtractors;
+
 				entity.DataHandler = dataHandler;
-				foreach (TargetUrlExtractor targetUrlExtractor in targetUrlExtractors)
-				{
-					for (int i = 0; i < targetUrlExtractor.Patterns.Count; ++i)
-					{
-						targetUrlExtractor.Patterns[i] = targetUrlExtractor.KeepOrigin ? targetUrlExtractor.Patterns[i] :
-							$"({targetUrlExtractor.Patterns[i].Replace(".", "\\.").Replace("*", "[^\"'#]*")})";
-					}
-				}
-				Entities.Add(entity);
-				GlobalValues = type.GetTypeInfo().GetCustomAttributes<GlobalValueSelector>().Select(e => new GlobalValueSelector
+
+				entity.SharedValues = type.GetTypeInfo().GetCustomAttributes<SharedValueSelector>().Select(e => new SharedValueSelector
 				{
 					Name = e.Name,
 					Expression = e.Expression,
 					Type = e.Type
 				}).ToList();
+				Entities.Add(entity);
+				EntityProcessor processor = new EntityProcessor(Site, entity);
+				AddPageProcessor(processor);
 			}
 			else
 			{
@@ -254,16 +260,6 @@ namespace DotnetSpider.Extension
 			{
 				((CachedPipeline)pipeline).CachedSize = count;
 			}
-		}
-
-		public override Spider AddPipeline(IPipeline pipeline)
-		{
-			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
-		}
-
-		public override Spider AddPipelines(IList<IPipeline> pipelines)
-		{
-			throw new SpiderException("EntitySpider only support AddEntityPipeline.");
 		}
 
 		public ISpider ToDefaultSpider()
@@ -377,48 +373,6 @@ namespace DotnetSpider.Extension
 				RedialExecutor.Init();
 				NetworkCenter.Current.Executor = RedialExecutor;
 			}
-
-			if (string.IsNullOrEmpty(RedisHost))
-			{
-				RedisHost = Configuration.GetValue("redisHost");
-				RedisPassword = Configuration.GetValue("redisPassword");
-				int port;
-				RedisPort = int.TryParse(Configuration.GetValue("redisPort"), out port) ? port : 6379;
-			}
-
-			if (!string.IsNullOrEmpty(RedisHost))
-			{
-				var confiruation = new ConfigurationOptions()
-				{
-					ServiceName = "DotnetSpider",
-					Password = RedisPassword,
-					ConnectTimeout = 65530,
-					KeepAlive = 8,
-					ConnectRetry = 3,
-					ResponseTimeout = 3000
-				};
-#if NET_CORE
-				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				{
-					// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
-					var address = Dns.GetHostAddressesAsync(RedisHost).Result.FirstOrDefault();
-					if (address == null)
-					{
-						this.Log($"Can't resovle host: {RedisHost}", LogLevel.Error);
-						throw new SpiderException($"Can't resovle host: {RedisHost}");
-					}
-					confiruation.EndPoints.Add(new IPEndPoint(address, RedisPort));
-				}
-				else
-				{
-					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
-				}
-#else
-				confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
-#endif
-				Redis = ConnectionMultiplexer.Connect(confiruation);
-				Db = Redis.GetDatabase(1);
-			}
 		}
 
 		public static EntityMetadata ParseEntityMetaData(
@@ -458,7 +412,8 @@ namespace DotnetSpider.Extension
 			{
 				entityMetadata.Entity.Multi = false;
 			}
-
+			TargetUrlsSelector targetUrlsSelector = entityType.GetCustomAttribute<TargetUrlsSelector>();
+			entityMetadata.TargetUrlExtractor = targetUrlsSelector;
 			return entityMetadata;
 		}
 

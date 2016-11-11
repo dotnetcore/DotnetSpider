@@ -1,26 +1,34 @@
 {
-	"version": "0.0.9",
-	"buildOptions": {
-		"emitEntryPoint": false,
-		"debugType": "portable"
-	},
+  "version": "1.0.0-*",
+  "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
+  "description": "This is the offical package.",
+  "packOptions": {
+    "licenseUrl": "https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE",
+    "repository": { "url": "https://github.com/zlzforever/DotnetSpider" },
+    "owners": [ "zlzforever@163.com" ],
+    "tags": [ "DotnetSpider", "Crawler", "Cross Platform", ".Net Core" ]
+  },
+  "buildOptions": {
+    "emitEntryPoint": false,
+    "debugType": "portable"
+  },
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.0"
+      "version": "1.0.1"
     },
-    "DotnetSpider.HtmlAgilityPack": "0.0.9"
+    "DotnetSpider.HtmlAgilityPack": "1.0.0-*"
   },
-	"frameworks": {
-		"netcoreapp1.0": {
-			"imports": "portable-net45+win8+dnxcore50",
-			"dependencies": {},
-			"buildOptions": {
-				"define": [
-					"NET_CORE",
-					"RELEASE"
-				]
-			}
-		}
-	}
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": "portable-net45+win8+dnxcore50",
+      "dependencies": {},
+      "buildOptions": {
+        "define": [
+          "NET_CORE",
+          "RELEASE"
+        ]
+      }
+    }
+  }
 }

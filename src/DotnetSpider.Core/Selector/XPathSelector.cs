@@ -73,5 +73,20 @@ namespace DotnetSpider.Core.Selector
 		{
 			return !string.IsNullOrEmpty(_attribute);
 		}
+
+		public override int GetHashCode()
+		{
+			return $"{_xpath}|{_attribute}".GetHashCode();
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj == null)
+			{
+				return false;
+			}
+
+			return obj.GetHashCode() == GetHashCode();
+		}
 	}
 }

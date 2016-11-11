@@ -12,7 +12,8 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
-			Page page = new Page(request, spider.Site.ContentType)
+			var site = spider.Site;
+			Page page = new Page(request, spider.Site.ContentType, site.RemoveOutboundLinks ? site.Domain : null)
 			{
 				Content = File.ReadAllText(request.Url.LocalPath),
 				TargetUrl = request.Url.ToString(),

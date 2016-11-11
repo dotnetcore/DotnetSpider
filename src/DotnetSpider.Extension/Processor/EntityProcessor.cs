@@ -4,57 +4,50 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
 using Site = DotnetSpider.Core.Site;
 using Newtonsoft.Json.Linq;
-
+using DotnetSpider.Core.Selector;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Extension.Processor
 {
-	public class EntityProcessor : IPageProcessor
+	public class EntityProcessor : BasePageProcessor
 	{
-		protected readonly IList<IEntityExtractor> EntityExtractorList = new List<IEntityExtractor>();
-		private readonly EntitySpider _spiderContext;
+		protected readonly EntityMetadata _entity;
+		protected readonly IEntityExtractor _extractor;
 
-		public EntityProcessor(EntitySpider spiderContext)
+		public EntityProcessor(Site site, EntityMetadata entity)
 		{
-			Site = spiderContext.Site;
-			_spiderContext = spiderContext;
-		}
-
-
-		public void AddEntity(EntityMetadata entityDefine)
-		{
-			EntityExtractorList.Add(GenerateExtractor(entityDefine));
-		}
-
-		private IEntityExtractor GenerateExtractor(EntityMetadata entityDefine)
-		{
-			return new EntityExtractor(entityDefine.Entity.Name, _spiderContext.GlobalValues, entityDefine);
-		}
-
-		public void Process(Page page)
-		{
-			foreach (IEntityExtractor pageModelExtractor in EntityExtractorList)
+			Site = site;
+			_entity = entity;
+			_extractor = new EntityExtractor(entity.Entity.Name, entity.SharedValues, entity);
+			if (entity.TargetUrlExtractor != null)
 			{
-				List<JObject> list = pageModelExtractor.Process(page);
-
-				if (list == null || list.Count == 0)
+				if (entity.TargetUrlExtractor.Patterns != null && entity.TargetUrlExtractor.Patterns.Length > 0)
 				{
-					continue;
+					TargetUrlPatterns = new HashSet<Regex>(entity.TargetUrlExtractor.Patterns.Select(p => new Regex(p)));
 				}
-
-				if (pageModelExtractor.DataHandler != null)
+				if (entity.TargetUrlExtractor.XPaths != null && entity.TargetUrlExtractor.XPaths.Length > 0)
 				{
-					list = pageModelExtractor.DataHandler.Handle(list, page);
+					TargetUrlRegions = new HashSet<ISelector>(entity.TargetUrlExtractor.XPaths.Select(x => Selectors.XPath(x)));
 				}
-
-				page.AddResultItem(pageModelExtractor.EntityMetadata.Entity.Name, list);
-			}
-
-			if (page.ResultItems.Results.Count == 0)
-			{
-				page.ResultItems.IsSkip = true;
 			}
 		}
 
-		public Site Site { get; set; }
+		protected override void Handle(Page page)
+		{
+			List<JObject> list = _extractor.Extract(page);
+
+			if (list == null || list.Count == 0)
+			{
+				return;
+			}
+
+			if (_extractor.DataHandler != null)
+			{
+				list = _extractor.DataHandler.Handle(list, page);
+			}
+
+			page.AddResultItem(_extractor.Name, list);
+		}
 	}
 }

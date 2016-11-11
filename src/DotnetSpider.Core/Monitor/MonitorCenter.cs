@@ -16,7 +16,7 @@ namespace DotnetSpider.Core.Monitor
 
 		static MonitorCenter()
 		{
-			Monitors = IocContainer.Default.GetServices<IMonitor>().ToList();
+			Monitors = IocManager.GetServices<IMonitor>().ToList();
 			if (Monitors.Count == 0)
 			{
 				Monitors = new List<IMonitor> { new NLogMonitor() };

@@ -102,7 +102,7 @@ namespace DotnetSpider.Extension.Downloader
 
 					AfterNavigate?.Invoke((RemoteWebDriver)_webDriver);
 
-					Page page = new Page(request, spider.Site.ContentType);
+					Page page = new Page(request, spider.Site.ContentType, site.RemoveOutboundLinks ? site.Domain : null);
 					page.Content = _fiddlerClient.ResponseBodyString;
 					_fiddlerClient.Clear();
 					page.TargetUrl = _webDriver.Url;
@@ -119,7 +119,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, site.ContentType) { Exception = e };
+				Page page = new Page(request, site.ContentType, null) { Exception = e };
 				return page;
 			}
 		}

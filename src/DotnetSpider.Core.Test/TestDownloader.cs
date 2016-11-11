@@ -6,7 +6,8 @@ namespace DotnetSpider.Core.Test
 	{
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
-			return new Page(request, ContentType.Html)
+			var site = spider.Site;
+			return new Page(request, ContentType.Html, site.RemoveOutboundLinks ? site.Domain : null)
 			{
 				Content = "aabbcccdefg下载人数100"
 			};

@@ -2,6 +2,8 @@
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Downloader.WebDriver;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using DotnetSpider.Core.Selector;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
@@ -113,6 +115,52 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				return false;
 			}
+		}
+	}
+
+	public class ClickHandler : SignIner
+	{
+		public List<Selector> Clicks { get; set; }
+
+		public override bool Handle(RemoteWebDriver webDriver)
+		{
+			try
+			{
+				webDriver.Manage().Window.Maximize();
+				foreach (var click in Clicks)
+				{
+					var e = FindElements(webDriver, click);
+					if (e != null)
+					{
+						foreach (var element in e)
+						{
+							element.Click();
+						}
+					}
+				}
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+
+		private List<IWebElement> FindElements(RemoteWebDriver webDriver, Selector element)
+		{
+			switch (element.Type)
+			{
+
+				case SelectorType.XPath:
+					{
+						return webDriver.FindElementsByXPath(element.Expression)?.ToList();
+					}
+				case SelectorType.Css:
+					{
+						return webDriver.FindElementsByCssSelector(element.Expression)?.ToList();
+					}
+			}
+			throw new SpiderException("Unsport findy: " + element.Type);
 		}
 	}
 }

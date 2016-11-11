@@ -54,7 +54,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NLog.4.3.7\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\..\..\packages\NLog.4.3.11\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -185,8 +185,8 @@
     <Compile Include="..\INamed.cs">
       <Link>INamed.cs</Link>
     </Compile>
-    <Compile Include="..\IocContainer.cs">
-      <Link>IocContainer.cs</Link>
+    <Compile Include="..\IocManager.cs">
+      <Link>IocManager.cs</Link>
     </Compile>
     <Compile Include="..\IRunable.cs">
       <Link>IRunable.cs</Link>
@@ -254,6 +254,9 @@
     <Compile Include="..\Pipeline\JsonFilePipeline.cs">
       <Link>Pipeline\JsonFilePipeline.cs</Link>
     </Compile>
+    <Compile Include="..\Processor\BasePageProcessor.cs">
+      <Link>Processor\BasePageProcessor.cs</Link>
+    </Compile>
     <Compile Include="..\Processor\DefaultPageProcessor.cs">
       <Link>Processor\DefaultPageProcessor.cs</Link>
     </Compile>
@@ -266,6 +269,9 @@
     <Compile Include="..\Proxy\HttpProxyPool.cs">
       <Link>Proxy\HttpProxyPool.cs</Link>
     </Compile>
+    <Compile Include="..\Proxy\IHttpProxyPool.cs">
+      <Link>Proxy\IHttpProxyPool.cs</Link>
+    </Compile>
     <Compile Include="..\Proxy\IProxySupplier.cs">
       <Link>Proxy\IProxySupplier.cs</Link>
     </Compile>
@@ -277,6 +283,9 @@
     </Compile>
     <Compile Include="..\Proxy\ProxyUtil.cs">
       <Link>Proxy\ProxyUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\Proxy\SingleProxyPool.cs">
+      <Link>Proxy\SingleProxyPool.cs</Link>
     </Compile>
     <Compile Include="..\Proxy\UseSpecifiedUriWebProxy.cs">
       <Link>Proxy\UseSpecifiedUriWebProxy.cs</Link>

@@ -1,16 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DotnetSpider.Core;
+using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class CollectEntityPipeline : ICollectEntityPipeline
+	public class CollectEntityPipeline : BaseEntityPipeline, ICollectEntityPipeline
 	{
 		private readonly List<JObject> _collector = new List<JObject>();
 
-		public ISpider Spider { get; protected set; }
+		public override BaseEntityPipeline Clone()
+		{
+			return new CollectEntityPipeline();
+		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 			_collector.Clear();
 		}
@@ -20,12 +25,11 @@ namespace DotnetSpider.Extension.Pipeline
 			return _collector;
 		}
 
-		public void InitPipeline(ISpider spider)
+		public override void InitiEntity(EntityMetadata metadata)
 		{
-			Spider = spider;
 		}
 
-		public void Process(List<JObject> datas)
+		public override void Process(List<JObject> datas)
 		{
 			lock (this)
 			{

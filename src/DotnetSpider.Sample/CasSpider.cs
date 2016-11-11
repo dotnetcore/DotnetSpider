@@ -32,18 +32,13 @@ namespace DotnetSpider.Sample
 				new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 			context.AddStartUrl("http://www.cas.cn/kx/kpwz/index_1.shtml");
-			context.AddEntityType(typeof(ArticleSummary), new TargetUrlExtractor
-			{
-				Patterns = new List<string> { @"index_[0-9]+.shtml", "index.shtml" }
-			});
-			context.AddEntityType(typeof(Article), new TargetUrlExtractor
-			{
-				Patterns = new List<string> { @"t[0-9]+_[0-9]+.shtml" }
-			});
+			context.AddEntityType(typeof(ArticleSummary));
+			context.AddEntityType(typeof(Article));
 			return context;
 		}
 
 		[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
+		[TargetUrlsSelector(Patterns = new[] { @"index_[0-9]+.shtml", "index.shtml" })]
 		public class ArticleSummary : ISpiderEntity
 		{
 			[PropertySelector(Expression = ".//a/@title")]
@@ -56,6 +51,7 @@ namespace DotnetSpider.Sample
 
 		[Schema("test", "Article", TableSuffix.Today)]
 		[Indexes(Index = new[] { "Title" })]
+		[TargetUrlsSelector(Patterns = new[] { @"t[0-9]+_[0-9]+.shtml" })]
 		public class Article : ISpiderEntity
 		{
 			[StoredAs("Title", DataType.String, 100)]

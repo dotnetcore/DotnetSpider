@@ -27,6 +27,14 @@ namespace DotnetSpider.Extension.Downloader
 		public abstract SiteCookie GetCookie();
 	}
 
+	public class DataBaseCookieInterceptor : CookieInterceptor
+	{
+		public override SiteCookie GetCookie()
+		{
+			return new SiteCookie();
+		}
+	}
+
 #if !NET_CORE
 	public abstract class WebDriverCookieInterceptor : CookieInterceptor
 	{

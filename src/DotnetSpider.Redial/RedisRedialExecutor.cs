@@ -44,9 +44,11 @@ namespace DotnetSpider.Redial
 
 		public override void WaitRedialExit()
 		{
-			while (Db.HashExists(HostName, Locker))
+			var locker = Db.HashGet(HostName, Locker);
+			while (locker.HasValue)
 			{
 				ClearTimeoutRedialLocker();
+				locker = Db.HashGet(HostName, Locker);
 				Thread.Sleep(50);
 			}
 		}
@@ -65,7 +67,8 @@ namespace DotnetSpider.Redial
 
 		public override bool CheckIsRedialing()
 		{
-			if (Db.HashExists(HostName, Locker))
+			var locker = Db.HashGet(HostName, Locker);
+			if (!locker.HasValue)
 			{
 				Db.HashSet(HostName, Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 				return false;
@@ -75,7 +78,14 @@ namespace DotnetSpider.Redial
 
 		public override void ReleaseRedialLocker()
 		{
-			Db.HashDelete(HostName, Locker);
+			var locker = Db.HashGet(HostName, Locker);
+			while (locker.HasValue)
+			{
+				Console.WriteLine("Try releasing redis redial-locker");
+				Db.HashDelete(HostName, Locker);
+				locker = Db.HashGet(HostName, Locker);
+				Thread.Sleep(50);
+			}
 		}
 
 		private void ClearTimeoutAction()

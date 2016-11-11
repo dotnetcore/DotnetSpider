@@ -58,18 +58,15 @@ namespace DotnetSpider.Sample
 				ConnectString = "Database='taobao';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=4306",
 				Mode = PipelineMode.Update
 			});
-			context.AddEntityType(typeof(ProductUpdater), new TargetUrlExtractor
-			{
-				Region = new Selector { Type = SelectorType.XPath, Expression = "//*[@id=\"J_bottomPage\"]" },
-				Patterns = new List<string> { @"&page=[0-9]+&" }
-			});
+			context.AddEntityType(typeof(ProductUpdater));
 			return context;
 		}
 
 		[Schema("jd", "sku_v2", TableSuffix.Monday)]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
 		[Indexes(Primary = "sku")]
-		[UpdateColumns(new []{""})]
+		[UpdateColumns(new[] { "" })]
+		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"J_bottomPage\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		public class ProductUpdater : ISpiderEntity
 		{
 			[StoredAs("sku", DataType.String, 25)]

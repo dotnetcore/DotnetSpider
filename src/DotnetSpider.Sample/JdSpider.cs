@@ -9,6 +9,7 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Core.Proxy;
 
 namespace DotnetSpider.Sample
 {
@@ -27,6 +28,7 @@ namespace DotnetSpider.Sample
 		}
 
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
+		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		public class TmpProduct : ISpiderEntity
 		{
 			[PropertySelector(Expression = "CategoryName", Type = SelectorType.Enviroment)]
@@ -43,6 +45,7 @@ namespace DotnetSpider.Sample
 			public string Sku { get; set; }
 		}
 
+		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		[Schema("jd", "jd_product")]
 		[Indexes(Index = new[] { "Sku" }, Primary = "Sku")]
 		public class JdProduct : ISpiderEntity
@@ -79,23 +82,17 @@ namespace DotnetSpider.Sample
 
 		protected override EntitySpider GetEntitySpider()
 		{
-			var entitySpider = new EntitySpider(new Site())
+			var entitySpider = new EntitySpider(new Site {
+				HttpProxyPool=new SingleProxyPool(new UseSpecifiedUriWebProxy(new Uri("http://sdfsdf:1234")))
+			})
 			{
 				Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Day1OfThisWeek.ToString("yyyy-MM-dd")
 			};
 
 			entitySpider.AddStartUrl("http://www.jd.com/allSort.aspx");
 			entitySpider.AddEntityType(typeof(Category));
-			entitySpider.AddEntityType(typeof(TmpProduct), new TargetUrlExtractor
-			{
-				Region = new BaseSelector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
-				Patterns = new List<string> { @"&page=[0-9]+&" }
-			});
-			entitySpider.AddEntityType(typeof(JdProduct), new TargetUrlExtractor
-			{
-				Region = new BaseSelector { Type = SelectorType.XPath, Expression = "//span[@class=\"p-num\"]" },
-				Patterns = new List<string> { @"http://item\.jd\.com/[0-9]+\.html" }
-			});
+			entitySpider.AddEntityType(typeof(TmpProduct));
+			entitySpider.AddEntityType(typeof(JdProduct));
 			entitySpider.AddEntityPipeline(
 				new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			return entitySpider;

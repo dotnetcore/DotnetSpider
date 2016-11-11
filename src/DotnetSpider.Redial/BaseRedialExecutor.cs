@@ -19,6 +19,8 @@ namespace DotnetSpider.Redial
 		public abstract void ReleaseRedialLocker();
 		public abstract void Init();
 
+		public int AfterRedialWaitTime { get; set; } = -1;
+
 		protected RedialExecutor(IRedialer redialer, IInternetDetector validater)
 		{
 			if (redialer == null || validater == null)
@@ -38,6 +40,7 @@ namespace DotnetSpider.Redial
 					Thread.Sleep(50);
 					if (!CheckIsRedialing())
 					{
+						ReleaseRedialLocker();
 						return RedialResult.OtherRedialed;
 					}
 				}
@@ -71,6 +74,11 @@ namespace DotnetSpider.Redial
 				finally
 				{
 					ReleaseRedialLocker();
+					if (AfterRedialWaitTime > 0)
+					{
+						Console.WriteLine($"Going to sleep for {AfterRedialWaitTime} after redial.");
+						Thread.Sleep(AfterRedialWaitTime);
+					}
 				}
 			}
 		}
