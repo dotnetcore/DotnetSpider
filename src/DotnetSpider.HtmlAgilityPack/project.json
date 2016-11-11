@@ -6,32 +6,33 @@
     "licenseUrl": "https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE",
     "repository": { "url": "https://github.com/zlzforever/DotnetSpider" },
     "owners": [ "zlzforever@163.com" ],
-    "tags": [ "DotnetSpider", "Crawler", "Cross Platform", ".Net Core" ]
+    "tags": [ "DotnetSpider", "Crawler", "Cross Platform", ".Net Core" ],
   },
-  "language": "C#",
   "buildOptions": {
     "emitEntryPoint": false,
     "debugType": "portable"
   },
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.1"
-    },
-    "System.Xml.XmlDocument": "4.0.1",
-    "System.Xml.ReaderWriter": "4.0.11",
-    "System.Xml.XPath": "4.0.1",
-    "System.Xml.XPath.XDocument": "4.0.1",
-    "System.Diagnostics.StackTrace": "4.0.1"
+
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netstandard1.6": {
       "imports": "portable-net45+win8+dnxcore50",
-      "dependencies": {},
+      "dependencies": {
+        "System.Collections": "4.3.0",
+        "System.IO.FileSystem": "4.3.0",
+        "System.Runtime.Extensions": "4.3.0",
+        "System.Text.RegularExpressions": "4.3.0",
+        "System.Diagnostics.Debug": "4.3.0",
+        "System.Xml.XmlDocument": "4.0.1",
+        "System.Xml.ReaderWriter": "4.0.11",
+        "System.Xml.XPath": "4.0.1",
+        "System.Xml.XPath.XDocument": "4.0.1",
+        "System.Diagnostics.StackTrace": "4.0.1"
+      },
       "buildOptions": {
         "define": [
-          "NET_CORE",
-          "RELEASE"
+          "NET_CORE"
         ]
       }
     }

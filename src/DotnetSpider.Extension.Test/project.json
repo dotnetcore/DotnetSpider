@@ -46,7 +46,6 @@
       },
       "buildOptions": {
         "define": [
-          "RELEASE",
           "NET_CORE"
         ]
       }
@@ -57,7 +56,6 @@
       },
       "buildOptions": {
         "define": [
-          "RELEASE",
           "NET_45"
         ]
       }

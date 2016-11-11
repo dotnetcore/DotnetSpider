@@ -13,20 +13,18 @@
     "debugType": "portable"
   },
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.1"
-    },
-    "DotnetSpider.HtmlAgilityPack": "1.0.0-*"
+    "DotnetSpider.HtmlAgilityPack": "1.0.0-*",
+    "System.Globalization": "4.3.0",
+    "System.Linq.Queryable": "4.0.1",
+    "System.Threading": "4.3.0"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netstandard1.6": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {},
       "buildOptions": {
         "define": [
-          "NET_CORE",
-          "RELEASE"
+          "NET_CORE"
         ]
       }
     }

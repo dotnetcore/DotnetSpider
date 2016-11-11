@@ -53,17 +53,13 @@
         ]
       }
     },
-    "netstandard1.3": {
+    "netstandard1.6": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
         "MailKit": "1.4.1",
         "Microsoft.CSharp": "4.0.1",
         "Microsoft.Extensions.DependencyInjection": "1.0.0",
         "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.1"
-        },
         "MySql.Data": "7.0.6-IR31",
         "StackExchange.Redis": "1.1.608",
         "System.Data.Common": "4.1.0",

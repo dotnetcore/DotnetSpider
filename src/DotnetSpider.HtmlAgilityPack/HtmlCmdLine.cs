@@ -17,66 +17,66 @@ namespace DotnetSpider.HtmlAgilityPack
         static HtmlCmdLine()
         {
             Help = false;
-            ParseArgs();
+            //ParseArgs();
         }
 
         #endregion
 
-        #region Internal Methods
+        //#region Internal Methods
 
-        internal static string GetOption(string name, string def)
-        {
-            string p = def;
-            string[] args = Environment.GetCommandLineArgs();
-            for (int i = 1; i < args.Length; i++)
-            {
-                GetStringArg(args[i], name, ref p);
-            }
-            return p;
-        }
+        //internal static string GetOption(string name, string def)
+        //{
+        //    string p = def;
+        //    string[] args = Environment.GetCommandLineArgs();
+        //    for (int i = 1; i < args.Length; i++)
+        //    {
+        //        GetStringArg(args[i], name, ref p);
+        //    }
+        //    return p;
+        //}
 
-        internal static string GetOption(int index, string def)
-        {
-            string p = def;
-            string[] args = Environment.GetCommandLineArgs();
-            int j = 0;
-            for (int i = 1; i < args.Length; i++)
-            {
-                if (GetStringArg(args[i], ref p))
-                {
-                    if (index == j)
-                        return p;
-                    else
-                        p = def;
-                    j++;
-                }
-            }
-            return p;
-        }
+        //internal static string GetOption(int index, string def)
+        //{
+        //    string p = def;
+        //    string[] args = Environment.GetCommandLineArgs();
+        //    int j = 0;
+        //    for (int i = 1; i < args.Length; i++)
+        //    {
+        //        if (GetStringArg(args[i], ref p))
+        //        {
+        //            if (index == j)
+        //                return p;
+        //            else
+        //                p = def;
+        //            j++;
+        //        }
+        //    }
+        //    return p;
+        //}
 
-        internal static bool GetOption(string name, bool def)
-        {
-            bool p = def;
-            string[] args = Environment.GetCommandLineArgs();
-            for (int i = 1; i < args.Length; i++)
-            {
-                GetBoolArg(args[i], name, ref p);
-            }
-            return p;
-        }
+        //internal static bool GetOption(string name, bool def)
+        //{
+        //    bool p = def;
+        //    string[] args = Environment.GetCommandLineArgs();
+        //    for (int i = 1; i < args.Length; i++)
+        //    {
+        //        GetBoolArg(args[i], name, ref p);
+        //    }
+        //    return p;
+        //}
 
-        internal static int GetOption(string name, int def)
-        {
-            int p = def;
-            string[] args = Environment.GetCommandLineArgs();
-            for (int i = 1; i < args.Length; i++)
-            {
-                GetIntArg(args[i], name, ref p);
-            }
-            return p;
-        }
+        //internal static int GetOption(string name, int def)
+        //{
+        //    int p = def;
+        //    string[] args = Environment.GetCommandLineArgs();
+        //    for (int i = 1; i < args.Length; i++)
+        //    {
+        //        GetIntArg(args[i], name, ref p);
+        //    }
+        //    return p;
+        //}
 
-        #endregion
+        //#endregion
 
         #region Private Methods
 
@@ -126,17 +126,17 @@ namespace DotnetSpider.HtmlAgilityPack
                 argValue = arg.Substring(name.Length + 2, arg.Length - name.Length - 2);
         }
 
-        private static void ParseArgs()
-        {
-            string[] args = Environment.GetCommandLineArgs();
-            for (int i = 1; i < args.Length; i++)
-            {
-                // help
-                GetBoolArg(args[i], "?", ref Help);
-                GetBoolArg(args[i], "h", ref Help);
-                GetBoolArg(args[i], "help", ref Help);
-            }
-        }
+        //private static void ParseArgs()
+        //{
+        //    string[] args = Environment.GetCommandLineArgs();
+        //    for (int i = 1; i < args.Length; i++)
+        //    {
+        //        // help
+        //        GetBoolArg(args[i], "?", ref Help);
+        //        GetBoolArg(args[i], "h", ref Help);
+        //        GetBoolArg(args[i], "help", ref Help);
+        //    }
+        //}
 
         #endregion
     }

@@ -33,14 +33,14 @@
       "frameworkAssemblies": {
         "System.Net.Http": "4.0.0",
         "System.Management": "4.0.0",
-        "System.Runtime": "4.0.0",
         "System.Web": "4.0.0.0",
         "System.Xml": "4.0.0.0"
       }
     },
     "net451": {
       "dependencies": {
-        "NLog": "4.3.9",
+        "NLog": "4.3.11",
+        "System.Runtime": "4.0.10",
         "HtmlAgilityPack": "1.4.9.5",
         "HtmlAgilityPack.CssSelectors": "1.0.2"
       },
@@ -56,7 +56,7 @@
         "System.Xml": "4.0.0.0"
       }
     },
-    "netcoreapp1.0": {
+    "netstandard1.6": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
         "DotnetSpider.HtmlAgilityPack": "1.0.0-*",
@@ -64,10 +64,6 @@
         "Microsoft.CSharp": "4.0.1",
         "Microsoft.Extensions.Configuration.Binder": "1.0.0",
         "Microsoft.Extensions.Configuration.Ini": "1.0.0",
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.1"
-        },
         "NLog": "5.0.0-beta03",
         "System.Collections.NonGeneric": "4.0.1",
         "System.Dynamic.Runtime": "4.0.11",
@@ -75,7 +71,7 @@
         "System.Net.Http": "4.1.0",
         "System.Net.NameResolution": "4.0.0",
         "System.Net.Requests": "4.0.11",
-        "System.Runtime.Extensions": "4.1.0",
+        "System.Runtime.Extensions": "4.3.0",
         "System.Runtime.Serialization.Primitives": "4.1.1",
         "System.Security.Cryptography.Algorithms": "4.2.0",
         "System.Security.Cryptography.Primitives": "4.0.0",
@@ -83,7 +79,8 @@
         "System.Threading.Tasks.Parallel": "4.0.1",
         "System.Threading.Thread": "4.0.0",
         "System.Threading.ThreadPool": "4.0.10",
-        "System.Xml.XDocument": "4.0.11"
+        "System.Xml.XDocument": "4.0.11",
+        "System.Diagnostics.Process": "4.1.0"
       },
       "buildOptions": {
         "define": [
@@ -91,5 +88,6 @@
         ]
       }
     }
+
   }
 }
