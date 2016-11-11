@@ -24,19 +24,30 @@
       },
       "buildOptions": {
         "define": [
-          "RELEASE",
-          "NET_45",
-          "Publish"
+          "NET_45"
         ]
       }
     },
-    "netcoreapp1.0": {
+    "net451": {
+      "dependencies": {
+        "HtmlAgilityPack": "1.4.9.5",
+        "HtmlAgilityPack.CssSelectors": "1.0.2",
+        "MySql.Data": "6.9.9",
+        "Selenium.WebDriver": "2.53.1",
+        "FiddlerCore2": "1.0.0"
+      },
+      "frameworkAssemblies": {
+        "System.Data": "4.0.0.0"
+      },
+      "buildOptions": {
+        "define": [
+          "NET_45"
+        ]
+      }
+    },
+    "netstandard1.3": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.0"
-        },
         "DotnetSpider.HtmlAgilityPack": "0.0.9",
         "DotnetSpider.HtmlAgilityPack.Css": "0.0.9",
         "SapientGuardian.MySql.Data": "6.9.812",
@@ -54,9 +65,7 @@
       },
       "buildOptions": {
         "define": [
-          "RELEASE",
-          "NET_CORE",
-          "Publish"
+          "NET_CORE"
         ]
       }
     }

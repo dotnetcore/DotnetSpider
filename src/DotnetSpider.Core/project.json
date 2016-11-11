@@ -18,7 +18,25 @@
       },
       "buildOptions": {
         "define": [
-          "RELEASE",
+          "NET_45"
+        ]
+      },
+      "frameworkAssemblies": {
+        "System.Net.Http": "4.0.0",
+        "System.Management": "4.0.0",
+        "System.Runtime": "4.0.0",
+        "System.Web": "4.0.0.0",
+        "System.Xml": "4.0.0.0"
+      }
+    },
+    "net451": {
+      "dependencies": {
+        "NLog": "4.3.9",
+        "HtmlAgilityPack": "1.4.9.5",
+        "HtmlAgilityPack.CssSelectors": "1.0.2"
+      },
+      "buildOptions": {
+        "define": [
           "NET_45"
         ]
       },
@@ -61,7 +79,6 @@
       },
       "buildOptions": {
         "define": [
-          "RELEASE",
           "NET_CORE"
         ]
       }
