@@ -34,7 +34,7 @@ namespace DotnetSpider.Core.Processor
 
 			Handle(page);
 
-			if (page.ResultItems.Results.Count == 0)
+			if (page.ResultItems.Results.Count == 0 && page.ResultItems.IsSkip)
 			{
 				page.ResultItems.IsSkip = true;
 			}
