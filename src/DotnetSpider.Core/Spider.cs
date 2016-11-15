@@ -444,7 +444,7 @@ namespace DotnetSpider.Core
 		{
 			foreach (string url in urls)
 			{
-				AddStartRequest(new Request(url, 1, null));
+				AddStartRequest(new Request(url, null));
 			}
 			return this;
 		}
@@ -457,7 +457,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider AddStartUrl(string url, Dictionary<string, dynamic> extras)
 		{
-			AddStartRequest(new Request(url, 1, extras));
+			AddStartRequest(new Request(url, extras));
 			return this;
 		}
 
@@ -465,7 +465,7 @@ namespace DotnetSpider.Core
 		{
 			foreach (string url in urls)
 			{
-				AddStartRequest(new Request(url, 1, null));
+				AddStartRequest(new Request(url, null));
 			}
 
 			return this;

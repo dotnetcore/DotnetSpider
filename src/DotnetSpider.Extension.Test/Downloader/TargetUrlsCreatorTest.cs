@@ -21,7 +21,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 					new IncrementTargetUrlsCreator("&page=0",2)
 				}
 			};
-			var request = new Request("http://a.com/?&page=0", 0, null);
+			var request = new Request("http://a.com/?&page=0", null);
 			Page page = downloader.Download(request, spider);
 			var request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());
@@ -40,7 +40,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 				}
 			};
 
-			request = new Request("http://a.com/?&page=0", 0, new Dictionary<string, object>() { { "page_index", 1 } });
+			request = new Request("http://a.com/?&page=0", new Dictionary<string, object>() { { "page_index", 1 } });
 			page = downloader.Download(request, spider);
 			request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());
@@ -66,7 +66,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 					}
 				}
 			};
-			var request = new Request("http://a.com/?&page=0", 0, null);
+			var request = new Request("http://a.com/?&page=0", null);
 			Page page = downloader.Download(request, spider);
 			var request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());

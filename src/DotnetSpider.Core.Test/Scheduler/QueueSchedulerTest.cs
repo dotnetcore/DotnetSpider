@@ -15,11 +15,11 @@ namespace DotnetSpider.Core.Test.Scheduler
 
 			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 30 }, i =>
 			{
-				scheduler.Push(new Request("http://www.a.com", 1, null));
-				scheduler.Push(new Request("http://www.a.com", 1, null));
-				scheduler.Push(new Request("http://www.a.com", 1, null));
-				scheduler.Push(new Request("http://www.b.com", 1, null));
-				scheduler.Push(new Request($"http://www.{i.ToString()}.com", 1, null));
+				scheduler.Push(new Request("http://www.a.com", null));
+				scheduler.Push(new Request("http://www.a.com", null));
+				scheduler.Push(new Request("http://www.a.com", null));
+				scheduler.Push(new Request("http://www.b.com", null));
+				scheduler.Push(new Request($"http://www.{i.ToString()}.com", null));
 			});
 
 			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 30 }, i =>
@@ -41,10 +41,10 @@ namespace DotnetSpider.Core.Test.Scheduler
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
-			scheduler.Push(new Request("http://www.a.com", 1, null));
-			scheduler.Push(new Request("http://www.a.com", 1, null));
-			scheduler.Push(new Request("http://www.a.com", 1, null));
-			scheduler.Push(new Request("http://www.b.com", 1, null));
+			scheduler.Push(new Request("http://www.a.com", null));
+			scheduler.Push(new Request("http://www.a.com", null));
+			scheduler.Push(new Request("http://www.a.com", null));
+			scheduler.Push(new Request("http://www.b.com", null));
 
 			var request = scheduler.Poll();
 			Assert.Equal(request.Url.ToString(), "http://www.b.com/");
@@ -64,10 +64,10 @@ namespace DotnetSpider.Core.Test.Scheduler
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
-			scheduler.Push(new Request("http://www.a.com", 1, null));
-			scheduler.Push(new Request("http://www.a.com", 1, null));
-			scheduler.Push(new Request("http://www.a.com", 1, null));
-			scheduler.Push(new Request("http://www.b.com", 1, null));
+			scheduler.Push(new Request("http://www.a.com", null));
+			scheduler.Push(new Request("http://www.a.com", null));
+			scheduler.Push(new Request("http://www.a.com", null));
+			scheduler.Push(new Request("http://www.b.com", null));
 
 			var request = scheduler.Poll();
 			Assert.Equal(request.Url.ToString(), "http://www.a.com/");
@@ -88,10 +88,10 @@ namespace DotnetSpider.Core.Test.Scheduler
 
 			scheduler.Clear();
 
-			scheduler.Push(new Request("http://www.a.com/", 1, null));
-			scheduler.Push(new Request("http://www.b.com/", 1, null));
-			scheduler.Push(new Request("http://www.c.com/", 1, null));
-			scheduler.Push(new Request("http://www.d.com/", 1, null));
+			scheduler.Push(new Request("http://www.a.com/", null));
+			scheduler.Push(new Request("http://www.b.com/", null));
+			scheduler.Push(new Request("http://www.c.com/", null));
+			scheduler.Push(new Request("http://www.d.com/", null));
 
 			Assert.Equal(0, scheduler.GetErrorRequestsCount());
 			Assert.Equal(4, scheduler.GetLeftRequestsCount());

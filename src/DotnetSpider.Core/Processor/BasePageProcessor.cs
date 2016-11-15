@@ -96,7 +96,7 @@ namespace DotnetSpider.Core.Processor
 					{
 						if (targetUrlPattern.IsMatch(link))
 						{
-							page.AddTargetRequest(new Request(link, page.Request.NextDepth, page.Request.Extras));
+							page.AddTargetRequest(new Request(link, page.Request.Extras));
 						}
 					}
 				}

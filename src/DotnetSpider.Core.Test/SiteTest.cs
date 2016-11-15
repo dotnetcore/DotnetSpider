@@ -27,8 +27,8 @@ namespace DotnetSpider.Core.Test
 			Site site = new Site { EncodingName = "UTF-8", Timeout = 3000 };
 			site.ClearStartRequests();
 			site.AddStartUrl(Url);
-			site.AddStartRequest(new Request(Url, 1, null));
-			Assert.True(site.StartRequests.Contains(new Request(Url, 1, null)));
+			site.AddStartRequest(new Request(Url, null));
+			Assert.True(site.StartRequests.Contains(new Request(Url, null)));
 		}
 
 		[Fact]
@@ -45,7 +45,7 @@ namespace DotnetSpider.Core.Test
 				site.AddStartUrl("http://a.com/" + i);
 			});
 
-			Assert.True(site.StartRequests.Contains(new Request("http://a.com/1", 1, null)));
+			Assert.True(site.StartRequests.Contains(new Request("http://a.com/1", null)));
 		}
 
 		[Fact]

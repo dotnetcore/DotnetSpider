@@ -125,7 +125,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Site AddStartUrl(string startUrl)
 		{
-			return AddStartRequest(new Request(startUrl, 1, null));
+			return AddStartRequest(new Request(startUrl, null));
 		}
 
 		/// <summary>
@@ -136,7 +136,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Site AddStartUrl(string startUrl, IDictionary<string, object> data)
 		{
-			return AddStartRequest(new Request(startUrl, 1, data));
+			return AddStartRequest(new Request(startUrl, data));
 		}
 
 		public Site AddStartUrls(IList<string> startUrls)

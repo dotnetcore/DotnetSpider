@@ -130,7 +130,7 @@ namespace DotnetSpider.Extension.Model
 					var value = result.GetValue(targetUrl.PropertyName);
 					if (value != null)
 					{
-						page.AddTargetRequest(new Request(value.ToString(), page.Request.NextDepth, allExtras));
+						page.AddTargetRequest(new Request(value.ToString(), allExtras));
 					}
 				}
 

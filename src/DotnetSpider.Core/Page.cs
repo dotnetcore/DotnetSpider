@@ -78,7 +78,7 @@ namespace DotnetSpider.Core
 
 		public string Domain { get; }
 
-		public Page(Request request, ContentType contentType, string domain)
+		public Page(Request request, ContentType contentType, string domain = null)
 		{
 			Request = request;
 			Url = request.Url.ToString();
@@ -134,7 +134,7 @@ namespace DotnetSpider.Core
 						continue;
 					}
 					string s1 = UrlUtils.CanonicalizeUrl(s, Url);
-					TargetRequests.Add(new Request(s1, Request.NextDepth, Request.Extras));
+					TargetRequests.Add(new Request(s1, Request.Extras) { Depth = Request.NextDepth });
 				}
 			}
 		}
@@ -153,6 +153,7 @@ namespace DotnetSpider.Core
 			{
 				foreach (var r in requests)
 				{
+					r.Depth = Request.NextDepth;
 					TargetRequests.Add(r);
 				}
 			}
@@ -178,7 +179,7 @@ namespace DotnetSpider.Core
 						continue;
 					}
 					string s1 = UrlUtils.CanonicalizeUrl(s, Url);
-					Request request = new Request(s1, Request.NextDepth, Request.Extras) { Priority = priority };
+					Request request = new Request(s1, Request.Extras) { Priority = priority, Depth = Request.NextDepth };
 					TargetRequests.Add(request);
 				}
 			}
@@ -198,7 +199,10 @@ namespace DotnetSpider.Core
 				}
 
 				requestString = UrlUtils.CanonicalizeUrl(requestString, Url);
-				TargetRequests.Add(new Request(requestString, Request.NextDepth, Request.Extras));
+				TargetRequests.Add(new Request(requestString, Request.Extras)
+				{
+					Depth = Request.NextDepth
+				});
 			}
 		}
 
@@ -213,6 +217,7 @@ namespace DotnetSpider.Core
 			}
 			lock (this)
 			{
+				request.Depth = Request.NextDepth;
 				TargetRequests.Add(request);
 			}
 		}

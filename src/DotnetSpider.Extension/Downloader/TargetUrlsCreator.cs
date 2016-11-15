@@ -167,7 +167,7 @@ namespace DotnetSpider.Extension.Downloader
 			string newUrl = IncreasePageNum(page.Url);
 			if (!string.IsNullOrEmpty(newUrl))
 			{
-				return new List<Request> { new Request(newUrl, page.Request.Depth, page.Request.Extras) };
+				return new List<Request> { new Request(newUrl, page.Request.Extras) };
 			}
 			else
 			{
@@ -198,7 +198,7 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			IncreasExtraPageIndex(page);
 			return new List<Request>{
-				new Request(page.Url, page.Request.Depth, page.Request.Extras)
+				new Request(page.Url, page.Request.Extras)
 				{
 					Method = page.Request.Method,
 					Origin = page.Request.Origin,

@@ -13,10 +13,10 @@ namespace DotnetSpider.Core.Test.Downloader
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
 			DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
-			downloader.Download(new Request("http://www.163.com", 0, null), spider);
+			downloader.Download(new Request("http://www.163.com", null), spider);
 			try
 			{
-				downloader.Download(new Request("http://localhost/abcasdfasdfasdfas", 0, null), spider);
+				downloader.Download(new Request("http://localhost/abcasdfasdfasdfas", null), spider);
 			}
 			catch (Exception e)
 			{
@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			watch.Start();
 			try
 			{
-				downloader.Download(new Request("http://google.com/", 0, null), spider);
+				downloader.Download(new Request("http://google.com/", null), spider);
 			}
 			catch (Exception e)
 			{
@@ -50,7 +50,7 @@ namespace DotnetSpider.Core.Test.Downloader
 
 			for (int i = 0; i < 100; i++)
 			{
-				downloader.Download(new Request("http://www.163.com", 0, null), spider);
+				downloader.Download(new Request("http://www.163.com", null), spider);
 			}
 		}
 
@@ -72,9 +72,9 @@ namespace DotnetSpider.Core.Test.Downloader
 				}
 			};
 			HttpClientDownloader downloader = new HttpClientDownloader();
-			downloader.Download(new Request("http://baidu.com", 0, null), new DefaultSpider("test", site1));
+			downloader.Download(new Request("http://baidu.com", null), new DefaultSpider("test", site1));
 
-			downloader.Download(new Request("http://baidu.com", 0, null), new DefaultSpider("test", site2));
+			downloader.Download(new Request("http://baidu.com", null), new DefaultSpider("test", site2));
 		}
 	}
 }

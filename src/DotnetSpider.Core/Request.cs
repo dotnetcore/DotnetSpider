@@ -18,18 +18,18 @@ namespace DotnetSpider.Core
 		public const string Proxy = "6f09c4d6-167a-4272-8208-8a59bebdfe33";
 		public const string ResultIsEmptyTriedTimes = "BA2788B8-FC48-4B11-861D-524B5FB21582";
 
-		public int Depth { get; set; }
+		public int Depth { get; internal set; } = 1;
 		public int NextDepth => Depth + 1;
 
 		public Request()
 		{
 		}
 
-		public Request(string url, int grade, IDictionary<string, dynamic> extras) : this(new Uri(url), grade, extras)
+		public Request(string url, IDictionary<string, dynamic> extras) : this(new Uri(url), extras)
 		{
 		}
 
-		public Request(Uri url, int grade, IDictionary<string, dynamic> extras)
+		public Request(Uri url, IDictionary<string, dynamic> extras)
 		{
 			Url = url;
 			if (extras != null)
@@ -39,8 +39,6 @@ namespace DotnetSpider.Core
 					PutExtra(extra.Key, extra.Value);
 				}
 			}
-
-			Depth = grade;
 		}
 
 		public string Referer { get; set; }
@@ -162,13 +160,14 @@ namespace DotnetSpider.Core
 						extras.Add(entry.Key, entry.Value);
 					}
 				}
-				Request newObj = new Request(Url, Depth, extras)
+				Request newObj = new Request(Url, extras)
 				{
 					Method = Method,
 					Priority = Priority,
 					Referer = Referer,
 					PostBody = PostBody,
-					Origin = Origin
+					Origin = Origin,
+					Depth = Depth
 				};
 				return newObj;
 			}

@@ -28,6 +28,7 @@ namespace DotnetSpider.Sample
 			// 使用内存Scheduler、自定义PageProcessor、自定义Pipeline创建爬虫
 			Spider spider = Spider.Create(site, new QueueDuplicateRemovedScheduler(), new MyPageProcessor()).AddPipeline(new MyPipeline()).SetThreadNum(1);
 			spider.EmptySleepTime = 3000;
+			spider.Deep = 2;
 			// 注册爬虫到监控服务
 			MonitorCenter.Register(spider);
 
@@ -70,7 +71,7 @@ namespace DotnetSpider.Sample
 
 				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
 				{
-					page.AddTargetRequest(new Request(url.GetValue(), 0, null));
+					page.AddTargetRequest(new Request(url.GetValue(), null));
 				}
 			}
 		}

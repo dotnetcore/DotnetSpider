@@ -7,8 +7,8 @@ namespace DotnetSpider.Core.Test
 	{
 		public static Request GetRequest()
 		{
-			var extras = new Dictionary<string, dynamic> {{"Test", "Forever"}};
-			var request = new Request("http://www.taobao.com", 2, extras)
+			var extras = new Dictionary<string, dynamic> { { "Test", "Forever" } };
+			var request = new Request("http://www.taobao.com", extras)
 			{
 				Method = "get",
 				Priority = 1
@@ -44,7 +44,7 @@ namespace DotnetSpider.Core.Test
 			var request = GetRequest();
 			request.PutExtra("One", new { Name = "John" });
 			Assert.Equal(request.Extras["One"], new { Name = "John" });
-			Assert.Equal(request.Depth, 2);
+			Assert.Equal(request.Depth, 1);
 		}
 
 		[Fact]

@@ -39,7 +39,7 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void RemoveOutboundLinks()
 		{
-			Page page = new Page(new Request("http://a.com", 0, null), ContentType.Html, "a.com")
+			Page page = new Page(new Request("http://a.com", null), ContentType.Html, "a.com")
 			{
 				Content = _html3
 			};

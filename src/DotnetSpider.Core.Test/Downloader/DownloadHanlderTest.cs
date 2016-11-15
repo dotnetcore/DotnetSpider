@@ -26,7 +26,7 @@ namespace DotnetSpider.Core.Test.Downloader
 					}
 				}
 			};
-			var request1 = new Request("http://a.com/", 0, new Dictionary<string, dynamic>
+			var request1 = new Request("http://a.com/", new Dictionary<string, dynamic>
 			{
 				{"TOKEN2", "TEST2"}
 			})
@@ -36,14 +36,14 @@ namespace DotnetSpider.Core.Test.Downloader
 			Page page = downloader.Download(request1, spider);
 			Assert.Equal("TEST1TEST2", page.Request.PostBody);
 
-			var request2 = new Request("http://a.com/", 0, new Dictionary<string, dynamic>())
+			var request2 = new Request("http://a.com/", new Dictionary<string, dynamic>())
 			{
 				PostBody = "{0}{1}"
 			};
 			page = downloader.Download(request2, spider);
 			Assert.Equal("TEST1", page.Request.PostBody);
 
-			request1 = new Request("http://a.com/", 0, new Dictionary<string, dynamic>
+			request1 = new Request("http://a.com/", new Dictionary<string, dynamic>
 			{
 				{"TOKEN2", "TEST2"}
 			})
@@ -70,7 +70,7 @@ namespace DotnetSpider.Core.Test.Downloader
 					}
 				}
 			};
-			var request1 = new Request("http://a.com/", 0, null);
+			var request1 = new Request("http://a.com/", null);
 			Page page = downloader1.Download(request1, spider);
 			Assert.Equal("aabbc", page.Content);
 
@@ -177,7 +177,7 @@ namespace DotnetSpider.Core.Test.Downloader
 					}
 				}
 			};
-			var request1 = new Request("http://www.163.com/", 0, null);
+			var request1 = new Request("http://www.163.com/", null);
 			Page page = downloader1.Download(request1, spider);
 			Assert.Equal(1, page.TargetRequests.Count);
 

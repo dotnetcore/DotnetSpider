@@ -48,7 +48,7 @@ namespace DotnetSpider.Core.Common
 
 		public static IList<Request> ConvertToRequests(IEnumerable<string> urls, int grade)
 		{
-			return urls.Select(url => new Request(url, grade, null)).ToList();
+			return urls.Select(url => new Request(url, null) { Depth = grade }).ToList();
 		}
 
 		public static IList<string> ConvertToUrls(IEnumerable<Request> requests)

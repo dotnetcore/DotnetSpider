@@ -64,7 +64,7 @@ namespace DotnetSpider.Extension.Model
 			{
 				for (int j = From; j <= To; j += PostInterval)
 				{
-					spider.Scheduler.Push(new Request(string.Format(FormateString, i), 1, data)
+					spider.Scheduler.Push(new Request(string.Format(FormateString, i), data)
 					{
 						PostBody = string.IsNullOrEmpty(PostBody) ? null : string.Format(PostBody, j),
 						Origin = Origin,
@@ -99,7 +99,7 @@ namespace DotnetSpider.Extension.Model
 
 			for (DateTime i = From; i <= To; i = i.AddDays(IntervalDay))
 			{
-				spider.Scheduler.Push(new Request(string.Format(FormateString, i.ToString(DateFormate)), 1, data)
+				spider.Scheduler.Push(new Request(string.Format(FormateString, i.ToString(DateFormate)), data)
 				{
 					PostBody = PostBody,
 					Origin = Origin,
@@ -207,7 +207,7 @@ namespace DotnetSpider.Extension.Model
 				foreach (var formate in FormateStrings)
 				{
 					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					spider.Scheduler.Push(new Request(tmpUrl, 0, data)
+					spider.Scheduler.Push(new Request(tmpUrl, data)
 					{
 						Method = Method,
 						Origin = Origin,
@@ -282,12 +282,12 @@ namespace DotnetSpider.Extension.Model
 						foreach (var formate in FormateStrings)
 						{
 							string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-							spider.Scheduler.Push(new Request(tmpUrl, 0, data)
+							spider.Scheduler.Push(new Request(tmpUrl, data)
 							{
 								Method = Method,
 								Origin = !string.IsNullOrEmpty(Origin) ? string.Format(Origin, arguments.Cast<object>().ToArray()) : null,
 								PostBody = !string.IsNullOrEmpty(PostBody) ? string.Format(PostBody, arguments.Cast<object>().ToArray()) : null,
-								Referer = !string.IsNullOrEmpty(Referer) ? string.Format(Referer, arguments.Cast<object>().ToArray()): null
+								Referer = !string.IsNullOrEmpty(Referer) ? string.Format(Referer, arguments.Cast<object>().ToArray()) : null
 							});
 						}
 						arguments.RemoveAt(arguments.Count - 1);
@@ -392,7 +392,7 @@ namespace DotnetSpider.Extension.Model
 								if (!canStop)
 								{
 									string tmpUrl = string.Format(formate, args.Cast<object>().ToArray());
-									spider.Scheduler.Push(new Request(tmpUrl, 0, data)
+									spider.Scheduler.Push(new Request(tmpUrl, data)
 									{
 										Method = Method,
 										Origin = Origin,
@@ -452,7 +452,7 @@ namespace DotnetSpider.Extension.Model
 				foreach (var formate in FormateStrings)
 				{
 					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					spider.Scheduler.Push(new Request(tmpUrl, 0, tmp)
+					spider.Scheduler.Push(new Request(tmpUrl, tmp)
 					{
 						Method = Method,
 						Origin = Origin,

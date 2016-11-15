@@ -22,7 +22,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Init(spider);
 			scheduler.Clear();
 
-			Request request = new Request("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", 1, null);
+			Request request = new Request("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", null);
 			request.PutExtra("1", "2");
 			scheduler.Push(request);
 			Request result = scheduler.Poll();
@@ -42,10 +42,10 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
 			scheduler.Clear();
-			Request request1 = new Request("http://www.ibm.com/1", 1, null);
-			Request request2 = new Request("http://www.ibm.com/2", 1, null);
-			Request request3 = new Request("http://www.ibm.com/3", 1, null);
-			Request request4 = new Request("http://www.ibm.com/4", 1, null);
+			Request request1 = new Request("http://www.ibm.com/1", null);
+			Request request2 = new Request("http://www.ibm.com/2", null);
+			Request request3 = new Request("http://www.ibm.com/3", null);
+			Request request4 = new Request("http://www.ibm.com/4", null);
 			scheduler.Push(request1);
 			scheduler.Push(request2);
 			scheduler.Push(request3);
@@ -67,10 +67,10 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
 			scheduler.Clear();
-			Request request1 = new Request("http://www.ibm.com/1", 1, null);
-			Request request2 = new Request("http://www.ibm.com/2", 1, null);
-			Request request3 = new Request("http://www.ibm.com/3", 1, null);
-			Request request4 = new Request("http://www.ibm.com/4", 1, null);
+			Request request1 = new Request("http://www.ibm.com/1", null);
+			Request request2 = new Request("http://www.ibm.com/2", null);
+			Request request3 = new Request("http://www.ibm.com/3", null);
+			Request request4 = new Request("http://www.ibm.com/4", null);
 			scheduler.Push(request1);
 			scheduler.Push(request2);
 			scheduler.Push(request3);
@@ -94,7 +94,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			var start = DateTime.Now;
 			for (int i = 0; i < 40000; i++)
 			{
-				scheduler.Push(new Request("http://www.a.com/" + i, 1, null));
+				scheduler.Push(new Request("http://www.a.com/" + i, null));
 			}
 
 			var end = DateTime.Now;
@@ -105,7 +105,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			HashSet<Request> list = new HashSet<Request>();
 			for (int i = 0; i < 40000; i++)
 			{
-				list.Add(new Request("http://www.a.com/" + i, 1, null));
+				list.Add(new Request("http://www.a.com/" + i, null));
 			}
 			scheduler.Import(list);
 			var end1 = DateTime.Now;
@@ -121,10 +121,10 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
-			scheduler.Push(new Request("http://www.a.com/", 1, null));
-			scheduler.Push(new Request("http://www.b.com/", 1, null));
-			scheduler.Push(new Request("http://www.c.com/", 1, null));
-			scheduler.Push(new Request("http://www.d.com/", 1, null));
+			scheduler.Push(new Request("http://www.a.com/", null));
+			scheduler.Push(new Request("http://www.b.com/", null));
+			scheduler.Push(new Request("http://www.c.com/", null));
+			scheduler.Push(new Request("http://www.d.com/", null));
 
 			Extension.Scheduler.RedisScheduler redisScheduler = GetRedisScheduler();
 			redisScheduler.Init(spider);
@@ -150,10 +150,10 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			scheduler.Clear();
 
-			scheduler.Push(new Request("http://www.a.com/", 1, null));
-			scheduler.Push(new Request("http://www.b.com/", 1, null));
-			scheduler.Push(new Request("http://www.c.com/", 1, null));
-			scheduler.Push(new Request("http://www.d.com/", 1, null));
+			scheduler.Push(new Request("http://www.a.com/", null));
+			scheduler.Push(new Request("http://www.b.com/", null));
+			scheduler.Push(new Request("http://www.c.com/", null));
+			scheduler.Push(new Request("http://www.d.com/", null));
 
 			Assert.Equal(0, scheduler.GetErrorRequestsCount());
 			Assert.Equal(4, scheduler.GetLeftRequestsCount());
@@ -229,10 +229,10 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
 			scheduler.Clear();
-			Request request1 = new Request("http://www.ibm.com/1", 1, null);
-			Request request2 = new Request("http://www.ibm.com/2", 1, null);
-			Request request3 = new Request("http://www.ibm.com/3", 1, null);
-			Request request4 = new Request("http://www.ibm.com/4", 1, null);
+			Request request1 = new Request("http://www.ibm.com/1", null);
+			Request request2 = new Request("http://www.ibm.com/2", null);
+			Request request3 = new Request("http://www.ibm.com/3", null);
+			Request request4 = new Request("http://www.ibm.com/4", null);
 			scheduler.Push(request1);
 			scheduler.Push(request2);
 			scheduler.Push(request3);
