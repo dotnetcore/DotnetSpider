@@ -21,15 +21,15 @@ namespace DotnetSpider.Core
 		public int Depth { get; internal set; } = 1;
 		public int NextDepth => Depth + 1;
 
-		public Request()
+		public Request(string url) : this(new Uri(url), null)
 		{
 		}
 
-		public Request(string url, IDictionary<string, dynamic> extras) : this(new Uri(url), extras)
+		public Request(string url, IDictionary<string, dynamic> extras = null) : this(new Uri(url), extras)
 		{
 		}
 
-		public Request(Uri url, IDictionary<string, dynamic> extras)
+		public Request(Uri url, IDictionary<string, dynamic> extras = null)
 		{
 			Url = url;
 			if (extras != null)
