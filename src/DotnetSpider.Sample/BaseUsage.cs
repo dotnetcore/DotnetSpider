@@ -18,7 +18,7 @@ namespace DotnetSpider.Sample
 			IocManager.AddSingleton<IMonitor, NLogMonitor>();
 
 			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
-			var site = new Site { EncodingName = "UTF-8" };
+			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
 			for (int i = 1; i < 5; ++i)
 			{
 				// 添加初始采集链接

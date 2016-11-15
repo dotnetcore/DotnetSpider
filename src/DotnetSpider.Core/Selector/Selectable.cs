@@ -20,14 +20,14 @@ namespace DotnetSpider.Core.Selector
 						HtmlDocument document = new HtmlDocument { OptionAutoCloseOnEnd = true };
 						document.LoadHtml(text);
 
-						if (!string.IsNullOrEmpty(domain) && !string.IsNullOrWhiteSpace(domain))
-						{
-							RemoveOutboundLinks(document, domain);
-						}
-
 						if (!string.IsNullOrEmpty(urlOrPadding))
 						{
 							FixAllRelativeHrefs(document, urlOrPadding);
+						}
+
+						if (!string.IsNullOrEmpty(domain) && !string.IsNullOrWhiteSpace(domain))
+						{
+							RemoveOutboundLinks(document, domain);
 						}
 
 						Elements = new List<dynamic> { document.DocumentNode.OuterHtml };
@@ -178,7 +178,7 @@ namespace DotnetSpider.Core.Selector
 					if (node.Attributes["href"] != null)
 					{
 						Uri uri;
-						if (Uri.TryCreate(node.Attributes["href"].Value, UriKind.RelativeOrAbsolute, out uri))
+						if (Uri.TryCreate(node.Attributes["href"].Value, UriKind.Absolute, out uri))
 						{
 							if (uri.Host != domain)
 							{
@@ -187,7 +187,7 @@ namespace DotnetSpider.Core.Selector
 						}
 					}
 				}
-				foreach(var node in deleteNodes)
+				foreach (var node in deleteNodes)
 				{
 					node.Remove();
 				}

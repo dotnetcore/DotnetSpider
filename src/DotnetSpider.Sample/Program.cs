@@ -12,10 +12,10 @@ namespace DotnetSpider.Sample
 		{
 			IocManager.AddSingleton<IMonitor, NLogMonitor>();
 
-			//BaseUsage.Run();
+			BaseUsage.Run();
 
-			CasSpider casSper = new CasSpider();
-			casSper.Run();
+			//CasSpider casSper = new CasSpider();
+			//casSper.Run();
 		}
 	}
 }
