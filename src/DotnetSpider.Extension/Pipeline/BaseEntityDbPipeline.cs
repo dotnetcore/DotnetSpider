@@ -264,7 +264,8 @@ namespace DotnetSpider.Extension.Pipeline
 									List<DbParameter> parameters = new List<DbParameter>();
 									foreach (var column in Columns)
 									{
-										var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
+										var value = data.SelectToken($"{column.Name}")?.Value<string>();
+										var parameter = CreateDbParameter($"@{column.Name}", value);
 										parameter.DbType = Convert(column.DataType);
 										parameters.Add(parameter);
 									}

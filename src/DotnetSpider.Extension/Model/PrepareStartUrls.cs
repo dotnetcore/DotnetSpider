@@ -62,7 +62,7 @@ namespace DotnetSpider.Extension.Model
 
 			for (int i = From; i <= To; i += Interval)
 			{
-				for (int j = From; j <= To; j += PostInterval)
+				for (int j = PostFrom; j <= PostFrom; j += PostInterval)
 				{
 					spider.Scheduler.Push(new Request(string.Format(FormateString, i), data)
 					{
