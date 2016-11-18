@@ -21,6 +21,10 @@ namespace DotnetSpider.Core
 		public int Depth { get; internal set; } = 1;
 		public int NextDepth => Depth + 1;
 
+		public Request()
+		{
+		}
+
 		public Request(string url) : this(new Uri(url), null)
 		{
 		}
