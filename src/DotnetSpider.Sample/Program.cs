@@ -14,6 +14,8 @@ namespace DotnetSpider.Sample
 
 			BaseUsage.Run();
 
+
+
 			//CasSpider casSper = new CasSpider();
 			//casSper.Run();
 		}

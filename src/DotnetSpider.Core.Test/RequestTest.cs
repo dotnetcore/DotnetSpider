@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using Xunit;
 
 namespace DotnetSpider.Core.Test
@@ -70,5 +71,13 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(request.Priority, clone.Priority);
 		}
 
+		[Fact]
+		public void Serialize()
+		{
+			var request = GetRequest();
+			var str = JsonConvert.SerializeObject(request);
+			var r = JsonConvert.DeserializeObject<Request>(str);
+			Assert.Equal(request.Depth, r.Depth);
+		}
 	}
 }
