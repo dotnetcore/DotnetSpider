@@ -132,41 +132,45 @@ namespace DotnetSpider.Extension.Model
 		protected List<Dictionary<string, object>> PrepareDatas()
 		{
 			List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
-			using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
+			NetworkCenter.Current.Execute("db-pstu", () =>
 			{
-				conn.Open();
-				var command = conn.CreateCommand();
-				command.CommandText = QueryString;
-				command.CommandTimeout = 60000;
-				command.CommandType = CommandType.Text;
-
-				var reader = command.ExecuteReader();
-
-				while (reader.Read())
+				using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
 				{
-					Dictionary<string, object> data = new Dictionary<string, object>();
-					int count = reader.FieldCount;
-					for (int i = 0; i < count; ++i)
-					{
-						string name = reader.GetName(i);
-						data.Add(name, reader.GetValue(i));
-					}
+					conn.Open();
+					var command = conn.CreateCommand();
+					command.CommandText = QueryString;
+					command.CommandTimeout = 60000;
+					command.CommandType = CommandType.Text;
 
-					if (Extras != null)
+					var reader = command.ExecuteReader();
+
+					while (reader.Read())
 					{
-						foreach (var extra in Extras)
+						Dictionary<string, object> data = new Dictionary<string, object>();
+						int count = reader.FieldCount;
+						for (int i = 0; i < count; ++i)
 						{
-							data.Add(extra.Key, extra.Value);
+							string name = reader.GetName(i);
+							data.Add(name, reader.GetValue(i));
 						}
+
+						if (Extras != null)
+						{
+							foreach (var extra in Extras)
+							{
+								data.Add(extra.Key, extra.Value);
+							}
+						}
+						list.Add(data);
 					}
-					list.Add(data);
-				}
 #if !NET_CORE
-				reader.Close();
+					reader.Close();
 #else
 				reader.Dispose();
 #endif
-			}
+				}
+			});
+			
 			return list;
 		}
 
