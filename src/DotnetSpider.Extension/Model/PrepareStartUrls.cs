@@ -286,6 +286,24 @@ namespace DotnetSpider.Extension.Model
 						foreach (var formate in FormateStrings)
 						{
 							string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
+							if (data.ContainsKey("DotnetSpiderEnvironmentIndex"))
+							{
+								data["DotnetSpiderEnvironmentIndex"]= i;
+							}
+							else
+							{
+								data.Add("DotnetSpiderEnvironmentIndex", i);
+							}
+
+							if (data.ContainsKey("DotnetSpiderEnvironmentPostIndex"))
+							{
+								data["DotnetSpiderEnvironmentPostIndex"] = j;
+							}
+							else
+							{
+								data.Add("DotnetSpiderEnvironmentPostIndex", j);
+							}
+
 							spider.Scheduler.Push(new Request(tmpUrl, data)
 							{
 								Method = Method,
