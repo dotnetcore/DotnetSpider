@@ -1,9 +1,9 @@
 using DotnetSpider.Core;
 using System.Collections.Generic;
 using System.IO;
-using OpenQA.Selenium.Firefox;
 using LogLevel = DotnetSpider.Core.LogLevel;
 #if !NET_CORE
+using OpenQA.Selenium.Firefox;
 using System;
 using DotnetSpider.Core.Selector;
 using System.Linq;
