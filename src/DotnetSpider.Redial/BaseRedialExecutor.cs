@@ -40,7 +40,7 @@ namespace DotnetSpider.Redial
 					Thread.Sleep(50);
 					if (!CheckIsRedialing())
 					{
-						ReleaseRedialLocker();
+						//ReleaseRedialLocker();
 						return RedialResult.OtherRedialed;
 					}
 				}

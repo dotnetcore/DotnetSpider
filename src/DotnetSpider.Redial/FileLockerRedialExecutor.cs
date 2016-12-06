@@ -26,13 +26,13 @@ namespace DotnetSpider.Redial
 
 		public override void WaitAll()
 		{
+			File.Create(RedialLockerFile).Dispose();
 			while (true)
 			{
 				if (!Directory.GetFiles(AtomicActionFolder).Any())
 				{
 					break;
 				}
-
 				Thread.Sleep(50);
 			}
 		}
@@ -69,9 +69,9 @@ namespace DotnetSpider.Redial
 
 		public override bool CheckIsRedialing()
 		{
-			if (File.Exists(RedialLockerFile))
+			if (!File.Exists(RedialLockerFile))
 			{
-				File.Create(RedialLockerFile).Dispose();
+				//File.Create(RedialLockerFile).Dispose();
 				return false;
 			}
 			return true;
