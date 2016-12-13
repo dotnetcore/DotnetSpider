@@ -169,9 +169,16 @@ namespace DotnetSpider.Extension.Downloader
 
 				if (LoginAreaSelector != null)
 				{
-					var loginArea = FindElement(webDriver, LoginAreaSelector);
-					loginArea.Click();
-					Thread.Sleep(1000);
+					try
+					{
+						var loginArea = FindElement(webDriver, LoginAreaSelector);
+						loginArea.Click();
+						Thread.Sleep(1000);
+					}
+					catch (Exception e)
+					{
+						// ignored
+					}
 				}
 
 				if (UserSelector != null)

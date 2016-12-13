@@ -392,12 +392,12 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\..\..\packages\Selenium.WebDriver.ChromeDriver.2.25.0.0\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\..\..\packages\Selenium.WebDriver.ChromeDriver.2.25.0.0\build\Selenium.WebDriver.ChromeDriver.targets')" />
+  <Import Project="..\..\..\packages\Selenium.WebDriver.ChromeDriver.2.26.0\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\..\..\packages\Selenium.WebDriver.ChromeDriver.2.26.0\build\Selenium.WebDriver.ChromeDriver.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\packages\Selenium.WebDriver.ChromeDriver.2.25.0.0\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Selenium.WebDriver.ChromeDriver.2.25.0.0\build\Selenium.WebDriver.ChromeDriver.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\Selenium.WebDriver.ChromeDriver.2.26.0\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Selenium.WebDriver.ChromeDriver.2.26.0\build\Selenium.WebDriver.ChromeDriver.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
