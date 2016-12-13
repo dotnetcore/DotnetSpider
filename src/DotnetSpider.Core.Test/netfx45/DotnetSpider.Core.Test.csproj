@@ -88,6 +88,9 @@
     <Compile Include="..\HtmlTest.cs">
       <Link>HtmlTest.cs</Link>
     </Compile>
+    <Compile Include="..\IocManagerTests.cs">
+      <Link>IocManagerTests.cs</Link>
+    </Compile>
     <Compile Include="..\Pipeline\FilePipelineTest.cs">
       <Link>Pipeline\FilePipelineTest.cs</Link>
     </Compile>

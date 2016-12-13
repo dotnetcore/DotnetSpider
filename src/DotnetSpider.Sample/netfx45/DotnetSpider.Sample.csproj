@@ -67,6 +67,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\BaiduSearchSpider.cs">
+      <Link>BaiduSearchSpider.cs</Link>
+    </Compile>
     <Compile Include="..\BaseUsage.cs">
       <Link>BaseUsage.cs</Link>
     </Compile>
