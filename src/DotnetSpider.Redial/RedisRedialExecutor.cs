@@ -30,14 +30,18 @@ namespace DotnetSpider.Redial
 
 		public override void WaitAll()
 		{
+			Db.HashSet(HostName, Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 			while (true)
 			{
 				ClearTimeoutAction();
-				if (Db.HashLength(HostName) <= 1)
+				var hashSet = Db.HashGetAll(HostName);
+				if (hashSet.Length == 1)
 				{
-					break;
+					if (hashSet[0].Value.HasValue && hashSet[0].Name.ToString() == Locker)
+					{
+						break;
+					}
 				}
-
 				Thread.Sleep(50);
 			}
 		}
@@ -70,7 +74,7 @@ namespace DotnetSpider.Redial
 			var locker = Db.HashGet(HostName, Locker);
 			if (!locker.HasValue)
 			{
-				Db.HashSet(HostName, Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+				//Db.HashSet(HostName, Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 				return false;
 			}
 			return true;

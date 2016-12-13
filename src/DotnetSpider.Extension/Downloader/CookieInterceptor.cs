@@ -1,7 +1,9 @@
 using DotnetSpider.Core;
 using System.Collections.Generic;
+using System.IO;
 using LogLevel = DotnetSpider.Core.LogLevel;
 #if !NET_CORE
+using OpenQA.Selenium.Firefox;
 using System;
 using DotnetSpider.Core.Selector;
 using System.Linq;
@@ -16,6 +18,11 @@ using OpenQA.Selenium.Remote;
 
 namespace DotnetSpider.Extension.Downloader
 {
+	public enum WebBrowser
+	{
+		Chrome,
+		Firefox
+	}
 	public class SiteCookie
 	{
 		public string CookiesStringPart { get; set; }
@@ -38,6 +45,7 @@ namespace DotnetSpider.Extension.Downloader
 #if !NET_CORE
 	public abstract class WebDriverCookieInterceptor : CookieInterceptor
 	{
+		public WebBrowser Browser { get; set; } = WebBrowser.Chrome;
 		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
 		{
 			switch (element.Type)
@@ -57,11 +65,39 @@ namespace DotnetSpider.Extension.Downloader
 
 		protected RemoteWebDriver GetWebDriver()
 		{
-			ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
-			cds.HideCommandPromptWindow = true;
-			ChromeOptions opt = new ChromeOptions();
-			opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
-			RemoteWebDriver webDriver = new ChromeDriver(cds, opt);
+			RemoteWebDriver webDriver = null;
+			switch (Browser)
+			{
+				case WebBrowser.Chrome:
+					{
+						ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
+						cds.HideCommandPromptWindow = true;
+						ChromeOptions opt = new ChromeOptions();
+						opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
+						webDriver = new ChromeDriver(cds, opt);
+						break;
+					}
+				case WebBrowser.Firefox:
+					{
+						string path = Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
+						string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
+						if (pathsToProfiles.Length == 1)
+						{
+							FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false);
+							profile.AlwaysLoadNoFocusLibrary = true;
+							webDriver = new FirefoxDriver(profile);
+						}
+						else
+						{
+							throw new Exception("No Firefox profiles: webdriver.");
+						}
+						break;
+					}
+				default:
+					{
+						throw new Exception("Unsupported browser!");
+					}
+			}
 
 			webDriver.Manage().Window.Maximize();
 			return webDriver;
@@ -133,9 +169,16 @@ namespace DotnetSpider.Extension.Downloader
 
 				if (LoginAreaSelector != null)
 				{
-					var loginArea = FindElement(webDriver, LoginAreaSelector);
-					loginArea.Click();
-					Thread.Sleep(1000);
+					try
+					{
+						var loginArea = FindElement(webDriver, LoginAreaSelector);
+						loginArea.Click();
+						Thread.Sleep(1000);
+					}
+					catch (Exception e)
+					{
+						// ignored
+					}
 				}
 
 				if (UserSelector != null)

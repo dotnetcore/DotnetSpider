@@ -111,7 +111,7 @@ namespace DotnetSpider.Extension
 				if (CookieInterceptor != null)
 				{
 					this.Log("尝试获取 Cookie...", LogLevel.Info);
-					var cookie = CookieInterceptor.GetCookie();
+					var cookie = NetworkCenter.Current.Execute("getcookie", () => CookieInterceptor.GetCookie());
 					if (cookie == null)
 					{
 						this.Log("获取 Cookie 失败, 爬虫无法继续.", LogLevel.Warn);

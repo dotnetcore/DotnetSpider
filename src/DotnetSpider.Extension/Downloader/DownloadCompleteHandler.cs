@@ -75,7 +75,7 @@ namespace DotnetSpider.Extension.Downloader
 			if (rawText.Contains(ContainsString))
 			{
 				((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
-				var cookie = ((EntitySpider)Spider).CookieInterceptor.GetCookie();
+				var cookie = NetworkCenter.Current.Execute("getcookie", () => ((EntitySpider)Spider).CookieInterceptor.GetCookie());
 				if (cookie != null)
 				{
 					Spider.Site.SetCookies(cookie.CookiesDictionary);
