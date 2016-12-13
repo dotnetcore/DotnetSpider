@@ -14,6 +14,8 @@ namespace DotnetSpider.Core.Scheduler
 
 		public bool DepthFirst { get; set; } = true;
 
+		public virtual bool IsExited { get; set; }
+ 
 		public void Push(Request request)
 		{
 			lock (this)
@@ -76,11 +78,6 @@ namespace DotnetSpider.Core.Scheduler
 		public abstract void Import(HashSet<Request> requests);
 
 		public abstract HashSet<Request> ToList();
-
-		public virtual void Clear()
-		{
-			DuplicateRemover.ResetDuplicateCheck();
-		}
 
 		public abstract long GetLeftRequestsCount();
 

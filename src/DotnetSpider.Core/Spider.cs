@@ -16,6 +16,7 @@ using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace DotnetSpider.Core
 {
@@ -27,9 +28,9 @@ namespace DotnetSpider.Core
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 
-		protected bool IsExited { get; set; }
 		protected int WaitInterval { get; private set; } = 10;
 		protected Status Stat = Status.Init;
+		protected IScheduler _scheduler;
 
 		#region ITask
 
@@ -49,7 +50,6 @@ namespace DotnetSpider.Core
 
 		private int _waitCountLimit = 1500;
 		private bool _init;
-		private IScheduler _scheduler;
 		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
 		private readonly Random _random = new Random();
@@ -67,6 +67,8 @@ namespace DotnetSpider.Core
 		private List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private List<IPipeline> _pipelines = new List<IPipeline>();
 		private Site _site;
+		private List<IMonitor> _monitors;
+		private Task _monitorTask;
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -111,7 +113,6 @@ namespace DotnetSpider.Core
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-			IsExited = false;
 		}
 
 		/// <summary>
@@ -369,11 +370,6 @@ namespace DotnetSpider.Core
 			Site = site;
 		}
 
-		public bool IfExited()
-		{
-			return IsExited;
-		}
-
 		public void SetIdentity(string identity)
 		{
 			CheckIfRunning();
@@ -565,7 +561,27 @@ namespace DotnetSpider.Core
 				throw new SpiderException("Pipelines should not be null.");
 			}
 
+			_monitors = IocManager.GetServices<IMonitor>().ToList();
+			if (_monitors.Count == 0)
+			{
+				_monitors = new List<IMonitor> { new NLogMonitor() };
+			}
+
 			Scheduler.Init(this);
+
+			_monitorTask = Task.Factory.StartNew(() =>
+			{
+				var monitor = GetMonitor();
+				while (!_scheduler.IsExited)
+				{
+					ReportStatus();
+
+					Thread.Sleep(2000);
+				}
+				monitor.IsExited = true;
+				ReportStatus();
+			});
+
 #if !NET_CORE
 			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 #else
@@ -618,7 +634,7 @@ namespace DotnetSpider.Core
 			CheckIfSettingsCorrect();
 
 			Stat = Status.Running;
-			IsExited = false;
+			_scheduler.IsExited = false;
 
 #if !NET_CORE
 			// 开启多线程支持
@@ -700,6 +716,16 @@ namespace DotnetSpider.Core
 
 			SpiderClosing?.Invoke();
 
+			if (!_scheduler.IsExited)
+			{
+				_scheduler.IsExited = true;
+			}
+
+			this.Log($"等待监控进程退出.", LogLevel.Info);
+			_monitorTask.Wait();
+
+			Scheduler.Dispose();
+
 			if (Stat == Status.Finished)
 			{
 				OnClose();
@@ -715,8 +741,6 @@ namespace DotnetSpider.Core
 			{
 				this.Log($"退出采集, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
 			}
-
-			IsExited = true;
 		}
 
 		public static void PrintInfo()
@@ -998,7 +1022,7 @@ namespace DotnetSpider.Core
 		private void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
 		{
 			Stop();
-			while (!IsExited)
+			while (!_scheduler.IsExited)
 			{
 				Thread.Sleep(1500);
 			}
@@ -1014,7 +1038,7 @@ namespace DotnetSpider.Core
 			CheckIfRunning();
 
 			int i = 0;
-			while (!IsExited)
+			while (!_scheduler.IsExited)
 			{
 				++i;
 				Thread.Sleep(500);
@@ -1048,6 +1072,36 @@ namespace DotnetSpider.Core
 			lock (_avgPipelineTimeLocker)
 			{
 				AvgPipelineSpeed = (AvgPipelineSpeed + time) / 2;
+			}
+		}
+
+		private void ReportStatus()
+		{
+			foreach (var monitor in _monitors)
+			{
+				if (monitor.IsEnabled)
+				{
+					var monitorable = GetMonitor();
+
+					monitor.Report(new SpiderStatus
+					{
+						Status = StatusCode.ToString(),
+						Code = StatusCode.ToString(),
+						Error = monitorable.GetErrorRequestsCount(),
+						Identity = Identity,
+						Left = monitorable.GetLeftRequestsCount(),
+						Machine = SystemInfo.HostName,
+						Success = monitorable.GetSuccessRequestsCount(),
+						TaskGroup = TaskGroup,
+						ThreadNum = ThreadNum,
+						Total = monitorable.GetTotalRequestsCount(),
+						UserId = UserId,
+						Timestamp = DateTime.Now.ToString(CultureInfo.InvariantCulture),
+						AvgDownloadSpeed = AvgDownloadSpeed,
+						AvgProcessorSpeed = AvgProcessorSpeed,
+						AvgPipelineSpeed = AvgPipelineSpeed
+					});
+				}
 			}
 		}
 	}

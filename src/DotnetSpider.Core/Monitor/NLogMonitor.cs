@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Monitor
 
 		public NLogMonitor()
 		{
-			NLogUtils.Init(true);
+			NLogUtils.Init(false);
 		}
 
 		public void Report(SpiderStatus status)

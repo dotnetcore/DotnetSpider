@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
-			scheduler.Clear();
+			scheduler.Dispose();
 
 			Request request = new Request("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", null);
 			request.PutExtra("1", "2");
@@ -31,7 +31,6 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Request result1 = scheduler.Poll();
 			Assert.Null(result1);
 			scheduler.Dispose();
-			scheduler.Clear();
 		}
 
 		[Fact]
@@ -41,7 +40,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.DepthFirst = false;
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
-			scheduler.Clear();
+			scheduler.Dispose();
 			Request request1 = new Request("http://www.ibm.com/1", null);
 			Request request2 = new Request("http://www.ibm.com/2", null);
 			Request request3 = new Request("http://www.ibm.com/3", null);
@@ -56,7 +55,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Request result1 = scheduler.Poll();
 			Assert.Equal("http://www.ibm.com/2", result1.Url.ToString());
 			scheduler.Dispose();
-			scheduler.Clear();
+			scheduler.Dispose();
 		}
 
 		[Fact]
@@ -66,7 +65,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.DepthFirst = true;
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
-			scheduler.Clear();
+			scheduler.Dispose();
 			Request request1 = new Request("http://www.ibm.com/1", null);
 			Request request2 = new Request("http://www.ibm.com/2", null);
 			Request request3 = new Request("http://www.ibm.com/3", null);
@@ -81,7 +80,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Request result1 = scheduler.Poll();
 			Assert.Equal("http://www.ibm.com/3", result1.Url.ToString());
 			scheduler.Dispose();
-			scheduler.Clear();
+			scheduler.Dispose();
 		}
 
 		[Fact]
@@ -90,7 +89,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
-			scheduler.Clear();
+			scheduler.Dispose();
 			var start = DateTime.Now;
 			for (int i = 0; i < 40000; i++)
 			{
@@ -99,7 +98,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			var end = DateTime.Now;
 			double seconds = (end - start).TotalSeconds;
-			scheduler.Clear();
+			scheduler.Dispose();
 
 			var start1 = DateTime.Now;
 			HashSet<Request> list = new HashSet<Request>();
@@ -111,7 +110,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			var end1 = DateTime.Now;
 			double seconds1 = (end1 - start1).TotalSeconds;
 			Assert.True(seconds1 < seconds);
-			scheduler.Clear();
+			scheduler.Dispose();
 		}
 
 		[Fact]
@@ -129,7 +128,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Extension.Scheduler.RedisScheduler redisScheduler = GetRedisScheduler();
 			redisScheduler.Init(spider);
 
-			redisScheduler.Clear();
+			redisScheduler.Dispose();
 
 			redisScheduler.Import(scheduler.ToList());
 
@@ -138,7 +137,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Assert.Equal("http://www.b.com/", redisScheduler.Poll().Url.ToString());
 			Assert.Equal("http://www.a.com/", redisScheduler.Poll().Url.ToString());
 
-			redisScheduler.Clear();
+			redisScheduler.Dispose();
 		}
 
 		[Fact]
@@ -148,7 +147,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
-			scheduler.Clear();
+			scheduler.Dispose();
 
 			scheduler.Push(new Request("http://www.a.com/", null));
 			scheduler.Push(new Request("http://www.b.com/", null));
@@ -195,7 +194,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Assert.Equal(1, scheduler.GetErrorRequestsCount());
 			Assert.Equal(4, scheduler.GetTotalRequestsCount());
 
-			scheduler.Clear();
+			scheduler.Dispose();
 		}
 
 		[Fact]
@@ -217,7 +216,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Assert.Equal(errorCountKey, scheduler.GetErrorCountKey());
 			Assert.Equal(successCountKey, scheduler.GetSuccessCountKey());
 
-			scheduler.Clear();
+			scheduler.Dispose();
 			scheduler.Dispose();
 		}
 
@@ -228,7 +227,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
-			scheduler.Clear();
+			scheduler.Dispose();
 			Request request1 = new Request("http://www.ibm.com/1", null);
 			Request request2 = new Request("http://www.ibm.com/2", null);
 			Request request3 = new Request("http://www.ibm.com/3", null);
@@ -241,7 +240,6 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Request result = scheduler.Poll();
 			Assert.Equal("http://www.ibm.com/4", result.Url.ToString());
 
-			scheduler.Clear();
 			scheduler.Dispose();
 		}
 	}

@@ -14,7 +14,7 @@ using Xunit;
 
 namespace DotnetSpider.Extension.Test
 {
-	public class SpiderEntityTest
+	public class EntitySpiderTest2
 	{
 		private class TestPipeline : BaseEntityDbPipeline
 		{
@@ -172,7 +172,7 @@ namespace DotnetSpider.Extension.Test
 			var entity3 = EntitySpider.ParseEntityMetaData(typeof(Entity9).GetTypeInfo());
 			Assert.False(entity3.Entity.Multi);
 			Assert.Null(entity3.Entity.Selector);
-			Assert.Equal("DotnetSpider.Extension.Test.SpiderEntityTest+Entity9", entity3.Entity.Name);
+			Assert.Equal("DotnetSpider.Extension.Test.EntitySpiderTest2+Entity9", entity3.Entity.Name);
 		}
 
 		[Fact]

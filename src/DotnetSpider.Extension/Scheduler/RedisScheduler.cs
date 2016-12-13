@@ -22,8 +22,8 @@ namespace DotnetSpider.Extension.Scheduler
 		public int Port { get; set; } = 6379;
 		public string Password { get; set; }
 
-		public static string TaskList = "task";
-		public static string TaskStatus = "task-status";
+		public const string TaskList = "task";
+		public const string TaskStatus = "task-status";
 		private string _queueKey;
 		private string _setKey;
 		private string _itemKey;
@@ -209,6 +209,9 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void Dispose()
 		{
+			_db.KeyDelete(_queueKey);
+			_db.KeyDelete(_setKey);
+			_db.KeyDelete(_itemKey);
 			_db.KeyDelete(_successCountKey);
 			_db.KeyDelete(_errorCountKey);
 		}
@@ -271,15 +274,24 @@ namespace DotnetSpider.Extension.Scheduler
 			return requests;
 		}
 
-		public override void Clear()
+		public override bool IsExited
 		{
-			base.Clear();
-
-			_db.KeyDelete(_queueKey);
-			_db.KeyDelete(_setKey);
-			_db.KeyDelete(_itemKey);
-			_db.KeyDelete(_successCountKey);
-			_db.KeyDelete(_errorCountKey);
+			get
+			{
+				var result = _db.HashGet(TaskStatus, _identityMd5);
+				if (result.HasValue)
+				{
+					return result == 1;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			set
+			{
+				_db.HashSet(TaskStatus, _identityMd5, value ? 1 : 0);
+			}
 		}
 
 		#region For Test

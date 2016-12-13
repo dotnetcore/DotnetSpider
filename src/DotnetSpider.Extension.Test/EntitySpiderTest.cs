@@ -7,16 +7,11 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using StackExchange.Redis;
 using Xunit;
-using DotnetSpider.Core.Processor;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Core.Selector;
 using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Downloader;
+using DotnetSpider.Extension.Scheduler;
+using DotnetSpider.Core.Common;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -85,7 +80,8 @@ namespace DotnetSpider.Extension.Test
 				KeepAlive = 8,
 				ConnectRetry = 3,
 				ResponseTimeout = 3000,
-				Password = "6GS9F2QTkP36GggE0c3XwVwI"
+				Password = "6GS9F2QTkP36GggE0c3XwVwI",
+				AllowAdmin = true
 			};
 
 			confiruation.EndPoints.Add(new DnsEndPoint("127.0.0.1", 6379));
@@ -102,6 +98,56 @@ namespace DotnetSpider.Extension.Test
 			Thread.Sleep(240000);
 
 			db.LockRelease(key, 0);
+		}
+
+		[Fact]
+		public void ClearScheduler()
+		{
+			EntitySpider spider = new EntitySpider(new Site());
+			spider.Identity = Guid.NewGuid().ToString("N");
+			spider.SetScheduler(new RedisScheduler
+			{
+				Host = "localhost",
+				Password = "6GS9F2QTkP36GggE0c3XwVwI"
+			});
+			spider.AddStartUrl("https://baidu.com");
+			spider.AddEntityPipeline(new ConsoleEntityPipeline());
+			spider.AddEntityType(typeof(TestEntity));
+			spider.Run();
+
+			var confiruation = new ConfigurationOptions()
+			{
+				ServiceName = "DotnetSpider",
+				ConnectTimeout = 65530,
+				KeepAlive = 8,
+				ConnectRetry = 3,
+				ResponseTimeout = 3000,
+				Password = "6GS9F2QTkP36GggE0c3XwVwI",
+				AllowAdmin = true
+			};
+
+			confiruation.EndPoints.Add(new DnsEndPoint("127.0.0.1", 6379));
+
+			var redis = ConnectionMultiplexer.Connect(confiruation);
+			var db = redis.GetDatabase(0);
+
+			var md5 = Encrypt.Md5Encrypt(spider.Identity);
+			var itemKey = "item-" + md5;
+			var setKey = "set-" + md5;
+			var queueKey = "queue-" + md5;
+			var errorCountKey = "error-record" + md5;
+			var successCountKey = "success-record" + md5;
+
+			//queue
+			Assert.Equal(0, db.ListLength(queueKey));
+			//set
+			Assert.Equal(0, db.SetLength(setKey));
+			//item
+			Assert.Equal(0, db.HashLength(itemKey));
+			//error-count
+			Assert.Equal(false, db.StringGet(errorCountKey).HasValue);
+			//success-count
+			Assert.Equal(false, db.StringGet(successCountKey).HasValue);
 		}
 
 		[Fact]
@@ -125,9 +171,9 @@ namespace DotnetSpider.Extension.Test
 				context.SetEmptySleepTime(5000);
 				context.ExitWhenComplete = true;
 				context.SetCachedSize(1);
-				context.SetDownloader(new HttpClientDownloader());		
+				context.SetDownloader(new HttpClientDownloader());
 				context.SetScheduler(new QueueDuplicateRemovedScheduler());
-			
+
 				context.SkipWhenResultIsEmpty = true;
 				context.SpawnUrl = true;
 				context.SetIdentity("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
@@ -137,7 +183,7 @@ namespace DotnetSpider.Extension.Test
 				return context;
 			}
 
-			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]		
+			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
 			public class ArticleSummary : ISpiderEntity
 			{
 				[PropertySelector(Expression = ".//a/@title")]
@@ -147,6 +193,26 @@ namespace DotnetSpider.Extension.Test
 				[PropertySelector(Expression = ".//a/@href")]
 				public string Url { get; set; }
 			}
+		}
+
+		public static void ClearDB()
+		{
+			var confiruation = new ConfigurationOptions()
+			{
+				ServiceName = "DotnetSpider",
+				ConnectTimeout = 65530,
+				KeepAlive = 8,
+				ConnectRetry = 3,
+				ResponseTimeout = 3000,
+				Password = "6GS9F2QTkP36GggE0c3XwVwI",
+				AllowAdmin = true
+			};
+
+			confiruation.EndPoints.Add(new DnsEndPoint("127.0.0.1", 6379));
+
+			var redis = ConnectionMultiplexer.Connect(confiruation);
+			var server = redis.GetServer(redis.GetEndPoints()[0]);
+			server.FlushAllDatabases();
 		}
 	}
 }
