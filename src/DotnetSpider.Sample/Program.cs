@@ -12,12 +12,7 @@ namespace DotnetSpider.Sample
 		{
 			IocManager.AddSingleton<IMonitor, NLogMonitor>();
 
-			//BaseUsage.Run();
-
-
-
-			BaiduSearchSpider casSper = new BaiduSearchSpider();
-			casSper.Run();
+			BaseUsage.Run();
 		}
 	}
 }
