@@ -86,7 +86,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
-			scheduler.Clear();
+			scheduler.Dispose();
 
 			scheduler.Push(new Request("http://www.a.com/", null));
 			scheduler.Push(new Request("http://www.b.com/", null));
@@ -133,7 +133,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 			Assert.Equal(1, scheduler.GetErrorRequestsCount());
 			Assert.Equal(4, scheduler.GetTotalRequestsCount());
 
-			scheduler.Clear();
+			scheduler.Dispose();
 		}
 	}
 }

@@ -143,6 +143,9 @@
     <Compile Include="..\EntitySpiderTest.cs">
       <Link>EntitySpiderTest.cs</Link>
     </Compile>
+    <Compile Include="..\EntitySpiderTest2.cs">
+      <Link>EntitySpiderTest2.cs</Link>
+    </Compile>
     <Compile Include="..\FormatterTest.cs">
       <Link>FormatterTest.cs</Link>
     </Compile>
@@ -155,10 +158,6 @@
     <Compile Include="..\Scheduler\RedisSchedulerTest.cs">
       <Link>Scheduler\RedisSchedulerTest.cs</Link>
     </Compile>
-    <Compile Include="..\SpiderEntityTest.cs">
-      <Link>SpiderEntityTest.cs</Link>
-    </Compile>
-    <Compile Include="EntitySpiderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

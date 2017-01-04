@@ -103,5 +103,11 @@ namespace DotnetSpider.Core.Scheduler
 				return new HashSet<Request>(_queue.ToArray());
 			}
 		}
+
+		public override void Dispose()
+		{
+			base.Dispose();
+			_queue.Clear();
+		}
 	}
 }

@@ -8,7 +8,7 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
 
-namespace DotnetSpider.Sample
+namespace DotnetSpider.Demo
 {
 	public class BaseUsage
 	{
@@ -29,7 +29,6 @@ namespace DotnetSpider.Sample
 
 			// ∆Ù∂Ø≈¿≥Ê
 			spider.Run();
-			Console.Read();
 		}
 
 		private class MyPipeline : BasePipeline

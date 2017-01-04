@@ -15,7 +15,7 @@ namespace DotnetSpider.Core
 
 		static SpiderConsts()
 		{
-			SaveLogAndStatusToDb = string.IsNullOrEmpty(Configuration.GetValue("logAndStatusConnectString"));
+			SaveLogAndStatusToDb = !string.IsNullOrEmpty(Configuration.GetValue("logAndStatusConnectString"));
 
 #if !NET_CORE
 			GlobalDirectory=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DotnetSpider");

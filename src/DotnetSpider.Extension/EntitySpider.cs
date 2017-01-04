@@ -13,7 +13,6 @@ using DotnetSpider.Redial;
 using StackExchange.Redis;
 using DotnetSpider.Core.Common;
 using System.Net;
-using DotnetSpider.Core.Monitor;
 using System.Threading;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extension.Pipeline;
@@ -28,8 +27,8 @@ namespace DotnetSpider.Extension
 {
 	public class EntitySpider : Spider
 	{
-		private const string InitStatusSetName = "init-status";
-		private const string ValidateStatusName = "validate-status";
+		private const string InitStatusSetKey = "init-status";
+		private const string ValidateStatusKey = "validate-status";
 
 		protected static ConnectionMultiplexer Redis;
 		protected static IDatabase Db;
@@ -93,7 +92,7 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public EntitySpider(Site site)
+		public EntitySpider(Site site) : base()
 		{
 			if (site == null)
 			{
@@ -157,16 +156,16 @@ namespace DotnetSpider.Extension
 					{
 						Thread.Sleep(1000);
 					}
-					var lockerValue = Db.HashGet(InitStatusSetName, Identity);
+					var lockerValue = Db.HashGet(InitStatusSetKey, Identity);
 					needInitStartRequest = lockerValue != "init finished";
 				}
 
 				if (arguments.Contains("rerun"))
 				{
 					Scheduler.Init(this);
-					Scheduler.Clear();
+					Scheduler.Dispose();
 					//DELETE verify record.
-					Db?.HashDelete(ValidateStatusName, Identity);
+					Db?.HashDelete(ValidateStatusKey, Identity);
 					needInitStartRequest = true;
 				}
 
@@ -186,8 +185,6 @@ namespace DotnetSpider.Extension
 					}
 				}
 
-				MonitorCenter.Register(this);
-
 				Db?.LockRelease(key, 0);
 
 				RegisterControl(this);
@@ -198,7 +195,7 @@ namespace DotnetSpider.Extension
 				}
 				else
 				{
-					IsExited = true;
+					_scheduler.IsExited = true;
 				}
 
 				TaskFinished();
@@ -208,7 +205,6 @@ namespace DotnetSpider.Extension
 			finally
 			{
 				Dispose();
-				MonitorCenter.Dispose();
 			}
 		}
 
@@ -290,7 +286,7 @@ namespace DotnetSpider.Extension
 						Thread.Sleep(1000);
 					}
 
-					var lockerValue = Db.HashGet(ValidateStatusName, Identity);
+					var lockerValue = Db.HashGet(ValidateStatusKey, Identity);
 					needInitStartRequest = lockerValue != "verify finished";
 				}
 				if (needInitStartRequest)
@@ -302,7 +298,7 @@ namespace DotnetSpider.Extension
 
 				if (needInitStartRequest && Redis != null)
 				{
-					Db.HashSet(ValidateStatusName, Identity, "verify finished");
+					Db.HashSet(ValidateStatusKey, Identity, "verify finished");
 				}
 			}
 			catch (Exception e)

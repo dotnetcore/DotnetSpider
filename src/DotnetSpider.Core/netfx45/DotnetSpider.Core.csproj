@@ -209,9 +209,6 @@
     <Compile Include="..\Monitor\ISpeedMonitor.cs">
       <Link>Monitor\ISpeedMonitor.cs</Link>
     </Compile>
-    <Compile Include="..\Monitor\MonitorCenter.cs">
-      <Link>Monitor\MonitorCenter.cs</Link>
-    </Compile>
     <Compile Include="..\Monitor\NLogMonitor.cs">
       <Link>Monitor\NLogMonitor.cs</Link>
     </Compile>

@@ -119,13 +119,12 @@ namespace DotnetSpider.Core.Test
 				{
 					spider.AddStartUrl("http://www.baidu.com/" + i);
 				}
-				MonitorCenter.Register(spider);
 				spider.Run();
 			}
 			using (MySqlConnection conn = new MySqlConnection(connectString))
 			{
 				Assert.Equal(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where userid='{userId}' and taskgroup='{taskGroup}' and identity='{id}'").First().Count);
-				Assert.Equal(7, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where userid='{userId}' and taskgroup='{taskGroup}' and identity='{id}'").First().Count);
+				Assert.Equal(8, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where userid='{userId}' and taskgroup='{taskGroup}' and identity='{id}'").First().Count);
 			}
 		}
 

@@ -17,9 +17,6 @@ namespace DotnetSpider.Sample
 	{
 		public static void Run()
 		{
-			// 注入监控服务
-			IocManager.AddSingleton<IMonitor, NLogMonitor>();
-
 			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8" };
 			for (int i = 1; i < 5; ++i)
@@ -35,9 +32,6 @@ namespace DotnetSpider.Sample
 				new NewsProcessor()).
 				AddPipeline(new MyPipeline()).
 				SetThreadNum(1);
-
-			// 注册爬虫到监控服务
-			MonitorCenter.Register(spider);
 
 			// 启动爬虫
 			spider.Run();

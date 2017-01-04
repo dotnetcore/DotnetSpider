@@ -5,6 +5,8 @@ namespace DotnetSpider.Core.Scheduler
 	/// </summary>
 	public interface IMonitorable
 	{
+		bool IsExited { get; set; }
+
 		long GetLeftRequestsCount();
 
 		long GetTotalRequestsCount();
