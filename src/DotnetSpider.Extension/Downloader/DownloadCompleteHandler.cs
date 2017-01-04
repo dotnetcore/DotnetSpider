@@ -11,7 +11,7 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		public string ContainsString { get; set; }
 
-		public override void Handle(Page page)
+		public override bool Handle(Page page)
 		{
 			string rawText = page.Content;
 			if (string.IsNullOrEmpty(rawText))
@@ -23,6 +23,7 @@ namespace DotnetSpider.Extension.Downloader
 				((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
 				throw new DownloadException($"Content downloaded contains illegal string: {ContainsString}.");
 			}
+			return true;
 		}
 	}
 
@@ -30,7 +31,7 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		public string ExceptionMessage { get; set; } = string.Empty;
 
-		public override void Handle(Page page)
+		public override bool Handle(Page page)
 		{
 			if (page.Exception != null)
 			{
@@ -44,6 +45,7 @@ namespace DotnetSpider.Extension.Downloader
 					throw new DownloadException("Download failed and redial finished already.");
 				}
 			}
+			return true;
 		}
 	}
 
@@ -52,7 +54,7 @@ namespace DotnetSpider.Extension.Downloader
 		public string ContainsString { get; set; }
 		public ISpider Spider { get; set; }
 
-		public override void Handle(Page page)
+		public override bool Handle(Page page)
 		{
 			if (Spider == null)
 			{
@@ -84,6 +86,7 @@ namespace DotnetSpider.Extension.Downloader
 
 				throw new DownloadException($"Content downloaded contains illegal string: {ContainsString}.");
 			}
+			return true;
 		}
 	}
 
@@ -92,7 +95,7 @@ namespace DotnetSpider.Extension.Downloader
 		public int RedialLimit { get; set; }
 		public static int RequestedCount { get; set; }
 
-		public override void Handle(Page page)
+		public override bool Handle(Page page)
 		{
 			if (RedialLimit != 0)
 			{
@@ -108,6 +111,7 @@ namespace DotnetSpider.Extension.Downloader
 					}
 				}
 			}
+			return true;
 		}
 	}
 

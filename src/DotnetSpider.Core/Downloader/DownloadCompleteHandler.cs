@@ -10,12 +10,12 @@ namespace DotnetSpider.Core.Downloader
 {
 	public interface IDownloadCompleteHandler
 	{
-		void Handle(Page page);
+		bool Handle(Page page);
 	}
 
 	public abstract class DownloadCompleteHandler : Named, IDownloadCompleteHandler
 	{
-		public abstract void Handle(Page page);
+		public abstract bool Handle(Page page);
 	}
 
 	#region Content Handler
@@ -23,7 +23,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string ContainsString { get; set; }
 
-		public override void Handle(Page page)
+		public override bool Handle(Page page)
 		{
 			string rawText = page.Content;
 			if (string.IsNullOrEmpty(rawText))
@@ -33,7 +33,9 @@ namespace DotnetSpider.Core.Downloader
 			if (rawText.Contains(ContainsString))
 			{
 				page.IsSkip = true;
+				return false;
 			}
+			return true;
 		}
 	}
 
@@ -44,7 +46,7 @@ namespace DotnetSpider.Core.Downloader
 		public int StartOffset { get; set; } = 0;
 		public int EndOffset { get; set; } = 0;
 
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			string rawText = p.Content;
 
@@ -63,6 +65,8 @@ namespace DotnetSpider.Core.Downloader
 			}
 			string newRawText = rawText.Substring(begin, length).Trim();
 			p.Content = newRawText;
+
+			return true;
 		}
 	}
 
@@ -74,7 +78,7 @@ namespace DotnetSpider.Core.Downloader
 		public int EndOffset { get; set; } = 0;
 		public bool RemoveAll { get; set; } = false;
 
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			string rawText = p.Content;
 
@@ -100,16 +104,18 @@ namespace DotnetSpider.Core.Downloader
 				} while ((begin = rawText.IndexOf(Start, StringComparison.Ordinal)) > 0 && RemoveAll);
 			}
 			p.Content = rawText;
+			return true;
 		}
 	}
 
 	public class RemoveContentHtmlTagHandler : DownloadCompleteHandler
 	{
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			var htmlDocument = new HtmlDocument();
 			htmlDocument.LoadHtml(p.Content);
 			p.Content = htmlDocument.DocumentNode.InnerText;
+			return true;
 		}
 	}
 
@@ -117,13 +123,14 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public bool ToUpper { get; set; } = false;
 
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			if (string.IsNullOrEmpty(p.Content))
 			{
-				return;
+				return false;
 			}
 			p.Content = ToUpper ? p.Content.ToUpper() : p.Content.ToLower();
+			return true;
 		}
 	}
 
@@ -137,7 +144,7 @@ namespace DotnetSpider.Core.Downloader
 		public int EndOffset { get; set; } = 0;
 		public string TargetTag { get; set; } = "my_target";
 
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			string rawText = p.Content;
 			rawText = rawText.Replace("script", "div");
@@ -159,6 +166,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 
 			p.Content = rawText;
+			return true;
 		}
 
 		private string AmendRawText(string rawText, ref int start)
@@ -181,25 +189,28 @@ namespace DotnetSpider.Core.Downloader
 		public string OldValue { get; set; }
 		public string NewValue { get; set; }
 
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			p.Content = p.Content?.Replace(OldValue, NewValue);
+			return true;
 		}
 	}
 
 	public class TrimContentHandler : DownloadCompleteHandler
 	{
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			p.Content = p.Content?.Trim();
+			return true;
 		}
 	}
 
 	public class UnescapeContentHandler : DownloadCompleteHandler
 	{
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			p.Content = Regex.Unescape(p.Content);
+			return true;
 		}
 	}
 
@@ -207,7 +218,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Pattern { get; set; }
 
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			string textValue = string.Empty;
 			MatchCollection collection = Regex.Matches(p.Content, Pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase);
@@ -217,6 +228,7 @@ namespace DotnetSpider.Core.Downloader
 				textValue += item.Value;
 			}
 			p.Content = textValue;
+			return true;
 		}
 	}
 	#endregion
@@ -225,13 +237,14 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string ContainString { get; set; }
 
-		public override void Handle(Page p)
+		public override bool Handle(Page p)
 		{
 			if (p.Content.Contains(ContainString))
 			{
 				Request r = (Request)p.Request.Clone();
 				p.AddTargetRequest(r);
 			}
+			return true;
 		}
 	}
 }

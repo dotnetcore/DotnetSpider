@@ -4,8 +4,8 @@ namespace DotnetSpider.Core.Downloader
 {
 	public abstract class BaseDownloader : Named, IDownloader, IDisposable
 	{
-		public IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }  
-		public  IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }  
+		public IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }
+		public IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }
 		public dynamic Context { get; set; }
 
 		protected abstract Page DowloadContent(Request request, ISpider spider);
@@ -52,7 +52,11 @@ namespace DotnetSpider.Core.Downloader
 			{
 				foreach (var handler in DownloadCompleteHandlers)
 				{
-					handler.Handle(page);
+					var success = handler.Handle(page);
+					if (!success)
+					{
+						break;
+					}
 				}
 			}
 		}

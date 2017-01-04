@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension.Downloader
 
 	public abstract class BaseTargetUrlsCreator : IDownloadCompleteHandler
 	{
-		public virtual void Handle(Page page)
+		public virtual bool Handle(Page page)
 		{
 			if (Stopper != null)
 			{
@@ -64,6 +64,7 @@ namespace DotnetSpider.Extension.Downloader
 				page.AddTargetRequests(GenerateRequests(page));
 				page.MissExtractTargetUrls = true;
 			}
+			return true;
 		}
 
 		public abstract string GetCurrentPaggerString(string currentUrl);
@@ -98,7 +99,7 @@ namespace DotnetSpider.Extension.Downloader
 			PaggerPattern = new Regex($"{RegexUtil.NumRegex.Replace(PaggerString, @"\d+")}");
 		}
 
-		public override void Handle(Page page)
+		public override bool Handle(Page page)
 		{
 			var i = SetInterval?.Interval(page);
 			if (i != null)
@@ -119,6 +120,7 @@ namespace DotnetSpider.Extension.Downloader
 				page.AddTargetRequests(GenerateRequests(page));
 				page.MissExtractTargetUrls = true;
 			}
+			return true;
 		}
 
 		public override string GetCurrentPaggerString(string currentUrl)

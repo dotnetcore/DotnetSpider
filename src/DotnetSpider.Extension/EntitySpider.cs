@@ -308,7 +308,7 @@ namespace DotnetSpider.Extension
 			catch (Exception e)
 			{
 				this.Log(e.Message, LogLevel.Error, e);
-				throw;
+				//throw;
 			}
 			finally
 			{
