@@ -31,12 +31,12 @@ namespace DotnetSpider.Core.Common
 		{
 #if !NET_CORE
 			HostName = Dns.GetHostName();
-#else
-			HostName = "Unsport";
-#endif
 
 			// docker 化后只会有一个IP
 			Ip4Address = Dns.GetHostAddressesAsync(HostName).Result[0].ToString();
+#else
+			HostName = "Unsport";
+#endif
 
 #if !NET_CORE
 			//初始化CPU计数器
