@@ -29,7 +29,11 @@ namespace DotnetSpider.Core.Common
 
 		static SystemInfo()
 		{
+#if !NET_CORE
 			HostName = Dns.GetHostName();
+#else
+			HostName = "Unsport";
+#endif
 
 			// docker 化后只会有一个IP
 			Ip4Address = Dns.GetHostAddressesAsync(HostName).Result[0].ToString();
