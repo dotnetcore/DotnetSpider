@@ -9,7 +9,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 using System.Threading;
 using DotnetSpider.Extension.Model;
- 
+
 namespace DotnetSpider.Extension.Downloader
 {
 	public abstract class SignIner : Named, IWebDriverHandler
@@ -161,6 +161,26 @@ namespace DotnetSpider.Extension.Downloader
 					}
 			}
 			throw new SpiderException("Unsport findy: " + element.Type);
+		}
+	}
+
+	public class ScrollHandler : SignIner
+	{
+		public int ScrollTo { get; set; } = 0;
+
+		public override bool Handle(RemoteWebDriver webDriver)
+		{
+			try
+			{
+				webDriver.Manage().Window.Maximize();
+				webDriver.ExecuteScript($"window.scrollBy(0, {ScrollTo})");
+				Thread.Sleep(500);
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+			return true;
 		}
 	}
 }
