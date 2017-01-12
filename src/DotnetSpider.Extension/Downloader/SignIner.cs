@@ -166,6 +166,7 @@ namespace DotnetSpider.Extension.Downloader
 
 	public class ScrollHandler : SignIner
 	{
+		public int Interval { get; set; } = 1;
 		public int ScrollTo { get; set; } = 0;
 
 		public override bool Handle(RemoteWebDriver webDriver)
@@ -173,8 +174,11 @@ namespace DotnetSpider.Extension.Downloader
 			try
 			{
 				webDriver.Manage().Window.Maximize();
-				webDriver.ExecuteScript($"window.scrollBy(0, {ScrollTo})");
-				Thread.Sleep(500);
+				for (int i = 0; i <= Interval; i++)
+				{
+					webDriver.ExecuteScript($"window.scrollBy(0, {ScrollTo})");
+					Thread.Sleep(1000);
+				}
 			}
 			catch (Exception)
 			{
