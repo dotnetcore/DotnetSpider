@@ -29,7 +29,7 @@ namespace DotnetSpider.Sample
 				Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
 			});
 			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
-			context.AddStartUrl("http://www.ddeng.com/product/967659");
+			context.AddStartUrl("http://www.ddeng.com/product/982227");
 			context.AddEntityType(typeof(Corp));
 
 			return context;
@@ -62,6 +62,10 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "地址：")]
 			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertySelector.ValueOption.PlainText)]
 			public string Address { get; set; }
+
+			[StoredAs("html", DataType.Text)]
+			[PropertySelector(Expression = ".")]
+			public string Html { get; set; }
 
 			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
 			[StoredAs("cdate", DataType.Time)]

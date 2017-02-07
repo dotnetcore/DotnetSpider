@@ -10,7 +10,8 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			BaseUsage.Run();
+			DDengEntitySpider spider = new DDengEntitySpider();
+			spider.Run();
 		}
 	}
 }
