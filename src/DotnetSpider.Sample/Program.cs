@@ -12,9 +12,9 @@ namespace DotnetSpider.Sample
 		public static void Main(string[] args)
 		{
 			// 采集指定页面
-			//CrawlerHtml.Run();
-			//Console.WriteLine("Press any key to continue...");
-			//Console.Read();
+			CrawlerHtml.Run();
+			Console.WriteLine("Press any key to continue...");
+			Console.Read();
 
 			// 采集指定页面, 并采集筛选出的符合要求的URL
 			CrawlerHtml.CrossPage();
