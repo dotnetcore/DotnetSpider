@@ -55,9 +55,9 @@ namespace DotnetSpider.Sample
 				page.AddResultItem("Html", page.Content);
 
 				// 利用XPATH, Regext等筛选出需要采集的URL
-				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
+				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().GetValues())
 				{
-					page.AddTargetRequest(new Request(url.GetValue(), null));
+					page.AddTargetRequest(new Request(url, null));
 				}
 			}
 		}
