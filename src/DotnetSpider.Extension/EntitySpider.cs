@@ -60,15 +60,17 @@ namespace DotnetSpider.Extension
 
 			if (!string.IsNullOrEmpty(RedisHost))
 			{
-				var confiruation = new ConfigurationOptions()
+				try
 				{
-					ServiceName = "DotnetSpider",
-					Password = RedisPassword,
-					ConnectTimeout = 65530,
-					KeepAlive = 8,
-					ConnectRetry = 3,
-					ResponseTimeout = 3000
-				};
+					var confiruation = new ConfigurationOptions()
+					{
+						ServiceName = "DotnetSpider",
+						Password = RedisPassword,
+						ConnectTimeout = 65530,
+						KeepAlive = 8,
+						ConnectRetry = 3,
+						ResponseTimeout = 3000
+					};
 #if NET_CORE
 				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 				{
@@ -85,10 +87,15 @@ namespace DotnetSpider.Extension
 					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
 				}
 #else
-				confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
+					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
 #endif
-				Redis = ConnectionMultiplexer.Connect(confiruation);
-				Db = Redis.GetDatabase(1);
+					Redis = ConnectionMultiplexer.Connect(confiruation);
+					Db = Redis.GetDatabase(1);
+				}
+				catch (Exception e)
+				{
+					throw new SpiderException("Can't connect to redis server.", e);
+				}
 			}
 		}
 
