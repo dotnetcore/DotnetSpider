@@ -113,7 +113,7 @@ namespace DotnetSpider.Sample
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
 			site.AddStartUrl("http://www.cnblogs.com/");
 			Spider spider = Spider.Create(site,
-				"gushiwen_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
+				"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
 				new QueueDuplicateRemovedScheduler(),
 				new DefaultPageProcessor("cnblogs\\.com"))
 				.AddPipeline(new FilePipeline())
