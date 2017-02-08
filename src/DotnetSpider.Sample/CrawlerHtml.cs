@@ -36,7 +36,7 @@ namespace DotnetSpider.Sample
 		public static void CrossPage()
 		{
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
-			site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_1.html");
+			site.AddStartUrl("http://list.youku.com/category/show/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_pr__h__d_1_p_1.html");
 			Spider spider = Spider.Create(site,
 				"YOUKU_DEEP_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
 				new QueueDuplicateRemovedScheduler(),
@@ -44,13 +44,11 @@ namespace DotnetSpider.Sample
 				.AddPipeline(new FilePipeline())
 				.SetThreadNum(2);
 
-			spider.EmptySleepTime = 3000;
-
 			// ∆Ù∂Ø≈¿≥Ê
 			spider.Run();
 		}
 
-		private class MyPageProcessor : BasePageProcessor
+		public class MyPageProcessor : BasePageProcessor
 		{
 			protected override void Handle(Page page)
 			{

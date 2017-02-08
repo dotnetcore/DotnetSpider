@@ -16,15 +16,13 @@ namespace DotnetSpider.Core.Selector
 		public XPathSelector(string xpathStr)
 		{
 			_xpath = xpathStr;
-			//if (!string.IsNullOrEmpty(this.xpath))
-			//{
+
 			Match match = AttributeXPathRegex.Match(_xpath);
 			if (!string.IsNullOrEmpty(match.Value) && _xpath.EndsWith(match.Value))
 			{
 				_attribute = match.Value.Replace("@", "");
 				_xpath = _xpath.Replace("/" + match.Value, "");
 			}
-			//}
 		}
 
 		public override dynamic Select(HtmlNode element)
