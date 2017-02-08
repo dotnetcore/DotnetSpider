@@ -984,7 +984,7 @@ namespace DotnetSpider.Core
 
 		protected void ExtractAndAddRequests(Page page, bool spawnUrl)
 		{
-			if (spawnUrl && page.Request.NextDepth < Deep && page.TargetRequests != null && page.TargetRequests.Count > 0)
+			if (spawnUrl && page.Request.NextDepth <= Deep && page.TargetRequests != null && page.TargetRequests.Count > 0)
 			{
 				foreach (Request request in page.TargetRequests)
 				{

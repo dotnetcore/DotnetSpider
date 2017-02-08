@@ -11,17 +11,18 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			// 采集指定页面
-			CrawlerHtml.Run();
+			// Custmize processor and pipeline 完全自定义页面解析和数据管道
+			BaseUsage.CustmizeProcessorAndPipeline();
 			Console.WriteLine("Press any key to continue...");
 			Console.Read();
 
-			// 采集指定页面, 并采集筛选出的符合要求的URL
-			CrawlerHtml.CrossPage();
+			// Crawler pages without traverse 采集指定页面不做遍历
+			BaseUsage.CrawlerPagesWithoutTraverse();
 			Console.WriteLine("Press any key to continue...");
 			Console.Read();
 
-			BaseUsage.Run();
+			// Crawler pages traversal 遍历整站
+			BaseUsage.CrawlerPagesTraversal();
 			Console.WriteLine("Press any key to continue...");
 			Console.Read();
 

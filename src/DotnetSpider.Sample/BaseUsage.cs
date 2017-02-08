@@ -12,7 +12,9 @@ namespace DotnetSpider.Sample
 {
 	public class BaseUsage
 	{
-		public static void Run()
+		#region Custmize processor and pipeline 完全自定义页面解析和数据管道
+
+		public static void CustmizeProcessorAndPipeline()
 		{
 			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
@@ -23,7 +25,9 @@ namespace DotnetSpider.Sample
 			}
 
 			// 使用内存Scheduler、自定义PageProcessor、自定义Pipeline创建爬虫
-			Spider spider = Spider.Create(site, new QueueDuplicateRemovedScheduler(), new MyPageProcessor()).AddPipeline(new MyPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(site,
+				new QueueDuplicateRemovedScheduler(),
+				new YoukuPageProcessor()).AddPipeline(new YoukuPipeline()).SetThreadNum(1);
 			spider.EmptySleepTime = 3000;
 			spider.Deep = 2;
 
@@ -31,7 +35,7 @@ namespace DotnetSpider.Sample
 			spider.Run();
 		}
 
-		private class MyPipeline : BasePipeline
+		public class YoukuPipeline : BasePipeline
 		{
 			private static long count = 0;
 
@@ -47,7 +51,7 @@ namespace DotnetSpider.Sample
 			}
 		}
 
-		private class MyPageProcessor : BasePageProcessor
+		public class YoukuPageProcessor : BasePageProcessor
 		{
 			protected override void Handle(Page page)
 			{
@@ -74,5 +78,55 @@ namespace DotnetSpider.Sample
 		{
 			public string Name { get; set; }
 		}
+
+		#endregion
+
+		#region Crawler pages without traverse 采集指定页面不做遍历
+
+		public static void CrawlerPagesWithoutTraverse()
+		{
+			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			for (int i = 1; i < 5; ++i)
+			{
+				site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
+			}
+
+			Spider spider = Spider.Create(site,
+				"YOUKU_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
+				new QueueDuplicateRemovedScheduler(),
+				new SimplePageProcessor())
+				.AddPipeline(new FilePipeline())
+				.SetThreadNum(2);
+
+			spider.EmptySleepTime = 3000;
+
+			// 启动爬虫
+			spider.Run();
+		}
+
+		#endregion
+
+		#region Crawler pages traversal 遍历整站
+
+		public static void CrawlerPagesTraversal()
+		{
+			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			site.AddStartUrl("http://www.cnblogs.com/");
+			Spider spider = Spider.Create(site,
+				"gushiwen_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
+				new QueueDuplicateRemovedScheduler(),
+				new DefaultPageProcessor("cnblogs\\.com"))
+				.AddPipeline(new FilePipeline())
+				// 4线程
+				.SetThreadNum(4);
+
+			// 遍历深度
+			spider.Deep = 3;
+
+			// 启动爬虫
+			spider.Run();
+		}
+
+		#endregion
 	}
 }

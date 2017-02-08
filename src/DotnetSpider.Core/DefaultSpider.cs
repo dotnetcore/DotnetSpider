@@ -13,7 +13,7 @@ namespace DotnetSpider.Core
 		{
 		}
 
-		public DefaultSpider(string id, Site site) : base(site, id, "admin", "", new QueueDuplicateRemovedScheduler(), new DefaultPageProcessor())
+		public DefaultSpider(string id, Site site) : base(site, id, "admin", "", new QueueDuplicateRemovedScheduler(), new SimplePageProcessor())
 		{
 		}
 	}

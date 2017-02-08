@@ -79,9 +79,6 @@
     <Compile Include="..\Cnblogs.cs">
       <Link>Cnblogs.cs</Link>
     </Compile>
-    <Compile Include="..\CrawlerHtml.cs">
-      <Link>CrawlerHtml.cs</Link>
-    </Compile>
     <Compile Include="..\DDengSpider.cs">
       <Link>DDengSpider.cs</Link>
     </Compile>
