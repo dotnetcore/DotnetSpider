@@ -29,7 +29,6 @@ namespace DotnetSpider.Sample
 
 			// ∆Ù∂Ø≈¿≥Ê
 			spider.Run();
-			Console.Read();
 		}
 
 		private class MyPipeline : BasePipeline

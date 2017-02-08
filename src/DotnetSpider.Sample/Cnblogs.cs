@@ -35,7 +35,6 @@ namespace DotnetSpider.Sample
 
 			// 启动爬虫
 			spider.Run();
-			Console.Read();
 		}
 
 		private class MyPipeline : BasePipeline

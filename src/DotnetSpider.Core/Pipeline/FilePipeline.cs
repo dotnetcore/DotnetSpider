@@ -19,11 +19,7 @@ namespace DotnetSpider.Core.Pipeline
 		/// </summary>
 		public FilePipeline()
 		{
-#if NET_CORE
-			SetPath(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "data\\files" : "data/files");
-#else
-			SetPath("data\\files");
-#endif
+			SetPath("data");
 		}
 
 		public FilePipeline(string path)
@@ -40,7 +36,7 @@ namespace DotnetSpider.Core.Pipeline
 		{
 			try
 			{
-				string filePath = $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}{Encrypt.Md5Encrypt(resultItems.Request.Url.ToString())}.fd";
+				string filePath = $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}{Guid.NewGuid().ToString("N")}.dsd";
 				FileInfo file = PrepareFile(filePath);
 				using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
 				{

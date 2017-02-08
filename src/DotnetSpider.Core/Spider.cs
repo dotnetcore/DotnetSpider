@@ -94,6 +94,19 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
+		/// Create a spider with pageProcessor and scheduler
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="identify"></param>
+		/// <param name="pageProcessor"></param>
+		/// <param name="scheduler"></param>
+		/// <returns></returns>
+		public static Spider Create(Site site, string identify, IScheduler scheduler, params IPageProcessor[] pageProcessors)
+		{
+			return new Spider(site, identify, null, null, scheduler, pageProcessors);
+		}
+
+		/// <summary>
 		/// Create a spider with indentify, pageProcessor, scheduler.
 		/// </summary>
 		/// <param name="site"></param>
