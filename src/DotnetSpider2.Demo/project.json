@@ -3,10 +3,6 @@
   "buildOptions": {
     "emitEntryPoint": true,
     "debugType": "portable",
-    "copyToOutput": [ "config.ini", "nlog.netcore.config", "nlog.net45.config" ]
-  },
-  "publishOptions": {
-    "includeFiles": [ "config.ini", "nlog.netcore.config", "nlog.net45.config" ]
   },
   "dependencies": {
     "Dapper": "1.50.2",
