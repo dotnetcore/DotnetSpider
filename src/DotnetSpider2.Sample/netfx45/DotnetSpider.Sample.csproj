@@ -123,15 +123,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DotnetSpider.Core\netfx45\DotnetSpider.Core.csproj">
+    <ProjectReference Include="..\..\DotnetSpider2.Core\netfx45\DotnetSpider.Core.csproj">
       <Project>{28dadca2-9053-4222-a813-a73dd0fe7f2f}</Project>
       <Name>DotnetSpider.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DotnetSpider.Extension\netfx45\DotnetSpider.Extension.csproj">
+    <ProjectReference Include="..\..\DotnetSpider2.Extension\netfx45\DotnetSpider.Extension.csproj">
       <Project>{ddb5a085-6219-4a95-8cd8-ddcf3a54b962}</Project>
       <Name>DotnetSpider.Extension</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DotnetSpider.Redial\netfx45\DotnetSpider.Redial.csproj">
+    <ProjectReference Include="..\..\DotnetSpider2.Redial\netfx45\DotnetSpider.Redial.csproj">
       <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>
       <Name>DotnetSpider.Redial</Name>
     </ProjectReference>

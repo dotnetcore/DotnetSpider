@@ -1,7 +1,7 @@
 {
   "version": "1.0.0-*",
   "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
-  "description": "This is the offical package.",
+  "description": "Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.",
   "packOptions": {
     "licenseUrl": "https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE",
     "repository": { "url": "https://github.com/zlzforever/DotnetSpider" },
@@ -13,7 +13,7 @@
     "debugType": "portable"
   },
   "dependencies": {
-    "DotnetSpider.Core": "1.0.0-*",
+    "DotnetSpider2.Core": "1.0.0-*",
     "StackExchange.Redis": "1.1.608",
     "SSH.NET": "2016.0.0"
   },

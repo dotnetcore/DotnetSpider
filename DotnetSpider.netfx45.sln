@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Redial", "src\DotnetSpider.Redial\netfx45\DotnetSpider.Redial.csproj", "{8B6E0732-481E-42BC-8FA0-C48F4C6AFD8C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Redial", "src\DotnetSpider2.Redial\netfx45\DotnetSpider.Redial.csproj", "{8B6E0732-481E-42BC-8FA0-C48F4C6AFD8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Core", "src\DotnetSpider.Core\netfx45\DotnetSpider.Core.csproj", "{28DADCA2-9053-4222-A813-A73DD0FE7F2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Core", "src\DotnetSpider2.Core\netfx45\DotnetSpider.Core.csproj", "{28DADCA2-9053-4222-A813-A73DD0FE7F2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension", "src\DotnetSpider.Extension\netfx45\DotnetSpider.Extension.csproj", "{DDB5A085-6219-4A95-8CD8-DDCF3A54B962}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension", "src\DotnetSpider2.Extension\netfx45\DotnetSpider.Extension.csproj", "{DDB5A085-6219-4A95-8CD8-DDCF3A54B962}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2825D0D3-8DB8-4450-AC2E-004FB4161997}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,11 +17,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Sample", "src\DotnetSpider.Sample\netfx45\DotnetSpider.Sample.csproj", "{E49B94BD-2E84-4AF4-A7E9-073CC10A413C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Sample", "src\DotnetSpider2.Sample\netfx45\DotnetSpider.Sample.csproj", "{E49B94BD-2E84-4AF4-A7E9-073CC10A413C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension.Test", "src\DotnetSpider.Extension.Test\netfx45\DotnetSpider.Extension.Test.csproj", "{5806BCBB-08FF-46A5-AC63-40B4CF48A7F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension.Test", "src\DotnetSpider2.Extension.Test\netfx45\DotnetSpider.Extension.Test.csproj", "{5806BCBB-08FF-46A5-AC63-40B4CF48A7F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Core.Test", "src\DotnetSpider.Core.Test\netfx45\DotnetSpider.Core.Test.csproj", "{DCB1CEB0-DDA9-49B9-8358-13C4F3B53997}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Core.Test", "src\DotnetSpider2.Core.Test\netfx45\DotnetSpider.Core.Test.csproj", "{DCB1CEB0-DDA9-49B9-8358-13C4F3B53997}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

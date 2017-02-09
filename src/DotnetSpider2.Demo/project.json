@@ -1,4 +1,4 @@
-{
+﻿{
   "version": "1.0.0-*",
   "buildOptions": {
     "emitEntryPoint": true,
@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "Dapper": "1.50.2",
-    "DotnetSpider.Core": "1.0.0-*",
-    "DotnetSpider.Extension": "1.0.0-*",
-    "DotnetSpider.Redial": "1.0.0-*",
+    "DotnetSpider2.Core": "1.0.0-*",
+    "DotnetSpider2.Extension": "1.0.0-*",
+    "DotnetSpider2.Redial": "1.0.0-*",
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
   },
   "frameworks": {
@@ -27,18 +27,6 @@
       "buildOptions": {
         "define": [
           "NET_CORE"
-        ]
-      }
-    },
-    "net45": {
-      "dependencies": {
-        "HtmlAgilityPack": "1.4.9.5",
-        "HtmlAgilityPack.CssSelectors": "1.0.2",
-        "MySql.Data": "6.9.9"
-      },
-      "buildOptions": {
-        "define": [
-          "NET_45"
         ]
       }
     }

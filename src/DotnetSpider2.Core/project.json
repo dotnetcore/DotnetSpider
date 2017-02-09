@@ -1,7 +1,7 @@
- {
+{
   "version": "1.0.0-*",
   "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
-  "description": "This is the offical package.",
+  "description": "Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.",
   "packOptions": {
     "licenseUrl": "https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE",
     "repository": { "url": "https://github.com/zlzforever/DotnetSpider" },
@@ -59,8 +59,8 @@
     "netstandard1.6": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
-        "DotnetSpider.HtmlAgilityPack": "1.0.0-*",
-        "DotnetSpider.HtmlAgilityPack.Css": "1.0.0-*",
+        "DotnetSpider2.HtmlAgilityPack": "1.0.0-*",
+        "DotnetSpider2.HtmlAgilityPack.Css": "1.0.0-*",
         "Microsoft.CSharp": "4.0.1",
         "Microsoft.Extensions.Configuration.Binder": "1.0.0",
         "Microsoft.Extensions.Configuration.Ini": "1.0.0",

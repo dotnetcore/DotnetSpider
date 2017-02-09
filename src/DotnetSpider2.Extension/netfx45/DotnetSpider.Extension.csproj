@@ -134,11 +134,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DotnetSpider.Core\netfx45\DotnetSpider.Core.csproj">
+    <ProjectReference Include="..\..\DotnetSpider2.Core\netfx45\DotnetSpider.Core.csproj">
       <Project>{28dadca2-9053-4222-a813-a73dd0fe7f2f}</Project>
       <Name>DotnetSpider.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DotnetSpider.Redial\netfx45\DotnetSpider.Redial.csproj">
+    <ProjectReference Include="..\..\DotnetSpider2.Redial\netfx45\DotnetSpider.Redial.csproj">
       <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>
       <Name>DotnetSpider.Redial</Name>
     </ProjectReference>

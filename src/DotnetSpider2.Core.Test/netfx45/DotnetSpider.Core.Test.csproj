@@ -148,7 +148,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DotnetSpider.Core\netfx45\DotnetSpider.Core.csproj">
+    <ProjectReference Include="..\..\DotnetSpider2.Core\netfx45\DotnetSpider.Core.csproj">
       <Project>{28dadca2-9053-4222-a813-a73dd0fe7f2f}</Project>
       <Name>DotnetSpider.Core</Name>
     </ProjectReference>
