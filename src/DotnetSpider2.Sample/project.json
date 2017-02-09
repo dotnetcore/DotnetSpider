@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "Dapper": "1.50.2",
-    "DotnetSpider2.Core": "1.0.0-*",
-    "DotnetSpider2.Extension": "1.0.0-*",
-    "DotnetSpider2.Redial": "1.0.0-*",
+    "DotnetSpider2.Core": "*",
+    "DotnetSpider2.Extension": "*",
+    "DotnetSpider2.Redial": "*",
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
   },
   "frameworks": {

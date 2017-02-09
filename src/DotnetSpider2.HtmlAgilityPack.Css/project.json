@@ -13,7 +13,7 @@
     "debugType": "portable"
   },
   "dependencies": {
-    "DotnetSpider2.HtmlAgilityPack": "1.0.0-*",
+    "DotnetSpider2.HtmlAgilityPack": "*",
     "System.Globalization": "4.3.0",
     "System.Linq.Queryable": "4.0.1",
     "System.Threading": "4.3.0"
