@@ -1,0 +1,34 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "debugType": "portable",
+    "copyToOutput": [ "config.ini", "nlog.netcore.config", "nlog.net45.config" ]
+  },
+  "publishOptions": {
+    "includeFiles": [ "config.ini", "nlog.netcore.config", "nlog.net45.config" ]
+  },
+  "dependencies": {
+    "Dapper": "1.50.2",
+    "DotnetSpider2.Core": "*",
+    "DotnetSpider2.Extension": "*",
+    "DotnetSpider2.Redial": "*",
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": "portable-net45+win8+dnxcore50",
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.1"
+        }
+      },
+      "buildOptions": {
+        "define": [
+          "NET_CORE"
+        ]
+      }
+    }
+  }
+}

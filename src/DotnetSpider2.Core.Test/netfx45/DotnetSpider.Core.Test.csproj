@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DCB1CEB0-DDA9-49B9-8358-13C4F3B53997}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DotnetSpider.Core.Test</RootNamespace>
+    <AssemblyName>DotnetSpider.Core.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MySql.Data.6.9.9\lib\net45\MySql.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.assert, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\xunit.assert.2.1.0\lib\dotnet\xunit.assert.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.core, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\xunit.extensibility.core.2.1.0\lib\dotnet\xunit.core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Downloader\DownloadHanlderTest.cs">
+      <Link>Downloader\DownloadHanlderTest.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\HttpClientDownloaderTest.cs">
+      <Link>Downloader\HttpClientDownloaderTest.cs</Link>
+    </Compile>
+    <Compile Include="..\Downloader\TestDownloader.cs">
+      <Link>Downloader\TestDownloader.cs</Link>
+    </Compile>
+    <Compile Include="..\HtmlTest.cs">
+      <Link>HtmlTest.cs</Link>
+    </Compile>
+    <Compile Include="..\IocManagerTests.cs">
+      <Link>IocManagerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\Pipeline\FilePipelineTest.cs">
+      <Link>Pipeline\FilePipelineTest.cs</Link>
+    </Compile>
+    <Compile Include="..\Pipeline\JsonFilePipelineTest.cs">
+      <Link>Pipeline\JsonFilePipelineTest.cs</Link>
+    </Compile>
+    <Compile Include="..\Processor\TargetUrlTests.cs">
+      <Link>Processor\TargetUrlTests.cs</Link>
+    </Compile>
+    <Compile Include="..\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="..\RequestTest.cs">
+      <Link>RequestTest.cs</Link>
+    </Compile>
+    <Compile Include="..\ResultItemsTest.cs">
+      <Link>ResultItemsTest.cs</Link>
+    </Compile>
+    <Compile Include="..\Scheduler\BloomFilterDuplicateRemover.cs">
+      <Link>Scheduler\BloomFilterDuplicateRemover.cs</Link>
+    </Compile>
+    <Compile Include="..\Scheduler\HashSetDuplicateRemoverTest.cs">
+      <Link>Scheduler\HashSetDuplicateRemoverTest.cs</Link>
+    </Compile>
+    <Compile Include="..\Scheduler\QueueSchedulerTest.cs">
+      <Link>Scheduler\QueueSchedulerTest.cs</Link>
+    </Compile>
+    <Compile Include="..\SelectorTest.cs">
+      <Link>SelectorTest.cs</Link>
+    </Compile>
+    <Compile Include="..\SiteTest.cs">
+      <Link>SiteTest.cs</Link>
+    </Compile>
+    <Compile Include="..\SpiderTest.cs">
+      <Link>SpiderTest.cs</Link>
+    </Compile>
+    <Compile Include="..\TestDownloader.cs">
+      <Link>TestDownloader.cs</Link>
+    </Compile>
+    <Compile Include="..\UrlUtilsTest.cs">
+      <Link>UrlUtilsTest.cs</Link>
+    </Compile>
+    <None Include="nlog.net45.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\config.ini">
+      <Link>config.ini</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DotnetSpider2.Core\netfx45\DotnetSpider.Core.csproj">
+      <Project>{28dadca2-9053-4222-a813-a73dd0fe7f2f}</Project>
+      <Name>DotnetSpider.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

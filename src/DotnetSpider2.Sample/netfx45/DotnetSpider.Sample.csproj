@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E49B94BD-2E84-4AF4-A7E9-073CC10A413C}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DotnetSpider.Sample</RootNamespace>
+    <AssemblyName>DotnetSpider.Sample</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Dapper.1.50.2\lib\net45\Dapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Extensions.DependencyInjection.1.0.0\lib\netstandard1.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MySql.Data.6.9.9\lib\net45\MySql.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WebDriver, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Selenium.WebDriver.3.0.0\lib\net40\WebDriver.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\BaiduSearchSpider.cs">
+      <Link>BaiduSearchSpider.cs</Link>
+    </Compile>
+    <Compile Include="..\BaseUsage.cs">
+      <Link>BaseUsage.cs</Link>
+    </Compile>
+    <Compile Include="..\CasSpider.cs">
+      <Link>CasSpider.cs</Link>
+    </Compile>
+    <Compile Include="..\Cnblogs.cs">
+      <Link>Cnblogs.cs</Link>
+    </Compile>
+    <Compile Include="..\DDengSpider.cs">
+      <Link>DDengSpider.cs</Link>
+    </Compile>
+    <Compile Include="..\JdShopDetailSpider.cs">
+      <Link>JdShopDetailSpider.cs</Link>
+    </Compile>
+    <Compile Include="..\JdSkuSampleSpider.cs">
+      <Link>JdSkuSampleSpider.cs</Link>
+    </Compile>
+    <Compile Include="..\JdSkuWebDriverSample.cs">
+      <Link>JdSkuWebDriverSample.cs</Link>
+    </Compile>
+    <Compile Include="..\JdSpider.cs">
+      <Link>JdSpider.cs</Link>
+    </Compile>
+    <Compile Include="..\LinkSpiderExample.cs">
+      <Link>LinkSpiderExample.cs</Link>
+    </Compile>
+    <Compile Include="..\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="..\RegexTestSpider.cs">
+      <Link>RegexTestSpider.cs</Link>
+    </Compile>
+    <Compile Include="..\TestSpider.cs">
+      <Link>TestSpider.cs</Link>
+    </Compile>
+    <Compile Include="Anjuke.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\config.ini">
+      <Link>config.ini</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="App.config" />
+    <None Include="nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DotnetSpider2.Core\netfx45\DotnetSpider.Core.csproj">
+      <Project>{28dadca2-9053-4222-a813-a73dd0fe7f2f}</Project>
+      <Name>DotnetSpider.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DotnetSpider2.Extension\netfx45\DotnetSpider.Extension.csproj">
+      <Project>{ddb5a085-6219-4a95-8cd8-ddcf3a54b962}</Project>
+      <Name>DotnetSpider.Extension</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DotnetSpider2.Redial\netfx45\DotnetSpider.Redial.csproj">
+      <Project>{8b6e0732-481e-42bc-8fa0-c48f4c6afd8c}</Project>
+      <Name>DotnetSpider.Redial</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
