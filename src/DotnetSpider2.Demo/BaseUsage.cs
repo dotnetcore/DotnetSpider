@@ -8,6 +8,7 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Core.Downloader;
+using System.Text;
 
 namespace DotnetSpider.Demo
 {
@@ -49,11 +50,13 @@ namespace DotnetSpider.Demo
 
 			public override void Process(ResultItems resultItems)
 			{
+				StringBuilder builder = new StringBuilder();
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
 					count++;
-					Console.WriteLine($"[YoukuVideo {count}] {entry.Name}");
+					builder.Append($" [YoukuVideo {count}] {entry.Name}");
 				}
+				Console.WriteLine(builder);
 
 				// Other actions like save data to DB. 可以自由实现插入数据库或保存到文件
 			}
