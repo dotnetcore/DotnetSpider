@@ -7,6 +7,7 @@ using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
+using DotnetSpider.Core.Downloader;
 
 namespace DotnetSpider.Sample
 {
@@ -16,22 +17,29 @@ namespace DotnetSpider.Sample
 
 		public static void CustmizeProcessorAndPipeline()
 		{
-			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
+			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
 			for (int i = 1; i < 5; ++i)
 			{
-				// 添加初始采集链接
+				// Add start/feed urls. 添加初始采集链接
 				site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
 			}
 
-			// 使用内存Scheduler、自定义PageProcessor、自定义Pipeline创建爬虫
 			Spider spider = Spider.Create(site,
+				// use memoery queue scheduler. 使用内存调度
 				new QueueDuplicateRemovedScheduler(),
-				new YoukuPageProcessor()).AddPipeline(new YoukuPipeline()).SetThreadNum(1);
-			spider.EmptySleepTime = 3000;
-			spider.Deep = 2;
+				// use custmize processor for youku 为优酷自定义的 Processor
+				new YoukuPageProcessor())
+				// use custmize pipeline for youku 为优酷自定义的 Pipeline
+				.AddPipeline(new YoukuPipeline())
+				// dowload html by http client
+				.SetDownloader(new HttpClientDownloader())
+				// 1 thread
+				.SetThreadNum(1);
 
-			// 启动爬虫
+			spider.EmptySleepTime = 3000;
+
+			// Start crawler 启动爬虫
 			spider.Run();
 		}
 
@@ -47,7 +55,7 @@ namespace DotnetSpider.Sample
 					Console.WriteLine($"[YoukuVideo {count}] {entry.Name}");
 				}
 
-				// 可以自由实现插入数据库或保存到文件
+				// Other actions like save data to DB. 可以自由实现插入数据库或保存到文件
 			}
 		}
 
@@ -64,9 +72,11 @@ namespace DotnetSpider.Sample
 					video.Name = videoElement.Select(Selectors.XPath(".//img[@class='quic']/@alt")).GetValue();
 					results.Add(video);
 				}
-				// 以自定义KEY存入page对象中供Pipeline调用
+				
+				// Save data object by key. 以自定义KEY存入page对象中供Pipeline调用
 				page.AddResultItem("VideoResult", results);
 
+				// Add target requests to scheduler. 解析需要采集的URL
 				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
 				{
 					page.AddTargetRequest(new Request(url.GetValue(), null));
@@ -110,20 +120,33 @@ namespace DotnetSpider.Sample
 
 		public static void CrawlerPagesTraversal()
 		{
+			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+
+			// Set start/seed url
 			site.AddStartUrl("http://www.cnblogs.com/");
+
 			Spider spider = Spider.Create(site,
+				// crawler identity
 				"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
+				// use memoery queue scheduler
 				new QueueDuplicateRemovedScheduler(),
+				// default page processor will save whole html, and extract urls to target urls via regex
 				new DefaultPageProcessor("cnblogs\\.com"))
+				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
 				.AddPipeline(new FilePipeline())
-				// 4线程
+				// dowload html by http client
+				.SetDownloader(new HttpClientDownloader())
+				// 4 threads 4线程
 				.SetThreadNum(4);
 
-			// 遍历深度
+			// traversal deep 遍历深度
 			spider.Deep = 3;
 
-			// 启动爬虫
+			// stop crawler if it can't get url from the scheduler after 30000 ms 当爬虫连续30秒无法从调度中心取得需要采集的链接时结束.
+			spider.EmptySleepTime = 30000;
+
+			// start crawler 启动爬虫
 			spider.Run();
 		}
 

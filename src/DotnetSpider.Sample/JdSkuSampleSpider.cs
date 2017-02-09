@@ -7,6 +7,7 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Core.Downloader;
 
 namespace DotnetSpider.Sample
 {
@@ -20,6 +21,9 @@ namespace DotnetSpider.Sample
 			});
 			context.SetThreadNum(1);
 			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_hhmmss"));
+			// dowload html by http client
+			context.SetDownloader(new HttpClientDownloader());
+			// save data to mysql.
 			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			context.AddEntityType(typeof(Product));
