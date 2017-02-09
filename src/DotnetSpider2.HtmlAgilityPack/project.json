@@ -13,7 +13,6 @@
     "debugType": "portable"
   },
   "dependencies": {
-
   },
   "frameworks": {
     "netstandard1.6": {
