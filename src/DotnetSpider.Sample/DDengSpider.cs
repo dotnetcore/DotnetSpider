@@ -49,7 +49,7 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "\n")]
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
-			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = PropertySelector.ValueOption.PlainText)]
+			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = PropertySelector.Options.PlainText)]
 			public string Phone { get; set; }
 
 			[StoredAs("address", DataType.String, 200)]
@@ -60,7 +60,7 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
 			[ReplaceFormatter(NewValue = "", OldValue = "地址：")]
-			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertySelector.ValueOption.PlainText)]
+			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertySelector.Options.PlainText)]
 			public string Address { get; set; }
 
 			[StoredAs("html", DataType.Text)]

@@ -46,11 +46,11 @@ namespace DotnetSpider.Sample
 			public string Url { get; set; }
 
 			[StoredAs("Price", DataType.String, 100)]
-			[PropertySelector(Expression = ".//p[@class='price']", Option = PropertySelector.ValueOption.PlainText)]
+			[PropertySelector(Expression = ".//p[@class='price']", Option = PropertySelector.Options.PlainText)]
 			public string Price { get; set; }
 
 			[StoredAs("Tel", DataType.String, 100)]
-			[PropertySelector(Expression = ".//p[@class='tel']", Option = PropertySelector.ValueOption.PlainText)]
+			[PropertySelector(Expression = ".//p[@class='tel']", Option = PropertySelector.Options.PlainText)]
 			public string Tel { get; set; }
 		}
 	}

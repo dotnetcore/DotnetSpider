@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension.Model
 	public class Field : DataToken
 	{
 		public string DataType { get; set; }
-		public PropertySelector.ValueOption Option { get; set; }
+		public PropertySelector.Options Option { get; set; }
 		public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
 	}
 

@@ -266,5 +266,5 @@ NOTE:
 
 ### AREAS FOR IMPROVEMENTS
 
-QQ: 477731655
-EMail: zlzforever@163.com
+QQ Group: 477731655
+Email: zlzforever@163.com

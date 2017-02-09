@@ -61,14 +61,14 @@ namespace DotnetSpider.Sample
 		public string Snapshot { get; set; }
 
 
-		[PropertySelector(Expression = ".//div[@class='c-summary c-row ']", Option = PropertySelector.ValueOption.PlainText)]
+		[PropertySelector(Expression = ".//div[@class='c-summary c-row ']", Option = PropertySelector.Options.PlainText)]
 		[StoredAs("Details", DataType.Text)]
 		[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 		[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 		[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 		public string Details { get; set; }
 
-		[PropertySelector(Expression = ".", Option = PropertySelector.ValueOption.PlainText)]
+		[PropertySelector(Expression = ".", Option = PropertySelector.Options.PlainText)]
 		[StoredAs("PlainText", DataType.Text)]
 		[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 		[ReplaceFormatter(NewValue = "", OldValue = "</em>")]

@@ -5,7 +5,7 @@ namespace DotnetSpider.Extension.Model.Attribute
 	[AttributeUsage(AttributeTargets.Property)]
 	public class PropertySelector : BaseSelector
 	{
-		public enum ValueOption
+		public enum Options
 		{
 			None,
 			PlainText,
@@ -18,6 +18,6 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// </summary>
 		public bool NotNull { get; set; } = false;
 
-		public ValueOption Option { get; set; } = ValueOption.None;
+		public Options Option { get; set; } = Options.None;
 	}
 }
