@@ -43,7 +43,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 			{
 				if (False == Id)
 				{
-					return tmp;
+					return "";
 				}
 				else
 				{
