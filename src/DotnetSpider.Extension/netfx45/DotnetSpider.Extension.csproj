@@ -252,6 +252,9 @@
     <Compile Include="..\Model\Formatter\Formatter.cs">
       <Link>Model\Formatter\Formatter.cs</Link>
     </Compile>
+    <Compile Include="..\Model\Formatter\HtmlDecodeFormater.cs">
+      <Link>Model\Formatter\HtmlDecodeFormater.cs</Link>
+    </Compile>
     <Compile Include="..\Model\Formatter\RegexAppendFormatter.cs">
       <Link>Model\Formatter\RegexAppendFormatter.cs</Link>
     </Compile>

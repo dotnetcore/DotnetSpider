@@ -299,7 +299,15 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool NeedStop(Page page, BaseTargetUrlsCreator creator)
 		{
-			string current = creator.GetCurrentPaggerString(page.Url);
+			string current;
+			if (page.Request.Method.ToUpper() == "GET")
+			{
+				current = creator.GetCurrentPaggerString(page.Url);
+			}
+			else
+			{
+				current = creator.GetCurrentPaggerString(page.Request.PostBody);
+			}
 			int currentIndex = int.Parse(RegexUtil.NumRegex.Match(current).Value);
 
 			if (currentIndex >= Limit)
