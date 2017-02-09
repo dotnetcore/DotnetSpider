@@ -1,5 +1,5 @@
 {
-  "version": "1.0.4-*",
+  "version": "1.0.5-*",
   "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
   "description": "Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.",
   "packOptions": {
@@ -21,9 +21,8 @@
     "net45": {
       "dependencies": {
         "NLog": "4.3.11",
-        "HtmlAgilityPack": "1.4.9.5",
-        "System.Runtime": "4.0.0",
-        "HtmlAgilityPack.CssSelectors": "1.0.2"
+        "HtmlAgilityPack.CssSelectors": "1.0.2",
+        "System.Runtime": "4.0.0"
       },
       "buildOptions": {
         "define": [
@@ -41,7 +40,6 @@
       "dependencies": {
         "NLog": "4.3.11",
         "System.Runtime": "4.0.10",
-        "HtmlAgilityPack": "1.4.9.5",
         "HtmlAgilityPack.CssSelectors": "1.0.2"
       },
       "buildOptions": {
