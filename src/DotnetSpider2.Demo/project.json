@@ -7,7 +7,7 @@
   "dependencies": {
     "Dapper": "1.50.2",
     "DotnetSpider2.Core": "*",
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
+    "Microsoft.Extensions.Logging.Abstractions": "1.1.0"
   },
   "frameworks": {
     "net45": {
@@ -24,7 +24,7 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.1"
+          "version": "1.1.0"
         }
       },
       "buildOptions": {

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1-*",
+  "version": "1.0.6-*",
   "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
   "description": "Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.",
   "packOptions": {
@@ -23,10 +23,10 @@
         "System.Runtime.Extensions": "4.3.0",
         "System.Text.RegularExpressions": "4.3.0",
         "System.Diagnostics.Debug": "4.3.0",
-        "System.Xml.XmlDocument": "4.0.1",
-        "System.Xml.ReaderWriter": "4.0.11",
-        "System.Xml.XPath": "4.0.1",
-        "System.Xml.XPath.XDocument": "4.0.1",
+        "System.Xml.XmlDocument": "4.3.0",
+        "System.Xml.ReaderWriter": "4.3.0",
+        "System.Xml.XPath": "4.3.0",
+        "System.Xml.XPath.XDocument": "4.3.0",
         "System.Diagnostics.StackTrace": "4.0.1"
       },
       "buildOptions": {
