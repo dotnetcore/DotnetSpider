@@ -33,8 +33,6 @@
         },
         "System.Net.Http": "4.3.0",
         "System.Diagnostics.Process": "4.3.0",
-        "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
-        "System.Text.Encoding.CodePages": "4.3.0",
         "dotnet-test-xunit": "2.2.0-preview2-build1029",
         "MySql.Data": "7.0.6-IR31",
         "System.Linq": "4.3.0"

@@ -23,7 +23,7 @@
       "dependencies": {
         "HtmlAgilityPack.CssSelectors": "1.0.2",
         "MySql.Data": "6.9.9",
-        "Selenium.WebDriver": "2.53.1",
+        "Selenium.WebDriver": "3.0.1",
         "FiddlerCore2": "1.0.0"
       },
       "frameworkAssemblies": {

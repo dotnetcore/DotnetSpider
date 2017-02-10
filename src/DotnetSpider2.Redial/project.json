@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "DotnetSpider2.Core": "*",
-    "StackExchange.Redis": "1.1.608",
+    "StackExchange.Redis": "1.2.0",
     "SSH.NET": "2016.0.0"
   },
   "frameworks": {

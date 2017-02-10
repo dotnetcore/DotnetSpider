@@ -6,8 +6,7 @@
   },
   "dependencies": {
     "Dapper": "1.50.2",
-    "DotnetSpider2.Core": "*",
-    "Microsoft.Extensions.Logging.Abstractions": "1.1.0"
+    "DotnetSpider2.Core": "*"
   },
   "frameworks": {
     "net45": {

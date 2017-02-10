@@ -27,7 +27,7 @@
         "System.Xml.ReaderWriter": "4.3.0",
         "System.Xml.XPath": "4.3.0",
         "System.Xml.XPath.XDocument": "4.3.0",
-        "System.Diagnostics.StackTrace": "4.0.1"
+        "System.Diagnostics.StackTrace": "4.3.0"
       },
       "buildOptions": {
         "define": [

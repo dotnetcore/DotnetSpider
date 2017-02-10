@@ -21,7 +21,7 @@
   "frameworks": {
     "net45": {
       "dependencies": {
-        "NLog": "4.3.11",
+        "NLog": "4.4.2",
         "HtmlAgilityPack.CssSelectors": "1.0.2"
       },
       "buildOptions": {
