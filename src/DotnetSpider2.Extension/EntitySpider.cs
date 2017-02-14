@@ -415,8 +415,8 @@ namespace DotnetSpider.Extension
 			{
 				entityMetadata.Entity.Multi = false;
 			}
-			TargetUrlsSelector targetUrlsSelector = entityType.GetCustomAttribute<TargetUrlsSelector>();
-			entityMetadata.TargetUrlExtractor = targetUrlsSelector;
+			var targetUrlsSelectors = entityType.GetCustomAttributes<TargetUrlsSelector>();
+			entityMetadata.TargetUrlsSelectors = targetUrlsSelectors.ToList();
 			return entityMetadata;
 		}
 

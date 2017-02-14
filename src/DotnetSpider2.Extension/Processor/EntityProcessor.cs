@@ -20,15 +20,19 @@ namespace DotnetSpider.Extension.Processor
 			Site = site;
 			_entity = entity;
 			_extractor = new EntityExtractor(entity.Entity.Name, entity.SharedValues, entity);
-			if (entity.TargetUrlExtractor != null)
+			if (entity.TargetUrlsSelectors != null && entity.TargetUrlsSelectors.Count > 0)
 			{
-				if (entity.TargetUrlExtractor.Patterns != null && entity.TargetUrlExtractor.Patterns.Length > 0)
+				var pairs = new List<string>();
+				foreach (var targetUrlsSelector in entity.TargetUrlsSelectors)
 				{
-					TargetUrlPatterns = new HashSet<Regex>(entity.TargetUrlExtractor.Patterns.Select(p => new Regex(p)));
-				}
-				if (entity.TargetUrlExtractor.XPaths != null && entity.TargetUrlExtractor.XPaths.Length > 0)
-				{
-					TargetUrlRegions = new HashSet<ISelector>(entity.TargetUrlExtractor.XPaths.Select(x => Selectors.XPath(x)));
+					if (targetUrlsSelector.XPaths == null && targetUrlsSelector.Patterns == null)
+					{
+						throw new SpiderException("Region xpath and patterns should not be null both.");
+					}
+					foreach (var xpath in targetUrlsSelector.XPaths.Select(x => x.Trim()).Distinct())
+					{
+						AddTargetUrlExtractor(xpath, targetUrlsSelector.Patterns);
+					}
 				}
 			}
 		}

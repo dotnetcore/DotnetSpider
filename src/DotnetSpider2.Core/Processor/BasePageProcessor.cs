@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DotnetSpider.Core.Selector;
+using System.Linq;
 #if !NET_CORE
 using System.Web;
 #else
@@ -11,14 +12,19 @@ namespace DotnetSpider.Core.Processor
 {
 	public abstract class BasePageProcessor : IPageProcessor
 	{
+		private List<Regex> _targetUrlPatterns;
+
+		private Dictionary<ISelector, List<string>> _targetUrlExtractors { get; set; } = new Dictionary<ISelector, List<string>>();
+
 		protected abstract void Handle(Page page);
 
 		public void Process(Page page)
 		{
-			if (TargetUrlPatterns != null)
+			if (_targetUrlExtractors != null)
 			{
 				bool isTarget = true;
-				foreach (var regex in TargetUrlPatterns)
+
+				foreach (var regex in GetTargetUrlPatterns())
 				{
 					isTarget = regex.IsMatch(page.Url);
 					if (isTarget)
@@ -56,16 +62,14 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="targetUrlExtractInfos"></param>
 		protected virtual void ExtractUrls(Page page)
 		{
-			VerifyTargetUrlsSelector();
-
-			if (TargetUrlRegions == null || TargetUrlRegions.Count == 0)
+			if (_targetUrlExtractors == null || _targetUrlExtractors.Count == 0)
 			{
 				return;
 			}
 
-			foreach (var urlRegionSelector in TargetUrlRegions)
+			foreach (var targetUrlExtractor in _targetUrlExtractors)
 			{
-				var links = urlRegionSelector == null ? page.Selectable.Links().GetValues() : (page.Selectable.SelectList(urlRegionSelector)).Links().GetValues();
+				var links = (page.Selectable.SelectList(targetUrlExtractor.Key)).Links().GetValues();
 				if (links == null)
 				{
 					continue;
@@ -84,17 +88,17 @@ namespace DotnetSpider.Core.Processor
 				}
 				links = tmp;
 
-				if (TargetUrlPatterns == null || TargetUrlPatterns.Count == 0)
+				if (targetUrlExtractor.Value == null || targetUrlExtractor.Value.Count == 0)
 				{
 					page.AddTargetRequests(links);
 					continue;
 				}
 
-				foreach (Regex targetUrlPattern in TargetUrlPatterns)
+				foreach (var targetUrlPattern in targetUrlExtractor.Value)
 				{
 					foreach (string link in links)
 					{
-						if (targetUrlPattern.IsMatch(link))
+						if (Regex.IsMatch(targetUrlPattern, link))
 						{
 							page.AddTargetRequest(new Request(link, page.Request.Extras));
 						}
@@ -108,27 +112,77 @@ namespace DotnetSpider.Core.Processor
 			return url;
 		}
 
-		protected virtual void VerifyTargetUrlsSelector()
+		protected virtual List<Regex> GetTargetUrlPatterns()
 		{
-			Dictionary<ISelector, List<Regex>> results = new Dictionary<ISelector, List<Regex>>();
+			if (_targetUrlPatterns == null)
+			{
+				_targetUrlPatterns = new List<Regex>();
+				foreach (var targetUrlExtractor in _targetUrlExtractors)
+				{
+					foreach (var pattern in targetUrlExtractor.Value)
+					{
+						_targetUrlPatterns.Add(new Regex(pattern));
+					}
+				}
+			}
+			return _targetUrlPatterns;
+		}
 
-			if ((TargetUrlRegions == null || TargetUrlRegions.Count == 0) && (TargetUrlPatterns == null || TargetUrlPatterns.Count == 0))
+		protected virtual void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
+		{
+			string xpath = string.IsNullOrEmpty(regionXpath?.Trim()) ? "." : regionXpath.Trim();
+
+			var selector = Selectors.XPath(xpath);
+			if (!_targetUrlExtractors.ContainsKey(selector))
+			{
+				_targetUrlExtractors.Add(selector, new List<string>());
+			}
+			var realPatterns = _targetUrlExtractors[selector];
+			// 如果已经有正则为空, 即表示当前区域内所有的URL都是目标链接, 则无需再校验其它正则了
+			if (realPatterns.Contains(null))
 			{
 				return;
 			}
-			if (TargetUrlRegions == null || TargetUrlRegions.Count == 0)
+
+			if (patterns == null || patterns.Length == 0)
 			{
-				TargetUrlRegions = new HashSet<ISelector> { Selectors.XPath(".") };
+				if (!realPatterns.Contains(null))
+				{
+					realPatterns.Add(null);
+				}
+				else
+				{
+					return;
+				}
+			}
+			foreach (var pattern in patterns)
+			{
+				var realPattern = string.IsNullOrEmpty(pattern?.Trim()) ? null : pattern.Trim();
+				if (!realPatterns.Any(p => p == realPattern))
+				{
+					realPatterns.Add(realPattern);
+				}
 			}
 		}
+
+		//protected virtual void AddTargetUrlRegion(string regionXpath)
+		//{
+		//	var xpath = string.IsNullOrEmpty(regionXpath) ? "." : regionXpath;
+		//	var selector = Selectors.XPath(xpath);
+		//	if (!_targetUrlExtractors.ContainsKey(selector))
+		//	{
+		//		_targetUrlExtractors.Add(selector, new List<Regex>());
+		//	}
+		//	var patterns = _targetUrlExtractors[selector];
+		//	if (!patterns.Any(p => p.ToString() == regex))
+		//	{
+		//		patterns.Add(new Regex(regex));
+		//	}
+		//}
 
 		/// <summary>
 		/// Get the site settings
 		/// </summary>
 		public Site Site { get; set; }
-
-		public HashSet<ISelector> TargetUrlRegions { get; protected set; } = new HashSet<ISelector>();
-
-		public HashSet<Regex> TargetUrlPatterns { get; protected set; } = new HashSet<Regex>();
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Selector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +16,7 @@ namespace DotnetSpider.Core.Test.Processor
 		{
 			public CnblogsProcessor1()
 			{
-				TargetUrlRegions = new HashSet<Selector.ISelector>
-				{
-					Selector.Selectors.XPath(".//div[@class='pager']")
-				};
-				TargetUrlPatterns = new HashSet<Regex>
-				{
-					new Regex("/sitehome/p/\\d+"),new Regex("^http://www\\.cnblogs\\.com/$")
-				};
+				AddTargetUrlExtractor(".//div[@class='pager']", "/sitehome/p/\\d+", "^http://www\\.cnblogs\\.com/$");
 			}
 
 			protected override void Handle(Page page)
@@ -52,10 +46,7 @@ namespace DotnetSpider.Core.Test.Processor
 		{
 			public CnblogsProcessor2()
 			{
-				TargetUrlPatterns = new HashSet<Regex>
-				{
-					new Regex("/sitehome/p/\\d+"),new Regex("^http://www\\.cnblogs\\.com/$")
-				};
+				AddTargetUrlExtractor(".//div[@class='pager']", "/sitehome/p/\\d+", "^http://www\\.cnblogs\\.com/$");
 			}
 
 			protected override void Handle(Page page)
@@ -85,10 +76,7 @@ namespace DotnetSpider.Core.Test.Processor
 		{
 			public CnblogsProcessor3()
 			{
-				TargetUrlPatterns = new HashSet<Regex>
-				{
-					new Regex("/sitehome/p/\\d+")
-				};
+				AddTargetUrlExtractor(".", "/sitehome/p/\\d+");
 			}
 
 			protected override void Handle(Page page)
@@ -117,10 +105,7 @@ namespace DotnetSpider.Core.Test.Processor
 		{
 			public CnblogsProcessor4()
 			{
-				TargetUrlPatterns = new HashSet<Regex>
-				{
-					new Regex("/sitehome/p/\\d+")
-				};
+				AddTargetUrlExtractor(".", "/sitehome/p/\\d+");
 			}
 
 			protected override void Handle(Page page)

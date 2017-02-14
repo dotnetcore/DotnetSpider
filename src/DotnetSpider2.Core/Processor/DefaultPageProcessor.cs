@@ -1,5 +1,4 @@
 using DotnetSpider.Core.Selector;
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -11,11 +10,7 @@ namespace DotnetSpider.Core.Processor
 
 		public DefaultPageProcessor(string partten)
 		{
-			TargetUrlPatterns = new HashSet<Regex>()
-			{
-				new Regex(partten)
-			};
-			TargetUrlRegions = new HashSet<ISelector> { Selectors.XPath(".") };
+			AddTargetUrlExtractor(".", partten);
 		}
 
 		protected override void Handle(Page page)
