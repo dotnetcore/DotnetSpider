@@ -98,7 +98,7 @@ namespace DotnetSpider.Core.Processor
 				{
 					foreach (string link in links)
 					{
-						if (Regex.IsMatch(targetUrlPattern, link))
+						if (Regex.IsMatch(link, targetUrlPattern))
 						{
 							page.AddTargetRequest(new Request(link, page.Request.Extras));
 						}
