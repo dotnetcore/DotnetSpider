@@ -11,8 +11,6 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			Situoli.Run();
-
 			// Crawler pages traversal 遍历整站
 			BaseUsage.CrawlerPagesTraversal();
 			Console.WriteLine("Press any key to continue...");
@@ -61,6 +59,8 @@ namespace DotnetSpider.Sample
 			jdSkuSampleSpider.Run();
 			Console.WriteLine("Press any key to continue...");
 			Console.Read();
+
+			Situoli.Run();
 		}
 	}
 }
