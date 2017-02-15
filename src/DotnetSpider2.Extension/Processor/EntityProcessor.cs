@@ -4,9 +4,7 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
 using Site = DotnetSpider.Core.Site;
 using Newtonsoft.Json.Linq;
-using DotnetSpider.Core.Selector;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Extension.Processor
 {
