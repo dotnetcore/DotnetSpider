@@ -35,6 +35,7 @@ namespace DotnetSpider.Core.Test.Processor
 			page.Content = html;
 
 			CnblogsProcessor1 processor = new CnblogsProcessor1();
+			processor.Site = new Site();
 			processor.Process(page);
 
 			Assert.True(page.ResultItems.GetResultItem("test"));
@@ -65,6 +66,7 @@ namespace DotnetSpider.Core.Test.Processor
 			page.Content = html;
 
 			CnblogsProcessor2 processor = new CnblogsProcessor2();
+			processor.Site = new Site();
 			processor.Process(page);
 
 			Assert.True(page.ResultItems.GetResultItem("test"));
@@ -124,6 +126,7 @@ namespace DotnetSpider.Core.Test.Processor
 			page.Content = html;
 
 			CnblogsProcessor4 processor = new CnblogsProcessor4();
+			processor.Site = new Site();
 			processor.Process(page);
 
 			Assert.True(page.ResultItems.GetResultItem("test"));
