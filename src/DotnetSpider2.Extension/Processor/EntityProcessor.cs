@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension.Processor
 					{
 						throw new SpiderException("Region xpath and patterns should not be null both.");
 					}
-					foreach (var xpath in targetUrlsSelector.XPaths.Select(x => x.Trim()).Distinct())
+					foreach (var xpath in targetUrlsSelector.XPaths.Select(x => x?.Trim()).Distinct())
 					{
 						AddTargetUrlExtractor(xpath, targetUrlsSelector.Patterns);
 					}

@@ -59,6 +59,21 @@ namespace DotnetSpider.Extension.Test
 		{
 		}
 
+		[TargetUrlsSelector(XPaths = new[] { "" }, Patterns = new[] { "" })]
+		public class Entity23 : ISpiderEntity
+		{
+		}
+
+		[TargetUrlsSelector(XPaths = new string[] { null }, Patterns = new string[] { null })]
+		public class Entity24 : ISpiderEntity
+		{
+		}
+
+		[TargetUrlsSelector(XPaths = new string[] { null }, Patterns = new string[] { @"&page=[0-9]+&" })]
+		public class Entity25 : ISpiderEntity
+		{
+		}
+
 		[Fact]
 		public void TargetUrlsSelector_1Region_1Pattern()
 		{
@@ -105,7 +120,9 @@ namespace DotnetSpider.Extension.Test
 			catch (Exception e)
 			{
 				Assert.Equal("Region xpath and patterns should not be null both.", e.Message);
+				return;
 			}
+			throw new Exception("Failed.");
 		}
 
 		[Fact]
@@ -171,6 +188,49 @@ namespace DotnetSpider.Extension.Test
 
 			Assert.Equal(1, processor.GetTargetUrlPatterns("//*[@id=\"2222\"]").Count);
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"2222\"]")[0].ToString());
+
+			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
+		}
+
+		[Fact]
+		public void TargetUrlsSelector_EmptyRegion_EmptyPattern()
+		{
+			try
+			{
+				var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity23).GetTypeInfo());
+				var processor2 = new EntityProcessor(new Site(), entity2);
+			}
+			catch (Exception e)
+			{
+				Assert.Equal("值不能为 null。\r\n参数名: pattern", e.Message);
+				return;
+			}
+			throw new Exception("Failed.");
+		}
+
+		[Fact]
+		public void TargetUrlsSelector_NullRegion_NullPattern()
+		{
+			try
+			{
+				var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity24).GetTypeInfo());
+				var processor2 = new EntityProcessor(new Site(), entity2);
+			}
+			catch (Exception e)
+			{
+				Assert.Equal("值不能为 null。\r\n参数名: pattern", e.Message);
+				return;
+			}
+			throw new Exception("Failed.");
+		}
+
+		[Fact]
+		public void TargetUrlsSelector_NullRegion_1Pattern()
+		{
+			var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity25).GetTypeInfo());
+			var processor = new EntityProcessor(new Site(), entity2);
+			Assert.Equal(1, processor.GetTargetUrlPatterns(".").Count);
+			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns(".")[0].ToString());
 
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}
