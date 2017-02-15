@@ -816,7 +816,7 @@ namespace DotnetSpider.Core
 		{
 			lock (this)
 			{
-				File.AppendAllText(_errorRequestFile.FullName, JsonConvert.SerializeObject(request) + Environment.NewLine, Encoding.UTF8);
+				File.AppendAllText(_errorRequestFile.FullName, JsonConvert.SerializeObject(request) + System.Environment.NewLine, Encoding.UTF8);
 			}
 			Scheduler.IncreaseErrorCounter();
 		}

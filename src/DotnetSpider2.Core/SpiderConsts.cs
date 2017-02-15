@@ -18,21 +18,21 @@ namespace DotnetSpider.Core
 			SaveLogAndStatusToDb = !string.IsNullOrEmpty(Configuration.GetValue("logAndStatusConnectString"));
 
 #if !NET_CORE
-			GlobalDirectory=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DotnetSpider");
+			GlobalDirectory=Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "DotnetSpider");
 			BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #else
 			BaseDirectory = AppContext.BaseDirectory;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
-				GlobalDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
+				GlobalDirectory = Path.Combine(System.Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
-				GlobalDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
+				GlobalDirectory = Path.Combine(System.Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				GlobalDirectory = $"C:\\Users\\{Environment.GetEnvironmentVariable("USERNAME")}\\Documents\\DotnetSpider\\";
+				GlobalDirectory = $"C:\\Users\\{System.Environment.GetEnvironmentVariable("USERNAME")}\\Documents\\DotnetSpider\\";
 			}
 			else
 			{

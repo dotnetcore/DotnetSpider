@@ -96,6 +96,9 @@
     <Compile Include="..\Common\Encrypt.cs">
       <Link>Common\Encrypt.cs</Link>
     </Compile>
+    <Compile Include="..\Common\Environment.cs">
+      <Link>Common\Environment.cs</Link>
+    </Compile>
     <Compile Include="..\Common\ExcelClient.cs">
       <Link>Common\ExcelClient.cs</Link>
     </Compile>

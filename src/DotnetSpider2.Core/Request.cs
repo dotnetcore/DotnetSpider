@@ -21,19 +21,52 @@ namespace DotnetSpider.Core
 		public int Depth { get; internal set; } = 1;
 		public int NextDepth => Depth + 1;
 
+		//public bool IsPicture { get; private set; }
+
+		public bool IsAvailable { get; private set; } = true;
+
 		public Request()
 		{
 		}
 
-		public Request(string url) : this(new Uri(url), null)
+		public Request(string url) : this(url, null)
 		{
 		}
 
-		public Request(string url, IDictionary<string, dynamic> extras = null) : this(new Uri(url), extras)
+		public Request(string url, IDictionary<string, dynamic> extras = null)
 		{
+			if (string.IsNullOrEmpty(url))
+			{
+				IsAvailable = false;
+				return;
+			}
+			Uri tmp;
+			if (Uri.TryCreate(url.TrimEnd('#'), UriKind.RelativeOrAbsolute, out tmp))
+			{
+				Url = tmp;
+			}
+			else
+			{
+				IsAvailable = false;
+				return;
+			}
+
+			if (Url.Scheme != "http" && Url.Scheme != "https")
+			{
+				IsAvailable = false;
+				return;
+			}
+
+			if (extras != null)
+			{
+				foreach (var extra in extras)
+				{
+					PutExtra(extra.Key, extra.Value);
+				}
+			}
 		}
 
-		public Request(Uri url, IDictionary<string, dynamic> extras = null)
+		private Request(Uri url, IDictionary<string, dynamic> extras = null)
 		{
 			Url = url;
 			if (extras != null)

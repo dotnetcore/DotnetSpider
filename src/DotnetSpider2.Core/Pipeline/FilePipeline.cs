@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Text;
-using DotnetSpider.Core.Common;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -29,14 +28,14 @@ namespace DotnetSpider.Core.Pipeline
 
 		public string GetDataForlder()
 		{
-			return $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}";
+			return $"{BasePath}{Common.Environment.PathSeperator}{Spider.Identity}{Common.Environment.PathSeperator}";
 		}
 
 		public override void Process(ResultItems resultItems)
 		{
 			try
 			{
-				string filePath = $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}{Guid.NewGuid().ToString("N")}.dsd";
+				string filePath = $"{BasePath}{Common.Environment.PathSeperator}{Spider.Identity}{Common.Environment.PathSeperator}{Guid.NewGuid().ToString("N")}.dsd";
 				FileInfo file = PrepareFile(filePath);
 				using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
 				{

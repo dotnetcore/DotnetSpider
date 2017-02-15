@@ -26,7 +26,7 @@ namespace DotnetSpider.Core.Pipeline
 
 		public string GetDataForlder()
 		{
-			return $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}";
+			return $"{BasePath}{Environment.PathSeperator}{Spider.Identity}{Environment.PathSeperator}";
 		}
 
 		public JsonFilePipeline(string path)
@@ -58,7 +58,7 @@ namespace DotnetSpider.Core.Pipeline
 		{
 			try
 			{
-				string path = $"{BasePath}{PathSeperator}{Spider.Identity}{PathSeperator}{Encrypt.Md5Encrypt(resultItems.Request.Url.ToString())}.json";
+				string path = $"{BasePath}{Environment.PathSeperator}{Spider.Identity}{Environment.PathSeperator}{Encrypt.Md5Encrypt(resultItems.Request.Url.ToString())}.json";
 				FileInfo file = PrepareFile(path);
 				using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
 				{

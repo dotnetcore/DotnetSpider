@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotnetSpider.Core.Common;
+using System;
 using System.IO;
 #if NET_CORE
 using System.Runtime.InteropServices;
@@ -12,17 +13,6 @@ namespace DotnetSpider.Core.Pipeline
 
 		public ISpider Spider { get; protected set; }
 
-		public static string PathSeperator;
-
-		static BasePipeline()
-		{
-#if !NET_CORE
-			PathSeperator = "\\";
-#else
-			PathSeperator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/";
-#endif
-		}
-
 		public virtual void InitPipeline(ISpider spider)
 		{
 			Spider = spider;
@@ -32,9 +22,9 @@ namespace DotnetSpider.Core.Pipeline
 
 		protected void SetPath(string path)
 		{
-			if (!path.EndsWith(PathSeperator))
+			if (!path.EndsWith(Common.Environment.PathSeperator))
 			{
-				path += PathSeperator;
+				path += Common.Environment.PathSeperator;
 			}
 
 #if !NET_CORE

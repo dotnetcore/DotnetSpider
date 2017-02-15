@@ -13,9 +13,9 @@ namespace DotnetSpider.Core.Processor
 	public abstract class BasePageProcessor : IPageProcessor
 	{
 		private List<Regex> _targetUrlPatterns;
-
-		private Dictionary<ISelector, List<string>> _targetUrlExtractors { get; set; } = new Dictionary<ISelector, List<string>>();
-
+		private List<Regex> _excludeTargetUrlPatterns = new List<Regex>();
+		private Dictionary<ISelector, List<Regex>> _targetUrlExtractors { get; set; } = new Dictionary<ISelector, List<Regex>>();
+		private ISelector _imageSelector = Selectors.XPath(".//img/@src");
 		protected abstract void Handle(Page page);
 
 		public void Process(Page page)
@@ -70,6 +70,7 @@ namespace DotnetSpider.Core.Processor
 			foreach (var targetUrlExtractor in _targetUrlExtractors)
 			{
 				var links = (page.Selectable.SelectList(targetUrlExtractor.Key)).Links().GetValues();
+
 				if (links == null)
 				{
 					continue;
@@ -94,14 +95,58 @@ namespace DotnetSpider.Core.Processor
 					continue;
 				}
 
-				foreach (var targetUrlPattern in targetUrlExtractor.Value)
+				foreach (var regex in targetUrlExtractor.Value)
 				{
 					foreach (string link in links)
 					{
-						if (Regex.IsMatch(link, targetUrlPattern))
+						if (regex.IsMatch(link))
 						{
-							page.AddTargetRequest(new Request(link, page.Request.Extras));
+							bool isRequired = true;
+							if (_excludeTargetUrlPatterns != null)
+							{
+								foreach (var excludeRegex in _excludeTargetUrlPatterns)
+								{
+									if (excludeRegex.IsMatch(link))
+									{
+										isRequired = false;
+										break;
+									}
+								}
+							}
+							if (isRequired)
+							{
+								page.AddTargetRequest(new Request(link, page.Request.Extras));
+							}
 						}
+					}
+				}
+			}
+
+			if (Site.DownloadFiles)
+			{
+				var links = (page.Selectable.SelectList(_imageSelector)).GetValues();
+
+				if (links == null || links.Count == 0)
+				{
+					return;
+				}
+				foreach (string link in links)
+				{
+					bool isRequired = true;
+					if (_excludeTargetUrlPatterns != null)
+					{
+						foreach (var excludeRegex in _excludeTargetUrlPatterns)
+						{
+							if (excludeRegex.IsMatch(link))
+							{
+								isRequired = false;
+								break;
+							}
+						}
+					}
+					if (isRequired)
+					{
+						page.AddTargetRequest(new Request(link, page.Request.Extras));
 					}
 				}
 			}
@@ -121,7 +166,7 @@ namespace DotnetSpider.Core.Processor
 				{
 					foreach (var pattern in targetUrlExtractor.Value)
 					{
-						_targetUrlPatterns.Add(new Regex(pattern));
+						_targetUrlPatterns.Add(pattern);
 					}
 				}
 			}
@@ -135,7 +180,7 @@ namespace DotnetSpider.Core.Processor
 			var selector = Selectors.XPath(xpath);
 			if (!_targetUrlExtractors.ContainsKey(selector))
 			{
-				_targetUrlExtractors.Add(selector, new List<string>());
+				_targetUrlExtractors.Add(selector, new List<Regex>());
 			}
 			var realPatterns = _targetUrlExtractors[selector];
 			// 如果已经有正则为空, 即表示当前区域内所有的URL都是目标链接, 则无需再校验其它正则了
@@ -158,27 +203,27 @@ namespace DotnetSpider.Core.Processor
 			foreach (var pattern in patterns)
 			{
 				var realPattern = string.IsNullOrEmpty(pattern?.Trim()) ? null : pattern.Trim();
-				if (!realPatterns.Any(p => p == realPattern))
+				if (!realPatterns.Any(p => p.ToString() == realPattern))
 				{
-					realPatterns.Add(realPattern);
+					realPatterns.Add(new Regex(realPattern));
 				}
 			}
 		}
 
-		//protected virtual void AddTargetUrlRegion(string regionXpath)
-		//{
-		//	var xpath = string.IsNullOrEmpty(regionXpath) ? "." : regionXpath;
-		//	var selector = Selectors.XPath(xpath);
-		//	if (!_targetUrlExtractors.ContainsKey(selector))
-		//	{
-		//		_targetUrlExtractors.Add(selector, new List<Regex>());
-		//	}
-		//	var patterns = _targetUrlExtractors[selector];
-		//	if (!patterns.Any(p => p.ToString() == regex))
-		//	{
-		//		patterns.Add(new Regex(regex));
-		//	}
-		//}
+		protected virtual void AddExcludeTargetUrlPattern(params string[] patterns)
+		{
+			if (patterns == null || patterns.Length == 0)
+			{
+				return;
+			}
+			foreach (var pattern in patterns)
+			{
+				if (!_excludeTargetUrlPatterns.Any(p => p.ToString() == pattern))
+				{
+					_excludeTargetUrlPatterns.Add(new Regex(pattern));
+				}
+			}
+		}
 
 		/// <summary>
 		/// Get the site settings

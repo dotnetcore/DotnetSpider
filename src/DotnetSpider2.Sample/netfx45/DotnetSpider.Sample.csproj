@@ -99,6 +99,9 @@
     <Compile Include="..\RegexTestSpider.cs">
       <Link>RegexTestSpider.cs</Link>
     </Compile>
+    <Compile Include="..\Situoli.cs">
+      <Link>Situoli.cs</Link>
+    </Compile>
     <Compile Include="..\TestSpider.cs">
       <Link>TestSpider.cs</Link>
     </Compile>

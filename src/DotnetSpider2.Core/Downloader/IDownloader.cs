@@ -18,10 +18,6 @@ namespace DotnetSpider.Core.Downloader
 		IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }
 
 		IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }
-		/// <summary>
-		/// Can be any object as a context instance.
-		/// </summary>
-		dynamic Context { get; set; }
 
 		IDownloader Clone();
 	}

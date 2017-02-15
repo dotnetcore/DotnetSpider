@@ -23,6 +23,7 @@ namespace DotnetSpider.Core.Downloader
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
+
 			HttpResponseMessage response = null;
 			var proxy = site.GetHttpProxy();
 			request.PutExtra(Request.Proxy, proxy);
@@ -53,8 +54,22 @@ namespace DotnetSpider.Core.Downloader
 				}
 				var httpStatusCode = response.StatusCode;
 				request.PutExtra(Request.StatusCode, httpStatusCode);
-
-				Page page = HandleResponse(request, response, httpStatusCode, site);
+				Page page;
+				if (response.Content.Headers.ContentType.MediaType != "text/html")
+				{
+					if (!site.DownloadFiles)
+					{
+						return new Page(request, site.ContentType, null) { IsSkip = true };
+					}
+					else
+					{
+						page = SaveFile(request, response, spider);
+					}
+				}
+				else
+				{
+					page = HandleResponse(request, response, httpStatusCode, site);
+				}
 
 				// need update
 				page.TargetUrl = request.Url.ToString();

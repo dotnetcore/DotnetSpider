@@ -128,7 +128,7 @@ namespace DotnetSpider.Core.Test.Processor
 
 			Assert.True(page.ResultItems.GetResultItem("test"));
 			Assert.Equal(12, page.TargetRequests.Count);
-			Assert.Equal("http://www.cnblogs.com/sitehome/p/2/#", page.TargetRequests.ElementAt(0).Url.ToString());
+			Assert.Equal("http://www.cnblogs.com/sitehome/p/2/", page.TargetRequests.ElementAt(0).Url.ToString());
 		}
 	}
 }
