@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Demo
 {
-    public class Program
-    {
-        public static void Main(string[] args)
+	public class Program
+	{
+		public static void Main(string[] args)
 		{
-			BaseUsage.Run();
+			BaseUsage.CustmizeProcessorAndPipeline();
+			Console.Read();
 		}
-    }
+	}
 }

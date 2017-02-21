@@ -1,5 +1,5 @@
 {
-  "version": "1.0.2-*",
+  "version": "1.0.6-*",
   "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
   "description": "Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.",
   "packOptions": {
@@ -15,16 +15,15 @@
   "dependencies": {
     "DotnetSpider2.Core": "*",
     "DotnetSpider2.Redial": "*",
-    "MongoDB.Driver": "2.3.0",
+    "MongoDB.Driver": "2.4.2",
     "Newtonsoft.Json": "9.0.1"
   },
   "frameworks": {
     "net45": {
       "dependencies": {
-        "HtmlAgilityPack": "1.4.9.5",
         "HtmlAgilityPack.CssSelectors": "1.0.2",
         "MySql.Data": "6.9.9",
-        "Selenium.WebDriver": "2.53.1",
+        "Selenium.WebDriver": "3.0.1",
         "FiddlerCore2": "1.0.0"
       },
       "frameworkAssemblies": {
@@ -38,10 +37,9 @@
     },
     "net451": {
       "dependencies": {
-        "HtmlAgilityPack": "1.4.9.5",
         "HtmlAgilityPack.CssSelectors": "1.0.2",
         "MySql.Data": "6.9.9",
-        "Selenium.WebDriver": "2.53.1",
+        "Selenium.WebDriver": "3.0.1",
         "FiddlerCore2": "1.0.0"
       },
       "frameworkAssemblies": {
@@ -56,17 +54,17 @@
     "netstandard1.6": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
-        "MailKit": "1.4.1",
-        "Microsoft.CSharp": "4.0.1",
-        "Microsoft.Extensions.DependencyInjection": "1.0.0",
-        "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
+        "MailKit": "1.10.2",
+        "Microsoft.CSharp": "4.3.0",
+        "Microsoft.Extensions.DependencyInjection": "1.1.0",
+        "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
         "MySql.Data": "7.0.6-IR31",
-        "StackExchange.Redis": "1.1.608",
-        "System.Data.Common": "4.1.0",
-        "System.Data.SqlClient": "4.1.0",
-        "System.Dynamic.Runtime": "4.0.11",
+        "StackExchange.Redis": "1.2.0",
+        "System.Data.Common": "4.3.0",
+        "System.Data.SqlClient": "4.3.0",
+        "System.Dynamic.Runtime": "4.3.0",
         "System.Runtime.Extensions": "4.3.0",
-        "System.Runtime.Serialization.Primitives": "4.1.1",
+        "System.Runtime.Serialization.Primitives": "4.3.0",
         "System.Xml.XDocument": "4.3.0"
       },
       "buildOptions": {

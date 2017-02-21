@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1-*",
+  "version": "1.0.6-*",
   "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
   "description": "Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.",
   "packOptions": {
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "DotnetSpider2.Core": "*",
-    "StackExchange.Redis": "1.1.608",
+    "StackExchange.Redis": "1.2.0",
     "SSH.NET": "2016.0.0"
   },
   "frameworks": {
@@ -35,11 +35,11 @@
     "netstandard1.6": {
       "imports": "portable-net45+win8+dnxcore50",
       "dependencies": {
-        "System.Threading.Thread": "4.0.0",
-        "System.Net.NameResolution": "4.0.0",
-        "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
-        "System.Diagnostics.Process": "4.1.0",
-        "System.Net.Http": "4.1.0"
+        "System.Threading.Thread": "4.3.0",
+        "System.Net.NameResolution": "4.3.0",
+        "System.Runtime.InteropServices.RuntimeInformation": "4.3.0",
+        "System.Diagnostics.Process": "4.3.0",
+        "System.Net.Http": "4.3.0"
       },
       "buildOptions": {
         "define": [

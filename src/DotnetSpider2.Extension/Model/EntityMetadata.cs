@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Model
 		public Entity Entity { get; set; } = new Entity();
 		public List<string> Updates { get; internal set; }
 		public int? Limit { get; set; }
-		public TargetUrlsSelector TargetUrlExtractor { get; set; }
+		public List<TargetUrlsSelector> TargetUrlsSelectors { get; set; }
 		public DataHandler DataHandler { get; set; }
 		public List<SharedValueSelector> SharedValues { get; internal set; } = new List<SharedValueSelector>();
 	}

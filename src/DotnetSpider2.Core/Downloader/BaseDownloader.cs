@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Net.Http;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -6,19 +8,16 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }
 		public IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }
-		public dynamic Context { get; set; }
 
-		protected abstract Page DowloadContent(Request request, ISpider spider);
+		protected string DownloadFolder { get; set; }
 
-		protected void BeforeDownload(Request request, ISpider spider)
+		public BaseDownloader()
 		{
-			if (BeforeDownloadHandlers != null)
-			{
-				foreach (var handler in BeforeDownloadHandlers)
-				{
-					handler.Handle(request, spider);
-				}
-			}
+#if !NET_CORE
+			DownloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
+#else
+			DownloadFolder = Path.Combine(AppContext.BaseDirectory, "data");
+#endif
 		}
 
 		public Page Download(Request request, ISpider spider)
@@ -42,8 +41,26 @@ namespace DotnetSpider.Core.Downloader
 			return result;
 		}
 
+		public virtual IDownloader Clone()
+		{
+			return (IDownloader)MemberwiseClone();
+		}
+
 		public virtual void Dispose()
 		{
+		}
+
+		protected abstract Page DowloadContent(Request request, ISpider spider);
+
+		protected void BeforeDownload(Request request, ISpider spider)
+		{
+			if (BeforeDownloadHandlers != null)
+			{
+				foreach (var handler in BeforeDownloadHandlers)
+				{
+					handler.Handle(request, spider);
+				}
+			}
 		}
 
 		protected void AfterDownloadComplete(Page page, ISpider spider)
@@ -61,9 +78,28 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		public virtual IDownloader Clone()
+		protected Page SaveFile(Request request, HttpResponseMessage response, ISpider spider)
 		{
-			return (IDownloader)MemberwiseClone();
+			var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Common.Environment.PathSeperator);
+			string filePath = $"{DownloadFolder}{Common.Environment.PathSeperator}{spider.Identity}{intervalPath}";
+			if (!File.Exists(filePath))
+			{
+				try
+				{
+					string folder = Path.GetDirectoryName(filePath);
+					if (!Directory.Exists(folder))
+					{
+						Directory.CreateDirectory(folder);
+					}
+					File.WriteAllBytes(filePath, response.Content.ReadAsByteArrayAsync().Result);
+				}
+				catch (Exception e)
+				{
+					spider.Log("保存文件失败。", LogLevel.Warn, e);
+				}
+			}
+			spider.Log($"下载文件: {request.Url} 成功.", LogLevel.Info);
+			return new Page(request, ContentType.File, null) { IsSkip = true };
 		}
 	}
 }

@@ -54,6 +54,11 @@ namespace DotnetSpider.Core
 		public string Accept { get; set; }
 
 		/// <summary>
+		/// Whether download pictiures
+		/// </summary>
+		public bool DownloadFiles { get; set; }
+
+		/// <summary>
 		/// Set charset of page manually. 
 		/// When charset is not set or set to null, it can be auto detected by Http header.
 		/// </summary>

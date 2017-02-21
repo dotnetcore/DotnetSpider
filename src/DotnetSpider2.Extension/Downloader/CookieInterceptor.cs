@@ -79,7 +79,7 @@ namespace DotnetSpider.Extension.Downloader
 					}
 				case WebBrowser.Firefox:
 					{
-						string path = Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
+						string path = System.Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
 						string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
 						if (pathsToProfiles.Length == 1)
 						{

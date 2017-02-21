@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Extension.Model.Attribute
 {
-	[AttributeUsage(AttributeTargets.Class)]
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 	public class TargetUrlsSelector : System.Attribute
 	{
 		public string[] XPaths { get; set; }

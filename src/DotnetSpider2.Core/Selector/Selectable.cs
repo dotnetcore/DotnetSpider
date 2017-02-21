@@ -175,6 +175,18 @@ namespace DotnetSpider.Core.Selector
 					}
 				}
 			}
+
+			var images = document.DocumentNode.SelectNodes(".//img");
+			if (images != null)
+			{
+				foreach (var image in images)
+				{
+					if (image.Attributes["src"] != null)
+					{
+						image.Attributes["src"].Value = UrlUtils.CanonicalizeUrl(image.Attributes["src"].Value, url);
+					}
+				}
+			}
 		}
 
 		private void RemoveOutboundLinks(HtmlDocument document, string domain)

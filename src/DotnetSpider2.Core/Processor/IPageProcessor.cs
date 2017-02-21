@@ -1,15 +1,7 @@
-using DotnetSpider.Core.Selector;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-
 namespace DotnetSpider.Core.Processor
 {
 	public interface IPageProcessor
 	{
-		HashSet<ISelector> TargetUrlRegions { get; }
-
-		HashSet<Regex> TargetUrlPatterns { get; }
-
 		/// <summary>
 		/// Process the page, extract urls to fetch, extract the data and store
 		/// </summary>

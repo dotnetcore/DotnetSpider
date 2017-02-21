@@ -158,6 +158,9 @@
     <Compile Include="..\Scheduler\RedisSchedulerTest.cs">
       <Link>Scheduler\RedisSchedulerTest.cs</Link>
     </Compile>
+    <Compile Include="..\TargetUrlSelectorTest.cs">
+      <Link>TargetUrlSelectorTest.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

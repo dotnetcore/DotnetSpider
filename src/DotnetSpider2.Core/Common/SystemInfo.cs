@@ -73,7 +73,7 @@ namespace DotnetSpider.Core.Common
 		{
 			SystemInfo systemInfo = new SystemInfo
 			{
-				CpuCount = Environment.ProcessorCount,
+				CpuCount = System.Environment.ProcessorCount,
 				TotalMemory = PhysicalMemory,
 				Name = HostName,
 				Timestamp = DateTime.Now,

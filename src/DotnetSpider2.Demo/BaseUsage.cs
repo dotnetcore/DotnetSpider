@@ -7,47 +7,62 @@ using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
+using DotnetSpider.Core.Downloader;
+using System.Text;
 
 namespace DotnetSpider.Demo
 {
 	public class BaseUsage
 	{
-		public static void Run()
+		#region Custmize processor and pipeline 完全自定义页面解析和数据管道
+
+		public static void CustmizeProcessorAndPipeline()
 		{
-			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
+			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
 			for (int i = 1; i < 5; ++i)
 			{
-				// 添加初始采集链接
+				// Add start/feed urls. 添加初始采集链接
 				site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
 			}
 
-			// 使用内存Scheduler、自定义PageProcessor、自定义Pipeline创建爬虫
-			Spider spider = Spider.Create(site, new QueueDuplicateRemovedScheduler(), new MyPageProcessor()).AddPipeline(new MyPipeline()).SetThreadNum(1);
-			spider.EmptySleepTime = 3000;
-			spider.Deep = 2;
+			Spider spider = Spider.Create(site,
+				// use memoery queue scheduler. 使用内存调度
+				new QueueDuplicateRemovedScheduler(),
+				// use custmize processor for youku 为优酷自定义的 Processor
+				new YoukuPageProcessor())
+				// use custmize pipeline for youku 为优酷自定义的 Pipeline
+				.AddPipeline(new YoukuPipeline())
+				// dowload html by http client
+				.SetDownloader(new HttpClientDownloader())
+				// 1 thread
+				.SetThreadNum(1);
 
-			// 启动爬虫
+			spider.EmptySleepTime = 3000;
+
+			// Start crawler 启动爬虫
 			spider.Run();
 		}
 
-		private class MyPipeline : BasePipeline
+		public class YoukuPipeline : BasePipeline
 		{
 			private static long count = 0;
 
 			public override void Process(ResultItems resultItems)
 			{
+				StringBuilder builder = new StringBuilder();
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
 					count++;
-					Console.WriteLine($"[YoukuVideo {count}] {entry.Name}");
+					builder.Append($" [YoukuVideo {count}] {entry.Name}");
 				}
+				Console.WriteLine(builder);
 
-				// 可以自由实现插入数据库或保存到文件
+				// Other actions like save data to DB. 可以自由实现插入数据库或保存到文件
 			}
 		}
 
-		private class MyPageProcessor : BasePageProcessor
+		public class YoukuPageProcessor : BasePageProcessor
 		{
 			protected override void Handle(Page page)
 			{
@@ -60,9 +75,11 @@ namespace DotnetSpider.Demo
 					video.Name = videoElement.Select(Selectors.XPath(".//img[@class='quic']/@alt")).GetValue();
 					results.Add(video);
 				}
-				// 以自定义KEY存入page对象中供Pipeline调用
+
+				// Save data object by key. 以自定义KEY存入page对象中供Pipeline调用
 				page.AddResultItem("VideoResult", results);
 
+				// Add target requests to scheduler. 解析需要采集的URL
 				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
 				{
 					page.AddTargetRequest(new Request(url.GetValue(), null));
@@ -74,5 +91,7 @@ namespace DotnetSpider.Demo
 		{
 			public string Name { get; set; }
 		}
+
+		#endregion
 	}
 }

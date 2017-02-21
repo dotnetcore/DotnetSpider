@@ -70,7 +70,7 @@ namespace DotnetSpider.Sample
 			public BlogSumaryProcessor()
 			{
 				// 定义目标页的筛选
-				TargetUrlPatterns = new HashSet<Regex> { new Regex("^http://www\\.cnblogs\\.com/$"), new Regex("http://www\\.cnblogs\\.com/sitehome/p/\\d+") };
+				AddTargetUrlExtractor(null, "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+");
 			}
 
 			protected override void Handle(Page page)
@@ -98,7 +98,7 @@ namespace DotnetSpider.Sample
 			public NewsProcessor()
 			{
 				// 定义目标页的筛选
-				TargetUrlPatterns = new HashSet<Regex> { new Regex("^http://www\\.cnblogs\\.com/$"), new Regex("^http://www\\.cnblogs\\.com/news/$"), new Regex("www\\.cnblogs\\.com/news/\\d+") };
+				AddTargetUrlExtractor(null, "^http://www\\.cnblogs\\.com/$", "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+");
 			}
 
 			protected override void Handle(Page page)

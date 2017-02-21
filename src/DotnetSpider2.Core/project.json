@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1-*",
+  "version": "1.0.6-*",
   "authors": [ "Lewis Zou", "Walterwhatwater", "xiaohuan0204" ],
   "description": "Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.",
   "packOptions": {
@@ -13,16 +13,15 @@
     "debugType": "portable"
   },
   "dependencies": {
-    "Microsoft.Extensions.DependencyInjection": "1.0.0",
-    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
-    "Newtonsoft.Json": "9.0.1"
+    "Microsoft.Extensions.DependencyInjection": "1.1.0",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
+    "Newtonsoft.Json": "9.0.1",
+    "System.Runtime": "4.3.0"
   },
   "frameworks": {
     "net45": {
       "dependencies": {
-        "NLog": "4.3.11",
-        "HtmlAgilityPack": "1.4.9.5",
-        "System.Runtime": "4.0.0",
+        "NLog": "4.4.2",
         "HtmlAgilityPack.CssSelectors": "1.0.2"
       },
       "buildOptions": {
@@ -39,9 +38,8 @@
     },
     "net451": {
       "dependencies": {
-        "NLog": "4.3.11",
-        "System.Runtime": "4.0.10",
-        "HtmlAgilityPack": "1.4.9.5",
+        "NLog": "4.4.2",
+        
         "HtmlAgilityPack.CssSelectors": "1.0.2"
       },
       "buildOptions": {
@@ -61,26 +59,26 @@
       "dependencies": {
         "DotnetSpider2.HtmlAgilityPack": "*",
         "DotnetSpider2.HtmlAgilityPack.Css": "*",
-        "Microsoft.CSharp": "4.0.1",
-        "Microsoft.Extensions.Configuration.Binder": "1.0.0",
-        "Microsoft.Extensions.Configuration.Ini": "1.0.0",
+        "Microsoft.CSharp": "4.3.0",
+        "Microsoft.Extensions.Configuration.Binder": "1.1.0",
+        "Microsoft.Extensions.Configuration.Ini": "1.1.0",
         "NLog": "5.0.0-beta03",
-        "System.Collections.NonGeneric": "4.0.1",
-        "System.Dynamic.Runtime": "4.0.11",
-        "System.IO.Compression": "4.1.0",
-        "System.Net.Http": "4.1.0",
-        "System.Net.NameResolution": "4.0.0",
-        "System.Net.Requests": "4.0.11",
+        "System.Collections.NonGeneric": "4.3.0",
+        "System.Dynamic.Runtime": "4.3.0",
+        "System.IO.Compression": "4.3.0",
+        "System.Net.Http": "4.3.0",
+        "System.Net.NameResolution": "4.3.0",
+        "System.Net.Requests": "4.3.0",
         "System.Runtime.Extensions": "4.3.0",
-        "System.Runtime.Serialization.Primitives": "4.1.1",
-        "System.Security.Cryptography.Algorithms": "4.2.0",
-        "System.Security.Cryptography.Primitives": "4.0.0",
-        "System.Text.Encoding.CodePages": "4.0.1",
-        "System.Threading.Tasks.Parallel": "4.0.1",
-        "System.Threading.Thread": "4.0.0",
-        "System.Threading.ThreadPool": "4.0.10",
-        "System.Xml.XDocument": "4.0.11",
-        "System.Diagnostics.Process": "4.1.0"
+        "System.Runtime.Serialization.Primitives": "4.3.0",
+        "System.Security.Cryptography.Algorithms": "4.3.0",
+        "System.Security.Cryptography.Primitives": "4.3.0",
+        "System.Text.Encoding.CodePages": "4.3.0",
+        "System.Threading.Tasks.Parallel": "4.3.0",
+        "System.Threading.Thread": "4.3.0",
+        "System.Threading.ThreadPool": "4.3.0",
+        "System.Xml.XDocument": "4.3.0",
+        "System.Diagnostics.Process": "4.3.0"
       },
       "buildOptions": {
         "define": [

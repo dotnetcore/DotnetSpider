@@ -8,6 +8,7 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Core.Downloader;
+using System.Text;
 
 namespace DotnetSpider.Sample
 {
@@ -49,11 +50,13 @@ namespace DotnetSpider.Sample
 
 			public override void Process(ResultItems resultItems)
 			{
+				StringBuilder builder = new StringBuilder();
 				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
 				{
 					count++;
-					Console.WriteLine($"[YoukuVideo {count}] {entry.Name}");
+					builder.Append($" [YoukuVideo {count}] {entry.Name}");
 				}
+				Console.WriteLine(builder);
 
 				// Other actions like save data to DB. 可以自由实现插入数据库或保存到文件
 			}
@@ -72,7 +75,7 @@ namespace DotnetSpider.Sample
 					video.Name = videoElement.Select(Selectors.XPath(".//img[@class='quic']/@alt")).GetValue();
 					results.Add(video);
 				}
-				
+
 				// Save data object by key. 以自定义KEY存入page对象中供Pipeline调用
 				page.AddResultItem("VideoResult", results);
 
@@ -132,7 +135,7 @@ namespace DotnetSpider.Sample
 				// use memoery queue scheduler
 				new QueueDuplicateRemovedScheduler(),
 				// default page processor will save whole html, and extract urls to target urls via regex
-				new DefaultPageProcessor("cnblogs\\.com"))
+				new DefaultPageProcessor(new[] { "cnblogs\\.com" }))
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
 				.AddPipeline(new FilePipeline())
 				// dowload html by http client

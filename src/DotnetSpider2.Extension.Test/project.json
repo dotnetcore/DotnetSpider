@@ -27,8 +27,7 @@
     "DotnetSpider2.Core": "*",
     "DotnetSpider2.Extension": "*",
     "DotnetSpider2.Redial": "*",
-    "Dapper": "1.50.2",
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
+    "Dapper": "1.50.2"
   },
   "frameworks": {
     "netcoreapp1.0": {
@@ -36,11 +35,11 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.1"
+          "version": "1.1.0"
         },
-        "System.Diagnostics.Process": "4.1.0",
-        "System.Net.Http": "4.1.0",
-        "System.Text.Encoding.CodePages": "4.0.1",
+        "System.Diagnostics.Process": "4.3.0",
+        "System.Net.Http": "4.3.0",
+        "System.Text.Encoding.CodePages": "4.3.0",
         "MySql.Data": "7.0.6-IR31",
         "dotnet-test-xunit": "2.2.0-preview2-build1029"
       },

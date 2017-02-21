@@ -259,11 +259,6 @@ NOTE:
 	timeout 0 
 	tcp-keepalive 60
 
-
-### UPDATES
-
-1.0.0.0-PRE
-
 ### AREAS FOR IMPROVEMENTS
 
 QQ Group: 477731655
