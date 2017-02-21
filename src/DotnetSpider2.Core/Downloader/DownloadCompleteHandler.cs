@@ -39,6 +39,39 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
+	public class MissTargetUrlWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	{
+		public string String { get; set; }
+		public bool IsContain { get; set; }
+
+		public override bool Handle(Page page)
+		{
+			string rawText = page.Content;
+			if (string.IsNullOrEmpty(rawText))
+			{
+				throw new DownloadException("Download failed or response is null.");
+			}
+
+			if (IsContain)
+			{
+				if (rawText.Contains(String))
+				{
+					page.MissExtractTargetUrls = true;
+					page.MissTargetUrls = true;
+				}
+			}
+			else
+			{
+				if (!rawText.Contains(String))
+				{
+					page.MissExtractTargetUrls = true;
+					page.MissTargetUrls = true;
+				}
+			}
+			return true;
+		}
+	}
+
 	public class SubContentHandler : DownloadCompleteHandler
 	{
 		public string Start { get; set; }

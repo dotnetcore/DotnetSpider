@@ -97,11 +97,15 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 
+			data.Add("DateTime", "");
+
 			for (DateTime i = From; i <= To; i = i.AddDays(IntervalDay))
 			{
+				var postBody = string.Format(PostBody, i.ToString(DateFormate));
+				data["DateTime"] = i.ToString(DateFormate);
 				spider.Scheduler.Push(new Request(string.Format(FormateString, i.ToString(DateFormate)), data)
 				{
-					PostBody = PostBody,
+					PostBody = postBody,
 					Origin = Origin,
 					Method = Method,
 					Referer = Referer
@@ -170,7 +174,7 @@ namespace DotnetSpider.Extension.Model
 #endif
 				}
 			});
-			
+
 			return list;
 		}
 
@@ -288,7 +292,7 @@ namespace DotnetSpider.Extension.Model
 							string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
 							if (data.ContainsKey("DotnetSpiderEnvironmentIndex"))
 							{
-								data["DotnetSpiderEnvironmentIndex"]= i;
+								data["DotnetSpiderEnvironmentIndex"] = i;
 							}
 							else
 							{
