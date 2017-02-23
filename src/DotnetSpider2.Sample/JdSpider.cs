@@ -82,9 +82,7 @@ namespace DotnetSpider.Sample
 
 		protected override EntitySpider GetEntitySpider()
 		{
-			var entitySpider = new EntitySpider(new Site {
-				HttpProxyPool=new SingleProxyPool(new UseSpecifiedUriWebProxy(new Uri("http://sdfsdf:1234")))
-			})
+			var entitySpider = new EntitySpider(new Site())
 			{
 				Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Day1OfThisWeek.ToString("yyyy-MM-dd")
 			};
@@ -94,7 +92,7 @@ namespace DotnetSpider.Sample
 			entitySpider.AddEntityType(typeof(TmpProduct));
 			entitySpider.AddEntityType(typeof(JdProduct));
 			entitySpider.AddEntityPipeline(
-				new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+				new MySqlEntityPipeline("Database='test';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306"));
 			return entitySpider;
 		}
 	}

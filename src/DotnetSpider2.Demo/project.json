@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "Dapper": "1.50.2",
-    "DotnetSpider2.Core": "*"
+    "DotnetSpider2.Extension": "*"
   },
   "frameworks": {
     "net45": {
