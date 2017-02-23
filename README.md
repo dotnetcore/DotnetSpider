@@ -253,6 +253,10 @@ NOTE:
 
 ![monitor](https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/images/1.png)
 
+### Web Manager
+
+
+
 ### NOTICE
 
 #### when you use redis scheduler, please update your redis config: 
