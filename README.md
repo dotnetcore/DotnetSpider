@@ -251,7 +251,6 @@ NOTE:
 1. Set logAndStatusConnectString to correct mysql connect string in config.ini project DotnetSpider.Sample.
 2. Update MySqlConnectString in appsettings.json in DotnetSpider.Enterpise project.
 
-![monitor](https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/images/1.png)
 
 ### Web Manager
 
