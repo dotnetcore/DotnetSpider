@@ -254,23 +254,23 @@ NOTE:
 
 ### Web Manager
 
-1. Manage Project
++ Manage Project
 
 ![projects](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/projects.jpg?raw=true)
 
-2. Manage Tasks
++ Manage Tasks
 
 ![tasks](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/createTask.jpg?raw=true)
 ![createTask](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/tasks.jpg?raw=true)
 
-3. Nodes Monitor
++ Nodes Monitor
 ![nodes](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/nodes.jpg?raw=true)
 
-4. Status Monitor
++ Status Monitor
 
 ![status](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/status.jpg?raw=true)
 
-5. View Logs
++ View Logs
 
 ![logs](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/log.jpg?raw=true)
 
