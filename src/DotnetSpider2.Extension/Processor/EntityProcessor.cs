@@ -4,9 +4,7 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
 using Site = DotnetSpider.Core.Site;
 using Newtonsoft.Json.Linq;
-using DotnetSpider.Core.Selector;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Extension.Processor
 {
@@ -29,7 +27,7 @@ namespace DotnetSpider.Extension.Processor
 					{
 						throw new SpiderException("Region xpath and patterns should not be null both.");
 					}
-					foreach (var xpath in targetUrlsSelector.XPaths.Select(x => x.Trim()).Distinct())
+					foreach (var xpath in targetUrlsSelector.XPaths.Select(x => x?.Trim()).Distinct())
 					{
 						AddTargetUrlExtractor(xpath, targetUrlsSelector.Patterns);
 					}

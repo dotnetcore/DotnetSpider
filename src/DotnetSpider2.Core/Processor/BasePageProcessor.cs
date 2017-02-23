@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using DotnetSpider.Core.Selector;
 using System.Linq;
+using System;
 #if !NET_CORE
 using System.Web;
 #else
@@ -16,6 +17,7 @@ namespace DotnetSpider.Core.Processor
 		private List<Regex> _excludeTargetUrlPatterns = new List<Regex>();
 		private Dictionary<ISelector, List<Regex>> _targetUrlExtractors { get; set; } = new Dictionary<ISelector, List<Regex>>();
 		private ISelector _imageSelector = Selectors.XPath(".//img/@src");
+
 		protected abstract void Handle(Page page);
 
 		public void Process(Page page)
@@ -223,6 +225,37 @@ namespace DotnetSpider.Core.Processor
 					_excludeTargetUrlPatterns.Add(new Regex(pattern));
 				}
 			}
+		}
+
+		/// <summary>
+		/// Only used for test
+		/// </summary>
+		/// <param name="region"></param>
+		/// <returns></returns>
+		[Obsolete]
+		public virtual List<Regex> GetTargetUrlPatterns(string region)
+		{
+			var selector = Selectors.XPath(region);
+			if(_targetUrlExtractors.ContainsKey(selector))
+			{
+				return _targetUrlExtractors[selector];
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Only used for test
+		/// </summary>
+		/// <param name="region"></param>
+		/// <returns></returns>
+		[Obsolete]
+		public virtual bool ContainsTargetUrlRegion(string region)
+		{
+			var selector = Selectors.XPath(region);
+			return _targetUrlExtractors.ContainsKey(selector);
 		}
 
 		/// <summary>
