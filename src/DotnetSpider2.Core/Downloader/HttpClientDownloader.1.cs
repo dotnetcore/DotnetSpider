@@ -266,7 +266,7 @@ namespace DotnetSpider.Core.Downloader
 			contentBytes = PreventCutOff(contentBytes);
 			if (string.IsNullOrEmpty(site.EncodingName))
 			{
-				Encoding htmlCharset = Encoding.Default;
+				Encoding htmlCharset = Encoding.GetEncoding("UTF-8");
 				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
 			}
 			else

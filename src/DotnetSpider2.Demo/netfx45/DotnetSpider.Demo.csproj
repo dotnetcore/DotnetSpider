@@ -141,6 +141,10 @@
       <Project>{28dadca2-9053-4222-a813-a73dd0fe7f2f}</Project>
       <Name>DotnetSpider.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\DotnetSpider2.Extension\netfx45\DotnetSpider.Extension.csproj">
+      <Project>{ddb5a085-6219-4a95-8cd8-ddcf3a54b962}</Project>
+      <Name>DotnetSpider.Extension</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\BaseUsage.cs">
