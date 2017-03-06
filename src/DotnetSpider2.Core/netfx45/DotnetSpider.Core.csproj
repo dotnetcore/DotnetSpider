@@ -162,9 +162,6 @@
     <Compile Include="..\Downloader\HttpClientDownloader.1.cs">
       <Link>Downloader\HttpClientDownloader.1.cs</Link>
     </Compile>
-    <Compile Include="..\Downloader\HttpClientDownloader.cs">
-      <Link>Downloader\HttpClientDownloader.cs</Link>
-    </Compile>
     <Compile Include="..\Downloader\HttpClientPool.cs">
       <Link>Downloader\HttpClientPool.cs</Link>
     </Compile>
