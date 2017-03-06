@@ -69,7 +69,8 @@ namespace DotnetSpider.Core.Downloader
 				var httpStatusCode = response.StatusCode;
 				request.PutExtra(Request.StatusCode, httpStatusCode);
 				Page page;
-				if (response.Content.Headers.ContentType.MediaType != "text/html")
+				if (response.Content.Headers.ContentType.MediaType != "text/html" 
+                    			&& response.Content.Headers.ContentType.MediaType != "text/plain")
 				{
 					if (!site.DownloadFiles)
 					{
