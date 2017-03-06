@@ -8,6 +8,7 @@ using System.Web;
 using System.Text;
 using System.Net.Http;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Downloader
@@ -266,8 +267,8 @@ namespace DotnetSpider.Core.Downloader
 			contentBytes = PreventCutOff(contentBytes);
 			if (string.IsNullOrEmpty(site.EncodingName))
 			{
-				Encoding htmlCharset = Encoding.GetEncoding("UTF-8");
-				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
+				response.Content = new ByteArrayContent(contentBytes);
+				return response.Content.ReadAsStringAsync().Result;
 			}
 			else
 			{
