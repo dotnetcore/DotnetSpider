@@ -60,6 +60,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.Schema == null)
 			{
+				Spider.Log("Schema is necessary", LogLevel.Warn);
 				IsEnabled = false;
 				return;
 			}
@@ -70,6 +71,12 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					Columns.Add((Field)f);
 				}
+			}
+			if (Columns.Count==0)
+			{
+				Spider.Log("Columns is necessary", LogLevel.Warn);
+				IsEnabled = false;
+				return;
 			}
 			var primary = metadata.Primary;
 			if (primary != null)
