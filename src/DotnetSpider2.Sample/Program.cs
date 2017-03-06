@@ -4,9 +4,15 @@ using DotnetSpider.Redial;
 using DotnetSpider.Redial.InternetDetector;
 using DotnetSpider.Redial.Redialer;
 using System;
+using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Core.Selector;
 
 namespace DotnetSpider.Sample
 {
+
 	public class Program
 	{
 		public static void Main(string[] args)

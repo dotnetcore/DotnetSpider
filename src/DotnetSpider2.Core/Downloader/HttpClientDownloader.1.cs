@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 #if !NET_CORE
 using System.Web;
 #endif
@@ -261,16 +262,30 @@ namespace DotnetSpider.Core.Downloader
 
 		private string GetContent(Site site, HttpResponseMessage response)
 		{
+			byte[] contentBytes = response.Content.ReadAsByteArrayAsync().Result;
+			contentBytes = PreventCutOff(contentBytes);
 			if (string.IsNullOrEmpty(site.EncodingName))
 			{
-				return response.Content.ReadAsStringAsync().Result;
+				Encoding htmlCharset = Encoding.Default;
+				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
 			}
 			else
 			{
-				byte[] contentBytes = response.Content.ReadAsByteArrayAsync().Result;
 				Encoding htmlCharset = Encoding.GetEncoding(site.EncodingName);
-				return htmlCharset.GetString(contentBytes);
+				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
 			}
+		}
+
+		private byte[] PreventCutOff(byte[] bytes)
+		{
+			var list = bytes.ToList();
+			var temp = list.Where(b => b == 0x00).ToList();
+			foreach (var t in temp)
+			{
+				list.Remove(t);
+			}
+
+			return list.ToArray();
 		}
 
 		//private Encoding GetHtmlCharset(byte[] contentBytes)
