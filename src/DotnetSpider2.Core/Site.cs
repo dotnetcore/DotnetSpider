@@ -25,6 +25,13 @@ namespace DotnetSpider.Core
 		public bool RemoveOutboundLinks { get; set; }
 		public string Domain { get; private set; }
 
+		public Site()
+		{
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+		}
+
 		public ReadOnlyDictionary<string, string> Cookies
 		{
 			get { return new ReadOnlyDictionary<string, string>(_cookies); }

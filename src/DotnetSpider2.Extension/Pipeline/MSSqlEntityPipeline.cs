@@ -64,7 +64,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override string GetCreateSchemaSql()
 		{
-			return $"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database}; USE {Schema.Database};";
+			return $"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database};";
 		}
 
 		protected override string GetCreateTableSql()

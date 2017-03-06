@@ -202,9 +202,16 @@ namespace DotnetSpider.Core.Selector
 						Uri uri;
 						if (Uri.TryCreate(node.Attributes["href"].Value, UriKind.Absolute, out uri))
 						{
-							if (uri.Host != domain)
+							if (string.IsNullOrEmpty(uri.Host))
 							{
-								deleteNodes.Add(node);
+								continue;
+							}
+							else
+							{
+								if (uri.Host != domain)
+								{
+									deleteNodes.Add(node);
+								}
 							}
 						}
 					}

@@ -1,9 +1,4 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Monitor;
-using DotnetSpider.Redial;
-using DotnetSpider.Redial.InternetDetector;
-using DotnetSpider.Redial.Redialer;
-using System;
+﻿using System;
 
 namespace DotnetSpider.Sample
 {
@@ -11,7 +6,10 @@ namespace DotnetSpider.Sample
 	public class Program
 	{
 		public static void Main(string[] args)
-		{		
+		{
+			//ShanxizhaoshengSpider spider = new ShanxizhaoshengSpider();
+			//spider.Run();
+
 			// Crawler pages traversal 遍历整站
 			BaseUsage.CrawlerPagesTraversal();
 			Console.WriteLine("Press any key to continue...");
