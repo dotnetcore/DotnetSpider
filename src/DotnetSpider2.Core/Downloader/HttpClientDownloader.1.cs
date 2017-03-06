@@ -278,14 +278,14 @@ namespace DotnetSpider.Core.Downloader
 
 		private byte[] PreventCutOff(byte[] bytes)
 		{
-			var list = bytes.ToList();
-			var temp = list.Where(b => b == 0x00).ToList();
-			foreach (var t in temp)
+			for (int i = 0; i < bytes.Length; i++)
 			{
-				list.Remove(t);
+				if (bytes[i] == 0x00)
+				{
+					bytes[i] = 32;
+				}
 			}
-
-			return list.ToArray();
+			return bytes;
 		}
 
 		//private Encoding GetHtmlCharset(byte[] contentBytes)
