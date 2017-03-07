@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 #if !NET_CORE
 using System.Web;
 #endif
 using System.Text;
 using System.Net.Http;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -69,10 +68,19 @@ namespace DotnetSpider.Core.Downloader
 				var httpStatusCode = response.StatusCode;
 				request.PutExtra(Request.StatusCode, httpStatusCode);
 				Page page;
-				if (response.Content.Headers.ContentType.MediaType != "text/html")
+				
+				if (
+					response.Content.Headers.ContentType.MediaType != "text/html"
+					&& response.Content.Headers.ContentType.MediaType != "text/plain"
+					&& response.Content.Headers.ContentType.MediaType != "text/richtext"
+					&& response.Content.Headers.ContentType.MediaType != "text/xml"
+					&& response.Content.Headers.ContentType.MediaType != "application/soap+xml"
+					&& response.Content.Headers.ContentType.MediaType != "application/xml"
+					&& response.Content.Headers.ContentType.MediaType != "application/json")
 				{
 					if (!site.DownloadFiles)
 					{
+						spider.Log($"Miss request: {request.Url} because media type is not text.", LogLevel.Debug);
 						return new Page(request, site.ContentType, null) { IsSkip = true };
 					}
 					else
