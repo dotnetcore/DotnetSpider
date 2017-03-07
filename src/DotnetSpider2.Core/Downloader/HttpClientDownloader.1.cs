@@ -9,7 +9,6 @@ using System.Text;
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -28,6 +27,17 @@ namespace DotnetSpider.Core.Downloader
 		private const byte Utf32PreambleByte3 = 0x00;
 		private const int Utf32OrUnicodePreambleFirst2Bytes = 0xFFFE;
 		private const int BigEndianUnicodePreambleFirst2Bytes = 0xFEFF;
+
+		private static List<string> MediaTypes = new List<string>()
+		{
+			"text/html",
+			"text/plain",
+			"text/richtext",
+			"text/xml",
+			"application/soap+xml",
+			"application/xml",
+			"application/json",
+		};
 
 		public bool DecodeContentAsUrl;
 
@@ -68,15 +78,8 @@ namespace DotnetSpider.Core.Downloader
 				var httpStatusCode = response.StatusCode;
 				request.PutExtra(Request.StatusCode, httpStatusCode);
 				Page page;
-				
-				if (
-					response.Content.Headers.ContentType.MediaType != "text/html"
-					&& response.Content.Headers.ContentType.MediaType != "text/plain"
-					&& response.Content.Headers.ContentType.MediaType != "text/richtext"
-					&& response.Content.Headers.ContentType.MediaType != "text/xml"
-					&& response.Content.Headers.ContentType.MediaType != "application/soap+xml"
-					&& response.Content.Headers.ContentType.MediaType != "application/xml"
-					&& response.Content.Headers.ContentType.MediaType != "application/json")
+
+				if (!MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
 				{
 					if (!site.DownloadFiles)
 					{
@@ -165,14 +168,7 @@ namespace DotnetSpider.Core.Downloader
 
 			HttpRequestMessage httpWebRequest = CreateRequestMessage(request);
 
-			if (site.Headers.ContainsKey("UserAgent"))
-			{
-				httpWebRequest.Headers.Add("UserAgent", site.Headers["UserAgent"]);
-			}
-			else
-			{
-				httpWebRequest.Headers.Add("User-Agent", site.UserAgent);
-			}
+			httpWebRequest.Headers.Add("UserAgent", site.Headers.ContainsKey("UserAgent")? site.Headers["UserAgent"]: site.UserAgent);
 
 			if (!string.IsNullOrEmpty(request.Referer))
 			{
@@ -228,31 +224,42 @@ namespace DotnetSpider.Core.Downloader
 
 		private HttpRequestMessage CreateRequestMessage(Request request)
 		{
-			if (request.Method == null || request.Method.ToUpper().Equals(HttpConstant.Method.Get))
+			if (request.Method == null)
 			{
 				return new HttpRequestMessage(HttpMethod.Get, request.Url);
 			}
-			if (request.Method.ToUpper().Equals(HttpConstant.Method.Post))
+
+			switch (request.Method.ToUpper())
 			{
-				return new HttpRequestMessage(HttpMethod.Post, request.Url);
+				case HttpConstant.Method.Get:
+					{
+						return new HttpRequestMessage(HttpMethod.Get, request.Url);
+					}
+				case HttpConstant.Method.Post:
+					{
+						return new HttpRequestMessage(HttpMethod.Post, request.Url);
+					}
+				case HttpConstant.Method.Head:
+					{
+						return new HttpRequestMessage(HttpMethod.Head, request.Url);
+					}
+				case HttpConstant.Method.Put:
+					{
+						return new HttpRequestMessage(HttpMethod.Put, request.Url);
+					}
+				case HttpConstant.Method.Delete:
+					{
+						return new HttpRequestMessage(HttpMethod.Delete, request.Url);
+					}
+				case HttpConstant.Method.Trace:
+					{
+						return new HttpRequestMessage(HttpMethod.Trace, request.Url);
+					}
+				default:
+					{
+						throw new ArgumentException("Illegal HTTP Method " + request.Method);
+					}
 			}
-			if (request.Method.ToUpper().Equals(HttpConstant.Method.Head))
-			{
-				return new HttpRequestMessage(HttpMethod.Head, request.Url);
-			}
-			if (request.Method.ToUpper().Equals(HttpConstant.Method.Put))
-			{
-				return new HttpRequestMessage(HttpMethod.Put, request.Url);
-			}
-			if (request.Method.ToUpper().Equals(HttpConstant.Method.Delete))
-			{
-				return new HttpRequestMessage(HttpMethod.Delete, request.Url);
-			}
-			if (request.Method.ToUpper().Equals(HttpConstant.Method.Trace))
-			{
-				return new HttpRequestMessage(HttpMethod.Trace, request.Url);
-			}
-			throw new ArgumentException("Illegal HTTP Method " + request.Method);
 		}
 
 		private Page HandleResponse(Request request, HttpResponseMessage response, HttpStatusCode statusCode, Site site)
@@ -302,7 +309,6 @@ namespace DotnetSpider.Core.Downloader
 				}
 
 				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
-
 			}
 			else
 			{
