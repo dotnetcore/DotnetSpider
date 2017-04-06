@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DotnetSpider.Extension</RootNamespace>
+    <AssemblyName>DotnetSpider.Extension</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\output\net451\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET4_5</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\net45\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>DEL /S /Q $(ProjectDir)obj\*.*</PreBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Common\DataSourceUtil.cs" />
+    <Compile Include="Common\DoubleKeyDictionary.cs" />
+    <Compile Include="Common\FiddlerClient.cs" />
+    <Compile Include="Common\Macros.cs" />
+    <Compile Include="Common\SelectorUtil.cs" />
+    <Compile Include="Configuration\JsonSpiderContext.cs" />
+    <Compile Include="DataSource.cs" />
+    <Compile Include="Downloader\CookieInterceptor.cs" />
+    <Compile Include="Downloader\DownloadCompleteHandler.cs" />
+    <Compile Include="Downloader\FiddlerDownloader.cs" />
+    <Compile Include="Downloader\FileCacheDownloader.cs" />
+    <Compile Include="Downloader\FileDownloader.cs" />
+    <Compile Include="Downloader\SignIner.cs" />
+    <Compile Include="Downloader\TargetUrlsCreator.cs" />
+    <Compile Include="Downloader\WebDriver\Browser.cs" />
+    <Compile Include="Downloader\WebDriver\IWebDriverHandler.cs" />
+    <Compile Include="Downloader\WebDriver\Option.cs" />
+    <Compile Include="Downloader\WebDriver\WebDriverDownloader.cs" />
+    <Compile Include="Downloader\WebDriver\WebDriverUtil.cs" />
+    <Compile Include="EntitySpider.cs" />
+    <Compile Include="ILinkSpiderContext.cs" />
+    <Compile Include="LinkContextSpider.cs" />
+    <Compile Include="Model\Attribute\BaseSelector.cs" />
+    <Compile Include="Model\Attribute\EntitySelector.cs" />
+    <Compile Include="Model\Attribute\Indexes.cs" />
+    <Compile Include="Model\Attribute\PropertySelector.cs" />
+    <Compile Include="Model\Attribute\SharedValueSelector.cs" />
+    <Compile Include="Model\Attribute\TargetUrl.cs" />
+    <Compile Include="Model\Attribute\TargetUrlsSelector.cs" />
+    <Compile Include="Model\Attribute\UpdateColumns.cs" />
+    <Compile Include="Model\DataHandler.cs" />
+    <Compile Include="Model\EntityExtractor.cs" />
+    <Compile Include="Model\EntityMetadata.cs" />
+    <Compile Include="Model\Formatter\CharacterCaseFormater.cs" />
+    <Compile Include="Model\Formatter\DigitUnitFormater.cs" />
+    <Compile Include="Model\Formatter\DisplaceFormater.cs" />
+    <Compile Include="Model\Formatter\Download.cs" />
+    <Compile Include="Model\Formatter\FormatStringFormater.cs" />
+    <Compile Include="Model\Formatter\Formatter.cs" />
+    <Compile Include="Model\Formatter\HtmlDecodeFormater.cs" />
+    <Compile Include="Model\Formatter\RegexAppendFormatter.cs" />
+    <Compile Include="Model\Formatter\RegexFormater.cs" />
+    <Compile Include="Model\Formatter\RegexReplaceFormater.cs" />
+    <Compile Include="Model\Formatter\RemoveHtmlTagFormater.cs" />
+    <Compile Include="Model\Formatter\ReplaceFormater.cs" />
+    <Compile Include="Model\Formatter\SplitFormater.cs" />
+    <Compile Include="Model\Formatter\SplitToListFormater.cs" />
+    <Compile Include="Model\Formatter\SubStringFormater.cs" />
+    <Compile Include="Model\Formatter\TimeStampFormater.cs" />
+    <Compile Include="Model\Formatter\TrimFormater.cs" />
+    <Compile Include="Model\Formatter\UrlEncodeFormater.cs" />
+    <Compile Include="Model\IEntityExtractor.cs" />
+    <Compile Include="Model\ISpiderEntity.cs" />
+    <Compile Include="Model\MultiPageModel.cs" />
+    <Compile Include="Model\PrepareStartUrls.cs" />
+    <Compile Include="Model\Selector.cs" />
+    <Compile Include="Monitor\HttpMonitor.cs" />
+    <Compile Include="Monitor\ISpiderStatus.cs" />
+    <Compile Include="ORM\Scheme.cs" />
+    <Compile Include="ORM\StoredAs.cs" />
+    <Compile Include="ORM\TableSuffix.cs" />
+    <Compile Include="Pipeline\BaseEntityDbPipeline.cs" />
+    <Compile Include="Pipeline\BaseEntityPipeline.cs" />
+    <Compile Include="Pipeline\CollectEntityPipeline.cs" />
+    <Compile Include="Pipeline\ConsoleEntityPipeline.cs" />
+    <Compile Include="Pipeline\DbUpdateConnectString.cs" />
+    <Compile Include="Pipeline\EntityPipeline.cs" />
+    <Compile Include="Pipeline\ICollectEntityPipeline.cs" />
+    <Compile Include="Pipeline\IEntityPipeline.cs" />
+    <Compile Include="Pipeline\ImagePipeline.cs" />
+    <Compile Include="Pipeline\IUpdateConnectString.cs" />
+    <Compile Include="Pipeline\JsonFileEntityPipeline.cs" />
+    <Compile Include="Pipeline\LinkSpiderPipeline.cs" />
+    <Compile Include="Pipeline\MongoDbEntityPipeline.cs" />
+    <Compile Include="Pipeline\MSSqlEntityPipeline.cs" />
+    <Compile Include="Pipeline\MultiPagePipeline.cs" />
+    <Compile Include="Pipeline\MySqlEntityPipeline.cs" />
+    <Compile Include="Pipeline\MySqlFileEntityPipeline.cs" />
+    <Compile Include="Pipeline\PipelineMode.cs" />
+    <Compile Include="Processor\EntityProcessor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scheduler\RedisScheduler.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="SpiderBuilder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.net45.csproj">
+      <Project>{8efd08a2-cbd0-4984-b2a8-0aafe227e5fa}</Project>
+      <Name>DotnetSpider.Core.net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotnetSpider.Redial\DotnetSpider.Redial.net45.csproj">
+      <Project>{0e2e2062-f924-4efb-97cf-d36a7b5493f6}</Project>
+      <Name>DotnetSpider.Redial.net45</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="BasicFormatsForCore, Version=2.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FiddlerCore2.1.0.0\lib\net40\BasicFormatsForCore.dll</HintPath>
+    </Reference>
+    <Reference Include="BCMakeCert, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FiddlerCore2.1.0.0\lib\net40\BCMakeCert.dll</HintPath>
+    </Reference>
+    <Reference Include="CertMaker, Version=4.5.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FiddlerCore2.1.0.0\lib\net40\CertMaker.dll</HintPath>
+    </Reference>
+    <Reference Include="FiddlerCore4, Version=4.6.2.0, Culture=neutral, PublicKeyToken=67cb91587178ac5a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FiddlerCore2.1.0.0\lib\net40\FiddlerCore4.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Protobuf, Version=3.0.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Google.Protobuf.3.0.0\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MongoDB.Bson, Version=2.4.3.23, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MongoDB.Bson.2.4.3\lib\net45\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver, Version=2.4.3.23, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MongoDB.Driver.2.4.3\lib\net45\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core, Version=2.4.3.23, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MongoDB.Driver.Core.2.4.3\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=7.0.7.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MySql.Data.7.0.7-m61\lib\net451\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="StackExchange.Redis, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\StackExchange.Redis.1.2.1\lib\net45\StackExchange.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.InteropServices.RuntimeInformation.4.0.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WebDriver, Version=3.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Selenium.WebDriver.3.3.0\lib\net40\WebDriver.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

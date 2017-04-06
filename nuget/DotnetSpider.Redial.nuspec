@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>DotnetSpider2.Redial</id>
+    <version>1.3.0-rc1</version>
+    <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
+    <owners>zlzforever@163.com</owners>
+    <licenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/zlzforever/DotnetSpider</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <tags>DotnetSpider;crawler;cross platform;dotnet core</tags>
+    <description>Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.</description>
+    <dependencies>
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="DotnetSpider2.Core" version="1.3.0-rc1" exclude="Build,Analyzers" />
+        <dependency id="StackExchange.Redis" version="1.2.1" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="Build,Analyzers"/>
+      </group>
+      <group targetFramework=".NETFramework4.5.1" >
+        <dependency id="DotnetSpider2.Core" version="1.3.0-rc1" exclude="Build,Analyzers" />
+        <dependency id="DotRas.for.Win7" version="1.3.0" exclude="Build,Analyzers" />
+        <dependency id="StackExchange.Redis" version="1.2.1" exclude="Build,Analyzers" />
+        <dependency id="SSH.NET" version="2016.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Net.Http" version="4.3.1" exclude="Build,Analyzers" />
+        <dependency id="System.Net.NetworkInformation" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\output\netstandard1.6\DotnetSpider.Redial.dll" target="lib\netstandard1.6\DotnetSpider.Redial.dll" />
+    <file src="..\output\net451\DotnetSpider.Redial.dll" target="lib\net451\DotnetSpider.Redial.dll" />
+  </files>
+</package>
