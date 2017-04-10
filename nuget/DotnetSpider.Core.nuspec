@@ -23,7 +23,6 @@
       </group>
       <group targetFramework=".NETFramework4.5.1" >
         <dependency id="Autofac" version="4.4.0" exclude="Build,Analyzers" />
-        <dependency id="HtmlAgilityPack" version="1.4.9.5 " exclude="Build,Analyzers" />
         <dependency id="HtmlAgilityPack.CssSelectors" version="1.0.2" exclude="Build,Analyzers" />
         <dependency id="NLog" version="4.4.5" exclude="Build,Analyzers" />
         <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="4.3.0" exclude="Build,Analyzers" />

@@ -52,7 +52,6 @@ namespace DotnetSpider.Core
 		private bool _init;
 		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
-		private readonly Random _random = new Random();
 		private readonly object _avgDownloadTimeLocker = new object();
 		private readonly object _avgProcessorTimeLocker = new object();
 		private readonly object _avgPipelineTimeLocker = new object();
@@ -638,11 +637,6 @@ namespace DotnetSpider.Core
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
 
-			if (Site.MinSleepTime > Site.MaxSleepTime)
-			{
-				Site.MaxSleepTime = Site.MinSleepTime;
-			}
-
 			_init = true;
 		}
 
@@ -700,7 +694,7 @@ namespace DotnetSpider.Core
 						{
 							Stopwatch sw = new Stopwatch();
 							ProcessRequest(sw, request, downloader);
-							Thread.Sleep(_random.Next(Site.MinSleepTime, Site.MaxSleepTime));
+							Thread.Sleep(Site.SleepTime);
 							_OnSuccess(request);
 						}
 						catch (Exception e)

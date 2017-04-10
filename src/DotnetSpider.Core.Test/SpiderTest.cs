@@ -24,7 +24,7 @@ namespace DotnetSpider.Core.Test
 		{
 			try
 			{
-				Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
+				Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new QueueDuplicateRemovedScheduler(),
@@ -37,7 +37,7 @@ namespace DotnetSpider.Core.Test
 
 			try
 			{
-				Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
+				Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 					"abc",
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new QueueDuplicateRemovedScheduler(),
@@ -50,7 +50,7 @@ namespace DotnetSpider.Core.Test
 
 			try
 			{
-				Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
+				Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 					"abcd",
 					"abbb",
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new QueueDuplicateRemovedScheduler(),
@@ -68,7 +68,7 @@ namespace DotnetSpider.Core.Test
 		[TestMethod]
 		public void RunAsyncAndStop()
 		{
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
 			for (int i = 0; i < 10000; i++)
 			{
 				spider.AddStartUrl("http://www.baidu.com/" + i);
@@ -86,7 +86,7 @@ namespace DotnetSpider.Core.Test
 		{
 			try
 			{
-				Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new TestPageProcessor());
+				Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor());
 				spider.Run();
 			}
 			catch (SpiderException exception)
@@ -108,7 +108,7 @@ namespace DotnetSpider.Core.Test
 			Configuration.SetValue("logAndStatusConnectString", connectString);
 			Assert.AreEqual("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", Configuration.GetValue("logAndStatusConnectString"));
 
-			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 },
+			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 				id,
 				userId,
 				taskGroup, new QueueDuplicateRemovedScheduler(),
@@ -131,7 +131,7 @@ namespace DotnetSpider.Core.Test
 		[TestMethod]
 		public void WhenNoStartUrl()
 		{
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
 			spider.Run();
 
 			Assert.AreEqual(Status.Finished, spider.StatusCode);
@@ -159,7 +159,7 @@ namespace DotnetSpider.Core.Test
 		[TestMethod]
 		public void TestRetryWhenResultIsEmpty()
 		{
-			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", MinSleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
 			spider.AddStartUrl("http://taobao.com");
 			spider.RetryWhenResultIsEmpty = true;
 			spider.Run();

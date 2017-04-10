@@ -106,9 +106,7 @@ namespace DotnetSpider.Core
 		/// Set the interval between the processing of two pages. 
 		/// Time unit is micro seconds. 
 		/// </summary>
-		public int MaxSleepTime { get; set; } = 100;
-
-		public int MinSleepTime { get; set; } = 1;
+		public int SleepTime { get; set; } = 100;
 
 		/// <summary>
 		/// When cycleRetryTimes is more than 0, it will add back to scheduler and try download again. 
