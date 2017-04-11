@@ -128,6 +128,11 @@ namespace DotnetSpider.Extension.Pipeline
 			return $"CREATE SCHEMA IF NOT EXISTS `{Schema.Database}` DEFAULT CHARACTER SET utf8mb4 ;";
 		}
 
+		protected override string GetIfSchemaExistsSql()
+		{
+			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{Schema.Database}';";
+		}
+
 		protected override DbParameter CreateDbParameter(string name, object value)
 		{
 			return new MySqlParameter(name, value);

@@ -64,6 +64,11 @@ namespace DotnetSpider.Extension.Test
 			{
 				return new TestPipeline();
 			}
+
+			protected override string GetIfSchemaExistsSql()
+			{
+				throw new NotImplementedException();
+			}
 		}
 
 		[Schema("db", "table")]

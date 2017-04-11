@@ -88,6 +88,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				InnerHandler = innerHandler;
 			}
+
 			private Task<HttpResponseMessage> _SendAsync(HttpRequestMessage request, CancellationToken cancellationToken, TaskCompletionSource<HttpResponseMessage> tcs)
 			{
 				base.SendAsync(request, cancellationToken)
@@ -121,8 +122,8 @@ namespace DotnetSpider.Core.Downloader
 							{
 								newRequest.Content = null;
 								newRequest.Method = HttpMethod.Get;
-
 							}
+
 							newRequest.RequestUri = response.Headers.Location;
 
 							_SendAsync(newRequest, cancellationToken, tcs);
@@ -135,6 +136,7 @@ namespace DotnetSpider.Core.Downloader
 
 				return tcs.Task;
 			}
+
 			protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 			{
 				var tcs = new TaskCompletionSource<HttpResponseMessage>();

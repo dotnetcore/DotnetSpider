@@ -67,6 +67,11 @@ namespace DotnetSpider.Extension.Pipeline
 			return $"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database};";
 		}
 
+		protected override string GetIfSchemaExistsSql()
+		{
+			return $"SELECT COUNT(*) FROM sysdatabases WHERE name='{Schema.Database}'";
+		}
+
 		protected override string GetCreateTableSql()
 		{
 			var identity = "IDENTITY(1,1)";
