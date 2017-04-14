@@ -55,10 +55,9 @@ namespace DotnetSpider.Core.Downloader
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 
-				response = NetworkCenter.Current.Execute("http", m =>
+				response = NetworkCenter.Current.Execute("http", message =>
 				{
 					HttpClient httpClient = _httpClientPool.GetHttpClient(proxy);
-					var message = (HttpRequestMessage)m;
 					var requestTask = httpClient.SendAsync(message);
 					requestTask.Wait(site.Timeout);
 					if (requestTask.Status == TaskStatus.RanToCompletion)
@@ -95,6 +94,11 @@ namespace DotnetSpider.Core.Downloader
 				else
 				{
 					page = HandleResponse(request, response, httpStatusCode, site);
+				}
+
+				if (string.IsNullOrEmpty(page.Content))
+				{
+					spider.Log($"下载 {request.Url} 内容为空。", LogLevel.Warn);
 				}
 
 				// need update
@@ -199,7 +203,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 			}
 
-			httpWebRequest.Headers.Add("Cookie", site.GetAllCookiesString());
+			httpWebRequest.Headers.Add("Cookie", site.Cookies.ToString());
 
 			if (httpWebRequest.Method == HttpMethod.Post)
 			{

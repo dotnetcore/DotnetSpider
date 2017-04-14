@@ -74,6 +74,7 @@ namespace DotnetSpider.Core.Scheduler
 		public virtual void Dispose()
 		{
 			DuplicateRemover.Dispose();
+			IsExited = true;
 		}
 
 		public abstract void Import(HashSet<Request> requests);

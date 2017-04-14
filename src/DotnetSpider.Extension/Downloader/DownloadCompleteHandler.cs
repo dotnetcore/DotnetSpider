@@ -7,23 +7,16 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Downloader
 {
-	#region Redial Handler
-
-	public class RedialWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	public class RedialWhenContainsHandler : DownloadCompleteHandler
 	{
-		public string ContainsString { get; set; }
+		public string Content { get; set; }
 
-		public override bool Handle(Page page)
+		public override bool Handle(Page page, ISpider spider)
 		{
-			string rawText = page.Content;
-			if (string.IsNullOrEmpty(rawText))
-			{
-				throw new DownloadException("Download failed or response is null.");
-			}
-			if (rawText.Contains(ContainsString))
+			if (!string.IsNullOrEmpty(page.Content)&& page.Content.Contains(Content))
 			{
 				((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
-				throw new DownloadException($"Content downloaded contains illegal string: {ContainsString}.");
+				throw new DownloadException($"Content downloaded contains string: {Content}.");
 			}
 			return true;
 		}
@@ -33,7 +26,7 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		public string ExceptionMessage { get; set; } = string.Empty;
 
-		public override bool Handle(Page page)
+		public override bool Handle(Page page, ISpider spider)
 		{
 			if (page.Exception != null)
 			{
@@ -51,42 +44,20 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class RedialAndUpdateCookieWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	public class RedialAndUpdateCookieWhenContainsHandler : DownloadCompleteHandler
 	{
-		public string ContainsString { get; set; }
-		public ISpider Spider { get; set; }
+		public string Content { get; set; }
+		public ICookieInjector CookieInjector { get; set; }
 
-		public override bool Handle(Page page)
+		public override bool Handle(Page page, ISpider spider)
 		{
-			if (Spider == null)
-			{
-				throw new ArgumentNullException();
-			}
-			if (!(Spider is EntitySpider))
-			{
-				throw new ArgumentException("Only Support EntitySpider");
-			}
-			if (((EntitySpider)Spider).CookieInterceptor == null)
-			{
-				throw new ArgumentException("Please Set Cookie Interceptor");
-			}
-
-			string rawText = page.Content;
-			if (string.IsNullOrEmpty(rawText))
-			{
-				throw new DownloadException("Download failed or response is null.");
-			}
-			if (rawText.Contains(ContainsString))
+			if (!string.IsNullOrEmpty(page.Content) && CookieInjector != null && page.Content.Contains(Content))
 			{
 				((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
-				var cookie = NetworkCenter.Current.Execute("getcookie", () => ((EntitySpider)Spider).CookieInterceptor.GetCookie());
-				if (cookie != null)
-				{
-					Spider.Site.SetCookies(cookie.CookiesDictionary);
-					Spider.Site.CookiesStringPart = cookie.CookiesStringPart;
-				}
 
-				throw new DownloadException($"Content downloaded contains illegal string: {ContainsString}.");
+				CookieInjector?.Inject(spider);
+
+				throw new DownloadException($"Content downloaded contains string: {Content}.");
 			}
 			return true;
 		}
@@ -97,7 +68,7 @@ namespace DotnetSpider.Extension.Downloader
 		public int RedialLimit { get; set; }
 		public static int RequestedCount { get; set; }
 
-		public override bool Handle(Page page)
+		public override bool Handle(Page page, ISpider spider)
 		{
 			if (RedialLimit != 0)
 			{
@@ -116,6 +87,4 @@ namespace DotnetSpider.Extension.Downloader
 			return true;
 		}
 	}
-
-	#endregion
 }

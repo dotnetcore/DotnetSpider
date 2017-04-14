@@ -214,6 +214,7 @@ namespace DotnetSpider.Extension.Scheduler
 			_db.KeyDelete(_itemKey);
 			_db.KeyDelete(_successCountKey);
 			_db.KeyDelete(_errorCountKey);
+			IsExited = true;
 		}
 
 		public override void Import(HashSet<Request> requests)

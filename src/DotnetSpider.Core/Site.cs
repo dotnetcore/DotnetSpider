@@ -4,6 +4,7 @@ using System.Text;
 using DotnetSpider.Core.Proxy;
 using System.Net;
 using System.Collections.ObjectModel;
+using DotnetSpider.Core.Downloader;
 
 namespace DotnetSpider.Core
 {
@@ -15,39 +16,19 @@ namespace DotnetSpider.Core
 		public IHttpProxyPool HttpProxyPool { get; set; }
 		private Encoding _encoding = Encoding.UTF8;
 		private string _encodingName;
-		private string _cookiesStringPart;
-		private string _allCookiesString;
-		private Dictionary<string, string> _cookies = new Dictionary<string, string>();
 
 		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
 		public ContentType ContentType { get; set; } = ContentType.Html;
 		public bool RemoveOutboundLinks { get; set; }
 		public string Domain { get; private set; }
+		public Cookies Cookies { get; set; } = new Cookies();
 
 		public Site()
 		{
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-		}
-
-		public ReadOnlyDictionary<string, string> Cookies
-		{
-			get { return new ReadOnlyDictionary<string, string>(_cookies); }
-		}
-
-		public string CookiesStringPart
-		{
-			get { return _cookiesStringPart; }
-			set
-			{
-				if (_cookiesStringPart != value)
-				{
-					_cookiesStringPart = value;
-					_allCookiesString = GenerateCookieString();
-				}
-			}
 		}
 
 		/// <summary>
@@ -207,7 +188,7 @@ namespace DotnetSpider.Core
 		{
 			return "Site{" +
 					", userAgent='" + UserAgent + '\'' +
-					", cookies=" + _allCookiesString +
+					", cookies=" + Cookies.ToString() +
 					", charset='" + Encoding + '\'' +
 					", startRequests=" + StartRequests +
 					", cycleRetryTimes=" + CycleRetryTimes +
@@ -228,61 +209,17 @@ namespace DotnetSpider.Core
 			HttpProxyPool?.ReturnProxy(proxy, statusCode);
 		}
 
-		public void SetCookiesStringPart(string cookies)
+		public string CookiesStringPart
 		{
-			if (_cookiesStringPart != cookies)
+			set
 			{
-				_cookiesStringPart = cookies;
-				_allCookiesString = GenerateCookieString();
+				Cookies.StringPart = value;
 			}
 		}
 
 		public void SetCookies(Dictionary<string, string> cookies)
 		{
-			_cookies = cookies;
-			_allCookiesString = GenerateCookieString();
-		}
-
-		public void AddOrUpdateCookie(string key, string value)
-		{
-			if (Cookies == null)
-			{
-				_cookies = new Dictionary<string, string>();
-			}
-
-			if (Cookies.ContainsKey(key))
-			{
-				if (Cookies[key] != value)
-				{
-					_cookies[key] = value;
-					_allCookiesString = GenerateCookieString();
-				}
-			}
-			else
-			{
-				_cookies.Add(key, value);
-				_allCookiesString = GenerateCookieString();
-			}
-		}
-
-		public string GetAllCookiesString()
-		{
-			return _allCookiesString;
-		}
-
-		private string GenerateCookieString()
-		{
-			StringBuilder builder = new StringBuilder("");
-
-			if (Cookies != null)
-			{
-				foreach (var cookie in Cookies)
-				{
-					builder.Append($"{cookie.Key}={cookie.Value};");
-				}
-			}
-			builder.Append(_cookiesStringPart);
-			return builder.ToString();
+			Cookies.PairPart = cookies;
 		}
 	}
 }

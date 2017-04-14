@@ -1,31 +1,38 @@
-﻿//using System.Text;
-//using System.Threading;
-//using DotnetSpider.Core.Monitor;
+﻿#if !NET_CORE
+using System.Text;
+using System.Threading;
+using DotnetSpider.Core.Monitor;
+using System.IO;
+using DotnetSpider.Core.Downloader;
+using static DotnetSpider.Core.Test.SpiderTest;
 
-//namespace DotnetSpider.Core.Test
-//{
-//	public class Program
-//	{
-//		public static void Main(string[] args)
-//		{
-//#if NET_CORE
-//			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-//#endif
+namespace DotnetSpider.Core.Test
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+			var path = "www.baidu.com.cookies";
+			if (File.Exists(path))
+			{
+				File.Delete(path);
+			}
+			File.WriteAllText(path, "a=b&c=d");
 
-//			IocManager.Register<IMonitor, NLogMonitor>();
-
-//			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", MinSleepTime = 1000 }, new SpiderTest.TestPageProcessor()).AddPipeline(new SpiderTest.TestPipeline()).SetThreadNum(1);
-//			spider.SetDownloader(new TestDownloader());
-//			for (int i = 0; i < 10; i++)
-//			{
-//				spider.AddStartUrl("http://www.baidu.com/" + i);
-//			}
-//			spider.Run();
-//			Thread.Sleep(5000);
-//			spider.Stop();
-//			Thread.Sleep(5000);
-//			spider.RunAsync();
-//			Thread.Sleep(5000);
-//		}
-//	}
-//}
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			spider.SetDownloader(new HttpClientDownloader()
+			{
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
+				{
+					new TimerUpdateCookieHandler(5,new FileCookieInject())
+				}
+			});
+			for (int i = 0; i < 10000; i++)
+			{
+				spider.AddStartUrl("http://www.baidu.com/" + i);
+			}
+			spider.Run();
+		}
+	}
+}
+#endif

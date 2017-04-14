@@ -75,7 +75,7 @@ namespace DotnetSpider.Core.Test
 			}
 			spider.RunAsync();
 			Thread.Sleep(5000);
-			spider.Stop();
+			spider.Pause();
 			Thread.Sleep(5000);
 			spider.RunAsync();
 			Thread.Sleep(5000);
@@ -134,7 +134,7 @@ namespace DotnetSpider.Core.Test
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
 			spider.Run();
 
-			Assert.AreEqual(Status.Finished, spider.StatusCode);
+			Assert.AreEqual(Status.Finished, spider.Stat);
 		}
 
 		public class TestPipeline : BasePipeline
@@ -164,7 +164,7 @@ namespace DotnetSpider.Core.Test
 			spider.RetryWhenResultIsEmpty = true;
 			spider.Run();
 
-			Assert.AreEqual(Status.Finished, spider.StatusCode);
+			Assert.AreEqual(Status.Finished, spider.Stat);
 		}
 
 		//[TestMethod]

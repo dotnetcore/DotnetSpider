@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{430F0199-088B-43E2-BB8E-2C14C62F69C1}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DotnetSpider.Core.Test</RootNamespace>
     <AssemblyName>DotnetSpider.Core.Test</AssemblyName>
@@ -32,7 +32,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CookieInjectorTest.cs" />
     <Compile Include="Downloader\DownloadHanlderTest.cs" />
     <Compile Include="Downloader\HttpClientDownloaderTest.cs" />
     <Compile Include="Downloader\TestDownloader.cs" />

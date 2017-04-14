@@ -106,8 +106,8 @@ namespace DotnetSpider.Core.Scheduler
 
 		public override void Dispose()
 		{
-			base.Dispose();
 			_queue.Clear();
+			base.Dispose();
 		}
 	}
 }

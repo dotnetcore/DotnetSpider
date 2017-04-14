@@ -280,7 +280,7 @@ namespace DotnetSpider.Extension.Model
 				var arguments = PrepareArguments(data);
 				if (!string.IsNullOrEmpty(CookieString))
 				{
-					spider.Site.CookiesStringPart = string.Format(CookieString, arguments.Cast<object>().ToArray());
+					spider.Site.Cookies.StringPart = string.Format(CookieString, arguments.Cast<object>().ToArray());
 				}
 				for (int i = From; i <= To; i += Interval)
 				{

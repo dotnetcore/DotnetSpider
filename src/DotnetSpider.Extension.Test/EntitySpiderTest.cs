@@ -28,8 +28,8 @@ namespace DotnetSpider.Extension.Test
 		{
 			public MyEntitySpider1(Site site) : base(site)
 			{
-				RedisHost = "redis";
-				RedisPassword = "test";
+				//RedisHost = "redis";
+				//RedisPassword = "test";
 			}
 		}
 
@@ -171,7 +171,7 @@ namespace DotnetSpider.Extension.Test
 				context.EmptySleepTime = 5000;
 				context.SetEmptySleepTime(5000);
 				context.ExitWhenComplete = true;
-				context.SetCachedSize(1);
+				context.CachedSize = 1;
 				context.SetDownloader(new HttpClientDownloader());
 				context.SetScheduler(new QueueDuplicateRemovedScheduler());
 

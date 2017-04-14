@@ -1,4 +1,5 @@
 using DotnetSpider.Core;
+using DotnetSpider.Core.Downloader;
 using System.Collections.Generic;
 using System.IO;
 
@@ -19,34 +20,11 @@ using OpenQA.Selenium.Remote;
 
 namespace DotnetSpider.Extension.Downloader
 {
-	public enum WebBrowser
-	{
-		Chrome,
-		Firefox
-	}
-	public class SiteCookie
-	{
-		public string CookiesStringPart { get; set; }
-		public Dictionary<string, string> CookiesDictionary = new Dictionary<string, string>();
-	}
-
-	public abstract class CookieInterceptor : Named
-	{
-		public abstract SiteCookie GetCookie();
-	}
-
-	public class DataBaseCookieInterceptor : CookieInterceptor
-	{
-		public override SiteCookie GetCookie()
-		{
-			return new SiteCookie();
-		}
-	}
-
 #if !NET_CORE
-	public abstract class WebDriverCookieInterceptor : CookieInterceptor
+	public abstract class WebDriverCookieInjector : CookieInjector
 	{
-		public WebBrowser Browser { get; set; } = WebBrowser.Chrome;
+		public Browser Browser { get; set; } = Browser.Chrome;
+
 		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
 		{
 			switch (element.Type)
@@ -69,7 +47,7 @@ namespace DotnetSpider.Extension.Downloader
 			RemoteWebDriver webDriver = null;
 			switch (Browser)
 			{
-				case WebBrowser.Chrome:
+				case Browser.Chrome:
 					{
 						ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
 						cds.HideCommandPromptWindow = true;
@@ -78,7 +56,7 @@ namespace DotnetSpider.Extension.Downloader
 						webDriver = new ChromeDriver(cds, opt);
 						break;
 					}
-				case WebBrowser.Firefox:
+				case Browser.Firefox:
 					{
 						string path = System.Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
 						string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
@@ -105,12 +83,12 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class FiddlerLoginCookieInterceptor : CommonCookieInterceptor
+	public class FiddlerLoginCookieInjector : CommonCookieInjector
 	{
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
 
-		public override SiteCookie GetCookie()
+		protected override Cookies GetCookies(Site site)
 		{
 			if (string.IsNullOrEmpty(Pattern))
 			{
@@ -123,7 +101,7 @@ namespace DotnetSpider.Extension.Downloader
 				fiddlerWrapper.StartCapture(true);
 				try
 				{
-					base.GetCookie();
+					base.GetCookies(site);
 					var header = fiddlerWrapper.Headers;
 					const string cookiesPattern = @"Cookie: (.*?)\r\n";
 					cookie = Regex.Match(header, cookiesPattern).Groups[1].Value;
@@ -136,11 +114,11 @@ namespace DotnetSpider.Extension.Downloader
 				fiddlerWrapper.StopCapture();
 			}
 
-			return new SiteCookie { CookiesStringPart = cookie };
+			return new Cookies { StringPart = cookie };
 		}
 	}
 
-	public class CommonCookieInterceptor : WebDriverCookieInterceptor
+	public class CommonCookieInjector : WebDriverCookieInjector
 	{
 		public string Url { get; set; }
 
@@ -158,7 +136,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public Selector LoginAreaSelector { get; set; }
 
-		public override SiteCookie GetCookie()
+		protected override Cookies GetCookies(Site site)
 		{
 			var cookies = new Dictionary<string, string>();
 
@@ -226,7 +204,7 @@ namespace DotnetSpider.Extension.Downloader
 				return null;
 			}
 
-			return new SiteCookie { CookiesDictionary = cookies };
+			return new Cookies { PairPart = cookies };
 		}
 	}
 #endif

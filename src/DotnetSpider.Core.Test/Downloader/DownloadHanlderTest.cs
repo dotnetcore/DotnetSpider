@@ -182,9 +182,9 @@ namespace DotnetSpider.Core.Test.Downloader
 			{
 				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 				{
-					new RetryWhenContainsIllegalStringHandler
+					new RetryWhenContainsHandler
 					{
-						ContainString = "aabbcccdefg下载人数100"
+						Content = "aabbcccdefg下载人数100"
 					}
 				}
 			};
@@ -196,9 +196,9 @@ namespace DotnetSpider.Core.Test.Downloader
 			{
 				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 				{
-					new RetryWhenContainsIllegalStringHandler
+					new RetryWhenContainsHandler
 					{
-						ContainString = "网易倒闭啦"
+						Content = "网易倒闭啦"
 					}
 				}
 			};

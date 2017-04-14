@@ -29,7 +29,6 @@ namespace DotnetSpider.Core
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 
 		protected int WaitInterval { get; private set; } = 10;
-		protected Status Stat = Status.Init;
 		protected IScheduler _scheduler;
 
 		#region ITask
@@ -40,7 +39,7 @@ namespace DotnetSpider.Core
 
 		#endregion
 
-		public Status StatusCode => Stat;
+		public Status Stat { get; private set; }
 		public event SpiderEvent OnSuccess;
 		public event SpiderClosingHandler SpiderClosing;
 
@@ -49,8 +48,8 @@ namespace DotnetSpider.Core
 		public long AvgPipelineSpeed { get; private set; }
 
 		private int _waitCountLimit = 1500;
+		private bool _isPaused;
 		private bool _init;
-		private static bool _printedInfo;
 		private FileInfo _errorRequestFile;
 		private readonly object _avgDownloadTimeLocker = new object();
 		private readonly object _avgProcessorTimeLocker = new object();
@@ -68,6 +67,7 @@ namespace DotnetSpider.Core
 		private Site _site;
 		private IMonitor _monitor;
 		private Task _monitorTask;
+		private ICookieInjector _cookieInjector;
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -125,6 +125,7 @@ namespace DotnetSpider.Core
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
+			PrintInfo();
 		}
 
 		/// <summary>
@@ -205,11 +206,6 @@ namespace DotnetSpider.Core
 				processor.Site = Site;
 			}
 
-			if (_pipelines.Count == 0)
-			{
-				throw new SpiderException("Pipeline should not be null.");
-			}
-
 			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
 			Downloader = Downloader ?? new HttpClientDownloader();
 		}
@@ -266,6 +262,19 @@ namespace DotnetSpider.Core
 			{
 				CheckIfRunning();
 				_downloader = value;
+			}
+		}
+
+		public ICookieInjector CookieInjector
+		{
+			get
+			{
+				return _cookieInjector;
+			}
+			set
+			{
+				CheckIfRunning();
+				_cookieInjector = value;
 			}
 		}
 
@@ -567,36 +576,42 @@ namespace DotnetSpider.Core
 			return this;
 		}
 
-		public void InitComponent()
+		protected virtual void PreInitComponent(params string[] arguments) { }
+
+		protected virtual void AfterInitComponent(params string[] arguments) { }
+
+		protected virtual void InitComponent(params string[] arguments)
 		{
 			if (_init)
 			{
 				return;
 			}
 
+			this.Log("构建内部模块、准备爬虫数据...", LogLevel.Info);
+
+			PreInitComponent(arguments);
+
 			if (Pipelines == null || Pipelines.Count == 0)
 			{
 				throw new SpiderException("Pipelines should not be null.");
 			}
 
-			_monitor = IocManager.Resolve<IMonitor>();
-			if (_monitor == null)
+			_monitor = IocManager.Resolve<IMonitor>() ?? new NLogMonitor();
+
+			if (CookieInjector != null)
 			{
-				_monitor = new NLogMonitor();
+				CookieInjector.Inject(this, false);
 			}
 
 			Scheduler.Init(this);
 
 			_monitorTask = Task.Factory.StartNew(() =>
 			{
-				var monitor = GetMonitor();
-				while (!_scheduler.IsExited)
+				while (!Monitorable.IsExited)
 				{
 					ReportStatus();
-
 					Thread.Sleep(2000);
 				}
-				monitor.IsExited = true;
 				ReportStatus();
 			});
 
@@ -637,29 +652,42 @@ namespace DotnetSpider.Core
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
 
+			AfterInitComponent(arguments);
+
 			_init = true;
 		}
 
 		public virtual void Run(params string[] arguments)
 		{
-			CheckIfRunning();
+			if (Stat == Status.Running)
+			{
+				this.Log("任务运行中...", LogLevel.Warn);
+				return;
+			}
 
 			CheckIfSettingsCorrect();
 
-			Stat = Status.Running;
-			_scheduler.IsExited = false;
+			Monitorable.IsExited = false;
 
 #if !NET_CORE
 			// 开启多线程支持
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
 
-			InitComponent();
+			InitComponent(arguments);
+
+			if (arguments.Contains("running-test"))
+			{
+				_scheduler.IsExited = true;
+				return;
+			}
 
 			if (StartTime == DateTime.MinValue)
 			{
 				StartTime = DateTime.Now;
 			}
+
+			Stat = Status.Running;
 
 			Parallel.For(0, ThreadNum, new ParallelOptions
 			{
@@ -671,8 +699,13 @@ namespace DotnetSpider.Core
 
 				var downloader = Downloader.Clone();
 
-				while (Stat == Status.Running)
+				while (Stat == Status.Running || Stat == Status.Stopped)
 				{
+					if (Stat != Status.Running)
+					{
+						Thread.Sleep(50);
+						continue;
+					}
 					Request request = Scheduler.Poll();
 
 					if (request == null)
@@ -722,55 +755,28 @@ namespace DotnetSpider.Core
 
 			FinishedTime = DateTime.Now;
 
-			foreach (IPipeline pipeline in Pipelines)
-			{
-				SafeDestroy(pipeline);
-			}
-
-			SpiderClosing?.Invoke();
-
-			if (!_scheduler.IsExited)
-			{
-				_scheduler.IsExited = true;
-			}
+			OnClose();
 
 			this.Log($"等待监控进程退出.", LogLevel.Info);
 			_monitorTask.Wait();
 
-			Scheduler.Dispose();
+			SpiderClosing?.Invoke();
 
-			if (Stat == Status.Finished)
-			{
-				OnClose();
-				this.Log($"结束采集, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
-			}
-
-			if (Stat == Status.Stopped)
-			{
-				this.Log($"暂停采集, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
-			}
-
-			if (Stat == Status.Exited)
-			{
-				this.Log($"退出采集, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
-			}
+			var msg = Stat == Status.Finished ? "结束采集" : "退出采集";
+			this.Log($"{msg}, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
 		}
 
 		public static void PrintInfo()
 		{
-			if (!_printedInfo)
-			{
-				Console.WriteLine("=============================================================");
-				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
-				Console.WriteLine("== It's a light, stable, high performce spider             ==");
-				Console.WriteLine("== Support multi thread, ajax page, http                   ==");
-				Console.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
-				Console.WriteLine("== License: LGPL3.0                                        ==");
-				Console.WriteLine("== Version: 0.9.10                                         ==");
-				Console.WriteLine("== Author: zlzforever@163.com                              ==");
-				Console.WriteLine("=============================================================");
-				_printedInfo = true;
-			}
+			Console.WriteLine("=============================================================");
+			Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
+			Console.WriteLine("== It's a light, stable, high performce spider             ==");
+			Console.WriteLine("== Support multi thread, ajax page, http                   ==");
+			Console.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
+			Console.WriteLine("== License: LGPL3.0                                        ==");
+			Console.WriteLine("== Version: 1.3.0-rc1                                      ==");
+			Console.WriteLine("== Author: zlzforever@163.com                              ==");
+			Console.WriteLine("=============================================================");
 		}
 
 		public Task RunAsync(params string[] arguments)
@@ -778,26 +784,34 @@ namespace DotnetSpider.Core
 			return Task.Factory.StartNew(() =>
 			{
 				Run(arguments);
-			}).ContinueWith(t =>
-			{
-				if (t.Exception != null)
-				{
-					this.Log(t.Exception.Message, LogLevel.Error);
-				}
 			});
 		}
 
-		public void Stop()
+		public void Pause()
 		{
 			Stat = Status.Stopped;
+			_isPaused = true;
 			this.Log("停止任务中...", LogLevel.Warn);
+		}
+
+		public void Contiune()
+		{
+			if (_isPaused)
+			{
+				Stat = Status.Running;
+				_isPaused = false;
+				this.Log("任务继续...", LogLevel.Warn);
+			}
+			else
+			{
+				this.Log("任务未暂停, 不能执行继续操作...", LogLevel.Warn);
+			}
 		}
 
 		public void Exit()
 		{
 			Stat = Status.Exited;
 			this.Log("退出任务中...", LogLevel.Warn);
-			SpiderClosing?.Invoke();
 		}
 
 		protected void OnClose()
@@ -912,7 +926,7 @@ namespace DotnetSpider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				this.Log($"下载{request.Url}失败:{de.Message}", LogLevel.Warn);
+				this.Log($"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
 			}
 			catch (Exception e)
 			{
@@ -997,7 +1011,7 @@ namespace DotnetSpider.Core
 		{
 			if (Stat == Status.Running)
 			{
-				throw new SpiderException("Spider is already running!");
+				throw new SpiderException("Spider is running.");
 			}
 		}
 
@@ -1034,16 +1048,16 @@ namespace DotnetSpider.Core
 
 		private void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
 		{
-			Stop();
+			Pause();
 			while (!_scheduler.IsExited)
 			{
 				Thread.Sleep(1500);
 			}
 		}
 
-		public IMonitorable GetMonitor()
+		public IMonitorable Monitorable
 		{
-			return Scheduler;
+			get { return Scheduler; }
 		}
 
 		public void Dispose()
@@ -1092,20 +1106,18 @@ namespace DotnetSpider.Core
 		{
 			if (_monitor.IsEnabled)
 			{
-				var monitorable = GetMonitor();
-
 				_monitor.Report(new SpiderStatus
 				{
-					Status = StatusCode.ToString(),
-					Code = StatusCode.ToString(),
-					Error = monitorable.GetErrorRequestsCount(),
+					Status = Stat.ToString(),
+					Code = Stat.ToString(),
+					Error = Monitorable.GetErrorRequestsCount(),
 					Identity = Identity,
-					Left = monitorable.GetLeftRequestsCount(),
+					Left = Monitorable.GetLeftRequestsCount(),
 					Machine = SystemInfo.HostName,
-					Success = monitorable.GetSuccessRequestsCount(),
+					Success = Monitorable.GetSuccessRequestsCount(),
 					TaskGroup = TaskGroup,
 					ThreadNum = ThreadNum,
-					Total = monitorable.GetTotalRequestsCount(),
+					Total = Monitorable.GetTotalRequestsCount(),
 					UserId = UserId,
 					Timestamp = DateTime.Now.ToString(CultureInfo.InvariantCulture),
 					AvgDownloadSpeed = AvgDownloadSpeed,

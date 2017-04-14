@@ -9,6 +9,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader.WebDriver;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Sample
 {

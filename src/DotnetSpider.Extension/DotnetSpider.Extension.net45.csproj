@@ -42,14 +42,13 @@
     <Compile Include="Common\SelectorUtil.cs" />
     <Compile Include="Configuration\JsonSpiderContext.cs" />
     <Compile Include="DataSource.cs" />
-    <Compile Include="Downloader\CookieInterceptor.cs" />
+    <Compile Include="Downloader\CookieInjector.cs" />
     <Compile Include="Downloader\DownloadCompleteHandler.cs" />
     <Compile Include="Downloader\FiddlerDownloader.cs" />
     <Compile Include="Downloader\FileCacheDownloader.cs" />
     <Compile Include="Downloader\FileDownloader.cs" />
     <Compile Include="Downloader\SignIner.cs" />
     <Compile Include="Downloader\TargetUrlsCreator.cs" />
-    <Compile Include="Downloader\WebDriver\Browser.cs" />
     <Compile Include="Downloader\WebDriver\IWebDriverHandler.cs" />
     <Compile Include="Downloader\WebDriver\Option.cs" />
     <Compile Include="Downloader\WebDriver\WebDriverDownloader.cs" />

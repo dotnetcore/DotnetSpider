@@ -70,7 +70,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				foreach (var handler in DownloadCompleteHandlers)
 				{
-					var success = handler.Handle(page);
+					var success = handler.Handle(page, spider);
 					if (!success)
 					{
 						break;

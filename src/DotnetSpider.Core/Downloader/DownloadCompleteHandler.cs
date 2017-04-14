@@ -8,29 +8,62 @@ using HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Downloader
 {
-	public interface IDownloadCompleteHandler
-	{
-		bool Handle(Page page);
-	}
-
 	public abstract class DownloadCompleteHandler : Named, IDownloadCompleteHandler
 	{
-		public abstract bool Handle(Page page);
+		public abstract bool Handle(Page page, ISpider spider);
 	}
 
-	#region Content Handler
-	public class SkipWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	public class UpdateCookieWhenContainsHandler : DownloadCompleteHandler
 	{
-		public string ContainsString { get; set; }
+		public ICookieInjector CookieInjector { get; set; }
+		public string Content { get; set; }
 
-		public override bool Handle(Page page)
+		public override bool Handle(Page page, ISpider spider)
 		{
-			string rawText = page.Content;
-			if (string.IsNullOrEmpty(rawText))
+			if (!string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
 			{
-				throw new DownloadException("Download failed or response is null.");
+				CookieInjector?.Inject(spider);
 			}
-			if (rawText.Contains(ContainsString))
+			throw new DownloadException($"Content downloaded contains string: {Content}.");
+		}
+	}
+
+	public class TimerUpdateCookieHandler : DownloadCompleteHandler
+	{
+		public ICookieInjector CookieInjector { get; private set; }
+		public int Interval { get; private set; }
+		protected DateTime Next { get; set; }
+
+		public TimerUpdateCookieHandler(int interval, ICookieInjector injector)
+		{
+			Interval = interval;
+			CookieInjector = injector;
+			Next = DateTime.Now.AddSeconds(Interval);
+		}
+
+		public override bool Handle(Page page, ISpider spider)
+		{
+			if (DateTime.Now > Next)
+			{
+				CookieInjector?.Inject(spider);
+				Next = DateTime.Now.AddSeconds(Interval);
+			}
+
+			return true;
+		}
+	}
+
+	public class SkipWhenContainsHandler : DownloadCompleteHandler
+	{
+		public string Content { get; set; }
+
+		public override bool Handle(Page page, ISpider spider)
+		{
+			if (string.IsNullOrEmpty(page.Content))
+			{
+				return true;
+			}
+			if (page.Content.Contains(Content))
 			{
 				page.IsSkip = true;
 				return false;
@@ -39,34 +72,21 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class MissTargetUrlWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	public class MissTargetUrlWhenNotContainsHandler : DownloadCompleteHandler
 	{
-		public string String { get; set; }
-		public bool IsContain { get; set; }
+		public string Content { get; set; }
 
-		public override bool Handle(Page page)
+		public override bool Handle(Page page, ISpider spider)
 		{
-			string rawText = page.Content;
-			if (string.IsNullOrEmpty(rawText))
+			if (string.IsNullOrEmpty(page.Content))
 			{
-				throw new DownloadException("Download failed or response is null.");
+				return true;
 			}
 
-			if (IsContain)
+			if (!page.Content.Contains(Content))
 			{
-				if (rawText.Contains(String))
-				{
-					page.MissExtractTargetUrls = true;
-					page.MissTargetUrls = true;
-				}
-			}
-			else
-			{
-				if (!rawText.Contains(String))
-				{
-					page.MissExtractTargetUrls = true;
-					page.MissTargetUrls = true;
-				}
+				page.MissExtractTargetUrls = true;
+				page.MissTargetUrls = true;
 			}
 			return true;
 		}
@@ -79,7 +99,7 @@ namespace DotnetSpider.Core.Downloader
 		public int StartOffset { get; set; } = 0;
 		public int EndOffset { get; set; } = 0;
 
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
 			string rawText = p.Content;
 
@@ -111,7 +131,7 @@ namespace DotnetSpider.Core.Downloader
 		public int EndOffset { get; set; } = 0;
 		public bool RemoveAll { get; set; } = false;
 
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
 			string rawText = p.Content;
 
@@ -141,9 +161,9 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class RemoveContentHtmlTagHandler : DownloadCompleteHandler
+	public class RemoveHtmlTagHandler : DownloadCompleteHandler
 	{
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
 			var htmlDocument = new HtmlDocument();
 			htmlDocument.LoadHtml(p.Content);
@@ -152,22 +172,27 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class ContentToUpperOrLowerHandler : DownloadCompleteHandler
+	public class ContentToUpperHandler : DownloadCompleteHandler
 	{
-		public bool ToUpper { get; set; } = false;
-
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
-			if (string.IsNullOrEmpty(p.Content))
-			{
-				return false;
-			}
-			p.Content = ToUpper ? p.Content.ToUpper() : p.Content.ToLower();
+			p.Content = p.Content ?? p.Content.ToUpper();
 			return true;
 		}
 	}
 
-	public class CustomContentHandler : DownloadCompleteHandler
+	public class ContentToLowerHandler : DownloadCompleteHandler
+	{
+		public bool ToUpper { get; set; } = false;
+
+		public override bool Handle(Page p, ISpider spider)
+		{
+			p.Content = p.Content ?? p.Content.ToLower();
+			return true;
+		}
+	}
+
+	public class CustomizeContentHandler : DownloadCompleteHandler
 	{
 		public bool Loop { get; set; } = true;
 		public bool DisableNewLine { get; set; } = false;
@@ -177,7 +202,7 @@ namespace DotnetSpider.Core.Downloader
 		public int EndOffset { get; set; } = 0;
 		public string TargetTag { get; set; } = "my_target";
 
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
 			string rawText = p.Content;
 			rawText = rawText.Replace("script", "div");
@@ -222,7 +247,7 @@ namespace DotnetSpider.Core.Downloader
 		public string OldValue { get; set; }
 		public string NewValue { get; set; }
 
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
 			p.Content = p.Content?.Replace(OldValue, NewValue);
 			return true;
@@ -231,18 +256,21 @@ namespace DotnetSpider.Core.Downloader
 
 	public class TrimContentHandler : DownloadCompleteHandler
 	{
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
-			p.Content = p.Content?.Trim();
+			p.Content = p.Content ?? p.Content.Trim();
 			return true;
 		}
 	}
 
 	public class UnescapeContentHandler : DownloadCompleteHandler
 	{
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
-			p.Content = Regex.Unescape(p.Content);
+			if (!string.IsNullOrEmpty(p.Content))
+			{
+				p.Content = Regex.Unescape(p.Content);
+			}
 			return true;
 		}
 	}
@@ -251,7 +279,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Pattern { get; set; }
 
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
 			string textValue = string.Empty;
 			MatchCollection collection = Regex.Matches(p.Content, Pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase);
@@ -264,15 +292,18 @@ namespace DotnetSpider.Core.Downloader
 			return true;
 		}
 	}
-	#endregion
 
-	public class RetryWhenContainsIllegalStringHandler : DownloadCompleteHandler
+	public class RetryWhenContainsHandler : DownloadCompleteHandler
 	{
-		public string ContainString { get; set; }
+		public string Content { get; set; }
 
-		public override bool Handle(Page p)
+		public override bool Handle(Page p, ISpider spider)
 		{
-			if (p.Content.Contains(ContainString))
+			if (string.IsNullOrEmpty(p.Content))
+			{
+				return true;
+			}
+			if (p.Content.Contains(Content))
 			{
 				Request r = (Request)p.Request.Clone();
 				p.AddTargetRequest(r);

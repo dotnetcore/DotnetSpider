@@ -25,13 +25,13 @@ namespace DotnetSpider.Redial
 		{
 			if (redialer == null || validater == null)
 			{
-				throw new RedialException("IWaitRedial should not be null.");
+				throw new RedialException("IRedialer, validatershould not be null.");
 			}
 			Redialer = redialer;
 			InternetDetector = validater;
 		}
 
-		public RedialResult Redial()
+		public RedialResult Redial(Action action = null)
 		{
 			if (CheckIsRedialing())
 			{
@@ -60,12 +60,15 @@ namespace DotnetSpider.Redial
 
 					Thread.Sleep(2000);
 					LogCenter.Log(null, "Redial finished.", LogLevel.Warn);
+
+					action?.Invoke();
+
 					return RedialResult.Sucess;
 				}
 				catch (IOException)
 				{
 					// 有极小可能同时调用File.Open时抛出异常
-					return Redial();
+					return Redial(action);
 				}
 				catch (Exception)
 				{
@@ -99,7 +102,7 @@ namespace DotnetSpider.Redial
 			}
 		}
 
-		public void Execute(string name, Action<object> action, object obj)
+		public void Execute(string name, Action<dynamic> action, dynamic obj)
 		{
 			WaitRedialExit();
 
@@ -131,7 +134,7 @@ namespace DotnetSpider.Redial
 			}
 		}
 
-		public T Execute<T>(string name, Func<object, T> func, object obj)
+		public T Execute<T>(string name, Func<dynamic, T> func, dynamic obj)
 		{
 			WaitRedialExit();
 

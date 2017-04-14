@@ -85,11 +85,11 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 
 				var domainUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}";
 				var options = _webDriver.Manage();
-				if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies.Count > 0)
+				if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies.PairPart.Count > 0)
 				{
 					_webDriver.Url = domainUrl;
 					options.Cookies.DeleteAllCookies();
-					foreach (var c in spider.Site.Cookies)
+					foreach (var c in spider.Site.Cookies.PairPart)
 					{
 						options.Cookies.AddCookie(new Cookie(c.Key, c.Value));
 					}

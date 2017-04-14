@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace DotnetSpider.Sample
 {
@@ -9,9 +10,6 @@ namespace DotnetSpider.Sample
 		{
 			CasSpider spider = new CasSpider();
 			spider.Run();
-			//ShanxizhaoshengSpider spider = new ShanxizhaoshengSpider();
-			//spider.Run();
-
 			// Crawler pages traversal 遍历整站
 			BaseUsage.CrawlerPagesTraversal();
 			Console.WriteLine("Press any key to continue...");

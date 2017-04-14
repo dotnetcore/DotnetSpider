@@ -4,10 +4,23 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public class NetworkCenter
 	{
-		private static NetworkCenter _instance;
+		private bool _isEnabled = true;
+
 		public INetworkExecutor Executor { get; set; }
 
-		public static NetworkCenter Current => _instance ?? (_instance = new NetworkCenter());
+		public static readonly Lazy<NetworkCenter> _instance = new Lazy<NetworkCenter>(() =>
+		{
+			return new NetworkCenter();
+		});
+
+		public static NetworkCenter Current
+		{
+			get { return _instance.Value; }
+		}
+
+		private NetworkCenter()
+		{
+		}
 
 		public void Register(INetworkExecutor executor)
 		{
@@ -26,7 +39,7 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
-		public void Execute(string name, Action<object> action, object obj)
+		public void Execute(string name, Action<dynamic> action, dynamic obj)
 		{
 			if (Executor != null)
 			{
@@ -50,7 +63,7 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
-		public T Execute<T>(string name, Func<object, T> func, object obj)
+		public T Execute<T>(string name, Func<dynamic, T> func, dynamic obj)
 		{
 			if (Executor != null)
 			{
@@ -60,6 +73,16 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				return func(obj);
 			}
+		}
+
+		public void Disable()
+		{
+			_isEnabled = false;
+		}
+
+		public void Enable()
+		{
+			_isEnabled = true;
 		}
 	}
 }

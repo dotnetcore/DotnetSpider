@@ -1,7 +1,13 @@
-﻿namespace DotnetSpider.Core
+﻿using System.Threading.Tasks;
+
+namespace DotnetSpider.Core
 {
 	public interface IRunable
 	{
+		Task RunAsync(params string[] arguments);
 		void Run(params string[] arguments);
+		void Pause();
+		void Exit();
+		void Contiune();
 	}
 }
