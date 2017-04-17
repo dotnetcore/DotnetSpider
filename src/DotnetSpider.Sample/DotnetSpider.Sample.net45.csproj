@@ -65,10 +65,6 @@
       <Project>{0d7eeda6-f7d4-4cc0-8c60-d950bc43d1f7}</Project>
       <Name>DotnetSpider.Extension.net45</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DotnetSpider.Redial\DotnetSpider.Redial.net45.csproj">
-      <Project>{0e2e2062-f924-4efb-97cf-d36a7b5493f6}</Project>
-      <Name>DotnetSpider.Redial.net45</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotnetSpider.Extension.Common
+namespace DotnetSpider.Extension.Infrastructure
 {
 	/// <summary>
 	/// 代码用户直接调用此类的值用于拼接URL

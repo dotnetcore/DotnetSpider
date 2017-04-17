@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Core.net45", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Core.Test.net45", "src\DotnetSpider.Core.Test\DotnetSpider.Core.Test.net45.csproj", "{430F0199-088B-43E2-BB8E-2C14C62F69C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Redial.net45", "src\DotnetSpider.Redial\DotnetSpider.Redial.net45.csproj", "{0E2E2062-F924-4EFB-97CF-D36A7B5493F6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension.net45", "src\DotnetSpider.Extension\DotnetSpider.Extension.net45.csproj", "{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension.Test.net45", "src\DotnetSpider.Extension.Test\DotnetSpider.Extension.Test.net45.csproj", "{6E57AD2D-F3D2-4388-A5B1-AD437929577C}"
@@ -45,10 +43,6 @@ Global
 		{430F0199-088B-43E2-BB8E-2C14C62F69C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{430F0199-088B-43E2-BB8E-2C14C62F69C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{430F0199-088B-43E2-BB8E-2C14C62F69C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0E2E2062-F924-4EFB-97CF-D36A7B5493F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E2E2062-F924-4EFB-97CF-D36A7B5493F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E2E2062-F924-4EFB-97CF-D36A7B5493F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E2E2062-F924-4EFB-97CF-D36A7B5493F6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}.Release|Any CPU.ActiveCfg = Release|Any CPU

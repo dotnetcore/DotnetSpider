@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Core.Test", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension", "src\DotnetSpider.Extension\DotnetSpider.Extension.csproj", "{AB496600-ABF5-494A-B07B-A36D9C2D0455}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Redial", "src\DotnetSpider.Redial\DotnetSpider.Redial.csproj", "{AA4F0B9A-3244-4103-B5AA-4E0E25B0425E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension.Test", "src\DotnetSpider.Extension.Test\DotnetSpider.Extension.Test.csproj", "{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Sample", "src\DotnetSpider.Sample\DotnetSpider.Sample.csproj", "{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}"
@@ -31,7 +29,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{C74A404F
 	ProjectSection(SolutionItems) = preProject
 		nuget\DotnetSpider.Core.nuspec = nuget\DotnetSpider.Core.nuspec
 		nuget\DotnetSpider.Extension.nuspec = nuget\DotnetSpider.Extension.nuspec
-		nuget\DotnetSpider.Redial.nuspec = nuget\DotnetSpider.Redial.nuspec
 	EndProjectSection
 EndProject
 Global
@@ -60,10 +57,6 @@ Global
 		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA4F0B9A-3244-4103-B5AA-4E0E25B0425E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA4F0B9A-3244-4103-B5AA-4E0E25B0425E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA4F0B9A-3244-4103-B5AA-4E0E25B0425E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA4F0B9A-3244-4103-B5AA-4E0E25B0425E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Release|Any CPU.ActiveCfg = Release|Any CPU

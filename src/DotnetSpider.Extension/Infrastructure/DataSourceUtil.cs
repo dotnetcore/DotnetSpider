@@ -3,7 +3,7 @@ using MySql.Data.MySqlClient;
 using System.Data.Common;
 using System.Data.SqlClient;
 
-namespace DotnetSpider.Extension.Common
+namespace DotnetSpider.Extension.Infrastructure
 {
 	public class DataSourceUtil
 	{

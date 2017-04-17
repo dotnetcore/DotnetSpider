@@ -22,12 +22,7 @@ namespace DotnetSpider.Sample
 				Identity = "JD Shop details " + DateTimeUtils.RunIdOfMonday,
 				CachedSize = 1,
 				ThreadNum = 8,
-				Scheduler = new RedisScheduler
-				{
-					Host = "redis",
-					Port = 6379,
-					Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w"
-				},
+				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"),
 				Downloader = new HttpClientDownloader
 				{
 					DownloadCompleteHandlers = new IDownloadCompleteHandler[]

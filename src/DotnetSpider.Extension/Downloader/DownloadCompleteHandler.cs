@@ -2,7 +2,7 @@
 using System;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
-using DotnetSpider.Redial;
+using DotnetSpider.Extension.Redial;
 using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Downloader

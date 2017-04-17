@@ -2,6 +2,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using System.Collections.Generic;
 using System.IO;
+using DotnetSpider.Extension.Infrastructure;
 
 #if !NET_CORE
 

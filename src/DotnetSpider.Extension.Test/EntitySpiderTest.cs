@@ -106,11 +106,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			EntitySpider spider = new EntitySpider(new Site());
 			spider.Identity = Guid.NewGuid().ToString("N");
-			spider.SetScheduler(new RedisScheduler
-			{
-				Host = "localhost",
-				Password = "6GS9F2QTkP36GggE0c3XwVwI"
-			});
+			spider.SetScheduler(new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
 			spider.AddStartUrl("https://baidu.com");
 			spider.AddEntityPipeline(new ConsoleEntityPipeline());
 			spider.AddEntityType(typeof(TestEntity));

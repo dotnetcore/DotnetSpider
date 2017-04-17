@@ -9,7 +9,7 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json;
-using DotnetSpider.Redial;
+using DotnetSpider.Extension.Redial;
 using StackExchange.Redis;
 using DotnetSpider.Core.Infrastructure;
 using System.Net;
@@ -19,6 +19,7 @@ using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Core.Downloader;
+using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -27,19 +28,17 @@ namespace DotnetSpider.Extension
 {
 	public class EntitySpider : Spider
 	{
-		private const string InitStatusSetKey = "init-status";
-		private const string ValidateStatusKey = "validate-status";
+		private const string InitStatusSetKey = "dotnetspider:init-status";
+		private const string ValidateStatusKey = "dotnetspider:validate-status";
+		private IRedialExecutor _redialExecutor;
+
 		private int _cachedSize;
 
-		protected static ConnectionMultiplexer Redis;
-		protected static IDatabase Db;
-
-		[JsonIgnore]
-		public Action TaskFinished { get; set; }
 		[JsonIgnore]
 		public Action VerifyCollectedData { get; set; }
+		public Infrastructure.RedisConnection RedisConnection { get; private set; }
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
-		public RedialExecutor RedialExecutor { get; set; }
+
 		public PrepareStartUrls[] PrepareStartUrls { get; set; }
 		public List<BaseEntityPipeline> EntityPipelines { get; internal set; } = new List<BaseEntityPipeline>();
 
@@ -56,53 +55,17 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		static EntitySpider()
+		public IRedialExecutor RedialExecutor
 		{
-
-			var RedisHost = Configuration.GetValue("redis.host");
-			var RedisPassword = Configuration.GetValue("redis.password");
-			int port;
-			var RedisPort = int.TryParse(Configuration.GetValue("redis.port"), out port) ? port : 6379;
-
-
-			if (!string.IsNullOrEmpty(RedisHost))
+			get
 			{
-				try
-				{
-					var confiruation = new ConfigurationOptions()
-					{
-						ServiceName = "DotnetSpider",
-						Password = RedisPassword,
-						ConnectTimeout = 65530,
-						KeepAlive = 8,
-						ConnectRetry = 3,
-						ResponseTimeout = 3000
-					};
-#if NET_CORE
-					if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-					{
-						// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
-						var address = Dns.GetHostAddressesAsync(RedisHost).Result.FirstOrDefault();
-						if (address == null)
-						{
-							throw new SpiderException($"Can't resovle host: {RedisHost}");
-						}
-						confiruation.EndPoints.Add(new IPEndPoint(address, RedisPort));
-					}
-					else
-					{
-						confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
-					}
-#else
-					confiruation.EndPoints.Add(new DnsEndPoint(RedisHost, RedisPort));
-#endif
-					Redis = ConnectionMultiplexer.Connect(confiruation);
-					Db = Redis.GetDatabase(1);
-				}
-				catch (Exception e)
-				{
-					throw new SpiderException("Can't connect to redis server.", e);
-				}
+				return _redialExecutor;
+			}
+			set
+			{
+				CheckIfRunning();
+				_redialExecutor = value;
+				NetworkCenter.Current.Executor = RedialExecutor;
 			}
 		}
 
@@ -125,12 +88,6 @@ namespace DotnetSpider.Extension
 				throw new SpiderException("Need at least one entity pipeline.");
 			}
 
-			if (RedialExecutor != null)
-			{
-				RedialExecutor.Init();
-				NetworkCenter.Current.Executor = RedialExecutor;
-			}
-
 			foreach (var entity in Entities)
 			{
 				string entiyName = entity.Entity.Name;
@@ -151,14 +108,25 @@ namespace DotnetSpider.Extension
 			}
 
 			bool needInitStartRequest = true;
-			string key = "locker-" + Identity;
-			if (Db != null)
+			var redisConnectString = Configuration.GetValue("redis.connectString");
+			if (!string.IsNullOrEmpty(redisConnectString))
 			{
-				while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+				RedisConnection = Cache.Instance.Get(redisConnectString);
+				if (RedisConnection == null)
+				{
+					RedisConnection = new Infrastructure.RedisConnection(redisConnectString);
+					Cache.Instance.Set(redisConnectString, RedisConnection);
+				}
+			}
+
+
+			if (RedisConnection != null && RedisConnection.IsEnable)
+			{
+				while (!RedisConnection.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(10)))
 				{
 					Thread.Sleep(1000);
 				}
-				var lockerValue = Db.HashGet(InitStatusSetKey, Identity);
+				var lockerValue = RedisConnection.Database.HashGet(InitStatusSetKey, Identity);
 				needInitStartRequest = lockerValue != "init finished";
 			}
 
@@ -166,7 +134,10 @@ namespace DotnetSpider.Extension
 			{
 				Scheduler.Init(this);
 				Scheduler.Dispose();
-				Db?.HashDelete(ValidateStatusKey, Identity);
+				if (RedisConnection != null && RedisConnection.IsEnable)
+				{
+					RedisConnection.Database.HashDelete(ValidateStatusKey, Identity);
+				}
 				needInitStartRequest = true;
 			}
 
@@ -187,47 +158,20 @@ namespace DotnetSpider.Extension
 
 		protected override void AfterInitComponent(params string[] arguments)
 		{
-			string key = "locker-" + Identity;
-			Db?.LockRelease(key, 0);
+			if (RedisConnection != null && RedisConnection.IsEnable)
+			{
+				RedisConnection.Database.LockRelease(InitLockKey, 0);
+			}
 			base.AfterInitComponent(arguments);
 		}
 
-		//public override void Run(params string[] arguments)
-		//{
-		//	if (Stat == Status.Running)
-		//	{
-		//		this.Log("任务运行中...", LogLevel.Info);
-		//		return;
-		//	}
-
-		//	try
-		//	{
-
-		//		InitComponent();
-
-
-
-
-
-
-		//		if (!arguments.Contains("running-test"))
-		//		{
-		//			base.Run();
-		//		}
-		//		else
-		//		{
-		//			_scheduler.IsExited = true;
-		//		}
-
-		//		TaskFinished?.Invoke();
-
-		//		HandleVerifyCollectData();
-		//	}
-		//	finally
-		//	{
-		//		Dispose();
-		//	}
-		//}
+		protected string InitLockKey
+		{
+			get
+			{
+				return "dotnetspider:locker-" + Identity;
+			}
+		}
 
 		public EntitySpider AddEntityType(Type type)
 		{
@@ -286,19 +230,19 @@ namespace DotnetSpider.Extension
 			{
 				return;
 			}
-			string key = "locker-validate-" + Identity;
+			string key = "dotnetspider:locker-validate-" + Identity;
 
 			try
 			{
 				bool needInitStartRequest = true;
-				if (Redis != null)
+				if (RedisConnection != null && RedisConnection.IsEnable)
 				{
-					while (!Db.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+					while (!RedisConnection.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 					{
 						Thread.Sleep(1000);
 					}
 
-					var lockerValue = Db.HashGet(ValidateStatusKey, Identity);
+					var lockerValue = RedisConnection.Database.HashGet(ValidateStatusKey, Identity);
 					needInitStartRequest = lockerValue != "verify finished";
 				}
 				if (needInitStartRequest)
@@ -308,9 +252,9 @@ namespace DotnetSpider.Extension
 				}
 				this.Log("数据验证已完成.", LogLevel.Info);
 
-				if (needInitStartRequest && Redis != null)
+				if (needInitStartRequest && RedisConnection != null && RedisConnection.IsEnable)
 				{
-					Db.HashSet(ValidateStatusKey, Identity, "verify finished");
+					RedisConnection.Database.HashSet(ValidateStatusKey, Identity, "verify finished");
 				}
 			}
 			catch (Exception e)
@@ -320,20 +264,20 @@ namespace DotnetSpider.Extension
 			}
 			finally
 			{
-				if (Redis != null)
+				if (RedisConnection != null && RedisConnection.IsEnable)
 				{
-					Db.LockRelease(key, 0);
+					RedisConnection.Database.LockRelease(key, 0);
 				}
 			}
 		}
 
 		private void RegisterControl(ISpider spider)
 		{
-			if (Redis != null)
+			if (RedisConnection != null && RedisConnection.IsEnable)
 			{
 				try
 				{
-					Redis.GetSubscriber().Subscribe($"{spider.Identity}", (c, m) =>
+					RedisConnection.Subscriber.Subscribe($"{spider.Identity}", (c, m) =>
 					{
 						switch (m)
 						{

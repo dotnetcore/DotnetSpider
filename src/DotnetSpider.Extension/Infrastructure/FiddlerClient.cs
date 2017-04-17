@@ -7,7 +7,7 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Fiddler;
 
-namespace DotnetSpider.Extension
+namespace DotnetSpider.Extension.Infrastructure
 {
 	public class FiddlerClient : IDisposable
 	{

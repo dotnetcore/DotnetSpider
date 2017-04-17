@@ -3,7 +3,7 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 
-namespace DotnetSpider.Extension.Common
+namespace DotnetSpider.Extension.Infrastructure
 {
 	public class SelectorUtil
 	{

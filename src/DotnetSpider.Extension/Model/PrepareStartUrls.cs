@@ -5,7 +5,7 @@ using System.Linq;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
-using DotnetSpider.Extension.Common;
+using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Infrastructure;
 #if !NET_CORE
 using System.Web;

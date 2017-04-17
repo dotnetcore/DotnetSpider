@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using StackExchange.Redis;
 using System.Net;
+using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
 using System.Runtime.InteropServices;
 using System.Linq;
@@ -18,12 +19,12 @@ namespace DotnetSpider.Extension.Scheduler
 	/// </summary>
 	public sealed class RedisScheduler : DuplicateRemovedScheduler, IDuplicateRemover
 	{
-		public string Host { get; set; }
-		public int Port { get; set; } = 6379;
-		public string Password { get; set; }
+		public string ConnectString { get; private set; }
 
-		public const string TaskList = "task";
-		public const string TaskStatus = "task-status";
+		public RedisConnection RedisConnection { get; private set; }
+
+		public const string TaskList = "dotnetspider:task";
+		public const string TaskStatus = "dotnetspider:task-status";
 		private string _queueKey;
 		private string _setKey;
 		private string _itemKey;
@@ -31,66 +32,37 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _successCountKey;
 		private string _identityMd5;
 
-		private IDatabase _db;
-		private ConnectionMultiplexer _redis;
-
-		public RedisScheduler()
+		private RedisScheduler()
 		{
 			DuplicateRemover = this;
 		}
 
-		public RedisScheduler(string host, string password = null, int port = 6379) : this()
+		public RedisScheduler(string connectString) : this()
 		{
-			Host = host;
-			Password = password;
-			Port = port;
+			ConnectString = connectString;
 		}
 
 		public override void Init(ISpider spider)
 		{
 			base.Init(spider);
-
-			var confiruation = new ConfigurationOptions()
+			RedisConnection = Cache.Instance.Get(ConnectString);
+			if (RedisConnection == null)
 			{
-				ServiceName = "DotnetSpider",
-				Password = Password,
-				ConnectTimeout = 65530,
-				KeepAlive = 20,
-				ConnectRetry = 3,
-				ResponseTimeout = 5000
-			};
-#if NET_CORE
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				// Lewis: This is a Workaround for .NET CORE can't use EndPoint to create Socket.
-				var address = Dns.GetHostAddressesAsync(Host).Result.FirstOrDefault();
-				if (address == null)
-				{
-					throw new SpiderException("Can't resovle your host: " + Host);
-				}
-				confiruation.EndPoints.Add(new IPEndPoint(address, Port));
+				RedisConnection = new RedisConnection(ConnectString);
+				Cache.Instance.Set(ConnectString, RedisConnection);
 			}
-			else
-			{
-				confiruation.EndPoints.Add(new DnsEndPoint(Host, Port));
-			}
-#else
-			confiruation.EndPoints.Add(new DnsEndPoint(Host, Port));
-#endif
-			_redis = ConnectionMultiplexer.Connect(confiruation);
-			_db = _redis.GetDatabase(0);
 
 			var md5 = Encrypt.Md5Encrypt(spider.Identity);
-			_itemKey = "item-" + md5;
-			_setKey = "set-" + md5;
-			_queueKey = "queue-" + md5;
-			_errorCountKey = "error-record" + md5;
-			_successCountKey = "success-record" + md5;
+			_itemKey = "dotnetspider:item-" + md5;
+			_setKey = "dotnetspider:set-" + md5;
+			_queueKey = "dotnetspider:queue-" + md5;
+			_errorCountKey = "dotnetspider:error-record" + md5;
+			_successCountKey = "dotnetspider:success-record" + md5;
 			_identityMd5 = md5;
 
 			NetworkCenter.Current.Execute("rds-in", () =>
 			{
-				_db.SortedSetAdd(TaskList, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
+				RedisConnection.Database.SortedSetAdd(TaskList, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
 			});
 		}
 
@@ -98,7 +70,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			NetworkCenter.Current.Execute("rds-rs", () =>
 			{
-				_db.KeyDelete(_setKey);
+				RedisConnection.Database.KeyDelete(_setKey);
 			});
 		}
 
@@ -106,29 +78,27 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			return RetryExecutor.Execute(30, () =>
 			{
-				bool isDuplicate = _db.SetContains(_setKey, request.Identity);
+				bool isDuplicate = RedisConnection.Database.SetContains(_setKey, request.Identity);
 				if (!isDuplicate)
 				{
-					_db.SetAdd(_setKey, request.Identity);
+					RedisConnection.Database.SetAdd(_setKey, request.Identity);
 				}
 				return isDuplicate;
 			});
 		}
 
-		//[MethodImpl(MethodImplOptions.Synchronized)]
 		protected override void PushWhenNoDuplicate(Request request)
 		{
 			RetryExecutor.Execute(30, () =>
 			{
-				_db.ListRightPush(_queueKey, request.Identity);
+				RedisConnection.Database.ListRightPush(_queueKey, request.Identity);
 				string field = request.Identity;
 				string value = JsonConvert.SerializeObject(request);
 
-				_db.HashSet(_itemKey, field, value);
+				RedisConnection.Database.HashSet(_itemKey, field, value);
 			});
 		}
 
-		//[MethodImpl(MethodImplOptions.Synchronized)]
 		public override Request Poll()
 		{
 			return NetworkCenter.Current.Execute("rds-pl", () =>
@@ -138,11 +108,11 @@ namespace DotnetSpider.Extension.Scheduler
 					RedisValue value;
 					if (DepthFirst)
 					{
-						value = _db.ListRightPop(_queueKey);
+						value = RedisConnection.Database.ListRightPop(_queueKey);
 					}
 					else
 					{
-						value = _db.ListLeftPop(_queueKey);
+						value = RedisConnection.Database.ListLeftPop(_queueKey);
 					}
 					if (!value.HasValue)
 					{
@@ -150,12 +120,12 @@ namespace DotnetSpider.Extension.Scheduler
 					}
 					string field = value.ToString();
 
-					string json = _db.HashGet(_itemKey, field);
+					string json = RedisConnection.Database.HashGet(_itemKey, field);
 
 					if (!string.IsNullOrEmpty(json))
 					{
 						var result = JsonConvert.DeserializeObject<Request>(json);
-						_db.HashDelete(_itemKey, field);
+						RedisConnection.Database.HashDelete(_itemKey, field);
 						return result;
 					}
 					return null;
@@ -165,19 +135,19 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override long GetLeftRequestsCount()
 		{
-			return NetworkCenter.Current.Execute("rds-lc", () => _db.ListLength(_queueKey));
+			return NetworkCenter.Current.Execute("rds-lc", () => RedisConnection.Database.ListLength(_queueKey));
 		}
 
 		public override long GetTotalRequestsCount()
 		{
-			return NetworkCenter.Current.Execute("rds-tc", () => _db.SetLength(_setKey));
+			return NetworkCenter.Current.Execute("rds-tc", () => RedisConnection.Database.SetLength(_setKey));
 		}
 
 		public override long GetSuccessRequestsCount()
 		{
 			return NetworkCenter.Current.Execute("rds-src", () =>
 			{
-				var result = _db.HashGet(_successCountKey, _identityMd5);
+				var result = RedisConnection.Database.HashGet(_successCountKey, _identityMd5);
 				return result.HasValue ? (long)result : 0;
 			});
 		}
@@ -186,7 +156,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			return NetworkCenter.Current.Execute("rds-erc", () =>
 			{
-				var result = _db.HashGet(_errorCountKey, _identityMd5);
+				var result = RedisConnection.Database.HashGet(_errorCountKey, _identityMd5);
 				return result.HasValue ? (long)result : 0;
 			});
 		}
@@ -195,7 +165,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			NetworkCenter.Current.Execute("rds-isc", () =>
 			{
-				_db.HashIncrement(_successCountKey, _identityMd5);
+				RedisConnection.Database.HashIncrement(_successCountKey, _identityMd5);
 			});
 		}
 
@@ -203,17 +173,17 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			NetworkCenter.Current.Execute("rds-iec", () =>
 			{
-				_db.HashIncrement(_errorCountKey, _identityMd5);
+				RedisConnection.Database.HashIncrement(_errorCountKey, _identityMd5);
 			});
 		}
 
 		public override void Dispose()
 		{
-			_db.KeyDelete(_queueKey);
-			_db.KeyDelete(_setKey);
-			_db.KeyDelete(_itemKey);
-			_db.KeyDelete(_successCountKey);
-			_db.KeyDelete(_errorCountKey);
+			RedisConnection.Database.KeyDelete(_queueKey);
+			RedisConnection.Database.KeyDelete(_setKey);
+			RedisConnection.Database.KeyDelete(_itemKey);
+			RedisConnection.Database.KeyDelete(_successCountKey);
+			RedisConnection.Database.KeyDelete(_errorCountKey);
 			IsExited = true;
 		}
 
@@ -237,9 +207,9 @@ namespace DotnetSpider.Extension.Scheduler
 					{
 						--n;
 
-						_db.SetAdd(_setKey, identities);
-						_db.ListRightPush(_queueKey, identities);
-						_db.HashSet(_itemKey, items);
+						RedisConnection.Database.SetAdd(_setKey, identities);
+						RedisConnection.Database.ListRightPush(_queueKey, identities);
+						RedisConnection.Database.HashSet(_itemKey, items);
 
 						i = 0;
 						if (n != 0)
@@ -257,9 +227,9 @@ namespace DotnetSpider.Extension.Scheduler
 
 				if (i > 0)
 				{
-					_db.SetAdd(_setKey, identities);
-					_db.ListRightPush(_queueKey, identities);
-					_db.HashSet(_itemKey, items);
+					RedisConnection.Database.SetAdd(_setKey, identities);
+					RedisConnection.Database.ListRightPush(_queueKey, identities);
+					RedisConnection.Database.HashSet(_itemKey, items);
 				}
 			}
 		}
@@ -279,7 +249,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			get
 			{
-				var result = _db.HashGet(TaskStatus, _identityMd5);
+				var result = RedisConnection.Database.HashGet(TaskStatus, _identityMd5);
 				if (result.HasValue)
 				{
 					return result == 1;
@@ -291,7 +261,7 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 			set
 			{
-				_db.HashSet(TaskStatus, _identityMd5, value ? 1 : 0);
+				RedisConnection.Database.HashSet(TaskStatus, _identityMd5, value ? 1 : 0);
 			}
 		}
 

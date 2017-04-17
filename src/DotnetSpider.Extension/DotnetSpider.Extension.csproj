@@ -16,6 +16,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="packages.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.4.3" />
     <PackageReference Include="MySql.Data" Version="7.0.7-m61" />
     <PackageReference Include="StackExchange.Redis" Version="1.2.1" />
@@ -25,7 +29,10 @@
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
     <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj" />
     <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack\DotnetSpider.HtmlAgilityPack.csproj" />
-    <ProjectReference Include="..\DotnetSpider.Redial\DotnetSpider.Redial.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Redial\" />
   </ItemGroup>
 
 </Project>

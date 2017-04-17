@@ -5,7 +5,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Common;
+using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;

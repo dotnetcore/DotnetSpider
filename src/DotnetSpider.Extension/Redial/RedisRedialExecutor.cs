@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
-using DotnetSpider.Redial.InternetDetector;
-using DotnetSpider.Redial.Redialer;
+using DotnetSpider.Extension.Redial.InternetDetector;
+using DotnetSpider.Extension.Redial.Redialer;
 using StackExchange.Redis;
 using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
 using System.Linq;
 using System.Runtime.InteropServices;
 #endif
 
-namespace DotnetSpider.Redial
+namespace DotnetSpider.Extension.Redial
 {
 	public class RedisRedialExecutor : RedialExecutor
 	{
@@ -18,7 +19,7 @@ namespace DotnetSpider.Redial
 		public const string Locker = "redial-locker";
 
 		public string ConnectString { get; private set; }
-		internal RedisConnection RedisConnection { get; private set; }
+		public RedisConnection RedisConnection { get; private set; }
 
 		public RedisRedialExecutor(string connectString, IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{

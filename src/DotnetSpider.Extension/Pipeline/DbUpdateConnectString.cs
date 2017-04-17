@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using DotnetSpider.Extension.Common;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {

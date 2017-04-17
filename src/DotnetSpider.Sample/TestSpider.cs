@@ -39,11 +39,7 @@ namespace DotnetSpider.Sample
 					}
 				}
 			};
-			context.SetScheduler(new Extension.Scheduler.RedisScheduler {
-				Host = "127.0.0.1",
-				Port = 6379,
-				Password = "#frAiI^MtFxh3Ks&swrnVyzAtRTq%w"
-			});
+			context.SetScheduler(new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
 			context.AddEntityPipeline(new MySqlEntityPipeline("Database='testhao';Data Source= localhost;User ID=root;Password=root@123456;Port=3306"));
 			context.AddStartUrl("https://hao.360.cn/");
 			context.AddEntityType(typeof(UpdateHao360Info));

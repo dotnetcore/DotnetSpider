@@ -87,6 +87,7 @@
     <Compile Include="Infrastructure\BlockingQueue.cs" />
     <Compile Include="Infrastructure\BloomFilter.cs" />
     <Compile Include="Infrastructure\Browser.cs" />
+    <Compile Include="Infrastructure\Cache.cs" />
     <Compile Include="Infrastructure\Configuration.cs" />
     <Compile Include="Infrastructure\DateTimeUtils.cs" />
     <Compile Include="Infrastructure\DirectoryExtensions.cs" />

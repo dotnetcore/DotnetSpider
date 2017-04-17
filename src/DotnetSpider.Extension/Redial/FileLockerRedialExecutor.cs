@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using DotnetSpider.Redial.Redialer;
+using DotnetSpider.Extension.Redial.Redialer;
 using System.Linq;
-using DotnetSpider.Redial.InternetDetector;
+using DotnetSpider.Extension.Redial.InternetDetector;
 using DotnetSpider.Core.Infrastructure;
 
-namespace DotnetSpider.Redial
+namespace DotnetSpider.Extension.Redial
 {
 	public class FileLockerRedialExecutor : RedialExecutor
 	{

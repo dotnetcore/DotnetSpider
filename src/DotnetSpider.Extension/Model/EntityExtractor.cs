@@ -3,7 +3,7 @@ using System.Linq;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Common;
+using DotnetSpider.Extension.Infrastructure;
 using Newtonsoft.Json.Linq;
 using System;
 using DotnetSpider.Core.Infrastructure;
