@@ -32,7 +32,7 @@ namespace DotnetSpider.Core.Test
 			}
 			catch (SpiderException exception)
 			{
-				Assert.AreEqual("Length of Identity should less than 100.", exception.Message);
+				Assert.AreEqual("Length of Identity should less than 32.", exception.Message);
 			}
 
 			try
@@ -45,7 +45,7 @@ namespace DotnetSpider.Core.Test
 			}
 			catch (SpiderException exception)
 			{
-				Assert.AreEqual("Length of UserId should less than 100.", exception.Message);
+				Assert.AreEqual("Length of UserId should less than 32.", exception.Message);
 			}
 
 			try
@@ -58,7 +58,7 @@ namespace DotnetSpider.Core.Test
 			}
 			catch (SpiderException exception)
 			{
-				Assert.AreEqual("Length of TaskGroup should less than 100.", exception.Message);
+				Assert.AreEqual("Length of TaskGroup should less than 32.", exception.Message);
 				return;
 			}
 
@@ -124,7 +124,7 @@ namespace DotnetSpider.Core.Test
 			using (MySqlConnection conn = new MySqlConnection(connectString))
 			{
 				Assert.AreEqual(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where userid='{userId}' and taskgroup='{taskGroup}' and identity='{id}'").First().Count);
-				Assert.AreEqual(8, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where userid='{userId}' and taskgroup='{taskGroup}' and identity='{id}'").First().Count);
+				Assert.AreEqual(9, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where userid='{userId}' and taskgroup='{taskGroup}' and identity='{id}'").First().Count);
 			}
 		}
 

@@ -25,8 +25,9 @@ namespace DotnetSpider.Extension.Pipeline
 			return _collector;
 		}
 
-		public override void InitiEntity(EntityMetadata metadata)
+		public override void InitEntity(EntityMetadata metadata)
 		{
+			IsEnabled = true;
 		}
 
 		public override void Process(List<JObject> datas)

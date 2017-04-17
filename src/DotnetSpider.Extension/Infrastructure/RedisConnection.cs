@@ -14,8 +14,6 @@ namespace DotnetSpider.Extension.Infrastructure
 		public IDatabase Database { get; private set; }
 		public ISubscriber Subscriber { get; private set; }
 
-		public bool IsEnable { get; private set; }
-
 		public RedisConnection(string connectString)
 		{
 			ConnectString = connectString;

@@ -17,27 +17,6 @@ namespace DotnetSpider.Extension.Downloader
 		public abstract bool Handle(RemoteWebDriver driver);
 	}
 
-	public class VerifyCode
-	{
-		public bool Verify(dynamic webDriver)
-		{
-
-			try
-			{
-				IWebDriver driver = webDriver;
-				while (!driver.Url.Contains("baidu.com"))
-				{
-					Thread.Sleep(1000);
-				}
-				return true;
-			}
-			catch (Exception)
-			{
-				return false;
-			}
-		}
-	}
-
 	public class CommonSignIner : SignIner
 	{
 		public string Url { get; set; }
@@ -95,7 +74,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class ManualLoginer : SignIner
+	public class ManualSignIner : SignIner
 	{
 		public string Url { get; set; }
 
@@ -115,76 +94,6 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				return false;
 			}
-		}
-	}
-
-	public class ClickHandler : SignIner
-	{
-		public List<Selector> Clicks { get; set; }
-
-		public override bool Handle(RemoteWebDriver webDriver)
-		{
-			try
-			{
-				webDriver.Manage().Window.Maximize();
-				foreach (var click in Clicks)
-				{
-					var e = FindElements(webDriver, click);
-					if (e != null)
-					{
-						foreach (var element in e)
-						{
-							element.Click();
-						}
-					}
-				}
-				return true;
-			}
-			catch (Exception)
-			{
-				return false;
-			}
-		}
-
-		private List<IWebElement> FindElements(RemoteWebDriver webDriver, Selector element)
-		{
-			switch (element.Type)
-			{
-
-				case SelectorType.XPath:
-					{
-						return webDriver.FindElementsByXPath(element.Expression)?.ToList();
-					}
-				case SelectorType.Css:
-					{
-						return webDriver.FindElementsByCssSelector(element.Expression)?.ToList();
-					}
-			}
-			throw new SpiderException("Unsport findy: " + element.Type);
-		}
-	}
-
-	public class ScrollHandler : SignIner
-	{
-		public int Interval { get; set; } = 1;
-		public int ScrollTo { get; set; } = 0;
-
-		public override bool Handle(RemoteWebDriver webDriver)
-		{
-			try
-			{
-				webDriver.Manage().Window.Maximize();
-				for (int i = 0; i <= Interval; i++)
-				{
-					webDriver.ExecuteScript($"window.scrollBy(0, {ScrollTo})");
-					Thread.Sleep(1000);
-				}
-			}
-			catch (Exception)
-			{
-				return false;
-			}
-			return true;
 		}
 	}
 }

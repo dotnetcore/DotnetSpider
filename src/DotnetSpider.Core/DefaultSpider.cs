@@ -9,7 +9,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class DefaultSpider : Spider
 	{
-		public DefaultSpider() : this(Guid.NewGuid().ToString(), new Site())
+		public DefaultSpider() : this(Guid.NewGuid().ToString("N"), new Site())
 		{
 		}
 

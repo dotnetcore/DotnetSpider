@@ -15,8 +15,9 @@ namespace DotnetSpider.Extension.Redial
 {
 	public class RedisRedialExecutor : RedialExecutor
 	{
-		public static string HostName { get; set; } = Dns.GetHostName();
-		public const string Locker = "redial-locker";
+		public static string HostName => $"dotnetspider:nodes:{Dns.GetHostName()}";
+
+		public const string Locker = "dotnetspider:redial-locker";
 
 		public string ConnectString { get; private set; }
 		public RedisConnection RedisConnection { get; private set; }
@@ -79,7 +80,6 @@ namespace DotnetSpider.Extension.Redial
 			var locker = RedisConnection.Database.HashGet(HostName, Locker);
 			if (!locker.HasValue)
 			{
-				//RedisConnection.Database.HashSet(HostName, Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 				return false;
 			}
 			return true;

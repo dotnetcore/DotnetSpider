@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MsSqlEntityPipeline insertPipeline = new MsSqlEntityPipeline(ConnectString);
-				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
+				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
 				insertPipeline.InitPipeline(spider);
 
 				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -53,7 +53,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(new List<JObject> { data1, data2 });
 
 				MsSqlEntityPipeline updatePipeline = new MsSqlEntityPipeline(ConnectString, PipelineMode.Update);
-				updatePipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
+				updatePipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
 				updatePipeline.InitPipeline(spider);
 
 				JObject data3 = new JObject { { "sku", "110" }, { "category", "4C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -78,7 +78,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MsSqlEntityPipeline insertPipeline = new MsSqlEntityPipeline(ConnectString);
-				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product2).GetTypeInfo()));
+				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo()));
 				insertPipeline.InitPipeline(spider);
 
 				JObject data1 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -86,7 +86,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(new List<JObject> { data1, data2 });
 
 				MsSqlEntityPipeline updatePipeline = new MsSqlEntityPipeline(ConnectString, PipelineMode.Update);
-				updatePipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product2).GetTypeInfo()));
+				updatePipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo()));
 				updatePipeline.InitPipeline(spider);
 
 				JObject data3 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "AAAA" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -111,7 +111,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MsSqlEntityPipeline insertPipeline = new MsSqlEntityPipeline(ConnectString);
-				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
+				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
 				insertPipeline.InitPipeline(spider);
 
 				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -119,7 +119,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(new List<JObject> { data1, data2 });
 
 				MsSqlEntityPipeline updatePipeline = new MsSqlEntityPipeline(ConnectString, PipelineMode.Update, true);
-				updatePipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
+				updatePipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
 				updatePipeline.InitPipeline(spider);
 
 				JObject data3 = new JObject { { "sku", "110" }, { "category", "4C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -144,7 +144,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MsSqlEntityPipeline insertPipeline = new MsSqlEntityPipeline(ConnectString);
-				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product2).GetTypeInfo()));
+				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo()));
 				insertPipeline.InitPipeline(spider);
 
 				JObject data1 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -152,7 +152,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(new List<JObject> { data1, data2 });
 
 				MsSqlEntityPipeline updatePipeline = new MsSqlEntityPipeline(ConnectString, PipelineMode.Update, true);
-				updatePipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product2).GetTypeInfo()));
+				updatePipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo()));
 				updatePipeline.InitPipeline(spider);
 
 				JObject data3 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "AAAA" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
@@ -177,7 +177,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MsSqlEntityPipeline insertPipeline = new MsSqlEntityPipeline(ConnectString);
-				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo()));
+				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
 				insertPipeline.InitPipeline(spider);
 
 				// Common data
@@ -201,9 +201,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		public void DefineUpdateEntity()
 		{
 			MsSqlEntityPipeline insertPipeline = new MsSqlEntityPipeline(ConnectString, PipelineMode.Update);
+			IEntityPipeline pipeline;
 			try
 			{
-				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(UpdateEntity1).GetTypeInfo()));
+				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity1).GetTypeInfo()));
 				throw new SpiderException("TEST FAILED.");
 			}
 			catch (SpiderException e)
@@ -213,7 +214,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			try
 			{
-				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(UpdateEntity2).GetTypeInfo()));
+				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity2).GetTypeInfo()));
 				throw new SpiderException("TEST FAILED.");
 			}
 			catch (SpiderException e)
@@ -223,7 +224,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			try
 			{
-				insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(UpdateEntity3).GetTypeInfo()));
+				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity3).GetTypeInfo()));
 				throw new SpiderException("TEST FAILED.");
 			}
 			catch (SpiderException e)
@@ -231,12 +232,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				Assert.AreEqual("There is no column need update.", e.Message);
 			}
 
-			insertPipeline.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(UpdateEntity4).GetTypeInfo()));
+			insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity4).GetTypeInfo()));
 			Assert.AreEqual(1, insertPipeline.GetUpdateColumns().Count);
 			Assert.AreEqual("value", insertPipeline.GetUpdateColumns().First().Name);
 
 			MsSqlEntityPipeline insertPipeline2 = new MsSqlEntityPipeline(ConnectString, PipelineMode.Update);
-			insertPipeline2.InitiEntity(EntitySpider.ParseEntityMetaData(typeof(UpdateEntity5).GetTypeInfo()));
+			insertPipeline2.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity5).GetTypeInfo()));
 			Assert.AreEqual(1, insertPipeline2.GetUpdateColumns().Count);
 			Assert.AreEqual("value", insertPipeline2.GetUpdateColumns().First().Name);
 		}

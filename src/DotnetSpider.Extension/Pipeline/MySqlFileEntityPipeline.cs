@@ -21,16 +21,16 @@ namespace DotnetSpider.Extension.Pipeline
 		protected string DataFolder;
 		protected StreamWriter Writer;
 
-		public override void InitiEntity(EntityMetadata metadata)
+		public override void InitEntity(EntityMetadata metadata)
 		{
 			if (metadata.Schema == null)
 			{
 				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				IsEnabled = false;
 				return;
 			}
 			Schema = metadata.Schema;
 			Columns = metadata.Entity.Fields;
+			IsEnabled = true;
 		}
 
 		public override void InitPipeline(ISpider spider)

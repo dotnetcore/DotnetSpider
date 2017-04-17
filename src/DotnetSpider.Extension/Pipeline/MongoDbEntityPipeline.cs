@@ -23,12 +23,11 @@ namespace DotnetSpider.Extension.Pipeline
 			ConnectString = connectString;
 		}
 
-		public override void InitiEntity(EntityMetadata metadata)
+		public override void InitEntity(EntityMetadata metadata)
 		{
 			if (metadata.Schema == null)
 			{
 				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				IsEnabled = false;
 				return;
 			}
 
@@ -37,6 +36,8 @@ namespace DotnetSpider.Extension.Pipeline
 			var db = client.GetDatabase(metadata.Schema.Database);
 
 			_collection = db.GetCollection<BsonDocument>(metadata.Schema.TableName);
+
+			IsEnabled = true;
 		}
 
 		public override void Process(List<JObject> datas)

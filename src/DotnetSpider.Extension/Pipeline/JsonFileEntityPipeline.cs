@@ -16,15 +16,15 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string _entityName;
 
-		public override void InitiEntity(EntityMetadata metadata)
+		public override void InitEntity(EntityMetadata metadata)
 		{
 			if (metadata.Schema == null)
 			{
 				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				IsEnabled = false;
 				return;
 			}
 			_entityName = metadata.Entity.Name;
+			IsEnabled = true;
 		}
 
 		public override void InitPipeline(ISpider spider)

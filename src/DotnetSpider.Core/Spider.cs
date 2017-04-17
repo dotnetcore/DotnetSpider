@@ -77,7 +77,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public static Spider Create(Site site, params IPageProcessor[] pageProcessors)
 		{
-			return new Spider(site, Guid.NewGuid().ToString(), null, null, new QueueDuplicateRemovedScheduler(), pageProcessors);
+			return new Spider(site, Guid.NewGuid().ToString("N"), null, null, new QueueDuplicateRemovedScheduler(), pageProcessors);
 		}
 
 		/// <summary>
@@ -89,7 +89,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public static Spider Create(Site site, IScheduler scheduler, params IPageProcessor[] pageProcessors)
 		{
-			return new Spider(site, Guid.NewGuid().ToString(), null, null, scheduler, pageProcessors);
+			return new Spider(site, Guid.NewGuid().ToString("N"), null, null, scheduler, pageProcessors);
 		}
 
 		/// <summary>
@@ -154,39 +154,28 @@ namespace DotnetSpider.Core
 
 		protected void CheckIfSettingsCorrect()
 		{
-			if (string.IsNullOrWhiteSpace(Identity) || string.IsNullOrEmpty(Identity))
+			Identity = (string.IsNullOrWhiteSpace(Identity) || string.IsNullOrEmpty(Identity)) ? Encrypt.Md5Encrypt(Guid.NewGuid().ToString()) : Identity;
+			UserId = (string.IsNullOrEmpty(UserId) || string.IsNullOrWhiteSpace(UserId)) ? "" : UserId;
+			TaskGroup = (string.IsNullOrEmpty(TaskGroup) || string.IsNullOrWhiteSpace(TaskGroup)) ? "" : TaskGroup;
+
+			if (Identity.Length > 32)
 			{
-				Identity = Guid.NewGuid().ToString();
+				throw new SpiderException("Length of Identity should less than 32.");
 			}
 
-			if (string.IsNullOrEmpty(UserId) || string.IsNullOrWhiteSpace(UserId))
+			if (UserId.Length > 32)
 			{
-				UserId = "";
+				throw new SpiderException("Length of UserId should less than 32.");
 			}
 
-			if (string.IsNullOrEmpty(TaskGroup) || string.IsNullOrWhiteSpace(TaskGroup))
+			if (TaskGroup.Length > 32)
 			{
-				TaskGroup = "";
+				throw new SpiderException("Length of TaskGroup should less than 32.");
 			}
 
-			if (Identity.Length > 100)
+			if (PageProcessors == null || PageProcessors.Count == 0)
 			{
-				throw new SpiderException("Length of Identity should less than 100.");
-			}
-
-			if (UserId.Length > 100)
-			{
-				throw new SpiderException("Length of UserId should less than 100.");
-			}
-
-			if (TaskGroup.Length > 100)
-			{
-				throw new SpiderException("Length of TaskGroup should less than 100.");
-			}
-
-			if (PageProcessors == null)
-			{
-				throw new SpiderException("PageProcessor should not be null.");
+				throw new SpiderException("Count of PageProcessor is zero.");
 			}
 
 			if (Site == null)
@@ -667,14 +656,14 @@ namespace DotnetSpider.Core
 
 			CheckIfSettingsCorrect();
 
-			Monitorable.IsExited = false;
-
 #if !NET_CORE
 			// 开启多线程支持
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
 
 			InitComponent(arguments);
+
+			Monitorable.IsExited = false;
 
 			if (arguments.Contains("running-test"))
 			{

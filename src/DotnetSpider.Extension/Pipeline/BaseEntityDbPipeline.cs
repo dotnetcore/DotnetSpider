@@ -57,12 +57,11 @@ namespace DotnetSpider.Extension.Pipeline
 			return Schema;
 		}
 
-		public override void InitiEntity(EntityMetadata metadata)
+		public override void InitEntity(EntityMetadata metadata)
 		{
 			if (metadata.Schema == null)
 			{
 				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				IsEnabled = false;
 				return;
 			}
 			Schema = GenerateSchema(metadata.Schema);
@@ -76,7 +75,6 @@ namespace DotnetSpider.Extension.Pipeline
 			if (Columns.Count == 0)
 			{
 				Spider.Log($"Columns is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				IsEnabled = false;
 				return;
 			}
 			var primary = metadata.Primary;
@@ -185,6 +183,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				}
 			}
+			IsEnabled = true;
 		}
 
 		public override void InitPipeline(ISpider spider)
