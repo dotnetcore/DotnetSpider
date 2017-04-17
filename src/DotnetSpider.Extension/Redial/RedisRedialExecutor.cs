@@ -77,12 +77,16 @@ namespace DotnetSpider.Extension.Redial
 
 		public override bool CheckIsRedialing()
 		{
-			var locker = RedisConnection.Database.HashGet(HostName, Locker);
-			if (!locker.HasValue)
+			lock (Lock)
 			{
-				return false;
+				var locker = RedisConnection.Database.HashGet(HostName, Locker);
+				if (!locker.HasValue)
+				{
+					//RedisConnection.Database.HashSet(HostName, Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+					return false;
+				}
+				return true;
 			}
-			return true;
 		}
 
 		public override void ReleaseRedialLocker()
