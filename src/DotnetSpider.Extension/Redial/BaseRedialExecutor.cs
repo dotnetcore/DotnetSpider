@@ -9,6 +9,7 @@ namespace DotnetSpider.Extension.Redial
 {
 	public abstract class RedialExecutor : IRedialExecutor
 	{
+		protected static object Lock = new object();
 		public IRedialer Redialer { get; }
 		public IInternetDetector InternetDetector { get; }
 		public abstract void WaitAll();

@@ -73,12 +73,15 @@ namespace DotnetSpider.Extension.Redial
 
 		public override bool CheckIsRedialing()
 		{
-			if (!File.Exists(RedialLockerFile))
+			lock (Lock)
 			{
-				//File.Create(RedialLockerFile).Dispose();
-				return false;
+				if (!File.Exists(RedialLockerFile))
+				{
+					//File.Create(RedialLockerFile).Dispose();
+					return false;
+				}
+				return true;
 			}
-			return true;
 		}
 
 		public override void ReleaseRedialLocker()
