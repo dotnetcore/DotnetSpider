@@ -73,11 +73,11 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				case "11":
 					{
-						return $"USE master; IF NOT EXISTS(SELECT * FROM sys.database WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database};";
+						return $"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database};";
 					}
 				default:
 					{
-						return $"USE master; IF NOT EXISTS(SELECT * FROM sys.database WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database};";
+						return $"USE master; IF NOT EXISTS(SELECT * FROM sys.databases WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database};";
 					}
 			}
 		}
@@ -93,7 +93,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				default:
 					{
-						return $"SELECT COUNT(*) FROM sys.database WHERE name='{Schema.Database}'";
+						return $"SELECT COUNT(*) FROM sys.databases WHERE name='{Schema.Database}'";
 					}
 			}
 		}
