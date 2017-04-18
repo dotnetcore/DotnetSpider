@@ -168,7 +168,7 @@ namespace DotnetSpider.Extension
 		{
 			get
 			{
-				return "dotnetspider:locker-" + Identity;
+				return $"dotnetspider:initLocker:{Identity}";
 			}
 		}
 
@@ -229,7 +229,7 @@ namespace DotnetSpider.Extension
 			{
 				return;
 			}
-			string key = "dotnetspider:locker-validate-" + Identity;
+			string key = $"dotnetspider:validateLocker:{Identity}";
 
 			try
 			{

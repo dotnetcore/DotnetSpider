@@ -39,7 +39,7 @@ namespace DotnetSpider.Core
 
 		#endregion
 
-		public Status Stat { get; private set; }
+		public Status Stat { get; private set; } = Status.Init;
 		public event SpiderEvent OnSuccess;
 		public event SpiderClosingHandler SpiderClosing;
 
@@ -48,7 +48,6 @@ namespace DotnetSpider.Core
 		public long AvgPipelineSpeed { get; private set; }
 
 		private int _waitCountLimit = 1500;
-		private bool _isPaused;
 		private bool _init;
 		private FileInfo _errorRequestFile;
 		private readonly object _avgDownloadTimeLocker = new object();
@@ -68,6 +67,7 @@ namespace DotnetSpider.Core
 		private IMonitor _monitor;
 		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;
+		private Status _realStat = Status.Init;
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -677,72 +677,80 @@ namespace DotnetSpider.Core
 			}
 
 			Stat = Status.Running;
+			_realStat = Status.Running;
 
-			Parallel.For(0, ThreadNum, new ParallelOptions
+			while (Stat == Status.Running || Stat == Status.Stopped)
 			{
-				MaxDegreeOfParallelism = ThreadNum
-			}, i =>
-			{
-				int waitCount = 0;
-				bool firstTask = false;
-
-				var downloader = Downloader.Clone();
-
-				while (Stat == Status.Running || Stat == Status.Stopped)
+				if (Stat == Status.Stopped)
 				{
-					if (Stat != Status.Running)
-					{
-						Thread.Sleep(50);
-						continue;
-					}
-					Request request = Scheduler.Poll();
+					_realStat = Status.Stopped;
+					Thread.Sleep(50);
+					continue;
+				}
 
-					if (request == null)
-					{
-						if (waitCount > _waitCountLimit && ExitWhenComplete)
-						{
-							Stat = Status.Finished;
-							break;
-						}
+				Parallel.For(0, ThreadNum, new ParallelOptions
+				{
+					MaxDegreeOfParallelism = ThreadNum
+				}, i =>
+				{
+					int waitCount = 0;
+					bool firstTask = false;
 
-						// wait until new url added
-						WaitNewUrl(ref waitCount);
-					}
-					else
-					{
-						waitCount = 0;
+					var downloader = Downloader.Clone();
 
-						try
+					while (Stat == Status.Running)
+					{
+						Request request = Scheduler.Poll();
+
+						if (request == null)
 						{
-							Stopwatch sw = new Stopwatch();
-							ProcessRequest(sw, request, downloader);
-							Thread.Sleep(Site.SleepTime);
-							_OnSuccess(request);
-						}
-						catch (Exception e)
-						{
-							OnError(request);
-							this.Log($"采集失败: {request.Url}.", LogLevel.Error, e);
-						}
-						finally
-						{
-							if (request.GetExtra(Request.Proxy) != null)
+							if (waitCount > _waitCountLimit && ExitWhenComplete)
 							{
-								var statusCode = request.GetExtra(Request.StatusCode);
-								Site.ReturnHttpProxy(request.GetExtra(Request.Proxy) as UseSpecifiedUriWebProxy, statusCode == null ? HttpStatusCode.Found : (HttpStatusCode)statusCode);
+								Stat = Status.Finished;
+								_realStat = Status.Finished;
+								break;
+							}
+
+							// wait until new url added
+							WaitNewUrl(ref waitCount);
+						}
+						else
+						{
+							waitCount = 0;
+
+							try
+							{
+								Stopwatch sw = new Stopwatch();
+								ProcessRequest(sw, request, downloader);
+								Thread.Sleep(Site.SleepTime);
+								_OnSuccess(request);
+							}
+							catch (Exception e)
+							{
+								OnError(request);
+								this.Log($"采集失败: {request.Url}.", LogLevel.Error, e);
+							}
+							finally
+							{
+								if (request.GetExtra(Request.Proxy) != null)
+								{
+									var statusCode = request.GetExtra(Request.StatusCode);
+									Site.ReturnHttpProxy(request.GetExtra(Request.Proxy) as UseSpecifiedUriWebProxy, statusCode == null ? HttpStatusCode.Found : (HttpStatusCode)statusCode);
+								}
+							}
+
+							if (!firstTask)
+							{
+								Thread.Sleep(3000);
+								firstTask = true;
 							}
 						}
-
-						if (!firstTask)
-						{
-							Thread.Sleep(3000);
-							firstTask = true;
-						}
 					}
-				}
-			});
+				});
+			}
 
 			FinishedTime = DateTime.Now;
+			_realStat = Status.Exited;
 
 			OnClose();
 
@@ -757,6 +765,7 @@ namespace DotnetSpider.Core
 
 		public static void PrintInfo()
 		{
+			Console.ForegroundColor = ConsoleColor.Magenta;
 			Console.WriteLine("=============================================================");
 			Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
 			Console.WriteLine("== It's a light, stable, high performce spider             ==");
@@ -766,6 +775,7 @@ namespace DotnetSpider.Core
 			Console.WriteLine("== Version: 1.3.0-rc1                                      ==");
 			Console.WriteLine("== Author: zlzforever@163.com                              ==");
 			Console.WriteLine("=============================================================");
+			Console.ForegroundColor = ConsoleColor.White;
 		}
 
 		public Task RunAsync(params string[] arguments)
@@ -776,19 +786,34 @@ namespace DotnetSpider.Core
 			});
 		}
 
-		public void Pause()
+		public void Pause(Action action = null)
 		{
+			if (Stat != Status.Running)
+			{
+				this.Log("任务不在运行中。", LogLevel.Warn);
+				return;
+			}
 			Stat = Status.Stopped;
-			_isPaused = true;
 			this.Log("停止任务中...", LogLevel.Warn);
+			if (action != null)
+			{
+				Task.Factory.StartNew(() =>
+				{
+					while (_realStat != Status.Stopped)
+					{
+						Thread.Sleep(100);
+					}
+					action();
+				});
+			}
 		}
 
 		public void Contiune()
 		{
-			if (_isPaused)
+			if (_realStat == Status.Stopped)
 			{
 				Stat = Status.Running;
-				_isPaused = false;
+				_realStat = Status.Running;
 				this.Log("任务继续...", LogLevel.Warn);
 			}
 			else
@@ -797,10 +822,26 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public void Exit()
+		public void Exit(Action action = null)
 		{
-			Stat = Status.Exited;
-			this.Log("退出任务中...", LogLevel.Warn);
+			if (Stat == Status.Running || Stat == Status.Stopped)
+			{
+				Stat = Status.Exited;
+				this.Log("退出任务中...", LogLevel.Warn);
+				return;
+			}
+			this.Log("任务不在运行中。", LogLevel.Warn);
+			if (action != null)
+			{
+				Task.Factory.StartNew(() =>
+				{
+					while (_realStat != Status.Exited)
+					{
+						Thread.Sleep(100);
+					}
+					action();
+				});
+			}
 		}
 
 		protected void OnClose()

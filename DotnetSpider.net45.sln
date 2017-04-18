@@ -26,7 +26,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{4F294905
 	ProjectSection(SolutionItems) = preProject
 		nuget\DotnetSpider.Core.nuspec = nuget\DotnetSpider.Core.nuspec
 		nuget\DotnetSpider.Extension.nuspec = nuget\DotnetSpider.Extension.nuspec
-		nuget\DotnetSpider.Redial.nuspec = nuget\DotnetSpider.Redial.nuspec
 	EndProjectSection
 EndProject
 Global

@@ -12,11 +12,15 @@ namespace DotnetSpider.Extension
 		public EntitySpiderBuilder()
 		{
 			Spider = GetEntitySpider();
+			if (Spider == null)
+			{
+				throw new SpiderException("Spider is null.");
+			}
 		}
 
 		public virtual void Run(params string[] args)
 		{
-			Spider?.Run(args);
+			Spider.Run(args);
 		}
 
 		public Task RunAsync(params string[] arguments)
@@ -27,19 +31,19 @@ namespace DotnetSpider.Extension
 			});
 		}
 
-		public void Pause()
+		public void Pause(Action action = null)
 		{
-			Spider?.Pause();
+			Spider.Pause(action);
 		}
 
-		public void Exit()
+		public void Exit(Action action = null)
 		{
-			Spider?.Exit();
+			Spider.Exit(action);
 		}
 
 		public void Contiune()
 		{
-			Spider?.Contiune();
+			Spider.Contiune();
 		}
 	}
 }

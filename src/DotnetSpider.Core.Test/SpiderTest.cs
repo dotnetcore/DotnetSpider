@@ -16,6 +16,7 @@ namespace DotnetSpider.Core.Test
 	{
 		public int Count { get; set; }
 	}
+
 	[TestClass]
 	public class SpiderTest
 	{
@@ -75,9 +76,44 @@ namespace DotnetSpider.Core.Test
 			}
 			spider.RunAsync();
 			Thread.Sleep(5000);
-			spider.Pause();
-			Thread.Sleep(5000);
+			spider.Pause(() =>
+			{
+				spider.RunAsync();
+			});
+			Thread.Sleep(3000);
+		}
+
+		[TestMethod]
+		public void RunAsyncAndContiune()
+		{
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			for (int i = 0; i < 10000; i++)
+			{
+				spider.AddStartUrl("http://www.baidu.com/" + i);
+			}
 			spider.RunAsync();
+			Thread.Sleep(5000);
+			spider.Pause(() =>
+			{
+				spider.Contiune();
+			});
+			Thread.Sleep(5000);
+		}
+
+		[TestMethod]
+		public void RunAsyncAndStopThenExit()
+		{
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			for (int i = 0; i < 10000; i++)
+			{
+				spider.AddStartUrl("http://www.baidu.com/" + i);
+			}
+			spider.RunAsync();
+			Thread.Sleep(5000);
+			spider.Pause(() =>
+			{
+				spider.Exit();
+			});
 			Thread.Sleep(5000);
 		}
 
