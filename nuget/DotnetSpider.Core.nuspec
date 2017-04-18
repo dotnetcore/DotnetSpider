@@ -5,6 +5,7 @@
     <version>1.3.1</version>
     <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
     <owners>zlzforever@163.com</owners>
+    <iconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/zlzforever/DotnetSpider</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
