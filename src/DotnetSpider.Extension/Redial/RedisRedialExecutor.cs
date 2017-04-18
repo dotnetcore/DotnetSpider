@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Redial
 	{
 		public static string HostName => $"dotnetspider:nodes:{Dns.GetHostName()}";
 
-		public const string Locker = "dotnetspider:redial-locker";
+		public const string Locker = "dotnetspider:redialLocker";
 
 		public string ConnectString { get; private set; }
 		public RedisConnection RedisConnection { get; private set; }
