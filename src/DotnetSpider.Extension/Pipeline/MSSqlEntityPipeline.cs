@@ -66,14 +66,36 @@ namespace DotnetSpider.Extension.Pipeline
 			return new SqlParameter(name, value);
 		}
 
-		protected override string GetCreateSchemaSql()
+		protected override string GetCreateSchemaSql(string serverVersion)
 		{
-			return $"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database};";
+			string version = serverVersion.Split('.')[0];
+			switch (version)
+			{
+				case "11":
+					{
+						return $"USE master; IF NOT EXISTS(SELECT * FROM sys.database WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database};";
+					}
+				default:
+					{
+						return $"USE master; IF NOT EXISTS(SELECT * FROM sys.database WHERE name='{Schema.Database}') CREATE DATABASE {Schema.Database};";
+					}
+			}
 		}
 
-		protected override string GetIfSchemaExistsSql()
+		protected override string GetIfSchemaExistsSql(string serverVersion)
 		{
-			return $"SELECT COUNT(*) FROM sysdatabases WHERE name='{Schema.Database}'";
+			string version = serverVersion.Split('.')[0];
+			switch (version)
+			{
+				case "11":
+					{
+						return $"SELECT COUNT(*) FROM sysdatabases WHERE name='{Schema.Database}'";
+					}
+				default:
+					{
+						return $"SELECT COUNT(*) FROM sys.database WHERE name='{Schema.Database}'";
+					}
+			}
 		}
 
 		protected override string GetCreateTableSql()

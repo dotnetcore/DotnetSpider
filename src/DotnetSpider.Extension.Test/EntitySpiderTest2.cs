@@ -44,7 +44,7 @@ namespace DotnetSpider.Extension.Test
 				throw new NotImplementedException();
 			}
 
-			protected override string GetCreateSchemaSql()
+			protected override string GetCreateSchemaSql(string serverVersion)
 			{
 				throw new NotImplementedException();
 			}
@@ -64,7 +64,7 @@ namespace DotnetSpider.Extension.Test
 				return new TestPipeline();
 			}
 
-			protected override string GetIfSchemaExistsSql()
+			protected override string GetIfSchemaExistsSql(string serverVersion)
 			{
 				throw new NotImplementedException();
 			}

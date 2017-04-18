@@ -27,8 +27,8 @@ namespace DotnetSpider.Extension.Pipeline
 		protected abstract string GetUpdateSql();
 		protected abstract string GetSelectSql();
 		protected abstract string GetCreateTableSql();
-		protected abstract string GetCreateSchemaSql();
-		protected abstract string GetIfSchemaExistsSql();
+		protected abstract string GetCreateSchemaSql(string serverVersion);
+		protected abstract string GetIfSchemaExistsSql(string serverVersion);
 		protected abstract DbParameter CreateDbParameter(string name, object value);
 
 		protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
@@ -234,11 +234,11 @@ namespace DotnetSpider.Extension.Pipeline
 				using (DbConnection conn = CreateConnection())
 				{
 					var command = conn.CreateCommand();
-					command.CommandText = GetIfSchemaExistsSql();
-					
+					command.CommandText = GetIfSchemaExistsSql(conn.ServerVersion);
+
 					if (System.Convert.ToInt16(command.ExecuteScalar()) == 0)
 					{
-						command.CommandText = GetCreateSchemaSql();
+						command.CommandText = GetCreateSchemaSql(conn.ServerVersion);
 						command.CommandType = CommandType.Text;
 						command.ExecuteNonQuery();
 					}

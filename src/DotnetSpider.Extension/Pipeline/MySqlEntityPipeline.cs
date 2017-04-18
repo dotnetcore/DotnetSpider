@@ -123,12 +123,12 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		protected override string GetCreateSchemaSql()
+		protected override string GetCreateSchemaSql(string serverVersion)
 		{
 			return $"CREATE SCHEMA IF NOT EXISTS `{Schema.Database}` DEFAULT CHARACTER SET utf8mb4 ;";
 		}
 
-		protected override string GetIfSchemaExistsSql()
+		protected override string GetIfSchemaExistsSql(string serverVersion)
 		{
 			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{Schema.Database}';";
 		}
