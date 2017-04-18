@@ -67,7 +67,11 @@ namespace DotnetSpider.Extension
 
 		public EntitySpider(Site site) : base()
 		{
-			Site = site ?? throw new SpiderException("Site should not be null.");
+			if (site == null)
+			{
+				throw new SpiderException("Site should not be null.");
+			}
+			Site = site;
 		}
 
 		protected override void PreInitComponent(params string[] arguments)
@@ -111,7 +115,6 @@ namespace DotnetSpider.Extension
 					Cache.Instance.Set(redisConnectString, RedisConnection);
 				}
 			}
-
 
 			if (RedisConnection != null)
 			{

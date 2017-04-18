@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotnetSpider.Extension;
+using System;
 
 namespace DotnetSpider.Sample
 {
@@ -7,6 +8,10 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
+			EntitySpider spider = new EntitySpider(new Core.Site());
+			spider.AddStartUrl("http://www.baidu.com");
+
+
 			// Custmize processor and pipeline 完全自定义页面解析和数据管道
 			BaseUsage.CustmizeProcessorAndPipeline();
 			Console.WriteLine("Press any key to continue...");

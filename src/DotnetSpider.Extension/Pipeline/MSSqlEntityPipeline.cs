@@ -59,7 +59,11 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override DbParameter CreateDbParameter(string name, object value)
 		{
-			return new SqlParameter(name, value ?? DBNull.Value);
+			if (value == null)
+			{
+				value = DBNull.Value;
+			}
+			return new SqlParameter(name, value);
 		}
 
 		protected override string GetCreateSchemaSql()
