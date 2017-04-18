@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using DotnetSpider.Core;
+﻿using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
 

@@ -1,15 +1,10 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Sample
 {

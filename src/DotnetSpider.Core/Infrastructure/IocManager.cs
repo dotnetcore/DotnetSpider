@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using System;
-using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Infrastructure
 {

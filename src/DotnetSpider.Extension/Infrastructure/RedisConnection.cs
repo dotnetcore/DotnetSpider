@@ -1,10 +1,4 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
-using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using StackExchange.Redis;
 
 namespace DotnetSpider.Extension.Infrastructure
 {

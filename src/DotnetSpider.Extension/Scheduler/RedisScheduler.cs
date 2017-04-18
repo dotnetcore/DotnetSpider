@@ -5,11 +5,8 @@ using DotnetSpider.Core.Infrastructure;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using StackExchange.Redis;
-using System.Net;
 using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
-using System.Runtime.InteropServices;
-using System.Linq;
 #endif
 
 namespace DotnetSpider.Extension.Scheduler

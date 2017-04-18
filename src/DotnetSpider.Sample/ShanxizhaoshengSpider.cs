@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;

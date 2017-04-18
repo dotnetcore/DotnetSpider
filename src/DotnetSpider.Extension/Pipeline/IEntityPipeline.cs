@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline

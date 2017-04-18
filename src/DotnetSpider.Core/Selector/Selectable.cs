@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure;
-using System.Linq;
 #if NET_CORE
 using DotnetSpider.HtmlAgilityPack;
 #else

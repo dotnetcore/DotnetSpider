@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.ORM;
 using MongoDB.Bson;

@@ -3,12 +3,9 @@ using System.Net;
 using System.Threading;
 using DotnetSpider.Extension.Redial.InternetDetector;
 using DotnetSpider.Extension.Redial.Redialer;
-using StackExchange.Redis;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
-using System.Linq;
-using System.Runtime.InteropServices;
 #endif
 
 namespace DotnetSpider.Extension.Redial

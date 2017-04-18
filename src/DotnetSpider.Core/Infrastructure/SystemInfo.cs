@@ -1,10 +1,6 @@
-﻿using System;
+﻿#if !NET_CORE
 using System.Diagnostics;
 using System.Net;
-#if NET_CORE
-using System.Runtime.InteropServices;
-#else
-using System.Management;
 #endif
 
 namespace DotnetSpider.Core.Infrastructure

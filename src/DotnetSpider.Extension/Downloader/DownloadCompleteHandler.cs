@@ -1,6 +1,4 @@
-﻿
-using System;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension.Redial;
 using DotnetSpider.Core.Infrastructure;

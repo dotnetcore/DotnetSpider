@@ -6,7 +6,6 @@ using DotnetSpider.Core.Scheduler;
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Linq;
-using DotnetSpider.Core.Monitor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Core.Infrastructure;
 

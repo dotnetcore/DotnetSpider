@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension;
@@ -9,7 +8,6 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Core.Proxy;
 
 namespace DotnetSpider.Sample
 {

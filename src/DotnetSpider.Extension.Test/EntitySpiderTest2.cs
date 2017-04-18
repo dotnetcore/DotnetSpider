@@ -11,7 +11,6 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DotnetSpider.Extension.Processor;
 
 namespace DotnetSpider.Extension.Test
 {
