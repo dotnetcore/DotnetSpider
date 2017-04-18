@@ -32,7 +32,7 @@ namespace DotnetSpider.Core.Test
 			}
 			catch (SpiderException exception)
 			{
-				Assert.AreEqual("Length of Identity should less than 32.", exception.Message);
+				Assert.AreEqual("Length of Identity should less than 100.", exception.Message);
 			}
 
 			try
@@ -45,7 +45,7 @@ namespace DotnetSpider.Core.Test
 			}
 			catch (SpiderException exception)
 			{
-				Assert.AreEqual("Length of UserId should less than 32.", exception.Message);
+				Assert.AreEqual("Length of UserId should less than 100.", exception.Message);
 			}
 
 			try
@@ -58,7 +58,7 @@ namespace DotnetSpider.Core.Test
 			}
 			catch (SpiderException exception)
 			{
-				Assert.AreEqual("Length of TaskGroup should less than 32.", exception.Message);
+				Assert.AreEqual("Length of TaskGroup should less than 100.", exception.Message);
 				return;
 			}
 

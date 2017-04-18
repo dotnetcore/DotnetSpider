@@ -14,11 +14,6 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		public override void InitEntity(EntityMetadata metadata)
 		{
-			if (metadata.Schema == null)
-			{
-				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				return;
-			}
 			IsEnabled = true;
 		}
 

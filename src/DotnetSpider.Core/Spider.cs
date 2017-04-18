@@ -158,19 +158,19 @@ namespace DotnetSpider.Core
 			UserId = (string.IsNullOrEmpty(UserId) || string.IsNullOrWhiteSpace(UserId)) ? "" : UserId;
 			TaskGroup = (string.IsNullOrEmpty(TaskGroup) || string.IsNullOrWhiteSpace(TaskGroup)) ? "" : TaskGroup;
 
-			if (Identity.Length > 32)
+			if (Identity.Length > 100)
 			{
-				throw new SpiderException("Length of Identity should less than 32.");
+				throw new SpiderException("Length of Identity should less than 100.");
 			}
 
-			if (UserId.Length > 32)
+			if (UserId.Length > 100)
 			{
-				throw new SpiderException("Length of UserId should less than 32.");
+				throw new SpiderException("Length of UserId should less than 100.");
 			}
 
-			if (TaskGroup.Length > 32)
+			if (TaskGroup.Length > 100)
 			{
-				throw new SpiderException("Length of TaskGroup should less than 32.");
+				throw new SpiderException("Length of TaskGroup should less than 100.");
 			}
 
 			if (PageProcessors == null || PageProcessors.Count == 0)

@@ -8,6 +8,9 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
+			RegexTestEntitySpider spider2 = new RegexTestEntitySpider();
+			spider2.Run();
+
 			EntitySpider spider = new EntitySpider(new Core.Site());
 			spider.AddStartUrl("http://www.baidu.com");
 
