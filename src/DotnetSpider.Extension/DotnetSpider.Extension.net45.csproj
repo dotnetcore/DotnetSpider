@@ -59,6 +59,7 @@
     <Compile Include="Infrastructure\Macros.cs" />
     <Compile Include="Infrastructure\RedisConnection.cs" />
     <Compile Include="Infrastructure\SelectorUtil.cs" />
+    <Compile Include="Infrastructure\WindowsUserUtil.cs" />
     <Compile Include="LinkContextSpider.cs" />
     <Compile Include="Model\Attribute\BaseSelector.cs" />
     <Compile Include="Model\Attribute\EntitySelector.cs" />

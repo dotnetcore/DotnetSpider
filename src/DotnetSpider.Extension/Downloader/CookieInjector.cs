@@ -23,6 +23,8 @@ namespace DotnetSpider.Extension.Downloader
 	public abstract class WebDriverCookieInjector : CookieInjector
 	{
 		public Browser Browser { get; set; } = Browser.Chrome;
+		public bool UseSystemProfile { get; set; } = false;
+		public string UserDataDir { get; set; } = string.Empty;
 
 		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
 		{
@@ -51,7 +53,19 @@ namespace DotnetSpider.Extension.Downloader
 						ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
 						cds.HideCommandPromptWindow = true;
 						ChromeOptions opt = new ChromeOptions();
-						opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
+						if (UseSystemProfile)
+						{
+							var userFileDir = $"C:\\Users\\{WindowsUserUtil.CurrentUser}\\AppData\\Local\\Google\\Chrome\\User Data\\";
+							opt.AddArgument("--user-data-dir=" + userFileDir + "");
+						}
+						else if (!string.IsNullOrEmpty(UserDataDir))
+						{
+							opt.AddArgument("--user-data-dir=" + UserDataDir + "");
+						}
+						else
+						{
+							opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
+						}
 						webDriver = new ChromeDriver(cds, opt);
 						break;
 					}
