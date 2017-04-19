@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Core;
-using System;
 
 namespace DotnetSpider.Extension.Redial
 {

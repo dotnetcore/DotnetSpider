@@ -3,20 +3,18 @@ using System.Net;
 using System.Threading;
 using DotnetSpider.Extension.Redial.InternetDetector;
 using DotnetSpider.Extension.Redial.Redialer;
-using StackExchange.Redis;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
-using System.Linq;
-using System.Runtime.InteropServices;
 #endif
 
 namespace DotnetSpider.Extension.Redial
 {
 	public class RedisRedialExecutor : RedialExecutor
 	{
-		public static string HostName { get; set; } = Dns.GetHostName();
-		public const string Locker = "redial-locker";
+		public static string HostName => $"dotnetspider:nodes:{Dns.GetHostName()}";
+
+		public const string Locker = "dotnetspider:redialLocker";
 
 		public string ConnectString { get; private set; }
 		public RedisConnection RedisConnection { get; private set; }

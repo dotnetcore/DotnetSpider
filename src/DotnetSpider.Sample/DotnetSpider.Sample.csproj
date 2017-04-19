@@ -12,7 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
-    <ProjectReference Include="..\DotnetSpider.Redial\DotnetSpider.Redial.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;NETSTANDARD1_6;NET_CORE;</DefineConstants>
-    <OutputPath>C:\solutions\DotnetSpider2\output\</OutputPath>
+    <OutputPath>C:\solutions\DotnetSpider\output\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

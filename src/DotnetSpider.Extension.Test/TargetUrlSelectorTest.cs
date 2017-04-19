@@ -78,7 +78,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void TargetUrlsSelector_1Region_1Pattern()
 		{
-			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity14).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity14).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity1);
 			Assert.AreEqual(1, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -88,7 +88,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void TargetUrlsSelector_2Region_1Pattern()
 		{
-			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity16).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity16).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity1);
 			Assert.AreEqual(1, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -102,7 +102,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void TargetUrlsSelector_1Region_2Pattern()
 		{
-			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity17).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity17).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity1);
 			Assert.AreEqual(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -115,7 +115,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity15).GetTypeInfo());
+				var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity15).GetTypeInfo());
 				var processor2 = new EntityProcessor(new Site(), entity2);
 			}
 			catch (Exception e)
@@ -129,7 +129,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void TargetUrlsSelector_2Region_2Pattern()
 		{
-			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity18).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity18).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity1);
 			Assert.AreEqual(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -145,7 +145,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void TargetUrlsSelector_Multi_2Region_2Pattern()
 		{
-			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity19).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity19).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity1);
 			Assert.AreEqual(1, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -159,7 +159,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void TargetUrlsSelector_Multi_2SameRegion_2Pattern()
 		{
-			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity20).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity20).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity1);
 			Assert.AreEqual(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.AreEqual(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -171,7 +171,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void TargetUrlsSelector_Multi_2SameRegion_2SamePattern()
 		{
-			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity21).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity21).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity1);
 			Assert.AreEqual(1, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -182,7 +182,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void TargetUrlsSelector_Multi_2Region_2SamePattern()
 		{
-			var entity1 = EntitySpider.ParseEntityMetaData(typeof(Entity22).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity22).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity1);
 			Assert.AreEqual(1, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -198,7 +198,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity23).GetTypeInfo());
+				var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity23).GetTypeInfo());
 				var processor2 = new EntityProcessor(new Site(), entity2);
 			}
 			catch (ArgumentNullException e)
@@ -214,7 +214,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity24).GetTypeInfo());
+				var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity24).GetTypeInfo());
 				var processor2 = new EntityProcessor(new Site(), entity2);
 			}
 			catch (ArgumentNullException e)
@@ -228,7 +228,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void TargetUrlsSelector_NullRegion_1Pattern()
 		{
-			var entity2 = EntitySpider.ParseEntityMetaData(typeof(Entity25).GetTypeInfo());
+			var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity25).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity2);
 			Assert.AreEqual(1, processor.GetTargetUrlPatterns(".").Count);
 			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns(".")[0].ToString());

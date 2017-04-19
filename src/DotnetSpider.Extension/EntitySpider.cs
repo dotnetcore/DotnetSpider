@@ -10,33 +10,29 @@ using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json;
 using DotnetSpider.Extension.Redial;
-using StackExchange.Redis;
 using DotnetSpider.Core.Infrastructure;
-using System.Net;
 using System.Threading;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Extension.Downloader;
-using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
-using System.Runtime.InteropServices;
 #endif
 
 namespace DotnetSpider.Extension
 {
 	public class EntitySpider : Spider
 	{
-		private const string InitStatusSetKey = "dotnetspider:init-status";
-		private const string ValidateStatusKey = "dotnetspider:validate-status";
+		private const string InitStatusSetKey = "dotnetspider:init-stats";
+		private const string ValidateStatusKey = "dotnetspider:validate-stats";
 		private IRedialExecutor _redialExecutor;
 
 		private int _cachedSize;
 
 		[JsonIgnore]
 		public Action VerifyCollectedData { get; set; }
-		public Infrastructure.RedisConnection RedisConnection { get; private set; }
+		[JsonIgnore]
+		public RedisConnection RedisConnection { get; private set; }
+
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 
 		public PrepareStartUrls[] PrepareStartUrls { get; set; }
@@ -71,31 +67,32 @@ namespace DotnetSpider.Extension
 
 		public EntitySpider(Site site) : base()
 		{
-			Site = site ?? throw new SpiderException("Site should not be null.");
+			if (site == null)
+			{
+				throw new SpiderException("Site should not be null.");
+			}
+			Site = site;
 		}
 
 		protected override void PreInitComponent(params string[] arguments)
 		{
 			if (Entities == null || Entities.Count == 0)
 			{
-				this.Log("Count of entity is zero.", LogLevel.Error);
 				throw new SpiderException("Count of entity is zero.");
 			}
 
 			if (EntityPipelines == null || EntityPipelines.Count == 0)
 			{
-				this.Log("Need at least one entity pipeline.", LogLevel.Error);
 				throw new SpiderException("Need at least one entity pipeline.");
 			}
 
 			foreach (var entity in Entities)
 			{
-				string entiyName = entity.Entity.Name;
 				var pipelines = new List<BaseEntityPipeline>();
 				foreach (var pipeline in EntityPipelines)
 				{
-					var newPipeline = pipeline.Clone();
-					newPipeline.InitiEntity(entity);
+					BaseEntityPipeline newPipeline = pipeline.Clone();
+					newPipeline.InitEntity(entity);
 					if (newPipeline.IsEnabled)
 					{
 						pipelines.Add(newPipeline);
@@ -103,7 +100,7 @@ namespace DotnetSpider.Extension
 				}
 				if (pipelines.Count > 0)
 				{
-					AddPipeline(new EntityPipeline(entiyName, pipelines));
+					AddPipeline(new EntityPipeline(entity.Entity.Name, pipelines));
 				}
 			}
 
@@ -119,8 +116,7 @@ namespace DotnetSpider.Extension
 				}
 			}
 
-
-			if (RedisConnection != null && RedisConnection.IsEnable)
+			if (RedisConnection != null)
 			{
 				while (!RedisConnection.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(10)))
 				{
@@ -134,7 +130,7 @@ namespace DotnetSpider.Extension
 			{
 				Scheduler.Init(this);
 				Scheduler.Dispose();
-				if (RedisConnection != null && RedisConnection.IsEnable)
+				if (RedisConnection != null)
 				{
 					RedisConnection.Database.HashDelete(ValidateStatusKey, Identity);
 				}
@@ -158,7 +154,7 @@ namespace DotnetSpider.Extension
 
 		protected override void AfterInitComponent(params string[] arguments)
 		{
-			if (RedisConnection != null && RedisConnection.IsEnable)
+			if (RedisConnection != null)
 			{
 				RedisConnection.Database.LockRelease(InitLockKey, 0);
 			}
@@ -169,7 +165,7 @@ namespace DotnetSpider.Extension
 		{
 			get
 			{
-				return "dotnetspider:locker-" + Identity;
+				return $"dotnetspider:initLocker:{Identity}";
 			}
 		}
 
@@ -185,7 +181,7 @@ namespace DotnetSpider.Extension
 
 			if (typeof(ISpiderEntity).IsAssignableFrom(type))
 			{
-				var entity = ParseEntityMetaData(type.GetTypeInfoCrossPlatform());
+				var entity = GenerateEntityMetaData(type.GetTypeInfoCrossPlatform());
 
 				entity.DataHandler = dataHandler;
 
@@ -230,12 +226,12 @@ namespace DotnetSpider.Extension
 			{
 				return;
 			}
-			string key = "dotnetspider:locker-validate-" + Identity;
+			string key = $"dotnetspider:validateLocker:{Identity}";
 
 			try
 			{
 				bool needInitStartRequest = true;
-				if (RedisConnection != null && RedisConnection.IsEnable)
+				if (RedisConnection != null)
 				{
 					while (!RedisConnection.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
 					{
@@ -252,7 +248,7 @@ namespace DotnetSpider.Extension
 				}
 				this.Log("数据验证已完成.", LogLevel.Info);
 
-				if (needInitStartRequest && RedisConnection != null && RedisConnection.IsEnable)
+				if (needInitStartRequest && RedisConnection != null)
 				{
 					RedisConnection.Database.HashSet(ValidateStatusKey, Identity, "verify finished");
 				}
@@ -264,7 +260,7 @@ namespace DotnetSpider.Extension
 			}
 			finally
 			{
-				if (RedisConnection != null && RedisConnection.IsEnable)
+				if (RedisConnection != null)
 				{
 					RedisConnection.Database.LockRelease(key, 0);
 				}
@@ -273,7 +269,7 @@ namespace DotnetSpider.Extension
 
 		private void RegisterControl(ISpider spider)
 		{
-			if (RedisConnection != null && RedisConnection.IsEnable)
+			if (RedisConnection != null)
 			{
 				try
 				{
@@ -311,7 +307,7 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public static EntityMetadata ParseEntityMetaData(
+		public static EntityMetadata GenerateEntityMetaData(
 #if !NET_CORE
 			Type entityType
 #else
@@ -336,7 +332,7 @@ namespace DotnetSpider.Extension
 				entityMetadata.Updates = updates.Columns.ToList();
 			}
 
-			Entity entity = ParseEntity(entityType);
+			Entity entity = GenerateEntity(entityType);
 			entityMetadata.Entity = entity;
 			EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
 			if (extractByAttribute != null)
@@ -353,7 +349,7 @@ namespace DotnetSpider.Extension
 			return entityMetadata;
 		}
 
-		public static Entity ParseEntity(
+		public static Entity GenerateEntity(
 #if !NET_CORE
 			Type entityType
 #else
@@ -405,7 +401,7 @@ namespace DotnetSpider.Extension
 						throw new SpiderException("Can not set TargetUrl attribute to a ISpiderEntity property.");
 					}
 
-					token.Fields.Add(ParseEntity(propertyInfo.PropertyType.GetTypeInfoCrossPlatform()));
+					token.Fields.Add(GenerateEntity(propertyInfo.PropertyType.GetTypeInfoCrossPlatform()));
 				}
 				else
 				{
@@ -438,7 +434,7 @@ namespace DotnetSpider.Extension
 					if (storeAs != null)
 					{
 						token.Name = storeAs.Name;
-						token.DataType = ParseDataType(storeAs);
+						token.DataType = storeAs.ToString();
 					}
 					else
 					{
@@ -461,43 +457,6 @@ namespace DotnetSpider.Extension
 				}
 			}
 			return entity;
-		}
-
-		private static string ParseDataType(StoredAs storedAs)
-		{
-			string reslut = "";
-
-			switch (storedAs.Type)
-			{
-				case DataType.Bool:
-					{
-						reslut = "BOOL";
-						break;
-					}
-				case DataType.Date:
-					{
-						reslut = "DATE";
-						break;
-					}
-				case DataType.Time:
-					{
-						reslut = "TIME";
-						break;
-					}
-				case DataType.Text:
-					{
-						reslut = "TEXT";
-						break;
-					}
-
-				case DataType.String:
-					{
-						reslut = $"STRING,{storedAs.Length}";
-						break;
-					}
-			}
-
-			return reslut;
 		}
 	}
 }

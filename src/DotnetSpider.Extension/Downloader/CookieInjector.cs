@@ -1,11 +1,4 @@
-using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
-using System.Collections.Generic;
-using System.IO;
-using DotnetSpider.Extension.Infrastructure;
-
 #if !NET_CORE
-
 using OpenQA.Selenium.Firefox;
 using System;
 using DotnetSpider.Core.Selector;
@@ -17,6 +10,11 @@ using DotnetSpider.Extension.Model;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
+using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core;
+using System.IO;
+using DotnetSpider.Extension.Infrastructure;
+using System.Collections.Generic;
 #endif
 
 namespace DotnetSpider.Extension.Downloader

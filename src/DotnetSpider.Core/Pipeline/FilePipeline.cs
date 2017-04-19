@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using DotnetSpider.Core.Infrastructure;
 #if NET_CORE
-using System.Runtime.InteropServices;
 #endif
 
 namespace DotnetSpider.Core.Pipeline

@@ -1,5 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using DotnetSpider.Extension;
+using System;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace DotnetSpider.Sample
 {
@@ -8,12 +10,12 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			CasSpider spider = new CasSpider();
-			spider.Run();
-			// Crawler pages traversal 遍历整站
-			BaseUsage.CrawlerPagesTraversal();
-			Console.WriteLine("Press any key to continue...");
-			Console.Read();
+			RegexTestEntitySpider spider2 = new RegexTestEntitySpider();
+			spider2.Run();
+
+			EntitySpider spider = new EntitySpider(new Core.Site());
+			spider.AddStartUrl("http://www.baidu.com");
+
 
 			// Custmize processor and pipeline 完全自定义页面解析和数据管道
 			BaseUsage.CustmizeProcessorAndPipeline();

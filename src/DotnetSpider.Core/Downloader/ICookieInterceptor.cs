@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DotnetSpider.Core.Downloader
+﻿namespace DotnetSpider.Core.Downloader
 {
 	public interface ICookieInjector
 	{

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using DotnetSpider.Core;
+﻿using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
 
@@ -25,8 +23,9 @@ namespace DotnetSpider.Extension.Pipeline
 			return _collector;
 		}
 
-		public override void InitiEntity(EntityMetadata metadata)
+		public override void InitEntity(EntityMetadata metadata)
 		{
+			IsEnabled = true;
 		}
 
 		public override void Process(List<JObject> datas)

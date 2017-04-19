@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using DotnetSpider.Core.Proxy;
 using System.Net;
-using System.Collections.ObjectModel;
 using DotnetSpider.Core.Downloader;
 
 namespace DotnetSpider.Core

@@ -7,14 +7,14 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class BaseEntityPipeline : IEntityPipeline
 	{
+		public bool IsEnabled { get; protected set; } = false;
 		public ISpider Spider { get; protected set; }
-		public bool IsEnabled { get; protected set; } = true;
 
 		public virtual void Dispose()
 		{
 		}
 
-		public abstract void InitiEntity(EntityMetadata metadata);
+		public abstract void InitEntity(EntityMetadata metadata);
 
 		public virtual void InitPipeline(ISpider spider)
 		{

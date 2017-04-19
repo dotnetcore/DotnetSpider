@@ -1,8 +1,6 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using System;
+﻿using System;
 using System.IO;
 #if NET_CORE
-using System.Runtime.InteropServices;
 #endif
 
 namespace DotnetSpider.Core.Pipeline

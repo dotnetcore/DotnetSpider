@@ -5,11 +5,8 @@ using DotnetSpider.Core.Infrastructure;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using StackExchange.Redis;
-using System.Net;
 using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
-using System.Runtime.InteropServices;
-using System.Linq;
 #endif
 
 namespace DotnetSpider.Extension.Scheduler
@@ -23,8 +20,8 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public RedisConnection RedisConnection { get; private set; }
 
-		public const string TaskList = "dotnetspider:task";
-		public const string TaskStatus = "dotnetspider:task-status";
+		public const string TasksKey = "dotnetspider:tasks";
+		public const string TaskStatsKey = "dotnetspider:task-stats";
 		private string _queueKey;
 		private string _setKey;
 		private string _itemKey;
@@ -53,16 +50,16 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 
 			var md5 = Encrypt.Md5Encrypt(spider.Identity);
-			_itemKey = "dotnetspider:item-" + md5;
-			_setKey = "dotnetspider:set-" + md5;
-			_queueKey = "dotnetspider:queue-" + md5;
-			_errorCountKey = "dotnetspider:error-record" + md5;
-			_successCountKey = "dotnetspider:success-record" + md5;
+			_itemKey = $"dotnetspider:scheduler:{md5}:items";
+			_setKey = $"dotnetspider:scheduler:{md5}:set";
+			_queueKey = $"dotnetspider:scheduler:{md5}:queue";
+			_errorCountKey = $"dotnetspider:scheduler:{md5}:numberOfFailures";
+			_successCountKey = $"dotnetspider:scheduler:{md5}:numberOfSuccessful";
 			_identityMd5 = md5;
 
 			NetworkCenter.Current.Execute("rds-in", () =>
 			{
-				RedisConnection.Database.SortedSetAdd(TaskList, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
+				RedisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
 			});
 		}
 
@@ -249,7 +246,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			get
 			{
-				var result = RedisConnection.Database.HashGet(TaskStatus, _identityMd5);
+				var result = RedisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
 				if (result.HasValue)
 				{
 					return result == 1;
@@ -261,7 +258,7 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 			set
 			{
-				RedisConnection.Database.HashSet(TaskStatus, _identityMd5, value ? 1 : 0);
+				RedisConnection.Database.HashSet(TaskStatsKey, _identityMd5, value ? 1 : 0);
 			}
 		}
 

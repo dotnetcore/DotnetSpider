@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void Extract()
 		{
-			var entityMetadata = EntitySpider.ParseEntityMetaData(typeof(Product).GetTypeInfo());
+			var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo());
 			EntityExtractor extractor = new EntityExtractor("test", null, entityMetadata);
 			var results = extractor.Extract(new Page(new Request("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, dynamic>
 			{

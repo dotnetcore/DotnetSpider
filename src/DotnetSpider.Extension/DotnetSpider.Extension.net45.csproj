@@ -49,6 +49,7 @@
     <Compile Include="Downloader\WebDriver\IWebDriverHandler.cs" />
     <Compile Include="Downloader\WebDriver\Option.cs" />
     <Compile Include="Downloader\WebDriver\WebDriverDownloader.cs" />
+    <Compile Include="Downloader\WebDriver\WebDriverHandler.cs" />
     <Compile Include="Downloader\WebDriver\WebDriverUtil.cs" />
     <Compile Include="EntitySpider.cs" />
     <Compile Include="ILinkSpiderContext.cs" />

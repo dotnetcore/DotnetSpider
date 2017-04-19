@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>C:\solutions\DotnetSpider2\output\</OutputPath>
+    <OutputPath>C:\solutions\DotnetSpider\output\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

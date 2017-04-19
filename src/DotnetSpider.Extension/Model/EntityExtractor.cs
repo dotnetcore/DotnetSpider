@@ -193,7 +193,9 @@ namespace DotnetSpider.Extension.Model
 						if (needCount)
 						{
 							var propertyValues = item.SelectList(selector).Nodes();
-							return propertyValues?.Count.ToString() ?? "-1";
+							string count = propertyValues?.Count.ToString();
+							count = string.IsNullOrEmpty(count) ? "-1" : count;
+							return count;
 						}
 						else
 						{

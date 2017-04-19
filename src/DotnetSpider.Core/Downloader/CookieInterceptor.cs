@@ -1,7 +1,4 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -11,14 +8,17 @@ namespace DotnetSpider.Core.Downloader
 		{
 			if (stopSpider)
 			{
-				spider.Pause();
+				spider.Pause(() =>
+				{
+					spider.Site.Cookies = GetCookies(spider.Site);
+					spider.Log("注入 Cookies 成功。", LogLevel.Info);
+					spider.Contiune();
+				});
 			}
-			spider.Site.Cookies = GetCookies(spider.Site);
-			spider.Log("注入 Cookies 成功。", LogLevel.Info);
-
-			if (stopSpider)
+			else
 			{
-				spider.Contiune();
+				spider.Site.Cookies = GetCookies(spider.Site);
+				spider.Log("注入 Cookies 成功。", LogLevel.Info);
 			}
 		}
 

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DotnetSpider.Core.Downloader
+﻿namespace DotnetSpider.Core.Downloader
 {
 	public class DownloadException : SpiderException
 	{

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Core.Infrastructure;
@@ -13,13 +12,9 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class ConsoleEntityPipeline : BaseEntityPipeline
 	{
-		public override void InitiEntity(EntityMetadata metadata)
+		public override void InitEntity(EntityMetadata metadata)
 		{
-			if (metadata.Schema == null)
-			{
-				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				IsEnabled = false;
-			}
+			IsEnabled = true;
 		}
 
 		public override void Process(List<JObject> datas)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using DotnetSpider.Core.Infrastructure;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
