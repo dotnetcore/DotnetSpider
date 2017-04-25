@@ -19,23 +19,21 @@ namespace DotnetSpider.Sample
 			{
 				EncodingName = "GB2312"
 			});
-			context.AddEntityPipeline(new MsSqlEntityPipeline("Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True"));
+			context.AddPipeline(new SqlServerEntityPipeline("Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True"));
 			context.AddStartUrl("http://www.sneac.com/pgjhcx/ypbkyxjg.jsp?a11709CountNo=2000");
 			context.AddEntityType(typeof(Item));
 
 			return context;
 		}
 
-		[Schema("abc", "shanxizhaosheng")]
+		[Table("abc", "shanxizhaosheng")]
 		[EntitySelector(Expression = "/html/body/table[3]/tbody/tr/td/table/tbody/tr/td/table[2]/tbody/tr/td/table/tr/td/a")]
 		public class Item : ISpiderEntity
 		{
-			[StoredAs("school", DataType.String, 200)]
-			[PropertySelector(Expression = ".")]
+			[PropertyDefine(Expression = ".")]
 			public string School { get; set; }
 
-			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
-			[StoredAs("cdate", DataType.Time)]
+			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
 			public DateTime CDate { get; set; }
 		}
 	}

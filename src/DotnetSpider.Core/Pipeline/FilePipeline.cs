@@ -31,31 +31,35 @@ namespace DotnetSpider.Core.Pipeline
 			return $"{BasePath}{Infrastructure.Environment.PathSeperator}{Spider.Identity}{Infrastructure.Environment.PathSeperator}";
 		}
 
-		public override void Process(ResultItems resultItems)
+		public override void Process(params ResultItems[] resultItems)
 		{
 			try
 			{
-				string filePath = $"{BasePath}{Infrastructure.Environment.PathSeperator}{Spider.Identity}{Infrastructure.Environment.PathSeperator}{Guid.NewGuid().ToString("N")}.dsd";
-				FileInfo file = PrepareFile(filePath);
-				using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
+				foreach (var resultItem in resultItems)
 				{
-					printWriter.WriteLine("url:\t" + resultItems.Request.Url);
+					string filePath = $"{BasePath}{Infrastructure.Environment.PathSeperator}{Spider.Identity}{Infrastructure.Environment.PathSeperator}{Guid.NewGuid().ToString("N")}.dsd";
+					FileInfo file = PrepareFile(filePath);
 
-					foreach (var entry in resultItems.Results)
+					using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
 					{
-						var value = entry.Value as IList;
-						if (value != null)
+						printWriter.WriteLine("url:\t" + resultItem.Request.Url);
+
+						foreach (var entry in resultItem.Results)
 						{
-							IList list = value;
-							printWriter.WriteLine(entry.Key + ":");
-							foreach (var o in list)
+							var value = entry.Value as IList;
+							if (value != null)
 							{
-								printWriter.WriteLine(o);
+								IList list = value;
+								printWriter.WriteLine(entry.Key + ":");
+								foreach (var o in list)
+								{
+									printWriter.WriteLine(o);
+								}
 							}
-						}
-						else
-						{
-							printWriter.WriteLine(entry.Key + ":\t" + entry.Value);
+							else
+							{
+								printWriter.WriteLine(entry.Key + ":\t" + entry.Value);
+							}
 						}
 					}
 				}

@@ -40,41 +40,41 @@ namespace DotnetSpider.Extension.Test
 			Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), results[0].GetValue("RunId"));
 		}
 
-		[Schema("test", "sku", TableSuffix.Today)]
+		[Table("test", "sku", TableSuffix.Today)]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class Product : ISpiderEntity
 		{
-			[PropertySelector(Expression = "cat", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "cat", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
 
-			[PropertySelector(Expression = "cat3", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "cat3", Type = SelectorType.Enviroment)]
 			public int CategoryId { get; set; }
 
-			[PropertySelector(Expression = "./div[1]/a/@href")]
+			[PropertyDefine(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[PropertySelector(Expression = "./@data-sku")]
+			[PropertyDefine(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 
-			[PropertySelector(Expression = "./div[5]/strong/a")]
+			[PropertyDefine(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
-			[PropertySelector(Expression = ".//div[@class='p-shop']/@data-shop_name")]
+			[PropertyDefine(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
-			[PropertySelector(Expression = ".//div[@class='p-name']/a/em")]
+			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
 
-			[PropertySelector(Expression = "./@venderid")]
+			[PropertyDefine(Expression = "./@venderid")]
 			public string VenderId { get; set; }
 
-			[PropertySelector(Expression = "./@jdzy_shop_id")]
+			[PropertyDefine(Expression = "./@jdzy_shop_id")]
 			public string JdzyShopId { get; set; }
 
-			[PropertySelector(Expression = "Today", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "Today", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 
-			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
 			public DateTime CDate { get; set; }
 		}
 	}

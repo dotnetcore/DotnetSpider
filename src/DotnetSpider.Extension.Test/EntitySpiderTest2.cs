@@ -19,32 +19,11 @@ namespace DotnetSpider.Extension.Test
 	{
 		private class TestPipeline : BaseEntityDbPipeline
 		{
+			public TestPipeline(string connectString, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
+			{
+			}
+
 			protected override DbConnection CreateConnection()
-			{
-				throw new NotImplementedException();
-			}
-
-			protected override string GetInsertSql()
-			{
-				throw new NotImplementedException();
-			}
-
-			protected override string GetUpdateSql()
-			{
-				throw new NotImplementedException();
-			}
-
-			protected override string GetSelectSql()
-			{
-				throw new NotImplementedException();
-			}
-
-			protected override string GetCreateTableSql()
-			{
-				throw new NotImplementedException();
-			}
-
-			protected override string GetCreateSchemaSql(string serverVersion)
 			{
 				throw new NotImplementedException();
 			}
@@ -54,126 +33,136 @@ namespace DotnetSpider.Extension.Test
 				throw new NotImplementedException();
 			}
 
-			protected override string ConvertToDbType(string datatype)
+			protected override string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion)
 			{
 				throw new NotImplementedException();
 			}
 
-			public override BaseEntityPipeline Clone()
+			protected override string GetCreateTableSql(EntityDbMetadata metadata)
 			{
-				return new TestPipeline();
+				throw new NotImplementedException();
 			}
 
-			protected override string GetIfSchemaExistsSql(string serverVersion)
+			protected override string GetIfSchemaExistsSql(EntityDbMetadata metadata, string serverVersion)
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override string GetInsertSql(EntityDbMetadata metadata)
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override string GetSelectSql(EntityDbMetadata metadata)
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override string GetUpdateSql(EntityDbMetadata metadata)
 			{
 				throw new NotImplementedException();
 			}
 		}
 
-		[Schema("db", "table")]
-		[Indexes(Primary = "name")]
+		[Table("db", "table", Primary = "name")]
 		public class Entity1 : ISpiderEntity
 		{
-			[StoredAs("url", DataType.String)]
+			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
-		[Schema("db", "table")]
-		[Indexes(Index = new[] { "c1" })]
+		[Table("db", "table", Indexs = new[] { "c1" })]
 		public class Entity2 : ISpiderEntity
 		{
-			[StoredAs("url", DataType.String)]
+			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
-		[Schema("db", "table")]
-		[Indexes(Unique = new[] { "c1" })]
+		[Table("db", "table", Uniques = new[] { "c1" })]
 		public class Entity3 : ISpiderEntity
 		{
-			[StoredAs("url", DataType.String)]
+			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
-		[Schema("db", "table", TableSuffix.Monday)]
+		[Table("db", "table", TableSuffix.Monday)]
 		public class Entity4 : ISpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
-		[Indexes(Primary = "Name")]
-		[Schema("db", "table")]
+		[Table("db", "table", Primary = "Name")]
 		public class Entity5 : ISpiderEntity
 		{
+			[PropertyDefine(Expression = "")]
 			public string Name { get; set; }
 		}
 
-		[Indexes(Primary = "name")]
-		[Schema("db", "table")]
+		[Table("db", "table", Primary = "name")]
 		public class Entity6 : ISpiderEntity
 		{
-			[StoredAs("name", DataType.String, 255)]
-			public string Name { get; set; }
+			[PropertyDefine(Expression = "", Length = 255)]
+			public string name { get; set; }
 		}
 
-		[Schema("db", "table")]
+		[Table("db", "table")]
 		[EntitySelector(Expression = "expression")]
 		public class Entity7 : ISpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
-		[Schema("db", "table")]
+		[Table("db", "table")]
 		[EntitySelector(Expression = "expression2", Type = SelectorType.Css)]
 		public class Entity8 : ISpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
-		[Schema("db", "table")]
+		[Table("db", "table")]
 		public class Entity9 : ISpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
-		[Schema("db", "table")]
-		[Indexes(Primary = "name", AutoIncrement = new[] { "Id" }, Index = new[] { "Id" }, Unique = new[] { "Id,Name", "Id" })]
+		[Table("db", "table", Primary = "Name", Indexs = new[] { "Id" }, Uniques = new[] { "Id,Name", "Id" })]
 		public class Entity10 : ISpiderEntity
 		{
 			public int Id { get; set; }
 			public string Name { get; set; }
 		}
 
-		[Schema("db", "table")]
+		[Table("db", "table")]
 		public class Entity11 : ISpiderEntity
 		{
 			public int Id { get; set; }
+
 			[ReplaceFormatter(NewValue = "a", OldValue = "b")]
 			[RegexFormatter(Pattern = "a(*)")]
+			[PropertyDefine(Expression = "Name")]
 			public string Name { get; set; }
 		}
 
-		[Schema("db", "table12")]
+		[Table("db", "table12")]
 		public class Entity12 : ISpiderEntity
 		{
-			[PropertySelector(Expression = "Id")]
+			[PropertyDefine(Expression = "Id")]
 			public int Id { get; set; }
-			[StoredAs("url", DataType.String)]
-			[PropertySelector(Expression = "Name")]
+
+			[PropertyDefine(Expression = "Name")]
 			public string Name { get; set; }
 		}
 
-		[Schema("db", "table13")]
+		[Table("db", "table13")]
 		public class Entity13 : ISpiderEntity
 		{
-			[PropertySelector(Expression = "Url")]
-			[StoredAs("url", DataType.String)]
+			[PropertyDefine(Expression = "Url")]
 			public string Url { get; set; }
 		}
 
 		public class Entity14 : ISpiderEntity
 		{
-			[PropertySelector(Expression = "Url")]
-			[StoredAs("url", DataType.String)]
+			[PropertyDefine(Expression = "Url")]
 			public string Url { get; set; }
 		}
 
@@ -200,19 +189,18 @@ namespace DotnetSpider.Extension.Test
 		public void Indexes()
 		{
 			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity10).GetTypeInfo());
-			Assert.AreEqual("Id", entity1.Indexes[0][0]);
-			Assert.AreEqual("name", entity1.Primary[0]);
-			Assert.AreEqual(2, entity1.Uniques.Count);
-			Assert.AreEqual("Id", entity1.Uniques[0][0]);
-			Assert.AreEqual("Name", entity1.Uniques[0][1]);
-			Assert.AreEqual("Id", entity1.Uniques[1][0]);
+			Assert.AreEqual("Id", entity1.Table.Indexs[0]);
+			Assert.AreEqual("Name", entity1.Table.Primary);
+			Assert.AreEqual(2, entity1.Table.Uniques.Length);
+			Assert.AreEqual("Id,Name", entity1.Table.Uniques[0]);
+			Assert.AreEqual("Id", entity1.Table.Uniques[1]);
 		}
 
 		[TestMethod]
 		public void Formater()
 		{
 			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity11).GetTypeInfo());
-			var formatters = ((Field)entity1.Entity.Fields[1]).Formatters;
+			var formatters = ((Field)entity1.Entity.Fields[0]).Formatters;
 			Assert.AreEqual(2, formatters.Count);
 			var replaceFormatter = (ReplaceFormatter)formatters[0];
 			Assert.AreEqual("a", replaceFormatter.NewValue);
@@ -223,12 +211,12 @@ namespace DotnetSpider.Extension.Test
 		public void Schema()
 		{
 			var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity4).GetTypeInfo());
-			Assert.AreEqual("db", entityMetadata.Schema.Database);
-			Assert.AreEqual("table", entityMetadata.Schema.TableName);
-			Assert.AreEqual(TableSuffix.Monday, entityMetadata.Schema.Suffix);
+			Assert.AreEqual("db", entityMetadata.Table.Database);
+			Assert.AreEqual(EntitySpider.GenerateTableName("table", entityMetadata.Table.Suffix), entityMetadata.Table.Name);
+			Assert.AreEqual(TableSuffix.Monday, entityMetadata.Table.Suffix);
 
 			var entityMetadata1 = EntitySpider.GenerateEntityMetaData(typeof(Entity14).GetTypeInfo());
-			Assert.IsNull(entityMetadata1.Schema);
+			Assert.IsNull(entityMetadata1.Table);
 		}
 
 		[TestMethod]
@@ -248,13 +236,13 @@ namespace DotnetSpider.Extension.Test
 			try
 			{
 				var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity1).GetTypeInfo());
-				TestPipeline pipeline = new TestPipeline();
-				pipeline.InitEntity(entityMetadata);
+				TestPipeline pipeline = new TestPipeline("");
+				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
 			}
 			catch (SpiderException exception)
 			{
-				Assert.AreEqual("Columns set as primary is not a property of your entity.", exception.Message);
+				Assert.AreEqual("Columns set as Primary is not a property of your entity.", exception.Message);
 			}
 		}
 
@@ -264,8 +252,8 @@ namespace DotnetSpider.Extension.Test
 			try
 			{
 				var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity2).GetTypeInfo());
-				TestPipeline pipeline = new TestPipeline();
-				pipeline.InitEntity(entityMetadata);
+				TestPipeline pipeline = new TestPipeline("");
+				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
 			}
 			catch (SpiderException exception)
@@ -280,8 +268,8 @@ namespace DotnetSpider.Extension.Test
 			try
 			{
 				var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity3).GetTypeInfo());
-				TestPipeline pipeline = new TestPipeline();
-				pipeline.InitEntity(entityMetadata);
+				TestPipeline pipeline = new TestPipeline("");
+				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
 			}
 			catch (SpiderException exception)
@@ -296,17 +284,17 @@ namespace DotnetSpider.Extension.Test
 			EntitySpider context = new EntitySpider(new Site());
 			context.SetIdentity(Guid.NewGuid().ToString("N"));
 			context.SetThreadNum(1);
-			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
-			context.AddEntityPipeline(new MySqlFileEntityPipeline());
-			context.AddEntityPipeline(new ConsoleEntityPipeline());
-			context.AddEntityPipeline(new JsonFileEntityPipeline());
+			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			context.AddPipeline(new MySqlFileEntityPipeline());
+			context.AddPipeline(new ConsoleEntityPipeline());
+			context.AddPipeline(new JsonFileEntityPipeline());
 
 			context.AddStartUrl("http://baidu.com");
 			context.AddEntityType(typeof(Entity13));
 			context.AddEntityType(typeof(Entity12));
 			context.Run("running-test");
 
-			var entityPipelines = context.EntityPipelines;
+			var entityPipelines = context.Pipelines;
 
 			Assert.AreEqual(4, entityPipelines.Count);
 
@@ -318,13 +306,13 @@ namespace DotnetSpider.Extension.Test
 			Assert.AreEqual("JsonFileEntityPipeline", entityPipelines[3].GetType().Name);
 
 			var pipelines = context.GetPipelines();
-			Assert.AreEqual(2, pipelines.Count);
-			EntityPipeline pipeline = (EntityPipeline)pipelines[0];
-			entityPipelines = pipeline.GetEntityPipelines();
-			Assert.AreEqual(4, entityPipelines.Count);
-			pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
-			Assert.AreEqual("db", pipeline1.GetSchema().Database);
-			Assert.AreEqual("table13", pipeline1.GetSchema().TableName);
+			Assert.AreEqual(4, pipelines.Count);
+			IEntityPipeline pipeline = (IEntityPipeline)pipelines[0];
+			//entityPipelines = pipeline.GetEntityPipelines();
+			//Assert.AreEqual(4, entityPipelines.Count);
+			//pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
+			//Assert.AreEqual("db", pipeline1.GetSchema().Database);
+			//Assert.AreEqual("table13", pipeline1.GetSchema().Name);
 
 			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{

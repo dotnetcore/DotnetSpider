@@ -6,11 +6,14 @@ namespace DotnetSpider.Core.Pipeline
 	/// </summary>
 	public class ConsolePipeline : BasePipeline
 	{
-		public override void Process(ResultItems resultItems)
+		public override void Process(params ResultItems[] resultItems)
 		{
-			foreach (var entry in resultItems.Results)
+			foreach (var resultItem in resultItems)
 			{
-				System.Console.WriteLine(entry.Key + ":\t" + entry.Value);
+				foreach (var entry in resultItem.Results)
+				{
+					System.Console.WriteLine(entry.Key + ":\t" + entry.Value);
+				}
 			}
 		}
 	}

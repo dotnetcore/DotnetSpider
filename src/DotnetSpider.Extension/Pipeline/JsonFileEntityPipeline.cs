@@ -12,20 +12,6 @@ namespace DotnetSpider.Extension.Pipeline
 	public class JsonFileEntityPipeline : BaseEntityPipeline
 	{
 		protected string DataFolder;
-		protected StreamWriter Writer;
-
-		private string _entityName;
-
-		public override void InitEntity(EntityMetadata metadata)
-		{
-			if (metadata.Schema == null)
-			{
-				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				return;
-			}
-			_entityName = metadata.Entity.Name;
-			IsEnabled = true;
-		}
 
 		public override void InitPipeline(ISpider spider)
 		{
@@ -36,30 +22,24 @@ namespace DotnetSpider.Extension.Pipeline
 #else
 			DataFolder = Path.Combine(AppContext.BaseDirectory, spider.Identity, "entityJson");
 #endif
-			Writer = BasePipeline.PrepareFile(Path.Combine(DataFolder, $"{_entityName}.data")).AppendText();
-			Writer.AutoFlush = true;
 		}
 
-		public override void Process(List<JObject> datas)
+		public override void Process(string entityName, List<JObject> datas)
 		{
 			lock (this)
 			{
+				var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{entityName}.data"));
+
 				foreach (var entry in datas)
 				{
-					Writer.WriteLine(entry);
+					File.AppendAllText(fileInfo.Name, entry.ToString());
 				}
 			}
-		}
-
-		public override BaseEntityPipeline Clone()
-		{
-			return  new JsonFileEntityPipeline();
 		}
 
 		public override void Dispose()
 		{
 			base.Dispose();
-			Writer.Dispose();
 		}
 	}
 }

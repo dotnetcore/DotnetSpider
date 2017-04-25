@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Collections.Concurrent;
 
 namespace DotnetSpider.Core
 {
@@ -60,6 +61,8 @@ namespace DotnetSpider.Core
 		private bool _retryWhenResultIsEmpty = false;
 		private bool _exitWhenComplete = true;
 		private int _emptySleepTime = 15000;
+		private int _cachedSize = 1;
+
 		private IDownloader _downloader;
 		private List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private List<IPipeline> _pipelines = new List<IPipeline>();
@@ -68,6 +71,8 @@ namespace DotnetSpider.Core
 		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
+		private readonly List<ResultItems> _cached = new List<ResultItems>();
+		private readonly object _cachedLocker = new object();
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -222,6 +227,19 @@ namespace DotnetSpider.Core
 			{
 				CheckIfRunning();
 				_site = value;
+			}
+		}
+
+		public int CachedSize
+		{
+			get
+			{
+				return _cachedSize;
+			}
+			set
+			{
+				CheckIfRunning();
+				_cachedSize = value;
 			}
 		}
 
@@ -578,12 +596,12 @@ namespace DotnetSpider.Core
 
 			this.Log("构建内部模块、准备爬虫数据...", LogLevel.Info);
 
-			PreInitComponent(arguments);
-
 			if (Pipelines == null || Pipelines.Count == 0)
 			{
 				throw new SpiderException("Pipelines should not be null.");
 			}
+
+			PreInitComponent(arguments);
 
 			_monitor = IocManager.Resolve<IMonitor>() ?? new NLogMonitor();
 
@@ -765,17 +783,35 @@ namespace DotnetSpider.Core
 
 		public static void PrintInfo()
 		{
-			Console.ForegroundColor = ConsoleColor.Magenta;
-			Console.WriteLine("=============================================================");
-			Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
-			Console.WriteLine("== It's a light, stable, high performce spider             ==");
-			Console.WriteLine("== Support multi thread, ajax page, http                   ==");
-			Console.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
-			Console.WriteLine("== License: LGPL3.0                                        ==");
-			Console.WriteLine("== Version: 1.3.0-rc1                                      ==");
-			Console.WriteLine("== Author: zlzforever@163.com                              ==");
-			Console.WriteLine("=============================================================");
-			Console.ForegroundColor = ConsoleColor.White;
+			bool isPrinted = false;
+			var key = "_DotnetSpider_Info";
+
+#if !NET_CORE
+			isPrinted = AppDomain.CurrentDomain.GetData(key) == null;
+#else
+
+			AppContext.TryGetSwitch(key, out isPrinted);
+#endif
+			if (!isPrinted)
+			{
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine("=============================================================");
+				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
+				Console.WriteLine("== It's a light, stable, high performce spider             ==");
+				Console.WriteLine("== Support multi thread, ajax page, http                   ==");
+				Console.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
+				Console.WriteLine("== License: LGPL3.0                                        ==");
+				Console.WriteLine("== Version: 1.3.0-rc1                                      ==");
+				Console.WriteLine("== Author: zlzforever@163.com                              ==");
+				Console.WriteLine("=============================================================");
+				Console.ForegroundColor = ConsoleColor.White;
+#if !NET_CORE
+				AppDomain.CurrentDomain.SetData(key, "True");
+#else
+
+				AppContext.SetSwitch(key, true);
+#endif
+			}
 		}
 
 		public Task RunAsync(params string[] arguments)
@@ -846,8 +882,9 @@ namespace DotnetSpider.Core
 
 		protected void OnClose()
 		{
-			foreach (var pipeline in Pipelines)
+			foreach (IPipeline pipeline in Pipelines)
 			{
+				pipeline.Process(_cached.ToArray());
 				SafeDestroy(pipeline);
 			}
 
@@ -992,10 +1029,31 @@ namespace DotnetSpider.Core
 
 			if (!page.ResultItems.IsSkip)
 			{
-				foreach (IPipeline pipeline in Pipelines)
+				if (CachedSize == 1)
 				{
-					pipeline.Process(page.ResultItems);
+					foreach (IPipeline pipeline in Pipelines)
+					{
+						pipeline.Process(page.ResultItems);
+					}
 				}
+				else
+				{
+					lock (this)
+					{
+						_cached.Add(page.ResultItems);
+
+						if (_cached.Count >= CachedSize)
+						{
+							var items = _cached.ToArray();
+							_cached.Clear();
+							foreach (IPipeline pipeline in Pipelines)
+							{
+								pipeline.Process(items);
+							}
+						}
+					}
+				}
+
 				this.Log($"采集: {request.Url} 成功.", LogLevel.Info);
 			}
 			else

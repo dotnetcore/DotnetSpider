@@ -46,15 +46,18 @@ namespace DotnetSpider.Sample
 		{
 			private static long count = 0;
 
-			public override void Process(ResultItems resultItems)
+			public override void Process(params ResultItems[] resultItems)
 			{
-				StringBuilder builder = new StringBuilder();
-				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
+				foreach (var resultItem in resultItems)
 				{
-					count++;
-					builder.Append($" [YoukuVideo {count}] {entry.Name}");
+					StringBuilder builder = new StringBuilder();
+					foreach (YoukuVideo entry in resultItem.Results["VideoResult"])
+					{
+						count++;
+						builder.Append($" [YoukuVideo {count}] {entry.Name}");
+					}
+					Console.WriteLine(builder);
 				}
-				Console.WriteLine(builder);
 
 				// Other actions like save data to DB. 可以自由实现插入数据库或保存到文件
 			}

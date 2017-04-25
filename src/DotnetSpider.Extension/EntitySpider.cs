@@ -15,6 +15,7 @@ using System.Threading;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Core.Pipeline;
 #if NET_CORE
 #endif
 
@@ -26,8 +27,6 @@ namespace DotnetSpider.Extension
 		private const string ValidateStatusKey = "dotnetspider:validate-stats";
 		private IRedialExecutor _redialExecutor;
 
-		private int _cachedSize;
-
 		[JsonIgnore]
 		public Action VerifyCollectedData { get; set; }
 		[JsonIgnore]
@@ -36,20 +35,6 @@ namespace DotnetSpider.Extension
 		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
 
 		public PrepareStartUrls[] PrepareStartUrls { get; set; }
-		public List<BaseEntityPipeline> EntityPipelines { get; internal set; } = new List<BaseEntityPipeline>();
-
-		public int CachedSize
-		{
-			get
-			{
-				return _cachedSize;
-			}
-			set
-			{
-				CheckIfRunning();
-				_cachedSize = value;
-			}
-		}
 
 		public IRedialExecutor RedialExecutor
 		{
@@ -81,26 +66,15 @@ namespace DotnetSpider.Extension
 				throw new SpiderException("Count of entity is zero.");
 			}
 
-			if (EntityPipelines == null || EntityPipelines.Count == 0)
-			{
-				throw new SpiderException("Need at least one entity pipeline.");
-			}
-
 			foreach (var entity in Entities)
 			{
-				var pipelines = new List<BaseEntityPipeline>();
-				foreach (var pipeline in EntityPipelines)
+				foreach (var pipeline in Pipelines)
 				{
-					BaseEntityPipeline newPipeline = pipeline.Clone();
-					newPipeline.InitEntity(entity);
-					if (newPipeline.IsEnabled)
+					BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
+					if (newPipeline != null)
 					{
-						pipelines.Add(newPipeline);
+						newPipeline.AddEntity(entity);
 					}
-				}
-				if (pipelines.Count > 0)
-				{
-					AddPipeline(new EntityPipeline(entity.Entity.Name, pipelines));
 				}
 			}
 
@@ -203,21 +177,9 @@ namespace DotnetSpider.Extension
 			return this;
 		}
 
-		public EntitySpider AddEntityPipeline(BaseEntityPipeline pipeline)
-		{
-			CheckIfRunning();
-			EntityPipelines.Add(pipeline);
-			return this;
-		}
-
 		public ISpider ToDefaultSpider()
 		{
 			return new DefaultSpider("", new Site());
-		}
-
-		private static string GetEntityName(Type type)
-		{
-			return type.FullName;
 		}
 
 		private void HandleVerifyCollectData()
@@ -317,28 +279,17 @@ namespace DotnetSpider.Extension
 		{
 			EntityMetadata entityMetadata = new EntityMetadata();
 
-			entityMetadata.Schema = entityType.GetCustomAttribute<Schema>();
-			var indexes = entityType.GetCustomAttribute<Indexes>();
-			if (indexes != null)
+			entityMetadata.Table = entityType.GetCustomAttribute<Table>();
+			if (entityMetadata.Table != null)
 			{
-				entityMetadata.Indexes = indexes.Index?.Select(i => i.Split(',')).ToList();
-				entityMetadata.Uniques = indexes.Unique?.Select(i => i.Split(',')).ToList();
-				entityMetadata.Primary = indexes.Primary == null ? new List<string>() : indexes.Primary.Split(',').ToList();
-				entityMetadata.AutoIncrement = indexes.AutoIncrement == null ? new List<string>() : indexes.AutoIncrement.ToList();
+				entityMetadata.Table.Name = GenerateTableName(entityMetadata.Table.Name, entityMetadata.Table.Suffix);
 			}
-			var updates = entityType.GetCustomAttribute<UpdateColumns>();
-			if (updates != null)
-			{
-				entityMetadata.Updates = updates.Columns.ToList();
-			}
-
-			Entity entity = GenerateEntity(entityType);
-			entityMetadata.Entity = entity;
-			EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
-			if (extractByAttribute != null)
+			entityMetadata.Entity = GenerateEntity(entityType);
+			EntitySelector entitySelector = entityType.GetCustomAttribute<EntitySelector>();
+			if (entitySelector != null)
 			{
 				entityMetadata.Entity.Multi = true;
-				entityMetadata.Entity.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
+				entityMetadata.Entity.Selector = new BaseSelector { Expression = entitySelector.Expression, Type = entitySelector.Type };
 			}
 			else
 			{
@@ -357,9 +308,10 @@ namespace DotnetSpider.Extension
 #endif
 		)
 		{
+			var typeName = entityType.GetTypeCrossPlatform().FullName;
 			Entity entity = new Entity
 			{
-				Name = GetEntityName(entityType.GetTypeCrossPlatform())
+				Name = typeName
 			};
 			var properties = entityType.GetProperties();
 			foreach (var propertyInfo in properties)
@@ -368,95 +320,70 @@ namespace DotnetSpider.Extension
 
 				if (typeof(ISpiderEntity).IsAssignableFrom(type) || typeof(List<ISpiderEntity>).IsAssignableFrom(type))
 				{
-					Entity token = new Entity();
-					if (typeof(IEnumerable).IsAssignableFrom(type))
-					{
-						token.Multi = true;
-					}
-					else
-					{
-						token.Multi = false;
-					}
-					token.Name = GetEntityName(propertyInfo.PropertyType);
-					EntitySelector extractByAttribute = entityType.GetCustomAttribute<EntitySelector>();
-					if (extractByAttribute != null)
-					{
-						token.Selector = new BaseSelector { Expression = extractByAttribute.Expression, Type = extractByAttribute.Type };
-					}
-					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
-					if (extractBy != null)
-					{
-						token.Selector = new BaseSelector()
-						{
-							Expression = extractBy.Expression,
-							Type = extractBy.Type,
-							Argument = extractBy.Argument
-						};
-						token.NotNull = extractBy.NotNull;
-					}
-
-					var targetUrl = propertyInfo.GetCustomAttribute<TargetUrl>();
-					if (targetUrl != null)
-					{
-						throw new SpiderException("Can not set TargetUrl attribute to a ISpiderEntity property.");
-					}
-
-					token.Fields.Add(GenerateEntity(propertyInfo.PropertyType.GetTypeInfoCrossPlatform()));
+					var token = GenerateEntity(propertyInfo.PropertyType.GetTypeInfoCrossPlatform());
+					token.Name = propertyInfo.Name;
+					token.Multi = typeof(IEnumerable).IsAssignableFrom(type);
+					token.Fields.Add(token);
 				}
 				else
 				{
 					Field token = new Field();
 
-					var extractBy = propertyInfo.GetCustomAttribute<PropertySelector>();
-					var storeAs = propertyInfo.GetCustomAttribute<StoredAs>();
+					var propertySelector = propertyInfo.GetCustomAttribute<PropertyDefine>();
+					token.Multi = typeof(IList).IsAssignableFrom(type);
 
-					if (typeof(IList).IsAssignableFrom(type))
+					if (propertySelector != null)
 					{
-						token.Multi = true;
-					}
-					else
-					{
-						token.Multi = false;
-					}
-
-					if (extractBy != null)
-					{
-						token.Option = extractBy.Option;
+						token.Option = propertySelector.Option;
 						token.Selector = new BaseSelector()
 						{
-							Expression = extractBy.Expression,
-							Type = extractBy.Type,
-							Argument = extractBy.Argument
+							Expression = propertySelector.Expression,
+							Type = propertySelector.Type,
+							Argument = propertySelector.Argument
 						};
-						token.NotNull = extractBy.NotNull;
-					}
+						token.NotNull = propertySelector.NotNull;
+						token.Store = propertySelector.Store;
+						token.Length = propertySelector.Length;
 
-					if (storeAs != null)
-					{
-						token.Name = storeAs.Name;
-						token.DataType = storeAs.ToString();
-					}
-					else
-					{
 						token.Name = propertyInfo.Name;
-					}
 
-					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
-					{
-						token.Formatters.Add(formatter);
-					}
+						foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
+						{
+							token.Formatters.Add(formatter);
+						}
 
-					var targetUrl = propertyInfo.GetCustomAttribute<TargetUrl>();
-					if (targetUrl != null)
-					{
-						targetUrl.PropertyName = token.Name;
-						entity.TargetUrls.Add(targetUrl);
-					}
+						var targetUrl = propertyInfo.GetCustomAttribute<TargetUrl>();
+						if (targetUrl != null)
+						{
+							targetUrl.PropertyName = token.Name;
+							entity.TargetUrls.Add(targetUrl);
+						}
 
-					entity.Fields.Add(token);
+						entity.Fields.Add(token);
+					}
 				}
 			}
 			return entity;
+		}
+
+		public static string GenerateTableName(string name, TableSuffix suffix)
+		{
+			switch (suffix)
+			{
+				case TableSuffix.FirstDayOfThisMonth:
+					{
+						return name + "_" + DateTimeUtils.Day1OfThisMonth.ToString("yyyy_MM_dd");
+					}
+				case TableSuffix.Monday:
+					{
+						return name + "_" + DateTimeUtils.Day1OfThisWeek.ToString("yyyy_MM_dd");
+					}
+				case TableSuffix.Today:
+					{
+						return name + "_" + DateTime.Now.ToString("yyyy_MM_dd");
+					}
+			}
+			return name;
 		}
 	}
 }

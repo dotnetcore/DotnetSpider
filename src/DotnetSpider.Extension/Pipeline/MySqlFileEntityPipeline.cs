@@ -16,22 +16,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class MySqlFileEntityPipeline : BaseEntityPipeline
 	{
-		protected Schema Schema;
-		protected List<DataToken> Columns;
 		protected string DataFolder;
-		protected StreamWriter Writer;
-
-		public override void InitEntity(EntityMetadata metadata)
-		{
-			if (metadata.Schema == null)
-			{
-				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				return;
-			}
-			Schema = metadata.Schema;
-			Columns = metadata.Entity.Fields;
-			IsEnabled = true;
-		}
 
 		public override void InitPipeline(ISpider spider)
 		{
@@ -41,44 +26,36 @@ namespace DotnetSpider.Extension.Pipeline
 #else
 			DataFolder = Path.Combine(AppContext.BaseDirectory, spider.Identity, "mysql");
 #endif
-			Writer = BasePipeline.PrepareFile(Path.Combine(DataFolder, $"{Schema.Database}.{Schema.TableName}.data")).AppendText();
-			Writer.AutoFlush = true;
 		}
 
-		public override void Process(List<JObject> datas)
+		public override void Process(string entityName, List<JObject> datas)
 		{
 			lock (this)
 			{
-
-				StringBuilder builder = new StringBuilder();
-				foreach (var entry in datas)
+				EntityMetadata metadata;
+				if (EntityMetadatas.TryGetValue(entityName, out metadata))
 				{
-					builder.Append("@END@");
-					foreach (var column in Columns)
+					var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
+					StringBuilder builder = new StringBuilder();
+					foreach (var entry in datas)
 					{
-						var value = entry.SelectToken($"$.{column.Name}")?.ToString();
-						if (!string.IsNullOrEmpty(value))
+						builder.Append("@END@");
+						foreach (var column in metadata.Entity.Fields)
 						{
-							builder.Append("#").Append(value).Append("#").Append("$");
-						}
-						else
-						{
-							builder.Append("##$");
+							var value = entry.SelectToken($"$.{column.Name}")?.ToString();
+							if (!string.IsNullOrEmpty(value))
+							{
+								builder.Append("#").Append(value).Append("#").Append("$");
+							}
+							else
+							{
+								builder.Append("##$");
+							}
 						}
 					}
+					File.AppendAllText(fileInfo.Name, builder.ToString());
 				}
-				Writer.Write(builder.ToString());
 			}
-		}
-
-		public override void Dispose()
-		{
-			Writer.Dispose();
-		}
-
-		public override BaseEntityPipeline Clone()
-		{
-			return new MySqlFileEntityPipeline();
 		}
 	}
 }

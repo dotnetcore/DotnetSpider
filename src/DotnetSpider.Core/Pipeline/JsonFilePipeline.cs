@@ -54,15 +54,18 @@ namespace DotnetSpider.Core.Pipeline
 			SetPath(path);
 		}
 
-		public override void Process(ResultItems resultItems)
+		public override void Process(params ResultItems[] resultItems)
 		{
 			try
 			{
-				string path = $"{BasePath}{Environment.PathSeperator}{Spider.Identity}{Environment.PathSeperator}{Encrypt.Md5Encrypt(resultItems.Request.Url.ToString())}.json";
-				FileInfo file = PrepareFile(path);
-				using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
+				foreach (var resultItem in resultItems)
 				{
-					printWriter.WriteLine(JsonConvert.SerializeObject(resultItems.Results));
+					string path = $"{BasePath}{Environment.PathSeperator}{Spider.Identity}{Environment.PathSeperator}{Encrypt.Md5Encrypt(resultItem.Request.Url.ToString())}.json";
+					FileInfo file = PrepareFile(path);
+					using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
+					{
+						printWriter.WriteLine(JsonConvert.SerializeObject(resultItem.Results));
+					}
 				}
 			}
 			catch (IOException e)

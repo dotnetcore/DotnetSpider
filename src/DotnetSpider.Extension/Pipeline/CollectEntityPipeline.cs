@@ -1,38 +1,48 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
+using System.Collections.Concurrent;
+using DotnetSpider.Core;
+using System;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public class CollectEntityPipeline : BaseEntityPipeline, ICollectEntityPipeline
 	{
-		private readonly List<JObject> _collector = new List<JObject>();
-
-		public override BaseEntityPipeline Clone()
-		{
-			return new CollectEntityPipeline();
-		}
+		private readonly Dictionary<string, List<JObject>> _collector = new Dictionary<string, List<JObject>>();
 
 		public override void Dispose()
 		{
 			_collector.Clear();
 		}
 
-		public IEnumerable<JObject> GetCollected()
+		public List<JObject> GetCollected(string entityName)
 		{
-			return _collector;
+			List<JObject> result;
+			if (_collector.TryGetValue(entityName, out result))
+			{
+				return result;
+			}
+			return null;
 		}
 
-		public override void InitEntity(EntityMetadata metadata)
+		public override void AddEntity(EntityMetadata metadata)
 		{
-			IsEnabled = true;
 		}
 
-		public override void Process(List<JObject> datas)
+		public override void Process(string entityName, List<JObject> datas)
 		{
 			lock (this)
 			{
-				_collector.AddRange(datas);
+				if (_collector.ContainsKey(entityName))
+				{
+					var list = _collector[entityName];
+					list.AddRange(datas);
+				}
+				else
+				{
+					_collector.Add(entityName, new List<JObject>(datas));
+				}
 			}
 		}
 	}

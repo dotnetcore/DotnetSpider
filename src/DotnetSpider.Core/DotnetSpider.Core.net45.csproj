@@ -126,7 +126,6 @@
     <Compile Include="Monitor\SpiderStatus.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="Pipeline\BasePipeline.cs" />
-    <Compile Include="Pipeline\CachedPipeline.cs" />
     <Compile Include="Pipeline\ConsolePipeline.cs" />
     <Compile Include="Pipeline\FilePipeline.cs" />
     <Compile Include="Pipeline\ICollectorPipeline.cs" />

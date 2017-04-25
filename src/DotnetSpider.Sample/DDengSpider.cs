@@ -28,31 +28,28 @@ namespace DotnetSpider.Sample
 				UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
 				Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
 			});
-			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://www.ddeng.com/product/982227");
 			context.AddEntityType(typeof(Corp));
 
 			return context;
 		}
 
-		[Schema("test", "ddeng_corp", TableSuffix.Today)]
+		[Table("test", "ddeng_corp", TableSuffix.Today)]
 		public class Corp : ISpiderEntity
 		{
-			[StoredAs("name", DataType.String, 20)]
-			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong")]
+			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong")]
 			public string Name { get; set; }
 
-			[StoredAs("phone", DataType.String, 100)]
 			[ReplaceFormatter(NewValue = "", OldValue = "\r")]
 			[ReplaceFormatter(NewValue = "", OldValue = "\t")]
 			[ReplaceFormatter(NewValue = "", OldValue = "&nbsp;")]
 			[ReplaceFormatter(NewValue = "", OldValue = "\n")]
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
-			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = PropertySelector.Options.PlainText)]
+			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = PropertyDefine.Options.PlainText)]
 			public string Phone { get; set; }
 
-			[StoredAs("address", DataType.String, 200)]
 			[ReplaceFormatter(NewValue = "", OldValue = "\r")]
 			[ReplaceFormatter(NewValue = "", OldValue = "\t")]
 			[ReplaceFormatter(NewValue = "", OldValue = "&nbsp;")]
@@ -60,15 +57,13 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
 			[ReplaceFormatter(NewValue = "", OldValue = "地址：")]
-			[PropertySelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertySelector.Options.PlainText)]
+			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertyDefine.Options.PlainText)]
 			public string Address { get; set; }
 
-			[StoredAs("html", DataType.Text)]
-			[PropertySelector(Expression = ".")]
+			[PropertyDefine(Expression = ".")]
 			public string Html { get; set; }
 
-			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
-			[StoredAs("cdate", DataType.Time)]
+			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
 			public DateTime CDate { get; set; }
 		}
 	}

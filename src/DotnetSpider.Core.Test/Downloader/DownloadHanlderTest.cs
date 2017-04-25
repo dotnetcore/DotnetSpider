@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DotnetSpider.Core.Downloader;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

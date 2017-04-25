@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample
 			context.SetTaskGroup("cnblogs homepage");
 			context.SetIdentity("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddStartUrl("http://www.cnblogs.com");
-			context.AddEntityPipeline(new ConsoleEntityPipeline());
+			context.AddPipeline(new ConsoleEntityPipeline());
 			context.AddEntityType(typeof(HomePage));
 			return context;
 		}
@@ -24,7 +24,7 @@ namespace DotnetSpider.Sample
 		public class HomePage : ISpiderEntity
 		{
 			//jQuery(".yk-rank div:1")
-			[PropertySelector(Expression = "<a.*?т╟вс</a>", Type = SelectorType.Regex, Argument = "1")]
+			[PropertyDefine(Expression = "<a.*?т╟вс</a>", Type = SelectorType.Regex, Argument = "1")]
 			public string Category { get; set; }
 		}
 	}

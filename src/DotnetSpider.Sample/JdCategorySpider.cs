@@ -10,16 +10,14 @@ namespace DotnetSpider.Sample
 {
 	public class JdCategorySpider : EntitySpiderBuilder
 	{
-		[Schema("jd", "jd_category")]
+		[Table("jd", "jd_category")]
 		[EntitySelector(Expression = ".//div[@class='items']//a")]
 		public class Category : ISpiderEntity
 		{
-			[StoredAs("name", DataType.String, 50)]
-			[PropertySelector(Expression = ".")]
+			[PropertyDefine(Expression = ".")]
 			public string CategoryName { get; set; }
 
-			[StoredAs("url", DataType.Text)]
-			[PropertySelector(Expression = "./@href")]
+			[PropertyDefine(Expression = "./@href")]
 			public string Url { get; set; }
 		}
 
@@ -32,7 +30,7 @@ namespace DotnetSpider.Sample
 
 			entitySpider.AddStartUrl("http://www.jd.com/allSort.aspx");
 			entitySpider.AddEntityType(typeof(Category));
-			entitySpider.AddEntityPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			entitySpider.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			return entitySpider;
 		}
 	}

@@ -11,11 +11,7 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class MySqlEntityPipeline : BaseEntityDbPipeline
 	{
-		public MySqlEntityPipeline()
-		{
-		}
-
-		public MySqlEntityPipeline(string connectString, PipelineMode mode = PipelineMode.Insert, bool checkIfSaveBeforeUpdate = false) : base(connectString, mode, checkIfSaveBeforeUpdate)
+		public MySqlEntityPipeline(string connectString, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
 		{
 		}
 
@@ -51,132 +47,139 @@ namespace DotnetSpider.Extension.Pipeline
 			throw new SpiderException("Can't get any connect string.");
 		}
 
-		protected override string GetInsertSql()
+		protected override string GetInsertSql(EntityDbMetadata metadata)
 		{
-			string columNames = string.Join(", ", Columns.Select(p => $"`{p.Name}`"));
-			string values = string.Join(", ", Columns.Select(p => $"@{p.Name}"));
+			string columNames = string.Join(", ", metadata.Columns.Select(p => $"`{p.Name}`"));
+			string values = string.Join(", ", metadata.Columns.Select(p => $"@{p.Name}"));
 
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("INSERT IGNORE INTO `{0}`.`{1}` {2} {3};",
-				Schema.Database,
-				Schema.TableName,
+				metadata.Table.Database,
+				metadata.Table.Name,
 				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
 				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
 
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GetUpdateSql()
+		protected override string GetUpdateSql(EntityDbMetadata metadata)
 		{
-			string setParamenters = string.Join(", ", UpdateColumns.Select(p => $"`{p.Name}`=@{p.Name}"));
-			string primaryParamenters = string.Join(" AND ", Primary.Select(p => $"`{p.Name}`=@{p.Name}"));
+			string setParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"`{p}`=@{p}"));
 
+			StringBuilder primaryParamenters = new StringBuilder();
+			if ("__id" == metadata.Table.Primary)
+			{
+				primaryParamenters.Append("`__Id` = @__Id,");
+			}
+			else
+			{
+				var columns = metadata.Table.Primary.Split(',');
+				foreach (var column in columns)
+				{
+					if (columns.Last() != column)
+					{
+						primaryParamenters.Append($" `{column}` = @{column} AND ");
+					}
+					else
+					{
+						primaryParamenters.Append($" `{column}` = @{column}");
+					}
+				}
+			}
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("UPDATE `{0}`.`{1}` SET {2} WHERE {3};",
-				Schema.Database,
-				Schema.TableName,
+				metadata.Table.Database,
+				metadata.Table.Name,
 				setParamenters, primaryParamenters);
 
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GetSelectSql()
+		protected override string GetSelectSql(EntityDbMetadata metadata)
 		{
-			string selectParamenters = string.Join(", ", UpdateColumns.Select(p => $"`{p.Name}`"));
-			string primaryParamenters = string.Join(" AND ", Primary.Select(p => $"`{p.Name}`=@{p.Name}"));
-
+			string selectParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"`{p}`"));
+			StringBuilder primaryParamenters = new StringBuilder();
+			//string.Join(" AND ", $"`{Schema.Primary}`=@{Schema.Primary}");
+			if ("__id" == metadata.Table.Primary)
+			{
+				primaryParamenters.Append("`__Id` = @__Id,");
+			}
+			else
+			{
+				var columns = metadata.Table.Primary.Split(',');
+				foreach (var column in columns)
+				{
+					if (columns.Last() != column)
+					{
+						primaryParamenters.Append($" `{column}` = @{column} AND ");
+					}
+					else
+					{
+						primaryParamenters.Append($" `{column}` = @{column}");
+					}
+				}
+			}
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("SELECT {0} FROM `{1}`.`{2}` WHERE {3};",
 				selectParamenters,
-				Schema.Database,
-				Schema.TableName,
+				metadata.Table.Database,
+				metadata.Table.Name,
 				primaryParamenters);
 
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GetCreateTableSql()
+		protected override string GetCreateTableSql(EntityDbMetadata metadata)
 		{
-			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS  `{Schema.Database }`.`{Schema.TableName}`  (");
-			string columNames = string.Join(", ", Columns.Select(p => $"`{p.Name}` {ConvertToDbType(p.DataType)} "));
+			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{metadata.Table.Database }`.`{metadata.Table.Name}` (");
+
+			string columNames = string.Join(", ", metadata.Columns.Select(p => $"`{p.Name}` {((p.Length <= 0) ? "TEXT" : $"VARCHAR({ p.Length})")} "));
 			builder.Append(columNames);
-			builder.Append(Primary == null || Primary.Count == 0 ? (string.IsNullOrEmpty(columNames) ? "" : ",") + "`__id` bigint AUTO_INCREMENT" : "");
-			foreach (var index in Indexs)
+			if (metadata.Table.Primary == "__id")
 			{
-				string name = string.Join("_", index.Select(c => c));
-				string indexColumNames = string.Join(", ", index.Select(c => $"`{c}`"));
-				builder.Append($", KEY `index_{name}` ({indexColumNames.Substring(0, indexColumNames.Length)})");
+				builder.Append(", `__id` bigint AUTO_INCREMENT");
 			}
 
-			foreach (var unique in Uniques)
+			if (metadata.Table.Indexs != null)
 			{
-				string name = string.Join("_", unique.Select(c => c));
-				string uniqueColumNames = string.Join(", ", unique.Select(c => $"`{c}`"));
-				builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames.Substring(0, uniqueColumNames.Length)})");
+				foreach (var index in metadata.Table.Indexs)
+				{
+					var columns = index.Split(',');
+					string name = string.Join("_", columns.Select(c => c));
+					string indexColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
+					builder.Append($", KEY `index_{name}` ({indexColumNames.Substring(0, indexColumNames.Length)})");
+				}
 			}
-
-			string primaryColumNames = Primary == null || Primary.Count == 0 ? "`__id` " : string.Join(", ", Primary.Select(c => $"`{c.Name}`"));
-			builder.Append($", PRIMARY KEY ({primaryColumNames.Substring(0, primaryColumNames.Length)})");
+			if (metadata.Table.Uniques != null)
+			{
+				foreach (var unique in metadata.Table.Uniques)
+				{
+					var columns = unique.Split(',');
+					string name = string.Join("_", columns.Select(c => c));
+					string uniqueColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
+					builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames.Substring(0, uniqueColumNames.Length)})");
+				}
+			}
+			builder.Append($", PRIMARY KEY ({ metadata.Table.Primary})");
 
 			builder.Append(") ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
 			string sql = builder.ToString();
 			return sql;
 		}
 
-		protected override string GetCreateSchemaSql(string serverVersion)
+		protected override string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion)
 		{
-			return $"CREATE SCHEMA IF NOT EXISTS `{Schema.Database}` DEFAULT CHARACTER SET utf8mb4 ;";
+			return $"CREATE SCHEMA IF NOT EXISTS `{metadata.Table.Database}` DEFAULT CHARACTER SET utf8mb4 ;";
 		}
 
-		protected override string GetIfSchemaExistsSql(string serverVersion)
+		protected override string GetIfSchemaExistsSql(EntityDbMetadata metadata, string serverVersion)
 		{
-			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{Schema.Database}';";
+			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{metadata.Table.Database}';";
 		}
 
 		protected override DbParameter CreateDbParameter(string name, object value)
 		{
 			return new MySqlParameter(name, value);
-		}
-
-		protected override string ConvertToDbType(string dataType)
-		{
-			var match = RegexUtil.NumRegex.Match(dataType);
-			var length = match.Length == 0 ? 0 : int.Parse(match.Value);
-
-			if (dataType.StartsWith("STRING,"))
-			{
-				return length == 0 ? "VARCHAR(100)" : $"VARCHAR({length})";
-			}
-
-			if ("DATE" == dataType)
-			{
-				return "DATE ";
-			}
-
-			if ("BOOL" == dataType)
-			{
-				return "TINYINT(1) ";
-			}
-
-			if ("TIME" == dataType)
-			{
-				return "TIMESTAMP ";
-			}
-
-			if ("TEXT" == dataType)
-			{
-				return "TEXT";
-			}
-
-			throw new SpiderException("UNSPORT datatype: " + dataType);
-		}
-
-		public override BaseEntityPipeline Clone()
-		{
-			return new MySqlEntityPipeline(ConnectString, Mode)
-			{
-				UpdateConnectString = UpdateConnectString
-			};
 		}
 	}
 }

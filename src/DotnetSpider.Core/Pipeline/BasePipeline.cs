@@ -16,7 +16,7 @@ namespace DotnetSpider.Core.Pipeline
 			Spider = spider;
 		}
 
-		public abstract void Process(ResultItems resultItems);
+		public abstract void Process(params ResultItems[] resultItems);
 
 		protected void SetPath(string path)
 		{

@@ -16,6 +16,6 @@ namespace DotnetSpider.Core.Pipeline
 		/// Process extracted results.
 		/// </summary>
 		/// <param name="resultItems"></param>
-		void Process(ResultItems resultItems);
+		void Process(params ResultItems[] resultItems);
 	}
 }

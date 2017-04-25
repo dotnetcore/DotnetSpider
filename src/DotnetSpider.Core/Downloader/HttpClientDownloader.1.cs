@@ -80,7 +80,7 @@ namespace DotnetSpider.Core.Downloader
 				request.PutExtra(Request.StatusCode, httpStatusCode);
 				Page page;
 
-				if (response.Content.Headers.ContentType!=null && !MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
+				if (response.Content.Headers.ContentType != null && !MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
 				{
 					if (!site.DownloadFiles)
 					{
