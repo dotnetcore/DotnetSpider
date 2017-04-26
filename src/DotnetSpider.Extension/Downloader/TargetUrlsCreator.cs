@@ -318,6 +318,16 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
+	public class FuncStopper : ITargetUrlsCreatorStopper
+	{
+		public Func<Page, BaseTargetUrlsCreator, bool> Func { get; set; }
+
+		public bool NeedStop(Page page, BaseTargetUrlsCreator creator)
+		{
+			return Func(page, creator);
+		}
+	}
+
 	public class ContainsStopper : ITargetUrlsCreatorStopper
 	{
 		public List<string> Contents { get; set; }
