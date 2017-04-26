@@ -1,7 +1,10 @@
-﻿using DotnetSpider.Extension;
+﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Selector;
+using DotnetSpider.Extension;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace DotnetSpider.Sample
 {
