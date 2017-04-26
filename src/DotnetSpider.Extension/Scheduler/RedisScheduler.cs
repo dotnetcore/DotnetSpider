@@ -42,6 +42,7 @@ namespace DotnetSpider.Extension.Scheduler
 		public override void Init(ISpider spider)
 		{
 			base.Init(spider);
+
 			RedisConnection = Cache.Instance.Get(ConnectString);
 			if (RedisConnection == null)
 			{
@@ -55,6 +56,7 @@ namespace DotnetSpider.Extension.Scheduler
 			_queueKey = $"dotnetspider:scheduler:{md5}:queue";
 			_errorCountKey = $"dotnetspider:scheduler:{md5}:numberOfFailures";
 			_successCountKey = $"dotnetspider:scheduler:{md5}:numberOfSuccessful";
+
 			_identityMd5 = md5;
 
 			NetworkCenter.Current.Execute("rds-in", () =>
@@ -176,12 +178,18 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void Dispose()
 		{
+			IsExited = true;
+		}
+
+		public override void Clean()
+		{
+			base.Clean();
+
 			RedisConnection.Database.KeyDelete(_queueKey);
 			RedisConnection.Database.KeyDelete(_setKey);
 			RedisConnection.Database.KeyDelete(_itemKey);
 			RedisConnection.Database.KeyDelete(_successCountKey);
 			RedisConnection.Database.KeyDelete(_errorCountKey);
-			IsExited = true;
 		}
 
 		public override void Import(HashSet<Request> requests)

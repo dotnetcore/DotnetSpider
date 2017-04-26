@@ -42,7 +42,8 @@ namespace DotnetSpider.Core
 
 		public Status Stat { get; private set; } = Status.Init;
 		public event SpiderEvent OnSuccess;
-		public event SpiderClosingHandler SpiderClosing;
+		public event SpiderClosingHandler OnClosing;
+		public event Action OnComplete;
 
 		public long AvgDownloadSpeed { get; private set; }
 		public long AvgProcessorSpeed { get; private set; }
@@ -726,6 +727,8 @@ namespace DotnetSpider.Core
 							{
 								Stat = Status.Finished;
 								_realStat = Status.Finished;
+								_OnComplete();
+								OnComplete();
 								break;
 							}
 
@@ -775,7 +778,7 @@ namespace DotnetSpider.Core
 			this.Log($"等待监控进程退出.", LogLevel.Info);
 			_monitorTask.Wait();
 
-			SpiderClosing?.Invoke();
+			OnClosing?.Invoke();
 
 			var msg = Stat == Status.Finished ? "结束采集" : "退出采集";
 			this.Log($"{msg}, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
@@ -891,6 +894,14 @@ namespace DotnetSpider.Core
 			SafeDestroy(Scheduler);
 			SafeDestroy(PageProcessors);
 			SafeDestroy(Downloader);
+		}
+
+		protected virtual void _OnComplete()
+		{
+			if (Scheduler.GetLeftRequestsCount() == 0)
+			{
+				Scheduler.Clean();
+			}
 		}
 
 		protected void OnError(Request request)

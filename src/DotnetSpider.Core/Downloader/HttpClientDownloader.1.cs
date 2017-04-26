@@ -152,18 +152,6 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		//private HttpWebRequest GeneratorCookie(HttpWebRequest httpWebRequest, Site site)
-		//{
-		//	StringBuilder builder = new StringBuilder();
-		//	foreach (var cookie in site.AllCookies)
-		//	{
-		//		builder.Append($"{cookie.Key}={cookie.Value};");
-		//	}
-		//	httpWebRequest.Headers.Add("Cookie", builder.ToString());
-
-		//	return httpWebRequest;
-		//}
-
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request, Site site)
 		{
 			if (site == null) return null;

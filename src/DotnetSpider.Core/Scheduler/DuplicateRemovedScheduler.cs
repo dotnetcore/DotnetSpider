@@ -1,6 +1,7 @@
 using DotnetSpider.Core.Scheduler.Component;
 using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure;
+using System;
 
 namespace DotnetSpider.Core.Scheduler
 {
@@ -93,6 +94,10 @@ namespace DotnetSpider.Core.Scheduler
 		public abstract void IncreaseErrorCounter();
 
 		public virtual void Export()
+		{
+		}
+
+		public virtual void Clean()
 		{
 		}
 	}

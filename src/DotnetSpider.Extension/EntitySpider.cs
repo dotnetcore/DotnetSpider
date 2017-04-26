@@ -103,6 +103,7 @@ namespace DotnetSpider.Extension
 			if (arguments.Contains("rerun"))
 			{
 				Scheduler.Init(this);
+				Scheduler.Clean();
 				Scheduler.Dispose();
 				if (RedisConnection != null)
 				{
