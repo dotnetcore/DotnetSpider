@@ -12,22 +12,17 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class ConsoleEntityPipeline : BaseEntityPipeline
 	{
-		public override void InitEntity(EntityMetadata metadata)
+		public override void AddEntity(EntityMetadata metadata)
 		{
-			IsEnabled = true;
+
 		}
 
-		public override void Process(List<JObject> datas)
+		public override void Process(string entityName, List<JObject> datas)
 		{
 			foreach (var data in datas)
 			{
-				Console.WriteLine(data.ToString());
+				Console.WriteLine($"{entityName}: {data.ToString()}");
 			}
-		}
-
-		public override BaseEntityPipeline Clone()
-		{
-			return new ConsoleEntityPipeline();
 		}
 	}
 }

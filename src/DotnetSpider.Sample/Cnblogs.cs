@@ -37,23 +37,26 @@ namespace DotnetSpider.Sample
 			private static long blogSumaryCount = 0;
 			private static long newsCount = 0;
 
-			public override void Process(ResultItems resultItems)
+			public override void Process(params ResultItems[] resultItems)
 			{
-				if (resultItems.GetResultItem("BlogSumary") != null)
+				foreach (var resultItem in resultItems)
 				{
-					foreach (BlogSumary entry in resultItems.GetResultItem("BlogSumary"))
+					if (resultItem.GetResultItem("BlogSumary") != null)
 					{
-						blogSumaryCount++;
-						Console.WriteLine($"BlogSumary [{blogSumaryCount}] {entry}");
+						foreach (BlogSumary entry in resultItem.GetResultItem("BlogSumary"))
+						{
+							blogSumaryCount++;
+							Console.WriteLine($"BlogSumary [{blogSumaryCount}] {entry}");
+						}
 					}
-				}
 
-				if (resultItems.GetResultItem("News") != null)
-				{
-					foreach (News entry in resultItems.GetResultItem("News"))
+					if (resultItem.GetResultItem("News") != null)
 					{
-						newsCount++;
-						Console.WriteLine($"News [{newsCount}] {entry}");
+						foreach (News entry in resultItem.GetResultItem("News"))
+						{
+							newsCount++;
+							Console.WriteLine($"News [{newsCount}] {entry}");
+						}
 					}
 				}
 				// 可以自由实现插入数据库或保存到文件

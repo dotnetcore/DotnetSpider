@@ -48,31 +48,22 @@ namespace DotnetSpider.Sample
 					}
 				}
 			};
-			context.AddEntityPipeline(new MySqlEntityPipeline
-			{
-				ConnectString = "Database='taobao';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=4306",
-				Mode = PipelineMode.Update
-			});
+			context.AddPipeline(new MySqlEntityPipeline("Database='taobao';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=4306"));
 			context.AddEntityType(typeof(ProductUpdater));
 			return context;
 		}
 
-		[Schema("jd", "sku_v2", TableSuffix.Monday)]
+		[Table("jd", "sku_v2", TableSuffix.Monday, Primary = "Sku", UpdateColumns = new[] { "ShopId" })]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
-		[Indexes(Primary = "sku")]
-		[UpdateColumns(new[] { "ShopId" })]
 		public class ProductUpdater : ISpiderEntity
 		{
-			[StoredAs("sku", DataType.String, 25)]
-			[PropertySelector(Expression = "$.pid", Type = SelectorType.JsonPath)]
+			[PropertyDefine(Expression = "$.pid", Type = SelectorType.JsonPath, Length = 25)]
 			public string Sku { get; set; }
 
-			[StoredAs("shopname", DataType.String, 100)]
-			[PropertySelector(Expression = "$.seller", Type = SelectorType.JsonPath)]
+			[PropertyDefine(Expression = "$.seller", Type = SelectorType.JsonPath, Length = 100)]
 			public string ShopName { get; set; }
 
-			[StoredAs("shopid", DataType.String, 25)]
-			[PropertySelector(Expression = "$.shopId", Type = SelectorType.JsonPath)]
+			[PropertyDefine(Expression = "$.shopId", Type = SelectorType.JsonPath, Length = 25)]
 			public string ShopId { get; set; }
 		}
 	}

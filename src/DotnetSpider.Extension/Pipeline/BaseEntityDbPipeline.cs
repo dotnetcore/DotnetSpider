@@ -11,188 +11,167 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class BaseEntityDbPipeline : BaseEntityPipeline
 	{
 		public string ConnectString { get; set; }
-		public PipelineMode Mode { get; set; } = PipelineMode.Insert;
 		public bool CheckIfSameBeforeUpdate { get; set; }
 
 		[JsonIgnore]
 		public IUpdateConnectString UpdateConnectString { get; set; }
 		protected abstract DbConnection CreateConnection();
-		protected abstract string GetInsertSql();
-		protected abstract string GetUpdateSql();
-		protected abstract string GetSelectSql();
-		protected abstract string GetCreateTableSql();
-		protected abstract string GetCreateSchemaSql(string serverVersion);
-		protected abstract string GetIfSchemaExistsSql(string serverVersion);
+
+		protected abstract string GetInsertSql(EntityDbMetadata metadata);
+		protected abstract string GetUpdateSql(EntityDbMetadata metadata);
+		protected abstract string GetSelectSql(EntityDbMetadata metadata);
+		protected abstract string GetCreateTableSql(EntityDbMetadata metadata);
+
+		protected abstract string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion);
+		protected abstract string GetIfSchemaExistsSql(EntityDbMetadata metadata, string serverVersion);
 		protected abstract DbParameter CreateDbParameter(string name, object value);
+		protected ConcurrentDictionary<string, EntityDbMetadata> DbMetadatas = new ConcurrentDictionary<string, EntityDbMetadata>();
 
-		protected List<List<string>> Indexs { get; set; } = new List<List<string>>();
-		protected List<List<string>> Uniques { get; set; } = new List<List<string>>();
-		protected List<Field> Primary { get; set; } = new List<Field>();
-		protected List<string> AutoIncrement { get; set; } = new List<string>();
-		protected Schema Schema { get; set; }
-		protected List<Field> Columns { get; set; } = new List<Field>();
-		protected List<Field> UpdateColumns { get; set; } = new List<Field>();
-
-		protected abstract string ConvertToDbType(string datatype);
-
-		protected BaseEntityDbPipeline()
+		protected BaseEntityDbPipeline(string connectString, bool checkIfSaveBeforeUpdate = false)
 		{
-		}
-
-		protected BaseEntityDbPipeline(string connectString, PipelineMode mode = PipelineMode.Insert, bool checkIfSaveBeforeUpdate = false)
-		{
-			Mode = mode;
 			ConnectString = connectString;
 			CheckIfSameBeforeUpdate = checkIfSaveBeforeUpdate;
 		}
 
-		public Schema GetSchema()
+		public override void AddEntity(EntityMetadata metadata)
 		{
-			return Schema;
-		}
-
-		public override void InitEntity(EntityMetadata metadata)
-		{
-			if (metadata.Schema == null)
+			if (metadata.Table == null)
 			{
 				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
 				return;
 			}
-			Schema = GenerateSchema(metadata.Schema);
+			EntityDbMetadata dbMetadata = new EntityDbMetadata();
+			dbMetadata.Table = metadata.Table;
 			foreach (var f in metadata.Entity.Fields)
 			{
-				if (!string.IsNullOrEmpty(((Field)f).DataType))
+				var column = (Field)f;
+				if (column.Store)
 				{
-					Columns.Add((Field)f);
+					dbMetadata.Columns.Add(column);
 				}
 			}
-			if (Columns.Count == 0)
+			if (dbMetadata.Columns.Count == 0)
 			{
-				Spider.Log($"Columns is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
-				return;
+				throw new SpiderException($"Columns is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.");
 			}
-			var primary = metadata.Primary;
-			if (primary != null)
+			if (!string.IsNullOrEmpty(metadata.Table.Primary))
 			{
-				foreach (var p in primary)
+				var items = new HashSet<string>(metadata.Table.Primary.Split(','));
+				if (items.Count > 0)
 				{
-					var col = Columns.FirstOrDefault(c => c.Name == p);
-					if (col == null)
+					foreach (var item in items)
 					{
-						throw new SpiderException("Columns set as primary is not a property of your entity.");
-					}
-					else
-					{
-						Primary.Add(col);
-					}
-				}
-			}
-
-			if (Mode == PipelineMode.Update)
-			{
-				if (Primary == null || Primary.Count == 0)
-				{
-					throw new SpiderException("Set Primary in the Indexex attribute.");
-				}
-
-				if (metadata.Updates != null && metadata.Updates.Count > 0)
-				{
-					foreach (var column in metadata.Updates)
-					{
-						var col = Columns.FirstOrDefault(c => c.Name == column);
-						if (col == null)
+						var column = dbMetadata.Columns.FirstOrDefault(c => c.Name == item);
+						if (column == null)
 						{
-							throw new SpiderException("Columns set as update is not a property of your entity.");
+							throw new SpiderException("Columns set as Primary is not a property of your entity.");
 						}
-						else
+						if (column.Length <= 0 || column.Length > 256)
 						{
-							UpdateColumns.Add(col);
+							throw new SpiderException("Column length of Primary should not large than 256.");
 						}
-					}
-
-					UpdateColumns.RemoveAll(c => Primary.Contains(c));
-
-					if (UpdateColumns.Count == 0)
-					{
-						throw new SpiderException("There is no column need update.");
+						column.NotNull = true;
 					}
 				}
 				else
 				{
-					UpdateColumns = Columns;
-					UpdateColumns.RemoveAll(c => Primary.Contains(c));
-
-					if (UpdateColumns.Count == 0)
-					{
-						throw new SpiderException("There is no column need update.");
-					}
+					dbMetadata.Table.Primary = "__id";
 				}
 			}
-
-			AutoIncrement = metadata.AutoIncrement;
-
-			if (metadata.Indexes != null)
+			else
 			{
-				foreach (var index in metadata.Indexes)
+				dbMetadata.Table.Primary = "__id";
+			}
+
+			if (dbMetadata.Table.UpdateColumns != null && dbMetadata.Table.UpdateColumns.Length > 0)
+			{
+				foreach (var column in dbMetadata.Table.UpdateColumns)
 				{
-					List<string> tmpIndex = new List<string>();
-					foreach (var i in index)
+					if (!dbMetadata.Columns.Any(c => c.Name == column))
 					{
-						var col = Columns.FirstOrDefault(c => c.Name == i);
-						if (col == null)
+						throw new SpiderException("Columns set as update is not a property of your entity.");
+					}
+				}
+				var updateColumns = new List<string>(dbMetadata.Table.UpdateColumns);
+				updateColumns.Remove(dbMetadata.Table.Primary);
+
+				dbMetadata.Table.UpdateColumns = updateColumns.ToArray();
+
+				if (dbMetadata.Table.UpdateColumns.Length == 0)
+				{
+					throw new SpiderException("There is no column need update.");
+				}
+
+				dbMetadata.SelectSql = GetSelectSql(dbMetadata);
+				dbMetadata.UpdateSql = GetUpdateSql(dbMetadata);
+
+				dbMetadata.IsInsertModel = false;
+			}
+
+			if (dbMetadata.Table.Indexs != null && dbMetadata.Table.Indexs.Length > 0)
+			{
+				for (int i = 0; i < dbMetadata.Table.Indexs.Length; ++i)
+				{
+					var items = new HashSet<string>(dbMetadata.Table.Indexs[i].Split(','));
+
+					if (items.Count == 0)
+					{
+						throw new SpiderException("Index should contain more than a column.");
+					}
+					foreach (var item in items)
+					{
+						var column = dbMetadata.Columns.FirstOrDefault(c => c.Name == item);
+						if (column == null)
 						{
 							throw new SpiderException("Columns set as index is not a property of your entity.");
 						}
-						else
+						if (column.Length <= 0 || column.Length > 256)
 						{
-							tmpIndex.Add(col.Name);
+							throw new SpiderException("Column length of index should not large than 256.");
 						}
 					}
-					if (tmpIndex.Count != 0)
-					{
-						Indexs.Add(tmpIndex);
-					}
+					dbMetadata.Table.Indexs[i] = string.Join(",", items);
 				}
 			}
-			if (metadata.Uniques != null)
+			if (dbMetadata.Table.Uniques != null && dbMetadata.Table.Uniques.Length > 0)
 			{
-				foreach (var unique in metadata.Uniques)
+				for (int i = 0; i < dbMetadata.Table.Uniques.Length; ++i)
 				{
-					List<string> tmpUnique = new List<string>();
-					foreach (var i in unique)
+					var items = new HashSet<string>(dbMetadata.Table.Uniques[i].Split(','));
+
+					if (items.Count == 0)
 					{
-						var col = Columns.FirstOrDefault(c => c.Name == i);
-						if (col == null)
+						throw new SpiderException("Unique should contain more than a column.");
+					}
+					foreach (var item in items)
+					{
+						var column = dbMetadata.Columns.FirstOrDefault(c => c.Name == item);
+						if (column == null)
 						{
 							throw new SpiderException("Columns set as unique is not a property of your entity.");
 						}
-						else
+						if (column.Length <= 0 || column.Length > 256)
 						{
-							tmpUnique.Add(col.Name);
+							throw new SpiderException("Column length of unique should not large than 256.");
 						}
 					}
-					if (tmpUnique.Count != 0)
-					{
-						Uniques.Add(tmpUnique);
-					}
+					dbMetadata.Table.Uniques[i] = string.Join(",", items);
 				}
 			}
-			IsEnabled = true;
+
+			dbMetadata.InsertSql = GetInsertSql(dbMetadata);
+			DbMetadatas.TryAdd(metadata.Entity.Name, dbMetadata);
 		}
 
 		public override void InitPipeline(ISpider spider)
 		{
-			if (!IsEnabled)
-			{
-				return;
-			}
-
 			if (string.IsNullOrEmpty(ConnectString))
 			{
 				if (UpdateConnectString == null)
@@ -224,215 +203,194 @@ namespace DotnetSpider.Extension.Pipeline
 
 			base.InitPipeline(spider);
 
-			if (Mode == PipelineMode.Update)
-			{
-				return;
-			}
 
-			NetworkCenter.Current.Execute("db-init", () =>
+			foreach (var metadata in DbMetadatas.Values)
 			{
-				using (DbConnection conn = CreateConnection())
+				if (!metadata.IsInsertModel)
 				{
-					var command = conn.CreateCommand();
-					command.CommandText = GetIfSchemaExistsSql(conn.ServerVersion);
+					continue;
+				}
 
-					if (System.Convert.ToInt16(command.ExecuteScalar()) == 0)
+				NetworkCenter.Current.Execute("db-init", () =>
+				{
+					using (DbConnection conn = CreateConnection())
 					{
-						command.CommandText = GetCreateSchemaSql(conn.ServerVersion);
+						var command = conn.CreateCommand();
+						command.CommandText = GetIfSchemaExistsSql(metadata, conn.ServerVersion);
+
+						if (System.Convert.ToInt16(command.ExecuteScalar()) == 0)
+						{
+							command.CommandText = GetCreateSchemaSql(metadata, conn.ServerVersion);
+							command.CommandType = CommandType.Text;
+							command.ExecuteNonQuery();
+						}
+
+						command.CommandText = GetCreateTableSql(metadata);
 						command.CommandType = CommandType.Text;
 						command.ExecuteNonQuery();
+						conn.Close();
 					}
-
-					command.CommandText = GetCreateTableSql();
-					command.CommandType = CommandType.Text;
-					command.ExecuteNonQuery();
-					conn.Close();
-				}
-			});
+				});
+			}
 		}
 
-		public override void Process(List<JObject> datas)
+		public override void Process(string entityName, List<JObject> datas)
 		{
-			if (!IsEnabled)
+			EntityDbMetadata metadata;
+			if (DbMetadatas.TryGetValue(entityName, out metadata))
 			{
-				return;
-			}
-			NetworkCenter.Current.Execute("pp-", () =>
-			{
-				switch (Mode)
+				NetworkCenter.Current.Execute("pp-", () =>
 				{
-					case PipelineMode.Insert:
+					if (metadata.IsInsertModel)
+					{
+						using (var conn = CreateConnection())
 						{
-							using (var conn = CreateConnection())
-							{
-								var cmd = conn.CreateCommand();
-								cmd.CommandText = GetInsertSql();
-								cmd.CommandType = CommandType.Text;
+							var cmd = conn.CreateCommand();
+							cmd.CommandText = metadata.InsertSql;
+							cmd.CommandType = CommandType.Text;
 
-								foreach (var data in datas)
+							foreach (var data in datas)
+							{
+								cmd.Parameters.Clear();
+
+								List<DbParameter> parameters = new List<DbParameter>();
+								foreach (var column in metadata.Columns)
 								{
-									cmd.Parameters.Clear();
+									var value = data.SelectToken($"{column.Name}")?.Value<string>();
+									var parameter = CreateDbParameter($"@{column.Name}", value);
+									parameter.DbType = DbType.String;
+									parameters.Add(parameter);
+								}
+
+								cmd.Parameters.AddRange(parameters.ToArray());
+								cmd.ExecuteNonQuery();
+							}
+							conn.Close();
+						}
+					}
+					else
+					{
+						using (var conn = CreateConnection())
+						{
+
+							foreach (var data in datas)
+							{
+								bool needUpdate;
+								if (CheckIfSameBeforeUpdate)
+								{
+									var selectCmd = conn.CreateCommand();
+									selectCmd.CommandText = metadata.SelectSql;
+									selectCmd.CommandType = CommandType.Text;
+									List<DbParameter> selectParameters = new List<DbParameter>();
+									if (string.IsNullOrEmpty(metadata.Table.Primary))
+									{
+										var primaryParameter = CreateDbParameter($"@__Id", data.SelectToken("__Id")?.Value<string>());
+										primaryParameter.DbType = DbType.String;
+										selectParameters.Add(primaryParameter);
+									}
+									else
+									{
+										var columns = metadata.Table.Primary.Split(',');
+										foreach (var column in columns)
+										{
+											var primaryParameter = CreateDbParameter($"@{column}", data.SelectToken($"{column}")?.Value<string>());
+											primaryParameter.DbType = DbType.String;
+											selectParameters.Add(primaryParameter);
+										}
+									}
+									selectCmd.Parameters.AddRange(selectParameters.ToArray());
+									var reader = selectCmd.ExecuteReader();
+									JObject old = new JObject();
+									if (reader.Read())
+									{
+										for (int i = 0; i < reader.FieldCount; ++i)
+										{
+											old.Add(reader.GetName(i), reader.GetString(i));
+										}
+									}
+									reader.Dispose();
+									selectCmd.Dispose();
+
+									// the primary key is not exists.
+									if (!old.HasValues)
+									{
+										continue;
+									}
+
+									string oldValue = string.Join("-", old.PropertyValues());
+
+									StringBuilder newValueBuilder = new StringBuilder();
+									foreach (var column in metadata.Table.UpdateColumns)
+									{
+										var v = data.SelectToken($"$.{column}");
+										newValueBuilder.Append($"-{v}");
+									}
+									string newValue = newValueBuilder.ToString().Substring(1, newValueBuilder.Length - 1);
+									needUpdate = oldValue != newValue;
+								}
+								else
+								{
+									needUpdate = true;
+								}
+
+								if (needUpdate)
+								{
+									var cmd = conn.CreateCommand();
+									cmd.CommandText = metadata.UpdateSql;
+									cmd.CommandType = CommandType.Text;
 
 									List<DbParameter> parameters = new List<DbParameter>();
-									foreach (var column in Columns)
+									foreach (var column in metadata.Table.UpdateColumns)
 									{
-										var value = data.SelectToken($"{column.Name}")?.Value<string>();
-										var parameter = CreateDbParameter($"@{column.Name}", value);
-										parameter.DbType = Convert(column.DataType);
+										var parameter = CreateDbParameter($"@{column}", data.SelectToken($"{column}")?.Value<string>());
+										parameter.DbType = DbType.String;
 										parameters.Add(parameter);
 									}
+
+									if (string.IsNullOrEmpty(metadata.Table.Primary))
+									{
+										var primaryParameter = CreateDbParameter($"@__Id", data.SelectToken("__Id")?.Value<string>());
+										primaryParameter.DbType = DbType.String;
+										parameters.Add(primaryParameter);
+									}
+									else
+									{
+										var columns = metadata.Table.Primary.Split(',');
+										foreach (var column in columns)
+										{
+											var primaryParameter = CreateDbParameter($"@{column}", data.SelectToken($"{column}")?.Value<string>());
+											primaryParameter.DbType = DbType.String;
+											parameters.Add(primaryParameter);
+										}
+									}
+									//var primaryParameter = CreateDbParameter($"@{Schema.Primary}", data.SelectToken($"{Schema.Primary}")?.Value<string>());
+									//primaryParameter.DbType = DbType.String;
+									//parameters.Add(primaryParameter);
 
 									cmd.Parameters.AddRange(parameters.ToArray());
 									cmd.ExecuteNonQuery();
 								}
-								conn.Close();
 							}
-							break;
+
+							conn.Close();
 						}
-					case PipelineMode.Update:
-						{
-							using (var conn = CreateConnection())
-							{
-								foreach (var data in datas)
-								{
-									bool needUpdate;
-									if (CheckIfSameBeforeUpdate)
-									{
-										var selectCmd = conn.CreateCommand();
-										selectCmd.CommandText = GetSelectSql();
-										selectCmd.CommandType = CommandType.Text;
-										List<DbParameter> selectParameters = new List<DbParameter>();
-										foreach (var column in Primary)
-										{
-											var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
-
-											parameter.DbType = Convert(column.DataType);
-											selectParameters.Add(parameter);
-										}
-										selectCmd.Parameters.AddRange(selectParameters.ToArray());
-										var reader = selectCmd.ExecuteReader();
-										JObject old = new JObject();
-										if (reader.Read())
-										{
-											for (int i = 0; i < reader.FieldCount; ++i)
-											{
-												old.Add(reader.GetName(i), reader.GetString(i));
-											}
-										}
-										reader.Dispose();
-										selectCmd.Dispose();
-
-										// the primary key is not exists.
-										if (!old.HasValues)
-										{
-											continue;
-										}
-
-										string oldValue = string.Join("-", old.PropertyValues());
-
-										StringBuilder newValueBuilder = new StringBuilder();
-										foreach (var updateColumn in UpdateColumns)
-										{
-											var v = data.SelectToken($"$.{updateColumn.Name}");
-											newValueBuilder.Append($"-{v}");
-										}
-										string newValue = newValueBuilder.ToString().Substring(1, newValueBuilder.Length - 1);
-										needUpdate = oldValue != newValue;
-									}
-									else
-									{
-										needUpdate = true;
-									}
-
-									if (needUpdate)
-									{
-										var cmd = conn.CreateCommand();
-										cmd.CommandText = GetUpdateSql();
-										cmd.CommandType = CommandType.Text;
-
-										List<DbParameter> parameters = new List<DbParameter>();
-										foreach (var column in UpdateColumns)
-										{
-											var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
-											parameter.DbType = Convert(column.DataType);
-											parameters.Add(parameter);
-										}
-
-										foreach (var column in Primary)
-										{
-											var parameter = CreateDbParameter($"@{column.Name}", data.SelectToken($"{column.Name}")?.Value<string>());
-
-											parameter.DbType = Convert(column.DataType);
-											parameters.Add(parameter);
-										}
-
-										cmd.Parameters.AddRange(parameters.ToArray());
-										cmd.ExecuteNonQuery();
-									}
-								}
-
-								conn.Close();
-							}
-							break;
-						}
-				}
-			});
+					}
+				});
+			}
 		}
 
 		/// <summary>
 		/// For test
 		/// </summary>
 		/// <returns></returns>
-		public List<Field> GetUpdateColumns()
+		public string[] GetUpdateColumns(string entityName)
 		{
-			return UpdateColumns;
-		}
-
-		public static Schema GenerateSchema(Schema schema)
-		{
-			switch (schema.Suffix)
+			EntityDbMetadata metadata;
+			if (DbMetadatas.TryGetValue(entityName, out metadata))
 			{
-				case TableSuffix.FirstDayOfThisMonth:
-					{
-						schema.TableName += "_" + DateTimeUtils.Day1OfThisMonth.ToString("yyyy_MM_dd");
-						break;
-					}
-				case TableSuffix.Monday:
-					{
-						schema.TableName += "_" + DateTimeUtils.Day1OfThisWeek.ToString("yyyy_MM_dd");
-						break;
-					}
-				case TableSuffix.Today:
-					{
-						schema.TableName += "_" + DateTime.Now.ToString("yyyy_MM_dd");
-						break;
-					}
+				return metadata.Table.UpdateColumns;
 			}
-			return schema;
-		}
-
-		private DbType Convert(string datatype)
-		{
-			if (string.IsNullOrEmpty(datatype))
-			{
-				throw new SpiderException("TYPE can not be null");
-			}
-
-			if (datatype.StartsWith("STRING,") || "TEXT" == datatype)
-			{
-				return DbType.String;
-			}
-			if ("BOOL" == datatype)
-			{
-				return DbType.Boolean;
-			}
-
-			if ("DATE" == datatype || "TIME" == datatype)
-			{
-				return DbType.DateTime;
-			}
-
-			throw new SpiderException("Unsport datatype: " + datatype);
+			return null;
 		}
 	}
 }

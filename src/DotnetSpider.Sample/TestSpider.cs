@@ -40,26 +40,23 @@ namespace DotnetSpider.Sample
 				}
 			};
 			context.SetScheduler(new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
-			context.AddEntityPipeline(new MySqlEntityPipeline("Database='testhao';Data Source= localhost;User ID=root;Password=root@123456;Port=3306"));
+			context.AddPipeline(new MySqlEntityPipeline("Database='testhao';Data Source= localhost;User ID=root;Password=root@123456;Port=3306"));
 			context.AddStartUrl("https://hao.360.cn/");
 			context.AddEntityType(typeof(UpdateHao360Info));
 			return context;
 		}
 
-		[Schema("testhao", "hao360buble")]
+		[Table("testhao", "hao360buble")]
 		[EntitySelector(Expression = "$.data", Type = SelectorType.JsonPath)]
 		public class UpdateHao360Info : ISpiderEntity
 		{
-			[StoredAs("title", DataType.String, 100)]
-			[PropertySelector(Expression = "$.title", Type = SelectorType.JsonPath)]
+			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath)]
 			public string Title { get; set; }
 
-			[StoredAs("url", DataType.String, 200)]
-			[PropertySelector(Expression = "$.link", Type = SelectorType.JsonPath)]
+			[PropertyDefine(Expression = "$.link", Type = SelectorType.JsonPath)]
 			public string Url { get; set; }
 
-			[StoredAs("run_id", DataType.Date)]
-			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 
 			public string Id { get; set; }

@@ -168,7 +168,7 @@ namespace DotnetSpider.Extension.Model
 				}
 				else
 				{
-					bool needPlainText = ((Field)field).Option == PropertySelector.Options.PlainText;
+					bool needPlainText = ((Field)field).Option == PropertyDefine.Options.PlainText;
 					if (field.Multi)
 					{
 						var propertyValues = item.SelectList(selector).Nodes();
@@ -189,7 +189,7 @@ namespace DotnetSpider.Extension.Model
 					}
 					else
 					{
-						bool needCount = (((Field)field).Option == PropertySelector.Options.Count);
+						bool needCount = (((Field)field).Option == PropertyDefine.Options.Count);
 						if (needCount)
 						{
 							var propertyValues = item.SelectList(selector).Nodes();

@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Test
 	[TestClass]
 	public class EntitySpiderTest
 	{
-		[Schema("test", "table")]
+		[Table("test", "table")]
 		public class TestEntity : ISpiderEntity
 		{
 
@@ -37,7 +37,7 @@ namespace DotnetSpider.Extension.Test
 		public void TestCorrectRedisSetting()
 		{
 			EntitySpider spider = new EntitySpider(new Site());
-			spider.AddEntityPipeline(new ConsoleEntityPipeline());
+			spider.AddPipeline(new ConsoleEntityPipeline());
 			spider.AddEntityType(typeof(TestEntity));
 			spider.Run("running-test");
 		}
@@ -55,21 +55,6 @@ namespace DotnetSpider.Extension.Test
 		//		Assert.AreEqual("Count of entity is zero.", exception.Message);
 		//	}
 		//}
-
-		[TestMethod]
-		public void ThrowExceptionWhenNoEntityPipeline()
-		{
-			try
-			{
-				EntitySpider spider = new EntitySpider(new Site());
-				spider.AddEntityType(typeof(TestEntity));
-				spider.Run("running-test");
-			}
-			catch (SpiderException exception)
-			{
-				Assert.AreEqual("Need at least one entity pipeline.", exception.Message);
-			}
-		}
 
 		[TestMethod]
 		public void RedisKeepConnect()
@@ -108,7 +93,7 @@ namespace DotnetSpider.Extension.Test
 			spider.Identity = Guid.NewGuid().ToString("N");
 			spider.SetScheduler(new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
 			spider.AddStartUrl("https://baidu.com");
-			spider.AddEntityPipeline(new ConsoleEntityPipeline());
+			spider.AddPipeline(new ConsoleEntityPipeline());
 			spider.AddEntityType(typeof(TestEntity));
 			spider.Run();
 
@@ -174,7 +159,7 @@ namespace DotnetSpider.Extension.Test
 				context.SkipWhenResultIsEmpty = true;
 				context.SpawnUrl = true;
 				context.SetIdentity("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-				context.AddEntityPipeline(new CollectEntityPipeline());
+				context.AddPipeline(new CollectEntityPipeline());
 				context.AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 				context.AddEntityType(typeof(ArticleSummary));
 				return context;
@@ -183,11 +168,11 @@ namespace DotnetSpider.Extension.Test
 			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
 			public class ArticleSummary : ISpiderEntity
 			{
-				[PropertySelector(Expression = ".//a/@title")]
+				[PropertyDefine(Expression = ".//a/@title")]
 				public string Title { get; set; }
 
 				[TargetUrl(Extras = new[] { "Title", "Url" })]
-				[PropertySelector(Expression = ".//a/@href")]
+				[PropertyDefine(Expression = ".//a/@href")]
 				public string Url { get; set; }
 			}
 		}

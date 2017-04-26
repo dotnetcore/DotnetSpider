@@ -6,13 +6,8 @@ namespace DotnetSpider.Extension.Model
 {
 	public class EntityMetadata
 	{
-		public Schema Schema { get; set; }
-		public List<string[]> Indexes { get; set; }
-		public List<string[]> Uniques { get; set; }
-		public List<string> AutoIncrement { get; set; }
-		public List<string> Primary { get; set; }
+		public Table Table { get; set; }
 		public Entity Entity { get; set; } = new Entity();
-		public List<string> Updates { get; internal set; }
 		public int? Limit { get; set; }
 		public List<TargetUrlsSelector> TargetUrlsSelectors { get; set; }
 		public DataHandler DataHandler { get; set; }
@@ -27,8 +22,9 @@ namespace DotnetSpider.Extension.Model
 
 	public class Field : DataToken
 	{
-		public string DataType { get; set; }
-		public PropertySelector.Options Option { get; set; }
+		public PropertyDefine.Options Option { get; set; }
+		public int Length { get; set; }
+		public bool Store { get; set; }
 		public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
 	}
 

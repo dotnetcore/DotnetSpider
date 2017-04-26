@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample
 				EncodingName = "UTF-8"
 			});
 
-			context.AddEntityPipeline(
+			context.AddPipeline(
 				new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 
 			var word = "可乐|雪碧";
@@ -30,46 +30,38 @@ namespace DotnetSpider.Sample
 		}
 	}
 
-	[Schema("DB", "BaiduSearch", TableSuffix.Today)]
+	[Table("DB", "BaiduSearch", TableSuffix.Today)]
 	[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 	[TargetUrlsSelector(XPaths = new[] { "//p[@id=\"page\"]" }, Patterns = new[] { @"&pn=[0-9]+&" })]
 	public class BaiduSearchEntry : ISpiderEntity
 	{
-		[PropertySelector(Expression = "Keyword", Type = SelectorType.Enviroment)]
-		[StoredAs("Keyword", DataType.Text)]
+		[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment)]
 		public string Keyword { get; set; }
 
-		[PropertySelector(Expression = ".//h3[@class='c-title']/a")]
+		[PropertyDefine(Expression = ".//h3[@class='c-title']/a")]
 		[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 		[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-		[StoredAs("Title", DataType.Text)]
 		public string Title { get; set; }
 
-		[PropertySelector(Expression = ".//h3[@class='c-title']/a/@href")]
-		[StoredAs("Url", DataType.Text)]
+		[PropertyDefine(Expression = ".//h3[@class='c-title']/a/@href")]
 		public string Url { get; set; }
 
-
-		[PropertySelector(Expression = ".//div/p[@class='c-author']/text()")]
+		[PropertyDefine(Expression = ".//div/p[@class='c-author']/text()")]
 		[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
-		[StoredAs("Website", DataType.Text)]
 		public string Website { get; set; }
 
 
-		[PropertySelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
-		[StoredAs("Snapshot", DataType.Text)]
+		[PropertyDefine(Expression = ".//div/span/a[@class='c-cache']/@href")]
 		public string Snapshot { get; set; }
 
 
-		[PropertySelector(Expression = ".//div[@class='c-summary c-row ']", Option = PropertySelector.Options.PlainText)]
-		[StoredAs("Details", DataType.Text)]
+		[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefine.Options.PlainText)]
 		[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 		[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 		[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 		public string Details { get; set; }
 
-		[PropertySelector(Expression = ".", Option = PropertySelector.Options.PlainText)]
-		[StoredAs("PlainText", DataType.Text)]
+		[PropertyDefine(Expression = ".", Option = PropertyDefine.Options.PlainText)]
 		[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 		[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 		[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]

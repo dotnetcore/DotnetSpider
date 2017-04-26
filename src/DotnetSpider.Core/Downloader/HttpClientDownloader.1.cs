@@ -80,7 +80,7 @@ namespace DotnetSpider.Core.Downloader
 				request.PutExtra(Request.StatusCode, httpStatusCode);
 				Page page;
 
-				if (response.Content.Headers.ContentType!=null && !MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
+				if (response.Content.Headers.ContentType != null && !MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
 				{
 					if (!site.DownloadFiles)
 					{
@@ -151,18 +151,6 @@ namespace DotnetSpider.Core.Downloader
 				}
 			}
 		}
-
-		//private HttpWebRequest GeneratorCookie(HttpWebRequest httpWebRequest, Site site)
-		//{
-		//	StringBuilder builder = new StringBuilder();
-		//	foreach (var cookie in site.AllCookies)
-		//	{
-		//		builder.Append($"{cookie.Key}={cookie.Value};");
-		//	}
-		//	httpWebRequest.Headers.Add("Cookie", builder.ToString());
-
-		//	return httpWebRequest;
-		//}
 
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request, Site site)
 		{

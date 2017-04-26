@@ -1,7 +1,10 @@
-﻿using DotnetSpider.Extension;
+﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Selector;
+using DotnetSpider.Extension;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace DotnetSpider.Sample
 {
@@ -10,12 +13,8 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			RegexTestEntitySpider spider2 = new RegexTestEntitySpider();
-			spider2.Run();
-
-			EntitySpider spider = new EntitySpider(new Core.Site());
-			spider.AddStartUrl("http://www.baidu.com");
-
+			//JdCategorySpider spider = new JdCategorySpider();
+			//spider.Run();
 
 			// Custmize processor and pipeline 完全自定义页面解析和数据管道
 			BaseUsage.CustmizeProcessorAndPipeline();

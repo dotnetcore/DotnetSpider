@@ -39,21 +39,23 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
-				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				JObject data2 = new JObject { { "sku", "111" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
-				insertPipeline.Process(new List<JObject> { data1, data2 });
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2 });
 
-				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString, PipelineMode.Update);
-				updatePipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString);
+				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
+				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
-				JObject data3 = new JObject { { "sku", "110" }, { "category", "4C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				updatePipeline.Process(new List<JObject> { data3 });
+				JObject data3 = new JObject { { "Sku", "110" }, { "Category", "4C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				updatePipeline.Process(metadata2.Entity.Name, new List<JObject> { data3 });
 
-				var list = conn.Query<Product>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(2, list.Count);
 				Assert.AreEqual("110", list[0].Sku);
 				Assert.AreEqual("4C", list[0].Category);
@@ -72,21 +74,23 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo()));
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(Product2Insert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
-				JObject data1 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				JObject data2 = new JObject { { "sku", "111" }, { "category1", "4C" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
-				insertPipeline.Process(new List<JObject> { data1, data2 });
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2 });
 
-				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString, PipelineMode.Update);
-				updatePipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo()));
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString);
+				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(Product2Update).GetTypeInfo());
+				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
-				JObject data3 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "AAAA" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				updatePipeline.Process(new List<JObject> { data3 });
+				JObject data3 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				updatePipeline.Process(metadata2.Entity.Name, new List<JObject> { data3 });
 
-				var list = conn.Query<Product2>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(2, list.Count);
 				Assert.AreEqual("110", list[0].Sku);
 				Assert.AreEqual("AAAA", list[0].Category);
@@ -105,21 +109,23 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
-				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				JObject data2 = new JObject { { "sku", "111" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
-				insertPipeline.Process(new List<JObject> { data1, data2 });
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2 });
 
-				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString, PipelineMode.Update, true);
-				updatePipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString, true);
+				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
+				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
-				JObject data3 = new JObject { { "sku", "110" }, { "category", "4C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				updatePipeline.Process(new List<JObject> { data3 });
+				JObject data3 = new JObject { { "Sku", "110" }, { "Category", "4C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				updatePipeline.Process(metadata2.Entity.Name, new List<JObject> { data3 });
 
-				var list = conn.Query<Product>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(2, list.Count);
 				Assert.AreEqual("110", list[0].Sku);
 				Assert.AreEqual("4C", list[0].Category);
@@ -138,21 +144,24 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo()));
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(Product2Insert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
-				JObject data1 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				JObject data2 = new JObject { { "sku", "111" }, { "category1", "4C" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
-				insertPipeline.Process(new List<JObject> { data1, data2 });
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2 });
 
-				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString, PipelineMode.Update, true);
-				updatePipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo()));
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString, true);
+				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(Product2Update).GetTypeInfo());
+				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
-				JObject data3 = new JObject { { "sku", "110" }, { "category1", "4C" }, { "category", "AAAA" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				updatePipeline.Process(new List<JObject> { data3 });
 
-				var list = conn.Query<Product2>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				JObject data3 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				updatePipeline.Process(metadata2.Entity.Name, new List<JObject> { data3 });
+
+				var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(2, list.Count);
 				Assert.AreEqual("110", list[0].Sku);
 				Assert.AreEqual("AAAA", list[0].Category);
@@ -171,17 +180,18 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
 				// Common data
-				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				JObject data2 = new JObject { { "sku", "111" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
 				// Value is null
-				JObject data3 = new JObject { { "sku", "112" }, { "category", null }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
-				insertPipeline.Process(new List<JObject> { data1, data2, data3 });
+				JObject data3 = new JObject { { "Sku", "112" }, { "Category", null }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2, data3 });
 
-				var list = conn.Query<Product>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(3, list.Count);
 				Assert.AreEqual("110", list[0].Sku);
 				Assert.AreEqual("111", list[1].Sku);
@@ -210,7 +220,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				}
 				ISpider spider = new DefaultSpider("test", new Site());
 
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(null)
 				{
 					UpdateConnectString = new DbUpdateConnectString
 					{
@@ -218,15 +228,16 @@ namespace DotnetSpider.Extension.Test.Pipeline
 						QueryString = "SELECT value from `dotnetspider1`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"
 					}
 				};
-				insertPipeline.InitEntity(EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo()));
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
-				JObject data1 = new JObject { { "sku", "110" }, { "category", "3C" }, { "url", "http://jd.com/110" }, { "cdate", "2016-08-13" } };
-				JObject data2 = new JObject { { "sku", "111" }, { "category", "3C" }, { "url", "http://jd.com/111" }, { "cdate", "2016-08-13" } };
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
 
-				insertPipeline.Process(new List<JObject> { data1, data2 });
+				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2 });
 
-				var list = conn.Query<Product>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(2, list.Count);
 				Assert.AreEqual("110", list[0].Sku);
 				Assert.AreEqual("111", list[1].Sku);
@@ -235,67 +246,78 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			ClearDb();
 		}
+ 
 
-		[TestMethod]
-		public void Clone()
-		{
-			MySqlEntityPipeline insertipeline = new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306");
-			var newPipeline1 = (MySqlEntityPipeline)insertipeline.Clone();
-			Assert.AreEqual("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306", newPipeline1.ConnectString);
-			Assert.AreEqual(PipelineMode.Insert, newPipeline1.Mode);
-
-			MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306", PipelineMode.Update);
-			Assert.AreEqual("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306", updatePipeline.ConnectString);
-			Assert.AreEqual(PipelineMode.Update, updatePipeline.Mode);
-		}
-
-		[Schema("test", "sku", TableSuffix.Today)]
+		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		[Indexes(Primary = "sku", Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
-		[UpdateColumns("category")]
-		public class Product : ISpiderEntity
+		public class ProductInsert : ISpiderEntity
 		{
-			[StoredAs("category", DataType.String, 20)]
-			[PropertySelector(Expression = "name", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
-			[StoredAs("url", DataType.Text)]
-			[PropertySelector(Expression = "./div[1]/a/@href")]
+			[PropertyDefine(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[StoredAs("sku", DataType.String, 20)]
-			[PropertySelector(Expression = "./div[1]/a")]
+			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
 
-			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
-			[StoredAs("cdate", DataType.Time)]
+			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment, Length = 100)]
 			public DateTime CDate { get; set; }
 		}
 
-		[Schema("test", "sku2", TableSuffix.Today)]
+		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		[Indexes(Primary = "sku,category1")]
-		[UpdateColumns("category")]
-		public class Product2 : ISpiderEntity
+		public class ProductUpdate : ISpiderEntity
 		{
-			[StoredAs("category1", DataType.String, 20)]
-			[PropertySelector(Expression = "name", Type = SelectorType.Enviroment)]
-			public string Category1 { get; set; }
-
-			[StoredAs("category", DataType.String, 20)]
-			[PropertySelector(Expression = "name", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
-			[StoredAs("url", DataType.Text)]
-			[PropertySelector(Expression = "./div[1]/a/@href")]
+			[PropertyDefine(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[StoredAs("sku", DataType.String, 20)]
-			[PropertySelector(Expression = "./div[1]/a")]
+			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
 
-			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
-			[StoredAs("cdate", DataType.Time)]
+			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment, Length = 100)]
+			public DateTime CDate { get; set; }
+		}
+		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku,Category1")]
+		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
+		public class Product2Insert : ISpiderEntity
+		{
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			public string Category1 { get; set; }
+
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment)]
+			public string Category { get; set; }
+
+			[PropertyDefine(Expression = "./div[1]/a/@href")]
+			public string Url { get; set; }
+
+			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
+			public string Sku { get; set; }
+
+			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
+			public DateTime CDate { get; set; }
+		}
+
+		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku,Category1", UpdateColumns = new[] { "Category" })]
+		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
+		public class Product2Update : ISpiderEntity
+		{
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			public string Category1 { get; set; }
+
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment)]
+			public string Category { get; set; }
+
+			[PropertyDefine(Expression = "./div[1]/a/@href")]
+			public string Url { get; set; }
+
+			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
+			public string Sku { get; set; }
+
+			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
 			public DateTime CDate { get; set; }
 		}
 	}

@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Core.Infrastructure;
+using System.Collections.Concurrent;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -14,54 +15,43 @@ namespace DotnetSpider.Extension.Pipeline
 		public string ConnectString { get; set; }
 		[JsonIgnore]
 		public IUpdateConnectString UpdateConnectString { get; set; }
-		protected Schema Schema { get; set; }
-		private IMongoCollection<BsonDocument> _collection;
+
+		protected ConcurrentDictionary<string, IMongoCollection<BsonDocument>> Collections = new ConcurrentDictionary<string, IMongoCollection<BsonDocument>>();
 
 		public MongoDbEntityPipeline(string connectString)
 		{
 			ConnectString = connectString;
 		}
 
-		public override void InitEntity(EntityMetadata metadata)
+		public override void AddEntity(EntityMetadata metadata)
 		{
-			if (metadata.Schema == null)
+			base.AddEntity(metadata);
+
+			if (metadata.Table == null)
 			{
-				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
 				return;
 			}
 
-			Schema = BaseEntityDbPipeline.GenerateSchema(metadata.Schema);
 			MongoClient client = new MongoClient(ConnectString);
-			var db = client.GetDatabase(metadata.Schema.Database);
+			var db = client.GetDatabase(metadata.Table.Database);
 
-			_collection = db.GetCollection<BsonDocument>(metadata.Schema.TableName);
-
-			IsEnabled = true;
+			Collections.TryAdd(metadata.Table.Name, db.GetCollection<BsonDocument>(metadata.Table.Name));
 		}
 
-		public override void Process(List<JObject> datas)
+		public override void Process(string entityName, List<JObject> datas)
 		{
-			List<BsonDocument> reslut = new List<BsonDocument>();
-			foreach (var data in datas)
+			IMongoCollection<BsonDocument> collection;
+			if (Collections.TryGetValue(entityName, out collection))
 			{
-				BsonDocument item = BsonDocument.Parse(data.ToString());
+				List<BsonDocument> reslut = new List<BsonDocument>();
+				foreach (var data in datas)
+				{
+					BsonDocument item = BsonDocument.Parse(data.ToString());
 
-				reslut.Add(item);
+					reslut.Add(item);
+				}
+				collection.InsertMany(reslut);
 			}
-			_collection.InsertMany(reslut);
-		}
-
-		public override BaseEntityPipeline Clone()
-		{
-			return new MongoDbEntityPipeline(ConnectString)
-			{
-				UpdateConnectString = UpdateConnectString
-			};
-		}
-
-		public Schema GetSchema()
-		{
-			return Schema;
 		}
 	}
 }

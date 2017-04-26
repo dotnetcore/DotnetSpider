@@ -5,6 +5,6 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public interface ICollectEntityPipeline
 	{
-		IEnumerable<JObject> GetCollected();
+		List<JObject> GetCollected(string entityName);
 	}
 }

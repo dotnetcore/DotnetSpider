@@ -174,11 +174,14 @@ namespace DotnetSpider.Core.Test
 
 		public class TestPipeline : BasePipeline
 		{
-			public override void Process(ResultItems resultItems)
+			public override void Process(params ResultItems[] resultItems)
 			{
-				foreach (var entry in resultItems.Results)
+				foreach (var resultItem in resultItems)
 				{
-					Console.WriteLine($"{entry.Key}:{entry.Value}");
+					foreach (var entry in resultItem.Results)
+					{
+						Console.WriteLine($"{entry.Key}:{entry.Value}");
+					}
 				}
 			}
 		}
