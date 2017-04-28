@@ -728,7 +728,7 @@ namespace DotnetSpider.Core
 								Stat = Status.Finished;
 								_realStat = Status.Finished;
 								_OnComplete();
-								OnComplete();
+								OnComplete?.Invoke();
 								break;
 							}
 
