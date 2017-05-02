@@ -47,6 +47,9 @@ namespace DotnetSpider.Extension.Model
 		public int Interval { get; set; } = 1;
 		public int PostInterval { get; set; } = 1;
 
+		public string IndexKey { get; set; } = "IndexKey";
+		public string PostIndexKey { get; set; } = "PostIndexKey";
+
 		public string FormateString { get; set; }
 
 		public override void Build(Spider spider, dynamic obj)
@@ -61,10 +64,15 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 
+			data.Add(IndexKey, null);
+			data.Add(PostIndexKey, null);
+
 			for (int i = From; i <= To; i += Interval)
 			{
+				data[IndexKey] = i;
 				for (int j = PostFrom; j <= PostFrom; j += PostInterval)
 				{
+					data[PostIndexKey] = j;
 					spider.Scheduler.Push(new Request(string.Format(FormateString, i), data)
 					{
 						PostBody = string.IsNullOrEmpty(PostBody) ? null : string.Format(PostBody, j),
@@ -252,6 +260,54 @@ namespace DotnetSpider.Extension.Model
 
 			// implement more rules
 			return tmpPostBody;
+		}
+	}
+
+	public class ListPrepareStartUrls : PrepareStartUrls
+	{
+		public List<string> Data { get; set; } = new List<string>();
+		public string DataKey { get; set; } = "Data";
+
+		public string FormateString { get; set; }
+
+		public override void Build(Spider spider, dynamic obj)
+		{
+			Dictionary<string, object> data = new Dictionary<string, object>();
+
+			if (Extras != null)
+			{
+				foreach (var extra in Extras)
+				{
+					data.Add(extra.Key, extra.Value);
+				}
+			}
+
+			data.Add(DataKey, "");
+
+			if (Data.Count > 0)
+			{
+				foreach (var d in Data)
+				{
+					data[DataKey] = d;
+					spider.Scheduler.Push(new Request(string.Format(FormateString, d), data)
+					{
+						PostBody = string.IsNullOrEmpty(PostBody) ? null : string.Format(PostBody, d),
+						Origin = Origin,
+						Method = Method,
+						Referer = Referer
+					});
+				}
+			}
+			else
+			{
+				spider.Scheduler.Push(new Request(FormateString, data)
+				{
+					PostBody = string.IsNullOrEmpty(PostBody) ? null : PostBody,
+					Origin = Origin,
+					Method = Method,
+					Referer = Referer
+				});
+			}
 		}
 	}
 
