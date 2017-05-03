@@ -15,14 +15,9 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
-		public static void Log(ITask spider, string message, LogLevel level, Exception e = null)
+		public static void Log(this IIdentity identity, string message, LogLevel level, Exception e = null)
 		{
-			Logger.Log(spider, message, level, e);
-		}
-
-		public static void Log(this ISpider spider, string message, LogLevel level, Exception e = null)
-		{
-			Logger.Log(spider, message, level, e);
+			Logger.Log(identity, message, level, e);
 		}
 	}
 }

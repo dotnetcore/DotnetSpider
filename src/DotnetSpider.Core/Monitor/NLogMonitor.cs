@@ -22,8 +22,14 @@ namespace DotnetSpider.Core.Monitor
 			theEvent.Properties["TaskGroup"] = status.TaskGroup;
 			theEvent.Properties["Identity"] = status.Identity;
 			theEvent.Properties["Status"] = status.Status;
-			theEvent.Properties["Message"] = msg;
-
+			theEvent.Properties["Left"] = status.Left;
+			theEvent.Properties["Success"] = status.Success;
+			theEvent.Properties["Error"] = status.Error;
+			theEvent.Properties["Total"] = status.Total;
+			theEvent.Properties["AvgDownloadSpeed"] = status.AvgDownloadSpeed;
+			theEvent.Properties["AvgProcessorSpeed"] = status.AvgProcessorSpeed;
+			theEvent.Properties["AvgPipelineSpeed"] = status.AvgPipelineSpeed;
+			
 			if (SpiderConsts.SaveLogAndStatusToDb)
 			{
 				NetworkCenter.Current.Execute("nm", () =>

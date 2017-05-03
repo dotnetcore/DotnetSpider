@@ -3,7 +3,7 @@ using NLog;
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public class NLogLogger :  ILogger
+	public class NLogLogger : ILogger
 	{
 		private readonly NLog.ILogger _logger;
 		private static readonly Lazy<NLog.ILogger> builder = new Lazy<NLog.ILogger>(() =>
@@ -18,12 +18,10 @@ namespace DotnetSpider.Core.Infrastructure
 			_logger = LogManager.GetCurrentClassLogger();
 		}
 
-		public void Log(ITask spider, string message, LogLevel level, Exception e = null)
+		public void Log(IIdentity identity, string message, LogLevel level, Exception e = null)
 		{
 			LogEventInfo theEvent = new LogEventInfo(GetNLogLevel(level), _logger.Name, message) { Exception = e };
-			theEvent.Properties["UserId"] = spider == null ? "DotnetSpider" : spider.UserId;
-			theEvent.Properties["TaskGroup"] = spider == null ? "Default" : spider.TaskGroup;
-			theEvent.Properties["Identity"] = spider == null ? "Default" : spider.Identity;
+			theEvent.Properties["Identity"] = identity == null ? "UNKNOW" : identity.Identity;
 			_logger.Log(theEvent);
 		}
 

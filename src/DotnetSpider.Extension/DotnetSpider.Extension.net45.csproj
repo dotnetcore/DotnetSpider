@@ -62,7 +62,7 @@
     <Compile Include="Model\Attribute\EntitySelector.cs" />
     <Compile Include="Model\Attribute\PropertyDefine.cs" />
     <Compile Include="Model\Attribute\SharedValueSelector.cs" />
-    <Compile Include="Model\Attribute\TargetUrl.cs" />
+    <Compile Include="Model\Attribute\LinkedUrl.cs" />
     <Compile Include="Model\Attribute\TargetUrlsSelector.cs" />
     <Compile Include="Model\DataHandler.cs" />
     <Compile Include="Model\EntityExtractor.cs" />

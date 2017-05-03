@@ -148,7 +148,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
-			scheduler.Dispose();
+			scheduler.Clean();
 
 			scheduler.Push(new Request("http://www.a.com/", null));
 			scheduler.Push(new Request("http://www.b.com/", null));
@@ -195,7 +195,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Assert.AreEqual(1, scheduler.GetErrorRequestsCount());
 			Assert.AreEqual(4, scheduler.GetTotalRequestsCount());
 
-			scheduler.Dispose();
+			scheduler.Clean();
 		}
 
 		[TestMethod]

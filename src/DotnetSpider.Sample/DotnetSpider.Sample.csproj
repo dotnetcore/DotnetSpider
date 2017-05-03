@@ -14,4 +14,13 @@
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="config.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Model
 	public class Entity : DataToken
 	{
 		public List<DataToken> Fields { get; set; } = new List<DataToken>();
-		public List<TargetUrl> TargetUrls { get; set; } = new List<TargetUrl>();
+		public List<LinkedUrl> TargetUrls { get; set; } = new List<LinkedUrl>();
 	}
 
 	public class Field : DataToken

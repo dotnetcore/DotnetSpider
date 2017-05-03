@@ -79,7 +79,7 @@ namespace DotnetSpider.Extension
 			}
 
 			bool needInitStartRequest = true;
-			var redisConnectString = Configuration.GetValue("redis.connectString");
+			var redisConnectString = Configuration.GetValue(Configuration.RedisConnectString);
 			if (!string.IsNullOrEmpty(redisConnectString))
 			{
 				RedisConnection = Cache.Instance.Get(redisConnectString);
@@ -353,7 +353,7 @@ namespace DotnetSpider.Extension
 							token.Formatters.Add(formatter);
 						}
 
-						var targetUrl = propertyInfo.GetCustomAttribute<TargetUrl>();
+						var targetUrl = propertyInfo.GetCustomAttribute<LinkedUrl>();
 						if (targetUrl != null)
 						{
 							targetUrl.PropertyName = token.Name;

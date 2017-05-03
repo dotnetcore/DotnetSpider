@@ -23,10 +23,8 @@ namespace DotnetSpider.Sample
 
 		protected override EntitySpider GetEntitySpider()
 		{
-			var entitySpider = new EntitySpider(new Site())
-			{
-				Identity = "JdCategory Daliy Tracking " + DateTimeUtils.Day1OfThisWeek.ToString("yyyy-MM-dd")
-			};
+			var entitySpider = new EntitySpider(new Site());
+			Name = "JdCategory Daliy Tracking";
 
 			entitySpider.AddStartUrl("http://www.jd.com/allSort.aspx");
 			entitySpider.AddEntityType(typeof(Category));

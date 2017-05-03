@@ -171,7 +171,7 @@ namespace DotnetSpider.Extension.Test
 				[PropertyDefine(Expression = ".//a/@title")]
 				public string Title { get; set; }
 
-				[TargetUrl(Extras = new[] { "Title", "Url" })]
+				[LinkedUrl(Extras = new[] { "Title", "Url" })]
 				[PropertyDefine(Expression = ".//a/@href")]
 				public string Url { get; set; }
 			}

@@ -11,11 +11,8 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public class Configuration
 	{
-		public const string RedisHost = "redisHost";
-		public const string RredisPassword = "redisPassword";
-		public const string RedialRedisHost = "redialRedisHost";
-		public const string RedialRedisPassword = "redialRedisPassword";
-		public const string LogAndStatusConnectString = "logAndStatusConnectString";
+		public static string RedisConnectString = "redisConnectString";
+		public static string LogAndStatusConnectString = "logAndStatusConnectString";
 
 #if NET_CORE
 		private static readonly IConfigurationRoot ConfigurationRoot;
