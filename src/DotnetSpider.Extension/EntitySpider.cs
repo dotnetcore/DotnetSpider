@@ -353,7 +353,7 @@ namespace DotnetSpider.Extension
 							token.Formatters.Add(formatter);
 						}
 
-						var targetUrl = propertyInfo.GetCustomAttribute<LinkedUrl>();
+						var targetUrl = propertyInfo.GetCustomAttribute<LinkToNext>();
 						if (targetUrl != null)
 						{
 							targetUrl.PropertyName = token.Name;

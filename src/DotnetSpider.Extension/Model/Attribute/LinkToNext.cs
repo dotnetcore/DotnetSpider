@@ -3,7 +3,7 @@
 namespace DotnetSpider.Extension.Model.Attribute
 {
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-	public class LinkedUrl : System.Attribute
+	public class LinkToNext : System.Attribute
 	{
 		public string[] Extras { get; set; }
 

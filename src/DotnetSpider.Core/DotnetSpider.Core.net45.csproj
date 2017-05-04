@@ -81,6 +81,7 @@
     <Compile Include="Downloader\ICookieInterceptor.cs" />
     <Compile Include="Downloader\IDownloader.cs" />
     <Compile Include="IClean.cs" />
+    <Compile Include="IIdentity.cs" />
     <Compile Include="INamed.cs" />
     <Compile Include="Infrastructure\AutomicInteger.cs" />
     <Compile Include="Infrastructure\AutomicLong.cs" />
@@ -118,7 +119,6 @@
     <Compile Include="Infrastructure\XTokenQueue.cs" />
     <Compile Include="IRunable.cs" />
     <Compile Include="ISpider.cs" />
-    <Compile Include="ITask.cs" />
     <Compile Include="Monitor\IMonitor.cs" />
     <Compile Include="Monitor\ISpeedMonitor.cs" />
     <Compile Include="Monitor\NLogMonitor.cs" />

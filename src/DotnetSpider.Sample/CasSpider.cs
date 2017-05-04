@@ -43,7 +43,7 @@ namespace DotnetSpider.Sample
 			[PropertyDefine(Expression = ".//a/@title")]
 			public string Title { get; set; }
 
-			[LinkedUrl(Extras = new[] { "Title", "Url" })]
+			[LinkToNext(Extras = new[] { "Title", "Url" })]
 			[PropertyDefine(Expression = ".//a/@href")]
 			public string Url { get; set; }
 		}

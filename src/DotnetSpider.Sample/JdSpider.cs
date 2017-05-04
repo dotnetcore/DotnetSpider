@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample
 			[PropertyDefine(Expression = ".")]
 			public string CategoryName { get; set; }
 
-			[LinkedUrl(Extras = new[] { "CategoryName" })]
+			[LinkToNext(Extras = new[] { "CategoryName" })]
 			[RegexAppendFormatter(Pattern = "http://list.jd.com/list.html\\?cat=[0-9]+", AppendValue = "&page=1&trans=1&JL=6_0_0")]
 			[PropertyDefine(Expression = "./@href")]
 			public string Url { get; set; }
@@ -32,7 +32,7 @@ namespace DotnetSpider.Sample
 			[PropertyDefine(Expression = "CategoryName", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
 
-			[LinkedUrl(Extras = new[] { "CategoryName", "Sku", "Name", "Url" })]
+			[LinkToNext(Extras = new[] { "CategoryName", "Sku", "Name", "Url" })]
 			[PropertyDefine(Expression = "./div[@class='p-name']/a[1]/@href")]
 			public string Url { get; set; }
 
