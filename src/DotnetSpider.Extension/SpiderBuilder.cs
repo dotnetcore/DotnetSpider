@@ -11,6 +11,7 @@ namespace DotnetSpider.Extension
 	{
 		private string _userId;
 		private string _name;
+		private string _batch;
 
 		protected abstract EntitySpider GetEntitySpider();
 		protected EntitySpider Spider { get; private set; }
@@ -30,6 +31,25 @@ namespace DotnetSpider.Extension
 				if (_userId != value)
 				{
 					_userId = value;
+				}
+			}
+		}
+
+		public string Batch
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(_batch))
+				{
+					_batch = Guid.NewGuid().ToString("N");
+				}
+				return _batch;
+			}
+			set
+			{
+				if (_batch != value)
+				{
+					_batch = value;
 				}
 			}
 		}
@@ -126,7 +146,7 @@ namespace DotnetSpider.Extension
 					if (result != null)
 					{
 						var taskId = Convert.ToInt32(result);
-						var identity = Guid.NewGuid().ToString("N");
+						var identity = Encrypt.Md5Encrypt($"{Name}{Batch}");
 						command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_batches` (`taskId`,`batch`, `code`) values ('{taskId}','{DateTime.Now}','{identity}');";
 						command.ExecuteNonQuery();
 
