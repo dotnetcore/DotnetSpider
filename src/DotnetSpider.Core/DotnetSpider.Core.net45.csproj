@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8EFD08A2-CBD0-4984-B2A8-0AAFE227E5FA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DotnetSpider.Core</RootNamespace>
+    <AssemblyName>DotnetSpider.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\output\net451\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET4_5</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\..\packages\Autofac.4.5.0\lib\net45\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack.CssSelectors, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HtmlAgilityPack.CssSelectors.1.0.2\lib\net45\HtmlAgilityPack.CssSelectors.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NLog.4.4.5\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ContentType.cs" />
+    <Compile Include="DefaultSpider.cs" />
+    <Compile Include="Downloader\BaseDownloader.cs" />
+    <Compile Include="Downloader\BeforeDownloadHandler.cs" />
+    <Compile Include="Downloader\IDownloadCompleteHandler.cs" />
+    <Compile Include="Downloader\CookieInterceptor.cs" />
+    <Compile Include="Downloader\Cookies.cs" />
+    <Compile Include="Downloader\DownloadCompleteHandler.cs" />
+    <Compile Include="Downloader\DownloadException.cs" />
+    <Compile Include="Downloader\FileCookieInject.cs" />
+    <Compile Include="Downloader\HttpClientDownloader.1.cs" />
+    <Compile Include="Downloader\HttpClientPool.cs" />
+    <Compile Include="Downloader\HttpConstant.cs" />
+    <Compile Include="Downloader\ICookieInterceptor.cs" />
+    <Compile Include="Downloader\IDownloader.cs" />
+    <Compile Include="IClean.cs" />
+    <Compile Include="IIdentity.cs" />
+    <Compile Include="INamed.cs" />
+    <Compile Include="Infrastructure\AutomicInteger.cs" />
+    <Compile Include="Infrastructure\AutomicLong.cs" />
+    <Compile Include="Infrastructure\BitArrayExtensions.cs" />
+    <Compile Include="Infrastructure\BlockingQueue.cs" />
+    <Compile Include="Infrastructure\BloomFilter.cs" />
+    <Compile Include="Infrastructure\Browser.cs" />
+    <Compile Include="Infrastructure\Cache.cs" />
+    <Compile Include="Infrastructure\Configuration.cs" />
+    <Compile Include="Infrastructure\DateTimeUtils.cs" />
+    <Compile Include="Infrastructure\DirectoryExtensions.cs" />
+    <Compile Include="Infrastructure\Encrypt.cs" />
+    <Compile Include="Infrastructure\Environment.cs" />
+    <Compile Include="Infrastructure\ExcelClient.cs" />
+    <Compile Include="Infrastructure\HttpUtils.cs" />
+    <Compile Include="Infrastructure\ILogger.cs" />
+    <Compile Include="Infrastructure\INetworkExecutor.cs" />
+    <Compile Include="Infrastructure\IocManager.cs" />
+    <Compile Include="Infrastructure\LimitedConcurrencyLevelTaskScheduler.cs" />
+    <Compile Include="Infrastructure\LogCenter.cs" />
+    <Compile Include="Infrastructure\NetworkCenter.cs" />
+    <Compile Include="Infrastructure\NLogExtensions.cs" />
+    <Compile Include="Infrastructure\NLogLogger.cs" />
+    <Compile Include="Infrastructure\PriorityBlockingQueue.cs" />
+    <Compile Include="Infrastructure\RegexUtils.cs" />
+    <Compile Include="Infrastructure\RetryExecutor.cs" />
+    <Compile Include="Infrastructure\Singleton.cs" />
+    <Compile Include="Infrastructure\SpiderConsts.cs" />
+    <Compile Include="Infrastructure\StreamExtensions.cs" />
+    <Compile Include="Infrastructure\StringExtensions.cs" />
+    <Compile Include="Infrastructure\SystemInfo.cs" />
+    <Compile Include="Infrastructure\TypeExtentions.cs" />
+    <Compile Include="Infrastructure\UrlUtils.cs" />
+    <Compile Include="Infrastructure\WindowsFormUtil.cs" />
+    <Compile Include="Infrastructure\XTokenQueue.cs" />
+    <Compile Include="IRunable.cs" />
+    <Compile Include="ISpider.cs" />
+    <Compile Include="Monitor\IMonitor.cs" />
+    <Compile Include="Monitor\ISpeedMonitor.cs" />
+    <Compile Include="Monitor\NLogMonitor.cs" />
+    <Compile Include="Monitor\SpiderClosingHandler.cs" />
+    <Compile Include="Monitor\SpiderEvent.cs" />
+    <Compile Include="Monitor\SpiderStatus.cs" />
+    <Compile Include="Page.cs" />
+    <Compile Include="Pipeline\BasePipeline.cs" />
+    <Compile Include="Pipeline\ConsolePipeline.cs" />
+    <Compile Include="Pipeline\FilePipeline.cs" />
+    <Compile Include="Pipeline\ICollectorPipeline.cs" />
+    <Compile Include="Pipeline\IPipeline.cs" />
+    <Compile Include="Pipeline\JsonFilePipeline.cs" />
+    <Compile Include="Processor\BasePageProcessor.cs" />
+    <Compile Include="Processor\DefaultPageProcessor.cs" />
+    <Compile Include="Processor\IPageProcessor.cs" />
+    <Compile Include="Processor\SimplePageProcessor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Proxy\HttpProxyPool.cs" />
+    <Compile Include="Proxy\IHttpProxyPool.cs" />
+    <Compile Include="Proxy\IProxySupplier.cs" />
+    <Compile Include="Proxy\KuaidailiProxySupplier.cs" />
+    <Compile Include="Proxy\Proxy.cs" />
+    <Compile Include="Proxy\ProxyUtil.cs" />
+    <Compile Include="Proxy\SingleProxyPool.cs" />
+    <Compile Include="Proxy\UseSpecifiedUriWebProxy.cs" />
+    <Compile Include="Request.cs" />
+    <Compile Include="ResultItems.cs" />
+    <Compile Include="Scheduler\Component\BloomFilterDuplicateRemover.cs" />
+    <Compile Include="Scheduler\Component\HashSetDuplicateRemover.cs" />
+    <Compile Include="Scheduler\Component\IDuplicateRemover.cs" />
+    <Compile Include="Scheduler\DuplicateRemovedScheduler.cs" />
+    <Compile Include="Scheduler\IMonitorableScheduler.cs" />
+    <Compile Include="Scheduler\IScheduler.cs" />
+    <Compile Include="Scheduler\PriorityScheduler.cs" />
+    <Compile Include="Scheduler\QueueDuplicateRemovedScheduler.cs" />
+    <Compile Include="Selector\BaseHtmlSelector.cs" />
+    <Compile Include="Selector\BaseSelectable.cs" />
+    <Compile Include="Selector\CssSelector.cs" />
+    <Compile Include="Selector\EnviromentSelector.cs" />
+    <Compile Include="Selector\ISelectable.cs" />
+    <Compile Include="Selector\ISelector.cs" />
+    <Compile Include="Selector\JsonPathSelector.cs" />
+    <Compile Include="Selector\RegexResult.cs" />
+    <Compile Include="Selector\RegexSelector.cs" />
+    <Compile Include="Selector\Selectable.cs" />
+    <Compile Include="Selector\Selectors.cs" />
+    <Compile Include="Selector\SelectorType.cs" />
+    <Compile Include="Selector\SmartContentSelector.cs" />
+    <Compile Include="Selector\XPathSelector.cs" />
+    <Compile Include="Site.cs" />
+    <Compile Include="Spider.cs" />
+    <Compile Include="SpiderExceptoin.cs" />
+    <Compile Include="Status.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>DEL /S /Q $(ProjectDir)obj\*.*</PreBuildEvent>
+  </PropertyGroup>
+</Project>

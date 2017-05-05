@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Core.net45", "src\DotnetSpider.Core\DotnetSpider.Core.net45.csproj", "{8EFD08A2-CBD0-4984-B2A8-0AAFE227E5FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Core.Test.net45", "src\DotnetSpider.Core.Test\DotnetSpider.Core.Test.net45.csproj", "{430F0199-088B-43E2-BB8E-2C14C62F69C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension.net45", "src\DotnetSpider.Extension\DotnetSpider.Extension.net45.csproj", "{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension.Test.net45", "src\DotnetSpider.Extension.Test\DotnetSpider.Extension.Test.net45.csproj", "{6E57AD2D-F3D2-4388-A5B1-AD437929577C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Sample.net45", "src\DotnetSpider.Sample\DotnetSpider.Sample.net45.csproj", "{2A2C8657-5F71-48AC-876B-E2F194BF75A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C356B40B-5E8C-49F9-AEEB-07C43470F9AB}"
+	ProjectSection(SolutionItems) = preProject
+		build.bat = build.bat
+		guide.md = guide.md
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{4F294905-CBD3-44E1-BCD2-58A0825A28B0}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\DotnetSpider.Core.nuspec = nuget\DotnetSpider.Core.nuspec
+		nuget\DotnetSpider.Extension.nuspec = nuget\DotnetSpider.Extension.nuspec
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8EFD08A2-CBD0-4984-B2A8-0AAFE227E5FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EFD08A2-CBD0-4984-B2A8-0AAFE227E5FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EFD08A2-CBD0-4984-B2A8-0AAFE227E5FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EFD08A2-CBD0-4984-B2A8-0AAFE227E5FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{430F0199-088B-43E2-BB8E-2C14C62F69C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{430F0199-088B-43E2-BB8E-2C14C62F69C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{430F0199-088B-43E2-BB8E-2C14C62F69C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{430F0199-088B-43E2-BB8E-2C14C62F69C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D7EEDA6-F7D4-4CC0-8C60-D950BC43D1F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E57AD2D-F3D2-4388-A5B1-AD437929577C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E57AD2D-F3D2-4388-A5B1-AD437929577C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E57AD2D-F3D2-4388-A5B1-AD437929577C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E57AD2D-F3D2-4388-A5B1-AD437929577C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A2C8657-5F71-48AC-876B-E2F194BF75A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A2C8657-5F71-48AC-876B-E2F194BF75A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A2C8657-5F71-48AC-876B-E2F194BF75A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A2C8657-5F71-48AC-876B-E2F194BF75A8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

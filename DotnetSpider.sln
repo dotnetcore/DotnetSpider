@@ -1,0 +1,71 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Core", "src\DotnetSpider.Core\DotnetSpider.Core.csproj", "{5C1BFB68-305B-4CF1-B985-630A447074F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.HtmlAgilityPack.Css", "src\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj", "{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.HtmlAgilityPack", "src\DotnetSpider.HtmlAgilityPack\DotnetSpider.HtmlAgilityPack.csproj", "{B0D5CCD9-7C19-4D2E-85AC-A758631F481F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Core.Test", "src\DotnetSpider.Core.Test\DotnetSpider.Core.Test.csproj", "{5118198E-0F4C-44FF-94E7-03AEAB896EBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension", "src\DotnetSpider.Extension\DotnetSpider.Extension.csproj", "{AB496600-ABF5-494A-B07B-A36D9C2D0455}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Extension.Test", "src\DotnetSpider.Extension.Test\DotnetSpider.Extension.Test.csproj", "{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Sample", "src\DotnetSpider.Sample\DotnetSpider.Sample.csproj", "{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{67D308FE-3967-420F-91B0-1F1EB5C09FF5}"
+	ProjectSection(SolutionItems) = preProject
+		build.bat = build.bat
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{C74A404F-B0E5-466C-937A-66D04C4CFFEB}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\DotnetSpider.Core.nuspec = nuget\DotnetSpider.Core.nuspec
+		nuget\DotnetSpider.Extension.nuspec = nuget\DotnetSpider.Extension.nuspec
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5C1BFB68-305B-4CF1-B985-630A447074F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C1BFB68-305B-4CF1-B985-630A447074F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C1BFB68-305B-4CF1-B985-630A447074F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C1BFB68-305B-4CF1-B985-630A447074F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0D5CCD9-7C19-4D2E-85AC-A758631F481F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0D5CCD9-7C19-4D2E-85AC-A758631F481F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0D5CCD9-7C19-4D2E-85AC-A758631F481F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0D5CCD9-7C19-4D2E-85AC-A758631F481F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5118198E-0F4C-44FF-94E7-03AEAB896EBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5118198E-0F4C-44FF-94E7-03AEAB896EBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5118198E-0F4C-44FF-94E7-03AEAB896EBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5118198E-0F4C-44FF-94E7-03AEAB896EBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Release|Any CPU.Build.0 = Release|Any CPU
+		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
