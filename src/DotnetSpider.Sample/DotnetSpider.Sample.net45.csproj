@@ -38,6 +38,7 @@
     <Compile Include="BaseUsage.cs" />
     <Compile Include="CasSpider.cs" />
     <Compile Include="Cnblogs.cs" />
+    <Compile Include="ConfigurableSpider.cs" />
     <Compile Include="DDengSpider.cs" />
     <Compile Include="JdCategorySpider.cs" />
     <Compile Include="JdShopDetailSpider.cs" />
@@ -57,9 +58,13 @@
     <None Include="config.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="jdCategory.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.net45.csproj">
@@ -73,6 +78,9 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
   </ItemGroup>

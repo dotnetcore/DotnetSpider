@@ -65,8 +65,8 @@
     <Compile Include="Model\Attribute\LinkToNext.cs" />
     <Compile Include="Model\Attribute\TargetUrlsSelector.cs" />
     <Compile Include="Model\DataHandler.cs" />
+    <Compile Include="Model\Entity.cs" />
     <Compile Include="Model\EntityExtractor.cs" />
-    <Compile Include="Model\EntityMetadata.cs" />
     <Compile Include="Model\Formatter\CharacterCaseFormater.cs" />
     <Compile Include="Model\Formatter\DigitUnitFormater.cs" />
     <Compile Include="Model\Formatter\DisplaceFormater.cs" />

@@ -4,31 +4,26 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Model
 {
-	public class EntityMetadata
+	public class Entity : AbstractSelector
 	{
 		public Table Table { get; set; }
-		public Entity Entity { get; set; } = new Entity();
-		public int? Limit { get; set; }
+		public int Take { get; set; }
 		public List<TargetUrlsSelector> TargetUrlsSelectors { get; set; }
+		public List<Field> Fields { get; set; } = new List<Field>();
+		public List<LinkToNext> LinkToNexts { get; set; } = new List<LinkToNext>();
 		public DataHandler DataHandler { get; set; }
 		public List<SharedValueSelector> SharedValues { get; internal set; } = new List<SharedValueSelector>();
 	}
 
-	public class Entity : DataToken
-	{
-		public List<DataToken> Fields { get; set; } = new List<DataToken>();
-		public List<LinkToNext> TargetUrls { get; set; } = new List<LinkToNext>();
-	}
-
-	public class Field : DataToken
+	public class Field : AbstractSelector
 	{
 		public PropertyDefine.Options Option { get; set; }
 		public int Length { get; set; }
-		public bool Store { get; set; }
+		public bool IgnoreStore { get; set; }
 		public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
 	}
 
-	public abstract class DataToken
+	public abstract class AbstractSelector
 	{
 		public BaseSelector Selector { get; set; }
 		public bool NotNull { get; set; }

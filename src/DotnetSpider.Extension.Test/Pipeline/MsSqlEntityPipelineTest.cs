@@ -51,7 +51,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
 				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
-				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2 });
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
 
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString);
 				var metadat2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
@@ -59,7 +59,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.InitPipeline(spider);
 
 				JObject data3 = new JObject { { "Sku", "110" }, { "Category", "4C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
-				updatePipeline.Process(metadat2.Entity.Name, new List<JObject> { data3 });
+				updatePipeline.Process(metadat2.Name, new List<JObject> { data3 });
 
 				var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(2, list.Count);
@@ -86,7 +86,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				JObject data1 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
 				JObject data2 = new JObject { { "Sku", "111" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
-				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2 });
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
 
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString);
 				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(Product2Update).GetTypeInfo());
@@ -94,7 +94,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.InitPipeline(spider);
 
 				JObject data3 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
-				updatePipeline.Process(metadata2.Entity.Name, new List<JObject> { data3 });
+				updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
 
 				var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(2, list.Count);
@@ -121,7 +121,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
 				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
-				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2 });
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
 
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString, true);
 				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
@@ -129,7 +129,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.InitPipeline(spider);
 
 				JObject data3 = new JObject { { "Sku", "110" }, { "Category", "4C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
-				updatePipeline.Process(metadata2.Entity.Name, new List<JObject> { data3 });
+				updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
 
 				var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(2, list.Count);
@@ -156,7 +156,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				JObject data1 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
 				JObject data2 = new JObject { { "Sku", "111" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
-				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2 });
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
 
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString, true);
 				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(Product2Update).GetTypeInfo());
@@ -164,7 +164,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.InitPipeline(spider);
 
 				JObject data3 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
-				updatePipeline.Process(metadata2.Entity.Name, new List<JObject> { data3 });
+				updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
 
 				var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(2, list.Count);
@@ -194,7 +194,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
 				// Value is null
 				JObject data3 = new JObject { { "Sku", "112" }, { "Category", null }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
-				insertPipeline.Process(metadata.Entity.Name, new List<JObject> { data1, data2, data3 });
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2, data3 });
 
 				var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.AreEqual(3, list.Count);
@@ -241,14 +241,14 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			var metadata = EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity4).GetTypeInfo());
 			insertPipeline.AddEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity4).GetTypeInfo()));
-			Assert.AreEqual(1, insertPipeline.GetUpdateColumns(metadata.Entity.Name).Length);
-			Assert.AreEqual("Value", insertPipeline.GetUpdateColumns(metadata.Entity.Name).First());
+			Assert.AreEqual(1, insertPipeline.GetUpdateColumns(metadata.Name).Length);
+			Assert.AreEqual("Value", insertPipeline.GetUpdateColumns(metadata.Name).First());
 
 			SqlServerEntityPipeline insertPipeline2 = new SqlServerEntityPipeline(ConnectString);
 			var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity5).GetTypeInfo());
 			insertPipeline2.AddEntity(metadata2);
-			Assert.AreEqual(1, insertPipeline2.GetUpdateColumns(metadata2.Entity.Name).Length);
-			Assert.AreEqual("Value", insertPipeline2.GetUpdateColumns(metadata2.Entity.Name).First());
+			Assert.AreEqual(1, insertPipeline2.GetUpdateColumns(metadata2.Name).Length);
+			Assert.AreEqual("Value", insertPipeline2.GetUpdateColumns(metadata2.Name).First());
 		}
 
 		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]

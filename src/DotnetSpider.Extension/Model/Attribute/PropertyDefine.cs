@@ -22,6 +22,6 @@ namespace DotnetSpider.Extension.Model.Attribute
 
 		public int Length { get; set; } = 0;
 
-		public bool Store { get; set; } = true;
+		public bool IgnoreStore { get; set; } = false;
 	}
 }

@@ -64,7 +64,7 @@ namespace DotnetSpider.Sample
 
 			[FormatStringFormater(Format = "http:{0}")]
 			[Download]
-			[PropertyDefine(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src", Store = false)]
+			[PropertyDefine(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src", IgnoreStore = true)]
 			public string Logo { get; set; }
 
 			[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]

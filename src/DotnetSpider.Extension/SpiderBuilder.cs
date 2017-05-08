@@ -41,9 +41,30 @@ namespace DotnetSpider.Extension
 			{
 				if (string.IsNullOrEmpty(_batch))
 				{
-					_batch = Guid.NewGuid().ToString("N");
+					return Guid.NewGuid().ToString("N");
 				}
-				return _batch;
+				else
+				{
+					switch (_batch)
+					{
+						case "DAILY":
+							{
+								return DateTimeUtils.RunIdOfToday;
+							}
+						case "WEEKLY":
+							{
+								return DateTimeUtils.RunIdOfMonday;
+							}
+						case "MONTHLY":
+							{
+								return DateTimeUtils.RunIdOfMonthly;
+							}
+						default:
+							{
+								return _batch;
+							}
+					}
+				}
 			}
 			set
 			{
@@ -73,11 +94,14 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public string ConnectString { get; private set; }
+		public string ConnectString { get; set; }
 
-		public EntitySpiderBuilder()
+		public virtual void Run(params string[] args)
 		{
-			ConnectString = Configuration.GetValue(Configuration.LogAndStatusConnectString);
+			if (string.IsNullOrEmpty(ConnectString))
+			{
+				ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.LogAndStatusConnectString);
+			}
 			Spider = GetEntitySpider();
 			if (Spider == null)
 			{
@@ -85,10 +109,6 @@ namespace DotnetSpider.Extension
 			}
 			PrepareDb();
 			InsertTask();
-		}
-
-		public virtual void Run(params string[] args)
-		{
 			InsertBatch();
 			Spider.Run(args);
 		}
@@ -103,7 +123,7 @@ namespace DotnetSpider.Extension
 					var command = conn.CreateCommand();
 					command.CommandType = CommandType.Text;
 
-					command.CommandText = $"CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4 ;";
+					command.CommandText = $"CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;";
 					command.ExecuteNonQuery();
 				}
 			}

@@ -16,23 +16,27 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class MySqlFileEntityPipeline : BaseEntityPipeline
 	{
-		protected string DataFolder;
+		public string DataFolder { get; set; }
 
 		public override void InitPipeline(ISpider spider)
 		{
 			base.InitPipeline(spider);
+
+			if (string.IsNullOrEmpty(DataFolder))
+			{
 #if !NET_CORE
 			DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, spider.Identity, "mysql");
 #else
-			DataFolder = Path.Combine(AppContext.BaseDirectory, spider.Identity, "mysql");
+				DataFolder = Path.Combine(AppContext.BaseDirectory, spider.Identity, "mysql");
 #endif
+			}
 		}
 
 		public override void Process(string entityName, List<JObject> datas)
 		{
 			lock (this)
 			{
-				EntityMetadata metadata;
+				Entity metadata;
 				if (EntityMetadatas.TryGetValue(entityName, out metadata))
 				{
 					var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
@@ -40,7 +44,7 @@ namespace DotnetSpider.Extension.Pipeline
 					foreach (var entry in datas)
 					{
 						builder.Append("@END@");
-						foreach (var column in metadata.Entity.Fields)
+						foreach (var column in metadata.Fields)
 						{
 							var value = entry.SelectToken($"$.{column.Name}")?.ToString();
 							if (!string.IsNullOrEmpty(value))

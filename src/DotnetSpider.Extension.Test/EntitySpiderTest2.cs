@@ -170,19 +170,19 @@ namespace DotnetSpider.Extension.Test
 		public void EntitySelector()
 		{
 			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity7).GetTypeInfo());
-			Assert.AreEqual("expression", entity1.Entity.Selector.Expression);
-			Assert.AreEqual(SelectorType.XPath, entity1.Entity.Selector.Type);
-			Assert.IsTrue(entity1.Entity.Multi);
+			Assert.AreEqual("expression", entity1.Selector.Expression);
+			Assert.AreEqual(SelectorType.XPath, entity1.Selector.Type);
+			Assert.IsTrue(entity1.Multi);
 
 			var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity8).GetTypeInfo());
-			Assert.AreEqual("expression2", entity2.Entity.Selector.Expression);
-			Assert.AreEqual(SelectorType.Css, entity2.Entity.Selector.Type);
-			Assert.IsTrue(entity2.Entity.Multi);
+			Assert.AreEqual("expression2", entity2.Selector.Expression);
+			Assert.AreEqual(SelectorType.Css, entity2.Selector.Type);
+			Assert.IsTrue(entity2.Multi);
 
 			var entity3 = EntitySpider.GenerateEntityMetaData(typeof(Entity9).GetTypeInfo());
-			Assert.IsFalse(entity3.Entity.Multi);
-			Assert.IsNull(entity3.Entity.Selector);
-			Assert.AreEqual("DotnetSpider.Extension.Test.EntitySpiderTest2+Entity9", entity3.Entity.Name);
+			Assert.IsFalse(entity3.Multi);
+			Assert.IsNull(entity3.Selector);
+			Assert.AreEqual("DotnetSpider.Extension.Test.EntitySpiderTest2+Entity9", entity3.Name);
 		}
 
 		[TestMethod]
@@ -200,7 +200,7 @@ namespace DotnetSpider.Extension.Test
 		public void Formater()
 		{
 			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity11).GetTypeInfo());
-			var formatters = ((Field)entity1.Entity.Fields[0]).Formatters;
+			var formatters = ((Field)entity1.Fields[0]).Formatters;
 			Assert.AreEqual(2, formatters.Count);
 			var replaceFormatter = (ReplaceFormatter)formatters[0];
 			Assert.AreEqual("a", replaceFormatter.NewValue);
@@ -223,11 +223,11 @@ namespace DotnetSpider.Extension.Test
 		public void SetPrimary()
 		{
 			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity5).GetTypeInfo());
-			Assert.AreEqual(1, entity1.Entity.Fields.Count);
-			Assert.AreEqual("Name", entity1.Entity.Fields[0].Name);
+			Assert.AreEqual(1, entity1.Fields.Count);
+			Assert.AreEqual("Name", entity1.Fields[0].Name);
 			var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity6).GetTypeInfo());
-			Assert.AreEqual(1, entity2.Entity.Fields.Count);
-			Assert.AreEqual("name", entity2.Entity.Fields[0].Name);
+			Assert.AreEqual(1, entity2.Fields.Count);
+			Assert.AreEqual("name", entity2.Fields[0].Name);
 		}
 
 		[TestMethod]

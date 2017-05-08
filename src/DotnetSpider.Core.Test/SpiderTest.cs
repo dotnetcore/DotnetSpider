@@ -158,8 +158,8 @@ namespace DotnetSpider.Core.Test
 			}
 			using (MySqlConnection conn = new MySqlConnection(connectString))
 			{
-				Assert.AreEqual(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where userid='{userId}' and taskgroup='{taskGroup}' and identity='{id}'").First().Count);
-				Assert.AreEqual(9, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where userid='{userId}' and taskgroup='{taskGroup}' and identity='{id}'").First().Count);
+				Assert.AreEqual(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count);
+				Assert.AreEqual(9, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{id}'").First().Count);
 			}
 		}
 

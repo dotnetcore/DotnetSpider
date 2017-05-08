@@ -14,8 +14,7 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			JdCategorySpider spider = new JdCategorySpider();
-			spider.Run();
+			ConfigurableSpider.Run();
 
 			// Custmize processor and pipeline 完全自定义页面解析和数据管道
 			BaseUsage.CustmizeProcessorAndPipeline();

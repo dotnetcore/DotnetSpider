@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Monitor
 
 		public HttpMonitor()
 		{
-			_server = Configuration.GetValue("statusHttpServer");
+			_server = Core.Infrastructure.Configuration.GetValue("statusHttpServer");
 		}
 
 		public bool IsEnabled => !string.IsNullOrEmpty(_server) && !string.IsNullOrWhiteSpace(_server);

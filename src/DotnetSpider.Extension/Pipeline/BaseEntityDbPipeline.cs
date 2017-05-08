@@ -40,26 +40,26 @@ namespace DotnetSpider.Extension.Pipeline
 			CheckIfSameBeforeUpdate = checkIfSaveBeforeUpdate;
 		}
 
-		public override void AddEntity(EntityMetadata metadata)
+		public override void AddEntity(Entity metadata)
 		{
 			if (metadata.Table == null)
 			{
-				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
+				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
 			EntityDbMetadata dbMetadata = new EntityDbMetadata();
 			dbMetadata.Table = metadata.Table;
-			foreach (var f in metadata.Entity.Fields)
+			foreach (var f in metadata.Fields)
 			{
-				var column = (Field)f;
-				if (column.Store)
+				var column = f;
+				if (!column.IgnoreStore)
 				{
 					dbMetadata.Columns.Add(column);
 				}
 			}
 			if (dbMetadata.Columns.Count == 0)
 			{
-				throw new SpiderException($"Columns is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.");
+				throw new SpiderException($"Columns is necessary, Pass {GetType().Name} for {metadata.Name}.");
 			}
 			if (!string.IsNullOrEmpty(metadata.Table.Primary))
 			{
@@ -167,7 +167,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 
 			dbMetadata.InsertSql = GetInsertSql(dbMetadata);
-			DbMetadatas.TryAdd(metadata.Entity.Name, dbMetadata);
+			DbMetadatas.TryAdd(metadata.Name, dbMetadata);
 		}
 
 		public override void InitPipeline(ISpider spider)

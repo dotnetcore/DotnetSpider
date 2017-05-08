@@ -29,10 +29,13 @@ namespace DotnetSpider.Extension
 
 		[JsonIgnore]
 		public Action VerifyCollectedData { get; set; }
+
+		public string RedisConnectString { get; set; }
+
 		[JsonIgnore]
 		public RedisConnection RedisConnection { get; private set; }
 
-		public List<EntityMetadata> Entities { get; internal set; } = new List<EntityMetadata>();
+		public List<Entity> Entities { get; internal set; } = new List<Entity>();
 
 		public PrepareStartUrls[] PrepareStartUrls { get; set; }
 
@@ -50,17 +53,22 @@ namespace DotnetSpider.Extension
 			}
 		}
 
+		public EntitySpider()
+		{
+		}
+
 		public EntitySpider(Site site) : base()
 		{
-			if (site == null)
-			{
-				throw new SpiderException("Site should not be null.");
-			}
 			Site = site;
 		}
 
 		protected override void PreInitComponent(params string[] arguments)
 		{
+			if (Site == null)
+			{
+				throw new SpiderException("Site should not be null.");
+			}
+
 			if (Entities == null || Entities.Count == 0)
 			{
 				throw new SpiderException("Count of entity is zero.");
@@ -79,13 +87,13 @@ namespace DotnetSpider.Extension
 			}
 
 			bool needInitStartRequest = true;
-			var redisConnectString = Configuration.GetValue(Configuration.RedisConnectString);
+			var redisConnectString = string.IsNullOrEmpty(RedisConnectString) ? Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.RedisConnectString) : RedisConnectString;
 			if (!string.IsNullOrEmpty(redisConnectString))
 			{
 				RedisConnection = Cache.Instance.Get(redisConnectString);
 				if (RedisConnection == null)
 				{
-					RedisConnection = new Infrastructure.RedisConnection(redisConnectString);
+					RedisConnection = new RedisConnection(redisConnectString);
 					Cache.Instance.Set(redisConnectString, RedisConnection);
 				}
 			}
@@ -270,7 +278,7 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public static EntityMetadata GenerateEntityMetaData(
+		public static Entity GenerateEntityMetaData(
 #if !NET_CORE
 			Type entityType
 #else
@@ -278,23 +286,21 @@ namespace DotnetSpider.Extension
 #endif
 		)
 		{
-			EntityMetadata entityMetadata = new EntityMetadata();
-
+			Entity entityMetadata = GenerateEntity(entityType);
 			entityMetadata.Table = entityType.GetCustomAttribute<Table>();
 			if (entityMetadata.Table != null)
 			{
 				entityMetadata.Table.Name = GenerateTableName(entityMetadata.Table.Name, entityMetadata.Table.Suffix);
 			}
-			entityMetadata.Entity = GenerateEntity(entityType);
 			EntitySelector entitySelector = entityType.GetCustomAttribute<EntitySelector>();
 			if (entitySelector != null)
 			{
-				entityMetadata.Entity.Multi = true;
-				entityMetadata.Entity.Selector = new BaseSelector { Expression = entitySelector.Expression, Type = entitySelector.Type };
+				entityMetadata.Multi = true;
+				entityMetadata.Selector = new BaseSelector { Expression = entitySelector.Expression, Type = entitySelector.Type };
 			}
 			else
 			{
-				entityMetadata.Entity.Multi = false;
+				entityMetadata.Multi = false;
 			}
 			var targetUrlsSelectors = entityType.GetCustomAttributes<TargetUrlsSelector>();
 			entityMetadata.TargetUrlsSelectors = targetUrlsSelectors.ToList();
@@ -319,49 +325,39 @@ namespace DotnetSpider.Extension
 			{
 				var type = propertyInfo.PropertyType;
 
-				if (typeof(ISpiderEntity).IsAssignableFrom(type) || typeof(List<ISpiderEntity>).IsAssignableFrom(type))
-				{
-					var token = GenerateEntity(propertyInfo.PropertyType.GetTypeInfoCrossPlatform());
-					token.Name = propertyInfo.Name;
-					token.Multi = typeof(IEnumerable).IsAssignableFrom(type);
-					token.Fields.Add(token);
-				}
-				else
-				{
-					Field token = new Field();
+				Field token = new Field();
 
-					var propertySelector = propertyInfo.GetCustomAttribute<PropertyDefine>();
-					token.Multi = typeof(IList).IsAssignableFrom(type);
+				var propertySelector = propertyInfo.GetCustomAttribute<PropertyDefine>();
+				token.Multi = typeof(IList).IsAssignableFrom(type);
 
-					if (propertySelector != null)
+				if (propertySelector != null)
+				{
+					token.Option = propertySelector.Option;
+					token.Selector = new BaseSelector()
 					{
-						token.Option = propertySelector.Option;
-						token.Selector = new BaseSelector()
-						{
-							Expression = propertySelector.Expression,
-							Type = propertySelector.Type,
-							Argument = propertySelector.Argument
-						};
-						token.NotNull = propertySelector.NotNull;
-						token.Store = propertySelector.Store;
-						token.Length = propertySelector.Length;
+						Expression = propertySelector.Expression,
+						Type = propertySelector.Type,
+						Argument = propertySelector.Argument
+					};
+					token.NotNull = propertySelector.NotNull;
+					token.IgnoreStore = propertySelector.IgnoreStore;
+					token.Length = propertySelector.Length;
 
-						token.Name = propertyInfo.Name;
+					token.Name = propertyInfo.Name;
 
-						foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
-						{
-							token.Formatters.Add(formatter);
-						}
-
-						var targetUrl = propertyInfo.GetCustomAttribute<LinkToNext>();
-						if (targetUrl != null)
-						{
-							targetUrl.PropertyName = token.Name;
-							entity.TargetUrls.Add(targetUrl);
-						}
-
-						entity.Fields.Add(token);
+					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
+					{
+						token.Formatters.Add(formatter);
 					}
+
+					var targetUrl = propertyInfo.GetCustomAttribute<LinkToNext>();
+					if (targetUrl != null)
+					{
+						targetUrl.PropertyName = token.Name;
+						entity.LinkToNexts.Add(targetUrl);
+					}
+
+					entity.Fields.Add(token);
 				}
 			}
 			return entity;

@@ -26,7 +26,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return null;
 		}
 
-		public override void AddEntity(EntityMetadata metadata)
+		public override void AddEntity(Entity metadata)
 		{
 		}
 

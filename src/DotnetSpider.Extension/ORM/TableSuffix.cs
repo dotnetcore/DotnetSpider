@@ -2,9 +2,9 @@
 {
 	public enum TableSuffix
 	{
+		Empty,
 		Monday,
 		Today,
 		FirstDayOfThisMonth,
-		Empty
 	}
 }

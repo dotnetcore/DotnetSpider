@@ -12,16 +12,16 @@ namespace DotnetSpider.Extension.Model
 {
 	public class EntityExtractor : IEntityExtractor
 	{
-		public EntityMetadata EntityMetadata { get; }
+		public Entity EntityMetadata { get; }
 		public DataHandler DataHandler { get; set; }
 		public string Name { get; }
 		protected readonly List<SharedValueSelector> _globalValues;
 
-		public EntityExtractor(string name, List<SharedValueSelector> globalValues, EntityMetadata entityDefine)
+		public EntityExtractor(string name, List<SharedValueSelector> globalValues, Entity entityMetadata)
 		{
-			EntityMetadata = entityDefine;
+			EntityMetadata = entityMetadata;
 			Name = name;
-			DataHandler = entityDefine.DataHandler;
+			DataHandler = entityMetadata.DataHandler;
 			_globalValues = globalValues;
 		}
 
@@ -37,8 +37,8 @@ namespace DotnetSpider.Extension.Model
 					page.Request.PutExtra(name, value);
 				}
 			}
-			ISelector selector = SelectorUtil.Parse(EntityMetadata.Entity.Selector);
-			if (selector != null && EntityMetadata.Entity.Multi)
+			ISelector selector = SelectorUtil.Parse(EntityMetadata.Selector);
+			if (selector != null && EntityMetadata.Multi)
 			{
 				var list = page.Selectable.SelectList(selector).Nodes();
 				if (list == null || list.Count == 0)
@@ -47,10 +47,9 @@ namespace DotnetSpider.Extension.Model
 				}
 				else
 				{
-					var countToken = EntityMetadata.Limit;
-					if (countToken != null)
+					if (EntityMetadata.Take > 0)
 					{
-						list = list.Take(countToken.Value).ToList();
+						list = list.Take(EntityMetadata.Take).ToList();
 					}
 
 					int index = 0;
@@ -87,7 +86,7 @@ namespace DotnetSpider.Extension.Model
 			JObject dataObject = new JObject();
 
 			bool skip = false;
-			foreach (var field in EntityMetadata.Entity.Fields)
+			foreach (var field in EntityMetadata.Fields)
 			{
 				var fieldValue = ExtractField(item, page, field, index);
 				if (fieldValue == null)
@@ -112,7 +111,7 @@ namespace DotnetSpider.Extension.Model
 			var result = dataObject.Children().Any() ? dataObject : null;
 			if (result != null)
 			{
-				foreach (var targetUrl in EntityMetadata.Entity.TargetUrls)
+				foreach (var targetUrl in EntityMetadata.LinkToNexts)
 				{
 					Dictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
 					if (targetUrl.Extras != null)
@@ -138,7 +137,7 @@ namespace DotnetSpider.Extension.Model
 			return result;
 		}
 
-		private dynamic ExtractField(ISelectable item, Page page, DataToken field, int index)
+		private dynamic ExtractField(ISelectable item, Page page, Field field, int index)
 		{
 			ISelector selector = SelectorUtil.Parse(field.Selector);
 			if (selector == null)
@@ -146,99 +145,57 @@ namespace DotnetSpider.Extension.Model
 				return null;
 			}
 
-			var f = field as Field;
-
-			bool isEntity = field is Entity;
-
-			if (!isEntity)
+			string tmpValue;
+			if (selector is EnviromentSelector)
 			{
-				string tmpValue;
-				if (selector is EnviromentSelector)
+				var enviromentSelector = selector as EnviromentSelector;
+				tmpValue = GetEnviromentValue(enviromentSelector.Field, page, index);
+				if (field != null)
 				{
-					var enviromentSelector = selector as EnviromentSelector;
-					tmpValue = GetEnviromentValue(enviromentSelector.Field, page, index);
-					if (f != null)
+					foreach (var formatter in field.Formatters)
 					{
-						foreach (var formatter in f.Formatters)
-						{
-							tmpValue = formatter.Formate(tmpValue);
-						}
-					}
-					return tmpValue;
-				}
-				else
-				{
-					bool needPlainText = ((Field)field).Option == PropertyDefine.Options.PlainText;
-					if (field.Multi)
-					{
-						var propertyValues = item.SelectList(selector).Nodes();
-
-						List<string> results = new List<string>();
-						foreach (var propertyValue in propertyValues)
-						{
-							results.Add(propertyValue.GetValue(needPlainText));
-						}
-						if (f != null)
-						{
-							foreach (var formatter in f.Formatters)
-							{
-								results = formatter.Formate(results);
-							}
-						}
-						return new JArray(results);
-					}
-					else
-					{
-						bool needCount = (((Field)field).Option == PropertyDefine.Options.Count);
-						if (needCount)
-						{
-							var propertyValues = item.SelectList(selector).Nodes();
-							string count = propertyValues?.Count.ToString();
-							count = string.IsNullOrEmpty(count) ? "-1" : count;
-							return count;
-						}
-						else
-						{
-							tmpValue = item.Select(selector)?.GetValue(needPlainText);
-							if (f != null)
-							{
-								foreach (var formatter in f.Formatters)
-								{
-									tmpValue = formatter.Formate(tmpValue);
-								}
-							}
-							return tmpValue;
-						}
+						tmpValue = formatter.Formate(tmpValue);
 					}
 				}
+				return tmpValue;
 			}
 			else
 			{
+				bool needPlainText = field.Option == PropertyDefine.Options.PlainText;
 				if (field.Multi)
 				{
-					JArray objs = new JArray();
-					var selectables = item.SelectList(selector).Nodes();
-					foreach (var selectable in selectables)
-					{
-						JObject obj = new JObject();
+					var propertyValues = item.SelectList(selector).Nodes();
 
-						foreach (var child in ((Entity)field).Fields)
-						{
-							obj.Add(child.Name, ExtractField(selectable, page, child, 0));
-						}
-						objs.Add(obj);
+					List<string> results = new List<string>();
+					foreach (var propertyValue in propertyValues)
+					{
+						results.Add(propertyValue.GetValue(needPlainText));
 					}
-					return objs;
+					foreach (var formatter in field.Formatters)
+					{
+						results = formatter.Formate(results);
+					}
+					return new JArray(results);
 				}
 				else
 				{
-					JObject obj = new JObject();
-					var selectable = item.Select(selector);
-					foreach (var child in ((Entity)field).Fields)
+					bool needCount = field.Option == PropertyDefine.Options.Count;
+					if (needCount)
 					{
-						obj.Add(child.Name, ExtractField(selectable, page, field, 0));
+						var propertyValues = item.SelectList(selector).Nodes();
+						string count = propertyValues?.Count.ToString();
+						count = string.IsNullOrEmpty(count) ? "-1" : count;
+						return count;
 					}
-					return obj;
+					else
+					{
+						tmpValue = item.Select(selector)?.GetValue(needPlainText);
+						foreach (var formatter in field.Formatters)
+						{
+							tmpValue = formatter.Formate(tmpValue);
+						}
+						return tmpValue;
+					}
 				}
 			}
 		}

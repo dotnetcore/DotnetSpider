@@ -10,14 +10,14 @@ namespace DotnetSpider.Extension.Processor
 {
 	public class EntityProcessor : BasePageProcessor
 	{
-		protected readonly EntityMetadata _entity;
+		protected readonly Entity _entity;
 		protected readonly IEntityExtractor _extractor;
 
-		public EntityProcessor(Site site, EntityMetadata entity)
+		public EntityProcessor(Site site, Entity entity)
 		{
 			Site = site;
 			_entity = entity;
-			_extractor = new EntityExtractor(entity.Entity.Name, entity.SharedValues, entity);
+			_extractor = new EntityExtractor(entity.Name, entity.SharedValues, entity);
 			if (entity.TargetUrlsSelectors != null && entity.TargetUrlsSelectors.Count > 0)
 			{
 				var pairs = new List<string>();

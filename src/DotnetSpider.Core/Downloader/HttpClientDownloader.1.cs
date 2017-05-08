@@ -162,7 +162,7 @@ namespace DotnetSpider.Core.Downloader
 
 			HttpRequestMessage httpWebRequest = CreateRequestMessage(request);
 
-			httpWebRequest.Headers.Add("UserAgent", site.Headers.ContainsKey("UserAgent") ? site.Headers["UserAgent"] : site.UserAgent);
+			httpWebRequest.Headers.Add("User-Agent", site.Headers.ContainsKey("User-Agent") ? site.Headers["User-Agent"] : site.UserAgent);
 
 			if (!string.IsNullOrEmpty(request.Referer))
 			{

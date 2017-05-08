@@ -158,10 +158,12 @@ namespace DotnetSpider.Extension.Test
 
 				context.SkipWhenResultIsEmpty = true;
 				context.SpawnUrl = true;
-				context.SetIdentity("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 				context.AddPipeline(new CollectEntityPipeline());
 				context.AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 				context.AddEntityType(typeof(ArticleSummary));
+
+				Name = "qidian";
+				Batch = DateTime.Now.ToString("yyyy_MM_dd_HHmmss");
 				return context;
 			}
 

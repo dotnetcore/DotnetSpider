@@ -5,6 +5,7 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
+using Newtonsoft.Json;
 
 namespace DotnetSpider.Sample
 {
@@ -24,11 +25,13 @@ namespace DotnetSpider.Sample
 		protected override EntitySpider GetEntitySpider()
 		{
 			var entitySpider = new EntitySpider(new Site());
-			Name = "JdCategory Daliy Tracking";
+			Name = "京东类目 Daliy Tracking";
 
 			entitySpider.AddStartUrl("http://www.jd.com/allSort.aspx");
 			entitySpider.AddEntityType(typeof(Category));
 			entitySpider.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+
+			var t = JsonConvert.SerializeObject(entitySpider);
 			return entitySpider;
 		}
 	}

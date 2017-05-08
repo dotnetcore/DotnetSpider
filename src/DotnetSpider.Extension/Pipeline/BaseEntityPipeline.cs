@@ -9,16 +9,16 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class BaseEntityPipeline : BasePipeline, IEntityPipeline
 	{
-		protected ConcurrentDictionary<string, EntityMetadata> EntityMetadatas = new ConcurrentDictionary<string, EntityMetadata>();
+		protected ConcurrentDictionary<string, Entity> EntityMetadatas = new ConcurrentDictionary<string, Entity>();
 
-		public virtual void AddEntity(EntityMetadata metadata)
+		public virtual void AddEntity(Entity metadata)
 		{
 			if (metadata.Table == null)
 			{
 				//Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Entity.Name}.", LogLevel.Warn);
 				return;
 			}
-			EntityMetadatas.TryAdd(metadata.Entity.Name, metadata);
+			EntityMetadatas.TryAdd(metadata.Name, metadata);
 		}
 
 		public abstract void Process(string entityName, List<JObject> datas);
