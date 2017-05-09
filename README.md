@@ -172,54 +172,42 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 			return context;
 		}
 
-		[Schema("test", "sku", TableSuffix.Today)]
+		[Table("test", "sku", TableSuffix.Today, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		public class Product : ISpiderEntity
 		{
-			[StoredAs("sku", DataType.String, 25)]
-			[PropertySelector(Expression = "./@data-sku")]
+			[PropertyDefine(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 
-			[StoredAs("category", DataType.String, 20)]
-			[PropertySelector(Expression = "name", Type = SelectorType.Enviroment)]
-			public string CategoryName { get; set; }
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment)]
+			public string Category { get; set; }
 
-			[StoredAs("cat3", DataType.String, 20)]
-			[PropertySelector(Expression = "cat3", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "cat3", Type = SelectorType.Enviroment)]
 			public int CategoryId { get; set; }
 
-			[StoredAs("url", DataType.Text)]
-			[PropertySelector(Expression = "./div[1]/a/@href")]
+			[PropertyDefine(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[StoredAs("commentscount", DataType.String, 32)]
-			[PropertySelector(Expression = "./div[5]/strong/a")]
+			[PropertyDefine(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
-			[StoredAs("shopname", DataType.String, 100)]
-			[PropertySelector(Expression = ".//div[@class='p-shop']/@data-shop_name")]
+			[PropertyDefine(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
-			[StoredAs("name", DataType.String, 50)]
-			[PropertySelector(Expression = ".//div[@class='p-name']/a/em")]
+			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
 
-			[StoredAs("venderid", DataType.String, 25)]
-			[PropertySelector(Expression = "./@venderid")]
+			[PropertyDefine(Expression = "./@venderid")]
 			public string VenderId { get; set; }
 
-			[StoredAs("jdzy_shop_id", DataType.String, 25)]
-			[PropertySelector(Expression = "./@jdzy_shop_id")]
+			[PropertyDefine(Expression = "./@jdzy_shop_id")]
 			public string JdzyShopId { get; set; }
 
-			[StoredAs("run_id", DataType.Date)]
-			[PropertySelector(Expression = "Monday", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 
-			[PropertySelector(Expression = "Now", Type = SelectorType.Enviroment)]
-			[StoredAs("cdate", DataType.Time)]
+			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
 			public DateTime CDate { get; set; }
 		}
 	}
