@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>DotnetSpider2.Extension</id>
-    <version>1.3.2-rc2</version>
+    <version>1.3.2-rc3</version>
     <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
     <owners>zlzforever@163.com</owners>
     <iconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</iconUrl>
@@ -13,20 +13,21 @@
     <description>Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.</description>
     <dependencies>
       <group targetFramework=".NETStandard1.6">
-        <dependency id="DotnetSpider2.Core" version="1.3.2-rc2" exclude="Build,Analyzers" />
-        <dependency id="StackExchange.Redis" version="1.2.1" exclude="Build,Analyzers" />
+        <dependency id="DotnetSpider2.Core" version="1.3.2-rc3" exclude="Build,Analyzers" />
+        <dependency id="StackExchange.Redis" version="1.2.3" exclude="Build,Analyzers" />
         <dependency id="MongoDB.Driver" version="2.4.3" exclude="Build,Analyzers"/>
         <dependency id="MySql.Data" version="7.0.7-m61"/>
       </group>
       <group targetFramework=".NETFramework4.5.1" >
         <dependency id="DotRas.for.Win7" version="1.3.0" exclude="Build,Analyzers" />
         <dependency id="SSH.NET" version="2016.0.0" exclude="Build,Analyzers" />
-        <dependency id="DotnetSpider2.Core" version="1.3.2-rc2" exclude="Build,Analyzers" />
-        <dependency id="StackExchange.Redis" version="1.2.1" exclude="Build,Analyzers" />
+        <dependency id="DotnetSpider2.Core" version="1.3.2-rc3" exclude="Build,Analyzers" />
+        <dependency id="StackExchange.Redis" version="1.2.3" exclude="Build,Analyzers" />
         <dependency id="MongoDB.Driver" version="2.4.3" exclude="Build,Analyzers"/>
         <dependency id="MySql.Data" version="7.0.7-m61"/>
         <dependency id="FiddlerCore2" version="1.0.0" exclude="Build,Analyzers"/>
-        <dependency id="Selenium.WebDriver" version="3.3.0" exclude="Build,Analyzers"/>
+        <dependency id="Selenium.WebDriver" version="3.4.0" exclude="Build,Analyzers"/>
+        <dependency id="System.Net.Http" version="4.3.1" exclude="Build,Analyzers"/>
         <dependency id="Newtonsoft.Json" version="10.0.2" exclude="Build,Analyzers"/>
       </group>
     </dependencies>
