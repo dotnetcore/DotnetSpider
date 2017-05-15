@@ -72,8 +72,9 @@ namespace DotnetSpider.Core.Processor
 			foreach (var targetUrlExtractor in _targetUrlExtractors)
 			{
 				var links = (page.Selectable.SelectList(targetUrlExtractor.Key)).Links().GetValues();
+                page.Request.PutExtra("Referer", page.Url);
 
-				if (links == null)
+                if (links == null)
 				{
 					continue;
 				}

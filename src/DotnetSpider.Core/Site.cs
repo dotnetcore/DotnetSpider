@@ -20,7 +20,7 @@ namespace DotnetSpider.Core
 		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
 		public ContentType ContentType { get; set; } = ContentType.Html;
 		public bool RemoveOutboundLinks { get; set; }
-		public string Domain { get; private set; }
+		public string Domain { get; set; }
 		public Cookies Cookies { get; set; } = new Cookies();
 
 		public Site()

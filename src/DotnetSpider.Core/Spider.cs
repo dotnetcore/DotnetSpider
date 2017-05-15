@@ -1004,7 +1004,7 @@ namespace DotnetSpider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				this.Log($"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
+				this.Log($"下载 {request.Url} 失败: {de.Message} Referer: {request.GetExtra("Referer")}", LogLevel.Warn);
 			}
 			catch (Exception e)
 			{
@@ -1065,7 +1065,7 @@ namespace DotnetSpider.Core
 					}
 				}
 
-				this.Log($"采集: {request.Url} 成功.", LogLevel.Info);
+				//this.Log($"采集: {request.Url} 成功.", LogLevel.Info);
 			}
 			else
 			{
