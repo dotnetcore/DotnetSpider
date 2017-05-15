@@ -109,7 +109,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 
 				Thread.Sleep(_webDriverWaitTime);
 
-				Page page = new Page(request, spider.Site.ContentType, site.RemoveOutboundLinks ? site.Domain : null)
+				Page page = new Page(request, spider.Site.ContentType, site.RemoveOutboundLinks ? site.Domains : null)
 				{
 					Content = _webDriver.PageSource,
 					TargetUrl = _webDriver.Url,

@@ -87,7 +87,7 @@ namespace DotnetSpider.Extension.Downloader
 		public int ProxyPort { get; set; } = 30000;
 		public string Pattern { get; set; }
 
-		protected override Cookies GetCookies(Site site)
+		protected override Cookies GetCookies(ISpider spider)
 		{
 			if (string.IsNullOrEmpty(Pattern))
 			{
@@ -100,7 +100,7 @@ namespace DotnetSpider.Extension.Downloader
 				fiddlerWrapper.StartCapture(true);
 				try
 				{
-					base.GetCookies(site);
+					base.GetCookies(spider);
 					var header = fiddlerWrapper.Headers;
 					const string cookiesPattern = @"Cookie: (.*?)\r\n";
 					cookie = Regex.Match(header, cookiesPattern).Groups[1].Value;
@@ -135,7 +135,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public Selector LoginAreaSelector { get; set; }
 
-		protected override Cookies GetCookies(Site site)
+		protected override Cookies GetCookies(ISpider spider)
 		{
 			var cookies = new Dictionary<string, string>();
 

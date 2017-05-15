@@ -76,16 +76,16 @@ namespace DotnetSpider.Core
 
 		public bool RemoveOutboundLinks { get; }
 
-		public string Domain { get; }
+		public string[] Domains { get; }
 
-		public Page(Request request, ContentType contentType, string domain = null)
+		public Page(Request request, ContentType contentType, params string[] domains)
 		{
 			Request = request;
 			Url = request.Url.ToString();
 			ResultItems.Request = request;
 			ContentType = contentType;
-			RemoveOutboundLinks = !string.IsNullOrEmpty(domain);
-			Domain = domain;
+			RemoveOutboundLinks = domains != null && domains.Length > 0;
+			Domains = domains;
 		}
 
 		/// <summary>
@@ -109,7 +109,7 @@ namespace DotnetSpider.Core
 				if (_selectable == null)
 				{
 					string urlPadding = ContentType == ContentType.Json ? Padding : Request.Url.ToString();
-					_selectable = new Selectable(Content, urlPadding, ContentType, RemoveOutboundLinks ? Domain : null);
+					_selectable = new Selectable(Content, urlPadding, ContentType, RemoveOutboundLinks ? Domains : null);
 				}
 				return _selectable;
 			}

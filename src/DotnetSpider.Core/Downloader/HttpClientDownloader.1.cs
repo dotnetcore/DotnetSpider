@@ -269,7 +269,7 @@ namespace DotnetSpider.Core.Downloader
 #endif
 			}
 
-			Page page = new Page(request, site.ContentType, site.RemoveOutboundLinks ? site.Domain : null)
+			Page page = new Page(request, site.ContentType, site.RemoveOutboundLinks ? site.Domains : null)
 			{
 				Content = content,
 				StatusCode = statusCode

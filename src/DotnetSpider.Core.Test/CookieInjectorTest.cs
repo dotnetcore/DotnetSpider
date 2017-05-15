@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Test
 		[TestMethod]
 		public void InjectCookiesBeforeSpiderRun()
 		{
-			var path = "www.baidu.com.cookies";
+			var path = "a.cookies";
 			if (File.Exists(path))
 			{
 				File.Delete(path);

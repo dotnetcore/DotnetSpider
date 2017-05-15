@@ -4,9 +4,9 @@ namespace DotnetSpider.Core.Downloader
 {
 	public class FileCookieInject : CookieInjector
 	{
-		protected override Cookies GetCookies(Site site)
+		protected override Cookies GetCookies(ISpider spider)
 		{
-			var path = $"{site.Domain}.cookies";
+			var path = $"{spider.Identity}.cookies";
 			if (File.Exists(path))
 			{
 				var cookie = File.ReadAllText(path);

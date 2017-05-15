@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Selector
 {
 	public class Selectable : BaseSelectable
 	{
-		public Selectable(string text, string urlOrPadding, ContentType contentType, string domain = null)
+		public Selectable(string text, string urlOrPadding, ContentType contentType, params string[] domain)
 		{
 			switch (contentType)
 			{
@@ -25,7 +25,7 @@ namespace DotnetSpider.Core.Selector
 							FixAllRelativeHrefs(document, urlOrPadding);
 						}
 
-						if (!string.IsNullOrEmpty(domain) && !string.IsNullOrWhiteSpace(domain))
+						if (domain != null && domain.Length > 0)
 						{
 							RemoveOutboundLinks(document, domain);
 						}
@@ -188,7 +188,7 @@ namespace DotnetSpider.Core.Selector
 			}
 		}
 
-		private void RemoveOutboundLinks(HtmlDocument document, string domain)
+		private void RemoveOutboundLinks(HtmlDocument document, params string[] domains)
 		{
 			var nodes = document.DocumentNode.SelectNodes(".//a");
 			if (nodes != null)
@@ -196,23 +196,18 @@ namespace DotnetSpider.Core.Selector
 				List<HtmlNode> deleteNodes = new List<HtmlNode>();
 				foreach (var node in nodes)
 				{
-					if (node.Attributes["href"] != null)
+					bool isMatch = false;
+					foreach (var domain in domains)
 					{
-						Uri uri;
-						if (Uri.TryCreate(node.Attributes["href"].Value, UriKind.Absolute, out uri))
+						if (System.Text.RegularExpressions.Regex.IsMatch(node.Attributes["href"].Value, domain))
 						{
-							if (string.IsNullOrEmpty(uri.Host))
-							{
-								continue;
-							}
-							else
-							{
-								if (uri.Host != domain)
-								{
-									deleteNodes.Add(node);
-								}
-							}
+							isMatch = true;
+							break;
 						}
+					}
+					if (!isMatch)
+					{
+						deleteNodes.Add(node);
 					}
 				}
 				foreach (var node in deleteNodes)

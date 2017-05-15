@@ -10,18 +10,18 @@ namespace DotnetSpider.Core.Downloader
 			{
 				spider.Pause(() =>
 				{
-					spider.Site.Cookies = GetCookies(spider.Site);
+					spider.Site.Cookies = GetCookies(spider);
 					spider.Log("注入 Cookies 成功。", LogLevel.Info);
 					spider.Contiune();
 				});
 			}
 			else
 			{
-				spider.Site.Cookies = GetCookies(spider.Site);
+				spider.Site.Cookies = GetCookies(spider);
 				spider.Log("注入 Cookies 成功。", LogLevel.Info);
 			}
 		}
 
-		protected abstract Cookies GetCookies(Site site);
+		protected abstract Cookies GetCookies(ISpider spider);
 	}
 }

@@ -20,7 +20,10 @@ namespace DotnetSpider.Core
 		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
 		public ContentType ContentType { get; set; } = ContentType.Html;
 		public bool RemoveOutboundLinks { get; set; }
-		public string Domain { get; private set; }
+		/// <summary>
+		/// 采集目标域名的正则
+		/// </summary>
+		public string[] Domains { get; set; }
 		public Cookies Cookies { get; set; } = new Cookies();
 
 		public Site()
@@ -159,10 +162,6 @@ namespace DotnetSpider.Core
 			lock (this)
 			{
 				StartRequests.Add(startRequest);
-				if (Domain == null)
-				{
-					Domain = startRequest.Url.Host;
-				}
 				return this;
 			}
 		}
