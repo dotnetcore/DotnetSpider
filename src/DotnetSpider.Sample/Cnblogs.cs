@@ -68,7 +68,7 @@ namespace DotnetSpider.Sample
 			public BlogSumaryProcessor()
 			{
 				// 定义目标页的筛选
-				AddTargetUrlExtractor(null, "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+");
+				AddTargetUrlExtractor(".", "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+");
 			}
 
 			protected override void Handle(Page page)

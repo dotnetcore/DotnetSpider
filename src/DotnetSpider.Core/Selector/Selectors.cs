@@ -8,6 +8,7 @@ namespace DotnetSpider.Core.Selector
 	public class Selectors
 	{
 		private static readonly Dictionary<string, ISelector> Cache = new Dictionary<string, ISelector>();
+		private static readonly DefaultSelector DefaultSelector = new DefaultSelector();
 
 		static Selectors()
 		{
@@ -83,6 +84,11 @@ namespace DotnetSpider.Core.Selector
 				}
 				return Cache[expr];
 			}
+		}
+
+		public static ISelector Default()
+		{
+			return DefaultSelector;
 		}
 
 		public static ISelector Enviroment(string expr)

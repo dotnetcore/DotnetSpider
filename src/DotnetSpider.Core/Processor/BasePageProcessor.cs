@@ -71,6 +71,11 @@ namespace DotnetSpider.Core.Processor
 
 			foreach (var targetUrlExtractor in _targetUrlExtractors)
 			{
+				if (targetUrlExtractor.Key == Selectors.Default())
+				{
+					continue;
+				}
+
 				var links = (page.Selectable.SelectList(targetUrlExtractor.Key)).Links().GetValues();
 
 				if (links == null)
@@ -177,9 +182,12 @@ namespace DotnetSpider.Core.Processor
 
 		protected virtual void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
 		{
-			string xpath = string.IsNullOrEmpty(regionXpath?.Trim()) ? "." : regionXpath.Trim();
-
-			var selector = Selectors.XPath(xpath);
+			ISelector selector = Selectors.Default();
+			if (regionXpath != null)
+			{
+				string xpath = string.IsNullOrWhiteSpace(regionXpath.Trim()) ? "." : regionXpath.Trim();
+				selector = Selectors.XPath(xpath);
+			}
 			if (!_targetUrlExtractors.ContainsKey(selector))
 			{
 				_targetUrlExtractors.Add(selector, new List<Regex>());
@@ -232,8 +240,13 @@ namespace DotnetSpider.Core.Processor
 		[Obsolete]
 		public virtual List<Regex> GetTargetUrlPatterns(string region)
 		{
-			var selector = Selectors.XPath(region);
-			if(_targetUrlExtractors.ContainsKey(selector))
+			ISelector selector = Selectors.Default();
+			if (!string.IsNullOrWhiteSpace(region))
+			{
+				selector = Selectors.XPath(region);
+			}
+
+			if (_targetUrlExtractors.ContainsKey(selector))
 			{
 				return _targetUrlExtractors[selector];
 			}
@@ -251,7 +264,11 @@ namespace DotnetSpider.Core.Processor
 		[Obsolete]
 		public virtual bool ContainsTargetUrlRegion(string region)
 		{
-			var selector = Selectors.XPath(region);
+			ISelector selector = Selectors.Default();
+			if (!string.IsNullOrWhiteSpace(region))
+			{
+				selector = Selectors.XPath(region);
+			}
 			return _targetUrlExtractors.ContainsKey(selector);
 		}
 

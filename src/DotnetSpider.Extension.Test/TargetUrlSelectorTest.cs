@@ -230,8 +230,8 @@ namespace DotnetSpider.Extension.Test
 		{
 			var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity25).GetTypeInfo());
 			var processor = new EntityProcessor(new Site(), entity2);
-			Assert.AreEqual(1, processor.GetTargetUrlPatterns(".").Count);
-			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns(".")[0].ToString());
+			Assert.AreEqual(1, processor.GetTargetUrlPatterns(null).Count);
+			Assert.AreEqual(@"&page=[0-9]+&", processor.GetTargetUrlPatterns(null)[0].ToString());
 
 			Assert.IsTrue(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}

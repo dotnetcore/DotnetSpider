@@ -159,6 +159,7 @@
     <Compile Include="Selector\BaseHtmlSelector.cs" />
     <Compile Include="Selector\BaseSelectable.cs" />
     <Compile Include="Selector\CssSelector.cs" />
+    <Compile Include="Selector\DefaultSelector.cs" />
     <Compile Include="Selector\EnviromentSelector.cs" />
     <Compile Include="Selector\ISelectable.cs" />
     <Compile Include="Selector\ISelector.cs" />
