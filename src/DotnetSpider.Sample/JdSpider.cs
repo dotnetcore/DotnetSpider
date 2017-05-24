@@ -14,7 +14,7 @@ namespace DotnetSpider.Sample
 	public class JdSpider : EntitySpiderBuilder
 	{
 		[EntitySelector(Expression = ".//div[@class='items']//a")]
-		public class Category : ISpiderEntity
+		public class Category : SpiderEntity
 		{
 			[PropertyDefine(Expression = ".")]
 			public string CategoryName { get; set; }
@@ -27,7 +27,7 @@ namespace DotnetSpider.Sample
 
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class TmpProduct : ISpiderEntity
+		public class TmpProduct : SpiderEntity
 		{
 			[PropertyDefine(Expression = "CategoryName", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
@@ -45,7 +45,7 @@ namespace DotnetSpider.Sample
 
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		[Table("jd", "jd_product", Primary = "Sku", Indexs = new[] { "Sku" })]
-		public class JdProduct : ISpiderEntity
+		public class JdProduct : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Name", Type = SelectorType.Enviroment)]
 			public string Name { get; set; }

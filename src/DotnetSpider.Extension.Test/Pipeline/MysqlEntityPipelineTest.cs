@@ -250,7 +250,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class ProductInsert : ISpiderEntity
+		public class ProductInsert : SpiderEntity
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
@@ -267,7 +267,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class ProductUpdate : ISpiderEntity
+		public class ProductUpdate : SpiderEntity
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
@@ -283,7 +283,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku,Category1")]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product2Insert : ISpiderEntity
+		public class Product2Insert : SpiderEntity
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category1 { get; set; }
@@ -303,7 +303,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku,Category1", UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product2Update : ISpiderEntity
+		public class Product2Update : SpiderEntity
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category1 { get; set; }

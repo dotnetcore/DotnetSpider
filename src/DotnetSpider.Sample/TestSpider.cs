@@ -48,7 +48,7 @@ namespace DotnetSpider.Sample
 
 		[Table("testhao", "hao360buble")]
 		[EntitySelector(Expression = "$.data", Type = SelectorType.JsonPath)]
-		public class UpdateHao360Info : ISpiderEntity
+		public class UpdateHao360Info : SpiderEntity
 		{
 			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath)]
 			public string Title { get; set; }

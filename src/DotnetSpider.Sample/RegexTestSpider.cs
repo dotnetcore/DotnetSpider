@@ -21,7 +21,7 @@ namespace DotnetSpider.Sample
 			return context;
 		}
 
-		public class HomePage : ISpiderEntity
+		public class HomePage : SpiderEntity
 		{
 			//jQuery(".yk-rank div:1")
 			[PropertyDefine(Expression = "<a.*?т╟вс</a>", Type = SelectorType.Regex, Argument = "1")]

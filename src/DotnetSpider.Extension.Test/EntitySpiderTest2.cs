@@ -65,41 +65,41 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[Table("db", "table", Primary = "name")]
-		public class Entity1 : ISpiderEntity
+		public class Entity1 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
 		[Table("db", "table", Indexs = new[] { "c1" })]
-		public class Entity2 : ISpiderEntity
+		public class Entity2 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
 		[Table("db", "table", Uniques = new[] { "c1" })]
-		public class Entity3 : ISpiderEntity
+		public class Entity3 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
 		[Table("db", "table", TableSuffix.Monday)]
-		public class Entity4 : ISpiderEntity
+		public class Entity4 : SpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
 		[Table("db", "table", Primary = "Name")]
-		public class Entity5 : ISpiderEntity
+		public class Entity5 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Name { get; set; }
 		}
 
 		[Table("db", "table", Primary = "name")]
-		public class Entity6 : ISpiderEntity
+		public class Entity6 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 255)]
 			public string name { get; set; }
@@ -107,33 +107,33 @@ namespace DotnetSpider.Extension.Test
 
 		[Table("db", "table")]
 		[EntitySelector(Expression = "expression")]
-		public class Entity7 : ISpiderEntity
+		public class Entity7 : SpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
 		[Table("db", "table")]
 		[EntitySelector(Expression = "expression2", Type = SelectorType.Css)]
-		public class Entity8 : ISpiderEntity
+		public class Entity8 : SpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
 		[Table("db", "table")]
-		public class Entity9 : ISpiderEntity
+		public class Entity9 : SpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
 		[Table("db", "table", Primary = "Name", Indexs = new[] { "Id" }, Uniques = new[] { "Id,Name", "Id" })]
-		public class Entity10 : ISpiderEntity
+		public class Entity10 : SpiderEntity
 		{
 			public int Id { get; set; }
 			public string Name { get; set; }
 		}
 
 		[Table("db", "table")]
-		public class Entity11 : ISpiderEntity
+		public class Entity11 : SpiderEntity
 		{
 			public int Id { get; set; }
 
@@ -144,7 +144,7 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[Table("db", "table12")]
-		public class Entity12 : ISpiderEntity
+		public class Entity12 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Id")]
 			public int Id { get; set; }
@@ -154,13 +154,13 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[Table("db", "table13")]
-		public class Entity13 : ISpiderEntity
+		public class Entity13 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Url")]
 			public string Url { get; set; }
 		}
 
-		public class Entity14 : ISpiderEntity
+		public class Entity14 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Url")]
 			public string Url { get; set; }

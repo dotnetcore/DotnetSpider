@@ -73,17 +73,18 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 
 			builder.Append(columnNames.ToString().Substring(1, columnNames.Length - 1));
+			builder.Append(",[CDate] DATETIME DEFAULT(GETDATE())");
 
-			if ("__id" == metadata.Table.Primary)
+			if ("__id" == metadata.Table.Primary.ToLower())
 			{
-				builder.Append(", [__id] [int] IDENTITY(1,1) NOT NULL");
+				builder.Append(", [__Id] [bigint] IDENTITY(1,1) NOT NULL");
 			}
 
 			builder.Append(",");
 			StringBuilder primaryKey = new StringBuilder();
 			if (string.IsNullOrEmpty(metadata.Table.Primary))
 			{
-				primaryKey.Append("[__id] ASC,");
+				primaryKey.Append("[__Id] ASC,");
 			}
 			else
 			{

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Core.Infrastructure;
 using System.Collections.Concurrent;
+using System;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -50,6 +51,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 					reslut.Add(item);
 				}
+				reslut.Add(BsonDocument.Create(DateTime.Now));
 				collection.InsertMany(reslut);
 			}
 		}

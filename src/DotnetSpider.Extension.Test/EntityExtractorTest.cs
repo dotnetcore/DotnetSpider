@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension.Test
 
 		[Table("test", "sku", TableSuffix.Today)]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product : ISpiderEntity
+		public class Product : SpiderEntity
 		{
 			[PropertyDefine(Expression = "cat", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }

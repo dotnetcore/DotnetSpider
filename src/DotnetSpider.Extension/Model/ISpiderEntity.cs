@@ -1,6 +1,8 @@
-﻿namespace DotnetSpider.Extension.Model
+﻿using DotnetSpider.Extension.Model.Attribute;
+
+namespace DotnetSpider.Extension.Model
 {
-	public interface ISpiderEntity
+	public abstract class SpiderEntity
 	{
 	}
 }

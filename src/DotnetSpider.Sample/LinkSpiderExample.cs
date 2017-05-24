@@ -84,7 +84,7 @@
 //		[Schema("test", "sku", TableSuffix.Today)]
 //		[TypeExtractBy(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", Multi = true)]
 //		[Indexes(Index = new[] { "category" }, Unique = new[] { "category,sku", "sku" })]
-//		public class Product : ISpiderEntity
+//		public class Product : SpiderEntity
 //		{
 //			[PropertyExtractBy(Expression = "./@data-sku")]
 //			public string Sku { get; set; }

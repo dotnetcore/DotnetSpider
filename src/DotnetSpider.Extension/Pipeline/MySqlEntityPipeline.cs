@@ -135,7 +135,8 @@ namespace DotnetSpider.Extension.Pipeline
 
 			string columNames = string.Join(", ", metadata.Columns.Select(p => $"`{p.Name}` {((p.Length <= 0) ? "TEXT" : $"VARCHAR({ p.Length})")} "));
 			builder.Append(columNames);
-			if (metadata.Table.Primary == "__id")
+			builder.Append(",`cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP");
+			if (metadata.Table.Primary.ToLower() == "__id")
 			{
 				builder.Append(", `__id` bigint AUTO_INCREMENT");
 			}

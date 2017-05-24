@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Test
 	public class EntitySpiderTest
 	{
 		[Table("test", "table")]
-		public class TestEntity : ISpiderEntity
+		public class TestEntity : SpiderEntity
 		{
 
 		}
@@ -168,7 +168,7 @@ namespace DotnetSpider.Extension.Test
 			}
 
 			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
-			public class ArticleSummary : ISpiderEntity
+			public class ArticleSummary : SpiderEntity
 			{
 				[PropertyDefine(Expression = ".//a/@title")]
 				public string Title { get; set; }

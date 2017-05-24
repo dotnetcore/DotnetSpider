@@ -32,6 +32,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 				foreach (var entry in datas)
 				{
+					entry.Add("cdate", DateTime.Now);
 					File.AppendAllText(fileInfo.Name, entry.ToString());
 				}
 			}

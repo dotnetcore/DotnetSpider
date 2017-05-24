@@ -12,66 +12,66 @@ namespace DotnetSpider.Extension.Test
 	public class TargetUrlSelectorTest
 	{
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity14 : ISpiderEntity
+		public class Entity14 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]", "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity16 : ISpiderEntity
+		public class Entity16 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&", @"&page=[0-1]+&" })]
-		public class Entity17 : ISpiderEntity
+		public class Entity17 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector()]
-		public class Entity15 : ISpiderEntity
+		public class Entity15 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]", "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&", @"&page=[0-1]+&" })]
-		public class Entity18 : ISpiderEntity
+		public class Entity18 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-1]+&" })]
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity19 : ISpiderEntity
+		public class Entity19 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-1]+&" })]
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity20 : ISpiderEntity
+		public class Entity20 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity21 : ISpiderEntity
+		public class Entity21 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity22 : ISpiderEntity
+		public class Entity22 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "" }, Patterns = new[] { "" })]
-		public class Entity23 : ISpiderEntity
+		public class Entity23 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new string[] { null }, Patterns = new string[] { null })]
-		public class Entity24 : ISpiderEntity
+		public class Entity24 : SpiderEntity
 		{
 		}
 
 		[TargetUrlsSelector(XPaths = new string[] { null }, Patterns = new string[] { @"&page=[0-9]+&" })]
-		public class Entity25 : ISpiderEntity
+		public class Entity25 : SpiderEntity
 		{
 		}
 

@@ -253,7 +253,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class ProductInsert : ISpiderEntity
+		public class ProductInsert : SpiderEntity
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
@@ -270,7 +270,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class ProductUpdate : ISpiderEntity
+		public class ProductUpdate : SpiderEntity
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
@@ -288,7 +288,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku", Indexs = new[] { "Sku,Category1" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product2 : ISpiderEntity
+		public class Product2 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category1 { get; set; }
@@ -309,7 +309,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku", UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product2Update : ISpiderEntity
+		public class Product2Update : SpiderEntity
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category1 { get; set; }
@@ -328,7 +328,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Table("test", "sku2", Primary = "Sku", UpdateColumns = new[] { "category" })]
-		public class UpdateEntity1 : ISpiderEntity
+		public class UpdateEntity1 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
 			public string Key { get; set; }
@@ -339,7 +339,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Table("test", "sku2", Primary = "Key", UpdateColumns = new[] { "calue" })]
-		public class UpdateEntity2 : ISpiderEntity
+		public class UpdateEntity2 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
 			public string Key { get; set; }
@@ -349,7 +349,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Table("test", "sku2", Primary = "Key", UpdateColumns = new[] { "Key" })]
-		public class UpdateEntity3 : ISpiderEntity
+		public class UpdateEntity3 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
 			public string Key { get; set; }
@@ -359,7 +359,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Table("test", "sku2", Primary = "Key", UpdateColumns = new[] { "Value" })]
-		public class UpdateEntity4 : ISpiderEntity
+		public class UpdateEntity4 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
 			public string Key { get; set; }
@@ -369,7 +369,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Table("test", "sku2", Primary = "Key", UpdateColumns = new[] { "Value", "Key" })]
-		public class UpdateEntity5 : ISpiderEntity
+		public class UpdateEntity5 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
 			public string Key { get; set; }

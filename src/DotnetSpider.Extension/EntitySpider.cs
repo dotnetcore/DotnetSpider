@@ -26,6 +26,7 @@ namespace DotnetSpider.Extension
 		private const string InitStatusSetKey = "dotnetspider:init-stats";
 		private const string ValidateStatusKey = "dotnetspider:validate-stats";
 		private IRedialExecutor _redialExecutor;
+		private static List<string> _defaultProperties = new List<string> { "cdate", "__id" };
 
 		[JsonIgnore]
 		public Action VerifyCollectedData { get; set; }
@@ -162,7 +163,7 @@ namespace DotnetSpider.Extension
 		{
 			CheckIfRunning();
 
-			if (typeof(ISpiderEntity).IsAssignableFrom(type))
+			if (typeof(SpiderEntity).IsAssignableFrom(type))
 			{
 				var entity = GenerateEntityMetaData(type.GetTypeInfoCrossPlatform());
 
@@ -321,6 +322,10 @@ namespace DotnetSpider.Extension
 				Name = typeName
 			};
 			var properties = entityType.GetProperties();
+			if (properties.Any(p => _defaultProperties.Contains(p.Name.ToLower())))
+			{
+				throw new SpiderException("cdate 是默认属性, 请勿使用。");
+			}
 			foreach (var propertyInfo in properties)
 			{
 				var type = propertyInfo.PropertyType;

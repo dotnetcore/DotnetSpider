@@ -33,7 +33,7 @@ namespace DotnetSpider.Sample
 	[Table("DB", "BaiduSearch", TableSuffix.Today)]
 	[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 	[TargetUrlsSelector(XPaths = new[] { "//p[@id=\"page\"]" }, Patterns = new[] { @"&pn=[0-9]+&" })]
-	public class BaiduSearchEntry : ISpiderEntity
+	public class BaiduSearchEntry : SpiderEntity
 	{
 		[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment)]
 		public string Keyword { get; set; }
