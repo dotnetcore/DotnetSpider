@@ -260,9 +260,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
-
-			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment, Length = 100)]
-			public DateTime CDate { get; set; }
 		}
 
 		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", UpdateColumns = new[] { "Category" })]
@@ -277,9 +274,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
-
-			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment, Length = 100)]
-			public DateTime CDate { get; set; }
 		}
 		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku,Category1")]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
@@ -296,9 +290,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
-
-			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
-			public DateTime CDate { get; set; }
 		}
 
 		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku,Category1", UpdateColumns = new[] { "Category" })]
@@ -316,9 +307,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
-
-			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
-			public DateTime CDate { get; set; }
 		}
 	}
 }
