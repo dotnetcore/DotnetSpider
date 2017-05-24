@@ -64,9 +64,9 @@ namespace DotnetSpider.Core.Infrastructure
 			Day6OfNextWeek = Day1OfNextWeek.AddDays(5);
 			Day7OfNextWeek = Day1OfNextWeek.AddDays(6);
 
-			RunIdOfToday = now.ToString("yyyy-MM-dd");
-			RunIdOfMonthly = Day1OfThisMonth.ToString("yyyy-MM");
-			RunIdOfMonday = Day1OfThisWeek.ToString("yyyy-MM-dd");
+			RunIdOfToday = now.ToString("yyyy_MM_dd");
+			RunIdOfMonthly = Day1OfThisMonth.ToString("yyyy_MM");
+			RunIdOfMonday = Day1OfThisWeek.ToString("yyyy_MM_dd");
 		}
 
 		public static DateTime Day1OfThisMonth { get; }
