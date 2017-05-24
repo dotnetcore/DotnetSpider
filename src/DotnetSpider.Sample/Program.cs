@@ -50,11 +50,6 @@ namespace DotnetSpider.Sample
 			Console.WriteLine("Press any key to continue...");
 			Console.Read();
 
-			JdShopDetailSpider jdShopDetailSpider = new JdShopDetailSpider();
-			jdShopDetailSpider.Run();
-			Console.WriteLine("Press any key to continue...");
-			Console.Read();
-
 			JdSkuSampleSpider jdSkuSampleSpider = new JdSkuSampleSpider();
 			jdSkuSampleSpider.Run();
 			Console.WriteLine("Press any key to continue...");
