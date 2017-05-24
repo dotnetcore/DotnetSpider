@@ -206,9 +206,6 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 
 			[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
-
-			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
-			public DateTime CDate { get; set; }
 		}
 	}
 
@@ -267,6 +264,15 @@ NOTE:
 #### when you use redis scheduler, please update your redis config: 
 	timeout 0 
 	tcp-keepalive 60
+### Upgrade
+
+##### 20170524
+
++ Make cdate as a default column, and it's the time when insert one row.
++ The type of property will map to database colum
+MySql: int->int(11), long->bigint(20), float->float, double->double, datetime->timestamp, string without length->text, string->varchar(n)
+
+SqlServer: int->int(4),long->bigint(8),float->float,double->float,datetime->datetime,string without length->nvarchar(8000),string->nvarchar(n)
 
 ### AREAS FOR IMPROVEMENTS
 
