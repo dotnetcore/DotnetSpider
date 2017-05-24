@@ -328,15 +328,16 @@ namespace DotnetSpider.Extension
 			}
 			foreach (var propertyInfo in properties)
 			{
-				var type = propertyInfo.PropertyType;
-
-				Field token = new Field();
-
 				var propertySelector = propertyInfo.GetCustomAttribute<PropertyDefine>();
-				token.Multi = typeof(IList).IsAssignableFrom(type);
-				token.DataType = GetDataType(type.Name);
+
 				if (propertySelector != null)
 				{
+					var type = propertyInfo.PropertyType;
+
+					Field token = new Field();
+
+					token.Multi = typeof(IList).IsAssignableFrom(type);
+
 					token.Option = propertySelector.Option;
 					token.Selector = new BaseSelector()
 					{
@@ -360,6 +361,13 @@ namespace DotnetSpider.Extension
 					{
 						targetUrl.PropertyName = token.Name;
 						entity.LinkToNexts.Add(targetUrl);
+					}
+
+					token.DataType = GetDataType(type.Name);
+
+					if (token.DataType != DataType.TEXT && propertySelector.Length > 0)
+					{
+						throw new SpiderException("Only string property can set length.");
 					}
 
 					entity.Fields.Add(token);

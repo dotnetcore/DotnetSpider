@@ -343,8 +343,8 @@ namespace DotnetSpider.Extension.Test
 
 			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{
-				conn.Execute($"DROP table db.table12");
-				conn.Execute($"DROP table db.table13");
+				conn.Execute($"DROP table test.table12");
+				conn.Execute($"DROP table test.table13");
 			}
 		}
 
