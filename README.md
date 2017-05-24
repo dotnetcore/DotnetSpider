@@ -8,9 +8,7 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 ![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
 
 ### DEVELOP ENVIROMENT
-- Visual Studio 2015 update 3 or later
-- [Visual Studio 2015 Tools (Preview 2)](https://www.microsoft.com/net/download/core)
-- [.NET Core SDK](https://www.microsoft.com/net/download/core)
+- Visual Studio 2017
 
 ### OPTIONAL ENVIROMENT
 
