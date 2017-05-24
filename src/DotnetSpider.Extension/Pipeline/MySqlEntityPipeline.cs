@@ -6,6 +6,7 @@ using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using MySql.Data.MySqlClient;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -132,8 +133,7 @@ namespace DotnetSpider.Extension.Pipeline
 		protected override string GetCreateTableSql(EntityDbMetadata metadata)
 		{
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{metadata.Table.Database }`.`{metadata.Table.Name}` (");
-
-			string columNames = string.Join(", ", metadata.Columns.Select(p => $"`{p.Name}` {((p.Length <= 0) ? "TEXT" : $"VARCHAR({ p.Length})")} "));
+			string columNames = string.Join(", ", metadata.Columns.Select(p => $"`{p.Name}` {GetDataTypeSql(p)} "));
 			builder.Append(columNames);
 			builder.Append(",`cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP");
 			if (metadata.Table.Primary.ToLower() == "__id")
@@ -181,6 +181,38 @@ namespace DotnetSpider.Extension.Pipeline
 		protected override DbParameter CreateDbParameter(string name, object value)
 		{
 			return new MySqlParameter(name, value);
+		}
+
+		protected string GetDataTypeSql(Field field)
+		{
+			switch (field.DataType)
+			{
+				case DataType.BIGINT:
+					{
+						return "bigint";
+					}
+				case DataType.INT:
+					{
+						return "int";
+					}
+				case DataType.DOUBLE:
+					{
+						return "double";
+					}
+				case DataType.FLOAT:
+					{
+						return "float";
+					}
+				case DataType.TEXT:
+					{
+						return (field.Length <= 0) ? "TEXT" : $"VARCHAR({field.Length})";
+					}
+				case DataType.TIME:
+					{
+						return "timestamp null";
+					}
+			}
+			return "TEXT";
 		}
 	}
 }

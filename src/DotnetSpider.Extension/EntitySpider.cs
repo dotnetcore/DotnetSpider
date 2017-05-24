@@ -334,7 +334,7 @@ namespace DotnetSpider.Extension
 
 				var propertySelector = propertyInfo.GetCustomAttribute<PropertyDefine>();
 				token.Multi = typeof(IList).IsAssignableFrom(type);
-
+				token.DataType = GetDataType(type.Name);
 				if (propertySelector != null)
 				{
 					token.Option = propertySelector.Option;
@@ -366,6 +366,39 @@ namespace DotnetSpider.Extension
 				}
 			}
 			return entity;
+		}
+
+		private static DataType GetDataType(string name)
+		{
+			switch (name)
+			{
+				case "Int32":
+					{
+						return DataType.INT;
+					}
+				case "Int64":
+					{
+						return DataType.BIGINT;
+					}
+				case "Single":
+					{
+						return DataType.FLOAT;
+					}
+				case "Double":
+					{
+						return DataType.DOUBLE;
+					}
+				case "String":
+					{
+						return DataType.TEXT;
+					}
+				case "DateTime":
+					{
+						return DataType.TIME;
+					}
+			}
+
+			return DataType.TEXT;
 		}
 
 		public static string GenerateTableName(string name, TableSuffix suffix)

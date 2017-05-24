@@ -11,6 +11,8 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Data.SqlClient;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -64,75 +66,75 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		[Table("db", "table", Primary = "name")]
+		[Table("test", "table", Primary = "name")]
 		public class Entity1 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
-		[Table("db", "table", Indexs = new[] { "c1" })]
+		[Table("test", "table", Indexs = new[] { "c1" })]
 		public class Entity2 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
-		[Table("db", "table", Uniques = new[] { "c1" })]
+		[Table("test", "table", Uniques = new[] { "c1" })]
 		public class Entity3 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
-		[Table("db", "table", TableSuffix.Monday)]
+		[Table("test", "table", TableSuffix.Monday)]
 		public class Entity4 : SpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
-		[Table("db", "table", Primary = "Name")]
+		[Table("test", "table", Primary = "Name")]
 		public class Entity5 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Name { get; set; }
 		}
 
-		[Table("db", "table", Primary = "name")]
+		[Table("test", "table", Primary = "name")]
 		public class Entity6 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 255)]
 			public string name { get; set; }
 		}
 
-		[Table("db", "table")]
+		[Table("test", "table")]
 		[EntitySelector(Expression = "expression")]
 		public class Entity7 : SpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
-		[Table("db", "table")]
+		[Table("test", "table")]
 		[EntitySelector(Expression = "expression2", Type = SelectorType.Css)]
 		public class Entity8 : SpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
-		[Table("db", "table")]
+		[Table("test", "table")]
 		public class Entity9 : SpiderEntity
 		{
 			public string Name { get; set; }
 		}
 
-		[Table("db", "table", Primary = "Name", Indexs = new[] { "Id" }, Uniques = new[] { "Id,Name", "Id" })]
+		[Table("test", "table", Primary = "Name", Indexs = new[] { "Id" }, Uniques = new[] { "Id,Name", "Id" })]
 		public class Entity10 : SpiderEntity
 		{
 			public int Id { get; set; }
 			public string Name { get; set; }
 		}
 
-		[Table("db", "table")]
+		[Table("test", "table")]
 		public class Entity11 : SpiderEntity
 		{
 			public int Id { get; set; }
@@ -143,7 +145,7 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		[Table("db", "table12")]
+		[Table("test", "table12")]
 		public class Entity12 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Id")]
@@ -153,7 +155,7 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		[Table("db", "table13")]
+		[Table("test", "table13")]
 		public class Entity13 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Url")]
@@ -164,6 +166,31 @@ namespace DotnetSpider.Extension.Test
 		{
 			[PropertyDefine(Expression = "Url")]
 			public string Url { get; set; }
+		}
+
+		[Table("test", "table15")]
+		public class Entity15 : SpiderEntity
+		{
+			[PropertyDefine(Expression = "Url")]
+			public int Int { get; set; }
+
+			[PropertyDefine(Expression = "Url")]
+			public long BigInt { get; set; }
+
+			[PropertyDefine(Expression = "Url")]
+			public string String { get; set; }
+
+			[PropertyDefine(Expression = "Url")]
+			public DateTime Time { get; set; }
+
+			[PropertyDefine(Expression = "Url")]
+			public float Float { get; set; }
+
+			[PropertyDefine(Expression = "Url")]
+			public double Double { get; set; }
+
+			[PropertyDefine(Expression = "Url", Length = 100)]
+			public string String1 { get; set; }
 		}
 
 		[TestMethod]
@@ -211,7 +238,7 @@ namespace DotnetSpider.Extension.Test
 		public void Schema()
 		{
 			var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity4).GetTypeInfo());
-			Assert.AreEqual("db", entityMetadata.Table.Database);
+			Assert.AreEqual("test", entityMetadata.Table.Database);
 			Assert.AreEqual(EntitySpider.GenerateTableName("table", entityMetadata.Table.Suffix), entityMetadata.Table.Name);
 			Assert.AreEqual(TableSuffix.Monday, entityMetadata.Table.Suffix);
 
@@ -311,7 +338,7 @@ namespace DotnetSpider.Extension.Test
 			//entityPipelines = pipeline.GetEntityPipelines();
 			//Assert.AreEqual(4, entityPipelines.Count);
 			//pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
-			//Assert.AreEqual("db", pipeline1.GetSchema().Database);
+			//Assert.AreEqual("test", pipeline1.GetSchema().Database);
 			//Assert.AreEqual("table13", pipeline1.GetSchema().Name);
 
 			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"))
@@ -321,5 +348,97 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
+
+		[TestMethod]
+		public void MySqlDataTypeTests()
+		{
+			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"))
+			{
+				EntitySpider context = new EntitySpider(new Site());
+				context.SetIdentity(Guid.NewGuid().ToString("N"));
+				context.SetThreadNum(1);
+				context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+
+				context.AddStartUrl("http://baidu.com");
+				context.AddEntityType(typeof(Entity15));
+
+				context.Run("running-test");
+
+
+				var columns = conn.Query<ColumnInfo>("SELECT COLUMN_NAME as `Name`, COLUMN_TYPE as `Type` FROM information_schema.columns WHERE table_name='table15' AND table_schema = 'test';").ToList(); ;
+				Assert.AreEqual(9, columns.Count);
+
+				Assert.AreEqual("Int", columns[0].Name);
+				Assert.AreEqual("BigInt", columns[1].Name);
+				Assert.AreEqual("String", columns[2].Name);
+				Assert.AreEqual("Time", columns[3].Name);
+				Assert.AreEqual("Float", columns[4].Name);
+				Assert.AreEqual("Double", columns[5].Name);
+				Assert.AreEqual("String1", columns[6].Name);
+				Assert.AreEqual("cdate", columns[7].Name);
+				Assert.AreEqual("__id", columns[8].Name);
+
+				Assert.AreEqual("int(11)", columns[0].Type);
+				Assert.AreEqual("bigint(20)", columns[1].Type);
+				Assert.AreEqual("text", columns[2].Type);
+				Assert.AreEqual("timestamp", columns[3].Type);
+				Assert.AreEqual("float", columns[4].Type);
+				Assert.AreEqual("double", columns[5].Type);
+				Assert.AreEqual("varchar(100)", columns[6].Type);
+				Assert.AreEqual("timestamp", columns[7].Type);
+				Assert.AreEqual("bigint(20)", columns[8].Type);
+
+				conn.Execute("drop table `test`.`table15`");
+			}
+		}
+
+		[TestMethod]
+		public void SqlServerDataTypeTests()
+		{
+			using (var conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"))
+			{
+				EntitySpider context = new EntitySpider(new Site());
+				context.SetIdentity(Guid.NewGuid().ToString("N"));
+				context.SetThreadNum(1);
+				context.AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"));
+
+				context.AddStartUrl("http://baidu.com");
+				context.AddEntityType(typeof(Entity15));
+
+				context.Run("running-test");
+
+
+				var columns = conn.Query<ColumnInfo>("USE [test];select  b.name Name,c.name+'(' + cast(c.length as varchar)+')' [Type] from sysobjects a,syscolumns b,systypes c where a.id=b.id and a.name='table15' and a.xtype='U'and b.xtype=c.xtype").ToList(); ;
+				Assert.AreEqual(11, columns.Count);
+
+				Assert.AreEqual("Int", columns[0].Name);
+				Assert.AreEqual("Time", columns[1].Name);
+				Assert.AreEqual("CDate", columns[2].Name);
+				Assert.AreEqual("Float", columns[3].Name);
+				Assert.AreEqual("Double", columns[4].Name);
+				Assert.AreEqual("BigInt", columns[5].Name);
+				Assert.AreEqual("__Id", columns[6].Name);
+				Assert.AreEqual("String", columns[7].Name);
+				Assert.AreEqual("String1", columns[8].Name);
+
+				Assert.AreEqual("int(4)", columns[0].Type);
+				Assert.AreEqual("datetime(8)", columns[1].Type);
+				Assert.AreEqual("datetime(8)", columns[2].Type);
+				Assert.AreEqual("float(8)", columns[3].Type);
+				Assert.AreEqual("float(8)", columns[4].Type);
+				Assert.AreEqual("bigint(8)", columns[5].Type);
+				Assert.AreEqual("bigint(8)", columns[6].Type);
+				Assert.AreEqual("nvarchar(8000)", columns[7].Type);
+				Assert.AreEqual("nvarchar(8000)", columns[8].Type);
+
+				conn.Execute("USE [test]; drop table [test].dbo.[table15]");
+			}
+		}
+
+		public class ColumnInfo
+		{
+			public string Name { get; set; }
+			public string Type { get; set; }
+		}
 	}
 }

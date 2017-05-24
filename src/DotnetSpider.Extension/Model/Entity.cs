@@ -19,8 +19,19 @@ namespace DotnetSpider.Extension.Model
 	{
 		public PropertyDefine.Options Option { get; set; }
 		public int Length { get; set; }
+		public DataType DataType { get; set; }
 		public bool IgnoreStore { get; set; }
 		public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
+	}
+
+	public enum DataType
+	{
+		INT,
+		BIGINT,
+		TEXT,
+		FLOAT,
+		DOUBLE,
+		TIME
 	}
 
 	public abstract class AbstractSelector

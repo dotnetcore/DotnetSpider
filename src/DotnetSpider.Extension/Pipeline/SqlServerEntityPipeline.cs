@@ -5,6 +5,7 @@ using System.Text;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using System.Linq;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -30,7 +31,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return new SqlParameter(name, value);
 		}
 
-		protected override string GetCreateSchemaSql(EntityDbMetadata metadata,string serverVersion)
+		protected override string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion)
 		{
 			string version = serverVersion.Split('.')[0];
 			switch (version)
@@ -69,7 +70,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			foreach (var p in metadata.Columns)
 			{
-				columnNames.Append($",[{p.Name}] {(p.Length <= 0 ? "NVARCHAR(MAX)" : $"NVARCHAR({p.Length})")} {(p.NotNull ? "NOT NULL" : "NULL")}");
+				columnNames.Append($",[{p.Name}] {GetDataTypeSql(p)}");
 			}
 
 			builder.Append(columnNames.ToString().Substring(1, columnNames.Length - 1));
@@ -183,6 +184,38 @@ namespace DotnetSpider.Extension.Pipeline
 				primaryParamenters);
 
 			return sqlBuilder.ToString();
+		}
+
+		protected string GetDataTypeSql(Field field)
+		{
+			switch (field.DataType)
+			{
+				case DataType.BIGINT:
+					{
+						return "BIGINT";
+					}
+				case DataType.INT:
+					{
+						return "INT";
+					}
+				case DataType.DOUBLE:
+					{
+						return "FLOAT";
+					}
+				case DataType.FLOAT:
+					{
+						return "FLOAT";
+					}
+				case DataType.TEXT:
+					{
+						return field.Length <= 0 ? "NVARCHAR(MAX)" : $"NVARCHAR({field.Length}) {(field.NotNull ? "NOT NULL" : "NULL")}";
+					}
+				case DataType.TIME:
+					{
+						return "DATETIME";
+					}
+			}
+			return "TEXT";
 		}
 	}
 }
