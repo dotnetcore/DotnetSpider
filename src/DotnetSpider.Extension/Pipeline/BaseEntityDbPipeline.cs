@@ -157,7 +157,7 @@ namespace DotnetSpider.Extension.Pipeline
 						{
 							throw new SpiderException("Columns set as unique is not a property of your entity.");
 						}
-						if (column.Length <= 0 || column.Length > 256)
+						if (column.DataType == DataType.TEXT && (column.Length <= 0 || column.Length > 256))
 						{
 							throw new SpiderException("Column length of unique should not large than 256.");
 						}
