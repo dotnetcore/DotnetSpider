@@ -71,7 +71,14 @@ namespace DotnetSpider.Extension.Model
 				if (select != null)
 				{
 					var singleResult = ExtractSingle(page, select, 0);
-					result = new List<JObject> { singleResult };
+					if (singleResult != null)
+					{
+						result = new List<JObject> { singleResult };
+					}
+					else
+					{
+						result = null;
+					}
 				}
 				else
 				{
