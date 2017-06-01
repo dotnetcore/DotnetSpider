@@ -169,7 +169,6 @@
     <Compile Include="Selector\Selectable.cs" />
     <Compile Include="Selector\Selectors.cs" />
     <Compile Include="Selector\SelectorType.cs" />
-    <Compile Include="Selector\SmartContentSelector.cs" />
     <Compile Include="Selector\XPathSelector.cs" />
     <Compile Include="Site.cs" />
     <Compile Include="Spider.cs" />

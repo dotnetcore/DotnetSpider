@@ -10,14 +10,6 @@ namespace DotnetSpider.Core.Selector
 		private static readonly Dictionary<string, ISelector> Cache = new Dictionary<string, ISelector>();
 		private static readonly DefaultSelector DefaultSelector = new DefaultSelector();
 
-		static Selectors()
-		{
-			lock (Cache)
-			{
-				Cache.Add("SmartContentSelector", new SmartContentSelector());
-			}
-		}
-
 		public static ISelector Regex(string expr)
 		{
 			lock (Cache)
