@@ -29,7 +29,7 @@ namespace DotnetSpider.Core.Downloader
 		private const int Utf32OrUnicodePreambleFirst2Bytes = 0xFFFE;
 		private const int BigEndianUnicodePreambleFirst2Bytes = 0xFEFF;
 
-		private static List<string> MediaTypes = new List<string>()
+		private static readonly List<string> MediaTypes = new List<string>
 		{
 			"text/html",
 			"text/plain",
@@ -289,7 +289,7 @@ namespace DotnetSpider.Core.Downloader
 			if (string.IsNullOrEmpty(site.EncodingName))
 			{
 				Encoding htmlCharset;
-				if (response.Content.Headers.ContentType != null && response.Content.Headers.ContentType.CharSet != null)
+				if (response.Content.Headers.ContentType?.CharSet != null)
 				{
 					htmlCharset = Encoding.GetEncoding(response.Content.Headers.ContentType.CharSet);
 				}

@@ -28,14 +28,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				else
 				{
-					if (request.ExistExtra(arg))
-					{
-						arguments.Add(request.GetExtra(arg));
-					}
-					else
-					{
-						arguments.Add("");
-					}
+					arguments.Add(request.ExistExtra(arg) ? request.GetExtra(arg) : "");
 				}
 			}
 			var args = arguments.Select(a => (object) a).ToArray();

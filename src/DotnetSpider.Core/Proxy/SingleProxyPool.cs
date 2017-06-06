@@ -4,7 +4,7 @@ namespace DotnetSpider.Core.Proxy
 {
 	public class SingleProxyPool : IHttpProxyPool
 	{
-		private UseSpecifiedUriWebProxy _proxy;
+		private readonly UseSpecifiedUriWebProxy _proxy;
 
 		public SingleProxyPool(string url)
 		{

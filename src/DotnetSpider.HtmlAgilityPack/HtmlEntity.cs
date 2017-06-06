@@ -21,18 +21,12 @@ namespace DotnetSpider.HtmlAgilityPack
         /// <summary>
         /// A collection of entities indexed by name.
         /// </summary>
-        public static Dictionary<int, string> EntityName
-        {
-            get { return _entityName; }
-        }
+        public static Dictionary<int, string> EntityName => _entityName;
 
         /// <summary>
         /// A collection of entities indexed by value.
         /// </summary>
-        public static Dictionary<string, int> EntityValue
-        {
-            get { return _entityValue; }
-        }
+        public static Dictionary<string, int> EntityValue => _entityValue;
 
         #endregion
 

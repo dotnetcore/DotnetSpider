@@ -8,19 +8,16 @@ using System.Linq;
 
 namespace DotnetSpider.Extension.Processor
 {
-	public class EntityProcessor : BasePageProcessor
+	public sealed class EntityProcessor : BasePageProcessor
 	{
-		protected readonly Entity _entity;
-		protected readonly IEntityExtractor _extractor;
+		private readonly IEntityExtractor _extractor;
 
 		public EntityProcessor(Site site, Entity entity)
 		{
 			Site = site;
-			_entity = entity;
 			_extractor = new EntityExtractor(entity.Name, entity.SharedValues, entity);
 			if (entity.TargetUrlsSelectors != null && entity.TargetUrlsSelectors.Count > 0)
 			{
-				var pairs = new List<string>();
 				foreach (var targetUrlsSelector in entity.TargetUrlsSelectors)
 				{
 					if (targetUrlsSelector.XPaths == null && targetUrlsSelector.Patterns == null)

@@ -100,7 +100,7 @@ namespace DotnetSpider.Core.Scheduler
 		private class Comparator : IComparer<Request>
 		{
 			public int Compare(Request x, Request y)
-			{
+			{								
 				if (x.Priority > y.Priority)
 				{
 					return -1;

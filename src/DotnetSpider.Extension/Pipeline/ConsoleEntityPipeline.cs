@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -21,7 +20,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			foreach (var data in datas)
 			{
-				Console.WriteLine($"{entityName}: {data.ToString()}");
+				Console.WriteLine($"{entityName}: {data}");
 			}
 		}
 	}

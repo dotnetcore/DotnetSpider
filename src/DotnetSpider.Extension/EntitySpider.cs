@@ -15,9 +15,6 @@ using System.Threading;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Core.Pipeline;
-#if NET_CORE
-#endif
 
 namespace DotnetSpider.Extension
 {
@@ -26,7 +23,7 @@ namespace DotnetSpider.Extension
 		private const string InitStatusSetKey = "dotnetspider:init-stats";
 		private const string ValidateStatusKey = "dotnetspider:validate-stats";
 		private IRedialExecutor _redialExecutor;
-		private static List<string> _defaultProperties = new List<string> { "cdate", "__id" };
+		private static readonly List<string> DefaultProperties = new List<string> { "cdate", "__id" };
 
 		[JsonIgnore]
 		public Action VerifyCollectedData { get; set; }
@@ -42,10 +39,7 @@ namespace DotnetSpider.Extension
 
 		public IRedialExecutor RedialExecutor
 		{
-			get
-			{
-				return _redialExecutor;
-			}
+			get => _redialExecutor;
 			set
 			{
 				CheckIfRunning();
@@ -58,7 +52,7 @@ namespace DotnetSpider.Extension
 		{
 		}
 
-		public EntitySpider(Site site) : base()
+		public EntitySpider(Site site)
 		{
 			Site = site;
 		}
@@ -80,10 +74,7 @@ namespace DotnetSpider.Extension
 				foreach (var pipeline in Pipelines)
 				{
 					BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
-					if (newPipeline != null)
-					{
-						newPipeline.AddEntity(entity);
-					}
+					newPipeline?.AddEntity(entity);
 				}
 			}
 
@@ -114,10 +105,7 @@ namespace DotnetSpider.Extension
 				Scheduler.Init(this);
 				Scheduler.Clean();
 				Scheduler.Dispose();
-				if (RedisConnection != null)
-				{
-					RedisConnection.Database.HashDelete(ValidateStatusKey, Identity);
-				}
+				RedisConnection?.Database.HashDelete(ValidateStatusKey, Identity);
 				needInitStartRequest = true;
 			}
 
@@ -138,20 +126,11 @@ namespace DotnetSpider.Extension
 
 		protected override void AfterInitComponent(params string[] arguments)
 		{
-			if (RedisConnection != null)
-			{
-				RedisConnection.Database.LockRelease(InitLockKey, 0);
-			}
+			RedisConnection?.Database.LockRelease(InitLockKey, 0);
 			base.AfterInitComponent(arguments);
 		}
 
-		protected string InitLockKey
-		{
-			get
-			{
-				return $"dotnetspider:initLocker:{Identity}";
-			}
-		}
+		protected string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
 		public EntitySpider AddEntityType(Type type)
 		{
@@ -220,9 +199,9 @@ namespace DotnetSpider.Extension
 				}
 				this.Log("数据验证已完成.", LogLevel.Info);
 
-				if (needInitStartRequest && RedisConnection != null)
+				if (needInitStartRequest)
 				{
-					RedisConnection.Database.HashSet(ValidateStatusKey, Identity, "verify finished");
+					RedisConnection?.Database.HashSet(ValidateStatusKey, Identity, "verify finished");
 				}
 			}
 			catch (Exception e)
@@ -232,10 +211,7 @@ namespace DotnetSpider.Extension
 			}
 			finally
 			{
-				if (RedisConnection != null)
-				{
-					RedisConnection.Database.LockRelease(key, 0);
-				}
+				RedisConnection?.Database.LockRelease(key, 0);
 			}
 		}
 
@@ -322,7 +298,7 @@ namespace DotnetSpider.Extension
 				Name = typeName
 			};
 			var properties = entityType.GetProperties();
-			if (properties.Any(p => _defaultProperties.Contains(p.Name.ToLower())))
+			if (properties.Any(p => DefaultProperties.Contains(p.Name.ToLower())))
 			{
 				throw new SpiderException("cdate 是默认属性, 请勿使用。");
 			}
@@ -334,22 +310,21 @@ namespace DotnetSpider.Extension
 				{
 					var type = propertyInfo.PropertyType;
 
-					Field token = new Field();
-
-					token.Multi = typeof(IList).IsAssignableFrom(type);
-
-					token.Option = propertySelector.Option;
-					token.Selector = new BaseSelector()
+					Field token = new Field
 					{
-						Expression = propertySelector.Expression,
-						Type = propertySelector.Type,
-						Argument = propertySelector.Argument
+						Multi = typeof(IList).IsAssignableFrom(type),
+						Option = propertySelector.Option,
+						Selector = new BaseSelector
+						{
+							Expression = propertySelector.Expression,
+							Type = propertySelector.Type,
+							Argument = propertySelector.Argument
+						},
+						NotNull = propertySelector.NotNull,
+						IgnoreStore = propertySelector.IgnoreStore,
+						Length = propertySelector.Length,
+						Name = propertyInfo.Name
 					};
-					token.NotNull = propertySelector.NotNull;
-					token.IgnoreStore = propertySelector.IgnoreStore;
-					token.Length = propertySelector.Length;
-
-					token.Name = propertyInfo.Name;
 
 					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
 					{
@@ -365,7 +340,7 @@ namespace DotnetSpider.Extension
 
 					token.DataType = GetDataType(type.Name);
 
-					if (token.DataType != DataType.TEXT && propertySelector.Length > 0)
+					if (token.DataType != DataType.Text && propertySelector.Length > 0)
 					{
 						throw new SpiderException("Only string property can set length.");
 					}
@@ -382,31 +357,31 @@ namespace DotnetSpider.Extension
 			{
 				case "Int32":
 					{
-						return DataType.INT;
+						return DataType.Int;
 					}
 				case "Int64":
 					{
-						return DataType.BIGINT;
+						return DataType.Bigint;
 					}
 				case "Single":
 					{
-						return DataType.FLOAT;
+						return DataType.Float;
 					}
 				case "Double":
 					{
-						return DataType.DOUBLE;
+						return DataType.Double;
 					}
 				case "String":
 					{
-						return DataType.TEXT;
+						return DataType.Text;
 					}
 				case "DateTime":
 					{
-						return DataType.TIME;
+						return DataType.Time;
 					}
 			}
 
-			return DataType.TEXT;
+			return DataType.Text;
 		}
 
 		public static string GenerateTableName(string name, TableSuffix suffix)

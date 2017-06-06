@@ -49,17 +49,14 @@ namespace DotnetSpider.HtmlAgilityPack
         /// </summary>
         public int Line
         {
-            get { return _line; }
-            internal set { _line = value; }
+            get => _line;
+            internal set => _line = value;
         }
 
         /// <summary>
         /// Gets the column number of this attribute in the document.
         /// </summary>
-        public int LinePosition
-        {
-            get { return _lineposition; }
-        }
+        public int LinePosition => _lineposition;
 
         /// <summary>
         /// Gets the qualified name of the attribute.
@@ -91,43 +88,31 @@ namespace DotnetSpider.HtmlAgilityPack
         /// <summary>
         /// Name of attribute with original case
         /// </summary>
-        public string OriginalName
-        {
-            get { return _name; }
-        }
+        public string OriginalName => _name;
 
         /// <summary>
         /// Gets the HTML document to which this attribute belongs.
         /// </summary>
-        public HtmlDocument OwnerDocument
-        {
-            get { return _ownerdocument; }
-        }
+        public HtmlDocument OwnerDocument => _ownerdocument;
 
         /// <summary>
         /// Gets the HTML node to which this attribute belongs.
         /// </summary>
-        public HtmlNode OwnerNode
-        {
-            get { return _ownernode; }
-        }
+        public HtmlNode OwnerNode => _ownernode;
 
         /// <summary>
         /// Specifies what type of quote the data should be wrapped in
         /// </summary>
         public AttributeValueQuote QuoteType
         {
-            get { return _quoteType; }
-            set { _quoteType = value; }
+            get => _quoteType;
+            set => _quoteType = value;
         }
 
         /// <summary>
         /// Gets the stream position of this attribute in the document, relative to the start of the document.
         /// </summary>
-        public int StreamPosition
-        {
-            get { return _streamposition; }
-        }
+        public int StreamPosition => _streamposition;
 
         /// <summary>
         /// Gets or sets the value of the attribute.
@@ -152,15 +137,9 @@ namespace DotnetSpider.HtmlAgilityPack
             }
         }
 
-        internal string XmlName
-        {
-            get { return HtmlDocument.GetXmlName(Name); }
-        }
+        internal string XmlName => HtmlDocument.GetXmlName(Name);
 
-        internal string XmlValue
-        {
-            get { return Value; }
-        }
+        internal string XmlValue => Value;
 
         /// <summary>
         /// Gets a valid XPath string that points to this Attribute

@@ -8,11 +8,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		static LogCenter()
 		{
-			Logger = IocManager.Resolve<ILogger>();
-			if (Logger == null)
-			{
-				Logger = new NLogLogger();
-			}
+			Logger = IocManager.Resolve<ILogger>() ?? new NLogLogger();
 		}
 
 		public static void Log(this IIdentity identity, string message, LogLevel level, Exception e = null)

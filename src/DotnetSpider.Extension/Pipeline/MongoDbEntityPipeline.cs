@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.ORM;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using DotnetSpider.Core.Infrastructure;
 using System.Collections.Concurrent;
 using System;
 

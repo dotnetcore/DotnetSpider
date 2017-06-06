@@ -37,7 +37,7 @@ namespace DotnetSpider.HtmlAgilityPack
                 }
                 return _comment;
             }
-            set { _comment = value; }
+            set => _comment = value;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace DotnetSpider.HtmlAgilityPack
                 }
                 return _comment;
             }
-            set { _comment = value; }
+            set => _comment = value;
         }
 
         /// <summary>

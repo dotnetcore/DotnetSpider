@@ -24,10 +24,7 @@ namespace DotnetSpider.HtmlAgilityPack
 
         #region Properties
 
-        internal Encoding Encoding
-        {
-            get { return _encoding; }
-        }
+        internal Encoding Encoding => _encoding;
 
         #endregion
     }

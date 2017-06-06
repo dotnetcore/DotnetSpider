@@ -181,7 +181,7 @@ namespace DotnetSpider.HtmlAgilityPack
 				}
 				return _attributes;
 			}
-			internal set { _attributes = value; }
+			internal set => _attributes = value;
 		}
 
 		/// <summary>
@@ -189,44 +189,26 @@ namespace DotnetSpider.HtmlAgilityPack
 		/// </summary>
 		public HtmlNodeCollection ChildNodes
 		{
-			get { return _childnodes ?? (_childnodes = new HtmlNodeCollection(this)); }
-			internal set { _childnodes = value; }
+			get => _childnodes ?? (_childnodes = new HtmlNodeCollection(this));
+			internal set => _childnodes = value;
 		}
 
 		/// <summary>
 		/// Gets a value indicating if this node has been closed or not.
 		/// </summary>
-		public bool Closed
-		{
-			get { return (_endnode != null); }
-		}
+		public bool Closed => (_endnode != null);
 
 		/// <summary>
 		/// Gets the collection of HTML attributes for the closing tag. May not be null.
 		/// </summary>
-		public HtmlAttributeCollection ClosingAttributes
-		{
-			get
-			{
-				return !HasClosingAttributes ? new HtmlAttributeCollection(this) : _endnode.Attributes;
-			}
-		}
+		public HtmlAttributeCollection ClosingAttributes => !HasClosingAttributes ? new HtmlAttributeCollection(this) : _endnode.Attributes;
 
-		internal HtmlNode EndNode
-		{
-			get { return _endnode; }
-		}
+		internal HtmlNode EndNode => _endnode;
 
 		/// <summary>
 		/// Gets the first child of the node.
 		/// </summary>
-		public HtmlNode FirstChild
-		{
-			get
-			{
-				return !HasChildNodes ? null : _childnodes[0];
-			}
-		}
+		public HtmlNode FirstChild => !HasChildNodes ? null : _childnodes[0];
 
 		/// <summary>
 		/// Gets a value indicating whether the current node has any attributes.
@@ -376,21 +358,15 @@ namespace DotnetSpider.HtmlAgilityPack
 		/// <summary>
 		/// Gets the last child of the node.
 		/// </summary>
-		public HtmlNode LastChild
-		{
-			get
-			{
-				return !HasChildNodes ? null : _childnodes[_childnodes.Count - 1];
-			}
-		}
+		public HtmlNode LastChild => !HasChildNodes ? null : _childnodes[_childnodes.Count - 1];
 
 		/// <summary>
 		/// Gets the line number of this node in the document.
 		/// </summary>
 		public int Line
 		{
-			get { return _line; }
-			internal set { _line = value; }
+			get => _line;
+			internal set => _line = value;
 		}
 
 		/// <summary>
@@ -398,8 +374,8 @@ namespace DotnetSpider.HtmlAgilityPack
 		/// </summary>
 		public int LinePosition
 		{
-			get { return _lineposition; }
-			internal set { _lineposition = value; }
+			get => _lineposition;
+			internal set => _lineposition = value;
 		}
 
 		/// <summary>
@@ -429,8 +405,8 @@ namespace DotnetSpider.HtmlAgilityPack
 		/// </summary>
 		public HtmlNode NextSibling
 		{
-			get { return _nextnode; }
-			internal set { _nextnode = value; }
+			get => _nextnode;
+			internal set => _nextnode = value;
 		}
 
 		/// <summary>
@@ -438,17 +414,14 @@ namespace DotnetSpider.HtmlAgilityPack
 		/// </summary>
 		public HtmlNodeType NodeType
 		{
-			get { return _nodetype; }
-			internal set { _nodetype = value; }
+			get => _nodetype;
+			internal set => _nodetype = value;
 		}
 
 		/// <summary>
 		/// The original unaltered name of the tag
 		/// </summary>
-		public string OriginalName
-		{
-			get { return _name; }
-		}
+		public string OriginalName => _name;
 
 		/// <summary>
 		/// Gets or Sets the object and its content in HTML.
@@ -482,8 +455,8 @@ namespace DotnetSpider.HtmlAgilityPack
 		/// </summary>
 		public HtmlDocument OwnerDocument
 		{
-			get { return _ownerdocument; }
-			internal set { _ownerdocument = value; }
+			get => _ownerdocument;
+			internal set => _ownerdocument = value;
 		}
 
 		/// <summary>
@@ -491,8 +464,8 @@ namespace DotnetSpider.HtmlAgilityPack
 		/// </summary>
 		public HtmlNode ParentNode
 		{
-			get { return _parentnode; }
-			internal set { _parentnode = value; }
+			get => _parentnode;
+			internal set => _parentnode = value;
 		}
 
 		/// <summary>
@@ -500,17 +473,14 @@ namespace DotnetSpider.HtmlAgilityPack
 		/// </summary>
 		public HtmlNode PreviousSibling
 		{
-			get { return _prevnode; }
-			internal set { _prevnode = value; }
+			get => _prevnode;
+			internal set => _prevnode = value;
 		}
 
 		/// <summary>
 		/// Gets the stream position of this node in the document, relative to the start of the document.
 		/// </summary>
-		public int StreamPosition
-		{
-			get { return _streamposition; }
-		}
+		public int StreamPosition => _streamposition;
 
 		/// <summary>
 		/// Gets a valid XPath string that points to this node

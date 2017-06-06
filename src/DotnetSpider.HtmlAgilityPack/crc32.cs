@@ -67,8 +67,8 @@ namespace DotnetSpider.HtmlAgilityPack
 
         internal uint CheckSum
         {
-            get { return _crc32; }
-            set { _crc32 = value; }
+            get => _crc32;
+            set => _crc32 = value;
         }
 
         #endregion

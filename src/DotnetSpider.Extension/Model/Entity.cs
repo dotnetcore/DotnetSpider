@@ -26,12 +26,12 @@ namespace DotnetSpider.Extension.Model
 
 	public enum DataType
 	{
-		INT,
-		BIGINT,
-		TEXT,
-		FLOAT,
-		DOUBLE,
-		TIME
+		Int,
+		Bigint,
+		Text,
+		Float,
+		Double,
+		Time
 	}
 
 	public abstract class AbstractSelector

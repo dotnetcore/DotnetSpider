@@ -42,50 +42,32 @@ namespace DotnetSpider.HtmlAgilityPack
         /// <summary>
         /// Gets the type of error.
         /// </summary>
-        public HtmlParseErrorCode Code
-        {
-            get { return _code; }
-        }
+        public HtmlParseErrorCode Code => _code;
 
         /// <summary>
         /// Gets the line number of this error in the document.
         /// </summary>
-        public int Line
-        {
-            get { return _line; }
-        }
+        public int Line => _line;
 
         /// <summary>
         /// Gets the column number of this error in the document.
         /// </summary>
-        public int LinePosition
-        {
-            get { return _linePosition; }
-        }
+        public int LinePosition => _linePosition;
 
         /// <summary>
         /// Gets a description for the error.
         /// </summary>
-        public string Reason
-        {
-            get { return _reason; }
-        }
+        public string Reason => _reason;
 
         /// <summary>
         /// Gets the the full text of the line containing the error.
         /// </summary>
-        public string SourceText
-        {
-            get { return _sourceText; }
-        }
+        public string SourceText => _sourceText;
 
         /// <summary>
         /// Gets the absolute stream position of this error in the document, relative to the start of the document.
         /// </summary>
-        public int StreamPosition
-        {
-            get { return _streamPosition; }
-        }
+        public int StreamPosition => _streamPosition;
 
         #endregion
     }

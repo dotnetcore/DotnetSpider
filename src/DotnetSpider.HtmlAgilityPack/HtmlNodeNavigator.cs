@@ -208,18 +208,12 @@ namespace DotnetSpider.HtmlAgilityPack
         /// <summary>
         /// Gets the current HTML document.
         /// </summary>
-        public HtmlDocument CurrentDocument
-        {
-            get { return _doc; }
-        }
+        public HtmlDocument CurrentDocument => _doc;
 
         /// <summary>
         /// Gets the current HTML node.
         /// </summary>
-        public HtmlNode CurrentNode
-        {
-            get { return _currentnode; }
-        }
+        public HtmlNode CurrentNode => _currentnode;
 
         /// <summary>
         /// Gets a value indicating whether the current node has child nodes.

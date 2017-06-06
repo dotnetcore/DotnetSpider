@@ -258,9 +258,9 @@ namespace DotnetSpider.HtmlAgilityPack
                 _input = input;
             }
 
-            private bool Ready { get { return _index >= 0 && _index < _input.Length; } }
-            public char? Value { get { return Ready ? _input[_index] : (char?)null; } }
-            public int Position { get { return _index + 1; } }
+            private bool Ready => _index >= 0 && _index < _input.Length;
+            public char? Value => Ready ? _input[_index] : (char?)null;
+            public int Position => _index + 1;
 
             public void Mark()
             {

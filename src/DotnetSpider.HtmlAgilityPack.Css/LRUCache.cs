@@ -81,10 +81,7 @@ namespace DotnetSpider.HtmlAgilityPack
 
         public int Capacity
         {
-            get
-            {
-                return _capacity;
-            }
+            get => _capacity;
 
             set
             {
@@ -145,13 +142,7 @@ namespace DotnetSpider.HtmlAgilityPack
                 _index.Clear();
             }
 
-            public T First
-            {
-                get
-                {
-                    return _data.First.Value;
-                }
-            }
+            public T First => _data.First.Value;
         }
 
 

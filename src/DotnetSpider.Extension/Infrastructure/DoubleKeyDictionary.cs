@@ -11,11 +11,6 @@ namespace DotnetSpider.Extension.Infrastructure
 			Init();
 		}
 
-		public DoubleKeyMap(IDictionary<TK1, IDictionary<TK2, TV>> map)
-		{
-			Init();
-		}
-
 		private void Init()
 		{
 			if (_map == null)

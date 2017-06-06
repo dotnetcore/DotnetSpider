@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 
 		public string Proxy
 		{
-			get { return _proxy; }
+			get => _proxy;
 			set
 			{
 				string v = value;

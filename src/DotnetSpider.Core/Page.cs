@@ -51,7 +51,7 @@ namespace DotnetSpider.Core
 
 		public string Content
 		{
-			get { return _content; }
+			get => _content;
 			set
 			{
 				if (!Equals(value, _content))
@@ -66,8 +66,8 @@ namespace DotnetSpider.Core
 
 		public bool IsSkip
 		{
-			get { return ResultItems.IsSkip; }
-			set { ResultItems.IsSkip = value; }
+			get => ResultItems.IsSkip;
+			set => ResultItems.IsSkip = value;
 		}
 
 		public Exception Exception { get; set; }

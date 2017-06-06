@@ -8,12 +8,6 @@ namespace DotnetSpider.Core
 
 	public abstract class Named
 	{
-		public string Name
-		{
-			get
-			{
-				return GetType().Name;
-			}
-		}
+		public string Name => GetType().Name;
 	}
 }

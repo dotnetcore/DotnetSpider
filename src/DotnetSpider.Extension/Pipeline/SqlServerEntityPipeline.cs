@@ -2,8 +2,6 @@
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Text;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using System.Linq;
 using DotnetSpider.Extension.Model;
 
@@ -190,27 +188,27 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			switch (field.DataType)
 			{
-				case DataType.BIGINT:
+				case DataType.Bigint:
 					{
 						return "BIGINT";
 					}
-				case DataType.INT:
+				case DataType.Int:
 					{
 						return "INT";
 					}
-				case DataType.DOUBLE:
+				case DataType.Double:
 					{
 						return "FLOAT";
 					}
-				case DataType.FLOAT:
+				case DataType.Float:
 					{
 						return "FLOAT";
 					}
-				case DataType.TEXT:
+				case DataType.Text:
 					{
 						return field.Length <= 0 ? "NVARCHAR(MAX)" : $"NVARCHAR({field.Length}) {(field.NotNull ? "NOT NULL" : "NULL")}";
 					}
-				case DataType.TIME:
+				case DataType.Time:
 					{
 						return "DATETIME";
 					}

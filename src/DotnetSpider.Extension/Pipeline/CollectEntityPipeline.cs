@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json.Linq;
-using System.Collections.Concurrent;
-using DotnetSpider.Core;
-using System;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -18,10 +15,13 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public List<JObject> GetCollected(string entityName)
 		{
-			List<JObject> result;
-			if (_collector.TryGetValue(entityName, out result))
+			lock (this)
 			{
-				return result;
+				List<JObject> result;
+				if (_collector.TryGetValue(entityName, out result))
+				{
+					return result;
+				}
 			}
 			return null;
 		}

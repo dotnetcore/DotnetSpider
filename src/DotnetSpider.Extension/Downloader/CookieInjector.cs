@@ -15,11 +15,10 @@ using DotnetSpider.Core;
 using System.IO;
 using DotnetSpider.Extension.Infrastructure;
 using System.Collections.Generic;
-#endif
 
 namespace DotnetSpider.Extension.Downloader
 {
-#if !NET_CORE
+
 	public abstract class WebDriverCookieInjector : CookieInjector
 	{
 		public Browser Browser { get; set; } = Browser.Chrome;
@@ -206,5 +205,6 @@ namespace DotnetSpider.Extension.Downloader
 			return new Cookies { PairPart = cookies };
 		}
 	}
-#endif
+
 }
+#endif

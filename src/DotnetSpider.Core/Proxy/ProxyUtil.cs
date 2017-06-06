@@ -30,7 +30,7 @@ namespace DotnetSpider.Core.Proxy
 			}
 			catch (Exception e)
 			{
-				LogCenter.Log(null, "FAILRE - CAN not connect! Proxy: " + http, Infrastructure.LogLevel.Error, e);
+				LogCenter.Log(null, "FAILRE - CAN not connect! Proxy: " + http, LogLevel.Error, e);
 			}
 
 			return isReachable;

@@ -4,19 +4,11 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public class NetworkCenter
 	{
-		private bool _isEnabled = true;
-
 		public INetworkExecutor Executor { get; set; }
 
-		public static readonly Lazy<NetworkCenter> _instance = new Lazy<NetworkCenter>(() =>
-		{
-			return new NetworkCenter();
-		});
+		public static readonly Lazy<NetworkCenter> Instance = new Lazy<NetworkCenter>(() => new NetworkCenter());
 
-		public static NetworkCenter Current
-		{
-			get { return _instance.Value; }
-		}
+		public static NetworkCenter Current => Instance.Value;
 
 		private NetworkCenter()
 		{
@@ -73,16 +65,6 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				return func(obj);
 			}
-		}
-
-		public void Disable()
-		{
-			_isEnabled = false;
-		}
-
-		public void Enable()
-		{
-			_isEnabled = true;
 		}
 	}
 }

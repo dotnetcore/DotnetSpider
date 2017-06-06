@@ -16,7 +16,7 @@ namespace DotnetSpider.Extension.Scheduler
 	/// </summary>
 	public sealed class RedisScheduler : DuplicateRemovedScheduler, IDuplicateRemover
 	{
-		public string ConnectString { get; private set; }
+		public string ConnectString { get; }
 
 		public RedisConnection RedisConnection { get; private set; }
 
@@ -264,10 +264,7 @@ namespace DotnetSpider.Extension.Scheduler
 					return false;
 				}
 			}
-			set
-			{
-				RedisConnection.Database.HashSet(TaskStatsKey, _identityMd5, value ? 1 : 0);
-			}
+			set => RedisConnection.Database.HashSet(TaskStatsKey, _identityMd5, value ? 1 : 0);
 		}
 
 		#region For Test

@@ -4,7 +4,7 @@ namespace DotnetSpider.Core.Selector
 {
 	public class EnviromentSelector : ISelector
 	{
-		public string Field { get; private set; }
+		public string Field { get; }
 
 		public EnviromentSelector(string field)
 		{

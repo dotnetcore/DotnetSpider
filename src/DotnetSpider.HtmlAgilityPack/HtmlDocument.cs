@@ -158,69 +158,45 @@ namespace DotnetSpider.HtmlAgilityPack
 		/// <summary>
 		/// Gets the document CRC32 checksum if OptionComputeChecksum was set to true before parsing, 0 otherwise.
 		/// </summary>
-		public int CheckSum
-		{
-			get { return _crc32 == null ? 0 : (int)_crc32.CheckSum; }
-		}
+		public int CheckSum => _crc32 == null ? 0 : (int)_crc32.CheckSum;
 
 		/// <summary>
 		/// Gets the document's declared encoding.
 		/// Declared encoding is determined using the meta http-equiv="content-type" content="text/html;charset=XXXXX" html node.
 		/// </summary>
-		public Encoding DeclaredEncoding
-		{
-			get { return _declaredencoding; }
-		}
+		public Encoding DeclaredEncoding => _declaredencoding;
 
 		/// <summary>
 		/// Gets the root node of the document.
 		/// </summary>
-		public HtmlNode DocumentNode
-		{
-			get { return _documentnode; }
-		}
+		public HtmlNode DocumentNode => _documentnode;
 
 		/// <summary>
 		/// Gets the document's output encoding.
 		/// </summary>
-		public Encoding Encoding
-		{
-			get { return GetOutEncoding(); }
-		}
+		public Encoding Encoding => GetOutEncoding();
 
 		/// <summary>
 		/// Gets a list of parse errors found in the document.
 		/// </summary>
-		public IEnumerable<HtmlParseError> ParseErrors
-		{
-			get { return _parseerrors; }
-		}
+		public IEnumerable<HtmlParseError> ParseErrors => _parseerrors;
 
 		/// <summary>
 		/// Gets the remaining text.
 		/// Will always be null if OptionStopperNodeName is null.
 		/// </summary>
-		public string Remainder
-		{
-			get { return _remainder; }
-		}
+		public string Remainder => _remainder;
 
 		/// <summary>
 		/// Gets the offset of Remainder in the original Html text.
 		/// If OptionStopperNodeName is null, this will return the length of the original Html text.
 		/// </summary>
-		public int RemainderOffset
-		{
-			get { return _remainderOffset; }
-		}
+		public int RemainderOffset => _remainderOffset;
 
 		/// <summary>
 		/// Gets the document's stream encoding.
 		/// </summary>
-		public Encoding StreamEncoding
-		{
-			get { return _streamencoding; }
-		}
+		public Encoding StreamEncoding => _streamencoding;
 
 		#endregion
 

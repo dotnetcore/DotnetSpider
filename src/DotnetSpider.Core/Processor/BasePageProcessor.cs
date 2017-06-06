@@ -14,9 +14,9 @@ namespace DotnetSpider.Core.Processor
 	public abstract class BasePageProcessor : IPageProcessor
 	{
 		private List<Regex> _targetUrlPatterns;
-		private List<Regex> _excludeTargetUrlPatterns = new List<Regex>();
-		private Dictionary<ISelector, List<Regex>> _targetUrlExtractors { get; set; } = new Dictionary<ISelector, List<Regex>>();
-		private ISelector _imageSelector = Selectors.XPath(".//img/@src");
+		private readonly List<Regex> _excludeTargetUrlPatterns = new List<Regex>();
+		private readonly Dictionary<ISelector, List<Regex>> _targetUrlExtractors = new Dictionary<ISelector, List<Regex>>();
+		private readonly ISelector _imageSelector = Selectors.XPath(".//img/@src");
 
 		protected abstract void Handle(Page page);
 
@@ -42,14 +42,7 @@ namespace DotnetSpider.Core.Processor
 
 			Handle(page);
 
-			if (page.ResultItems.Results.Count == 0)
-			{
-				page.ResultItems.IsSkip = true;
-			}
-			else
-			{
-				page.ResultItems.IsSkip = false;
-			}
+			page.ResultItems.IsSkip = page.ResultItems.Results.Count == 0;
 
 			if (!page.MissExtractTargetUrls)
 			{
@@ -61,7 +54,6 @@ namespace DotnetSpider.Core.Processor
 		/// 如果找不到则不返回URL, 不然返回的URL太多
 		/// </summary>
 		/// <param name="page"></param>
-		/// <param name="targetUrlExtractInfos"></param>
 		protected virtual void ExtractUrls(Page page)
 		{
 			if (_targetUrlExtractors == null || _targetUrlExtractors.Count == 0)
@@ -71,12 +63,12 @@ namespace DotnetSpider.Core.Processor
 
 			foreach (var targetUrlExtractor in _targetUrlExtractors)
 			{
-				if (targetUrlExtractor.Key == Selectors.Default())
+				if (Equals(targetUrlExtractor.Key, Selectors.Default()))
 				{
 					continue;
 				}
 
-				var links = (page.Selectable.SelectList(targetUrlExtractor.Key)).Links().GetValues();
+				var links = page.Selectable.SelectList(targetUrlExtractor.Key).Links().GetValues();
 
 				if (links == null)
 				{
@@ -210,7 +202,7 @@ namespace DotnetSpider.Core.Processor
 			foreach (var pattern in patterns)
 			{
 				var realPattern = string.IsNullOrEmpty(pattern?.Trim()) ? null : pattern.Trim();
-				if (!realPatterns.Any(p => p.ToString() == realPattern))
+				if (realPatterns.All(p => p.ToString() != realPattern))
 				{
 					realPatterns.Add(new Regex(realPattern));
 				}
@@ -225,7 +217,7 @@ namespace DotnetSpider.Core.Processor
 			}
 			foreach (var pattern in patterns)
 			{
-				if (!_excludeTargetUrlPatterns.Any(p => p.ToString() == pattern))
+				if (_excludeTargetUrlPatterns.All(p => p.ToString() != pattern))
 				{
 					_excludeTargetUrlPatterns.Add(new Regex(pattern));
 				}

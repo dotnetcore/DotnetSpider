@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using DotnetSpider.Core;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using DotnetSpider.Core.Pipeline;
 
 namespace DotnetSpider.Extension.Pipeline
 {

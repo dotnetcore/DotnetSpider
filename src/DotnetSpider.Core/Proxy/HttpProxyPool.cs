@@ -18,11 +18,7 @@ namespace DotnetSpider.Core.Proxy
 
 		public HttpProxyPool(IProxySupplier supplier, int reuseInterval = 500)
 		{
-			if (supplier == null)
-			{
-				throw new SpiderException("IProxySupplier should not be null.");
-			}
-			_supplier = supplier;
+			_supplier = supplier ?? throw new SpiderException("IProxySupplier should not be null.");
 
 			_reuseInterval = reuseInterval;
 

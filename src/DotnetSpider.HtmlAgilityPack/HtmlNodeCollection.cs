@@ -74,26 +74,20 @@ namespace DotnetSpider.HtmlAgilityPack
         /// <summary>
         /// Gets the number of elements actually contained in the list.
         /// </summary>
-        public int Count
-        {
-            get { return _items.Count; }
-        }
+        public int Count => _items.Count;
 
         /// <summary>
         /// Is collection read only
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Gets the node at the specified index.
         /// </summary>
         public HtmlNode this[int index]
         {
-            get { return _items[index]; }
-            set { _items[index] = value; }
+            get => _items[index];
+            set => _items[index] = value;
         }
 
         /// <summary>

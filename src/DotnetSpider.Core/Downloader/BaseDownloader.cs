@@ -12,7 +12,7 @@ namespace DotnetSpider.Core.Downloader
 
 		protected string DownloadFolder { get; set; }
 
-		public BaseDownloader()
+		protected BaseDownloader()
 		{
 #if !NET_CORE
 			DownloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");

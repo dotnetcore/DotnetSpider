@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Model.Formatter;
 using Newtonsoft.Json.Linq;
-using System.Linq;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Extension.Scheduler;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Pipeline;
-using System;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
-using DotnetSpider.Core.Infrastructure;
+
 #if !NET_CORE
 using DotnetSpider.Extension.Downloader.WebDriver;
+using DotnetSpider.Core.Infrastructure;
 #endif
 
 namespace DotnetSpider.Extension.Configuration
@@ -56,10 +54,6 @@ namespace DotnetSpider.Extension.Configuration
 					{
 						return jobject.ToObject<RedisScheduler>();
 					}
-				default:
-					{
-						break;
-					}
 			}
 
 			throw new SpiderException("Can't convert Scheduler: " + jobject);
@@ -93,13 +87,13 @@ namespace DotnetSpider.Extension.Configuration
 					case "SqlServer":
 						{
 							var checkIfSaveBeforeUpdate = pipeline.SelectToken("$.checkIfSaveBeforeUpdate");
-							tmp = new SqlServerEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString(), checkIfSaveBeforeUpdate == null ? false : checkIfSaveBeforeUpdate.ToObject<bool>());
+							tmp = new SqlServerEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString(), checkIfSaveBeforeUpdate?.ToObject<bool>() ?? false);
 							break;
 						}
 					case "MySql":
 						{
 							var checkIfSaveBeforeUpdate = pipeline.SelectToken("$.checkIfSaveBeforeUpdate");
-							tmp = new MySqlEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString(), checkIfSaveBeforeUpdate == null ? false : checkIfSaveBeforeUpdate.ToObject<bool>());
+							tmp = new MySqlEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString(), checkIfSaveBeforeUpdate?.ToObject<bool>() ?? false);
 							break;
 						}
 					case "MySqlFile":
@@ -172,9 +166,9 @@ namespace DotnetSpider.Extension.Configuration
 				SkipWhenResultIsEmpty = SkipWhenResultIsEmpty,
 				Scheduler = GetScheduler(Scheduler),
 				ThreadNum = ThreadNum,
-				UserId = UserId
+				UserId = UserId,
+				Entities = Entities
 			};
-			context.Entities = Entities;
 			context.AddPipelines(GetPipepines(Pipelines));
 			context.RedisConnectString = RedisConnectString;
 			ConnectString = ConnectString;

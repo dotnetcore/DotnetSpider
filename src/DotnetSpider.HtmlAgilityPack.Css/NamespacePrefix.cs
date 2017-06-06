@@ -43,29 +43,26 @@ namespace DotnetSpider.HtmlAgilityPack
         /// document, depending on whether a default namespace is
         /// in effect or not.
         /// </summary>
-        public bool IsNone { get { return Text == null; } }
+        public bool IsNone => Text == null;
 
         /// <summary>
         /// Indicates whether this instance represents a name
         /// from any namespace (including one without one)
         /// in a target document.
         /// </summary>
-        public bool IsAny
-        {
-            get { return !IsNone && Text.Length == 1 && Text[0] == '*'; }
-        }
+        public bool IsAny => !IsNone && Text.Length == 1 && Text[0] == '*';
 
         /// <summary>
         /// Indicates whether this instance represents a name
         /// without a namespace in a target document.
         /// </summary>
-        public bool IsEmpty { get { return !IsNone && Text.Length == 0; } }
+        public bool IsEmpty => !IsNone && Text.Length == 0;
 
         /// <summary>
         /// Indicates whether this instance represents a name from a 
         /// specific namespace or not.
         /// </summary>
-        public bool IsSpecific { get {return !IsNone && !IsAny; } }
+        public bool IsSpecific => !IsNone && !IsAny;
 
         /// <summary>
         /// Indicates whether this instance and a specified object are equal.

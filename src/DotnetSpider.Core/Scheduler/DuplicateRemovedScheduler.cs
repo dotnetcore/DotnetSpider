@@ -1,7 +1,6 @@
 using DotnetSpider.Core.Scheduler.Component;
 using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure;
-using System;
 
 namespace DotnetSpider.Core.Scheduler
 {
@@ -45,7 +44,7 @@ namespace DotnetSpider.Core.Scheduler
 		}
 
 		/// <summary>
-		/// ÓÃÓÚÈç¹ûURLÖ´ĞĞÊ§°Ü, ÖØĞÂÌí¼Ó»ØTargetUrlsÊ±ÒòHash¶ø²»ÄÜÖØĞÂ¼ÓÈë¶ÓÁĞµÄÎÊÌâ
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½URLÖ´ï¿½ï¿½Ê§ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó»ï¿½TargetUrlsÊ±ï¿½ï¿½Hashï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½ï¿½ï¿½ï¿½ï¿½
 		/// </summary>
 		/// <param name="request"></param>
 		/// <returns></returns>

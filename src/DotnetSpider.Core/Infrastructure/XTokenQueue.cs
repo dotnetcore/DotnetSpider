@@ -14,11 +14,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		public XTokenQueue(string data)
 		{
-			if (data == null)
-			{
-				throw new ArgumentException("Object must not be null");
-			}
-			_queue = data;
+			_queue = data ?? throw new ArgumentException("Object must not be null");
 		}
 
 		public bool IsEmpty => RemainingLength() == 0;

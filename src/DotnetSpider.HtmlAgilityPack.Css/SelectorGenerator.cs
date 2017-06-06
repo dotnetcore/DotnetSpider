@@ -30,7 +30,7 @@ namespace DotnetSpider.HtmlAgilityPack
         }
 
         public Selector<TElement> Selector { get; private set; }
-        object ISelectorGenerator.Selector { get { return Selector; } }
+        object ISelectorGenerator.Selector => Selector;
 
         public IElementOps<TElement> Ops { get; private set; }
 

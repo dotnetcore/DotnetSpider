@@ -3,9 +3,6 @@ using System.IO;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using System;
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -36,11 +33,6 @@ namespace DotnetSpider.Extension.Pipeline
 					File.AppendAllText(fileInfo.Name, entry.ToString());
 				}
 			}
-		}
-
-		public override void Dispose()
-		{
-			base.Dispose();
 		}
 	}
 }

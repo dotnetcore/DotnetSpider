@@ -29,8 +29,8 @@ namespace DotnetSpider.HtmlAgilityPack
         /// </summary>
         public override string InnerHtml
         {
-            get { return OuterHtml; }
-            set { _text = value; }
+            get => OuterHtml;
+            set => _text = value;
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace DotnetSpider.HtmlAgilityPack
                 }
                 return _text;
             }
-            set { _text = value; }
+            set => _text = value;
         }
 
         #endregion

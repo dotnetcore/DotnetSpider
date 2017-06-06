@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
-using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json;
@@ -47,8 +46,7 @@ namespace DotnetSpider.Extension.Pipeline
 				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
-			EntityDbMetadata dbMetadata = new EntityDbMetadata();
-			dbMetadata.Table = metadata.Table;
+			EntityDbMetadata dbMetadata = new EntityDbMetadata {Table = metadata.Table};
 			foreach (var f in metadata.Fields)
 			{
 				var column = f;
@@ -94,7 +92,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				foreach (var column in dbMetadata.Table.UpdateColumns)
 				{
-					if (!dbMetadata.Columns.Any(c => c.Name == column))
+					if (dbMetadata.Columns.All(c => c.Name != column))
 					{
 						throw new SpiderException("Columns set as update is not a property of your entity.");
 					}
@@ -157,7 +155,7 @@ namespace DotnetSpider.Extension.Pipeline
 						{
 							throw new SpiderException("Columns set as unique is not a property of your entity.");
 						}
-						if (column.DataType == DataType.TEXT && (column.Length <= 0 || column.Length > 256))
+						if (column.DataType == DataType.Text && (column.Length <= 0 || column.Length > 256))
 						{
 							throw new SpiderException("Column length of unique should not large than 256.");
 						}
@@ -218,7 +216,7 @@ namespace DotnetSpider.Extension.Pipeline
 						var command = conn.CreateCommand();
 						command.CommandText = GetIfSchemaExistsSql(metadata, conn.ServerVersion);
 
-						if (System.Convert.ToInt16(command.ExecuteScalar()) == 0)
+						if (Convert.ToInt16(command.ExecuteScalar()) == 0)
 						{
 							command.CommandText = GetCreateSchemaSql(metadata, conn.ServerVersion);
 							command.CommandType = CommandType.Text;
@@ -284,7 +282,7 @@ namespace DotnetSpider.Extension.Pipeline
 									List<DbParameter> selectParameters = new List<DbParameter>();
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@__Id", data.SelectToken("__Id")?.Value<string>());
+										var primaryParameter = CreateDbParameter("@__Id", data.SelectToken("__Id")?.Value<string>());
 										primaryParameter.DbType = DbType.String;
 										selectParameters.Add(primaryParameter);
 									}

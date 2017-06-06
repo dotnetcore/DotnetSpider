@@ -2,12 +2,9 @@
 using System.IO;
 using System.Text;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json.Linq;
 using System;
-using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {

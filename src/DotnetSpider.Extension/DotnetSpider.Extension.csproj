@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
     <Version>1.1.0.0</Version>
@@ -9,30 +8,25 @@
     <PackageId>DotnetSpider2.Extension</PackageId>
     <Product>DotnetSpider</Product>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;NETSTANDARD1_6;NET_CORE;</DefineConstants>
     <OutputPath>C:\solutions\DotnetSpider\output\</OutputPath>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="packages.config" />
   </ItemGroup>
-
   <ItemGroup>
+    <PackageReference Include="CassandraCSharpDriver" Version="3.3.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.3" />
     <PackageReference Include="MySql.Data" Version="7.0.7-m61" />
     <PackageReference Include="StackExchange.Redis" Version="1.2.3" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
     <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj" />
     <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack\DotnetSpider.HtmlAgilityPack.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Redial\" />
   </ItemGroup>
-
 </Project>

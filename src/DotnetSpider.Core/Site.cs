@@ -21,7 +21,7 @@ namespace DotnetSpider.Core
 		public ContentType ContentType { get; set; } = ContentType.Html;
 		public bool RemoveOutboundLinks { get; set; }
 		/// <summary>
-		/// ²É¼¯Ä¿±êÓòÃûµÄÕıÔò
+		/// é‡‡é›†ç›®æ ‡åŸŸåçš„æ­£åˆ™
 		/// </summary>
 		public string[] Domains { get; set; }
 		public Cookies Cookies { get; set; } = new Cookies();
@@ -54,10 +54,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public string EncodingName
 		{
-			get
-			{
-				return _encodingName;
-			}
+			get => _encodingName;
 			set
 			{
 				if (_encodingName != value)
@@ -186,7 +183,7 @@ namespace DotnetSpider.Core
 		{
 			return "Site{" +
 					", userAgent='" + UserAgent + '\'' +
-					", cookies=" + Cookies.ToString() +
+					", cookies=" + Cookies +
 					", charset='" + Encoding + '\'' +
 					", startRequests=" + StartRequests +
 					", cycleRetryTimes=" + CycleRetryTimes +
@@ -209,10 +206,7 @@ namespace DotnetSpider.Core
 
 		public string CookiesStringPart
 		{
-			set
-			{
-				Cookies.StringPart = value;
-			}
+			set => Cookies.StringPart = value;
 		}
 
 		public void SetCookies(Dictionary<string, string> cookies)

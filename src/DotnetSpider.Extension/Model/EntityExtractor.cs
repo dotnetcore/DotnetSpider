@@ -15,22 +15,22 @@ namespace DotnetSpider.Extension.Model
 		public Entity EntityMetadata { get; }
 		public DataHandler DataHandler { get; set; }
 		public string Name { get; }
-		protected readonly List<SharedValueSelector> _globalValues;
+		protected readonly List<SharedValueSelector> GlobalValues;
 
 		public EntityExtractor(string name, List<SharedValueSelector> globalValues, Entity entityMetadata)
 		{
 			EntityMetadata = entityMetadata;
 			Name = name;
 			DataHandler = entityMetadata.DataHandler;
-			_globalValues = globalValues;
+			GlobalValues = globalValues;
 		}
 
 		public virtual List<JObject> Extract(Page page)
 		{
 			List<JObject> result = new List<JObject>();
-			if (_globalValues != null && _globalValues.Count > 0)
+			if (GlobalValues != null && GlobalValues.Count > 0)
 			{
-				foreach (var enviromentValue in _globalValues)
+				foreach (var enviromentValue in GlobalValues)
 				{
 					string name = enviromentValue.Name;
 					var value = page.Selectable.Select(SelectorUtil.Parse(enviromentValue)).GetValue();
@@ -55,7 +55,7 @@ namespace DotnetSpider.Extension.Model
 					int index = 0;
 					foreach (var item in list)
 					{
-						JObject obj = ExtractSingle(page, item, index);
+						var obj = ExtractSingle(page, item, index);
 						if (obj != null)
 						{
 							result.Add(obj);
@@ -71,14 +71,7 @@ namespace DotnetSpider.Extension.Model
 				if (select != null)
 				{
 					var singleResult = ExtractSingle(page, select, 0);
-					if (singleResult != null)
-					{
-						result = new List<JObject> { singleResult };
-					}
-					else
-					{
-						result = null;
-					}
+					result = singleResult != null ? new List<JObject> { singleResult } : null;
 				}
 				else
 				{
@@ -146,6 +139,10 @@ namespace DotnetSpider.Extension.Model
 
 		private dynamic ExtractField(ISelectable item, Page page, Field field, int index)
 		{
+			if (field == null)
+			{
+				return null;
+			}
 			ISelector selector = SelectorUtil.Parse(field.Selector);
 			if (selector == null)
 			{
@@ -157,12 +154,9 @@ namespace DotnetSpider.Extension.Model
 			{
 				var enviromentSelector = selector as EnviromentSelector;
 				tmpValue = GetEnviromentValue(enviromentSelector.Field, page, index);
-				if (field != null)
+				foreach (var formatter in field.Formatters)
 				{
-					foreach (var formatter in field.Formatters)
-					{
-						tmpValue = formatter.Formate(tmpValue);
-					}
+					tmpValue = formatter.Formate(tmpValue);
 				}
 				return tmpValue;
 			}

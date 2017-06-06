@@ -5,22 +5,16 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public class Cache
 	{
-		private ConcurrentDictionary<string, dynamic> _cache = new ConcurrentDictionary<string, dynamic>();
+		private readonly ConcurrentDictionary<string, dynamic> _cache = new ConcurrentDictionary<string, dynamic>();
 
 		private Cache()
 		{
 
 		}
 
-		private static readonly Lazy<Cache> _instance = new Lazy<Cache>(() =>
-		{
-			return new Cache();
-		});
+		private static readonly Lazy<Cache> MyInstance = new Lazy<Cache>(() => new Cache());
 
-		public static Cache Instance
-		{
-			get { return _instance.Value; }
-		}
+		public static Cache Instance => MyInstance.Value;
 
 		public void Set(string key, dynamic data)
 		{
@@ -30,14 +24,7 @@ namespace DotnetSpider.Core.Infrastructure
 		public dynamic Get(string key)
 		{
 			dynamic result;
-			if (_cache.TryGetValue(key, out result))
-			{
-				return result;
-			}
-			else
-			{
-				return null;
-			}
+			return _cache.TryGetValue(key, out result) ? result : null;
 		}
 	}
 }

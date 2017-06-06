@@ -63,14 +63,8 @@ namespace DotnetSpider.HtmlAgilityPack
         /// </summary>
         public static int CacheSize
         {
-            get
-            {
-                return _compilerCache.Capacity;
-            }
-            set
-            {
-                _compilerCache.Capacity = value;
-            }
+            get => _compilerCache.Capacity;
+            set => _compilerCache.Capacity = value;
         }
 
         /// <summary>

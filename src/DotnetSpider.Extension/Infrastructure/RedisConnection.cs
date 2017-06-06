@@ -2,19 +2,19 @@
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public class RedisConnection
-	{
-		public string ConnectString { get; private set; }
-		public IDatabase Database { get; private set; }
-		public ISubscriber Subscriber { get; private set; }
+    public class RedisConnection
+    {
+        public string ConnectString { get; }
+        public IDatabase Database { get; }
+        public ISubscriber Subscriber { get; }
 
-		public RedisConnection(string connectString)
-		{
-			ConnectString = connectString;
+        public RedisConnection(string connectString)
+        {
+            ConnectString = connectString;
 
-			var _connection = ConnectionMultiplexer.Connect(connectString);
-			Database = _connection.GetDatabase(0);
-			Subscriber = _connection.GetSubscriber();
-		}
-	}
+            var connection = ConnectionMultiplexer.Connect(connectString);
+            Database = connection.GetDatabase(0);
+            Subscriber = connection.GetSubscriber();
+        }
+    }
 }

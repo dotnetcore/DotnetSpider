@@ -1,8 +1,6 @@
 ﻿using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.ORM;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace DotnetSpider.Extension.Pipeline
 {

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Extension.Model;
 
@@ -187,27 +186,27 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			switch (field.DataType)
 			{
-				case DataType.BIGINT:
+				case DataType.Bigint:
 					{
 						return "bigint";
 					}
-				case DataType.INT:
+				case DataType.Int:
 					{
 						return "int";
 					}
-				case DataType.DOUBLE:
+				case DataType.Double:
 					{
 						return "double";
 					}
-				case DataType.FLOAT:
+				case DataType.Float:
 					{
 						return "float";
 					}
-				case DataType.TEXT:
+				case DataType.Text:
 					{
 						return (field.Length <= 0) ? "TEXT" : $"VARCHAR({field.Length})";
 					}
-				case DataType.TIME:
+				case DataType.Time:
 					{
 						return "timestamp null";
 					}

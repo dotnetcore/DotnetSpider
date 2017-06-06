@@ -6,16 +6,13 @@ namespace DotnetSpider.Core.Infrastructure
 	public class NLogLogger : ILogger
 	{
 		private readonly NLog.ILogger _logger;
-		private static readonly Lazy<NLog.ILogger> builder = new Lazy<NLog.ILogger>(() =>
-		{
-			var _logger = LogManager.GetCurrentClassLogger();
-			return _logger;
-		});
+		
+		private static readonly Lazy<NLog.ILogger> Builder = new Lazy<NLog.ILogger>(() => LogManager.GetCurrentClassLogger());
 
 		public NLogLogger()
 		{
 			NLogExtensions.Init();
-			_logger = LogManager.GetCurrentClassLogger();
+			_logger = Builder.Value;
 		}
 
 		public void Log(IIdentity identity, string message, LogLevel level, Exception e = null)

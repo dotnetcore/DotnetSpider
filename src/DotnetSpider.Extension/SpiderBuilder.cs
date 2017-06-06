@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension
 			}
 			set
 			{
-				if (_userId != value)
+				if (!string.Equals(_userId, value, StringComparison.Ordinal))
 				{
 					_userId = value;
 				}
@@ -68,7 +68,7 @@ namespace DotnetSpider.Extension
 			}
 			set
 			{
-				if (_batch != value)
+				if (!string.Equals(_batch, value, StringComparison.Ordinal))
 				{
 					_batch = value;
 				}
@@ -87,7 +87,7 @@ namespace DotnetSpider.Extension
 			}
 			set
 			{
-				if (_name != value)
+				if (!string.Equals(_name, value, StringComparison.Ordinal))
 				{
 					_name = value;
 				}
@@ -123,7 +123,7 @@ namespace DotnetSpider.Extension
 					var command = conn.CreateCommand();
 					command.CommandType = CommandType.Text;
 
-					command.CommandText = $"CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;";
+					command.CommandText = "CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;";
 					command.ExecuteNonQuery();
 				}
 			}
@@ -139,7 +139,7 @@ namespace DotnetSpider.Extension
 					var command = conn.CreateCommand();
 					command.CommandType = CommandType.Text;
 
-					command.CommandText = $"CREATE TABLE IF NOT EXISTS `dotnetspider`.`tasks` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `name` varchar(120) NOT NULL, `userId` varchar(120) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `userId_name_unique` (`userId`,`name`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
+					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`tasks` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `name` varchar(120) NOT NULL, `userId` varchar(120) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `userId_name_unique` (`userId`,`name`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
 					command.ExecuteNonQuery();
 
 					command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`tasks` (`name`,`userId`,`cdate`) values ('{Name}','{UserId}','{DateTime.Now}');";
@@ -158,7 +158,7 @@ namespace DotnetSpider.Extension
 					var command = conn.CreateCommand();
 					command.CommandType = CommandType.Text;
 
-					command.CommandText = $"CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_batches` (`id` bigint AUTO_INCREMENT, `taskId` bigint(20) NOT NULL, `batch` timestamp NOT NULL, `code` varchar(32) NOT NULL, PRIMARY KEY (`id`), INDEX `taskId_index` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
+					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_batches` (`id` bigint AUTO_INCREMENT, `taskId` bigint(20) NOT NULL, `batch` timestamp NOT NULL, `code` varchar(32) NOT NULL, PRIMARY KEY (`id`), INDEX `taskId_index` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
 					command.ExecuteNonQuery();
 
 					command.CommandText = $"SELECT id FROM `dotnetspider`.`tasks` WHERE `userId` = '{UserId}' and `name` = '{Name}';";
