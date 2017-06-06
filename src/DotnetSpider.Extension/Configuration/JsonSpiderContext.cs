@@ -8,6 +8,8 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extension.Infrastructure;
+using System;
 
 #if !NET_CORE
 using DotnetSpider.Extension.Downloader.WebDriver;
@@ -18,6 +20,10 @@ namespace DotnetSpider.Extension.Configuration
 {
 	public class JsonSpiderContext : EntitySpiderBuilder
 	{
+		public JsonSpiderContext() : base(null, "NULL", Infrastructure.Batch.Now)
+		{
+		}
+
 		public string LogAndStatusConnectString { get; set; }
 		public string RedisConnectString { get; set; }
 		public Site Site { get; set; }
@@ -32,6 +38,42 @@ namespace DotnetSpider.Extension.Configuration
 		public bool SpawnUrl { get; set; } = true;
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public bool RetryWhenResultIsEmpty { get; set; } = false;
+
+		public string UserId
+		{
+			get
+			{
+				return _userId;
+			}
+			set
+			{
+				_userId = value;
+			}
+		}
+
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+			set
+			{
+				_name = value;
+			}
+		}
+
+		public string Batch
+		{
+			get
+			{
+				return _batch;
+			}
+			set
+			{
+				_batch = value;
+			}
+		}
 
 		public List<Entity> Entities { get; set; }
 
@@ -169,6 +211,7 @@ namespace DotnetSpider.Extension.Configuration
 				UserId = UserId,
 				Entities = Entities
 			};
+			SetInfo(UserId, Name, (Batch)Enum.Parse(typeof(Batch), Batch));
 			context.AddPipelines(GetPipepines(Pipelines));
 			context.RedisConnectString = RedisConnectString;
 			ConnectString = ConnectString;

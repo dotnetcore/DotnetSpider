@@ -9,14 +9,18 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class JdShopDetailSpider : EntitySpiderBuilder
 	{
+		public JdShopDetailSpider() : base("", "JdShopDetailSpider", Batch.Now)
+		{
+		}
+
 		protected override EntitySpider GetEntitySpider()
 		{
-			Name = "JD Shop details " + DateTimeUtils.RunIdOfMonday;
 			var context = new EntitySpider(new Site())
 			{
 				TaskGroup = "JD SKU Weekly",

@@ -1,11 +1,4 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension;
-using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.IO;
-using System.Text;
+﻿using System;
 
 namespace DotnetSpider.Sample
 {
@@ -14,6 +7,8 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
+			Spider1 s = new Spider1();
+			s.Run();
 			//ConfigurableSpider.Run();
 
 			//// Custmize processor and pipeline 完全自定义页面解析和数据管道

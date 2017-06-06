@@ -5,11 +5,16 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class RegexTestEntitySpider : EntitySpiderBuilder
 	{
+		public RegexTestEntitySpider() : base("", "RegexTest", Batch.Now)
+		{
+		}
+
 		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());

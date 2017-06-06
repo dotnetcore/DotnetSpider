@@ -10,11 +10,16 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader.WebDriver;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class JdSkuWebDriverSample : EntitySpiderBuilder
 	{
+		public JdSkuWebDriverSample() : base("", "JdSkuWebDriver", Batch.Now)
+		{
+		}
+
 		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());

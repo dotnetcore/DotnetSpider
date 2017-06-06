@@ -8,11 +8,16 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Downloader;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class JdSkuSampleSpider : EntitySpiderBuilder
 	{
+		public JdSkuSampleSpider() : base("", "JdSkuSample", Batch.Now)
+		{
+		}
+
 		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site
@@ -72,6 +77,10 @@ namespace DotnetSpider.Sample
 
 	public class JdSkuSampleSpider2 : EntitySpiderBuilder
 	{
+		public JdSkuSampleSpider2() : base("", "JdSkuSample2", Batch.Now)
+		{
+		}
+
 		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());

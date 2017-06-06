@@ -7,11 +7,16 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class Hao360EntitySpiderInfoBuble : EntitySpiderBuilder
 	{
+		public Hao360EntitySpiderInfoBuble() : base("", "Hao360", Batch.Now)
+		{
+		}
+
 		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site())

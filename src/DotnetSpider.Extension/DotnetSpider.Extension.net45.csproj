@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Configuration\JsonSpiderContext.cs" />
+    <Compile Include="CustomSpider.cs" />
     <Compile Include="DataSource.cs" />
     <Compile Include="Downloader\CookieInjector.cs" />
     <Compile Include="Downloader\DownloadCompleteHandler.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Downloader\WebDriver\WebDriverUtil.cs" />
     <Compile Include="EntitySpider.cs" />
     <Compile Include="ILinkSpiderContext.cs" />
+    <Compile Include="Infrastructure\Batch.cs" />
     <Compile Include="Infrastructure\DataSourceUtil.cs" />
     <Compile Include="Infrastructure\DoubleKeyDictionary.cs" />
     <Compile Include="Infrastructure\FiddlerClient.cs" />
@@ -136,7 +138,7 @@
     <Compile Include="Infrastructure\VpnUtils.cs" />
     <Compile Include="Scheduler\RedisScheduler.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="SpiderBuilder.cs" />
+    <Compile Include="EntitySpiderBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.net45.csproj">

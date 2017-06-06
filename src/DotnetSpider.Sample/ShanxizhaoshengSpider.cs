@@ -6,11 +6,16 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class ShanxizhaoshengSpider : EntitySpiderBuilder
 	{
+		public ShanxizhaoshengSpider() : base("", "ShanxizhaoshengSpider", Batch.Now)
+		{
+		}
+
 		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());

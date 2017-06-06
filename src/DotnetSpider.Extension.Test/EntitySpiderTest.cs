@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -141,6 +142,10 @@ namespace DotnetSpider.Extension.Test
 
 		public class CasSpider : EntitySpiderBuilder
 		{
+			public CasSpider() : base("cas", "cas", Batch.Now)
+			{
+			}
+
 			protected override EntitySpider GetEntitySpider()
 			{
 				EntitySpider context = new EntitySpider(new Site());
@@ -161,9 +166,6 @@ namespace DotnetSpider.Extension.Test
 				context.AddPipeline(new CollectEntityPipeline());
 				context.AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 				context.AddEntityType(typeof(ArticleSummary));
-
-				Name = "qidian";
-				Batch = DateTime.Now.ToString("yyyy_MM_dd_HHmmss");
 				return context;
 			}
 

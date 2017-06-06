@@ -1,6 +1,6 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension;
+using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
@@ -11,6 +11,10 @@ namespace DotnetSpider.Sample
 {
 	public class JdCategorySpider : EntitySpiderBuilder
 	{
+		public JdCategorySpider() : base("", "京东类目 Daliy Tracking", Batch.Now)
+		{
+		}
+
 		[Table("jd", "jd_category")]
 		[EntitySelector(Expression = ".//div[@class='items']//a")]
 		public class Category : SpiderEntity
@@ -25,7 +29,6 @@ namespace DotnetSpider.Sample
 		protected override EntitySpider GetEntitySpider()
 		{
 			var entitySpider = new EntitySpider(new Site());
-			Name = "京东类目 Daliy Tracking";
 
 			entitySpider.AddStartUrl("http://www.jd.com/allSort.aspx");
 			entitySpider.AddEntityType(typeof(Category));

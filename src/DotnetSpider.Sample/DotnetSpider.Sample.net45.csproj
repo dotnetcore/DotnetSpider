@@ -51,6 +51,7 @@
     <Compile Include="RegexTestSpider.cs" />
     <Compile Include="ShanxizhaoshengSpider.cs" />
     <Compile Include="Situoli.cs" />
+    <Compile Include="Spider1.cs" />
     <Compile Include="TestSpider.cs" />
   </ItemGroup>
   <ItemGroup>
