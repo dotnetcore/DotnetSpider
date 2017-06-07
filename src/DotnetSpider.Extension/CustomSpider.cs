@@ -12,14 +12,15 @@ using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension
 {
-	public abstract class CustomSpider : IRunable
+	public abstract class CustomSpider : IRunable, INamed
 	{
-		private string _userId;
 		private string _name;
 		private string _batchStr;
 		private bool _exited;
 
 		private Task _statusReporter;
+
+		public string Name => _name;
 
 		public string ConnectString { get; set; }
 
@@ -27,13 +28,7 @@ namespace DotnetSpider.Extension
 
 		protected CustomSpider(string userId, string name, Batch batch)
 		{
-			_userId = userId;
 			_name = name;
-
-			if (string.IsNullOrEmpty(_userId))
-			{
-				_userId = "DotnetSpider";
-			}
 
 			if (string.IsNullOrEmpty(_name) || _name.Length > 120)
 			{
@@ -74,12 +69,12 @@ namespace DotnetSpider.Extension
 				ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.LogAndStatusConnectString);
 			}
 
-			PrepareDb();
-			InsertTask();
-			InsertBatch();
-
 			if (!string.IsNullOrEmpty(ConnectString))
 			{
+				PrepareDb();
+				InsertTask();
+				InsertBatch();
+
 				using (IDbConnection conn = new MySqlConnection(ConnectString))
 				{
 					conn.Open();
@@ -93,24 +88,24 @@ namespace DotnetSpider.Extension
 					command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message) values ('{Identity}', '{NodeId.Id}', '{DateTime.Now}', 'Info', '{message}');";
 					command.ExecuteNonQuery();
 				}
-			}
 
-			_statusReporter = Task.Factory.StartNew(() =>
-			{
-				using (IDbConnection conn = new MySqlConnection(ConnectString))
+				_statusReporter = Task.Factory.StartNew(() =>
 				{
-					conn.Open();
-					var command = conn.CreateCommand();
-					command.CommandType = CommandType.Text;
-
-					while (!_exited)
+					using (IDbConnection conn = new MySqlConnection(ConnectString))
 					{
-						command.CommandText = $"update dotnetspider.status set `logged`='{DateTime.Now}' WHERE identity='{Identity}';";
-						command.ExecuteNonQuery();
-						Thread.Sleep(5000);
+						conn.Open();
+						var command = conn.CreateCommand();
+						command.CommandType = CommandType.Text;
+
+						while (!_exited)
+						{
+							command.CommandText = $"update dotnetspider.status set `logged`='{DateTime.Now}' WHERE identity='{Identity}';";
+							command.ExecuteNonQuery();
+							Thread.Sleep(5000);
+						}
 					}
-				}
-			});
+				});
+			}
 
 			try
 			{
@@ -167,74 +162,65 @@ namespace DotnetSpider.Extension
 
 		protected void PrepareDb()
 		{
-			if (!string.IsNullOrEmpty(ConnectString))
+			using (IDbConnection conn = new MySqlConnection(ConnectString))
 			{
-				using (IDbConnection conn = new MySqlConnection(ConnectString))
-				{
-					conn.Open();
-					var command = conn.CreateCommand();
-					command.CommandType = CommandType.Text;
+				conn.Open();
+				var command = conn.CreateCommand();
+				command.CommandType = CommandType.Text;
 
-					command.CommandText = "CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;";
-					command.ExecuteNonQuery();
+				command.CommandText = "CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;";
+				command.ExecuteNonQuery();
 
-					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`identity` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT NULL,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20),PRIMARY KEY(`identity`)) ENGINE = InnoDB DEFAULT CHARSET = utf8;";
-					command.ExecuteNonQuery();
+				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`identity` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT NULL,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20),PRIMARY KEY(`identity`)) ENGINE = InnoDB DEFAULT CHARSET = utf8;";
+				command.ExecuteNonQuery();
 
-					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`log` (`identity` varchar(120) NOT NULL, `node` varchar(120) NULL, `logged` timestamp NULL DEFAULT NULL,`level` varchar(20) DEFAULT NULL, `message` text, `callSite` text, `exception` text, `id` bigint(20) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`), KEY `index01` (`identity`)) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;";
-					command.ExecuteNonQuery();
+				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`log` (`identity` varchar(120) NOT NULL, `node` varchar(120) NULL, `logged` timestamp NULL DEFAULT NULL,`level` varchar(20) DEFAULT NULL, `message` text, `callSite` text, `exception` text, `id` bigint(20) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`), KEY `index01` (`identity`)) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;";
+				command.ExecuteNonQuery();
 
-				}
 			}
 		}
 
 		private void InsertTask()
 		{
-			if (!string.IsNullOrEmpty(ConnectString))
+			using (IDbConnection conn = new MySqlConnection(ConnectString))
 			{
-				using (IDbConnection conn = new MySqlConnection(ConnectString))
-				{
-					conn.Open();
-					var command = conn.CreateCommand();
-					command.CommandType = CommandType.Text;
+				conn.Open();
+				var command = conn.CreateCommand();
+				command.CommandType = CommandType.Text;
 
-					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`tasks` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `name` varchar(120) NOT NULL, `userId` varchar(120) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `userId_name_unique` (`userId`,`name`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
-					command.ExecuteNonQuery();
+				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`tasks` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `name` varchar(120) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `name_unique` (`name`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
+				command.ExecuteNonQuery();
 
-					command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`tasks` (`name`,`userId`,`cdate`) values ('{_name}','{_userId}','{DateTime.Now}');";
-					command.ExecuteNonQuery();
-				}
+				command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`tasks` (`name`,`cdate`) values ('{_name}','{DateTime.Now}');";
+				command.ExecuteNonQuery();
 			}
 		}
 
 		private void InsertBatch()
 		{
-			if (!string.IsNullOrEmpty(ConnectString))
+			using (IDbConnection conn = new MySqlConnection(ConnectString))
 			{
-				using (IDbConnection conn = new MySqlConnection(ConnectString))
-				{
-					conn.Open();
-					var command = conn.CreateCommand();
-					command.CommandType = CommandType.Text;
+				conn.Open();
+				var command = conn.CreateCommand();
+				command.CommandType = CommandType.Text;
 
-					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_batches` (`id` bigint AUTO_INCREMENT, `taskId` bigint(20) NOT NULL, `batch` timestamp NOT NULL, `code` varchar(32) NOT NULL, PRIMARY KEY (`id`), INDEX `taskId_index` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
+				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_batches` (`id` bigint AUTO_INCREMENT, `taskId` bigint(20) NOT NULL, `batch` timestamp NOT NULL, `code` varchar(32) NOT NULL, PRIMARY KEY (`id`), INDEX `taskId_index` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
+				command.ExecuteNonQuery();
+
+				command.CommandText = $"SELECT id FROM `dotnetspider`.`tasks` WHERE `name` = '{_name}';";
+				var result = command.ExecuteScalar();
+				if (result != null)
+				{
+					var taskId = Convert.ToInt32(result);
+					var identity = Encrypt.Md5Encrypt($"{_name}{_batchStr}");
+					command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_batches` (`taskId`,`batch`, `code`) values ('{taskId}','{DateTime.Now}','{identity}');";
 					command.ExecuteNonQuery();
 
-					command.CommandText = $"SELECT id FROM `dotnetspider`.`tasks` WHERE `userId` = '{_userId}' and `name` = '{_name}';";
-					var result = command.ExecuteScalar();
-					if (result != null)
-					{
-						var taskId = Convert.ToInt32(result);
-						var identity = Encrypt.Md5Encrypt($"{_name}{_batchStr}");
-						command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_batches` (`taskId`,`batch`, `code`) values ('{taskId}','{DateTime.Now}','{identity}');";
-						command.ExecuteNonQuery();
-
-						Identity = identity;
-					}
-					else
-					{
-						throw new ArgumentException("Task info is missing.");
-					}
+					Identity = identity;
+				}
+				else
+				{
+					throw new ArgumentException("Task info is missing.");
 				}
 			}
 		}

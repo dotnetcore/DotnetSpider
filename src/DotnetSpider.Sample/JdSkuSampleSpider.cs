@@ -14,7 +14,7 @@ namespace DotnetSpider.Sample
 {
 	public class JdSkuSampleSpider : EntitySpiderBuilder
 	{
-		public JdSkuSampleSpider() : base("", "JdSkuSample", Batch.Now)
+		public JdSkuSampleSpider() : base("JdSkuSample", Batch.Now)
 		{
 		}
 
@@ -77,7 +77,7 @@ namespace DotnetSpider.Sample
 
 	public class JdSkuSampleSpider2 : EntitySpiderBuilder
 	{
-		public JdSkuSampleSpider2() : base("", "JdSkuSample2", Batch.Now)
+		public JdSkuSampleSpider2() : base("JdSkuSample2", Batch.Now)
 		{
 		}
 

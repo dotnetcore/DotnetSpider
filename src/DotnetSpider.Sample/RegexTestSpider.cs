@@ -11,7 +11,7 @@ namespace DotnetSpider.Sample
 {
 	public class RegexTestEntitySpider : EntitySpiderBuilder
 	{
-		public RegexTestEntitySpider() : base("", "RegexTest", Batch.Now)
+		public RegexTestEntitySpider() : base("RegexTest", Batch.Now)
 		{
 		}
 

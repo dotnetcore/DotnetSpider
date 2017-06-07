@@ -14,7 +14,7 @@ namespace DotnetSpider.Sample
 {
 	public class JdSpider : EntitySpiderBuilder
 	{
-		public JdSpider() : base("", "JD", Batch.Now)
+		public JdSpider() : base("JD", Batch.Now)
 		{
 		}
 

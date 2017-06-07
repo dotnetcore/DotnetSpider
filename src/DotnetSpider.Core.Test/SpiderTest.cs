@@ -20,7 +20,7 @@ namespace DotnetSpider.Core.Test
 	public class SpiderTest
 	{
 		[TestMethod]
-		public void UserIdAndTaskGroupAndIdentityLengthLimit()
+		public void IdentityLengthLimit()
 		{
 			try
 			{

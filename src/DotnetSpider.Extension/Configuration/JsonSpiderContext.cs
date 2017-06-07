@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension.Configuration
 {
 	public class JsonSpiderContext : EntitySpiderBuilder
 	{
-		public JsonSpiderContext() : base(null, "NULL", Infrastructure.Batch.Now)
+		public JsonSpiderContext() : base("NULL", Infrastructure.Batch.Now)
 		{
 		}
 
@@ -38,30 +38,6 @@ namespace DotnetSpider.Extension.Configuration
 		public bool SpawnUrl { get; set; } = true;
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public bool RetryWhenResultIsEmpty { get; set; } = false;
-
-		public string UserId
-		{
-			get
-			{
-				return _userId;
-			}
-			set
-			{
-				_userId = value;
-			}
-		}
-
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-			set
-			{
-				_name = value;
-			}
-		}
 
 		public string Batch
 		{
@@ -210,7 +186,7 @@ namespace DotnetSpider.Extension.Configuration
 				ThreadNum = ThreadNum,
 				Entities = Entities
 			};
-			SetInfo(UserId, Name, (Batch)Enum.Parse(typeof(Batch), Batch));
+			SetInfo(Name, (Batch)Enum.Parse(typeof(Batch), Batch));
 			context.AddPipelines(GetPipepines(Pipelines));
 			context.RedisConnectString = RedisConnectString;
 			ConnectString = ConnectString;
