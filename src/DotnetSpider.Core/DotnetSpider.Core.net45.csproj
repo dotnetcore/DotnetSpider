@@ -109,6 +109,7 @@
     <Compile Include="Infrastructure\NetworkCenter.cs" />
     <Compile Include="Infrastructure\NLogExtensions.cs" />
     <Compile Include="Infrastructure\NLogLogger.cs" />
+    <Compile Include="Infrastructure\NodeId.cs" />
     <Compile Include="Infrastructure\PriorityBlockingQueue.cs" />
     <Compile Include="Infrastructure\RegexUtils.cs" />
     <Compile Include="Infrastructure\RetryExecutor.cs" />
