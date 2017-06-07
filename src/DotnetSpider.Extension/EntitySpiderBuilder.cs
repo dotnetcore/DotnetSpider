@@ -17,7 +17,11 @@ namespace DotnetSpider.Extension
 
 		public string Name { get; set; }
 
-		protected EntitySpiderBuilder(string name, Batch batch)
+		public EntitySpiderBuilder(string name) : this(name, Batch.Now)
+		{
+		}
+
+		public EntitySpiderBuilder(string name, Batch batch)
 		{
 			SetInfo(name, batch);
 		}
