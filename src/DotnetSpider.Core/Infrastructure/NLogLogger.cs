@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Infrastructure
 	public class NLogLogger : ILogger
 	{
 		private readonly NLog.ILogger _logger;
-		
+
 		private static readonly Lazy<NLog.ILogger> Builder = new Lazy<NLog.ILogger>(() => LogManager.GetCurrentClassLogger());
 
 		public NLogLogger()
@@ -15,10 +15,11 @@ namespace DotnetSpider.Core.Infrastructure
 			_logger = Builder.Value;
 		}
 
-		public void Log(IIdentity identity, string message, LogLevel level, Exception e = null)
+		public void Log(IIdentity identity, string node, string message, LogLevel level, Exception e = null)
 		{
 			LogEventInfo theEvent = new LogEventInfo(GetNLogLevel(level), _logger.Name, message) { Exception = e };
 			theEvent.Properties["Identity"] = identity == null ? "UNKNOW" : identity.Identity;
+			theEvent.Properties["Node"] = node;
 			_logger.Log(theEvent);
 		}
 

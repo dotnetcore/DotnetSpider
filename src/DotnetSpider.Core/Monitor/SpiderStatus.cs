@@ -10,12 +10,7 @@
 		public long AvgDownloadSpeed { get; set; }
 		public long AvgProcessorSpeed { get; set; }
 		public long AvgPipelineSpeed { get; set; }
-		public string Code { get; set; }
 		public int ThreadNum { get; set; }
 		public string Identity { get; set; }
-		public string Machine { get; set; }
-		public string UserId { get; set; }
-		public string TaskGroup { get; set; }
-		public string Timestamp { get; set; }
 	}
 }

@@ -18,7 +18,6 @@ namespace DotnetSpider.Sample
 		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());
-			context.SetTaskGroup("cnblogs homepage");
 			context.SetIdentity("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddStartUrl("http://www.cnblogs.com");
 			context.AddPipeline(new ConsoleEntityPipeline());

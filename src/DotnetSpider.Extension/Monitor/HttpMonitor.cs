@@ -41,16 +41,11 @@ namespace DotnetSpider.Extension.Monitor
 				{
 					status.Error,
 					status.Left,
-					Status = status.Code,
 					status.Success,
 					Thread = status.ThreadNum,
 					status.Total
 				},
 				Name = status.Identity,
-				status.Machine,
-				status.UserId,
-				status.TaskGroup,
-				status.Timestamp
 			};
 			_postCounter.Inc();
 			var task = _client.PostAsync(_server, new StringContent(JsonConvert.SerializeObject(tmp), Encoding.UTF8, "application/json"));

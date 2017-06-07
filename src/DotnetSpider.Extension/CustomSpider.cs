@@ -86,11 +86,11 @@ namespace DotnetSpider.Extension
 					var command = conn.CreateCommand();
 					command.CommandType = CommandType.Text;
 
-					command.CommandText = $"insert ignore into dotnetspider.status (`identity`, `status`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`, `logged`) values('{Identity}', 'Init', -1, -1, -1, -1, -1, -1, -1, '{DateTime.Now}');";
+					command.CommandText = $"insert ignore into dotnetspider.status (`identity`, `status`,`thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`, `logged`) values('{Identity}', 'Init',-1, -1, -1, -1, -1, -1, -1, -1, '{DateTime.Now}');";
 					command.ExecuteNonQuery();
 
 					var message = $"开始任务: {_name}";
-					command.CommandText = $"insert into dotnetspider.log (identity, logged, level, message) values ('{Identity}', '{DateTime.Now}', 'Info', '{message}');";
+					command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message) values ('{Identity}', '{NodeId.Id}', '{DateTime.Now}', 'Info', '{message}');";
 					command.ExecuteNonQuery();
 				}
 			}
@@ -128,7 +128,7 @@ namespace DotnetSpider.Extension
 						command.CommandType = CommandType.Text;
 
 						var message = $"结束任务: {_name}";
-						command.CommandText = $"insert into dotnetspider.log (identity, logged, level, message) values ('{Identity}', '{DateTime.Now}', 'Info', '{message}');";
+						command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message) values ('{Identity}','{NodeId.Id}', '{DateTime.Now}', 'Info', '{message}');";
 						command.ExecuteNonQuery();
 
 						command.CommandText = $"update dotnetspider.status set `status`='Finished',`logged`='{DateTime.Now}' WHERE identity='{Identity}';";
@@ -147,7 +147,7 @@ namespace DotnetSpider.Extension
 						command.CommandType = CommandType.Text;
 
 						var message = $"退出任务: {_name}";
-						command.CommandText = $"insert into dotnetspider.log (identity, logged, level, message, callsite, exception) values ('{Identity}', '{DateTime.Now}', 'Info', '{message}','{e}','{e.Message}');";
+						command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message, callsite, exception) values ('{Identity}','{NodeId.Id}','{DateTime.Now}', 'Info', '{message}','{e}','{e.Message}');";
 						command.ExecuteNonQuery();
 
 						command.CommandText = $"update dotnetspider.status set `status`='Exited' `logged`='{DateTime.Now}' WHERE identity='{Identity}';";
@@ -178,10 +178,10 @@ namespace DotnetSpider.Extension
 					command.CommandText = "CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;";
 					command.ExecuteNonQuery();
 
-					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`identity` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT NULL,`status` varchar(20) DEFAULT NULL,`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20),PRIMARY KEY(`identity`)) ENGINE = InnoDB DEFAULT CHARSET = utf8;";
+					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`identity` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT NULL,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20),PRIMARY KEY(`identity`)) ENGINE = InnoDB DEFAULT CHARSET = utf8;";
 					command.ExecuteNonQuery();
 
-					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`log` (`identity` varchar(120) NOT NULL, `logged` timestamp NULL DEFAULT NULL,`level` varchar(20) DEFAULT NULL, `message` text, `callSite` text, `exception` text, `id` bigint(20) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`), KEY `index01` (`identity`)) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;";
+					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`log` (`identity` varchar(120) NOT NULL, `node` varchar(120) NULL, `logged` timestamp NULL DEFAULT NULL,`level` varchar(20) DEFAULT NULL, `message` text, `callSite` text, `exception` text, `id` bigint(20) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`), KEY `index01` (`identity`)) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;";
 					command.ExecuteNonQuery();
 
 				}

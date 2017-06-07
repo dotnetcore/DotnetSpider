@@ -15,6 +15,6 @@ namespace DotnetSpider.Core.Infrastructure
 
 	public interface ILogger
 	{
-		void Log(IIdentity spider, string message, LogLevel level, Exception e = null);
+		void Log(IIdentity spider, string node, string message, LogLevel level, Exception e = null);
 	}
 }

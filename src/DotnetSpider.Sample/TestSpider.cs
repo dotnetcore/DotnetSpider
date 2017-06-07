@@ -21,8 +21,6 @@ namespace DotnetSpider.Sample
 		{
 			EntitySpider context = new EntitySpider(new Site())
 			{
-				UserId = "DotnetSpider",
-				TaskGroup = "HaoBrowser",
 				Identity = "HaoBrowser Hao360Spider Buble " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
 				CachedSize = 1,
 				ThreadNum = 1,

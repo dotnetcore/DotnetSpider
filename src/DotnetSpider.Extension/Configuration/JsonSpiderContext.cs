@@ -208,7 +208,6 @@ namespace DotnetSpider.Extension.Configuration
 				SkipWhenResultIsEmpty = SkipWhenResultIsEmpty,
 				Scheduler = GetScheduler(Scheduler),
 				ThreadNum = ThreadNum,
-				UserId = UserId,
 				Entities = Entities
 			};
 			SetInfo(UserId, Name, (Batch)Enum.Parse(typeof(Batch), Batch));

@@ -5,8 +5,6 @@ using DotnetSpider.Extension.Redial.InternetDetector;
 using DotnetSpider.Extension.Redial.Redialer;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Infrastructure;
-#if NET_CORE
-#endif
 
 namespace DotnetSpider.Extension.Redial
 {
