@@ -105,22 +105,6 @@ namespace DotnetSpider.Core
 			return new Spider(site, identify, scheduler, pageProcessors);
 		}
 
-		/// <summary>
-		/// Create a spider with indentify, pageProcessor, scheduler.
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="identify"></param>
-		/// <param name="taskGroup"></param>
-		/// <param name="pageProcessors"></param>
-		/// <param name="scheduler"></param>
-		/// <param name="userid"></param>
-		/// <returns></returns>
-		public static Spider Create(Site site, string identify, string userid, string taskGroup, IScheduler scheduler,
-			params IPageProcessor[] pageProcessors)
-		{
-			return new Spider(site, identify, scheduler, pageProcessors);
-		}
-
 		protected Spider()
 		{
 #if NET_CORE

@@ -26,39 +26,12 @@ namespace DotnetSpider.Core.Test
 			{
 				Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new QueueDuplicateRemovedScheduler(),
+					new QueueDuplicateRemovedScheduler(),
 					new TestPageProcessor());
 			}
 			catch (SpiderException exception)
 			{
 				Assert.AreEqual("Length of Identity should less than 100.", exception.Message);
-			}
-
-			try
-			{
-				Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
-					"abc",
-					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new QueueDuplicateRemovedScheduler(),
-					new TestPageProcessor());
-			}
-			catch (SpiderException exception)
-			{
-				Assert.AreEqual("Length of UserId should less than 100.", exception.Message);
-			}
-
-			try
-			{
-				Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
-					"abcd",
-					"abbb",
-					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", new QueueDuplicateRemovedScheduler(),
-					new TestPageProcessor());
-			}
-			catch (SpiderException exception)
-			{
-				Assert.AreEqual("Length of TaskGroup should less than 100.", exception.Message);
 				return;
 			}
 
@@ -145,8 +118,7 @@ namespace DotnetSpider.Core.Test
 
 			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 				id,
-				userId,
-				taskGroup, new QueueDuplicateRemovedScheduler(),
+				new QueueDuplicateRemovedScheduler(),
 				new TestPageProcessor()))
 			{
 				spider.AddPipeline(new TestPipeline()).SetThreadNum(1);
