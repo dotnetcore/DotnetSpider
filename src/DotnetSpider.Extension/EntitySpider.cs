@@ -26,6 +26,9 @@ namespace DotnetSpider.Extension
 		private static readonly List<string> DefaultProperties = new List<string> { "cdate", "__id" };
 
 		[JsonIgnore]
+		public Action TaskFinished { get; set; } = () => { };
+
+		[JsonIgnore]
 		public Action VerifyCollectedData { get; set; }
 
 		public string RedisConnectString { get; set; }
