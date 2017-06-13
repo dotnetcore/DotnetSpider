@@ -61,6 +61,7 @@ namespace DotnetSpider.Extension
 				InsertBatch();
 			}
 			Spider.Run(args);
+			Spider.TaskFinished();
 		}
 
 		public Task RunAsync(params string[] arguments)
