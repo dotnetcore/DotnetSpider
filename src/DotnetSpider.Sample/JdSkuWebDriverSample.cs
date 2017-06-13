@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample
 {
 	public class JdSkuWebDriverSample : EntitySpiderBuilder
 	{
-		public JdSkuWebDriverSample() : base("JdSkuWebDriver", Batch.Now)
+		public JdSkuWebDriverSample() : base("JdSkuWebDriver", Extension.Infrastructure.Batch.Now)
 		{
 		}
 

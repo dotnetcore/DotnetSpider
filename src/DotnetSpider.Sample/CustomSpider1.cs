@@ -4,9 +4,9 @@ using System;
 
 namespace DotnetSpider.Sample
 {
-	public class Spider1 : CustomSpider
+	public class CustomSpider1 : CustomSpider
 	{
-		public Spider1() : base("CustomSpider1", Extension.Infrastructure.Batch.Daily)
+		public CustomSpider1() : base("CustomSpider1", Extension.Infrastructure.Batch.Daily)
 		{
 		}
 

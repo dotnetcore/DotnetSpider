@@ -55,13 +55,22 @@ namespace DotnetSpider.Runner
 			{
 				spiderName = arguments["-s"];
 			}
+
+#if NETCOREAPP1_1
 			var asl = new AssemblyLoader(AppContext.BaseDirectory);
+#endif
 			int totalTypesCount = 0;
 			var spiders = new Dictionary<string, IRunable>();
 			foreach (var spiderDll in DetectDlls())
 			{
-				var asm = asl.LoadFromAssemblyPath(Path.Combine(AppContext.BaseDirectory, spiderDll));
+#if NETCOREAPP1_1
+				var asm = asl.LoadFromAssemblyPath(Path.Combine(AppContext.BaseDirectory, "netcore", spiderDll));
 				var types = asm.GetTypes();
+#else
+
+				var asm = Assembly.LoadFrom(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "net45", spiderDll));
+				var types = asm.GetTypes();
+#endif
 
 				foreach (var type in types)
 				{
@@ -85,13 +94,36 @@ namespace DotnetSpider.Runner
 				}
 			}
 
+			if (spiders.Count == 0)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("No spiders.");
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.WriteLine("Press any key to continue...");
+				Console.Read();
+				return;
+			}
+
 			if (spiders.Count != totalTypesCount)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("There are some duplicate spiders.");
 				Console.ForegroundColor = ConsoleColor.White;
+				Console.WriteLine("Press any key to continue...");
+				Console.Read();
 				return;
 			}
+
+			if (!spiders.ContainsKey(spiderName))
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine($"There is no spider named: {spiderName}.");
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.WriteLine("Press any key to continue...");
+				Console.Read();
+				return;
+			}
+
 			if (arguments.ContainsKey("-b"))
 			{
 				var batch = spiders[spiderName] as IBatch;
@@ -115,7 +147,12 @@ namespace DotnetSpider.Runner
 
 		private static List<string> DetectDlls()
 		{
-			return Directory.GetFiles(Path.Combine("Spiders")).Where(f => f.ToLower().EndsWith(".dll")).ToList();
+#if NETCOREAPP1_1
+			var path = Path.Combine(AppContext.BaseDirectory, "Spiders","netcore");
+#else
+			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Spiders", "net45");
+#endif
+			return Directory.GetFiles(path).Where(f => f.ToLower().EndsWith(".dll") || f.ToLower().EndsWith(".exe")).ToList();
 		}
 	}
 }

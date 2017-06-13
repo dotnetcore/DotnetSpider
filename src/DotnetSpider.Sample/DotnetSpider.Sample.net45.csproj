@@ -37,11 +37,15 @@
     <Compile Include="BaiduSearchSpider.cs" />
     <Compile Include="BaseUsage.cs" />
     <Compile Include="CasSpider.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Cnblogs.cs" />
     <Compile Include="ConfigurableSpider.cs" />
+    <Compile Include="CustomSpider1.cs" />
     <Compile Include="DDengSpider.cs" />
+    <Compile Include="Hao360EntitySpiderInfoBuble.cs" />
     <Compile Include="JdCategorySpider.cs" />
     <Compile Include="JdShopDetailSpider.cs" />
+    <Compile Include="JdShopDetailSpider2.cs" />
     <Compile Include="JdSkuSampleSpider.cs" />
     <Compile Include="JdSkuWebDriverSample.cs" />
     <Compile Include="JdSpider.cs" />
@@ -51,8 +55,6 @@
     <Compile Include="RegexTestSpider.cs" />
     <Compile Include="ShanxizhaoshengSpider.cs" />
     <Compile Include="Situoli.cs" />
-    <Compile Include="Spider1.cs" />
-    <Compile Include="TestSpider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -10,7 +10,7 @@ namespace DotnetSpider.Sample
 			JdShopDetailSpider2 spider2 = new JdShopDetailSpider2();
 			spider2.Run();
 
-			Spider1 s = new Spider1();
+			CustomSpider1 s = new CustomSpider1();
 			s.Run();
 			//ConfigurableSpider.Run();
 
