@@ -109,6 +109,8 @@ namespace DotnetSpider.Core
 		{
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#else
+			ThreadPool.SetMinThreads(200, 200);
 #endif
 			PrintInfo();
 		}

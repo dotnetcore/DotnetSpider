@@ -3,7 +3,7 @@ namespace DotnetSpider.Core
 {
 	public interface INamed
 	{
-		string Name { get; }
+		string Name { get; set; }
 	}
 
 	public abstract class Named

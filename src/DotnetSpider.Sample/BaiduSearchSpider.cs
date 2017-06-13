@@ -13,7 +13,7 @@ namespace DotnetSpider.Sample
 {
 	public class BaiduSearchSpider : EntitySpiderBuilder
 	{
-		public BaiduSearchSpider() : base("BaiduSearch", Batch.Now)
+		public BaiduSearchSpider() : base("BaiduSearch", Extension.Infrastructure.Batch.Now)
 		{
 		}
 

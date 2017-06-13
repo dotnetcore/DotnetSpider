@@ -4,29 +4,27 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using System.Data;
 using MySql.Data.MySqlClient;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension
 {
-	public abstract class EntitySpiderBuilder : IControllable, INamed
+	public abstract class EntitySpiderBuilder : IControllable, INamed, IBatch
 	{
-		protected string _batch;
-
 		protected abstract EntitySpider GetEntitySpider();
 		protected EntitySpider Spider { get; private set; }
 
 		public string Name { get; set; }
+		public string Batch { get; set; }
 
-		public EntitySpiderBuilder(string name) : this(name, Batch.Now)
+		public EntitySpiderBuilder(string name) : this(name, Infrastructure.Batch.Now)
 		{
 		}
 
-		public EntitySpiderBuilder(string name, Batch batch)
+		public EntitySpiderBuilder(string name, string batch)
 		{
 			SetInfo(name, batch);
 		}
 
-		protected void SetInfo(string name, Batch batch)
+		protected void SetInfo(string name, string batch)
 		{
 			Name = name;
 
@@ -35,29 +33,7 @@ namespace DotnetSpider.Extension
 				throw new ArgumentException("Length of name should between 1 and 120.");
 			}
 
-			switch (batch)
-			{
-				case Batch.Now:
-					{
-						_batch = DateTime.Now.ToString("yyyy_MM_dd_hhmmss");
-						break;
-					}
-				case Batch.Daily:
-					{
-						_batch = DateTimeUtils.RunIdOfToday;
-						break;
-					}
-				case Batch.Weekly:
-					{
-						_batch = DateTimeUtils.RunIdOfMonday;
-						break;
-					}
-				case Batch.Monthly:
-					{
-						_batch = DateTimeUtils.RunIdOfMonthly;
-						break;
-					}
-			}
+			Batch = batch;
 		}
 
 		public string ConnectString { get; set; }
@@ -155,7 +131,7 @@ namespace DotnetSpider.Extension
 				if (result != null)
 				{
 					var taskId = Convert.ToInt32(result);
-					var identity = Encrypt.Md5Encrypt($"{Name}{_batch}");
+					var identity = Encrypt.Md5Encrypt($"{Name}{Batch}");
 					command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_batches` (`taskId`,`batch`, `code`) values ('{taskId}','{DateTime.Now}','{identity}');";
 					command.ExecuteNonQuery();
 

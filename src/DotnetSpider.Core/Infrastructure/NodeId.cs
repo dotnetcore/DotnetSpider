@@ -28,6 +28,6 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
-		public static readonly string Id = "";
+		public static readonly string Id = "DEFAULT";
 	}
 }

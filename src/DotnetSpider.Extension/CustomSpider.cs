@@ -14,50 +14,28 @@ namespace DotnetSpider.Extension
 {
 	public abstract class CustomSpider : IRunable, INamed
 	{
-		private string _name;
-		private string _batchStr;
 		private bool _exited;
 
 		private Task _statusReporter;
 
-		public string Name => _name;
+		public string Name { get; set; }
+
+		public string Batch { get; set; }
 
 		public string ConnectString { get; set; }
 
 		public string Identity { get; private set; }
 
-		protected CustomSpider(string userId, string name, Batch batch)
+		protected CustomSpider(string name, string batch)
 		{
-			_name = name;
+			Name = name;
 
-			if (string.IsNullOrEmpty(_name) || _name.Length > 120)
+			if (string.IsNullOrEmpty(Name) || Name.Length > 120)
 			{
 				throw new ArgumentException("Length of name should between 1 and 120.");
 			}
 
-			switch (batch)
-			{
-				case Batch.Now:
-					{
-						_batchStr = DateTime.Now.ToString("yyyy_MM_dd_hhmmss");
-						break;
-					}
-				case Batch.Daily:
-					{
-						_batchStr = DateTimeUtils.RunIdOfToday;
-						break;
-					}
-				case Batch.Weekly:
-					{
-						_batchStr = DateTimeUtils.RunIdOfMonday;
-						break;
-					}
-				case Batch.Monthly:
-					{
-						_batchStr = DateTimeUtils.RunIdOfMonthly;
-						break;
-					}
-			}
+			 
 		}
 
 		protected abstract void ImplementAction(params string[] arguments);
@@ -84,7 +62,7 @@ namespace DotnetSpider.Extension
 					command.CommandText = $"insert ignore into dotnetspider.status (`identity`, `status`,`thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`, `logged`) values('{Identity}', 'Init',-1, -1, -1, -1, -1, -1, -1, -1, '{DateTime.Now}');";
 					command.ExecuteNonQuery();
 
-					var message = $"开始任务: {_name}";
+					var message = $"开始任务: {Name}";
 					command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message) values ('{Identity}', '{NodeId.Id}', '{DateTime.Now}', 'Info', '{message}');";
 					command.ExecuteNonQuery();
 				}
@@ -122,7 +100,7 @@ namespace DotnetSpider.Extension
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
 
-						var message = $"结束任务: {_name}";
+						var message = $"结束任务: {Name}";
 						command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message) values ('{Identity}','{NodeId.Id}', '{DateTime.Now}', 'Info', '{message}');";
 						command.ExecuteNonQuery();
 
@@ -141,7 +119,7 @@ namespace DotnetSpider.Extension
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
 
-						var message = $"退出任务: {_name}";
+						var message = $"退出任务: {Name}";
 						command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message, callsite, exception) values ('{Identity}','{NodeId.Id}','{DateTime.Now}', 'Info', '{message}','{e}','{e.Message}');";
 						command.ExecuteNonQuery();
 
@@ -191,7 +169,7 @@ namespace DotnetSpider.Extension
 				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`tasks` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `name` varchar(120) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `name_unique` (`name`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
 				command.ExecuteNonQuery();
 
-				command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`tasks` (`name`,`cdate`) values ('{_name}','{DateTime.Now}');";
+				command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`tasks` (`name`,`cdate`) values ('{Name}','{DateTime.Now}');";
 				command.ExecuteNonQuery();
 			}
 		}
@@ -207,12 +185,12 @@ namespace DotnetSpider.Extension
 				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_batches` (`id` bigint AUTO_INCREMENT, `taskId` bigint(20) NOT NULL, `batch` timestamp NOT NULL, `code` varchar(32) NOT NULL, PRIMARY KEY (`id`), INDEX `taskId_index` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
 				command.ExecuteNonQuery();
 
-				command.CommandText = $"SELECT id FROM `dotnetspider`.`tasks` WHERE `name` = '{_name}';";
+				command.CommandText = $"SELECT id FROM `dotnetspider`.`tasks` WHERE `name` = '{Name}';";
 				var result = command.ExecuteScalar();
 				if (result != null)
 				{
 					var taskId = Convert.ToInt32(result);
-					var identity = Encrypt.Md5Encrypt($"{_name}{_batchStr}");
+					var identity = Encrypt.Md5Encrypt($"{Name}{Batch}");
 					command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_batches` (`taskId`,`batch`, `code`) values ('{taskId}','{DateTime.Now}','{identity}');";
 					command.ExecuteNonQuery();
 

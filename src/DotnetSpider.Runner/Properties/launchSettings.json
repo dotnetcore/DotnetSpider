@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DotnetSpider.Runner": {
+      "commandName": "Project",
+      "commandLineArgs": "-s:test"
+    }
+  }
+}

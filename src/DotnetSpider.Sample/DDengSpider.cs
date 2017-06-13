@@ -12,7 +12,7 @@ namespace DotnetSpider.Sample
 {
 	public class DDengEntitySpider : EntitySpiderBuilder
 	{
-		public DDengEntitySpider() : base("ddeng.com", Batch.Now)
+		public DDengEntitySpider() : base("ddeng.com", Extension.Infrastructure.Batch.Now)
 		{
 		}
 

@@ -142,7 +142,7 @@ namespace DotnetSpider.Extension.Test
 
 		public class CasSpider : EntitySpiderBuilder
 		{
-			public CasSpider() : base("cas", Batch.Now)
+			public CasSpider() : base("cas", Infrastructure.Batch.Now)
 			{
 			}
 

@@ -7,6 +7,9 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
+			JdShopDetailSpider2 spider2 = new JdShopDetailSpider2();
+			spider2.Run();
+
 			Spider1 s = new Spider1();
 			s.Run();
 			//ConfigurableSpider.Run();

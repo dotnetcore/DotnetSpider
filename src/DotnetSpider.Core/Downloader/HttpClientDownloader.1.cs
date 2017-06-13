@@ -38,7 +38,8 @@ namespace DotnetSpider.Core.Downloader
 			"application/soap+xml",
 			"application/xml",
 			"application/json",
-			"application/x-javascript"
+			"application/x-javascript",
+			"text/javascript"
 		};
 
 		public bool DecodeContentAsUrl;

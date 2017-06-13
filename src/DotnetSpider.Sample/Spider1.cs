@@ -6,7 +6,7 @@ namespace DotnetSpider.Sample
 {
 	public class Spider1 : CustomSpider
 	{
-		public Spider1() : base(null, "CustomSpider1", Batch.Daily)
+		public Spider1() : base("CustomSpider1", Extension.Infrastructure.Batch.Daily)
 		{
 		}
 

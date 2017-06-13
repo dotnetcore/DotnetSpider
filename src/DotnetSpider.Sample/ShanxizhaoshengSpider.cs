@@ -12,7 +12,7 @@ namespace DotnetSpider.Sample
 {
 	public class ShanxizhaoshengSpider : EntitySpiderBuilder
 	{
-		public ShanxizhaoshengSpider() : base("ShanxizhaoshengSpider", Batch.Now)
+		public ShanxizhaoshengSpider() : base("ShanxizhaoshengSpider", Extension.Infrastructure.Batch.Now)
 		{
 		}
 

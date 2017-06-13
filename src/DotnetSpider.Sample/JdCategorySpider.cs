@@ -12,7 +12,7 @@ namespace DotnetSpider.Sample
 {
 	public class JdCategorySpider : EntitySpiderBuilder
 	{
-		public JdCategorySpider() : base("京东类目 Daliy Tracking", Batch.Now)
+		public JdCategorySpider() : base("京东类目 Daliy Tracking", Extension.Infrastructure.Batch.Now)
 		{
 		}
 

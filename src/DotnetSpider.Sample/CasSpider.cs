@@ -14,7 +14,7 @@ namespace DotnetSpider.Sample
 {
 	public class CasSpider : EntitySpiderBuilder
 	{
-		public CasSpider() : base("CasSpider", Batch.Now)
+		public CasSpider() : base("CasSpider", Extension.Infrastructure.Batch.Now)
 		{
 		}
 

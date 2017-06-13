@@ -39,18 +39,6 @@ namespace DotnetSpider.Extension.Configuration
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public bool RetryWhenResultIsEmpty { get; set; } = false;
 
-		public string Batch
-		{
-			get
-			{
-				return _batch;
-			}
-			set
-			{
-				_batch = value;
-			}
-		}
-
 		public List<Entity> Entities { get; set; }
 
 		private IScheduler GetScheduler(JObject jobject)
@@ -186,7 +174,7 @@ namespace DotnetSpider.Extension.Configuration
 				ThreadNum = ThreadNum,
 				Entities = Entities
 			};
-			SetInfo(Name, (Batch)Enum.Parse(typeof(Batch), Batch));
+			SetInfo(Name, Batch);
 			context.AddPipelines(GetPipepines(Pipelines));
 			context.RedisConnectString = RedisConnectString;
 			ConnectString = ConnectString;

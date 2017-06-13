@@ -13,7 +13,7 @@ namespace DotnetSpider.Sample
 {
 	public class Hao360EntitySpiderInfoBuble : EntitySpiderBuilder
 	{
-		public Hao360EntitySpiderInfoBuble() : base("Hao360", Batch.Now)
+		public Hao360EntitySpiderInfoBuble() : base("Hao360", Extension.Infrastructure.Batch.Now)
 		{
 		}
 

@@ -15,7 +15,7 @@ namespace DotnetSpider.Sample
 {
 	public class JdShopDetailSpider : EntitySpiderBuilder
 	{
-		public JdShopDetailSpider() : base("JdShopDetailSpider", Batch.Now)
+		public JdShopDetailSpider() : base("JdShopDetailSpider", Extension.Infrastructure.Batch.Now)
 		{
 		}
 

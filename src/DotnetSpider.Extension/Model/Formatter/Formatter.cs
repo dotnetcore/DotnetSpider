@@ -6,7 +6,13 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property)]
 	public abstract class Formatter : System.Attribute, INamed
 	{
-		public string Name => GetType().Name;
+		protected Formatter()
+		{
+			Name = GetType().Name;
+		}
+
+		public string Name { get; set; }
+
 		public string ValueWhenNull { get; set; } = null;
 
 		public bool RetutnDateString { get; set; } = false;
