@@ -58,7 +58,7 @@ namespace DotnetSpider.Sample
 			return context;
 		}
 
-		[Table("jd", "sku_v2", TableSuffix.Monday, Primary = "pid")]
+		[Table("jd", "shop", TableSuffix.Monday, Primary = "pid")]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
 		public class ProductUpdater : SpiderEntity
 		{
