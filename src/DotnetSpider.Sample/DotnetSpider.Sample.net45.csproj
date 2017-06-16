@@ -55,6 +55,7 @@
     <Compile Include="RegexTestSpider.cs" />
     <Compile Include="ShanxizhaoshengSpider.cs" />
     <Compile Include="Situoli.cs" />
+    <Compile Include="TaobaoKeywordWatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -86,6 +87,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="taobaokeyword.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

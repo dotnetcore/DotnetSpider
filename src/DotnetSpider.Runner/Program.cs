@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+#if NETCOREAPP1_1
 using System.Runtime.Loader;
+#endif
 
 namespace DotnetSpider.Runner
 {
