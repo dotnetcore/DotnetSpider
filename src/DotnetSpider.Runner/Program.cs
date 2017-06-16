@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace DotnetSpider.Runner
 {
@@ -57,7 +58,7 @@ namespace DotnetSpider.Runner
 			}
 
 #if NETCOREAPP1_1
-			var asl = new AssemblyLoader(AppContext.BaseDirectory);
+			var asl = AssemblyLoadContext.Default;
 #endif
 			int totalTypesCount = 0;
 			var spiders = new Dictionary<string, IRunable>();
@@ -65,6 +66,7 @@ namespace DotnetSpider.Runner
 			{
 #if NETCOREAPP1_1
 				var asm = asl.LoadFromAssemblyPath(Path.Combine(AppContext.BaseDirectory, "netcore", spiderDll));
+		 
 				var types = asm.GetTypes();
 #else
 
@@ -78,7 +80,7 @@ namespace DotnetSpider.Runner
 
 					if (hasNonParametersConstructor)
 					{
-						dynamic obj = Activator.CreateInstance(type);
+						dynamic obj = asm.CreateInstance(type.Name);
 						var named = obj as INamed;
 						var runner = obj as IRunable;
 
@@ -148,7 +150,7 @@ namespace DotnetSpider.Runner
 		private static List<string> DetectDlls()
 		{
 #if NETCOREAPP1_1
-			var path = Path.Combine(AppContext.BaseDirectory, "Spiders","netcore");
+			var path = Path.Combine(AppContext.BaseDirectory, "Spiders", "netcore");
 #else
 			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Spiders", "net45");
 #endif

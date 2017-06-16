@@ -31,6 +31,9 @@
     <None Update="Spiders\DotnetSpider.Sample.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Spiders\netcore\DotnetSpider.Sample.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
