@@ -1,6 +1,8 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using System;
+using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 
 namespace DotnetSpider.Core.Proxy
 {
@@ -10,27 +12,17 @@ namespace DotnetSpider.Core.Proxy
 		{
 			bool isReachable = false;
 
-			string http = $"http://{ip}:{port}";
 			try
 			{
-				HttpClient client = new HttpClient(new HttpClientHandler
-				{
-					AllowAutoRedirect = true,
-					UseProxy = true,
-					Proxy = new UseSpecifiedUriWebProxy(new Uri(http))
-				})
-				{
-					Timeout = new TimeSpan(0, 0, 0, 5)
-				};
-				var result = client.GetStringAsync("http://www.baidu.com").Result;
-				if (result.Contains("百度"))
-				{
-					isReachable = true;
-				}
+				TcpClient tcp = new TcpClient();
+				IPAddress ipAddr = IPAddress.Parse(ip);
+				tcp.ReceiveTimeout = 5000;
+				tcp.ConnectAsync(ipAddr, port).Wait();
+				isReachable = true;
 			}
 			catch (Exception e)
 			{
-				LogCenter.Log(null, "FAILRE - CAN not connect! Proxy: " + http, LogLevel.Error, e);
+				LogCenter.Log(null, $"FAILRE - CAN not connect! Proxy: {ip}:{port}.", LogLevel.Error, e);
 			}
 
 			return isReachable;

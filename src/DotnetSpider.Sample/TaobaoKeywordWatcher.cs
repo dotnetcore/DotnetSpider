@@ -79,8 +79,7 @@ namespace DotnetSpider.Sample
 			return context;
 		}
 
-		//[Table("taobao", "taobao_keyword_need_watch_result1")]
-		[Table("taobao", "tmall_paper_diaper")]//美瞳表
+		[Table("taobao", "tmall_paper_diaper")]
 		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
 		public class Item : SpiderEntity
 		{
@@ -113,9 +112,6 @@ namespace DotnetSpider.Sample
 
 			[PropertyDefine(Expression = "$.nick", Type = SelectorType.JsonPath, Length = 100)]
 			public string nick { get; set; }
-
-			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
-			public DateTime run_id { get; set; }
 		}
 	}
 }
