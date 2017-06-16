@@ -82,7 +82,7 @@ namespace DotnetSpider.Runner
 
 					if (hasNonParametersConstructor)
 					{
-						dynamic obj = asm.CreateInstance(type.Name);
+						dynamic obj = Activator.CreateInstance(type);
 						var named = obj as INamed;
 						var runner = obj as IRunable;
 
