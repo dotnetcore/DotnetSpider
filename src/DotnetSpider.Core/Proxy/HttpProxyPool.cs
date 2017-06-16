@@ -114,7 +114,6 @@ namespace DotnetSpider.Core.Proxy
 
 				if (ProxyUtil.ValidateProxy(proxy.Value.HttpHost.Uri.Host, proxy.Value.HttpHost.Uri.Port))
 				{
-					LogCenter.Log(null, $"Detect one usefull proxy: {key}", LogLevel.Debug);
 					value.SetFailedNum(0);
 					value.SetReuseTime(_reuseInterval);
 
