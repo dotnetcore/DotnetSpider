@@ -102,6 +102,14 @@ namespace DotnetSpider.Extension.Model
 					dataObject.Add(field.Name, fieldValue);
 				}
 			}
+			if (EntityMetadata.Table.Primary == "__id")
+			{
+				var id = GetEnviromentValue("__id", page, index);
+				if (!string.IsNullOrEmpty(id))
+				{
+					dataObject.Add("__id", id);
+				}
+			}
 
 			if (skip)
 			{

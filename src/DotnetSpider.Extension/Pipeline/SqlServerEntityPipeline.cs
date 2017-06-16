@@ -142,7 +142,7 @@ namespace DotnetSpider.Extension.Pipeline
 			StringBuilder primaryParamenters = new StringBuilder();
 			if (string.IsNullOrEmpty(metadata.Table.Primary))
 			{
-				primaryParamenters.Append("[__Id] = @__Id,");
+				primaryParamenters.Append("[__Id] = @__Id");
 			}
 			else
 			{
