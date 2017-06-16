@@ -24,41 +24,13 @@ namespace DotnetSpider.Core.Proxy
 
 			Task.Factory.StartNew(() =>
 			{
-				for (long i = 0; i < long.MaxValue; i++)
+				while (true)
 				{
 					if (_proxyQueue.Count < 50)
 					{
-						UpdateProxy();
+						RefreshProxies();
 					}
 					Thread.Sleep(30000);
-				}
-			});
-		}
-
-		private void UpdateProxy()
-		{
-			var result = _supplier.GetProxies();
-
-			Parallel.ForEach(result, new ParallelOptions
-			{
-				MaxDegreeOfParallelism = 10
-			}, proxy =>
-			{
-				var key = proxy.Key;
-				var value = proxy.Value;
-				if (_allProxy.ContainsKey(key))
-				{
-					return;
-				}
-
-				if (ProxyUtil.ValidateProxy(proxy.Value.HttpHost.Uri.Host, proxy.Value.HttpHost.Uri.Port))
-				{
-					LogCenter.Log(null, $"Detect one usefull proxy: {key}", LogLevel.Debug);
-					value.SetFailedNum(0);
-					value.SetReuseTime(_reuseInterval);
-
-					_proxyQueue.Add(value);
-					_allProxy.GetOrAdd(key, value);
 				}
 			});
 		}
@@ -122,6 +94,34 @@ namespace DotnetSpider.Core.Proxy
 			}
 
 			_proxyQueue.Add(p);
+		}
+
+		private void RefreshProxies()
+		{
+			var result = _supplier.GetProxies();
+
+			Parallel.ForEach(result, new ParallelOptions
+			{
+				MaxDegreeOfParallelism = 4
+			}, proxy =>
+			{
+				var key = proxy.Key;
+				var value = proxy.Value;
+				if (_allProxy.ContainsKey(key))
+				{
+					return;
+				}
+
+				if (ProxyUtil.ValidateProxy(proxy.Value.HttpHost.Uri.Host, proxy.Value.HttpHost.Uri.Port))
+				{
+					LogCenter.Log(null, $"Detect one usefull proxy: {key}", LogLevel.Debug);
+					value.SetFailedNum(0);
+					value.SetReuseTime(_reuseInterval);
+
+					_proxyQueue.Add(value);
+					_allProxy.GetOrAdd(key, value);
+				}
+			});
 		}
 	}
 }
