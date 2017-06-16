@@ -7,27 +7,24 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			JdShopDetailSpider2 spider2 = new JdShopDetailSpider2();
-			spider2.Run();
-
 			CustomSpider1 s = new CustomSpider1();
 			s.Run();
 			//ConfigurableSpider.Run();
 
-			//// Custmize processor and pipeline 完全自定义页面解析和数据管道
-			//BaseUsage.CustmizeProcessorAndPipeline();
-			//Console.WriteLine("Press any key to continue...");
-			//Console.Read();
+			// Custmize processor and pipeline 完全自定义页面解析和数据管道
+			BaseUsage.CustmizeProcessorAndPipeline();
+			Console.WriteLine("Press any key to continue...");
+			Console.Read();
 
-			//// Crawler pages without traverse 采集指定页面不做遍历
-			//BaseUsage.CrawlerPagesWithoutTraverse();
-			//Console.WriteLine("Press any key to continue...");
-			//Console.Read();
+			// Crawler pages without traverse 采集指定页面不做遍历
+			BaseUsage.CrawlerPagesWithoutTraverse();
+			Console.WriteLine("Press any key to continue...");
+			Console.Read();
 
-			//// Crawler pages traversal 遍历整站
-			//BaseUsage.CrawlerPagesTraversal();
-			//Console.WriteLine("Press any key to continue...");
-			//Console.Read();
+			// Crawler pages traversal 遍历整站
+			BaseUsage.CrawlerPagesTraversal();
+			Console.WriteLine("Press any key to continue...");
+			Console.Read();
 
 			DDengEntitySpider dDengEntitySpider = new DDengEntitySpider();
 			dDengEntitySpider.Run();

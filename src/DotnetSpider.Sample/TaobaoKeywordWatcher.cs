@@ -13,6 +13,7 @@ using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.Infrastructure;
+using System.IO;
 
 namespace DotnetSpider.Sample
 {
@@ -42,11 +43,22 @@ namespace DotnetSpider.Sample
 		protected override EntitySpider GetEntitySpider()
 		{
 			Site site = new Site();
-			//https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}
-			var context = new EntitySpider(new Site() { SleepTime = 3000 })
+			using (var reader = new StreamReader(File.OpenRead("taobaokeyword.txt")))
 			{
-				ThreadNum = 1,
+				string keyword;
+				while (!string.IsNullOrEmpty(keyword = reader.ReadLine()))
+				{
+					site.AddStartUrl("https://" + $"s.taobao.com/search?q={keyword}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}&fs=1&filter_tianmao=tmall", new Dictionary<string, object>
+					{
+						{ "keyword" , keyword}
+					});
+				}
+			}
+			var context = new EntitySpider(site)
+			{
+				ThreadNum = 5,
 				SkipWhenResultIsEmpty = true,
+				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName = DotnetSpider,keepAlive = 8,allowAdmin = True,connectTimeout = 10000,password = 6GS9F2QTkP36GggE0c3XwVwI,abortConnect = True,connectRetry = 20"),
 				Downloader = new HttpClientDownloader
 				{
 					DownloadCompleteHandlers = new IDownloadCompleteHandler[]
@@ -62,62 +74,48 @@ namespace DotnetSpider.Sample
 					}
 				}
 			};
-			context.AddPipeline(new MySqlEntityPipeline("Database='taobao';Data Source= 86research.imwork.net;User ID=root;Password=1qazZAQ!;Port=4306"));
+			context.AddPipeline(new MySqlEntityPipeline("Database = 'mysql'; Data Source = localhost; User ID = root; Password = 1qazZAQ!; Port = 3306"));
 			context.AddEntityType(typeof(Item), new MyDataHanlder());
 			return context;
 		}
 
 		//[Table("taobao", "taobao_keyword_need_watch_result1")]
-		[Table("taobao", "taobao_need_watch_result_Rebort")]//美瞳表
+		[Table("taobao", "tmall_paper_diaper")]//美瞳表
 		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
 		public class Item : SpiderEntity
 		{
-			//[StoredAs("tab", DataType.String, 20)]
-			[PropertyDefine(Expression = "tab", Type = SelectorType.Enviroment, Length = 20)]
-			public string tab { get; set; }
+			[PropertyDefine(Expression = "keyword", Type = SelectorType.Enviroment, Length = 20)]
+			public string shop { get; set; }
 
-			//[StoredAs("team", DataType.String, 20)]
-			[PropertyDefine(Expression = "team", Type = SelectorType.Enviroment, Length = 20)]
-			public string team { get; set; }
-
-			//[StoredAs("keyword", DataType.String, 20)]
-			[PropertyDefine(Expression = "word", Type = SelectorType.Enviroment, Length = 20)]
-			public string keyword { get; set; }
+			[PropertyDefine(Expression = "$.category", Type = SelectorType.JsonPath, Length = 20)]
+			public string category { get; set; }
 
 			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath, Option = PropertyDefine.Options.PlainText, Length = 100)]
-			//[StoredAs("name", DataType.String, 100)]
 			public string name { get; set; }
 
 			[PropertyDefine(Expression = "$.view_price", Type = SelectorType.JsonPath, Length = 50)]
-			//[StoredAs("price", DataType.String, 50)]
 			public string price { get; set; }
 
 			[PropertyDefine(Expression = "$.view_sales", Type = SelectorType.JsonPath, Length = 100)]
-			//[StoredAs("sold", DataType.String, 100)]
 			[ReplaceFormatter(NewValue = "", OldValue = "付款")]
 			[ReplaceFormatter(NewValue = "", OldValue = "收货")]
 			[ReplaceFormatter(NewValue = "", OldValue = "人")]
 			public string sold { get; set; }
 
 			[PropertyDefine(Expression = "$.nid", Type = SelectorType.JsonPath, Length = 50)]
-			//[StoredAs("item_id", DataType.String, 50)]
 			public string item_id { get; set; }
 
-			//[StoredAs("url", DataType.Text)]
 			[PropertyDefine(Expression = "$.detail_url", Type = SelectorType.JsonPath)]
 			public string url { get; set; }
 
 			[PropertyDefine(Expression = "$.user_id", Type = SelectorType.JsonPath, Length = 50)]
-			//[StoredAs("uid", DataType.String, 50)]
-			public string uid { get; set; }
+			public string userid { get; set; }
+
+			[PropertyDefine(Expression = "$.nick", Type = SelectorType.JsonPath, Length = 100)]
+			public string nick { get; set; }
 
 			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
-			//[StoredAs("run_id", DataType.Date)]
 			public DateTime run_id { get; set; }
-
-			//[StoredAs("cdate", DataType.Time)]
-			//[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
-			//public DateTime cdate { get; set; }
 		}
 	}
 }
