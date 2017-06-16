@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotnetSpider.Sample
 {
@@ -7,6 +9,10 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
+			Dictionary<string, dynamic> v = new Dictionary<string, dynamic>();
+			v.Add("a", "t");
+			v.Add("b", "t2");
+			var b = string.Join(",", v.Select(kv => kv.Key + "=" + kv.Value));
 			CustomSpider1 s = new CustomSpider1();
 			s.Run();
 			//ConfigurableSpider.Run();

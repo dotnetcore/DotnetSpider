@@ -13,10 +13,8 @@ using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
-using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.ObjectModel;
-using System.Globalization;
 
 namespace DotnetSpider.Core
 {
@@ -826,8 +824,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 		{
 			lock (this)
 			{
-				File.AppendAllText(_errorRequestFile.FullName,
-					JsonConvert.SerializeObject(request) + System.Environment.NewLine, Encoding.UTF8);
+				File.AppendAllText(_errorRequestFile.FullName, $"{request}{System.Environment.NewLine}", Encoding.UTF8);
 			}
 			Scheduler.IncreaseErrorCounter();
 		}
