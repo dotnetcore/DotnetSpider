@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>DotnetSpider2.Runner</id>
+    <version>1.3.2-rc8</version>
+    <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
+    <owners>zlzforever@163.com</owners>
+    <iconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</iconUrl>
+    <licenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/zlzforever/DotnetSpider</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <tags>DotnetSpider;crawler;cross platform;dotnet core</tags>
+    <description>Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.</description>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\output\netstandard1.6\DotnetSpider.Runner.dll" target="lib\netstandard1.6\DotnetSpider.Runner.dll" />
+    <file src="..\output\net451\DotnetSpider.Runner.dll" target="lib\net451\DotnetSpider.Runner.dll" />
+  </files>
+</package>

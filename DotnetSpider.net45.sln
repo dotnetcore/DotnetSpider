@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{4F294905
 	ProjectSection(SolutionItems) = preProject
 		nuget\DotnetSpider.Core.nuspec = nuget\DotnetSpider.Core.nuspec
 		nuget\DotnetSpider.Extension.nuspec = nuget\DotnetSpider.Extension.nuspec
+		nuget\DotnetSpider.Runner.nuspec = nuget\DotnetSpider.Runner.nuspec
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Runner.net45", "src\DotnetSpider.Runner\DotnetSpider.Runner.net45.csproj", "{8C144C56-7757-4442-A83A-67693EA078FB}"
