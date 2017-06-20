@@ -67,6 +67,7 @@
     </None>
     <None Include="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
@@ -78,6 +79,10 @@
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.net45.csproj">
       <Project>{0d7eeda6-f7d4-4cc0-8c60-d950bc43d1f7}</Project>
       <Name>DotnetSpider.Extension.net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotnetSpider.Runner\DotnetSpider.Runner.net45.csproj">
+      <Project>{8c144c56-7757-4442-a83a-67693ea078fb}</Project>
+      <Name>DotnetSpider.Runner.net45</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

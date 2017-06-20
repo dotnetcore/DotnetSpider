@@ -25,7 +25,6 @@ namespace DotnetSpider.Sample
 				//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("快代理API"))
 			});
 			context.SetThreadNum(1);
-			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_hhmmss"));
 			// dowload html by http client
 			context.SetDownloader(new HttpClientDownloader());
 			// save data to mysql.

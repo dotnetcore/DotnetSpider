@@ -16,8 +16,7 @@
     <None Remove="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CassandraCSharpDriver" Version="3.3.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.4.3" />
+    <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
     <PackageReference Include="MySql.Data" Version="7.0.7-m61" />
     <PackageReference Include="StackExchange.Redis" Version="1.2.3" />
   </ItemGroup>

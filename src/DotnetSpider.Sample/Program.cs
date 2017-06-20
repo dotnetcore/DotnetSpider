@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotnetSpider.Runner;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,6 +10,8 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
+			Startup.Run(new string[] { "-s:CustomSpider1", " -n:1" });
+
 			CustomSpider1 s = new CustomSpider1();
 			s.Run();
 			//ConfigurableSpider.Run();

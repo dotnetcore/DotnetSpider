@@ -1,18 +1,19 @@
-﻿using DotnetSpider.Core;
+﻿using Microsoft.Extensions.DependencyModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 #if NETCOREAPP1_1
 using System.Runtime.Loader;
 #endif
 
 namespace DotnetSpider.Runner
 {
-	public class Program
+	public class Runner
 	{
-		public static void Main(string[] args)
+		public static void Run(params string[] args)
 		{
 			Dictionary<string, string> arguments = new Dictionary<string, string>();
 			foreach (var arg in args)
@@ -61,18 +62,18 @@ namespace DotnetSpider.Runner
 
 #if NETCOREAPP1_1
 			var asl = AssemblyLoadContext.Default;
+			asl.Resolving += Asl_Resolving;
 #endif
 			int totalTypesCount = 0;
-			var spiders = new Dictionary<string, IRunable>();
+			var spiders = new Dictionary<string, object>();
 			foreach (var spiderDll in DetectDlls())
 			{
 #if NETCOREAPP1_1
-				var asm = asl.LoadFromAssemblyPath(Path.Combine(AppContext.BaseDirectory, "netcore", spiderDll));
-		 
+				var asm = asl.LoadFromAssemblyPath(Path.Combine(AppContext.BaseDirectory, spiderDll));
 				var types = asm.GetTypes();
 #else
 
-				var asm = Assembly.LoadFrom(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "net45", spiderDll));
+				var asm = Assembly.LoadFrom(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, spiderDll));
 				var types = asm.GetTypes();
 #endif
 
@@ -82,15 +83,20 @@ namespace DotnetSpider.Runner
 
 					if (hasNonParametersConstructor)
 					{
-						dynamic obj = Activator.CreateInstance(type);
-						var named = obj as INamed;
-						var runner = obj as IRunable;
+						var interfaces = type.GetInterfaces();
 
-						if (named != null && runner != null)
+						var isNamed = interfaces.Any(t => t.FullName == "DotnetSpider.Core.INamed");
+						var isRunner = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IRunable");
+						var isBatch = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IBatch");
+
+						if (isNamed && isRunner && isBatch)
 						{
-							if (!spiders.ContainsKey(named.Name))
+							var property = type.GetProperties().First(p => p.Name == "Name");
+							object runner = Activator.CreateInstance(type);
+							var name = (string)property.GetValue(runner);
+							if (!spiders.ContainsKey(name))
 							{
-								spiders.Add(named.Name, runner);
+								spiders.Add(name, runner);
 							}
 							++totalTypesCount;
 						}
@@ -130,33 +136,46 @@ namespace DotnetSpider.Runner
 
 			if (arguments.ContainsKey("-b"))
 			{
-				var batch = spiders[spiderName] as IBatch;
-				batch.Batch = arguments["-b"];
+				var property = spiders[spiderName].GetType().GetProperties().First(p => p.Name == "Batch");
+				property.SetValue(spiders[spiderName], arguments["-b"]);
 			}
 			if (arguments.ContainsKey("-n"))
 			{
-				var named = spiders[spiderName] as INamed;
-				named.Name = arguments["-n"];
+				var property = spiders[spiderName].GetType().GetProperties().First(p => p.Name == "Name");
+				property.SetValue(spiders[spiderName], arguments["-n"]);
 			}
 
+			var method = spiders[spiderName].GetType().GetMethod("Run");
 			if (!arguments.ContainsKey("-a"))
 			{
-				spiders[spiderName].Run();
+				method.Invoke(spiders[spiderName], new object[] { new string[] { } });
 			}
 			else
 			{
-				spiders[spiderName].Run(arguments["-a"]);
+				method.Invoke(spiders[spiderName], new object[] { new string[] { arguments["-a"] } });
 			}
+		}
+
+		private static Assembly Asl_Resolving(AssemblyLoadContext arg1, AssemblyName arg2)
+		{
+			var path = Path.Combine(AppContext.BaseDirectory, $"{arg2.Name}.dll");
+			if (File.Exists(path))
+			{
+				return arg1.LoadFromAssemblyPath(path);
+			}
+
+			return null;
 		}
 
 		private static List<string> DetectDlls()
 		{
 #if NETCOREAPP1_1
-			var path = Path.Combine(AppContext.BaseDirectory, "Spiders", "netcore");
+			var path = Path.Combine(AppContext.BaseDirectory);
 #else
-			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Spiders", "net45");
+			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
 #endif
-			return Directory.GetFiles(path).Where(f => f.ToLower().EndsWith(".dll") || f.ToLower().EndsWith(".exe")).ToList();
+			//return new List<string> { Path.Combine(path, "DotnetSpider.Core.dll") };
+			return Directory.GetFiles(path).Where(f => f.ToLower().EndsWith("dotnetspider.sample.exe") || f.ToLower().EndsWith("dotnetspider.sample.dll") || f.ToLower().EndsWith("Spiders.dll") || f.ToLower().EndsWith("Spiders.exe")).ToList();
 		}
 	}
 }

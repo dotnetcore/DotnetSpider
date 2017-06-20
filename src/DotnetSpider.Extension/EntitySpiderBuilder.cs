@@ -61,6 +61,8 @@ namespace DotnetSpider.Extension
 				InsertBatch();
 			}
 			Spider.Run(args);
+
+			RemoveRunningState();
 		}
 
 		public Task RunAsync(params string[] arguments)
@@ -107,10 +109,23 @@ namespace DotnetSpider.Extension
 				var command = conn.CreateCommand();
 				command.CommandType = CommandType.Text;
 
-				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`tasks` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `name` varchar(120) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `name_unique` (`name`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
+				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_running` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `taskId` bigint(20) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `taskId_unique` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
 				command.ExecuteNonQuery();
 
-				command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`tasks` (`name`,`cdate`) values ('{Name}','{DateTime.Now}');";
+				command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_running` (`taskId`,`cdate`) values ('{Name}','{DateTime.Now}');";
+				command.ExecuteNonQuery();
+			}
+		}
+
+		private void RemoveRunningState()
+		{
+			using (IDbConnection conn = new MySqlConnection(ConnectString))
+			{
+				conn.Open();
+				var command = conn.CreateCommand();
+				command.CommandType = CommandType.Text;
+
+				command.CommandText = $"DELETE FROM `dotnetspider`.`task_running` WHERE `taskId`='{Name}';";
 				command.ExecuteNonQuery();
 			}
 		}
@@ -126,21 +141,11 @@ namespace DotnetSpider.Extension
 				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_batches` (`id` bigint AUTO_INCREMENT, `taskId` bigint(20) NOT NULL, `batch` timestamp NOT NULL, `code` varchar(32) NOT NULL, PRIMARY KEY (`id`), INDEX `taskId_index` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
 				command.ExecuteNonQuery();
 
-				command.CommandText = $"SELECT id FROM `dotnetspider`.`tasks` WHERE `name` = '{Name}';";
-				var result = command.ExecuteScalar();
-				if (result != null)
-				{
-					var taskId = Convert.ToInt32(result);
-					var identity = Encrypt.Md5Encrypt($"{Name}{Batch}");
-					command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_batches` (`taskId`,`batch`, `code`) values ('{taskId}','{DateTime.Now}','{identity}');";
-					command.ExecuteNonQuery();
+				var identity = Encrypt.Md5Encrypt($"{Name}{Batch}");
+				command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_batches` (`taskId`,`batch`, `code`) values ('{Name}','{DateTime.Now}','{identity}');";
+				command.ExecuteNonQuery();
 
-					Spider.Identity = identity;
-				}
-				else
-				{
-					throw new ArgumentException("Task info is missing.");
-				}
+				Spider.Identity = identity;
 			}
 		}
 	}

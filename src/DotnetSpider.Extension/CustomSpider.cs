@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension
 {
-	public abstract class CustomSpider : IRunable, INamed
+	public abstract class CustomSpider : IRunable, INamed, IBatch
 	{
 		private bool _exited;
 
@@ -34,8 +34,6 @@ namespace DotnetSpider.Extension
 			{
 				throw new ArgumentException("Length of name should between 1 and 120.");
 			}
-
-			 
 		}
 
 		protected abstract void ImplementAction(params string[] arguments);

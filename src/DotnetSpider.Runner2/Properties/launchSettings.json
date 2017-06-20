@@ -2,7 +2,7 @@
   "profiles": {
     "DotnetSpider.Runner": {
       "commandName": "Project",
-      "commandLineArgs": "-s:test"
+      "commandLineArgs": "-s:BaiduSearch -n:1"
     }
   }
 }
