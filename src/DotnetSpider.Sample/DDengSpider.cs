@@ -6,13 +6,12 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class DDengEntitySpider : EntitySpiderBuilder
 	{
-		public DDengEntitySpider() : base("ddeng.com", Extension.Infrastructure.Batch.Now)
+		public DDengEntitySpider() : base("ddeng.com")
 		{
 		}
 

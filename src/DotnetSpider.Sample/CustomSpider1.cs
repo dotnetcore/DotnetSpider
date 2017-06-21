@@ -1,12 +1,11 @@
 ﻿using DotnetSpider.Extension;
-using DotnetSpider.Extension.Infrastructure;
 using System;
 
 namespace DotnetSpider.Sample
 {
 	public class CustomSpider1 : CustomSpider
 	{
-		public CustomSpider1() : base("CustomSpider1", Extension.Infrastructure.Batch.Daily)
+		public CustomSpider1() : base("CustomSpider1")
 		{
 		}
 

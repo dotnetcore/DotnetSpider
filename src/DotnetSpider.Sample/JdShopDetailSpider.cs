@@ -9,13 +9,12 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class JdShopDetailSpider : EntitySpiderBuilder
 	{
-		public JdShopDetailSpider() : base("JdShopDetailSpider", Extension.Infrastructure.Batch.Now)
+		public JdShopDetailSpider() : base("JdShopDetailSpider")
 		{
 		}
 

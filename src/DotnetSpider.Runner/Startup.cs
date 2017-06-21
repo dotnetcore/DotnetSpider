@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 #if !NET_45
-using System.Runtime.Loader;
 using Microsoft.Extensions.DependencyModel;
 #endif
 
@@ -85,10 +83,10 @@ namespace DotnetSpider.Runner
 						var interfaces = type.GetInterfaces();
 
 						var isNamed = interfaces.Any(t => t.FullName == "DotnetSpider.Core.INamed");
-						var isRunner = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IRunable");
-						var isBatch = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IBatch");
+						var isIdentity = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IIdentity");
+						var isRunnable = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IRunable");
 
-						if (isNamed && isRunner && isBatch)
+						if (isNamed && isRunnable && isIdentity)
 						{
 							var property = type.GetProperties().First(p => p.Name == "Name");
 							object runner = Activator.CreateInstance(type);
@@ -133,15 +131,10 @@ namespace DotnetSpider.Runner
 				return;
 			}
 
-			if (arguments.ContainsKey("-b"))
+			if (arguments.ContainsKey("-i"))
 			{
-				var property = spiders[spiderName].GetType().GetProperties().First(p => p.Name == "Batch");
-				property.SetValue(spiders[spiderName], arguments["-b"]);
-			}
-			if (arguments.ContainsKey("-n"))
-			{
-				var property = spiders[spiderName].GetType().GetProperties().First(p => p.Name == "Name");
-				property.SetValue(spiders[spiderName], arguments["-n"]);
+				var property = spiders[spiderName].GetType().GetProperties().First(p => p.Name == "Identity");
+				property.SetValue(spiders[spiderName], arguments["-i"]);
 			}
 
 			var method = spiders[spiderName].GetType().GetMethod("Run");

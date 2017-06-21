@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
@@ -8,15 +7,12 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Scheduler;
-using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Core.Scheduler;
 
 namespace DotnetSpider.Sample
 {
 	public class JdShopDetailSpider2 : EntitySpiderBuilder
 	{
-		public JdShopDetailSpider2() : base("JdShopDetailSpider2", Extension.Infrastructure.Batch.Now)
+		public JdShopDetailSpider2() : base("JdShopDetailSpider2")
 		{
 		}
 

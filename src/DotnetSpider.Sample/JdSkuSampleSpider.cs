@@ -8,13 +8,12 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Downloader;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class JdSkuSampleSpider : EntitySpiderBuilder
 	{
-		public JdSkuSampleSpider() : base("JdSkuSample", Extension.Infrastructure.Batch.Now)
+		public JdSkuSampleSpider() : base("JdSkuSample" )
 		{
 		}
 
@@ -76,7 +75,7 @@ namespace DotnetSpider.Sample
 
 	public class JdSkuSampleSpider2 : EntitySpiderBuilder
 	{
-		public JdSkuSampleSpider2() : base("JdSkuSample2", Extension.Infrastructure.Batch.Now)
+		public JdSkuSampleSpider2() : base("JdSkuSample2")
 		{
 		}
 
@@ -84,7 +83,7 @@ namespace DotnetSpider.Sample
 		{
 			EntitySpider context = new EntitySpider(new Site());
 			context.SetThreadNum(1);
-			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+			context.Identity = ("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 			context.AddPipeline(new MySqlEntityPipeline(null)
 			{
 				UpdateConnectString = new DbUpdateConnectString

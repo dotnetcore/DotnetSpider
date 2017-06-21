@@ -7,13 +7,12 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class Hao360EntitySpiderInfoBuble : EntitySpiderBuilder
 	{
-		public Hao360EntitySpiderInfoBuble() : base("Hao360", Extension.Infrastructure.Batch.Now)
+		public Hao360EntitySpiderInfoBuble() : base("Hao360")
 		{
 		}
 

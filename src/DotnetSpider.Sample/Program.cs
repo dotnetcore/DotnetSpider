@@ -1,7 +1,5 @@
 ﻿using DotnetSpider.Runner;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace DotnetSpider.Sample
 {
@@ -10,7 +8,7 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			Startup.Run(new string[] { "-s:CustomSpider1", " -n:1" });
+			Startup.Run(new string[] { "-s:CustomSpider1", $" -i:CustomSpider1{DateTime.Now.ToString("yyyyMMddhhmmss")}" });
 
 			CustomSpider1 s = new CustomSpider1();
 			s.Run();

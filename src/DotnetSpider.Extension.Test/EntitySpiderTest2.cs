@@ -309,7 +309,7 @@ namespace DotnetSpider.Extension.Test
 		public void MultiEntitiesInitPipelines()
 		{
 			EntitySpider context = new EntitySpider(new Site());
-			context.SetIdentity(Guid.NewGuid().ToString("N"));
+			context.Identity = (Guid.NewGuid().ToString("N"));
 			context.SetThreadNum(1);
 			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddPipeline(new MySqlFileEntityPipeline());
@@ -355,7 +355,7 @@ namespace DotnetSpider.Extension.Test
 			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{
 				EntitySpider context = new EntitySpider(new Site());
-				context.SetIdentity(Guid.NewGuid().ToString("N"));
+				context.Identity = (Guid.NewGuid().ToString("N"));
 				context.SetThreadNum(1);
 				context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 
@@ -398,7 +398,7 @@ namespace DotnetSpider.Extension.Test
 			using (var conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"))
 			{
 				EntitySpider context = new EntitySpider(new Site());
-				context.SetIdentity(Guid.NewGuid().ToString("N"));
+				context.Identity = (Guid.NewGuid().ToString("N"));
 				context.SetThreadNum(1);
 				context.AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"));
 
@@ -408,7 +408,7 @@ namespace DotnetSpider.Extension.Test
 				context.Run("running-test");
 
 
-				var columns = conn.Query<ColumnInfo>("USE [test];select  b.name Name,c.name+'(' + cast(c.length as varchar)+')' [Type] from sysobjects a,syscolumns b,systypes c where a.id=b.id and a.name='table15' and a.xtype='U'and b.xtype=c.xtype").ToList(); ;
+				var columns = conn.Query<ColumnInfo>("USE [test];select  b.name Name,c.name+'(' + cast(c.length as varchar)+')' [Type] from sysobjects a,syscolumns b,systypes c where a.id=b.id and a.name='table15' and a.xtype='U'and b.xtype=c.xtype").ToList();
 				Assert.AreEqual(11, columns.Count);
 
 				Assert.AreEqual("Int", columns[0].Name);

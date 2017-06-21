@@ -6,20 +6,19 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class ShanxizhaoshengSpider : EntitySpiderBuilder
 	{
-		public ShanxizhaoshengSpider() : base("ShanxizhaoshengSpider", Extension.Infrastructure.Batch.Now)
+		public ShanxizhaoshengSpider() : base("ShanxizhaoshengSpider")
 		{
 		}
 
 		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());
-			context.SetIdentity("ShanxizhaoshengSpider " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			context.Identity = ("ShanxizhaoshengSpider " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.SetSite(new Site
 			{
 				EncodingName = "GB2312"

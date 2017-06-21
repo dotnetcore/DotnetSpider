@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Core.Selector;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace DotnetSpider.Core.Test
 {

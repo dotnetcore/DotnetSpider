@@ -12,7 +12,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -142,7 +141,7 @@ namespace DotnetSpider.Extension.Test
 
 		public class CasSpider : EntitySpiderBuilder
 		{
-			public CasSpider() : base("cas", Infrastructure.Batch.Now)
+			public CasSpider() : base("casTest")
 			{
 			}
 

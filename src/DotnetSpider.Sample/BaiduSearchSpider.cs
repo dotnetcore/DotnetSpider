@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
@@ -13,7 +12,7 @@ namespace DotnetSpider.Sample
 {
 	public class BaiduSearchSpider : EntitySpiderBuilder
 	{
-		public BaiduSearchSpider() : base("BaiduSearch", Extension.Infrastructure.Batch.Now)
+		public BaiduSearchSpider() : base("BaiduSearch")
 		{
 		}
 

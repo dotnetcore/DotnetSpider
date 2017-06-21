@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Selector;
@@ -12,7 +11,6 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
 using Newtonsoft.Json.Linq;
-using DotnetSpider.Extension.Infrastructure;
 using System.IO;
 
 namespace DotnetSpider.Sample
@@ -35,7 +33,7 @@ namespace DotnetSpider.Sample
 			}
 		}
 
-		public TaobaoKeywordWatcher() : base("TaobaoKeywordCheck ", Extension.Infrastructure.Batch.Now)
+		public TaobaoKeywordWatcher() : base("TaobaoKeywordCheck ")
 		{
 
 		}

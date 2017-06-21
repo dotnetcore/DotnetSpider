@@ -8,13 +8,12 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
 	public class CasSpider : EntitySpiderBuilder
 	{
-		public CasSpider() : base("CasSpider", Extension.Infrastructure.Batch.Now)
+		public CasSpider() : base("cas")
 		{
 		}
 
@@ -31,7 +30,7 @@ namespace DotnetSpider.Sample
 				},
 			};
 			context.SetThreadNum(10);
-			context.SetIdentity("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+			context.Identity = ("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 			context.AddPipeline(
 				new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");

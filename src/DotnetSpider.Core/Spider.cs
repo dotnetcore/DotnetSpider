@@ -29,7 +29,21 @@ namespace DotnetSpider.Core
 		protected int WaitInterval { get; } = 10;
 		private IScheduler _scheduler;
 
-		public string Identity { get; set; }
+		public string Identity
+		{
+			get { return _identity; }
+			set
+			{
+				CheckIfRunning();
+
+				if (string.IsNullOrEmpty(value) || value.Length > 120)
+				{
+					throw new ArgumentException("Length of identity should between 1 and 120.");
+				}
+
+				_identity = value;
+			}
+		}
 
 		public Status Stat { get; private set; } = Status.Init;
 		public event SpiderEvent OnSuccess;
@@ -54,6 +68,7 @@ namespace DotnetSpider.Core
 		private bool _exitWhenComplete = true;
 		private int _emptySleepTime = 15000;
 		private int _cachedSize = 1;
+		private string _identity;
 
 		private IDownloader _downloader;
 		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
@@ -326,13 +341,6 @@ namespace DotnetSpider.Core
 		public void SetSite(Site site)
 		{
 			Site = site;
-		}
-
-		public void SetIdentity(string identity)
-		{
-			CheckIfRunning();
-
-			Identity = identity;
 		}
 
 		/// <summary>

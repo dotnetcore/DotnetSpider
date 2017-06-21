@@ -8,8 +8,6 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
-using DotnetSpider.Extension.Infrastructure;
-using System;
 
 #if !NET_CORE
 using DotnetSpider.Extension.Downloader.WebDriver;
@@ -18,14 +16,15 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Configuration
 {
-	public class JsonSpiderContext : EntitySpiderBuilder
+	public class JsonSpiderContext
 	{
-		public JsonSpiderContext() : base("NULL", Infrastructure.Batch.Now)
+		public JsonSpiderContext()
 		{
 		}
-
-		public string LogAndStatusConnectString { get; set; }
+		public string ConnectString { get; set; }
 		public string RedisConnectString { get; set; }
+		public string LogAndStatusConnectString { get; set; }
+		public string Identity { get; set; }
 		public Site Site { get; set; }
 		public int CachedSize { get; set; } = 1;
 		public JObject Scheduler { get; set; }
@@ -161,7 +160,7 @@ namespace DotnetSpider.Extension.Configuration
 			return downloader;
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		private EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(Site)
 			{
@@ -174,10 +173,10 @@ namespace DotnetSpider.Extension.Configuration
 				ThreadNum = ThreadNum,
 				Entities = Entities
 			};
-			SetInfo(Name, Batch);
+			context.Identity = Identity;
 			context.AddPipelines(GetPipepines(Pipelines));
 			context.RedisConnectString = RedisConnectString;
-			ConnectString = ConnectString;
+			context.ConnectString = ConnectString;
 
 			foreach (var entity in Entities)
 			{
@@ -185,6 +184,15 @@ namespace DotnetSpider.Extension.Configuration
 				context.AddPageProcessor(processor);
 			}
 			return context;
+		}
+
+		public void Run()
+		{
+			var spider = GetEntitySpider();
+			if (spider != null)
+			{
+				spider.Run();
+			}
 		}
 	}
 }

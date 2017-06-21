@@ -5,7 +5,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
@@ -18,7 +17,7 @@ namespace DotnetSpider.Sample
 		protected override EntitySpider GetEntitySpider()
 		{
 			EntitySpider context = new EntitySpider(new Site());
-			context.SetIdentity("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			context.Identity = ("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			context.AddStartUrl("http://www.cnblogs.com");
 			context.AddPipeline(new ConsoleEntityPipeline());
 			context.AddEntityType(typeof(HomePage));

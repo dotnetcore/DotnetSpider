@@ -8,13 +8,13 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Infrastructure;
+
 
 namespace DotnetSpider.Sample
 {
 	public class JdSpider : EntitySpiderBuilder
 	{
-		public JdSpider() : base("JD", Extension.Infrastructure.Batch.Now)
+		public JdSpider() : base("JD")
 		{
 		}
 
