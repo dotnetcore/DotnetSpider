@@ -22,6 +22,8 @@ namespace DotnetSpider.Extension
 {
 	public abstract class EntitySpider : Spider
 	{
+		protected abstract void MyInit();
+
 		private const string InitStatusSetKey = "dotnetspider:init-stats";
 		private const string ValidateStatusKey = "dotnetspider:validate-stats";
 		private IRedialExecutor _redialExecutor;
@@ -31,7 +33,10 @@ namespace DotnetSpider.Extension
 		public Action VerifyCollectedData { get; set; }
 
 		public string RedisConnectString { get; set; }
+
 		public string ConnectString { get; set; }
+
+		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
 		[JsonIgnore]
 		public RedisConnection RedisConnection { get; private set; }
@@ -59,11 +64,10 @@ namespace DotnetSpider.Extension
 
 		public EntitySpider(string name, Site site)
 		{
+			Name = name;
 			Site = site;
 			ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.LogAndStatusConnectString);
 		}
-
-		protected abstract void MyInit();
 
 		public override void Run(params string[] arguments)
 		{
@@ -157,8 +161,6 @@ namespace DotnetSpider.Extension
 			base.AfterInitComponent(arguments);
 		}
 
-		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
-
 		public EntitySpider AddEntityType(Type type)
 		{
 			AddEntityType(type, null);
@@ -196,90 +198,6 @@ namespace DotnetSpider.Extension
 		public ISpider ToDefaultSpider()
 		{
 			return new DefaultSpider("", new Site());
-		}
-
-		private void HandleVerifyCollectData()
-		{
-			if (VerifyCollectedData == null)
-			{
-				return;
-			}
-			string key = $"dotnetspider:validateLocker:{Identity}";
-
-			try
-			{
-				bool needInitStartRequest = true;
-				if (RedisConnection != null)
-				{
-					while (!RedisConnection.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
-					{
-						Thread.Sleep(1000);
-					}
-
-					var lockerValue = RedisConnection.Database.HashGet(ValidateStatusKey, Identity);
-					needInitStartRequest = lockerValue != "verify finished";
-				}
-				if (needInitStartRequest)
-				{
-					this.Log("开始执行数据验证...", LogLevel.Info);
-					VerifyCollectedData();
-				}
-				this.Log("数据验证已完成.", LogLevel.Info);
-
-				if (needInitStartRequest)
-				{
-					RedisConnection?.Database.HashSet(ValidateStatusKey, Identity, "verify finished");
-				}
-			}
-			catch (Exception e)
-			{
-				this.Log(e.Message, LogLevel.Error, e);
-				//throw;
-			}
-			finally
-			{
-				RedisConnection?.Database.LockRelease(key, 0);
-			}
-		}
-
-		private void RegisterControl(ISpider spider)
-		{
-			if (RedisConnection != null)
-			{
-				try
-				{
-					RedisConnection.Subscriber.Subscribe($"{spider.Identity}", (c, m) =>
-					{
-						switch (m)
-						{
-							case "PAUSE":
-								{
-									spider.Pause();
-									break;
-								}
-							case "CONTINUE":
-								{
-									spider.Contiune();
-									break;
-								}
-							case "RUNASYNC":
-								{
-									spider.RunAsync();
-									break;
-								}
-							case "EXIT":
-								{
-									spider.Exit();
-									break;
-								}
-						}
-					});
-				}
-				catch (Exception e)
-				{
-					spider.Log("Register contol failed.", LogLevel.Error, e);
-				}
-			}
 		}
 
 		public static Entity GenerateEntityMetaData(
@@ -378,6 +296,26 @@ namespace DotnetSpider.Extension
 			return entity;
 		}
 
+		public static string GenerateTableName(string name, TableSuffix suffix)
+		{
+			switch (suffix)
+			{
+				case TableSuffix.FirstDayOfThisMonth:
+					{
+						return name + "_" + DateTimeUtils.Day1OfThisMonth.ToString("yyyy_MM_dd");
+					}
+				case TableSuffix.Monday:
+					{
+						return name + "_" + DateTimeUtils.Day1OfThisWeek.ToString("yyyy_MM_dd");
+					}
+				case TableSuffix.Today:
+					{
+						return name + "_" + DateTime.Now.ToString("yyyy_MM_dd");
+					}
+			}
+			return name;
+		}
+
 		private static DataType GetDataType(string name)
 		{
 			switch (name)
@@ -411,26 +349,6 @@ namespace DotnetSpider.Extension
 			return DataType.Text;
 		}
 
-		public static string GenerateTableName(string name, TableSuffix suffix)
-		{
-			switch (suffix)
-			{
-				case TableSuffix.FirstDayOfThisMonth:
-					{
-						return name + "_" + DateTimeUtils.Day1OfThisMonth.ToString("yyyy_MM_dd");
-					}
-				case TableSuffix.Monday:
-					{
-						return name + "_" + DateTimeUtils.Day1OfThisWeek.ToString("yyyy_MM_dd");
-					}
-				case TableSuffix.Today:
-					{
-						return name + "_" + DateTime.Now.ToString("yyyy_MM_dd");
-					}
-			}
-			return name;
-		}
-
 		private void InsertRunningState()
 		{
 			using (IDbConnection conn = new MySqlConnection(ConnectString))
@@ -460,6 +378,90 @@ namespace DotnetSpider.Extension
 
 				command.CommandText = $"DELETE FROM `dotnetspider`.`task_running` WHERE `taskId`='{Identity}';";
 				command.ExecuteNonQuery();
+			}
+		}
+
+		private void HandleVerifyCollectData()
+		{
+			if (VerifyCollectedData == null)
+			{
+				return;
+			}
+			string key = $"dotnetspider:validateLocker:{Identity}";
+
+			try
+			{
+				bool needInitStartRequest = true;
+				if (RedisConnection != null)
+				{
+					while (!RedisConnection.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+					{
+						Thread.Sleep(1000);
+					}
+
+					var lockerValue = RedisConnection.Database.HashGet(ValidateStatusKey, Identity);
+					needInitStartRequest = lockerValue != "verify finished";
+				}
+				if (needInitStartRequest)
+				{
+					this.Log("开始执行数据验证...", LogLevel.Info);
+					VerifyCollectedData();
+				}
+				this.Log("数据验证已完成.", LogLevel.Info);
+
+				if (needInitStartRequest)
+				{
+					RedisConnection?.Database.HashSet(ValidateStatusKey, Identity, "verify finished");
+				}
+			}
+			catch (Exception e)
+			{
+				this.Log(e.Message, LogLevel.Error, e);
+				//throw;
+			}
+			finally
+			{
+				RedisConnection?.Database.LockRelease(key, 0);
+			}
+		}
+
+		private void RegisterControl(ISpider spider)
+		{
+			if (RedisConnection != null)
+			{
+				try
+				{
+					RedisConnection.Subscriber.Subscribe($"{spider.Identity}", (c, m) =>
+					{
+						switch (m)
+						{
+							case "PAUSE":
+								{
+									spider.Pause();
+									break;
+								}
+							case "CONTINUE":
+								{
+									spider.Contiune();
+									break;
+								}
+							case "RUNASYNC":
+								{
+									spider.RunAsync();
+									break;
+								}
+							case "EXIT":
+								{
+									spider.Exit();
+									break;
+								}
+						}
+					});
+				}
+				catch (Exception e)
+				{
+					spider.Log("Register contol failed.", LogLevel.Error, e);
+				}
 			}
 		}
 	}

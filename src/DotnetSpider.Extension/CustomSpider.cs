@@ -23,17 +23,17 @@ namespace DotnetSpider.Extension
 		protected CustomSpider(string name)
 		{
 			Name = name;
-
-			if (string.IsNullOrEmpty(Identity) || Identity.Length > 120)
-			{
-				throw new ArgumentException("Length of Identity should between 1 and 120.");
-			}
 		}
 
 		protected abstract void ImplementAction(params string[] arguments);
 
 		public void Run(params string[] arguments)
 		{
+			if (string.IsNullOrEmpty(Identity) || Identity.Length > 120)
+			{
+				throw new ArgumentException("Length of Identity should between 1 and 120.");
+			}
+
 			if (string.IsNullOrEmpty(ConnectString))
 			{
 				ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.LogAndStatusConnectString);

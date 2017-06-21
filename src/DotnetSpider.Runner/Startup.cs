@@ -19,26 +19,28 @@ namespace DotnetSpider.Runner
 				var results = arg.Split(':');
 				if (results.Length == 2)
 				{
-					if (arguments.ContainsKey(results[0]))
+					var key = results[0].Trim();
+					if (arguments.ContainsKey(key))
 					{
-						arguments[results[0]] = results[1];
+						arguments[key] = results[1].Trim();
 					}
 					else
 					{
-						arguments.Add(results[0], results[1]);
+						arguments.Add(key, results[1].Trim());
 					}
 				}
 				else if (results.Length == 1)
 				{
-					if (!arguments.ContainsKey(results[0]))
+					var key = results[0].Trim();
+					if (!arguments.ContainsKey(key))
 					{
-						arguments.Add(results[0], string.Empty);
+						arguments.Add(key, string.Empty);
 					}
 				}
 				else
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Please use command like: -s:[spider type name] -b:[batch] -a:[arg1,arg2...]");
+					Console.WriteLine("Please use command like: -s:[spider type name] -i:[identity] -a:[arg1,arg2...]");
 					Console.ForegroundColor = ConsoleColor.White;
 					return;
 				}

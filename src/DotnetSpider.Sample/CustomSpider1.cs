@@ -7,6 +7,7 @@ namespace DotnetSpider.Sample
 	{
 		public CustomSpider1() : base("CustomSpider1")
 		{
+			Identity = Guid.NewGuid().ToString();
 		}
 
 		protected override void ImplementAction(params string[] arguments)
