@@ -48,9 +48,7 @@ namespace DotnetSpider.Runner
 			string spiderName = string.Empty;
 			if (arguments.Count == 0 || !arguments.ContainsKey("-s") || !arguments.ContainsKey("-tid"))
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("-s or -tid are necessary.");
-				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
 			else
@@ -73,7 +71,7 @@ namespace DotnetSpider.Runner
 			{
 				var types = asm.GetTypes();
 #endif
-
+				Console.WriteLine($"Fetch assembly: {asm.FullName}.");
 				foreach (var type in types)
 				{
 					bool hasNonParametersConstructor = type.GetConstructors().Any(c => c.IsPublic && c.GetParameters().Length == 0);
@@ -94,6 +92,7 @@ namespace DotnetSpider.Runner
 							var name = (string)property.GetValue(runner);
 							if (!spiders.ContainsKey(name))
 							{
+								Console.WriteLine($"Detected spider: {name}.");
 								spiders.Add(name, runner);
 							}
 							++totalTypesCount;
@@ -104,31 +103,19 @@ namespace DotnetSpider.Runner
 
 			if (spiders.Count == 0)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("No spiders.");
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.WriteLine("Press any key to continue...");
-				Console.Read();
+				Console.WriteLine("Did not detect any spider.");
 				return;
 			}
 
 			if (spiders.Count != totalTypesCount)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("There are some duplicate spiders.");
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.WriteLine("Press any key to continue...");
-				Console.Read();
 				return;
 			}
 
 			if (!spiders.ContainsKey(spiderName))
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine($"There is no spider named: {spiderName}.");
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.WriteLine("Press any key to continue...");
-				Console.Read();
 				return;
 			}
 			var spider = spiders[spiderName];
@@ -163,7 +150,10 @@ namespace DotnetSpider.Runner
 			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
 #endif
 			//return new List<string> { Path.Combine(path, "DotnetSpider.Core.dll") };
-			return Directory.GetFiles(path).Where(f => f.ToLower().EndsWith("dotnetspider.sample") || f.ToLower().EndsWith("dotnetspider.sample.dll") || f.ToLower().EndsWith("Spiders.dll") || f.ToLower().EndsWith("Spiders.exe")).ToList();
+			return Directory.GetFiles(path).Where(f =>
+			f.ToLower().EndsWith("dotnetspider.sample") || f.ToLower().EndsWith("dotnetspider.sample.dll")
+			|| f.ToLower().EndsWith("spiders.dll") || f.ToLower().EndsWith("spiders.exe")
+			|| f.ToLower().EndsWith("crawlers.dll") || f.ToLower().EndsWith("crawlers.exe")).ToList();
 		}
 	}
 }

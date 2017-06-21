@@ -1,5 +1,9 @@
 ﻿using DotnetSpider.Runner;
 using System;
+using System.Text;
+#if !NET_CORE
+using System.Threading;
+#endif
 
 namespace DotnetSpider.Sample
 {
@@ -8,6 +12,12 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#else
+			ThreadPool.SetMinThreads(200, 200);
+#endif
+
 			Startup.Run(new string[] { "-s:CustomSpider1", $"-i:CustomSpider1{DateTime.Now.ToString("yyyyMMddhhmmss")}", "-tid:1" });
 
 			//CustomSpider1 s = new CustomSpider1();
