@@ -39,9 +39,7 @@ namespace DotnetSpider.Runner
 				}
 				else
 				{
-					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine("Please use command like: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId]");
-					Console.ForegroundColor = ConsoleColor.White;
 					return;
 				}
 			}
@@ -62,12 +60,12 @@ namespace DotnetSpider.Runner
 			int totalTypesCount = 0;
 			var spiders = new Dictionary<string, object>();
 #if !NET_45
-			foreach (var library in deps.CompileLibraries.Where(l => l.Name.ToLower().EndsWith("dotnetspider.sample") || l.Name.ToLower().EndsWith("spiders.dll") || l.Name.ToLower().EndsWith("spiders.exe")))
+			foreach (var library in deps.CompileLibraries.Where(l => l.Name.ToLower().EndsWith("dotnetspider.sample") || l.Name.ToLower().EndsWith("spiders.dll") || l.Name.ToLower().EndsWith("spiders.exe") || l.Name.ToLower().EndsWith("crawlers.dll") || l.Name.ToLower().EndsWith("crawlers.exe")))
 			{
 				var asm = Assembly.Load(new AssemblyName(library.Name));
 				var types = asm.GetTypes();
 #else
-			foreach (var asm in  AppDomain.CurrentDomain.GetAssemblies().Where(l => l.GetName().Name.ToLower().EndsWith("dotnetspider.sample") || l.GetName().Name.ToLower().EndsWith("spiders.dll") || l.GetName().Name.ToLower().EndsWith("spiders.exe")))
+			foreach (var asm in AppDomain.CurrentDomain.GetAssemblies().Where(l => l.GetName().Name.ToLower().EndsWith("dotnetspider.sample") || l.GetName().Name.ToLower().EndsWith("spiders.dll") || l.GetName().Name.ToLower().EndsWith("spiders.exe") || l.GetName().Name.ToLower().EndsWith("crawlers.dll") || l.GetName().Name.ToLower().EndsWith("crawlers.exe")))
 			{
 				var types = asm.GetTypes();
 #endif
@@ -140,20 +138,6 @@ namespace DotnetSpider.Runner
 			{
 				method.Invoke(spider, new object[] { new string[] { arguments["-a"] } });
 			}
-		}
-
-		private static List<string> DetectDlls()
-		{
-#if !NET_45
-			var path = Path.Combine(AppContext.BaseDirectory);
-#else
-			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-#endif
-			//return new List<string> { Path.Combine(path, "DotnetSpider.Core.dll") };
-			return Directory.GetFiles(path).Where(f =>
-			f.ToLower().EndsWith("dotnetspider.sample") || f.ToLower().EndsWith("dotnetspider.sample.dll")
-			|| f.ToLower().EndsWith("spiders.dll") || f.ToLower().EndsWith("spiders.exe")
-			|| f.ToLower().EndsWith("crawlers.dll") || f.ToLower().EndsWith("crawlers.exe")).ToList();
 		}
 	}
 }
