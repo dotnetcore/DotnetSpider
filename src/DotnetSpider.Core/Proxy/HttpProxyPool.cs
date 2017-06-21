@@ -39,12 +39,15 @@ namespace DotnetSpider.Core.Proxy
 		{
 			for (int i = 0; i < 3600; ++i)
 			{
-				var proxy = _proxyQueue.FirstOrDefault(p => DateTimeUtils.GetCurrentTimeStamp() - p.GetLastUseTime() > _reuseInterval);
-				if (proxy != null)
+				lock (this)
 				{
-					proxy.SetLastBorrowTime(DateTimeUtils.GetCurrentTimeStamp());
-					_proxyQueue.Remove(proxy);
-					return proxy.GetWebProxy();
+					var proxy = _proxyQueue.FirstOrDefault(p => DateTimeUtils.GetCurrentTimeStamp() - p.GetLastUseTime() > _reuseInterval);
+					if (proxy != null)
+					{
+						proxy.SetLastBorrowTime(DateTimeUtils.GetCurrentTimeStamp());
+						_proxyQueue.Remove(proxy);
+						return proxy.GetWebProxy();
+					}
 				}
 				Thread.Sleep(1000);
 			}
@@ -92,8 +95,10 @@ namespace DotnetSpider.Core.Proxy
 			{
 				return;
 			}
-
-			_proxyQueue.Add(p);
+			lock (this)
+			{
+				_proxyQueue.Add(p);
+			}
 		}
 
 		private void RefreshProxies()
@@ -117,10 +122,14 @@ namespace DotnetSpider.Core.Proxy
 					value.SetFailedNum(0);
 					value.SetReuseTime(_reuseInterval);
 
-					_proxyQueue.Add(value);
+					lock (this)
+					{
+						_proxyQueue.Add(value);
+					}
 					_allProxy.GetOrAdd(key, value);
 				}
 			});
+
 		}
 	}
 }
