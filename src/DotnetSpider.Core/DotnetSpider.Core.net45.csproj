@@ -81,7 +81,6 @@
     <Compile Include="Downloader\HttpConstant.cs" />
     <Compile Include="Downloader\ICookieInterceptor.cs" />
     <Compile Include="Downloader\IDownloader.cs" />
-    <Compile Include="IBatch.cs" />
     <Compile Include="IClean.cs" />
     <Compile Include="IContiunable.cs" />
     <Compile Include="IControllable.cs" />

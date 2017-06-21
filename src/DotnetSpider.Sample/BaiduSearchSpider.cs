@@ -7,30 +7,24 @@ using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using System.Collections.Generic;
+using System;
 
 namespace DotnetSpider.Sample
 {
-	public class BaiduSearchSpider : EntitySpiderBuilder
+	public class BaiduSearchSpider : EntitySpider
 	{
 		public BaiduSearchSpider() : base("BaiduSearch")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		protected override void MyInit()
 		{
-			EntitySpider context = new EntitySpider(new Site
-			{
-				EncodingName = "UTF-8"
-			});
-
-			context.AddPipeline(
-				new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			AddPipeline(
+					new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 
 			var word = "可乐|雪碧";
-			context.AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
-			context.AddEntityType(typeof(BaiduSearchEntry));
-
-			return context;
+			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+			AddEntityType(typeof(BaiduSearchEntry));
 		}
 	}
 

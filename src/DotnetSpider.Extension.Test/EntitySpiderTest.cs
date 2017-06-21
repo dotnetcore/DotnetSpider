@@ -26,19 +26,23 @@ namespace DotnetSpider.Extension.Test
 
 		public class MyEntitySpider1 : EntitySpider
 		{
-			public MyEntitySpider1(Site site) : base(site)
+			public MyEntitySpider1() : base("tes")
 			{
-				//RedisHost = "redis";
-				//RedisPassword = "test";
+			}
+
+			protected override void MyInit()
+			{
+				Identity = Guid.NewGuid().ToString();
+				AddPipeline(new ConsoleEntityPipeline());
+				AddEntityType(typeof(TestEntity));
 			}
 		}
 
 		[TestMethod]
 		public void TestCorrectRedisSetting()
 		{
-			EntitySpider spider = new EntitySpider(new Site());
-			spider.AddPipeline(new ConsoleEntityPipeline());
-			spider.AddEntityType(typeof(TestEntity));
+			EntitySpider spider = new MyEntitySpider1();
+
 			spider.Run("running-test");
 		}
 
@@ -86,15 +90,28 @@ namespace DotnetSpider.Extension.Test
 			db.LockRelease(key, 0);
 		}
 
+
+		public class ClearSchedulerTestSpider : EntitySpider
+		{
+			public ClearSchedulerTestSpider() : base("ClearSchedulerTestSpider")
+			{
+			}
+
+			protected override void MyInit()
+			{
+				Identity = Guid.NewGuid().ToString("N");
+				SetScheduler(new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
+				AddStartUrl("https://baidu.com");
+				AddPipeline(new ConsoleEntityPipeline());
+				AddEntityType(typeof(TestEntity));
+			}
+		}
+
 		[TestMethod]
 		public void ClearScheduler()
 		{
-			EntitySpider spider = new EntitySpider(new Site());
-			spider.Identity = Guid.NewGuid().ToString("N");
-			spider.SetScheduler(new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
-			spider.AddStartUrl("https://baidu.com");
-			spider.AddPipeline(new ConsoleEntityPipeline());
-			spider.AddEntityType(typeof(TestEntity));
+			EntitySpider spider = new ClearSchedulerTestSpider();
+
 			spider.Run();
 
 			var confiruation = new ConfigurationOptions()
@@ -139,33 +156,27 @@ namespace DotnetSpider.Extension.Test
 			spider.Run();
 		}
 
-		public class CasSpider : EntitySpiderBuilder
+		public class CasSpider : EntitySpider
 		{
 			public CasSpider() : base("casTest")
 			{
 			}
 
-			protected override EntitySpider GetEntitySpider()
-			{
-				EntitySpider context = new EntitySpider(new Site());
-				context.SetSite(new Site());
-				context.SetThreadNum(2);
-				context.ThreadNum = 1;
-				context.RetryWhenResultIsEmpty = false;
-				context.Deep = 100;
-				context.EmptySleepTime = 5000;
-				context.SetEmptySleepTime(5000);
-				context.ExitWhenComplete = true;
-				context.CachedSize = 1;
-				context.SetDownloader(new HttpClientDownloader());
-				context.SetScheduler(new QueueDuplicateRemovedScheduler());
 
-				context.SkipWhenResultIsEmpty = true;
-				context.SpawnUrl = true;
-				context.AddPipeline(new CollectEntityPipeline());
-				context.AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
-				context.AddEntityType(typeof(ArticleSummary));
-				return context;
+			protected override void MyInit()
+			{
+				Identity = Guid.NewGuid().ToString();
+				ThreadNum = 1;
+				RetryWhenResultIsEmpty = false;
+				Deep = 100;
+				EmptySleepTime = 5000;
+				ExitWhenComplete = true;
+				CachedSize = 1;
+				SkipWhenResultIsEmpty = true;
+				SpawnUrl = true;
+				AddPipeline(new CollectEntityPipeline());
+				AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
+				AddEntityType(typeof(ArticleSummary));
 			}
 
 			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]

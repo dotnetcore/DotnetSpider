@@ -9,25 +9,22 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class ShanxizhaoshengSpider : EntitySpiderBuilder
+	public class ShanxizhaoshengSpider : EntitySpider
 	{
 		public ShanxizhaoshengSpider() : base("ShanxizhaoshengSpider")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		protected override void MyInit()
 		{
-			EntitySpider context = new EntitySpider(new Site());
-			context.Identity = ("ShanxizhaoshengSpider " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
-			context.SetSite(new Site
+			Identity = ("ShanxizhaoshengSpider " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			SetSite(new Site
 			{
 				EncodingName = "GB2312"
 			});
-			context.AddPipeline(new SqlServerEntityPipeline("Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True"));
-			context.AddStartUrl("http://www.sneac.com/pgjhcx/ypbkyxjg.jsp?a11709CountNo=2000");
-			context.AddEntityType(typeof(Item));
-
-			return context;
+			AddPipeline(new SqlServerEntityPipeline("Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True"));
+			AddStartUrl("http://www.sneac.com/pgjhcx/ypbkyxjg.jsp?a11709CountNo=2000");
+			AddEntityType(typeof(Item));
 		}
 
 		[Table("abc", "shanxizhaosheng")]

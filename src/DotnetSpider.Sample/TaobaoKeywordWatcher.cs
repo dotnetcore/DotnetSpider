@@ -12,10 +12,11 @@ using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using System;
 
 namespace DotnetSpider.Sample
 {
-	public class TaobaoKeywordWatcher : EntitySpiderBuilder
+	public class TaobaoKeywordWatcher : EntitySpider
 	{
 		public class MyDataHanlder : DataHandler
 		{
@@ -36,45 +37,6 @@ namespace DotnetSpider.Sample
 		public TaobaoKeywordWatcher() : base("TaobaoKeywordCheck ")
 		{
 
-		}
-
-		protected override EntitySpider GetEntitySpider()
-		{
-			Site site = new Site();
-			using (var reader = new StreamReader(File.OpenRead("taobaokeyword.txt")))
-			{
-				string keyword;
-				while (!string.IsNullOrEmpty(keyword = reader.ReadLine()))
-				{
-					site.AddStartUrl("https://" + $"s.taobao.com/search?q={keyword}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}&fs=1&filter_tianmao=tmall", new Dictionary<string, object>
-					{
-						{ "keyword" , keyword}
-					});
-				}
-			}
-			var context = new EntitySpider(site)
-			{
-				ThreadNum = 5,
-				SkipWhenResultIsEmpty = true,
-				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName = DotnetSpider,keepAlive = 8,allowAdmin = True,connectTimeout = 10000,password = 6GS9F2QTkP36GggE0c3XwVwI,abortConnect = True,connectRetry = 20"),
-				Downloader = new HttpClientDownloader
-				{
-					DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-					{
-							new SubContentHandler
-							{
-								StartOffset = 16,
-								EndOffset = 22,
-								Start = "g_page_config = {",
-								End = "g_srp_loadCss();"
-							},
-						new IncrementTargetUrlsCreator("&s=0",null,44)
-					}
-				}
-			};
-			context.AddPipeline(new MySqlEntityPipeline("Database = 'mysql'; Data Source = localhost; User ID = root; Password = 1qazZAQ!; Port = 3306"));
-			context.AddEntityType(typeof(Item), new MyDataHanlder());
-			return context;
 		}
 
 		[Table("taobao", "tmall_paper_diaper")]
@@ -110,6 +72,42 @@ namespace DotnetSpider.Sample
 
 			[PropertyDefine(Expression = "$.nick", Type = SelectorType.JsonPath, Length = 100)]
 			public string nick { get; set; }
+		}
+
+		protected override void MyInit()
+		{
+			Site site = new Site();
+			using (var reader = new StreamReader(File.OpenRead("taobaokeyword.txt")))
+			{
+				string keyword;
+				while (!string.IsNullOrEmpty(keyword = reader.ReadLine()))
+				{
+					site.AddStartUrl("https://" + $"s.taobao.com/search?q={keyword}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}&fs=1&filter_tianmao=tmall", new Dictionary<string, object>
+					{
+						{ "keyword" , keyword}
+					});
+				}
+			}
+			Site = site;
+			ThreadNum = 5;
+			SkipWhenResultIsEmpty = true;
+			Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName = DotnetSpider,keepAlive = 8,allowAdmin = True,connectTimeout = 10000,password = 6GS9F2QTkP36GggE0c3XwVwI,abortConnect = True,connectRetry = 20");
+				Downloader = new HttpClientDownloader
+				{
+					DownloadCompleteHandlers = new IDownloadCompleteHandler[]
+					{
+							new SubContentHandler
+							{
+								StartOffset = 16,
+								EndOffset = 22,
+								Start = "g_page_config = {",
+								End = "g_srp_loadCss();"
+							},
+						new IncrementTargetUrlsCreator("&s=0",null,44)
+					}
+				};
+			AddPipeline(new MySqlEntityPipeline("Database = 'mysql'; Data Source = localhost; User ID = root; Password = 1qazZAQ!; Port = 3306"));
+			AddEntityType(typeof(Item), new MyDataHanlder());
 		}
 	}
 }

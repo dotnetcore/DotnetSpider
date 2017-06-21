@@ -11,33 +11,29 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class CasSpider : EntitySpiderBuilder
+	public class CasSpider : EntitySpider
 	{
 		public CasSpider() : base("cas")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		protected override void MyInit()
 		{
-			EntitySpider context = new EntitySpider(new Site())
+			Downloader = new HttpClientDownloader
 			{
-				Downloader = new HttpClientDownloader
-				{
-					DownloadCompleteHandlers = new IDownloadCompleteHandler[]
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 					{
 						new IncrementTargetUrlsCreator("index_1.shtml")
 					}
-				},
 			};
-			context.SetThreadNum(10);
-			context.Identity = ("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-			context.AddPipeline(
-				new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
-			context.AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
-			context.AddStartUrl("http://www.cas.cn/kx/kpwz/index_1.shtml");
-			context.AddEntityType(typeof(ArticleSummary));
-			context.AddEntityType(typeof(Article));
-			return context;
+			SetThreadNum(10);
+			Identity = ("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+			AddPipeline(
+			   new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
+			AddStartUrl("http://www.cas.cn/kx/kpwz/index_1.shtml");
+			AddEntityType(typeof(ArticleSummary));
+			AddEntityType(typeof(Article));
 		}
 
 		[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]

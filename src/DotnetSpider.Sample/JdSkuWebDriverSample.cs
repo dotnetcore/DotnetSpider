@@ -10,25 +10,22 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader.WebDriver;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
-	public class JdSkuWebDriverSample : EntitySpiderBuilder
+	public class JdSkuWebDriverSample : EntitySpider
 	{
-		public JdSkuWebDriverSample() : base("JdSkuWebDriver", Extension.Infrastructure.Batch.Now)
+		public JdSkuWebDriverSample() : base("JdSkuWebDriver")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		protected override void MyInit()
 		{
-			EntitySpider context = new EntitySpider(new Site());
-			context.SetIdentity("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
-			context.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
-			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-			context.AddEntityType(typeof(Product));
-			context.SetDownloader(new WebDriverDownloader(Browser.Chrome));
-			return context;
+			Identity = ("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			AddEntityType(typeof(Product));
+			SetDownloader(new WebDriverDownloader(Browser.Chrome));
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]

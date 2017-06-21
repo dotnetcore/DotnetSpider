@@ -10,24 +10,22 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class Hao360EntitySpiderInfoBuble : EntitySpiderBuilder
+	public class Hao360EntitySpiderInfoBuble : EntitySpider
 	{
 		public Hao360EntitySpiderInfoBuble() : base("Hao360")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		protected override void MyInit()
 		{
-			EntitySpider context = new EntitySpider(new Site())
+			Identity = "HaoBrowser Hao360Spider Buble " + DateTime.Now.ToString("yyyy-MM-dd HHmmss");
+			CachedSize = 1;
+			ThreadNum = 1;
+			SkipWhenResultIsEmpty = true;
+			Downloader = new HttpClientDownloader
 			{
-				Identity = "HaoBrowser Hao360Spider Buble " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"),
-				CachedSize = 1,
-				ThreadNum = 1,
-				SkipWhenResultIsEmpty = true,
-				Downloader = new HttpClientDownloader
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 				{
-					DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-					{
 						new SubContentHandler {
 							Start="sales[\"hotsite_yixing\"] = [",
 							End="}}",
@@ -38,14 +36,12 @@ namespace DotnetSpider.Sample
 							NewValue="/",
 							OldValue="\\/",
 						},
-					}
 				}
 			};
-			context.SetScheduler(new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
-			context.AddPipeline(new MySqlEntityPipeline("Database='testhao';Data Source= localhost;User ID=root;Password=root@123456;Port=3306"));
-			context.AddStartUrl("https://hao.360.cn/");
-			context.AddEntityType(typeof(UpdateHao360Info));
-			return context;
+			SetScheduler(new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
+			AddPipeline(new MySqlEntityPipeline("Database='testhao';Data Source= localhost;User ID=root;Password=root@123456;Port=3306"));
+			AddStartUrl("https://hao.360.cn/");
+			AddEntityType(typeof(UpdateHao360Info));
 		}
 
 		[Table("testhao", "hao360buble")]

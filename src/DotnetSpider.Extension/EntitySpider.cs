@@ -20,7 +20,7 @@ using System.Data;
 
 namespace DotnetSpider.Extension
 {
-	public class EntitySpider : Spider
+	public abstract class EntitySpider : Spider
 	{
 		private const string InitStatusSetKey = "dotnetspider:init-stats";
 		private const string ValidateStatusKey = "dotnetspider:validate-stats";
@@ -53,21 +53,25 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public EntitySpider()
+		public EntitySpider(string name) : this(name, new Site())
 		{
+		}
+
+		public EntitySpider(string name, Site site)
+		{
+			Site = site;
 			ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.LogAndStatusConnectString);
 		}
 
-		public EntitySpider(Site site) : this()
-		{
-			Site = site;
-		}
+		protected abstract void MyInit();
 
 		public override void Run(params string[] arguments)
 		{
+			MyInit();
+
 			if (string.IsNullOrEmpty(Identity) || Identity.Length > 120)
 			{
-				throw new ArgumentException("Length of name should between 1 and 120.");
+				throw new ArgumentException("Length of Identity should between 1 and 120.");
 			}
 
 			if (!string.IsNullOrEmpty(ConnectString))
@@ -153,7 +157,7 @@ namespace DotnetSpider.Extension
 			base.AfterInitComponent(arguments);
 		}
 
-		protected string InitLockKey => $"dotnetspider:initLocker:{Identity}";
+		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
 		public EntitySpider AddEntityType(Type type)
 		{

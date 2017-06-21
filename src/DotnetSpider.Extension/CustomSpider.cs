@@ -24,9 +24,9 @@ namespace DotnetSpider.Extension
 		{
 			Name = name;
 
-			if (string.IsNullOrEmpty(Name) || Name.Length > 120)
+			if (string.IsNullOrEmpty(Identity) || Identity.Length > 120)
 			{
-				throw new ArgumentException("Length of name should between 1 and 120.");
+				throw new ArgumentException("Length of Identity should between 1 and 120.");
 			}
 		}
 

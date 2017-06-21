@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Selector;
@@ -10,13 +11,13 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class JdShopDetailSpider2 : EntitySpiderBuilder
+	public class JdShopDetailSpider2 : EntitySpider
 	{
 		public JdShopDetailSpider2() : base("JdShopDetailSpider2")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		protected override void MyInit()
 		{
 			var site = new Site()
 			{
@@ -32,11 +33,10 @@ namespace DotnetSpider.Sample
 			};
 			site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3355984&callback=json");
 			site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3682523&callback=json");
-			var context = new EntitySpider(site)
+			Site = site;
+			Downloader = new HttpClientDownloader
 			{
-				Downloader = new HttpClientDownloader
-				{
-					DownloadCompleteHandlers = new IDownloadCompleteHandler[]
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 					{
 						new SubContentHandler
 						{
@@ -46,12 +46,10 @@ namespace DotnetSpider.Sample
 							EndOffset = 2
 						}
 					}
-				}
 			};
 
-			context.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=3306"));
-			context.AddEntityType(typeof(ProductUpdater));
-			return context;
+			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=3306"));
+			AddEntityType(typeof(ProductUpdater));
 		}
 
 		[Table("jd", "shop", TableSuffix.Monday, Primary = "pid")]

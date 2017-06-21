@@ -11,26 +11,25 @@ using DotnetSpider.Core.Downloader;
 
 namespace DotnetSpider.Sample
 {
-	public class JdSkuSampleSpider : EntitySpiderBuilder
+	public class JdSkuSampleSpider : EntitySpider
 	{
-		public JdSkuSampleSpider() : base("JdSkuSample" )
+		public JdSkuSampleSpider() : base("JdSkuSample")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		protected override void MyInit()
 		{
-			EntitySpider context = new EntitySpider(new Site
+			Site = new Site
 			{
 				//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("快代理API"))
-			});
-			context.SetThreadNum(1);
+			};
+			SetThreadNum(1);
 			// dowload html by http client
-			context.SetDownloader(new HttpClientDownloader());
+			SetDownloader(new HttpClientDownloader());
 			// save data to mysql.
-			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
-			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-			context.AddEntityType(typeof(Product));
-			return context;
+			AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			AddEntityType(typeof(Product));
 		}
 
 		[Table("test", "sku", TableSuffix.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
@@ -73,18 +72,17 @@ namespace DotnetSpider.Sample
 		}
 	}
 
-	public class JdSkuSampleSpider2 : EntitySpiderBuilder
+	public class JdSkuSampleSpider2 : EntitySpider
 	{
 		public JdSkuSampleSpider2() : base("JdSkuSample2")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		protected override void MyInit()
 		{
-			EntitySpider context = new EntitySpider(new Site());
-			context.SetThreadNum(1);
-			context.Identity = ("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-			context.AddPipeline(new MySqlEntityPipeline(null)
+			SetThreadNum(1);
+			Identity = ("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
+			AddPipeline(new MySqlEntityPipeline(null)
 			{
 				UpdateConnectString = new DbUpdateConnectString
 				{
@@ -92,10 +90,9 @@ namespace DotnetSpider.Sample
 					QueryString = "SELECT value from `dotnetspider`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"
 				}
 			});
-			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main",
+			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main",
 				new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-			context.AddEntityType(typeof(JdSkuSampleSpider.Product));
-			return context;
+			AddEntityType(typeof(JdSkuSampleSpider.Product));
 		}
 	}
 }

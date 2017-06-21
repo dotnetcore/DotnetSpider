@@ -308,7 +308,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void MultiEntitiesInitPipelines()
 		{
-			EntitySpider context = new EntitySpider(new Site());
+			EntitySpider context = new DefaultEntitySpider();
 			context.Identity = (Guid.NewGuid().ToString("N"));
 			context.SetThreadNum(1);
 			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
@@ -354,7 +354,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"))
 			{
-				EntitySpider context = new EntitySpider(new Site());
+				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
 				context.SetThreadNum(1);
 				context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
@@ -397,7 +397,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			using (var conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"))
 			{
-				EntitySpider context = new EntitySpider(new Site());
+				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
 				context.SetThreadNum(1);
 				context.AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"));

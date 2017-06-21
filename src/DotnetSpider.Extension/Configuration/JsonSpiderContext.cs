@@ -25,6 +25,7 @@ namespace DotnetSpider.Extension.Configuration
 		public string RedisConnectString { get; set; }
 		public string LogAndStatusConnectString { get; set; }
 		public string Identity { get; set; }
+		public string Name { get; set; }
 		public Site Site { get; set; }
 		public int CachedSize { get; set; } = 1;
 		public JObject Scheduler { get; set; }
@@ -162,7 +163,7 @@ namespace DotnetSpider.Extension.Configuration
 
 		private EntitySpider GetEntitySpider()
 		{
-			EntitySpider context = new EntitySpider(Site)
+			EntitySpider context = new DefaultEntitySpider()
 			{
 				CachedSize = CachedSize,
 				Deep = Deep,
@@ -173,6 +174,8 @@ namespace DotnetSpider.Extension.Configuration
 				ThreadNum = ThreadNum,
 				Entities = Entities
 			};
+			context.Name = Name;
+			context.Site = Site;
 			context.Identity = Identity;
 			context.AddPipelines(GetPipepines(Pipelines));
 			context.RedisConnectString = RedisConnectString;

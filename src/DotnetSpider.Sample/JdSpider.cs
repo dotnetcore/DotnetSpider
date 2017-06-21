@@ -12,7 +12,7 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class JdSpider : EntitySpiderBuilder
+	public class JdSpider : EntitySpider
 	{
 		public JdSpider() : base("JD")
 		{
@@ -76,20 +76,16 @@ namespace DotnetSpider.Sample
 			public DateTime RunId { get; set; }
 		}
 
-		protected override EntitySpider GetEntitySpider()
-		{
-			var entitySpider = new EntitySpider(new Site())
-			{
-				Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Day1OfThisWeek.ToString("yyyy-MM-dd")
-			};
 
-			entitySpider.AddStartUrl("http://www.jd.com/allSort.aspx");
-			entitySpider.AddEntityType(typeof(Category));
-			entitySpider.AddEntityType(typeof(TmpProduct));
-			entitySpider.AddEntityType(typeof(JdProduct));
-			entitySpider.AddPipeline(
+		protected override void MyInit()
+		{
+			Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Day1OfThisWeek.ToString("yyyy-MM-dd");
+			AddStartUrl("http://www.jd.com/allSort.aspx");
+			AddEntityType(typeof(Category));
+			AddEntityType(typeof(TmpProduct));
+			AddEntityType(typeof(JdProduct));
+			AddPipeline(
 				new MySqlEntityPipeline("Database='test';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306"));
-			return entitySpider;
 		}
 	}
 

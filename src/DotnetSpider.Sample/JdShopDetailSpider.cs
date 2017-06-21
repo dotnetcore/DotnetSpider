@@ -9,26 +9,25 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
+using System;
 
 namespace DotnetSpider.Sample
 {
-	public class JdShopDetailSpider : EntitySpiderBuilder
+	public class JdShopDetailSpider : EntitySpider
 	{
 		public JdShopDetailSpider() : base("JdShopDetailSpider")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+		protected override void MyInit()
 		{
-			var context = new EntitySpider(new Site())
+			CachedSize = 1;
+			ThreadNum = 8;
+			Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
+			Downloader = new HttpClientDownloader
 			{
-				CachedSize = 1,
-				ThreadNum = 8,
-				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"),
-				Downloader = new HttpClientDownloader
+				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 				{
-					DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-					{
 						new SubContentHandler
 						{
 							Start = "json(",
@@ -36,10 +35,10 @@ namespace DotnetSpider.Sample
 							StartOffset = 5,
 							EndOffset = 0
 						}
-					}
-				},
-				PrepareStartUrls = new PrepareStartUrls[]
-				{
+				}
+			};
+			PrepareStartUrls = new PrepareStartUrls[]
+			{
 					new BaseDbPrepareStartUrls()
 					{
 						Source = DataSource.MySql,
@@ -48,11 +47,9 @@ namespace DotnetSpider.Sample
 						Columns = new [] {new DataColumn { Name = "sku"} },
 						FormateStrings = new List<string> { "http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json" }
 					}
-				}
 			};
-			context.AddPipeline(new MySqlEntityPipeline("Database='taobao';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=4306"));
-			context.AddEntityType(typeof(ProductUpdater));
-			return context;
+			AddPipeline(new MySqlEntityPipeline("Database='taobao';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=4306"));
+			AddEntityType(typeof(ProductUpdater));
 		}
 
 		[Table("jd", "sku_v2", TableSuffix.Monday, Primary = "Sku", UpdateColumns = new[] { "ShopId" })]

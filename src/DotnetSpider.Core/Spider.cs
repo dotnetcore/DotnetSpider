@@ -21,7 +21,7 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// A spider contains four modules: Downloader, Scheduler, PageProcessor and Pipeline. 
 	/// </summary>
-	public class Spider : ISpider, ISpeedMonitor
+	public class Spider : ISpider, ISpeedMonitor, INamed
 	{
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
@@ -38,12 +38,14 @@ namespace DotnetSpider.Core
 
 				if (string.IsNullOrEmpty(value) || value.Length > 120)
 				{
-					throw new ArgumentException("Length of identity should between 1 and 120.");
+					throw new ArgumentException("Length of Identity should less than 100.");
 				}
 
 				_identity = value;
 			}
 		}
+
+		public string Name { get; set; }
 
 		public Status Stat { get; private set; } = Status.Init;
 		public event SpiderEvent OnSuccess;

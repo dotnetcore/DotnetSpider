@@ -29,7 +29,7 @@ namespace DotnetSpider.Core.Test
 					new QueueDuplicateRemovedScheduler(),
 					new TestPageProcessor());
 			}
-			catch (SpiderException exception)
+			catch (Exception exception)
 			{
 				Assert.AreEqual("Length of Identity should less than 100.", exception.Message);
 				return;

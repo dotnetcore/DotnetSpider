@@ -8,20 +8,19 @@ using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {
-	public class RegexTestEntitySpider : EntitySpiderBuilder
+	public class RegexTestEntitySpider : EntitySpider
 	{
 		public RegexTestEntitySpider() : base("RegexTest")
 		{
 		}
 
-		protected override EntitySpider GetEntitySpider()
+
+		protected override void MyInit()
 		{
-			EntitySpider context = new EntitySpider(new Site());
-			context.Identity = ("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
-			context.AddStartUrl("http://www.cnblogs.com");
-			context.AddPipeline(new ConsoleEntityPipeline());
-			context.AddEntityType(typeof(HomePage));
-			return context;
+			Identity = ("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
+			AddStartUrl("http://www.cnblogs.com");
+			AddPipeline(new ConsoleEntityPipeline());
+			AddEntityType(typeof(HomePage));
 		}
 
 		public class HomePage : SpiderEntity
