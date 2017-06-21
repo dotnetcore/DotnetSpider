@@ -8,7 +8,7 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			Startup.Run(new string[] { "-s:CustomSpider1", $"-i:CustomSpider1{DateTime.Now.ToString("yyyyMMddhhmmss")}", "-tid:1" });
+			Startup.Run(new string[] { "-s:JdShopDetailSpider", $"-i:JdShopDetailSpider{DateTime.Now.ToString("yyyyMMddhhmmss")}", "-tid:1" });
 
 			//CustomSpider1 s = new CustomSpider1();
 			//s.Run();
