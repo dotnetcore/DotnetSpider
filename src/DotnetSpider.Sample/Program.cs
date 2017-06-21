@@ -10,8 +10,8 @@ namespace DotnetSpider.Sample
 		{
 			Startup.Run(new string[] { "-s:CustomSpider1", $"-i:CustomSpider1{DateTime.Now.ToString("yyyyMMddhhmmss")}", "-tid:1" });
 
-			CustomSpider1 s = new CustomSpider1();
-			s.Run();
+			//CustomSpider1 s = new CustomSpider1();
+			//s.Run();
 			//ConfigurableSpider.Run();
 
 			// Custmize processor and pipeline 完全自定义页面解析和数据管道
