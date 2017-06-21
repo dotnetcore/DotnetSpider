@@ -20,7 +20,7 @@ using System.Data;
 
 namespace DotnetSpider.Extension
 {
-	public abstract class EntitySpider : Spider
+	public abstract class EntitySpider : Spider, ITask
 	{
 		protected abstract void MyInit();
 
@@ -35,6 +35,8 @@ namespace DotnetSpider.Extension
 		public string RedisConnectString { get; set; }
 
 		public string ConnectString { get; set; }
+
+		public string TaskId { get; set; }
 
 		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
@@ -351,33 +353,39 @@ namespace DotnetSpider.Extension
 
 		private void InsertRunningState()
 		{
-			using (IDbConnection conn = new MySqlConnection(ConnectString))
+			if (!string.IsNullOrEmpty(ConnectString) && !string.IsNullOrEmpty(TaskId))
 			{
-				conn.Open();
-				var command = conn.CreateCommand();
-				command.CommandType = CommandType.Text;
+				using (IDbConnection conn = new MySqlConnection(ConnectString))
+				{
+					conn.Open();
+					var command = conn.CreateCommand();
+					command.CommandType = CommandType.Text;
 
-				command.CommandText = "CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;";
-				command.ExecuteNonQuery();
+					command.CommandText = "CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;";
+					command.ExecuteNonQuery();
 
-				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_running` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `taskId` varchar(120) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `taskId_unique` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
-				command.ExecuteNonQuery();
+					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_running` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `taskId` varchar(120) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `taskId_unique` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
+					command.ExecuteNonQuery();
 
-				command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_running` (`taskId`,`cdate`) values ('{Identity}','{DateTime.Now}');";
-				command.ExecuteNonQuery();
+					command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_running` (`taskId`,`cdate`) values ('{TaskId}','{DateTime.Now}');";
+					command.ExecuteNonQuery();
+				}
 			}
 		}
 
 		private void RemoveRunningState()
 		{
-			using (IDbConnection conn = new MySqlConnection(ConnectString))
+			if (!string.IsNullOrEmpty(ConnectString) && !string.IsNullOrEmpty(TaskId))
 			{
-				conn.Open();
-				var command = conn.CreateCommand();
-				command.CommandType = CommandType.Text;
+				using (IDbConnection conn = new MySqlConnection(ConnectString))
+				{
+					conn.Open();
+					var command = conn.CreateCommand();
+					command.CommandType = CommandType.Text;
 
-				command.CommandText = $"DELETE FROM `dotnetspider`.`task_running` WHERE `taskId`='{Identity}';";
-				command.ExecuteNonQuery();
+					command.CommandText = $"DELETE FROM `dotnetspider`.`task_running` WHERE `taskId`='{TaskId}';";
+					command.ExecuteNonQuery();
+				}
 			}
 		}
 

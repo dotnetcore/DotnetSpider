@@ -40,19 +40,17 @@ namespace DotnetSpider.Runner
 				else
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Please use command like: -s:[spider type name] -i:[identity] -a:[arg1,arg2...]");
+					Console.WriteLine("Please use command like: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId]");
 					Console.ForegroundColor = ConsoleColor.White;
 					return;
 				}
 			}
 			string spiderName = string.Empty;
-			if (arguments.Count == 0 || !arguments.ContainsKey("-s"))
+			if (arguments.Count == 0 || !arguments.ContainsKey("-s") || !arguments.ContainsKey("-tid"))
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("-s is necessary.");
+				Console.WriteLine("-s or -tid are necessary.");
 				Console.ForegroundColor = ConsoleColor.White;
-				Console.WriteLine("Press any key to continue...");
-				Console.Read();
 				return;
 			}
 			else
@@ -87,8 +85,9 @@ namespace DotnetSpider.Runner
 						var isNamed = interfaces.Any(t => t.FullName == "DotnetSpider.Core.INamed");
 						var isIdentity = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IIdentity");
 						var isRunnable = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IRunable");
+						var isTask = interfaces.Any(t => t.FullName == "DotnetSpider.Extension.ITask");
 
-						if (isNamed && isRunnable && isIdentity)
+						if (isNamed && isRunnable && isIdentity && isTask)
 						{
 							var property = type.GetProperties().First(p => p.Name == "Name");
 							object runner = Activator.CreateInstance(type);
@@ -132,21 +131,27 @@ namespace DotnetSpider.Runner
 				Console.Read();
 				return;
 			}
-
+			var spider = spiders[spiderName];
 			if (arguments.ContainsKey("-i"))
 			{
-				var property = spiders[spiderName].GetType().GetProperties().First(p => p.Name == "Identity");
-				property.SetValue(spiders[spiderName], arguments["-i"]);
+				var property = spider.GetType().GetProperties().First(p => p.Name == "Identity");
+				property.SetValue(spider, arguments["-i"]);
 			}
 
-			var method = spiders[spiderName].GetType().GetMethod("Run");
+			if (arguments.ContainsKey("-tid"))
+			{
+				var property = spider.GetType().GetProperties().First(p => p.Name == "TaskId");
+				property.SetValue(spider, arguments["-tid"]);
+			}
+
+			var method = spider.GetType().GetMethod("Run");
 			if (!arguments.ContainsKey("-a"))
 			{
-				method.Invoke(spiders[spiderName], new object[] { new string[] { } });
+				method.Invoke(spider, new object[] { new string[] { } });
 			}
 			else
 			{
-				method.Invoke(spiders[spiderName], new object[] { new string[] { arguments["-a"] } });
+				method.Invoke(spider, new object[] { new string[] { arguments["-a"] } });
 			}
 		}
 

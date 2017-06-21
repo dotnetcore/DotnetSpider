@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension
 {
-	public abstract class CustomSpider : IRunable, INamed, IIdentity
+	public abstract class CustomSpider : IRunable, INamed, IIdentity, ITask
 	{
 		private bool _exited;
 
@@ -19,6 +19,8 @@ namespace DotnetSpider.Extension
 		public string ConnectString { get; set; }
 
 		public string Identity { get; set; }
+
+		public string TaskId { get; set; }
 
 		protected CustomSpider(string name)
 		{
@@ -39,9 +41,17 @@ namespace DotnetSpider.Extension
 				ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.LogAndStatusConnectString);
 			}
 
+			if (string.IsNullOrEmpty(ConnectString))
+			{
+				throw new ArgumentException("ConnectString is missing.");
+			}
+
 			if (!string.IsNullOrEmpty(ConnectString))
 			{
-				InsertRunningState();
+				if (!string.IsNullOrEmpty(TaskId))
+				{
+					InsertRunningState();
+				}
 
 				using (IDbConnection conn = new MySqlConnection(ConnectString))
 				{
@@ -120,7 +130,10 @@ namespace DotnetSpider.Extension
 			}
 			finally
 			{
-				RemoveRunningState();
+				if (!string.IsNullOrEmpty(ConnectString) && !string.IsNullOrEmpty(TaskId))
+				{
+					RemoveRunningState();
+				}
 			}
 		}
 
@@ -146,7 +159,7 @@ namespace DotnetSpider.Extension
 				command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_running` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `taskId` varchar(120) NOT NULL, `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `taskId_unique` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
 				command.ExecuteNonQuery();
 
-				command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_running` (`taskId`,`cdate`) values ('{Identity}','{DateTime.Now}');";
+				command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_running` (`taskId`,`cdate`) values ('{TaskId}','{DateTime.Now}');";
 				command.ExecuteNonQuery();
 			}
 		}
@@ -159,7 +172,7 @@ namespace DotnetSpider.Extension
 				var command = conn.CreateCommand();
 				command.CommandType = CommandType.Text;
 
-				command.CommandText = $"DELETE FROM `dotnetspider`.`task_running` WHERE `taskId`='{Identity}';";
+				command.CommandText = $"DELETE FROM `dotnetspider`.`task_running` WHERE `taskId`='{TaskId}';";
 				command.ExecuteNonQuery();
 			}
 		}
