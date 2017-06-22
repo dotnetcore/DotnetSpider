@@ -60,7 +60,7 @@ namespace DotnetSpider.Runner
 			int totalTypesCount = 0;
 			var spiders = new Dictionary<string, object>();
 #if !NET_45
-			foreach (var library in deps.CompileLibraries.Where(l => l.Name.ToLower().EndsWith("dotnetspider.sample") || l.Name.ToLower().EndsWith("spiders.dll") || l.Name.ToLower().EndsWith("spiders.exe") || l.Name.ToLower().EndsWith("crawlers.dll") || l.Name.ToLower().EndsWith("crawlers.exe")))
+			foreach (var library in deps.CompileLibraries.Where(l => l.Name.ToLower().EndsWith("dotnetspider.sample") || l.Name.ToLower().EndsWith("spiders") || l.Name.ToLower().EndsWith("crawlers")))
 			{
 				var asm = Assembly.Load(new AssemblyName(library.Name));
 				var types = asm.GetTypes();
