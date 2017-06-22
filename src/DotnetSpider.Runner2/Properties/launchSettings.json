@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "DotnetSpider.Runner": {
-      "commandName": "Project",
-      "commandLineArgs": "-s:BaiduSearch -n:1"
-    }
-  }
-}
