@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>DotnetSpider2.Runner</id>
-    <version>1.3.2-rc8</version>
+    <version>1.3.3-rc3</version>
     <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
     <owners>zlzforever@163.com</owners>
     <iconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</iconUrl>
@@ -12,6 +12,10 @@
     <tags>DotnetSpider;crawler;cross platform;dotnet core</tags>
     <description>Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.</description>
     <dependencies>
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="System.Runtime.Loader" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyModel" version="1.1.2" exclude="Build,Analyzers" />
+      </group>
     </dependencies>
   </metadata>
   <files>

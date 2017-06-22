@@ -39,18 +39,14 @@ namespace DotnetSpider.Runner
 				}
 				else
 				{
-					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine("Please use command like: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId]");
-					Console.ForegroundColor = ConsoleColor.White;
 					return;
 				}
 			}
 			string spiderName = string.Empty;
 			if (arguments.Count == 0 || !arguments.ContainsKey("-s") || !arguments.ContainsKey("-tid"))
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("-s or -tid are necessary.");
-				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
 			else
@@ -64,16 +60,16 @@ namespace DotnetSpider.Runner
 			int totalTypesCount = 0;
 			var spiders = new Dictionary<string, object>();
 #if !NET_45
-			foreach (var library in deps.CompileLibraries.Where(l => l.Name.ToLower().EndsWith("dotnetspider.sample") || l.Name.ToLower().EndsWith("spiders.dll") || l.Name.ToLower().EndsWith("spiders.exe")))
+			foreach (var library in deps.CompileLibraries.Where(l => l.Name.ToLower().EndsWith("dotnetspider.sample") || l.Name.ToLower().EndsWith("spiders.dll") || l.Name.ToLower().EndsWith("spiders.exe") || l.Name.ToLower().EndsWith("crawlers.dll") || l.Name.ToLower().EndsWith("crawlers.exe")))
 			{
 				var asm = Assembly.Load(new AssemblyName(library.Name));
 				var types = asm.GetTypes();
 #else
-			foreach (var asm in  AppDomain.CurrentDomain.GetAssemblies().Where(l => l.GetName().Name.ToLower().EndsWith("dotnetspider.sample") || l.GetName().Name.ToLower().EndsWith("spiders.dll") || l.GetName().Name.ToLower().EndsWith("spiders.exe")))
+			foreach (var asm in AppDomain.CurrentDomain.GetAssemblies().Where(l => l.GetName().Name.ToLower().EndsWith("dotnetspider.sample") || l.GetName().Name.ToLower().EndsWith("spiders.dll") || l.GetName().Name.ToLower().EndsWith("spiders.exe") || l.GetName().Name.ToLower().EndsWith("crawlers.dll") || l.GetName().Name.ToLower().EndsWith("crawlers.exe")))
 			{
 				var types = asm.GetTypes();
 #endif
-
+				Console.WriteLine($"Fetch assembly: {asm.FullName}.");
 				foreach (var type in types)
 				{
 					bool hasNonParametersConstructor = type.GetConstructors().Any(c => c.IsPublic && c.GetParameters().Length == 0);
@@ -94,6 +90,7 @@ namespace DotnetSpider.Runner
 							var name = (string)property.GetValue(runner);
 							if (!spiders.ContainsKey(name))
 							{
+								Console.WriteLine($"Detected spider: {name}.");
 								spiders.Add(name, runner);
 							}
 							++totalTypesCount;
@@ -104,31 +101,19 @@ namespace DotnetSpider.Runner
 
 			if (spiders.Count == 0)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("No spiders.");
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.WriteLine("Press any key to continue...");
-				Console.Read();
+				Console.WriteLine("Did not detect any spider.");
 				return;
 			}
 
 			if (spiders.Count != totalTypesCount)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("There are some duplicate spiders.");
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.WriteLine("Press any key to continue...");
-				Console.Read();
 				return;
 			}
 
 			if (!spiders.ContainsKey(spiderName))
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine($"There is no spider named: {spiderName}.");
-				Console.ForegroundColor = ConsoleColor.White;
-				Console.WriteLine("Press any key to continue...");
-				Console.Read();
 				return;
 			}
 			var spider = spiders[spiderName];
@@ -153,17 +138,6 @@ namespace DotnetSpider.Runner
 			{
 				method.Invoke(spider, new object[] { new string[] { arguments["-a"] } });
 			}
-		}
-
-		private static List<string> DetectDlls()
-		{
-#if !NET_45
-			var path = Path.Combine(AppContext.BaseDirectory);
-#else
-			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-#endif
-			//return new List<string> { Path.Combine(path, "DotnetSpider.Core.dll") };
-			return Directory.GetFiles(path).Where(f => f.ToLower().EndsWith("dotnetspider.sample") || f.ToLower().EndsWith("dotnetspider.sample.dll") || f.ToLower().EndsWith("Spiders.dll") || f.ToLower().EndsWith("Spiders.exe")).ToList();
 		}
 	}
 }
