@@ -18,7 +18,7 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 #endif
 
-			Startup.Run(new string[] { "-s:CustomSpider1", $"-i:CustomSpider1{DateTime.Now.ToString("yyyyMMddhhmmss")}", "-tid:1" });
+			Startup.Run(args);
 
 			//CustomSpider1 s = new CustomSpider1();
 			//s.Run();
