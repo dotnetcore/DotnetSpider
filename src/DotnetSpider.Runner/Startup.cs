@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 #if !NET_45
 using Microsoft.Extensions.DependencyModel;
 #endif
@@ -13,6 +14,9 @@ namespace DotnetSpider.Runner
 	{
 		public static void Run(params string[] args)
 		{
+#if NETSTANDARD1_6
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
 			Dictionary<string, string> arguments = new Dictionary<string, string>();
 			foreach (var arg in args)
 			{
@@ -65,8 +69,9 @@ namespace DotnetSpider.Runner
 				var asm = Assembly.Load(new AssemblyName(library.Name));
 				var types = asm.GetTypes();
 #else
-			foreach (var asm in AppDomain.CurrentDomain.GetAssemblies().Where(l => l.GetName().Name.ToLower().EndsWith("dotnetspider.sample") || l.GetName().Name.ToLower().EndsWith("spiders.dll") || l.GetName().Name.ToLower().EndsWith("spiders.exe") || l.GetName().Name.ToLower().EndsWith("crawlers.dll") || l.GetName().Name.ToLower().EndsWith("crawlers.exe")))
+			foreach (var file in DetectDlls())
 			{
+				var asm = Assembly.LoadFrom(file);
 				var types = asm.GetTypes();
 #endif
 				Console.WriteLine($"Fetch assembly: {asm.FullName}.");
@@ -139,5 +144,12 @@ namespace DotnetSpider.Runner
 				method.Invoke(spider, new object[] { new string[] { arguments["-a"] } });
 			}
 		}
+#if NET_45
+		private static List<string> DetectDlls()
+		{
+			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+			return Directory.GetFiles(path).Where(f => f.ToLower().EndsWith("dotnetspider.sample.exe") || f.ToLower().EndsWith("dotnetspider.sample.dll") || f.ToLower().EndsWith("spiders.dll") || f.ToLower().EndsWith("spiders.exe") || f.ToLower().EndsWith("crawlers.dll") || f.ToLower().EndsWith("crawlers.exe")).ToList();
+		}
+#endif
 	}
 }
