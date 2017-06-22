@@ -383,7 +383,7 @@ namespace DotnetSpider.Extension
 					var command = conn.CreateCommand();
 					command.CommandType = CommandType.Text;
 
-					command.CommandText = $"DELETE FROM `dotnetspider`.`task_running` WHERE `taskId`='{TaskId}';";
+					command.CommandText = $"DELETE FROM `dotnetspider`.`task_running` WHERE `identity`='{Identity}';";
 					command.ExecuteNonQuery();
 				}
 			}
