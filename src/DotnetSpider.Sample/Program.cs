@@ -12,10 +12,6 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			HuazhuBrandSpider sss = new HuazhuBrandSpider();
-			sss.Identity = "asdf";
-			sss.Run();
-
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
