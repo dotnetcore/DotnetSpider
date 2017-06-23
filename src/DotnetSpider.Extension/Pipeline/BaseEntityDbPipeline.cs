@@ -226,7 +226,6 @@ namespace DotnetSpider.Extension.Pipeline
 						command.CommandText = GetCreateTableSql(metadata);
 						command.CommandType = CommandType.Text;
 						command.ExecuteNonQuery();
-						conn.Close();
 					}
 				});
 			}
@@ -263,14 +262,12 @@ namespace DotnetSpider.Extension.Pipeline
 								cmd.Parameters.AddRange(parameters.ToArray());
 								cmd.ExecuteNonQuery();
 							}
-							conn.Close();
 						}
 					}
 					else
 					{
 						using (var conn = CreateConnection())
 						{
-
 							foreach (var data in datas)
 							{
 								bool needUpdate;
@@ -369,8 +366,6 @@ namespace DotnetSpider.Extension.Pipeline
 									cmd.ExecuteNonQuery();
 								}
 							}
-
-							conn.Close();
 						}
 					}
 				});
