@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>DotnetSpider2.Core</id>
-    <version>1.3.3-rc1</version>
+    <version>1.3.3-rc2</version>
     <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
     <owners>zlzforever@163.com</owners>
     <iconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</iconUrl>
@@ -13,21 +13,22 @@
     <description>Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.</description>
     <dependencies>
       <group targetFramework=".NETStandard1.6">
-        <dependency id="Autofac" version="4.6.0" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Extensions.Configuration" version="1.1.2" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Extensions.Configuration.Binder" version="1.1.2" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Extensions.Configuration.Ini" version="1.1.2" exclude="Build,Analyzers" />
-        <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
-        <dependency id="System.Text.Encoding.CodePages" version="4.3.0" exclude="Build,Analyzers"/>
-        <dependency id="System.Threading.Tasks.Parallel" version="4.3.0" exclude="Build,Analyzers"/>
-        <dependency id="NLog" version="5.0.0-beta06" exclude="Build,Analyzers" />
+        <dependency id="Autofac" version="4.6.0"/>
+        <dependency id="Microsoft.Extensions.Configuration" version="1.1.2"/>
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="1.1.2"/>
+        <dependency id="Microsoft.Extensions.Configuration.Ini" version="1.1.2"/>
+        <dependency id="Newtonsoft.Json" version="10.0.3"/>
+        <dependency id="System.Text.Encoding.CodePages" version="4.3.0"/>
+        <dependency id="System.Threading.Tasks.Parallel" version="4.3.0"/>
+        <dependency id="NLog" version="5.0.0-beta06"/>
       </group>
-      <group targetFramework=".NETFramework4.5.1" >
-        <dependency id="Autofac" version="4.6.0" exclude="Build,Analyzers" />
-        <dependency id="HtmlAgilityPack.CssSelectors" version="1.0.2" exclude="Build,Analyzers" />
-        <dependency id="NLog" version="4.4.11" exclude="Build,Analyzers" />
-        <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
-        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="4.3.0" exclude="Build,Analyzers" />
+      <group targetFramework=".NETFramework4.5.1">
+        <dependency id="Autofac" version="4.6.0"/>
+        <dependency id="HtmlAgilityPack" version="1.4.9.5"/>
+        <dependency id="HtmlAgilityPack.CssSelectors" version="1.0.2"/>
+        <dependency id="NLog" version="4.4.11"  />
+        <dependency id="Newtonsoft.Json" version="10.0.3"/>
+        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="4.3.0"/>
       </group>
     </dependencies>
   </metadata>

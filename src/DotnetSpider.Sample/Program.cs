@@ -12,6 +12,8 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
+			var a = Guid.Empty;
+			var id1 = Guid.NewGuid().ToString("N");
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else

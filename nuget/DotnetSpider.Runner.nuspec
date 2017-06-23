@@ -13,9 +13,9 @@
     <description>Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.</description>
     <dependencies>
       <group targetFramework=".NETStandard1.6">
-        <dependency id="System.Runtime.Loader" version="4.3.0" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Extensions.DependencyModel" version="1.1.2" exclude="Build,Analyzers" />
-        <dependency id="System.Text.Encoding.CodePages" version="4.3.0" exclude="Build,Analyzers"/>
+        <dependency id="System.Runtime.Loader" version="4.3.0" />
+        <dependency id="Microsoft.Extensions.DependencyModel" version="1.1.2" />
+        <dependency id="System.Text.Encoding.CodePages" version="4.3.0"/>
       </group>
     </dependencies>
   </metadata>
