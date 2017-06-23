@@ -38,7 +38,7 @@ namespace DotnetSpider.Extension
 
 			if (string.IsNullOrEmpty(ConnectString))
 			{
-				ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.LogAndStatusConnectString);
+				ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.ConnectString);
 			}
 
 			if (string.IsNullOrEmpty(ConnectString))

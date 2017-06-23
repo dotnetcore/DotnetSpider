@@ -113,8 +113,8 @@ namespace DotnetSpider.Core.Test
 			string taskGroup = Guid.NewGuid().ToString("N");
 			string userId = Guid.NewGuid().ToString("N");
 			string connectString = "Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306";
-			Configuration.SetValue("logAndStatusConnectString", connectString);
-			Assert.AreEqual("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", Configuration.GetValue("logAndStatusConnectString"));
+			Configuration.SetValue("connectString", connectString);
+			Assert.AreEqual("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", Configuration.GetValue("connectString"));
 
 			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 				id,

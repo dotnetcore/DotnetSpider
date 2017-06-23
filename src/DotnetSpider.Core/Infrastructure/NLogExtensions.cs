@@ -23,7 +23,7 @@ namespace DotnetSpider.Core.Infrastructure
 						File.AppendAllText(nlogConfigPath, NlogDefaultConfig);
 					}
 					XmlLoggingConfiguration configuration = new XmlLoggingConfiguration(nlogConfigPath);
-					var connectString = Configuration.GetValue("logAndStatusConnectString");
+					var connectString = Configuration.GetValue("connectString");
 					var logAndStatusTargets = configuration.AllTargets.Where(t => t.Name == "dblog" || t.Name == "dbstatus").ToList();
 					if (!string.IsNullOrEmpty(connectString))
 					{

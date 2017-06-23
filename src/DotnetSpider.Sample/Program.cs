@@ -12,15 +12,13 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-			var a = Guid.Empty;
-			var id1 = Guid.NewGuid().ToString("N");
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
 			ThreadPool.SetMinThreads(200, 200);
 #endif
 
-			Startup.Run(args);
+			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:1", "-i:00001" });
 
 			//CustomSpider1 s = new CustomSpider1();
 			//s.Run();

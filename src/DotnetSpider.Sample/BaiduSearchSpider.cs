@@ -19,9 +19,6 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit()
 		{
-			AddPipeline(
-					new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
-
 			var word = "可乐|雪碧";
 			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 			AddEntityType(typeof(BaiduSearchEntry));

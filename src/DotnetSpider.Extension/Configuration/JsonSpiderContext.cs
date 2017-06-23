@@ -23,7 +23,6 @@ namespace DotnetSpider.Extension.Configuration
 		}
 		public string ConnectString { get; set; }
 		public string RedisConnectString { get; set; }
-		public string LogAndStatusConnectString { get; set; }
 		public string Identity { get; set; }
 		public string Name { get; set; }
 		public Site Site { get; set; }

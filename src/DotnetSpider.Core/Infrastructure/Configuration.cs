@@ -12,7 +12,7 @@ namespace DotnetSpider.Core.Infrastructure
 	public class Configuration
 	{
 		public static string RedisConnectString = "redisConnectString";
-		public static string LogAndStatusConnectString = "logAndStatusConnectString";
+		public static string ConnectString = "connectString";
 
 #if NET_CORE
 		private static readonly IConfigurationRoot ConfigurationRoot;

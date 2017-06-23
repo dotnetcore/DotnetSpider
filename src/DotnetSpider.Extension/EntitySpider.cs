@@ -68,7 +68,7 @@ namespace DotnetSpider.Extension
 		{
 			Name = name;
 			Site = site;
-			ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.LogAndStatusConnectString);
+			ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.ConnectString);
 		}
 
 		public override void Run(params string[] arguments)
@@ -82,6 +82,10 @@ namespace DotnetSpider.Extension
 
 			if (!string.IsNullOrEmpty(ConnectString))
 			{
+				if (!Pipelines.Any(p => p.GetType() == typeof(MySqlEntityPipeline)))
+				{
+					AddPipeline(new MySqlEntityPipeline(ConnectString));
+				}
 				InsertRunningState();
 			}
 
