@@ -17,6 +17,11 @@ namespace DotnetSpider.Extension.Model
 {
 	public class DataColumn
 	{
+		public DataColumn(string name)
+		{
+			Name = name;
+		}
+
 		public string Name { get; set; }
 
 		public Formatter.Formatter[] Formatters { get; set; }
@@ -179,7 +184,7 @@ namespace DotnetSpider.Extension.Model
 #if !NET_CORE
 					reader.Close();
 #else
-				reader.Dispose();
+					reader.Dispose();
 #endif
 				}
 			});

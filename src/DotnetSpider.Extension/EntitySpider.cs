@@ -68,7 +68,7 @@ namespace DotnetSpider.Extension
 		{
 			Name = name;
 			Site = site;
-			ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.ConnectString);
+			ConnectString = Core.Infrastructure.Configuration.ConnectString;
 		}
 
 		public override void Run(params string[] arguments)
@@ -116,7 +116,7 @@ namespace DotnetSpider.Extension
 			}
 
 			bool needInitStartRequest = true;
-			var redisConnectString = string.IsNullOrEmpty(RedisConnectString) ? Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.RedisConnectString) : RedisConnectString;
+			var redisConnectString = string.IsNullOrEmpty(RedisConnectString) ? Core.Infrastructure.Configuration.RedisConnectString : RedisConnectString;
 			if (!string.IsNullOrEmpty(redisConnectString))
 			{
 				RedisConnection = Cache.Instance.Get(redisConnectString);
