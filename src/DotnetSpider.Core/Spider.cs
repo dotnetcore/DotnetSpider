@@ -1074,7 +1074,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		private void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
 		{
-			Pause();
+			Exit();
 			while (!_scheduler.IsExited)
 			{
 				Thread.Sleep(1500);
