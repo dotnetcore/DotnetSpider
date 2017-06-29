@@ -69,7 +69,7 @@ namespace DotnetSpider.Extension.Pipeline
 			StringBuilder primaryParamenters = new StringBuilder();
 			if ("__id" == metadata.Table.Primary)
 			{
-				primaryParamenters.Append("`__Id` = @__Id");
+				primaryParamenters.Append("`__id` = @__id");
 			}
 			else
 			{
@@ -102,7 +102,7 @@ namespace DotnetSpider.Extension.Pipeline
 			//string.Join(" AND ", $"`{Schema.Primary}`=@{Schema.Primary}");
 			if ("__id" == metadata.Table.Primary)
 			{
-				primaryParamenters.Append("`__Id` = @__Id,");
+				primaryParamenters.Append("`__id` = @__id,");
 			}
 			else
 			{

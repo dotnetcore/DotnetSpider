@@ -71,7 +71,7 @@ namespace DotnetSpider.Extension.Pipeline
 						{
 							throw new SpiderException("Columns set as Primary is not a property of your entity.");
 						}
-						if (column.Length <= 0 || column.Length > 256)
+						if (column.Length > 256)
 						{
 							throw new SpiderException("Column length of Primary should not large than 256.");
 						}
@@ -344,7 +344,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@__Id", data.SelectToken("__Id")?.Value<string>());
+										var primaryParameter = CreateDbParameter($"@__id", data.SelectToken("__id")?.Value<string>());
 										primaryParameter.DbType = DbType.String;
 										parameters.Add(primaryParameter);
 									}
