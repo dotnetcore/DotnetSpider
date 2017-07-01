@@ -137,9 +137,10 @@ namespace DotnetSpider.Extension
 				needInitStartRequest = lockerValue != "init finished";
 			}
 
+			Scheduler.Init(this);
+
 			if (arguments.Contains("rerun"))
 			{
-				Scheduler.Init(this);
 				Scheduler.Clean();
 				Scheduler.Dispose();
 				RedisConnection?.Database.HashDelete(ValidateStatusKey, Identity);

@@ -1,4 +1,5 @@
-﻿using DotnetSpider.Runner;
+﻿using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Runner;
 using System;
 using System.Text;
 #if !NET_CORE
@@ -18,7 +19,7 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 #endif
 
-			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:1", "-i:00001" });
+			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:guid", "-i:" + DateTimeUtils.RunIdOfMonthly });
 
 			//CustomSpider1 s = new CustomSpider1();
 			//s.Run();

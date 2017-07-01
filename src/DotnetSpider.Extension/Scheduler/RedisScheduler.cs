@@ -43,26 +43,29 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			base.Init(spider);
 
-			RedisConnection = Cache.Instance.Get(ConnectString);
-			if (RedisConnection == null)
+			if (string.IsNullOrEmpty(_identityMd5))
 			{
-				RedisConnection = new RedisConnection(ConnectString);
-				Cache.Instance.Set(ConnectString, RedisConnection);
+				RedisConnection = Cache.Instance.Get(ConnectString);
+				if (RedisConnection == null)
+				{
+					RedisConnection = new RedisConnection(ConnectString);
+					Cache.Instance.Set(ConnectString, RedisConnection);
+				}
+
+				var md5 = Encrypt.Md5Encrypt(spider.Identity);
+				_itemKey = $"dotnetspider:scheduler:{md5}:items";
+				_setKey = $"dotnetspider:scheduler:{md5}:set";
+				_queueKey = $"dotnetspider:scheduler:{md5}:queue";
+				_errorCountKey = $"dotnetspider:scheduler:{md5}:numberOfFailures";
+				_successCountKey = $"dotnetspider:scheduler:{md5}:numberOfSuccessful";
+
+				_identityMd5 = md5;
+
+				NetworkCenter.Current.Execute("rds-in", () =>
+				{
+					RedisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
+				});
 			}
-
-			var md5 = Encrypt.Md5Encrypt(spider.Identity);
-			_itemKey = $"dotnetspider:scheduler:{md5}:items";
-			_setKey = $"dotnetspider:scheduler:{md5}:set";
-			_queueKey = $"dotnetspider:scheduler:{md5}:queue";
-			_errorCountKey = $"dotnetspider:scheduler:{md5}:numberOfFailures";
-			_successCountKey = $"dotnetspider:scheduler:{md5}:numberOfSuccessful";
-
-			_identityMd5 = md5;
-
-			NetworkCenter.Current.Execute("rds-in", () =>
-			{
-				RedisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
-			});
 		}
 
 		public override void ResetDuplicateCheck()

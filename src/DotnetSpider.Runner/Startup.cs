@@ -125,13 +125,27 @@ namespace DotnetSpider.Runner
 			if (arguments.ContainsKey("-i"))
 			{
 				var property = spider.GetType().GetProperties().First(p => p.Name == "Identity");
-				property.SetValue(spider, arguments["-i"]);
+				if (arguments["-i"].ToLower() != "guid")
+				{
+					property.SetValue(spider, arguments["-i"]);
+				}
+				else
+				{
+					property.SetValue(spider, Guid.NewGuid().ToString("N"));
+				}
 			}
 
 			if (arguments.ContainsKey("-tid"))
 			{
 				var property = spider.GetType().GetProperties().First(p => p.Name == "TaskId");
-				property.SetValue(spider, arguments["-tid"]);
+				if (arguments["-tid"].ToLower() != "guid")
+				{
+					property.SetValue(spider, arguments["-tid"]);
+				}
+				else
+				{
+					property.SetValue(spider, Guid.NewGuid().ToString("N"));
+				}
 			}
 
 			var method = spider.GetType().GetMethod("Run");
