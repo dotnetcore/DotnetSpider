@@ -25,19 +25,59 @@ namespace DotnetSpider.Sample
 			protected override JObject HandleDataOject(JObject data, Page page)
 			{
 				var sold = data.GetValue("sold")?.Value<int>();
+				var price = data.GetValue("price").Value<float>();
+
 				if (sold == null)
 				{
 					data.Add("sold", -1);
 					return data;
 				}
-				else if (sold == 0)
+				else
 				{
-					if (!page.MissTargetUrls)
+					if (price >= 100 && price < 5000)
 					{
-						page.MissTargetUrls = true;
+						if (sold <= 1)
+						{
+							if (!page.MissTargetUrls)
+							{
+								page.MissTargetUrls = true;
+							}
+						}
+						else
+						{
+							return data;
+						}
 					}
+					else if (price < 100)
+					{
+						if (sold <= 5)
+						{
+							if (!page.MissTargetUrls)
+							{
+								page.MissTargetUrls = true;
+							}
+						}
+						else
+						{
+							return data;
+						}
+					}
+					else
+					{
+						if (sold == 0)
+						{
+							if (!page.MissTargetUrls)
+							{
+								page.MissTargetUrls = true;
+							}
+						}
+						else
+						{
+							return data;
+						}
+					}
+					return data;
 				}
-				return data;
 			}
 		}
 
@@ -72,7 +112,7 @@ namespace DotnetSpider.Sample
 					new IncrementTargetUrlsCreator("&s=0",null,44)
 				}
 			};
-			ThreadNum = 10;
+			ThreadNum = 20;
 			SkipWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))
 			{
@@ -95,7 +135,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(Item), new MyDataHanlder());
 		}
 
-		[Table("taobao", "taobao_items", TableSuffix.Today)]
+		[Table("taobao", "taobao_items", TableSuffix.FirstDayOfThisMonth, Uniques = new[] { "item_id" })]
 		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
 		public class Item : SpiderEntity
 		{
