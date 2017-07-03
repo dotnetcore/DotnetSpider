@@ -17,7 +17,7 @@ namespace DotnetSpider.Sample
 		{
 		}
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			Site = new Site
 			{
@@ -78,7 +78,7 @@ namespace DotnetSpider.Sample
 		{
 		}
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			SetThreadNum(1);
 			Identity = ("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));

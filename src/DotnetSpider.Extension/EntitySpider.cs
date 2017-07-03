@@ -22,7 +22,7 @@ namespace DotnetSpider.Extension
 {
 	public abstract class EntitySpider : Spider, ITask
 	{
-		protected abstract void MyInit();
+		protected abstract void MyInit(params string[] arguments);
 
 		private const string InitStatusSetKey = "dotnetspider:init-stats";
 		private const string ValidateStatusKey = "dotnetspider:validate-stats";
@@ -73,7 +73,7 @@ namespace DotnetSpider.Extension
 
 		public override void Run(params string[] arguments)
 		{
-			MyInit();
+			MyInit(arguments);
 
 			if (string.IsNullOrEmpty(Identity) || Identity.Length > 120)
 			{

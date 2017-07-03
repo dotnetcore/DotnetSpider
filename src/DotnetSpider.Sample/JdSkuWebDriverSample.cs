@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample
 		{
 		}
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			Identity = ("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));

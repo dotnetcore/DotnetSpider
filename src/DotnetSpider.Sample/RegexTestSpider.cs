@@ -15,7 +15,7 @@ namespace DotnetSpider.Sample
 		}
 
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			Identity = ("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			AddStartUrl("http://www.cnblogs.com");

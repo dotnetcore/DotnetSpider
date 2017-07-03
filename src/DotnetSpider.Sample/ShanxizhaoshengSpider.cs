@@ -15,7 +15,7 @@ namespace DotnetSpider.Sample
 		{
 		}
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			Identity = ("ShanxizhaoshengSpider " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			SetSite(new Site

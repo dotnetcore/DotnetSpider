@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample
 		{
 		}
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			Identity = "HaoBrowser Hao360Spider Buble " + DateTime.Now.ToString("yyyy-MM-dd HHmmss");
 			CachedSize = 1;

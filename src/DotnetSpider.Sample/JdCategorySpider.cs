@@ -27,7 +27,7 @@ namespace DotnetSpider.Sample
 		}
 
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			AddStartUrl("http://www.jd.com/allSort.aspx");
 			AddEntityType(typeof(Category));

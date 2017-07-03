@@ -4,7 +4,7 @@ namespace DotnetSpider.Extension
 	{
 		public DefaultEntitySpider() : base(null, new Core.Site()) { }
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 		}
 	}

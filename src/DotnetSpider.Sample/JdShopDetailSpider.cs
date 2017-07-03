@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample
 		{
 		}
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			CachedSize = 1;
 			ThreadNum = 8;

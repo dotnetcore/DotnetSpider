@@ -30,7 +30,7 @@ namespace DotnetSpider.Extension.Test
 			{
 			}
 
-			protected override void MyInit()
+			protected override void MyInit(params string[] arguments)
 			{
 				Identity = Guid.NewGuid().ToString();
 				AddPipeline(new ConsoleEntityPipeline());
@@ -97,7 +97,7 @@ namespace DotnetSpider.Extension.Test
 			{
 			}
 
-			protected override void MyInit()
+			protected override void MyInit(params string[] arguments)
 			{
 				Identity = Guid.NewGuid().ToString("N");
 				SetScheduler(new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
@@ -163,7 +163,7 @@ namespace DotnetSpider.Extension.Test
 			}
 
 
-			protected override void MyInit()
+			protected override void MyInit(params string[] arguments)
 			{
 				Identity = Guid.NewGuid().ToString();
 				ThreadNum = 1;

@@ -77,7 +77,7 @@ namespace DotnetSpider.Sample
 		}
 
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Day1OfThisWeek.ToString("yyyy-MM-dd");
 			AddStartUrl("http://www.jd.com/allSort.aspx");
