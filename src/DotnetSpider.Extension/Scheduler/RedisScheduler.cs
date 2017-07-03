@@ -199,31 +199,32 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			lock (this)
 			{
-				int cacheSize = requests.Count > 10000 ? 10000 : requests.Count;
+				int batchCount = 10000;
+				int cacheSize = requests.Count > batchCount ? batchCount : requests.Count;
 				RedisValue[] identities = new RedisValue[cacheSize];
 				HashEntry[] items = new HashEntry[cacheSize];
 				int i = 0;
-				int j = requests.Count % 10000;
-				int n = requests.Count / 10000;
+				int j = requests.Count % batchCount;
+				int n = requests.Count / batchCount;
 
 				foreach (var request in requests)
 				{
 					identities[i] = request.Identity;
 					items[i] = new HashEntry(request.Identity, JsonConvert.SerializeObject(request));
 					++i;
-					if (i == 10000)
+					if (i == batchCount)
 					{
 						--n;
 
 						RedisConnection.Database.SetAdd(_setKey, identities);
 						RedisConnection.Database.ListRightPush(_queueKey, identities);
-						RedisConnection.Database.HashSet(_itemKey, items);
+						RedisConnection.Database.HashSet(_itemKey, items,CommandFlags.HighPriority);
 
 						i = 0;
 						if (n != 0)
 						{
-							identities = new RedisValue[10000];
-							items = new HashEntry[10000];
+							identities = new RedisValue[batchCount];
+							items = new HashEntry[batchCount];
 						}
 						else
 						{

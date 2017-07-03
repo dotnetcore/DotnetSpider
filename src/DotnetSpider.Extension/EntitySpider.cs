@@ -129,6 +129,11 @@ namespace DotnetSpider.Extension
 
 			if (RedisConnection != null)
 			{
+				if (arguments.Contains("rerun"))
+				{
+					RedisConnection.Database.HashDelete(InitStatusSetKey, Identity);
+					RedisConnection.Database.LockRelease(InitLockKey, "0");
+				}
 				while (!RedisConnection.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(10)))
 				{
 					Thread.Sleep(1000);
