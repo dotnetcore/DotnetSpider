@@ -21,7 +21,8 @@ namespace DotnetSpider.Extension.Test
 		[Table("test", "table")]
 		public class TestEntity : SpiderEntity
 		{
-
+			[PropertyDefine(Expression = ".")]
+			public string name { get; set; }
 		}
 
 		public class MyEntitySpider1 : EntitySpider

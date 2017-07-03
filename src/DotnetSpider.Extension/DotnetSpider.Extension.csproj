@@ -18,7 +18,7 @@
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
     <PackageReference Include="MySql.Data" Version="7.0.7-m61" />
-    <PackageReference Include="StackExchange.Redis" Version="1.2.3" />
+    <PackageReference Include="StackExchange.Redis" Version="1.2.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />

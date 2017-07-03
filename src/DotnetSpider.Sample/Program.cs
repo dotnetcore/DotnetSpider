@@ -20,6 +20,7 @@ namespace DotnetSpider.Sample
 #endif
 
 			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:guid", "-i:" + DateTimeUtils.RunIdOfMonthly });
+			//Startup.Run(new[] { "-s:TAOBAO_KEYWORD_WATHCHER", "-tid:TAOBAO_KEYWORD_WATHCHER", "-i:TAOBAO_KEYWORD_WATHCHER_20170701", "-a:noprepare" });
 
 			//CustomSpider1 s = new CustomSpider1();
 			//s.Run();
