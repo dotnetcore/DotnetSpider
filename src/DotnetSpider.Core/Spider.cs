@@ -1127,21 +1127,27 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		private void ReportStatus()
 		{
-			if (_monitor.IsEnabled)
+			try
 			{
-				_monitor.Report(new SpiderStatus
+				if (_monitor.IsEnabled)
 				{
-					Status = Stat.ToString(),
-					Error = Monitorable.GetErrorRequestsCount(),
-					Identity = Identity,
-					Left = Monitorable.GetLeftRequestsCount(),
-					Success = Monitorable.GetSuccessRequestsCount(),
-					ThreadNum = ThreadNum,
-					Total = Monitorable.GetTotalRequestsCount(),
-					AvgDownloadSpeed = AvgDownloadSpeed,
-					AvgProcessorSpeed = AvgProcessorSpeed,
-					AvgPipelineSpeed = AvgPipelineSpeed
-				});
+					_monitor.Report(new SpiderStatus
+					{
+						Status = Stat.ToString(),
+						Error = Monitorable.GetErrorRequestsCount(),
+						Identity = Identity,
+						Left = Monitorable.GetLeftRequestsCount(),
+						Success = Monitorable.GetSuccessRequestsCount(),
+						ThreadNum = ThreadNum,
+						Total = Monitorable.GetTotalRequestsCount(),
+						AvgDownloadSpeed = AvgDownloadSpeed,
+						AvgProcessorSpeed = AvgProcessorSpeed,
+						AvgPipelineSpeed = AvgPipelineSpeed
+					});
+				}
+			}
+			catch
+			{
 			}
 		}
 	}
