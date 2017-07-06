@@ -258,12 +258,19 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			get
 			{
-				var result = RedisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
-				if (result.HasValue)
+				try
 				{
-					return result == 1;
+					var result = RedisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
+					if (result.HasValue)
+					{
+						return result == 1;
+					}
+					else
+					{
+						return false;
+					}
 				}
-				else
+				catch
 				{
 					return false;
 				}

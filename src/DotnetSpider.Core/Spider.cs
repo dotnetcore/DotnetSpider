@@ -546,7 +546,7 @@ namespace DotnetSpider.Core
 				while (!Monitorable.IsExited)
 				{
 					ReportStatus();
-					Thread.Sleep(2000);
+					Thread.Sleep(5000);
 				}
 				ReportStatus();
 			});
@@ -1148,6 +1148,8 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			}
 			catch
 			{
+
+
 			}
 		}
 	}

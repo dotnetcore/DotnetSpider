@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Runner;
 using System;
+using System.Net;
 using System.Text;
 #if !NET_CORE
 using System.Threading;
@@ -18,8 +19,7 @@ namespace DotnetSpider.Sample
 #else
 			ThreadPool.SetMinThreads(200, 200);
 #endif
-
-			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:guid", "-i:" + DateTimeUtils.RunIdOfMonthly });
+			Startup.Run(new string[] { "-s:XUNFEI_HUIHUI_HISTORY_ITEMS", "-tid:XUNFEI_HUIHUI_HISTORY_ITEMS", "-i:guid" });
 			//Startup.Run(new[] { "-s:TAOBAO_KEYWORD_WATHCHER", "-tid:TAOBAO_KEYWORD_WATHCHER", "-i:TAOBAO_KEYWORD_WATHCHER_20170701", "-a:noprepare" });
 
 			//CustomSpider1 s = new CustomSpider1();

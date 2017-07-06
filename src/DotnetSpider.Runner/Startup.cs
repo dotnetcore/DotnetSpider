@@ -14,6 +14,11 @@ namespace DotnetSpider.Runner
 	{
 		public static void Run(params string[] args)
 		{
+			Console.ForegroundColor = ConsoleColor.DarkYellow;
+			Console.WriteLine("Args: " + string.Join(" ", args));
+			Console.WriteLine("");
+			Console.ForegroundColor = ConsoleColor.White;
+
 #if NETSTANDARD1_6
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
@@ -43,14 +48,18 @@ namespace DotnetSpider.Runner
 				}
 				else
 				{
+					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine("Please use command like: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId]");
+					Console.ForegroundColor = ConsoleColor.White;
 					return;
 				}
 			}
 			string spiderName = string.Empty;
 			if (arguments.Count == 0 || !arguments.ContainsKey("-s") || !arguments.ContainsKey("-tid"))
 			{
+				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("-s or -tid are necessary.");
+				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
 			else
@@ -98,6 +107,15 @@ namespace DotnetSpider.Runner
 								Console.WriteLine($"Detected spider: {name}.");
 								spiders.Add(name, runner);
 							}
+							else
+							{
+								Console.ForegroundColor = ConsoleColor.Red;
+								Console.WriteLine();
+								Console.WriteLine($"Spider {name} are duplicate.");
+								Console.WriteLine();
+								Console.ForegroundColor = ConsoleColor.White;
+								return;
+							}
 							++totalTypesCount;
 						}
 					}
@@ -106,13 +124,11 @@ namespace DotnetSpider.Runner
 
 			if (spiders.Count == 0)
 			{
+				Console.ForegroundColor = ConsoleColor.DarkYellow;
+				Console.WriteLine();
 				Console.WriteLine("Did not detect any spider.");
-				return;
-			}
-
-			if (spiders.Count != totalTypesCount)
-			{
-				Console.WriteLine("There are some duplicate spiders.");
+				Console.WriteLine();
+				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
 

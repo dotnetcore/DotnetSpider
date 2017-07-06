@@ -148,7 +148,7 @@ namespace DotnetSpider.Sample
 			[PropertyDefine(Expression = "bidwordstr", Type = SelectorType.Enviroment, Length = 20)]
 			public string bidwordstr { get; set; }
 
-			[PropertyDefine(Expression = "category", Type = SelectorType.Enviroment, Length = 20)]
+			[PropertyDefine(Expression = "$.category", Type = SelectorType.Enviroment, Length = 20)]
 			public string category { get; set; }
 
 			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath, Option = PropertyDefine.Options.PlainText, Length = 100)]

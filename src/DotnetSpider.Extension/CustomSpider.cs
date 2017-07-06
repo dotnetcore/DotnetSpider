@@ -62,9 +62,7 @@ namespace DotnetSpider.Extension
 					command.CommandText = $"insert ignore into dotnetspider.status (`identity`, `status`,`thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`, `logged`) values('{Identity}', 'Init',-1, -1, -1, -1, -1, -1, -1, -1, '{DateTime.Now}');";
 					command.ExecuteNonQuery();
 
-					var message = $"开始任务: {Name}";
-					command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message) values ('{Identity}', '{NodeId.Id}', '{DateTime.Now}', 'Info', '{message}');";
-					command.ExecuteNonQuery();
+					InsertLog(conn, "Info", $"开始任务: {Name}");
 				}
 
 				_statusReporter = Task.Factory.StartNew(() =>
@@ -97,13 +95,10 @@ namespace DotnetSpider.Extension
 					using (IDbConnection conn = new MySqlConnection(ConnectString))
 					{
 						conn.Open();
+						InsertLog(conn, "Info", $"结束任务: {Name}");
+
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
-
-						var message = $"结束任务: {Name}";
-						command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message) values ('{Identity}','{NodeId.Id}', '{DateTime.Now}', 'Info', '{message}');";
-						command.ExecuteNonQuery();
-
 						command.CommandText = $"update dotnetspider.status set `status`='Finished',`logged`='{DateTime.Now}' WHERE identity='{Identity}';";
 						command.ExecuteNonQuery();
 					}
@@ -116,13 +111,11 @@ namespace DotnetSpider.Extension
 					using (IDbConnection conn = new MySqlConnection(ConnectString))
 					{
 						conn.Open();
+						
+						InsertLog(conn, "Info", $"退出任务: {Name}", e.ToString(), e.Message);
+
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
-
-						var message = $"退出任务: {Name}";
-						command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message, callsite, exception) values ('{Identity}','{NodeId.Id}','{DateTime.Now}', 'Info', '{message}','{e}','{e.Message}');";
-						command.ExecuteNonQuery();
-
 						command.CommandText = $"update dotnetspider.status set `status`='Exited' `logged`='{DateTime.Now}' WHERE identity='{Identity}';";
 						command.ExecuteNonQuery();
 					}
@@ -143,6 +136,58 @@ namespace DotnetSpider.Extension
 			{
 				Run(arguments);
 			});
+		}
+
+		private void InsertLog(IDbConnection conn, string level, string message, string callsite = null, string exception = null)
+		{
+			var command = conn.CreateCommand();
+			command.CommandType = CommandType.Text;
+
+			command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message, callsite, exception) values (@identity, @node, @logged, @level, @message, @callsite, @exception)";
+
+			var identity = command.CreateParameter();
+			identity.ParameterName = "@identity";
+			identity.DbType = DbType.String;
+			identity.Value = Identity;
+			command.Parameters.Add(identity);
+
+			var node = command.CreateParameter();
+			node.ParameterName = "@node";
+			node.DbType = DbType.String;
+			node.Value = NodeId.Id;
+			command.Parameters.Add(node);
+
+			var logged = command.CreateParameter();
+			logged.ParameterName = "@logged";
+			logged.DbType = DbType.DateTime;
+			logged.Value = DateTime.Now;
+			command.Parameters.Add(logged);
+
+			var level2 = command.CreateParameter();
+			level2.ParameterName = "@level";
+			level2.DbType = DbType.String;
+			level2.Value = level;
+			command.Parameters.Add(level2);
+
+			var message2 = command.CreateParameter();
+			message2.ParameterName = "@message";
+			message2.DbType = DbType.String;
+			message2.Value = message;
+			command.Parameters.Add(message2);
+
+			var callsite2 = command.CreateParameter();
+			callsite2.ParameterName = "@callsite";
+			callsite2.DbType = DbType.String;
+			callsite2.Value = callsite;
+			command.Parameters.Add(callsite2);
+
+			var exception2 = command.CreateParameter();
+			exception2.ParameterName = "@exception";
+			exception2.DbType = DbType.String;
+			exception2.Value = exception;
+			command.Parameters.Add(exception2);
+
+			command.ExecuteNonQuery();
 		}
 
 		private void InsertRunningState()
