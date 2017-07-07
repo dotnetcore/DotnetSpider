@@ -116,7 +116,7 @@ namespace DotnetSpider.Extension
 
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
-						command.CommandText = $"update dotnetspider.status set `status`='Exited' `logged`='{DateTime.Now}' WHERE identity='{Identity}';";
+						command.CommandText = $"update dotnetspider.status set `status`='Exited', `logged`='{DateTime.Now}' WHERE identity='{Identity}';";
 						command.ExecuteNonQuery();
 					}
 				}

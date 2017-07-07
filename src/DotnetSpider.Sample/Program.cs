@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Runner;
+using MySql.Data.MySqlClient;
 using System;
 using System.Net;
 using System.Text;
@@ -14,12 +15,15 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
+			 DateTime
+
+
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
 			ThreadPool.SetMinThreads(200, 200);
 #endif
-			Startup.Run(new string[] { "-s:XUNFEI_HUIHUI_HISTORY_ITEMS", "-tid:XUNFEI_HUIHUI_HISTORY_ITEMS", "-i:guid" });
+			Startup.Run(new string[] { "-s:XUNFEI_JD_HUIHUI_HISTORY_ITEMS", "-tid:XUNFEI_JD_HUIHUI_HISTORY_ITEMS", "-i:guid" });
 			//Startup.Run(new[] { "-s:TAOBAO_KEYWORD_WATHCHER", "-tid:TAOBAO_KEYWORD_WATHCHER", "-i:TAOBAO_KEYWORD_WATHCHER_20170701", "-a:noprepare" });
 
 			//CustomSpider1 s = new CustomSpider1();
