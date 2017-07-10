@@ -25,6 +25,10 @@ namespace DotnetSpider.Extension
 		protected CustomSpider(string name)
 		{
 			Name = name;
+			if (string.IsNullOrEmpty(ConnectString))
+			{
+				ConnectString = Core.Infrastructure.Configuration.ConnectString;
+			}
 		}
 
 		protected abstract void ImplementAction(params string[] arguments);

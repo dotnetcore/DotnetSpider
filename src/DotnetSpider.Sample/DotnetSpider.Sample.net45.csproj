@@ -38,7 +38,6 @@
     <Compile Include="BaseUsage.cs" />
     <Compile Include="CasSpider.cs" />
     <Compile Include="Class1.cs" />
-    <Compile Include="Class2.cs" />
     <Compile Include="Cnblogs.cs" />
     <Compile Include="ConfigurableSpider.cs" />
     <Compile Include="CustomSpider1.cs" />
@@ -119,9 +118,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="taobaokeyword.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TextFile1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

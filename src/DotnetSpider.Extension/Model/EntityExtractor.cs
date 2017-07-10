@@ -231,6 +231,11 @@ namespace DotnetSpider.Extension.Model
 				return DateTimeUtils.RunIdOfMonday;
 			}
 
+			if (field.ToLower() == "monthly")
+			{
+				return DateTimeUtils.RunIdOfMonthly;
+			}
+
 			if (field.ToLower() == "today")
 			{
 				return DateTimeUtils.RunIdOfToday;
