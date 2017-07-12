@@ -10,7 +10,7 @@ namespace DotnetSpider.Core
 	/// It contains some additional information. 
 	/// </summary>
 	public class Request : IDisposable
-#if NET4_5
+#if NET_45
 	, ICloneable
 #endif
 	{
