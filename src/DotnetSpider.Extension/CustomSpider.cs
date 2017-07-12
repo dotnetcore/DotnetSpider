@@ -142,7 +142,7 @@ namespace DotnetSpider.Extension
 			});
 		}
 
-		private void InsertLog(IDbConnection conn, string level, string message, string callsite = null, string exception = null)
+		protected void InsertLog(IDbConnection conn, string level, string message, string callsite = null, string exception = null)
 		{
 			var command = conn.CreateCommand();
 			command.CommandType = CommandType.Text;
