@@ -845,7 +845,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			OnSuccess?.Invoke(request);
 		}
 
-		protected Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
+		public static Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
 		{
 			Page page = new Page(request, site.ContentType, null);
 			if (!resultIsEmpty)
@@ -923,14 +923,6 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 				sw.Stop();
 				UpdateProcessorSpeed(sw.ElapsedMilliseconds);
-			}
-			catch (DownloadException de)
-			{
-				if (Site.CycleRetryTimes > 0)
-				{
-					page = AddToCycleRetry(request, Site);
-				}
-				this.Log($"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
 			}
 			catch (Exception e)
 			{

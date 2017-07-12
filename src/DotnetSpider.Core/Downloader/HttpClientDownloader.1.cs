@@ -126,13 +126,25 @@ namespace DotnetSpider.Core.Downloader
 				//正常结果在上面已经Return了, 到此处必然是下载失败的值.
 				//throw new SpiderExceptoin("Download failed.");
 			}
-			catch (DownloadException)
+			catch (DownloadException de)
 			{
-				throw;
+				Page page = new Page(request, site.ContentType, null) { Exception = de };
+				if (site.CycleRetryTimes > 0)
+				{
+					page = Spider.AddToCycleRetry(request, site);
+				}
+				spider.Log($"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
+				return page;
 			}
 			catch (HttpRequestException he)
 			{
-				throw new DownloadException(he.Message);
+				Page page = new Page(request, site.ContentType, null) { Exception = he };
+				if (site.CycleRetryTimes > 0)
+				{
+					page = Spider.AddToCycleRetry(request, site);
+				}
+				spider.Log($"下载 {request.Url} 失败: {he.Message}", LogLevel.Warn);
+				return page;
 			}
 			catch (Exception e)
 			{
@@ -178,11 +190,6 @@ namespace DotnetSpider.Core.Downloader
 				httpWebRequest.Headers.Add("Origin", request.Origin);
 			}
 
-			if (!string.IsNullOrEmpty(request.Origin))
-			{
-				httpWebRequest.Headers.Add("Origin", request.Origin);
-			}
-
 			if (!string.IsNullOrEmpty(site.Accept))
 			{
 				httpWebRequest.Headers.Add("Accept", site.Accept);
@@ -212,9 +219,12 @@ namespace DotnetSpider.Core.Downloader
 				{
 					httpWebRequest.Content.Headers.Remove("X-Requested-With");
 				}
-				else if (!site.Headers.ContainsKey("X-Requested-With") || site.Headers["X-Requested-With"] != "NULL")
+				else
 				{
-					httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
+					if (!httpWebRequest.Content.Headers.Contains("X-Requested-With") && !httpWebRequest.Headers.Contains("X-Requested-With"))
+					{
+						httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
+					}
 				}
 			}
 			return httpWebRequest;
