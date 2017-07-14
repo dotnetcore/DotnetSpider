@@ -20,10 +20,12 @@ namespace DotnetSpider.Sample
 #else
 			ThreadPool.SetMinThreads(200, 200);
 #endif
+			OcrDemo.Process();
+
 			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:BaiduSearch" });
 
-			CustomSpider1 s = new CustomSpider1();
-			s.Run();
+			Startup.Run(new string[] { "-s:CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1" });
+
 			//ConfigurableSpider.Run();
 
 			// Custmize processor and pipeline 完全自定义页面解析和数据管道
