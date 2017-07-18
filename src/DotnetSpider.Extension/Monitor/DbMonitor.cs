@@ -56,9 +56,9 @@ namespace DotnetSpider.Extension.Monitor
 			});
 		}
 
-		public override void Report(string identity, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
+		public override void Report(string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
-			base.Report(identity, status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
+			base.Report(status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 
 			if (Core.Infrastructure.Environment.SaveLogAndStatusToDb)
 			{
@@ -70,7 +70,7 @@ namespace DotnetSpider.Extension.Monitor
 							$"update dotnetspider.status set `status`=@status, `thread`=@thread,`left`=@left, `success`=@success, `error`=@error, `total`=@total, `avgdownloadspeed`=@avgdownloadspeed, `avgprocessorspeed`=@avgprocessorspeed, `avgpipelinespeed`=@avgpipelinespeed WHERE `identity`=@identity and `node`=@node;",
 							new
 							{
-								identity = identity,
+								identity = Identity,
 								node = NodeId.Id,
 								status = status,
 								left = left,

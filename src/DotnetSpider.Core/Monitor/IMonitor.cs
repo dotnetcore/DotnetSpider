@@ -3,7 +3,7 @@ namespace DotnetSpider.Core.Monitor
 {
 	public interface IMonitor : IDisposable
 	{
-		void Report(string identity,
+		void Report(
 			string status,
 			long left,
 			long total,
@@ -15,6 +15,6 @@ namespace DotnetSpider.Core.Monitor
 			int threadNum
 			);
 
-		bool IsEnabled { get; }
+		string Identity { get; set; }
 	}
 }

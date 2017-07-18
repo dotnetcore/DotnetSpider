@@ -8,14 +8,13 @@ namespace DotnetSpider.Core.Monitor
 	{
 		private static readonly ILogger _logger = LogCenter.GetLogger();
 
-		public bool IsEnabled => true;
-
+		public string Identity { get; set; }
 
 		public void Dispose()
 		{
 		}
 
-		public virtual void Report(string identity, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
+		public virtual void Report(string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
 			string msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
 			LogEventInfo theEvent = new LogEventInfo(LogLevel.Trace, "", msg);

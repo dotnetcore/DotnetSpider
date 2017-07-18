@@ -24,7 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
     <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj" />
-    <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack\DotnetSpider.HtmlAgilityPack.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Redial\" />

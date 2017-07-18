@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack\DotnetSpider.HtmlAgilityPack.csproj" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.5.1" />
   </ItemGroup>
 
 </Project>

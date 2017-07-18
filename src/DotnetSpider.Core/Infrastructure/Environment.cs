@@ -12,6 +12,7 @@ namespace DotnetSpider.Core.Infrastructure
 		public static string GlobalDirectory { get; }
 		public static string BaseDirectory { get; }
 		public static string PathSeperator;
+		public static string IdColumn = "__id";
 
 		static Environment()
 		{

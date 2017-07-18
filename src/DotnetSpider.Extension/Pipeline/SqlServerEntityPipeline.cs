@@ -74,16 +74,16 @@ namespace DotnetSpider.Extension.Pipeline
 			builder.Append(columnNames.ToString().Substring(1, columnNames.Length - 1));
 			builder.Append(",[CDate] DATETIME DEFAULT(GETDATE())");
 
-			if ("__id" == metadata.Table.Primary.ToLower())
+			if (Core.Infrastructure.Environment.IdColumn == metadata.Table.Primary.ToLower())
 			{
-				builder.Append(", [__Id] [bigint] IDENTITY(1,1) NOT NULL");
+				builder.Append($", [{Core.Infrastructure.Environment.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL");
 			}
 
 			builder.Append(",");
 			StringBuilder primaryKey = new StringBuilder();
 			if (string.IsNullOrEmpty(metadata.Table.Primary))
 			{
-				primaryKey.Append("[__Id] ASC,");
+				primaryKey.Append($"[{Core.Infrastructure.Environment.IdColumn}] ASC,");
 			}
 			else
 			{

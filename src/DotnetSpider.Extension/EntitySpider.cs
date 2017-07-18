@@ -30,7 +30,7 @@ namespace DotnetSpider.Extension
 		private const string InitStatusSetKey = "dotnetspider:init-stats";
 		private const string ValidateStatusKey = "dotnetspider:validate-stats";
 		private IRedialExecutor _redialExecutor;
-		private static readonly List<string> DefaultProperties = new List<string> { "cdate", "__id" };
+		private static readonly List<string> DefaultProperties = new List<string> { "cdate", Core.Infrastructure.Environment.IdColumn };
 
 		[JsonIgnore]
 		public Action VerifyCollectedData { get; set; }
@@ -99,7 +99,7 @@ namespace DotnetSpider.Extension
 
 		protected override void PreInitComponent(params string[] arguments)
 		{
-			_monitor = IocManager.Resolve<IMonitor>() ?? new DbMonitor(Identity);
+			Monitor = IocManager.Resolve<IMonitor>() ?? new DbMonitor(Identity);
 
 			if (Site == null)
 			{

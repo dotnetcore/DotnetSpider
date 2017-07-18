@@ -67,9 +67,9 @@ namespace DotnetSpider.Extension.Pipeline
 			string setParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"`{p}`=@{p}"));
 
 			StringBuilder primaryParamenters = new StringBuilder();
-			if ("__id" == metadata.Table.Primary)
+			if (Core.Infrastructure.Environment.IdColumn == metadata.Table.Primary)
 			{
-				primaryParamenters.Append("`__id` = @__id");
+				primaryParamenters.Append($"`{Core.Infrastructure.Environment.IdColumn}` = @__id");
 			}
 			else
 			{
@@ -100,9 +100,9 @@ namespace DotnetSpider.Extension.Pipeline
 			string selectParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"`{p}`"));
 			StringBuilder primaryParamenters = new StringBuilder();
 			//string.Join(" AND ", $"`{Schema.Primary}`=@{Schema.Primary}");
-			if ("__id" == metadata.Table.Primary)
+			if (Core.Infrastructure.Environment.IdColumn == metadata.Table.Primary)
 			{
-				primaryParamenters.Append("`__id` = @__id,");
+				primaryParamenters.Append($"`{Core.Infrastructure.Environment.IdColumn}` = @{Core.Infrastructure.Environment.IdColumn},");
 			}
 			else
 			{
@@ -135,9 +135,9 @@ namespace DotnetSpider.Extension.Pipeline
 			string columNames = string.Join(", ", metadata.Columns.Select(p => $"`{p.Name}` {GetDataTypeSql(p)} "));
 			builder.Append(columNames);
 			builder.Append(",`cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP");
-			if (metadata.Table.Primary.ToLower() == "__id")
+			if (metadata.Table.Primary.ToLower() == Core.Infrastructure.Environment.IdColumn)
 			{
-				builder.Append(", `__id` bigint AUTO_INCREMENT");
+				builder.Append($", `{Core.Infrastructure.Environment.IdColumn}` bigint AUTO_INCREMENT");
 			}
 
 			if (metadata.Table.Indexs != null)

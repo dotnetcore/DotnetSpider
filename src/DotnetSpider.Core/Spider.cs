@@ -54,6 +54,8 @@ namespace DotnetSpider.Core
 		public event SpiderClosingHandler OnClosing;
 		public event Action OnComplete;
 
+		public IMonitor Monitor { get; set; }
+
 		public long AvgDownloadSpeed { get; private set; }
 		public long AvgProcessorSpeed { get; private set; }
 		public long AvgPipelineSpeed { get; private set; }
@@ -80,7 +82,6 @@ namespace DotnetSpider.Core
 		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private List<IPipeline> _pipelines = new List<IPipeline>();
 		private Site _site;
-		protected IMonitor _monitor;
 		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
@@ -517,7 +518,7 @@ namespace DotnetSpider.Core
 
 		protected virtual void PreInitComponent(params string[] arguments)
 		{
-			_monitor = IocManager.Resolve<IMonitor>() ?? new NLogMonitor();
+			Monitor = IocManager.Resolve<IMonitor>() ?? new NLogMonitor();
 		}
 
 		protected virtual void AfterInitComponent(params string[] arguments)
@@ -539,6 +540,8 @@ namespace DotnetSpider.Core
 			}
 
 			PreInitComponent(arguments);
+
+			Monitor.Identity = Identity;
 
 			CookieInjector?.Inject(this, false);
 
@@ -1120,23 +1123,20 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		private void ReportStatus()
 		{
-			if (_monitor.IsEnabled)
+			try
 			{
-				try
-				{
-					_monitor.Report(Identity, Stat.ToString(),
-						Monitorable.GetLeftRequestsCount(),
-						Monitorable.GetTotalRequestsCount(),
-						Monitorable.GetSuccessRequestsCount(),
-						Monitorable.GetErrorRequestsCount(),
-						AvgDownloadSpeed,
-						AvgProcessorSpeed,
-						AvgPipelineSpeed,
-						ThreadNum);
-				}
-				catch
-				{
-				}
+				Monitor.Report(Stat.ToString(),
+					Monitorable.GetLeftRequestsCount(),
+					Monitorable.GetTotalRequestsCount(),
+					Monitorable.GetSuccessRequestsCount(),
+					Monitorable.GetErrorRequestsCount(),
+					AvgDownloadSpeed,
+					AvgProcessorSpeed,
+					AvgPipelineSpeed,
+					ThreadNum);
+			}
+			catch
+			{
 			}
 		}
 	}

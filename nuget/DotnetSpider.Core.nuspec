@@ -18,13 +18,14 @@
         <dependency id="Microsoft.Extensions.Configuration.Binder" version="1.1.2"/>
         <dependency id="Microsoft.Extensions.Configuration.Ini" version="1.1.2"/>
         <dependency id="Newtonsoft.Json" version="10.0.3"/>
+        <dependency id="HtmlAgilityPack" version="1.5.1"/>
         <dependency id="System.Text.Encoding.CodePages" version="4.3.0"/>
         <dependency id="System.Threading.Tasks.Parallel" version="4.3.0"/>
         <dependency id="NLog" version="5.0.0-beta09"/>
       </group>
       <group targetFramework=".NETFramework4.5.1">
         <dependency id="Autofac" version="4.6.0"/>
-        <dependency id="HtmlAgilityPack" version="1.5.0"/>
+        <dependency id="HtmlAgilityPack" version="1.5.1"/>
         <dependency id="HtmlAgilityPack.CssSelectors" version="1.0.2"/>
         <dependency id="NLog" version="4.4.11"  />
         <dependency id="Newtonsoft.Json" version="10.0.3"/>
@@ -33,7 +34,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\output\netstandard1.6\DotnetSpider.HtmlAgilityPack.dll" target="lib\netstandard1.6\DotnetSpider.HtmlAgilityPack.dll" />
     <file src="..\output\netstandard1.6\DotnetSpider.HtmlAgilityPack.Css.dll" target="lib\netstandard1.6\DotnetSpider.HtmlAgilityPack.Css.dll" />
     <file src="..\output\netstandard1.6\DotnetSpider.Core.dll" target="lib\netstandard1.6\DotnetSpider.Core.dll" />
     <file src="..\output\net451\DotnetSpider.Core.dll" target="lib\net451\DotnetSpider.Core.dll" />

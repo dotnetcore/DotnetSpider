@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure;
-#if NET_CORE
-using DotnetSpider.HtmlAgilityPack;
-#else
 using HtmlAgilityPack;
-#endif
 
 namespace DotnetSpider.Core.Selector
 {

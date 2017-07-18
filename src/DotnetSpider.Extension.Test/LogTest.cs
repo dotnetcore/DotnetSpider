@@ -3,6 +3,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Extension.Monitor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MySql.Data.MySqlClient;
 using System;
@@ -40,12 +41,13 @@ namespace DotnetSpider.Extension.Test
 				{
 					spider.AddStartUrl("http://www.baidu.com/" + i);
 				}
+				spider.Monitor = new DbMonitor(id);
 				spider.Run();
 			}
 			using (MySqlConnection conn = new MySqlConnection(connectString))
 			{
-				Assert.AreEqual(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count);
 				Assert.AreEqual(9, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{id}'").First().Count);
+				Assert.AreEqual(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count);
 			}
 		}
 
