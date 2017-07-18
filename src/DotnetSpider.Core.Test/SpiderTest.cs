@@ -3,7 +3,6 @@ using System.Threading;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
-using MySql.Data.MySqlClient;
 using Dapper;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,7 +10,7 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Test
 {
-	public class CountResult
+	internal class CountResult
 	{
 		public int Count { get; set; }
 	}
@@ -107,35 +106,6 @@ namespace DotnetSpider.Core.Test
 		}
 
 		[TestMethod]
-		public void DatebaseLogAndStatus()
-		{
-			string id = Guid.NewGuid().ToString("N");
-			string taskGroup = Guid.NewGuid().ToString("N");
-			string userId = Guid.NewGuid().ToString("N");
-			string connectString = "Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306";
-			Configuration.SetValue("connectString", connectString);
-			Assert.AreEqual("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", Configuration.GetValue("connectString"));
-
-			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
-				id,
-				new QueueDuplicateRemovedScheduler(),
-				new TestPageProcessor()))
-			{
-				spider.AddPipeline(new TestPipeline()).SetThreadNum(1);
-				for (int i = 0; i < 5; i++)
-				{
-					spider.AddStartUrl("http://www.baidu.com/" + i);
-				}
-				spider.Run();
-			}
-			using (MySqlConnection conn = new MySqlConnection(connectString))
-			{
-				Assert.AreEqual(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count);
-				Assert.AreEqual(9, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{id}'").First().Count);
-			}
-		}
-
-		[TestMethod]
 		public void WhenNoStartUrl()
 		{
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
@@ -144,7 +114,7 @@ namespace DotnetSpider.Core.Test
 			Assert.AreEqual(Status.Finished, spider.Stat);
 		}
 
-		public class TestPipeline : BasePipeline
+		internal class TestPipeline : BasePipeline
 		{
 			public override void Process(params ResultItems[] resultItems)
 			{
@@ -158,7 +128,7 @@ namespace DotnetSpider.Core.Test
 			}
 		}
 
-		public class TestPageProcessor : BasePageProcessor
+		internal class TestPageProcessor : BasePageProcessor
 		{
 			protected override void Handle(Page page)
 			{

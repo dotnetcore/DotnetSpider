@@ -26,7 +26,7 @@ namespace DotnetSpider.Extension.Test
 				{ "cat3", "110" }
 			}), ContentType.Html, null)
 			{
-				Content = File.ReadAllText(Path.Combine(SpiderConsts.BaseDirectory, "Jd.html"))
+				Content = File.ReadAllText(Path.Combine(Core.Infrastructure.Environment.BaseDirectory, "Jd.html"))
 			});
 			Assert.AreEqual(60, results.Count);
 			Assert.AreEqual("手机", results[0].GetValue("CategoryName"));

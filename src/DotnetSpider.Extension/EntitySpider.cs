@@ -17,6 +17,9 @@ using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Infrastructure;
 using MySql.Data.MySqlClient;
 using System.Data;
+using NLog;
+using DotnetSpider.Core.Monitor;
+using DotnetSpider.Extension.Monitor;
 
 namespace DotnetSpider.Extension
 {
@@ -68,7 +71,7 @@ namespace DotnetSpider.Extension
 		{
 			Name = name;
 			Site = site;
-			ConnectString = Core.Infrastructure.Configuration.ConnectString;
+			ConnectString = Config.ConnectString;
 		}
 
 		public override void Run(params string[] arguments)
@@ -96,6 +99,8 @@ namespace DotnetSpider.Extension
 
 		protected override void PreInitComponent(params string[] arguments)
 		{
+			_monitor = IocManager.Resolve<IMonitor>() ?? new DbMonitor(Identity);
+
 			if (Site == null)
 			{
 				throw new SpiderException("Site should not be null.");
@@ -116,7 +121,7 @@ namespace DotnetSpider.Extension
 			}
 
 			bool needInitStartRequest = true;
-			var redisConnectString = string.IsNullOrEmpty(RedisConnectString) ? Core.Infrastructure.Configuration.RedisConnectString : RedisConnectString;
+			var redisConnectString = string.IsNullOrEmpty(RedisConnectString) ? Core.Infrastructure.Config.RedisConnectString : RedisConnectString;
 			if (!string.IsNullOrEmpty(redisConnectString))
 			{
 				RedisConnection = Cache.Instance.Get(redisConnectString);
@@ -157,7 +162,7 @@ namespace DotnetSpider.Extension
 				for (int i = 0; i < PrepareStartUrls.Length; ++i)
 				{
 					var prepareStartUrl = PrepareStartUrls[i];
-					this.Log($"[步骤 {i + 2}] 添加链接到调度中心.", LogLevel.Info);
+					Logger.MyLog(Identity, $"[步骤 {i + 2}] 添加链接到调度中心.", LogLevel.Info);
 					prepareStartUrl.Build(this, null);
 				}
 			}
@@ -314,11 +319,11 @@ namespace DotnetSpider.Extension
 			{
 				case TableSuffix.FirstDayOfThisMonth:
 					{
-						return name + "_" + DateTimeUtils.Day1OfThisMonth.ToString("yyyy_MM_dd");
+						return name + "_" + DateTimeUtils.First_Day_Of_Current_Month.ToString("yyyy_MM_dd");
 					}
 				case TableSuffix.Monday:
 					{
-						return name + "_" + DateTimeUtils.Day1OfThisWeek.ToString("yyyy_MM_dd");
+						return name + "_" + DateTimeUtils.Monday_Of_Current_Week.ToString("yyyy_MM_dd");
 					}
 				case TableSuffix.Today:
 					{
@@ -422,10 +427,10 @@ namespace DotnetSpider.Extension
 				}
 				if (needInitStartRequest)
 				{
-					this.Log("开始执行数据验证...", LogLevel.Info);
+					Logger.MyLog(Identity, "开始执行数据验证...", LogLevel.Info);
 					VerifyCollectedData();
 				}
-				this.Log("数据验证已完成.", LogLevel.Info);
+				Logger.MyLog(Identity, "数据验证已完成.", LogLevel.Info);
 
 				if (needInitStartRequest)
 				{
@@ -434,7 +439,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				this.Log(e.Message, LogLevel.Error, e);
+				Logger.MyLog(Identity, e.Message, LogLevel.Error, e);
 				//throw;
 			}
 			finally
@@ -478,7 +483,7 @@ namespace DotnetSpider.Extension
 				}
 				catch (Exception e)
 				{
-					spider.Log("Register contol failed.", LogLevel.Error, e);
+					Logger.MyLog(Identity, "Register contol failed.", LogLevel.Error, e);
 				}
 			}
 		}

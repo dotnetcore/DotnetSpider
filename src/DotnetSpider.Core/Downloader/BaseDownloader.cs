@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
+using NLog;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -7,6 +8,7 @@ namespace DotnetSpider.Core.Downloader
 {
 	public abstract class BaseDownloader : Named, IDownloader, IDisposable
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
 		public IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }
 		public IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }
 
@@ -96,10 +98,10 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					spider.Log("保存文件失败。", LogLevel.Warn, e);
+					Logger.MyLog(spider.Identity, "保存文件失败。", LogLevel.Error, e);
 				}
 			}
-			spider.Log($"下载文件: {request.Url} 成功.", LogLevel.Info);
+			Logger.MyLog(spider.Identity, $"下载文件: {request.Url} 成功.", LogLevel.Info);
 			return new Page(request, ContentType.File, null) { IsSkip = true };
 		}
 	}

@@ -11,6 +11,7 @@ using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using NLog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -43,10 +44,10 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.Table == null)
 			{
-				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
+				Logger.MyLog(Spider.Identity, $"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
-			EntityDbMetadata dbMetadata = new EntityDbMetadata {Table = metadata.Table};
+			EntityDbMetadata dbMetadata = new EntityDbMetadata { Table = metadata.Table };
 			foreach (var f in metadata.Fields)
 			{
 				var column = f;
@@ -187,7 +188,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 						catch (Exception e)
 						{
-							spider.Log("Update ConnectString failed.", LogLevel.Error, e);
+							Logger.MyLog(Spider.Identity, $"Update ConnectString failed.", LogLevel.Error, e);
 							Thread.Sleep(1000);
 						}
 					}

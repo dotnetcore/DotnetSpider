@@ -3,12 +3,14 @@ using System.IO;
 using System.Threading;
 using DotnetSpider.Extension.Redial.InternetDetector;
 using DotnetSpider.Extension.Redial.Redialer;
+using NLog;
 using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Redial
 {
 	public abstract class RedialExecutor : IRedialExecutor
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
 		protected static object Lock = new object();
 		public IRedialer Redialer { get; }
 		public IInternetDetector InternetDetector { get; }
@@ -49,17 +51,17 @@ namespace DotnetSpider.Extension.Redial
 			{
 				try
 				{
-					LogCenter.Log(null, "Wait all atomic action...", LogLevel.Warn);
+					Logger.MyLog("Wait all atomic action...", LogLevel.Warn);
 					// 等待数据库等操作完成
 					WaitAll();
-					LogCenter.Log(null, "Start redial...", LogLevel.Warn);
+					Logger.MyLog("Start redial...", LogLevel.Warn);
 
 					Redialer.Redial();
 
 					InternetDetector.Detect();
 
 					Thread.Sleep(2000);
-					LogCenter.Log(null, "Redial finished.", LogLevel.Warn);
+					Logger.MyLog("Redial finished.", LogLevel.Warn);
 
 					action?.Invoke();
 

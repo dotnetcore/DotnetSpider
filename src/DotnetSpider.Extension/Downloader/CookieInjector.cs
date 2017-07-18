@@ -106,7 +106,7 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				catch (Exception e)
 				{
-					LogCenter.Log(null, "Get cookie failed.", Core.Infrastructure.LogLevel.Error, e);
+					Logger.MyLog(spider.Identity, "Get cookie failed.", NLog.LogLevel.Error, e);
 					return null;
 				}
 				fiddlerWrapper.StopCapture();
@@ -197,7 +197,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 			catch (Exception e)
 			{
-				LogCenter.Log(null, "Get cookie failed.", Core.Infrastructure.LogLevel.Error, e);
+				Logger.MyLog(spider.Identity, "Get cookie failed.", NLog.LogLevel.Error, e);
 				webDriver.Dispose();
 				return null;
 			}

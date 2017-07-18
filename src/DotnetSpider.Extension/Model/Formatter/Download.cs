@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 						throw t.Exception;
 					}
 					var fileData = t.Result;
-					string file = Path.Combine(SpiderConsts.GlobalDirectory, "images", name);
+					string file = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "images", name);
 					if (!File.Exists(file))
 					{
 						var stream = BasePipeline.PrepareFile(file).OpenWrite();

@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
+using NLog;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -88,7 +89,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					if (!site.DownloadFiles)
 					{
-						spider.Log($"Miss request: {request.Url} because media type is not text.", LogLevel.Debug);
+						Logger.MyLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
 						return new Page(request, site.ContentType, null) { IsSkip = true };
 					}
 					else
@@ -103,7 +104,7 @@ namespace DotnetSpider.Core.Downloader
 
 				if (string.IsNullOrEmpty(page.Content))
 				{
-					spider.Log($"下载 {request.Url} 内容为空。", LogLevel.Warn);
+					Logger.MyLog(spider.Identity, $"下载 {request.Url} 内容为空.", LogLevel.Warn);
 				}
 
 				// need update
@@ -133,7 +134,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					page = Spider.AddToCycleRetry(request, site);
 				}
-				spider.Log($"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
 				return page;
 			}
 			catch (HttpRequestException he)
@@ -143,7 +144,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					page = Spider.AddToCycleRetry(request, site);
 				}
-				spider.Log($"下载 {request.Url} 失败: {he.Message}", LogLevel.Warn);
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {he.Message}.", LogLevel.Warn);
 				return page;
 			}
 			catch (Exception e)
@@ -163,7 +164,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					spider.Log("Close response fail.", LogLevel.Warn, e);
+					Logger.MyLog(spider.Identity, "Close response fail.", LogLevel.Error, e);
 				}
 			}
 		}

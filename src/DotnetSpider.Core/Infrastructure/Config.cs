@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public class Configuration
+	public class Config
 	{
 		public static string RedisConnectString
 		{
@@ -32,7 +32,7 @@ namespace DotnetSpider.Core.Infrastructure
 #endif
 		private static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
 
-		static Configuration()
+		static Config()
 		{
 #if !NET_CORE
 			string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;

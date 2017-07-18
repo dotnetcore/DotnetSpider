@@ -57,9 +57,11 @@
     <Compile Include="Infrastructure\DoubleKeyDictionary.cs" />
     <Compile Include="Infrastructure\FiddlerClient.cs" />
     <Compile Include="Infrastructure\Macros.cs" />
+    <Compile Include="Infrastructure\MySqlEngine.cs" />
     <Compile Include="Infrastructure\RedisConnection.cs" />
     <Compile Include="Infrastructure\SelectorUtil.cs" />
     <Compile Include="Infrastructure\WebDriverExtensions.cs" />
+    <Compile Include="Infrastructure\WindowsUserUtil.cs" />
     <Compile Include="ITask.cs" />
     <Compile Include="LinkContextSpider.cs" />
     <Compile Include="Model\Attribute\BaseSelector.cs" />
@@ -94,7 +96,7 @@
     <Compile Include="Model\MultiPageModel.cs" />
     <Compile Include="Model\PrepareStartUrls.cs" />
     <Compile Include="Model\Selector.cs" />
-    <Compile Include="Monitor\HttpMonitor.cs" />
+    <Compile Include="Monitor\DbMonitor.cs" />
     <Compile Include="ORM\Table.cs" />
     <Compile Include="ORM\TableSuffix.cs" />
     <Compile Include="Pipeline\BaseEntityDbPipeline.cs" />
@@ -157,6 +159,9 @@
     <Reference Include="CertMaker, Version=4.5.0.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FiddlerCore2.1.0.0\lib\net40\CertMaker.dll</HintPath>
     </Reference>
+    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="DotRas, Version=1.3.5166.33434, Culture=neutral, PublicKeyToken=b378f04384b7892a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\DotRas.for.Win7.1.3.0\lib\net40\DotRas.dll</HintPath>
     </Reference>
@@ -194,6 +199,9 @@
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="Renci.SshNet, Version=2016.0.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SSH.NET.2016.0.0\lib\net40\Renci.SshNet.dll</HintPath>
     </Reference>
@@ -219,6 +227,7 @@
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WebDriver">
       <HintPath>..\..\packages\Selenium.WebDriver.3.4.0\lib\net40\WebDriver.dll</HintPath>
       <Private>True</Private>

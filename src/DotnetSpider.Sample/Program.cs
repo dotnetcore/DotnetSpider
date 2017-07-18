@@ -7,20 +7,27 @@ using System.Text;
 #if !NET_CORE
 using System.Threading;
 #endif
+using Dapper;
 
 namespace DotnetSpider.Sample
 {
 
 	public class Program
 	{
+		public class MySqlEngine
+		{
+			public string Engine { get; set; }
+			public string Support { get; set; }
+		}
+
 		public static void Main(string[] args)
 		{
 #if NET_CORE
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
 			ThreadPool.SetMinThreads(200, 200);
-#endif
 			OcrDemo.Process();
+#endif
 
 			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:BaiduSearch" });
 

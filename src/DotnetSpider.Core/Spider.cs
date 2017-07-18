@@ -15,6 +15,7 @@ using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
 using System.Linq;
 using System.Collections.ObjectModel;
+using NLog;
 
 namespace DotnetSpider.Core
 {
@@ -23,6 +24,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Spider : ISpider, ISpeedMonitor, INamed
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 
@@ -56,6 +58,8 @@ namespace DotnetSpider.Core
 		public long AvgProcessorSpeed { get; private set; }
 		public long AvgPipelineSpeed { get; private set; }
 
+		public int StatusReportInterval { get; set; } = 5000;
+
 		private int _waitCountLimit = 1500;
 		private bool _init;
 		private FileInfo _errorRequestFile;
@@ -76,7 +80,7 @@ namespace DotnetSpider.Core
 		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private List<IPipeline> _pipelines = new List<IPipeline>();
 		private Site _site;
-		private IMonitor _monitor;
+		protected IMonitor _monitor;
 		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
@@ -513,6 +517,7 @@ namespace DotnetSpider.Core
 
 		protected virtual void PreInitComponent(params string[] arguments)
 		{
+			_monitor = IocManager.Resolve<IMonitor>() ?? new NLogMonitor();
 		}
 
 		protected virtual void AfterInitComponent(params string[] arguments)
@@ -526,7 +531,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			this.Log("构建内部模块、准备爬虫数据...", LogLevel.Info);
+			Logger.MyLog(Identity, "构建内部模块、准备爬虫数据...", LogLevel.Info);
 
 			if (Pipelines == null || Pipelines.Count == 0)
 			{
@@ -534,8 +539,6 @@ namespace DotnetSpider.Core
 			}
 
 			PreInitComponent(arguments);
-
-			_monitor = IocManager.Resolve<IMonitor>() ?? new NLogMonitor();
 
 			CookieInjector?.Inject(this, false);
 
@@ -546,7 +549,7 @@ namespace DotnetSpider.Core
 				while (!Monitorable.IsExited)
 				{
 					ReportStatus();
-					Thread.Sleep(5000);
+					Thread.Sleep(StatusReportInterval);
 				}
 				ReportStatus();
 			});
@@ -569,7 +572,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
-				this.Log($"准备步骤: 添加链接到调度中心, 数量 {Site.StartRequests.Count}.", LogLevel.Info);
+				Logger.MyLog(Identity, $"准备步骤: 添加链接到调度中心, 数量 {Site.StartRequests.Count}.", LogLevel.Info);
 				//Logger.SaveLog(LogInfo.Create(, Logger.Name, this, LogLevel.Info));
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
@@ -584,7 +587,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			}
 			else
 			{
-				this.Log("准备步骤: 添加链接到调度中心, 数量 0.", LogLevel.Info);
+				Logger.MyLog(Identity, "准备步骤: 添加链接到调度中心, 数量 0.", LogLevel.Info);
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
@@ -598,7 +601,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 		{
 			if (Stat == Status.Running)
 			{
-				this.Log("任务运行中...", LogLevel.Warn);
+				Logger.MyLog(Identity, "任务运行中...", LogLevel.Warn);
 				return;
 			}
 
@@ -677,7 +680,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 							catch (Exception e)
 							{
 								OnError(request);
-								this.Log($"采集失败: {request.Url}.", LogLevel.Error, e);
+								Logger.MyLog(Identity, $"采集失败: {request.Url}.", LogLevel.Error, e);
 							}
 							finally
 							{
@@ -703,14 +706,13 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			_realStat = Status.Exited;
 
 			OnClose();
-
-			this.Log($"等待监控进程退出.", LogLevel.Info);
+			Logger.MyLog(Identity, $"等待监控进程退出.", LogLevel.Info);
 			_monitorTask.Wait();
 
 			OnClosing?.Invoke();
 
 			var msg = Stat == Status.Finished ? "结束采集" : "退出采集";
-			this.Log($"{msg}, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
+			Logger.MyLog(Identity, $"{msg}, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
 		}
 
 		public static void PrintInfo()
@@ -755,11 +757,11 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 		{
 			if (Stat != Status.Running)
 			{
-				this.Log("任务不在运行中。", LogLevel.Warn);
+				Logger.MyLog(Identity, $"任务不在运行中.", LogLevel.Warn);
 				return;
 			}
 			Stat = Status.Stopped;
-			this.Log("停止任务中...", LogLevel.Warn);
+			Logger.MyLog(Identity, $"停止任务中...", LogLevel.Warn);
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
@@ -779,11 +781,11 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			{
 				Stat = Status.Running;
 				_realStat = Status.Running;
-				this.Log("任务继续...", LogLevel.Warn);
+				Logger.MyLog(Identity, $"任务继续...", LogLevel.Warn);
 			}
 			else
 			{
-				this.Log("任务未暂停, 不能执行继续操作...", LogLevel.Warn);
+				Logger.MyLog(Identity, $"任务未暂停, 不能执行继续操作...", LogLevel.Warn);
 			}
 		}
 
@@ -792,10 +794,10 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			if (Stat == Status.Running || Stat == Status.Stopped)
 			{
 				Stat = Status.Exited;
-				this.Log("退出任务中...", LogLevel.Warn);
+				Logger.MyLog(Identity, $"退出任务中...", LogLevel.Warn);
 				return;
 			}
-			this.Log("任务不在运行中。", LogLevel.Warn);
+			Logger.MyLog(Identity, $"任务不在运行中.", LogLevel.Warn);
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
@@ -930,7 +932,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				this.Log($"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}", LogLevel.Warn);
+				Logger.MyLog(Identity, $"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}.", LogLevel.Warn);
 			}
 
 			if (page == null)
@@ -982,8 +984,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 						}
 					}
 				}
-
-				this.Log($"采集: {request.Url} 成功.", LogLevel.Info);
+				Logger.MyLog(Identity, $"采集: {request.Url} 成功.", LogLevel.Info);
 			}
 			else
 			{
@@ -996,16 +997,16 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 						{
 							ExtractAndAddRequests(page, true);
 						}
-						this.Log($"解析: {request.Url} 结果为 0, 重新尝试采集.", LogLevel.Info);
+						Logger.MyLog(Identity, $"解析: {request.Url} 结果为 0, 重新尝试采集.", LogLevel.Info);
 					}
 					else
 					{
-						this.Log($"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
+						Logger.MyLog(Identity, $"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
 					}
 				}
 				else
 				{
-					this.Log($"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
+					Logger.MyLog(Identity, $"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
 				}
 			}
 
@@ -1059,7 +1060,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				}
 				catch (Exception e)
 				{
-					this.Log(e.ToString(), LogLevel.Warn);
+					Logger.MyLog(Identity, e.ToString(), LogLevel.Error);
 				}
 			}
 		}
@@ -1119,29 +1120,23 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		private void ReportStatus()
 		{
-			try
+			if (_monitor.IsEnabled)
 			{
-				if (_monitor.IsEnabled)
+				try
 				{
-					_monitor.Report(new SpiderStatus
-					{
-						Status = Stat.ToString(),
-						Error = Monitorable.GetErrorRequestsCount(),
-						Identity = Identity,
-						Left = Monitorable.GetLeftRequestsCount(),
-						Success = Monitorable.GetSuccessRequestsCount(),
-						ThreadNum = ThreadNum,
-						Total = Monitorable.GetTotalRequestsCount(),
-						AvgDownloadSpeed = AvgDownloadSpeed,
-						AvgProcessorSpeed = AvgProcessorSpeed,
-						AvgPipelineSpeed = AvgPipelineSpeed
-					});
+					_monitor.Report(Identity, Stat.ToString(),
+						Monitorable.GetLeftRequestsCount(),
+						Monitorable.GetTotalRequestsCount(),
+						Monitorable.GetSuccessRequestsCount(),
+						Monitorable.GetErrorRequestsCount(),
+						AvgDownloadSpeed,
+						AvgProcessorSpeed,
+						AvgPipelineSpeed,
+						ThreadNum);
 				}
-			}
-			catch
-			{
-
-
+				catch
+				{
+				}
 			}
 		}
 	}

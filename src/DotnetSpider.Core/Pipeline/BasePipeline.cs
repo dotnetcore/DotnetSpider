@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DotnetSpider.Core.Infrastructure;
+using NLog;
+using System;
 using System.IO;
 #if NET_CORE
 #endif
@@ -7,6 +9,7 @@ namespace DotnetSpider.Core.Pipeline
 {
 	public abstract class BasePipeline : IPipeline
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
 		protected string BasePath { get; set; }
 
 		public ISpider Spider { get; protected set; }

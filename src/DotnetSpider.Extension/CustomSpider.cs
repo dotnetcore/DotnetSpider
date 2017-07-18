@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension
 			Name = name;
 			if (string.IsNullOrEmpty(ConnectString))
 			{
-				ConnectString = Core.Infrastructure.Configuration.ConnectString;
+				ConnectString = Core.Infrastructure.Config.ConnectString;
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension
 
 			if (string.IsNullOrEmpty(ConnectString))
 			{
-				ConnectString = Core.Infrastructure.Configuration.ConnectString;
+				ConnectString = Core.Infrastructure.Config.ConnectString;
 			}
 
 			if (string.IsNullOrEmpty(ConnectString))

@@ -40,6 +40,7 @@ namespace DotnetSpider.Sample
 
 			// Start crawler ∆Ù∂Ø≈¿≥Ê
 			spider.Run();
+
 		}
 
 		public class YoukuPipeline : BasePipeline

@@ -128,7 +128,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 				{
 					page = Spider.AddToCycleRetry(request, site);
 				}
-				spider.Log($"下载 {request.Url} 失败: {de.Message}", Core.Infrastructure.LogLevel.Warn);
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}.", NLog.LogLevel.Warn);
 				return page;
 			}
 			catch (HttpRequestException he)
@@ -138,7 +138,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 				{
 					page = Spider.AddToCycleRetry(request, site);
 				}
-				spider.Log($"下载 {request.Url} 失败: {he.Message}", Core.Infrastructure.LogLevel.Warn);
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {he.Message}.", NLog.LogLevel.Warn);
 				return page;
 			}
 			catch (Exception e)
