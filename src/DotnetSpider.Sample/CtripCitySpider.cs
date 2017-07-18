@@ -1,15 +1,11 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
-using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Dapper;
 
 namespace DotnetSpider.Sample
 {

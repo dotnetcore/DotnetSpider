@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
-using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
@@ -10,8 +9,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Scheduler;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core.Scheduler;
 
 namespace DotnetSpider.Extension.Test
 {

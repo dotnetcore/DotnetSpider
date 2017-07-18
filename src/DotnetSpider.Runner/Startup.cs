@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 #if !NET_45
 using Microsoft.Extensions.DependencyModel;
+using System.Text;
 #endif
 
 namespace DotnetSpider.Runner
@@ -19,7 +19,7 @@ namespace DotnetSpider.Runner
 			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.White;
 
-#if NETSTANDARD1_6
+#if !NET_45
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 			Dictionary<string, string> arguments = new Dictionary<string, string>();

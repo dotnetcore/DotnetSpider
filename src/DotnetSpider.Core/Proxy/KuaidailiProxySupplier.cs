@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DotnetSpider.Core.Infrastructure;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
@@ -7,6 +9,7 @@ namespace DotnetSpider.Core.Proxy
 {
 	public class KuaidailiProxySupplier : IProxySupplier
 	{
+		private readonly static ILogger Logger = LogCenter.GetLogger();
 		public string Url { get; }
 		private readonly HttpClient _client = new HttpClient();
 
@@ -38,8 +41,9 @@ namespace DotnetSpider.Core.Proxy
 						}
 					}
 				}
-				catch (Exception e)
+				catch (Exception ex)
 				{
+					Logger.MyLog("Get new proxies failed.", LogLevel.Error, ex);
 					Thread.Sleep(5000);
 				}
 			}

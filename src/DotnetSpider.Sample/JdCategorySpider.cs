@@ -1,11 +1,8 @@
-﻿using System;
-using DotnetSpider.Core;
-using DotnetSpider.Extension;
+﻿using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using Newtonsoft.Json;
 
 namespace DotnetSpider.Sample
 {

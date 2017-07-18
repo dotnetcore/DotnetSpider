@@ -1,9 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Dapper;
 using DotnetSpider.Extension.Infrastructure;
 

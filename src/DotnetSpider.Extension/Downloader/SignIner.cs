@@ -2,8 +2,6 @@
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Downloader.WebDriver;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using DotnetSpider.Core.Selector;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;

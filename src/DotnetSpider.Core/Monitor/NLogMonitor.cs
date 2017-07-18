@@ -1,5 +1,4 @@
-﻿using System;
-using DotnetSpider.Core.Infrastructure;
+﻿using DotnetSpider.Core.Infrastructure;
 using NLog;
 
 namespace DotnetSpider.Core.Monitor

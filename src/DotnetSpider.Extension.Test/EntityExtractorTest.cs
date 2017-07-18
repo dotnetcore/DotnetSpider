@@ -8,7 +8,6 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Test
 {

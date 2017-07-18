@@ -4,7 +4,6 @@ using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
-using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
 

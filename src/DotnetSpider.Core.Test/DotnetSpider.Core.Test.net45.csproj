@@ -82,9 +82,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dapper.1.50.2\lib\net45\Dapper.dll</HintPath>
-    </Reference>
     <Reference Include="Google.Protobuf">
       <HintPath>..\..\packages\Google.Protobuf.3.3.0\lib\net45\Google.Protobuf.dll</HintPath>
       <Private>True</Private>
@@ -124,7 +121,6 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>DEL /S /Q $(ProjectDir)obj\*.*</PreBuildEvent>
   </PropertyGroup>

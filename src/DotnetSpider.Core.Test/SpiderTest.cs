@@ -3,10 +3,7 @@ using System.Threading;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
-using Dapper;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Test
 {

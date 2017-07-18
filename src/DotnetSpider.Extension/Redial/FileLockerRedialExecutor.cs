@@ -4,7 +4,6 @@ using System.Threading;
 using DotnetSpider.Extension.Redial.Redialer;
 using System.Linq;
 using DotnetSpider.Extension.Redial.InternetDetector;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Redial
 {

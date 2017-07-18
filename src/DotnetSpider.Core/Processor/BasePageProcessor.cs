@@ -229,7 +229,6 @@ namespace DotnetSpider.Core.Processor
 		/// </summary>
 		/// <param name="region"></param>
 		/// <returns></returns>
-		[Obsolete]
 		public virtual List<Regex> GetTargetUrlPatterns(string region)
 		{
 			ISelector selector = Selectors.Default();

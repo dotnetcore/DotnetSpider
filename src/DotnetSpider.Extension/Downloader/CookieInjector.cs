@@ -154,7 +154,7 @@ namespace DotnetSpider.Extension.Downloader
 					}
 					catch (Exception e)
 					{
-						// ignored
+						Logger.MyLog(spider.Identity, "µã»÷µÇÂ¼ÇøÓòÊ§°Ü.", NLog.LogLevel.Info, e);
 					}
 				}
 

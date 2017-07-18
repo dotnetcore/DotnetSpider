@@ -1,13 +1,10 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Selector;
+﻿using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
-using DotnetSpider.Extension.Pipeline;
 using System.Collections.Generic;
-using System;
 
 namespace DotnetSpider.Sample
 {

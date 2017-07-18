@@ -1,7 +1,4 @@
 ﻿#if !NET_CORE
-using System.Text;
-using System.Threading;
-using DotnetSpider.Core.Monitor;
 using System.IO;
 using DotnetSpider.Core.Downloader;
 using static DotnetSpider.Core.Test.SpiderTest;

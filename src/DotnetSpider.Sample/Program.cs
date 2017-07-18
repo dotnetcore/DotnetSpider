@@ -1,13 +1,10 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Runner;
-using MySql.Data.MySqlClient;
+﻿using DotnetSpider.Runner;
 using System;
-using System.Net;
-using System.Text;
 #if !NET_CORE
 using System.Threading;
+#else
+using System.Text;
 #endif
-using Dapper;
 
 namespace DotnetSpider.Sample
 {

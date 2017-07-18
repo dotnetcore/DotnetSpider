@@ -8,11 +8,8 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
-using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
 using Newtonsoft.Json.Linq;
-using System.IO;
-using System;
 using System.Linq;
 using DotnetSpider.Core.Infrastructure;
 
