@@ -41,6 +41,7 @@ namespace DotnetSpider.Extension.Monitor
 						new
 						{
 							identity = identity,
+							node = NodeId.Id,
 							status = "INIT",
 							left = 0,
 							total = 0,
@@ -49,7 +50,7 @@ namespace DotnetSpider.Extension.Monitor
 							avgDownloadSpeed = 0,
 							avgProcessorSpeed = 0,
 							avgPipelineSpeed = 0,
-							threadNum = 0
+							thread = 0
 						});
 				}
 			});
@@ -70,6 +71,7 @@ namespace DotnetSpider.Extension.Monitor
 							new
 							{
 								identity = identity,
+								node = NodeId.Id,
 								status = status,
 								left = left,
 								total = total,
@@ -78,7 +80,7 @@ namespace DotnetSpider.Extension.Monitor
 								avgDownloadSpeed = avgDownloadSpeed,
 								avgProcessorSpeed = avgProcessorSpeed,
 								avgPipelineSpeed = avgPipelineSpeed,
-								threadNum = threadNum
+								thread = threadNum
 							});
 					}
 				});

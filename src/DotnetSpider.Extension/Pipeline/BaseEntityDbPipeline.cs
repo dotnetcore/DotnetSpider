@@ -44,7 +44,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.Table == null)
 			{
-				Logger.MyLog(Spider.Identity, $"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
+				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
 			EntityDbMetadata dbMetadata = new EntityDbMetadata { Table = metadata.Table };
