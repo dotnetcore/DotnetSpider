@@ -6,6 +6,7 @@ using System.Threading;
 using DotnetSpider.Core;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -161,10 +162,13 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 			builder.Append($", PRIMARY KEY ({ metadata.Table.Primary})");
-
-			builder.Append(") ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
-			string sql = builder.ToString();
-			return sql;
+			using (var conn = new MySqlConnection(ConnectString))
+			{
+				var dbEngine = MySqlEngine.IsSupportToku(conn) ? "TokuDB" : "InnoDB";
+				builder.Append($") ENGINE={dbEngine} AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
+				string sql = builder.ToString();
+				return sql;
+			}
 		}
 
 		protected override string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion)

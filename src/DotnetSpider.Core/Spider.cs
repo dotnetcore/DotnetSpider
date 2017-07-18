@@ -710,7 +710,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 			OnClose();
 			Logger.MyLog(Identity, $"等待监控进程退出.", LogLevel.Info);
-			_monitorTask.Wait();
+			_monitorTask.Wait(5000);
 
 			OnClosing?.Invoke();
 
