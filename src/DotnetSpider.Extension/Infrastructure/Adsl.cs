@@ -1,5 +1,4 @@
-﻿#if !NET_CORE
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace DotnetSpider.Extension.Infrastructure
@@ -16,7 +15,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		public string SzDeviceName;
 	}
 
-	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+	[StructLayout(LayoutKind.Sequential)]
 	public struct RasStats
 	{
 		public int dwSize;
@@ -36,7 +35,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		public int dwConnectionDuration;
 	}
 
-	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+	[StructLayout(LayoutKind.Sequential)]
 	public struct RasEntryName
 	{
 		public int dwSize;
@@ -58,10 +57,10 @@ namespace DotnetSpider.Extension.Infrastructure
 
 	public class Adsl
 	{
-		[DllImport("rasapi32.dll", CharSet = CharSet.Auto)]
+		[DllImport("rasapi32.dll")]
 		public static extern uint RasHangUp(IntPtr hrasconn);
 
-		[DllImport("wininet.dll", CharSet = CharSet.Auto)]
+		[DllImport("wininet.dll")]
 		public static extern int InternetDial(IntPtr hwnd, [In]string lpszConnectoid, uint dwFlags, ref int lpdwConnection, uint dwReserved);
 
 		[DllImport("Rasapi32.dll", EntryPoint = "RasEnumConnectionsA",
@@ -73,18 +72,18 @@ namespace DotnetSpider.Extension.Infrastructure
 			ref int lpcConnections // number of connections written to buffer
 			);
 
-		[DllImport("wininet.dll", CharSet = CharSet.Auto)]
+		[DllImport("wininet.dll")]
 		public static extern bool DeleteUrlCacheEntry(
 			DelCacheType type
 			);
 
-		[DllImport("rasapi32.dll", CharSet = CharSet.Auto)]
+		[DllImport("rasapi32.dll")]
 		internal static extern uint RasGetConnectionStatistics(
 			IntPtr hRasConn,       // handle to the connection
 			[In, Out]RasStats lpStatistics  // buffer to receive statistics
 			);
 
-		[DllImport("rasapi32.dll", CharSet = CharSet.Auto)]
+		[DllImport("rasapi32.dll")]
 		public static extern uint RasEnumEntries(
 			string reserved,              // reserved, must be NULL
 			string lpszPhonebook,         // pointer to full path and
@@ -211,4 +210,3 @@ namespace DotnetSpider.Extension.Infrastructure
 		}
 	}
 }
-#endif

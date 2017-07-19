@@ -13,7 +13,7 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			if (!string.IsNullOrEmpty(page.Content)&& page.Content.Contains(Content))
 			{
-				((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
+				NetworkCenter.Current.Executor.Redial();
 				throw new DownloadException($"Content downloaded contains string: {Content}.");
 			}
 			return true;
@@ -34,7 +34,7 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				if (page.Exception.Message.Contains(ExceptionMessage))
 				{
-					((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
+					NetworkCenter.Current.Executor.Redial();
 					throw new DownloadException("Download failed and redial finished already.");
 				}
 			}
@@ -51,7 +51,7 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			if (!string.IsNullOrEmpty(page.Content) && CookieInjector != null && page.Content.Contains(Content))
 			{
-				((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
+				NetworkCenter.Current.Executor.Redial();
 
 				CookieInjector?.Inject(spider);
 
@@ -78,7 +78,7 @@ namespace DotnetSpider.Extension.Downloader
 					{
 						RequestedCount = 0;
 
-						((IRedialExecutor)NetworkCenter.Current.Executor).Redial();
+						NetworkCenter.Current.Executor.Redial();
 					}
 				}
 			}

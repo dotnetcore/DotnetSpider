@@ -4,7 +4,7 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public class NetworkCenter
 	{
-		public INetworkExecutor Executor { get; set; }
+		public IRedialExecutor Executor { get; set; }
 
 		public static readonly Lazy<NetworkCenter> Instance = new Lazy<NetworkCenter>(() => new NetworkCenter());
 
@@ -12,11 +12,6 @@ namespace DotnetSpider.Core.Infrastructure
 
 		private NetworkCenter()
 		{
-		}
-
-		public void Register(INetworkExecutor executor)
-		{
-			Executor = executor;
 		}
 
 		public void Execute(string name, Action action)

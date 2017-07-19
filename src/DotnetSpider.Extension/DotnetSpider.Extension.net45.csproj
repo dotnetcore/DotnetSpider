@@ -126,15 +126,12 @@
     <Compile Include="Redial\InternetDetector\IInternetDetector.cs" />
     <Compile Include="Redial\InternetDetector\VpnInternetDetector.cs" />
     <Compile Include="Redial\InternetDetector\VpsInternetDetector.cs" />
-    <Compile Include="Redial\IRedialExecutor.cs" />
     <Compile Include="Redial\Redialer\AdslCommandRedialer.cs" />
     <Compile Include="Redial\Redialer\AdslRedialer.cs" />
     <Compile Include="Redial\Redialer\BaseAdslRedialer.cs" />
     <Compile Include="Redial\Redialer\H3CSshAdslRedialer.cs" />
     <Compile Include="Redial\Redialer\IRedialer.cs" />
     <Compile Include="Redial\Redialer\VpnRedialer.cs" />
-    <Compile Include="Redial\RedialException.cs" />
-    <Compile Include="Redial\RedialResult.cs" />
     <Compile Include="Redial\RedisRedialExecutor.cs" />
     <Compile Include="Infrastructure\Adsl.cs" />
     <Compile Include="Infrastructure\AdslCommandUtil.cs" />

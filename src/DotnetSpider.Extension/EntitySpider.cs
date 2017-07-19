@@ -29,7 +29,6 @@ namespace DotnetSpider.Extension
 
 		private const string InitStatusSetKey = "dotnetspider:init-stats";
 		private const string ValidateStatusKey = "dotnetspider:validate-stats";
-		private IRedialExecutor _redialExecutor;
 		private static readonly List<string> DefaultProperties = new List<string> { "cdate", Core.Infrastructure.Environment.IdColumn };
 
 		[JsonIgnore]
@@ -54,11 +53,13 @@ namespace DotnetSpider.Extension
 		[JsonIgnore]
 		public IRedialExecutor RedialExecutor
 		{
-			get => _redialExecutor;
+			get
+			{
+				return NetworkCenter.Current.Executor;
+			}
 			set
 			{
 				CheckIfRunning();
-				_redialExecutor = value;
 				NetworkCenter.Current.Executor = RedialExecutor;
 			}
 		}

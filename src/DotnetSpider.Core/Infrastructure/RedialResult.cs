@@ -1,4 +1,4 @@
-﻿namespace DotnetSpider.Extension.Redial
+﻿namespace DotnetSpider.Core.Infrastructure
 {
 	public enum RedialResult
 	{

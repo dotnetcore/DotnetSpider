@@ -100,13 +100,15 @@
     <Compile Include="Infrastructure\Encrypt.cs" />
     <Compile Include="Infrastructure\Environment.cs" />
     <Compile Include="Infrastructure\HttpUtils.cs" />
-    <Compile Include="Infrastructure\INetworkExecutor.cs" />
     <Compile Include="Infrastructure\IocManager.cs" />
+    <Compile Include="Infrastructure\IRedialExecutor.cs" />
     <Compile Include="Infrastructure\LimitedConcurrencyLevelTaskScheduler.cs" />
     <Compile Include="Infrastructure\LogCenter.cs" />
     <Compile Include="Infrastructure\NetworkCenter.cs" />
     <Compile Include="Infrastructure\NodeId.cs" />
     <Compile Include="Infrastructure\PriorityBlockingQueue.cs" />
+    <Compile Include="Infrastructure\RedialException.cs" />
+    <Compile Include="Infrastructure\RedialResult.cs" />
     <Compile Include="Infrastructure\RegexUtils.cs" />
     <Compile Include="Infrastructure\RetryExecutor.cs" />
     <Compile Include="Infrastructure\Singleton.cs" />

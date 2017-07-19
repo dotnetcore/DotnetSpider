@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Core;
-
-namespace DotnetSpider.Extension.Redial
+﻿namespace DotnetSpider.Core.Infrastructure
 {
 	public class RedialException : SpiderException
 	{
