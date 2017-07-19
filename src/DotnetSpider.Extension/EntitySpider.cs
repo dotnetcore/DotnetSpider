@@ -50,7 +50,7 @@ namespace DotnetSpider.Extension
 		[JsonIgnore]
 		public PrepareStartUrls[] PrepareStartUrls { get; set; }
 
-		public EntitySpider(string name) : base(new Site())
+		public EntitySpider(string name) : this(name, new Site())
 		{
 		}
 
