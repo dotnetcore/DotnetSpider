@@ -279,8 +279,8 @@ namespace DotnetSpider.Core
 
 				if (value >= 1000)
 				{
-					EmptySleepTime = value;
-					_waitCountLimit = EmptySleepTime / WaitInterval;
+					_emptySleepTime = value;
+					_waitCountLimit = value / WaitInterval;
 				}
 				else
 				{
@@ -695,7 +695,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			var key = "_DotnetSpider_Info";
 
 #if !NET_CORE
-			isPrinted = AppDomain.CurrentDomain.GetData(key) == null;
+			isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
 #else
 
 			AppContext.TryGetSwitch(key, out isPrinted);
@@ -703,15 +703,13 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			if (!isPrinted)
 			{
 				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine("=============================================================");
-				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
-				Console.WriteLine("== It's a light, stable, high performce spider             ==");
-				Console.WriteLine("== Support multi thread, ajax page, http                   ==");
-				Console.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
-				Console.WriteLine("== License: LGPL3.0                                        ==");
-				Console.WriteLine("== Version: 1.3.0-rc1                                      ==");
-				Console.WriteLine("== Author: zlzforever@163.com                              ==");
-				Console.WriteLine("=============================================================");
+				Console.WriteLine("=================================================================");
+				Console.WriteLine("== DotnetSpider is an open source crawler developed by C#      ==");
+				Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
+				Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
+				Console.WriteLine("== License: LGPL3.0                                            ==");
+				Console.WriteLine("== Author: zlzforever@163.com                                  ==");
+				Console.WriteLine("=================================================================");
 				Console.ForegroundColor = ConsoleColor.White;
 #if !NET_CORE
 				AppDomain.CurrentDomain.SetData(key, "True");
@@ -720,6 +718,8 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				AppContext.SetSwitch(key, true);
 #endif
 			}
+			Console.WriteLine();
+			Console.WriteLine("=================================================================");
 		}
 
 		public Task RunAsync(params string[] arguments)

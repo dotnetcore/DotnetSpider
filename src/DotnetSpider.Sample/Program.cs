@@ -26,6 +26,8 @@ namespace DotnetSpider.Sample
 			OcrDemo.Process();
 #endif
 
+			BaseUsage.CustmizeProcessorAndPipeline();
+			BaseUsage.CustmizeProcessorAndPipeline();
 			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:BaiduSearch" });
 
 			Startup.Run(new string[] { "-s:CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1" });

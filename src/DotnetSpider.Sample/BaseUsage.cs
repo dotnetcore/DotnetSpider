@@ -79,10 +79,10 @@ namespace DotnetSpider.Sample
 				page.AddResultItem("VideoResult", results);
 
 				// Add target requests to scheduler. 解析需要采集的URL
-				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
-				{
-					page.AddTargetRequest(new Request(url.GetValue(), null));
-				}
+				//foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
+				//{
+				//	page.AddTargetRequest(new Request(url.GetValue(), null));
+				//}
 			}
 		}
 
