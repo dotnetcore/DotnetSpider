@@ -1,16 +1,15 @@
-﻿#if !NET_CORE
+﻿
 using System.Diagnostics;
 
-namespace DotnetSpider.Extension.Infrastructure
+namespace DotnetSpider.Core.Infrastructure
 {
-	public class AdslCommandUtil
+	public class AdslCommand
 	{
-		public AdslCommandUtil(string interfaceName, string username = null, string password = null, ProcessWindowStyle windowstyle = ProcessWindowStyle.Hidden)
+		public AdslCommand(string interfaceName, string username = null, string password = null)
 		{
 			InterfaceName = interfaceName;
 			Username = username;
 			Password = password;
-			WindowStyle = windowstyle;
 		}
 
 		/// <summary>
@@ -18,10 +17,6 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// </summary>
 		public string InterfaceName { get; set; }
 
-		/// <summary>
-		/// 拨号进程的窗口方式
-		/// </summary>
-		public ProcessWindowStyle WindowStyle { get; set; }
 
 		public string Username { get; set; }
 		/// <summary>
@@ -74,4 +69,3 @@ namespace DotnetSpider.Extension.Infrastructure
 		}
 	}
 }
-#endif

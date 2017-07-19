@@ -7,13 +7,13 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
-
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Sample
 {
 	public class JdSpider : EntitySpider
 	{
-		public JdSpider() : base("JD")
+		public JdSpider() : base("JD", new Site())
 		{
 		}
 

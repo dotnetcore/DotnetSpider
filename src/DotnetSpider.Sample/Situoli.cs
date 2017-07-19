@@ -25,12 +25,9 @@ namespace DotnetSpider.Sample
 				// default page processor will save whole html, and extract urls to target urls via regex
 				new DefaultPageProcessor(new[] { "situoli\\.com" }, new string[] { "user=register", "user=login" }))
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
-				.AddPipeline(new FilePipeline())
-				// dowload html by http client
-				.SetDownloader(new HttpClientDownloader())
-				// 4 threads 4线程
-				.SetThreadNum(1);
-
+				.AddPipeline(new FilePipeline());
+			spider.Downloader = new HttpClientDownloader();
+			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
 			spider.Deep = 3;
 

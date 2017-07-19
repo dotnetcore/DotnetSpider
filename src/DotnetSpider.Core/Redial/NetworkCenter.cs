@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotnetSpider.Core.Infrastructure
+namespace DotnetSpider.Core.Redial
 {
 	public class NetworkCenter
 	{

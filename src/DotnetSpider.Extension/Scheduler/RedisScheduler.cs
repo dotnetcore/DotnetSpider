@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using StackExchange.Redis;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Core.Redial;
 #if NET_CORE
 #endif
 

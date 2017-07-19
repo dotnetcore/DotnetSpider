@@ -37,7 +37,8 @@ namespace DotnetSpider.Core.Test
 		[TestMethod]
 		public void RunAsyncAndStop()
 		{
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			spider.ThreadNum = 1;
 			for (int i = 0; i < 10000; i++)
 			{
 				spider.AddStartUrl("http://www.baidu.com/" + i);
@@ -54,7 +55,8 @@ namespace DotnetSpider.Core.Test
 		[TestMethod]
 		public void RunAsyncAndContiune()
 		{
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			spider.ThreadNum = 1;
 			for (int i = 0; i < 10000; i++)
 			{
 				spider.AddStartUrl("http://www.baidu.com/" + i);
@@ -71,7 +73,8 @@ namespace DotnetSpider.Core.Test
 		[TestMethod]
 		public void RunAsyncAndStopThenExit()
 		{
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			spider.ThreadNum = 1;
 			for (int i = 0; i < 10000; i++)
 			{
 				spider.AddStartUrl("http://www.baidu.com/" + i);
@@ -105,7 +108,8 @@ namespace DotnetSpider.Core.Test
 		[TestMethod]
 		public void WhenNoStartUrl()
 		{
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			spider.ThreadNum = 1;
 			spider.Run();
 
 			Assert.AreEqual(Status.Finished, spider.Stat);
@@ -136,7 +140,8 @@ namespace DotnetSpider.Core.Test
 		[TestMethod]
 		public void TestRetryWhenResultIsEmpty()
 		{
-			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
+			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			spider.ThreadNum = 1;
 			spider.AddStartUrl("http://taobao.com");
 			spider.RetryWhenResultIsEmpty = true;
 			spider.Run();

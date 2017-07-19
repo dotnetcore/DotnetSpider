@@ -1,4 +1,4 @@
-﻿namespace DotnetSpider.Extension.Redial.Redialer
+﻿namespace DotnetSpider.Core.Redial.Redialer
 {
 	public interface IRedialer
 	{

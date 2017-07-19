@@ -12,6 +12,7 @@ using DotnetSpider.Extension.Model;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using NLog;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Pipeline
 {

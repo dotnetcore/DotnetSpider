@@ -11,17 +11,13 @@ namespace DotnetSpider.Sample
 {
 	public class ShanxizhaoshengSpider : EntitySpider
 	{
-		public ShanxizhaoshengSpider() : base("ShanxizhaoshengSpider")
+		public ShanxizhaoshengSpider() : base("ShanxizhaoshengSpider", new Site() { EncodingName = "GB2312" })
 		{
 		}
 
 		protected override void MyInit(params string[] arguments)
 		{
 			Identity = ("ShanxizhaoshengSpider " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
-			SetSite(new Site
-			{
-				EncodingName = "GB2312"
-			});
 			AddPipeline(new SqlServerEntityPipeline("Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True"));
 			AddStartUrl("http://www.sneac.com/pgjhcx/ypbkyxjg.jsp?a11709CountNo=2000");
 			AddEntityType(typeof(Item));

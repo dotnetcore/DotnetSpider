@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Text;
 using System.Threading;
 using Renci.SshNet;
+using DotnetSpider.Core.Redial.Redialer;
 
 namespace DotnetSpider.Extension.Redial.Redialer
 {
@@ -13,20 +14,9 @@ namespace DotnetSpider.Extension.Redial.Redialer
 		private readonly string _sshhost;
 		private readonly string _sshuser;
 		private readonly string _sshpass;
-		private readonly string _sshInterface;
 		private readonly int _sshport;
 
-		public H3CSshAdslRedialer()
-		{
-			_sshhost = ConfigurationManager.AppSettings["sshHost"];
-			_sshuser = ConfigurationManager.AppSettings["sshUser"];
-			_sshpass = ConfigurationManager.AppSettings["sshPassword"];
-			_sshInterface = ConfigurationManager.AppSettings["sshInterface"];
-			var port = ConfigurationManager.AppSettings["sshPort"];
-			_sshport = port == null ? 22 : int.Parse(port);
-		}
-
-		public H3CSshAdslRedialer(string sshhost,int sshPort, string sshuser, string sshpass, string interface1, string user, string password) : base(interface1, user, password)
+		public H3CSshAdslRedialer(string sshhost,int sshPort, string sshuser, string sshpass, string interfaceName, string user, string password) : base(interfaceName, user, password)
 		{
 			_sshhost = sshhost;
 			_sshuser = sshuser;
@@ -45,7 +35,7 @@ namespace DotnetSpider.Extension.Redial.Redialer
 
 				shell.WriteLine("system-view");
 				Thread.Sleep(1000);
-				shell.WriteLine("interface " + _sshInterface);
+				shell.WriteLine("interface " + Interface);
 				Thread.Sleep(1000);
 				shell.WriteLine("shutdown");
 				Thread.Sleep(35000);

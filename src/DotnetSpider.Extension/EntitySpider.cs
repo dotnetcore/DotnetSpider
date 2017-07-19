@@ -50,28 +50,13 @@ namespace DotnetSpider.Extension
 		[JsonIgnore]
 		public PrepareStartUrls[] PrepareStartUrls { get; set; }
 
-		[JsonIgnore]
-		public IRedialExecutor RedialExecutor
-		{
-			get
-			{
-				return NetworkCenter.Current.Executor;
-			}
-			set
-			{
-				CheckIfRunning();
-				NetworkCenter.Current.Executor = RedialExecutor;
-			}
-		}
-
-		public EntitySpider(string name) : this(name, new Site())
+		public EntitySpider(string name) : base(new Site())
 		{
 		}
 
-		public EntitySpider(string name, Site site)
+		public EntitySpider(string name, Site site) : base(site)
 		{
 			Name = name;
-			Site = site;
 			ConnectString = Config.ConnectString;
 		}
 

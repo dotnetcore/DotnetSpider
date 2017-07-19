@@ -36,7 +36,8 @@ namespace DotnetSpider.Extension.Test
 				new QueueDuplicateRemovedScheduler(),
 				new TestPageProcessor()))
 			{
-				spider.AddPipeline(new TestPipeline()).SetThreadNum(1);
+				spider.AddPipeline(new TestPipeline());
+				spider.ThreadNum = 1;
 				for (int i = 0; i < 5; i++)
 				{
 					spider.AddStartUrl("http://www.baidu.com/" + i);

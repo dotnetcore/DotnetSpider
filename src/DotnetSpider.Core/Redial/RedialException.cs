@@ -1,4 +1,4 @@
-﻿namespace DotnetSpider.Core.Infrastructure
+﻿namespace DotnetSpider.Core.Redial
 {
 	public class RedialException : SpiderException
 	{

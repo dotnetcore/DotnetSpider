@@ -8,12 +8,13 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Sample
 {
 	public class JdShopDetailSpider : EntitySpider
 	{
-		public JdShopDetailSpider() : base("JdShopDetailSpider")
+		public JdShopDetailSpider() : base("JdShopDetailSpider", new Site())
 		{
 		}
 

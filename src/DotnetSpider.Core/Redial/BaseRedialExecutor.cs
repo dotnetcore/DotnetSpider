@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using DotnetSpider.Extension.Redial.InternetDetector;
-using DotnetSpider.Extension.Redial.Redialer;
+using DotnetSpider.Core.Redial.InternetDetector;
+using DotnetSpider.Core.Redial.Redialer;
 using NLog;
 using DotnetSpider.Core.Infrastructure;
 
-namespace DotnetSpider.Extension.Redial
+namespace DotnetSpider.Core.Redial
 {
 	public abstract class RedialExecutor : IRedialExecutor
 	{

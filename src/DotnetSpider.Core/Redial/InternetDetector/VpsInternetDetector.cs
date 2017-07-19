@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace DotnetSpider.Extension.Redial.InternetDetector
+namespace DotnetSpider.Core.Redial.InternetDetector
 {
 	/// <summary>
 	/// VPS 有多根线路, 其中几根是用于稳定远程, 另几根是IP拨号, 所以不能用PING baidu.com这种形式判断是否拨号成功.

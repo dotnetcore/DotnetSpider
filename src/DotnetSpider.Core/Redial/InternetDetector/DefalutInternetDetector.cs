@@ -1,4 +1,4 @@
-﻿#if NET_CORE
+﻿#if !NET_45
 using System;
 using System.Net.Http;
 using System.Threading;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Net.NetworkInformation;
 #endif
 
-namespace DotnetSpider.Extension.Redial.InternetDetector
+namespace DotnetSpider.Core.Redial.InternetDetector
 {
 	public class DefalutInternetDetector : BaseInternetDetector
 	{

@@ -9,6 +9,7 @@ using DotnetSpider.Core.Infrastructure;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
 using System.Net.Http;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Downloader.WebDriver
 {

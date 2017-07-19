@@ -1,4 +1,5 @@
-﻿using DotnetSpider.Extension;
+﻿using DotnetSpider.Core;
+using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
@@ -8,7 +9,7 @@ namespace DotnetSpider.Sample
 {
 	public class JdCategorySpider : EntitySpider
 	{
-		public JdCategorySpider() : base("京东类目 Daliy Tracking")
+		public JdCategorySpider() : base("京东类目 Daliy Tracking", new Site())
 		{
 		}
 

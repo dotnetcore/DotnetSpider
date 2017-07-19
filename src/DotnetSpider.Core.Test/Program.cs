@@ -16,14 +16,15 @@ namespace DotnetSpider.Core.Test
 			}
 			File.WriteAllText(path, "a=b&c=d");
 
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
-			spider.SetDownloader(new HttpClientDownloader()
+			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			spider.ThreadNum = 1;
+			spider.Downloader = new HttpClientDownloader()
 			{
 				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
 				{
 					new TimerUpdateCookieHandler(5,new FileCookieInject())
 				}
-			});
+			};
 			for (int i = 0; i < 10000; i++)
 			{
 				spider.AddStartUrl("http://www.baidu.com/" + i);

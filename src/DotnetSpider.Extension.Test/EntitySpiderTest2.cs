@@ -310,7 +310,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			EntitySpider context = new DefaultEntitySpider();
 			context.Identity = (Guid.NewGuid().ToString("N"));
-			context.SetThreadNum(1);
+			context.ThreadNum = 1;
 			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddPipeline(new MySqlFileEntityPipeline());
 			context.AddPipeline(new ConsoleEntityPipeline());
@@ -356,7 +356,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
-				context.SetThreadNum(1);
+				context.ThreadNum = 1;
 				context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 
 				context.AddStartUrl("http://baidu.com");
@@ -399,7 +399,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
-				context.SetThreadNum(1);
+				context.ThreadNum = 1;
 				context.AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"));
 
 				context.AddStartUrl("http://baidu.com");

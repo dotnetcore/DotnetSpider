@@ -50,6 +50,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Management" />
@@ -87,6 +88,8 @@
     <Compile Include="IExitable.cs" />
     <Compile Include="IIdentity.cs" />
     <Compile Include="INamed.cs" />
+    <Compile Include="Infrastructure\Adsl.cs" />
+    <Compile Include="Infrastructure\AdslCommand.cs" />
     <Compile Include="Infrastructure\AutomicInteger.cs" />
     <Compile Include="Infrastructure\AutomicLong.cs" />
     <Compile Include="Infrastructure\BitArrayExtensions.cs" />
@@ -101,14 +104,10 @@
     <Compile Include="Infrastructure\Environment.cs" />
     <Compile Include="Infrastructure\HttpUtils.cs" />
     <Compile Include="Infrastructure\IocManager.cs" />
-    <Compile Include="Infrastructure\IRedialExecutor.cs" />
     <Compile Include="Infrastructure\LimitedConcurrencyLevelTaskScheduler.cs" />
     <Compile Include="Infrastructure\LogCenter.cs" />
-    <Compile Include="Infrastructure\NetworkCenter.cs" />
     <Compile Include="Infrastructure\NodeId.cs" />
     <Compile Include="Infrastructure\PriorityBlockingQueue.cs" />
-    <Compile Include="Infrastructure\RedialException.cs" />
-    <Compile Include="Infrastructure\RedialResult.cs" />
     <Compile Include="Infrastructure\RegexUtils.cs" />
     <Compile Include="Infrastructure\RetryExecutor.cs" />
     <Compile Include="Infrastructure\Singleton.cs" />
@@ -148,6 +147,20 @@
     <Compile Include="Proxy\ProxyUtil.cs" />
     <Compile Include="Proxy\SingleProxyPool.cs" />
     <Compile Include="Proxy\UseSpecifiedUriWebProxy.cs" />
+    <Compile Include="Redial\BaseRedialExecutor.cs" />
+    <Compile Include="Redial\FileLockerRedialExecutor.cs" />
+    <Compile Include="Redial\InternetDetector\BaseInternetDetector.cs" />
+    <Compile Include="Redial\InternetDetector\DefalutInternetDetector.cs" />
+    <Compile Include="Redial\InternetDetector\IInternetDetector.cs" />
+    <Compile Include="Redial\InternetDetector\VpnInternetDetector.cs" />
+    <Compile Include="Redial\InternetDetector\VpsInternetDetector.cs" />
+    <Compile Include="Redial\IRedialExecutor.cs" />
+    <Compile Include="Redial\NetworkCenter.cs" />
+    <Compile Include="Redial\Redialer\AdslRedialer.cs" />
+    <Compile Include="Redial\Redialer\BaseAdslRedialer.cs" />
+    <Compile Include="Redial\Redialer\IRedialer.cs" />
+    <Compile Include="Redial\RedialException.cs" />
+    <Compile Include="Redial\RedialResult.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="ResultItems.cs" />
     <Compile Include="Scheduler\Component\BloomFilterDuplicateRemover.cs" />

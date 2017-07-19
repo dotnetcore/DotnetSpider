@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample
 						new IncrementTargetUrlsCreator("index_1.shtml")
 					}
 			};
-			SetThreadNum(10);
+			ThreadNum = 10;
 			Identity = ("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 			AddPipeline(
 			   new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));

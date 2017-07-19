@@ -6,12 +6,13 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Sample
 {
 	public class Hao360EntitySpiderInfoBuble : EntitySpider
 	{
-		public Hao360EntitySpiderInfoBuble() : base("Hao360")
+		public Hao360EntitySpiderInfoBuble() : base("Hao360", new Site())
 		{
 		}
 
@@ -37,7 +38,7 @@ namespace DotnetSpider.Sample
 						},
 				}
 			};
-			SetScheduler(new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
+			Scheduler = new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
 			AddPipeline(new MySqlEntityPipeline("Database='testhao';Data Source= localhost;User ID=root;Password=root@123456;Port=3306"));
 			AddStartUrl("https://hao.360.cn/");
 			AddEntityType(typeof(UpdateHao360Info));

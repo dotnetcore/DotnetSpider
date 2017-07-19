@@ -25,8 +25,8 @@ namespace DotnetSpider.Sample
 				new QueueDuplicateRemovedScheduler(),
 				new BlogSumaryProcessor(),
 				new NewsProcessor()).
-				AddPipeline(new MyPipeline()).
-				SetThreadNum(1);
+				AddPipeline(new MyPipeline());
+			spider.ThreadNum = 1;
 
 			// 启动爬虫
 			spider.Run();

@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace DotnetSpider.Extension.Redial.InternetDetector
+namespace DotnetSpider.Core.Redial.InternetDetector
 {
 	public abstract class BaseInternetDetector : IInternetDetector
 	{

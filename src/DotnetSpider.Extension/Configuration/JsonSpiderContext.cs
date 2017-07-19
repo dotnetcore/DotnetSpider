@@ -162,7 +162,7 @@ namespace DotnetSpider.Extension.Configuration
 
 		private EntitySpider GetEntitySpider()
 		{
-			EntitySpider context = new DefaultEntitySpider()
+			EntitySpider context = new DefaultEntitySpider(Site)
 			{
 				CachedSize = CachedSize,
 				Deep = Deep,
@@ -174,7 +174,6 @@ namespace DotnetSpider.Extension.Configuration
 				Entities = Entities
 			};
 			context.Name = Name;
-			context.Site = Site;
 			context.Identity = Identity;
 			context.AddPipelines(GetPipepines(Pipelines));
 			context.RedisConnectString = RedisConnectString;

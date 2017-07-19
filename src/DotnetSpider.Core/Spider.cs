@@ -16,6 +16,8 @@ using DotnetSpider.Core.Scheduler;
 using System.Linq;
 using System.Collections.ObjectModel;
 using NLog;
+using Newtonsoft.Json;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Core
 {
@@ -48,6 +50,13 @@ namespace DotnetSpider.Core
 		}
 
 		public string Name { get; set; }
+		public Site Site
+		{
+			get
+			{
+				return _site;
+			}
+		}
 
 		public Status Stat { get; private set; } = Status.Init;
 		public event SpiderEvent OnSuccess;
@@ -62,6 +71,7 @@ namespace DotnetSpider.Core
 
 		public int StatusReportInterval { get; set; } = 5000;
 
+		private readonly Site _site;
 		private int _waitCountLimit = 1500;
 		private bool _init;
 		private FileInfo _errorRequestFile;
@@ -81,7 +91,6 @@ namespace DotnetSpider.Core
 		private IDownloader _downloader;
 		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private List<IPipeline> _pipelines = new List<IPipeline>();
-		private Site _site;
 		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
@@ -135,6 +144,11 @@ namespace DotnetSpider.Core
 			PrintInfo();
 		}
 
+		protected Spider(Site site) :this()
+		{
+			_site = site ?? throw new SpiderException("Site should not be null.");
+		}
+
 		/// <summary>
 		/// Create a spider with pageProcessor.
 		/// </summary>
@@ -153,9 +167,14 @@ namespace DotnetSpider.Core
 			{
 				_pageProcessors = pageProcessors.ToList();
 			}
-			Site = site;
+			_site = site;
 
 			Scheduler = scheduler;
+
+			if (_site == null)
+			{
+				_site = new Site();
+			}
 
 			CheckIfSettingsCorrect();
 		}
@@ -174,11 +193,6 @@ namespace DotnetSpider.Core
 			if (PageProcessors == null || PageProcessors.Count == 0)
 			{
 				throw new SpiderException("Count of PageProcessor is zero.");
-			}
-
-			if (Site == null)
-			{
-				Site = new Site();
 			}
 
 			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
@@ -208,16 +222,6 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public Site Site
-		{
-			get => _site;
-			set
-			{
-				CheckIfRunning();
-				_site = value;
-			}
-		}
-
 		public int CachedSize
 		{
 			get => _cachedSize;
@@ -225,6 +229,20 @@ namespace DotnetSpider.Core
 			{
 				CheckIfRunning();
 				_cachedSize = value;
+			}
+		}
+
+		[JsonIgnore]
+		public IRedialExecutor RedialExecutor
+		{
+			get
+			{
+				return NetworkCenter.Current.Executor;
+			}
+			set
+			{
+				CheckIfRunning();
+				NetworkCenter.Current.Executor = RedialExecutor;
 			}
 		}
 
@@ -258,7 +276,16 @@ namespace DotnetSpider.Core
 			set
 			{
 				CheckIfRunning();
-				_emptySleepTime = value;
+
+				if (value >= 1000)
+				{
+					EmptySleepTime = value;
+					_waitCountLimit = EmptySleepTime / WaitInterval;
+				}
+				else
+				{
+					throw new SpiderException("Sleep time should be large than 1000.");
+				}
 			}
 		}
 
@@ -326,50 +353,6 @@ namespace DotnetSpider.Core
 				CheckIfRunning();
 				_retryWhenResultIsEmpty = value;
 			}
-		}
-
-		/// <summary>
-		/// Start with more than one threads
-		/// </summary>
-		/// <param name="threadNum"></param>
-		/// <returns></returns>
-		public virtual Spider SetThreadNum(int threadNum)
-		{
-			if (threadNum <= 0)
-			{
-				throw new ArgumentException("threadNum should be more than one!");
-			}
-
-			ThreadNum = threadNum;
-
-			return this;
-		}
-
-		public void SetSite(Site site)
-		{
-			Site = site;
-		}
-
-		/// <summary>
-		/// Set wait time when no url is polled.
-		/// </summary>
-		/// <param name="emptySleepTime"></param>
-		public void SetEmptySleepTime(int emptySleepTime)
-		{
-			if (emptySleepTime >= 1000)
-			{
-				EmptySleepTime = emptySleepTime;
-				_waitCountLimit = EmptySleepTime / WaitInterval;
-			}
-			else
-			{
-				throw new SpiderException("Sleep time should be large than 1000.");
-			}
-		}
-
-		public void SetScheduler(IScheduler scheduler)
-		{
-			Scheduler = scheduler;
 		}
 
 		/// <summary>
@@ -501,18 +484,6 @@ namespace DotnetSpider.Core
 		public Spider ClearPipeline()
 		{
 			_pipelines = new List<IPipeline>();
-			return this;
-		}
-
-		/// <summary>
-		/// Set the downloader of spider
-		/// </summary>
-		/// <param name="downloader"></param>
-		/// <returns></returns>
-		public Spider SetDownloader(IDownloader downloader)
-		{
-			CheckIfRunning();
-			Downloader = downloader;
 			return this;
 		}
 

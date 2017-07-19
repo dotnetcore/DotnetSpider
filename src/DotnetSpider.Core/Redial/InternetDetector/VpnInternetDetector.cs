@@ -1,5 +1,5 @@
 ﻿#if !NET_CORE
-namespace DotnetSpider.Extension.Redial.InternetDetector
+namespace DotnetSpider.Core.Redial.InternetDetector
 {
 	public class VpnInternetDetector : BaseInternetDetector
 	{

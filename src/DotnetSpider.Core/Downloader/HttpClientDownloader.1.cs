@@ -11,6 +11,7 @@ using System.Net;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Core.Downloader
 {

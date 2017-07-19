@@ -9,6 +9,7 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Scheduler;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -24,7 +25,7 @@ namespace DotnetSpider.Extension.Test
 
 		public class MyEntitySpider1 : EntitySpider
 		{
-			public MyEntitySpider1() : base("tes")
+			public MyEntitySpider1() : base("tes", new Site())
 			{
 			}
 
@@ -91,14 +92,14 @@ namespace DotnetSpider.Extension.Test
 
 		public class ClearSchedulerTestSpider : EntitySpider
 		{
-			public ClearSchedulerTestSpider() : base("ClearSchedulerTestSpider")
+			public ClearSchedulerTestSpider() : base("ClearSchedulerTestSpider", new Site())
 			{
 			}
 
 			protected override void MyInit(params string[] arguments)
 			{
 				Identity = Guid.NewGuid().ToString("N");
-				SetScheduler(new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
+				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
 				AddStartUrl("https://baidu.com");
 				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType(typeof(TestEntity));
@@ -156,10 +157,9 @@ namespace DotnetSpider.Extension.Test
 
 		public class CasSpider : EntitySpider
 		{
-			public CasSpider() : base("casTest")
+			public CasSpider() : base("casTest", new Site())
 			{
 			}
-
 
 			protected override void MyInit(params string[] arguments)
 			{

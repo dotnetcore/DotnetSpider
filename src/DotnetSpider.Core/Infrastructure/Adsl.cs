@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace DotnetSpider.Extension.Infrastructure
+namespace DotnetSpider.Core.Infrastructure
 {
 	public struct Rasconn
 	{
@@ -109,13 +109,13 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			Rasconn lprasConn = new Rasconn
 			{
-				DwSize = Marshal.SizeOf(typeof(Rasconn)),
+				DwSize = Marshal.SizeOf<Rasconn>(),
 				Hrasconn = IntPtr.Zero
 			};
 
 
 			int lpcConnections = 0;
-			var lpcb = Marshal.SizeOf(typeof(Rasconn));
+			var lpcb = Marshal.SizeOf<Rasconn>();
 
 			var nRet = RasEnumConnections(ref lprasConn, ref lpcb, ref
 				lpcConnections);
@@ -158,7 +158,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			int lpNames = 1;
 
-			var entryNameSize = Marshal.SizeOf(typeof(RasEntryName));
+			var entryNameSize = Marshal.SizeOf<RasEntryName>();
 			var lpSize = lpNames * entryNameSize;
 
 			var names = new RasEntryName[lpNames];
