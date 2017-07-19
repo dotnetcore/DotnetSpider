@@ -489,7 +489,7 @@ namespace DotnetSpider.Core
 
 		protected virtual void PreInitComponent(params string[] arguments)
 		{
-			Monitor = IocManager.Resolve<IMonitor>() ?? new NLogMonitor();
+			Monitor = new NLogMonitor();
 		}
 
 		protected virtual void AfterInitComponent(params string[] arguments)

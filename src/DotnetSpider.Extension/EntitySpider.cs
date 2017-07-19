@@ -85,7 +85,9 @@ namespace DotnetSpider.Extension
 
 		protected override void PreInitComponent(params string[] arguments)
 		{
-			Monitor = IocManager.Resolve<IMonitor>() ?? new DbMonitor(Identity);
+			base.PreInitComponent();
+
+			Monitor = new DbMonitor(Identity);
 
 			if (Site == null)
 			{
@@ -154,8 +156,6 @@ namespace DotnetSpider.Extension
 			}
 
 			RegisterControl(this);
-
-			base.PreInitComponent();
 		}
 
 		protected override void AfterInitComponent(params string[] arguments)

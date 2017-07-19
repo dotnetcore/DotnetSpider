@@ -15,6 +15,8 @@ namespace DotnetSpider.Extension.Monitor
 
 		public DbMonitor(string identity)
 		{
+			Identity = identity;
+
 			NetworkCenter.Current.Execute("dm", () =>
 			{
 				using (var conn = new MySqlConnection(Config.ConnectString))
