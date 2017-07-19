@@ -43,7 +43,7 @@ namespace DotnetSpider.Extension.Monitor
 						throw e;
 					}
 
-					var insertSql = $"insert ignore into dotnetspider.status (`identity`, `node`, `status`, `thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values (@identity, @node, @status, @thread, @left, @success, @error, @total, @avgdownloadspeed, @avgprocessorspeed, @avgpipelinespeed);";
+					var insertSql = $"insert ignore into dotnetspider.status (`identity`, `node`, `logged`, `status`, `thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values (@identity, @node, current_timestamp, @status, @thread, @left, @success, @error, @total, @avgdownloadspeed, @avgprocessorspeed, @avgpipelinespeed);";
 					conn.Execute(insertSql,
 						new
 						{

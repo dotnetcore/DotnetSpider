@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>DotnetSpider2.Extension</id>
-    <version>1.3.5-rc6</version>
+    <version>1.3.5-rc7</version>
     <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
     <owners>zlzforever@163.com</owners>
     <iconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</iconUrl>
