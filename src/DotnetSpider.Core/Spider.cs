@@ -141,7 +141,6 @@ namespace DotnetSpider.Core
 #else
 			ThreadPool.SetMinThreads(200, 200);
 #endif
-			PrintInfo();
 		}
 
 		protected Spider(Site site) : this()
@@ -489,6 +488,8 @@ namespace DotnetSpider.Core
 
 		protected virtual void PreInitComponent(params string[] arguments)
 		{
+			PrintInfo();
+
 			Monitor = new NLogMonitor();
 		}
 
