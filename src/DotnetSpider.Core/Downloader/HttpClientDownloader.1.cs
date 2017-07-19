@@ -130,27 +130,26 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (DownloadException de)
 			{
-				Page page = new Page(request, site.ContentType, null) { Exception = de };
-				if (site.CycleRetryTimes > 0)
-				{
-					page = Spider.AddToCycleRetry(request, site);
-				}
+				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, site.ContentType, null);
+
+				page.Exception = de;
 				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
+
 				return page;
 			}
 			catch (HttpRequestException he)
 			{
-				Page page = new Page(request, site.ContentType, null) { Exception = he };
-				if (site.CycleRetryTimes > 0)
-				{
-					page = Spider.AddToCycleRetry(request, site);
-				}
+				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, site.ContentType, null);
+				page.Exception = he;
 				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {he.Message}.", LogLevel.Warn);
 				return page;
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, site.ContentType, null) { Exception = e };
+				Page page = new Page(request, site.ContentType, null);
+				page.Exception = e;
+				page.IsSkip = true;
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", LogLevel.Error, e);
 				return page;
 			}
 			finally

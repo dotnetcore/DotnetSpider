@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "DotnetSpider.Runner": {
+      "commandName": "Project"
+    }
+  }
+}

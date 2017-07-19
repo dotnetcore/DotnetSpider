@@ -144,7 +144,7 @@ namespace DotnetSpider.Core
 			PrintInfo();
 		}
 
-		protected Spider(Site site) :this()
+		protected Spider(Site site) : this()
 		{
 			_site = site ?? throw new SpiderException("Site should not be null.");
 		}
@@ -518,16 +518,6 @@ namespace DotnetSpider.Core
 
 			Scheduler.Init(this);
 
-			_monitorTask = Task.Factory.StartNew(() =>
-			{
-				while (!Monitorable.IsExited)
-				{
-					ReportStatus();
-					Thread.Sleep(StatusReportInterval);
-				}
-				ReportStatus();
-			});
-
 #if !NET_CORE
 			_errorRequestFile =
 BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
@@ -588,6 +578,16 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			InitComponent(arguments);
 
 			Monitorable.IsExited = false;
+
+			_monitorTask = Task.Factory.StartNew(() =>
+			{
+				while (!Monitorable.IsExited)
+				{
+					ReportStatus();
+					Thread.Sleep(StatusReportInterval);
+				}
+				ReportStatus();
+			});
 
 			if (arguments.Contains("running-test"))
 			{
@@ -900,16 +900,20 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				sw.Stop();
 				UpdateProcessorSpeed(sw.ElapsedMilliseconds);
 			}
+			catch (DownloadException)
+			{
+				// Download exception already handled.
+			}
 			catch (Exception e)
 			{
 				if (Site.CycleRetryTimes > 0)
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				Logger.MyLog(Identity, $"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}.", LogLevel.Warn);
+				Logger.MyLog(Identity, $"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}.", LogLevel.Warn, e);
 			}
 
-			if (page == null)
+			if (page == null || page.Exception != null)
 			{
 				OnError(request);
 				return;

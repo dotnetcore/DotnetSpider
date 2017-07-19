@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Downloader
 
 			if (result.Exception != null)
 			{
-				throw result.Exception;
+				throw new DownloadException(result.Exception.Message);
 			}
 
 			return result;
