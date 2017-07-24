@@ -241,7 +241,7 @@ namespace DotnetSpider.Core
 			set
 			{
 				CheckIfRunning();
-				NetworkCenter.Current.Executor = RedialExecutor;
+				NetworkCenter.Current.Executor = value;
 			}
 		}
 
