@@ -661,9 +661,9 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 							{
 								if (request.GetExtra(Request.Proxy) != null)
 								{
-									var statusCode = request.GetExtra(Request.StatusCode);
+									var statusCode = request.StatusCode;
 									Site.ReturnHttpProxy(request.GetExtra(Request.Proxy) as UseSpecifiedUriWebProxy,
-										statusCode == null ? HttpStatusCode.Found : (HttpStatusCode)statusCode);
+										statusCode == null ? HttpStatusCode.Found : statusCode.Value);
 								}
 							}
 

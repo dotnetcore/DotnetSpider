@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure;
 using System.Linq;
+using System.Net;
 
 namespace DotnetSpider.Core
 {
@@ -15,7 +16,7 @@ namespace DotnetSpider.Core
 #endif
 	{
 		public const string CycleTriedTimes = "983009ae-baee-467b-92cd-44188da2b021";
-		public const string StatusCode = "02d71099-b897-49dd-a180-55345fe9abfc";
+		public const string StatusCodeKey = "02d71099-b897-49dd-a180-55345fe9abfc";
 		public const string Proxy = "6f09c4d6-167a-4272-8208-8a59bebdfe33";
 		public const string ResultIsEmptyTriedTimes = "BA2788B8-FC48-4B11-861D-524B5FB21582";
 
@@ -117,6 +118,26 @@ namespace DotnetSpider.Core
 					return Extras[key];
 				}
 				return null;
+			}
+		}
+
+		public HttpStatusCode? StatusCode
+		{
+			get
+			{
+				var code = GetExtra(StatusCodeKey);
+				if (code == null)
+				{
+					return null;
+				}
+				else
+				{
+					return (HttpStatusCode)code;
+				}
+			}
+			set
+			{
+				PutExtra(StatusCodeKey, value);
 			}
 		}
 

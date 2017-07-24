@@ -76,14 +76,12 @@ namespace DotnetSpider.Core.Downloader
 						return new HttpResponseMessage(HttpStatusCode.RequestTimeout);
 					}
 				}, httpMessage);
-
+				request.StatusCode = response.StatusCode;
 				response.EnsureSuccessStatusCode();
 				if (!site.AcceptStatCode.Contains(response.StatusCode))
 				{
 					throw new DownloadException($"下载 {request.Url} 失败. Code {response.StatusCode}");
 				}
-				var httpStatusCode = response.StatusCode;
-				request.PutExtra(Request.StatusCode, httpStatusCode);
 				Page page;
 
 				if (response.Content.Headers.ContentType != null && !MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
@@ -100,7 +98,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				else
 				{
-					page = HandleResponse(request, response, httpStatusCode, site);
+					page = HandleResponse(request, response, site);
 				}
 
 				if (string.IsNullOrEmpty(page.Content))
@@ -271,7 +269,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		private Page HandleResponse(Request request, HttpResponseMessage response, HttpStatusCode statusCode, Site site)
+		private Page HandleResponse(Request request, HttpResponseMessage response, Site site)
 		{
 			string content = GetContent(site, response);
 
@@ -286,8 +284,7 @@ namespace DotnetSpider.Core.Downloader
 
 			Page page = new Page(request, site.ContentType, site.RemoveOutboundLinks ? site.Domains : null)
 			{
-				Content = content,
-				StatusCode = statusCode
+				Content = content
 			};
 			foreach (var header in response.Headers)
 			{

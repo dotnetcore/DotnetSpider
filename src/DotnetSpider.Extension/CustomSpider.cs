@@ -115,8 +115,8 @@ namespace DotnetSpider.Extension
 					using (IDbConnection conn = new MySqlConnection(ConnectString))
 					{
 						conn.Open();
-						
-						InsertLog(conn, "Info", $"退出任务: {Name}", e.ToString(), e.Message);
+
+						InsertLog(conn, "Info", $"退出任务: {Name}", e.ToString());
 
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
@@ -142,12 +142,12 @@ namespace DotnetSpider.Extension
 			});
 		}
 
-		protected void InsertLog(IDbConnection conn, string level, string message, string callsite = null, string exception = null)
+		protected void InsertLog(IDbConnection conn, string level, string message, string exception = null)
 		{
 			var command = conn.CreateCommand();
 			command.CommandType = CommandType.Text;
 
-			command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message, callsite, exception) values (@identity, @node, @logged, @level, @message, @callsite, @exception)";
+			command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message,exception) values (@identity, @node, @logged, @level, @message, @exception)";
 
 			var identity = command.CreateParameter();
 			identity.ParameterName = "@identity";
@@ -178,12 +178,6 @@ namespace DotnetSpider.Extension
 			message2.DbType = DbType.String;
 			message2.Value = message;
 			command.Parameters.Add(message2);
-
-			var callsite2 = command.CreateParameter();
-			callsite2.ParameterName = "@callsite";
-			callsite2.DbType = DbType.String;
-			callsite2.Value = callsite;
-			command.Parameters.Add(callsite2);
 
 			var exception2 = command.CreateParameter();
 			exception2.ParameterName = "@exception";

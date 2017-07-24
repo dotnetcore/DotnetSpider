@@ -13,11 +13,11 @@ namespace DotnetSpider.Extension.Downloader
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			var site = spider.Site;
+			request.StatusCode = HttpStatusCode.OK;
 			Page page = new Page(request, spider.Site.ContentType, site.RemoveOutboundLinks ? site.Domains : null)
 			{
 				Content = File.ReadAllText(request.Url.LocalPath),
-				TargetUrl = request.Url.ToString(),
-				StatusCode = HttpStatusCode.OK
+				TargetUrl = request.Url.ToString()
 			};
 
 			return page;

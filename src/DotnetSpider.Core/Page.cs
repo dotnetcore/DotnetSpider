@@ -45,7 +45,7 @@ namespace DotnetSpider.Core
 
 		public ResultItems ResultItems { get; } = new ResultItems();
 
-		public HttpStatusCode StatusCode { get; set; }
+		public HttpStatusCode? StatusCode => Request?.StatusCode;
 
 		public string Padding { get; set; }
 
