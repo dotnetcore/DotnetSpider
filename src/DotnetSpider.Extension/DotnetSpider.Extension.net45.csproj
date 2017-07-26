@@ -60,6 +60,7 @@
     <Compile Include="Infrastructure\MySqlEngine.cs" />
     <Compile Include="Infrastructure\RedisConnection.cs" />
     <Compile Include="Infrastructure\SelectorUtil.cs" />
+    <Compile Include="Infrastructure\Verifier.cs" />
     <Compile Include="Infrastructure\WebDriverExtensions.cs" />
     <Compile Include="Infrastructure\WindowsUserUtil.cs" />
     <Compile Include="ITask.cs" />
@@ -140,6 +141,9 @@
     <Reference Include="BCMakeCert, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FiddlerCore2.1.0.0\lib\net40\BCMakeCert.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="CertMaker, Version=4.5.0.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FiddlerCore2.1.0.0\lib\net40\CertMaker.dll</HintPath>
     </Reference>
@@ -152,9 +156,8 @@
     <Reference Include="FiddlerCore4, Version=4.6.2.0, Culture=neutral, PublicKeyToken=67cb91587178ac5a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FiddlerCore2.1.0.0\lib\net40\FiddlerCore4.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\..\packages\HtmlAgilityPack.1.5.0\lib\Net45\HtmlAgilityPack.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="HtmlAgilityPack, Version=1.5.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HtmlAgilityPack.1.5.1\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack.CssSelectors, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\HtmlAgilityPack.CssSelectors.1.0.2\lib\net45\HtmlAgilityPack.CssSelectors.dll</HintPath>
@@ -163,10 +166,12 @@
       <HintPath>..\..\packages\lz4net.1.0.15.93\lib\net4-client\LZ4.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MailKit, Version=1.16.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MailKit.1.16.2\lib\net451\MailKit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="MimeKit">
+    <Reference Include="MimeKit, Version=1.16.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MimeKit.1.16.2\lib\net451\MimeKit.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="MongoDB.Bson">
       <HintPath>..\..\packages\MongoDB.Bson.2.4.4\lib\net45\MongoDB.Bson.dll</HintPath>
@@ -212,6 +217,7 @@
       <HintPath>..\..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
@@ -222,6 +228,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
 </Project>
