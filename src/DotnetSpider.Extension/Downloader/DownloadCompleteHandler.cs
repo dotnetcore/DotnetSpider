@@ -14,6 +14,7 @@ namespace DotnetSpider.Extension.Downloader
 			if (!string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
 			{
 				NetworkCenter.Current.Executor.Redial();
+				Spider.AddToCycleRetry(page.Request, spider.Site);
 				page.Exception = new DownloadException($"Content downloaded contains string: {Content}.");
 			}
 			return true;
@@ -35,6 +36,7 @@ namespace DotnetSpider.Extension.Downloader
 				if (page.Exception.Message.Contains(ExceptionMessage))
 				{
 					NetworkCenter.Current.Executor.Redial();
+					Spider.AddToCycleRetry(page.Request, spider.Site);
 					page.Exception = new DownloadException($"Download failed and redial finished already.");
 				}
 			}
@@ -52,7 +54,7 @@ namespace DotnetSpider.Extension.Downloader
 			if (!string.IsNullOrEmpty(page.Content) && CookieInjector != null && page.Content.Contains(Content))
 			{
 				NetworkCenter.Current.Executor.Redial();
-
+				Spider.AddToCycleRetry(page.Request, spider.Site);
 				CookieInjector?.Inject(spider);
 				page.Exception = new DownloadException($"Content downloaded contains string: {Content}.");
 			}
@@ -76,7 +78,7 @@ namespace DotnetSpider.Extension.Downloader
 					if (RedialLimit > 0 && RequestedCount == RedialLimit)
 					{
 						RequestedCount = 0;
-
+						Spider.AddToCycleRetry(page.Request, spider.Site);
 						NetworkCenter.Current.Executor.Redial();
 					}
 				}
