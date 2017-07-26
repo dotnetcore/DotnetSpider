@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Downloader
@@ -10,10 +11,11 @@ namespace DotnetSpider.Extension.Downloader
 
 		public override bool Handle(Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page.Content)&& page.Content.Contains(Content))
+			if (!string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
 			{
 				NetworkCenter.Current.Executor.Redial();
-				throw new DownloadException($"Content downloaded contains string: {Content}.");
+				Spider.AddToCycleRetry(page.Request, spider.Site);
+				page.Exception = new DownloadException($"Content downloaded contains string: {Content}.");
 			}
 			return true;
 		}
@@ -29,12 +31,13 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				if (string.IsNullOrEmpty(ExceptionMessage))
 				{
-					throw new SpiderException("ExceptionMessage should not be empty/null.");
+					page.Exception = new SpiderException("ExceptionMessage should not be empty/null.");
 				}
 				if (page.Exception.Message.Contains(ExceptionMessage))
 				{
 					NetworkCenter.Current.Executor.Redial();
-					throw new DownloadException("Download failed and redial finished already.");
+					Spider.AddToCycleRetry(page.Request, spider.Site);
+					page.Exception = new DownloadException($"Download failed and redial finished already.");
 				}
 			}
 			return true;
@@ -51,10 +54,9 @@ namespace DotnetSpider.Extension.Downloader
 			if (!string.IsNullOrEmpty(page.Content) && CookieInjector != null && page.Content.Contains(Content))
 			{
 				NetworkCenter.Current.Executor.Redial();
-
+				Spider.AddToCycleRetry(page.Request, spider.Site);
 				CookieInjector?.Inject(spider);
-
-				throw new DownloadException($"Content downloaded contains string: {Content}.");
+				page.Exception = new DownloadException($"Content downloaded contains string: {Content}.");
 			}
 			return true;
 		}
@@ -76,7 +78,7 @@ namespace DotnetSpider.Extension.Downloader
 					if (RedialLimit > 0 && RequestedCount == RedialLimit)
 					{
 						RequestedCount = 0;
-
+						Spider.AddToCycleRetry(page.Request, spider.Site);
 						NetworkCenter.Current.Executor.Redial();
 					}
 				}

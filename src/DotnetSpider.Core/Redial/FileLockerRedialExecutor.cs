@@ -4,6 +4,7 @@ using System.Threading;
 using DotnetSpider.Core.Redial.Redialer;
 using System.Linq;
 using DotnetSpider.Core.Redial.InternetDetector;
+using System.Collections.Concurrent;
 
 namespace DotnetSpider.Core.Redial
 {
@@ -13,10 +14,12 @@ namespace DotnetSpider.Core.Redial
 		private static readonly string RedialLockerFile;
 		private static readonly int RedialTimeout = 120 * 1000 / 50;
 
+		private static ConcurrentDictionary<string, Stream> files = new ConcurrentDictionary<string, Stream>();
+
 		static FileLockerRedialExecutor()
 		{
-			AtomicActionFolder = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "atomicaction");
-			RedialLockerFile = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "redial.lock");
+			AtomicActionFolder = Path.Combine(Infrastructure.Environment.GlobalDirectory, "atomicaction");
+			RedialLockerFile = Path.Combine(Infrastructure.Environment.GlobalDirectory, "redial.lock");
 		}
 
 		public FileLockerRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
@@ -25,11 +28,29 @@ namespace DotnetSpider.Core.Redial
 			{
 				Directory.CreateDirectory(AtomicActionFolder);
 			}
+
+			foreach (var file in Directory.GetFiles(AtomicActionFolder))
+			{
+				try
+				{
+					File.Delete(file);
+				}
+				catch
+				{
+				}
+			}
+			try
+			{
+				File.Delete(RedialLockerFile);
+			}
+			catch
+			{
+			}
 		}
 
 		public override void WaitAll()
 		{
-			File.Create(RedialLockerFile).Dispose();
+			files.TryAdd(RedialLockerFile, File.Create(RedialLockerFile));
 			while (true)
 			{
 				if (!Directory.GetFiles(AtomicActionFolder).Any())
@@ -61,12 +82,18 @@ namespace DotnetSpider.Core.Redial
 		public override string CreateActionIdentity(string name)
 		{
 			string id = Path.Combine(AtomicActionFolder, name + "-" + Guid.NewGuid().ToString("N"));
-			File.Create(id).Dispose();
+			files.TryAdd(id, File.Create(id));
 			return id;
 		}
 
 		public override void DeleteActionIdentity(string identity)
 		{
+			Stream stream;
+			files.TryGetValue(identity, out stream);
+			if (stream != null)
+			{
+				stream.Dispose();
+			}
 			File.Delete(identity);
 		}
 
@@ -85,6 +112,12 @@ namespace DotnetSpider.Core.Redial
 
 		public override void ReleaseRedialLocker()
 		{
+			Stream stream;
+			files.TryGetValue(RedialLockerFile, out stream);
+			if (stream != null)
+			{
+				stream.Dispose();
+			}
 			File.Delete(RedialLockerFile);
 		}
 	}
