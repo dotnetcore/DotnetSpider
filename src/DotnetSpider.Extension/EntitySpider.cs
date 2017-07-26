@@ -31,9 +31,6 @@ namespace DotnetSpider.Extension
 		private const string ValidateStatusKey = "dotnetspider:validate-stats";
 		private static readonly List<string> DefaultProperties = new List<string> { "cdate", Core.Infrastructure.Environment.IdColumn };
 
-		[JsonIgnore]
-		public Action VerifyCollectedData { get; set; }
-
 		public string RedisConnectString { get; set; }
 
 		public string ConnectString { get; set; }
@@ -44,6 +41,8 @@ namespace DotnetSpider.Extension
 
 		[JsonIgnore]
 		public RedisConnection RedisConnection { get; private set; }
+
+		public event Action VerifyData;
 
 		public List<Entity> Entities { get; internal set; } = new List<Entity>();
 
@@ -392,7 +391,7 @@ namespace DotnetSpider.Extension
 
 		private void HandleVerifyCollectData()
 		{
-			if (VerifyCollectedData == null)
+			if (VerifyData == null)
 			{
 				return;
 			}
@@ -414,7 +413,7 @@ namespace DotnetSpider.Extension
 				if (needInitStartRequest)
 				{
 					Logger.MyLog(Identity, "开始执行数据验证...", LogLevel.Info);
-					VerifyCollectedData();
+					VerifyData();
 				}
 				Logger.MyLog(Identity, "数据验证已完成.", LogLevel.Info);
 

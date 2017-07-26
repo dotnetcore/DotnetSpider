@@ -59,9 +59,12 @@ namespace DotnetSpider.Core
 		}
 
 		public Status Stat { get; private set; } = Status.Init;
-		public event SpiderEvent OnSuccess;
-		public event SpiderClosingHandler OnClosing;
+		public event Action<Request> OnSuccess;
+		public event Action OnClosing;
 		public event Action OnComplete;
+		public event Action OnClosed;
+
+		public bool ClearSchedulerAfterComplete { get; set; } = true;
 
 		public IMonitor Monitor { get; set; }
 
@@ -688,6 +691,8 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 			var msg = Stat == Status.Finished ? "结束采集" : "退出采集";
 			Logger.MyLog(Identity, $"{msg}, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
+
+			OnClosed?.Invoke();
 		}
 
 		public static void PrintInfo()
@@ -801,7 +806,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		protected virtual void _OnComplete()
 		{
-			if (Scheduler.GetLeftRequestsCount() == 0)
+			if (ClearSchedulerAfterComplete && Scheduler.GetLeftRequestsCount() == 0)
 			{
 				Scheduler.Clean();
 			}

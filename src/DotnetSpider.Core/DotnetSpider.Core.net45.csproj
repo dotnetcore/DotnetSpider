@@ -31,8 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=4.6.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Autofac.4.6.0\lib\net45\Autofac.dll</HintPath>
+    <Reference Include="Autofac">
+      <HintPath>..\..\packages\Autofac.4.6.1\lib\net45\Autofac.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.5.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\HtmlAgilityPack.1.5.1\lib\Net45\HtmlAgilityPack.dll</HintPath>
@@ -124,8 +125,6 @@
     <Compile Include="Monitor\IMonitor.cs" />
     <Compile Include="Monitor\ISpeedMonitor.cs" />
     <Compile Include="Monitor\NLogMonitor.cs" />
-    <Compile Include="Monitor\SpiderClosingHandler.cs" />
-    <Compile Include="Monitor\SpiderEvent.cs" />
     <Compile Include="Monitor\SpiderStatus.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="Pipeline\BasePipeline.cs" />
