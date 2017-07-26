@@ -1,4 +1,5 @@
-﻿using DotnetSpider.Runner;
+﻿using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Runner;
 using System;
 #if !NET_CORE
 using System.Threading;
@@ -25,6 +26,9 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
+			Verifier<BaiduSearchSpider> verifier = new Verifier<BaiduSearchSpider>("136831898@qq.com", "百度搜索监控报告");
+			verifier.AddEqual("采集总量", "SELECT COUNT(*) sdf AS Result FROM taobao.anmuxi_cpc ", 999);
+			verifier.Report();
 
 			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:BaiduSearch" });
 

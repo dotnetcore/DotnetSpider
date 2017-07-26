@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension
 		[JsonIgnore]
 		public RedisConnection RedisConnection { get; private set; }
 
-		public event Action VerifyData;
+		public Action VerifyData;
 
 		public List<Entity> Entities { get; internal set; } = new List<Entity>();
 

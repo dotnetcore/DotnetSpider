@@ -7,13 +7,15 @@ using DotnetSpider.Core.Infrastructure;
 using MySql.Data.MySqlClient;
 using MimeKit;
 using System.Linq;
+using System.Reflection;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public class Verifier
+	public class Verifier<E>
 	{
 		private List<IVerifier> verifiers = new List<IVerifier>();
 
+		public Properties Properties { get; }
 		public List<string> EmailTo { get; }
 		public string EmailHost { get; }
 		public string Subject { get; }
@@ -29,6 +31,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			EmailAccount = Config.GetValue("emailAccount");
 			EmailPassword = Config.GetValue("emailPassword");
 			Subject = subject;
+			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
 		}
 
 		public Verifier(string emailTo, string subject, string host, int port, string account, string password)
@@ -39,44 +42,76 @@ namespace DotnetSpider.Extension.Infrastructure
 			EmailAccount = account;
 			EmailPassword = password;
 			Subject = subject;
+			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
 		}
 
-		public void AddEqual<T>(string name, string sql, T value)
+		public void AddEqual(string name, string sql, dynamic value)
 		{
-			verifiers.Add(new Equal<T>(name, sql, value));
+			verifiers.Add(new Equal(name, sql, value));
 		}
 
-		public void AddLarge<T>(string name, string sql, T value)
+		public void AddLarge(string name, string sql, dynamic value)
 		{
-			verifiers.Add(new Large<T>(name, sql, value));
+			verifiers.Add(new Large(name, sql, value));
 		}
 
-		public void AddLess<T>(string name, string sql, T value)
+		public void AddLess(string name, string sql, dynamic value)
 		{
-			verifiers.Add(new Less<T>(name, sql, value));
+			verifiers.Add(new Less(name, sql, value));
 		}
 
-		public void AddRange<T>(string name, string minSql, string maxSql, T minValue, T maxValue)
+		public void AddRange(string name, string sql, dynamic minValue, dynamic maxValue)
 		{
-			verifiers.Add(new Range<T>(name, minSql, maxSql, minValue, maxValue));
+			verifiers.Add(new Range(name, sql, minValue, maxValue));
 		}
 
-		public void Build()
+		public void Report()
 		{
 			if (verifiers != null && verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0)
 			{
 				using (var conn = new MySqlConnection(Config.ConnectString))
 				{
 					var emailBody = new StringBuilder();
-					emailBody.Append($"HEADER{System.Environment.NewLine}");
+					var hasProperties = Properties != null;
+					emailBody.Append(
+"<html><head>" +
+"<meta charset=\"utf-8\">" +
+"<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">" +
+"<meta name=\"viewport\" content=\"width=device-width initial-scale=1.0\">" +
+$"<title>{Subject}: {DateTime.Now.ToString()}</title>" +
+"<style>" +
+"table {border-collapse: collapse;border-spacing: 0;border-left: 1px solid #888;border-top: 1px solid #888;background: #efefef;}th, td {border-right: 1px solid #888;border-bottom: 1px solid #888;padding: 5px 15px;}th {font-weight: bold;background: #ccc;}" +
+"</style>" +
+"</head>" +
+"<body style=\"background-color:#FAF7EC\">" +
+$"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
+(hasProperties ? $"<p><strong>研究员: {Properties.Designer}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>爬虫负责人: {Properties.Developer}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>开发时间: {Properties.Date}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>任务描述: {Properties.Detail}</strong></p>" : "") +
+"<br/>" +
+"<table>" +
+"<thead>" +
+"<tr>" +
+"<th>检查项</th>" +
+"<th>规则</th>" +
+"<th>SQL</th>" +
+"<th>期望值</th>" +
+"<th>真实值</th>" +
+"<th>结果</th>" +
+"<th>检测时间</th> " +
+"</tr>" +
+"</thead>" +
+"<tbody>"
+);
 					foreach (var verifier in verifiers)
 					{
 						emailBody.AppendLine(verifier.Verify(conn));
 					}
-					emailBody.Append($"FOOTER{System.Environment.NewLine}");
+					emailBody.Append("</tbody></table><br/></body></html>");
 
 					var message = new MimeMessage();
-					message.From.Add(new MailboxAddress("DotnetSpider Verifier", "verifier@dotnetspider.com"));
+					message.From.Add(new MailboxAddress("DotnetSpider Verifier", EmailAccount));
 					foreach (var emailTo in EmailTo)
 					{
 						message.To.Add(new MailboxAddress(emailTo, emailTo));
@@ -108,86 +143,128 @@ namespace DotnetSpider.Extension.Infrastructure
 		interface IVerifier
 		{
 			string Name { get; }
+			string VerifierName { get; }
 			string Verify(IDbConnection conn);
 		}
 
-		class Equal<T> : IVerifier
+		abstract class BaseVerifier : IVerifier
 		{
-			public string Sql { get; }
-			public T Value { get; }
-			public string Name { get; }
-
-			public Equal(string name, string sql, T value)
-			{
-				Sql = sql;
-				Value = value;
-				Name = name;
-			}
+			public string Name { get; protected set; }
+			public string VerifierName { get; protected set; }
+			public string Sql { get; protected set; }
+			public dynamic[] Values { get; protected set; }
 
 			public string Verify(IDbConnection conn)
 			{
-				return "";
+				QueryResult query;
+				bool verifyResult;
+				Object result;
+				string color;
+				string verifyResultStr;
+				try
+				{
+					query = conn.Query<QueryResult>(Sql).FirstOrDefault();
+					result = query != null ? query.Result : null;
+					verifyResult = Verify(result);
+					color = verifyResult ? "forestgreen" : "orangered";
+					verifyResultStr = verifyResult ? "PASS" : "FAILED";
+				}
+				catch (Exception e)
+				{
+					result = e.ToString();
+					verifyResult = false;
+					color = "orangered";
+					verifyResultStr = "FAILED";
+				}
+
+
+				return
+				"<tr>" +
+				$"<td>{Name}</td>" +
+				$"<td>{VerifierName}</td>" +
+				$"<td>{Sql}</td>" +
+				$"<td>{ExpectedValue}</td>" +
+				$"<td>{result}</td>" +
+				$"<td style=\"color:{color}\"><strong>{verifyResultStr}</strong></td>" +
+				$"<td>{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}</td>" +
+				"</tr>";
+			}
+
+			public abstract dynamic ExpectedValue { get; }
+
+			public abstract bool Verify(dynamic result);
+		}
+
+		class Equal : BaseVerifier
+		{
+			public Equal(string name, string sql, dynamic value)
+			{
+				Sql = sql;
+				Values = new dynamic[] { value };
+				Name = name;
+				VerifierName = "相等";
+			}
+
+			public override dynamic ExpectedValue => Values[0];
+
+			public override bool Verify(dynamic result)
+			{
+				return result == ExpectedValue;
 			}
 		}
 
-		class Large<T> : IVerifier
+		class Large : BaseVerifier
 		{
-			public string Name { get; }
-			public string Sql { get; }
-			public T Value { get; }
-
-			public Large(string name, string sql, T value)
+			public Large(string name, string sql, dynamic value)
 			{
 				Name = name;
 				Sql = sql;
-				Value = value;
+				VerifierName = "大于";
+				Values = new dynamic[] { value };
 			}
 
-			public string Verify(IDbConnection conn)
+			public override dynamic ExpectedValue => Values[0];
+
+			public override bool Verify(dynamic result)
 			{
-				return "";
+				return result > ExpectedValue;
 			}
 		}
 
-		class Less<T> : IVerifier
+		class Less : BaseVerifier
 		{
-			public string Name { get; }
-			public string Sql { get; }
-			public T Value { get; }
-
-			public Less(string name, string sql, T value)
+			public Less(string name, string sql, dynamic value)
 			{
 				Name = name;
 				Sql = sql;
-				Value = value;
+				VerifierName = "小于";
+				Values = new dynamic[] { value };
 			}
 
-			public string Verify(IDbConnection conn)
+			public override dynamic ExpectedValue => Values[0];
+
+			public override bool Verify(dynamic result)
 			{
-				return "";
+				return result < ExpectedValue;
 			}
 		}
 
-		class Range<T> : IVerifier
+		class Range : BaseVerifier
 		{
-			public string Name { get; }
-			public string MinSql { get; }
-			public string MaxSql { get; }
-			public T MinValue { get; }
-			public T MaxValue { get; }
 
-			public Range(string name, string minSql, string maxSql, T minValue, T maxValue)
+			public Range(string name, string sql, dynamic minValue, dynamic maxValue)
 			{
 				Name = name;
-				MinSql = minSql;
-				MinValue = minValue;
-				MaxSql = maxSql;
-				MaxValue = maxValue;
+				Sql = sql;
+				VerifierName = "范围";
+				Values = new dynamic[] { minValue, maxValue };
 			}
 
-			public string Verify(IDbConnection conn)
+			public override dynamic ExpectedValue => $"{Values[0]},{Values[1]}";
+
+			public override bool Verify(dynamic result)
 			{
-				return "";
+				return result >= Values[0] && result <= Values[1];
 			}
 		}
 
