@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using NLog;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Downloader
 {
 	public abstract class DownloadCompleteHandler : Named, IDownloadCompleteHandler
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
+
 		public abstract bool Handle(Page page, ISpider spider);
 	}
 
@@ -20,7 +24,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				CookieInjector?.Inject(spider);
 			}
-			throw new DownloadException($"Content downloaded contains string: {Content}.");
+			throw new SpiderException($"Content downloaded contains string: {Content}.");
 		}
 	}
 
@@ -114,7 +118,7 @@ namespace DotnetSpider.Core.Downloader
 
 			if (begin < 0 || length < 0)
 			{
-				throw new DownloadException("Sub content failed. Please check your settings.");
+				throw new SpiderException("Sub content failed. Please check your settings.");
 			}
 			string newRawText = rawText.Substring(begin, length).Trim();
 			p.Content = newRawText;
@@ -150,7 +154,7 @@ namespace DotnetSpider.Core.Downloader
 
 					if (begin < 0 || length < 0)
 					{
-						throw new DownloadException("Remove content failed. Please check your settings.");
+						throw new SpiderException("Remove content failed. Please check your settings.");
 					}
 
 					rawText = rawText.Remove(begin, length);
