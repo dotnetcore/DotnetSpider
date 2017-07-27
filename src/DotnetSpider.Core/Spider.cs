@@ -492,8 +492,6 @@ namespace DotnetSpider.Core
 
 		protected virtual void PreInitComponent(params string[] arguments)
 		{
-			PrintInfo();
-
 			Monitor = new NLogMonitor();
 		}
 
@@ -503,6 +501,8 @@ namespace DotnetSpider.Core
 
 		protected virtual void InitComponent(params string[] arguments)
 		{
+			PrintInfo();
+
 			if (_init)
 			{
 				return;
