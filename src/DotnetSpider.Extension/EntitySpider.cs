@@ -67,14 +67,12 @@ namespace DotnetSpider.Extension
 				throw new ArgumentException("Length of Identity should between 1 and 120.");
 			}
 
-			if (!string.IsNullOrEmpty(ConnectString))
+			if (!string.IsNullOrEmpty(ConnectString) && !Pipelines.Any())
 			{
-				if (!Pipelines.Any())
-				{
-					AddPipeline(new MySqlEntityPipeline(ConnectString));
-				}
-				InsertRunningState();
+				AddPipeline(new MySqlEntityPipeline(ConnectString));
 			}
+
+			InsertRunningState();
 
 			base.Run(arguments);
 
