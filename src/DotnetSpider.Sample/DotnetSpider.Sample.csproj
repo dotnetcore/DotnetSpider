@@ -9,6 +9,10 @@
     <DefineConstants>TRACE;DEBUG;NETCOREAPP1_1;NET_CORE;</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;RELEASE;NETCOREAPP1_1;NET_CORE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.2" />
   </ItemGroup>

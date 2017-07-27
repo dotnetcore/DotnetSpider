@@ -89,7 +89,7 @@ namespace DotnetSpider.Core.Redial
 		public override void DeleteActionIdentity(string identity)
 		{
 			Stream stream;
-			files.TryGetValue(identity, out stream);
+			files.TryRemove(identity, out stream);
 			if (stream != null)
 			{
 				stream.Dispose();
@@ -113,7 +113,7 @@ namespace DotnetSpider.Core.Redial
 		public override void ReleaseRedialLocker()
 		{
 			Stream stream;
-			files.TryGetValue(RedialLockerFile, out stream);
+			files.TryRemove(RedialLockerFile, out stream);
 			if (stream != null)
 			{
 				stream.Dispose();

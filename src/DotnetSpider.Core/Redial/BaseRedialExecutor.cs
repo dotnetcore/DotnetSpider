@@ -56,9 +56,28 @@ namespace DotnetSpider.Core.Redial
 					WaitAll();
 					Logger.MyLog("Start redial...", LogLevel.Warn);
 
-					Redialer.Redial();
+					var redialCount = 0;
 
-					InternetDetector.Detect();
+					while (redialCount++ < 10)
+					{
+						Console.WriteLine($"redial loop {redialCount}");
+						Redialer.Redial();
+
+						if (InternetDetector.Detect())
+						{
+							Console.WriteLine($"redial loop {redialCount} success!!!!");
+							break;
+						}
+						else
+						{
+							Console.WriteLine($"redial loop {redialCount} failed!!!!");
+						}
+					}
+
+					if (redialCount > 10)
+					{
+						return RedialResult.Failed;
+					}
 
 					Thread.Sleep(2000);
 					Logger.MyLog("Redial finished.", LogLevel.Warn);
@@ -70,10 +89,13 @@ namespace DotnetSpider.Core.Redial
 				catch (IOException)
 				{
 					// 有极小可能同时调用File.Open时抛出异常
+
 					return Redial(action);
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					Console.WriteLine(ex.ToString());
+
 					return RedialResult.Failed;
 				}
 				finally

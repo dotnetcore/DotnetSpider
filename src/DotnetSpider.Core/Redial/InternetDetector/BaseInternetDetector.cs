@@ -18,7 +18,13 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 					{
 						return true;
 					}
-					Thread.Sleep(2000);
+
+					if (currentWaitTime > 4)
+					{
+						return false;
+					}
+
+					Thread.Sleep(1500);
 				}
 				catch
 				{

@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		protected readonly static ILogger Logger = LogCenter.GetLogger();
 
-		public abstract bool Handle(Page page, ISpider spider);
+		public abstract bool Handle(ref Page page, ISpider spider);
 	}
 
 	public class UpdateCookieWhenContainsHandler : DownloadCompleteHandler
@@ -18,7 +18,7 @@ namespace DotnetSpider.Core.Downloader
 		public ICookieInjector CookieInjector { get; set; }
 		public string Content { get; set; }
 
-		public override bool Handle(Page page, ISpider spider)
+		public override bool Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
 			{
@@ -41,7 +41,7 @@ namespace DotnetSpider.Core.Downloader
 			Next = DateTime.Now.AddSeconds(Interval);
 		}
 
-		public override bool Handle(Page page, ISpider spider)
+		public override bool Handle(ref Page page, ISpider spider)
 		{
 			if (DateTime.Now > Next)
 			{
@@ -57,7 +57,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Content { get; set; }
 
-		public override bool Handle(Page page, ISpider spider)
+		public override bool Handle(ref Page page, ISpider spider)
 		{
 			if (string.IsNullOrEmpty(page.Content))
 			{
@@ -76,7 +76,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Content { get; set; }
 
-		public override bool Handle(Page page, ISpider spider)
+		public override bool Handle(ref Page page, ISpider spider)
 		{
 			if (string.IsNullOrEmpty(page.Content))
 			{
@@ -99,7 +99,7 @@ namespace DotnetSpider.Core.Downloader
 		public int StartOffset { get; set; } = 0;
 		public int EndOffset { get; set; } = 0;
 
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			if (string.IsNullOrEmpty(p.Content))
 			{
@@ -135,7 +135,7 @@ namespace DotnetSpider.Core.Downloader
 		public int EndOffset { get; set; } = 0;
 		public bool RemoveAll { get; set; } = false;
 
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			string rawText = p.Content;
 
@@ -167,7 +167,7 @@ namespace DotnetSpider.Core.Downloader
 
 	public class RemoveHtmlTagHandler : DownloadCompleteHandler
 	{
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			var htmlDocument = new HtmlDocument();
 			htmlDocument.LoadHtml(p.Content);
@@ -178,7 +178,7 @@ namespace DotnetSpider.Core.Downloader
 
 	public class ContentToUpperHandler : DownloadCompleteHandler
 	{
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(p.Content))
 			{
@@ -192,7 +192,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public bool ToUpper { get; set; } = false;
 
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(p.Content))
 			{
@@ -212,7 +212,7 @@ namespace DotnetSpider.Core.Downloader
 		public int EndOffset { get; set; } = 0;
 		public string TargetTag { get; set; } = "my_target";
 
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			string rawText = p.Content;
 			rawText = rawText.Replace("script", "div");
@@ -257,7 +257,7 @@ namespace DotnetSpider.Core.Downloader
 		public string OldValue { get; set; }
 		public string NewValue { get; set; }
 
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			p.Content = p.Content?.Replace(OldValue, NewValue);
 			return true;
@@ -266,7 +266,7 @@ namespace DotnetSpider.Core.Downloader
 
 	public class TrimContentHandler : DownloadCompleteHandler
 	{
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(p.Content))
 			{
@@ -278,7 +278,7 @@ namespace DotnetSpider.Core.Downloader
 
 	public class UnescapeContentHandler : DownloadCompleteHandler
 	{
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(p.Content))
 			{
@@ -292,7 +292,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Pattern { get; set; }
 
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			string textValue = string.Empty;
 			MatchCollection collection = Regex.Matches(p.Content, Pattern,
@@ -311,7 +311,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Content { get; set; }
 
-		public override bool Handle(Page p, ISpider spider)
+		public override bool Handle(ref Page p, ISpider spider)
 		{
 			if (string.IsNullOrEmpty(p.Content))
 			{

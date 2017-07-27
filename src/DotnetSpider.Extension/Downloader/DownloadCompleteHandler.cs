@@ -9,12 +9,16 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		public string Content { get; set; }
 
-		public override bool Handle(Page page, ISpider spider)
+		public override bool Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
 			{
-				NetworkCenter.Current.Executor.Redial();
-				Spider.AddToCycleRetry(page.Request, spider.Site);
+				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
+				{
+					System.Console.WriteLine("prepare to exit spider!!!!!!!!!!!!!!!!!!!!!!");
+					spider.Exit();
+				}
+				page = Spider.AddToCycleRetry(page.Request, spider.Site);
 				page.Exception = new DownloadException($"Content downloaded contains string: {Content}.");
 			}
 			return true;
@@ -25,7 +29,7 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		public string ExceptionMessage { get; set; } = string.Empty;
 
-		public override bool Handle(Page page, ISpider spider)
+		public override bool Handle(ref Page page, ISpider spider)
 		{
 			if (page.Exception != null)
 			{
@@ -35,7 +39,10 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				if (page.Exception.Message.Contains(ExceptionMessage))
 				{
-					NetworkCenter.Current.Executor.Redial();
+					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
+					{
+						spider.Exit();
+					}
 					Spider.AddToCycleRetry(page.Request, spider.Site);
 					page.Exception = new DownloadException($"Download failed and redial finished already.");
 				}
@@ -49,11 +56,14 @@ namespace DotnetSpider.Extension.Downloader
 		public string Content { get; set; }
 		public ICookieInjector CookieInjector { get; set; }
 
-		public override bool Handle(Page page, ISpider spider)
+		public override bool Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page.Content) && CookieInjector != null && page.Content.Contains(Content))
 			{
-				NetworkCenter.Current.Executor.Redial();
+				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
+				{
+					spider.Exit();
+				}
 				Spider.AddToCycleRetry(page.Request, spider.Site);
 				CookieInjector?.Inject(spider);
 				page.Exception = new DownloadException($"Content downloaded contains string: {Content}.");
@@ -67,7 +77,7 @@ namespace DotnetSpider.Extension.Downloader
 		public int RedialLimit { get; set; }
 		public static int RequestedCount { get; set; }
 
-		public override bool Handle(Page page, ISpider spider)
+		public override bool Handle(ref Page page, ISpider spider)
 		{
 			if (RedialLimit != 0)
 			{
@@ -79,7 +89,10 @@ namespace DotnetSpider.Extension.Downloader
 					{
 						RequestedCount = 0;
 						Spider.AddToCycleRetry(page.Request, spider.Site);
-						NetworkCenter.Current.Executor.Redial();
+						if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
+						{
+							spider.Exit();
+						}
 					}
 				}
 			}

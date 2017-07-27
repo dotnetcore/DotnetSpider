@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension.Downloader
 
 	public abstract class BaseTargetUrlsCreator : IDownloadCompleteHandler
 	{
-		public virtual bool Handle(Page page, ISpider spider)
+		public virtual bool Handle(ref Page page, ISpider spider)
 		{
 			if (Stopper != null)
 			{
@@ -99,7 +99,7 @@ namespace DotnetSpider.Extension.Downloader
 			PaggerPattern = new Regex($"{RegexUtil.NumRegex.Replace(PaggerString, @"\d+")}");
 		}
 
-		public override bool Handle(Page page, ISpider spider)
+		public override bool Handle(ref Page page, ISpider spider)
 		{
 			var i = SetInterval?.Interval(page);
 			if (i != null)

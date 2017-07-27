@@ -2,6 +2,6 @@
 {
 	public interface IDownloadCompleteHandler
 	{
-		bool Handle(Page page, ISpider spider);
+		bool Handle(ref Page page, ISpider spider);
 	}
 }
