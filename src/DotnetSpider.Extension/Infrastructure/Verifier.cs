@@ -325,7 +325,7 @@ $"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
 
 					using (var client = new MailKit.Net.Smtp.SmtpClient())
 					{
-						client.Connect("smtp.office365.com", 25, SecureSocketOptions.Auto);
+						client.Connect(EmailHost, EmailPort);
 
 						// Note: only needed if the SMTP server requires authentication
 						client.Authenticate(EmailAccount, EmailPassword);
