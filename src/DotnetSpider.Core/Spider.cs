@@ -74,7 +74,7 @@ namespace DotnetSpider.Core
 		public long AvgPipelineSpeed { get; private set; }
 
 		public int StatusReportInterval { get; set; } = 5000;
-
+		public int PipelineRetryTimes { get; set; } = 1;
 		private readonly Site _site;
 		private int _waitCountLimit = 1500;
 		private bool _init;
@@ -950,7 +950,10 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				{
 					foreach (IPipeline pipeline in Pipelines)
 					{
-						pipeline.Process(page.ResultItems);
+						RetryExecutor.Execute(PipelineRetryTimes, () =>
+						{
+							pipeline.Process(page.ResultItems);
+						});
 					}
 				}
 				else

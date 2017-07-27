@@ -24,9 +24,7 @@ namespace DotnetSpider.Core.Infrastructure
 				}
 			}
 
-			var msg = $"SafeExecutor failed after times: {retryNumber}.";
-			Logger.MyLog(msg, LogLevel.Error);
-			throw new SpiderException(msg);
+			throw new SpiderException($"SafeExecutor failed after times: {retryNumber}.");
 		}
 
 		public static T Execute<T>(int retryNumber, Func<T> func)
@@ -43,9 +41,7 @@ namespace DotnetSpider.Core.Infrastructure
 					Thread.Sleep(500);
 				}
 			}
-			var msg = $"SafeExecutor failed after times: {retryNumber}.";
-			Logger.MyLog(msg, LogLevel.Error);
-			throw new SpiderException(msg);
+			throw new SpiderException($"SafeExecutor failed after times: {retryNumber}.");
 		}
 	}
 }
