@@ -103,7 +103,6 @@ namespace DotnetSpider.Runner
 							var name = (string)property.GetValue(runner);
 							if (!spiders.ContainsKey(name))
 							{
-								Console.WriteLine($"Detected spider: {name}.");
 								spiders.Add(name, runner);
 							}
 							else
@@ -130,6 +129,10 @@ namespace DotnetSpider.Runner
 				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
+
+			Console.WriteLine();
+			Console.WriteLine($"Detected {spiders.Keys.Count} crawlers.");
+			Console.WriteLine();
 
 			if (!spiders.ContainsKey(spiderName))
 			{

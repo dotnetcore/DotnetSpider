@@ -24,7 +24,7 @@ namespace DotnetSpider.Extension.Pipeline
 #if !NET_CORE
 			DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, spider.Identity, "mysql");
 #else
-				DataFolder = Path.Combine(AppContext.BaseDirectory, spider.Identity, "mysql");
+			DataFolder = Path.Combine(AppContext.BaseDirectory, spider.Identity, "mysql");
 #endif
 			}
 		}

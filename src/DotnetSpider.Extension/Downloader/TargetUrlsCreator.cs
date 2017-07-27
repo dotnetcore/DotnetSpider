@@ -81,6 +81,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		public string PaggerString { get; protected set; }
 		public string PageIndexKey { get; set; }
+		public int MatchIndex { get; set; } = 0;
 
 		public int Interval { get; set; }
 		public bool DirectlySetOffset { get; set; } = false;
@@ -132,7 +133,12 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			var current = GetCurrentPaggerString(currentUrl);
 			int currentIndex;
-			if (int.TryParse(RegexUtil.NumRegex.Match(current).Value, out currentIndex))
+			var matches = RegexUtil.NumRegex.Matches(current);
+			if (matches.Count < MatchIndex + 1)
+			{
+				return null;
+			}
+			if (int.TryParse(matches[MatchIndex].Value, out currentIndex))
 			{
 				int nextIndex;
 				if (!DirectlySetOffset)
