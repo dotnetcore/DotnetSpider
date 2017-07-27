@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using StackExchange.Redis;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Core.Redial;
 #if NET_CORE
 #endif
 
@@ -43,26 +44,29 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			base.Init(spider);
 
-			RedisConnection = Cache.Instance.Get(ConnectString);
-			if (RedisConnection == null)
+			if (string.IsNullOrEmpty(_identityMd5))
 			{
-				RedisConnection = new RedisConnection(ConnectString);
-				Cache.Instance.Set(ConnectString, RedisConnection);
+				RedisConnection = Cache.Instance.Get(ConnectString);
+				if (RedisConnection == null)
+				{
+					RedisConnection = new RedisConnection(ConnectString);
+					Cache.Instance.Set(ConnectString, RedisConnection);
+				}
+
+				var md5 = Encrypt.Md5Encrypt(spider.Identity);
+				_itemKey = $"dotnetspider:scheduler:{md5}:items";
+				_setKey = $"dotnetspider:scheduler:{md5}:set";
+				_queueKey = $"dotnetspider:scheduler:{md5}:queue";
+				_errorCountKey = $"dotnetspider:scheduler:{md5}:numberOfFailures";
+				_successCountKey = $"dotnetspider:scheduler:{md5}:numberOfSuccessful";
+
+				_identityMd5 = md5;
+
+				NetworkCenter.Current.Execute("rds-in", () =>
+				{
+					RedisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
+				});
 			}
-
-			var md5 = Encrypt.Md5Encrypt(spider.Identity);
-			_itemKey = $"dotnetspider:scheduler:{md5}:items";
-			_setKey = $"dotnetspider:scheduler:{md5}:set";
-			_queueKey = $"dotnetspider:scheduler:{md5}:queue";
-			_errorCountKey = $"dotnetspider:scheduler:{md5}:numberOfFailures";
-			_successCountKey = $"dotnetspider:scheduler:{md5}:numberOfSuccessful";
-
-			_identityMd5 = md5;
-
-			NetworkCenter.Current.Execute("rds-in", () =>
-			{
-				RedisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
-			});
 		}
 
 		public override void ResetDuplicateCheck()
@@ -196,31 +200,32 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			lock (this)
 			{
-				int cacheSize = requests.Count > 10000 ? 10000 : requests.Count;
+				int batchCount = 10000;
+				int cacheSize = requests.Count > batchCount ? batchCount : requests.Count;
 				RedisValue[] identities = new RedisValue[cacheSize];
 				HashEntry[] items = new HashEntry[cacheSize];
 				int i = 0;
-				int j = requests.Count % 10000;
-				int n = requests.Count / 10000;
+				int j = requests.Count % batchCount;
+				int n = requests.Count / batchCount;
 
 				foreach (var request in requests)
 				{
 					identities[i] = request.Identity;
 					items[i] = new HashEntry(request.Identity, JsonConvert.SerializeObject(request));
 					++i;
-					if (i == 10000)
+					if (i == batchCount)
 					{
 						--n;
 
 						RedisConnection.Database.SetAdd(_setKey, identities);
 						RedisConnection.Database.ListRightPush(_queueKey, identities);
-						RedisConnection.Database.HashSet(_itemKey, items);
+						RedisConnection.Database.HashSet(_itemKey, items,CommandFlags.HighPriority);
 
 						i = 0;
 						if (n != 0)
 						{
-							identities = new RedisValue[10000];
-							items = new HashEntry[10000];
+							identities = new RedisValue[batchCount];
+							items = new HashEntry[batchCount];
 						}
 						else
 						{
@@ -254,12 +259,19 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			get
 			{
-				var result = RedisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
-				if (result.HasValue)
+				try
 				{
-					return result == 1;
+					var result = RedisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
+					if (result.HasValue)
+					{
+						return result == 1;
+					}
+					else
+					{
+						return false;
+					}
 				}
-				else
+				catch
 				{
 					return false;
 				}

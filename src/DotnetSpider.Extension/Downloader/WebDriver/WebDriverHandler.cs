@@ -1,11 +1,7 @@
 ﻿#if !NET_CORE
 using OpenQA.Selenium.Remote;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension.Downloader.WebDriver
 {

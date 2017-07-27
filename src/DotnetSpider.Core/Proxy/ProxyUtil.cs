@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
+using NLog;
 using System;
 using System.Diagnostics;
 using System.Net;
@@ -8,6 +9,8 @@ namespace DotnetSpider.Core.Proxy
 {
 	public class ProxyUtil
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
+
 		public static bool ValidateProxy(string ip, int port)
 		{
 			bool isReachable = false;
@@ -21,12 +24,12 @@ namespace DotnetSpider.Core.Proxy
 				watch.Start();
 				tcp.ConnectAsync(ipAddr, port).Wait();
 				watch.Stop();
-				LogCenter.Log(null, $"Detect one usefull proxy: {ip}:{port}, cost {watch.ElapsedMilliseconds}ms.", LogLevel.Debug);
+				Logger.MyLog($"Detect one usefull proxy: {ip}:{port}, cost {watch.ElapsedMilliseconds}ms.", LogLevel.Debug);
 				isReachable = true;
 			}
 			catch (Exception e)
 			{
-				LogCenter.Log(null, $"FAILRE - CAN not connect! Proxy: {ip}:{port}.", LogLevel.Error, e);
+				Logger.MyLog($"FAILRE - CAN not connect! Proxy: {ip}:{port}.", LogLevel.Error, e);
 			}
 
 			return isReachable;

@@ -5,46 +5,19 @@ namespace DotnetSpider.Core.Monitor
 {
 	public class NLogMonitor : IMonitor
 	{
-		private readonly NLog.ILogger _logger = LogManager.GetLogger("NLogMonitor");
+		private static readonly ILogger _logger = LogCenter.GetLogger();
 
-		public bool IsEnabled => true;
-
-		public NLogMonitor()
-		{
-			NLogExtensions.Init();
-		}
-
-		public void Report(SpiderStatus status)
-		{
-			string msg = $"Left {status.Left} Success {status.Success} Error {status.Error} Total {status.Total} Dowload {status.AvgDownloadSpeed} Extract {status.AvgProcessorSpeed} Pipeline {status.AvgPipelineSpeed}";
-			LogEventInfo theEvent = new LogEventInfo(NLog.LogLevel.Trace, "", msg);
-			theEvent.Properties["Identity"] = status.Identity;
-			theEvent.Properties["Node"] = NodeId.Id;
-			theEvent.Properties["ThreadNum"] = status.ThreadNum;
-			theEvent.Properties["Status"] = status.Status;
-			theEvent.Properties["Left"] = status.Left;
-			theEvent.Properties["Success"] = status.Success;
-			theEvent.Properties["Error"] = status.Error;
-			theEvent.Properties["Total"] = status.Total;
-			theEvent.Properties["AvgDownloadSpeed"] = status.AvgDownloadSpeed;
-			theEvent.Properties["AvgProcessorSpeed"] = status.AvgProcessorSpeed;
-			theEvent.Properties["AvgPipelineSpeed"] = status.AvgPipelineSpeed;
-
-			if (SpiderConsts.SaveLogAndStatusToDb)
-			{
-				NetworkCenter.Current.Execute("nm", () =>
-				{
-					_logger.Log(theEvent);
-				});
-			}
-			else
-			{
-				_logger.Log(theEvent);
-			}
-		}
+		public string Identity { get; set; }
 
 		public void Dispose()
 		{
+		}
+
+		public virtual void Report(string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
+		{
+			string msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
+			LogEventInfo theEvent = new LogEventInfo(LogLevel.Trace, "", msg);
+			_logger.Log(theEvent);
 		}
 	}
 }

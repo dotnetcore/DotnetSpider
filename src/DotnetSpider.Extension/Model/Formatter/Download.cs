@@ -3,7 +3,6 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
@@ -27,7 +26,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 						throw t.Exception;
 					}
 					var fileData = t.Result;
-					string file = Path.Combine(SpiderConsts.GlobalDirectory, "images", name);
+					string file = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "images", name);
 					if (!File.Exists(file))
 					{
 						var stream = BasePipeline.PrepareFile(file).OpenWrite();

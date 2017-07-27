@@ -310,7 +310,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			EntitySpider context = new DefaultEntitySpider();
 			context.Identity = (Guid.NewGuid().ToString("N"));
-			context.SetThreadNum(1);
+			context.ThreadNum = 1;
 			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			context.AddPipeline(new MySqlFileEntityPipeline());
 			context.AddPipeline(new ConsoleEntityPipeline());
@@ -356,7 +356,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
-				context.SetThreadNum(1);
+				context.ThreadNum = 1;
 				context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 
 				context.AddStartUrl("http://baidu.com");
@@ -376,7 +376,7 @@ namespace DotnetSpider.Extension.Test
 				Assert.AreEqual("Double", columns[5].Name);
 				Assert.AreEqual("String1", columns[6].Name);
 				Assert.AreEqual("cdate", columns[7].Name);
-				Assert.AreEqual("__id", columns[8].Name);
+				Assert.AreEqual(Core.Infrastructure.Environment.IdColumn, columns[8].Name);
 
 				Assert.AreEqual("int(11)", columns[0].Type);
 				Assert.AreEqual("bigint(20)", columns[1].Type);
@@ -399,7 +399,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
-				context.SetThreadNum(1);
+				context.ThreadNum = 1;
 				context.AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"));
 
 				context.AddStartUrl("http://baidu.com");
@@ -417,7 +417,7 @@ namespace DotnetSpider.Extension.Test
 				Assert.AreEqual("Float", columns[3].Name);
 				Assert.AreEqual("Double", columns[4].Name);
 				Assert.AreEqual("BigInt", columns[5].Name);
-				Assert.AreEqual("__Id", columns[6].Name);
+				Assert.AreEqual(Core.Infrastructure.Environment.IdColumn, columns[6].Name);
 				Assert.AreEqual("String", columns[7].Name);
 				Assert.AreEqual("String1", columns[8].Name);
 

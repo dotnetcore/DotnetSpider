@@ -1,17 +1,15 @@
-﻿using System;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using Newtonsoft.Json;
 
 namespace DotnetSpider.Sample
 {
 	public class JdCategorySpider : EntitySpider
 	{
-		public JdCategorySpider() : base("京东类目 Daliy Tracking")
+		public JdCategorySpider() : base("京东类目 Daliy Tracking", new Site())
 		{
 		}
 
@@ -27,7 +25,7 @@ namespace DotnetSpider.Sample
 		}
 
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			AddStartUrl("http://www.jd.com/allSort.aspx");
 			AddEntityType(typeof(Category));

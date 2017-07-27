@@ -102,12 +102,12 @@ namespace DotnetSpider.Extension.Model
 					dataObject.Add(field.Name, fieldValue);
 				}
 			}
-			if (EntityMetadata.Table.Primary == "__id")
+			if (EntityMetadata.Table.Primary == Core.Infrastructure.Environment.IdColumn)
 			{
-				var id = GetEnviromentValue("__id", page, index);
+				var id = GetEnviromentValue(Core.Infrastructure.Environment.IdColumn, page, index);
 				if (!string.IsNullOrEmpty(id))
 				{
-					dataObject.Add("__id", id);
+					dataObject.Add(Core.Infrastructure.Environment.IdColumn, id);
 				}
 			}
 
@@ -229,6 +229,11 @@ namespace DotnetSpider.Extension.Model
 			if (field.ToLower() == "monday")
 			{
 				return DateTimeUtils.RunIdOfMonday;
+			}
+
+			if (field.ToLower() == "monthly")
+			{
+				return DateTimeUtils.RunIdOfMonthly;
 			}
 
 			if (field.ToLower() == "today")

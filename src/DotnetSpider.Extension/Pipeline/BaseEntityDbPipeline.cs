@@ -11,6 +11,8 @@ using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using NLog;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -43,10 +45,10 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.Table == null)
 			{
-				Spider.Log($"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
+				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
-			EntityDbMetadata dbMetadata = new EntityDbMetadata {Table = metadata.Table};
+			EntityDbMetadata dbMetadata = new EntityDbMetadata { Table = metadata.Table };
 			foreach (var f in metadata.Fields)
 			{
 				var column = f;
@@ -61,31 +63,34 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			if (!string.IsNullOrEmpty(metadata.Table.Primary))
 			{
-				var items = new HashSet<string>(metadata.Table.Primary.Split(','));
-				if (items.Count > 0)
+				if (metadata.Table.Primary != Core.Infrastructure.Environment.IdColumn)
 				{
-					foreach (var item in items)
+					var items = new HashSet<string>(metadata.Table.Primary.Split(','));
+					if (items.Count > 0)
 					{
-						var column = dbMetadata.Columns.FirstOrDefault(c => c.Name == item);
-						if (column == null)
+						foreach (var item in items)
 						{
-							throw new SpiderException("Columns set as Primary is not a property of your entity.");
+							var column = dbMetadata.Columns.FirstOrDefault(c => c.Name == item);
+							if (column == null)
+							{
+								throw new SpiderException("Columns set as Primary is not a property of your entity.");
+							}
+							if (column.Length > 256)
+							{
+								throw new SpiderException("Column length of Primary should not large than 256.");
+							}
+							column.NotNull = true;
 						}
-						if (column.Length <= 0 || column.Length > 256)
-						{
-							throw new SpiderException("Column length of Primary should not large than 256.");
-						}
-						column.NotNull = true;
 					}
-				}
-				else
-				{
-					dbMetadata.Table.Primary = "__id";
+					else
+					{
+						dbMetadata.Table.Primary = Core.Infrastructure.Environment.IdColumn;
+					}
 				}
 			}
 			else
 			{
-				dbMetadata.Table.Primary = "__id";
+				dbMetadata.Table.Primary = Core.Infrastructure.Environment.IdColumn;
 			}
 
 			if (dbMetadata.Table.UpdateColumns != null && dbMetadata.Table.UpdateColumns.Length > 0)
@@ -187,7 +192,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 						catch (Exception e)
 						{
-							spider.Log("Update ConnectString failed.", LogLevel.Error, e);
+							Logger.MyLog(Spider.Identity, $"Update ConnectString failed.", LogLevel.Error, e);
 							Thread.Sleep(1000);
 						}
 					}
@@ -226,7 +231,6 @@ namespace DotnetSpider.Extension.Pipeline
 						command.CommandText = GetCreateTableSql(metadata);
 						command.CommandType = CommandType.Text;
 						command.ExecuteNonQuery();
-						conn.Close();
 					}
 				});
 			}
@@ -263,14 +267,12 @@ namespace DotnetSpider.Extension.Pipeline
 								cmd.Parameters.AddRange(parameters.ToArray());
 								cmd.ExecuteNonQuery();
 							}
-							conn.Close();
 						}
 					}
 					else
 					{
 						using (var conn = CreateConnection())
 						{
-
 							foreach (var data in datas)
 							{
 								bool needUpdate;
@@ -282,7 +284,7 @@ namespace DotnetSpider.Extension.Pipeline
 									List<DbParameter> selectParameters = new List<DbParameter>();
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter("@__Id", data.SelectToken("__Id")?.Value<string>());
+										var primaryParameter = CreateDbParameter($"@{Core.Infrastructure.Environment.IdColumn}", data.SelectToken(Core.Infrastructure.Environment.IdColumn)?.Value<string>());
 										primaryParameter.DbType = DbType.String;
 										selectParameters.Add(primaryParameter);
 									}
@@ -347,7 +349,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@__Id", data.SelectToken("__Id")?.Value<string>());
+										var primaryParameter = CreateDbParameter($"@{Core.Infrastructure.Environment.IdColumn}", data.SelectToken(Core.Infrastructure.Environment.IdColumn)?.Value<string>());
 										primaryParameter.DbType = DbType.String;
 										parameters.Add(primaryParameter);
 									}
@@ -369,8 +371,6 @@ namespace DotnetSpider.Extension.Pipeline
 									cmd.ExecuteNonQuery();
 								}
 							}
-
-							conn.Close();
 						}
 					}
 				});

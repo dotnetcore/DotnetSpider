@@ -10,6 +10,7 @@ using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Downloader
 {

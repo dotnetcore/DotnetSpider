@@ -8,7 +8,6 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -26,7 +25,7 @@ namespace DotnetSpider.Extension.Test
 				{ "cat3", "110" }
 			}), ContentType.Html, null)
 			{
-				Content = File.ReadAllText(Path.Combine(SpiderConsts.BaseDirectory, "Jd.html"))
+				Content = File.ReadAllText(Path.Combine(Core.Infrastructure.Environment.BaseDirectory, "Jd.html"))
 			});
 			Assert.AreEqual(60, results.Count);
 			Assert.AreEqual("手机", results[0].GetValue("CategoryName"));
@@ -37,7 +36,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.AreEqual("荣耀 NOTE 8 4GB+32GB 全网通版 冰河银", results[0].GetValue("Name"));
 			Assert.AreEqual("1000000904", results[0].GetValue("VenderId"));
 			Assert.AreEqual("1000000904", results[0].GetValue("JdzyShopId"));
-			Assert.AreEqual(DateTime.Now.ToString("yyyy_MM_dd"), results[0].GetValue("RunId"));
+			Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), results[0].GetValue("RunId"));
 		}
 
 		[Table("test", "sku", TableSuffix.Today)]

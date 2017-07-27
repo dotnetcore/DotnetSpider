@@ -10,7 +10,6 @@ namespace DotnetSpider.Core.Test
 	{
 		private string WName = "WebSite";
 		private string WValue = "12580emall";
-		private string WDomain = "www.12580emall.com";
 		private string Url = @"http://www.12580emall.com/emall/mall/index.html";
 
 		[TestMethod]

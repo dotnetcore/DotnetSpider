@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Extension.Infrastructure;
 using MySql.Data.MySqlClient;
 using System;
 using System.Data;
@@ -25,9 +26,14 @@ namespace DotnetSpider.Extension
 		protected CustomSpider(string name)
 		{
 			Name = name;
+			if (string.IsNullOrEmpty(ConnectString))
+			{
+				ConnectString = Core.Infrastructure.Config.ConnectString;
+			}
 		}
 
 		protected abstract void ImplementAction(params string[] arguments);
+		protected virtual void VerifyData() { }
 
 		public void Run(params string[] arguments)
 		{
@@ -38,7 +44,7 @@ namespace DotnetSpider.Extension
 
 			if (string.IsNullOrEmpty(ConnectString))
 			{
-				ConnectString = Core.Infrastructure.Configuration.GetValue(Core.Infrastructure.Configuration.LogAndStatusConnectString);
+				ConnectString = Core.Infrastructure.Config.ConnectString;
 			}
 
 			if (string.IsNullOrEmpty(ConnectString))
@@ -62,9 +68,7 @@ namespace DotnetSpider.Extension
 					command.CommandText = $"insert ignore into dotnetspider.status (`identity`, `status`,`thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`, `logged`) values('{Identity}', 'Init',-1, -1, -1, -1, -1, -1, -1, -1, '{DateTime.Now}');";
 					command.ExecuteNonQuery();
 
-					var message = $"开始任务: {Name}";
-					command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message) values ('{Identity}', '{NodeId.Id}', '{DateTime.Now}', 'Info', '{message}');";
-					command.ExecuteNonQuery();
+					InsertLog(conn, "Info", $"开始任务: {Name}");
 				}
 
 				_statusReporter = Task.Factory.StartNew(() =>
@@ -97,17 +101,15 @@ namespace DotnetSpider.Extension
 					using (IDbConnection conn = new MySqlConnection(ConnectString))
 					{
 						conn.Open();
+						InsertLog(conn, "Info", $"结束任务: {Name}");
+
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
-
-						var message = $"结束任务: {Name}";
-						command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message) values ('{Identity}','{NodeId.Id}', '{DateTime.Now}', 'Info', '{message}');";
-						command.ExecuteNonQuery();
-
 						command.CommandText = $"update dotnetspider.status set `status`='Finished',`logged`='{DateTime.Now}' WHERE identity='{Identity}';";
 						command.ExecuteNonQuery();
 					}
 				}
+				Verifier.ProcessVerifidation(Identity, VerifyData);
 			}
 			catch (Exception e)
 			{
@@ -116,14 +118,12 @@ namespace DotnetSpider.Extension
 					using (IDbConnection conn = new MySqlConnection(ConnectString))
 					{
 						conn.Open();
+
+						InsertLog(conn, "Info", $"退出任务: {Name}", e.ToString());
+
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
-
-						var message = $"退出任务: {Name}";
-						command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message, callsite, exception) values ('{Identity}','{NodeId.Id}','{DateTime.Now}', 'Info', '{message}','{e}','{e.Message}');";
-						command.ExecuteNonQuery();
-
-						command.CommandText = $"update dotnetspider.status set `status`='Exited' `logged`='{DateTime.Now}' WHERE identity='{Identity}';";
+						command.CommandText = $"update dotnetspider.status set `status`='Exited', `logged`='{DateTime.Now}' WHERE identity='{Identity}';";
 						command.ExecuteNonQuery();
 					}
 				}
@@ -143,6 +143,52 @@ namespace DotnetSpider.Extension
 			{
 				Run(arguments);
 			});
+		}
+
+		protected void InsertLog(IDbConnection conn, string level, string message, string exception = null)
+		{
+			var command = conn.CreateCommand();
+			command.CommandType = CommandType.Text;
+
+			command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message,exception) values (@identity, @node, @logged, @level, @message, @exception)";
+
+			var identity = command.CreateParameter();
+			identity.ParameterName = "@identity";
+			identity.DbType = DbType.String;
+			identity.Value = Identity;
+			command.Parameters.Add(identity);
+
+			var node = command.CreateParameter();
+			node.ParameterName = "@node";
+			node.DbType = DbType.String;
+			node.Value = NodeId.Id;
+			command.Parameters.Add(node);
+
+			var logged = command.CreateParameter();
+			logged.ParameterName = "@logged";
+			logged.DbType = DbType.DateTime;
+			logged.Value = DateTime.Now;
+			command.Parameters.Add(logged);
+
+			var level2 = command.CreateParameter();
+			level2.ParameterName = "@level";
+			level2.DbType = DbType.String;
+			level2.Value = level;
+			command.Parameters.Add(level2);
+
+			var message2 = command.CreateParameter();
+			message2.ParameterName = "@message";
+			message2.DbType = DbType.String;
+			message2.Value = message;
+			command.Parameters.Add(message2);
+
+			var exception2 = command.CreateParameter();
+			exception2.ParameterName = "@exception";
+			exception2.DbType = DbType.String;
+			exception2.Value = exception;
+			command.Parameters.Add(exception2);
+
+			command.ExecuteNonQuery();
 		}
 
 		private void InsertRunningState()

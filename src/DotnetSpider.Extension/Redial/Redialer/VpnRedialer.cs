@@ -2,6 +2,7 @@
 using System;
 using DotnetSpider.Extension.Infrastructure;
 using System.Threading;
+using DotnetSpider.Core.Redial.Redialer;
 
 namespace DotnetSpider.Extension.Redial.Redialer
 {

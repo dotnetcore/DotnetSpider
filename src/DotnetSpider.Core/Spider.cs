@@ -15,6 +15,9 @@ using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
 using System.Linq;
 using System.Collections.ObjectModel;
+using NLog;
+using Newtonsoft.Json;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Core
 {
@@ -23,6 +26,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Spider : ISpider, ISpeedMonitor, INamed
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
 		protected DateTime StartTime { get; private set; }
 		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
 
@@ -46,16 +50,32 @@ namespace DotnetSpider.Core
 		}
 
 		public string Name { get; set; }
+		public Site Site
+		{
+			get
+			{
+				return _site;
+			}
+		}
+		public bool IsComplete { get; private set; }
 
 		public Status Stat { get; private set; } = Status.Init;
-		public event SpiderEvent OnSuccess;
-		public event SpiderClosingHandler OnClosing;
+		public event Action<Request> OnSuccess;
+		public event Action OnClosing;
 		public event Action OnComplete;
+		public event Action OnClosed;
+
+		public bool ClearSchedulerAfterComplete { get; set; } = true;
+
+		public IMonitor Monitor { get; set; }
 
 		public long AvgDownloadSpeed { get; private set; }
 		public long AvgProcessorSpeed { get; private set; }
 		public long AvgPipelineSpeed { get; private set; }
 
+		public int StatusReportInterval { get; set; } = 5000;
+
+		private readonly Site _site;
 		private int _waitCountLimit = 1500;
 		private bool _init;
 		private FileInfo _errorRequestFile;
@@ -75,8 +95,6 @@ namespace DotnetSpider.Core
 		private IDownloader _downloader;
 		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private List<IPipeline> _pipelines = new List<IPipeline>();
-		private Site _site;
-		private IMonitor _monitor;
 		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
@@ -127,7 +145,11 @@ namespace DotnetSpider.Core
 #else
 			ThreadPool.SetMinThreads(200, 200);
 #endif
-			PrintInfo();
+		}
+
+		protected Spider(Site site) : this()
+		{
+			_site = site ?? throw new SpiderException("Site should not be null.");
 		}
 
 		/// <summary>
@@ -148,9 +170,14 @@ namespace DotnetSpider.Core
 			{
 				_pageProcessors = pageProcessors.ToList();
 			}
-			Site = site;
+			_site = site;
 
 			Scheduler = scheduler;
+
+			if (_site == null)
+			{
+				_site = new Site();
+			}
 
 			CheckIfSettingsCorrect();
 		}
@@ -169,11 +196,6 @@ namespace DotnetSpider.Core
 			if (PageProcessors == null || PageProcessors.Count == 0)
 			{
 				throw new SpiderException("Count of PageProcessor is zero.");
-			}
-
-			if (Site == null)
-			{
-				Site = new Site();
 			}
 
 			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
@@ -203,16 +225,6 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public Site Site
-		{
-			get => _site;
-			set
-			{
-				CheckIfRunning();
-				_site = value;
-			}
-		}
-
 		public int CachedSize
 		{
 			get => _cachedSize;
@@ -220,6 +232,20 @@ namespace DotnetSpider.Core
 			{
 				CheckIfRunning();
 				_cachedSize = value;
+			}
+		}
+
+		[JsonIgnore]
+		public IRedialExecutor RedialExecutor
+		{
+			get
+			{
+				return NetworkCenter.Current.Executor;
+			}
+			set
+			{
+				CheckIfRunning();
+				NetworkCenter.Current.Executor = value;
 			}
 		}
 
@@ -253,7 +279,16 @@ namespace DotnetSpider.Core
 			set
 			{
 				CheckIfRunning();
-				_emptySleepTime = value;
+
+				if (value >= 1000)
+				{
+					_emptySleepTime = value;
+					_waitCountLimit = value / WaitInterval;
+				}
+				else
+				{
+					throw new SpiderException("Sleep time should be large than 1000.");
+				}
 			}
 		}
 
@@ -321,50 +356,6 @@ namespace DotnetSpider.Core
 				CheckIfRunning();
 				_retryWhenResultIsEmpty = value;
 			}
-		}
-
-		/// <summary>
-		/// Start with more than one threads
-		/// </summary>
-		/// <param name="threadNum"></param>
-		/// <returns></returns>
-		public virtual Spider SetThreadNum(int threadNum)
-		{
-			if (threadNum <= 0)
-			{
-				throw new ArgumentException("threadNum should be more than one!");
-			}
-
-			ThreadNum = threadNum;
-
-			return this;
-		}
-
-		public void SetSite(Site site)
-		{
-			Site = site;
-		}
-
-		/// <summary>
-		/// Set wait time when no url is polled.
-		/// </summary>
-		/// <param name="emptySleepTime"></param>
-		public void SetEmptySleepTime(int emptySleepTime)
-		{
-			if (emptySleepTime >= 1000)
-			{
-				EmptySleepTime = emptySleepTime;
-				_waitCountLimit = EmptySleepTime / WaitInterval;
-			}
-			else
-			{
-				throw new SpiderException("Sleep time should be large than 1000.");
-			}
-		}
-
-		public void SetScheduler(IScheduler scheduler)
-		{
-			Scheduler = scheduler;
 		}
 
 		/// <summary>
@@ -499,20 +490,9 @@ namespace DotnetSpider.Core
 			return this;
 		}
 
-		/// <summary>
-		/// Set the downloader of spider
-		/// </summary>
-		/// <param name="downloader"></param>
-		/// <returns></returns>
-		public Spider SetDownloader(IDownloader downloader)
-		{
-			CheckIfRunning();
-			Downloader = downloader;
-			return this;
-		}
-
 		protected virtual void PreInitComponent(params string[] arguments)
 		{
+			Monitor = new NLogMonitor();
 		}
 
 		protected virtual void AfterInitComponent(params string[] arguments)
@@ -521,12 +501,14 @@ namespace DotnetSpider.Core
 
 		protected virtual void InitComponent(params string[] arguments)
 		{
+			PrintInfo();
+
 			if (_init)
 			{
 				return;
 			}
 
-			this.Log("构建内部模块、准备爬虫数据...", LogLevel.Info);
+			Logger.MyLog(Identity, "构建内部模块、准备爬虫数据...", LogLevel.Info);
 
 			if (Pipelines == null || Pipelines.Count == 0)
 			{
@@ -535,21 +517,11 @@ namespace DotnetSpider.Core
 
 			PreInitComponent(arguments);
 
-			_monitor = IocManager.Resolve<IMonitor>() ?? new NLogMonitor();
+			Monitor.Identity = Identity;
 
 			CookieInjector?.Inject(this, false);
 
 			Scheduler.Init(this);
-
-			_monitorTask = Task.Factory.StartNew(() =>
-			{
-				while (!Monitorable.IsExited)
-				{
-					ReportStatus();
-					Thread.Sleep(2000);
-				}
-				ReportStatus();
-			});
 
 #if !NET_CORE
 			_errorRequestFile =
@@ -569,7 +541,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
-				this.Log($"准备步骤: 添加链接到调度中心, 数量 {Site.StartRequests.Count}.", LogLevel.Info);
+				Logger.MyLog(Identity, $"准备步骤: 添加链接到调度中心, 数量 {Site.StartRequests.Count}.", LogLevel.Info);
 				//Logger.SaveLog(LogInfo.Create(, Logger.Name, this, LogLevel.Info));
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
@@ -584,7 +556,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			}
 			else
 			{
-				this.Log("准备步骤: 添加链接到调度中心, 数量 0.", LogLevel.Info);
+				Logger.MyLog(Identity, "准备步骤: 添加链接到调度中心, 数量 0.", LogLevel.Info);
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
@@ -598,7 +570,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 		{
 			if (Stat == Status.Running)
 			{
-				this.Log("任务运行中...", LogLevel.Warn);
+				Logger.MyLog(Identity, "任务运行中...", LogLevel.Warn);
 				return;
 			}
 
@@ -611,6 +583,16 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			InitComponent(arguments);
 
 			Monitorable.IsExited = false;
+
+			_monitorTask = Task.Factory.StartNew(() =>
+			{
+				while (!Monitorable.IsExited)
+				{
+					ReportStatus();
+					Thread.Sleep(StatusReportInterval);
+				}
+				ReportStatus();
+			});
 
 			if (arguments.Contains("running-test"))
 			{
@@ -677,15 +659,15 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 							catch (Exception e)
 							{
 								OnError(request);
-								this.Log($"采集失败: {request.Url}.", LogLevel.Error, e);
+								Logger.MyLog(Identity, $"采集失败: {request.Url}.", LogLevel.Error, e);
 							}
 							finally
 							{
 								if (request.GetExtra(Request.Proxy) != null)
 								{
-									var statusCode = request.GetExtra(Request.StatusCode);
+									var statusCode = request.StatusCode;
 									Site.ReturnHttpProxy(request.GetExtra(Request.Proxy) as UseSpecifiedUriWebProxy,
-										statusCode == null ? HttpStatusCode.Found : (HttpStatusCode)statusCode);
+										statusCode == null ? HttpStatusCode.Found : statusCode.Value);
 								}
 							}
 
@@ -703,14 +685,15 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			_realStat = Status.Exited;
 
 			OnClose();
-
-			this.Log($"等待监控进程退出.", LogLevel.Info);
-			_monitorTask.Wait();
+			Logger.MyLog(Identity, $"等待监控进程退出.", LogLevel.Info);
+			_monitorTask.Wait(5000);
 
 			OnClosing?.Invoke();
 
 			var msg = Stat == Status.Finished ? "结束采集" : "退出采集";
-			this.Log($"{msg}, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
+			Logger.MyLog(Identity, $"{msg}, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
+
+			OnClosed?.Invoke();
 		}
 
 		public static void PrintInfo()
@@ -719,7 +702,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			var key = "_DotnetSpider_Info";
 
 #if !NET_CORE
-			isPrinted = AppDomain.CurrentDomain.GetData(key) == null;
+			isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
 #else
 
 			AppContext.TryGetSwitch(key, out isPrinted);
@@ -727,15 +710,13 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			if (!isPrinted)
 			{
 				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine("=============================================================");
-				Console.WriteLine("== DotnetSpider is an open source .Net spider              ==");
-				Console.WriteLine("== It's a light, stable, high performce spider             ==");
-				Console.WriteLine("== Support multi thread, ajax page, http                   ==");
-				Console.WriteLine("== Support save data to file, mysql, mssql, mongodb etc    ==");
-				Console.WriteLine("== License: LGPL3.0                                        ==");
-				Console.WriteLine("== Version: 1.3.0-rc1                                      ==");
-				Console.WriteLine("== Author: zlzforever@163.com                              ==");
-				Console.WriteLine("=============================================================");
+				Console.WriteLine("=================================================================");
+				Console.WriteLine("== DotnetSpider is an open source crawler developed by C#      ==");
+				Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
+				Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
+				Console.WriteLine("== License: LGPL3.0                                            ==");
+				Console.WriteLine("== Author: zlzforever@163.com                                  ==");
+				Console.WriteLine("=================================================================");
 				Console.ForegroundColor = ConsoleColor.White;
 #if !NET_CORE
 				AppDomain.CurrentDomain.SetData(key, "True");
@@ -744,6 +725,8 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				AppContext.SetSwitch(key, true);
 #endif
 			}
+			Console.WriteLine();
+			Console.WriteLine("=================================================================");
 		}
 
 		public Task RunAsync(params string[] arguments)
@@ -755,11 +738,11 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 		{
 			if (Stat != Status.Running)
 			{
-				this.Log("任务不在运行中。", LogLevel.Warn);
+				Logger.MyLog(Identity, $"任务不在运行中.", LogLevel.Warn);
 				return;
 			}
 			Stat = Status.Stopped;
-			this.Log("停止任务中...", LogLevel.Warn);
+			Logger.MyLog(Identity, $"停止任务中...", LogLevel.Warn);
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
@@ -779,11 +762,11 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			{
 				Stat = Status.Running;
 				_realStat = Status.Running;
-				this.Log("任务继续...", LogLevel.Warn);
+				Logger.MyLog(Identity, $"任务继续...", LogLevel.Warn);
 			}
 			else
 			{
-				this.Log("任务未暂停, 不能执行继续操作...", LogLevel.Warn);
+				Logger.MyLog(Identity, $"任务未暂停, 不能执行继续操作...", LogLevel.Warn);
 			}
 		}
 
@@ -792,10 +775,10 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			if (Stat == Status.Running || Stat == Status.Stopped)
 			{
 				Stat = Status.Exited;
-				this.Log("退出任务中...", LogLevel.Warn);
+				Logger.MyLog(Identity, $"退出任务中...", LogLevel.Warn);
 				return;
 			}
-			this.Log("任务不在运行中。", LogLevel.Warn);
+			Logger.MyLog(Identity, $"任务不在运行中.", LogLevel.Warn);
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
@@ -824,7 +807,8 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		protected virtual void _OnComplete()
 		{
-			if (Scheduler.GetLeftRequestsCount() == 0)
+			IsComplete = true;
+			if (ClearSchedulerAfterComplete && Scheduler.GetLeftRequestsCount() == 0)
 			{
 				Scheduler.Clean();
 			}
@@ -845,7 +829,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			OnSuccess?.Invoke(request);
 		}
 
-		protected Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
+		public static Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
 		{
 			Page page = new Page(request, site.ContentType, null);
 			if (!resultIsEmpty)
@@ -924,13 +908,9 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				sw.Stop();
 				UpdateProcessorSpeed(sw.ElapsedMilliseconds);
 			}
-			catch (DownloadException de)
+			catch (DownloadException)
 			{
-				if (Site.CycleRetryTimes > 0)
-				{
-					page = AddToCycleRetry(request, Site);
-				}
-				this.Log($"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
+				// Download exception already handled.
 			}
 			catch (Exception e)
 			{
@@ -938,10 +918,10 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				this.Log($"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}", LogLevel.Warn);
+				Logger.MyLog(Identity, $"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}.", LogLevel.Warn, e);
 			}
 
-			if (page == null)
+			if (page == null || page.Exception != null)
 			{
 				OnError(request);
 				return;
@@ -990,8 +970,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 						}
 					}
 				}
-
-				this.Log($"采集: {request.Url} 成功.", LogLevel.Info);
+				Logger.MyLog(Identity, $"采集: {request.Url} 成功.", LogLevel.Info);
 			}
 			else
 			{
@@ -1004,16 +983,16 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 						{
 							ExtractAndAddRequests(page, true);
 						}
-						this.Log($"解析: {request.Url} 结果为 0, 重新尝试采集.", LogLevel.Info);
+						Logger.MyLog(Identity, $"解析: {request.Url} 结果为 0, 重新尝试采集.", LogLevel.Info);
 					}
 					else
 					{
-						this.Log($"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
+						Logger.MyLog(Identity, $"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
 					}
 				}
 				else
 				{
-					this.Log($"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
+					Logger.MyLog(Identity, $"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
 				}
 			}
 
@@ -1067,14 +1046,14 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				}
 				catch (Exception e)
 				{
-					this.Log(e.ToString(), LogLevel.Warn);
+					Logger.MyLog(Identity, e.ToString(), LogLevel.Error);
 				}
 			}
 		}
 
 		private void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
 		{
-			Pause();
+			Exit();
 			while (!_scheduler.IsExited)
 			{
 				Thread.Sleep(1500);
@@ -1127,21 +1106,20 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		private void ReportStatus()
 		{
-			if (_monitor.IsEnabled)
+			try
 			{
-				_monitor.Report(new SpiderStatus
-				{
-					Status = Stat.ToString(),
-					Error = Monitorable.GetErrorRequestsCount(),
-					Identity = Identity,
-					Left = Monitorable.GetLeftRequestsCount(),
-					Success = Monitorable.GetSuccessRequestsCount(),
-					ThreadNum = ThreadNum,
-					Total = Monitorable.GetTotalRequestsCount(),
-					AvgDownloadSpeed = AvgDownloadSpeed,
-					AvgProcessorSpeed = AvgProcessorSpeed,
-					AvgPipelineSpeed = AvgPipelineSpeed
-				});
+				Monitor.Report(Stat.ToString(),
+					Monitorable.GetLeftRequestsCount(),
+					Monitorable.GetTotalRequestsCount(),
+					Monitorable.GetSuccessRequestsCount(),
+					Monitorable.GetErrorRequestsCount(),
+					AvgDownloadSpeed,
+					AvgProcessorSpeed,
+					AvgPipelineSpeed,
+					ThreadNum);
+			}
+			catch
+			{
 			}
 		}
 	}

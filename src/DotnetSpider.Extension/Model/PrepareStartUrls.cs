@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Redial;
 #if !NET_CORE
 using System.Web;
 #else
@@ -17,6 +18,11 @@ namespace DotnetSpider.Extension.Model
 {
 	public class DataColumn
 	{
+		public DataColumn(string name)
+		{
+			Name = name;
+		}
+
 		public string Name { get; set; }
 
 		public Formatter.Formatter[] Formatters { get; set; }
@@ -131,6 +137,8 @@ namespace DotnetSpider.Extension.Model
 
 		public string QueryString { get; set; }
 
+		public bool BulkInsert { get; set; }
+
 		/// <summary>
 		/// 用于拼接Url所需要的列
 		/// </summary>
@@ -179,7 +187,7 @@ namespace DotnetSpider.Extension.Model
 #if !NET_CORE
 					reader.Close();
 #else
-				reader.Dispose();
+					reader.Dispose();
 #endif
 				}
 			});
@@ -217,21 +225,48 @@ namespace DotnetSpider.Extension.Model
 			}
 
 			var datas = PrepareDatas();
-			foreach (var data in datas)
-			{
-				var arguments = PrepareArguments(data);
 
-				foreach (var formate in FormateStrings)
+			if (!BulkInsert)
+			{
+				foreach (var data in datas)
 				{
-					string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
-					spider.Scheduler.Push(new Request(tmpUrl, data)
+					var arguments = PrepareArguments(data);
+
+					foreach (var formate in FormateStrings)
 					{
-						Method = Method,
-						Origin = Origin,
-						PostBody = GetPostBody(PostBody, data),
-						Referer = Referer
-					});
+						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
+						var request = new Request(tmpUrl, data)
+						{
+							Method = Method,
+							Origin = Origin,
+							PostBody = GetPostBody(PostBody, data),
+							Referer = Referer
+						};
+						spider.Scheduler.Push(request);
+					}
 				}
+			}
+			else
+			{
+				HashSet<Request> results = new HashSet<Request>();
+				foreach (var data in datas)
+				{
+					var arguments = PrepareArguments(data);
+
+					foreach (var formate in FormateStrings)
+					{
+						string tmpUrl = string.Format(formate, arguments.Cast<object>().ToArray());
+						var request = new Request(tmpUrl, data)
+						{
+							Method = Method,
+							Origin = Origin,
+							PostBody = GetPostBody(PostBody, data),
+							Referer = Referer
+						};
+						results.Add(request);
+					}
+				}
+				spider.Scheduler.Import(results);
 			}
 		}
 

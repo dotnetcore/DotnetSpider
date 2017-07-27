@@ -23,7 +23,6 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					connectString = reader.GetString(0);
 				}
-				conn.Close();
 				return connectString;
 			}
 		}

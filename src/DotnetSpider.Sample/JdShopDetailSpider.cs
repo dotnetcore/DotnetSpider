@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Selector;
@@ -9,17 +8,17 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
-using System;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Sample
 {
 	public class JdShopDetailSpider : EntitySpider
 	{
-		public JdShopDetailSpider() : base("JdShopDetailSpider")
+		public JdShopDetailSpider() : base("JdShopDetailSpider", new Site())
 		{
 		}
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
 			CachedSize = 1;
 			ThreadNum = 8;
@@ -44,7 +43,7 @@ namespace DotnetSpider.Sample
 						Source = DataSource.MySql,
 						ConnectString = "Database='test';Data Source= localhost;User ID=root;Password=1qazZAQ!;Port=3306",
 						QueryString = $"SELECT * FROM jd.sku_v2_{DateTimeUtils.RunIdOfMonday} WHERE shopname is null or shopid is null order by sku",
-						Columns = new [] {new DataColumn { Name = "sku"} },
+						Columns = new [] {new DataColumn("sku")   },
 						FormateStrings = new List<string> { "http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json" }
 					}
 			};

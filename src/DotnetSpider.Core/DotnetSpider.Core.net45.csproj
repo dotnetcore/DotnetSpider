@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\output\net451\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET4_5</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -32,24 +32,26 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac">
-      <HintPath>..\..\packages\Autofac.4.6.0\lib\net45\Autofac.dll</HintPath>
+      <HintPath>..\..\packages\Autofac.4.6.1\lib\net45\Autofac.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.5.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HtmlAgilityPack.1.5.1\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack.CssSelectors, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\HtmlAgilityPack.CssSelectors.1.0.2\lib\net45\HtmlAgilityPack.CssSelectors.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="NLog">
-      <HintPath>..\..\packages\NLog.4.4.10\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\..\packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Management" />
@@ -87,6 +89,8 @@
     <Compile Include="IExitable.cs" />
     <Compile Include="IIdentity.cs" />
     <Compile Include="INamed.cs" />
+    <Compile Include="Infrastructure\Adsl.cs" />
+    <Compile Include="Infrastructure\AdslCommand.cs" />
     <Compile Include="Infrastructure\AutomicInteger.cs" />
     <Compile Include="Infrastructure\AutomicLong.cs" />
     <Compile Include="Infrastructure\BitArrayExtensions.cs" />
@@ -94,27 +98,21 @@
     <Compile Include="Infrastructure\BloomFilter.cs" />
     <Compile Include="Infrastructure\Browser.cs" />
     <Compile Include="Infrastructure\Cache.cs" />
-    <Compile Include="Infrastructure\Configuration.cs" />
+    <Compile Include="Infrastructure\Config.cs" />
     <Compile Include="Infrastructure\DateTimeUtils.cs" />
     <Compile Include="Infrastructure\DirectoryExtensions.cs" />
     <Compile Include="Infrastructure\Encrypt.cs" />
     <Compile Include="Infrastructure\Environment.cs" />
-    <Compile Include="Infrastructure\ExcelClient.cs" />
     <Compile Include="Infrastructure\HttpUtils.cs" />
-    <Compile Include="Infrastructure\ILogger.cs" />
-    <Compile Include="Infrastructure\INetworkExecutor.cs" />
     <Compile Include="Infrastructure\IocManager.cs" />
     <Compile Include="Infrastructure\LimitedConcurrencyLevelTaskScheduler.cs" />
     <Compile Include="Infrastructure\LogCenter.cs" />
-    <Compile Include="Infrastructure\NetworkCenter.cs" />
-    <Compile Include="Infrastructure\NLogExtensions.cs" />
-    <Compile Include="Infrastructure\NLogLogger.cs" />
     <Compile Include="Infrastructure\NodeId.cs" />
     <Compile Include="Infrastructure\PriorityBlockingQueue.cs" />
+    <Compile Include="Infrastructure\Properties.cs" />
     <Compile Include="Infrastructure\RegexUtils.cs" />
     <Compile Include="Infrastructure\RetryExecutor.cs" />
     <Compile Include="Infrastructure\Singleton.cs" />
-    <Compile Include="Infrastructure\SpiderConsts.cs" />
     <Compile Include="Infrastructure\StreamExtensions.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />
     <Compile Include="Infrastructure\SystemInfo.cs" />
@@ -128,8 +126,6 @@
     <Compile Include="Monitor\IMonitor.cs" />
     <Compile Include="Monitor\ISpeedMonitor.cs" />
     <Compile Include="Monitor\NLogMonitor.cs" />
-    <Compile Include="Monitor\SpiderClosingHandler.cs" />
-    <Compile Include="Monitor\SpiderEvent.cs" />
     <Compile Include="Monitor\SpiderStatus.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="Pipeline\BasePipeline.cs" />
@@ -151,6 +147,20 @@
     <Compile Include="Proxy\ProxyUtil.cs" />
     <Compile Include="Proxy\SingleProxyPool.cs" />
     <Compile Include="Proxy\UseSpecifiedUriWebProxy.cs" />
+    <Compile Include="Redial\BaseRedialExecutor.cs" />
+    <Compile Include="Redial\FileLockerRedialExecutor.cs" />
+    <Compile Include="Redial\InternetDetector\BaseInternetDetector.cs" />
+    <Compile Include="Redial\InternetDetector\DefalutInternetDetector.cs" />
+    <Compile Include="Redial\InternetDetector\IInternetDetector.cs" />
+    <Compile Include="Redial\InternetDetector\VpnInternetDetector.cs" />
+    <Compile Include="Redial\InternetDetector\VpsInternetDetector.cs" />
+    <Compile Include="Redial\IRedialExecutor.cs" />
+    <Compile Include="Redial\NetworkCenter.cs" />
+    <Compile Include="Redial\Redialer\AdslRedialer.cs" />
+    <Compile Include="Redial\Redialer\BaseAdslRedialer.cs" />
+    <Compile Include="Redial\Redialer\IRedialer.cs" />
+    <Compile Include="Redial\RedialException.cs" />
+    <Compile Include="Redial\RedialResult.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="ResultItems.cs" />
     <Compile Include="Scheduler\Component\BloomFilterDuplicateRemover.cs" />

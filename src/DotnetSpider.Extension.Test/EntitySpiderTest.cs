@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
-using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
@@ -10,8 +9,7 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Scheduler;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -21,16 +19,17 @@ namespace DotnetSpider.Extension.Test
 		[Table("test", "table")]
 		public class TestEntity : SpiderEntity
 		{
-
+			[PropertyDefine(Expression = ".")]
+			public string name { get; set; }
 		}
 
 		public class MyEntitySpider1 : EntitySpider
 		{
-			public MyEntitySpider1() : base("tes")
+			public MyEntitySpider1() : base("tes", new Site())
 			{
 			}
 
-			protected override void MyInit()
+			protected override void MyInit(params string[] arguments)
 			{
 				Identity = Guid.NewGuid().ToString();
 				AddPipeline(new ConsoleEntityPipeline());
@@ -93,14 +92,14 @@ namespace DotnetSpider.Extension.Test
 
 		public class ClearSchedulerTestSpider : EntitySpider
 		{
-			public ClearSchedulerTestSpider() : base("ClearSchedulerTestSpider")
+			public ClearSchedulerTestSpider() : base("ClearSchedulerTestSpider", new Site())
 			{
 			}
 
-			protected override void MyInit()
+			protected override void MyInit(params string[] arguments)
 			{
 				Identity = Guid.NewGuid().ToString("N");
-				SetScheduler(new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20"));
+				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
 				AddStartUrl("https://baidu.com");
 				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType(typeof(TestEntity));
@@ -158,12 +157,11 @@ namespace DotnetSpider.Extension.Test
 
 		public class CasSpider : EntitySpider
 		{
-			public CasSpider() : base("casTest")
+			public CasSpider() : base("casTest", new Site())
 			{
 			}
 
-
-			protected override void MyInit()
+			protected override void MyInit(params string[] arguments)
 			{
 				Identity = Guid.NewGuid().ToString();
 				ThreadNum = 1;

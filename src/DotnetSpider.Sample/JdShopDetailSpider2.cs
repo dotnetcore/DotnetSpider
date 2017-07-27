@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Selector;
@@ -13,27 +12,25 @@ namespace DotnetSpider.Sample
 {
 	public class JdShopDetailSpider2 : EntitySpider
 	{
-		public JdShopDetailSpider2() : base("JdShopDetailSpider2")
+		public JdShopDetailSpider2() : base("JdShopDetailSpider2", new Site
 		{
-		}
-
-		protected override void MyInit()
-		{
-			var site = new Site()
-			{
-				UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
-				Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-				Headers = new Dictionary<string, string>
+			UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+			Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+			Headers = new Dictionary<string, string>
 				{
 					{ "Accept-Encoding"  ,"gzip, deflate, sdch" },
 					{ "Upgrade-Insecure-Requests"  ,"1" },
 					{ "Accept-Language"  ,"en,en-US;q=0.8" },
 					{ "Cache-Control" , "ax-age=0" },
 				}
-			};
-			site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3355984&callback=json");
-			site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3682523&callback=json");
-			Site = site;
+		})
+		{
+		}
+
+		protected override void MyInit(params string[] arguments)
+		{
+			Site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3355984&callback=json");
+			Site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3682523&callback=json");
 			Downloader = new HttpClientDownloader
 			{
 				DownloadCompleteHandlers = new IDownloadCompleteHandler[]

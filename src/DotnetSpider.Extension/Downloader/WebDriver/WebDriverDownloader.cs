@@ -8,6 +8,8 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
+using System.Net.Http;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Downloader.WebDriver
 {
@@ -120,9 +122,25 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 				request.PutExtra(Request.CycleTriedTimes, null);
 				return page;
 			}
-			catch (DownloadException)
+			catch (DownloadException de)
 			{
-				throw;
+				Page page = new Page(request, site.ContentType, null) { Exception = de };
+				if (site.CycleRetryTimes > 0)
+				{
+					page = Spider.AddToCycleRetry(request, site);
+				}
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}.", NLog.LogLevel.Warn);
+				return page;
+			}
+			catch (HttpRequestException he)
+			{
+				Page page = new Page(request, site.ContentType, null) { Exception = he };
+				if (site.CycleRetryTimes > 0)
+				{
+					page = Spider.AddToCycleRetry(request, site);
+				}
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {he.Message}.", NLog.LogLevel.Warn);
+				return page;
 			}
 			catch (Exception e)
 			{

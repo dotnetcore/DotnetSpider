@@ -1,8 +1,10 @@
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+
 namespace DotnetSpider.HtmlAgilityPack
 {
     #region Imports

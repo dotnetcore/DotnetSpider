@@ -1,5 +1,4 @@
 ﻿using System;
-using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
@@ -8,13 +7,13 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
-
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Sample
 {
 	public class JdSpider : EntitySpider
 	{
-		public JdSpider() : base("JD")
+		public JdSpider() : base("JD", new Site())
 		{
 		}
 
@@ -77,9 +76,9 @@ namespace DotnetSpider.Sample
 		}
 
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
-			Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Day1OfThisWeek.ToString("yyyy-MM-dd");
+			Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Monday_Of_Current_Week.ToString("yyyy-MM-dd");
 			AddStartUrl("http://www.jd.com/allSort.aspx");
 			AddEntityType(typeof(Category));
 			AddEntityType(typeof(TmpProduct));

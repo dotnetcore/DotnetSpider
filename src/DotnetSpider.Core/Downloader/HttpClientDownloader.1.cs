@@ -10,6 +10,8 @@ using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
+using NLog;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -74,21 +76,19 @@ namespace DotnetSpider.Core.Downloader
 						return new HttpResponseMessage(HttpStatusCode.RequestTimeout);
 					}
 				}, httpMessage);
-
+				request.StatusCode = response.StatusCode;
 				response.EnsureSuccessStatusCode();
 				if (!site.AcceptStatCode.Contains(response.StatusCode))
 				{
 					throw new DownloadException($"下载 {request.Url} 失败. Code {response.StatusCode}");
 				}
-				var httpStatusCode = response.StatusCode;
-				request.PutExtra(Request.StatusCode, httpStatusCode);
 				Page page;
 
 				if (response.Content.Headers.ContentType != null && !MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
 				{
 					if (!site.DownloadFiles)
 					{
-						spider.Log($"Miss request: {request.Url} because media type is not text.", LogLevel.Debug);
+						Logger.MyLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
 						return new Page(request, site.ContentType, null) { IsSkip = true };
 					}
 					else
@@ -98,12 +98,12 @@ namespace DotnetSpider.Core.Downloader
 				}
 				else
 				{
-					page = HandleResponse(request, response, httpStatusCode, site);
+					page = HandleResponse(request, response, site);
 				}
 
 				if (string.IsNullOrEmpty(page.Content))
 				{
-					spider.Log($"下载 {request.Url} 内容为空。", LogLevel.Warn);
+					Logger.MyLog(spider.Identity, $"下载 {request.Url} 内容为空.", LogLevel.Warn);
 				}
 
 				// need update
@@ -126,17 +126,28 @@ namespace DotnetSpider.Core.Downloader
 				//正常结果在上面已经Return了, 到此处必然是下载失败的值.
 				//throw new SpiderExceptoin("Download failed.");
 			}
-			catch (DownloadException)
+			catch (DownloadException de)
 			{
-				throw;
+				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, site.ContentType, null);
+
+				page.Exception = de;
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
+
+				return page;
 			}
 			catch (HttpRequestException he)
 			{
-				throw new DownloadException(he.Message);
+				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, site.ContentType, null);
+				page.Exception = he;
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {he.Message}.", LogLevel.Warn);
+				return page;
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, site.ContentType, null) { Exception = e };
+				Page page = new Page(request, site.ContentType, null);
+				page.Exception = e;
+				page.IsSkip = true;
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", LogLevel.Error, e);
 				return page;
 			}
 			finally
@@ -151,7 +162,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					spider.Log("Close response fail.", LogLevel.Warn, e);
+					Logger.MyLog(spider.Identity, "Close response fail.", LogLevel.Error, e);
 				}
 			}
 		}
@@ -171,11 +182,6 @@ namespace DotnetSpider.Core.Downloader
 			if (!string.IsNullOrEmpty(request.Referer))
 			{
 				httpWebRequest.Headers.Add("Referer", request.Referer);
-			}
-
-			if (!string.IsNullOrEmpty(request.Origin))
-			{
-				httpWebRequest.Headers.Add("Origin", request.Origin);
 			}
 
 			if (!string.IsNullOrEmpty(request.Origin))
@@ -212,9 +218,12 @@ namespace DotnetSpider.Core.Downloader
 				{
 					httpWebRequest.Content.Headers.Remove("X-Requested-With");
 				}
-				else if (!site.Headers.ContainsKey("X-Requested-With") || site.Headers["X-Requested-With"] != "NULL")
+				else
 				{
-					httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
+					if (!httpWebRequest.Content.Headers.Contains("X-Requested-With") && !httpWebRequest.Headers.Contains("X-Requested-With"))
+					{
+						httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
+					}
 				}
 			}
 			return httpWebRequest;
@@ -260,7 +269,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		private Page HandleResponse(Request request, HttpResponseMessage response, HttpStatusCode statusCode, Site site)
+		private Page HandleResponse(Request request, HttpResponseMessage response, Site site)
 		{
 			string content = GetContent(site, response);
 
@@ -275,8 +284,7 @@ namespace DotnetSpider.Core.Downloader
 
 			Page page = new Page(request, site.ContentType, site.RemoveOutboundLinks ? site.Domains : null)
 			{
-				Content = content,
-				StatusCode = statusCode
+				Content = content
 			};
 			foreach (var header in response.Headers)
 			{

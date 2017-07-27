@@ -13,19 +13,19 @@ namespace DotnetSpider.Sample
 {
 	public class JdSkuSampleSpider : EntitySpider
 	{
-		public JdSkuSampleSpider() : base("JdSkuSample")
+		public JdSkuSampleSpider() : base("JdSkuSample", new Site
+		{
+			//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("快代理API"))
+		})
 		{
 		}
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
-			Site = new Site
-			{
-				//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("快代理API"))
-			};
-			SetThreadNum(1);
+			ThreadNum = (1);
 			// dowload html by http client
-			SetDownloader(new HttpClientDownloader());
+			Downloader = new HttpClientDownloader();
+
 			// save data to mysql.
 			AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
@@ -74,13 +74,13 @@ namespace DotnetSpider.Sample
 
 	public class JdSkuSampleSpider2 : EntitySpider
 	{
-		public JdSkuSampleSpider2() : base("JdSkuSample2")
+		public JdSkuSampleSpider2() : base("JdSkuSample2", new Site())
 		{
 		}
 
-		protected override void MyInit()
+		protected override void MyInit(params string[] arguments)
 		{
-			SetThreadNum(1);
+			ThreadNum = 1;
 			Identity = ("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 			AddPipeline(new MySqlEntityPipeline(null)
 			{

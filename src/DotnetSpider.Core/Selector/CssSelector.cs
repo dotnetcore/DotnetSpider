@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using HtmlAgilityPack;
+using System;
 #if NET_CORE
 using DotnetSpider.HtmlAgilityPack;
-#else
-using System;
-using HtmlAgilityPack;
 #endif
 
 namespace DotnetSpider.Core.Selector
@@ -41,11 +40,8 @@ namespace DotnetSpider.Core.Selector
 
 		public override dynamic Select(HtmlNode element)
 		{
-#if !NET_CORE
-			IList<HtmlNode> elements = element.QuerySelectorAll(_selectorText);
-#else
 			IList<HtmlNode> elements = element.QuerySelectorAll(_selectorText).ToList();
-#endif
+
 			if (elements != null && elements.Count > 0)
 			{
 				if (string.IsNullOrEmpty(_attrName))

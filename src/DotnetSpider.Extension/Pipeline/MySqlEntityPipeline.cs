@@ -6,6 +6,7 @@ using System.Threading;
 using DotnetSpider.Core;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -67,9 +68,9 @@ namespace DotnetSpider.Extension.Pipeline
 			string setParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"`{p}`=@{p}"));
 
 			StringBuilder primaryParamenters = new StringBuilder();
-			if ("__id" == metadata.Table.Primary)
+			if (Core.Infrastructure.Environment.IdColumn == metadata.Table.Primary)
 			{
-				primaryParamenters.Append("`__Id` = @__Id");
+				primaryParamenters.Append($"`{Core.Infrastructure.Environment.IdColumn}` = @__id");
 			}
 			else
 			{
@@ -100,9 +101,9 @@ namespace DotnetSpider.Extension.Pipeline
 			string selectParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"`{p}`"));
 			StringBuilder primaryParamenters = new StringBuilder();
 			//string.Join(" AND ", $"`{Schema.Primary}`=@{Schema.Primary}");
-			if ("__id" == metadata.Table.Primary)
+			if (Core.Infrastructure.Environment.IdColumn == metadata.Table.Primary)
 			{
-				primaryParamenters.Append("`__Id` = @__Id,");
+				primaryParamenters.Append($"`{Core.Infrastructure.Environment.IdColumn}` = @{Core.Infrastructure.Environment.IdColumn},");
 			}
 			else
 			{
@@ -135,9 +136,9 @@ namespace DotnetSpider.Extension.Pipeline
 			string columNames = string.Join(", ", metadata.Columns.Select(p => $"`{p.Name}` {GetDataTypeSql(p)} "));
 			builder.Append(columNames);
 			builder.Append(",`cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP");
-			if (metadata.Table.Primary.ToLower() == "__id")
+			if (metadata.Table.Primary.ToLower() == Core.Infrastructure.Environment.IdColumn)
 			{
-				builder.Append(", `__id` bigint AUTO_INCREMENT");
+				builder.Append($", `{Core.Infrastructure.Environment.IdColumn}` bigint AUTO_INCREMENT");
 			}
 
 			if (metadata.Table.Indexs != null)
@@ -161,10 +162,13 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 			builder.Append($", PRIMARY KEY ({ metadata.Table.Primary})");
-
-			builder.Append(") ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
-			string sql = builder.ToString();
-			return sql;
+			using (var conn = new MySqlConnection(ConnectString))
+			{
+				var dbEngine = MySqlEngine.IsSupportToku(conn) ? "TokuDB" : "InnoDB";
+				builder.Append($") ENGINE={dbEngine} AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
+				string sql = builder.ToString();
+				return sql;
+			}
 		}
 
 		protected override string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion)

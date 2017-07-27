@@ -40,6 +40,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		/// <summary>
 		/// 手动执行此测试脚本，运行结束后用netstat -ano 查看端口占用情况。只会占用一个就对了。如果
 		/// </summary>
+		[Ignore]
 		[TestMethod]
 		public void Ports()
 		{
@@ -70,9 +71,9 @@ namespace DotnetSpider.Core.Test.Downloader
 				}
 			};
 			HttpClientDownloader downloader = new HttpClientDownloader();
-			downloader.Download(new Request("http://baidu.com", null), new DefaultSpider("test", site1));
+			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site1));
 
-			downloader.Download(new Request("http://baidu.com", null), new DefaultSpider("test", site2));
+			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site2));
 		}
 	}
 }

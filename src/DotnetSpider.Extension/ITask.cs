@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DotnetSpider.Extension
+﻿namespace DotnetSpider.Extension
 {
 	public interface ITask
 	{

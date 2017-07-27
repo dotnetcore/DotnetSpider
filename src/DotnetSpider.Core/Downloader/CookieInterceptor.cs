@@ -1,9 +1,12 @@
 ﻿using DotnetSpider.Core.Infrastructure;
+using NLog;
 
 namespace DotnetSpider.Core.Downloader
 {
 	public abstract class CookieInjector : Named, ICookieInjector
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
+
 		public virtual void Inject(ISpider spider, bool stopSpider = true)
 		{
 			if (stopSpider)
@@ -11,14 +14,14 @@ namespace DotnetSpider.Core.Downloader
 				spider.Pause(() =>
 				{
 					spider.Site.Cookies = GetCookies(spider);
-					spider.Log("注入 Cookies 成功。", LogLevel.Info);
+					Logger.MyLog(spider.Identity, "注入 Cookies 成功.", LogLevel.Info);
 					spider.Contiune();
 				});
 			}
 			else
 			{
 				spider.Site.Cookies = GetCookies(spider);
-				spider.Log("注入 Cookies 成功。", LogLevel.Info);
+				Logger.MyLog(spider.Identity, "注入 Cookies 成功.", LogLevel.Info);
 			}
 		}
 

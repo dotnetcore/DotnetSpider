@@ -144,7 +144,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		{
 			RasDialer dialer = new RasDialer();
 			RasPhoneBook allUsersPhoneBook = new RasPhoneBook();
-			allUsersPhoneBook.Open(true);
+			allUsersPhoneBook.Open(allUsersPhoneBook.Path);
 			// 如果已经该名称的Vpn已经存在，则更新这个Vpn服务器地址
 			if (allUsersPhoneBook.Entries.Contains(updateVpNname))
 			{
@@ -169,7 +169,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		public void TryDeleteVpn(string delVpnName)
 		{
 			RasPhoneBook allUsersPhoneBook = new RasPhoneBook();
-			allUsersPhoneBook.Open();
+			allUsersPhoneBook.Open(allUsersPhoneBook.Path);
 			if (allUsersPhoneBook.Entries.Contains(delVpnName))
 			{
 				allUsersPhoneBook.Entries.Remove(delVpnName);

@@ -30,16 +30,14 @@ namespace DotnetSpider.Sample
 				// use custmize processor for youku 为优酷自定义的 Processor
 				new YoukuPageProcessor())
 				// use custmize pipeline for youku 为优酷自定义的 Pipeline
-				.AddPipeline(new YoukuPipeline())
-				// dowload html by http client
-				.SetDownloader(new HttpClientDownloader())
-				// 1 thread
-				.SetThreadNum(1);
-
+				.AddPipeline(new YoukuPipeline());
+			spider.Downloader = new HttpClientDownloader();
+			spider.ThreadNum = 1;
 			spider.EmptySleepTime = 3000;
 
 			// Start crawler 启动爬虫
 			spider.Run();
+
 		}
 
 		public class YoukuPipeline : BasePipeline
@@ -81,10 +79,10 @@ namespace DotnetSpider.Sample
 				page.AddResultItem("VideoResult", results);
 
 				// Add target requests to scheduler. 解析需要采集的URL
-				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
-				{
-					page.AddTargetRequest(new Request(url.GetValue(), null));
-				}
+				//foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
+				//{
+				//	page.AddTargetRequest(new Request(url.GetValue(), null));
+				//}
 			}
 		}
 
@@ -109,9 +107,8 @@ namespace DotnetSpider.Sample
 				"YOUKU_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
 				new QueueDuplicateRemovedScheduler(),
 				new SimplePageProcessor())
-				.AddPipeline(new FilePipeline())
-				.SetThreadNum(2);
-
+				.AddPipeline(new FilePipeline());
+			spider.ThreadNum = 2;
 			spider.EmptySleepTime = 3000;
 
 			// 启动爬虫
@@ -138,12 +135,12 @@ namespace DotnetSpider.Sample
 				// default page processor will save whole html, and extract urls to target urls via regex
 				new DefaultPageProcessor(new[] { "cnblogs\\.com" }))
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
-				.AddPipeline(new FilePipeline())
-				// dowload html by http client
-				.SetDownloader(new HttpClientDownloader())
-				// 4 threads 4线程
-				.SetThreadNum(4);
+				.AddPipeline(new FilePipeline());
 
+			// dowload html by http client
+			spider.Downloader = new HttpClientDownloader();
+			// 4 threads 4线程
+			spider.ThreadNum = 4;
 			// traversal deep 遍历深度
 			spider.Deep = 3;
 

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 #if !NET_45
 using Microsoft.Extensions.DependencyModel;
+using System.Text;
 #endif
 
 namespace DotnetSpider.Runner
@@ -13,6 +13,14 @@ namespace DotnetSpider.Runner
 	{
 		public static void Run(params string[] args)
 		{
+			Console.ForegroundColor = ConsoleColor.DarkYellow;
+			Console.WriteLine("Args: " + string.Join(" ", args));
+			Console.WriteLine("");
+			Console.ForegroundColor = ConsoleColor.White;
+
+#if !NET_45
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
 			Dictionary<string, string> arguments = new Dictionary<string, string>();
 			foreach (var arg in args)
 			{
@@ -39,14 +47,18 @@ namespace DotnetSpider.Runner
 				}
 				else
 				{
+					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine("Please use command like: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId]");
+					Console.ForegroundColor = ConsoleColor.White;
 					return;
 				}
 			}
 			string spiderName = string.Empty;
 			if (arguments.Count == 0 || !arguments.ContainsKey("-s") || !arguments.ContainsKey("-tid"))
 			{
+				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine("-s or -tid are necessary.");
+				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
 			else
@@ -65,8 +77,9 @@ namespace DotnetSpider.Runner
 				var asm = Assembly.Load(new AssemblyName(library.Name));
 				var types = asm.GetTypes();
 #else
-			foreach (var asm in AppDomain.CurrentDomain.GetAssemblies().Where(l => l.GetName().Name.ToLower().EndsWith("dotnetspider.sample") || l.GetName().Name.ToLower().EndsWith("spiders.dll") || l.GetName().Name.ToLower().EndsWith("spiders.exe") || l.GetName().Name.ToLower().EndsWith("crawlers.dll") || l.GetName().Name.ToLower().EndsWith("crawlers.exe")))
+			foreach (var file in DetectDlls())
 			{
+				var asm = Assembly.LoadFrom(file);
 				var types = asm.GetTypes();
 #endif
 				Console.WriteLine($"Fetch assembly: {asm.FullName}.");
@@ -90,8 +103,16 @@ namespace DotnetSpider.Runner
 							var name = (string)property.GetValue(runner);
 							if (!spiders.ContainsKey(name))
 							{
-								Console.WriteLine($"Detected spider: {name}.");
 								spiders.Add(name, runner);
+							}
+							else
+							{
+								Console.ForegroundColor = ConsoleColor.Red;
+								Console.WriteLine();
+								Console.WriteLine($"Spider {name} are duplicate.");
+								Console.WriteLine();
+								Console.ForegroundColor = ConsoleColor.White;
+								return;
 							}
 							++totalTypesCount;
 						}
@@ -101,15 +122,17 @@ namespace DotnetSpider.Runner
 
 			if (spiders.Count == 0)
 			{
+				Console.ForegroundColor = ConsoleColor.DarkYellow;
+				Console.WriteLine();
 				Console.WriteLine("Did not detect any spider.");
+				Console.WriteLine();
+				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
 
-			if (spiders.Count != totalTypesCount)
-			{
-				Console.WriteLine("There are some duplicate spiders.");
-				return;
-			}
+			Console.WriteLine();
+			Console.WriteLine($"Detected {spiders.Keys.Count} crawlers.");
+			Console.WriteLine();
 
 			if (!spiders.ContainsKey(spiderName))
 			{
@@ -120,13 +143,27 @@ namespace DotnetSpider.Runner
 			if (arguments.ContainsKey("-i"))
 			{
 				var property = spider.GetType().GetProperties().First(p => p.Name == "Identity");
-				property.SetValue(spider, arguments["-i"]);
+				if (arguments["-i"].ToLower() != "guid")
+				{
+					property.SetValue(spider, arguments["-i"]);
+				}
+				else
+				{
+					property.SetValue(spider, Guid.NewGuid().ToString("N"));
+				}
 			}
 
 			if (arguments.ContainsKey("-tid"))
 			{
 				var property = spider.GetType().GetProperties().First(p => p.Name == "TaskId");
-				property.SetValue(spider, arguments["-tid"]);
+				if (arguments["-tid"].ToLower() != "guid")
+				{
+					property.SetValue(spider, arguments["-tid"]);
+				}
+				else
+				{
+					property.SetValue(spider, Guid.NewGuid().ToString("N"));
+				}
 			}
 
 			var method = spider.GetType().GetMethod("Run");
@@ -139,5 +176,12 @@ namespace DotnetSpider.Runner
 				method.Invoke(spider, new object[] { new string[] { arguments["-a"] } });
 			}
 		}
+#if NET_45
+		private static List<string> DetectDlls()
+		{
+			var path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+			return System.IO.Directory.GetFiles(path).Where(f => f.ToLower().EndsWith("dotnetspider.sample.exe") || f.ToLower().EndsWith("dotnetspider.sample.dll") || f.ToLower().EndsWith("spiders.dll") || f.ToLower().EndsWith("spiders.exe") || f.ToLower().EndsWith("crawlers.dll") || f.ToLower().EndsWith("crawlers.exe")).ToList();
+		}
+#endif
 	}
 }
