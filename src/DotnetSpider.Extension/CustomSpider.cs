@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Extension.Infrastructure;
 using MySql.Data.MySqlClient;
 using System;
 using System.Data;
@@ -32,6 +33,7 @@ namespace DotnetSpider.Extension
 		}
 
 		protected abstract void ImplementAction(params string[] arguments);
+		protected virtual void VerifyData() { }
 
 		public void Run(params string[] arguments)
 		{
@@ -107,6 +109,7 @@ namespace DotnetSpider.Extension
 						command.ExecuteNonQuery();
 					}
 				}
+				Verifier.ProcessVerifidation(Identity, VerifyData);
 			}
 			catch (Exception e)
 			{

@@ -57,6 +57,7 @@ namespace DotnetSpider.Core
 				return _site;
 			}
 		}
+		public bool IsComplete { get; private set; }
 
 		public Status Stat { get; private set; } = Status.Init;
 		public event Action<Request> OnSuccess;
@@ -806,6 +807,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		protected virtual void _OnComplete()
 		{
+			IsComplete = true;
 			if (ClearSchedulerAfterComplete && Scheduler.GetLeftRequestsCount() == 0)
 			{
 				Scheduler.Clean();

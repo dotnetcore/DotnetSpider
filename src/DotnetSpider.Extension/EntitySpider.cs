@@ -27,8 +27,10 @@ namespace DotnetSpider.Extension
 	{
 		protected abstract void MyInit(params string[] arguments);
 
+		protected virtual void VerifyData() { }
+
 		private const string InitStatusSetKey = "dotnetspider:init-stats";
-		private const string ValidateStatusKey = "dotnetspider:validate-stats";
+
 		private static readonly List<string> DefaultProperties = new List<string> { "cdate", Core.Infrastructure.Environment.IdColumn };
 
 		public string RedisConnectString { get; set; }
@@ -37,12 +39,9 @@ namespace DotnetSpider.Extension
 
 		public string TaskId { get; set; }
 
+		public bool UseDbLog { get; set; } = true;
+
 		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
-
-		[JsonIgnore]
-		public RedisConnection RedisConnection { get; private set; }
-
-		public Action VerifyData;
 
 		public List<Entity> Entities { get; internal set; } = new List<Entity>();
 
@@ -70,7 +69,7 @@ namespace DotnetSpider.Extension
 
 			if (!string.IsNullOrEmpty(ConnectString))
 			{
-				if (!Pipelines.Any(p => p.GetType() == typeof(MySqlEntityPipeline)))
+				if (!Pipelines.Any())
 				{
 					AddPipeline(new MySqlEntityPipeline(ConnectString));
 				}
@@ -79,6 +78,11 @@ namespace DotnetSpider.Extension
 
 			base.Run(arguments);
 
+			if (IsComplete)
+			{
+				Verifier.ProcessVerifidation(Identity, VerifyData);
+			}
+
 			RemoveRunningState();
 		}
 
@@ -86,7 +90,10 @@ namespace DotnetSpider.Extension
 		{
 			base.PreInitComponent();
 
-			Monitor = new DbMonitor(Identity);
+			if (UseDbLog)
+			{
+				Monitor = new DbMonitor(Identity);
+			}
 
 			if (Site == null)
 			{
@@ -108,29 +115,19 @@ namespace DotnetSpider.Extension
 			}
 
 			bool needInitStartRequest = true;
-			var redisConnectString = string.IsNullOrEmpty(RedisConnectString) ? Core.Infrastructure.Config.RedisConnectString : RedisConnectString;
-			if (!string.IsNullOrEmpty(redisConnectString))
-			{
-				RedisConnection = Cache.Instance.Get(redisConnectString);
-				if (RedisConnection == null)
-				{
-					RedisConnection = new RedisConnection(redisConnectString);
-					Cache.Instance.Set(redisConnectString, RedisConnection);
-				}
-			}
 
-			if (RedisConnection != null)
+			if (RedisConnection.Default != null)
 			{
 				if (arguments.Contains("rerun"))
 				{
-					RedisConnection.Database.HashDelete(InitStatusSetKey, Identity);
-					RedisConnection.Database.LockRelease(InitLockKey, "0");
+					RedisConnection.Default.Database.HashDelete(InitStatusSetKey, Identity);
+					RedisConnection.Default.Database.LockRelease(InitLockKey, "0");
 				}
-				while (!RedisConnection.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(10)))
+				while (!RedisConnection.Default.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(10)))
 				{
 					Thread.Sleep(1000);
 				}
-				var lockerValue = RedisConnection.Database.HashGet(InitStatusSetKey, Identity);
+				var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
 				needInitStartRequest = lockerValue != "init finished";
 			}
 
@@ -140,7 +137,7 @@ namespace DotnetSpider.Extension
 			{
 				Scheduler.Clean();
 				Scheduler.Dispose();
-				RedisConnection?.Database.HashDelete(ValidateStatusKey, Identity);
+				Verifier.RemoveVerifidationLock(Identity);
 				needInitStartRequest = true;
 			}
 
@@ -159,7 +156,7 @@ namespace DotnetSpider.Extension
 
 		protected override void AfterInitComponent(params string[] arguments)
 		{
-			RedisConnection?.Database.LockRelease(InitLockKey, 0);
+			RedisConnection.Default?.Database.LockRelease(InitLockKey, 0);
 			base.AfterInitComponent(arguments);
 		}
 
@@ -389,57 +386,13 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		private void HandleVerifyCollectData()
-		{
-			if (VerifyData == null)
-			{
-				return;
-			}
-			string key = $"dotnetspider:validateLocker:{Identity}";
-
-			try
-			{
-				bool needInitStartRequest = true;
-				if (RedisConnection != null)
-				{
-					while (!RedisConnection.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
-					{
-						Thread.Sleep(1000);
-					}
-
-					var lockerValue = RedisConnection.Database.HashGet(ValidateStatusKey, Identity);
-					needInitStartRequest = lockerValue != "verify finished";
-				}
-				if (needInitStartRequest)
-				{
-					Logger.MyLog(Identity, "开始执行数据验证...", LogLevel.Info);
-					VerifyData();
-				}
-				Logger.MyLog(Identity, "数据验证已完成.", LogLevel.Info);
-
-				if (needInitStartRequest)
-				{
-					RedisConnection?.Database.HashSet(ValidateStatusKey, Identity, "verify finished");
-				}
-			}
-			catch (Exception e)
-			{
-				Logger.MyLog(Identity, e.Message, LogLevel.Error, e);
-				//throw;
-			}
-			finally
-			{
-				RedisConnection?.Database.LockRelease(key, 0);
-			}
-		}
-
 		private void RegisterControl(ISpider spider)
 		{
-			if (RedisConnection != null)
+			if (RedisConnection.Default != null)
 			{
 				try
 				{
-					RedisConnection.Subscriber.Subscribe($"{spider.Identity}", (c, m) =>
+					RedisConnection.Default.Subscriber.Subscribe($"{spider.Identity}", (c, m) =>
 					{
 						switch (m)
 						{

@@ -54,7 +54,7 @@ namespace DotnetSpider.Extension.Pipeline
 							}
 						}
 					}
-					File.AppendAllText(fileInfo.Name, builder.ToString());
+					File.AppendAllText(fileInfo.FullName, builder.ToString());
 				}
 			}
 		}

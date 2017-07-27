@@ -8,14 +8,25 @@ using MySql.Data.MySqlClient;
 using MimeKit;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using NLog;
+using MailKit.Security;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public class Verifier<E>
+	public interface IVerifier
 	{
-		private List<IVerifier> verifiers = new List<IVerifier>();
+		string Name { get; }
+		string VerifierName { get; }
+		string Verify(IDbConnection conn);
+	}
 
-		public Properties Properties { get; }
+	public abstract class Verifier
+	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected const string ValidateStatusKey = "dotnetspider:validate-stats";
+		protected List<IVerifier> verifiers = new List<IVerifier>();
+
 		public List<string> EmailTo { get; }
 		public string EmailHost { get; }
 		public string Subject { get; }
@@ -31,7 +42,6 @@ namespace DotnetSpider.Extension.Infrastructure
 			EmailAccount = Config.GetValue("emailAccount");
 			EmailPassword = Config.GetValue("emailPassword");
 			Subject = subject;
-			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
 		}
 
 		public Verifier(string emailTo, string subject, string host, int port, string account, string password)
@@ -42,7 +52,51 @@ namespace DotnetSpider.Extension.Infrastructure
 			EmailAccount = account;
 			EmailPassword = password;
 			Subject = subject;
-			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
+		}
+
+		public static void RemoveVerifidationLock(string identity)
+		{
+			RedisConnection.Default?.Database.HashDelete(ValidateStatusKey, identity);
+		}
+
+		public static void ProcessVerifidation(string identity, Action verify)
+		{
+			string key = $"dotnetspider:validateLocker:{identity}";
+
+			try
+			{
+				bool needInitStartRequest = true;
+				if (RedisConnection.Default != null)
+				{
+					while (!RedisConnection.Default.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+					{
+						Thread.Sleep(1000);
+					}
+
+					var lockerValue = RedisConnection.Default.Database.HashGet(ValidateStatusKey, identity);
+					needInitStartRequest = lockerValue != "verify finished";
+				}
+				if (needInitStartRequest)
+				{
+					Logger.MyLog(identity, "开始执行数据验证...", LogLevel.Info);
+					verify();
+				}
+				Logger.MyLog(identity, "数据验证已完成.", LogLevel.Info);
+
+				if (needInitStartRequest)
+				{
+					RedisConnection.Default?.Database.HashSet(ValidateStatusKey, identity, "verify finished");
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.MyLog(identity, e.Message, LogLevel.Error, e);
+				//throw;
+			}
+			finally
+			{
+				RedisConnection.Default?.Database.LockRelease(key, 0);
+			}
 		}
 
 		public void AddEqual(string name, string sql, dynamic value)
@@ -65,87 +119,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			verifiers.Add(new Range(name, sql, minValue, maxValue));
 		}
 
-		public void Report()
-		{
-			if (verifiers != null && verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0)
-			{
-				using (var conn = new MySqlConnection(Config.ConnectString))
-				{
-					var emailBody = new StringBuilder();
-					var hasProperties = Properties != null;
-					emailBody.Append(
-"<html><head>" +
-"<meta charset=\"utf-8\">" +
-"<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">" +
-"<meta name=\"viewport\" content=\"width=device-width initial-scale=1.0\">" +
-$"<title>{Subject}: {DateTime.Now.ToString()}</title>" +
-"<style>" +
-"table {border-collapse: collapse;border-spacing: 0;border-left: 1px solid #888;border-top: 1px solid #888;background: #efefef;}th, td {border-right: 1px solid #888;border-bottom: 1px solid #888;padding: 5px 15px;}th {font-weight: bold;background: #ccc;}" +
-"</style>" +
-"</head>" +
-"<body style=\"background-color:#FAF7EC\">" +
-$"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
-(hasProperties ? $"<p><strong>研究员: {Properties.Designer}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>爬虫负责人: {Properties.Developer}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>开发时间: {Properties.Date}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>任务描述: {Properties.Detail}</strong></p>" : "") +
-"<br/>" +
-"<table>" +
-"<thead>" +
-"<tr>" +
-"<th>检查项</th>" +
-"<th>规则</th>" +
-"<th>SQL</th>" +
-"<th>期望值</th>" +
-"<th>真实值</th>" +
-"<th>结果</th>" +
-"<th>检测时间</th> " +
-"</tr>" +
-"</thead>" +
-"<tbody>"
-);
-					foreach (var verifier in verifiers)
-					{
-						emailBody.AppendLine(verifier.Verify(conn));
-					}
-					emailBody.Append("</tbody></table><br/></body></html>");
-
-					var message = new MimeMessage();
-					message.From.Add(new MailboxAddress("DotnetSpider Verifier", EmailAccount));
-					foreach (var emailTo in EmailTo)
-					{
-						message.To.Add(new MailboxAddress(emailTo, emailTo));
-					}
-
-					message.Subject = Subject;
-
-					var html = new TextPart("html")
-					{
-						Text = emailBody.ToString()
-					};
-
-					message.Body = html;
-
-					using (var client = new MailKit.Net.Smtp.SmtpClient())
-					{
-						client.Connect(EmailHost, EmailPort, false);
-
-						// Note: only needed if the SMTP server requires authentication
-						client.Authenticate(EmailAccount, EmailPassword);
-
-						client.Send(message);
-						client.Disconnect(true);
-					}
-				}
-			}
-		}
-
-		interface IVerifier
-		{
-			string Name { get; }
-			string VerifierName { get; }
-			string Verify(IDbConnection conn);
-		}
+		public abstract void Report();
 
 		abstract class BaseVerifier : IVerifier
 		{
@@ -272,5 +246,97 @@ $"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
 		{
 			public dynamic Result { get; set; }
 		}
+	}
+
+	public class Verifier<E> : Verifier
+	{
+		public Properties Properties { get; }
+
+		public Verifier(string emailTo, string subject) : base(emailTo, subject)
+		{
+			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
+		}
+
+		public Verifier(string emailTo, string subject, string host, int port, string account, string password) : base(emailTo, subject, host, port, account, password)
+		{
+			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
+		}
+
+		public override void Report()
+		{
+			if (verifiers != null && verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0)
+			{
+				using (var conn = new MySqlConnection(Config.ConnectString))
+				{
+					var emailBody = new StringBuilder();
+					var hasProperties = Properties != null;
+					emailBody.Append(
+"<html><head>" +
+"<meta charset=\"utf-8\">" +
+"<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">" +
+"<meta name=\"viewport\" content=\"width=device-width initial-scale=1.0\">" +
+$"<title>{Subject}: {DateTime.Now.ToString()}</title>" +
+"<style>" +
+"table {border-collapse: collapse;border-spacing: 0;border-left: 1px solid #888;border-top: 1px solid #888;background: #efefef;}th, td {border-right: 1px solid #888;border-bottom: 1px solid #888;padding: 5px 15px;}th {font-weight: bold;background: #ccc;}" +
+"</style>" +
+"</head>" +
+"<body style=\"background-color:#FAF7EC\">" +
+$"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
+(hasProperties ? $"<p><strong>研究员: {Properties.Designer}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>爬虫负责人: {Properties.Developer}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>开发时间: {Properties.Date}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>任务描述: {Properties.Detail}</strong></p>" : "") +
+"<br/>" +
+"<table>" +
+"<thead>" +
+"<tr>" +
+"<th>检查项</th>" +
+"<th>规则</th>" +
+"<th>SQL</th>" +
+"<th>期望值</th>" +
+"<th>真实值</th>" +
+"<th>结果</th>" +
+"<th>检测时间</th> " +
+"</tr>" +
+"</thead>" +
+"<tbody>"
+);
+					foreach (var verifier in verifiers)
+					{
+						emailBody.AppendLine(verifier.Verify(conn));
+					}
+					emailBody.Append("</tbody></table><br/></body></html>");
+
+					var message = new MimeMessage();
+					message.From.Add(new MailboxAddress("DotnetSpider Verifier", EmailAccount));
+					foreach (var emailTo in EmailTo)
+					{
+						message.To.Add(new MailboxAddress(emailTo, emailTo));
+					}
+
+					message.Subject = Subject;
+
+					var html = new TextPart("html")
+					{
+						Text = emailBody.ToString()
+					};
+
+					message.Body = html;
+
+					using (var client = new MailKit.Net.Smtp.SmtpClient())
+					{
+						client.Connect("smtp.office365.com", 25, SecureSocketOptions.Auto);
+
+						// Note: only needed if the SMTP server requires authentication
+						client.Authenticate(EmailAccount, EmailPassword);
+
+						client.Send(message);
+						client.Disconnect(true);
+					}
+				}
+			}
+		}
+
+
 	}
 }
