@@ -544,7 +544,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				Logger.MyLog(Identity, $"准备步骤: 添加链接到调度中心, 数量 {Site.StartRequests.Count}.", LogLevel.Info);
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
-					foreach(var request in Site.StartRequests)
+					foreach (var request in Site.StartRequests)
 					{
 						Scheduler.Push(request);
 					}
@@ -808,8 +808,8 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		protected virtual void _OnComplete()
 		{
-			IsComplete = true;
-			if (ClearSchedulerAfterComplete && Scheduler.GetLeftRequestsCount() == 0)
+			IsComplete = Scheduler.GetLeftRequestsCount() == 0;
+			if (ClearSchedulerAfterComplete && IsComplete)
 			{
 				Scheduler.Clean();
 			}
