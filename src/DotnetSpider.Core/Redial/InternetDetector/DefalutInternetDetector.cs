@@ -22,6 +22,8 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 
 		public override bool DoValidate()
 		{
+			try
+			{
 #if !NET_CORE
 			Ping p = new Ping();//创建Ping对象p
 			PingReply pr = p.Send("www.baidu.com", 30000);//向指定IP或者主机名的计算机发送ICMP协议的ping数据包
@@ -32,19 +34,24 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 			}
 
 #else
-			HttpClient clinet = new HttpClient();
-			IAsyncResult asyncResult = clinet.GetStringAsync("http://www.baidu.com");
-			if (!asyncResult.AsyncWaitHandle.WaitOne(2000))
+				HttpClient clinet = new HttpClient();
+				IAsyncResult asyncResult = clinet.GetStringAsync("http://www.baidu.com");
+				if (!asyncResult.AsyncWaitHandle.WaitOne(2000))
+				{
+					return false;
+				}
+				if (((Task<string>)asyncResult).Result.Contains("<title>百度一下，你就知道</title>"))
+				{
+					return true;
+				}
+				Thread.Sleep(100);
+#endif
+				return false;
+			}
+			catch
 			{
 				return false;
 			}
-			if (((Task<string>)asyncResult).Result.Contains("<title>百度一下，你就知道</title>"))
-			{
-				return true;
-			}
-			Thread.Sleep(100);
-#endif
-			return false;
 		}
 	}
 }
