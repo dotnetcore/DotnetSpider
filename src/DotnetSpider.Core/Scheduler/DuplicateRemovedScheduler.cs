@@ -16,15 +16,21 @@ namespace DotnetSpider.Core.Scheduler
 		public bool DepthFirst { get; set; } = true;
 
 		public virtual bool IsExited { get; set; }
- 
+
+		public abstract bool IsNetworkScheduler { get; }
+
 		public void Push(Request request)
 		{
-			lock (this)
+			if (IsNetworkScheduler)
 			{
 				NetworkCenter.Current.Execute("sp", () =>
 				{
 					DoPush(request);
 				});
+			}
+			else
+			{
+				DoPush(request);
 			}
 		}
 
@@ -44,11 +50,6 @@ namespace DotnetSpider.Core.Scheduler
 		{
 		}
 
-		/// <summary>
-		/// �������URLִ��ʧ��, ������ӻ�TargetUrlsʱ��Hash���������¼�����е�����
-		/// </summary>
-		/// <param name="request"></param>
-		/// <returns></returns>
 		private bool ShouldReserved(Request request)
 		{
 			var cycleTriedTimes = request.GetExtra(Request.CycleTriedTimes);

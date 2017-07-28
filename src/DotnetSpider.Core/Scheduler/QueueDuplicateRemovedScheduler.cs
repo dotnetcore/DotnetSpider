@@ -1,6 +1,7 @@
 using DotnetSpider.Core.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace DotnetSpider.Core.Scheduler
 {
@@ -13,6 +14,8 @@ namespace DotnetSpider.Core.Scheduler
 		private List<Request> _queue = new List<Request>();
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
+
+		public override bool IsNetworkScheduler => false;
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{

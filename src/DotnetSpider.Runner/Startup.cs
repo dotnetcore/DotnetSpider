@@ -181,9 +181,9 @@ namespace DotnetSpider.Runner
 
 			var method = spider.GetType().GetMethod("Run");
 
-			//CreateTable();
+			CreateTable();
 
-			//InsertExecuteRecord(spiderName, commands, taskId, identity);
+			InsertExecuteRecord(spiderName, commands, taskId, identity);
 
 			if (!arguments.ContainsKey("-a"))
 			{

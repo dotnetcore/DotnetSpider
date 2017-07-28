@@ -542,11 +542,12 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
 				Logger.MyLog(Identity, $"准备步骤: 添加链接到调度中心, 数量 {Site.StartRequests.Count}.", LogLevel.Info);
-				//Logger.SaveLog(LogInfo.Create(, Logger.Name, this, LogLevel.Info));
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
-					Parallel.ForEach(Site.StartRequests, new ParallelOptions() { MaxDegreeOfParallelism = 4 },
-						request => { Scheduler.Push(request); });
+					foreach(var request in Site.StartRequests)
+					{
+						Scheduler.Push(request);
+					}
 				}
 				else
 				{

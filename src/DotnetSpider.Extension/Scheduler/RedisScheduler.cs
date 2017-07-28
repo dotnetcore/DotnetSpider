@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Scheduler
 	public sealed class RedisScheduler : DuplicateRemovedScheduler, IDuplicateRemover
 	{
 		public string ConnectString { get; }
-
+		public override bool IsNetworkScheduler => true;
 		public RedisConnection RedisConnection { get; private set; }
 
 		public const string TasksKey = "dotnetspider:tasks";
