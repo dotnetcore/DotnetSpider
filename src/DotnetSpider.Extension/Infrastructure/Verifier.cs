@@ -234,7 +234,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Values = new dynamic[] { minValue, maxValue };
 			}
 
-			public override dynamic ExpectedValue => $"{Values[0]},{Values[1]}";
+			public override dynamic ExpectedValue => $"{Values[0]}-{Values[1]}";
 
 			public override bool Verify(dynamic result)
 			{
