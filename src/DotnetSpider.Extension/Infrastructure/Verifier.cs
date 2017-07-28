@@ -264,7 +264,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public override void Report()
 		{
-			if (verifiers != null && verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0)
+			if (verifiers != null && verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrEmpty(EmailHost))
 			{
 				using (var conn = new MySqlConnection(Config.ConnectString))
 				{

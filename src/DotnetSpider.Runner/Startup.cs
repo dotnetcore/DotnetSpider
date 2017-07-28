@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using MySql.Data.MySqlClient;
+using Dapper;
 #if !NET_45
 using Microsoft.Extensions.DependencyModel;
 using System.Text;
@@ -14,7 +16,8 @@ namespace DotnetSpider.Runner
 		public static void Run(params string[] args)
 		{
 			Console.ForegroundColor = ConsoleColor.DarkYellow;
-			Console.WriteLine("Args: " + string.Join(" ", args));
+			var commands = string.Join(" ", args);
+			Console.WriteLine("Args: " + commands);
 			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.White;
 
@@ -140,33 +143,48 @@ namespace DotnetSpider.Runner
 				return;
 			}
 			var spider = spiders[spiderName];
+			string identity = "";
 			if (arguments.ContainsKey("-i"))
 			{
 				var property = spider.GetType().GetProperties().First(p => p.Name == "Identity");
-				if (arguments["-i"].ToLower() != "guid")
+				identity = arguments["-i"].ToLower();
+				if (arguments["-i"].ToLower() == "guid")
 				{
-					property.SetValue(spider, arguments["-i"]);
+					property.SetValue(spider, Guid.NewGuid().ToString("N"));
 				}
 				else
 				{
-					property.SetValue(spider, Guid.NewGuid().ToString("N"));
+					if (!string.IsNullOrEmpty(identity))
+					{
+						property.SetValue(spider, arguments["-i"]);
+					}
 				}
 			}
 
+			string taskId = "";
 			if (arguments.ContainsKey("-tid"))
 			{
 				var property = spider.GetType().GetProperties().First(p => p.Name == "TaskId");
-				if (arguments["-tid"].ToLower() != "guid")
+				taskId = arguments["-tid"].ToLower();
+				if (arguments["-tid"].ToLower() == "guid")
 				{
-					property.SetValue(spider, arguments["-tid"]);
+					property.SetValue(spider, Guid.NewGuid().ToString("N"));
 				}
 				else
 				{
-					property.SetValue(spider, Guid.NewGuid().ToString("N"));
+					if (!string.IsNullOrEmpty(identity))
+					{
+						property.SetValue(spider, arguments["-tid"]);
+					}
 				}
 			}
 
 			var method = spider.GetType().GetMethod("Run");
+
+			//CreateTable();
+
+			//InsertExecuteRecord(spiderName, commands, taskId, identity);
+
 			if (!arguments.ContainsKey("-a"))
 			{
 				method.Invoke(spider, new object[] { new string[] { } });
@@ -176,6 +194,35 @@ namespace DotnetSpider.Runner
 				method.Invoke(spider, new object[] { new string[] { arguments["-a"] } });
 			}
 		}
+
+		private static void InsertExecuteRecord(string spiderName, string commands, string taskId, string identity)
+		{
+			if (!string.IsNullOrEmpty(Config.ConnectString))
+			{
+				using (var conn = new MySqlConnection(Config.ConnectString))
+				{
+					conn.Execute("INSERT IGNORE INTO dotnetspider.`task_execute_history` (`task_id` ,`identity`,`spider_name`,`commands`) VALUES (@task_id, @identity , @spider_name , @commands)", new
+					{
+						task_id = taskId,
+						identity = identity,
+						spider_name = spiderName,
+						commands = commands
+					});
+				}
+			}
+		}
+
+		private static void CreateTable()
+		{
+			if (!string.IsNullOrEmpty(Config.ConnectString))
+			{
+				using (var conn = new MySqlConnection(Config.ConnectString))
+				{
+					conn.Execute("CREATE TABLE IF NOT EXISTS dotnetspider.`task_execute_history` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`task_id` varchar(128) DEFAULT NULL,`identity` varchar(128) DEFAULT NULL, `spider_name` varchar(128) DEFAULT NULL, `commands` varchar(500) DEFAULT NULL,`cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(`id`),KEY `TASKID` (`task_id`),KEY `IDENTITY` (`identity`)) ENGINE = InnoDB DEFAULT CHARSET = utf8;");
+				}
+			}
+		}
+
 #if NET_45
 		private static List<string> DetectDlls()
 		{
