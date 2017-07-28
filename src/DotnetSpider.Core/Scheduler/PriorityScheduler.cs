@@ -16,6 +16,8 @@ namespace DotnetSpider.Core.Scheduler
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 
+		public override bool IsNetworkScheduler => false;
+
 		protected override void PushWhenNoDuplicate(Request request)
 		{
 			if (request.Priority == 0)
