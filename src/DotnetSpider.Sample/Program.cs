@@ -27,7 +27,7 @@ namespace DotnetSpider.Sample
 			OcrDemo.Process();
 #endif
 
-			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:guid" });
+			Startup.Run(new string[] { "-s:BrandShopSpider", "-tid:BrandShopSpider", "-i:guid" });
 
 			Startup.Run(new string[] { "-s:CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1" });
 

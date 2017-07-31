@@ -2,6 +2,7 @@
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Infrastructure;
 using MySql.Data.MySqlClient;
+using NLog;
 using System;
 using System.Data;
 using System.Threading;
@@ -68,7 +69,7 @@ namespace DotnetSpider.Extension
 					command.CommandText = $"insert ignore into dotnetspider.status (`identity`, `status`,`thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`, `logged`) values('{Identity}', 'Init',-1, -1, -1, -1, -1, -1, -1, -1, '{DateTime.Now}');";
 					command.ExecuteNonQuery();
 
-					InsertLog(conn, "Info", $"开始任务: {Name}");
+					InsertLog(conn, LogLevel.Info, $"开始任务: {Name}");
 				}
 
 				_statusReporter = Task.Factory.StartNew(() =>
@@ -101,7 +102,7 @@ namespace DotnetSpider.Extension
 					using (IDbConnection conn = new MySqlConnection(ConnectString))
 					{
 						conn.Open();
-						InsertLog(conn, "Info", $"结束任务: {Name}");
+						InsertLog(conn, LogLevel.Info, $"结束任务: {Name}");
 
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
@@ -119,7 +120,7 @@ namespace DotnetSpider.Extension
 					{
 						conn.Open();
 
-						InsertLog(conn, "Info", $"退出任务: {Name}", e.ToString());
+						InsertLog(conn, LogLevel.Info, $"退出任务: {Name}", e.ToString());
 
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
@@ -145,7 +146,7 @@ namespace DotnetSpider.Extension
 			});
 		}
 
-		protected void InsertLog(IDbConnection conn, string level, string message, string exception = null)
+		protected void InsertLog(IDbConnection conn, LogLevel level, string message, string exception = null)
 		{
 			var command = conn.CreateCommand();
 			command.CommandType = CommandType.Text;
@@ -173,7 +174,7 @@ namespace DotnetSpider.Extension
 			var level2 = command.CreateParameter();
 			level2.ParameterName = "@level";
 			level2.DbType = DbType.String;
-			level2.Value = level;
+			level2.Value = level.Name;
 			command.Parameters.Add(level2);
 
 			var message2 = command.CreateParameter();
@@ -191,7 +192,7 @@ namespace DotnetSpider.Extension
 			command.ExecuteNonQuery();
 		}
 
-		protected void InsertLog(string level, string message, string exception = null)
+		protected void InsertLog(LogLevel level, string message, string exception = null)
 		{
 			using (var conn = new MySqlConnection(Config.ConnectString))
 			{
