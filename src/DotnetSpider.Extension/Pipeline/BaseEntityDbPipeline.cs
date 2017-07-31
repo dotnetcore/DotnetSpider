@@ -65,7 +65,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				if (metadata.Table.Primary != Core.Infrastructure.Environment.IdColumn)
 				{
-					var items = new HashSet<string>(metadata.Table.Primary.Split(','));
+					var items = new HashSet<string>(metadata.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 					if (items.Count > 0)
 					{
 						foreach (var item in items)
@@ -122,7 +122,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				for (int i = 0; i < dbMetadata.Table.Indexs.Length; ++i)
 				{
-					var items = new HashSet<string>(dbMetadata.Table.Indexs[i].Split(','));
+					var items = new HashSet<string>(dbMetadata.Table.Indexs[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 
 					if (items.Count == 0)
 					{
@@ -147,7 +147,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				for (int i = 0; i < dbMetadata.Table.Uniques.Length; ++i)
 				{
-					var items = new HashSet<string>(dbMetadata.Table.Uniques[i].Split(','));
+					var items = new HashSet<string>(dbMetadata.Table.Uniques[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 
 					if (items.Count == 0)
 					{
@@ -290,7 +290,7 @@ namespace DotnetSpider.Extension.Pipeline
 									}
 									else
 									{
-										var columns = metadata.Table.Primary.Split(',');
+										var columns = metadata.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim());
 										foreach (var column in columns)
 										{
 											var primaryParameter = CreateDbParameter($"@{column}", data.SelectToken($"{column}")?.Value<string>());
@@ -355,7 +355,7 @@ namespace DotnetSpider.Extension.Pipeline
 									}
 									else
 									{
-										var columns = metadata.Table.Primary.Split(',');
+										var columns = metadata.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim());
 										foreach (var column in columns)
 										{
 											var primaryParameter = CreateDbParameter($"@{column}", data.SelectToken($"{column}")?.Value<string>());

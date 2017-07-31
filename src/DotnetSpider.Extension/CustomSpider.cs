@@ -191,6 +191,14 @@ namespace DotnetSpider.Extension
 			command.ExecuteNonQuery();
 		}
 
+		protected void InsertLog(string level, string message, string exception = null)
+		{
+			using (var conn = new MySqlConnection(Config.ConnectString))
+			{
+				InsertLog(conn, level, message, exception);
+			}
+		}
+
 		private void InsertRunningState()
 		{
 			using (IDbConnection conn = new MySqlConnection(ConnectString))
