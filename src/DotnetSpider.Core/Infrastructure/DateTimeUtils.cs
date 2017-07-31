@@ -7,10 +7,15 @@ namespace DotnetSpider.Core.Infrastructure
 		private static readonly DateTimeOffset Epoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 		private const long TicksPerMicrosecond = 10;
 
+		public static string ConvertDateTimeToUnix(DateTime time)
+		{
+			return time.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds.ToString("f0");
+		}
+
 		/// <returns></returns>
 		public static string GetCurrentTimeStampString()
 		{
-			return DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds.ToString("f0");
+			return ConvertDateTimeToUnix(DateTime.UtcNow);
 		}
 
 		/// <returns></returns>

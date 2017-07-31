@@ -164,6 +164,18 @@ namespace DotnetSpider.Extension
 			return this;
 		}
 
+		public EntitySpider AddEntityType<T>()
+		{
+			AddEntityType(typeof(T));
+			return this;
+		}
+
+		public EntitySpider AddEntityType<T>(DataHandler dataHandler)
+		{
+			AddEntityType(typeof(T), dataHandler);
+			return this;
+		}
+
 		public EntitySpider AddEntityType(Type type, DataHandler dataHandler)
 		{
 			CheckIfRunning();
