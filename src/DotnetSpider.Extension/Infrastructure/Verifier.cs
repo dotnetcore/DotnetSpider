@@ -14,6 +14,11 @@ using MailKit.Security;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
+	public class QueryResult
+	{
+		public dynamic Result { get; set; }
+	}
+
 	public interface IVerifier
 	{
 		string Name { get; }
@@ -244,11 +249,6 @@ namespace DotnetSpider.Extension.Infrastructure
 			{
 				return result >= Values[0] && result <= Values[1];
 			}
-		}
-
-		class QueryResult
-		{
-			public dynamic Result { get; set; }
 		}
 	}
 
