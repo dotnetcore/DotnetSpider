@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension
 	{
 		protected abstract void MyInit(params string[] arguments);
 
-		protected virtual void VerifyData() { }
+		protected virtual void OnExited() { }
 
 		private const string InitStatusSetKey = "dotnetspider:init-stats";
 
@@ -78,7 +78,7 @@ namespace DotnetSpider.Extension
 
 			if (IsComplete)
 			{
-				Verifier.ProcessVerifidation(Identity, VerifyData);
+				Verifier.ProcessVerifidation(Identity, OnExited);
 			}
 
 			RemoveRunningState();

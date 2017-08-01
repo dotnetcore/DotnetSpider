@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(BaiduSearchEntry));
 		}
 
-		protected override void VerifyData()
+		protected override void OnExited()
 		{
 			Verifier<BaiduSearchSpider> verifier = new Verifier<BaiduSearchSpider>("136831898@163.com", "百度搜索监控报告");
 			verifier.AddEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);

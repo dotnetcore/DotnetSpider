@@ -890,6 +890,11 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 				page = downloader.Download(request, this);
 
+				if (page.Exception != null)
+				{
+					throw new DownloadException();
+				}
+
 				sw.Stop();
 				UpdateDownloadSpeed(sw.ElapsedMilliseconds);
 
@@ -922,7 +927,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				Logger.MyLog(Identity, $"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}.", LogLevel.Warn, e);
 			}
 
-			if (page == null || page.Exception != null)
+			if (page == null)
 			{
 				OnError(request);
 				return;

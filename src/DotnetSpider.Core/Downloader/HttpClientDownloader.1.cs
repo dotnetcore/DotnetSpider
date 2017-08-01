@@ -78,6 +78,7 @@ namespace DotnetSpider.Core.Downloader
 				}, httpMessage);
 				request.StatusCode = response.StatusCode;
 				response.EnsureSuccessStatusCode();
+				throw new HttpRequestException("");
 				if (!site.AcceptStatCode.Contains(response.StatusCode))
 				{
 					throw new DownloadException($"下载 {request.Url} 失败. Code {response.StatusCode}");

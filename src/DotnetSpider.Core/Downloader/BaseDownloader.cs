@@ -36,11 +36,6 @@ namespace DotnetSpider.Core.Downloader
 
 			AfterDownloadComplete(result, spider);
 
-			if (result.Exception != null)
-			{
-				throw new DownloadException(result.Exception.Message);
-			}
-
 			return result;
 		}
 
