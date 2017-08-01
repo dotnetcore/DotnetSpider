@@ -197,6 +197,7 @@ namespace DotnetSpider.Extension
 		{
 			using (var conn = new MySqlConnection(Config.ConnectString))
 			{
+				conn.Open();
 				InsertLog(conn, level, message, exception);
 			}
 		}

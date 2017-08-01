@@ -65,7 +65,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			try
 			{
-				bool needInitStartRequest = true;
+				bool needVerify = true;
 				if (RedisConnection.Default != null)
 				{
 					while (!RedisConnection.Default.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
@@ -74,16 +74,20 @@ namespace DotnetSpider.Extension.Infrastructure
 					}
 
 					var lockerValue = RedisConnection.Default.Database.HashGet(ValidateStatusKey, identity);
-					needInitStartRequest = lockerValue != "verify finished";
+					needVerify = lockerValue != "verify finished";
 				}
-				if (needInitStartRequest)
+				if (needVerify)
 				{
 					Logger.MyLog(identity, "开始执行数据验证...", LogLevel.Info);
 					verify();
+					Logger.MyLog(identity, "数据验证已完成.", LogLevel.Info);
 				}
-				Logger.MyLog(identity, "数据验证已完成.", LogLevel.Info);
+				else
+				{
+					Logger.MyLog(identity, "数据验证已完成, 请勿重复操作.", LogLevel.Info);
+				}
 
-				if (needInitStartRequest)
+				if (needVerify)
 				{
 					RedisConnection.Default?.Database.HashSet(ValidateStatusKey, identity, "verify finished");
 				}

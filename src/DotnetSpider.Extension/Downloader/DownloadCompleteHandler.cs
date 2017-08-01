@@ -2,6 +2,7 @@
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
+using NLog;
 
 namespace DotnetSpider.Extension.Downloader
 {
@@ -15,7 +16,7 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
-					System.Console.WriteLine("prepare to exit spider!!!!!!!!!!!!!!!!!!!!!!");
+					Logger.MyLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
 					spider.Exit();
 				}
 				page = Spider.AddToCycleRetry(page.Request, spider.Site);
@@ -41,6 +42,7 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 					{
+						Logger.MyLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
 						spider.Exit();
 					}
 					Spider.AddToCycleRetry(page.Request, spider.Site);

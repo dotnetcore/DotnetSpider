@@ -34,7 +34,7 @@ namespace DotnetSpider.Core.Downloader
 
 			var result = DowloadContent(request, spider);
 
-			AfterDownloadComplete(result, spider);
+			AfterDownloadComplete(ref result, spider);
 
 			return result;
 		}
@@ -61,7 +61,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		protected void AfterDownloadComplete(Page page, ISpider spider)
+		protected void AfterDownloadComplete(ref Page page, ISpider spider)
 		{
 			if (DownloadCompleteHandlers != null)
 			{
