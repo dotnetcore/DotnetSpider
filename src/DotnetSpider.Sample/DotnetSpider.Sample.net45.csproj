@@ -39,7 +39,6 @@
     <Compile Include="BaseUsage.cs" />
     <Compile Include="CasSpider.cs" />
     <Compile Include="Class1.cs" />
-    <Compile Include="Class2.cs" />
     <Compile Include="Cnblogs.cs" />
     <Compile Include="ConfigurableSpider.cs" />
     <Compile Include="CtripCitySpider.cs" />
