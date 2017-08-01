@@ -13,6 +13,7 @@ namespace DotnetSpider.Runner
 	{
 		public static void Run(params string[] args)
 		{
+			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.DarkYellow;
 			var commands = string.Join(" ", args);
 			Console.WriteLine("Args: " + commands);
