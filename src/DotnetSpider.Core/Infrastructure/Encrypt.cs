@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -15,18 +16,18 @@ namespace DotnetSpider.Core.Infrastructure
 	/// </summary>
 	public static class Encrypt
 	{
-//		public static string Md5Encrypt(string myString)
-//		{
-//#if !NET_CORE
-//			MD5 md5 = new MD5CryptoServiceProvider();
-//#else
-//			MD5 md5 = MD5.Create();
-//#endif
-//			byte[] fromData = Encoding.UTF8.GetBytes(myString);
-//			byte[] targetData = md5.ComputeHash(fromData);
+		public static string Md5Encrypt32(string myString)
+		{
+#if !NET_CORE
+			MD5 md5 = new MD5CryptoServiceProvider();
+#else
+			MD5 md5 = MD5.Create();
+#endif
+			byte[] fromData = Encoding.UTF8.GetBytes(myString);
+			byte[] targetData = md5.ComputeHash(fromData);
 
-//			return targetData.Aggregate<byte, string>(null, (current, t) => current + t.ToString("x"));
-//		}
+			return targetData.Aggregate<byte, string>(null, (current, t) => current + t.ToString("x"));
+		}
 
 		public static string Md5Encrypt(string myString)
 		{
