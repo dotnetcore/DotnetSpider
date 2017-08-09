@@ -22,7 +22,7 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit(params string[] arguments)
 		{
-			ThreadNum = (1);
+			ThreadNum = 1;
 			// dowload html by http client
 			Downloader = new HttpClientDownloader();
 
@@ -66,9 +66,6 @@ namespace DotnetSpider.Sample
 
 			[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
-
-			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
-			public DateTime CDate { get; set; }
 		}
 	}
 

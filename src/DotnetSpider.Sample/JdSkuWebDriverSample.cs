@@ -66,9 +66,6 @@ namespace DotnetSpider.Sample
 
 			[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
-
-			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
-			public DateTime CDate { get; set; }
 		}
 	}
 }

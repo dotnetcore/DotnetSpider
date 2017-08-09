@@ -26,20 +26,12 @@ namespace DotnetSpider.Core.Infrastructure
 			byte[] fromData = Encoding.UTF8.GetBytes(myString);
 			byte[] targetData = md5.ComputeHash(fromData);
 
-			return targetData.Aggregate<byte, string>(null, (current, t) => current + t.ToString("x"));
+			return BitConverter.ToString(targetData).Replace("-", "").ToLower();
 		}
 
 		public static string Md5Encrypt(string myString)
 		{
-#if !NET_CORE
-			MD5 md5 = new MD5CryptoServiceProvider();
-#else
-			MD5 md5 = MD5.Create();
-#endif
-			byte[] fromData = Encoding.UTF8.GetBytes(myString);
-			byte[] targetData = md5.ComputeHash(fromData);
-
-			return BitConverter.ToString(targetData).Replace("-", "").Substring(8, 16).ToLower();
+			return Md5Encrypt32(myString).Substring(8, 16).ToLower();
 		}
 	}
 }

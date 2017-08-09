@@ -12,6 +12,9 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Sample
 {
+	/// <summary>
+	/// 使用 PrepareStartUrls 模块 以及 RedisScheduler
+	/// </summary>
 	public class JdShopDetailSpider : EntitySpider
 	{
 		public JdShopDetailSpider() : base("JdShopDetailSpider", new Site())
@@ -20,8 +23,7 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit(params string[] arguments)
 		{
-			CachedSize = 1;
-			ThreadNum = 8;
+			ThreadNum = 1;
 			Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
 			Downloader = new HttpClientDownloader
 			{

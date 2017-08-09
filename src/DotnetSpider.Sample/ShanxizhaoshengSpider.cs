@@ -29,9 +29,6 @@ namespace DotnetSpider.Sample
 		{
 			[PropertyDefine(Expression = ".")]
 			public string School { get; set; }
-
-			[PropertyDefine(Expression = "Now", Type = SelectorType.Enviroment)]
-			public DateTime CDate { get; set; }
 		}
 	}
 }

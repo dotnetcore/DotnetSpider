@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Extension.Monitor;
 using MySql.Data.MySqlClient;
 using NLog;
 using System;
@@ -29,7 +30,7 @@ namespace DotnetSpider.Extension
 			Name = name;
 			if (string.IsNullOrEmpty(ConnectString))
 			{
-				ConnectString = Core.Infrastructure.Config.ConnectString;
+				ConnectString = Config.ConnectString;
 			}
 		}
 
@@ -46,7 +47,7 @@ namespace DotnetSpider.Extension
 
 			if (string.IsNullOrEmpty(ConnectString))
 			{
-				ConnectString = Core.Infrastructure.Config.ConnectString;
+				ConnectString = Config.ConnectString;
 			}
 
 			if (string.IsNullOrEmpty(ConnectString))
@@ -56,6 +57,9 @@ namespace DotnetSpider.Extension
 
 			if (!string.IsNullOrEmpty(ConnectString))
 			{
+				NLogUtil.PrepareDatabase(ConnectString);
+				DbMonitor.InitStatusDatabase(ConnectString);
+
 				if (!string.IsNullOrEmpty(TaskId))
 				{
 					InsertRunningState();
