@@ -35,7 +35,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AlexaSpider2.cs" />
     <Compile Include="BaiduSearchSpider.cs" />
     <Compile Include="BaseUsage.cs" />
     <Compile Include="CasSpider.cs" />
