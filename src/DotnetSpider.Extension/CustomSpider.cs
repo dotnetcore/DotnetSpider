@@ -13,6 +13,8 @@ namespace DotnetSpider.Extension
 {
 	public abstract class CustomSpider : IRunable, INamed, IIdentity, ITask
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
+
 		private bool _exited;
 
 		private Task _statusReporter;
@@ -74,7 +76,7 @@ namespace DotnetSpider.Extension
 					command.CommandText = $"insert ignore into dotnetspider.status (`identity`, `status`,`thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`, `logged`) values('{Identity}', 'Init',-1, -1, -1, -1, -1, -1, -1, -1, '{DateTime.Now}');";
 					command.ExecuteNonQuery();
 
-					InsertLog(conn, LogLevel.Info, $"开始任务: {Name}");
+					Logger.MyLog(Identity, $"开始任务: {Name}", LogLevel.Info);
 				}
 
 				_statusReporter = Task.Factory.StartNew(() =>
@@ -102,13 +104,13 @@ namespace DotnetSpider.Extension
 				_exited = true;
 				_statusReporter.Wait();
 
+				Logger.MyLog(Identity, $"结束任务: {Name}", LogLevel.Info);
+
 				if (!string.IsNullOrEmpty(ConnectString))
 				{
 					using (IDbConnection conn = new MySqlConnection(ConnectString))
 					{
 						conn.Open();
-						InsertLog(conn, LogLevel.Info, $"结束任务: {Name}");
-
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
 						command.CommandText = $"update dotnetspider.status set `status`='Finished',`logged`='{DateTime.Now}' WHERE identity='{Identity}';";
@@ -122,13 +124,13 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
+				Logger.MyLog(Identity, $"退出任务: {Name}", LogLevel.Info);
+
 				if (!string.IsNullOrEmpty(ConnectString))
 				{
 					using (IDbConnection conn = new MySqlConnection(ConnectString))
 					{
 						conn.Open();
-
-						InsertLog(conn, LogLevel.Info, $"退出任务: {Name}", e.ToString());
 
 						var command = conn.CreateCommand();
 						command.CommandType = CommandType.Text;
@@ -152,61 +154,6 @@ namespace DotnetSpider.Extension
 			{
 				Run(arguments);
 			});
-		}
-
-		protected void InsertLog(IDbConnection conn, LogLevel level, string message, string exception = null)
-		{
-			var command = conn.CreateCommand();
-			command.CommandType = CommandType.Text;
-
-			command.CommandText = $"insert into dotnetspider.log (identity, node, logged, level, message,exception) values (@identity, @node, @logged, @level, @message, @exception)";
-
-			var identity = command.CreateParameter();
-			identity.ParameterName = "@identity";
-			identity.DbType = DbType.String;
-			identity.Value = Identity;
-			command.Parameters.Add(identity);
-
-			var node = command.CreateParameter();
-			node.ParameterName = "@node";
-			node.DbType = DbType.String;
-			node.Value = NodeId.Id;
-			command.Parameters.Add(node);
-
-			var logged = command.CreateParameter();
-			logged.ParameterName = "@logged";
-			logged.DbType = DbType.DateTime;
-			logged.Value = DateTime.Now;
-			command.Parameters.Add(logged);
-
-			var level2 = command.CreateParameter();
-			level2.ParameterName = "@level";
-			level2.DbType = DbType.String;
-			level2.Value = level.Name;
-			command.Parameters.Add(level2);
-
-			var message2 = command.CreateParameter();
-			message2.ParameterName = "@message";
-			message2.DbType = DbType.String;
-			message2.Value = message;
-			command.Parameters.Add(message2);
-
-			var exception2 = command.CreateParameter();
-			exception2.ParameterName = "@exception";
-			exception2.DbType = DbType.String;
-			exception2.Value = exception;
-			command.Parameters.Add(exception2);
-
-			command.ExecuteNonQuery();
-		}
-
-		protected void InsertLog(LogLevel level, string message, string exception = null)
-		{
-			using (var conn = new MySqlConnection(Config.ConnectString))
-			{
-				conn.Open();
-				InsertLog(conn, level, message, exception);
-			}
 		}
 
 		private void InsertRunningState()
