@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Core.Downloader;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using DotnetSpider.Core.Scheduler;
+using static DotnetSpider.Core.Test.SpiderTest;
+using System;
+using DotnetSpider.Core.Pipeline;
 
 namespace DotnetSpider.Core.Test.Downloader
 {
@@ -74,6 +78,19 @@ namespace DotnetSpider.Core.Test.Downloader
 			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site1));
 
 			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site2));
+		}
+
+		[TestMethod]
+		public void Test404Url()
+		{
+			var spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
+					"abcd",
+					new QueueDuplicateRemovedScheduler(),
+					new TestPageProcessor());
+			spider.AddPipeline(new ConsolePipeline());
+			spider.AddStartUrl("http://www.mlr.gov.cn/xwdt/jrxw/201707/t20170710_15242382.htm");
+			spider.Run();
+			Assert.AreEqual(4, spider.RetriedTimes.Value);
 		}
 	}
 }

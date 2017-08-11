@@ -1,5 +1,4 @@
-﻿#if !NET_CORE
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -23,4 +22,3 @@ namespace DotnetSpider.Extension.Infrastructure
 		}
 	}
 }
-#endif

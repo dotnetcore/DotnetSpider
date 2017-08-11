@@ -31,8 +31,8 @@ namespace DotnetSpider.Core.Test.Scheduler
 			long left = scheduler.GetLeftRequestsCount();
 			long total = scheduler.GetTotalRequestsCount();
 
-			Assert.AreEqual(left, 2);
-			Assert.AreEqual(total, 1002);
+			Assert.AreEqual(2, left);
+			Assert.AreEqual(1002, total);
 		}
 
 		[TestMethod]

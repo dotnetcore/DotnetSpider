@@ -1,4 +1,4 @@
-﻿#if !NET_CORE
+﻿
 using OpenQA.Selenium.Remote;
 
 namespace DotnetSpider.Extension.Downloader.WebDriver
@@ -8,4 +8,3 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 		bool Handle(RemoteWebDriver driver);
 	}
 }
-#endif

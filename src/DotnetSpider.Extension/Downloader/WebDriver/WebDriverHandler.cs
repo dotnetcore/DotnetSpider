@@ -1,5 +1,4 @@
-﻿#if !NET_CORE
-using OpenQA.Selenium.Remote;
+﻿using OpenQA.Selenium.Remote;
 using System;
 using System.Threading;
 
@@ -29,4 +28,3 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 		}
 	}
 }
-#endif

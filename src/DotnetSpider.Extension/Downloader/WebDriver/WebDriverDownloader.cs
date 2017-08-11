@@ -1,8 +1,6 @@
-﻿#if !NET_CORE
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
@@ -10,6 +8,12 @@ using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
 using System.Net.Http;
 using DotnetSpider.Core.Redial;
+using System.Runtime.InteropServices;
+#if NET_CORE
+using System.Net;
+#else
+using System.Web;
+#endif
 
 namespace DotnetSpider.Extension.Downloader.WebDriver
 {
@@ -31,7 +35,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 			_browser = browser;
 			_option = option ?? new Option();
 
-			if (browser == Browser.Firefox)
+			if (browser == Browser.Firefox && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				Task.Factory.StartNew(() =>
 				{
@@ -82,7 +86,11 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 
 				//中文乱码URL
 				Uri uri = request.Url;
+#if NET_CORE
+				string query = string.IsNullOrEmpty(uri.Query) ? "" : $"?{WebUtility.UrlEncode(uri.Query.Substring(1, uri.Query.Length - 1))}";
+#else
 				string query = string.IsNullOrEmpty(uri.Query) ? "" : $"?{HttpUtility.UrlPathEncode(uri.Query.Substring(1, uri.Query.Length - 1))}";
+#endif
 				string realUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}{uri.AbsolutePath}{query}";
 
 				var domainUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}";
@@ -93,7 +101,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 					options.Cookies.DeleteAllCookies();
 					foreach (var c in spider.Site.Cookies.PairPart)
 					{
-						options.Cookies.AddCookie(new Cookie(c.Key, c.Value));
+						options.Cookies.AddCookie(new OpenQA.Selenium.Cookie(c.Key, c.Value));
 					}
 				}
 
@@ -151,9 +159,8 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 
 		public override void Dispose()
 		{
-			_webDriver.Quit();
-			_webDriver.Close();
+			_webDriver?.Quit();
+
 		}
 	}
 }
-#endif

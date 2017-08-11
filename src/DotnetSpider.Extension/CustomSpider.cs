@@ -36,7 +36,7 @@ namespace DotnetSpider.Extension
 
 		protected abstract void ImplementAction(params string[] arguments);
 
-		protected virtual void OnExited() { }
+		protected event Action OnExited;
 
 		public void Run(params string[] arguments)
 		{
@@ -115,7 +115,10 @@ namespace DotnetSpider.Extension
 						command.ExecuteNonQuery();
 					}
 				}
-				Verifier.ProcessVerifidation(Identity, OnExited);
+				if (OnExited != null)
+				{
+					Verifier.ProcessVerifidation(Identity, OnExited);
+				}
 			}
 			catch (Exception e)
 			{

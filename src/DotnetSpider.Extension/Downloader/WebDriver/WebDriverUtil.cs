@@ -1,5 +1,4 @@
-﻿#if !NET_CORE
-using DotnetSpider.Core.Infrastructure;
+﻿using DotnetSpider.Core.Infrastructure;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
@@ -64,7 +63,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 					e = new FirefoxDriver(profile);
 					break;
 				case Browser.Chrome:
-					ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
+					ChromeDriverService cds = ChromeDriverService.CreateDefaultService(Core.Infrastructure.Environment.BaseDirectory);
 					cds.HideCommandPromptWindow = true;
 					ChromeOptions opt = new ChromeOptions();
 					if (!option.LoadImage)
@@ -82,5 +81,3 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 		}
 	}
 }
-
-#endif

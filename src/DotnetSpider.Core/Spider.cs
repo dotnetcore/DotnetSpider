@@ -58,6 +58,7 @@ namespace DotnetSpider.Core
 			}
 		}
 		public bool IsComplete { get; private set; }
+		public AutomicLong RetriedTimes { get; private set; } = new AutomicLong();
 
 		public Status Stat { get; private set; } = Status.Init;
 		public event Action<Request> OnSuccess;
@@ -626,56 +627,57 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 					int waitCount = 0;
 					bool firstTask = true;
 
-					var downloader = Downloader.Clone();
-
-					while (Stat == Status.Running)
+					using (var downloader = Downloader.Clone())
 					{
-						Request request = Scheduler.Poll();
-
-						if (request == null)
+						while (Stat == Status.Running)
 						{
-							if (waitCount > _waitCountLimit && ExitWhenComplete)
-							{
-								Stat = Status.Finished;
-								_realStat = Status.Finished;
-								_OnComplete();
-								OnComplete?.Invoke();
-								break;
-							}
+							Request request = Scheduler.Poll();
 
-							// wait until new url added
-							WaitNewUrl(ref waitCount);
-						}
-						else
-						{
-							waitCount = 0;
-
-							try
+							if (request == null)
 							{
-								Stopwatch sw = new Stopwatch();
-								ProcessRequest(sw, request, downloader);
-								Thread.Sleep(Site.SleepTime);
-								_OnSuccess(request);
-							}
-							catch (Exception e)
-							{
-								OnError(request);
-								Logger.MyLog(Identity, $"采集失败: {request.Url}.", LogLevel.Error, e);
-							}
-							finally
-							{
-								if (request.GetExtra(Request.Proxy) != null)
+								if (waitCount > _waitCountLimit && ExitWhenComplete)
 								{
-									var statusCode = request.StatusCode;
-									Site.ReturnHttpProxy(request.GetExtra(Request.Proxy) as UseSpecifiedUriWebProxy,
-										statusCode == null ? HttpStatusCode.Found : statusCode.Value);
+									Stat = Status.Finished;
+									_realStat = Status.Finished;
+									_OnComplete();
+									OnComplete?.Invoke();
+									break;
 								}
-							}
 
-							if (firstTask)
+								// wait until new url added
+								WaitNewUrl(ref waitCount);
+							}
+							else
 							{
-								Thread.Sleep(3000);
-								firstTask = false;
+								waitCount = 0;
+
+								try
+								{
+									Stopwatch sw = new Stopwatch();
+									ProcessRequest(sw, request, downloader);
+									Thread.Sleep(Site.SleepTime);
+									_OnSuccess(request);
+								}
+								catch (Exception e)
+								{
+									OnError(request);
+									Logger.MyLog(Identity, $"采集失败: {request.Url}.", LogLevel.Error, e);
+								}
+								finally
+								{
+									if (request.GetExtra(Request.Proxy) != null)
+									{
+										var statusCode = request.StatusCode;
+										Site.ReturnHttpProxy(request.GetExtra(Request.Proxy) as UseSpecifiedUriWebProxy,
+											statusCode == null ? HttpStatusCode.Found : statusCode.Value);
+									}
+								}
+
+								if (firstTask)
+								{
+									Thread.Sleep(3000);
+									firstTask = false;
+								}
 							}
 						}
 					}
@@ -686,6 +688,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 			_realStat = Status.Exited;
 
 			OnClose();
+
 			Logger.MyLog(Identity, $"等待监控进程退出.", LogLevel.Info);
 			_monitorTask.Wait(5000);
 
@@ -890,33 +893,36 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 				page = downloader.Download(request, this);
 
-				if (page.Exception != null)
-				{
-					throw new DownloadException();
-				}
-
 				sw.Stop();
 				UpdateDownloadSpeed(sw.ElapsedMilliseconds);
 
-				if (page.IsSkip)
+				if (page == null || page.IsSkip)
 				{
 					return;
 				}
 
-				sw.Reset();
-				sw.Start();
-
-				foreach (var processor in PageProcessors)
+				if (page.Exception == null)
 				{
-					processor.Process(page);
-				}
+					sw.Reset();
+					sw.Start();
 
-				sw.Stop();
-				UpdateProcessorSpeed(sw.ElapsedMilliseconds);
+					foreach (var processor in PageProcessors)
+					{
+						processor.Process(page);
+					}
+
+					sw.Stop();
+					UpdateProcessorSpeed(sw.ElapsedMilliseconds);
+				}
+				else
+				{
+					OnError(page.Request);
+				}
 			}
-			catch (DownloadException)
+			catch (DownloadException de)
 			{
-				// Download exception already handled.
+				page.Exception = de;
+				Logger.MyLog(Identity, $"Should not catch download exception: {request.Url}.", LogLevel.Warn, de);
 			}
 			catch (Exception e)
 			{
@@ -927,86 +933,83 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				Logger.MyLog(Identity, $"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}.", LogLevel.Warn, e);
 			}
 
-			if (page == null)
-			{
-				OnError(request);
-				return;
-			}
-
+			// 此处是用于需要循环本身的场景, 不能使用本身Request的原因是Request的尝试次数计算问题
 			if (page.IsNeedCycleRetry)
 			{
+				RetriedTimes.Inc();
 				ExtractAndAddRequests(page, true);
 				return;
 			}
 
-			if (!page.MissTargetUrls)
+			if (!page.MissTargetUrls && !(SkipWhenResultIsEmpty && page.ResultItems.IsSkip))
 			{
-				if (!(SkipWhenResultIsEmpty && page.ResultItems.IsSkip))
-				{
-					ExtractAndAddRequests(page, SpawnUrl);
-				}
+				ExtractAndAddRequests(page, SpawnUrl);
 			}
 
-			sw.Reset();
-			sw.Start();
-
-			if (!page.ResultItems.IsSkip)
+			if (page.Exception == null)
 			{
-				if (CachedSize == 1)
-				{
-					foreach (IPipeline pipeline in Pipelines)
-					{
-						RetryExecutor.Execute(PipelineRetryTimes, () =>
-						{
-							pipeline.Process(page.ResultItems);
-						});
-					}
-				}
-				else
-				{
-					lock (this)
-					{
-						_cached.Add(page.ResultItems);
+				sw.Reset();
+				sw.Start();
 
-						if (_cached.Count >= CachedSize)
+				if (!page.ResultItems.IsSkip)
+				{
+					if (CachedSize == 1)
+					{
+						foreach (IPipeline pipeline in Pipelines)
 						{
-							var items = _cached.ToArray();
-							_cached.Clear();
-							foreach (IPipeline pipeline in Pipelines)
+							RetryExecutor.Execute(PipelineRetryTimes, () =>
 							{
-								pipeline.Process(items);
-							}
+								pipeline.Process(page.ResultItems);
+							});
 						}
-					}
-				}
-				Logger.MyLog(Identity, $"采集: {request.Url} 成功.", LogLevel.Info);
-			}
-			else
-			{
-				if (RetryWhenResultIsEmpty)
-				{
-					if (Site.CycleRetryTimes > 0)
-					{
-						page = AddToCycleRetry(request, Site, true);
-						if (page != null && page.IsNeedCycleRetry)
-						{
-							ExtractAndAddRequests(page, true);
-						}
-						Logger.MyLog(Identity, $"解析: {request.Url} 结果为 0, 重新尝试采集.", LogLevel.Info);
 					}
 					else
 					{
-						Logger.MyLog(Identity, $"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
+						lock (this)
+						{
+							_cached.Add(page.ResultItems);
+
+							if (_cached.Count >= CachedSize)
+							{
+								var items = _cached.ToArray();
+								_cached.Clear();
+								foreach (IPipeline pipeline in Pipelines)
+								{
+									pipeline.Process(items);
+								}
+							}
+						}
 					}
+					Logger.MyLog(Identity, $"采集: {request.Url} 成功.", LogLevel.Info);
 				}
 				else
 				{
-					Logger.MyLog(Identity, $"采集: {request.Url} 成功, 解析结果为 0.", LogLevel.Info);
+					if (RetryWhenResultIsEmpty)
+					{
+						if (Site.CycleRetryTimes > 0)
+						{
+							page = AddToCycleRetry(request, Site, true);
+							if (page != null && page.IsNeedCycleRetry)
+							{
+								RetriedTimes.Inc();
+								ExtractAndAddRequests(page, true);
+							}
+							Logger.MyLog(Identity, $"下载: {request.Url} 成功, 解析结果为 0, 重新尝试采集.", LogLevel.Warn);
+						}
+						else
+						{
+							Logger.MyLog(Identity, $"下载: {request.Url} 成功, 解析结果为 0.", LogLevel.Warn);
+						}
+					}
+					else
+					{
+						Logger.MyLog(Identity, $"下载: {request.Url} 成功, 解析结果为 0.", LogLevel.Warn);
+					}
 				}
-			}
 
-			sw.Stop();
-			UpdatePipelineSpeed(sw.ElapsedMilliseconds);
+				sw.Stop();
+				UpdatePipelineSpeed(sw.ElapsedMilliseconds);
+			}
 		}
 
 		protected void ExtractAndAddRequests(Page page, bool spawnUrl)

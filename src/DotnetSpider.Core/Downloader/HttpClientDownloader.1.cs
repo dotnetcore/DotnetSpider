@@ -131,7 +131,10 @@ namespace DotnetSpider.Core.Downloader
 			{
 				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, site.ContentType, null);
 
-				page.Exception = de;
+				if (page != null)
+				{
+					page.Exception = de;
+				}
 				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
 
 				return page;
@@ -139,15 +142,23 @@ namespace DotnetSpider.Core.Downloader
 			catch (HttpRequestException he)
 			{
 				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, site.ContentType, null);
-				page.Exception = he;
+				if (page != null)
+				{
+					page.Exception = he;
+				}
+				
 				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {he.Message}.", LogLevel.Warn);
 				return page;
 			}
 			catch (Exception e)
 			{
 				Page page = new Page(request, site.ContentType, null);
-				page.Exception = e;
-				page.IsSkip = true;
+				if (page != null)
+				{
+					page.Exception = e;
+					page.IsSkip = true;
+				}
+
 				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", LogLevel.Error, e);
 				return page;
 			}

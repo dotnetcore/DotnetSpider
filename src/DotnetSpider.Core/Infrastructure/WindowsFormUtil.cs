@@ -1,6 +1,4 @@
-﻿#if !NET_CORE
-
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace DotnetSpider.Core.Infrastructure
@@ -18,4 +16,4 @@ namespace DotnetSpider.Core.Infrastructure
 		public const int WmClose = 0x10;
 	}
 }
-#endif
+

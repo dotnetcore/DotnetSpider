@@ -5,7 +5,7 @@ namespace DotnetSpider.Core.Downloader
 	/// Downloader has {@link #setThread(int)} method because downloader is always the bottleneck of a crawler,
 	/// there are always some mechanisms such as pooling in downloader, and pool size is related to thread numbers.
 	/// </summary>
-	public interface IDownloader
+	public interface IDownloader : System.IDisposable
 	{
 		/// <summary>
 		/// Downloads web pages and store in Page object.

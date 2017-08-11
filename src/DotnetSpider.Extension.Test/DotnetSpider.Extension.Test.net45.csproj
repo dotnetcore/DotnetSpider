@@ -31,12 +31,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CustomSpiderTest.cs" />
     <Compile Include="Downloader\TargetUrlsCreatorTest.cs" />
     <Compile Include="Downloader\TestDownloader.cs" />
+    <Compile Include="Downloader\WebDriverDownloaderTests.cs" />
     <Compile Include="EntityExtractorTest.cs" />
     <Compile Include="EntitySpiderTest.cs" />
     <Compile Include="EntitySpiderTest2.cs" />
     <Compile Include="FormatterTest.cs" />
+    <Compile Include="LogTest.cs" />
     <Compile Include="Pipeline\MsSqlEntityPipelineTest.cs" />
     <Compile Include="Pipeline\MysqlEntityPipelineTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -54,6 +57,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="chromedriver.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Jd.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -23,13 +23,13 @@ namespace DotnetSpider.Sample
 			var word = "可乐|雪碧";
 			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 			AddEntityType(typeof(BaiduSearchEntry));
-		}
 
-		protected override void OnExited()
-		{
-			Verifier<BaiduSearchSpider> verifier = new Verifier<BaiduSearchSpider>("136831898@163.com", "百度搜索监控报告");
-			verifier.AddEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);
-			verifier.Report();
+			OnExited += () =>
+			{
+				Verifier<BaiduSearchSpider> verifier = new Verifier<BaiduSearchSpider>("136831898@163.com", "百度搜索监控报告");
+				verifier.AddEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);
+				verifier.Report();
+			};
 		}
 	}
 

@@ -13,6 +13,8 @@ namespace DotnetSpider.Runner
 	{
 		public static void Run(params string[] args)
 		{
+			PrintInfo();
+
 			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.DarkYellow;
 			var commands = string.Join(" ", args);
@@ -221,6 +223,39 @@ namespace DotnetSpider.Runner
 		//		}
 		//	}
 		//}
+
+		public static void PrintInfo()
+		{
+			bool isPrinted;
+			var key = "_DotnetSpider_Info";
+
+#if !NET_CORE
+			isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
+#else
+
+			AppContext.TryGetSwitch(key, out isPrinted);
+#endif
+			if (!isPrinted)
+			{
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.WriteLine("=================================================================");
+				Console.WriteLine("== DotnetSpider is an open source crawler developed by C#      ==");
+				Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
+				Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
+				Console.WriteLine("== License: LGPL3.0                                            ==");
+				Console.WriteLine("== Author: zlzforever@163.com                                  ==");
+				Console.WriteLine("=================================================================");
+				Console.ForegroundColor = ConsoleColor.White;
+#if !NET_CORE
+				AppDomain.CurrentDomain.SetData(key, "True");
+#else
+
+				AppContext.SetSwitch(key, true);
+#endif
+			}
+			Console.WriteLine();
+			Console.WriteLine("=================================================================");
+		}
 
 #if NET_45
 		private static List<string> DetectDlls()
