@@ -17,6 +17,8 @@ namespace DotnetSpider.Core.Monitor
 		{
 			string msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
 			LogEventInfo theEvent = new LogEventInfo(LogLevel.Trace, "", msg);
+			theEvent.Properties["Identity"] = Identity;
+			theEvent.Properties["Node"] = NodeId.Id;
 			_logger.Log(theEvent);
 		}
 	}

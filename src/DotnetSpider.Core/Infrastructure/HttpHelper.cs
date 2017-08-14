@@ -1,4 +1,5 @@
-﻿#if !NET_CORE
+﻿
+using DotnetSpider.Core.Proxy;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -16,12 +17,23 @@ namespace DotnetSpider.Core.Utils
 	public class HttpHelper
 	{
 		#region 预定义方变量
+
 		//默认的编码  
+#if NET_CORE
+		private Encoding _encoding = Encoding.GetEncoding(0);
+#else
 		private Encoding _encoding = Encoding.Default;
+#endif
+
 		//Post数据编码  
+#if NET_CORE
+		private Encoding _postencoding = Encoding.GetEncoding(0);
+#else
 		private Encoding _postencoding = Encoding.Default;
+#endif
 		//HttpWebRequest对象用来发起请求  
 		private HttpWebRequest _request;
+
 		//获取影响流的数据对象  
 		private HttpWebResponse _response;
 		#endregion
@@ -54,7 +66,7 @@ namespace DotnetSpider.Core.Utils
 			try
 			{
 				//请求数据  
-				using (_response = (HttpWebResponse)_request.GetResponse())
+				using (_response = (HttpWebResponse)_request.GetResponseAsync().Result)
 				{
 					GetData(item, result);
 				}
@@ -137,7 +149,7 @@ namespace DotnetSpider.Core.Utils
 			//从这里开始我们要无视编码了  
 			if (_encoding == null)
 			{
-				Match meta = Regex.Match(Encoding.Default.GetString(responseByte), "<meta[^<]*charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
+				Match meta = Regex.Match(_encoding.GetString(responseByte), "<meta[^<]*charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
 				string c = string.Empty;
 				if (meta != null && meta.Groups.Count > 0)
 				{
@@ -151,25 +163,25 @@ namespace DotnetSpider.Core.Utils
 					}
 					catch
 					{
-						if (string.IsNullOrEmpty(_response.CharacterSet))
+						if (string.IsNullOrEmpty(_response.ContentType))
 						{
 							_encoding = Encoding.UTF8;
 						}
 						else
 						{
-							_encoding = Encoding.GetEncoding(_response.CharacterSet);
+							_encoding = Encoding.GetEncoding(_response.ContentType);
 						}
 					}
 				}
 				else
 				{
-					if (string.IsNullOrEmpty(_response.CharacterSet))
+					if (string.IsNullOrEmpty(_response.ContentType))
 					{
 						_encoding = Encoding.UTF8;
 					}
 					else
 					{
-						_encoding = Encoding.GetEncoding(_response.CharacterSet);
+						_encoding = Encoding.GetEncoding(_response.ContentType);
 					}
 				}
 			}
@@ -184,7 +196,7 @@ namespace DotnetSpider.Core.Utils
 			MemoryStream stream = new MemoryStream();
 
 			//GZIIP处理  
-			if (_response.ContentEncoding != null && _response.ContentEncoding.Equals("gzip", StringComparison.InvariantCultureIgnoreCase))
+			if (_response.ContentType != null && _response.ContentType.Equals("gzip", StringComparison.OrdinalIgnoreCase))
 			{
 				//开始读取流并设置编码方式  
 				stream = GetMemoryStream(new GZipStream(_response.GetResponseStream(), CompressionMode.Decompress));
@@ -196,7 +208,12 @@ namespace DotnetSpider.Core.Utils
 			}
 			//获取Byte  
 			responseByte = stream.ToArray();
+
+#if NET_CORE
+			stream.Dispose();
+#else
 			stream.Close();
+#endif
 			return responseByte;
 		}
 
@@ -233,30 +250,42 @@ namespace DotnetSpider.Core.Utils
 			if (item.Header != null && item.Header.Count > 0)
 				foreach (string key in item.Header.AllKeys)
 				{
+#if NET_CORE
+					_request.Headers[key] = item.Header[key];
+#else
 					_request.Headers.Add(key, item.Header[key]);
+#endif
 				}
 			// 设置代理  
 			SetProxy(item);
-			if (item.ProtocolVersion != null) _request.ProtocolVersion = item.ProtocolVersion;
-			_request.ServicePoint.Expect100Continue = item.Expect100Continue;
+			if (item.ProtocolVersion != null)
+			{
+#if NET_CORE
+				_request.Headers["Version"] = item.ProtocolVersion.ToString();
+#else
+				_request.ProtocolVersion = item.ProtocolVersion;
+#endif
+			}
+#if !NET_CORE
+				_request.ServicePoint.Expect100Continue = item.Expect100Continue;
+#endif
+
 			//请求方式Get或者Post  
 			_request.Method = item.Method;
+#if NET_CORE
+			if (item.KeepAlive)
+			{
+				_request.Headers["Connection"] = "Keep-Alive";
+			}
+			_request.Headers["User-Agent"] = item.UserAgent;
+			_request.Headers["Referer"] = item.UserAgent;
+#else
 			_request.Timeout = item.Timeout;
 			_request.KeepAlive = item.KeepAlive;
 			_request.ReadWriteTimeout = item.ReadWriteTimeout;
 			if (item.IfModifiedSince != null) _request.IfModifiedSince = Convert.ToDateTime(item.IfModifiedSince);
-			//Accept  
-			_request.Accept = item.Accept;
-			//ContentType返回类型  
-			_request.ContentType = item.ContentType;
 			//UserAgent客户端的访问类型，包括浏览器版本和操作系统信息  
 			_request.UserAgent = item.UserAgent;
-			// 编码  
-			_encoding = item.Encoding;
-			//设置安全凭证  
-			_request.Credentials = item.Credentials;
-			//设置Cookie  
-			SetCookie(item);
 			//来源地址  
 			_request.Referer = item.Referer;
 			//是否执行跳转功能  
@@ -265,10 +294,22 @@ namespace DotnetSpider.Core.Utils
 			{
 				_request.MaximumAutomaticRedirections = item.MaximumAutomaticRedirections;
 			}
-			//设置Post数据  
-			SetPostData(item);
 			//设置最大连接  
 			if (item.Connectionlimit > 0) _request.ServicePoint.ConnectionLimit = item.Connectionlimit;
+#endif
+			//Accept  
+			_request.Accept = item.Accept;
+			//ContentType返回类型  
+			_request.ContentType = item.ContentType;
+			// 编码  
+			_encoding = item.Encoding;
+			//设置安全凭证  
+			_request.Credentials = item.Credentials;
+			//设置Cookie  
+			SetCookie(item);
+
+			//设置Post数据  
+			SetPostData(item);
 		}
 		/// <summary>  
 		/// 设置证书  
@@ -276,15 +317,20 @@ namespace DotnetSpider.Core.Utils
 		/// <param name="item"></param>  
 		private void SetCer(HttpItem item)
 		{
+#if NET_CORE
+			_request = (HttpWebRequest)WebRequest.Create(item.Url);
+#else
 			if (!string.IsNullOrEmpty(item.CerPath))
 			{
+
 				//这一句一定要写在创建连接的前面。使用回调的方法进行证书验证。  
 				ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
-				//初始化对像，并设置请求的URL地址  
-				_request = (HttpWebRequest)WebRequest.Create(item.Url);
+
+			//初始化对像，并设置请求的URL地址  
+			_request = (HttpWebRequest)WebRequest.Create(item.Url);
 				SetCerList(item);
 				//将证书添加到请求里  
-				_request.ClientCertificates.Add(new X509Certificate(item.CerPath));
+				_request.Credentials=new X509Certificate(item.CerPath));
 			}
 			else
 			{
@@ -292,6 +338,7 @@ namespace DotnetSpider.Core.Utils
 				_request = (HttpWebRequest)WebRequest.Create(item.Url);
 				SetCerList(item);
 			}
+#endif
 		}
 		/// <summary>  
 		/// 设置多个证书  
@@ -299,6 +346,7 @@ namespace DotnetSpider.Core.Utils
 		/// <param name="item"></param>  
 		private void SetCerList(HttpItem item)
 		{
+#if !NET_CORE
 			if (item.ClentCertificates != null && item.ClentCertificates.Count > 0)
 			{
 				foreach (X509Certificate c in item.ClentCertificates)
@@ -306,6 +354,7 @@ namespace DotnetSpider.Core.Utils
 					_request.ClientCertificates.Add(c);
 				}
 			}
+#endif
 		}
 		/// <summary>  
 		/// 设置Cookie  
@@ -319,7 +368,11 @@ namespace DotnetSpider.Core.Utils
 			{
 				_request.CookieContainer = new CookieContainer();
 				if (item.CookieCollection != null && item.CookieCollection.Count > 0)
+#if NET_CORE
+					_request.CookieContainer.Add(new Uri(item.Url), item.CookieCollection);
+#else
 					_request.CookieContainer.Add(item.CookieCollection);
+#endif
 			}
 		}
 		/// <summary>  
@@ -344,9 +397,14 @@ namespace DotnetSpider.Core.Utils
 				}//写入文件  
 				else if (item.PostDataType == PostDataType.FilePath && !string.IsNullOrEmpty(item.Postdata))
 				{
-					StreamReader r = new StreamReader(item.Postdata, _postencoding);
+					StreamReader r = new StreamReader(File.OpenRead(item.Postdata), _postencoding);
 					buffer = _postencoding.GetBytes(r.ReadToEnd());
+#if NET_CORE
+					r.Dispose();
+#else
 					r.Close();
+#endif
+
 				} //写入字符串  
 				else if (!string.IsNullOrEmpty(item.Postdata))
 				{
@@ -354,8 +412,14 @@ namespace DotnetSpider.Core.Utils
 				}
 				if (buffer != null)
 				{
+#if NET_CORE
+					_request.Headers["Content-Length"] = buffer.Length.ToString();
+					_request.GetRequestStreamAsync().Result.Write(buffer, 0, buffer.Length);
+#else
 					_request.ContentLength = buffer.Length;
 					_request.GetRequestStream().Write(buffer, 0, buffer.Length);
+#endif
+
 				}
 			}
 		}
@@ -373,23 +437,11 @@ namespace DotnetSpider.Core.Utils
 			if (!string.IsNullOrEmpty(item.ProxyIp) && !isIeProxy)
 			{
 				//设置代理服务器  
-				if (item.ProxyIp.Contains(":"))
-				{
-					string[] plist = item.ProxyIp.Split(':');
-					WebProxy myProxy = new WebProxy(plist[0].Trim(), Convert.ToInt32(plist[1].Trim()));
-					//建议连接  
-					myProxy.Credentials = new NetworkCredential(item.ProxyUserName, item.ProxyPwd);
-					//给当前请求对象  
-					_request.Proxy = myProxy;
-				}
-				else
-				{
-					WebProxy myProxy = new WebProxy(item.ProxyIp, false);
-					//建议连接  
-					myProxy.Credentials = new NetworkCredential(item.ProxyUserName, item.ProxyPwd);
-					//给当前请求对象  
-					_request.Proxy = myProxy;
-				}
+				IWebProxy myProxy = new UseSpecifiedUriWebProxy(new Uri(item.ProxyIp));
+				//建议连接  
+				myProxy.Credentials = new NetworkCredential(item.ProxyUserName, item.ProxyPwd);
+				//给当前请求对象  
+				_request.Proxy = myProxy;
 			}
 			else if (isIeProxy)
 			{
@@ -397,7 +449,10 @@ namespace DotnetSpider.Core.Utils
 			}
 			else
 			{
-				_request.Proxy = item.WebProxy;
+				if (item.WebProxy != null)
+				{
+					_request.Proxy = item.WebProxy;
+				}
 			}
 		}
 		#endregion
@@ -419,6 +474,9 @@ namespace DotnetSpider.Core.Utils
 	/// </summary>  
 	public class HttpItem
 	{
+		public static readonly Version Version10 = new Version("1.0");
+		public static readonly Version Version11 = new Version("1.1");
+
 		string _url = string.Empty;
 		/// <summary>  
 		/// 请求URL必须填写  
@@ -527,11 +585,11 @@ namespace DotnetSpider.Core.Utils
 			get { return _postdataByte; }
 			set { _postdataByte = value; }
 		}
-		private WebProxy _webProxy;
+		private IWebProxy _webProxy;
 		/// <summary>  
 		/// 设置代理对象，不想使用IE默认配置就设置为Null，而且不要设置ProxyIp  
 		/// </summary>  
-		public WebProxy WebProxy
+		public IWebProxy WebProxy
 		{
 			get { return _webProxy; }
 			set { _webProxy = value; }
@@ -841,4 +899,3 @@ namespace DotnetSpider.Core.Utils
 		CookieCollection
 	}
 }
-#endif

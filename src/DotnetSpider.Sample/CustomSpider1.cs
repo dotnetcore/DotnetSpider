@@ -1,4 +1,6 @@
-﻿using DotnetSpider.Extension;
+﻿using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Extension;
+using NLog;
 using System;
 
 namespace DotnetSpider.Sample
@@ -16,3 +18,4 @@ namespace DotnetSpider.Sample
 		}
 	}
 }
+
