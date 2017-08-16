@@ -1,24 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>    
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+  <PropertyGroup>
+    <TargetFramework>net45</TargetFramework>
+    <Version>2.0.0</Version>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETCOREAPP1_1;NET_CORE;</DefineConstants>
+ <PropertyGroup>
+    <AssemblyTitle>DotnetSpider</AssemblyTitle>
+    <DefineConstants>NET_45;$(AdditionalConstants)</DefineConstants>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE;RELEASE;NETCOREAPP1_1;NET_CORE</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
-  </ItemGroup>
-
+    <Reference Include="Microsoft.CSharp" />    
+    <Reference Include="System.Net.Http" />
+  </ItemGroup> 
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
   </ItemGroup>

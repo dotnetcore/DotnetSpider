@@ -58,6 +58,21 @@ namespace DotnetSpider.Core.Test.Downloader
 		}
 
 		[TestMethod]
+		public void DetectDownloadContent()
+		{
+			HttpClientDownloader downloader = new HttpClientDownloader();
+			DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
+
+			downloader.Download(new Request("http://www.163.com", null), spider);
+			Assert.AreEqual(ContentType.Html, spider.Site.ContentType);
+
+			HttpClientDownloader2 downloader2 = new HttpClientDownloader2();
+			DefaultSpider spider2 = new DefaultSpider("abcd", new Site { Timeout = 5000 });
+			downloader2.Download(new Request("http://www.163.com", null), spider2);
+			Assert.AreEqual(ContentType.Json, spider2.Site.ContentType);
+		}
+
+		[TestMethod]
 		public void SetContentType()
 		{
 			Site site1 = new Site
@@ -91,6 +106,14 @@ namespace DotnetSpider.Core.Test.Downloader
 			spider.AddStartUrl("http://www.mlr.gov.cn/xwdt/jrxw/201707/t20170710_15242382.htm");
 			spider.Run();
 			Assert.AreEqual(4, spider.RetriedTimes.Value);
+		}
+
+		class HttpClientDownloader2 : HttpClientDownloader
+		{
+			protected override Page DowloadContent(Request request, ISpider spider)
+			{
+				return new Page(request) { Content = "{'a':'b'}" };
+			}
 		}
 	}
 }

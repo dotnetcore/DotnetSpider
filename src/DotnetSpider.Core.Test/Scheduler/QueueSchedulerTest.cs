@@ -22,12 +22,13 @@ namespace DotnetSpider.Core.Test.Scheduler
 				scheduler.Push(new Request("http://www.b.com", null));
 				scheduler.Push(new Request($"http://www.{i.ToString()}.com", null));
 			});
-
+			System.Threading.Thread.Sleep(2000);
 			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 30 }, i =>
 			{
 				scheduler.Poll();
 			});
 
+			System.Threading.Thread.Sleep(2000);
 			long left = scheduler.GetLeftRequestsCount();
 			long total = scheduler.GetTotalRequestsCount();
 

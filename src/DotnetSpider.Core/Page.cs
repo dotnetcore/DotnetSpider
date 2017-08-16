@@ -31,7 +31,7 @@ namespace DotnetSpider.Core
 
 		public string Title { get; set; }
 
-		public ContentType ContentType { get; set; }
+		public ContentType ContentType { get; set; } = ContentType.Html;
 
 		/// <summary>
 		/// Get request of current page
@@ -78,12 +78,11 @@ namespace DotnetSpider.Core
 
 		public string[] Domains { get; }
 
-		public Page(Request request, ContentType contentType, params string[] domains)
+		public Page(Request request, params string[] domains)
 		{
 			Request = request;
 			Url = request.Url.ToString();
 			ResultItems.Request = request;
-			ContentType = contentType;
 			RemoveOutboundLinks = domains != null && domains.Length > 0;
 			Domains = domains;
 		}

@@ -1,9 +1,9 @@
-﻿
+﻿using DotnetSpider.Core.Infrastructure;
+using System.Threading;
+#if !NET_45
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
-using DotnetSpider.Core.Infrastructure;
-using System.Threading;
+#endif
 
 namespace DotnetSpider.Core.Redial.Redialer
 {
@@ -15,6 +15,14 @@ namespace DotnetSpider.Core.Redial.Redialer
 
 		public override void Redial()
 		{
+#if NET_45
+			AdslCommand adsl = new AdslCommand(Interface, Account, Password);
+			adsl.Disconnect();
+			while (adsl.Connect() != 0)
+			{
+				Thread.Sleep(2000);
+			}
+#else
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
 				Process process = Process.Start("adsl-stop");
@@ -35,6 +43,7 @@ namespace DotnetSpider.Core.Redial.Redialer
 			{
 				throw new RedialException("Unsport this OS.");
 			}
+#endif
 		}
 	}
 }

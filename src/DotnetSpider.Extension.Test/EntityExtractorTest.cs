@@ -23,7 +23,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				{ "cat", "手机" },
 				{ "cat3", "110" }
-			}), ContentType.Html, null)
+			}), null)
 			{
 				Content = File.ReadAllText(Path.Combine(Core.Infrastructure.Environment.BaseDirectory, "Jd.html"))
 			});

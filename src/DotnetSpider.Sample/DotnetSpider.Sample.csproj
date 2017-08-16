@@ -2,21 +2,26 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFrameworks Condition="'$(LibraryFrameworks)'==''">net45;netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks Condition="'$(LibraryFrameworks)'!=''">$(LibraryFrameworks)</TargetFrameworks>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETCOREAPP1_1;NET_CORE;</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
+    <AssemblyTitle>DotnetSpider</AssemblyTitle>
+    <DefineConstants>NET_45;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <AssemblyTitle>DotnetSpider</AssemblyTitle>
+    <DefineConstants>NET_CORE;$(AdditionalConstants)</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE;RELEASE;NETCOREAPP1_1;NET_CORE</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Dapper" Version="1.50.2" />
   </ItemGroup>
-
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+    <PackageReference Include="Tesseract" Version="3.0.2" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
@@ -39,6 +44,10 @@
     <None Update="TextFile1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

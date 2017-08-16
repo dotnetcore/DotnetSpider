@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			var site = spider.Site;
 			request.StatusCode = HttpStatusCode.OK;
-			Page page = new Page(request, spider.Site.ContentType, site.RemoveOutboundLinks ? site.Domains : null)
+			Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
 			{
 				Content = File.ReadAllText(request.Url.LocalPath),
 				TargetUrl = request.Url.ToString()

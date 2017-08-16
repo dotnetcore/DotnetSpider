@@ -1,22 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFrameworks Condition="'$(LibraryFrameworks)'==''">net45;netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks Condition="'$(LibraryFrameworks)'!=''">$(LibraryFrameworks)</TargetFrameworks>
+    <Version>2.0.0</Version>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD1_6;NET_CORE;NETSTANDARD1_6</DefineConstants>
-    <OutputPath>C:\solutions\DotnetSpider\output\</OutputPath>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
+    <AssemblyTitle>DotnetSpider</AssemblyTitle>
+    <DefineConstants>NET_45;$(AdditionalConstants)</DefineConstants>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE;RELEASE;NETSTANDARD1_6;NET_CORE</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <AssemblyTitle>DotnetSpider</AssemblyTitle>
+    <DefineConstants>NET_CORE;$(AdditionalConstants)</DefineConstants>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.2" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
   </ItemGroup>
-
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+  </ItemGroup>  
 </Project>

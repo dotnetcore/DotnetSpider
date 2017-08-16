@@ -625,7 +625,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				}, i =>
 				{
 					int waitCount = 0;
-					bool firstTask = true;
+					//bool firstTask = true;
 
 					using (var downloader = Downloader.Clone())
 					{
@@ -673,15 +673,17 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 									}
 								}
 
-								if (firstTask)
-								{
-									Thread.Sleep(3000);
-									firstTask = false;
-								}
+								//if (firstTask)
+								//{
+								//	Thread.Sleep(3000);
+								//	firstTask = false;
+								//}
 							}
 						}
 					}
 				});
+
+				Thread.Sleep(3000);
 			}
 
 			FinishedTime = DateTime.Now;
@@ -835,7 +837,9 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 		public static Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
 		{
-			Page page = new Page(request, site.ContentType, null);
+			Page page = new Page(request, null);
+			page.ContentType = site.ContentType;
+
 			if (!resultIsEmpty)
 			{
 				dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);

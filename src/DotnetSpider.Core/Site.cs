@@ -18,7 +18,7 @@ namespace DotnetSpider.Core
 
 		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
-		public ContentType ContentType { get; set; } = ContentType.Html;
+		public ContentType ContentType { get; set; } = ContentType.Auto;
 		public bool RemoveOutboundLinks { get; set; }
 		/// <summary>
 		/// 采集目标域名的正则

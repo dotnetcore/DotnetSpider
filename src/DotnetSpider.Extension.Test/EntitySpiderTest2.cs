@@ -395,12 +395,19 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void SqlServerDataTypeTests()
 		{
-			using (var conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"))
+			using (var conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true"))
 			{
+				try
+				{
+					conn.Execute("create database test;");
+				}
+				catch
+				{
+				}
 				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
 				context.ThreadNum = 1;
-				context.AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"));
+				context.AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true"));
 
 				context.AddStartUrl("http://baidu.com");
 				context.AddEntityType(typeof(Entity15));

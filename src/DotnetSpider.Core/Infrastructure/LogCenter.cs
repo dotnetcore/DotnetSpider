@@ -13,7 +13,11 @@ namespace DotnetSpider.Core.Infrastructure
 
 		static LogCenter()
 		{
+#if NET_45
+			string nlogConfigPath = Path.Combine(Environment.BaseDirectory, "nlog.net45.config");
+#else
 			string nlogConfigPath = Path.Combine(Environment.BaseDirectory, "nlog.config");
+#endif
 
 			if (!File.Exists(nlogConfigPath))
 			{

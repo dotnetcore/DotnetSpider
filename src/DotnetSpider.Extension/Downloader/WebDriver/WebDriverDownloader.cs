@@ -119,7 +119,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 
 				Thread.Sleep(_webDriverWaitTime);
 
-				Page page = new Page(request, spider.Site.ContentType, site.RemoveOutboundLinks ? site.Domains : null)
+				Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
 				{
 					Content = _webDriver.PageSource,
 					TargetUrl = _webDriver.Url,
@@ -132,7 +132,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 			}
 			catch (DownloadException de)
 			{
-				Page page = new Page(request, site.ContentType, null) { Exception = de };
+				Page page = new Page(request, null) { Exception = de };
 				if (site.CycleRetryTimes > 0)
 				{
 					page = Spider.AddToCycleRetry(request, site);
@@ -142,7 +142,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 			}
 			catch (HttpRequestException he)
 			{
-				Page page = new Page(request, site.ContentType, null) { Exception = he };
+				Page page = new Page(request, null) { Exception = he };
 				if (site.CycleRetryTimes > 0)
 				{
 					page = Spider.AddToCycleRetry(request, site);
@@ -152,7 +152,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, site.ContentType, null) { Exception = e };
+				Page page = new Page(request, null) { Exception = e };
 				return page;
 			}
 		}

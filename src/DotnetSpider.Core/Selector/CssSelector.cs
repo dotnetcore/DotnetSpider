@@ -3,9 +3,7 @@ using System.Text;
 using System.Linq;
 using HtmlAgilityPack;
 using System;
-#if NET_CORE
 using DotnetSpider.HtmlAgilityPack;
-#endif
 
 namespace DotnetSpider.Core.Selector
 {

@@ -124,7 +124,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.MyLog(Identity, $"退出任务: {Name}", LogLevel.Info);
+				Logger.MyLog(Identity, $"退出任务: {Name}: {e}", LogLevel.Error, e);
 
 				if (!string.IsNullOrEmpty(ConnectString))
 				{

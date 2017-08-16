@@ -2,6 +2,7 @@
 {
 	public enum ContentType
 	{
+		Auto,
 		Html,
 		Json,
 		File

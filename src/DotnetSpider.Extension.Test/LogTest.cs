@@ -27,9 +27,9 @@ namespace DotnetSpider.Extension.Test
 			string id = Guid.NewGuid().ToString("N");
 			string taskGroup = Guid.NewGuid().ToString("N");
 			string userId = Guid.NewGuid().ToString("N");
-			string connectString = "Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306";
+			string connectString = "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306";
 			Core.Infrastructure.Config.SetValue("connectString", connectString);
-			Assert.AreEqual("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", Core.Infrastructure.Config.GetValue("connectString"));
+			Assert.AreEqual("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", Core.Infrastructure.Config.GetValue("connectString"));
 
 			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 				id,
@@ -47,7 +47,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			using (MySqlConnection conn = new MySqlConnection(connectString))
 			{
-				Assert.AreEqual(9, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{id}'").First().Count);
+				Assert.AreEqual(15, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{id}'").First().Count);
 				Assert.AreEqual(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count);
 			}
 		}

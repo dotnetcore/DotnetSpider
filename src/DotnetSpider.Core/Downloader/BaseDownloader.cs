@@ -1,4 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NLog;
 using System;
 using System.IO;
@@ -9,6 +11,9 @@ namespace DotnetSpider.Core.Downloader
 	public abstract class BaseDownloader : Named, IDownloader, IDisposable
 	{
 		protected readonly static ILogger Logger = LogCenter.GetLogger();
+
+		protected bool IsDetectedContentType { get; set; } = false;
+
 		public IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }
 		public IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }
 
@@ -33,6 +38,31 @@ namespace DotnetSpider.Core.Downloader
 			BeforeDownload(request, spider);
 
 			var result = DowloadContent(request, spider);
+
+			if (!IsDetectedContentType)
+			{
+				lock (this)
+				{
+					if (result != null && result.Exception == null && spider.Site.ContentType == ContentType.Auto)
+					{
+						try
+						{
+							JToken.Parse(result.Content);
+							spider.Site.ContentType = ContentType.Json;
+						}
+						catch
+						{
+							spider.Site.ContentType = ContentType.Html;
+						}
+						finally
+						{
+							IsDetectedContentType = true;
+						}
+					}
+				}
+			}
+
+			result.ContentType = spider.Site.ContentType;
 
 			AfterDownloadComplete(ref result, spider);
 
@@ -97,7 +127,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 			}
 			Logger.MyLog(spider.Identity, $"下载文件: {request.Url} 成功.", LogLevel.Info);
-			return new Page(request, ContentType.File, null) { IsSkip = true };
+			return new Page(request, null) { IsSkip = true };
 		}
 	}
 }

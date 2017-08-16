@@ -90,7 +90,7 @@ namespace DotnetSpider.Core.Downloader
 					if (!site.DownloadFiles)
 					{
 						Logger.MyLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
-						return new Page(request, site.ContentType, null) { IsSkip = true };
+						return new Page(request, null) { IsSkip = true };
 					}
 					else
 					{
@@ -129,7 +129,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (DownloadException de)
 			{
-				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, site.ContentType, null);
+				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, null);
 
 				if (page != null)
 				{
@@ -141,18 +141,18 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (HttpRequestException he)
 			{
-				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, site.ContentType, null);
+				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, null);
 				if (page != null)
 				{
 					page.Exception = he;
 				}
-				
+
 				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {he.Message}.", LogLevel.Warn);
 				return page;
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, site.ContentType, null);
+				Page page = new Page(request, null);
 				if (page != null)
 				{
 					page.Exception = e;
@@ -294,7 +294,7 @@ namespace DotnetSpider.Core.Downloader
 #endif
 			}
 
-			Page page = new Page(request, site.ContentType, site.RemoveOutboundLinks ? site.Domains : null)
+			Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
 			{
 				Content = content
 			};

@@ -1,6 +1,6 @@
-﻿using DotnetSpider.Core.Utils;
-using DotnetSpider.Extension.Infrastructure;
+﻿using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Runner;
+using Newtonsoft.Json.Linq;
 using System;
 #if !NET_CORE
 using System.Threading;
@@ -28,6 +28,7 @@ namespace DotnetSpider.Sample
 			OcrDemo.Process();
 #endif
 
+			var t = JToken.Parse("{'a':'b'}");
 			//HttpHelper helper = new HttpHelper();
 			//var result = helper.GetHtml(new HttpItem
 			//{

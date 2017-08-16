@@ -23,7 +23,7 @@ namespace DotnetSpider.Core.Test
 		public void Deep()
 		{
 			var request = GetRequest();
-			Page page = new Page(request, ContentType.Html);
+			Page page = new Page(request);
 			page.AddTargetRequest("http://taobao.com/bbb");
 			Assert.AreEqual(page.TargetRequests.First().Depth, 2);
 		}

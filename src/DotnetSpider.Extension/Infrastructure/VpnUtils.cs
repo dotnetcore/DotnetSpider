@@ -5,6 +5,7 @@ using System.Diagnostics;
 using DotRas;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Linq;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
@@ -155,7 +156,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			// 创建一个新Vpn
 			else
 			{
-				RasEntry entry = RasEntry.CreateVpnEntry(updateVpNname, updateVpNip, RasVpnStrategy.PptpFirst, RasDevice.GetDeviceByName("(PPTP)", RasDeviceType.Vpn));
+				RasEntry entry = RasEntry.CreateVpnEntry(updateVpNname, updateVpNip, RasVpnStrategy.PptpFirst, RasDevice.GetDevices().First(d => d.Name == "(PPTP)"));
 				allUsersPhoneBook.Entries.Add(entry);
 				dialer.EntryName = updateVpNname;
 				dialer.PhoneBookPath = RasPhoneBook.GetPhoneBookPath(RasPhoneBookType.AllUsers);

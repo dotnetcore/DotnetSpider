@@ -1,7 +1,7 @@
 ﻿using DotnetSpider.Core.Processor;
 using System.Linq;
-using System.Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Net.Http;
 
 namespace DotnetSpider.Core.Test.Processor
 {
@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Test.Processor
 			HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com").Result;
 
-			Page page = new Page(new Request("http://www.cnblogs.com/", null), ContentType.Html, null);
+			Page page = new Page(new Request("http://www.cnblogs.com/", null), null);
 			page.Content = html;
 
 			CnblogsProcessor1 processor = new CnblogsProcessor1();
@@ -58,7 +58,7 @@ namespace DotnetSpider.Core.Test.Processor
 			HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com").Result;
 
-			Page page = new Page(new Request("http://www.cnblogs.com/", null), ContentType.Html, null);
+			Page page = new Page(new Request("http://www.cnblogs.com/", null), null);
 			page.Content = html;
 
 			CnblogsProcessor2 processor = new CnblogsProcessor2();
@@ -89,7 +89,7 @@ namespace DotnetSpider.Core.Test.Processor
 			HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com").Result;
 
-			Page page = new Page(new Request("http://www.cnblogs.com/", null), ContentType.Html, null);
+			Page page = new Page(new Request("http://www.cnblogs.com/", null), null);
 			page.Content = html;
 
 			CnblogsProcessor3 processor = new CnblogsProcessor3();
@@ -118,7 +118,7 @@ namespace DotnetSpider.Core.Test.Processor
 			HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com/sitehome/p/2/").Result;
 
-			Page page = new Page(new Request("http://www.cnblogs.com/sitehome/p/2/", null), ContentType.Html, null);
+			Page page = new Page(new Request("http://www.cnblogs.com/sitehome/p/2/", null), null);
 			page.Content = html;
 
 			CnblogsProcessor4 processor = new CnblogsProcessor4();
