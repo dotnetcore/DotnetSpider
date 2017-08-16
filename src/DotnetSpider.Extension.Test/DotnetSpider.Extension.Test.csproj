@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>    
+  <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <Version>2.0.0</Version>
     <ApplicationIcon />
@@ -8,7 +8,7 @@
     <StartupObject />
   </PropertyGroup>
 
- <PropertyGroup>
+  <PropertyGroup>
     <AssemblyTitle>DotnetSpider</AssemblyTitle>
     <DefineConstants>DEBUG</DefineConstants>
   </PropertyGroup>
@@ -18,8 +18,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
-    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />    
-    <Reference Include="System.Net.Http" />    
+    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +35,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Jd.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="nlog.net452.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="nlog.config">
