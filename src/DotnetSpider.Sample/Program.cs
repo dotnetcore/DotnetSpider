@@ -2,7 +2,7 @@
 using DotnetSpider.Runner;
 using Newtonsoft.Json.Linq;
 using System;
-#if !NET_CORE
+#if !NETCOREAPP2_0
 using System.Threading;
 #else
 using System.Text;
@@ -10,18 +10,11 @@ using System.Text;
 
 namespace DotnetSpider.Sample
 {
-
 	public class Program
 	{
-		public class MySqlEngine
-		{
-			public string Engine { get; set; }
-			public string Support { get; set; }
-		}
-
 		public static void Main(string[] args)
 		{
-#if NET_CORE
+#if NETCOREAPP2_0
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
 			ThreadPool.SetMinThreads(200, 200);

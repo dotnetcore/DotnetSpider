@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-#if !NET_45
+#if !NET452
 using Microsoft.Extensions.DependencyModel;
 using System.Text;
 #endif
@@ -22,7 +22,7 @@ namespace DotnetSpider.Runner
 			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.White;
 
-#if !NET_45
+#if !NET452
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 			Dictionary<string, string> arguments = new Dictionary<string, string>();
@@ -70,12 +70,12 @@ namespace DotnetSpider.Runner
 				spiderName = arguments["-s"];
 			}
 
-#if !NET_45
+#if !NET452
 			var deps = DependencyContext.Default;
 #endif
 			int totalTypesCount = 0;
 			var spiders = new Dictionary<string, object>();
-#if !NET_45
+#if !NET452
 			foreach (var library in deps.CompileLibraries.Where(l => l.Name.ToLower().EndsWith("dotnetspider.sample") || l.Name.ToLower().EndsWith("spiders") || l.Name.ToLower().EndsWith("crawlers")))
 			{
 				var asm = Assembly.Load(new AssemblyName(library.Name));
@@ -257,7 +257,7 @@ namespace DotnetSpider.Runner
 			Console.WriteLine("=================================================================");
 		}
 
-#if NET_45
+#if NET452
 		private static List<string> DetectDlls()
 		{
 			var path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory);

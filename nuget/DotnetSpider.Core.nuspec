@@ -25,7 +25,7 @@
         <dependency id="NLog" version="5.0.0-beta09"/>
         <dependency id="System.Diagnostics.Process" version="4.3.0"/>
       </group>
-      <group targetFramework=".NETFramework4.5">
+      <group targetFramework=".NETFramework4.5.2">
         <dependency id="Autofac" version="4.6.1"/>
         <dependency id="HtmlAgilityPack" version="1.5.1"/>
         <dependency id="NLog" version="4.4.12"  />
@@ -34,9 +34,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\output\netstandard2.0\DotnetSpider.HtmlAgilityPack.Css.dll" target="lib\netstandard1.6\DotnetSpider.HtmlAgilityPack.Css.dll" />
-    <file src="..\output\netstandard2.0\DotnetSpider.Core.dll" target="lib\netstandard1.6\DotnetSpider.Core.dll" />
-    <file src="..\output\net45\DotnetSpider.Core.dll" target="lib\net45\DotnetSpider.Core.dll" />
-    <file src="..\output\net45\DotnetSpider.HtmlAgilityPack.Css.dll" target="lib\net45\DotnetSpider.HtmlAgilityPack.Css.dll" />
+    <file src="..\output\netstandard2.0\DotnetSpider.HtmlAgilityPack.Css.dll" target="lib\netstandard2.0\DotnetSpider.HtmlAgilityPack.Css.dll" />
+    <file src="..\output\netstandard2.0\DotnetSpider.Core.dll" target="lib\netstandard2.0\DotnetSpider.Core.dll" />
+    <file src="..\output\net452\DotnetSpider.Core.dll" target="lib\net452\DotnetSpider.Core.dll" />
+    <file src="..\output\net452\DotnetSpider.HtmlAgilityPack.Css.dll" target="lib\net452\DotnetSpider.HtmlAgilityPack.Css.dll" />
   </files>
 </package>

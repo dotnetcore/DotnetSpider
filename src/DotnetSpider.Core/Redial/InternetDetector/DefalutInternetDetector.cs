@@ -1,4 +1,4 @@
-﻿#if !NET_45
+﻿#if !NET452
 using System;
 using System.Net.Http;
 using System.Threading;

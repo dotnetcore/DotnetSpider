@@ -109,7 +109,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 			Rasconn lprasConn = new Rasconn
 			{
-#if NET_45
+#if NET452
 				DwSize = Marshal.SizeOf(typeof(Rasconn)),
 #else
 				DwSize = Marshal.SizeOf<Rasconn>(),
@@ -119,7 +119,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 
 			int lpcConnections = 0;
-#if NET_45
+#if NET452
 			var lpcb = Marshal.SizeOf(typeof(Rasconn));
 #else
 			var lpcb = Marshal.SizeOf<Rasconn>();
@@ -166,7 +166,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 			int lpNames = 1;
 
-#if NET_45
+#if NET452
 			var entryNameSize = Marshal.SizeOf(typeof(RasEntryName));
 #else
 			var entryNameSize = Marshal.SizeOf<RasEntryName>();

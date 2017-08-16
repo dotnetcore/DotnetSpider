@@ -1,6 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using System.Threading;
-#if !NET_45
+#if !NET452
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 #endif
@@ -15,7 +15,7 @@ namespace DotnetSpider.Core.Redial.Redialer
 
 		public override void Redial()
 		{
-#if NET_45
+#if NET452
 			AdslCommand adsl = new AdslCommand(Interface, Account, Password);
 			adsl.Disconnect();
 			while (adsl.Connect() != 0)

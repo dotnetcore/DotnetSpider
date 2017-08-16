@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net452</TargetFramework>
     <Version>2.0.0</Version>
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
@@ -8,7 +8,7 @@
   </PropertyGroup>
  <PropertyGroup>
     <AssemblyTitle>DotnetSpider</AssemblyTitle>
-    <DefineConstants>NET_45;$(AdditionalConstants)</DefineConstants>
+    <DefineConstants>DEBUG;NET452</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.2" />
