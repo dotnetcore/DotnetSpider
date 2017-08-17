@@ -1,6 +1,5 @@
 ﻿using System;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;

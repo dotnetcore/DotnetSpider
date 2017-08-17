@@ -2,7 +2,6 @@
 using System.Text;
 using System.Linq;
 using HtmlAgilityPack;
-using System;
 using DotnetSpider.HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Selector

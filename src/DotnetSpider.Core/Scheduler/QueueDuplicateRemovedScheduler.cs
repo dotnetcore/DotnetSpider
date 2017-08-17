@@ -1,7 +1,6 @@
 using DotnetSpider.Core.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace DotnetSpider.Core.Scheduler
 {

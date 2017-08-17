@@ -196,37 +196,9 @@ namespace DotnetSpider.Runner
 			}
 			else
 			{
-				method.Invoke(spider, new object[] { new string[] { arguments["-a"] } });
+				method.Invoke(spider, new object[] { arguments["-a"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries) });
 			}
 		}
-
-		//private static void InsertExecuteRecord(string spiderName, string commands, string taskId, string identity)
-		//{
-		//	if (!string.IsNullOrEmpty(Config.ConnectString))
-		//	{
-		//		using (var conn = new MySqlConnection(Config.ConnectString))
-		//		{
-		//			conn.Execute("INSERT IGNORE INTO dotnetspider.`task_execute_history` (`task_id` ,`identity`,`spider_name`,`commands`) VALUES (@task_id, @identity , @spider_name , @commands)", new
-		//			{
-		//				task_id = taskId,
-		//				identity = identity,
-		//				spider_name = spiderName,
-		//				commands = commands
-		//			});
-		//		}
-		//	}
-		//}
-
-		//private static void CreateTable()
-		//{
-		//	if (!string.IsNullOrEmpty(Config.ConnectString))
-		//	{
-		//		using (var conn = new MySqlConnection(Config.ConnectString))
-		//		{
-		//			conn.Execute("CREATE TABLE IF NOT EXISTS dotnetspider.`task_execute_history` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`task_id` varchar(128) DEFAULT NULL,`identity` varchar(128) DEFAULT NULL, `spider_name` varchar(128) DEFAULT NULL, `commands` varchar(500) DEFAULT NULL,`cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(`id`),KEY `TASKID` (`task_id`),KEY `IDENTITY` (`identity`)) ENGINE = InnoDB DEFAULT CHARSET = utf8;");
-		//		}
-		//	}
-		//}
 
 		private static void PrintInfo()
 		{

@@ -1,6 +1,5 @@
 using DotnetSpider.Core.Scheduler.Component;
 using System.Collections.Generic;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Core.Scheduler

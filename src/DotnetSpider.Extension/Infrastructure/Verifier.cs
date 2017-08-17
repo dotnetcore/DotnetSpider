@@ -10,7 +10,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using NLog;
-using MailKit.Security;
 
 namespace DotnetSpider.Extension.Infrastructure
 {

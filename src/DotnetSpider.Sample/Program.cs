@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Runner;
-using Newtonsoft.Json.Linq;
+﻿using DotnetSpider.Runner;
 using System;
 #if !NETCOREAPP2_0
 using System.Threading;

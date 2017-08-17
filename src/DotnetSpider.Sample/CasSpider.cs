@@ -6,7 +6,6 @@ using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
-using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
 {

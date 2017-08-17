@@ -6,7 +6,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader.WebDriver;
-using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core;
 

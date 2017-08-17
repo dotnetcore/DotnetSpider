@@ -1,4 +1,3 @@
-using System;
 using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension

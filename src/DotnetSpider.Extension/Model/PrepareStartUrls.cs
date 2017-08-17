@@ -6,7 +6,6 @@ using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
 #if !NET_CORE
 using System.Web;

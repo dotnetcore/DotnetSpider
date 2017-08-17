@@ -3,7 +3,6 @@ using DotnetSpider.Core.Downloader;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Core.Scheduler;
 using static DotnetSpider.Core.Test.SpiderTest;
-using System;
 using DotnetSpider.Core.Pipeline;
 
 namespace DotnetSpider.Core.Test.Downloader

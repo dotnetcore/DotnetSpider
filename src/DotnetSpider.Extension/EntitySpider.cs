@@ -9,7 +9,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using Newtonsoft.Json;
-using DotnetSpider.Extension.Redial;
 using DotnetSpider.Core.Infrastructure;
 using System.Threading;
 using DotnetSpider.Extension.Processor;
@@ -18,7 +17,7 @@ using DotnetSpider.Extension.Infrastructure;
 using MySql.Data.MySqlClient;
 using System.Data;
 using NLog;
-using DotnetSpider.Core.Monitor;
+using Dapper;
 using DotnetSpider.Extension.Monitor;
 
 namespace DotnetSpider.Extension
@@ -364,18 +363,9 @@ namespace DotnetSpider.Extension
 			{
 				using (IDbConnection conn = new MySqlConnection(ConnectString))
 				{
-					conn.Open();
-					var command = conn.CreateCommand();
-					command.CommandType = CommandType.Text;
-
-					command.CommandText = "CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;";
-					command.ExecuteNonQuery();
-
-					command.CommandText = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_running` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `taskId` varchar(120) NOT NULL, `name` varchar(200) NULL, `identity` varchar(120), `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `taskId_unique` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8";
-					command.ExecuteNonQuery();
-
-					command.CommandText = $"INSERT IGNORE INTO `dotnetspider`.`task_running` (`taskId`,`name`,`identity`,`cdate`) values ('{TaskId}','{Name}','{Identity}','{DateTime.Now}');";
-					command.ExecuteNonQuery();
+					conn.Execute("CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;");
+					conn.Execute("CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_running` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `taskId` varchar(120) NOT NULL, `name` varchar(200) NULL, `identity` varchar(120), `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `taskId_unique` (`taskId`)) ENGINE=InnoDB AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
+					conn.Execute($"INSERT IGNORE INTO `dotnetspider`.`task_running` (`taskId`,`name`,`identity`,`cdate`) values ('{TaskId}','{Name}','{Identity}','{DateTime.Now}');");
 				}
 			}
 		}
@@ -386,12 +376,7 @@ namespace DotnetSpider.Extension
 			{
 				using (IDbConnection conn = new MySqlConnection(ConnectString))
 				{
-					conn.Open();
-					var command = conn.CreateCommand();
-					command.CommandType = CommandType.Text;
-
-					command.CommandText = $"DELETE FROM `dotnetspider`.`task_running` WHERE `identity`='{Identity}';";
-					command.ExecuteNonQuery();
+					conn.Execute($"DELETE FROM `dotnetspider`.`task_running` WHERE `identity`='{Identity}';");
 				}
 			}
 		}

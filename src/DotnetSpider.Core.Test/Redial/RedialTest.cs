@@ -6,8 +6,6 @@ using DotnetSpider.Core.Redial.Redialer;
 using DotnetSpider.Core.Scheduler;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DotnetSpider.Core.Test.Redial
 {

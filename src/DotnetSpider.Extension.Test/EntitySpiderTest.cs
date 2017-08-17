@@ -60,6 +60,7 @@ namespace DotnetSpider.Extension.Test
 		//}
 
 		[TestMethod]
+		[Ignore]
 		public void RedisKeepConnect()
 		{
 			var confiruation = new ConfigurationOptions()
