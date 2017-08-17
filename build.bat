@@ -1,6 +1,5 @@
 rem build
-dotnet restore DotnetSpider.sln
-dotnet build DotnetSpider.sln
+dotnet build DotnetSpider.sln -c Release
 cd %cd%\nuget
 rem clear old nuget packages
 for %%i in (*.nupkg) do del /q/a/f/s %%i

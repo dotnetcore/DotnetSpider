@@ -224,7 +224,7 @@ namespace DotnetSpider.Runner
 		//	}
 		//}
 
-		public static void PrintInfo()
+		private static void PrintInfo()
 		{
 			bool isPrinted;
 			var key = "_DotnetSpider_Info";
