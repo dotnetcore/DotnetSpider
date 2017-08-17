@@ -230,6 +230,8 @@ namespace DotnetSpider.Runner
 
 		private static void PrintInfo()
 		{
+			Console.WriteLine();
+
 			bool isPrinted;
 			var key = "_DotnetSpider_Info";
 

@@ -9,7 +9,7 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 
 ### DEVELOP ENVIROMENT
 - Visual Studio 2017(15.3)
-- ![.NET CORE 2.0] (https://download.microsoft.com/download/0/F/D/0FD852A4-7EA1-4E2A-983A-0484AC19B92C/dotnet-sdk-2.0.0-win-x64.exe)
+- [.NET CORE 2.0] (https://download.microsoft.com/download/0/F/D/0FD852A4-7EA1-4E2A-983A-0484AC19B92C/dotnet-sdk-2.0.0-win-x64.exe)
 
 ### OPTIONAL ENVIROMENT
 

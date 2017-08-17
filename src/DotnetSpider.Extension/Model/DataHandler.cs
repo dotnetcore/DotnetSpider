@@ -8,7 +8,12 @@ namespace DotnetSpider.Extension.Model
 	{
 		public virtual List<JObject> Handle(List<JObject> datas, Page page)
 		{
-			List<JObject> results = new List<JObject>();
+			if (datas == null || datas.Count == 0)
+			{
+				return datas;
+			}
+
+			List<JObject> results =new List<JObject>();
 			foreach (var data in datas)
 			{
 				var tmp = HandleDataOject(data, page);

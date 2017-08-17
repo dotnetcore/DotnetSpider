@@ -8,6 +8,7 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using DotnetSpider.Extension.Processor;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -37,6 +38,21 @@ namespace DotnetSpider.Extension.Test
 			Assert.AreEqual("1000000904", results[0].GetValue("VenderId"));
 			Assert.AreEqual("1000000904", results[0].GetValue("JdzyShopId"));
 			Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), results[0].GetValue("RunId"));
+		}
+
+		[TestMethod]
+		public void TempEntityNoPrimaryInfo()
+		{
+			var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity1).GetTypeInfo());
+
+			EntityProcessor processor = new EntityProcessor(new Site(), entityMetadata);
+			var page = new Page(new Request("http://www.abcd.com"))
+			{
+				Content = "{'data':[{'age':'1'},{'age':'2'}]}",
+				ContentType = ContentType.Json
+			};
+			processor.Process(page);
+			Assert.AreEqual(2, page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1").Count);
 		}
 
 		[Table("test", "sku", TableSuffix.Today)]
@@ -72,6 +88,13 @@ namespace DotnetSpider.Extension.Test
 
 			[PropertyDefine(Expression = "Today", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
+		}
+
+		[EntitySelector(Expression = "$.data[*]", Type = SelectorType.JsonPath)]
+		public class Entity1 : SpiderEntity
+		{
+			[PropertyDefine(Expression = "$.age", Type = SelectorType.JsonPath)]
+			public int age { get; set; }
 		}
 	}
 }

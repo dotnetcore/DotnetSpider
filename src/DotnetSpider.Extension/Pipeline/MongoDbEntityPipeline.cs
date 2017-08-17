@@ -6,10 +6,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System;
+using DotnetSpider.Core.Infrastructure;
+using NLog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class MongoDbEntityPipeline : BaseEntityPipeline
+	public class MongoDBEntityPipeline : BaseEntityPipeline
 	{
 		public string ConnectString { get; set; }
 		[JsonIgnore]
@@ -17,7 +19,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected ConcurrentDictionary<string, IMongoCollection<BsonDocument>> Collections = new ConcurrentDictionary<string, IMongoCollection<BsonDocument>>();
 
-		public MongoDbEntityPipeline(string connectString)
+		public MongoDBEntityPipeline(string connectString)
 		{
 			ConnectString = connectString;
 		}
@@ -28,6 +30,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (metadata.Table == null)
 			{
+				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
 

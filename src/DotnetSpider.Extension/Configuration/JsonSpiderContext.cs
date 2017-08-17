@@ -86,7 +86,7 @@ namespace DotnetSpider.Extension.Configuration
 				{
 					case "MongoDb":
 						{
-							tmp = new MongoDbEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString());
+							tmp = new MongoDBEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString());
 							break;
 						}
 					case "SqlServer":
