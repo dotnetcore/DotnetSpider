@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Sample
 {
-	[Properties("Fay", "Lewis", "2017-07-27", "百度搜索结果")]
+	[Properties(Owner = "Fay", Developer = "Lewis", Date = "2017-07-27", Subject = "百度搜索结果", Email = "136831898@163.com")]
 	public class BaiduSearchSpider : EntitySpider
 	{
 		public BaiduSearchSpider() : base("BaiduSearch")
@@ -26,7 +26,7 @@ namespace DotnetSpider.Sample
 
 			OnExited += () =>
 			{
-				Verifier<BaiduSearchSpider> verifier = new Verifier<BaiduSearchSpider>("136831898@163.com", "百度搜索监控报告");
+				Verifier<BaiduSearchSpider> verifier = new Verifier<BaiduSearchSpider>();
 				verifier.AddEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);
 				verifier.Report();
 			};

@@ -22,6 +22,9 @@ namespace DotnetSpider.Sample
 #endif
 			MyTest();
 
+			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:guid" });
+			return;
+
 			Startup.Run(new string[] { "-s:JdSkuSample", "-tid:JdSkuSample", "-i:guid" });
 
 			Startup.Run(new string[] { "-s:CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1" });

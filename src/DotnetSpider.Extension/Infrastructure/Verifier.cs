@@ -32,21 +32,20 @@ namespace DotnetSpider.Extension.Infrastructure
 		protected const string ValidateStatusKey = "dotnetspider:validate-stats";
 		protected List<IVerifier> verifiers = new List<IVerifier>();
 
-		public List<string> EmailTo { get; }
-		public string EmailHost { get; }
-		public string Subject { get; }
-		public int EmailPort { get; }
-		public string EmailAccount { get; }
-		public string EmailPassword { get; }
+		public List<string> EmailTo { get; set; }
+		public string EmailHost { get; set; }
+		public string Subject { get; set; }
+		public string Description { get; set; }
+		public int EmailPort { get; set; }
+		public string EmailAccount { get; set; }
+		public string EmailPassword { get; set; }
 
-		public Verifier(string emailTo, string subject)
+		public Verifier()
 		{
-			EmailTo = emailTo.Split(';').Select(e => e.Trim()).ToList();
-			EmailHost = Config.GetValue("emailHost");
-			EmailPort = int.Parse(Config.GetValue("emailPort"));
-			EmailAccount = Config.GetValue("emailAccount");
-			EmailPassword = Config.GetValue("emailPassword");
-			Subject = subject;
+			EmailHost = Config.GetValue("emailHost")?.Trim();
+			EmailPort = int.Parse(Config.GetValue("emailPort")?.Trim());
+			EmailAccount = Config.GetValue("emailAccount")?.Trim();
+			EmailPassword = Config.GetValue("emailPassword")?.Trim();
 		}
 
 		public Verifier(string emailTo, string subject, string host, int port, string account, string password)
@@ -256,9 +255,11 @@ namespace DotnetSpider.Extension.Infrastructure
 	{
 		public Properties Properties { get; }
 
-		public Verifier(string emailTo, string subject) : base(emailTo, subject)
+		public Verifier()
 		{
 			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
+			EmailTo = Properties.Email?.Split(';').Select(e => e.Trim()).ToList();
+			Subject = Properties.Subject;
 		}
 
 		public Verifier(string emailTo, string subject, string host, int port, string account, string password) : base(emailTo, subject, host, port, account, password)
@@ -286,10 +287,10 @@ $"<title>{Subject}: {DateTime.Now.ToString()}</title>" +
 "</head>" +
 "<body style=\"background-color:#FAF7EC\">" +
 $"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
-(hasProperties ? $"<p><strong>研究员: {Properties.Designer}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>研究员: {Properties.Owner}</strong></p>" : "") +
 (hasProperties ? $"<p><strong>爬虫负责人: {Properties.Developer}</strong></p>" : "") +
 (hasProperties ? $"<p><strong>开发时间: {Properties.Date}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>任务描述: {Properties.Detail}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>任务描述: {Description}</strong></p>" : "") +
 "<br/>" +
 "<table>" +
 "<thead>" +
