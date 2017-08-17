@@ -1,4 +1,4 @@
-﻿#if NET452
+﻿#if !NET_CORE
 using OpenQA.Selenium;
 using System;
 using System.Drawing;

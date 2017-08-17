@@ -33,17 +33,17 @@ namespace DotnetSpider.Sample
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		public class TmpProduct : SpiderEntity
 		{
-			[PropertyDefine(Expression = "CategoryName", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
 			public string CategoryName { get; set; }
 
 			[LinkToNext(Extras = new[] { "CategoryName", "Sku", "Name", "Url" })]
 			[PropertyDefine(Expression = "./div[@class='p-name']/a[1]/@href")]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em")]
+			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
 			public string Name { get; set; }
 
-			[PropertyDefine(Expression = "./@data-sku")]
+			[PropertyDefine(Expression = "./@data-sku", Length = 100)]
 			public string Sku { get; set; }
 		}
 
@@ -51,19 +51,19 @@ namespace DotnetSpider.Sample
 		[Table("jd", "jd_product", Primary = "Sku", Indexs = new[] { "Sku" })]
 		public class JdProduct : SpiderEntity
 		{
-			[PropertyDefine(Expression = "Name", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "Name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Name { get; set; }
 
-			[PropertyDefine(Expression = "Sku", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "Sku", Type = SelectorType.Enviroment, Length = 100)]
 			public string Sku { get; set; }
 
 			[PropertyDefine(Expression = "Url", Type = SelectorType.Enviroment)]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = "CategoryName", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
 			public string CategoryName { get; set; }
 
-			[PropertyDefine(Expression = ".//a[@class='name']")]
+			[PropertyDefine(Expression = ".//a[@class='name']", Length = 100)]
 			public string ShopName { get; set; }
 
 			[FormatStringFormater(Format = "http:{0}")]

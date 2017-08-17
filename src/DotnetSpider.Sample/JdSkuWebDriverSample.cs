@@ -1,5 +1,4 @@
-﻿#if !NET_CORE
-using System;
+﻿using System;
 using System.Collections.Generic;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
@@ -22,7 +21,6 @@ namespace DotnetSpider.Sample
 		protected override void MyInit(params string[] arguments)
 		{
 			Identity = ("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
-			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
 			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			AddEntityType(typeof(Product));
 			Downloader = new WebDriverDownloader(Browser.Chrome);
@@ -35,7 +33,6 @@ namespace DotnetSpider.Sample
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 20)]
 			public string CategoryName { get; set; }
-
 
 			[PropertyDefine(Expression = "cat3", Type = SelectorType.Enviroment, Length = 20)]
 			public int CategoryId { get; set; }
@@ -59,14 +56,11 @@ namespace DotnetSpider.Sample
 			[PropertyDefine(Expression = "./@venderid", Length = 20)]
 			public string VenderId { get; set; }
 
-
 			[PropertyDefine(Expression = "./@jdzy_shop_id", Length = 20)]
 			public string JdzyShopId { get; set; }
-
 
 			[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 		}
 	}
 }
-#endif

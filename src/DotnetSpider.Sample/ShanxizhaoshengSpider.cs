@@ -27,7 +27,7 @@ namespace DotnetSpider.Sample
 		[EntitySelector(Expression = "/html/body/table[3]/tbody/tr/td/table/tbody/tr/td/table[2]/tbody/tr/td/table/tr/td/a")]
 		public class Item : SpiderEntity
 		{
-			[PropertyDefine(Expression = ".")]
+			[PropertyDefine(Expression = ".", Length = 100)]
 			public string School { get; set; }
 		}
 	}

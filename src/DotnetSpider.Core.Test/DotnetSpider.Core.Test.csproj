@@ -1,23 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net45</TargetFramework>
     <Version>2.0.0</Version>
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
   </PropertyGroup>
- <PropertyGroup>
+  <PropertyGroup>
     <AssemblyTitle>DotnetSpider</AssemblyTitle>
-    <DefineConstants>DEBUG;NET452</DefineConstants>
+    <DefineConstants>DEBUG;NET45</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
-    <Reference Include="Microsoft.CSharp" />    
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
-  </ItemGroup> 
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
   </ItemGroup>

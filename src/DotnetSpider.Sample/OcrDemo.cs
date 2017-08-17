@@ -1,4 +1,4 @@
-﻿#if NET452
+﻿#if !NET_CORE
 using System;
 using System.Drawing;
 using System.IO;

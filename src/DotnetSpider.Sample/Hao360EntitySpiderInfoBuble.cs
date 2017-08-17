@@ -48,7 +48,7 @@ namespace DotnetSpider.Sample
 		[EntitySelector(Expression = "$.data", Type = SelectorType.JsonPath)]
 		public class UpdateHao360Info : SpiderEntity
 		{
-			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath)]
+			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath, Length = 100)]
 			public string Title { get; set; }
 
 			[PropertyDefine(Expression = "$.link", Type = SelectorType.JsonPath)]

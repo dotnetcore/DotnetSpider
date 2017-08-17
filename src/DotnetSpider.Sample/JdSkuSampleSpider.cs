@@ -26,21 +26,21 @@ namespace DotnetSpider.Sample
 			// dowload html by http client
 			Downloader = new HttpClientDownloader();
 
-			// save data to mysql.
-			AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			// storage data to mysql, default is mysql entity pipeline, so you can comment this line. Don't miss sslmode.
+			AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306;SslMode=None;"));
 			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			AddEntityType(typeof(Product));
 		}
 
-		[Table("test", "sku", TableSuffix.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
+		[Table("test", "jd_sku", TableSuffix.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		public class Product : SpiderEntity
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[PropertyDefine(Expression = "./@data-sku", Length = 100)]
 			public string Sku { get; set; }
 
-			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
 			[PropertyDefine(Expression = "cat3", Type = SelectorType.Enviroment)]
@@ -52,16 +52,16 @@ namespace DotnetSpider.Sample
 			[PropertyDefine(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
-			[PropertyDefine(Expression = ".//div[@class='p-shop']/@data-shop_name")]
+			[PropertyDefine(Expression = ".//div[@class='p-shop']/@data-shop_name", Length = 100)]
 			public string ShopName { get; set; }
 
-			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em")]
+			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
 			public string Name { get; set; }
 
-			[PropertyDefine(Expression = "./@venderid")]
+			[PropertyDefine(Expression = "./@venderid", Length = 100)]
 			public string VenderId { get; set; }
 
-			[PropertyDefine(Expression = "./@jdzy_shop_id")]
+			[PropertyDefine(Expression = "./@jdzy_shop_id", Length = 100)]
 			public string JdzyShopId { get; set; }
 
 			[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]

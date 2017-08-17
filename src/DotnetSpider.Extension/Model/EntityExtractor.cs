@@ -102,7 +102,7 @@ namespace DotnetSpider.Extension.Model
 					dataObject.Add(field.Name, fieldValue);
 				}
 			}
-			if (EntityMetadata.Table.Primary == Core.Infrastructure.Environment.IdColumn)
+			if (EntityMetadata.Table != null && EntityMetadata.Table.Primary == Core.Infrastructure.Environment.IdColumn)
 			{
 				var id = GetEnviromentValue(Core.Infrastructure.Environment.IdColumn, page, index);
 				if (!string.IsNullOrEmpty(id))

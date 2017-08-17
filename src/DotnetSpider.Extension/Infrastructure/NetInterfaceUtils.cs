@@ -1,4 +1,4 @@
-﻿#if NET452
+﻿#if !NET_CORE
 using System.Management;
 
 namespace DotnetSpider.Extension.Infrastructure

@@ -4,10 +4,8 @@
     <TargetFrameworks>netcoreapp2.0;</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETCOREAPP2_0</DefineConstants>
+    <DefineConstants>DEBUG;NETCOREAPP2_0;NET_CORE</DefineConstants>
   </PropertyGroup>
-  
-
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
@@ -24,7 +22,7 @@
     <None Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="nlog.net452.config">
+    <None Update="nlog.net45.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="taobaokeyword.txt">

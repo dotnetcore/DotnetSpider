@@ -9,7 +9,7 @@ namespace DotnetSpider.Sample
 {
 	public class JdCategorySpider : EntitySpider
 	{
-		public JdCategorySpider() : base("京东类目 Daliy Tracking", new Site())
+		public JdCategorySpider() : base("京东类目_Daliy_Tracking", new Site())
 		{
 		}
 
@@ -17,7 +17,7 @@ namespace DotnetSpider.Sample
 		[EntitySelector(Expression = ".//div[@class='items']//a")]
 		public class Category : SpiderEntity
 		{
-			[PropertyDefine(Expression = ".")]
+			[PropertyDefine(Expression = ".", Length = 100)]
 			public string CategoryName { get; set; }
 
 			[PropertyDefine(Expression = "./@href")]

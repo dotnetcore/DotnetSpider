@@ -18,17 +18,15 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit(params string[] arguments)
 		{
+			Identity = ("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 			Downloader = new HttpClientDownloader
 			{
 				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-					{
-						new IncrementTargetUrlsCreator("index_1.shtml")
-					}
+				{
+					new IncrementTargetUrlsCreator("index_1.shtml")
+				}
 			};
-			ThreadNum = 10;
-			Identity = ("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-			AddPipeline(
-			   new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			ThreadNum = 1;
 			AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 			AddStartUrl("http://www.cas.cn/kx/kpwz/index_1.shtml");
 			AddEntityType(typeof(ArticleSummary));
@@ -39,7 +37,7 @@ namespace DotnetSpider.Sample
 		[TargetUrlsSelector(Patterns = new[] { @"index_[0-9]+.shtml", "index.shtml" })]
 		public class ArticleSummary : SpiderEntity
 		{
-			[PropertyDefine(Expression = ".//a/@title")]
+			[PropertyDefine(Expression = ".//a/@title", Length = 100)]
 			public string Title { get; set; }
 
 			[LinkToNext(Extras = new[] { "Title", "Url" })]

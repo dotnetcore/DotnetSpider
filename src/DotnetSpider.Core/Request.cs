@@ -11,7 +11,7 @@ namespace DotnetSpider.Core
 	/// It contains some additional information. 
 	/// </summary>
 	public class Request : IDisposable
-#if NET452
+#if !NET_CORE
 	, ICloneable
 #endif
 	{

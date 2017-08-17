@@ -8,12 +8,13 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 ![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
 
 ### DEVELOP ENVIROMENT
-- Visual Studio 2017
+- Visual Studio 2017(15.3)
+- ![.NET CORE 2.0] (https://download.microsoft.com/download/0/F/D/0FD852A4-7EA1-4E2A-983A-0484AC19B92C/dotnet-sdk-2.0.0-win-x64.exe)
 
 ### OPTIONAL ENVIROMENT
 
-- If you want to save data to mysql. [Download MySql](http://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-community-5.7.14.0.msi)
-- If you want to run distributed crawler. [Download Redis for windows](https://github.com/MSOpenTech/redis/releases)
+- Storage data to mysql. [Download MySql](http://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-community-5.7.14.0.msi)
+- Run distributed crawler. [Download Redis for windows](https://github.com/MSOpenTech/redis/releases)
 - MSSQL.
 
 ### SAMPLES
@@ -28,32 +29,26 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 
 		public static void CrawlerPagesTraversal()
 		{
-			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
+			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
 
 			// Set start/seed url
 			site.AddStartUrl("http://www.cnblogs.com/");
 
 			Spider spider = Spider.Create(site,
-
 				// crawler identity
 				"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
-
 				// use memoery queue scheduler
 				new QueueDuplicateRemovedScheduler(),
-
 				// default page processor will save whole html, and extract urls to target urls via regex
-				new DefaultPageProcessor("cnblogs\\.com"))
-
+				new DefaultPageProcessor(new[] { "cnblogs\\.com" }))
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
-				.AddPipeline(new FilePipeline())
+				.AddPipeline(new FilePipeline());
 
-				// dowload html by http client
-				.SetDownloader(new HttpClientDownloader())
-
-				// 4 threads 4线程
-				.SetThreadNum(4);
-
+			// dowload html by http client
+			spider.Downloader = new HttpClientDownloader();
+			// 4 threads 4线程
+			spider.ThreadNum = 4;
 			// traversal deep 遍历深度
 			spider.Deep = 3;
 
@@ -69,46 +64,44 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 		public static void CustmizeProcessorAndPipeline()
 		{
 			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
-			for (int i = 1; i < 5; ++i)
-			{
-				// Add start/feed urls. 添加初始采集链接
-				site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
-			}
-
+			var site = new Site { EncodingName = "GB2312", RemoveOutboundLinks = true };
+			//for (int i = 1; i < 5; ++i)
+			//{
+			//	// Add start/feed urls. 添加初始采集链接
+			//	site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
+			//}
+			site.AddStartUrl("http://www.unistrong.com/");
 			Spider spider = Spider.Create(site,
-
 				// use memoery queue scheduler. 使用内存调度
 				new QueueDuplicateRemovedScheduler(),
-
 				// use custmize processor for youku 为优酷自定义的 Processor
 				new YoukuPageProcessor())
-
 				// use custmize pipeline for youku 为优酷自定义的 Pipeline
-				.AddPipeline(new YoukuPipeline())
-
-				// dowload html by http client
-				.SetDownloader(new HttpClientDownloader())
-
-				// 1 thread
-				.SetThreadNum(1);
-
+				.AddPipeline(new YoukuPipeline());
+			spider.Downloader = new HttpClientDownloader();
+			spider.ThreadNum = 1;
 			spider.EmptySleepTime = 3000;
 
 			// Start crawler 启动爬虫
 			spider.Run();
+
 		}
 
 		public class YoukuPipeline : BasePipeline
 		{
 			private static long count = 0;
 
-			public override void Process(ResultItems resultItems)
+			public override void Process(params ResultItems[] resultItems)
 			{
-				foreach (YoukuVideo entry in resultItems.Results["VideoResult"])
+				foreach (var resultItem in resultItems)
 				{
-					count++;
-					Console.WriteLine($"[YoukuVideo {count}] {entry.Name}");
+					StringBuilder builder = new StringBuilder();
+					foreach (YoukuVideo entry in resultItem.Results["VideoResult"])
+					{
+						count++;
+						builder.Append($" [YoukuVideo {count}] {entry.Name}");
+					}
+					Console.WriteLine(builder);
 				}
 
 				// Other actions like save data to DB. 可以自由实现插入数据库或保存到文件
@@ -128,15 +121,15 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 					video.Name = videoElement.Select(Selectors.XPath(".//img[@class='quic']/@alt")).GetValue();
 					results.Add(video);
 				}
-				
+
 				// Save data object by key. 以自定义KEY存入page对象中供Pipeline调用
 				page.AddResultItem("VideoResult", results);
 
 				// Add target requests to scheduler. 解析需要采集的URL
-				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
-				{
-					page.AddTargetRequest(new Request(url.GetValue(), null));
-				}
+				//foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
+				//{
+				//	page.AddTargetRequest(new Request(url.GetValue(), null));
+				//}
 			}
 		}
 
@@ -151,34 +144,36 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 
 [View compelte Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/JdSkuSampleSpider.cs)
 
-	public class JdSkuSampleSpider : EntitySpiderBuilder
+	public class JdSkuSampleSpider : EntitySpider
 	{
-		protected override EntitySpider GetEntitySpider()
+		public JdSkuSampleSpider() : base("JdSkuSample", new Site
 		{
-			EntitySpider context = new EntitySpider(new Site
-			{
-				//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("快代理API"))
-			});
-			context.SetThreadNum(1);
-			context.SetIdentity("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_hhmmss"));
-			// save data to mysql.
-			context.AddEntityPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
-			// dowload html by http client
-			context.SetDownloader(new HttpClientDownloader())
-			context.AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-			context.AddEntityType(typeof(Product));
-			return context;
+			//HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("快代理API"))
+		})
+		{
 		}
 
-		[Table("test", "sku", TableSuffix.Today, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
+		protected override void MyInit(params string[] arguments)
+		{
+			ThreadNum = 1;
+			// dowload html by http client
+			Downloader = new HttpClientDownloader();
+
+			// storage data to mysql, default is mysql entity pipeline, so you can comment this line. Don't miss sslmode.
+			AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306;SslMode=None;"));
+			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			AddEntityType(typeof(Product));
+		}
+
+		[Table("test", "jd_sku", TableSuffix.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Product : ISpiderEntity
+		public class Product : SpiderEntity
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[PropertyDefine(Expression = "./@data-sku", Length = 100)]
 			public string Sku { get; set; }
 
-			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
 			[PropertyDefine(Expression = "cat3", Type = SelectorType.Enviroment)]
@@ -190,16 +185,16 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 			[PropertyDefine(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
-			[PropertyDefine(Expression = ".//div[@class='p-shop']/@data-shop_name")]
+			[PropertyDefine(Expression = ".//div[@class='p-shop']/@data-shop_name", Length = 100)]
 			public string ShopName { get; set; }
 
-			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em")]
+			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
 			public string Name { get; set; }
 
-			[PropertyDefine(Expression = "./@venderid")]
+			[PropertyDefine(Expression = "./@venderid", Length = 100)]
 			public string VenderId { get; set; }
 
-			[PropertyDefine(Expression = "./@jdzy_shop_id")]
+			[PropertyDefine(Expression = "./@jdzy_shop_id", Length = 100)]
 			public string JdzyShopId { get; set; }
 
 			[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]
@@ -209,30 +204,27 @@ This is a cross platfrom, high performance, light weight cralwer developed by C#
 
 	public static void Main()
 	{
-		JdSkuSampleSpider spider = new JdSkuSampleSpider();
-		spider.Run();
+		Startup.Run(new string[] { "-s:JdSkuSample", "-tid:JdSkuSample", "-i:guid" });
 	}
 
 #### WebDriver Support
 
 When you want to collect a page JS loaded, there is only one thing to do, set the downloader to WebDriverDownloader.
 
-	context.SetDownloader(new WebDriverDownloader(Browser.Chrome));
-	or
-	spider.SetDownloader(new WebDriverDownloader(Browser.Chrome));
+	Downloader=new WebDriverDownloader(Browser.Chrome);
 
 [See a complete sample](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/JdSkuWebDriverSample.cs)
 
 NOTE:
 
-1. Make sure there is a  ChromeDriver.exe in bin forlder when you set Browser to Chrome. You can contain it to your project via NUGET manager: Chromium.ChromeDriver
-2. Make sure you already add a *.webdriver Firefox profile when you set Browser to Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
-3. Make sure there is a PhantomJS.exe in bin folder when you set Browser to PhantomJS. You can contain it to your project via NUGET manager: PhantomJS
+1. Make sure there is a  ChromeDriver.exe in bin forlder when you try to use Chrome. You can contain it to your project via NUGET manager: Chromium.ChromeDriver
+2. Make sure you already add a *.webdriver Firefox profile when you try to use Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
+3. Make sure there is a PhantomJS.exe in bin folder when you try to use PhantomJS. You can contain it to your project via NUGET manager: PhantomJS
 
-### Monitor
+### Monitor and Database log
 
-1. Set logAndStatusConnectString to correct mysql connect string in config.ini project DotnetSpider.Sample.
-2. Update MySqlConnectString in appsettings.json in DotnetSpider.Enterpise project.
+1. Set connectString to correct mysql connect string in config.ini project DotnetSpider.Sample.
+2. Run your EntitySpider then check data in database: dotnetspider
 
 
 ### Web Manager
@@ -263,6 +255,12 @@ NOTE:
 	timeout 0 
 	tcp-keepalive 60
 ### Upgrade
+
+##### 20170817
++ Upgrade to .NET CORE 2.0
++ Use multi target framework instead of two solution
++ Downgrade to .NET 45(Before is .NET451)
++ Fix some issues.
 
 ##### 20170524
 
