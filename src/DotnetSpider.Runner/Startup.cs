@@ -16,7 +16,7 @@ namespace DotnetSpider.Runner
 			PrintInfo();
 
 			Console.WriteLine("");
-			Console.ForegroundColor = ConsoleColor.DarkYellow;
+			Console.ForegroundColor = ConsoleColor.Cyan;
 			var commands = string.Join(" ", args);
 			Console.WriteLine("Args: " + commands);
 			Console.WriteLine("");
@@ -135,7 +135,11 @@ namespace DotnetSpider.Runner
 			}
 
 			Console.WriteLine();
+			Console.ForegroundColor = ConsoleColor.Cyan;
 			Console.WriteLine($"Detected {spiders.Keys.Count} crawlers.");
+			Console.ForegroundColor = ConsoleColor.White;
+			Console.WriteLine();
+			Console.WriteLine("=================================================================");
 			Console.WriteLine();
 
 			if (!spiders.ContainsKey(spiderName))
@@ -239,7 +243,7 @@ namespace DotnetSpider.Runner
 			{
 				Console.ForegroundColor = ConsoleColor.Green;
 				Console.WriteLine("=================================================================");
-				Console.WriteLine("== DotnetSpider is an open source crawler developed by C#      ==");
+				Console.WriteLine("== DotnetSpider is an open source C# crawler.                  ==");
 				Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
 				Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
 				Console.WriteLine("== License: LGPL3.0                                            ==");

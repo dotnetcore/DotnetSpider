@@ -40,16 +40,15 @@ namespace DotnetSpider.Extension.Processor
 		{
 			List<JObject> list = _extractor.Extract(page);
 
-			if (list == null || list.Count == 0)
-			{
-				return;
-			}
-
 			if (_extractor.DataHandler != null)
 			{
 				list = _extractor.DataHandler.Handle(list, page);
 			}
 
+			if (list == null || list.Count == 0)
+			{
+				return;
+			}
 			page.AddResultItem(_extractor.Name, list);
 		}
 	}
