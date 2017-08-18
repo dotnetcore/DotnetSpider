@@ -110,13 +110,12 @@ namespace DotnetSpider.Core.Downloader
 				// need update
 				page.TargetUrl = request.Url.ToString();
 
-				//page.SetRawText(File.ReadAllText(@"C:\Users\Lewis\Desktop\taobao.html"));
 
 				// 这里只要是遇上登录的, 则在拨号成功之后, 全部抛异常在Spider中加入Scheduler调度
 				// 因此如果使用多线程遇上多个Warning Custom Validate Failed不需要紧张, 可以考虑用自定义Exception分开
 
 				// 结束后要置空, 这个值存到Redis会导致无限循环跑单个任务
-				request.PutExtra(Request.CycleTriedTimes, null);
+				//request.PutExtra(Request.CycleTriedTimes, null);
 
 				//#if !NET_CORE
 				//	httpWebRequest.ServicePoint.ConnectionLimit = int.MaxValue;

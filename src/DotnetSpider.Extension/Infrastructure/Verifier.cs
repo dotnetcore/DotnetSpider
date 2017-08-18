@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using NLog;
+using System.Web;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
@@ -35,14 +36,28 @@ namespace DotnetSpider.Extension.Infrastructure
 		public string EmailHost { get; set; }
 		public string Subject { get; set; }
 		public string Description { get; set; }
-		public int EmailPort { get; set; }
+		public int EmailPort { get; set; } = 25;
 		public string EmailAccount { get; set; }
 		public string EmailPassword { get; set; }
+
+		public string EmailDisplayName { get; set; } = "DotnetSpider Alert";
 
 		public Verifier()
 		{
 			EmailHost = Config.GetValue("emailHost")?.Trim();
-			EmailPort = int.Parse(Config.GetValue("emailPort")?.Trim());
+			var portStr = Config.GetValue("emailPort");
+			if (!string.IsNullOrEmpty(portStr))
+			{
+				int port;
+				if (int.TryParse(portStr, out port))
+				{
+					EmailPort = port;
+				}
+				else
+				{
+					Logger.MyLog($"EmailPort is not a number: {portStr}.", LogLevel.Error);
+				}
+			}
 			EmailAccount = Config.GetValue("emailAccount")?.Trim();
 			EmailPassword = Config.GetValue("emailPassword")?.Trim();
 		}
@@ -257,7 +272,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		public Verifier()
 		{
 			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
-			EmailTo = Properties.Email?.Split(';').Select(e => e.Trim()).ToList();
+			EmailTo = Properties.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
 			Subject = Properties.Subject;
 		}
 
@@ -312,7 +327,7 @@ $"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
 					emailBody.Append("</tbody></table><br/></body></html>");
 
 					var message = new MimeMessage();
-					message.From.Add(new MailboxAddress("DotnetSpider Verifier", EmailAccount));
+					message.From.Add(new MailboxAddress(EmailDisplayName, EmailAccount));
 					foreach (var emailTo in EmailTo)
 					{
 						message.To.Add(new MailboxAddress(emailTo, emailTo));
@@ -322,7 +337,7 @@ $"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
 
 					var html = new TextPart("html")
 					{
-						Text = emailBody.ToString()
+						Text = HttpUtility.HtmlDecode(emailBody.ToString())
 					};
 
 					message.Body = html;

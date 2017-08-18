@@ -1,4 +1,12 @@
-﻿using DotnetSpider.Runner;
+﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Extension.Scheduler;
+using DotnetSpider.Runner;
 using System;
 #if !NETCOREAPP2_0
 using System.Threading;
@@ -10,6 +18,49 @@ namespace DotnetSpider.Sample
 {
 	public class Program
 	{
+
+		static public void TestProcessException()
+		{
+			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+
+			var scheduler = new RedisScheduler(Config.RedisConnectString);
+
+			site.AddStartUrl("http://www.cnblogs.com/");
+
+			Spider spider = Spider.Create(site,
+				// crawler identity
+				"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
+				// use memoery queue scheduler
+				scheduler,
+				// default page processor will save whole html, and extract urls to target urls via regex
+				new DefaultPageProcessor(new[] { "cnblogs\\.com" }))
+				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
+				.AddPipeline(new FilePipeline());
+
+			// dowload html by http client
+			spider.Downloader = new HttpClientDownloader();
+
+			spider.ThreadNum = 1;
+
+			// start crawler 启动爬虫
+			spider.Run();
+		}
+
+		class TestPageProcessor : BasePageProcessor
+		{
+			protected override void Handle(Page page)
+			{
+				if (page.Request.Url.ToString() == "http://www.cnblogs.com/")
+				{
+					throw new SpiderException("");
+				}
+				else
+				{
+					page.AddTargetRequest("http://www.cnblogs.com/", false);
+				}
+			}
+		}
+
 		public static void Main(string[] args)
 		{
 #if NETCOREAPP2_0
@@ -18,9 +69,10 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
+			TestProcessException();
 			MyTest();
 
-			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:guid" });
+			Startup.Run(new string[] { "-s:TaosjBrandShop", "-tid:TaosjBrandShop", "-i:guid", "-a:家用电器,南极人" });
 
 			Startup.Run(new string[] { "-s:JdSkuSample", "-tid:JdSkuSample", "-i:guid" });
 

@@ -195,7 +195,7 @@ namespace DotnetSpider.Core
 		/// Add url to fetch
 		/// </summary>
 		/// <param name="requestString"></param>
-		public void AddTargetRequest(string requestString)
+		public void AddTargetRequest(string requestString, bool increaseDeep = true)
 		{
 			lock (this)
 			{
@@ -209,17 +209,19 @@ namespace DotnetSpider.Core
 				{
 					Depth = Request.NextDepth
 				};
-				if (request.IsAvailable)
+
+				if (increaseDeep)
 				{
-					TargetRequests.Add(request);
+					request.Depth = Request.NextDepth;
 				}
+				TargetRequests.Add(request);
 			}
 		}
 
 		/// <summary>
 		/// Add requests to fetch
 		/// </summary>		 
-		public void AddTargetRequest(Request request)
+		public void AddTargetRequest(Request request, bool increaseDeep = true)
 		{
 			if (request == null)
 			{
@@ -229,7 +231,10 @@ namespace DotnetSpider.Core
 			{
 				if (request.IsAvailable)
 				{
-					request.Depth = Request.NextDepth;
+					if (increaseDeep)
+					{
+						request.Depth = Request.NextDepth;
+					}
 					TargetRequests.Add(request);
 				}
 			}

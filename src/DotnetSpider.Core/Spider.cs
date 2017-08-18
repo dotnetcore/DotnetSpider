@@ -656,7 +656,6 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 									Stopwatch sw = new Stopwatch();
 									ProcessRequest(sw, request, downloader);
 									Thread.Sleep(Site.SleepTime);
-									_OnSuccess(request);
 								}
 								catch (Exception e)
 								{
@@ -846,7 +845,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				if (cycleTriedTimesObject == null)
 				{
 					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, 1));
+					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, 1), false);
 				}
 				else
 				{
@@ -857,7 +856,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 						return null;
 					}
 					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, cycleTriedTimes));
+					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, cycleTriedTimes), false);
 				}
 				page.IsNeedCycleRetry = true;
 				return page;
@@ -868,7 +867,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 				if (cycleTriedTimesObject == null)
 				{
 					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, 1));
+					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, 1), false);
 				}
 				else
 				{
@@ -879,7 +878,7 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 						return null;
 					}
 					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, cycleTriedTimes));
+					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, cycleTriedTimes), false);
 				}
 				page.IsNeedCycleRetry = true;
 				return page;
@@ -1013,6 +1012,8 @@ BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Er
 
 				sw.Stop();
 				UpdatePipelineSpeed(sw.ElapsedMilliseconds);
+
+				_OnSuccess(request);
 			}
 		}
 
