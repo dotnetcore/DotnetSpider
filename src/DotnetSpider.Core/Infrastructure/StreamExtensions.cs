@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public static class StreamUtils
+	public static class StreamExtensions
 	{
 		public static byte[] StreamToBytes(this Stream stream)
 		{

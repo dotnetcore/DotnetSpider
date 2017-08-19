@@ -11,10 +11,10 @@ namespace DotnetSpider.Core.Test.Scheduler
 		public void PushAndPollAsync()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			var spider = new DefaultSpider("test", new Site());
+			var spider = new DefaultSpider("test", new Site(), scheduler);
 			scheduler.Init(spider);
 
-			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 30 }, i =>
+			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 20 }, i =>
 			{
 				scheduler.Push(new Request("http://www.a.com", null));
 				scheduler.Push(new Request("http://www.a.com", null));
@@ -22,13 +22,10 @@ namespace DotnetSpider.Core.Test.Scheduler
 				scheduler.Push(new Request("http://www.b.com", null));
 				scheduler.Push(new Request($"http://www.{i.ToString()}.com", null));
 			});
-			System.Threading.Thread.Sleep(2000);
-			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 30 }, i =>
+			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 20}, i =>
 			{
 				scheduler.Poll();
 			});
-
-			System.Threading.Thread.Sleep(2000);
 			long left = scheduler.GetLeftRequestsCount();
 			long total = scheduler.GetTotalRequestsCount();
 
@@ -40,7 +37,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 		public void PushAndPollDepthFirst()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			ISpider spider = new DefaultSpider("test", new Site());
+			ISpider spider = new DefaultSpider("test", new Site(), scheduler);
 			scheduler.Init(spider);
 
 			scheduler.Push(new Request("http://www.a.com", null));

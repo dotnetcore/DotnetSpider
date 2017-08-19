@@ -267,7 +267,7 @@
 //#endif
 //			}
 //#if !NET_CORE
-//				_request.ServicePoint.Expect100Continue = item.Expect100Continue;
+//			_request.ServicePoint.Expect100Continue = item.Expect100Continue;
 //#endif
 
 //			//请求方式Get或者Post  
@@ -317,20 +317,19 @@
 //		/// <param name="item"></param>  
 //		private void SetCer(HttpItem item)
 //		{
-//#if NET_CORE
+
 //			_request = (HttpWebRequest)WebRequest.Create(item.Url);
-//#else
+
 //			if (!string.IsNullOrEmpty(item.CerPath))
 //			{
-
 //				//这一句一定要写在创建连接的前面。使用回调的方法进行证书验证。  
 //				ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
 
-//			//初始化对像，并设置请求的URL地址  
-//			_request = (HttpWebRequest)WebRequest.Create(item.Url);
+//				//初始化对像，并设置请求的URL地址  
+//				_request = (HttpWebRequest)WebRequest.Create(item.Url);
 //				SetCerList(item);
 //				//将证书添加到请求里  
-//				_request.Credentials=new X509Certificate(item.CerPath);
+//				_request.ClientCertificates.Add(new X509Certificate(item.CerPath));
 //			}
 //			else
 //			{
@@ -338,7 +337,7 @@
 //				_request = (HttpWebRequest)WebRequest.Create(item.Url);
 //				SetCerList(item);
 //			}
-//#endif
+
 //		}
 //		/// <summary>  
 //		/// 设置多个证书  

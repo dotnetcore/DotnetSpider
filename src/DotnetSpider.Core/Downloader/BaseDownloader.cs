@@ -4,6 +4,7 @@ using NLog;
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -16,15 +17,13 @@ namespace DotnetSpider.Core.Downloader
 		public IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }
 		public IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }
 
+		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+
 		protected string DownloadFolder { get; set; }
 
 		protected BaseDownloader()
 		{
-#if !NET_CORE
-			DownloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
-#else
-			DownloadFolder = Path.Combine(AppContext.BaseDirectory, "data");
-#endif
+			DownloadFolder = Path.Combine(Infrastructure.Environment.BaseDirectory, "data");
 		}
 
 		public Page Download(Request request, ISpider spider)
@@ -38,9 +37,10 @@ namespace DotnetSpider.Core.Downloader
 
 			var result = DowloadContent(request, spider);
 
-			if (!IsDetectedContentType)
+			_lock.EnterWriteLock();
+			try
 			{
-				lock (this)
+				if (!IsDetectedContentType)
 				{
 					if (result != null && result.Exception == null && spider.Site.ContentType == ContentType.Auto)
 					{
@@ -60,7 +60,10 @@ namespace DotnetSpider.Core.Downloader
 					}
 				}
 			}
-
+			finally
+			{
+				_lock.ExitWriteLock();
+			}
 			result.ContentType = spider.Site.ContentType;
 
 			AfterDownloadComplete(ref result, spider);

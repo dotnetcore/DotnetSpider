@@ -59,7 +59,7 @@ namespace DotnetSpider.Core.Scheduler
 			}
 			else
 			{
-				return (cycleTriedTimes != null && cycleTriedTimes > 0) || (resultEmptyTriedTimes != null && resultEmptyTriedTimes > 0);
+				return (cycleTriedTimes != null && cycleTriedTimes > 0 && cycleTriedTimes < Spider.Site.CycleRetryTimes) || (resultEmptyTriedTimes != null && resultEmptyTriedTimes > 0 && resultEmptyTriedTimes < Spider.Site.CycleRetryTimes);
 			}
 		}
 

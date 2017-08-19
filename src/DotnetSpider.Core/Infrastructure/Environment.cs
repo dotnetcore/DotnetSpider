@@ -6,7 +6,7 @@ using System.IO;
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public class Environment
+	public static class Environment
 	{
 		public static bool SaveLogAndStatusToDb { get; }
 		public static string GlobalDirectory { get; }

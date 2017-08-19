@@ -16,5 +16,9 @@ namespace DotnetSpider.Core
 		public DefaultSpider(string id, Site site) : base(site, id, new QueueDuplicateRemovedScheduler(), new SimplePageProcessor())
 		{
 		}
+
+		public DefaultSpider(string id, Site site, IScheduler scheduler) : base(site, id, scheduler, new SimplePageProcessor())
+		{
+		}
 	}
 }

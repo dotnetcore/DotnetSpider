@@ -28,11 +28,7 @@ namespace DotnetSpider.Core.Pipeline
 				path += Infrastructure.Environment.PathSeperator;
 			}
 
-#if !NET_CORE
-			BasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
-#else
-			BasePath = Path.Combine(AppContext.BaseDirectory, path);
-#endif
+			BasePath = Path.Combine(Infrastructure.Environment.BaseDirectory, path);
 		}
 
 		public virtual void Dispose()

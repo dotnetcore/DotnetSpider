@@ -8,6 +8,8 @@ using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Scheduler;
 using DotnetSpider.Runner;
 using System;
+using System.Collections.Concurrent;
+using System.Linq;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
@@ -18,49 +20,6 @@ namespace DotnetSpider.Sample
 {
 	public class Program
 	{
-
-		static public void TestProcessException()
-		{
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
-
-			var scheduler = new RedisScheduler(Config.RedisConnectString);
-
-			site.AddStartUrl("http://www.cnblogs.com/");
-
-			Spider spider = Spider.Create(site,
-				// crawler identity
-				"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
-				// use memoery queue scheduler
-				scheduler,
-				// default page processor will save whole html, and extract urls to target urls via regex
-				new DefaultPageProcessor(new[] { "cnblogs\\.com" }))
-				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
-				.AddPipeline(new FilePipeline());
-
-			// dowload html by http client
-			spider.Downloader = new HttpClientDownloader();
-
-			spider.ThreadNum = 1;
-
-			// start crawler 启动爬虫
-			spider.Run();
-		}
-
-		class TestPageProcessor : BasePageProcessor
-		{
-			protected override void Handle(Page page)
-			{
-				if (page.Request.Url.ToString() == "http://www.cnblogs.com/")
-				{
-					throw new SpiderException("");
-				}
-				else
-				{
-					page.AddTargetRequest("http://www.cnblogs.com/", false);
-				}
-			}
-		}
-
 		public static void Main(string[] args)
 		{
 #if NETCOREAPP2_0
@@ -69,10 +28,8 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-			TestProcessException();
-			MyTest();
 
-			Startup.Run(new string[] { "-s:TaosjBrandShop", "-tid:TaosjBrandShop", "-i:guid", "-a:家用电器,南极人" });
+			MyTest();
 
 			Startup.Run(new string[] { "-s:JdSkuSample", "-tid:JdSkuSample", "-i:guid" });
 
@@ -124,11 +81,6 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
-			//HttpHelper helper = new HttpHelper();
-			//var result = helper.GetHtml(new HttpItem
-			//{
-			//	Url = "https://amos.alicdn.com/muliuserstatus.aw?_ksTS=1502446000449_784&callback=jsonp785&beginnum=0&charset=utf-8&uids=%E4%B8%83%E5%8C%B9%E7%8B%BC%E5%B0%8A%E6%82%A6%E4%B8%93%E5%8D%96%E5%BA%97;%E6%A3%89%E5%93%81%E4%B8%96%E5%AE%B6%E5%86%85%E8%A1%A3%E4%B8%93%E8%90%A5%E5%BA%97;%E5%98%89%E5%A3%AB%E5%86%85%E8%A1%A3%E4%B8%93%E8%90%A5%E5%BA%97;%E8%8C%B5%E4%B9%8B%E8%8B%A5%E6%9C%8D%E9%A5%B0%E4%B8%93%E8%90%A5%E5%BA%97;%E8%B6%85%E4%B9%8B%E7%BE%A4%E6%9C%8D%E9%A5%B0%E4%B8%93%E8%90%A5%E5%BA%97;%E5%BD%BC%E5%B0%94%E4%B8%B9%E6%97%97%E8%88%B0%E5%BA%97;%E5%AF%B9%E5%AF%B9%E7%86%8A%E6%9C%8D%E9%A5%B0%E4%B8%93%E8%90%A5%E5%BA%97;%E8%BF%AA%E9%82%A6%E4%BB%95%E6%9C%8D%E9%A5%B0%E5%88%B6%E8%A1%A3%E5%8E%82;%E7%A7%91%E5%B0%86%E6%9C%8D%E9%A5%B0%E6%97%97%E8%88%B0%E5%BA%97;%E6%AC%A7%E9%98%B3%E7%BE%8E%E5%86%85%E8%A3%A4%E5%88%B6%E8%A1%A3%E5%8E%82&site=cntaobao"
-			//});
 		}
 	}
 }

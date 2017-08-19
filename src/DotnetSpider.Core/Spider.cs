@@ -524,15 +524,8 @@ namespace DotnetSpider.Core
 
 			Scheduler.Init(this);
 
-#if !NET_CORE
-			_errorRequestFile =
-BasePipeline.PrepareFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
-#else
-			_errorRequestFile =
-				BasePipeline.PrepareFile(
-					Path.Combine(AppContext.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Infrastructure.Environment.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 
 			foreach (var pipeline in Pipelines)

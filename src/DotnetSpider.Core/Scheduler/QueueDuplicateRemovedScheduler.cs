@@ -1,15 +1,16 @@
 using DotnetSpider.Core.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace DotnetSpider.Core.Scheduler
 {
 	/// <summary>
 	/// Basic Scheduler implementation. 
-	/// Store urls to fetch in LinkedBlockingQueue and remove duplicate urls by HashMap.
 	/// </summary>
 	public sealed class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler
 	{
+		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private List<Request> _queue = new List<Request>();
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
@@ -18,21 +19,34 @@ namespace DotnetSpider.Core.Scheduler
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{
-			// ReSharper disable once InconsistentlySynchronizedField
-			_queue.Add(request);
+			_lock.EnterWriteLock();
+			try
+			{
+				_queue.Add(request);
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
+			}
 		}
 
 		public override void ResetDuplicateCheck()
 		{
-			lock (this)
+			_lock.EnterWriteLock();
+			try
 			{
 				_queue.Clear();
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
 			}
 		}
 
 		public override Request Poll()
 		{
-			lock (this)
+			_lock.EnterWriteLock();
+			try
 			{
 				if (_queue.Count == 0)
 				{
@@ -55,13 +69,22 @@ namespace DotnetSpider.Core.Scheduler
 					return request;
 				}
 			}
+			finally
+			{
+				_lock.ExitWriteLock();
+			}
 		}
 
 		public override long GetLeftRequestsCount()
 		{
-			lock (this)
+			_lock.EnterWriteLock();
+			try
 			{
 				return _queue.Count;
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
 			}
 		}
 
@@ -92,23 +115,42 @@ namespace DotnetSpider.Core.Scheduler
 
 		public override void Import(HashSet<Request> requests)
 		{
-			lock (this)
+			_lock.EnterWriteLock();
+			try
 			{
 				_queue = new List<Request>(requests);
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
 			}
 		}
 
 		public override HashSet<Request> ToList()
 		{
-			lock (this)
+			_lock.EnterWriteLock();
+			try
 			{
 				return new HashSet<Request>(_queue.ToArray());
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
 			}
 		}
 
 		public override void Dispose()
 		{
-			_queue.Clear();
+			_lock.EnterWriteLock();
+			try
+			{
+				_queue.Clear();
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
+			}
+		
 			base.Dispose();
 		}
 	}

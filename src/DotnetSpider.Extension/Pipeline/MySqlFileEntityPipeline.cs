@@ -21,11 +21,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (string.IsNullOrEmpty(DataFolder))
 			{
-#if !NET_CORE
-			DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, spider.Identity, "mysql");
-#else
-			DataFolder = Path.Combine(AppContext.BaseDirectory, spider.Identity, "mysql");
-#endif
+				DataFolder = Path.Combine(Core.Infrastructure.Environment.BaseDirectory, spider.Identity, "mysql");
 			}
 		}
 

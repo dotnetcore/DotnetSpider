@@ -95,7 +95,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		}
 
 		[TestMethod]
-		public void Test404Url()
+		public void _404Url()
 		{
 			var spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 					"abcd",
@@ -113,6 +113,17 @@ namespace DotnetSpider.Core.Test.Downloader
 			{
 				return new Page(request) { Content = "{'a':'b'}" };
 			}
+		}
+
+		[TestMethod]
+		public void GetTargetUrlWhenRedirect()
+		{
+			Site site = new Site
+			{
+			};
+			HttpClientDownloader downloader = new HttpClientDownloader();
+			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site));
+			Assert.AreEqual("https://www.jd.com/?d", page.TargetUrl);
 		}
 	}
 }
