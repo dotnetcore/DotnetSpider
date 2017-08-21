@@ -209,6 +209,10 @@ namespace DotnetSpider.Core.Processor
 						realPatterns.Add(new Regex(realPattern));
 					}
 				}
+				else
+				{
+					throw new ArgumentNullException("Pattern should not be null.");
+				}
 			}
 		}
 

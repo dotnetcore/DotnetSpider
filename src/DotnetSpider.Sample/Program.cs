@@ -28,7 +28,7 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-
+		 
 			MyTest();
 
 			Startup.Run(new string[] { "-s:JdSkuSample", "-tid:JdSkuSample", "-i:guid" });
@@ -82,5 +82,6 @@ namespace DotnetSpider.Sample
 		private static void MyTest()
 		{
 		}
+
 	}
 }

@@ -285,7 +285,8 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Assert.AreEqual(4, spider.RetriedTimes.Value);
 			Assert.AreEqual(0, scheduler.GetLeftRequestsCount());
 			Assert.AreEqual(6, scheduler.GetSuccessRequestsCount());
-			Assert.AreEqual(1, scheduler.GetErrorRequestsCount());
+			// 重试次数应该包含
+			Assert.AreEqual(5, scheduler.GetErrorRequestsCount());
 		}
 
 		class TestPageProcessor : BasePageProcessor

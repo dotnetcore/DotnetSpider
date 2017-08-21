@@ -918,6 +918,7 @@ namespace DotnetSpider.Core
 			}
 			catch (DownloadException de)
 			{
+				OnError(page.Request);
 				Logger.MyLog(Identity, $"Should not catch download exception: {request.Url}.", LogLevel.Warn, de);
 			}
 			catch (Exception e)
@@ -926,6 +927,7 @@ namespace DotnetSpider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
+				OnError(page.Request);
 				Logger.MyLog(Identity, $"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}.", LogLevel.Warn, e);
 			}
 

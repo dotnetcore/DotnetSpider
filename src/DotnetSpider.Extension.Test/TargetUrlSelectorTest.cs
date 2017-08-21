@@ -199,7 +199,7 @@ namespace DotnetSpider.Extension.Test
 			try
 			{
 				var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity23).GetTypeInfo());
-				var processor2 = new EntityProcessor(new Site(), entity2);
+				var processor = new EntityProcessor(new Site(), entity2);
 			}
 			catch (ArgumentNullException e)
 			{
