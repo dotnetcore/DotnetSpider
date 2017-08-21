@@ -100,7 +100,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			string selectParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"`{p}`"));
 			StringBuilder primaryParamenters = new StringBuilder();
-			//string.Join(" AND ", $"`{Schema.Primary}`=@{Schema.Primary}");
+
 			if (Core.Infrastructure.Environment.IdColumn == metadata.Table.Primary)
 			{
 				primaryParamenters.Append($"`{Core.Infrastructure.Environment.IdColumn}` = @{Core.Infrastructure.Environment.IdColumn},");
@@ -162,13 +162,9 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 			builder.Append($", PRIMARY KEY ({ metadata.Table.Primary})");
-			using (var conn = new MySqlConnection(ConnectString))
-			{
-				var dbEngine = MySqlEngine.IsSupportToku(conn) ? "TokuDB" : "InnoDB";
-				builder.Append($") ENGINE={dbEngine} AUTO_INCREMENT=1  DEFAULT CHARSET=utf8");
-				string sql = builder.ToString();
-				return sql;
-			}
+			builder.Append($") AUTO_INCREMENT=1");
+			string sql = builder.ToString();
+			return sql;
 		}
 
 		protected override string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion)

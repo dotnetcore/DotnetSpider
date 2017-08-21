@@ -1,5 +1,5 @@
 ﻿using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Downloader.WebDriver;
+using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;

@@ -17,6 +17,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		private readonly Dictionary<int, HttpClientObj> _pool = new Dictionary<int, HttpClientObj>();
+
 		private readonly HttpClient _noProxyHttpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler
 		{
 			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,

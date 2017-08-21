@@ -21,6 +21,6 @@ namespace DotnetSpider.Core.Downloader
 
 		void AddBeforeDownloadHandler(IBeforeDownloadHandler handler);
 
-		IDownloader Clone();
+		IDownloader Clone(ISpider spider);
 	}
 }

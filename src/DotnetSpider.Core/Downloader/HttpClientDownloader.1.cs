@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;
+using static DotnetSpider.Core.Downloader.HttpClientPool;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -51,6 +52,8 @@ namespace DotnetSpider.Core.Downloader
 
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
 
+		private HttpClient _httpClient;
+
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
@@ -64,7 +67,7 @@ namespace DotnetSpider.Core.Downloader
 
 				response = NetworkCenter.Current.Execute("http", message =>
 				{
-					HttpClient httpClient = _httpClientPool.GetHttpClient(proxy);
+					HttpClient httpClient = _httpClient == null ? _httpClientPool.GetHttpClient(proxy) : _httpClient;
 					var requestTask = httpClient.SendAsync(message);
 					requestTask.Wait(site.Timeout);
 					if (requestTask.Status == TaskStatus.RanToCompletion)
@@ -379,56 +382,19 @@ namespace DotnetSpider.Core.Downloader
 			return false;
 		}
 
-		//private Encoding GetHtmlCharset(byte[] contentBytes)
-		//{
-		//	//// charset
-		//	//// 1、encoding in http header Content-Type
-		//	//string value = contentType;
-		//	//var encoding = UrlUtils.GetEncoding(value);
-		//	//if (encoding != null)
-		//	//{
-		//	//	return encoding;
-		//	//}
-		//	// use default charset to decode first time
-		//	Encoding defaultCharset = Encoding.UTF8;
-		//	string content = defaultCharset.GetString(contentBytes);
-		//	string charset = null;
-		//	// 2、charset in meta
-		//	if (!string.IsNullOrEmpty(content))
-		//	{
-		//		HtmlDocument document = new HtmlDocument();
-		//		document.LoadHtml(content);
-		//		HtmlNodeCollection links = document.DocumentNode.SelectNodes("//meta");
-		//		if (links != null)
-		//		{
-		//			foreach (var link in links)
-		//			{
-		//				// 2.1、html4.01 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		//				string metaContent = link.Attributes["content"] != null ? link.Attributes["content"].Value : "";
-		//				string metaCharset = link.Attributes["charset"] != null ? link.Attributes["charset"].Value : "";
-		//				if (metaContent.IndexOf("charset", StringComparison.Ordinal) != -1)
-		//				{
-		//					metaContent = metaContent.Substring(metaContent.IndexOf("charset", StringComparison.Ordinal), metaContent.Length - metaContent.IndexOf("charset", StringComparison.Ordinal));
-		//					charset = metaContent.Split('=')[1];
-		//					break;
-		//				}
-		//				// 2.2、html5 <meta charset="UTF-8" />
-		//				if (!string.IsNullOrEmpty(metaCharset))
-		//				{
-		//					charset = metaCharset;
-		//					break;
-		//				}
-		//			}
-		//		}
-		//	}
-		//	try
-		//	{
-		//		return Encoding.GetEncoding(string.IsNullOrEmpty(charset) ? "UTF-8" : charset);
-		//	}
-		//	catch
-		//	{
-		//		return Encoding.UTF8;
-		//	}
-		//}
+		public override IDownloader Clone(ISpider spider)
+		{
+			var downloader = (HttpClientDownloader)MemberwiseClone();
+			if (spider.Site.HttpProxyPool == null)
+			{
+				_httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler
+				{
+					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+					UseProxy = true,
+					UseCookies = false
+				}));
+			}
+			return downloader;
+		}
 	}
 }

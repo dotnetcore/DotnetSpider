@@ -1,11 +1,15 @@
-﻿using OpenQA.Selenium.Remote;
+﻿using DotnetSpider.Core.Infrastructure;
+using NLog;
+using OpenQA.Selenium.Remote;
 using System;
 using System.Threading;
 
 namespace DotnetSpider.Extension.Downloader.WebDriver
 {
-	public class ScrollHandler : IWebDriverHandler
+	public class Scroll : IWebDriverHandler
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
+
 		public int Interval { get; set; } = 1;
 		public int ScrollTo { get; set; } = 0;
 

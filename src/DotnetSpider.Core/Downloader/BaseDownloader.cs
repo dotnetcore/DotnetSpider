@@ -73,7 +73,7 @@ namespace DotnetSpider.Core.Downloader
 			return result;
 		}
 
-		public virtual IDownloader Clone()
+		public virtual IDownloader Clone(ISpider spider)
 		{
 			return (IDownloader)MemberwiseClone();
 		}

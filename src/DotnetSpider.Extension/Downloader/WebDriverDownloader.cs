@@ -9,31 +9,32 @@ using OpenQA.Selenium;
 using System.Net.Http;
 using DotnetSpider.Core.Redial;
 using System.Runtime.InteropServices;
+using DotnetSpider.Extension.Downloader.WebDriver;
+using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
 using System.Net;
 #else
 using System.Web;
 #endif
 
-namespace DotnetSpider.Extension.Downloader.WebDriver
+namespace DotnetSpider.Extension.Downloader
 {
 	public class WebDriverDownloader : BaseDownloader
 	{
 		private IWebDriver _webDriver;
-		private readonly int _webDriverWaitTime;
-		private static bool _isLogined;
-		private readonly Browser _browser;
-		private readonly Option _option;
-		public IWebDriverHandler SignIn { get; set; }
-		public IWebDriverHandler VerifyCode { get; set; }
+		private readonly int WebDriverWaitTime;
+		private bool _isLogined;
+		private readonly Browser Browser;
+		private readonly Option Option;
+		public LoginHandler Login { get; set; }
 		public Func<string, string> UrlHandler;
 		public IWebDriverHandler NavigateCompeleted;
 
 		public WebDriverDownloader(Browser browser, int webDriverWaitTime = 200, Option option = null)
 		{
-			_webDriverWaitTime = webDriverWaitTime;
-			_browser = browser;
-			_option = option ?? new Option();
+			WebDriverWaitTime = webDriverWaitTime;
+			Browser = browser;
+			Option = option ?? new Option();
 
 			if (browser == Browser.Firefox && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
@@ -57,9 +58,9 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 		{
 		}
 
-		public WebDriverDownloader(Browser browser, IWebDriverHandler siginIn) : this(browser, 200, null)
+		public WebDriverDownloader(Browser browser, LoginHandler loginHandler) : this(browser, 200, null)
 		{
-			SignIn = siginIn;
+			Login = loginHandler;
 		}
 
 		protected override Page DowloadContent(Request request, ISpider spider)
@@ -71,12 +72,12 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 				{
 					if (_webDriver == null)
 					{
-						_webDriver = WebDriverUtil.Open(_browser, _option);
+						_webDriver = WebDriverExtensions.Open(Browser, Option);
 					}
 
-					if (!_isLogined && SignIn != null)
+					if (!_isLogined && Login != null)
 					{
-						_isLogined = SignIn.Handle(_webDriver as RemoteWebDriver);
+						_isLogined = Login.Handle(_webDriver as RemoteWebDriver);
 						if (!_isLogined)
 						{
 							throw new SpiderException("Login failed. Please check your login codes.");
@@ -117,7 +118,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 					NavigateCompeleted?.Handle((RemoteWebDriver)_webDriver);
 				});
 
-				Thread.Sleep(_webDriverWaitTime);
+				Thread.Sleep(WebDriverWaitTime);
 
 				Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
 				{
@@ -160,7 +161,6 @@ namespace DotnetSpider.Extension.Downloader.WebDriver
 		public override void Dispose()
 		{
 			_webDriver?.Quit();
-
 		}
 	}
 }

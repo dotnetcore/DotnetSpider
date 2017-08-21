@@ -8,50 +8,6 @@ namespace DotnetSpider.Core.Test.Downloader
 	public class DownloadHanlderTest
 	{
 		[TestMethod]
-		public void GeneratePostBody()
-		{
-			var spider = new DefaultSpider("test", new Site
-			{
-				Arguments = new Dictionary<string, string>
-				{
-					{"TOKEN1", "TEST1"}
-				}
-			});
-			TestDownloader downloader = new TestDownloader();
-			downloader.AddBeforeDownloadHandler(new GeneratePostBodyHandler
-			{
-				ArgumnetNames = new[] { "TOKEN1", "TOKEN2" }
-			});
-			var request1 = new Request("http://a.com/", new Dictionary<string, dynamic>
-			{
-				{"TOKEN2", "TEST2"}
-			})
-			{
-				PostBody = "{0}{1}"
-			};
-			Page page = downloader.Download(request1, spider);
-			Assert.AreEqual("TEST1TEST2", page.Request.PostBody);
-
-			var request2 = new Request("http://a.com/", new Dictionary<string, dynamic>())
-			{
-				PostBody = "{0}{1}"
-			};
-			page = downloader.Download(request2, spider);
-			Assert.AreEqual("TEST1", page.Request.PostBody);
-
-			request1 = new Request("http://a.com/", new Dictionary<string, dynamic>
-			{
-				{"TOKEN2", "TEST2"}
-			})
-			{
-				PostBody = "{0}{1}"
-			};
-			var spider2 = new DefaultSpider("test", new Site());
-			page = downloader.Download(request1, spider2);
-			Assert.AreEqual("TEST2", page.Request.PostBody);
-		}
-
-		[TestMethod]
 		public void SubContentHandler()
 		{
 			var spider = new DefaultSpider("test", new Site());

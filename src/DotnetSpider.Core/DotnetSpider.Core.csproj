@@ -38,9 +38,15 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <None Remove="nlog.default.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="nlog.default.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 </Project>

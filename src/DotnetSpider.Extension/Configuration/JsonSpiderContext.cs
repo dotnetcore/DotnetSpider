@@ -10,7 +10,7 @@ using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
 
 #if !NET_CORE
-using DotnetSpider.Extension.Downloader.WebDriver;
+using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Core.Infrastructure;
 #endif
 

@@ -1,5 +1,4 @@
-﻿#if !NET_CORE
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Extension.Downloader.WebDriver;
 using System;
 using DotnetSpider.Core.Selector;
@@ -7,15 +6,19 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 using System.Threading;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Core.Infrastructure;
+using NLog;
 
 namespace DotnetSpider.Extension.Downloader
 {
-	public abstract class SignIner : Named, IWebDriverHandler
+	public abstract class LoginHandler : Named, IWebDriverHandler
 	{
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
+
 		public abstract bool Handle(RemoteWebDriver driver);
 	}
 
-	public class CommonSignIner : SignIner
+	public abstract class CommonLoginHandler : LoginHandler
 	{
 		public string Url { get; set; }
 
@@ -25,31 +28,35 @@ namespace DotnetSpider.Extension.Downloader
 
 		public Selector PassSelector { get; set; }
 
-		public string Pass { get; set; }
+		public string Password { get; set; }
 
 		public Selector SubmitSelector { get; set; }
 
 		public override bool Handle(RemoteWebDriver webDriver)
 		{
-
 			try
 			{
 				webDriver.Navigate().GoToUrl(Url);
-				var user = FindElement(webDriver, UserSelector);
+				Thread.Sleep(5000);
 
+				var user = FindElement(webDriver, UserSelector);
 				user.Clear();
 				user.SendKeys(User);
 				Thread.Sleep(1500);
-				var pass = FindElement(webDriver, PassSelector);
-				pass.SendKeys(Pass);
+
+				var password = FindElement(webDriver, PassSelector);
+				password.SendKeys(Password);
 				Thread.Sleep(1500);
+
 				var submit = FindElement(webDriver, SubmitSelector);
 				submit.Click();
 				Thread.Sleep(5000);
+
 				return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				Logger.MyLog($"LoginHandler failed: {ex}.", NLog.LogLevel.Error);
 				return false;
 			}
 		}
@@ -72,7 +79,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class ManualSignIner : SignIner
+	public class ManualLoginHandler : LoginHandler
 	{
 		public string Url { get; set; }
 
@@ -95,4 +102,3 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 }
-#endif

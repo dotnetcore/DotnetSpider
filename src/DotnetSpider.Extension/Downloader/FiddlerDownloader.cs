@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Web;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
-using DotnetSpider.Extension.Downloader.WebDriver;
+using DotnetSpider.Extension.Downloader;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
 using DotnetSpider.Core.Infrastructure;
@@ -21,7 +21,6 @@ namespace DotnetSpider.Extension.Downloader
 		private static bool _isLogined;
 		private readonly FiddlerClient _fiddlerClient;
 		private IWebDriver _webDriver;
-		private static FiddlerDownloader _downloader;
 
 		public Func<RemoteWebDriver, bool> Login;
 		public Func<string, string> UrlFormat;
@@ -49,11 +48,6 @@ namespace DotnetSpider.Extension.Downloader
 
 			_fiddlerClient = new FiddlerClient(30000, urlParten);
 			_fiddlerClient.StartCapture();
-
-			if (_downloader == null)
-			{
-				_downloader = this;
-			}
 		}
 
 		public FiddlerDownloader(string urlParten, Option option) : this(urlParten, option, 300)
@@ -74,7 +68,7 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					if (_webDriver == null)
 					{
-						_webDriver = WebDriverUtil.Open(Browser.Chrome, _option);
+						_webDriver = WebDriverExtensions.Open(Browser.Chrome, _option);
 					}
 					if (!_isLogined && Login != null)
 					{
@@ -129,11 +123,6 @@ namespace DotnetSpider.Extension.Downloader
 		public override void Dispose()
 		{
 			_fiddlerClient.Dispose();
-		}
-
-		public override IDownloader Clone()
-		{
-			return _downloader;
 		}
 	}
 }

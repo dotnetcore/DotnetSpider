@@ -620,7 +620,7 @@ namespace DotnetSpider.Core
 					int waitCount = 0;
 					//bool firstTask = true;
 
-					using (var downloader = Downloader.Clone())
+					using (var downloader = Downloader.Clone(this))
 					{
 						while (Stat == Status.Running)
 						{

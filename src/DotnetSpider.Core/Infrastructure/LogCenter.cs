@@ -9,8 +9,6 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public static class LogCenter
 	{
-		private const string NlogDefaultConfig = "<nlog xmlns=\"http://www.nlog-project.org/schemas/NLog.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" throwExceptions=\"true\"><targets><target name = \"console\" xsi:type=\"ColoredConsole\" useDefaultRowHighlightingRules=\"true\" layout=\"[${date:format=yyyyMMdd HH\\:mm\\:ss}][${event-properties:item=UserId}][${event-properties:item=TaskGroup}][${level}] ${message}\"><highlight-row foregroundColor = \"Cyan\" condition=\"level == LogLevel.Trace\"/><highlight-row foregroundColor = \"DarkGray\" condition=\"level == LogLevel.Debug\"/></target><target name = \"file\" xsi:type=\"File\" maxArchiveFiles=\"30\" layout=\"[${date:format=yyyyMMdd HH\\:mm\\:ss}][${event-properties:item=UserId}][${event-properties:item=TaskGroup}][${level}] ${message}\" fileName=\"${basedir}/logs/log${shortdate}.txt\" keepFileOpen=\"false\" /></targets><rules><logger name = \"*\" minlevel=\"Trace\" writeTo=\"console\" /><logger name = \"*\" minlevel=\"Trace\" writeTo=\"file\" /></rules></nlog>";
-
 		static LogCenter()
 		{
 #if !NET_CORE
@@ -20,7 +18,10 @@ namespace DotnetSpider.Core.Infrastructure
 #endif
 			if (!File.Exists(nlogConfigPath))
 			{
-				File.AppendAllText(nlogConfigPath, NlogDefaultConfig);
+				using (StreamReader reader = new StreamReader(typeof(LogCenter).Assembly.GetManifestResourceStream("DotnetSpider.Core.nlog.default.config")))
+				{
+					File.AppendAllText(nlogConfigPath, reader.ReadToEnd());
+				}
 			}
 			XmlLoggingConfiguration configuration = new XmlLoggingConfiguration(nlogConfigPath);
 			var connectString = Config.GetValue("connectString");
