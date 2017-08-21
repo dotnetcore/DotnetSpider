@@ -116,7 +116,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		protected RemoteWebDriver CreateWebDriver()
 		{
-			RemoteWebDriver webDriver = null;
+			RemoteWebDriver webDriver;
 			switch (Browser)
 			{
 				case Browser.Chrome:
@@ -134,8 +134,7 @@ namespace DotnetSpider.Extension.Downloader
 						string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
 						if (pathsToProfiles.Length == 1)
 						{
-							FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false);
-							profile.AlwaysLoadNoFocusLibrary = true;
+							FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false) {AlwaysLoadNoFocusLibrary = true};
 							webDriver = new FirefoxDriver(profile);
 						}
 						else

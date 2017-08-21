@@ -2,7 +2,6 @@
 using DotnetSpider.Core.Monitor;
 using MySql.Data.MySqlClient;
 using Dapper;
-using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
 using NLog;
 using System;

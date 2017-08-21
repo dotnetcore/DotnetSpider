@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
-using System;
 using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline

@@ -5,7 +5,7 @@ namespace DotnetSpider.Core.Monitor
 {
 	public class NLogMonitor : IMonitor
 	{
-		private static readonly ILogger _logger = LogCenter.GetLogger();
+		private static readonly ILogger Logger = LogCenter.GetLogger();
 
 		public string Identity { get; set; }
 
@@ -19,7 +19,7 @@ namespace DotnetSpider.Core.Monitor
 			LogEventInfo theEvent = new LogEventInfo(LogLevel.Trace, "", msg);
 			theEvent.Properties["Identity"] = Identity;
 			theEvent.Properties["Node"] = NodeId.Id;
-			_logger.Log(theEvent);
+			Logger.Log(theEvent);
 		}
 	}
 }

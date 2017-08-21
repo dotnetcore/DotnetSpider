@@ -9,7 +9,7 @@ namespace DotnetSpider.Core.Proxy
 {
 	public class ProxyUtil
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		public static bool ValidateProxy(string ip, int port)
 		{

@@ -8,9 +8,9 @@ namespace DotnetSpider.Core.Test
 	[TestClass]
 	public class SiteTest
 	{
-		private string WName = "WebSite";
-		private string WValue = "12580emall";
-		private string Url = @"http://www.12580emall.com/emall/mall/index.html";
+		private string _wName = "WebSite";
+		private string _wValue = "12580emall";
+		private string _url = @"http://www.12580emall.com/emall/mall/index.html";
 
 		[TestMethod]
 		public void SetEncoding()
@@ -27,9 +27,9 @@ namespace DotnetSpider.Core.Test
 		{
 			Site site = new Site { EncodingName = "UTF-8", Timeout = 3000 };
 			site.ClearStartRequests();
-			site.AddStartUrl(Url);
-			site.AddStartRequest(new Request(Url, null));
-			Assert.IsTrue(site.StartRequests.Contains(new Request(Url, null)));
+			site.AddStartUrl(_url);
+			site.AddStartRequest(new Request(_url, null));
+			Assert.IsTrue(site.StartRequests.Contains(new Request(_url, null)));
 		}
 
 		[TestMethod]
@@ -53,7 +53,7 @@ namespace DotnetSpider.Core.Test
 		public void AddHeaders()
 		{
 			Site site = new Site { EncodingName = "UTF-8", Timeout = 3000 };
-			site.AddHeader(WName, WValue);
+			site.AddHeader(_wName, _wValue);
 			Assert.IsNotNull(site.Headers);
 			Assert.IsTrue(site.Headers.Count > 0);
 		}

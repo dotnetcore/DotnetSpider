@@ -135,10 +135,7 @@ namespace DotnetSpider.Core
 					return (HttpStatusCode)code;
 				}
 			}
-			set
-			{
-				PutExtra(StatusCodeKey, value);
-			}
+			set => PutExtra(StatusCodeKey, value);
 		}
 
 		public bool ExistExtra(string key)
@@ -202,7 +199,8 @@ namespace DotnetSpider.Core
 
 		public override string ToString()
 		{
-			return $"{{ url='{Url}', method='{Method}', extras='{string.Join(",", Extras?.Select(kv => kv.Key + ":" + kv.Value))}', priority='{Priority}'}}";
+			var extracs = Extras == null ? "" : string.Join(",", Extras.Select(kv => kv.Key + ":" + kv.Value));
+			return $"{{ url='{Url}', method='{Method}', extras='{extracs}', priority='{Priority}'}}";
 		}
 
 		public string Identity => Encrypt.Md5Encrypt(Url + PostBody);

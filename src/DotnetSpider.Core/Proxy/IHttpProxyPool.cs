@@ -1,8 +1,9 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 
 namespace DotnetSpider.Core.Proxy
 {
-	public interface IHttpProxyPool
+	public interface IHttpProxyPool : IDisposable
 	{
 		UseSpecifiedUriWebProxy GetProxy();
 		void ReturnProxy(UseSpecifiedUriWebProxy host, HttpStatusCode statusCode);

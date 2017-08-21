@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Downloader
 {
 	public abstract class AfterDownloadCompleteHandler : Named, IAfterDownloadCompleteHandler
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		public abstract bool Handle(ref Page page, ISpider spider);
 	}

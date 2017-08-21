@@ -158,10 +158,8 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="identity"></param>
-		/// <param name="taskGroup"></param>
 		/// <param name="pageProcessors"></param>
 		/// <param name="scheduler"></param>
-		/// <param name="userid"></param>
 		protected Spider(Site site, string identity, IScheduler scheduler,
 			params IPageProcessor[] pageProcessors) : this()
 		{
@@ -653,7 +651,7 @@ namespace DotnetSpider.Core
 								catch (Exception e)
 								{
 									OnError(request);
-									Logger.MyLog(Identity, $"采集失败: {request.Url}.", LogLevel.Error, e);
+									Logger.MyLog(Identity, $"Crawler failed: {request.Url}.", LogLevel.Error, e);
 								}
 								finally
 								{
@@ -661,7 +659,7 @@ namespace DotnetSpider.Core
 									{
 										var statusCode = request.StatusCode;
 										Site.ReturnHttpProxy(request.GetExtra(Request.Proxy) as UseSpecifiedUriWebProxy,
-											statusCode == null ? HttpStatusCode.Found : statusCode.Value);
+											statusCode ?? HttpStatusCode.Found);
 									}
 								}
 
@@ -683,26 +681,26 @@ namespace DotnetSpider.Core
 
 			OnClose();
 
-			Logger.MyLog(Identity, $"等待监控进程退出.", LogLevel.Info);
+			Logger.MyLog(Identity, "Waiting for monitor exit.", LogLevel.Info);
 			_monitorTask.Wait(5000);
 
 			OnClosing?.Invoke();
 
-			var msg = Stat == Status.Finished ? "结束采集" : "退出采集";
-			Logger.MyLog(Identity, $"{msg}, 运行时间: {(FinishedTime - StartTime).TotalSeconds} 秒.", LogLevel.Info);
+			var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl exit";
+			Logger.MyLog(Identity, $"{msg}, cost: {(FinishedTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
 
 			OnClosed?.Invoke();
 		}
 
 		public static void PrintInfo()
 		{
-			bool isPrinted;
+			
 			var key = "_DotnetSpider_Info";
 
 #if !NET_CORE
-			isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
+			var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
 #else
-
+			bool isPrinted;
 			AppContext.TryGetSwitch(key, out isPrinted);
 #endif
 			if (!isPrinted)
@@ -719,7 +717,6 @@ namespace DotnetSpider.Core
 #if !NET_CORE
 				AppDomain.CurrentDomain.SetData(key, "True");
 #else
-
 				AppContext.SetSwitch(key, true);
 #endif
 			}
@@ -736,11 +733,11 @@ namespace DotnetSpider.Core
 		{
 			if (Stat != Status.Running)
 			{
-				Logger.MyLog(Identity, $"任务不在运行中.", LogLevel.Warn);
+				Logger.MyLog(Identity, "Crawler is not running.", LogLevel.Warn);
 				return;
 			}
 			Stat = Status.Stopped;
-			Logger.MyLog(Identity, $"停止任务中...", LogLevel.Warn);
+			Logger.MyLog(Identity, "Stop running...", LogLevel.Warn);
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
@@ -760,11 +757,11 @@ namespace DotnetSpider.Core
 			{
 				Stat = Status.Running;
 				_realStat = Status.Running;
-				Logger.MyLog(Identity, $"任务继续...", LogLevel.Warn);
+				Logger.MyLog(Identity, "Continue...", LogLevel.Warn);
 			}
 			else
 			{
-				Logger.MyLog(Identity, $"任务未暂停, 不能执行继续操作...", LogLevel.Warn);
+				Logger.MyLog(Identity, "Crawler is not pause, can not continue...", LogLevel.Warn);
 			}
 		}
 
@@ -773,10 +770,10 @@ namespace DotnetSpider.Core
 			if (Stat == Status.Running || Stat == Status.Stopped)
 			{
 				Stat = Status.Exited;
-				Logger.MyLog(Identity, $"退出任务中...", LogLevel.Warn);
+				Logger.MyLog(Identity, "Exit...", LogLevel.Warn);
 				return;
 			}
-			Logger.MyLog(Identity, $"任务不在运行中.", LogLevel.Warn);
+			Logger.MyLog(Identity, "Crawler is not running.", LogLevel.Warn);
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
@@ -801,6 +798,8 @@ namespace DotnetSpider.Core
 			SafeDestroy(Scheduler);
 			SafeDestroy(PageProcessors);
 			SafeDestroy(Downloader);
+
+			Site.HttpProxyPool?.Dispose();
 		}
 
 		protected virtual void _OnComplete()
@@ -829,8 +828,10 @@ namespace DotnetSpider.Core
 
 		public static Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
 		{
-			Page page = new Page(request, null);
-			page.ContentType = site.ContentType;
+			Page page = new Page(request, null)
+			{
+				ContentType = site.ContentType
+			};
 
 			if (!resultIsEmpty)
 			{
@@ -917,7 +918,6 @@ namespace DotnetSpider.Core
 			}
 			catch (DownloadException de)
 			{
-				page.Exception = de;
 				Logger.MyLog(Identity, $"Should not catch download exception: {request.Url}.", LogLevel.Warn, de);
 			}
 			catch (Exception e)
@@ -929,6 +929,10 @@ namespace DotnetSpider.Core
 				Logger.MyLog(Identity, $"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}.", LogLevel.Warn, e);
 			}
 
+			if (page == null)
+			{
+				return;
+			}
 			// 此处是用于需要循环本身的场景, 不能使用本身Request的原因是Request的尝试次数计算问题
 			if (page.IsNeedCycleRetry)
 			{
@@ -1128,8 +1132,9 @@ namespace DotnetSpider.Core
 					AvgPipelineSpeed,
 					ThreadNum);
 			}
-			catch
+			catch (Exception e)
 			{
+				Logger.MyLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
 			}
 		}
 	}

@@ -32,10 +32,10 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			var now = DateTime.Now.Date;
 
-			First_Day_Of_Current_Month = now.AddDays(now.Day * -1 + 1);
-			Last_Day_Of_Current_Month = First_Day_Of_Current_Month.AddMonths(1).AddDays(-1);
-			First_Day_Of_Previous_Month = First_Day_Of_Current_Month.AddMonths(-1);
-			Last_Day_Of_Previous_Month = First_Day_Of_Current_Month.AddDays(-1);
+			FirstDayOfCurrentMonth = now.AddDays(now.Day * -1 + 1);
+			LastDayOfCurrentMonth = FirstDayOfCurrentMonth.AddMonths(1).AddDays(-1);
+			FirstDayOfPreviousMonth = FirstDayOfCurrentMonth.AddMonths(-1);
+			LastDayOfPreviousMonth = FirstDayOfCurrentMonth.AddDays(-1);
 
 			int i = now.DayOfWeek - DayOfWeek.Monday;
 			if (i == -1)
@@ -45,60 +45,60 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 			TimeSpan ts = new TimeSpan(i, 0, 0, 0);
 
-			Monday_Of_Current_Week = now.Subtract(ts).Date;
-			Tuesday_Of_Current_Week = Monday_Of_Current_Week.AddDays(1);
-			Wednesday_Of_Current_Week = Monday_Of_Current_Week.AddDays(2);
-			Thursday_Of_Current_Week = Monday_Of_Current_Week.AddDays(3);
-			Friday_Of_Current_Week = Monday_Of_Current_Week.AddDays(4);
-			Saturday_Of_Current_Week = Monday_Of_Current_Week.AddDays(5);
-			Sunday_Of_Current_Week = Monday_Of_Current_Week.AddDays(6);
+			MondayOfCurrentWeek = now.Subtract(ts).Date;
+			TuesdayOfCurrentWeek = MondayOfCurrentWeek.AddDays(1);
+			WednesdayOfCurrentWeek = MondayOfCurrentWeek.AddDays(2);
+			ThursdayOfCurrentWeek = MondayOfCurrentWeek.AddDays(3);
+			FridayOfCurrentWeek = MondayOfCurrentWeek.AddDays(4);
+			SaturdayOfCurrentWeek = MondayOfCurrentWeek.AddDays(5);
+			SundayOfCurrentWeek = MondayOfCurrentWeek.AddDays(6);
 
-			Monday_Of_Previous_Week = Monday_Of_Current_Week.AddDays(-7);
-			Tuesday_Of_Previous_Week = Monday_Of_Previous_Week.AddDays(1);
-			Wednesday_Of_Previous_Week = Monday_Of_Previous_Week.AddDays(2);
-			Thursday_Of_Previous_Week = Monday_Of_Previous_Week.AddDays(3);
-			Friday_Of_Previous_Week = Monday_Of_Previous_Week.AddDays(4);
-			Saturday_Of_Previous_Week = Monday_Of_Previous_Week.AddDays(5);
-			Sunday_Of_Previous_Week = Monday_Of_Previous_Week.AddDays(6);
+			MondayOfPreviousWeek = MondayOfCurrentWeek.AddDays(-7);
+			TuesdayOfPreviousWeek = MondayOfPreviousWeek.AddDays(1);
+			WednesdayOfPreviousWeek = MondayOfPreviousWeek.AddDays(2);
+			ThursdayOfPreviousWeek = MondayOfPreviousWeek.AddDays(3);
+			FridayOfPreviousWeek = MondayOfPreviousWeek.AddDays(4);
+			SaturdayOfPreviousWeek = MondayOfPreviousWeek.AddDays(5);
+			SundayOfPreviousWeek = MondayOfPreviousWeek.AddDays(6);
 
-			Monday_Of_Next_Week = Sunday_Of_Current_Week.AddDays(1);
-			Tuesday_Of_Next_Week = Monday_Of_Next_Week.AddDays(1);
-			Wednesday_Of_Next_Week = Monday_Of_Next_Week.AddDays(2);
-			Thursday_Of_Next_Week = Monday_Of_Next_Week.AddDays(3);
-			Friday_Of_Next_Week = Monday_Of_Next_Week.AddDays(4);
-			Saturday_Of_Next_Week = Monday_Of_Next_Week.AddDays(5);
-			Sunday_Of_Next_Week = Monday_Of_Next_Week.AddDays(6);
+			MondayOfNextWeek = SundayOfCurrentWeek.AddDays(1);
+			TuesdayOfNextWeek = MondayOfNextWeek.AddDays(1);
+			WednesdayOfNextWeek = MondayOfNextWeek.AddDays(2);
+			ThursdayOfNextWeek = MondayOfNextWeek.AddDays(3);
+			FridayOfNextWeek = MondayOfNextWeek.AddDays(4);
+			SaturdayOfNextWeek = MondayOfNextWeek.AddDays(5);
+			SundayOfNextWeek = MondayOfNextWeek.AddDays(6);
 
 			RunIdOfToday = now.ToString("yyyy-MM-dd");
-			RunIdOfMonthly = First_Day_Of_Current_Month.ToString("yyyy-MM-dd");
-			RunIdOfMonday = Monday_Of_Current_Week.ToString("yyyy-MM-dd");
+			RunIdOfMonthly = FirstDayOfCurrentMonth.ToString("yyyy-MM-dd");
+			RunIdOfMonday = MondayOfCurrentWeek.ToString("yyyy-MM-dd");
 		}
 
-		public static DateTime First_Day_Of_Current_Month { get; }
-		public static DateTime Last_Day_Of_Current_Month { get; }
-		public static DateTime First_Day_Of_Previous_Month { get; }
-		public static DateTime Last_Day_Of_Previous_Month { get; }
-		public static DateTime Monday_Of_Current_Week { get; }
-		public static DateTime Tuesday_Of_Current_Week { get; }
-		public static DateTime Wednesday_Of_Current_Week { get; }
-		public static DateTime Thursday_Of_Current_Week { get; }
-		public static DateTime Friday_Of_Current_Week { get; }
-		public static DateTime Saturday_Of_Current_Week { get; }
-		public static DateTime Sunday_Of_Current_Week { get; }
-		public static DateTime Monday_Of_Previous_Week { get; }
-		public static DateTime Tuesday_Of_Previous_Week { get; }
-		public static DateTime Wednesday_Of_Previous_Week { get; }
-		public static DateTime Thursday_Of_Previous_Week { get; }
-		public static DateTime Friday_Of_Previous_Week { get; }
-		public static DateTime Saturday_Of_Previous_Week { get; }
-		public static DateTime Sunday_Of_Previous_Week { get; }
-		public static DateTime Monday_Of_Next_Week { get; }
-		public static DateTime Tuesday_Of_Next_Week { get; }
-		public static DateTime Wednesday_Of_Next_Week { get; }
-		public static DateTime Thursday_Of_Next_Week { get; }
-		public static DateTime Friday_Of_Next_Week { get; }
-		public static DateTime Saturday_Of_Next_Week { get; }
-		public static DateTime Sunday_Of_Next_Week { get; }
+		public static DateTime FirstDayOfCurrentMonth { get; }
+		public static DateTime LastDayOfCurrentMonth { get; }
+		public static DateTime FirstDayOfPreviousMonth { get; }
+		public static DateTime LastDayOfPreviousMonth { get; }
+		public static DateTime MondayOfCurrentWeek { get; }
+		public static DateTime TuesdayOfCurrentWeek { get; }
+		public static DateTime WednesdayOfCurrentWeek { get; }
+		public static DateTime ThursdayOfCurrentWeek { get; }
+		public static DateTime FridayOfCurrentWeek { get; }
+		public static DateTime SaturdayOfCurrentWeek { get; }
+		public static DateTime SundayOfCurrentWeek { get; }
+		public static DateTime MondayOfPreviousWeek { get; }
+		public static DateTime TuesdayOfPreviousWeek { get; }
+		public static DateTime WednesdayOfPreviousWeek { get; }
+		public static DateTime ThursdayOfPreviousWeek { get; }
+		public static DateTime FridayOfPreviousWeek { get; }
+		public static DateTime SaturdayOfPreviousWeek { get; }
+		public static DateTime SundayOfPreviousWeek { get; }
+		public static DateTime MondayOfNextWeek { get; }
+		public static DateTime TuesdayOfNextWeek { get; }
+		public static DateTime WednesdayOfNextWeek { get; }
+		public static DateTime ThursdayOfNextWeek { get; }
+		public static DateTime FridayOfNextWeek { get; }
+		public static DateTime SaturdayOfNextWeek { get; }
+		public static DateTime SundayOfNextWeek { get; }
 
 		/// <summary>
 		/// Returns the number of microseconds since Epoch of the current UTC date and time.

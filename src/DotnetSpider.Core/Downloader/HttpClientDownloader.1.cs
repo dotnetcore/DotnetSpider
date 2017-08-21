@@ -67,7 +67,7 @@ namespace DotnetSpider.Core.Downloader
 
 				response = NetworkCenter.Current.Execute("http", message =>
 				{
-					HttpClient httpClient = _httpClient == null ? _httpClientPool.GetHttpClient(proxy) : _httpClient;
+					HttpClient httpClient = _httpClient ?? _httpClientPool.GetHttpClient(proxy);
 					var requestTask = httpClient.SendAsync(message);
 					requestTask.Wait(site.Timeout);
 					if (requestTask.Status == TaskStatus.RanToCompletion)
@@ -110,8 +110,7 @@ namespace DotnetSpider.Core.Downloader
 					Logger.MyLog(spider.Identity, $"下载 {request.Url} 内容为空.", LogLevel.Warn);
 				}
 
-				// need update
-				page.TargetUrl = response.RequestMessage.RequestUri.AbsoluteUri.ToString();
+				page.TargetUrl = response.RequestMessage.RequestUri.AbsoluteUri;
 
 				return page;
 			}
@@ -140,12 +139,11 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, null);
-				if (page != null)
+				Page page = new Page(request, null)
 				{
-					page.Exception = e;
-					page.IsSkip = true;
-				}
+					Exception = e,
+					IsSkip = true
+				};
 
 				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", LogLevel.Error, e);
 				return page;

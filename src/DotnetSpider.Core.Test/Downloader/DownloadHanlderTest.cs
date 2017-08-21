@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DotnetSpider.Core.Downloader;
+﻿using DotnetSpider.Core.Downloader;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DotnetSpider.Core.Test.Downloader

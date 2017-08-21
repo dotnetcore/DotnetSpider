@@ -18,10 +18,7 @@ namespace DotnetSpider.Core.Infrastructure
 #endif
 			if (!File.Exists(nlogConfigPath))
 			{
-				using (StreamReader reader = new StreamReader(typeof(LogCenter).Assembly.GetManifestResourceStream("DotnetSpider.Core.nlog.default.config")))
-				{
-					File.AppendAllText(nlogConfigPath, reader.ReadToEnd());
-				}
+				File.AppendAllText(nlogConfigPath, GetDefaultConfigString());
 			}
 			XmlLoggingConfiguration configuration = new XmlLoggingConfiguration(nlogConfigPath);
 			var connectString = Config.GetValue("connectString");
@@ -52,6 +49,22 @@ namespace DotnetSpider.Core.Infrastructure
 		public static ILogger GetLogger()
 		{
 			return LogManager.GetCurrentClassLogger();
+		}
+
+		public static string GetDefaultConfigString()
+		{
+			var stream = typeof(LogCenter).Assembly.GetManifestResourceStream("DotnetSpider.Core.nlog.default.config");
+			if (stream == null)
+			{
+				return string.Empty;
+			}
+			else
+			{
+				using (StreamReader reader = new StreamReader(stream))
+				{
+					return reader.ReadToEnd();
+				}
+			}
 		}
 
 		public static void MyLog(this ILogger logger, string identity, string message, LogLevel level, Exception e = null)

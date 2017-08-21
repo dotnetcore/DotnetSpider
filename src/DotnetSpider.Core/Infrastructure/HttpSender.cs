@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Core.Proxy;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -22,7 +20,7 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			HttpResult result = new HttpResult();
 			HttpWebRequest request;
-			HttpWebResponse _response;
+			HttpWebResponse response;
 			try
 			{
 				//准备参数  
@@ -40,18 +38,18 @@ namespace DotnetSpider.Core.Infrastructure
 			try
 			{
 				//请求数据  
-				using (_response = (HttpWebResponse)request.GetResponse())
+				using (response = (HttpWebResponse)request.GetResponse())
 				{
-					GetData(item, result, _response);
+					GetData(item, result, response);
 				}
 			}
 			catch (WebException ex)
 			{
 				if (ex.Response != null)
 				{
-					using (_response = (HttpWebResponse)ex.Response)
+					using (response = (HttpWebResponse)ex.Response)
 					{
-						GetData(item, result, _response);
+						GetData(item, result, response);
 					}
 				}
 				else
@@ -113,7 +111,7 @@ namespace DotnetSpider.Core.Infrastructure
 			//从这里开始我们要无视编码了  
 			Match meta = Regex.Match(encoding.GetString(responseByte), "<meta[^<]*charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
 			string c = string.Empty;
-			if (meta != null && meta.Groups.Count > 0)
+			if (meta.Groups.Count > 0)
 			{
 				c = meta.Groups[1].Value.ToLower().Trim();
 			}
@@ -125,42 +123,26 @@ namespace DotnetSpider.Core.Infrastructure
 				}
 				catch
 				{
-					if (string.IsNullOrEmpty(response.ContentType))
-					{
-						encoding = Encoding.UTF8;
-					}
-					else
-					{
-						encoding = Encoding.GetEncoding(response.ContentType);
-					}
+					encoding = string.IsNullOrEmpty(response.ContentType) ? Encoding.UTF8 : Encoding.GetEncoding(response.ContentType);
 				}
 			}
 			else
 			{
-				if (string.IsNullOrEmpty(response.ContentType))
-				{
-					encoding = Encoding.UTF8;
-				}
-				else
-				{
-					encoding = Encoding.GetEncoding(response.ContentType);
-				}
+				encoding = string.IsNullOrEmpty(response.ContentType) ? Encoding.UTF8 : Encoding.GetEncoding(response.ContentType);
 			}
 			return encoding;
 		}
 
 		private static byte[] ReadBytes(HttpWebResponse response)
 		{
-			byte[] bytes = null;
-
 			using (var responseSteam = response.GetResponseStream())
 			using (var ms = new MemoryStream())
 			{
-				responseSteam.CopyTo(ms);
+				responseSteam?.CopyTo(ms);
 
 				Stream stream;
 				//GZIIP处理  
-				if (response.ContentType != null && response.ContentType.Equals("gzip", StringComparison.OrdinalIgnoreCase))
+				if (response.ContentType.Equals("gzip", StringComparison.OrdinalIgnoreCase))
 				{
 
 					//开始读取流并设置编码方式  
@@ -171,7 +153,7 @@ namespace DotnetSpider.Core.Infrastructure
 					stream = ms;
 				}
 				//获取Byte  
-				bytes = stream.StreamToBytes();
+				var bytes = stream.StreamToBytes();
 
 #if NET_CORE
 				stream.Dispose();
@@ -273,13 +255,13 @@ namespace DotnetSpider.Core.Infrastructure
 		private static void SetPostData(HttpWebRequest request, HttpRequest item)
 		{
 			//验证在得到结果时是否有传入数据  
-			var _postencoding = Encoding.UTF8;
+			var postencoding = Encoding.UTF8;
 
 			if (request.Method.Trim().ToLower().Contains("post"))
 			{
 				if (item.PostEncoding != null)
 				{
-					_postencoding = item.PostEncoding;
+					postencoding = item.PostEncoding;
 				}
 				byte[] buffer = null;
 				//写入Byte类型  
@@ -291,8 +273,8 @@ namespace DotnetSpider.Core.Infrastructure
 				//写入文件  
 				else if (item.PostDataType == PostDataType.File && !string.IsNullOrEmpty(item.Postdata))
 				{
-					StreamReader r = new StreamReader(File.OpenRead(item.Postdata), _postencoding);
-					buffer = _postencoding.GetBytes(r.ReadToEnd());
+					StreamReader r = new StreamReader(File.OpenRead(item.Postdata), postencoding);
+					buffer = postencoding.GetBytes(r.ReadToEnd());
 #if NET_CORE
 					r.Dispose();
 #else
@@ -302,7 +284,7 @@ namespace DotnetSpider.Core.Infrastructure
 				//写入字符串  
 				else if (!string.IsNullOrEmpty(item.Postdata))
 				{
-					buffer = _postencoding.GetBytes(item.Postdata);
+					buffer = postencoding.GetBytes(item.Postdata);
 				}
 				if (buffer != null)
 				{
@@ -347,7 +329,7 @@ namespace DotnetSpider.Core.Infrastructure
 			if (!string.IsNullOrEmpty(item.CerPath))
 			{
 				//这一句一定要写在创建连接的前面。使用回调的方法进行证书验证。  
-				ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+				ServicePointManager.ServerCertificateValidationCallback = CheckValidationResult;
 
 				if (item.ClentCertificates != null && item.ClentCertificates.Count > 0)
 				{
@@ -475,8 +457,6 @@ namespace DotnetSpider.Core.Infrastructure
 		/// header对象  
 		/// </summary>  
 		public WebHeaderCollection Header { get; set; } = new WebHeaderCollection();
-
-		private Version _protocolVersion;
 
 		/// <summary>  
 		// 获取或设置用于请求的 HTTP 版本。返回结果:用于请求的 HTTP 版本。

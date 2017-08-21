@@ -1,7 +1,6 @@
 ﻿#if !NET_CORE
 
 using System;
-using System.Configuration;
 using System.Text;
 using System.Threading;
 using Renci.SshNet;

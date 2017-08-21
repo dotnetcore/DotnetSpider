@@ -5,7 +5,7 @@ namespace DotnetSpider.Core.Downloader
 {
 	public abstract class CookieInjector : Named, ICookieInjector
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		public virtual void Inject(ISpider spider, bool stopSpider = true)
 		{

@@ -73,7 +73,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 			public string PlainText { get; set; }
 
 			[PropertyDefine(Expression = "today", Type = SelectorType.Enviroment)]
-			public DateTime run_id { get; set; }
+			public DateTime RunId { get; set; }
 		}
 	}
 }

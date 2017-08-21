@@ -39,7 +39,7 @@ namespace DotnetSpider.Core.Selector
 		{
 			IList<HtmlNode> elements = element.QuerySelectorAll(_selectorText).ToList();
 
-			if (elements != null && elements.Count > 0)
+			if (elements.Count > 0)
 			{
 				if (string.IsNullOrEmpty(_attrName))
 				{

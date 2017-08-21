@@ -104,7 +104,7 @@ namespace DotnetSpider.Extension.Test
 		public class Entity6 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 255)]
-			public string name { get; set; }
+			public string Name { get; set; }
 		}
 
 		[Table("test", "table")]

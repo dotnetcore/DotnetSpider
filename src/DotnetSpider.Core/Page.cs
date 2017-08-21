@@ -195,6 +195,7 @@ namespace DotnetSpider.Core
 		/// Add url to fetch
 		/// </summary>
 		/// <param name="requestString"></param>
+		/// <param name="increaseDeep"></param>
 		public void AddTargetRequest(string requestString, bool increaseDeep = true)
 		{
 			lock (this)

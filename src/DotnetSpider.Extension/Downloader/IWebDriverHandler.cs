@@ -1,7 +1,7 @@
 ﻿
 using OpenQA.Selenium.Remote;
 
-namespace DotnetSpider.Extension.Downloader.WebDriver
+namespace DotnetSpider.Extension.Downloader
 {
 	public interface IWebDriverHandler
 	{

@@ -11,7 +11,7 @@ using NLog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class MongoDBEntityPipeline : BaseEntityPipeline
+	public class MongoDbEntityPipeline : BaseEntityPipeline
 	{
 		public string ConnectString { get; set; }
 		[JsonIgnore]
@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected ConcurrentDictionary<string, IMongoCollection<BsonDocument>> Collections = new ConcurrentDictionary<string, IMongoCollection<BsonDocument>>();
 
-		public MongoDBEntityPipeline(string connectString)
+		public MongoDbEntityPipeline(string connectString)
 		{
 			ConnectString = connectString;
 		}

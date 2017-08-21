@@ -201,10 +201,13 @@ namespace DotnetSpider.Core.Processor
 			}
 			foreach (var pattern in patterns)
 			{
-				var realPattern = string.IsNullOrEmpty(pattern?.Trim()) ? null : pattern.Trim();
-				if (realPatterns.All(p => p.ToString() != realPattern))
+				if (!string.IsNullOrEmpty(pattern))
 				{
-					realPatterns.Add(new Regex(realPattern));
+					var realPattern = pattern.Trim();
+					if (realPatterns.All(p => p.ToString() != realPattern))
+					{
+						realPatterns.Add(new Regex(realPattern));
+					}
 				}
 			}
 		}

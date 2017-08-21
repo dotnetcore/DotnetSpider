@@ -13,7 +13,7 @@ namespace DotnetSpider.Core.Proxy
 		private readonly IProxySupplier _supplier;
 		private readonly List<Proxy> _proxyQueue = new List<Proxy>();
 		private readonly ConcurrentDictionary<string, Proxy> _allProxy = new ConcurrentDictionary<string, Proxy>();
-
+		private bool _isDispose;
 		private readonly int _reuseInterval;
 
 		public HttpProxyPool(IProxySupplier supplier, int reuseInterval = 500)
@@ -24,7 +24,7 @@ namespace DotnetSpider.Core.Proxy
 
 			Task.Factory.StartNew(() =>
 			{
-				while (true)
+				while (!_isDispose)
 				{
 					if (_proxyQueue.Count < 50)
 					{
@@ -130,6 +130,11 @@ namespace DotnetSpider.Core.Proxy
 				}
 			});
 
+		}
+
+		public void Dispose()
+		{
+			_isDispose = true;
 		}
 	}
 }

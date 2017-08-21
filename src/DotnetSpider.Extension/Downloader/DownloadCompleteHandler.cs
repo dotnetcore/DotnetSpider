@@ -46,7 +46,7 @@ namespace DotnetSpider.Extension.Downloader
 						spider.Exit();
 					}
 					Spider.AddToCycleRetry(page.Request, spider.Site);
-					page.Exception = new DownloadException($"Download failed and redial finished already.");
+					page.Exception = new DownloadException("Download failed and redial finished already.");
 				}
 			}
 			return true;

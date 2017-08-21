@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public static class RetryExecutor
 	{
-		private readonly static ILogger Logger = LogCenter.GetLogger();
+		private static readonly ILogger Logger = LogCenter.GetLogger();
 
 		public static void Execute(int retryNumber, Action action)
 		{

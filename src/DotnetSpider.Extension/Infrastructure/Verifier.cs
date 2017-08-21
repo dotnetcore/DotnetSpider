@@ -34,9 +34,9 @@ namespace DotnetSpider.Extension.Infrastructure
 
 	public abstract class Verifier
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 		protected const string ValidateStatusKey = "dotnetspider:validate-stats";
-		protected List<IVerifier> verifiers = new List<IVerifier>();
+		protected List<IVerifier> Verifiers = new List<IVerifier>();
 
 		public List<string> EmailTo { get; set; }
 		public string EmailHost { get; set; }
@@ -48,7 +48,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public string EmailDisplayName { get; set; } = "DotnetSpider Alert";
 
-		public Verifier()
+		protected Verifier()
 		{
 			EmailHost = Config.GetValue("emailHost")?.Trim();
 			var portStr = Config.GetValue("emailPort");
@@ -68,7 +68,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			EmailPassword = Config.GetValue("emailPassword")?.Trim();
 		}
 
-		public Verifier(string emailTo, string subject, string host, int port, string account, string password)
+		protected Verifier(string emailTo, string subject, string host, int port, string account, string password)
 		{
 			EmailTo = emailTo.Split(';').Select(e => e.Trim()).ToList();
 			EmailHost = host;
@@ -129,22 +129,22 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public void AddEqual(string name, string sql, dynamic value)
 		{
-			verifiers.Add(new Equal(name, sql, value));
+			Verifiers.Add(new Equal(name, sql, value));
 		}
 
 		public void AddLarge(string name, string sql, dynamic value)
 		{
-			verifiers.Add(new Large(name, sql, value));
+			Verifiers.Add(new Large(name, sql, value));
 		}
 
 		public void AddLess(string name, string sql, dynamic value)
 		{
-			verifiers.Add(new Less(name, sql, value));
+			Verifiers.Add(new Less(name, sql, value));
 		}
 
 		public void AddRange(string name, string sql, dynamic minValue, dynamic maxValue)
 		{
-			verifiers.Add(new Range(name, sql, minValue, maxValue));
+			Verifiers.Add(new Range(name, sql, minValue, maxValue));
 		}
 
 		public abstract void Report();
@@ -153,12 +153,11 @@ namespace DotnetSpider.Extension.Infrastructure
 		{
 			public string Name { get; protected set; }
 			public string VerifierName { get; protected set; }
-			public string Sql { get; protected set; }
-			public dynamic[] Values { get; protected set; }
+			protected string Sql { get; set; }
+			protected dynamic[] Values { get; set; }
 
 			public VerifyResult Verify(IDbConnection conn)
 			{
-				QueryResult query;
 				bool verifyResult;
 				Object result;
 				string color;
@@ -166,8 +165,8 @@ namespace DotnetSpider.Extension.Infrastructure
 
 				try
 				{
-					query = conn.Query<QueryResult>(Sql).FirstOrDefault();
-					result = query != null ? query.Result : null;
+					var query = conn.Query<QueryResult>(Sql).FirstOrDefault();
+					result = query?.Result;
 					verifyResult = Verify(result);
 					color = verifyResult ? "forestgreen" : "orangered";
 					verifyResultStr = verifyResult ? "PASS" : "FAILED";
@@ -189,7 +188,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				$"<td>{ExpectedValue}</td>" +
 				$"<td>{result}</td>" +
 				$"<td style=\"color:{color}\"><strong>{verifyResultStr}</strong></td>" +
-				$"<td>{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}</td>" +
+				$"<td>{DateTime.Now:yyyy-MM-dd hh:mm:ss}</td>" +
 				"</tr>";
 
 				return new VerifyResult
@@ -209,7 +208,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			public Equal(string name, string sql, dynamic value)
 			{
 				Sql = sql;
-				Values = new dynamic[] { value };
+				Values = new[] { value };
 				Name = name;
 				VerifierName = "相等";
 			}
@@ -229,7 +228,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Name = name;
 				Sql = sql;
 				VerifierName = "大于";
-				Values = new dynamic[] { value };
+				Values = new[] { value };
 			}
 
 			public override dynamic ExpectedValue => Values[0];
@@ -247,7 +246,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Name = name;
 				Sql = sql;
 				VerifierName = "小于";
-				Values = new dynamic[] { value };
+				Values = new[] { value };
 			}
 
 			public override dynamic ExpectedValue => Values[0];
@@ -266,7 +265,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Name = name;
 				Sql = sql;
 				VerifierName = "范围";
-				Values = new dynamic[] { minValue, maxValue };
+				Values = new[] { minValue, maxValue };
 			}
 
 			public override dynamic ExpectedValue => $"{Values[0]}-{Values[1]}";
@@ -278,25 +277,25 @@ namespace DotnetSpider.Extension.Infrastructure
 		}
 	}
 
-	public class Verifier<E> : Verifier
+	public class Verifier<TE> : Verifier
 	{
 		public Properties Properties { get; }
 
 		public Verifier()
 		{
-			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
+			Properties = typeof(TE).GetTypeInfo().GetCustomAttribute<Properties>();
 			EmailTo = Properties.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
 			Subject = Properties.Subject;
 		}
 
 		public Verifier(string emailTo, string subject, string host, int port, string account, string password) : base(emailTo, subject, host, port, account, password)
 		{
-			Properties = typeof(E).GetTypeInfo().GetCustomAttribute<Properties>();
+			Properties = typeof(TE).GetTypeInfo().GetCustomAttribute<Properties>();
 		}
 
 		public override void Report()
 		{
-			if (verifiers != null && verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrEmpty(EmailHost))
+			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrEmpty(EmailHost))
 			{
 				using (var conn = new MySqlConnection(Config.ConnectString))
 				{
@@ -307,13 +306,13 @@ namespace DotnetSpider.Extension.Infrastructure
 "<meta charset=\"utf-8\">" +
 "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">" +
 "<meta name=\"viewport\" content=\"width=device-width initial-scale=1.0\">" +
-$"<title>{Subject}: {DateTime.Now.ToString()}</title>" +
+$"<title>{Subject}: {DateTime.Now}</title>" +
 "<style>" +
 "table {border-collapse: collapse;border-spacing: 0;border-left: 1px solid #888;border-top: 1px solid #888;background: #efefef;}th, td {border-right: 1px solid #888;border-bottom: 1px solid #888;padding: 5px 15px;}th {font-weight: bold;background: #ccc;}" +
 "</style>" +
 "</head>" +
 "<body style=\"background-color:#FAF7EC\">" +
-$"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
+$"<h2>{Subject}: {DateTime.Now}</h2>" +
 (hasProperties ? $"<p><strong>研究员: {Properties.Owner}</strong></p>" : "") +
 (hasProperties ? $"<p><strong>爬虫负责人: {Properties.Developer}</strong></p>" : "") +
 (hasProperties ? $"<p><strong>开发时间: {Properties.Date}</strong></p>" : "") +
@@ -334,7 +333,7 @@ $"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
 "<tbody>"
 );
 					var success = true;
-					foreach (var verifier in verifiers)
+					foreach (var verifier in Verifiers)
 					{
 						var result = verifier.Verify(conn);
 						emailBody.AppendLine(result.Report);

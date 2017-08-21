@@ -14,16 +14,16 @@ namespace DotnetSpider.Core.Infrastructure
 			_container = Builder.Value.Build();
 		}
 
-		public static void Register<IT, T>()
+		public static void Register<TIt, T>()
 		{
-			Builder.Value.RegisterType<T>().As<IT>();
+			Builder.Value.RegisterType<T>().As<TIt>();
 			_container = Builder.Value.Build();
 		}
 
-		public static IT Resolve<IT>()
+		public static TIt Resolve<TIt>()
 		{
-			IT o;
-			_container.TryResolve<IT>(out o);
+			TIt o;
+			_container.TryResolve(out o);
 			return o;
 		}
 

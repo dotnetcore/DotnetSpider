@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Model.Attribute;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

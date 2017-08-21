@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension.Test
 		public class TestEntity : SpiderEntity
 		{
 			[PropertyDefine(Expression = ".")]
-			public string name { get; set; }
+			public string Name { get; set; }
 		}
 
 		public class MyEntitySpider1 : EntitySpider
@@ -190,7 +190,7 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		public static void ClearDB()
+		public static void ClearDb()
 		{
 			var confiruation = new ConfigurationOptions()
 			{

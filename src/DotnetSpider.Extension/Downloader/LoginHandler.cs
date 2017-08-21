@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Extension.Downloader.WebDriver;
 using System;
 using DotnetSpider.Core.Selector;
 using OpenQA.Selenium;
@@ -13,7 +12,7 @@ namespace DotnetSpider.Extension.Downloader
 {
 	public abstract class LoginHandler : Named, IWebDriverHandler
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		public abstract bool Handle(RemoteWebDriver driver);
 	}
@@ -45,6 +44,7 @@ namespace DotnetSpider.Extension.Downloader
 				Thread.Sleep(1500);
 
 				var password = FindElement(webDriver, PassSelector);
+				password.Clear();
 				password.SendKeys(Password);
 				Thread.Sleep(1500);
 

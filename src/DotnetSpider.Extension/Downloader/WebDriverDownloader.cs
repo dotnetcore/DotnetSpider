@@ -9,7 +9,6 @@ using OpenQA.Selenium;
 using System.Net.Http;
 using DotnetSpider.Core.Redial;
 using System.Runtime.InteropServices;
-using DotnetSpider.Extension.Downloader.WebDriver;
 using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
 using System.Net;
@@ -22,25 +21,26 @@ namespace DotnetSpider.Extension.Downloader
 	public class WebDriverDownloader : BaseDownloader
 	{
 		private IWebDriver _webDriver;
-		private readonly int WebDriverWaitTime;
+		private readonly int _webDriverWaitTime;
 		private bool _isLogined;
-		private readonly Browser Browser;
-		private readonly Option Option;
+		private readonly Browser _browser;
+		private readonly Option _option;
 		public LoginHandler Login { get; set; }
 		public Func<string, string> UrlHandler;
 		public IWebDriverHandler NavigateCompeleted;
+		private bool _isDisposed;
 
 		public WebDriverDownloader(Browser browser, int webDriverWaitTime = 200, Option option = null)
 		{
-			WebDriverWaitTime = webDriverWaitTime;
-			Browser = browser;
-			Option = option ?? new Option();
+			_webDriverWaitTime = webDriverWaitTime;
+			_browser = browser;
+			_option = option ?? new Option();
 
 			if (browser == Browser.Firefox && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				Task.Factory.StartNew(() =>
 				{
-					while (true)
+					while (!_isDisposed)
 					{
 						IntPtr maindHwnd = WindowsFormUtil.FindWindow(null, "plugin-container.exe - 应用程序错误");
 						if (maindHwnd != IntPtr.Zero)
@@ -49,7 +49,6 @@ namespace DotnetSpider.Extension.Downloader
 						}
 						Thread.Sleep(500);
 					}
-					// ReSharper disable once FunctionNeverReturns
 				});
 			}
 		}
@@ -58,7 +57,7 @@ namespace DotnetSpider.Extension.Downloader
 		{
 		}
 
-		public WebDriverDownloader(Browser browser, LoginHandler loginHandler) : this(browser, 200, null)
+		public WebDriverDownloader(Browser browser, LoginHandler loginHandler) : this(browser, 200)
 		{
 			Login = loginHandler;
 		}
@@ -70,17 +69,14 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				lock (this)
 				{
-					if (_webDriver == null)
-					{
-						_webDriver = WebDriverExtensions.Open(Browser, Option);
-					}
+					_webDriver = _webDriver ?? WebDriverExtensions.Open(_browser, _option);
 
 					if (!_isLogined && Login != null)
 					{
 						_isLogined = Login.Handle(_webDriver as RemoteWebDriver);
 						if (!_isLogined)
 						{
-							throw new SpiderException("Login failed. Please check your login codes.");
+							throw new DownloadException("Login failed. Please check your login codes.");
 						}
 					}
 				}
@@ -118,7 +114,7 @@ namespace DotnetSpider.Extension.Downloader
 					NavigateCompeleted?.Handle((RemoteWebDriver)_webDriver);
 				});
 
-				Thread.Sleep(WebDriverWaitTime);
+				Thread.Sleep(_webDriverWaitTime);
 
 				Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
 				{
@@ -160,6 +156,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public override void Dispose()
 		{
+			_isDisposed = true;
 			_webDriver?.Quit();
 		}
 	}

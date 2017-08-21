@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using NLog;
-using System;
 using System.IO;
 #if NET_CORE
 #endif
@@ -9,7 +8,7 @@ namespace DotnetSpider.Core.Pipeline
 {
 	public abstract class BasePipeline : IPipeline
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 		protected string BasePath { get; set; }
 
 		public ISpider Spider { get; protected set; }
@@ -23,12 +22,12 @@ namespace DotnetSpider.Core.Pipeline
 
 		protected void SetPath(string path)
 		{
-			if (!path.EndsWith(Infrastructure.Environment.PathSeperator))
+			if (!path.EndsWith(Environment.PathSeperator))
 			{
-				path += Infrastructure.Environment.PathSeperator;
+				path += Environment.PathSeperator;
 			}
 
-			BasePath = Path.Combine(Infrastructure.Environment.BaseDirectory, path);
+			BasePath = Path.Combine(Environment.BaseDirectory, path);
 		}
 
 		public virtual void Dispose()

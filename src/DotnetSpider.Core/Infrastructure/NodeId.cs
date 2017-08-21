@@ -9,16 +9,11 @@ namespace DotnetSpider.Core.Infrastructure
 	{
 		static NodeId()
 		{
-			string path = "";
+
 #if NET_CORE
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-			{
-
-			}
-			path = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"c:\DotnetSpider\node.id" : "/opt/dotnetspider/node.id";
-
+			string path = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"c:\DotnetSpider\node.id" : "/opt/dotnetspider/node.id";
 #else
-			path = @"c:\DotnetSpider\node.id";
+			string path = @"c:\DotnetSpider\node.id";
 #endif
 			if (File.Exists(path))
 			{

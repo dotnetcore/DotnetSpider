@@ -11,12 +11,12 @@ namespace DotnetSpider.Core.Infrastructure
 			var ctors = typeof(T).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 			if (ctors.Length != 1)
 			{
-				throw new InvalidOperationException(String.Format("Type {0} must have exactly one constructor.", typeof(T)));
+				throw new InvalidOperationException($"Type {typeof(T)} must have exactly one constructor.");
 			}
 			var ctor = ctors.SingleOrDefault(c => !c.GetParameters().Any() && c.IsPrivate);
 			if (ctor == null)
 			{
-				throw new InvalidOperationException(String.Format("The constructor for {0} must be private and take no parameters.", typeof(T)));
+				throw new InvalidOperationException($"The constructor for {typeof(T)} must be private and take no parameters.");
 			}
 			return (T)ctor.Invoke(null);
 		});

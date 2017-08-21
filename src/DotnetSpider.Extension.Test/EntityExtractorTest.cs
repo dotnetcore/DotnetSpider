@@ -94,7 +94,7 @@ namespace DotnetSpider.Extension.Test
 		public class Entity1 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "$.age", Type = SelectorType.JsonPath)]
-			public int age { get; set; }
+			public int Age { get; set; }
 		}
 	}
 }

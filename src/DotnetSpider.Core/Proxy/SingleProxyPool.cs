@@ -24,5 +24,9 @@ namespace DotnetSpider.Core.Proxy
 		public void ReturnProxy(UseSpecifiedUriWebProxy host, HttpStatusCode statusCode)
 		{
 		}
+
+		public void Dispose()
+		{
+		}
 	}
 }

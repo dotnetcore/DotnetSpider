@@ -18,9 +18,6 @@ namespace DotnetSpider.Extension.Configuration
 {
 	public class JsonSpiderContext
 	{
-		public JsonSpiderContext()
-		{
-		}
 		public string ConnectString { get; set; }
 		public string RedisConnectString { get; set; }
 		public string Identity { get; set; }
@@ -86,7 +83,7 @@ namespace DotnetSpider.Extension.Configuration
 				{
 					case "MongoDb":
 						{
-							tmp = new MongoDBEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString());
+							tmp = new MongoDbEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString());
 							break;
 						}
 					case "SqlServer":

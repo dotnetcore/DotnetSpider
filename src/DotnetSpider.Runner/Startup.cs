@@ -57,7 +57,7 @@ namespace DotnetSpider.Runner
 					return;
 				}
 			}
-			string spiderName = string.Empty;
+			string spiderName;
 			if (arguments.Count == 0 || !arguments.ContainsKey("-s") || !arguments.ContainsKey("-tid"))
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
@@ -73,7 +73,7 @@ namespace DotnetSpider.Runner
 #if NET_CORE
 			var deps = DependencyContext.Default;
 #endif
-			int totalTypesCount = 0;
+
 			var spiders = new Dictionary<string, object>();
 #if NET_CORE
 			foreach (var library in deps.CompileLibraries.Where(l => l.Name.ToLower().EndsWith("dotnetspider.sample") || l.Name.ToLower().EndsWith("spiders") || l.Name.ToLower().EndsWith("crawlers")))
@@ -118,7 +118,6 @@ namespace DotnetSpider.Runner
 								Console.ForegroundColor = ConsoleColor.White;
 								return;
 							}
-							++totalTypesCount;
 						}
 					}
 				}
@@ -166,11 +165,9 @@ namespace DotnetSpider.Runner
 				}
 			}
 
-			string taskId = "";
 			if (arguments.ContainsKey("-tid"))
 			{
 				var property = spider.GetType().GetProperties().First(p => p.Name == "TaskId");
-				taskId = arguments["-tid"].ToLower();
 				if (arguments["-tid"].ToLower() == "guid")
 				{
 					property.SetValue(spider, Guid.NewGuid().ToString("N"));
@@ -204,13 +201,12 @@ namespace DotnetSpider.Runner
 		{
 			Console.WriteLine();
 
-			bool isPrinted;
 			var key = "_DotnetSpider_Info";
 
 #if !NET_CORE
-			isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
+			var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
 #else
-
+			bool isPrinted;
 			AppContext.TryGetSwitch(key, out isPrinted);
 #endif
 			if (!isPrinted)

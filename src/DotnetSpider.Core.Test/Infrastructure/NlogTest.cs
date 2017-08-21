@@ -1,12 +1,7 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NLog;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml;
 
 namespace DotnetSpider.Core.Test.Infrastructure
 {
@@ -16,34 +11,19 @@ namespace DotnetSpider.Core.Test.Infrastructure
 		[TestMethod]
 		public void WithoutNlogConfig()
 		{
-#if !NET_CORE
-			string nlogConfigPath = Path.Combine(Core.Infrastructure.Environment.BaseDirectory, "nlog.net45.config");
-#else
-			string nlogConfigPath = Path.Combine(Core.Infrastructure.Environment.BaseDirectory, "nlog.config");
-#endif
-
-#if !NET_CORE
-			var tmpPath = Path.Combine(System.Environment.GetEnvironmentVariable("TEMP"), "nlog.net45.config");
-#else
-			var tmpPath = Path.Combine(System.Environment.GetEnvironmentVariable("TEMP"), "nlog.config");
-#endif
-			try
-			{
-				File.Move(nlogConfigPath, tmpPath);
-
-				ILogger logger = LogCenter.GetLogger();
-
-				using (StreamReader reader = new StreamReader(typeof(LogCenter).Assembly.GetManifestResourceStream("DotnetSpider.Core.nlog.default.config")))
-				{
-					var nlogConfig = reader.ReadToEnd();
-					Assert.AreEqual(nlogConfig, File.ReadAllText(nlogConfigPath));
-				}
-			}
-			finally
-			{
-				File.Delete(nlogConfigPath);
-				File.Move(tmpPath, nlogConfigPath);
-			}
+			var nlogConfig = LogCenter.GetDefaultConfigString();
+			XmlDocument document = new XmlDocument();
+			document.Load(new StringReader(nlogConfig));
+			Assert.AreEqual("nlog", document.DocumentElement.Name);
+			Assert.AreEqual(2, document.DocumentElement.ChildNodes.Count);
+			Assert.AreEqual(2, document.DocumentElement.ChildNodes[0].ChildNodes.Count);
+			Assert.AreEqual("target", document.DocumentElement.ChildNodes[0].ChildNodes[0].Name);
+			Assert.AreEqual("console", document.DocumentElement.ChildNodes[0].ChildNodes[0].Attributes["name"].Value);
+			Assert.AreEqual("file", document.DocumentElement.ChildNodes[0].ChildNodes[1].Attributes["name"].Value);
+			Assert.AreEqual(2, document.DocumentElement.ChildNodes[1].ChildNodes.Count);
+			Assert.AreEqual("logger", document.DocumentElement.ChildNodes[1].ChildNodes[0].Name);
+			Assert.AreEqual("console", document.DocumentElement.ChildNodes[1].ChildNodes[0].Attributes["writeTo"].Value);
+			Assert.AreEqual("file", document.DocumentElement.ChildNodes[1].ChildNodes[1].Attributes["writeTo"].Value);
 		}
 	}
 }

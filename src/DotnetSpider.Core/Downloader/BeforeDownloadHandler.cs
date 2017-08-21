@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace DotnetSpider.Core.Downloader
+﻿namespace DotnetSpider.Core.Downloader
 {
 	public abstract class BeforeDownloadHandler : Named, IBeforeDownloadHandler
 	{

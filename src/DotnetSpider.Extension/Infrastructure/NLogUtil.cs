@@ -15,21 +15,26 @@ namespace DotnetSpider.Extension.Infrastructure
 			{
 				XElement root = XElement.Parse(File.ReadAllText(fileInfo.FullName));
 
-				var targetsRoot = root.Element("{http://www.nlog-project.org/schemas/NLog.xsd}targets");
-				var targets = targetsRoot.Elements("{http://www.nlog-project.org/schemas/NLog.xsd}target").ToList();
-				var dblog = targets.First(e => e.Attribute("name").Value == "dblog");
-				var commands = dblog.Elements("{http://www.nlog-project.org/schemas/NLog.xsd}install-command");
-				using (var conn = new MySqlConnection(connectString))
+				var xElement = root.Element("{http://www.nlog-project.org/schemas/NLog.xsd}targets");
+				if (xElement != null)
 				{
-					foreach (var command in commands)
+					var targets = xElement.Elements("{http://www.nlog-project.org/schemas/NLog.xsd}target").ToList();
+					var dblog = targets.First(e =>
 					{
-						var sql = command.Attribute("text").Value;
-						try
+						var xAttribute = e.Attribute("name");
+						return xAttribute != null && xAttribute.Value == "dblog";
+					});
+					var commands = dblog.Elements("{http://www.nlog-project.org/schemas/NLog.xsd}install-command");
+					using (var conn = new MySqlConnection(connectString))
+					{
+						foreach (var command in commands)
 						{
-							conn.Execute(sql);
-						}
-						catch
-						{
+							var xAttribute = command.Attribute("text");
+							if (xAttribute != null)
+							{
+								var sql = xAttribute.Value;
+								conn.Execute(sql);
+							}
 						}
 					}
 				}

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Web;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
-using DotnetSpider.Extension.Downloader;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
 using DotnetSpider.Core.Infrastructure;

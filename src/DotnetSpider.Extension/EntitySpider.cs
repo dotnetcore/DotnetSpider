@@ -311,11 +311,11 @@ namespace DotnetSpider.Extension
 			{
 				case TableSuffix.FirstDayOfThisMonth:
 					{
-						return name + "_" + DateTimeUtils.First_Day_Of_Current_Month.ToString("yyyy_MM_dd");
+						return name + "_" + DateTimeUtils.FirstDayOfCurrentMonth.ToString("yyyy_MM_dd");
 					}
 				case TableSuffix.Monday:
 					{
-						return name + "_" + DateTimeUtils.Monday_Of_Current_Week.ToString("yyyy_MM_dd");
+						return name + "_" + DateTimeUtils.MondayOfCurrentWeek.ToString("yyyy_MM_dd");
 					}
 				case TableSuffix.Today:
 					{

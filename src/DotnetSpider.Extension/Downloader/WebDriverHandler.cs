@@ -4,11 +4,11 @@ using OpenQA.Selenium.Remote;
 using System;
 using System.Threading;
 
-namespace DotnetSpider.Extension.Downloader.WebDriver
+namespace DotnetSpider.Extension.Downloader
 {
 	public class Scroll : IWebDriverHandler
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		public int Interval { get; set; } = 1;
 		public int ScrollTo { get; set; } = 0;

@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Redial
 {
 	public abstract class RedialExecutor : IRedialExecutor
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 		protected static object Lock = new object();
 		public IRedialer Redialer { get; }
 		public IInternetDetector InternetDetector { get; }

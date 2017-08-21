@@ -9,7 +9,7 @@ namespace DotnetSpider.Core.Proxy
 {
 	public class KuaidailiProxySupplier : IProxySupplier
 	{
-		private readonly static ILogger Logger = LogCenter.GetLogger();
+		private static readonly ILogger Logger = LogCenter.GetLogger();
 		public string Url { get; }
 		private readonly HttpClient _client = new HttpClient();
 

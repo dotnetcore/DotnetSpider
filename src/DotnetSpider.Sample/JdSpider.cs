@@ -78,7 +78,7 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit(params string[] arguments)
 		{
-			Identity = "Cnblog Daliy Tracking " + DateTimeUtils.Monday_Of_Current_Week.ToString("yyyy-MM-dd");
+			Identity = "Cnblog Daliy Tracking " + DateTime.Now.ToString("yyyy-MM-dd");
 			AddStartUrl("http://www.jd.com/allSort.aspx");
 			AddEntityType(typeof(Category));
 			AddEntityType(typeof(TmpProduct));

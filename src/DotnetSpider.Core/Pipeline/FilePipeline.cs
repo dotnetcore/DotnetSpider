@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Pipeline
 			{
 				foreach (var resultItem in resultItems)
 				{
-					string filePath = $"{BasePath}{Infrastructure.Environment.PathSeperator}{Spider.Identity}{Infrastructure.Environment.PathSeperator}{Guid.NewGuid().ToString("N")}.dsd";
+					string filePath = $"{BasePath}{Infrastructure.Environment.PathSeperator}{Spider.Identity}{Infrastructure.Environment.PathSeperator}{Guid.NewGuid():N}.dsd";
 					FileInfo file = PrepareFile(filePath);
 
 					using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))

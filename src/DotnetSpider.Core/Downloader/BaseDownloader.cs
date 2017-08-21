@@ -9,11 +9,11 @@ using System.Threading;
 
 namespace DotnetSpider.Core.Downloader
 {
-	public abstract class BaseDownloader : Named, IDownloader, IDisposable
+	public abstract class BaseDownloader : Named, IDownloader
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		protected bool IsDetectedContentType { get; set; } = false;
+		protected bool IsDetectedContentType { get; set; }
 
 		protected List<IAfterDownloadCompleteHandler> AfterDownloadComplete { get; set; } = new List<IAfterDownloadCompleteHandler>();
 
@@ -66,7 +66,11 @@ namespace DotnetSpider.Core.Downloader
 			{
 				_lock.ExitWriteLock();
 			}
-			result.ContentType = spider.Site.ContentType;
+
+			if (result != null)
+			{
+				result.ContentType = spider.Site.ContentType;
+			}
 
 			HandlerAfterDownloadComplete(ref result, spider);
 
@@ -131,10 +135,14 @@ namespace DotnetSpider.Core.Downloader
 				try
 				{
 					string folder = Path.GetDirectoryName(filePath);
-					if (!Directory.Exists(folder))
+					if (!string.IsNullOrEmpty(folder))
 					{
-						Directory.CreateDirectory(folder);
+						if (!Directory.Exists(folder))
+						{
+							Directory.CreateDirectory(folder);
+						}
 					}
+
 					File.WriteAllBytes(filePath, response.Content.ReadAsByteArrayAsync().Result);
 				}
 				catch (Exception e)
