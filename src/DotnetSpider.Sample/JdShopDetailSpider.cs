@@ -25,19 +25,15 @@ namespace DotnetSpider.Sample
 		{
 			ThreadNum = 1;
 			Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
-			Downloader = new HttpClientDownloader
+			Downloader = new HttpClientDownloader();
+			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-						new SubContentHandler
-						{
-							Start = "json(",
-							End = ");",
-							StartOffset = 5,
-							EndOffset = 0
-						}
-				}
-			};
+				Start = "json(",
+				End = ");",
+				StartOffset = 5,
+				EndOffset = 0
+			});
+
 			PrepareStartUrls = new PrepareStartUrls[]
 			{
 					new BaseDbPrepareStartUrls()

@@ -95,20 +95,14 @@ namespace DotnetSpider.Sample
 		protected override void MyInit(params string[] arguments)
 		{
 			Scheduler = new RedisScheduler(Config.RedisConnectString);
-			Downloader = new HttpClientDownloader
+			var downloader = new HttpClientDownloader();
+			downloader.AddAfterDownloadCompleteHandler(new ReplaceContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new SubContentHandler
-					{
-						StartOffset = 16,
-						EndOffset = 22,
-						Start = "g_page_config = {",
-						End = "g_srp_loadCss();"
-					},
-					new IncrementTargetUrlsCreator("&s=0",null,44)
-				}
-			};
+				NewValue = "/",
+				OldValue = "\\/",
+			});
+			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsCreator("&s=0", null, 44));
+			Downloader = downloader;
 			ThreadNum = 1;
 			SkipWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))

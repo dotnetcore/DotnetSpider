@@ -226,6 +226,7 @@ namespace DotnetSpider.Extension
 			if (entitySelector != null)
 			{
 				entityMetadata.Multi = true;
+				entityMetadata.Take = entitySelector.Take;
 				entityMetadata.Selector = new BaseSelector { Expression = entitySelector.Expression, Type = entitySelector.Type };
 			}
 			else

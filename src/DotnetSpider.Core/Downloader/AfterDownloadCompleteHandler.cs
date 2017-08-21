@@ -6,14 +6,14 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Downloader
 {
-	public abstract class DownloadCompleteHandler : Named, IDownloadCompleteHandler
+	public abstract class AfterDownloadCompleteHandler : Named, IAfterDownloadCompleteHandler
 	{
 		protected readonly static ILogger Logger = LogCenter.GetLogger();
 
 		public abstract bool Handle(ref Page page, ISpider spider);
 	}
 
-	public class UpdateCookieWhenContainsHandler : DownloadCompleteHandler
+	public class UpdateCookieWhenContainsHandler : AfterDownloadCompleteHandler
 	{
 		public ICookieInjector CookieInjector { get; set; }
 		public string Content { get; set; }
@@ -28,7 +28,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class TimerUpdateCookieHandler : DownloadCompleteHandler
+	public class TimerUpdateCookieHandler : AfterDownloadCompleteHandler
 	{
 		public ICookieInjector CookieInjector { get; }
 		public int Interval { get; }
@@ -53,7 +53,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class SkipWhenContainsHandler : DownloadCompleteHandler
+	public class SkipWhenContainsHandler : AfterDownloadCompleteHandler
 	{
 		public string Content { get; set; }
 
@@ -72,7 +72,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class MissTargetUrlWhenNotContainsHandler : DownloadCompleteHandler
+	public class MissTargetUrlWhenNotContainsHandler : AfterDownloadCompleteHandler
 	{
 		public string Content { get; set; }
 
@@ -92,7 +92,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class SubContentHandler : DownloadCompleteHandler
+	public class SubContentHandler : AfterDownloadCompleteHandler
 	{
 		public string Start { get; set; }
 		public string End { get; set; }
@@ -127,7 +127,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class RemoveContentHandler : DownloadCompleteHandler
+	public class RemoveContentHandler : AfterDownloadCompleteHandler
 	{
 		public string Start { get; set; }
 		public string End { get; set; }
@@ -165,7 +165,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class RemoveHtmlTagHandler : DownloadCompleteHandler
+	public class RemoveHtmlTagHandler : AfterDownloadCompleteHandler
 	{
 		public override bool Handle(ref Page p, ISpider spider)
 		{
@@ -176,7 +176,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class ContentToUpperHandler : DownloadCompleteHandler
+	public class ContentToUpperHandler : AfterDownloadCompleteHandler
 	{
 		public override bool Handle(ref Page p, ISpider spider)
 		{
@@ -188,7 +188,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class ContentToLowerHandler : DownloadCompleteHandler
+	public class ContentToLowerHandler : AfterDownloadCompleteHandler
 	{
 		public bool ToUpper { get; set; } = false;
 
@@ -202,7 +202,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class CustomizeContentHandler : DownloadCompleteHandler
+	public class CustomizeContentHandler : AfterDownloadCompleteHandler
 	{
 		public bool Loop { get; set; } = true;
 		public bool DisableNewLine { get; set; } = false;
@@ -252,7 +252,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class ReplaceContentHandler : DownloadCompleteHandler
+	public class ReplaceContentHandler : AfterDownloadCompleteHandler
 	{
 		public string OldValue { get; set; }
 		public string NewValue { get; set; }
@@ -264,7 +264,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class TrimContentHandler : DownloadCompleteHandler
+	public class TrimContentHandler : AfterDownloadCompleteHandler
 	{
 		public override bool Handle(ref Page p, ISpider spider)
 		{
@@ -276,7 +276,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class UnescapeContentHandler : DownloadCompleteHandler
+	public class UnescapeContentHandler : AfterDownloadCompleteHandler
 	{
 		public override bool Handle(ref Page p, ISpider spider)
 		{
@@ -288,7 +288,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class RegexMatchContentHandler : DownloadCompleteHandler
+	public class RegexMatchContentHandler : AfterDownloadCompleteHandler
 	{
 		public string Pattern { get; set; }
 
@@ -307,7 +307,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class RetryWhenContainsHandler : DownloadCompleteHandler
+	public class RetryWhenContainsHandler : AfterDownloadCompleteHandler
 	{
 		public string Content { get; set; }
 

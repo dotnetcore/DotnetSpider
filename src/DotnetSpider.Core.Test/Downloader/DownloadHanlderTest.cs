@@ -17,16 +17,11 @@ namespace DotnetSpider.Core.Test.Downloader
 					{"TOKEN1", "TEST1"}
 				}
 			});
-			TestDownloader downloader = new TestDownloader
+			TestDownloader downloader = new TestDownloader();
+			downloader.AddBeforeDownloadHandler(new GeneratePostBodyHandler
 			{
-				BeforeDownloadHandlers = new IBeforeDownloadHandler[]
-				{
-					new GeneratePostBodyHandler
-					{
-						ArgumnetNames = new[] {"TOKEN1","TOKEN2"}
-					}
-				}
-			};
+				ArgumnetNames = new[] { "TOKEN1", "TOKEN2" }
+			});
 			var request1 = new Request("http://a.com/", new Dictionary<string, dynamic>
 			{
 				{"TOKEN2", "TEST2"}
@@ -60,82 +55,56 @@ namespace DotnetSpider.Core.Test.Downloader
 		public void SubContentHandler()
 		{
 			var spider = new DefaultSpider("test", new Site());
-			TestDownloader downloader1 = new TestDownloader()
+			TestDownloader downloader1 = new TestDownloader();
+			downloader1.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new SubContentHandler
-					{
-						Start = "a",
-						End = "c"
-					}
-				}
-			};
+				Start = "a",
+				End = "c"
+			});
 			var request1 = new Request("http://a.com/", null);
 			Page page = downloader1.Download(request1, spider);
 			Assert.AreEqual("aabbc", page.Content);
 
-			downloader1 = new TestDownloader
+			downloader1 = new TestDownloader();
+			downloader1.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new SubContentHandler
-					{
-						Start = "a",
-						End = "c",
-						EndOffset = 1
-					}
-				}
-			};
+				Start = "a",
+				End = "c",
+				EndOffset = 1
+			});
 
 			page = downloader1.Download(request1, spider);
 			Assert.AreEqual("aabb", page.Content);
 
-			downloader1 = new TestDownloader
+			downloader1 = new TestDownloader();
+			downloader1.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new SubContentHandler
-					{
-						Start = "a",
-						End = "c",
-						StartOffset = 1
-					}
-				}
-			};
-
+				Start = "a",
+				End = "c",
+				StartOffset = 1
+			});
 			page = downloader1.Download(request1, spider);
 			Assert.AreEqual("abbc", page.Content);
 
-			downloader1 = new TestDownloader
+			downloader1 = new TestDownloader();
+			downloader1.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new SubContentHandler
-					{
-						Start = "a",
-						End = "c",
-						StartOffset = 1,
-						EndOffset = 1
-					}
-				}
-			};
+				Start = "a",
+				End = "c",
+				StartOffset = 1,
+				EndOffset = 1
+			});
 
 			page = downloader1.Download(request1, spider);
 			Assert.AreEqual("abb", page.Content);
 
-			downloader1 = new TestDownloader
+			downloader1 = new TestDownloader();
+			downloader1.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new SubContentHandler
-					{
-						Start = "a",
-						End = "c",
-						StartOffset = 10
-					}
-				}
-			};
+				Start = "a",
+				End = "c",
+				StartOffset = 10
+			});
 
 			var downloader2 = downloader1;
 
@@ -149,19 +118,13 @@ namespace DotnetSpider.Core.Test.Downloader
 				Assert.AreEqual("Sub content failed. Please check your settings.", exception.Message);
 			}
 
-
-			downloader1 = new TestDownloader
+			downloader1 = new TestDownloader();
+			downloader1.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new SubContentHandler
-					{
-						Start = "a",
-						End = "c",
-						EndOffset = 20
-					}
-				}
-			};
+				Start = "a",
+				End = "c",
+				EndOffset = 20
+			});
 
 			try
 			{
@@ -178,31 +141,21 @@ namespace DotnetSpider.Core.Test.Downloader
 		public void RetryWhenContainsIllegalStringHandler()
 		{
 			var spider = new DefaultSpider("test", new Site());
-			TestDownloader downloader1 = new TestDownloader()
+
+			TestDownloader downloader1 = new TestDownloader();
+			downloader1.AddAfterDownloadCompleteHandler(new RetryWhenContainsHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new RetryWhenContainsHandler
-					{
-						Content = "aabbcccdefg下载人数100"
-					}
-				}
-			};
+				Content = "aabbcccdefg下载人数100"
+			});
 			var request1 = new Request("http://www.163.com/", null);
 			Page page = downloader1.Download(request1, spider);
 			Assert.AreEqual(1, page.TargetRequests.Count);
 
-			downloader1 = new TestDownloader
+			downloader1 = new TestDownloader();
+			downloader1.AddAfterDownloadCompleteHandler(new RetryWhenContainsHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new RetryWhenContainsHandler
-					{
-						Content = "网易倒闭啦"
-					}
-				}
-			};
-
+				Content = "网易倒闭啦"
+			});
 			page = downloader1.Download(request1, spider);
 			Assert.AreEqual(0, page.TargetRequests.Count);
 		}

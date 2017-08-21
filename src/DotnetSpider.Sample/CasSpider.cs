@@ -18,13 +18,9 @@ namespace DotnetSpider.Sample
 		protected override void MyInit(params string[] arguments)
 		{
 			Identity = ("qidian_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-			Downloader = new HttpClientDownloader
-			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-					new IncrementTargetUrlsCreator("index_1.shtml")
-				}
-			};
+			var downloader = new HttpClientDownloader();
+			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsCreator("index_1.shtml"));
+			Downloader = downloader;
 			ThreadNum = 1;
 			AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 			AddStartUrl("http://www.cas.cn/kx/kpwz/index_1.shtml");

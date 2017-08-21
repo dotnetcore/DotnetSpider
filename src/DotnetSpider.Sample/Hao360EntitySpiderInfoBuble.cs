@@ -22,22 +22,19 @@ namespace DotnetSpider.Sample
 			CachedSize = 1;
 			ThreadNum = 1;
 			SkipWhenResultIsEmpty = true;
-			Downloader = new HttpClientDownloader
+			var downloader = new HttpClientDownloader();
+			downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-				{
-						new SubContentHandler {
-							Start="sales[\"hotsite_yixing\"] = [",
-							End="}}",
-							StartOffset=27,
-							EndOffset=0
-						},
-						new ReplaceContentHandler {
-							NewValue="/",
-							OldValue="\\/",
-						},
-				}
-			};
+				Start = "sales[\"hotsite_yixing\"] = [",
+				End = "}}",
+				StartOffset = 27,
+				EndOffset = 0
+			});
+			downloader.AddAfterDownloadCompleteHandler(new ReplaceContentHandler
+			{
+				NewValue = "/",
+				OldValue = "\\/",
+			});
 			Scheduler = new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
 			AddPipeline(new MySqlEntityPipeline("Database='testhao';Data Source= localhost;User ID=root;Password=root@123456;Port=3306"));
 			AddStartUrl("https://hao.360.cn/");

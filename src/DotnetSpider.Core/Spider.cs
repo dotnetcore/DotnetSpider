@@ -93,7 +93,7 @@ namespace DotnetSpider.Core
 		private int _cachedSize = 1;
 		private string _identity;
 
-		private IDownloader _downloader;
+		private IDownloader _downloader = new HttpClientDownloader();
 		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private List<IPipeline> _pipelines = new List<IPipeline>();
 		private Task _monitorTask;

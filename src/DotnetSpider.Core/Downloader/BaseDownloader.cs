@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -14,8 +15,9 @@ namespace DotnetSpider.Core.Downloader
 
 		protected bool IsDetectedContentType { get; set; } = false;
 
-		public IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }
-		public IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }
+		protected List<IAfterDownloadCompleteHandler> AfterDownloadComplete { get; set; } = new List<IAfterDownloadCompleteHandler>();
+
+		protected List<IBeforeDownloadHandler> BeforeDownload { get; set; } = new List<IBeforeDownloadHandler>();
 
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
@@ -33,7 +35,7 @@ namespace DotnetSpider.Core.Downloader
 				return null;
 			}
 
-			BeforeDownload(request, spider);
+			HandleBeforeDownload(ref request, spider);
 
 			var result = DowloadContent(request, spider);
 
@@ -66,7 +68,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			result.ContentType = spider.Site.ContentType;
 
-			AfterDownloadComplete(ref result, spider);
+			HandlerAfterDownloadComplete(ref result, spider);
 
 			return result;
 		}
@@ -80,27 +82,39 @@ namespace DotnetSpider.Core.Downloader
 		{
 		}
 
+		public void AddAfterDownloadCompleteHandler(IAfterDownloadCompleteHandler handler)
+		{
+			AfterDownloadComplete.Add(handler);
+		}
+
+		public void AddBeforeDownloadHandler(IBeforeDownloadHandler handler)
+		{
+			BeforeDownload.Add(handler);
+		}
+
 		protected abstract Page DowloadContent(Request request, ISpider spider);
 
-		protected void BeforeDownload(Request request, ISpider spider)
+		protected void HandleBeforeDownload(ref Request request, ISpider spider)
 		{
-			if (BeforeDownloadHandlers != null)
+			if (BeforeDownload != null && BeforeDownload.Count > 0)
 			{
-				foreach (var handler in BeforeDownloadHandlers)
+				foreach (var handler in BeforeDownload)
 				{
-					handler.Handle(request, spider);
+					if (!handler.Handle(ref request, spider))
+					{
+						break;
+					}
 				}
 			}
 		}
 
-		protected void AfterDownloadComplete(ref Page page, ISpider spider)
+		protected void HandlerAfterDownloadComplete(ref Page page, ISpider spider)
 		{
-			if (DownloadCompleteHandlers != null)
+			if (AfterDownloadComplete != null && AfterDownloadComplete.Count > 0)
 			{
-				foreach (var handler in DownloadCompleteHandlers)
+				foreach (var handler in AfterDownloadComplete)
 				{
-					var success = handler.Handle(ref page, spider);
-					if (!success)
+					if (!handler.Handle(ref page, spider))
 					{
 						break;
 					}

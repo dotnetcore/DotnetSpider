@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
@@ -15,9 +17,9 @@ namespace DotnetSpider.Core.Downloader
 		/// <returns></returns>
 		Page Download(Request request, ISpider spider);
 
-		IDownloadCompleteHandler[] DownloadCompleteHandlers { get; set; }
+		void AddAfterDownloadCompleteHandler(IAfterDownloadCompleteHandler handler);
 
-		IBeforeDownloadHandler[] BeforeDownloadHandlers { get; set; }
+		void AddBeforeDownloadHandler(IBeforeDownloadHandler handler);
 
 		IDownloader Clone();
 	}

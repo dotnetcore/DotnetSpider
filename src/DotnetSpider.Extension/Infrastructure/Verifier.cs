@@ -19,11 +19,17 @@ namespace DotnetSpider.Extension.Infrastructure
 		public dynamic Result { get; set; }
 	}
 
+	public class VerifyResult
+	{
+		public bool IsPass { get; set; }
+		public string Report { get; set; }
+	}
+
 	public interface IVerifier
 	{
 		string Name { get; }
 		string VerifierName { get; }
-		string Verify(IDbConnection conn);
+		VerifyResult Verify(IDbConnection conn);
 	}
 
 	public abstract class Verifier
@@ -150,13 +156,14 @@ namespace DotnetSpider.Extension.Infrastructure
 			public string Sql { get; protected set; }
 			public dynamic[] Values { get; protected set; }
 
-			public string Verify(IDbConnection conn)
+			public VerifyResult Verify(IDbConnection conn)
 			{
 				QueryResult query;
 				bool verifyResult;
 				Object result;
 				string color;
 				string verifyResultStr;
+
 				try
 				{
 					query = conn.Query<QueryResult>(Sql).FirstOrDefault();
@@ -174,7 +181,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				}
 
 
-				return
+				var report =
 				"<tr>" +
 				$"<td>{Name}</td>" +
 				$"<td>{VerifierName}</td>" +
@@ -184,6 +191,12 @@ namespace DotnetSpider.Extension.Infrastructure
 				$"<td style=\"color:{color}\"><strong>{verifyResultStr}</strong></td>" +
 				$"<td>{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}</td>" +
 				"</tr>";
+
+				return new VerifyResult
+				{
+					IsPass = verifyResult,
+					Report = report
+				};
 			}
 
 			public abstract dynamic ExpectedValue { get; }
@@ -320,9 +333,15 @@ $"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
 "</thead>" +
 "<tbody>"
 );
+					var success = true;
 					foreach (var verifier in verifiers)
 					{
-						emailBody.AppendLine(verifier.Verify(conn));
+						var result = verifier.Verify(conn);
+						emailBody.AppendLine(result.Report);
+						if (success && !result.IsPass)
+						{
+							success = false;
+						}
 					}
 					emailBody.Append("</tbody></table><br/></body></html>");
 
@@ -333,7 +352,7 @@ $"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
 						message.To.Add(new MailboxAddress(emailTo, emailTo));
 					}
 
-					message.Subject = Subject;
+					message.Subject = $"{Subject}: {(success ? "成功" : "失败")}";
 
 					var html = new TextPart("html")
 					{
@@ -355,7 +374,5 @@ $"<h2>{Subject}: {DateTime.Now.ToString()}</h2>" +
 				}
 			}
 		}
-
-
 	}
 }

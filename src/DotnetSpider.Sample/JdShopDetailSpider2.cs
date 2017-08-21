@@ -31,19 +31,14 @@ namespace DotnetSpider.Sample
 		{
 			Site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3355984&callback=json");
 			Site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3682523&callback=json");
-			Downloader = new HttpClientDownloader
+			var downloader = new HttpClientDownloader();
+			downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				DownloadCompleteHandlers = new IDownloadCompleteHandler[]
-					{
-						new SubContentHandler
-						{
-							Start = "json(",
-							End = ");",
-							StartOffset = 5,
-							EndOffset = 2
-						}
-					}
-			};
+				Start = "json(",
+				End = ");",
+				StartOffset = 5,
+				EndOffset = 2
+			});
 
 			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=3306"));
 			AddEntityType(typeof(ProductUpdater));

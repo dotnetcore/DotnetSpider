@@ -6,7 +6,7 @@ using NLog;
 
 namespace DotnetSpider.Extension.Downloader
 {
-	public class RedialWhenContainsHandler : DownloadCompleteHandler
+	public class RedialWhenContainsHandler : AfterDownloadCompleteHandler
 	{
 		public string Content { get; set; }
 
@@ -26,7 +26,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class RedialWhenExceptionThrowHandler : DownloadCompleteHandler
+	public class RedialWhenExceptionThrowHandler : AfterDownloadCompleteHandler
 	{
 		public string ExceptionMessage { get; set; } = string.Empty;
 
@@ -53,7 +53,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class RedialAndUpdateCookieWhenContainsHandler : DownloadCompleteHandler
+	public class RedialAndUpdateCookieWhenContainsHandler : AfterDownloadCompleteHandler
 	{
 		public string Content { get; set; }
 		public ICookieInjector CookieInjector { get; set; }
@@ -74,7 +74,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class CycleRedialHandler : DownloadCompleteHandler
+	public class CycleRedialHandler : AfterDownloadCompleteHandler
 	{
 		public int RedialLimit { get; set; }
 		public static int RequestedCount { get; set; }

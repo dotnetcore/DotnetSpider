@@ -47,7 +47,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public abstract class BaseTargetUrlsCreator : IDownloadCompleteHandler
+	public abstract class BaseTargetUrlsCreator : IAfterDownloadCompleteHandler
 	{
 		public virtual bool Handle(ref Page page, ISpider spider)
 		{
