@@ -102,13 +102,13 @@ namespace DotnetSpider.Extension.Infrastructure
 				}
 				if (needVerify)
 				{
-					Logger.MyLog(identity, "开始执行数据验证...", LogLevel.Info);
+					Logger.MyLog(identity, "Start data verification...", LogLevel.Info);
 					verify();
-					Logger.MyLog(identity, "数据验证已完成.", LogLevel.Info);
+					Logger.MyLog(identity, "Data verification complete.", LogLevel.Info);
 				}
 				else
 				{
-					Logger.MyLog(identity, "数据验证已完成, 请勿重复操作.", LogLevel.Info);
+					Logger.MyLog(identity, "Data verification is done already.", LogLevel.Info);
 				}
 
 				if (needVerify)
@@ -210,7 +210,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Sql = sql;
 				Values = new[] { value };
 				Name = name;
-				VerifierName = "相等";
+				VerifierName = "Equal";
 			}
 
 			public override dynamic ExpectedValue => Values[0];
@@ -227,7 +227,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			{
 				Name = name;
 				Sql = sql;
-				VerifierName = "大于";
+				VerifierName = "Large";
 				Values = new[] { value };
 			}
 
@@ -245,7 +245,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			{
 				Name = name;
 				Sql = sql;
-				VerifierName = "小于";
+				VerifierName = "Less";
 				Values = new[] { value };
 			}
 
@@ -259,12 +259,11 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		class Range : BaseVerifier
 		{
-
 			public Range(string name, string sql, dynamic minValue, dynamic maxValue)
 			{
 				Name = name;
 				Sql = sql;
-				VerifierName = "范围";
+				VerifierName = "Range";
 				Values = new[] { minValue, maxValue };
 			}
 
@@ -313,21 +312,21 @@ $"<title>{Subject}: {DateTime.Now}</title>" +
 "</head>" +
 "<body style=\"background-color:#FAF7EC\">" +
 $"<h2>{Subject}: {DateTime.Now}</h2>" +
-(hasProperties ? $"<p><strong>研究员: {Properties.Owner}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>爬虫负责人: {Properties.Developer}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>开发时间: {Properties.Date}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>任务描述: {Description}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>Analyst: {Properties.Owner}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>Developer: {Properties.Developer}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>Date: {Properties.Date}</strong></p>" : "") +
+(hasProperties ? $"<p><strong>Description: {Description}</strong></p>" : "") +
 "<br/>" +
 "<table>" +
 "<thead>" +
 "<tr>" +
-"<th>检查项</th>" +
-"<th>规则</th>" +
+"<th>Item</th>" +
+"<th>Rule</th>" +
 "<th>SQL</th>" +
-"<th>期望值</th>" +
-"<th>真实值</th>" +
-"<th>结果</th>" +
-"<th>检测时间</th> " +
+"<th>Expected</th>" +
+"<th>Actual</th>" +
+"<th>Result</th>" +
+"<th>Time</th> " +
 "</tr>" +
 "</thead>" +
 "<tbody>"
@@ -351,7 +350,7 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 						message.To.Add(new MailboxAddress(emailTo, emailTo));
 					}
 
-					message.Subject = $"{Subject}: {(success ? "成功" : "失败")}";
+					message.Subject = $"{Subject}: {(success ? "Success" : "Failed")}";
 
 					var html = new TextPart("html")
 					{

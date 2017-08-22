@@ -147,10 +147,10 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.MyLog(spider.Identity, "保存文件失败。", LogLevel.Error, e);
+					Logger.MyLog(spider.Identity, "Storage file failed.", LogLevel.Error, e);
 				}
 			}
-			Logger.MyLog(spider.Identity, $"下载文件: {request.Url} 成功.", LogLevel.Info);
+			Logger.MyLog(spider.Identity, $"Storage file: {request.Url} success.", LogLevel.Info);
 			return new Page(request, null) { IsSkip = true };
 		}
 	}

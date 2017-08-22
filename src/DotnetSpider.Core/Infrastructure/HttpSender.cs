@@ -107,8 +107,12 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				result.ResultByte = responseByte;
 			}
+			if (item.Encoding != null)
+			{
+				return item.Encoding;
+			}
 			var encoding = Encoding.UTF8;
-			//从这里开始我们要无视编码了  
+
 			Match meta = Regex.Match(encoding.GetString(responseByte), "<meta[^<]*charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
 			string c = string.Empty;
 			if (meta.Groups.Count > 0)
@@ -123,14 +127,23 @@ namespace DotnetSpider.Core.Infrastructure
 				}
 				catch
 				{
-					encoding = string.IsNullOrEmpty(response.ContentType) ? Encoding.UTF8 : Encoding.GetEncoding(response.ContentType);
+					encoding = GetEncoding(response.ContentType);
 				}
 			}
 			else
 			{
-				encoding = string.IsNullOrEmpty(response.ContentType) ? Encoding.UTF8 : Encoding.GetEncoding(response.ContentType);
+				encoding = GetEncoding(response.ContentType);
 			}
 			return encoding;
+		}
+
+		private static Encoding GetEncoding(string contentType)
+		{
+			if (string.IsNullOrEmpty(contentType))
+			{
+				return Encoding.UTF8;
+			}
+			return contentType.ToLower().Contains("gb2312") ? Encoding.GetEncoding("GB2312") : Encoding.UTF8;
 		}
 
 		private static byte[] ReadBytes(HttpWebResponse response)
@@ -139,30 +152,30 @@ namespace DotnetSpider.Core.Infrastructure
 			using (var ms = new MemoryStream())
 			{
 				responseSteam?.CopyTo(ms);
+				ms.Seek(0, SeekOrigin.Begin);
 
-				Stream stream;
-				//GZIIP处理  
-				if (response.ContentType.Equals("gzip", StringComparison.OrdinalIgnoreCase))
-				{
+				var ms2 = new MemoryStream();
 
-					//开始读取流并设置编码方式  
-					stream = new GZipStream(ms, CompressionMode.Decompress);
-				}
-				else
+				try
 				{
-					stream = ms;
+					//GZIIP处理   
+					var stream = new GZipStream(ms, CompressionMode.Decompress);
+					stream.CopyTo(ms2);
 				}
-				//获取Byte  
-				var bytes = stream.StreamToBytes();
+				catch
+				{
+					ms2 = ms;
+				}
+
+				byte[] bytes = ms2.StreamToBytes();
 
 #if NET_CORE
-				stream.Dispose();
+				ms2.Dispose();
 #else
-				stream.Close();
+				ms2.Close();
 #endif
 				return bytes;
 			}
-
 		}
 
 		private static HttpWebRequest GenerateRequest(HttpRequest item)

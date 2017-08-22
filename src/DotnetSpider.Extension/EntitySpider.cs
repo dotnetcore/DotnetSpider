@@ -160,7 +160,7 @@ namespace DotnetSpider.Extension
 			var properties = entityType.GetProperties();
 			if (properties.Any(p => DefaultProperties.Contains(p.Name.ToLower())))
 			{
-				throw new SpiderException("cdate 是默认属性, 请勿使用。");
+				throw new SpiderException("cdate is not available because it's a default property.");
 			}
 			foreach (var propertyInfo in properties)
 			{

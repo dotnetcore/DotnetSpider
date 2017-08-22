@@ -576,7 +576,7 @@ namespace DotnetSpider.Core
 		{
 			if (Stat == Status.Running)
 			{
-				Logger.MyLog(Identity, "任务运行中...", LogLevel.Warn);
+				Logger.MyLog(Identity, "Crawler is running...", LogLevel.Warn);
 				return;
 			}
 
@@ -941,7 +941,7 @@ namespace DotnetSpider.Core
 					page = AddToCycleRetry(request, Site);
 				}
 				OnError(page.Request);
-				Logger.MyLog(Identity, $"解析数据失败: {request.Url}, 请检查您的数据抽取设置: {e.Message}.", LogLevel.Warn, e);
+				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, please check your extractor: {e.Message}.", LogLevel.Warn, e);
 			}
 
 			if (page == null)
@@ -995,7 +995,7 @@ namespace DotnetSpider.Core
 							}
 						}
 					}
-					Logger.MyLog(Identity, $"采集: {request.Url} 成功.", LogLevel.Info);
+					Logger.MyLog(Identity, $"Crawl: {request.Url} success.", LogLevel.Info);
 				}
 				else
 				{
@@ -1009,16 +1009,16 @@ namespace DotnetSpider.Core
 								RetriedTimes.Inc();
 								ExtractAndAddRequests(page, true);
 							}
-							Logger.MyLog(Identity, $"下载: {request.Url} 成功, 解析结果为 0, 重新尝试采集.", LogLevel.Warn);
+							Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0, retry.", LogLevel.Warn);
 						}
 						else
 						{
-							Logger.MyLog(Identity, $"下载: {request.Url} 成功, 解析结果为 0.", LogLevel.Warn);
+							Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0.", LogLevel.Warn);
 						}
 					}
 					else
 					{
-						Logger.MyLog(Identity, $"下载: {request.Url} 成功, 解析结果为 0.", LogLevel.Warn);
+						Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0.", LogLevel.Warn);
 					}
 				}
 

@@ -84,7 +84,7 @@ namespace DotnetSpider.Core.Downloader
 
 				if (!site.AcceptStatCode.Contains(response.StatusCode))
 				{
-					throw new DownloadException($"下载 {request.Url} 失败. Code {response.StatusCode}");
+					throw new DownloadException($"Download {request.Url} failed. Code {response.StatusCode}");
 				}
 				Page page;
 
@@ -107,7 +107,7 @@ namespace DotnetSpider.Core.Downloader
 
 				if (string.IsNullOrEmpty(page.Content))
 				{
-					Logger.MyLog(spider.Identity, $"下载 {request.Url} 内容为空.", LogLevel.Warn);
+					Logger.MyLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
 				}
 
 				page.TargetUrl = response.RequestMessage.RequestUri.AbsoluteUri;
@@ -122,7 +122,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					page.Exception = de;
 				}
-				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}", LogLevel.Warn);
+				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {de.Message}", LogLevel.Warn);
 
 				return page;
 			}
@@ -134,7 +134,7 @@ namespace DotnetSpider.Core.Downloader
 					page.Exception = he;
 				}
 
-				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {he.Message}.", LogLevel.Warn);
+				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {he.Message}.", LogLevel.Warn);
 				return page;
 			}
 			catch (Exception e)
@@ -145,7 +145,7 @@ namespace DotnetSpider.Core.Downloader
 					IsSkip = true
 				};
 
-				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", LogLevel.Error, e);
+				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {e.Message}.", LogLevel.Error, e);
 				return page;
 			}
 			finally
