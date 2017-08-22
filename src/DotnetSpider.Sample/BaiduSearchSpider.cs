@@ -35,7 +35,6 @@ namespace DotnetSpider.Sample
 
 	[Table("baidu", "baidu_search")]
 	[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-	//[TargetUrlsSelector(XPaths = new[] { "//p[@id=\"page\"]" }, Patterns = new[] { @"&pn=[0-9]+&" })]
 	public class BaiduSearchEntry : SpiderEntity
 	{
 		[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment)]
@@ -72,6 +71,5 @@ namespace DotnetSpider.Sample
 
 		[PropertyDefine(Expression = "today", Type = SelectorType.Enviroment)]
 		public DateTime run_id { get; set; }
-
 	}
 }

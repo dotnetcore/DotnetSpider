@@ -507,11 +507,19 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			Logger.MyLog(Identity, "构建内部模块、准备爬虫数据...", LogLevel.Info);
+			Logger.MyLog(Identity, "Build crawler...", LogLevel.Info);
 
 			if (Pipelines == null || Pipelines.Count == 0)
 			{
-				throw new SpiderException("Pipelines should not be null.");
+				var defaultPipeline = GetDefaultPipeline();
+				if (defaultPipeline == null)
+				{
+					throw new SpiderException("Pipelines should not be null.");
+				}
+				else
+				{
+					_pipelines.Add(defaultPipeline);
+				}
 			}
 
 			PreInitComponent(arguments);
@@ -533,7 +541,7 @@ namespace DotnetSpider.Core
 
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
-				Logger.MyLog(Identity, $"准备步骤: 添加链接到调度中心, 数量 {Site.StartRequests.Count}.", LogLevel.Info);
+				Logger.MyLog(Identity, $"Add start urls to scheduler, count {Site.StartRequests.Count}.", LogLevel.Info);
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
 					foreach (var request in Site.StartRequests)
@@ -549,7 +557,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				Logger.MyLog(Identity, "准备步骤: 添加链接到调度中心, 数量 0.", LogLevel.Info);
+				Logger.MyLog(Identity, "Add start urls to scheduler, count 0.", LogLevel.Info);
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
@@ -557,6 +565,11 @@ namespace DotnetSpider.Core
 			AfterInitComponent(arguments);
 
 			_init = true;
+		}
+
+		protected virtual IPipeline GetDefaultPipeline()
+		{
+			return null;
 		}
 
 		public virtual void Run(params string[] arguments)
@@ -694,7 +707,7 @@ namespace DotnetSpider.Core
 
 		public static void PrintInfo()
 		{
-			
+
 			var key = "_DotnetSpider_Info";
 
 #if !NET_CORE

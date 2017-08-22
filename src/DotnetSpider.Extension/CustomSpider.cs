@@ -78,7 +78,7 @@ namespace DotnetSpider.Extension
 
 			try
 			{
-				Logger.MyLog(Identity, $"任务开始: {Name}", LogLevel.Info);
+				Logger.MyLog(Identity, $"Start: {Name}", LogLevel.Info);
 
 				if (arguments.Contains("rerun") || arguments.Contains("validate"))
 				{
@@ -90,7 +90,7 @@ namespace DotnetSpider.Extension
 				_exited = true;
 				_statusReporter.Wait();
 
-				Logger.MyLog(Identity, $"任务结束: {Name}", LogLevel.Info);
+				Logger.MyLog(Identity, $"Complete: {Name}", LogLevel.Info);
 
 				if (!string.IsNullOrEmpty(ConnectString))
 				{
@@ -106,7 +106,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.MyLog(Identity, $"任务中止: {Name}: {e}", LogLevel.Error, e);
+				Logger.MyLog(Identity, $"Terminated: {Name}: {e}", LogLevel.Error, e);
 
 				if (!string.IsNullOrEmpty(ConnectString))
 				{

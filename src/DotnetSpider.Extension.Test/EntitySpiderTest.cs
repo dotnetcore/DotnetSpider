@@ -10,6 +10,12 @@ using DotnetSpider.Extension.Scheduler;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core;
+using DotnetSpider.Extension.Model.Formatter;
+using DotnetSpider.Core.Selector;
+using MySql.Data.MySqlClient;
+using Dapper;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -150,13 +156,89 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[TestMethod]
-		public void Run()
+		public void EntitySpiderWithDefaultPipeline()
+		{
+			var datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+			var guid = Guid.NewGuid().ToString();
+			BaiduSearchSpider spider = new BaiduSearchSpider(guid);
+			spider.Run();
+			using (var conn = new MySqlConnection(Config.ConnectString))
+			{
+				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid>='{guid}'");
+				Assert.AreEqual(20, count);
+			}
+		}
+
+		[TestMethod]
+		public void EntitySpiderRunCorrect()
 		{
 			CasSpider spider = new CasSpider();
 			spider.Run();
 		}
 
-		public class CasSpider : EntitySpider
+		class BaiduSearchSpider : EntitySpider
+		{
+			private string _guid;
+
+			public BaiduSearchSpider(string guid) : base("BaiduSearch")
+			{
+				_guid = guid;
+			}
+
+			protected override void MyInit(params string[] arguments)
+			{
+				var word = "可乐|雪碧";
+				Identity = Guid.NewGuid().ToString();
+				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),
+					new Dictionary<string, dynamic> {
+						{ "Keyword", word },
+						{ "guid", _guid }
+					});
+				AddEntityType(typeof(BaiduSearchEntry));
+			}
+
+			[Table("test", "baidu_search")]
+			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			class BaiduSearchEntry : SpiderEntity
+			{
+				[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
+				public string Keyword { get; set; }
+
+				[PropertyDefine(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
+				public string Guid { get; set; }
+
+				[PropertyDefine(Expression = ".//h3[@class='c-title']/a")]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				public string Title { get; set; }
+
+				[PropertyDefine(Expression = ".//h3[@class='c-title']/a/@href")]
+				public string Url { get; set; }
+
+				[PropertyDefine(Expression = ".//div/p[@class='c-author']/text()")]
+				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
+				public string Website { get; set; }
+
+
+				[PropertyDefine(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				public string Snapshot { get; set; }
+
+
+				[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefine.Options.PlainText)]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+				public string Details { get; set; }
+
+				[PropertyDefine(Expression = ".", Option = PropertyDefine.Options.PlainText)]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+				public string PlainText { get; set; }
+			}
+		}
+
+		class CasSpider : EntitySpider
 		{
 			public CasSpider() : base("casTest", new Site())
 			{
@@ -179,7 +261,7 @@ namespace DotnetSpider.Extension.Test
 			}
 
 			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
-			public class ArticleSummary : SpiderEntity
+			class ArticleSummary : SpiderEntity
 			{
 				[PropertyDefine(Expression = ".//a/@title")]
 				public string Title { get; set; }
