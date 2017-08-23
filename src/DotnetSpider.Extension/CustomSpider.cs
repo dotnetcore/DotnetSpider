@@ -60,7 +60,7 @@ namespace DotnetSpider.Extension
 
 				using (IDbConnection conn = new MySqlConnection(ConnectString))
 				{
-					conn.Execute($"insert ignore into dotnetspider.status (`identity`, `status`,`thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`, `logged`) values('{Identity}', 'Init',-1, -1, -1, -1, -1, -1, -1, -1, '{DateTime.Now}');");
+					conn.Execute($"insert ignore into dotnetspider.status (`identity`, `status`,`thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values('{Identity}', 'Init',-1, -1, -1, -1, -1, -1, -1, -1);");
 				}
 
 				_statusReporter = Task.Factory.StartNew(() =>
