@@ -13,6 +13,7 @@ using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;
 using static DotnetSpider.Core.Downloader.HttpClientPool;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -21,17 +22,6 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class HttpClientDownloader : BaseDownloader
 	{
-		private const int Utf8PreambleLength = 3;
-		private const byte Utf8PreambleByte2 = 0xBF;
-		private const int Utf8PreambleFirst2Bytes = 0xEFBB;
-
-		// UTF32 not supported on Phone
-		private const int Utf32PreambleLength = 4;
-		private const byte Utf32PreambleByte2 = 0x00;
-		private const byte Utf32PreambleByte3 = 0x00;
-		private const int Utf32OrUnicodePreambleFirst2Bytes = 0xFFFE;
-		private const int BigEndianUnicodePreambleFirst2Bytes = 0xFEFF;
-
 		private static readonly List<string> MediaTypes = new List<string>
 		{
 			"text/html",
@@ -48,7 +38,7 @@ namespace DotnetSpider.Core.Downloader
 			"application/x-www-form-urlencoded"
 		};
 
-		public bool DecodeContentAsUrl;
+		public bool DecodeHtml;
 
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
 
@@ -269,9 +259,9 @@ namespace DotnetSpider.Core.Downloader
 
 		private Page HandleResponse(Request request, HttpResponseMessage response, Site site)
 		{
-			string content = GetContent(site, response);
+			string content = ReadContent(site, response);
 
-			if (DecodeContentAsUrl)
+			if (DecodeHtml)
 			{
 #if !NET_CORE
 				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
@@ -293,32 +283,19 @@ namespace DotnetSpider.Core.Downloader
 			return page;
 		}
 
-		private string GetContent(Site site, HttpResponseMessage response)
+		private string ReadContent(Site site, HttpResponseMessage response)
 		{
 			byte[] contentBytes = response.Content.ReadAsByteArrayAsync().Result;
 			contentBytes = PreventCutOff(contentBytes);
 			if (string.IsNullOrEmpty(site.EncodingName))
 			{
-				Encoding htmlCharset;
-				if (response.Content.Headers.ContentType?.CharSet != null)
-				{
-					htmlCharset = Encoding.GetEncoding(response.Content.Headers.ContentType.CharSet);
-				}
-				else
-				{
-					var buffer = new ArraySegment<byte>(contentBytes);
-					if (!TryDetectEncoding(buffer, out htmlCharset))
-					{
-						htmlCharset = Encoding.GetEncoding("UTF-8");
-					}
-				}
-
+				var charSet = response.Content.Headers.ContentType == null ? null : response.Content.Headers.ContentType.CharSet;
+				Encoding htmlCharset = EncodingExtensions.GetEncoding(charSet, contentBytes);
 				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
 			}
 			else
 			{
-				Encoding htmlCharset = Encoding.GetEncoding(site.EncodingName);
-				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
+				return site.Encoding.GetString(contentBytes, 0, contentBytes.Length);
 			}
 		}
 
@@ -332,52 +309,6 @@ namespace DotnetSpider.Core.Downloader
 				}
 			}
 			return bytes;
-		}
-
-		private static bool TryDetectEncoding(ArraySegment<byte> buffer, out Encoding encoding)
-		{
-			byte[] data = buffer.Array;
-			int offset = buffer.Offset;
-			int dataLength = buffer.Count;
-
-			Debug.Assert(data != null);
-
-			if (dataLength >= 2)
-			{
-				int first2Bytes = data[offset + 0] << 8 | data[offset + 1];
-
-				switch (first2Bytes)
-				{
-					case Utf8PreambleFirst2Bytes:
-						if (dataLength >= Utf8PreambleLength && data[offset + 2] == Utf8PreambleByte2)
-						{
-							encoding = Encoding.UTF8;
-							return true;
-						}
-						break;
-
-					case Utf32OrUnicodePreambleFirst2Bytes:
-#if !NETNative
-						// UTF32 not supported on Phone
-						if (dataLength >= Utf32PreambleLength && data[offset + 2] == Utf32PreambleByte2 && data[offset + 3] == Utf32PreambleByte3)
-						{
-							encoding = Encoding.UTF32;
-						}
-						else
-#endif
-						{
-							encoding = Encoding.Unicode;
-						}
-						return true;
-
-					case BigEndianUnicodePreambleFirst2Bytes:
-						encoding = Encoding.BigEndianUnicode;
-						return true;
-				}
-			}
-
-			encoding = null;
-			return false;
 		}
 
 		public override IDownloader Clone(ISpider spider)

@@ -164,7 +164,7 @@ namespace DotnetSpider.Extension.Test
 			spider.Run();
 			using (var conn = new MySqlConnection(Config.ConnectString))
 			{
-				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid>='{guid}'");
+				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{guid}'");
 				Assert.AreEqual(20, count);
 			}
 		}

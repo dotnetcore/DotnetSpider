@@ -41,7 +41,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// User agent
 		/// </summary>
-		public string Accept { get; set; }
+		public string Accept { get; set; } = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
 
 		/// <summary>
 		/// Whether download pictiures

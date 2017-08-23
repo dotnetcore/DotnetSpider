@@ -24,12 +24,12 @@ namespace DotnetSpider.Core.Proxy
 				watch.Start();
 				tcp.ConnectAsync(ipAddr, port).Wait();
 				watch.Stop();
-				Logger.MyLog($"Detect one usefull proxy: {ip}:{port}, cost {watch.ElapsedMilliseconds}ms.", LogLevel.Debug);
+				Logger.MyLog($"Detect one avaliable proxy: {ip}:{port}, cost {watch.ElapsedMilliseconds}ms.", LogLevel.Debug);
 				isReachable = true;
 			}
 			catch (Exception e)
 			{
-				Logger.MyLog($"FAILRE - CAN not connect! Proxy: {ip}:{port}.", LogLevel.Error, e);
+				Logger.MyLog($"Connect test failed for proxy: {ip}:{port}.", LogLevel.Error, e);
 			}
 
 			return isReachable;

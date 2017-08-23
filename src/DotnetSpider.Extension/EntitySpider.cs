@@ -68,25 +68,25 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public EntitySpider AddEntityType(Type type)
+		public EntitySpider AddEntityType(Type type, string tableName = null)
 		{
-			AddEntityType(type, null);
+			AddEntityType(type, null, tableName);
 			return this;
 		}
 
-		public EntitySpider AddEntityType<T>()
+		public EntitySpider AddEntityType<T>(string tableName = null)
 		{
-			AddEntityType(typeof(T));
+			AddEntityType(typeof(T), null, tableName);
 			return this;
 		}
 
 		public EntitySpider AddEntityType<T>(DataHandler dataHandler)
 		{
-			AddEntityType(typeof(T), dataHandler);
+			AddEntityType(typeof(T), dataHandler, null);
 			return this;
 		}
 
-		public EntitySpider AddEntityType(Type type, DataHandler dataHandler)
+		public EntitySpider AddEntityType(Type type, DataHandler dataHandler, string tableName = null)
 		{
 			CheckIfRunning();
 
@@ -102,6 +102,10 @@ namespace DotnetSpider.Extension
 					Expression = e.Expression,
 					Type = e.Type
 				}).ToList();
+				if (entity.Table != null && !string.IsNullOrEmpty(tableName))
+				{
+					entity.Table.Name = tableName;
+				}
 				Entities.Add(entity);
 				EntityProcessor processor = new EntityProcessor(Site, entity);
 				AddPageProcessor(processor);

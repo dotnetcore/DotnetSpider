@@ -86,64 +86,33 @@ namespace DotnetSpider.Core.Infrastructure
 			//处理网页Byte  
 			byte[] responseByte = ReadBytes(response);
 
-			if (responseByte != null && responseByte.Length > 0)
-			{
-				//设置编码  
-				var encoding = GetEncoding(item, result, response, responseByte);
-				//得到返回的HTML  
-				result.Html = encoding.GetString(responseByte);
-			}
-			else
-			{
-				//没有返回任何Html代码  
-				result.Html = string.Empty;
-			}
-		}
-
-		private static Encoding GetEncoding(HttpRequest item, HttpResult result, HttpWebResponse response, byte[] responseByte)
-		{
-			//是否返回Byte类型数据  
 			if (item.ResultType == ResultType.Byte)
 			{
 				result.ResultByte = responseByte;
-			}
-			if (item.Encoding != null)
-			{
-				return item.Encoding;
-			}
-			var encoding = Encoding.UTF8;
-
-			Match meta = Regex.Match(encoding.GetString(responseByte), "<meta[^<]*charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
-			string c = string.Empty;
-			if (meta.Groups.Count > 0)
-			{
-				c = meta.Groups[1].Value.ToLower().Trim();
-			}
-			if (c.Length > 2)
-			{
-				try
-				{
-					encoding = Encoding.GetEncoding(c.Replace("\"", string.Empty).Replace("'", "").Replace(";", "").Replace("iso-8859-1", "gbk").Trim());
-				}
-				catch
-				{
-					encoding = GetEncoding(response.ContentType);
-				}
+				return;
 			}
 			else
 			{
-				encoding = GetEncoding(response.ContentType);
+				if (responseByte != null && responseByte.Length > 0)
+				{
+					if (item.Encoding != null)
+					{
+						result.Html = item.Encoding.GetString(responseByte);
+					}
+					else
+					{
+						//设置编码
+						var encoding = EncodingExtensions.GetEncoding(response.CharacterSet, responseByte);
+						//得到返回的HTML
+						result.Html = encoding.GetString(responseByte);
+					}
+				}
+				else
+				{
+					//没有返回任何Html代码  
+					result.Html = string.Empty;
+				}
 			}
-			return encoding;
-		}
-
-		private static Encoding GetEncoding(string contentType)
-		{
-			if (string.IsNullOrEmpty(contentType))
-			{
-				return Encoding.UTF8;
-			}
-			return contentType.ToLower().Contains("gb2312") ? Encoding.GetEncoding("GB2312") : Encoding.UTF8;
 		}
 
 		private static byte[] ReadBytes(HttpWebResponse response)
