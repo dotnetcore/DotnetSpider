@@ -16,30 +16,33 @@ namespace DotnetSpider.Extension.Monitor
 		{
 			Identity = identity;
 
-			NetworkCenter.Current.Execute("dm", () =>
+			if (!string.IsNullOrEmpty(Config.ConnectString))
 			{
-				using (var conn = new MySqlConnection(Config.ConnectString))
+				NetworkCenter.Current.Execute("dm", () =>
 				{
-					InitStatusDatabase(Config.ConnectString);
+					using (var conn = new MySqlConnection(Config.ConnectString))
+					{
+						InitStatusDatabase(Config.ConnectString);
 
-					var insertSql = $"insert ignore into dotnetspider.status (`identity`, `node`, `logged`, `status`, `thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values (@identity, @node, current_timestamp, @status, @thread, @left, @success, @error, @total, @avgdownloadspeed, @avgprocessorspeed, @avgpipelinespeed);";
-					conn.Execute(insertSql,
-						new
-						{
-							identity = identity,
-							node = NodeId.Id,
-							status = "INIT",
-							left = 0,
-							total = 0,
-							success = 0,
-							error = 0,
-							avgDownloadSpeed = 0,
-							avgProcessorSpeed = 0,
-							avgPipelineSpeed = 0,
-							thread = 0
-						});
-				}
-			});
+						var insertSql = $"insert ignore into dotnetspider.status (`identity`, `node`, `logged`, `status`, `thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values (@identity, @node, current_timestamp, @status, @thread, @left, @success, @error, @total, @avgdownloadspeed, @avgprocessorspeed, @avgpipelinespeed);";
+						conn.Execute(insertSql,
+							new
+							{
+								identity = identity,
+								node = NodeId.Id,
+								status = "INIT",
+								left = 0,
+								total = 0,
+								success = 0,
+								error = 0,
+								avgDownloadSpeed = 0,
+								avgProcessorSpeed = 0,
+								avgPipelineSpeed = 0,
+								thread = 0
+							});
+					}
+				});
+			}
 		}
 
 		public static void InitStatusDatabase(string connectString)

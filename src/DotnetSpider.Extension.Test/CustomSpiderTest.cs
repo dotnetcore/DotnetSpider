@@ -30,7 +30,7 @@ namespace DotnetSpider.Extension.Test
 
 			using (MySqlConnection conn = new MySqlConnection(Core.Infrastructure.Config.ConnectString))
 			{
-				var c1 = conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{spider.Identity}'").First().Count;
+				var c1 = conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{spider.Identity}' and level='Info'").First().Count;
 				var c2 = conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{spider.Identity}'").First().Count;
 				Assert.AreEqual(2, c1);
 				Assert.AreEqual(1, c2);

@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using System.Linq;
+using DotnetSpider.Core.Monitor;
 
 namespace DotnetSpider.Extension
 {
@@ -28,6 +29,8 @@ namespace DotnetSpider.Extension
 		public string Identity { get; set; }
 
 		public string TaskId { get; set; }
+
+		public IMonitor Monitor { get; set; }
 
 		protected CustomSpider(string name)
 		{
@@ -51,34 +54,44 @@ namespace DotnetSpider.Extension
 				throw new ArgumentException("ConnectString is empty.");
 			}
 
-			if (!string.IsNullOrEmpty(ConnectString))
-			{
-				NLogUtil.PrepareDatabase(ConnectString);
-				DbMonitor.InitStatusDatabase(ConnectString);
-
-				InsertRunningState();
-
-				using (IDbConnection conn = new MySqlConnection(ConnectString))
-				{
-					conn.Execute($"insert ignore into dotnetspider.status (`identity`, `status`,`thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values('{Identity}', 'Init',-1, -1, -1, -1, -1, -1, -1, -1);");
-				}
-
-				_statusReporter = Task.Factory.StartNew(() =>
-				{
-					using (IDbConnection conn = new MySqlConnection(ConnectString))
-					{
-						while (!_exited)
-						{
-							conn.Execute($"update dotnetspider.status set `logged`='{DateTime.Now}' WHERE identity='{Identity}';");
-							Thread.Sleep(5000);
-						}
-					}
-				});
-			}
+			Monitor = new DbMonitor(Identity);
 
 			try
 			{
 				Logger.MyLog(Identity, $"Start: {Name}", LogLevel.Info);
+
+				if (!string.IsNullOrEmpty(ConnectString))
+				{
+					NLogUtil.PrepareDatabase(ConnectString);
+
+					DbMonitor.InitStatusDatabase(ConnectString);
+
+					InsertRunningState();
+
+					_statusReporter = Task.Factory.StartNew(() =>
+					{
+						while (!_exited)
+						{
+							try
+							{
+								Monitor.Report("Running",
+									-1,
+									-1,
+									-1,
+									-1,
+									0,
+									0,
+									0,
+									-1);
+							}
+							catch (Exception e)
+							{
+								Logger.MyLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
+							}
+							Thread.Sleep(5000);
+						}
+					});
+				}
 
 				if (arguments.Contains("rerun") || arguments.Contains("validate"))
 				{
@@ -94,9 +107,21 @@ namespace DotnetSpider.Extension
 
 				if (!string.IsNullOrEmpty(ConnectString))
 				{
-					using (IDbConnection conn = new MySqlConnection(ConnectString))
+					try
 					{
-						conn.Execute($"update dotnetspider.status set `status`='Finished',`logged`='{DateTime.Now}' WHERE identity='{Identity}';");
+						Monitor.Report("Finished",
+							-1,
+							-1,
+							-1,
+							-1,
+							0,
+							0,
+							0,
+							-1);
+					}
+					catch (Exception e)
+					{
+						Logger.MyLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
 					}
 				}
 				if (OnExited != null)
@@ -110,9 +135,21 @@ namespace DotnetSpider.Extension
 
 				if (!string.IsNullOrEmpty(ConnectString))
 				{
-					using (IDbConnection conn = new MySqlConnection(ConnectString))
+					try
 					{
-						conn.Execute($"update dotnetspider.status set `status`='Exited', `logged`='{DateTime.Now}' WHERE identity='{Identity}';");
+						Monitor.Report("Terminated",
+							-1,
+							-1,
+							-1,
+							-1,
+							0,
+							0,
+							0,
+							-1);
+					}
+					catch (Exception e1)
+					{
+						Logger.MyLog(Identity, $"Report status failed: {e1}.", LogLevel.Error);
 					}
 				}
 			}
@@ -124,6 +161,7 @@ namespace DotnetSpider.Extension
 				}
 			}
 		}
+ 
 
 		public Task RunAsync(params string[] arguments)
 		{
@@ -139,7 +177,7 @@ namespace DotnetSpider.Extension
 			{
 				conn.Execute("CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;");
 				conn.Execute("CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_running` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `taskId` varchar(120) NOT NULL, `name` varchar(200) NULL, `identity` varchar(120), `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `taskId_unique` (`taskId`)) AUTO_INCREMENT=1");
-				conn.Execute($"INSERT IGNORE INTO `dotnetspider`.`task_running` (`taskId`,`name`,`identity`,`cdate`) values ('{TaskId}','{Name}','{Identity}','{DateTime.Now}');");
+				conn.Execute($"INSERT IGNORE INTO `dotnetspider`.`task_running` (`taskId`,`name`,`identity`,`cdate`) values ('{TaskId}','{Name}','{Identity}','{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}');");
 			}
 		}
 

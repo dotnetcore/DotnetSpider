@@ -699,7 +699,7 @@ namespace DotnetSpider.Core
 
 			OnClosing?.Invoke();
 
-			var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl exit";
+			var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
 			Logger.MyLog(Identity, $"{msg}, cost: {(FinishedTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
 
 			OnClosed?.Invoke();
