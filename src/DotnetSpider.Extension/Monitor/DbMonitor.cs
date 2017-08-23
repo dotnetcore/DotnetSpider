@@ -11,10 +11,13 @@ namespace DotnetSpider.Extension.Monitor
 	public class DbMonitor : NLogMonitor
 	{
 		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		private bool _isDbOnly { get; set; }
 
-		public DbMonitor(string identity)
+		public DbMonitor(string identity, bool isDbOnly = false)
 		{
 			Identity = identity;
+
+			_isDbOnly = isDbOnly;
 
 			if (!string.IsNullOrEmpty(Config.ConnectString))
 			{
@@ -73,7 +76,10 @@ namespace DotnetSpider.Extension.Monitor
 
 		public override void Report(string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
-			base.Report(status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
+			if (!_isDbOnly)
+			{
+				base.Report(status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
+			}
 
 			if (Core.Infrastructure.Environment.SaveLogAndStatusToDb)
 			{

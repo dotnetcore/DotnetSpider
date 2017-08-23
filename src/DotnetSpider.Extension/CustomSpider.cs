@@ -30,7 +30,7 @@ namespace DotnetSpider.Extension
 
 		public string TaskId { get; set; }
 
-		public IMonitor Monitor { get; set; }
+		public DbMonitor Monitor { get; set; }
 
 		protected CustomSpider(string name)
 		{
