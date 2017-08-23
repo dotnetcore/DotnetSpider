@@ -118,7 +118,7 @@ namespace DotnetSpider.Sample
 			}
 		}
 
-		public class BlogSumary
+		class BlogSumary
 		{
 			public string Name { get; set; }
 			public string Author { get; set; }
@@ -131,7 +131,7 @@ namespace DotnetSpider.Sample
 			}
 		}
 
-		public class News
+		class News
 		{
 			public string Name { get; set; }
 			public string PublishTime { get; set; }

@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.Model;
 using System;
 using System.Linq;
+using MySql.Data.MySqlClient;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -92,7 +93,9 @@ namespace DotnetSpider.Extension.Pipeline
 
 				foreach (var column in metadata.Fields)
 				{
-					var value = entry.SelectToken($"$.{column.Name}")?.ToString();
+					var token = entry.SelectToken($"$.{column.Name}");
+					var value = token == null ? "" : MySqlHelper.EscapeString(token.Value<string>());
+
 					if (column == lastColumn)
 					{
 						builder.Append($"'{value}'");

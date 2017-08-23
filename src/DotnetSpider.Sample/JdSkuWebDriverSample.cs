@@ -28,7 +28,7 @@ namespace DotnetSpider.Sample
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		[Table("test", "sku", TableSuffix.Today, Indexs = new[] { "CategoryName" }, Uniques = new[] { "CategoryName,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product : SpiderEntity
+		class Product : SpiderEntity
 		{
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 20)]
 			public string CategoryName { get; set; }

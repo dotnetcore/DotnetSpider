@@ -35,7 +35,7 @@ namespace DotnetSpider.Sample
 
 		[Table("ctrip", "city", Uniques = new[] { "city_id,run_id" })]
 		[EntitySelector(Expression = "//div[@class='city_item']//a")]
-		public class CtripCity : SpiderEntity
+		class CtripCity : SpiderEntity
 		{
 			[PropertyDefine(Expression = ".", Length = 100)]
 			public string name { get; set; }

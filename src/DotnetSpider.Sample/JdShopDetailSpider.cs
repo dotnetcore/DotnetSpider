@@ -51,7 +51,7 @@ namespace DotnetSpider.Sample
 
 		[Table("jd", "sku_v2", TableSuffix.Monday, Primary = "Sku", UpdateColumns = new[] { "ShopId" })]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
-		public class ProductUpdater : SpiderEntity
+		class ProductUpdater : SpiderEntity
 		{
 			[PropertyDefine(Expression = "$.pid", Type = SelectorType.JsonPath, Length = 25)]
 			public string Sku { get; set; }

@@ -22,7 +22,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(HomePage));
 		}
 
-		public class HomePage : SpiderEntity
+		class HomePage : SpiderEntity
 		{
 			//jQuery(".yk-rank div:1")
 			[PropertyDefine(Expression = "<a.*?т╟вс</a>", Type = SelectorType.Regex, Argument = "1")]

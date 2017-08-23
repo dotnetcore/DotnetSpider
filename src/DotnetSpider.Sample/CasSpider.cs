@@ -30,7 +30,7 @@ namespace DotnetSpider.Sample
 
 		[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
 		[TargetUrlsSelector(Patterns = new[] { @"index_[0-9]+.shtml", "index.shtml" })]
-		public class ArticleSummary : SpiderEntity
+		class ArticleSummary : SpiderEntity
 		{
 			[PropertyDefine(Expression = ".//a/@title", Length = 100)]
 			public string Title { get; set; }
@@ -42,7 +42,7 @@ namespace DotnetSpider.Sample
 
 		[Table("test", "Article", TableSuffix.Today, Indexs = new[] { "Title" })]
 		[TargetUrlsSelector(Patterns = new[] { @"t[0-9]+_[0-9]+.shtml" })]
-		public class Article : SpiderEntity
+		class Article : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Title", Type = SelectorType.Enviroment, Length = 100)]
 			public string Title { get; set; }

@@ -33,7 +33,7 @@ namespace DotnetSpider.Sample
 		}
 
 		[Table("test", "ddeng_corp", TableSuffix.Today)]
-		public class Corp : SpiderEntity
+		class Corp : SpiderEntity
 		{
 			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong", Length = 100)]
 			public string Name { get; set; }

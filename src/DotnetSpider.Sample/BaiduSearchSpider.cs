@@ -31,45 +31,45 @@ namespace DotnetSpider.Sample
 				verifier.Report();
 			};
 		}
-	}
 
-	[Table("baidu", "baidu_search")]
-	[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-	public class BaiduSearchEntry : SpiderEntity
-	{
-		[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment)]
-		public string Keyword { get; set; }
+		[Table("baidu", "baidu_search")]
+		[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+		class BaiduSearchEntry : SpiderEntity
+		{
+			[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment)]
+			public string Keyword { get; set; }
 
-		[PropertyDefine(Expression = ".//h3[@class='c-title']/a")]
-		[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-		[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-		public string Title { get; set; }
+			[PropertyDefine(Expression = ".//h3[@class='c-title']/a")]
+			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+			public string Title { get; set; }
 
-		[PropertyDefine(Expression = ".//h3[@class='c-title']/a/@href")]
-		public string Url { get; set; }
+			[PropertyDefine(Expression = ".//h3[@class='c-title']/a/@href")]
+			public string Url { get; set; }
 
-		[PropertyDefine(Expression = ".//div/p[@class='c-author']/text()")]
-		[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
-		public string Website { get; set; }
-
-
-		[PropertyDefine(Expression = ".//div/span/a[@class='c-cache']/@href")]
-		public string Snapshot { get; set; }
+			[PropertyDefine(Expression = ".//div/p[@class='c-author']/text()")]
+			[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
+			public string Website { get; set; }
 
 
-		[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefine.Options.PlainText)]
-		[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-		[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-		[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
-		public string Details { get; set; }
+			[PropertyDefine(Expression = ".//div/span/a[@class='c-cache']/@href")]
+			public string Snapshot { get; set; }
 
-		[PropertyDefine(Expression = ".", Option = PropertyDefine.Options.PlainText)]
-		[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-		[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-		[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
-		public string PlainText { get; set; }
 
-		[PropertyDefine(Expression = "today", Type = SelectorType.Enviroment)]
-		public DateTime run_id { get; set; }
+			[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefine.Options.PlainText)]
+			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+			public string Details { get; set; }
+
+			[PropertyDefine(Expression = ".", Option = PropertyDefine.Options.PlainText)]
+			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+			public string PlainText { get; set; }
+
+			[PropertyDefine(Expression = "today", Type = SelectorType.Enviroment)]
+			public DateTime run_id { get; set; }
+		}
 	}
 }

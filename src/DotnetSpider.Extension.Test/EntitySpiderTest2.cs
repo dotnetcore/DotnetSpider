@@ -13,6 +13,9 @@ using MySql.Data.MySqlClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Data.SqlClient;
+using System.Collections.Generic;
+using System.IO;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -302,6 +305,94 @@ namespace DotnetSpider.Extension.Test
 			catch (SpiderException exception)
 			{
 				Assert.AreEqual("Columns set as unique is not a property of your entity.", exception.Message);
+			}
+		}
+		[TestMethod]
+		public void MySqlFileEntityPipeline_InsertSql()
+		{
+			var id = Guid.NewGuid().ToString("N");
+			var folder = Path.Combine(Core.Infrastructure.Environment.BaseDirectory, id);
+			var path = Path.Combine(folder, "mysql", "baidu.baidu_search_mysql_file.sql");
+			try
+			{
+				BaiduSearchSpider spider = new BaiduSearchSpider();
+				spider.Identity = id;
+				spider.Run();
+
+				var lines = File.ReadAllLines(path);
+				Assert.AreEqual(20, lines.Length);
+				using (var conn = new MySqlConnection(Config.ConnectString))
+				{
+					conn.Execute("DELETE FROM baidu.baidu_search_mysql_file");
+					foreach (var sql in lines)
+					{
+						conn.Execute(sql);
+					}
+					var count = conn.QueryFirst<int>("SELECT COUNT(*) FROM baidu.baidu_search_mysql_file");
+					Assert.AreEqual(20, count);
+					conn.Execute("DROP TABLE baidu.baidu_search_mysql_file");
+				}
+			}
+			finally
+			{
+				Directory.Delete(folder, true);
+			}
+		}
+
+		class BaiduSearchSpider : EntitySpider
+		{
+			public BaiduSearchSpider() : base("BaiduSearch")
+			{
+			}
+
+			protected override void MyInit(params string[] arguments)
+			{
+				EmptySleepTime = 1000;
+				var word = "可乐|雪碧";
+				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+				AddEntityType(typeof(BaiduSearchEntry));
+				AddPipeline(new MySqlEntityPipeline(ConnectString));
+				AddPipeline(new MySqlFileEntityPipeline(MySqlFileEntityPipeline.FileType.InsertSql));
+			}
+
+			[Table("baidu", "baidu_search_mysql_file")]
+			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			class BaiduSearchEntry : SpiderEntity
+			{
+				[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment)]
+				public string Keyword { get; set; }
+
+				[PropertyDefine(Expression = ".//h3[@class='c-title']/a")]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				public string Title { get; set; }
+
+				[PropertyDefine(Expression = ".//h3[@class='c-title']/a/@href")]
+				public string Url { get; set; }
+
+				[PropertyDefine(Expression = ".//div/p[@class='c-author']/text()")]
+				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
+				public string Website { get; set; }
+
+
+				[PropertyDefine(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				public string Snapshot { get; set; }
+
+
+				[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefine.Options.PlainText)]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+				public string Details { get; set; }
+
+				[PropertyDefine(Expression = ".", Option = PropertyDefine.Options.PlainText)]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+				public string PlainText { get; set; }
+
+				[PropertyDefine(Expression = "today", Type = SelectorType.Enviroment)]
+				public DateTime run_id { get; set; }
 			}
 		}
 

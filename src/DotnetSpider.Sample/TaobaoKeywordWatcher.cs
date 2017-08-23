@@ -128,7 +128,7 @@ namespace DotnetSpider.Sample
 
 		[Table("taobao", "taobao_items", TableSuffix.FirstDayOfThisMonth, Uniques = new[] { "item_id" })]
 		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
-		public class Item : SpiderEntity
+		class Item : SpiderEntity
 		{
 			[PropertyDefine(Expression = "tab", Type = SelectorType.Enviroment, Length = 20)]
 			public string tab { get; set; }

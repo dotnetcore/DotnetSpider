@@ -15,7 +15,7 @@ namespace DotnetSpider.Sample
 
 		[Table("jd", "jd_category")]
 		[EntitySelector(Expression = ".//div[@class='items']//a")]
-		public class Category : SpiderEntity
+		class Category : SpiderEntity
 		{
 			[PropertyDefine(Expression = ".", Length = 100)]
 			public string CategoryName { get; set; }
