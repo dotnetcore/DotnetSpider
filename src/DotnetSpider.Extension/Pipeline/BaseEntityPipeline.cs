@@ -21,7 +21,7 @@ namespace DotnetSpider.Extension.Pipeline
 			EntityMetadatas.TryAdd(metadata.Name, metadata);
 		}
 
-		public abstract void Process(string entityName, List<JObject> datas);
+		public abstract void Process(string entityName, List<JObject> items);
 
 		public override void Process(params ResultItems[] resultItems)
 		{

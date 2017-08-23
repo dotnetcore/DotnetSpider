@@ -4,6 +4,8 @@ using System.Text;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.Model;
+using System;
+using System.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -12,7 +14,20 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class MySqlFileEntityPipeline : BaseEntityPipeline
 	{
+		public enum FileType
+		{
+			LoadFile,
+			InsertSql
+		}
+		public FileType Type { get; set; }
+
 		public string DataFolder { get; set; }
+
+
+		public MySqlFileEntityPipeline(FileType fileType = FileType.LoadFile)
+		{
+			Type = fileType;
+		}
 
 		public override void InitPipeline(ISpider spider)
 		{
@@ -24,34 +39,95 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override void Process(string entityName, List<JObject> datas)
+		public override void Process(string entityName, List<JObject> items)
 		{
+			if (items == null || items.Count == 0)
+			{
+				return;
+			}
+
 			lock (this)
 			{
 				Entity metadata;
 				if (EntityMetadatas.TryGetValue(entityName, out metadata))
 				{
-					var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
-					StringBuilder builder = new StringBuilder();
-					foreach (var entry in datas)
+					switch (Type)
 					{
-						builder.Append("@END@");
-						foreach (var column in metadata.Fields)
-						{
-							var value = entry.SelectToken($"$.{column.Name}")?.ToString();
-							if (!string.IsNullOrEmpty(value))
+						case FileType.LoadFile:
 							{
-								builder.Append("#").Append(value).Append("#").Append("$");
+								SaveLoadFile(metadata, items);
+								break;
 							}
-							else
+						case FileType.InsertSql:
 							{
-								builder.Append("##$");
+								SaveInsertSqlFile(metadata, items);
+								break;
 							}
-						}
 					}
-					File.AppendAllText(fileInfo.FullName, builder.ToString());
 				}
 			}
+		}
+
+		private void SaveInsertSqlFile(Entity metadata, List<JObject> items)
+		{
+			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.sql"));
+			StringBuilder builder = new StringBuilder();
+			foreach (var entry in items)
+			{
+				//{Environment.NewLine}
+				builder.Append($"INSERT IGNORE INTO `{metadata.Table.Database}`.`{metadata.Table.Name}` (");
+				var lastColumn = metadata.Fields.Last();
+				foreach (var column in metadata.Fields)
+				{
+					if (column == lastColumn)
+					{
+						builder.Append($"`{column.Name}`");
+					}
+					else
+					{
+						builder.Append($"`{column.Name}`, ");
+					}
+				}
+				builder.Append(") VALUES (");
+
+				foreach (var column in metadata.Fields)
+				{
+					var value = entry.SelectToken($"$.{column.Name}")?.ToString();
+					if (column == lastColumn)
+					{
+						builder.Append($"'{value}'");
+					}
+					else
+					{
+						builder.Append($"'{value}', ");
+					}
+				}
+				builder.Append($");{Environment.NewLine}");
+			}
+			File.AppendAllText(fileInfo.FullName, builder.ToString());
+		}
+
+		private void SaveLoadFile(Entity metadata, List<JObject> items)
+		{
+			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
+			StringBuilder builder = new StringBuilder();
+			foreach (var entry in items)
+			{
+				builder.Append("@END@");
+				foreach (var column in metadata.Fields)
+				{
+					var value = entry.SelectToken($"$.{column.Name}")?.ToString();
+					if (!string.IsNullOrEmpty(value))
+					{
+						builder.Append("#").Append(value).Append("#").Append("$");
+					}
+					else
+					{
+						builder.Append("##$");
+					}
+				}
+			}
+			File.AppendAllText(fileInfo.FullName, builder.ToString());
 		}
 	}
 }
