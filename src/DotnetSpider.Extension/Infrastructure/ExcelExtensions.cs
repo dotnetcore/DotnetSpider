@@ -27,63 +27,81 @@ namespace DotnetSpider.Extension.Infrastructure
 			{
 				conn.Open();
 			}
-			var reader = command.ExecuteReader();
 
-			int row = 1;
-			using (var p = new ExcelPackage())
+			IDataReader reader = null;
+
+			try
 			{
-				var sheet = p.Workbook.Worksheets.Add("Sheet1");
-				while (reader.Read())
+				reader = command.ExecuteReader();
+
+				int row = 1;
+				using (var p = new ExcelPackage())
 				{
-					if (row == 1)
+					var sheet = p.Workbook.Worksheets.Add("Sheet1");
+					while (reader.Read())
 					{
-						for (int i = 1; i < reader.FieldCount + 1; ++i)
+						if (row == 1)
 						{
-							sheet.Cells[1, i].Value = reader.GetName(i - 1);
+							for (int i = 1; i < reader.FieldCount + 1; ++i)
+							{
+								sheet.Cells[1, i].Value = reader.GetName(i - 1);
+							}
 						}
-					}
 
-					var realRowIndx = row + 1;
-					for (int j = 1; j < reader.FieldCount + 1; ++j)
+						var realRowIndx = row + 1;
+						for (int j = 1; j < reader.FieldCount + 1; ++j)
+						{
+							sheet.Cells[realRowIndx, j].Value = reader.GetValue(j - 1);
+						}
+
+						row++;
+					}
+					var folder = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "excels");
+					if (!Directory.Exists(folder))
 					{
-						sheet.Cells[realRowIndx, j].Value = reader.GetValue(j - 1);
+						Directory.CreateDirectory(folder);
 					}
-
-					row++;
+					var path = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "excels", $"{fileName}.xlsx");
+					if (File.Exists(path) && rewrite)
+					{
+						File.Delete(path);
+					}
+					p.SaveAs(new FileInfo(path));
+					return path;
 				}
-				var folder = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "excels");
-				if (!Directory.Exists(folder))
-				{
-					Directory.CreateDirectory(folder);
-				}
-				var path = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "excels", $"{fileName}.xlsx");
-				if (File.Exists(path) && rewrite)
-				{
-					File.Delete(path);
-				}
-				p.SaveAs(new FileInfo(path));
-				return path;
+			}
+			finally
+			{
+				reader?.Close();
 			}
 		}
 
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, string emailTo)
+		{
+			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), Config.GetValue("emailHost"), int.Parse(Config.GetValue("emailPort")), Config.GetValue("emailAccount"), Config.GetValue("emailPassword"), Config.GetValue("emailDisplayName"));
+		}
+
+		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, List<string> emailTo)
 		{
 			EmailTo(conn, sql, fileName, subject, emailTo, Config.GetValue("emailHost"), int.Parse(Config.GetValue("emailPort")), Config.GetValue("emailAccount"), Config.GetValue("emailPassword"), Config.GetValue("emailDisplayName"));
 		}
 
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, string emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
 		{
+			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), emailHost, port, account, password, displayName);
+		}
+		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, List<string> emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
+		{
 			var path = Export(conn, sql, $"{fileName}_{DateTime.Now.ToString("yyyyMMddhhmmss")}", true);
 			var message = new MimeMessage();
 
 			message.From.Add(new MailboxAddress(displayName, account));
-			foreach (var email in emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList())
+			foreach (var email in emailTo)
 			{
 				message.To.Add(new MailboxAddress(email, email));
 			}
 
 			message.Subject = subject;
-
 
 			var attachment = new MimePart("excel", "xlsx")
 			{

@@ -27,7 +27,7 @@ namespace DotnetSpider.Sample
 			OnExited += () =>
 			{
 				Verification<BaiduSearchSpider> verifier = new Verification<BaiduSearchSpider>();
-				verifier.AddEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);
+				verifier.AddSqlEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);
 				verifier.Report();
 			};
 		}

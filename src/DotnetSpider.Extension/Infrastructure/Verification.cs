@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Threading;
 using NLog;
 using System.Web;
+using System.IO;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
@@ -28,7 +29,7 @@ namespace DotnetSpider.Extension.Infrastructure
 	public interface IVerification
 	{
 		string Name { get; }
-		string VerifierName { get; }
+		string VerificationName { get; }
 		VerificationInfo Verify(IDbConnection conn);
 	}
 
@@ -128,32 +129,52 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
-		public void AddEqual(string name, string sql, dynamic value)
+		public void AddSqlEqual(string name, string sql, dynamic value)
 		{
-			Verifiers.Add(new Equal(name, sql, value));
+			Verifiers.Add(new SqlEqual(name, sql, value));
 		}
 
-		public void AddLarge(string name, string sql, dynamic value)
+		public void AddSqlLarge(string name, string sql, dynamic value)
 		{
-			Verifiers.Add(new Large(name, sql, value));
+			Verifiers.Add(new SqlLarge(name, sql, value));
 		}
 
-		public void AddLess(string name, string sql, dynamic value)
+		public void AddSqlLess(string name, string sql, dynamic value)
 		{
-			Verifiers.Add(new Less(name, sql, value));
+			Verifiers.Add(new SqlLess(name, sql, value));
 		}
 
-		public void AddRange(string name, string sql, dynamic minValue, dynamic maxValue)
+		public void AddSqlRange(string name, string sql, dynamic minValue, dynamic maxValue)
 		{
-			Verifiers.Add(new Range(name, sql, minValue, maxValue));
+			Verifiers.Add(new SqlRange(name, sql, minValue, maxValue));
 		}
 
-		public abstract VerificationResult Report(string sql = null);
+		public void AddValueEqual(string name, dynamic actual, dynamic expected)
+		{
+			Verifiers.Add(new ValueEqual(name, actual, expected));
+		}
 
-		abstract class BaseVerifier : IVerification
+		public void AddValueLarge(string name, dynamic actual, dynamic value)
+		{
+			Verifiers.Add(new ValueLarge(name, actual, value));
+		}
+
+		public void AddValueLess(string name, dynamic actual, dynamic value)
+		{
+			Verifiers.Add(new ValueLess(name, actual, value));
+		}
+
+		public void AddValueRange(string name, dynamic actual, dynamic minValue, dynamic maxValue)
+		{
+			Verifiers.Add(new ValueRange(name, actual, minValue, maxValue));
+		}
+
+		public abstract VerificationResult Report();
+
+		abstract class BaseSqlVerification : IVerification
 		{
 			public string Name { get; protected set; }
-			public string VerifierName { get; protected set; }
+			public string VerificationName { get; protected set; }
 			protected string Sql { get; set; }
 			protected dynamic[] Values { get; set; }
 
@@ -168,7 +189,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				{
 					var query = conn.Query<QueryResult>(Sql).FirstOrDefault();
 					result = query?.Result;
-					verifyResult = Verify(result);
+					verifyResult = Validate(result);
 					color = verifyResult ? "forestgreen" : "orangered";
 					verifyResultStr = verifyResult ? "PASS" : "FAILED";
 				}
@@ -180,11 +201,10 @@ namespace DotnetSpider.Extension.Infrastructure
 					verifyResultStr = "FAILED";
 				}
 
-
 				var report =
 				"<tr>" +
 				$"<td>{Name}</td>" +
-				$"<td>{VerifierName}</td>" +
+				$"<td>{VerificationName}</td>" +
 				$"<td>{Sql}</td>" +
 				$"<td>{ExpectedValue}</td>" +
 				$"<td>{result}</td>" +
@@ -201,78 +221,200 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			public abstract dynamic ExpectedValue { get; }
 
-			public abstract bool Verify(dynamic result);
+			public abstract bool Validate(dynamic result);
 		}
 
-		class Equal : BaseVerifier
+		class SqlEqual : BaseSqlVerification
 		{
-			public Equal(string name, string sql, dynamic value)
+			public SqlEqual(string name, string sql, dynamic value)
 			{
 				Sql = sql;
 				Values = new[] { value };
 				Name = name;
-				VerifierName = "Equal";
+				VerificationName = "SQLEqual";
 			}
 
 			public override dynamic ExpectedValue => Values[0];
 
-			public override bool Verify(dynamic result)
+			public override bool Validate(dynamic result)
 			{
 				return result == ExpectedValue;
 			}
 		}
 
-		class Large : BaseVerifier
+		class SqlLarge : BaseSqlVerification
 		{
-			public Large(string name, string sql, dynamic value)
+			public SqlLarge(string name, string sql, dynamic value)
 			{
 				Name = name;
 				Sql = sql;
-				VerifierName = "Large";
+				VerificationName = "SQLLarge";
 				Values = new[] { value };
 			}
 
 			public override dynamic ExpectedValue => Values[0];
 
-			public override bool Verify(dynamic result)
+			public override bool Validate(dynamic result)
 			{
 				return result > ExpectedValue;
 			}
 		}
 
-		class Less : BaseVerifier
+		class SqlLess : BaseSqlVerification
 		{
-			public Less(string name, string sql, dynamic value)
+			public SqlLess(string name, string sql, dynamic value)
 			{
 				Name = name;
 				Sql = sql;
-				VerifierName = "Less";
+				VerificationName = "SQLLess";
 				Values = new[] { value };
 			}
 
 			public override dynamic ExpectedValue => Values[0];
 
-			public override bool Verify(dynamic result)
+			public override bool Validate(dynamic result)
 			{
 				return result < ExpectedValue;
 			}
 		}
 
-		class Range : BaseVerifier
+		class SqlRange : BaseSqlVerification
 		{
-			public Range(string name, string sql, dynamic minValue, dynamic maxValue)
+			public SqlRange(string name, string sql, dynamic minValue, dynamic maxValue)
 			{
 				Name = name;
 				Sql = sql;
-				VerifierName = "Range";
+				VerificationName = "SQLRange";
 				Values = new[] { minValue, maxValue };
 			}
 
 			public override dynamic ExpectedValue => $"{Values[0]}-{Values[1]}";
 
-			public override bool Verify(dynamic result)
+			public override bool Validate(dynamic result)
 			{
 				return result >= Values[0] && result <= Values[1];
+			}
+		}
+
+		abstract class BaseValueVerification : IVerification
+		{
+			public string Name { get; protected set; }
+			public string VerificationName { get; protected set; }
+			public dynamic Acutal { get; set; }
+			protected dynamic[] Expected { get; set; }
+
+			public VerificationInfo Verify(IDbConnection conn)
+			{
+				bool verifyResult;
+				string color;
+				string verifyResultStr;
+
+				try
+				{
+					verifyResult = Validate(Acutal);
+					color = verifyResult ? "forestgreen" : "orangered";
+					verifyResultStr = verifyResult ? "PASS" : "FAILED";
+				}
+				catch (Exception e)
+				{
+					Acutal = e.ToString();
+					verifyResult = false;
+					color = "orangered";
+					verifyResultStr = "FAILED";
+				}
+
+				var report =
+				"<tr>" +
+				$"<td>{Name}</td>" +
+				$"<td>{VerificationName}</td>" +
+				$"<td>NONE</td>" +
+				$"<td>{ExpectedValue}</td>" +
+				$"<td>{Acutal}</td>" +
+				$"<td style=\"color:{color}\"><strong>{verifyResultStr}</strong></td>" +
+				$"<td>{DateTime.Now:yyyy-MM-dd hh:mm:ss}</td>" +
+				"</tr>";
+
+				return new VerificationInfo
+				{
+					Pass = verifyResult,
+					Report = report
+				};
+			}
+
+			public abstract dynamic ExpectedValue { get; }
+
+			public abstract bool Validate(dynamic result);
+		}
+
+		class ValueEqual : BaseValueVerification
+		{
+			public ValueEqual(string name, dynamic actual, dynamic expected)
+			{
+				Expected = new[] { expected };
+				Name = name;
+				Acutal = actual;
+				VerificationName = "ValueEqual";
+			}
+
+			public override dynamic ExpectedValue => Expected[0];
+
+			public override bool Validate(dynamic result)
+			{
+				return result == ExpectedValue;
+			}
+		}
+
+		class ValueLarge : BaseValueVerification
+		{
+			public ValueLarge(string name, dynamic actual, dynamic expected)
+			{
+				Name = name;
+				Acutal = actual;
+				VerificationName = "ValueLarge";
+				Expected = new[] { expected };
+			}
+
+			public override dynamic ExpectedValue => Expected[0];
+
+			public override bool Validate(dynamic result)
+			{
+				return result > ExpectedValue;
+			}
+		}
+
+		class ValueLess : BaseValueVerification
+		{
+			public ValueLess(string name, dynamic actual, dynamic expected)
+			{
+				Name = name;
+				Acutal = actual;
+				VerificationName = "ValueLess";
+				Expected = new[] { expected };
+			}
+
+			public override dynamic ExpectedValue => Expected[0];
+
+			public override bool Validate(dynamic result)
+			{
+				return result < ExpectedValue;
+			}
+		}
+
+		class ValueRange : BaseValueVerification
+		{
+			public ValueRange(string name, dynamic actual, dynamic minValue, dynamic maxValue)
+			{
+				Name = name;
+				Acutal = actual;
+				VerificationName = "ValueRange";
+				Expected = new[] { minValue, maxValue };
+			}
+
+			public override dynamic ExpectedValue => $"{Expected[0]}-{Expected[1]}";
+
+			public override bool Validate(dynamic result)
+			{
+				return result >= Expected[0] && result <= Expected[1];
 			}
 		}
 	}
@@ -286,11 +428,18 @@ namespace DotnetSpider.Extension.Infrastructure
 	{
 		public Properties Properties { get; }
 
-		public Verification()
+		public string ReportSampleSql { get; set; }
+
+		public string ExportDataSql { get; set; }
+
+		public string ExportDataFileName { get; set; }
+
+		public Verification(string reportSampleSql = null)
 		{
 			Properties = typeof(TE).GetTypeInfo().GetCustomAttribute<Properties>();
 			EmailTo = Properties.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
 			Subject = Properties.Subject;
+			ReportSampleSql = reportSampleSql;
 		}
 
 		public Verification(string emailTo, string subject, string host, int port, string account, string password) : base(emailTo, subject, host, port, account, password)
@@ -298,10 +447,14 @@ namespace DotnetSpider.Extension.Infrastructure
 			Properties = typeof(TE).GetTypeInfo().GetCustomAttribute<Properties>();
 		}
 
-		public override VerificationResult Report(string sql = null)
+		public override VerificationResult Report()
 		{
 			VerificationResult veridationResult = new VerificationResult();
-			if (!string.IsNullOrEmpty(sql) && sql.ToLower().Contains("limit"))
+			if (string.IsNullOrEmpty(Config.ConnectString))
+			{
+				return veridationResult;
+			}
+			if (!string.IsNullOrEmpty(ReportSampleSql) && ReportSampleSql.ToLower().Contains("limit"))
 			{
 				Logger.MyLog("SQL contains 'LIMIT'.", LogLevel.Error);
 				return veridationResult;
@@ -355,10 +508,10 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					}
 					veridationResult.PassVeridation = success;
 					emailBody.Append("</tbody></table><br/>");
-					if (!string.IsNullOrEmpty(sql))
+					if (!string.IsNullOrEmpty(ReportSampleSql))
 					{
 						emailBody.Append("<strong>数据样本</strong><br/><br/>");
-						emailBody.Append(conn.ToHTML($"{sql} LIMIT 100;"));
+						emailBody.Append(conn.ToHTML($"{ReportSampleSql} LIMIT 100;"));
 					}
 					emailBody.Append("<br/><br/></body></html>");
 
@@ -376,8 +529,23 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					{
 						Text = HttpUtility.HtmlDecode(emailBody.ToString())
 					};
+					var multipart = new Multipart("mixed");
+					multipart.Add(html);
 
-					message.Body = html;
+					if (veridationResult.PassVeridation && !string.IsNullOrEmpty(ExportDataSql) && !string.IsNullOrEmpty(ExportDataFileName))
+					{
+						var path = conn.Export(ExportDataSql, $"{ExportDataFileName}_{DateTime.Now.ToString("yyyyMMddhhmmss")}", true);
+						var attachment = new MimePart("excel", "xlsx")
+						{
+							ContentObject = new ContentObject(File.OpenRead(path), ContentEncoding.Default),
+							ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+							ContentTransferEncoding = ContentEncoding.Base64,
+							FileName = Path.GetFileName(path)
+						};
+						multipart.Add(attachment);
+					}
+
+					message.Body = multipart;
 
 					using (var client = new MailKit.Net.Smtp.SmtpClient())
 					{
@@ -391,6 +559,7 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					}
 				}
 			}
+
 
 			return veridationResult;
 		}

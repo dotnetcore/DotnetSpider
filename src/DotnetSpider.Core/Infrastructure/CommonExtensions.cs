@@ -19,34 +19,42 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				conn.Open();
 			}
-			var reader = command.ExecuteReader();
-
-			int row = 1;
-			StringBuilder html = new StringBuilder("<table>");
-			while (reader.Read())
+			IDataReader reader = null;
+			try
 			{
-				if (row == 1)
+				reader = command.ExecuteReader();
+
+				int row = 1;
+				StringBuilder html = new StringBuilder("<table>");
+				while (reader.Read())
 				{
-					html.Append("<tr>");
-					for (int i = 1; i < reader.FieldCount + 1; ++i)
+					if (row == 1)
 					{
-						html.Append($"<td>{reader.GetName(i - 1)}</td>");
+						html.Append("<tr>");
+						for (int i = 1; i < reader.FieldCount + 1; ++i)
+						{
+							html.Append($"<td>{reader.GetName(i - 1)}</td>");
+						}
+						html.Append("</tr>");
+					}
+
+					var realRowIndx = row + 1;
+					html.Append("<tr>");
+					for (int j = 1; j < reader.FieldCount + 1; ++j)
+					{
+						html.Append($"<td>{reader.GetValue(j - 1)}</td>");
 					}
 					html.Append("</tr>");
+					row++;
 				}
+				html.Append("</table>");
 
-				var realRowIndx = row + 1;
-				html.Append("<tr>");
-				for (int j = 1; j < reader.FieldCount + 1; ++j)
-				{
-					html.Append($"<td>{reader.GetValue(j - 1)}</td>");
-				}
-				html.Append("</tr>");
-				row++;
+				return html.ToString();
 			}
-			html.Append("</table>");
-
-			return html.ToString();
+			finally
+			{
+				reader?.Close();
+			}
 		}
 	}
 }
