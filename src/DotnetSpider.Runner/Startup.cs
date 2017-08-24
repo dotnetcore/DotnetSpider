@@ -181,7 +181,8 @@ namespace DotnetSpider.Runner
 				}
 			}
 
-			var method = spider.GetType().GetMethod("Run");
+			var spiderType = spider.GetType();
+			var method = spiderType.GetMethod("Run");
 
 			//CreateTable();
 
@@ -193,7 +194,17 @@ namespace DotnetSpider.Runner
 			}
 			else
 			{
-				method.Invoke(spider, new object[] { arguments["-a"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries) });
+				var parameters = arguments["-a"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+				if (parameters.Contains("report"))
+				{
+					var emptySleepTime = spiderType.GetProperty("EmptySleepTime");
+					if (emptySleepTime != null)
+					{
+						emptySleepTime.SetValue(spider, 1000);
+					}
+				}
+
+				method.Invoke(spider, new object[] { parameters });
 			}
 		}
 

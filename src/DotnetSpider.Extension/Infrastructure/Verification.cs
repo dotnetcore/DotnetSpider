@@ -148,7 +148,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			Verifiers.Add(new Range(name, sql, minValue, maxValue));
 		}
 
-		public abstract VerificationResult Report();
+		public abstract VerificationResult Report(string sql = null);
 
 		abstract class BaseVerifier : IVerification
 		{
@@ -298,9 +298,14 @@ namespace DotnetSpider.Extension.Infrastructure
 			Properties = typeof(TE).GetTypeInfo().GetCustomAttribute<Properties>();
 		}
 
-		public override VerificationResult Report()
+		public override VerificationResult Report(string sql = null)
 		{
 			VerificationResult veridationResult = new VerificationResult();
+			if (!string.IsNullOrEmpty(sql) && sql.ToLower().Contains("limit"))
+			{
+				Logger.MyLog("SQL contains 'LIMIT'.", LogLevel.Error);
+				return veridationResult;
+			}
 			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrEmpty(EmailHost))
 			{
 				using (var conn = new MySqlConnection(Config.ConnectString))
@@ -319,11 +324,11 @@ $"<title>{Subject}: {DateTime.Now}</title>" +
 "</head>" +
 "<body style=\"background-color:#FAF7EC\">" +
 $"<h2>{Subject}: {DateTime.Now}</h2>" +
-(hasProperties ? $"<p><strong>Analyst: {Properties.Owner}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>Developer: {Properties.Developer}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>Date: {Properties.Date}</strong></p>" : "") +
-(hasProperties ? $"<p><strong>Description: {Description}</strong></p>" : "") +
-"<br/>" +
+(hasProperties ? $"<strong>Analyst: </strong>{Properties.Owner}" : "") +
+(hasProperties ? $"&nbsp;&nbsp;&nbsp;<strong>Developer: </strong>{Properties.Developer}" : "") +
+(hasProperties ? $"&nbsp;&nbsp;&nbsp;<strong>Date: </strong>{Properties.Date}" : "") +
+(hasProperties ? $"&nbsp;&nbsp;&nbsp;<strong>Description: </strong>{Description}" : "") +
+"<br/><br/>" +
 "<table>" +
 "<thead>" +
 "<tr>" +
@@ -349,7 +354,13 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 						}
 					}
 					veridationResult.PassVeridation = success;
-					emailBody.Append("</tbody></table><br/></body></html>");
+					emailBody.Append("</tbody></table><br/>");
+					if (!string.IsNullOrEmpty(sql))
+					{
+						emailBody.Append("<strong>数据样本</strong><br/><br/>");
+						emailBody.Append(conn.ToHTML($"{sql} LIMIT 100;"));
+					}
+					emailBody.Append("<br/><br/></body></html>");
 
 					var message = new MimeMessage();
 					var displayName = string.IsNullOrEmpty(EmailDisplayName) ? "DotnetSpider Alert" : EmailDisplayName;
