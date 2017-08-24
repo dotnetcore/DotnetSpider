@@ -7,12 +7,18 @@
     <DefineConstants>DEBUG;NETCOREAPP2_0;NET_CORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="EPPlus.Core" Version="1.5.2" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
     <ProjectReference Include="..\DotnetSpider.Runner\DotnetSpider.Runner.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="chromedriver.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="config.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

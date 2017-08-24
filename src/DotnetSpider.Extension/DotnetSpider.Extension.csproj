@@ -49,4 +49,7 @@
     <Folder Include="Properties\" />
     <Folder Include="Redial\" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="EPPlus.Core" Version="1.5.2" />
+  </ItemGroup>
 </Project>

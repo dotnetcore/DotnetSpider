@@ -26,8 +26,7 @@ namespace DotnetSpider.Extension.Downloader
 		private readonly Browser _browser;
 		private readonly Option _option;
 		public LoginHandler Login { get; set; }
-		public Func<string, string> UrlHandler;
-		public IWebDriverHandler NavigateCompeleted;
+		public event Action<RemoteWebDriver> NavigateCompeleted;
 		private bool _isDisposed;
 
 		public WebDriverDownloader(Browser browser, int webDriverWaitTime = 200, Option option = null)
@@ -81,16 +80,17 @@ namespace DotnetSpider.Extension.Downloader
 					}
 				}
 
-				//中文乱码URL
 				Uri uri = request.Url;
-#if NET_CORE
-				string query = string.IsNullOrEmpty(uri.Query) ? "" : $"?{WebUtility.UrlEncode(uri.Query.Substring(1, uri.Query.Length - 1))}";
-#else
-				string query = string.IsNullOrEmpty(uri.Query) ? "" : $"?{HttpUtility.UrlPathEncode(uri.Query.Substring(1, uri.Query.Length - 1))}";
-#endif
-				string realUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}{uri.AbsolutePath}{query}";
+
+				//#if NET_CORE
+				//				string query = string.IsNullOrEmpty(uri.Query) ? "" : $"?{WebUtility.UrlEncode(uri.Query.Substring(1, uri.Query.Length - 1))}";
+				//#else
+				//				string query = string.IsNullOrEmpty(uri.Query) ? "" : $"?{HttpUtility.UrlPathEncode(uri.Query.Substring(1, uri.Query.Length - 1))}";
+				//#endif
+				//				string realUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}{uri.AbsolutePath}{query}";
 
 				var domainUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}";
+
 				var options = _webDriver.Manage();
 				if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies.PairPart.Count > 0)
 				{
@@ -102,16 +102,13 @@ namespace DotnetSpider.Extension.Downloader
 					}
 				}
 
-				if (UrlHandler != null)
-				{
-					realUrl = UrlHandler(realUrl);
-				}
+				string realUrl = request.Url.ToString();
 
-				NetworkCenter.Current.Execute("wd-d", () =>
+				NetworkCenter.Current.Execute("wdd", () =>
 				{
 					_webDriver.Navigate().GoToUrl(realUrl);
 
-					NavigateCompeleted?.Handle((RemoteWebDriver)_webDriver);
+					NavigateCompeleted?.Invoke((RemoteWebDriver)_webDriver);
 				});
 
 				Thread.Sleep(_webDriverWaitTime);
@@ -137,18 +134,9 @@ namespace DotnetSpider.Extension.Downloader
 				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}.", NLog.LogLevel.Warn);
 				return page;
 			}
-			catch (HttpRequestException he)
-			{
-				Page page = new Page(request, null) { Exception = he };
-				if (site.CycleRetryTimes > 0)
-				{
-					page = Spider.AddToCycleRetry(request, site);
-				}
-				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {he.Message}.", NLog.LogLevel.Warn);
-				return page;
-			}
 			catch (Exception e)
 			{
+				Logger.MyLog(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", NLog.LogLevel.Warn);
 				Page page = new Page(request, null) { Exception = e };
 				return page;
 			}
