@@ -6,6 +6,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 	public class DisplaceFormater : Formatter
 	{
 		public string EqualValue { get; set; }
+
 		public string Displacement { get; set; }
 
 		protected override dynamic FormateValue(dynamic value)

@@ -6,6 +6,7 @@ namespace DotnetSpider.Core.Downloader
 	public class Cookies
 	{
 		public string StringPart { get; set; }
+
 		public Dictionary<string, string> PairPart { get; set; } = new Dictionary<string, string>();
 
 		public override string ToString()

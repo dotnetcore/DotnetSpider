@@ -6,14 +6,13 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
-using System.Net.Http;
 using DotnetSpider.Core.Redial;
 using System.Runtime.InteropServices;
 using DotnetSpider.Extension.Infrastructure;
 #if NET_CORE
 using System.Net;
 #else
-using System.Web;
+
 #endif
 
 namespace DotnetSpider.Extension.Downloader
@@ -25,9 +24,11 @@ namespace DotnetSpider.Extension.Downloader
 		private bool _isLogined;
 		private readonly Browser _browser;
 		private readonly Option _option;
-		public LoginHandler Login { get; set; }
-		public event Action<RemoteWebDriver> NavigateCompeleted;
 		private bool _isDisposed;
+
+		public event Action<RemoteWebDriver> NavigateCompeleted;
+
+		public LoginHandler Login { get; set; }
 
 		public WebDriverDownloader(Browser browser, int webDriverWaitTime = 200, Option option = null)
 		{
@@ -41,10 +42,10 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					while (!_isDisposed)
 					{
-						IntPtr maindHwnd = WindowsFormUtil.FindWindow(null, "plugin-container.exe - 应用程序错误");
+						IntPtr maindHwnd = WindowsFormUtils.FindWindow(null, "plugin-container.exe - 应用程序错误");
 						if (maindHwnd != IntPtr.Zero)
 						{
-							WindowsFormUtil.SendMessage(maindHwnd, WindowsFormUtil.WmClose, 0, 0);
+							WindowsFormUtils.SendMessage(maindHwnd, WindowsFormUtils.WmClose, 0, 0);
 						}
 						Thread.Sleep(500);
 					}
@@ -59,6 +60,12 @@ namespace DotnetSpider.Extension.Downloader
 		public WebDriverDownloader(Browser browser, LoginHandler loginHandler) : this(browser, 200)
 		{
 			Login = loginHandler;
+		}
+
+		public override void Dispose()
+		{
+			_isDisposed = true;
+			_webDriver?.Quit();
 		}
 
 		protected override Page DowloadContent(Request request, ISpider spider)
@@ -92,7 +99,7 @@ namespace DotnetSpider.Extension.Downloader
 				var domainUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}";
 
 				var options = _webDriver.Manage();
-				if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies.PairPart.Count > 0)
+				if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies?.PairPart.Count > 0)
 				{
 					_webDriver.Url = domainUrl;
 					options.Cookies.DeleteAllCookies();
@@ -142,10 +149,5 @@ namespace DotnetSpider.Extension.Downloader
 			}
 		}
 
-		public override void Dispose()
-		{
-			_isDisposed = true;
-			_webDriver?.Quit();
-		}
 	}
 }

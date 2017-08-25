@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Infrastructure
 {
 	public static class CommonExtensions
 	{
-		public static string ToHTML(this IDbConnection conn, string sql)
+		public static string ToHtml(this IDbConnection conn, string sql)
 		{
 			var command = conn.CreateCommand();
 			command.CommandText = sql;
@@ -39,7 +35,6 @@ namespace DotnetSpider.Core.Infrastructure
 						html.Append("</tr>");
 					}
 
-					var realRowIndx = row + 1;
 					html.Append("<tr>");
 					for (int j = 1; j < reader.FieldCount + 1; ++j)
 					{
@@ -58,7 +53,7 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
-		public static void AddOrUpdate<K, V>(this ConcurrentDictionary<K, V> dictionary, K key, V value)
+		public static void AddOrUpdate<TK, TV>(this ConcurrentDictionary<TK, TV> dictionary, TK key, TV value)
 		{
 			dictionary.AddOrUpdate(key, value, (oldkey, oldvalue) => value);
 		}

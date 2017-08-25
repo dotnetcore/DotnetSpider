@@ -5,7 +5,7 @@ using DotnetSpider.Extension.Model.Attribute;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public class SelectorUtil
+	public class SelectorUtils
 	{
 		public static ISelector Parse(BaseSelector selector)
 		{

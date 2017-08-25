@@ -17,12 +17,9 @@ namespace DotnetSpider.Extension.Scheduler
 	/// </summary>
 	public sealed class RedisScheduler : DuplicateRemovedScheduler, IDuplicateRemover
 	{
-		public string ConnectString { get; }
-		public override bool IsNetworkScheduler => true;
-		public RedisConnection RedisConnection { get; private set; }
-
 		public const string TasksKey = "dotnetspider:tasks";
 		public const string TaskStatsKey = "dotnetspider:task-stats";
+
 		private string _queueKey;
 		private string _setKey;
 		private string _itemKey;
@@ -30,10 +27,9 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _successCountKey;
 		private string _identityMd5;
 
-		private RedisScheduler()
-		{
-			DuplicateRemover = this;
-		}
+		public string ConnectString { get; }
+		public override bool IsNetworkScheduler => true;
+		public RedisConnection RedisConnection { get; private set; }
 
 		public RedisScheduler(string connectString) : this()
 		{
@@ -90,33 +86,14 @@ namespace DotnetSpider.Extension.Scheduler
 			});
 		}
 
-		protected override void PushWhenNoDuplicate(Request request)
-		{
-			RetryExecutor.Execute(30, () =>
-			{
-				RedisConnection.Database.ListRightPush(_queueKey, request.Identity);
-				string field = request.Identity;
-				string value = JsonConvert.SerializeObject(request);
-
-				RedisConnection.Database.HashSet(_itemKey, field, value);
-			});
-		}
-
 		public override Request Poll()
 		{
 			return NetworkCenter.Current.Execute("rds-pl", () =>
 			{
 				return RetryExecutor.Execute(30, () =>
 				{
-					RedisValue value;
-					if (DepthFirst)
-					{
-						value = RedisConnection.Database.ListRightPop(_queueKey);
-					}
-					else
-					{
-						value = RedisConnection.Database.ListLeftPop(_queueKey);
-					}
+					var value = DepthFirst ? RedisConnection.Database.ListRightPop(_queueKey) : RedisConnection.Database.ListLeftPop(_queueKey);
+
 					if (!value.HasValue)
 					{
 						return null;
@@ -136,35 +113,44 @@ namespace DotnetSpider.Extension.Scheduler
 			});
 		}
 
-		public override long GetLeftRequestsCount()
+		public override long LeftRequestsCount
 		{
-			return NetworkCenter.Current.Execute("rds-lc", () => RedisConnection.Database.ListLength(_queueKey));
+			get { return NetworkCenter.Current.Execute("rds-lc", () => RedisConnection.Database.ListLength(_queueKey)); }
 		}
 
-		public override long GetTotalRequestsCount()
+		public override long TotalRequestsCount
 		{
-			return NetworkCenter.Current.Execute("rds-tc", () => RedisConnection.Database.SetLength(_setKey));
-		}
-
-		public override long GetSuccessRequestsCount()
-		{
-			return NetworkCenter.Current.Execute("rds-src", () =>
+			get
 			{
-				var result = RedisConnection.Database.HashGet(_successCountKey, _identityMd5);
-				return result.HasValue ? (long)result : 0;
-			});
+				return NetworkCenter.Current.Execute("rds-tc", () => RedisConnection.Database.SetLength(_setKey));
+			}
 		}
 
-		public override long GetErrorRequestsCount()
+		public override long SuccessRequestsCount
 		{
-			return NetworkCenter.Current.Execute("rds-erc", () =>
+			get
 			{
-				var result = RedisConnection.Database.HashGet(_errorCountKey, _identityMd5);
-				return result.HasValue ? (long)result : 0;
-			});
+				return NetworkCenter.Current.Execute("rds-src", () =>
+				{
+					var result = RedisConnection.Database.HashGet(_successCountKey, _identityMd5);
+					return result.HasValue ? (long)result : 0;
+				});
+			}
 		}
 
-		public override void IncreaseSuccessCounter()
+		public override long ErrorRequestsCount
+		{
+			get
+			{
+				return NetworkCenter.Current.Execute("rds-erc", () =>
+				{
+					var result = RedisConnection.Database.HashGet(_errorCountKey, _identityMd5);
+					return result.HasValue ? (long)result : 0;
+				});
+			}
+		}
+
+		public override void IncreaseSuccessCount()
 		{
 			NetworkCenter.Current.Execute("rds-isc", () =>
 			{
@@ -172,7 +158,7 @@ namespace DotnetSpider.Extension.Scheduler
 			});
 		}
 
-		public override void IncreaseErrorCounter()
+		public override void IncreaseErrorCount()
 		{
 			NetworkCenter.Current.Execute("rds-iec", () =>
 			{
@@ -185,9 +171,9 @@ namespace DotnetSpider.Extension.Scheduler
 			IsExited = true;
 		}
 
-		public override void Clean()
+		public override void Clear()
 		{
-			base.Clean();
+			base.Clear();
 
 			RedisConnection.Database.KeyDelete(_queueKey);
 			RedisConnection.Database.KeyDelete(_setKey);
@@ -219,7 +205,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 						RedisConnection.Database.SetAdd(_setKey, identities);
 						RedisConnection.Database.ListRightPush(_queueKey, identities);
-						RedisConnection.Database.HashSet(_itemKey, items,CommandFlags.HighPriority);
+						RedisConnection.Database.HashSet(_itemKey, items, CommandFlags.HighPriority);
 
 						i = 0;
 						if (n != 0)
@@ -277,6 +263,23 @@ namespace DotnetSpider.Extension.Scheduler
 				}
 			}
 			set => RedisConnection.Database.HashSet(TaskStatsKey, _identityMd5, value ? 1 : 0);
+		}
+
+		protected override void PushWhenNoDuplicate(Request request)
+		{
+			RetryExecutor.Execute(30, () =>
+			{
+				RedisConnection.Database.ListRightPush(_queueKey, request.Identity);
+				string field = request.Identity;
+				string value = JsonConvert.SerializeObject(request);
+
+				RedisConnection.Database.HashSet(_itemKey, field, value);
+			});
+		}
+
+		private RedisScheduler()
+		{
+			DuplicateRemover = this;
 		}
 
 		#region For Test

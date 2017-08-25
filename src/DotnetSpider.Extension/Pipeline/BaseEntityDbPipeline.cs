@@ -9,31 +9,31 @@ using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
-using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using NLog;
 using DotnetSpider.Core.Redial;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class BaseEntityDbPipeline : BaseEntityPipeline
 	{
-		public string ConnectString { get; set; }
-		public bool CheckIfSameBeforeUpdate { get; set; }
-
-		[JsonIgnore]
-		public IUpdateConnectString UpdateConnectString { get; set; }
 		protected abstract DbConnection CreateConnection();
-
 		protected abstract string GetInsertSql(EntityDbMetadata metadata);
 		protected abstract string GetUpdateSql(EntityDbMetadata metadata);
 		protected abstract string GetSelectSql(EntityDbMetadata metadata);
 		protected abstract string GetCreateTableSql(EntityDbMetadata metadata);
-
 		protected abstract string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion);
 		protected abstract string GetIfSchemaExistsSql(EntityDbMetadata metadata, string serverVersion);
 		protected abstract DbParameter CreateDbParameter(string name, object value);
-		protected ConcurrentDictionary<string, EntityDbMetadata> DbMetadatas = new ConcurrentDictionary<string, EntityDbMetadata>();
+
+		protected ConcurrentDictionary<string, EntityDbMetadata> DbMetadatas { get; set; } = new ConcurrentDictionary<string, EntityDbMetadata>();
+
+		public IUpdateConnectString UpdateConnectString { get; set; }
+
+		public string ConnectString { get; set; }
+
+		public bool CheckIfSameBeforeUpdate { get; set; }
 
 		protected BaseEntityDbPipeline(string connectString, bool checkIfSaveBeforeUpdate = false)
 		{

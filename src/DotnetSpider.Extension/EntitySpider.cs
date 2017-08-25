@@ -8,7 +8,6 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
-using Newtonsoft.Json;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extension.Pipeline;
@@ -23,51 +22,12 @@ namespace DotnetSpider.Extension
 
 		public List<Entity> Entities { get; internal set; } = new List<Entity>();
 
-		public EntitySpider(string name) : this(name, new Site())
+		protected EntitySpider(string name) : this(name, new Site())
 		{
 		}
 
-		public EntitySpider(string name, Site site) : base(name, site)
+		protected EntitySpider(string name, Site site) : base(name, site)
 		{
-		}
-
-		protected override IPipeline GetDefaultPipeline()
-		{
-			return new MySqlEntityPipeline(ConnectString);
-		}
-
-		protected override void PreInitComponent(params string[] arguments)
-		{
-			base.PreInitComponent(arguments);
-
-			if (arguments.Contains("skip"))
-			{
-				return;
-			}
-
-			if (Entities == null || Entities.Count == 0)
-			{
-				throw new SpiderException("Count of entity is zero.");
-			}
-
-			foreach (var entity in Entities)
-			{
-				foreach (var pipeline in _pipelines)
-				{
-					BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
-					newPipeline?.AddEntity(entity);
-				}
-			}
-
-			if (IfRequireInitStartRequests(arguments) && StartUrlBuilders != null && StartUrlBuilders.Count > 0)
-			{
-				for (int i = 0; i < StartUrlBuilders.Count; ++i)
-				{
-					var builder = StartUrlBuilders[i];
-					Logger.MyLog(Identity, $"[{i + 1}] Add extra start urls to scheduler.", LogLevel.Info);
-					builder.Build(Site);
-				}
-			}
 		}
 
 		public EntitySpider AddEntityType(Type type, string tableName = null)
@@ -84,7 +44,7 @@ namespace DotnetSpider.Extension
 
 		public EntitySpider AddEntityType<T>(DataHandler dataHandler)
 		{
-			AddEntityType(typeof(T), dataHandler, null);
+			AddEntityType(typeof(T), dataHandler);
 			return this;
 		}
 
@@ -221,7 +181,7 @@ namespace DotnetSpider.Extension
 		{
 			switch (suffix)
 			{
-				case TableSuffix.FirstDayOfThisMonth:
+				case TableSuffix.FirstDayOfCurrentMonth:
 					{
 						return name + "_" + DateTimeUtils.FirstDayOfCurrentMonth.ToString("yyyy_MM_dd");
 					}
@@ -235,6 +195,45 @@ namespace DotnetSpider.Extension
 					}
 			}
 			return name;
+		}
+
+		protected override IPipeline GetDefaultPipeline()
+		{
+			return new MySqlEntityPipeline(ConnectString);
+		}
+
+		protected override void PreInitComponent(params string[] arguments)
+		{
+			base.PreInitComponent(arguments);
+
+			if (arguments.Contains("skip"))
+			{
+				return;
+			}
+
+			if (Entities == null || Entities.Count == 0)
+			{
+				throw new SpiderException("Count of entity is zero.");
+			}
+
+			foreach (var entity in Entities)
+			{
+				foreach (var pipeline in Pipelines)
+				{
+					BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
+					newPipeline?.AddEntity(entity);
+				}
+			}
+
+			if (IfRequireInitStartRequests(arguments) && StartUrlBuilders != null && StartUrlBuilders.Count > 0)
+			{
+				for (int i = 0; i < StartUrlBuilders.Count; ++i)
+				{
+					var builder = StartUrlBuilders[i];
+					Logger.MyLog(Identity, $"[{i + 1}] Add extra start urls to scheduler.", LogLevel.Info);
+					builder.Build(Site);
+				}
+			}
 		}
 
 		private static DataType GetDataType(string name)

@@ -2,24 +2,24 @@
 using DotnetSpider.Extension.Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class MongoDbEntityPipeline : BaseEntityPipeline
+	public class MongoDBEntityPipeline : BaseEntityPipeline
 	{
-		public string ConnectString { get; set; }
-		[JsonIgnore]
-		public IUpdateConnectString UpdateConnectString { get; set; }
-
 		protected ConcurrentDictionary<string, IMongoCollection<BsonDocument>> Collections = new ConcurrentDictionary<string, IMongoCollection<BsonDocument>>();
 
-		public MongoDbEntityPipeline(string connectString)
+		public string ConnectString { get; set; }
+
+		public IUpdateConnectString UpdateConnectString { get; set; }
+
+		public MongoDBEntityPipeline(string connectString)
 		{
 			ConnectString = connectString;
 		}

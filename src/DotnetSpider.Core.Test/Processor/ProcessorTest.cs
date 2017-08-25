@@ -46,9 +46,9 @@ namespace DotnetSpider.Core.Test.Processor
 			spider.Run();
 
 			Assert.AreEqual(4, spider.RetriedTimes.Value);
-			Assert.AreEqual(0, scheduler.GetLeftRequestsCount());
-			Assert.AreEqual(6, scheduler.GetSuccessRequestsCount());
-			Assert.AreEqual(5, scheduler.GetErrorRequestsCount());
+			Assert.AreEqual(0, scheduler.LeftRequestsCount);
+			Assert.AreEqual(6, scheduler.SuccessRequestsCount);
+			Assert.AreEqual(5, scheduler.ErrorRequestsCount);
 		}
 
 		class TestPageProcessor : BasePageProcessor

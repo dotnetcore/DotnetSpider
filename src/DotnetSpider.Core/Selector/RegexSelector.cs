@@ -12,26 +12,26 @@ namespace DotnetSpider.Core.Selector
 {
 	public class RegexSelector : ISelector
 	{
-		private readonly string _regexStr;
+		private readonly string _pattern;
 		private readonly Regex _regex;
 		private readonly int _group;
 
-		public RegexSelector(string regexStr, int group)
+		public RegexSelector(string pattern, int group)
 		{
-			if (string.IsNullOrEmpty(regexStr))
+			if (string.IsNullOrEmpty(pattern))
 			{
 				throw new ArgumentException("regex must not be empty");
 			}
 			// Check bracket for regex group. Add default group 1 if there is no group.
 			// Only check if there exists the valid left parenthesis, leave regexp validation for Pattern.
-			if (StringExtensions.CountMatches(regexStr, "(") - StringExtensions.CountMatches(regexStr, "\\(") ==
-					StringExtensions.CountMatches(regexStr, "(?:") - StringExtensions.CountMatches(regexStr, "\\(?:"))
+			if (StringExtensions.CountMatches(pattern, "(") - StringExtensions.CountMatches(pattern, "\\(") ==
+					StringExtensions.CountMatches(pattern, "(?:") - StringExtensions.CountMatches(pattern, "\\(?:"))
 			{
-				regexStr = "(" + regexStr + ")";
+				pattern = "(" + pattern + ")";
 			}
-			_regexStr = regexStr;
+			_pattern = pattern;
 			//check: regex = Pattern.compile(regexStr, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-			_regex = new Regex(regexStr, RegexOptions.IgnoreCase);
+			_regex = new Regex(pattern, RegexOptions.IgnoreCase);
 			_group = group;
 		}
 
@@ -93,6 +93,11 @@ namespace DotnetSpider.Core.Selector
 			return results.Select(result => result.Get(_group)).Cast<dynamic>().ToList();
 		}
 
+		public override string ToString()
+		{
+			return _pattern;
+		}
+
 		private RegexResult SelectGroup(string text)
 		{
 			var match = _regex.Match(text);
@@ -120,11 +125,6 @@ namespace DotnetSpider.Core.Selector
 			}
 
 			return resultList;
-		}
-
-		public override string ToString()
-		{
-			return _regexStr;
 		}
 	}
 }

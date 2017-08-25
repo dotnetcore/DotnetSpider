@@ -12,10 +12,13 @@ namespace DotnetSpider.Extension.Model
 {
 	public class EntityExtractor : IEntityExtractor
 	{
-		public Entity EntityMetadata { get; }
-		public DataHandler DataHandler { get; set; }
-		public string Name { get; }
 		protected readonly List<SharedValueSelector> GlobalValues;
+
+		public Entity EntityMetadata { get; }
+
+		public DataHandler DataHandler { get; set; }
+
+		public string Name { get; }
 
 		public EntityExtractor(string name, List<SharedValueSelector> globalValues, Entity entityMetadata)
 		{
@@ -33,11 +36,11 @@ namespace DotnetSpider.Extension.Model
 				foreach (var enviromentValue in GlobalValues)
 				{
 					string name = enviromentValue.Name;
-					var value = page.Selectable.Select(SelectorUtil.Parse(enviromentValue)).GetValue();
+					var value = page.Selectable.Select(SelectorUtils.Parse(enviromentValue)).GetValue();
 					page.Request.PutExtra(name, value);
 				}
 			}
-			ISelector selector = SelectorUtil.Parse(EntityMetadata.Selector);
+			ISelector selector = SelectorUtils.Parse(EntityMetadata.Selector);
 			if (selector != null && EntityMetadata.Multi)
 			{
 				var list = page.Selectable.SelectList(selector).Nodes();
@@ -77,8 +80,55 @@ namespace DotnetSpider.Extension.Model
 				{
 					result = null;
 				}
-			};
+			}
 			return result;
+		}
+
+		public static string GetEnviromentValue(string field, Page page, int index)
+		{
+			if (field.ToLower() == "url")
+			{
+				return page.Url;
+			}
+
+			if (field.ToLower() == "targeturl")
+			{
+				return page.TargetUrl;
+			}
+
+			if (field.ToLower() == "now")
+			{
+				return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+			}
+
+			if (field.ToLower() == "monday")
+			{
+				return DateTimeUtils.RunIdOfMonday;
+			}
+
+			if (field.ToLower() == "monthly")
+			{
+				return DateTimeUtils.RunIdOfMonthly;
+			}
+
+			if (field.ToLower() == "today")
+			{
+				return DateTimeUtils.RunIdOfToday;
+			}
+
+			if (field.ToLower() == "index")
+			{
+				return index.ToString();
+			}
+
+			if (!page.Request.ExistExtra(field))
+			{
+				return field;
+			}
+			else
+			{
+				return page.Request.GetExtra(field)?.ToString();
+			}
 		}
 
 		private JObject ExtractSingle(Page page, ISelectable item, int index)
@@ -151,7 +201,7 @@ namespace DotnetSpider.Extension.Model
 			{
 				return null;
 			}
-			ISelector selector = SelectorUtil.Parse(field.Selector);
+			ISelector selector = SelectorUtils.Parse(field.Selector);
 			if (selector == null)
 			{
 				return null;
@@ -206,53 +256,6 @@ namespace DotnetSpider.Extension.Model
 						return tmpValue;
 					}
 				}
-			}
-		}
-
-		public static string GetEnviromentValue(string field, Page page, int index)
-		{
-			if (field.ToLower() == "url")
-			{
-				return page.Url;
-			}
-
-			if (field.ToLower() == "targeturl")
-			{
-				return page.TargetUrl;
-			}
-
-			if (field.ToLower() == "now")
-			{
-				return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-			}
-
-			if (field.ToLower() == "monday")
-			{
-				return DateTimeUtils.RunIdOfMonday;
-			}
-
-			if (field.ToLower() == "monthly")
-			{
-				return DateTimeUtils.RunIdOfMonthly;
-			}
-
-			if (field.ToLower() == "today")
-			{
-				return DateTimeUtils.RunIdOfToday;
-			}
-
-			if (field.ToLower() == "index")
-			{
-				return index.ToString();
-			}
-
-			if (!page.Request.ExistExtra(field))
-			{
-				return field;
-			}
-			else
-			{
-				return page.Request.GetExtra(field)?.ToString();
 			}
 		}
 	}

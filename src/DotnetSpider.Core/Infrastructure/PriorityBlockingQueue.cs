@@ -5,16 +5,24 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public class PriorityBlockingQueue<T>
 	{
-		readonly IComparer<T> _comparer;
-		T[] _heap;
+		private readonly IComparer<T> _comparer;
+		private readonly int _capacity;
+
+		private T[] _heap;
 
 		public int Count { get; private set; }
 
-		public PriorityBlockingQueue() : this(null) { }
-		public PriorityBlockingQueue(int capacity) : this(capacity, null) { }
-		public PriorityBlockingQueue(IComparer<T> comparer) : this(16, comparer) { }
+		public PriorityBlockingQueue() : this(null)
+		{
+		}
 
-		private readonly int _capacity;
+		public PriorityBlockingQueue(int capacity) : this(capacity, null)
+		{
+		}
+
+		public PriorityBlockingQueue(IComparer<T> comparer) : this(16, comparer)
+		{
+		}
 
 		public PriorityBlockingQueue(int capacity, IComparer<T> comparer)
 		{
@@ -50,14 +58,14 @@ namespace DotnetSpider.Core.Infrastructure
 			throw new InvalidOperationException("优先队列为空");
 		}
 
-		void SiftUp(int n)
+		private void SiftUp(int n)
 		{
 			var v = _heap[n];
 			for (var n2 = n / 2; n > 0 && _comparer.Compare(v, _heap[n2]) > 0; n = n2, n2 /= 2) _heap[n] = _heap[n2];
 			_heap[n] = v;
 		}
 
-		void SiftDown(int n)
+		private void SiftDown(int n)
 		{
 			var v = _heap[n];
 			for (var n2 = n * 2; n2 < Count; n = n2, n2 *= 2)

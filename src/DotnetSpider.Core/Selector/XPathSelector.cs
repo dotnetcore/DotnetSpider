@@ -6,8 +6,8 @@ namespace DotnetSpider.Core.Selector
 {
 	public class XPathSelector : BaseHtmlSelector
 	{
-		private readonly string _xpath;
 		private static readonly Regex AttributeXPathRegex = new Regex(@"@[\w\s-]+", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
+		private readonly string _xpath;
 		private readonly string _attribute;
 
 		public XPathSelector(string xpathStr)

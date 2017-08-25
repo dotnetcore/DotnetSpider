@@ -16,6 +16,7 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 			NetworkCount = 2;
 			Timeout = 100;
 		}
+
 		public VpsInternetDetector(int networkCount, int maxWaitTime)
 		{
 			NetworkCount = networkCount;

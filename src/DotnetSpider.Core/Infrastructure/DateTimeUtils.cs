@@ -7,6 +7,41 @@ namespace DotnetSpider.Core.Infrastructure
 		private static readonly DateTimeOffset Epoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 		private const long TicksPerMicrosecond = 10;
 
+		public static string RunIdOfToday { get; }
+		public static string RunIdOfMonthly { get; }
+		public static string RunIdOfMonday { get; }
+
+		public static DateTime FirstDayOfCurrentMonth { get; }
+		public static DateTime LastDayOfCurrentMonth { get; }
+		public static DateTime FirstDayOfPreviousMonth { get; }
+		public static DateTime LastDayOfPreviousMonth { get; }
+		public static DateTime MondayOfCurrentWeek { get; }
+		public static DateTime TuesdayOfCurrentWeek { get; }
+		public static DateTime WednesdayOfCurrentWeek { get; }
+		public static DateTime ThursdayOfCurrentWeek { get; }
+		public static DateTime FridayOfCurrentWeek { get; }
+		public static DateTime SaturdayOfCurrentWeek { get; }
+		public static DateTime SundayOfCurrentWeek { get; }
+		public static DateTime MondayOfPreviousWeek { get; }
+		public static DateTime TuesdayOfPreviousWeek { get; }
+		public static DateTime WednesdayOfPreviousWeek { get; }
+		public static DateTime ThursdayOfPreviousWeek { get; }
+		public static DateTime FridayOfPreviousWeek { get; }
+		public static DateTime SaturdayOfPreviousWeek { get; }
+		public static DateTime SundayOfPreviousWeek { get; }
+		public static DateTime MondayOfNextWeek { get; }
+		public static DateTime TuesdayOfNextWeek { get; }
+		public static DateTime WednesdayOfNextWeek { get; }
+		public static DateTime ThursdayOfNextWeek { get; }
+		public static DateTime FridayOfNextWeek { get; }
+		public static DateTime SaturdayOfNextWeek { get; }
+		public static DateTime SundayOfNextWeek { get; }
+
+		/// <summary>
+		/// Returns the number of microseconds since Epoch of the current UTC date and time.
+		/// </summary>
+		public static long UtcNow => FromDateTimeOffset(DateTimeOffset.UtcNow);
+
 		public static string ConvertDateTimeToUnix(DateTime time)
 		{
 			return time.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds.ToString("f0");
@@ -23,10 +58,6 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			return DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
 		}
-
-		public static string RunIdOfToday { get; }
-		public static string RunIdOfMonthly { get; }
-		public static string RunIdOfMonday { get; }
 
 		static DateTimeUtils()
 		{
@@ -73,37 +104,6 @@ namespace DotnetSpider.Core.Infrastructure
 			RunIdOfMonthly = FirstDayOfCurrentMonth.ToString("yyyy-MM-dd");
 			RunIdOfMonday = MondayOfCurrentWeek.ToString("yyyy-MM-dd");
 		}
-
-		public static DateTime FirstDayOfCurrentMonth { get; }
-		public static DateTime LastDayOfCurrentMonth { get; }
-		public static DateTime FirstDayOfPreviousMonth { get; }
-		public static DateTime LastDayOfPreviousMonth { get; }
-		public static DateTime MondayOfCurrentWeek { get; }
-		public static DateTime TuesdayOfCurrentWeek { get; }
-		public static DateTime WednesdayOfCurrentWeek { get; }
-		public static DateTime ThursdayOfCurrentWeek { get; }
-		public static DateTime FridayOfCurrentWeek { get; }
-		public static DateTime SaturdayOfCurrentWeek { get; }
-		public static DateTime SundayOfCurrentWeek { get; }
-		public static DateTime MondayOfPreviousWeek { get; }
-		public static DateTime TuesdayOfPreviousWeek { get; }
-		public static DateTime WednesdayOfPreviousWeek { get; }
-		public static DateTime ThursdayOfPreviousWeek { get; }
-		public static DateTime FridayOfPreviousWeek { get; }
-		public static DateTime SaturdayOfPreviousWeek { get; }
-		public static DateTime SundayOfPreviousWeek { get; }
-		public static DateTime MondayOfNextWeek { get; }
-		public static DateTime TuesdayOfNextWeek { get; }
-		public static DateTime WednesdayOfNextWeek { get; }
-		public static DateTime ThursdayOfNextWeek { get; }
-		public static DateTime FridayOfNextWeek { get; }
-		public static DateTime SaturdayOfNextWeek { get; }
-		public static DateTime SundayOfNextWeek { get; }
-
-		/// <summary>
-		/// Returns the number of microseconds since Epoch of the current UTC date and time.
-		/// </summary>
-		public static long UtcNow => FromDateTimeOffset(DateTimeOffset.UtcNow);
 
 		/// <summary>
 		/// Converts the microseconds since Epoch time provided to a DateTimeOffset.

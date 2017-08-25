@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 #if !NET_CORE
 using System.Web;
@@ -12,8 +11,6 @@ using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;
-using static DotnetSpider.Core.Downloader.HttpClientPool;
-using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -37,12 +34,25 @@ namespace DotnetSpider.Core.Downloader
 			"application/javascript",
 			"application/x-www-form-urlencoded"
 		};
+		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
+		private HttpClient _httpClient;
 
 		public bool DecodeHtml;
 
-		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
-
-		private HttpClient _httpClient;
+		public override IDownloader Clone(ISpider spider)
+		{
+			var downloader = (HttpClientDownloader)MemberwiseClone();
+			if (spider.Site.HttpProxyPool == null)
+			{
+				_httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler
+				{
+					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+					UseProxy = true,
+					UseCookies = false
+				}));
+			}
+			return downloader;
+		}
 
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
@@ -190,7 +200,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 			}
 
-			httpWebRequest.Headers.Add("Cookie", site.Cookies.ToString());
+			httpWebRequest.Headers.Add("Cookie", site.Cookies?.ToString());
 
 			if (httpWebRequest.Method == HttpMethod.Post)
 			{
@@ -289,7 +299,7 @@ namespace DotnetSpider.Core.Downloader
 			contentBytes = PreventCutOff(contentBytes);
 			if (string.IsNullOrEmpty(site.EncodingName))
 			{
-				var charSet = response.Content.Headers.ContentType == null ? null : response.Content.Headers.ContentType.CharSet;
+				var charSet = response.Content.Headers.ContentType?.CharSet;
 				Encoding htmlCharset = EncodingExtensions.GetEncoding(charSet, contentBytes);
 				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
 			}
@@ -309,21 +319,6 @@ namespace DotnetSpider.Core.Downloader
 				}
 			}
 			return bytes;
-		}
-
-		public override IDownloader Clone(ISpider spider)
-		{
-			var downloader = (HttpClientDownloader)MemberwiseClone();
-			if (spider.Site.HttpProxyPool == null)
-			{
-				_httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler
-				{
-					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-					UseProxy = true,
-					UseCookies = false
-				}));
-			}
-			return downloader;
 		}
 	}
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using DotnetSpider.Core.Proxy;
@@ -14,7 +13,6 @@ namespace DotnetSpider.Core
 	{
 		private Encoding _encoding = Encoding.UTF8;
 		private string _encodingName;
-		private readonly List<Request> _startRequest = new List<Request>();
 
 		/// <summary>
 		/// 代理池
@@ -44,7 +42,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 设置全局Cookie
 		/// </summary>
-		public Cookies Cookies { get; set; }
+		public Cookies Cookies { get; set; } 
 
 		/// <summary>
 		/// 设置 User Agent
@@ -93,7 +91,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public HashSet<HttpStatusCode> AcceptStatCode { get; set; } = new HashSet<HttpStatusCode> { HttpStatusCode.OK };
 
-		public List<Request> StartRequests => _startRequest;
+		public List<Request> StartRequests { get; } = new List<Request>();
 
 		/// <summary>
 		/// Set the interval between the processing of two pages. 

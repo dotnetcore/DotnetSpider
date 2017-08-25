@@ -7,6 +7,8 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public class NodeId
 	{
+		public static readonly string Id = "DEFAULT";
+
 		static NodeId()
 		{
 
@@ -24,7 +26,5 @@ namespace DotnetSpider.Core.Infrastructure
 				}
 			}
 		}
-
-		public static readonly string Id = "DEFAULT";
 	}
 }

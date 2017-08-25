@@ -14,8 +14,9 @@ namespace DotnetSpider.Core
 		public const string Images = "580c9065-0f44-47e9-94ea-b172d5a730c0";
 
 		private Selectable _selectable;
-
 		private string _content;
+
+		public ContentType ContentType { get; internal set; } = ContentType.Html;
 
 		/// <summary>
 		/// Url of current page
@@ -31,8 +32,6 @@ namespace DotnetSpider.Core
 
 		public string Title { get; set; }
 
-		internal ContentType ContentType { get; set; } = ContentType.Html;
-
 		/// <summary>
 		/// Get request of current page
 		/// </summary>
@@ -41,7 +40,7 @@ namespace DotnetSpider.Core
 
 		public bool IsNeedCycleRetry { get; set; }
 
-		public bool MissExtractTargetUrls { get; set; } = false;
+		public bool SkipExtractTargetUrls { get; set; }
 
 		public ResultItems ResultItems { get; } = new ResultItems();
 
@@ -62,7 +61,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public bool MissTargetUrls { get; set; }
+		public bool SkipTargetUrls { get; set; }
 
 		public bool IsSkip
 		{
@@ -77,6 +76,23 @@ namespace DotnetSpider.Core
 		public bool RemoveOutboundLinks { get; }
 
 		public string[] Domains { get; }
+
+		/// <summary>
+		/// Get html content of page
+		/// </summary>
+		/// <returns></returns>
+		public Selectable Selectable
+		{
+			get
+			{
+				if (_selectable == null)
+				{
+					string urlPadding = ContentType == ContentType.Json ? Padding : Request.Url.ToString();
+					_selectable = new Selectable(Content, urlPadding, ContentType, RemoveOutboundLinks ? Domains : null);
+				}
+				return _selectable;
+			}
+		}
 
 		public Page(Request request, params string[] domains)
 		{
@@ -95,23 +111,6 @@ namespace DotnetSpider.Core
 		public void AddResultItem(string key, dynamic field)
 		{
 			ResultItems.AddOrUpdateResultItem(key, field);
-		}
-
-		/// <summary>
-		/// Get html content of page
-		/// </summary>
-		/// <returns></returns>
-		public Selectable Selectable
-		{
-			get
-			{
-				if (_selectable == null)
-				{
-					string urlPadding = ContentType == ContentType.Json ? Padding : Request.Url.ToString();
-					_selectable = new Selectable(Content, urlPadding, ContentType, RemoveOutboundLinks ? Domains : null);
-				}
-				return _selectable;
-			}
 		}
 
 		/// <summary>
@@ -239,11 +238,6 @@ namespace DotnetSpider.Core
 					TargetRequests.Add(request);
 				}
 			}
-		}
-
-		public override string ToString()
-		{
-			return $"Page{{request='{Request}',padding='{Padding}' resultItems='{ResultItems}', content='{Content}', url={Url}, statusCode={StatusCode}, targetRequests={TargetRequests}}}";
 		}
 	}
 }

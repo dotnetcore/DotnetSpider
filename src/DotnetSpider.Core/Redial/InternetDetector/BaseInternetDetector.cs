@@ -4,6 +4,8 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 {
 	public abstract class BaseInternetDetector : IInternetDetector
 	{
+		public abstract bool DoValidate();
+
 		public int Timeout { get; set; } = 10;
 
 		public bool Detect()
@@ -33,7 +35,5 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 			}
 			return false;
 		}
-
-		public abstract bool DoValidate();
 	}
 }

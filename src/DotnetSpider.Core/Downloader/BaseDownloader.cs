@@ -14,15 +14,15 @@ namespace DotnetSpider.Core.Downloader
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
-		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
 
 		/// <summary>
 		/// Auto detect content is json or html
 		/// </summary>
 		protected bool DetectContentType { get; set; }
-		protected List<IAfterDownloadCompleteHandler> AfterDownloadComplete => _afterDownloadCompletes;
-		protected List<IBeforeDownloadHandler> BeforeDownload => _beforeDownloads;
+
+		protected List<IAfterDownloadCompleteHandler> AfterDownloadComplete { get; } = new List<IAfterDownloadCompleteHandler>();
+
+		protected List<IBeforeDownloadHandler> BeforeDownload { get; } = new List<IBeforeDownloadHandler>();
 
 		protected string DownloadFolder { get; set; }
 

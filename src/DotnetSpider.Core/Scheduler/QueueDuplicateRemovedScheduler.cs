@@ -75,40 +75,34 @@ namespace DotnetSpider.Core.Scheduler
 			}
 		}
 
-		public override long GetLeftRequestsCount()
+		public override long LeftRequestsCount
 		{
-			_lock.EnterWriteLock();
-			try
+			get
 			{
-				return _queue.Count;
+				_lock.EnterWriteLock();
+				try
+				{
+					return _queue.Count;
+				}
+				finally
+				{
+					_lock.ExitWriteLock();
+				}
 			}
-			finally
-			{
-				_lock.ExitWriteLock();
-			}
 		}
 
-		public override long GetTotalRequestsCount()
-		{
-			return DuplicateRemover.GetTotalRequestsCount();
-		}
+		public override long TotalRequestsCount => DuplicateRemover.TotalRequestsCount;
 
-		public override long GetSuccessRequestsCount()
-		{
-			return _successCounter.Value;
-		}
+		public override long SuccessRequestsCount => _successCounter.Value;
 
-		public override long GetErrorRequestsCount()
-		{
-			return _errorCounter.Value;
-		}
+		public override long ErrorRequestsCount => _errorCounter.Value;
 
-		public override void IncreaseSuccessCounter()
+		public override void IncreaseSuccessCount()
 		{
 			_successCounter.Inc();
 		}
 
-		public override void IncreaseErrorCounter()
+		public override void IncreaseErrorCount()
 		{
 			_errorCounter.Inc();
 		}
@@ -150,7 +144,7 @@ namespace DotnetSpider.Core.Scheduler
 			{
 				_lock.ExitWriteLock();
 			}
-		
+
 			base.Dispose();
 		}
 	}

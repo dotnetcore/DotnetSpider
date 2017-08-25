@@ -48,7 +48,6 @@ namespace DotnetSpider.Core.Infrastructure
 		//#endif
 	}
 
-
 	public enum DelCacheType //要删除的类型。
 	{
 		File,//表示internet临时文件
@@ -57,14 +56,21 @@ namespace DotnetSpider.Core.Infrastructure
 
 	public class Adsl
 	{
+		private readonly string _mDuration;
+		private readonly string _mConnectionName;
+		private readonly string[] _mConnectionNames;
+		private readonly double _mTx;
+		private readonly double _mRx;
+		private readonly bool _mConnected;
+		private readonly IntPtr _mConnectedRasHandle;
+
 		[DllImport("rasapi32.dll")]
 		public static extern uint RasHangUp(IntPtr hrasconn);
 
 		[DllImport("wininet.dll")]
 		public static extern int InternetDial(IntPtr hwnd, [In]string lpszConnectoid, uint dwFlags, ref int lpdwConnection, uint dwReserved);
 
-		[DllImport("Rasapi32.dll", EntryPoint = "RasEnumConnectionsA",
-			 SetLastError = true)]
+		[DllImport("Rasapi32.dll", EntryPoint = "RasEnumConnectionsA", SetLastError = true)]
 		internal static extern int RasEnumConnections
 			(
 			ref Rasconn lprasconn, // buffer to receive connections data
@@ -73,9 +79,7 @@ namespace DotnetSpider.Core.Infrastructure
 			);
 
 		[DllImport("wininet.dll")]
-		public static extern bool DeleteUrlCacheEntry(
-			DelCacheType type
-			);
+		public static extern bool DeleteUrlCacheEntry(DelCacheType type);
 
 		[DllImport("rasapi32.dll")]
 		internal static extern uint RasGetConnectionStatistics(
@@ -95,13 +99,17 @@ namespace DotnetSpider.Core.Infrastructure
 										   //  to buffer
 			);
 
-		private readonly string _mDuration;
-		private readonly string _mConnectionName;
-		private readonly string[] _mConnectionNames;
-		private readonly double _mTx;
-		private readonly double _mRx;
-		private readonly bool _mConnected;
-		private readonly IntPtr _mConnectedRasHandle;
+		public string Duration => _mConnected ? _mDuration : "";
+
+		public string[] Connections => _mConnectionNames;
+
+		public double BytesTransmitted => _mConnected ? _mTx : 0;
+
+		public double BytesReceived => _mConnected ? _mRx : 0;
+
+		public string ConnectionName => _mConnected ? _mConnectionName : "";
+
+		public bool IsConnected => _mConnected;
 
 		public Adsl()
 		{
@@ -202,21 +210,13 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
-		public string Duration => _mConnected ? _mDuration : "";
-
-		public string[] Connections => _mConnectionNames;
-
-		public double BytesTransmitted => _mConnected ? _mTx : 0;
-		public double BytesReceived => _mConnected ? _mRx : 0;
-		public string ConnectionName => _mConnected ? _mConnectionName : "";
-		public bool IsConnected => _mConnected;
-
 		public int Connect(string connection)
 		{
 			int temp = 0;
 			uint internetAutoDialUnattended = 2;
 			return InternetDial(IntPtr.Zero, connection, internetAutoDialUnattended, ref temp, 0);
 		}
+
 		public void Disconnect()
 		{
 			RasHangUp(_mConnectedRasHandle);

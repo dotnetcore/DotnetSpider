@@ -175,7 +175,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		{
 			public string Name { get; protected set; }
 			public string VerificationName { get; protected set; }
-			protected string Sql { get; set; }
+			public string Sql { get; protected set; }
 			protected dynamic[] Values { get; set; }
 
 			public VerificationInfo Verify(IDbConnection conn)
@@ -300,7 +300,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		{
 			public string Name { get; protected set; }
 			public string VerificationName { get; protected set; }
-			public dynamic Acutal { get; set; }
+			public dynamic Acutal { get; protected set; }
 			protected dynamic[] Expected { get; set; }
 
 			public VerificationInfo Verify(IDbConnection conn)
@@ -511,7 +511,7 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					if (!string.IsNullOrEmpty(ReportSampleSql))
 					{
 						emailBody.Append("<strong>数据样本</strong><br/><br/>");
-						emailBody.Append(conn.ToHTML($"{ReportSampleSql} LIMIT 100;"));
+						emailBody.Append(conn.ToHtml($"{ReportSampleSql} LIMIT 100;"));
 					}
 					emailBody.Append("<br/><br/></body></html>");
 
@@ -529,15 +529,14 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					{
 						Text = HttpUtility.HtmlDecode(emailBody.ToString())
 					};
-					var multipart = new Multipart("mixed");
-					multipart.Add(html);
+					var multipart = new Multipart("mixed") {html};
 
 					if (veridationResult.PassVeridation && !string.IsNullOrEmpty(ExportDataSql) && !string.IsNullOrEmpty(ExportDataFileName))
 					{
-						var path = conn.Export(ExportDataSql, $"{ExportDataFileName}_{DateTime.Now.ToString("yyyyMMddhhmmss")}", true);
+						var path = conn.Export(ExportDataSql, $"{ExportDataFileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
 						var attachment = new MimePart("excel", "xlsx")
 						{
-							ContentObject = new ContentObject(File.OpenRead(path), ContentEncoding.Default),
+							ContentObject = new ContentObject(File.OpenRead(path)),
 							ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
 							ContentTransferEncoding = ContentEncoding.Base64,
 							FileName = Path.GetFileName(path)

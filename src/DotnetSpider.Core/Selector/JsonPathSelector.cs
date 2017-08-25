@@ -12,11 +12,11 @@ namespace DotnetSpider.Core.Selector
 	/// </summary>
 	public class JsonPathSelector : ISelector
 	{
-		private readonly string _jsonPathStr;
+		private readonly string _jsonPath;
 
-		public JsonPathSelector(string jsonPathStr)
+		public JsonPathSelector(string jsonPath)
 		{
-			_jsonPathStr = jsonPathStr;
+			_jsonPath = jsonPath;
 		}
 
 		public dynamic Select(dynamic text)
@@ -40,7 +40,7 @@ namespace DotnetSpider.Core.Selector
 
 					if (o != null)
 					{
-						var items = o.SelectTokens(_jsonPathStr).Select(t=>t.ToString()).ToList();
+						var items = o.SelectTokens(_jsonPath).Select(t=>t.ToString()).ToList();
 						if (items.Count > 0)
 						{
 							list.AddRange(items);
@@ -49,7 +49,7 @@ namespace DotnetSpider.Core.Selector
 					else
 					{
 						JArray array = JsonConvert.DeserializeObject(text) as JArray;
-						var items = array?.SelectTokens(_jsonPathStr).Select(t => t.ToString()).ToList();
+						var items = array?.SelectTokens(_jsonPath).Select(t => t.ToString()).ToList();
 						if (items != null && items.Count > 0)
 						{
 							list.AddRange(items);
@@ -64,7 +64,7 @@ namespace DotnetSpider.Core.Selector
 
 					if (o != null)
 					{
-						var items = o.SelectTokens(_jsonPathStr).Select(t => t.ToString()).ToList();
+						var items = o.SelectTokens(_jsonPath).Select(t => t.ToString()).ToList();
 						if (items.Count > 0)
 						{
 							list.AddRange(items);
@@ -73,7 +73,7 @@ namespace DotnetSpider.Core.Selector
 					else
 					{
 						JArray array = text as JArray;
-						var items = array?.SelectTokens(_jsonPathStr).Select(t => t.ToString()).ToList();
+						var items = array?.SelectTokens(_jsonPath).Select(t => t.ToString()).ToList();
 						if (items != null && items.Count > 0)
 						{
 							list.AddRange(items);

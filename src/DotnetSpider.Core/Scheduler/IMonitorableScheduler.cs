@@ -7,16 +7,16 @@ namespace DotnetSpider.Core.Scheduler
 	{
 		bool IsExited { get; set; }
 
-		long GetLeftRequestsCount();
+		long LeftRequestsCount { get; }
 
-		long GetTotalRequestsCount();
+		long TotalRequestsCount { get; }
 
-		long GetSuccessRequestsCount();
+		long SuccessRequestsCount { get; }
 
-		long GetErrorRequestsCount();
+		long ErrorRequestsCount { get; }
 
-		void IncreaseSuccessCounter();
+		void IncreaseSuccessCount();
 
-		void IncreaseErrorCounter();
+		void IncreaseErrorCount();
 	}
 }

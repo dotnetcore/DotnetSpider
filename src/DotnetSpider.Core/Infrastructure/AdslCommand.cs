@@ -1,28 +1,26 @@
-﻿
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace DotnetSpider.Core.Infrastructure
 {
 	public class AdslCommand
 	{
+		/// <summary>
+		/// 拨号名称
+		/// </summary>
+		public string InterfaceName { get; }
+
+		public string Username { get; }
+		/// <summary>
+		/// 密码
+		/// </summary>
+		public string Password { get; }
+
 		public AdslCommand(string interfaceName, string username = null, string password = null)
 		{
 			InterfaceName = interfaceName;
 			Username = username;
 			Password = password;
 		}
-
-		/// <summary>
-		/// 拨号名称
-		/// </summary>
-		public string InterfaceName { get; set; }
-
-
-		public string Username { get; set; }
-		/// <summary>
-		/// 密码
-		/// </summary>
-		public string Password { get; set; }
 
 		/// <summary>
 		/// 开始拨号

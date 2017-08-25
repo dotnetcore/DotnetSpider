@@ -2,21 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper;
 using OfficeOpenXml;
 using System.IO;
 using DotnetSpider.Core.Infrastructure;
-using NLog;
 using MimeKit;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
 	public static class ExcelExtensions
 	{
-		private readonly static ILogger Logger = LogCenter.GetLogger();
-
 		public static string Export(this IDbConnection conn, string sql, string fileName, bool rewrite = false)
 		{
 			var command = conn.CreateCommand();
@@ -90,9 +84,10 @@ namespace DotnetSpider.Extension.Infrastructure
 		{
 			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), emailHost, port, account, password, displayName);
 		}
+
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, List<string> emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
 		{
-			var path = Export(conn, sql, $"{fileName}_{DateTime.Now.ToString("yyyyMMddhhmmss")}", true);
+			var path = Export(conn, sql, $"{fileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
 			var message = new MimeMessage();
 
 			message.From.Add(new MailboxAddress(displayName, account));
@@ -105,7 +100,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			var attachment = new MimePart("excel", "xlsx")
 			{
-				ContentObject = new ContentObject(File.OpenRead(path), ContentEncoding.Default),
+				ContentObject = new ContentObject(File.OpenRead(path)),
 				ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
 				ContentTransferEncoding = ContentEncoding.Base64,
 				FileName = Path.GetFileName(path)
@@ -114,9 +109,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			var text = new TextPart { Text = subject };
 
 
-			var multipart = new Multipart("mixed");
-			multipart.Add(text);
-			multipart.Add(attachment);
+			var multipart = new Multipart("mixed") {text, attachment};
 
 			message.Body = multipart;
 

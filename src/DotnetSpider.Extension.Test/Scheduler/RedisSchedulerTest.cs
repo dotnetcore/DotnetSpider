@@ -151,54 +151,54 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
-			scheduler.Clean();
+			scheduler.Clear();
 
 			scheduler.Push(new Request("http://www.a.com/", null));
 			scheduler.Push(new Request("http://www.b.com/", null));
 			scheduler.Push(new Request("http://www.c.com/", null));
 			scheduler.Push(new Request("http://www.d.com/", null));
 
-			Assert.AreEqual(0, scheduler.GetErrorRequestsCount());
-			Assert.AreEqual(4, scheduler.GetLeftRequestsCount());
-			Assert.AreEqual(4, scheduler.GetTotalRequestsCount());
-			scheduler.IncreaseErrorCounter();
-			Assert.AreEqual(1, scheduler.GetErrorRequestsCount());
-			Assert.AreEqual(0, scheduler.GetSuccessRequestsCount());
-			scheduler.IncreaseSuccessCounter();
-			Assert.AreEqual(1, scheduler.GetSuccessRequestsCount());
+			Assert.AreEqual(0, scheduler.ErrorRequestsCount);
+			Assert.AreEqual(4, scheduler.LeftRequestsCount);
+			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			scheduler.IncreaseErrorCount();
+			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
+			Assert.AreEqual(0, scheduler.SuccessRequestsCount);
+			scheduler.IncreaseSuccessCount();
+			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(3, scheduler.GetLeftRequestsCount());
-			Assert.AreEqual(1, scheduler.GetSuccessRequestsCount());
-			Assert.AreEqual(1, scheduler.GetErrorRequestsCount());
-			Assert.AreEqual(4, scheduler.GetTotalRequestsCount());
+			Assert.AreEqual(3, scheduler.LeftRequestsCount);
+			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
+			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
+			Assert.AreEqual(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(2, scheduler.GetLeftRequestsCount());
-			Assert.AreEqual(1, scheduler.GetSuccessRequestsCount());
-			Assert.AreEqual(1, scheduler.GetErrorRequestsCount());
-			Assert.AreEqual(4, scheduler.GetTotalRequestsCount());
+			Assert.AreEqual(2, scheduler.LeftRequestsCount);
+			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
+			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
+			Assert.AreEqual(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(1, scheduler.GetLeftRequestsCount());
-			Assert.AreEqual(1, scheduler.GetSuccessRequestsCount());
-			Assert.AreEqual(1, scheduler.GetErrorRequestsCount());
-			Assert.AreEqual(4, scheduler.GetTotalRequestsCount());
+			Assert.AreEqual(1, scheduler.LeftRequestsCount);
+			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
+			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
+			Assert.AreEqual(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(0, scheduler.GetLeftRequestsCount());
-			Assert.AreEqual(1, scheduler.GetSuccessRequestsCount());
-			Assert.AreEqual(1, scheduler.GetErrorRequestsCount());
-			Assert.AreEqual(4, scheduler.GetTotalRequestsCount());
+			Assert.AreEqual(0, scheduler.LeftRequestsCount);
+			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
+			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
+			Assert.AreEqual(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
 			scheduler.Poll();
-			Assert.AreEqual(0, scheduler.GetLeftRequestsCount());
-			Assert.AreEqual(1, scheduler.GetSuccessRequestsCount());
-			Assert.AreEqual(1, scheduler.GetErrorRequestsCount());
-			Assert.AreEqual(4, scheduler.GetTotalRequestsCount());
+			Assert.AreEqual(0, scheduler.LeftRequestsCount);
+			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
+			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
+			Assert.AreEqual(4, scheduler.TotalRequestsCount);
 
-			scheduler.Clean();
+			scheduler.Clear();
 		}
 
 		[TestMethod]
@@ -283,10 +283,10 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			spider.Run();
 
 			Assert.AreEqual(4, spider.RetriedTimes.Value);
-			Assert.AreEqual(0, scheduler.GetLeftRequestsCount());
-			Assert.AreEqual(6, scheduler.GetSuccessRequestsCount());
+			Assert.AreEqual(0, scheduler.LeftRequestsCount);
+			Assert.AreEqual(6, scheduler.SuccessRequestsCount);
 			// 重试次数应该包含
-			Assert.AreEqual(5, scheduler.GetErrorRequestsCount());
+			Assert.AreEqual(5, scheduler.ErrorRequestsCount);
 		}
 
 		class TestPageProcessor : BasePageProcessor

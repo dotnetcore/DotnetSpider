@@ -2,9 +2,11 @@
 {
 	public abstract class BaseAdslRedialer : IRedialer
 	{
-		public string Interface { get; set; }
-		public string Account { get; set; }
-		public string Password { get; set; }
+		public abstract void Redial();
+
+		public string Interface { get; }
+		public string Account { get; }
+		public string Password { get; }
 
 		protected BaseAdslRedialer(string interfaceName, string account, string password)
 		{
@@ -12,7 +14,5 @@
 			Account = account;
 			Password = password;
 		}
-
-		public abstract void Redial();
 	}
 }

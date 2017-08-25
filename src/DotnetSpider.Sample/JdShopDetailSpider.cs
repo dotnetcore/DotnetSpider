@@ -26,13 +26,13 @@ namespace DotnetSpider.Sample
 			ThreadNum = 1;
 			Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
 			Downloader = new HttpClientDownloader();
-			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
-			{
-				Start = "json(",
-				End = ");",
-				StartOffset = 5,
-				EndOffset = 0
-			});
+			//Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
+			//{
+			//	Start = "json(",
+			//	End = ");",
+			//	StartOffset = 5,
+			//	EndOffset = 0
+			//});
 
 			AddStartUrlBuilder(
 				new DbStartUrlBuilder(DataSource.MySql, "Database='test';Data Source= localhost;User ID=root;Password=1qazZAQ!;Port=3306",

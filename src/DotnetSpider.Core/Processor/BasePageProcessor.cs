@@ -13,10 +13,11 @@ namespace DotnetSpider.Core.Processor
 {
 	public abstract class BasePageProcessor : IPageProcessor
 	{
-		private List<Regex> _targetUrlPatterns;
 		private readonly List<Regex> _excludeTargetUrlPatterns = new List<Regex>();
 		private readonly Dictionary<ISelector, List<Regex>> _targetUrlExtractors = new Dictionary<ISelector, List<Regex>>();
 		private readonly ISelector _imageSelector = Selectors.XPath(".//img/@src");
+
+		private List<Regex> _targetUrlPatterns;
 
 		protected abstract void Handle(Page page);
 
@@ -44,11 +45,55 @@ namespace DotnetSpider.Core.Processor
 
 			page.ResultItems.IsSkip = page.ResultItems.Results.Count == 0;
 
-			if (!page.MissExtractTargetUrls)
+			if (!page.SkipExtractTargetUrls)
 			{
 				ExtractUrls(page);
 			}
 		}
+
+		/// <summary>
+		/// Only used for test
+		/// </summary>
+		/// <param name="region"></param>
+		/// <returns></returns>
+		public virtual List<Regex> GetTargetUrlPatterns(string region)
+		{
+			ISelector selector = Selectors.Default();
+			if (!string.IsNullOrWhiteSpace(region))
+			{
+				selector = Selectors.XPath(region);
+			}
+
+			if (_targetUrlExtractors.ContainsKey(selector))
+			{
+				return _targetUrlExtractors[selector];
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Only used for test
+		/// </summary>
+		/// <param name="region"></param>
+		/// <returns></returns>
+		[Obsolete]
+		public virtual bool ContainsTargetUrlRegion(string region)
+		{
+			ISelector selector = Selectors.Default();
+			if (!string.IsNullOrWhiteSpace(region))
+			{
+				selector = Selectors.XPath(region);
+			}
+			return _targetUrlExtractors.ContainsKey(selector);
+		}
+
+		/// <summary>
+		/// Get the site settings
+		/// </summary>
+		public Site Site { get; set; }
 
 		/// <summary>
 		/// 如果找不到则不返回URL, 不然返回的URL太多
@@ -211,7 +256,7 @@ namespace DotnetSpider.Core.Processor
 				}
 				else
 				{
-					throw new ArgumentNullException("Pattern should not be null.");
+					throw new ArgumentNullException(nameof(regionXpath));
 				}
 			}
 		}
@@ -230,49 +275,5 @@ namespace DotnetSpider.Core.Processor
 				}
 			}
 		}
-
-		/// <summary>
-		/// Only used for test
-		/// </summary>
-		/// <param name="region"></param>
-		/// <returns></returns>
-		public virtual List<Regex> GetTargetUrlPatterns(string region)
-		{
-			ISelector selector = Selectors.Default();
-			if (!string.IsNullOrWhiteSpace(region))
-			{
-				selector = Selectors.XPath(region);
-			}
-
-			if (_targetUrlExtractors.ContainsKey(selector))
-			{
-				return _targetUrlExtractors[selector];
-			}
-			else
-			{
-				return null;
-			}
-		}
-
-		/// <summary>
-		/// Only used for test
-		/// </summary>
-		/// <param name="region"></param>
-		/// <returns></returns>
-		[Obsolete]
-		public virtual bool ContainsTargetUrlRegion(string region)
-		{
-			ISelector selector = Selectors.Default();
-			if (!string.IsNullOrWhiteSpace(region))
-			{
-				selector = Selectors.XPath(region);
-			}
-			return _targetUrlExtractors.ContainsKey(selector);
-		}
-
-		/// <summary>
-		/// Get the site settings
-		/// </summary>
-		public Site Site { get; set; }
 	}
 }

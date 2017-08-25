@@ -10,6 +10,7 @@ namespace DotnetSpider.Core.Scheduler
 	public class PriorityScheduler : DuplicateRemovedScheduler
 	{
 		public static int InitialCapacity = 5;
+
 		private readonly Queue<Request> _noPriorityQueue = new Queue<Request>();
 		private readonly PriorityBlockingQueue<Request> _priorityQueuePlus = new PriorityBlockingQueue<Request>(InitialCapacity);
 		private readonly PriorityBlockingQueue<Request> _priorityQueueMinus = new PriorityBlockingQueue<Request>(InitialCapacity, new Comparator());
@@ -18,21 +19,13 @@ namespace DotnetSpider.Core.Scheduler
 
 		public override bool IsNetworkScheduler => false;
 
-		protected override void PushWhenNoDuplicate(Request request)
-		{
-			if (request.Priority == 0)
-			{
-				_noPriorityQueue.Enqueue(request);
-			}
-			else if (request.Priority > 0)
-			{
-				_priorityQueuePlus.Push(request);
-			}
-			else
-			{
-				_priorityQueueMinus.Pop();
-			}
-		}
+		public override long LeftRequestsCount => _noPriorityQueue.Count;
+
+		public override long TotalRequestsCount => DuplicateRemover.TotalRequestsCount;
+
+		public override long SuccessRequestsCount => _successCounter.Value;
+
+		public override long ErrorRequestsCount => _errorCounter.Value;
 
 		public override void ResetDuplicateCheck()
 		{
@@ -59,32 +52,12 @@ namespace DotnetSpider.Core.Scheduler
 			}
 		}
 
-		public override long GetLeftRequestsCount()
-		{
-			return _noPriorityQueue.Count;
-		}
-
-		public override long GetTotalRequestsCount()
-		{
-			return DuplicateRemover.GetTotalRequestsCount();
-		}
-
-		public override long GetSuccessRequestsCount()
-		{
-			return _successCounter.Value;
-		}
-
-		public override long GetErrorRequestsCount()
-		{
-			return _errorCounter.Value;
-		}
-
-		public override void IncreaseSuccessCounter()
+		public override void IncreaseSuccessCount()
 		{
 			_successCounter.Inc();
 		}
 
-		public override void IncreaseErrorCounter()
+		public override void IncreaseErrorCount()
 		{
 			_errorCounter.Inc();
 		}
@@ -97,6 +70,22 @@ namespace DotnetSpider.Core.Scheduler
 		public override HashSet<Request> ToList()
 		{
 			throw new NotImplementedException();
+		}
+
+		protected override void PushWhenNoDuplicate(Request request)
+		{
+			if (request.Priority == 0)
+			{
+				_noPriorityQueue.Enqueue(request);
+			}
+			else if (request.Priority > 0)
+			{
+				_priorityQueuePlus.Push(request);
+			}
+			else
+			{
+				_priorityQueueMinus.Pop();
+			}
 		}
 
 		private class Comparator : IComparer<Request>

@@ -15,6 +15,7 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 		{
 			Timeout = 100;
 		}
+
 		public DefalutInternetDetector(int maxWaitTime)
 		{
 			Timeout = maxWaitTime;

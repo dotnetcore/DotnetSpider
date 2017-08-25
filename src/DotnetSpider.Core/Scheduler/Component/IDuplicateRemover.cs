@@ -23,6 +23,6 @@ namespace DotnetSpider.Core.Scheduler.Component
 		/// Get TotalRequestsCount for monitor.
 		/// </summary>
 		/// <returns></returns>
-		long GetTotalRequestsCount();
+		long TotalRequestsCount { get; }
 	}
 }

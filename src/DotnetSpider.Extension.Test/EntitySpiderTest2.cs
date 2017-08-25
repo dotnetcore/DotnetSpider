@@ -335,7 +335,10 @@ namespace DotnetSpider.Extension.Test
 			}
 			finally
 			{
-				Directory.Delete(folder, true);
+				if (Directory.Exists(folder))
+				{
+					Directory.Delete(folder, true);
+				}
 			}
 		}
 
@@ -351,7 +354,7 @@ namespace DotnetSpider.Extension.Test
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				AddEntityType(typeof(BaiduSearchEntry));
-				AddPipeline(new MySqlEntityPipeline(ConnectString));
+				AddPipeline(new MySqlEntityPipeline(Config.ConnectString));
 				AddPipeline(new MySqlFileEntityPipeline(MySqlFileEntityPipeline.FileType.InsertSql));
 			}
 
@@ -412,7 +415,7 @@ namespace DotnetSpider.Extension.Test
 			context.AddEntityType(typeof(Entity12));
 			context.Run("running-test");
 
-			var entityPipelines = context.Pipelines;
+			var entityPipelines = context.ReadOnlyPipelines;
 
 			Assert.AreEqual(4, entityPipelines.Count);
 

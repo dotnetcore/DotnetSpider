@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace DotnetSpider.Extension.Processor
 {
-	public class EntityProcessor : BasePageProcessor
+	public sealed class EntityProcessor : BasePageProcessor
 	{
 		private readonly IEntityExtractor _extractor;
 

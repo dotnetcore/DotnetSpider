@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public static class WindowsFormUtil
+	public static class WindowsFormUtils
 	{
 		[DllImport("User32.dll", EntryPoint = "FindWindow")]
 		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);

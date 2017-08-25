@@ -8,6 +8,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 	public class RegexReplaceFormatter : Formatter
 	{
 		public string Pattern { get; set; }
+
 		public string NewValue { get; set; }
 
 		protected override dynamic FormateValue(dynamic value)

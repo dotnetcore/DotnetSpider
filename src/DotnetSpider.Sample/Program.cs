@@ -88,10 +88,8 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
-			//using (var conn = new MySqlConnection(Config.ConnectString))
-			//{
-			//	conn.EmailTo("SELECT * FROM appaso.app_ios_rank;", "app_ios_rank", "ASO100 IOS RANK", "136831898@qq.com");
-			//}
+			Class1 c = new Class1();
+			c.ProcessException();
 		}
 	}
 

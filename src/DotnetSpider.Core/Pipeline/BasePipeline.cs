@@ -20,16 +20,6 @@ namespace DotnetSpider.Core.Pipeline
 
 		public abstract void Process(params ResultItems[] resultItems);
 
-		protected void SetPath(string path)
-		{
-			if (!path.EndsWith(Environment.PathSeperator))
-			{
-				path += Environment.PathSeperator;
-			}
-
-			BasePath = Path.Combine(Environment.BaseDirectory, path);
-		}
-
 		public virtual void Dispose()
 		{
 		}
@@ -43,6 +33,16 @@ namespace DotnetSpider.Core.Pipeline
 		public static DirectoryInfo PrepareDirectory(string fullName)
 		{
 			return new DirectoryInfo(CheckAndMakeParentDirecotry(fullName));
+		}
+
+		protected void SetPath(string path)
+		{
+			if (!path.EndsWith(Environment.PathSeperator))
+			{
+				path += Environment.PathSeperator;
+			}
+
+			BasePath = Path.Combine(Environment.BaseDirectory, path);
 		}
 
 		private static string CheckAndMakeParentDirecotry(string fullName)

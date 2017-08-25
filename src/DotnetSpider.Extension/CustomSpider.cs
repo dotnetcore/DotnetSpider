@@ -10,13 +10,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using System.Linq;
-using DotnetSpider.Core.Monitor;
 
 namespace DotnetSpider.Extension
 {
+	[Obsolete]
 	public abstract class CustomSpider : IRunable, INamed, IIdentity, ITask
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		private bool _exited;
 
@@ -62,7 +62,7 @@ namespace DotnetSpider.Extension
 
 				if (!string.IsNullOrEmpty(ConnectString))
 				{
-					NLogUtil.PrepareDatabase(ConnectString);
+					NLogUtils.PrepareDatabase(ConnectString);
 
 					DbMonitor.InitStatusDatabase(ConnectString);
 

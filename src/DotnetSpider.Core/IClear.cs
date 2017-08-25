@@ -1,7 +1,7 @@
 ﻿namespace DotnetSpider.Core
 {
-	public interface IClean
+	public interface IClear
 	{
-		void Clean();
+		void Clear();
 	}
 }

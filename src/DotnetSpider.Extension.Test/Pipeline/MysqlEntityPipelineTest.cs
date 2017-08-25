@@ -12,6 +12,7 @@ using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {

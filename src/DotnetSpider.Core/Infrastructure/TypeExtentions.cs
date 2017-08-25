@@ -9,14 +9,17 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			return entityType;
 		}
+
 		public static Type GetTypeCrossPlatform(this TypeInfo entityType)
 		{
 			return entityType.AsType();
 		}
+
 		public static TypeInfo GetTypeInfoCrossPlatform(this Type entityType)
 		{
 			return entityType.GetTypeInfo();
 		}
+
 		public static TypeInfo GetTypeInfoCrossPlatform(this TypeInfo entityType)
 		{
 			return entityType;

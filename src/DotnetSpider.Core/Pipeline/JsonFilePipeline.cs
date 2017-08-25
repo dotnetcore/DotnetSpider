@@ -25,14 +25,14 @@ namespace DotnetSpider.Core.Pipeline
 #endif
 		}
 
-		public string GetDataForlder()
-		{
-			return $"{BasePath}{Environment.PathSeperator}{Spider.Identity}{Environment.PathSeperator}";
-		}
-
 		public JsonFilePipeline(string path)
 		{
 			_intervalPath = path;
+		}
+
+		public string GetDataForlder()
+		{
+			return $"{BasePath}{Environment.PathSeperator}{Spider.Identity}{Environment.PathSeperator}";
 		}
 
 		public override void InitPipeline(ISpider spider)

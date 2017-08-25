@@ -6,6 +6,8 @@ namespace DotnetSpider.Extension.Model
 {
 	public abstract class DataHandler
 	{
+		protected abstract JObject HandleDataOject(JObject data, Page page);
+
 		public virtual List<JObject> Handle(List<JObject> datas, Page page)
 		{
 			if (datas == null || datas.Count == 0)
@@ -24,7 +26,5 @@ namespace DotnetSpider.Extension.Model
 			}
 			return results;
 		}
-
-		protected abstract JObject HandleDataOject(JObject data, Page page);
 	}
 }

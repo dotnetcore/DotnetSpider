@@ -16,7 +16,6 @@ using DotnetSpider.Core.Scheduler;
 using System.Linq;
 using System.Collections.ObjectModel;
 using NLog;
-using Newtonsoft.Json;
 using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Core
@@ -26,6 +25,9 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Spider : ISpider, ISpeedMonitor, INamed
 	{
+		private static readonly object Locker = new object();
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
+
 		private readonly Site _site;
 		private IScheduler _scheduler;
 		private IDownloader _downloader = new HttpClientDownloader();
@@ -50,16 +52,18 @@ namespace DotnetSpider.Core
 		private int _cachedSize = 1;
 		private string _identity;
 
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected readonly List<IPageProcessor> PageProcessors = new List<IPageProcessor>();
+		protected List<IPipeline> Pipelines = new List<IPipeline>();
+
 		protected DateTime StartTime { get; private set; }
-		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
+
+		protected DateTime EndTime { get; private set; } = DateTime.MinValue;
+
 		protected int WaitInterval { get; } = 10;
-		protected readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
-		protected List<IPipeline> _pipelines = new List<IPipeline>();
 
 		public string Identity
 		{
-			get { return _identity; }
+			get => _identity;
 			set
 			{
 				CheckIfRunning();
@@ -72,139 +76,35 @@ namespace DotnetSpider.Core
 				_identity = value;
 			}
 		}
+
 		public string Name { get; set; }
+
 		public Site Site => _site;
 
 		public bool IsComplete { get; private set; }
-		public AutomicLong RetriedTimes { get; private set; } = new AutomicLong();
+
+		public AutomicLong RetriedTimes { get; } = new AutomicLong();
+
 		public Status Stat { get; private set; } = Status.Init;
+
 		public event Action<Request> OnSuccess;
 		public event Action OnClosing;
 		public event Action OnComplete;
 		public event Action OnClosed;
+
 		public bool ClearSchedulerAfterComplete { get; set; } = true;
+
 		public IMonitor Monitor { get; set; }
+
 		public long AvgDownloadSpeed { get; private set; }
+
 		public long AvgProcessorSpeed { get; private set; }
+
 		public long AvgPipelineSpeed { get; private set; }
+
 		public int StatusReportInterval { get; set; } = 5000;
+
 		public int PipelineRetryTimes { get; set; } = 1;
-		public ReadOnlyCollection<IPageProcessor> PageProcessors => _pageProcessors.AsReadOnly();
-		public ReadOnlyCollection<IPipeline> Pipelines => _pipelines.AsReadOnly();
-		public ReadOnlyCollection<IStartUrlBuilder> StartUrlBuilders => _startUrlBuilders.AsReadOnly();
-
-		/// <summary>
-		/// Create a spider with pageProcessor.
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="pageProcessors"></param>
-		/// <returns></returns>
-		public static Spider Create(Site site, params IPageProcessor[] pageProcessors)
-		{
-			return new Spider(site, Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(),
-				pageProcessors);
-		}
-
-		/// <summary>
-		/// Create a spider with pageProcessor and scheduler
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="pageProcessors"></param>
-		/// <param name="scheduler"></param>
-		/// <returns></returns>
-		public static Spider Create(Site site, IScheduler scheduler, params IPageProcessor[] pageProcessors)
-		{
-			return new Spider(site, Guid.NewGuid().ToString("N"), scheduler, pageProcessors);
-		}
-
-		/// <summary>
-		/// Create a spider with pageProcessor and scheduler
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="identify"></param>
-		/// <param name="pageProcessors"></param>
-		/// <param name="scheduler"></param>
-		/// <returns></returns>
-		public static Spider Create(Site site, string identify, IScheduler scheduler,
-			params IPageProcessor[] pageProcessors)
-		{
-			return new Spider(site, identify, scheduler, pageProcessors);
-		}
-
-		protected Spider()
-		{
-#if NET_CORE
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#else
-			ThreadPool.SetMinThreads(200, 200);
-#endif
-		}
-
-		protected Spider(Site site) : this()
-		{
-			_site = site ?? throw new SpiderException("Site should not be null.");
-		}
-
-		/// <summary>
-		/// Create a spider with pageProcessor.
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="identity"></param>
-		/// <param name="pageProcessors"></param>
-		/// <param name="scheduler"></param>
-		protected Spider(Site site, string identity, IScheduler scheduler,
-			params IPageProcessor[] pageProcessors) : this()
-		{
-			Identity = identity;
-
-			if (pageProcessors != null)
-			{
-				_pageProcessors = pageProcessors.ToList();
-			}
-			_site = site;
-
-			Scheduler = scheduler;
-
-			if (_site == null)
-			{
-				_site = new Site();
-			}
-
-			CheckIfSettingsCorrect();
-		}
-
-		protected void CheckIfSettingsCorrect()
-		{
-			Identity = (string.IsNullOrWhiteSpace(Identity) || string.IsNullOrEmpty(Identity))
-				? Encrypt.Md5Encrypt(Guid.NewGuid().ToString())
-				: Identity;
-
-			if (Identity.Length > 100)
-			{
-				throw new SpiderException("Length of Identity should less than 100.");
-			}
-
-			if (_pageProcessors == null || _pageProcessors.Count == 0)
-			{
-				throw new SpiderException("Count of PageProcessor is zero.");
-			}
-
-			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
-			Site.UserAgent = Site.UserAgent ??
-							 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
-			if (!Site.Headers.ContainsKey("Accept-Language"))
-			{
-				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
-			}
-
-			foreach (var processor in _pageProcessors)
-			{
-				processor.Site = Site;
-			}
-
-			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
-			Downloader = Downloader ?? new HttpClientDownloader();
-		}
 
 		public IScheduler Scheduler
 		{
@@ -226,13 +126,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		[JsonIgnore]
 		public IRedialExecutor RedialExecutor
 		{
-			get
-			{
-				return NetworkCenter.Current.Executor;
-			}
+			get => NetworkCenter.Current.Executor;
 			set
 			{
 				CheckIfRunning();
@@ -345,6 +241,113 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		public ReadOnlyCollection<IPageProcessor> ReadOnlyPageProcessors => PageProcessors.AsReadOnly();
+
+		public ReadOnlyCollection<IPipeline> ReadOnlyPipelines => Pipelines.AsReadOnly();
+
+		public ReadOnlyCollection<IStartUrlBuilder> StartUrlBuilders => _startUrlBuilders.AsReadOnly();
+
+		public IMonitorable Monitorable => Scheduler;
+
+		/// <summary>
+		/// Create a spider with pageProcessor.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="pageProcessors"></param>
+		/// <returns></returns>
+		public static Spider Create(Site site, params IPageProcessor[] pageProcessors)
+		{
+			return new Spider(site, Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(),
+				pageProcessors);
+		}
+
+		/// <summary>
+		/// Create a spider with pageProcessor and scheduler
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="pageProcessors"></param>
+		/// <param name="scheduler"></param>
+		/// <returns></returns>
+		public static Spider Create(Site site, IScheduler scheduler, params IPageProcessor[] pageProcessors)
+		{
+			return new Spider(site, Guid.NewGuid().ToString("N"), scheduler, pageProcessors);
+		}
+
+		public static Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
+		{
+			Page page = new Page(request, null)
+			{
+				ContentType = site.ContentType
+			};
+
+			if (!resultIsEmpty)
+			{
+				dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);
+				if (cycleTriedTimesObject == null)
+				{
+					request.Priority = 0;
+					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, 1), false);
+				}
+				else
+				{
+					int cycleTriedTimes = (int)cycleTriedTimesObject;
+					cycleTriedTimes++;
+					if (cycleTriedTimes >= site.CycleRetryTimes)
+					{
+						return null;
+					}
+					request.Priority = 0;
+					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, cycleTriedTimes), false);
+				}
+				page.IsNeedCycleRetry = true;
+				return page;
+			}
+			else
+			{
+				dynamic cycleTriedTimesObject = request.GetExtra(Request.ResultIsEmptyTriedTimes);
+				if (cycleTriedTimesObject == null)
+				{
+					request.Priority = 0;
+					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, 1), false);
+				}
+				else
+				{
+					int cycleTriedTimes = (int)cycleTriedTimesObject;
+					cycleTriedTimes++;
+					if (cycleTriedTimes >= site.CycleRetryTimes)
+					{
+						return null;
+					}
+					request.Priority = 0;
+					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, cycleTriedTimes), false);
+				}
+				page.IsNeedCycleRetry = true;
+				return page;
+			}
+		}
+
+		/// <summary>
+		/// Create a spider with pageProcessor and scheduler
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="identify"></param>
+		/// <param name="pageProcessors"></param>
+		/// <param name="scheduler"></param>
+		/// <returns></returns>
+		public static Spider Create(Site site, string identify, IScheduler scheduler, params IPageProcessor[] pageProcessors)
+		{
+			return new Spider(site, identify, scheduler, pageProcessors);
+		}
+
+		protected Spider()
+		{
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#else
+			ThreadPool.SetMinThreads(200, 200);
+#endif
+		}
+
 		public Spider AddStartUrlBuilder(IStartUrlBuilder builder)
 		{
 			_startUrlBuilders.Add(builder);
@@ -435,7 +438,7 @@ namespace DotnetSpider.Core
 			if (pipeline != null)
 			{
 				CheckIfRunning();
-				_pipelines.Add(pipeline);
+				Pipelines.Add(pipeline);
 			}
 			return this;
 		}
@@ -447,7 +450,7 @@ namespace DotnetSpider.Core
 				CheckIfRunning();
 				foreach (var processor in processors)
 				{
-					_pageProcessors.Add(processor);
+					PageProcessors.Add(processor);
 				}
 			}
 			return this;
@@ -470,7 +473,7 @@ namespace DotnetSpider.Core
 
 		public IList<IPipeline> GetPipelines()
 		{
-			return Pipelines;
+			return ReadOnlyPipelines;
 		}
 
 		/// <summary>
@@ -479,91 +482,8 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider ClearPipeline()
 		{
-			_pipelines = new List<IPipeline>();
+			Pipelines = new List<IPipeline>();
 			return this;
-		}
-
-		protected virtual void PreInitComponent(params string[] arguments)
-		{
-			Monitor = new NLogMonitor();
-		}
-
-		protected virtual void AfterInitComponent(params string[] arguments)
-		{
-		}
-
-		protected virtual void InitComponent(params string[] arguments)
-		{
-			PrintInfo();
-
-			if (_init)
-			{
-				return;
-			}
-
-			Logger.MyLog(Identity, "Build crawler...", LogLevel.Info);
-
-			if (_pipelines == null || _pipelines.Count == 0)
-			{
-				var defaultPipeline = GetDefaultPipeline();
-				if (defaultPipeline == null)
-				{
-					throw new SpiderException("Pipelines should not be null.");
-				}
-				else
-				{
-					_pipelines.Add(defaultPipeline);
-				}
-			}
-
-			PreInitComponent(arguments);
-
-			Monitor.Identity = Identity;
-
-			CookieInjector?.Inject(this, false);
-
-			Scheduler.Init(this);
-
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Infrastructure.Environment.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
-
-			Console.CancelKeyPress += ConsoleCancelKeyPress;
-
-			foreach (var pipeline in _pipelines)
-			{
-				pipeline.InitPipeline(this);
-			}
-
-			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
-			{
-				Logger.MyLog(Identity, $"Add start urls to scheduler, count {Site.StartRequests.Count}.", LogLevel.Info);
-				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
-				{
-					foreach (var request in Site.StartRequests)
-					{
-						Scheduler.Push(request);
-					}
-				}
-				else
-				{
-					Scheduler.Import(new HashSet<Request>(Site.StartRequests));
-					ClearStartRequests();
-				}
-			}
-			else
-			{
-				Logger.MyLog(Identity, "Add start urls to scheduler, count 0.", LogLevel.Info);
-			}
-
-			_waitCountLimit = EmptySleepTime / WaitInterval;
-
-			AfterInitComponent(arguments);
-
-			_init = true;
-		}
-
-		protected virtual IPipeline GetDefaultPipeline()
-		{
-			return null;
 		}
 
 		public virtual void Run(params string[] arguments)
@@ -683,7 +603,7 @@ namespace DotnetSpider.Core
 				Thread.Sleep(3000);
 			}
 
-			FinishedTime = DateTime.Now;
+			EndTime = DateTime.Now;
 			_realStat = Status.Exited;
 
 			OnClose();
@@ -694,7 +614,7 @@ namespace DotnetSpider.Core
 			OnClosing?.Invoke();
 
 			var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
-			Logger.MyLog(Identity, $"{msg}, cost: {(FinishedTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
+			Logger.MyLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
 
 			OnClosed?.Invoke();
 		}
@@ -794,16 +714,182 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		public void Dispose()
+		{
+			CheckIfRunning();
+
+			int i = 0;
+			while (!_scheduler.IsExited)
+			{
+				++i;
+				Thread.Sleep(500);
+				if (i > 10)
+				{
+					break;
+				}
+			}
+
+			OnClose();
+		}
+
+		protected Spider(Site site) : this()
+		{
+			_site = site ?? throw new SpiderException("Site should not be null.");
+		}
+
+		/// <summary>
+		/// Create a spider with pageProcessor.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="identity"></param>
+		/// <param name="pageProcessors"></param>
+		/// <param name="scheduler"></param>
+		protected Spider(Site site, string identity, IScheduler scheduler, params IPageProcessor[] pageProcessors) : this()
+		{
+			Identity = identity;
+
+			if (pageProcessors != null)
+			{
+				PageProcessors = pageProcessors.ToList();
+			}
+			_site = site;
+
+			Scheduler = scheduler;
+
+			if (_site == null)
+			{
+				_site = new Site();
+			}
+
+			CheckIfSettingsCorrect();
+		}
+
+		protected void CheckIfSettingsCorrect()
+		{
+			Identity = (string.IsNullOrWhiteSpace(Identity) || string.IsNullOrEmpty(Identity))
+				? Encrypt.Md5Encrypt(Guid.NewGuid().ToString())
+				: Identity;
+
+			if (Identity.Length > 100)
+			{
+				throw new SpiderException("Length of Identity should less than 100.");
+			}
+
+			if (PageProcessors == null || PageProcessors.Count == 0)
+			{
+				throw new SpiderException("Count of PageProcessor is zero.");
+			}
+
+			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
+			Site.UserAgent = Site.UserAgent ??
+							 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
+			if (!Site.Headers.ContainsKey("Accept-Language"))
+			{
+				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
+			}
+
+			foreach (var processor in PageProcessors)
+			{
+				processor.Site = Site;
+			}
+
+			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
+			Downloader = Downloader ?? new HttpClientDownloader();
+		}
+
+		protected virtual void PreInitComponent(params string[] arguments)
+		{
+			Monitor = new NLogMonitor();
+		}
+
+		protected virtual void AfterInitComponent(params string[] arguments)
+		{
+		}
+
+		protected virtual void InitComponent(params string[] arguments)
+		{
+			PrintInfo();
+
+			if (_init)
+			{
+				return;
+			}
+
+			Logger.MyLog(Identity, "Build crawler...", LogLevel.Info);
+
+			if (Pipelines == null || Pipelines.Count == 0)
+			{
+				var defaultPipeline = GetDefaultPipeline();
+				if (defaultPipeline == null)
+				{
+					throw new SpiderException("Pipelines should not be null.");
+				}
+				else
+				{
+					Pipelines.Add(defaultPipeline);
+				}
+			}
+
+			PreInitComponent(arguments);
+
+			Monitor.Identity = Identity;
+
+			CookieInjector?.Inject(this, false);
+
+			Scheduler.Init(this);
+
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Infrastructure.Environment.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+
+			Console.CancelKeyPress += ConsoleCancelKeyPress;
+
+			foreach (var pipeline in Pipelines)
+			{
+				pipeline.InitPipeline(this);
+			}
+
+			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
+			{
+				Logger.MyLog(Identity, $"Add start urls to scheduler, count {Site.StartRequests.Count}.", LogLevel.Info);
+				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
+				{
+					foreach (var request in Site.StartRequests)
+					{
+						Scheduler.Push(request);
+					}
+				}
+				else
+				{
+					Scheduler.Import(new HashSet<Request>(Site.StartRequests));
+					ClearStartRequests();
+				}
+			}
+			else
+			{
+				Logger.MyLog(Identity, "Add start urls to scheduler, count 0.", LogLevel.Info);
+			}
+
+			_waitCountLimit = EmptySleepTime / WaitInterval;
+
+			AfterInitComponent(arguments);
+
+			_init = true;
+		}
+
+		protected virtual IPipeline GetDefaultPipeline()
+		{
+			return null;
+		}
+
 		protected void OnClose()
 		{
-			foreach (IPipeline pipeline in _pipelines)
+			foreach (IPipeline pipeline in Pipelines)
 			{
 				pipeline.Process(_cached.ToArray());
 				SafeDestroy(pipeline);
 			}
 
 			SafeDestroy(Scheduler);
-			SafeDestroy(_pageProcessors);
+			SafeDestroy(PageProcessors);
 			SafeDestroy(Downloader);
 
 			Site.HttpProxyPool?.Dispose();
@@ -811,79 +897,26 @@ namespace DotnetSpider.Core
 
 		protected virtual void _OnComplete()
 		{
-			IsComplete = Scheduler.GetLeftRequestsCount() == 0;
+			IsComplete = Scheduler.LeftRequestsCount == 0;
 			if (ClearSchedulerAfterComplete && IsComplete)
 			{
-				Scheduler.Clean();
+				Scheduler.Clear();
 			}
 		}
 
 		protected void OnError(Request request)
 		{
-			lock (this)
+			lock (Locker)
 			{
 				File.AppendAllText(_errorRequestFile.FullName, $"{request}{System.Environment.NewLine}", Encoding.UTF8);
 			}
-			Scheduler.IncreaseErrorCounter();
+			Scheduler.IncreaseErrorCount();
 		}
 
 		protected void _OnSuccess(Request request)
 		{
-			Scheduler.IncreaseSuccessCounter();
+			Scheduler.IncreaseSuccessCount();
 			OnSuccess?.Invoke(request);
-		}
-
-		public static Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
-		{
-			Page page = new Page(request, null)
-			{
-				ContentType = site.ContentType
-			};
-
-			if (!resultIsEmpty)
-			{
-				dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);
-				if (cycleTriedTimesObject == null)
-				{
-					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, 1), false);
-				}
-				else
-				{
-					int cycleTriedTimes = (int)cycleTriedTimesObject;
-					cycleTriedTimes++;
-					if (cycleTriedTimes >= site.CycleRetryTimes)
-					{
-						return null;
-					}
-					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, cycleTriedTimes), false);
-				}
-				page.IsNeedCycleRetry = true;
-				return page;
-			}
-			else
-			{
-				dynamic cycleTriedTimesObject = request.GetExtra(Request.ResultIsEmptyTriedTimes);
-				if (cycleTriedTimesObject == null)
-				{
-					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, 1), false);
-				}
-				else
-				{
-					int cycleTriedTimes = (int)cycleTriedTimesObject;
-					cycleTriedTimes++;
-					if (cycleTriedTimes >= site.CycleRetryTimes)
-					{
-						return null;
-					}
-					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, cycleTriedTimes), false);
-				}
-				page.IsNeedCycleRetry = true;
-				return page;
-			}
 		}
 
 		protected void ProcessRequest(Stopwatch sw, Request request, IDownloader downloader)
@@ -910,7 +943,7 @@ namespace DotnetSpider.Core
 					sw.Reset();
 					sw.Start();
 
-					foreach (var processor in _pageProcessors)
+					foreach (var processor in PageProcessors)
 					{
 						processor.Process(page);
 					}
@@ -925,7 +958,7 @@ namespace DotnetSpider.Core
 			}
 			catch (DownloadException de)
 			{
-				OnError(page.Request);
+				if (page != null) OnError(page.Request);
 				Logger.MyLog(Identity, $"Should not catch download exception: {request.Url}.", LogLevel.Warn, de);
 			}
 			catch (Exception e)
@@ -934,7 +967,7 @@ namespace DotnetSpider.Core
 				{
 					page = AddToCycleRetry(request, Site);
 				}
-				OnError(page.Request);
+				if (page != null) OnError(page.Request);
 				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, please check your extractor: {e.Message}.", LogLevel.Warn, e);
 			}
 
@@ -950,7 +983,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			if (!page.MissTargetUrls && !(SkipWhenResultIsEmpty && page.ResultItems.IsSkip))
+			if (!page.SkipTargetUrls && !(SkipWhenResultIsEmpty && page.ResultItems.IsSkip))
 			{
 				ExtractAndAddRequests(page, SpawnUrl);
 			}
@@ -964,7 +997,7 @@ namespace DotnetSpider.Core
 				{
 					if (CachedSize == 1)
 					{
-						foreach (IPipeline pipeline in _pipelines)
+						foreach (IPipeline pipeline in Pipelines)
 						{
 							RetryExecutor.Execute(PipelineRetryTimes, () =>
 							{
@@ -974,7 +1007,7 @@ namespace DotnetSpider.Core
 					}
 					else
 					{
-						lock (this)
+						lock (Locker)
 						{
 							_cached.Add(page.ResultItems);
 
@@ -982,7 +1015,7 @@ namespace DotnetSpider.Core
 							{
 								var items = _cached.ToArray();
 								_cached.Clear();
-								foreach (IPipeline pipeline in _pipelines)
+								foreach (IPipeline pipeline in Pipelines)
 								{
 									pipeline.Process(items);
 								}
@@ -1045,7 +1078,7 @@ namespace DotnetSpider.Core
 
 		private void ClearStartRequests()
 		{
-			lock (this)
+			lock (Locker)
 			{
 				Site.StartRequests.Clear();
 				GC.Collect();
@@ -1083,26 +1116,6 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public IMonitorable Monitorable => Scheduler;
-
-		public void Dispose()
-		{
-			CheckIfRunning();
-
-			int i = 0;
-			while (!_scheduler.IsExited)
-			{
-				++i;
-				Thread.Sleep(500);
-				if (i > 10)
-				{
-					break;
-				}
-			}
-
-			OnClose();
-		}
-
 		private void CalculateDownloadSpeed(long time)
 		{
 			lock (_avgDownloadTimeLocker)
@@ -1132,10 +1145,10 @@ namespace DotnetSpider.Core
 			try
 			{
 				Monitor.Report(Stat.ToString(),
-					Monitorable.GetLeftRequestsCount(),
-					Monitorable.GetTotalRequestsCount(),
-					Monitorable.GetSuccessRequestsCount(),
-					Monitorable.GetErrorRequestsCount(),
+					Monitorable.LeftRequestsCount,
+					Monitorable.TotalRequestsCount,
+					Monitorable.SuccessRequestsCount,
+					Monitorable.ErrorRequestsCount,
 					AvgDownloadSpeed,
 					AvgProcessorSpeed,
 					AvgPipelineSpeed,

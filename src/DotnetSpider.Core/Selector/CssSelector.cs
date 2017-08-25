@@ -22,19 +22,6 @@ namespace DotnetSpider.Core.Selector
 			_attrName = attrName;
 		}
 
-		protected string GetText(HtmlNode element)
-		{
-			StringBuilder accum = new StringBuilder();
-			foreach (var node in element.ChildNodes)
-			{
-				if (node is HtmlTextNode)
-				{
-					accum.Append(node.InnerText);
-				}
-			}
-			return accum.ToString();
-		}
-
 		public override dynamic Select(HtmlNode element)
 		{
 			IList<HtmlNode> elements = element.QuerySelectorAll(_selectorText).ToList();
@@ -61,6 +48,19 @@ namespace DotnetSpider.Core.Selector
 		public override bool HasAttribute()
 		{
 			return _attrName != null;
+		}
+
+		protected string GetText(HtmlNode element)
+		{
+			StringBuilder accum = new StringBuilder();
+			foreach (var node in element.ChildNodes)
+			{
+				if (node is HtmlTextNode)
+				{
+					accum.Append(node.InnerText);
+				}
+			}
+			return accum.ToString();
 		}
 	}
 }

@@ -35,10 +35,10 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				while (true)
 				{
-					IntPtr maindHwnd = WindowsFormUtil.FindWindow(null, "plugin-container.exe - 应用程序错误");
+					IntPtr maindHwnd = WindowsFormUtils.FindWindow(null, "plugin-container.exe - 应用程序错误");
 					if (maindHwnd != IntPtr.Zero)
 					{
-						WindowsFormUtil.SendMessage(maindHwnd, WindowsFormUtil.WmClose, 0, 0);
+						WindowsFormUtils.SendMessage(maindHwnd, WindowsFormUtils.WmClose, 0, 0);
 					}
 					Thread.Sleep(500);
 				}
@@ -56,6 +56,11 @@ namespace DotnetSpider.Extension.Downloader
 		public FiddlerDownloader(string urlParten, Option option, Func<RemoteWebDriver, bool> login = null) : this(urlParten, option, 200)
 		{
 			Login = login;
+		}
+
+		public override void Dispose()
+		{
+			_fiddlerClient.Dispose();
 		}
 
 		protected override Page DowloadContent(Request request, ISpider spider)
@@ -117,11 +122,6 @@ namespace DotnetSpider.Extension.Downloader
 				Page page = new Page(request, null) { Exception = e };
 				return page;
 			}
-		}
-
-		public override void Dispose()
-		{
-			_fiddlerClient.Dispose();
 		}
 	}
 }

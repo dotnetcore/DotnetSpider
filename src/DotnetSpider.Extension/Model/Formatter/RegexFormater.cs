@@ -8,9 +8,13 @@ namespace DotnetSpider.Extension.Model.Formatter
 	public class RegexFormatter : Formatter
 	{
 		private const string Id = "227a207a28024b1cbee3754e76443df2";
+
 		public string Pattern { get; set; }
+
 		public string True { get; set; } = Id;
+
 		public string False { get; set; } = Id;
+
 		public int Group { get; set; } = -1;
 
 		protected override dynamic FormateValue(dynamic value)

@@ -127,7 +127,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var f = new FormatStringFormater { Format = "" };
+				var f = new StringFormater { Format = "" };
 				f.Formate("");
 				throw new Exception("TEST FAILED.");
 			}
@@ -137,7 +137,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			try
 			{
-				var f = new FormatStringFormater { Format = null };
+				var f = new StringFormater { Format = null };
 				f.Formate("");
 				throw new Exception("TEST FAILED.");
 			}
@@ -147,7 +147,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			try
 			{
-				var f = new FormatStringFormater { Format = "     " };
+				var f = new StringFormater { Format = "     " };
 				f.Formate("");
 				throw new Exception("TEST FAILED.");
 			}
@@ -156,10 +156,10 @@ namespace DotnetSpider.Extension.Test
 				Assert.AreEqual("FormatString should not be null or empty.", se.Message);
 			}
 
-			FormatStringFormater formatter1 = new FormatStringFormater { Format = "http://{0}" };
+			StringFormater formatter1 = new StringFormater { Format = "http://{0}" };
 			Assert.AreEqual("http://a", formatter1.Formate("a"));
 
-			FormatStringFormater formatter2 = new FormatStringFormater { Format = "http://{0}/{1}" };
+			StringFormater formatter2 = new StringFormater { Format = "http://{0}/{1}" };
 			Assert.AreEqual("http://a/b", formatter2.Formate(new[] { "a", "b" }));
 		}
 	}

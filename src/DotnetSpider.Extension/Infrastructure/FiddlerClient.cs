@@ -49,45 +49,6 @@ namespace DotnetSpider.Extension.Infrastructure
 			//FiddlerApplication.BeforeResponse += FiddlerApplication_AfterSessionComplete;
 		}
 
-		void FiddlerApplication_BeforeRequest(Session oSession)
-		{
-			if (oSession.url.Contains("localhost") || oSession.url.Contains("127.0.0.1"))
-			{
-				return;
-			}
-			oSession["X-OverrideGateway"] = Gateway;
-		}
-
-		// ReSharper disable once UnusedMember.Local
-		private string GetMachineIpAddress()
-		{
-			var ipEntryList = Dns.GetHostEntry(Dns.GetHostName());
-			return (from ipAddress in ipEntryList.AddressList where ipAddress.ToString().Contains("192.168") select ipAddress.ToString()).FirstOrDefault();
-		}
-
-		// ReSharper disable once UnusedMember.Local
-		void FiddlerApplication_RequestHeadersAvailable(Session oSession)
-		{
-			if (!oSession.url.Contains(_partUrl)) return;
-
-			Headers = oSession.oRequest.headers.ToString();
-			RequestBodyString = oSession.GetRequestBodyAsString();
-		}
-
-		void FiddlerApplication_AfterSessionComplete(Session oSession)
-		{
-			if (oSession.url.Contains(_partUrl))//&& string.IsNullOrEmpty(this.Headers) remove for index.baidu.com
-			{
-				Headers = oSession.oRequest.headers.ToString();
-				RequestBodyString = oSession.GetRequestBodyAsString();
-				ResponseBodyString = oSession.GetResponseBodyAsString();
-			}
-			else
-			{
-				//System.Console.WriteLine(oSession.url);
-			}
-		}
-
 		public void Clear()
 		{
 			RequestBodyString = null;
@@ -108,6 +69,45 @@ namespace DotnetSpider.Extension.Infrastructure
 		{
 			//FiddlerApplication.oProxy.Detach();
 			FiddlerApplication.Shutdown();
+		}
+
+		private void FiddlerApplication_BeforeRequest(Session oSession)
+		{
+			if (oSession.url.Contains("localhost") || oSession.url.Contains("127.0.0.1"))
+			{
+				return;
+			}
+			oSession["X-OverrideGateway"] = Gateway;
+		}
+
+		// ReSharper disable once UnusedMember.Local
+		private string GetMachineIpAddress()
+		{
+			var ipEntryList = Dns.GetHostEntry(Dns.GetHostName());
+			return (from ipAddress in ipEntryList.AddressList where ipAddress.ToString().Contains("192.168") select ipAddress.ToString()).FirstOrDefault();
+		}
+
+		// ReSharper disable once UnusedMember.Local
+		private void FiddlerApplication_RequestHeadersAvailable(Session oSession)
+		{
+			if (!oSession.url.Contains(_partUrl)) return;
+
+			Headers = oSession.oRequest.headers.ToString();
+			RequestBodyString = oSession.GetRequestBodyAsString();
+		}
+
+		private void FiddlerApplication_AfterSessionComplete(Session oSession)
+		{
+			if (oSession.url.Contains(_partUrl))//&& string.IsNullOrEmpty(this.Headers) remove for index.baidu.com
+			{
+				Headers = oSession.oRequest.headers.ToString();
+				RequestBodyString = oSession.GetRequestBodyAsString();
+				ResponseBodyString = oSession.GetResponseBodyAsString();
+			}
+			else
+			{
+				//System.Console.WriteLine(oSession.url);
+			}
 		}
 	}
 }

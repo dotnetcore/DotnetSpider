@@ -12,8 +12,7 @@ namespace DotnetSpider.Core.Redial
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 		protected static object Lock = new object();
-		public IRedialer Redialer { get; }
-		public IInternetDetector InternetDetector { get; }
+
 		public abstract void WaitAll();
 		public abstract void WaitRedialExit();
 		public abstract string CreateActionIdentity(string name);
@@ -21,17 +20,11 @@ namespace DotnetSpider.Core.Redial
 		public abstract bool CheckIsRedialing();
 		public abstract void ReleaseRedialLocker();
 
-		public int AfterRedialWaitTime { get; set; } = -1;
+		public IRedialer Redialer { get; }
 
-		protected RedialExecutor(IRedialer redialer, IInternetDetector validater)
-		{
-			if (redialer == null || validater == null)
-			{
-				throw new RedialException("IRedialer, validatershould not be null.");
-			}
-			Redialer = redialer;
-			InternetDetector = validater;
-		}
+		public IInternetDetector InternetDetector { get; }
+
+		public int AfterRedialWaitTime { get; set; } = -1;
 
 		public RedialResult Redial(Action action = null)
 		{
@@ -172,6 +165,16 @@ namespace DotnetSpider.Core.Redial
 			{
 				DeleteActionIdentity(identity);
 			}
+		}
+
+		protected RedialExecutor(IRedialer redialer, IInternetDetector validater)
+		{
+			if (redialer == null || validater == null)
+			{
+				throw new RedialException("IRedialer, validatershould not be null.");
+			}
+			Redialer = redialer;
+			InternetDetector = validater;
 		}
 	}
 }

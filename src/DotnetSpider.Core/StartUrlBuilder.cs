@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
 {
@@ -18,13 +14,15 @@ namespace DotnetSpider.Core
 
 	public class CycleStartUrlBuilder : StartUrlBuilder
 	{
-		public int Min { get; private set; }
-		public int Max { get; private set; }
-		public int Interval { get; private set; }
+		public int Min { get; }
 
-		public string Prefix { get; private set; }
+		public int Max { get; }
 
-		public string Postfix { get; private set; }
+		public int Interval { get; }
+
+		public string Prefix { get; }
+
+		public string Postfix { get; }
 
 		public CycleStartUrlBuilder(int min, int max, int interval, string prefix, string postfix)
 		{
@@ -35,10 +33,6 @@ namespace DotnetSpider.Core
 			Postfix = postfix;
 		}
 
-		protected virtual void FormateRequest(Request request)
-		{
-		}
-
 		public override void Build(Site site)
 		{
 			for (int i = Min; i <= Max; i += Interval)
@@ -47,21 +41,25 @@ namespace DotnetSpider.Core
 				site.AddStartRequest(request);
 			}
 		}
+
+		protected virtual void FormateRequest(Request request)
+		{
+		}
 	}
 
 	public class CycleDateStartUrlBuilder : StartUrlBuilder
 	{
-		public DateTime Min { get; private set; }
+		public DateTime Min { get; }
 
-		public DateTime Max { get; private set; }
+		public DateTime Max { get; }
 
-		public int IntervalDay { get; private set; }
+		public int IntervalDay { get; }
 
-		public string DateFormateString { get; private set; }
+		public string DateFormateString { get; }
 
-		public string Prefix { get; private set; }
+		public string Prefix { get; }
 
-		public string Postfix { get; private set; }
+		public string Postfix { get; }
 
 		protected virtual void FormateRequest(Request request)
 		{
@@ -74,6 +72,7 @@ namespace DotnetSpider.Core
 			IntervalDay = interval;
 			Prefix = prefix;
 			Postfix = postfix;
+			DateFormateString = dateFormateString;
 		}
 
 		public override void Build(Site site)

@@ -35,9 +35,9 @@ namespace DotnetSpider.Sample
 					{
 						if (sold <= 1)
 						{
-							if (!page.MissTargetUrls)
+							if (!page.SkipTargetUrls)
 							{
-								page.MissTargetUrls = true;
+								page.SkipTargetUrls = true;
 							}
 						}
 						else
@@ -49,9 +49,9 @@ namespace DotnetSpider.Sample
 					{
 						if (sold <= 5)
 						{
-							if (!page.MissTargetUrls)
+							if (!page.SkipTargetUrls)
 							{
-								page.MissTargetUrls = true;
+								page.SkipTargetUrls = true;
 							}
 						}
 						else
@@ -63,9 +63,9 @@ namespace DotnetSpider.Sample
 					{
 						if (sold == 0)
 						{
-							if (!page.MissTargetUrls)
+							if (!page.SkipTargetUrls)
 							{
-								page.MissTargetUrls = true;
+								page.SkipTargetUrls = true;
 							}
 						}
 						else
@@ -112,7 +112,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(Item), new MyDataHanlder());
 		}
 
-		[Table("taobao", "taobao_items", TableSuffix.FirstDayOfThisMonth, Uniques = new[] { "item_id" })]
+		[Table("taobao", "taobao_items", TableSuffix.FirstDayOfCurrentMonth, Uniques = new[] { "item_id" })]
 		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
 		class Item : SpiderEntity
 		{

@@ -8,6 +8,9 @@ namespace DotnetSpider.Core.Proxy
 		public readonly Uri Uri;
 		private readonly bool _bypass;
 
+		public ICredentials Credentials { get; set; }
+		public Uri GetProxy(Uri destination) => Uri;
+
 		public UseSpecifiedUriWebProxy(Uri uri, ICredentials credentials = null, bool bypass = false)
 		{
 			Uri = uri;
@@ -15,8 +18,6 @@ namespace DotnetSpider.Core.Proxy
 			Credentials = credentials;
 		}
 
-		public ICredentials Credentials { get; set; }
-		public Uri GetProxy(Uri destination) => Uri;
 		public bool IsBypassed(Uri host) => _bypass;
 
 		public override int GetHashCode()

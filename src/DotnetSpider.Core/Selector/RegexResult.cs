@@ -4,9 +4,10 @@ namespace DotnetSpider.Core.Selector
 {
 	public class RegexResult
 	{
-		private readonly List<string> _groups;
 		public static RegexResult EmptyResult = new RegexResult();
-		public string Expression { get; set; }
+
+		private readonly List<string> _groups;
+		public readonly string Expression;
 
 		private RegexResult()
 		{

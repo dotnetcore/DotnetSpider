@@ -8,7 +8,7 @@ namespace DotnetSpider.Extension.Redial.Redialer
 {
 	public class VpnRedialer : IRedialer
 	{
-		public string NetInterface { get; set; } = null;
+		public string NetInterface { get; set; }
 		public string VpnInterface { get; set; }
 		public string VpnIp { get; set; }
 		public string Account { get; set; }

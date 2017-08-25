@@ -11,14 +11,14 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public class Config
 	{
-		public static string RedisConnectString => GetValue("redisConnectString");
-
-		public static string ConnectString => GetValue("connectString");
-
 #if NET_CORE
 		private static readonly IConfigurationRoot ConfigurationRoot;
 #endif
 		private static readonly Dictionary<string, string> Values = new Dictionary<string, string>();
+
+		public static string RedisConnectString => GetValue("redisConnectString");
+
+		public static string ConnectString => GetValue("connectString");
 
 		static Config()
 		{

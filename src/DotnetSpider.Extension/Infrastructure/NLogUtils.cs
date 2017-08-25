@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public class NLogUtil
+	public class NLogUtils
 	{
 		public static void PrepareDatabase(string connectString)
 		{

@@ -10,8 +10,9 @@ namespace DotnetSpider.Extension.Monitor
 {
 	public class DbMonitor : NLogMonitor
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
-		private bool _isDbOnly { get; set; }
+		protected static readonly ILogger Logger = LogCenter.GetLogger();
+
+		private readonly bool _isDbOnly;
 
 		public DbMonitor(string identity, bool isDbOnly = false)
 		{
@@ -27,11 +28,11 @@ namespace DotnetSpider.Extension.Monitor
 					{
 						InitStatusDatabase(Config.ConnectString);
 
-						var insertSql = $"insert ignore into dotnetspider.status (`identity`, `node`, `logged`, `status`, `thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values (@identity, @node, current_timestamp, @status, @thread, @left, @success, @error, @total, @avgdownloadspeed, @avgprocessorspeed, @avgpipelinespeed);";
+						var insertSql = "insert ignore into dotnetspider.status (`identity`, `node`, `logged`, `status`, `thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values (@identity, @node, current_timestamp, @status, @thread, @left, @success, @error, @total, @avgdownloadspeed, @avgprocessorspeed, @avgpipelinespeed);";
 						conn.Execute(insertSql,
 							new
 							{
-								identity = identity,
+								identity,
 								node = NodeId.Id,
 								status = "INIT",
 								left = 0,
@@ -56,20 +57,20 @@ namespace DotnetSpider.Extension.Monitor
 				{
 					conn.Execute("CREATE DATABASE IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8;");
 
-					var sql = $"CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`identity` varchar(120) NOT NULL,`node` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT current_timestamp,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20), PRIMARY KEY (`identity`,`node`))";
+					var sql = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`identity` varchar(120) NOT NULL,`node` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT current_timestamp,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20), PRIMARY KEY (`identity`,`node`))";
 					conn.Execute(sql);
 
-					var trigger = conn.QueryFirstOrDefault($"SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'status_AFTER_UPDATE' and EVENT_OBJECT_SCHEMA='dotnetspider' and EVENT_OBJECT_TABLE='status'");
+					var trigger = conn.QueryFirstOrDefault("SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'status_AFTER_UPDATE' and EVENT_OBJECT_SCHEMA='dotnetspider' and EVENT_OBJECT_TABLE='status'");
 					if (trigger == null)
 					{
-						var timeTrigger = $"CREATE TRIGGER `dotnetspider`.`status_AFTER_UPDATE` BEFORE UPDATE ON `status` FOR EACH ROW BEGIN set NEW.logged = NOW(); END";
+						var timeTrigger = "CREATE TRIGGER `dotnetspider`.`status_AFTER_UPDATE` BEFORE UPDATE ON `status` FOR EACH ROW BEGIN set NEW.logged = NOW(); END";
 						conn.Execute(timeTrigger);
 					}
 				}
 				catch (Exception e)
 				{
 					Logger.MyLog("Prepare dotnetspider.status failed.", LogLevel.Error, e);
-					throw e;
+					throw;
 				}
 			}
 		}
@@ -88,19 +89,19 @@ namespace DotnetSpider.Extension.Monitor
 					using (var conn = new MySqlConnection(Config.ConnectString))
 					{
 						conn.Execute(
-							$"update dotnetspider.status set `status`=@status, `thread`=@thread,`left`=@left, `success`=@success, `error`=@error, `total`=@total, `avgdownloadspeed`=@avgdownloadspeed, `avgprocessorspeed`=@avgprocessorspeed, `avgpipelinespeed`=@avgpipelinespeed WHERE `identity`=@identity and `node`=@node;",
+							"update dotnetspider.status set `status`=@status, `thread`=@thread,`left`=@left, `success`=@success, `error`=@error, `total`=@total, `avgdownloadspeed`=@avgdownloadspeed, `avgprocessorspeed`=@avgprocessorspeed, `avgpipelinespeed`=@avgpipelinespeed WHERE `identity`=@identity and `node`=@node;",
 							new
 							{
 								identity = Identity,
 								node = NodeId.Id,
-								status = status,
-								left = left,
-								total = total,
-								success = success,
-								error = error,
-								avgDownloadSpeed = avgDownloadSpeed,
-								avgProcessorSpeed = avgProcessorSpeed,
-								avgPipelineSpeed = avgPipelineSpeed,
+								status,
+								left,
+								total,
+								success,
+								error,
+								avgDownloadSpeed,
+								avgProcessorSpeed,
+								avgPipelineSpeed,
 								thread = threadNum
 							});
 					}

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DotnetSpider.Core;
-using Newtonsoft.Json.Linq;
-using System.Text.RegularExpressions;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
 using Dapper;
 #if !NET_CORE
-using System.Web;
+
 #else
 using System.Net;
 #endif
@@ -19,19 +15,19 @@ namespace DotnetSpider.Extension
 
 	public class DbStartUrlBuilder : StartUrlBuilder
 	{
-		public DataSource Source { get; private set; }
+		public DataSource Source { get; }
 
-		public string ConnectString { get; private set; }
+		public string ConnectString { get; }
 
-		public string Sql { get; private set; }
+		public string Sql { get; }
 
 		/// <summary>
 		/// 拼接Url的方式, 会把Columns对应列的数据传入
 		/// https://s.taobao.com/search?q={0},s=0;
 		/// </summary>
-		public string[] FormateStrings { get; private set; }
+		public string[] FormateStrings { get; }
 
-		public string[] FormateArguments { get; private set; }
+		public string[] FormateArguments { get; }
 
 		protected virtual void FormateDataObject(IDictionary<string, object> item)
 		{
@@ -55,7 +51,7 @@ namespace DotnetSpider.Extension
 			List<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
 			NetworkCenter.Current.Execute("dbsb", () =>
 			{
-				using (var conn = DataSourceUtil.GetConnection(Source, ConnectString))
+				using (var conn = DataSourceUtils.GetConnection(Source, ConnectString))
 				{
 					foreach (var item in conn.Query(Sql))
 					{
@@ -72,7 +68,6 @@ namespace DotnetSpider.Extension
 		{
 			var datas = QueryDatas();
 
-			HashSet<Request> results = new HashSet<Request>();
 			foreach (var data in datas)
 			{
 				object[] arguments = FormateArguments.Select(a => data[a]).ToArray();

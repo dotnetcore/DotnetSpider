@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure;
-using System.Linq;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace DotnetSpider.Core
 {
@@ -11,21 +11,62 @@ namespace DotnetSpider.Core
 	/// It contains some additional information. 
 	/// </summary>
 	public class Request : IDisposable
-#if !NET_CORE
-	, ICloneable
-#endif
 	{
-		public const string CycleTriedTimes = "983009ae-baee-467b-92cd-44188da2b021";
-		public const string StatusCodeKey = "02d71099-b897-49dd-a180-55345fe9abfc";
-		public const string Proxy = "6f09c4d6-167a-4272-8208-8a59bebdfe33";
-		public const string ResultIsEmptyTriedTimes = "BA2788B8-FC48-4B11-861D-524B5FB21582";
+		private readonly object _locker = new object();
+
+		public const string CycleTriedTimes = "983009aebaee467b92cd44188da2b021";
+		public const string StatusCodeKey = "02d71099b89749dda18055345fe9abfc";
+		public const string Proxy = "6f09c4d6167a427282088a59bebdfe33";
+		public const string ResultIsEmptyTriedTimes = "BA2788B8FC484B11861D524B5FB21582";
 
 		public int Depth { get; internal set; } = 1;
+
 		public int NextDepth => Depth + 1;
 
-		//public bool IsPicture { get; private set; }
-
 		public bool IsAvailable { get; } = true;
+
+		public string Referer { get; set; }
+
+		public string Origin { get; set; }
+
+		/// <summary>
+		/// Set the priority of request for sorting. 
+		/// Need a scheduler supporting priority. 
+		/// </summary>
+		public int Priority { get; set; }
+
+		/// <summary>
+		/// Store additional information in extras.
+		/// </summary>
+		public Dictionary<string, dynamic> Extras { get; set; }
+
+		/// <summary>
+		/// The http method of the request. Get for default.
+		/// </summary>
+		public string Method { get; set; } = "GET";
+
+		public string PostBody { get; set; }
+
+		public Uri Url { get; set; }
+
+		public string Identity => Encrypt.Md5Encrypt(Url + PostBody);
+
+		public HttpStatusCode? StatusCode
+		{
+			get
+			{
+				var code = GetExtra(StatusCodeKey);
+				if (code == null)
+				{
+					return null;
+				}
+				else
+				{
+					return (HttpStatusCode)code;
+				}
+			}
+			set => PutExtra(StatusCodeKey, value);
+		}
 
 		public Request()
 		{
@@ -68,45 +109,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private Request(Uri url, IDictionary<string, dynamic> extras = null)
-		{
-			Url = url;
-			if (extras != null)
-			{
-				foreach (var extra in extras)
-				{
-					PutExtra(extra.Key, extra.Value);
-				}
-			}
-		}
-
-		public string Referer { get; set; }
-
-		public string Origin { get; set; }
-
-		/// <summary>
-		/// Set the priority of request for sorting. 
-		/// Need a scheduler supporting priority. 
-		/// </summary>
-		public int Priority { get; set; }
-
-		/// <summary>
-		/// Store additional information in extras.
-		/// </summary>
-		public Dictionary<string, dynamic> Extras { get; set; }
-
-		/// <summary>
-		/// The http method of the request. Get for default.
-		/// </summary>
-		public string Method { get; set; } = "GET";
-
-		public string PostBody { get; set; }
-
-		public Uri Url { get; set; }
-
 		public dynamic GetExtra(string key)
 		{
-			lock (this)
+			lock (_locker)
 			{
 				if (Extras == null)
 				{
@@ -121,26 +126,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public HttpStatusCode? StatusCode
-		{
-			get
-			{
-				var code = GetExtra(StatusCodeKey);
-				if (code == null)
-				{
-					return null;
-				}
-				else
-				{
-					return (HttpStatusCode)code;
-				}
-			}
-			set => PutExtra(StatusCodeKey, value);
-		}
-
 		public bool ExistExtra(string key)
 		{
-			lock (this)
+			lock (_locker)
 			{
 				if (Extras == null)
 				{
@@ -153,7 +141,7 @@ namespace DotnetSpider.Core
 
 		public Request PutExtra(string key, dynamic value)
 		{
-			lock (this)
+			lock (_locker)
 			{
 				if (key == null)
 					return this;
@@ -199,15 +187,12 @@ namespace DotnetSpider.Core
 
 		public override string ToString()
 		{
-			var extracs = Extras == null ? "" : string.Join(",", Extras.Select(kv => kv.Key + ":" + kv.Value));
-			return $"{{ url='{Url}', method='{Method}', extras='{extracs}', priority='{Priority}'}}";
+			return JsonConvert.SerializeObject(this);
 		}
 
-		public string Identity => Encrypt.Md5Encrypt(Url + PostBody);
-
-		public object Clone()
+		public Request Clone()
 		{
-			lock (this)
+			lock (_locker)
 			{
 				IDictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
 				if (Extras != null)
@@ -227,6 +212,18 @@ namespace DotnetSpider.Core
 					Depth = Depth
 				};
 				return newObj;
+			}
+		}
+
+		private Request(Uri url, IDictionary<string, dynamic> extras = null)
+		{
+			Url = url;
+			if (extras != null)
+			{
+				foreach (var extra in extras)
+				{
+					PutExtra(extra.Key, extra.Value);
+				}
 			}
 		}
 	}

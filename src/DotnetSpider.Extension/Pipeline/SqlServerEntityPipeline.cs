@@ -149,14 +149,7 @@ namespace DotnetSpider.Extension.Pipeline
 				var columns = metadata.Table.Primary.Split(',');
 				foreach (var column in columns)
 				{
-					if (columns.Last() != column)
-					{
-						primaryParamenters.Append($" [{column}] = @{column} AND ");
-					}
-					else
-					{
-						primaryParamenters.Append($" [{column}] = @{column}");
-					}
+					primaryParamenters.Append(columns.Last() != column ? $" [{column}] = @{column} AND " : $" [{column}] = @{column}");
 				}
 			}
 

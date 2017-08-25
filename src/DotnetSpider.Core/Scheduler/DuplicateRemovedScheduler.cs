@@ -12,11 +12,25 @@ namespace DotnetSpider.Core.Scheduler
 		protected IDuplicateRemover DuplicateRemover { get; set; } = new HashSetDuplicateRemover();
 		protected ISpider Spider { get; set; }
 
+		public abstract void IncreaseSuccessCount();
+		public abstract void IncreaseErrorCount();
+		public abstract void Import(HashSet<Request> requests);
+
+		public abstract bool IsNetworkScheduler { get; }
+
+		public abstract HashSet<Request> ToList();
+
+		public abstract long LeftRequestsCount { get; }
+
+		public abstract long TotalRequestsCount { get; }
+
+		public abstract long SuccessRequestsCount { get; }
+
+		public abstract long ErrorRequestsCount { get; }
+
 		public bool DepthFirst { get; set; } = true;
 
 		public virtual bool IsExited { get; set; }
-
-		public abstract bool IsNetworkScheduler { get; }
 
 		public void Push(Request request)
 		{
@@ -45,6 +59,20 @@ namespace DotnetSpider.Core.Scheduler
 			return null;
 		}
 
+		public virtual void Dispose()
+		{
+			DuplicateRemover.Dispose();
+			IsExited = true;
+		}
+
+		public virtual void Export()
+		{
+		}
+
+		public virtual void Clear()
+		{
+		}
+
 		protected virtual void PushWhenNoDuplicate(Request request)
 		{
 		}
@@ -69,36 +97,6 @@ namespace DotnetSpider.Core.Scheduler
 			{
 				PushWhenNoDuplicate(request);
 			}
-		}
-
-		public virtual void Dispose()
-		{
-			DuplicateRemover.Dispose();
-			IsExited = true;
-		}
-
-		public abstract void Import(HashSet<Request> requests);
-
-		public abstract HashSet<Request> ToList();
-
-		public abstract long GetLeftRequestsCount();
-
-		public abstract long GetTotalRequestsCount();
-
-		public abstract long GetSuccessRequestsCount();
-
-		public abstract long GetErrorRequestsCount();
-
-		public abstract void IncreaseSuccessCounter();
-
-		public abstract void IncreaseErrorCounter();
-
-		public virtual void Export()
-		{
-		}
-
-		public virtual void Clean()
-		{
 		}
 	}
 }

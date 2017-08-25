@@ -20,10 +20,10 @@ namespace DotnetSpider.Extension.Pipeline
 			LoadFile,
 			InsertSql
 		}
+
 		public FileType Type { get; set; }
 
 		public string DataFolder { get; set; }
-
 
 		public MySqlFileEntityPipeline(FileType fileType = FileType.LoadFile)
 		{
@@ -50,7 +50,7 @@ namespace DotnetSpider.Extension.Pipeline
 			lock (this)
 			{
 				Entity metadata;
-				if (EntityMetadatas.TryGetValue(entityName, out metadata))
+				if (Entities.TryGetValue(entityName, out metadata))
 				{
 					switch (Type)
 					{
@@ -80,14 +80,7 @@ namespace DotnetSpider.Extension.Pipeline
 				var lastColumn = metadata.Fields.Last();
 				foreach (var column in metadata.Fields)
 				{
-					if (column == lastColumn)
-					{
-						builder.Append($"`{column.Name}`");
-					}
-					else
-					{
-						builder.Append($"`{column.Name}`, ");
-					}
+					builder.Append(column == lastColumn ? $"`{column.Name}`" : $"`{column.Name}`, ");
 				}
 				builder.Append(") VALUES (");
 
@@ -96,14 +89,7 @@ namespace DotnetSpider.Extension.Pipeline
 					var token = entry.SelectToken($"$.{column.Name}");
 					var value = token == null ? "" : MySqlHelper.EscapeString(token.Value<string>());
 
-					if (column == lastColumn)
-					{
-						builder.Append($"'{value}'");
-					}
-					else
-					{
-						builder.Append($"'{value}', ");
-					}
+					builder.Append(column == lastColumn ? $"'{value}'" : $"'{value}', ");
 				}
 				builder.Append($");{Environment.NewLine}");
 			}

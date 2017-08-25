@@ -5,6 +5,10 @@ namespace DotnetSpider.Core.Selector
 {
 	public abstract class BaseHtmlSelector : ISelector
 	{
+		public abstract bool HasAttribute();
+		public abstract dynamic Select(HtmlNode element);
+		public abstract List<dynamic> SelectList(HtmlNode element);
+
 		public virtual dynamic Select(dynamic text)
 		{
 			if (text != null)
@@ -44,9 +48,5 @@ namespace DotnetSpider.Core.Selector
 				return new List<dynamic>();
 			}
 		}
-
-		public abstract bool HasAttribute();
-		public abstract dynamic Select(HtmlNode element);
-		public abstract List<dynamic> SelectList(HtmlNode element);
 	}
 }

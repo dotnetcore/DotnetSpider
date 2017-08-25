@@ -6,6 +6,14 @@ namespace DotnetSpider.Core.Proxy
 	{
 		private double _lastBorrowTime = DateTimeUtils.GetCurrentTimeStamp();
 
+		public readonly UseSpecifiedUriWebProxy HttpHost;
+
+		public double CanReuseTime { get; set; }
+
+		public double ResponseTime { get; private set; }
+
+		public int FailedNum { get; private set; }
+
 		public Proxy(UseSpecifiedUriWebProxy httpHost, int reuseTimeInterval = 1500)
 		{
 			HttpHost = httpHost;
@@ -33,14 +41,6 @@ namespace DotnetSpider.Core.Proxy
 		{
 			FailedNum++;
 		}
-
-		public readonly UseSpecifiedUriWebProxy HttpHost;
-
-		public double CanReuseTime { get; set; }
-
-		public double ResponseTime { get; private set; }
-
-		public int FailedNum { get; private set; }
 
 		public UseSpecifiedUriWebProxy GetWebProxy()
 		{

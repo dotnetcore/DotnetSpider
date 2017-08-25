@@ -9,10 +9,11 @@ namespace DotnetSpider.Core.Selector
 	{
 		private static readonly Dictionary<string, ISelector> Cache = new Dictionary<string, ISelector>();
 		private static readonly DefaultSelector DefaultSelector = new DefaultSelector();
+		private static readonly object Locker = new object();
 
 		public static ISelector Regex(string expr)
 		{
-			lock (Cache)
+			lock (Locker)
 			{
 				if (!Cache.ContainsKey(expr))
 				{
@@ -24,7 +25,7 @@ namespace DotnetSpider.Core.Selector
 
 		public static ISelector Css(string expr)
 		{
-			lock (Cache)
+			lock (Locker)
 			{
 				if (!Cache.ContainsKey(expr))
 				{
@@ -36,7 +37,7 @@ namespace DotnetSpider.Core.Selector
 
 		public static ISelector Css(string expr, string attrName)
 		{
-			lock (Cache)
+			lock (Locker)
 			{
 				if (!Cache.ContainsKey(expr + attrName))
 				{
@@ -48,7 +49,7 @@ namespace DotnetSpider.Core.Selector
 
 		public static ISelector Regex(string expr, int group)
 		{
-			lock (Cache)
+			lock (Locker)
 			{
 				if (!Cache.ContainsKey(expr))
 				{
@@ -60,7 +61,7 @@ namespace DotnetSpider.Core.Selector
 
 		public static ISelector SmartContent()
 		{
-			lock (Cache)
+			lock (Locker)
 			{
 				return Cache["SmartContentSelector"];
 			}
@@ -68,7 +69,7 @@ namespace DotnetSpider.Core.Selector
 
 		public static ISelector XPath(string expr)
 		{
-			lock (Cache)
+			lock (Locker)
 			{
 				if (!Cache.ContainsKey(expr))
 				{
@@ -85,7 +86,7 @@ namespace DotnetSpider.Core.Selector
 
 		public static ISelector Enviroment(string expr)
 		{
-			lock (Cache)
+			lock (Locker)
 			{
 				if (!Cache.ContainsKey(expr))
 				{
@@ -97,7 +98,7 @@ namespace DotnetSpider.Core.Selector
 
 		public static ISelector JsonPath(string expr)
 		{
-			lock (Cache)
+			lock (Locker)
 			{
 				if (!Cache.ContainsKey(expr))
 				{
@@ -106,14 +107,5 @@ namespace DotnetSpider.Core.Selector
 				return Cache[expr];
 			}
 		}
-		//public static AndSelector And(params ISelector[] selectors)
-		//{
-		//	return new AndSelector(selectors);
-		//}
-
-		//public static OrSelector Or(params ISelector[] selectors)
-		//{
-		//	return new OrSelector(selectors);
-		//}
 	}
 }

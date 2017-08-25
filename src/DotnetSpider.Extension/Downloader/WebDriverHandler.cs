@@ -10,17 +10,16 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public int Interval { get; set; } = 1;
-		public int ScrollTo { get; set; } = 0;
+		public int ScrollTimes { get; set; } = 1;
 
 		public bool Handle(RemoteWebDriver webDriver)
 		{
 			try
 			{
 				webDriver.Manage().Window.Maximize();
-				for (int i = 0; i <= Interval; i++)
+				for (int i = 0; i <= ScrollTimes; i++)
 				{
-					webDriver.ExecuteScript($"window.scrollBy(0, {ScrollTo})");
+					webDriver.ExecuteScript("window.scrollBy(0, 500)");
 					Thread.Sleep(1000);
 				}
 			}

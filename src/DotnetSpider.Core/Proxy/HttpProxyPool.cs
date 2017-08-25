@@ -102,6 +102,11 @@ namespace DotnetSpider.Core.Proxy
 			}
 		}
 
+		public void Dispose()
+		{
+			_isDispose = true;
+		}
+
 		private void RefreshProxies()
 		{
 			var result = _supplier.GetProxies();
@@ -131,11 +136,6 @@ namespace DotnetSpider.Core.Proxy
 				}
 			});
 
-		}
-
-		public void Dispose()
-		{
-			_isDispose = true;
 		}
 	}
 }

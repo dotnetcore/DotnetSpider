@@ -9,7 +9,6 @@ using System.Data;
 using NLog;
 using Dapper;
 using DotnetSpider.Extension.Monitor;
-using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 
@@ -17,11 +16,11 @@ namespace DotnetSpider.Extension
 {
 	public abstract class CommonSpider : Spider, ITask
 	{
+		protected const string InitStatusSetKey = "dotnetspider:init-stats";
+
 		protected abstract void MyInit(params string[] arguments);
 
 		protected Action OnExited;
-
-		protected const string InitStatusSetKey = "dotnetspider:init-stats";
 
 		public string ConnectString { get; set; }
 
@@ -33,11 +32,11 @@ namespace DotnetSpider.Extension
 
 		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
-		public CommonSpider(string name) : this(name, new Site())
+		protected CommonSpider(string name) : this(name, new Site())
 		{
 		}
 
-		public CommonSpider(string name, Site site) : base(site)
+		protected CommonSpider(string name, Site site) : base(site)
 		{
 			Name = name;
 			ConnectString = Config.ConnectString;
@@ -57,11 +56,11 @@ namespace DotnetSpider.Extension
 			{
 				EmptySleepTime = 1000;
 
-				if (_pipelines == null || _pipelines.Count == 0)
+				if (Pipelines == null || Pipelines.Count == 0)
 				{
 					AddPipeline(new NullPipeline());
 				}
-				if (PageProcessors == null || PageProcessors.Count == 0)
+				if (ReadOnlyPageProcessors == null || ReadOnlyPageProcessors.Count == 0)
 				{
 					AddPageProcessor(new NullPageProcessor());
 				}
@@ -86,6 +85,11 @@ namespace DotnetSpider.Extension
 			}
 		}
 
+		public ISpider ToDefaultSpider()
+		{
+			return new DefaultSpider("", new Site());
+		}
+
 		protected override void PreInitComponent(params string[] arguments)
 		{
 			base.PreInitComponent();
@@ -104,7 +108,7 @@ namespace DotnetSpider.Extension
 
 			if (arguments.Contains("rerun"))
 			{
-				Scheduler.Clean();
+				Scheduler.Clear();
 				Scheduler.Dispose();
 				Verification.RemoveVerifidationLock(Identity);
 			}
@@ -114,11 +118,6 @@ namespace DotnetSpider.Extension
 		{
 			RedisConnection.Default?.Database.LockRelease(InitLockKey, 0);
 			base.AfterInitComponent(arguments);
-		}
-
-		public ISpider ToDefaultSpider()
-		{
-			return new DefaultSpider("", new Site());
 		}
 
 		/// <summary>

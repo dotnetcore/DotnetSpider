@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension.Downloader
 		public Formatter[] IntervalFormatters { get; set; }
 		public int? Interval(Page page)
 		{
-			var intervalStr = page.Selectable.Select(SelectorUtil.Parse(Selector)).GetValue();
+			var intervalStr = page.Selectable.Select(SelectorUtils.Parse(Selector)).GetValue();
 			if (!string.IsNullOrEmpty(intervalStr))
 			{
 				if (IntervalFormatters != null)
@@ -56,13 +56,13 @@ namespace DotnetSpider.Extension.Downloader
 				if (!Stopper.NeedStop(page, this))
 				{
 					page.AddTargetRequests(GenerateRequests(page));
-					page.MissExtractTargetUrls = true;
+					page.SkipExtractTargetUrls = true;
 				}
 			}
 			else
 			{
 				page.AddTargetRequests(GenerateRequests(page));
-				page.MissExtractTargetUrls = true;
+				page.SkipExtractTargetUrls = true;
 			}
 			return true;
 		}
@@ -113,13 +113,13 @@ namespace DotnetSpider.Extension.Downloader
 				if (!Stopper.NeedStop(page, this))
 				{
 					page.AddTargetRequests(GenerateRequests(page));
-					page.MissExtractTargetUrls = true;
+					page.SkipExtractTargetUrls = true;
 				}
 			}
 			else
 			{
 				page.AddTargetRequests(GenerateRequests(page));
-				page.MissExtractTargetUrls = true;
+				page.SkipExtractTargetUrls = true;
 			}
 			return true;
 		}
@@ -233,7 +233,7 @@ namespace DotnetSpider.Extension.Downloader
 				string totalStr = string.Empty;
 				if (TotalPageSelector.Type == SelectorType.Enviroment)
 				{
-					var selector = SelectorUtil.Parse(TotalPageSelector) as EnviromentSelector;
+					var selector = SelectorUtils.Parse(TotalPageSelector) as EnviromentSelector;
 					if (selector != null)
 					{
 						totalStr = EntityExtractor.GetEnviromentValue(selector.Field, page, 0);
@@ -241,7 +241,7 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				else
 				{
-					totalStr = page.Selectable.Select(SelectorUtil.Parse(TotalPageSelector)).GetValue();
+					totalStr = page.Selectable.Select(SelectorUtils.Parse(TotalPageSelector)).GetValue();
 				}
 
 				if (!string.IsNullOrEmpty(totalStr))
@@ -265,7 +265,7 @@ namespace DotnetSpider.Extension.Downloader
 				string currentStr = string.Empty;
 				if (CurrenctPageSelector.Type == SelectorType.Enviroment)
 				{
-					var selector = SelectorUtil.Parse(CurrenctPageSelector) as EnviromentSelector;
+					var selector = SelectorUtils.Parse(CurrenctPageSelector) as EnviromentSelector;
 					if (selector != null)
 					{
 						currentStr = EntityExtractor.GetEnviromentValue(selector.Field, page, 0);
@@ -273,7 +273,7 @@ namespace DotnetSpider.Extension.Downloader
 				}
 				else
 				{
-					currentStr = page.Selectable.Select(SelectorUtil.Parse(CurrenctPageSelector)).GetValue();
+					currentStr = page.Selectable.Select(SelectorUtils.Parse(CurrenctPageSelector)).GetValue();
 				}
 
 				if (!string.IsNullOrEmpty(currentStr))
@@ -372,7 +372,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool NeedStop(Page page, BaseTargetUrlsCreator creator)
 		{
-			var tmps = page.Selectable.SelectList(SelectorUtil.Parse(TimeSelector)).GetValues();
+			var tmps = page.Selectable.SelectList(SelectorUtils.Parse(TimeSelector)).GetValues();
 			if (tmps == null)
 			{
 				return true;

@@ -11,12 +11,13 @@ namespace DotnetSpider.Extension.Redial
 {
 	public class RedisRedialExecutor : RedialExecutor
 	{
-		public static string HostName => $"dotnetspider:nodes:{Dns.GetHostName()}";
+		public static readonly string HostName = $"dotnetspider:nodes:{Dns.GetHostName()}";
 
 		public const string Locker = "dotnetspider:redialLocker";
 
-		public string ConnectString { get; private set; }
-		public RedisConnection RedisConnection { get; private set; }
+		public string ConnectString { get; }
+
+		public RedisConnection RedisConnection { get; }
 
 		public RedisRedialExecutor(string connectString, IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{

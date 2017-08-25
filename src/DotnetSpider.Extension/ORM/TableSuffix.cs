@@ -5,6 +5,6 @@
 		Empty,
 		Monday,
 		Today,
-		FirstDayOfThisMonth,
+		FirstDayOfCurrentMonth,
 	}
 }

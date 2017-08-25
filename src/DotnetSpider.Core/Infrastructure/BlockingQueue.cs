@@ -6,7 +6,6 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public sealed class BlockingQueue<T> : ICollection
 	{
-		#region Fields
 		// Buffer used to store queue objects with max "Size".
 		private readonly T[] _buffer;
 		// Current number of elements in the queue.
@@ -19,7 +18,6 @@ namespace DotnetSpider.Core.Infrastructure
 		private int _tail;
 		// Object used to synchronize the queue.
 		private readonly object _syncRoot;
-		#endregion
 
 		#region Constructors
 		/// <summary>
@@ -389,7 +387,7 @@ namespace DotnetSpider.Core.Infrastructure
 			throw new NotImplementedException("Not Implemented.");
 		}
 		#endregion
-	} // End BlockingQueue
+	}
 
 	public class QueueTimeoutException : SpiderException
 	{

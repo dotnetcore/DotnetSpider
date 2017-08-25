@@ -21,6 +21,10 @@ namespace DotnetSpider.Core.Selector
 
 		public abstract ISelectable JsonPath(string path);
 
+		public abstract ISelectable Select(ISelector selector);
+
+		public abstract ISelectable SelectList(ISelector selector);
+
 		public ISelectable Regex(string regex)
 		{
 			return Select(Selectors.Regex(regex));
@@ -73,16 +77,10 @@ namespace DotnetSpider.Core.Selector
 			List<string> result = new List<string>();
 			foreach (var el in Elements)
 			{
-				if (el is HtmlNode)
+				var node = el as HtmlNode;
+				if (node != null)
 				{
-					if (!isPlainText)
-					{
-						result.Add(((HtmlNode)el).InnerHtml);
-					}
-					else
-					{
-						result.Add(((HtmlNode)el).InnerText.Trim());
-					}
+					result.Add(!isPlainText ? node.InnerHtml : node.InnerText.Trim());
 				}
 				else
 				{
@@ -100,9 +98,5 @@ namespace DotnetSpider.Core.Selector
 			}
 			return result;
 		}
-
-		public abstract ISelectable Select(ISelector selector);
-
-		public abstract ISelectable SelectList(ISelector selector);
 	}
 }

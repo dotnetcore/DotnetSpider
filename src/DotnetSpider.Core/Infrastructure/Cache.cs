@@ -1,30 +1,35 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Infrastructure
 {
 	public class Cache
 	{
-		private readonly ConcurrentDictionary<string, dynamic> _cache = new ConcurrentDictionary<string, dynamic>();
+		private static readonly Dictionary<string, dynamic> Cached = new Dictionary<string, dynamic>();
+		private static readonly Lazy<Cache> MyInstance = new Lazy<Cache>(() => new Cache());
+		private static readonly object Locker = new object();
 
 		private Cache()
 		{
-
 		}
-
-		private static readonly Lazy<Cache> MyInstance = new Lazy<Cache>(() => new Cache());
 
 		public static Cache Instance => MyInstance.Value;
 
 		public void Set(string key, dynamic data)
 		{
-			_cache.TryAdd(key, data);
+			lock (Locker)
+			{
+				Cached.Add(key, data);
+			}
 		}
 
 		public dynamic Get(string key)
 		{
-			dynamic result;
-			return _cache.TryGetValue(key, out result) ? result : null;
+			lock (Locker)
+			{
+				var result = Cached.ContainsKey(key) ? Cached[key] : null;
+				return result;
+			}
 		}
 	}
 }

@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public class DataSourceUtil
+	public class DataSourceUtils
 	{
 		public static DbConnection GetConnection(DataSource source, string connectString)
 		{

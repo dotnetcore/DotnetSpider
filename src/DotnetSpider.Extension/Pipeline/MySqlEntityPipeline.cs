@@ -76,14 +76,7 @@ namespace DotnetSpider.Extension.Pipeline
 				var columns = metadata.Table.Primary.Split(',');
 				foreach (var column in columns)
 				{
-					if (columns.Last() != column)
-					{
-						primaryParamenters.Append($" `{column}` = @{column} AND ");
-					}
-					else
-					{
-						primaryParamenters.Append($" `{column}` = @{column}");
-					}
+					primaryParamenters.Append(columns.Last() != column ? $" `{column}` = @{column} AND " : $" `{column}` = @{column}");
 				}
 			}
 			var sqlBuilder = new StringBuilder();
@@ -109,14 +102,7 @@ namespace DotnetSpider.Extension.Pipeline
 				var columns = metadata.Table.Primary.Split(',');
 				foreach (var column in columns)
 				{
-					if (columns.Last() != column)
-					{
-						primaryParamenters.Append($" `{column}` = @{column} AND ");
-					}
-					else
-					{
-						primaryParamenters.Append($" `{column}` = @{column}");
-					}
+					primaryParamenters.Append(columns.Last() != column ? $" `{column}` = @{column} AND " : $" `{column}` = @{column}");
 				}
 			}
 			var sqlBuilder = new StringBuilder();
@@ -161,7 +147,7 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 			builder.Append($", PRIMARY KEY ({ metadata.Table.Primary})");
-			builder.Append($") AUTO_INCREMENT=1");
+			builder.Append(") AUTO_INCREMENT=1");
 			string sql = builder.ToString();
 			return sql;
 		}

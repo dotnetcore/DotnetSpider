@@ -6,8 +6,11 @@ namespace DotnetSpider.Extension.Model.Formatter
 	public class SubStringFormatter : Formatter
 	{
 		public string Start { get; set; }
+
 		public string End { get; set; }
+
 		public int StartOffset { get; set; } = 0;
+
 		public int EndOffset { get; set; } = 0;
 
 		protected override dynamic FormateValue(dynamic value)

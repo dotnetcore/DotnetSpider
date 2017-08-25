@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Infrastructure
 {
@@ -89,7 +88,6 @@ namespace DotnetSpider.Core.Infrastructure
 			if (item.ResultType == ResultType.Byte)
 			{
 				result.ResultByte = responseByte;
-				return;
 			}
 			else
 			{

@@ -5,7 +5,7 @@ using DotnetSpider.Core;
 namespace DotnetSpider.Extension.Model.Formatter
 {
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-	public class FormatStringFormater : Formatter
+	public class StringFormater : Formatter
 	{
 		public string Format { get; set; }
 

@@ -12,6 +12,8 @@ namespace DotnetSpider.Core.Scheduler.Component
 		private readonly double _fpp;
 		private AtomicInteger _counter;
 
+		public long TotalRequestsCount => _counter.Value;
+
 		public BloomFilterDuplicateRemover(int expectedInsertions)
 			: this(expectedInsertions, 0.01)
 		{
@@ -44,11 +46,6 @@ namespace DotnetSpider.Core.Scheduler.Component
 		public void ResetDuplicateCheck()
 		{
 			RebuildBloomFilter();
-		}
-
-		public long GetTotalRequestsCount()
-		{
-			return _counter.Value;
 		}
 
 		public void Dispose()
