@@ -9,30 +9,7 @@ namespace DotnetSpider.Core
 	public class ResultItems
 	{
 		private readonly Dictionary<string, dynamic> _fields = new Dictionary<string, dynamic>();
-
-		public dynamic GetResultItem(string key)
-		{
-			lock (this)
-			{
-				return _fields.ContainsKey(key) ? _fields[key] : null;
-			}
-		}
-
-		public ResultItems AddOrUpdateResultItem(string key, dynamic value)
-		{
-			lock (this)
-			{
-				if (_fields.ContainsKey(key))
-				{
-					_fields[key] = value;
-				}
-				else
-				{
-					_fields.Add(key, value);
-				}
-				return this;
-			}
-		}
+		private readonly object _locker = new object();
 
 		public Dictionary<string, dynamic> Results => _fields;
 
@@ -44,9 +21,28 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public bool IsSkip { get; set; }
 
-		public override string ToString()
+		public dynamic GetResultItem(string key)
 		{
-			return "ResultItems{ fields=" + _fields + ", request=" + Request + ", skip=" + IsSkip + '}';
+			lock (_locker)
+			{
+				return _fields.ContainsKey(key) ? _fields[key] : null;
+			}
+		}
+
+		public ResultItems AddOrUpdateResultItem(string key, dynamic value)
+		{
+			lock (_locker)
+			{
+				if (_fields.ContainsKey(key))
+				{
+					_fields[key] = value;
+				}
+				else
+				{
+					_fields.Add(key, value);
+				}
+				return this;
+			}
 		}
 	}
 }

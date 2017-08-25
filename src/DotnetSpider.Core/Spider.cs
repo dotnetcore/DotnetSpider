@@ -26,57 +26,14 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Spider : ISpider, ISpeedMonitor, INamed
 	{
-		protected readonly static ILogger Logger = LogCenter.GetLogger();
-		protected DateTime StartTime { get; private set; }
-		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
-
-		protected int WaitInterval { get; } = 10;
-		private IScheduler _scheduler;
-
-		public string Identity
-		{
-			get { return _identity; }
-			set
-			{
-				CheckIfRunning();
-
-				if (string.IsNullOrEmpty(value) || value.Length > 120)
-				{
-					throw new ArgumentException("Length of Identity should less than 100.");
-				}
-
-				_identity = value;
-			}
-		}
-
-		public string Name { get; set; }
-		public Site Site
-		{
-			get
-			{
-				return _site;
-			}
-		}
-		public bool IsComplete { get; private set; }
-		public AutomicLong RetriedTimes { get; private set; } = new AutomicLong();
-
-		public Status Stat { get; private set; } = Status.Init;
-		public event Action<Request> OnSuccess;
-		public event Action OnClosing;
-		public event Action OnComplete;
-		public event Action OnClosed;
-
-		public bool ClearSchedulerAfterComplete { get; set; } = true;
-
-		public IMonitor Monitor { get; set; }
-
-		public long AvgDownloadSpeed { get; private set; }
-		public long AvgProcessorSpeed { get; private set; }
-		public long AvgPipelineSpeed { get; private set; }
-
-		public int StatusReportInterval { get; set; } = 5000;
-		public int PipelineRetryTimes { get; set; } = 1;
 		private readonly Site _site;
+		private IScheduler _scheduler;
+		private IDownloader _downloader = new HttpClientDownloader();
+		private Task _monitorTask;
+		private ICookieInjector _cookieInjector;
+		private Status _realStat = Status.Init;
+		private readonly List<ResultItems> _cached = new List<ResultItems>();
+		private readonly List<IStartUrlBuilder> _startUrlBuilders = new List<IStartUrlBuilder>();
 		private int _waitCountLimit = 1500;
 		private bool _init;
 		private FileInfo _errorRequestFile;
@@ -93,13 +50,48 @@ namespace DotnetSpider.Core
 		private int _cachedSize = 1;
 		private string _identity;
 
-		private IDownloader _downloader = new HttpClientDownloader();
-		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
-		private List<IPipeline> _pipelines = new List<IPipeline>();
-		private Task _monitorTask;
-		private ICookieInjector _cookieInjector;
-		private Status _realStat = Status.Init;
-		private readonly List<ResultItems> _cached = new List<ResultItems>();
+		protected readonly static ILogger Logger = LogCenter.GetLogger();
+		protected DateTime StartTime { get; private set; }
+		protected DateTime FinishedTime { get; private set; } = DateTime.MinValue;
+		protected int WaitInterval { get; } = 10;
+		protected readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
+		protected List<IPipeline> _pipelines = new List<IPipeline>();
+
+		public string Identity
+		{
+			get { return _identity; }
+			set
+			{
+				CheckIfRunning();
+
+				if (string.IsNullOrEmpty(value) || value.Length > 120)
+				{
+					throw new ArgumentException("Length of Identity should less than 100.");
+				}
+
+				_identity = value;
+			}
+		}
+		public string Name { get; set; }
+		public Site Site => _site;
+
+		public bool IsComplete { get; private set; }
+		public AutomicLong RetriedTimes { get; private set; } = new AutomicLong();
+		public Status Stat { get; private set; } = Status.Init;
+		public event Action<Request> OnSuccess;
+		public event Action OnClosing;
+		public event Action OnComplete;
+		public event Action OnClosed;
+		public bool ClearSchedulerAfterComplete { get; set; } = true;
+		public IMonitor Monitor { get; set; }
+		public long AvgDownloadSpeed { get; private set; }
+		public long AvgProcessorSpeed { get; private set; }
+		public long AvgPipelineSpeed { get; private set; }
+		public int StatusReportInterval { get; set; } = 5000;
+		public int PipelineRetryTimes { get; set; } = 1;
+		public ReadOnlyCollection<IPageProcessor> PageProcessors => _pageProcessors.AsReadOnly();
+		public ReadOnlyCollection<IPipeline> Pipelines => _pipelines.AsReadOnly();
+		public ReadOnlyCollection<IStartUrlBuilder> StartUrlBuilders => _startUrlBuilders.AsReadOnly();
 
 		/// <summary>
 		/// Create a spider with pageProcessor.
@@ -192,7 +184,7 @@ namespace DotnetSpider.Core
 				throw new SpiderException("Length of Identity should less than 100.");
 			}
 
-			if (PageProcessors == null || PageProcessors.Count == 0)
+			if (_pageProcessors == null || _pageProcessors.Count == 0)
 			{
 				throw new SpiderException("Count of PageProcessor is zero.");
 			}
@@ -205,7 +197,7 @@ namespace DotnetSpider.Core
 				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
 			}
 
-			foreach (var processor in PageProcessors)
+			foreach (var processor in _pageProcessors)
 			{
 				processor.Site = Site;
 			}
@@ -247,10 +239,6 @@ namespace DotnetSpider.Core
 				NetworkCenter.Current.Executor = value;
 			}
 		}
-
-		public ReadOnlyCollection<IPageProcessor> PageProcessors => _pageProcessors.AsReadOnly();
-
-		public ReadOnlyCollection<IPipeline> Pipelines => _pipelines.AsReadOnly();
 
 		public IDownloader Downloader
 		{
@@ -355,6 +343,12 @@ namespace DotnetSpider.Core
 				CheckIfRunning();
 				_retryWhenResultIsEmpty = value;
 			}
+		}
+
+		public Spider AddStartUrlBuilder(IStartUrlBuilder builder)
+		{
+			_startUrlBuilders.Add(builder);
+			return this;
 		}
 
 		/// <summary>
@@ -509,7 +503,7 @@ namespace DotnetSpider.Core
 
 			Logger.MyLog(Identity, "Build crawler...", LogLevel.Info);
 
-			if (Pipelines == null || Pipelines.Count == 0)
+			if (_pipelines == null || _pipelines.Count == 0)
 			{
 				var defaultPipeline = GetDefaultPipeline();
 				if (defaultPipeline == null)
@@ -534,7 +528,7 @@ namespace DotnetSpider.Core
 
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 
-			foreach (var pipeline in Pipelines)
+			foreach (var pipeline in _pipelines)
 			{
 				pipeline.InitPipeline(this);
 			}
@@ -802,14 +796,14 @@ namespace DotnetSpider.Core
 
 		protected void OnClose()
 		{
-			foreach (IPipeline pipeline in Pipelines)
+			foreach (IPipeline pipeline in _pipelines)
 			{
 				pipeline.Process(_cached.ToArray());
 				SafeDestroy(pipeline);
 			}
 
 			SafeDestroy(Scheduler);
-			SafeDestroy(PageProcessors);
+			SafeDestroy(_pageProcessors);
 			SafeDestroy(Downloader);
 
 			Site.HttpProxyPool?.Dispose();
@@ -904,7 +898,7 @@ namespace DotnetSpider.Core
 				page = downloader.Download(request, this);
 
 				sw.Stop();
-				UpdateDownloadSpeed(sw.ElapsedMilliseconds);
+				CalculateDownloadSpeed(sw.ElapsedMilliseconds);
 
 				if (page == null || page.IsSkip)
 				{
@@ -916,13 +910,13 @@ namespace DotnetSpider.Core
 					sw.Reset();
 					sw.Start();
 
-					foreach (var processor in PageProcessors)
+					foreach (var processor in _pageProcessors)
 					{
 						processor.Process(page);
 					}
 
 					sw.Stop();
-					UpdateProcessorSpeed(sw.ElapsedMilliseconds);
+					CalculateProcessorSpeed(sw.ElapsedMilliseconds);
 				}
 				else
 				{
@@ -970,7 +964,7 @@ namespace DotnetSpider.Core
 				{
 					if (CachedSize == 1)
 					{
-						foreach (IPipeline pipeline in Pipelines)
+						foreach (IPipeline pipeline in _pipelines)
 						{
 							RetryExecutor.Execute(PipelineRetryTimes, () =>
 							{
@@ -988,7 +982,7 @@ namespace DotnetSpider.Core
 							{
 								var items = _cached.ToArray();
 								_cached.Clear();
-								foreach (IPipeline pipeline in Pipelines)
+								foreach (IPipeline pipeline in _pipelines)
 								{
 									pipeline.Process(items);
 								}
@@ -1023,7 +1017,7 @@ namespace DotnetSpider.Core
 				}
 
 				sw.Stop();
-				UpdatePipelineSpeed(sw.ElapsedMilliseconds);
+				CalculatePipelineSpeed(sw.ElapsedMilliseconds);
 
 				_OnSuccess(request);
 			}
@@ -1109,7 +1103,7 @@ namespace DotnetSpider.Core
 			OnClose();
 		}
 
-		private void UpdateDownloadSpeed(long time)
+		private void CalculateDownloadSpeed(long time)
 		{
 			lock (_avgDownloadTimeLocker)
 			{
@@ -1117,7 +1111,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void UpdateProcessorSpeed(long time)
+		private void CalculateProcessorSpeed(long time)
 		{
 			lock (_avgProcessorTimeLocker)
 			{
@@ -1125,7 +1119,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void UpdatePipelineSpeed(long time)
+		private void CalculatePipelineSpeed(long time)
 		{
 			lock (_avgPipelineTimeLocker)
 			{

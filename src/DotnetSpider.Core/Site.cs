@@ -12,39 +12,52 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Site
 	{
-		public IHttpProxyPool HttpProxyPool { get; set; }
 		private Encoding _encoding = Encoding.UTF8;
 		private string _encodingName;
+		private readonly List<Request> _startRequest = new List<Request>();
 
-		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
-		public Dictionary<string, string> Arguments = new Dictionary<string, string>();
-		public ContentType ContentType { get; set; } = ContentType.Auto;
-		public bool RemoveOutboundLinks { get; set; }
 		/// <summary>
-		/// 采集目标域名的正则
+		/// 代理池
+		/// </summary>
+		public IHttpProxyPool HttpProxyPool { get; set; }
+
+		/// <summary>
+		/// 设置全局Http头
+		/// </summary>
+		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+
+		/// <summary>
+		/// 配置采集的是Json还是Html
+		/// </summary>
+		public ContentType ContentType { get; set; } = ContentType.Auto;
+
+		/// <summary>
+		/// 是否去除外链
+		/// </summary>
+		public bool RemoveOutboundLinks { get; set; }
+
+		/// <summary>
+		/// 采集目标的Domain, 如果RemoveOutboundLinks为True, 则Domain不同的链接会被排除
 		/// </summary>
 		public string[] Domains { get; set; }
-		public Cookies Cookies { get; set; } = new Cookies();
-
-		public Site()
-		{
-#if NET_CORE
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
-		}
 
 		/// <summary>
-		/// User agent
+		/// 设置全局Cookie
+		/// </summary>
+		public Cookies Cookies { get; set; }
+
+		/// <summary>
+		/// 设置 User Agent
 		/// </summary>
 		public string UserAgent { get; set; }
 
 		/// <summary>
-		/// User agent
+		/// 设置 User Accept
 		/// </summary>
 		public string Accept { get; set; } = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
 
 		/// <summary>
-		/// Whether download pictiures
+		/// Whether download pictiures or file
 		/// </summary>
 		public bool DownloadFiles { get; set; }
 
@@ -80,7 +93,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public HashSet<HttpStatusCode> AcceptStatCode { get; set; } = new HashSet<HttpStatusCode> { HttpStatusCode.OK };
 
-		public List<Request> StartRequests { get; set; } = new List<Request>();
+		public List<Request> StartRequests => _startRequest;
 
 		/// <summary>
 		/// Set the interval between the processing of two pages. 
@@ -99,13 +112,11 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public bool IsUseGzip { get; set; }
 
-		public void ClearStartRequests()
+		public Site()
 		{
-			lock (this)
-			{
-				StartRequests.Clear();
-				GC.Collect();
-			}
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
 		}
 
 		/// <summary>
@@ -163,6 +174,14 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		public void ClearStartRequests()
+		{
+			lock (this)
+			{
+				StartRequests.Clear();
+			}
+		}
+
 		/// <summary>
 		/// Put an Http header for downloader. 
 		/// </summary>
@@ -179,21 +198,6 @@ namespace DotnetSpider.Core
 			return this;
 		}
 
-		public override string ToString()
-		{
-			return "Site{" +
-					", userAgent='" + UserAgent + '\'' +
-					", cookies=" + Cookies +
-					", charset='" + Encoding + '\'' +
-					", startRequests=" + StartRequests +
-					", cycleRetryTimes=" + CycleRetryTimes +
-					", timeOut=" + Timeout +
-					", acceptStatCode=" + AcceptStatCode +
-					", headers=" + Headers +
-					'}';
-		}
-
-
 		public UseSpecifiedUriWebProxy GetHttpProxy()
 		{
 			return HttpProxyPool?.GetProxy();
@@ -206,11 +210,22 @@ namespace DotnetSpider.Core
 
 		public string CookiesStringPart
 		{
-			set => Cookies.StringPart = value;
+			set
+			{
+				if (Cookies == null)
+				{
+					Cookies = new Cookies();
+				}
+				Cookies.StringPart = value;
+			}
 		}
 
 		public void SetCookies(Dictionary<string, string> cookies)
 		{
+			if (Cookies == null)
+			{
+				Cookies = new Cookies();
+			}
 			Cookies.PairPart = cookies;
 		}
 	}

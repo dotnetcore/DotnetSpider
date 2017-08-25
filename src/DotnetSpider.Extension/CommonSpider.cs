@@ -9,6 +9,9 @@ using System.Data;
 using NLog;
 using Dapper;
 using DotnetSpider.Extension.Monitor;
+using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Core.Processor;
 
 namespace DotnetSpider.Extension
 {
@@ -48,6 +51,20 @@ namespace DotnetSpider.Extension
 			if (string.IsNullOrEmpty(Identity) || Identity.Length > 120)
 			{
 				throw new ArgumentException("Length of Identity should between 1 and 120.");
+			}
+
+			if (arguments.Contains("skip"))
+			{
+				EmptySleepTime = 1000;
+
+				if (_pipelines == null || _pipelines.Count == 0)
+				{
+					AddPipeline(new NullPipeline());
+				}
+				if (PageProcessors == null || PageProcessors.Count == 0)
+				{
+					AddPageProcessor(new NullPageProcessor());
+				}
 			}
 
 			try

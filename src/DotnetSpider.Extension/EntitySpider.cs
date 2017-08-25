@@ -23,9 +23,6 @@ namespace DotnetSpider.Extension
 
 		public List<Entity> Entities { get; internal set; } = new List<Entity>();
 
-		[JsonIgnore]
-		public PrepareStartUrls[] PrepareStartUrls { get; set; }
-
 		public EntitySpider(string name) : this(name, new Site())
 		{
 		}
@@ -43,6 +40,11 @@ namespace DotnetSpider.Extension
 		{
 			base.PreInitComponent(arguments);
 
+			if (arguments.Contains("skip"))
+			{
+				return;
+			}
+
 			if (Entities == null || Entities.Count == 0)
 			{
 				throw new SpiderException("Count of entity is zero.");
@@ -50,20 +52,20 @@ namespace DotnetSpider.Extension
 
 			foreach (var entity in Entities)
 			{
-				foreach (var pipeline in Pipelines)
+				foreach (var pipeline in _pipelines)
 				{
 					BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
 					newPipeline?.AddEntity(entity);
 				}
 			}
 
-			if (IfRequireInitStartRequests(arguments) && PrepareStartUrls != null)
+			if (IfRequireInitStartRequests(arguments) && StartUrlBuilders != null && StartUrlBuilders.Count > 0)
 			{
-				for (int i = 0; i < PrepareStartUrls.Length; ++i)
+				for (int i = 0; i < StartUrlBuilders.Count; ++i)
 				{
-					var prepareStartUrl = PrepareStartUrls[i];
+					var builder = StartUrlBuilders[i];
 					Logger.MyLog(Identity, $"[{i + 1}] Add extra start urls to scheduler.", LogLevel.Info);
-					prepareStartUrl.Build(this, null);
+					builder.Build(Site);
 				}
 			}
 		}

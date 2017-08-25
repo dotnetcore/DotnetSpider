@@ -9,6 +9,7 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Extension.Processor;
+using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -48,11 +49,10 @@ namespace DotnetSpider.Extension.Test
 			EntityProcessor processor = new EntityProcessor(new Site(), entityMetadata);
 			var page = new Page(new Request("http://www.abcd.com"))
 			{
-				Content = "{'data':[{'age':'1'},{'age':'2'}]}",
-				ContentType = ContentType.Json
+				Content = "{'data':[{'age':'1'},{'age':'2'}]}"
 			};
 			processor.Process(page);
-			Assert.AreEqual(2, page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1").Count);
+			Assert.AreEqual(2, (page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1") as List<JObject>).Count);
 		}
 
 		[Table("test", "sku", TableSuffix.Today)]

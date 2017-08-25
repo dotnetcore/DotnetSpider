@@ -15,6 +15,7 @@ namespace DotnetSpider.Core.Proxy
 		private readonly ConcurrentDictionary<string, Proxy> _allProxy = new ConcurrentDictionary<string, Proxy>();
 		private bool _isDispose;
 		private readonly int _reuseInterval;
+		private readonly object _locker = new object();
 
 		public HttpProxyPool(IProxySupplier supplier, int reuseInterval = 500)
 		{
@@ -39,7 +40,7 @@ namespace DotnetSpider.Core.Proxy
 		{
 			for (int i = 0; i < 3600; ++i)
 			{
-				lock (this)
+				lock (_locker)
 				{
 					var proxy = _proxyQueue.FirstOrDefault(p => DateTimeUtils.GetCurrentTimeStamp() - p.GetLastUseTime() > _reuseInterval);
 					if (proxy != null)
@@ -95,7 +96,7 @@ namespace DotnetSpider.Core.Proxy
 			{
 				return;
 			}
-			lock (this)
+			lock (_locker)
 			{
 				_proxyQueue.Add(p);
 			}

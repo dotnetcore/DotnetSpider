@@ -13,19 +13,22 @@ namespace DotnetSpider.Core.Downloader
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		protected bool IsDetectedContentType { get; set; }
-
-		protected List<IAfterDownloadCompleteHandler> AfterDownloadComplete { get; set; } = new List<IAfterDownloadCompleteHandler>();
-
-		protected List<IBeforeDownloadHandler> BeforeDownload { get; set; } = new List<IBeforeDownloadHandler>();
-
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
+		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
+
+		/// <summary>
+		/// Auto detect content is json or html
+		/// </summary>
+		protected bool DetectContentType { get; set; }
+		protected List<IAfterDownloadCompleteHandler> AfterDownloadComplete => _afterDownloadCompletes;
+		protected List<IBeforeDownloadHandler> BeforeDownload => _beforeDownloads;
 
 		protected string DownloadFolder { get; set; }
 
 		protected BaseDownloader()
 		{
-			DownloadFolder = Path.Combine(Infrastructure.Environment.BaseDirectory, "data");
+			DownloadFolder = Path.Combine(Infrastructure.Environment.BaseDirectory, "download");
 		}
 
 		public Page Download(Request request, ISpider spider)
@@ -37,53 +40,18 @@ namespace DotnetSpider.Core.Downloader
 
 			HandleBeforeDownload(ref request, spider);
 
-			var result = DowloadContent(request, spider);
+			var page = DowloadContent(request, spider);
 
-			_lock.EnterWriteLock();
-			try
-			{
-				if (!IsDetectedContentType)
-				{
-					if (result != null && result.Exception == null && spider.Site.ContentType == ContentType.Auto)
-					{
-						try
-						{
-							JToken.Parse(result.Content);
-							spider.Site.ContentType = ContentType.Json;
-						}
-						catch
-						{
-							spider.Site.ContentType = ContentType.Html;
-						}
-						finally
-						{
-							IsDetectedContentType = true;
-						}
-					}
-				}
-			}
-			finally
-			{
-				_lock.ExitWriteLock();
-			}
+			HandlerAfterDownloadComplete(ref page, spider);
 
-			if (result != null)
-			{
-				result.ContentType = spider.Site.ContentType;
-			}
+			TryDetectContentType(page, spider);
 
-			HandlerAfterDownloadComplete(ref result, spider);
-
-			return result;
+			return page;
 		}
 
 		public virtual IDownloader Clone(ISpider spider)
 		{
 			return (IDownloader)MemberwiseClone();
-		}
-
-		public virtual void Dispose()
-		{
 		}
 
 		public void AddAfterDownloadCompleteHandler(IAfterDownloadCompleteHandler handler)
@@ -94,6 +62,10 @@ namespace DotnetSpider.Core.Downloader
 		public void AddBeforeDownloadHandler(IBeforeDownloadHandler handler)
 		{
 			BeforeDownload.Add(handler);
+		}
+
+		public virtual void Dispose()
+		{
 		}
 
 		protected abstract Page DowloadContent(Request request, ISpider spider);
@@ -152,6 +124,42 @@ namespace DotnetSpider.Core.Downloader
 			}
 			Logger.MyLog(spider.Identity, $"Storage file: {request.Url} success.", LogLevel.Info);
 			return new Page(request, null) { IsSkip = true };
+		}
+
+		private void TryDetectContentType(Page page, ISpider spider)
+		{
+			_lock.EnterWriteLock();
+			try
+			{
+				if (!DetectContentType)
+				{
+					if (page != null && page.Exception == null && spider.Site.ContentType == ContentType.Auto)
+					{
+						try
+						{
+							JToken.Parse(page.Content);
+							spider.Site.ContentType = ContentType.Json;
+						}
+						catch
+						{
+							spider.Site.ContentType = ContentType.Html;
+						}
+						finally
+						{
+							DetectContentType = true;
+						}
+					}
+				}
+			}
+			finally
+			{
+				_lock.ExitWriteLock();
+			}
+
+			if (page != null)
+			{
+				page.ContentType = spider.Site.ContentType;
+			}
 		}
 	}
 }

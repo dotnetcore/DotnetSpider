@@ -107,21 +107,7 @@ namespace DotnetSpider.Sample
 			SkipWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))
 			{
-				PrepareStartUrls = new PrepareStartUrls[]
-				{
-					new BaseDbPrepareStartUrls
-					{
-						BulkInsert=true,
-						ConnectString = Config.ConnectString,
-						QueryString = "SELECT * FROM taobao.result_keywords limit 10000",
-						Columns = new []
-						{
-							new DataColumn ("bidwordstr"),
-							new DataColumn ("tab")
-						},
-						FormateStrings = new List<string> { "https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}" }
-					}
-				};
+				AddStartUrlBuilder(new DbStartUrlBuilder(DataSource.MySql, Config.ConnectString, "SELECT * FROM taobao.result_keywords limit 10000", new[] { "bidwordstr", "tab" }, "https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}"));
 			}
 			AddEntityType(typeof(Item), new MyDataHanlder());
 		}

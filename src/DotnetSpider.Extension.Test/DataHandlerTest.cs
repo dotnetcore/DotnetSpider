@@ -45,8 +45,7 @@ namespace DotnetSpider.Extension.Test
 			EntityProcessor processor = new EntityProcessor(new Site(), entityMetadata);
 			processor.Process(new Page(new Request("http://www.abcd.com"))
 			{
-				Content = "{}",
-				ContentType = ContentType.Json
+				Content = "{}"
 			});
 			Assert.IsTrue(File.Exists(identity));
 			File.Delete(identity);

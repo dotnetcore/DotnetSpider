@@ -31,7 +31,7 @@ namespace DotnetSpider.Core
 
 		public string Title { get; set; }
 
-		public ContentType ContentType { get; set; } = ContentType.Html;
+		internal ContentType ContentType { get; set; } = ContentType.Html;
 
 		/// <summary>
 		/// Get request of current page
