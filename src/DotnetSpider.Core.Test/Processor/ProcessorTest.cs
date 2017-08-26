@@ -45,7 +45,7 @@ namespace DotnetSpider.Core.Test.Processor
 			// start crawler 启动爬虫
 			spider.Run();
 
-			Assert.AreEqual(4, spider.RetriedTimes.Value);
+			Assert.AreEqual(5, spider.RetriedTimes.Value);
 			Assert.AreEqual(0, scheduler.LeftRequestsCount);
 			Assert.AreEqual(6, scheduler.SuccessRequestsCount);
 			Assert.AreEqual(5, scheduler.ErrorRequestsCount);

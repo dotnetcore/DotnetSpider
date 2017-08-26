@@ -68,7 +68,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			if (page.Content.Contains(Content))
 			{
-				page.IsSkip = true;
+				page.Skip = true;
 				return false;
 			}
 			return true;

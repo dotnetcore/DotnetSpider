@@ -292,14 +292,14 @@ namespace DotnetSpider.Core
 				{
 					int cycleTriedTimes = (int)cycleTriedTimesObject;
 					cycleTriedTimes++;
-					if (cycleTriedTimes >= site.CycleRetryTimes)
+					if (cycleTriedTimes > site.CycleRetryTimes)
 					{
 						return null;
 					}
 					request.Priority = 0;
 					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, cycleTriedTimes), false);
 				}
-				page.IsNeedCycleRetry = true;
+				page.Retry = true;
 				return page;
 			}
 			else
@@ -314,14 +314,14 @@ namespace DotnetSpider.Core
 				{
 					int cycleTriedTimes = (int)cycleTriedTimesObject;
 					cycleTriedTimes++;
-					if (cycleTriedTimes >= site.CycleRetryTimes)
+					if (cycleTriedTimes > site.CycleRetryTimes)
 					{
 						return null;
 					}
 					request.Priority = 0;
 					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, cycleTriedTimes), false);
 				}
-				page.IsNeedCycleRetry = true;
+				page.Retry = true;
 				return page;
 			}
 		}
@@ -933,7 +933,7 @@ namespace DotnetSpider.Core
 				sw.Stop();
 				CalculateDownloadSpeed(sw.ElapsedMilliseconds);
 
-				if (page == null || page.IsSkip)
+				if (page == null || page.Skip)
 				{
 					return;
 				}
@@ -976,7 +976,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 			// 此处是用于需要循环本身的场景, 不能使用本身Request的原因是Request的尝试次数计算问题
-			if (page.IsNeedCycleRetry)
+			if (page.Retry)
 			{
 				RetriedTimes.Inc();
 				ExtractAndAddRequests(page, true);
@@ -1031,7 +1031,7 @@ namespace DotnetSpider.Core
 						if (Site.CycleRetryTimes > 0)
 						{
 							page = AddToCycleRetry(request, Site, true);
-							if (page != null && page.IsNeedCycleRetry)
+							if (page != null && page.Retry)
 							{
 								RetriedTimes.Inc();
 								ExtractAndAddRequests(page, true);

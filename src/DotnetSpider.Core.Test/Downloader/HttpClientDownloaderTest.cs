@@ -104,7 +104,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			spider.AddPipeline(new ConsolePipeline());
 			spider.AddStartUrl("http://www.mlr.gov.cn/xwdt/jrxw/201707/t20170710_15242382.htm");
 			spider.Run();
-			Assert.AreEqual(4, spider.RetriedTimes.Value);
+			Assert.AreEqual(5, spider.RetriedTimes.Value);
 		}
 
 		class HttpClientDownloader2 : HttpClientDownloader

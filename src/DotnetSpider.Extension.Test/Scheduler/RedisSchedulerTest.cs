@@ -282,7 +282,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			// start crawler 启动爬虫
 			spider.Run();
 
-			Assert.AreEqual(4, spider.RetriedTimes.Value);
+			Assert.AreEqual(5, spider.RetriedTimes.Value);
 			Assert.AreEqual(0, scheduler.LeftRequestsCount);
 			Assert.AreEqual(6, scheduler.SuccessRequestsCount);
 			// 重试次数应该包含

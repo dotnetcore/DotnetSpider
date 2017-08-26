@@ -38,7 +38,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Request Request { get; }
 
-		public bool IsNeedCycleRetry { get; set; }
+		public bool Retry { get; set; }
 
 		public bool SkipExtractTargetUrls { get; set; }
 
@@ -63,7 +63,7 @@ namespace DotnetSpider.Core
 
 		public bool SkipTargetUrls { get; set; }
 
-		public bool IsSkip
+		public bool Skip
 		{
 			get => ResultItems.IsSkip;
 			set => ResultItems.IsSkip = value;

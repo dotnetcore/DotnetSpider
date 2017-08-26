@@ -133,7 +133,7 @@ namespace DotnetSpider.Core.Test
 		{
 			protected override void Handle(Page page)
 			{
-				page.IsSkip = true;
+				page.Skip = true;
 			}
 		}
 

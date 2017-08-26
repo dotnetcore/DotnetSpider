@@ -11,9 +11,9 @@ namespace DotnetSpider.Core.Test.Infrastructure
 		{
 			var result = HttpSender.GetHtml(new HttpRequest
 			{
-				Url = "http://163.com"
+				Url = "https://www.cnblogs.com/"
 			});
-			Assert.IsTrue(result.Html.Contains("网易"));
+			Assert.IsTrue(result.Html.Contains("博客园"));
 		}
 	}
 }
