@@ -25,6 +25,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		private void ClearDb()
 		{
+
 			using (SqlConnection conn = new SqlConnection(ConnectString))
 			{
 				var tableName = $"sku_{DateTime.Now.ToString("yyyy_MM_dd")}";
@@ -250,6 +251,234 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			Assert.AreEqual(1, insertPipeline2.GetUpdateColumns(metadata2.Name).Length);
 			Assert.AreEqual("Value", insertPipeline2.GetUpdateColumns(metadata2.Name).First());
 		}
+
+		//#region Use App.config
+
+		//[TestMethod]
+		//public void UpdateUseAppConfig()
+		//{
+		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
+		//	ClearDb();
+
+		//	using (SqlConnection conn = new SqlConnection(ConnectString))
+		//	{
+		//		ISpider spider = new DefaultSpider("test", new Site());
+
+		//		SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline();
+		//		var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+		//		insertPipeline.AddEntity(metadata);
+		//		insertPipeline.InitPipeline(spider);
+
+		//		JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+		//		JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+		//		insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
+
+		//		SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline();
+		//		var metadat2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
+		//		updatePipeline.AddEntity(metadat2);
+		//		updatePipeline.InitPipeline(spider);
+
+		//		JObject data3 = new JObject { { "Sku", "110" }, { "Category", "4C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+		//		updatePipeline.Process(metadat2.Name, new List<JObject> { data3 });
+
+		//		var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+		//		Assert.AreEqual(2, list.Count);
+		//		Assert.AreEqual("110", list[0].Sku);
+		//		Assert.AreEqual("4C", list[0].Category);
+		//	}
+
+		//	ClearDb();
+		//}
+
+		//[TestMethod]
+		//public void UpdateWhenUnionPrimaryUseAppConfig()
+		//{
+		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
+		//	ClearDb();
+
+		//	using (SqlConnection conn = new SqlConnection(ConnectString))
+		//	{
+		//		ISpider spider = new DefaultSpider("test", new Site());
+
+		//		SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline();
+		//		var metadata = EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo());
+		//		insertPipeline.AddEntity(metadata);
+		//		insertPipeline.InitPipeline(spider);
+
+		//		JObject data1 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+		//		JObject data2 = new JObject { { "Sku", "111" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+		//		insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
+
+		//		SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline();
+		//		var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(Product2Update).GetTypeInfo());
+		//		updatePipeline.AddEntity(metadata2);
+		//		updatePipeline.InitPipeline(spider);
+
+		//		JObject data3 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+		//		updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
+
+		//		var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+		//		Assert.AreEqual(2, list.Count);
+		//		Assert.AreEqual("110", list[0].Sku);
+		//		Assert.AreEqual("AAAA", list[0].Category);
+		//	}
+
+		//	ClearDb();
+		//}
+
+		//[TestMethod]
+		//public void UpdateCheckIfSameBeforeUpdateUseAppConfig()
+		//{
+		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
+
+		//	ClearDb();
+
+		//	using (SqlConnection conn = new SqlConnection(ConnectString))
+		//	{
+		//		ISpider spider = new DefaultSpider("test", new Site());
+
+		//		SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline();
+		//		var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+		//		insertPipeline.AddEntity(metadata);
+		//		insertPipeline.InitPipeline(spider);
+
+		//		JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+		//		JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+		//		insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
+
+		//		SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(null, true);
+		//		var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
+		//		updatePipeline.AddEntity(metadata2);
+		//		updatePipeline.InitPipeline(spider);
+
+		//		JObject data3 = new JObject { { "Sku", "110" }, { "Category", "4C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+		//		updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
+
+		//		var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+		//		Assert.AreEqual(2, list.Count);
+		//		Assert.AreEqual("110", list[0].Sku);
+		//		Assert.AreEqual("4C", list[0].Category);
+		//	}
+
+		//	ClearDb();
+		//}
+
+		//[TestMethod]
+		//public void UpdateWhenUnionPrimaryCheckIfSameBeforeUpdateUseAppConfig()
+		//{
+		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
+		//	ClearDb();
+
+		//	using (SqlConnection conn = new SqlConnection(ConnectString))
+		//	{
+		//		ISpider spider = new DefaultSpider("test", new Site());
+
+		//		SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline();
+		//		var metadata = EntitySpider.GenerateEntityMetaData(typeof(Product2).GetTypeInfo());
+		//		insertPipeline.AddEntity(metadata);
+		//		insertPipeline.InitPipeline(spider);
+
+		//		JObject data1 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+		//		JObject data2 = new JObject { { "Sku", "111" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+		//		insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
+
+		//		SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(null, true);
+		//		var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(Product2Update).GetTypeInfo());
+		//		updatePipeline.AddEntity(EntitySpider.GenerateEntityMetaData(typeof(Product2Update).GetTypeInfo()));
+		//		updatePipeline.InitPipeline(spider);
+
+		//		JObject data3 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+		//		updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
+
+		//		var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+		//		Assert.AreEqual(2, list.Count);
+		//		Assert.AreEqual("110", list[0].Sku);
+		//		Assert.AreEqual("AAAA", list[0].Category);
+		//	}
+
+		//	ClearDb();
+		//}
+
+		//[TestMethod]
+		//public void InsertUseAppConfig()
+		//{
+		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
+
+		//	ClearDb();
+
+		//	using (SqlConnection conn = new SqlConnection(ConnectString))
+		//	{
+		//		ISpider spider = new DefaultSpider("test", new Site());
+
+		//		SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline();
+		//		var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+		//		insertPipeline.AddEntity(EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo()));
+		//		insertPipeline.InitPipeline(spider);
+
+		//		// Common data
+		//		JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+		//		JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+		//		// Value is null
+		//		JObject data3 = new JObject { { "Sku", "112" }, { "Category", null }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+		//		insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2, data3 });
+
+		//		var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+		//		Assert.AreEqual(3, list.Count);
+		//		Assert.AreEqual("110", list[0].Sku);
+		//		Assert.AreEqual("111", list[1].Sku);
+		//		Assert.AreEqual(null, list[2].Category);
+		//	}
+
+		//	ClearDb();
+		//}
+
+		//[TestMethod]
+		//public void DefineUpdateEntityUseAppConfig()
+		//{
+		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
+		//	SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline();
+		//	try
+		//	{
+		//		insertPipeline.AddEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity1).GetTypeInfo()));
+		//		throw new SpiderException("TEST FAILED.");
+		//	}
+		//	catch (SpiderException e)
+		//	{
+		//		Assert.AreEqual("Columns set as Primary is not a property of your entity.", e.Message);
+		//	}
+
+		//	try
+		//	{
+		//		insertPipeline.AddEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity2).GetTypeInfo()));
+		//		throw new SpiderException("TEST FAILED.");
+		//	}
+		//	catch (SpiderException e)
+		//	{
+		//		Assert.AreEqual("Columns set as update is not a property of your entity.", e.Message);
+		//	}
+
+		//	try
+		//	{
+		//		insertPipeline.AddEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity3).GetTypeInfo()));
+		//		throw new SpiderException("TEST FAILED.");
+		//	}
+		//	catch (SpiderException e)
+		//	{
+		//		Assert.AreEqual("There is no column need update.", e.Message);
+		//	}
+		//	var metadata = EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity4).GetTypeInfo());
+		//	insertPipeline.AddEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity4).GetTypeInfo()));
+		//	Assert.AreEqual(1, insertPipeline.GetUpdateColumns(metadata.Name).Length);
+		//	Assert.AreEqual("Value", insertPipeline.GetUpdateColumns(metadata.Name).First());
+
+		//	SqlServerEntityPipeline insertPipeline2 = new SqlServerEntityPipeline(ConnectString);
+		//	var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity5).GetTypeInfo());
+		//	insertPipeline2.AddEntity(metadata2);
+		//	Assert.AreEqual(1, insertPipeline2.GetUpdateColumns(metadata2.Name).Length);
+		//	Assert.AreEqual("Value", insertPipeline2.GetUpdateColumns(metadata2.Name).First());
+		//}
+
+		//#endregion
 
 		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]

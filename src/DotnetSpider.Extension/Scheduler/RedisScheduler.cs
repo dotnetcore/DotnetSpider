@@ -31,9 +31,16 @@ namespace DotnetSpider.Extension.Scheduler
 		public override bool IsNetworkScheduler => true;
 		public RedisConnection RedisConnection { get; private set; }
 
-		public RedisScheduler(string connectString) : this()
+		public RedisScheduler(string connectString)
 		{
 			ConnectString = connectString;
+			DuplicateRemover = this;
+		}
+
+		public RedisScheduler()
+		{
+			ConnectString = Environment.RedisConnectString;
+			DuplicateRemover = this;
 		}
 
 		public override void Init(ISpider spider)
@@ -58,7 +65,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 				_identityMd5 = md5;
 
-				NetworkCenter.Current.Execute("rds-in", () =>
+				NetworkCenter.Current.Execute("rdsin", () =>
 				{
 					RedisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
 				});
@@ -67,7 +74,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void ResetDuplicateCheck()
 		{
-			NetworkCenter.Current.Execute("rds-rs", () =>
+			NetworkCenter.Current.Execute("rdsrd", () =>
 			{
 				RedisConnection.Database.KeyDelete(_setKey);
 			});
@@ -88,7 +95,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override Request Poll()
 		{
-			return NetworkCenter.Current.Execute("rds-pl", () =>
+			return NetworkCenter.Current.Execute("rdspl", () =>
 			{
 				return RetryExecutor.Execute(30, () =>
 				{
@@ -115,14 +122,14 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override long LeftRequestsCount
 		{
-			get { return NetworkCenter.Current.Execute("rds-lc", () => RedisConnection.Database.ListLength(_queueKey)); }
+			get { return NetworkCenter.Current.Execute("rdslc", () => RedisConnection.Database.ListLength(_queueKey)); }
 		}
 
 		public override long TotalRequestsCount
 		{
 			get
 			{
-				return NetworkCenter.Current.Execute("rds-tc", () => RedisConnection.Database.SetLength(_setKey));
+				return NetworkCenter.Current.Execute("rdstc", () => RedisConnection.Database.SetLength(_setKey));
 			}
 		}
 
@@ -130,7 +137,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			get
 			{
-				return NetworkCenter.Current.Execute("rds-src", () =>
+				return NetworkCenter.Current.Execute("rdssrc", () =>
 				{
 					var result = RedisConnection.Database.HashGet(_successCountKey, _identityMd5);
 					return result.HasValue ? (long)result : 0;
@@ -142,7 +149,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			get
 			{
-				return NetworkCenter.Current.Execute("rds-erc", () =>
+				return NetworkCenter.Current.Execute("rdserc", () =>
 				{
 					var result = RedisConnection.Database.HashGet(_errorCountKey, _identityMd5);
 					return result.HasValue ? (long)result : 0;
@@ -152,7 +159,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void IncreaseSuccessCount()
 		{
-			NetworkCenter.Current.Execute("rds-isc", () =>
+			NetworkCenter.Current.Execute("rdsisc", () =>
 			{
 				RedisConnection.Database.HashIncrement(_successCountKey, _identityMd5);
 			});
@@ -160,7 +167,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void IncreaseErrorCount()
 		{
-			NetworkCenter.Current.Execute("rds-iec", () =>
+			NetworkCenter.Current.Execute("rdsiec", () =>
 			{
 				RedisConnection.Database.HashIncrement(_errorCountKey, _identityMd5);
 			});
@@ -275,11 +282,6 @@ namespace DotnetSpider.Extension.Scheduler
 
 				RedisConnection.Database.HashSet(_itemKey, field, value);
 			});
-		}
-
-		private RedisScheduler()
-		{
-			DuplicateRemover = this;
 		}
 
 		#region For Test

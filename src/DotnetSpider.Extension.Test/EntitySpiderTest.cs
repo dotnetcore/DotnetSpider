@@ -12,10 +12,9 @@ using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Core.Selector;
-using MySql.Data.MySqlClient;
 using Dapper;
 using System.Collections.Generic;
-using System.Linq;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -162,7 +161,7 @@ namespace DotnetSpider.Extension.Test
 			var guid = Guid.NewGuid().ToString();
 			BaiduSearchSpider spider = new BaiduSearchSpider(guid);
 			spider.Run();
-			using (var conn = new MySqlConnection(Config.ConnectString))
+			using (var conn = Core.Environment.DataConnectionStringSettings.GetDbConnection())
 			{
 				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{guid}'");
 				Assert.AreEqual(20, count);

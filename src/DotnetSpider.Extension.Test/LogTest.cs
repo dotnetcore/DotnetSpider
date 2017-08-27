@@ -1,11 +1,11 @@
 ﻿using Dapper;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Extension.Monitor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MySql.Data.MySqlClient;
 using System;
 using System.Linq;
 
@@ -25,9 +25,6 @@ namespace DotnetSpider.Extension.Test
 			string id = Guid.NewGuid().ToString("N");
 			string taskGroup = Guid.NewGuid().ToString("N");
 			string userId = Guid.NewGuid().ToString("N");
-			string connectString = "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306";
-			Core.Infrastructure.Config.SetValue("connectString", connectString);
-			Assert.AreEqual("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", Core.Infrastructure.Config.GetValue("connectString"));
 
 			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 				id,
@@ -43,7 +40,7 @@ namespace DotnetSpider.Extension.Test
 				spider.Monitor = new DbMonitor(id);
 				spider.Run();
 			}
-			using (MySqlConnection conn = new MySqlConnection(connectString))
+			using (var conn = (Core.Environment.SystemConnectionStringSettings.GetDbConnection()))
 			{
 				Assert.AreEqual(15, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{id}'").First().Count);
 				Assert.AreEqual(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count);

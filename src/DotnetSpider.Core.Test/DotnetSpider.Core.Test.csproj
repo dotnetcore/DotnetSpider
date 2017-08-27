@@ -31,9 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="config.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Jd.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

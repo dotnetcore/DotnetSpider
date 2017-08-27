@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Test.Processor
 	public class ProcessorTest
 	{
 		[TestMethod]
-		public void ProcessException()
+		public void ProcesserException()
 		{
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
 

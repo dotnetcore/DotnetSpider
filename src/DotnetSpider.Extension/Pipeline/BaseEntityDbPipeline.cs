@@ -13,31 +13,33 @@ using System.Collections.Concurrent;
 using NLog;
 using DotnetSpider.Core.Redial;
 using DotnetSpider.Extension.Infrastructure;
+using System.Configuration;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class BaseEntityDbPipeline : BaseEntityPipeline
 	{
-		protected abstract DbConnection CreateConnection();
-		protected abstract string GetInsertSql(EntityDbMetadata metadata);
-		protected abstract string GetUpdateSql(EntityDbMetadata metadata);
-		protected abstract string GetSelectSql(EntityDbMetadata metadata);
-		protected abstract string GetCreateTableSql(EntityDbMetadata metadata);
-		protected abstract string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion);
-		protected abstract string GetIfSchemaExistsSql(EntityDbMetadata metadata, string serverVersion);
+		protected abstract ConnectionStringSettings CreateConnectionStringSettings(string connectString = null);
+		protected abstract string GenerateInsertSql(EntityDbMetadata metadata);
+		protected abstract string GenerateUpdateSql(EntityDbMetadata metadata);
+		protected abstract string GenerateSelectSql(EntityDbMetadata metadata);
+		protected abstract string GenerateCreateTableSql(EntityDbMetadata metadata);
+		protected abstract string GenerateCreateDatabaseSql(EntityDbMetadata metadata, string serverVersion);
+		protected abstract string GenerateIfDatabaseExistsSql(EntityDbMetadata metadata, string serverVersion);
 		protected abstract DbParameter CreateDbParameter(string name, object value);
 
 		protected ConcurrentDictionary<string, EntityDbMetadata> DbMetadatas { get; set; } = new ConcurrentDictionary<string, EntityDbMetadata>();
 
 		public IUpdateConnectString UpdateConnectString { get; set; }
 
-		public string ConnectString { get; set; }
+		public ConnectionStringSettings ConnectionStringSettings { get; private set; }
 
 		public bool CheckIfSameBeforeUpdate { get; set; }
 
-		protected BaseEntityDbPipeline(string connectString, bool checkIfSaveBeforeUpdate = false)
+		protected BaseEntityDbPipeline(string connectString = null, bool checkIfSaveBeforeUpdate = false)
 		{
-			ConnectString = connectString;
+			ConnectionStringSettings = CreateConnectionStringSettings(connectString);
 			CheckIfSameBeforeUpdate = checkIfSaveBeforeUpdate;
 		}
 
@@ -45,7 +47,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.Table == null)
 			{
-				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Pass {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
+				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Skip {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
 			EntityDbMetadata dbMetadata = new EntityDbMetadata { Table = metadata.Table };
@@ -59,11 +61,11 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			if (dbMetadata.Columns.Count == 0)
 			{
-				throw new SpiderException($"Columns is necessary, Pass {GetType().Name} for {metadata.Name}.");
+				throw new SpiderException($"Columns is necessary, Skip {GetType().Name} for {metadata.Name}.");
 			}
 			if (!string.IsNullOrEmpty(metadata.Table.Primary))
 			{
-				if (metadata.Table.Primary != Core.Infrastructure.Environment.IdColumn)
+				if (metadata.Table.Primary != Core.Environment.IdColumn)
 				{
 					var items = new HashSet<string>(metadata.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 					if (items.Count > 0)
@@ -84,13 +86,13 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 					else
 					{
-						dbMetadata.Table.Primary = Core.Infrastructure.Environment.IdColumn;
+						dbMetadata.Table.Primary = Core.Environment.IdColumn;
 					}
 				}
 			}
 			else
 			{
-				dbMetadata.Table.Primary = Core.Infrastructure.Environment.IdColumn;
+				dbMetadata.Table.Primary = Core.Environment.IdColumn;
 			}
 
 			if (dbMetadata.Table.UpdateColumns != null && dbMetadata.Table.UpdateColumns.Length > 0)
@@ -112,10 +114,10 @@ namespace DotnetSpider.Extension.Pipeline
 					throw new SpiderException("There is no column need update.");
 				}
 
-				dbMetadata.SelectSql = GetSelectSql(dbMetadata);
-				dbMetadata.UpdateSql = GetUpdateSql(dbMetadata);
+				dbMetadata.SelectSql = GenerateSelectSql(dbMetadata);
+				dbMetadata.UpdateSql = GenerateUpdateSql(dbMetadata);
 
-				dbMetadata.IsInsertModel = false;
+				dbMetadata.InsertModel = false;
 			}
 
 			if (dbMetadata.Table.Indexs != null && dbMetadata.Table.Indexs.Length > 0)
@@ -169,17 +171,17 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 
-			dbMetadata.InsertSql = GetInsertSql(dbMetadata);
+			dbMetadata.InsertSql = GenerateInsertSql(dbMetadata);
 			DbMetadatas.TryAdd(metadata.Name, dbMetadata);
 		}
 
 		public override void InitPipeline(ISpider spider)
 		{
-			if (string.IsNullOrEmpty(ConnectString))
+			if (ConnectionStringSettings == null)
 			{
 				if (UpdateConnectString == null)
 				{
-					throw new SpiderException("Can't find ConnectString or IUpdateConnectString.");
+					throw new SpiderException("ConnectionStringSettings or IUpdateConnectString are unfound.");
 				}
 				else
 				{
@@ -187,7 +189,7 @@ namespace DotnetSpider.Extension.Pipeline
 					{
 						try
 						{
-							ConnectString = UpdateConnectString.GetNew();
+							ConnectionStringSettings = UpdateConnectString.GetNew();
 							break;
 						}
 						catch (Exception e)
@@ -197,9 +199,9 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 					}
 
-					if (string.IsNullOrEmpty(ConnectString))
+					if (ConnectionStringSettings == null)
 					{
-						throw new SpiderException("Can't updadate ConnectString via IUpdateConnectString.");
+						throw new SpiderException("Can not update ConnectionStringSettings via IUpdateConnectString.");
 					}
 				}
 			}
@@ -209,26 +211,26 @@ namespace DotnetSpider.Extension.Pipeline
 
 			foreach (var metadata in DbMetadatas.Values)
 			{
-				if (!metadata.IsInsertModel)
+				if (!metadata.InsertModel)
 				{
 					continue;
 				}
 
-				NetworkCenter.Current.Execute("db-init", () =>
+				NetworkCenter.Current.Execute("dbi", () =>
 				{
-					using (DbConnection conn = CreateConnection())
+					using (var conn = ConnectionStringSettings.GetDbConnection())
 					{
 						var command = conn.CreateCommand();
-						command.CommandText = GetIfSchemaExistsSql(metadata, conn.ServerVersion);
+						command.CommandText = GenerateIfDatabaseExistsSql(metadata, conn.ServerVersion);
 
 						if (Convert.ToInt16(command.ExecuteScalar()) == 0)
 						{
-							command.CommandText = GetCreateSchemaSql(metadata, conn.ServerVersion);
+							command.CommandText = GenerateCreateDatabaseSql(metadata, conn.ServerVersion);
 							command.CommandType = CommandType.Text;
 							command.ExecuteNonQuery();
 						}
 
-						command.CommandText = GetCreateTableSql(metadata);
+						command.CommandText = GenerateCreateTableSql(metadata);
 						command.CommandType = CommandType.Text;
 						command.ExecuteNonQuery();
 					}
@@ -241,11 +243,11 @@ namespace DotnetSpider.Extension.Pipeline
 			EntityDbMetadata metadata;
 			if (DbMetadatas.TryGetValue(entityName, out metadata))
 			{
-				NetworkCenter.Current.Execute("pp-", () =>
+				NetworkCenter.Current.Execute("pp", () =>
 				{
-					if (metadata.IsInsertModel)
+					if (metadata.InsertModel)
 					{
-						using (var conn = CreateConnection())
+						using (var conn = ConnectionStringSettings.GetDbConnection())
 						{
 							var cmd = conn.CreateCommand();
 							cmd.CommandText = metadata.InsertSql;
@@ -271,7 +273,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 					else
 					{
-						using (var conn = CreateConnection())
+						using (var conn = ConnectionStringSettings.GetDbConnection())
 						{
 							foreach (var data in datas)
 							{
@@ -284,7 +286,7 @@ namespace DotnetSpider.Extension.Pipeline
 									List<DbParameter> selectParameters = new List<DbParameter>();
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@{Core.Infrastructure.Environment.IdColumn}", data.SelectToken(Core.Infrastructure.Environment.IdColumn)?.Value<string>());
+										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data.SelectToken(Core.Environment.IdColumn)?.Value<string>());
 										primaryParameter.DbType = DbType.String;
 										selectParameters.Add(primaryParameter);
 									}
@@ -349,7 +351,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@{Core.Infrastructure.Environment.IdColumn}", data.SelectToken(Core.Infrastructure.Environment.IdColumn)?.Value<string>());
+										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data.SelectToken(Core.Environment.IdColumn)?.Value<string>());
 										primaryParameter.DbType = DbType.String;
 										parameters.Add(primaryParameter);
 									}

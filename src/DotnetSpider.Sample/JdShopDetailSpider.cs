@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DotnetSpider.Core.Infrastructure;
+﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
@@ -9,6 +8,7 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Sample
 {
@@ -35,11 +35,11 @@ namespace DotnetSpider.Sample
 			//});
 
 			AddStartUrlBuilder(
-				new DbStartUrlBuilder(DataSource.MySql, "Database='test';Data Source= localhost;User ID=root;Password=1qazZAQ!;Port=3306",
+				new DbStartUrlBuilder(Database.MySql, "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306;SslMode=None;",
 				$"SELECT * FROM jd.sku_v2_{DateTimeUtils.RunIdOfMonday} WHERE shopname is null or shopid is null order by sku",
 				new[] { "sku" }, "http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json"));
 
-			AddPipeline(new MySqlEntityPipeline("Database='taobao';Data Source=localhost ;User ID=root;Password=1qazZAQ!;Port=4306"));
+			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306;SslMode=None;"));
 			AddEntityType(typeof(ProductUpdater));
 		}
 

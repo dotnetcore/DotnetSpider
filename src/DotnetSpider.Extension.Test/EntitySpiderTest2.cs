@@ -15,7 +15,7 @@ using System.Linq;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.IO;
-using DotnetSpider.Core.Infrastructure;
+using System.Configuration;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -28,9 +28,9 @@ namespace DotnetSpider.Extension.Test
 			{
 			}
 
-			protected override DbConnection CreateConnection()
+			protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
 			{
-				throw new NotImplementedException();
+				return new ConnectionStringSettings();
 			}
 
 			protected override DbParameter CreateDbParameter(string name, object value)
@@ -38,32 +38,32 @@ namespace DotnetSpider.Extension.Test
 				throw new NotImplementedException();
 			}
 
-			protected override string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion)
+			protected override string GenerateCreateDatabaseSql(EntityDbMetadata metadata, string serverVersion)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GetCreateTableSql(EntityDbMetadata metadata)
+			protected override string GenerateCreateTableSql(EntityDbMetadata metadata)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GetIfSchemaExistsSql(EntityDbMetadata metadata, string serverVersion)
+			protected override string GenerateIfDatabaseExistsSql(EntityDbMetadata metadata, string serverVersion)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GetInsertSql(EntityDbMetadata metadata)
+			protected override string GenerateInsertSql(EntityDbMetadata metadata)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GetSelectSql(EntityDbMetadata metadata)
+			protected override string GenerateSelectSql(EntityDbMetadata metadata)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GetUpdateSql(EntityDbMetadata metadata)
+			protected override string GenerateUpdateSql(EntityDbMetadata metadata)
 			{
 				throw new NotImplementedException();
 			}
@@ -311,7 +311,7 @@ namespace DotnetSpider.Extension.Test
 		public void MySqlFileEntityPipeline_InsertSql()
 		{
 			var id = Guid.NewGuid().ToString("N");
-			var folder = Path.Combine(Core.Infrastructure.Environment.BaseDirectory, id);
+			var folder = Path.Combine(Core.Environment.BaseDirectory, id);
 			var path = Path.Combine(folder, "mysql", "baidu.baidu_search_mysql_file.sql");
 			try
 			{
@@ -321,7 +321,7 @@ namespace DotnetSpider.Extension.Test
 
 				var lines = File.ReadAllLines(path);
 				Assert.AreEqual(20, lines.Length);
-				using (var conn = new MySqlConnection(Config.ConnectString))
+				using (var conn = new MySqlConnection(Core.Environment.DataConnectionStringSettings.ConnectionString))
 				{
 					conn.Execute("DELETE FROM baidu.baidu_search_mysql_file");
 					foreach (var sql in lines)
@@ -354,7 +354,7 @@ namespace DotnetSpider.Extension.Test
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				AddEntityType(typeof(BaiduSearchEntry));
-				AddPipeline(new MySqlEntityPipeline(Config.ConnectString));
+				AddPipeline(new MySqlEntityPipeline(Core.Environment.DataConnectionStringSettings.ConnectionString));
 				AddPipeline(new MySqlFileEntityPipeline(MySqlFileEntityPipeline.FileType.InsertSql));
 			}
 
@@ -420,7 +420,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.AreEqual(4, entityPipelines.Count);
 
 			var pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
-			Assert.AreEqual("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", pipeline1.ConnectString);
+			Assert.AreEqual("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306", pipeline1.ConnectionStringSettings.ConnectionString);
 
 			Assert.AreEqual("MySqlFileEntityPipeline", entityPipelines[1].GetType().Name);
 			Assert.AreEqual("ConsoleEntityPipeline", entityPipelines[2].GetType().Name);
@@ -470,7 +470,7 @@ namespace DotnetSpider.Extension.Test
 				Assert.AreEqual("Double", columns[5].Name);
 				Assert.AreEqual("String1", columns[6].Name);
 				Assert.AreEqual("cdate", columns[7].Name);
-				Assert.AreEqual(Core.Infrastructure.Environment.IdColumn, columns[8].Name);
+				Assert.AreEqual(Core.Environment.IdColumn, columns[8].Name);
 
 				Assert.AreEqual("int(11)", columns[0].Type);
 				Assert.AreEqual("bigint(20)", columns[1].Type);
@@ -518,7 +518,7 @@ namespace DotnetSpider.Extension.Test
 				Assert.AreEqual("Float", columns[3].Name);
 				Assert.AreEqual("Double", columns[4].Name);
 				Assert.AreEqual("BigInt", columns[5].Name);
-				Assert.AreEqual(Core.Infrastructure.Environment.IdColumn, columns[6].Name);
+				Assert.AreEqual(Core.Environment.IdColumn, columns[6].Name);
 				Assert.AreEqual("String", columns[7].Name);
 				Assert.AreEqual("String1", columns[8].Name);
 

@@ -7,14 +7,14 @@ using Microsoft.Extensions.DependencyModel;
 using System.Text;
 #endif
 
-namespace DotnetSpider.Runner
+namespace DotnetSpider.Core
 {
 	public class Startup
 	{
 		public static void Run(params string[] args)
 		{
-			PrintInfo();
-
+			Console.WriteLine("");
+			Spider.PrintInfo();
 			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			var commands = string.Join(" ", args);
@@ -98,9 +98,8 @@ namespace DotnetSpider.Runner
 						var isNamed = interfaces.Any(t => t.FullName == "DotnetSpider.Core.INamed");
 						var isIdentity = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IIdentity");
 						var isRunnable = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IRunable");
-						var isTask = interfaces.Any(t => t.FullName == "DotnetSpider.Extension.ITask");
 
-						if (isNamed && isRunnable && isIdentity && isTask)
+						if (isNamed && isRunnable && isIdentity)
 						{
 							var property = type.GetProperties().First(p => p.Name == "Name");
 							object runner = Activator.CreateInstance(type);
@@ -184,10 +183,6 @@ namespace DotnetSpider.Runner
 			var spiderType = spider.GetType();
 			var method = spiderType.GetMethod("Run");
 
-			//CreateTable();
-
-			//InsertExecuteRecord(spiderName, commands, taskId, identity);
-
 			if (!arguments.ContainsKey("-a"))
 			{
 				method.Invoke(spider, new object[] { new string[] { } });
@@ -206,40 +201,6 @@ namespace DotnetSpider.Runner
 
 				method.Invoke(spider, new object[] { parameters });
 			}
-		}
-
-		private static void PrintInfo()
-		{
-			Console.WriteLine();
-
-			var key = "_DotnetSpider_Info";
-
-#if !NET_CORE
-			var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
-#else
-			bool isPrinted;
-			AppContext.TryGetSwitch(key, out isPrinted);
-#endif
-			if (!isPrinted)
-			{
-				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine("=================================================================");
-				Console.WriteLine("== DotnetSpider is an open source C# crawler.                  ==");
-				Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
-				Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
-				Console.WriteLine("== License: LGPL3.0                                            ==");
-				Console.WriteLine("== Author: zlzforever@163.com                                  ==");
-				Console.WriteLine("=================================================================");
-				Console.ForegroundColor = ConsoleColor.White;
-#if !NET_CORE
-				AppDomain.CurrentDomain.SetData(key, "True");
-#else
-
-				AppContext.SetSwitch(key, true);
-#endif
-			}
-			Console.WriteLine();
-			Console.WriteLine("=================================================================");
 		}
 
 #if !NET_CORE

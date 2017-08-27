@@ -20,8 +20,8 @@ namespace DotnetSpider.Core.Redial
 
 		static FileLockerRedialExecutor()
 		{
-			AtomicActionFolder = Path.Combine(Infrastructure.Environment.GlobalDirectory, "atomicaction");
-			RedialLockerFile = Path.Combine(Infrastructure.Environment.GlobalDirectory, "redial.lock");
+			AtomicActionFolder = Path.Combine(Environment.GlobalDirectory, "atomicaction");
+			RedialLockerFile = Path.Combine(Environment.GlobalDirectory, "redial.lock");
 		}
 
 		public FileLockerRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)

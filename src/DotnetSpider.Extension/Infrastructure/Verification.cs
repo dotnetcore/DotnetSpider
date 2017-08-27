@@ -4,7 +4,6 @@ using System.Data;
 using System.Text;
 using Dapper;
 using DotnetSpider.Core.Infrastructure;
-using MySql.Data.MySqlClient;
 using MimeKit;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +11,7 @@ using System.Threading;
 using NLog;
 using System.Web;
 using System.IO;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
@@ -51,8 +51,8 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		protected Verification()
 		{
-			EmailHost = Config.GetValue("emailHost")?.Trim();
-			var portStr = Config.GetValue("emailPort");
+			EmailHost = Core.Environment.EmailHost;
+			var portStr = Core.Environment.EmailPort;
 			if (!string.IsNullOrEmpty(portStr))
 			{
 				int port;
@@ -65,9 +65,9 @@ namespace DotnetSpider.Extension.Infrastructure
 					Logger.MyLog($"EmailPort is not a number: {portStr}.", LogLevel.Error);
 				}
 			}
-			EmailAccount = Config.GetValue("emailAccount");
-			EmailPassword = Config.GetValue("emailPassword");
-			EmailDisplayName = Config.GetValue("emailDisplayName");
+			EmailAccount = Core.Environment.EmailAccount;
+			EmailPassword = Core.Environment.EmailPassword;
+			EmailDisplayName = Core.Environment.EmailDisplayName;
 		}
 
 		protected Verification(string emailTo, string subject, string host, int port, string account, string password)
@@ -450,7 +450,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		public override VerificationResult Report()
 		{
 			VerificationResult veridationResult = new VerificationResult();
-			if (string.IsNullOrEmpty(Config.ConnectString))
+			if (Core.Environment.SystemConnectionStringSettings == null)
 			{
 				return veridationResult;
 			}
@@ -461,7 +461,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrEmpty(EmailHost))
 			{
-				using (var conn = new MySqlConnection(Config.ConnectString))
+				using (var conn = Core.Environment.DataConnectionStringSettings.GetDbConnection())
 				{
 					var emailBody = new StringBuilder();
 					var hasProperties = Properties != null;
@@ -529,7 +529,7 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					{
 						Text = HttpUtility.HtmlDecode(emailBody.ToString())
 					};
-					var multipart = new Multipart("mixed") {html};
+					var multipart = new Multipart("mixed") { html };
 
 					if (veridationResult.PassVeridation && !string.IsNullOrEmpty(ExportDataSql) && !string.IsNullOrEmpty(ExportDataFileName))
 					{

@@ -4,13 +4,13 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using System.Threading;
 using DotnetSpider.Extension.Infrastructure;
-using MySql.Data.MySqlClient;
 using System.Data;
 using NLog;
 using Dapper;
 using DotnetSpider.Extension.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension
 {
@@ -21,10 +21,6 @@ namespace DotnetSpider.Extension
 		protected abstract void MyInit(params string[] arguments);
 
 		protected Action OnExited;
-
-		public string ConnectString { get; set; }
-
-		public string RedisConnectString { get; set; }
 
 		public string TaskId { get; set; }
 
@@ -38,9 +34,9 @@ namespace DotnetSpider.Extension
 
 		protected CommonSpider(string name, Site site) : base(site)
 		{
+
+			Core.Infrastructure.Database.DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
 			Name = name;
-			ConnectString = Config.ConnectString;
-			RedisConnectString = Config.RedisConnectString;
 		}
 
 		public override void Run(params string[] arguments)
@@ -153,9 +149,9 @@ namespace DotnetSpider.Extension
 
 		protected void InsertRunningState()
 		{
-			if (!string.IsNullOrEmpty(ConnectString) && !string.IsNullOrEmpty(TaskId))
+			if (Core.Environment.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(TaskId))
 			{
-				using (IDbConnection conn = new MySqlConnection(ConnectString))
+				using (IDbConnection conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
 				{
 					conn.Execute("CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8mb4;");
 					conn.Execute("CREATE TABLE IF NOT EXISTS `dotnetspider`.`task_running` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `taskId` varchar(120) NOT NULL, `name` varchar(200) NULL, `identity` varchar(120), `cdate` timestamp NOT NULL, PRIMARY KEY (id), UNIQUE KEY `taskId_unique` (`taskId`)) AUTO_INCREMENT=1");
@@ -166,9 +162,9 @@ namespace DotnetSpider.Extension
 
 		protected void RemoveRunningState()
 		{
-			if (!string.IsNullOrEmpty(ConnectString) && !string.IsNullOrEmpty(TaskId))
+			if (Core.Environment.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(TaskId))
 			{
-				using (IDbConnection conn = new MySqlConnection(ConnectString))
+				using (IDbConnection conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
 				{
 					conn.Execute($"DELETE FROM `dotnetspider`.`task_running` WHERE `identity`='{Identity}';");
 				}

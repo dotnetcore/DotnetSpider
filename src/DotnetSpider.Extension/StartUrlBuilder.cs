@@ -1,23 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
 using Dapper;
-#if !NET_CORE
-
-#else
-using System.Net;
-#endif
+using DotnetSpider.Core.Infrastructure.Database;
+using System.Configuration;
 
 namespace DotnetSpider.Extension
 {
-
 	public class DbStartUrlBuilder : StartUrlBuilder
 	{
-		public DataSource Source { get; }
-
-		public string ConnectString { get; }
+		public ConnectionStringSettings ConnectionStringSettings { get; }
 
 		public string Sql { get; }
 
@@ -37,10 +30,37 @@ namespace DotnetSpider.Extension
 		{
 		}
 
-		public DbStartUrlBuilder(DataSource source, string connectString, string sql, string[] formateArguments, params string[] formateStrings)
+		public DbStartUrlBuilder(string sql, string[] formateArguments, params string[] formateStrings)
 		{
-			Source = source;
-			ConnectString = connectString;
+			if (Environment.DataConnectionStringSettings == null)
+			{
+				throw new SpiderException("DataConnection is unfound in app.config.");
+			}
+			ConnectionStringSettings = Environment.DataConnectionStringSettings;
+			Sql = sql;
+			FormateStrings = formateStrings;
+			FormateArguments = formateArguments;
+		}
+
+		public DbStartUrlBuilder(Database source, string connectString, string sql, string[] formateArguments, params string[] formateStrings)
+		{
+			switch (source)
+			{
+				case Database.MySql:
+					{
+						ConnectionStringSettings = new ConnectionStringSettings("MySql", connectString, "MySql.Data.MySqlClient");
+						break;
+					}
+				case Database.SqlServer:
+					{
+						ConnectionStringSettings = new ConnectionStringSettings("SqlServer", connectString, "System.Data.SqlClient");
+						break;
+					}
+				default:
+					{
+						throw new SpiderException($"Database {source} is unsported right now.");
+					}
+			}
 			Sql = sql;
 			FormateStrings = formateStrings;
 			FormateArguments = formateArguments;
@@ -51,7 +71,7 @@ namespace DotnetSpider.Extension
 			List<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
 			NetworkCenter.Current.Execute("dbsb", () =>
 			{
-				using (var conn = DataSourceUtils.GetConnection(Source, ConnectString))
+				using (var conn = ConnectionStringSettings.GetDbConnection())
 				{
 					foreach (var item in conn.Query(Sql))
 					{

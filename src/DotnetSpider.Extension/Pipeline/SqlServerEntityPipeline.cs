@@ -4,20 +4,16 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Linq;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Core.Infrastructure.Database;
+using System.Configuration;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public class SqlServerEntityPipeline : BaseEntityDbPipeline
 	{
-		public SqlServerEntityPipeline(string connectString, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
+		public SqlServerEntityPipeline(string connectString = null, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
 		{
-		}
-
-		protected override DbConnection CreateConnection()
-		{
-			var conn = new SqlConnection(ConnectString);
-			conn.Open();
-			return conn;
 		}
 
 		protected override DbParameter CreateDbParameter(string name, object value)
@@ -29,7 +25,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return new SqlParameter(name, value);
 		}
 
-		protected override string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion)
+		protected override string GenerateCreateDatabaseSql(EntityDbMetadata metadata, string serverVersion)
 		{
 			string version = serverVersion.Split('.')[0];
 			switch (version)
@@ -45,7 +41,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		protected override string GetIfSchemaExistsSql(EntityDbMetadata metadata, string serverVersion)
+		protected override string GenerateIfDatabaseExistsSql(EntityDbMetadata metadata, string serverVersion)
 		{
 			string version = serverVersion.Split('.')[0];
 			switch (version)
@@ -61,7 +57,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		protected override string GetCreateTableSql(EntityDbMetadata metadata)
+		protected override string GenerateCreateTableSql(EntityDbMetadata metadata)
 		{
 			StringBuilder builder = new StringBuilder($"USE {metadata.Table.Database}; IF OBJECT_ID('{metadata.Table.Name}', 'U') IS NULL CREATE table {metadata.Table.Name} (");
 			StringBuilder columnNames = new StringBuilder();
@@ -74,16 +70,16 @@ namespace DotnetSpider.Extension.Pipeline
 			builder.Append(columnNames.ToString().Substring(1, columnNames.Length - 1));
 			builder.Append(",[CDate] DATETIME DEFAULT(GETDATE())");
 
-			if (Core.Infrastructure.Environment.IdColumn == metadata.Table.Primary.ToLower())
+			if (Core.Environment.IdColumn == metadata.Table.Primary.ToLower())
 			{
-				builder.Append($", [{Core.Infrastructure.Environment.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL");
+				builder.Append($", [{Core.Environment.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL");
 			}
 
 			builder.Append(",");
 			StringBuilder primaryKey = new StringBuilder();
 			if (string.IsNullOrEmpty(metadata.Table.Primary))
 			{
-				primaryKey.Append($"[{Core.Infrastructure.Environment.IdColumn}] ASC,");
+				primaryKey.Append($"[{Core.Environment.IdColumn}] ASC,");
 			}
 			else
 			{
@@ -121,7 +117,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return builder.ToString();
 		}
 
-		protected override string GetInsertSql(EntityDbMetadata metadata)
+		protected override string GenerateInsertSql(EntityDbMetadata metadata)
 		{
 			string columNames = string.Join(", ", metadata.Columns.Select(p => $"[{p.Name}]"));
 			string values = string.Join(", ", metadata.Columns.Select(p => $"@{p.Name}"));
@@ -136,7 +132,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GetUpdateSql(EntityDbMetadata metadata)
+		protected override string GenerateUpdateSql(EntityDbMetadata metadata)
 		{
 			string setParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"[{p}]=@{p}"));
 			StringBuilder primaryParamenters = new StringBuilder();
@@ -162,7 +158,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GetSelectSql(EntityDbMetadata metadata)
+		protected override string GenerateSelectSql(EntityDbMetadata metadata)
 		{
 			string selectParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"[{p}]"));
 			string primaryParamenters = $" [{metadata.Table.Primary}]=@{metadata.Table.Primary}";
@@ -207,6 +203,27 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 			}
 			return "TEXT";
+		}
+
+		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
+		{
+			ConnectionStringSettings connectionStringSettings;
+			if (!string.IsNullOrEmpty(connectString))
+			{
+				connectionStringSettings = new ConnectionStringSettings("SqlServer", connectString, "System.Data.SqlClient");
+			}
+			else
+			{
+				if (Core.Environment.DataConnectionStringSettings != null)
+				{
+					connectionStringSettings = Core.Environment.DataConnectionStringSettings;
+				}
+				else
+				{
+					throw new SpiderException("DataConnection is unfound in app.config.");
+				}
+			}
+			return connectionStringSettings;
 		}
 	}
 }

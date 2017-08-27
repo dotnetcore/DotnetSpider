@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			base.InitPipeline(spider);
 
-			DataFolder = Path.Combine(Core.Infrastructure.Environment.BaseDirectory, spider.Identity, "entityJson");
+			DataFolder = Path.Combine(Core.Environment.BaseDirectory, spider.Identity, "entityJson");
 		}
 
 		public override void Process(string entityName, List<JObject> datas)

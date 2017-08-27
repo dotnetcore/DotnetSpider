@@ -1,13 +1,8 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Extension;
+﻿using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DotnetSpider.Sample
 {

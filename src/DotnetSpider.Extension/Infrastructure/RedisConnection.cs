@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using StackExchange.Redis;
+﻿using StackExchange.Redis;
 using System;
 
 namespace DotnetSpider.Extension.Infrastructure
@@ -9,10 +8,9 @@ namespace DotnetSpider.Extension.Infrastructure
 		private static readonly Lazy<RedisConnection> MyInstance = new Lazy<RedisConnection>(() =>
 		{
 			RedisConnection conn = null;
-			var redisConnectString = Config.RedisConnectString;
-			if (!string.IsNullOrEmpty(redisConnectString))
+			if (!string.IsNullOrEmpty(Core.Environment.RedisConnectString))
 			{
-				conn = new RedisConnection(redisConnectString);
+				conn = new RedisConnection(Core.Environment.RedisConnectString);
 			}
 			return conn;
 		});

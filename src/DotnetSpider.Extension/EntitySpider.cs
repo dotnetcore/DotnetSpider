@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension
 {
 	public abstract class EntitySpider : CommonSpider
 	{
-		private static readonly List<string> DefaultProperties = new List<string> { "cdate", Core.Infrastructure.Environment.IdColumn };
+		private static readonly List<string> DefaultProperties = new List<string> { "cdate", Core.Environment.IdColumn };
 
 		public List<Entity> Entities { get; internal set; } = new List<Entity>();
 
@@ -28,6 +28,7 @@ namespace DotnetSpider.Extension
 
 		protected EntitySpider(string name, Site site) : base(name, site)
 		{
+			Core.Infrastructure.Database.DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
 		}
 
 		public EntitySpider AddEntityType(Type type, string tableName = null)
@@ -199,7 +200,26 @@ namespace DotnetSpider.Extension
 
 		protected override IPipeline GetDefaultPipeline()
 		{
-			return new MySqlEntityPipeline(ConnectString);
+			IPipeline pipeline;
+			switch (Core.Environment.DataConnectionStringSettings.ProviderName)
+			{
+				case "MySql.Data.MySqlClient":
+					{
+						pipeline = new MySqlEntityPipeline();
+						break;
+					}
+				case "System.Data.SqlClient":
+					{
+						pipeline = new SqlServerEntityPipeline();
+						break;
+					}
+				default:
+					{
+						pipeline = new MySqlEntityPipeline();
+						break;
+					}
+			}
+			return pipeline;
 		}
 
 		protected override void PreInitComponent(params string[] arguments)

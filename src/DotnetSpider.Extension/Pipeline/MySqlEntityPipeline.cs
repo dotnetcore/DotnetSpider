@@ -1,53 +1,21 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using DotnetSpider.Core;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Core.Infrastructure.Database;
+using System.Configuration;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public class MySqlEntityPipeline : BaseEntityDbPipeline
 	{
-		public MySqlEntityPipeline(string connectString, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
+		public MySqlEntityPipeline(string connectString = null, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
 		{
 		}
 
-		protected override DbConnection CreateConnection()
-		{
-			for (int i = 0; i < 5; ++i)
-			{
-				try
-				{
-					if (string.IsNullOrEmpty(ConnectString))
-					{
-						ConnectString = UpdateConnectString.GetNew();
-					}
-					var conn = new MySqlConnection(ConnectString);
-					conn.Open();
-					return conn;
-				}
-				catch (Exception e)
-				{
-					// mysql authentication error
-					if (e.Message.ToLower().StartsWith("authentication to host"))
-					{
-						Thread.Sleep(1000);
-						ConnectString = UpdateConnectString.GetNew();
-					}
-					else
-					{
-						throw;
-					}
-				}
-			}
-
-			throw new SpiderException("Can't get any connect string.");
-		}
-
-		protected override string GetInsertSql(EntityDbMetadata metadata)
+		protected override string GenerateInsertSql(EntityDbMetadata metadata)
 		{
 			string columNames = string.Join(", ", metadata.Columns.Select(p => $"`{p.Name}`"));
 			string values = string.Join(", ", metadata.Columns.Select(p => $"@{p.Name}"));
@@ -62,14 +30,14 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GetUpdateSql(EntityDbMetadata metadata)
+		protected override string GenerateUpdateSql(EntityDbMetadata metadata)
 		{
 			string setParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"`{p}`=@{p}"));
 
 			StringBuilder primaryParamenters = new StringBuilder();
-			if (Core.Infrastructure.Environment.IdColumn == metadata.Table.Primary)
+			if (Core.Environment.IdColumn == metadata.Table.Primary)
 			{
-				primaryParamenters.Append($"`{Core.Infrastructure.Environment.IdColumn}` = @__id");
+				primaryParamenters.Append($"`{Core.Environment.IdColumn}` = @__id");
 			}
 			else
 			{
@@ -88,14 +56,14 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GetSelectSql(EntityDbMetadata metadata)
+		protected override string GenerateSelectSql(EntityDbMetadata metadata)
 		{
 			string selectParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"`{p}`"));
 			StringBuilder primaryParamenters = new StringBuilder();
 
-			if (Core.Infrastructure.Environment.IdColumn == metadata.Table.Primary)
+			if (Core.Environment.IdColumn == metadata.Table.Primary)
 			{
-				primaryParamenters.Append($"`{Core.Infrastructure.Environment.IdColumn}` = @{Core.Infrastructure.Environment.IdColumn},");
+				primaryParamenters.Append($"`{Core.Environment.IdColumn}` = @{Core.Environment.IdColumn},");
 			}
 			else
 			{
@@ -115,15 +83,15 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GetCreateTableSql(EntityDbMetadata metadata)
+		protected override string GenerateCreateTableSql(EntityDbMetadata metadata)
 		{
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{metadata.Table.Database }`.`{metadata.Table.Name}` (");
 			string columNames = string.Join(", ", metadata.Columns.Select(p => $"`{p.Name}` {GetDataTypeSql(p)} "));
 			builder.Append(columNames);
 			builder.Append(",`cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP");
-			if (metadata.Table.Primary.ToLower() == Core.Infrastructure.Environment.IdColumn)
+			if (metadata.Table.Primary.ToLower() == Core.Environment.IdColumn)
 			{
-				builder.Append($", `{Core.Infrastructure.Environment.IdColumn}` bigint AUTO_INCREMENT");
+				builder.Append($", `{Core.Environment.IdColumn}` bigint AUTO_INCREMENT");
 			}
 
 			if (metadata.Table.Indexs != null)
@@ -152,12 +120,12 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		protected override string GetCreateSchemaSql(EntityDbMetadata metadata, string serverVersion)
+		protected override string GenerateCreateDatabaseSql(EntityDbMetadata metadata, string serverVersion)
 		{
 			return $"CREATE SCHEMA IF NOT EXISTS `{metadata.Table.Database}` DEFAULT CHARACTER SET utf8mb4 ;";
 		}
 
-		protected override string GetIfSchemaExistsSql(EntityDbMetadata metadata, string serverVersion)
+		protected override string GenerateIfDatabaseExistsSql(EntityDbMetadata metadata, string serverVersion)
 		{
 			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{metadata.Table.Database}';";
 		}
@@ -197,6 +165,27 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 			}
 			return "TEXT";
+		}
+
+		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
+		{
+			ConnectionStringSettings connectionStringSettings;
+			if (!string.IsNullOrEmpty(connectString))
+			{
+				connectionStringSettings = new ConnectionStringSettings("MySql", connectString, "MySql.Data.MySqlClient");
+			}
+			else
+			{
+				if (Environment.DataConnectionStringSettings != null)
+				{
+					connectionStringSettings = Environment.DataConnectionStringSettings;
+				}
+				else
+				{
+					throw new SpiderException("DataConnection is unfound in app.config.");
+				}
+			}
+			return connectionStringSettings;
 		}
 	}
 }

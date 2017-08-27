@@ -35,7 +35,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			try
 			{
-				FiddlerApplication.oDefaultClientCertificate = new X509Certificate(Path.Combine(Core.Infrastructure.Environment.BaseDirectory, "FiddlerRoot.cer"));
+				FiddlerApplication.oDefaultClientCertificate = new X509Certificate(Path.Combine(Core.Environment.BaseDirectory, "FiddlerRoot.cer"));
 				FiddlerApplication.Startup(Port, asSystemProxy, decryptSsl, true);
 			}
 			catch (Exception)

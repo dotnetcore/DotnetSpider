@@ -1,26 +1,28 @@
 ﻿using Dapper;
+using DotnetSpider.Core.Infrastructure.Database;
+using System.Configuration;
 using System.Linq;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
 	public interface IUpdateConnectString
 	{
-		string GetNew();
+		ConnectionStringSettings GetNew();
 	}
 
 	public class DbUpdateConnectString : IUpdateConnectString
 	{
 		public string ConnectString { get; set; }
 
-		public DataSource DataSource { get; set; } = DataSource.MySql;
+		public Database DataSource { get; set; } = Database.MySql;
 
 		public string QueryString { get; set; }
 
-		public string GetNew()
+		public ConnectionStringSettings GetNew()
 		{
-			using (var conn = DataSourceUtils.GetConnection(DataSource, ConnectString))
+			using (var conn = DatabaseExtensions.GetDbConnection(DataSource, ConnectString))
 			{
-				string connectString = conn.Query<string>(QueryString).FirstOrDefault();
+				ConnectionStringSettings connectString = conn.Query<ConnectionStringSettings>(QueryString).FirstOrDefault();
 				return connectString;
 			}
 		}

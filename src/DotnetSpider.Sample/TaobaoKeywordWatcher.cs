@@ -11,7 +11,7 @@ using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Scheduler;
 using Newtonsoft.Json.Linq;
 using System.Linq;
-using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Sample
 {
@@ -94,7 +94,7 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit(params string[] arguments)
 		{
-			Scheduler = new RedisScheduler(Config.RedisConnectString);
+			Scheduler = new RedisScheduler();
 			var downloader = new HttpClientDownloader();
 			downloader.AddAfterDownloadCompleteHandler(new ReplaceContentHandler
 			{
@@ -107,7 +107,7 @@ namespace DotnetSpider.Sample
 			SkipWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))
 			{
-				AddStartUrlBuilder(new DbStartUrlBuilder(DataSource.MySql, Config.ConnectString, "SELECT * FROM taobao.result_keywords limit 10000", new[] { "bidwordstr", "tab" }, "https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}"));
+				AddStartUrlBuilder(new DbStartUrlBuilder(Database.MySql, Environment.DataConnectionStringSettings.ConnectionString, "SELECT * FROM taobao.result_keywords limit 10000", new[] { "bidwordstr", "tab" }, "https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}"));
 			}
 			AddEntityType(typeof(Item), new MyDataHanlder());
 		}

@@ -1,10 +1,11 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
-using MySql.Data.MySqlClient;
 using Dapper;
 using DotnetSpider.Core.Redial;
 using NLog;
 using System;
+using DotnetSpider.Core.Infrastructure.Database;
+using System.Data;
 
 namespace DotnetSpider.Extension.Monitor
 {
@@ -20,13 +21,13 @@ namespace DotnetSpider.Extension.Monitor
 
 			_isDbOnly = isDbOnly;
 
-			if (!string.IsNullOrEmpty(Config.ConnectString))
+			if (Core.Environment.SystemConnectionStringSettings != null)
 			{
 				NetworkCenter.Current.Execute("dm", () =>
 				{
-					using (var conn = new MySqlConnection(Config.ConnectString))
+					using (var conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
 					{
-						InitStatusDatabase(Config.ConnectString);
+						InitStatusDatabase(conn);
 
 						var insertSql = "insert ignore into dotnetspider.status (`identity`, `node`, `logged`, `status`, `thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values (@identity, @node, current_timestamp, @status, @thread, @left, @success, @error, @total, @avgdownloadspeed, @avgprocessorspeed, @avgpipelinespeed);";
 						conn.Execute(insertSql,
@@ -49,29 +50,34 @@ namespace DotnetSpider.Extension.Monitor
 			}
 		}
 
-		public static void InitStatusDatabase(string connectString)
+		public static void InitStatusDatabase()
 		{
-			using (var conn = new MySqlConnection(connectString))
+			using (var conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
 			{
-				try
-				{
-					conn.Execute("CREATE DATABASE IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8;");
+				InitStatusDatabase(conn);
+			}
+		}
 
-					var sql = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`identity` varchar(120) NOT NULL,`node` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT current_timestamp,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20), PRIMARY KEY (`identity`,`node`))";
-					conn.Execute(sql);
+		public static void InitStatusDatabase(IDbConnection conn)
+		{
+			try
+			{
+				conn.Execute("CREATE DATABASE IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8;");
 
-					var trigger = conn.QueryFirstOrDefault("SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'status_AFTER_UPDATE' and EVENT_OBJECT_SCHEMA='dotnetspider' and EVENT_OBJECT_TABLE='status'");
-					if (trigger == null)
-					{
-						var timeTrigger = "CREATE TRIGGER `dotnetspider`.`status_AFTER_UPDATE` BEFORE UPDATE ON `status` FOR EACH ROW BEGIN set NEW.logged = NOW(); END";
-						conn.Execute(timeTrigger);
-					}
-				}
-				catch (Exception e)
+				var sql = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`identity` varchar(120) NOT NULL,`node` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT current_timestamp,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20), PRIMARY KEY (`identity`,`node`))";
+				conn.Execute(sql);
+
+				var trigger = conn.QueryFirstOrDefault("SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'status_AFTER_UPDATE' and EVENT_OBJECT_SCHEMA='dotnetspider' and EVENT_OBJECT_TABLE='status'");
+				if (trigger == null)
 				{
-					Logger.MyLog("Prepare dotnetspider.status failed.", LogLevel.Error, e);
-					throw;
+					var timeTrigger = "CREATE TRIGGER `dotnetspider`.`status_AFTER_UPDATE` BEFORE UPDATE ON `status` FOR EACH ROW BEGIN set NEW.logged = NOW(); END";
+					conn.Execute(timeTrigger);
 				}
+			}
+			catch (Exception e)
+			{
+				Logger.MyLog("Prepare dotnetspider.status failed.", LogLevel.Error, e);
+				throw;
 			}
 		}
 
@@ -82,11 +88,11 @@ namespace DotnetSpider.Extension.Monitor
 				base.Report(status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 			}
 
-			if (Core.Infrastructure.Environment.SaveLogAndStatusToDb)
+			if (Core.Environment.SaveLogAndStatusToDb)
 			{
 				NetworkCenter.Current.Execute("dm", () =>
 				{
-					using (var conn = new MySqlConnection(Config.ConnectString))
+					using (var conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
 					{
 						conn.Execute(
 							"update dotnetspider.status set `status`=@status, `thread`=@thread,`left`=@left, `success`=@success, `error`=@error, `total`=@total, `avgdownloadspeed`=@avgdownloadspeed, `avgprocessorspeed`=@avgprocessorspeed, `avgpipelinespeed`=@avgpipelinespeed WHERE `identity`=@identity and `node`=@node;",

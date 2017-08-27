@@ -28,7 +28,7 @@ namespace DotnetSpider.Sample
 			Downloader = new HttpClientDownloader();
 
 			// storage data to mysql, default is mysql entity pipeline, so you can comment this line. Don't miss sslmode.
-			AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306;SslMode=None;"));
+			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306;SslMode=None;"));
 			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			AddEntityType(typeof(Product));
 		}

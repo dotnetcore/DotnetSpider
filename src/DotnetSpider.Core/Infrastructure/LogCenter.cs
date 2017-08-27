@@ -11,6 +11,16 @@ namespace DotnetSpider.Core.Infrastructure
 	{
 		static LogCenter()
 		{
+			InitLogCenter();
+		}
+
+		public static ILogger GetLogger()
+		{
+			return LogManager.GetCurrentClassLogger();
+		}
+
+		public static void InitLogCenter()
+		{
 #if !NET_CORE
 			string nlogConfigPath = Path.Combine(Environment.BaseDirectory, "nlog.net45.config");
 #else
@@ -21,17 +31,8 @@ namespace DotnetSpider.Core.Infrastructure
 				File.AppendAllText(nlogConfigPath, GetDefaultConfigString());
 			}
 			XmlLoggingConfiguration configuration = new XmlLoggingConfiguration(nlogConfigPath);
-			var connectString = Config.GetValue("connectString");
-			var logAndStatusTargets = configuration.AllTargets.Where(t => t.Name == "dblog" || t.Name == "dbstatus").ToList();
-			if (!string.IsNullOrEmpty(connectString))
-			{
-				foreach (var logAndStatusTarget in logAndStatusTargets)
-				{
-					DatabaseTarget dbTarget = (DatabaseTarget)logAndStatusTarget;
-					dbTarget.ConnectionString = connectString;
-				}
-			}
-			else
+
+			if (Environment.SystemConnectionStringSettings == null)
 			{
 				var needDeleteRules = configuration.LoggingRules.Where(r => r.Targets.Any(t => t is DatabaseTarget && ((DatabaseTarget)t).ConnectionString == null)).ToList();
 				foreach (var rule in needDeleteRules)
@@ -39,16 +40,19 @@ namespace DotnetSpider.Core.Infrastructure
 					configuration.LoggingRules.Remove(rule);
 				}
 				configuration.RemoveTarget("dblog");
-				configuration.RemoveTarget("dbstatus");
+			}
+			else
+			{
+				var dblog = configuration.AllTargets.FirstOrDefault(t => t.Name == "dblog");
+				if (dblog != null)
+				{
+					DatabaseTarget dbTarget = (DatabaseTarget)dblog;
+					dbTarget.ConnectionString = Environment.SystemConnectionStringSettings.ConnectionString;
+				}
 			}
 
 			configuration.Install(new InstallationContext());
 			LogManager.Configuration = configuration;
-		}
-
-		public static ILogger GetLogger()
-		{
-			return LogManager.GetCurrentClassLogger();
 		}
 
 		public static string GetDefaultConfigString()

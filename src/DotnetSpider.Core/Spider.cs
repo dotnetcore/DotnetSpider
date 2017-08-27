@@ -346,6 +346,7 @@ namespace DotnetSpider.Core
 #else
 			ThreadPool.SetMinThreads(200, 200);
 #endif
+			LogCenter.InitLogCenter();
 		}
 
 		public Spider AddStartUrlBuilder(IStartUrlBuilder builder)
@@ -621,7 +622,6 @@ namespace DotnetSpider.Core
 
 		public static void PrintInfo()
 		{
-
 			var key = "_DotnetSpider_Info";
 
 #if !NET_CORE
@@ -838,7 +838,7 @@ namespace DotnetSpider.Core
 
 			Scheduler.Init(this);
 
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Infrastructure.Environment.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Environment.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 

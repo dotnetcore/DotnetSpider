@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using OfficeOpenXml;
 using System.IO;
-using DotnetSpider.Core.Infrastructure;
 using MimeKit;
 
 namespace DotnetSpider.Extension.Infrastructure
@@ -50,12 +49,12 @@ namespace DotnetSpider.Extension.Infrastructure
 
 						row++;
 					}
-					var folder = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "excels");
+					var folder = Path.Combine(Core.Environment.GlobalDirectory, "excels");
 					if (!Directory.Exists(folder))
 					{
 						Directory.CreateDirectory(folder);
 					}
-					var path = Path.Combine(Core.Infrastructure.Environment.GlobalDirectory, "excels", $"{fileName}.xlsx");
+					var path = Path.Combine(Core.Environment.GlobalDirectory, "excels", $"{fileName}.xlsx");
 					if (File.Exists(path) && rewrite)
 					{
 						File.Delete(path);
@@ -72,12 +71,12 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, string emailTo)
 		{
-			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), Config.GetValue("emailHost"), int.Parse(Config.GetValue("emailPort")), Config.GetValue("emailAccount"), Config.GetValue("emailPassword"), Config.GetValue("emailDisplayName"));
+			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), Core.Environment.EmailHost, int.Parse(Core.Environment.EmailPort), Core.Environment.EmailAccount, Core.Environment.EmailPassword, Core.Environment.EmailDisplayName);
 		}
 
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, List<string> emailTo)
 		{
-			EmailTo(conn, sql, fileName, subject, emailTo, Config.GetValue("emailHost"), int.Parse(Config.GetValue("emailPort")), Config.GetValue("emailAccount"), Config.GetValue("emailPassword"), Config.GetValue("emailDisplayName"));
+			EmailTo(conn, sql, fileName, subject, emailTo, Core.Environment.EmailHost, int.Parse(Core.Environment.EmailPort), Core.Environment.EmailAccount, Core.Environment.EmailPassword, Core.Environment.EmailDisplayName);
 		}
 
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, string emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
@@ -109,7 +108,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			var text = new TextPart { Text = subject };
 
 
-			var multipart = new Multipart("mixed") {text, attachment};
+			var multipart = new Multipart("mixed") { text, attachment };
 
 			message.Body = multipart;
 

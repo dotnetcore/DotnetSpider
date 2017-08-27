@@ -10,7 +10,7 @@ namespace DotnetSpider.Sample
 	{
 		public static void Process()
 		{
-			TesseractEngine ocrEngine = new TesseractEngine(Path.Combine(Core.Infrastructure.Environment.BaseDirectory, "tessdata"), "eng", EngineMode.Default);
+			TesseractEngine ocrEngine = new TesseractEngine(Path.Combine(Core.Environment.BaseDirectory, "tessdata"), "eng", EngineMode.Default);
 			ocrEngine.SetVariable("tessedit_char_whitelist", "0123456789");
 
 			var image = Image.FromFile("929c331e8319a761773125efe3f11f20.png");

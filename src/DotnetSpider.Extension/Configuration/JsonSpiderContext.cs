@@ -173,8 +173,6 @@ namespace DotnetSpider.Extension.Configuration
 			context.Name = Name;
 			context.Identity = Identity;
 			context.AddPipelines(GetPipepines(Pipelines));
-			context.RedisConnectString = RedisConnectString;
-			context.ConnectString = ConnectString;
 
 			foreach (var entity in Entities)
 			{

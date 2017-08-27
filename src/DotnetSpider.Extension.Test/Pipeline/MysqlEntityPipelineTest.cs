@@ -21,6 +21,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 	{
 		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306";
 
+		[TestInitialize]
+		public void Init()
+		{
+			Core.Infrastructure.Database.DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
+		}
+
 		private void ClearDb()
 		{
 			using (MySqlConnection conn = new MySqlConnection(ConnectString))
@@ -49,6 +55,41 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString);
+				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
+				updatePipeline.AddEntity(metadata2);
+				updatePipeline.InitPipeline(spider);
+
+				JObject data3 = new JObject { { "Sku", "110" }, { "Category", "4C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
+
+				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				Assert.AreEqual(2, list.Count);
+				Assert.AreEqual("110", list[0].Sku);
+				Assert.AreEqual("4C", list[0].Category);
+			}
+
+			ClearDb();
+		}
+
+		[TestMethod]
+		public void UpdatePipelineUseAppConfig()
+		{
+			ClearDb();
+
+			using (MySqlConnection conn = new MySqlConnection(ConnectString))
+			{
+				ISpider spider = new DefaultSpider("test", new Site());
+
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
+				insertPipeline.InitPipeline(spider);
+
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
+
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline();
 				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
@@ -101,6 +142,41 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[TestMethod]
+		public void UpdateWhenUnionPrimaryUseAppConfig()
+		{
+			ClearDb();
+
+			using (MySqlConnection conn = new MySqlConnection(ConnectString))
+			{
+				ISpider spider = new DefaultSpider("test", new Site());
+
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(Product2Insert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
+				insertPipeline.InitPipeline(spider);
+
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
+
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline();
+				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(Product2Update).GetTypeInfo());
+				updatePipeline.AddEntity(metadata2);
+				updatePipeline.InitPipeline(spider);
+
+				JObject data3 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
+
+				var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				Assert.AreEqual(2, list.Count);
+				Assert.AreEqual("110", list[0].Sku);
+				Assert.AreEqual("AAAA", list[0].Category);
+			}
+
+			ClearDb();
+		}
+
+		[TestMethod]
 		public void UpdateCheckIfSameBeforeUpdate()
 		{
 			ClearDb();
@@ -119,6 +195,41 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString, true);
+				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
+				updatePipeline.AddEntity(metadata2);
+				updatePipeline.InitPipeline(spider);
+
+				JObject data3 = new JObject { { "Sku", "110" }, { "Category", "4C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
+
+				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				Assert.AreEqual(2, list.Count);
+				Assert.AreEqual("110", list[0].Sku);
+				Assert.AreEqual("4C", list[0].Category);
+			}
+
+			ClearDb();
+		}
+
+		[TestMethod]
+		public void UpdateCheckIfSameBeforeUpdateUseAppConfig()
+		{
+			ClearDb();
+
+			using (MySqlConnection conn = new MySqlConnection(ConnectString))
+			{
+				ISpider spider = new DefaultSpider("test", new Site());
+
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
+				insertPipeline.InitPipeline(spider);
+
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
+
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(null, true);
 				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(ProductUpdate).GetTypeInfo());
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
@@ -172,6 +283,42 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[TestMethod]
+		public void UpdateWhenUnionPrimaryCheckIfSameBeforeUpdateUseAppConfig()
+		{
+			ClearDb();
+
+			using (MySqlConnection conn = new MySqlConnection(ConnectString))
+			{
+				ISpider spider = new DefaultSpider("test", new Site());
+
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(Product2Insert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
+				insertPipeline.InitPipeline(spider);
+
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2 });
+
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(null, true);
+				var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(Product2Update).GetTypeInfo());
+				updatePipeline.AddEntity(metadata2);
+				updatePipeline.InitPipeline(spider);
+
+
+				JObject data3 = new JObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
+
+				var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				Assert.AreEqual(2, list.Count);
+				Assert.AreEqual("110", list[0].Sku);
+				Assert.AreEqual("AAAA", list[0].Category);
+			}
+
+			ClearDb();
+		}
+
+		[TestMethod]
 		public void Insert()
 		{
 			ClearDb();
@@ -181,6 +328,37 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
+				var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
+				insertPipeline.AddEntity(metadata);
+				insertPipeline.InitPipeline(spider);
+
+				// Common data
+				JObject data1 = new JObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
+				JObject data2 = new JObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				// Value is null
+				JObject data3 = new JObject { { "Sku", "112" }, { "Category", null }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2, data3 });
+
+				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				Assert.AreEqual(3, list.Count);
+				Assert.AreEqual("110", list[0].Sku);
+				Assert.AreEqual("111", list[1].Sku);
+				Assert.AreEqual(null, list[2].Category);
+			}
+
+			ClearDb();
+		}
+
+		[TestMethod]
+		public void InsertUseAppConfig()
+		{
+			ClearDb();
+
+			using (MySqlConnection conn = new MySqlConnection(ConnectString))
+			{
+				ISpider spider = new DefaultSpider("test", new Site());
+
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
 				var metadata = EntitySpider.GenerateEntityMetaData(typeof(ProductInsert).GetTypeInfo());
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
@@ -247,7 +425,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			ClearDb();
 		}
- 
+
 
 		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
@@ -276,6 +454,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
 		}
+
 		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku,Category1")]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class Product2Insert : SpiderEntity

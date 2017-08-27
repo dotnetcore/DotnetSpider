@@ -4,7 +4,6 @@ using System.Text;
 using DotnetSpider.Core;
 using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.Model;
-using System;
 using System.Linq;
 using MySql.Data.MySqlClient;
 
@@ -36,7 +35,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (string.IsNullOrEmpty(DataFolder))
 			{
-				DataFolder = Path.Combine(Core.Infrastructure.Environment.BaseDirectory, spider.Identity, "mysql");
+				DataFolder = Path.Combine(Core.Environment.BaseDirectory, spider.Identity, "mysql");
 			}
 		}
 
@@ -91,7 +90,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 					builder.Append(column == lastColumn ? $"'{value}'" : $"'{value}', ");
 				}
-				builder.Append($");{Environment.NewLine}");
+				builder.Append($");{System.Environment.NewLine}");
 			}
 			File.AppendAllText(fileInfo.FullName, builder.ToString());
 		}

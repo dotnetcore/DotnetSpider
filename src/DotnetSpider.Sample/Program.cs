@@ -1,26 +1,9 @@
-﻿using Dapper;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Extension.Scheduler;
-using DotnetSpider.Runner;
-using MySql.Data.MySqlClient;
-using OfficeOpenXml;
+﻿using DotnetSpider.Core;
 using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
 using System.Text;
-using System.Text.RegularExpressions;
 #endif
 
 namespace DotnetSpider.Sample
@@ -38,7 +21,7 @@ namespace DotnetSpider.Sample
 
 			MyTest();
 
-			Startup.Run(new string[] { "-s:JdSkuSample", "-tid:JdSkuSample", "-i:guid", "-a:" });
+			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:guid", "-a:" });
 
 			Startup.Run(new string[] { "-s:CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1" });
 
@@ -88,8 +71,6 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
-			Class1 c = new Class1();
-			c.ProcessException();
 		}
 	}
 

@@ -16,6 +16,6 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public string SelectSql { get; set; }
 
-		public bool IsInsertModel { get; set; } = true;
+		public bool InsertModel { get; set; } = true;
 	}
 }

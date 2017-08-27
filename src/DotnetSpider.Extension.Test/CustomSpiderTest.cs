@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MySql.Data.MySqlClient;
 using System;
 using Dapper;
 using System.Linq;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension.Test
 			CustomSpider1 spider = new CustomSpider1();
 			spider.Run();
 
-			using (MySqlConnection conn = new MySqlConnection(Core.Infrastructure.Config.ConnectString))
+			using (var conn = Core.Environment.DataConnectionStringSettings.GetDbConnection())
 			{
 				var c1 = conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{spider.Identity}' and level='Info'").First().Count;
 				var c2 = conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{spider.Identity}'").First().Count;
