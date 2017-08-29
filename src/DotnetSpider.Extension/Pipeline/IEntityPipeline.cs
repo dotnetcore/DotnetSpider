@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public interface IEntityPipeline
 	{
-		void Process(string entityName, List<JObject> datas);
+		void Process(string entityName, List<DataObject> datas);
 	}
 }

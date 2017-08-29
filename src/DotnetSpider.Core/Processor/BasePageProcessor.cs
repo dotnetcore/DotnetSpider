@@ -13,21 +13,21 @@ namespace DotnetSpider.Core.Processor
 {
 	public abstract class BasePageProcessor : IPageProcessor
 	{
+		private readonly static ISelector _imageSelector = Selectors.XPath(".//img/@src");
+
 		private readonly List<Regex> _excludeTargetUrlPatterns = new List<Regex>();
 		private readonly Dictionary<ISelector, List<Regex>> _targetUrlExtractors = new Dictionary<ISelector, List<Regex>>();
-		private readonly ISelector _imageSelector = Selectors.XPath(".//img/@src");
-
-		private List<Regex> _targetUrlPatterns;
+		private readonly HashSet<Regex> _targetUrlPatterns = new HashSet<Regex>();
 
 		protected abstract void Handle(Page page);
 
 		public void Process(Page page)
 		{
-			if (_targetUrlExtractors != null)
-			{
-				bool isTarget = true;
+			bool isTarget = true;
 
-				foreach (var regex in GetTargetUrlPatterns())
+			if (_targetUrlPatterns.Count > 0 && !_targetUrlPatterns.Contains(null))
+			{
+				foreach (var regex in _targetUrlPatterns)
 				{
 					isTarget = regex.IsMatch(page.Url);
 					if (isTarget)
@@ -35,10 +35,11 @@ namespace DotnetSpider.Core.Processor
 						break;
 					}
 				}
-				if (!isTarget)
-				{
-					return;
-				}
+			}
+
+			if (!isTarget)
+			{
+				return;
 			}
 
 			Handle(page);
@@ -54,24 +55,17 @@ namespace DotnetSpider.Core.Processor
 		/// <summary>
 		/// Only used for test
 		/// </summary>
-		/// <param name="region"></param>
+		/// <param name="regionXpath"></param>
 		/// <returns></returns>
-		public virtual List<Regex> GetTargetUrlPatterns(string region)
+		public virtual List<Regex> GetTargetUrlPatterns(string regionXpath)
 		{
 			ISelector selector = Selectors.Default();
-			if (!string.IsNullOrWhiteSpace(region))
+			if (!string.IsNullOrWhiteSpace(regionXpath))
 			{
-				selector = Selectors.XPath(region);
+				selector = Selectors.XPath(regionXpath);
 			}
 
-			if (_targetUrlExtractors.ContainsKey(selector))
-			{
-				return _targetUrlExtractors[selector];
-			}
-			else
-			{
-				return null;
-			}
+			return _targetUrlExtractors.ContainsKey(selector) ? _targetUrlExtractors[selector] : null;
 		}
 
 		/// <summary>
@@ -201,24 +195,15 @@ namespace DotnetSpider.Core.Processor
 			return url;
 		}
 
-		protected virtual List<Regex> GetTargetUrlPatterns()
+		protected void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
 		{
-			if (_targetUrlPatterns == null)
-			{
-				_targetUrlPatterns = new List<Regex>();
-				foreach (var targetUrlExtractor in _targetUrlExtractors)
-				{
-					foreach (var pattern in targetUrlExtractor.Value)
-					{
-						_targetUrlPatterns.Add(pattern);
-					}
-				}
-			}
-			return _targetUrlPatterns;
-		}
+			var validPatterns = patterns.Where(p => p != null && !string.IsNullOrEmpty(p.Trim())).Select(p => p.Trim()).ToList();
 
-		protected virtual void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
-		{
+			if (validPatterns.Count != patterns.Length)
+			{
+				throw new ArgumentNullException("Pattern should not be null or empty.");
+			}
+
 			ISelector selector = Selectors.Default();
 			if (regionXpath != null)
 			{
@@ -236,7 +221,7 @@ namespace DotnetSpider.Core.Processor
 				return;
 			}
 
-			if (patterns == null || patterns.Length == 0)
+			if (validPatterns.Count == 0)
 			{
 				if (!realPatterns.Contains(null))
 				{
@@ -244,24 +229,18 @@ namespace DotnetSpider.Core.Processor
 				}
 				return;
 			}
-			foreach (var pattern in patterns)
+			foreach (var pattern in validPatterns)
 			{
-				if (!string.IsNullOrEmpty(pattern))
+				if (realPatterns.All(p => p.ToString() != pattern))
 				{
-					var realPattern = pattern.Trim();
-					if (realPatterns.All(p => p.ToString() != realPattern))
-					{
-						realPatterns.Add(new Regex(realPattern));
-					}
-				}
-				else
-				{
-					throw new ArgumentNullException(nameof(regionXpath));
+					var regex = new Regex(pattern);
+					realPatterns.Add(regex);
+					_targetUrlPatterns.Add(regex);
 				}
 			}
 		}
 
-		protected virtual void AddExcludeTargetUrlPattern(params string[] patterns)
+		protected void AddExcludeTargetUrlPattern(params string[] patterns)
 		{
 			if (patterns == null || patterns.Length == 0)
 			{

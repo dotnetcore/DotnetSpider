@@ -3,7 +3,6 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
 using Site = DotnetSpider.Core.Site;
-using Newtonsoft.Json.Linq;
 using System.Linq;
 
 namespace DotnetSpider.Extension.Processor
@@ -12,7 +11,7 @@ namespace DotnetSpider.Extension.Processor
 	{
 		private readonly IEntityExtractor _extractor;
 
-		public EntityProcessor(Site site, Entity entity)
+		public EntityProcessor(Site site, EntityDefine entity)
 		{
 			Site = site;
 			_extractor = new EntityExtractor(entity.Name, entity.SharedValues, entity);
@@ -38,7 +37,7 @@ namespace DotnetSpider.Extension.Processor
 
 		protected override void Handle(Page page)
 		{
-			List<JObject> list = _extractor.Extract(page);
+			List<DataObject> list = _extractor.Extract(page);
 
 			if (_extractor.DataHandler != null)
 			{

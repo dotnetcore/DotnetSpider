@@ -9,7 +9,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DotnetSpider.Extension.Processor;
-using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -19,7 +18,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void Extract()
 		{
-			var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo());
+			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Product).GetTypeInfo());
 			EntityExtractor extractor = new EntityExtractor("test", null, entityMetadata);
 			var results = extractor.Extract(new Page(new Request("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, dynamic>
 			{
@@ -30,21 +29,21 @@ namespace DotnetSpider.Extension.Test
 				Content = File.ReadAllText(Path.Combine(Core.Environment.BaseDirectory, "Jd.html"))
 			});
 			Assert.AreEqual(60, results.Count);
-			Assert.AreEqual("手机", results[0].GetValue("CategoryName"));
-			Assert.AreEqual("110", results[0].GetValue("CategoryId"));
-			Assert.AreEqual("http://item.jd.com/3031737.html", results[0].GetValue("Url"));
-			Assert.AreEqual("3031737", results[0].GetValue("Sku"));
-			Assert.AreEqual("荣耀官方旗舰店", results[0].GetValue("ShopName"));
-			Assert.AreEqual("荣耀 NOTE 8 4GB+32GB 全网通版 冰河银", results[0].GetValue("Name"));
-			Assert.AreEqual("1000000904", results[0].GetValue("VenderId"));
-			Assert.AreEqual("1000000904", results[0].GetValue("JdzyShopId"));
-			Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), results[0].GetValue("RunId"));
+			Assert.AreEqual("手机", results[0]["CategoryName"]);
+			Assert.AreEqual("110", results[0]["CategoryId"]);
+			Assert.AreEqual("http://item.jd.com/3031737.html", results[0]["Url"]);
+			Assert.AreEqual("3031737", results[0]["Sku"]);
+			Assert.AreEqual("荣耀官方旗舰店", results[0]["ShopName"]);
+			Assert.AreEqual("荣耀 NOTE 8 4GB+32GB 全网通版 冰河银", results[0]["Name"]);
+			Assert.AreEqual("1000000904", results[0]["VenderId"]);
+			Assert.AreEqual("1000000904", results[0]["JdzyShopId"]);
+			Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), results[0]["RunId"]);
 		}
 
 		[TestMethod]
 		public void TempEntityNoPrimaryInfo()
 		{
-			var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity1).GetTypeInfo());
+			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity1).GetTypeInfo());
 
 			EntityProcessor processor = new EntityProcessor(new Site(), entityMetadata);
 			var page = new Page(new Request("http://www.abcd.com"))
@@ -52,7 +51,7 @@ namespace DotnetSpider.Extension.Test
 				Content = "{'data':[{'age':'1'},{'age':'2'}]}"
 			};
 			processor.Process(page);
-			Assert.AreEqual(2, (page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1") as List<JObject>).Count);
+			Assert.AreEqual(2, (page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1") as List<DataObject>).Count);
 		}
 
 		[Table("test", "sku", TableSuffix.Today)]

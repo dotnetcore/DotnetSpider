@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using DotnetSpider.Core;
-using Newtonsoft.Json.Linq;
 using System;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Pipeline
 			DataFolder = Path.Combine(Core.Environment.BaseDirectory, spider.Identity, "entityJson");
 		}
 
-		public override void Process(string entityName, List<JObject> datas)
+		public override void Process(string entityName, List<DataObject> datas)
 		{
 			lock (this)
 			{

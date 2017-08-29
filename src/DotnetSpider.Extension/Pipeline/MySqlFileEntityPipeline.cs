@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using DotnetSpider.Core;
-using Newtonsoft.Json.Linq;
 using DotnetSpider.Extension.Model;
 using System.Linq;
 using MySql.Data.MySqlClient;
@@ -39,7 +38,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override void Process(string entityName, List<JObject> items)
+		public override void Process(string entityName, List<DataObject> items)
 		{
 			if (items == null || items.Count == 0)
 			{
@@ -48,7 +47,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			lock (this)
 			{
-				Entity metadata;
+				EntityDefine metadata;
 				if (Entities.TryGetValue(entityName, out metadata))
 				{
 					switch (Type)
@@ -68,7 +67,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private void SaveInsertSqlFile(Entity metadata, List<JObject> items)
+		private void SaveInsertSqlFile(EntityDefine metadata, List<DataObject> items)
 		{
 			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.sql"));
 			StringBuilder builder = new StringBuilder();
@@ -76,17 +75,17 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				//{Environment.NewLine}
 				builder.Append($"INSERT IGNORE INTO `{metadata.Table.Database}`.`{metadata.Table.Name}` (");
-				var lastColumn = metadata.Fields.Last();
-				foreach (var column in metadata.Fields)
+				var lastColumn = metadata.Columns.Last();
+				foreach (var column in metadata.Columns)
 				{
 					builder.Append(column == lastColumn ? $"`{column.Name}`" : $"`{column.Name}`, ");
 				}
 				builder.Append(") VALUES (");
 
-				foreach (var column in metadata.Fields)
+				foreach (var column in metadata.Columns)
 				{
-					var token = entry.SelectToken($"$.{column.Name}");
-					var value = token == null ? "" : MySqlHelper.EscapeString(token.Value<string>());
+					var token = entry[$"$.{column.Name}"];
+					var value = token == null ? "" : MySqlHelper.EscapeString(token?.ToString());
 
 					builder.Append(column == lastColumn ? $"'{value}'" : $"'{value}', ");
 				}
@@ -95,16 +94,16 @@ namespace DotnetSpider.Extension.Pipeline
 			File.AppendAllText(fileInfo.FullName, builder.ToString());
 		}
 
-		private void SaveLoadFile(Entity metadata, List<JObject> items)
+		private void SaveLoadFile(EntityDefine metadata, List<DataObject> items)
 		{
 			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
 			StringBuilder builder = new StringBuilder();
 			foreach (var entry in items)
 			{
 				builder.Append("@END@");
-				foreach (var column in metadata.Fields)
+				foreach (var column in metadata.Columns)
 				{
-					var value = entry.SelectToken($"$.{column.Name}")?.ToString();
+					var value = entry[$"$.{column.Name}"]?.ToString();
 					if (!string.IsNullOrEmpty(value))
 					{
 						builder.Append("#").Append(value).Append("#").Append("$");

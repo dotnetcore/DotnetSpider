@@ -4,9 +4,9 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Linq;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Core.Infrastructure.Database;
 using System.Configuration;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -25,44 +25,44 @@ namespace DotnetSpider.Extension.Pipeline
 			return new SqlParameter(name, value);
 		}
 
-		protected override string GenerateCreateDatabaseSql(EntityDbMetadata metadata, string serverVersion)
+		protected override string GenerateCreateDatabaseSql(EntityAdapter adapter, string serverVersion)
 		{
 			string version = serverVersion.Split('.')[0];
 			switch (version)
 			{
 				case "11":
 					{
-						return $"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{metadata.Table.Database}') CREATE DATABASE {metadata.Table.Database};";
+						return $"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{adapter.Table.Database}') CREATE DATABASE {adapter.Table.Database};";
 					}
 				default:
 					{
-						return $"USE master; IF NOT EXISTS(SELECT * FROM sys.databases WHERE name='{metadata.Table.Database}') CREATE DATABASE {metadata.Table.Database};";
+						return $"USE master; IF NOT EXISTS(SELECT * FROM sys.databases WHERE name='{adapter.Table.Database}') CREATE DATABASE {adapter.Table.Database};";
 					}
 			}
 		}
 
-		protected override string GenerateIfDatabaseExistsSql(EntityDbMetadata metadata, string serverVersion)
+		protected override string GenerateIfDatabaseExistsSql(EntityAdapter adapter, string serverVersion)
 		{
 			string version = serverVersion.Split('.')[0];
 			switch (version)
 			{
 				case "11":
 					{
-						return $"SELECT COUNT(*) FROM sysdatabases WHERE name='{metadata.Table.Database}'";
+						return $"SELECT COUNT(*) FROM sysdatabases WHERE name='{adapter.Table.Database}'";
 					}
 				default:
 					{
-						return $"SELECT COUNT(*) FROM sys.databases WHERE name='{metadata.Table.Database}'";
+						return $"SELECT COUNT(*) FROM sys.databases WHERE name='{adapter.Table.Database}'";
 					}
 			}
 		}
 
-		protected override string GenerateCreateTableSql(EntityDbMetadata metadata)
+		protected override string GenerateCreateTableSql(EntityAdapter adapter)
 		{
-			StringBuilder builder = new StringBuilder($"USE {metadata.Table.Database}; IF OBJECT_ID('{metadata.Table.Name}', 'U') IS NULL CREATE table {metadata.Table.Name} (");
+			StringBuilder builder = new StringBuilder($"USE {adapter.Table.Database}; IF OBJECT_ID('{adapter.Table.Name}', 'U') IS NULL CREATE table {adapter.Table.Name} (");
 			StringBuilder columnNames = new StringBuilder();
 
-			foreach (var p in metadata.Columns)
+			foreach (var p in adapter.Columns)
 			{
 				columnNames.Append($",[{p.Name}] {GetDataTypeSql(p)}");
 			}
@@ -70,20 +70,20 @@ namespace DotnetSpider.Extension.Pipeline
 			builder.Append(columnNames.ToString().Substring(1, columnNames.Length - 1));
 			builder.Append(",[CDate] DATETIME DEFAULT(GETDATE())");
 
-			if (Core.Environment.IdColumn == metadata.Table.Primary.ToLower())
+			if (Core.Environment.IdColumn == adapter.Table.Primary.ToLower())
 			{
 				builder.Append($", [{Core.Environment.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL");
 			}
 
 			builder.Append(",");
 			StringBuilder primaryKey = new StringBuilder();
-			if (string.IsNullOrEmpty(metadata.Table.Primary))
+			if (string.IsNullOrEmpty(adapter.Table.Primary))
 			{
 				primaryKey.Append($"[{Core.Environment.IdColumn}] ASC,");
 			}
 			else
 			{
-				var columns = metadata.Table.Primary.Split(',');
+				var columns = adapter.Table.Primary.Split(',');
 				foreach (var column in columns)
 				{
 					primaryKey.Append($"[{column}] ASC,");
@@ -91,58 +91,58 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 
 			builder.Append(
-				$" CONSTRAINT [PK_{metadata.Table.Name}] PRIMARY KEY CLUSTERED ({primaryKey.ToString(0, primaryKey.Length - 1)})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
+				$" CONSTRAINT [PK_{adapter.Table.Name}] PRIMARY KEY CLUSTERED ({primaryKey.ToString(0, primaryKey.Length - 1)})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
 
-			if (metadata.Table.Indexs != null)
+			if (adapter.Table.Indexs != null)
 			{
-				foreach (var index in metadata.Table.Indexs)
+				foreach (var index in adapter.Table.Indexs)
 				{
 					var columns = index.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
 					string indexColumNames = string.Join(", ", columns.Select(c => $"[{c}]"));
-					builder.Append($"CREATE NONCLUSTERED INDEX [index_{name}] ON {metadata.Table.Name} ({indexColumNames.Substring(0, indexColumNames.Length)});");
+					builder.Append($"CREATE NONCLUSTERED INDEX [index_{name}] ON {adapter.Table.Name} ({indexColumNames.Substring(0, indexColumNames.Length)});");
 				}
 			}
 
-			if (metadata.Table.Uniques != null)
+			if (adapter.Table.Uniques != null)
 			{
-				foreach (var unique in metadata.Table.Uniques)
+				foreach (var unique in adapter.Table.Uniques)
 				{
 					var columns = unique.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
 					string uniqueColumNames = string.Join(", ", columns.Select(c => $"[{c}]"));
-					builder.Append($"CREATE UNIQUE NONCLUSTERED INDEX [unique_{name}] ON {metadata.Table.Name} ({uniqueColumNames.Substring(0, uniqueColumNames.Length)});");
+					builder.Append($"CREATE UNIQUE NONCLUSTERED INDEX [unique_{name}] ON {adapter.Table.Name} ({uniqueColumNames.Substring(0, uniqueColumNames.Length)});");
 				}
 			}
 			return builder.ToString();
 		}
 
-		protected override string GenerateInsertSql(EntityDbMetadata metadata)
+		protected override string GenerateInsertSql(EntityAdapter adapter)
 		{
-			string columNames = string.Join(", ", metadata.Columns.Select(p => $"[{p.Name}]"));
-			string values = string.Join(", ", metadata.Columns.Select(p => $"@{p.Name}"));
+			string columNames = string.Join(", ", adapter.Columns.Select(p => $"[{p.Name}]"));
+			string values = string.Join(", ", adapter.Columns.Select(p => $"@{p.Name}"));
 
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("USE {0}; INSERT INTO [{1}] {2} {3};",
-				metadata.Table.Database,
-				metadata.Table.Name,
+				adapter.Table.Database,
+				adapter.Table.Name,
 				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
 				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
 
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GenerateUpdateSql(EntityDbMetadata metadata)
+		protected override string GenerateUpdateSql(EntityAdapter adapter)
 		{
-			string setParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"[{p}]=@{p}"));
+			string setParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"[{p}]=@{p}"));
 			StringBuilder primaryParamenters = new StringBuilder();
-			if (string.IsNullOrEmpty(metadata.Table.Primary))
+			if (string.IsNullOrEmpty(adapter.Table.Primary))
 			{
 				primaryParamenters.Append("[__Id] = @__Id");
 			}
 			else
 			{
-				var columns = metadata.Table.Primary.Split(',');
+				var columns = adapter.Table.Primary.Split(',');
 				foreach (var column in columns)
 				{
 					primaryParamenters.Append(columns.Last() != column ? $" [{column}] = @{column} AND " : $" [{column}] = @{column}");
@@ -151,58 +151,66 @@ namespace DotnetSpider.Extension.Pipeline
 
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("USE {0}; UPDATE [{1}] SET {2} WHERE {3};",
-				metadata.Table.Database,
-				metadata.Table.Name,
+				adapter.Table.Database,
+				adapter.Table.Name,
 				setParamenters, primaryParamenters);
 
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GenerateSelectSql(EntityDbMetadata metadata)
+		protected override string GenerateSelectSql(EntityAdapter adapter)
 		{
-			string selectParamenters = string.Join(", ", metadata.Table.UpdateColumns.Select(p => $"[{p}]"));
-			string primaryParamenters = $" [{metadata.Table.Primary}]=@{metadata.Table.Primary}";
+			string selectParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"[{p}]"));
+			string primaryParamenters = $" [{adapter.Table.Primary}]=@{adapter.Table.Primary}";
 
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("USE {0}; SELECT {1} FROM [{2}] WHERE {3};",
-				metadata.Table.Database,
+				adapter.Table.Database,
 				selectParamenters,
-				metadata.Table.Name,
+				adapter.Table.Name,
 				primaryParamenters);
 
 			return sqlBuilder.ToString();
 		}
 
-		protected string GetDataTypeSql(Field field)
+		protected string GetDataTypeSql(Column field)
 		{
-			switch (field.DataType)
+			var dataType = "TEXT";
+
+			if (field.DataType == DataTypeNames.Boolean)
 			{
-				case DataType.Bigint:
-					{
-						return "BIGINT";
-					}
-				case DataType.Int:
-					{
-						return "INT";
-					}
-				case DataType.Double:
-					{
-						return "FLOAT";
-					}
-				case DataType.Float:
-					{
-						return "FLOAT";
-					}
-				case DataType.Text:
-					{
-						return field.Length <= 0 ? "NVARCHAR(MAX)" : $"NVARCHAR({field.Length}) {(field.NotNull ? "NOT NULL" : "NULL")}";
-					}
-				case DataType.Time:
-					{
-						return "DATETIME";
-					}
+				dataType = "BOOL";
 			}
-			return "TEXT";
+			else if (field.DataType == DataTypeNames.DateTime)
+			{
+				dataType = "DATETIME";
+			}
+			else if (field.DataType == DataTypeNames.Decimal)
+			{
+				dataType = "DECIMAL(18,2)";
+			}
+			else if (field.DataType == DataTypeNames.Double)
+			{
+				dataType = "FLOAT";
+			}
+			else if (field.DataType == DataTypeNames.Float)
+			{
+				dataType = "FLOAT";
+			}
+			else if (field.DataType == DataTypeNames.Int)
+			{
+				dataType = "INT";
+			}
+			else if (field.DataType == DataTypeNames.Int64)
+			{
+				dataType = "BIGINT";
+			}
+			else if (field.DataType == DataTypeNames.String)
+			{
+				dataType = field.Length <= 0 ? "NVARCHAR(MAX)" : $"NVARCHAR({field.Length}) {(field.NotNull ? "NOT NULL" : "NULL")}";
+			}
+
+			return dataType;
 		}
 
 		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)

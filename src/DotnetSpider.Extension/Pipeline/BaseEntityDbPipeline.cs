@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using DotnetSpider.Core;
-using Newtonsoft.Json.Linq;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
 using System.Collections.Concurrent;
@@ -21,15 +20,15 @@ namespace DotnetSpider.Extension.Pipeline
 	public abstract class BaseEntityDbPipeline : BaseEntityPipeline
 	{
 		protected abstract ConnectionStringSettings CreateConnectionStringSettings(string connectString = null);
-		protected abstract string GenerateInsertSql(EntityDbMetadata metadata);
-		protected abstract string GenerateUpdateSql(EntityDbMetadata metadata);
-		protected abstract string GenerateSelectSql(EntityDbMetadata metadata);
-		protected abstract string GenerateCreateTableSql(EntityDbMetadata metadata);
-		protected abstract string GenerateCreateDatabaseSql(EntityDbMetadata metadata, string serverVersion);
-		protected abstract string GenerateIfDatabaseExistsSql(EntityDbMetadata metadata, string serverVersion);
+		protected abstract string GenerateInsertSql(EntityAdapter adapter);
+		protected abstract string GenerateUpdateSql(EntityAdapter adapter);
+		protected abstract string GenerateSelectSql(EntityAdapter adapter);
+		protected abstract string GenerateCreateTableSql(EntityAdapter adapter);
+		protected abstract string GenerateCreateDatabaseSql(EntityAdapter adapter, string serverVersion);
+		protected abstract string GenerateIfDatabaseExistsSql(EntityAdapter adapter, string serverVersion);
 		protected abstract DbParameter CreateDbParameter(string name, object value);
 
-		protected ConcurrentDictionary<string, EntityDbMetadata> DbMetadatas { get; set; } = new ConcurrentDictionary<string, EntityDbMetadata>();
+		protected ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
 
 		public IUpdateConnectString UpdateConnectString { get; set; }
 
@@ -43,136 +42,30 @@ namespace DotnetSpider.Extension.Pipeline
 			CheckIfSameBeforeUpdate = checkIfSaveBeforeUpdate;
 		}
 
-		public override void AddEntity(Entity metadata)
+		public override void AddEntity(EntityDefine entityDefine)
 		{
-			if (metadata.Table == null)
+			if (entityDefine == null  )
 			{
-				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Skip {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
+				throw new ArgumentException("Should not add a null entity to a entity dabase pipeline.");
+			}
+
+			if (entityDefine == null || entityDefine.Table == null)
+			{
+				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", LogLevel.Warn);
 				return;
 			}
-			EntityDbMetadata dbMetadata = new EntityDbMetadata { Table = metadata.Table };
-			foreach (var f in metadata.Fields)
+
+			EntityAdapter entityAdapter = new EntityAdapter(entityDefine.Table, entityDefine.Columns);
+
+			if (entityAdapter.Table.UpdateColumns != null && entityAdapter.Table.UpdateColumns.Length > 0)
 			{
-				var column = f;
-				if (!column.IgnoreStore)
-				{
-					dbMetadata.Columns.Add(column);
-				}
-			}
-			if (dbMetadata.Columns.Count == 0)
-			{
-				throw new SpiderException($"Columns is necessary, Skip {GetType().Name} for {metadata.Name}.");
-			}
-			if (!string.IsNullOrEmpty(metadata.Table.Primary))
-			{
-				if (metadata.Table.Primary != Core.Environment.IdColumn)
-				{
-					var items = new HashSet<string>(metadata.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
-					if (items.Count > 0)
-					{
-						foreach (var item in items)
-						{
-							var column = dbMetadata.Columns.FirstOrDefault(c => c.Name == item);
-							if (column == null)
-							{
-								throw new SpiderException("Columns set as Primary is not a property of your entity.");
-							}
-							if (column.Length > 256)
-							{
-								throw new SpiderException("Column length of Primary should not large than 256.");
-							}
-							column.NotNull = true;
-						}
-					}
-					else
-					{
-						dbMetadata.Table.Primary = Core.Environment.IdColumn;
-					}
-				}
-			}
-			else
-			{
-				dbMetadata.Table.Primary = Core.Environment.IdColumn;
+				entityAdapter.SelectSql = GenerateSelectSql(entityAdapter);
+				entityAdapter.UpdateSql = GenerateUpdateSql(entityAdapter);
+				entityAdapter.InsertModel = false;
 			}
 
-			if (dbMetadata.Table.UpdateColumns != null && dbMetadata.Table.UpdateColumns.Length > 0)
-			{
-				foreach (var column in dbMetadata.Table.UpdateColumns)
-				{
-					if (dbMetadata.Columns.All(c => c.Name != column))
-					{
-						throw new SpiderException("Columns set as update is not a property of your entity.");
-					}
-				}
-				var updateColumns = new List<string>(dbMetadata.Table.UpdateColumns);
-				updateColumns.Remove(dbMetadata.Table.Primary);
-
-				dbMetadata.Table.UpdateColumns = updateColumns.ToArray();
-
-				if (dbMetadata.Table.UpdateColumns.Length == 0)
-				{
-					throw new SpiderException("There is no column need update.");
-				}
-
-				dbMetadata.SelectSql = GenerateSelectSql(dbMetadata);
-				dbMetadata.UpdateSql = GenerateUpdateSql(dbMetadata);
-
-				dbMetadata.InsertModel = false;
-			}
-
-			if (dbMetadata.Table.Indexs != null && dbMetadata.Table.Indexs.Length > 0)
-			{
-				for (int i = 0; i < dbMetadata.Table.Indexs.Length; ++i)
-				{
-					var items = new HashSet<string>(dbMetadata.Table.Indexs[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
-
-					if (items.Count == 0)
-					{
-						throw new SpiderException("Index should contain more than a column.");
-					}
-					foreach (var item in items)
-					{
-						var column = dbMetadata.Columns.FirstOrDefault(c => c.Name == item);
-						if (column == null)
-						{
-							throw new SpiderException("Columns set as index is not a property of your entity.");
-						}
-						if (column.Length <= 0 || column.Length > 256)
-						{
-							throw new SpiderException("Column length of index should not large than 256.");
-						}
-					}
-					dbMetadata.Table.Indexs[i] = string.Join(",", items);
-				}
-			}
-			if (dbMetadata.Table.Uniques != null && dbMetadata.Table.Uniques.Length > 0)
-			{
-				for (int i = 0; i < dbMetadata.Table.Uniques.Length; ++i)
-				{
-					var items = new HashSet<string>(dbMetadata.Table.Uniques[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
-
-					if (items.Count == 0)
-					{
-						throw new SpiderException("Unique should contain more than a column.");
-					}
-					foreach (var item in items)
-					{
-						var column = dbMetadata.Columns.FirstOrDefault(c => c.Name == item);
-						if (column == null)
-						{
-							throw new SpiderException("Columns set as unique is not a property of your entity.");
-						}
-						if (column.DataType == DataType.Text && (column.Length <= 0 || column.Length > 256))
-						{
-							throw new SpiderException("Column length of unique should not large than 256.");
-						}
-					}
-					dbMetadata.Table.Uniques[i] = string.Join(",", items);
-				}
-			}
-
-			dbMetadata.InsertSql = GenerateInsertSql(dbMetadata);
-			DbMetadatas.TryAdd(metadata.Name, dbMetadata);
+			entityAdapter.InsertSql = GenerateInsertSql(entityAdapter);
+			EntityAdapters.TryAdd(entityDefine.Name, entityAdapter);
 		}
 
 		public override void InitPipeline(ISpider spider)
@@ -209,7 +102,7 @@ namespace DotnetSpider.Extension.Pipeline
 			base.InitPipeline(spider);
 
 
-			foreach (var metadata in DbMetadatas.Values)
+			foreach (var metadata in EntityAdapters.Values)
 			{
 				if (!metadata.InsertModel)
 				{
@@ -238,10 +131,10 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override void Process(string entityName, List<JObject> datas)
+		public override void Process(string entityName, List<DataObject> datas)
 		{
-			EntityDbMetadata metadata;
-			if (DbMetadatas.TryGetValue(entityName, out metadata))
+			EntityAdapter metadata;
+			if (EntityAdapters.TryGetValue(entityName, out metadata))
 			{
 				NetworkCenter.Current.Execute("pp", () =>
 				{
@@ -260,7 +153,7 @@ namespace DotnetSpider.Extension.Pipeline
 								List<DbParameter> parameters = new List<DbParameter>();
 								foreach (var column in metadata.Columns)
 								{
-									var value = data.SelectToken($"{column.Name}")?.Value<string>();
+									var value = data[$"{column.Name}"];
 									var parameter = CreateDbParameter($"@{column.Name}", value);
 									parameter.DbType = DbType.String;
 									parameters.Add(parameter);
@@ -286,7 +179,7 @@ namespace DotnetSpider.Extension.Pipeline
 									List<DbParameter> selectParameters = new List<DbParameter>();
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data.SelectToken(Core.Environment.IdColumn)?.Value<string>());
+										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data[Core.Environment.IdColumn]);
 										primaryParameter.DbType = DbType.String;
 										selectParameters.Add(primaryParameter);
 									}
@@ -295,14 +188,14 @@ namespace DotnetSpider.Extension.Pipeline
 										var columns = metadata.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim());
 										foreach (var column in columns)
 										{
-											var primaryParameter = CreateDbParameter($"@{column}", data.SelectToken($"{column}")?.Value<string>());
+											var primaryParameter = CreateDbParameter($"@{column}", data[$"{column}"]);
 											primaryParameter.DbType = DbType.String;
 											selectParameters.Add(primaryParameter);
 										}
 									}
 									selectCmd.Parameters.AddRange(selectParameters.ToArray());
 									var reader = selectCmd.ExecuteReader();
-									JObject old = new JObject();
+									DataObject old = new DataObject();
 									if (reader.Read())
 									{
 										for (int i = 0; i < reader.FieldCount; ++i)
@@ -314,17 +207,17 @@ namespace DotnetSpider.Extension.Pipeline
 									selectCmd.Dispose();
 
 									// the primary key is not exists.
-									if (!old.HasValues)
+									if (old.Count == 0)
 									{
 										continue;
 									}
 
-									string oldValue = string.Join("-", old.PropertyValues());
+									string oldValue = string.Join("-", old.Values);
 
 									StringBuilder newValueBuilder = new StringBuilder();
 									foreach (var column in metadata.Table.UpdateColumns)
 									{
-										var v = data.SelectToken($"$.{column}");
+										var v = data[$"$.{column}"];
 										newValueBuilder.Append($"-{v}");
 									}
 									string newValue = newValueBuilder.ToString().Substring(1, newValueBuilder.Length - 1);
@@ -344,14 +237,14 @@ namespace DotnetSpider.Extension.Pipeline
 									List<DbParameter> parameters = new List<DbParameter>();
 									foreach (var column in metadata.Table.UpdateColumns)
 									{
-										var parameter = CreateDbParameter($"@{column}", data.SelectToken($"{column}")?.Value<string>());
+										var parameter = CreateDbParameter($"@{column}", data[$"{column}"]);
 										parameter.DbType = DbType.String;
 										parameters.Add(parameter);
 									}
 
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data.SelectToken(Core.Environment.IdColumn)?.Value<string>());
+										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data[Core.Environment.IdColumn]);
 										primaryParameter.DbType = DbType.String;
 										parameters.Add(primaryParameter);
 									}
@@ -360,7 +253,7 @@ namespace DotnetSpider.Extension.Pipeline
 										var columns = metadata.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim());
 										foreach (var column in columns)
 										{
-											var primaryParameter = CreateDbParameter($"@{column}", data.SelectToken($"{column}")?.Value<string>());
+											var primaryParameter = CreateDbParameter($"@{column}", data[$"{column}"]);
 											primaryParameter.DbType = DbType.String;
 											parameters.Add(primaryParameter);
 										}
@@ -385,8 +278,8 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <returns></returns>
 		public string[] GetUpdateColumns(string entityName)
 		{
-			EntityDbMetadata metadata;
-			if (DbMetadatas.TryGetValue(entityName, out metadata))
+			EntityAdapter metadata;
+			if (EntityAdapters.TryGetValue(entityName, out metadata))
 			{
 				return metadata.Table.UpdateColumns;
 			}

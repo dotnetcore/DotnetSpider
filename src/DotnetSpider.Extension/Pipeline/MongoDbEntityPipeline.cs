@@ -2,7 +2,6 @@
 using DotnetSpider.Extension.Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System;
 using DotnetSpider.Core.Infrastructure;
@@ -24,7 +23,7 @@ namespace DotnetSpider.Extension.Pipeline
 			ConnectString = connectString;
 		}
 
-		public override void AddEntity(Entity metadata)
+		public override void AddEntity(EntityDefine metadata)
 		{
 			base.AddEntity(metadata);
 
@@ -40,7 +39,7 @@ namespace DotnetSpider.Extension.Pipeline
 			Collections.TryAdd(metadata.Table.Name, db.GetCollection<BsonDocument>(metadata.Table.Name));
 		}
 
-		public override void Process(string entityName, List<JObject> datas)
+		public override void Process(string entityName, List<DataObject> datas)
 		{
 			IMongoCollection<BsonDocument> collection;
 			if (Collections.TryGetValue(entityName, out collection))
@@ -48,7 +47,7 @@ namespace DotnetSpider.Extension.Pipeline
 				List<BsonDocument> reslut = new List<BsonDocument>();
 				foreach (var data in datas)
 				{
-					BsonDocument item = BsonDocument.Parse(data.ToString());
+					BsonDocument item = new BsonDocument(data);
 
 					reslut.Add(item);
 				}

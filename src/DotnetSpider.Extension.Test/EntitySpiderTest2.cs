@@ -38,32 +38,32 @@ namespace DotnetSpider.Extension.Test
 				throw new NotImplementedException();
 			}
 
-			protected override string GenerateCreateDatabaseSql(EntityDbMetadata metadata, string serverVersion)
+			protected override string GenerateCreateDatabaseSql(EntityAdapter metadata, string serverVersion)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GenerateCreateTableSql(EntityDbMetadata metadata)
+			protected override string GenerateCreateTableSql(EntityAdapter metadata)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GenerateIfDatabaseExistsSql(EntityDbMetadata metadata, string serverVersion)
+			protected override string GenerateIfDatabaseExistsSql(EntityAdapter metadata, string serverVersion)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GenerateInsertSql(EntityDbMetadata metadata)
+			protected override string GenerateInsertSql(EntityAdapter metadata)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GenerateSelectSql(EntityDbMetadata metadata)
+			protected override string GenerateSelectSql(EntityAdapter metadata)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GenerateUpdateSql(EntityDbMetadata metadata)
+			protected override string GenerateUpdateSql(EntityAdapter metadata)
 			{
 				throw new NotImplementedException();
 			}
@@ -93,13 +93,14 @@ namespace DotnetSpider.Extension.Test
 		[Table("test", "table", TableSuffix.Monday)]
 		public class Entity4 : SpiderEntity
 		{
+			[PropertyDefine(Expression = "")]
 			public string Name { get; set; }
 		}
 
 		[Table("test", "table", Primary = "Name")]
 		public class Entity5 : SpiderEntity
 		{
-			[PropertyDefine(Expression = "")]
+			[PropertyDefine(Expression = "", Length = 100)]
 			public string Name { get; set; }
 		}
 
@@ -114,6 +115,7 @@ namespace DotnetSpider.Extension.Test
 		[EntitySelector(Expression = "expression")]
 		public class Entity7 : SpiderEntity
 		{
+			[PropertyDefine(Expression = "")]
 			public string Name { get; set; }
 		}
 
@@ -121,19 +123,24 @@ namespace DotnetSpider.Extension.Test
 		[EntitySelector(Expression = "expression2", Type = SelectorType.Css)]
 		public class Entity8 : SpiderEntity
 		{
+			[PropertyDefine(Expression = "")]
 			public string Name { get; set; }
 		}
 
 		[Table("test", "table")]
 		public class Entity9 : SpiderEntity
 		{
+			[PropertyDefine(Expression = "")]
 			public string Name { get; set; }
 		}
 
 		[Table("test", "table", Primary = "Name", Indexs = new[] { "Id" }, Uniques = new[] { "Id,Name", "Id" })]
 		public class Entity10 : SpiderEntity
 		{
+			[PropertyDefine(Expression = "")]
 			public int Id { get; set; }
+
+			[PropertyDefine(Expression = "", Length = 100)]
 			public string Name { get; set; }
 		}
 
@@ -196,20 +203,48 @@ namespace DotnetSpider.Extension.Test
 			public string String1 { get; set; }
 		}
 
+		[Table("test", "table", Indexs = new[] { "c1" })]
+		public class Entity16 : SpiderEntity
+		{
+			[PropertyDefine(Expression = "")]
+			public int c1 { get; set; }
+		}
+
+		[Table("test", "table", Indexs = new[] { "c1" })]
+		public class Entity17 : SpiderEntity
+		{
+			[PropertyDefine(Expression = "", Length = 300)]
+			public string c1 { get; set; }
+		}
+
+		[Table("test", "table", Uniques = new[] { "c1" })]
+		public class Entity18 : SpiderEntity
+		{
+			[PropertyDefine(Expression = "", Length = 300)]
+			public string c1 { get; set; }
+		}
+
+		[Table("test", "table", Primary = "c1")]
+		public class Entity19 : SpiderEntity
+		{
+			[PropertyDefine(Expression = "", Length = 300)]
+			public string c1 { get; set; }
+		}
+
 		[TestMethod]
 		public void EntitySelector()
 		{
-			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity7).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityDefine(typeof(Entity7).GetTypeInfo());
 			Assert.AreEqual("expression", entity1.Selector.Expression);
 			Assert.AreEqual(SelectorType.XPath, entity1.Selector.Type);
 			Assert.IsTrue(entity1.Multi);
 
-			var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity8).GetTypeInfo());
+			var entity2 = EntitySpider.GenerateEntityDefine(typeof(Entity8).GetTypeInfo());
 			Assert.AreEqual("expression2", entity2.Selector.Expression);
 			Assert.AreEqual(SelectorType.Css, entity2.Selector.Type);
 			Assert.IsTrue(entity2.Multi);
 
-			var entity3 = EntitySpider.GenerateEntityMetaData(typeof(Entity9).GetTypeInfo());
+			var entity3 = EntitySpider.GenerateEntityDefine(typeof(Entity9).GetTypeInfo());
 			Assert.IsFalse(entity3.Multi);
 			Assert.IsNull(entity3.Selector);
 			Assert.AreEqual("DotnetSpider.Extension.Test.EntitySpiderTest2+Entity9", entity3.Name);
@@ -218,7 +253,7 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void Indexes()
 		{
-			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity10).GetTypeInfo());
+			var entity1 = EntitySpider.GenerateEntityDefine(typeof(Entity10).GetTypeInfo());
 			Assert.AreEqual("Id", entity1.Table.Indexs[0]);
 			Assert.AreEqual("Name", entity1.Table.Primary);
 			Assert.AreEqual(2, entity1.Table.Uniques.Length);
@@ -227,10 +262,91 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[TestMethod]
+		public void ColumnOfIndexesOverLength()
+		{
+			try
+			{
+				EntitySpider context = new DefaultEntitySpider();
+				context.Identity = (Guid.NewGuid().ToString("N"));
+				context.ThreadNum = 1;
+
+				var entity = context.AddEntityType<Entity17>();
+				var pipeline = new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306");
+				pipeline.AddEntity(entity);
+
+				throw new Exception("Failed.");
+			}
+			catch (Exception e)
+			{
+				Assert.AreEqual("Column length of index should not large than 256.", e.Message);
+			}
+		}
+
+		[TestMethod]
+		public void ColumnOfUniqueOverLength()
+		{
+			try
+			{
+				EntitySpider context = new DefaultEntitySpider();
+				context.Identity = (Guid.NewGuid().ToString("N"));
+				context.ThreadNum = 1;
+
+				var entity = context.AddEntityType<Entity18>();
+				var pipeline = new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306");
+				pipeline.AddEntity(entity);
+
+				throw new Exception("Failed.");
+			}
+			catch (Exception e)
+			{
+				Assert.AreEqual("Column length of unique should not large than 256.", e.Message);
+			}
+		}
+
+		[TestMethod]
+		public void ColumnOfPrimayOverLength()
+		{
+			try
+			{
+				EntitySpider context = new DefaultEntitySpider();
+				context.Identity = (Guid.NewGuid().ToString("N"));
+				context.ThreadNum = 1;
+
+				var entity = context.AddEntityType<Entity19>();
+				var pipeline = new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306");
+				pipeline.AddEntity(entity);
+
+				throw new Exception("Failed.");
+			}
+			catch (Exception e)
+			{
+				Assert.AreEqual("Column length of primary should not large than 256.", e.Message);
+			}
+		}
+
+
+
+		[TestMethod]
+		public void CustomePrimary()
+		{
+
+		}
+
+		[TestMethod]
+		public void ColumnOfIndexesIsInt()
+		{
+			EntitySpider context = new DefaultEntitySpider();
+			context.Identity = (Guid.NewGuid().ToString("N"));
+			context.ThreadNum = 1;
+			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			context.AddEntityType<Entity16>();
+		}
+
+		[TestMethod]
 		public void Formater()
 		{
-			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity11).GetTypeInfo());
-			var formatters = ((Field)entity1.Fields[0]).Formatters;
+			var entity1 = EntitySpider.GenerateEntityDefine(typeof(Entity11).GetTypeInfo());
+			var formatters = ((Column)entity1.Columns[0]).Formatters;
 			Assert.AreEqual(2, formatters.Count);
 			var replaceFormatter = (ReplaceFormatter)formatters[0];
 			Assert.AreEqual("a", replaceFormatter.NewValue);
@@ -240,24 +356,24 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void Schema()
 		{
-			var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity4).GetTypeInfo());
+			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity4).GetTypeInfo());
 			Assert.AreEqual("test", entityMetadata.Table.Database);
 			Assert.AreEqual(EntitySpider.GenerateTableName("table", entityMetadata.Table.Suffix), entityMetadata.Table.Name);
 			Assert.AreEqual(TableSuffix.Monday, entityMetadata.Table.Suffix);
 
-			var entityMetadata1 = EntitySpider.GenerateEntityMetaData(typeof(Entity14).GetTypeInfo());
+			var entityMetadata1 = EntitySpider.GenerateEntityDefine(typeof(Entity14).GetTypeInfo());
 			Assert.IsNull(entityMetadata1.Table);
 		}
 
 		[TestMethod]
 		public void SetPrimary()
 		{
-			var entity1 = EntitySpider.GenerateEntityMetaData(typeof(Entity5).GetTypeInfo());
-			Assert.AreEqual(1, entity1.Fields.Count);
-			Assert.AreEqual("Name", entity1.Fields[0].Name);
-			var entity2 = EntitySpider.GenerateEntityMetaData(typeof(Entity6).GetTypeInfo());
-			Assert.AreEqual(1, entity2.Fields.Count);
-			Assert.AreEqual("name", entity2.Fields[0].Name);
+			var entity1 = EntitySpider.GenerateEntityDefine(typeof(Entity5).GetTypeInfo());
+			Assert.AreEqual(1, entity1.Columns.Count);
+			Assert.AreEqual("Name", entity1.Columns[0].Name);
+			var entity2 = EntitySpider.GenerateEntityDefine(typeof(Entity6).GetTypeInfo());
+			Assert.AreEqual(1, entity2.Columns.Count);
+			Assert.AreEqual("name", entity2.Columns[0].Name);
 		}
 
 		[TestMethod]
@@ -265,14 +381,14 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity1).GetTypeInfo());
+				var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity1).GetTypeInfo());
 				TestPipeline pipeline = new TestPipeline("");
 				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
 			}
 			catch (SpiderException exception)
 			{
-				Assert.AreEqual("Columns set as Primary is not a property of your entity.", exception.Message);
+				Assert.AreEqual("Columns set as primary is not a property of your entity.", exception.Message);
 			}
 		}
 
@@ -281,7 +397,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity2).GetTypeInfo());
+				var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity2).GetTypeInfo());
 				TestPipeline pipeline = new TestPipeline("");
 				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
@@ -297,7 +413,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Entity3).GetTypeInfo());
+				var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity3).GetTypeInfo());
 				TestPipeline pipeline = new TestPipeline("");
 				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
@@ -441,7 +557,6 @@ namespace DotnetSpider.Extension.Test
 				conn.Execute($"DROP table test.table13");
 			}
 		}
-
 
 		[TestMethod]
 		public void MySqlDataTypeTests()

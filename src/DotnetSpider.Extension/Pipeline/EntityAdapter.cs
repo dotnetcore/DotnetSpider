@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class EntityDbMetadata
+	public class EntityAdapter
 	{
 		public Table Table { get; set; }
 
-		public List<Field> Columns { get; set; } = new List<Field>();
+		public List<Column> Columns { get; set; }
 
 		public string InsertSql { get; set; }
 
@@ -17,5 +17,11 @@ namespace DotnetSpider.Extension.Pipeline
 		public string SelectSql { get; set; }
 
 		public bool InsertModel { get; set; } = true;
+
+		public EntityAdapter(Table table, List<Column> columns)
+		{
+			Table = table;
+			Columns = columns;
+		}
 	}
 }

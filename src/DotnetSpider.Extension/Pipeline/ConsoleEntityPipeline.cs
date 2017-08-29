@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
-using Newtonsoft.Json.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -11,12 +10,11 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class ConsoleEntityPipeline : BaseEntityPipeline
 	{
-		public override void AddEntity(Entity metadata)
+		public override void AddEntity(EntityDefine metadata)
 		{
-
 		}
 
-		public override void Process(string entityName, List<JObject> datas)
+		public override void Process(string entityName, List<DataObject> datas)
 		{
 			foreach (var data in datas)
 			{

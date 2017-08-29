@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public interface ICollectEntityPipeline
 	{
-		List<JObject> GetCollected(string entityName);
+		List<DataObject> GetCollected(string entityName);
 	}
 }

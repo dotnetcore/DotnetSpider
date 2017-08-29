@@ -9,7 +9,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Scheduler;
-using Newtonsoft.Json.Linq;
 using System.Linq;
 using DotnetSpider.Core.Infrastructure.Database;
 
@@ -19,18 +18,20 @@ namespace DotnetSpider.Sample
 	{
 		public class MyDataHanlder : DataHandler
 		{
-			protected override JObject HandleDataOject(JObject data, Page page)
+			protected override DataObject HandleDataOject(DataObject data, Page page)
 			{
-				var sold = data.GetValue("sold")?.Value<int>();
-				var price = data.GetValue("price").Value<float>();
+				var soldStr = data.GetValue("sold");
 
-				if (sold == null)
+				if (soldStr == null)
 				{
-					data.Add("sold", -1);
+					data.Add("sold", "-1");
 					return data;
 				}
 				else
 				{
+					var sold = int.Parse(soldStr?.ToString());
+					var price = int.Parse(data.GetValue("price")?.ToString());
+
 					if (price >= 100 && price < 5000)
 					{
 						if (sold <= 1)

@@ -14,23 +14,23 @@ namespace DotnetSpider.Extension.Model
 	{
 		protected readonly List<SharedValueSelector> GlobalValues;
 
-		public Entity EntityMetadata { get; }
+		public EntityDefine EntityDefine { get; }
 
 		public DataHandler DataHandler { get; set; }
 
 		public string Name { get; }
 
-		public EntityExtractor(string name, List<SharedValueSelector> globalValues, Entity entityMetadata)
+		public EntityExtractor(string name, List<SharedValueSelector> globalValues, EntityDefine entityDefine)
 		{
-			EntityMetadata = entityMetadata;
+			EntityDefine = entityDefine;
 			Name = name;
-			DataHandler = entityMetadata.DataHandler;
+			DataHandler = entityDefine.DataHandler;
 			GlobalValues = globalValues;
 		}
 
-		public virtual List<JObject> Extract(Page page)
+		public virtual List<DataObject> Extract(Page page)
 		{
-			List<JObject> result = new List<JObject>();
+			List<DataObject> result = new List<DataObject>();
 			if (GlobalValues != null && GlobalValues.Count > 0)
 			{
 				foreach (var enviromentValue in GlobalValues)
@@ -40,8 +40,8 @@ namespace DotnetSpider.Extension.Model
 					page.Request.PutExtra(name, value);
 				}
 			}
-			ISelector selector = SelectorUtils.Parse(EntityMetadata.Selector);
-			if (selector != null && EntityMetadata.Multi)
+			ISelector selector = SelectorUtils.Parse(EntityDefine.Selector);
+			if (selector != null && EntityDefine.Multi)
 			{
 				var list = page.Selectable.SelectList(selector).Nodes();
 				if (list == null || list.Count == 0)
@@ -50,9 +50,9 @@ namespace DotnetSpider.Extension.Model
 				}
 				else
 				{
-					if (EntityMetadata.Take > 0)
+					if (EntityDefine.Take > 0)
 					{
-						list = list.Take(EntityMetadata.Take).ToList();
+						list = list.Take(EntityDefine.Take).ToList();
 					}
 
 					int index = 0;
@@ -74,7 +74,7 @@ namespace DotnetSpider.Extension.Model
 				if (select != null)
 				{
 					var singleResult = ExtractSingle(page, select, 0);
-					result = singleResult != null ? new List<JObject> { singleResult } : null;
+					result = singleResult != null ? new List<DataObject> { singleResult } : null;
 				}
 				else
 				{
@@ -131,12 +131,12 @@ namespace DotnetSpider.Extension.Model
 			}
 		}
 
-		private JObject ExtractSingle(Page page, ISelectable item, int index)
+		private DataObject ExtractSingle(Page page, ISelectable item, int index)
 		{
-			JObject dataObject = new JObject();
+			DataObject dataObject = new DataObject();
 
 			bool skip = false;
-			foreach (var field in EntityMetadata.Fields)
+			foreach (var field in EntityDefine.Columns)
 			{
 				var fieldValue = ExtractField(item, page, field, index);
 				if (fieldValue == null)
@@ -152,7 +152,7 @@ namespace DotnetSpider.Extension.Model
 					dataObject.Add(field.Name, fieldValue);
 				}
 			}
-			if (EntityMetadata.Table != null && EntityMetadata.Table.Primary == Core.Environment.IdColumn)
+			if (EntityDefine.Table != null && EntityDefine.Table.Primary == Core.Environment.IdColumn)
 			{
 				var id = GetEnviromentValue(Core.Environment.IdColumn, page, index);
 				if (!string.IsNullOrEmpty(id))
@@ -166,17 +166,17 @@ namespace DotnetSpider.Extension.Model
 				return null;
 			}
 
-			var result = dataObject.Children().Any() ? dataObject : null;
-			if (result != null)
+			var result = dataObject.Count > 0 ? dataObject : null;
+			if (result != null && EntityDefine.LinkToNexts != null)
 			{
-				foreach (var targetUrl in EntityMetadata.LinkToNexts)
+				foreach (var targetUrl in EntityDefine.LinkToNexts)
 				{
 					Dictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
 					if (targetUrl.Extras != null)
 					{
 						foreach (var extra in targetUrl.Extras)
 						{
-							extras.Add(extra, result.GetValue(extra));
+							extras.Add(extra, result[extra]);
 						}
 					}
 					Dictionary<string, dynamic> allExtras = new Dictionary<string, dynamic>();
@@ -184,7 +184,7 @@ namespace DotnetSpider.Extension.Model
 					{
 						allExtras.Add(extra.Key, extra.Value);
 					}
-					var value = result.GetValue(targetUrl.PropertyName);
+					var value = result[targetUrl.PropertyName];
 					if (value != null)
 					{
 						page.AddTargetRequest(new Request(value.ToString(), allExtras));
@@ -195,7 +195,7 @@ namespace DotnetSpider.Extension.Model
 			return result;
 		}
 
-		private dynamic ExtractField(ISelectable item, Page page, Field field, int index)
+		private dynamic ExtractField(ISelectable item, Page page, Column field, int index)
 		{
 			if (field == null)
 			{

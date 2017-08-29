@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using DotnetSpider.Core;
-using Newtonsoft.Json.Linq;
 using System.IO;
 
 namespace DotnetSpider.Extension.Test
@@ -23,12 +22,12 @@ namespace DotnetSpider.Extension.Test
 				Identity = guid;
 			}
 
-			protected override JObject HandleDataOject(JObject data, Page page)
+			protected override DataObject HandleDataOject(DataObject data, Page page)
 			{
 				return data;
 			}
 
-			public override List<JObject> Handle(List<JObject> datas, Page page)
+			public override List<DataObject> Handle(List<DataObject> datas, Page page)
 			{
 				var stream = File.Create(Identity);
 				stream.Dispose();
@@ -39,13 +38,13 @@ namespace DotnetSpider.Extension.Test
 		[TestMethod]
 		public void HandlerWhenExtractZeroResult()
 		{
-			var entityMetadata = EntitySpider.GenerateEntityMetaData(typeof(Product).GetTypeInfo());
+			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Product).GetTypeInfo());
 			var identity = Guid.NewGuid().ToString("N");
 			entityMetadata.DataHandler = new MyDataHanlder(identity);
 			EntityProcessor processor = new EntityProcessor(new Site(), entityMetadata);
 			processor.Process(new Page(new Request("http://www.abcd.com"))
 			{
-				Content = "{}"
+				Content = "{'data':[{'name':'1'},{'name':'2'}]}"
 			});
 			Assert.IsTrue(File.Exists(identity));
 			File.Delete(identity);
@@ -54,6 +53,8 @@ namespace DotnetSpider.Extension.Test
 		[EntitySelector(Expression = "$.data[*]", Type = Core.Selector.SelectorType.JsonPath)]
 		public class Product : SpiderEntity
 		{
+			[PropertyDefine(Expression = "$.name", Type = Core.Selector.SelectorType.JsonPath, Length = 100)]
+			public string name { get; set; }
 		}
 	}
 }

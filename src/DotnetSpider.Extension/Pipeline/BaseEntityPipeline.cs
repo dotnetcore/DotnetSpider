@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
-using Newtonsoft.Json.Linq;
 using DotnetSpider.Core.Pipeline;
 using System.Collections.Concurrent;
 
@@ -9,19 +8,19 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class BaseEntityPipeline : BasePipeline, IEntityPipeline
 	{
-		private readonly ConcurrentDictionary<string, Entity> _entities = new ConcurrentDictionary<string, Entity>();
+		private readonly ConcurrentDictionary<string, EntityDefine> _entities = new ConcurrentDictionary<string, EntityDefine>();
 
-		public abstract void Process(string entityName, List<JObject> items);
+		protected ConcurrentDictionary<string, EntityDefine> Entities => _entities;
 
-		protected ConcurrentDictionary<string, Entity> Entities => _entities;
+		public abstract void Process(string entityName, List<DataObject> items);
 
-		public virtual void AddEntity(Entity entity)
+		public virtual void AddEntity(EntityDefine entityDefine)
 		{
-			if (entity.Table == null)
+			if (entityDefine == null)
 			{
 				return;
 			}
-			_entities.TryAdd(entity.Name, entity);
+			_entities.TryAdd(entityDefine.Name, entityDefine);
 		}
 
 		public override void Process(params ResultItems[] resultItems)
@@ -35,12 +34,12 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				foreach (var result in resultItem.Results)
 				{
-					List<JObject> list = new List<JObject>();
+					List<DataObject> list = new List<DataObject>();
 					dynamic data = resultItem.GetResultItem(result.Key);
 
 					if (data != null)
 					{
-						if (data is JObject)
+						if (data is DataObject)
 						{
 							list.Add(data);
 						}

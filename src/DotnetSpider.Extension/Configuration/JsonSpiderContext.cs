@@ -35,7 +35,7 @@ namespace DotnetSpider.Extension.Configuration
 		public bool SkipWhenResultIsEmpty { get; set; } = false;
 		public bool RetryWhenResultIsEmpty { get; set; } = false;
 
-		public List<Entity> Entities { get; set; }
+		public List<EntityDefine> Entities { get; set; }
 
 		private IScheduler GetScheduler(JObject jobject)
 		{
