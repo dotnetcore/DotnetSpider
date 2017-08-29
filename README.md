@@ -1,6 +1,8 @@
 # DotnetSpider
 =================
 
+[![Member project of .NET China Foundation](https://img.shields.io/badge/member_project_of-.NET_CHINA-red.svg?style=flat&colorB=9E20C8)](https://github.com/dotnetcore)
+
 This is a cross platfrom, high performance, light weight cralwer developed by C#.
 
 ### DESIGN
