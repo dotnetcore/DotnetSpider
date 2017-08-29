@@ -229,25 +229,7 @@ NOTE:
 
 ### Web Manager
 
-+ Manage Project
-
-![projects](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/projects.jpg?raw=true)
-
-+ Manage Tasks
-
-![tasks](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/createTask.jpg?raw=true)
-![createTask](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/tasks.jpg?raw=true)
-
-+ Nodes Monitor
-![nodes](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/nodes.jpg?raw=true)
-
-+ Status Monitor
-
-![status](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/status.jpg?raw=true)
-
-+ View Logs
-
-![logs](https://github.com/zlzforever/DotnetSpider/blob/master/docs/images/log.jpg?raw=true)
+1. Beta
 
 ### NOTICE
 
