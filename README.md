@@ -2,9 +2,7 @@
 
 [![Member project of .NET China Foundation](https://img.shields.io/badge/member_project_of-.NET_CHINA-red.svg?style=flat&colorB=9E20C8)](https://github.com/dotnetcore)
 
-test
-
-This is a cross platfrom, high performance, light weight cralwer developed by C#.
+DotnetSpider is .NET Standard library to implement web crawler similar to WebMagic and Scrapy. It is lightweight ,efficient and highly customized, support storage data to MySql, SqlServer, MongoDB and able to run as distributed system via Redis.
 
 ### DESIGN
 
