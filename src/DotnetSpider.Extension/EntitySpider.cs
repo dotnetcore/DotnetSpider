@@ -212,6 +212,11 @@ namespace DotnetSpider.Extension
 			IPipeline pipeline;
 			switch (Core.Environment.DataConnectionStringSettings.ProviderName)
 			{
+				case "Npgsql":
+					{
+						pipeline = new PostgreSqlEntityPipeline();
+						break;
+					}
 				case "MySql.Data.MySqlClient":
 					{
 						pipeline = new MySqlEntityPipeline();
@@ -220,6 +225,11 @@ namespace DotnetSpider.Extension
 				case "System.Data.SqlClient":
 					{
 						pipeline = new SqlServerEntityPipeline();
+						break;
+					}
+				case "MongoDB":
+					{
+						pipeline = new MongoDBEntityPipeline(Core.Environment.DataConnectionString);
 						break;
 					}
 				default:

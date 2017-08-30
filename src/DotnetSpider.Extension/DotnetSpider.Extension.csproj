@@ -51,4 +51,7 @@
     <Folder Include="Properties\" />
     <Folder Include="Redial\" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="3.2.5" />
+  </ItemGroup>
 </Project>

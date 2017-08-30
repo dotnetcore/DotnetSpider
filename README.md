@@ -224,8 +224,8 @@ NOTE:
 
 ### Monitor and Database log
 
-1. Set connectString to correct mysql connect string in config.ini project DotnetSpider.Sample.
-2. Run your EntitySpider then check data in database: dotnetspider
+1. Set SystemConnection in app.config, only support mysql so far.
+2. Run a spider then check data in database: dotnetspider, there are 3 tables: log, status, task_running
 
 
 ### Web Manager
@@ -238,6 +238,13 @@ NOTE:
 	timeout 0 
 	tcp-keepalive 60
 ### Upgrade
+
+##### 20170829
++ A lot of restruct
++ Use DataObject instead of JObject for performace reason
++ Move entity validation to EntitySpider class, then we can detected issues when try to add a Entity class before run a spider.
++ Use App.config instead of config.ini
++ Framework will detect a pipeline from App.config(MySql or SqlServer) if user did not add.
 
 ##### 20170817
 + Upgrade to .NET CORE 2.0
