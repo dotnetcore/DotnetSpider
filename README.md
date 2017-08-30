@@ -2,7 +2,7 @@
 
 [![Member project of .NET China Foundation](https://img.shields.io/badge/member_project_of-.NET_CHINA-red.svg?style=flat&colorB=9E20C8)](https://github.com/dotnetcore)
 
-DotnetSpider is .NET Standard library to implement web crawler similar to WebMagic and Scrapy. It is lightweight ,efficient and highly customized, support storage data to MySql, SqlServer, MongoDB and able to run as distributed system via Redis.
+DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling & scraping framework for .NET
 
 ### DESIGN
 
