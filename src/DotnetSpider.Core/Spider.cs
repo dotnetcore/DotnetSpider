@@ -88,9 +88,9 @@ namespace DotnetSpider.Core
 		public Status Stat { get; private set; } = Status.Init;
 
 		public event Action<Request> OnSuccess;
-		public event Action OnClosing;
-		public event Action OnComplete;
-		public event Action OnClosed;
+		public event Action<Spider> OnClosing;
+		public event Action<Spider> OnComplete;
+		public event Action<Spider> OnClosed;
 
 		public bool ClearSchedulerAfterComplete { get; set; } = true;
 
@@ -559,7 +559,7 @@ namespace DotnetSpider.Core
 									Stat = Status.Finished;
 									_realStat = Status.Finished;
 									_OnComplete();
-									OnComplete?.Invoke();
+									OnComplete?.Invoke(this);
 									break;
 								}
 
@@ -612,43 +612,46 @@ namespace DotnetSpider.Core
 			Logger.MyLog(Identity, "Waiting for monitor exit.", LogLevel.Info);
 			_monitorTask.Wait(5000);
 
-			OnClosing?.Invoke();
+			OnClosing?.Invoke(this);
 
 			var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
 			Logger.MyLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
 
-			OnClosed?.Invoke();
+			OnClosed?.Invoke(this);
 		}
 
 		public static void PrintInfo()
 		{
-			var key = "_DotnetSpider_Info";
+			lock (Locker)
+			{
+				var key = "_DotnetSpider_Info";
 
 #if !NET_CORE
-			var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
+				var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
 #else
 			bool isPrinted;
 			AppContext.TryGetSwitch(key, out isPrinted);
 #endif
-			if (!isPrinted)
-			{
-				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine("=================================================================");
-				Console.WriteLine("== DotnetSpider is an open source crawler developed by C#      ==");
-				Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
-				Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
-				Console.WriteLine("== License: LGPL3.0                                            ==");
-				Console.WriteLine("== Author: zlzforever@163.com                                  ==");
-				Console.WriteLine("=================================================================");
-				Console.ForegroundColor = ConsoleColor.White;
+				if (!isPrinted)
+				{
+					Console.ForegroundColor = ConsoleColor.Green;
+					Console.WriteLine("=================================================================");
+					Console.WriteLine("== DotnetSpider is an open source crawler developed by C#      ==");
+					Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
+					Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
+					Console.WriteLine("== License: LGPL3.0                                            ==");
+					Console.WriteLine("== Author: zlzforever@163.com                                  ==");
+					Console.WriteLine("=================================================================");
+					Console.ForegroundColor = ConsoleColor.White;
 #if !NET_CORE
-				AppDomain.CurrentDomain.SetData(key, "True");
+					AppDomain.CurrentDomain.SetData(key, "True");
 #else
 				AppContext.SetSwitch(key, true);
 #endif
+				}
+				Console.WriteLine();
+				Console.WriteLine("=================================================================");
 			}
-			Console.WriteLine();
-			Console.WriteLine("=================================================================");
 		}
 
 		public Task RunAsync(params string[] arguments)
