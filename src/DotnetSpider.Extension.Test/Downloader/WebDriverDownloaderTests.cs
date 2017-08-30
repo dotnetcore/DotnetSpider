@@ -4,16 +4,16 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace DotnetSpider.Extension.Test.Downloader
 {
-	[TestClass]
+#if LOCAL
 	public class WebDriverDownloaderTests
 	{
-		[TestMethod]
+		[Fact]
 		public void DestoryDownloader()
 		{
 			BaiduSearchSpider spider = new BaiduSearchSpider();
@@ -76,4 +76,5 @@ namespace DotnetSpider.Extension.Test.Downloader
 			public DateTime RunId { get; set; }
 		}
 	}
+#endif
 }

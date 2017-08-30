@@ -15,7 +15,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// </summary>  
 		/// <param name="item">参数类对象</param>  
 		/// <returns>返回HttpResult类型</returns>  
-		public static HttpResult GetHtml(HttpRequest item)
+		public static HttpResult Request(HttpRequest item)
 		{
 			HttpResult result = new HttpResult();
 			HttpWebRequest request;
@@ -61,6 +61,33 @@ namespace DotnetSpider.Core.Infrastructure
 				result.Html = ex.Message;
 			}
 			return result;
+		}
+
+		public static HttpResult Request(string url)
+		{
+			return Request(new HttpRequest
+			{
+				Url = url
+			});
+		}
+
+		public static HttpResult Request(string url, Encoding encoding)
+		{
+			return Request(new HttpRequest
+			{
+				Url = url,
+				Encoding = encoding
+			});
+		}
+
+		public static HttpResult Request(string url, System.Net.Http.HttpMethod method, Encoding encoding)
+		{
+			return Request(new HttpRequest
+			{
+				Url = url,
+				Method = method.ToString(),
+				Encoding = encoding
+			});
 		}
 
 		private static void GetData(HttpRequest item, HttpResult result, HttpWebResponse response)

@@ -5,9 +5,10 @@ using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Extension.Monitor;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 using System.Linq;
+using System.Threading;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -16,10 +17,10 @@ namespace DotnetSpider.Extension.Test
 		public int Count { get; set; }
 	}
 
-	[TestClass]
+
 	public class LogTest
 	{
-		[TestMethod]
+		[Fact]
 		public void DatebaseLogAndStatus()
 		{
 			string id = Guid.NewGuid().ToString("N");
@@ -40,13 +41,24 @@ namespace DotnetSpider.Extension.Test
 				spider.Monitor = new DbMonitor(id);
 				spider.Run();
 			}
+
 			using (var conn = (Core.Environment.SystemConnectionStringSettings.GetDbConnection()))
 			{
-				Assert.AreEqual(15, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.log where identity='{id}'").First().Count);
-				Assert.AreEqual(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count);
+				Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM dotnetspider.log where identity='{id}'").Last().message);
+				Assert.Equal($"1{id}", $"{conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count}{id}");
+				Assert.Equal("Finished", conn.Query<statusObj>($"SELECT * FROM dotnetspider.status where identity='{id}'").First().status);
 			}
 		}
 
+		class Log
+		{
+			public string level { get; set; }
+			public string message { get; set; }
+		}
+		class statusObj
+		{
+			public string status { get; set; }
+		}
 		internal class TestPipeline : BasePipeline
 		{
 			public override void Process(params ResultItems[] resultItems)

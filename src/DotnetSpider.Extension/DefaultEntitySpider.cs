@@ -8,7 +8,6 @@ namespace DotnetSpider.Extension
 
 		public DefaultEntitySpider(Site site) : base(null, site)
 		{
-			Core.Infrastructure.Database.DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
 		}
 
 		protected override void MyInit(params string[] arguments)

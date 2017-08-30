@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Scheduler;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 
 namespace DotnetSpider.Extension.Test.Scheduler
 {
-	[TestClass]
+	
 	public class RedisSchedulerTest
 	{
 		private Extension.Scheduler.RedisScheduler GetRedisScheduler()
@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			return new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
 		}
 
-		[TestMethod]
+		[Fact]
 		public void PushAndPoll1()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -30,14 +30,14 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			request.PutExtra("1", "2");
 			scheduler.Push(request);
 			Request result = scheduler.Poll();
-			Assert.AreEqual("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", result.Url.ToString());
-			Assert.AreEqual("2", request.GetExtra("1"));
+			Assert.Equal("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", result.Url.ToString());
+			Assert.Equal("2", request.GetExtra("1"));
 			Request result1 = scheduler.Poll();
-			Assert.IsNull(result1);
+			Assert.Null(result1);
 			scheduler.Dispose();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void PushAndPollBreadthFirst()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -55,14 +55,14 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Push(request4);
 
 			Request result = scheduler.Poll();
-			Assert.AreEqual("http://www.ibm.com/1", result.Url.ToString());
+			Assert.Equal("http://www.ibm.com/1", result.Url.ToString());
 			Request result1 = scheduler.Poll();
-			Assert.AreEqual("http://www.ibm.com/2", result1.Url.ToString());
+			Assert.Equal("http://www.ibm.com/2", result1.Url.ToString());
 			scheduler.Dispose();
 			scheduler.Dispose();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void PushAndPollDepthFirst()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -80,14 +80,14 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Push(request4);
 
 			Request result = scheduler.Poll();
-			Assert.AreEqual("http://www.ibm.com/4", result.Url.ToString());
+			Assert.Equal("http://www.ibm.com/4", result.Url.ToString());
 			Request result1 = scheduler.Poll();
-			Assert.AreEqual("http://www.ibm.com/3", result1.Url.ToString());
+			Assert.Equal("http://www.ibm.com/3", result1.Url.ToString());
 			scheduler.Dispose();
 			scheduler.Dispose();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void LoadPerformace()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -113,11 +113,11 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Import(list);
 			var end1 = DateTime.Now;
 			double seconds1 = (end1 - start1).TotalSeconds;
-			Assert.IsTrue(seconds1 < seconds);
+			Assert.True(seconds1 < seconds);
 			scheduler.Dispose();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Load()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -136,15 +136,15 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			redisScheduler.Import(scheduler.ToList());
 
-			Assert.AreEqual("http://www.d.com/", redisScheduler.Poll().Url.ToString());
-			Assert.AreEqual("http://www.c.com/", redisScheduler.Poll().Url.ToString());
-			Assert.AreEqual("http://www.b.com/", redisScheduler.Poll().Url.ToString());
-			Assert.AreEqual("http://www.a.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.d.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.c.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.b.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.a.com/", redisScheduler.Poll().Url.ToString());
 
 			redisScheduler.Dispose();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Status()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -158,50 +158,50 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Push(new Request("http://www.c.com/", null));
 			scheduler.Push(new Request("http://www.d.com/", null));
 
-			Assert.AreEqual(0, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.LeftRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(0, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.LeftRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 			scheduler.IncreaseErrorCount();
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(0, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(0, scheduler.SuccessRequestsCount);
 			scheduler.IncreaseSuccessCount();
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(3, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(3, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(2, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(2, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(1, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(1, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(0, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(0, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
 			scheduler.Poll();
-			Assert.AreEqual(0, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(0, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Clear();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void MultiInit()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -214,17 +214,17 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			string errorCountKey = scheduler.GetErrorCountKey();
 			string successCountKey = scheduler.GetSuccessCountKey();
 			scheduler.Init(spider);
-			Assert.AreEqual(queueKey, scheduler.GetQueueKey());
-			Assert.AreEqual(setKey, scheduler.GetSetKey());
-			Assert.AreEqual(itemKey, scheduler.GetItemKey());
-			Assert.AreEqual(errorCountKey, scheduler.GetErrorCountKey());
-			Assert.AreEqual(successCountKey, scheduler.GetSuccessCountKey());
+			Assert.Equal(queueKey, scheduler.GetQueueKey());
+			Assert.Equal(setKey, scheduler.GetSetKey());
+			Assert.Equal(itemKey, scheduler.GetItemKey());
+			Assert.Equal(errorCountKey, scheduler.GetErrorCountKey());
+			Assert.Equal(successCountKey, scheduler.GetSuccessCountKey());
 
 			scheduler.Dispose();
 			scheduler.Dispose();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Clear()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -242,12 +242,12 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Push(request4);
 
 			Request result = scheduler.Poll();
-			Assert.AreEqual("http://www.ibm.com/4", result.Url.ToString());
+			Assert.Equal("http://www.ibm.com/4", result.Url.ToString());
 
 			scheduler.Dispose();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void RetryRequest()
 		{
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
@@ -282,11 +282,11 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			// start crawler 启动爬虫
 			spider.Run();
 
-			Assert.AreEqual(5, spider.RetriedTimes.Value);
-			Assert.AreEqual(0, scheduler.LeftRequestsCount);
-			Assert.AreEqual(6, scheduler.SuccessRequestsCount);
+			Assert.Equal(5, spider.RetriedTimes.Value);
+			Assert.Equal(0, scheduler.LeftRequestsCount);
+			Assert.Equal(6, scheduler.SuccessRequestsCount);
 			// 重试次数应该包含
-			Assert.AreEqual(5, scheduler.ErrorRequestsCount);
+			Assert.Equal(5, scheduler.ErrorRequestsCount);
 		}
 
 		class TestPageProcessor : BasePageProcessor

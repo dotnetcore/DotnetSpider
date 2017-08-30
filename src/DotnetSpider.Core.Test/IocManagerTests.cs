@@ -37,7 +37,7 @@
 
 //	public class IocManagerTests
 //	{
-//		[TestMethod]
+//		[Fact]
 //		public void Ioc1()
 //		{
 //			IocManager.AddSingleton<IMonitor, NLogMonitor>();
@@ -47,10 +47,10 @@
 //			IocManager.AddSingleton<IMonitor, TestMonitor>();
 //			var monitor = IocManager.GetService<IMonitor>();
 
-//			Assert.AreEqual(typeof(TestMonitor).FullName, monitor.GetType().FullName);
+//			Assert.Equal(typeof(TestMonitor).FullName, monitor.GetType().FullName);
 //		}
 
-//		[TestMethod]
+//		[Fact]
 //		public void Ioc2()
 //		{
 //			IocManager.AddTransient<IMonitor, NLogMonitor>();
@@ -60,10 +60,10 @@
 //			IocManager.AddTransient<IMonitor, TestMonitor>();
 //			var monitor = IocManager.GetService<IMonitor>();
 
-//			Assert.AreEqual(typeof(TestMonitor).FullName, monitor.GetType().FullName);
+//			Assert.Equal(typeof(TestMonitor).FullName, monitor.GetType().FullName);
 //		}
 
-//		[TestMethod]
+//		[Fact]
 //		public void Ioc3()
 //		{
 //			IocManager.AddTransient<NLogMonitor, NLogMonitor>();
@@ -73,10 +73,10 @@
 //			IocManager.AddTransient<TestMonitor, TestMonitor>();
 //			var monitor = IocManager.GetService<TestMonitor>();
 
-//			Assert.AreEqual(typeof(TestMonitor).FullName, monitor.GetType().FullName);
+//			Assert.Equal(typeof(TestMonitor).FullName, monitor.GetType().FullName);
 //		}
 
-//		[TestMethod]
+//		[Fact]
 //		public void Ioc4()
 //		{
 //			IocManager.AddTransient<IMonitor, NLogMonitor>();
@@ -85,9 +85,9 @@
 //			IocManager.AddTransient<IMonitor, TestMonitor>();
 //			var monitors = IocManager.GetServices<IMonitor>().ToList();
 
-//			Assert.AreEqual(2, monitors.Count);
-//			Assert.AreEqual(typeof(NLogMonitor).FullName, monitors[0].GetType().FullName);
-//			Assert.AreEqual(typeof(TestMonitor).FullName, monitors[1].GetType().FullName);
+//			Assert.Equal(2, monitors.Count);
+//			Assert.Equal(typeof(NLogMonitor).FullName, monitors[0].GetType().FullName);
+//			Assert.Equal(typeof(TestMonitor).FullName, monitors[1].GetType().FullName);
 //		}
 //	}
 //}

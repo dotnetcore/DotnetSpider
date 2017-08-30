@@ -4,15 +4,15 @@ using DotnetSpider.Core.Redial;
 using DotnetSpider.Core.Redial.InternetDetector;
 using DotnetSpider.Core.Redial.Redialer;
 using DotnetSpider.Core.Scheduler;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 
 namespace DotnetSpider.Core.Test.Redial
 {
-	[TestClass]
+
 	public class RedialTest
 	{
-		[TestMethod]
+		[Fact]
 		public void Setting()
 		{
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
@@ -31,7 +31,7 @@ namespace DotnetSpider.Core.Test.Redial
 				.AddPipeline(new FilePipeline());
 
 			spider.RedialExecutor = new FileLockerRedialExecutor(new AdslRedialer("", "", ""), new VpsInternetDetector());
-			Assert.IsNotNull(spider.RedialExecutor);
+			Assert.NotNull(spider.RedialExecutor);
 		}
 	}
 }

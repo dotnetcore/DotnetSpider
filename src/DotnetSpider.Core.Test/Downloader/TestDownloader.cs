@@ -1,9 +1,8 @@
 ﻿using DotnetSpider.Core.Downloader;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DotnetSpider.Core.Test.Downloader
 {
-	[TestClass]
+
 	public class TestDownloader : BaseDownloader
 	{
 		protected override Page DowloadContent(Request request, ISpider spider)

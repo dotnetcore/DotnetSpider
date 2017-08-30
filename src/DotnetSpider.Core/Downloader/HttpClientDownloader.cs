@@ -229,40 +229,35 @@ namespace DotnetSpider.Core.Downloader
 
 		private HttpRequestMessage CreateRequestMessage(Request request)
 		{
-			if (string.IsNullOrEmpty(request.Method))
+			switch (request.Method.Method)
 			{
-				return new HttpRequestMessage(HttpMethod.Get, request.Url);
-			}
-
-			switch (request.Method.ToUpper())
-			{
-				case HttpConstant.Method.Get:
+				case "GET":
 					{
 						return new HttpRequestMessage(HttpMethod.Get, request.Url);
 					}
-				case HttpConstant.Method.Post:
+				case "POST":
 					{
 						return new HttpRequestMessage(HttpMethod.Post, request.Url);
 					}
-				case HttpConstant.Method.Head:
+				case "HEAD":
 					{
 						return new HttpRequestMessage(HttpMethod.Head, request.Url);
 					}
-				case HttpConstant.Method.Put:
+				case "PUT":
 					{
 						return new HttpRequestMessage(HttpMethod.Put, request.Url);
 					}
-				case HttpConstant.Method.Delete:
+				case "DELETE":
 					{
 						return new HttpRequestMessage(HttpMethod.Delete, request.Url);
 					}
-				case HttpConstant.Method.Trace:
+				case "TRACE":
 					{
 						return new HttpRequestMessage(HttpMethod.Trace, request.Url);
 					}
 				default:
 					{
-						throw new ArgumentException("Illegal HTTP Method " + request.Method);
+						throw new ArgumentException($"Illegal HTTP Method: {request.Method}.");
 					}
 			}
 		}

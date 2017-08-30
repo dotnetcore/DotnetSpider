@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
 using DotnetSpider.Core.Scheduler;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace DotnetSpider.Core.Test.Scheduler
 {
-	[TestClass]
+
 	public class QueueSchedulerTest
 	{
-		[TestMethod]
+		[Fact]
 		public void PushAndPollAsync()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -29,11 +29,11 @@ namespace DotnetSpider.Core.Test.Scheduler
 			long left = scheduler.LeftRequestsCount;
 			long total = scheduler.TotalRequestsCount;
 
-			Assert.AreEqual(2, left);
-			Assert.AreEqual(1002, total);
+			Assert.Equal(2, left);
+			Assert.Equal(1002, total);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void PushAndPollDepthFirst()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -46,16 +46,16 @@ namespace DotnetSpider.Core.Test.Scheduler
 			scheduler.Push(new Request("http://www.b.com", null));
 
 			var request = scheduler.Poll();
-			Assert.AreEqual(request.Url.ToString(), "http://www.b.com/");
+			Assert.Equal("http://www.b.com/", request.Url.ToString());
 
 			long left = scheduler.LeftRequestsCount;
 			long total = scheduler.TotalRequestsCount;
 
-			Assert.AreEqual(left, 1);
-			Assert.AreEqual(total, 2);
+			Assert.Equal(1, left);
+			Assert.Equal(2, total);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void PushAndPollBreadthFirst()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -69,16 +69,16 @@ namespace DotnetSpider.Core.Test.Scheduler
 			scheduler.Push(new Request("http://www.b.com", null));
 
 			var request = scheduler.Poll();
-			Assert.AreEqual(request.Url.ToString(), "http://www.a.com/");
+			Assert.Equal("http://www.a.com/", request.Url.ToString());
 
 			long left = scheduler.LeftRequestsCount;
 			long total = scheduler.TotalRequestsCount;
 
-			Assert.AreEqual(left, 1);
-			Assert.AreEqual(total, 2);
+			Assert.Equal(1, left);
+			Assert.Equal(2, total);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Status()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -92,45 +92,45 @@ namespace DotnetSpider.Core.Test.Scheduler
 			scheduler.Push(new Request("http://www.c.com/", null));
 			scheduler.Push(new Request("http://www.d.com/", null));
 
-			Assert.AreEqual(0, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.LeftRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(0, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.LeftRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 			scheduler.IncreaseErrorCount();
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(0, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(0, scheduler.SuccessRequestsCount);
 			scheduler.IncreaseSuccessCount();
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(3, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(3, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(2, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(2, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(1, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(1, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
-			Assert.AreEqual(0, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(0, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Poll();
 			scheduler.Poll();
-			Assert.AreEqual(0, scheduler.LeftRequestsCount);
-			Assert.AreEqual(1, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(1, scheduler.ErrorRequestsCount);
-			Assert.AreEqual(4, scheduler.TotalRequestsCount);
+			Assert.Equal(0, scheduler.LeftRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.ErrorRequestsCount);
+			Assert.Equal(4, scheduler.TotalRequestsCount);
 
 			scheduler.Dispose();
 		}

@@ -629,8 +629,8 @@ namespace DotnetSpider.Core
 #if !NET_CORE
 				var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
 #else
-			bool isPrinted;
-			AppContext.TryGetSwitch(key, out isPrinted);
+				bool isPrinted;
+				AppContext.TryGetSwitch(key, out isPrinted);
 #endif
 				if (!isPrinted)
 				{
@@ -646,7 +646,7 @@ namespace DotnetSpider.Core
 #if !NET_CORE
 					AppDomain.CurrentDomain.SetData(key, "True");
 #else
-				AppContext.SetSwitch(key, true);
+					AppContext.SetSwitch(key, true);
 #endif
 				}
 				Console.WriteLine();
@@ -802,7 +802,7 @@ namespace DotnetSpider.Core
 
 		protected virtual void PreInitComponent(params string[] arguments)
 		{
-			Monitor = new NLogMonitor();
+			Monitor = Monitor ?? new NLogMonitor();
 		}
 
 		protected virtual void AfterInitComponent(params string[] arguments)

@@ -7,7 +7,7 @@ using DotnetSpider.Extension.Pipeline;
 using StackExchange.Redis;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Scheduler;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model.Formatter;
@@ -18,7 +18,7 @@ using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Test
 {
-	[TestClass]
+	
 	public class EntitySpiderTest
 	{
 		[Table("test", "table")]
@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void TestCorrectRedisSetting()
 		{
 			EntitySpider spider = new MyEntitySpider1();
@@ -50,7 +50,7 @@ namespace DotnetSpider.Extension.Test
 			spider.Run("running-test");
 		}
 
-		//[TestMethod]
+		//[Fact]
 		//public void ThrowExceptionWhenNoEntity()
 		//{
 		//	try
@@ -60,12 +60,11 @@ namespace DotnetSpider.Extension.Test
 		//	}
 		//	catch (SpiderException exception)
 		//	{
-		//		Assert.AreEqual("Count of entity is zero.", exception.Message);
+		//		Assert.Equal("Count of entity is zero.", exception.Message);
 		//	}
 		//}
 
-		[TestMethod]
-		[Ignore]
+		[Fact(Skip = "Manual test case")]
 		public void RedisKeepConnect()
 		{
 			var confiruation = new ConfigurationOptions()
@@ -112,7 +111,7 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void ClearScheduler()
 		{
 			EntitySpider spider = new ClearSchedulerTestSpider();
@@ -143,18 +142,18 @@ namespace DotnetSpider.Extension.Test
 			var successCountKey = "success-record" + md5;
 
 			//queue
-			Assert.AreEqual(0, db.ListLength(queueKey));
+			Assert.Equal(0, db.ListLength(queueKey));
 			//set
-			Assert.AreEqual(0, db.SetLength(setKey));
+			Assert.Equal(0, db.SetLength(setKey));
 			//item
-			Assert.AreEqual(0, db.HashLength(itemKey));
+			Assert.Equal(0, db.HashLength(itemKey));
 			//error-count
-			Assert.AreEqual(false, db.StringGet(errorCountKey).HasValue);
+			Assert.False(db.StringGet(errorCountKey).HasValue);
 			//success-count
-			Assert.AreEqual(false, db.StringGet(successCountKey).HasValue);
+			Assert.False(db.StringGet(successCountKey).HasValue);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void EntitySpiderWithDefaultPipeline()
 		{
 			var datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
@@ -164,11 +163,11 @@ namespace DotnetSpider.Extension.Test
 			using (var conn = Core.Environment.DataConnectionStringSettings.GetDbConnection())
 			{
 				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{guid}'");
-				Assert.AreEqual(20, count);
+				Assert.Equal(20, count);
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void EntitySpiderRunCorrect()
 		{
 			CasSpider spider = new CasSpider();
@@ -271,7 +270,7 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		public static void ClearDb()
+		private static void ClearDb()
 		{
 			var confiruation = new ConfigurationOptions()
 			{

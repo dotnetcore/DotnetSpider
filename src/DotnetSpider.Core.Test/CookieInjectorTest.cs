@@ -1,13 +1,13 @@
 ﻿using DotnetSpider.Core.Downloader;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System.IO;
 
 namespace DotnetSpider.Core.Test
 {
-	[TestClass]
+
 	public class CookieInjectorTest
 	{
-		[TestMethod]
+		[Fact]
 		public void InjectCookiesBeforeSpiderRun()
 		{
 			var path = "a.cookies";
@@ -21,7 +21,7 @@ namespace DotnetSpider.Core.Test
 			site.AddStartUrl("http://www.baidu.com");
 			DefaultSpider spider = new DefaultSpider("a", site);
 			inject.Inject(spider, false);
-			Assert.AreEqual("a=b&c=d", site.Cookies.ToString());
+			Assert.Equal("a=b&c=d", site.Cookies.ToString());
 		}
 	}
 }

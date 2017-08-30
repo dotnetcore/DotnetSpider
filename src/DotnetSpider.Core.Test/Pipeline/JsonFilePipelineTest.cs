@@ -1,9 +1,9 @@
 ﻿using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace DotnetSpider.Core.Test.Pipeline
 {
-	[TestClass]
+
 	public class JsonFilePipelineTest
 	{
 		private ResultItems _resultItems;
@@ -21,7 +21,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 			_resultItems.Request = request;
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Process()
 		{
 			Core.Pipeline.JsonFilePipeline pipeline = new Core.Pipeline.JsonFilePipeline();
@@ -39,7 +39,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
 			string expected = "{\"content\":\"爬虫工具\"}\r\n";
-			Assert.AreEqual(expected, content);
+			Assert.Equal(expected, content);
 		}
 	}
 }

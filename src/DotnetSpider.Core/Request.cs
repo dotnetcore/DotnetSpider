@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure;
 using System.Net;
 using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace DotnetSpider.Core
 {
@@ -43,7 +44,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// The http method of the request. Get for default.
 		/// </summary>
-		public string Method { get; set; } = "GET";
+		public HttpMethod Method { get; set; } = HttpMethod.Get;
 
 		public string PostBody { get; set; }
 

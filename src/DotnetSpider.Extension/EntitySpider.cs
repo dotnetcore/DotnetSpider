@@ -28,7 +28,6 @@ namespace DotnetSpider.Extension
 
 		protected EntitySpider(string name, Site site) : base(name, site)
 		{
-			Core.Infrastructure.Database.DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
 		}
 
 		public EntityDefine AddEntityType(Type type, string tableName = null)

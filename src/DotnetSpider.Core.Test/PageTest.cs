@@ -1,11 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-
+using System.Net.Http;
+using Xunit;
 
 namespace DotnetSpider.Core.Test
 {
-	[TestClass]
+
 	public class PageTest
 	{
 		public static Request GetRequest()
@@ -13,19 +13,19 @@ namespace DotnetSpider.Core.Test
 			var extras = new Dictionary<string, dynamic> { { "Test", "Forever" } };
 			var request = new Request("http://www.taobao.com", extras)
 			{
-				Method = "get",
+				Method = HttpMethod.Get,
 				Priority = 1
 			};
 			return request;
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Deep()
 		{
 			var request = GetRequest();
 			Page page = new Page(request);
 			page.AddTargetRequest("http://taobao.com/bbb");
-			Assert.AreEqual(page.TargetRequests.First().Depth, 2);
+			Assert.Equal(2, page.TargetRequests.First().Depth);
 		}
 	}
 }

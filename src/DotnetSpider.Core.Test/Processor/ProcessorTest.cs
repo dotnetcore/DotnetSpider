@@ -2,15 +2,15 @@
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 
 namespace DotnetSpider.Core.Test.Processor
 {
-	[TestClass]
+
 	public class ProcessorTest
 	{
-		[TestMethod]
+		[Fact]
 		public void ProcesserException()
 		{
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
@@ -45,10 +45,10 @@ namespace DotnetSpider.Core.Test.Processor
 			// start crawler 启动爬虫
 			spider.Run();
 
-			Assert.AreEqual(5, spider.RetriedTimes.Value);
-			Assert.AreEqual(0, scheduler.LeftRequestsCount);
-			Assert.AreEqual(6, scheduler.SuccessRequestsCount);
-			Assert.AreEqual(5, scheduler.ErrorRequestsCount);
+			Assert.Equal(5, spider.RetriedTimes.Value);
+			Assert.Equal(0, scheduler.LeftRequestsCount);
+			Assert.Equal(6, scheduler.SuccessRequestsCount);
+			Assert.Equal(5, scheduler.ErrorRequestsCount);
 		}
 
 		class TestPageProcessor : BasePageProcessor

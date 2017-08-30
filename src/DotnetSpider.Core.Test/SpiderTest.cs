@@ -3,7 +3,7 @@ using System.Threading;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace DotnetSpider.Core.Test
 {
@@ -12,10 +12,10 @@ namespace DotnetSpider.Core.Test
 		public int Count { get; set; }
 	}
 
-	[TestClass]
+	
 	public class SpiderTest
 	{
-		[TestMethod]
+		[Fact]
 		public void IdentityLengthLimit()
 		{
 			try
@@ -27,14 +27,14 @@ namespace DotnetSpider.Core.Test
 			}
 			catch (Exception exception)
 			{
-				Assert.AreEqual("Length of Identity should less than 100.", exception.Message);
+				Assert.Equal("Length of Identity should less than 100.", exception.Message);
 				return;
 			}
 
 			throw new Exception("TEST FAILED.");
 		}
 
-		[TestMethod]
+		[Fact]
 		public void RunAsyncAndStop()
 		{
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
@@ -52,7 +52,7 @@ namespace DotnetSpider.Core.Test
 			Thread.Sleep(3000);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void RunAsyncAndContiune()
 		{
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
@@ -70,7 +70,7 @@ namespace DotnetSpider.Core.Test
 			Thread.Sleep(5000);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void RunAsyncAndStopThenExit()
 		{
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
@@ -88,7 +88,7 @@ namespace DotnetSpider.Core.Test
 			Thread.Sleep(5000);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void ThrowExceptionWhenNoPipeline()
 		{
 			try
@@ -98,21 +98,21 @@ namespace DotnetSpider.Core.Test
 			}
 			catch (SpiderException exception)
 			{
-				Assert.AreEqual("Pipelines should not be null.", exception.Message);
+				Assert.Equal("Pipelines should not be null.", exception.Message);
 				return;
 			}
 
 			throw new Exception("TEST FAILED.");
 		}
 
-		[TestMethod]
+		[Fact]
 		public void WhenNoStartUrl()
 		{
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
 			spider.Run();
 
-			Assert.AreEqual(Status.Finished, spider.Stat);
+			Assert.Equal(Status.Finished, spider.Stat);
 		}
 
 		internal class TestPipeline : BasePipeline
@@ -137,7 +137,7 @@ namespace DotnetSpider.Core.Test
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void TestRetryWhenResultIsEmpty()
 		{
 			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
@@ -146,10 +146,10 @@ namespace DotnetSpider.Core.Test
 			spider.RetryWhenResultIsEmpty = true;
 			spider.Run();
 
-			Assert.AreEqual(Status.Finished, spider.Stat);
+			Assert.Equal(Status.Finished, spider.Stat);
 		}
 
-		//[TestMethod]
+		//[Fact]
 		//public void TestReturnHttpProxy()
 		//{
 		//	Spider spider = Spider.Create(new Site { HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("代理链接")), EncodingName = "UTF-8", MinSleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
@@ -159,7 +159,7 @@ namespace DotnetSpider.Core.Test
 		//	}
 		//	spider.Run();
 
-		//	Assert.AreEqual(Status.Finished, spider.StatusCode);
+		//	Assert.Equal(Status.Finished, spider.StatusCode);
 		//}
 	}
 }

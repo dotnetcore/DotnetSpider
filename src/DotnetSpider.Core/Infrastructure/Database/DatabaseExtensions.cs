@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 			{
 				try
 				{
-					var connection = factory.CreateConnection();
+					DbConnection connection = factory.CreateConnection();
 					connection.ConnectionString = connectionStringSettings.ConnectionString;
 					connection.Open();
 					return connection;

@@ -1,7 +1,7 @@
 ﻿using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Processor;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -10,7 +10,7 @@ using System.IO;
 
 namespace DotnetSpider.Extension.Test
 {
-	[TestClass]
+	
 	public class DataHandlerTest
 	{
 		class MyDataHanlder : DataHandler
@@ -35,7 +35,7 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void HandlerWhenExtractZeroResult()
 		{
 			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Product).GetTypeInfo());
@@ -46,7 +46,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				Content = "{'data':[{'name':'1'},{'name':'2'}]}"
 			});
-			Assert.IsTrue(File.Exists(identity));
+			Assert.True(File.Exists(identity));
 			File.Delete(identity);
 		}
 

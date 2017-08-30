@@ -1,10 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Net.Http;
 
 namespace DotnetSpider.Core.Test
 {
-	[TestClass]
+
 	public class RequestTest
 	{
 		public static Request GetRequest()
@@ -12,20 +13,20 @@ namespace DotnetSpider.Core.Test
 			var extras = new Dictionary<string, dynamic> { { "Test", "Forever" } };
 			var request = new Request("http://www.taobao.com", extras)
 			{
-				Method = "get",
+				Method = HttpMethod.Get,
 				Priority = 1
 			};
 			return request;
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Request()
 		{
 			var request = GetRequest();
-			Assert.AreEqual(request.Extras.Count, 1);
-			Assert.AreEqual(request.Extras["Test"], "Forever");
+			Assert.Single(request.Extras);
+			Assert.Equal(request.Extras["Test"], "Forever");
 		}
-		[TestMethod]
+		[Fact]
 		public void PutExtra()
 		{
 			var request = GetRequest();
@@ -35,50 +36,50 @@ namespace DotnetSpider.Core.Test
 			request.PutExtra("", "");
 			request.PutExtra("One", "One");
 			request.PutExtra("One", "One");
-			Assert.AreEqual(request.Extras.Count, 3);
-			Assert.AreEqual(request.Extras["One"], "One");
-			Assert.AreEqual(request.Extras[""], "");
+			Assert.Equal(3, request.Extras.Count);
+			Assert.Equal(request.Extras["One"], "One");
+			Assert.Equal(request.Extras[""], "");
 		}
 
-		[TestMethod]
+		[Fact]
 		public void GetExtra()
 		{
 			var request = GetRequest();
 			request.PutExtra("One", new { Name = "John" });
-			Assert.AreEqual(request.Extras["One"], new { Name = "John" });
-			Assert.AreEqual(request.Depth, 1);
+			Assert.Equal(request.Extras["One"], new { Name = "John" });
+			Assert.Equal(1, request.Depth);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Dispose()
 		{
 			var request = GetRequest();
-			Assert.AreEqual(request.Extras.Count, 1);
+			Assert.Single(request.Extras);
 			request.Dispose();
-			Assert.AreEqual(request.Extras.Count, 0);
+			Assert.Empty(request.Extras);
 		}
 
 
-		[TestMethod]
+		[Fact]
 		public void Clone()
 		{
 			var request = GetRequest();
 			var clone = (Request)request.Clone();
-			Assert.AreEqual(request.Extras.Count, clone.Extras.Count);
-			Assert.AreEqual(request.Depth, clone.Depth);
-			Assert.AreEqual(request.Extras["Test"], clone.Extras["Test"]);
-			Assert.AreEqual(request.Url, clone.Url);
-			Assert.AreEqual(request.Method, clone.Method);
-			Assert.AreEqual(request.Priority, clone.Priority);
+			Assert.Equal(request.Extras.Count, clone.Extras.Count);
+			Assert.Equal(request.Depth, clone.Depth);
+			Assert.Equal(request.Extras["Test"], clone.Extras["Test"]);
+			Assert.Equal(request.Url, clone.Url);
+			Assert.Equal(request.Method, clone.Method);
+			Assert.Equal(request.Priority, clone.Priority);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Serialize()
 		{
 			var request = GetRequest();
 			var str = JsonConvert.SerializeObject(request);
 			var r = JsonConvert.DeserializeObject<Request>(str);
-			Assert.AreEqual(request.Depth, r.Depth);
+			Assert.Equal(request.Depth, r.Depth);
 		}
 	}
 }

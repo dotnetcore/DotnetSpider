@@ -1,10 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using System.IO;
-
 
 namespace DotnetSpider.Core.Test.Pipeline
 {
-	[TestClass]
+
 	public class FilePipelineTest
 	{
 		private ResultItems _resultItems;
@@ -22,7 +21,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 			_resultItems.Request = request;
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Process()
 		{
 			Core.Pipeline.FilePipeline filePipeline = new Core.Pipeline.FilePipeline();
@@ -40,7 +39,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
 			string expected = "url:\thttp://www.baidu.com/\r\ncontent:\t爬虫工具\r\n";
-			Assert.AreEqual(expected, content);
+			Assert.Equal(expected, content);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <Version>2.0.0</Version>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
@@ -10,17 +10,15 @@
 
   <PropertyGroup>
     <AssemblyTitle>DotnetSpider</AssemblyTitle>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG;NET_CORE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
     <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Configuration" />
+    <PackageReference Include="xunit" Version="2.3.0-beta4-build3742" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta4-build3742" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="app.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="chromedriver.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

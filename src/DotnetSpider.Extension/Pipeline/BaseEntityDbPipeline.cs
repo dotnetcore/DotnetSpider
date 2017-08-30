@@ -44,7 +44,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void AddEntity(EntityDefine entityDefine)
 		{
-			if (entityDefine == null  )
+			if (entityDefine == null)
 			{
 				throw new ArgumentException("Should not add a null entity to a entity dabase pipeline.");
 			}
@@ -150,16 +150,13 @@ namespace DotnetSpider.Extension.Pipeline
 							{
 								cmd.Parameters.Clear();
 
-								List<DbParameter> parameters = new List<DbParameter>();
 								foreach (var column in metadata.Columns)
 								{
 									var value = data[$"{column.Name}"];
 									var parameter = CreateDbParameter($"@{column.Name}", value);
-									parameter.DbType = DbType.String;
-									parameters.Add(parameter);
+									cmd.Parameters.Add(parameter);
 								}
 
-								cmd.Parameters.AddRange(parameters.ToArray());
 								cmd.ExecuteNonQuery();
 							}
 						}
@@ -176,12 +173,10 @@ namespace DotnetSpider.Extension.Pipeline
 									var selectCmd = conn.CreateCommand();
 									selectCmd.CommandText = metadata.SelectSql;
 									selectCmd.CommandType = CommandType.Text;
-									List<DbParameter> selectParameters = new List<DbParameter>();
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
 										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data[Core.Environment.IdColumn]);
-										primaryParameter.DbType = DbType.String;
-										selectParameters.Add(primaryParameter);
+										selectCmd.Parameters.Add(primaryParameter);
 									}
 									else
 									{
@@ -189,11 +184,10 @@ namespace DotnetSpider.Extension.Pipeline
 										foreach (var column in columns)
 										{
 											var primaryParameter = CreateDbParameter($"@{column}", data[$"{column}"]);
-											primaryParameter.DbType = DbType.String;
-											selectParameters.Add(primaryParameter);
+											selectCmd.Parameters.Add(primaryParameter);
 										}
 									}
-									selectCmd.Parameters.AddRange(selectParameters.ToArray());
+
 									var reader = selectCmd.ExecuteReader();
 									DataObject old = new DataObject();
 									if (reader.Read())
@@ -234,19 +228,17 @@ namespace DotnetSpider.Extension.Pipeline
 									cmd.CommandText = metadata.UpdateSql;
 									cmd.CommandType = CommandType.Text;
 
-									List<DbParameter> parameters = new List<DbParameter>();
 									foreach (var column in metadata.Table.UpdateColumns)
 									{
 										var parameter = CreateDbParameter($"@{column}", data[$"{column}"]);
-										parameter.DbType = DbType.String;
-										parameters.Add(parameter);
+										cmd.Parameters.Add(parameter);
 									}
 
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
 										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data[Core.Environment.IdColumn]);
 										primaryParameter.DbType = DbType.String;
-										parameters.Add(primaryParameter);
+										cmd.Parameters.Add(primaryParameter);
 									}
 									else
 									{
@@ -254,15 +246,9 @@ namespace DotnetSpider.Extension.Pipeline
 										foreach (var column in columns)
 										{
 											var primaryParameter = CreateDbParameter($"@{column}", data[$"{column}"]);
-											primaryParameter.DbType = DbType.String;
-											parameters.Add(primaryParameter);
+											cmd.Parameters.Add(primaryParameter);
 										}
 									}
-									//var primaryParameter = CreateDbParameter($"@{Schema.Primary}", data.SelectToken($"{Schema.Primary}")?.Value<string>());
-									//primaryParameter.DbType = DbType.String;
-									//parameters.Add(primaryParameter);
-
-									cmd.Parameters.AddRange(parameters.ToArray());
 									cmd.ExecuteNonQuery();
 								}
 							}

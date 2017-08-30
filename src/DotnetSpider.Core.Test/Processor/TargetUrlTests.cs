@@ -1,11 +1,11 @@
 ﻿using DotnetSpider.Core.Processor;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System.Net.Http;
 
 namespace DotnetSpider.Core.Test.Processor
 {
-	[TestClass]
+	
 	public class TargetUrlTests
 	{
 		public class CnblogsProcessor1 : BasePageProcessor
@@ -21,7 +21,7 @@ namespace DotnetSpider.Core.Test.Processor
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UrlVerifyAndExtract1()
 		{
 			HttpClient client = new HttpClient();
@@ -34,9 +34,9 @@ namespace DotnetSpider.Core.Test.Processor
 			processor.Site = new Site();
 			processor.Process(page);
 
-			Assert.IsTrue(page.ResultItems.GetResultItem("test"));
-			Assert.AreEqual(12, page.TargetRequests.Count);
-			Assert.AreEqual("http://www.cnblogs.com/", page.TargetRequests.ElementAt(11).Url.ToString());
+			Assert.True(page.ResultItems.GetResultItem("test"));
+			Assert.Equal(12, page.TargetRequests.Count);
+			Assert.Equal("http://www.cnblogs.com/", page.TargetRequests.ElementAt(11).Url.ToString());
 		}
 
 		public class CnblogsProcessor2 : BasePageProcessor
@@ -52,7 +52,7 @@ namespace DotnetSpider.Core.Test.Processor
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UrlVerifyAndExtract2()
 		{
 			HttpClient client = new HttpClient();
@@ -65,9 +65,9 @@ namespace DotnetSpider.Core.Test.Processor
 			processor.Site = new Site();
 			processor.Process(page);
 
-			Assert.IsTrue(page.ResultItems.GetResultItem("test"));
-			Assert.AreEqual(12, page.TargetRequests.Count);
-			Assert.AreEqual("http://www.cnblogs.com/", page.TargetRequests.ElementAt(11).Url.ToString());
+			Assert.True(page.ResultItems.GetResultItem("test"));
+			Assert.Equal(12, page.TargetRequests.Count);
+			Assert.Equal("http://www.cnblogs.com/", page.TargetRequests.ElementAt(11).Url.ToString());
 		}
 
 		public class CnblogsProcessor3 : BasePageProcessor
@@ -83,7 +83,7 @@ namespace DotnetSpider.Core.Test.Processor
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UrlVerifyAndExtract3()
 		{
 			HttpClient client = new HttpClient();
@@ -95,8 +95,8 @@ namespace DotnetSpider.Core.Test.Processor
 			CnblogsProcessor3 processor = new CnblogsProcessor3();
 			processor.Process(page);
 
-			Assert.IsNull(page.ResultItems.GetResultItem("test"));
-			Assert.AreEqual(0, page.TargetRequests.Count);
+			Assert.Null(page.ResultItems.GetResultItem("test"));
+			Assert.Empty(page.TargetRequests);
 		}
 
 		public class CnblogsProcessor4 : BasePageProcessor
@@ -112,7 +112,7 @@ namespace DotnetSpider.Core.Test.Processor
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UrlVerifyAndExtract4()
 		{
 			HttpClient client = new HttpClient();
@@ -125,9 +125,9 @@ namespace DotnetSpider.Core.Test.Processor
 			processor.Site = new Site();
 			processor.Process(page);
 
-			Assert.IsTrue(page.ResultItems.GetResultItem("test"));
-			Assert.AreEqual(12, page.TargetRequests.Count);
-			Assert.AreEqual("http://www.cnblogs.com/sitehome/p/2/", page.TargetRequests.ElementAt(0).Url.ToString());
+			Assert.True(page.ResultItems.GetResultItem("test"));
+			Assert.Equal(12, page.TargetRequests.Count);
+			Assert.Equal("http://www.cnblogs.com/sitehome/p/2/", page.TargetRequests.ElementAt(0).Url.ToString());
 		}
 	}
 }

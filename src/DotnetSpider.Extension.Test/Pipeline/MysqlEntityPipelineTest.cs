@@ -10,20 +10,20 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
-	[TestClass]
+	
 	public class MySqlEntityPipelineTest
 	{
-		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306";
+		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306;SslMode=None;";
 
-		[TestInitialize]
-		public void Init()
+
+		public MySqlEntityPipelineTest()
 		{
-			Core.Infrastructure.Database.DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
 		}
 
 		private void ClearDb()
@@ -35,7 +35,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Update()
 		{
 			ClearDb();
@@ -62,15 +62,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("4C", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("4C", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdatePipelineUseAppConfig()
 		{
 			ClearDb();
@@ -97,15 +97,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("4C", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("4C", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateWhenUnionPrimary()
 		{
 			ClearDb();
@@ -132,15 +132,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("AAAA", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("AAAA", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateWhenUnionPrimaryUseAppConfig()
 		{
 			ClearDb();
@@ -167,15 +167,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("AAAA", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("AAAA", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateCheckIfSameBeforeUpdate()
 		{
 			ClearDb();
@@ -202,15 +202,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("4C", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("4C", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateCheckIfSameBeforeUpdateUseAppConfig()
 		{
 			ClearDb();
@@ -237,15 +237,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("4C", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("4C", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateWhenUnionPrimaryCheckIfSameBeforeUpdate()
 		{
 			ClearDb();
@@ -273,15 +273,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("AAAA", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("AAAA", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateWhenUnionPrimaryCheckIfSameBeforeUpdateUseAppConfig()
 		{
 			ClearDb();
@@ -309,15 +309,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("AAAA", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("AAAA", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Insert()
 		{
 			ClearDb();
@@ -339,16 +339,16 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2, data3 });
 
 				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(3, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("111", list[1].Sku);
-				Assert.AreEqual(null, list[2].Category);
+				Assert.Equal(3, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("111", list[1].Sku);
+				Assert.Null(list[2].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void InsertUseAppConfig()
 		{
 			ClearDb();
@@ -370,16 +370,16 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2, data3 });
 
 				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(3, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("111", list[1].Sku);
-				Assert.AreEqual(null, list[2].Category);
+				Assert.Equal(3, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("111", list[1].Sku);
+				Assert.Null(list[2].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateConnectString()
 		{
 			ClearDb();
@@ -416,9 +416,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("111", list[1].Sku);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("111", list[1].Sku);
 				conn.Execute("DROP DATABASE IF EXISTS `dotnetspider1`");
 			}
 

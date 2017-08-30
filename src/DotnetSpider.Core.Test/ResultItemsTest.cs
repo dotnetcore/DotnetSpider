@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace DotnetSpider.Core.Test
 {
-	[TestClass]
+
 	public class ResultItemsTest
 	{
 		public class A
@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Test
 			public string Name { get; set; }
 		}
 
-		[TestMethod]
+		[Fact]
 		public void AddOrUpdateOrGet()
 		{
 			ResultItems resultItems = new ResultItems();
@@ -20,14 +20,14 @@ namespace DotnetSpider.Core.Test
 			resultItems.AddOrUpdateResultItem("c", "c");
 			resultItems.AddOrUpdateResultItem("d", 1);
 			resultItems.AddOrUpdateResultItem("e", new A { Name = "test" });
-			Assert.AreEqual("a", resultItems.GetResultItem("a"));
-			Assert.AreEqual("b", resultItems.GetResultItem("b"));
-			Assert.AreEqual("c", resultItems.GetResultItem("c"));
-			Assert.AreEqual(1, resultItems.GetResultItem("d"));
-			Assert.AreEqual("test", resultItems.GetResultItem("e").Name);
+			Assert.Equal("a", resultItems.GetResultItem("a"));
+			Assert.Equal("b", resultItems.GetResultItem("b"));
+			Assert.Equal("c", resultItems.GetResultItem("c"));
+			Assert.Equal(1, resultItems.GetResultItem("d"));
+			Assert.Equal("test", resultItems.GetResultItem("e").Name);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void AddOrUpdateOrGetAsync()
 		{
 			ResultItems resultItems = new ResultItems();
@@ -40,7 +40,7 @@ namespace DotnetSpider.Core.Test
 				resultItems.AddOrUpdateResultItem(i.ToString(), i);
 			});
 
-			Assert.AreEqual(1, resultItems.GetResultItem("1"));
+			Assert.Equal(1, resultItems.GetResultItem("1"));
 		}
 	}
 }

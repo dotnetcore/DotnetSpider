@@ -1,19 +1,19 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace DotnetSpider.Core.Test.Infrastructure
 {
-	[TestClass]
+
 	public class HttpSenderTest
 	{
-		[TestMethod]
+		[Fact]
 		public void Get()
 		{
-			var result = HttpSender.GetHtml(new HttpRequest
+			var result = HttpSender.Request(new HttpRequest
 			{
 				Url = "https://www.cnblogs.com/"
 			});
-			Assert.IsTrue(result.Html.Contains("博客园"));
+			Assert.Contains("博客园", result.Html);
 		}
 	}
 }

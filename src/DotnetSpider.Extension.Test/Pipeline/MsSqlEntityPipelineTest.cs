@@ -10,11 +10,11 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
-	[TestClass]
+	
 	/// <summary>
 	/// CREATE database  test firstly
 	/// </summary>
@@ -24,7 +24,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		private void ClearDb()
 		{
-
 			using (SqlConnection conn = new SqlConnection(ConnectString))
 			{
 				var tableName = $"sku_{DateTime.Now.ToString("yyyy_MM_dd")}";
@@ -35,7 +34,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Update()
 		{
 			ClearDb();
@@ -62,15 +61,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadat2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("4C", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("4C", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateWhenUnionPrimary()
 		{
 			ClearDb();
@@ -97,15 +96,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("AAAA", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("AAAA", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateCheckIfSameBeforeUpdate()
 		{
 			ClearDb();
@@ -132,15 +131,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("4C", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("4C", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void UpdateWhenUnionPrimaryCheckIfSameBeforeUpdate()
 		{
 			ClearDb();
@@ -167,15 +166,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
 
 				var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(2, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("AAAA", list[0].Category);
+				Assert.Equal(2, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("AAAA", list[0].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Insert()
 		{
 			ClearDb();
@@ -197,16 +196,16 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2, data3 });
 
 				var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.AreEqual(3, list.Count);
-				Assert.AreEqual("110", list[0].Sku);
-				Assert.AreEqual("111", list[1].Sku);
-				Assert.AreEqual(null, list[2].Category);
+				Assert.Equal(3, list.Count);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("111", list[1].Sku);
+				Assert.Null(list[2].Category);
 			}
 
 			ClearDb();
 		}
 
-		[TestMethod]
+		[Fact]
 		public void DefineUpdateEntity()
 		{
 			SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
@@ -217,7 +216,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			catch (SpiderException e)
 			{
-				Assert.AreEqual("Columns set as primary is not a property of your entity.", e.Message);
+				Assert.Equal("Columns set as primary is not a property of your entity.", e.Message);
 			}
 
 			try
@@ -227,7 +226,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			catch (SpiderException e)
 			{
-				Assert.AreEqual("Columns set as update is not a property of your entity.", e.Message);
+				Assert.Equal("Columns set as update is not a property of your entity.", e.Message);
 			}
 
 			try
@@ -237,23 +236,23 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			catch (SpiderException e)
 			{
-				Assert.AreEqual("There is no column need update.", e.Message);
+				Assert.Equal("There is no column need update.", e.Message);
 			}
 			var metadata = EntitySpider.GenerateEntityDefine(typeof(UpdateEntity4).GetTypeInfo());
 			insertPipeline.AddEntity(EntitySpider.GenerateEntityDefine(typeof(UpdateEntity4).GetTypeInfo()));
-			Assert.AreEqual(1, insertPipeline.GetUpdateColumns(metadata.Name).Length);
-			Assert.AreEqual("Value", insertPipeline.GetUpdateColumns(metadata.Name).First());
+			Assert.Single(insertPipeline.GetUpdateColumns(metadata.Name));
+			Assert.Equal("Value", insertPipeline.GetUpdateColumns(metadata.Name).First());
 
 			SqlServerEntityPipeline insertPipeline2 = new SqlServerEntityPipeline(ConnectString);
 			var metadata2 = EntitySpider.GenerateEntityDefine(typeof(UpdateEntity5).GetTypeInfo());
 			insertPipeline2.AddEntity(metadata2);
-			Assert.AreEqual(1, insertPipeline2.GetUpdateColumns(metadata2.Name).Length);
-			Assert.AreEqual("Value", insertPipeline2.GetUpdateColumns(metadata2.Name).First());
+			Assert.Single(insertPipeline2.GetUpdateColumns(metadata2.Name));
+			Assert.Equal("Value", insertPipeline2.GetUpdateColumns(metadata2.Name).First());
 		}
 
 		//#region Use App.config
 
-		//[TestMethod]
+		//[Fact]
 		//public void UpdateUseAppConfig()
 		//{
 		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
@@ -281,15 +280,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		//		updatePipeline.Process(metadat2.Name, new List<JObject> { data3 });
 
 		//		var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-		//		Assert.AreEqual(2, list.Count);
-		//		Assert.AreEqual("110", list[0].Sku);
-		//		Assert.AreEqual("4C", list[0].Category);
+		//		Assert.Equal(2, list.Count);
+		//		Assert.Equal("110", list[0].Sku);
+		//		Assert.Equal("4C", list[0].Category);
 		//	}
 
 		//	ClearDb();
 		//}
 
-		//[TestMethod]
+		//[Fact]
 		//public void UpdateWhenUnionPrimaryUseAppConfig()
 		//{
 		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
@@ -317,15 +316,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		//		updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
 
 		//		var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-		//		Assert.AreEqual(2, list.Count);
-		//		Assert.AreEqual("110", list[0].Sku);
-		//		Assert.AreEqual("AAAA", list[0].Category);
+		//		Assert.Equal(2, list.Count);
+		//		Assert.Equal("110", list[0].Sku);
+		//		Assert.Equal("AAAA", list[0].Category);
 		//	}
 
 		//	ClearDb();
 		//}
 
-		//[TestMethod]
+		//[Fact]
 		//public void UpdateCheckIfSameBeforeUpdateUseAppConfig()
 		//{
 		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
@@ -354,15 +353,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		//		updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
 
 		//		var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-		//		Assert.AreEqual(2, list.Count);
-		//		Assert.AreEqual("110", list[0].Sku);
-		//		Assert.AreEqual("4C", list[0].Category);
+		//		Assert.Equal(2, list.Count);
+		//		Assert.Equal("110", list[0].Sku);
+		//		Assert.Equal("4C", list[0].Category);
 		//	}
 
 		//	ClearDb();
 		//}
 
-		//[TestMethod]
+		//[Fact]
 		//public void UpdateWhenUnionPrimaryCheckIfSameBeforeUpdateUseAppConfig()
 		//{
 		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
@@ -390,15 +389,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		//		updatePipeline.Process(metadata2.Name, new List<JObject> { data3 });
 
 		//		var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-		//		Assert.AreEqual(2, list.Count);
-		//		Assert.AreEqual("110", list[0].Sku);
-		//		Assert.AreEqual("AAAA", list[0].Category);
+		//		Assert.Equal(2, list.Count);
+		//		Assert.Equal("110", list[0].Sku);
+		//		Assert.Equal("AAAA", list[0].Category);
 		//	}
 
 		//	ClearDb();
 		//}
 
-		//[TestMethod]
+		//[Fact]
 		//public void InsertUseAppConfig()
 		//{
 		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
@@ -422,16 +421,16 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		//		insertPipeline.Process(metadata.Name, new List<JObject> { data1, data2, data3 });
 
 		//		var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-		//		Assert.AreEqual(3, list.Count);
-		//		Assert.AreEqual("110", list[0].Sku);
-		//		Assert.AreEqual("111", list[1].Sku);
-		//		Assert.AreEqual(null, list[2].Category);
+		//		Assert.Equal(3, list.Count);
+		//		Assert.Equal("110", list[0].Sku);
+		//		Assert.Equal("111", list[1].Sku);
+		//		Assert.Equal(null, list[2].Category);
 		//	}
 
 		//	ClearDb();
 		//}
 
-		//[TestMethod]
+		//[Fact]
 		//public void DefineUpdateEntityUseAppConfig()
 		//{
 		//	Core.Environment.DataConnectionStringSettings = new System.Configuration.ConnectionStringSettings("SqlServer", "Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True", "System.Data.SqlClient");
@@ -443,7 +442,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		//	}
 		//	catch (SpiderException e)
 		//	{
-		//		Assert.AreEqual("Columns set as Primary is not a property of your entity.", e.Message);
+		//		Assert.Equal("Columns set as Primary is not a property of your entity.", e.Message);
 		//	}
 
 		//	try
@@ -453,7 +452,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		//	}
 		//	catch (SpiderException e)
 		//	{
-		//		Assert.AreEqual("Columns set as update is not a property of your entity.", e.Message);
+		//		Assert.Equal("Columns set as update is not a property of your entity.", e.Message);
 		//	}
 
 		//	try
@@ -463,18 +462,18 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		//	}
 		//	catch (SpiderException e)
 		//	{
-		//		Assert.AreEqual("There is no column need update.", e.Message);
+		//		Assert.Equal("There is no column need update.", e.Message);
 		//	}
 		//	var metadata = EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity4).GetTypeInfo());
 		//	insertPipeline.AddEntity(EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity4).GetTypeInfo()));
-		//	Assert.AreEqual(1, insertPipeline.GetUpdateColumns(metadata.Name).Length);
-		//	Assert.AreEqual("Value", insertPipeline.GetUpdateColumns(metadata.Name).First());
+		//	Assert.Equal(1, insertPipeline.GetUpdateColumns(metadata.Name).Length);
+		//	Assert.Equal("Value", insertPipeline.GetUpdateColumns(metadata.Name).First());
 
 		//	SqlServerEntityPipeline insertPipeline2 = new SqlServerEntityPipeline(ConnectString);
 		//	var metadata2 = EntitySpider.GenerateEntityMetaData(typeof(UpdateEntity5).GetTypeInfo());
 		//	insertPipeline2.AddEntity(metadata2);
-		//	Assert.AreEqual(1, insertPipeline2.GetUpdateColumns(metadata2.Name).Length);
-		//	Assert.AreEqual("Value", insertPipeline2.GetUpdateColumns(metadata2.Name).First());
+		//	Assert.Equal(1, insertPipeline2.GetUpdateColumns(metadata2.Name).Length);
+		//	Assert.Equal("Value", insertPipeline2.GetUpdateColumns(metadata2.Name).First());
 		//}
 
 		//#endregion

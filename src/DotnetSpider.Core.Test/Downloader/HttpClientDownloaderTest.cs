@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Core.Downloader;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using DotnetSpider.Core.Scheduler;
 using static DotnetSpider.Core.Test.SpiderTest;
 using DotnetSpider.Core.Pipeline;
 
 namespace DotnetSpider.Core.Test.Downloader
 {
-	[TestClass]
+
 	public class HttpClientDownloaderTest
 	{
-		//[TestMethod]
+		//[Fact]
 		//public void Timeout()
 		//{
 		//	HttpClientDownloader downloader = new HttpClientDownloader();
@@ -36,15 +36,14 @@ namespace DotnetSpider.Core.Test.Downloader
 		//		Assert.IsNotNull(e);
 		//	}
 		//	watch.Stop();
-		//	Assert.IsTrue(watch.ElapsedMilliseconds > 5000);
-		//	Assert.IsTrue(watch.ElapsedMilliseconds < 6000);
+		//	Assert.True(watch.ElapsedMilliseconds > 5000);
+		//	Assert.True(watch.ElapsedMilliseconds < 6000);
 		//}
 
 		/// <summary>
 		/// 手动执行此测试脚本，运行结束后用netstat -ano 查看端口占用情况。只会占用一个就对了。如果
 		/// </summary>
-		[Ignore]
-		[TestMethod]
+		[Fact(Skip = "Need person double check")]
 		public void Ports()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
@@ -56,22 +55,22 @@ namespace DotnetSpider.Core.Test.Downloader
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void DetectDownloadContent()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
 			DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
 
 			downloader.Download(new Request("http://www.163.com", null), spider);
-			Assert.AreEqual(ContentType.Html, spider.Site.ContentType);
+			Assert.Equal(ContentType.Html, spider.Site.ContentType);
 
 			HttpClientDownloader2 downloader2 = new HttpClientDownloader2();
 			DefaultSpider spider2 = new DefaultSpider("abcd", new Site { Timeout = 5000 });
 			downloader2.Download(new Request("http://www.163.com", null), spider2);
-			Assert.AreEqual(ContentType.Json, spider2.Site.ContentType);
+			Assert.Equal(ContentType.Json, spider2.Site.ContentType);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void SetContentType()
 		{
 			Site site1 = new Site
@@ -94,7 +93,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site2));
 		}
 
-		[TestMethod]
+		[Fact]
 		public void _404Url()
 		{
 			var spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
@@ -104,7 +103,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			spider.AddPipeline(new ConsolePipeline());
 			spider.AddStartUrl("http://www.mlr.gov.cn/xwdt/jrxw/201707/t20170710_15242382.htm");
 			spider.Run();
-			Assert.AreEqual(5, spider.RetriedTimes.Value);
+			Assert.Equal(5, spider.RetriedTimes.Value);
 		}
 
 		class HttpClientDownloader2 : HttpClientDownloader
@@ -115,7 +114,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void GetTargetUrlWhenRedirect()
 		{
 			Site site = new Site
@@ -123,7 +122,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			};
 			HttpClientDownloader downloader = new HttpClientDownloader();
 			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site));
-			Assert.AreEqual("https://www.jd.com/?d", page.TargetUrl);
+			Assert.Equal("https://www.jd.com/?d", page.TargetUrl);
 		}
 	}
 }

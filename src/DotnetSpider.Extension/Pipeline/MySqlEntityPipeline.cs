@@ -132,7 +132,9 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override DbParameter CreateDbParameter(string name, object value)
 		{
-			return new MySqlParameter(name, value);
+			var parameter = new MySqlParameter(name, MySqlDbType.String);
+			parameter.Value = value;
+			return parameter;
 		}
 
 		protected string GetDataTypeSql(Column field)

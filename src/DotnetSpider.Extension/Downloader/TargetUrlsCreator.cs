@@ -9,6 +9,7 @@ using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
+using System.Net.Http;
 
 namespace DotnetSpider.Extension.Downloader
 {
@@ -305,7 +306,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool NeedStop(Page page, BaseTargetUrlsCreator creator)
 		{
-			var current = creator.GetCurrentPaggerString(page.Request.Method.ToUpper() == "GET" ? page.Url : page.Request.PostBody);
+			var current = creator.GetCurrentPaggerString(page.Request.Method == HttpMethod.Get ? page.Url : page.Request.PostBody);
 			int currentIndex = int.Parse(RegexUtil.NumRegex.Match(current).Value);
 
 			if (currentIndex >= Limit)

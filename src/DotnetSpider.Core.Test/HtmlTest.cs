@@ -1,41 +1,40 @@
 ﻿using DotnetSpider.Core.Selector;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace DotnetSpider.Core.Test
 {
-	[TestClass]
 	public class HtmlTest
 	{
-		[TestMethod]
+		[Fact]
 		public void Select()
 		{
 			Selectable selectable = new Selectable("aaaaaaab", "", ContentType.Html);
 			string value = selectable.Regex("(.*)").GetValue();
-			Assert.AreEqual("aaaaaaab", value);
+			Assert.Equal("aaaaaaab", value);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void DonotDetectDomain()
 		{
 			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>", "", ContentType.Html);
 			var values = selectable.XPath(".//a").GetValues();
-			Assert.AreEqual("aaaaaaab", values[0]);
+			Assert.Equal("aaaaaaab", values[0]);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void DetectDomain1()
 		{
 			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>", "", ContentType.Html, "www\\.aaaa\\.com");
 			var values = selectable.XPath(".//a").GetValues();
-			Assert.AreEqual("aaaaaaab", values[0]);
+			Assert.Equal("aaaaaaab", values[0]);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void DetectDomain2()
 		{
 			Selectable selectable = new Selectable("<div><a href=\"www.aaaab.com\">aaaaaaab</a></div>", "", ContentType.Html, "www\\.aaaa\\.com");
 			var values = selectable.XPath(".//a").GetValues();
-			Assert.AreEqual(0, values.Count);
+			Assert.Empty(values);
 		}
 	}
 }

@@ -32,7 +32,6 @@ namespace DotnetSpider.Extension
 
 		protected CustomSpider(string name)
 		{
-			Core.Infrastructure.Database.DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
 			Name = name;
 		}
 

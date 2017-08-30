@@ -1,12 +1,12 @@
 ﻿using DotnetSpider.Core.Downloader;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace DotnetSpider.Core.Test.Downloader
 {
-	[TestClass]
+
 	public class DownloadHanlderTest
 	{
-		[TestMethod]
+		[Fact]
 		public void RetryWhenContainsIllegalStringHandler()
 		{
 			var spider = new DefaultSpider("test", new Site());
@@ -18,7 +18,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			});
 			var request1 = new Request("http://www.163.com/", null);
 			Page page = downloader1.Download(request1, spider);
-			Assert.AreEqual(1, page.TargetRequests.Count);
+			Assert.Single(page.TargetRequests);
 
 			downloader1 = new TestDownloader();
 			downloader1.AddAfterDownloadCompleteHandler(new RetryWhenContainsContentHandler
@@ -26,7 +26,7 @@ namespace DotnetSpider.Core.Test.Downloader
 				Content = "网易倒闭啦"
 			});
 			page = downloader1.Download(request1, spider);
-			Assert.AreEqual(0, page.TargetRequests.Count);
+			Assert.Empty(page.TargetRequests);
 		}
 	}
 }
