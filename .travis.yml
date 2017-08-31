@@ -23,7 +23,6 @@ services:
 before_install:
   - chmod a+x ./build.sh
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ulimit -n 1024 ; fi
-  - mysql -e 'set password=password('1qazZAQ')'
 
 install:
   - export DOTNET_CLI_TELEMETRY_OPTOUT=1

@@ -35,11 +35,11 @@ namespace DotnetSpider.Sample
 			//});
 
 			AddStartUrlBuilder(
-				new DbStartUrlBuilder(Database.MySql, "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ;Port=3306;SslMode=None;",
+				new DbStartUrlBuilder(Database.MySql, "Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;",
 				$"SELECT * FROM jd.sku_v2_{DateTimeUtils.RunIdOfMonday} WHERE shopname is null or shopid is null order by sku",
 				new[] { "sku" }, "http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json"));
 
-			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ;Port=3306;SslMode=None;"));
+			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
 			AddEntityType(typeof(ProductUpdater));
 		}
 

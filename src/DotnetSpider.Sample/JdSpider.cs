@@ -83,7 +83,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(TmpProduct));
 			AddEntityType(typeof(JdProduct));
 			AddPipeline(
-				new MySqlEntityPipeline("Database='test';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ;Port=3306"));
+				new MySqlEntityPipeline("Database='test';Data Source=127.0.0.1;User ID=root;Password=;Port=3306"));
 		}
 	}
 

@@ -32,7 +32,7 @@
   "UserId": "DotnetSpider",
   "Name": "京东类目",
   "Batch": "DAILY",
-  "ConnectString": "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ;Port=3306",
+  "ConnectString": "Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306",
   "RedisConnectString": "127.0.0.1:6379,serviceName=DotnetSpider,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20",
   "Site": {
     "EncodingName": "utf-8",
@@ -44,7 +44,7 @@
   },
   "Pipelines": [
     {
-      "ConnectString": "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ;Port=3306",
+      "ConnectString": "Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306",
       "CheckIfSameBeforeUpdate": false,
       "Type": "MySql"
     }
