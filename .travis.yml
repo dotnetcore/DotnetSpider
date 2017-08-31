@@ -19,11 +19,10 @@ matrix:
         - chmod a+x ./build.sh
         - ulimit -n 1024 ;
         - brew update
-        - brew install openssl
         - brew install mariadb
-        - brew install redis
         - brew services start mariadb
-        - redis-server /usr/local/etc/redis.conf
+        - brew install redis
+        - brew services start redis
 
 services:
   - mysql
