@@ -22,7 +22,8 @@ matrix:
         - brew install openssl
         - brew install mariadb
         - brew install redis
-        - mysql.server start
+        - brew services start mariadb
+        - redis-server /usr/local/etc/redis.conf
 
 services:
   - mysql
