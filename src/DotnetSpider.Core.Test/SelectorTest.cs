@@ -78,8 +78,10 @@ namespace DotnetSpider.Core.Test
 			var list2 = jsonPathSelector.SelectList(_text);
 			var result2 = jsonPathSelector.Select(_text);
 
-			Assert.Equal(result2, "{\r\n  \"category\": \"reference\",\r\n  \"author\": \"Nigel Rees\",\r\n  \"title\": \"Sayings of the Century\",\r\n  \"price\": 8.95\r\n}");
-			Assert.Equal(list2[0], "{\r\n  \"category\": \"reference\",\r\n  \"author\": \"Nigel Rees\",\r\n  \"title\": \"Sayings of the Century\",\r\n  \"price\": 8.95\r\n}");
+			var expected1 = $"{{{System.Environment.NewLine}  \"category\": \"reference\",{System.Environment.NewLine}  \"author\": \"Nigel Rees\",{System.Environment.NewLine}  \"title\": \"Sayings of the Century\",{System.Environment.NewLine}  \"price\": 8.95{System.Environment.NewLine}}}";
+			var expected2 = $"{{{System.Environment.NewLine}  \"category\": \"reference\",{System.Environment.NewLine}  \"author\": \"Nigel Rees\",{System.Environment.NewLine}  \"title\": \"Sayings of the Century\",{System.Environment.NewLine}  \"price\": 8.95{System.Environment.NewLine}}}";
+			Assert.Equal(result2, expected1);
+			Assert.Equal(list2[0], expected2);
 		}
 
 		[Fact]

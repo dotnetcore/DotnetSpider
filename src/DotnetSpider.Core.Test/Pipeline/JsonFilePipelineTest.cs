@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 			pipeline.Process(_resultItems);
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
-			string expected = "{\"content\":\"爬虫工具\"}\r\n";
+			string expected = $"{{\"content\":\"爬虫工具\"}}{System.Environment.NewLine}";
 			Assert.Equal(expected, content);
 		}
 	}

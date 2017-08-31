@@ -16,6 +16,7 @@ using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.IO;
 using System.Configuration;
+using System.Runtime.InteropServices;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -604,6 +605,10 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void SqlServerDataTypeTests()
 		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return;
+			}
 			using (var conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true"))
 			{
 				try
