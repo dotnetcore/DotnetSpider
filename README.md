@@ -1,5 +1,5 @@
 # DotnetSpider
-[![Travis branch](https://img.shields.io/travis/dotnetcore/DotnetSpider/develop.svg?label=travis-ci)](https://travis-ci.org/dotnetcore/DotnetSpider)
+[![Travis branch](https://travis-ci.org/dotnetcore/DotnetSpider.svg?branch=master)](https://travis-ci.org/dotnetcore/DotnetSpider)
 [![NuGet](https://img.shields.io/nuget/v/DotnetSpider2.Extension.svg)](https://www.nuget.org/packages/DotnetSpider2.Extension)
 [![NuGet Preview](https://img.shields.io/nuget/vpre/DotnetSpider2.Extension.svg?label=nuget-pre)](https://www.nuget.org/packages/DotnetSpider2.Extension/)
 [![Member project of .NET China Foundation](https://img.shields.io/badge/member_project_of-.NET_CHINA-red.svg?style=flat&colorB=9E20C8)](https://github.com/dotnetcore)
