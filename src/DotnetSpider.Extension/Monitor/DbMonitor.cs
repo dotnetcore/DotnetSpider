@@ -6,6 +6,7 @@ using NLog;
 using System;
 using DotnetSpider.Core.Infrastructure.Database;
 using System.Data;
+using MySql.Data.MySqlClient;
 
 namespace DotnetSpider.Extension.Monitor
 {
@@ -72,6 +73,13 @@ namespace DotnetSpider.Extension.Monitor
 				{
 					var timeTrigger = "CREATE TRIGGER `dotnetspider`.`status_AFTER_UPDATE` BEFORE UPDATE ON `status` FOR EACH ROW BEGIN set NEW.logged = NOW(); END";
 					conn.Execute(timeTrigger);
+				}
+			}
+			catch (MySqlException e)
+			{
+				if (e.Message != "This version of MySQL doesn't yet support 'multiple triggers with the same action time and event for one table'")
+				{
+					throw;
 				}
 			}
 			catch (Exception e)
