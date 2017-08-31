@@ -41,7 +41,7 @@ namespace DotnetSpider.Extension.Test
 				spider.Monitor = new DbMonitor(id);
 				spider.Run();
 			}
-
+			Thread.Sleep(3000);
 			using (var conn = (Core.Environment.SystemConnectionStringSettings.GetDbConnection()))
 			{
 				Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM dotnetspider.log where identity='{id}'").Last().message);
