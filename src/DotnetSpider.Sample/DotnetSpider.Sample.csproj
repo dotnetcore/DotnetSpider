@@ -7,6 +7,14 @@
     <DefineConstants>DEBUG;NETCOREAPP2_0;NET_CORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="app.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="EPPlus.Core" Version="1.5.2" />
   </ItemGroup>
   <ItemGroup>

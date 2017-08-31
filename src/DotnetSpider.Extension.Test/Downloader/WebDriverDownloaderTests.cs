@@ -6,16 +6,20 @@ using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.ORM;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test.Downloader
 {
-#if LOCAL
 	public class WebDriverDownloaderTests
 	{
 		[Fact]
 		public void DestoryDownloader()
 		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return;
+			}
 			BaiduSearchSpider spider = new BaiduSearchSpider();
 			spider.Run();
 		}
@@ -76,5 +80,4 @@ namespace DotnetSpider.Extension.Test.Downloader
 			public DateTime RunId { get; set; }
 		}
 	}
-#endif
 }

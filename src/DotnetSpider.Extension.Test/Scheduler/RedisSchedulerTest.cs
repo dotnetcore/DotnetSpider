@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 	{
 		private Extension.Scheduler.RedisScheduler GetRedisScheduler()
 		{
-			return new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
+			return new Extension.Scheduler.RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
 		}
 
 		[Fact]

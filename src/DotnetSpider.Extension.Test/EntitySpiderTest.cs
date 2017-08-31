@@ -18,7 +18,7 @@ using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Test
 {
-	
+
 	public class EntitySpiderTest
 	{
 		[Table("test", "table")]
@@ -64,7 +64,8 @@ namespace DotnetSpider.Extension.Test
 		//	}
 		//}
 
-		[Fact(Skip = "Manual test case")]
+#if Release
+		[Fact]
 		public void RedisKeepConnect()
 		{
 			var confiruation = new ConfigurationOptions()
@@ -74,7 +75,6 @@ namespace DotnetSpider.Extension.Test
 				KeepAlive = 8,
 				ConnectRetry = 3,
 				ResponseTimeout = 3000,
-				Password = "6GS9F2QTkP36GggE0c3XwVwI",
 				AllowAdmin = true
 			};
 
@@ -94,6 +94,7 @@ namespace DotnetSpider.Extension.Test
 			db.LockRelease(key, 0);
 		}
 
+#endif
 
 		public class ClearSchedulerTestSpider : EntitySpider
 		{
@@ -104,7 +105,7 @@ namespace DotnetSpider.Extension.Test
 			protected override void MyInit(params string[] arguments)
 			{
 				Identity = Guid.NewGuid().ToString("N");
-				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=6GS9F2QTkP36GggE0c3XwVwI,abortConnect=True,connectRetry=20");
+				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
 				AddStartUrl("https://baidu.com");
 				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType(typeof(TestEntity));
@@ -125,7 +126,6 @@ namespace DotnetSpider.Extension.Test
 				KeepAlive = 8,
 				ConnectRetry = 3,
 				ResponseTimeout = 3000,
-				Password = "6GS9F2QTkP36GggE0c3XwVwI",
 				AllowAdmin = true
 			};
 
@@ -279,7 +279,6 @@ namespace DotnetSpider.Extension.Test
 				KeepAlive = 8,
 				ConnectRetry = 3,
 				ResponseTimeout = 3000,
-				Password = "6GS9F2QTkP36GggE0c3XwVwI",
 				AllowAdmin = true
 			};
 

@@ -11,10 +11,10 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using Xunit;
+using System.Runtime.InteropServices;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
-	
 	/// <summary>
 	/// CREATE database  test firstly
 	/// </summary>
@@ -37,6 +37,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void Update()
 		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return;
+			}
+
 			ClearDb();
 
 			using (SqlConnection conn = new SqlConnection(ConnectString))
@@ -72,6 +77,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void UpdateWhenUnionPrimary()
 		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return;
+			}
 			ClearDb();
 
 			using (SqlConnection conn = new SqlConnection(ConnectString))
@@ -107,6 +116,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void UpdateCheckIfSameBeforeUpdate()
 		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return;
+			}
 			ClearDb();
 
 			using (SqlConnection conn = new SqlConnection(ConnectString))
@@ -142,6 +155,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void UpdateWhenUnionPrimaryCheckIfSameBeforeUpdate()
 		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return;
+			}
 			ClearDb();
 
 			using (SqlConnection conn = new SqlConnection(ConnectString))
@@ -177,6 +194,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void Insert()
 		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return;
+			}
 			ClearDb();
 
 			using (SqlConnection conn = new SqlConnection(ConnectString))
@@ -208,6 +229,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void DefineUpdateEntity()
 		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return;
+			}
 			SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
 			try
 			{
