@@ -15,6 +15,11 @@ matrix:
     dotnet: 2.0.0
     mono: none
     env: DOTNETCORE=1
+    before_install:
+        - brew update
+        - brew install mariadb
+        - brew install redis
+        - mysql.server start
 
 services:
   - mysql
@@ -26,7 +31,6 @@ before_install:
 
 install:
   - export DOTNET_CLI_TELEMETRY_OPTOUT=1
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm get stable; brew update; brew install openssl; brew install mysql; brew install redis;  fi
 
 script:
   - ./build.sh

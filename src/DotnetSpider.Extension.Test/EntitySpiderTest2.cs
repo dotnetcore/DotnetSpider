@@ -272,7 +272,7 @@ namespace DotnetSpider.Extension.Test
 				context.ThreadNum = 1;
 
 				var entity = context.AddEntityType<Entity17>();
-				var pipeline = new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=;Port=3306");
+				var pipeline = new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306");
 				pipeline.AddEntity(entity);
 
 				throw new Exception("Failed.");
@@ -293,7 +293,7 @@ namespace DotnetSpider.Extension.Test
 				context.ThreadNum = 1;
 
 				var entity = context.AddEntityType<Entity18>();
-				var pipeline = new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=;Port=3306");
+				var pipeline = new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306");
 				pipeline.AddEntity(entity);
 
 				throw new Exception("Failed.");
@@ -314,7 +314,7 @@ namespace DotnetSpider.Extension.Test
 				context.ThreadNum = 1;
 
 				var entity = context.AddEntityType<Entity19>();
-				var pipeline = new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=;Port=3306");
+				var pipeline = new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306");
 				pipeline.AddEntity(entity);
 
 				throw new Exception("Failed.");
@@ -339,7 +339,7 @@ namespace DotnetSpider.Extension.Test
 			EntitySpider context = new DefaultEntitySpider();
 			context.Identity = (Guid.NewGuid().ToString("N"));
 			context.ThreadNum = 1;
-			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=;Port=3306"));
+			context.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306"));
 			context.AddEntityType<Entity16>();
 		}
 
@@ -522,7 +522,7 @@ namespace DotnetSpider.Extension.Test
 			EntitySpider context = new DefaultEntitySpider();
 			context.Identity = (Guid.NewGuid().ToString("N"));
 			context.ThreadNum = 1;
-			context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
+			context.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
 			context.AddPipeline(new MySqlFileEntityPipeline());
 			context.AddPipeline(new ConsoleEntityPipeline());
 			context.AddPipeline(new JsonFileEntityPipeline());
@@ -537,7 +537,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.Equal(4, entityPipelines.Count);
 
 			var pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
-			Assert.Equal("Database='test';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;", pipeline1.ConnectionStringSettings.ConnectionString);
+			Assert.Equal("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;", pipeline1.ConnectionStringSettings.ConnectionString);
 
 			Assert.Equal("MySqlFileEntityPipeline", entityPipelines[1].GetType().Name);
 			Assert.Equal("ConsoleEntityPipeline", entityPipelines[2].GetType().Name);
@@ -567,7 +567,7 @@ namespace DotnetSpider.Extension.Test
 				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
 				context.ThreadNum = 1;
-				context.AddPipeline(new MySqlEntityPipeline("Database='test';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
+				context.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
 
 				context.AddStartUrl("http://baidu.com");
 				context.AddEntityType(typeof(Entity15));

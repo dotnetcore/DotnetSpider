@@ -84,7 +84,7 @@ namespace DotnetSpider.Sample
 			{
 				UpdateConnectString = new DbUpdateConnectString
 				{
-					ConnectString = "Database='test';Data Source=localhost;User ID=root;Password=;Port=3306",
+					ConnectString = "Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306",
 					QueryString = "SELECT value from `dotnetspider`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"
 				}
 			});
