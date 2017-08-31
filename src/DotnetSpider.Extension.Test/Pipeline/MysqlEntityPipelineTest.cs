@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 	
 	public class MySqlEntityPipelineTest
 	{
-		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306;SslMode=None;";
+		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ;Port=3306;SslMode=None;";
 
 
 		public MySqlEntityPipelineTest()
@@ -390,7 +390,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				conn.Execute("CREATE TABLE IF NOT EXISTS `dotnetspider1`.`settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`type` varchar(45) NOT NULL,`key` varchar(45) DEFAULT NULL,`value` text,PRIMARY KEY(`id`),UNIQUE KEY `UNIQUE` (`key`,`type`)) AUTO_INCREMENT = 1");
 				try
 				{
-					conn.Execute("INSERT `dotnetspider1`.`settings` (`value`,`type`,`key`) VALUES (\"Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ!;Port=3306\",'ConnectString','MySql01')");
+					conn.Execute("INSERT `dotnetspider1`.`settings` (`value`,`type`,`key`) VALUES (\"Database='mysql';Data Source=127.0.0.1;User ID=root;Password=1qazZAQ;Port=3306\",'ConnectString','MySql01')");
 				}
 				catch (Exception)
 				{

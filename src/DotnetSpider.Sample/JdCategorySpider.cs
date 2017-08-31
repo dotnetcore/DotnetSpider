@@ -29,7 +29,7 @@ namespace DotnetSpider.Sample
 		{
 			AddStartUrl("http://www.jd.com/allSort.aspx");
 			AddEntityType(typeof(Category));
-			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306"));
+			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ;Port=3306"));
 		}
 	}
 }

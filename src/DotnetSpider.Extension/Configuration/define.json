@@ -42,7 +42,7 @@
   "UserId": "DotnetSpider",
   "Name": "",
   "Batch": "DAILY",
-  "LogAndStatusConnectString": "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306",
+  "LogAndStatusConnectString": "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ;Port=3306",
   "RedisConnectString": "127.0.0.1:6379,serviceName=DotnetSpider,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20",
   "Site": {
     "Arguments": {},
@@ -77,7 +77,7 @@
   "CachedSize": 1,
   "Pipelines": [
     {
-      "ConnectString": "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ!;Port=3306",
+      "ConnectString": "Database='mysql';Data Source=localhost;User ID=root;Password=1qazZAQ;Port=3306",
       "CheckIfSameBeforeUpdate": false,
       "Type": "MySql"
     },
