@@ -16,7 +16,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		public static ILogger GetLogger()
 		{
-			return LogManager.GetCurrentClassLogger();
+			return LogManager.GetLogger("DotnetSpider");
 		}
 
 		public static void InitLogCenter()
