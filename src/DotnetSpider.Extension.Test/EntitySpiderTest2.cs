@@ -23,6 +23,11 @@ namespace DotnetSpider.Extension.Test
 	
 	public class EntitySpiderTest2
 	{
+		public EntitySpiderTest2()
+		{
+			Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll");
+		}
+
 		private class TestPipeline : BaseEntityDbPipeline
 		{
 			public TestPipeline(string connectString, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
