@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core;
+using DotnetSpider.Extension.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading;
 #else
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 #endif
 
 namespace DotnetSpider.Sample
@@ -71,30 +73,9 @@ namespace DotnetSpider.Sample
 
 			Situoli.Run();
 		}
-		static List<Core.Spider> Spiders;
 
 		private static void MyTest()
 		{
-			Spiders = new List<Core.Spider> { new BaiduSearchSpider(), new BaiduSearchSpider(), new BaiduSearchSpider() };
-
-			int i = 1;
-			foreach (var spider in Spiders)
-			{
-				spider.Identity = i.ToString();
-				spider.OnClosed += Spider_OnClosed;
-				spider.RunAsync();
-				++i;
-			}
-			while (!Spiders.All(s => s.Stat == Status.Finished))
-			{
-				foreach (var spider in Spiders)
-				{
-					Console.WriteLine($"Spider: {spider.Identity} Status: {spider.Stat}");
-				}
-				Thread.Sleep(5000);
-			}
-
-			Thread.Sleep(5000);
 		}
 
 		private static void Spider_OnClosed(Spider spider)

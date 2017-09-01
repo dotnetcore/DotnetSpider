@@ -25,6 +25,7 @@
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
     <PackageReference Include="EPPlus.Core" Version="1.5.2" />
     <PackageReference Include="CoreCompat.Selenium.WebDriver" Version="3.4.0-beta001" />
+    <PackageReference Include="Npgsql" Version="3.2.5" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
     <Reference Include="System.Web" />
@@ -42,6 +43,7 @@
     <PackageReference Include="NLog" Version="4.4.12" />
     <PackageReference Include="EPPlus" Version="4.1.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.5.1" />
+    <PackageReference Include="Npgsql" Version="3.2.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
