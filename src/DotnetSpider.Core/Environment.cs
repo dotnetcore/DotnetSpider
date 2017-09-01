@@ -21,16 +21,16 @@ namespace DotnetSpider.Core
 		public const string IdColumn = "__id";
 
 		public static readonly Configuration Configuration;
-		public static readonly ConnectionStringSettings SystemConnectionStringSettings;
-		public static readonly ConnectionStringSettings DataConnectionStringSettings;
+		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
+		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
 
-		public static string RedisConnectString { get; }
-		public static string EmailHost { get; }
-		public static string EmailPort { get; }
-		public static string EmailAccount { get; }
-		public static string EmailPassword { get; }
-		public static string EmailDisplayName { get; }
-		public static bool SaveLogAndStatusToDb { get; }
+		public static string RedisConnectString { get; private set; }
+		public static string EmailHost { get; private set; }
+		public static string EmailPort { get; private set; }
+		public static string EmailAccount { get; private set; }
+		public static string EmailPassword { get; private set; }
+		public static string EmailDisplayName { get; private set; }
+		public static bool SaveLogAndStatusToDb => SystemConnectionStringSettings != null;
 		public static string GlobalDirectory { get; }
 		public static string BaseDirectory { get; }
 		public static string PathSeperator { get; }
@@ -62,48 +62,38 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		public static void LoadConfiguration(string fileName)
+		{
+			var configuration = ConfigurationManager.OpenExeConfiguration(fileName);
+
+			RedisConnectString = configuration.AppSettings.Settings[RedisConnectStringKey].Value?.Trim();
+			EmailHost = configuration.AppSettings.Settings[EmailHostKey].Value?.Trim();
+			EmailPort = configuration.AppSettings.Settings[EmailPortKey].Value?.Trim();
+			EmailAccount = configuration.AppSettings.Settings[EmailAccountKey].Value?.Trim();
+			EmailPassword = configuration.AppSettings.Settings[EmailPasswordKey].Value?.Trim();
+			EmailDisplayName = configuration.AppSettings.Settings[EmailDisplayNameKey].Value?.Trim();
+
+			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
+			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+		}
+
 		static Environment()
 		{
-			var configurationPaths = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory).Where(p => p.EndsWith(".dll.config")).ToList();
+			RedisConnectString = ConfigurationManager.AppSettings[RedisConnectStringKey]?.Trim();
+			EmailHost = ConfigurationManager.AppSettings[EmailHostKey]?.Trim();
+			EmailPort = ConfigurationManager.AppSettings[EmailPortKey]?.Trim();
+			EmailAccount = ConfigurationManager.AppSettings[EmailAccountKey]?.Trim();
+			EmailPassword = ConfigurationManager.AppSettings[EmailPasswordKey]?.Trim();
+			EmailDisplayName = ConfigurationManager.AppSettings[EmailDisplayNameKey]?.Trim();
 
-			if (configurationPaths.Count > 1)
-			{
-				throw new ArgumentException($"Allow one application config file, please check your runtime folder: {AppDomain.CurrentDomain.BaseDirectory}");
-			}
-			if (configurationPaths.Count == 1)
-			{
-				Configuration = ConfigurationManager.OpenExeConfiguration(configurationPaths[0].Replace(".config", ""));
-
-				RedisConnectString = Configuration.AppSettings.Settings[RedisConnectStringKey].Value?.Trim();
-				EmailHost = Configuration.AppSettings.Settings[EmailHostKey].Value?.Trim();
-				EmailPort = Configuration.AppSettings.Settings[EmailPortKey].Value?.Trim();
-				EmailAccount = Configuration.AppSettings.Settings[EmailAccountKey].Value?.Trim();
-				EmailPassword = Configuration.AppSettings.Settings[EmailPasswordKey].Value?.Trim();
-				EmailDisplayName = Configuration.AppSettings.Settings[EmailDisplayNameKey].Value?.Trim();
-
-				SystemConnectionStringSettings = Configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
-				DataConnectionStringSettings = Configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
-			}
-			else
-			{
-				RedisConnectString = ConfigurationManager.AppSettings[RedisConnectStringKey]?.Trim();
-				EmailHost = ConfigurationManager.AppSettings[EmailHostKey]?.Trim();
-				EmailPort = ConfigurationManager.AppSettings[EmailPortKey]?.Trim();
-				EmailAccount = ConfigurationManager.AppSettings[EmailAccountKey]?.Trim();
-				EmailPassword = ConfigurationManager.AppSettings[EmailPasswordKey]?.Trim();
-				EmailDisplayName = ConfigurationManager.AppSettings[EmailDisplayNameKey]?.Trim();
-
-				SystemConnectionStringSettings = ConfigurationManager.ConnectionStrings[SystemConnectionStringKey];
-				DataConnectionStringSettings = ConfigurationManager.ConnectionStrings[DataConnectionStringKey];
-			}
+			SystemConnectionStringSettings = ConfigurationManager.ConnectionStrings[SystemConnectionStringKey];
+			DataConnectionStringSettings = ConfigurationManager.ConnectionStrings[DataConnectionStringKey];
 
 #if !NET_CORE
 			PathSeperator = "\\";
 #else
 			PathSeperator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/";
 #endif
-
-			SaveLogAndStatusToDb = SystemConnectionStringSettings != null;
 
 #if !NET_CORE
 			GlobalDirectory = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "DotnetSpider");

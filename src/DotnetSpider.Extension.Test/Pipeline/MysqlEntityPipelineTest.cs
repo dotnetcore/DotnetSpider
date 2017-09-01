@@ -13,10 +13,11 @@ using MySql.Data.MySqlClient;
 using Xunit;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Infrastructure.Database;
+using System.IO;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
-	
+
 	public class MySqlEntityPipelineTest
 	{
 		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=;Port=3306;SslMode=None;";
@@ -24,6 +25,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		public MySqlEntityPipelineTest()
 		{
+			Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll");
 		}
 
 		private void ClearDb()
