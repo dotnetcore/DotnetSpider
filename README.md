@@ -9,7 +9,7 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 
 ### DESIGN
 
-![DESIGN](https://github.com/dotnetcore/DotnetSpider/raw/master/images/DESIGN.png)
+![DESIGN](https://github.com/dotnetcore/DotnetSpider/blob/master/images/DESIGN.jpg)
 
 ### DEVELOP ENVIROMENT
 - Visual Studio 2017(15.3 or later)
