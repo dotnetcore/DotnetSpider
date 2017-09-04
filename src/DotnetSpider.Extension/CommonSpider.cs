@@ -72,7 +72,7 @@ namespace DotnetSpider.Extension
 
 				if (IsComplete && OnExited != null)
 				{
-					Verification.ProcessVerifidation(Identity, OnExited);
+					BaseVerification.ProcessVerifidation(Identity, OnExited);
 				}
 			}
 			finally
@@ -106,7 +106,7 @@ namespace DotnetSpider.Extension
 			{
 				Scheduler.Clear();
 				Scheduler.Dispose();
-				Verification.RemoveVerifidationLock(Identity);
+				BaseVerification.RemoveVerifidationLock(Identity);
 			}
 		}
 

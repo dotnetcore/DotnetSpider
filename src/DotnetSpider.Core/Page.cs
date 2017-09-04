@@ -40,7 +40,7 @@ namespace DotnetSpider.Core
 
 		public bool Retry { get; set; }
 
-		public bool SkipExtractTargetUrls { get; set; }
+		public bool SkipExtractedTargetUrls { get; set; }
 
 		public ResultItems ResultItems { get; } = new ResultItems();
 

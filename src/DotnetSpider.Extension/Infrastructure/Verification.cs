@@ -33,7 +33,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		VerificationInfo Verify(IDbConnection conn);
 	}
 
-	public abstract class Verification
+	public abstract class BaseVerification
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 		protected const string ValidateStatusKey = "dotnetspider:validate-stats";
@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public string EmailDisplayName { get; set; }
 
-		protected Verification()
+		protected BaseVerification()
 		{
 			EmailHost = Core.Environment.EmailHost;
 			var portStr = Core.Environment.EmailPort;
@@ -70,7 +70,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			EmailDisplayName = Core.Environment.EmailDisplayName;
 		}
 
-		protected Verification(string emailTo, string subject, string host, int port, string account, string password)
+		protected BaseVerification(string emailTo, string subject, string host, int port, string account, string password)
 		{
 			EmailTo = emailTo.Split(';').Select(e => e.Trim()).ToList();
 			EmailHost = host;
@@ -424,7 +424,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		public bool PassVeridation { get; set; }
 	}
 
-	public class Verification<TE> : Verification
+	public class Verification : BaseVerification
 	{
 		public Properties Properties { get; }
 
@@ -434,17 +434,17 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public string ExportDataFileName { get; set; }
 
-		public Verification(string reportSampleSql = null)
+		public Verification(Type type, string reportSampleSql = null)
 		{
-			Properties = typeof(TE).GetTypeInfo().GetCustomAttribute<Properties>();
+			Properties = type.GetTypeInfo().GetCustomAttribute<Properties>();
 			EmailTo = Properties.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
 			Subject = Properties.Subject;
 			ReportSampleSql = reportSampleSql;
 		}
 
-		public Verification(string emailTo, string subject, string host, int port, string account, string password) : base(emailTo, subject, host, port, account, password)
+		public Verification(Type type, string emailTo, string subject, string host, int port, string account, string password) : base(emailTo, subject, host, port, account, password)
 		{
-			Properties = typeof(TE).GetTypeInfo().GetCustomAttribute<Properties>();
+			Properties = type.GetTypeInfo().GetCustomAttribute<Properties>();
 		}
 
 		public override VerificationResult Report()
@@ -562,5 +562,17 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 
 			return veridationResult;
 		}
+	}
+
+	public class Verification<TE> : Verification
+	{
+		public Verification(string reportSampleSql = null) : base(typeof(TE), reportSampleSql)
+		{
+		}
+
+		public Verification(string emailTo, string subject, string host, int port, string account, string password) : base(typeof(TE), emailTo, subject, host, port, account, password)
+		{
+		}
+
 	}
 }

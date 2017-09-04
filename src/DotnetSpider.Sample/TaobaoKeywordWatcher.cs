@@ -102,7 +102,7 @@ namespace DotnetSpider.Sample
 				NewValue = "/",
 				OldValue = "\\/",
 			});
-			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsCreator("&s=0", null, 44));
+			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&s=0", 44));
 			Downloader = downloader;
 			ThreadNum = 1;
 			SkipWhenResultIsEmpty = true;

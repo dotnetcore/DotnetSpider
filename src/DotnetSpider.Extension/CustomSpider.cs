@@ -83,7 +83,7 @@ namespace DotnetSpider.Extension
 
 				if (arguments.Contains("rerun") || arguments.Contains("validate"))
 				{
-					Verification.RemoveVerifidationLock(Identity);
+					BaseVerification.RemoveVerifidationLock(Identity);
 				}
 
 				ImplementAction(arguments);
@@ -114,7 +114,7 @@ namespace DotnetSpider.Extension
 				}
 				if (OnExited != null)
 				{
-					Verification.ProcessVerifidation(Identity, OnExited);
+					BaseVerification.ProcessVerifidation(Identity, OnExited);
 				}
 			}
 			catch (Exception e)

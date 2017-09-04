@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 		{
 			var spider = new DefaultSpider("test", new Site());
 			TestDownloader downloader = new TestDownloader();
-			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsCreator("&page=0", 2));
+			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&page=0", 2));
 			var request = new Request("http://a.com/?&page=0", null);
 			Page page = downloader.Download(request, spider);
 			var request2 = page.TargetRequests.First();
@@ -25,12 +25,9 @@ namespace DotnetSpider.Extension.Test.Downloader
 			Assert.Equal("http://a.com/?&page=4", request2.Url.ToString());
 
 			downloader = new TestDownloader();
-			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsCreator("&page=0", 2)
-			{
-				PageIndexKey = "page_index"
-			});
+			downloader.AddAfterDownloadCompleteHandler(new RequestExtraTargetUrlsBuilder("&page=0", "page_index"));
 
-			request = new Request("http://a.com/?&page=0", new Dictionary<string, object>() { { "page_index", 1 } });
+			request = new Request("http://a.com/?&page=0", new Dictionary<string, object>() { { "page_index", 2 } });
 			page = downloader.Download(request, spider);
 			request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());
@@ -42,9 +39,9 @@ namespace DotnetSpider.Extension.Test.Downloader
 		{
 			var spider = new DefaultSpider("test", new Site());
 			TestDownloader downloader = new TestDownloader();
-			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsCreator("&page=0", 2)
+			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&page=0", 2)
 			{
-				Stopper = new PaggerStopper
+				Termination = new PaggerTermination
 				{
 					CurrenctPageSelector = new BaseSelector
 					{
