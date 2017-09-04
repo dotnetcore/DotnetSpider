@@ -9,19 +9,23 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 
 ### DESIGN
 
-![demo](http://images2015.cnblogs.com/blog/40347/201605/40347-20160511101118155-1794710718.jpg)
+![DESIGN](https://github.com/dotnetcore/DotnetSpider/raw/master/images/DESIGN.png)
 
 ### DEVELOP ENVIROMENT
-- Visual Studio 2017(15.3)
+- Visual Studio 2017(15.3 or later)
 - [.NET Core 2.0](https://download.microsoft.com/download/0/F/D/0FD852A4-7EA1-4E2A-983A-0484AC19B92C/dotnet-sdk-2.0.0-win-x64.exe)
 
 ### OPTIONAL ENVIROMENT
 
 - Storage data to mysql. [Download MySql](http://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-community-5.7.14.0.msi) 
+	
 		grant all on *.* to 'root'@'localhost' IDENTIFIED BY '' with grant option;
+	
 		flush privileges;
+
 - Run distributed crawler. [Download Redis for windows](https://github.com/MSOpenTech/redis/releases)
 - SqlServer.
+- PostgreSQL.
 
 ### SAMPLES
 
