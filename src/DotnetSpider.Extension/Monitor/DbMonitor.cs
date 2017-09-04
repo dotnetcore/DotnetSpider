@@ -77,10 +77,11 @@ namespace DotnetSpider.Extension.Monitor
 			}
 			catch (MySqlException e)
 			{
-				if (e.Message != "This version of MySQL doesn't yet support 'multiple triggers with the same action time and event for one table'")
+				if (e.Message == "This version of MySQL doesn't yet support 'multiple triggers with the same action time and event for one table'" || e.Message.Contains("Trigger already exists"))
 				{
-					throw;
+					return;
 				}
+				throw;
 			}
 			catch (Exception e)
 			{

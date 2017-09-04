@@ -3,10 +3,12 @@ using DotnetSpider.Core;
 using MySql.Data.MySqlClient;
 using System;
 using System.Linq;
+using System.Net;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
 using System.Text;
+using System.Text.RegularExpressions;
 #endif
 
 namespace DotnetSpider.Sample
@@ -23,7 +25,7 @@ namespace DotnetSpider.Sample
 #endif
 
 			MyTest();
-
+		 
 			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:guid", "-a:" });
 
 			Startup.Run(new string[] { "-s:CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1" });
@@ -77,6 +79,8 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
+			var html = new WebClient().DownloadString("http://wq.jd.com/search/searchco?coupon_batch=34299561&datatype=1&page=22&pagesize=100&multi_suppliers=yes&rtapi=no&filt_type=col_type,L1M1;&sort_type=sort_totalsales15_desc&g_ty=ls");
+			Regex regex = new Regex(@"searchCB\(");
 		}
 
 		private static void Spider_OnClosed(Spider spider)
