@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using NLog;
 using DotnetSpider.Core.Infrastructure;
-using System.Threading;
 using DotnetSpider.Core.Redial;
 using System.Linq;
 

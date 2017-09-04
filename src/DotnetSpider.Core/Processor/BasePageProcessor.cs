@@ -195,7 +195,7 @@ namespace DotnetSpider.Core.Processor
 			return url;
 		}
 
-		protected void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
+		public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
 		{
 			var validPatterns = patterns.Where(p => p != null && !string.IsNullOrEmpty(p.Trim())).Select(p => p.Trim()).ToList();
 
@@ -240,7 +240,7 @@ namespace DotnetSpider.Core.Processor
 			}
 		}
 
-		protected void AddExcludeTargetUrlPattern(params string[] patterns)
+		public void AddExcludeTargetUrlPattern(params string[] patterns)
 		{
 			if (patterns == null || patterns.Length == 0)
 			{

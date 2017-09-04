@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using System;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 
 namespace DotnetSpider.Core
 {

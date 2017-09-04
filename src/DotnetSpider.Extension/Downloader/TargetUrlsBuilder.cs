@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
@@ -9,7 +8,6 @@ using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-using System.Net.Http;
 using System.Linq;
 
 namespace DotnetSpider.Extension.Downloader

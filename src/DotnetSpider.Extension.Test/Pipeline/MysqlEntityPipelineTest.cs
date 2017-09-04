@@ -12,8 +12,6 @@ using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
 using Xunit;
 using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Core.Infrastructure.Database;
-using System.IO;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {

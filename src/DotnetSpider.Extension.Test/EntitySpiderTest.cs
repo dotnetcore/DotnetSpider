@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Threading;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
