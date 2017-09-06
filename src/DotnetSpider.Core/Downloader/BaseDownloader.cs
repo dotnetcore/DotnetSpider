@@ -76,10 +76,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				foreach (var handler in BeforeDownload)
 				{
-					if (!handler.Handle(ref request, spider))
-					{
-						break;
-					}
+					handler.Handle(ref request, spider);
 				}
 			}
 		}
@@ -90,10 +87,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				foreach (var handler in AfterDownloadComplete)
 				{
-					if (!handler.Handle(ref page, spider))
-					{
-						break;
-					}
+					handler.Handle(ref page, spider);
 				}
 			}
 		}

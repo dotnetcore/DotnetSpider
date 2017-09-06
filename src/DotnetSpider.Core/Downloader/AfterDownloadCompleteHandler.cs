@@ -12,7 +12,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public abstract bool Handle(ref Page page, ISpider spider);
+		public abstract void Handle(ref Page page, ISpider spider);
 	}
 
 	public class UpdateCookieWhenContainsContentHandler : AfterDownloadCompleteHandler
@@ -21,7 +21,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public string Content { get; set; }
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (page != null && !string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
 			{
@@ -46,15 +46,13 @@ namespace DotnetSpider.Core.Downloader
 			NextTime = DateTime.Now.AddSeconds(DueTime);
 		}
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (DateTime.Now > NextTime)
 			{
 				CookieInjector?.Inject(spider);
 				NextTime = DateTime.Now.AddSeconds(DueTime);
 			}
-
-			return true;
 		}
 	}
 
@@ -62,18 +60,9 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Content { get; set; }
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && string.IsNullOrEmpty(page.Content))
-			{
-				return true;
-			}
-			if (page.Content.Contains(Content))
-			{
-				page.Skip = true;
-				return false;
-			}
-			return true;
+			page.Skip = page != null && !string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content);
 		}
 	}
 
@@ -81,25 +70,19 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Content { get; set; }
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && string.IsNullOrEmpty(page.Content))
-			{
-				return true;
-			}
-
-			if (!page.Content.Contains(Content))
+			if (page != null && !string.IsNullOrEmpty(page.Content) && !page.Content.Contains(Content))
 			{
 				page.SkipExtractedTargetUrls = true;
 				page.SkipTargetUrls = true;
 			}
-			return true;
 		}
 	}
 
 	public class RemoveHtmlTagHandler : AfterDownloadCompleteHandler
 	{
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (page != null && !string.IsNullOrEmpty(page.Content))
 			{
@@ -107,31 +90,28 @@ namespace DotnetSpider.Core.Downloader
 				htmlDocument.LoadHtml(page.Content);
 				page.Content = htmlDocument.DocumentNode.InnerText;
 			}
-			return true;
 		}
 	}
 
 	public class ContentToUpperHandler : AfterDownloadCompleteHandler
 	{
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (page != null && !string.IsNullOrEmpty(page.Content))
 			{
 				page.Content = page.Content.ToUpper();
 			}
-			return true;
 		}
 	}
 
 	public class ContentToLowerHandler : AfterDownloadCompleteHandler
 	{
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (page != null && !string.IsNullOrEmpty(page.Content))
 			{
 				page.Content = page.Content.ToLower();
 			}
-			return true;
 		}
 	}
 
@@ -141,38 +121,34 @@ namespace DotnetSpider.Core.Downloader
 
 		public string NewValue { get; set; }
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (page != null && !string.IsNullOrEmpty(page.Content))
 			{
 				page.Content = page.Content.Replace(OldValue, NewValue);
 			}
-
-			return true;
 		}
 	}
 
 	public class TrimContentHandler : AfterDownloadCompleteHandler
 	{
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (page != null && !string.IsNullOrEmpty(page.Content))
 			{
 				page.Content = page.Content.Trim();
 			}
-			return true;
 		}
 	}
 
 	public class UnescapeContentHandler : AfterDownloadCompleteHandler
 	{
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (page != null && !string.IsNullOrEmpty(page.Content))
 			{
 				page.Content = Regex.Unescape(page.Content);
 			}
-			return true;
 		}
 	}
 
@@ -180,11 +156,11 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Pattern { get; set; }
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content))
 			{
-				return true;
+				return;
 			}
 
 			string textValue = string.Empty;
@@ -195,7 +171,6 @@ namespace DotnetSpider.Core.Downloader
 				textValue += item.Value;
 			}
 			page.Content = textValue;
-			return true;
 		}
 	}
 
@@ -212,11 +187,11 @@ namespace DotnetSpider.Core.Downloader
 			Contents = contents;
 		}
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (page == null || string.IsNullOrEmpty(page.Content))
 			{
-				return true;
+				return;
 			}
 			var tmpPage = page;
 			if (Contents.Any(c => tmpPage.Content.Contains(c)))
@@ -224,7 +199,6 @@ namespace DotnetSpider.Core.Downloader
 				Request r = page.Request.Clone();
 				page.AddTargetRequest(r);
 			}
-			return true;
 		}
 	}
 
@@ -232,9 +206,13 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string Content { get; set; }
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
+			if (page == null || string.IsNullOrEmpty(Content) || string.IsNullOrEmpty(page.Content))
+			{
+				return;
+			}
+			if (page != null && !string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
 			{
 				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
@@ -244,7 +222,6 @@ namespace DotnetSpider.Core.Downloader
 				page = Spider.AddToCycleRetry(page.Request, spider.Site);
 				page.Exception = new DownloadException($"Content downloaded contains string: {Content}.");
 			}
-			return true;
 		}
 	}
 
@@ -252,8 +229,12 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public string ExceptionMessage { get; set; } = string.Empty;
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
+			if (page == null || string.IsNullOrEmpty(ExceptionMessage) || string.IsNullOrEmpty(page.Content))
+			{
+				return;
+			}
 			if (page.Exception != null)
 			{
 				if (string.IsNullOrEmpty(ExceptionMessage))
@@ -271,7 +252,6 @@ namespace DotnetSpider.Core.Downloader
 					page.Exception = new DownloadException("Download failed and redial finished already.");
 				}
 			}
-			return true;
 		}
 	}
 
@@ -281,9 +261,9 @@ namespace DotnetSpider.Core.Downloader
 
 		public ICookieInjector CookieInjector { get; set; }
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page.Content) && CookieInjector != null && page.Content.Contains(Content))
+			if (page != null && !string.IsNullOrEmpty(page.Content) && !string.IsNullOrEmpty(Content) && CookieInjector != null && page.Content.Contains(Content))
 			{
 				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
@@ -293,7 +273,6 @@ namespace DotnetSpider.Core.Downloader
 				CookieInjector?.Inject(spider);
 				page.Exception = new DownloadException($"Content downloaded contains string: {Content}.");
 			}
-			return true;
 		}
 	}
 
@@ -303,7 +282,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public static int RequestedCount { get; set; }
 
-		public override bool Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (RedialLimit != 0)
 			{
@@ -322,7 +301,40 @@ namespace DotnetSpider.Core.Downloader
 					}
 				}
 			}
-			return true;
+		}
+	}
+
+	public class SubContentHandler : AfterDownloadCompleteHandler
+	{
+		public string StartPart { get; set; }
+		public string EndPart { get; set; }
+		public int StartOffset { get; set; } = 0;
+		public int EndOffset { get; set; } = 0;
+
+		public override void Handle(ref Page page, ISpider spider)
+		{
+			if (page == null || string.IsNullOrEmpty(page.Content))
+			{
+				return;
+			}
+
+			string rawText = page.Content;
+
+			int begin = rawText.IndexOf(StartPart, StringComparison.Ordinal);
+			int end = rawText.IndexOf(EndPart, begin, StringComparison.Ordinal);
+			int length = end - begin;
+
+			begin += StartOffset;
+			length -= StartOffset;
+			length -= EndOffset;
+			length += EndPart.Length;
+
+			if (begin < 0 || length < 0)
+			{
+				throw new SpiderException("Sub content failed. Please check your settings.");
+			}
+			string newRawText = rawText.Substring(begin, length).Trim();
+			page.Content = newRawText;
 		}
 	}
 }
