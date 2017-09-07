@@ -1,9 +1,16 @@
 ﻿using Dapper;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Infrastructure.Database;
+using DotnetSpider.Extension.Infrastructure;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
@@ -79,8 +86,8 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
- 
 		}
+
 
 		private static void Spider_OnClosed(Spider spider)
 		{

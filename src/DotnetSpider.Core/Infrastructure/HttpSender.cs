@@ -215,7 +215,7 @@ namespace DotnetSpider.Core.Infrastructure
 				request.Headers["Connection"] = "Keep-Alive";
 			}
 			request.Headers["User-Agent"] = item.UserAgent;
-			request.Headers["Referer"] = item.UserAgent;
+			request.Headers["Referer"] = item.Referer;
 #else
 			request.Timeout = item.Timeout;
 			request.KeepAlive = item.KeepAlive;

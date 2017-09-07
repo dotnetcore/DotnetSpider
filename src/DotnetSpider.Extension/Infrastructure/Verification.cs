@@ -85,7 +85,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			RedisConnection.Default?.Database.HashDelete(ValidateStatusKey, identity);
 		}
 
-		public static void ProcessVerifidation(string identity, Action verify)
+		public static void ProcessVerifidation(string identity, Action dataVerificationAndReport)
 		{
 			string key = $"dotnetspider:validateLocker:{identity}";
 
@@ -100,12 +100,12 @@ namespace DotnetSpider.Extension.Infrastructure
 					}
 
 					var lockerValue = RedisConnection.Default.Database.HashGet(ValidateStatusKey, identity);
-					needVerify = lockerValue != "verify finished";
+					needVerify = lockerValue != "verify completed.";
 				}
 				if (needVerify)
 				{
 					Logger.MyLog(identity, "Start data verification...", LogLevel.Info);
-					verify();
+					dataVerificationAndReport();
 					Logger.MyLog(identity, "Data verification complete.", LogLevel.Info);
 				}
 				else
@@ -115,13 +115,12 @@ namespace DotnetSpider.Extension.Infrastructure
 
 				if (needVerify)
 				{
-					RedisConnection.Default?.Database.HashSet(ValidateStatusKey, identity, "verify finished");
+					RedisConnection.Default?.Database.HashSet(ValidateStatusKey, identity, "verify completed.");
 				}
 			}
 			catch (Exception e)
 			{
 				Logger.MyLog(identity, e.Message, LogLevel.Error, e);
-				//throw;
 			}
 			finally
 			{

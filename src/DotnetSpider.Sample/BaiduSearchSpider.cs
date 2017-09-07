@@ -24,7 +24,7 @@ namespace DotnetSpider.Sample
 			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 			AddEntityType(typeof(BaiduSearchEntry));
 
-			OnExited += () =>
+			DataVerificationAndReport += () =>
 			{
 				Verification<BaiduSearchSpider> verifier = new Verification<BaiduSearchSpider>();
 				verifier.AddSqlEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);

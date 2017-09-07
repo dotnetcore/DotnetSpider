@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension
 
 		protected abstract void MyInit(params string[] arguments);
 
-		protected Action OnExited;
+		protected Action DataVerificationAndReport;
 
 		public string TaskId { get; set; }
 
@@ -34,8 +34,6 @@ namespace DotnetSpider.Extension
 
 		protected CommonSpider(string name, Site site) : base(site)
 		{
-			Core.Infrastructure.Database.DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
-			Core.Infrastructure.Database.DbProviderFactories.RegisterFactory("Npgsql", Npgsql.NpgsqlFactory.Instance);
 			Name = name;
 		}
 
@@ -70,9 +68,9 @@ namespace DotnetSpider.Extension
 
 				base.Run(arguments);
 
-				if (IsComplete && OnExited != null)
+				if (IsComplete && DataVerificationAndReport != null)
 				{
-					BaseVerification.ProcessVerifidation(Identity, OnExited);
+					BaseVerification.ProcessVerifidation(Identity, DataVerificationAndReport);
 				}
 			}
 			finally
