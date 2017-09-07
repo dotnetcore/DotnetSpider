@@ -82,7 +82,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			protected override void Handle(Page page)
 			{
-				page.Skip = true;
+				page.SkipRequest = true;
 			}
 		}
 	}

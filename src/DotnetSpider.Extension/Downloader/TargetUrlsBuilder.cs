@@ -29,10 +29,10 @@ namespace DotnetSpider.Extension.Downloader
 
 		public virtual void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(PaggerString) && (Termination == null || !Termination.IsTermination(page, this)))
+			if (page != null && !string.IsNullOrEmpty(page.Content) && !string.IsNullOrEmpty(PaggerString) && (Termination == null || !Termination.IsTermination(page, this)))
 			{
 				page.AddTargetRequests(GenerateRequests(page));
-				page.SkipExtractedTargetUrls = true;
+				page.SkipExtractTargetUrls = true;
 			}
 		}
 
@@ -110,21 +110,20 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			var currentUrl = page.Url;
 			var nextPagger = page.Request.GetExtra(Field)?.ToString();
-			if (string.IsNullOrEmpty(nextPagger))
+			if (nextPagger != null)
 			{
-				return null;
-			}
-			var currentPaggerString = GetCurrentPagger(currentUrl);
-			var matches = RegexUtil.NumRegex.Matches(currentPaggerString);
-			if (matches.Count == 0)
-			{
-				return null;
-			}
+				var currentPaggerString = GetCurrentPagger(currentUrl);
+				var matches = RegexUtil.NumRegex.Matches(currentPaggerString);
+				if (matches.Count == 0)
+				{
+					return null;
+				}
 
-			if (int.TryParse(matches[0].Value, out _))
-			{
-				var next = RegexUtil.NumRegex.Replace(PaggerString, nextPagger.ToString());
-				return currentUrl.Replace(currentPaggerString, next);
+				if (int.TryParse(matches[0].Value, out _))
+				{
+					var next = RegexUtil.NumRegex.Replace(PaggerString, nextPagger.ToString());
+					return currentUrl.Replace(currentPaggerString, next);
+				}
 			}
 			return null;
 		}
@@ -200,7 +199,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
-			if (string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content))
 			{
 				return false;
 			}
@@ -215,7 +214,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
-			if (string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content))
 			{
 				return false;
 			}
@@ -228,9 +227,14 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		public int Limit { get; set; }
 
+		public LimitPageNumTermination(int limit)
+		{
+			Limit = limit;
+		}
+
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
-			if (string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content))
 			{
 				return false;
 			}

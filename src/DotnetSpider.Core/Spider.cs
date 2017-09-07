@@ -935,7 +935,7 @@ namespace DotnetSpider.Core
 				sw.Stop();
 				CalculateDownloadSpeed(sw.ElapsedMilliseconds);
 
-				if (page == null || page.Skip)
+				if (page == null || page.SkipRequest)
 				{
 					return;
 				}

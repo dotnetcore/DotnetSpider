@@ -13,6 +13,7 @@ namespace DotnetSpider.Core
 	{
 		public const string Images = "580c9065-0f44-47e9-94ea-b172d5a730c0";
 
+		private readonly object _locker = new object();
 		private Selectable _selectable;
 		private string _content;
 
@@ -30,6 +31,9 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public string TargetUrl { get; set; }
 
+		/// <summary>
+		/// Title of current page.
+		/// </summary>
 		public string Title { get; set; }
 
 		/// <summary>
@@ -38,9 +42,29 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Request Request { get; }
 
+		/// <summary>
+		/// Whether need retry current page.
+		/// </summary>
 		public bool Retry { get; set; }
 
-		public bool SkipExtractedTargetUrls { get; set; }
+		/// <summary>
+		/// Skip extract target urls, when someone use custom target url builder.
+		/// </summary>
+		public bool SkipExtractTargetUrls { get; set; }
+
+		/// <summary>
+		/// Skip all target urls, will not add to scheduler.
+		/// </summary>
+		public bool SkipTargetUrls { get; set; }
+
+		/// <summary>
+		/// Skip current page.
+		/// </summary>
+		public bool SkipRequest
+		{
+			get => ResultItems.IsSkip;
+			set => ResultItems.IsSkip = value;
+		}
 
 		public ResultItems ResultItems { get; } = new ResultItems();
 
@@ -61,24 +85,22 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public bool SkipTargetUrls { get; set; }
-
-		public bool Skip
-		{
-			get => ResultItems.IsSkip;
-			set => ResultItems.IsSkip = value;
-		}
-
 		public Exception Exception { get; set; }
 
 		public HashSet<Request> TargetRequests { get; } = new HashSet<Request>();
 
+		/// <summary>
+		/// Whether remove outbound urls.
+		/// </summary>
 		public bool RemoveOutboundLinks { get; }
 
+		/// <summary>
+		/// Only used to remove outbound urls.
+		/// </summary>
 		public string[] Domains { get; }
 
 		/// <summary>
-		/// Get html content of page
+		/// Get selectable interface
 		/// </summary>
 		/// <returns></returns>
 		public Selectable Selectable
@@ -123,7 +145,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			lock (this)
+			lock (_locker)
 			{
 				foreach (string s in requests)
 				{
@@ -151,7 +173,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			lock (this)
+			lock (_locker)
 			{
 				foreach (var r in requests)
 				{
@@ -172,7 +194,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			lock (this)
+			lock (_locker)
 			{
 				foreach (string s in requests)
 				{
@@ -197,7 +219,7 @@ namespace DotnetSpider.Core
 		/// <param name="increaseDeep"></param>
 		public void AddTargetRequest(string requestString, bool increaseDeep = true)
 		{
-			lock (this)
+			lock (_locker)
 			{
 				if (string.IsNullOrEmpty(requestString) || requestString.Equals("#"))
 				{
@@ -227,7 +249,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			lock (this)
+			lock (_locker)
 			{
 				if (request.IsAvailable)
 				{

@@ -117,7 +117,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 			}
 			Logger.MyLog(spider.Identity, $"Storage file: {request.Url} success.", LogLevel.Info);
-			return new Page(request, null) { Skip = true };
+			return new Page(request, null) { SkipRequest = true };
 		}
 
 		private void TryDetectContentType(Page page, ISpider spider)

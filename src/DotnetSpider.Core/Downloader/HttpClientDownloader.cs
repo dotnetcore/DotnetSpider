@@ -93,7 +93,7 @@ namespace DotnetSpider.Core.Downloader
 					if (!site.DownloadFiles)
 					{
 						Logger.MyLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
-						return new Page(request, null) { Skip = true };
+						return new Page(request, null) { SkipRequest = true };
 					}
 					else
 					{
@@ -142,7 +142,7 @@ namespace DotnetSpider.Core.Downloader
 				Page page = new Page(request, null)
 				{
 					Exception = e,
-					Skip = true
+					SkipRequest = true
 				};
 
 				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {e.Message}.", LogLevel.Error, e);
