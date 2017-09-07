@@ -11,7 +11,16 @@ namespace DotnetSpider.Core
 		private readonly Dictionary<string, dynamic> _fields = new Dictionary<string, dynamic>();
 		private readonly object _locker = new object();
 
-		public Dictionary<string, dynamic> Results => _fields;
+		public Dictionary<string, dynamic> Results
+		{
+			get
+			{
+				lock (_locker)
+				{
+					return _fields;
+				}
+			}
+		}
 
 		public Request Request { get; set; }
 

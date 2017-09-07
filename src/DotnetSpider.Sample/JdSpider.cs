@@ -2,7 +2,7 @@
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
@@ -47,7 +47,7 @@ namespace DotnetSpider.Sample
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		[Table("jd", "jd_product", Primary = "Sku", Indexs = new[] { "Sku" })]
+		[EntityTable("jd", "jd_product", Primary = "Sku", Indexs = new[] { "Sku" })]
 		class JdProduct : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Name", Type = SelectorType.Enviroment, Length = 100)]

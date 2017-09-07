@@ -36,9 +36,7 @@ namespace DotnetSpider.Core.Selector
 				List<dynamic> list = new List<dynamic>();
 				if (text is string)
 				{
-					JObject o = JsonConvert.DeserializeObject(text) as JObject;
-
-					if (o != null)
+					if (JsonConvert.DeserializeObject(text) is JObject o)
 					{
 						var items = o.SelectTokens(_jsonPath).Select(t=>t.ToString()).ToList();
 						if (items.Count > 0)
@@ -58,11 +56,9 @@ namespace DotnetSpider.Core.Selector
 				}
 				else
 				{
-					var node = text as HtmlNode;
-					dynamic realText = node != null ? JsonConvert.DeserializeObject<JObject>(node.InnerText) : text;
-					JObject o = realText as JObject;
+					dynamic realText = text is HtmlNode node ? JsonConvert.DeserializeObject<JObject>(node.InnerText) : text;
 
-					if (o != null)
+					if (realText is JObject o)
 					{
 						var items = o.SelectTokens(_jsonPath).Select(t => t.ToString()).ToList();
 						if (items.Count > 0)

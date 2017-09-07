@@ -5,7 +5,7 @@ using DotnetSpider.Extension;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 
 namespace DotnetSpider.Sample
 {
@@ -40,7 +40,7 @@ namespace DotnetSpider.Sample
 			public string Url { get; set; }
 		}
 
-		[Table("test", "Article", TableSuffix.Today, Indexs = new[] { "Title" })]
+		[EntityTable("test", "Article", EntityTable.Today, Indexs = new[] { "Title" })]
 		[TargetUrlsSelector(Patterns = new[] { @"t[0-9]+_[0-9]+.shtml" })]
 		class Article : SpiderEntity
 		{

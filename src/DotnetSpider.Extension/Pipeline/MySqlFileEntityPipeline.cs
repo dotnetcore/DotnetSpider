@@ -13,6 +13,8 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class MySqlFileEntityPipeline : BaseEntityPipeline
 	{
+		private readonly object _locker = new object();
+
 		public enum FileType
 		{
 			LoadFile,
@@ -34,7 +36,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (string.IsNullOrEmpty(DataFolder))
 			{
-				DataFolder = Path.Combine(Core.Environment.BaseDirectory, spider.Identity, "mysql");
+				DataFolder = Path.Combine(Environment.BaseDirectory, spider.Identity, "mysql");
 			}
 		}
 
@@ -45,10 +47,9 @@ namespace DotnetSpider.Extension.Pipeline
 				return;
 			}
 
-			lock (this)
+			lock (_locker)
 			{
-				EntityDefine metadata;
-				if (Entities.TryGetValue(entityName, out metadata))
+				if (Entities.TryGetValue(entityName, out var metadata))
 				{
 					switch (Type)
 					{
@@ -69,12 +70,13 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private void SaveInsertSqlFile(EntityDefine metadata, List<DataObject> items)
 		{
-			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.sql"));
+			var tableName = metadata.TableInfo.CalculateTableName();
+			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.TableInfo.Database}.{tableName}.sql"));
 			StringBuilder builder = new StringBuilder();
 			foreach (var entry in items)
 			{
 				//{Environment.NewLine}
-				builder.Append($"INSERT IGNORE INTO `{metadata.Table.Database}`.`{metadata.Table.Name}` (");
+				builder.Append($"INSERT IGNORE INTO `{metadata.TableInfo.Database}`.`{tableName}` (");
 				var lastColumn = metadata.Columns.Last();
 				foreach (var column in metadata.Columns)
 				{
@@ -85,7 +87,7 @@ namespace DotnetSpider.Extension.Pipeline
 				foreach (var column in metadata.Columns)
 				{
 					var token = entry[$"$.{column.Name}"];
-					var value = token == null ? "" : MySqlHelper.EscapeString(token?.ToString());
+					var value = token == null ? "" : MySqlHelper.EscapeString(token.ToString());
 
 					builder.Append(column == lastColumn ? $"'{value}'" : $"'{value}', ");
 				}
@@ -96,7 +98,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private void SaveLoadFile(EntityDefine metadata, List<DataObject> items)
 		{
-			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
+			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.TableInfo.Database}.{metadata.TableInfo.Name}.data"));
 			StringBuilder builder = new StringBuilder();
 			foreach (var entry in items)
 			{

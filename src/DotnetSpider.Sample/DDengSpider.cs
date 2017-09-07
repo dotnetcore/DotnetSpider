@@ -4,7 +4,7 @@ using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
@@ -32,7 +32,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(Corp));
 		}
 
-		[Table("test", "ddeng_corp", TableSuffix.Today)]
+		[EntityTable("test", "ddeng_corp", EntityTable.Today)]
 		class Corp : SpiderEntity
 		{
 			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong", Length = 100)]

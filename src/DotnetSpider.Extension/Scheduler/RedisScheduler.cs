@@ -17,6 +17,7 @@ namespace DotnetSpider.Extension.Scheduler
 	/// </summary>
 	public sealed class RedisScheduler : DuplicateRemovedScheduler, IDuplicateRemover
 	{
+		private readonly object _locker = new object();
 		public const string TasksKey = "dotnetspider:tasks";
 		public const string TaskStatsKey = "dotnetspider:task-stats";
 
@@ -191,7 +192,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void Import(HashSet<Request> requests)
 		{
-			lock (this)
+			lock (_locker)
 			{
 				int batchCount = 10000;
 				int cacheSize = requests.Count > batchCount ? batchCount : requests.Count;

@@ -69,8 +69,7 @@ namespace DotnetSpider.Core.Selector
 			var links = new List<dynamic>();
 			foreach (var link in tmplinks)
 			{
-				Uri uri;
-				if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out uri))
+				if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out _))
 				{
 					links.Add(link);
 				}

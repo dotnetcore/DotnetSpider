@@ -10,7 +10,7 @@ using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class MongoDBEntityPipeline : BaseEntityPipeline
+	public class MongoDbEntityPipeline : BaseEntityPipeline
 	{
 		protected ConcurrentDictionary<string, IMongoCollection<BsonDocument>> Collections = new ConcurrentDictionary<string, IMongoCollection<BsonDocument>>();
 
@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public IUpdateConnectString UpdateConnectString { get; set; }
 
-		public MongoDBEntityPipeline(string connectString)
+		public MongoDbEntityPipeline(string connectString)
 		{
 			ConnectString = connectString;
 		}
@@ -27,22 +27,21 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			base.AddEntity(metadata);
 
-			if (metadata.Table == null)
+			if (metadata.TableInfo == null)
 			{
 				Logger.MyLog(Spider?.Identity, $"Schema is necessary, skip {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
 
 			MongoClient client = new MongoClient(ConnectString);
-			var db = client.GetDatabase(metadata.Table.Database);
+			var db = client.GetDatabase(metadata.TableInfo.Database);
 
-			Collections.TryAdd(metadata.Table.Name, db.GetCollection<BsonDocument>(metadata.Table.Name));
+			Collections.TryAdd(metadata.Name, db.GetCollection<BsonDocument>(metadata.TableInfo.CalculateTableName()));
 		}
 
 		public override void Process(string entityName, List<DataObject> datas)
 		{
-			IMongoCollection<BsonDocument> collection;
-			if (Collections.TryGetValue(entityName, out collection))
+			if (Collections.TryGetValue(entityName, out var collection))
 			{
 				List<BsonDocument> reslut = new List<BsonDocument>();
 				foreach (var data in datas)

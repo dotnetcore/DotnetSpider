@@ -67,17 +67,14 @@ namespace DotnetSpider.Core.Redial
 
 		public override void WaitRedialExit()
 		{
-			lock (this)
+			if (File.Exists(RedialLockerFile))
 			{
-				if (File.Exists(RedialLockerFile))
+				for (int i = 0; i < RedialTimeout; ++i)
 				{
-					for (int i = 0; i < RedialTimeout; ++i)
+					Thread.Sleep(50);
+					if (!File.Exists(RedialLockerFile))
 					{
-						Thread.Sleep(50);
-						if (!File.Exists(RedialLockerFile))
-						{
-							break;
-						}
+						break;
 					}
 				}
 			}
@@ -92,8 +89,7 @@ namespace DotnetSpider.Core.Redial
 
 		public override void DeleteActionIdentity(string identity)
 		{
-			Stream stream;
-			Files.TryRemove(identity, out stream);
+			Files.TryRemove(identity, out var stream);
 			stream?.Dispose();
 			File.Delete(identity);
 		}
@@ -112,8 +108,7 @@ namespace DotnetSpider.Core.Redial
 
 		public override void ReleaseRedialLocker()
 		{
-			Stream stream;
-			Files.TryRemove(RedialLockerFile, out stream);
+			Files.TryRemove(RedialLockerFile, out var stream);
 			stream?.Dispose();
 			File.Delete(RedialLockerFile);
 		}

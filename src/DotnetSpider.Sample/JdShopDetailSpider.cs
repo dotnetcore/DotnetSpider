@@ -4,7 +4,7 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
 using DotnetSpider.Core;
@@ -43,7 +43,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(ProductUpdater));
 		}
 
-		[Table("jd", "sku_v2", TableSuffix.Monday, Primary = "Sku", UpdateColumns = new[] { "ShopId" })]
+		[EntityTable("jd", "sku_v2", EntityTable.Monday, Primary = "Sku", UpdateColumns = new[] { "ShopId" })]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
 		class ProductUpdater : SpiderEntity
 		{

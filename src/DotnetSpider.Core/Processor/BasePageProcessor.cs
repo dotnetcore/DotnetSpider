@@ -13,7 +13,7 @@ namespace DotnetSpider.Core.Processor
 {
 	public abstract class BasePageProcessor : IPageProcessor
 	{
-		private readonly static ISelector _imageSelector = Selectors.XPath(".//img/@src");
+		private static readonly ISelector ImageSelector = Selectors.XPath(".//img/@src");
 
 		private readonly List<Regex> _excludeTargetUrlPatterns = new List<Regex>();
 		private readonly Dictionary<ISelector, List<Regex>> _targetUrlExtractors = new Dictionary<ISelector, List<Regex>>();
@@ -162,7 +162,7 @@ namespace DotnetSpider.Core.Processor
 
 			if (Site.DownloadFiles)
 			{
-				var links = (page.Selectable.SelectList(_imageSelector)).GetValues();
+				var links = (page.Selectable.SelectList(ImageSelector)).GetValues();
 
 				if (links == null || links.Count == 0)
 				{

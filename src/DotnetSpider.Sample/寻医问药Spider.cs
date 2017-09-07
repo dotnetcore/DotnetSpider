@@ -1,7 +1,7 @@
 ﻿using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
@@ -24,7 +24,7 @@ namespace DotnetSpider.Sample
 			AddEntityType<Item>();
 		}
 
-		[Table("test", "yaoping")]
+		[EntityTable("test", "yaoping")]
 		[EntitySelector(Expression = ".//div[@class='s-list-btn']")]
 		class Item : SpiderEntity
 		{

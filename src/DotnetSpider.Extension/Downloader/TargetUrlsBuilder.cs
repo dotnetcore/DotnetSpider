@@ -29,7 +29,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public virtual void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content) && !string.IsNullOrEmpty(PaggerString) && (Termination == null || !Termination.IsTermination(page, this)))
+			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(PaggerString) && (Termination == null || !Termination.IsTermination(page, this)))
 			{
 				page.AddTargetRequests(GenerateRequests(page));
 				page.SkipExtractedTargetUrls = true;
@@ -54,7 +54,7 @@ namespace DotnetSpider.Extension.Downloader
 
 	public class IncrementTargetUrlsBuilder : BaseTargetUrlsBuilder
 	{
-		public int Interval { get; set; } = 1;
+		public int Interval { get; set; }
 
 		public IncrementTargetUrlsBuilder(string paggerString, int interval = 1, ITargetUrlsBuilderTermination termination = null) : base(paggerString)
 		{
@@ -70,14 +70,13 @@ namespace DotnetSpider.Extension.Downloader
 		protected string IncreasePageNum(string currentUrl)
 		{
 			var currentPaggerString = GetCurrentPagger(currentUrl);
-			int currentPagger;
 			var matches = RegexUtil.NumRegex.Matches(currentPaggerString);
 			if (matches.Count == 0)
 			{
 				return null;
 			}
 
-			if (int.TryParse(matches[0].Value, out currentPagger))
+			if (int.TryParse(matches[0].Value, out var currentPagger))
 			{
 				var nextPagger = currentPagger + Interval;
 				var next = RegexUtil.NumRegex.Replace(PaggerString, nextPagger.ToString());
@@ -116,14 +115,13 @@ namespace DotnetSpider.Extension.Downloader
 				return null;
 			}
 			var currentPaggerString = GetCurrentPagger(currentUrl);
-			int currentPagger;
 			var matches = RegexUtil.NumRegex.Matches(currentPaggerString);
 			if (matches.Count == 0)
 			{
 				return null;
 			}
 
-			if (int.TryParse(matches[0].Value, out currentPagger))
+			if (int.TryParse(matches[0].Value, out _))
 			{
 				var next = RegexUtil.NumRegex.Replace(PaggerString, nextPagger.ToString());
 				return currentUrl.Replace(currentPaggerString, next);
@@ -152,23 +150,22 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				throw new SpiderException("Total page selector or current page selector should not be null.");
 			}
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return false;
 			}
-			var totalStr = GetSelectorValue(page, TotalPageSelector, TotalPageFormatters);
-			var currentStr = GetSelectorValue(page, CurrenctPageSelector, CurrnetPageFormatters);
+			var totalStr = GetSelectorValue(page, TotalPageSelector);
+			var currentStr = GetSelectorValue(page, CurrenctPageSelector);
 
 			return currentStr == totalStr;
 		}
 
-		private string GetSelectorValue(Page page, BaseSelector selector, Formatter[] formatters)
+		private string GetSelectorValue(Page page, BaseSelector selector)
 		{
 			string totalStr = string.Empty;
 			if (selector.Type == SelectorType.Enviroment)
 			{
-				var enviromentSelector = SelectorUtils.Parse(TotalPageSelector) as EnviromentSelector;
-				if (enviromentSelector != null)
+				if (SelectorUtils.Parse(TotalPageSelector) is EnviromentSelector enviromentSelector)
 				{
 					totalStr = EntityExtractor.GetEnviromentValue(enviromentSelector.Field, page, 0);
 				}
@@ -203,7 +200,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return false;
 			}
@@ -218,7 +215,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return false;
 			}
@@ -233,7 +230,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return false;
 			}

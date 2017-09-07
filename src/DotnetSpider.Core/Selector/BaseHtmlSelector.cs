@@ -31,8 +31,7 @@ namespace DotnetSpider.Core.Selector
 		{
 			if (text != null)
 			{
-				var htmlNode = text as HtmlNode;
-				if (htmlNode != null)
+				if (text is HtmlNode htmlNode)
 				{
 					return SelectList(htmlNode);
 				}

@@ -319,6 +319,7 @@ namespace DotnetSpider.Core.Infrastructure
 		#endregion
 
 		#region ICollection Members
+		/// <inheritdoc />
 		/// <summary>
 		/// Gets a value indicating whether access
 		/// to the Queue is synchronized (thread-safe).

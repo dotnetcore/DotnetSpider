@@ -9,16 +9,12 @@ using OpenQA.Selenium;
 using DotnetSpider.Core.Redial;
 using System.Runtime.InteropServices;
 using DotnetSpider.Extension.Infrastructure;
-#if NET_CORE
-using System.Net;
-#else
-
-#endif
 
 namespace DotnetSpider.Extension.Downloader
 {
 	public class WebDriverDownloader : BaseDownloader
 	{
+		private readonly object _locker = new object();
 		private IWebDriver _webDriver;
 		private readonly int _webDriverWaitTime;
 		private bool _isLogined;
@@ -73,7 +69,7 @@ namespace DotnetSpider.Extension.Downloader
 			Site site = spider.Site;
 			try
 			{
-				lock (this)
+				lock (_locker)
 				{
 					_webDriver = _webDriver ?? WebDriverExtensions.Open(_browser, _option);
 
@@ -103,9 +99,12 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					_webDriver.Url = domainUrl;
 					options.Cookies.DeleteAllCookies();
-					foreach (var c in spider.Site.Cookies.PairPart)
+					if (spider.Site.Cookies != null)
 					{
-						options.Cookies.AddCookie(new OpenQA.Selenium.Cookie(c.Key, c.Value));
+						foreach (var c in spider.Site.Cookies.PairPart)
+						{
+							options.Cookies.AddCookie(new Cookie(c.Key, c.Value));
+						}
 					}
 				}
 

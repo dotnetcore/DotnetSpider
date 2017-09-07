@@ -7,7 +7,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
 using Xunit;
@@ -426,7 +426,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 
-		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku" })]
+		[EntityTable("test", "sku", EntityTable.Today, Primary = "Sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class ProductInsert : SpiderEntity
 		{
@@ -440,7 +440,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Sku { get; set; }
 		}
 
-		[Table("test", "sku", TableSuffix.Today, Primary = "Sku", UpdateColumns = new[] { "Category" })]
+		[EntityTable("test", "sku", EntityTable.Today, Primary = "Sku", UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class ProductUpdate : SpiderEntity
 		{
@@ -454,7 +454,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Sku { get; set; }
 		}
 
-		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku,Category1")]
+		[EntityTable("test", "sku2", EntityTable.Today, Primary = "Sku,Category1")]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class Product2Insert : SpiderEntity
 		{
@@ -471,7 +471,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Sku { get; set; }
 		}
 
-		[Table("test", "sku2", TableSuffix.Today, Primary = "Sku,Category1", UpdateColumns = new[] { "Category" })]
+		[EntityTable("test", "sku2", EntityTable.Today, Primary = "Sku,Category1", UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class Product2Update : SpiderEntity
 		{

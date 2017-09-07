@@ -1,12 +1,11 @@
 ﻿using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.ORM;
 using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public class EntityAdapter
 	{
-		public Table Table { get; set; }
+		public EntityTable Table { get; set; }
 
 		public List<Column> Columns { get; set; }
 
@@ -18,7 +17,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public bool InsertModel { get; set; } = true;
 
-		public EntityAdapter(Table table, List<Column> columns)
+		public EntityAdapter(EntityTable table, List<Column> columns)
 		{
 			Table = table;
 			Columns = columns;

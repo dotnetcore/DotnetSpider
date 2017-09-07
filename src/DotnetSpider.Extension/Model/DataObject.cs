@@ -4,44 +4,37 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Model
 {
-	public partial class DataObject : IDictionary<string, object>
+	public class DataObject : IDictionary<string, object>
 	{
-		private Dictionary<string, object> data = new Dictionary<string, object>();
-
-		public DataObject()
-		{
-		}
+		private readonly Dictionary<string, object> _data = new Dictionary<string, object>();
 
 		public object this[string key]
 		{
 			get
 			{
-				var result = data.ContainsKey(key) ? data[key] : null;
+				var result = _data.ContainsKey(key) ? _data[key] : null;
 				return result;
 			}
-			set
-			{
-				Add(key, value);
-			}
+			set => Add(key, value);
 		}
 
-		public ICollection<string> Keys => data.Keys;
+		public ICollection<string> Keys => _data.Keys;
 
-		public ICollection<object> Values => data.Values;
+		public ICollection<object> Values => _data.Values;
 
-		public int Count => data.Keys.Count;
+		public int Count => _data.Keys.Count;
 
 		public bool IsReadOnly => false;
 
 		public void Add(string key, object value)
 		{
-			if (data.ContainsKey(key))
+			if (_data.ContainsKey(key))
 			{
-				data[key] = value;
+				_data[key] = value;
 			}
 			else
 			{
-				data.Add(key, value);
+				_data.Add(key, value);
 			}
 		}
 
@@ -57,7 +50,7 @@ namespace DotnetSpider.Extension.Model
 
 		public void Clear()
 		{
-			data.Clear();
+			_data.Clear();
 		}
 
 		public bool Contains(KeyValuePair<string, object> item)
@@ -68,21 +61,22 @@ namespace DotnetSpider.Extension.Model
 
 		public bool ContainsKey(string key)
 		{
-			return data.ContainsKey(key);
+			return _data.ContainsKey(key);
 		}
 
 		public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
 		{
+			throw new NotImplementedException();
 		}
 
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 		{
-			return data.GetEnumerator();
+			return _data.GetEnumerator();
 		}
 
 		public bool Remove(string key)
 		{
-			return data.Remove(key);
+			return _data.Remove(key);
 		}
 
 		public bool Remove(KeyValuePair<string, object> item)
@@ -105,7 +99,7 @@ namespace DotnetSpider.Extension.Model
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return data.GetEnumerator();
+			return _data.GetEnumerator();
 		}
 	}
 }

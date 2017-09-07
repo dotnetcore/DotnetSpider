@@ -14,9 +14,8 @@ namespace DotnetSpider.Core.Infrastructure
 		///
 		public long Value => _value;
 
-		///
-		/// 使用0作为初始值创建新实例
-		///
+		/// <inheritdoc />
+		///  使用0作为初始值创建新实例
 		public AutomicLong()
 			: this(0)
 		{

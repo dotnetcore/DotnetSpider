@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace DotnetSpider.Core.Infrastructure.Database
 {
-	public static partial class DatabaseExtensions
+	public static class DatabaseExtensions
 	{
 		private static readonly ILogger Logger = LogCenter.GetLogger();
 
@@ -28,9 +28,12 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				try
 				{
 					DbConnection connection = factory.CreateConnection();
-					connection.ConnectionString = connectionStringSettings.ConnectionString;
-					connection.Open();
-					return connection;
+					if (connection != null)
+					{
+						connection.ConnectionString = connectionStringSettings.ConnectionString;
+						connection.Open();
+						return connection;
+					}
 				}
 				catch (Exception e)
 				{
@@ -75,9 +78,12 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				try
 				{
 					var connection = factory.CreateConnection();
-					connection.ConnectionString = connectString;
-					connection.Open();
-					return connection;
+					if (connection != null)
+					{
+						connection.ConnectionString = connectString;
+						connection.Open();
+						return connection;
+					}
 				}
 				catch (Exception e)
 				{

@@ -4,7 +4,6 @@ using DotnetSpider.Core;
 using System.Configuration;
 using DotnetSpider.Core.Infrastructure.Database;
 using Dapper;
-using System;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -60,9 +59,9 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			else
 			{
-				if (Core.Environment.DataConnectionStringSettings != null)
+				if (Environment.DataConnectionStringSettings != null)
 				{
-					connectionStringSettings = Core.Environment.DataConnectionStringSettings;
+					connectionStringSettings = Environment.DataConnectionStringSettings;
 				}
 				else
 				{
@@ -81,7 +80,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private class DefaulHtmlContent
+		public class DefaulHtmlContent
 		{
 			public string Url { get; set; }
 			public string Title { get; set; }

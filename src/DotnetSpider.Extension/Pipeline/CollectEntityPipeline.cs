@@ -6,6 +6,7 @@ namespace DotnetSpider.Extension.Pipeline
 	public class CollectEntityPipeline : BaseEntityPipeline, ICollectEntityPipeline
 	{
 		private readonly Dictionary<string, List<DataObject>> _collector = new Dictionary<string, List<DataObject>>();
+		private readonly object _locker = new object();
 
 		public override void Dispose()
 		{
@@ -14,10 +15,9 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public List<DataObject> GetCollected(string entityName)
 		{
-			lock (this)
+			lock (_locker)
 			{
-				List<DataObject> result;
-				if (_collector.TryGetValue(entityName, out result))
+				if (_collector.TryGetValue(entityName, out var result))
 				{
 					return result;
 				}
@@ -31,7 +31,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void Process(string entityName, List<DataObject> datas)
 		{
-			lock (this)
+			lock (_locker)
 			{
 				if (_collector.ContainsKey(entityName))
 				{

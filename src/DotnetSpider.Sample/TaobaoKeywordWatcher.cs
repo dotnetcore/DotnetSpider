@@ -7,7 +7,7 @@ using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Extension.Scheduler;
 using System.Linq;
 using DotnetSpider.Core.Infrastructure.Database;
@@ -113,7 +113,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(Item), new MyDataHanlder());
 		}
 
-		[Table("taobao", "taobao_items", TableSuffix.FirstDayOfCurrentMonth, Uniques = new[] { "item_id" })]
+		[EntityTable("taobao", "taobao_items", EntityTable.FirstDayOfCurrentMonth, Uniques = new[] { "item_id" })]
 		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
 		class Item : SpiderEntity
 		{

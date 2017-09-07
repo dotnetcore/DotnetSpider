@@ -19,7 +19,6 @@ namespace DotnetSpider.Core
 		public const string DataConnectionStringKey = "DataConnection";
 		public const string IdColumn = "__id";
 
-		public static readonly Configuration Configuration;
 		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
 
@@ -39,26 +38,12 @@ namespace DotnetSpider.Core
 
 		public static string GetAppSettings(string key)
 		{
-			if (Configuration == null)
-			{
-				return ConfigurationManager.AppSettings[key];
-			}
-			else
-			{
-				return Configuration.AppSettings.Settings[key].Value;
-			}
+			return ConfigurationManager.AppSettings[key];
 		}
 
 		public static ConnectionStringSettings GetConnectStringSettings(string key)
 		{
-			if (Configuration == null)
-			{
-				return ConfigurationManager.ConnectionStrings[key];
-			}
-			else
-			{
-				return Configuration.ConnectionStrings.ConnectionStrings[key];
-			}
+			return ConfigurationManager.ConnectionStrings[key];
 		}
 
 		public static void LoadConfiguration(string fileName)

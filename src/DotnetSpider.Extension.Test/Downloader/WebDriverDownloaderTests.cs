@@ -3,7 +3,7 @@ using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Extension.ORM;
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -40,7 +40,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 			}
 		}
 
-		[Table("baidu", "baidu_search")]
+		[EntityTable("baidu", "baidu_search")]
 		[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 		public class BaiduSearchEntry : SpiderEntity
 		{

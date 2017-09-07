@@ -9,83 +9,79 @@ namespace DotnetSpider.Extension.Infrastructure
 	{
 		public static ISelector Parse(BaseSelector selector)
 		{
-			if (string.IsNullOrEmpty(selector?.Expression))
+			if (selector != null && !string.IsNullOrEmpty(selector.Expression))
 			{
-				return null;
-			}
+				string expression = selector.Expression;
 
-			string expression = selector.Expression;
-
-			switch (selector.Type)
-			{
-				case SelectorType.Css:
-					{
-						return Selectors.Css(expression);
-					}
-				case SelectorType.Enviroment:
-					{
-						return Selectors.Enviroment (expression);
-					}
-				case SelectorType.JsonPath:
-					{
-						return Selectors.JsonPath(expression);
-					}
-				case SelectorType.Regex:
-					{
-						if (string.IsNullOrEmpty(selector.Argument))
+				switch (selector.Type)
+				{
+					case SelectorType.Css:
 						{
-							return Selectors.Regex(expression);
+							return Selectors.Css(expression);
 						}
-						else
+					case SelectorType.Enviroment:
 						{
-							int group;
-							if (int.TryParse(selector.Argument, out group))
+							return Selectors.Enviroment(expression);
+						}
+					case SelectorType.JsonPath:
+						{
+							return Selectors.JsonPath(expression);
+						}
+					case SelectorType.Regex:
+						{
+							if (string.IsNullOrEmpty(selector.Argument))
 							{
-								return Selectors.Regex(expression, group);
+								return Selectors.Regex(expression);
 							}
-							throw new SpiderException("Regex argument should be a number set to group: " + selector);
+							else
+							{
+								if (int.TryParse(selector.Argument, out var group))
+								{
+									return Selectors.Regex(expression, group);
+								}
+								throw new SpiderException("Regex argument should be a number set to group: " + selector);
+							}
 						}
-					}
-				case SelectorType.XPath:
-					{
-						return Selectors.XPath(expression);
-					}
+					case SelectorType.XPath:
+						{
+							return Selectors.XPath(expression);
+						}
+				}
 			}
 			throw new SpiderException("Not support selector: " + selector);
 		}
 
 		public static ISelector Parse(Selector selector)
 		{
-			if (string.IsNullOrEmpty(selector?.Expression))
+			if (selector != null && !string.IsNullOrEmpty(selector.Expression))
 			{
-				return null;
+				string expression = selector.Expression;
+
+				switch (selector.Type)
+				{
+					case SelectorType.Css:
+						{
+							return Selectors.Css(expression);
+						}
+					case SelectorType.Enviroment:
+						{
+							return Selectors.Enviroment(expression);
+						}
+					case SelectorType.JsonPath:
+						{
+							return Selectors.JsonPath(expression);
+						}
+					case SelectorType.Regex:
+						{
+							return Selectors.Regex(expression);
+						}
+					case SelectorType.XPath:
+						{
+							return Selectors.XPath(expression);
+						}
+				}
 			}
 
-			string expression = selector.Expression;
-
-			switch (selector.Type)
-			{
-				case SelectorType.Css:
-					{
-						return Selectors.Css(expression);
-					}
-				case SelectorType.Enviroment:
-					{
-						return Selectors.Enviroment(expression);
-					}
-				case SelectorType.JsonPath:
-					{
-						return Selectors.JsonPath(expression);
-					}
-				case SelectorType.Regex:
-					{
-						return Selectors.Regex(expression);
-					}
-				case SelectorType.XPath:
-					{
-						return Selectors.XPath(expression);
-					}
-			}
 			throw new SpiderException("Not support selector: " + selector);
 		}
 	}

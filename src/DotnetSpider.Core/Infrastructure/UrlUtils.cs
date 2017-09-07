@@ -79,7 +79,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		public static IList<Request> ConvertToRequests(IEnumerable<string> urls, int grade)
 		{
-			return urls.Select(url => new Request(url, null) { Depth = grade }).ToList();
+			return urls.Select(url => new Request(url) { Depth = grade }).ToList();
 		}
 
 		public static IList<string> ConvertToUrls(IEnumerable<Request> requests)

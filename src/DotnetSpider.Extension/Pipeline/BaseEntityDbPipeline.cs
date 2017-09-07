@@ -19,6 +19,9 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class BaseEntityDbPipeline : BaseEntityPipeline
 	{
+		private ConnectionStringSettings _connectionStringSettings;
+		private readonly string _connectString;
+
 		protected abstract ConnectionStringSettings CreateConnectionStringSettings(string connectString = null);
 		protected abstract string GenerateInsertSql(EntityAdapter adapter);
 		protected abstract string GenerateUpdateSql(EntityAdapter adapter);
@@ -32,13 +35,17 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public IUpdateConnectString UpdateConnectString { get; set; }
 
-		public ConnectionStringSettings ConnectionStringSettings { get; private set; }
+		public ConnectionStringSettings ConnectionStringSettings
+		{
+			get => _connectionStringSettings ?? (_connectionStringSettings = CreateConnectionStringSettings(_connectString));
+			set => _connectionStringSettings = value;
+		}
 
 		public bool CheckIfSameBeforeUpdate { get; set; }
 
 		protected BaseEntityDbPipeline(string connectString = null, bool checkIfSaveBeforeUpdate = false)
 		{
-			ConnectionStringSettings = CreateConnectionStringSettings(connectString);
+			_connectString = connectString;
 			CheckIfSameBeforeUpdate = checkIfSaveBeforeUpdate;
 		}
 
@@ -49,13 +56,13 @@ namespace DotnetSpider.Extension.Pipeline
 				throw new ArgumentException("Should not add a null entity to a entity dabase pipeline.");
 			}
 
-			if (entityDefine == null || entityDefine.Table == null)
+			if (entityDefine.TableInfo == null)
 			{
 				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", LogLevel.Warn);
 				return;
 			}
 
-			EntityAdapter entityAdapter = new EntityAdapter(entityDefine.Table, entityDefine.Columns);
+			EntityAdapter entityAdapter = new EntityAdapter(entityDefine.TableInfo, entityDefine.Columns);
 
 			if (entityAdapter.Table.UpdateColumns != null && entityAdapter.Table.UpdateColumns.Length > 0)
 			{
@@ -87,7 +94,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 						catch (Exception e)
 						{
-							Logger.MyLog(Spider.Identity, $"Update ConnectString failed.", LogLevel.Error, e);
+							Logger.MyLog(Spider.Identity, "Update ConnectString failed.", LogLevel.Error, e);
 							Thread.Sleep(1000);
 						}
 					}
@@ -133,8 +140,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void Process(string entityName, List<DataObject> datas)
 		{
-			EntityAdapter metadata;
-			if (EntityAdapters.TryGetValue(entityName, out metadata))
+			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
 				NetworkCenter.Current.Execute("pp", () =>
 				{
@@ -264,8 +270,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <returns></returns>
 		public string[] GetUpdateColumns(string entityName)
 		{
-			EntityAdapter metadata;
-			if (EntityAdapters.TryGetValue(entityName, out metadata))
+			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
 				return metadata.Table.UpdateColumns;
 			}

@@ -59,7 +59,8 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override string GenerateCreateTableSql(EntityAdapter adapter)
 		{
-			StringBuilder builder = new StringBuilder($"USE {adapter.Table.Database}; IF OBJECT_ID('{adapter.Table.Name}', 'U') IS NULL CREATE table {adapter.Table.Name} (");
+			var tableName = adapter.Table.CalculateTableName();
+			StringBuilder builder = new StringBuilder($"USE {adapter.Table.Database}; IF OBJECT_ID('{tableName}', 'U') IS NULL CREATE table {tableName} (");
 			StringBuilder columnNames = new StringBuilder();
 
 			foreach (var p in adapter.Columns)
@@ -91,7 +92,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 
 			builder.Append(
-				$" CONSTRAINT [PK_{adapter.Table.Name}] PRIMARY KEY CLUSTERED ({primaryKey.ToString(0, primaryKey.Length - 1)})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
+				$" CONSTRAINT [PK_{tableName}] PRIMARY KEY CLUSTERED ({primaryKey.ToString(0, primaryKey.Length - 1)})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
 
 			if (adapter.Table.Indexs != null)
 			{
@@ -100,7 +101,7 @@ namespace DotnetSpider.Extension.Pipeline
 					var columns = index.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
 					string indexColumNames = string.Join(", ", columns.Select(c => $"[{c}]"));
-					builder.Append($"CREATE NONCLUSTERED INDEX [index_{name}] ON {adapter.Table.Name} ({indexColumNames.Substring(0, indexColumNames.Length)});");
+					builder.Append($"CREATE NONCLUSTERED INDEX [index_{name}] ON {tableName} ({indexColumNames.Substring(0, indexColumNames.Length)});");
 				}
 			}
 
@@ -111,7 +112,7 @@ namespace DotnetSpider.Extension.Pipeline
 					var columns = unique.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
 					string uniqueColumNames = string.Join(", ", columns.Select(c => $"[{c}]"));
-					builder.Append($"CREATE UNIQUE NONCLUSTERED INDEX [unique_{name}] ON {adapter.Table.Name} ({uniqueColumNames.Substring(0, uniqueColumNames.Length)});");
+					builder.Append($"CREATE UNIQUE NONCLUSTERED INDEX [unique_{name}] ON {tableName} ({uniqueColumNames.Substring(0, uniqueColumNames.Length)});");
 				}
 			}
 			return builder.ToString();
@@ -121,11 +122,11 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			string columNames = string.Join(", ", adapter.Columns.Select(p => $"[{p.Name}]"));
 			string values = string.Join(", ", adapter.Columns.Select(p => $"@{p.Name}"));
-
+			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("USE {0}; INSERT INTO [{1}] {2} {3};",
 				adapter.Table.Database,
-				adapter.Table.Name,
+				tableName,
 				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
 				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
 
@@ -150,9 +151,10 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 
 			var sqlBuilder = new StringBuilder();
+			var tableName = adapter.Table.CalculateTableName();
 			sqlBuilder.AppendFormat("USE {0}; UPDATE [{1}] SET {2} WHERE {3};",
 				adapter.Table.Database,
-				adapter.Table.Name,
+				tableName,
 				setParamenters, primaryParamenters);
 
 			return sqlBuilder.ToString();
@@ -164,10 +166,11 @@ namespace DotnetSpider.Extension.Pipeline
 			string primaryParamenters = $" [{adapter.Table.Primary}]=@{adapter.Table.Primary}";
 
 			var sqlBuilder = new StringBuilder();
+			var tableName = adapter.Table.CalculateTableName();
 			sqlBuilder.AppendFormat("USE {0}; SELECT {1} FROM [{2}] WHERE {3};",
 				adapter.Table.Database,
 				selectParamenters,
-				adapter.Table.Name,
+				tableName,
 				primaryParamenters);
 
 			return sqlBuilder.ToString();

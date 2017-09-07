@@ -14,17 +14,20 @@ namespace DotnetSpider.Core.Infrastructure
 			Directory.CreateDirectory(copytopath);
 			while (copyfolders.Count > 0)
 			{
-				FileSystemInfo atom = copyfolders.Dequeue();
-				FileInfo file = atom as FileInfo;
-				if (file == null)
+				FileSystemInfo filsSystemInfo = copyfolders.Dequeue();
+				if (!(filsSystemInfo is FileInfo file))
 				{
-					DirectoryInfo directory = (DirectoryInfo)atom;
+					DirectoryInfo directory = (DirectoryInfo) filsSystemInfo;
 					Directory.CreateDirectory(directory.FullName.Replace(sourcepath, copytopath));
 					foreach (FileSystemInfo fi in directory.GetFileSystemInfos())
+					{
 						copyfolders.Enqueue(fi);
+					}
 				}
 				else
+				{
 					file.CopyTo(file.FullName.Replace(sourcepath, copytopath));
+				}
 			}
 
 			return new DirectoryInfo(target);

@@ -84,8 +84,7 @@ namespace DotnetSpider.Core
 				IsAvailable = false;
 				return;
 			}
-			Uri tmp;
-			if (Uri.TryCreate(url.TrimEnd('#'), UriKind.RelativeOrAbsolute, out tmp))
+			if (Uri.TryCreate(url.TrimEnd('#'), UriKind.RelativeOrAbsolute, out var tmp))
 			{
 				Url = tmp;
 			}

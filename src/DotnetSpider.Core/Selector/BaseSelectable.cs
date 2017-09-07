@@ -77,8 +77,7 @@ namespace DotnetSpider.Core.Selector
 			List<string> result = new List<string>();
 			foreach (var el in Elements)
 			{
-				var node = el as HtmlNode;
-				if (node != null)
+				if (el is HtmlNode node)
 				{
 					result.Add(!isPlainText ? node.InnerHtml : node.InnerText.Trim());
 				}

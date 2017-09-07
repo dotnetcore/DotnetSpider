@@ -15,6 +15,7 @@ namespace DotnetSpider.Extension.Downloader
 {
 	public class FiddlerDownloader : BaseDownloader
 	{
+		private readonly object _locker = new object();
 		private readonly int _webDriverWaitTime;
 		private readonly Option _option;
 		private static bool _isLogined;
@@ -68,7 +69,7 @@ namespace DotnetSpider.Extension.Downloader
 			Site site = spider.Site;
 			try
 			{
-				lock (this)
+				lock (_locker)
 				{
 					if (_webDriver == null)
 					{

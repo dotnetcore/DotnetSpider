@@ -14,9 +14,8 @@ namespace DotnetSpider.Core.Infrastructure
 		///
 		public int Value => _value;
 
-		///
-		/// 使用0作为初始值创建新实例
-		///
+		/// <inheritdoc />
+		///  使用0作为初始值创建新实例
 		public AtomicInteger()
 			: this(0)
 		{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Core.Infrastructure;
@@ -26,7 +26,7 @@ namespace DotnetSpider.Sample
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		[Table("test", "sku", TableSuffix.Today, Indexs = new[] { "CategoryName" }, Uniques = new[] { "CategoryName,Sku", "Sku" })]
+		[EntityTable("test", "sku", EntityTable.Today, Indexs = new[] { "CategoryName" }, Uniques = new[] { "CategoryName,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		class Product : SpiderEntity
 		{

@@ -629,8 +629,7 @@ namespace DotnetSpider.Core
 #if !NET_CORE
 				var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
 #else
-				bool isPrinted;
-				AppContext.TryGetSwitch(key, out isPrinted);
+				AppContext.TryGetSwitch(key, out var isPrinted);
 #endif
 				if (!isPrinted)
 				{
@@ -1096,8 +1095,7 @@ namespace DotnetSpider.Core
 
 		private void SafeDestroy(object obj)
 		{
-			var disposable = obj as IDisposable;
-			if (disposable != null)
+			if (obj is IDisposable disposable)
 			{
 				try
 				{

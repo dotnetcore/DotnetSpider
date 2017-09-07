@@ -3,7 +3,7 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using System;
 using System.Collections.Generic;
 
@@ -33,7 +33,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(CtripCity));
 		}
 
-		[Table("ctrip", "city", Uniques = new[] { "city_id,run_id" })]
+		[EntityTable("ctrip", "city", Uniques = new[] { "city_id,run_id" })]
 		[EntitySelector(Expression = "//div[@class='city_item']//a")]
 		class CtripCity : SpiderEntity
 		{

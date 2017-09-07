@@ -2,7 +2,7 @@
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
@@ -13,7 +13,7 @@ namespace DotnetSpider.Sample
 		{
 		}
 
-		[Table("jd", "jd_category")]
+		[EntityTable("jd", "jd_category")]
 		[EntitySelector(Expression = ".//div[@class='items']//a")]
 		class Category : SpiderEntity
 		{

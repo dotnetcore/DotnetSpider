@@ -23,7 +23,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
+			if (!string.IsNullOrEmpty(page?.Content) && page.Content.Contains(Content))
 			{
 				CookieInjector?.Inject(spider);
 			}
@@ -62,7 +62,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			page.Skip = page != null && !string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content);
+			page.Skip = !string.IsNullOrEmpty(page?.Content) && page.Content.Contains(Content);
 		}
 	}
 
@@ -72,7 +72,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content) && !page.Content.Contains(Content))
+			if (!string.IsNullOrEmpty(page?.Content) && !page.Content.Contains(Content))
 			{
 				page.SkipExtractedTargetUrls = true;
 				page.SkipTargetUrls = true;
@@ -84,7 +84,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content))
+			if (!string.IsNullOrEmpty(page?.Content))
 			{
 				var htmlDocument = new HtmlDocument();
 				htmlDocument.LoadHtml(page.Content);
@@ -97,7 +97,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content))
+			if (!string.IsNullOrEmpty(page?.Content))
 			{
 				page.Content = page.Content.ToUpper();
 			}
@@ -108,7 +108,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content))
+			if (!string.IsNullOrEmpty(page?.Content))
 			{
 				page.Content = page.Content.ToLower();
 			}
@@ -123,7 +123,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content))
+			if (!string.IsNullOrEmpty(page?.Content))
 			{
 				page.Content = page.Content.Replace(OldValue, NewValue);
 			}
@@ -134,7 +134,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content))
+			if (!string.IsNullOrEmpty(page?.Content))
 			{
 				page.Content = page.Content.Trim();
 			}
@@ -145,7 +145,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content))
+			if (!string.IsNullOrEmpty(page?.Content))
 			{
 				page.Content = Regex.Unescape(page.Content);
 			}
@@ -158,7 +158,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return;
 			}
@@ -189,7 +189,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return;
 			}
@@ -212,7 +212,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				return;
 			}
-			if (page != null && !string.IsNullOrEmpty(page.Content) && page.Content.Contains(Content))
+			if (!string.IsNullOrEmpty(page?.Content) && page.Content.Contains(Content))
 			{
 				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
@@ -263,7 +263,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content) && !string.IsNullOrEmpty(Content) && CookieInjector != null && page.Content.Contains(Content))
+			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(Content) && CookieInjector != null && page.Content.Contains(Content))
 			{
 				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
@@ -313,7 +313,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return;
 			}

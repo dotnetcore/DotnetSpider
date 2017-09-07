@@ -5,7 +5,7 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
@@ -44,7 +44,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(ProductUpdater));
 		}
 
-		[Table("jd", "shop", TableSuffix.Monday, Primary = "pid")]
+		[EntityTable("jd", "shop", EntityTable.Monday, Primary = "pid")]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
 		class ProductUpdater : SpiderEntity
 		{

@@ -47,8 +47,7 @@ namespace DotnetSpider.Core.Pipeline
 
 						foreach (var entry in resultItem.Results)
 						{
-							var value = entry.Value as IList;
-							if (value != null)
+							if (entry.Value is IList value)
 							{
 								IList list = value;
 								printWriter.WriteLine(entry.Key + ":");

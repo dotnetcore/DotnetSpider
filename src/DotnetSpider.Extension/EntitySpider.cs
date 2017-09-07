@@ -7,7 +7,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extension.Pipeline;
@@ -61,10 +61,12 @@ namespace DotnetSpider.Extension
 					Expression = e.Expression,
 					Type = e.Type
 				}).ToList();
-				if (entity.Table != null && !string.IsNullOrEmpty(tableName))
+
+				if (entity.TableInfo != null && !string.IsNullOrEmpty(tableName))
 				{
-					entity.Table.Name = tableName;
+					entity.TableInfo.Name = tableName;
 				}
+
 				Entities.Add(entity);
 				EntityProcessor processor = new EntityProcessor(Site, entity);
 				AddPageProcessor(processor);
@@ -84,20 +86,20 @@ namespace DotnetSpider.Extension
 #endif
 		)
 		{
-			EntityDefine entityDefine = GenerateEntityProperties(entityType);
+			EntityDefine entityDefine = new EntityDefine();
+			GenerateEntityColumns(entityType, entityDefine);
 
-			entityDefine.Table = entityType.GetCustomAttribute<Table>();
+			entityDefine.TableInfo = entityType.GetCustomAttribute<EntityTable>();
 
-			if (entityDefine.Table != null)
+			if (entityDefine.TableInfo != null)
 			{
-				entityDefine.Table.Name = GenerateTableName(entityDefine.Table.Name, entityDefine.Table.Suffix);
-				if (entityDefine.Table.Indexs != null)
+				if (entityDefine.TableInfo.Indexs != null)
 				{
-					entityDefine.Table.Indexs = new HashSet<string>(entityDefine.Table.Indexs.Select(i => i.Replace(" ", ""))).ToArray();
+					entityDefine.TableInfo.Indexs = new HashSet<string>(entityDefine.TableInfo.Indexs.Select(i => i.Replace(" ", ""))).ToArray();
 				}
-				if (entityDefine.Table.Uniques != null)
+				if (entityDefine.TableInfo.Uniques != null)
 				{
-					entityDefine.Table.Uniques = new HashSet<string>(entityDefine.Table.Uniques.Select(i => i.Replace(" ", ""))).ToArray();
+					entityDefine.TableInfo.Uniques = new HashSet<string>(entityDefine.TableInfo.Uniques.Select(i => i.Replace(" ", ""))).ToArray();
 				}
 			}
 			EntitySelector entitySelector = entityType.GetCustomAttribute<EntitySelector>();
@@ -119,19 +121,18 @@ namespace DotnetSpider.Extension
 			return entityDefine;
 		}
 
-		public static EntityDefine GenerateEntityProperties(
+		public static EntityDefine GenerateEntityColumns(
 #if !NET_CORE
 			Type entityType
 #else
 			TypeInfo entityType
 #endif
+			, EntityDefine entity
 		)
 		{
 			var typeName = entityType.GetTypeCrossPlatform().FullName;
-			EntityDefine entity = new EntityDefine
-			{
-				Name = typeName
-			};
+			entity.Name = typeName;
+
 			var properties = entityType.GetProperties();
 			if (properties.Any(p => DefaultProperties.Contains(p.Name.ToLower())))
 			{
@@ -140,70 +141,51 @@ namespace DotnetSpider.Extension
 			foreach (var propertyInfo in properties)
 			{
 				var propertySelector = propertyInfo.GetCustomAttribute<PropertyDefine>();
-
-				if (propertySelector != null)
+				if (propertySelector == null)
 				{
-					var type = propertyInfo.PropertyType;
-
-					Column token = new Column
-					{
-						Multi = typeof(IList).IsAssignableFrom(type),
-						Option = propertySelector.Option,
-						Selector = new BaseSelector
-						{
-							Expression = propertySelector.Expression,
-							Type = propertySelector.Type,
-							Argument = propertySelector.Argument
-						},
-						NotNull = propertySelector.NotNull,
-						IgnoreStore = propertySelector.IgnoreStore,
-						Length = propertySelector.Length,
-						Name = propertyInfo.Name
-					};
-
-					foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
-					{
-						token.Formatters.Add(formatter);
-					}
-
-					var targetUrl = propertyInfo.GetCustomAttribute<LinkToNext>();
-					if (targetUrl != null)
-					{
-						targetUrl.PropertyName = token.Name;
-						entity.LinkToNexts.Add(targetUrl);
-					}
-
-					token.DataType = type.Name;
-
-					if (token.DataType != DataTypeNames.String && propertySelector.Length > 0)
-					{
-						throw new SpiderException("Only string property can set length.");
-					}
-
-					entity.Columns.Add(token);
+					continue;
 				}
+
+				var type = propertyInfo.PropertyType;
+
+				var column = new Column
+				{
+					Multi = typeof(IList).IsAssignableFrom(type),
+					Option = propertySelector.Option,
+					Selector = new BaseSelector
+					{
+						Expression = propertySelector.Expression,
+						Type = propertySelector.Type,
+						Argument = propertySelector.Argument
+					},
+					NotNull = propertySelector.NotNull,
+					IgnoreStore = propertySelector.IgnoreStore,
+					Length = propertySelector.Length,
+					Name = propertyInfo.Name
+				};
+
+				foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter>(true))
+				{
+					column.Formatters.Add(formatter);
+				}
+
+				var targetUrl = propertyInfo.GetCustomAttribute<LinkToNext>();
+				if (targetUrl != null)
+				{
+					targetUrl.PropertyName = column.Name;
+					entity.LinkToNexts.Add(targetUrl);
+				}
+
+				column.DataType = type.Name;
+
+				if (column.DataType != DataTypeNames.String && propertySelector.Length > 0)
+				{
+					throw new SpiderException("Only string property can set length.");
+				}
+
+				entity.Columns.Add(column);
 			}
 			return entity;
-		}
-
-		public static string GenerateTableName(string name, TableSuffix suffix)
-		{
-			switch (suffix)
-			{
-				case TableSuffix.FirstDayOfCurrentMonth:
-					{
-						return name + "_" + DateTimeUtils.FirstDayOfCurrentMonth.ToString("yyyy_MM_dd");
-					}
-				case TableSuffix.Monday:
-					{
-						return name + "_" + DateTimeUtils.MondayOfCurrentWeek.ToString("yyyy_MM_dd");
-					}
-				case TableSuffix.Today:
-					{
-						return name + "_" + DateTime.Now.ToString("yyyy_MM_dd");
-					}
-			}
-			return name;
 		}
 
 		protected override IPipeline GetDefaultPipeline()
@@ -228,7 +210,7 @@ namespace DotnetSpider.Extension
 					}
 				case "MongoDB":
 					{
-						pipeline = new MongoDBEntityPipeline(Core.Environment.DataConnectionString);
+						pipeline = new MongoDbEntityPipeline(Core.Environment.DataConnectionString);
 						break;
 					}
 				default:
@@ -282,15 +264,15 @@ namespace DotnetSpider.Extension
 			{
 				throw new SpiderException($"Columns is necessary for {entity.Name}.");
 			}
-			if (entity.Table == null)
+			if (entity.TableInfo == null)
 			{
 				return;
 			}
-			if (!string.IsNullOrEmpty(entity.Table.Primary))
+			if (!string.IsNullOrEmpty(entity.TableInfo.Primary))
 			{
-				if (entity.Table.Primary != Core.Environment.IdColumn)
+				if (entity.TableInfo.Primary != Core.Environment.IdColumn)
 				{
-					var items = new HashSet<string>(entity.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
+					var items = new HashSet<string>(entity.TableInfo.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 					if (items.Count > 0)
 					{
 						foreach (var item in items)
@@ -309,46 +291,46 @@ namespace DotnetSpider.Extension
 					}
 					else
 					{
-						entity.Table.Primary = Core.Environment.IdColumn;
+						entity.TableInfo.Primary = Core.Environment.IdColumn;
 					}
 				}
 			}
 			else
 			{
-				entity.Table.Primary = Core.Environment.IdColumn;
+				entity.TableInfo.Primary = Core.Environment.IdColumn;
 			}
 
-			if (entity.Table.UpdateColumns != null && entity.Table.UpdateColumns.Length > 0)
+			if (entity.TableInfo.UpdateColumns != null && entity.TableInfo.UpdateColumns.Length > 0)
 			{
-				foreach (var column in entity.Table.UpdateColumns)
+				foreach (var column in entity.TableInfo.UpdateColumns)
 				{
 					if (columns.All(c => c.Name != column))
 					{
 						throw new SpiderException("Columns set as update is not a property of your entity.");
 					}
 				}
-				var updateColumns = new List<string>(entity.Table.UpdateColumns);
-				updateColumns.Remove(entity.Table.Primary);
+				var updateColumns = new List<string>(entity.TableInfo.UpdateColumns);
+				updateColumns.Remove(entity.TableInfo.Primary);
 
-				entity.Table.UpdateColumns = updateColumns.ToArray();
+				entity.TableInfo.UpdateColumns = updateColumns.ToArray();
 
-				if (entity.Table.UpdateColumns.Length == 0)
+				if (entity.TableInfo.UpdateColumns.Length == 0)
 				{
 					throw new SpiderException("There is no column need update.");
 				}
 			}
 
-			if (entity.Table.Indexs != null && entity.Table.Indexs.Length > 0)
+			if (entity.TableInfo.Indexs != null && entity.TableInfo.Indexs.Length > 0)
 			{
-				for (int i = 0; i < entity.Table.Indexs.Length; ++i)
+				for (int i = 0; i < entity.TableInfo.Indexs.Length; ++i)
 				{
-					var items = new HashSet<string>(entity.Table.Indexs[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
+					var items = new HashSet<string>(entity.TableInfo.Indexs[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 
 					if (items.Count == 0)
 					{
 						throw new SpiderException("Index should contain more than a column.");
 					}
-					if (items.Count == 1 && items.First() == entity.Table.Primary)
+					if (items.Count == 1 && items.First() == entity.TableInfo.Primary)
 					{
 						throw new SpiderException("Primary is no need to create another index.");
 					}
@@ -364,20 +346,20 @@ namespace DotnetSpider.Extension
 							throw new SpiderException("Column length of index should not large than 256.");
 						}
 					}
-					entity.Table.Indexs[i] = string.Join(",", items);
+					entity.TableInfo.Indexs[i] = string.Join(",", items);
 				}
 			}
-			if (entity.Table.Uniques != null && entity.Table.Uniques.Length > 0)
+			if (entity.TableInfo.Uniques != null && entity.TableInfo.Uniques.Length > 0)
 			{
-				for (int i = 0; i < entity.Table.Uniques.Length; ++i)
+				for (int i = 0; i < entity.TableInfo.Uniques.Length; ++i)
 				{
-					var items = new HashSet<string>(entity.Table.Uniques[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
+					var items = new HashSet<string>(entity.TableInfo.Uniques[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 
 					if (items.Count == 0)
 					{
 						throw new SpiderException("Unique should contain more than a column.");
 					}
-					if (items.Count == 1 && items.First() == entity.Table.Primary)
+					if (items.Count == 1 && items.First() == entity.TableInfo.Primary)
 					{
 						throw new SpiderException("Primary is no need to create another unique.");
 					}
@@ -393,7 +375,7 @@ namespace DotnetSpider.Extension
 							throw new SpiderException("Column length of unique should not large than 256.");
 						}
 					}
-					entity.Table.Uniques[i] = string.Join(",", items);
+					entity.TableInfo.Uniques[i] = string.Join(",", items);
 				}
 			}
 		}

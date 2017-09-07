@@ -3,7 +3,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using DotnetSpider.Extension.Pipeline;
 
 namespace DotnetSpider.Sample
@@ -22,7 +22,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(typeof(Item));
 		}
 
-		[Table("abc", "shanxizhaosheng")]
+		[EntityTable("abc", "shanxizhaosheng")]
 		[EntitySelector(Expression = "/html/body/table[3]/tbody/tr/td/table/tbody/tr/td/table[2]/tbody/tr/td/table/tr/td/a")]
 		class Item : SpiderEntity
 		{

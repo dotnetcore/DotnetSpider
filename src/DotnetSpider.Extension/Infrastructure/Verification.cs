@@ -55,8 +55,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			var portStr = Core.Environment.EmailPort;
 			if (!string.IsNullOrEmpty(portStr))
 			{
-				int port;
-				if (int.TryParse(portStr, out port))
+				if (int.TryParse(portStr, out var port))
 				{
 					EmailPort = port;
 				}

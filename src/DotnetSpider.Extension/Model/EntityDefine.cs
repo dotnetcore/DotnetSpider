@@ -1,12 +1,12 @@
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Model
 {
 	public class EntityDefine : AbstractSelector
 	{
-		public Table Table { get; set; }
+		public EntityTable TableInfo { get; set; }
 
 		public List<Column> Columns { get; set; } = new List<Column>();
 

@@ -8,18 +8,22 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class JsonFileEntityPipeline : BaseEntityPipeline
 	{
+		private readonly object _locker = new object();
 		protected string DataFolder;
 
 		public override void InitPipeline(ISpider spider)
 		{
 			base.InitPipeline(spider);
 
-			DataFolder = Path.Combine(Core.Environment.BaseDirectory, spider.Identity, "entityJson");
+			lock (_locker)
+			{
+				DataFolder = Path.Combine(Core.Environment.BaseDirectory, spider.Identity, "entityJson");
+			}
 		}
 
 		public override void Process(string entityName, List<DataObject> datas)
 		{
-			lock (this)
+			lock (_locker)
 			{
 				var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{entityName}.data"));
 

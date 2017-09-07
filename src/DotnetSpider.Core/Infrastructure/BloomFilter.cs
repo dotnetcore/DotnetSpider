@@ -464,7 +464,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 			while (enumA.MoveNext() && enumB.MoveNext())
 			{
-				if ((bool)enumA.Current != (bool)enumB.Current) return false;
+				if (enumB.Current != null && enumA.Current != null && (bool)enumA.Current != (bool)enumB.Current) return false;
 			}
 			return true;
 		}

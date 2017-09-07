@@ -1,26 +1,25 @@
-﻿using System;
-using System.Data.Common;
-using System.Reflection;
-using Dapper;
+﻿using Dapper;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Extension.ORM;
 using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
-using Xunit;
-using System.Linq;
-using System.Data.SqlClient;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Configuration;
+using System.Data.Common;
+using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using Xunit;
 
 namespace DotnetSpider.Extension.Test
 {
-	
+
 	public class EntitySpiderTest2
 	{
 		public EntitySpiderTest2()
@@ -75,49 +74,49 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		[Table("test", "table", Primary = "name")]
+		[EntityTable("test", "table", Primary = "name")]
 		public class Entity1 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
-		[Table("test", "table", Indexs = new[] { "c1" })]
+		[EntityTable("test", "table", Indexs = new[] { "c1" })]
 		public class Entity2 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
-		[Table("test", "table", Uniques = new[] { "c1" })]
+		[EntityTable("test", "table", Uniques = new[] { "c1" })]
 		public class Entity3 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Url { get; set; }
 		}
 
-		[Table("test", "table", TableSuffix.Monday)]
+		[EntityTable("test", "table", EntityTable.Monday)]
 		public class Entity4 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Name { get; set; }
 		}
 
-		[Table("test", "table", Primary = "Name")]
+		[EntityTable("test", "table", Primary = "Name")]
 		public class Entity5 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 100)]
 			public string Name { get; set; }
 		}
 
-		[Table("test", "table", Primary = "name")]
+		[EntityTable("test", "table", Primary = "name")]
 		public class Entity6 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 255)]
 			public string name { get; set; }
 		}
 
-		[Table("test", "table")]
+		[EntityTable("test", "table")]
 		[EntitySelector(Expression = "expression")]
 		public class Entity7 : SpiderEntity
 		{
@@ -125,7 +124,7 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		[Table("test", "table")]
+		[EntityTable("test", "table")]
 		[EntitySelector(Expression = "expression2", Type = SelectorType.Css)]
 		public class Entity8 : SpiderEntity
 		{
@@ -133,14 +132,14 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		[Table("test", "table")]
+		[EntityTable("test", "table")]
 		public class Entity9 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public string Name { get; set; }
 		}
 
-		[Table("test", "table", Primary = "Name", Indexs = new[] { "Id" }, Uniques = new[] { "Id,Name", "Id" })]
+		[EntityTable("test", "table", Primary = "Name", Indexs = new[] { "Id" }, Uniques = new[] { "Id,Name", "Id" })]
 		public class Entity10 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
@@ -150,7 +149,7 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		[Table("test", "table")]
+		[EntityTable("test", "table")]
 		public class Entity11 : SpiderEntity
 		{
 			public int Id { get; set; }
@@ -161,7 +160,7 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		[Table("test", "table12")]
+		[EntityTable("test", "table12")]
 		public class Entity12 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Id")]
@@ -171,7 +170,7 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		[Table("test", "table13")]
+		[EntityTable("test", "table13")]
 		public class Entity13 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Url")]
@@ -184,7 +183,7 @@ namespace DotnetSpider.Extension.Test
 			public string Url { get; set; }
 		}
 
-		[Table("test", "table15")]
+		[EntityTable("test", "table15")]
 		public class Entity15 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Url")]
@@ -209,28 +208,28 @@ namespace DotnetSpider.Extension.Test
 			public string String1 { get; set; }
 		}
 
-		[Table("test", "table", Indexs = new[] { "c1" })]
+		[EntityTable("test", "table", Indexs = new[] { "c1" })]
 		public class Entity16 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "")]
 			public int c1 { get; set; }
 		}
 
-		[Table("test", "table", Indexs = new[] { "c1" })]
+		[EntityTable("test", "table", Indexs = new[] { "c1" })]
 		public class Entity17 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 300)]
 			public string c1 { get; set; }
 		}
 
-		[Table("test", "table", Uniques = new[] { "c1" })]
+		[EntityTable("test", "table", Uniques = new[] { "c1" })]
 		public class Entity18 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 300)]
 			public string c1 { get; set; }
 		}
 
-		[Table("test", "table", Primary = "c1")]
+		[EntityTable("test", "table", Primary = "c1")]
 		public class Entity19 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 300)]
@@ -260,11 +259,11 @@ namespace DotnetSpider.Extension.Test
 		public void Indexes()
 		{
 			var entity1 = EntitySpider.GenerateEntityDefine(typeof(Entity10).GetTypeInfo());
-			Assert.Equal("Id", entity1.Table.Indexs[0]);
-			Assert.Equal("Name", entity1.Table.Primary);
-			Assert.Equal(2, entity1.Table.Uniques.Length);
-			Assert.Equal("Id,Name", entity1.Table.Uniques[0]);
-			Assert.Equal("Id", entity1.Table.Uniques[1]);
+			Assert.Equal("Id", entity1.TableInfo.Indexs[0]);
+			Assert.Equal("Name", entity1.TableInfo.Primary);
+			Assert.Equal(2, entity1.TableInfo.Uniques.Length);
+			Assert.Equal("Id,Name", entity1.TableInfo.Uniques[0]);
+			Assert.Equal("Id", entity1.TableInfo.Uniques[1]);
 		}
 
 		[Fact]
@@ -363,12 +362,11 @@ namespace DotnetSpider.Extension.Test
 		public void Schema()
 		{
 			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity4).GetTypeInfo());
-			Assert.Equal("test", entityMetadata.Table.Database);
-			Assert.Equal(EntitySpider.GenerateTableName("table", entityMetadata.Table.Suffix), entityMetadata.Table.Name);
-			Assert.Equal(TableSuffix.Monday, entityMetadata.Table.Suffix);
+			Assert.Equal("test", entityMetadata.TableInfo.Database);
+			Assert.Equal(EntityTable.Monday, entityMetadata.TableInfo.Postfix);
 
 			var entityMetadata1 = EntitySpider.GenerateEntityDefine(typeof(Entity14).GetTypeInfo());
-			Assert.Null(entityMetadata1.Table);
+			Assert.Null(entityMetadata1.TableInfo);
 		}
 
 		[Fact]
@@ -480,7 +478,7 @@ namespace DotnetSpider.Extension.Test
 				AddPipeline(new MySqlFileEntityPipeline(MySqlFileEntityPipeline.FileType.InsertSql));
 			}
 
-			[Table("baidu", "baidu_search_mysql_file")]
+			[EntityTable("baidu", "baidu_search_mysql_file")]
 			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 			class BaiduSearchEntry : SpiderEntity
 			{

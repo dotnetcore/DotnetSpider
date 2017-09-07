@@ -1,26 +1,25 @@
-﻿using System;
-using System.Net;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.ORM;
-using DotnetSpider.Extension.Pipeline;
-using StackExchange.Redis;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Scheduler;
-using Xunit;
-using DotnetSpider.Core.Infrastructure;
+﻿using Dapper;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Core.Selector;
-using Dapper;
-using System.Collections.Generic;
+using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Infrastructure.Database;
+using DotnetSpider.Core.Selector;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.Model.Attribute;
+using DotnetSpider.Extension.Model.Formatter;
+using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Scheduler;
+using StackExchange.Redis;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using Xunit;
 
 namespace DotnetSpider.Extension.Test
 {
 
 	public class EntitySpiderTest
 	{
-		[Table("test", "table")]
+		[EntityTable("test", "table")]
 		public class TestEntity : SpiderEntity
 		{
 			[PropertyDefine(Expression = ".")]
@@ -155,7 +154,6 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void EntitySpiderWithDefaultPipeline()
 		{
-			var datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 			var guid = Guid.NewGuid().ToString();
 			BaiduSearchSpider spider = new BaiduSearchSpider(guid);
 			spider.Run();
@@ -175,7 +173,7 @@ namespace DotnetSpider.Extension.Test
 
 		class BaiduSearchSpider : EntitySpider
 		{
-			private string _guid;
+			private readonly string _guid;
 
 			public BaiduSearchSpider(string guid) : base("BaiduSearch")
 			{
@@ -194,7 +192,7 @@ namespace DotnetSpider.Extension.Test
 				AddEntityType(typeof(BaiduSearchEntry));
 			}
 
-			[Table("test", "baidu_search")]
+			[EntityTable("test", "baidu_search")]
 			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 			class BaiduSearchEntry : SpiderEntity
 			{

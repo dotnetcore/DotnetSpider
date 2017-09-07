@@ -79,7 +79,7 @@ namespace DotnetSpider.Core.Infrastructure
 			int dataLength = buffer.Count;
 
 
-			if (dataLength >= 2)
+			if (dataLength >= 2 && data != null)
 			{
 				int first2Bytes = data[offset + 0] << 8 | data[offset + 1];
 
@@ -107,7 +107,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 					case BigEndianUnicodePreambleFirst2Bytes:
 						return Encoding.BigEndianUnicode;
-						 
+
 				}
 			}
 

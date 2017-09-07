@@ -6,7 +6,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.ORM;
+
 using Xunit;
 using DotnetSpider.Extension.Processor;
 
@@ -54,7 +54,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.Equal(2, (page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1") as List<DataObject>).Count);
 		}
 
-		[Table("test", "sku", TableSuffix.Today)]
+		[EntityTable("test", "sku", EntityTable.Today)]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class Product : SpiderEntity
 		{

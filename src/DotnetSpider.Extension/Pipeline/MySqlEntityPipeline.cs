@@ -19,11 +19,11 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			string columNames = string.Join(", ", adapter.Columns.Select(p => $"`{p.Name}`"));
 			string values = string.Join(", ", adapter.Columns.Select(p => $"@{p.Name}"));
-
+			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("INSERT IGNORE INTO `{0}`.`{1}` {2} {3};",
 				adapter.Table.Database,
-				adapter.Table.Name,
+				tableName,
 				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
 				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
 
@@ -33,11 +33,11 @@ namespace DotnetSpider.Extension.Pipeline
 		protected override string GenerateUpdateSql(EntityAdapter adapter)
 		{
 			string setParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"`{p}`=@{p}"));
-
+			var tableName = adapter.Table.CalculateTableName();
 			StringBuilder primaryParamenters = new StringBuilder();
-			if (Core.Environment.IdColumn == adapter.Table.Primary)
+			if (Environment.IdColumn == adapter.Table.Primary)
 			{
-				primaryParamenters.Append($"`{Core.Environment.IdColumn}` = @__id");
+				primaryParamenters.Append($"`{Environment.IdColumn}` = @__id");
 			}
 			else
 			{
@@ -50,7 +50,7 @@ namespace DotnetSpider.Extension.Pipeline
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("UPDATE `{0}`.`{1}` SET {2} WHERE {3};",
 				adapter.Table.Database,
-				adapter.Table.Name,
+				tableName,
 				setParamenters, primaryParamenters);
 
 			return sqlBuilder.ToString();
@@ -61,9 +61,9 @@ namespace DotnetSpider.Extension.Pipeline
 			string selectParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"`{p}`"));
 			StringBuilder primaryParamenters = new StringBuilder();
 
-			if (Core.Environment.IdColumn == adapter.Table.Primary)
+			if (Environment.IdColumn == adapter.Table.Primary)
 			{
-				primaryParamenters.Append($"`{Core.Environment.IdColumn}` = @{Core.Environment.IdColumn},");
+				primaryParamenters.Append($"`{Environment.IdColumn}` = @{Environment.IdColumn},");
 			}
 			else
 			{
@@ -73,11 +73,12 @@ namespace DotnetSpider.Extension.Pipeline
 					primaryParamenters.Append(columns.Last() != column ? $" `{column}` = @{column} AND " : $" `{column}` = @{column}");
 				}
 			}
+			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("SELECT {0} FROM `{1}`.`{2}` WHERE {3};",
 				selectParamenters,
 				adapter.Table.Database,
-				adapter.Table.Name,
+				tableName,
 				primaryParamenters);
 
 			return sqlBuilder.ToString();
@@ -85,13 +86,14 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override string GenerateCreateTableSql(EntityAdapter adapter)
 		{
-			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{adapter.Table.Database }`.`{adapter.Table.Name}` (");
+			var tableName = adapter.Table.CalculateTableName();
+			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{adapter.Table.Database }`.`{tableName}` (");
 			string columNames = string.Join(", ", adapter.Columns.Select(p => $"`{p.Name}` {GetDataTypeSql(p)} "));
 			builder.Append(columNames);
 			builder.Append(",`cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP");
-			if (adapter.Table.Primary.ToLower() == Core.Environment.IdColumn)
+			if (Environment.IdColumn == adapter.Table.Primary.ToLower())
 			{
-				builder.Append($", `{Core.Environment.IdColumn}` bigint AUTO_INCREMENT");
+				builder.Append($", `{Environment.IdColumn}` bigint AUTO_INCREMENT");
 			}
 
 			if (adapter.Table.Indexs != null)
@@ -122,7 +124,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override string GenerateCreateDatabaseSql(EntityAdapter adapter, string serverVersion)
 		{
-			return $"CREATE SCHEMA IF NOT EXISTS `{adapter.Table.Database}` DEFAULT CHARACTER SET utf8mb4 ;";
+			return $"CREATE SCHEMA IF NOT EXISTS `{adapter.Table.Database}` DEFAULT CHARACTER SET utf8mb4;";
 		}
 
 		protected override string GenerateIfDatabaseExistsSql(EntityAdapter adapter, string serverVersion)
@@ -132,8 +134,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override DbParameter CreateDbParameter(string name, object value)
 		{
-			var parameter = new MySqlParameter(name, MySqlDbType.String);
-			parameter.Value = value;
+			var parameter = new MySqlParameter(name, MySqlDbType.String) {Value = value};
 			return parameter;
 		}
 
