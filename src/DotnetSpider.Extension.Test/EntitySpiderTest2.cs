@@ -588,7 +588,7 @@ namespace DotnetSpider.Extension.Test
 				Assert.Equal("Float", columns[4].Name);
 				Assert.Equal("Double", columns[5].Name);
 				Assert.Equal("String1", columns[6].Name);
-				Assert.Equal("cdate", columns[7].Name);
+				Assert.Equal("CDate", columns[7].Name);
 				Assert.Equal(Core.Environment.IdColumn, columns[8].Name);
 
 				Assert.Equal("int(11)", columns[0].Type);

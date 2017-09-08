@@ -71,7 +71,7 @@ namespace DotnetSpider.Extension.Pipeline
 			builder.Append(columnNames.ToString().Substring(1, columnNames.Length - 1));
 			builder.Append(",[CDate] DATETIME DEFAULT(GETDATE())");
 
-			if (Core.Environment.IdColumn == adapter.Table.Primary.ToLower())
+			if (Core.Environment.IdColumn.ToLower() == adapter.Table.Primary.ToLower())
 			{
 				builder.Append($", [{Core.Environment.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL");
 			}

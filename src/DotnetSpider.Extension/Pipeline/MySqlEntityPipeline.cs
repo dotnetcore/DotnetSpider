@@ -37,7 +37,7 @@ namespace DotnetSpider.Extension.Pipeline
 			StringBuilder primaryParamenters = new StringBuilder();
 			if (Environment.IdColumn == adapter.Table.Primary)
 			{
-				primaryParamenters.Append($"`{Environment.IdColumn}` = @__id");
+				primaryParamenters.Append($"`{Environment.IdColumn}` = @__Id");
 			}
 			else
 			{
@@ -90,8 +90,8 @@ namespace DotnetSpider.Extension.Pipeline
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{adapter.Table.Database }`.`{tableName}` (");
 			string columNames = string.Join(", ", adapter.Columns.Select(p => $"`{p.Name}` {GetDataTypeSql(p)} "));
 			builder.Append(columNames);
-			builder.Append(",`cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP");
-			if (Environment.IdColumn == adapter.Table.Primary.ToLower())
+			builder.Append(",`CDate` timestamp NULL DEFAULT CURRENT_TIMESTAMP");
+			if (Environment.IdColumn.ToLower() == adapter.Table.Primary.ToLower())
 			{
 				builder.Append($", `{Environment.IdColumn}` bigint AUTO_INCREMENT");
 			}
@@ -134,7 +134,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override DbParameter CreateDbParameter(string name, object value)
 		{
-			var parameter = new MySqlParameter(name, MySqlDbType.String) {Value = value};
+			var parameter = new MySqlParameter(name, MySqlDbType.String) { Value = value };
 			return parameter;
 		}
 

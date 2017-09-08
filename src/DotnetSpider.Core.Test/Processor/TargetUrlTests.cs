@@ -75,6 +75,7 @@ namespace DotnetSpider.Core.Test.Processor
 			public CnblogsProcessor3()
 			{
 				AddTargetUrlExtractor(".", "/sitehome/p/\\d+");
+				Site = new Site();
 			}
 
 			protected override void Handle(Page page)
@@ -95,8 +96,8 @@ namespace DotnetSpider.Core.Test.Processor
 			CnblogsProcessor3 processor = new CnblogsProcessor3();
 			processor.Process(page);
 
-			Assert.Null(page.ResultItems.GetResultItem("test"));
-			Assert.Empty(page.TargetRequests);
+			Assert.True(page.ResultItems.GetResultItem("test"));
+			Assert.Equal(11, page.TargetRequests.Count);
 		}
 
 		public class CnblogsProcessor4 : BasePageProcessor

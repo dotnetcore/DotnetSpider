@@ -164,7 +164,7 @@ namespace DotnetSpider.Core
 				if (!string.IsNullOrEmpty(identity) && !string.IsNullOrWhiteSpace(identity))
 				{
 					var property = spiderProperties.First(p => p.Name == "Identity");
-					property.SetValue(spider, arguments["-i"]);
+					property.SetValue(spider, identity);
 				}
 			}
 

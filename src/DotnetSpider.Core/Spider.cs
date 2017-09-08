@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Xml.XPath;
 using NLog;
 using DotnetSpider.Core.Redial;
+using Newtonsoft.Json;
 
 namespace DotnetSpider.Core
 {
@@ -972,6 +973,15 @@ namespace DotnetSpider.Core
 				}
 				if (page != null) OnError(page.Request);
 				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, selector: {xe.Message}, maybe you should set SelectorType to Json.", LogLevel.Error, xe);
+			}
+			catch(JsonReaderException je)
+			{
+				if (Site.CycleRetryTimes > 0)
+				{
+					page = AddToCycleRetry(request, Site);
+				}
+				if (page != null) OnError(page.Request);
+				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, selector: {je.Message}, maybe you should set SelectorType to XPATH.", LogLevel.Error, je);
 			}
 			catch (Exception e)
 			{

@@ -25,7 +25,7 @@ namespace DotnetSpider.Core.Processor
 		{
 			bool isTarget = true;
 
-			if (_targetUrlPatterns.Count > 0 && !_targetUrlPatterns.Contains(null))
+			if (page.Request.Depth > 1 && _targetUrlPatterns.Count > 0 && !_targetUrlPatterns.Contains(null))
 			{
 				foreach (var regex in _targetUrlPatterns)
 				{

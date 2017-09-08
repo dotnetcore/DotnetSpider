@@ -17,7 +17,7 @@ namespace DotnetSpider.Core
 		public const string EmailDisplayNameKey = "emailDisplayName";
 		public const string SystemConnectionStringKey = "SystemConnection";
 		public const string DataConnectionStringKey = "DataConnection";
-		public const string IdColumn = "__id";
+		public const string IdColumn = "__Id";
 
 		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
