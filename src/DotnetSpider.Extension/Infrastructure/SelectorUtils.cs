@@ -9,7 +9,7 @@ namespace DotnetSpider.Extension.Infrastructure
 	{
 		public static ISelector Parse(BaseSelector selector)
 		{
-			if (selector != null && !string.IsNullOrEmpty(selector.Expression))
+			if (!string.IsNullOrEmpty(selector?.Expression))
 			{
 				string expression = selector.Expression;
 
@@ -53,7 +53,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public static ISelector Parse(Selector selector)
 		{
-			if (selector != null && !string.IsNullOrEmpty(selector.Expression))
+			if (!string.IsNullOrEmpty(selector?.Expression))
 			{
 				string expression = selector.Expression;
 

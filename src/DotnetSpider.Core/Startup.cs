@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 #if NET_CORE
 using Microsoft.Extensions.DependencyModel;
+using System.Runtime.InteropServices;
 using System.Text;
 #endif
 
@@ -21,7 +22,10 @@ namespace DotnetSpider.Core
 			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			var commands = string.Join(" ", args);
-			Console.WriteLine($"Args: {commands}");
+			Console.WriteLine($"Args:           {commands}");
+			Console.WriteLine($"BaseDirectory:  {Environment.BaseDirectory}");
+			Console.WriteLine($"System:         {System.Environment.OSVersion} {(System.Environment.Is64BitOperatingSystem ? "X64" : "X86")}");
+
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine("");
 

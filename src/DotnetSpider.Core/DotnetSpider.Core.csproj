@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
     <AssemblyTitle>DotnetSpider</AssemblyTitle>
-    <DefineConstants>NET45;</DefineConstants>
+    <DefineConstants>DEBUG;NET45</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <AssemblyTitle>DotnetSpider</AssemblyTitle>
@@ -14,6 +14,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\..\output\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Autofac" Version="4.6.1" />

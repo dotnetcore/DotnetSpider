@@ -15,6 +15,7 @@ using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Scheduler;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Xml.XPath;
 using NLog;
 using DotnetSpider.Core.Redial;
 
@@ -961,7 +962,16 @@ namespace DotnetSpider.Core
 			catch (DownloadException de)
 			{
 				if (page != null) OnError(page.Request);
-				Logger.MyLog(Identity, $"Should not catch download exception: {request.Url}.", LogLevel.Warn, de);
+				Logger.MyLog(Identity, $"Should not catch download exception: {request.Url}.", LogLevel.Error, de);
+			}
+			catch (XPathException xe)
+			{
+				if (Site.CycleRetryTimes > 0)
+				{
+					page = AddToCycleRetry(request, Site);
+				}
+				if (page != null) OnError(page.Request);
+				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, selector: {xe.Message}, maybe you should set SelectorType to Json.", LogLevel.Error, xe);
 			}
 			catch (Exception e)
 			{
@@ -970,7 +980,7 @@ namespace DotnetSpider.Core
 					page = AddToCycleRetry(request, Site);
 				}
 				if (page != null) OnError(page.Request);
-				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, please check your extractor: {e.Message}.", LogLevel.Warn, e);
+				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, please check your extractor: {e.Message}.", LogLevel.Error, e);
 			}
 
 			if (page == null)

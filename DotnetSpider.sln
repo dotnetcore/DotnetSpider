@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.bat = build.bat
 		build.sh = build.sh
 		LICENSE = LICENSE
+		pack.bat = pack.bat
 		README.md = README.md
 	EndProjectSection
 EndProject
