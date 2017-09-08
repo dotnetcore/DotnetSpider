@@ -13,18 +13,18 @@ namespace DotnetSpider.Core
 	{
 		public static void Run(params string[] args)
 		{
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
 			Console.WriteLine("");
 			Spider.PrintInfo();
 			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			var commands = string.Join(" ", args);
-			Console.WriteLine("Args: " + commands);
-			Console.WriteLine("");
+			Console.WriteLine($"Args: {commands}");
 			Console.ForegroundColor = ConsoleColor.White;
+			Console.WriteLine("");
 
-#if NET_CORE
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
 			Dictionary<string, string> arguments = new Dictionary<string, string>();
 			foreach (var arg in args)
 			{
@@ -52,23 +52,21 @@ namespace DotnetSpider.Core
 				else
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Please use command like: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId]");
+					Console.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name]");
 					Console.ForegroundColor = ConsoleColor.White;
 					return;
 				}
 			}
-			string spiderName;
+
 			if (arguments.Count == 0 || !arguments.ContainsKey("-s") || !arguments.ContainsKey("-tid"))
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("-s or -tid are necessary.");
+				Console.WriteLine("Error: -s & -tid are necessary.");
 				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
-			else
-			{
-				spiderName = arguments["-s"];
-			}
+
+			var spiderName = arguments["-s"];
 
 #if NET_CORE
 			var deps = DependencyContext.Default;
@@ -87,6 +85,7 @@ namespace DotnetSpider.Core
 				var types = asm.GetTypes();
 #endif
 				Console.WriteLine($"Fetch assembly: {asm.FullName}.");
+
 				foreach (var type in types)
 				{
 					bool hasNonParametersConstructor = type.GetConstructors().Any(c => c.IsPublic && c.GetParameters().Length == 0);
@@ -146,7 +145,7 @@ namespace DotnetSpider.Core
 			if (!spiderTypes.ContainsKey(spiderName))
 			{
 				Console.ForegroundColor = ConsoleColor.DarkYellow;
-				Console.WriteLine($"There is no spider named: {spiderName}.");
+				Console.WriteLine($"Spider: {spiderName} unfound.");
 				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
@@ -154,37 +153,33 @@ namespace DotnetSpider.Core
 			var spiderType = spiderTypes[spiderName];
 			var spider = Activator.CreateInstance(spiderType);
 			var spiderProperties = spiderType.GetProperties();
-			string identity = "";
+
 			if (arguments.ContainsKey("-i"))
 			{
-				var property = spiderProperties.First(p => p.Name == "Identity");
-				identity = arguments["-i"].ToLower();
-				if (arguments["-i"].ToLower() == "guid")
+				var identity = "guid" == arguments["-i"].ToLower() ? Guid.NewGuid().ToString("N") : arguments["-i"];
+				if (!string.IsNullOrEmpty(identity) && !string.IsNullOrWhiteSpace(identity))
 				{
-					property.SetValue(spider, Guid.NewGuid().ToString("N"));
-				}
-				else
-				{
-					if (!string.IsNullOrEmpty(identity))
-					{
-						property.SetValue(spider, arguments["-i"]);
-					}
+					var property = spiderProperties.First(p => p.Name == "Identity");
+					property.SetValue(spider, arguments["-i"]);
 				}
 			}
 
 			if (arguments.ContainsKey("-tid"))
 			{
 				var property = spiderProperties.First(p => p.Name == "TaskId");
-				if (arguments["-tid"].ToLower() == "guid")
+				var taskId = "guid" == arguments["-tid"].ToLower() ? Guid.NewGuid().ToString("N") : arguments["-tid"].Trim();
+				if (!string.IsNullOrEmpty(taskId) && !string.IsNullOrWhiteSpace(taskId))
 				{
-					property.SetValue(spider, Guid.NewGuid().ToString("N"));
+					property.SetValue(spider, taskId);
 				}
-				else
+			}
+
+			if (arguments.ContainsKey("-n"))
+			{
+				var property = spiderProperties.First(p => p.Name == "Name");
+				if (!string.IsNullOrEmpty(arguments["-n"]) && string.IsNullOrWhiteSpace(arguments["-n"]))
 				{
-					if (!string.IsNullOrEmpty(identity))
-					{
-						property.SetValue(spider, arguments["-tid"]);
-					}
+					property.SetValue(spider, arguments["-n"].Trim());
 				}
 			}
 
@@ -199,11 +194,7 @@ namespace DotnetSpider.Core
 				var parameters = arguments["-a"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 				if (parameters.Contains("report"))
 				{
-					var emptySleepTime = spiderType.GetProperty("EmptySleepTime");
-					if (emptySleepTime != null)
-					{
-						emptySleepTime.SetValue(spider, 1000);
-					}
+					spiderType.GetProperty("EmptySleepTime")?.SetValue(spider, 1000);
 				}
 
 				runMethod.Invoke(spider, new object[] { parameters });

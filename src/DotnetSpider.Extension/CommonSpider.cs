@@ -5,7 +5,6 @@ using DotnetSpider.Core.Infrastructure;
 using System.Threading;
 using DotnetSpider.Extension.Infrastructure;
 using System.Data;
-using System.Reflection;
 using NLog;
 using Dapper;
 using DotnetSpider.Extension.Monitor;
