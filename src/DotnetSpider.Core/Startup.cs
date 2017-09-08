@@ -74,7 +74,7 @@ namespace DotnetSpider.Core
 			var deps = DependencyContext.Default;
 #endif
 
-			var spiders = new Dictionary<string, object>();
+			var spiderTypes = new Dictionary<string, Type>();
 #if NET_CORE
 			foreach (var library in deps.CompileLibraries.Where(l => l.Name.ToLower().EndsWith("dotnetspider.sample") || l.Name.ToLower().EndsWith("spiders") || l.Name.ToLower().EndsWith("crawlers")))
 			{
@@ -91,6 +91,12 @@ namespace DotnetSpider.Core
 				{
 					bool hasNonParametersConstructor = type.GetConstructors().Any(c => c.IsPublic && c.GetParameters().Length == 0);
 
+					var fullName = type.FullName;
+					if (string.IsNullOrEmpty(fullName))
+					{
+						continue;
+					}
+
 					if (hasNonParametersConstructor)
 					{
 						var interfaces = type.GetInterfaces();
@@ -101,18 +107,15 @@ namespace DotnetSpider.Core
 
 						if (isNamed && isRunnable && isIdentity)
 						{
-							var property = type.GetProperties().First(p => p.Name == "Name");
-							object runner = Activator.CreateInstance(type);
-							var name = (string)property.GetValue(runner);
-							if (!spiders.ContainsKey(name))
+							if (!spiderTypes.ContainsKey(fullName))
 							{
-								spiders.Add(name, runner);
+								spiderTypes.Add(fullName, type);
 							}
 							else
 							{
 								Console.ForegroundColor = ConsoleColor.Red;
 								Console.WriteLine();
-								Console.WriteLine($"Spider {name} are duplicate.");
+								Console.WriteLine($"Spider {type.Name} are duplicate.");
 								Console.WriteLine();
 								Console.ForegroundColor = ConsoleColor.White;
 								return;
@@ -122,7 +125,7 @@ namespace DotnetSpider.Core
 				}
 			}
 
-			if (spiders.Count == 0)
+			if (spiderTypes.Count == 0)
 			{
 				Console.ForegroundColor = ConsoleColor.DarkYellow;
 				Console.WriteLine();
@@ -134,22 +137,27 @@ namespace DotnetSpider.Core
 
 			Console.WriteLine();
 			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine($"Detected {spiders.Keys.Count} crawlers.");
+			Console.WriteLine($"Detected {spiderTypes.Keys.Count} crawlers.");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
 			Console.WriteLine("=================================================================");
 			Console.WriteLine();
 
-			if (!spiders.ContainsKey(spiderName))
+			if (!spiderTypes.ContainsKey(spiderName))
 			{
+				Console.ForegroundColor = ConsoleColor.DarkYellow;
 				Console.WriteLine($"There is no spider named: {spiderName}.");
+				Console.ForegroundColor = ConsoleColor.White;
 				return;
 			}
-			var spider = spiders[spiderName];
+
+			var spiderType = spiderTypes[spiderName];
+			var spider = Activator.CreateInstance(spiderType);
+			var spiderProperties = spiderType.GetProperties();
 			string identity = "";
 			if (arguments.ContainsKey("-i"))
 			{
-				var property = spider.GetType().GetProperties().First(p => p.Name == "Identity");
+				var property = spiderProperties.First(p => p.Name == "Identity");
 				identity = arguments["-i"].ToLower();
 				if (arguments["-i"].ToLower() == "guid")
 				{
@@ -166,7 +174,7 @@ namespace DotnetSpider.Core
 
 			if (arguments.ContainsKey("-tid"))
 			{
-				var property = spider.GetType().GetProperties().First(p => p.Name == "TaskId");
+				var property = spiderProperties.First(p => p.Name == "TaskId");
 				if (arguments["-tid"].ToLower() == "guid")
 				{
 					property.SetValue(spider, Guid.NewGuid().ToString("N"));
@@ -180,12 +188,11 @@ namespace DotnetSpider.Core
 				}
 			}
 
-			var spiderType = spider.GetType();
-			var method = spiderType.GetMethod("Run");
+			var runMethod = spiderType.GetMethod("Run");
 
 			if (!arguments.ContainsKey("-a"))
 			{
-				method.Invoke(spider, new object[] { new string[] { } });
+				runMethod.Invoke(spider, new object[] { new string[] { } });
 			}
 			else
 			{
@@ -199,7 +206,7 @@ namespace DotnetSpider.Core
 					}
 				}
 
-				method.Invoke(spider, new object[] { parameters });
+				runMethod.Invoke(spider, new object[] { parameters });
 			}
 		}
 

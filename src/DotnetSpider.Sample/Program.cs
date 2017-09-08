@@ -33,11 +33,11 @@ namespace DotnetSpider.Sample
 
 			MyTest();
 
-			Startup.Run(new string[] { "-s:BaiduSearch", "-tid:BaiduSearch", "-i:guid", "-a:" });
+			Startup.Run("-s:DotnetSpider.Sample.BaiduSearchSpider", "-tid:BaiduSearch", "-i:guid", "-a:");
 
-			Startup.Run(new string[] { "-s:CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1" });
+			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 
-			Startup.Run(new string[] { "-s:DefaultMySqlPipeline", "-tid:DefaultMySqlPipeline", "-i:guid", "-a:" });
+			Startup.Run("-s:DotnetSpider.Sample.DefaultMySqlPipelineSpider", "-tid:DefaultMySqlPipeline", "-i:guid", "-a:");
 
 			//ConfigurableSpider.Run();
 
@@ -88,11 +88,6 @@ namespace DotnetSpider.Sample
 		{
 		}
 
-
-		private static void Spider_OnClosed(Spider spider)
-		{
-			Console.WriteLine($"Spider: {spider.Identity} closed, Status: {spider.Stat}");
-		}
 	}
 
 }
