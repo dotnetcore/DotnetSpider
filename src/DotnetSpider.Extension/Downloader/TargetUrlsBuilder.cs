@@ -15,6 +15,12 @@ namespace DotnetSpider.Extension.Downloader
 {
 	public interface ITargetUrlsBuilderTermination
 	{
+		/// <summary>
+		/// Return true, skip all urls from target urls builder.
+		/// </summary>
+		/// <param name="page"></param>
+		/// <param name="creator"></param>
+		/// <returns></returns>
 		bool IsTermination(Page page, BaseTargetUrlsBuilder creator);
 	}
 
@@ -29,7 +35,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public virtual void Handle(ref Page page, ISpider spider)
 		{
-			if (page != null && !string.IsNullOrEmpty(page.Content) && !string.IsNullOrEmpty(PaggerString) && (Termination == null || !Termination.IsTermination(page, this)))
+			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(PaggerString) && (Termination == null || !Termination.IsTermination(page, this)))
 			{
 				page.AddTargetRequests(GenerateRequests(page));
 				page.SkipExtractTargetUrls = true;
@@ -40,7 +46,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		protected abstract IList<Request> GenerateRequests(Page page);
 
-		public BaseTargetUrlsBuilder(string paggerString)
+		protected BaseTargetUrlsBuilder(string paggerString)
 		{
 			PaggerString = paggerString;
 			PaggerPattern = new Regex($"{RegexUtil.NumRegex.Replace(PaggerString, @"\d+")}");
@@ -199,7 +205,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return false;
 			}
@@ -214,7 +220,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return false;
 			}
@@ -234,7 +240,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content))
+			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return false;
 			}
