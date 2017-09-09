@@ -25,6 +25,14 @@ namespace DotnetSpider.Core.Test
 			var args2 = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "-tid:TestSpider", "-i:guid", "-a::::" };
 			var arguments2 = Startup.AnalyzeArguments(args2);
 			Assert.Null(arguments2);
+
+			var args6 = new[] { "-s:DotnetSpider.Core.Test.TestSpider" };
+			var arguments6 = Startup.AnalyzeArguments(args6);
+			Assert.Null(arguments6);
+
+			var args3 = new[] { "-ti:DotnetSpider.Core.Test.TestSpider" };
+			var arguments3 = Startup.AnalyzeArguments(args3);
+			Assert.Null(arguments3);
 		}
 
 		[Fact]
@@ -43,6 +51,11 @@ namespace DotnetSpider.Core.Test
 			var arguments3 = Startup.AnalyzeArguments(args3);
 			Assert.Equal(4, arguments3.Count);
 			Assert.Equal("asdf", arguments3["-a"]);
+
+			var args4 = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "-tid:TestSpider", "-i:guid" };
+			var arguments4 = Startup.AnalyzeArguments(args4);
+			Assert.Equal(3, arguments4.Count);
+			Assert.Equal("TestSpider", arguments4["-tid"]);
 		}
 
 		[Fact]

@@ -102,10 +102,13 @@ namespace DotnetSpider.Core
 				}
 			}
 
-			var parameters = arguments["-a"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-			if (parameters.Contains("report"))
+			if (arguments.ContainsKey("-a"))
 			{
-				spiderType.GetProperty("EmptySleepTime")?.SetValue(spider, 1000);
+				var parameters = arguments["-a"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+				if (parameters.Contains("report"))
+				{
+					spiderType.GetProperty("EmptySleepTime")?.SetValue(spider, 1000);
+				}
 			}
 
 			return spider;
