@@ -25,7 +25,7 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// A spider contains four modules: Downloader, Scheduler, PageProcessor and Pipeline. 
 	/// </summary>
-	public class Spider : ISpider, ISpeedMonitor, INamed
+	public class Spider : ISpider, ISpeedMonitor, INamed, ITask
 	{
 		private static readonly object Locker = new object();
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
@@ -97,6 +97,8 @@ namespace DotnetSpider.Core
 		public bool ClearSchedulerAfterComplete { get; set; } = true;
 
 		public IMonitor Monitor { get; set; }
+
+		public string TaskId { get; set; }
 
 		public long AvgDownloadSpeed { get; private set; }
 
@@ -974,7 +976,7 @@ namespace DotnetSpider.Core
 				if (page != null) OnError(page.Request);
 				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, selector: {xe.Message}, maybe you should set SelectorType to Json.", LogLevel.Error, xe);
 			}
-			catch(JsonReaderException je)
+			catch (JsonReaderException je)
 			{
 				if (Site.CycleRetryTimes > 0)
 				{

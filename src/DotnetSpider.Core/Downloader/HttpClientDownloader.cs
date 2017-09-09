@@ -37,7 +37,7 @@ namespace DotnetSpider.Core.Downloader
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
 		private HttpClient _httpClient;
 
-		public bool DecodeHtml;
+		public bool DecodeHtml { get; set; }
 
 		public override IDownloader Clone(ISpider spider)
 		{

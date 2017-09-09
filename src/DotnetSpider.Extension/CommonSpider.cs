@@ -22,8 +22,6 @@ namespace DotnetSpider.Extension
 
 		protected Action DataVerificationAndReport;
 
-		public string TaskId { get; set; }
-
 		public bool UseDbLog { get; set; } = true;
 
 		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";

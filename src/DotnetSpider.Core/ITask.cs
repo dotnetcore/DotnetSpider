@@ -1,4 +1,4 @@
-﻿namespace DotnetSpider.Extension
+﻿namespace DotnetSpider.Core
 {
 	public interface ITask
 	{
