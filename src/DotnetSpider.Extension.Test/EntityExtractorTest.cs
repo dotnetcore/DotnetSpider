@@ -12,13 +12,13 @@ using DotnetSpider.Extension.Processor;
 
 namespace DotnetSpider.Extension.Test
 {
-	
+
 	public class EntityExtractorTest
 	{
 		[Fact]
 		public void Extract()
 		{
-			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Product).GetTypeInfo());
+			var entityMetadata = EntityDefine.Parse<Product>();
 			EntityExtractor extractor = new EntityExtractor("test", null, entityMetadata);
 			var results = extractor.Extract(new Page(new Request("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, dynamic>
 			{
@@ -43,7 +43,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void TempEntityNoPrimaryInfo()
 		{
-			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity1).GetTypeInfo());
+			var entityMetadata = EntityDefine.Parse<Entity1>();
 
 			EntityProcessor processor = new EntityProcessor(new Site(), entityMetadata);
 			var page = new Page(new Request("http://www.abcd.com"))

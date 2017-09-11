@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -54,7 +54,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString);
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(ProductUpdate).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<ProductUpdate>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -80,7 +80,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -89,7 +89,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline();
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(ProductUpdate).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<ProductUpdate>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -115,7 +115,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(Product2Insert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<Product2Insert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -124,7 +124,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString);
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(Product2Update).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<Product2Update>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -150,7 +150,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(Product2Insert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<Product2Insert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -159,7 +159,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline();
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(Product2Update).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<Product2Update>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -185,7 +185,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -194,7 +194,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString, true);
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(ProductUpdate).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<ProductUpdate>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -220,7 +220,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -229,7 +229,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(null, true);
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(ProductUpdate).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<ProductUpdate>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -255,7 +255,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(Product2Insert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<Product2Insert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -264,7 +264,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString, true);
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(Product2Update).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<Product2Update>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -291,7 +291,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(Product2Insert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<Product2Insert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -300,7 +300,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(null, true);
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(Product2Update).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<Product2Update>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -327,7 +327,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -358,7 +358,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -406,7 +406,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 						QueryString = "SELECT value from `dotnetspider1`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"
 					}
 				};
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 

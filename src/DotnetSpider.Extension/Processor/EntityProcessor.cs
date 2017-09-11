@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DotnetSpider.Extension.Processor
 {
-	public sealed class EntityProcessor : BasePageProcessor
+	public class EntityProcessor : BasePageProcessor
 	{
 		private readonly IEntityExtractor _extractor;
 
@@ -49,6 +49,13 @@ namespace DotnetSpider.Extension.Processor
 				return;
 			}
 			page.AddResultItem(_extractor.Name, list);
+		}
+	}
+
+	public class EntityProcessor<T> : EntityProcessor where T : SpiderEntity
+	{
+		public EntityProcessor(Site site) : base(site, EntityDefine.Parse<T>())
+		{
 		}
 	}
 }

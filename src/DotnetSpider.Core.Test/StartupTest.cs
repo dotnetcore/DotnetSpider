@@ -64,7 +64,7 @@ namespace DotnetSpider.Core.Test
 			var args = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "-tid:TestSpider", "-i:guid", "-a:" };
 			var arguments = Startup.AnalyzeArguments(args);
 			var spiderTypes = Startup.DetectSpiders();
-			Assert.Equal(2, spiderTypes.Count);
+			Assert.Single(spiderTypes);
 		}
 
 		[Fact]

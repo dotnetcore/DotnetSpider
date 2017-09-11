@@ -10,7 +10,7 @@ using System.IO;
 
 namespace DotnetSpider.Extension.Test
 {
-	
+
 	public class DataHandlerTest
 	{
 		class MyDataHanlder : DataHandler
@@ -38,7 +38,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void HandlerWhenExtractZeroResult()
 		{
-			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Product).GetTypeInfo());
+			var entityMetadata = EntityDefine.Parse<Product>();
 			var identity = Guid.NewGuid().ToString("N");
 			entityMetadata.DataHandler = new MyDataHanlder(identity);
 			EntityProcessor processor = new EntityProcessor(new Site(), entityMetadata);

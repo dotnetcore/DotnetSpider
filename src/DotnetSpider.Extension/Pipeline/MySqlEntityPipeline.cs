@@ -199,4 +199,12 @@ namespace DotnetSpider.Extension.Pipeline
 			return connectionStringSettings;
 		}
 	}
+
+	public class MySqlEntityPipeline<T> : MySqlEntityPipeline where T : SpiderEntity
+	{
+		public MySqlEntityPipeline(string connectString = null, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
+		{
+			AddEntity(EntityDefine.Parse<T>());
+		}
+	}
 }

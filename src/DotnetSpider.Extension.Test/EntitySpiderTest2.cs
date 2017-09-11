@@ -239,17 +239,17 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void EntitySelector()
 		{
-			var entity1 = EntitySpider.GenerateEntityDefine(typeof(Entity7).GetTypeInfo());
+			var entity1 = EntityDefine.Parse<Entity7>();
 			Assert.Equal("expression", entity1.Selector.Expression);
 			Assert.Equal(SelectorType.XPath, entity1.Selector.Type);
 			Assert.True(entity1.Multi);
 
-			var entity2 = EntitySpider.GenerateEntityDefine(typeof(Entity8).GetTypeInfo());
+			var entity2 = EntityDefine.Parse<Entity8>();
 			Assert.Equal("expression2", entity2.Selector.Expression);
 			Assert.Equal(SelectorType.Css, entity2.Selector.Type);
 			Assert.True(entity2.Multi);
 
-			var entity3 = EntitySpider.GenerateEntityDefine(typeof(Entity9).GetTypeInfo());
+			var entity3 = EntityDefine.Parse<Entity9>();
 			Assert.False(entity3.Multi);
 			Assert.Null(entity3.Selector);
 			Assert.Equal("DotnetSpider.Extension.Test.EntitySpiderTest2+Entity9", entity3.Name);
@@ -258,7 +258,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void Indexes()
 		{
-			var entity1 = EntitySpider.GenerateEntityDefine(typeof(Entity10).GetTypeInfo());
+			var entity1 = EntityDefine.Parse<Entity10>();
 			Assert.Equal("Id", entity1.TableInfo.Indexs[0]);
 			Assert.Equal("Name", entity1.TableInfo.Primary);
 			Assert.Equal(2, entity1.TableInfo.Uniques.Length);
@@ -350,7 +350,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void Formater()
 		{
-			var entity1 = EntitySpider.GenerateEntityDefine(typeof(Entity11).GetTypeInfo());
+			var entity1 = EntityDefine.Parse<Entity11>();
 			var formatters = ((Column)entity1.Columns[0]).Formatters;
 			Assert.Equal(2, formatters.Count);
 			var replaceFormatter = (ReplaceFormatter)formatters[0];
@@ -361,21 +361,21 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void Schema()
 		{
-			var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity4).GetTypeInfo());
+			var entityMetadata = EntityDefine.Parse<Entity4>();
 			Assert.Equal("test", entityMetadata.TableInfo.Database);
 			Assert.Equal(EntityTable.Monday, entityMetadata.TableInfo.Postfix);
 
-			var entityMetadata1 = EntitySpider.GenerateEntityDefine(typeof(Entity14).GetTypeInfo());
+			var entityMetadata1 = EntityDefine.Parse<Entity14>();
 			Assert.Null(entityMetadata1.TableInfo);
 		}
 
 		[Fact]
 		public void SetPrimary()
 		{
-			var entity1 = EntitySpider.GenerateEntityDefine(typeof(Entity5).GetTypeInfo());
+			var entity1 = EntityDefine.Parse<Entity5>();
 			Assert.Single(entity1.Columns);
 			Assert.Equal("Name", entity1.Columns[0].Name);
-			var entity2 = EntitySpider.GenerateEntityDefine(typeof(Entity6).GetTypeInfo());
+			var entity2 = EntityDefine.Parse<Entity6>();
 			Assert.Single(entity2.Columns);
 			Assert.Equal("name", entity2.Columns[0].Name);
 		}
@@ -385,7 +385,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity1).GetTypeInfo());
+				var entityMetadata = EntityDefine.Parse<Entity1>();
 				TestPipeline pipeline = new TestPipeline("");
 				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
@@ -401,7 +401,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity2).GetTypeInfo());
+				var entityMetadata = EntityDefine.Parse<Entity2>();
 				TestPipeline pipeline = new TestPipeline("");
 				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
@@ -417,7 +417,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entityMetadata = EntitySpider.GenerateEntityDefine(typeof(Entity3).GetTypeInfo());
+				var entityMetadata = EntityDefine.Parse<Entity3>();
 				TestPipeline pipeline = new TestPipeline("");
 				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");

@@ -249,7 +249,6 @@ namespace DotnetSpider.Core.Infrastructure
 
 			//设置安全凭证  
 			request.Credentials = item.Credentials;
-
 			//设置Cookie  
 			SetCookie(request, item);
 

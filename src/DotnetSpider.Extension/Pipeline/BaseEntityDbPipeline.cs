@@ -31,7 +31,7 @@ namespace DotnetSpider.Extension.Pipeline
 		protected abstract string GenerateIfDatabaseExistsSql(EntityAdapter adapter, string serverVersion);
 		protected abstract DbParameter CreateDbParameter(string name, object value);
 
-		protected ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
+		internal ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
 
 		public IUpdateConnectString UpdateConnectString { get; set; }
 
@@ -108,10 +108,14 @@ namespace DotnetSpider.Extension.Pipeline
 
 			base.InitPipeline(spider);
 
+			InitDatabaseAndTable();
+		}
 
-			foreach (var metadata in EntityAdapters.Values)
+		internal void InitDatabaseAndTable()
+		{
+			foreach (var adapter in EntityAdapters.Values)
 			{
-				if (!metadata.InsertModel)
+				if (!adapter.InsertModel)
 				{
 					continue;
 				}
@@ -121,16 +125,16 @@ namespace DotnetSpider.Extension.Pipeline
 					using (var conn = ConnectionStringSettings.GetDbConnection())
 					{
 						var command = conn.CreateCommand();
-						command.CommandText = GenerateIfDatabaseExistsSql(metadata, conn.ServerVersion);
+						command.CommandText = GenerateIfDatabaseExistsSql(adapter, conn.ServerVersion);
 
 						if (Convert.ToInt16(command.ExecuteScalar()) == 0)
 						{
-							command.CommandText = GenerateCreateDatabaseSql(metadata, conn.ServerVersion);
+							command.CommandText = GenerateCreateDatabaseSql(adapter, conn.ServerVersion);
 							command.CommandType = CommandType.Text;
 							command.ExecuteNonQuery();
 						}
 
-						command.CommandText = GenerateCreateTableSql(metadata);
+						command.CommandText = GenerateCreateTableSql(adapter);
 						command.CommandType = CommandType.Text;
 						command.ExecuteNonQuery();
 					}

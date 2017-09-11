@@ -214,7 +214,17 @@ namespace DotnetSpider.Extension.Model
 				tmpValue = GetEnviromentValue(enviromentSelector.Field, page, index);
 				foreach (var formatter in field.Formatters)
 				{
-					tmpValue = formatter.Formate(tmpValue);
+#if DEBUG
+					try
+					{
+#endif
+						tmpValue = formatter.Formate(tmpValue);
+#if DEBUG
+					}
+					catch (Exception e)
+					{
+					}
+#endif
 				}
 				return tmpValue;
 			}
@@ -232,7 +242,17 @@ namespace DotnetSpider.Extension.Model
 					}
 					foreach (var formatter in field.Formatters)
 					{
-						results = formatter.Formate(results);
+#if DEBUG
+						try
+						{
+#endif
+							results = formatter.Formate(results);
+#if DEBUG
+						}
+						catch (Exception e)
+						{
+						}
+#endif
 					}
 					return new JArray(results);
 				}
@@ -251,7 +271,17 @@ namespace DotnetSpider.Extension.Model
 						tmpValue = item.Select(selector)?.GetValue(needPlainText);
 						foreach (var formatter in field.Formatters)
 						{
-							tmpValue = formatter.Formate(tmpValue);
+#if DEBUG
+							try
+							{
+#endif
+								tmpValue = formatter.Formate(tmpValue);
+#if DEBUG
+							}
+							catch (Exception e)
+							{
+							}
+#endif
 						}
 						return tmpValue;
 					}

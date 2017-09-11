@@ -16,6 +16,7 @@ using System.Threading;
 #else
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 #endif
 
 namespace DotnetSpider.Sample
@@ -86,6 +87,20 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
+			Parallel.For(1, 10, new ParallelOptions { MaxDegreeOfParallelism = 10 }, (i) =>
+			{
+				while (true)
+				{
+					System.Net.WebRequest wReq = System.Net.WebRequest.Create("http://www.pa1pa.com");
+					System.Net.WebResponse wResp = wReq.GetResponse();
+					System.IO.Stream respStream = wResp.GetResponseStream();
+					using (System.IO.StreamReader reader = new System.IO.StreamReader(respStream, Encoding.UTF8))
+					{
+						reader.ReadToEnd();
+						Console.WriteLine($"Thread: {i}, PASS.");
+					}
+				}
+			});
 		}
 
 	}

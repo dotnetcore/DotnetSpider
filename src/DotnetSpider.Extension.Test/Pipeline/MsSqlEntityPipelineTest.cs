@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -58,7 +58,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadat2 = EntitySpider.GenerateEntityDefine(typeof(ProductUpdate).GetTypeInfo());
+				var metadat2 = EntityDefine.Parse<ProductUpdate>();
 				updatePipeline.AddEntity(metadat2);
 				updatePipeline.InitPipeline(spider);
 
@@ -88,7 +88,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(Product2).GetTypeInfo());
+				var metadata = EntityDefine.Parse<Product2>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -97,7 +97,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(Product2Update).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<Product2Update>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -127,7 +127,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
+				var metadata = EntityDefine.Parse<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -136,7 +136,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString, true);
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(ProductUpdate).GetTypeInfo());
+				var metadata2 = EntityDefine.Parse<ProductUpdate>();
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
@@ -166,7 +166,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(Product2).GetTypeInfo());
+				var metadata = EntityDefine.Parse<Product2>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
@@ -175,8 +175,8 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
 
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString, true);
-				var metadata2 = EntitySpider.GenerateEntityDefine(typeof(Product2Update).GetTypeInfo());
-				updatePipeline.AddEntity(EntitySpider.GenerateEntityDefine(typeof(Product2Update).GetTypeInfo()));
+				var metadata2 = EntityDefine.Parse<Product2Update>();
+				updatePipeline.AddEntity(metadata2);
 				updatePipeline.InitPipeline(spider);
 
 				var data3 = new DataObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
@@ -205,8 +205,8 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata = EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo());
-				insertPipeline.AddEntity(EntitySpider.GenerateEntityDefine(typeof(ProductInsert).GetTypeInfo()));
+				var metadata = EntityDefine.Parse<ProductInsert>();
+				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
 				// Common data
@@ -236,7 +236,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
 			try
 			{
-				insertPipeline.AddEntity(EntitySpider.GenerateEntityDefine(typeof(UpdateEntity1).GetTypeInfo()));
+				insertPipeline.AddEntity(EntityDefine.Parse<UpdateEntity1>());
 				throw new SpiderException("TEST FAILED.");
 			}
 			catch (SpiderException e)
@@ -246,7 +246,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			try
 			{
-				insertPipeline.AddEntity(EntitySpider.GenerateEntityDefine(typeof(UpdateEntity2).GetTypeInfo()));
+				insertPipeline.AddEntity(EntityDefine.Parse<UpdateEntity2>());
 				throw new SpiderException("TEST FAILED.");
 			}
 			catch (SpiderException e)
@@ -256,20 +256,20 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			try
 			{
-				insertPipeline.AddEntity(EntitySpider.GenerateEntityDefine(typeof(UpdateEntity3).GetTypeInfo()));
+				insertPipeline.AddEntity(EntityDefine.Parse<UpdateEntity3>());
 				throw new SpiderException("TEST FAILED.");
 			}
 			catch (SpiderException e)
 			{
 				Assert.Equal("There is no column need update.", e.Message);
 			}
-			var metadata = EntitySpider.GenerateEntityDefine(typeof(UpdateEntity4).GetTypeInfo());
-			insertPipeline.AddEntity(EntitySpider.GenerateEntityDefine(typeof(UpdateEntity4).GetTypeInfo()));
+			var metadata = EntityDefine.Parse<UpdateEntity4>();
+			insertPipeline.AddEntity(metadata);
 			Assert.Single(insertPipeline.GetUpdateColumns(metadata.Name));
 			Assert.Equal("Value", insertPipeline.GetUpdateColumns(metadata.Name).First());
 
 			SqlServerEntityPipeline insertPipeline2 = new SqlServerEntityPipeline(ConnectString);
-			var metadata2 = EntitySpider.GenerateEntityDefine(typeof(UpdateEntity5).GetTypeInfo());
+			var metadata2 = EntityDefine.Parse<UpdateEntity5>();
 			insertPipeline2.AddEntity(metadata2);
 			Assert.Single(insertPipeline2.GetUpdateColumns(metadata2.Name));
 			Assert.Equal("Value", insertPipeline2.GetUpdateColumns(metadata2.Name).First());
