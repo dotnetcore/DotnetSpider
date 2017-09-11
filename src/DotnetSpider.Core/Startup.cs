@@ -13,7 +13,7 @@ namespace DotnetSpider.Core
 {
 	public static class Startup
 	{
-		public static string[] DetectNames = new[] { "dotnetspider.sample", "dotnetspider.core.test", "dotnetspider.extension.test", "crawler", "crawlers", "spider", "spiders" };
+		public static string[] DetectNames = new[] { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
 
 		public static void Run(params string[] args)
 		{
@@ -119,7 +119,7 @@ namespace DotnetSpider.Core
 			var spiderTypes = new Dictionary<string, Type>();
 
 #if NET_CORE
-			foreach (var library in DependencyContext.Default.CompileLibraries.Where(f => DetectNames.Any(n => f.Name.ToLower().Contains(n))))
+			foreach (var library in DependencyContext.Default.CompileLibraries.Where(f => "DotnetSpider.HtmlAgilityPack.Css" != f.Name && "DotnetSpider.Extension" != f.Name &&"DotnetSpider2.Extension" != f.Name && "DotnetSpider.Core" != f.Name &&"DotnetSpider2.Core" != f.Name && DetectNames.Any(n => f.Name.ToLower().Contains(n))))
 			{
 				var asm = Assembly.Load(new AssemblyName(library.Name));
 				var types = asm.GetTypes();
