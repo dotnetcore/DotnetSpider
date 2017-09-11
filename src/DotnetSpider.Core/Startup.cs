@@ -13,7 +13,7 @@ namespace DotnetSpider.Core
 {
 	public static class Startup
 	{
-		public static string[] DetectNames = new[] { "dotnetspider", "crawler", "crawlers", "spider", "spiders" };
+		public static string[] DetectNames = new[] { "dotnetspider.sample", "dotnetspider.core.test", "dotnetspider.extension.test", "crawler", "crawlers", "spider", "spiders" };
 
 		public static void Run(params string[] args)
 		{
@@ -184,8 +184,8 @@ namespace DotnetSpider.Core
 			Console.WriteLine($"Detected {spiderTypes.Keys.Count} crawlers.");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
-			Console.WriteLine("=================================================================");
-			Console.WriteLine();
+
+			Environment.PrintLine();
 
 			return spiderTypes;
 		}

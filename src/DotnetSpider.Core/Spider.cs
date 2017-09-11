@@ -651,9 +651,9 @@ namespace DotnetSpider.Core
 #else
 					AppContext.SetSwitch(key, true);
 #endif
+					Console.WriteLine();
+					Environment.PrintLine();
 				}
-				Console.WriteLine();
-				Console.WriteLine("=================================================================");
 			}
 		}
 

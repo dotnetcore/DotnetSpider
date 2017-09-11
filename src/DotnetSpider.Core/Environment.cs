@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System;
 using System.Configuration;
 using System.IO;
+using System.Text;
 
 namespace DotnetSpider.Core
 {
@@ -59,6 +60,17 @@ namespace DotnetSpider.Core
 
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+		}
+
+		public static void PrintLine(char word = '=')
+		{
+			StringBuilder builder = new StringBuilder();
+			for (int i = 0; i < Console.WindowWidth; ++i)
+			{
+				builder.Append(word);
+			}
+
+			Console.WriteLine(builder.ToString());
 		}
 
 		static Environment()
