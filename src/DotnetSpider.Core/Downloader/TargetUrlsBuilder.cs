@@ -1,63 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Downloader;
+﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Model.Formatter;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace DotnetSpider.Extension.Downloader
+namespace DotnetSpider.Core.Downloader
 {
-	public interface ITargetUrlsBuilderTermination
-	{
-		/// <summary>
-		/// Return true, skip all urls from target urls builder.
-		/// </summary>
-		/// <param name="page"></param>
-		/// <param name="creator"></param>
-		/// <returns></returns>
-		bool IsTermination(Page page, BaseTargetUrlsBuilder creator);
-	}
-
-	public abstract class BaseTargetUrlsBuilder : IAfterDownloadCompleteHandler
-	{
-		/// <summary>
-		/// http://a.com?p=40  PaggerString: p=40 Pattern: p=\d+
-		/// </summary>
-		public string PaggerString { get; protected set; }
-
-		public Regex PaggerPattern { get; protected set; }
-
-		public virtual void Handle(ref Page page, ISpider spider)
-		{
-			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(PaggerString) && (Termination == null || !Termination.IsTermination(page, this)))
-			{
-				page.AddTargetRequests(GenerateRequests(page));
-				page.SkipExtractTargetUrls = true;
-			}
-		}
-
-		public ITargetUrlsBuilderTermination Termination { get; set; }
-
-		protected abstract IList<Request> GenerateRequests(Page page);
-
-		protected BaseTargetUrlsBuilder(string paggerString)
-		{
-			PaggerString = paggerString;
-			PaggerPattern = new Regex($"{RegexUtil.NumRegex.Replace(PaggerString, @"\d+")}");
-		}
-
-		public virtual string GetCurrentPagger(string currentUrlOrContent)
-		{
-			return PaggerPattern.Match(currentUrlOrContent).Value;
-		}
-	}
-
 	public class IncrementTargetUrlsBuilder : BaseTargetUrlsBuilder
 	{
 		public int Interval { get; set; }
@@ -141,63 +92,6 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class PaggerTermination : ITargetUrlsBuilderTermination
-	{
-		public BaseSelector TotalPageSelector { get; set; }
-		public Formatter[] TotalPageFormatters { get; set; }
-
-		public BaseSelector CurrenctPageSelector { get; set; }
-		public Formatter[] CurrnetPageFormatters { get; set; }
-
-		public bool IsTermination(Page page, BaseTargetUrlsBuilder creator)
-		{
-			if (TotalPageSelector == null || CurrenctPageSelector == null)
-			{
-				throw new SpiderException("Total page selector or current page selector should not be null.");
-			}
-			if (string.IsNullOrEmpty(page?.Content))
-			{
-				return false;
-			}
-			var totalStr = GetSelectorValue(page, TotalPageSelector);
-			var currentStr = GetSelectorValue(page, CurrenctPageSelector);
-
-			return currentStr == totalStr;
-		}
-
-		private string GetSelectorValue(Page page, BaseSelector selector)
-		{
-			string totalStr = string.Empty;
-			if (selector.Type == SelectorType.Enviroment)
-			{
-				if (SelectorUtils.Parse(TotalPageSelector) is EnviromentSelector enviromentSelector)
-				{
-					totalStr = EntityExtractor.GetEnviromentValue(enviromentSelector.Field, page, 0);
-				}
-			}
-			else
-			{
-				totalStr = page.Selectable.Select(SelectorUtils.Parse(TotalPageSelector)).GetValue();
-			}
-
-			if (!string.IsNullOrEmpty(totalStr) && TotalPageFormatters != null)
-			{
-				foreach (var formatter in TotalPageFormatters)
-				{
-					totalStr = formatter.Formate(totalStr);
-				}
-			}
-
-			if (string.IsNullOrEmpty(totalStr))
-			{
-				throw new SpiderException("The result of total selector is null.");
-			}
-			else
-			{
-				return totalStr;
-			}
-		}
-	}
 
 	public class ContainsTermination : ITargetUrlsBuilderTermination
 	{

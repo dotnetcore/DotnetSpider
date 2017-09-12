@@ -4,6 +4,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Model.Attribute;
 using Xunit;
+using DotnetSpider.Core.Downloader;
 
 namespace DotnetSpider.Extension.Test.Downloader
 {
