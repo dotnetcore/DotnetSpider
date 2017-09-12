@@ -31,7 +31,7 @@ namespace DotnetSpider.Core
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		private readonly Site _site;
-		private IScheduler _scheduler;
+		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
 		private IDownloader _downloader = new HttpClientDownloader();
 		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;

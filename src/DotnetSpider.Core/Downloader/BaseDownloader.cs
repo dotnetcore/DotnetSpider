@@ -13,7 +13,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		private readonly object _lock = new object();
 
 		/// <summary>
 		/// Auto detect content is json or html
@@ -122,8 +122,7 @@ namespace DotnetSpider.Core.Downloader
 
 		private void TryDetectContentType(Page page, ISpider spider)
 		{
-			_lock.EnterWriteLock();
-			try
+			lock (_lock)
 			{
 				if (!DetectContentType)
 				{
@@ -145,10 +144,7 @@ namespace DotnetSpider.Core.Downloader
 					}
 				}
 			}
-			finally
-			{
-				_lock.ExitWriteLock();
-			}
+
 
 			if (page != null)
 			{

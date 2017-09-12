@@ -21,11 +21,11 @@ namespace DotnetSpider.Extension
 	{
 		public List<EntityDefine> Entities { get; internal set; } = new List<EntityDefine>();
 
-		protected EntitySpider(string name) : this(name, new Site())
+		public EntitySpider(string name) : this(name, new Site())
 		{
 		}
 
-		protected EntitySpider(string name, Site site) : base(name, site)
+		public EntitySpider(string name, Site site) : base(name, site)
 		{
 		}
 
@@ -56,21 +56,12 @@ namespace DotnetSpider.Extension
 			if (typeof(SpiderEntity).IsAssignableFrom(type))
 			{
 				var entity = EntityDefine.Parse(type.GetTypeInfoCrossPlatform());
-
-				entity.DataHandler = dataHandler;
-
-				entity.SharedValues = type.GetTypeInfo().GetCustomAttributes<SharedValueSelector>().Select(e => new SharedValueSelector
-				{
-					Name = e.Name,
-					Expression = e.Expression,
-					Type = e.Type
-				}).ToList();
-
 				if (entity.TableInfo != null && !string.IsNullOrEmpty(tableName))
 				{
 					entity.TableInfo.Name = tableName;
 				}
-
+				entity.DataHandler = dataHandler;
+				
 				Entities.Add(entity);
 				EntityProcessor processor = new EntityProcessor(Site, entity);
 				AddPageProcessor(processor);

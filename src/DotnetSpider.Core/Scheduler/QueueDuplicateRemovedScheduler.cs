@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Scheduler
 	/// </summary>
 	public sealed class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler
 	{
-		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		private readonly object _lock = new object();
 		private List<Request> _queue = new List<Request>();
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
@@ -19,34 +19,23 @@ namespace DotnetSpider.Core.Scheduler
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{
-			_lock.EnterWriteLock();
-			try
+			lock (_lock)
 			{
 				_queue.Add(request);
-			}
-			finally
-			{
-				_lock.ExitWriteLock();
 			}
 		}
 
 		public override void ResetDuplicateCheck()
 		{
-			_lock.EnterWriteLock();
-			try
+			lock (_lock)
 			{
 				_queue.Clear();
-			}
-			finally
-			{
-				_lock.ExitWriteLock();
 			}
 		}
 
 		public override Request Poll()
 		{
-			_lock.EnterWriteLock();
-			try
+			lock (_lock)
 			{
 				if (_queue.Count == 0)
 				{
@@ -69,24 +58,15 @@ namespace DotnetSpider.Core.Scheduler
 					return request;
 				}
 			}
-			finally
-			{
-				_lock.ExitWriteLock();
-			}
 		}
 
 		public override long LeftRequestsCount
 		{
 			get
 			{
-				_lock.EnterWriteLock();
-				try
+				lock (_lock)
 				{
 					return _queue.Count;
-				}
-				finally
-				{
-					_lock.ExitWriteLock();
 				}
 			}
 		}
@@ -109,40 +89,25 @@ namespace DotnetSpider.Core.Scheduler
 
 		public override void Import(HashSet<Request> requests)
 		{
-			_lock.EnterWriteLock();
-			try
+			lock (_lock)
 			{
 				_queue = new List<Request>(requests);
-			}
-			finally
-			{
-				_lock.ExitWriteLock();
 			}
 		}
 
 		public override HashSet<Request> ToList()
 		{
-			_lock.EnterWriteLock();
-			try
+			lock (_lock)
 			{
 				return new HashSet<Request>(_queue.ToArray());
-			}
-			finally
-			{
-				_lock.ExitWriteLock();
 			}
 		}
 
 		public override void Dispose()
 		{
-			_lock.EnterWriteLock();
-			try
+			lock (_lock)
 			{
 				_queue.Clear();
-			}
-			finally
-			{
-				_lock.ExitWriteLock();
 			}
 
 			base.Dispose();

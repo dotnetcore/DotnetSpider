@@ -6,14 +6,13 @@ namespace DotnetSpider.Core.Scheduler.Component
 	public class HashSetDuplicateRemover : IDuplicateRemover
 	{
 		private readonly Dictionary<string, string> _urls = new Dictionary<string, string>();
-		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		private readonly object _lock = new object();
 
 		public long TotalRequestsCount => _urls.Count;
 
 		public bool IsDuplicate(Request request)
 		{
-			_lock.EnterWriteLock();
-			try
+			lock (_lock)
 			{
 				bool isDuplicate = _urls.ContainsKey(request.Identity);
 				if (!isDuplicate)
@@ -21,10 +20,6 @@ namespace DotnetSpider.Core.Scheduler.Component
 					_urls.Add(request.Identity, string.Empty);
 				}
 				return isDuplicate;
-			}
-			finally
-			{
-				_lock.ExitWriteLock();
 			}
 		}
 

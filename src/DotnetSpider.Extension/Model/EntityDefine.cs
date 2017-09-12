@@ -66,6 +66,13 @@ namespace DotnetSpider.Extension.Model
 			var targetUrlsSelectors = entityType.GetCustomAttributes<TargetUrlsSelector>();
 			entityDefine.TargetUrlsSelectors = targetUrlsSelectors.ToList();
 
+			entityDefine.SharedValues = entityType.GetCustomAttributes<SharedValueSelector>().Select(e => new SharedValueSelector
+			{
+				Name = e.Name,
+				Expression = e.Expression,
+				Type = e.Type
+			}).ToList();
+
 			ValidateEntityDefine(entityDefine);
 
 			return entityDefine;
