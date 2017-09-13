@@ -59,7 +59,7 @@ namespace DotnetSpider.Core
 
 		public static void LoadConfiguration(string fileName)
 		{
-			var path = string.IsNullOrEmpty(fileName) ? "app.config" : (File.Exists(fileName) ? fileName : "app.config");
+			var path = Path.Combine(BaseDirectory, string.IsNullOrEmpty(fileName) ? "app.config" : (File.Exists(fileName) ? fileName : "app.config"));
 			var fileMap = new ExeConfigurationFileMap
 			{
 				ExeConfigFilename = path
