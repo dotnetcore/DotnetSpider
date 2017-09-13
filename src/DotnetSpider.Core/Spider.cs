@@ -630,11 +630,8 @@ namespace DotnetSpider.Core
 			{
 				var key = "_DotnetSpider_Info";
 
-#if !NET_CORE
 				var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
-#else
-				AppContext.TryGetSwitch(key, out var isPrinted);
-#endif
+
 				if (!isPrinted)
 				{
 					Console.ForegroundColor = ConsoleColor.Green;
@@ -646,11 +643,9 @@ namespace DotnetSpider.Core
 					Console.WriteLine("== Author: zlzforever@163.com                                  ==");
 					Console.WriteLine("=================================================================");
 					Console.ForegroundColor = ConsoleColor.White;
-#if !NET_CORE
+
 					AppDomain.CurrentDomain.SetData(key, "True");
-#else
-					AppContext.SetSwitch(key, true);
-#endif
+
 					Console.WriteLine();
 					Environment.PrintLine();
 				}

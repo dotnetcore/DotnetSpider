@@ -21,11 +21,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=;Port=3306;SslMode=None;";
 
 
-		public MySqlEntityPipelineTest()
-		{
-			Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll");
-		}
-
 		private void ClearDb()
 		{
 			using (MySqlConnection conn = new MySqlConnection(ConnectString))

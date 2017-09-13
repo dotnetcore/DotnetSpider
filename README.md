@@ -217,6 +217,17 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 		Startup.Run(new string[] { "-s:JdSkuSample", "-tid:JdSkuSample", "-i:guid" });
 	}
 
+#### Startup configuration
+
+	Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name] -e:[en1=value1,en2=value2,...]
+
+-s: Type name of spider for example: DotnetSpider.Sample.BaiduSearchSpiderl
+-i: Set identity.
+-a: Pass arguments to spider's Run method.
+-tid: Set task id.
+-n: Set name.
+-e: Set enviroment, for example you want to run with a customize config: -e:app.my.config.
+
 #### WebDriver Support
 
 When you want to collect a page JS loaded, there is only one thing to do, set the downloader to WebDriverDownloader.

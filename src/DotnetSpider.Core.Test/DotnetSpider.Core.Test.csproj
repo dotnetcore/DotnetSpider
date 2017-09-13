@@ -4,7 +4,7 @@
     <Version>2.0.0</Version>
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
-    <StartupObject />
+    <StartupObject>DotnetSpider.Core.Test.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyTitle>DotnetSpider</AssemblyTitle>
@@ -23,6 +23,18 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="app - Copy %282%29.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="app.outside.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="app.inside.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="app.global.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="app.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

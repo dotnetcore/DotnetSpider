@@ -19,6 +19,9 @@ namespace DotnetSpider.Core
 		public const string SystemConnectionStringKey = "SystemConnection";
 		public const string DataConnectionStringKey = "DataConnection";
 		public const string IdColumn = "__Id";
+		public const string EnvLocation = "LOCATION";
+		public const string EnvConfig = "CONFIG";
+		public const string EnvDbConfig = "DBCONFIG";
 
 		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
@@ -30,12 +33,18 @@ namespace DotnetSpider.Core
 		public static string EmailPassword { get; private set; }
 		public static string EmailDisplayName { get; private set; }
 		public static bool SaveLogAndStatusToDb => SystemConnectionStringSettings != null;
-		public static string GlobalDirectory { get; }
-		public static string BaseDirectory { get; }
-		public static string PathSeperator { get; }
+		public static string GlobalDirectory { get; private set; }
+		public static string BaseDirectory { get; private set; }
+		public static string PathSeperator { get; private set; }
 
 		public static string SystemConnectionString => SystemConnectionStringSettings?.ConnectionString;
 		public static string DataConnectionString => DataConnectionStringSettings?.ConnectionString;
+
+		public static string GlobalAppConfigPath;
+
+		public static Configuration GlobalConfiguraiton;
+
+		public static ConnectionStringSettings GlobalDataConnectionStringSettings { get; private set; }
 
 		public static string GetAppSettings(string key)
 		{
@@ -49,9 +58,15 @@ namespace DotnetSpider.Core
 
 		public static void LoadConfiguration(string fileName)
 		{
-			var configuration = ConfigurationManager.OpenExeConfiguration(fileName);
+			var path = string.IsNullOrEmpty(fileName) ? "app.config" : (File.Exists(fileName) ? fileName : "app.config");
+			var fileMap = new ExeConfigurationFileMap
+			{
+				ExeConfigFilename = path
+			};
 
-			RedisConnectString = configuration.AppSettings.Settings[RedisConnectStringKey].Value?.Trim();
+			var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+
+			RedisConnectString = configuration.AppSettings.Settings[RedisConnectStringKey]?.Value?.Trim();
 			EmailHost = configuration.AppSettings.Settings[EmailHostKey].Value?.Trim();
 			EmailPort = configuration.AppSettings.Settings[EmailPortKey].Value?.Trim();
 			EmailAccount = configuration.AppSettings.Settings[EmailAccountKey].Value?.Trim();
@@ -60,6 +75,17 @@ namespace DotnetSpider.Core
 
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+
+			if ("GLOBAL" == AppDomain.CurrentDomain.GetData(EnvDbConfig)?.ToString().ToUpper())
+			{
+				var globalFileMap = new ExeConfigurationFileMap
+				{
+					ExeConfigFilename = GlobalAppConfigPath
+				};
+
+				GlobalConfiguraiton = ConfigurationManager.OpenMappedExeConfiguration(globalFileMap, ConfigurationUserLevel.None);
+				GlobalDataConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+			}
 		}
 
 		public static void PrintLine(char word = '=')
@@ -75,16 +101,11 @@ namespace DotnetSpider.Core
 
 		static Environment()
 		{
-			RedisConnectString = ConfigurationManager.AppSettings[RedisConnectStringKey]?.Trim();
-			EmailHost = ConfigurationManager.AppSettings[EmailHostKey]?.Trim();
-			EmailPort = ConfigurationManager.AppSettings[EmailPortKey]?.Trim();
-			EmailAccount = ConfigurationManager.AppSettings[EmailAccountKey]?.Trim();
-			EmailPassword = ConfigurationManager.AppSettings[EmailPasswordKey]?.Trim();
-			EmailDisplayName = ConfigurationManager.AppSettings[EmailDisplayNameKey]?.Trim();
+			Reload();
+		}
 
-			SystemConnectionStringSettings = ConfigurationManager.ConnectionStrings[SystemConnectionStringKey];
-			DataConnectionStringSettings = ConfigurationManager.ConnectionStrings[DataConnectionStringKey];
-
+		public static void Reload()
+		{
 #if !NET_CORE
 			PathSeperator = "\\";
 #else
@@ -119,6 +140,10 @@ namespace DotnetSpider.Core
 				di.Create();
 			}
 #endif
+			GlobalAppConfigPath = Path.Combine(GlobalDirectory, "app.config");
+
+			var path = AppDomain.CurrentDomain.GetData(EnvConfig)?.ToString();
+			LoadConfiguration(File.Exists(path) ? path : "app.config");
 		}
 	}
 }

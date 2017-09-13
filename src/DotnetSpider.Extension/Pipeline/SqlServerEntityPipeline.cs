@@ -231,7 +231,7 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 				else
 				{
-					throw new SpiderException("DataConnection is unfound in app.config.");
+					return null;
 				}
 			}
 			return connectionStringSettings;

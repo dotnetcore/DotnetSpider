@@ -45,7 +45,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 			var providerDlls = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory).Where(p => DataProviders.Contains(Path.GetFileName(p).ToLower())).ToList();
 			foreach (var providerDll in providerDlls)
 			{
-				var assembly = Assembly.LoadFrom(providerDll);
+				var assembly = Assembly.Load(Path.GetFileName(providerDll).Replace(".dll", ""));
 				var factoryType = assembly.GetExportedTypes().FirstOrDefault(t => t.BaseType == typeof(DbProviderFactory));
 				if (factoryType != null)
 				{

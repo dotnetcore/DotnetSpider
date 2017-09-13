@@ -28,6 +28,8 @@ namespace DotnetSpider.Core
 				return;
 			}
 
+			SetEnviroment(arguments);
+
 			var spiderName = arguments["-s"];
 
 			var spiderTypes = DetectSpiders();
@@ -52,6 +54,22 @@ namespace DotnetSpider.Core
 				{
 					var parameters = arguments["-a"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 					runMethod.Invoke(spider, new object[] { parameters });
+				}
+			}
+		}
+
+		public static void SetEnviroment(Dictionary<string, string> arguments)
+		{
+			if (arguments.ContainsKey("-e"))
+			{
+				var valuePairs = arguments["-e"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+				foreach (var pair in valuePairs)
+				{
+					var datas = pair.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+					if (datas.Length == 2)
+					{
+						AppDomain.CurrentDomain.SetData(datas[0], datas[1]);
+					}
 				}
 			}
 		}
@@ -198,7 +216,7 @@ namespace DotnetSpider.Core
 				if (string.IsNullOrEmpty(arg) || string.IsNullOrWhiteSpace(arg))
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name]");
+					Console.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name] -e:[en1=value1,en2=value2,...]");
 					Console.ForegroundColor = ConsoleColor.White;
 					return null;
 				}

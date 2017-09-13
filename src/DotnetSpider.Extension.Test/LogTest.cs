@@ -22,7 +22,7 @@ namespace DotnetSpider.Extension.Test
 	{
 		public LogTest()
 		{
-			Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll");
+			Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll.config");
 		}
 
 		[Fact]

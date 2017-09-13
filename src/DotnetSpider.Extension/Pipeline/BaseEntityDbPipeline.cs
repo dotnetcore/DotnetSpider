@@ -37,7 +37,34 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public ConnectionStringSettings ConnectionStringSettings
 		{
-			get => _connectionStringSettings ?? (_connectionStringSettings = CreateConnectionStringSettings(_connectString));
+			get
+			{
+				if (null == _connectionStringSettings)
+				{
+					if (string.IsNullOrEmpty(_connectString))
+					{
+						var useGlobalConfig = AppDomain.CurrentDomain.GetData(Core.Environment.EnvConfig)?.ToString().ToUpper() == "GLOBAL";
+						if (useGlobalConfig)
+						{
+							if (null == Core.Environment.GlobalDataConnectionStringSettings)
+							{
+								throw new SpiderException("Global app.config unfound.");
+							}
+							_connectionStringSettings = CreateConnectionStringSettings(Core.Environment.GlobalDataConnectionStringSettings.ConnectionString);
+						}
+						else
+						{
+							_connectionStringSettings = CreateConnectionStringSettings(Core.Environment.DataConnectionStringSettings.ConnectionString);
+						}
+					}
+					else
+					{
+						_connectionStringSettings = CreateConnectionStringSettings(_connectString);
+					}
+				}
+
+				return _connectionStringSettings;
+			}
 			set => _connectionStringSettings = value;
 		}
 
@@ -48,6 +75,7 @@ namespace DotnetSpider.Extension.Pipeline
 			_connectString = connectString;
 			CheckIfSameBeforeUpdate = checkIfSaveBeforeUpdate;
 		}
+
 
 		public override void AddEntity(EntityDefine entityDefine)
 		{
