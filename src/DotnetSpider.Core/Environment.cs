@@ -10,6 +10,7 @@ namespace DotnetSpider.Core
 {
 	public static class Environment
 	{
+		public const string Version = "2.0.17-beta4";
 		public const string RedisConnectStringKey = "redisConnectString";
 		public const string EmailHostKey = "emailHost";
 		public const string EmailPortKey = "emailPort";
