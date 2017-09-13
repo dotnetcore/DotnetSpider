@@ -46,7 +46,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				{
 					File.Delete(Core.Environment.GlobalAppConfigPath);
 				}
-				Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll.config");
+				Core.Environment.Reload();
 				var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-e:CONFIG=GLOBAL" };
 				var arguments1 = Startup.AnalyzeArguments(args1);
 				Startup.SetEnviroment(arguments1);
@@ -74,7 +74,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				File.Delete(Core.Environment.GlobalAppConfigPath);
 			}
 			File.Copy("app.global.config", Core.Environment.GlobalAppConfigPath);
-			Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll.config");
+			Core.Environment.Reload();
 			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-e:CONFIG=GLOBAL" };
 			var arguments1 = Startup.AnalyzeArguments(args1);
 			Startup.SetEnviroment(arguments1);
@@ -95,7 +95,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				File.Delete(Core.Environment.GlobalAppConfigPath);
 			}
 			File.Copy("app.global.config", Core.Environment.GlobalAppConfigPath);
-			Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll.config");
+			Core.Environment.Reload();
 			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:" };
 			var arguments1 = Startup.AnalyzeArguments(args1);
 			Startup.SetEnviroment(arguments1);

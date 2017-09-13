@@ -57,9 +57,9 @@ namespace DotnetSpider.Core
 			return ConfigurationManager.ConnectionStrings[key];
 		}
 
-		public static void LoadConfiguration(string fileName)
+		public static void LoadConfiguration(string filePath)
 		{
-			var path = Path.Combine(BaseDirectory, string.IsNullOrEmpty(fileName) ? "app.config" : (File.Exists(fileName) ? fileName : "app.config"));
+			var path = File.Exists(filePath) ? filePath : Path.Combine(BaseDirectory, "app.config");
 			var fileMap = new ExeConfigurationFileMap
 			{
 				ExeConfigFilename = path
@@ -143,8 +143,11 @@ namespace DotnetSpider.Core
 #endif
 			GlobalAppConfigPath = Path.Combine(GlobalDirectory, "app.config");
 
-			var path = AppDomain.CurrentDomain.GetData(EnvConfig)?.ToString();
-			LoadConfiguration(File.Exists(path) ? path : "app.config");
+			var appConfigName = AppDomain.CurrentDomain.GetData(EnvConfig)?.ToString();
+
+			var path = string.IsNullOrEmpty(appConfigName) ? Path.Combine(BaseDirectory, "app.config") : Path.Combine(BaseDirectory, appConfigName);
+
+			LoadConfiguration(path);
 		}
 	}
 }

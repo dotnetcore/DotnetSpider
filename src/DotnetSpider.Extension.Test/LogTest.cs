@@ -20,11 +20,6 @@ namespace DotnetSpider.Extension.Test
 
 	public class LogTest
 	{
-		public LogTest()
-		{
-			Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll.config");
-		}
-
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{

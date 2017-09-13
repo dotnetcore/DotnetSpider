@@ -137,7 +137,6 @@ namespace DotnetSpider.Core
 		{
 			var spiderTypes = new Dictionary<string, Type>();
 
-
 			foreach (var file in DetectDlls())
 			{
 				var asm = Assembly.Load(file);
@@ -278,6 +277,12 @@ namespace DotnetSpider.Core
 			return arguments;
 		}
 
+		public static List<string> DetectDlls()
+		{
+			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+			return Directory.GetFiles(path).Where(f => f.EndsWith(".dll")).Select(f => Path.GetFileName(f).Replace(".dll", "")).Where(f => !f.EndsWith("DotnetSpider.HtmlAgilityPack.Css") && !f.EndsWith("DotnetSpider.Extension") && !f.EndsWith("DotnetSpider2.Extension") && !f.EndsWith("DotnetSpider.Core") && !f.EndsWith("DotnetSpider2.Core") && DetectNames.Any(n => f.ToLower().Contains(n))).ToList();
+		}
+
 		private static void PrintEnviroment(params string[] args)
 		{
 			Console.WriteLine("");
@@ -290,12 +295,6 @@ namespace DotnetSpider.Core
 			Console.WriteLine($"System:         {System.Environment.OSVersion} {(System.Environment.Is64BitOperatingSystem ? "X64" : "X86")}");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine("");
-		}
-
-		private static List<string> DetectDlls()
-		{
-			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-			return Directory.GetFiles(path).Where(f => f.EndsWith(".dll")).Select(f => Path.GetFileName(f).Replace(".dll", "")).Where(f => !f.Contains("DotnetSpider.HtmlAgilityPack.Css") && !f.Contains("DotnetSpider.Extension") && !f.Contains("DotnetSpider2.Extension") && !f.Contains("DotnetSpider.Core") && !f.Contains("DotnetSpider2.Core") && DetectNames.Any(n => f.ToLower().Contains(n))).ToList();
 		}
 
 		private static void SetConsoleEncoding()

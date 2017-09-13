@@ -24,7 +24,6 @@ namespace DotnetSpider.Extension.Test
 	{
 		public EntitySpiderTest2()
 		{
-			Core.Environment.LoadConfiguration("DotnetSpider.Extension.Test.dll.config");
 		}
 
 		private class TestPipeline : BaseEntityDbPipeline
