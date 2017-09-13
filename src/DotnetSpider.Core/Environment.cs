@@ -45,8 +45,6 @@ namespace DotnetSpider.Core
 
 		public static Configuration GlobalConfiguraiton;
 
-		public static ConnectionStringSettings GlobalDataConnectionStringSettings { get; private set; }
-
 		public static string GetAppSettings(string key)
 		{
 			return ConfigurationManager.AppSettings[key];
@@ -74,9 +72,6 @@ namespace DotnetSpider.Core
 			EmailPassword = configuration.AppSettings.Settings[EmailPasswordKey].Value?.Trim();
 			EmailDisplayName = configuration.AppSettings.Settings[EmailDisplayNameKey].Value?.Trim();
 
-			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
-			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
-
 			if ("GLOBAL" == AppDomain.CurrentDomain.GetData(EnvDbConfig)?.ToString().ToUpper())
 			{
 				var globalFileMap = new ExeConfigurationFileMap
@@ -85,7 +80,14 @@ namespace DotnetSpider.Core
 				};
 
 				GlobalConfiguraiton = ConfigurationManager.OpenMappedExeConfiguration(globalFileMap, ConfigurationUserLevel.None);
-				GlobalDataConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+
+				SystemConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
+				DataConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+			}
+			else
+			{
+				SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
+				DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 			}
 		}
 

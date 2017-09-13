@@ -24,7 +24,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-e:" };
 			var arguments1 = Startup.AnalyzeArguments(args1);
 			Startup.SetEnviroment(arguments1);
-
 		}
 
 		[Fact]
@@ -35,6 +34,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			Startup.SetEnviroment(arguments1);
 
 			Assert.Equal("GLOBAL", AppDomain.CurrentDomain.GetData(Core.Environment.EnvDbConfig)?.ToString());
+
+			AppDomain.CurrentDomain.SetData("CONFIG", "");
+			AppDomain.CurrentDomain.SetData("DBCONFIG", "");
 		}
 
 		[Fact]
@@ -46,10 +48,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				{
 					File.Delete(Core.Environment.GlobalAppConfigPath);
 				}
-				Core.Environment.Reload();
-				var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-e:CONFIG=GLOBAL" };
+				var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-e:DBCONFIG=GLOBAL" };
 				var arguments1 = Startup.AnalyzeArguments(args1);
 				Startup.SetEnviroment(arguments1);
+
+				Core.Environment.Reload();
 
 				MySqlEntityPipeline pipeline = new MySqlEntityPipeline();
 
@@ -57,11 +60,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				{
 					var a = pipeline.ConnectionStringSettings;
 				});
-
 			}
 			finally
 			{
-				AppDomain.CurrentDomain.SetData("CONFIG", "NOGLOBAL");
+				AppDomain.CurrentDomain.SetData("CONFIG", "");
+				AppDomain.CurrentDomain.SetData("DBCONFIG", "");
 			}
 
 		}
@@ -74,16 +77,20 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				File.Delete(Core.Environment.GlobalAppConfigPath);
 			}
 			File.Copy("app.global.config", Core.Environment.GlobalAppConfigPath);
-			Core.Environment.Reload();
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-e:CONFIG=GLOBAL" };
+
+			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-e:DBCONFIG=GLOBAL" };
 			var arguments1 = Startup.AnalyzeArguments(args1);
 			Startup.SetEnviroment(arguments1);
+
+			Core.Environment.Reload();
 
 			MySqlEntityPipeline pipeline = new MySqlEntityPipeline();
 			var a = pipeline.ConnectionStringSettings;
 			Assert.Equal("Database='mysql';Data Source=localhost2;User ID=root;Port=3306;SslMode=None;", a.ConnectionString);
+			Assert.Equal("127.0.0.1:6379,serviceName=DotnetSpider,keepAlive=8,allowAdmin=True,connectTimeout=10000,abortConnect=True,connectRetry=20", Core.Environment.RedisConnectString);
 
-			AppDomain.CurrentDomain.SetData("CONFIG", "NOGLOBAL");
+			AppDomain.CurrentDomain.SetData("CONFIG", "");
+			AppDomain.CurrentDomain.SetData("DBCONFIG", "");
 		}
 
 		[Fact]
@@ -95,15 +102,19 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				File.Delete(Core.Environment.GlobalAppConfigPath);
 			}
 			File.Copy("app.global.config", Core.Environment.GlobalAppConfigPath);
-			Core.Environment.Reload();
+
 			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:" };
 			var arguments1 = Startup.AnalyzeArguments(args1);
 			Startup.SetEnviroment(arguments1);
+
+			Core.Environment.Reload();
 
 			MySqlEntityPipeline pipeline = new MySqlEntityPipeline();
 			var a = pipeline.ConnectionStringSettings;
 			Assert.Equal("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;", a.ConnectionString);
 
+			AppDomain.CurrentDomain.SetData("CONFIG", "");
+			AppDomain.CurrentDomain.SetData("DBCONFIG", "");
 		}
 	}
 }
