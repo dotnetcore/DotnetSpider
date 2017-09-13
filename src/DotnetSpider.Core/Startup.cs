@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -136,17 +137,12 @@ namespace DotnetSpider.Core
 		{
 			var spiderTypes = new Dictionary<string, Type>();
 
-#if NET_CORE
-			foreach (var library in DependencyContext.Default.CompileLibraries.Where(f => "DotnetSpider.HtmlAgilityPack.Css" != f.Name && "DotnetSpider.Extension" != f.Name &&"DotnetSpider2.Extension" != f.Name && "DotnetSpider.Core" != f.Name &&"DotnetSpider2.Core" != f.Name && DetectNames.Any(n => f.Name.ToLower().Contains(n))))
-			{
-				var asm = Assembly.Load(new AssemblyName(library.Name));
-				var types = asm.GetTypes();
-#else
+
 			foreach (var file in DetectDlls())
 			{
-				var asm = Assembly.LoadFrom(file);
+				var asm = Assembly.Load(file);
 				var types = asm.GetTypes();
-#endif
+
 				Console.WriteLine($"Fetch assembly: {asm.FullName}.");
 
 				foreach (var type in types)
@@ -296,13 +292,11 @@ namespace DotnetSpider.Core
 			Console.WriteLine("");
 		}
 
-#if !NET_CORE
 		private static List<string> DetectDlls()
 		{
-			var path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-			return System.IO.Directory.GetFiles(path).Where(f => DetectNames.Any(n => f.ToLower().Contains(n))).ToList();
+			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
+			return Directory.GetFiles(path).Where(f => f.EndsWith(".dll")).Select(f => Path.GetFileName(f).Replace(".dll", "")).Where(f => !f.Contains("DotnetSpider.HtmlAgilityPack.Css") && !f.Contains("DotnetSpider.Extension") && !f.Contains("DotnetSpider2.Extension") && !f.Contains("DotnetSpider.Core") && !f.Contains("DotnetSpider2.Core") && DetectNames.Any(n => f.ToLower().Contains(n))).ToList();
 		}
-#endif
 
 		private static void SetConsoleEncoding()
 		{
