@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotnetSpider.Core.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -200,8 +201,7 @@ namespace DotnetSpider.Core
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
 
-			//Environment.PrintLine('=');
-
+			PrintInfo.PrintLine('=');
 			return spiderTypes;
 		}
 
@@ -293,8 +293,8 @@ namespace DotnetSpider.Core
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			var commands = string.Join(" ", args);
 			Console.WriteLine($"Args:           {commands}");
-			Console.WriteLine($"BaseDirectory:  {Env.BaseDirectory}");
-			Console.WriteLine($"System:         {System.Environment.OSVersion} {(System.Environment.Is64BitOperatingSystem ? "X64" : "X86")}");
+			Console.WriteLine($"BaseDirectory:  {AppDomain.CurrentDomain.BaseDirectory}");
+			Console.WriteLine($"System:         {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine("");
 		}

@@ -14,7 +14,7 @@ namespace DotnetSpider.Core
 	//     and platform. This class cannot be inherited.
 	public static class Env
 	{
-		public const string Version = "2.0.18-beta3";
+		public const string Version = "2.0.18-beta5";
 		public const string RedisConnectStringKey = "redisConnectString";
 		public const string EmailHostKey = "emailHost";
 		public const string EmailPortKey = "emailPort";

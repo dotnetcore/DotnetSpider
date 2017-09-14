@@ -9,7 +9,7 @@ namespace DotnetSpider.Extension.Infrastructure
 	{
 		public static ISelector Parse(BaseSelector selector)
 		{
-			if (!string.IsNullOrEmpty(selector?.Expression))
+			if (selector != null)
 			{
 				string expression = selector.Expression;
 
@@ -17,6 +17,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				{
 					case SelectorType.Css:
 						{
+							NotNullExpression(selector);
 							return Selectors.Css(expression);
 						}
 					case SelectorType.Enviroment:
@@ -25,10 +26,12 @@ namespace DotnetSpider.Extension.Infrastructure
 						}
 					case SelectorType.JsonPath:
 						{
+							NotNullExpression(selector);
 							return Selectors.JsonPath(expression);
 						}
 					case SelectorType.Regex:
 						{
+							NotNullExpression(selector);
 							if (string.IsNullOrEmpty(selector.Argument))
 							{
 								return Selectors.Regex(expression);
@@ -44,11 +47,27 @@ namespace DotnetSpider.Extension.Infrastructure
 						}
 					case SelectorType.XPath:
 						{
+							NotNullExpression(selector);
 							return Selectors.XPath(expression);
+						}
+					default:
+						{
+							throw new SpiderException($"Selector {selector} unsupoort.");
 						}
 				}
 			}
-			throw new SpiderException("Not support selector: " + selector);
+			else
+			{
+				throw new SpiderException("Selector shold not be null.");
+			}
+		}
+
+		public static void NotNullExpression(BaseSelector selector)
+		{
+			if (string.IsNullOrEmpty(selector.Expression))
+			{
+				throw new SpiderException($"Expression of {selector} should not be null/empty.");
+			}
 		}
 
 		public static ISelector Parse(Selector selector)

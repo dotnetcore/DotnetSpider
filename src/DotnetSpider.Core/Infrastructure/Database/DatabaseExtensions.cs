@@ -44,7 +44,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 					}
 					else
 					{
-						throw;
+						//throw;
 					}
 				}
 			}

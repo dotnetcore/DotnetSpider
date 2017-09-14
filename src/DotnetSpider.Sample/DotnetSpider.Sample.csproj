@@ -10,6 +10,9 @@
     <None Remove="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app.test.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="app.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
