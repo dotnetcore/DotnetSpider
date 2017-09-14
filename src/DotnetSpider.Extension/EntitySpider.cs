@@ -41,7 +41,7 @@ namespace DotnetSpider.Extension
 
 		public EntityDefine AddEntityType(Type type, DataHandler dataHandler)
 		{
-			return AddEntityType(type, dataHandler);
+			return AddEntityType(type, dataHandler, null);
 		}
 
 		public EntityDefine AddEntityType<T>(DataHandler dataHandler)
@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension
 			return AddEntityType(typeof(T), dataHandler);
 		}
 
-		public EntityDefine AddEntityType(Type type, DataHandler dataHandler, string tableName = null)
+		public EntityDefine AddEntityType(Type type, DataHandler dataHandler, string tableName)
 		{
 			CheckIfRunning();
 
@@ -61,7 +61,7 @@ namespace DotnetSpider.Extension
 					entity.TableInfo.Name = tableName;
 				}
 				entity.DataHandler = dataHandler;
-				
+
 				Entities.Add(entity);
 				EntityProcessor processor = new EntityProcessor(Site, entity);
 				AddPageProcessor(processor);
