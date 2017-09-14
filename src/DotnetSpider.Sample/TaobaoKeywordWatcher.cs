@@ -108,7 +108,7 @@ namespace DotnetSpider.Sample
 			SkipWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))
 			{
-				AddStartUrlBuilder(new DbStartUrlBuilder(Database.MySql, Environment.DataConnectionStringSettings.ConnectionString, "SELECT * FROM taobao.result_keywords limit 10000", new[] { "bidwordstr", "tab" }, "https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}"));
+				AddStartUrlBuilder(new DbStartUrlBuilder(Database.MySql, Env.DataConnectionStringSettings.ConnectionString, "SELECT * FROM taobao.result_keywords limit 10000", new[] { "bidwordstr", "tab" }, "https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}"));
 			}
 			AddEntityType(typeof(Item), new MyDataHanlder());
 		}

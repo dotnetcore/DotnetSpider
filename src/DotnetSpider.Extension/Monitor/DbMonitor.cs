@@ -22,11 +22,11 @@ namespace DotnetSpider.Extension.Monitor
 
 			_isDbOnly = isDbOnly;
 
-			if (Core.Environment.SystemConnectionStringSettings != null)
+			if (Core.Env.SystemConnectionStringSettings != null)
 			{
 				NetworkCenter.Current.Execute("dm", () =>
 				{
-					using (var conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
+					using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 					{
 						InitStatusDatabase(conn);
 
@@ -53,7 +53,7 @@ namespace DotnetSpider.Extension.Monitor
 
 		public static void InitStatusDatabase()
 		{
-			using (var conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
+			using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 			{
 				InitStatusDatabase(conn);
 			}
@@ -97,11 +97,11 @@ namespace DotnetSpider.Extension.Monitor
 				base.Report(status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 			}
 
-			if (Core.Environment.SaveLogAndStatusToDb)
+			if (Core.Env.SaveLogAndStatusToDb)
 			{
 				NetworkCenter.Current.Execute("dm", () =>
 				{
-					using (var conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
+					using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 					{
 						conn.Execute(
 							"update dotnetspider.status set `status`=@status, `thread`=@thread,`left`=@left, `success`=@success, `error`=@error, `total`=@total, `avgdownloadspeed`=@avgdownloadspeed, `avgprocessorspeed`=@avgprocessorspeed, `avgpipelinespeed`=@avgpipelinespeed WHERE `identity`=@identity and `node`=@node;",

@@ -350,7 +350,6 @@ namespace DotnetSpider.Core
 #else
 			ThreadPool.SetMinThreads(200, 200);
 #endif
-			LogCenter.InitLogCenter();
 		}
 
 		public Spider AddStartUrlBuilder(IStartUrlBuilder builder)
@@ -624,34 +623,6 @@ namespace DotnetSpider.Core
 			OnClosed?.Invoke(this);
 		}
 
-		public static void PrintInfo()
-		{
-			lock (Locker)
-			{
-				var key = "_DotnetSpider_Info";
-
-				var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
-
-				if (!isPrinted)
-				{
-					Console.ForegroundColor = ConsoleColor.Green;
-					Console.WriteLine("=================================================================");
-					Console.WriteLine("== DotnetSpider is an open source crawler developed by C#      ==");
-					Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
-					Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
-					Console.WriteLine("== License: LGPL3.0                                            ==");
-					Console.WriteLine("== Author: zlzforever@163.com                                  ==");
-					Console.WriteLine("=================================================================");
-					Console.ForegroundColor = ConsoleColor.White;
-
-					AppDomain.CurrentDomain.SetData(key, "True");
-
-					Console.WriteLine();
-					Environment.PrintLine();
-				}
-			}
-		}
-
 		public Task RunAsync(params string[] arguments)
 		{
 			return Task.Factory.StartNew(() => { Run(arguments); });
@@ -809,7 +780,7 @@ namespace DotnetSpider.Core
 
 		protected virtual void InitComponent(params string[] arguments)
 		{
-			PrintInfo();
+			Env.PrintInfo();
 
 			if (_init)
 			{
@@ -839,7 +810,7 @@ namespace DotnetSpider.Core
 
 			Scheduler.Init(this);
 
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Environment.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 

@@ -12,7 +12,7 @@ namespace DotnetSpider.Extension.Model
 {
 	public class EntityDefine : AbstractSelector
 	{
-		private static readonly List<string> DefaultProperties = new List<string> { "cdate", Core.Environment.IdColumn };
+		private static readonly List<string> DefaultProperties = new List<string> { "cdate", Core.Env.IdColumn };
 
 		public EntityTable TableInfo { get; set; }
 
@@ -175,7 +175,7 @@ namespace DotnetSpider.Extension.Model
 			}
 			if (!string.IsNullOrEmpty(entity.TableInfo.Primary))
 			{
-				if (entity.TableInfo.Primary != Core.Environment.IdColumn)
+				if (entity.TableInfo.Primary != Core.Env.IdColumn)
 				{
 					var items = new HashSet<string>(entity.TableInfo.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 					if (items.Count > 0)
@@ -196,13 +196,13 @@ namespace DotnetSpider.Extension.Model
 					}
 					else
 					{
-						entity.TableInfo.Primary = Core.Environment.IdColumn;
+						entity.TableInfo.Primary = Core.Env.IdColumn;
 					}
 				}
 			}
 			else
 			{
-				entity.TableInfo.Primary = Core.Environment.IdColumn;
+				entity.TableInfo.Primary = Core.Env.IdColumn;
 			}
 
 			if (entity.TableInfo.UpdateColumns != null && entity.TableInfo.UpdateColumns.Length > 0)

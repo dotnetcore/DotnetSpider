@@ -29,7 +29,7 @@ namespace DotnetSpider.Core.Pipeline
 
 		public string GetDataForlder()
 		{
-			return $"{BasePath}{Environment.PathSeperator}{Spider.Identity}{Environment.PathSeperator}";
+			return $"{BasePath}{Env.PathSeperator}{Spider.Identity}{Env.PathSeperator}";
 		}
 
 		public override void Process(params ResultItems[] resultItems)
@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Pipeline
 			{
 				foreach (var resultItem in resultItems)
 				{
-					string filePath = $"{BasePath}{Environment.PathSeperator}{Spider.Identity}{Environment.PathSeperator}{Guid.NewGuid():N}.dsd";
+					string filePath = $"{BasePath}{Env.PathSeperator}{Spider.Identity}{Env.PathSeperator}{Guid.NewGuid():N}.dsd";
 					FileInfo file = PrepareFile(filePath);
 
 					using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))

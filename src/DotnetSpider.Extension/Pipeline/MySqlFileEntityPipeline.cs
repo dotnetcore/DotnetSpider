@@ -36,7 +36,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (string.IsNullOrEmpty(DataFolder))
 			{
-				DataFolder = Path.Combine(Environment.BaseDirectory, spider.Identity, "mysql");
+				DataFolder = Path.Combine(Env.BaseDirectory, spider.Identity, "mysql");
 			}
 		}
 

@@ -59,9 +59,9 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			else
 			{
-				if (Environment.DataConnectionStringSettings != null)
+				if (Env.DataConnectionStringSettings != null)
 				{
-					connectionStringSettings = Environment.DataConnectionStringSettings;
+					connectionStringSettings = Env.DataConnectionStringSettings;
 				}
 				else
 				{

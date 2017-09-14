@@ -51,8 +51,8 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		protected BaseVerification()
 		{
-			EmailHost = Core.Environment.EmailHost;
-			var portStr = Core.Environment.EmailPort;
+			EmailHost = Core.Env.EmailHost;
+			var portStr = Core.Env.EmailPort;
 			if (!string.IsNullOrEmpty(portStr))
 			{
 				if (int.TryParse(portStr, out var port))
@@ -64,9 +64,9 @@ namespace DotnetSpider.Extension.Infrastructure
 					Logger.MyLog($"EmailPort is not a number: {portStr}.", LogLevel.Error);
 				}
 			}
-			EmailAccount = Core.Environment.EmailAccount;
-			EmailPassword = Core.Environment.EmailPassword;
-			EmailDisplayName = Core.Environment.EmailDisplayName;
+			EmailAccount = Core.Env.EmailAccount;
+			EmailPassword = Core.Env.EmailPassword;
+			EmailDisplayName = Core.Env.EmailDisplayName;
 		}
 
 		protected BaseVerification(string emailTo, string subject, string host, int port, string account, string password)
@@ -448,7 +448,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		public override VerificationResult Report()
 		{
 			VerificationResult veridationResult = new VerificationResult();
-			if (Core.Environment.SystemConnectionStringSettings == null)
+			if (Core.Env.SystemConnectionStringSettings == null)
 			{
 				return veridationResult;
 			}
@@ -459,7 +459,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrEmpty(EmailHost))
 			{
-				using (var conn = Core.Environment.DataConnectionStringSettings.GetDbConnection())
+				using (var conn = Core.Env.DataConnectionStringSettings.GetDbConnection())
 				{
 					var emailBody = new StringBuilder();
 					var hasProperties = Properties != null;

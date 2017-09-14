@@ -152,12 +152,12 @@ namespace DotnetSpider.Extension.Model
 					dataObject.Add(field.Name, fieldValue);
 				}
 			}
-			if (EntityDefine.TableInfo != null && EntityDefine.TableInfo.Primary == Core.Environment.IdColumn)
+			if (EntityDefine.TableInfo != null && EntityDefine.TableInfo.Primary == Core.Env.IdColumn)
 			{
-				var id = GetEnviromentValue(Core.Environment.IdColumn, page, index);
+				var id = GetEnviromentValue(Core.Env.IdColumn, page, index);
 				if (!string.IsNullOrEmpty(id))
 				{
-					dataObject.Add(Core.Environment.IdColumn, id);
+					dataObject.Add(Core.Env.IdColumn, id);
 				}
 			}
 

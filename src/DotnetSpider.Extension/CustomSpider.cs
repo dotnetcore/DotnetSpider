@@ -52,7 +52,7 @@ namespace DotnetSpider.Extension
 			{
 				Logger.MyLog(Identity, $"Start: {Name}", LogLevel.Info);
 
-				if (Core.Environment.SystemConnectionStringSettings != null)
+				if (Core.Env.SystemConnectionStringSettings != null)
 				{
 					InsertRunningState();
 
@@ -93,7 +93,7 @@ namespace DotnetSpider.Extension
 
 				Logger.MyLog(Identity, $"Complete: {Name}", LogLevel.Info);
 
-				if (Core.Environment.SystemConnectionStringSettings != null)
+				if (Core.Env.SystemConnectionStringSettings != null)
 				{
 					try
 					{
@@ -121,7 +121,7 @@ namespace DotnetSpider.Extension
 			{
 				Logger.MyLog(Identity, $"Terminated: {Name}: {e}", LogLevel.Error, e);
 
-				if (Core.Environment.SystemConnectionStringSettings != null)
+				if (Core.Env.SystemConnectionStringSettings != null)
 				{
 					try
 					{
@@ -143,7 +143,7 @@ namespace DotnetSpider.Extension
 			}
 			finally
 			{
-				if (Core.Environment.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(TaskId))
+				if (Core.Env.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(TaskId))
 				{
 					RemoveRunningState();
 				}
@@ -161,7 +161,7 @@ namespace DotnetSpider.Extension
 
 		private void InsertRunningState()
 		{
-			using (IDbConnection conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
+			using (IDbConnection conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 			{
 				conn.Execute("CREATE SCHEMA IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8mb4;");
 				conn.Execute("CREATE TABLE IF NOT EXISTS `DotnetSpider`.`TaskRunning` (`__Id` bigint(20) NOT NULL AUTO_INCREMENT, `TaskId` varchar(120) NOT NULL, `Name` varchar(200) NULL, `Identity` varchar(120), `CDate` timestamp NOT NULL, PRIMARY KEY (__Id), UNIQUE KEY `taskId_unique` (`TaskId`)) AUTO_INCREMENT=1");
@@ -171,7 +171,7 @@ namespace DotnetSpider.Extension
 
 		private void RemoveRunningState()
 		{
-			using (IDbConnection conn = Core.Environment.SystemConnectionStringSettings.GetDbConnection())
+			using (IDbConnection conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 			{
 				conn.Execute($"DELETE FROM `DotnetSpider`.`TaskRunning` WHERE `Identity`='{Identity}';");
 			}

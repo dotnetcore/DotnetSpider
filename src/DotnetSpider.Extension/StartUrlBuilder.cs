@@ -32,11 +32,11 @@ namespace DotnetSpider.Extension
 
 		public DbStartUrlBuilder(string sql, string[] formateArguments, params string[] formateStrings)
 		{
-			if (Environment.DataConnectionStringSettings == null)
+			if (Env.DataConnectionStringSettings == null)
 			{
 				throw new SpiderException("DataConnection is unfound in app.config.");
 			}
-			ConnectionStringSettings = Environment.DataConnectionStringSettings;
+			ConnectionStringSettings = Env.DataConnectionStringSettings;
 			Sql = sql;
 			FormateStrings = formateStrings;
 			FormateArguments = formateArguments;

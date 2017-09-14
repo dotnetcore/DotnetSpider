@@ -43,13 +43,13 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					if (string.IsNullOrEmpty(_connectString))
 					{
-						if (null == Core.Environment.DataConnectionStringSettings)
+						if (null == Core.Env.DataConnectionStringSettings)
 						{
 							throw new SpiderException("Default DbConnection unfound.");
 						}
 						else
 						{
-							_connectionStringSettings = CreateConnectionStringSettings(Core.Environment.DataConnectionStringSettings?.ConnectionString);
+							_connectionStringSettings = CreateConnectionStringSettings(Core.Env.DataConnectionStringSettings?.ConnectionString);
 						}
 					}
 					else
@@ -208,7 +208,7 @@ namespace DotnetSpider.Extension.Pipeline
 									selectCmd.CommandType = CommandType.Text;
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data[Core.Environment.IdColumn]);
+										var primaryParameter = CreateDbParameter($"@{Core.Env.IdColumn}", data[Core.Env.IdColumn]);
 										selectCmd.Parameters.Add(primaryParameter);
 									}
 									else
@@ -269,7 +269,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@{Core.Environment.IdColumn}", data[Core.Environment.IdColumn]);
+										var primaryParameter = CreateDbParameter($"@{Core.Env.IdColumn}", data[Core.Env.IdColumn]);
 										primaryParameter.DbType = DbType.String;
 										cmd.Parameters.Add(primaryParameter);
 									}

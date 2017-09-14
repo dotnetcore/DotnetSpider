@@ -71,16 +71,16 @@ namespace DotnetSpider.Extension.Pipeline
 			builder.Append(columnNames.ToString().Substring(1, columnNames.Length - 1));
 			builder.Append(",[CDate] DATETIME DEFAULT(GETDATE())");
 
-			if (Core.Environment.IdColumn.ToLower() == adapter.Table.Primary.ToLower())
+			if (Core.Env.IdColumn.ToLower() == adapter.Table.Primary.ToLower())
 			{
-				builder.Append($", [{Core.Environment.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL");
+				builder.Append($", [{Core.Env.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL");
 			}
 
 			builder.Append(",");
 			StringBuilder primaryKey = new StringBuilder();
 			if (string.IsNullOrEmpty(adapter.Table.Primary))
 			{
-				primaryKey.Append($"[{Core.Environment.IdColumn}] ASC,");
+				primaryKey.Append($"[{Core.Env.IdColumn}] ASC,");
 			}
 			else
 			{
@@ -225,9 +225,9 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			else
 			{
-				if (Core.Environment.DataConnectionStringSettings != null)
+				if (Core.Env.DataConnectionStringSettings != null)
 				{
-					connectionStringSettings = Core.Environment.DataConnectionStringSettings;
+					connectionStringSettings = Core.Env.DataConnectionStringSettings;
 				}
 				else
 				{

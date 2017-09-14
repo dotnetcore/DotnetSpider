@@ -40,7 +40,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public RedisScheduler()
 		{
-			ConnectString = Environment.RedisConnectString;
+			ConnectString = Env.RedisConnectString;
 			DuplicateRemover = this;
 		}
 

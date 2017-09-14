@@ -28,7 +28,7 @@ namespace DotnetSpider.Core.Downloader
 
 		protected BaseDownloader()
 		{
-			DownloadFolder = Path.Combine(Environment.BaseDirectory, "download");
+			DownloadFolder = Path.Combine(Env.BaseDirectory, "download");
 		}
 
 		public Page Download(Request request, ISpider spider)
@@ -94,8 +94,8 @@ namespace DotnetSpider.Core.Downloader
 
 		protected Page SaveFile(Request request, HttpResponseMessage response, ISpider spider)
 		{
-			var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Environment.PathSeperator);
-			string filePath = $"{DownloadFolder}{Environment.PathSeperator}{spider.Identity}{intervalPath}";
+			var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Env.PathSeperator);
+			string filePath = $"{DownloadFolder}{Env.PathSeperator}{spider.Identity}{intervalPath}";
 			if (!File.Exists(filePath))
 			{
 				try

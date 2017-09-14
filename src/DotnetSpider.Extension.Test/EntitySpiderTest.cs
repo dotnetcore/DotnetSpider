@@ -157,7 +157,7 @@ namespace DotnetSpider.Extension.Test
 			var guid = Guid.NewGuid().ToString();
 			BaiduSearchSpider spider = new BaiduSearchSpider(guid);
 			spider.Run();
-			using (var conn = Core.Environment.DataConnectionStringSettings.GetDbConnection())
+			using (var conn = Core.Env.DataConnectionStringSettings.GetDbConnection())
 			{
 				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{guid}'");
 				Assert.Equal(20, count);

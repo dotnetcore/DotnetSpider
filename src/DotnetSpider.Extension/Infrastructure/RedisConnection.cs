@@ -8,9 +8,9 @@ namespace DotnetSpider.Extension.Infrastructure
 		private static readonly Lazy<RedisConnection> MyInstance = new Lazy<RedisConnection>(() =>
 		{
 			RedisConnection conn = null;
-			if (!string.IsNullOrEmpty(Core.Environment.RedisConnectString))
+			if (!string.IsNullOrEmpty(Core.Env.RedisConnectString))
 			{
-				conn = new RedisConnection(Core.Environment.RedisConnectString);
+				conn = new RedisConnection(Core.Env.RedisConnectString);
 			}
 			return conn;
 		});

@@ -76,7 +76,7 @@ namespace DotnetSpider.Extension
 		protected override IPipeline GetDefaultPipeline()
 		{
 			IPipeline pipeline;
-			switch (Core.Environment.DataConnectionStringSettings.ProviderName)
+			switch (Core.Env.DataConnectionStringSettings.ProviderName)
 			{
 				case "Npgsql":
 					{
@@ -95,7 +95,7 @@ namespace DotnetSpider.Extension
 					}
 				case "MongoDB":
 					{
-						pipeline = new MongoDbEntityPipeline(Core.Environment.DataConnectionString);
+						pipeline = new MongoDbEntityPipeline(Core.Env.DataConnectionString);
 						break;
 					}
 				default:

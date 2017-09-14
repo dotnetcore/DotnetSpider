@@ -198,7 +198,7 @@ namespace DotnetSpider.Core
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine();
 
-			Environment.PrintLine();
+			//Environment.PrintLine('=');
 
 			return spiderTypes;
 		}
@@ -286,12 +286,12 @@ namespace DotnetSpider.Core
 		private static void PrintEnviroment(params string[] args)
 		{
 			Console.WriteLine("");
-			Spider.PrintInfo();
+			Core.Env.PrintInfo();
 			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			var commands = string.Join(" ", args);
 			Console.WriteLine($"Args:           {commands}");
-			Console.WriteLine($"BaseDirectory:  {Environment.BaseDirectory}");
+			Console.WriteLine($"BaseDirectory:  {Env.BaseDirectory}");
 			Console.WriteLine($"System:         {System.Environment.OSVersion} {(System.Environment.Is64BitOperatingSystem ? "X64" : "X86")}");
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine("");

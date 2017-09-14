@@ -226,7 +226,7 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 3. -a: Pass arguments to spider's Run method.
 4. -tid: Set task id.
 5. -n: Set name.
-6. -e: Set enviroment, for example you want to run with a customize config: -e:CONFIG=app.my.config.
+6. -e: Set enviroment, for example you want to run with a customize config: -e:CONFIG=app.my.config,DBCONFIG=GLOBAL
 
 #### WebDriver Support
 

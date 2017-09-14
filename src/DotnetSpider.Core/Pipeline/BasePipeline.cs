@@ -37,12 +37,12 @@ namespace DotnetSpider.Core.Pipeline
 
 		protected void SetPath(string path)
 		{
-			if (!path.EndsWith(Environment.PathSeperator))
+			if (!path.EndsWith(Env.PathSeperator))
 			{
-				path += Environment.PathSeperator;
+				path += Env.PathSeperator;
 			}
 
-			BasePath = Path.Combine(Environment.BaseDirectory, path);
+			BasePath = Path.Combine(Env.BaseDirectory, path);
 		}
 
 		private static string CheckAndMakeParentDirecotry(string fullName)

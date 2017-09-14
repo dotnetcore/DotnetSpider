@@ -8,9 +8,15 @@ using System.Text;
 
 namespace DotnetSpider.Core
 {
-	public static class Environment
+	//
+	// Summary:
+	//     Provides information about, and means to manipulate, the current environment
+	//     and platform. This class cannot be inherited.
+	public static class Env
 	{
-		public const string Version = "2.0.17-beta4";
+		private static readonly object Locker = new object();
+
+		public const string Version = "2.0.18-beta2";
 		public const string RedisConnectStringKey = "redisConnectString";
 		public const string EmailHostKey = "emailHost";
 		public const string EmailPortKey = "emailPort";
@@ -102,7 +108,35 @@ namespace DotnetSpider.Core
 			Console.WriteLine(builder.ToString());
 		}
 
-		static Environment()
+		public static void PrintInfo()
+		{
+			lock (Locker)
+			{
+				var key = "_DotnetSpider_Info";
+
+				var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
+
+				if (!isPrinted)
+				{
+					Console.ForegroundColor = ConsoleColor.Green;
+					Console.WriteLine("=================================================================");
+					Console.WriteLine("== DotnetSpider is an open source crawler developed by C#      ==");
+					Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
+					Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
+					Console.WriteLine("== License: LGPL3.0                                            ==");
+					Console.WriteLine("== Author: zlzforever@163.com                                  ==");
+					Console.WriteLine("=================================================================");
+					Console.ForegroundColor = ConsoleColor.White;
+
+					AppDomain.CurrentDomain.SetData(key, "True");
+
+					Console.WriteLine();
+					PrintLine('=');
+				}
+			}
+		}
+
+		static Env()
 		{
 			Reload();
 		}

@@ -49,12 +49,12 @@ namespace DotnetSpider.Extension.Infrastructure
 
 						row++;
 					}
-					var folder = Path.Combine(Core.Environment.GlobalDirectory, "excels");
+					var folder = Path.Combine(Core.Env.GlobalDirectory, "excels");
 					if (!Directory.Exists(folder))
 					{
 						Directory.CreateDirectory(folder);
 					}
-					var path = Path.Combine(Core.Environment.GlobalDirectory, "excels", $"{fileName}.xlsx");
+					var path = Path.Combine(Core.Env.GlobalDirectory, "excels", $"{fileName}.xlsx");
 					if (File.Exists(path) && rewrite)
 					{
 						File.Delete(path);
@@ -71,12 +71,12 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, string emailTo)
 		{
-			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), Core.Environment.EmailHost, int.Parse(Core.Environment.EmailPort), Core.Environment.EmailAccount, Core.Environment.EmailPassword, Core.Environment.EmailDisplayName);
+			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), Core.Env.EmailHost, int.Parse(Core.Env.EmailPort), Core.Env.EmailAccount, Core.Env.EmailPassword, Core.Env.EmailDisplayName);
 		}
 
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, List<string> emailTo)
 		{
-			EmailTo(conn, sql, fileName, subject, emailTo, Core.Environment.EmailHost, int.Parse(Core.Environment.EmailPort), Core.Environment.EmailAccount, Core.Environment.EmailPassword, Core.Environment.EmailDisplayName);
+			EmailTo(conn, sql, fileName, subject, emailTo, Core.Env.EmailHost, int.Parse(Core.Env.EmailPort), Core.Env.EmailAccount, Core.Env.EmailPassword, Core.Env.EmailDisplayName);
 		}
 
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, string emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")

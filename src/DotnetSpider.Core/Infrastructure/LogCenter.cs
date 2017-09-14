@@ -22,9 +22,9 @@ namespace DotnetSpider.Core.Infrastructure
 		public static void InitLogCenter()
 		{
 #if !NET_CORE
-			string nlogConfigPath = Path.Combine(Environment.BaseDirectory, "nlog.net45.config");
+			string nlogConfigPath = Path.Combine(Env.BaseDirectory, "nlog.net45.config");
 #else
-			string nlogConfigPath = Path.Combine(Environment.BaseDirectory, "nlog.config");
+			string nlogConfigPath = Path.Combine(Env.BaseDirectory, "nlog.config");
 #endif
 			if (!File.Exists(nlogConfigPath))
 			{
@@ -32,7 +32,7 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 			XmlLoggingConfiguration configuration = new XmlLoggingConfiguration(nlogConfigPath);
 
-			if (Environment.SystemConnectionStringSettings == null)
+			if (Env.SystemConnectionStringSettings == null)
 			{
 				var needDeleteRules = configuration.LoggingRules.Where(r => r.Targets.Any(t => t is DatabaseTarget && ((DatabaseTarget)t).ConnectionString == null)).ToList();
 				foreach (var rule in needDeleteRules)
@@ -47,7 +47,7 @@ namespace DotnetSpider.Core.Infrastructure
 				if (dblog != null)
 				{
 					DatabaseTarget dbTarget = (DatabaseTarget)dblog;
-					dbTarget.ConnectionString = Environment.SystemConnectionStringSettings.ConnectionString;
+					dbTarget.ConnectionString = Env.SystemConnectionStringSettings.ConnectionString;
 				}
 			}
 
