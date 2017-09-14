@@ -9,7 +9,7 @@ namespace DotnetSpider.Extension.Downloader
 	/// <summary>
 	/// Save download content to database.
 	/// </summary>
-	internal class StorageCache : AfterDownloadCompleteHandler
+	public class StorageCache : AfterDownloadCompleteHandler
 	{
 		private readonly BaseEntityDbPipeline _pipeline;
 		private readonly ISpider _spider;
@@ -22,6 +22,7 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				throw new SpiderException("Can not get StorageCache's pipeline.");
 			}
+			_pipeline.AddEntity(EntityDefine.Parse<CrawlCache>());
 			_pipeline.InitPipeline(spider);
 
 			_spider = spider;
@@ -36,7 +37,7 @@ namespace DotnetSpider.Extension.Downloader
 			cache.Add("Url", page.Url);
 			cache.Add("Content", page.Content);
 
-			_pipeline.Process(typeof(Cache).FullName, new List<DataObject>
+			_pipeline.Process(typeof(CrawlCache).FullName, new List<DataObject>
 			{
 				cache
 			});

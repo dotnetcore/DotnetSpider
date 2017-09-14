@@ -1,11 +1,11 @@
 ﻿using DotnetSpider.Core.Selector;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using System;
 
-namespace DotnetSpider.Extension.Model
+namespace DotnetSpider.Extension.Downloader
 {
-	[EntityTable("crawler_cache", "cache", EntityTable.Today, Indexs = new[] { "Url", "Identity", "TaskId", "Name" })]
-	internal class Cache : SpiderEntity
+	[EntityTable("crawl_cache", "cache", EntityTable.Today, Indexs = new[] { "Url", "Identity", "TaskId", "Name" })]
+	public class CrawlCache : SpiderEntity
 	{
 		[PropertyDefine(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
 		public string Identity { get; set; }
@@ -21,8 +21,5 @@ namespace DotnetSpider.Extension.Model
 
 		[PropertyDefine(Expression = "", Type = SelectorType.Enviroment)]
 		public string Content { get; set; }
-
-		[PropertyDefine(Expression = "", Type = SelectorType.Enviroment)]
-		public DateTime CDate { get; set; }
 	}
 }
