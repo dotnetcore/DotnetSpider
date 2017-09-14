@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections;
+﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Processor;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Model.Formatter;
-using Dapper;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Extension.Processor;
-using DotnetSpider.Extension.Pipeline;
-using NLog;
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension
 {
@@ -75,36 +69,7 @@ namespace DotnetSpider.Extension
 
 		protected override IPipeline GetDefaultPipeline()
 		{
-			IPipeline pipeline;
-			switch (Core.Env.DataConnectionStringSettings.ProviderName)
-			{
-				case "Npgsql":
-					{
-						pipeline = new PostgreSqlEntityPipeline();
-						break;
-					}
-				case "MySql.Data.MySqlClient":
-					{
-						pipeline = new MySqlEntityPipeline();
-						break;
-					}
-				case "System.Data.SqlClient":
-					{
-						pipeline = new SqlServerEntityPipeline();
-						break;
-					}
-				case "MongoDB":
-					{
-						pipeline = new MongoDbEntityPipeline(Core.Env.DataConnectionString);
-						break;
-					}
-				default:
-					{
-						pipeline = new NullPipeline();
-						break;
-					}
-			}
-			return pipeline;
+			return BaseEntityDbPipeline.GetPipelineFromAppConfig();
 		}
 
 		protected override void PreInitComponent(params string[] arguments)

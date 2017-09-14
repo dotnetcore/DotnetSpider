@@ -1,31 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core.Infrastructure;
+using System.Xml.XPath;
 using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Proxy;
-using DotnetSpider.Core.Scheduler;
-using System.Linq;
-using System.Collections.ObjectModel;
-using System.Xml.XPath;
-using NLog;
 using DotnetSpider.Core.Redial;
+using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
+using NLog;
 
 namespace DotnetSpider.Core
 {
 	/// <summary>
 	/// A spider contains four modules: Downloader, Scheduler, PageProcessor and Pipeline. 
 	/// </summary>
-	public class Spider : ISpider, ISpeedMonitor, INamed, ITask
+	public class Spider : ISpider, ISpeedMonitor
 	{
 		private static readonly object Locker = new object();
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
@@ -880,7 +880,7 @@ namespace DotnetSpider.Core
 		{
 			lock (Locker)
 			{
-				File.AppendAllText(_errorRequestFile.FullName, $"{request}{System.Environment.NewLine}", Encoding.UTF8);
+				File.AppendAllText(_errorRequestFile.FullName, $"{request}{Environment.NewLine}", Encoding.UTF8);
 			}
 			Scheduler.IncreaseErrorCount();
 		}

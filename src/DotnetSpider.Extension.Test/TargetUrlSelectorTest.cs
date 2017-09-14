@@ -3,7 +3,6 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Processor;
 using System;
-using System.Reflection;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test

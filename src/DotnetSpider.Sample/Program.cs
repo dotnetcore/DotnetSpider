@@ -1,24 +1,9 @@
-﻿using Dapper;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Infrastructure.Database;
-using DotnetSpider.Extension.Infrastructure;
-using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using DotnetSpider.Core;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Security.Cryptography;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 #endif
 
 namespace DotnetSpider.Sample

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading;
 
 namespace DotnetSpider.Core.Scheduler.Component
 {

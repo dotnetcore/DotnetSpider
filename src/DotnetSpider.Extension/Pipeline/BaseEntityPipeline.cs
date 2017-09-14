@@ -12,7 +12,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected ConcurrentDictionary<string, EntityDefine> Entities => _entities;
 
-		public abstract void Process(string entityName, List<DataObject> items);
+		public abstract void Process(string entityName, List<DataObject> datas);
 
 		public virtual void AddEntity(EntityDefine entityDefine)
 		{

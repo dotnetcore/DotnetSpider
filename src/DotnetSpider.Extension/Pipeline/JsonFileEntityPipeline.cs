@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			lock (_locker)
 			{
-				DataFolder = Path.Combine(Core.Env.BaseDirectory, spider.Identity, "entityJson");
+				DataFolder = Path.Combine(Env.BaseDirectory, spider.Identity, "entityJson");
 			}
 		}
 

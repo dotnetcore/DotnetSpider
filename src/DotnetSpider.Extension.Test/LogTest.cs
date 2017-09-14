@@ -24,9 +24,9 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{
-			if (File.Exists(Core.Env.GlobalAppConfigPath))
+			if (File.Exists(Env.GlobalAppConfigPath))
 			{
-				File.Delete(Core.Env.GlobalAppConfigPath);
+				File.Delete(Env.GlobalAppConfigPath);
 			}
 			AppDomain.CurrentDomain.SetData("CONFIG", "");
 			AppDomain.CurrentDomain.SetData("DBCONFIG", "");
@@ -50,7 +50,7 @@ namespace DotnetSpider.Extension.Test
 				spider.Run();
 			}
 			Thread.Sleep(3000);
-			using (var conn = (Core.Env.SystemConnectionStringSettings.GetDbConnection()))
+			using (var conn = (Env.SystemConnectionStringSettings.GetDbConnection()))
 			{
 				Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM dotnetspider.log where identity='{id}'").Last().message);
 				Assert.Equal($"1{id}", $"{conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count}{id}");

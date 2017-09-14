@@ -14,6 +14,7 @@ using DotnetSpider.Core.Redial;
 using DotnetSpider.Extension.Infrastructure;
 using System.Configuration;
 using DotnetSpider.Core.Infrastructure.Database;
+using DotnetSpider.Core.Pipeline;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -43,13 +44,13 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					if (string.IsNullOrEmpty(_connectString))
 					{
-						if (null == Core.Env.DataConnectionStringSettings)
+						if (null == Env.DataConnectionStringSettings)
 						{
 							throw new SpiderException("Default DbConnection unfound.");
 						}
 						else
 						{
-							_connectionStringSettings = CreateConnectionStringSettings(Core.Env.DataConnectionStringSettings?.ConnectionString);
+							_connectionStringSettings = CreateConnectionStringSettings(Env.DataConnectionStringSettings?.ConnectionString);
 						}
 					}
 					else
@@ -167,6 +168,10 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void Process(string entityName, List<DataObject> datas)
 		{
+			if (datas == null || datas.Count == 0)
+			{
+				return;
+			}
 			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
 				NetworkCenter.Current.Execute("pp", () =>
@@ -208,7 +213,7 @@ namespace DotnetSpider.Extension.Pipeline
 									selectCmd.CommandType = CommandType.Text;
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@{Core.Env.IdColumn}", data[Core.Env.IdColumn]);
+										var primaryParameter = CreateDbParameter($"@{Env.IdColumn}", data[Env.IdColumn]);
 										selectCmd.Parameters.Add(primaryParameter);
 									}
 									else
@@ -269,7 +274,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 									if (string.IsNullOrEmpty(metadata.Table.Primary))
 									{
-										var primaryParameter = CreateDbParameter($"@{Core.Env.IdColumn}", data[Core.Env.IdColumn]);
+										var primaryParameter = CreateDbParameter($"@{Env.IdColumn}", data[Env.IdColumn]);
 										primaryParameter.DbType = DbType.String;
 										cmd.Parameters.Add(primaryParameter);
 									}
@@ -289,6 +294,40 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				});
 			}
+		}
+
+		public static IPipeline GetPipelineFromAppConfig()
+		{
+			IPipeline pipeline;
+			switch (Env.DataConnectionStringSettings.ProviderName)
+			{
+				case "Npgsql":
+					{
+						pipeline = new PostgreSqlEntityPipeline();
+						break;
+					}
+				case "MySql.Data.MySqlClient":
+					{
+						pipeline = new MySqlEntityPipeline();
+						break;
+					}
+				case "System.Data.SqlClient":
+					{
+						pipeline = new SqlServerEntityPipeline();
+						break;
+					}
+				case "MongoDB":
+					{
+						pipeline = new MongoDbEntityPipeline(Env.DataConnectionString);
+						break;
+					}
+				default:
+					{
+						pipeline = new NullPipeline();
+						break;
+					}
+			}
+			return pipeline;
 		}
 
 		/// <summary>

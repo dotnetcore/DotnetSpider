@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using System;
 using System.Configuration;
 using System.IO;
-using System.Text;
 
 namespace DotnetSpider.Core
 {
@@ -14,7 +13,7 @@ namespace DotnetSpider.Core
 	//     and platform. This class cannot be inherited.
 	public static class Env
 	{
-		public const string Version = "2.0.18-beta7";
+		public const string Version = "2.0.18-beta9";
 		public const string RedisConnectStringKey = "redisConnectString";
 		public const string EmailHostKey = "emailHost";
 		public const string EmailPortKey = "emailPort";

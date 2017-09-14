@@ -13,7 +13,6 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using Xunit;
 
@@ -430,7 +429,7 @@ namespace DotnetSpider.Extension.Test
 		public void MySqlFileEntityPipeline_InsertSql()
 		{
 			var id = Guid.NewGuid().ToString("N");
-			var folder = Path.Combine(Core.Env.BaseDirectory, id);
+			var folder = Path.Combine(Env.BaseDirectory, id);
 			var path = Path.Combine(folder, "mysql", "baidu.baidu_search_mysql_file.sql");
 			try
 			{
@@ -440,7 +439,7 @@ namespace DotnetSpider.Extension.Test
 
 				var lines = File.ReadAllLines(path);
 				Assert.Equal(20, lines.Length);
-				using (var conn = new MySqlConnection(Core.Env.DataConnectionStringSettings.ConnectionString))
+				using (var conn = new MySqlConnection(Env.DataConnectionStringSettings.ConnectionString))
 				{
 					conn.Execute("DELETE FROM baidu.baidu_search_mysql_file");
 					foreach (var sql in lines)
@@ -473,7 +472,7 @@ namespace DotnetSpider.Extension.Test
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				AddEntityType(typeof(BaiduSearchEntry));
-				AddPipeline(new MySqlEntityPipeline(Core.Env.DataConnectionStringSettings.ConnectionString));
+				AddPipeline(new MySqlEntityPipeline(Env.DataConnectionStringSettings.ConnectionString));
 				AddPipeline(new MySqlFileEntityPipeline(MySqlFileEntityPipeline.FileType.InsertSql));
 			}
 
@@ -588,7 +587,7 @@ namespace DotnetSpider.Extension.Test
 				Assert.Equal("Double", columns[5].Name);
 				Assert.Equal("String1", columns[6].Name);
 				Assert.Equal("CDate", columns[7].Name);
-				Assert.Equal(Core.Env.IdColumn, columns[8].Name);
+				Assert.Equal(Env.IdColumn, columns[8].Name);
 
 				Assert.Equal("int(11)", columns[0].Type);
 				Assert.Equal("bigint(20)", columns[1].Type);
@@ -640,7 +639,7 @@ namespace DotnetSpider.Extension.Test
 				Assert.Equal("Float", columns[3].Name);
 				Assert.Equal("Double", columns[4].Name);
 				Assert.Equal("BigInt", columns[5].Name);
-				Assert.Equal(Core.Env.IdColumn, columns[6].Name);
+				Assert.Equal(Env.IdColumn, columns[6].Name);
 				Assert.Equal("String", columns[7].Name);
 				Assert.Equal("String1", columns[8].Name);
 

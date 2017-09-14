@@ -4,7 +4,6 @@ using DotnetSpider.Extension.Processor;
 using Xunit;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using DotnetSpider.Core;
 using System.IO;
 

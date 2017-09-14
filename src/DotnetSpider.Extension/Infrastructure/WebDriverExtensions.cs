@@ -120,7 +120,7 @@ namespace DotnetSpider.Extension.Infrastructure
 					e = new FirefoxDriver(profile);
 					break;
 				case Browser.Chrome:
-					ChromeDriverService cds = ChromeDriverService.CreateDefaultService(Core.Env.BaseDirectory);
+					ChromeDriverService cds = ChromeDriverService.CreateDefaultService(Env.BaseDirectory);
 					cds.HideCommandPromptWindow = true;
 					ChromeOptions opt = new ChromeOptions();
 					if (!option.LoadImage)

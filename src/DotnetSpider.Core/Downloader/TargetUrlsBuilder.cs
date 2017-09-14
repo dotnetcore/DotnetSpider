@@ -1,11 +1,7 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Selector;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Downloader
 {

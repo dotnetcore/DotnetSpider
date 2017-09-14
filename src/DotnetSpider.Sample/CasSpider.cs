@@ -2,7 +2,6 @@
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 
