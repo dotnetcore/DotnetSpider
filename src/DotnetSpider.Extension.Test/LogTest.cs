@@ -9,6 +9,7 @@ using Xunit;
 using System;
 using System.Linq;
 using System.Threading;
+using System.IO;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -23,6 +24,13 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{
+			if (File.Exists(Core.Env.GlobalAppConfigPath))
+			{
+				File.Delete(Core.Env.GlobalAppConfigPath);
+			}
+			AppDomain.CurrentDomain.SetData("CONFIG", "");
+			AppDomain.CurrentDomain.SetData("DBCONFIG", "");
+			Env.Reload();
 			string id = Guid.NewGuid().ToString("N");
 			string taskGroup = Guid.NewGuid().ToString("N");
 			string userId = Guid.NewGuid().ToString("N");

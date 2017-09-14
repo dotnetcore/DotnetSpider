@@ -14,7 +14,7 @@ namespace DotnetSpider.Core
 	//     and platform. This class cannot be inherited.
 	public static class Env
 	{
-		public const string Version = "2.0.18-beta5";
+		public const string Version = "2.0.18-beta7";
 		public const string RedisConnectStringKey = "redisConnectString";
 		public const string EmailHostKey = "emailHost";
 		public const string EmailPortKey = "emailPort";
@@ -78,15 +78,22 @@ namespace DotnetSpider.Core
 
 			if ("GLOBAL" == AppDomain.CurrentDomain.GetData(EnvDbConfig)?.ToString().ToUpper())
 			{
-				var globalFileMap = new ExeConfigurationFileMap
+				if (File.Exists(GlobalAppConfigPath))
 				{
-					ExeConfigFilename = GlobalAppConfigPath
-				};
+					var globalFileMap = new ExeConfigurationFileMap
+					{
+						ExeConfigFilename = GlobalAppConfigPath
+					};
 
-				GlobalConfiguraiton = ConfigurationManager.OpenMappedExeConfiguration(globalFileMap, ConfigurationUserLevel.None);
+					GlobalConfiguraiton = ConfigurationManager.OpenMappedExeConfiguration(globalFileMap, ConfigurationUserLevel.None);
 
-				SystemConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
-				DataConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+					SystemConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
+					DataConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+				}
+				else
+				{
+					throw new SpiderException("Global app.config unfound.");
+				}
 			}
 			else
 			{
