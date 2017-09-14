@@ -14,9 +14,7 @@ namespace DotnetSpider.Core
 	//     and platform. This class cannot be inherited.
 	public static class Env
 	{
-		private static readonly object Locker = new object();
-
-		public const string Version = "2.0.18-beta2";
+		public const string Version = "2.0.18-beta3";
 		public const string RedisConnectStringKey = "redisConnectString";
 		public const string EmailHostKey = "emailHost";
 		public const string EmailPortKey = "emailPort";
@@ -94,45 +92,6 @@ namespace DotnetSpider.Core
 			{
 				SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 				DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
-			}
-		}
-
-		public static void PrintLine(char word = '=')
-		{
-			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i < Console.WindowWidth; ++i)
-			{
-				builder.Append(word);
-			}
-
-			Console.WriteLine(builder.ToString());
-		}
-
-		public static void PrintInfo()
-		{
-			lock (Locker)
-			{
-				var key = "_DotnetSpider_Info";
-
-				var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
-
-				if (!isPrinted)
-				{
-					Console.ForegroundColor = ConsoleColor.Green;
-					Console.WriteLine("=================================================================");
-					Console.WriteLine("== DotnetSpider is an open source crawler developed by C#      ==");
-					Console.WriteLine("== It's multi thread, light weight, stable and high performce  ==");
-					Console.WriteLine("== Support storage data to file, mysql, mssql, mongodb etc     ==");
-					Console.WriteLine("== License: LGPL3.0                                            ==");
-					Console.WriteLine("== Author: zlzforever@163.com                                  ==");
-					Console.WriteLine("=================================================================");
-					Console.ForegroundColor = ConsoleColor.White;
-
-					AppDomain.CurrentDomain.SetData(key, "True");
-
-					Console.WriteLine();
-					PrintLine('=');
-				}
 			}
 		}
 

@@ -72,6 +72,8 @@ namespace DotnetSpider.Core
 						AppDomain.CurrentDomain.SetData(datas[0], datas[1]);
 					}
 				}
+
+				Env.Reload();
 			}
 		}
 
@@ -286,7 +288,7 @@ namespace DotnetSpider.Core
 		private static void PrintEnviroment(params string[] args)
 		{
 			Console.WriteLine("");
-			Core.Env.PrintInfo();
+			PrintInfo.Print();
 			Console.WriteLine("");
 			Console.ForegroundColor = ConsoleColor.Cyan;
 			var commands = string.Join(" ", args);

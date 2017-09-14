@@ -780,7 +780,7 @@ namespace DotnetSpider.Core
 
 		protected virtual void InitComponent(params string[] arguments)
 		{
-			Env.PrintInfo();
+			PrintInfo.Print();
 
 			if (_init)
 			{
