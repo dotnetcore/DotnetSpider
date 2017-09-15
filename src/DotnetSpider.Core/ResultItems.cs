@@ -28,7 +28,7 @@ namespace DotnetSpider.Core
 		/// Whether to skip the result. 
 		/// Result which is skipped will not be processed by Pipeline.
 		/// </summary>
-		public bool IsSkip { get; set; }
+		public bool IsEmpty => _fields.Count == 0;
 
 		public dynamic GetResultItem(string key)
 		{

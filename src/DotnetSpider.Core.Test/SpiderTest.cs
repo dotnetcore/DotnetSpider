@@ -133,7 +133,7 @@ namespace DotnetSpider.Core.Test
 		{
 			protected override void Handle(Page page)
 			{
-				page.SkipRequest = true;
+				page.Skip = true;
 			}
 		}
 
@@ -143,7 +143,6 @@ namespace DotnetSpider.Core.Test
 			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
 			spider.AddStartUrl("http://taobao.com");
-			spider.RetryWhenResultIsEmpty = true;
 			spider.Run();
 
 			Assert.Equal(Status.Finished, spider.Stat);

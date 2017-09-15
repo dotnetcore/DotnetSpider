@@ -60,7 +60,8 @@ namespace DotnetSpider.Core.Downloader
 
 			HttpResponseMessage response = null;
 			var proxy = site.GetHttpProxy();
-			request.PutExtra(Request.Proxy, proxy);
+			request.Proxy = proxy;
+
 			try
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, site);
@@ -93,7 +94,7 @@ namespace DotnetSpider.Core.Downloader
 					if (!site.DownloadFiles)
 					{
 						Logger.MyLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
-						return new Page(request, null) { SkipRequest = true };
+						return new Page(request, null) { Skip = true };
 					}
 					else
 					{
@@ -142,7 +143,7 @@ namespace DotnetSpider.Core.Downloader
 				Page page = new Page(request, null)
 				{
 					Exception = e,
-					SkipRequest = true
+					Skip = true
 				};
 
 				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {e.Message}.", LogLevel.Error, e);

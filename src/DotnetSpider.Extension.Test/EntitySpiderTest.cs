@@ -243,12 +243,11 @@ namespace DotnetSpider.Extension.Test
 			{
 				Identity = Guid.NewGuid().ToString();
 				ThreadNum = 1;
-				RetryWhenResultIsEmpty = false;
 				Deep = 100;
 				EmptySleepTime = 5000;
 				ExitWhenComplete = true;
 				CachedSize = 1;
-				SkipWhenResultIsEmpty = true;
+				SkipWhenResultIsEmpty = false;
 				SpawnUrl = true;
 				AddPipeline(new CollectEntityPipeline());
 				AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");

@@ -80,17 +80,7 @@ namespace DotnetSpider.Core.Scheduler
 
 		private bool ShouldReserved(Request request)
 		{
-			var shouldReserved = false;
-			var cycleTriedTimes = request.GetExtra(Request.CycleTriedTimes);
-			var resultEmptyTriedTimes = request.GetExtra(Request.ResultIsEmptyTriedTimes);
-
-			shouldReserved = (cycleTriedTimes != null && cycleTriedTimes > 0 && cycleTriedTimes <= Spider.Site.CycleRetryTimes) || (resultEmptyTriedTimes != null && resultEmptyTriedTimes > 0 && resultEmptyTriedTimes <= Spider.Site.CycleRetryTimes);
-
-			if (shouldReserved)
-			{
-				Console.WriteLine($"Identity: {request.Identity}, Url: {request.Url}, CycleTriedTimes: {cycleTriedTimes}, ResultEmptyTriedTimes: {resultEmptyTriedTimes}.");
-			}
-			return shouldReserved;
+			return request.CycleTriedTimes.Value > 0 && request.CycleTriedTimes.Value <= Spider.Site.CycleRetryTimes;
 		}
 
 		private void DoPush(Request request)

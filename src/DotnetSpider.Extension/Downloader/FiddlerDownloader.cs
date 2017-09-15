@@ -109,7 +109,7 @@ namespace DotnetSpider.Extension.Downloader
 					page.TargetUrl = _webDriver.Url;
 					page.Title = _webDriver.Title;
 					// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
-					request.PutExtra(Request.CycleTriedTimes, null);
+					//request.PutExtra(Request.CycleTriedTimes, null);
 
 					return page;
 				}

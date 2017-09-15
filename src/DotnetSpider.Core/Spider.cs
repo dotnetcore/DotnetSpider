@@ -47,8 +47,7 @@ namespace DotnetSpider.Core
 		private int _threadNum = 1;
 		private int _deep = int.MaxValue;
 		private bool _spawnUrl = true;
-		private bool _skipWhenResultIsEmpty;
-		private bool _retryWhenResultIsEmpty;
+		private bool _skipWhenResultIsEmpty = true;
 		private bool _exitWhenComplete = true;
 		private int _emptySleepTime = 15000;
 		private int _cachedSize = 1;
@@ -235,16 +234,6 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public bool RetryWhenResultIsEmpty
-		{
-			get => _retryWhenResultIsEmpty;
-			set
-			{
-				CheckIfRunning();
-				_retryWhenResultIsEmpty = value;
-			}
-		}
-
 		public ReadOnlyCollection<IPageProcessor> ReadOnlyPageProcessors => PageProcessors.AsReadOnly();
 
 		public ReadOnlyCollection<IPipeline> ReadOnlyPipelines => Pipelines.AsReadOnly();
@@ -277,56 +266,25 @@ namespace DotnetSpider.Core
 			return new Spider(site, Guid.NewGuid().ToString("N"), scheduler, pageProcessors);
 		}
 
-		public static Page AddToCycleRetry(Request request, Site site, bool resultIsEmpty = false)
+		public static Page AddToCycleRetry(Request request, Site site)
 		{
 			Page page = new Page(request, null)
 			{
 				ContentType = site.ContentType
 			};
 
-			if (!resultIsEmpty)
+			request.CycleTriedTimes.Inc();
+
+			if (request.CycleTriedTimes.Value <= site.CycleRetryTimes)
 			{
-				dynamic cycleTriedTimesObject = request.GetExtra(Request.CycleTriedTimes);
-				if (cycleTriedTimesObject == null)
-				{
-					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, 1), false);
-				}
-				else
-				{
-					int cycleTriedTimes = (int)cycleTriedTimesObject;
-					cycleTriedTimes++;
-					if (cycleTriedTimes > site.CycleRetryTimes)
-					{
-						return null;
-					}
-					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.CycleTriedTimes, cycleTriedTimes), false);
-				}
+				request.Priority = 0;
+				page.AddTargetRequest(request, false);
 				page.Retry = true;
 				return page;
 			}
 			else
 			{
-				dynamic cycleTriedTimesObject = request.GetExtra(Request.ResultIsEmptyTriedTimes);
-				if (cycleTriedTimesObject == null)
-				{
-					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, 1), false);
-				}
-				else
-				{
-					int cycleTriedTimes = (int)cycleTriedTimesObject;
-					cycleTriedTimes++;
-					if (cycleTriedTimes > site.CycleRetryTimes)
-					{
-						return null;
-					}
-					request.Priority = 0;
-					page.AddTargetRequest(request.PutExtra(Request.ResultIsEmptyTriedTimes, cycleTriedTimes), false);
-				}
-				page.Retry = true;
-				return page;
+				return null;
 			}
 		}
 
@@ -586,11 +544,10 @@ namespace DotnetSpider.Core
 								}
 								finally
 								{
-									if (request.GetExtra(Request.Proxy) != null)
+									if (request.Proxy != null)
 									{
 										var statusCode = request.StatusCode;
-										Site.ReturnHttpProxy(request.GetExtra(Request.Proxy) as UseSpecifiedUriWebProxy,
-											statusCode ?? HttpStatusCode.Found);
+										Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
 									}
 								}
 
@@ -905,7 +862,7 @@ namespace DotnetSpider.Core
 				sw.Stop();
 				CalculateDownloadSpeed(sw.ElapsedMilliseconds);
 
-				if (page == null || page.SkipRequest)
+				if (page == null || page.Skip)
 				{
 					return;
 				}
@@ -933,24 +890,6 @@ namespace DotnetSpider.Core
 				if (page != null) OnError(page.Request);
 				Logger.MyLog(Identity, $"Should not catch download exception: {request.Url}.", LogLevel.Error, de);
 			}
-			catch (XPathException xe)
-			{
-				if (Site.CycleRetryTimes > 0)
-				{
-					page = AddToCycleRetry(request, Site);
-				}
-				if (page != null) OnError(page.Request);
-				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, selector: {xe.Message}, maybe you should set SelectorType to Json.", LogLevel.Error, xe);
-			}
-			catch (JsonReaderException je)
-			{
-				if (Site.CycleRetryTimes > 0)
-				{
-					page = AddToCycleRetry(request, Site);
-				}
-				if (page != null) OnError(page.Request);
-				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, selector: {je.Message}, maybe you should set SelectorType to XPATH.", LogLevel.Error, je);
-			}
 			catch (Exception e)
 			{
 				if (Site.CycleRetryTimes > 0)
@@ -973,8 +912,26 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			if (!page.SkipTargetUrls && !(SkipWhenResultIsEmpty && page.ResultItems.IsSkip))
+
+			if (!page.SkipTargetUrls)
 			{
+				if (!SkipWhenResultIsEmpty && page.ResultItems.IsEmpty)
+				{
+					if (Site.CycleRetryTimes > 0)
+					{
+						page = AddToCycleRetry(request, Site);
+						if (page != null && page.Retry)
+						{
+							RetriedTimes.Inc();
+							ExtractAndAddRequests(page, true);
+						}
+						Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0, retry.", LogLevel.Warn);
+					}
+					else
+					{
+						Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0.", LogLevel.Warn);
+					}
+				}
 				ExtractAndAddRequests(page, SpawnUrl);
 			}
 
@@ -983,7 +940,7 @@ namespace DotnetSpider.Core
 				sw.Reset();
 				sw.Start();
 
-				if (!page.ResultItems.IsSkip)
+				if (!page.ResultItems.IsEmpty)
 				{
 					if (CachedSize == 1)
 					{
@@ -1013,30 +970,6 @@ namespace DotnetSpider.Core
 						}
 					}
 					Logger.MyLog(Identity, $"Crawl: {request.Url} success.", LogLevel.Info);
-				}
-				else
-				{
-					if (RetryWhenResultIsEmpty)
-					{
-						if (Site.CycleRetryTimes > 0)
-						{
-							page = AddToCycleRetry(request, Site, true);
-							if (page != null && page.Retry)
-							{
-								RetriedTimes.Inc();
-								ExtractAndAddRequests(page, true);
-							}
-							Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0, retry.", LogLevel.Warn);
-						}
-						else
-						{
-							Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0.", LogLevel.Warn);
-						}
-					}
-					else
-					{
-						Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0.", LogLevel.Warn);
-					}
 				}
 
 				sw.Stop();

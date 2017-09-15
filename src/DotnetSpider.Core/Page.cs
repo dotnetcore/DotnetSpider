@@ -11,8 +11,6 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Page
 	{
-		public const string Images = "580c9065-0f44-47e9-94ea-b172d5a730c0";
-
 		private readonly object _locker = new object();
 		private Selectable _selectable;
 		private string _content;
@@ -60,11 +58,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Skip current page.
 		/// </summary>
-		public bool SkipRequest
-		{
-			get => ResultItems.IsSkip;
-			set => ResultItems.IsSkip = value;
-		}
+		public bool Skip { get; set; }
 
 		public ResultItems ResultItems { get; } = new ResultItems();
 

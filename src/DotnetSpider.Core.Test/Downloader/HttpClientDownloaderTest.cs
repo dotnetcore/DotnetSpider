@@ -101,6 +101,7 @@ namespace DotnetSpider.Core.Test.Downloader
 					new QueueDuplicateRemovedScheduler(),
 					new TestPageProcessor());
 			spider.AddPipeline(new ConsolePipeline());
+			spider.SkipWhenResultIsEmpty = false;
 			spider.AddStartUrl("http://www.mlr.gov.cn/xwdt/jrxw/201707/t20170710_15242382.htm");
 			spider.Run();
 			Assert.Equal(5, spider.RetriedTimes.Value);

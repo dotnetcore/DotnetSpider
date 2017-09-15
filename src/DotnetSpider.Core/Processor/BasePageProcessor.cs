@@ -44,8 +44,6 @@ namespace DotnetSpider.Core.Processor
 
 			Handle(page);
 
-			page.ResultItems.IsSkip = page.ResultItems.Results.Count == 0;
-
 			if (!page.SkipExtractTargetUrls)
 			{
 				ExtractUrls(page);

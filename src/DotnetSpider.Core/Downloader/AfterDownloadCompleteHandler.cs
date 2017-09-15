@@ -62,7 +62,7 @@ namespace DotnetSpider.Core.Downloader
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			page.SkipRequest = !string.IsNullOrEmpty(page?.Content) && page.Content.Contains(Content);
+			page.Skip = !string.IsNullOrEmpty(page?.Content) && page.Content.Contains(Content);
 		}
 	}
 

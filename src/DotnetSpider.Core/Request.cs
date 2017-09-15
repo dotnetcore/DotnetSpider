@@ -4,6 +4,7 @@ using DotnetSpider.Core.Infrastructure;
 using System.Net;
 using Newtonsoft.Json;
 using System.Net.Http;
+using DotnetSpider.Core.Proxy;
 
 namespace DotnetSpider.Core
 {
@@ -15,12 +16,11 @@ namespace DotnetSpider.Core
 	{
 		private readonly object _locker = new object();
 
-		public const string CycleTriedTimes = "983009aebaee467b92cd44188da2b021";
-		public const string StatusCodeKey = "02d71099b89749dda18055345fe9abfc";
-		public const string Proxy = "6f09c4d6167a427282088a59bebdfe33";
-		public const string ResultIsEmptyTriedTimes = "BA2788B8FC484B11861D524B5FB21582";
+		public UseSpecifiedUriWebProxy Proxy { get; set; }
 
 		public int Depth { get; internal set; } = 1;
+
+		public AtomicInteger CycleTriedTimes { get; set; } = new AtomicInteger(0);
 
 		public int NextDepth => Depth + 1;
 
@@ -52,22 +52,7 @@ namespace DotnetSpider.Core
 
 		public string Identity => Encrypt.Md5Encrypt(Url + PostBody);
 
-		public HttpStatusCode? StatusCode
-		{
-			get
-			{
-				var code = GetExtra(StatusCodeKey);
-				if (code == null)
-				{
-					return null;
-				}
-				else
-				{
-					return (HttpStatusCode)code;
-				}
-			}
-			set => PutExtra(StatusCodeKey, value);
-		}
+		public HttpStatusCode? StatusCode { get; set; }
 
 		public Request()
 		{
@@ -209,7 +194,10 @@ namespace DotnetSpider.Core
 					Referer = Referer,
 					PostBody = PostBody,
 					Origin = Origin,
-					Depth = Depth
+					Depth = Depth,
+					CycleTriedTimes = CycleTriedTimes,
+					Proxy = Proxy,
+					StatusCode = StatusCode
 				};
 				return newObj;
 			}
