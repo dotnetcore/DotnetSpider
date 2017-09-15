@@ -1,6 +1,7 @@
 using DotnetSpider.Core.Scheduler.Component;
 using System.Collections.Generic;
 using DotnetSpider.Core.Redial;
+using System;
 
 namespace DotnetSpider.Core.Scheduler
 {
@@ -79,16 +80,17 @@ namespace DotnetSpider.Core.Scheduler
 
 		private bool ShouldReserved(Request request)
 		{
+			var shouldReserved = false;
 			var cycleTriedTimes = request.GetExtra(Request.CycleTriedTimes);
 			var resultEmptyTriedTimes = request.GetExtra(Request.ResultIsEmptyTriedTimes);
-			if (cycleTriedTimes == null && resultEmptyTriedTimes == null)
+
+			shouldReserved = (cycleTriedTimes != null && cycleTriedTimes > 0 && cycleTriedTimes <= Spider.Site.CycleRetryTimes) || (resultEmptyTriedTimes != null && resultEmptyTriedTimes > 0 && resultEmptyTriedTimes <= Spider.Site.CycleRetryTimes);
+
+			if (shouldReserved)
 			{
-				return false;
+				Console.WriteLine($"Identity: {request.Identity}, Url: {request.Url}, CycleTriedTimes: {cycleTriedTimes}, ResultEmptyTriedTimes: {resultEmptyTriedTimes}.");
 			}
-			else
-			{
-				return (cycleTriedTimes != null && cycleTriedTimes > 0 && cycleTriedTimes < Spider.Site.CycleRetryTimes) || (resultEmptyTriedTimes != null && resultEmptyTriedTimes > 0 && resultEmptyTriedTimes < Spider.Site.CycleRetryTimes);
-			}
+			return shouldReserved;
 		}
 
 		private void DoPush(Request request)
