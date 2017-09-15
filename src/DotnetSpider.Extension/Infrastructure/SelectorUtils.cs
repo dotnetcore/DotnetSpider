@@ -58,7 +58,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 			else
 			{
-				throw new SpiderException("Selector shold not be null.");
+				throw new SpiderException("Selector shold not be null");
 			}
 		}
 
