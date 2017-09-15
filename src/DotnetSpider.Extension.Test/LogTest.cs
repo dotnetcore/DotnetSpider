@@ -52,9 +52,9 @@ namespace DotnetSpider.Extension.Test
 			Thread.Sleep(3000);
 			using (var conn = (Env.SystemConnectionStringSettings.GetDbConnection()))
 			{
-				Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM dotnetspider.log where identity='{id}'").Last().message);
-				Assert.Equal($"1{id}", $"{conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count}{id}");
-				Assert.Equal("Finished", conn.Query<statusObj>($"SELECT * FROM dotnetspider.status where identity='{id}'").First().status);
+				Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM DotnetSpider.Log where Identity='{id}'").Last().message);
+				Assert.Equal($"1{id}", $"{conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM DotnetSpider.Status where Identity='{id}'").First().Count}{id}");
+				Assert.Equal("Finished", conn.Query<statusObj>($"SELECT * FROM DotnetSpider.Status where Identity='{id}'").First().status);
 			}
 		}
 
