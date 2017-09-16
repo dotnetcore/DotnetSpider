@@ -29,6 +29,7 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _identityMd5;
 
 		public string ConnectString { get; }
+		public int BatchCount { get; set; } = 1000;
 		public override bool IsNetworkScheduler => true;
 		public RedisConnection RedisConnection { get; private set; }
 
@@ -194,7 +195,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			lock (_locker)
 			{
-				int batchCount = 10000;
+				int batchCount = BatchCount;
 				int cacheSize = requests.Count > batchCount ? batchCount : requests.Count;
 				RedisValue[] identities = new RedisValue[cacheSize];
 				HashEntry[] items = new HashEntry[cacheSize];
