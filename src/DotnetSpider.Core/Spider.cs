@@ -273,9 +273,9 @@ namespace DotnetSpider.Core
 				ContentType = site.ContentType
 			};
 
-			request.CycleTriedTimes.Inc();
+			request.CycleTriedTimes++;
 
-			if (request.CycleTriedTimes.Value <= site.CycleRetryTimes)
+			if (request.CycleTriedTimes <= site.CycleRetryTimes)
 			{
 				request.Priority = 0;
 				page.AddTargetRequest(request, false);
@@ -915,24 +915,42 @@ namespace DotnetSpider.Core
 
 			if (!page.SkipTargetUrls)
 			{
-				if (!SkipWhenResultIsEmpty && page.ResultItems.IsEmpty)
+				if (page.ResultItems.IsEmpty)
 				{
-					if (Site.CycleRetryTimes > 0)
+					if (SkipWhenResultIsEmpty)
 					{
-						page = AddToCycleRetry(request, Site);
-						if (page != null && page.Retry)
-						{
-							RetriedTimes.Inc();
-							ExtractAndAddRequests(page, true);
-						}
-						Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0, retry.", LogLevel.Warn);
+						Logger.MyLog(Identity, $"Skip: {request.Url} because the extract results is null.", LogLevel.Warn);
+						return;
 					}
 					else
 					{
-						Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0.", LogLevel.Warn);
+						if (Site.CycleRetryTimes > 0)
+						{
+							page = AddToCycleRetry(request, Site);
+							if (page != null && page.Retry)
+							{
+								RetriedTimes.Inc();
+								ExtractAndAddRequests(page, true);
+							}
+							Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0, retry.", LogLevel.Warn);
+							return;
+						}
+						else
+						{
+							Logger.MyLog(Identity, $"Download: {request.Url}, extract 0, without retry because cycleRetryTimes is 0.", LogLevel.Warn);
+							return;
+						}
 					}
 				}
-				ExtractAndAddRequests(page, SpawnUrl);
+				else
+				{
+					ExtractAndAddRequests(page, SpawnUrl);
+				}
+			}
+			else
+			{
+				Logger.MyLog(Identity, $"Skip: {request.Url}.", LogLevel.Warn);
+				return;
 			}
 
 			if (page.Exception == null)

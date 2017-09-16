@@ -20,7 +20,7 @@ namespace DotnetSpider.Core
 
 		public int Depth { get; internal set; } = 1;
 
-		public AtomicInteger CycleTriedTimes { get; set; } = new AtomicInteger(0);
+		public int CycleTriedTimes { get; set; } = 0;
 
 		public int NextDepth => Depth + 1;
 

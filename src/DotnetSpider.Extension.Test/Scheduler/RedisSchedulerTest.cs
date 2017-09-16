@@ -9,7 +9,7 @@ using DotnetSpider.Core.Processor;
 
 namespace DotnetSpider.Extension.Test.Scheduler
 {
-	
+
 	public class RedisSchedulerTest
 	{
 		private Extension.Scheduler.RedisScheduler GetRedisScheduler()
@@ -254,12 +254,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			var scheduler = new QueueDuplicateRemovedScheduler();
 
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMTMyMTkzNTY1Mg==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMjkzNzMwMDMyOA==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMjcwNDg0NDI3Mg==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMTMwNzQwMTcwMA==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMjk1MzI0Mzk4NA==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMjkzNzY0NzkyOA==.html?spm=a2h1n.8251845.0.0");
+			site.AddStartUrl("http://www.baidu.com");
 			site.AddStartUrl("http://www.cnblogs.com/");
 
 			Spider spider = Spider.Create(site,
@@ -278,13 +273,13 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
 			spider.Deep = 3;
-
+			spider.EmptySleepTime = 3000;
 			// start crawler 启动爬虫
 			spider.Run();
 
 			Assert.Equal(5, spider.RetriedTimes.Value);
 			Assert.Equal(0, scheduler.LeftRequestsCount);
-			Assert.Equal(6, scheduler.SuccessRequestsCount);
+			Assert.Equal(0, scheduler.SuccessRequestsCount);
 			// 重试次数应该包含
 			Assert.Equal(5, scheduler.ErrorRequestsCount);
 		}

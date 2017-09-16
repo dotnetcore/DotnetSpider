@@ -80,7 +80,7 @@ namespace DotnetSpider.Core.Scheduler
 
 		private bool ShouldReserved(Request request)
 		{
-			return request.CycleTriedTimes.Value > 0 && request.CycleTriedTimes.Value <= Spider.Site.CycleRetryTimes;
+			return request.CycleTriedTimes > 0 && request.CycleTriedTimes <= Spider.Site.CycleRetryTimes;
 		}
 
 		private void DoPush(Request request)
