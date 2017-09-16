@@ -971,6 +971,10 @@ namespace DotnetSpider.Core
 					}
 					Logger.MyLog(Identity, $"Crawl: {request.Url} success.", LogLevel.Info);
 				}
+				else
+				{
+					Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0.", LogLevel.Warn);
+				}
 
 				sw.Stop();
 				CalculatePipelineSpeed(sw.ElapsedMilliseconds);
