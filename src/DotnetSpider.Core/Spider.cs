@@ -744,7 +744,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			Logger.MyLog(Identity, "Build crawler...", LogLevel.Info);
+			Logger.MyLog(Identity, "Build internal component...", LogLevel.Info);
 
 			if (Pipelines == null || Pipelines.Count == 0)
 			{

@@ -37,6 +37,8 @@ namespace DotnetSpider.Extension
 
 		public override void Run(params string[] arguments)
 		{
+			Logger.MyLog(Identity, "Build custom component...", LogLevel.Info);
+
 			MyInit(arguments);
 
 			if (string.IsNullOrEmpty(Identity) || Identity.Length > 120)
