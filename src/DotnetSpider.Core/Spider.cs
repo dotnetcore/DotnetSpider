@@ -897,7 +897,7 @@ namespace DotnetSpider.Core
 					page = AddToCycleRetry(request, Site);
 				}
 				if (page != null) OnError(page.Request);
-				Logger.MyLog(Identity, $"Extract data failed: {request.Url}, please check your extractor: {e.Message}.", LogLevel.Error, e);
+				Logger.MyLog(Identity, $"Extract {request.Url} failed, please check your extractor: {e.Message}.", LogLevel.Error, e);
 			}
 
 			if (page == null)
@@ -912,15 +912,14 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-
+			bool excutePipeline = false;
 			if (!page.SkipTargetUrls)
 			{
 				if (page.ResultItems.IsEmpty)
 				{
 					if (SkipWhenResultIsEmpty)
 					{
-						Logger.MyLog(Identity, $"Skip: {request.Url} because the extract results is null.", LogLevel.Warn);
-						return;
+						Logger.MyLog(Identity, $"Skip {request.Url} because extract 0 result.", LogLevel.Warn);
 					}
 					else
 					{
@@ -932,24 +931,27 @@ namespace DotnetSpider.Core
 								RetriedTimes.Inc();
 								ExtractAndAddRequests(page, true);
 							}
-							Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0, retry.", LogLevel.Warn);
-							return;
+							Logger.MyLog(Identity, $"Download {request.Url} success, retry becuase extract 0 result.", LogLevel.Warn);
 						}
 						else
 						{
-							Logger.MyLog(Identity, $"Download: {request.Url}, extract 0, without retry because cycleRetryTimes is 0.", LogLevel.Warn);
-							return;
+							Logger.MyLog(Identity, $"Download {request.Url} success, will not retry because Site.CycleRetryTimes is 0.", LogLevel.Warn);
 						}
 					}
 				}
 				else
 				{
+					excutePipeline = true;
 					ExtractAndAddRequests(page, SpawnUrl);
 				}
 			}
 			else
 			{
-				Logger.MyLog(Identity, $"Skip: {request.Url}.", LogLevel.Warn);
+				Logger.MyLog(Identity, $"Skip {request.Url}.", LogLevel.Warn);
+			}
+
+			if (!excutePipeline)
+			{
 				return;
 			}
 
@@ -958,46 +960,39 @@ namespace DotnetSpider.Core
 				sw.Reset();
 				sw.Start();
 
-				if (!page.ResultItems.IsEmpty)
+				if (CachedSize == 1)
 				{
-					if (CachedSize == 1)
+					foreach (IPipeline pipeline in Pipelines)
 					{
-						foreach (IPipeline pipeline in Pipelines)
+						RetryExecutor.Execute(PipelineRetryTimes, () =>
 						{
-							RetryExecutor.Execute(PipelineRetryTimes, () =>
-							{
-								pipeline.Process(page.ResultItems);
-							});
-						}
+							pipeline.Process(page.ResultItems);
+						});
 					}
-					else
-					{
-						lock (Locker)
-						{
-							_cached.Add(page.ResultItems);
-
-							if (_cached.Count >= CachedSize)
-							{
-								var items = _cached.ToArray();
-								_cached.Clear();
-								foreach (IPipeline pipeline in Pipelines)
-								{
-									pipeline.Process(items);
-								}
-							}
-						}
-					}
-					Logger.MyLog(Identity, $"Crawl: {request.Url} success.", LogLevel.Info);
 				}
 				else
 				{
-					Logger.MyLog(Identity, $"Download: {request.Url} success, extract 0.", LogLevel.Warn);
+					lock (Locker)
+					{
+						_cached.Add(page.ResultItems);
+
+						if (_cached.Count >= CachedSize)
+						{
+							var items = _cached.ToArray();
+							_cached.Clear();
+							foreach (IPipeline pipeline in Pipelines)
+							{
+								pipeline.Process(items);
+							}
+						}
+					}
 				}
+
+				_OnSuccess(request);
+				Logger.MyLog(Identity, $"Crawl: {request.Url} success.", LogLevel.Info);
 
 				sw.Stop();
 				CalculatePipelineSpeed(sw.ElapsedMilliseconds);
-
-				_OnSuccess(request);
 			}
 		}
 
