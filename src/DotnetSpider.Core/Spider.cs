@@ -920,6 +920,7 @@ namespace DotnetSpider.Core
 					if (SkipWhenResultIsEmpty)
 					{
 						Logger.MyLog(Identity, $"Skip {request.Url} because extract 0 result.", LogLevel.Warn);
+						_OnSuccess(request);
 					}
 					else
 					{
@@ -936,6 +937,7 @@ namespace DotnetSpider.Core
 						else
 						{
 							Logger.MyLog(Identity, $"Download {request.Url} success, will not retry because Site.CycleRetryTimes is 0.", LogLevel.Warn);
+							_OnSuccess(request);
 						}
 					}
 				}
@@ -947,7 +949,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				Logger.MyLog(Identity, $"Skip {request.Url}.", LogLevel.Warn);
+				excutePipeline = true;
 			}
 
 			if (!excutePipeline)

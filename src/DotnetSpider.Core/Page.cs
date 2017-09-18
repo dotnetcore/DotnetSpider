@@ -51,12 +51,12 @@ namespace DotnetSpider.Core
 		public bool SkipExtractTargetUrls { get; set; }
 
 		/// <summary>
-		/// Skip all target urls, will not add to scheduler.
+		/// Skip all target urls, still will execute pipeline.
 		/// </summary>
 		public bool SkipTargetUrls { get; set; }
 
 		/// <summary>
-		/// Skip current page.
+		/// Skip current page, will not execute pipeline.
 		/// </summary>
 		public bool Skip { get; set; }
 

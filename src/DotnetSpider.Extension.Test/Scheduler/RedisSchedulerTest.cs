@@ -279,7 +279,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			Assert.Equal(5, spider.RetriedTimes.Value);
 			Assert.Equal(0, scheduler.LeftRequestsCount);
-			Assert.Equal(0, scheduler.SuccessRequestsCount);
+			Assert.Equal(1, scheduler.SuccessRequestsCount);
 			// 重试次数应该包含
 			Assert.Equal(5, scheduler.ErrorRequestsCount);
 		}

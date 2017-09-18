@@ -47,7 +47,7 @@ namespace DotnetSpider.Core.Test.Processor
 
 			Assert.Equal(5, spider.RetriedTimes.Value);
 			Assert.Equal(0, scheduler.LeftRequestsCount);
-			Assert.Equal(0, scheduler.SuccessRequestsCount);
+			Assert.Equal(6, scheduler.SuccessRequestsCount);
 			Assert.Equal(5, scheduler.ErrorRequestsCount);
 		}
 
