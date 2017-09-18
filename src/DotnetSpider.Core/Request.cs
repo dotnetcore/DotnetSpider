@@ -18,13 +18,13 @@ namespace DotnetSpider.Core
 
 		public UseSpecifiedUriWebProxy Proxy { get; set; }
 
-		public int Depth { get; internal set; } = 1;
+		public int Depth { get; set; } = 1;
 
 		public int CycleTriedTimes { get; set; } = 0;
 
 		public int NextDepth => Depth + 1;
 
-		public bool IsAvailable { get; } = true;
+		public bool IsAvailable { get; set; } = true;
 
 		public string Referer { get; set; }
 

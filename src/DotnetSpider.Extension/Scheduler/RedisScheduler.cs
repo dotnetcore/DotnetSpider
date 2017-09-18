@@ -288,27 +288,27 @@ namespace DotnetSpider.Extension.Scheduler
 
 		#region For Test
 
-		public string GetQueueKey()
+		internal string GetQueueKey()
 		{
 			return _queueKey;
 		}
 
-		public string GetSetKey()
+		internal string GetSetKey()
 		{
 			return _setKey;
 		}
 
-		public string GetItemKey()
+		internal string GetItemKey()
 		{
 			return _itemKey;
 		}
 
-		public string GetErrorCountKey()
+		internal string GetErrorCountKey()
 		{
 			return _errorCountKey;
 		}
 
-		public string GetSuccessCountKey()
+		internal string GetSuccessCountKey()
 		{
 			return _successCountKey;
 		}

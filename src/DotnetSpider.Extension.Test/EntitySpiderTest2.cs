@@ -533,7 +533,7 @@ namespace DotnetSpider.Extension.Test
 			context.AddEntityType(typeof(Entity12));
 			context.Run("running-test");
 
-			var entityPipelines = context.ReadOnlyPipelines;
+			var entityPipelines = context.GetPipelines();
 
 			Assert.Equal(4, entityPipelines.Count);
 

@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/zlzforever/DotnetSpider</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <tags>DotnetSpider;crawler;cross platform;dotnet core</tags>
-    <description>Offical package. DotnetSpider is a high performance, light weight cralwer developed by C#.</description>
+    <description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp; scraping framework for .NET</description>
     <dependencies>
       <group targetFramework=".NETStandard2.0">
         <dependency id="Autofac" version="4.6.1"/>

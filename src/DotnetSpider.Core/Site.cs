@@ -7,7 +7,7 @@ using DotnetSpider.Core.Downloader;
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// Object contains setting for crawler.
+	/// Object contains setting for spider.
 	/// </summary>
 	public class Site
 	{
@@ -25,7 +25,7 @@ namespace DotnetSpider.Core
 		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 
 		/// <summary>
-		/// 配置采集的是Json还是Html
+		/// 配置采集的是Json还是Html, 如果是Auto则会自动检测下载的内容。
 		/// </summary>
 		public ContentType ContentType { get; set; } = ContentType.Auto;
 
@@ -42,7 +42,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 设置全局Cookie
 		/// </summary>
-		public Cookies Cookies { get; set; } 
+		public Cookies Cookies { get; set; }
 
 		/// <summary>
 		/// 设置 User Agent
@@ -76,6 +76,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// 使用何种编码读取下载流。
+		/// </summary>
 		public Encoding Encoding => _encoding;
 
 		/// <summary>
@@ -91,7 +94,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public HashSet<HttpStatusCode> AcceptStatCode { get; set; } = new HashSet<HttpStatusCode> { HttpStatusCode.OK };
 
-		public List<Request> StartRequests { get; } = new List<Request>();
+		public readonly List<Request> StartRequests = new List<Request>();
 
 		/// <summary>
 		/// Set the interval between the processing of two pages. 

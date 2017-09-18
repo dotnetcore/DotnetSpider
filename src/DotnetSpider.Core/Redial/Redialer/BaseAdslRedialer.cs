@@ -4,9 +4,9 @@
 	{
 		public abstract void Redial();
 
-		public string Interface { get; }
-		public string Account { get; }
-		public string Password { get; }
+		public string Interface { get; protected set; }
+		public string Account { get; protected set; }
+		public string Password { get; protected set; }
 
 		protected BaseAdslRedialer(string interfaceName, string account, string password)
 		{

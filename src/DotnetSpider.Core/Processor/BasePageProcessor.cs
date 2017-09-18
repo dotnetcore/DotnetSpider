@@ -55,7 +55,7 @@ namespace DotnetSpider.Core.Processor
 		/// </summary>
 		/// <param name="regionXpath"></param>
 		/// <returns></returns>
-		public virtual List<Regex> GetTargetUrlPatterns(string regionXpath)
+		internal virtual List<Regex> GetTargetUrlPatterns(string regionXpath)
 		{
 			ISelector selector = Selectors.Default();
 			if (!string.IsNullOrWhiteSpace(regionXpath))
@@ -71,8 +71,7 @@ namespace DotnetSpider.Core.Processor
 		/// </summary>
 		/// <param name="region"></param>
 		/// <returns></returns>
-		[Obsolete]
-		public virtual bool ContainsTargetUrlRegion(string region)
+		internal virtual bool ContainsTargetUrlRegion(string region)
 		{
 			ISelector selector = Selectors.Default();
 			if (!string.IsNullOrWhiteSpace(region))

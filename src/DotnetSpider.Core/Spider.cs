@@ -29,7 +29,6 @@ namespace DotnetSpider.Core
 	{
 		private static readonly object Locker = new object();
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
-
 		private readonly Site _site;
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
 		private IDownloader _downloader = new HttpClientDownloader();
@@ -37,7 +36,6 @@ namespace DotnetSpider.Core
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
 		private readonly List<ResultItems> _cached = new List<ResultItems>();
-		private readonly List<IStartUrlBuilder> _startUrlBuilders = new List<IStartUrlBuilder>();
 		private int _waitCountLimit = 1500;
 		private bool _init;
 		private FileInfo _errorRequestFile;
@@ -46,22 +44,40 @@ namespace DotnetSpider.Core
 		private readonly object _avgPipelineTimeLocker = new object();
 		private int _threadNum = 1;
 		private int _deep = int.MaxValue;
-		private bool _spawnUrl = true;
 		private bool _skipWhenResultIsEmpty = true;
 		private bool _exitWhenComplete = true;
 		private int _emptySleepTime = 15000;
 		private int _cachedSize = 1;
 		private string _identity;
 
+		/// <summary>
+		/// Storage all processors for spider.
+		/// </summary>
 		protected readonly List<IPageProcessor> PageProcessors = new List<IPageProcessor>();
+
+		/// <summary>
+		/// Storage all pipelines for spider.
+		/// </summary>
 		protected List<IPipeline> Pipelines = new List<IPipeline>();
 
+		/// <summary>
+		/// start time of spider.
+		/// </summary>
 		protected DateTime StartTime { get; private set; }
 
+		/// <summary>
+		/// end time of spider.
+		/// </summary>
 		protected DateTime EndTime { get; private set; } = DateTime.MinValue;
 
+		/// <summary>
+		/// Interval time wait for new url.
+		/// </summary>
 		protected int WaitInterval { get; } = 10;
 
+		/// <summary>
+		/// Identity of spider.
+		/// </summary>
 		public string Identity
 		{
 			get => _identity;
@@ -78,37 +94,91 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Name of spider.
+		/// </summary>
 		public string Name { get; set; }
 
+		/// <summary>
+		/// Site of spider.
+		/// </summary>
 		public Site Site => _site;
 
+		/// <summary>
+		/// Whether spider is complete.
+		/// </summary>
 		public bool IsComplete { get; private set; }
 
+		/// <summary>
+		/// Record how many times retried.
+		/// </summary>
 		public AutomicLong RetriedTimes { get; } = new AutomicLong();
 
+		/// <summary>
+		/// Status of spider.
+		/// </summary>
 		public Status Stat { get; private set; } = Status.Init;
 
+		/// <summary>
+		/// Event of crawler a request success.
+		/// </summary>
 		public event Action<Request> OnSuccess;
+
+		/// <summary>
+		/// Event of crawler on closing.
+		/// </summary>
 		public event Action<Spider> OnClosing;
+
+		/// <summary>
+		/// Event of crawler on comoplete.
+		/// </summary>
 		public event Action<Spider> OnComplete;
+
+		/// <summary>
+		/// Event of crawler on closed.
+		/// </summary>
 		public event Action<Spider> OnClosed;
 
+		/// <summary>
+		/// Whether clear scheduler after spider completed.
+		/// </summary>
 		public bool ClearSchedulerAfterComplete { get; set; } = true;
 
+		/// <summary>
+		/// Monitor of spider.
+		/// </summary>
 		public IMonitor Monitor { get; set; }
 
+		/// <summary>
+		/// TaskId of spider.
+		/// </summary>
 		public string TaskId { get; set; }
 
+		/// <summary>
+		/// Average speed downloader.
+		/// </summary>
 		public long AvgDownloadSpeed { get; private set; }
 
+		/// <summary>
+		/// Average speed processor.
+		/// </summary>
 		public long AvgProcessorSpeed { get; private set; }
 
+		/// <summary>
+		/// Average speed pipeline.
+		/// </summary>
 		public long AvgPipelineSpeed { get; private set; }
 
 		public int StatusReportInterval { get; set; } = 5000;
 
+		/// <summary>
+		/// Set the retry times for pipeline.
+		/// </summary>
 		public int PipelineRetryTimes { get; set; } = 1;
 
+		/// <summary>
+		/// Scheduler of spider.
+		/// </summary>
 		public IScheduler Scheduler
 		{
 			get => _scheduler;
@@ -119,6 +189,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// The number of request pipeline handled every time.
+		/// </summary>
 		public int CachedSize
 		{
 			get => _cachedSize;
@@ -129,6 +202,14 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Start url builders of spider.
+		/// </summary>
+		public readonly List<IStartUrlBuilder> StartUrlBuilders = new List<IStartUrlBuilder>();
+
+		/// <summary>
+		/// Interface used to adsl redial.
+		/// </summary>
 		public IRedialExecutor RedialExecutor
 		{
 			get => NetworkCenter.Current.Executor;
@@ -139,6 +220,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Downloader of spider.
+		/// </summary>
 		public IDownloader Downloader
 		{
 			get => _downloader;
@@ -149,6 +233,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Interface to inject cookie.
+		/// </summary>
 		public ICookieInjector CookieInjector
 		{
 			get => _cookieInjector;
@@ -159,6 +246,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Spider will exit if there is no any other request after waitting this time.
+		/// </summary>
 		public int EmptySleepTime
 		{
 			get => _emptySleepTime;
@@ -178,6 +268,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Whether exit spider after complete.
+		/// </summary>
 		public bool ExitWhenComplete
 		{
 			get => _exitWhenComplete;
@@ -188,6 +281,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Thread number of spider.
+		/// </summary>
 		public int ThreadNum
 		{
 			get => _threadNum;
@@ -204,6 +300,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// How deep spider will crawl.
+		/// </summary>
 		public int Deep
 		{
 			get => _deep;
@@ -214,16 +313,10 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public bool SpawnUrl
-		{
-			get => _spawnUrl;
-			set
-			{
-				CheckIfRunning();
-				_spawnUrl = value;
-			}
-		}
-
+		/// <summary>
+		/// Whether skip request when results of processor.
+		/// When results of processor is empty will retry request if this value is false.
+		/// </summary>
 		public bool SkipWhenResultIsEmpty
 		{
 			get => _skipWhenResultIsEmpty;
@@ -234,16 +327,13 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public ReadOnlyCollection<IPageProcessor> ReadOnlyPageProcessors => PageProcessors.AsReadOnly();
-
-		public ReadOnlyCollection<IPipeline> ReadOnlyPipelines => Pipelines.AsReadOnly();
-
-		public ReadOnlyCollection<IStartUrlBuilder> StartUrlBuilders => _startUrlBuilders.AsReadOnly();
-
+		/// <summary>
+		/// Monitor to get success count, error count, speed info etc.
+		/// </summary>
 		public IMonitorable Monitorable => Scheduler;
 
 		/// <summary>
-		/// Create a spider with pageProcessor.
+		/// Create a spider with pageProcessors.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="pageProcessors"></param>
@@ -255,7 +345,7 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Create a spider with pageProcessor and scheduler
+		/// Create a spider with pageProcessors and scheduler.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="pageProcessors"></param>
@@ -289,7 +379,7 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Create a spider with pageProcessor and scheduler
+		/// Create a spider with pageProcessors and scheduler.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="identify"></param>
@@ -310,15 +400,19 @@ namespace DotnetSpider.Core
 #endif
 		}
 
+		/// <summary>
+		/// Add start url builder to spider.
+		/// </summary>
+		/// <param name="builder"></param>
+		/// <returns></returns>
 		public Spider AddStartUrlBuilder(IStartUrlBuilder builder)
 		{
-			_startUrlBuilders.Add(builder);
+			StartUrlBuilders.Add(builder);
 			return this;
 		}
 
 		/// <summary>
-		/// Set startUrls of Spider. 
-		/// Prior to startUrls of Site.
+		/// Add startUrls to spider. 
 		/// </summary>
 		/// <param name="startUrls"></param>
 		/// <returns></returns>
@@ -330,8 +424,7 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Set startUrls of Spider. 
-		/// Prior to startUrls of Site.
+		/// Add start requests to spider. 
 		/// </summary>
 		/// <param name="startRequests"></param>
 		/// <returns></returns>
@@ -357,10 +450,10 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Add urls to crawl.
+		/// Add urls to spider.
 		/// </summary>
 		/// <param name="url"></param>
-		/// <param name="extras"></param>
+		/// <param name="extras">Extra properties of request.</param>
 		/// <returns></returns>
 		public Spider AddStartUrl(string url, Dictionary<string, dynamic> extras)
 		{
@@ -368,6 +461,11 @@ namespace DotnetSpider.Core
 			return this;
 		}
 
+		/// <summary>
+		/// Add start urls to spider.
+		/// </summary>
+		/// <param name="urls"></param>
+		/// <returns></returns>
 		public Spider AddStartUrl(ICollection<string> urls)
 		{
 			foreach (string url in urls)
@@ -405,6 +503,11 @@ namespace DotnetSpider.Core
 			return this;
 		}
 
+		/// <summary>
+		/// Add page processors to spider.
+		/// </summary>
+		/// <param name="processors"></param>
+		/// <returns></returns>
 		public virtual Spider AddPageProcessor(params IPageProcessor[] processors)
 		{
 			if (processors != null && processors.Length > 0)
@@ -433,9 +536,13 @@ namespace DotnetSpider.Core
 			return this;
 		}
 
+		/// <summary>
+		/// Used for testing.
+		/// </summary>
+		/// <returns>All pipelines of spider.</returns>
 		public IList<IPipeline> GetPipelines()
 		{
-			return ReadOnlyPipelines;
+			return Pipelines.AsReadOnly();
 		}
 
 		/// <summary>
@@ -448,6 +555,10 @@ namespace DotnetSpider.Core
 			return this;
 		}
 
+		/// <summary>
+		/// Run spider.
+		/// </summary>
+		/// <param name="arguments"></param>
 		public virtual void Run(params string[] arguments)
 		{
 			if (Stat == Status.Running)
@@ -534,7 +645,7 @@ namespace DotnetSpider.Core
 								try
 								{
 									Stopwatch sw = new Stopwatch();
-									ProcessRequest(sw, request, downloader);
+									HandleRequest(sw, request, downloader);
 									Thread.Sleep(Site.SleepTime);
 								}
 								catch (Exception e)
@@ -580,11 +691,20 @@ namespace DotnetSpider.Core
 			OnClosed?.Invoke(this);
 		}
 
+		/// <summary>
+		/// Run spider async.
+		/// </summary>
+		/// <param name="arguments"></param>
+		/// <returns></returns>
 		public Task RunAsync(params string[] arguments)
 		{
 			return Task.Factory.StartNew(() => { Run(arguments); });
 		}
 
+		/// <summary>
+		/// Pause spider.
+		/// </summary>
+		/// <param name="action"></param>
 		public void Pause(Action action = null)
 		{
 			if (Stat != Status.Running)
@@ -607,6 +727,10 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Contiune spider if spider is paused.
+		/// </summary>
+		/// <param name="action"></param>
 		public void Contiune()
 		{
 			if (_realStat == Status.Stopped)
@@ -621,6 +745,10 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Exit spider.
+		/// </summary>
+		/// <param name="action"></param>
 		public void Exit(Action action = null)
 		{
 			if (Stat == Status.Running || Stat == Status.Stopped)
@@ -643,6 +771,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Dispose spider.
+		/// </summary>
 		public void Dispose()
 		{
 			CheckIfRunning();
@@ -667,7 +798,7 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Create a spider with pageProcessor.
+		/// Create a spider with site, identity, scheduler and pageProcessors.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="identity"></param>
@@ -693,6 +824,9 @@ namespace DotnetSpider.Core
 			CheckIfSettingsCorrect();
 		}
 
+		/// <summary>
+		/// Check if all settings of spider are correct.
+		/// </summary>
 		protected void CheckIfSettingsCorrect()
 		{
 			Identity = (string.IsNullOrWhiteSpace(Identity) || string.IsNullOrEmpty(Identity))
@@ -726,15 +860,27 @@ namespace DotnetSpider.Core
 			Downloader = Downloader ?? new HttpClientDownloader();
 		}
 
+		/// <summary>
+		/// Pre-init component of spider.
+		/// </summary>
+		/// <param name="arguments"></param>
 		protected virtual void PreInitComponent(params string[] arguments)
 		{
 			Monitor = Monitor ?? new NLogMonitor();
 		}
 
+		/// <summary>
+		/// After init component of spider.
+		/// </summary>
+		/// <param name="arguments"></param>
 		protected virtual void AfterInitComponent(params string[] arguments)
 		{
 		}
 
+		/// <summary>
+		/// Init component of spider.
+		/// </summary>
+		/// <param name="arguments"></param>
 		protected virtual void InitComponent(params string[] arguments)
 		{
 			PrintInfo.Print();
@@ -804,11 +950,18 @@ namespace DotnetSpider.Core
 			_init = true;
 		}
 
+		/// <summary>
+		/// Get the default pipeline when user forget set a pepeline to spider.
+		/// </summary>
+		/// <returns></returns>
 		protected virtual IPipeline GetDefaultPipeline()
 		{
 			return null;
 		}
 
+		/// <summary>
+		/// Event when spider on close.
+		/// </summary>
 		protected void OnClose()
 		{
 			foreach (IPipeline pipeline in Pipelines)
@@ -824,6 +977,9 @@ namespace DotnetSpider.Core
 			Site.HttpProxyPool?.Dispose();
 		}
 
+		/// <summary>
+		/// Event when spider on complete.
+		/// </summary>
 		protected virtual void _OnComplete()
 		{
 			IsComplete = Scheduler.LeftRequestsCount == 0;
@@ -833,6 +989,10 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Record error request.
+		/// </summary>
+		/// <param name="request"></param>
 		protected void OnError(Request request)
 		{
 			lock (Locker)
@@ -842,13 +1002,22 @@ namespace DotnetSpider.Core
 			Scheduler.IncreaseErrorCount();
 		}
 
+		/// <summary>
+		/// Event when spider on success.
+		/// </summary>
 		protected void _OnSuccess(Request request)
 		{
 			Scheduler.IncreaseSuccessCount();
 			OnSuccess?.Invoke(request);
 		}
 
-		protected void ProcessRequest(Stopwatch sw, Request request, IDownloader downloader)
+		/// <summary>
+		/// Single/atom logical to handle a request by downloader, processors and pipelines.
+		/// </summary>
+		/// <param name="sw"></param>
+		/// <param name="request"></param>
+		/// <param name="downloader"></param>
+		protected void HandleRequest(Stopwatch sw, Request request, IDownloader downloader)
 		{
 			Page page = null;
 
@@ -908,7 +1077,7 @@ namespace DotnetSpider.Core
 			if (page.Retry)
 			{
 				RetriedTimes.Inc();
-				ExtractAndAddRequests(page, true);
+				ExtractAndAddRequests(page);
 				return;
 			}
 
@@ -930,7 +1099,7 @@ namespace DotnetSpider.Core
 							if (page != null && page.Retry)
 							{
 								RetriedTimes.Inc();
-								ExtractAndAddRequests(page, true);
+								ExtractAndAddRequests(page);
 							}
 							Logger.MyLog(Identity, $"Download {request.Url} success, retry becuase extract 0 result.", LogLevel.Warn);
 						}
@@ -944,7 +1113,7 @@ namespace DotnetSpider.Core
 				else
 				{
 					excutePipeline = true;
-					ExtractAndAddRequests(page, SpawnUrl);
+					ExtractAndAddRequests(page);
 				}
 			}
 			else
@@ -998,9 +1167,13 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		protected void ExtractAndAddRequests(Page page, bool spawnUrl)
+		/// <summary>
+		/// Extract and add target urls to scheduler.
+		/// </summary>
+		/// <param name="page"></param>
+		protected void ExtractAndAddRequests(Page page)
 		{
-			if (spawnUrl && page.Request.NextDepth <= Deep && page.TargetRequests != null &&
+			if (page.Request.NextDepth <= Deep && page.TargetRequests != null &&
 				page.TargetRequests.Count > 0)
 			{
 				foreach (Request request in page.TargetRequests)
@@ -1010,6 +1183,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// Check whether spider is running.
+		/// </summary>
 		protected void CheckIfRunning()
 		{
 			if (Stat == Status.Running)

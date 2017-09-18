@@ -2,6 +2,9 @@
 
 namespace DotnetSpider.Core
 {
+	/// <summary>
+	/// Some easy method to help spider build start urls.
+	/// </summary>
 	public interface IStartUrlBuilder
 	{
 		void Build(Site spider);

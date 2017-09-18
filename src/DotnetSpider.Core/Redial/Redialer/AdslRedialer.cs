@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
+using System.IO;
 using System.Threading;
 #if NET_CORE
 using System.Diagnostics;
@@ -11,6 +12,19 @@ namespace DotnetSpider.Core.Redial.Redialer
 	{
 		public AdslRedialer(string interfaceName, string user, string password) : base(interfaceName, user, password)
 		{
+		}
+
+		public AdslRedialer() : base("", "", "")
+		{
+#if NET45
+			var path = (@"c:\adsl_account.txt");
+#else
+			var path = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? @"c:\adsl_account.txt" : "/root/adsl_account.txt";
+#endif
+			var accounts = File.ReadAllLines(path);
+			Interface = accounts[0].Trim();
+			Account = accounts[1].Trim();
+			Password = accounts[2].Trim();
 		}
 
 		public override void Redial()

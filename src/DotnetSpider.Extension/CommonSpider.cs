@@ -54,7 +54,7 @@ namespace DotnetSpider.Extension
 				{
 					AddPipeline(new NullPipeline());
 				}
-				if (ReadOnlyPageProcessors == null || ReadOnlyPageProcessors.Count == 0)
+				if (PageProcessors == null || PageProcessors.Count == 0)
 				{
 					AddPageProcessor(new NullPageProcessor());
 				}
