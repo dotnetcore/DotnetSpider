@@ -17,6 +17,12 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\..\output\</OutputPath>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/dotnetcore/DotnetSpider</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/dotnetcore/DotnetSpider/master/images/icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider.git</RepositoryUrl>
+    <PackageTags>DotnetSpider;crawler;cross platform;dotnet core</PackageTags>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
     <DebugType>portable</DebugType>

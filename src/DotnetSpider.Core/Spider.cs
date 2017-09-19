@@ -19,7 +19,11 @@ using DotnetSpider.Core.Redial;
 using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
 using NLog;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
+[assembly: InternalsVisibleTo("DotnetSpider.Extension")]
+[assembly: InternalsVisibleTo("DotnetSpider.Extension.Test")]
 namespace DotnetSpider.Core
 {
 	/// <summary>

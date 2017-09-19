@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Core;
 using System;
+using System.Net;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
@@ -74,9 +75,30 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
+			//http://www.zzpzh.com/dealer/dealer.asp?country=%D6%D0%B9%FA&pro=%C9%CF%BA%A3&city=&page=2
+			var str = utf8_gb2312("中国");
+
 		}
 
-
+		/// <summary>
+		/// UTF8转换成GB2312
+		/// </summary>
+		/// <param name="text"></param>
+		/// <returns></returns>
+		public static string utf8_gb2312(string text)
+		{
+			//声明字符集   
+			System.Text.Encoding utf8, gb2312;
+			//utf8   
+			utf8 = System.Text.Encoding.GetEncoding("utf-8");
+			//gb2312   
+			gb2312 = System.Text.Encoding.GetEncoding("gb2312");
+			byte[] utf;
+			utf = utf8.GetBytes(text);
+			utf = System.Text.Encoding.Convert(utf8, gb2312, utf);
+			//返回转换后的字符   
+			return gb2312.GetString(utf);
+		}
 	}
 
 }

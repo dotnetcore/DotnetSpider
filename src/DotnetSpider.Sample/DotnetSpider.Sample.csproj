@@ -2,13 +2,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <StartupObject>DotnetSpider.Sample.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
-    <DefineConstants>DEBUG;NETCOREAPP2_0;NET_CORE</DefineConstants>
+    <DefineConstants>DEBUG;NETCOREAPP2_0;NET_CORE;</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="app.config" />
-  </ItemGroup>
   <ItemGroup>
     <Content Include="app.test.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -44,5 +42,9 @@
     <None Update="TextFile1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 </Project>

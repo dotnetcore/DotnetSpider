@@ -5,6 +5,9 @@ using DotnetSpider.Core.Redial;
 using Dapper;
 using DotnetSpider.Core.Infrastructure.Database;
 using System.Configuration;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("DotnetSpider.Extension.Test")]
 
 namespace DotnetSpider.Extension
 {
