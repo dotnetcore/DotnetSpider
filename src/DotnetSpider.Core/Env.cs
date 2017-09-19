@@ -69,11 +69,11 @@ namespace DotnetSpider.Core
 			var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
 
 			RedisConnectString = configuration.AppSettings.Settings[RedisConnectStringKey]?.Value?.Trim();
-			EmailHost = configuration.AppSettings.Settings[EmailHostKey].Value?.Trim();
-			EmailPort = configuration.AppSettings.Settings[EmailPortKey].Value?.Trim();
-			EmailAccount = configuration.AppSettings.Settings[EmailAccountKey].Value?.Trim();
-			EmailPassword = configuration.AppSettings.Settings[EmailPasswordKey].Value?.Trim();
-			EmailDisplayName = configuration.AppSettings.Settings[EmailDisplayNameKey].Value?.Trim();
+			EmailHost = configuration.AppSettings.Settings[EmailHostKey]?.Value?.Trim();
+			EmailPort = configuration.AppSettings.Settings[EmailPortKey]?.Value?.Trim();
+			EmailAccount = configuration.AppSettings.Settings[EmailAccountKey]?.Value?.Trim();
+			EmailPassword = configuration.AppSettings.Settings[EmailPasswordKey]?.Value?.Trim();
+			EmailDisplayName = configuration.AppSettings.Settings[EmailDisplayNameKey]?.Value?.Trim();
 
 			if ("GLOBAL" == AppDomain.CurrentDomain.GetData(EnvDbConfig)?.ToString().ToUpper())
 			{

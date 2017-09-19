@@ -298,6 +298,10 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public static IPipeline GetPipelineFromAppConfig()
 		{
+			if (Env.DataConnectionStringSettings == null)
+			{
+				return null;
+			}
 			IPipeline pipeline;
 			switch (Env.DataConnectionStringSettings.ProviderName)
 			{
