@@ -75,8 +75,8 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
-			//http://www.zzpzh.com/dealer/dealer.asp?country=%D6%D0%B9%FA&pro=%C9%CF%BA%A3&city=&page=2
-			var str = utf8_gb2312("中国");
+			JdShopDetailSpider spider = new JdShopDetailSpider();
+			spider.Run();
 
 		}
 

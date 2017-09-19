@@ -17,13 +17,12 @@ namespace DotnetSpider.Sample
 		public static void CustmizeProcessorAndPipeline()
 		{
 			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
-			var site = new Site { EncodingName = "GB2312", RemoveOutboundLinks = true };
-			//for (int i = 1; i < 5; ++i)
-			//{
-			//	// Add start/feed urls. 添加初始采集链接
-			//	site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
-			//}
-			site.AddStartUrl("http://www.unistrong.com/");
+			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			for (int i = 1; i < 5; ++i)
+			{
+				// Add start/feed urls. 添加初始采集链接
+				site.AddStartUrl($"http://list.youku.com/category/show/c_96_s_1_d_1_p_{i}.html");
+			}
 			Spider spider = Spider.Create(site,
 				// use memoery queue scheduler. 使用内存调度
 				new QueueDuplicateRemovedScheduler(),
@@ -37,7 +36,6 @@ namespace DotnetSpider.Sample
 
 			// Start crawler 启动爬虫
 			spider.Run();
-
 		}
 
 		public class YoukuPipeline : BasePipeline
@@ -54,7 +52,7 @@ namespace DotnetSpider.Sample
 						count++;
 						builder.Append($" [YoukuVideo {count}] {entry.Name}");
 					}
-					Console.WriteLine(builder);
+					//Console.WriteLine(builder);
 				}
 
 				// Other actions like save data to DB. 可以自由实现插入数据库或保存到文件
@@ -79,10 +77,10 @@ namespace DotnetSpider.Sample
 				page.AddResultItem("VideoResult", results);
 
 				// Add target requests to scheduler. 解析需要采集的URL
-				//foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
-				//{
-				//	page.AddTargetRequest(new Request(url.GetValue(), null));
-				//}
+				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
+				{
+					page.AddTargetRequest(new Request(url.GetValue(), null));
+				}
 			}
 		}
 

@@ -29,16 +29,15 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit(params string[] arguments)
 		{
-			Site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3355984&callback=json");
-			Site.AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3682523&callback=json");
-			var downloader = new HttpClientDownloader();
-			//downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
-			//{
-			//	Start = "json(",
-			//	End = ");",
-			//	StartOffset = 5,
-			//	EndOffset = 2
-			//});
+			AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3355984&callback=json");
+			AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3682523&callback=json");
+			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
+			{
+				StartPart = "json(",
+				EndPart = ");",
+				StartOffset = 5,
+				EndOffset = 2
+			});
 
 			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost ;User ID=root;Password=;Port=3306"));
 			AddEntityType(typeof(ProductUpdater));
