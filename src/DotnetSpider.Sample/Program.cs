@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Redial.InternetDetector;
 using System;
 using System.Net;
 #if !NETCOREAPP2_0

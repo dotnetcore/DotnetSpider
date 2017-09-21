@@ -37,11 +37,7 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 		private int GetIp4Count()
 		{
 			string hostName = Dns.GetHostName();
-#if !NET_CORE
-			IPAddress[] addressList = Dns.GetHostAddresses(hostName);
-#else
-			IPAddress[] addressList = Dns.GetHostAddressesAsync(hostName).Result;
-#endif
+			var addressList = Dns.GetHostAddresses(hostName);
 			return addressList.Count(i => i.AddressFamily == AddressFamily.InterNetwork);
 		}
 	}
