@@ -70,8 +70,8 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			_connectString = connectString;
 			CheckIfSameBeforeUpdate = checkIfSaveBeforeUpdate;
+			UseInternet = true;
 		}
-
 
 		public override void AddEntity(EntityDefine entityDefine)
 		{
@@ -143,8 +143,7 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					continue;
 				}
-
-				NetworkCenter.Current.Execute("dbi", () =>
+				var action = new Action(() =>
 				{
 					using (var conn = ConnectionStringSettings.GetDbConnection())
 					{
@@ -163,6 +162,14 @@ namespace DotnetSpider.Extension.Pipeline
 						command.ExecuteNonQuery();
 					}
 				});
+				if (UseInternet)
+				{
+					NetworkCenter.Current.Execute("db-insert", action);
+				}
+				else
+				{
+					action();
+				}
 			}
 		}
 
@@ -174,7 +181,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
-				NetworkCenter.Current.Execute("pp", () =>
+				var action = new Action(() =>
 				{
 					if (metadata.InsertModel)
 					{
@@ -293,6 +300,14 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 					}
 				});
+				if (UseInternet)
+				{
+					NetworkCenter.Current.Execute("pipeline", action);
+				}
+				else
+				{
+					action();
+				}
 			}
 		}
 

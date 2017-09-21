@@ -13,6 +13,8 @@ namespace DotnetSpider.Core.Pipeline
 
 		public ISpider Spider { get; protected set; }
 
+		public bool UseInternet { get; set; } = false;
+
 		public virtual void InitPipeline(ISpider spider)
 		{
 			Spider = spider;

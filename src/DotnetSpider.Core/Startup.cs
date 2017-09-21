@@ -12,6 +12,7 @@ using System.Text;
 
 namespace DotnetSpider.Core
 {
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 	public class SpiderName : Attribute
 	{
 		public string Name

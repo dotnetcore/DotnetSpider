@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Scheduler
 		public abstract void IncreaseErrorCount();
 		public abstract void Import(HashSet<Request> requests);
 
-		public abstract bool IsNetworkScheduler { get; }
+		public abstract bool UseInternet { get; set; }
 
 		public abstract HashSet<Request> ToList();
 
@@ -35,9 +35,9 @@ namespace DotnetSpider.Core.Scheduler
 
 		public void Push(Request request)
 		{
-			if (IsNetworkScheduler)
+			if (UseInternet)
 			{
-				NetworkCenter.Current.Execute("sp", () =>
+				NetworkCenter.Current.Execute("sch-push", () =>
 				{
 					DoPush(request);
 				});

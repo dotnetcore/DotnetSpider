@@ -14,6 +14,8 @@ namespace DotnetSpider.Extension.Monitor
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
+		public bool UseInternet { get; set; } = true;
+
 		private readonly bool _isDbOnly;
 
 		public DbMonitor(string identity, bool isDbOnly = false)
@@ -24,7 +26,7 @@ namespace DotnetSpider.Extension.Monitor
 
 			if (Core.Env.SystemConnectionStringSettings != null)
 			{
-				NetworkCenter.Current.Execute("dm", () =>
+				var action = new Action(() =>
 				{
 					using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 					{
@@ -48,6 +50,14 @@ namespace DotnetSpider.Extension.Monitor
 							});
 					}
 				});
+				if (UseInternet)
+				{
+					NetworkCenter.Current.Execute("db-monitor", action);
+				}
+				else
+				{
+					action();
+				}
 			}
 		}
 
@@ -99,7 +109,7 @@ namespace DotnetSpider.Extension.Monitor
 
 			if (Core.Env.SaveLogAndStatusToDb)
 			{
-				NetworkCenter.Current.Execute("dm", () =>
+				var action = new Action(() =>
 				{
 					using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 					{
@@ -121,6 +131,14 @@ namespace DotnetSpider.Extension.Monitor
 							});
 					}
 				});
+				if (UseInternet)
+				{
+					NetworkCenter.Current.Execute("db-monitor-report", action);
+				}
+				else
+				{
+					action();
+				}
 			}
 		}
 	}

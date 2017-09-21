@@ -94,7 +94,7 @@ namespace DotnetSpider.Extension.Downloader
 						realUrl = UrlFormat(realUrl);
 					}
 
-					NetworkCenter.Current.Execute("fd", () =>
+					NetworkCenter.Current.Execute("fiddler-download", () =>
 					{
 						_webDriver.Navigate().GoToUrl(realUrl);
 					});

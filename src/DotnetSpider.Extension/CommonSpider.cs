@@ -22,7 +22,7 @@ namespace DotnetSpider.Extension
 
 		protected Action DataVerificationAndReport;
 
-		public bool UseDbLog { get; set; } = true;
+		public bool UseDbMonitor { get; set; } = true;
 
 		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
@@ -90,7 +90,7 @@ namespace DotnetSpider.Extension
 		{
 			base.PreInitComponent();
 
-			if (UseDbLog)
+			if (UseDbMonitor)
 			{
 				Monitor = new DbMonitor(Identity);
 			}

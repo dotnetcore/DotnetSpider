@@ -110,7 +110,7 @@ namespace DotnetSpider.Extension.Downloader
 
 				string realUrl = request.Url.ToString();
 
-				NetworkCenter.Current.Execute("wdd", () =>
+				NetworkCenter.Current.Execute("webdriver-download", () =>
 				{
 					_webDriver.Navigate().GoToUrl(realUrl);
 

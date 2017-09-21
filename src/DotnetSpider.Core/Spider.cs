@@ -1070,7 +1070,7 @@ namespace DotnetSpider.Core
 					page = AddToCycleRetry(request, Site);
 				}
 				if (page != null) OnError(page.Request);
-				Logger.MyLog(Identity, $"Extract {request.Url} failed, please check your extractor: {e.Message}.", LogLevel.Error, e);
+				Logger.MyLog(Identity, $"Extract {request.Url} failed, please check your pipeline: {e.Message}.", LogLevel.Error, e);
 			}
 
 			if (page == null)

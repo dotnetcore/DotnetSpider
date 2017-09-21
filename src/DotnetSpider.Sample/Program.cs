@@ -76,26 +76,7 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
-		}
 
-		/// <summary>
-		/// UTF8转换成GB2312
-		/// </summary>
-		/// <param name="text"></param>
-		/// <returns></returns>
-		public static string utf8_gb2312(string text)
-		{
-			//声明字符集   
-			System.Text.Encoding utf8, gb2312;
-			//utf8   
-			utf8 = System.Text.Encoding.GetEncoding("utf-8");
-			//gb2312   
-			gb2312 = System.Text.Encoding.GetEncoding("gb2312");
-			byte[] utf;
-			utf = utf8.GetBytes(text);
-			utf = System.Text.Encoding.Convert(utf8, gb2312, utf);
-			//返回转换后的字符   
-			return gb2312.GetString(utf);
 		}
 	}
 

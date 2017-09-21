@@ -72,7 +72,7 @@ namespace DotnetSpider.Extension
 		protected List<IDictionary<string, object>> QueryDatas()
 		{
 			List<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
-			NetworkCenter.Current.Execute("dbsb", () =>
+			NetworkCenter.Current.Execute("db-starturlbuilder", () =>
 			{
 				using (var conn = ConnectionStringSettings.GetDbConnection())
 				{
