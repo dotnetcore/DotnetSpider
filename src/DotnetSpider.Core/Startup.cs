@@ -12,6 +12,19 @@ using System.Text;
 
 namespace DotnetSpider.Core
 {
+	public class SpiderName : Attribute
+	{
+		public string Name
+		{
+			get; set;
+		}
+
+		public SpiderName(string name)
+		{
+			Name = name;
+		}
+	}
+
 	public static class Startup
 	{
 		public static List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
@@ -178,6 +191,24 @@ namespace DotnetSpider.Core
 								Console.WriteLine();
 								Console.ForegroundColor = ConsoleColor.White;
 								return null;
+							}
+
+							var startupName = type.GetCustomAttribute<SpiderName>();
+							if (startupName != null)
+							{
+								if (!spiderTypes.ContainsKey(startupName.Name))
+								{
+									spiderTypes.Add(startupName.Name, type);
+								}
+								else
+								{
+									Console.ForegroundColor = ConsoleColor.Red;
+									Console.WriteLine();
+									Console.WriteLine($"Spider {type.Name} are duplicate.");
+									Console.WriteLine();
+									Console.ForegroundColor = ConsoleColor.White;
+									return null;
+								}
 							}
 						}
 					}

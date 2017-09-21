@@ -22,7 +22,7 @@ namespace DotnetSpider.Sample
 
 			MyTest();
 
-			Startup.Run("-s:DotnetSpider.Sample.BaiduSearchSpider", "-tid:BaiduSearch", "-i:guid", "-a:");
+			Startup.Run("-s:BaiduSearchSpider", "-tid:BaiduSearch", "-i:guid", "-a:");
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 
@@ -75,9 +75,6 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
-			JdShopDetailSpider spider = new JdShopDetailSpider();
-			spider.Run();
-
 		}
 
 		/// <summary>

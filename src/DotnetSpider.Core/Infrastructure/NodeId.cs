@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Net;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -11,19 +13,20 @@ namespace DotnetSpider.Core.Infrastructure
 
 		static NodeId()
 		{
+			string path = Path.Combine(Env.GlobalDirectory, "node.id");
 
-#if NET_CORE
-			string path = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"c:\DotnetSpider\node.id" : "/opt/dotnetspider/node.id";
-#else
-			string path = @"c:\DotnetSpider\node.id";
-#endif
-			if (File.Exists(path))
+			if (!File.Exists(path))
+			{
+				Id = string.IsNullOrEmpty(Env.IP) ? Id : Env.IP;
+				File.AppendAllText(path, Id);
+			}
+			else
 			{
 				Id = File.ReadAllText(path);
-				if (Id.Length > 100)
-				{
-					throw new SpiderException("Length of Node identity should less than 100.");
-				}
+			}
+			if (Id.Length > 100)
+			{
+				throw new SpiderException("Length of Node identity should less than 100.");
 			}
 		}
 	}

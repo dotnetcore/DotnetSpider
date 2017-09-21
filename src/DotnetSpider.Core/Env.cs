@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using System;
 using System.Configuration;
 using System.IO;
+using System.Net;
+using System.Linq;
 
 namespace DotnetSpider.Core
 {
@@ -30,6 +32,8 @@ namespace DotnetSpider.Core
 		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
 
+		public static string HostName { get; set; }
+		public static string IP { get; set; }
 		public static string RedisConnectString { get; private set; }
 		public static string EmailHost { get; private set; }
 		public static string EmailPort { get; private set; }
@@ -144,11 +148,17 @@ namespace DotnetSpider.Core
 #endif
 			GlobalAppConfigPath = Path.Combine(GlobalDirectory, "app.config");
 
+			HostName = Dns.GetHostName();
+			var addresses = Dns.GetHostAddresses(HostName);
+			IP = addresses.FirstOrDefault(i => i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
+
 			var appConfigName = AppDomain.CurrentDomain.GetData(EnvConfig)?.ToString();
 
 			var path = string.IsNullOrEmpty(appConfigName) ? Path.Combine(BaseDirectory, "app.config") : Path.Combine(BaseDirectory, appConfigName);
 
 			LoadConfiguration(path);
 		}
+
+
 	}
 }

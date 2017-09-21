@@ -16,11 +16,7 @@ namespace DotnetSpider.Core.Redial.Redialer
 
 		public AdslRedialer() : base("", "", "")
 		{
-#if NET45
-			var path = (@"c:\adsl_account.txt");
-#else
-			var path = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)? @"c:\adsl_account.txt" : "/root/adsl_account.txt";
-#endif
+			var path = Path.Combine(Env.GlobalDirectory, "adsl_account.txt");
 			var accounts = File.ReadAllLines(path);
 			Interface = accounts[0].Trim();
 			Account = accounts[1].Trim();
@@ -39,9 +35,9 @@ namespace DotnetSpider.Core.Redial.Redialer
 #else
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
-				Process process = Process.Start("adsl-stop");
+				Process process = Process.Start("/sbin/ifdown", "ppp0");
 				process.WaitForExit();
-				process = Process.Start("adsl-start");
+				process = Process.Start("/sbin/ifup", "ppp0");
 				process.WaitForExit();
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
