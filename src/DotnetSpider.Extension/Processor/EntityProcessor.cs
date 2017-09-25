@@ -48,6 +48,7 @@ namespace DotnetSpider.Extension.Processor
 			{
 				return;
 			}
+
 			page.AddResultItem(_extractor.Name, list);
 		}
 	}

@@ -12,7 +12,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected ConcurrentDictionary<string, EntityDefine> Entities => _entities;
 
-		public abstract void Process(string entityName, List<DataObject> datas);
+		public abstract int Process(string entityName, List<DataObject> datas);
 
 		public virtual void AddEntity(EntityDefine entityDefine)
 		{
@@ -32,6 +32,8 @@ namespace DotnetSpider.Extension.Pipeline
 
 			foreach (var resultItem in resultItems)
 			{
+				int count = 0;
+				int effectedRow = 0;
 				foreach (var result in resultItem.Results)
 				{
 					List<DataObject> list = new List<DataObject>();
@@ -50,9 +52,12 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 					if (list.Count > 0)
 					{
-						Process(result.Key, list);
+						count += list.Count;
+						effectedRow += Process(result.Key, list);
 					}
 				}
+				resultItem.AddOrUpdateResultItem(ResultItems.CountOfResultsKey, count);
+				resultItem.AddOrUpdateResultItem(ResultItems.CountOfEffectedRows, effectedRow);
 			}
 		}
 	}

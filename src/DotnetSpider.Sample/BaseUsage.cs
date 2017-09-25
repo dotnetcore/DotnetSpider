@@ -54,7 +54,6 @@ namespace DotnetSpider.Sample
 					}
 					//Console.WriteLine(builder);
 				}
-
 				// Other actions like save data to DB. 可以自由实现插入数据库或保存到文件
 			}
 		}

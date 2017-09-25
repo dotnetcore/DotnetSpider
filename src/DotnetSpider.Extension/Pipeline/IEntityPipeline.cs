@@ -5,6 +5,6 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public interface IEntityPipeline
 	{
-		void Process(string entityName, List<DataObject> datas);
+		int Process(string entityName, List<DataObject> datas);
 	}
 }

@@ -1164,7 +1164,20 @@ namespace DotnetSpider.Core
 				}
 
 				_OnSuccess(request);
-				Logger.MyLog(Identity, $"Crawl: {request.Url} success.", LogLevel.Info);
+
+				StringBuilder builder = new StringBuilder($"Crawl: {request.Url} success");
+				var countOfResults = page.ResultItems.GetResultItem(ResultItems.CountOfResultsKey);
+				if (countOfResults != null)
+				{
+					builder.Append($", countOfResults: {countOfResults}");
+				}
+				var countOfEffectedRow = page.ResultItems.GetResultItem(ResultItems.CountOfEffectedRows);
+				if (countOfEffectedRow != null)
+				{
+					builder.Append($", countOfEffectedRow: {countOfEffectedRow}");
+				}
+				builder.Append(".");
+				Logger.MyLog(Identity, builder.ToString(), LogLevel.Info);
 
 				sw.Stop();
 				CalculatePipelineSpeed(sw.ElapsedMilliseconds);

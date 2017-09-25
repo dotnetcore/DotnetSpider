@@ -11,6 +11,9 @@ namespace DotnetSpider.Core
 		private readonly Dictionary<string, dynamic> _fields = new Dictionary<string, dynamic>();
 		private readonly object _locker = new object();
 
+		public const string CountOfResultsKey = "__CountOfResultsKey";
+		public const string CountOfEffectedRows = "__CountOfEffectedRowsKey";
+
 		public Dictionary<string, dynamic> Results
 		{
 			get

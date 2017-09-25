@@ -21,7 +21,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override void Process(string entityName, List<DataObject> datas)
+		public override int Process(string entityName, List<DataObject> datas)
 		{
 			lock (_locker)
 			{
@@ -32,6 +32,7 @@ namespace DotnetSpider.Extension.Pipeline
 					entry.Add("cdate", DateTime.Now);
 					File.AppendAllText(fileInfo.Name, entry.ToString());
 				}
+				return datas.Count;
 			}
 		}
 	}

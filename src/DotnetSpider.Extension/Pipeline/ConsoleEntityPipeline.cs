@@ -14,12 +14,13 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 		}
 
-		public override void Process(string entityName, List<DataObject> datas)
+		public override int Process(string entityName, List<DataObject> datas)
 		{
 			foreach (var data in datas)
 			{
 				Console.WriteLine($"{entityName}: {data}");
 			}
+			return datas.Count;
 		}
 	}
 }

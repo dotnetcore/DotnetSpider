@@ -173,12 +173,13 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override void Process(string entityName, List<DataObject> datas)
+		public override int Process(string entityName, List<DataObject> datas)
 		{
 			if (datas == null || datas.Count == 0)
 			{
-				return;
+				return 0;
 			}
+			int count = 0;
 			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
 				var action = new Action(() =>
@@ -202,7 +203,7 @@ namespace DotnetSpider.Extension.Pipeline
 									cmd.Parameters.Add(parameter);
 								}
 
-								cmd.ExecuteNonQuery();
+								count += cmd.ExecuteNonQuery();
 							}
 						}
 					}
@@ -294,7 +295,7 @@ namespace DotnetSpider.Extension.Pipeline
 											cmd.Parameters.Add(primaryParameter);
 										}
 									}
-									cmd.ExecuteNonQuery();
+									count += cmd.ExecuteNonQuery();
 								}
 							}
 						}
@@ -309,6 +310,7 @@ namespace DotnetSpider.Extension.Pipeline
 					action();
 				}
 			}
+			return count;
 		}
 
 		public static IPipeline GetPipelineFromAppConfig()

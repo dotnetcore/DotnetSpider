@@ -40,11 +40,11 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override void Process(string entityName, List<DataObject> items)
+		public override int Process(string entityName, List<DataObject> items)
 		{
 			if (items == null || items.Count == 0)
 			{
-				return;
+				return 0;
 			}
 
 			lock (_locker)
@@ -65,6 +65,7 @@ namespace DotnetSpider.Extension.Pipeline
 							}
 					}
 				}
+				return items.Count;
 			}
 		}
 

@@ -29,7 +29,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 		}
 
-		public override void Process(string entityName, List<DataObject> datas)
+		public override int Process(string entityName, List<DataObject> datas)
 		{
 			lock (_locker)
 			{
@@ -42,6 +42,7 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					_collector.Add(entityName, new List<DataObject>(datas));
 				}
+				return datas.Count;
 			}
 		}
 	}

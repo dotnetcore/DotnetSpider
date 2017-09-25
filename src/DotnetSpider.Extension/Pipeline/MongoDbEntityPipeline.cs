@@ -39,7 +39,7 @@ namespace DotnetSpider.Extension.Pipeline
 			Collections.TryAdd(metadata.Name, db.GetCollection<BsonDocument>(metadata.TableInfo.CalculateTableName()));
 		}
 
-		public override void Process(string entityName, List<DataObject> datas)
+		public override int Process(string entityName, List<DataObject> datas)
 		{
 			if (Collections.TryGetValue(entityName, out var collection))
 			{
@@ -53,6 +53,7 @@ namespace DotnetSpider.Extension.Pipeline
 				reslut.Add(BsonDocument.Create(DateTime.Now));
 				collection.InsertMany(reslut);
 			}
+			return datas.Count;
 		}
 	}
 }
