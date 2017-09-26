@@ -6,6 +6,7 @@ using DotnetSpider.Extension.Model;
 using System.Configuration;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
+using System.IO;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -27,7 +28,8 @@ namespace DotnetSpider.Extension.Pipeline
 				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
 				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
 
-			return sqlBuilder.ToString();
+			var sql = sqlBuilder.ToString();
+			return sql;
 		}
 
 		protected override string GenerateUpdateSql(EntityAdapter adapter)
@@ -140,7 +142,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected string GetDataTypeSql(Column field)
 		{
-			var dataType = "TEXT";
+			var dataType = "LONGTEXT";
 
 			if (field.DataType == DataTypeNames.Boolean)
 			{
@@ -172,7 +174,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			else if (field.DataType == DataTypeNames.String)
 			{
-				dataType = (field.Length <= 0) ? "TEXT" : $"VARCHAR({field.Length})";
+				dataType = (field.Length <= 0) ? "LONGTEXT" : $"VARCHAR({field.Length})";
 			}
 
 			return dataType;
