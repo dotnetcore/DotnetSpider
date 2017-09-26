@@ -7,5 +7,5 @@ rem create nuget packages
 nuget pack DotnetSpider.Core.nuspec
 nuget pack DotnetSpider.Extension.nuspec
 rem upload nuget packages
-for %%i in (*.nupkg) do nuget push %%i -Source https://www.nuget.org/api/v2/package
+for %%i in (*.nupkg) do nuget push %%i -Source http://zlzforever.6655.la:40001/nuget
 cd ..

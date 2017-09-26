@@ -39,7 +39,7 @@
     <None Update="taobaokeyword.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TextFile1.txt">
+    <None Update="yaozh_gupiao_codes.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
