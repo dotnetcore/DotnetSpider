@@ -591,7 +591,7 @@ namespace DotnetSpider.Extension.Test
 
 				Assert.Equal("int(11)", columns[0].Type);
 				Assert.Equal("bigint(20)", columns[1].Type);
-				Assert.Equal("text", columns[2].Type);
+				Assert.Equal("longtext", columns[2].Type);
 				Assert.Equal("timestamp", columns[3].Type);
 				Assert.Equal("float", columns[4].Type);
 				Assert.Equal("double", columns[5].Type);
