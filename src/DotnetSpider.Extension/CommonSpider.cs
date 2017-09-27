@@ -166,7 +166,7 @@ namespace DotnetSpider.Extension
 			{
 				using (IDbConnection conn = Env.SystemConnectionStringSettings.GetDbConnection())
 				{
-					conn.Execute($"DELETE FROM `DotnetSpider.`TaskRunning` WHERE `Identity`='{Identity}';");
+					conn.Execute($"DELETE FROM `DotnetSpider`.`TaskRunning` WHERE `Identity`='{Identity}';");
 				}
 			}
 		}

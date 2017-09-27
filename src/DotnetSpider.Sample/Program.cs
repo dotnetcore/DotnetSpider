@@ -23,7 +23,7 @@ namespace DotnetSpider.Sample
 
 			MyTest();
 
-			Startup.Run("-s:BaiduSearchSpider", "-tid:BaiduSearch", "-i:guid", "-a:");
+			Startup.Run("-s:JdZiYingCoupon", "-tid:BaiduSearch", "-i:guid", "-a:");
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 
