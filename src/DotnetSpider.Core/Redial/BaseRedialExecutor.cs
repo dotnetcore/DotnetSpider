@@ -13,12 +13,16 @@ namespace DotnetSpider.Core.Redial
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 		protected static object Lock = new object();
 
-		public abstract void WaitAll();
-		public abstract void WaitRedialExit();
+		public int WaitRedialTimeout { get; set; } = 100 * 1000 / 100;
+		public int RedialIntervalLimit { get; set; } = 10;
+		public abstract void WaitAllNetworkRequestComplete();
 		public abstract string CreateActionIdentity(string name);
 		public abstract void DeleteActionIdentity(string identity);
-		public abstract bool CheckIsRedialing();
-		public abstract void ReleaseRedialLocker();
+		public abstract void LockRedial();
+		public abstract bool IsRedialing();
+		public abstract void ReleaseRedialLock();
+		public abstract DateTime GetLastRedialTime();
+		public abstract void RecordLastRedialTime();
 
 		public IRedialer Redialer { get; }
 
@@ -26,86 +30,96 @@ namespace DotnetSpider.Core.Redial
 
 		public int AfterRedialWaitTime { get; set; } = -1;
 
-		public RedialResult Redial(Action action = null)
+		public void WaitRedialComplete()
 		{
-			if (CheckIsRedialing())
+			for (int i = 0; i < WaitRedialTimeout; ++i)
 			{
-				while (true)
+				if (IsRedialing())
 				{
-					Thread.Sleep(50);
-					if (!CheckIsRedialing())
-					{
-						//ReleaseRedialLocker();
-						return RedialResult.OtherRedialed;
-					}
+					Thread.Sleep(100);
+				}
+				else
+				{
+					return;
 				}
 			}
-			else
+			throw new RedialException("Wait redial timeout.");
+		}
+
+		public RedialResult Redial(Action action = null)
+		{
+			try
 			{
-				try
+				Logger.MyLog("Try to lock redialer...", LogLevel.Warn);
+				LockRedial();
+				Logger.MyLog("Lock redialer", LogLevel.Warn);
+				var lastRedialTime = GetLastRedialTime();
+				if ((DateTime.Now - lastRedialTime).Seconds < RedialIntervalLimit)
 				{
-					Logger.MyLog("Wait all atomic action...", LogLevel.Warn);
-					// 等待数据库等操作完成
-					WaitAll();
-					Logger.MyLog("Start redial...", LogLevel.Warn);
+					return RedialResult.OtherRedialed;
+				}
+				Thread.Sleep(500);
+				Logger.MyLog("Wait all network requests complete...", LogLevel.Warn);
+				// 等待所有网络请求结束
+				WaitAllNetworkRequestComplete();
+				Logger.MyLog("Start redial...", LogLevel.Warn);
 
-					var redialCount = 0;
+				var redialCount = 1;
 
-					while (redialCount++ < 10)
+				while (redialCount++ < 10)
+				{
+					try
 					{
 						Console.WriteLine($"redial loop {redialCount}");
 						Redialer.Redial();
 
 						if (InternetDetector.Detect())
 						{
-							Console.WriteLine($"redial loop {redialCount} success!!!!");
+							Console.WriteLine($"redial loop {redialCount} success.");
 							break;
 						}
 						else
 						{
-							Console.WriteLine($"redial loop {redialCount} failed!!!!");
+							Console.WriteLine($"redial loop {redialCount} failed.");
 						}
 					}
-
-					if (redialCount > 10)
+					catch (Exception ex)
 					{
-						return RedialResult.Failed;
+						Logger.MyLog($"Redial failed loop {redialCount}: {ex}", LogLevel.Error);
+						continue;
 					}
-
-					Thread.Sleep(2000);
-					Logger.MyLog("Redial finished.", LogLevel.Warn);
-
-					action?.Invoke();
-
-					return RedialResult.Sucess;
 				}
-				catch (IOException)
-				{
-					// 有极小可能同时调用File.Open时抛出异常
 
-					return Redial(action);
-				}
-				catch (Exception ex)
+				if (redialCount > 10)
 				{
-					Console.WriteLine(ex.ToString());
-
 					return RedialResult.Failed;
 				}
-				finally
+
+				Logger.MyLog("Redial success.", LogLevel.Warn);
+
+				action?.Invoke();
+
+				return RedialResult.Sucess;
+			}
+			catch (Exception ex)
+			{
+				Logger.MyLog($"Redial failed: {ex}", LogLevel.Error);
+				return RedialResult.Failed;
+			}
+			finally
+			{
+				ReleaseRedialLock();
+				if (AfterRedialWaitTime > 0)
 				{
-					ReleaseRedialLocker();
-					if (AfterRedialWaitTime > 0)
-					{
-						Console.WriteLine($"Going to sleep for {AfterRedialWaitTime} after redial.");
-						Thread.Sleep(AfterRedialWaitTime);
-					}
+					Console.WriteLine($"Going to sleep for {AfterRedialWaitTime} after redial.");
+					Thread.Sleep(AfterRedialWaitTime);
 				}
 			}
 		}
 
 		public void Execute(string name, Action action)
 		{
-			WaitRedialExit();
+			WaitRedialComplete();
 
 			string identity = null;
 			try
@@ -121,7 +135,7 @@ namespace DotnetSpider.Core.Redial
 
 		public void Execute(string name, Action<dynamic> action, dynamic obj)
 		{
-			WaitRedialExit();
+			WaitRedialComplete();
 
 			string identity = null;
 			try
@@ -137,7 +151,7 @@ namespace DotnetSpider.Core.Redial
 
 		public T Execute<T>(string name, Func<T> func)
 		{
-			WaitRedialExit();
+			WaitRedialComplete();
 
 			string identity = null;
 			try
@@ -153,7 +167,7 @@ namespace DotnetSpider.Core.Redial
 
 		public T Execute<T>(string name, Func<dynamic, T> func, dynamic obj)
 		{
-			WaitRedialExit();
+			WaitRedialComplete();
 
 			string identity = null;
 			try

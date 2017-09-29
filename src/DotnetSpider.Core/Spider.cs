@@ -1169,12 +1169,12 @@ namespace DotnetSpider.Core
 				var countOfResults = page.ResultItems.GetResultItem(ResultItems.CountOfResultsKey);
 				if (countOfResults != null)
 				{
-					builder.Append($", countOfResults: {countOfResults}");
+					builder.Append($", results: {countOfResults}");
 				}
-				var countOfEffectedRow = page.ResultItems.GetResultItem(ResultItems.CountOfEffectedRows);
-				if (countOfEffectedRow != null)
+				var effectedRow = page.ResultItems.GetResultItem(ResultItems.EffectedRows);
+				if (effectedRow != null)
 				{
-					builder.Append($", countOfEffectedRow: {countOfEffectedRow}");
+					builder.Append($", effectedRow: {effectedRow}");
 				}
 				builder.Append(".");
 				Logger.MyLog(Identity, builder.ToString(), LogLevel.Info);

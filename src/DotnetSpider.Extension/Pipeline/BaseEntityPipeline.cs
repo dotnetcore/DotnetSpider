@@ -57,7 +57,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				}
 				resultItem.AddOrUpdateResultItem(ResultItems.CountOfResultsKey, count);
-				resultItem.AddOrUpdateResultItem(ResultItems.CountOfEffectedRows, effectedRow);
+				resultItem.AddOrUpdateResultItem(ResultItems.EffectedRows, effectedRow);
 			}
 		}
 	}

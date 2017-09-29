@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Downloader
 		public abstract bool Handle(RemoteWebDriver driver);
 	}
 
-	public abstract class CommonLoginHandler : LoginHandler
+	public class CommonLoginHandler : LoginHandler
 	{
 		public string Url { get; set; }
 
@@ -41,12 +41,12 @@ namespace DotnetSpider.Extension.Downloader
 				var user = FindElement(webDriver, UserSelector);
 				user.Clear();
 				user.SendKeys(User);
-				Thread.Sleep(1500);
+				Thread.Sleep(1000);
 
 				var password = FindElement(webDriver, PassSelector);
 				password.Clear();
 				password.SendKeys(Password);
-				Thread.Sleep(1500);
+				Thread.Sleep(1000);
 
 				var submit = FindElement(webDriver, SubmitSelector);
 				submit.Click();
@@ -81,7 +81,12 @@ namespace DotnetSpider.Extension.Downloader
 
 	public class ManualLoginHandler : LoginHandler
 	{
-		public string Url { get; set; }
+		public Uri Url { get; set; }
+
+		public ManualLoginHandler(string url)
+		{
+			Url = new Uri(url);
+		}
 
 		public override bool Handle(RemoteWebDriver webDriver)
 		{

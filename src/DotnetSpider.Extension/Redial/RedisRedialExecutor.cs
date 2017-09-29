@@ -6,14 +6,15 @@ using DotnetSpider.Core.Redial.Redialer;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Redial
 {
 	public class RedisRedialExecutor : RedialExecutor
 	{
-		public static readonly string HostName = $"dotnetspider:nodes:{Dns.GetHostName()}";
-
-		public const string Locker = "dotnetspider:redialLocker";
+		public static readonly string HostName = $"dotnetspider:nodes:{Env.HostName}";
+		public static string RedialLockerKey = $"dotnetspider:redialLocker:{Env.HostName}";
+		public static string RedialTimeKey = $"dotnetspider:redialLocker{Env.HostName}";
 
 		public string ConnectString { get; }
 
@@ -31,31 +32,20 @@ namespace DotnetSpider.Extension.Redial
 			}
 		}
 
-		public override void WaitAll()
+		public override void WaitAllNetworkRequestComplete()
 		{
-			RedisConnection.Database.HashSet(HostName, Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+			RedisConnection.Database.HashSet(HostName, RedialLockerKey, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
 			while (true)
 			{
 				ClearTimeoutAction();
 				var hashSet = RedisConnection.Database.HashGetAll(HostName);
 				if (hashSet.Length == 1)
 				{
-					if (hashSet[0].Value.HasValue && hashSet[0].Name.ToString() == Locker)
+					if (hashSet[0].Value.HasValue && hashSet[0].Name.ToString() == RedialLockerKey)
 					{
 						break;
 					}
 				}
-				Thread.Sleep(50);
-			}
-		}
-
-		public override void WaitRedialExit()
-		{
-			var locker = RedisConnection.Database.HashGet(HostName, Locker);
-			while (locker.HasValue)
-			{
-				ClearTimeoutRedialLocker();
-				locker = RedisConnection.Database.HashGet(HostName, Locker);
 				Thread.Sleep(50);
 			}
 		}
@@ -72,30 +62,20 @@ namespace DotnetSpider.Extension.Redial
 			RedisConnection.Database.HashDelete(HostName, identity);
 		}
 
-		public override bool CheckIsRedialing()
+		public override void LockRedial()
 		{
-			lock (Lock)
+			var key = $"{RedialLockerKey}:{HostName}";
+			while (!RedisConnection.Database.LockTake(key, HostName, TimeSpan.FromSeconds(120)))
 			{
-				var locker = RedisConnection.Database.HashGet(HostName, Locker);
-				if (!locker.HasValue)
-				{
-					//RedisConnection.Database.HashSet(HostName, Locker, DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
-					return false;
-				}
-				return true;
+				Thread.Sleep(50);
+				continue;
 			}
 		}
 
-		public override void ReleaseRedialLocker()
+		public override void ReleaseRedialLock()
 		{
-			var locker = RedisConnection.Database.HashGet(HostName, Locker);
-			while (locker.HasValue)
-			{
-				Console.WriteLine("Try releasing redis redial-locker");
-				RedisConnection.Database.HashDelete(HostName, Locker);
-				locker = RedisConnection.Database.HashGet(HostName, Locker);
-				Thread.Sleep(50);
-			}
+			var key = $"{RedialLockerKey}:{HostName}";
+			RedisConnection.Database.LockRelease(key, HostName);
 		}
 
 		private void ClearTimeoutAction()
@@ -115,19 +95,27 @@ namespace DotnetSpider.Extension.Redial
 			}
 		}
 
-		private void ClearTimeoutRedialLocker()
+		public override bool IsRedialing()
 		{
-			var result = RedisConnection.Database.HashGet(HostName, Locker);
-			if (result.HasValue)
-			{
-				var value = DateTime.Parse(result.ToString());
-				var minutes = (DateTime.Now - value).TotalMinutes;
+			return RedisConnection.Database.KeyExists(RedialLockerKey);
+		}
 
-				if (minutes > 5)
-				{
-					RedisConnection.Database.HashDelete(HostName, Locker);
-				}
+		public override DateTime GetLastRedialTime()
+		{
+			var redialTime = RedisConnection.Database.StringGet(RedialTimeKey);
+			if (redialTime.HasValue)
+			{
+				return DateTime.Parse(redialTime.ToString().Trim());
 			}
+			else
+			{
+				return new DateTime();
+			}
+		}
+
+		public override void RecordLastRedialTime()
+		{
+			RedisConnection.Database.StringSet(RedialTimeKey, DateTime.Now.ToString());
 		}
 	}
 }

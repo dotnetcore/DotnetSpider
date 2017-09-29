@@ -10,21 +10,21 @@ using LogLevel = NLog.LogLevel;
 
 namespace DotnetSpider.Core.Redial
 {
-	public class FileLockerRedialExecutor : RedialExecutor
+	public class MutexRedialExecutor : RedialExecutor
 	{
+		private const string MutexName = "DotnetSpiderRedialLocker";
 		private static readonly string AtomicActionFolder;
-		private static readonly string RedialLockerFile;
 		private static readonly string RedialTimeFile;
-		private static readonly ConcurrentDictionary<string, Stream> Files = new ConcurrentDictionary<string, Stream>();
+		private static Mutex SyncNamed;
+		private static readonly ConcurrentDictionary<string, Stream> NetworkFiles = new ConcurrentDictionary<string, Stream>();
 
-		static FileLockerRedialExecutor()
+		static MutexRedialExecutor()
 		{
 			AtomicActionFolder = Path.Combine(Env.GlobalDirectory, "atomicaction");
-			RedialLockerFile = Path.Combine(Env.GlobalDirectory, "redial.lock");
 			RedialTimeFile = Path.Combine(Env.GlobalDirectory, "redial.time");
 		}
 
-		public FileLockerRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
+		public MutexRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{
 			if (!Directory.Exists(AtomicActionFolder))
 			{
@@ -41,13 +41,6 @@ namespace DotnetSpider.Core.Redial
 				{
 				}
 			}
-			try
-			{
-				File.Delete(RedialLockerFile);
-			}
-			catch
-			{
-			}
 		}
 
 		public override void WaitAllNetworkRequestComplete()
@@ -62,40 +55,50 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
+		public override bool IsRedialing()
+		{
+			try
+			{
+				Mutex.OpenExisting(MutexName).Dispose();
+				return true;
+			}
+			catch (WaitHandleCannotBeOpenedException)
+			{
+				return false;
+			}
+		}
+
 		public override string CreateActionIdentity(string name)
 		{
 			string id = Path.Combine(AtomicActionFolder, name + "-" + Guid.NewGuid().ToString("N"));
-			Files.TryAdd(id, File.Create(id));
+			NetworkFiles.TryAdd(id, File.Create(id));
 			return id;
 		}
 
 		public override void DeleteActionIdentity(string identity)
 		{
-			Files.TryRemove(identity, out var stream);
+			NetworkFiles.TryRemove(identity, out var stream);
 			stream?.Dispose();
 			File.Delete(identity);
 		}
 
 		public override void LockRedial()
 		{
-			while (File.Exists(RedialLockerFile))
+			try
 			{
-				Thread.Sleep(50);
-				continue;
+				SyncNamed = Mutex.OpenExisting(MutexName);       //如果此命名互斥对象已存在则请求打开
 			}
-			Files.AddOrUpdate(RedialLockerFile, File.Create(RedialLockerFile));
+			catch (WaitHandleCannotBeOpenedException)
+			{
+				SyncNamed = new Mutex(false, MutexName);
+			}
+			SyncNamed.WaitOne();
 		}
 
 		public override void ReleaseRedialLock()
 		{
-			Files.TryRemove(RedialLockerFile, out var stream);
-			stream?.Dispose();
-			File.Delete(RedialLockerFile);
-		}
-
-		public override bool IsRedialing()
-		{
-			return File.Exists(RedialLockerFile);
+			SyncNamed.ReleaseMutex();
+			SyncNamed.Dispose();
 		}
 
 		public override DateTime GetLastRedialTime()

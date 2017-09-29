@@ -1,10 +1,23 @@
 ﻿using System;
+using DotnetSpider.Core.Selector;
 
 namespace DotnetSpider.Extension.Model.Attribute
 {
 	[AttributeUsage(AttributeTargets.Property)]
 	public class PropertyDefine : BaseSelector
 	{
+		public PropertyDefine()
+		{
+		}
+
+		public PropertyDefine(string expression) : base(expression)
+		{
+		}
+
+		public PropertyDefine(SelectorType type, string expression) : base(type, expression)
+		{
+		}
+
 		public enum Options
 		{
 			None,
