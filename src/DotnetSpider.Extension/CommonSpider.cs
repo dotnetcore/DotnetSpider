@@ -34,6 +34,7 @@ namespace DotnetSpider.Extension
 		{
 			Name = name;
 		}
+
 		public CommonSpider(string name) : base(new Site())
 		{
 			Name = name;
