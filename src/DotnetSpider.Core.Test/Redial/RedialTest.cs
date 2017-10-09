@@ -6,6 +6,9 @@ using DotnetSpider.Core.Redial.Redialer;
 using DotnetSpider.Core.Scheduler;
 using Xunit;
 using System;
+using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace DotnetSpider.Core.Test.Redial
 {
@@ -29,9 +32,78 @@ namespace DotnetSpider.Core.Test.Redial
 				new DefaultPageProcessor(new[] { "cnblogs\\.com" }))
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
 				.AddPipeline(new FilePipeline());
-
-			spider.RedialExecutor = new FileLockerRedialExecutor(new AdslRedialer("", "", ""), new VpsInternetDetector());
+			PrepareAdslConfig();
+			spider.RedialExecutor = new MutexRedialExecutor(new AdslRedialer("adsl_account.txt"));
 			Assert.NotNull(spider.RedialExecutor);
+		}
+
+		[Fact]
+		public void ConfigFileMissing()
+		{
+			Assert.Throws<SpiderException>(() =>
+			{
+				new MutexRedialExecutor(new AdslRedialer("adsl_account_null.txt"));
+			});
+		}
+
+		[Fact]
+		public void MulitThread()
+		{
+			PrepareAdslConfig();
+			var executor = new MutexRedialExecutor(new AdslRedialer("adsl_account.txt"));
+			executor.IsTest = true;
+			NetworkCenter.Current.Executor = executor;
+
+			Parallel.For(0, 5, new ParallelOptions
+			{
+				MaxDegreeOfParallelism = 5
+			}, j =>
+			{
+				for (int i = 0; i < 400; ++i)
+				{
+					NetworkCenter.Current.Executor.Execute("test", () =>
+					{
+						Thread.Sleep(50);
+					});
+
+					if (i % 100 == 0)
+					{
+						NetworkCenter.Current.Executor.Redial();
+					}
+				}
+			});
+
+			var executor2 = new FileLockerRedialExecutor(new AdslRedialer("adsl_account.txt"));
+			executor2.IsTest = true;
+			NetworkCenter.Current.Executor = executor2;
+
+			Parallel.For(0, 5, new ParallelOptions
+			{
+				MaxDegreeOfParallelism = 5
+			}, j =>
+			{
+				for (int i = 0; i < 400; ++i)
+				{
+					NetworkCenter.Current.Executor.Execute("test", () =>
+					{
+						Thread.Sleep(50);
+					});
+
+					if (i % 100 == 0)
+					{
+						NetworkCenter.Current.Executor.Redial();
+					}
+				}
+			});
+		}
+
+		private void PrepareAdslConfig()
+		{
+			FileInfo file = new FileInfo("adsl_account.txt");
+			if (!file.Exists)
+			{
+				File.AppendAllLines("adsl_account.txt", new[] { "a", "b", "c" });
+			}
 		}
 	}
 }

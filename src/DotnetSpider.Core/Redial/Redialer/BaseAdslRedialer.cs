@@ -14,5 +14,9 @@
 			Account = account;
 			Password = password;
 		}
+
+		protected BaseAdslRedialer()
+		{
+		}
 	}
 }

@@ -26,11 +26,15 @@ namespace DotnetSpider.Extension
 
 		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
-		protected CommonSpider(string name) : this(name, new Site())
+		protected CommonSpider(Site site) : base(site)
 		{
 		}
 
-		protected CommonSpider(string name, Site site) : base(site)
+		public CommonSpider(string name, Site site) : base(site)
+		{
+			Name = name;
+		}
+		public CommonSpider(string name) : base(new Site())
 		{
 			Name = name;
 		}

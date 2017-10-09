@@ -5,24 +5,25 @@ using DotnetSpider.Core.Redial.InternetDetector;
 using DotnetSpider.Core.Redial.Redialer;
 using NLog;
 using DotnetSpider.Core.Infrastructure;
+using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Redial
 {
 	public abstract class RedialExecutor : IRedialExecutor
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
-		protected static object Lock = new object();
 
+		internal bool IsTest { get; set; } = false;
 		public int WaitRedialTimeout { get; set; } = 100 * 1000 / 100;
 		public int RedialIntervalLimit { get; set; } = 10;
 		public abstract void WaitAllNetworkRequestComplete();
 		public abstract string CreateActionIdentity(string name);
 		public abstract void DeleteActionIdentity(string identity);
-		public abstract void LockRedial();
+		public abstract ILocker CreateLocker();
 		public abstract bool IsRedialing();
-		public abstract void ReleaseRedialLock();
 		public abstract DateTime GetLastRedialTime();
 		public abstract void RecordLastRedialTime();
+		public abstract void Dispose();
 
 		public IRedialer Redialer { get; }
 
@@ -48,21 +49,24 @@ namespace DotnetSpider.Core.Redial
 
 		public RedialResult Redial(Action action = null)
 		{
+			ILocker locker = null;
 			try
 			{
-				Logger.MyLog("Try to lock redialer...", LogLevel.Warn);
-				LockRedial();
-				Logger.MyLog("Lock redialer", LogLevel.Warn);
-				var lastRedialTime = GetLastRedialTime();
-				if ((DateTime.Now - lastRedialTime).Seconds < RedialIntervalLimit)
+				Logger.MyLog("Try to lock redialer...", LogLevel.Info);
+				locker = CreateLocker();
+				locker.Lock();
+				Logger.MyLog("Lock redialer", LogLevel.Info);
+				var lastRedialTime = (DateTime.Now - GetLastRedialTime()).Seconds;
+				if (lastRedialTime < RedialIntervalLimit)
 				{
+					Logger.MyLog($"Skip redial because last redial compeleted before {lastRedialTime} seconds.", LogLevel.Info);
 					return RedialResult.OtherRedialed;
 				}
 				Thread.Sleep(500);
-				Logger.MyLog("Wait all network requests complete...", LogLevel.Warn);
+				Logger.MyLog("Wait all network requests complete...", LogLevel.Info);
 				// 等待所有网络请求结束
 				WaitAllNetworkRequestComplete();
-				Logger.MyLog("Start redial...", LogLevel.Warn);
+				Logger.MyLog("Start redial...", LogLevel.Info);
 
 				var redialCount = 1;
 
@@ -71,7 +75,11 @@ namespace DotnetSpider.Core.Redial
 					try
 					{
 						Console.WriteLine($"redial loop {redialCount}");
-						Redialer.Redial();
+
+						if (!IsTest)
+						{
+							Redialer.Redial();
+						}
 
 						if (InternetDetector.Detect())
 						{
@@ -95,9 +103,11 @@ namespace DotnetSpider.Core.Redial
 					return RedialResult.Failed;
 				}
 
-				Logger.MyLog("Redial success.", LogLevel.Warn);
+				Logger.MyLog("Redial success.", LogLevel.Info);
 
 				action?.Invoke();
+
+				RecordLastRedialTime();
 
 				return RedialResult.Sucess;
 			}
@@ -108,7 +118,7 @@ namespace DotnetSpider.Core.Redial
 			}
 			finally
 			{
-				ReleaseRedialLock();
+				locker?.Release();
 				if (AfterRedialWaitTime > 0)
 				{
 					Console.WriteLine($"Going to sleep for {AfterRedialWaitTime} after redial.");
@@ -185,10 +195,14 @@ namespace DotnetSpider.Core.Redial
 		{
 			if (redialer == null || validater == null)
 			{
-				throw new RedialException("IRedialer, validatershould not be null.");
+				throw new RedialException("IRedialer, validatershould should not be null.");
 			}
 			Redialer = redialer;
 			InternetDetector = validater;
+		}
+
+		protected RedialExecutor(IRedialer redialer) : this(redialer, new DefaultInternetDetector())
+		{
 		}
 	}
 }

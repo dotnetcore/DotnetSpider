@@ -7,115 +7,63 @@ using DotnetSpider.Core.Redial.InternetDetector;
 using System.Collections.Concurrent;
 using DotnetSpider.Core.Infrastructure;
 using LogLevel = NLog.LogLevel;
+using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Redial
 {
-	public class MutexRedialExecutor : RedialExecutor
+	public sealed class MutexRedialExecutor : LocalRedialExecutor
 	{
-		private const string MutexName = "DotnetSpiderRedialLocker";
-		private static readonly string AtomicActionFolder;
-		private static readonly string RedialTimeFile;
-		private static Mutex SyncNamed;
-		private static readonly ConcurrentDictionary<string, Stream> NetworkFiles = new ConcurrentDictionary<string, Stream>();
-
-		static MutexRedialExecutor()
+		public sealed class MutexLocker : ILocker
 		{
-			AtomicActionFolder = Path.Combine(Env.GlobalDirectory, "atomicaction");
-			RedialTimeFile = Path.Combine(Env.GlobalDirectory, "redial.time");
+			public const string MutexName = "DotnetSpiderRedialLocker";
+			private Mutex SyncNamed;
+
+			public MutexLocker()
+			{
+				bool isOpened = Mutex.TryOpenExisting(MutexName, out SyncNamed);
+				if (!isOpened)
+				{
+					SyncNamed = new Mutex(false, MutexName);
+				}
+			}
+
+			public void Lock()
+			{
+				SyncNamed.WaitOne();
+			}
+
+			public void Release()
+			{
+				SyncNamed.ReleaseMutex();
+				SyncNamed.Dispose();
+			}
 		}
 
 		public MutexRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{
-			if (!Directory.Exists(AtomicActionFolder))
-			{
-				Directory.CreateDirectory(AtomicActionFolder);
-			}
-
-			foreach (var file in Directory.GetFiles(AtomicActionFolder))
-			{
-				try
-				{
-					File.Delete(file);
-				}
-				catch
-				{
-				}
-			}
 		}
 
-		public override void WaitAllNetworkRequestComplete()
+		public MutexRedialExecutor(IRedialer redialer) : this(redialer, new DefaultInternetDetector()) { }
+
+		public MutexRedialExecutor() : this(new AdslRedialer(), new DefaultInternetDetector())
 		{
-			while (true)
-			{
-				if (!Directory.GetFiles(AtomicActionFolder).Any())
-				{
-					break;
-				}
-				Thread.Sleep(50);
-			}
 		}
 
 		public override bool IsRedialing()
 		{
-			try
-			{
-				Mutex.OpenExisting(MutexName).Dispose();
-				return true;
-			}
-			catch (WaitHandleCannotBeOpenedException)
-			{
-				return false;
-			}
+			Mutex mutex;
+			bool isRedialing = Mutex.TryOpenExisting(MutexLocker.MutexName, out mutex);
+			mutex?.Dispose();
+			return isRedialing;
 		}
 
-		public override string CreateActionIdentity(string name)
+		public override ILocker CreateLocker()
 		{
-			string id = Path.Combine(AtomicActionFolder, name + "-" + Guid.NewGuid().ToString("N"));
-			NetworkFiles.TryAdd(id, File.Create(id));
-			return id;
+			return new MutexLocker();
 		}
 
-		public override void DeleteActionIdentity(string identity)
+		public override void Dispose()
 		{
-			NetworkFiles.TryRemove(identity, out var stream);
-			stream?.Dispose();
-			File.Delete(identity);
-		}
-
-		public override void LockRedial()
-		{
-			try
-			{
-				SyncNamed = Mutex.OpenExisting(MutexName);       //如果此命名互斥对象已存在则请求打开
-			}
-			catch (WaitHandleCannotBeOpenedException)
-			{
-				SyncNamed = new Mutex(false, MutexName);
-			}
-			SyncNamed.WaitOne();
-		}
-
-		public override void ReleaseRedialLock()
-		{
-			SyncNamed.ReleaseMutex();
-			SyncNamed.Dispose();
-		}
-
-		public override DateTime GetLastRedialTime()
-		{
-			if (File.Exists(RedialTimeFile))
-			{
-				return DateTime.Parse(File.ReadAllText(RedialTimeFile).Trim());
-			}
-			else
-			{
-				return new DateTime();
-			}
-		}
-
-		public override void RecordLastRedialTime()
-		{
-			File.AppendAllText(RedialTimeFile, DateTime.Now.ToString());
 		}
 	}
 }

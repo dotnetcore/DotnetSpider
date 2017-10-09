@@ -6,7 +6,7 @@ namespace DotnetSpider.Extension
 	{
 		public DefaultEntitySpider() : this(new Site()) { }
 
-		public DefaultEntitySpider(Site site) : base(null, site)
+		public DefaultEntitySpider(Site site) : base(site)
 		{
 		}
 

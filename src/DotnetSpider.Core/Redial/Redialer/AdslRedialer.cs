@@ -10,28 +10,38 @@ namespace DotnetSpider.Core.Redial.Redialer
 {
 	public class AdslRedialer : BaseAdslRedialer
 	{
-		public AdslRedialer(string interfaceName, string user, string password) : base(interfaceName, user, password)
+		public AdslRedialer() : this(Path.Combine(Env.GlobalDirectory, "adsl_account.txt"))
 		{
 		}
 
-		public AdslRedialer() : base("", "", "")
+		public AdslRedialer(string configPath)
 		{
-			var path = Path.Combine(Env.GlobalDirectory, "adsl_account.txt");
-			var accounts = File.ReadAllLines(path);
-			Interface = accounts[0].Trim();
-			Account = accounts[1].Trim();
-			Password = accounts[2].Trim();
+			var path = Path.Combine(configPath);
+			if (File.Exists(path))
+			{
+				var accounts = File.ReadAllLines(path);
+				Interface = accounts[0].Trim();
+				Account = accounts[1].Trim();
+				Password = accounts[2].Trim();
+			}
+			else
+			{
+				throw new SpiderException($"Unfound adsl config: {path}.");
+			}
+		}
+
+		public AdslRedialer(string interfaceName, string user, string password)
+		{
+			Interface = interfaceName;
+			Account = user;
+			Password = password;
 		}
 
 		public override void Redial()
 		{
+
 #if !NET_CORE
-			AdslCommand adsl = new AdslCommand(Interface, Account, Password);
-			adsl.Disconnect();
-			while (adsl.Connect() != 0)
-			{
-				Thread.Sleep(2000);
-			}
+			RedialOnWindows();
 #else
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
@@ -42,18 +52,23 @@ namespace DotnetSpider.Core.Redial.Redialer
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				AdslCommand adsl = new AdslCommand(Interface, Account, Password);
-				adsl.Disconnect();
-				while (adsl.Connect() != 0)
-				{
-					Thread.Sleep(2000);
-				}
+				RedialOnWindows();
 			}
 			else
 			{
 				throw new RedialException("Unsport this OS.");
 			}
 #endif
+		}
+
+		private void RedialOnWindows()
+		{
+			AdslCommand adsl = new AdslCommand(Interface, Account, Password);
+			adsl.Disconnect();
+			while (adsl.Connect() != 0)
+			{
+				Thread.Sleep(2000);
+			}
 		}
 	}
 }

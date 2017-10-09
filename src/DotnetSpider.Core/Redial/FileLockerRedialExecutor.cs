@@ -7,112 +7,89 @@ using DotnetSpider.Core.Redial.InternetDetector;
 using System.Collections.Concurrent;
 using DotnetSpider.Core.Infrastructure;
 using LogLevel = NLog.LogLevel;
+using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Redial
 {
-	public class FileLockerRedialExecutor : RedialExecutor
+	public class FileLockerRedialExecutor : LocalRedialExecutor
 	{
-		private static readonly string AtomicActionFolder;
-		private static readonly string RedialLockerFile;
-		private static readonly string RedialTimeFile;
-		private static readonly ConcurrentDictionary<string, Stream> Files = new ConcurrentDictionary<string, Stream>();
-
-		static FileLockerRedialExecutor()
+		public sealed class FileLocker : ILocker
 		{
-			AtomicActionFolder = Path.Combine(Env.GlobalDirectory, "atomicaction");
-			RedialLockerFile = Path.Combine(Env.GlobalDirectory, "redial.lock");
-			RedialTimeFile = Path.Combine(Env.GlobalDirectory, "redial.time");
+			public static readonly string RedialLockerFile = Path.Combine(Env.GlobalDirectory, "redial.lock");
+			private Stream _lockStream;
+
+			public FileLocker()
+			{
+				var fileInfo = new FileInfo(RedialLockerFile);
+				if (fileInfo.Exists)
+				{
+					try
+					{
+						fileInfo.Delete();
+					}
+					catch
+					{
+					}
+				}
+			}
+
+			public void Lock()
+			{
+				while (true)
+				{
+					try
+					{
+						_lockStream = File.Create(RedialLockerFile);
+						return;
+					}
+					catch
+					{
+						Thread.Sleep(50);
+						continue;
+					}
+				}
+			}
+
+			public void Release()
+			{
+				_lockStream.Dispose();
+				File.Delete(RedialLockerFile);
+			}
+		}
+
+		public FileLockerRedialExecutor(IRedialer redialer) : this(redialer, new DefaultInternetDetector()) { }
+
+		public FileLockerRedialExecutor() : this(new AdslRedialer(), new DefaultInternetDetector())
+		{
 		}
 
 		public FileLockerRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{
-			if (!Directory.Exists(AtomicActionFolder))
-			{
-				Directory.CreateDirectory(AtomicActionFolder);
-			}
-
-			foreach (var file in Directory.GetFiles(AtomicActionFolder))
+			var fileInfo = new FileInfo(FileLocker.RedialLockerFile);
+			if (fileInfo.Exists)
 			{
 				try
 				{
-					File.Delete(file);
+					fileInfo.Delete();
 				}
 				catch
 				{
 				}
 			}
-			try
-			{
-				File.Delete(RedialLockerFile);
-			}
-			catch
-			{
-			}
-		}
-
-		public override void WaitAllNetworkRequestComplete()
-		{
-			while (true)
-			{
-				if (!Directory.GetFiles(AtomicActionFolder).Any())
-				{
-					break;
-				}
-				Thread.Sleep(50);
-			}
-		}
-
-		public override string CreateActionIdentity(string name)
-		{
-			string id = Path.Combine(AtomicActionFolder, name + "-" + Guid.NewGuid().ToString("N"));
-			Files.TryAdd(id, File.Create(id));
-			return id;
-		}
-
-		public override void DeleteActionIdentity(string identity)
-		{
-			Files.TryRemove(identity, out var stream);
-			stream?.Dispose();
-			File.Delete(identity);
-		}
-
-		public override void LockRedial()
-		{
-			while (File.Exists(RedialLockerFile))
-			{
-				Thread.Sleep(50);
-				continue;
-			}
-			Files.AddOrUpdate(RedialLockerFile, File.Create(RedialLockerFile));
-		}
-
-		public override void ReleaseRedialLock()
-		{
-			Files.TryRemove(RedialLockerFile, out var stream);
-			stream?.Dispose();
-			File.Delete(RedialLockerFile);
 		}
 
 		public override bool IsRedialing()
 		{
-			return File.Exists(RedialLockerFile);
+			return File.Exists(FileLocker.RedialLockerFile);
 		}
 
-		public override DateTime GetLastRedialTime()
+		public override void Dispose()
 		{
-			if (File.Exists(RedialTimeFile))
-			{
-				return DateTime.Parse(File.ReadAllText(RedialTimeFile).Trim());
-			}
-			else
-			{
-				return new DateTime();
-			}
 		}
 
-		public override void RecordLastRedialTime()
+		public override ILocker CreateLocker()
 		{
-			File.AppendAllText(RedialTimeFile, DateTime.Now.ToString());
+			return new FileLocker();
 		}
 	}
 }

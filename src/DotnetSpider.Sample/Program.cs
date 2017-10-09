@@ -1,11 +1,16 @@
 ﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Redial;
 using DotnetSpider.Core.Redial.InternetDetector;
+using DotnetSpider.Core.Redial.Redialer;
 using System;
+using System.IO;
 using System.Net;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 #endif
 
 namespace DotnetSpider.Sample
@@ -23,7 +28,7 @@ namespace DotnetSpider.Sample
 
 			MyTest();
 
-			Startup.Run("-s:JdZiYingCoupon", "-tid:BaiduSearch", "-i:guid", "-a:");
+			Startup.Run("-s:BaiduSearch", "-tid:BaiduSearch", "-i:guid", "-a:");
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 
@@ -76,7 +81,6 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
-
 		}
 	}
 

@@ -20,8 +20,10 @@ using DotnetSpider.Core.Scheduler;
 using Newtonsoft.Json;
 using NLog;
 using System.Runtime.CompilerServices;
+using System.Reflection;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
+[assembly: InternalsVisibleTo("DotnetSpider.Sample")]
 [assembly: InternalsVisibleTo("DotnetSpider.Extension")]
 [assembly: InternalsVisibleTo("DotnetSpider.Extension.Test")]
 namespace DotnetSpider.Core
@@ -402,6 +404,17 @@ namespace DotnetSpider.Core
 #else
 			ThreadPool.SetMinThreads(200, 200);
 #endif
+			var type = GetType();
+			var spiderNameAttribute = type.GetCustomAttribute<SpiderName>();
+			if (spiderNameAttribute != null)
+			{
+				Name = spiderNameAttribute.Name;
+			}
+			else
+			{
+				Name = type.Name;
+			}
+			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 		}
 
 		/// <summary>
@@ -1292,6 +1305,11 @@ namespace DotnetSpider.Core
 			{
 				Logger.MyLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
 			}
+		}
+
+		private void CurrentDomain_ProcessExit(object sender, EventArgs e)
+		{
+			NetworkCenter.Current.Executor?.Dispose();
 		}
 	}
 }

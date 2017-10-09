@@ -4,9 +4,9 @@ namespace DotnetSpider.Core.Redial
 {
 	public class NetworkCenter
 	{
-		public static readonly Lazy<NetworkCenter> Instance = new Lazy<NetworkCenter>(() => new NetworkCenter());
+		private static readonly Lazy<NetworkCenter> _instance = new Lazy<NetworkCenter>(() => new NetworkCenter());
 
-		public static NetworkCenter Current => Instance.Value;
+		public static NetworkCenter Current => _instance.Value;
 
 		public IRedialExecutor Executor { get; set; }
 

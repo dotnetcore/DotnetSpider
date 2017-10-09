@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Core.Redial
 {
-	public interface IRedialExecutor
+	public interface IRedialExecutor : IDisposable
 	{
 		RedialResult Redial(Action action = null);
 		void WaitAllNetworkRequestComplete();
