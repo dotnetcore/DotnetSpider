@@ -158,7 +158,7 @@ namespace DotnetSpider.Core
 				var asm = Assembly.Load(file);
 				var types = asm.GetTypes();
 
-				Console.WriteLine($"Fetch assembly: {asm.FullName}.");
+				Console.WriteLine($"Fetch assembly   : {asm.GetName(false)}.");
 
 				foreach (var type in types)
 				{
@@ -226,10 +226,7 @@ namespace DotnetSpider.Core
 				return null;
 			}
 
-			Console.WriteLine();
-			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine($"Detected {spiderTypes.Keys.Count} crawlers.");
-			Console.ForegroundColor = ConsoleColor.White;
+			Console.WriteLine($"Count of crawlers: {spiderTypes.Keys.Count}");
 			Console.WriteLine();
 
 			PrintInfo.PrintLine('=');
@@ -320,14 +317,10 @@ namespace DotnetSpider.Core
 		{
 			Console.WriteLine("");
 			PrintInfo.Print();
-			Console.WriteLine("");
-			Console.ForegroundColor = ConsoleColor.Cyan;
 			var commands = string.Join(" ", args);
-			Console.WriteLine($"Args:           {commands}");
-			Console.WriteLine($"BaseDirectory:  {AppDomain.CurrentDomain.BaseDirectory}");
-			Console.WriteLine($"System:         {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}");
-			Console.ForegroundColor = ConsoleColor.White;
-			Console.WriteLine("");
+			Console.WriteLine($"Args             : {commands}");
+			Console.WriteLine($"BaseDirectory    : {AppDomain.CurrentDomain.BaseDirectory}");
+			Console.WriteLine($"System           : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}");
 		}
 
 		private static void SetConsoleEncoding()

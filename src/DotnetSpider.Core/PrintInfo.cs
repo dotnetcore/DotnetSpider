@@ -29,7 +29,6 @@ namespace DotnetSpider.Core
 
 					AppDomain.CurrentDomain.SetData(key, "True");
 
-					Console.WriteLine();
 					PrintLine('=');
 				}
 			}
