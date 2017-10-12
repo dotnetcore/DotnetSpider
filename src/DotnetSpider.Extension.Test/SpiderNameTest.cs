@@ -8,7 +8,7 @@ namespace DotnetSpider.Extension.Test
 {
 	public class SpiderNameTest
 	{
-		[SpiderName("HelloSpider")]
+		[TaskName("HelloSpider")]
 		public class MySpider1 : EntitySpider
 		{
 			public MySpider1()

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 namespace DotnetSpider.Sample
 {
 	[Properties(Owner = "Fay", Developer = "Lewis", Date = "2017-07-27", Subject = "百度搜索结果", Email = "136831898@qq.com")]
-	[SpiderName("BaiduSearchSpider")]
+	[TaskName("BaiduSearchSpider")]
 	public class BaiduSearchSpider : EntitySpider
 	{
 		public BaiduSearchSpider() : base("BaiduSearch")

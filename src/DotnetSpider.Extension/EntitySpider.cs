@@ -15,11 +15,11 @@ namespace DotnetSpider.Extension
 	{
 		public List<EntityDefine> Entities { get; internal set; } = new List<EntityDefine>();
 
-		public EntitySpider(Site site) : base(site)
+		public EntitySpider() : this(new Site())
 		{
 		}
 
-		public EntitySpider() : this(new Site())
+		public EntitySpider(Site site) : base(site)
 		{
 		}
 

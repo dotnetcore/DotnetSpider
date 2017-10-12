@@ -13,14 +13,14 @@ using System.Text;
 namespace DotnetSpider.Core
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-	public class SpiderName : Attribute
+	public class TaskName : Attribute
 	{
 		public string Name
 		{
 			get; set;
 		}
 
-		public SpiderName(string name)
+		public TaskName(string name)
 		{
 			Name = name;
 		}
@@ -194,7 +194,7 @@ namespace DotnetSpider.Core
 								return null;
 							}
 
-							var startupName = type.GetCustomAttribute<SpiderName>();
+							var startupName = type.GetCustomAttribute<TaskName>();
 							if (startupName != null)
 							{
 								if (!spiderTypes.ContainsKey(startupName.Name))

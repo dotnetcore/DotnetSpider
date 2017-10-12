@@ -405,7 +405,7 @@ namespace DotnetSpider.Core
 			ThreadPool.SetMinThreads(200, 200);
 #endif
 			var type = GetType();
-			var spiderNameAttribute = type.GetCustomAttribute<SpiderName>();
+			var spiderNameAttribute = type.GetCustomAttribute<TaskName>();
 			if (spiderNameAttribute != null)
 			{
 				Name = spiderNameAttribute.Name;
