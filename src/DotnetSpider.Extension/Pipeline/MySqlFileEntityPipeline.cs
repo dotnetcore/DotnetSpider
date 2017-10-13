@@ -87,7 +87,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 				foreach (var column in metadata.Columns)
 				{
-					var token = entry[$"$.{column.Name}"];
+					var token = entry.TryGetValue(column.Name);
 					var value = token == null ? "" : MySqlHelper.EscapeString(token.ToString());
 
 					builder.Append(column == lastColumn ? $"'{value}'" : $"'{value}', ");
@@ -106,8 +106,8 @@ namespace DotnetSpider.Extension.Pipeline
 				builder.Append("@END@");
 				foreach (var column in metadata.Columns)
 				{
-					var value = entry[$"$.{column.Name}"]?.ToString();
-					if (!string.IsNullOrEmpty(value))
+					var value = entry.TryGetValue(column.Name);
+					if (value != null)
 					{
 						builder.Append("#").Append(value).Append("#").Append("$");
 					}

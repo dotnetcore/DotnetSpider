@@ -7,13 +7,16 @@ using DotnetSpider.Extension.Model;
 using System.Configuration;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
+using System.Collections.Generic;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public class SqlServerEntityPipeline : BaseEntityDbPipeline
 	{
-		public SqlServerEntityPipeline(string connectString = null, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
+		public SqlServerEntityPipeline(string connectString = null) : base(connectString)
 		{
+			DefaultPipelineModel = PipelineMode.Insert;
 		}
 
 		protected override DbParameter CreateDbParameter(string name, object value)
@@ -25,7 +28,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return new SqlParameter(name, value);
 		}
 
-		protected override string GenerateCreateDatabaseSql(EntityAdapter adapter, string serverVersion)
+		private string GenerateCreateDatabaseSql(EntityAdapter adapter, string serverVersion)
 		{
 			string version = serverVersion.Split('.')[0];
 			switch (version)
@@ -41,7 +44,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		protected override string GenerateIfDatabaseExistsSql(EntityAdapter adapter, string serverVersion)
+		private string GenerateIfDatabaseExistsSql(EntityAdapter adapter, string serverVersion)
 		{
 			string version = serverVersion.Split('.')[0];
 			switch (version)
@@ -57,7 +60,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		protected override string GenerateCreateTableSql(EntityAdapter adapter)
+		private string GenerateCreateTableSql(EntityAdapter adapter)
 		{
 			var tableName = adapter.Table.CalculateTableName();
 			StringBuilder builder = new StringBuilder($"USE {adapter.Table.Database}; IF OBJECT_ID('{tableName}', 'U') IS NULL CREATE table {tableName} (");
@@ -92,7 +95,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 
 			builder.Append(
-				$" CONSTRAINT [PK_{tableName}] PRIMARY KEY CLUSTERED ({primaryKey.ToString(0, primaryKey.Length - 1)})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
+				$" CONSTRAINT [PK_{tableName}] PRIMARY KEY CLUSTERED ({primaryKey.ToString(0, primaryKey.Length - 1)})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = {(adapter.PipelineMode == PipelineMode.InsertAndIgnoreDuplicate ? "ON" : "OFF")}, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
 
 			if (adapter.Table.Indexs != null)
 			{
@@ -112,14 +115,20 @@ namespace DotnetSpider.Extension.Pipeline
 					var columns = unique.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
 					string uniqueColumNames = string.Join(", ", columns.Select(c => $"[{c}]"));
-					builder.Append($"CREATE UNIQUE NONCLUSTERED INDEX [unique_{name}] ON {tableName} ({uniqueColumNames.Substring(0, uniqueColumNames.Length)});");
+					builder.Append($"CREATE UNIQUE NONCLUSTERED INDEX [unique_{name}] ON {tableName} ({uniqueColumNames.Substring(0, uniqueColumNames.Length)}) {(adapter.PipelineMode == PipelineMode.InsertAndIgnoreDuplicate ? "WITH (IGNORE_DUP_KEY = ON)" : "") };");
 				}
 			}
-			return builder.ToString();
+			var sql = builder.ToString();
+			return sql;
 		}
 
-		protected override string GenerateInsertSql(EntityAdapter adapter)
+		private string GenerateInsertSql(EntityAdapter adapter)
 		{
+			if (adapter.PipelineMode == PipelineMode.InsertAndIgnoreDuplicate)
+			{
+				throw new NotSupportedException("Sql Server not supported this model.");
+			}
+
 			string columNames = string.Join(", ", adapter.Columns.Select(p => $"[{p.Name}]"));
 			string values = string.Join(", ", adapter.Columns.Select(p => $"@{p.Name}"));
 			var tableName = adapter.Table.CalculateTableName();
@@ -133,7 +142,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GenerateUpdateSql(EntityAdapter adapter)
+		private string GenerateUpdateSql(EntityAdapter adapter)
 		{
 			string setParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"[{p}]=@{p}"));
 			StringBuilder primaryParamenters = new StringBuilder();
@@ -160,18 +169,29 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		protected override string GenerateSelectSql(EntityAdapter adapter)
+		private string GenerateSelectSql(EntityAdapter adapter)
 		{
-			string selectParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"[{p}]"));
-			string primaryParamenters = $" [{adapter.Table.Primary}]=@{adapter.Table.Primary}";
+			StringBuilder primaryParamenters = new StringBuilder();
+
+			if (Env.IdColumn == adapter.Table.Primary)
+			{
+				primaryParamenters.Append($"[{Env.IdColumn}] = @{Env.IdColumn}");
+			}
+			else
+			{
+				var columns = adapter.Table.Primary.Split(',');
+				foreach (var column in columns)
+				{
+					primaryParamenters.Append(columns.Last() != column ? $" [{column}] = @{column} AND " : $" [{column}] = @{column}");
+				}
+			}
 
 			var sqlBuilder = new StringBuilder();
 			var tableName = adapter.Table.CalculateTableName();
-			sqlBuilder.AppendFormat("USE {0}; SELECT {1} FROM [{2}] WHERE {3};",
+			sqlBuilder.AppendFormat("USE {0}; SELECT * FROM [{1}] WHERE {2};",
 				adapter.Table.Database,
-				selectParamenters,
 				tableName,
-				primaryParamenters);
+				primaryParamenters.ToString());
 
 			return sqlBuilder.ToString();
 		}
@@ -235,6 +255,81 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 			return connectionStringSettings;
+		}
+
+		protected override void InitAllSqlOfEntity(EntityAdapter adapter)
+		{
+			if (adapter.PipelineMode == PipelineMode.InsertNewAndUpdateOld)
+			{
+				//Logger.MyLog(Spider.Identity, "Sql Server only check if primary key duplicate.", NLog.LogLevel.Warn);
+				throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
+			}
+			adapter.InsertSql = GenerateInsertSql(adapter);
+			adapter.SelectSql = GenerateSelectSql(adapter);
+			adapter.InsertAndIgnoreDuplicateSql = GenerateInsertSql(adapter);
+			if (adapter.PipelineMode == PipelineMode.Update)
+			{
+				adapter.UpdateSql = GenerateUpdateSql(adapter);
+			}
+		}
+
+		internal override void InitDatabaseAndTable()
+		{
+			foreach (var adapter in EntityAdapters.Values)
+			{
+				using (var conn = ConnectionStringSettings.GetDbConnection())
+				{
+					var sql = GenerateIfDatabaseExistsSql(adapter, conn.ServerVersion);
+
+					if (Convert.ToInt16(conn.MyExecuteScalar(sql)) == 0)
+					{
+						sql = GenerateCreateDatabaseSql(adapter, conn.ServerVersion);
+						conn.MyExecute(sql);
+					}
+
+					sql = GenerateCreateTableSql(adapter);
+					conn.MyExecute(sql);
+				}
+			}
+		}
+
+		public override int Process(string entityName, List<DataObject> datas)
+		{
+			if (datas == null || datas.Count == 0)
+			{
+				return 0;
+			}
+			int count = 0;
+			if (EntityAdapters.TryGetValue(entityName, out var metadata))
+			{
+				using (var conn = ConnectionStringSettings.GetDbConnection())
+				{
+					switch (metadata.PipelineMode)
+					{
+						case PipelineMode.Insert:
+						case PipelineMode.InsertAndIgnoreDuplicate:
+							{
+								count += conn.MyExecute(metadata.InsertSql, datas);
+								break;
+							}
+						case PipelineMode.InsertNewAndUpdateOld:
+							{
+								throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
+							}
+						case PipelineMode.Update:
+							{
+								count += conn.MyExecute(metadata.UpdateSql, datas);
+								break;
+							}
+						default:
+							{
+								count += conn.MyExecute(metadata.InsertSql, datas);
+								break;
+							}
+					}
+				}
+			}
+			return count;
 		}
 	}
 }

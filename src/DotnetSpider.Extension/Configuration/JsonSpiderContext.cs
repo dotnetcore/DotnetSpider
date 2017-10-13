@@ -88,14 +88,12 @@ namespace DotnetSpider.Extension.Configuration
 						}
 					case "SqlServer":
 						{
-							var checkIfSaveBeforeUpdate = pipeline.SelectToken("$.checkIfSaveBeforeUpdate");
-							tmp = new SqlServerEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString(), checkIfSaveBeforeUpdate?.ToObject<bool>() ?? false);
+							tmp = new SqlServerEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString());
 							break;
 						}
 					case "MySql":
 						{
-							var checkIfSaveBeforeUpdate = pipeline.SelectToken("$.checkIfSaveBeforeUpdate");
-							tmp = new MySqlEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString(), checkIfSaveBeforeUpdate?.ToObject<bool>() ?? false);
+							tmp = new MySqlEntityPipeline(pipeline.SelectToken("$.ConnectString").ToString());
 							break;
 						}
 					case "MySqlFile":

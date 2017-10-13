@@ -4,7 +4,7 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class PostgreSqlEntityPipeline : MySqlEntityPipeline
 	{
-		public PostgreSqlEntityPipeline(string connectString = null, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
+		public PostgreSqlEntityPipeline(string connectString = null) : base(connectString)
 		{
 		}
 

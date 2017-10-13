@@ -9,13 +9,17 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public List<Column> Columns { get; set; }
 
-		public string InsertSql { get; set; }
+		internal string InsertSql { get; set; }
 
-		public string UpdateSql { get; set; }
+		internal string InsertAndIgnoreDuplicateSql { get; set; }
 
-		public string SelectSql { get; set; }
+		internal string UpdateSql { get; set; }
 
-		public bool InsertModel { get; set; } = true;
+		internal string SelectSql { get; set; }
+
+		internal string InsertNewAndUpdateOldSql { get; set; }
+
+		public PipelineMode PipelineMode { get; set; } = PipelineMode.InsertAndIgnoreDuplicate;
 
 		public EntityAdapter(EntityTable table, List<Column> columns)
 		{

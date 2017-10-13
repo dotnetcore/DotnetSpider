@@ -20,7 +20,7 @@ namespace DotnetSpider.Sample
 		{
 			protected override DataObject HandleDataOject(DataObject data, Page page)
 			{
-				var soldStr = data.GetValue("sold");
+				var soldStr = data.TryGetValue("sold");
 
 				if (soldStr == null)
 				{
@@ -30,7 +30,7 @@ namespace DotnetSpider.Sample
 				else
 				{
 					var sold = int.Parse(soldStr?.ToString());
-					var price = float.Parse(data.GetValue("price")?.ToString());
+					var price = float.Parse(data.TryGetValue("price")?.ToString());
 
 					if (price >= 100 && price < 5000)
 					{

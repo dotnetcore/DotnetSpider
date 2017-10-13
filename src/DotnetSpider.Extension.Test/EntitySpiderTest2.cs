@@ -27,8 +27,13 @@ namespace DotnetSpider.Extension.Test
 
 		private class TestPipeline : BaseEntityDbPipeline
 		{
-			public TestPipeline(string connectString, bool checkIfSaveBeforeUpdate = false) : base(connectString, checkIfSaveBeforeUpdate)
+			public TestPipeline(string connectString) : base(connectString)
 			{
+			}
+
+			public override int Process(string entityName, List<DataObject> datas)
+			{
+				throw new NotImplementedException();
 			}
 
 			protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
@@ -41,32 +46,12 @@ namespace DotnetSpider.Extension.Test
 				throw new NotImplementedException();
 			}
 
-			protected override string GenerateCreateDatabaseSql(EntityAdapter metadata, string serverVersion)
+			protected override void InitAllSqlOfEntity(EntityAdapter adapter)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected override string GenerateCreateTableSql(EntityAdapter metadata)
-			{
-				throw new NotImplementedException();
-			}
-
-			protected override string GenerateIfDatabaseExistsSql(EntityAdapter metadata, string serverVersion)
-			{
-				throw new NotImplementedException();
-			}
-
-			protected override string GenerateInsertSql(EntityAdapter metadata)
-			{
-				throw new NotImplementedException();
-			}
-
-			protected override string GenerateSelectSql(EntityAdapter metadata)
-			{
-				throw new NotImplementedException();
-			}
-
-			protected override string GenerateUpdateSql(EntityAdapter metadata)
+			internal override void InitDatabaseAndTable()
 			{
 				throw new NotImplementedException();
 			}
