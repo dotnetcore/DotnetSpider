@@ -70,7 +70,6 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			_connectString = connectString;
 			CheckIfSameBeforeUpdate = checkIfSaveBeforeUpdate;
-			UseInternet = true;
 		}
 
 		public override void AddEntity(EntityDefine entityDefine)
@@ -143,32 +142,18 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					continue;
 				}
-				var action = new Action(() =>
+				using (var conn = ConnectionStringSettings.GetDbConnection())
 				{
-					using (var conn = ConnectionStringSettings.GetDbConnection())
+					var sql = GenerateIfDatabaseExistsSql(adapter, conn.ServerVersion);
+
+					if (Convert.ToInt16(conn.MyExecuteScalar(sql)) == 0)
 					{
-						var command = conn.CreateCommand();
-						command.CommandText = GenerateIfDatabaseExistsSql(adapter, conn.ServerVersion);
-
-						if (Convert.ToInt16(command.ExecuteScalar()) == 0)
-						{
-							command.CommandText = GenerateCreateDatabaseSql(adapter, conn.ServerVersion);
-							command.CommandType = CommandType.Text;
-							command.ExecuteNonQuery();
-						}
-
-						command.CommandText = GenerateCreateTableSql(adapter);
-						command.CommandType = CommandType.Text;
-						command.ExecuteNonQuery();
+						sql = GenerateCreateDatabaseSql(adapter, conn.ServerVersion);
+						conn.MyExecute(sql);
 					}
-				});
-				if (UseInternet)
-				{
-					NetworkCenter.Current.Execute("db-insert", action);
-				}
-				else
-				{
-					action();
+
+					sql = GenerateCreateTableSql(adapter);
+					conn.MyExecute(sql);
 				}
 			}
 		}
@@ -182,132 +167,16 @@ namespace DotnetSpider.Extension.Pipeline
 			int count = 0;
 			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
-				var action = new Action(() =>
+				using (var conn = ConnectionStringSettings.GetDbConnection())
 				{
 					if (metadata.InsertModel)
 					{
-						using (var conn = ConnectionStringSettings.GetDbConnection())
-						{
-							var cmd = conn.CreateCommand();
-							cmd.CommandText = metadata.InsertSql;
-							cmd.CommandType = CommandType.Text;
-
-							foreach (var data in datas)
-							{
-								cmd.Parameters.Clear();
-
-								foreach (var column in metadata.Columns)
-								{
-									var value = data[$"{column.Name}"];
-									var parameter = CreateDbParameter($"@{column.Name}", value);
-									cmd.Parameters.Add(parameter);
-								}
-
-								count += cmd.ExecuteNonQuery();
-							}
-						}
+						count += conn.MyExecute(metadata.InsertSql, datas);
 					}
 					else
 					{
-						using (var conn = ConnectionStringSettings.GetDbConnection())
-						{
-							foreach (var data in datas)
-							{
-								bool needUpdate;
-								if (CheckIfSameBeforeUpdate)
-								{
-									var selectCmd = conn.CreateCommand();
-									selectCmd.CommandText = metadata.SelectSql;
-									selectCmd.CommandType = CommandType.Text;
-									if (string.IsNullOrEmpty(metadata.Table.Primary))
-									{
-										var primaryParameter = CreateDbParameter($"@{Env.IdColumn}", data[Env.IdColumn]);
-										selectCmd.Parameters.Add(primaryParameter);
-									}
-									else
-									{
-										var columns = metadata.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim());
-										foreach (var column in columns)
-										{
-											var primaryParameter = CreateDbParameter($"@{column}", data[$"{column}"]);
-											selectCmd.Parameters.Add(primaryParameter);
-										}
-									}
-
-									var reader = selectCmd.ExecuteReader();
-									DataObject old = new DataObject();
-									if (reader.Read())
-									{
-										for (int i = 0; i < reader.FieldCount; ++i)
-										{
-											old.Add(reader.GetName(i), reader.GetString(i));
-										}
-									}
-									reader.Dispose();
-									selectCmd.Dispose();
-
-									// the primary key is not exists.
-									if (old.Count == 0)
-									{
-										continue;
-									}
-
-									string oldValue = string.Join("-", old.Values);
-
-									StringBuilder newValueBuilder = new StringBuilder();
-									foreach (var column in metadata.Table.UpdateColumns)
-									{
-										var v = data[$"$.{column}"];
-										newValueBuilder.Append($"-{v}");
-									}
-									string newValue = newValueBuilder.ToString().Substring(1, newValueBuilder.Length - 1);
-									needUpdate = oldValue != newValue;
-								}
-								else
-								{
-									needUpdate = true;
-								}
-
-								if (needUpdate)
-								{
-									var cmd = conn.CreateCommand();
-									cmd.CommandText = metadata.UpdateSql;
-									cmd.CommandType = CommandType.Text;
-
-									foreach (var column in metadata.Table.UpdateColumns)
-									{
-										var parameter = CreateDbParameter($"@{column}", data[$"{column}"]);
-										cmd.Parameters.Add(parameter);
-									}
-
-									if (string.IsNullOrEmpty(metadata.Table.Primary))
-									{
-										var primaryParameter = CreateDbParameter($"@{Env.IdColumn}", data[Env.IdColumn]);
-										primaryParameter.DbType = DbType.String;
-										cmd.Parameters.Add(primaryParameter);
-									}
-									else
-									{
-										var columns = metadata.Table.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim());
-										foreach (var column in columns)
-										{
-											var primaryParameter = CreateDbParameter($"@{column}", data[$"{column}"]);
-											cmd.Parameters.Add(primaryParameter);
-										}
-									}
-									count += cmd.ExecuteNonQuery();
-								}
-							}
-						}
+						count += conn.MyExecute(metadata.UpdateSql, datas);
 					}
-				});
-				if (UseInternet)
-				{
-					NetworkCenter.Current.Execute("pipeline", action);
-				}
-				else
-				{
-					action();
 				}
 			}
 			return count;

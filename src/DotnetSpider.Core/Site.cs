@@ -219,6 +219,10 @@ namespace DotnetSpider.Core
 				}
 				Cookies.StringPart = value;
 			}
+			get
+			{
+				return Cookies == null ? string.Empty : Cookies.StringPart;
+			}
 		}
 
 		public void SetCookies(Dictionary<string, string> cookies)

@@ -7,7 +7,6 @@ using System;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using System.Linq;
 using DotnetSpider.Core.Infrastructure.Database;
 
@@ -163,9 +162,9 @@ namespace DotnetSpider.Extension
 		{
 			using (IDbConnection conn = Env.SystemConnectionStringSettings.GetDbConnection())
 			{
-				conn.Execute("CREATE SCHEMA IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8mb4;");
-				conn.Execute("CREATE TABLE IF NOT EXISTS `DotnetSpider`.`TaskRunning` (`__Id` bigint(20) NOT NULL AUTO_INCREMENT, `TaskId` varchar(120) NOT NULL, `Name` varchar(200) NULL, `Identity` varchar(120), `CDate` timestamp NOT NULL, PRIMARY KEY (__Id), UNIQUE KEY `taskId_unique` (`TaskId`)) AUTO_INCREMENT=1");
-				conn.Execute($"INSERT IGNORE INTO `DotnetSpider`.`TaskRunning` (`TaskId`,`Name`,`Identity`,`CDate`) values ('{TaskId}','{Name}','{Identity}','{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}');");
+				conn.MyExecute("CREATE SCHEMA IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8mb4;");
+				conn.MyExecute("CREATE TABLE IF NOT EXISTS `DotnetSpider`.`TaskRunning` (`__Id` bigint(20) NOT NULL AUTO_INCREMENT, `TaskId` varchar(120) NOT NULL, `Name` varchar(200) NULL, `Identity` varchar(120), `CDate` timestamp NOT NULL, PRIMARY KEY (__Id), UNIQUE KEY `taskId_unique` (`TaskId`)) AUTO_INCREMENT=1");
+				conn.MyExecute($"INSERT IGNORE INTO `DotnetSpider`.`TaskRunning` (`TaskId`,`Name`,`Identity`,`CDate`) values ('{TaskId}','{Name}','{Identity}','{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")}');");
 			}
 		}
 
@@ -173,7 +172,7 @@ namespace DotnetSpider.Extension
 		{
 			using (IDbConnection conn = Env.SystemConnectionStringSettings.GetDbConnection())
 			{
-				conn.Execute($"DELETE FROM `DotnetSpider`.`TaskRunning` WHERE `Identity`='{Identity}';");
+				conn.MyExecute($"DELETE FROM `DotnetSpider`.`TaskRunning` WHERE `Identity`='{Identity}';");
 			}
 		}
 	}

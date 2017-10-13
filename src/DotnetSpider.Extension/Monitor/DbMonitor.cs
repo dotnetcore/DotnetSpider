@@ -1,7 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
-using Dapper;
-using DotnetSpider.Core.Redial;
 using NLog;
 using System;
 using DotnetSpider.Core.Infrastructure.Database;
@@ -14,8 +12,6 @@ namespace DotnetSpider.Extension.Monitor
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public bool UseInternet { get; set; } = true;
-
 		private readonly bool _isDbOnly;
 
 		public DbMonitor(string identity, bool isDbOnly = false)
@@ -26,37 +22,26 @@ namespace DotnetSpider.Extension.Monitor
 
 			if (Core.Env.SystemConnectionStringSettings != null)
 			{
-				var action = new Action(() =>
+				using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 				{
-					using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
-					{
-						InitStatusDatabase(conn);
+					InitStatusDatabase(conn);
 
-						var insertSql = "insert ignore into DotnetSpider.Status (`Identity`, `Node`, `Logged`, `Status`, `Thread`, `Left`, `Success`, `Error`, `Total`, `AvgDownloadSpeed`, `AvgProcessorSpeed`, `AvgPipelineSpeed`) values (@Identity, @Node, current_timestamp, @Status, @Thread, @Left, @Success, @Error, @Total, @AvgDownloadSpeed, @AvgProcessorSpeed, @AvgPipelineSpeed);";
-						conn.Execute(insertSql,
-							new
-							{
-								Identity,
-								Node = NodeId.Id,
-								Status = "INIT",
-								Left = 0,
-								Total = 0,
-								Success = 0,
-								Error = 0,
-								AvgDownloadSpeed = 0,
-								AvgProcessorSpeed = 0,
-								AvgPipelineSpeed = 0,
-								Thread = 0
-							});
-					}
-				});
-				if (UseInternet)
-				{
-					NetworkCenter.Current.Execute("db-monitor", action);
-				}
-				else
-				{
-					action();
+					var insertSql = "insert ignore into DotnetSpider.Status (`Identity`, `Node`, `Logged`, `Status`, `Thread`, `Left`, `Success`, `Error`, `Total`, `AvgDownloadSpeed`, `AvgProcessorSpeed`, `AvgPipelineSpeed`) values (@Identity, @Node, current_timestamp, @Status, @Thread, @Left, @Success, @Error, @Total, @AvgDownloadSpeed, @AvgProcessorSpeed, @AvgPipelineSpeed);";
+					conn.MyExecute(insertSql,
+						new
+						{
+							Identity,
+							Node = NodeId.Id,
+							Status = "INIT",
+							Left = 0,
+							Total = 0,
+							Success = 0,
+							Error = 0,
+							AvgDownloadSpeed = 0,
+							AvgProcessorSpeed = 0,
+							AvgPipelineSpeed = 0,
+							Thread = 0
+						});
 				}
 			}
 		}
@@ -73,16 +58,16 @@ namespace DotnetSpider.Extension.Monitor
 		{
 			try
 			{
-				conn.Execute("CREATE DATABASE IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8;");
+				conn.MyExecute("CREATE DATABASE IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8;");
 
 				var sql = "CREATE TABLE IF NOT EXISTS `DotnetSpider`.`Status` (`Identity` varchar(120) NOT NULL,`Node` varchar(120) NOT NULL,`Logged` timestamp NULL DEFAULT current_timestamp,`Status` varchar(20) DEFAULT NULL,`Thread` int(13),`Left` bigint(20),`Success` bigint(20),`Error` bigint(20),`Total` bigint(20),`AvgDownloadSpeed` float,`AvgProcessorSpeed` bigint(20),`AvgPipelineSpeed` bigint(20), PRIMARY KEY (`Identity`,`Node`))";
-				conn.Execute(sql);
+				conn.MyExecute(sql);
 
-				var trigger = conn.QueryFirstOrDefault("SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'Status_AFTER_UPDATE' and EVENT_OBJECT_SCHEMA='DotnetSpider' and EVENT_OBJECT_TABLE='Status'");
+				var trigger = conn.MyQueryFirstOrDefault("SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'Status_AFTER_UPDATE' and EVENT_OBJECT_SCHEMA='DotnetSpider' and EVENT_OBJECT_TABLE='Status'");
 				if (trigger == null)
 				{
 					var timeTrigger = "CREATE TRIGGER `DotnetSpider`.`Status_AFTER_UPDATE` BEFORE UPDATE ON `Status` FOR EACH ROW BEGIN set NEW.Logged = NOW(); END";
-					conn.Execute(timeTrigger);
+					conn.MyExecute(timeTrigger);
 				}
 			}
 			catch (MySqlException e)
@@ -109,35 +94,24 @@ namespace DotnetSpider.Extension.Monitor
 
 			if (Core.Env.SaveLogAndStatusToDb)
 			{
-				var action = new Action(() =>
+				using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 				{
-					using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
-					{
-						conn.Execute(
-							"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `Node`=@Node;",
-							new
-							{
-								Identity = Identity,
-								Node = NodeId.Id,
-								Status = status,
-								Left = left,
-								Total = total,
-								Success = success,
-								Error = error,
-								AvgDownloadSpeed = avgDownloadSpeed,
-								AvgProcessorSpeed = avgProcessorSpeed,
-								AvgPipelineSpeed = avgPipelineSpeed,
-								Thread = threadNum
-							});
-					}
-				});
-				if (UseInternet)
-				{
-					NetworkCenter.Current.Execute("db-monitor-report", action);
-				}
-				else
-				{
-					action();
+					conn.MyExecute(
+						"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `Node`=@Node;",
+						new
+						{
+							Identity = Identity,
+							Node = NodeId.Id,
+							Status = status,
+							Left = left,
+							Total = total,
+							Success = success,
+							Error = error,
+							AvgDownloadSpeed = avgDownloadSpeed,
+							AvgProcessorSpeed = avgProcessorSpeed,
+							AvgPipelineSpeed = avgPipelineSpeed,
+							Thread = threadNum
+						});
 				}
 			}
 		}

@@ -146,6 +146,10 @@ namespace DotnetSpider.Extension.Model
 						skip = true;
 						break;
 					}
+					else
+					{
+						dataObject.Add(field.Name, null);
+					}
 				}
 				else
 				{

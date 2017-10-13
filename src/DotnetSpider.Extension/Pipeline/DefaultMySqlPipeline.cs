@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using DotnetSpider.Core;
 using System.Configuration;
 using DotnetSpider.Core.Infrastructure.Database;
-using Dapper;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -46,7 +45,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			using (var conn = ConnectionStringSettings.GetDbConnection())
 			{
-				conn.Execute($"INSERT IGNORE `{Database}`.`{TableName}` (`url`, `title`, `html`) VALUES (@Url, @Title, @Html);", results);
+				conn.MyExecute($"INSERT IGNORE `{Database}`.`{TableName}` (`url`, `title`, `html`) VALUES (@Url, @Title, @Html);", results);
 			}
 		}
 
@@ -75,8 +74,8 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			using (var conn = ConnectionStringSettings.GetDbConnection())
 			{
-				conn.Execute($"CREATE SCHEMA IF NOT EXISTS `{database}` DEFAULT CHARACTER SET utf8mb4 ;");
-				conn.Execute($"CREATE TABLE IF NOT EXISTS `{database}`.`{tableName}` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `url` varchar(300) DEFAULT NULL, `title` varchar(300) DEFAULT NULL, `html` text, `cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`), KEY `url_index` (`url`) USING BTREE) DEFAULT CHARSET=utf8mb4;");
+				conn.MyExecute($"CREATE SCHEMA IF NOT EXISTS `{database}` DEFAULT CHARACTER SET utf8mb4 ;");
+				conn.MyExecute($"CREATE TABLE IF NOT EXISTS `{database}`.`{tableName}` (`id` bigint(20) NOT NULL AUTO_INCREMENT, `url` varchar(300) DEFAULT NULL, `title` varchar(300) DEFAULT NULL, `html` text, `cdate` timestamp NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`), KEY `url_index` (`url`) USING BTREE) DEFAULT CHARSET=utf8mb4;");
 			}
 		}
 

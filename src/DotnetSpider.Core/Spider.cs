@@ -668,7 +668,7 @@ namespace DotnetSpider.Core
 								catch (Exception e)
 								{
 									OnError(request);
-									Logger.MyLog(Identity, $"Crawler failed: {request.Url}.", LogLevel.Error, e);
+									Logger.MyLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
 								}
 								finally
 								{
@@ -1083,7 +1083,7 @@ namespace DotnetSpider.Core
 					page = AddToCycleRetry(request, Site);
 				}
 				if (page != null) OnError(page.Request);
-				Logger.MyLog(Identity, $"Extract {request.Url} failed, please check your pipeline: {e.Message}.", LogLevel.Error, e);
+				Logger.MyLog(Identity, $"Extract {request.Url} failed, please check your pipeline: {e}.", LogLevel.Error, e);
 			}
 
 			if (page == null)

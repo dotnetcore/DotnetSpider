@@ -13,6 +13,7 @@ using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Sample
 {
+	[TaskName("TaobaoKeywordWatcher")]
 	public class TaobaoKeywordWatcher : EntitySpider
 	{
 		public class MyDataHanlder : DataHandler
@@ -29,7 +30,7 @@ namespace DotnetSpider.Sample
 				else
 				{
 					var sold = int.Parse(soldStr?.ToString());
-					var price = int.Parse(data.GetValue("price")?.ToString());
+					var price = float.Parse(data.GetValue("price")?.ToString());
 
 					if (price >= 100 && price < 5000)
 					{
@@ -94,20 +95,23 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit(params string[] arguments)
 		{
-			Scheduler = new RedisScheduler();
-			var downloader = new HttpClientDownloader();
-			downloader.AddAfterDownloadCompleteHandler(new ReplaceContentHandler
+			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
 			{
-				NewValue = "/",
-				OldValue = "\\/",
+				StartOffset = 16,
+				EndOffset = 22,
+				StartPart = "g_page_config = {",
+				EndPart = "g_srp_loadCss();"
 			});
-			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&s=0", 44));
-			Downloader = downloader;
-			ThreadNum = 1;
+			Downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&s=0", 44));
 			SkipWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))
 			{
-				AddStartUrlBuilder(new DbStartUrlBuilder(Database.MySql, Env.DataConnectionStringSettings.ConnectionString, "SELECT * FROM taobao.result_keywords limit 10000", new[] { "bidwordstr", "tab" }, "https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}"));
+				//AddStartUrlBuilder(
+				//	new DbStartUrlBuilder(Database.MySql, Env.DataConnectionStringSettings.ConnectionString,
+				//	"SELECT * FROM taobao.result_keywords limit 10000", new[] { "bidwordstr", "tab" },
+				//	"https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}"));
+
+				AddStartRequest(new Request("https://s.taobao.com/search?q=妙可蓝多&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab=all", new Dictionary<string, dynamic> { { "bidwordstr", "妙可蓝多" } }));
 			}
 			AddEntityType(typeof(Item), new MyDataHanlder());
 		}

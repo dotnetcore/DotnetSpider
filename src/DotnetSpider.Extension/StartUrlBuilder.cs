@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Redial;
-using Dapper;
 using DotnetSpider.Core.Infrastructure.Database;
 using System.Configuration;
 using System.Runtime.CompilerServices;
@@ -72,18 +70,15 @@ namespace DotnetSpider.Extension
 		protected List<IDictionary<string, object>> QueryDatas()
 		{
 			List<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
-			NetworkCenter.Current.Execute("db-starturlbuilder", () =>
+			using (var conn = ConnectionStringSettings.GetDbConnection())
 			{
-				using (var conn = ConnectionStringSettings.GetDbConnection())
+				foreach (var item in conn.MyQuery(Sql))
 				{
-					foreach (var item in conn.Query(Sql))
-					{
-						var dataItem = item as IDictionary<string, object>;
-						FormateDataObject(dataItem);
-						list.Add(dataItem);
-					}
+					var dataItem = item as IDictionary<string, object>;
+					FormateDataObject(dataItem);
+					list.Add(dataItem);
 				}
-			});
+			}
 			return list;
 		}
 

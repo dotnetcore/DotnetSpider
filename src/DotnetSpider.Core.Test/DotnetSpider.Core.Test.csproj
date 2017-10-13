@@ -13,8 +13,8 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="xunit" Version="2.3.0-beta4-build3742" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta4-build3742" />
+    <PackageReference Include="xunit" Version="2.3.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
@@ -23,9 +23,6 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="app - Copy %282%29.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="app.outside.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

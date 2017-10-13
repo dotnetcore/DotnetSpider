@@ -1,5 +1,4 @@
-﻿using Dapper;
-using DotnetSpider.Core.Infrastructure.Database;
+﻿using DotnetSpider.Core.Infrastructure.Database;
 using System.Configuration;
 using System.Linq;
 
@@ -22,9 +21,11 @@ namespace DotnetSpider.Extension.Infrastructure
 		{
 			using (var conn = DatabaseExtensions.GetDbConnection(DataSource, ConnectString))
 			{
-				ConnectionStringSettings connectString = conn.Query<ConnectionStringSettings>(QueryString).FirstOrDefault();
+				ConnectionStringSettings connectString = conn.MyQuery<ConnectionStringSettings>(QueryString).FirstOrDefault();
 				return connectString;
 			}
 		}
+
+	
 	}
 }

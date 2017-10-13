@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
-using Dapper;
 using DotnetSpider.Core.Infrastructure;
 using MimeKit;
 using System.Linq;
@@ -185,7 +184,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 				try
 				{
-					var query = conn.Query<QueryResult>(Sql).FirstOrDefault();
+					var query = conn.MyQuery<QueryResult>(Sql).FirstOrDefault();
 					result = query?.Result;
 					verifyResult = Validate(result);
 					color = verifyResult ? "forestgreen" : "orangered";

@@ -12,20 +12,11 @@ namespace DotnetSpider.Extension.Infrastructure
 	{
 		public static string Export(this IDbConnection conn, string sql, string fileName, bool rewrite = false)
 		{
-			var command = conn.CreateCommand();
-			command.CommandText = sql;
-			command.CommandType = CommandType.Text;
-
-			if (conn.State == ConnectionState.Closed)
-			{
-				conn.Open();
-			}
-
 			IDataReader reader = null;
 
 			try
 			{
-				reader = command.ExecuteReader();
+				reader = conn.MyExecuteReader(sql);
 
 				int row = 1;
 				using (var p = new ExcelPackage())
