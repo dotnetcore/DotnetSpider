@@ -6,13 +6,14 @@ using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
+using DotnetSpider.Extension.Pipeline;
 using System;
 using System.Collections.Generic;
 
 namespace DotnetSpider.Sample
 {
 	[Properties(Owner = "Fay", Developer = "Lewis", Date = "2017-07-27", Subject = "百度搜索结果", Email = "136831898@qq.com")]
-	[TaskName("BaiduSearchSpider")]
+	[TaskName("BaiduSearch")]
 	public class BaiduSearchSpider : EntitySpider
 	{
 		public BaiduSearchSpider() : base("BaiduSearch")
@@ -23,6 +24,8 @@ namespace DotnetSpider.Sample
 		{
 			var word = "可乐|雪碧";
 			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+
+			//AddPipeline(new CassandraEntityPipeline("127.0.0.1"));
 			AddEntityType(typeof(BaiduSearchEntry));
 
 			DataVerificationAndReport += () =>

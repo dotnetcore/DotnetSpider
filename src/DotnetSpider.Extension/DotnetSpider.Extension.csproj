@@ -67,6 +67,7 @@
     <Folder Include="Redial\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CassandraCSharpDriver" Version="3.3.2" />
     <PackageReference Include="Npgsql" Version="3.2.5" />
   </ItemGroup>
 </Project>

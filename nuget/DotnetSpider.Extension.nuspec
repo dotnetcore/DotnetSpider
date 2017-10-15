@@ -24,6 +24,7 @@
         <dependency id="EPPlus.Core" version="1.5.2"/>
         <dependency id="CoreCompat.Selenium.WebDriver" version="3.4.0-beta001"/>
         <dependency id="Npgsql" version="3.2.5"/>
+        <dependency id="CassandraCSharpDriver" version="3.3.2"/>
       </group>
       <group targetFramework=".NETFramework4.5" >
         <dependency id="DotnetSpider2.Core" version="2.1.0-beta1" />
@@ -39,6 +40,7 @@
         <dependency id="EPPlus" version="4.1.0"/>
         <dependency id="Selenium.WebDriver" version="3.5.2"/>
         <dependency id="Npgsql" version="3.2.5"/>
+        <dependency id="CassandraCSharpDriver" version="3.3.2"/>
       </group>
     </dependencies>
   </metadata>

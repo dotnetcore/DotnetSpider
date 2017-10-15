@@ -2,6 +2,7 @@
 using DotnetSpider.Core.Redial;
 using DotnetSpider.Core.Redial.InternetDetector;
 using DotnetSpider.Core.Redial.Redialer;
+using DotnetSpider.Extension.Pipeline;
 using System;
 using System.IO;
 using System.Net;
@@ -81,6 +82,7 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
+	 
 		}
 	}
 
