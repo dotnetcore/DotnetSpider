@@ -21,7 +21,7 @@ namespace DotnetSpider.Sample
 		{
 			Identity = ("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-			AddEntityType(typeof(Product));
+			AddEntityType<Product>();
 			Downloader = new WebDriverDownloader(Browser.Chrome);
 		}
 

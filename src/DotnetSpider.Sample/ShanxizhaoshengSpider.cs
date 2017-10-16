@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample
 			Identity = ("ShanxizhaoshengSpider " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			AddPipeline(new SqlServerEntityPipeline("Data Source=.\\SQLEXPRESS;Initial Catalog=master;Integrated Security=True"));
 			AddStartUrl("http://www.sneac.com/pgjhcx/ypbkyxjg.jsp?a11709CountNo=2000");
-			AddEntityType(typeof(Item));
+			AddEntityType<Item>();
 		}
 
 		[EntityTable("abc", "shanxizhaosheng")]

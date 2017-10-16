@@ -121,7 +121,6 @@ namespace DotnetSpider.Core.Selector
 
 		public override IList<ISelectable> Nodes()
 		{
-			//return Elements.Select(element => new Selectable(element)).Cast<ISelectable>().ToList();
 			List<ISelectable> reslut = new List<ISelectable>();
 			foreach (var element in Elements)
 			{

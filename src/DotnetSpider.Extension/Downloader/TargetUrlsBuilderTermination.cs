@@ -39,7 +39,7 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				if (SelectorUtils.Parse(TotalPageSelector) is EnviromentSelector enviromentSelector)
 				{
-					totalStr = EntityExtractor.GetEnviromentValue(enviromentSelector.Field, page, 0);
+					totalStr = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, 0);
 				}
 			}
 			else

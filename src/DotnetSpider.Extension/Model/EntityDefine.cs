@@ -10,9 +10,31 @@ using System.Reflection;
 
 namespace DotnetSpider.Extension.Model
 {
-	public class EntityDefine : AbstractSelector
+	public interface IEntityDefine
 	{
-		private static readonly List<string> DefaultProperties = new List<string> { "cdate", Env.IdColumn };
+		string Name { get; }
+		BaseSelector Selector { get; }
+		bool NotNull { get; }
+		bool Multi { get; }
+		Type Type { get; }
+		EntityTable TableInfo { get; }
+		List<Column> Columns { get; }
+		int Take { get; }
+		List<TargetUrlsSelector> TargetUrlsSelectors { get; }
+		List<SharedValueSelector> SharedValues { get; }
+	}
+
+	public class EntityDefine<T> : IEntityDefine
+	{
+		public string Name { get; }
+
+		public BaseSelector Selector { get; set; }
+
+		public bool NotNull { get; set; }
+
+		public bool Multi { get; set; }
+
+		public Type Type { get; }
 
 		public EntityTable TableInfo { get; set; }
 
@@ -22,220 +44,129 @@ namespace DotnetSpider.Extension.Model
 
 		public List<TargetUrlsSelector> TargetUrlsSelectors { get; set; }
 
-		public List<LinkToNext> LinkToNexts { get; set; } = new List<LinkToNext>();
+		public DataHandler<T> DataHandler { get; set; }
 
-		public DataHandler DataHandler { get; set; }
+		public List<SharedValueSelector> SharedValues { get; internal set; }
 
-		public List<SharedValueSelector> SharedValues { get; internal set; } = new List<SharedValueSelector>();
-
-		public static EntityDefine Parse(
-#if !NET_CORE
-			Type entityType
-#else
-			TypeInfo entityType
-#endif
-		)
+		public EntityDefine()
 		{
-			EntityDefine entityDefine = new EntityDefine();
-			GenerateEntityColumns(entityType, entityDefine);
+			Type = typeof(T);
 
-			entityDefine.TableInfo = entityType.GetCustomAttribute<EntityTable>();
+			var typeName = Type.GetTypeCrossPlatform().FullName;
+			Name = typeName;
 
-			if (entityDefine.TableInfo != null)
+			TableInfo = Type.GetCustomAttribute<EntityTable>();
+
+			if (TableInfo != null)
 			{
-				if (entityDefine.TableInfo.Indexs != null)
+				if (TableInfo.Indexs != null)
 				{
-					entityDefine.TableInfo.Indexs = new HashSet<string>(entityDefine.TableInfo.Indexs.Select(i => i.Replace(" ", ""))).ToArray();
+					TableInfo.Indexs = new HashSet<string>(TableInfo.Indexs.Select(i => i.Replace(" ", ""))).ToArray();
 				}
-				if (entityDefine.TableInfo.Uniques != null)
+				if (TableInfo.Uniques != null)
 				{
-					entityDefine.TableInfo.Uniques = new HashSet<string>(entityDefine.TableInfo.Uniques.Select(i => i.Replace(" ", ""))).ToArray();
+					TableInfo.Uniques = new HashSet<string>(TableInfo.Uniques.Select(i => i.Replace(" ", ""))).ToArray();
 				}
 			}
-			EntitySelector entitySelector = entityType.GetCustomAttribute<EntitySelector>();
+			EntitySelector entitySelector = Type.GetCustomAttribute<EntitySelector>();
 			if (entitySelector != null)
 			{
-				entityDefine.Multi = true;
-				entityDefine.Take = entitySelector.Take;
-				entityDefine.Selector = new BaseSelector { Expression = entitySelector.Expression, Type = entitySelector.Type };
+				Multi = true;
+				Take = entitySelector.Take;
+				Selector = new BaseSelector { Expression = entitySelector.Expression, Type = entitySelector.Type };
 			}
 			else
 			{
-				entityDefine.Multi = false;
+				Multi = false;
 			}
-			var targetUrlsSelectors = entityType.GetCustomAttributes<TargetUrlsSelector>();
-			entityDefine.TargetUrlsSelectors = targetUrlsSelectors.ToList();
-
-			entityDefine.SharedValues = entityType.GetCustomAttributes<SharedValueSelector>().Select(e => new SharedValueSelector
+			var targetUrlsSelectors = Type.GetCustomAttributes<TargetUrlsSelector>();
+			TargetUrlsSelectors = targetUrlsSelectors.ToList();
+			var sharedValueSelectorAttributes = Type.GetCustomAttributes<SharedValueSelector>();
+			if (sharedValueSelectorAttributes != null)
 			{
-				Name = e.Name,
-				Expression = e.Expression,
-				Type = e.Type
-			}).ToList();
+				SharedValues = sharedValueSelectorAttributes.Select(e => new SharedValueSelector
+				{
+					Name = e.Name,
+					Expression = e.Expression,
+					Type = e.Type
+				}).ToList();
+			}
+			else
+			{
+				SharedValues = new List<SharedValueSelector>();
+			}
 
-			ValidateEntityDefine(entityDefine);
+			GenerateEntityColumns();
 
-			return entityDefine;
+			ValidateEntityDefine();
 		}
 
-		public static EntityDefine Parse<T>()
+		public void CreateTable(BaseEntityDbPipeline pipeline)
 		{
-#if !NET_CORE
-			Type type = typeof(T);
-#else
-			TypeInfo type=typeof(T).GetTypeInfo();
-#endif
-			return Parse(type);
-		}
-
-		public static void CreateTable<T>(BaseEntityDbPipeline pipeline)
-		{
-			var entity = Parse<T>();
-			pipeline.AddEntity(entity);
 			pipeline.InitDatabaseAndTable();
 		}
 
-		private static void GenerateEntityColumns(
-#if !NET_CORE
-			Type entityType
-#else
-			TypeInfo entityType
-#endif
-			, EntityDefine entity
-)
+		private void GenerateEntityColumns()
 		{
-			var typeName = entityType.GetTypeCrossPlatform().FullName;
-			entity.Name = typeName;
+			var properties = Type.GetProperties();
 
-			var properties = entityType.GetProperties();
-			if (properties.Any(p => DefaultProperties.Contains(p.Name.ToLower())))
+			foreach (var property in properties)
 			{
-				throw new SpiderException("cdate is not available because it's a default property.");
-			}
-			foreach (var propertyInfo in properties)
-			{
-				var propertySelector = propertyInfo.GetCustomAttribute<PropertyDefine>();
-				if (propertySelector == null)
+				var propertyDefine = property.GetCustomAttribute<PropertyDefine>();
+				if (propertyDefine == null)
 				{
 					continue;
 				}
 
-				var type = propertyInfo.PropertyType;
-
-				var column = new Column
-				{
-					Multi = typeof(IList).IsAssignableFrom(type),
-					Option = propertySelector.Option,
-					Selector = new BaseSelector
-					{
-						Expression = propertySelector.Expression,
-						Type = propertySelector.Type,
-						Argument = propertySelector.Argument
-					},
-					NotNull = propertySelector.NotNull,
-					IgnoreStore = propertySelector.IgnoreStore,
-					Length = propertySelector.Length,
-					Name = propertyInfo.Name
-				};
-
-				foreach (var formatter in propertyInfo.GetCustomAttributes<Formatter.Formatter>(true))
-				{
-					column.Formatters.Add(formatter);
-				}
-
-				var targetUrl = propertyInfo.GetCustomAttribute<LinkToNext>();
-				if (targetUrl != null)
-				{
-					targetUrl.PropertyName = column.Name;
-					entity.LinkToNexts.Add(targetUrl);
-				}
-
-				column.DataType = type.Name;
-
-				if (column.DataType != DataTypeNames.String && propertySelector.Length > 0)
-				{
-					throw new SpiderException("Only string property can set length.");
-				}
-
-				entity.Columns.Add(column);
+				var column = new Column(property, propertyDefine);
+				Columns.Add(column);
 			}
 		}
 
-		private static void ValidateEntityDefine(EntityDefine entity)
+		private void ValidateEntityDefine()
 		{
-			var columns = GetColumns(entity);
+			var columns = Columns.Where(c => !c.IgnoreStore).ToList();
 
 			if (columns.Count == 0)
 			{
-				throw new SpiderException($"Columns is necessary for {entity.Name}.");
+				throw new SpiderException($"Columns is necessary for {Name}.");
 			}
-			if (entity.TableInfo == null)
+			if (TableInfo == null)
 			{
 				return;
 			}
-			if (!string.IsNullOrEmpty(entity.TableInfo.Primary))
-			{
-				if (entity.TableInfo.Primary != Env.IdColumn)
-				{
-					var items = new HashSet<string>(entity.TableInfo.Primary.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
-					if (items.Count > 0)
-					{
-						foreach (var item in items)
-						{
-							var column = columns.FirstOrDefault(c => c.Name == item);
-							if (column == null)
-							{
-								throw new SpiderException("Columns set as primary is not a property of your entity.");
-							}
-							if (column.DataType == DataTypeNames.String && (column.Length > 256 || column.Length <= 0))
-							{
-								throw new SpiderException("Column length of primary should not large than 256.");
-							}
-							column.NotNull = true;
-						}
-					}
-					else
-					{
-						entity.TableInfo.Primary = Env.IdColumn;
-					}
-				}
-			}
-			else
-			{
-				entity.TableInfo.Primary = Env.IdColumn;
-			}
 
-			if (entity.TableInfo.UpdateColumns != null && entity.TableInfo.UpdateColumns.Length > 0)
+			if (TableInfo.UpdateColumns != null && TableInfo.UpdateColumns.Length > 0)
 			{
-				foreach (var column in entity.TableInfo.UpdateColumns)
+				foreach (var column in TableInfo.UpdateColumns)
 				{
 					if (columns.All(c => c.Name != column))
 					{
-						throw new SpiderException("Columns set as update is not a property of your entity.");
+						throw new SpiderException("Columns set to update are not a property of your entity.");
 					}
 				}
-				var updateColumns = new List<string>(entity.TableInfo.UpdateColumns);
-				updateColumns.Remove(entity.TableInfo.Primary);
+				var updateColumns = new List<string>(TableInfo.UpdateColumns);
+				updateColumns.Remove(Env.IdColumn);
 
-				entity.TableInfo.UpdateColumns = updateColumns.ToArray();
+				TableInfo.UpdateColumns = updateColumns.ToArray();
 
-				if (entity.TableInfo.UpdateColumns.Length == 0)
+				if (TableInfo.UpdateColumns.Length == 0)
 				{
 					throw new SpiderException("There is no column need update.");
 				}
 			}
 
-			if (entity.TableInfo.Indexs != null && entity.TableInfo.Indexs.Length > 0)
+			if (TableInfo.Indexs != null && TableInfo.Indexs.Length > 0)
 			{
-				for (int i = 0; i < entity.TableInfo.Indexs.Length; ++i)
+				for (int i = 0; i < TableInfo.Indexs.Length; ++i)
 				{
-					var items = new HashSet<string>(entity.TableInfo.Indexs[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
+					var items = new HashSet<string>(TableInfo.Indexs[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 
 					if (items.Count == 0)
 					{
 						throw new SpiderException("Index should contain more than a column.");
 					}
-					if (items.Count == 1 && items.First() == entity.TableInfo.Primary)
+					if (items.Count == 1 && items.First() == Env.IdColumn)
 					{
 						throw new SpiderException("Primary is no need to create another index.");
 					}
@@ -244,27 +175,27 @@ namespace DotnetSpider.Extension.Model
 						var column = columns.FirstOrDefault(c => c.Name == item);
 						if (column == null)
 						{
-							throw new SpiderException("Columns set as index is not a property of your entity.");
+							throw new SpiderException("Columns set as index are not a property of your entity.");
 						}
-						if (column.DataType == DataTypeNames.String && (column.Length <= 0 || column.Length > 256))
+						if (column.DataType.FullName == DataTypeNames.String && (column.Length <= 0 || column.Length > 256))
 						{
 							throw new SpiderException("Column length of index should not large than 256.");
 						}
 					}
-					entity.TableInfo.Indexs[i] = string.Join(",", items);
+					TableInfo.Indexs[i] = string.Join(",", items);
 				}
 			}
-			if (entity.TableInfo.Uniques != null && entity.TableInfo.Uniques.Length > 0)
+			if (TableInfo.Uniques != null && TableInfo.Uniques.Length > 0)
 			{
-				for (int i = 0; i < entity.TableInfo.Uniques.Length; ++i)
+				for (int i = 0; i < TableInfo.Uniques.Length; ++i)
 				{
-					var items = new HashSet<string>(entity.TableInfo.Uniques[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
+					var items = new HashSet<string>(TableInfo.Uniques[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
 
 					if (items.Count == 0)
 					{
 						throw new SpiderException("Unique should contain more than a column.");
 					}
-					if (items.Count == 1 && items.First() == entity.TableInfo.Primary)
+					if (items.Count == 1 && items.First() == Env.IdColumn)
 					{
 						throw new SpiderException("Primary is no need to create another unique.");
 					}
@@ -273,54 +204,76 @@ namespace DotnetSpider.Extension.Model
 						var column = columns.FirstOrDefault(c => c.Name == item);
 						if (column == null)
 						{
-							throw new SpiderException("Columns set as unique is not a property of your entity.");
+							throw new SpiderException("Columns set as unique are not a property of your entity.");
 						}
-						if (column.DataType == DataTypeNames.String && (column.Length <= 0 || column.Length > 256))
+						if (column.DataType.FullName == DataTypeNames.String && (column.Length <= 0 || column.Length > 256))
 						{
 							throw new SpiderException("Column length of unique should not large than 256.");
 						}
 					}
-					entity.TableInfo.Uniques[i] = string.Join(",", items);
+					TableInfo.Uniques[i] = string.Join(",", items);
 				}
 			}
 		}
+	}
 
-		private static List<Column> GetColumns(EntityDefine entity)
+	public class Column
+	{
+		public Column(PropertyInfo property, PropertyDefine propertyDefine)
 		{
-			var columns = new List<Column>();
-			foreach (var f in entity.Columns)
+			Property = property;
+			PropertyDefine = propertyDefine;
+
+			var type = Property.PropertyType;
+
+			if (DataType.FullName != DataTypeNames.String && propertyDefine.Length > 0)
 			{
-				var column = f;
-				if (!column.IgnoreStore)
-				{
-					columns.Add(column);
-				}
+				throw new SpiderException("Only string property can set length.");
 			}
-			return columns;
+
+			Multi = typeof(IList).IsAssignableFrom(type);
+			Option = propertyDefine.Option;
+			Selector = new BaseSelector
+			{
+				Expression = propertyDefine.Expression,
+				Type = propertyDefine.Type,
+				Argument = propertyDefine.Argument
+			};
+			NotNull = propertyDefine.NotNull;
+			IgnoreStore = propertyDefine.IgnoreStore;
+			Length = propertyDefine.Length;
+
+			foreach (var formatter in property.GetCustomAttributes<Formatter.Formatter>(true))
+			{
+				Formatters.Add(formatter);
+			}
 		}
-	}
 
-	public class Column : AbstractSelector
-	{
-		public PropertyDefine.Options Option { get; set; }
+		public PropertyDefine PropertyDefine { get; }
 
-		public int Length { get; set; }
+		public PropertyInfo Property { get; }
 
-		public string DataType { get; set; }
+		public string Name => Property.Name;
 
-		public bool IgnoreStore { get; set; }
-
-		public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
-	}
-
-	public abstract class AbstractSelector
-	{
 		public BaseSelector Selector { get; set; }
 
 		public bool NotNull { get; set; }
 
 		public bool Multi { get; set; }
 
-		public string Name { get; set; }
+		public PropertyDefine.Options Option { get; set; }
+
+		public int Length { get; set; }
+
+		public Type DataType => Property.PropertyType;
+
+		public bool IgnoreStore { get; set; }
+
+		public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
+
+		public override string ToString()
+		{
+			return $"{Name},{DataType.Name}";
+		}
 	}
 }

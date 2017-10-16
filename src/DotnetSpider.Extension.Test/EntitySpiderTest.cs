@@ -36,7 +36,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				Identity = Guid.NewGuid().ToString();
 				AddPipeline(new ConsoleEntityPipeline());
-				AddEntityType(typeof(TestEntity));
+				AddEntityType<TestEntity>();
 			}
 		}
 
@@ -106,7 +106,7 @@ namespace DotnetSpider.Extension.Test
 				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
 				AddStartUrl("https://baidu.com");
 				AddPipeline(new ConsoleEntityPipeline());
-				AddEntityType(typeof(TestEntity));
+				AddEntityType<TestEntity>();
 			}
 		}
 
@@ -189,7 +189,7 @@ namespace DotnetSpider.Extension.Test
 						{ "Keyword", word },
 						{ "guid", _guid }
 					});
-				AddEntityType(typeof(BaiduSearchEntry));
+				AddEntityType<BaiduSearchEntry>();
 			}
 
 			[EntityTable("test", "baidu_search")]
@@ -250,7 +250,7 @@ namespace DotnetSpider.Extension.Test
 				SkipWhenResultIsEmpty = false;
 				AddPipeline(new CollectEntityPipeline());
 				AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
-				AddEntityType(typeof(ArticleSummary));
+				AddEntityType<ArticleSummary>();
 			}
 
 			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]

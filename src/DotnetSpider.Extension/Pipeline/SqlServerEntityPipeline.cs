@@ -65,37 +65,11 @@ namespace DotnetSpider.Extension.Pipeline
 			var tableName = adapter.Table.CalculateTableName();
 			StringBuilder builder = new StringBuilder($"USE {adapter.Table.Database}; IF OBJECT_ID('{tableName}', 'U') IS NULL CREATE table {tableName} (");
 			StringBuilder columnNames = new StringBuilder();
-
-			foreach (var p in adapter.Columns)
-			{
-				columnNames.Append($",[{p.Name}] {GetDataTypeSql(p)}");
-			}
-
-			builder.Append(columnNames.ToString().Substring(1, columnNames.Length - 1));
-			builder.Append(",[CDate] DATETIME DEFAULT(GETDATE())");
-
-			if (Env.IdColumn.ToLower() == adapter.Table.Primary.ToLower())
-			{
-				builder.Append($", [{Env.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL");
-			}
-
+			string columNames = string.Join(", ", adapter.Columns.Select(p => GenerateColumn(adapter, p)));
+			builder.Append(columNames);
 			builder.Append(",");
-			StringBuilder primaryKey = new StringBuilder();
-			if (string.IsNullOrEmpty(adapter.Table.Primary))
-			{
-				primaryKey.Append($"[{Env.IdColumn}] ASC,");
-			}
-			else
-			{
-				var columns = adapter.Table.Primary.Split(',');
-				foreach (var column in columns)
-				{
-					primaryKey.Append($"[{column}] ASC,");
-				}
-			}
-
 			builder.Append(
-				$" CONSTRAINT [PK_{tableName}] PRIMARY KEY CLUSTERED ({primaryKey.ToString(0, primaryKey.Length - 1)})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = {(adapter.PipelineMode == PipelineMode.InsertAndIgnoreDuplicate ? "ON" : "OFF")}, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
+				$" CONSTRAINT [PK_{tableName}] PRIMARY KEY CLUSTERED ({Env.IdColumn})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = {(adapter.PipelineMode == PipelineMode.InsertAndIgnoreDuplicate ? "ON" : "OFF")}, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
 
 			if (adapter.Table.Indexs != null)
 			{
@@ -122,6 +96,22 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
+		private string GenerateColumn(EntityAdapter adapter, Column p)
+		{
+			if (p.DataType.FullName == DataTypeNames.DateTime)
+			{
+				return $"[{p.Name}] {GetDataTypeSql(p)} DEFAULT(GETDATE())";
+			}
+			else if (Env.IdColumn == p.Name)
+			{
+				return $"[{Env.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL";
+			}
+			else
+			{
+				return $"[{p.Name}] {GetDataTypeSql(p)}";
+			}
+		}
+
 		private string GenerateInsertSql(EntityAdapter adapter)
 		{
 			if (adapter.PipelineMode == PipelineMode.InsertAndIgnoreDuplicate)
@@ -129,8 +119,8 @@ namespace DotnetSpider.Extension.Pipeline
 				throw new NotSupportedException("Sql Server not supported this model.");
 			}
 
-			string columNames = string.Join(", ", adapter.Columns.Select(p => $"[{p.Name}]"));
-			string values = string.Join(", ", adapter.Columns.Select(p => $"@{p.Name}"));
+			string columNames = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"[{p.Name}]"));
+			string values = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"@{p.Name}"));
 			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("USE {0}; INSERT INTO [{1}] {2} {3};",
@@ -146,18 +136,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			string setParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"[{p}]=@{p}"));
 			StringBuilder primaryParamenters = new StringBuilder();
-			if (string.IsNullOrEmpty(adapter.Table.Primary))
-			{
-				primaryParamenters.Append("[__Id] = @__Id");
-			}
-			else
-			{
-				var columns = adapter.Table.Primary.Split(',');
-				foreach (var column in columns)
-				{
-					primaryParamenters.Append(columns.Last() != column ? $" [{column}] = @{column} AND " : $" [{column}] = @{column}");
-				}
-			}
+			primaryParamenters.Append($"[{Env.IdColumn}] = @{Env.IdColumn}");
 
 			var sqlBuilder = new StringBuilder();
 			var tableName = adapter.Table.CalculateTableName();
@@ -173,18 +152,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			StringBuilder primaryParamenters = new StringBuilder();
 
-			if (Env.IdColumn == adapter.Table.Primary)
-			{
-				primaryParamenters.Append($"[{Env.IdColumn}] = @{Env.IdColumn}");
-			}
-			else
-			{
-				var columns = adapter.Table.Primary.Split(',');
-				foreach (var column in columns)
-				{
-					primaryParamenters.Append(columns.Last() != column ? $" [{column}] = @{column} AND " : $" [{column}] = @{column}");
-				}
-			}
+			primaryParamenters.Append($"[{Env.IdColumn}] = @{Env.IdColumn}");
 
 			var sqlBuilder = new StringBuilder();
 			var tableName = adapter.Table.CalculateTableName();
@@ -200,35 +168,35 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			var dataType = "TEXT";
 
-			if (field.DataType == DataTypeNames.Boolean)
+			if (field.DataType.FullName == DataTypeNames.Boolean)
 			{
 				dataType = "BOOL";
 			}
-			else if (field.DataType == DataTypeNames.DateTime)
+			else if (field.DataType.FullName == DataTypeNames.DateTime)
 			{
 				dataType = "DATETIME";
 			}
-			else if (field.DataType == DataTypeNames.Decimal)
+			else if (field.DataType.FullName == DataTypeNames.Decimal)
 			{
 				dataType = "DECIMAL(18,2)";
 			}
-			else if (field.DataType == DataTypeNames.Double)
+			else if (field.DataType.FullName == DataTypeNames.Double)
 			{
 				dataType = "FLOAT";
 			}
-			else if (field.DataType == DataTypeNames.Float)
+			else if (field.DataType.FullName == DataTypeNames.Float)
 			{
 				dataType = "FLOAT";
 			}
-			else if (field.DataType == DataTypeNames.Int)
+			else if (field.DataType.FullName == DataTypeNames.Int)
 			{
 				dataType = "INT";
 			}
-			else if (field.DataType == DataTypeNames.Int64)
+			else if (field.DataType.FullName == DataTypeNames.Int64)
 			{
 				dataType = "BIGINT";
 			}
-			else if (field.DataType == DataTypeNames.String)
+			else if (field.DataType.FullName == DataTypeNames.String)
 			{
 				dataType = field.Length <= 0 ? "NVARCHAR(MAX)" : $"NVARCHAR({field.Length}) {(field.NotNull ? "NOT NULL" : "NULL")}";
 			}
@@ -293,7 +261,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override int Process(string entityName, List<DataObject> datas)
+		public override int Process(string entityName, List<dynamic> datas)
 		{
 			if (datas == null || datas.Count == 0)
 			{

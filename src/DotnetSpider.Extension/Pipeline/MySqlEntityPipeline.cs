@@ -30,35 +30,35 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			var dataType = "LONGTEXT";
 
-			if (field.DataType == DataTypeNames.Boolean)
+			if (field.DataType.FullName == DataTypeNames.Boolean)
 			{
 				dataType = "BOOL";
 			}
-			else if (field.DataType == DataTypeNames.DateTime)
+			else if (field.DataType.FullName == DataTypeNames.DateTime)
 			{
 				dataType = "TIMESTAMP NULL";
 			}
-			else if (field.DataType == DataTypeNames.Decimal)
+			else if (field.DataType.FullName == DataTypeNames.Decimal)
 			{
 				dataType = "DECIMAL(18,2)";
 			}
-			else if (field.DataType == DataTypeNames.Double)
+			else if (field.DataType.FullName == DataTypeNames.Double)
 			{
 				dataType = "DOUBLE";
 			}
-			else if (field.DataType == DataTypeNames.Float)
+			else if (field.DataType.FullName == DataTypeNames.Float)
 			{
 				dataType = "FLOAT";
 			}
-			else if (field.DataType == DataTypeNames.Int)
+			else if (field.DataType.FullName == DataTypeNames.Int)
 			{
 				dataType = "INT";
 			}
-			else if (field.DataType == DataTypeNames.Int64)
+			else if (field.DataType.FullName == DataTypeNames.Int64)
 			{
 				dataType = "BIGINT";
 			}
-			else if (field.DataType == DataTypeNames.String)
+			else if (field.DataType.FullName == DataTypeNames.String)
 			{
 				dataType = (field.Length <= 0) ? "LONGTEXT" : $"VARCHAR({field.Length})";
 			}
@@ -80,13 +80,14 @@ namespace DotnetSpider.Extension.Pipeline
 			return connectionStringSettings;
 		}
 
-		public override int Process(string entityName, List<DataObject> datas)
+		public override int Process(string entityName, List<dynamic> datas)
 		{
 			if (datas == null || datas.Count == 0)
 			{
 				return 0;
 			}
 			int count = 0;
+
 			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
 				using (var conn = ConnectionStringSettings.GetDbConnection())
@@ -158,8 +159,8 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string GenerateInsertSql(EntityAdapter adapter, bool ignoreDuplicate)
 		{
-			string columNames = string.Join(", ", adapter.Columns.Select(p => $"`{p.Name}`"));
-			string values = string.Join(", ", adapter.Columns.Select(p => $"@{p.Name}"));
+			string columNames = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"`{p.Name}`"));
+			string values = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"@{p.Name}"));
 			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("INSERT {0} INTO `{1}`.`{2}` {3} {4};",
@@ -175,10 +176,9 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string GenerateInsertNewAndUpdateOldSql(EntityAdapter adapter)
 		{
-			string setParamenters = string.Join(", ", adapter.Columns.Select(p => $"`{p.Name}`=@{p.Name}"));
-
-			string columNames = string.Join(", ", adapter.Columns.Select(p => $"`{p.Name}`"));
-			string values = string.Join(", ", adapter.Columns.Select(p => $"@{p.Name}"));
+			string setParamenters = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"`{p.Name}`=@{p.Name}"));
+			string columNames = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"`{p.Name}`"));
+			string values = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"@{p.Name}"));
 			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("INSERT INTO `{0}`.`{1}` {2} {3} ON DUPLICATE KEY UPDATE {4};",
@@ -197,18 +197,7 @@ namespace DotnetSpider.Extension.Pipeline
 			string setParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"`{p}`=@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
 			StringBuilder primaryParamenters = new StringBuilder();
-			if (Env.IdColumn == adapter.Table.Primary)
-			{
-				primaryParamenters.Append($"`{Env.IdColumn}` = @__Id");
-			}
-			else
-			{
-				var columns = adapter.Table.Primary.Split(',');
-				foreach (var column in columns)
-				{
-					primaryParamenters.Append(columns.Last() != column ? $" `{column}` = @{column} AND " : $" `{column}` = @{column}");
-				}
-			}
+			primaryParamenters.Append($"`{Env.IdColumn}` = @{Env.IdColumn}");
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("UPDATE `{0}`.`{1}` SET {2} WHERE {3};",
 				adapter.Table.Database,
@@ -222,18 +211,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			StringBuilder primaryParamenters = new StringBuilder();
 
-			if (Env.IdColumn == adapter.Table.Primary)
-			{
-				primaryParamenters.Append($"`{Env.IdColumn}` = @{Env.IdColumn}");
-			}
-			else
-			{
-				var columns = adapter.Table.Primary.Split(',');
-				foreach (var column in columns)
-				{
-					primaryParamenters.Append(columns.Last() != column ? $" `{column}` = @{column} AND " : $" `{column}` = @{column}");
-				}
-			}
+			primaryParamenters.Append($"`{Env.IdColumn}` = @{Env.IdColumn}");
 			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("SELECT * FROM `{0}`.`{1}` WHERE {2};",
@@ -248,13 +226,8 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			var tableName = adapter.Table.CalculateTableName();
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{adapter.Table.Database }`.`{tableName}` (");
-			string columNames = string.Join(", ", adapter.Columns.Select(p => $"`{p.Name}` {GetDataTypeSql(p)} "));
+			string columNames = string.Join(", ", adapter.Columns.Select(p => GenerateColumn(adapter, p)));
 			builder.Append(columNames);
-			builder.Append(",`CDate` timestamp NULL DEFAULT CURRENT_TIMESTAMP");
-			if (Env.IdColumn.ToLower() == adapter.Table.Primary.ToLower())
-			{
-				builder.Append($", `{Env.IdColumn}` bigint AUTO_INCREMENT");
-			}
 
 			if (adapter.Table.Indexs != null)
 			{
@@ -276,10 +249,26 @@ namespace DotnetSpider.Extension.Pipeline
 					builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames.Substring(0, uniqueColumNames.Length)})");
 				}
 			}
-			builder.Append($", PRIMARY KEY ({ adapter.Table.Primary})");
+			builder.Append($", PRIMARY KEY ({Env.IdColumn})");
 			builder.Append(") AUTO_INCREMENT=1");
 			string sql = builder.ToString();
 			return sql;
+		}
+
+		private string GenerateColumn(EntityAdapter adapter, Column p)
+		{
+			if (p.DataType.FullName == DataTypeNames.DateTime)
+			{
+				return $"`{p.Name}` {GetDataTypeSql(p)} DEFAULT CURRENT_TIMESTAMP";
+			}
+			else if (Env.IdColumn == p.Name)
+			{
+				return $"`{Env.IdColumn}` bigint AUTO_INCREMENT";
+			}
+			else
+			{
+				return $"`{p.Name}` {GetDataTypeSql(p)}";
+			}
 		}
 
 		private string GenerateCreateDatabaseSql(EntityAdapter adapter, string serverVersion)
@@ -290,14 +279,6 @@ namespace DotnetSpider.Extension.Pipeline
 		private string GenerateIfDatabaseExistsSql(EntityAdapter adapter, string serverVersion)
 		{
 			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{adapter.Table.Database}';";
-		}
-	}
-
-	public class MySqlEntityPipeline<T> : MySqlEntityPipeline where T : SpiderEntity
-	{
-		public MySqlEntityPipeline(string connectString = null) : base(connectString)
-		{
-			AddEntity(EntityDefine.Parse<T>());
 		}
 	}
 }

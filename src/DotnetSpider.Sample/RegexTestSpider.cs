@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample
 			Identity = ("cnblogs homepage " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
 			AddStartUrl("http://www.cnblogs.com");
 			AddPipeline(new ConsoleEntityPipeline());
-			AddEntityType(typeof(HomePage));
+			AddEntityType<HomePage>();
 		}
 
 		class HomePage : SpiderEntity

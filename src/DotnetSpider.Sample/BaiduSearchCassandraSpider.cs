@@ -1,50 +1,45 @@
-﻿using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Downloader;
+﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Selector;
+using DotnetSpider.Extension;
+using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-
+using DotnetSpider.Extension.Pipeline;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Xunit;
 
-namespace DotnetSpider.Extension.Test.Downloader
+namespace DotnetSpider.Sample
 {
-	public class WebDriverDownloaderTests
+	[Properties(Owner = "Fay", Developer = "Lewis", Date = "2017-07-27", Subject = "百度搜索结果", Email = "136831898@qq.com")]
+	[TaskName("BaiduSearchCassandraSpider")]
+	public class BaiduSearchCassandraSpider : EntitySpider
 	{
-		[Fact]
-		public void DestoryDownloader()
+		public BaiduSearchCassandraSpider() : base("BaiduSearch")
 		{
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				return;
-			}
-			BaiduSearchSpider spider = new BaiduSearchSpider();
-			spider.Run();
 		}
 
-		public class BaiduSearchSpider : EntitySpider
+		protected override void MyInit(params string[] arguments)
 		{
-			public BaiduSearchSpider() : base("BaiduSearchTest")
-			{
-			}
+			var word = "可乐|雪碧";
+			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 
-			protected override void MyInit(params string[] arguments)
+			AddPipeline(new CassandraEntityPipeline("127.0.0.1"));
+			AddEntityType<BaiduSearchEntry>();
+			DataVerificationAndReport += () =>
 			{
-				Identity = "hello";
-				var word = "可乐|雪碧";
-				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
-				Downloader = new WebDriverDownloader(Core.Infrastructure.Browser.Chrome);
-				AddEntityType<BaiduSearchEntry>();
-			}
+				Verification<BaiduSearchSpider> verifier = new Verification<BaiduSearchSpider>();
+				verifier.AddSqlEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);
+				verifier.Report();
+			};
 		}
 
-		[EntityTable("baidu", "baidu_search")]
+		[EntityTable("baidu", "baidu_search", Indexs = new[] { "Keyword" })]
 		[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-		public class BaiduSearchEntry : SpiderEntity
+		private class BaiduSearchEntry : CassandraSpiderEntity
 		{
-			[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 200)]
 			public string Keyword { get; set; }
 
 			[PropertyDefine(Expression = ".//h3[@class='c-title']/a")]
@@ -77,7 +72,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 			public string PlainText { get; set; }
 
 			[PropertyDefine(Expression = "today", Type = SelectorType.Enviroment)]
-			public DateTime RunId { get; set; }
+			public DateTime run_id { get; set; }
 		}
 	}
 }

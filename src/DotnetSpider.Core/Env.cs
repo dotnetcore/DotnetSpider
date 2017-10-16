@@ -28,6 +28,7 @@ namespace DotnetSpider.Core
 		public const string EnvLocation = "LOCATION";
 		public const string EnvConfig = "CONFIG";
 		public const string EnvDbConfig = "DBCONFIG";
+		public const string CDateColumn = "CDate";
 
 		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }

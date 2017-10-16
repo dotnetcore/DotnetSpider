@@ -47,7 +47,7 @@ namespace DotnetSpider.Sample
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		[EntityTable("jd", "jd_product", Primary = "Sku", Indexs = new[] { "Sku" })]
+		[EntityTable("jd", "jd_product", Uniques = new[] { "Sku" }, Indexs = new[] { "Sku" })]
 		class JdProduct : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Name", Type = SelectorType.Enviroment, Length = 100)]
@@ -79,9 +79,9 @@ namespace DotnetSpider.Sample
 		{
 			Identity = "Cnblog Daliy Tracking " + DateTime.Now.ToString("yyyy-MM-dd");
 			AddStartUrl("http://www.jd.com/allSort.aspx");
-			AddEntityType(typeof(Category));
-			AddEntityType(typeof(TmpProduct));
-			AddEntityType(typeof(JdProduct));
+			AddEntityType<Category>();
+			AddEntityType<TmpProduct>();
+			AddEntityType<JdProduct>();
 			AddPipeline(
 				new MySqlEntityPipeline("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=;Port=3306"));
 		}

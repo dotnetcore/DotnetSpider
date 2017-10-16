@@ -29,7 +29,7 @@ namespace DotnetSpider.Sample
 
 			MyTest();
 
-			Startup.Run("-s:BaiduSearch", "-tid:BaiduSearch", "-i:guid", "-a:");
+			Startup.Run("-s:BaiduSearchCassandraSpider", "-tid:BaiduSearchCassandraSpider", "-i:guid", "-a:");
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 
@@ -61,10 +61,10 @@ namespace DotnetSpider.Sample
 			Console.WriteLine("Press any key to continue...");
 			Console.Read();
 
-			CasSpider casSpider = new CasSpider();
-			casSpider.Run();
-			Console.WriteLine("Press any key to continue...");
-			Console.Read();
+			//CasSpider casSpider = new CasSpider();
+			//casSpider.Run();
+			//Console.WriteLine("Press any key to continue...");
+			//Console.Read();
 
 			BaiduSearchSpider baiduSearchSpider = new BaiduSearchSpider();
 			baiduSearchSpider.Run();

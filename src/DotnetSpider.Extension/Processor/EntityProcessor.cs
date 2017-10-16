@@ -7,17 +7,25 @@ using System.Linq;
 
 namespace DotnetSpider.Extension.Processor
 {
-	public class EntityProcessor : BasePageProcessor
+	public interface IEntityProcessor
 	{
-		private readonly IEntityExtractor _extractor;
+		IEntityDefine EntityDefine { get; }
+	}
 
-		public EntityProcessor(Site site, EntityDefine entity)
+	public class EntityProcessor<T> : BasePageProcessor, IEntityProcessor where T : ISpiderEntity
+	{
+		public IEntityExtractor<T> Extractor { get; }
+
+		public IEntityDefine EntityDefine => Extractor?.EntityDefine;
+
+		public EntityProcessor(Site site, DataHandler<T> dataHandler = null)
 		{
 			Site = site;
-			_extractor = new EntityExtractor(entity.Name, entity.SharedValues, entity);
-			if (entity.TargetUrlsSelectors != null && entity.TargetUrlsSelectors.Count > 0)
+			Extractor = new EntityExtractor<T>(dataHandler);
+
+			if (Extractor.EntityDefine.TargetUrlsSelectors != null && Extractor.EntityDefine.TargetUrlsSelectors.Count > 0)
 			{
-				foreach (var targetUrlsSelector in entity.TargetUrlsSelectors)
+				foreach (var targetUrlsSelector in Extractor.EntityDefine.TargetUrlsSelectors)
 				{
 					if (targetUrlsSelector.XPaths == null && targetUrlsSelector.Patterns == null)
 					{
@@ -37,11 +45,11 @@ namespace DotnetSpider.Extension.Processor
 
 		protected override void Handle(Page page)
 		{
-			List<DataObject> list = _extractor.Extract(page);
+			List<T> list = Extractor.Extract(page);
 
-			if (_extractor.DataHandler != null)
+			if (Extractor.DataHandler != null)
 			{
-				list = _extractor.DataHandler.Handle(list, page);
+				list = Extractor.DataHandler.Handle(list, page);
 			}
 
 			if (list == null || list.Count == 0)
@@ -49,14 +57,7 @@ namespace DotnetSpider.Extension.Processor
 				return;
 			}
 
-			page.AddResultItem(_extractor.Name, list);
-		}
-	}
-
-	public class EntityProcessor<T> : EntityProcessor where T : SpiderEntity
-	{
-		public EntityProcessor(Site site) : base(site, EntityDefine.Parse<T>())
-		{
+			page.AddResultItem(Extractor.Name, list);
 		}
 	}
 }

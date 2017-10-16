@@ -7,33 +7,34 @@ using DotnetSpider.Extension.Infrastructure;
 using Newtonsoft.Json.Linq;
 using System;
 using DotnetSpider.Core.Infrastructure;
+using Cassandra;
 
 namespace DotnetSpider.Extension.Model
 {
-	public class EntityExtractor : IEntityExtractor
+	public class EntityExtractor<T> : IEntityExtractor<T>
 	{
-		protected readonly List<SharedValueSelector> GlobalValues;
+		public IEntityDefine EntityDefine { get; }
 
-		public EntityDefine EntityDefine { get; }
+		public DataHandler<T> DataHandler { get; }
 
-		public DataHandler DataHandler { get; set; }
+		public string Name => EntityDefine?.Name;
 
-		public string Name { get; }
-
-		public EntityExtractor(string name, List<SharedValueSelector> globalValues, EntityDefine entityDefine)
+		public EntityExtractor()
 		{
-			EntityDefine = entityDefine;
-			Name = name;
-			DataHandler = entityDefine.DataHandler;
-			GlobalValues = globalValues;
+			EntityDefine = new EntityDefine<T>();
 		}
 
-		public virtual List<DataObject> Extract(Page page)
+		public EntityExtractor(DataHandler<T> dataHandler) : this()
 		{
-			List<DataObject> result = new List<DataObject>();
-			if (GlobalValues != null && GlobalValues.Count > 0)
+			DataHandler = dataHandler;
+		}
+
+		public virtual List<T> Extract(Page page)
+		{
+			List<T> result = new List<T>();
+			if (EntityDefine.SharedValues != null && EntityDefine.SharedValues.Count > 0)
 			{
-				foreach (var enviromentValue in GlobalValues)
+				foreach (var enviromentValue in EntityDefine.SharedValues)
 				{
 					string name = enviromentValue.Name;
 					var value = page.Selectable.Select(SelectorUtils.Parse(enviromentValue)).GetValue();
@@ -74,7 +75,7 @@ namespace DotnetSpider.Extension.Model
 				if (select != null)
 				{
 					var singleResult = ExtractSingle(page, select, 0);
-					result = singleResult != null ? new List<DataObject> { singleResult } : null;
+					result = singleResult != null ? new List<T> { singleResult } : null;
 				}
 				else
 				{
@@ -84,59 +85,12 @@ namespace DotnetSpider.Extension.Model
 			return result;
 		}
 
-		public static string GetEnviromentValue(string field, Page page, int index)
+		private T ExtractSingle(Page page, ISelectable item, int index)
 		{
-			if (field.ToLower() == "url")
-			{
-				return page.Url;
-			}
-
-			if (field.ToLower() == "targeturl")
-			{
-				return page.TargetUrl;
-			}
-
-			if (field.ToLower() == "now")
-			{
-				return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-			}
-
-			if (field.ToLower() == "monday")
-			{
-				return DateTimeUtils.RunIdOfMonday;
-			}
-
-			if (field.ToLower() == "monthly")
-			{
-				return DateTimeUtils.RunIdOfMonthly;
-			}
-
-			if (field.ToLower() == "today")
-			{
-				return DateTimeUtils.RunIdOfToday;
-			}
-
-			if (field.ToLower() == "index")
-			{
-				return index.ToString();
-			}
-
-			if (!page.Request.ExistExtra(field))
-			{
-				return field;
-			}
-			else
-			{
-				return page.Request.GetExtra(field)?.ToString();
-			}
-		}
-
-		private DataObject ExtractSingle(Page page, ISelectable item, int index)
-		{
-			DataObject dataObject = new DataObject();
+			T dataObject = Activator.CreateInstance<T>();
 
 			bool skip = false;
-			foreach (var field in EntityDefine.Columns)
+			foreach (var field in EntityDefine.Columns.Where(c => c.Name != Env.IdColumn))
 			{
 				var fieldValue = ExtractField(item, page, field, index);
 				if (fieldValue == null)
@@ -148,55 +102,45 @@ namespace DotnetSpider.Extension.Model
 					}
 					else
 					{
-						dataObject.Add(field.Name, null);
+						field.Property.SetValue(dataObject, null);
 					}
 				}
 				else
 				{
-					dataObject.Add(field.Name, fieldValue);
-				}
-			}
-			if (EntityDefine.TableInfo != null && EntityDefine.TableInfo.Primary == Env.IdColumn)
-			{
-				var id = GetEnviromentValue(Env.IdColumn, page, index);
-				if (!string.IsNullOrEmpty(id))
-				{
-					dataObject.Add(Env.IdColumn, id);
+					field.Property.SetValue(dataObject, fieldValue);
 				}
 			}
 
 			if (skip)
 			{
-				return null;
+				return default(T);
 			}
+			return dataObject;
 
-			var result = dataObject.Count > 0 ? dataObject : null;
-			if (result != null && EntityDefine.LinkToNexts != null)
-			{
-				foreach (var targetUrl in EntityDefine.LinkToNexts)
-				{
-					Dictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
-					if (targetUrl.Extras != null)
-					{
-						foreach (var extra in targetUrl.Extras)
-						{
-							extras.Add(extra, result[extra]);
-						}
-					}
-					Dictionary<string, dynamic> allExtras = new Dictionary<string, dynamic>();
-					foreach (var extra in page.Request.Extras.Union(extras))
-					{
-						allExtras.Add(extra.Key, extra.Value);
-					}
-					var value = result[targetUrl.PropertyName];
-					if (value != null)
-					{
-						page.AddTargetRequest(new Request(value.ToString(), allExtras));
-					}
-				}
-
-			}
-			return result;
+			//if (dataObject != null && EntityDefine.LinkToNexts != null)
+			//{
+			//	foreach (var targetUrl in EntityDefine.LinkToNexts)
+			//	{
+			//		Dictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
+			//		if (targetUrl.Extras != null)
+			//		{
+			//			foreach (var extra in targetUrl.Extras)
+			//			{
+			//				extras.Add(extra, result[extra]);
+			//			}
+			//		}
+			//		Dictionary<string, dynamic> allExtras = new Dictionary<string, dynamic>();
+			//		foreach (var extra in page.Request.Extras.Union(extras))
+			//		{
+			//			allExtras.Add(extra.Key, extra.Value);
+			//		}
+			//		var value = result[targetUrl.PropertyName];
+			//		if (value != null)
+			//		{
+			//			page.AddTargetRequest(new Request(value.ToString(), allExtras));
+			//		}
+			//	}
+			//}
 		}
 
 		private dynamic ExtractField(ISelectable item, Page page, Column field, int index)
@@ -211,11 +155,10 @@ namespace DotnetSpider.Extension.Model
 				return null;
 			}
 
-			string tmpValue;
 			if (selector is EnviromentSelector)
 			{
 				var enviromentSelector = selector as EnviromentSelector;
-				tmpValue = GetEnviromentValue(enviromentSelector.Field, page, index);
+				var tmpValue = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, index);
 				foreach (var formatter in field.Formatters)
 				{
 #if DEBUG
@@ -230,7 +173,7 @@ namespace DotnetSpider.Extension.Model
 					}
 #endif
 				}
-				return tmpValue;
+				return tmpValue == null ? null : Convert.ChangeType(tmpValue, field.DataType);
 			}
 			else
 			{
@@ -239,10 +182,10 @@ namespace DotnetSpider.Extension.Model
 				{
 					var propertyValues = item.SelectList(selector).Nodes();
 
-					List<string> results = new List<string>();
+					List<dynamic> results = new List<dynamic>();
 					foreach (var propertyValue in propertyValues)
 					{
-						results.Add(propertyValue.GetValue(needPlainText));
+						results.Add(Convert.ChangeType(propertyValue.GetValue(needPlainText), field.DataType));
 					}
 					foreach (var formatter in field.Formatters)
 					{
@@ -258,21 +201,20 @@ namespace DotnetSpider.Extension.Model
 						}
 #endif
 					}
-					return new JArray(results);
+					return results;
 				}
 				else
 				{
 					bool needCount = field.Option == PropertyDefine.Options.Count;
 					if (needCount)
 					{
-						var propertyValues = item.SelectList(selector).Nodes();
-						string count = propertyValues?.Count.ToString();
-						count = string.IsNullOrEmpty(count) ? "-1" : count;
-						return count;
+						var values = item.SelectList(selector).Nodes();
+						return values.Count;
 					}
 					else
 					{
-						tmpValue = item.Select(selector)?.GetValue(needPlainText);
+						var value = item.Select(selector)?.GetValue(needPlainText);
+						dynamic tmpValue = value;
 						foreach (var formatter in field.Formatters)
 						{
 #if DEBUG
@@ -287,7 +229,8 @@ namespace DotnetSpider.Extension.Model
 							}
 #endif
 						}
-						return tmpValue;
+
+						return tmpValue == null ? null : Convert.ChangeType(tmpValue, field.DataType);
 					}
 				}
 			}

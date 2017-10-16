@@ -17,8 +17,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void Extract()
 		{
-			var entityMetadata = EntityDefine.Parse<Product>();
-			EntityExtractor extractor = new EntityExtractor("test", null, entityMetadata);
+			EntityExtractor<Product> extractor = new EntityExtractor<Product>();
 			var results = extractor.Extract(new Page(new Request("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, dynamic>
 			{
 				{ "cat", "手机" },
@@ -28,34 +27,32 @@ namespace DotnetSpider.Extension.Test
 				Content = File.ReadAllText(Path.Combine(Env.BaseDirectory, "Jd.html"))
 			});
 			Assert.Equal(60, results.Count);
-			Assert.Equal("手机", results[0]["CategoryName"]);
-			Assert.Equal("110", results[0]["CategoryId"]);
-			Assert.Equal("http://item.jd.com/3031737.html", results[0]["Url"]);
-			Assert.Equal("3031737", results[0]["Sku"]);
-			Assert.Equal("荣耀官方旗舰店", results[0]["ShopName"]);
-			Assert.Equal("荣耀 NOTE 8 4GB+32GB 全网通版 冰河银", results[0]["Name"]);
-			Assert.Equal("1000000904", results[0]["VenderId"]);
-			Assert.Equal("1000000904", results[0]["JdzyShopId"]);
-			Assert.Equal(DateTime.Now.ToString("yyyy-MM-dd"), results[0]["RunId"]);
+			Assert.Equal("手机", results[0].CategoryName);
+			Assert.Equal(110, results[0].CategoryId);
+			Assert.Equal("http://item.jd.com/3031737.html", results[0].Url);
+			Assert.Equal("3031737", results[0].Sku);
+			Assert.Equal("荣耀官方旗舰店", results[0].ShopName);
+			Assert.Equal("荣耀 NOTE 8 4GB+32GB 全网通版 冰河银", results[0].Name);
+			Assert.Equal("1000000904", results[0].VenderId);
+			Assert.Equal("1000000904", results[0].JdzyShopId);
+			Assert.Equal(DateTime.Now.ToString("yyyy-MM-dd"), results[0].RunId.ToString("yyyy-MM-dd"));
 		}
 
 		[Fact]
 		public void TempEntityNoPrimaryInfo()
 		{
-			var entityMetadata = EntityDefine.Parse<Entity1>();
-
-			EntityProcessor processor = new EntityProcessor(new Site(), entityMetadata);
+			EntityProcessor<Entity1> processor = new EntityProcessor<Entity1>(new Site());
 			var page = new Page(new Request("http://www.abcd.com"))
 			{
 				Content = "{'data':[{'age':'1'},{'age':'2'}]}"
 			};
 			processor.Process(page);
-			Assert.Equal(2, (page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1") as List<DataObject>).Count);
+			Assert.Equal(2, (page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1") as List<Entity1>).Count);
 		}
 
 		[EntityTable("test", "sku", EntityTable.Today)]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product : SpiderEntity
+		private class Product : SpiderEntity
 		{
 			[PropertyDefine(Expression = "cat", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }

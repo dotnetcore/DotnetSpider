@@ -29,8 +29,8 @@ namespace DotnetSpider.Sample
 		protected override void MyInit(params string[] arguments)
 		{
 			AddStartUrl("http://www.ctrip.com/");
-
-			AddEntityType(typeof(CtripCity));
+			AddEntityType<CtripCity>();
+			 
 		}
 
 		[EntityTable("ctrip", "city", Uniques = new[] { "city_id,run_id" })]

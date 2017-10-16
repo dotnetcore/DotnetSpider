@@ -3,25 +3,13 @@ using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Pipeline;
 using System.Collections.Concurrent;
+using System;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class BaseEntityPipeline : BasePipeline, IEntityPipeline
 	{
-		private readonly ConcurrentDictionary<string, EntityDefine> _entities = new ConcurrentDictionary<string, EntityDefine>();
-
-		protected ConcurrentDictionary<string, EntityDefine> Entities => _entities;
-
-		public abstract int Process(string entityName, List<DataObject> datas);
-
-		public virtual void AddEntity(EntityDefine entityDefine)
-		{
-			if (entityDefine == null)
-			{
-				return;
-			}
-			_entities.TryAdd(entityDefine.Name, entityDefine);
-		}
+		public abstract int Process(string name, List<dynamic> datas);
 
 		public override void Process(params ResultItems[] resultItems)
 		{
@@ -36,19 +24,16 @@ namespace DotnetSpider.Extension.Pipeline
 				int effectedRow = 0;
 				foreach (var result in resultItem.Results)
 				{
-					List<DataObject> list = new List<DataObject>();
+					List<dynamic> list = new List<dynamic>();
 					dynamic data = resultItem.GetResultItem(result.Key);
-
-					if (data != null)
+					var t = data.GetType();
+					if (data is ISpiderEntity)
 					{
-						if (data is DataObject)
-						{
-							list.Add(data);
-						}
-						else
-						{
-							list.AddRange(data);
-						}
+						list.Add(data);
+					}
+					else
+					{
+						list.AddRange(data);
 					}
 					if (list.Count > 0)
 					{
@@ -60,5 +45,7 @@ namespace DotnetSpider.Extension.Pipeline
 				resultItem.AddOrUpdateResultItem(ResultItems.EffectedRows, effectedRow);
 			}
 		}
+
+		internal abstract void AddEntity(IEntityDefine type);
 	}
 }

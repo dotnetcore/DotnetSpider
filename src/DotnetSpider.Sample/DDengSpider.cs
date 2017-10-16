@@ -29,7 +29,7 @@ namespace DotnetSpider.Sample
 		{
 			AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=test;Trusted_Connection=True;MultipleActiveResultSets=true"));
 			AddStartUrl("http://www.ddeng.com/product/982227");
-			AddEntityType(typeof(Corp));
+			AddEntityType<Corp>();
 		}
 
 		[EntityTable("test", "ddeng_corp", EntityTable.Today)]

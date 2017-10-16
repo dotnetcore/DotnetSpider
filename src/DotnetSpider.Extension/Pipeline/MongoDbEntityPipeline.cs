@@ -23,10 +23,8 @@ namespace DotnetSpider.Extension.Pipeline
 			ConnectString = connectString;
 		}
 
-		public override void AddEntity(EntityDefine metadata)
+		internal override void AddEntity(IEntityDefine metadata)
 		{
-			base.AddEntity(metadata);
-
 			if (metadata.TableInfo == null)
 			{
 				Logger.MyLog(Spider?.Identity, $"Schema is necessary, skip {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
@@ -39,15 +37,14 @@ namespace DotnetSpider.Extension.Pipeline
 			Collections.TryAdd(metadata.Name, db.GetCollection<BsonDocument>(metadata.TableInfo.CalculateTableName()));
 		}
 
-		public override int Process(string entityName, List<DataObject> datas)
+		public override int Process(string entityName, List<dynamic> datas)
 		{
 			if (Collections.TryGetValue(entityName, out var collection))
 			{
 				List<BsonDocument> reslut = new List<BsonDocument>();
 				foreach (var data in datas)
 				{
-					BsonDocument item = new BsonDocument(data);
-
+					BsonDocument item = BsonDocument.Create(data);
 					reslut.Add(item);
 				}
 				reslut.Add(BsonDocument.Create(DateTime.Now));

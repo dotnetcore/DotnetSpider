@@ -49,65 +49,28 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata = EntityDefine.Parse<ProductInsert>();
+				var metadata = new EntityDefine<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
-				DataObject data1 = new DataObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
-				DataObject data2 = new DataObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
-				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
+				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
+				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2 });
 
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadat2 = EntityDefine.Parse<ProductUpdate>();
+				var metadat2 = new EntityDefine<ProductUpdate>();
 				updatePipeline.AddEntity(metadat2);
 				updatePipeline.InitPipeline(spider);
 
-				DataObject data3 = new DataObject { { "Sku", "110" }, { "Category", "4C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
-				updatePipeline.Process(metadat2.Name, new List<DataObject> { data3 });
+				var data3 = conn.Query<ProductUpdate>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
+				data3.Category = "4C";
+
+				updatePipeline.Process(metadat2.Name, new List<dynamic> { data3 });
 
 				var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.Equal(2, list.Count);
 				Assert.Equal("110", list[0].Sku);
 				Assert.Equal("4C", list[0].Category);
-			}
-
-			ClearDb();
-		}
-
-		[Fact]
-		public void UpdateWhenUnionPrimary()
-		{
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				return;
-			}
-			ClearDb();
-
-			using (SqlConnection conn = new SqlConnection(ConnectString))
-			{
-				ISpider spider = new DefaultSpider("test", new Site());
-
-				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata = EntityDefine.Parse<Product2>();
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
-
-				var data1 = new DataObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
-				var data2 = new DataObject { { "Sku", "111" }, { "Category1", "4C" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
-				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2 });
-
-				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata2 = EntityDefine.Parse<Product2Update>();
-				updatePipeline.AddEntity(metadata2);
-				updatePipeline.InitPipeline(spider);
-
-				var data3 = new DataObject { { "Sku", "110" }, { "Category1", "4C" }, { "Category", "AAAA" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
-				updatePipeline.Process(metadata2.Name, new List<DataObject> { data3 });
-
-				var list = conn.Query<Product2>($"use test;select * from sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.Equal(2, list.Count);
-				Assert.Equal("110", list[0].Sku);
-				Assert.Equal("AAAA", list[0].Category);
 			}
 
 			ClearDb();
@@ -127,16 +90,16 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
-				var metadata = EntityDefine.Parse<ProductInsert>();
+				var metadata = new EntityDefine<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.InitPipeline(spider);
 
 				// Common data
-				var data1 = new DataObject { { "Sku", "110" }, { "Category", "3C" }, { "Url", "http://jd.com/110" }, { "CDate", "2016-08-13" } };
-				var data2 = new DataObject { { "Sku", "111" }, { "Category", "3C" }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
+				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
+				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 				// Value is null
-				var data3 = new DataObject { { "Sku", "112" }, { "Category", null }, { "Url", "http://jd.com/111" }, { "CDate", "2016-08-13" } };
-				insertPipeline.Process(metadata.Name, new List<DataObject> { data1, data2, data3 });
+				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
 
 				var list = conn.Query<ProductInsert>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.Equal(3, list.Count);
@@ -158,43 +121,45 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
 			try
 			{
-				insertPipeline.AddEntity(EntityDefine.Parse<UpdateEntity1>());
+				insertPipeline.AddEntity(new EntityDefine<UpdateEntity1>());
 				throw new SpiderException("TEST FAILED.");
 			}
 			catch (SpiderException e)
 			{
-				Assert.Equal("Columns set as primary is not a property of your entity.", e.Message);
+				Assert.Equal("Columns set as unique are not a property of your entity.", e.Message);
 			}
 
 			try
 			{
-				insertPipeline.AddEntity(EntityDefine.Parse<UpdateEntity2>());
+				insertPipeline.AddEntity(new EntityDefine<UpdateEntity2>());
 				throw new SpiderException("TEST FAILED.");
 			}
 			catch (SpiderException e)
 			{
-				Assert.Equal("Columns set as update is not a property of your entity.", e.Message);
+				Assert.Equal("Columns set to update are not a property of your entity.", e.Message);
 			}
 
 			try
 			{
-				insertPipeline.AddEntity(EntityDefine.Parse<UpdateEntity3>());
+				insertPipeline.AddEntity(new EntityDefine<UpdateEntity3>());
 				throw new SpiderException("TEST FAILED.");
 			}
 			catch (SpiderException e)
 			{
 				Assert.Equal("There is no column need update.", e.Message);
 			}
-			var metadata = EntityDefine.Parse<UpdateEntity4>();
+			var metadata = new EntityDefine<UpdateEntity4>();
 			insertPipeline.AddEntity(metadata);
 			Assert.Single(insertPipeline.GetUpdateColumns(metadata.Name));
 			Assert.Equal("Value", insertPipeline.GetUpdateColumns(metadata.Name).First());
 
 			SqlServerEntityPipeline insertPipeline2 = new SqlServerEntityPipeline(ConnectString);
-			var metadata2 = EntityDefine.Parse<UpdateEntity5>();
+			var metadata2 = new EntityDefine<UpdateEntity5>();
 			insertPipeline2.AddEntity(metadata2);
-			Assert.Single(insertPipeline2.GetUpdateColumns(metadata2.Name));
-			Assert.Equal("Value", insertPipeline2.GetUpdateColumns(metadata2.Name).First());
+			var columns = insertPipeline2.GetUpdateColumns(metadata2.Name);
+			Assert.Equal(2, columns.Length);
+			Assert.Equal("Value", columns[0]);
+			Assert.Equal("Key", columns[1]);
 		}
 
 		//#region Use App.config
@@ -425,7 +390,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		//#endregion
 
-		[EntityTable("test", "sku", EntityTable.Today, Primary = "Sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku" })]
+		[EntityTable("test", "sku", EntityTable.Today, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class ProductInsert : SpiderEntity
 		{
@@ -439,7 +404,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Sku { get; set; }
 		}
 
-		[EntityTable("test", "sku", EntityTable.Today, Primary = "Sku", UpdateColumns = new[] { "Category" })]
+		[EntityTable("test", "sku", EntityTable.Today, UpdateColumns = new[] { "Category", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class ProductUpdate : SpiderEntity
 		{
@@ -454,7 +419,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 
-		[EntityTable("test", "sku2", EntityTable.Today, Primary = "Sku", Indexs = new[] { "Sku,Category1" })]
+		[EntityTable("test", "sku2", EntityTable.Today, Indexs = new[] { "Sku,Category1" }, Uniques = new[] { "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class Product2 : SpiderEntity
 		{
@@ -472,7 +437,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 
-		[EntityTable("test", "sku2", EntityTable.Today, Primary = "Sku", UpdateColumns = new[] { "Category" })]
+		[EntityTable("test", "sku2", EntityTable.Today, Uniques = new[] { "Sku" }, UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class Product2Update : SpiderEntity
 		{
@@ -489,7 +454,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Sku { get; set; }
 		}
 
-		[EntityTable("test", "sku2", Primary = "Sku", UpdateColumns = new[] { "category" })]
+		[EntityTable("test", "sku2", Uniques = new[] { "sku2" }, UpdateColumns = new[] { "Key" })]
 		public class UpdateEntity1 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
@@ -500,7 +465,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		}
 
-		[EntityTable("test", "sku2", Primary = "Key", UpdateColumns = new[] { "calue" })]
+		[EntityTable("test", "sku2", Uniques = new[] { "key" }, UpdateColumns = new[] { "value" })]
 		public class UpdateEntity2 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
@@ -510,7 +475,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Value { get; set; }
 		}
 
-		[EntityTable("test", "sku2", Primary = "Key", UpdateColumns = new[] { "Key" })]
+		[EntityTable("test", "sku2", Uniques = new[] { "Key" }, UpdateColumns = new[] { "Id" })]
 		public class UpdateEntity3 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
@@ -520,7 +485,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Value { get; set; }
 		}
 
-		[EntityTable("test", "sku2", Primary = "Key", UpdateColumns = new[] { "Value" })]
+		[EntityTable("test", "sku2", Uniques = new[] { "Key" }, UpdateColumns = new[] { "Value" })]
 		public class UpdateEntity4 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
@@ -530,7 +495,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Value { get; set; }
 		}
 
-		[EntityTable("test", "sku2", Primary = "Key", UpdateColumns = new[] { "Value", "Key" })]
+		[EntityTable("test", "sku2", Uniques = new[] { "Key" }, UpdateColumns = new[] { "Value", "Key", "Id" })]
 		public class UpdateEntity5 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]

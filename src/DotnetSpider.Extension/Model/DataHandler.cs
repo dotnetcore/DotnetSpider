@@ -3,18 +3,22 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Model
 {
-	public abstract class DataHandler
+	public interface IDataHandler
 	{
-		protected abstract DataObject HandleDataOject(DataObject data, Page page);
+	}
 
-		public virtual List<DataObject> Handle(List<DataObject> datas, Page page)
+	public abstract class DataHandler<T> : IDataHandler
+	{
+		protected abstract T HandleDataOject(T data, Page page);
+
+		public virtual List<T> Handle(List<T> datas, Page page)
 		{
 			if (datas == null || datas.Count == 0)
 			{
 				return datas;
 			}
 
-			List<DataObject> results =new List<DataObject>();
+			List<T> results = new List<T>();
 			foreach (var data in datas)
 			{
 				var tmp = HandleDataOject(data, page);

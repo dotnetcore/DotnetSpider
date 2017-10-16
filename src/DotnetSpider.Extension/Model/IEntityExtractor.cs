@@ -3,10 +3,11 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Model
 {
-	public interface IEntityExtractor
+	public interface IEntityExtractor<T>
 	{
-		List<DataObject> Extract(Page page);
-		DataHandler DataHandler { get; }
+		IEntityDefine EntityDefine { get; }
+		List<T> Extract(Page page);
+		DataHandler<T> DataHandler { get; }
 		string Name { get; }
 	}
 }

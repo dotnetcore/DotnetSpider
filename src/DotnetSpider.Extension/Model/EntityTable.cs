@@ -19,8 +19,6 @@ namespace DotnetSpider.Extension.Model
 
 		public string Postfix { get; set; }
 
-		public string Primary { get; set; }
-
 		public string[] UpdateColumns { get; set; }
 
 		public string[] Indexs { get; set; }

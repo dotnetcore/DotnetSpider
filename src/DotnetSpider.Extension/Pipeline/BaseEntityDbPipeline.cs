@@ -25,7 +25,6 @@ namespace DotnetSpider.Extension.Pipeline
 		private PipelineMode _defaultPipelineModel;
 
 		protected abstract ConnectionStringSettings CreateConnectionStringSettings(string connectString = null);
-
 		protected abstract DbParameter CreateDbParameter(string name, object value);
 		protected abstract void InitAllSqlOfEntity(EntityAdapter adapter);
 
@@ -85,7 +84,7 @@ namespace DotnetSpider.Extension.Pipeline
 			_connectString = connectString;
 		}
 
-		public override void AddEntity(EntityDefine entityDefine)
+		internal override void AddEntity(IEntityDefine entityDefine)
 		{
 			if (entityDefine == null)
 			{

@@ -14,14 +14,6 @@ using Cassandra.Mapping;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class Address
-	{
-		public string Street { get; set; }
-		public string City { get; set; }
-		public int ZipCode { get; set; }
-		public IEnumerable<string> Phones { get; set; }
-	}
-
 	public class CassandraEntityPipeline : BaseEntityPipeline
 	{
 		private PipelineMode _defaultPipelineModel;
@@ -60,7 +52,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override void AddEntity(EntityDefine entityDefine)
+		internal override void AddEntity(IEntityDefine entityDefine)
 		{
 			if (entityDefine == null)
 			{
@@ -96,6 +88,50 @@ namespace DotnetSpider.Extension.Pipeline
 			InitDatabaseAndTable();
 		}
 
+		public override int Process(string name, List<dynamic> datas)
+		{
+			if (datas == null || datas.Count == 0)
+			{
+				return 0;
+			}
+ 
+			if (EntityAdapters.TryGetValue(name, out var metadata) && EntitySessions.TryGetValue(name, out var session))
+			{
+				switch (metadata.PipelineMode)
+				{
+					default:
+					case PipelineMode.Update:
+					case PipelineMode.Insert:
+					case PipelineMode.InsertAndIgnoreDuplicate:
+						{
+							var insertStmt = session.Prepare(metadata.InsertSql);
+							var batch = new BatchStatement();
+							foreach (var data in datas)
+							{
+								List<object> values = new List<object>();
+								foreach (var column in metadata.Columns)
+								{
+									if (column.DataType.FullName != DataTypeNames.TimeUuid)
+									{
+										values.Add(column.Property.GetValue(data));
+									}
+								}
+
+								batch.Add(insertStmt.Bind(values.ToArray()));
+							};
+							// Execute the batch
+							session.Execute(batch);
+							break;
+						}
+					case PipelineMode.InsertNewAndUpdateOld:
+						{
+							throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
+						}
+				}
+			}
+			return datas.Count;
+		}
+
 		private void InitDatabaseAndTable()
 		{
 			foreach (var adapter in EntityAdapters)
@@ -104,79 +140,20 @@ namespace DotnetSpider.Extension.Pipeline
 				.AddContactPoints(ConnectString)
 				.Build();
 
+				var name = typeof(TimeUuid).FullName;
 				var session = cluster.Connect();
 				EntitySessions.AddOrUpdate(adapter.Key, session);
 				session.CreateKeyspaceIfNotExists(adapter.Value.Table.Database);
 				session.ChangeKeyspace(adapter.Value.Table.Database);
-				//session.Execute($"DROP table {adapter.Value.Table.Database}.{adapter.Value.Table.Name};");
-				session.Execute(GenerateCreateTableSql(adapter.Value));
-				//session.Execute(GenerateCreateIndexes(adapter.Value));
-
-			}
-		}
-
-		public override int Process(string entityName, List<DataObject> datas)
-		{
-			if (datas == null || datas.Count == 0)
-			{
-				return 0;
-			}
-			int count = 0;
-			if (EntityAdapters.TryGetValue(entityName, out var metadata) && EntitySessions.TryGetValue(entityName, out var session))
-			{
-				switch (metadata.PipelineMode)
+				try
 				{
-					case PipelineMode.Insert:
-						{
-							var insertStmt = session.Prepare(metadata.InsertSql);
-							var batch = new BatchStatement();
-							foreach (var data in datas)
-							{
-								data.Remove(Env.IdColumn);
-								var now = DateTime.Now;
-								data.Add("CDate", DateTime.Now);
-								data["run_id"] = DateTime.Now;
-								batch.Add(insertStmt.Bind(data.Values.ToArray()));
-							};
-							// Execute the batch
-							session.Execute(batch);
-
-							// ...you should reuse the prepared statement
-							// Bind the parameters and add the statement to the batch batch
-							break;
-						}
-					case PipelineMode.InsertAndIgnoreDuplicate:
-						{
-							IMapper mapper = new Mapper(session);
-							foreach (var data in datas)
-							{
-								mapper.InsertIfNotExists<DataObject>(data);
-							}
-							break;
-						}
-					case PipelineMode.InsertNewAndUpdateOld:
-						{
-							throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
-						}
-					case PipelineMode.Update:
-						{
-							break;
-						}
-					default:
-						{
-							var insertStmt = session.Prepare(metadata.InsertSql);
-							IMapper mapper = new Mapper(session);
-							// ...you should reuse the prepared statement
-							// Bind the parameters and add the statement to the batch batch
-							foreach (var data in datas)
-							{
-								mapper.Insert<DataObject>(data);
-							}
-							break;
-						}
+					session.Execute($"DROP table {adapter.Value.Table.Name}");
 				}
+				catch { }
+
+				session.Execute(GenerateCreateTableSql(adapter.Value));
+				session.Execute(GenerateCreateIndexes(adapter.Value));
 			}
-			return count;
 		}
 
 		private void InitAllCqlOfEntity(EntityAdapter adapter)
@@ -206,51 +183,12 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string GenerateInsertSql(EntityAdapter adapter)
 		{
-			//INSERT INTO user_track (key, text, date) VALUES (?, ?, ?)
-			var columNamesBuilder = new StringBuilder(string.Join(", ", adapter.Columns.Select(p => $"{p.Name}")));
-			columNamesBuilder.Append(", CDate");
-			if (Env.IdColumn.ToLower() == adapter.Table.Primary.ToLower())
-			{
-				columNamesBuilder.Append($", {Env.IdColumn}");
-			}
-			else
-			{
-				// 复合主键
-			}
+			var columNames = string.Join(", ", adapter.Columns.Select(p => $"{p.Name}"));
+			var values = string.Join(", ", adapter.Columns.Select(column => (column.DataType.FullName == DataTypeNames.TimeUuid ? "uuid()" : $"?")));
 
-			var columNames = columNamesBuilder.ToString();
-
-			var valuesBuilder = new StringBuilder();
-			int valuesCount = 0;
-			if (Env.IdColumn.ToLower() == adapter.Table.Primary.ToLower())
-			{
-				valuesCount = adapter.Columns.Count + 2;
-			}
-			else
-			{
-				// 复合主键
-			}
-			int lastIndex = valuesCount - 1;
-			int cdateIndex = lastIndex - 1;
-			for (int i = 0; i < valuesCount; ++i)
-			{
-				if (i == lastIndex)
-				{
-					valuesBuilder.Append("uuid()");
-				}
-				//else if (i == cdateIndex)
-				//{
-				//	valuesBuilder.Append("toTimestamp(now()),");
-				//}
-				else
-				{
-					valuesBuilder.Append("?,");
-				}
-			}
-			var values = valuesBuilder.ToString();
 			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
-			//				adapter.Table.Database,
+
 			sqlBuilder.AppendFormat("INSERT INTO {0} {1} {2};",
 				tableName,
 				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
@@ -267,11 +205,8 @@ namespace DotnetSpider.Extension.Pipeline
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS {adapter.Table.Database }.{tableName} (");
 			string columNames = string.Join(", ", adapter.Columns.Select(p => $"{p.Name} {GetDataTypeSql(p)} "));
 			builder.Append(columNames);
-			builder.Append(",CDate timestamp");
-			if (Env.IdColumn.ToLower() == adapter.Table.Primary.ToLower())
-			{
-				builder.Append($", {Env.IdColumn} UUID PRIMARY KEY");
-			}
+
+			builder.Append($", PRIMARY KEY({Env.IdColumn})");
 
 			builder.Append(")");
 			string sql = builder.ToString();
@@ -287,60 +222,59 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					var columns = index.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
-					string indexColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
-					builder.Append($", KEY `index_{name}` ({indexColumNames.Substring(0, indexColumNames.Length)})");
+					string indexColumNames = string.Join(", ", columns.Select(c => $"{c}"));
+
+					builder.Append($"CREATE INDEX IF NOT EXISTS {name} ON {adapter.Table.Database}.{adapter.Table.CalculateTableName()}({indexColumNames});");
 				}
 			}
 			if (adapter.Table.Uniques != null)
 			{
-				foreach (var unique in adapter.Table.Uniques)
-				{
-					var columns = unique.Split(',');
-					string name = string.Join("_", columns.Select(c => c));
-					string uniqueColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
-					builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames.Substring(0, uniqueColumNames.Length)})");
-				}
+				throw new SpiderException("Cassandra not support unique index.");
 			}
 
-			//			CREATE INDEX IF NOT EXISTS index_name
-			//ON keyspace_name.table_name(KEYS(column_name))
-			return "";
+			var sql = builder.ToString();
+			return sql;
 		}
+
 		private string GetDataTypeSql(Column field)
 		{
 			var dataType = "text";
 
-			if (field.DataType == DataTypeNames.Boolean)
+			if (field.DataType.FullName == DataTypeNames.Boolean)
 			{
 				dataType = "boolean";
 			}
-			else if (field.DataType == DataTypeNames.DateTime)
+			else if (field.DataType.FullName == DataTypeNames.DateTime)
 			{
 				dataType = "timestamp";
 			}
-			else if (field.DataType == DataTypeNames.Decimal)
+			else if (field.DataType.FullName == DataTypeNames.Decimal)
 			{
 				dataType = "decimal";
 			}
-			else if (field.DataType == DataTypeNames.Double)
+			else if (field.DataType.FullName == DataTypeNames.Double)
 			{
 				dataType = "double";
 			}
-			else if (field.DataType == DataTypeNames.Float)
+			else if (field.DataType.FullName == DataTypeNames.Float)
 			{
 				dataType = "float";
 			}
-			else if (field.DataType == DataTypeNames.Int)
+			else if (field.DataType.FullName == DataTypeNames.Int)
 			{
 				dataType = "int";
 			}
-			else if (field.DataType == DataTypeNames.Int64)
+			else if (field.DataType.FullName == DataTypeNames.Int64)
 			{
 				dataType = "bigint";
 			}
-			else if (field.DataType == DataTypeNames.String)
+			else if (field.DataType.FullName == DataTypeNames.String)
 			{
-				dataType = (field.Length <= 0) ? "text" : $"varchar({field.Length})";
+				dataType = "text";
+			}
+			else if (field.DataType.FullName == DataTypeNames.TimeUuid)
+			{
+				dataType = "uuid";
 			}
 
 			return dataType;

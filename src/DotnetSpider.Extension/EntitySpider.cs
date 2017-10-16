@@ -13,8 +13,6 @@ namespace DotnetSpider.Extension
 {
 	public abstract class EntitySpider : CommonSpider
 	{
-		public List<EntityDefine> Entities { get; internal set; } = new List<EntityDefine>();
-
 		public EntitySpider() : this(new Site())
 		{
 		}
@@ -31,48 +29,22 @@ namespace DotnetSpider.Extension
 		{
 		}
 
-		public EntityDefine AddEntityType(Type type, string tableName = null)
+		public void AddEntityType<T>(string tableName = null) where T : ISpiderEntity
 		{
-			return AddEntityType(type, null, tableName);
+			AddEntityType<T>(null, tableName);
 		}
 
-		public EntityDefine AddEntityType<T>(string tableName = null)
+		public void AddEntityType<T>(DataHandler<T> dataHandler) where T : ISpiderEntity
 		{
-			return AddEntityType(typeof(T), null, tableName);
+			AddEntityType<T>(dataHandler, null);
 		}
 
-		public EntityDefine AddEntityType(Type type, DataHandler dataHandler)
-		{
-			return AddEntityType(type, dataHandler, null);
-		}
-
-		public EntityDefine AddEntityType<T>(DataHandler dataHandler)
-		{
-			return AddEntityType(typeof(T), dataHandler);
-		}
-
-		public EntityDefine AddEntityType(Type type, DataHandler dataHandler, string tableName)
+		public void AddEntityType<T>(DataHandler<T> dataHandler, string tableName) where T : ISpiderEntity
 		{
 			CheckIfRunning();
 
-			if (typeof(SpiderEntity).IsAssignableFrom(type))
-			{
-				var entity = EntityDefine.Parse(type.GetTypeInfoCrossPlatform());
-				if (entity.TableInfo != null && !string.IsNullOrEmpty(tableName))
-				{
-					entity.TableInfo.Name = tableName;
-				}
-				entity.DataHandler = dataHandler;
-
-				Entities.Add(entity);
-				EntityProcessor processor = new EntityProcessor(Site, entity);
-				AddPageProcessor(processor);
-				return entity;
-			}
-			else
-			{
-				throw new SpiderException($"Type: {type.FullName} is not a SpiderEntity.");
-			}
+			EntityProcessor<T> processor = new EntityProcessor<T>(Site, dataHandler);
+			AddPageProcessor(processor);
 		}
 
 		protected override IPipeline GetDefaultPipeline()
@@ -89,17 +61,16 @@ namespace DotnetSpider.Extension
 				return;
 			}
 
-			if (Entities == null || Entities.Count == 0)
+			foreach (var processor in PageProcessors)
 			{
-				throw new SpiderException("Count of entity is zero.");
-			}
-
-			foreach (var entity in Entities)
-			{
-				foreach (var pipeline in Pipelines)
+				var entityProcessor = processor as IEntityProcessor;
+				if (entityProcessor != null)
 				{
-					BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
-					newPipeline?.AddEntity(entity);
+					foreach (var pipeline in Pipelines)
+					{
+						BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
+						newPipeline?.AddEntity(entityProcessor.EntityDefine);
+					}
 				}
 			}
 

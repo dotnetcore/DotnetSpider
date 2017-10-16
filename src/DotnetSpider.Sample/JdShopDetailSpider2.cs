@@ -40,10 +40,10 @@ namespace DotnetSpider.Sample
 			});
 
 			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost ;User ID=root;Password=;Port=3306"));
-			AddEntityType(typeof(ProductUpdater));
+			AddEntityType<ProductUpdater>();
 		}
 
-		[EntityTable("jd", "shop", EntityTable.Monday, Primary = "pid")]
+		[EntityTable("jd", "shop", EntityTable.Monday, Uniques = new[] { "pid" })]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
 		class ProductUpdater : SpiderEntity
 		{

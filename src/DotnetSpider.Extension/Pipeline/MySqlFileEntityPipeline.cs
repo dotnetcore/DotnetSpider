@@ -5,13 +5,15 @@ using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using System.Linq;
 using MySql.Data.MySqlClient;
+using System.Configuration;
+using System.Data.Common;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	/// <summary>
 	/// LOAD DATA LOCAL INFILE '{filePath}' INTO TABLE `{schema}`.`{dababase}` FIELDS TERMINATED BY '$'  ENCLOSED BY '#' LINES TERMINATED BY '@END@' IGNORE 1 LINES;
 	/// </summary>
-	public class MySqlFileEntityPipeline : BaseEntityPipeline
+	public class MySqlFileEntityPipeline : BaseEntityDbPipeline
 	{
 		private readonly object _locker = new object();
 
@@ -32,52 +34,49 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public override void InitPipeline(ISpider spider)
 		{
-			base.InitPipeline(spider);
-
 			if (string.IsNullOrEmpty(DataFolder))
 			{
 				DataFolder = Path.Combine(Env.BaseDirectory, spider.Identity, "mysql");
 			}
 		}
 
-		public override int Process(string entityName, List<DataObject> items)
+		public override int Process(string entityName, List<dynamic> datas)
 		{
-			if (items == null || items.Count == 0)
+			if (datas == null || datas.Count == 0)
 			{
 				return 0;
 			}
-
 			lock (_locker)
 			{
-				if (Entities.TryGetValue(entityName, out var metadata))
+				if (EntityAdapters.TryGetValue(entityName, out var metadata))
 				{
 					switch (Type)
 					{
 						case FileType.LoadFile:
 							{
-								SaveLoadFile(metadata, items);
+								SaveLoadFile(metadata, datas);
 								break;
 							}
 						case FileType.InsertSql:
 							{
-								SaveInsertSqlFile(metadata, items);
+								SaveInsertSqlFile(metadata, datas);
 								break;
 							}
 					}
 				}
-				return items.Count;
+				return datas.Count;
 			}
 		}
 
-		private void SaveInsertSqlFile(EntityDefine metadata, List<DataObject> items)
+		private void SaveInsertSqlFile<T>(EntityAdapter metadata, List<T> items)
 		{
-			var tableName = metadata.TableInfo.CalculateTableName();
-			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.TableInfo.Database}.{tableName}.sql"));
+			var tableName = metadata.Table.CalculateTableName();
+			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{tableName}.sql"));
 			StringBuilder builder = new StringBuilder();
 			foreach (var entry in items)
 			{
 				//{Environment.NewLine}
-				builder.Append($"INSERT IGNORE INTO `{metadata.TableInfo.Database}`.`{tableName}` (");
+				builder.Append($"INSERT IGNORE INTO `{metadata.Table.Database}`.`{tableName}` (");
 				var lastColumn = metadata.Columns.Last();
 				foreach (var column in metadata.Columns)
 				{
@@ -87,7 +86,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 				foreach (var column in metadata.Columns)
 				{
-					var token = entry.TryGetValue(column.Name);
+					var token = column.Property.GetValue(entry);
 					var value = token == null ? "" : MySqlHelper.EscapeString(token.ToString());
 
 					builder.Append(column == lastColumn ? $"'{value}'" : $"'{value}', ");
@@ -97,16 +96,16 @@ namespace DotnetSpider.Extension.Pipeline
 			File.AppendAllText(fileInfo.FullName, builder.ToString());
 		}
 
-		private void SaveLoadFile(EntityDefine metadata, List<DataObject> items)
+		private void SaveLoadFile<T>(EntityAdapter metadata, List<T> items)
 		{
-			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.TableInfo.Database}.{metadata.TableInfo.Name}.data"));
+			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
 			StringBuilder builder = new StringBuilder();
 			foreach (var entry in items)
 			{
 				builder.Append("@END@");
 				foreach (var column in metadata.Columns)
 				{
-					var value = entry.TryGetValue(column.Name);
+					var value = column.Property.GetValue(entry);
 					if (value != null)
 					{
 						builder.Append("#").Append(value).Append("#").Append("$");
@@ -118,6 +117,24 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 			File.AppendAllText(fileInfo.FullName, builder.ToString());
+		}
+
+		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
+		{
+			return null;
+		}
+
+		protected override DbParameter CreateDbParameter(string name, object value)
+		{
+			return null;
+		}
+
+		protected override void InitAllSqlOfEntity(EntityAdapter adapter)
+		{
+		}
+
+		internal override void InitDatabaseAndTable()
+		{
 		}
 	}
 }

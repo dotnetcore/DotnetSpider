@@ -31,7 +31,7 @@ namespace DotnetSpider.Extension.Test
 			{
 			}
 
-			public override int Process(string entityName, List<DataObject> datas)
+			public override int Process(string name, List<dynamic> datas)
 			{
 				throw new NotImplementedException();
 			}
@@ -57,12 +57,6 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		[EntityTable("test", "table", Primary = "name")]
-		public class Entity1 : SpiderEntity
-		{
-			[PropertyDefine(Expression = "")]
-			public string Url { get; set; }
-		}
 
 		[EntityTable("test", "table", Indexs = new[] { "c1" })]
 		public class Entity2 : SpiderEntity
@@ -85,14 +79,14 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		[EntityTable("test", "table", Primary = "Name")]
+		[EntityTable("test", "table")]
 		public class Entity5 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 100)]
 			public string Name { get; set; }
 		}
 
-		[EntityTable("test", "table", Primary = "name")]
+		[EntityTable("test", "table")]
 		public class Entity6 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 255)]
@@ -122,21 +116,22 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		[EntityTable("test", "table", Primary = "Name", Indexs = new[] { "Id" }, Uniques = new[] { "Id,Name", "Id" })]
+		[EntityTable("test", "table", Indexs = new[] { "Name3" }, Uniques = new[] { "Name,Name2", "Name2" })]
 		public class Entity10 : SpiderEntity
 		{
-			[PropertyDefine(Expression = "")]
-			public int Id { get; set; }
-
 			[PropertyDefine(Expression = "", Length = 100)]
 			public string Name { get; set; }
+
+			[PropertyDefine(Expression = "", Length = 100)]
+			public string Name2 { get; set; }
+
+			[PropertyDefine(Expression = "", Length = 100)]
+			public string Name3 { get; set; }
 		}
 
 		[EntityTable("test", "table")]
 		public class Entity11 : SpiderEntity
 		{
-			public int Id { get; set; }
-
 			[ReplaceFormatter(NewValue = "a", OldValue = "b")]
 			[RegexFormatter(Pattern = "a(*)")]
 			[PropertyDefine(Expression = "Name")]
@@ -146,9 +141,6 @@ namespace DotnetSpider.Extension.Test
 		[EntityTable("test", "table12")]
 		public class Entity12 : SpiderEntity
 		{
-			[PropertyDefine(Expression = "Id")]
-			public int Id { get; set; }
-
 			[PropertyDefine(Expression = "Name")]
 			public string Name { get; set; }
 		}
@@ -212,8 +204,8 @@ namespace DotnetSpider.Extension.Test
 			public string c1 { get; set; }
 		}
 
-		[EntityTable("test", "table", Primary = "c1")]
-		public class Entity19 : SpiderEntity
+		[EntityTable("test", "table")]
+		public class Entity19 : ISpiderEntity
 		{
 			[PropertyDefine(Expression = "", Length = 300)]
 			public string c1 { get; set; }
@@ -222,17 +214,17 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void EntitySelector()
 		{
-			var entity1 = EntityDefine.Parse<Entity7>();
+			var entity1 = new EntityDefine<Entity7>();
 			Assert.Equal("expression", entity1.Selector.Expression);
 			Assert.Equal(SelectorType.XPath, entity1.Selector.Type);
 			Assert.True(entity1.Multi);
 
-			var entity2 = EntityDefine.Parse<Entity8>();
+			var entity2 = new EntityDefine<Entity8>();
 			Assert.Equal("expression2", entity2.Selector.Expression);
 			Assert.Equal(SelectorType.Css, entity2.Selector.Type);
 			Assert.True(entity2.Multi);
 
-			var entity3 = EntityDefine.Parse<Entity9>();
+			var entity3 = new EntityDefine<Entity9>();
 			Assert.False(entity3.Multi);
 			Assert.Null(entity3.Selector);
 			Assert.Equal("DotnetSpider.Extension.Test.EntitySpiderTest2+Entity9", entity3.Name);
@@ -241,12 +233,11 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void Indexes()
 		{
-			var entity1 = EntityDefine.Parse<Entity10>();
-			Assert.Equal("Id", entity1.TableInfo.Indexs[0]);
-			Assert.Equal("Name", entity1.TableInfo.Primary);
+			var entity1 = new EntityDefine<Entity10>();
+			Assert.Equal("Name3", entity1.TableInfo.Indexs[0]);
 			Assert.Equal(2, entity1.TableInfo.Uniques.Length);
-			Assert.Equal("Id,Name", entity1.TableInfo.Uniques[0]);
-			Assert.Equal("Id", entity1.TableInfo.Uniques[1]);
+			Assert.Equal("Name,Name2", entity1.TableInfo.Uniques[0]);
+			Assert.Equal("Name2", entity1.TableInfo.Uniques[1]);
 		}
 
 		[Fact]
@@ -257,8 +248,8 @@ namespace DotnetSpider.Extension.Test
 				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
 				context.ThreadNum = 1;
+				var entity = new EntityDefine<Entity17>();
 
-				var entity = context.AddEntityType<Entity17>();
 				var pipeline = new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306");
 				pipeline.AddEntity(entity);
 
@@ -278,8 +269,8 @@ namespace DotnetSpider.Extension.Test
 				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
 				context.ThreadNum = 1;
+				var entity = new EntityDefine<Entity18>();
 
-				var entity = context.AddEntityType<Entity18>();
 				var pipeline = new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306");
 				pipeline.AddEntity(entity);
 
@@ -290,28 +281,6 @@ namespace DotnetSpider.Extension.Test
 				Assert.Equal("Column length of unique should not large than 256.", e.Message);
 			}
 		}
-
-		[Fact]
-		public void ColumnOfPrimayOverLength()
-		{
-			try
-			{
-				EntitySpider context = new DefaultEntitySpider();
-				context.Identity = (Guid.NewGuid().ToString("N"));
-				context.ThreadNum = 1;
-
-				var entity = context.AddEntityType<Entity19>();
-				var pipeline = new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306");
-				pipeline.AddEntity(entity);
-
-				throw new Exception("Failed.");
-			}
-			catch (Exception e)
-			{
-				Assert.Equal("Column length of primary should not large than 256.", e.Message);
-			}
-		}
-
 
 
 		[Fact]
@@ -333,7 +302,8 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void Formater()
 		{
-			var entity1 = EntityDefine.Parse<Entity11>();
+			var entity1 = new EntityDefine<Entity11>();
+
 			var formatters = ((Column)entity1.Columns[0]).Formatters;
 			Assert.Equal(2, formatters.Count);
 			var replaceFormatter = (ReplaceFormatter)formatters[0];
@@ -344,39 +314,13 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void Schema()
 		{
-			var entityMetadata = EntityDefine.Parse<Entity4>();
+			var entityMetadata = new EntityDefine<Entity4>();
+
 			Assert.Equal("test", entityMetadata.TableInfo.Database);
 			Assert.Equal(EntityTable.Monday, entityMetadata.TableInfo.Postfix);
 
-			var entityMetadata1 = EntityDefine.Parse<Entity14>();
+			var entityMetadata1 = new EntityDefine<Entity14>();
 			Assert.Null(entityMetadata1.TableInfo);
-		}
-
-		[Fact]
-		public void SetPrimary()
-		{
-			var entity1 = EntityDefine.Parse<Entity5>();
-			Assert.Single(entity1.Columns);
-			Assert.Equal("Name", entity1.Columns[0].Name);
-			var entity2 = EntityDefine.Parse<Entity6>();
-			Assert.Single(entity2.Columns);
-			Assert.Equal("name", entity2.Columns[0].Name);
-		}
-
-		[Fact]
-		public void SetNotExistColumnToPrimary()
-		{
-			try
-			{
-				var entityMetadata = EntityDefine.Parse<Entity1>();
-				TestPipeline pipeline = new TestPipeline("");
-				pipeline.AddEntity(entityMetadata);
-				throw new Exception("Test failed");
-			}
-			catch (SpiderException exception)
-			{
-				Assert.Equal("Columns set as primary is not a property of your entity.", exception.Message);
-			}
 		}
 
 		[Fact]
@@ -384,14 +328,15 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entityMetadata = EntityDefine.Parse<Entity2>();
+				var entityMetadata = new EntityDefine<Entity2>();
+
 				TestPipeline pipeline = new TestPipeline("");
 				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
 			}
 			catch (SpiderException exception)
 			{
-				Assert.Equal("Columns set as index is not a property of your entity.", exception.Message);
+				Assert.Equal("Columns set as index are not a property of your entity.", exception.Message);
 			}
 		}
 
@@ -400,14 +345,15 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				var entityMetadata = EntityDefine.Parse<Entity3>();
+				var entityMetadata = new EntityDefine<Entity3>();
+
 				TestPipeline pipeline = new TestPipeline("");
 				pipeline.AddEntity(entityMetadata);
 				throw new Exception("Test failed");
 			}
 			catch (SpiderException exception)
 			{
-				Assert.Equal("Columns set as unique is not a property of your entity.", exception.Message);
+				Assert.Equal("Columns set as unique are not a property of your entity.", exception.Message);
 			}
 		}
 		[Fact]
@@ -456,7 +402,7 @@ namespace DotnetSpider.Extension.Test
 				EmptySleepTime = 1000;
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
-				AddEntityType(typeof(BaiduSearchEntry));
+				AddEntityType<BaiduSearchEntry>();
 				AddPipeline(new MySqlEntityPipeline(Env.DataConnectionStringSettings.ConnectionString));
 				AddPipeline(new MySqlFileEntityPipeline(MySqlFileEntityPipeline.FileType.InsertSql));
 			}
@@ -514,8 +460,10 @@ namespace DotnetSpider.Extension.Test
 			context.AddPipeline(new JsonFileEntityPipeline());
 
 			context.AddStartUrl("http://baidu.com");
-			context.AddEntityType(typeof(Entity13));
-			context.AddEntityType(typeof(Entity12));
+
+			context.AddEntityType<Entity13>();
+			context.AddEntityType<Entity12>();
+
 			context.Run("running-test");
 
 			var entityPipelines = context.GetPipelines();
@@ -556,7 +504,8 @@ namespace DotnetSpider.Extension.Test
 				context.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
 
 				context.AddStartUrl("http://baidu.com");
-				context.AddEntityType(typeof(Entity15));
+
+				context.AddEntityType<Entity15>();
 
 				context.Run("running-test");
 
@@ -571,8 +520,8 @@ namespace DotnetSpider.Extension.Test
 				Assert.Equal("Float", columns[4].Name);
 				Assert.Equal("Double", columns[5].Name);
 				Assert.Equal("String1", columns[6].Name);
-				Assert.Equal("CDate", columns[7].Name);
-				Assert.Equal(Env.IdColumn, columns[8].Name);
+				Assert.Equal(Env.IdColumn, columns[7].Name);
+				Assert.Equal("CDate", columns[8].Name);
 
 				Assert.Equal("int(11)", columns[0].Type);
 				Assert.Equal("bigint(20)", columns[1].Type);
@@ -581,8 +530,8 @@ namespace DotnetSpider.Extension.Test
 				Assert.Equal("float", columns[4].Type);
 				Assert.Equal("double", columns[5].Type);
 				Assert.Equal("varchar(100)", columns[6].Type);
-				Assert.Equal("timestamp", columns[7].Type);
-				Assert.Equal("bigint(20)", columns[8].Type);
+				Assert.Equal("timestamp", columns[8].Type);
+				Assert.Equal("bigint(20)", columns[7].Type);
 
 				conn.Execute("drop table `test`.`table15`");
 			}
@@ -610,8 +559,8 @@ namespace DotnetSpider.Extension.Test
 				context.AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true"));
 
 				context.AddStartUrl("http://baidu.com");
-				context.AddEntityType(typeof(Entity15));
 
+				context.AddEntityType<Entity15>();
 				context.Run("running-test");
 
 

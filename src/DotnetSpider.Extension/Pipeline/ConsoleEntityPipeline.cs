@@ -10,11 +10,11 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class ConsoleEntityPipeline : BaseEntityPipeline
 	{
-		public override void AddEntity(EntityDefine metadata)
+		internal override void AddEntity(IEntityDefine metadata)
 		{
 		}
 
-		public override int Process(string entityName, List<DataObject> datas)
+		public override int Process(string entityName, List<dynamic> datas)
 		{
 			foreach (var data in datas)
 			{
