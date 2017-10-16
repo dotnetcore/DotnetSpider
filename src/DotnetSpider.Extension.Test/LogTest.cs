@@ -24,10 +24,22 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{
-			if (File.Exists(Env.GlobalAppConfigPath))
+			while (true)
 			{
-				File.Delete(Env.GlobalAppConfigPath);
+				try
+				{
+					if (File.Exists(Env.GlobalAppConfigPath))
+					{
+						File.Delete(Env.GlobalAppConfigPath);
+						break;
+					}
+				}
+				catch
+				{
+				}
+				Thread.Sleep(1000);
 			}
+
 			AppDomain.CurrentDomain.SetData("CONFIG", "");
 			AppDomain.CurrentDomain.SetData("DBCONFIG", "");
 			Env.Reload();

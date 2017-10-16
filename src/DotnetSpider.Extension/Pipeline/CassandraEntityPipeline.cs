@@ -17,6 +17,7 @@ namespace DotnetSpider.Extension.Pipeline
 	public class CassandraEntityPipeline : BaseEntityPipeline
 	{
 		private PipelineMode _defaultPipelineModel;
+		private static TimeUuid DefaultTimeUuid = default(TimeUuid);
 
 		internal ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
 		internal ConcurrentDictionary<string, ISession> EntitySessions { get; set; } = new ConcurrentDictionary<string, ISession>();
@@ -59,6 +60,11 @@ namespace DotnetSpider.Extension.Pipeline
 				throw new ArgumentException("Should not add a null entity to a entity dabase pipeline.");
 			}
 
+			if (!typeof(CassandraSpiderEntity).IsAssignableFrom(entityDefine.Type))
+			{
+				throw new ArgumentException("Cassandra pipeline only support CassandraSpiderEntity.");
+			}
+
 			if (entityDefine.TableInfo == null)
 			{
 				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", LogLevel.Warn);
@@ -94,7 +100,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return 0;
 			}
- 
+
 			if (EntityAdapters.TryGetValue(name, out var metadata) && EntitySessions.TryGetValue(name, out var session))
 			{
 				switch (metadata.PipelineMode)
@@ -114,6 +120,11 @@ namespace DotnetSpider.Extension.Pipeline
 									if (column.DataType.FullName != DataTypeNames.TimeUuid)
 									{
 										values.Add(column.Property.GetValue(data));
+									}
+									else
+									{
+										var value = column.Property.GetValue(data);
+										values.Add(value == DefaultTimeUuid ? TimeUuid.NewId() : value);
 									}
 								}
 
@@ -137,22 +148,19 @@ namespace DotnetSpider.Extension.Pipeline
 			foreach (var adapter in EntityAdapters)
 			{
 				var cluster = Cluster.Builder()
-				.AddContactPoints(ConnectString)
-				.Build();
+					.AddContactPoints(ConnectString)
+					.Build();
 
-				var name = typeof(TimeUuid).FullName;
 				var session = cluster.Connect();
-				EntitySessions.AddOrUpdate(adapter.Key, session);
 				session.CreateKeyspaceIfNotExists(adapter.Value.Table.Database);
 				session.ChangeKeyspace(adapter.Value.Table.Database);
-				try
-				{
-					session.Execute($"DROP table {adapter.Value.Table.Name}");
-				}
-				catch { }
-
 				session.Execute(GenerateCreateTableSql(adapter.Value));
-				session.Execute(GenerateCreateIndexes(adapter.Value));
+				var createIndexCql = GenerateCreateIndexes(adapter.Value);
+				if (!string.IsNullOrEmpty(createIndexCql))
+				{
+					session.Execute(createIndexCql);
+				}
+				EntitySessions.AddOrUpdate(adapter.Key, session);
 			}
 		}
 
@@ -184,7 +192,7 @@ namespace DotnetSpider.Extension.Pipeline
 		private string GenerateInsertSql(EntityAdapter adapter)
 		{
 			var columNames = string.Join(", ", adapter.Columns.Select(p => $"{p.Name}"));
-			var values = string.Join(", ", adapter.Columns.Select(column => (column.DataType.FullName == DataTypeNames.TimeUuid ? "uuid()" : $"?")));
+			var values = string.Join(", ", adapter.Columns.Select(column => $"?"));
 
 			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();

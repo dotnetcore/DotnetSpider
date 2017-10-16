@@ -54,10 +54,8 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 			public string Website { get; set; }
 
-
 			[PropertyDefine(Expression = ".//div/span/a[@class='c-cache']/@href")]
 			public string Snapshot { get; set; }
-
 
 			[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefine.Options.PlainText)]
 			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]

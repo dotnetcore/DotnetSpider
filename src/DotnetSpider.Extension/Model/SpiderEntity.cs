@@ -13,10 +13,10 @@ namespace DotnetSpider.Extension.Model
 		T Id { get; set; }
 	}
 
-	public abstract class SpiderEntity : ISpiderEntity<long?>
+	public abstract class SpiderEntity : ISpiderEntity<long>
 	{
 		[PropertyDefine(Expression = "null", Type = Core.Selector.SelectorType.Enviroment)]
-		public long? Id { get; set; }
+		public long Id { get; set; }
 
 		[PropertyDefine(Expression = "now", Type = Core.Selector.SelectorType.Enviroment)]
 		public DateTime CDate { get; set; }
