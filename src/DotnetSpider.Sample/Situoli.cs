@@ -26,7 +26,7 @@ namespace DotnetSpider.Sample
 				new DefaultPageProcessor(new[] { "situoli\\.com" }, new string[] { "user=register", "user=login" }))
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
 				.AddPipeline(new FilePipeline());
-			spider.Downloader = new HttpClientDownloader();
+			spider.Downloader = new HttpDownloader();
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
 			spider.Deep = 3;

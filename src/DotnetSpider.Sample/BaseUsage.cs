@@ -30,7 +30,7 @@ namespace DotnetSpider.Sample
 				new YoukuPageProcessor())
 				// use custmize pipeline for youku 为优酷自定义的 Pipeline
 				.AddPipeline(new YoukuPipeline());
-			spider.Downloader = new HttpClientDownloader();
+			spider.Downloader = new HttpDownloader();
 			spider.ThreadNum = 1;
 			spider.EmptySleepTime = 3000;
 
@@ -135,7 +135,7 @@ namespace DotnetSpider.Sample
 				.AddPipeline(new FilePipeline());
 
 			// dowload html by http client
-			spider.Downloader = new HttpClientDownloader();
+			spider.Downloader = new HttpDownloader();
 			// 4 threads 4线程
 			spider.ThreadNum = 4;
 			// traversal deep 遍历深度

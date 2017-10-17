@@ -46,7 +46,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(Skip = "Need person double check")]
 		public void Ports()
 		{
-			HttpClientDownloader downloader = new HttpClientDownloader();
+			HttpDownloader downloader = new HttpDownloader();
 			DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
 
 			for (int i = 0; i < 100; i++)
@@ -58,7 +58,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact]
 		public void DetectDownloadContent()
 		{
-			HttpClientDownloader downloader = new HttpClientDownloader();
+			HttpDownloader downloader = new HttpDownloader();
 			DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
 
 			downloader.Download(new Request("http://www.163.com", null), spider);
@@ -87,7 +87,7 @@ namespace DotnetSpider.Core.Test.Downloader
 					{"ContentType","abcd" }
 				}
 			};
-			HttpClientDownloader downloader = new HttpClientDownloader();
+			HttpDownloader downloader = new HttpDownloader();
 			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site1));
 
 			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site2));
@@ -107,7 +107,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			Assert.Equal(5, spider.RetriedTimes.Value);
 		}
 
-		class HttpClientDownloader2 : HttpClientDownloader
+		class HttpClientDownloader2 : HttpDownloader
 		{
 			protected override Page DowloadContent(Request request, ISpider spider)
 			{
@@ -121,7 +121,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			Site site = new Site
 			{
 			};
-			HttpClientDownloader downloader = new HttpClientDownloader();
+			HttpDownloader downloader = new HttpDownloader();
 			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site));
 			Assert.EndsWith("www.jd.com/?d", page.TargetUrl);
 		}
