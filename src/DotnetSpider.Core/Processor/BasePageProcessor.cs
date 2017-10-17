@@ -194,11 +194,16 @@ namespace DotnetSpider.Core.Processor
 
 		public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
 		{
+			if (patterns == null || patterns.Length == 0)
+			{
+				throw new ArgumentNullException("Patterns should not be null or empty.");
+			}
+
 			var validPatterns = patterns.Where(p => p != null && !string.IsNullOrEmpty(p.Trim())).Select(p => p.Trim()).ToList();
 
 			if (validPatterns.Count != patterns.Length)
 			{
-				throw new ArgumentNullException("Pattern should not be null or empty.");
+				throw new ArgumentNullException("Pattern value should not be null or empty.");
 			}
 
 			ISelector selector = Selectors.Default();
