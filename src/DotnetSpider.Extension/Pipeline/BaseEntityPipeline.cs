@@ -46,6 +46,6 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		internal abstract void AddEntity(IEntityDefine type);
+		public abstract void AddEntity(IEntityDefine type);
 	}
 }

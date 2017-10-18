@@ -35,7 +35,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		internal override void AddEntity(IEntityDefine type)
+		public override void AddEntity(IEntityDefine type)
 		{
 		}
 	}

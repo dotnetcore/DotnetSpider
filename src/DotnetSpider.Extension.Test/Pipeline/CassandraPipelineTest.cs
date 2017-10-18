@@ -1,6 +1,7 @@
 ﻿using Cassandra;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
+using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Pipeline;
@@ -15,14 +16,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 {
 	public class CassandraPipelineTest
 	{
-		string connectString = "127.0.0.1";
+		string connectString = "Host=127.0.0.1";
 		string keyspace = "test";
 
 		private void ClearDb()
 		{
-			var cluster = Cluster.Builder()
-				.AddContactPoints(connectString)
-				.Build();
+			var cluster = CassandraUtils.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.DeleteKeyspaceIfExists(keyspace);
@@ -51,9 +50,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			// Value is null
 			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
 
-			var cluster = Cluster.Builder()
-				.AddContactPoints(connectString)
-				.Build();
+			var cluster = CassandraUtils.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");
@@ -100,9 +97,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			// Value is null
 			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
 
-			var cluster = Cluster.Builder()
-				.AddContactPoints(connectString)
-				.Build();
+			var cluster = CassandraUtils.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");
@@ -164,9 +159,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			// Value is null
 			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
 
-			var cluster = Cluster.Builder()
-				.AddContactPoints(connectString)
-				.Build();
+			var cluster = CassandraUtils.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");
@@ -234,9 +227,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			// Value is null
 			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
 
-			var cluster = Cluster.Builder()
-				.AddContactPoints(connectString)
-				.Build();
+			var cluster = CassandraUtils.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");

@@ -10,7 +10,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// </summary>
 	public class ConsoleEntityPipeline : BaseEntityPipeline
 	{
-		internal override void AddEntity(IEntityDefine metadata)
+		public override void AddEntity(IEntityDefine metadata)
 		{
 		}
 

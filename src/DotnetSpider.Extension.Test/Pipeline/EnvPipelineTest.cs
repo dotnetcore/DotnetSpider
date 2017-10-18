@@ -29,7 +29,13 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		{
 			if (File.Exists(Env.GlobalAppConfigPath))
 			{
-				File.Delete(Env.GlobalAppConfigPath);
+				try
+				{
+					File.Delete(Env.GlobalAppConfigPath);
+				}
+				catch
+				{
+				}
 			}
 			File.Copy("app.global.config", Env.GlobalAppConfigPath);
 			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-e:DBCONFIG=GLOBAL" };
@@ -53,7 +59,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				}
 				var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-e:DBCONFIG=GLOBAL" };
 				var arguments1 = Startup.AnalyzeArguments(args1);
-		
+
 
 				Assert.Throws<SpiderException>(() =>
 				{
