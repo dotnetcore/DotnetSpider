@@ -26,9 +26,8 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public CassandraConnectionSetting ConnectionSetting { get; set; }
 
-		public CassandraEntityPipeline()
+		public CassandraEntityPipeline() : this(Env.DataConnectionStringSettings?.ConnectionString)
 		{
-			ConnectionSetting = new CassandraConnectionSetting(Env.DataConnectionStringSettings?.ConnectionString);
 		}
 
 		public CassandraEntityPipeline(string connectString)

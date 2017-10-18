@@ -81,10 +81,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		public static void MyLog(this ILogger logger, string message, LogLevel level, Exception e = null)
 		{
-			LogEventInfo theEvent = new LogEventInfo(level, logger.Name, message) { Exception = e };
-			theEvent.Properties["Identity"] = "System";
-			theEvent.Properties["Node"] = NodeId.Id;
-			logger.Log(theEvent);
+			MyLog(logger, "System", message, level, e);
 		}
 	}
 }
