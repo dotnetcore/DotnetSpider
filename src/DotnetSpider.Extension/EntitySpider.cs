@@ -73,16 +73,6 @@ namespace DotnetSpider.Extension
 					}
 				}
 			}
-
-			if (IfRequireInitStartRequests(arguments) && StartUrlBuilders != null && StartUrlBuilders.Count > 0)
-			{
-				for (int i = 0; i < StartUrlBuilders.Count; ++i)
-				{
-					var builder = StartUrlBuilders[i];
-					Logger.MyLog(Identity, $"[{i + 1}] Add extra start urls to scheduler.", LogLevel.Info);
-					builder.Build(Site);
-				}
-			}
 		}
 	}
 }

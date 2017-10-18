@@ -11,13 +11,14 @@ using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;
+using System.Linq;
 
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
-	/// The http downloader based on HttpClient.
+	/// The http downloader
 	/// </summary>
-	public class HttpClientDownloader : BaseDownloader
+	public class HttpDownloader : BaseDownloader
 	{
 		private static readonly List<string> MediaTypes = new List<string>
 		{
@@ -34,54 +35,26 @@ namespace DotnetSpider.Core.Downloader
 			"application/javascript",
 			"application/x-www-form-urlencoded"
 		};
-		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
-		private HttpClient _httpClient;
 
 		public bool DecodeHtml { get; set; }
-
-		public override IDownloader Clone(ISpider spider)
-		{
-			var downloader = (HttpClientDownloader)MemberwiseClone();
-			if (spider.Site.HttpProxyPool == null)
-			{
-				_httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler
-				{
-					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-					UseProxy = true,
-					UseCookies = false
-				}));
-			}
-			return downloader;
-		}
 
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
 
-			HttpResponseMessage response = null;
+			HttpWebResponse response = null;
 			var proxy = site.GetHttpProxy();
-			request.Proxy = proxy;
 
 			try
 			{
-				var httpMessage = GenerateHttpRequestMessage(request, site);
+				var httpMessage = GenerateHttpWebRequest(request, site);
 
-				response = NetworkCenter.Current.Execute("http", message =>
+				response = NetworkCenter.Current.Execute("http", () =>
 				{
-					HttpClient httpClient = _httpClient ?? _httpClientPool.GetHttpClient(proxy);
-					var requestTask = httpClient.SendAsync(message);
-					requestTask.Wait(site.Timeout);
-					if (requestTask.Status == TaskStatus.RanToCompletion)
-					{
-						return requestTask.Result;
-					}
-					else
-					{
-						return new HttpResponseMessage(HttpStatusCode.RequestTimeout);
-					}
-				}, httpMessage);
+					return (HttpWebResponse)httpMessage.GetResponse();
+				});
+
 				request.StatusCode = response.StatusCode;
-				response.EnsureSuccessStatusCode();
 
 				if (!site.AcceptStatCode.Contains(response.StatusCode))
 				{
@@ -89,7 +62,8 @@ namespace DotnetSpider.Core.Downloader
 				}
 				Page page;
 
-				if (response.Content.Headers.ContentType != null && !MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
+				var mediaType = response.ContentType?.Split(';').FirstOrDefault();
+				if (!string.IsNullOrEmpty(mediaType) && !MediaTypes.Contains(mediaType))
 				{
 					if (!site.DownloadFiles)
 					{
@@ -103,7 +77,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				else
 				{
-					page = HandleResponse(request, response, site);
+					page = ConstructPage(request, response, site);
 				}
 
 				if (string.IsNullOrEmpty(page.Content))
@@ -111,7 +85,7 @@ namespace DotnetSpider.Core.Downloader
 					Logger.MyLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
 				}
 
-				page.TargetUrl = response.RequestMessage.RequestUri.AbsoluteUri;
+				page.TargetUrl = response.ResponseUri.ToString();
 
 				return page;
 			}
@@ -127,7 +101,7 @@ namespace DotnetSpider.Core.Downloader
 
 				return page;
 			}
-			catch (HttpRequestException he)
+			catch (WebException he)
 			{
 				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, null);
 				if (page != null)
@@ -166,15 +140,15 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		private HttpRequestMessage GenerateHttpRequestMessage(Request request, Site site)
+		private HttpWebRequest GenerateHttpWebRequest(Request request, Site site)
 		{
 			if (site == null) return null;
 			if (site.Headers == null)
 			{
 				site.Headers = new Dictionary<string, string>();
 			}
-
-			HttpRequestMessage httpWebRequest = CreateRequestMessage(request);
+			var httpWebRequest = (HttpWebRequest)WebRequest.Create(request.Url);
+			httpWebRequest.Method = request.Method.Method;
 
 			httpWebRequest.Headers.Add("User-Agent", site.Headers.ContainsKey("User-Agent") ? site.Headers["User-Agent"] : site.UserAgent);
 
@@ -203,67 +177,41 @@ namespace DotnetSpider.Core.Downloader
 
 			httpWebRequest.Headers.Add("Cookie", site.Cookies?.ToString());
 
-			if (httpWebRequest.Method == HttpMethod.Post)
+			if (httpWebRequest.Method == "POST")
 			{
 				var data = string.IsNullOrEmpty(site.EncodingName) ? Encoding.UTF8.GetBytes(request.PostBody) : site.Encoding.GetBytes(request.PostBody);
-				httpWebRequest.Content = new StreamContent(new MemoryStream(data));
 
 				if (site.Headers.ContainsKey("Content-Type"))
 				{
-					httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
+					httpWebRequest.Headers.Add("Content-Type", site.Headers["Content-Type"]);
 				}
 
 				if (site.Headers.ContainsKey("X-Requested-With") && site.Headers["X-Requested-With"] == "NULL")
 				{
-					httpWebRequest.Content.Headers.Remove("X-Requested-With");
+					httpWebRequest.Headers.Remove("X-Requested-With");
 				}
 				else
 				{
-					if (!httpWebRequest.Content.Headers.Contains("X-Requested-With") && !httpWebRequest.Headers.Contains("X-Requested-With"))
+					if (!httpWebRequest.Headers.AllKeys.Contains("X-Requested-With") && !httpWebRequest.Headers.AllKeys.Contains("X-Requested-With"))
 					{
-						httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
+						httpWebRequest.Headers.Add("X-Requested-With", "XMLHttpRequest");
 					}
 				}
+
+				byte[] buffer = Encoding.UTF8.GetBytes(request.PostBody);
+
+				if (buffer != null)
+				{
+					httpWebRequest.ContentLength = buffer.Length;
+					httpWebRequest.GetRequestStream().Write(buffer, 0, buffer.Length);
+				}
 			}
+			httpWebRequest.Timeout = site.Timeout;
+
 			return httpWebRequest;
 		}
 
-		private HttpRequestMessage CreateRequestMessage(Request request)
-		{
-			switch (request.Method.Method)
-			{
-				case "GET":
-					{
-						return new HttpRequestMessage(HttpMethod.Get, request.Url);
-					}
-				case "POST":
-					{
-						return new HttpRequestMessage(HttpMethod.Post, request.Url);
-					}
-				case "HEAD":
-					{
-						return new HttpRequestMessage(HttpMethod.Head, request.Url);
-					}
-				case "PUT":
-					{
-						return new HttpRequestMessage(HttpMethod.Put, request.Url);
-					}
-				case "DELETE":
-					{
-						return new HttpRequestMessage(HttpMethod.Delete, request.Url);
-					}
-				case "TRACE":
-					{
-						return new HttpRequestMessage(HttpMethod.Trace, request.Url);
-					}
-				default:
-					{
-						throw new ArgumentException($"Illegal HTTP Method: {request.Method}.");
-					}
-			}
-		}
-
-		private Page HandleResponse(Request request, HttpResponseMessage response, Site site)
+		private Page ConstructPage(Request request, HttpWebResponse response, Site site)
 		{
 			string content = ReadContent(site, response);
 
@@ -289,13 +237,24 @@ namespace DotnetSpider.Core.Downloader
 			return page;
 		}
 
-		private string ReadContent(Site site, HttpResponseMessage response)
+		private string ReadContent(Site site, HttpWebResponse response)
 		{
-			byte[] contentBytes = response.Content.ReadAsByteArrayAsync().Result;
+			MemoryStream memoryStream = new MemoryStream(0x1000);
+			using (Stream responseStream = response.GetResponseStream())
+			{
+				byte[] buffer = new byte[0x1000];
+				int bytes;
+				while ((bytes = responseStream.Read(buffer, 0, buffer.Length)) > 0)
+				{
+					memoryStream.Write(buffer, 0, bytes);
+				}
+			}
+
+			byte[] contentBytes = memoryStream.StreamToBytes();
 			contentBytes = PreventCutOff(contentBytes);
 			if (string.IsNullOrEmpty(site.EncodingName))
 			{
-				var charSet = response.Content.Headers.ContentType?.CharSet;
+				var charSet = response.CharacterSet;
 				Encoding htmlCharset = EncodingExtensions.GetEncoding(charSet, contentBytes);
 				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
 			}

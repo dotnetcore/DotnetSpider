@@ -35,7 +35,7 @@ namespace DotnetSpider.Sample
 				.AddPipeline(new FilePipeline());
 
 			// dowload html by http client
-			spider.Downloader = new HttpClientDownloader();
+			spider.Downloader = new HttpDownloader();
 
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度

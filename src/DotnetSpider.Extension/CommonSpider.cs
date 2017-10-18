@@ -138,7 +138,7 @@ namespace DotnetSpider.Extension
 		/// </summary>
 		/// <param name="arguments"></param>
 		/// <returns></returns>
-		protected bool IfRequireInitStartRequests(string[] arguments)
+		protected override bool IfRequireInitStartRequests(string[] arguments)
 		{
 			if (RedisConnection.Default != null)
 			{

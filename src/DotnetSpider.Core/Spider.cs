@@ -37,7 +37,7 @@ namespace DotnetSpider.Core
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 		private readonly Site _site;
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
-		private IDownloader _downloader = new HttpClientDownloader();
+		private IDownloader _downloader = new HttpDownloader();
 		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
@@ -55,6 +55,11 @@ namespace DotnetSpider.Core
 		private int _emptySleepTime = 15000;
 		private int _cachedSize = 1;
 		private string _identity;
+
+		protected virtual bool IfRequireInitStartRequests(string[] arguments)
+		{
+			return true;
+		}
 
 		/// <summary>
 		/// Storage all processors for spider.
@@ -635,56 +640,53 @@ namespace DotnetSpider.Core
 					int waitCount = 0;
 					//bool firstTask = true;
 
-					using (var downloader = Downloader.Clone(this))
+					while (Stat == Status.Running)
 					{
-						while (Stat == Status.Running)
+						Request request = Scheduler.Poll();
+
+						if (request == null)
 						{
-							Request request = Scheduler.Poll();
-
-							if (request == null)
+							if (waitCount > _waitCountLimit && ExitWhenComplete)
 							{
-								if (waitCount > _waitCountLimit && ExitWhenComplete)
-								{
-									Stat = Status.Finished;
-									_realStat = Status.Finished;
-									_OnComplete();
-									OnComplete?.Invoke(this);
-									break;
-								}
-
-								// wait until new url added
-								WaitNewUrl(ref waitCount);
+								Stat = Status.Finished;
+								_realStat = Status.Finished;
+								_OnComplete();
+								OnComplete?.Invoke(this);
+								break;
 							}
-							else
+
+							// wait until new url added
+							WaitNewUrl(ref waitCount);
+						}
+						else
+						{
+							waitCount = 0;
+
+							try
 							{
-								waitCount = 0;
-
-								try
-								{
-									Stopwatch sw = new Stopwatch();
-									HandleRequest(sw, request, downloader);
-									Thread.Sleep(Site.SleepTime);
-								}
-								catch (Exception e)
-								{
-									OnError(request);
-									Logger.MyLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
-								}
-								finally
-								{
-									if (request.Proxy != null)
-									{
-										var statusCode = request.StatusCode;
-										Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
-									}
-								}
-
-								//if (firstTask)
-								//{
-								//	Thread.Sleep(3000);
-								//	firstTask = false;
-								//}
+								Stopwatch sw = new Stopwatch();
+								HandleRequest(sw, request, Downloader);
+								Thread.Sleep(Site.SleepTime);
 							}
+							catch (Exception e)
+							{
+								OnError(request);
+								Logger.MyLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
+							}
+							finally
+							{
+								if (request.Proxy != null)
+								{
+									var statusCode = request.StatusCode;
+									Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
+								}
+							}
+
+							//if (firstTask)
+							//{
+							//	Thread.Sleep(3000);
+							//	firstTask = false;
+							//}
 						}
 					}
 				});
@@ -874,7 +876,7 @@ namespace DotnetSpider.Core
 			}
 
 			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
-			Downloader = Downloader ?? new HttpClientDownloader();
+			Downloader = Downloader ?? new HttpDownloader();
 		}
 
 		/// <summary>
@@ -892,6 +894,15 @@ namespace DotnetSpider.Core
 		/// <param name="arguments"></param>
 		protected virtual void AfterInitComponent(params string[] arguments)
 		{
+			if (IfRequireInitStartRequests(arguments) && StartUrlBuilders != null && StartUrlBuilders.Count > 0)
+			{
+				for (int i = 0; i < StartUrlBuilders.Count; ++i)
+				{
+					var builder = StartUrlBuilders[i];
+					Logger.MyLog(Identity, $"[{i + 1}] Add extra start urls to scheduler.", LogLevel.Info);
+					builder.Build(Site);
+				}
+			}
 		}
 
 		/// <summary>

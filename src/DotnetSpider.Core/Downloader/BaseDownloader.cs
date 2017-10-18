@@ -4,6 +4,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 
 namespace DotnetSpider.Core.Downloader
@@ -91,7 +92,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		protected Page SaveFile(Request request, HttpResponseMessage response, ISpider spider)
+		protected Page SaveFile(Request request, HttpWebResponse response, ISpider spider)
 		{
 			var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Env.PathSeperator);
 			string filePath = $"{DownloadFolder}{Env.PathSeperator}{spider.Identity}{intervalPath}";
@@ -108,7 +109,7 @@ namespace DotnetSpider.Core.Downloader
 						}
 					}
 
-					File.WriteAllBytes(filePath, response.Content.ReadAsByteArrayAsync().Result);
+					File.WriteAllBytes(filePath, response.GetResponseStream().StreamToBytes());
 				}
 				catch (Exception e)
 				{
