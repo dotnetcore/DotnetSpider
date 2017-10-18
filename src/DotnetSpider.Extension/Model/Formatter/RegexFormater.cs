@@ -17,13 +17,9 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		public int Group { get; set; } = -1;
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
 			string tmp = value.ToString();
-			if (string.IsNullOrEmpty(tmp))
-			{
-				return ValueWhenNull;
-			}
 			MatchCollection matches = Regex.Matches(tmp, Pattern);
 			if (matches.Count > 0)
 			{

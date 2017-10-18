@@ -13,10 +13,9 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		public int EndOffset { get; set; } = 0;
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
-			string tmp = value.ToString();
-
+			var tmp = value.ToString();
 			int begin = tmp.IndexOf(Start, StringComparison.Ordinal);
 			int length;
 			if (!string.IsNullOrEmpty(End))

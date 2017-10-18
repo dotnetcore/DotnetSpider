@@ -9,19 +9,9 @@ namespace DotnetSpider.Extension.Model.Formatter
 	{
 		public string Format { get; set; }
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
-			var tmp = value as ICollection;
-
-			if (tmp == null)
-			{
-				return string.Format(Format, value.ToString());
-			}
-			else
-			{
-				ArrayList array =new ArrayList(tmp);
-				return string.Format(Format, array.ToArray());
-			}
+			return string.Format(Format, value.ToString());
 		}
 
 		protected override void CheckArguments()

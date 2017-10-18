@@ -6,7 +6,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class TimeStampFormatter : Formatter
 	{
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
 			DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 			string tmp = value.ToString();

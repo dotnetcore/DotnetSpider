@@ -13,17 +13,13 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		public string Name { get; set; }
 
-		public string ValueWhenNull { get; set; } = null;
+		public object ValueWhenNull { get; set; } 
 
-		public bool RetutnDateString { get; set; } = false;
-		public DateTime DateTime { get; set; } = DateTime.Now;
-		public string DateFormat { get; set; }
-
-		protected abstract dynamic FormateValue(dynamic value);
+		protected abstract object FormateValue(object value);
 
 		protected abstract void CheckArguments();
 
-		public dynamic Formate(dynamic value)
+		public object Formate(object value)
 		{
 			CheckArguments();
 

@@ -14,26 +14,25 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		public TrimType Type { get; set; } = TrimType.All;
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
-			string tmp = value.ToString();
 			switch (Type)
 			{
 				case TrimType.All:
 					{
-						return tmp.Trim();
+						return value.ToString().Trim();
 					}
 				case TrimType.Left:
 					{
-						return tmp.TrimStart();
+						return value.ToString().TrimStart();
 					}
 				case TrimType.Right:
 					{
-						return tmp.TrimEnd();
+						return value.ToString().TrimEnd();
 					}
 				default:
 					{
-						return tmp.Trim();
+						return value.ToString().Trim();
 					}
 			}
 		}

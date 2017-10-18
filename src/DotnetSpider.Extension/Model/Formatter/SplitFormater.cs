@@ -10,10 +10,9 @@ namespace DotnetSpider.Extension.Model.Formatter
 		public string[] Splitors { get; set; }
 		public int ElementAt { get; set; } = int.MaxValue;
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
-			string tmp = value.ToString();
-			string[] result = tmp.Split(Splitors, StringSplitOptions.RemoveEmptyEntries);
+			string[] result = value.ToString().Split(Splitors, StringSplitOptions.RemoveEmptyEntries);
 
 			if (result.Length > ElementAt)
 			{

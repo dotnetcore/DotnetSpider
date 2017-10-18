@@ -39,7 +39,7 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				if (SelectorUtils.Parse(TotalPageSelector) is EnviromentSelector enviromentSelector)
 				{
-					totalStr = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, 0);
+					totalStr = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, 0)?.ToString();
 				}
 			}
 			else
@@ -51,7 +51,7 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				foreach (var formatter in TotalPageFormatters)
 				{
-					totalStr = formatter.Formate(totalStr);
+					totalStr = formatter.Formate(totalStr)?.ToString();
 				}
 			}
 

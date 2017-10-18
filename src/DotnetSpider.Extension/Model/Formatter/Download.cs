@@ -13,12 +13,13 @@ namespace DotnetSpider.Extension.Model.Formatter
 			Timeout = new TimeSpan(0, 0, 2, 0)
 		};
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
-			var name = Path.GetFileName(value);
+			var filePath = value.ToString();
+			var name = Path.GetFileName(filePath);
 			if (name != null)
 			{
-				Task<byte[]> task = Client.GetByteArrayAsync(value);
+				Task<byte[]> task = Client.GetByteArrayAsync(filePath);
 				task.ContinueWith(t =>
 				{
 					if (t.Exception != null)

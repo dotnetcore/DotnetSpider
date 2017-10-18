@@ -268,7 +268,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 				.AddPipeline(new FilePipeline());
 
 			// dowload html by http client
-			spider.Downloader = new HttpDownloader();
+			spider.Downloader = new HttpClientDownloader();
 
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度

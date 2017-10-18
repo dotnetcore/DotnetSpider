@@ -20,6 +20,7 @@ namespace DotnetSpider.Extension.Model
 		}
 
 		public SelectorType Type { get; set; } = SelectorType.XPath;
+
 		public string Expression { get; set; }
 	}
 }

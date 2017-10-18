@@ -159,36 +159,35 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string GenerateInsertSql(EntityAdapter adapter, bool ignoreDuplicate)
 		{
-			string columNames = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"`{p.Name}`"));
-			string values = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"@{p.Name}"));
+			var colNames = adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => p.Name);
+			string cols = string.Join(", ", colNames.Select(p => $"`{p}`"));
+			string colsParams = string.Join(", ", colNames.Select(p => $"@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
-			var sqlBuilder = new StringBuilder();
-			sqlBuilder.AppendFormat("INSERT {0} INTO `{1}`.`{2}` {3} {4};",
+
+			var sql = string.Format("INSERT {0} INTO `{1}`.`{2}` ({3}) VALUES ({4});",
 				ignoreDuplicate ? "IGNORE" : "",
 				adapter.Table.Database,
 				tableName,
-				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
-				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
-
-			var sql = sqlBuilder.ToString();
+				cols,
+				colsParams);
 			return sql;
 		}
 
 		private string GenerateInsertNewAndUpdateOldSql(EntityAdapter adapter)
 		{
-			string setParamenters = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"`{p.Name}`=@{p.Name}"));
-			string columNames = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"`{p.Name}`"));
-			string values = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"@{p.Name}"));
+			var colNames = adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => p.Name);
+			string setParams = string.Join(", ", colNames.Select(p => $"`{p}`=@{p}"));
+			string cols = string.Join(", ", colNames.Select(p => $"`{p}`"));
+			string colsParams = string.Join(", ", colNames.Select(p => $"@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
-			var sqlBuilder = new StringBuilder();
-			sqlBuilder.AppendFormat("INSERT INTO `{0}`.`{1}` {2} {3} ON DUPLICATE KEY UPDATE {4};",
+
+			var sql = string.Format("INSERT INTO `{0}`.`{1}` ({2}) {3} ON DUPLICATE KEY UPDATE {4};",
 				adapter.Table.Database,
 				tableName,
-				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
-				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})",
-				setParamenters);
+				cols,
+				colsParams,
+				setParams);
 
-			var sql = sqlBuilder.ToString();
 			return sql;
 		}
 

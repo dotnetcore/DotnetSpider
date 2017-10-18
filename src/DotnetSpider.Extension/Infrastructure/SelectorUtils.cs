@@ -10,7 +10,7 @@ namespace DotnetSpider.Extension.Infrastructure
 {
 	public class SelectorUtils
 	{
-		public static dynamic GetEnviromentValue(string field, Page page, int index)
+		public static object GetEnviromentValue(string field, Page page, int index)
 		{
 			switch (field.ToLower())
 			{

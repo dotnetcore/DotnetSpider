@@ -359,34 +359,37 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void MySqlFileEntityPipeline_InsertSql()
 		{
-			var id = Guid.NewGuid().ToString("N");
-			var folder = Path.Combine(Env.BaseDirectory, id);
-			var path = Path.Combine(folder, "mysql", "baidu.baidu_search_mysql_file.sql");
-			try
+			lock (TestBase.Locker)
 			{
-				BaiduSearchSpider spider = new BaiduSearchSpider();
-				spider.Identity = id;
-				spider.Run();
+				var id = Guid.NewGuid().ToString("N");
+				var folder = Path.Combine(Env.BaseDirectory, id);
+				var path = Path.Combine(folder, "mysql", "baidu.baidu_search_mysql_file.sql");
+				try
+				{
+					BaiduSearchSpider spider = new BaiduSearchSpider();
+					spider.Identity = id;
+					spider.Run();
 
-				var lines = File.ReadAllLines(path);
-				Assert.Equal(20, lines.Length);
-				using (var conn = new MySqlConnection(Env.DataConnectionStringSettings.ConnectionString))
-				{
-					conn.Execute("DELETE FROM baidu.baidu_search_mysql_file");
-					foreach (var sql in lines)
+					var lines = File.ReadAllLines(path);
+					Assert.Equal(20, lines.Length);
+					using (var conn = new MySqlConnection(Env.DataConnectionStringSettings.ConnectionString))
 					{
-						conn.Execute(sql);
+						conn.Execute("DELETE FROM baidu.baidu_search_mysql_file");
+						foreach (var sql in lines)
+						{
+							conn.Execute(sql);
+						}
+						var count = conn.QueryFirst<int>("SELECT COUNT(*) FROM baidu.baidu_search_mysql_file");
+						Assert.Equal(20, count);
+						conn.Execute("DROP TABLE baidu.baidu_search_mysql_file");
 					}
-					var count = conn.QueryFirst<int>("SELECT COUNT(*) FROM baidu.baidu_search_mysql_file");
-					Assert.Equal(20, count);
-					conn.Execute("DROP TABLE baidu.baidu_search_mysql_file");
 				}
-			}
-			finally
-			{
-				if (Directory.Exists(folder))
+				finally
 				{
-					Directory.Delete(folder, true);
+					if (Directory.Exists(folder))
+					{
+						Directory.Delete(folder, true);
+					}
 				}
 			}
 		}

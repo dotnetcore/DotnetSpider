@@ -7,23 +7,9 @@ namespace DotnetSpider.Extension.Model.Formatter
 	{
 		public bool ToUpper { get; set; } = true;
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
-			string tmp = value.ToString();
-
-			if (string.IsNullOrEmpty(tmp))
-			{
-				return ValueWhenNull;
-			}
-
-			if (ToUpper)
-			{
-				return tmp.ToUpperInvariant();
-			}
-			else
-			{
-				return tmp.ToLowerInvariant();
-			}
+			return ToUpper ? value.ToString().ToUpperInvariant() : value.ToString().ToLowerInvariant();
 		}
 
 		protected override void CheckArguments()

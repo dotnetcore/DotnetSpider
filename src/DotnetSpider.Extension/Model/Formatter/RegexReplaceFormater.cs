@@ -11,27 +11,13 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		public string NewValue { get; set; }
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
-			string tmp = value.ToString();
-			if (string.IsNullOrEmpty(tmp))
-			{
-				return ValueWhenNull;
-			}
-
-			if (RetutnDateString)
-			{
-				return Regex.Replace(tmp, Pattern, DateTime.ToString(DateFormat));
-			}
-			return Regex.Replace(tmp, Pattern, NewValue);
+			return Regex.Replace(value.ToString(), Pattern, NewValue);
 		}
 
 		protected override void CheckArguments()
 		{
-			if (NewValue == null)
-			{
-				NewValue = string.Empty;
-			}
 			if (string.IsNullOrEmpty(Pattern) || string.IsNullOrWhiteSpace(Pattern))
 			{
 				throw new SpiderException("Pattern should not be null or empty.");

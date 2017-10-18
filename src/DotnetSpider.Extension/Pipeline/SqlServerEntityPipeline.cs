@@ -119,33 +119,30 @@ namespace DotnetSpider.Extension.Pipeline
 				throw new NotSupportedException("Sql Server not supported this model.");
 			}
 
-			string columNames = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"[{p.Name}]"));
-			string values = string.Join(", ", adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => $"@{p.Name}"));
+			var colNames = adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => p.Name);
+			string cols = string.Join(", ", colNames.Select(p => $"[{p}]"));
+			string colsParams = string.Join(", ", colNames.Select(p => $"@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
-			var sqlBuilder = new StringBuilder();
-			sqlBuilder.AppendFormat("USE {0}; INSERT INTO [{1}] {2} {3};",
+
+			var sql = string.Format("USE {0}; INSERT INTO [{1}] ({2}) VALUES ({3});",
 				adapter.Table.Database,
 				tableName,
-				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
-				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
-
-			return sqlBuilder.ToString();
+				cols,
+				colsParams);
+			return sql;
 		}
 
 		private string GenerateUpdateSql(EntityAdapter adapter)
 		{
-			string setParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"[{p}]=@{p}"));
-			StringBuilder primaryParamenters = new StringBuilder();
-			primaryParamenters.Append($"[{Env.IdColumn}] = @{Env.IdColumn}");
+			string setCols = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"[{p}]=@{p}"));
 
-			var sqlBuilder = new StringBuilder();
 			var tableName = adapter.Table.CalculateTableName();
-			sqlBuilder.AppendFormat("USE {0}; UPDATE [{1}] SET {2} WHERE {3};",
-				adapter.Table.Database,
-				tableName,
-				setParamenters, primaryParamenters);
+			var sql = string.Format("USE {0}; UPDATE [{1}] SET {2} WHERE [{3}] = @{3};",
+					adapter.Table.Database,
+					tableName,
+					setCols, Env.IdColumn);
 
-			return sqlBuilder.ToString();
+			return sql;
 		}
 
 		private string GenerateSelectSql(EntityAdapter adapter)

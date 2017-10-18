@@ -18,7 +18,7 @@ namespace DotnetSpider.Core.Downloader
 	/// <summary>
 	/// The http downloader
 	/// </summary>
-	public class HttpDownloader : BaseDownloader
+	public class HttpClientDownloader : BaseDownloader
 	{
 		private static readonly List<string> MediaTypes = new List<string>
 		{

@@ -9,7 +9,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		public string Displacement { get; set; }
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
 			return value.Equals(EqualValue) ? Displacement : value;
 		}

@@ -17,58 +17,46 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		public string NumFormat { get; set; } = "F0";
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
-			try
+			var tmp = value.ToString(); 
+			decimal num = decimal.Parse(RegexUtil.DecimalRegex.Match(tmp).ToString());
+			if (tmp.EndsWith(UnitStringForShi))
 			{
-				string tmp = value.ToString();
-				if (string.IsNullOrEmpty(tmp))
-				{
-					return ValueWhenNull;
-				}
-				decimal num = decimal.Parse(RegexUtil.DecimalRegex.Match(tmp).ToString());
-				if (tmp.EndsWith(UnitStringForShi))
-				{
-					num = num * 10;
-				}
-				else if (tmp.EndsWith(UnitStringForBai))
-				{
-					num = num * 100;
-				}
-				else if (tmp.EndsWith(UnitStringForBai))
-				{
-					num = num * 100;
-				}
-				else if (tmp.EndsWith(UnitStringForQian))
-				{
-					num = num * 1000;
-				}
-				else if (tmp.EndsWith(UnitStringForWan))
-				{
-					num = num * 10000;
-				}
-				else if (tmp.EndsWith(UnitStringForYi))
-				{
-					num = num * 100000000;
-				}
+				num = num * 10;
+			}
+			else if (tmp.EndsWith(UnitStringForBai))
+			{
+				num = num * 100;
+			}
+			else if (tmp.EndsWith(UnitStringForBai))
+			{
+				num = num * 100;
+			}
+			else if (tmp.EndsWith(UnitStringForQian))
+			{
+				num = num * 1000;
+			}
+			else if (tmp.EndsWith(UnitStringForWan))
+			{
+				num = num * 10000;
+			}
+			else if (tmp.EndsWith(UnitStringForYi))
+			{
+				num = num * 100000000;
+			}
 
-				if (CustomUnitString.Count > 0)
+			if (CustomUnitString.Count > 0)
+			{
+				for (int i = 0; i < CustomUnitString.Count; i++)
 				{
-					for (int i = 0; i < CustomUnitString.Count; i++)
+					if (tmp.EndsWith(CustomUnitString[i]))
 					{
-						if (tmp.EndsWith(CustomUnitString[i]))
-						{
-							num = num * CustomUnitValue[i];
-						}
+						num = num * CustomUnitValue[i];
 					}
 				}
-				return num.ToString(NumFormat);
 			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e.ToString());
-				return ValueWhenNull;
-			}
+			return num.ToString(NumFormat);
 		}
 
 		protected override void CheckArguments()

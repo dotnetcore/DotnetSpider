@@ -90,8 +90,12 @@ namespace DotnetSpider.Extension.Model
 			T dataObject = Activator.CreateInstance<T>();
 
 			bool skip = false;
-			foreach (var field in EntityDefine.Columns.Where(c => c.Name != Env.IdColumn))
+			foreach (var field in EntityDefine.Columns)
 			{
+				if (field.Name == Env.IdColumn)
+				{
+					continue;
+				}
 				var fieldValue = ExtractField(item, page, field, index);
 				if (fieldValue == null)
 				{
@@ -111,11 +115,7 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 
-			if (skip)
-			{
-				return default(T);
-			}
-			return dataObject;
+			return skip ? default(T) : dataObject;
 
 			//if (dataObject != null && EntityDefine.LinkToNexts != null)
 			//{
@@ -177,23 +177,23 @@ namespace DotnetSpider.Extension.Model
 			}
 			else
 			{
-				bool needPlainText = field.Option == PropertyDefine.Options.PlainText;
-				if (field.Multi)
+				bool needCount = field.Option == PropertyDefine.Options.Count;
+				if (needCount)
 				{
-					var propertyValues = item.SelectList(selector).Nodes();
+					var values = item.SelectList(selector).Nodes();
+					return values.Count;
+				}
+				else
+				{
+					var value = (object)item.Select(selector)?.GetValue(field.Option == PropertyDefine.Options.PlainText);
 
-					List<dynamic> results = new List<dynamic>();
-					foreach (var propertyValue in propertyValues)
-					{
-						results.Add(Convert.ChangeType(propertyValue.GetValue(needPlainText), field.DataType));
-					}
 					foreach (var formatter in field.Formatters)
 					{
 #if DEBUG
 						try
 						{
 #endif
-							results = formatter.Formate(results);
+							value = formatter.Formate(value);
 #if DEBUG
 						}
 						catch (Exception e)
@@ -201,37 +201,8 @@ namespace DotnetSpider.Extension.Model
 						}
 #endif
 					}
-					return results;
-				}
-				else
-				{
-					bool needCount = field.Option == PropertyDefine.Options.Count;
-					if (needCount)
-					{
-						var values = item.SelectList(selector).Nodes();
-						return values.Count;
-					}
-					else
-					{
-						var value = item.Select(selector)?.GetValue(needPlainText);
-						dynamic tmpValue = value;
-						foreach (var formatter in field.Formatters)
-						{
-#if DEBUG
-							try
-							{
-#endif
-								tmpValue = formatter.Formate(tmpValue);
-#if DEBUG
-							}
-							catch (Exception e)
-							{
-							}
-#endif
-						}
 
-						return tmpValue == null ? null : Convert.ChangeType(tmpValue, field.DataType);
-					}
+					return value == null ? null : Convert.ChangeType(value, field.DataType);
 				}
 			}
 		}

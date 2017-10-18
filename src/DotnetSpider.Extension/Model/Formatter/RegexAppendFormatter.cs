@@ -11,14 +11,10 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		public string AppendValue { get; set; }
 
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
-			string tmp = value.ToString();
-			if (Regex.IsMatch(tmp, Pattern))
-			{
-				return $"{tmp}{AppendValue}";
-			}
-			return value;
+			var tmp = value.ToString();
+			return Regex.IsMatch(tmp, Pattern) ? $"{tmp}{AppendValue}" : tmp;
 		}
 
 		protected override void CheckArguments()

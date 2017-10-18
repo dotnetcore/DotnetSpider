@@ -10,7 +10,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property)]
 	public class HtmlDecodeFormater : Formatter
 	{
-		protected override dynamic FormateValue(dynamic value)
+		protected override object FormateValue(object value)
 		{
 			string tmp = value.ToString();
 #if !NET_CORE

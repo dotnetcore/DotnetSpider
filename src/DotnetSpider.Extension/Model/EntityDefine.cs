@@ -108,7 +108,7 @@ namespace DotnetSpider.Extension.Model
 
 		private void GenerateEntityColumns()
 		{
-			var properties = Type.GetProperties();
+			var properties = Type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
 			foreach (var property in properties)
 			{
@@ -231,7 +231,6 @@ namespace DotnetSpider.Extension.Model
 				throw new SpiderException("Only string property can set length.");
 			}
 
-			Multi = typeof(IList).IsAssignableFrom(type);
 			Option = propertyDefine.Option;
 			Selector = new BaseSelector
 			{
@@ -258,8 +257,6 @@ namespace DotnetSpider.Extension.Model
 		public BaseSelector Selector { get; set; }
 
 		public bool NotNull { get; set; }
-
-		public bool Multi { get; set; }
 
 		public PropertyDefine.Options Option { get; set; }
 

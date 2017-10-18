@@ -37,7 +37,7 @@ namespace DotnetSpider.Core
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 		private readonly Site _site;
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
-		private IDownloader _downloader = new HttpDownloader();
+		private IDownloader _downloader = new HttpClientDownloader();
 		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
@@ -876,7 +876,7 @@ namespace DotnetSpider.Core
 			}
 
 			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
-			Downloader = Downloader ?? new HttpDownloader();
+			Downloader = Downloader ?? new HttpClientDownloader();
 		}
 
 		/// <summary>
@@ -894,15 +894,6 @@ namespace DotnetSpider.Core
 		/// <param name="arguments"></param>
 		protected virtual void AfterInitComponent(params string[] arguments)
 		{
-			if (IfRequireInitStartRequests(arguments) && StartUrlBuilders != null && StartUrlBuilders.Count > 0)
-			{
-				for (int i = 0; i < StartUrlBuilders.Count; ++i)
-				{
-					var builder = StartUrlBuilders[i];
-					Logger.MyLog(Identity, $"[{i + 1}] Add extra start urls to scheduler.", LogLevel.Info);
-					builder.Build(Site);
-				}
-			}
 		}
 
 		/// <summary>
@@ -934,6 +925,8 @@ namespace DotnetSpider.Core
 			}
 
 			PreInitComponent(arguments);
+
+			InvokeStartUrlBuilders(arguments);
 
 			Monitor.Identity = Identity;
 
@@ -1321,6 +1314,19 @@ namespace DotnetSpider.Core
 		private void CurrentDomain_ProcessExit(object sender, EventArgs e)
 		{
 			NetworkCenter.Current.Executor?.Dispose();
+		}
+
+		private void InvokeStartUrlBuilders(params string[] arguments)
+		{
+			if (IfRequireInitStartRequests(arguments) && StartUrlBuilders != null && StartUrlBuilders.Count > 0)
+			{
+				for (int i = 0; i < StartUrlBuilders.Count; ++i)
+				{
+					var builder = StartUrlBuilders[i];
+					Logger.MyLog(Identity, $"Add start urls to scheduler via builder[{i + 1}].", LogLevel.Info);
+					builder.Build(Site);
+				}
+			}
 		}
 	}
 }
