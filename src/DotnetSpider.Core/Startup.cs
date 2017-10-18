@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using DotnetSpider.Core.Infrastructure;
 #if NET_CORE
 using Microsoft.Extensions.DependencyModel;
 using System.Runtime.InteropServices;
@@ -95,9 +96,7 @@ namespace DotnetSpider.Core
 		{
 			if (!spiderTypes.ContainsKey(spiderName))
 			{
-				Console.ForegroundColor = ConsoleColor.DarkYellow;
-				Console.WriteLine($"Spider: {spiderName} unfound.");
-				Console.ForegroundColor = ConsoleColor.White;
+			    ConsoleHelper.WriteLine($"Spider: {spiderName} unfound.", ConsoleColor.DarkYellow);
 				return null;
 			}
 			var spiderType = spiderTypes[spiderName];
@@ -186,11 +185,7 @@ namespace DotnetSpider.Core
 							}
 							else
 							{
-								Console.ForegroundColor = ConsoleColor.Red;
-								Console.WriteLine();
-								Console.WriteLine($"Spider {type.Name} are duplicate.");
-								Console.WriteLine();
-								Console.ForegroundColor = ConsoleColor.White;
+							    ConsoleHelper.WriteLine($"Spider {type.Name} are duplicate.", 1);
 								return null;
 							}
 
@@ -203,11 +198,7 @@ namespace DotnetSpider.Core
 								}
 								else
 								{
-									Console.ForegroundColor = ConsoleColor.Red;
-									Console.WriteLine();
-									Console.WriteLine($"Spider {type.Name} are duplicate.");
-									Console.WriteLine();
-									Console.ForegroundColor = ConsoleColor.White;
+								    ConsoleHelper.WriteLine($"Spider {type.Name} are duplicate.", 1);
 									return null;
 								}
 							}
@@ -218,11 +209,7 @@ namespace DotnetSpider.Core
 
 			if (spiderTypes.Count == 0)
 			{
-				Console.ForegroundColor = ConsoleColor.DarkYellow;
-				Console.WriteLine();
-				Console.WriteLine("Did not detect any spider.");
-				Console.WriteLine();
-				Console.ForegroundColor = ConsoleColor.White;
+			    ConsoleHelper.WriteLine("Did not detect any spider.", 1, ConsoleColor.DarkYellow);
 				return null;
 			}
 
@@ -240,9 +227,7 @@ namespace DotnetSpider.Core
 			{
 				if (string.IsNullOrEmpty(arg) || string.IsNullOrWhiteSpace(arg))
 				{
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name] -e:[en1=value1,en2=value2,...]");
-					Console.ForegroundColor = ConsoleColor.White;
+				    ConsoleHelper.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name] -e:[en1=value1,en2=value2,...]");
 					return null;
 				}
 
@@ -263,9 +248,7 @@ namespace DotnetSpider.Core
 					}
 					else
 					{
-						Console.ForegroundColor = ConsoleColor.Red;
-						Console.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name]");
-						Console.ForegroundColor = ConsoleColor.White;
+					    ConsoleHelper.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name]");
 						return null;
 					}
 				}
@@ -281,26 +264,20 @@ namespace DotnetSpider.Core
 					}
 					else
 					{
-						Console.ForegroundColor = ConsoleColor.Red;
-						Console.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name]");
-						Console.ForegroundColor = ConsoleColor.White;
+					    ConsoleHelper.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name]");
 						return null;
 					}
 				}
 				else
 				{
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name]");
-					Console.ForegroundColor = ConsoleColor.White;
+				    ConsoleHelper.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name]");
 					return null;
 				}
 			}
 
 			if (arguments.Count == 0 || !arguments.ContainsKey("-s") || !arguments.ContainsKey("-tid"))
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("Error: -s & -tid are necessary.");
-				Console.ForegroundColor = ConsoleColor.White;
+			    ConsoleHelper.WriteLine("Error: -s & -tid are necessary.");
 				return null;
 			}
 
