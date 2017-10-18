@@ -16,6 +16,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CassandraCSharpDriver" Version="3.3.2" />
     <PackageReference Include="EPPlus.Core" Version="1.5.2" />
   </ItemGroup>
   <ItemGroup>

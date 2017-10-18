@@ -11,6 +11,9 @@ using DotnetSpider.Core;
 using System.Collections.Concurrent;
 using System.Configuration;
 using Cassandra.Mapping;
+using System.Net;
+using System.Data.SqlClient;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -18,20 +21,19 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		private PipelineMode _defaultPipelineModel;
 		private static TimeUuid DefaultTimeUuid = default(TimeUuid);
-
 		internal ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
 		internal ConcurrentDictionary<string, ISession> EntitySessions { get; set; } = new ConcurrentDictionary<string, ISession>();
 
-		public string ConnectString { get; set; }
+		public CassandraConnectionSetting ConnectionSetting { get; set; }
 
 		public CassandraEntityPipeline()
 		{
-			ConnectString = Env.DataConnectionStringSettings?.ConnectionString;
+			ConnectionSetting = new CassandraConnectionSetting(Env.DataConnectionStringSettings?.ConnectionString);
 		}
 
 		public CassandraEntityPipeline(string connectString)
 		{
-			ConnectString = connectString;
+			ConnectionSetting = new CassandraConnectionSetting(connectString);
 		}
 
 		public PipelineMode DefaultPipelineModel
@@ -53,7 +55,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		internal override void AddEntity(IEntityDefine entityDefine)
+		public override void AddEntity(IEntityDefine entityDefine)
 		{
 			if (entityDefine == null)
 			{
@@ -147,10 +149,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			foreach (var adapter in EntityAdapters)
 			{
-				var cluster = Cluster.Builder()
-					.AddContactPoints(ConnectString)
-					.Build();
-
+				var cluster = CassandraUtils.CreateCluster(ConnectionSetting);
 				var session = cluster.Connect();
 				session.CreateKeyspaceIfNotExists(adapter.Value.Table.Database);
 				session.ChangeKeyspace(adapter.Value.Table.Database);
@@ -193,7 +192,6 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			var columNames = string.Join(", ", adapter.Columns.Select(p => $"{p.Name}"));
 			var values = string.Join(", ", adapter.Columns.Select(column => $"?"));
-
 			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 
@@ -213,7 +211,6 @@ namespace DotnetSpider.Extension.Pipeline
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS {adapter.Table.Database }.{tableName} (");
 			string columNames = string.Join(", ", adapter.Columns.Select(p => $"{p.Name} {GetDataTypeSql(p)} "));
 			builder.Append(columNames);
-
 			builder.Append($", PRIMARY KEY({Env.IdColumn})");
 
 			builder.Append(")");

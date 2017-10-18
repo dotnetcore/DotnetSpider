@@ -159,7 +159,5 @@ namespace DotnetSpider.Core
 
 			LoadConfiguration(path);
 		}
-
-
 	}
 }

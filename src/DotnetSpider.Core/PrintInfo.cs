@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 
 namespace DotnetSpider.Core
@@ -9,6 +10,7 @@ namespace DotnetSpider.Core
 
 		public static void Print()
 		{
+
 			lock (Locker)
 			{
 				var key = "_DotnetSpider_Info";
@@ -36,8 +38,13 @@ namespace DotnetSpider.Core
 
 		public static void PrintLine(char word = '=')
 		{
+			var width = 120;
+			if (Console.In != StreamReader.Null)
+			{
+				width = Console.WindowWidth;
+			}
 			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i < Console.WindowWidth; ++i)
+			for (int i = 0; i < Console.BufferWidth; ++i)
 			{
 				builder.Append(word);
 			}

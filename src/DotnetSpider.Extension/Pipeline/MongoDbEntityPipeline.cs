@@ -23,7 +23,7 @@ namespace DotnetSpider.Extension.Pipeline
 			ConnectString = connectString;
 		}
 
-		internal override void AddEntity(IEntityDefine metadata)
+		public override void AddEntity(IEntityDefine metadata)
 		{
 			if (metadata.TableInfo == null)
 			{

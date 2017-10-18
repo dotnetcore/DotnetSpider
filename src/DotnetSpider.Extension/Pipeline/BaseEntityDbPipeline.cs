@@ -84,7 +84,7 @@ namespace DotnetSpider.Extension.Pipeline
 			_connectString = connectString;
 		}
 
-		internal override void AddEntity(IEntityDefine entityDefine)
+		public override void AddEntity(IEntityDefine entityDefine)
 		{
 			if (entityDefine == null)
 			{
