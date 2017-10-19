@@ -56,15 +56,14 @@ namespace DotnetSpider.Extension.Model
 						list = list.Take(EntityDefine.Take).ToList();
 					}
 
-					int index = 0;
-					foreach (var item in list)
+					for (int i = 0; i < list.Count; ++i)
 					{
-						var obj = ExtractSingle(page, item, index);
+						var item = list[i];
+						var obj = ExtractSingle(page, item, i);
 						if (obj != null)
 						{
 							result.Add(obj);
 						}
-						index++;
 					}
 				}
 			}
@@ -74,8 +73,8 @@ namespace DotnetSpider.Extension.Model
 
 				if (select != null)
 				{
-					var singleResult = ExtractSingle(page, select, 0);
-					result = singleResult != null ? new List<T> { singleResult } : null;
+					var item = ExtractSingle(page, select, 0);
+					result = item != null ? new List<T> { item } : null;
 				}
 				else
 				{
@@ -92,7 +91,7 @@ namespace DotnetSpider.Extension.Model
 			bool skip = false;
 			foreach (var field in EntityDefine.Columns)
 			{
-				if (field.Name == Env.IdColumn)
+				if (Env.IdColumns.Contains(field.Name))
 				{
 					continue;
 				}
@@ -143,7 +142,7 @@ namespace DotnetSpider.Extension.Model
 			//}
 		}
 
-		private dynamic ExtractField(ISelectable item, Page page, Column field, int index)
+		private object ExtractField(ISelectable item, Page page, Column field, int index)
 		{
 			if (field == null)
 			{

@@ -24,7 +24,7 @@ namespace DotnetSpider.Core
 		public const string EmailDisplayNameKey = "emailDisplayName";
 		public const string SystemConnectionStringKey = "SystemConnection";
 		public const string DataConnectionStringKey = "DataConnection";
-		public const string IdColumn = "Id";
+		public static string[] IdColumns = new[] { "Id", "__Id" };
 		public const string EnvLocation = "LOCATION";
 		public const string EnvConfig = "CONFIG";
 		public const string EnvDbConfig = "DBCONFIG";
@@ -113,6 +113,8 @@ namespace DotnetSpider.Core
 
 		public static void Reload()
 		{
+			BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
 #if !NET_CORE
 			PathSeperator = "\\";
 #else
@@ -120,33 +122,33 @@ namespace DotnetSpider.Core
 #endif
 
 #if !NET_CORE
-			GlobalDirectory = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "DotnetSpider");
-			BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+			GlobalDirectory = $"C:\\Users\\{Environment.GetEnvironmentVariable("USERNAME")}\\Documents\\DotnetSpider\\";
 #else
-			BaseDirectory = AppContext.BaseDirectory;
+
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
-				GlobalDirectory = Path.Combine(System.Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
+				GlobalDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
-				GlobalDirectory = Path.Combine(System.Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
+				GlobalDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				GlobalDirectory = $"C:\\Users\\{System.Environment.GetEnvironmentVariable("USERNAME")}\\Documents\\DotnetSpider\\";
+				// 修改本机用户名后 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) 取值依然是旧的.
+				GlobalDirectory = $"C:\\Users\\{Environment.GetEnvironmentVariable("USERNAME")}\\Documents\\DotnetSpider\\";
 			}
 			else
 			{
 				throw new ArgumentException("Unknow OS.");
 			}
-
+#endif
 			DirectoryInfo di = new DirectoryInfo(GlobalDirectory);
 			if (!di.Exists)
 			{
 				di.Create();
 			}
-#endif
+
 			GlobalAppConfigPath = Path.Combine(GlobalDirectory, "app.config");
 
 			HostName = Dns.GetHostName();

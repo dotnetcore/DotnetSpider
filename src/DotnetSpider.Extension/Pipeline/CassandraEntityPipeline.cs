@@ -210,7 +210,7 @@ namespace DotnetSpider.Extension.Pipeline
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS {adapter.Table.Database }.{tableName} (");
 			string columNames = string.Join(", ", adapter.Columns.Select(p => $"{p.Name} {GetDataTypeSql(p)} "));
 			builder.Append(columNames);
-			builder.Append($", PRIMARY KEY({Env.IdColumn})");
+			builder.Append($", PRIMARY KEY(Id)");
 
 			builder.Append(")");
 			string sql = builder.ToString();

@@ -82,7 +82,7 @@ namespace DotnetSpider.Extension.Infrastructure
 					e = new PhantomJSDriver(phantomJsDriverService);
 					break;
 				case Browser.Firefox:
-					string path = System.Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
+					string path = Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
 					string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
 					var profile = pathsToProfiles.Length == 1 ? new FirefoxProfile(pathsToProfiles[0], false) : new FirefoxProfile();
 					if (!option.AlwaysLoadNoFocusLibrary)

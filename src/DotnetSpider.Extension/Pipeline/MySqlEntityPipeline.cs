@@ -159,7 +159,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string GenerateInsertSql(EntityAdapter adapter, bool ignoreDuplicate)
 		{
-			var colNames = adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => p.Name);
+			var colNames = adapter.Columns.Where(p => !Env.IdColumns.Contains(p.Name) && p.Name != Env.CDateColumn).Select(p => p.Name);
 			string cols = string.Join(", ", colNames.Select(p => $"`{p}`"));
 			string colsParams = string.Join(", ", colNames.Select(p => $"@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
@@ -175,7 +175,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string GenerateInsertNewAndUpdateOldSql(EntityAdapter adapter)
 		{
-			var colNames = adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => p.Name);
+			var colNames = adapter.Columns.Where(p => !Env.IdColumns.Contains(p.Name) && p.Name != Env.CDateColumn).Select(p => p.Name);
 			string setParams = string.Join(", ", colNames.Select(p => $"`{p}`=@{p}"));
 			string cols = string.Join(", ", colNames.Select(p => $"`{p}`"));
 			string colsParams = string.Join(", ", colNames.Select(p => $"@{p}"));
@@ -196,7 +196,7 @@ namespace DotnetSpider.Extension.Pipeline
 			string setParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"`{p}`=@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
 			StringBuilder primaryParamenters = new StringBuilder();
-			primaryParamenters.Append($"`{Env.IdColumn}` = @{Env.IdColumn}");
+			primaryParamenters.Append($"`__Id` = @__Id");
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("UPDATE `{0}`.`{1}` SET {2} WHERE {3};",
 				adapter.Table.Database,
@@ -210,7 +210,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			StringBuilder primaryParamenters = new StringBuilder();
 
-			primaryParamenters.Append($"`{Env.IdColumn}` = @{Env.IdColumn}");
+			primaryParamenters.Append($"`__Id` = @__Id");
 			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("SELECT * FROM `{0}`.`{1}` WHERE {2};",
@@ -248,7 +248,7 @@ namespace DotnetSpider.Extension.Pipeline
 					builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames.Substring(0, uniqueColumNames.Length)})");
 				}
 			}
-			builder.Append($", PRIMARY KEY ({Env.IdColumn})");
+			builder.Append($", PRIMARY KEY (__Id)");
 			builder.Append(") AUTO_INCREMENT=1");
 			string sql = builder.ToString();
 			return sql;
@@ -260,9 +260,9 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return $"`{p.Name}` {GetDataTypeSql(p)} DEFAULT CURRENT_TIMESTAMP";
 			}
-			else if (Env.IdColumn == p.Name)
+			else if (Env.IdColumns.Contains(p.Name))
 			{
-				return $"`{Env.IdColumn}` bigint AUTO_INCREMENT";
+				return $"`__Id` bigint AUTO_INCREMENT";
 			}
 			else
 			{

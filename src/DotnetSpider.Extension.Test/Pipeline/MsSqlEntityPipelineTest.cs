@@ -475,7 +475,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Value { get; set; }
 		}
 
-		[EntityTable("test", "sku2", Uniques = new[] { "Key" }, UpdateColumns = new[] { "Id" })]
+		[EntityTable("test", "sku2", Uniques = new[] { "Key" }, UpdateColumns = new[] { "__Id" })]
 		public class UpdateEntity3 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]
@@ -495,7 +495,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Value { get; set; }
 		}
 
-		[EntityTable("test", "sku2", Uniques = new[] { "Key" }, UpdateColumns = new[] { "Value", "Key", "Id" })]
+		[EntityTable("test", "sku2", Uniques = new[] { "Key" }, UpdateColumns = new[] { "Value", "Key", "__Id" })]
 		public class UpdateEntity5 : SpiderEntity
 		{
 			[PropertyDefine(Expression = "key", Type = SelectorType.Enviroment, Length = 100)]

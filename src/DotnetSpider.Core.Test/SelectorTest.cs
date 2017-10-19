@@ -85,9 +85,9 @@ namespace DotnetSpider.Core.Test
             var result2 = jsonPathSelector.Select(_text);
 
             var expected1 =
-                $"{{{System.Environment.NewLine}  \"category\": \"reference\",{System.Environment.NewLine}  \"author\": \"Nigel Rees\",{System.Environment.NewLine}  \"title\": \"Sayings of the Century\",{System.Environment.NewLine}  \"price\": 8.95{System.Environment.NewLine}}}";
+                $"{{{Environment.NewLine}  \"category\": \"reference\",{Environment.NewLine}  \"author\": \"Nigel Rees\",{Environment.NewLine}  \"title\": \"Sayings of the Century\",{Environment.NewLine}  \"price\": 8.95{Environment.NewLine}}}";
             var expected2 =
-                $"{{{System.Environment.NewLine}  \"category\": \"reference\",{System.Environment.NewLine}  \"author\": \"Nigel Rees\",{System.Environment.NewLine}  \"title\": \"Sayings of the Century\",{System.Environment.NewLine}  \"price\": 8.95{System.Environment.NewLine}}}";
+                $"{{{Environment.NewLine}  \"category\": \"reference\",{Environment.NewLine}  \"author\": \"Nigel Rees\",{Environment.NewLine}  \"title\": \"Sayings of the Century\",{Environment.NewLine}  \"price\": 8.95{Environment.NewLine}}}";
             Assert.Equal(result2, expected1);
             Assert.Equal(list2[0], expected2);
         }

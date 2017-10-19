@@ -69,7 +69,7 @@ namespace DotnetSpider.Extension.Pipeline
 			builder.Append(columNames);
 			builder.Append(",");
 			builder.Append(
-				$" CONSTRAINT [PK_{tableName}] PRIMARY KEY CLUSTERED ({Env.IdColumn})WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = {(adapter.PipelineMode == PipelineMode.InsertAndIgnoreDuplicate ? "ON" : "OFF")}, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
+				$" CONSTRAINT [PK_{tableName}] PRIMARY KEY CLUSTERED (__Id)WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = {(adapter.PipelineMode == PipelineMode.InsertAndIgnoreDuplicate ? "ON" : "OFF")}, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON[PRIMARY]) ON[PRIMARY];");
 
 			if (adapter.Table.Indexs != null)
 			{
@@ -102,9 +102,9 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return $"[{p.Name}] {GetDataTypeSql(p)} DEFAULT(GETDATE())";
 			}
-			else if (Env.IdColumn == p.Name)
+			else if (Env.IdColumns.Contains(p.Name))
 			{
-				return $"[{Env.IdColumn}] [bigint] IDENTITY(1,1) NOT NULL";
+				return $"[__Id] [bigint] IDENTITY(1,1) NOT NULL";
 			}
 			else
 			{
@@ -119,7 +119,7 @@ namespace DotnetSpider.Extension.Pipeline
 				throw new NotSupportedException("Sql Server not supported this model.");
 			}
 
-			var colNames = adapter.Columns.Where(p => p.Name != Env.IdColumn && p.Name != Env.CDateColumn).Select(p => p.Name);
+			var colNames = adapter.Columns.Where(p => !Env.IdColumns.Contains(p.Name) && p.Name != Env.CDateColumn).Select(p => p.Name);
 			string cols = string.Join(", ", colNames.Select(p => $"[{p}]"));
 			string colsParams = string.Join(", ", colNames.Select(p => $"@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
@@ -137,10 +137,10 @@ namespace DotnetSpider.Extension.Pipeline
 			string setCols = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"[{p}]=@{p}"));
 
 			var tableName = adapter.Table.CalculateTableName();
-			var sql = string.Format("USE {0}; UPDATE [{1}] SET {2} WHERE [{3}] = @{3};",
+			var sql = string.Format("USE {0}; UPDATE [{1}] SET {2} WHERE [__Id] = @__Id;",
 					adapter.Table.Database,
 					tableName,
-					setCols, Env.IdColumn);
+					setCols);
 
 			return sql;
 		}
@@ -149,7 +149,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			StringBuilder primaryParamenters = new StringBuilder();
 
-			primaryParamenters.Append($"[{Env.IdColumn}] = @{Env.IdColumn}");
+			primaryParamenters.Append($"[__Id] = @__Id");
 
 			var sqlBuilder = new StringBuilder();
 			var tableName = adapter.Table.CalculateTableName();

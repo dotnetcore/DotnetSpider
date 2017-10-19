@@ -523,7 +523,7 @@ namespace DotnetSpider.Extension.Test
 				Assert.Equal("Float", columns[4].Name);
 				Assert.Equal("Double", columns[5].Name);
 				Assert.Equal("String1", columns[6].Name);
-				Assert.Equal(Env.IdColumn, columns[7].Name);
+				Assert.Equal("__Id", columns[7].Name);
 				Assert.Equal("CDate", columns[8].Name);
 
 				Assert.Equal("int(11)", columns[0].Type);
@@ -576,7 +576,7 @@ namespace DotnetSpider.Extension.Test
 				Assert.Equal("Float", columns[3].Name);
 				Assert.Equal("Double", columns[4].Name);
 				Assert.Equal("BigInt", columns[5].Name);
-				Assert.Equal(Env.IdColumn, columns[6].Name);
+				Assert.Equal("__Id", columns[6].Name);
 				Assert.Equal("String", columns[7].Name);
 				Assert.Equal("String1", columns[8].Name);
 

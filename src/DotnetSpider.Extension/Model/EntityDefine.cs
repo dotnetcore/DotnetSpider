@@ -146,7 +146,10 @@ namespace DotnetSpider.Extension.Model
 					}
 				}
 				var updateColumns = new List<string>(TableInfo.UpdateColumns);
-				updateColumns.Remove(Env.IdColumn);
+				foreach (var id in Env.IdColumns)
+				{
+					updateColumns.Remove(id);
+				}
 
 				TableInfo.UpdateColumns = updateColumns.ToArray();
 
@@ -166,7 +169,7 @@ namespace DotnetSpider.Extension.Model
 					{
 						throw new SpiderException("Index should contain more than a column.");
 					}
-					if (items.Count == 1 && items.First() == Env.IdColumn)
+					if (items.Count == 1 && Env.IdColumns.Contains(items.First()))
 					{
 						throw new SpiderException("Primary is no need to create another index.");
 					}
@@ -195,7 +198,7 @@ namespace DotnetSpider.Extension.Model
 					{
 						throw new SpiderException("Unique should contain more than a column.");
 					}
-					if (items.Count == 1 && items.First() == Env.IdColumn)
+					if (items.Count == 1 && Env.IdColumns.Contains(items.First()))
 					{
 						throw new SpiderException("Primary is no need to create another unique.");
 					}

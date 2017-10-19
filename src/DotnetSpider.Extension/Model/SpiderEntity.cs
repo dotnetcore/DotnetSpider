@@ -8,21 +8,16 @@ namespace DotnetSpider.Extension.Model
 	{
 	}
 
-	public interface ISpiderEntity<T> : ISpiderEntity
-	{
-		T Id { get; set; }
-	}
-
-	public abstract class SpiderEntity : ISpiderEntity<long>
+	public abstract class SpiderEntity : ISpiderEntity
 	{
 		[PropertyDefine(Expression = "null", Type = Core.Selector.SelectorType.Enviroment)]
-		public long Id { get; set; }
+		public long __Id { get; set; }
 
 		[PropertyDefine(Expression = "now", Type = Core.Selector.SelectorType.Enviroment)]
 		public DateTime CDate { get; set; }
 	}
 
-	public abstract class CassandraSpiderEntity : ISpiderEntity<TimeUuid>
+	public abstract class CassandraSpiderEntity : ISpiderEntity
 	{
 		[PropertyDefine(Expression = "timeuuid", Type = Core.Selector.SelectorType.Enviroment)]
 		public TimeUuid Id { get; set; }

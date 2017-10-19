@@ -154,17 +154,17 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					ISpider spider = new DefaultSpider("test", new Site());
 
 					MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
-					var metadata = new EntityDefine<ProductInsert>();
+					var metadata = new EntityDefine<Product2Insert>();
 					insertPipeline.AddEntity(metadata);
 					insertPipeline.InitPipeline(spider);
 
-					var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-					var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-					var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+					var data1 = new Product2Insert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
+					var data2 = new Product2Insert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+					var data3 = new Product2Insert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 
 					insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
 
-					var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+					var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 					Assert.Equal(3, list.Count);
 					Assert.Equal("110", list[0].Sku);
 					Assert.Equal("111", list[1].Sku);
