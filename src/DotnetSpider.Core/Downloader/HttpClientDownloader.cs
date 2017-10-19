@@ -173,6 +173,8 @@ namespace DotnetSpider.Core.Downloader
 				httpWebRequest.Accept = site.Accept;
 			}
 
+			httpWebRequest.AllowAutoRedirect = true;
+
 			foreach (var header in site.Headers)
 			{
 				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) &&
