@@ -215,9 +215,7 @@ namespace DotnetSpider.Core
 			}
 
 			Console.WriteLine($"Count of crawlers: {spiderTypes.Keys.Count}");
-			Console.WriteLine();
 
-			PrintInfo.PrintLine();
 			return spiderTypes;
 		}
 
@@ -298,6 +296,7 @@ namespace DotnetSpider.Core
 			Console.WriteLine("");
 			PrintInfo.Print();
 			var commands = string.Join(" ", args);
+			PrintInfo.PrintLine();
 			Console.WriteLine($"Args             : {commands}");
 			Console.WriteLine($"BaseDirectory    : {AppDomain.CurrentDomain.BaseDirectory}");
 			Console.WriteLine($"System           : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}");

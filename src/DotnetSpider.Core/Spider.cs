@@ -706,6 +706,8 @@ namespace DotnetSpider.Core
 			Logger.MyLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
 
 			OnClosed?.Invoke(this);
+
+			PrintInfo.PrintLine();
 		}
 
 		/// <summary>

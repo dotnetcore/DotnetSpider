@@ -30,8 +30,6 @@ namespace DotnetSpider.Core
 					Console.ForegroundColor = ConsoleColor.White;
 
 					AppDomain.CurrentDomain.SetData(key, "True");
-
-					PrintLine();
 				}
 			}
 		}
@@ -49,7 +47,7 @@ namespace DotnetSpider.Core
 				builder.Append(word);
 			}
 
-			Console.WriteLine(builder.ToString());
+			Console.Write(builder.ToString());
 		}
 	}
 }
