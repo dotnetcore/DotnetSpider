@@ -96,10 +96,6 @@ namespace DotnetSpider.Extension.Model
 						skip = true;
 						break;
 					}
-					else
-					{
-						field.Property.SetValue(dataObject, null);
-					}
 				}
 				else
 				{

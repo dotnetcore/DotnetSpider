@@ -59,6 +59,8 @@ namespace DotnetSpider.Core
 			var spider = CreateSpiderInstance(spiderName, arguments, spiderTypes);
 			if (spider != null)
 			{
+				PrintInfo.PrintLine();
+
 				var runMethod = spiderTypes[spiderName].GetMethod("Run");
 
 				if (!arguments.ContainsKey("-a"))

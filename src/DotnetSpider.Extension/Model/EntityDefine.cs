@@ -220,7 +220,7 @@ namespace DotnetSpider.Extension.Model
 			{
 				throw new SpiderException("Only string property can set length.");
 			}
-
+			DefaultValue = Property.PropertyType.IsValueType ? Activator.CreateInstance(Property.PropertyType) : null;
 			Option = propertyDefine.Option;
 			Selector = new BaseSelector
 			{
@@ -241,6 +241,8 @@ namespace DotnetSpider.Extension.Model
 		public PropertyDefine PropertyDefine { get; }
 
 		public PropertyInfo Property { get; }
+
+		public object DefaultValue { get; }
 
 		public string Name => Property.Name;
 

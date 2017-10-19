@@ -1019,10 +1019,8 @@ namespace DotnetSpider.Core
 			SafeDestroy(PageProcessors);
 			SafeDestroy(Downloader);
 
-			Site.HttpProxyPool?.Dispose();
-
-			_errorRequestStreamWriter.Flush();
-			_errorRequestStreamWriter.Dispose();
+			SafeDestroy(Site.HttpProxyPool);
+			SafeDestroy(_errorRequestStreamWriter);
 		}
 
 		/// <summary>
