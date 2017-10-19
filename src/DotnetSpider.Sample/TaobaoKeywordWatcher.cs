@@ -6,16 +6,25 @@ using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-
-using DotnetSpider.Extension.Scheduler;
 using System.Linq;
-using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Sample
 {
 	[TaskName("TaobaoKeywordWatcher")]
 	public class TaobaoKeywordWatcher : EntitySpider
 	{
+		private class MyAfterDownloadHandler : AfterDownloadCompleteHandler
+		{
+			public override void Handle(ref Page page, ISpider spider)
+			{
+				var pager = page.Selectable.Select(Selectors.JsonPath("$.mods.pager.status")).GetValue();
+				if (pager != "show")
+				{
+					page.SkipTargetUrls = true;
+				}
+			}
+		}
+
 		private class MyDataHanlder : DataHandler<TaobaoItem>
 		{
 			protected override TaobaoItem HandleDataOject(TaobaoItem data, Page page)
@@ -85,14 +94,9 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit(params string[] arguments)
 		{
-			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
-			{
-				StartOffset = 16,
-				EndOffset = 22,
-				StartPart = "g_page_config = {",
-				EndPart = "g_srp_loadCss();"
-			});
+			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler("g_page_config = {", "g_srp_loadCss();", 16, 22));
 			Downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&s=0", 44));
+			Downloader.AddAfterDownloadCompleteHandler(new MyAfterDownloadHandler());
 			SkipWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))
 			{
@@ -103,7 +107,7 @@ namespace DotnetSpider.Sample
 
 				AddStartRequest(new Request("https://s.taobao.com/search?q=妙可蓝多&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab=all", new Dictionary<string, dynamic> { { "bidwordstr", "妙可蓝多" } }));
 			}
-			AddEntityType<TaobaoItem>();
+			AddEntityType(new MyDataHanlder());
 		}
 
 		[EntityTable("taobao", "taobao_items", EntityTable.FirstDayOfCurrentMonth, Uniques = new[] { "item_id" })]

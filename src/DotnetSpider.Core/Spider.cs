@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,16 +7,13 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.XPath;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Redial;
 using DotnetSpider.Core.Scheduler;
-using Newtonsoft.Json;
 using NLog;
 using System.Runtime.CompilerServices;
 using System.Reflection;
@@ -749,7 +745,6 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Contiune spider if spider is paused.
 		/// </summary>
-		/// <param name="action"></param>
 		public void Contiune()
 		{
 			if (_realStat == Status.Stopped)

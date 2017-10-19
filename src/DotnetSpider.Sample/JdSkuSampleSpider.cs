@@ -7,7 +7,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample

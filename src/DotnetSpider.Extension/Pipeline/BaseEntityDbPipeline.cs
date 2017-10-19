@@ -1,20 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
 using System.Collections.Concurrent;
 using NLog;
-using DotnetSpider.Core.Redial;
 using DotnetSpider.Extension.Infrastructure;
 using System.Configuration;
-using DotnetSpider.Core.Infrastructure.Database;
-using DotnetSpider.Core.Pipeline;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -25,22 +17,18 @@ namespace DotnetSpider.Extension.Pipeline
 		private PipelineMode _defaultPipelineModel;
 
 		protected abstract ConnectionStringSettings CreateConnectionStringSettings(string connectString = null);
-		protected abstract DbParameter CreateDbParameter(string name, object value);
 		protected abstract void InitAllSqlOfEntity(EntityAdapter adapter);
 
 		public PipelineMode DefaultPipelineModel
 		{
-			get
-			{
-				return _defaultPipelineModel;
-			}
+			get => _defaultPipelineModel;
 			set
 			{
 				if (value == PipelineMode.Update)
 				{
 					throw new SpiderException("Can not set pipeline mode to Update.");
 				}
-				if (value != _defaultPipelineModel)
+				if (!Equals(value, _defaultPipelineModel))
 				{
 					_defaultPipelineModel = value;
 				}
@@ -150,44 +138,6 @@ namespace DotnetSpider.Extension.Pipeline
 		}
 
 		internal abstract void InitDatabaseAndTable();
-
-		public static IPipeline GetPipelineFromAppConfig()
-		{
-			if (Env.DataConnectionStringSettings == null)
-			{
-				return null;
-			}
-			IPipeline pipeline;
-			switch (Env.DataConnectionStringSettings.ProviderName)
-			{
-				case "Npgsql":
-					{
-						pipeline = new PostgreSqlEntityPipeline();
-						break;
-					}
-				case "MySql.Data.MySqlClient":
-					{
-						pipeline = new MySqlEntityPipeline();
-						break;
-					}
-				case "System.Data.SqlClient":
-					{
-						pipeline = new SqlServerEntityPipeline();
-						break;
-					}
-				case "MongoDB":
-					{
-						pipeline = new MongoDbEntityPipeline(Env.DataConnectionString);
-						break;
-					}
-				default:
-					{
-						pipeline = new NullPipeline();
-						break;
-					}
-			}
-			return pipeline;
-		}
 
 		/// <summary>
 		/// For test

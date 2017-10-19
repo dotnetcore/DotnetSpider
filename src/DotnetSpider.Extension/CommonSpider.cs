@@ -14,7 +14,7 @@ using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension
 {
-	public abstract class CommonSpider : Spider, ITask
+	public abstract class CommonSpider : Spider
 	{
 		protected const string InitStatusSetKey = "dotnetspider:init-stats";
 

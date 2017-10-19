@@ -1,19 +1,14 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading;
 using DotnetSpider.Core.Redial.Redialer;
-using System.Linq;
 using DotnetSpider.Core.Redial.InternetDetector;
-using System.Collections.Concurrent;
 using DotnetSpider.Core.Infrastructure;
-using LogLevel = NLog.LogLevel;
-using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Redial
 {
 	public class FileLockerRedialExecutor : LocalRedialExecutor
 	{
-		public sealed class FileLocker : ILocker
+		private sealed class FileLocker : ILocker
 		{
 			public static readonly string RedialLockerFile = Path.Combine(Env.GlobalDirectory, "redial.lock");
 			private Stream _lockStream;
@@ -29,6 +24,7 @@ namespace DotnetSpider.Core.Redial
 					}
 					catch
 					{
+						// ignored
 					}
 				}
 			}
@@ -45,7 +41,6 @@ namespace DotnetSpider.Core.Redial
 					catch
 					{
 						Thread.Sleep(50);
-						continue;
 					}
 				}
 			}
@@ -53,15 +48,25 @@ namespace DotnetSpider.Core.Redial
 			public void Release()
 			{
 				_lockStream.Dispose();
-				File.Delete(RedialLockerFile);
+
+				for (int i = 0; i < 3; ++i)
+				{
+					try
+					{
+						File.Delete(RedialLockerFile);
+					}
+					catch
+					{
+					}
+				}
 			}
 		}
-
-		public FileLockerRedialExecutor(IRedialer redialer) : this(redialer, new DefaultInternetDetector()) { }
 
 		public FileLockerRedialExecutor() : this(new AdslRedialer(), new DefaultInternetDetector())
 		{
 		}
+
+		public FileLockerRedialExecutor(IRedialer redialer) : this(redialer, new DefaultInternetDetector()) { }
 
 		public FileLockerRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{
@@ -74,11 +79,12 @@ namespace DotnetSpider.Core.Redial
 				}
 				catch
 				{
+					// ignored
 				}
 			}
 		}
 
-		public override bool IsRedialing()
+		protected override bool IsRedialing()
 		{
 			return File.Exists(FileLocker.RedialLockerFile);
 		}
@@ -87,7 +93,7 @@ namespace DotnetSpider.Core.Redial
 		{
 		}
 
-		public override ILocker CreateLocker()
+		protected override ILocker CreateLocker()
 		{
 			return new FileLocker();
 		}

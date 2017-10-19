@@ -8,7 +8,7 @@ using System.Text;
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public class HttpSender
+	public static class HttpSender
 	{
 		/// <summary>  
 		/// 根据相传入的数据，得到相应页面数据  

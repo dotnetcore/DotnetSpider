@@ -3,7 +3,6 @@ using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Pipeline;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +13,6 @@ namespace DotnetSpider.Extension.Model
 	{
 		string Name { get; }
 		BaseSelector Selector { get; }
-		bool NotNull { get; }
 		bool Multi { get; }
 		Type Type { get; }
 		EntityTable TableInfo { get; }
@@ -29,8 +27,6 @@ namespace DotnetSpider.Extension.Model
 		public string Name { get; }
 
 		public BaseSelector Selector { get; set; }
-
-		public bool NotNull { get; set; }
 
 		public bool Multi { get; set; }
 
@@ -82,19 +78,12 @@ namespace DotnetSpider.Extension.Model
 			var targetUrlsSelectors = Type.GetCustomAttributes<TargetUrlsSelector>();
 			TargetUrlsSelectors = targetUrlsSelectors.ToList();
 			var sharedValueSelectorAttributes = Type.GetCustomAttributes<SharedValueSelector>();
-			if (sharedValueSelectorAttributes != null)
+			SharedValues = sharedValueSelectorAttributes.Select(e => new SharedValueSelector
 			{
-				SharedValues = sharedValueSelectorAttributes.Select(e => new SharedValueSelector
-				{
-					Name = e.Name,
-					Expression = e.Expression,
-					Type = e.Type
-				}).ToList();
-			}
-			else
-			{
-				SharedValues = new List<SharedValueSelector>();
-			}
+				Name = e.Name,
+				Expression = e.Expression,
+				Type = e.Type
+			}).ToList();
 
 			GenerateEntityColumns();
 
@@ -226,8 +215,6 @@ namespace DotnetSpider.Extension.Model
 		{
 			Property = property;
 			PropertyDefine = propertyDefine;
-
-			var type = Property.PropertyType;
 
 			if (DataType.FullName != DataTypeNames.String && propertyDefine.Length > 0)
 			{

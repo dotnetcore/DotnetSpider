@@ -18,7 +18,8 @@ namespace DotnetSpider.Core
 	{
 		public string Name
 		{
-			get; set;
+			get;
+			private set;
 		}
 
 		public TaskName(string name)
@@ -29,7 +30,7 @@ namespace DotnetSpider.Core
 
 	public static class Startup
 	{
-		public static List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
+		public static readonly List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
 
 		public static void Run(params string[] args)
 		{
@@ -58,8 +59,6 @@ namespace DotnetSpider.Core
 			var spider = CreateSpiderInstance(spiderName, arguments, spiderTypes);
 			if (spider != null)
 			{
-				var spiderType = spiderTypes[spiderName];
-
 				var runMethod = spiderTypes[spiderName].GetMethod("Run");
 
 				if (!arguments.ContainsKey("-a"))
@@ -78,10 +77,10 @@ namespace DotnetSpider.Core
 		{
 			if (arguments.ContainsKey("-e"))
 			{
-				var valuePairs = arguments["-e"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+				var valuePairs = arguments["-e"].Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 				foreach (var pair in valuePairs)
 				{
-					var datas = pair.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+					var datas = pair.Split(new [] { '=' }, StringSplitOptions.RemoveEmptyEntries);
 					if (datas.Length == 2)
 					{
 						AppDomain.CurrentDomain.SetData(datas[0], datas[1]);
@@ -216,7 +215,7 @@ namespace DotnetSpider.Core
 			Console.WriteLine($"Count of crawlers: {spiderTypes.Keys.Count}");
 			Console.WriteLine();
 
-			PrintInfo.PrintLine('=');
+			PrintInfo.PrintLine();
 			return spiderTypes;
 		}
 
@@ -227,7 +226,7 @@ namespace DotnetSpider.Core
 			{
 				if (string.IsNullOrEmpty(arg) || string.IsNullOrWhiteSpace(arg))
 				{
-					ConsoleHelper.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name] -e:[en1=value1,en2=value2,...]", ConsoleColor.Red);
+					ConsoleHelper.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name] -e:[en1=value1,en2=value2,...]");
 					return null;
 				}
 

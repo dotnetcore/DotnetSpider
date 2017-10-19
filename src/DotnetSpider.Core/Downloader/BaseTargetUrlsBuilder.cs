@@ -9,32 +9,37 @@ namespace DotnetSpider.Core.Downloader
 		/// <summary>
 		/// http://a.com?p=40  PaggerString: p=40 Pattern: p=\d+
 		/// </summary>
-		public string PaggerString { get; protected set; }
+		protected readonly string PagerString;
+		private readonly Regex _pagerPattern;
+		private readonly ITargetUrlsBuilderTermination _termination;
 
-		public Regex PaggerPattern { get; protected set; }
+		protected abstract IList<Request> GenerateRequests(Page page);
+
+		protected BaseTargetUrlsBuilder(string pagerString, ITargetUrlsBuilderTermination termination)
+		{
+			if (string.IsNullOrEmpty(pagerString))
+			{
+				throw new SpiderException("pagerString should not be null.");
+			}
+
+			PagerString = pagerString;
+			_pagerPattern = new Regex($"{RegexUtil.NumRegex.Replace(PagerString, @"\d+")}");
+			_termination = termination;
+		}
 
 		public virtual void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(PaggerString) && (Termination == null || !Termination.IsTermination(page, this)))
+			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(PagerString) &&
+				(_termination == null || !_termination.IsTermination(page, this)))
 			{
 				page.AddTargetRequests(GenerateRequests(page));
 				page.SkipExtractTargetUrls = true;
 			}
 		}
 
-		public ITargetUrlsBuilderTermination Termination { get; set; }
-
-		protected abstract IList<Request> GenerateRequests(Page page);
-
-		protected BaseTargetUrlsBuilder(string paggerString)
+		public string GetCurrentPagger(string currentUrlOrContent)
 		{
-			PaggerString = paggerString;
-			PaggerPattern = new Regex($"{RegexUtil.NumRegex.Replace(PaggerString, @"\d+")}");
-		}
-
-		public virtual string GetCurrentPagger(string currentUrlOrContent)
-		{
-			return PaggerPattern.Match(currentUrlOrContent).Value;
+			return _pagerPattern.Match(currentUrlOrContent).Value;
 		}
 	}
 }

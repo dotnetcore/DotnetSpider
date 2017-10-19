@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DotnetSpider.Core
 {
-	public class PrintInfo
+	public static class PrintInfo
 	{
 		private static readonly object Locker = new object();
 
@@ -31,7 +31,7 @@ namespace DotnetSpider.Core
 
 					AppDomain.CurrentDomain.SetData(key, "True");
 
-					PrintLine('=');
+					PrintLine();
 				}
 			}
 		}
@@ -44,7 +44,7 @@ namespace DotnetSpider.Core
 				width = Console.WindowWidth;
 			}
 			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i < Console.BufferWidth; ++i)
+			for (int i = 0; i < width; ++i)
 			{
 				builder.Append(word);
 			}

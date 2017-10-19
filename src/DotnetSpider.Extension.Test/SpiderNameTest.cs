@@ -1,7 +1,4 @@
 ﻿using DotnetSpider.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test

@@ -3,16 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core;
 using System.Collections.Concurrent;
-using System.Configuration;
-using Cassandra.Mapping;
-using System.Net;
-using System.Data.SqlClient;
 using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -20,11 +15,11 @@ namespace DotnetSpider.Extension.Pipeline
 	public class CassandraEntityPipeline : BaseEntityPipeline
 	{
 		private PipelineMode _defaultPipelineModel;
-		private static TimeUuid DefaultTimeUuid = default(TimeUuid);
-		internal ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
-		internal ConcurrentDictionary<string, ISession> EntitySessions { get; set; } = new ConcurrentDictionary<string, ISession>();
+		private static readonly TimeUuid DefaultTimeUuid = default(TimeUuid);
+		private ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
+		private ConcurrentDictionary<string, ISession> EntitySessions { get; set; } = new ConcurrentDictionary<string, ISession>();
 
-		public CassandraConnectionSetting ConnectionSetting { get; set; }
+		private CassandraConnectionSetting ConnectionSetting { get; set; }
 
 		public CassandraEntityPipeline() : this(Env.DataConnectionStringSettings?.ConnectionString)
 		{
@@ -37,17 +32,14 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public PipelineMode DefaultPipelineModel
 		{
-			get
-			{
-				return _defaultPipelineModel;
-			}
+			get => _defaultPipelineModel;
 			set
 			{
 				if (value == PipelineMode.Update)
 				{
 					throw new SpiderException("Can not set pipeline mode to Update.");
 				}
-				if (value != _defaultPipelineModel)
+				if (!Equals(value, _defaultPipelineModel))
 				{
 					_defaultPipelineModel = value;
 				}
@@ -107,10 +99,7 @@ namespace DotnetSpider.Extension.Pipeline
 				switch (metadata.PipelineMode)
 				{
 					default:
-					case PipelineMode.Update:
-					case PipelineMode.Insert:
-					case PipelineMode.InsertAndIgnoreDuplicate:
-						{
+					{
 							var insertStmt = session.Prepare(metadata.InsertSql);
 							var batch = new BatchStatement();
 							foreach (var data in datas)
@@ -125,12 +114,12 @@ namespace DotnetSpider.Extension.Pipeline
 									else
 									{
 										var value = column.Property.GetValue(data);
-										values.Add(value == DefaultTimeUuid ? TimeUuid.NewId() : value);
+										values.Add(Equals(value, DefaultTimeUuid) ? TimeUuid.NewId() : value);
 									}
 								}
 
 								batch.Add(insertStmt.Bind(values.ToArray()));
-							};
+							}
 							// Execute the batch
 							session.Execute(batch);
 							break;
@@ -172,17 +161,17 @@ namespace DotnetSpider.Extension.Pipeline
 			adapter.InsertSql = GenerateInsertSql(adapter);
 			if (adapter.PipelineMode == PipelineMode.Update)
 			{
-				adapter.UpdateSql = GenerateUpdateSql(adapter);
+				adapter.UpdateSql = GenerateUpdateSql();
 			}
-			adapter.SelectSql = GenerateSelectSql(adapter);
+			adapter.SelectSql = GenerateSelectSql();
 		}
 
-		private string GenerateSelectSql(EntityAdapter adapter)
+		private string GenerateSelectSql()
 		{
 			return null;
 		}
 
-		private string GenerateUpdateSql(EntityAdapter adapter)
+		private string GenerateUpdateSql()
 		{
 			return null;
 		}

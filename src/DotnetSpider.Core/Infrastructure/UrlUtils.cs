@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Infrastructure
 	/// <summary>
 	/// url and html utils.
 	/// </summary>
-	public class UrlUtils
+	public static class UrlUtils
 	{
 		public static string GetBaseDomain(string url)
 		{
@@ -18,14 +18,14 @@ namespace DotnetSpider.Core.Infrastructure
 
 			if (hs.Length > 2)
 			{
-				//´«ÈëµÄhostµØÖ·ÖÁÉÙÓÐÈý¶Î
-				int p2 = host.LastIndexOf('.');                 //×îºóÒ»´Î¡°.¡±³öÏÖµÄÎ»ÖÃ
-				int p1 = host.Substring(0, p2).LastIndexOf('.');//µ¹ÊýµÚ¶þ¸ö¡°.¡±³öÏÖµÄÎ»ÖÃ
+				//ï¿½ï¿½ï¿½ï¿½ï¿½hostï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+				int p2 = host.LastIndexOf('.');                 //ï¿½ï¿½ï¿½Ò»ï¿½Î¡ï¿½.ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½Î»ï¿½ï¿½
+				int p1 = host.Substring(0, p2).LastIndexOf('.');//ï¿½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½.ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½Î»ï¿½ï¿½
 				string s1 = host.Substring(p1);
 				if (!list.Contains(s1))
 					return s1.TrimStart('.');
 
-				//ÓòÃûºó×ºÎªÁ½¶Î£¨ÓÐÓÃ¡°.¡±·Ö¸ô£©
+				//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ºÎªï¿½ï¿½ï¿½Î£ï¿½ï¿½ï¿½ï¿½Ã¡ï¿½.ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½
 				if (hs.Length > 3)
 					return host.Substring(host.Substring(0, p1).LastIndexOf('.'));
 				else

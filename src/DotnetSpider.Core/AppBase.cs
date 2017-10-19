@@ -15,14 +15,7 @@ namespace DotnetSpider.Core
 		{
 			var type = GetType();
 			var nameAttribute = type.GetCustomAttribute<TaskName>();
-			if (nameAttribute != null)
-			{
-				Name = nameAttribute.Name;
-			}
-			else
-			{
-				Name = type.Name;
-			}
+			Name = nameAttribute != null ? nameAttribute.Name : type.Name;
 		}
 
 		protected AppBase(string name) : this()

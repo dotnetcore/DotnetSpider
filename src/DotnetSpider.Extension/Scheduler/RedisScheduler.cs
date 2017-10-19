@@ -19,8 +19,8 @@ namespace DotnetSpider.Extension.Scheduler
 	public sealed class RedisScheduler : DuplicateRemovedScheduler, IDuplicateRemover
 	{
 		private readonly object _locker = new object();
-		public const string TasksKey = "dotnetspider:tasks";
-		public const string TaskStatsKey = "dotnetspider:task-stats";
+		private const string TasksKey = "dotnetspider:tasks";
+		private const string TaskStatsKey = "dotnetspider:task-stats";
 
 		private string _queueKey;
 		private string _setKey;
@@ -29,13 +29,13 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _successCountKey;
 		private string _identityMd5;
 
-		public string ConnectString { get; }
+		private string ConnectString { get; }
 
 		public int BatchCount { get; set; } = 1000;
 
-		public override bool UseInternet { get; set; } = true;
+		protected override bool UseInternet { get; set; } = true;
 
-		public RedisConnection RedisConnection { get; private set; }
+		private RedisConnection RedisConnection { get; set; }
 
 		public RedisScheduler(string connectString)
 		{
@@ -316,7 +316,7 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
-		public override HashSet<Request> ToList()
+		public HashSet<Request> ToList()
 		{
 			HashSet<Request> requests = new HashSet<Request>();
 			Request request;

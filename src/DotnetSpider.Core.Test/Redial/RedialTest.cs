@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Redial;
-using DotnetSpider.Core.Redial.InternetDetector;
 using DotnetSpider.Core.Redial.Redialer;
 using DotnetSpider.Core.Scheduler;
 using Xunit;

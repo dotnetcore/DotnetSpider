@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Scheduler
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 
-		public override bool UseInternet { get; set; } = false;
+		protected override bool UseInternet { get; set; } = false;
 
 		public override long LeftRequestsCount => _noPriorityQueue.Count;
 
@@ -67,7 +67,7 @@ namespace DotnetSpider.Core.Scheduler
 			throw new NotImplementedException();
 		}
 
-		public override HashSet<Request> ToList()
+		public virtual HashSet<Request> ToList()
 		{
 			throw new NotImplementedException();
 		}

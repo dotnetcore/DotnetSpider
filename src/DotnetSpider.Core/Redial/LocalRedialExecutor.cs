@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DotnetSpider.Core.Infrastructure;
 using System.Collections.Concurrent;
 using System.IO;
 using DotnetSpider.Core.Redial.Redialer;
@@ -63,7 +59,7 @@ namespace DotnetSpider.Core.Redial
 			File.Delete(identity);
 		}
 
-		public override DateTime GetLastRedialTime()
+		protected override DateTime GetLastRedialTime()
 		{
 			if (File.Exists(RedialTimeFile))
 			{
@@ -75,7 +71,7 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
-		public override void RecordLastRedialTime()
+		protected override void RecordLastRedialTime()
 		{
 			File.WriteAllText(RedialTimeFile, DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
 		}

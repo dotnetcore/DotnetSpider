@@ -26,10 +26,10 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Autofac" Version="4.6.1" />
+    <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.6.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.6.1" />
     <PackageReference Include="System.Net.Ping">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -43,10 +43,10 @@
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
-    <PackageReference Include="Autofac" Version="4.6.1" />
+    <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NLog" Version="4.4.12" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.6.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.6.1" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Web" />

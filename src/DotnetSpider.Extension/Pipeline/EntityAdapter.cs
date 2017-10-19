@@ -5,9 +5,9 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class EntityAdapter
 	{
-		public EntityTable Table { get; set; }
+		public EntityTable Table { get; }
 
-		public List<Column> Columns { get; set; }
+		public List<Column> Columns { get; }
 
 		internal string InsertSql { get; set; }
 

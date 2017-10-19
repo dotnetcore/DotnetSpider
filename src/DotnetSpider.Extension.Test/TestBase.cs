@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DotnetSpider.Extension.Test
+﻿namespace DotnetSpider.Extension.Test
 {
 	public class TestBase
 	{

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Model.Formatter

@@ -40,16 +40,13 @@ namespace DotnetSpider.Extension.Test.Downloader
 		{
 			var spider = new DefaultSpider("test", new Site());
 			TestDownloader downloader = new TestDownloader();
-			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&page=0", 2)
+			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&page=0", 2, new PaggerTermination
 			{
-				Termination = new PaggerTermination
+				CurrenctPageSelector = new BaseSelector
 				{
-					CurrenctPageSelector = new BaseSelector
-					{
-						Expression = ""
-					}
+					Expression = ""
 				}
-			});
+			}));
 
 			var request = new Request("http://a.com/?&page=0", null);
 			Page page = downloader.Download(request, spider);

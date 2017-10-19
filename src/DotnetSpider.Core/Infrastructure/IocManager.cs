@@ -22,8 +22,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		public static TIt Resolve<TIt>()
 		{
-			TIt o;
-			_container.TryResolve(out o);
+			_container.TryResolve(out TIt o);
 			return o;
 		}
 

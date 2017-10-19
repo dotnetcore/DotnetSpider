@@ -24,7 +24,7 @@ namespace DotnetSpider.Core
 		public const string EmailDisplayNameKey = "emailDisplayName";
 		public const string SystemConnectionStringKey = "SystemConnection";
 		public const string DataConnectionStringKey = "DataConnection";
-		public static string[] IdColumns = new[] { "Id", "__Id" };
+		public static readonly string[] IdColumns = new[] { "Id", "__Id" };
 		public const string EnvLocation = "LOCATION";
 		public const string EnvConfig = "CONFIG";
 		public const string EnvDbConfig = "DBCONFIG";
@@ -34,7 +34,7 @@ namespace DotnetSpider.Core
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
 
 		public static string HostName { get; set; }
-		public static string IP { get; set; }
+		public static string Ip { get; set; }
 		public static string RedisConnectString { get; private set; }
 		public static string EmailHost { get; private set; }
 		public static string EmailPort { get; private set; }
@@ -89,10 +89,13 @@ namespace DotnetSpider.Core
 						ExeConfigFilename = GlobalAppConfigPath
 					};
 
-					GlobalConfiguraiton = ConfigurationManager.OpenMappedExeConfiguration(globalFileMap, ConfigurationUserLevel.None);
+					GlobalConfiguraiton =
+						ConfigurationManager.OpenMappedExeConfiguration(globalFileMap, ConfigurationUserLevel.None);
 
-					SystemConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
-					DataConnectionStringSettings = GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+					SystemConnectionStringSettings =
+						GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
+					DataConnectionStringSettings =
+						GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 				}
 				else
 				{
@@ -101,8 +104,10 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
-				DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+				SystemConnectionStringSettings =
+					configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
+				DataConnectionStringSettings =
+					configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 			}
 		}
 
@@ -121,28 +126,8 @@ namespace DotnetSpider.Core
 			PathSeperator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/";
 #endif
 
-#if !NET_CORE
-			GlobalDirectory = $"C:\\Users\\{Environment.GetEnvironmentVariable("USERNAME")}\\Documents\\DotnetSpider\\";
-#else
+			GlobalDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dotnetspider");
 
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-			{
-				GlobalDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
-			}
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-			{
-				GlobalDirectory = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "dotnetspider");
-			}
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				// 修改本机用户名后 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) 取值依然是旧的.
-				GlobalDirectory = $"C:\\Users\\{Environment.GetEnvironmentVariable("USERNAME")}\\Documents\\DotnetSpider\\";
-			}
-			else
-			{
-				throw new ArgumentException("Unknow OS.");
-			}
-#endif
 			DirectoryInfo di = new DirectoryInfo(GlobalDirectory);
 			if (!di.Exists)
 			{
@@ -153,11 +138,14 @@ namespace DotnetSpider.Core
 
 			HostName = Dns.GetHostName();
 			var addresses = Dns.GetHostAddresses(HostName);
-			IP = addresses.FirstOrDefault(i => i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
+			Ip = addresses.FirstOrDefault(i => i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+				?.ToString();
 
 			var appConfigName = AppDomain.CurrentDomain.GetData(EnvConfig)?.ToString();
 
-			var path = string.IsNullOrEmpty(appConfigName) ? Path.Combine(BaseDirectory, "app.config") : Path.Combine(BaseDirectory, appConfigName);
+			var path = string.IsNullOrEmpty(appConfigName)
+				? Path.Combine(BaseDirectory, "app.config")
+				: Path.Combine(BaseDirectory, appConfigName);
 
 			LoadConfiguration(path);
 		}

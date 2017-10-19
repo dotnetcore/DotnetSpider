@@ -9,29 +9,29 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 	/// </summary>
 	public class VpsInternetDetector : BaseInternetDetector
 	{
-		public int NetworkCount { get; set; }
+		private readonly int _networkCount;
 
 		public VpsInternetDetector()
 		{
-			NetworkCount = 2;
+			_networkCount = 2;
 			Timeout = 100;
 		}
 
 		public VpsInternetDetector(int networkCount, int maxWaitTime)
 		{
-			NetworkCount = networkCount;
+			_networkCount = networkCount;
 			Timeout = maxWaitTime;
 		}
 
 		public VpsInternetDetector(int networkCount = 2)
 		{
-			NetworkCount = networkCount;
+			_networkCount = networkCount;
 			Timeout = 100;
 		}
 
 		public override bool DoValidate()
 		{
-			return GetIp4Count() == NetworkCount;
+			return GetIp4Count() == _networkCount;
 		}
 
 		private int GetIp4Count()

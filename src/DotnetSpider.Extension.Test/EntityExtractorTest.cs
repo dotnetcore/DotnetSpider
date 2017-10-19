@@ -50,7 +50,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.Equal(2, (page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1") as List<Entity1>).Count);
 		}
 
-		[EntityTable("test", "sku", EntityTable.Today)]
+		[EntityTable("test", "sku2", EntityTable.Today)]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		private class Product : SpiderEntity
 		{

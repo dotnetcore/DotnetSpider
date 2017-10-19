@@ -2,8 +2,6 @@
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Pipeline;
-using System.Collections.Concurrent;
-using System;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -26,7 +24,7 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					List<dynamic> list = new List<dynamic>();
 					dynamic data = resultItem.GetResultItem(result.Key);
-					var t = data.GetType();
+
 					if (data is ISpiderEntity)
 					{
 						list.Add(data);
@@ -47,5 +45,48 @@ namespace DotnetSpider.Extension.Pipeline
 		}
 
 		public abstract void AddEntity(IEntityDefine type);
+
+		public static IPipeline GetPipelineFromAppConfig()
+		{
+			if (Env.DataConnectionStringSettings == null)
+			{
+				return null;
+			}
+			IPipeline pipeline;
+			switch (Env.DataConnectionStringSettings.ProviderName)
+			{
+				case "Npgsql":
+					{
+						pipeline = new PostgreSqlEntityPipeline();
+						break;
+					}
+				case "MySql.Data.MySqlClient":
+					{
+						pipeline = new MySqlEntityPipeline();
+						break;
+					}
+				case "System.Data.SqlClient":
+					{
+						pipeline = new SqlServerEntityPipeline();
+						break;
+					}
+				case "MongoDB":
+					{
+						pipeline = new MongoDbEntityPipeline(Env.DataConnectionString);
+						break;
+					}
+				case "Cassandra":
+					{
+						pipeline = new CassandraEntityPipeline(Env.DataConnectionString);
+						break;
+					}
+				default:
+					{
+						pipeline = new NullPipeline();
+						break;
+					}
+			}
+			return pipeline;
+		}
 	}
 }

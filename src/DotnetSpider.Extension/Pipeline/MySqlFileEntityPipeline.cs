@@ -2,18 +2,16 @@
 using System.IO;
 using System.Text;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Configuration;
-using System.Data.Common;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	/// <summary>
 	/// LOAD DATA LOCAL INFILE '{filePath}' INTO TABLE `{schema}`.`{dababase}` FIELDS TERMINATED BY '$'  ENCLOSED BY '#' LINES TERMINATED BY '@END@' IGNORE 1 LINES;
 	/// </summary>
-	public class MySqlFileEntityPipeline : BaseEntityDbPipeline
+	public sealed class MySqlFileEntityPipeline : BaseEntityDbPipeline
 	{
 		private readonly object _locker = new object();
 
@@ -23,9 +21,9 @@ namespace DotnetSpider.Extension.Pipeline
 			InsertSql
 		}
 
-		public FileType Type { get; set; }
+		private FileType Type { get; }
 
-		public string DataFolder { get; set; }
+		private string DataFolder { get; set; }
 
 		public MySqlFileEntityPipeline(FileType fileType = FileType.LoadFile)
 		{
@@ -120,11 +118,6 @@ namespace DotnetSpider.Extension.Pipeline
 		}
 
 		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
-		{
-			return null;
-		}
-
-		protected override DbParameter CreateDbParameter(string name, object value)
 		{
 			return null;
 		}

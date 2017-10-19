@@ -1,37 +1,35 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using DotnetSpider.Core.Redial.InternetDetector;
 using DotnetSpider.Core.Redial.Redialer;
 using NLog;
 using DotnetSpider.Core.Infrastructure;
-using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Redial
 {
 	public abstract class RedialExecutor : IRedialExecutor
 	{
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		private static readonly ILogger Logger = LogCenter.GetLogger();
 
-		internal bool IsTest { get; set; } = false;
-		public int WaitRedialTimeout { get; set; } = 100 * 1000 / 100;
-		public int RedialIntervalLimit { get; set; } = 10;
+		internal bool IsTest { get; set; }
+		private int WaitRedialTimeout { get; } = 100 * 1000 / 100;
+		private int RedialIntervalLimit { get; } = 10;
 		public abstract void WaitAllNetworkRequestComplete();
 		public abstract string CreateActionIdentity(string name);
 		public abstract void DeleteActionIdentity(string identity);
-		public abstract ILocker CreateLocker();
-		public abstract bool IsRedialing();
-		public abstract DateTime GetLastRedialTime();
-		public abstract void RecordLastRedialTime();
+		protected abstract ILocker CreateLocker();
+		protected abstract bool IsRedialing();
+		protected abstract DateTime GetLastRedialTime();
+		protected abstract void RecordLastRedialTime();
 		public abstract void Dispose();
 
-		public IRedialer Redialer { get; }
+		private IRedialer Redialer { get; }
 
-		public IInternetDetector InternetDetector { get; }
+		private IInternetDetector InternetDetector { get; }
 
-		public int AfterRedialWaitTime { get; set; } = -1;
+		private int AfterRedialWaitTime { get; } = -1;
 
-		public void WaitRedialComplete()
+		private void WaitRedialComplete()
 		{
 			for (int i = 0; i < WaitRedialTimeout; ++i)
 			{
@@ -94,7 +92,6 @@ namespace DotnetSpider.Core.Redial
 					catch (Exception ex)
 					{
 						Logger.MyLog($"Redial failed loop {redialCount}: {ex}", LogLevel.Error);
-						continue;
 					}
 				}
 

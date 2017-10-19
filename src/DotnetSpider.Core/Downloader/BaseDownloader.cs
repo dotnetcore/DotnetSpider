@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Net.Http;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -18,17 +17,17 @@ namespace DotnetSpider.Core.Downloader
 		/// <summary>
 		/// Auto detect content is json or html
 		/// </summary>
-		protected bool DetectContentType { get; set; }
+		private bool _detectContentType;
 
-		protected List<IAfterDownloadCompleteHandler> AfterDownloadComplete { get; } = new List<IAfterDownloadCompleteHandler>();
+		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
 
-		protected List<IBeforeDownloadHandler> BeforeDownload { get; } = new List<IBeforeDownloadHandler>();
+		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
 
-		protected string DownloadFolder { get; set; }
+		private readonly string _downloadFolder;
 
 		protected BaseDownloader()
 		{
-			DownloadFolder = Path.Combine(Env.BaseDirectory, "download");
+			_downloadFolder = Path.Combine(Env.BaseDirectory, "download");
 		}
 
 		public Page Download(Request request, ISpider spider)
@@ -49,19 +48,14 @@ namespace DotnetSpider.Core.Downloader
 			return page;
 		}
 
-		public virtual IDownloader Clone(ISpider spider)
-		{
-			return (IDownloader)MemberwiseClone();
-		}
-
 		public void AddAfterDownloadCompleteHandler(IAfterDownloadCompleteHandler handler)
 		{
-			AfterDownloadComplete.Add(handler);
+			_afterDownloadCompletes.Add(handler);
 		}
 
 		public void AddBeforeDownloadHandler(IBeforeDownloadHandler handler)
 		{
-			BeforeDownload.Add(handler);
+			_beforeDownloads.Add(handler);
 		}
 
 		public virtual void Dispose()
@@ -70,32 +64,10 @@ namespace DotnetSpider.Core.Downloader
 
 		protected abstract Page DowloadContent(Request request, ISpider spider);
 
-		protected void HandleBeforeDownload(ref Request request, ISpider spider)
-		{
-			if (BeforeDownload != null && BeforeDownload.Count > 0)
-			{
-				foreach (var handler in BeforeDownload)
-				{
-					handler.Handle(ref request, spider);
-				}
-			}
-		}
-
-		protected void HandlerAfterDownloadComplete(ref Page page, ISpider spider)
-		{
-			if (AfterDownloadComplete != null && AfterDownloadComplete.Count > 0)
-			{
-				foreach (var handler in AfterDownloadComplete)
-				{
-					handler.Handle(ref page, spider);
-				}
-			}
-		}
-
 		protected Page SaveFile(Request request, HttpWebResponse response, ISpider spider)
 		{
 			var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Env.PathSeperator);
-			string filePath = $"{DownloadFolder}{Env.PathSeperator}{spider.Identity}{intervalPath}";
+			string filePath = $"{_downloadFolder}{Env.PathSeperator}{spider.Identity}{intervalPath}";
 			if (!File.Exists(filePath))
 			{
 				try
@@ -120,11 +92,33 @@ namespace DotnetSpider.Core.Downloader
 			return new Page(request, null) { Skip = true };
 		}
 
+		private void HandleBeforeDownload(ref Request request, ISpider spider)
+		{
+			if (_beforeDownloads != null && _beforeDownloads.Count > 0)
+			{
+				foreach (var handler in _beforeDownloads)
+				{
+					handler.Handle(ref request, spider);
+				}
+			}
+		}
+
+		private void HandlerAfterDownloadComplete(ref Page page, ISpider spider)
+		{
+			if (_afterDownloadCompletes != null && _afterDownloadCompletes.Count > 0)
+			{
+				foreach (var handler in _afterDownloadCompletes)
+				{
+					handler.Handle(ref page, spider);
+				}
+			}
+		}
+
 		private void TryDetectContentType(Page page, ISpider spider)
 		{
 			lock (_lock)
 			{
-				if (!DetectContentType)
+				if (!_detectContentType)
 				{
 					if (page != null && page.Exception == null && spider.Site.ContentType == ContentType.Auto)
 					{
@@ -139,7 +133,7 @@ namespace DotnetSpider.Core.Downloader
 						}
 						finally
 						{
-							DetectContentType = true;
+							_detectContentType = true;
 						}
 					}
 				}

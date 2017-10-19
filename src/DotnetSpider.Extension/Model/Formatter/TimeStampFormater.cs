@@ -10,8 +10,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		{
 			DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 			string tmp = value.ToString();
-			long timeStamp;
-			if (!long.TryParse(tmp, out timeStamp))
+			if (!long.TryParse(tmp, out var timeStamp))
 			{
 				return dt.ToString("yyyy-MM-dd HH:mm:ss");
 			}

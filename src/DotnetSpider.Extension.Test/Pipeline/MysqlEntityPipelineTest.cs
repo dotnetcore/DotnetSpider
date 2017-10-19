@@ -42,6 +42,8 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 					MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
 					var metadata = new EntityDefine<ProductInsert>();
+					var tableName = Guid.NewGuid().ToString("N");
+					metadata.TableInfo.Name = tableName;
 					insertPipeline.AddEntity(metadata);
 					insertPipeline.InitPipeline(spider);
 
@@ -52,19 +54,20 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 					MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString);
 					var metadata2 = new EntityDefine<ProductUpdate>();
+					metadata2.TableInfo.Name = tableName;
 					updatePipeline.AddEntity(metadata2);
 					updatePipeline.InitPipeline(spider);
-					var data3 = conn.Query<ProductUpdate>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
+					var data3 = conn.Query<ProductUpdate>($"use test;select * from {tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
 					data3.Category = "4C";
 					updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 });
 
-					var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+					var list = conn.Query<ProductInsert>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 					Assert.Equal(2, list.Count);
 					Assert.Equal("110", list[0].Sku);
 					Assert.Equal("4C", list[0].Category);
-				}
 
-				ClearDb();
+					conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
+				}
 			}
 		}
 
@@ -78,34 +81,36 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				using (MySqlConnection conn = new MySqlConnection(ConnectString))
 				{
 					ISpider spider = new DefaultSpider("test", new Site());
-
 					MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
-					var metadata = new EntityDefine<ProductInsert>();
+					var metadata = new EntityDefine<Product2Insert>();
+					var tableName = Guid.NewGuid().ToString("N");
+					metadata.TableInfo.Name = tableName;
 					insertPipeline.AddEntity(metadata);
 					insertPipeline.InitPipeline(spider);
 
-					var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-					var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+					var data1 = new Product2Insert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
+					var data2 = new Product2Insert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 
 					insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2 });
 
 					MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline();
-					var metadata2 = new EntityDefine<ProductUpdate>();
+					var metadata2 = new EntityDefine<Product2Update>();
+					metadata2.TableInfo.Name = tableName;
 					updatePipeline.AddEntity(metadata2);
 					updatePipeline.InitPipeline(spider);
 
-					var data3 = conn.Query<ProductUpdate>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
+					var data3 = conn.Query<Product2Update>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
 					data3.Category = "4C";
 
 					updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 });
 
-					var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+					var list = conn.Query<Product2Insert>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 					Assert.Equal(2, list.Count);
 					Assert.Equal("110", list[0].Sku);
 					Assert.Equal("4C", list[0].Category);
-				}
 
-				ClearDb();
+					conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
+				}
 			}
 		}
 
@@ -122,6 +127,8 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 					MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
 					var metadata = new EntityDefine<ProductInsert>();
+					var tableName = Guid.NewGuid().ToString("N");
+					metadata.TableInfo.Name = tableName;
 					insertPipeline.AddEntity(metadata);
 					insertPipeline.InitPipeline(spider);
 
@@ -131,14 +138,14 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 					insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
 
-					var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+					var list = conn.Query<ProductInsert>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 					Assert.Equal(3, list.Count);
 					Assert.Equal("110", list[0].Sku);
 					Assert.Equal("111", list[1].Sku);
 					Assert.Null(list[2].Category);
-				}
 
-				ClearDb();
+					conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
+				}
 			}
 		}
 
@@ -155,6 +162,8 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 					MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
 					var metadata = new EntityDefine<Product2Insert>();
+					var tableName = Guid.NewGuid().ToString("N");
+					metadata.TableInfo.Name = tableName;
 					insertPipeline.AddEntity(metadata);
 					insertPipeline.InitPipeline(spider);
 
@@ -164,14 +173,14 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 					insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
 
-					var list = conn.Query<Product2Insert>($"select * from test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+					var list = conn.Query<Product2Insert>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 					Assert.Equal(3, list.Count);
 					Assert.Equal("110", list[0].Sku);
 					Assert.Equal("111", list[1].Sku);
 					Assert.Null(list[2].Category);
-				}
 
-				ClearDb();
+					conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
+				}
 			}
 		}
 
@@ -219,8 +228,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					Assert.Equal("111", list[1].Sku);
 					conn.Execute("DROP DATABASE IF EXISTS `dotnetspider1`");
 				}
-
-				ClearDb();
 			}
 		}
 

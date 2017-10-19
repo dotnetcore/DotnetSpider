@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Processor
 
 		public IEntityDefine EntityDefine => Extractor?.EntityDefine;
 
-		public EntityProcessor(Site site, DataHandler<T> dataHandler = null)
+		public EntityProcessor(Site site, DataHandler<T> dataHandler = null, string tableName = null)
 		{
 			Site = site;
 			Extractor = new EntityExtractor<T>(dataHandler);

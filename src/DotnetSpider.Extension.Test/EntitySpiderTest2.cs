@@ -41,11 +41,6 @@ namespace DotnetSpider.Extension.Test
 				return new ConnectionStringSettings();
 			}
 
-			protected override DbParameter CreateDbParameter(string name, object value)
-			{
-				throw new NotImplementedException();
-			}
-
 			protected override void InitAllSqlOfEntity(EntityAdapter adapter)
 			{
 				throw new NotImplementedException();

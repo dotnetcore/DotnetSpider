@@ -1,5 +1,4 @@
-﻿using Cassandra;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
@@ -9,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test.Pipeline
@@ -56,7 +54,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				var session = cluster.Connect();
 				session.ChangeKeyspace("test");
-				var rows = session.Execute($"SELECT * FROM test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+				var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 				var results = new List<ProductInsert>();
 				foreach (var row in rows)
 				{
@@ -106,7 +104,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				var session = cluster.Connect();
 				session.ChangeKeyspace("test");
-				var rows = session.Execute($"SELECT * FROM test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+				var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 				var results = new List<ProductInsert>();
 				foreach (var row in rows)
 				{
@@ -122,7 +120,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var data4 = new ProductInsert { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 				insertPipeline.Process(metadata.Name, new List<dynamic> { data4 });
 
-				rows = session.Execute($"SELECT * FROM test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+				rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 				results = new List<ProductInsert>();
 				foreach (var row in rows)
 				{
@@ -171,7 +169,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				var session = cluster.Connect();
 				session.ChangeKeyspace("test");
-				var rows = session.Execute($"SELECT * FROM test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+				var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 				var results = new List<ProductInsert>();
 				foreach (var row in rows)
 				{
@@ -191,7 +189,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 				updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
 
-				rows = session.Execute($"SELECT * FROM test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+				rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 				results = new List<ProductInsert>();
 				foreach (var row in rows)
 				{
@@ -242,7 +240,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				var session = cluster.Connect();
 				session.ChangeKeyspace("test");
-				var rows = session.Execute($"SELECT * FROM test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+				var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 				var results = new List<ProductInsert>();
 				foreach (var row in rows)
 				{
@@ -262,7 +260,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 				updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
 
-				rows = session.Execute($"SELECT * FROM test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+				rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 				results = new List<ProductInsert>();
 				foreach (var row in rows)
 				{
@@ -288,7 +286,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		{
 		}
 
-		[EntityTable("test", "sku", EntityTable.Today, Indexs = new[] { "Category" })]
+		[EntityTable("test", "sku_cassandra", EntityTable.Today, Indexs = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class ProductInsert : CassandraSpiderEntity
 		{
@@ -302,7 +300,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			public string Sku { get; set; }
 		}
 
-		[EntityTable("test", "sku", EntityTable.Today, UpdateColumns = new[] { "Category", "Sku" })]
+		[EntityTable("test", "sku_cassandra", EntityTable.Today, UpdateColumns = new[] { "Category", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		public class ProductUpdate : CassandraSpiderEntity
 		{

@@ -1,5 +1,4 @@
-﻿#if !NET_CORE
-
+﻿
 using System;
 using System.Text;
 using System.Threading;
@@ -15,7 +14,7 @@ namespace DotnetSpider.Extension.Redial.Redialer
 		private readonly string _sshpass;
 		private readonly int _sshport;
 
-		public H3CSshAdslRedialer(string sshhost,int sshPort, string sshuser, string sshpass, string interfaceName, string user, string password) : base(interfaceName, user, password)
+		public H3CSshAdslRedialer(string sshhost, int sshPort, string sshuser, string sshpass, string interfaceName, string user, string password) : base(interfaceName, user, password)
 		{
 			_sshhost = sshhost;
 			_sshuser = sshuser;
@@ -50,5 +49,3 @@ namespace DotnetSpider.Extension.Redial.Redialer
 		}
 	}
 }
-
-#endif

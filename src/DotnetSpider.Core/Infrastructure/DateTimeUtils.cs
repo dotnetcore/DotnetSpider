@@ -68,12 +68,7 @@ namespace DotnetSpider.Core.Infrastructure
 			FirstDayOfPreviousMonth = FirstDayOfCurrentMonth.AddMonths(-1);
 			LastDayOfPreviousMonth = FirstDayOfCurrentMonth.AddDays(-1);
 
-			int i = now.DayOfWeek - DayOfWeek.Monday;
-			if (i == -1)
-			{
-				// i值 > = 0 ，因为枚举原因，Sunday排在最前，此时Sunday-Monday=-1，必须+7=6。 
-				i = 6;
-			}
+			int i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
 			TimeSpan ts = new TimeSpan(i, 0, 0, 0);
 
 			MondayOfCurrentWeek = now.Subtract(ts).Date;

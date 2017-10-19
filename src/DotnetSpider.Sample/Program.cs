@@ -1,26 +1,14 @@
-﻿using Dapper;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Redial;
-using DotnetSpider.Core.Redial.InternetDetector;
-using DotnetSpider.Core.Redial.Redialer;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-using DotnetSpider.Extension.Pipeline;
-using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+
 #endif
 
 namespace DotnetSpider.Sample
@@ -38,7 +26,7 @@ namespace DotnetSpider.Sample
 
 			MyTest();
 
-			Startup.Run("-s:BaiduSearchCassandraSpider", "-tid:BaiduSearchCassandraSpider", "-i:guid", "-a:");
+			Startup.Run("-s:TaobaoMassageArmchairSpider", "-tid:TaobaoMassageArmchairSpider", "-i:guid", "-a:");
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 

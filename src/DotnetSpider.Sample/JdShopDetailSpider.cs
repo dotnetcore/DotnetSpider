@@ -6,7 +6,6 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Scheduler;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure.Database;
 using System;
@@ -22,13 +21,7 @@ namespace DotnetSpider.Sample
 		protected override void MyInit(params string[] arguments)
 		{
 			Identity = Identity ?? Guid.NewGuid().ToString();
-			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler
-			{
-				StartPart = "json(",
-				EndPart = ");",
-				StartOffset = 5,
-				EndOffset = 0
-			});
+			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler("json(", ");", 5, 0));
 
 			AddStartUrlBuilder(new DbStartUrlBuilder(Database.MySql,
 				"Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;",

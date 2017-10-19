@@ -4,14 +4,11 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Infrastructure;
-using Newtonsoft.Json.Linq;
 using System;
-using DotnetSpider.Core.Infrastructure;
-using Cassandra;
 
 namespace DotnetSpider.Extension.Model
 {
-	public class EntityExtractor<T> : IEntityExtractor<T>
+	public sealed class EntityExtractor<T> : IEntityExtractor<T>
 	{
 		public IEntityDefine EntityDefine { get; }
 
@@ -19,17 +16,17 @@ namespace DotnetSpider.Extension.Model
 
 		public string Name => EntityDefine?.Name;
 
-		public EntityExtractor()
+		public EntityExtractor(DataHandler<T> dataHandler = null, string tableName = null)
 		{
 			EntityDefine = new EntityDefine<T>();
-		}
-
-		public EntityExtractor(DataHandler<T> dataHandler) : this()
-		{
+			if (!string.IsNullOrEmpty(tableName) && !string.IsNullOrWhiteSpace(tableName))
+			{
+				EntityDefine.TableInfo.Name = tableName;
+			}
 			DataHandler = dataHandler;
 		}
 
-		public virtual List<T> Extract(Page page)
+		public List<T> Extract(Page page)
 		{
 			List<T> result = new List<T>();
 			if (EntityDefine.SharedValues != null && EntityDefine.SharedValues.Count > 0)
@@ -169,6 +166,7 @@ namespace DotnetSpider.Extension.Model
 					}
 					catch (Exception e)
 					{
+						// ignored
 					}
 #endif
 				}
@@ -197,6 +195,7 @@ namespace DotnetSpider.Extension.Model
 						}
 						catch (Exception e)
 						{
+							// ignored
 						}
 #endif
 					}

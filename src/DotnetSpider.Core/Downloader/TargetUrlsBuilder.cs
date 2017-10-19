@@ -5,22 +5,17 @@ using System.Net.Http;
 
 namespace DotnetSpider.Core.Downloader
 {
-	public class IncrementTargetUrlsBuilder : BaseTargetUrlsBuilder
+	public sealed class IncrementTargetUrlsBuilder : BaseTargetUrlsBuilder
 	{
-		public int Interval { get; set; }
+		private readonly int _interval;
 
-		public IncrementTargetUrlsBuilder(string paggerString, int interval = 1, ITargetUrlsBuilderTermination termination = null) : base(paggerString)
+		public IncrementTargetUrlsBuilder(string pagerString, int interval = 1,
+			ITargetUrlsBuilderTermination termination = null) : base(pagerString, termination)
 		{
-			if (string.IsNullOrEmpty(paggerString))
-			{
-				throw new SpiderException("PaggerString should not be null.");
-			}
-
-			Interval = interval;
-			Termination = termination;
+			_interval = interval;
 		}
 
-		protected string IncreasePageNum(string currentUrl)
+		private string IncreasePageNum(string currentUrl)
 		{
 			var currentPaggerString = GetCurrentPagger(currentUrl);
 			var matches = RegexUtil.NumRegex.Matches(currentPaggerString);
@@ -31,8 +26,8 @@ namespace DotnetSpider.Core.Downloader
 
 			if (int.TryParse(matches[0].Value, out var currentPagger))
 			{
-				var nextPagger = currentPagger + Interval;
-				var next = RegexUtil.NumRegex.Replace(PaggerString, nextPagger.ToString());
+				var nextPagger = currentPagger + _interval;
+				var next = RegexUtil.NumRegex.Replace(PagerString, nextPagger.ToString());
 				return currentUrl.Replace(currentPaggerString, next);
 			}
 			return null;
@@ -45,24 +40,20 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class RequestExtraTargetUrlsBuilder : BaseTargetUrlsBuilder
+	public sealed class RequestExtraTargetUrlsBuilder : BaseTargetUrlsBuilder
 	{
-		public string Field { get; set; }
+		private readonly string _field;
 
-		public RequestExtraTargetUrlsBuilder(string paggerString, string field, ITargetUrlsBuilderTermination termination = null) : base(paggerString)
+		public RequestExtraTargetUrlsBuilder(string pagerString, string field,
+			ITargetUrlsBuilderTermination termination = null) : base(pagerString, termination)
 		{
-			if (string.IsNullOrEmpty(paggerString) || string.IsNullOrEmpty(field))
-			{
-				throw new SpiderException("PaggerString or field should not be null.");
-			}
-			Field = field;
-			Termination = termination;
+			_field = field;
 		}
 
-		protected virtual string GenerateNewPaggerUrl(Page page)
+		private string GenerateNewPaggerUrl(Page page)
 		{
 			var currentUrl = page.Url;
-			var nextPagger = page.Request.GetExtra(Field)?.ToString();
+			var nextPagger = page.Request.GetExtra(_field)?.ToString();
 			if (nextPagger != null)
 			{
 				var currentPaggerString = GetCurrentPagger(currentUrl);
@@ -74,7 +65,7 @@ namespace DotnetSpider.Core.Downloader
 
 				if (int.TryParse(matches[0].Value, out _))
 				{
-					var next = RegexUtil.NumRegex.Replace(PaggerString, nextPagger.ToString());
+					var next = RegexUtil.NumRegex.Replace(PagerString, nextPagger.ToString());
 					return currentUrl.Replace(currentPaggerString, next);
 				}
 			}
@@ -89,9 +80,14 @@ namespace DotnetSpider.Core.Downloader
 	}
 
 
-	public class ContainsTermination : ITargetUrlsBuilderTermination
+	public sealed class ContainsTermination : ITargetUrlsBuilderTermination
 	{
-		public string[] Contents { get; set; }
+		private readonly string[] _contents;
+
+		public ContainsTermination(string[] contents)
+		{
+			_contents = contents;
+		}
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
@@ -100,13 +96,18 @@ namespace DotnetSpider.Core.Downloader
 				return false;
 			}
 
-			return Contents.Any(c => page.Content.Contains(c));
+			return _contents.Any(c => page.Content.Contains(c));
 		}
 	}
 
 	public class UnContainsTermination : ITargetUrlsBuilderTermination
 	{
-		public string[] Contents { get; set; }
+		private readonly string[] _contents;
+
+		public UnContainsTermination(string[] contents)
+		{
+			_contents = contents;
+		}
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
 		{
@@ -115,17 +116,17 @@ namespace DotnetSpider.Core.Downloader
 				return false;
 			}
 
-			return !Contents.All(c => page.Content.Contains(c));
+			return !_contents.All(c => page.Content.Contains(c));
 		}
 	}
 
 	public class LimitPageNumTermination : ITargetUrlsBuilderTermination
 	{
-		public int Limit { get; set; }
+		private readonly int _limit;
 
 		public LimitPageNumTermination(int limit)
 		{
-			Limit = limit;
+			_limit = limit;
 		}
 
 		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
@@ -134,10 +135,11 @@ namespace DotnetSpider.Core.Downloader
 			{
 				return false;
 			}
-			var current = builder.GetCurrentPagger(page.Request.Method == HttpMethod.Get ? page.Url : page.Request.PostBody);
+			var current =
+				builder.GetCurrentPagger(page.Request.Method == HttpMethod.Get ? page.Url : page.Request.PostBody);
 			int currentIndex = int.Parse(RegexUtil.NumRegex.Match(current).Value);
 
-			return currentIndex >= Limit;
+			return currentIndex >= _limit;
 		}
 	}
 }

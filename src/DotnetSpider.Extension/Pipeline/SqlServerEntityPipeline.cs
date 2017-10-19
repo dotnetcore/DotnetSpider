@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Pipeline
 			DefaultPipelineModel = PipelineMode.Insert;
 		}
 
-		protected override DbParameter CreateDbParameter(string name, object value)
+		protected virtual DbParameter CreateDbParameter(string name, object value)
 		{
 			if (value == null)
 			{

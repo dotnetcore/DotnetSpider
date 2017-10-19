@@ -1,7 +1,6 @@
 using DotnetSpider.Core.Scheduler.Component;
 using System.Collections.Generic;
 using DotnetSpider.Core.Redial;
-using System;
 
 namespace DotnetSpider.Core.Scheduler
 {
@@ -11,15 +10,13 @@ namespace DotnetSpider.Core.Scheduler
 	public abstract class DuplicateRemovedScheduler : Named, IScheduler
 	{
 		protected IDuplicateRemover DuplicateRemover { get; set; } = new HashSetDuplicateRemover();
-		protected ISpider Spider { get; set; }
+		private ISpider Spider { get; set; }
 
 		public abstract void IncreaseSuccessCount();
 		public abstract void IncreaseErrorCount();
 		public abstract void Import(HashSet<Request> requests);
 
-		public abstract bool UseInternet { get; set; }
-
-		public abstract HashSet<Request> ToList();
+		protected abstract bool UseInternet { get; set; }
 
 		public abstract long LeftRequestsCount { get; }
 

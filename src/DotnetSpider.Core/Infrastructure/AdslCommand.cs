@@ -7,19 +7,20 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <summary>
 		/// 拨号名称
 		/// </summary>
-		public string InterfaceName { get; }
+		private readonly string _interfaceName;
 
-		public string Username { get; }
+		private readonly  string _username;
+
 		/// <summary>
 		/// 密码
 		/// </summary>
-		public string Password { get; }
+		private readonly  string _password;
 
 		public AdslCommand(string interfaceName, string username = null, string password = null)
 		{
-			InterfaceName = interfaceName;
-			Username = username;
-			Password = password;
+			_interfaceName = interfaceName;
+			_username = username;
+			_password = password;
 		}
 
 		/// <summary>
@@ -36,7 +37,7 @@ namespace DotnetSpider.Core.Infrastructure
 						UseShellExecute = false,
 						CreateNoWindow = false,
 						WorkingDirectory = @"C:\Windows\System32",
-						Arguments = InterfaceName + " " + Username + " " + Password
+						Arguments = _interfaceName + " " + _username + " " + _password
 					}
 			};
 			process.Start();
@@ -48,7 +49,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// 端口连接
 		/// </summary>
 		/// <returns></returns>
-		public int Disconnect()
+		public void Disconnect()
 		{
 			Process process = new Process
 			{
@@ -58,12 +59,11 @@ namespace DotnetSpider.Core.Infrastructure
 						UseShellExecute = false,
 						CreateNoWindow = false,
 						WorkingDirectory = @"C:\Windows\System32",
-						Arguments = InterfaceName + @" /DISCONNECT"
+						Arguments = _interfaceName + @" /DISCONNECT"
 					}
 			};
 			process.Start();
 			process.WaitForExit(10000);
-			return process.ExitCode;
 		}
 	}
 }

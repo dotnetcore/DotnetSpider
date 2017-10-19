@@ -15,7 +15,7 @@ namespace DotnetSpider.Core
 		public abstract void Build(Site spider);
 	}
 
-	public class CycleStartUrlBuilder : StartUrlBuilder
+	public sealed class CycleStartUrlBuilder : StartUrlBuilder
 	{
 		public int Min { get; }
 
@@ -44,13 +44,9 @@ namespace DotnetSpider.Core
 				site.AddStartRequest(request);
 			}
 		}
-
-		protected virtual void FormateRequest(Request request)
-		{
-		}
 	}
 
-	public class CycleDateStartUrlBuilder : StartUrlBuilder
+	public sealed class CycleDateStartUrlBuilder : StartUrlBuilder
 	{
 		public DateTime Min { get; }
 
@@ -64,9 +60,6 @@ namespace DotnetSpider.Core
 
 		public string Postfix { get; }
 
-		protected virtual void FormateRequest(Request request)
-		{
-		}
 
 		public CycleDateStartUrlBuilder(DateTime min, DateTime max, int interval, string prefix, string postfix, string dateFormateString = "yyyy-MM-dd")
 		{
@@ -84,7 +77,6 @@ namespace DotnetSpider.Core
 			{
 				var date = i.ToString(DateFormateString);
 				var request = new Request($"{Prefix}{date}{Postfix}");
-				FormateRequest(request);
 				site.AddStartRequest(request);
 			}
 		}

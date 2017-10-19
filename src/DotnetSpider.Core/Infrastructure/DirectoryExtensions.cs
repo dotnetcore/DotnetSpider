@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Infrastructure
 			string sourcepath = directoryInfo.FullName;
 			Queue<FileSystemInfo> copyfolders = new Queue<FileSystemInfo>(new DirectoryInfo(sourcepath).GetFileSystemInfos());
 			string copytopath = target;
-			copytopath = (copytopath.LastIndexOf(Path.DirectorySeparatorChar) == copytopath.Length - 1) ? copytopath : (copytopath + Path.DirectorySeparatorChar) + Path.GetFileName(sourcepath);
+			copytopath = copytopath.LastIndexOf(Path.DirectorySeparatorChar) == copytopath.Length - 1 ? copytopath : (copytopath + Path.DirectorySeparatorChar) + Path.GetFileName(sourcepath);
 			Directory.CreateDirectory(copytopath);
 			while (copyfolders.Count > 0)
 			{

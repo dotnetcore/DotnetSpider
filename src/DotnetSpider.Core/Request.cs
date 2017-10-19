@@ -8,211 +8,211 @@ using DotnetSpider.Core.Proxy;
 
 namespace DotnetSpider.Core
 {
-	/// <summary>
-	/// Object contains url to crawl. 
-	/// It contains some additional information. 
-	/// </summary>
-	public class Request : IDisposable
-	{
-		private readonly object _locker = new object();
+    /// <summary>
+    /// Object contains url to crawl. 
+    /// It contains some additional information. 
+    /// </summary>
+    public class Request : IDisposable
+    {
+        private readonly object _locker = new object();
 
-		public UseSpecifiedUriWebProxy Proxy { get; set; }
+        public UseSpecifiedUriWebProxy Proxy { get; set; }
 
-		public int Depth { get; set; } = 1;
+        public int Depth { get; set; } = 1;
 
-		public int CycleTriedTimes { get; set; } = 0;
+        public int CycleTriedTimes { get; set; }
 
-		public int NextDepth => Depth + 1;
+        public int NextDepth => Depth + 1;
 
-		public bool IsAvailable { get; set; } = true;
+        public bool IsAvailable { get; } = true;
 
-		public string Referer { get; set; }
+        public string Referer { get; set; }
 
-		public string Origin { get; set; }
+        public string Origin { get; set; }
 
-		/// <summary>
-		/// Set the priority of request for sorting. 
-		/// Need a scheduler supporting priority. 
-		/// </summary>
-		public int Priority { get; set; }
+        /// <summary>
+        /// Set the priority of request for sorting. 
+        /// Need a scheduler supporting priority. 
+        /// </summary>
+        public int Priority { get; set; }
 
-		/// <summary>
-		/// Store additional information in extras.
-		/// </summary>
-		public Dictionary<string, dynamic> Extras { get; set; }
+        /// <summary>
+        /// Store additional information in extras.
+        /// </summary>
+        public Dictionary<string, dynamic> Extras { get; set; }
 
-		/// <summary>
-		/// The http method of the request. Get for default.
-		/// </summary>
-		public HttpMethod Method { get; set; } = HttpMethod.Get;
+        /// <summary>
+        /// The http method of the request. Get for default.
+        /// </summary>
+        public HttpMethod Method { get; set; } = HttpMethod.Get;
 
-		public string PostBody { get; set; }
+        public string PostBody { get; set; }
 
-		public Uri Url { get; set; }
+        public Uri Url { get; set; }
 
-		public string Identity => Encrypt.Md5Encrypt(Url + PostBody);
+        public string Identity => Encrypt.Md5Encrypt(Url + PostBody);
 
-		public HttpStatusCode? StatusCode { get; set; }
+        public HttpStatusCode? StatusCode { get; set; }
 
-		public Request()
-		{
-		}
+        public Request()
+        {
+        }
 
-		public Request(string url) : this(url, null)
-		{
-		}
+        public Request(string url) : this(url, null)
+        {
+        }
 
-		public Request(string url, IDictionary<string, dynamic> extras = null)
-		{
-			if (string.IsNullOrEmpty(url))
-			{
-				IsAvailable = false;
-				return;
-			}
-			if (Uri.TryCreate(url.TrimEnd('#'), UriKind.RelativeOrAbsolute, out var tmp))
-			{
-				Url = tmp;
-			}
-			else
-			{
-				IsAvailable = false;
-				return;
-			}
+        public Request(string url, IDictionary<string, dynamic> extras = null)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                IsAvailable = false;
+                return;
+            }
+            if (Uri.TryCreate(url.TrimEnd('#'), UriKind.RelativeOrAbsolute, out var tmp))
+            {
+                Url = tmp;
+            }
+            else
+            {
+                IsAvailable = false;
+                return;
+            }
 
-			if (Url.Scheme != "http" && Url.Scheme != "https")
-			{
-				IsAvailable = false;
-				return;
-			}
+            if (Url.Scheme != "http" && Url.Scheme != "https")
+            {
+                IsAvailable = false;
+                return;
+            }
 
-			if (extras != null)
-			{
-				foreach (var extra in extras)
-				{
-					PutExtra(extra.Key, extra.Value);
-				}
-			}
-		}
+            if (extras != null)
+            {
+                foreach (var extra in extras)
+                {
+                    PutExtra(extra.Key, extra.Value);
+                }
+            }
+        }
 
-		public dynamic GetExtra(string key)
-		{
-			lock (_locker)
-			{
-				if (Extras == null)
-				{
-					return null;
-				}
+        public dynamic GetExtra(string key)
+        {
+            lock (_locker)
+            {
+                if (Extras == null)
+                {
+                    return null;
+                }
 
-				if (Extras.ContainsKey(key))
-				{
-					return Extras[key];
-				}
-				return null;
-			}
-		}
+                if (Extras.ContainsKey(key))
+                {
+                    return Extras[key];
+                }
+                return null;
+            }
+        }
 
-		public bool ExistExtra(string key)
-		{
-			lock (_locker)
-			{
-				if (Extras == null)
-				{
-					return false;
-				}
+        public bool ExistExtra(string key)
+        {
+            lock (_locker)
+            {
+                if (Extras == null)
+                {
+                    return false;
+                }
 
-				return Extras.ContainsKey(key);
-			}
-		}
+                return Extras.ContainsKey(key);
+            }
+        }
 
-		public Request PutExtra(string key, dynamic value)
-		{
-			lock (_locker)
-			{
-				if (key == null)
-					return this;
-				if (Extras == null)
-				{
-					Extras = new Dictionary<string, dynamic>();
-				}
+        public Request PutExtra(string key, dynamic value)
+        {
+            lock (_locker)
+            {
+                if (key == null)
+                    return this;
+                if (Extras == null)
+                {
+                    Extras = new Dictionary<string, dynamic>();
+                }
 
-				if (Extras.ContainsKey(key))
-				{
-					Extras[key] = value;
-				}
-				else
-				{
-					Extras.Add(key, value);
-				}
+                if (Extras.ContainsKey(key))
+                {
+                    Extras[key] = value;
+                }
+                else
+                {
+                    Extras.Add(key, value);
+                }
 
-				return this;
-			}
-		}
+                return this;
+            }
+        }
 
-		public override bool Equals(object o)
-		{
-			if (this == o) return true;
-			if (o == null || GetType() != o.GetType()) return false;
+        public override bool Equals(object o)
+        {
+            if (this == o) return true;
+            if (o == null || GetType() != o.GetType()) return false;
 
-			Request request = (Request)o;
+            Request request = (Request) o;
 
-			if (!Url.Equals(request.Url)) return false;
+            if (!Url.Equals(request.Url)) return false;
 
-			return true;
-		}
+            return true;
+        }
 
-		public override int GetHashCode()
-		{
-			return Identity.GetHashCode();
-		}
+        public override int GetHashCode()
+        {
+            return Identity.GetHashCode();
+        }
 
-		public void Dispose()
-		{
-			Extras.Clear();
-		}
+        public void Dispose()
+        {
+            Extras.Clear();
+        }
 
-		public override string ToString()
-		{
-			return JsonConvert.SerializeObject(this);
-		}
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
 
-		public Request Clone()
-		{
-			lock (_locker)
-			{
-				IDictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
-				if (Extras != null)
-				{
-					foreach (var entry in Extras)
-					{
-						extras.Add(entry.Key, entry.Value);
-					}
-				}
-				Request newObj = new Request(Url, extras)
-				{
-					Method = Method,
-					Priority = Priority,
-					Referer = Referer,
-					PostBody = PostBody,
-					Origin = Origin,
-					Depth = Depth,
-					CycleTriedTimes = CycleTriedTimes,
-					Proxy = Proxy,
-					StatusCode = StatusCode
-				};
-				return newObj;
-			}
-		}
+        public Request Clone()
+        {
+            lock (_locker)
+            {
+                IDictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
+                if (Extras != null)
+                {
+                    foreach (var entry in Extras)
+                    {
+                        extras.Add(entry.Key, entry.Value);
+                    }
+                }
+                Request newObj = new Request(Url, extras)
+                {
+                    Method = Method,
+                    Priority = Priority,
+                    Referer = Referer,
+                    PostBody = PostBody,
+                    Origin = Origin,
+                    Depth = Depth,
+                    CycleTriedTimes = CycleTriedTimes,
+                    Proxy = Proxy,
+                    StatusCode = StatusCode
+                };
+                return newObj;
+            }
+        }
 
-		private Request(Uri url, IDictionary<string, dynamic> extras = null)
-		{
-			Url = url;
-			if (extras != null)
-			{
-				foreach (var extra in extras)
-				{
-					PutExtra(extra.Key, extra.Value);
-				}
-			}
-		}
-	}
+        private Request(Uri url, IDictionary<string, dynamic> extras = null)
+        {
+            Url = url;
+            if (extras != null)
+            {
+                foreach (var extra in extras)
+                {
+                    PutExtra(extra.Key, extra.Value);
+                }
+            }
+        }
+    }
 }

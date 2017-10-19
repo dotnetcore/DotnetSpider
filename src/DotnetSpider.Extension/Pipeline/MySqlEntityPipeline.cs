@@ -1,12 +1,9 @@
-﻿using System.Data.Common;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
-using MySql.Data.MySqlClient;
 using DotnetSpider.Extension.Model;
 using System.Configuration;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
-using System.IO;
 using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure.Database;
 using System;
@@ -20,13 +17,7 @@ namespace DotnetSpider.Extension.Pipeline
 			DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
 		}
 
-		protected override DbParameter CreateDbParameter(string name, object value)
-		{
-			var parameter = new MySqlParameter(name, MySqlDbType.String) { Value = value };
-			return parameter;
-		}
-
-		protected string GetDataTypeSql(Column field)
+		private string GetDataTypeSql(Column field)
 		{
 			var dataType = "LONGTEXT";
 
@@ -143,11 +134,11 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				using (var conn = ConnectionStringSettings.GetDbConnection())
 				{
-					var sql = GenerateIfDatabaseExistsSql(adapter, conn.ServerVersion);
+					var sql = GenerateIfDatabaseExistsSql(adapter);
 
 					if (Convert.ToInt16(conn.MyExecuteScalar(sql)) == 0)
 					{
-						sql = GenerateCreateDatabaseSql(adapter, conn.ServerVersion);
+						sql = GenerateCreateDatabaseSql(adapter);
 						conn.MyExecute(sql);
 					}
 
@@ -159,34 +150,26 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string GenerateInsertSql(EntityAdapter adapter, bool ignoreDuplicate)
 		{
-			var colNames = adapter.Columns.Where(p => !Env.IdColumns.Contains(p.Name) && p.Name != Env.CDateColumn).Select(p => p.Name);
+			var colNames = adapter.Columns.Where(p => !Env.IdColumns.Contains(p.Name) && p.Name != Env.CDateColumn).Select(p => p.Name).ToList();
 			string cols = string.Join(", ", colNames.Select(p => $"`{p}`"));
 			string colsParams = string.Join(", ", colNames.Select(p => $"@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
 
-			var sql = string.Format("INSERT {0} INTO `{1}`.`{2}` ({3}) VALUES ({4});",
-				ignoreDuplicate ? "IGNORE" : "",
-				adapter.Table.Database,
-				tableName,
-				cols,
-				colsParams);
+			var sql =
+				$"INSERT {(ignoreDuplicate ? "IGNORE" : "")} INTO `{adapter.Table.Database}`.`{tableName}` ({cols}) VALUES ({colsParams});";
 			return sql;
 		}
 
 		private string GenerateInsertNewAndUpdateOldSql(EntityAdapter adapter)
 		{
-			var colNames = adapter.Columns.Where(p => !Env.IdColumns.Contains(p.Name) && p.Name != Env.CDateColumn).Select(p => p.Name);
+			var colNames = adapter.Columns.Where(p => !Env.IdColumns.Contains(p.Name) && p.Name != Env.CDateColumn).Select(p => p.Name).ToList();
 			string setParams = string.Join(", ", colNames.Select(p => $"`{p}`=@{p}"));
 			string cols = string.Join(", ", colNames.Select(p => $"`{p}`"));
 			string colsParams = string.Join(", ", colNames.Select(p => $"@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
 
-			var sql = string.Format("INSERT INTO `{0}`.`{1}` ({2}) {3} ON DUPLICATE KEY UPDATE {4};",
-				adapter.Table.Database,
-				tableName,
-				cols,
-				colsParams,
-				setParams);
+			var sql =
+				$"INSERT INTO `{adapter.Table.Database}`.`{tableName}` ({cols}) {colsParams} ON DUPLICATE KEY UPDATE {setParams};";
 
 			return sql;
 		}
@@ -196,7 +179,7 @@ namespace DotnetSpider.Extension.Pipeline
 			string setParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"`{p}`=@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
 			StringBuilder primaryParamenters = new StringBuilder();
-			primaryParamenters.Append($"`__Id` = @__Id");
+			primaryParamenters.Append("`__Id` = @__Id");
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("UPDATE `{0}`.`{1}` SET {2} WHERE {3};",
 				adapter.Table.Database,
@@ -210,7 +193,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			StringBuilder primaryParamenters = new StringBuilder();
 
-			primaryParamenters.Append($"`__Id` = @__Id");
+			primaryParamenters.Append("`__Id` = @__Id");
 			var tableName = adapter.Table.CalculateTableName();
 			var sqlBuilder = new StringBuilder();
 			sqlBuilder.AppendFormat("SELECT * FROM `{0}`.`{1}` WHERE {2};",
@@ -225,7 +208,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			var tableName = adapter.Table.CalculateTableName();
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{adapter.Table.Database }`.`{tableName}` (");
-			string columNames = string.Join(", ", adapter.Columns.Select(p => GenerateColumn(adapter, p)));
+			string columNames = string.Join(", ", adapter.Columns.Select(GenerateColumn));
 			builder.Append(columNames);
 
 			if (adapter.Table.Indexs != null)
@@ -254,7 +237,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		private string GenerateColumn(EntityAdapter adapter, Column p)
+		private string GenerateColumn(Column p)
 		{
 			if (p.DataType.FullName == DataTypeNames.DateTime)
 			{
@@ -262,7 +245,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			else if (Env.IdColumns.Contains(p.Name))
 			{
-				return $"`__Id` bigint AUTO_INCREMENT";
+				return "`__Id` bigint AUTO_INCREMENT";
 			}
 			else
 			{
@@ -270,12 +253,12 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private string GenerateCreateDatabaseSql(EntityAdapter adapter, string serverVersion)
+		private string GenerateCreateDatabaseSql(EntityAdapter adapter)
 		{
 			return $"CREATE SCHEMA IF NOT EXISTS `{adapter.Table.Database}` DEFAULT CHARACTER SET utf8mb4;";
 		}
 
-		private string GenerateIfDatabaseExistsSql(EntityAdapter adapter, string serverVersion)
+		private string GenerateIfDatabaseExistsSql(EntityAdapter adapter)
 		{
 			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{adapter.Table.Database}';";
 		}

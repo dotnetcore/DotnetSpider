@@ -1,41 +1,35 @@
-﻿using System;
-using System.IO;
-using System.Threading;
+﻿using System.Threading;
 using DotnetSpider.Core.Redial.Redialer;
-using System.Linq;
 using DotnetSpider.Core.Redial.InternetDetector;
-using System.Collections.Concurrent;
 using DotnetSpider.Core.Infrastructure;
-using LogLevel = NLog.LogLevel;
-using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Redial
 {
 	public sealed class MutexRedialExecutor : LocalRedialExecutor
 	{
-		public sealed class MutexLocker : ILocker
+		private sealed class MutexLocker : ILocker
 		{
 			public const string MutexName = "DotnetSpiderRedialLocker";
-			private Mutex SyncNamed;
+			private readonly Mutex _syncNamed;
 
 			public MutexLocker()
 			{
-				bool isOpened = Mutex.TryOpenExisting(MutexName, out SyncNamed);
+				bool isOpened = Mutex.TryOpenExisting(MutexName, out _syncNamed);
 				if (!isOpened)
 				{
-					SyncNamed = new Mutex(false, MutexName);
+					_syncNamed = new Mutex(false, MutexName);
 				}
 			}
 
 			public void Lock()
 			{
-				SyncNamed.WaitOne();
+				_syncNamed.WaitOne();
 			}
 
 			public void Release()
 			{
-				SyncNamed.ReleaseMutex();
-				SyncNamed.Dispose();
+				_syncNamed.ReleaseMutex();
+				_syncNamed.Dispose();
 			}
 		}
 
@@ -49,15 +43,14 @@ namespace DotnetSpider.Core.Redial
 		{
 		}
 
-		public override bool IsRedialing()
+		protected override bool IsRedialing()
 		{
-			Mutex mutex;
-			bool isRedialing = Mutex.TryOpenExisting(MutexLocker.MutexName, out mutex);
+			bool isRedialing = Mutex.TryOpenExisting(MutexLocker.MutexName, out var mutex);
 			mutex?.Dispose();
 			return isRedialing;
 		}
 
-		public override ILocker CreateLocker()
+		protected override ILocker CreateLocker()
 		{
 			return new MutexLocker();
 		}

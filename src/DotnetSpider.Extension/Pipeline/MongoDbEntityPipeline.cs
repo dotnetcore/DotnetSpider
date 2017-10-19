@@ -12,11 +12,9 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public class MongoDbEntityPipeline : BaseEntityPipeline
 	{
-		protected ConcurrentDictionary<string, IMongoCollection<BsonDocument>> Collections = new ConcurrentDictionary<string, IMongoCollection<BsonDocument>>();
+		private readonly ConcurrentDictionary<string, IMongoCollection<BsonDocument>> _collections = new ConcurrentDictionary<string, IMongoCollection<BsonDocument>>();
 
-		public string ConnectString { get; set; }
-
-		public IUpdateConnectString UpdateConnectString { get; set; }
+		private string ConnectString { get; }
 
 		public MongoDbEntityPipeline(string connectString)
 		{
@@ -34,12 +32,12 @@ namespace DotnetSpider.Extension.Pipeline
 			MongoClient client = new MongoClient(ConnectString);
 			var db = client.GetDatabase(metadata.TableInfo.Database);
 
-			Collections.TryAdd(metadata.Name, db.GetCollection<BsonDocument>(metadata.TableInfo.CalculateTableName()));
+			_collections.TryAdd(metadata.Name, db.GetCollection<BsonDocument>(metadata.TableInfo.CalculateTableName()));
 		}
 
 		public override int Process(string entityName, List<dynamic> datas)
 		{
-			if (Collections.TryGetValue(entityName, out var collection))
+			if (_collections.TryGetValue(entityName, out var collection))
 			{
 				List<BsonDocument> reslut = new List<BsonDocument>();
 				foreach (var data in datas)

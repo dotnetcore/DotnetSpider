@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public class EncodingExtensions
+	public static class EncodingExtensions
 	{
 		private const int Utf8PreambleLength = 3;
 		private const byte Utf8PreambleByte2 = 0xBF;

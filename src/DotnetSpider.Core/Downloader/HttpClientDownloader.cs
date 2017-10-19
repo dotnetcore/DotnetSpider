@@ -5,9 +5,7 @@ using System.IO;
 using System.Web;
 #endif
 using System.Text;
-using System.Net.Http;
 using System.Net;
-using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;
@@ -15,265 +13,278 @@ using System.Linq;
 
 namespace DotnetSpider.Core.Downloader
 {
-	/// <summary>
-	/// The http downloader
-	/// </summary>
-	public class HttpClientDownloader : BaseDownloader
-	{
-		private static readonly List<string> MediaTypes = new List<string>
-		{
-			"text/html",
-			"text/plain",
-			"text/richtext",
-			"text/xml",
-			"text/json",
-			"text/javascript",
-			"application/soap+xml",
-			"application/xml",
-			"application/json",
-			"application/x-javascript",
-			"application/javascript",
-			"application/x-www-form-urlencoded"
-		};
+    /// <summary>
+    /// The http downloader
+    /// </summary>
+    public class HttpClientDownloader : BaseDownloader
+    {
+        private static readonly List<string> MediaTypes = new List<string>
+        {
+            "text/html",
+            "text/plain",
+            "text/richtext",
+            "text/xml",
+            "text/json",
+            "text/javascript",
+            "application/soap+xml",
+            "application/xml",
+            "application/json",
+            "application/x-javascript",
+            "application/javascript",
+            "application/x-www-form-urlencoded"
+        };
 
-		public bool DecodeHtml { get; set; }
 
-		protected override Page DowloadContent(Request request, ISpider spider)
-		{
-			Site site = spider.Site;
+        private readonly bool _decodeHtml;
 
-			HttpWebResponse response = null;
-			var proxy = site.GetHttpProxy();
+        public HttpClientDownloader(bool decodeHtml = false)
+        {
+            _decodeHtml = decodeHtml;
+        }
 
-			try
-			{
-				var httpMessage = GenerateHttpWebRequest(request, site);
+        protected override Page DowloadContent(Request request, ISpider spider)
+        {
+            Site site = spider.Site;
 
-				response = NetworkCenter.Current.Execute("http", () =>
-				{
-					return (HttpWebResponse)httpMessage.GetResponse();
-				});
+            HttpWebResponse response = null;
+            var proxy = site.GetHttpProxy();
 
-				request.StatusCode = response.StatusCode;
+            try
+            {
+                var httpMessage = GenerateHttpWebRequest(request, site);
 
-				if (!site.AcceptStatCode.Contains(response.StatusCode))
-				{
-					throw new DownloadException($"Download {request.Url} failed. Code {response.StatusCode}");
-				}
-				Page page;
+                if (proxy != null)
+                {
+                    httpMessage.Proxy = proxy;
+                }
+                response = NetworkCenter.Current.Execute("http", () => (HttpWebResponse) httpMessage.GetResponse());
 
-				var mediaType = response.ContentType?.Split(';').FirstOrDefault();
-				if (!string.IsNullOrEmpty(mediaType) && !MediaTypes.Contains(mediaType))
-				{
-					if (!site.DownloadFiles)
-					{
-						Logger.MyLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
-						return new Page(request, null) { Skip = true };
-					}
-					else
-					{
-						page = SaveFile(request, response, spider);
-					}
-				}
-				else
-				{
-					page = ConstructPage(request, response, site);
-				}
+                request.StatusCode = response.StatusCode;
 
-				if (string.IsNullOrEmpty(page.Content))
-				{
-					Logger.MyLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
-				}
+                if (!site.AcceptStatCode.Contains(response.StatusCode))
+                {
+                    throw new DownloadException($"Download {request.Url} failed. Code {response.StatusCode}");
+                }
+                Page page;
 
-				page.TargetUrl = response.ResponseUri.ToString();
+                var mediaType = response.ContentType.Split(';').FirstOrDefault();
+                if (!string.IsNullOrEmpty(mediaType) && !MediaTypes.Contains(mediaType))
+                {
+                    if (!site.DownloadFiles)
+                    {
+                        Logger.MyLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.",
+                            LogLevel.Error);
+                        return new Page(request, null) {Skip = true};
+                    }
+                    else
+                    {
+                        page = SaveFile(request, response, spider);
+                    }
+                }
+                else
+                {
+                    page = ConstructPage(request, response, site);
+                }
 
-				return page;
-			}
-			catch (DownloadException de)
-			{
-				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, null);
+                if (string.IsNullOrEmpty(page.Content))
+                {
+                    Logger.MyLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
+                }
 
-				if (page != null)
-				{
-					page.Exception = de;
-				}
-				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {de.Message}", LogLevel.Warn);
+                page.TargetUrl = response.ResponseUri.ToString();
 
-				return page;
-			}
-			catch (WebException he)
-			{
-				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, null);
-				if (page != null)
-				{
-					page.Exception = he;
-				}
+                return page;
+            }
+            catch (DownloadException de)
+            {
+                Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, null);
 
-				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {he.Message}.", LogLevel.Warn);
-				return page;
-			}
-			catch (Exception e)
-			{
-				Page page = new Page(request, null)
-				{
-					Exception = e,
-					Skip = true
-				};
+                if (page != null)
+                {
+                    page.Exception = de;
+                }
+                Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {de.Message}", LogLevel.Warn);
 
-				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {e.Message}.", LogLevel.Error, e);
-				return page;
-			}
-			finally
-			{
-				// 先Close Response, 避免前面语句异常导致没有关闭.
-				try
-				{
-					//ensure the connection is released back to pool
-					//check:
-					//EntityUtils.consume(httpResponse.getEntity());
-					response?.Dispose();
-				}
-				catch (Exception e)
-				{
-					Logger.MyLog(spider.Identity, "Close response fail.", LogLevel.Error, e);
-				}
-			}
-		}
+                return page;
+            }
+            catch (WebException he)
+            {
+                Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, null);
+                if (page != null)
+                {
+                    page.Exception = he;
+                }
 
-		private HttpWebRequest GenerateHttpWebRequest(Request request, Site site)
-		{
-			if (site == null) return null;
-			if (site.Headers == null)
-			{
-				site.Headers = new Dictionary<string, string>();
-			}
-			var httpWebRequest = (HttpWebRequest)WebRequest.Create(request.Url);
-			httpWebRequest.Method = request.Method.Method;
+                Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {he.Message}.", LogLevel.Warn);
+                return page;
+            }
+            catch (Exception e)
+            {
+                Page page = new Page(request, null)
+                {
+                    Exception = e,
+                    Skip = true
+                };
 
-			httpWebRequest.Headers.Add("User-Agent", site.Headers.ContainsKey("User-Agent") ? site.Headers["User-Agent"] : site.UserAgent);
+                Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {e.Message}.", LogLevel.Error, e);
+                return page;
+            }
+            finally
+            {
+                // 先Close Response, 避免前面语句异常导致没有关闭.
+                try
+                {
+                    //ensure the connection is released back to pool
+                    //check:
+                    //EntityUtils.consume(httpResponse.getEntity());
+                    response?.Dispose();
+                }
+                catch (Exception e)
+                {
+                    Logger.MyLog(spider.Identity, "Close response fail.", LogLevel.Error, e);
+                }
+            }
+        }
 
-			if (!string.IsNullOrEmpty(request.Referer))
-			{
-				httpWebRequest.Headers.Add("Referer", request.Referer);
-			}
+        private HttpWebRequest GenerateHttpWebRequest(Request request, Site site)
+        {
+            if (site == null) return null;
+            if (site.Headers == null)
+            {
+                site.Headers = new Dictionary<string, string>();
+            }
+            var httpWebRequest = (HttpWebRequest) WebRequest.Create(request.Url);
+            httpWebRequest.Method = request.Method.Method;
 
-			if (!string.IsNullOrEmpty(request.Origin))
-			{
-				httpWebRequest.Headers.Add("Origin", request.Origin);
-			}
+            httpWebRequest.Headers.Add("User-Agent",
+                site.Headers.ContainsKey("User-Agent") ? site.Headers["User-Agent"] : site.UserAgent);
 
-			if (!string.IsNullOrEmpty(site.Accept))
-			{
-				httpWebRequest.Headers.Add("Accept", site.Accept);
-			}
+            if (!string.IsNullOrEmpty(request.Referer))
+            {
+                httpWebRequest.Headers.Add("Referer", request.Referer);
+            }
 
-			foreach (var header in site.Headers)
-			{
-				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) && header.Key != "Content-Type" && header.Key != "User-Agent")
-				{
-					httpWebRequest.Headers.Add(header.Key, header.Value);
-				}
-			}
+            if (!string.IsNullOrEmpty(request.Origin))
+            {
+                httpWebRequest.Headers.Add("Origin", request.Origin);
+            }
 
-			httpWebRequest.Headers.Add("Cookie", site.Cookies?.ToString());
+            if (!string.IsNullOrEmpty(site.Accept))
+            {
+                httpWebRequest.Headers.Add("Accept", site.Accept);
+            }
 
-			if (httpWebRequest.Method == "POST")
-			{
-				var data = string.IsNullOrEmpty(site.EncodingName) ? Encoding.UTF8.GetBytes(request.PostBody) : site.Encoding.GetBytes(request.PostBody);
+            foreach (var header in site.Headers)
+            {
+                if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) &&
+                    header.Key != "Content-Type" && header.Key != "User-Agent")
+                {
+                    httpWebRequest.Headers.Add(header.Key, header.Value);
+                }
+            }
 
-				if (site.Headers.ContainsKey("Content-Type"))
-				{
-					httpWebRequest.Headers.Add("Content-Type", site.Headers["Content-Type"]);
-				}
+            httpWebRequest.Headers.Add("Cookie", site.Cookies?.ToString());
 
-				if (site.Headers.ContainsKey("X-Requested-With") && site.Headers["X-Requested-With"] == "NULL")
-				{
-					httpWebRequest.Headers.Remove("X-Requested-With");
-				}
-				else
-				{
-					if (!httpWebRequest.Headers.AllKeys.Contains("X-Requested-With") && !httpWebRequest.Headers.AllKeys.Contains("X-Requested-With"))
-					{
-						httpWebRequest.Headers.Add("X-Requested-With", "XMLHttpRequest");
-					}
-				}
+            if (httpWebRequest.Method == "POST")
+            {
+                if (site.Headers.ContainsKey("Content-Type"))
+                {
+                    httpWebRequest.Headers.Add("Content-Type", site.Headers["Content-Type"]);
+                }
 
-				byte[] buffer = Encoding.UTF8.GetBytes(request.PostBody);
+                if (site.Headers.ContainsKey("X-Requested-With") && site.Headers["X-Requested-With"] == "NULL")
+                {
+                    httpWebRequest.Headers.Remove("X-Requested-With");
+                }
+                else
+                {
+                    if (!httpWebRequest.Headers.AllKeys.Contains("X-Requested-With") &&
+                        !httpWebRequest.Headers.AllKeys.Contains("X-Requested-With"))
+                    {
+                        httpWebRequest.Headers.Add("X-Requested-With", "XMLHttpRequest");
+                    }
+                }
 
-				if (buffer != null)
-				{
-					httpWebRequest.ContentLength = buffer.Length;
-					httpWebRequest.GetRequestStream().Write(buffer, 0, buffer.Length);
-				}
-			}
-			httpWebRequest.Timeout = site.Timeout;
+                byte[] buffer = Encoding.UTF8.GetBytes(request.PostBody);
+                httpWebRequest.ContentLength = buffer.Length;
+                httpWebRequest.GetRequestStream().Write(buffer, 0, buffer.Length);
+            }
+            httpWebRequest.Timeout = site.Timeout;
 
-			return httpWebRequest;
-		}
+            return httpWebRequest;
+        }
 
-		private Page ConstructPage(Request request, HttpWebResponse response, Site site)
-		{
-			string content = ReadContent(site, response);
+        private Page ConstructPage(Request request, HttpWebResponse response, Site site)
+        {
+            string content = ReadContent(site, response);
 
-			if (DecodeHtml)
-			{
+            if (_decodeHtml)
+            {
 #if !NET_CORE
-				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
+                content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content),
+                    string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
 #else
 				content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
 #endif
-			}
+            }
 
-			Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
-			{
-				Content = content
-			};
+            Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
+            {
+                Content = content
+            };
 
-			//foreach (var header in response.Headers)
-			//{
-			//	page.Request.PutExtra(header.Key, header.Value);
-			//}
+            //foreach (var header in response.Headers)
+            //{
+            //	page.Request.PutExtra(header.Key, header.Value);
+            //}
 
-			return page;
-		}
+            return page;
+        }
 
-		private string ReadContent(Site site, HttpWebResponse response)
-		{
-			MemoryStream memoryStream = new MemoryStream(0x1000);
-			using (Stream responseStream = response.GetResponseStream())
-			{
-				byte[] buffer = new byte[0x1000];
-				int bytes;
-				while ((bytes = responseStream.Read(buffer, 0, buffer.Length)) > 0)
-				{
-					memoryStream.Write(buffer, 0, bytes);
-				}
-			}
+        private string ReadContent(Site site, HttpWebResponse response)
+        {
+            MemoryStream memoryStream = new MemoryStream(0x1000);
+            using (Stream responseStream = response.GetResponseStream())
+            {
+                if (responseStream == null)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    byte[] buffer = new byte[0x1000];
+                    int bytes;
+                    while ((bytes = responseStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        memoryStream.Write(buffer, 0, bytes);
+                    }
+                }
+            }
 
-			byte[] contentBytes = memoryStream.StreamToBytes();
-			contentBytes = PreventCutOff(contentBytes);
-			if (string.IsNullOrEmpty(site.EncodingName))
-			{
-				var charSet = response.CharacterSet;
-				Encoding htmlCharset = EncodingExtensions.GetEncoding(charSet, contentBytes);
-				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
-			}
-			else
-			{
-				return site.Encoding.GetString(contentBytes, 0, contentBytes.Length);
-			}
-		}
+            byte[] contentBytes = memoryStream.StreamToBytes();
+            contentBytes = PreventCutOff(contentBytes);
+            if (string.IsNullOrEmpty(site.EncodingName))
+            {
+                var charSet = response.CharacterSet;
+                Encoding htmlCharset = EncodingExtensions.GetEncoding(charSet, contentBytes);
+                return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
+            }
+            else
+            {
+                return site.Encoding.GetString(contentBytes, 0, contentBytes.Length);
+            }
+        }
 
-		private byte[] PreventCutOff(byte[] bytes)
-		{
-			for (int i = 0; i < bytes.Length; i++)
-			{
-				if (bytes[i] == 0x00)
-				{
-					bytes[i] = 32;
-				}
-			}
-			return bytes;
-		}
-	}
+        private byte[] PreventCutOff(byte[] bytes)
+        {
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                if (bytes[i] == 0x00)
+                {
+                    bytes[i] = 32;
+                }
+            }
+            return bytes;
+        }
+    }
 }

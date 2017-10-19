@@ -14,7 +14,7 @@ namespace DotnetSpider.Core.Scheduler
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 
-		public override bool UseInternet { get; set; } = false;
+		protected override bool UseInternet { get; set; } = false;
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{
@@ -94,7 +94,7 @@ namespace DotnetSpider.Core.Scheduler
 			}
 		}
 
-		public override HashSet<Request> ToList()
+		public HashSet<Request> ToList()
 		{
 			lock (_lock)
 			{
