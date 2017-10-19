@@ -88,10 +88,6 @@ namespace DotnetSpider.Extension.Model
 			bool skip = false;
 			foreach (var field in EntityDefine.Columns)
 			{
-				if (Env.IdColumns.Contains(field.Name))
-				{
-					continue;
-				}
 				var fieldValue = ExtractField(item, page, field, index);
 				if (fieldValue == null)
 				{

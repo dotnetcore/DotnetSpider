@@ -12,7 +12,8 @@ namespace DotnetSpider.Extension.Infrastructure
 	{
 		public static object GetEnviromentValue(string field, Page page, int index)
 		{
-			switch (field.ToLower())
+			var key = field.ToLower();
+			switch (key)
 			{
 				case "timeuuid":
 					{
@@ -48,14 +49,13 @@ namespace DotnetSpider.Extension.Infrastructure
 					}
 				default:
 					{
-						if (!page.Request.ExistExtra(field))
+						var v1 = page.Request.GetExtra(field);
+						if (v1 == null)
 						{
-							return field;
+							var v2 = page.Request.GetExtra(key);
+							return v2;
 						}
-						else
-						{
-							return page.Request.GetExtra(field)?.ToString();
-						}
+						return v1;
 					}
 			}
 		}

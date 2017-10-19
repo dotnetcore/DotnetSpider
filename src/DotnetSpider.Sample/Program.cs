@@ -23,10 +23,9 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-			Startup.Run("-s:6roomLiveVideo", "-tid:6roomLiveVideo", "-i:guid", "-a:");
 			MyTest();
 
-			
+			Startup.Run("-s:BaiduSearchSpider", "-tid:BaiduSearchSpider", "-i:guid");
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 
@@ -80,118 +79,6 @@ namespace DotnetSpider.Sample
 		private static void MyTest()
 		{
 			BaseUsage.CustmizeProcessorAndPipeline();
-		}
-
-		[EntityTable("taobao", "taobao_items", EntityTable.FirstDayOfCurrentMonth, Uniques = new[] { "item_id" })]
-		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
-		private class TaobaoItem : SpiderEntity
-		{
-			[PropertyDefine(Expression = "tab", Type = SelectorType.Enviroment, Length = 20)]
-			public string tab { get; set; }
-
-			[PropertyDefine(Expression = "supercategory", Type = SelectorType.Enviroment, Length = 20)]
-			public string team { get; set; }
-
-			[PropertyDefine(Expression = "bidwordstr", Type = SelectorType.Enviroment, Length = 20)]
-			public string bidwordstr { get; set; }
-
-			[PropertyDefine(Expression = "$.category", Type = SelectorType.Enviroment, Length = 20)]
-			public string category { get; set; }
-
-			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath, Option = PropertyDefine.Options.PlainText, Length = 100)]
-			public string name { get; set; }
-
-			[PropertyDefine(Expression = "$.nick", Type = SelectorType.JsonPath, Length = 50)]
-			public string nick { get; set; }
-
-			[PropertyDefine(Expression = "$.view_price", Type = SelectorType.JsonPath, Length = 50)]
-			public string price { get; set; }
-
-			[PropertyDefine(Expression = "$.category", Type = SelectorType.JsonPath, Length = 20)]
-			public string cat { get; set; }
-
-			[PropertyDefine(Expression = "$.icon", Type = SelectorType.JsonPath)]
-			public string icon { get; set; }
-
-			[PropertyDefine(Expression = "$.view_fee", Type = SelectorType.JsonPath, Length = 50)]
-			public string fee { get; set; }
-
-			[PropertyDefine(Expression = "$.item_loc", Type = SelectorType.JsonPath, Length = 50)]
-			public string item_loc { get; set; }
-
-			[PropertyDefine(Expression = "$.shopcard.isTmall", Type = SelectorType.JsonPath)]
-			public bool is_Tmall { get; set; }
-
-			[PropertyDefine(Expression = "$.view_sales", Type = SelectorType.JsonPath, Length = 50)]
-			[ReplaceFormatter(NewValue = "", OldValue = "付款")]
-			[ReplaceFormatter(NewValue = "", OldValue = "收货")]
-			[ReplaceFormatter(NewValue = "", OldValue = "人")]
-			public string sold { get; set; }
-
-			[PropertyDefine(Expression = "$.nid", Type = SelectorType.JsonPath, Length = 50)]
-			public string item_id { get; set; }
-
-			[PropertyDefine(Expression = "$.detail_url", Type = SelectorType.JsonPath)]
-			public string url { get; set; }
-
-			[PropertyDefine(Expression = "$.user_id", Type = SelectorType.JsonPath, Length = 50)]
-			public string user_id { get; set; }
-		}
-
-		[EntityTable("taobao", "taobao_items_test", EntityTable.FirstDayOfCurrentMonth, Indexs = new[] { "item_id" })]
-		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
-		private class TaobaoItem2 : CassandraSpiderEntity
-		{
-			[PropertyDefine(Expression = "tab", Type = SelectorType.Enviroment, Length = 20)]
-			public string tab { get; set; }
-
-			[PropertyDefine(Expression = "supercategory", Type = SelectorType.Enviroment, Length = 20)]
-			public string team { get; set; }
-
-			[PropertyDefine(Expression = "bidwordstr", Type = SelectorType.Enviroment, Length = 20)]
-			public string bidwordstr { get; set; }
-
-			[PropertyDefine(Expression = "$.category", Type = SelectorType.Enviroment, Length = 20)]
-			public string category { get; set; }
-
-			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath, Option = PropertyDefine.Options.PlainText, Length = 100)]
-			public string name { get; set; }
-
-			[PropertyDefine(Expression = "$.nick", Type = SelectorType.JsonPath, Length = 50)]
-			public string nick { get; set; }
-
-			[PropertyDefine(Expression = "$.view_price", Type = SelectorType.JsonPath, Length = 50)]
-			public string price { get; set; }
-
-			[PropertyDefine(Expression = "$.category", Type = SelectorType.JsonPath, Length = 20)]
-			public string cat { get; set; }
-
-			[PropertyDefine(Expression = "$.icon", Type = SelectorType.JsonPath)]
-			public string icon { get; set; }
-
-			[PropertyDefine(Expression = "$.view_fee", Type = SelectorType.JsonPath, Length = 50)]
-			public string fee { get; set; }
-
-			[PropertyDefine(Expression = "$.item_loc", Type = SelectorType.JsonPath, Length = 50)]
-			public string item_loc { get; set; }
-
-			[PropertyDefine(Expression = "$.shopcard.isTmall", Type = SelectorType.JsonPath)]
-			public bool is_Tmall { get; set; }
-
-			[PropertyDefine(Expression = "$.view_sales", Type = SelectorType.JsonPath, Length = 50)]
-			[ReplaceFormatter(NewValue = "", OldValue = "付款")]
-			[ReplaceFormatter(NewValue = "", OldValue = "收货")]
-			[ReplaceFormatter(NewValue = "", OldValue = "人")]
-			public string sold { get; set; }
-
-			[PropertyDefine(Expression = "$.nid", Type = SelectorType.JsonPath, Length = 50)]
-			public string item_id { get; set; }
-
-			[PropertyDefine(Expression = "$.detail_url", Type = SelectorType.JsonPath)]
-			public string url { get; set; }
-
-			[PropertyDefine(Expression = "$.user_id", Type = SelectorType.JsonPath, Length = 50)]
-			public string user_id { get; set; }
 		}
 	}
 
