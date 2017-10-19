@@ -30,7 +30,7 @@ namespace DotnetSpider.Core
 
 	public static class Startup
 	{
-		public static readonly List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
+		public static List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
 
 		public static void Run(params string[] args)
 		{

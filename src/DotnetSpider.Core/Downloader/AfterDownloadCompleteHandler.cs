@@ -136,7 +136,7 @@ namespace DotnetSpider.Core.Downloader
 		private readonly string _oldValue;
 		private readonly string _newValue;
 
-		public ReplaceContentHandler(string oldValue, string newValue)
+		public ReplaceContentHandler(string oldValue, string newValue = "")
 		{
 			_oldValue = oldValue;
 			_newValue = newValue;
