@@ -23,10 +23,10 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-
+			Startup.Run("-s:6roomLiveVideo", "-tid:6roomLiveVideo", "-i:guid", "-a:");
 			MyTest();
 
-			Startup.Run("-s:TaobaoMassageArmchairSpider", "-tid:TaobaoMassageArmchairSpider", "-i:guid", "-a:");
+			
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 

@@ -1,167 +1,61 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Model.Formatter;
-using System.Collections.Generic;
-using System.Linq;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Scheduler;
+using System;
 
-namespace Xbjrkj.DataCollection.Apps.Taobao
+namespace DotnetSpider.Sample
 {
-	[TaskName("TaobaoMassageArmchairSpider")]
-	public class TaobaoMassageArmchairSpider : EntitySpider
+	public class Class1
 	{
-		private class MyDataHanlder : DataHandler<TaobaoItem>
-		{
-			protected override TaobaoItem HandleDataOject(TaobaoItem data, Page page)
-			{
-				var price = float.Parse(data.price);
-				var sold = int.Parse(data.sold);
 
-				if (price >= 100 && price < 5000)
-				{
-					if (sold <= 1)
-					{
-						if (!page.SkipTargetUrls)
-						{
-							page.SkipTargetUrls = true;
-						}
-					}
-					else
-					{
-						return data;
-					}
-				}
-				else if (price < 100)
-				{
-					if (sold <= 5)
-					{
-						if (!page.SkipTargetUrls)
-						{
-							page.SkipTargetUrls = true;
-						}
-					}
-					else
-					{
-						return data;
-					}
-				}
-				else
-				{
-					if (sold == 0)
-					{
-						if (!page.SkipTargetUrls)
-						{
-							page.SkipTargetUrls = true;
-						}
-					}
-					else
-					{
-						return data;
-					}
-				}
-				return data;
-			}
+		public void ProcessException()
+		{
+			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+
+			var scheduler = new QueueDuplicateRemovedScheduler();
+
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMTMyMTkzNTY1Mg==.html?spm=a2h1n.8251845.0.0");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMjkzNzMwMDMyOA==.html?spm=a2h1n.8251845.0.0");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMjcwNDg0NDI3Mg==.html?spm=a2h1n.8251845.0.0");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMTMwNzQwMTcwMA==.html?spm=a2h1n.8251845.0.0");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMjk1MzI0Mzk4NA==.html?spm=a2h1n.8251845.0.0");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMjkzNzY0NzkyOA==.html?spm=a2h1n.8251845.0.0");
+			site.AddStartUrl("http://www.cnblogs.com/");
+
+			Spider spider = Spider.Create(site,
+					// crawler identity
+					"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
+					// use memoery queue scheduler
+					scheduler,
+					// default page processor will save whole html, and extract urls to target urls via regex
+					new TestPageProcessor())
+				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
+				.AddPipeline(new FilePipeline());
+
+			// dowload html by http client
+			spider.Downloader = new HttpClientDownloader();
+
+			spider.ThreadNum = 1;
+			// traversal deep 遍历深度
+			spider.Deep = 3;
+
+			// start crawler 启动爬虫
+			spider.Run();
+
+
 		}
 
-		private class MyAfterDownloadHandler : AfterDownloadCompleteHandler
+		class TestPageProcessor : BasePageProcessor
 		{
-			public override void Handle(ref Page page, ISpider spider)
+			protected override void Handle(Page page)
 			{
-				var pager = page.Selectable.Select(Selectors.JsonPath("$.mods.pager.status")).GetValue();
-				if (pager != "show")
+				if (page.Request.Url.ToString() == "http://www.cnblogs.com/")
 				{
-					page.SkipTargetUrls = true;
+					throw new SpiderException("");
 				}
 			}
-		}
-
-		public TaobaoMassageArmchairSpider() : base("TaobaoMassageArmchairSpider", new Site
-		{
-			Timeout = 20000,
-			Headers = new Dictionary<string, string>
-			{
-				{ "Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" },
-				{ "Referer", "https://www.taobao.com/"},
-				{ "Cache-Control","max-age=0" },
-				{ "Upgrade-Insecure-Requests","1" }
-			}
-		})
-		{
-		}
-
-		protected override void MyInit(params string[] arguments)
-		{
-			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler("g_page_config = {", "g_srp_loadCss();", 16, 22));
-			Downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&s=0", 44));
-			Downloader.AddAfterDownloadCompleteHandler(new MyAfterDownloadHandler());
-
-			SkipWhenResultIsEmpty = true;
-			if (!arguments.Contains("noprepare"))
-			{
-				//AddStartUrlBuilder(
-				//	new DbStartUrlBuilder(Database.MySql, Env.DataConnectionStringSettings.ConnectionString,
-				//	"SELECT * FROM taobao.result_keywords limit 10000", new[] { "bidwordstr", "tab" },
-				//	"https://s.taobao.com/search?q={0}&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab={1}"));
-
-				AddStartRequest(new Request("https://s.taobao.com/search?q=按摩椅&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab=all", new Dictionary<string, dynamic> { { "bidwordstr", "按摩椅" } }));
-			}
-			AddEntityType<TaobaoItem>(new MyDataHanlder());
-		}
-
-		[EntityTable("taobao", "taobao_items_massage_armchair", Uniques = new[] { "item_id" })]
-		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
-		private class TaobaoItem : SpiderEntity
-		{
-			[PropertyDefine(Expression = "tab", Type = SelectorType.Enviroment, Length = 20)]
-			public string tab { get; set; }
-
-			[PropertyDefine(Expression = "住宅家具", Type = SelectorType.Enviroment, Length = 20)]
-			public string team { get; set; }
-
-			[PropertyDefine(Expression = "bidwordstr", Type = SelectorType.Enviroment, Length = 20)]
-			public string bidwordstr { get; set; }
-
-			[PropertyDefine(Expression = "沙发类", Type = SelectorType.Enviroment, Length = 20)]
-			public string category { get; set; }
-
-			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath, Option = PropertyDefine.Options.PlainText, Length = 100)]
-			public string name { get; set; }
-
-			[PropertyDefine(Expression = "$.nick", Type = SelectorType.JsonPath, Length = 50)]
-			public string nick { get; set; }
-
-			[PropertyDefine(Expression = "$.view_price", Type = SelectorType.JsonPath, Length = 50)]
-			public string price { get; set; }
-
-			[PropertyDefine(Expression = "$.category", Type = SelectorType.JsonPath, Length = 20)]
-			public string cat { get; set; }
-
-			[PropertyDefine(Expression = "$.view_fee", Type = SelectorType.JsonPath, Length = 50)]
-			public string fee { get; set; }
-
-			[PropertyDefine(Expression = "$.item_loc", Type = SelectorType.JsonPath, Length = 50)]
-			public string item_loc { get; set; }
-
-			[PropertyDefine(Expression = "$.shopcard.isTmall", Type = SelectorType.JsonPath)]
-			public bool is_Tmall { get; set; }
-
-			[PropertyDefine(Expression = "$.view_sales", Type = SelectorType.JsonPath, Length = 50)]
-			[ReplaceFormatter(NewValue = "", OldValue = "付款")]
-			[ReplaceFormatter(NewValue = "", OldValue = "收货")]
-			[ReplaceFormatter(NewValue = "", OldValue = "人")]
-			public string sold { get; set; }
-
-			[PropertyDefine(Expression = "$.nid", Type = SelectorType.JsonPath, Length = 50)]
-			public string item_id { get; set; }
-
-			[PropertyDefine(Expression = "$.detail_url", Type = SelectorType.JsonPath)]
-			public string url { get; set; }
-
-			[PropertyDefine(Expression = "$.user_id", Type = SelectorType.JsonPath, Length = 50)]
-			public string user_id { get; set; }
 		}
 	}
 }

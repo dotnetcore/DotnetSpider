@@ -154,14 +154,14 @@ namespace DotnetSpider.Extension.Model
 			if (selector is EnviromentSelector)
 			{
 				var enviromentSelector = selector as EnviromentSelector;
-				var tmpValue = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, index);
+				var value = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, index);
 				foreach (var formatter in field.Formatters)
 				{
 #if DEBUG
 					try
 					{
 #endif
-						tmpValue = formatter.Formate(tmpValue);
+						value = formatter.Formate(value);
 #if DEBUG
 					}
 					catch (Exception e)
@@ -170,7 +170,7 @@ namespace DotnetSpider.Extension.Model
 					}
 #endif
 				}
-				return tmpValue == null ? null : Convert.ChangeType(tmpValue, field.DataType);
+				return TryConvert(value, field.DataType);
 			}
 			else
 			{
@@ -200,9 +200,24 @@ namespace DotnetSpider.Extension.Model
 #endif
 					}
 
-					return value == null ? null : Convert.ChangeType(value, field.DataType);
+					return TryConvert(value, field.DataType);
 				}
 			}
+		}
+
+		private object TryConvert(object value, Type type)
+		{
+			try
+			{
+				if (value != null)
+				{
+					return Convert.ChangeType(value, type);
+				}
+			}
+			catch
+			{
+			}
+			return null;
 		}
 	}
 }

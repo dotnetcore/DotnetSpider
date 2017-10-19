@@ -120,6 +120,10 @@ namespace DotnetSpider.Core.Test.Downloader
 		{
 			Site site = new Site
 			{
+				Headers = new Dictionary<string, string>
+				{
+					{ "User-Agent", "Chrome" }
+				}
 			};
 			var downloader = new HttpClientDownloader();
 			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site));
