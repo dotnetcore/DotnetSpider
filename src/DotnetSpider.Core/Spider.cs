@@ -51,6 +51,8 @@ namespace DotnetSpider.Core
 		private int _emptySleepTime = 15000;
 		private int _cachedSize = 1;
 		private string _identity;
+		private StreamWriter _errorRequestStreamWriter;
+		private int _errorRequestFlushCount;
 
 		protected virtual bool IfRequireInitStartRequests(string[] arguments)
 		{
@@ -929,8 +931,6 @@ namespace DotnetSpider.Core
 
 			Scheduler.Init(this);
 
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
-
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 
 			foreach (var pipeline in Pipelines)
@@ -963,7 +963,36 @@ namespace DotnetSpider.Core
 
 			AfterInitComponent(arguments);
 
+			PrepaireErrorRequestsLogFile();
+
 			_init = true;
+		}
+
+		private void PrepaireErrorRequestsLogFile()
+		{
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+
+			while (true)
+			{
+				try
+				{
+					if (_errorRequestFile.Exists)
+					{
+						_errorRequestStreamWriter = new StreamWriter(File.OpenWrite(_errorRequestFile.FullName), Encoding.UTF8);
+						break;
+					}
+					else
+					{
+						_errorRequestStreamWriter = File.CreateText(_errorRequestFile.FullName);
+						break;
+					}
+				}
+				catch
+				{
+					_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, $"errors.{DateTime.Now.ToString("yyyyMMddhhmmss")}.txt"));
+				}
+				Thread.Sleep(50);
+			}
 		}
 
 		/// <summary>
@@ -991,6 +1020,9 @@ namespace DotnetSpider.Core
 			SafeDestroy(Downloader);
 
 			Site.HttpProxyPool?.Dispose();
+
+			_errorRequestStreamWriter.Flush();
+			_errorRequestStreamWriter.Dispose();
 		}
 
 		/// <summary>
@@ -1013,7 +1045,12 @@ namespace DotnetSpider.Core
 		{
 			lock (Locker)
 			{
-				File.AppendAllText(_errorRequestFile.FullName, $"{request}{Environment.NewLine}", Encoding.UTF8);
+				_errorRequestFlushCount++;
+				_errorRequestStreamWriter.WriteLine(request);
+				if (_errorRequestFlushCount % 50 == 0)
+				{
+					_errorRequestStreamWriter.Flush();
+				}
 			}
 			Scheduler.IncreaseErrorCount();
 		}
