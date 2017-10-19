@@ -79,6 +79,7 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
+			BaseUsage.CustmizeProcessorAndPipeline();
 		}
 
 		[EntityTable("taobao", "taobao_items", EntityTable.FirstDayOfCurrentMonth, Uniques = new[] { "item_id" })]

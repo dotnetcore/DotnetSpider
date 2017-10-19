@@ -23,11 +23,11 @@ namespace DotnetSpider.Core.Redial
 		protected abstract void RecordLastRedialTime();
 		public abstract void Dispose();
 
+		public int AfterRedialWaitTime { get; set; } = -1;
+
 		private IRedialer Redialer { get; }
 
 		private IInternetDetector InternetDetector { get; }
-
-		private int AfterRedialWaitTime { get; } = -1;
 
 		private void WaitRedialComplete()
 		{

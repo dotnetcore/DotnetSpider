@@ -63,16 +63,17 @@ namespace DotnetSpider.Core.Downloader
 
 	public sealed class SkipWhenContainsContentHandler : AfterDownloadCompleteHandler
 	{
-		private readonly string _content;
+		private readonly string[] _contents;
 
-		public SkipWhenContainsContentHandler(string content)
+		public SkipWhenContainsContentHandler(params string[] contents)
 		{
-			_content = content;
+			_contents = contents;
 		}
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			page.Skip = !string.IsNullOrEmpty(page?.Content) && page.Content.Contains(_content);
+			var content = page.Content;
+			page.Skip = !string.IsNullOrEmpty(page?.Content) && _contents.Any(c => content.Contains(c));
 		}
 	}
 
@@ -229,25 +230,29 @@ namespace DotnetSpider.Core.Downloader
 
 	public sealed class RedialWhenContainsContentHandler : AfterDownloadCompleteHandler
 	{
-		private readonly string _content;
+		private readonly string[] _contents;
 
-		public RedialWhenContainsContentHandler(string content)
+		public RedialWhenContainsContentHandler(params string[] contents)
 		{
-			_content = content;
+			_contents = contents;
 		}
 
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(_content) &&
-				page.Content.Contains(_content))
+			if (!string.IsNullOrEmpty(page?.Content))
 			{
-				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
+				var content = page.Content;
+				var containContent = _contents.FirstOrDefault(c => content.Contains(c));
+				if (containContent != null)
 				{
-					Logger.MyLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
-					spider.Exit();
+					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
+					{
+						Logger.MyLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
+						spider.Exit();
+					}
+					page = Spider.AddToCycleRetry(page.Request, spider.Site);
+					page.Exception = new DownloadException($"Content downloaded contains string: {containContent}.");
 				}
-				page = Spider.AddToCycleRetry(page.Request, spider.Site);
-				page.Exception = new DownloadException($"Content downloaded contains string: {_content}.");
 			}
 		}
 	}
