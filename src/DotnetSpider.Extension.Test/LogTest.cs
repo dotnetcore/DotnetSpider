@@ -24,41 +24,38 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{
-			lock (TestBase.Locker)
+			if (File.Exists(Env.GlobalAppConfigPath))
 			{
-				if (File.Exists(Env.GlobalAppConfigPath))
-				{
-					File.Delete(Env.GlobalAppConfigPath);
-				}
+				File.Delete(Env.GlobalAppConfigPath);
+			}
 
-				AppDomain.CurrentDomain.SetData("CONFIG", "");
-				AppDomain.CurrentDomain.SetData("DBCONFIG", "");
-				Env.Reload();
-				string id = Guid.NewGuid().ToString("N");
-				string taskGroup = Guid.NewGuid().ToString("N");
-				string userId = Guid.NewGuid().ToString("N");
+			AppDomain.CurrentDomain.SetData("CONFIG", "");
+			AppDomain.CurrentDomain.SetData("DBCONFIG", "");
+			Env.Reload();
+			string id = Guid.NewGuid().ToString("N");
+			string taskGroup = Guid.NewGuid().ToString("N");
+			string userId = Guid.NewGuid().ToString("N");
 
-				using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
-					id,
-					new QueueDuplicateRemovedScheduler(),
-					new TestPageProcessor()))
+			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
+				id,
+				new QueueDuplicateRemovedScheduler(),
+				new TestPageProcessor()))
+			{
+				spider.AddPipeline(new TestPipeline());
+				spider.ThreadNum = 1;
+				for (int i = 0; i < 5; i++)
 				{
-					spider.AddPipeline(new TestPipeline());
-					spider.ThreadNum = 1;
-					for (int i = 0; i < 5; i++)
-					{
-						spider.AddStartUrl("http://www.baidu.com/" + i);
-					}
-					spider.Monitor = new DbMonitor(id);
-					spider.Run();
+					spider.AddStartUrl("http://www.baidu.com/" + i);
 				}
-				Thread.Sleep(3000);
-				using (var conn = (Env.SystemConnectionStringSettings.GetDbConnection()))
-				{
-					Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM DotnetSpider.Log where Identity='{id}'").Last().message);
-					Assert.Equal(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM DotnetSpider.Status where Identity='{id}'").First().Count);
-					Assert.Equal("Finished", conn.Query<statusObj>($"SELECT * FROM DotnetSpider.Status where Identity='{id}'").First().status);
-				}
+				spider.Monitor = new DbMonitor(id);
+				spider.Run();
+			}
+			Thread.Sleep(3000);
+			using (var conn = (Env.SystemConnectionStringSettings.GetDbConnection()))
+			{
+				Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM DotnetSpider.Log where Identity='{id}'").Last().message);
+				Assert.Equal(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM DotnetSpider.Status where Identity='{id}'").First().Count);
+				Assert.Equal("Finished", conn.Query<statusObj>($"SELECT * FROM DotnetSpider.Status where Identity='{id}'").First().status);
 			}
 		}
 
@@ -67,10 +64,12 @@ namespace DotnetSpider.Extension.Test
 			public string level { get; set; }
 			public string message { get; set; }
 		}
+
 		class statusObj
 		{
 			public string status { get; set; }
 		}
+
 		internal class TestPipeline : BasePipeline
 		{
 			public override void Process(params ResultItems[] resultItems)

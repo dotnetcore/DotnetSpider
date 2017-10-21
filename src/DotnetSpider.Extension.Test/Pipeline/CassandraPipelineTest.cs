@@ -28,256 +28,244 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void Insert()
 		{
-			lock (TestBase.Locker)
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				{
-					return;
-				}
-				ClearDb();
-
-				ISpider spider = new DefaultSpider("test", new Site());
-
-				CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
-				var metadata = new EntityDefine<ProductInsert>();
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
-
-				// Common data
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				// Value is null
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
-
-				var cluster = CassandraUtils.CreateCluster(connectString);
-
-				var session = cluster.Connect();
-				session.ChangeKeyspace("test");
-				var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
-				var results = new List<ProductInsert>();
-				foreach (var row in rows)
-				{
-					results.Add(new ProductInsert
-					{
-						Sku = row.GetValue<string>("sku"),
-						Category = row.GetValue<string>("category")
-					});
-				}
-				Assert.Equal(3, results.Count);
-
-				Assert.Contains(results, r => r.Sku == "110");
-				Assert.Contains(results, r => r.Sku == "111");
-				Assert.Contains(results, r => r.Sku == "112");
-				Assert.Contains(results, r => r.Category == null);
-
-				ClearDb();
+				return;
 			}
+			ClearDb();
+
+			ISpider spider = new DefaultSpider("test", new Site());
+
+			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
+			var metadata = new EntityDefine<ProductInsert>();
+			insertPipeline.AddEntity(metadata);
+			insertPipeline.InitPipeline(spider);
+
+			// Common data
+			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
+			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			// Value is null
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+
+			var cluster = CassandraUtils.CreateCluster(connectString);
+
+			var session = cluster.Connect();
+			session.ChangeKeyspace("test");
+			var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+			var results = new List<ProductInsert>();
+			foreach (var row in rows)
+			{
+				results.Add(new ProductInsert
+				{
+					Sku = row.GetValue<string>("sku"),
+					Category = row.GetValue<string>("category")
+				});
+			}
+			Assert.Equal(3, results.Count);
+
+			Assert.Contains(results, r => r.Sku == "110");
+			Assert.Contains(results, r => r.Sku == "111");
+			Assert.Contains(results, r => r.Sku == "112");
+			Assert.Contains(results, r => r.Category == null);
+
+			ClearDb();
 		}
 
 		[Fact]
 		public void InsertAndIgnoreDuplicate()
 		{
-			lock (TestBase.Locker)
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				{
-					return;
-				}
-				ClearDb();
-
-				ISpider spider = new DefaultSpider("test", new Site());
-
-				CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
-				var metadata = new EntityDefine<ProductInsert>();
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
-
-				// Common data
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				// Value is null
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
-
-				var cluster = CassandraUtils.CreateCluster(connectString);
-
-				var session = cluster.Connect();
-				session.ChangeKeyspace("test");
-				var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
-				var results = new List<ProductInsert>();
-				foreach (var row in rows)
-				{
-					results.Add(new ProductInsert
-					{
-						Sku = row.GetValue<string>("sku"),
-						Category = row.GetValue<string>("category"),
-						Id = row.GetValue<Guid>("id")
-					});
-				}
-				insertPipeline.DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
-				var sku = results.First().Sku;
-				var data4 = new ProductInsert { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data4 });
-
-				rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
-				results = new List<ProductInsert>();
-				foreach (var row in rows)
-				{
-					results.Add(new ProductInsert
-					{
-						Sku = row.GetValue<string>("sku"),
-						Category = row.GetValue<string>("category")
-					});
-				}
-				Assert.Equal(3, results.Count);
-				Assert.DoesNotContain(results, r => r.Sku == sku);
-
-				Assert.Contains(results, r => r.Sku == "113");
-				Assert.Contains(results, r => r.Category == "asdfasf");
-
-				ClearDb();
+				return;
 			}
+			ClearDb();
+
+			ISpider spider = new DefaultSpider("test", new Site());
+
+			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
+			var metadata = new EntityDefine<ProductInsert>();
+			insertPipeline.AddEntity(metadata);
+			insertPipeline.InitPipeline(spider);
+
+			// Common data
+			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
+			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			// Value is null
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+
+			var cluster = CassandraUtils.CreateCluster(connectString);
+
+			var session = cluster.Connect();
+			session.ChangeKeyspace("test");
+			var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+			var results = new List<ProductInsert>();
+			foreach (var row in rows)
+			{
+				results.Add(new ProductInsert
+				{
+					Sku = row.GetValue<string>("sku"),
+					Category = row.GetValue<string>("category"),
+					Id = row.GetValue<Guid>("id")
+				});
+			}
+			insertPipeline.DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
+			var sku = results.First().Sku;
+			var data4 = new ProductInsert { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data4 });
+
+			rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+			results = new List<ProductInsert>();
+			foreach (var row in rows)
+			{
+				results.Add(new ProductInsert
+				{
+					Sku = row.GetValue<string>("sku"),
+					Category = row.GetValue<string>("category")
+				});
+			}
+			Assert.Equal(3, results.Count);
+			Assert.DoesNotContain(results, r => r.Sku == sku);
+
+			Assert.Contains(results, r => r.Sku == "113");
+			Assert.Contains(results, r => r.Category == "asdfasf");
+
+			ClearDb();
 		}
 
 		[Fact]
 		public void Update()
 		{
-			lock (TestBase.Locker)
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				{
-					return;
-				}
-				ClearDb();
-
-				ISpider spider = new DefaultSpider("test", new Site());
-
-				CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
-				var metadata = new EntityDefine<ProductInsert>();
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
-
-				// Common data
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				// Value is null
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
-
-				var cluster = CassandraUtils.CreateCluster(connectString);
-
-				var session = cluster.Connect();
-				session.ChangeKeyspace("test");
-				var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
-				var results = new List<ProductInsert>();
-				foreach (var row in rows)
-				{
-					results.Add(new ProductInsert
-					{
-						Sku = row.GetValue<string>("sku"),
-						Category = row.GetValue<string>("category"),
-						Id = row.GetValue<Guid>("id")
-					});
-				}
-				insertPipeline.DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
-				var sku = results.First().Sku;
-				CassandraEntityPipeline updatePipeline = new CassandraEntityPipeline(connectString);
-				var metadata2 = new EntityDefine<ProductUpdate>();
-				updatePipeline.AddEntity(metadata2);
-				updatePipeline.InitPipeline(spider);
-				var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
-
-				rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
-				results = new List<ProductInsert>();
-				foreach (var row in rows)
-				{
-					results.Add(new ProductInsert
-					{
-						Sku = row.GetValue<string>("sku"),
-						Category = row.GetValue<string>("category")
-					});
-				}
-				Assert.Equal(3, results.Count);
-				Assert.DoesNotContain(results, r => r.Sku == sku);
-
-				Assert.Contains(results, r => r.Sku == "113");
-				Assert.Contains(results, r => r.Category == "asdfasf");
-
-				ClearDb();
+				return;
 			}
+			ClearDb();
+
+			ISpider spider = new DefaultSpider("test", new Site());
+
+			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
+			var metadata = new EntityDefine<ProductInsert>();
+			insertPipeline.AddEntity(metadata);
+			insertPipeline.InitPipeline(spider);
+
+			// Common data
+			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
+			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			// Value is null
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+
+			var cluster = CassandraUtils.CreateCluster(connectString);
+
+			var session = cluster.Connect();
+			session.ChangeKeyspace("test");
+			var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+			var results = new List<ProductInsert>();
+			foreach (var row in rows)
+			{
+				results.Add(new ProductInsert
+				{
+					Sku = row.GetValue<string>("sku"),
+					Category = row.GetValue<string>("category"),
+					Id = row.GetValue<Guid>("id")
+				});
+			}
+			insertPipeline.DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
+			var sku = results.First().Sku;
+			CassandraEntityPipeline updatePipeline = new CassandraEntityPipeline(connectString);
+			var metadata2 = new EntityDefine<ProductUpdate>();
+			updatePipeline.AddEntity(metadata2);
+			updatePipeline.InitPipeline(spider);
+			var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
+
+			rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+			results = new List<ProductInsert>();
+			foreach (var row in rows)
+			{
+				results.Add(new ProductInsert
+				{
+					Sku = row.GetValue<string>("sku"),
+					Category = row.GetValue<string>("category")
+				});
+			}
+			Assert.Equal(3, results.Count);
+			Assert.DoesNotContain(results, r => r.Sku == sku);
+
+			Assert.Contains(results, r => r.Sku == "113");
+			Assert.Contains(results, r => r.Category == "asdfasf");
+
+			ClearDb();
 		}
 
 		[Fact]
 		public void UpdatePipelineUseAppConfig()
 		{
-			lock (TestBase.Locker)
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				{
-					return;
-				}
-				ClearDb();
-
-				Env.LoadConfiguration("app.cassandra.config");
-
-				ISpider spider = new DefaultSpider("test", new Site());
-
-				CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline();
-				var metadata = new EntityDefine<ProductInsert>();
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
-
-				// Common data
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				// Value is null
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
-
-				var cluster = CassandraUtils.CreateCluster(connectString);
-
-				var session = cluster.Connect();
-				session.ChangeKeyspace("test");
-				var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
-				var results = new List<ProductInsert>();
-				foreach (var row in rows)
-				{
-					results.Add(new ProductInsert
-					{
-						Sku = row.GetValue<string>("sku"),
-						Category = row.GetValue<string>("category"),
-						Id = row.GetValue<Guid>("id")
-					});
-				}
-				insertPipeline.DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
-				var sku = results.First().Sku;
-				CassandraEntityPipeline updatePipeline = new CassandraEntityPipeline();
-				var metadata2 = new EntityDefine<ProductUpdate>();
-				updatePipeline.AddEntity(metadata2);
-				updatePipeline.InitPipeline(spider);
-				var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
-
-				rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
-				results = new List<ProductInsert>();
-				foreach (var row in rows)
-				{
-					results.Add(new ProductInsert
-					{
-						Sku = row.GetValue<string>("sku"),
-						Category = row.GetValue<string>("category")
-					});
-				}
-				Assert.Equal(3, results.Count);
-				Assert.DoesNotContain(results, r => r.Sku == sku);
-
-				Assert.Contains(results, r => r.Sku == "113");
-				Assert.Contains(results, r => r.Category == "asdfasf");
-				Env.LoadConfiguration("asdfasdf");
-				ClearDb();
+				return;
 			}
+			ClearDb();
+
+			Env.LoadConfiguration("app.cassandra.config");
+
+			ISpider spider = new DefaultSpider("test", new Site());
+
+			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline();
+			var metadata = new EntityDefine<ProductInsert>();
+			insertPipeline.AddEntity(metadata);
+			insertPipeline.InitPipeline(spider);
+
+			// Common data
+			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
+			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			// Value is null
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+
+			var cluster = CassandraUtils.CreateCluster(connectString);
+
+			var session = cluster.Connect();
+			session.ChangeKeyspace("test");
+			var rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+			var results = new List<ProductInsert>();
+			foreach (var row in rows)
+			{
+				results.Add(new ProductInsert
+				{
+					Sku = row.GetValue<string>("sku"),
+					Category = row.GetValue<string>("category"),
+					Id = row.GetValue<Guid>("id")
+				});
+			}
+			insertPipeline.DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
+			var sku = results.First().Sku;
+			CassandraEntityPipeline updatePipeline = new CassandraEntityPipeline();
+			var metadata2 = new EntityDefine<ProductUpdate>();
+			updatePipeline.AddEntity(metadata2);
+			updatePipeline.InitPipeline(spider);
+			var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
+
+			rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+			results = new List<ProductInsert>();
+			foreach (var row in rows)
+			{
+				results.Add(new ProductInsert
+				{
+					Sku = row.GetValue<string>("sku"),
+					Category = row.GetValue<string>("category")
+				});
+			}
+			Assert.Equal(3, results.Count);
+			Assert.DoesNotContain(results, r => r.Sku == sku);
+
+			Assert.Contains(results, r => r.Sku == "113");
+			Assert.Contains(results, r => r.Category == "asdfasf");
+			Env.LoadConfiguration("asdfasdf");
+			ClearDb();
 		}
 
 
