@@ -154,16 +154,13 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void EntitySpiderWithDefaultPipeline()
 		{
-			lock (TestBase.Locker)
+			var guid = Guid.NewGuid().ToString();
+			BaiduSearchSpider spider = new BaiduSearchSpider(guid);
+			spider.Run();
+			using (var conn = Env.DataConnectionStringSettings.GetDbConnection())
 			{
-				var guid = Guid.NewGuid().ToString();
-				BaiduSearchSpider spider = new BaiduSearchSpider(guid);
-				spider.Run();
-				using (var conn = Env.DataConnectionStringSettings.GetDbConnection())
-				{
-					var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{guid}'");
-					Assert.Equal(20, count);
-				}
+				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{guid}'");
+				Assert.Equal(20, count);
 			}
 		}
 
