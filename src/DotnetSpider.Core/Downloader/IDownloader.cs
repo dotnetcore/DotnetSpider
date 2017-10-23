@@ -2,6 +2,8 @@ namespace DotnetSpider.Core.Downloader
 {
 	public interface IDownloader : System.IDisposable
 	{
+		IDownloader Clone(ISpider spider);
+
 		/// <summary>
 		/// Downloads web pages and store in Page object.
 		/// </summary>

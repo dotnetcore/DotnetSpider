@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -28,6 +29,11 @@ namespace DotnetSpider.Core.Downloader
 		protected BaseDownloader()
 		{
 			_downloadFolder = Path.Combine(Env.BaseDirectory, "download");
+		}
+
+		public virtual IDownloader Clone(ISpider spider)
+		{
+			return (IDownloader)MemberwiseClone();
 		}
 
 		public Page Download(Request request, ISpider spider)
@@ -64,7 +70,7 @@ namespace DotnetSpider.Core.Downloader
 
 		protected abstract Page DowloadContent(Request request, ISpider spider);
 
-		protected Page SaveFile(Request request, HttpWebResponse response, ISpider spider)
+		protected Page SaveFile(Request request, HttpResponseMessage response, ISpider spider)
 		{
 			var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Env.PathSeperator);
 			string filePath = $"{_downloadFolder}{Env.PathSeperator}{spider.Identity}{intervalPath}";
@@ -81,7 +87,7 @@ namespace DotnetSpider.Core.Downloader
 						}
 					}
 
-					File.WriteAllBytes(filePath, response.GetResponseStream().StreamToBytes());
+					File.WriteAllBytes(filePath, response.Content.ReadAsByteArrayAsync().Result);
 				}
 				catch (Exception e)
 				{

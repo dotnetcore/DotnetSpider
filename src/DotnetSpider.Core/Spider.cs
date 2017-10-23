@@ -637,54 +637,56 @@ namespace DotnetSpider.Core
 				{
 					int waitCount = 0;
 					//bool firstTask = true;
-
-					while (Stat == Status.Running)
+					using (var downloader = Downloader.Clone(this))
 					{
-						Request request = Scheduler.Poll();
-
-						if (request == null)
+						while (Stat == Status.Running)
 						{
-							if (waitCount > _waitCountLimit && ExitWhenComplete)
-							{
-								Stat = Status.Finished;
-								_realStat = Status.Finished;
-								_OnComplete();
-								OnComplete?.Invoke(this);
-								break;
-							}
+							Request request = Scheduler.Poll();
 
-							// wait until new url added
-							WaitNewUrl(ref waitCount);
-						}
-						else
-						{
-							waitCount = 0;
-
-							try
+							if (request == null)
 							{
-								Stopwatch sw = new Stopwatch();
-								HandleRequest(sw, request, Downloader);
-								Thread.Sleep(Site.SleepTime);
-							}
-							catch (Exception e)
-							{
-								OnError(request);
-								Logger.MyLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
-							}
-							finally
-							{
-								if (request.Proxy != null)
+								if (waitCount > _waitCountLimit && ExitWhenComplete)
 								{
-									var statusCode = request.StatusCode;
-									Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
+									Stat = Status.Finished;
+									_realStat = Status.Finished;
+									_OnComplete();
+									OnComplete?.Invoke(this);
+									break;
 								}
-							}
 
-							//if (firstTask)
-							//{
-							//	Thread.Sleep(3000);
-							//	firstTask = false;
-							//}
+								// wait until new url added
+								WaitNewUrl(ref waitCount);
+							}
+							else
+							{
+								waitCount = 0;
+
+								try
+								{
+									Stopwatch sw = new Stopwatch();
+									HandleRequest(sw, request, downloader);
+									Thread.Sleep(Site.SleepTime);
+								}
+								catch (Exception e)
+								{
+									OnError(request);
+									Logger.MyLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
+								}
+								finally
+								{
+									if (request.Proxy != null)
+									{
+										var statusCode = request.StatusCode;
+										Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
+									}
+								}
+
+								//if (firstTask)
+								//{
+								//	Thread.Sleep(3000);
+								//	firstTask = false;
+								//}
+							}
 						}
 					}
 				});
