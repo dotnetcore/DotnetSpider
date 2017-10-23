@@ -1,9 +1,11 @@
 ﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using System;
+using System.IO;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
@@ -78,7 +80,33 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
-			BaseUsage.CustmizeProcessorAndPipeline();
+			Site site = new Site();
+			site.DownloadFiles = true;
+			site.Headers = new System.Collections.Generic.Dictionary<string, string>
+			{
+				{ "Cache-Control","no-cache" },
+				{ "Pragma","no-cache" },
+				{ "Accept","image/webp,image/apng,image/*,*/*;q=0.8" },
+				{ "Accept-Encoding", "gzip, deflate, br" },
+				{ "Accept-Language", "zh-CN,zh;q=0.8" }
+			};
+			var spider = new DefaultSpider("test", site);
+			var request = new Request("https://cdn.dongmanmanhua.cn/15083718553482243295.jpg?x-oss-process=image/quality,q_90");
+			request.Referer = "https://www.dongmanmanhua.cn/fantasy/the-god-of-high-school/%E7%AC%AC6%E9%83%A8-re%E4%B8%8E%E7%A5%9E%E7%9A%84%E8%BE%83%E9%87%8F-%E7%AC%AC326%E8%AF%9D/viewer?title_no=224&episode_no=329";
+			var downloader = new HttpClientDownloader();
+
+			int downloadCount = 0;
+			var filePath = Path.Combine(AppContext.BaseDirectory, @"download\test\15083718553482243295.jpg");
+			for (int i = 0; i < 10; ++i)
+			{
+				downloader.Download(request, spider);
+				if (File.Exists(filePath))
+				{
+					File.Delete(filePath);
+					downloadCount++;
+				}
+			}
+			Console.WriteLine($"Download picture success: {downloadCount}");
 		}
 	}
 

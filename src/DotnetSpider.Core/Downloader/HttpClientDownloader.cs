@@ -104,11 +104,11 @@ namespace DotnetSpider.Core.Downloader
 				else
 				{
 					page = HandleResponse(request, response, site);
-				}
 
-				if (string.IsNullOrEmpty(page.Content))
-				{
-					Logger.MyLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
+					if (string.IsNullOrEmpty(page.Content))
+					{
+						Logger.MyLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
+					}
 				}
 
 				page.TargetUrl = response.RequestMessage.RequestUri.AbsoluteUri;
