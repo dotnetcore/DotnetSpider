@@ -44,12 +44,13 @@ namespace DotnetSpider.Core.Downloader
 			var downloader = (HttpClientDownloader)MemberwiseClone();
 			if (spider.Site.HttpProxyPool == null)
 			{
-				_httpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler
+				_httpClient = new HttpClient(new HttpClientHandler
 				{
+					AllowAutoRedirect = true,
 					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
 					UseProxy = true,
 					UseCookies = false
-				}));
+				});
 			}
 			return downloader;
 		}
