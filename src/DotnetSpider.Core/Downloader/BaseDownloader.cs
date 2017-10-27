@@ -31,11 +31,6 @@ namespace DotnetSpider.Core.Downloader
 			_downloadFolder = Path.Combine(Env.BaseDirectory, "download");
 		}
 
-		public virtual IDownloader Clone(ISpider spider)
-		{
-			return (IDownloader)MemberwiseClone();
-		}
-
 		public Page Download(Request request, ISpider spider)
 		{
 			if (spider.Site == null)

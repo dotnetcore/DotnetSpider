@@ -193,7 +193,8 @@ namespace DotnetSpider.Core.Selector
 					bool isMatch = false;
 					foreach (var domain in domains)
 					{
-						if (System.Text.RegularExpressions.Regex.IsMatch(node.Attributes["href"].Value, domain))
+						var href = node.Attributes["href"]?.Value;
+						if (!string.IsNullOrEmpty(href) && System.Text.RegularExpressions.Regex.IsMatch(href, domain))
 						{
 							isMatch = true;
 							break;

@@ -35,24 +35,24 @@ namespace DotnetSpider.Core.Downloader
 			"application/x-www-form-urlencoded"
 		};
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
-		private HttpClient _httpClient;
+		private readonly HttpClient _httpClient;
 
 		public bool DecodeHtml { get; set; }
 
-		public override IDownloader Clone(ISpider spider)
+		public HttpClientDownloader()
 		{
-			var downloader = (HttpClientDownloader)MemberwiseClone();
-			if (spider.Site.HttpProxyPool == null)
+			_httpClient = new HttpClient(new HttpClientHandler
 			{
-				_httpClient = new HttpClient(new HttpClientHandler
-				{
-					AllowAutoRedirect = true,
-					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-					UseProxy = true,
-					UseCookies = false
-				});
-			}
-			return downloader;
+				AllowAutoRedirect = true,
+				AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+				UseProxy = true,
+				UseCookies = false
+			});
+		}
+
+		public HttpClientDownloader(int timeout) : this()
+		{
+			_httpClient.Timeout = new TimeSpan(0, 0, timeout);
 		}
 
 		protected override Page DowloadContent(Request request, ISpider spider)
@@ -67,20 +67,10 @@ namespace DotnetSpider.Core.Downloader
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 
-				response = NetworkCenter.Current.Execute("http", message =>
-				{
-					HttpClient httpClient = _httpClient ?? _httpClientPool.GetHttpClient(proxy);
-					var requestTask = httpClient.SendAsync(message);
-					requestTask.Wait(site.Timeout);
-					if (requestTask.Status == TaskStatus.RanToCompletion)
-					{
-						return requestTask.Result;
-					}
-					else
-					{
-						return new HttpResponseMessage(HttpStatusCode.RequestTimeout);
-					}
-				}, httpMessage);
+				HttpClient httpClient = null == spider.Site.HttpProxyPool ? _httpClient : _httpClientPool.GetHttpClient(proxy);
+
+				response = NetworkCenter.Current.Execute("http", () => httpClient.SendAsync(httpMessage).Result);
+
 				request.StatusCode = response.StatusCode;
 				response.EnsureSuccessStatusCode();
 

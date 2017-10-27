@@ -17,9 +17,9 @@ namespace DotnetSpider.Core
 
 	public sealed class CycleStartUrlBuilder : StartUrlBuilder
 	{
-		public int Min { get; }
+		public int From { get; }
 
-		public int Max { get; }
+		public int To { get; }
 
 		public int Interval { get; }
 
@@ -29,8 +29,8 @@ namespace DotnetSpider.Core
 
 		public CycleStartUrlBuilder(int min, int max, int interval, string prefix, string postfix)
 		{
-			Min = min;
-			Max = max;
+			From = min;
+			To = max;
 			Interval = interval;
 			Prefix = prefix;
 			Postfix = postfix;
@@ -38,7 +38,7 @@ namespace DotnetSpider.Core
 
 		public override void Build(Site site)
 		{
-			for (int i = Min; i <= Max; i += Interval)
+			for (int i = From; i <= To; i += Interval)
 			{
 				var request = new Request($"{Prefix}{i}{Postfix}");
 				site.AddStartRequest(request);
@@ -48,11 +48,11 @@ namespace DotnetSpider.Core
 
 	public sealed class CycleDateStartUrlBuilder : StartUrlBuilder
 	{
-		public DateTime Min { get; }
+		public DateTime From { get; }
 
-		public DateTime Max { get; }
+		public DateTime To { get; }
 
-		public int IntervalDay { get; }
+		public int Interval { get; }
 
 		public string DateFormateString { get; }
 
@@ -60,12 +60,11 @@ namespace DotnetSpider.Core
 
 		public string Postfix { get; }
 
-
-		public CycleDateStartUrlBuilder(DateTime min, DateTime max, int interval, string prefix, string postfix, string dateFormateString = "yyyy-MM-dd")
+		public CycleDateStartUrlBuilder(DateTime from, DateTime to, int interval, string prefix, string postfix, string dateFormateString = "yyyy-MM-dd")
 		{
-			Min = min;
-			Max = max;
-			IntervalDay = interval;
+			From = from;
+			To = to;
+			Interval = interval;
 			Prefix = prefix;
 			Postfix = postfix;
 			DateFormateString = dateFormateString;
@@ -73,7 +72,7 @@ namespace DotnetSpider.Core
 
 		public override void Build(Site site)
 		{
-			for (var i = Min; i <= Max; i = i.AddDays(IntervalDay))
+			for (var i = From; i <= To; i = i.AddDays(Interval))
 			{
 				var date = i.ToString(DateFormateString);
 				var request = new Request($"{Prefix}{date}{Postfix}");
