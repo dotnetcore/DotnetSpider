@@ -31,7 +31,7 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Dapper" Version="1.50.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
-    <PackageReference Include="MySql.Data" Version="8.0.8-dmr" />
+    <PackageReference Include="MySql.Data" Version="6.10.4" />
     <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
     <PackageReference Include="SSH.NET" Version="2016.1.0" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
@@ -68,6 +68,6 @@
   <ItemGroup>
     <PackageReference Include="CassandraCSharpDriver" Version="3.3.2" />
     <PackageReference Include="Npgsql" Version="3.2.5" />
-    <PackageReference Include="MailKit" Version="1.18.1.1" />
+    <PackageReference Include="MailKit" Version="1.20.0" />
   </ItemGroup>
 </Project>

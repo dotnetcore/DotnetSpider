@@ -15,9 +15,9 @@
       <group targetFramework=".NETStandard2.0">
         <dependency id="DotnetSpider2.Core" version="2.2.5" />
         <dependency id="Dapper" version="1.50.2"/>
-        <dependency id="MailKit" version="1.18.1.1"/>
+        <dependency id="MailKit" version="1.20.0"/>
         <dependency id="MongoDB.Driver" version="2.4.4"/>
-        <dependency id="MySql.Data" version="8.0.8-dmr"/>
+        <dependency id="MySql.Data" version="6.10.4"/>
         <dependency id="StackExchange.Redis" version="1.2.6" />
         <dependency id="SSH.NET" version="2016.1.0" />
         <dependency id="System.Runtime.Extensions" version="4.3.0"/>
@@ -30,7 +30,7 @@
       <group targetFramework=".NETFramework4.5" >
         <dependency id="DotnetSpider2.Core" version="2.2.5" />
         <dependency id="Dapper" version="1.50.2"/>
-        <dependency id="MailKit" version="1.18.1.1"/>
+        <dependency id="MailKit" version="1.20.0"/>
         <dependency id="MongoDB.Driver" version="2.4.4"/>
         <dependency id="MySql.Data" version="6.9.9"/>
         <dependency id="StackExchange.Redis" version="1.2.6" />
