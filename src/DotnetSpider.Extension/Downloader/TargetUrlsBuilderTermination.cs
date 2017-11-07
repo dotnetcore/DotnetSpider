@@ -33,36 +33,35 @@ namespace DotnetSpider.Extension.Downloader
 
 		private string GetSelectorValue(Page page, BaseSelector selector)
 		{
-			string totalStr = string.Empty;
+			string result = string.Empty;
 			if (selector.Type == SelectorType.Enviroment)
 			{
-				if (SelectorUtils.Parse(TotalPageSelector) is EnviromentSelector enviromentSelector)
+				if (SelectorUtils.Parse(selector) is EnviromentSelector enviromentSelector)
 				{
-					totalStr = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, 0)?.ToString();
+					result = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, 0)?.ToString();
 				}
 			}
 			else
 			{
-				totalStr = page.Selectable.Select(SelectorUtils.Parse(TotalPageSelector)).GetValue();
+				result = page.Selectable.Select(SelectorUtils.Parse(selector)).GetValue();
 			}
 
-			if (!string.IsNullOrEmpty(totalStr) && TotalPageFormatters != null)
+			if (!string.IsNullOrEmpty(result) && TotalPageFormatters != null)
 			{
 				foreach (var formatter in TotalPageFormatters)
 				{
-					totalStr = formatter.Formate(totalStr)?.ToString();
+					result = formatter.Formate(result)?.ToString();
 				}
 			}
 
-			if (string.IsNullOrEmpty(totalStr))
+			if (string.IsNullOrEmpty(result))
 			{
 				throw new SpiderException("The result of total selector is null.");
 			}
 			else
 			{
-				return totalStr;
+				return result;
 			}
 		}
 	}
-
 }

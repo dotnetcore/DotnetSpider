@@ -29,7 +29,7 @@
       </group>
       <group targetFramework=".NETFramework4.5" >
         <dependency id="DotnetSpider2.Core" version="2.2.5" />
-        <dependency id="Dapper" version="1.50.2"/>
+        <dependency id="Dapper" version="1.50.2"/> 
         <dependency id="MailKit" version="1.20.0"/>
         <dependency id="MongoDB.Driver" version="2.4.4"/>
         <dependency id="MySql.Data" version="6.9.9"/>
