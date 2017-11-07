@@ -22,17 +22,15 @@ namespace DotnetSpider.Core
 		public const string EmailAccountKey = "emailAccount";
 		public const string EmailPasswordKey = "emailPassword";
 		public const string EmailDisplayNameKey = "emailDisplayName";
+		public const string HttpLogCenterKey = "httpLogCenter";
+		public const string HttpLogCenterTokenKey = "httpLogCenterToken";
 		public const string SystemConnectionStringKey = "SystemConnection";
 		public const string DataConnectionStringKey = "DataConnection";
 		public static readonly string[] IdColumns = new[] { "Id", "__Id" };
-		public const string EnvLocation = "LOCATION";
-		public const string EnvConfig = "CONFIG";
-		public const string EnvDbConfig = "DBCONFIG";
 		public const string CDateColumn = "CDate";
 
 		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
-
 		public static string HostName { get; set; }
 		public static string Ip { get; set; }
 		public static string RedisConnectString { get; private set; }
@@ -43,15 +41,13 @@ namespace DotnetSpider.Core
 		public static string EmailDisplayName { get; private set; }
 		public static bool SaveLogAndStatusToDb => SystemConnectionStringSettings != null;
 		public static string GlobalDirectory { get; private set; }
+		internal static string DefaultGlobalAppConfigPath { get; private set; }
 		public static string BaseDirectory { get; private set; }
 		public static string PathSeperator { get; private set; }
-
+		public static string HttpLogCenter { get; private set; }
+		public static string HttpLogCenterToken { get; private set; }
 		public static string SystemConnectionString => SystemConnectionStringSettings?.ConnectionString;
 		public static string DataConnectionString => DataConnectionStringSettings?.ConnectionString;
-
-		public static string GlobalAppConfigPath;
-
-		public static Configuration GlobalConfiguraiton;
 
 		public static string GetAppSettings(string key)
 		{
@@ -63,9 +59,25 @@ namespace DotnetSpider.Core
 			return ConfigurationManager.ConnectionStrings[key];
 		}
 
-		public static void LoadConfiguration(string filePath)
+		public static void LoadConfiguration(string path)
 		{
-			var path = File.Exists(filePath) ? filePath : Path.Combine(BaseDirectory, "app.config");
+			var globalStr = "%global%";
+
+			if (path.ToLower().StartsWith(globalStr))
+			{
+				var fileName = path.Substring(8, path.Length - 8);
+				path = string.IsNullOrEmpty(fileName) ? Path.Combine(GlobalDirectory, "app.config") : Path.Combine(GlobalDirectory, fileName);
+			}
+
+			if (string.IsNullOrEmpty(path))
+			{
+				path = Path.Combine(BaseDirectory, "app.config");
+			}
+			if (!File.Exists(path))
+			{
+				throw new SpiderException($"Configuration file {path} unfound.");
+			}
+
 			var fileMap = new ExeConfigurationFileMap
 			{
 				ExeConfigFilename = path
@@ -79,36 +91,10 @@ namespace DotnetSpider.Core
 			EmailAccount = configuration.AppSettings.Settings[EmailAccountKey]?.Value?.Trim();
 			EmailPassword = configuration.AppSettings.Settings[EmailPasswordKey]?.Value?.Trim();
 			EmailDisplayName = configuration.AppSettings.Settings[EmailDisplayNameKey]?.Value?.Trim();
-
-			if ("GLOBAL" == AppDomain.CurrentDomain.GetData(EnvDbConfig)?.ToString().ToUpper())
-			{
-				if (File.Exists(GlobalAppConfigPath))
-				{
-					var globalFileMap = new ExeConfigurationFileMap
-					{
-						ExeConfigFilename = GlobalAppConfigPath
-					};
-
-					GlobalConfiguraiton =
-						ConfigurationManager.OpenMappedExeConfiguration(globalFileMap, ConfigurationUserLevel.None);
-
-					SystemConnectionStringSettings =
-						GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
-					DataConnectionStringSettings =
-						GlobalConfiguraiton.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
-				}
-				else
-				{
-					throw new SpiderException("Global app.config unfound.");
-				}
-			}
-			else
-			{
-				SystemConnectionStringSettings =
-					configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
-				DataConnectionStringSettings =
-					configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
-			}
+			HttpLogCenter = configuration.AppSettings.Settings[HttpLogCenterKey]?.Value?.Trim();
+			HttpLogCenterToken = configuration.AppSettings.Settings[HttpLogCenterTokenKey]?.Value?.Trim();
+			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
+			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 		}
 
 		static Env()
@@ -127,25 +113,19 @@ namespace DotnetSpider.Core
 #endif
 
 			GlobalDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dotnetspider");
-
+			DefaultGlobalAppConfigPath = Path.Combine(GlobalDirectory, "app.config");
 			DirectoryInfo di = new DirectoryInfo(GlobalDirectory);
 			if (!di.Exists)
 			{
 				di.Create();
 			}
 
-			GlobalAppConfigPath = Path.Combine(GlobalDirectory, "app.config");
-
 			HostName = Dns.GetHostName();
 			var addresses = Dns.GetHostAddresses(HostName);
 			Ip = addresses.FirstOrDefault(i => i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
 				?.ToString();
 
-			var appConfigName = AppDomain.CurrentDomain.GetData(EnvConfig)?.ToString();
-
-			var path = string.IsNullOrEmpty(appConfigName)
-				? Path.Combine(BaseDirectory, "app.config")
-				: Path.Combine(BaseDirectory, appConfigName);
+			var path = Path.Combine(BaseDirectory, "app.config");
 
 			LoadConfiguration(path);
 		}

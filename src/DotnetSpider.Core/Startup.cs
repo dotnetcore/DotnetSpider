@@ -45,7 +45,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			SetEnviroment(arguments);
+			LoadConfiguration(arguments);
 
 			var spiderName = arguments["-s"];
 
@@ -75,21 +75,11 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public static void SetEnviroment(Dictionary<string, string> arguments)
+		public static void LoadConfiguration(Dictionary<string, string> arguments)
 		{
-			if (arguments.ContainsKey("-e"))
+			if (arguments.ContainsKey("-c"))
 			{
-				var valuePairs = arguments["-e"].Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-				foreach (var pair in valuePairs)
-				{
-					var datas = pair.Split(new [] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-					if (datas.Length == 2)
-					{
-						AppDomain.CurrentDomain.SetData(datas[0], datas[1]);
-					}
-				}
-
-				Env.Reload();
+				Env.LoadConfiguration(arguments["-c"]);
 			}
 		}
 

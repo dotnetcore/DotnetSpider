@@ -4,14 +4,22 @@ using NLog;
 using NLog.Config;
 using NLog.Targets;
 using System;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Core.Infrastructure
 {
 	public static class LogCenter
 	{
+		private static bool _submitHttpLog;
+		private static readonly HttpClient _httpClient = new HttpClient();
+
 		static LogCenter()
 		{
 			InitLogCenter();
+			_submitHttpLog = !string.IsNullOrEmpty(Env.HttpLogCenter);
 		}
 
 		public static ILogger GetLogger()
@@ -77,11 +85,45 @@ namespace DotnetSpider.Core.Infrastructure
 			theEvent.Properties["Identity"] = identity;
 			theEvent.Properties["Node"] = NodeId.Id;
 			logger.Log(theEvent);
+
+			SubmitHttpLog(identity, message, level, e);
 		}
 
 		public static void MyLog(this ILogger logger, string message, LogLevel level, Exception e = null)
 		{
 			MyLog(logger, "System", message, level, e);
+		}
+
+		private static void SubmitHttpLog(string identity, string message, LogLevel level, Exception e = null)
+		{
+			if (_submitHttpLog)
+			{
+				var json = JsonConvert.SerializeObject(new
+				{
+					Token = Env.HttpLogCenterToken,
+					Identity = identity,
+					LogInfo = new
+					{
+						Identity = identity,
+						Node = NodeId.Id,
+						Logged = DateTime.UtcNow,
+						Level = level.ToString(),
+						Message = message,
+						Exception = e?.ToString(),
+					}
+				});
+				var content = new StringContent(json, Encoding.UTF8, "application/json");
+				try
+				{
+					NetworkCenter.Current.Execute("log", () =>
+					{
+						_httpClient.PostAsync(Env.HttpLogCenter, content).Wait();
+					});
+				}
+				catch
+				{
+				}
+			}
 		}
 	}
 }

@@ -6,8 +6,6 @@
 		{
 			EnvironmentTest test = new EnvironmentTest();
 			test.DefaultConfig();
-			test.InsideConfig();
-			test.OutsideConfig();
 		}
 	}
 }

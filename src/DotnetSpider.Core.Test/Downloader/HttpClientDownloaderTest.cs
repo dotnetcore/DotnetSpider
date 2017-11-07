@@ -127,7 +127,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			};
 			var downloader = new HttpClientDownloader();
 			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site));
-			Assert.EndsWith("www.jd.com/?d", page.TargetUrl);
+			Assert.EndsWith("https://www.jd.com/2017?t=", page.TargetUrl);
 		}
 	}
 }

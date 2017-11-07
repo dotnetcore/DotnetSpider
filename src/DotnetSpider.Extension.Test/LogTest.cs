@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -24,23 +25,6 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{
-			while (true)
-			{
-				if (File.Exists(Env.GlobalAppConfigPath))
-				{
-					try
-					{
-						File.Delete(Env.GlobalAppConfigPath);
-						break;
-					}
-					catch
-					{
-					}
-				}
-			}
-
-			AppDomain.CurrentDomain.SetData("CONFIG", "");
-			AppDomain.CurrentDomain.SetData("DBCONFIG", "");
 			Env.Reload();
 			string id = Guid.NewGuid().ToString("N");
 			string taskGroup = Guid.NewGuid().ToString("N");
