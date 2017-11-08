@@ -25,6 +25,8 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public bool LoadFlashPlayer { get; set; } = true;
 
+		public bool Headless { get; set; }
+
 		public string Proxy
 		{
 			get => _proxy;
@@ -130,6 +132,10 @@ namespace DotnetSpider.Extension.Infrastructure
 					if (!string.IsNullOrEmpty(option.Proxy))
 					{
 						opt.Proxy = new Proxy() { HttpProxy = option.Proxy };
+					}
+					if (option.Headless)
+					{
+						opt.AddArgument("--headless");
 					}
 					e = new ChromeDriver(cds, opt);
 					break;

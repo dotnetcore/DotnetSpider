@@ -26,11 +26,12 @@ namespace DotnetSpider.Extension.Downloader
 
 		public LoginHandler Login { get; set; }
 
-		public WebDriverDownloader(Browser browser, int webDriverWaitTime = 200, Option option = null)
+		public WebDriverDownloader(Browser browser, int webDriverWaitTime = 200, LoginHandler loginHandler = null, Option option = null)
 		{
 			_webDriverWaitTime = webDriverWaitTime;
 			_browser = browser;
 			_option = option ?? new Option();
+			Login = loginHandler;
 
 			if (browser == Browser.Firefox && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
@@ -49,13 +50,17 @@ namespace DotnetSpider.Extension.Downloader
 			}
 		}
 
-		public WebDriverDownloader(Browser browser) : this(browser, 300)
+
+		public WebDriverDownloader(Browser browser, LoginHandler loginHandler) : this(browser, 200, loginHandler, null)
 		{
 		}
 
-		public WebDriverDownloader(Browser browser, LoginHandler loginHandler) : this(browser, 200)
+		public WebDriverDownloader(Browser browser) : this(browser, 200, null, null)
 		{
-			Login = loginHandler;
+		}
+
+		public WebDriverDownloader(Browser browser, Option option = null) : this(browser, 200, null, option)
+		{
 		}
 
 		public override void Dispose()

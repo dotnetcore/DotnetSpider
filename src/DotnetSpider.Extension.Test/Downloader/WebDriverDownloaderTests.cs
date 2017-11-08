@@ -1,5 +1,7 @@
-﻿using DotnetSpider.Core.Selector;
+﻿using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader;
+using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
@@ -22,6 +24,37 @@ namespace DotnetSpider.Extension.Test.Downloader
 			}
 			BaiduSearchSpider spider = new BaiduSearchSpider();
 			spider.Run();
+		}
+
+
+		[Fact]
+		public void ChromeHeadlessDownloader()
+		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return;
+			}
+			BaiduSearchHeadlessSpider spider = new BaiduSearchHeadlessSpider();
+			spider.Run();
+		}
+
+		public class BaiduSearchHeadlessSpider : EntitySpider
+		{
+			public BaiduSearchHeadlessSpider() : base("BaiduSearchTest2")
+			{
+			}
+
+			protected override void MyInit(params string[] arguments)
+			{
+				Identity = "hello";
+				var word = "可乐|雪碧";
+				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+				Downloader = new WebDriverDownloader(Browser.Chrome, new Option
+				{
+					Headless = true
+				});
+				AddEntityType<BaiduSearchEntry>();
+			}
 		}
 
 		public class BaiduSearchSpider : EntitySpider
