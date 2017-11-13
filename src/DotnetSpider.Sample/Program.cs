@@ -28,7 +28,7 @@ namespace DotnetSpider.Sample
 #endif
 			MyTest();
 
-			Startup.Run("-s:BaiduSearchSpider", "-tid:BaiduSearchSpider", "-i:guid");
+			Startup.Run("-s:BaiduSearchSpider", "-tid:1", "-i:guid");
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 

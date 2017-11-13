@@ -3,7 +3,11 @@ using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
 {
-	public abstract class AppBase : INamed, IRunable, IIdentity, ITask
+	public interface IAppBase : INamed, IRunable, IIdentity, ITask
+	{
+	}
+
+	public abstract class AppBase : IAppBase
 	{
 		public string Identity { get; set; }
 

@@ -7,7 +7,7 @@ namespace DotnetSpider.Core.Monitor
 	{
 		private static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public string Identity { get; set; }
+		public IAppBase App { get; set; }
 
 		public void Dispose()
 		{
@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Monitor
 		{
 			string msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
 			LogEventInfo theEvent = new LogEventInfo(LogLevel.Trace, "", msg);
-			theEvent.Properties["Identity"] = Identity;
+			theEvent.Properties["Identity"] = App.Identity;
 			theEvent.Properties["Node"] = NodeId.Id;
 			Logger.Log(theEvent);
 		}

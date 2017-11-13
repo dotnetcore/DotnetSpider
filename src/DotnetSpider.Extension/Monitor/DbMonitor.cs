@@ -5,6 +5,7 @@ using System;
 using DotnetSpider.Core.Infrastructure.Database;
 using System.Data;
 using MySql.Data.MySqlClient;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Monitor
 {
@@ -14,9 +15,9 @@ namespace DotnetSpider.Extension.Monitor
 
 		private readonly bool _isDbOnly;
 
-		public DbMonitor(string identity, bool isDbOnly = false)
+		public DbMonitor(IAppBase app, bool isDbOnly = false)
 		{
-			Identity = identity;
+			App = app;
 
 			_isDbOnly = isDbOnly;
 
@@ -26,12 +27,13 @@ namespace DotnetSpider.Extension.Monitor
 				{
 					InitStatusDatabase(conn);
 
-					var insertSql = "insert ignore into DotnetSpider.Status (`Identity`, `Node`, `Logged`, `Status`, `Thread`, `Left`, `Success`, `Error`, `Total`, `AvgDownloadSpeed`, `AvgProcessorSpeed`, `AvgPipelineSpeed`) values (@Identity, @Node, current_timestamp, @Status, @Thread, @Left, @Success, @Error, @Total, @AvgDownloadSpeed, @AvgProcessorSpeed, @AvgPipelineSpeed);";
+					var insertSql = "insert ignore into DotnetSpider.Status (`TaskId`,`Identity`, `NodeId`, `Logged`, `Status`, `Thread`, `Left`, `Success`, `Error`, `Total`, `AvgDownloadSpeed`, `AvgProcessorSpeed`, `AvgPipelineSpeed`) values (@TaskId,@Identity, @NodeId, current_timestamp, @Status, @Thread, @Left, @Success, @Error, @Total, @AvgDownloadSpeed, @AvgProcessorSpeed, @AvgPipelineSpeed);";
 					conn.MyExecute(insertSql,
 						new
 						{
-							Identity,
-							Node = NodeId.Id,
+							TaskId = App.TaskId,
+							Identity = App.Identity,
+							NodeId = NodeId.Id,
 							Status = "INIT",
 							Left = 0,
 							Total = 0,
@@ -60,7 +62,7 @@ namespace DotnetSpider.Extension.Monitor
 			{
 				conn.MyExecute("CREATE DATABASE IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8;");
 
-				var sql = "CREATE TABLE IF NOT EXISTS `DotnetSpider`.`Status` (`Identity` varchar(120) NOT NULL,`Node` varchar(120) NOT NULL,`Logged` timestamp NULL DEFAULT current_timestamp,`Status` varchar(20) DEFAULT NULL,`Thread` int(13),`Left` bigint(20),`Success` bigint(20),`Error` bigint(20),`Total` bigint(20),`AvgDownloadSpeed` float,`AvgProcessorSpeed` bigint(20),`AvgPipelineSpeed` bigint(20), PRIMARY KEY (`Identity`,`Node`))";
+				var sql = "CREATE TABLE IF NOT EXISTS `DotnetSpider`.`Status` (`TaskId` varchar(32), `Identity` varchar(120) NOT NULL,`NodeId` varchar(120) NOT NULL,`Logged` timestamp NULL DEFAULT current_timestamp,`Status` varchar(20) DEFAULT NULL,`Thread` int(13),`Left` bigint(20),`Success` bigint(20),`Error` bigint(20),`Total` bigint(20),`AvgDownloadSpeed` float,`AvgProcessorSpeed` bigint(20),`AvgPipelineSpeed` bigint(20), PRIMARY KEY (`Identity`,`NodeId`))";
 				conn.MyExecute(sql);
 
 				var trigger = conn.MyQueryFirstOrDefault("SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'Status_AFTER_UPDATE' and EVENT_OBJECT_SCHEMA='DotnetSpider' and EVENT_OBJECT_TABLE='Status'");
@@ -92,27 +94,24 @@ namespace DotnetSpider.Extension.Monitor
 				base.Report(status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 			}
 
-			if (Core.Env.SaveLogAndStatusToDb)
+			using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
 			{
-				using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
-				{
-					conn.MyExecute(
-						"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `Node`=@Node;",
-						new
-						{
-							Identity = Identity,
-							Node = NodeId.Id,
-							Status = status,
-							Left = left,
-							Total = total,
-							Success = success,
-							Error = error,
-							AvgDownloadSpeed = avgDownloadSpeed,
-							AvgProcessorSpeed = avgProcessorSpeed,
-							AvgPipelineSpeed = avgPipelineSpeed,
-							Thread = threadNum
-						});
-				}
+				conn.MyExecute(
+					"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `NodeId`=@NodeId;",
+					new
+					{
+						Identity = App.Identity,
+						NodeId = NodeId.Id,
+						Status = status,
+						Left = left,
+						Total = total,
+						Success = success,
+						Error = error,
+						AvgDownloadSpeed = avgDownloadSpeed,
+						AvgProcessorSpeed = avgProcessorSpeed,
+						AvgPipelineSpeed = avgPipelineSpeed,
+						Thread = threadNum
+					});
 			}
 		}
 	}

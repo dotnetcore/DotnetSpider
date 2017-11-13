@@ -158,6 +158,8 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public IMonitor Monitor { get; set; }
 
+		public IExecuteRecord ExecuteRecord { get; private set; }
+
 		/// <summary>
 		/// TaskId of spider.
 		/// </summary>
@@ -593,119 +595,119 @@ namespace DotnetSpider.Core
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
 
-			InitComponent(arguments);
-
-			Monitorable.IsExited = false;
-
-			_monitorTask = Task.Factory.StartNew(() =>
+			try
 			{
-				while (!Monitorable.IsExited)
+				InitComponent(arguments);
+
+				if (!_init)
 				{
-					ReportStatus();
-					Thread.Sleep(StatusReportInterval);
-				}
-				ReportStatus();
-			});
-
-			if (arguments.Contains("running-test"))
-			{
-				_scheduler.IsExited = true;
-				return;
-			}
-
-			if (StartTime == DateTime.MinValue)
-			{
-				StartTime = DateTime.Now;
-			}
-
-			Stat = Status.Running;
-			_realStat = Status.Running;
-
-			while (Stat == Status.Running || Stat == Status.Stopped)
-			{
-				if (Stat == Status.Stopped)
-				{
-					_realStat = Status.Stopped;
-					Thread.Sleep(50);
-					continue;
+					return;
 				}
 
-				Parallel.For(0, ThreadNum, new ParallelOptions
+				if (arguments.Contains("running-test"))
 				{
-					MaxDegreeOfParallelism = ThreadNum
-				}, i =>
+					_scheduler.IsExited = true;
+					return;
+				}
+
+				if (StartTime == DateTime.MinValue)
 				{
-					int waitCount = 0;
-					while (Stat == Status.Running)
+					StartTime = DateTime.Now;
+				}
+
+				Stat = Status.Running;
+				_realStat = Status.Running;
+
+				while (Stat == Status.Running || Stat == Status.Stopped)
+				{
+					if (Stat == Status.Stopped)
 					{
-						Request request = Scheduler.Poll();
-
-						if (request == null)
-						{
-							if (waitCount > _waitCountLimit && ExitWhenComplete)
-							{
-								Stat = Status.Finished;
-								_realStat = Status.Finished;
-								_OnComplete();
-								OnComplete?.Invoke(this);
-								break;
-							}
-
-							// wait until new url added
-							WaitNewUrl(ref waitCount);
-						}
-						else
-						{
-							waitCount = 0;
-
-							try
-							{
-								Stopwatch sw = new Stopwatch();
-								HandleRequest(sw, request, Downloader);
-								Thread.Sleep(Site.SleepTime);
-							}
-							catch (Exception e)
-							{
-								OnError(request);
-								Logger.MyLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
-							}
-							finally
-							{
-								if (request.Proxy != null)
-								{
-									var statusCode = request.StatusCode;
-									Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
-								}
-							}
-
-							//if (firstTask)
-							//{
-							//	Thread.Sleep(3000);
-							//	firstTask = false;
-							//}
-						}
+						_realStat = Status.Stopped;
+						Thread.Sleep(50);
+						continue;
 					}
-				});
 
-				Thread.Sleep(3000);
+					Parallel.For(0, ThreadNum, new ParallelOptions
+					{
+						MaxDegreeOfParallelism = ThreadNum
+					}, i =>
+					{
+						int waitCount = 0;
+						while (Stat == Status.Running)
+						{
+							Request request = Scheduler.Poll();
+
+							if (request == null)
+							{
+								if (waitCount > _waitCountLimit && ExitWhenComplete)
+								{
+									Stat = Status.Finished;
+									_realStat = Status.Finished;
+									_OnComplete();
+									OnComplete?.Invoke(this);
+									break;
+								}
+
+								// wait until new url added
+								WaitNewUrl(ref waitCount);
+							}
+							else
+							{
+								waitCount = 0;
+
+								try
+								{
+									Stopwatch sw = new Stopwatch();
+									HandleRequest(sw, request, Downloader);
+									Thread.Sleep(Site.SleepTime);
+								}
+								catch (Exception e)
+								{
+									OnError(request);
+									Logger.MyLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
+								}
+								finally
+								{
+									if (request.Proxy != null)
+									{
+										var statusCode = request.StatusCode;
+										Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
+									}
+								}
+
+								//if (firstTask)
+								//{
+								//	Thread.Sleep(3000);
+								//	firstTask = false;
+								//}
+							}
+						}
+					});
+
+					Thread.Sleep(3000);
+				}
+
+				EndTime = DateTime.Now;
+				_realStat = Status.Exited;
+
+				OnClose();
+
+				Logger.MyLog(Identity, "Waiting for monitor exit.", LogLevel.Info);
+				_monitorTask.Wait(5000);
+
+				OnClosing?.Invoke(this);
+
+				var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
+				Logger.MyLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
+
+				OnClosed?.Invoke(this);
+
+				PrintInfo.PrintLine();
 			}
-
-			EndTime = DateTime.Now;
-			_realStat = Status.Exited;
-
-			OnClose();
-
-			Logger.MyLog(Identity, "Waiting for monitor exit.", LogLevel.Info);
-			_monitorTask.Wait(5000);
-
-			OnClosing?.Invoke(this);
-
-			var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
-			Logger.MyLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
-
-			OnClosed?.Invoke(this);
-
-			PrintInfo.PrintLine();
+			finally
+			{
+				ExecuteRecord?.Remove();
+			}
 		}
 
 		/// <summary>
@@ -882,7 +884,16 @@ namespace DotnetSpider.Core
 		/// <param name="arguments"></param>
 		protected virtual void PreInitComponent(params string[] arguments)
 		{
-			Monitor = Monitor ?? new NLogMonitor();
+			if (Monitor == null)
+			{
+				Monitor = string.IsNullOrEmpty(Env.HttpCenter) ? new NLogMonitor() : new HttpMonitor(this);
+			}
+			Monitor.App = Monitor.App ?? this;
+
+			if (ExecuteRecord == null && !string.IsNullOrEmpty(Env.HttpCenter))
+			{
+				ExecuteRecord = new HttpExecuteRecord(this);
+			}
 		}
 
 		/// <summary>
@@ -923,13 +934,44 @@ namespace DotnetSpider.Core
 
 			PreInitComponent(arguments);
 
-			InvokeStartUrlBuilders(arguments);
+			if (ExecuteRecord != null && !ExecuteRecord.Add())
+			{
+				Logger.MyLog(Identity, "Can not record execute...", LogLevel.Error);
+				return;
+			}
 
-			Monitor.Identity = Identity;
+			_monitorTask = Task.Factory.StartNew(() =>
+			{
+				while (true)
+				{
+					try
+					{
+						ReportStatus();
+
+						while (!Monitorable.IsExited)
+						{
+							Thread.Sleep(StatusReportInterval);
+							ReportStatus();
+						}
+
+						ReportStatus();
+						break;
+					}
+					catch (Exception e)
+					{
+						Logger.MyLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
+						Thread.Sleep(StatusReportInterval);
+					}
+				}
+			});
+
+			InvokeStartUrlBuilders(arguments);
 
 			CookieInjector?.Inject(this, false);
 
 			Scheduler.Init(this);
+
+			Monitorable.IsExited = false;
 
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 
@@ -1323,22 +1365,15 @@ namespace DotnetSpider.Core
 
 		private void ReportStatus()
 		{
-			try
-			{
-				Monitor.Report(Stat.ToString(),
-					Monitorable.LeftRequestsCount,
-					Monitorable.TotalRequestsCount,
-					Monitorable.SuccessRequestsCount,
-					Monitorable.ErrorRequestsCount,
-					AvgDownloadSpeed,
-					AvgProcessorSpeed,
-					AvgPipelineSpeed,
-					ThreadNum);
-			}
-			catch (Exception e)
-			{
-				Logger.MyLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
-			}
+			Monitor?.Report(Stat.ToString(),
+				Monitorable.LeftRequestsCount,
+				Monitorable.TotalRequestsCount,
+				Monitorable.SuccessRequestsCount,
+				Monitorable.ErrorRequestsCount,
+				AvgDownloadSpeed,
+				AvgProcessorSpeed,
+				AvgPipelineSpeed,
+				ThreadNum);
 		}
 
 		private void CurrentDomain_ProcessExit(object sender, EventArgs e)

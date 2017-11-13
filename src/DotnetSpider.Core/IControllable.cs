@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Core
 {
-	public interface IControllable : IRunable
+	public interface IControllable 
 	{
 		void Pause(Action action = null);
 		void Contiune();

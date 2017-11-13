@@ -63,17 +63,17 @@ namespace DotnetSpider.Core.Redial
 		{
 			if (File.Exists(RedialTimeFile))
 			{
-				return DateTime.Parse(File.ReadAllText(RedialTimeFile).Trim());
+				return new DateTime(long.Parse(File.ReadAllText(RedialTimeFile)));
 			}
 			else
 			{
-				return new DateTime();
+				return DateTime.Now;
 			}
 		}
 
 		protected override void RecordLastRedialTime()
 		{
-			File.WriteAllText(RedialTimeFile, DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"));
+			File.WriteAllText(RedialTimeFile, DateTime.Now.Ticks.ToString());
 		}
 
 		public override void WaitAllNetworkRequestComplete()

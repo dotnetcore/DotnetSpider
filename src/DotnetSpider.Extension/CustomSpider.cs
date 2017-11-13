@@ -13,7 +13,7 @@ using DotnetSpider.Core.Infrastructure.Database;
 namespace DotnetSpider.Extension
 {
 	[Obsolete]
-	public abstract class CustomSpider : IRunable, INamed, IIdentity, ITask
+	public abstract class CustomSpider : IAppBase
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension
 				throw new ArgumentException("Length of Identity should between 1 and 120.");
 			}
 
-			Monitor = new DbMonitor(Identity);
+			Monitor = new DbMonitor(this);
 
 			try
 			{

@@ -22,8 +22,8 @@ namespace DotnetSpider.Core
 		public const string EmailAccountKey = "emailAccount";
 		public const string EmailPasswordKey = "emailPassword";
 		public const string EmailDisplayNameKey = "emailDisplayName";
-		public const string HttpLogCenterKey = "httpLogCenter";
-		public const string HttpLogCenterTokenKey = "httpLogCenterToken";
+		public const string HttpCenterKey = "serviceUrl";
+		public const string HttpCenterTokenKey = "serviceToken";
 		public const string SystemConnectionStringKey = "SystemConnection";
 		public const string DataConnectionStringKey = "DataConnection";
 		public static readonly string[] IdColumns = new[] { "Id", "__Id" };
@@ -39,13 +39,16 @@ namespace DotnetSpider.Core
 		public static string EmailAccount { get; private set; }
 		public static string EmailPassword { get; private set; }
 		public static string EmailDisplayName { get; private set; }
-		public static bool SaveLogAndStatusToDb => SystemConnectionStringSettings != null;
 		public static string GlobalDirectory { get; private set; }
 		internal static string DefaultGlobalAppConfigPath { get; private set; }
 		public static string BaseDirectory { get; private set; }
 		public static string PathSeperator { get; private set; }
-		public static string HttpLogCenter { get; private set; }
-		public static string HttpLogCenterToken { get; private set; }
+		public static string HttpCenter { get; private set; }
+		public static string HttpLogUrl { get; private set; }
+		public static string HttpStatusUrl { get; private set; }
+		public static string HttpAddExecuteRecordUrl { get; private set; }
+		public static string HttpRemoveExecuteRecordUrl { get; private set; }
+		public static string HttpCenterToken { get; private set; }
 		public static string SystemConnectionString => SystemConnectionStringSettings?.ConnectionString;
 		public static string DataConnectionString => DataConnectionStringSettings?.ConnectionString;
 
@@ -91,8 +94,15 @@ namespace DotnetSpider.Core
 			EmailAccount = configuration.AppSettings.Settings[EmailAccountKey]?.Value?.Trim();
 			EmailPassword = configuration.AppSettings.Settings[EmailPasswordKey]?.Value?.Trim();
 			EmailDisplayName = configuration.AppSettings.Settings[EmailDisplayNameKey]?.Value?.Trim();
-			HttpLogCenter = configuration.AppSettings.Settings[HttpLogCenterKey]?.Value?.Trim();
-			HttpLogCenterToken = configuration.AppSettings.Settings[HttpLogCenterTokenKey]?.Value?.Trim();
+			HttpCenter = configuration.AppSettings.Settings[HttpCenterKey]?.Value?.Trim();
+			if (!string.IsNullOrEmpty(HttpCenter))
+			{
+				HttpLogUrl = $"{HttpCenter}Log/submit";
+				HttpCenterToken = configuration.AppSettings.Settings[HttpCenterTokenKey]?.Value?.Trim();
+				HttpStatusUrl = $"{HttpCenter}TaskStatus/AddOrUpdate";
+				HttpAddExecuteRecordUrl = $"{HttpCenter}Task/IncreaseRunning";
+				HttpRemoveExecuteRecordUrl = $"{HttpCenter}Task/ReduceRunning";
+			}
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 		}

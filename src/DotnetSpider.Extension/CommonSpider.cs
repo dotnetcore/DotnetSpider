@@ -11,6 +11,7 @@ using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Redial;
+using DotnetSpider.Core.Monitor;
 
 namespace DotnetSpider.Extension
 {
@@ -21,8 +22,6 @@ namespace DotnetSpider.Extension
 		protected abstract void MyInit(params string[] arguments);
 
 		protected Action DataVerificationAndReport;
-
-		public bool UseDbMonitor { get; set; } = true;
 
 		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
@@ -74,25 +73,16 @@ namespace DotnetSpider.Extension
 				}
 			}
 
-			try
+			RegisterControl(this);
+
+			base.Run(arguments);
+
+			if (IsComplete && DataVerificationAndReport != null)
 			{
-				RegisterControl(this);
-
-				InsertRunningState();
-
-				base.Run(arguments);
-
-				if (IsComplete && DataVerificationAndReport != null)
+				NetworkCenter.Current.Execute("verifyAndReport", () =>
 				{
-					NetworkCenter.Current.Execute("verifyAndReport", () =>
-					{
-						BaseVerification.ProcessVerifidation(Identity, DataVerificationAndReport);
-					});
-				}
-			}
-			finally
-			{
-				RemoveRunningState();
+					BaseVerification.ProcessVerifidation(Identity, DataVerificationAndReport);
+				});
 			}
 		}
 
@@ -106,11 +96,6 @@ namespace DotnetSpider.Extension
 		protected override void PreInitComponent(params string[] arguments)
 		{
 			base.PreInitComponent();
-
-			if (UseDbMonitor)
-			{
-				Monitor = new DbMonitor(Identity);
-			}
 
 			if (Site == null)
 			{
@@ -161,30 +146,6 @@ namespace DotnetSpider.Extension
 			else
 			{
 				return true;
-			}
-		}
-
-		protected void InsertRunningState()
-		{
-			if (Env.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(TaskId))
-			{
-				using (IDbConnection conn = Env.SystemConnectionStringSettings.GetDbConnection())
-				{
-					conn.MyExecute("CREATE SCHEMA IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8mb4;");
-					conn.MyExecute("CREATE TABLE IF NOT EXISTS `DotnetSpider`.`TaskRunning` (`__Id` bigint(20) NOT NULL AUTO_INCREMENT, `TaskId` varchar(120) NOT NULL, `Name` varchar(200) NULL, `Identity` varchar(120), `CDate` timestamp NOT NULL DEFAULT current_timestamp, PRIMARY KEY (__Id), UNIQUE KEY `taskId_unique` (`TaskId`)) AUTO_INCREMENT=1");
-					conn.MyExecute($"INSERT IGNORE INTO `DotnetSpider`.`TaskRunning` (`TaskId`,`Name`,`Identity`) values ('{TaskId}','{Name}','{Identity}');");
-				}
-			}
-		}
-
-		protected void RemoveRunningState()
-		{
-			if (Env.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(TaskId))
-			{
-				using (IDbConnection conn = Env.SystemConnectionStringSettings.GetDbConnection())
-				{
-					conn.MyExecute($"DELETE FROM `DotnetSpider`.`TaskRunning` WHERE `Identity`='{Identity}';");
-				}
 			}
 		}
 

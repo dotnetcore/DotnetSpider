@@ -35,13 +35,13 @@ namespace DotnetSpider.Extension.Test
 				new QueueDuplicateRemovedScheduler(),
 				new TestPageProcessor()))
 			{
+				spider.Monitor = new DbMonitor(spider);
 				spider.AddPipeline(new TestPipeline());
 				spider.ThreadNum = 1;
 				for (int i = 0; i < 5; i++)
 				{
 					spider.AddStartUrl("http://www.baidu.com/" + i);
 				}
-				spider.Monitor = new DbMonitor(id);
 				spider.Run();
 			}
 			Thread.Sleep(3000);

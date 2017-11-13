@@ -2,6 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -10,6 +11,8 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public static class HttpSender
 	{
+		public static readonly HttpClient Client = new HttpClient();
+
 		/// <summary>  
 		/// 根据相传入的数据，得到相应页面数据  
 		/// </summary>  

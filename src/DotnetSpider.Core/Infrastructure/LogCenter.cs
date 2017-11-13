@@ -8,18 +8,19 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.Text;
 using DotnetSpider.Core.Redial;
+using System.Threading;
 
 namespace DotnetSpider.Core.Infrastructure
 {
 	public static class LogCenter
 	{
 		private static bool _submitHttpLog;
-		private static readonly HttpClient _httpClient = new HttpClient();
+		private static ILogger Logger;
 
 		static LogCenter()
 		{
 			InitLogCenter();
-			_submitHttpLog = !string.IsNullOrEmpty(Env.HttpLogCenter);
+			_submitHttpLog = !string.IsNullOrEmpty(Env.HttpLogUrl);
 		}
 
 		public static ILogger GetLogger()
@@ -61,6 +62,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 			configuration.Install(new InstallationContext());
 			LogManager.Configuration = configuration;
+			Logger = GetLogger();
 		}
 
 		public static string GetDefaultConfigString()
@@ -79,28 +81,28 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
-		public static void MyLog(this ILogger logger, string identity, string message, LogLevel level, Exception e = null)
+		public static void MyLog(this ILogger logger, string identity, string message, LogLevel level, Exception exception = null)
 		{
-			LogEventInfo theEvent = new LogEventInfo(level, logger.Name, message) { Exception = e };
+			LogEventInfo theEvent = new LogEventInfo(level, logger.Name, message) { Exception = exception };
 			theEvent.Properties["Identity"] = identity;
 			theEvent.Properties["Node"] = NodeId.Id;
 			logger.Log(theEvent);
 
-			SubmitHttpLog(identity, message, level, e);
+			SubmitHttpLog(identity, message, level, exception);
 		}
 
-		public static void MyLog(this ILogger logger, string message, LogLevel level, Exception e = null)
+		public static void MyLog(this ILogger logger, string message, LogLevel level, Exception exception = null)
 		{
-			MyLog(logger, "System", message, level, e);
+			MyLog(logger, "System", message, level, exception);
 		}
 
-		private static void SubmitHttpLog(string identity, string message, LogLevel level, Exception e = null)
+		private static void SubmitHttpLog(string identity, string message, LogLevel level, Exception exception = null)
 		{
 			if (_submitHttpLog)
 			{
 				var json = JsonConvert.SerializeObject(new
 				{
-					Token = Env.HttpLogCenterToken,
+					Token = Env.HttpCenterToken,
 					Identity = identity,
 					LogInfo = new
 					{
@@ -109,19 +111,28 @@ namespace DotnetSpider.Core.Infrastructure
 						Logged = DateTime.UtcNow,
 						Level = level.ToString(),
 						Message = message,
-						Exception = e?.ToString(),
+						Exception = exception?.ToString(),
 					}
 				});
 				var content = new StringContent(json, Encoding.UTF8, "application/json");
-				try
+
+				for (int i = 0; i < 10; ++i)
 				{
-					NetworkCenter.Current.Execute("log", () =>
+					try
 					{
-						_httpClient.PostAsync(Env.HttpLogCenter, content).Wait();
-					});
-				}
-				catch
-				{
+						NetworkCenter.Current.Execute("log", () =>
+						{
+							var response = HttpSender.Client.PostAsync(Env.HttpLogUrl, content).Result;
+							response.EnsureSuccessStatusCode();
+						});
+						break;
+
+					}
+					catch (Exception ex)
+					{
+						Logger.Error($"Submit log failed [{i}]: {ex}");
+						Thread.Sleep(5000);
+					}
 				}
 			}
 		}
