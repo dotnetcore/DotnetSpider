@@ -940,11 +940,14 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			var closeFile = Path.Combine(Env.BaseDirectory, $"{Identity}.close");
-
-			if (File.Exists(closeFile))
+			string closeSignal = string.Empty;
+			if (!string.IsNullOrEmpty(TaskId))
 			{
-				File.Delete(closeFile);
+				closeSignal = Path.Combine(Env.BaseDirectory, $"{TaskId}_close");
+				if (File.Exists(closeSignal))
+				{
+					File.Delete(closeSignal);
+				}
 			}
 
 			_monitorTask = Task.Factory.StartNew(() =>
@@ -960,10 +963,10 @@ namespace DotnetSpider.Core
 							Thread.Sleep(StatusReportInterval);
 							ReportStatus();
 
-							if (File.Exists(closeFile))
+							if (!string.IsNullOrEmpty(closeSignal) && File.Exists(closeSignal))
 							{
 								Exit();
-								File.Delete(closeFile);
+								File.Delete(closeSignal);
 							}
 						}
 
