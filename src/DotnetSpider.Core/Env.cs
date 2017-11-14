@@ -46,8 +46,8 @@ namespace DotnetSpider.Core
 		public static string HttpCenter { get; private set; }
 		public static string HttpLogUrl { get; private set; }
 		public static string HttpStatusUrl { get; private set; }
-		public static string HttpAddExecuteRecordUrl { get; private set; }
-		public static string HttpRemoveExecuteRecordUrl { get; private set; }
+		public static string HttpIncreaseRunningUrl { get; private set; }
+		public static string HttpReduceRunningUrl { get; private set; }
 		public static string HttpCenterToken { get; private set; }
 		public static string SystemConnectionString => SystemConnectionStringSettings?.ConnectionString;
 		public static string DataConnectionString => DataConnectionStringSettings?.ConnectionString;
@@ -100,8 +100,8 @@ namespace DotnetSpider.Core
 				HttpLogUrl = $"{HttpCenter}Log/submit";
 				HttpCenterToken = configuration.AppSettings.Settings[HttpCenterTokenKey]?.Value?.Trim();
 				HttpStatusUrl = $"{HttpCenter}TaskStatus/AddOrUpdate";
-				HttpAddExecuteRecordUrl = $"{HttpCenter}Task/IncreaseRunning";
-				HttpRemoveExecuteRecordUrl = $"{HttpCenter}Task/ReduceRunning";
+				HttpIncreaseRunningUrl = $"{HttpCenter}Task/IncreaseRunning";
+				HttpReduceRunningUrl = $"{HttpCenter}Task/ReduceRunning";
 			}
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];

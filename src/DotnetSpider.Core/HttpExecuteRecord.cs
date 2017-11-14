@@ -27,7 +27,7 @@ namespace DotnetSpider.Core
 		{
 			var json = JsonConvert.SerializeObject(new
 			{
-				TaskId = 1
+				TaskId = Spider.TaskId
 			});
 			var content = new StringContent(json, Encoding.UTF8, "application/json");
 			for (int i = 0; i < 10; ++i)
@@ -36,7 +36,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.PostAsync(Env.HttpAddExecuteRecordUrl, content).Result;
+						var response = HttpSender.Client.PostAsync(Env.HttpIncreaseRunningUrl, content).Result;
 						response.EnsureSuccessStatusCode();
 					});
 					return true;
@@ -63,7 +63,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.PostAsync(Env.HttpRemoveExecuteRecordUrl, content).Result;
+						var response = HttpSender.Client.PostAsync(Env.HttpReduceRunningUrl, content).Result;
 						response.EnsureSuccessStatusCode();
 					});
 					break;

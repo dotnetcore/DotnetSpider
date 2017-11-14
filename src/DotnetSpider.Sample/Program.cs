@@ -4,7 +4,9 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 
@@ -81,6 +83,11 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
+			Dictionary<string, string> tmp = new Dictionary<string, string>();
+			tmp.Add("a", "b");
+			tmp.Add("b", "c");
+
+			var o = JsonConvert.SerializeObject(tmp);
 		}
 	}
 
