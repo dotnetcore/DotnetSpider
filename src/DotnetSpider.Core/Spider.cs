@@ -940,6 +940,13 @@ namespace DotnetSpider.Core
 				return;
 			}
 
+			var closeFile = Path.Combine(Env.BaseDirectory, $"{Identity}.close");
+
+			if (File.Exists(closeFile))
+			{
+				File.Delete(closeFile);
+			}
+
 			_monitorTask = Task.Factory.StartNew(() =>
 			{
 				while (true)
@@ -952,6 +959,12 @@ namespace DotnetSpider.Core
 						{
 							Thread.Sleep(StatusReportInterval);
 							ReportStatus();
+
+							if (File.Exists(closeFile))
+							{
+								Exit();
+								File.Delete(closeFile);
+							}
 						}
 
 						ReportStatus();
@@ -1379,6 +1392,11 @@ namespace DotnetSpider.Core
 		private void CurrentDomain_ProcessExit(object sender, EventArgs e)
 		{
 			NetworkCenter.Current.Executor?.Dispose();
+			Exit();
+			while (!_scheduler.IsExited)
+			{
+				Thread.Sleep(1500);
+			}
 		}
 
 		private void InvokeStartUrlBuilders(params string[] arguments)
