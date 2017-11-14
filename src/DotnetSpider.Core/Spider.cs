@@ -966,7 +966,13 @@ namespace DotnetSpider.Core
 							if (!string.IsNullOrEmpty(closeSignal) && File.Exists(closeSignal))
 							{
 								Exit();
-								File.Delete(closeSignal);
+								try
+								{
+									File.Delete(closeSignal);
+								}
+								catch
+								{
+								}
 							}
 						}
 
