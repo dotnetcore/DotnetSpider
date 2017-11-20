@@ -1073,9 +1073,14 @@ namespace DotnetSpider.Core
 		/// </summary>
 		protected void OnClose()
 		{
+			var containsData = _cached != null && _cached.Count > 0;
+
 			foreach (IPipeline pipeline in Pipelines)
 			{
-				pipeline.Process(_cached.ToArray());
+				if (containsData)
+				{
+					pipeline.Process(_cached.ToArray());
+				}
 				SafeDestroy(pipeline);
 			}
 
