@@ -99,11 +99,11 @@ namespace DotnetSpider.Core
 			HttpCenter = configuration.AppSettings.Settings[HttpCenterKey]?.Value?.Trim();
 			if (!string.IsNullOrEmpty(HttpCenter))
 			{
-				HttpLogUrl = $"{HttpCenter}Log/submit";
+				HttpLogUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Log/submit";
 				HttpCenterToken = configuration.AppSettings.Settings[HttpCenterTokenKey]?.Value?.Trim();
-				HttpStatusUrl = $"{HttpCenter}TaskStatus/AddOrUpdate";
-				HttpIncreaseRunningUrl = $"{HttpCenter}Task/IncreaseRunning";
-				HttpReduceRunningUrl = $"{HttpCenter}Task/ReduceRunning";
+				HttpStatusUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}TaskStatus/AddOrUpdate";
+				HttpIncreaseRunningUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Task/IncreaseRunning";
+				HttpReduceRunningUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Task/ReduceRunning";
 			}
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];

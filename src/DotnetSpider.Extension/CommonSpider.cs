@@ -17,6 +17,7 @@ namespace DotnetSpider.Extension
 {
 	public abstract class CommonSpider : Spider
 	{
+		private const string InitFinishedValue = "init complete";
 		protected const string InitStatusSetKey = "dotnetspider:init-stats";
 
 		protected abstract void MyInit(params string[] arguments);
@@ -140,13 +141,18 @@ namespace DotnetSpider.Extension
 						Thread.Sleep(1000);
 					}
 					var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
-					return lockerValue != "init complete";
+					return lockerValue != InitFinishedValue;
 				}
 			}
 			else
 			{
 				return true;
 			}
+		}
+
+		protected override void InitFinished()
+		{
+			RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
 		}
 
 		protected void RegisterControl(ISpider spider)
