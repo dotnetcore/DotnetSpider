@@ -87,61 +87,61 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Dispose();
 		}
 
-		[Fact(Skip = "")]
+		[Fact()]
 		public void LoadPerformace()
 		{
-			//Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
-			//ISpider spider = new DefaultSpider("test", new Site());
-			//scheduler.Init(spider);
-			//scheduler.Dispose();
-			//var start = DateTime.Now;
-			//for (int i = 0; i < 40000; i++)
-			//{
-			//	scheduler.Push(new Request("http://www.a.com/" + i, null));
-			//}
+			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
+			ISpider spider = new DefaultSpider("test", new Site());
+			scheduler.Init(spider);
+			scheduler.Dispose();
+			var start = DateTime.Now;
+			for (int i = 0; i < 40000; i++)
+			{
+				scheduler.Push(new Request("http://www.a.com/" + i, null));
+			}
 
-			//var end = DateTime.Now;
-			//double seconds = (end - start).TotalSeconds;
-			//scheduler.Dispose();
+			var end = DateTime.Now;
+			double seconds = (end - start).TotalSeconds;
+			scheduler.Dispose();
 
-			//var start1 = DateTime.Now;
-			//HashSet<Request> list = new HashSet<Request>();
-			//for (int i = 0; i < 40000; i++)
-			//{
-			//	list.Add(new Request("http://www.a.com/" + i, null));
-			//}
-			//scheduler.Import(list);
-			//var end1 = DateTime.Now;
-			//double seconds1 = (end1 - start1).TotalSeconds;
-			//Assert.True(seconds1 < seconds);
-			//scheduler.Dispose();
+			var start1 = DateTime.Now;
+			HashSet<Request> list = new HashSet<Request>();
+			for (int i = 0; i < 40000; i++)
+			{
+				list.Add(new Request("http://www.a.com/" + i, null));
+			}
+			scheduler.Import(list);
+			var end1 = DateTime.Now;
+			double seconds1 = (end1 - start1).TotalSeconds;
+			Assert.True(seconds1 < seconds);
+			scheduler.Dispose();
 		}
 
-		[Fact(Skip = "")]
+		[Fact()]
 		public void Load()
 		{
-			//QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			//ISpider spider = new DefaultSpider("test", new Site());
-			//scheduler.Init(spider);
+			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
+			ISpider spider = new DefaultSpider("test", new Site());
+			scheduler.Init(spider);
 
-			//scheduler.Push(new Request("http://www.a.com/", null));
-			//scheduler.Push(new Request("http://www.b.com/", null));
-			//scheduler.Push(new Request("http://www.c.com/", null));
-			//scheduler.Push(new Request("http://www.d.com/", null));
+			scheduler.Push(new Request("http://www.a.com/", null));
+			scheduler.Push(new Request("http://www.b.com/", null));
+			scheduler.Push(new Request("http://www.c.com/", null));
+			scheduler.Push(new Request("http://www.d.com/", null));
 
-			//Extension.Scheduler.RedisScheduler redisScheduler = GetRedisScheduler();
-			//redisScheduler.Init(spider);
+			Extension.Scheduler.RedisScheduler redisScheduler = GetRedisScheduler();
+			redisScheduler.Init(spider);
 
-			//redisScheduler.Dispose();
+			redisScheduler.Dispose();
 
-			//redisScheduler.Import(scheduler.ToList());
+			redisScheduler.Import(scheduler.ToList());
 
-			//Assert.Equal("http://www.d.com/", redisScheduler.Poll().Url.ToString());
-			//Assert.Equal("http://www.c.com/", redisScheduler.Poll().Url.ToString());
-			//Assert.Equal("http://www.b.com/", redisScheduler.Poll().Url.ToString());
-			//Assert.Equal("http://www.a.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.d.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.c.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.b.com/", redisScheduler.Poll().Url.ToString());
+			Assert.Equal("http://www.a.com/", redisScheduler.Poll().Url.ToString());
 
-			//redisScheduler.Dispose();
+			redisScheduler.Dispose();
 		}
 
 		[Fact]
