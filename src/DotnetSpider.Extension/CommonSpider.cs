@@ -150,7 +150,7 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		protected override void InitFinished()
+		protected override void InitStartRequestsFinished()
 		{
 			RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
 		}

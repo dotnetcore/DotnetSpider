@@ -59,7 +59,7 @@ namespace DotnetSpider.Core
 			return true;
 		}
 
-		protected virtual void InitFinished()
+		protected virtual void InitStartRequestsFinished()
 		{
 		}
 
@@ -1419,7 +1419,7 @@ namespace DotnetSpider.Core
 					Logger.MyLog(Identity, $"Add start urls to scheduler via builder[{i + 1}].", LogLevel.Info);
 					builder.Build(Site);
 				}
-				InitFinished();
+				InitStartRequestsFinished();
 			}
 		}
 	}
