@@ -63,11 +63,19 @@ namespace DotnetSpider.Core.Redial
 		{
 			if (File.Exists(RedialTimeFile))
 			{
-				return new DateTime(long.Parse(File.ReadAllText(RedialTimeFile)));
+				long ticks;
+				if (long.TryParse(File.ReadAllText(RedialTimeFile), out ticks))
+				{
+					return new DateTime(ticks);
+				}
+				else
+				{
+					return DateTime.Now.AddDays(-1);
+				}
 			}
 			else
 			{
-				return DateTime.Now;
+				return DateTime.Now.AddDays(-1);
 			}
 		}
 
