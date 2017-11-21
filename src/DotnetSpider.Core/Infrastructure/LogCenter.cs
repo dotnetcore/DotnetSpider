@@ -81,17 +81,20 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
-		public static void MyLog(this ILogger logger, string identity, string message, LogLevel level, Exception exception = null)
+		public static void MyLog(this ILogger logger, string identity, string message, LogLevel level, Exception exception = null, bool noHttpLog = false)
 		{
 			LogEventInfo theEvent = new LogEventInfo(level, logger.Name, message) { Exception = exception };
 			theEvent.Properties["Identity"] = identity;
 			theEvent.Properties["Node"] = NodeId.Id;
 			logger.Log(theEvent);
 
-			SubmitHttpLog(identity, message, level, exception);
+			if (!noHttpLog)
+			{
+				SubmitHttpLog(identity, message, level, exception);
+			}
 		}
 
-		public static void MyLog(this ILogger logger, string message, LogLevel level, Exception exception = null)
+		public static void MyLog(this ILogger logger, string message, LogLevel level, Exception exception = null, bool noHttpLog = false)
 		{
 			MyLog(logger, "System", message, level, exception);
 		}
