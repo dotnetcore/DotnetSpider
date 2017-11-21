@@ -257,64 +257,64 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
-		public override void Import(HashSet<Request> requests)
-		{
-			var action = new Action(() =>
-			{
-				lock (_locker)
-				{
-					int batchCount = BatchCount;
-					int cacheSize = requests.Count > batchCount ? batchCount : requests.Count;
-					RedisValue[] identities = new RedisValue[cacheSize];
-					HashEntry[] items = new HashEntry[cacheSize];
-					int i = 0;
-					int j = requests.Count % batchCount;
-					int n = requests.Count / batchCount;
+		//public override void Import(HashSet<Request> requests)
+		//{
+		//	var action = new Action(() =>
+		//	{
+		//		lock (_locker)
+		//		{
+		//			int batchCount = BatchCount;
+		//			int cacheSize = requests.Count > batchCount ? batchCount : requests.Count;
+		//			RedisValue[] identities = new RedisValue[cacheSize];
+		//			HashEntry[] items = new HashEntry[cacheSize];
+		//			int i = 0;
+		//			int j = requests.Count % batchCount;
+		//			int n = requests.Count / batchCount;
 
-					foreach (var request in requests)
-					{
-						identities[i] = request.Identity;
-						items[i] = new HashEntry(request.Identity, JsonConvert.SerializeObject(request));
-						++i;
-						if (i == batchCount)
-						{
-							--n;
+		//			foreach (var request in requests)
+		//			{
+		//				identities[i] = request.Identity;
+		//				items[i] = new HashEntry(request.Identity, JsonConvert.SerializeObject(request));
+		//				++i;
+		//				if (i == batchCount)
+		//				{
+		//					--n;
 
-							RedisConnection.Database.SetAdd(_setKey, identities);
-							RedisConnection.Database.ListRightPush(_queueKey, identities);
-							RedisConnection.Database.HashSet(_itemKey, items, CommandFlags.HighPriority);
+		//					RedisConnection.Database.SetAdd(_setKey, identities);
+		//					RedisConnection.Database.ListRightPush(_queueKey, identities);
+		//					RedisConnection.Database.HashSet(_itemKey, items, CommandFlags.HighPriority);
 
-							i = 0;
-							if (n != 0)
-							{
-								identities = new RedisValue[batchCount];
-								items = new HashEntry[batchCount];
-							}
-							else
-							{
-								identities = new RedisValue[j];
-								items = new HashEntry[j];
-							}
-						}
-					}
+		//					i = 0;
+		//					if (n != 0)
+		//					{
+		//						identities = new RedisValue[batchCount];
+		//						items = new HashEntry[batchCount];
+		//					}
+		//					else
+		//					{
+		//						identities = new RedisValue[j];
+		//						items = new HashEntry[j];
+		//					}
+		//				}
+		//			}
 
-					if (i > 0)
-					{
-						RedisConnection.Database.SetAdd(_setKey, identities);
-						RedisConnection.Database.ListRightPush(_queueKey, identities);
-						RedisConnection.Database.HashSet(_itemKey, items);
-					}
-				}
-			});
-			if (UseInternet)
-			{
-				NetworkCenter.Current.Execute("rds-import", action);
-			}
-			else
-			{
-				action();
-			}
-		}
+		//			if (i > 0)
+		//			{
+		//				RedisConnection.Database.SetAdd(_setKey, identities);
+		//				RedisConnection.Database.ListRightPush(_queueKey, identities);
+		//				RedisConnection.Database.HashSet(_itemKey, items);
+		//			}
+		//		}
+		//	});
+		//	if (UseInternet)
+		//	{
+		//		NetworkCenter.Current.Execute("rds-import", action);
+		//	}
+		//	else
+		//	{
+		//		action();
+		//	}
+		//}
 
 		public HashSet<Request> ToList()
 		{

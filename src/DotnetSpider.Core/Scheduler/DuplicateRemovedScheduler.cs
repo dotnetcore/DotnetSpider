@@ -14,7 +14,8 @@ namespace DotnetSpider.Core.Scheduler
 
 		public abstract void IncreaseSuccessCount();
 		public abstract void IncreaseErrorCount();
-		public abstract void Import(HashSet<Request> requests);
+		
+		//public abstract void Import(HashSet<Request> requests);
 
 		protected abstract bool UseInternet { get; set; }
 

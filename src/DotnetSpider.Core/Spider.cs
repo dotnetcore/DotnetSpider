@@ -1005,17 +1005,9 @@ namespace DotnetSpider.Core
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
 				Logger.MyLog(Identity, $"Add start urls to scheduler, count {Site.StartRequests.Count}.", LogLevel.Info);
-				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
+				foreach (var request in Site.StartRequests)
 				{
-					foreach (var request in Site.StartRequests)
-					{
-						Scheduler.Push(request);
-					}
-				}
-				else
-				{
-					Scheduler.Import(new HashSet<Request>(Site.StartRequests));
-					ClearStartRequests();
+					Scheduler.Push(request);
 				}
 			}
 			else

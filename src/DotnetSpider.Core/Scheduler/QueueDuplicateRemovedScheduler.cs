@@ -86,13 +86,13 @@ namespace DotnetSpider.Core.Scheduler
 			_errorCounter.Inc();
 		}
 
-		public override void Import(HashSet<Request> requests)
-		{
-			lock (_lock)
-			{
-				_queue = new List<Request>(requests);
-			}
-		}
+		//public override void Import(HashSet<Request> requests)
+		//{
+		//	lock (_lock)
+		//	{
+		//		_queue = new List<Request>(requests);
+		//	}
+		//}
 
 		public HashSet<Request> ToList()
 		{

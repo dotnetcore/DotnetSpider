@@ -62,10 +62,10 @@ namespace DotnetSpider.Core.Scheduler
 			_errorCounter.Inc();
 		}
 
-		public override void Import(HashSet<Request> requests)
-		{
-			throw new NotImplementedException();
-		}
+		//public override void Import(HashSet<Request> requests)
+		//{
+		//	throw new NotImplementedException();
+		//}
 
 		public virtual HashSet<Request> ToList()
 		{

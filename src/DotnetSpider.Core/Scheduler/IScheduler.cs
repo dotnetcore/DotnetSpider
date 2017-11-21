@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Scheduler
 		/// <returns></returns>
 		Request Poll();
 
-		void Import(HashSet<Request> requests);
+		//void Import(HashSet<Request> requests);
 
 		void Export();
 	}
