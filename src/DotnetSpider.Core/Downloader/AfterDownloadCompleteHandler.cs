@@ -15,7 +15,7 @@ namespace DotnetSpider.Core.Downloader
 		public abstract void Handle(ref Page page, ISpider spider);
 	}
 
-	public sealed class UpdateCookieWhenContainsContentHandler : AfterDownloadCompleteHandler
+	public class UpdateCookieWhenContainsContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly ICookieInjector _cookieInjector;
 		private readonly string _content;
@@ -36,7 +36,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class UpdateCookieTimerHandler : AfterDownloadCompleteHandler
+	public class UpdateCookieTimerHandler : AfterDownloadCompleteHandler
 	{
 		private readonly ICookieInjector _cookieInjector;
 
@@ -61,7 +61,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class SkipWhenContainsContentHandler : AfterDownloadCompleteHandler
+	public class SkipWhenContainsContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly string[] _contents;
 
@@ -77,7 +77,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class SkipTargetUrlsWhenNotContainsContentHandler : AfterDownloadCompleteHandler
+	public class SkipTargetUrlsWhenNotContainsContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly string _content;
 
@@ -96,7 +96,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class RemoveHtmlTagHandler : AfterDownloadCompleteHandler
+	public class RemoveHtmlTagHandler : AfterDownloadCompleteHandler
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
@@ -109,7 +109,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class ContentToUpperHandler : AfterDownloadCompleteHandler
+	public class ContentToUpperHandler : AfterDownloadCompleteHandler
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
@@ -120,7 +120,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class ContentToLowerHandler : AfterDownloadCompleteHandler
+	public class ContentToLowerHandler : AfterDownloadCompleteHandler
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
@@ -131,7 +131,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class ReplaceContentHandler : AfterDownloadCompleteHandler
+	public class ReplaceContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly string _oldValue;
 		private readonly string _newValue;
@@ -151,7 +151,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class TrimContentHandler : AfterDownloadCompleteHandler
+	public class TrimContentHandler : AfterDownloadCompleteHandler
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
@@ -162,7 +162,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class UnescapeContentHandler : AfterDownloadCompleteHandler
+	public class UnescapeContentHandler : AfterDownloadCompleteHandler
 	{
 		public override void Handle(ref Page page, ISpider spider)
 		{
@@ -173,7 +173,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class PatternMatchContentHandler : AfterDownloadCompleteHandler
+	public class PatternMatchContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly string _pattern;
 
@@ -201,7 +201,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class RetryWhenContainsContentHandler : AfterDownloadCompleteHandler
+	public class RetryWhenContainsContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly string[] _contents;
 
@@ -228,7 +228,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class RedialWhenContainsContentHandler : AfterDownloadCompleteHandler
+	public class RedialWhenContainsContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly string[] _contents;
 
@@ -257,7 +257,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class RedialWhenExceptionThrowHandler : AfterDownloadCompleteHandler
+	public class RedialWhenExceptionThrowHandler : AfterDownloadCompleteHandler
 	{
 		private readonly string _exceptionMessage;
 
@@ -289,7 +289,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class RedialAndUpdateCookieWhenContainsContentHandler : AfterDownloadCompleteHandler
+	public class RedialAndUpdateCookieWhenContainsContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly ICookieInjector _cookieInjector;
 		private readonly string _content;
@@ -316,7 +316,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class SubContentHandler : AfterDownloadCompleteHandler
+	public class SubContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly string _startPart;
 		private readonly string _endPart;
