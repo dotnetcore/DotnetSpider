@@ -14,13 +14,11 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public static class LogCenter
 	{
-		private static bool _submitHttpLog;
 		private static ILogger Logger;
 
 		static LogCenter()
 		{
 			InitLogCenter();
-			_submitHttpLog = !string.IsNullOrEmpty(Env.HttpLogUrl);
 		}
 
 		public static ILogger GetLogger()
@@ -81,27 +79,34 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
-		public static void MyLog(this ILogger logger, string identity, string message, LogLevel level, Exception exception = null, bool noHttpLog = false)
+		public static void NLog(this ILogger logger, string identity, string message, LogLevel level, Exception exception = null)
 		{
 			LogEventInfo theEvent = new LogEventInfo(level, logger.Name, message) { Exception = exception };
 			theEvent.Properties["Identity"] = identity;
 			theEvent.Properties["Node"] = NodeId.Id;
 			logger.Log(theEvent);
-
-			if (!noHttpLog)
-			{
-				SubmitHttpLog(identity, message, level, exception);
-			}
 		}
 
-		public static void MyLog(this ILogger logger, string message, LogLevel level, Exception exception = null, bool noHttpLog = false)
+		public static void NLog(this ILogger logger, string message, LogLevel level, Exception exception = null)
 		{
-			MyLog(logger, "System", message, level, exception);
+			NLog(logger, "System", message, level, exception);
 		}
 
-		private static void SubmitHttpLog(string identity, string message, LogLevel level, Exception exception = null)
+		public static void AllLog(this ILogger logger, string identity, string message, LogLevel level, Exception exception = null)
 		{
-			if (_submitHttpLog)
+			NLog(logger, identity, message, level, exception);
+
+			HttpLog(identity, message, level, exception);
+		}
+
+		public static void AllLog(this ILogger logger, string message, LogLevel level, Exception exception = null)
+		{
+			AllLog(logger, "System", message, level, exception);
+		}
+
+		private static void HttpLog(string identity, string message, LogLevel level, Exception exception = null)
+		{
+			if (Env.SubmitHttpLog)
 			{
 				var json = JsonConvert.SerializeObject(new
 				{

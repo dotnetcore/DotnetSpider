@@ -106,7 +106,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 			catch (Exception e)
 			{
-				Logger.MyLog(spider.Identity, "Get cookie failed.", NLog.LogLevel.Error, e);
+				Logger.AllLog(spider.Identity, "Get cookie failed.", NLog.LogLevel.Error, e);
 				webDriver.Dispose();
 				return null;
 			}

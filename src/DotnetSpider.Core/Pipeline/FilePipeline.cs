@@ -66,7 +66,7 @@ namespace DotnetSpider.Core.Pipeline
 			}
 			catch (Exception e)
 			{
-				Logger.MyLog(Spider.Identity, "Write file error.", LogLevel.Error, e);
+				Logger.AllLog(Spider.Identity, "Write file error.", LogLevel.Error, e);
 				throw;
 			}
 		}

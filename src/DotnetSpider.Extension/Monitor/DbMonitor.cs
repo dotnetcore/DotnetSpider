@@ -82,7 +82,7 @@ namespace DotnetSpider.Extension.Monitor
 			}
 			catch (Exception e)
 			{
-				Logger.MyLog("Prepare DotnetSpider.Status failed.", LogLevel.Error, e);
+				Logger.AllLog("Prepare DotnetSpider.Status failed.", LogLevel.Error, e);
 				throw;
 			}
 		}

@@ -44,11 +44,11 @@ namespace DotnetSpider.Extension
 		{
 			PrintInfo.Print();
 
-			Logger.MyLog(Identity, "Init redial module if necessary.", LogLevel.Info);
+			Logger.AllLog(Identity, "Init redial module if necessary.", LogLevel.Info);
 
 			InitRedialConfiguration();
 
-			Logger.MyLog(Identity, "Build custom component...", LogLevel.Info);
+			Logger.AllLog(Identity, "Build custom component...", LogLevel.Info);
 
 			NetworkCenter.Current.Execute("myInit", () =>
 			{
@@ -190,7 +190,7 @@ namespace DotnetSpider.Extension
 				}
 				catch (Exception e)
 				{
-					Logger.MyLog(Identity, "Register contol failed.", LogLevel.Error, e);
+					Logger.AllLog(Identity, "Register contol failed.", LogLevel.Error, e);
 				}
 			}
 		}

@@ -589,7 +589,7 @@ namespace DotnetSpider.Core
 		{
 			if (Stat == Status.Running)
 			{
-				Logger.MyLog(Identity, "Crawler is running...", LogLevel.Warn);
+				Logger.AllLog(Identity, "Crawler is running...", LogLevel.Warn);
 				return;
 			}
 
@@ -668,7 +668,7 @@ namespace DotnetSpider.Core
 								catch (Exception e)
 								{
 									OnError(request);
-									Logger.MyLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
+									Logger.AllLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
 								}
 								finally
 								{
@@ -696,13 +696,13 @@ namespace DotnetSpider.Core
 
 				OnClose();
 
-				Logger.MyLog(Identity, "Waiting for monitor exit.", LogLevel.Info);
+				Logger.AllLog(Identity, "Waiting for monitor exit.", LogLevel.Info);
 				_monitorTask.Wait(5000);
 
 				OnClosing?.Invoke(this);
 
 				var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
-				Logger.MyLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
+				Logger.AllLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
 
 				OnClosed?.Invoke(this);
 
@@ -732,11 +732,11 @@ namespace DotnetSpider.Core
 		{
 			if (Stat != Status.Running)
 			{
-				Logger.MyLog(Identity, "Crawler is not running.", LogLevel.Warn);
+				Logger.AllLog(Identity, "Crawler is not running.", LogLevel.Warn);
 				return;
 			}
 			Stat = Status.Stopped;
-			Logger.MyLog(Identity, "Stop running...", LogLevel.Warn);
+			Logger.AllLog(Identity, "Stop running...", LogLevel.Warn);
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
@@ -759,11 +759,11 @@ namespace DotnetSpider.Core
 			{
 				Stat = Status.Running;
 				_realStat = Status.Running;
-				Logger.MyLog(Identity, "Continue...", LogLevel.Warn);
+				Logger.AllLog(Identity, "Continue...", LogLevel.Warn);
 			}
 			else
 			{
-				Logger.MyLog(Identity, "Crawler is not pause, can not continue...", LogLevel.Warn);
+				Logger.AllLog(Identity, "Crawler is not pause, can not continue...", LogLevel.Warn);
 			}
 		}
 
@@ -776,10 +776,10 @@ namespace DotnetSpider.Core
 			if (Stat == Status.Running || Stat == Status.Stopped)
 			{
 				Stat = Status.Exited;
-				Logger.MyLog(Identity, "Exit...", LogLevel.Warn);
+				Logger.AllLog(Identity, "Exit...", LogLevel.Warn);
 				return;
 			}
-			Logger.MyLog(Identity, "Crawler is not running.", LogLevel.Warn);
+			Logger.AllLog(Identity, "Crawler is not running.", LogLevel.Warn);
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
@@ -921,7 +921,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			Logger.MyLog(Identity, "Build internal component...", LogLevel.Info);
+			Logger.AllLog(Identity, "Build internal component...", LogLevel.Info);
 
 			if (Pipelines == null || Pipelines.Count == 0)
 			{
@@ -940,7 +940,7 @@ namespace DotnetSpider.Core
 
 			if (ExecuteRecord != null && !ExecuteRecord.Add())
 			{
-				Logger.MyLog(Identity, "Can not record execute...", LogLevel.Error);
+				Logger.AllLog(Identity, "Can not record execute...", LogLevel.Error);
 				return;
 			}
 
@@ -985,7 +985,7 @@ namespace DotnetSpider.Core
 					}
 					catch (Exception e)
 					{
-						Logger.MyLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
+						Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
 						Thread.Sleep(StatusReportInterval);
 					}
 				}
@@ -1008,7 +1008,7 @@ namespace DotnetSpider.Core
 
 			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
 			{
-				Logger.MyLog(Identity, $"Add start urls to scheduler, count {Site.StartRequests.Count}.", LogLevel.Info);
+				Logger.AllLog(Identity, $"Add start urls to scheduler, count {Site.StartRequests.Count}.", LogLevel.Info);
 				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
 				{
 					foreach (var request in Site.StartRequests)
@@ -1024,7 +1024,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				Logger.MyLog(Identity, "Add start urls to scheduler, count 0.", LogLevel.Info);
+				Logger.AllLog(Identity, "Add start urls to scheduler, count 0.", LogLevel.Info);
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
@@ -1181,7 +1181,7 @@ namespace DotnetSpider.Core
 			catch (DownloadException de)
 			{
 				if (page != null) OnError(page.Request);
-				Logger.MyLog(Identity, $"Should not catch download exception: {request.Url}.", LogLevel.Error, de);
+				Logger.AllLog(Identity, $"Should not catch download exception: {request.Url}.", LogLevel.Error, de);
 			}
 			catch (Exception e)
 			{
@@ -1190,7 +1190,7 @@ namespace DotnetSpider.Core
 					page = AddToCycleRetry(request, Site);
 				}
 				if (page != null) OnError(page.Request);
-				Logger.MyLog(Identity, $"Extract {request.Url} failed, please check your pipeline: {e}.", LogLevel.Error, e);
+				Logger.AllLog(Identity, $"Extract {request.Url} failed, please check your pipeline: {e}.", LogLevel.Error, e);
 			}
 
 			if (page == null)
@@ -1212,7 +1212,7 @@ namespace DotnetSpider.Core
 				{
 					if (SkipWhenResultIsEmpty)
 					{
-						Logger.MyLog(Identity, $"Skip {request.Url} because extract 0 result.", LogLevel.Warn);
+						Logger.AllLog(Identity, $"Skip {request.Url} because extract 0 result.", LogLevel.Warn);
 						_OnSuccess(request);
 					}
 					else
@@ -1225,11 +1225,11 @@ namespace DotnetSpider.Core
 								RetriedTimes.Inc();
 								ExtractAndAddRequests(page);
 							}
-							Logger.MyLog(Identity, $"Download {request.Url} success, retry becuase extract 0 result.", LogLevel.Warn);
+							Logger.AllLog(Identity, $"Download {request.Url} success, retry becuase extract 0 result.", LogLevel.Warn);
 						}
 						else
 						{
-							Logger.MyLog(Identity, $"Download {request.Url} success, will not retry because Site.CycleRetryTimes is 0.", LogLevel.Warn);
+							Logger.AllLog(Identity, $"Download {request.Url} success, will not retry because Site.CycleRetryTimes is 0.", LogLevel.Warn);
 							_OnSuccess(request);
 						}
 					}
@@ -1297,7 +1297,7 @@ namespace DotnetSpider.Core
 					builder.Append($", effectedRow: {effectedRow}");
 				}
 				builder.Append(".");
-				Logger.MyLog(Identity, builder.ToString(), LogLevel.Info);
+				Logger.AllLog(Identity, builder.ToString(), LogLevel.Info);
 
 				sw.Stop();
 				CalculatePipelineSpeed(sw.ElapsedMilliseconds);
@@ -1356,7 +1356,7 @@ namespace DotnetSpider.Core
 				}
 				catch (Exception e)
 				{
-					Logger.MyLog(Identity, e.ToString(), LogLevel.Error);
+					Logger.AllLog(Identity, e.ToString(), LogLevel.Error);
 				}
 			}
 		}
@@ -1424,7 +1424,7 @@ namespace DotnetSpider.Core
 				for (int i = 0; i < StartUrlBuilders.Count; ++i)
 				{
 					var builder = StartUrlBuilders[i];
-					Logger.MyLog(Identity, $"Add start urls to scheduler via builder[{i + 1}].", LogLevel.Info);
+					Logger.AllLog(Identity, $"Add start urls to scheduler via builder[{i + 1}].", LogLevel.Info);
 					builder.Build(Site);
 				}
 				InitStartRequestsFinished();

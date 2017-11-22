@@ -45,6 +45,7 @@ namespace DotnetSpider.Core
 		internal static string DefaultGlobalAppConfigPath { get; private set; }
 		public static string BaseDirectory { get; private set; }
 		public static string PathSeperator { get; private set; }
+		public static bool SubmitHttpLog { get; set; }
 		public static string HttpCenter { get; private set; }
 		public static string HttpLogUrl { get; private set; }
 		public static string HttpStatusUrl { get; private set; }
@@ -105,6 +106,7 @@ namespace DotnetSpider.Core
 				HttpIncreaseRunningUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Task/IncreaseRunning";
 				HttpReduceRunningUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Task/ReduceRunning";
 			}
+			SubmitHttpLog = !string.IsNullOrEmpty(HttpLogUrl);
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 		}

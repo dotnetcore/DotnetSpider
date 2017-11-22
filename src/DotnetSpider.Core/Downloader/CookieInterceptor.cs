@@ -14,14 +14,14 @@ namespace DotnetSpider.Core.Downloader
 				spider.Pause(() =>
 				{
 					spider.Site.Cookies = GetCookies(spider);
-					Logger.MyLog(spider.Identity, "Inject cookies success.", LogLevel.Info);
+					Logger.AllLog(spider.Identity, "Inject cookies success.", LogLevel.Info);
 					spider.Contiune();
 				});
 			}
 			else
 			{
 				spider.Site.Cookies = GetCookies(spider);
-				Logger.MyLog(spider.Identity, "Inject cookies success.", LogLevel.Info);
+				Logger.AllLog(spider.Identity, "Inject cookies success.", LogLevel.Info);
 			}
 		}
 

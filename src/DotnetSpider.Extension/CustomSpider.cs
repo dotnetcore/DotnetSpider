@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension
 
 			try
 			{
-				Logger.MyLog(Identity, $"Start: {Name}", LogLevel.Info);
+				Logger.AllLog(Identity, $"Start: {Name}", LogLevel.Info);
 
 				if (Env.SystemConnectionStringSettings != null)
 				{
@@ -73,7 +73,7 @@ namespace DotnetSpider.Extension
 							}
 							catch (Exception e)
 							{
-								Logger.MyLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
+								Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
 							}
 							Thread.Sleep(5000);
 						}
@@ -90,7 +90,7 @@ namespace DotnetSpider.Extension
 				_exited = true;
 				_statusReporter.Wait();
 
-				Logger.MyLog(Identity, $"Complete: {Name}", LogLevel.Info);
+				Logger.AllLog(Identity, $"Complete: {Name}", LogLevel.Info);
 
 				if (Env.SystemConnectionStringSettings != null)
 				{
@@ -108,7 +108,7 @@ namespace DotnetSpider.Extension
 					}
 					catch (Exception e)
 					{
-						Logger.MyLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
+						Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
 					}
 				}
 				if (OnExited != null)
@@ -118,7 +118,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.MyLog(Identity, $"Terminated: {Name}: {e}", LogLevel.Error, e);
+				Logger.AllLog(Identity, $"Terminated: {Name}: {e}", LogLevel.Error, e);
 
 				if (Env.SystemConnectionStringSettings != null)
 				{
@@ -136,7 +136,7 @@ namespace DotnetSpider.Extension
 					}
 					catch (Exception e1)
 					{
-						Logger.MyLog(Identity, $"Report status failed: {e1}.", LogLevel.Error);
+						Logger.AllLog(Identity, $"Report status failed: {e1}.", LogLevel.Error);
 					}
 				}
 			}

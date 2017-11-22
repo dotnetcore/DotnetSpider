@@ -50,21 +50,21 @@ namespace DotnetSpider.Core.Redial
 			ILocker locker = null;
 			try
 			{
-				Logger.MyLog("Try to lock redialer...", LogLevel.Info, null, true);
+				Logger.NLog("Try to lock redialer...", LogLevel.Info);
 				locker = CreateLocker();
 				locker.Lock();
-				Logger.MyLog("Lock redialer", LogLevel.Info, null, true);
+				Logger.NLog("Lock redialer", LogLevel.Info);
 				var lastRedialTime = (DateTime.Now - GetLastRedialTime()).Seconds;
 				if (lastRedialTime < RedialIntervalLimit)
 				{
-					Logger.MyLog($"Skip redial because last redial compeleted before {lastRedialTime} seconds.", LogLevel.Info, null, true);
+					Logger.NLog($"Skip redial because last redial compeleted before {lastRedialTime} seconds.", LogLevel.Info);
 					return RedialResult.OtherRedialed;
 				}
 				Thread.Sleep(500);
-				Logger.MyLog("Wait all network requests complete...", LogLevel.Info, null, true);
+				Logger.NLog("Wait all network requests complete...", LogLevel.Info);
 				// 等待所有网络请求结束
 				WaitAllNetworkRequestComplete();
-				Logger.MyLog("Start redial...", LogLevel.Info, null, true);
+				Logger.NLog("Start redial...", LogLevel.Info);
 
 				var redialCount = 1;
 
@@ -91,7 +91,7 @@ namespace DotnetSpider.Core.Redial
 					}
 					catch (Exception ex)
 					{
-						Logger.MyLog($"Redial failed loop {redialCount}: {ex}", LogLevel.Error, null, true);
+						Logger.NLog($"Redial failed loop {redialCount}: {ex}", LogLevel.Error);
 					}
 				}
 
@@ -100,7 +100,7 @@ namespace DotnetSpider.Core.Redial
 					return RedialResult.Failed;
 				}
 
-				Logger.MyLog("Redial success.", LogLevel.Info, null, true);
+				Logger.NLog("Redial success.", LogLevel.Info);
 
 				action?.Invoke();
 
@@ -110,7 +110,7 @@ namespace DotnetSpider.Core.Redial
 			}
 			catch (Exception ex)
 			{
-				Logger.MyLog($"Redial failed: {ex}", LogLevel.Error, null, true);
+				Logger.NLog($"Redial failed: {ex}", LogLevel.Error);
 				return RedialResult.Failed;
 			}
 			finally

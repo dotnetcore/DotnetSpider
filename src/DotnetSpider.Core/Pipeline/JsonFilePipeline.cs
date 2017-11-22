@@ -71,7 +71,7 @@ namespace DotnetSpider.Core.Pipeline
 			}
 			catch (IOException e)
 			{
-				Logger.MyLog(Spider.Identity, "Write data to json file failed.", LogLevel.Error, e);
+				Logger.AllLog(Spider.Identity, "Write data to json file failed.", LogLevel.Error, e);
 				throw;
 			}
 		}

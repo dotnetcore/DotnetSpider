@@ -84,7 +84,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					if (!site.DownloadFiles)
 					{
-						Logger.MyLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
+						Logger.AllLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
 						return new Page(request, null) { Skip = true };
 					}
 					else
@@ -98,7 +98,7 @@ namespace DotnetSpider.Core.Downloader
 
 					if (string.IsNullOrEmpty(page.Content))
 					{
-						Logger.MyLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
+						Logger.AllLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
 					}
 				}
 
@@ -114,7 +114,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					page.Exception = de;
 				}
-				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {de.Message}", LogLevel.Warn);
+				Logger.AllLog(spider.Identity, $"Download {request.Url} failed: {de.Message}", LogLevel.Warn);
 
 				return page;
 			}
@@ -126,7 +126,7 @@ namespace DotnetSpider.Core.Downloader
 					page.Exception = he;
 				}
 
-				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {he.Message}.", LogLevel.Warn);
+				Logger.AllLog(spider.Identity, $"Download {request.Url} failed: {he.Message}.", LogLevel.Warn);
 				return page;
 			}
 			catch (Exception e)
@@ -137,7 +137,7 @@ namespace DotnetSpider.Core.Downloader
 					Skip = true
 				};
 
-				Logger.MyLog(spider.Identity, $"Download {request.Url} failed: {e.Message}.", LogLevel.Error, e);
+				Logger.AllLog(spider.Identity, $"Download {request.Url} failed: {e.Message}.", LogLevel.Error, e);
 				return page;
 			}
 			finally
@@ -152,7 +152,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.MyLog(spider.Identity, "Close response fail.", LogLevel.Error, e);
+					Logger.AllLog(spider.Identity, "Close response fail.", LogLevel.Error, e);
 				}
 			}
 		}

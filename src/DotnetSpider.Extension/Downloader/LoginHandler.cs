@@ -56,7 +56,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 			catch (Exception ex)
 			{
-				Logger.MyLog($"LoginHandler failed: {ex}.", NLog.LogLevel.Error);
+				Logger.AllLog($"LoginHandler failed: {ex}.", NLog.LogLevel.Error);
 				return false;
 			}
 		}

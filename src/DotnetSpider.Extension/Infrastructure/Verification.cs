@@ -60,7 +60,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				}
 				else
 				{
-					Logger.MyLog($"EmailPort is not a number: {portStr}.", LogLevel.Error);
+					Logger.AllLog($"EmailPort is not a number: {portStr}.", LogLevel.Error);
 				}
 			}
 			EmailAccount = Core.Env.EmailAccount;
@@ -102,13 +102,13 @@ namespace DotnetSpider.Extension.Infrastructure
 				}
 				if (needVerify)
 				{
-					Logger.MyLog(identity, "Start data verification...", LogLevel.Info);
+					Logger.AllLog(identity, "Start data verification...", LogLevel.Info);
 					dataVerificationAndReport();
-					Logger.MyLog(identity, "Data verification complete.", LogLevel.Info);
+					Logger.AllLog(identity, "Data verification complete.", LogLevel.Info);
 				}
 				else
 				{
-					Logger.MyLog(identity, "Data verification is done already.", LogLevel.Info);
+					Logger.AllLog(identity, "Data verification is done already.", LogLevel.Info);
 				}
 
 				if (needVerify)
@@ -118,7 +118,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 			catch (Exception e)
 			{
-				Logger.MyLog(identity, e.Message, LogLevel.Error, e);
+				Logger.AllLog(identity, e.Message, LogLevel.Error, e);
 			}
 			finally
 			{
@@ -453,7 +453,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 			if (!string.IsNullOrEmpty(ReportSampleSql) && ReportSampleSql.ToLower().Contains("limit"))
 			{
-				Logger.MyLog("SQL contains 'LIMIT'.", LogLevel.Error);
+				Logger.AllLog("SQL contains 'LIMIT'.", LogLevel.Error);
 				return veridationResult;
 			}
 			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrEmpty(EmailHost))

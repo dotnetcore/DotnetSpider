@@ -81,7 +81,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (entityDefine.TableInfo == null)
 			{
-				Logger.MyLog(Spider?.Identity, $"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", LogLevel.Warn);
+				Logger.AllLog(Spider?.Identity, $"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", LogLevel.Warn);
 				return;
 			}
 
@@ -120,7 +120,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 						catch (Exception e)
 						{
-							Logger.MyLog(Spider.Identity, "Update ConnectString failed.", LogLevel.Error, e);
+							Logger.AllLog(Spider.Identity, "Update ConnectString failed.", LogLevel.Error, e);
 							Thread.Sleep(1000);
 						}
 					}

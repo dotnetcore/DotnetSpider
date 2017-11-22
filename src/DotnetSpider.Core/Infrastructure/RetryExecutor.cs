@@ -19,7 +19,7 @@ namespace DotnetSpider.Core.Infrastructure
 				}
 				catch (Exception ex)
 				{
-					Logger.MyLog($"Retry action failed: {ex}", LogLevel.Error);
+					Logger.AllLog($"Retry action failed: {ex}", LogLevel.Error);
 					Thread.Sleep(500);
 				}
 			}
@@ -37,7 +37,7 @@ namespace DotnetSpider.Core.Infrastructure
 				}
 				catch (Exception ex)
 				{
-					Logger.MyLog($"Retry action failed: {ex}", LogLevel.Error);
+					Logger.AllLog($"Retry action failed: {ex}", LogLevel.Error);
 					Thread.Sleep(500);
 				}
 			}

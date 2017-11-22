@@ -45,7 +45,7 @@ namespace DotnetSpider.Core.Proxy
 				}
 				catch (Exception ex)
 				{
-					Logger.MyLog("Get new proxies failed.", LogLevel.Error, ex);
+					Logger.AllLog("Get new proxies failed.", LogLevel.Error, ex);
 					Thread.Sleep(5000);
 				}
 			}

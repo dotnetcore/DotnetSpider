@@ -247,7 +247,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 					{
-						Logger.MyLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
+						Logger.AllLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
 						spider.Exit();
 					}
 					page = Spider.AddToCycleRetry(page.Request, spider.Site);
@@ -279,7 +279,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 					{
-						Logger.MyLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
+						Logger.AllLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
 						spider.Exit();
 					}
 					Spider.AddToCycleRetry(page.Request, spider.Site);

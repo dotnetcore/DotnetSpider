@@ -25,7 +25,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.TableInfo == null)
 			{
-				Logger.MyLog(Spider?.Identity, $"Schema is necessary, skip {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
+				Logger.AllLog(Spider?.Identity, $"Schema is necessary, skip {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
 

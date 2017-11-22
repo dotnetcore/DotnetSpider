@@ -86,10 +86,10 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.MyLog(spider.Identity, "Storage file failed.", LogLevel.Error, e);
+					Logger.AllLog(spider.Identity, "Storage file failed.", LogLevel.Error, e);
 				}
 			}
-			Logger.MyLog(spider.Identity, $"Storage file: {request.Url} success.", LogLevel.Info);
+			Logger.AllLog(spider.Identity, $"Storage file: {request.Url} success.", LogLevel.Info);
 			return new Page(request, null) { Skip = true };
 		}
 

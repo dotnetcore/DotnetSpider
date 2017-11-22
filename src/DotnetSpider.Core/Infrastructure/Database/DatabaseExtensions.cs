@@ -39,7 +39,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				{
 					if (e.Message.ToLower().StartsWith("authentication to host"))
 					{
-						Logger.MyLog($"{e}", LogLevel.Error);
+						Logger.AllLog($"{e}", LogLevel.Error);
 						Thread.Sleep(1000);
 					}
 					else
@@ -89,7 +89,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				{
 					if (e.Message.ToLower().StartsWith("authentication to host"))
 					{
-						Logger.MyLog($"{e}", LogLevel.Error);
+						Logger.AllLog($"{e}", LogLevel.Error);
 						Thread.Sleep(1000);
 					}
 					else
