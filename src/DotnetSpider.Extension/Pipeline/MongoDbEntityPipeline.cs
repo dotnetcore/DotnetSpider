@@ -7,6 +7,7 @@ using System;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -39,14 +40,25 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (_collections.TryGetValue(entityName, out var collection))
 			{
-				List<BsonDocument> reslut = new List<BsonDocument>();
-				foreach (var data in datas)
+				var action = new Action(() =>
 				{
-					BsonDocument item = BsonDocument.Create(data);
-					reslut.Add(item);
+					List<BsonDocument> reslut = new List<BsonDocument>();
+					foreach (var data in datas)
+					{
+						BsonDocument item = BsonDocument.Create(data);
+						reslut.Add(item);
+					}
+					reslut.Add(BsonDocument.Create(DateTime.Now));
+					collection.InsertMany(reslut);
+				});
+				if (DbExecutor.UseNetworkCenter)
+				{
+					NetworkCenter.Current.Execute("db", action);
 				}
-				reslut.Add(BsonDocument.Create(DateTime.Now));
-				collection.InsertMany(reslut);
+				else
+				{
+					action();
+				}
 			}
 			return datas.Count;
 		}

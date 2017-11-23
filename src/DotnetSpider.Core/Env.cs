@@ -138,8 +138,7 @@ namespace DotnetSpider.Core
 
 			var interf = NetworkInterface.GetAllNetworkInterfaces().First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet);
 			var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
-			Ip = unicastAddresses.First(a => a.IPv4Mask.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork).Address.ToString();
-
+			Ip = unicastAddresses.FirstOrDefault(a => a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString();
 			var path = Path.Combine(BaseDirectory, "app.config");
 
 			LoadConfiguration(path);

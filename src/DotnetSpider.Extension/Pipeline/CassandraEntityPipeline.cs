@@ -9,6 +9,7 @@ using NLog;
 using DotnetSpider.Core;
 using System.Collections.Concurrent;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -99,29 +100,41 @@ namespace DotnetSpider.Extension.Pipeline
 				switch (metadata.PipelineMode)
 				{
 					default:
-					{
-							var insertStmt = session.Prepare(metadata.InsertSql);
-							var batch = new BatchStatement();
-							foreach (var data in datas)
+						{
+							var action = new Action(() =>
 							{
-								List<object> values = new List<object>();
-								foreach (var column in metadata.Columns)
+								var insertStmt = session.Prepare(metadata.InsertSql);
+								var batch = new BatchStatement();
+								foreach (var data in datas)
 								{
-									if (column.DataType.FullName != DataTypeNames.TimeUuid)
+									List<object> values = new List<object>();
+									foreach (var column in metadata.Columns)
 									{
-										values.Add(column.Property.GetValue(data));
+										if (column.DataType.FullName != DataTypeNames.TimeUuid)
+										{
+											values.Add(column.Property.GetValue(data));
+										}
+										else
+										{
+											var value = column.Property.GetValue(data);
+											values.Add(Equals(value, DefaultTimeUuid) ? TimeUuid.NewId() : value);
+										}
 									}
-									else
-									{
-										var value = column.Property.GetValue(data);
-										values.Add(Equals(value, DefaultTimeUuid) ? TimeUuid.NewId() : value);
-									}
-								}
 
-								batch.Add(insertStmt.Bind(values.ToArray()));
+									batch.Add(insertStmt.Bind(values.ToArray()));
+								}
+								// Execute the batch
+								session.Execute(batch);
+							});
+							if (DbExecutor.UseNetworkCenter)
+							{
+								NetworkCenter.Current.Execute("db", action);
 							}
-							// Execute the batch
-							session.Execute(batch);
+							else
+							{
+								action();
+							}
+
 							break;
 						}
 					case PipelineMode.InsertNewAndUpdateOld:
