@@ -53,6 +53,11 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			base.Init(spider);
 
+			if (string.IsNullOrEmpty(ConnectString))
+			{
+				throw new SpiderException("Redis connection string unfound.");
+			}
+
 			if (string.IsNullOrEmpty(_identityMd5))
 			{
 				var md5 = Encrypt.Md5Encrypt(spider.Identity);

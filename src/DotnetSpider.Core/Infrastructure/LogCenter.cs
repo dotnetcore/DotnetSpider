@@ -83,7 +83,7 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			LogEventInfo theEvent = new LogEventInfo(level, logger.Name, message) { Exception = exception };
 			theEvent.Properties["Identity"] = identity;
-			theEvent.Properties["Node"] = NodeId.Id;
+			theEvent.Properties["NodeId"] = NodeId.Id;
 			logger.Log(theEvent);
 		}
 
