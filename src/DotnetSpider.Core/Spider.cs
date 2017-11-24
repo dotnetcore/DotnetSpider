@@ -1393,7 +1393,9 @@ namespace DotnetSpider.Core
 				AvgPipelineSpeed = (AvgPipelineSpeed + time) / 2;
 			}
 		}
-
+        /// <summary>
+        /// 显示状态
+        /// </summary>
 		private void ReportStatus()
 		{
 			Monitor?.Report(Stat.ToString(),

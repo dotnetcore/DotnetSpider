@@ -2,6 +2,10 @@
 
 namespace DotnetSpider.Core.Monitor
 {
+
+    /// <summary>
+    /// 显示监控 
+    /// </summary>
 	public interface IMonitor : IDisposable
 	{
 		IAppBase App { get; set; }

@@ -1,5 +1,9 @@
-namespace DotnetSpider.Core.Processor
+﻿namespace DotnetSpider.Core.Processor
 {
+
+    /// <summary>
+    /// 负责HTML解析、目标URL的选择
+    /// </summary>
 	public interface IPageProcessor
 	{
 		/// <summary>

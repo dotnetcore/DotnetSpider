@@ -23,13 +23,13 @@ namespace DotnetSpider.Sample
 		{
 			Identity = Identity ?? "JD SKU SAMPLE";
 			// storage data to mysql, default is mysql entity pipeline, so you can comment this line. Don't miss sslmode.
-			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
+			AddPipeline(new MySqlEntityPipeline(Env.DataConnectionStringSettings.ConnectionString));
 			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			AddEntityType<Product>();
 		}
 	}
 
-	[EntityTable("test", "jd_sku", EntityTable.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
+	[EntityTable("DotnetSpider", "jd_sku", EntityTable.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 	[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 	[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 	public class Product : SpiderEntity
