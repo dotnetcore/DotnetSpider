@@ -1,4 +1,4 @@
-using DotnetSpider.Core.Scheduler.Component;
+﻿using DotnetSpider.Core.Scheduler.Component;
 using System.Collections.Generic;
 using DotnetSpider.Core.Redial;
 
@@ -6,6 +6,7 @@ namespace DotnetSpider.Core.Scheduler
 {
 	/// <summary>
 	/// Remove duplicate urls and only push urls which are not duplicate.
+	/// 删除重复的URL
 	/// </summary>
 	public abstract class DuplicateRemovedScheduler : Named, IScheduler
 	{

@@ -1,15 +1,16 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Scheduler
 {
-	/// <summary>
-	/// Scheduler is the part of url management. 
-	/// You can implement interface Scheduler to do:
-	/// manage urls to fetch
-	/// remove duplicate urls
-	/// </summary>
-	public interface IScheduler : IDisposable, IMonitorable, IClear
+    /// <summary>
+    /// Scheduler is the part of url management. 
+    /// You can implement interface Scheduler to do:
+    /// manage urls to fetch
+    /// remove duplicate urls 
+    /// 负责URL的调度、去重，可以实现如Queue, PriorityQueueScheduler, RedisScheduler(可用于分布式)等等
+    /// </summary>
+    public interface IScheduler : IDisposable, IMonitorable, IClear
 	{
 		bool DepthFirst { get; set; }
 
