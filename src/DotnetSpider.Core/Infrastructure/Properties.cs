@@ -2,6 +2,9 @@
 
 namespace DotnetSpider.Core.Infrastructure
 {
+    /// <summary>
+    /// 自描述
+    /// </summary>
 	[AttributeUsage(AttributeTargets.Class)]
 	public class Properties : Attribute
 	{

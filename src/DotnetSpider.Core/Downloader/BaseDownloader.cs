@@ -17,6 +17,7 @@ namespace DotnetSpider.Core.Downloader
 
 		/// <summary>
 		/// Auto detect content is json or html
+		/// 自动检测内容是JSON or HTML
 		/// </summary>
 		private bool _detectContentType;
 

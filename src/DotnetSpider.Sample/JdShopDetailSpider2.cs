@@ -33,12 +33,12 @@ namespace DotnetSpider.Sample
 			AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3682523&callback=json");
 
 			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler("json(", ");", 5, 2));
-
-			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost ;User ID=root;Password=;Port=3306"));
+		    AddPipeline(new MySqlEntityPipeline(Env.DataConnectionStringSettings.ConnectionString));
+            //AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost ;User ID=root;Password=;Port=3306"));
 			AddEntityType<ProductUpdater>();
 		}
 
-		[EntityTable("jd", "shop", EntityTable.Monday, Uniques = new[] { "pid" })]
+		[EntityTable("DotnetSpider", "shop", EntityTable.Monday, Uniques = new[] { "pid" })]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
 		class ProductUpdater : SpiderEntity
 		{

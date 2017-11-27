@@ -41,7 +41,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public ResultItems AddOrUpdateResultItem(string key, dynamic value)
+		public ResultItems  AddOrUpdateResultItem(string key, dynamic value)
 		{
 			lock (_locker)
 			{

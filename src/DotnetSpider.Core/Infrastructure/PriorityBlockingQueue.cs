@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Infrastructure
 {
+    /// <summary>
+    /// 优先权阻塞队列
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
 	public class PriorityBlockingQueue<T>
 	{
 		private readonly IComparer<T> _comparer;

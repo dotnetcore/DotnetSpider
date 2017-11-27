@@ -25,13 +25,18 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				throw new SpiderException("Database or table name should not be null or empty.");
 			}
-			InitConnectStringSettings(connectString);
-			Database = database;
-			TableName = tableName;
-			InitDatabaseAndTable(Database, TableName);
-		}
+		    InitConnectStringSettings(connectString);
+		    Database = database;
+		    TableName = tableName;
+		    InitDatabaseAndTable(Database, TableName);
+        }
 
-		public override void Process(params ResultItems[] resultItems)
+	    public override void InitPipeline(ISpider spider)
+	    {
+	        base.InitPipeline(spider);
+	    }
+
+	    public override void Process(params ResultItems[] resultItems)
 		{
 			var results = new List<DefaulHtmlContent>();
 			foreach (var resultItem in resultItems)
@@ -45,7 +50,8 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			using (var conn = ConnectionStringSettings.GetDbConnection())
 			{
-				conn.MyExecute($"INSERT IGNORE `{Database}`.`{TableName}` (`url`, `title`, `html`) VALUES (@Url, @Title, @Html);", results);
+                // INSERT IGNORE 避免重复插入
+                conn.MyExecute($"INSERT IGNORE `{Database}`.`{TableName}` (`url`, `title`, `html`) VALUES (@Url, @Title, @Html);", results);
 			}
 		}
 
@@ -70,7 +76,7 @@ namespace DotnetSpider.Extension.Pipeline
 			ConnectionStringSettings = connectionStringSettings;
 		}
 
-		private void InitDatabaseAndTable(string database, string tableName)
+		private  void InitDatabaseAndTable(string database, string tableName)
 		{
 			using (var conn = ConnectionStringSettings.GetDbConnection())
 			{

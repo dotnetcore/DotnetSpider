@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
@@ -12,29 +12,29 @@ namespace DotnetSpider.Sample
 {
 	public class BaseUsage
 	{
-		#region Custmize processor and pipeline ÍêÈ«×Ô¶¨ÒåÒ³Ãæ½âÎöºÍÊı¾İ¹ÜµÀ
+		#region Custmize processor and pipeline å®Œå…¨è‡ªå®šä¹‰é¡µé¢è§£æå’Œæ•°æ®ç®¡é“
 
 		public static void CustmizeProcessorAndPipeline()
 		{
-			// Config encoding, header, cookie, proxy etc... ¶¨Òå²É¼¯µÄ Site ¶ÔÏó, ÉèÖÃ Header¡¢Cookie¡¢´úÀíµÈ
+			// Config encoding, header, cookie, proxy etc... å®šä¹‰é‡‡é›†çš„ Site å¯¹è±¡, è®¾ç½® Headerã€Cookieã€ä»£ç†ç­‰
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
 			for (int i = 1; i < 5; ++i)
 			{
-				// Add start/feed urls. Ìí¼Ó³õÊ¼²É¼¯Á´½Ó
+				// Add start/feed urls. æ·»åŠ åˆå§‹é‡‡é›†é“¾æ¥
 				site.AddStartUrl($"http://list.youku.com/category/show/c_96_s_1_d_1_p_{i}.html");
 			}
 			Spider spider = Spider.Create(site,
-				// use memoery queue scheduler. Ê¹ÓÃÄÚ´æµ÷¶È
+				// use memoery queue scheduler. ä½¿ç”¨å†…å­˜è°ƒåº¦
 				new QueueDuplicateRemovedScheduler(),
-				// use custmize processor for youku ÎªÓÅ¿á×Ô¶¨ÒåµÄ Processor
+				// use custmize processor for youku ä¸ºä¼˜é…·è‡ªå®šä¹‰çš„ Processor
 				new YoukuPageProcessor())
-				// use custmize pipeline for youku ÎªÓÅ¿á×Ô¶¨ÒåµÄ Pipeline
+				// use custmize pipeline for youku ä¸ºä¼˜é…·è‡ªå®šä¹‰çš„ Pipeline
 				.AddPipeline(new YoukuPipeline());
 			spider.Downloader = new HttpClientDownloader();
 			spider.ThreadNum = 1;
 			spider.EmptySleepTime = 3000;
 
-			// Start crawler Æô¶¯ÅÀ³æ
+			// Start crawler å¯åŠ¨çˆ¬è™«
 			spider.Run();
 		}
 
@@ -54,7 +54,7 @@ namespace DotnetSpider.Sample
 					}
 					//Console.WriteLine(builder);
 				}
-				// Other actions like save data to DB. ¿ÉÒÔ×ÔÓÉÊµÏÖ²åÈëÊı¾İ¿â»ò±£´æµ½ÎÄ¼ş
+				// Other actions like save data to DB. å¯ä»¥è‡ªç”±å®ç°æ’å…¥æ•°æ®åº“æˆ–ä¿å­˜åˆ°æ–‡ä»¶
 			}
 		}
 
@@ -62,7 +62,7 @@ namespace DotnetSpider.Sample
 		{
 			protected override void Handle(Page page)
 			{
-				// ÀûÓÃ Selectable ²éÑ¯²¢¹¹Ôì×Ô¼ºÏëÒªµÄÊı¾İ¶ÔÏó
+				// åˆ©ç”¨ Selectable æŸ¥è¯¢å¹¶æ„é€ è‡ªå·±æƒ³è¦çš„æ•°æ®å¯¹è±¡
 				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='yk-pack pack-film']")).Nodes();
 				List<YoukuVideo> results = new List<YoukuVideo>();
 				foreach (var videoElement in totalVideoElements)
@@ -72,10 +72,10 @@ namespace DotnetSpider.Sample
 					results.Add(video);
 				}
 
-				// Save data object by key. ÒÔ×Ô¶¨ÒåKEY´æÈëpage¶ÔÏóÖĞ¹©Pipelineµ÷ÓÃ
+				// Save data object by key. ä»¥è‡ªå®šä¹‰KEYå­˜å…¥pageå¯¹è±¡ä¸­ä¾›Pipelineè°ƒç”¨
 				page.AddResultItem("VideoResult", results);
 
-				// Add target requests to scheduler. ½âÎöĞèÒª²É¼¯µÄURL
+				// Add target requests to scheduler. è§£æéœ€è¦é‡‡é›†çš„URL
 				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
 				{
 					page.AddTargetRequest(new Request(url.GetValue(), null));
@@ -90,8 +90,10 @@ namespace DotnetSpider.Sample
 
 		#endregion
 
-		#region Crawler pages without traverse ²É¼¯Ö¸¶¨Ò³Ãæ²»×ö±éÀú
-
+		#region Crawler pages without traverse é‡‡é›†æŒ‡å®šé¡µé¢ä¸åšéå†
+        /// <summary>
+        /// é¡µé¢çˆ¬è™«
+        /// </summary>
 		public static void CrawlerPagesWithoutTraverse()
 		{
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
@@ -108,17 +110,19 @@ namespace DotnetSpider.Sample
 			spider.ThreadNum = 2;
 			spider.EmptySleepTime = 3000;
 
-			// Æô¶¯ÅÀ³æ
+			// å¯åŠ¨çˆ¬è™«
 			spider.Run();
 		}
 
 		#endregion
 
-		#region Crawler pages traversal ±éÀúÕûÕ¾
-
+		#region Crawler pages traversal éå†æ•´ç«™
+        /// <summary>
+        /// é¡µé¢çˆ¬è™«æ·±åº¦éå†
+        /// </summary>
 		public static void CrawlerPagesTraversal()
 		{
-			// Config encoding, header, cookie, proxy etc... ¶¨Òå²É¼¯µÄ Site ¶ÔÏó, ÉèÖÃ Header¡¢Cookie¡¢´úÀíµÈ
+			// Config encoding, header, cookie, proxy etc... å®šä¹‰é‡‡é›†çš„ Site å¯¹è±¡, è®¾ç½® Headerã€Cookieã€ä»£ç†ç­‰
 			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
 
 			// Set start/seed url
@@ -136,15 +140,15 @@ namespace DotnetSpider.Sample
 
 			// dowload html by http client
 			spider.Downloader = new HttpClientDownloader();
-			// 4 threads 4Ïß³Ì
+			// 4 threads 4çº¿ç¨‹
 			spider.ThreadNum = 4;
-			// traversal deep ±éÀúÉî¶È
+			// traversal deep éå†æ·±åº¦
 			spider.Deep = 3;
 
-			// stop crawler if it can't get url from the scheduler after 30000 ms µ±ÅÀ³æÁ¬Ğø30ÃëÎŞ·¨´Óµ÷¶ÈÖĞĞÄÈ¡µÃĞèÒª²É¼¯µÄÁ´½ÓÊ±½áÊø.
+			// stop crawler if it can't get url from the scheduler after 30000 ms å½“çˆ¬è™«è¿ç»­30ç§’æ— æ³•ä»è°ƒåº¦ä¸­å¿ƒå–å¾—éœ€è¦é‡‡é›†çš„é“¾æ¥æ—¶ç»“æŸ.
 			spider.EmptySleepTime = 30000;
 
-			// start crawler Æô¶¯ÅÀ³æ
+			// start crawler å¯åŠ¨çˆ¬è™«
 			spider.Run();
 		}
 

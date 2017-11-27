@@ -13,6 +13,9 @@ using System.Text;
 
 namespace DotnetSpider.Core
 {
+    /// <summary>
+    ///  任务名称
+    /// </summary>
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 	public class TaskName : Attribute
 	{
