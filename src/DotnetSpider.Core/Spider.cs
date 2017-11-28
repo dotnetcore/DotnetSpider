@@ -697,9 +697,12 @@ namespace DotnetSpider.Core
 				OnClose();
 
 				Logger.AllLog(Identity, "Waiting for monitor exit.", LogLevel.Info);
-				_monitorTask.Wait(5000);
 
-				OnClosing?.Invoke(this);
+#if !DEBUG
+	               _monitorTask.Wait(5000);		    
+#endif
+
+                OnClosing?.Invoke(this);
 
 				var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
 				Logger.AllLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
@@ -954,44 +957,48 @@ namespace DotnetSpider.Core
 				}
 			}
 
-			_monitorTask = Task.Factory.StartNew(() =>
-			{
-				while (true)
-				{
-					try
-					{
-						ReportStatus();
+#if !DEBUG
+		    // 每间隔一定时间发送一次报告
+		    _monitorTask = Task.Factory.StartNew(() =>
+		    {
+		        while (true)
+		        {
+		            try
+		            {
+		                ReportStatus();
 
-						while (!Monitorable.IsExited)
-						{
-							Thread.Sleep(StatusReportInterval);
-							ReportStatus();
+		                while (!Monitorable.IsExited)
+		                {
+		                    Thread.Sleep(StatusReportInterval);
+		                    ReportStatus();
 
-							if (!string.IsNullOrEmpty(closeSignal) && File.Exists(closeSignal))
-							{
-								Exit();
-								try
-								{
-									File.Delete(closeSignal);
-								}
-								catch
-								{
-								}
-							}
-						}
+		                    if (!string.IsNullOrEmpty(closeSignal) && File.Exists(closeSignal))
+		                    {
+		                        Exit();
+		                        try
+		                        {
+		                            File.Delete(closeSignal);
+		                        }
+		                        catch
+		                        {
+		                        }
+		                    }
+		                }
 
-						ReportStatus();
-						break;
-					}
-					catch (Exception e)
-					{
-						Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
-						Thread.Sleep(StatusReportInterval);
-					}
-				}
-			});
+		                ReportStatus();
+		                break;
+		            }
+		            catch (Exception e)
+		            {
+		                Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
+		                Thread.Sleep(StatusReportInterval);
+		            }
+		        }
+		    });
+#endif
 
-			InvokeStartUrlBuilders(arguments);
+
+            InvokeStartUrlBuilders(arguments);
 
 			CookieInjector?.Inject(this, false);
 

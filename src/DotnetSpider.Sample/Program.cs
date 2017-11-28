@@ -60,9 +60,9 @@ namespace DotnetSpider.Sample
             //Console.WriteLine("Press any key to continue...");
             //Console.Read();
 
-            Cnblogs.Run();
-            Console.WriteLine("Press any key to continue...");
-            Console.Read();
+            //Cnblogs.Run();
+            //Console.WriteLine("Press any key to continue...");
+            //Console.Read();
 
             ////CasSpider casSpider = new CasSpider();
             ////casSpider.Run();
@@ -74,13 +74,22 @@ namespace DotnetSpider.Sample
             //Console.WriteLine("Press any key to continue...");
             //Console.Read();
 
-   //         JdShopDetailSpider jdSkuSampleSpider = new JdShopDetailSpider();
-			//jdSkuSampleSpider.Run();
-			//Console.WriteLine("Press any key to continue...");
-			//Console.Read();
+            //JdSkuSampleSpider jdSkuSampleSpider = new JdSkuSampleSpider();
+            //jdSkuSampleSpider.Run();
+            //Console.WriteLine("Press any key to continue...");
+            //Console.Read();
 
-			Situoli.Run();
-		}
+            LyProductSpider lyProductSpider = new LyProductSpider();
+            lyProductSpider.Run();
+            Console.WriteLine("Press any key to continue...");
+            Console.Read();
+
+
+            //Situoli.Run();
+
+
+
+        }
 
 
 		private static void MyTest()
