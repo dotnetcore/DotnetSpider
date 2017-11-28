@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
@@ -24,19 +25,26 @@ namespace DotnetSpider.Core.Selector
 
 		public override dynamic Select(HtmlNode element)
 		{
-			var node = element.SelectSingleNode(_xpath);
-			if (node != null)
-			{
-				if (HasAttribute())
-				{
-					return node.Attributes.Contains(_attribute) ? node.Attributes[_attribute].Value?.Trim() : null;
-				}
-				else
-				{
-					return node;
-				}
-			}
-			return null;
+		    try
+		    {
+		        var node = element.SelectSingleNode(_xpath);
+		        if (node != null)
+		        {
+		            if (HasAttribute())
+		            {
+		                return node.Attributes.Contains(_attribute) ? node.Attributes[_attribute].Value?.Trim() : null;
+		            }
+		            else
+		            {
+		                return node;
+		            }
+		        }
+		        return null;
+            }
+		    catch (Exception e)
+		    {
+		        return null;
+            }
 		}
 
 		public override List<dynamic> SelectList(HtmlNode element)
