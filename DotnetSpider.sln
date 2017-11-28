@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Core", "src\DotnetSpider.Core\DotnetSpider.Core.csproj", "{5C1BFB68-305B-4CF1-B985-630A447074F2}"
 EndProject
@@ -20,10 +20,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.travis.yml = .travis.yml
 		build.bat = build.bat
 		build.sh = build.sh
+		tools\HtmlAgilityPack.dll = tools\HtmlAgilityPack.dll
 		LICENSE = LICENSE
 		pack.bat = pack.bat
 		publishToNuget.bat = publishToNuget.bat
 		README.md = README.md
+		tools\XPath测试.exe = tools\XPath测试.exe
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{C74A404F-B0E5-466C-937A-66D04C4CFFEB}"
