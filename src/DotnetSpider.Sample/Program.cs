@@ -79,10 +79,17 @@ namespace DotnetSpider.Sample
             //Console.WriteLine("Press any key to continue...");
             //Console.Read();
 
-            LyProductSpider lyProductSpider = new LyProductSpider();
-            lyProductSpider.Run();
+            //LyProductSpider lyProductSpider = new LyProductSpider();
+            //lyProductSpider.Run();
+            //Console.WriteLine("Press any key to continue...");
+            //Console.Read();
+
+
+            ZhiPinSpider spider = new ZhiPinSpider();
+		    spider.Run();
             Console.WriteLine("Press any key to continue...");
             Console.Read();
+
 
 
             //Situoli.Run();
@@ -92,7 +99,7 @@ namespace DotnetSpider.Sample
         }
 
 
-		private static void MyTest()
+        private static void MyTest()
 		{
 			Dictionary<string, string> tmp = new Dictionary<string, string>();
 			tmp.Add("a", "b");
