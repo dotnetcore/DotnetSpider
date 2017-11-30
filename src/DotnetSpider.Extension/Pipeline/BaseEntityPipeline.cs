@@ -80,6 +80,11 @@ namespace DotnetSpider.Extension.Pipeline
 						pipeline = new CassandraEntityPipeline(Env.DataConnectionString);
 						break;
 					}
+				case "Http":
+					{
+						pipeline = new HttpEntityPipeline(Env.DataConnectionString);
+						break;
+					}
 				default:
 					{
 						pipeline = new NullPipeline();

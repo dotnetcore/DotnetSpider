@@ -25,7 +25,5 @@ namespace DotnetSpider.Extension.Infrastructure
 				return connectString;
 			}
 		}
-
-	
 	}
 }
