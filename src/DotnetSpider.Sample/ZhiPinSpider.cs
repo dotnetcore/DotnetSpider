@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using MongoDB.Driver.Core.Events;
+using DotnetSpider.Core.Selector;
 
 namespace DotnetSpider.Sample
 {
@@ -18,9 +19,10 @@ namespace DotnetSpider.Sample
             Identity = Identity ?? "bosszhipin";
             // storage data to mysql, default is mysql entity pipeline, so you can comment this line. Don't miss sslmode.
             AddPipeline(new MySqlEntityPipeline(Env.DataConnectionStringSettings.ConnectionString));
-            AddStartUrl("https://www.zhipin.com/job_detail/?page=1&query=.net");
-            //AddStartUrl("https://www.zhipin.com/job_detail/",new Dictionary<string, object> { { "query", "JAVA" } });
-            //AddStartUrl("https://www.zhipin.com/job_detail/",new Dictionary<string, object> { { "query", "PYTHON" } });
+            AddStartUrl("https://www.zhipin.com/job_detail/?query=.net&page=1", new Dictionary<string, object> { { "query", ".NET" } });
+            AddStartUrl("https://www.zhipin.com/job_detail/?query=java&page=1", new Dictionary<string, object> { { "query", "JAVA" } });
+            AddStartUrl("https://www.zhipin.com/job_detail/?query=Python&page=1", new Dictionary<string, object> { { "query", "PYTHON" } });
+          
 
             AddEntityType<Work>();
         }
@@ -30,7 +32,7 @@ namespace DotnetSpider.Sample
 
     [EntityTable("DotnetSpider", "BOSS", EntityTable.Monday, Indexs = new[] { "JobId" })]
     [EntitySelector(Expression = "//div[@class='job-list']/ul/li")]
-     [TargetUrlsSelector(XPaths = new[] { "//div[@class=\"page\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+    [TargetUrlsSelector(XPaths = new[] { "//div[@class=\"page\"]" }, Patterns = new[] { @"page=[0-9]+" })]
     public class Work : SpiderEntity
     {
  
@@ -64,6 +66,9 @@ namespace DotnetSpider.Sample
         [PropertyDefine(Expression = "div/div/div[@class='company-text']/p", Length = 100)]
         [ReplaceFormatter(NewValue = "", OldValue = "<em class=\"vline\"></em>")]
         public string Level { get; set; }
+
+        [PropertyDefine(Expression = "query", Type = SelectorType.Enviroment)]
+        public string Type { get; set; }
     }
 
 
