@@ -19,12 +19,13 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class HttpClientDownloader : BaseDownloader
 	{
-		private static readonly List<string> MediaTypes = new List<string>
+		private static HashSet<string> MediaTypes = new HashSet<string>
 		{
 			"text/html",
 			"text/plain",
 			"text/richtext",
 			"text/xml",
+			"text/XML",
 			"text/json",
 			"text/javascript",
 			"application/soap+xml",
@@ -53,6 +54,11 @@ namespace DotnetSpider.Core.Downloader
 		public HttpClientDownloader(int timeout) : this()
 		{
 			_httpClient.Timeout = new TimeSpan(0, 0, timeout);
+		}
+
+		public static void AddMediaTypes(string type)
+		{
+			MediaTypes.Add(type);
 		}
 
 		protected override Page DowloadContent(Request request, ISpider spider)
