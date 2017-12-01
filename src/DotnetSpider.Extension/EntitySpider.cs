@@ -50,6 +50,15 @@ namespace DotnetSpider.Extension
 
 		protected override void InitPipelines(params string[] arguments)
 		{
+			if (Pipelines == null || Pipelines.Count == 0)
+			{
+				var defaultPipeline = GetDefaultPipeline();
+				if (defaultPipeline != null)
+				{
+					Pipelines.Add(defaultPipeline);
+				}
+			}
+
 			if (!arguments.Contains("skip"))
 			{
 				var entityProcessors = PageProcessors.Where(p => p is IEntityProcessor).ToList();
@@ -70,7 +79,23 @@ namespace DotnetSpider.Extension
 				}
 			}
 
-			base.InitPipelines(arguments);
+			if (PageProcessors == null || PageProcessors.Count == 0)
+			{
+				throw new SpiderException("Count of PageProcessor is zero.");
+			}
+
+			foreach (var pipeline in Pipelines)
+			{
+				pipeline.InitPipeline(this);
+			}
+		}
+
+		protected override void InitPageProcessor(params string[] arguments)
+		{
+			foreach (var processor in PageProcessors)
+			{
+				processor.Site = Site;
+			}
 		}
 	}
 }

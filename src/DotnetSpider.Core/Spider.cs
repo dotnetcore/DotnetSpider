@@ -829,22 +829,6 @@ namespace DotnetSpider.Core
 			{
 				throw new SpiderException("Length of Identity should less than 100.");
 			}
-
-			if (PageProcessors == null || PageProcessors.Count == 0)
-			{
-				throw new SpiderException("Count of PageProcessor is zero.");
-			}
-
-			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
-			Site.UserAgent = Site.UserAgent ??
-							 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
-			if (!Site.Headers.ContainsKey("Accept-Language"))
-			{
-				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
-			}
-
-			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
-			Downloader = Downloader ?? new HttpClientDownloader();
 		}
 
 		/// <summary>
@@ -860,6 +844,9 @@ namespace DotnetSpider.Core
 #if !NET_CORE // 开启多线程支持
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
+			InitSite();
+
+			InitDownloader();
 
 			InitScheduler(arguments);
 
@@ -1166,8 +1153,21 @@ namespace DotnetSpider.Core
 
 		protected virtual void InitScheduler(params string[] arguments)
 		{
+			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
 			Scheduler.Init(this);
 			Monitorable.IsExited = false;
+		}
+
+		protected virtual void InitPageProcessor(params string[] arguments)
+		{
+			if (PageProcessors == null || PageProcessors.Count == 0)
+			{
+				throw new SpiderException("Count of PageProcessor is zero.");
+			}
+			foreach (var processor in PageProcessors)
+			{
+				processor.Site = Site;
+			}
 		}
 
 		protected virtual void InitPipelines(params string[] arguments)
@@ -1309,14 +1309,6 @@ namespace DotnetSpider.Core
 			CookieInjector?.Inject(this, false);
 		}
 
-		private void InitPageProcessor()
-		{
-			foreach (var processor in PageProcessors)
-			{
-				processor.Site = Site;
-			}
-		}
-
 		private string RemoveFileCloseSignal()
 		{
 			string closeSignal = Path.Combine(Env.BaseDirectory, $"{TaskId}_close");
@@ -1409,6 +1401,22 @@ namespace DotnetSpider.Core
 				}
 				Thread.Sleep(500);
 			}
+		}
+
+		private void InitSite()
+		{
+			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
+			Site.UserAgent = Site.UserAgent ??
+							 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
+			if (!Site.Headers.ContainsKey("Accept-Language"))
+			{
+				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
+			}
+		}
+
+		private void InitDownloader()
+		{
+			Downloader = Downloader ?? new HttpClientDownloader();
 		}
 	}
 }

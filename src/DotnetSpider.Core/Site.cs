@@ -47,7 +47,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 设置 User Agent
 		/// </summary>
-		public string UserAgent { get; set; }
+		public string UserAgent { get; set; } = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
 
 		/// <summary>
 		/// 设置 User Accept

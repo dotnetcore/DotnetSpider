@@ -27,17 +27,25 @@ namespace DotnetSpider.Extension.Processor
 			{
 				foreach (var targetUrlsSelector in Extractor.EntityDefine.TargetUrlsSelectors)
 				{
-					if (targetUrlsSelector.XPaths == null && targetUrlsSelector.Patterns == null)
+					var patterns = targetUrlsSelector.Patterns?.Select(x => x?.Trim()).Distinct().ToArray();
+					var xpaths = targetUrlsSelector.XPaths?.Select(x => x?.Trim()).Distinct().ToList();
+					if (xpaths == null && patterns == null)
 					{
 						throw new SpiderException("Region xpath and patterns should not be null both.");
 					}
-					if (targetUrlsSelector.XPaths == null)
+					if (xpaths != null && xpaths.Count > 0)
 					{
-						targetUrlsSelector.XPaths = new string[] { };
+						foreach (var xpath in xpaths)
+						{
+							AddTargetUrlExtractor(xpath, patterns);
+						}
 					}
-					foreach (var xpath in targetUrlsSelector.XPaths?.Select(x => x?.Trim()).Distinct())
+					else
 					{
-						AddTargetUrlExtractor(xpath, targetUrlsSelector.Patterns);
+						if (patterns != null && patterns.Length > 0)
+						{
+							AddTargetUrlExtractor(null, patterns);
+						}
 					}
 				}
 			}

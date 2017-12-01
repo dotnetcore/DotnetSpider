@@ -48,19 +48,39 @@ namespace DotnetSpider.Extension.Test
 			spider.Run("running-test");
 		}
 
-		//[Fact]
-		//public void ThrowExceptionWhenNoEntity()
-		//{
-		//	try
-		//	{
-		//		EntitySpider spider = new EntitySpider(new Site());
-		//		spider.Run("running-test");
-		//	}
-		//	catch (SpiderException exception)
-		//	{
-		//		Assert.Equal("Count of entity is zero.", exception.Message);
-		//	}
-		//}
+		[Fact]
+		public void MultiEntity()
+		{
+			EntitySpider spider = new MultiEntitySpider();
+			spider.Run();
+		}
+
+		private class MultiEntitySpider : EntitySpider
+		{
+			protected override void MyInit(params string[] arguments)
+			{
+				AddStartUrl("http://www.baidu.com");
+				AddStartUrl("http://www.sohu.com");
+				AddEntityType<BaiduEntity>();
+				AddEntityType<SohuEntity>();
+			}
+
+			[EntityTable("test", "multy_entity")]
+			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "baidu" })]
+			public class BaiduEntity : SpiderEntity
+			{
+				[PropertyDefine(Expression = ".//title")]
+				public string Title { get; set; }
+			}
+
+			[EntityTable("test", "multy_entity")]
+			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "sohu" })]
+			public class SohuEntity : SpiderEntity
+			{
+				[PropertyDefine(Expression = ".//title")]
+				public string Title { get; set; }
+			}
+		}
 
 #if Release
 		[Fact]
