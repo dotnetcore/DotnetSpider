@@ -4,12 +4,9 @@ using Newtonsoft.Json;
 using NLog;
 using Polly;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
 {
@@ -17,18 +14,15 @@ namespace DotnetSpider.Core
 	{
 		private static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public ISpider Spider { get; private set; }
-
-		public HttpExecuteRecord(ISpider spider)
+		public bool Add(string taskId, string name, string identity)
 		{
-			Spider = spider;
-		}
-
-		public bool Add()
-		{
+			if (string.IsNullOrEmpty(taskId) || string.IsNullOrWhiteSpace(taskId))
+			{
+				return true;
+			}
 			var json = JsonConvert.SerializeObject(new
 			{
-				TaskId = Spider.TaskId
+				TaskId = taskId
 			});
 			var content = new StringContent(json, Encoding.UTF8, "application/json");
 			try
@@ -55,11 +49,16 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public void Remove()
+		public void Remove(string taskId)
 		{
+			if (string.IsNullOrEmpty(taskId) || string.IsNullOrWhiteSpace(taskId))
+			{
+				return;
+			}
+
 			var json = JsonConvert.SerializeObject(new
 			{
-				TaskId = Spider.TaskId
+				TaskId = taskId
 			});
 			var content = new StringContent(json, Encoding.UTF8, "application/json");
 

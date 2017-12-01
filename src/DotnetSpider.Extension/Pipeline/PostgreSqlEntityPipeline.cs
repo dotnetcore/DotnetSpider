@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-
-namespace DotnetSpider.Extension.Pipeline
+﻿namespace DotnetSpider.Extension.Pipeline
 {
 	public sealed class PostgreSqlEntityPipeline : MySqlEntityPipeline
 	{

@@ -4,27 +4,22 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using System.Threading;
 using DotnetSpider.Extension.Infrastructure;
-using System.Data;
 using NLog;
-using DotnetSpider.Extension.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Redial;
-using DotnetSpider.Core.Monitor;
 
 namespace DotnetSpider.Extension
 {
 	public abstract class CommonSpider : Spider
 	{
 		private const string InitFinishedValue = "init complete";
-		protected const string InitStatusSetKey = "dotnetspider:init-stats";
+		internal const string InitStatusSetKey = "dotnetspider:init-stats";
+		internal string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
 		protected abstract void MyInit(params string[] arguments);
 
-		protected Action DataVerificationAndReport;
-
-		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
+		public Action DataVerificationAndReport;
 
 		protected CommonSpider(Site site) : base(site)
 		{
@@ -40,13 +35,9 @@ namespace DotnetSpider.Extension
 			Name = name;
 		}
 
-		public override void Run(params string[] arguments)
+		protected override void RunApp(params string[] arguments)
 		{
 			PrintInfo.Print();
-
-			Logger.AllLog(Identity, "Init redial module if necessary.", LogLevel.Info);
-
-			InitRedialConfiguration();
 
 			Logger.AllLog(Identity, "Build custom component...", LogLevel.Info);
 
@@ -54,11 +45,6 @@ namespace DotnetSpider.Extension
 			{
 				MyInit(arguments);
 			});
-
-			if (string.IsNullOrEmpty(Identity) || Identity.Length > 120)
-			{
-				throw new ArgumentException("Length of Identity should between 1 and 120.");
-			}
 
 			if (arguments.Contains("skip"))
 			{
@@ -74,9 +60,11 @@ namespace DotnetSpider.Extension
 				}
 			}
 
+			CheckIfSettingsCorrect();
+
 			RegisterControl(this);
 
-			base.Run(arguments);
+			base.RunApp(arguments);
 
 			if (IsComplete && DataVerificationAndReport != null)
 			{
@@ -87,23 +75,9 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		protected virtual void InitRedialConfiguration() { }
-
-		public ISpider ToDefaultSpider()
+		protected override void InitScheduler(params string[] arguments)
 		{
-			return new DefaultSpider("", new Site());
-		}
-
-		protected override void PreInitComponent(params string[] arguments)
-		{
-			base.PreInitComponent();
-
-			if (Site == null)
-			{
-				throw new SpiderException("Site should not be null.");
-			}
-
-			Scheduler.Init(this);
+			base.InitScheduler(arguments);
 
 			if (arguments.Contains("rerun"))
 			{
@@ -111,12 +85,6 @@ namespace DotnetSpider.Extension
 				Scheduler.Dispose();
 				BaseVerification.RemoveVerifidationLock(Identity);
 			}
-		}
-
-		protected override void AfterInitComponent(params string[] arguments)
-		{
-			RedisConnection.Default?.Database.LockRelease(InitLockKey, 0);
-			base.AfterInitComponent(arguments);
 		}
 
 		/// <summary>
@@ -136,9 +104,9 @@ namespace DotnetSpider.Extension
 				}
 				else
 				{
-					while (!RedisConnection.Default.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(10)))
+					while (!RedisConnection.Default.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(30)))
 					{
-						Thread.Sleep(1000);
+						Thread.Sleep(1500);
 					}
 					var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
 					return lockerValue != InitFinishedValue;
@@ -155,6 +123,7 @@ namespace DotnetSpider.Extension
 			if (RedisConnection.Default != null)
 			{
 				RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
+				RedisConnection.Default.Database.LockRelease(InitLockKey, 0);
 			}
 		}
 
@@ -196,6 +165,11 @@ namespace DotnetSpider.Extension
 					Logger.AllLog(Identity, "Register contol failed.", LogLevel.Error, e);
 				}
 			}
+		}
+
+		public ISpider ToDefaultSpider()
+		{
+			return new DefaultSpider("", new Site());
 		}
 	}
 }

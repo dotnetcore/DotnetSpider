@@ -48,31 +48,29 @@ namespace DotnetSpider.Extension
 			return BaseEntityPipeline.GetPipelineFromAppConfig();
 		}
 
-		protected override void PreInitComponent(params string[] arguments)
+		protected override void InitPipelines(params string[] arguments)
 		{
-			base.PreInitComponent(arguments);
-
-			if (arguments.Contains("skip"))
+			if (!arguments.Contains("skip"))
 			{
-				return;
-			}
+				var entityProcessors = PageProcessors.Where(p => p is IEntityProcessor).ToList();
+				var entityPipelines = Pipelines.Where(p => p is BaseEntityPipeline).ToList();
 
-			var entityProcessors = PageProcessors.Where(p => p is IEntityProcessor).ToList();
-			var entityPipelines = Pipelines.Where(p => p is BaseEntityPipeline).ToList();
-
-			if (entityProcessors.Count != 0 && entityPipelines.Count == 0)
-			{
-				throw new SpiderException("You may miss a entity pipeline.");
-			}
-			foreach (var processor in entityProcessors)
-			{
-				foreach (var pipeline in entityPipelines)
+				if (entityProcessors.Count != 0 && entityPipelines.Count == 0)
 				{
-					var entityProcessor = processor as IEntityProcessor;
-					BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
-					newPipeline.AddEntity(entityProcessor.EntityDefine);
+					throw new SpiderException("You may miss a entity pipeline.");
+				}
+				foreach (var processor in entityProcessors)
+				{
+					foreach (var pipeline in entityPipelines)
+					{
+						var entityProcessor = processor as IEntityProcessor;
+						BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
+						newPipeline.AddEntity(entityProcessor.EntityDefine);
+					}
 				}
 			}
+
+			base.InitPipelines(arguments);
 		}
 	}
 }

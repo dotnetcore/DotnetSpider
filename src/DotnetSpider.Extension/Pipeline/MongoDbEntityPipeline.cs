@@ -6,7 +6,6 @@ using System.Collections.Concurrent;
 using System;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
-using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Pipeline

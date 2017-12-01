@@ -7,7 +7,6 @@ using System.Web;
 using System.Text;
 using System.Net.Http;
 using System.Net;
-using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;

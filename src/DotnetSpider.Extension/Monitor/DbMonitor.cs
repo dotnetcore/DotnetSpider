@@ -5,7 +5,6 @@ using System;
 using DotnetSpider.Core.Infrastructure.Database;
 using System.Data;
 using MySql.Data.MySqlClient;
-using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Monitor
 {
@@ -15,10 +14,8 @@ namespace DotnetSpider.Extension.Monitor
 
 		private readonly bool _isDbOnly;
 
-		public DbMonitor(IAppBase app, bool isDbOnly = false)
+		public DbMonitor(string taskId, string identity, bool isDbOnly = false) : base(taskId, identity)
 		{
-			App = app;
-
 			_isDbOnly = isDbOnly;
 
 			if (Core.Env.SystemConnectionStringSettings != null)
@@ -31,8 +28,8 @@ namespace DotnetSpider.Extension.Monitor
 					conn.MyExecute(insertSql,
 						new
 						{
-							TaskId = App.TaskId,
-							Identity = App.Identity,
+							TaskId = _taskId,
+							Identity = _identity,
 							NodeId = NodeId.Id,
 							Status = "INIT",
 							Left = 0,
@@ -100,7 +97,7 @@ namespace DotnetSpider.Extension.Monitor
 					"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `NodeId`=@NodeId;",
 					new
 					{
-						Identity = App.Identity,
+						Identity = _identity,
 						NodeId = NodeId.Id,
 						Status = status,
 						Left = left,

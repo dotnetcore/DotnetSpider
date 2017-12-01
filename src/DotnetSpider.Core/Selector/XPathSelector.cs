@@ -25,7 +25,7 @@ namespace DotnetSpider.Core.Selector
 
 		public override dynamic Select(HtmlNode element)
 		{
-			var node = element.SelectNodes(_xpath).FirstOrDefault();
+			var node = element.SelectSingleNode(_xpath);
 			if (node != null)
 			{
 				if (HasAttribute())

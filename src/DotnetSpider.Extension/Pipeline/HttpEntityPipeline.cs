@@ -1,13 +1,10 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Redial;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using DotnetSpider.Extension.Model;
 using System.Collections.Concurrent;
 using NLog;

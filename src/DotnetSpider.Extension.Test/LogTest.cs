@@ -9,8 +9,6 @@ using Xunit;
 using System;
 using System.Linq;
 using System.Threading;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -35,7 +33,7 @@ namespace DotnetSpider.Extension.Test
 				new QueueDuplicateRemovedScheduler(),
 				new TestPageProcessor()))
 			{
-				spider.Monitor = new DbMonitor(spider);
+				spider.Monitor = new DbMonitor(spider.TaskId, spider.Identity);
 				spider.AddPipeline(new TestPipeline());
 				spider.ThreadNum = 1;
 				for (int i = 0; i < 5; i++)

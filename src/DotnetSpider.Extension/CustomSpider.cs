@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension
 				throw new ArgumentException("Length of Identity should between 1 and 120.");
 			}
 
-			Monitor = new DbMonitor(this);
+			Monitor = new DbMonitor(TaskId, Identity);
 
 			try
 			{
@@ -148,7 +148,6 @@ namespace DotnetSpider.Extension
 				}
 			}
 		}
-
 
 		public Task RunAsync(params string[] arguments)
 		{

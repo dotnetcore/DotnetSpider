@@ -26,7 +26,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		public string User { get; set; }
 
-		public Selector PassSelector { get; set; }
+		public Selector PasswordSelector { get; set; }
 
 		public string Password { get; set; }
 
@@ -57,7 +57,7 @@ namespace DotnetSpider.Extension.Downloader
 
 		protected override Cookies GetCookies(ISpider spider)
 		{
-			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PassSelector == null)
+			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PasswordSelector == null)
 			{
 				throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect.");
 			}
@@ -79,9 +79,9 @@ namespace DotnetSpider.Extension.Downloader
 					Thread.Sleep(1500);
 				}
 
-				if (PassSelector != null)
+				if (PasswordSelector != null)
 				{
-					var pass = FindElement(webDriver, PassSelector);
+					var pass = FindElement(webDriver, PasswordSelector);
 					pass.Clear();
 					pass.SendKeys(Password);
 					Thread.Sleep(1500);

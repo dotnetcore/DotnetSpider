@@ -29,10 +29,10 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// A spider contains four modules: Downloader, Scheduler, PageProcessor and Pipeline. 
 	/// </summary>
-	public class Spider : ISpider, ISpeedMonitor
+	public class Spider : AppBase, ISpider, ISpeedMonitor
 	{
 		private static readonly object Locker = new object();
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+
 		private readonly Site _site;
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
 		private IDownloader _downloader = new HttpClientDownloader();
@@ -94,7 +94,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Identity of spider.
 		/// </summary>
-		public string Identity
+		public override string Identity
 		{
 			get => _identity;
 			set
@@ -109,11 +109,6 @@ namespace DotnetSpider.Core
 				_identity = value;
 			}
 		}
-
-		/// <summary>
-		/// Name of spider.
-		/// </summary>
-		public string Name { get; set; }
 
 		/// <summary>
 		/// Site of spider.
@@ -164,13 +159,6 @@ namespace DotnetSpider.Core
 		/// Monitor of spider.
 		/// </summary>
 		public IMonitor Monitor { get; set; }
-
-		public IExecuteRecord ExecuteRecord { get; private set; }
-
-		/// <summary>
-		/// TaskId of spider.
-		/// </summary>
-		public string TaskId { get; set; }
 
 		/// <summary>
 		/// Average speed downloader.
@@ -588,7 +576,7 @@ namespace DotnetSpider.Core
 		/// Run spider.
 		/// </summary>
 		/// <param name="arguments"></param>
-		public virtual void Run(params string[] arguments)
+		protected override void RunApp(params string[] arguments)
 		{
 			if (Stat == Status.Running)
 			{
@@ -598,133 +586,112 @@ namespace DotnetSpider.Core
 
 			CheckIfSettingsCorrect();
 
-#if !NET_CORE // 开启多线程支持
-			ServicePointManager.DefaultConnectionLimit = 1000;
-#endif
-
-			try
+			if (_init)
 			{
-				InitComponent(arguments);
+				return;
+			}
 
-				if (!_init)
+			InitComponent(arguments);
+
+			if (arguments.Contains("running-test"))
+			{
+				_scheduler.IsExited = true;
+				return;
+			}
+
+			if (StartTime == DateTime.MinValue)
+			{
+				StartTime = DateTime.Now;
+			}
+
+			Stat = Status.Running;
+			_realStat = Status.Running;
+
+			while (Stat == Status.Running || Stat == Status.Stopped)
+			{
+				if (Stat == Status.Stopped)
 				{
-					return;
+					_realStat = Status.Stopped;
+					Thread.Sleep(50);
+					continue;
 				}
 
-				if (arguments.Contains("running-test"))
+				Parallel.For(0, ThreadNum, new ParallelOptions
 				{
-					_scheduler.IsExited = true;
-					return;
-				}
-
-				if (StartTime == DateTime.MinValue)
+					MaxDegreeOfParallelism = ThreadNum
+				}, i =>
 				{
-					StartTime = DateTime.Now;
-				}
-
-				Stat = Status.Running;
-				_realStat = Status.Running;
-
-				while (Stat == Status.Running || Stat == Status.Stopped)
-				{
-					if (Stat == Status.Stopped)
+					int waitCount = 0;
+					while (Stat == Status.Running)
 					{
-						_realStat = Status.Stopped;
-						Thread.Sleep(50);
-						continue;
-					}
+						Request request = Scheduler.Poll();
 
-					Parallel.For(0, ThreadNum, new ParallelOptions
-					{
-						MaxDegreeOfParallelism = ThreadNum
-					}, i =>
-					{
-						int waitCount = 0;
-						while (Stat == Status.Running)
+						if (request == null)
 						{
-							Request request = Scheduler.Poll();
-
-							if (request == null)
+							if (waitCount > _waitCountLimit && ExitWhenComplete)
 							{
-								if (waitCount > _waitCountLimit && ExitWhenComplete)
-								{
-									Stat = Status.Finished;
-									_realStat = Status.Finished;
-									_OnComplete();
-									OnComplete?.Invoke(this);
-									break;
-								}
-
-								// wait until new url added
-								WaitNewUrl(ref waitCount);
+								Stat = Status.Finished;
+								_realStat = Status.Finished;
+								_OnComplete();
+								OnComplete?.Invoke(this);
+								break;
 							}
-							else
-							{
-								waitCount = 0;
 
-								try
-								{
-									Stopwatch sw = new Stopwatch();
-									HandleRequest(sw, request, Downloader);
-									Thread.Sleep(Site.SleepTime);
-								}
-								catch (Exception e)
-								{
-									OnError(request);
-									Logger.AllLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
-								}
-								finally
-								{
-									if (request.Proxy != null)
-									{
-										var statusCode = request.StatusCode;
-										Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
-									}
-								}
-
-								//if (firstTask)
-								//{
-								//	Thread.Sleep(3000);
-								//	firstTask = false;
-								//}
-							}
+							// wait until new url added
+							WaitNewUrl(ref waitCount);
 						}
-					});
+						else
+						{
+							waitCount = 0;
 
-					Thread.Sleep(3000);
-				}
+							try
+							{
+								Stopwatch sw = new Stopwatch();
+								HandleRequest(sw, request, Downloader);
+								Thread.Sleep(Site.SleepTime);
+							}
+							catch (Exception e)
+							{
+								OnError(request);
+								Logger.AllLog(Identity, $"Crawler {request.Url} failed: {e}.", LogLevel.Error, e);
+							}
+							finally
+							{
+								if (request.Proxy != null)
+								{
+									var statusCode = request.StatusCode;
+									Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
+								}
+							}
 
-				EndTime = DateTime.Now;
-				_realStat = Status.Exited;
+							//if (firstTask)
+							//{
+							//	Thread.Sleep(3000);
+							//	firstTask = false;
+							//}
+						}
+					}
+				});
 
-				OnClose();
-
-				Logger.AllLog(Identity, "Waiting for monitor exit.", LogLevel.Info);
-				_monitorTask.Wait(5000);
-
-				OnClosing?.Invoke(this);
-
-				var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
-				Logger.AllLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
-
-				OnClosed?.Invoke(this);
-
-				PrintInfo.PrintLine();
+				Thread.Sleep(3000);
 			}
-			finally
-			{
-				ExecuteRecord?.Remove();
-			}
-		}
 
-		/// <summary>
-		/// Run spider async.
-		/// </summary>
-		/// <param name="arguments"></param>
-		/// <returns></returns>
-		public Task RunAsync(params string[] arguments)
-		{
-			return Task.Factory.StartNew(() => { Run(arguments); });
+			EndTime = DateTime.Now;
+			_realStat = Status.Exited;
+
+			OnClose();
+
+			Logger.AllLog(Identity, "Waiting for monitor exit.", LogLevel.Info);
+			_monitorTask.Wait(5000);
+
+			OnClosing?.Invoke(this);
+
+			var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
+			Logger.AllLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
+
+			OnClosed?.Invoke(this);
+
+			PrintInfo.PrintLine();
 		}
 
 		/// <summary>
@@ -876,39 +843,8 @@ namespace DotnetSpider.Core
 				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
 			}
 
-			foreach (var processor in PageProcessors)
-			{
-				processor.Site = Site;
-			}
-
 			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
 			Downloader = Downloader ?? new HttpClientDownloader();
-		}
-
-		/// <summary>
-		/// Pre-init component of spider.
-		/// </summary>
-		/// <param name="arguments"></param>
-		protected virtual void PreInitComponent(params string[] arguments)
-		{
-			if (Monitor == null)
-			{
-				Monitor = string.IsNullOrEmpty(Env.HttpCenter) ? new NLogMonitor() : new HttpMonitor(this);
-			}
-			Monitor.App = Monitor.App ?? this;
-
-			if (ExecuteRecord == null && !string.IsNullOrEmpty(Env.HttpCenter))
-			{
-				ExecuteRecord = new HttpExecuteRecord(this);
-			}
-		}
-
-		/// <summary>
-		/// After init component of spider.
-		/// </summary>
-		/// <param name="arguments"></param>
-		protected virtual void AfterInitComponent(params string[] arguments)
-		{
 		}
 
 		/// <summary>
@@ -919,122 +855,29 @@ namespace DotnetSpider.Core
 		{
 			PrintInfo.Print();
 
-			if (_init)
-			{
-				return;
-			}
-
 			Logger.AllLog(Identity, "Build internal component...", LogLevel.Info);
 
-			if (Pipelines == null || Pipelines.Count == 0)
-			{
-				var defaultPipeline = GetDefaultPipeline();
-				if (defaultPipeline == null)
-				{
-					throw new SpiderException("Pipelines should not be null.");
-				}
-				else
-				{
-					Pipelines.Add(defaultPipeline);
-				}
-			}
+#if !NET_CORE // 开启多线程支持
+			ServicePointManager.DefaultConnectionLimit = 1000;
+#endif
 
-			PreInitComponent(arguments);
+			InitScheduler(arguments);
 
-			if (ExecuteRecord != null && !ExecuteRecord.Add())
-			{
-				Logger.AllLog(Identity, "Can not record execute...", LogLevel.Error);
-				return;
-			}
+			InitPageProcessor();
 
-			string closeSignal = string.Empty;
-			if (!string.IsNullOrEmpty(TaskId))
-			{
-				closeSignal = Path.Combine(Env.BaseDirectory, $"{TaskId}_close");
-				if (File.Exists(closeSignal))
-				{
-					File.Delete(closeSignal);
-				}
-			}
+			InitPipelines(arguments);
 
-			_monitorTask = Task.Factory.StartNew(() =>
-			{
-				while (true)
-				{
-					try
-					{
-						ReportStatus();
+			var closeSignalFile = RemoveFileCloseSignal();
 
-						while (!Monitorable.IsExited)
-						{
-							Thread.Sleep(StatusReportInterval);
-							ReportStatus();
+			InitMonitor(closeSignalFile);
 
-							if (!string.IsNullOrEmpty(closeSignal) && File.Exists(closeSignal))
-							{
-								Exit();
-								try
-								{
-									File.Delete(closeSignal);
-								}
-								catch
-								{
-								}
-							}
-						}
-
-						ReportStatus();
-						break;
-					}
-					catch (Exception e)
-					{
-						Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
-						Thread.Sleep(StatusReportInterval);
-					}
-				}
-			});
-
-			InvokeStartUrlBuilders(arguments);
-
-			CookieInjector?.Inject(this, false);
-
-			Scheduler.Init(this);
-
-			Monitorable.IsExited = false;
+			InjectCookie();
 
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 
-			foreach (var pipeline in Pipelines)
-			{
-				pipeline.InitPipeline(this);
-			}
-
-			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
-			{
-				Logger.AllLog(Identity, $"Add start urls to scheduler, count {Site.StartRequests.Count}.", LogLevel.Info);
-				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
-				{
-					foreach (var request in Site.StartRequests)
-					{
-						Scheduler.Push(request);
-					}
-				}
-				else
-				{
-					Scheduler.Import(new HashSet<Request>(Site.StartRequests));
-					ClearStartRequests();
-				}
-			}
-			else
-			{
-				Logger.AllLog(Identity, "Add start urls to scheduler, count 0.", LogLevel.Info);
-			}
-
 			_waitCountLimit = EmptySleepTime / WaitInterval;
 
-			AfterInitComponent(arguments);
-
-			PrepaireErrorRequestsLogFile();
+			PrepareErrorRequestsLogFile();
 
 			PipelineRetryTimes = PipelineRetryTimes <= 0 ? 1 : PipelineRetryTimes;
 
@@ -1043,34 +886,9 @@ namespace DotnetSpider.Core
 				Logger.Error($"Try to execute pipeline failed [{count}]: {ex}");
 			});
 
-			_init = true;
-		}
+			ExecuteStartUrlBuilders(arguments);
 
-		private void PrepaireErrorRequestsLogFile()
-		{
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
-
-			while (true)
-			{
-				try
-				{
-					if (_errorRequestFile.Exists)
-					{
-						_errorRequestStreamWriter = new StreamWriter(File.OpenWrite(_errorRequestFile.FullName), Encoding.UTF8);
-						break;
-					}
-					else
-					{
-						_errorRequestStreamWriter = File.CreateText(_errorRequestFile.FullName);
-						break;
-					}
-				}
-				catch
-				{
-					_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, $"errors.{DateTime.Now.ToString("yyyyMMddhhmmss")}.txt"));
-				}
-				Thread.Sleep(50);
-			}
+			PushStartRequestToScheduler();
 		}
 
 		/// <summary>
@@ -1079,7 +897,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		protected virtual IPipeline GetDefaultPipeline()
 		{
-			return null;
+			return new NullPipeline();
 		}
 
 		/// <summary>
@@ -1346,6 +1164,29 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		protected virtual void InitScheduler(params string[] arguments)
+		{
+			Scheduler.Init(this);
+			Monitorable.IsExited = false;
+		}
+
+		protected virtual void InitPipelines(params string[] arguments)
+		{
+			if (Pipelines == null || Pipelines.Count == 0)
+			{
+				var defaultPipeline = GetDefaultPipeline();
+				if (defaultPipeline != null)
+				{
+					Pipelines.Add(defaultPipeline);
+				}
+			}
+
+			foreach (var pipeline in Pipelines)
+			{
+				pipeline.InitPipeline(this);
+			}
+		}
+
 		private void ClearStartRequests()
 		{
 			lock (Locker)
@@ -1409,19 +1250,6 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void ReportStatus()
-		{
-			Monitor?.Report(Stat.ToString(),
-				Monitorable.LeftRequestsCount,
-				Monitorable.TotalRequestsCount,
-				Monitorable.SuccessRequestsCount,
-				Monitorable.ErrorRequestsCount,
-				AvgDownloadSpeed,
-				AvgProcessorSpeed,
-				AvgPipelineSpeed,
-				ThreadNum);
-		}
-
 		private void CurrentDomain_ProcessExit(object sender, EventArgs e)
 		{
 			NetworkCenter.Current.Executor?.Dispose();
@@ -1432,17 +1260,154 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void InvokeStartUrlBuilders(params string[] arguments)
+		private void ExecuteStartUrlBuilders(params string[] arguments)
 		{
-			if (IfRequireInitStartRequests(arguments) && StartUrlBuilders != null && StartUrlBuilders.Count > 0)
+			if (StartUrlBuilders != null && StartUrlBuilders.Count > 0 && IfRequireInitStartRequests(arguments))
 			{
-				for (int i = 0; i < StartUrlBuilders.Count; ++i)
+				try
 				{
-					var builder = StartUrlBuilders[i];
-					Logger.AllLog(Identity, $"Add start urls to scheduler via builder[{i + 1}].", LogLevel.Info);
-					builder.Build(Site);
+					for (int i = 0; i < StartUrlBuilders.Count; ++i)
+					{
+						var builder = StartUrlBuilders[i];
+						Logger.AllLog(Identity, $"Add start urls to scheduler via builder[{i + 1}].", LogLevel.Info);
+						builder.Build(Site);
+					}
 				}
-				InitStartRequestsFinished();
+				finally
+				{
+					InitStartRequestsFinished();
+				}
+			}
+		}
+
+		private void PushStartRequestToScheduler()
+		{
+			if (Site.StartRequests != null && Site.StartRequests.Count > 0)
+			{
+				Logger.AllLog(Identity, $"Add start urls to scheduler, count {Site.StartRequests.Count}.", LogLevel.Info);
+				if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
+				{
+					foreach (var request in Site.StartRequests)
+					{
+						Scheduler.Push(request);
+					}
+				}
+				else
+				{
+					Scheduler.Import(new HashSet<Request>(Site.StartRequests));
+					ClearStartRequests();
+				}
+			}
+			else
+			{
+				Logger.AllLog(Identity, "Add start urls to scheduler, count 0.", LogLevel.Info);
+			}
+		}
+
+		private void InjectCookie()
+		{
+			CookieInjector?.Inject(this, false);
+		}
+
+		private void InitPageProcessor()
+		{
+			foreach (var processor in PageProcessors)
+			{
+				processor.Site = Site;
+			}
+		}
+
+		private string RemoveFileCloseSignal()
+		{
+			string closeSignal = Path.Combine(Env.BaseDirectory, $"{TaskId}_close");
+			if (!string.IsNullOrEmpty(TaskId) && File.Exists(closeSignal))
+			{
+				File.Delete(closeSignal);
+			}
+			return closeSignal;
+		}
+
+		private void InitMonitor(string closeSignalFile)
+		{
+			if (Monitor == null)
+			{
+				Monitor = string.IsNullOrEmpty(Env.HttpCenter) ? new NLogMonitor(TaskId, Identity) : new HttpMonitor(TaskId, Identity);
+			}
+
+			_monitorTask = Task.Factory.StartNew(() =>
+			{
+				var reportAction = new Action(() =>
+				{
+					Monitor?.Report(Stat.ToString(),
+						Monitorable.LeftRequestsCount,
+						Monitorable.TotalRequestsCount,
+						Monitorable.SuccessRequestsCount,
+						Monitorable.ErrorRequestsCount,
+						AvgDownloadSpeed,
+						AvgProcessorSpeed,
+						AvgPipelineSpeed,
+						ThreadNum);
+				});
+				while (true)
+				{
+					try
+					{
+						reportAction();
+
+						while (!Monitorable.IsExited)
+						{
+							Thread.Sleep(StatusReportInterval);
+							reportAction();
+
+							if (!string.IsNullOrEmpty(closeSignalFile) && File.Exists(closeSignalFile))
+							{
+								Exit();
+								try
+								{
+									File.Delete(closeSignalFile);
+								}
+								catch
+								{
+								}
+							}
+						}
+
+						reportAction();
+						break;
+					}
+					catch (Exception e)
+					{
+						Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
+						Thread.Sleep(StatusReportInterval);
+					}
+				}
+			});
+		}
+
+		private void PrepareErrorRequestsLogFile()
+		{
+			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+
+			while (true)
+			{
+				try
+				{
+					if (_errorRequestFile.Exists)
+					{
+						_errorRequestStreamWriter = new StreamWriter(File.OpenWrite(_errorRequestFile.FullName), Encoding.UTF8);
+						break;
+					}
+					else
+					{
+						_errorRequestStreamWriter = File.CreateText(_errorRequestFile.FullName);
+						break;
+					}
+				}
+				catch
+				{
+					_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, $"errors.{DateTime.Now.ToString("yyyyMMddhhmmss")}.txt"));
+				}
+				Thread.Sleep(500);
 			}
 		}
 	}

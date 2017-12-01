@@ -256,28 +256,10 @@ NOTE:
 #### when you use redis scheduler, please update your redis config: 
 	timeout 0 
 	tcp-keepalive 60
-### Upgrade
 
-##### 20170829
-+ A lot of restruct
-+ Use DataObject instead of JObject for performace reason
-+ Move entity validation to EntitySpider class, then we can detected issues when try to add a Entity class before run a spider.
-+ Use App.config instead of config.ini
-+ Framework will detect a pipeline from App.config(MySql or SqlServer) if user did not add.
+### Comments
 
-##### 20170817
-+ Upgrade to .NET CORE 2.0
-+ Use multi target framework instead of two solution
-+ Downgrade to .NET 45(Before is .NET451)
-+ Fix some issues.
-
-##### 20170524
-
-+ Make cdate as a default column, and it's the time when insert one row.
-+ The type of property will map to database colum
-MySql: int->int(11), long->bigint(20), float->float, double->double, datetime->timestamp, string without length->text, string->varchar(n)
-
-SqlServer: int->int(4),long->bigint(8),float->float,double->float,datetime->datetime,string without length->nvarchar(8000),string->nvarchar(n)
++ 允许不添加Pipeline执行爬虫
 
 ### AREAS FOR IMPROVEMENTS
 
