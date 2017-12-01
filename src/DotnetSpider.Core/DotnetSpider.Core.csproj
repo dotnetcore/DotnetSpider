@@ -64,4 +64,7 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Polly" Version="5.6.1" />
+  </ItemGroup>
 </Project>

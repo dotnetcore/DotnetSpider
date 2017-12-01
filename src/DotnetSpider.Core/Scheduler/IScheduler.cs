@@ -22,11 +22,12 @@ namespace DotnetSpider.Core.Scheduler
 		/// <param name="request"></param>
 		void Push(Request request);
 
-		/// <summary>
-		/// Get an url to crawl
-		/// </summary>
-		/// <returns></returns>
-		Request Poll();
+        /// <summary>
+        /// Get an url to crawl
+        /// 获取要爬取的URL
+        /// </summary>
+        /// <returns></returns>
+        Request Poll();
 
 		void Import(HashSet<Request> requests);
 

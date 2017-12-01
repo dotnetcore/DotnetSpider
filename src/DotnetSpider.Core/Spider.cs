@@ -17,6 +17,8 @@ using DotnetSpider.Core.Scheduler;
 using NLog;
 using System.Runtime.CompilerServices;
 using System.Reflection;
+using Polly;
+using Polly.Retry;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
 [assembly: InternalsVisibleTo("DotnetSpider.Sample")]
@@ -53,6 +55,7 @@ namespace DotnetSpider.Core
 		private string _identity;
 		private StreamWriter _errorRequestStreamWriter;
 		private int _errorRequestFlushCount;
+		private RetryPolicy _pipelineRetryPolicy;
 
 		protected virtual bool IfRequireInitStartRequests(string[] arguments)
 		{
@@ -1040,6 +1043,13 @@ namespace DotnetSpider.Core
 
 			PrepaireErrorRequestsLogFile();
 
+			PipelineRetryTimes = PipelineRetryTimes <= 0 ? 1 : PipelineRetryTimes;
+
+			_pipelineRetryPolicy = Policy.Handle<Exception>().Retry(PipelineRetryTimes, (ex, count) =>
+			{
+				Logger.Error($"Try to execute pipeline failed [{count}]: {ex}");
+			});
+
 			_init = true;
 		}
 
@@ -1266,10 +1276,17 @@ namespace DotnetSpider.Core
 				{
 					foreach (IPipeline pipeline in Pipelines)
 					{
-						RetryExecutor.Execute(PipelineRetryTimes, () =>
+						try
 						{
-							pipeline.Process(page.ResultItems);
-						});
+							_pipelineRetryPolicy.Execute(() =>
+							{
+								pipeline.Process(page.ResultItems);
+							});
+						}
+						catch (Exception e)
+						{
+							Logger.AllLog(Identity, $"Execute pipeline failed: {e}", LogLevel.Error);
+						}
 					}
 				}
 				else
@@ -1293,15 +1310,13 @@ namespace DotnetSpider.Core
 				_OnSuccess(request);
 
 				StringBuilder builder = new StringBuilder($"Crawl: {request.Url} success");
-				var countOfResults = page.ResultItems.GetResultItem(ResultItems.CountOfResultsKey);
-				if (countOfResults != null)
+				if (request.CountOfResults != null)
 				{
-					builder.Append($", results: {countOfResults}");
+					builder.Append($", results: { request.CountOfResults}");
 				}
-				var effectedRow = page.ResultItems.GetResultItem(ResultItems.EffectedRows);
-				if (effectedRow != null)
+				if (request.EffectedRows != null)
 				{
-					builder.Append($", effectedRow: {effectedRow}");
+					builder.Append($", effectedRow: {request.EffectedRows}");
 				}
 				builder.Append(".");
 				Logger.AllLog(Identity, builder.ToString(), LogLevel.Info);

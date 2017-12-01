@@ -46,6 +46,7 @@ namespace DotnetSpider.Core.Processor
 
 			if (!page.SkipExtractTargetUrls)
 			{
+                // 解析URLS
 				ExtractUrls(page);
 			}
 		}

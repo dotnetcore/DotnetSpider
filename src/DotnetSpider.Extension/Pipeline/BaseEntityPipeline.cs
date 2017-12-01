@@ -39,8 +39,8 @@ namespace DotnetSpider.Extension.Pipeline
 						effectedRow += Process(result.Key, list);
 					}
 				}
-				resultItem.AddOrUpdateResultItem(ResultItems.CountOfResultsKey, count);
-				resultItem.AddOrUpdateResultItem(ResultItems.EffectedRows, effectedRow);
+				resultItem.Request.CountOfResults = count;
+				resultItem.Request.EffectedRows = effectedRow;
 			}
 		}
 
