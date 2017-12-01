@@ -2,6 +2,7 @@
 using DotnetSpider.Core.Redial;
 using Newtonsoft.Json;
 using NLog;
+using Polly;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,24 +31,28 @@ namespace DotnetSpider.Core
 				TaskId = Spider.TaskId
 			});
 			var content = new StringContent(json, Encoding.UTF8, "application/json");
-			for (int i = 0; i < 10; ++i)
+			try
 			{
-				try
+				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
+						{
+							Logger.Error($"Try to add execute record failed [{count}]: {ex}");
+							Thread.Sleep(5000);
+						});
+				retryTimesPolicy.Execute(() =>
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
 						var response = HttpSender.Client.PostAsync(Env.HttpIncreaseRunningUrl, content).Result;
 						response.EnsureSuccessStatusCode();
 					});
-					return true;
-				}
-				catch (Exception ex)
-				{
-					Logger.Error($"Add execute record: {ex}");
-					Thread.Sleep(5000);
-				}
+				});
+				return true;
 			}
-			return false;
+			catch (Exception e)
+			{
+				Logger.Error($"Add execute record failed: {e}");
+				return false;
+			}
 		}
 
 		public void Remove()
@@ -57,22 +62,26 @@ namespace DotnetSpider.Core
 				TaskId = Spider.TaskId
 			});
 			var content = new StringContent(json, Encoding.UTF8, "application/json");
-			for (int i = 0; i < 10; ++i)
+
+			try
 			{
-				try
+				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
+				{
+					Logger.Error($"Try to remove execute record failed [{count}]: {ex}");
+					Thread.Sleep(5000);
+				});
+				retryTimesPolicy.Execute(() =>
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
 						var response = HttpSender.Client.PostAsync(Env.HttpReduceRunningUrl, content).Result;
 						response.EnsureSuccessStatusCode();
 					});
-					break;
-				}
-				catch (Exception ex)
-				{
-					Logger.Error($"Remove execute record failed: {ex}");
-					Thread.Sleep(5000);
-				}
+				});
+			}
+			catch (Exception e)
+			{
+				Logger.Error($"Remove execute record failed: {e}");
 			}
 		}
 	}

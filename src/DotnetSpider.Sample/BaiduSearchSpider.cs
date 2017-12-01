@@ -6,6 +6,7 @@ using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
+using DotnetSpider.Extension.Scheduler;
 using System;
 using System.Collections.Generic;
 

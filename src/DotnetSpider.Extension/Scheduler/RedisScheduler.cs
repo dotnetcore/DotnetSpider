@@ -8,6 +8,8 @@ using StackExchange.Redis;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
 using System;
+using Polly;
+using Polly.Retry;
 #if NET_CORE
 #endif
 
@@ -21,7 +23,7 @@ namespace DotnetSpider.Extension.Scheduler
 		private readonly object _locker = new object();
 		private const string TasksKey = "dotnetspider:tasks";
 		private const string TaskStatsKey = "dotnetspider:task-stats";
-
+		private readonly RetryPolicy _retryPolicy = Policy.Handle<Exception>().Retry(30);
 		private string _queueKey;
 		private string _setKey;
 		private string _itemKey;
@@ -39,6 +41,10 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public RedisScheduler(string connectString)
 		{
+			if (string.IsNullOrEmpty(connectString) || string.IsNullOrWhiteSpace(connectString))
+			{
+				throw new SpiderException("Redis connect string should not be empty.");
+			}
 			ConnectString = connectString;
 			DuplicateRemover = this;
 		}
@@ -51,12 +57,12 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void Init(ISpider spider)
 		{
-			base.Init(spider);
-
 			if (string.IsNullOrEmpty(ConnectString))
 			{
-				throw new SpiderException("Redis connection string unfound.");
+				throw new SpiderException("Redis connect string should not be empty.");
 			}
+
+			base.Init(spider);
 
 			if (string.IsNullOrEmpty(_identityMd5))
 			{
@@ -109,7 +115,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public bool IsDuplicate(Request request)
 		{
-			return RetryExecutor.Execute(30, () =>
+			return _retryPolicy.Execute(() =>
 			{
 				bool isDuplicate = RedisConnection.Database.SetContains(_setKey, request.Identity);
 				if (!isDuplicate)
@@ -391,7 +397,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{
-			RetryExecutor.Execute(30, () =>
+			_retryPolicy.Execute(() =>
 			{
 				RedisConnection.Database.ListRightPush(_queueKey, request.Identity);
 				string field = request.Identity;
@@ -403,7 +409,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		private Request PollRequest()
 		{
-			return RetryExecutor.Execute(30, () =>
+			return _retryPolicy.Execute(() =>
 			{
 				var value = DepthFirst ? RedisConnection.Database.ListRightPop(_queueKey) : RedisConnection.Database.ListLeftPop(_queueKey);
 
