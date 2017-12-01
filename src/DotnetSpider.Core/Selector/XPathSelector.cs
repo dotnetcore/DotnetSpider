@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using System.Linq;
 
 namespace DotnetSpider.Core.Selector
 {
@@ -24,7 +25,7 @@ namespace DotnetSpider.Core.Selector
 
 		public override dynamic Select(HtmlNode element)
 		{
-			var node = element.SelectSingleNode(_xpath);
+			var node = element.SelectNodes(_xpath).FirstOrDefault();
 			if (node != null)
 			{
 				if (HasAttribute())
