@@ -85,8 +85,9 @@ namespace DotnetSpider.Sample
             //Console.Read();
 
 
+
             ZhiPinSpider spider = new ZhiPinSpider();
-		    spider.Run();
+            spider.Run();
             Console.WriteLine("Press any key to continue...");
             Console.Read();
 

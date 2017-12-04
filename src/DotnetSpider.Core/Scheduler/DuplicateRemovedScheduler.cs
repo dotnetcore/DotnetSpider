@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Scheduler
 {
 	/// <summary>
 	/// Remove duplicate urls and only push urls which are not duplicate.
-	/// 删除重复的URL
+	/// 删除重复的URL的调度
 	/// </summary>
 	public abstract class DuplicateRemovedScheduler : Named, IScheduler
 	{

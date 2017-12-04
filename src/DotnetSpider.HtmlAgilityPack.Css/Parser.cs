@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -14,6 +14,7 @@ namespace DotnetSpider.HtmlAgilityPack
 
     /// <summary>
     /// Semantic parser for CSS selector grammar.
+    /// CSS选择器语法语义分析器
     /// </summary>
     public sealed class Parser
     {

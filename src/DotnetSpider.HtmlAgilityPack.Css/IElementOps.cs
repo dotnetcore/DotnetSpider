@@ -1,7 +1,9 @@
-namespace DotnetSpider.HtmlAgilityPack
+﻿namespace DotnetSpider.HtmlAgilityPack
 {
     /// <summary>
     /// Represents a selectors implementation for an arbitrary document/node system.
+    /// 
+    /// 任意文档/节点系统的选择器实现。
     /// </summary>
     public interface IElementOps<TElement>
     {

@@ -2,6 +2,9 @@
 
 namespace DotnetSpider.Core.Redial
 {
+    /// <summary>
+    /// 重复执行接口
+    /// </summary>
 	public interface IRedialExecutor : IDisposable
 	{
 		RedialResult Redial(Action action = null);

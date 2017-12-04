@@ -1,13 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Scheduler
 {
-	/// <summary>
-	/// Priority scheduler. Request with higher priority will poll earlier.
-	/// </summary>
-	public class PriorityScheduler : DuplicateRemovedScheduler
+    /// <summary>
+    /// Priority scheduler. Request with higher priority will poll earlier.
+    /// 优先级调度。优先级较高的请求将提前轮询。
+    /// </summary>
+    public class PriorityScheduler : DuplicateRemovedScheduler
 	{
 		public static int InitialCapacity = 5;
 

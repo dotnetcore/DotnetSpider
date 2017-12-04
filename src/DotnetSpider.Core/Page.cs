@@ -6,10 +6,11 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core
 {
-	/// <summary>
-	/// Object storing extracted result and urls to fetch. 
-	/// </summary>
-	public class Page
+    /// <summary>
+    /// Object storing extracted result and urls to fetch. 
+    /// 存储提取结果和URL。
+    /// </summary>
+    public class Page
 	{
 		private readonly object _locker = new object();
 		private Selectable _selectable;
