@@ -54,6 +54,7 @@ namespace DotnetSpider.Core
 		public static string HttpCenterToken { get; private set; }
 		public static string SystemConnectionString => SystemConnectionStringSettings?.ConnectionString;
 		public static string DataConnectionString => DataConnectionStringSettings?.ConnectionString;
+		public static bool ProcessorFilterDefaultRequest = true;
 
 		public static string GetAppSettings(string key)
 		{

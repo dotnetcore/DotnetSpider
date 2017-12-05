@@ -30,6 +30,8 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _errorCountKey;
 		private string _successCountKey;
 		private string _identityMd5;
+		private readonly AutomicLong _successCounter = new AutomicLong(0);
+		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 
 		private string ConnectString { get; }
 
@@ -168,74 +170,18 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
-		public override long SuccessRequestsCount
-		{
-			get
-			{
-				if (UseInternet)
-				{
-					return NetworkCenter.Current.Execute("rds-success", () =>
-					{
-						var result = RedisConnection.Database.HashGet(_successCountKey, _identityMd5);
-						return result.HasValue ? (long)result : 0;
-					});
-				}
-				else
-				{
-					var result = RedisConnection.Database.HashGet(_successCountKey, _identityMd5);
-					return result.HasValue ? (long)result : 0;
-				}
-			}
-		}
+		public override long SuccessRequestsCount => _successCounter.Value;
 
-		public override long ErrorRequestsCount
-		{
-			get
-			{
-				if (UseInternet)
-				{
-					return NetworkCenter.Current.Execute("rds-error", () =>
-					{
-						var result = RedisConnection.Database.HashGet(_errorCountKey, _identityMd5);
-						return result.HasValue ? (long)result : 0;
-					});
-				}
-				else
-				{
-					var result = RedisConnection.Database.HashGet(_errorCountKey, _identityMd5);
-					return result.HasValue ? (long)result : 0;
-				}
-			}
-		}
+		public override long ErrorRequestsCount => _errorCounter.Value;
 
 		public override void IncreaseSuccessCount()
 		{
-			if (UseInternet)
-			{
-				NetworkCenter.Current.Execute("rds-inc-success", () =>
-				{
-					RedisConnection.Database.HashIncrement(_successCountKey, _identityMd5);
-				});
-			}
-			else
-			{
-				RedisConnection.Database.HashIncrement(_successCountKey, _identityMd5);
-			}
+			_successCounter.Inc();
 		}
 
 		public override void IncreaseErrorCount()
 		{
-			if (UseInternet)
-			{
-				NetworkCenter.Current.Execute("rds-inc-error", () =>
-				{
-					RedisConnection.Database.HashIncrement(_errorCountKey, _identityMd5);
-				});
-			}
-			else
-			{
-				RedisConnection.Database.HashIncrement(_errorCountKey, _identityMd5);
-			}
+			_errorCounter.Inc();
 		}
 
 		public override void Dispose()

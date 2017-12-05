@@ -23,7 +23,7 @@ namespace DotnetSpider.Sample
 #endif
 			MyTest();
 
-			Startup.Run("-s:AirlineAll", "-tid:1", "-i:guid");
+			Startup.Run("-s:BaiduSearchSpider", "-tid:1", "-i:guid");
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 
@@ -76,11 +76,6 @@ namespace DotnetSpider.Sample
 
 		private static void MyTest()
 		{
-			Dictionary<string, string> tmp = new Dictionary<string, string>();
-			tmp.Add("a", "b");
-			tmp.Add("b", "c");
-
-			var o = JsonConvert.SerializeObject(tmp);
 		}
 	}
 

@@ -5,7 +5,7 @@ using System.Net.Http;
 
 namespace DotnetSpider.Core.Test.Processor
 {
-	
+
 	public class TargetUrlTests
 	{
 		public class CnblogsProcessor1 : BasePageProcessor
@@ -85,8 +85,9 @@ namespace DotnetSpider.Core.Test.Processor
 		}
 
 		[Fact]
-		public void UrlVerifyAndExtract3()
+		public void ProcessorFilterDefaultRequest()
 		{
+			Env.ProcessorFilterDefaultRequest = false;
 			HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com").Result;
 
