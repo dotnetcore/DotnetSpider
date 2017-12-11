@@ -97,7 +97,7 @@ namespace DotnetSpider.Extension.Pipeline
 							}
 						case PipelineMode.InsertNewAndUpdateOld:
 							{
-								count += conn.MyExecute(metadata.UpdateSql, datas);
+								count += conn.MyExecute(metadata.InsertNewAndUpdateOldSql, datas);
 								break;
 							}
 						case PipelineMode.Update:
@@ -126,6 +126,49 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			adapter.SelectSql = GenerateSelectSql(adapter);
 			adapter.InsertNewAndUpdateOldSql = GenerateInsertNewAndUpdateOldSql(adapter);
+		}
+
+		protected string GenerateCreateDatabaseSql(EntityAdapter adapter)
+		{
+			return $"CREATE SCHEMA IF NOT EXISTS `{adapter.Table.Database}` DEFAULT CHARACTER SET utf8mb4;";
+		}
+
+		protected string GenerateIfDatabaseExistsSql(EntityAdapter adapter)
+		{
+			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{adapter.Table.Database}';";
+		}
+
+		protected string GenerateCreateTableSql(EntityAdapter adapter)
+		{
+			var tableName = adapter.Table.CalculateTableName();
+			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{adapter.Table.Database }`.`{tableName}` (");
+			string columNames = string.Join(", ", adapter.Columns.Select(GenerateColumn));
+			builder.Append(columNames);
+
+			if (adapter.Table.Indexs != null)
+			{
+				foreach (var index in adapter.Table.Indexs)
+				{
+					var columns = index.Split(',');
+					string name = string.Join("_", columns.Select(c => c));
+					string indexColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
+					builder.Append($", KEY `index_{name}` ({indexColumNames.Substring(0, indexColumNames.Length)})");
+				}
+			}
+			if (adapter.Table.Uniques != null)
+			{
+				foreach (var unique in adapter.Table.Uniques)
+				{
+					var columns = unique.Split(',');
+					string name = string.Join("_", columns.Select(c => c));
+					string uniqueColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
+					builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames.Substring(0, uniqueColumNames.Length)})");
+				}
+			}
+			builder.Append($", PRIMARY KEY (__Id)");
+			builder.Append(") AUTO_INCREMENT=1");
+			string sql = builder.ToString();
+			return sql;
 		}
 
 		internal override void InitDatabaseAndTable()
@@ -204,39 +247,6 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		private string GenerateCreateTableSql(EntityAdapter adapter)
-		{
-			var tableName = adapter.Table.CalculateTableName();
-			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{adapter.Table.Database }`.`{tableName}` (");
-			string columNames = string.Join(", ", adapter.Columns.Select(GenerateColumn));
-			builder.Append(columNames);
-
-			if (adapter.Table.Indexs != null)
-			{
-				foreach (var index in adapter.Table.Indexs)
-				{
-					var columns = index.Split(',');
-					string name = string.Join("_", columns.Select(c => c));
-					string indexColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
-					builder.Append($", KEY `index_{name}` ({indexColumNames.Substring(0, indexColumNames.Length)})");
-				}
-			}
-			if (adapter.Table.Uniques != null)
-			{
-				foreach (var unique in adapter.Table.Uniques)
-				{
-					var columns = unique.Split(',');
-					string name = string.Join("_", columns.Select(c => c));
-					string uniqueColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
-					builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames.Substring(0, uniqueColumNames.Length)})");
-				}
-			}
-			builder.Append($", PRIMARY KEY (__Id)");
-			builder.Append(") AUTO_INCREMENT=1");
-			string sql = builder.ToString();
-			return sql;
-		}
-
 		private string GenerateColumn(Column p)
 		{
 			if (p.DataType.FullName == DataTypeNames.DateTime)
@@ -251,16 +261,6 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return $"`{p.Name}` {GetDataTypeSql(p)}";
 			}
-		}
-
-		private string GenerateCreateDatabaseSql(EntityAdapter adapter)
-		{
-			return $"CREATE SCHEMA IF NOT EXISTS `{adapter.Table.Database}` DEFAULT CHARACTER SET utf8mb4;";
-		}
-
-		private string GenerateIfDatabaseExistsSql(EntityAdapter adapter)
-		{
-			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{adapter.Table.Database}';";
 		}
 	}
 }

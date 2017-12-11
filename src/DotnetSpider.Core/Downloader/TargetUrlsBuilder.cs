@@ -5,7 +5,7 @@ using System.Net.Http;
 
 namespace DotnetSpider.Core.Downloader
 {
-	public sealed class IncrementTargetUrlsBuilder : BaseTargetUrlsBuilder
+	public class IncrementTargetUrlsBuilder : BaseTargetUrlsBuilder
 	{
 		private readonly int _interval;
 
@@ -40,7 +40,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public sealed class RequestExtraTargetUrlsBuilder : BaseTargetUrlsBuilder
+	public class RequestExtraTargetUrlsBuilder : BaseTargetUrlsBuilder
 	{
 		private readonly string _field;
 
@@ -79,8 +79,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-
-	public sealed class ContainsTermination : ITargetUrlsBuilderTermination
+	public class ContainsTermination : ITargetUrlsBuilderTermination
 	{
 		private readonly string[] _contents;
 

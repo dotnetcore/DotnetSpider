@@ -8,7 +8,7 @@ using System;
 
 namespace DotnetSpider.Extension.Model
 {
-	public sealed class EntityExtractor<T> : IEntityExtractor<T>
+	public class EntityExtractor<T> : IEntityExtractor<T>
 	{
 		public IEntityDefine EntityDefine { get; }
 

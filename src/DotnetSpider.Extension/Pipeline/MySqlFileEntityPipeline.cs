@@ -11,7 +11,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// <summary>
 	/// LOAD DATA LOCAL INFILE '{filePath}' INTO TABLE `{schema}`.`{dababase}` FIELDS TERMINATED BY '$'  ENCLOSED BY '#' LINES TERMINATED BY '@END@' IGNORE 1 LINES;
 	/// </summary>
-	public sealed class MySqlFileEntityPipeline : BaseEntityDbPipeline
+	public class MySqlFileEntityPipeline : BaseEntityDbPipeline
 	{
 		private readonly object _locker = new object();
 

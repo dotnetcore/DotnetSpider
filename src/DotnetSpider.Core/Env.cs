@@ -30,6 +30,7 @@ namespace DotnetSpider.Core
 		public const string DataConnectionStringKey = "DataConnection";
 		public static readonly string[] IdColumns = new[] { "Id", "__Id" };
 		public const string CDateColumn = "CDate";
+		public const string SqlEncryptCodeKey = "sqlEncryptCode";
 
 		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
@@ -48,6 +49,7 @@ namespace DotnetSpider.Core
 		public static bool SubmitHttpLog { get; set; }
 		public static string HttpCenter { get; private set; }
 		public static string HttpLogUrl { get; private set; }
+		public static string HttpPipelineUrl { get; private set; }
 		public static string HttpStatusUrl { get; private set; }
 		public static string HttpIncreaseRunningUrl { get; private set; }
 		public static string HttpReduceRunningUrl { get; private set; }
@@ -55,6 +57,7 @@ namespace DotnetSpider.Core
 		public static string SystemConnectionString => SystemConnectionStringSettings?.ConnectionString;
 		public static string DataConnectionString => DataConnectionStringSettings?.ConnectionString;
 		public static bool ProcessorFilterDefaultRequest = true;
+		public static string SqlEncryptCode { get; private set; }
 
 		public static string GetAppSettings(string key)
 		{
@@ -82,7 +85,7 @@ namespace DotnetSpider.Core
 			}
 			if (!File.Exists(path))
 			{
-				throw new SpiderException($"Configuration file {path} unfound.");
+				return;
 			}
 
 			var fileMap = new ExeConfigurationFileMap
@@ -106,10 +109,12 @@ namespace DotnetSpider.Core
 				HttpStatusUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}TaskStatus/AddOrUpdate";
 				HttpIncreaseRunningUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Task/IncreaseRunning";
 				HttpReduceRunningUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Task/ReduceRunning";
+				HttpPipelineUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Pipeline/Process";
 			}
 			SubmitHttpLog = !string.IsNullOrEmpty(HttpLogUrl);
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
+			SqlEncryptCode = configuration.AppSettings.Settings[SqlEncryptCodeKey]?.Value?.Trim();
 		}
 
 		static Env()

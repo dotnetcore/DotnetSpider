@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
-using System.Linq;
 
 namespace DotnetSpider.Core.Selector
 {

@@ -6,7 +6,6 @@ using DotnetSpider.Core.Scheduler;
 using Xunit;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using DotnetSpider.Core.Downloader;
 
 namespace DotnetSpider.Core.Test

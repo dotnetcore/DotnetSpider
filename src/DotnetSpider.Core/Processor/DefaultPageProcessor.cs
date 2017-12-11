@@ -1,6 +1,6 @@
 namespace DotnetSpider.Core.Processor
 {
-	public sealed class DefaultPageProcessor : BasePageProcessor
+	public class DefaultPageProcessor : BasePageProcessor
 	{
 		public DefaultPageProcessor(string[] partterns = null, string[] excludeParterns = null)
 		{

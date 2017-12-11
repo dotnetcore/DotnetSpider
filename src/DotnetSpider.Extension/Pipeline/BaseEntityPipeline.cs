@@ -80,9 +80,9 @@ namespace DotnetSpider.Extension.Pipeline
 						pipeline = new CassandraEntityPipeline(Env.DataConnectionString);
 						break;
 					}
-				case "Http":
+				case "HttpMySql":
 					{
-						pipeline = new HttpEntityPipeline(Env.DataConnectionString);
+						pipeline = new HttpMySqlEntityPipeline();
 						break;
 					}
 				default:

@@ -15,7 +15,7 @@ namespace DotnetSpider.Core
 		public abstract void Build(Site spider);
 	}
 
-	public sealed class CycleStartUrlBuilder : StartUrlBuilder
+	public class CycleStartUrlBuilder : StartUrlBuilder
 	{
 		public int From { get; }
 
@@ -46,7 +46,7 @@ namespace DotnetSpider.Core
 		}
 	}
 
-	public sealed class CycleDateStartUrlBuilder : StartUrlBuilder
+	public class CycleDateStartUrlBuilder : StartUrlBuilder
 	{
 		public DateTime From { get; }
 

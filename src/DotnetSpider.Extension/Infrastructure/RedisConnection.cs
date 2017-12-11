@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			ConnectString = connectString;
 
 			var connection = ConnectionMultiplexer.Connect(connectString);
-			Database = connection.GetDatabase(0);
+			Database = connection.GetDatabase();
 			Subscriber = connection.GetSubscriber();
 		}
 	}

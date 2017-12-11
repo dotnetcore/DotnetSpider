@@ -3,7 +3,7 @@ using System.Net;
 
 namespace DotnetSpider.Core.Proxy
 {
-	public sealed class UseSpecifiedUriWebProxy : IWebProxy
+	public class UseSpecifiedUriWebProxy : IWebProxy
 	{
 		public readonly Uri Uri;
 		private readonly bool _bypass;

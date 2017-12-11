@@ -46,17 +46,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
 			var arguments1 = Startup.AnalyzeArguments(args1);
+			Startup.LoadConfiguration(arguments1);
 
-
-			Assert.Throws<SpiderException>(() =>
-			{
-				Startup.LoadConfiguration(arguments1);
-
-				Env.Reload();
-
-				MySqlEntityPipeline pipeline = new MySqlEntityPipeline();
-				var a = pipeline.ConnectionStringSettings;
-			});
+			Env.Reload();
 		}
 
 		[Fact]

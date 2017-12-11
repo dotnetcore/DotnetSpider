@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public sealed class BlockingQueue<T> : ICollection
+	public class BlockingQueue<T> : ICollection
 	{
 		// Buffer used to store queue objects with max "Size".
 		private readonly T[] _buffer;

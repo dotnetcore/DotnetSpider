@@ -7,7 +7,7 @@ namespace DotnetSpider.Core.Scheduler
 	/// <summary>
 	/// Basic Scheduler implementation. 
 	/// </summary>
-	public sealed class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler
+	public class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler
 	{
 		private readonly object _lock = new object();
 		private List<Request> _queue = new List<Request>();

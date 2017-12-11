@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Scheduler
 	/// <summary>
 	/// Use Redis as url scheduler for distributed crawlers.
 	/// </summary>
-	public sealed class RedisScheduler : DuplicateRemovedScheduler, IDuplicateRemover
+	public class RedisScheduler : DuplicateRemovedScheduler, IDuplicateRemover
 	{
 		private readonly object _locker = new object();
 		private const string TasksKey = "dotnetspider:tasks";

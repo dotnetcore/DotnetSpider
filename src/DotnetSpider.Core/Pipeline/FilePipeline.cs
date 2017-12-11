@@ -12,7 +12,7 @@ namespace DotnetSpider.Core.Pipeline
 	/// <summary>
 	/// Store results in files.
 	/// </summary>
-	public sealed class FilePipeline : BasePipeline
+	public class FilePipeline : BasePipeline
 	{
 		/// <summary>
 		/// create a FilePipeline with default path"/data/dotnetspider/"

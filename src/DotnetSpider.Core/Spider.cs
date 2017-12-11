@@ -1233,7 +1233,7 @@ namespace DotnetSpider.Core
 			Exit();
 			while (!_scheduler.IsExited)
 			{
-				Thread.Sleep(1500);
+				Thread.Sleep(100);
 			}
 		}
 
@@ -1267,7 +1267,7 @@ namespace DotnetSpider.Core
 			Exit();
 			while (!_scheduler.IsExited)
 			{
-				Thread.Sleep(1500);
+				Thread.Sleep(100);
 			}
 		}
 
