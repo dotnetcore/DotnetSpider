@@ -115,7 +115,7 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
-		public bool IsDuplicate(Request request)
+		public virtual bool IsDuplicate(Request request)
 		{
 			return _retryPolicy.Execute(() =>
 			{
