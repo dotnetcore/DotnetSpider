@@ -17,16 +17,12 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public static RedisConnection Default => MyInstance.Value;
 
-		public string ConnectString { get; }
-
 		public IDatabase Database { get; }
 
 		public ISubscriber Subscriber { get; }
 
 		public RedisConnection(string connectString)
 		{
-			ConnectString = connectString;
-
 			var connection = ConnectionMultiplexer.Connect(connectString);
 			Database = connection.GetDatabase();
 			Subscriber = connection.GetSubscriber();

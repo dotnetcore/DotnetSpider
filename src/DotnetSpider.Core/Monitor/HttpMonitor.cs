@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
 using Newtonsoft.Json;
-using NLog;
 using System.Net.Http;
 using System.Text;
 
@@ -9,8 +8,6 @@ namespace DotnetSpider.Core.Monitor
 {
 	public class HttpMonitor : NLogMonitor
 	{
-		private static readonly ILogger Logger = LogCenter.GetLogger();
-
 		public HttpMonitor(string taskId, string identity) : base(taskId, identity)
 		{
 		}
@@ -21,12 +18,12 @@ namespace DotnetSpider.Core.Monitor
 
 			var json = JsonConvert.SerializeObject(new SpiderStatus
 			{
-				TaskId = _taskId,
+				TaskId = TaskId,
 				AvgDownloadSpeed = avgDownloadSpeed,
 				AvgPipelineSpeed = avgPipelineSpeed,
 				AvgProcessorSpeed = avgProcessorSpeed,
 				Error = error,
-				Identity = _identity,
+				Identity = Identity,
 				Left = left,
 				NodeId = NodeId.Id,
 				Status = status,

@@ -30,7 +30,7 @@ namespace DotnetSpider.Core.Test
 			}
 			catch (Exception exception)
 			{
-				Assert.Equal("Length of Identity should less than 100.", exception.Message);
+				Assert.Equal($"Length of Identity should less than {Env.IdentityMaxLength}.", exception.Message);
 				return;
 			}
 

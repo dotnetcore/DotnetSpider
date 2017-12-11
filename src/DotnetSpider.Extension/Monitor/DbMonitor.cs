@@ -28,8 +28,8 @@ namespace DotnetSpider.Extension.Monitor
 					conn.MyExecute(insertSql,
 						new
 						{
-							TaskId = _taskId,
-							Identity = _identity,
+							TaskId = TaskId,
+							Identity = Identity,
 							NodeId = NodeId.Id,
 							Status = "INIT",
 							Left = 0,
@@ -97,7 +97,7 @@ namespace DotnetSpider.Extension.Monitor
 					"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `NodeId`=@NodeId;",
 					new
 					{
-						Identity = _identity,
+						Identity = Identity,
 						NodeId = NodeId.Id,
 						Status = status,
 						Left = left,

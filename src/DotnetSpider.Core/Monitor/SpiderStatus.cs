@@ -1,18 +1,18 @@
 ﻿namespace DotnetSpider.Core.Monitor
 {
-	public class SpiderStatus
+	public struct SpiderStatus
 	{
-		public virtual string TaskId { get; set; }
-		public virtual string Identity { get; set; }
-		public virtual string NodeId { get; set; }
-		public virtual string Status { get; set; }
-		public virtual int Thread { get; set; }
-		public virtual long Left { get; set; }
-		public virtual long Success { get; set; }
-		public virtual long Error { get; set; }
-		public virtual long Total { get; set; }
-		public virtual float AvgDownloadSpeed { get; set; }
-		public virtual float AvgProcessorSpeed { get; set; }
-		public virtual float AvgPipelineSpeed { get; set; }
+		public string TaskId { get; set; }
+		public string Identity { get; set; }
+		public string NodeId { get; set; }
+		public string Status { get; set; }
+		public int Thread { get; set; }
+		public long Left { get; set; }
+		public long Success { get; set; }
+		public long Error { get; set; }
+		public long Total { get; set; }
+		public float AvgDownloadSpeed { get; set; }
+		public float AvgProcessorSpeed { get; set; }
+		public float AvgPipelineSpeed { get; set; }
 	}
 }

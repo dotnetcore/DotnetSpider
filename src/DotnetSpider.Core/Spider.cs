@@ -36,7 +36,6 @@ namespace DotnetSpider.Core
 		private readonly Site _site;
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
 		private IDownloader _downloader = new HttpClientDownloader();
-		private Task _monitorTask;
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
 		private readonly List<ResultItems> _cached = new List<ResultItems>();
@@ -102,9 +101,9 @@ namespace DotnetSpider.Core
 			{
 				CheckIfRunning();
 
-				if (string.IsNullOrEmpty(value) || value.Length > 120)
+				if (string.IsNullOrEmpty(value) || value.Length > Env.IdentityMaxLength)
 				{
-					throw new ArgumentException("Length of Identity should less than 100.");
+					throw new ArgumentException($"Length of Identity should less than {Env.IdentityMaxLength}.");
 				}
 
 				_identity = value;
@@ -584,13 +583,13 @@ namespace DotnetSpider.Core
 		/// <param name="arguments"></param>
 		protected override void RunApp(params string[] arguments)
 		{
+			CheckIfSettingsCorrect();
+
 			if (Stat == Status.Running)
 			{
 				Logger.AllLog(Identity, "Crawler is running...", LogLevel.Warn);
 				return;
 			}
-
-			CheckIfSettingsCorrect();
 
 			if (_init)
 			{
@@ -809,7 +808,7 @@ namespace DotnetSpider.Core
 		/// <param name="scheduler"></param>
 		protected Spider(Site site, string identity, IScheduler scheduler, params IPageProcessor[] pageProcessors) : this()
 		{
-			Identity = identity;
+			_identity = identity;
 
 			if (pageProcessors != null)
 			{
@@ -836,9 +835,9 @@ namespace DotnetSpider.Core
 				? Encrypt.Md5Encrypt(Guid.NewGuid().ToString())
 				: Identity;
 
-			if (Identity.Length > 100)
+			if (Identity.Length > Env.IdentityMaxLength)
 			{
-				throw new SpiderException("Length of Identity should less than 100.");
+				throw new SpiderException($"Length of Identity should less than {Env.IdentityMaxLength}.");
 			}
 		}
 
@@ -887,6 +886,8 @@ namespace DotnetSpider.Core
 			ExecuteStartUrlBuilders(arguments);
 
 			PushStartRequestToScheduler();
+
+			_init = true;
 		}
 
 		/// <summary>

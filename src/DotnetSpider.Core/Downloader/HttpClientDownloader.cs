@@ -18,7 +18,7 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class HttpClientDownloader : BaseDownloader
 	{
-		private static HashSet<string> MediaTypes = new HashSet<string>
+		private static readonly HashSet<string> MediaTypes = new HashSet<string>
 		{
 			"text/html",
 			"text/plain",
@@ -37,7 +37,7 @@ namespace DotnetSpider.Core.Downloader
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
 		private readonly HttpClient _httpClient;
 
-		public bool DecodeHtml { get; set; }
+		private bool _decodeHtml;
 
 		public HttpClientDownloader()
 		{
@@ -50,9 +50,10 @@ namespace DotnetSpider.Core.Downloader
 			});
 		}
 
-		public HttpClientDownloader(int timeout) : this()
+		public HttpClientDownloader(bool decodeHtml = false, int timeout = 5) : this()
 		{
 			_httpClient.Timeout = new TimeSpan(0, 0, timeout);
+			_decodeHtml = decodeHtml;
 		}
 
 		public static void AddMediaTypes(string type)
@@ -263,7 +264,7 @@ namespace DotnetSpider.Core.Downloader
 		{
 			string content = ReadContent(site, response);
 
-			if (DecodeHtml)
+			if (_decodeHtml)
 			{
 #if !NET_CORE
 				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
