@@ -6,7 +6,6 @@ using System.Web;
 #endif
 using System.Text;
 using System.Net.Http;
-using System.Net;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;
@@ -35,24 +34,24 @@ namespace DotnetSpider.Core.Downloader
 			"application/x-www-form-urlencoded"
 		};
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
-		private readonly HttpClient _httpClient;
+		private static readonly HttpClient HttpClient;
+		private readonly string _downloadFolder;
 
-		private bool _decodeHtml;
+		private readonly bool _decodeHtml;
+
+		static HttpClientDownloader()
+		{
+			HttpClient = HttpSender.Client;
+		}
 
 		public HttpClientDownloader()
 		{
-			_httpClient = new HttpClient(new HttpClientHandler
-			{
-				AllowAutoRedirect = true,
-				AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-				UseProxy = true,
-				UseCookies = false
-			});
+			_downloadFolder = Path.Combine(Env.BaseDirectory, "download");
 		}
 
 		public HttpClientDownloader(bool decodeHtml = false, int timeout = 5) : this()
 		{
-			_httpClient.Timeout = new TimeSpan(0, 0, timeout);
+			HttpClient.Timeout = new TimeSpan(0, 0, timeout);
 			_decodeHtml = decodeHtml;
 		}
 
@@ -73,7 +72,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 
-				HttpClient httpClient = null == spider.Site.HttpProxyPool ? _httpClient : _httpClientPool.GetHttpClient(proxy);
+				HttpClient httpClient = null == spider.Site.HttpProxyPool ? HttpClient : _httpClientPool.GetHttpClient(proxy);
 
 				response = NetworkCenter.Current.Execute("http", () => httpClient.SendAsync(httpMessage).Result);
 
@@ -269,7 +268,7 @@ namespace DotnetSpider.Core.Downloader
 #if !NET_CORE
 				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
 #else
-				content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
+				content = System.Net.WebUtility.UrlDecode(System.Net.WebUtility.HtmlDecode(content));
 #endif
 			}
 
@@ -300,6 +299,34 @@ namespace DotnetSpider.Core.Downloader
 			{
 				return site.Encoding.GetString(contentBytes, 0, contentBytes.Length);
 			}
+		}
+
+		private Page SaveFile(Request request, HttpResponseMessage response, ISpider spider)
+		{
+			var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Env.PathSeperator);
+			string filePath = $"{_downloadFolder}{Env.PathSeperator}{spider.Identity}{intervalPath}";
+			if (!File.Exists(filePath))
+			{
+				try
+				{
+					string folder = Path.GetDirectoryName(filePath);
+					if (!string.IsNullOrEmpty(folder))
+					{
+						if (!Directory.Exists(folder))
+						{
+							Directory.CreateDirectory(folder);
+						}
+					}
+
+					File.WriteAllBytes(filePath, response.Content.ReadAsByteArrayAsync().Result);
+				}
+				catch (Exception e)
+				{
+					Logger.AllLog(spider.Identity, "Storage file failed.", LogLevel.Error, e);
+				}
+			}
+			Logger.AllLog(spider.Identity, $"Storage file: {request.Url} success.", LogLevel.Info);
+			return new Page(request, null) { Skip = true };
 		}
 
 		private byte[] PreventCutOff(byte[] bytes)

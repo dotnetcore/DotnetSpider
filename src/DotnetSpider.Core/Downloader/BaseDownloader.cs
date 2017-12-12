@@ -23,13 +23,6 @@ namespace DotnetSpider.Core.Downloader
 
 		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
 
-		private readonly string _downloadFolder;
-
-		protected BaseDownloader()
-		{
-			_downloadFolder = Path.Combine(Env.BaseDirectory, "download");
-		}
-
 		public Page Download(Request request, ISpider spider)
 		{
 			if (spider.Site == null)
@@ -63,34 +56,6 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		protected abstract Page DowloadContent(Request request, ISpider spider);
-
-		protected Page SaveFile(Request request, HttpResponseMessage response, ISpider spider)
-		{
-			var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Env.PathSeperator);
-			string filePath = $"{_downloadFolder}{Env.PathSeperator}{spider.Identity}{intervalPath}";
-			if (!File.Exists(filePath))
-			{
-				try
-				{
-					string folder = Path.GetDirectoryName(filePath);
-					if (!string.IsNullOrEmpty(folder))
-					{
-						if (!Directory.Exists(folder))
-						{
-							Directory.CreateDirectory(folder);
-						}
-					}
-
-					File.WriteAllBytes(filePath, response.Content.ReadAsByteArrayAsync().Result);
-				}
-				catch (Exception e)
-				{
-					Logger.AllLog(spider.Identity, "Storage file failed.", LogLevel.Error, e);
-				}
-			}
-			Logger.AllLog(spider.Identity, $"Storage file: {request.Url} success.", LogLevel.Info);
-			return new Page(request, null) { Skip = true };
-		}
 
 		private void HandleBeforeDownload(ref Request request, ISpider spider)
 		{
