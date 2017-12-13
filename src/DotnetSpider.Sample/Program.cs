@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DotnetSpider.Extension.Infrastructure;
+using OpenQA.Selenium.Chrome;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else

@@ -1069,7 +1069,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				excutePipeline = true;
+				excutePipeline = !page.ResultItems.IsEmpty;
 			}
 
 			if (!excutePipeline)
