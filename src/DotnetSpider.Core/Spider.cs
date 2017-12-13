@@ -1042,6 +1042,11 @@ namespace DotnetSpider.Core
 						Logger.AllLog(Identity, $"Skip {request.Url} because extract 0 result.", LogLevel.Warn);
 						_OnSuccess(request);
 					}
+					// 场景: 此链接就是用来生产新链接的, 因此不会有内容产出
+					else if (page.TargetRequests != null && page.TargetRequests.Count > 0)
+					{
+						ExtractAndAddRequests(page);
+					}
 					else
 					{
 						if (Site.CycleRetryTimes > 0)
