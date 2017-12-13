@@ -249,8 +249,11 @@ NOTE:
 
 ### Web Manager
 
-1. Beta
-
+![1](https://github.com/dotnetcore/DotnetSpider/blob/master/images/1.png)
+![2](https://github.com/dotnetcore/DotnetSpider/blob/master/images/2.png)
+![3](https://github.com/dotnetcore/DotnetSpider/blob/master/images/3.png)
+![4](https://github.com/dotnetcore/DotnetSpider/blob/master/images/4.png)
+![5](https://github.com/dotnetcore/DotnetSpider/blob/master/images/5.png)
 ### NOTICE
 
 #### when you use redis scheduler, please update your redis config: 
