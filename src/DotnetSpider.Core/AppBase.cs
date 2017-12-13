@@ -15,7 +15,7 @@ namespace DotnetSpider.Core
 
 		public virtual string Identity { get; set; }
 
-		public virtual string Name { get; set; }
+		public string Name { get; set; }
 
 		public virtual string TaskId { get; set; }
 
@@ -45,6 +45,11 @@ namespace DotnetSpider.Core
 
 		public void Run(params string[] arguments)
 		{
+			if (ExecuteRecord == null && !string.IsNullOrEmpty(Env.HttpCenter))
+			{
+				ExecuteRecord = new HttpExecuteRecord();
+			}
+
 			if (!AddExecuteRecord())
 			{
 				Logger.AllLog(Identity, "Can not add execute record.", LogLevel.Error);
@@ -61,10 +66,6 @@ namespace DotnetSpider.Core
 
 		private bool AddExecuteRecord()
 		{
-			if (ExecuteRecord == null && !string.IsNullOrEmpty(Env.HttpCenter))
-			{
-				ExecuteRecord = new HttpExecuteRecord();
-			}
 			if (ExecuteRecord == null)
 			{
 				return true;

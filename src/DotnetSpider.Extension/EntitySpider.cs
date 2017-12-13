@@ -73,8 +73,13 @@ namespace DotnetSpider.Extension
 					foreach (var pipeline in entityPipelines)
 					{
 						var entityProcessor = processor as IEntityProcessor;
-						BaseEntityPipeline newPipeline = pipeline as BaseEntityPipeline;
-						newPipeline.AddEntity(entityProcessor.EntityDefine);
+						if (pipeline is BaseEntityPipeline newPipeline)
+						{
+							if (entityProcessor != null)
+							{
+								newPipeline.AddEntity(entityProcessor.EntityDefine);
+							}
+						}
 					}
 				}
 			}

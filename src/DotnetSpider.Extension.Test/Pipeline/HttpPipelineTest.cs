@@ -15,6 +15,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 {
 	public class HttpPipelineTest
 	{
+		public HttpPipelineTest()
+		{
+			Env.LoadConfiguration("app.service.config");
+		}
+
 		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=;Port=3306;SslMode=None;";
 
 		[EntityTable("test", "sku", EntityTable.Today, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]

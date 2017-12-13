@@ -3,6 +3,7 @@ using System.Data;
 using DotnetSpider.Core.Redial;
 using System.Collections.Generic;
 
+// ReSharper disable once CheckNamespace
 namespace DotnetSpider.Extension
 {
 	public static class DbExecutor
@@ -13,14 +14,11 @@ namespace DotnetSpider.Extension
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () =>
-				{
-					return SqlMapper.ExecuteScalar(conn, sql, param, transaction, commandTimeout, commandType);
-				});
+				return NetworkCenter.Current.Execute("db", () => conn.ExecuteScalar(sql, param, transaction, commandTimeout, commandType));
 			}
 			else
 			{
-				return SqlMapper.ExecuteScalar(conn, sql, param, transaction, commandTimeout, commandType);
+				return conn.ExecuteScalar(sql, param, transaction, commandTimeout, commandType);
 			}
 		}
 
@@ -28,14 +26,11 @@ namespace DotnetSpider.Extension
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () =>
-				{
-					return SqlMapper.ExecuteReader(conn, sql, param, transaction, commandTimeout, commandType);
-				});
+				return NetworkCenter.Current.Execute("db", () => conn.ExecuteReader(sql, param, transaction, commandTimeout, commandType));
 			}
 			else
 			{
-				return SqlMapper.ExecuteReader(conn, sql, param, transaction, commandTimeout, commandType);
+				return conn.ExecuteReader(sql, param, transaction, commandTimeout, commandType);
 			}
 		}
 
@@ -43,14 +38,11 @@ namespace DotnetSpider.Extension
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () =>
-				{
-					return SqlMapper.Execute(conn, sql, param, transaction, commandTimeout, commandType);
-				});
+				return NetworkCenter.Current.Execute("db", () => conn.Execute(sql, param, transaction, commandTimeout, commandType));
 			}
 			else
 			{
-				return SqlMapper.Execute(conn, sql, param, transaction, commandTimeout, commandType);
+				return conn.Execute(sql, param, transaction, commandTimeout, commandType);
 			}
 		}
 
@@ -58,14 +50,11 @@ namespace DotnetSpider.Extension
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () =>
-				{
-					return SqlMapper.QueryFirstOrDefault(conn, sql, param, transaction, commandTimeout, commandType);
-				});
+				return NetworkCenter.Current.Execute("db", () => conn.QueryFirstOrDefault(sql, param, transaction, commandTimeout, commandType));
 			}
 			else
 			{
-				return SqlMapper.QueryFirstOrDefault(conn, sql, param, transaction, commandTimeout, commandType);
+				return conn.QueryFirstOrDefault(sql, param, transaction, commandTimeout, commandType);
 			}
 		}
 
@@ -73,14 +62,11 @@ namespace DotnetSpider.Extension
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () =>
-				{
-					return SqlMapper.Query<T>(conn, sql, param, transaction, buffered, commandTimeout, commandType);
-				});
+				return NetworkCenter.Current.Execute("db", () => conn.Query<T>(sql, param, transaction, buffered, commandTimeout, commandType));
 			}
 			else
 			{
-				return SqlMapper.Query<T>(conn, sql, param, transaction, buffered, commandTimeout, commandType);
+				return conn.Query<T>(sql, param, transaction, buffered, commandTimeout, commandType);
 			}
 		}
 
@@ -88,14 +74,11 @@ namespace DotnetSpider.Extension
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () =>
-				{
-					return SqlMapper.Query(conn, sql, param, transaction, buffered, commandTimeout, commandType);
-				});
+				return NetworkCenter.Current.Execute("db", () => conn.Query(sql, param, transaction, buffered, commandTimeout, commandType));
 			}
 			else
 			{
-				return SqlMapper.Query(conn, sql, param, transaction, buffered, commandTimeout, commandType);
+				return conn.Query(sql, param, transaction, buffered, commandTimeout, commandType);
 			}
 		}
 
@@ -103,14 +86,11 @@ namespace DotnetSpider.Extension
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () =>
-				{
-					return SqlMapper.ExecuteScalar<T>(conn, sql, param, transaction, commandTimeout, commandType);
-				});
+				return NetworkCenter.Current.Execute("db", () => conn.ExecuteScalar<T>(sql, param, transaction, commandTimeout, commandType));
 			}
 			else
 			{
-				return SqlMapper.ExecuteScalar<T>(conn, sql, param, transaction, commandTimeout, commandType);
+				return conn.ExecuteScalar<T>(sql, param, transaction, commandTimeout, commandType);
 			}
 		}
 	}

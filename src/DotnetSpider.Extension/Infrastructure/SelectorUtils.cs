@@ -8,7 +8,7 @@ using System;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public class SelectorUtils
+	public static class SelectorUtils
 	{
 		public static object GetEnviromentValue(string field, Page page, int index)
 		{

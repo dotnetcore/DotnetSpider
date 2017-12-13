@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension
 		{
 			try
 			{
-				if (Env.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(taskId))
+				if (Env.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(taskId) && !string.IsNullOrWhiteSpace(taskId) && !string.IsNullOrEmpty(identity) && !string.IsNullOrWhiteSpace(identity))
 				{
 					using (IDbConnection conn = Env.SystemConnectionStringSettings.GetDbConnection())
 					{
@@ -33,13 +33,11 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-
-
 		public void Remove(string taskId)
 		{
 			try
 			{
-				if (Env.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(taskId))
+				if (Env.SystemConnectionStringSettings != null && !string.IsNullOrEmpty(taskId) && !string.IsNullOrWhiteSpace(taskId))
 				{
 					using (IDbConnection conn = Env.SystemConnectionStringSettings.GetDbConnection())
 					{

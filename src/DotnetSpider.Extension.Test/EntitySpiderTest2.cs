@@ -20,10 +20,6 @@ namespace DotnetSpider.Extension.Test
 
 	public class EntitySpiderTest2
 	{
-		public EntitySpiderTest2()
-		{
-		}
-
 		private class TestPipeline : BaseEntityDbPipeline
 		{
 			public TestPipeline(string connectString) : base(connectString)

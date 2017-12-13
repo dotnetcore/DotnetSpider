@@ -57,6 +57,7 @@ namespace DotnetSpider.Core.Redial
 					}
 					catch
 					{
+						// ignored
 					}
 				}
 			}

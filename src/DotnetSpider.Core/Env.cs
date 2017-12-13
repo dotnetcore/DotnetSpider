@@ -28,7 +28,7 @@ namespace DotnetSpider.Core
 		public const string HttpCenterTokenKey = "serviceToken";
 		public const string SystemConnectionStringKey = "SystemConnection";
 		public const string DataConnectionStringKey = "DataConnection";
-		public static readonly string[] IdColumns = new[] { "Id", "__Id" };
+		public static readonly string[] IdColumns = { "Id", "__Id" };
 		public const string CDateColumn = "CDate";
 		public const string SqlEncryptCodeKey = "sqlEncryptCode";
 
@@ -58,6 +58,7 @@ namespace DotnetSpider.Core
 		public static string DataConnectionString => DataConnectionStringSettings?.ConnectionString;
 		public static bool ProcessorFilterDefaultRequest = true;
 		public static string SqlEncryptCode { get; private set; }
+		public static int IdentityMaxLength { get; set; } = 120;
 
 		public static string GetAppSettings(string key)
 		{

@@ -20,7 +20,7 @@ namespace DotnetSpider.Core.Redial
 			RedialTimeFile = Path.Combine(Env.GlobalDirectory, "redial.time");
 		}
 
-		public LocalRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
+		protected LocalRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{
 			if (!Directory.Exists(AtomicActionFolder))
 			{
@@ -35,14 +35,9 @@ namespace DotnetSpider.Core.Redial
 				}
 				catch
 				{
+					// ignored
 				}
 			}
-		}
-
-		public LocalRedialExecutor(IRedialer redialer) : this(redialer, new DefaultInternetDetector()) { }
-
-		public LocalRedialExecutor() : this(new AdslRedialer(), new DefaultInternetDetector())
-		{
 		}
 
 		public override string CreateActionIdentity(string name)
