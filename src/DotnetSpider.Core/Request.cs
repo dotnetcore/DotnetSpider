@@ -16,9 +16,9 @@ namespace DotnetSpider.Core
 	{
 		private readonly object _locker = new object();
 
-		internal int? CountOfResults { get; set; }
+		public int? CountOfResults { get; set; }
 
-		internal int? EffectedRows { get; set; }
+		public int? EffectedRows { get; set; }
 
 		public UseSpecifiedUriWebProxy Proxy { get; set; }
 
