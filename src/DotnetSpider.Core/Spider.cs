@@ -855,7 +855,7 @@ namespace DotnetSpider.Core
 #if !NET_CORE // 开启多线程支持
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
-			_cached = new List<ResultItems>(_cached);
+			_cached = new List<ResultItems>(CachedSize);
 
 			InitSite();
 
