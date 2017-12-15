@@ -56,6 +56,8 @@ namespace DotnetSpider.Core
 		private int _errorRequestFlushCount;
 		private RetryPolicy _pipelineRetryPolicy;
 		private string[] _closeSignalFiles;
+		private long requstCount = 0;
+		private static object RequestCountLocker = new object();
 
 		protected virtual bool IfRequireInitStartRequests(string[] arguments)
 		{
@@ -652,18 +654,6 @@ namespace DotnetSpider.Core
 						{
 							waitCount = 1;
 
-							if (Scheduler.SuccessRequestsCount % monitorInterval == 0)
-							{
-								try
-								{
-									ReportStatus();
-								}
-								catch (Exception e)
-								{
-									Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
-								}
-							}
-
 							try
 							{
 								Stopwatch sw = new Stopwatch();
@@ -681,6 +671,22 @@ namespace DotnetSpider.Core
 								{
 									var statusCode = request.StatusCode;
 									Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
+								}
+								lock (RequestCountLocker)
+								{
+									requstCount++;
+
+									if (requstCount % monitorInterval == 0)
+									{
+										try
+										{
+											ReportStatus();
+										}
+										catch (Exception e)
+										{
+											Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
+										}
+									}
 								}
 							}
 						}
