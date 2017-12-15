@@ -3,6 +3,7 @@ using System.Text;
 using DotnetSpider.Core.Infrastructure;
 using Newtonsoft.Json;
 using NLog;
+using System.Collections.Generic;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -55,7 +56,7 @@ namespace DotnetSpider.Core.Pipeline
 			SetPath(path);
 		}
 
-		public override void Process(params ResultItems[] resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems)
 		{
 			try
 			{

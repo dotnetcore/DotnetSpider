@@ -38,7 +38,7 @@ namespace DotnetSpider.Core
 		private IDownloader _downloader = new HttpClientDownloader();
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
-		private readonly List<ResultItems> _cached = new List<ResultItems>();
+		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
 		private bool _init;
 		private FileInfo _errorRequestFile;
@@ -419,6 +419,7 @@ namespace DotnetSpider.Core
 			{
 				Name = type.Name;
 			}
+
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 		}
 
@@ -854,6 +855,8 @@ namespace DotnetSpider.Core
 #if !NET_CORE // 开启多线程支持
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
+			_cached = new List<ResultItems>(_cached);
+
 			InitSite();
 
 			InitDownloader();
@@ -1095,7 +1098,7 @@ namespace DotnetSpider.Core
 						{
 							_pipelineRetryPolicy.Execute(() =>
 							{
-								pipeline.Process(page.ResultItems);
+								pipeline.Process(new[] { page.ResultItems });
 							});
 						}
 						catch (Exception e)
@@ -1103,12 +1106,26 @@ namespace DotnetSpider.Core
 							Logger.AllLog(Identity, $"Execute pipeline failed: {e}", LogLevel.Error);
 						}
 					}
+
+					StringBuilder builder = new StringBuilder($"Crawl: {request.Url} success");
+					if (request.CountOfResults.HasValue)
+					{
+						builder.Append($", results: { request.CountOfResults}");
+					}
+					if (request.EffectedRows.HasValue)
+					{
+						builder.Append($", effectedRow: {request.EffectedRows}");
+					}
+					builder.Append(".");
+					Logger.AllLog(Identity, builder.ToString(), LogLevel.Info);
 				}
 				else
 				{
 					lock (Locker)
 					{
 						_cached.Add(page.ResultItems);
+
+						Logger.AllLog(Identity, $"Cached {request.Url} results success.", LogLevel.Info);
 
 						if (_cached.Count >= CachedSize)
 						{
@@ -1118,23 +1135,25 @@ namespace DotnetSpider.Core
 							{
 								pipeline.Process(items);
 							}
+
+							StringBuilder builder = new StringBuilder("Crawl:");
+							int countOfResults = 0, effectedRows = 0;
+							foreach (var item in items)
+							{
+								builder.Append($" {request.Url},");
+								countOfResults += item.Request.CountOfResults.HasValue ? item.Request.CountOfResults.Value : 0;
+								effectedRows += item.Request.EffectedRows.HasValue ? item.Request.EffectedRows.Value : 0;
+							}
+							builder.Append($" success");
+							builder.Append($", results: {countOfResults}");
+							builder.Append($", effectedRow: {effectedRows}");
+							builder.Append(".");
+							Logger.AllLog(Identity, builder.ToString(), LogLevel.Info);
 						}
 					}
 				}
 
 				_OnSuccess(request);
-
-				StringBuilder builder = new StringBuilder($"Crawl: {request.Url} success");
-				if (request.CountOfResults != null)
-				{
-					builder.Append($", results: { request.CountOfResults}");
-				}
-				if (request.EffectedRows != null)
-				{
-					builder.Append($", effectedRow: {request.EffectedRows}");
-				}
-				builder.Append(".");
-				Logger.AllLog(Identity, builder.ToString(), LogLevel.Info);
 
 				sw.Stop();
 				CalculatePipelineSpeed(sw.ElapsedMilliseconds);

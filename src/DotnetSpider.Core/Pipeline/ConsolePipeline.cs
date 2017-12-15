@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DotnetSpider.Core.Pipeline
 {
 	/// <summary>
@@ -6,7 +8,7 @@ namespace DotnetSpider.Core.Pipeline
 	/// </summary>
 	public class ConsolePipeline : BasePipeline
 	{
-		public override void Process(params ResultItems[] resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems)
 		{
 			foreach (var resultItem in resultItems)
 			{

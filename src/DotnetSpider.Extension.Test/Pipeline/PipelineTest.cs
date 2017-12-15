@@ -68,7 +68,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			class MyPipeline : BasePipeline
 			{
-				public override void Process(params ResultItems[] resultItems)
+				public override void Process(IEnumerable<ResultItems> resultItems)
 				{
 				}
 			}

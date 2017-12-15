@@ -35,7 +35,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 					File.Delete(file);
 				}
 			}
-			pipeline.Process(_resultItems);
+			pipeline.Process(new[] { _resultItems });
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
 			string expected = $"{{\"content\":\"爬虫工具\"}}{System.Environment.NewLine}";

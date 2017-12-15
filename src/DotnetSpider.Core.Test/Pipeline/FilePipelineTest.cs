@@ -35,7 +35,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 					File.Delete(file);
 				}
 			}
-			filePipeline.Process(_resultItems);
+			filePipeline.Process(new[] { _resultItems });
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
 			string expected = $"url:\thttp://www.baidu.com/{System.Environment.NewLine}content:\t爬虫工具{System.Environment.NewLine}";

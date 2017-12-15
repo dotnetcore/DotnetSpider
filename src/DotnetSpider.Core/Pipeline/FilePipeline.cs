@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using DotnetSpider.Core.Infrastructure;
@@ -32,7 +33,7 @@ namespace DotnetSpider.Core.Pipeline
 			return $"{BasePath}{Env.PathSeperator}{Spider.Identity}{Env.PathSeperator}";
 		}
 
-		public override void Process(params ResultItems[] resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems)
 		{
 			try
 			{

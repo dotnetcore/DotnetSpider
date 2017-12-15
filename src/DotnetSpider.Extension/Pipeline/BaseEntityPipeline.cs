@@ -9,9 +9,9 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		public abstract int Process(string name, List<dynamic> datas);
 
-		public override void Process(params ResultItems[] resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems)
 		{
-			if (resultItems == null || resultItems.Length == 0)
+			if (resultItems == null)
 			{
 				return;
 			}

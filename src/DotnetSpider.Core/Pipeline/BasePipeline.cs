@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using NLog;
+using System.Collections.Generic;
 using System.IO;
 #if NET_CORE
 #endif
@@ -18,7 +19,7 @@ namespace DotnetSpider.Core.Pipeline
 			Spider = spider;
 		}
 
-		public abstract void Process(params ResultItems[] resultItems);
+		public abstract void Process(IEnumerable<ResultItems> resultItems);
 
 		public virtual void Dispose()
 		{

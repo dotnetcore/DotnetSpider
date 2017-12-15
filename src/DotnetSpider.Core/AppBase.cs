@@ -56,7 +56,7 @@ namespace DotnetSpider.Core
 			}
 			try
 			{
-				RunApp();
+				RunApp(arguments);
 			}
 			finally
 			{

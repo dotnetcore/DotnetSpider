@@ -31,7 +31,7 @@ namespace DotnetSpider.Extension.Pipeline
 			InitDatabaseAndTable(Database, TableName);
 		}
 
-		public override void Process(params ResultItems[] resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems)
 		{
 			var results = new List<DefaulHtmlContent>();
 			foreach (var resultItem in resultItems)
@@ -46,6 +46,7 @@ namespace DotnetSpider.Extension.Pipeline
 			using (var conn = ConnectionStringSettings.GetDbConnection())
 			{
 				conn.MyExecute($"INSERT IGNORE `{Database}`.`{TableName}` (`url`, `title`, `html`) VALUES (@Url, @Title, @Html);", results);
+
 			}
 		}
 
