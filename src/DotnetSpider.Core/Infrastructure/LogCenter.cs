@@ -115,7 +115,7 @@ namespace DotnetSpider.Core.Infrastructure
 					LogInfo = new
 					{
 						Identity = identity,
-						Node = NodeId.Id,
+						NodeId = NodeId.Id,
 						Logged = DateTime.UtcNow,
 						Level = level.ToString(),
 						Message = message,

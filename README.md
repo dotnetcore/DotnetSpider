@@ -25,6 +25,7 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 - Run distributed crawler. [Download Redis for windows](https://github.com/MSOpenTech/redis/releases)
 - SqlServer.
 - PostgreSQL.
+- Cassandra
 
 ### SAMPLES
 
@@ -46,7 +47,7 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 
 			Spider spider = Spider.Create(site,
 				// crawler identity
-				"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
+				"cnblogs",
 				// use memoery queue scheduler
 				new QueueDuplicateRemovedScheduler(),
 				// default page processor will save whole html, and extract urls to target urls via regex
@@ -220,12 +221,12 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 
 	Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name] -e:[en1=value1,en2=value2,...]
 
-1. -s: Type name of spider for example: DotnetSpider.Sample.BaiduSearchSpiderl
+1. -s: Type name of spider or TaskNameAttribute for example: DotnetSpider.Sample.BaiduSearchSpiderl
 2. -i: Set identity.
 3. -a: Pass arguments to spider's Run method.
 4. -tid: Set task id.
 5. -n: Set name.
-6. -e: Set enviroment, for example you want to run with a customize config: -e:CONFIG=app.my.config,DBCONFIG=GLOBAL
+6. -c: Set config file path, for example you want to run with a customize config: -e:app.my.config
 
 #### WebDriver Support
 
@@ -243,14 +244,17 @@ NOTE:
 
 ### Monitor and Database log
 
-1. Set SystemConnection in app.config, only support mysql so far.
-2. Run a spider then check data in database: dotnetspider, there are 3 tables: log, status, task_running
+1. Set SystemConnection in app.config
+2. Update nlog.config like https://github.com/dotnetcore/DotnetSpider/blob/master/src/DotnetSpider.Extension.Test/nlog.config
 
 
 ### Web Manager
 
-1. Beta
-
+![1](https://github.com/dotnetcore/DotnetSpider/blob/master/images/1.png)
+![2](https://github.com/dotnetcore/DotnetSpider/blob/master/images/2.png)
+![3](https://github.com/dotnetcore/DotnetSpider/blob/master/images/3.png)
+![4](https://github.com/dotnetcore/DotnetSpider/blob/master/images/4.png)
+![5](https://github.com/dotnetcore/DotnetSpider/blob/master/images/5.png)
 ### NOTICE
 
 #### when you use redis scheduler, please update your redis config: 

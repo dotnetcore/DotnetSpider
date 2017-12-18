@@ -9,6 +9,7 @@ using Xunit;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -64,7 +65,7 @@ namespace DotnetSpider.Extension.Test
 
 		internal class TestPipeline : BasePipeline
 		{
-			public override void Process(params ResultItems[] resultItems)
+			public override void Process(IEnumerable<ResultItems> resultItems)
 			{
 				foreach (var resultItem in resultItems)
 				{

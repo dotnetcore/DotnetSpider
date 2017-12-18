@@ -135,10 +135,18 @@ namespace DotnetSpider.Core
 
 			GlobalDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dotnetspider");
 			DefaultGlobalAppConfigPath = Path.Combine(GlobalDirectory, "app.config");
-			DirectoryInfo di = new DirectoryInfo(GlobalDirectory);
-			if (!di.Exists)
+
+			try
 			{
-				di.Create();
+				DirectoryInfo di = new DirectoryInfo(GlobalDirectory);
+				if (!di.Exists)
+				{
+					di.Create();
+				}
+			}
+			catch
+			{
+				// 某些情况下没有Global文件夹权限, 直接忽略。Global文件夹不是必要的运行环境
 			}
 
 			HostName = Dns.GetHostName();

@@ -38,7 +38,7 @@ namespace DotnetSpider.Core
 		private IDownloader _downloader = new HttpClientDownloader();
 		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
-		private readonly List<ResultItems> _cached = new List<ResultItems>();
+		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
 		private bool _init;
 		private FileInfo _errorRequestFile;
@@ -56,6 +56,8 @@ namespace DotnetSpider.Core
 		private int _errorRequestFlushCount;
 		private RetryPolicy _pipelineRetryPolicy;
 		private string[] _closeSignalFiles;
+		private long requstCount = 0;
+		private static object RequestCountLocker = new object();
 
 		protected virtual bool IfRequireInitStartRequests(string[] arguments)
 		{
@@ -419,6 +421,7 @@ namespace DotnetSpider.Core
 			{
 				Name = type.Name;
 			}
+
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 		}
 
@@ -651,18 +654,6 @@ namespace DotnetSpider.Core
 						{
 							waitCount = 1;
 
-							if (Scheduler.SuccessRequestsCount % monitorInterval == 0)
-							{
-								try
-								{
-									ReportStatus();
-								}
-								catch (Exception e)
-								{
-									Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
-								}
-							}
-
 							try
 							{
 								Stopwatch sw = new Stopwatch();
@@ -680,6 +671,22 @@ namespace DotnetSpider.Core
 								{
 									var statusCode = request.StatusCode;
 									Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
+								}
+								lock (RequestCountLocker)
+								{
+									requstCount++;
+
+									if (requstCount % monitorInterval == 0)
+									{
+										try
+										{
+											ReportStatus();
+										}
+										catch (Exception e)
+										{
+											Logger.AllLog(Identity, $"Report status failed: {e}.", LogLevel.Error);
+										}
+									}
 								}
 							}
 						}
@@ -854,6 +861,8 @@ namespace DotnetSpider.Core
 #if !NET_CORE // 开启多线程支持
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
+			_cached = new List<ResultItems>(CachedSize);
+
 			InitSite();
 
 			InitDownloader();
@@ -1042,6 +1051,11 @@ namespace DotnetSpider.Core
 						Logger.AllLog(Identity, $"Skip {request.Url} because extract 0 result.", LogLevel.Warn);
 						_OnSuccess(request);
 					}
+					// 场景: 此链接就是用来生产新链接的, 因此不会有内容产出
+					else if (page.TargetRequests != null && page.TargetRequests.Count > 0)
+					{
+						ExtractAndAddRequests(page);
+					}
 					else
 					{
 						if (Site.CycleRetryTimes > 0)
@@ -1069,7 +1083,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				excutePipeline = true;
+				excutePipeline = !page.ResultItems.IsEmpty;
 			}
 
 			if (!excutePipeline)
@@ -1090,7 +1104,7 @@ namespace DotnetSpider.Core
 						{
 							_pipelineRetryPolicy.Execute(() =>
 							{
-								pipeline.Process(page.ResultItems);
+								pipeline.Process(new[] { page.ResultItems });
 							});
 						}
 						catch (Exception e)
@@ -1098,12 +1112,26 @@ namespace DotnetSpider.Core
 							Logger.AllLog(Identity, $"Execute pipeline failed: {e}", LogLevel.Error);
 						}
 					}
+
+					StringBuilder builder = new StringBuilder($"Crawl: {request.Url} success");
+					if (request.CountOfResults.HasValue)
+					{
+						builder.Append($", results: { request.CountOfResults}");
+					}
+					if (request.EffectedRows.HasValue)
+					{
+						builder.Append($", effectedRow: {request.EffectedRows}");
+					}
+					builder.Append(".");
+					Logger.AllLog(Identity, builder.ToString(), LogLevel.Info);
 				}
 				else
 				{
 					lock (Locker)
 					{
 						_cached.Add(page.ResultItems);
+
+						Logger.AllLog(Identity, $"Cached {request.Url} results success.", LogLevel.Info);
 
 						if (_cached.Count >= CachedSize)
 						{
@@ -1113,23 +1141,25 @@ namespace DotnetSpider.Core
 							{
 								pipeline.Process(items);
 							}
+
+							StringBuilder builder = new StringBuilder("Crawl:");
+							int countOfResults = 0, effectedRows = 0;
+							foreach (var item in items)
+							{
+								builder.Append($" {request.Url},");
+								countOfResults += item.Request.CountOfResults.HasValue ? item.Request.CountOfResults.Value : 0;
+								effectedRows += item.Request.EffectedRows.HasValue ? item.Request.EffectedRows.Value : 0;
+							}
+							builder.Append($" success");
+							builder.Append($", results: {countOfResults}");
+							builder.Append($", effectedRow: {effectedRows}");
+							builder.Append(".");
+							Logger.AllLog(Identity, builder.ToString(), LogLevel.Info);
 						}
 					}
 				}
 
 				_OnSuccess(request);
-
-				StringBuilder builder = new StringBuilder($"Crawl: {request.Url} success");
-				if (request.CountOfResults != null)
-				{
-					builder.Append($", results: { request.CountOfResults}");
-				}
-				if (request.EffectedRows != null)
-				{
-					builder.Append($", effectedRow: {request.EffectedRows}");
-				}
-				builder.Append(".");
-				Logger.AllLog(Identity, builder.ToString(), LogLevel.Info);
 
 				sw.Stop();
 				CalculatePipelineSpeed(sw.ElapsedMilliseconds);

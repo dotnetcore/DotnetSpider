@@ -7,6 +7,8 @@ using Xunit;
 using System.Diagnostics;
 using System.IO;
 using DotnetSpider.Core.Downloader;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotnetSpider.Core.Test
 {
@@ -111,7 +113,7 @@ namespace DotnetSpider.Core.Test
 
 		internal class TestPipeline : BasePipeline
 		{
-			public override void Process(params ResultItems[] resultItems)
+			public override void Process(IEnumerable<ResultItems> resultItems)
 			{
 				foreach (var resultItem in resultItems)
 				{
@@ -205,9 +207,9 @@ namespace DotnetSpider.Core.Test
 
 		internal class FastExitPipeline : BasePipeline
 		{
-			public override void Process(params ResultItems[] resultItems)
+			public override void Process(IEnumerable<ResultItems> resultItems)
 			{
-				File.AppendAllLines("FastExit_Result.txt", new[] { resultItems[0].Request.Url.ToString() });
+				File.AppendAllLines("FastExit_Result.txt", new[] { resultItems.First().Request.Url.ToString() });
 			}
 		}
 		//[Fact]
