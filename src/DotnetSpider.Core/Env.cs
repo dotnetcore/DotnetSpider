@@ -46,7 +46,7 @@ namespace DotnetSpider.Core
 		internal static string DefaultGlobalAppConfigPath { get; private set; }
 		public static string BaseDirectory { get; private set; }
 		public static string PathSeperator { get; private set; }
-		public static bool SubmitHttpLog { get; set; }
+		public static bool HttpLog { get; set; }
 		public static string HttpCenter { get; private set; }
 		public static string HttpLogUrl { get; private set; }
 		public static string HttpPipelineUrl { get; private set; }
@@ -112,7 +112,7 @@ namespace DotnetSpider.Core
 				HttpReduceRunningUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Task/ReduceRunning";
 				HttpPipelineUrl = $"{HttpCenter}{(HttpCenter.EndsWith("/") ? "" : "/")}Pipeline/Process";
 			}
-			SubmitHttpLog = !string.IsNullOrEmpty(HttpLogUrl);
+			HttpLog = !string.IsNullOrEmpty(HttpLogUrl);
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 			SqlEncryptCode = configuration.AppSettings.Settings[SqlEncryptCodeKey]?.Value?.Trim();

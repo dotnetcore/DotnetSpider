@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 #if NET_CORE
+using System.Linq;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 #endif
@@ -45,6 +46,7 @@ namespace DotnetSpider.Core.Redial.Redialer
 #else
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
+				KillPPPOEProcesses();
 				Process process = Process.Start("/sbin/ifdown", "ppp0");
 				process.WaitForExit();
 				process = Process.Start("/sbin/ifup", "ppp0");
@@ -70,6 +72,27 @@ namespace DotnetSpider.Core.Redial.Redialer
 				Thread.Sleep(2000);
 			}
 		}
+#if NET_CORE
+		private void KillPPPOEProcesses()
+		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				var processes = Process.GetProcessesByName("pppd").ToList();
+				processes.AddRange(Process.GetProcessesByName("pppoe"));
+				foreach (var process in processes)
+				{
+					try
+					{
+						process.Kill();
+					}
+					catch
+					{
+						// ignore
+					}
+				}
+			}
+		}
+#endif
 	}
 }
 

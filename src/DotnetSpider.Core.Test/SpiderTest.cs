@@ -145,6 +145,32 @@ namespace DotnetSpider.Core.Test
 		}
 
 		[Fact]
+		public void CloseSignal()
+		{
+			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", Timeout = 20000 },
+				new TestPageProcessor()).AddPipeline(new TestPipeline());
+ 
+			for (int i = 0; i < 20; ++i)
+			{
+				spider.AddStartUrl($"http://www.baidu.com/_t={i}");
+			}
+			var task = spider.RunAsync();
+			Thread.Sleep(500);
+			spider.SendExitSignal();
+			task.Wait();
+			Assert.Equal(10, spider.Scheduler.SuccessRequestsCount);
+
+			Spider spider2 = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", Timeout = 20000 },
+				new TestPageProcessor()).AddPipeline(new TestPipeline());
+			for (int i = 0; i < 25; ++i)
+			{
+				spider2.AddStartUrl($"http://www.baidu.com/_t={i}");
+			}
+			spider2.Run();
+			Assert.Equal(25, spider2.Scheduler.SuccessRequestsCount);
+		}
+
+		[Fact]
 		public void FastExit()
 		{
 			var path = "FastExit_Result.txt";

@@ -9,12 +9,19 @@ using Newtonsoft.Json;
 using System.Text;
 using DotnetSpider.Core.Redial;
 using System.Threading;
+using Polly.Retry;
+using Polly;
 
 namespace DotnetSpider.Core.Infrastructure
 {
 	public static class LogCenter
 	{
 		private static ILogger Logger;
+
+		private readonly static RetryPolicy RetryPolicy = Policy.Handle<Exception>().Retry(5, (ex, count) =>
+		{
+			Logger.Error($"Submit http log failed [{count}]: {ex}");
+		});
 
 		static LogCenter()
 		{
@@ -106,7 +113,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		private static void HttpLog(string identity, string message, LogLevel level, Exception exception = null)
 		{
-			if (Env.SubmitHttpLog)
+			if (Env.HttpLog)
 			{
 				var json = JsonConvert.SerializeObject(new
 				{
@@ -124,24 +131,14 @@ namespace DotnetSpider.Core.Infrastructure
 				});
 				var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-				for (int i = 0; i < 10; ++i)
+				RetryPolicy.ExecuteAndCapture(() =>
 				{
-					try
+					NetworkCenter.Current.Execute("log", () =>
 					{
-						NetworkCenter.Current.Execute("log", () =>
-						{
-							var response = HttpSender.Client.PostAsync(Env.HttpLogUrl, content).Result;
-							response.EnsureSuccessStatusCode();
-						});
-						break;
-
-					}
-					catch (Exception ex)
-					{
-						Logger.Error($"Submit log failed [{i}]: {ex}");
-						Thread.Sleep(5000);
-					}
-				}
+						var response = HttpSender.Client.PostAsync(Env.HttpLogUrl, content).Result;
+						response.EnsureSuccessStatusCode();
+					});
+				});
 			}
 		}
 	}
