@@ -3,6 +3,7 @@ using System.Text;
 using DotnetSpider.Core.Proxy;
 using System.Net;
 using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core
 {

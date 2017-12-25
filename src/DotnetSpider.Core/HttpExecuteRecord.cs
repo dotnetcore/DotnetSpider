@@ -10,6 +10,9 @@ using System.Threading;
 
 namespace DotnetSpider.Core
 {
+	/// <summary>
+	/// 通过Http向企业服务上报运行状态
+	/// </summary>
 	public class HttpExecuteRecord : IExecuteRecord
 	{
 		private static readonly ILogger Logger = LogCenter.GetLogger();
@@ -36,7 +39,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.PostAsync(Env.HttpIncreaseRunningUrl, content).Result;
+						var response = HttpSender.Client.PostAsync(Env.EnterpiseServiceIncreaseRunningUrl, content).Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});
@@ -73,7 +76,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.PostAsync(Env.HttpReduceRunningUrl, content).Result;
+						var response = HttpSender.Client.PostAsync(Env.EnterpiseServiceReduceRunningUrl, content).Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});

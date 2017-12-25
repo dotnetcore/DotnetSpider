@@ -113,11 +113,11 @@ namespace DotnetSpider.Core.Infrastructure
 
 		private static void HttpLog(string identity, string message, LogLevel level, Exception exception = null)
 		{
-			if (Env.HttpLog)
+			if (Env.EnterpiseServiceLog)
 			{
 				var json = JsonConvert.SerializeObject(new
 				{
-					Token = Env.HttpCenterToken,
+					Token = Env.EnterpiseServiceToken,
 					Identity = identity,
 					LogInfo = new
 					{
@@ -135,7 +135,7 @@ namespace DotnetSpider.Core.Infrastructure
 				{
 					NetworkCenter.Current.Execute("log", () =>
 					{
-						var response = HttpSender.Client.PostAsync(Env.HttpLogUrl, content).Result;
+						var response = HttpSender.Client.PostAsync(Env.EnterpiseServiceLogUrl, content).Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});

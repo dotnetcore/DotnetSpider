@@ -620,11 +620,11 @@ namespace DotnetSpider.Core
 
 			int monitorInterval = CalculateMonitorInterval(Scheduler);
 
-			while (Stat == Status.Running || Stat == Status.Stopped)
+			while (Stat == Status.Running || Stat == Status.Paused)
 			{
-				if (Stat == Status.Stopped)
+				if (Stat == Status.Paused)
 				{
-					_realStat = Status.Stopped;
+					_realStat = Status.Paused;
 					Thread.Sleep(50);
 					continue;
 				}
@@ -727,13 +727,13 @@ namespace DotnetSpider.Core
 				Logger.AllLog(Identity, "Crawler is not running.", LogLevel.Warn);
 				return;
 			}
-			Stat = Status.Stopped;
+			Stat = Status.Paused;
 			Logger.AllLog(Identity, "Stop running...", LogLevel.Warn);
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
 				{
-					while (_realStat != Status.Stopped)
+					while (_realStat != Status.Paused)
 					{
 						Thread.Sleep(100);
 					}
@@ -747,7 +747,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public void Contiune()
 		{
-			if (_realStat == Status.Stopped)
+			if (_realStat == Status.Paused)
 			{
 				Stat = Status.Running;
 				_realStat = Status.Running;
@@ -794,7 +794,7 @@ namespace DotnetSpider.Core
 		/// <param name="action"></param>
 		public void Exit(Action action = null)
 		{
-			if (Stat == Status.Running || Stat == Status.Stopped)
+			if (Stat == Status.Running || Stat == Status.Paused)
 			{
 				Stat = Status.Exited;
 				Logger.AllLog(Identity, "Exit...", LogLevel.Warn);
@@ -1423,7 +1423,7 @@ namespace DotnetSpider.Core
 		{
 			if (Monitor == null)
 			{
-				Monitor = string.IsNullOrEmpty(Env.HttpCenter) ? new NLogMonitor(TaskId, Identity) : new HttpMonitor(TaskId, Identity);
+				Monitor = string.IsNullOrEmpty(Env.EnterpiseServiceUrl) ? new NLogMonitor(TaskId, Identity) : new HttpMonitor(TaskId, Identity);
 			}
 		}
 

@@ -112,7 +112,7 @@ namespace DotnetSpider.Core.Test
         [Fact]
         public void XPath2()
         {
-            Selectable selectable = new Selectable(_html2, "", ContentType.Html);
+            Selectable selectable = new Selectable(_html2, "", Core.Infrastructure.ContentType.Html);
             var linksWithoutChain = selectable.Links().GetValues();
             ISelectable xpath = selectable.XPath("//div");
             var linksWithChainFirstCall = xpath.Links().GetValues();
@@ -124,7 +124,7 @@ namespace DotnetSpider.Core.Test
         [Fact]
         public void Selectable()
         {
-            Selectable selectable = new Selectable(_html2, "", ContentType.Html);
+            Selectable selectable = new Selectable(_html2, "", Core.Infrastructure.ContentType.Html);
             var links = selectable.XPath(".//a/@href").Nodes();
             Assert.Equal("http://whatever.com/aaa", links[0].GetValue());
 

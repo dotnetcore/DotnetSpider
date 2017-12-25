@@ -9,7 +9,7 @@ namespace DotnetSpider.Core.Scheduler
 	/// manage urls to fetch
 	/// remove duplicate urls
 	/// </summary>
-	public interface IScheduler : IDisposable, IMonitorable, IClear
+	public interface IScheduler : IDisposable, IMonitorable
 	{
 		bool DepthFirst { get; set; }
 
@@ -30,5 +30,7 @@ namespace DotnetSpider.Core.Scheduler
 		void Import(HashSet<Request> requests);
 
 		void Export();
+
+		void Clear();
 	}
 }

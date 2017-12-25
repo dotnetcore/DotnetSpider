@@ -45,7 +45,7 @@ namespace DotnetSpider.Core
 
 		public void Run(params string[] arguments)
 		{
-			if (ExecuteRecord == null && !string.IsNullOrEmpty(Env.HttpCenter))
+			if (ExecuteRecord == null && !string.IsNullOrEmpty(Env.EnterpiseServiceUrl))
 			{
 				ExecuteRecord = new HttpExecuteRecord();
 			}

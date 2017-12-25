@@ -35,7 +35,7 @@ namespace DotnetSpider.Core.Monitor
 
 			NetworkCenter.Current.Execute("status", () =>
 			{
-				HttpSender.Client.PostAsync(Env.HttpStatusUrl, content).Wait();
+				HttpSender.Client.PostAsync(Env.EnterpiseServiceStatusUrl, content).Wait();
 			});
 		}
 	}
