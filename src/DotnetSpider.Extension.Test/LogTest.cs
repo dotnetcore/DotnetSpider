@@ -69,7 +69,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				foreach (var resultItem in resultItems)
 				{
-					foreach (var entry in resultItem.Results)
+					foreach (var entry in resultItem)
 					{
 						Console.WriteLine($"{entry.Key}:{entry.Value}");
 					}

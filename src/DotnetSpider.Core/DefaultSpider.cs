@@ -5,7 +5,7 @@ using DotnetSpider.Core.Scheduler;
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// Interface for identifying different tasks.
+	/// 默认爬虫, 用于测试和一些默认情况使用, 框架使用者可忽略
 	/// </summary>
 	public class DefaultSpider : Spider
 	{

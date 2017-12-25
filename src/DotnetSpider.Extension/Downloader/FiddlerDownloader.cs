@@ -107,7 +107,6 @@ namespace DotnetSpider.Extension.Downloader
 					page.Content = _fiddlerClient.ResponseBodyString;
 					_fiddlerClient.Clear();
 					page.TargetUrl = _webDriver.Url;
-					page.Title = _webDriver.Title;
 					// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
 					//request.PutExtra(Request.CycleTriedTimes, null);
 

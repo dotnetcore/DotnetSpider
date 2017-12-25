@@ -4,13 +4,18 @@ using System.Text;
 
 namespace DotnetSpider.Core
 {
+	/// <summary>
+	/// 打印爬虫框架信息的帮助类
+	/// </summary>
 	public static class PrintInfo
 	{
 		private static readonly object Locker = new object();
 
+		/// <summary>
+		/// 打印爬虫框架信息
+		/// </summary>
 		public static void Print()
 		{
-
 			lock (Locker)
 			{
 				var key = "_DotnetSpider_Info";
@@ -34,6 +39,10 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// 打印一整行word到控制台中
+		/// </summary>
+		/// <param name="word">打印的字符</param>
 		public static void PrintLine(char word = '=')
 		{
 			var width = 120;

@@ -80,7 +80,6 @@ namespace DotnetSpider.Sample
 
 		public TaobaoKeywordWatcher() : base("TAOBAO_KEYWORD_WATHCHER", new Site
 		{
-			Timeout = 20000,
 			Headers = new Dictionary<string, string>
 			{
 				{ "Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" },

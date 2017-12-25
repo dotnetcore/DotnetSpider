@@ -66,7 +66,7 @@ namespace DotnetSpider.Core.Pipeline
 					FileInfo file = PrepareFile(path);
 					using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
 					{
-						printWriter.WriteLine(JsonConvert.SerializeObject(resultItem.Results));
+						printWriter.WriteLine(JsonConvert.SerializeObject(resultItem));
 					}
 				}
 			}

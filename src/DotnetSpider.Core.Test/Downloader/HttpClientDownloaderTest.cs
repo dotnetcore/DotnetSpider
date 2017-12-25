@@ -47,7 +47,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		public void Ports()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
-			DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
+			DefaultSpider spider = new DefaultSpider("abcd", new Site { });
 
 			for (int i = 0; i < 100; i++)
 			{
@@ -59,13 +59,13 @@ namespace DotnetSpider.Core.Test.Downloader
 		public void DetectDownloadContent()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
-			DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
+			DefaultSpider spider = new DefaultSpider("abcd", new Site { });
 
 			downloader.Download(new Request("http://www.163.com", null), spider);
 			Assert.Equal(Core.Infrastructure.ContentType.Html, spider.Site.ContentType);
 
 			HttpClientDownloader2 downloader2 = new HttpClientDownloader2();
-			DefaultSpider spider2 = new DefaultSpider("abcd", new Site { Timeout = 5000 });
+			DefaultSpider spider2 = new DefaultSpider("abcd", new Site { });
 			downloader2.Download(new Request("http://www.163.com", null), spider2);
 			Assert.Equal(Core.Infrastructure.ContentType.Json, spider2.Site.ContentType);
 		}

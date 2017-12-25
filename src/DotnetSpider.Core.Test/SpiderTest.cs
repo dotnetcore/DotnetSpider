@@ -117,7 +117,7 @@ namespace DotnetSpider.Core.Test
 			{
 				foreach (var resultItem in resultItems)
 				{
-					foreach (var entry in resultItem.Results)
+					foreach (var entry in resultItem)
 					{
 						Console.WriteLine($"{entry.Key}:{entry.Value}");
 					}
@@ -136,7 +136,7 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void RetryWhenResultIsEmpty()
 		{
-			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
 			spider.AddStartUrl("http://taobao.com");
 			spider.Run();
@@ -147,9 +147,9 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void CloseSignal()
 		{
-			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", Timeout = 20000 },
+			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8" },
 				new TestPageProcessor()).AddPipeline(new TestPipeline());
- 
+
 			for (int i = 0; i < 20; ++i)
 			{
 				spider.AddStartUrl($"http://www.baidu.com/_t={i}");
@@ -160,7 +160,7 @@ namespace DotnetSpider.Core.Test
 			task.Wait();
 			Assert.Equal(10, spider.Scheduler.SuccessRequestsCount);
 
-			Spider spider2 = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", Timeout = 20000 },
+			Spider spider2 = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8" },
 				new TestPageProcessor()).AddPipeline(new TestPipeline());
 			for (int i = 0; i < 25; ++i)
 			{
@@ -181,7 +181,7 @@ namespace DotnetSpider.Core.Test
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.Start();
 
-			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 0, Timeout = 2000 },
+			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 0 },
 				new FastExitPageProcessor())
 				.AddPipeline(new FastExitPipeline());
 			spider.ThreadNum = 1;

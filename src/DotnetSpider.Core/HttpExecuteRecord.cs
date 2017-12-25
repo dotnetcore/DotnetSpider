@@ -16,7 +16,14 @@ namespace DotnetSpider.Core
 	public class HttpExecuteRecord : IExecuteRecord
 	{
 		private static readonly ILogger Logger = LogCenter.GetLogger();
-
+		
+		/// <summary>
+		/// 添加运行记录
+		/// </summary>
+		/// <param name="taskId">任务编号</param>
+		/// <param name="name">任务名称</param>
+		/// <param name="identity">任务标识</param>
+		/// <returns></returns>
 		public bool Add(string taskId, string name, string identity)
 		{
 			if (string.IsNullOrEmpty(taskId) || string.IsNullOrWhiteSpace(taskId))
@@ -52,6 +59,10 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// 删除运行记录
+		/// </summary>
+		/// <param name="taskId">任务编号</param>
 		public void Remove(string taskId)
 		{
 			if (string.IsNullOrEmpty(taskId) || string.IsNullOrWhiteSpace(taskId))

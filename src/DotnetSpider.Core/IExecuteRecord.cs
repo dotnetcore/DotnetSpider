@@ -2,7 +2,7 @@
 {
 	/// <summary>
 	/// 运行记录接口
-	/// 程序在运行前应该添加相应的运行记录, 任务结束后删除对应的记录, DotnetSpider.Enterprise依赖运行记录数据显示正在运行的任务
+	/// 程序在运行前应该添加相应的运行记录, 任务结束后删除对应的记录, 企业服务依赖运行记录数据显示正在运行的任务
 	/// </summary>
 	public interface IExecuteRecord
 	{

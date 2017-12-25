@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				int count = 0;
 				int effectedRow = 0;
-				foreach (var result in resultItem.Results)
+				foreach (var result in resultItem)
 				{
 					List<dynamic> list = new List<dynamic>();
 					dynamic data = resultItem.GetResultItem(result.Key);

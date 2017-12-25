@@ -56,7 +56,6 @@ namespace DotnetSpider.Core
 		private StreamWriter _errorRequestStreamWriter;
 		private int _errorRequestFlushCount;
 		private RetryPolicy _pipelineRetryPolicy;
-		private string[] _closeSignalFiles;
 		private long requstCount = 0;
 		private static object RequestCountLocker = new object();
 		private MemoryMappedFile _identityMmf;

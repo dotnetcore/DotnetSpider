@@ -47,7 +47,7 @@ namespace DotnetSpider.Sample
 				foreach (var resultItem in resultItems)
 				{
 					StringBuilder builder = new StringBuilder();
-					foreach (YoukuVideo entry in resultItem.Results["VideoResult"])
+					foreach (YoukuVideo entry in resultItem["VideoResult"])
 					{
 						count++;
 						builder.Append($" [YoukuVideo {count}] {entry.Name}");

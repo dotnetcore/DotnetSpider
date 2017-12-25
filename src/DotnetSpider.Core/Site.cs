@@ -4,11 +4,12 @@ using DotnetSpider.Core.Proxy;
 using System.Net;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
+using System;
 
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// Object contains setting for spider.
+	/// 采集站点的信息配置
 	/// </summary>
 	public class Site
 	{
@@ -21,12 +22,12 @@ namespace DotnetSpider.Core
 		public IHttpProxyPool HttpProxyPool { get; set; }
 
 		/// <summary>
-		/// 设置全局Http头
+		/// 设置全局的HTTP头, 下载器下载数据时会带上所有的HTTP头
 		/// </summary>
 		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 
 		/// <summary>
-		/// 配置采集的是Json还是Html, 如果是Auto则会自动检测下载的内容。
+		/// 配置下载器下载的内容是Json还是Html, 如果是Auto则会自动检测下载的内容, 建议设为Auto
 		/// </summary>
 		public ContentType ContentType { get; set; } = ContentType.Auto;
 
@@ -36,7 +37,7 @@ namespace DotnetSpider.Core
 		public bool RemoveOutboundLinks { get; set; }
 
 		/// <summary>
-		/// 采集目标的Domain, 如果RemoveOutboundLinks为True, 则Domain不同的链接会被排除
+		/// 采集目标的Domain, 如果RemoveOutboundLinks为True, 则Domain不同的链接会被排除, 如果RemoveOutboundLinks为False, 此值没有作用
 		/// </summary>
 		public string[] Domains { get; set; }
 
@@ -46,23 +47,23 @@ namespace DotnetSpider.Core
 		public Cookies Cookies { get; set; }
 
 		/// <summary>
-		/// 设置 User Agent
+		/// 设置 User Agent 头
 		/// </summary>
 		public string UserAgent { get; set; } = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
 
 		/// <summary>
-		/// 设置 User Accept
+		/// 设置 Accept 头
 		/// </summary>
 		public string Accept { get; set; } = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
 
 		/// <summary>
-		/// Whether download pictiures or file
+		/// 设置是否下载文件、图片
 		/// </summary>
 		public bool DownloadFiles { get; set; }
 
 		/// <summary>
-		/// Set charset of page manually. 
-		/// When charset is not set or set to null, it can be auto detected by Http header.
+		/// 设置站点的编码 
+		/// 如果没有设值, 下载器会尝试自动识别编码
 		/// </summary>
 		public string EncodingName
 		{
@@ -78,42 +79,33 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// 使用何种编码读取下载流。
+		/// 使用何种编码读取下载的内容, 如果没有设置编码, 下载器会尝试自动识别编码。
+		/// 通过设置EncodingName才能修改此值
 		/// </summary>
 		public Encoding Encoding => _encoding;
-
-		/// <summary>
-		/// Set or Get timeout for downloader in ms
-		/// </summary>
-		public int Timeout { get; set; } = 5000;
-
-		/// <summary>
-		/// Get or Set acceptStatCode. 
-		/// When status code of http response is in acceptStatCodes, it will be processed. 
-		/// {200} by default. 
-		/// It is not necessarily to be set.
-		/// </summary>
-		public HashSet<HttpStatusCode> AcceptStatCode { get; set; } = new HashSet<HttpStatusCode> { HttpStatusCode.OK };
 
 		public readonly List<Request> StartRequests = new List<Request>();
 
 		/// <summary>
-		/// Set the interval between the processing of two pages. 
-		/// Time unit is micro seconds. 
+		/// 每处理完一个目标链接后停顿的时间, 单位毫秒 
 		/// </summary>
 		public int SleepTime { get; set; } = 100;
 
 		/// <summary>
-		/// When cycleRetryTimes is more than 0, it will add back to scheduler and try download again. 
+		/// 目标链接的最大重试次数
 		/// </summary>
 		public int CycleRetryTimes { get; set; } = 5;
 
 		/// <summary>
-		/// Whether use gzip.  
-		/// Default is true, you can set it to false to disable gzip.
+		/// 目标服务器是否使用了Gzip压缩数据
+		/// 默认实现的下载器会自动解压数据, 不需要依赖此值
 		/// </summary>
+		[Obsolete]
 		public bool IsUseGzip { get; set; }
 
+		/// <summary>
+		/// 构造函数
+		/// </summary>
 		public Site()
 		{
 #if NET_CORE
@@ -122,60 +114,51 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Add a url to start request. 
+		/// 添加一个起始链接到当前站点 
 		/// </summary>
-		/// <param name="startUrl"></param>
-		/// <returns></returns>
-		public Site AddStartUrl(string startUrl)
+		/// <param name="startUrl">起始链接</param>
+		public void AddStartUrl(string startUrl)
 		{
-			return AddStartRequest(new Request(startUrl, null));
+			AddStartRequest(new Request(startUrl, null));
 		}
 
 		/// <summary>
-		/// Add a url to start request. 
+		/// 添加一个起始链接到当前站点 
 		/// </summary>
-		/// <param name="startUrl"></param>
-		/// <param name="data"></param>
-		/// <returns></returns>
-		public Site AddStartUrl(string startUrl, IDictionary<string, object> data)
+		/// <param name="startUrl">起始链接</param>
+		/// <param name="datas">链接对应的一些额外数据</param>
+		public void AddStartUrl(string startUrl, IDictionary<string, dynamic> datas)
 		{
-			return AddStartRequest(new Request(startUrl, data));
+			AddStartRequest(new Request(startUrl, datas));
 		}
 
-		public Site AddStartUrls(IList<string> startUrls)
+		/// <summary>
+		/// 添加多个起始链接到当前站点 
+		/// </summary>
+		/// <param name="startUrls">起始链接</param>
+		public void AddStartUrls(IEnumerable<string> startUrls)
 		{
 			foreach (var url in startUrls)
 			{
 				AddStartUrl(url);
 			}
-
-			return this;
-		}
-
-		public Site AddStartUrls(IDictionary<string, IDictionary<string, object>> startUrls)
-		{
-			foreach (var entry in startUrls)
-			{
-				AddStartUrl(entry.Key, entry.Value);
-			}
-
-			return this;
 		}
 
 		/// <summary>
-		/// Add a request.
+		/// 添加一个请求对象到当前站点
 		/// </summary>
-		/// <param name="startRequest"></param>
-		/// <returns></returns>
-		public Site AddStartRequest(Request startRequest)
+		/// <param name="startRequest">请求对象</param>
+		public void AddStartRequest(Request startRequest)
 		{
 			lock (this)
 			{
 				StartRequests.Add(startRequest);
-				return this;
 			}
 		}
 
+		/// <summary>
+		/// 清空所有起始链接
+		/// </summary>
 		public void ClearStartRequests()
 		{
 			lock (this)
@@ -185,9 +168,9 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Put an Http header for downloader. 
+		/// 添加一个全局的HTTP请求头 
 		/// </summary>
-		public Site AddHeader(string key, string value)
+		public void AddHeader(string key, string value)
 		{
 			if (Headers.ContainsKey(key))
 			{
@@ -197,19 +180,30 @@ namespace DotnetSpider.Core
 			{
 				Headers.Add(key, value);
 			}
-			return this;
 		}
 
+		/// <summary>
+		/// 获取HTTP代理
+		/// </summary>
+		/// <returns>HTTP代理对象</returns>
 		public UseSpecifiedUriWebProxy GetHttpProxy()
 		{
 			return HttpProxyPool?.GetProxy();
 		}
 
+		/// <summary>
+		/// 返回HTTP代理
+		/// </summary>
+		/// <param name="proxy">HTTP代理对象</param>
+		/// <param name="statusCode">使用此HTTP对象下载数据后的状态码</param>
 		public void ReturnHttpProxy(UseSpecifiedUriWebProxy proxy, HttpStatusCode statusCode)
 		{
 			HttpProxyPool?.ReturnProxy(proxy, statusCode);
 		}
 
+		/// <summary>
+		/// 获取或设置全局的Cookie
+		/// </summary>
 		public string CookiesStringPart
 		{
 			set
@@ -226,6 +220,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// 设置全局的Cookie
+		/// </summary>
 		public void SetCookies(Dictionary<string, string> cookies)
 		{
 			if (Cookies == null)

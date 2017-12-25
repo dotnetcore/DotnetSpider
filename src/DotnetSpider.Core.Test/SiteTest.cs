@@ -24,7 +24,7 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void AddRequests()
 		{
-			Site site = new Site { EncodingName = "UTF-8", Timeout = 3000 };
+			Site site = new Site { EncodingName = "UTF-8" };
 			site.ClearStartRequests();
 			site.AddStartUrl(_url);
 			site.AddStartRequest(new Request(_url, null));
@@ -34,7 +34,7 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void AddRequestsAsync()
 		{
-			Site site = new Site { EncodingName = "UTF-8", Timeout = 3000 };
+			Site site = new Site { EncodingName = "UTF-8" };
 			site.ClearStartRequests();
 
 			Parallel.For(1, 10000, new ParallelOptions
@@ -51,7 +51,7 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void AddHeaders()
 		{
-			Site site = new Site { EncodingName = "UTF-8", Timeout = 3000 };
+			Site site = new Site { EncodingName = "UTF-8" };
 			site.AddHeader(_wName, _wValue);
 			Assert.NotNull(site.Headers);
 			Assert.True(site.Headers.Count > 0);

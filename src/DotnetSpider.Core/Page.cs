@@ -7,7 +7,7 @@ using DotnetSpider.Core.Infrastructure;
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// Object storing extracted result and urls to fetch. 
+	/// 用于存储下载的内容, 解析到的目标链接等信息
 	/// </summary>
 	public class Page
 	{
@@ -15,48 +15,43 @@ namespace DotnetSpider.Core
 		private Selectable _selectable;
 		private string _content;
 
+		/// <summary>
+		/// 下载的内容类型, 自动识别
+		/// </summary>
 		public ContentType ContentType { get; internal set; } = ContentType.Html;
 
 		/// <summary>
-		/// Url of current page
+		/// 当前页面的链接
 		/// </summary>
-		/// <returns></returns>
 		public string Url { get; }
 
 		/// <summary>
-		/// Get url of current page
+		/// 最终请求的链接, 当发生30X跳转时与Url的值不一致
 		/// </summary>
-		/// <returns></returns>
 		public string TargetUrl { get; set; }
 
 		/// <summary>
-		/// Title of current page.
+		/// 页面的Http请求
 		/// </summary>
-		public string Title { get; set; }
-
-		/// <summary>
-		/// Get request of current page
-		/// </summary>
-		/// <returns></returns>
 		public Request Request { get; }
 
 		/// <summary>
-		/// Whether need retry current page.
+		/// 是否需要重试当前页面
 		/// </summary>
 		public bool Retry { get; set; }
 
 		/// <summary>
-		/// Skip extract target urls, when someone use custom target url builder.
+		/// 对此页面跳过解析目标链接的操作
 		/// </summary>
 		public bool SkipExtractTargetUrls { get; set; }
 
 		/// <summary>
-		/// Skip all target urls, still will execute pipeline.
+		/// 当前页面解析出来的目标链接不加入到调度队列中
 		/// </summary>
 		public bool SkipTargetUrls { get; set; }
 
 		/// <summary>
-		/// Skip current page, will not execute pipeline.
+		/// 当前页面解析的数据不传入数据管道中作处理
 		/// </summary>
 		public bool Skip { get; set; }
 
@@ -126,7 +121,7 @@ namespace DotnetSpider.Core
 		/// <param name="field"></param>
 		public void AddResultItem(string key, dynamic field)
 		{
-			ResultItems.AddOrUpdateResultItem(key, field);
+			ResultItems.AddOrUpdate(key, field, field);
 		}
 
 		/// <summary>

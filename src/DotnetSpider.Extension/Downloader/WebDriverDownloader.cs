@@ -127,8 +127,7 @@ namespace DotnetSpider.Extension.Downloader
 				Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
 				{
 					Content = _webDriver.PageSource,
-					TargetUrl = _webDriver.Url,
-					Title = _webDriver.Title
+					TargetUrl = _webDriver.Url
 				};
 
 				// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务

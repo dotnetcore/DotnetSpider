@@ -79,10 +79,6 @@ namespace DotnetSpider.Core.Downloader
 				request.StatusCode = response.StatusCode;
 				response.EnsureSuccessStatusCode();
 
-				if (!site.AcceptStatCode.Contains(response.StatusCode))
-				{
-					throw new DownloadException($"Download {request.Url} failed. Code {response.StatusCode}");
-				}
 				Page page;
 
 				if (response.Content.Headers.ContentType != null && !MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))

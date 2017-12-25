@@ -1,57 +1,26 @@
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// Object contains extract results. 
-	/// It is contained in Page and will be processed in pipeline.
+	/// 存储页面解析的数据结果
+	/// 此对象包含在页面对象中, 并传入数据管道被处理
 	/// </summary>
-	public class ResultItems
+	public class ResultItems : ConcurrentDictionary<string, dynamic>
 	{
-		private readonly Dictionary<string, dynamic> _fields = new Dictionary<string, dynamic>();
-		private readonly object _locker = new object();
-
-		public Dictionary<string, dynamic> Results
-		{
-			get
-			{
-				lock (_locker)
-				{
-					return _fields;
-				}
-			}
-		}
-
+		/// <summary>
+		/// 当前解析结果对应的目标链接信息
+		/// </summary>
 		public Request Request { get; set; }
 
 		/// <summary>
-		/// Whether to skip the result. 
-		/// Result which is skipped will not be processed by Pipeline.
+		/// 通过键值取得数据结果
 		/// </summary>
-		public bool IsEmpty => _fields.Count == 0;
-
+		/// <param name="key">键值</param>
+		/// <returns>数据结果</returns>
 		public dynamic GetResultItem(string key)
 		{
-			lock (_locker)
-			{
-				return _fields.ContainsKey(key) ? _fields[key] : null;
-			}
-		}
-
-		public ResultItems AddOrUpdateResultItem(string key, dynamic value)
-		{
-			lock (_locker)
-			{
-				if (_fields.ContainsKey(key))
-				{
-					_fields[key] = value;
-				}
-				else
-				{
-					_fields.Add(key, value);
-				}
-				return this;
-			}
+			return TryGetValue(key, out dynamic result) ? result : null;
 		}
 	}
 }
