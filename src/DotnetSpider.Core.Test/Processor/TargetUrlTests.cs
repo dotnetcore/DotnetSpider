@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Test.Processor
 
 			protected override void Handle(Page page)
 			{
-				page.ResultItems.TryAdd("test", true);
+				page.ResultItems.AddOrUpdateResultItem("test", true);
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace DotnetSpider.Core.Test.Processor
 
 			protected override void Handle(Page page)
 			{
-				page.ResultItems.TryAdd("test", true);
+				page.ResultItems.AddOrUpdateResultItem("test", true);
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace DotnetSpider.Core.Test.Processor
 
 			protected override void Handle(Page page)
 			{
-				page.ResultItems.TryAdd("test", true);
+				page.ResultItems.AddOrUpdateResultItem("test", true);
 			}
 		}
 
@@ -110,7 +110,7 @@ namespace DotnetSpider.Core.Test.Processor
 
 			protected override void Handle(Page page)
 			{
-				page.ResultItems.TryAdd("test", true);
+				page.ResultItems.AddOrUpdateResultItem("test", true);
 			}
 		}
 

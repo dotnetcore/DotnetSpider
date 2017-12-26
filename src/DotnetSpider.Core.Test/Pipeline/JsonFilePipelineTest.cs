@@ -16,7 +16,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 		private void Before()
 		{
 			_resultItems = new ResultItems();
-			_resultItems.TryAdd("content", "爬虫工具");
+			_resultItems.AddOrUpdateResultItem("content", "爬虫工具");
 			Request request = new Request("http://www.baidu.com", null);
 			_resultItems.Request = request;
 		}

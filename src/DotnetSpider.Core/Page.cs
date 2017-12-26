@@ -121,7 +121,7 @@ namespace DotnetSpider.Core
 		/// <param name="field"></param>
 		public void AddResultItem(string key, dynamic field)
 		{
-			ResultItems.AddOrUpdate(key, field, field);
+			ResultItems.AddOrUpdateResultItem(key, field);
 		}
 
 		/// <summary>

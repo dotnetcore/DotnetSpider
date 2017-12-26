@@ -12,7 +12,7 @@ namespace DotnetSpider.Core.Pipeline
 		{
 			foreach (var resultItem in resultItems)
 			{
-				foreach (var entry in resultItem)
+				foreach (var entry in resultItem.Results)
 				{
 					System.Console.WriteLine(entry.Key + ":\t" + entry.Value);
 				}

@@ -46,7 +46,7 @@ namespace DotnetSpider.Core.Pipeline
 					{
 						printWriter.WriteLine("url:\t" + resultItem.Request.Url);
 
-						foreach (var entry in resultItem)
+						foreach (var entry in resultItem.Results)
 						{
 							if (entry.Value is IList value)
 							{
