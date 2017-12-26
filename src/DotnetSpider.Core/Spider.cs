@@ -20,6 +20,7 @@ using System.Reflection;
 using Polly;
 using Polly.Retry;
 using System.IO.MemoryMappedFiles;
+using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
 [assembly: InternalsVisibleTo("DotnetSpider.Sample")]
@@ -59,7 +60,8 @@ namespace DotnetSpider.Core
 		private long requstCount = 0;
 		private static object RequestCountLocker = new object();
 		private MemoryMappedFile _identityMmf;
-		private MemoryMappedFile _taskMmf;
+		private MemoryMappedFile _taskIdMmf;
+		private string[] _closeSignalFiles = new string[2];
 
 		protected virtual bool IfRequireInitStartRequests(string[] arguments)
 		{
@@ -964,7 +966,7 @@ namespace DotnetSpider.Core
 			SafeDestroy(Site.HttpProxyPool);
 			SafeDestroy(_errorRequestStreamWriter);
 			SafeDestroy(_identityMmf);
-			SafeDestroy(_taskMmf);
+			SafeDestroy(_taskIdMmf);
 		}
 
 		/// <summary>
@@ -1388,22 +1390,43 @@ namespace DotnetSpider.Core
 
 		private void InitCloseSignal()
 		{
-			if (!string.IsNullOrEmpty(Identity) && !string.IsNullOrWhiteSpace(Identity))
+			if (Env.IsWindows)
 			{
-				_identityMmf = MemoryMappedFile.CreateOrOpen(Identity, 1, MemoryMappedFileAccess.ReadWrite);
-				using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
+				if (!string.IsNullOrEmpty(Identity) && !string.IsNullOrWhiteSpace(Identity))
 				{
-					var writer = new BinaryWriter(stream);
-					writer.Write(false);
+					_identityMmf = MemoryMappedFile.CreateOrOpen(Identity, 1, MemoryMappedFileAccess.ReadWrite);
+					using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
+					{
+						var writer = new BinaryWriter(stream);
+						writer.Write(false);
+					}
+				}
+				if (!string.IsNullOrEmpty(TaskId) && !string.IsNullOrWhiteSpace(TaskId))
+				{
+					_taskIdMmf = MemoryMappedFile.CreateOrOpen(TaskId, 1, MemoryMappedFileAccess.ReadWrite);
+					using (MemoryMappedViewStream stream = _taskIdMmf.CreateViewStream())
+					{
+						var writer = new BinaryWriter(stream);
+						writer.Write(false);
+					}
 				}
 			}
-			if (!string.IsNullOrEmpty(TaskId) && !string.IsNullOrWhiteSpace(TaskId))
+			else
 			{
-				_taskMmf = MemoryMappedFile.CreateOrOpen(TaskId, 1, MemoryMappedFileAccess.ReadWrite);
-				using (MemoryMappedViewStream stream = _taskMmf.CreateViewStream())
+				if (!string.IsNullOrEmpty(Identity) && !string.IsNullOrWhiteSpace(Identity))
 				{
-					var writer = new BinaryWriter(stream);
-					writer.Write(false);
+					_closeSignalFiles[0] = Path.Combine(Env.BaseDirectory, $"{Identity}_cl");
+				}
+				if (!string.IsNullOrEmpty(TaskId) && !string.IsNullOrWhiteSpace(TaskId))
+				{
+					_closeSignalFiles[1] = Path.Combine(Env.BaseDirectory, $"{TaskId}_cl");
+				}
+				foreach (var closeSignal in _closeSignalFiles)
+				{
+					if (File.Exists(closeSignal))
+					{
+						File.Delete(closeSignal);
+					}
 				}
 			}
 		}
@@ -1491,20 +1514,33 @@ namespace DotnetSpider.Core
 
 		private void CheckExitSignal()
 		{
-			using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
+			// MMF 暂时还不支持非WINDOWS操作系统
+			if (Env.IsWindows)
 			{
-				var reader = new BinaryReader(stream);
-				if (reader.ReadBoolean())
+				using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
 				{
-					Exit();
-					return;
+					var reader = new BinaryReader(stream);
+					if (reader.ReadBoolean())
+					{
+						Exit();
+						return;
+					}
+				}
+				if (_taskIdMmf != null)
+				{
+					using (MemoryMappedViewStream stream = _taskIdMmf.CreateViewStream())
+					{
+						var reader = new BinaryReader(stream);
+						if (reader.ReadBoolean())
+						{
+							Exit();
+						}
+					}
 				}
 			}
-
-			using (MemoryMappedViewStream stream = _taskMmf.CreateViewStream())
+			else
 			{
-				var reader = new BinaryReader(stream);
-				if (reader.ReadBoolean())
+				if (File.Exists(_closeSignalFiles[0]) || File.Exists(_closeSignalFiles[1]))
 				{
 					Exit();
 				}

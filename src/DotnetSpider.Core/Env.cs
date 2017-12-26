@@ -189,8 +189,19 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public static string ConfigurationFilePath { get; set; }
 
+		/// <summary>
+		/// 当前操作系统是否Windows
+		/// </summary>
+		public static readonly bool IsWindows;
+
 		static Env()
 		{
+#if !NET_CORE
+			IsWindows = true;
+#else
+			IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+#endif
+
 			Reload();
 		}
 
