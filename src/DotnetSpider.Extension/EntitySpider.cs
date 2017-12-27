@@ -39,7 +39,7 @@ namespace DotnetSpider.Extension
 		{
 			CheckIfRunning();
 
-			EntityProcessor<T> processor = new EntityProcessor<T>(Site, dataHandler, tableName);
+			EntityProcessor<T> processor = new EntityProcessor<T>(dataHandler, tableName);
 			AddPageProcessor(processor);
 		}
 
@@ -91,15 +91,7 @@ namespace DotnetSpider.Extension
 
 			foreach (var pipeline in Pipelines)
 			{
-				pipeline.InitPipeline(this);
-			}
-		}
-
-		protected override void InitPageProcessor(params string[] arguments)
-		{
-			foreach (var processor in PageProcessors)
-			{
-				processor.Site = Site;
+				pipeline.Init(this);
 			}
 		}
 	}

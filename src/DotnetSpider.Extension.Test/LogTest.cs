@@ -63,7 +63,7 @@ namespace DotnetSpider.Extension.Test
 			public string status { get; set; }
 		}
 
-		internal class TestPipeline : BasePipeline
+		internal class TestPipeline : Core.Pipeline.BasePipeline
 		{
 			public override void Process(IEnumerable<ResultItems> resultItems)
 			{

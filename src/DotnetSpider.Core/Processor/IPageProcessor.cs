@@ -1,16 +1,14 @@
 namespace DotnetSpider.Core.Processor
 {
+	/// <summary>
+	/// 页面解析器、抽取器
+	/// </summary>
 	public interface IPageProcessor
 	{
 		/// <summary>
-		/// Process the page, extract urls to fetch, extract the data and store
+		/// 解析数据结果, 解析目标链接
 		/// </summary>
-		/// <param name="page"></param>
-		void Process(Page page);
-
-		/// <summary>
-		/// Get the site settings
-		/// </summary>
-		Site Site { get; set; }
+		/// <param name="page">页面数据</param>
+		void Process(Page page, ISpider spider);
 	}
 }

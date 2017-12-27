@@ -51,7 +51,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
 				var metadata = new EntityDefine<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
+				insertPipeline.Init(spider);
 
 				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
@@ -60,7 +60,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				SqlServerEntityPipeline updatePipeline = new SqlServerEntityPipeline(ConnectString);
 				var metadat2 = new EntityDefine<ProductUpdate>();
 				updatePipeline.AddEntity(metadat2);
-				updatePipeline.InitPipeline(spider);
+				updatePipeline.Init(spider);
 
 				var data3 = conn.Query<ProductUpdate>($"use test;select * from sku_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
 				data3.Category = "4C";
@@ -92,7 +92,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
 				var metadata = new EntityDefine<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
+				insertPipeline.Init(spider);
 
 				// Common data
 				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };

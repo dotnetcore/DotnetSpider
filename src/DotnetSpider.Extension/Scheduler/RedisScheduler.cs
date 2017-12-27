@@ -32,14 +32,13 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _identityMd5;
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
-
-		private string ConnectString { get; }
+		private string _connectString;
+		private RedisConnection _redisConnection;
+		private ISpider _spider;
 
 		public int BatchCount { get; set; } = 1000;
 
 		protected override bool UseInternet { get; set; } = true;
-
-		private RedisConnection RedisConnection { get; set; }
 
 		public RedisScheduler(string connectString)
 		{
@@ -47,24 +46,26 @@ namespace DotnetSpider.Extension.Scheduler
 			{
 				throw new SpiderException("Redis connect string should not be empty.");
 			}
-			ConnectString = connectString;
+			_connectString = connectString;
 			DuplicateRemover = this;
 		}
 
 		public RedisScheduler()
 		{
-			ConnectString = Env.RedisConnectString;
+			_connectString = Env.RedisConnectString;
 			DuplicateRemover = this;
 		}
 
 		public override void Init(ISpider spider)
 		{
-			if (string.IsNullOrEmpty(ConnectString))
+			if (string.IsNullOrEmpty(_connectString))
 			{
 				throw new SpiderException("Redis connect string should not be empty.");
 			}
 
 			base.Init(spider);
+
+			_spider = spider;
 
 			if (string.IsNullOrEmpty(_identityMd5))
 			{
@@ -79,13 +80,13 @@ namespace DotnetSpider.Extension.Scheduler
 
 				var action = new Action(() =>
 				{
-					RedisConnection = Cache.Instance.Get(ConnectString);
-					if (RedisConnection == null)
+					_redisConnection = Cache.Instance.Get(_connectString);
+					if (_redisConnection == null)
 					{
-						RedisConnection = new RedisConnection(ConnectString);
-						Cache.Instance.Set(ConnectString, RedisConnection);
+						_redisConnection = new RedisConnection(_connectString);
+						Cache.Instance.Set(_connectString, _redisConnection);
 					}
-					RedisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
+					_redisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
 				});
 
 				if (UseInternet)
@@ -103,7 +104,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			var action = new Action(() =>
 			{
-				RedisConnection.Database.KeyDelete(_setKey);
+				_redisConnection.Database.KeyDelete(_setKey);
 			});
 			if (UseInternet)
 			{
@@ -119,10 +120,10 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			return _retryPolicy.Execute(() =>
 			{
-				bool isDuplicate = RedisConnection.Database.SetContains(_setKey, request.Identity);
+				bool isDuplicate = _redisConnection.Database.SetContains(_setKey, request.Identity);
 				if (!isDuplicate)
 				{
-					RedisConnection.Database.SetAdd(_setKey, request.Identity);
+					_redisConnection.Database.SetAdd(_setKey, request.Identity);
 				}
 				return isDuplicate;
 			});
@@ -146,11 +147,11 @@ namespace DotnetSpider.Extension.Scheduler
 			{
 				if (UseInternet)
 				{
-					return NetworkCenter.Current.Execute("rds-left", () => RedisConnection.Database.ListLength(_queueKey));
+					return NetworkCenter.Current.Execute("rds-left", () => _redisConnection.Database.ListLength(_queueKey));
 				}
 				else
 				{
-					return RedisConnection.Database.ListLength(_queueKey);
+					return _redisConnection.Database.ListLength(_queueKey);
 				}
 			}
 		}
@@ -161,11 +162,11 @@ namespace DotnetSpider.Extension.Scheduler
 			{
 				if (UseInternet)
 				{
-					return NetworkCenter.Current.Execute("rds-total", () => RedisConnection.Database.SetLength(_setKey));
+					return NetworkCenter.Current.Execute("rds-total", () => _redisConnection.Database.SetLength(_setKey));
 				}
 				else
 				{
-					return RedisConnection.Database.SetLength(_setKey);
+					return _redisConnection.Database.SetLength(_setKey);
 				}
 			}
 		}
@@ -197,20 +198,20 @@ namespace DotnetSpider.Extension.Scheduler
 			{
 				NetworkCenter.Current.Execute("rds-inc-clear", () =>
 				{
-					RedisConnection.Database.KeyDelete(_queueKey);
-					RedisConnection.Database.KeyDelete(_setKey);
-					RedisConnection.Database.KeyDelete(_itemKey);
-					RedisConnection.Database.KeyDelete(_successCountKey);
-					RedisConnection.Database.KeyDelete(_errorCountKey);
+					_redisConnection.Database.KeyDelete(_queueKey);
+					_redisConnection.Database.KeyDelete(_setKey);
+					_redisConnection.Database.KeyDelete(_itemKey);
+					_redisConnection.Database.KeyDelete(_successCountKey);
+					_redisConnection.Database.KeyDelete(_errorCountKey);
 				});
 			}
 			else
 			{
-				RedisConnection.Database.KeyDelete(_queueKey);
-				RedisConnection.Database.KeyDelete(_setKey);
-				RedisConnection.Database.KeyDelete(_itemKey);
-				RedisConnection.Database.KeyDelete(_successCountKey);
-				RedisConnection.Database.KeyDelete(_errorCountKey);
+				_redisConnection.Database.KeyDelete(_queueKey);
+				_redisConnection.Database.KeyDelete(_setKey);
+				_redisConnection.Database.KeyDelete(_itemKey);
+				_redisConnection.Database.KeyDelete(_successCountKey);
+				_redisConnection.Database.KeyDelete(_errorCountKey);
 			}
 		}
 
@@ -237,9 +238,9 @@ namespace DotnetSpider.Extension.Scheduler
 						{
 							--n;
 
-							RedisConnection.Database.SetAdd(_setKey, identities);
-							RedisConnection.Database.ListRightPush(_queueKey, identities);
-							RedisConnection.Database.HashSet(_itemKey, items, CommandFlags.HighPriority);
+							_redisConnection.Database.SetAdd(_setKey, identities);
+							_redisConnection.Database.ListRightPush(_queueKey, identities);
+							_redisConnection.Database.HashSet(_itemKey, items, CommandFlags.HighPriority);
 
 							i = 0;
 							if (n != 0)
@@ -257,9 +258,9 @@ namespace DotnetSpider.Extension.Scheduler
 
 					if (i > 0)
 					{
-						RedisConnection.Database.SetAdd(_setKey, identities);
-						RedisConnection.Database.ListRightPush(_queueKey, identities);
-						RedisConnection.Database.HashSet(_itemKey, items);
+						_redisConnection.Database.SetAdd(_setKey, identities);
+						_redisConnection.Database.ListRightPush(_queueKey, identities);
+						_redisConnection.Database.HashSet(_itemKey, items);
 					}
 				}
 			});
@@ -294,7 +295,7 @@ namespace DotnetSpider.Extension.Scheduler
 					{
 						return NetworkCenter.Current.Execute("rds-isexited", () =>
 						{
-							var result = RedisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
+							var result = _redisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
 							if (result.HasValue)
 							{
 								return result == 1;
@@ -307,7 +308,7 @@ namespace DotnetSpider.Extension.Scheduler
 					}
 					else
 					{
-						var result = RedisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
+						var result = _redisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
 						if (result.HasValue)
 						{
 							return result == 1;
@@ -328,7 +329,7 @@ namespace DotnetSpider.Extension.Scheduler
 			{
 				var action = new Action(() =>
 				{
-					RedisConnection.Database.HashSet(TaskStatsKey, _identityMd5, value ? 1 : 0);
+					_redisConnection.Database.HashSet(TaskStatsKey, _identityMd5, value ? 1 : 0);
 				});
 				if (UseInternet)
 				{
@@ -345,11 +346,11 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			_retryPolicy.Execute(() =>
 			{
-				RedisConnection.Database.ListRightPush(_queueKey, request.Identity);
+				_redisConnection.Database.ListRightPush(_queueKey, request.Identity);
 				string field = request.Identity;
 				string value = JsonConvert.SerializeObject(request);
 
-				RedisConnection.Database.HashSet(_itemKey, field, value);
+				_redisConnection.Database.HashSet(_itemKey, field, value);
 			});
 		}
 
@@ -357,7 +358,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			return _retryPolicy.Execute(() =>
 			{
-				var value = DepthFirst ? RedisConnection.Database.ListRightPop(_queueKey) : RedisConnection.Database.ListLeftPop(_queueKey);
+				var value = DepthFirst ? _redisConnection.Database.ListRightPop(_queueKey) : _redisConnection.Database.ListLeftPop(_queueKey);
 
 				if (!value.HasValue)
 				{
@@ -365,12 +366,13 @@ namespace DotnetSpider.Extension.Scheduler
 				}
 				string field = value.ToString();
 
-				string json = RedisConnection.Database.HashGet(_itemKey, field);
+				string json = _redisConnection.Database.HashGet(_itemKey, field);
 
 				if (!string.IsNullOrEmpty(json))
 				{
 					var result = JsonConvert.DeserializeObject<Request>(json);
-					RedisConnection.Database.HashDelete(_itemKey, field);
+					_redisConnection.Database.HashDelete(_itemKey, field);
+					result.Site = _spider.Site;
 					return result;
 				}
 				return null;

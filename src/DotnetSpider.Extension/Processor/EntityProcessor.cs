@@ -18,9 +18,8 @@ namespace DotnetSpider.Extension.Processor
 
 		public IEntityDefine EntityDefine => Extractor?.EntityDefine;
 
-		public EntityProcessor(Site site, DataHandler<T> dataHandler = null, string tableName = null)
+		public EntityProcessor(DataHandler<T> dataHandler = null, string tableName = null)
 		{
-			Site = site;
 			Extractor = new EntityExtractor<T>(dataHandler, tableName);
 
 			if (Extractor.EntityDefine.TargetUrlsSelectors != null && Extractor.EntityDefine.TargetUrlsSelectors.Count > 0)

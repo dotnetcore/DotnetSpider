@@ -27,12 +27,12 @@ namespace DotnetSpider.Core.Test.Processor
 			HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com").Result;
 
-			Page page = new Page(new Request("http://www.cnblogs.com/", null), null);
+			Page page = new Page(new Request("http://www.cnblogs.com/") { Site = new Site() });
 			page.Content = html;
 
 			CnblogsProcessor1 processor = new CnblogsProcessor1();
-			processor.Site = new Site();
-			processor.Process(page);
+
+			processor.Process(page, new DefaultSpider());
 
 			Assert.True(page.ResultItems.GetResultItem("test"));
 			Assert.Equal(12, page.TargetRequests.Count);
@@ -58,12 +58,11 @@ namespace DotnetSpider.Core.Test.Processor
 			HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com").Result;
 
-			Page page = new Page(new Request("http://www.cnblogs.com/", null), null);
+			Page page = new Page(new Request("http://www.cnblogs.com/") { Site = new Site() });
 			page.Content = html;
 
 			CnblogsProcessor2 processor = new CnblogsProcessor2();
-			processor.Site = new Site();
-			processor.Process(page);
+			processor.Process(page, new DefaultSpider());
 
 			Assert.True(page.ResultItems.GetResultItem("test"));
 			Assert.Equal(12, page.TargetRequests.Count);
@@ -75,7 +74,6 @@ namespace DotnetSpider.Core.Test.Processor
 			public CnblogsProcessor3()
 			{
 				AddTargetUrlExtractor(".", "/sitehome/p/\\d+");
-				Site = new Site();
 			}
 
 			protected override void Handle(Page page)
@@ -90,12 +88,12 @@ namespace DotnetSpider.Core.Test.Processor
 			Env.ProcessorFilterDefaultRequest = false;
 			HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com").Result;
-
-			Page page = new Page(new Request("http://www.cnblogs.com/", null), null);
+			Site site = new Site();
+			Page page = new Page(new Request("http://www.cnblogs.com/") { Site = site });
 			page.Content = html;
 
 			CnblogsProcessor3 processor = new CnblogsProcessor3();
-			processor.Process(page);
+			processor.Process(page, new DefaultSpider());
 
 			Assert.True(page.ResultItems.GetResultItem("test"));
 			Assert.Equal(11, page.TargetRequests.Count);
@@ -120,12 +118,11 @@ namespace DotnetSpider.Core.Test.Processor
 			HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com/sitehome/p/2/").Result;
 
-			Page page = new Page(new Request("http://www.cnblogs.com/sitehome/p/2/", null), null);
+			Page page = new Page(new Request("http://www.cnblogs.com/sitehome/p/2/") { Site = new Site() });
 			page.Content = html;
 
 			CnblogsProcessor4 processor = new CnblogsProcessor4();
-			processor.Site = new Site();
-			processor.Process(page);
+			processor.Process(page, new DefaultSpider());
 
 			Assert.True(page.ResultItems.GetResultItem("test"));
 			Assert.Equal(12, page.TargetRequests.Count);

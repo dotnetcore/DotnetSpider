@@ -18,27 +18,8 @@ namespace DotnetSpider.Core.Test
 	}
 
 
-	public class SpiderTest
+	public partial class SpiderTest
 	{
-		[Fact]
-		public void IdentityLengthLimit()
-		{
-			try
-			{
-				Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
-					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-					new QueueDuplicateRemovedScheduler(),
-					new TestPageProcessor());
-			}
-			catch (Exception exception)
-			{
-				Assert.Equal($"Length of Identity should less than {Env.IdentityMaxLength}.", exception.Message);
-				return;
-			}
-
-			throw new Exception("TEST FAILED.");
-		}
-
 		[Fact]
 		public void RunAsyncAndStop()
 		{
@@ -111,7 +92,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(Status.Finished, spider.Stat);
 		}
 
-		internal class TestPipeline : BasePipeline
+		internal class TestPipeline : Core.Pipeline.BasePipeline
 		{
 			public override void Process(IEnumerable<ResultItems> resultItems)
 			{
@@ -231,7 +212,7 @@ namespace DotnetSpider.Core.Test
 			}
 		}
 
-		internal class FastExitPipeline : BasePipeline
+		internal class FastExitPipeline : Core.Pipeline.BasePipeline
 		{
 			public override void Process(IEnumerable<ResultItems> resultItems)
 			{

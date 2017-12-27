@@ -3,6 +3,9 @@ using NLog;
 
 namespace DotnetSpider.Core.Downloader
 {
+	/// <summary>
+	/// Cookie 注入器的抽象
+	/// </summary>
 	public abstract class CookieInjector : Named, ICookieInjector
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();

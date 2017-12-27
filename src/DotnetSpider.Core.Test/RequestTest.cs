@@ -60,18 +60,18 @@ namespace DotnetSpider.Core.Test
 		}
 
 
-		[Fact]
-		public void Clone()
-		{
-			var request = GetRequest();
-			var clone = (Request)request.Clone();
-			Assert.Equal(request.Extras.Count, clone.Extras.Count);
-			Assert.Equal(request.Depth, clone.Depth);
-			Assert.Equal(request.Extras["Test"], clone.Extras["Test"]);
-			Assert.Equal(request.Url, clone.Url);
-			Assert.Equal(request.Method, clone.Method);
-			Assert.Equal(request.Priority, clone.Priority);
-		}
+		//[Fact]
+		//public void Clone()
+		//{
+		//	var request = GetRequest();
+		//	var clone = (Request)request.Clone();
+		//	Assert.Equal(request.Extras.Count, clone.Extras.Count);
+		//	Assert.Equal(request.Depth, clone.Depth);
+		//	Assert.Equal(request.Extras["Test"], clone.Extras["Test"]);
+		//	Assert.Equal(request.Url, clone.Url);
+		//	Assert.Equal(request.Method, clone.Method);
+		//	Assert.Equal(request.Priority, clone.Priority);
+		//}
 
 		[Fact]
 		public void Serialize()

@@ -250,7 +250,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact]
 		public void RetryRequest()
 		{
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			var site = new Site { EncodingName = "UTF-8" };
 
 			var scheduler = new QueueDuplicateRemovedScheduler();
 
@@ -294,7 +294,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 				}
 				else
 				{
-					page.AddTargetRequest("http://www.cnblogs.com/", false);
+					page.AddTargetRequest("http://www.cnblogs.com/", 0, false);
 				}
 			}
 		}

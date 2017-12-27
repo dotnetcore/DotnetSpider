@@ -22,7 +22,7 @@ namespace DotnetSpider.Core.Processor
 
 		protected abstract void Handle(Page page);
 
-		public void Process(Page page)
+		public void Process(Page page, ISpider spider)
 		{
 			bool isTarget = true;
 			if ((page.Request.Depth != 1 || Env.ProcessorFilterDefaultRequest) && _targetUrlPatterns.Count > 0 && !_targetUrlPatterns.Contains(null))
@@ -46,7 +46,7 @@ namespace DotnetSpider.Core.Processor
 
 			if (!page.SkipExtractTargetUrls)
 			{
-				ExtractUrls(page);
+				ExtractUrls(page, spider);
 			}
 		}
 
@@ -82,15 +82,10 @@ namespace DotnetSpider.Core.Processor
 		}
 
 		/// <summary>
-		/// Get the site settings
-		/// </summary>
-		public Site Site { get; set; }
-
-		/// <summary>
 		/// 如果找不到则不返回URL, 不然返回的URL太多
 		/// </summary>
 		/// <param name="page"></param>
-		protected virtual void ExtractUrls(Page page)
+		protected virtual void ExtractUrls(Page page, ISpider spider)
 		{
 			if (_targetUrlExtractors == null || _targetUrlExtractors.Count == 0)
 			{
@@ -167,7 +162,7 @@ namespace DotnetSpider.Core.Processor
 				}
 			}
 
-			if (Site.DownloadFiles)
+			if (spider.Site.DownloadFiles)
 			{
 				var links = (page.Selectable.SelectList(ImageSelector)).GetValues();
 

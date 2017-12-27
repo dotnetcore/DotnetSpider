@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
@@ -14,9 +15,9 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			var site = spider.Site;
 			request.StatusCode = HttpStatusCode.OK;
-			Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
+			Page page = new Page(request)
 			{
-				Content = File.ReadAllText(request.Url.LocalPath),
+				Content = File.ReadAllText(request.Uri.LocalPath),
 				TargetUrl = request.Url.ToString()
 			};
 

@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var tableName = Guid.NewGuid().ToString("N");
 				metadata.TableInfo.Name = tableName;
 				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
+				insertPipeline.Init(spider);
 
 				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
@@ -53,7 +53,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var metadata2 = new EntityDefine<ProductUpdate>();
 				metadata2.TableInfo.Name = tableName;
 				updatePipeline.AddEntity(metadata2);
-				updatePipeline.InitPipeline(spider);
+				updatePipeline.Init(spider);
 				var data3 = conn.Query<ProductUpdate>($"use test;select * from {tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
 				data3.Category = "4C";
 				updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 });
@@ -80,7 +80,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var tableName = Guid.NewGuid().ToString("N");
 				metadata.TableInfo.Name = tableName;
 				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
+				insertPipeline.Init(spider);
 
 				var data1 = new Product2Insert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 				var data2 = new Product2Insert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
@@ -91,7 +91,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var metadata2 = new EntityDefine<Product2Update>();
 				metadata2.TableInfo.Name = tableName;
 				updatePipeline.AddEntity(metadata2);
-				updatePipeline.InitPipeline(spider);
+				updatePipeline.Init(spider);
 
 				var data3 = conn.Query<Product2Update>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
 				data3.Category = "4C";
@@ -121,7 +121,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var tableName = Guid.NewGuid().ToString("N");
 				metadata.TableInfo.Name = tableName;
 				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
+				insertPipeline.Init(spider);
 
 				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
@@ -153,7 +153,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var tableName = Guid.NewGuid().ToString("N");
 				metadata.TableInfo.Name = tableName;
 				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
+				insertPipeline.Init(spider);
 
 				var data1 = new Product2Insert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 				var data2 = new Product2Insert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
@@ -200,7 +200,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				};
 				var metadata = new EntityDefine<ProductInsert>();
 				insertPipeline.AddEntity(metadata);
-				insertPipeline.InitPipeline(spider);
+				insertPipeline.Init(spider);
 
 				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };

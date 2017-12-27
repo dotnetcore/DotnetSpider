@@ -85,9 +85,8 @@ namespace DotnetSpider.Extension.Downloader
 					}
 
 					//中文乱码URL
-					Uri uri = request.Url;
-					string query = uri.Query;
-					string realUrl = uri.Scheme + "://" + uri.DnsSafeHost + ":" + uri.Port + uri.AbsolutePath + (string.IsNullOrEmpty(query) ? "" : ("?" + HttpUtility.UrlPathEncode(uri.Query.Substring(1, uri.Query.Length - 1))));
+					string query = request.Uri.Query;
+					string realUrl = request.Uri.Scheme + "://" + request.Uri.DnsSafeHost + ":" + request.Uri.Port + request.Uri.AbsolutePath + (string.IsNullOrEmpty(query) ? "" : ("?" + HttpUtility.UrlPathEncode(request.Uri.Query.Substring(1, request.Uri.Query.Length - 1))));
 
 					if (UrlFormat != null)
 					{
@@ -103,7 +102,7 @@ namespace DotnetSpider.Extension.Downloader
 
 					AfterNavigate?.Invoke((RemoteWebDriver)_webDriver);
 
-					Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null);
+					Page page = new Page(request);
 					page.Content = _fiddlerClient.ResponseBodyString;
 					_fiddlerClient.Clear();
 					page.TargetUrl = _webDriver.Url;
@@ -119,7 +118,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, null) { Exception = e };
+				Page page = new Page(request) { Exception = e };
 				return page;
 			}
 		}

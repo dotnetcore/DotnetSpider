@@ -375,7 +375,7 @@ namespace DotnetSpider.Core
 
 		public static Page AddToCycleRetry(Request request, Site site)
 		{
-			Page page = new Page(request, null)
+			Page page = new Page(request)
 			{
 				ContentType = site.ContentType
 			};
@@ -443,24 +443,24 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Add startUrls to spider. 
 		/// </summary>
-		/// <param name="startUrls"></param>
+		/// <param name="urls"></param>
 		/// <returns></returns>
-		public Spider AddStartUrls(IList<string> startUrls)
+		public Spider AddStartUrls(IEnumerable<string> urls)
 		{
 			CheckIfRunning();
-			Site.StartRequests.AddRange(UrlUtils.ConvertToRequests(startUrls, 1));
+			Site.AddStartUrls(urls);
 			return this;
 		}
 
 		/// <summary>
 		/// Add start requests to spider. 
 		/// </summary>
-		/// <param name="startRequests"></param>
+		/// <param name="requests"></param>
 		/// <returns></returns>
-		public Spider AddStartRequests(IList<Request> startRequests)
+		public Spider AddStartRequests(IEnumerable<Request> requests)
 		{
 			CheckIfRunning();
-			Site.StartRequests.AddRange(startRequests);
+			Site.AddStartRequests(requests);
 			return this;
 		}
 
@@ -471,10 +471,8 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider AddStartUrl(params string[] urls)
 		{
-			foreach (string url in urls)
-			{
-				AddStartRequest(new Request(url, null));
-			}
+			CheckIfRunning();
+			Site.AddStartUrls(urls);
 			return this;
 		}
 
@@ -484,24 +482,9 @@ namespace DotnetSpider.Core
 		/// <param name="url"></param>
 		/// <param name="extras">Extra properties of request.</param>
 		/// <returns></returns>
-		public Spider AddStartUrl(string url, Dictionary<string, dynamic> extras)
+		public Spider AddStartUrl(string url, IDictionary<string, dynamic> extras)
 		{
-			AddStartRequest(new Request(url, extras));
-			return this;
-		}
-
-		/// <summary>
-		/// Add start urls to spider.
-		/// </summary>
-		/// <param name="urls"></param>
-		/// <returns></returns>
-		public Spider AddStartUrl(ICollection<string> urls)
-		{
-			foreach (string url in urls)
-			{
-				AddStartRequest(new Request(url, null));
-			}
-
+			Site.AddStartUrl(url, extras);
 			return this;
 		}
 
@@ -510,10 +493,20 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="requests"></param>
 		/// <returns></returns>
-		public Spider AddStartRequest(params Request[] requests)
+		public Spider AddStartRequest(Request request)
+		{
+			return AddStartRequests(request);
+		}
+
+		/// <summary>
+		/// Add urls with information to crawl.
+		/// </summary>
+		/// <param name="requests"></param>
+		/// <returns></returns>
+		public Spider AddStartRequests(params Request[] requests)
 		{
 			CheckIfRunning();
-			Site.StartRequests.AddRange(requests);
+			Site.AddStartRequests(requests);
 			return this;
 		}
 
@@ -881,6 +874,16 @@ namespace DotnetSpider.Core
 			{
 				throw new SpiderException($"Length of Identity should less than {Env.IdentityMaxLength}.");
 			}
+
+			if (Site == null)
+			{
+				throw new SpiderException($"Site should not be null.");
+			}
+
+			if (Site.RemoveOutboundLinks && (Site.Domains == null || Site.Domains.Length == 0))
+			{
+				throw new SpiderException($"When you want remove outbound links, the domains should not be null or empty.");
+			}
 		}
 
 		/// <summary>
@@ -904,7 +907,10 @@ namespace DotnetSpider.Core
 
 			InitScheduler(arguments);
 
-			InitPageProcessor();
+			if (PageProcessors == null || PageProcessors.Count == 0)
+			{
+				throw new SpiderException("Count of PageProcessor is zero.");
+			}
 
 			InitPipelines(arguments);
 
@@ -1040,7 +1046,7 @@ namespace DotnetSpider.Core
 
 					foreach (var processor in PageProcessors)
 					{
-						processor.Process(page);
+						processor.Process(page, this);
 					}
 
 					sw.Stop();
@@ -1237,18 +1243,6 @@ namespace DotnetSpider.Core
 			Monitorable.IsExited = false;
 		}
 
-		protected virtual void InitPageProcessor(params string[] arguments)
-		{
-			if (PageProcessors == null || PageProcessors.Count == 0)
-			{
-				throw new SpiderException("Count of PageProcessor is zero.");
-			}
-			foreach (var processor in PageProcessors)
-			{
-				processor.Site = Site;
-			}
-		}
-
 		protected virtual void InitPipelines(params string[] arguments)
 		{
 			if (Pipelines == null || Pipelines.Count == 0)
@@ -1262,7 +1256,7 @@ namespace DotnetSpider.Core
 
 			foreach (var pipeline in Pipelines)
 			{
-				pipeline.InitPipeline(this);
+				pipeline.Init(this);
 			}
 		}
 
@@ -1431,7 +1425,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void ReportStatus() => Monitor?.Report(Stat.ToString(),
+		private void ReportStatus() => Monitor?.Report(Identity, TaskId, Stat.ToString(),
 					Monitorable.LeftRequestsCount,
 					Monitorable.TotalRequestsCount,
 					Monitorable.SuccessRequestsCount,
@@ -1445,7 +1439,7 @@ namespace DotnetSpider.Core
 		{
 			if (Monitor == null)
 			{
-				Monitor = string.IsNullOrEmpty(Env.EnterpiseServiceUrl) ? new NLogMonitor(TaskId, Identity) : new HttpMonitor(TaskId, Identity);
+				Monitor = string.IsNullOrEmpty(Env.EnterpiseServiceUrl) ? new NLogMonitor() : new HttpMonitor(Env.EnterpiseServiceUrl);
 			}
 		}
 
@@ -1471,7 +1465,7 @@ namespace DotnetSpider.Core
 
 		private void PrepareErrorRequestsLogFile()
 		{
-			_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+			_errorRequestFile = FileUtil.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 
 			while (true)
 			{
@@ -1490,7 +1484,7 @@ namespace DotnetSpider.Core
 				}
 				catch
 				{
-					_errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, $"errors.{DateTime.Now.ToString("yyyyMMddhhmmss")}.txt"));
+					_errorRequestFile = FileUtil.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, $"errors.{DateTime.Now.ToString("yyyyMMddhhmmss")}.txt"));
 				}
 				Thread.Sleep(500);
 			}
@@ -1498,6 +1492,10 @@ namespace DotnetSpider.Core
 
 		private void InitSite()
 		{
+			if (Site.Headers == null)
+			{
+				Site.Headers = new Dictionary<string, string>();
+			}
 			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
 			Site.UserAgent = Site.UserAgent ??
 							 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";

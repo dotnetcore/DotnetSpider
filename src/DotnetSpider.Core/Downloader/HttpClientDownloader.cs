@@ -13,11 +13,14 @@ using DotnetSpider.Core.Redial;
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
-	/// The http downloader based on HttpClient.
+	/// 纯HTTP下载器
 	/// </summary>
 	public class HttpClientDownloader : BaseDownloader
 	{
-		private static readonly HashSet<string> MediaTypes = new HashSet<string>
+		/// <summary>
+		/// 定义哪些类型的内容是要当成文件下载
+		/// </summary>
+		public static HashSet<string> MediaTypes = new HashSet<string>
 		{
 			"text/html",
 			"text/plain",
@@ -33,6 +36,9 @@ namespace DotnetSpider.Core.Downloader
 			"application/javascript",
 			"application/x-www-form-urlencoded"
 		};
+		/// <summary>
+		/// HttpClient池, 仅在使用代理的情况下使用, 但要研究如何解决端口耗尽的问题
+		/// </summary>
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
 		private static readonly HttpClient HttpClient;
 		private readonly string _downloadFolder;
@@ -49,33 +55,28 @@ namespace DotnetSpider.Core.Downloader
 			_downloadFolder = Path.Combine(Env.BaseDirectory, "download");
 		}
 
-		public HttpClientDownloader(bool decodeHtml = false, int timeout = 5) : this()
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="timeout">下载器超时时间</param>
+		/// <param name="decodeHtml">下载的内容是否需要HTML解码</param>
+		public HttpClientDownloader(int timeout = 5, bool decodeHtml = false) : this()
 		{
 			HttpClient.Timeout = new TimeSpan(0, 0, timeout);
 			_decodeHtml = decodeHtml;
 		}
 
-		public static void AddMediaTypes(string type)
-		{
-			MediaTypes.Add(type);
-		}
-
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
-
-			HttpResponseMessage response = null;
 			var proxy = site.GetHttpProxy();
 			request.Proxy = proxy;
-
+			HttpResponseMessage response = null;
 			try
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, site);
-
 				HttpClient httpClient = null == spider.Site.HttpProxyPool ? HttpClient : _httpClientPool.GetHttpClient(proxy);
-
 				response = NetworkCenter.Current.Execute("http", () => httpClient.SendAsync(httpMessage).Result);
-
 				request.StatusCode = response.StatusCode;
 				response.EnsureSuccessStatusCode();
 
@@ -85,8 +86,8 @@ namespace DotnetSpider.Core.Downloader
 				{
 					if (!site.DownloadFiles)
 					{
-						Logger.AllLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
-						return new Page(request, null) { Skip = true };
+						Logger.AllLog(spider.Identity, $"Ignore: {request.Url} because media type is not allowed to download.", LogLevel.Warn);
+						return new Page(request) { Skip = true };
 					}
 					else
 					{
@@ -109,7 +110,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (DownloadException de)
 			{
-				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, null);
+				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request);
 
 				if (page != null)
 				{
@@ -121,7 +122,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (HttpRequestException he)
 			{
-				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request, null);
+				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request);
 				if (page != null)
 				{
 					page.Exception = he;
@@ -132,7 +133,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request, null)
+				Page page = new Page(request)
 				{
 					Exception = e,
 					Skip = true
@@ -160,99 +161,58 @@ namespace DotnetSpider.Core.Downloader
 
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request, Site site)
 		{
-			if (site == null) return null;
-			if (site.Headers == null)
-			{
-				site.Headers = new Dictionary<string, string>();
-			}
+			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(request.Method, request.Url);
 
-			HttpRequestMessage httpWebRequest = CreateRequestMessage(request);
-
-			httpWebRequest.Headers.Add("User-Agent", site.Headers.ContainsKey("User-Agent") ? site.Headers["User-Agent"] : site.UserAgent);
+			httpRequestMessage.Headers.Add("User-Agent", site.Headers.ContainsKey("User-Agent") ? site.Headers["User-Agent"] : site.UserAgent);
 
 			if (!string.IsNullOrEmpty(request.Referer))
 			{
-				httpWebRequest.Headers.Add("Referer", request.Referer);
+				httpRequestMessage.Headers.Add("Referer", request.Referer);
 			}
 
 			if (!string.IsNullOrEmpty(request.Origin))
 			{
-				httpWebRequest.Headers.Add("Origin", request.Origin);
+				httpRequestMessage.Headers.Add("Origin", request.Origin);
 			}
 
 			if (!string.IsNullOrEmpty(site.Accept))
 			{
-				httpWebRequest.Headers.Add("Accept", site.Accept);
+				httpRequestMessage.Headers.Add("Accept", site.Accept);
 			}
 
 			foreach (var header in site.Headers)
 			{
 				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) && header.Key != "Content-Type" && header.Key != "User-Agent")
 				{
-					httpWebRequest.Headers.Add(header.Key, header.Value);
+					httpRequestMessage.Headers.Add(header.Key, header.Value);
 				}
 			}
 
-			httpWebRequest.Headers.Add("Cookie", site.Cookies?.ToString());
+			httpRequestMessage.Headers.Add("Cookie", site.Cookies?.ToString());
 
-			if (httpWebRequest.Method == HttpMethod.Post)
+			if (httpRequestMessage.Method == HttpMethod.Post)
 			{
 				var data = string.IsNullOrEmpty(site.EncodingName) ? Encoding.UTF8.GetBytes(request.PostBody) : site.Encoding.GetBytes(request.PostBody);
-				httpWebRequest.Content = new StreamContent(new MemoryStream(data));
+				httpRequestMessage.Content = new StreamContent(new MemoryStream(data));
 
 				if (site.Headers.ContainsKey("Content-Type"))
 				{
-					httpWebRequest.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
+					httpRequestMessage.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
 				}
 
 				if (site.Headers.ContainsKey("X-Requested-With") && site.Headers["X-Requested-With"] == "NULL")
 				{
-					httpWebRequest.Content.Headers.Remove("X-Requested-With");
+					httpRequestMessage.Content.Headers.Remove("X-Requested-With");
 				}
 				else
 				{
-					if (!httpWebRequest.Content.Headers.Contains("X-Requested-With") && !httpWebRequest.Headers.Contains("X-Requested-With"))
+					if (!httpRequestMessage.Content.Headers.Contains("X-Requested-With") && !httpRequestMessage.Headers.Contains("X-Requested-With"))
 					{
-						httpWebRequest.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
+						httpRequestMessage.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
 					}
 				}
 			}
-			return httpWebRequest;
-		}
-
-		private HttpRequestMessage CreateRequestMessage(Request request)
-		{
-			switch (request.Method.Method)
-			{
-				case "GET":
-					{
-						return new HttpRequestMessage(HttpMethod.Get, request.Url);
-					}
-				case "POST":
-					{
-						return new HttpRequestMessage(HttpMethod.Post, request.Url);
-					}
-				case "HEAD":
-					{
-						return new HttpRequestMessage(HttpMethod.Head, request.Url);
-					}
-				case "PUT":
-					{
-						return new HttpRequestMessage(HttpMethod.Put, request.Url);
-					}
-				case "DELETE":
-					{
-						return new HttpRequestMessage(HttpMethod.Delete, request.Url);
-					}
-				case "TRACE":
-					{
-						return new HttpRequestMessage(HttpMethod.Trace, request.Url);
-					}
-				default:
-					{
-						throw new ArgumentException($"Illegal HTTP Method: {request.Method}.");
-					}
-			}
+			return httpRequestMessage;
 		}
 
 		private Page HandleResponse(Request request, HttpResponseMessage response, Site site)
@@ -268,7 +228,7 @@ namespace DotnetSpider.Core.Downloader
 #endif
 			}
 
-			Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
+			Page page = new Page(request)
 			{
 				Content = content
 			};
@@ -299,7 +259,7 @@ namespace DotnetSpider.Core.Downloader
 
 		private Page SaveFile(Request request, HttpResponseMessage response, ISpider spider)
 		{
-			var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Env.PathSeperator);
+			var intervalPath = new Uri(request.Url).LocalPath.Replace("//", "/").Replace("/", Env.PathSeperator);
 			string filePath = $"{_downloadFolder}{Env.PathSeperator}{spider.Identity}{intervalPath}";
 			if (!File.Exists(filePath))
 			{
@@ -322,7 +282,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 			}
 			Logger.AllLog(spider.Identity, $"Storage file: {request.Url} success.", LogLevel.Info);
-			return new Page(request, null) { Skip = true };
+			return new Page(request) { Skip = true };
 		}
 
 		private byte[] PreventCutOff(byte[] bytes)

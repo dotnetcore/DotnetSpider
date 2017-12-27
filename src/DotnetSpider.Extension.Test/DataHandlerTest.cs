@@ -40,12 +40,12 @@ namespace DotnetSpider.Extension.Test
 			var entityMetadata = new EntityDefine<Product>();
 			var identity = Guid.NewGuid().ToString("N");
 
-			EntityProcessor<Product> processor = new EntityProcessor<Product>(new Site(), new MyDataHanlder(identity));
+			EntityProcessor<Product> processor = new EntityProcessor<Product>(new MyDataHanlder(identity));
 
-			processor.Process(new Page(new Request("http://www.abcd.com"))
+			processor.Process(new Page(new Request("http://www.abcd.com") { Site = new Site() })
 			{
 				Content = "{'data':[{'name':'1'},{'name':'2'}]}"
-			});
+			}, new DefaultSpider());
 			Assert.True(File.Exists(identity));
 			File.Delete(identity);
 		}

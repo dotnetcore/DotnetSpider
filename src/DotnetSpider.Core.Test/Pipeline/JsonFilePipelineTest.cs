@@ -26,16 +26,21 @@ namespace DotnetSpider.Core.Test.Pipeline
 		{
 			Core.Pipeline.JsonFilePipeline pipeline = new Core.Pipeline.JsonFilePipeline();
 			ISpider spider = new DefaultSpider("test", new Site());
-			pipeline.InitPipeline(spider);
-			var folder = pipeline.GetDataForlder();
+			pipeline.Init(spider);
+			var folder = pipeline.DataFolder;
 			if (Directory.Exists(folder))
 			{
 				foreach (var file in Directory.GetFiles(folder))
 				{
-					File.Delete(file);
+					try
+					{
+						File.Delete(file);
+					}
+					catch { }
 				}
 			}
 			pipeline.Process(new[] { _resultItems });
+			pipeline.Dispose();
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
 			string expected = $"{{\"content\":\"爬虫工具\"}}{System.Environment.NewLine}";

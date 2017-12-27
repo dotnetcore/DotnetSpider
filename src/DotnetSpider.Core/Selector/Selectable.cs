@@ -54,11 +54,6 @@ namespace DotnetSpider.Core.Selector
 			return Select(cssSelector);
 		}
 
-		public override ISelectable SmartContent()
-		{
-			return Select(Selectors.SmartContent());
-		}
-
 		/// <summary>
 		/// 仅用于Html查询
 		/// </summary>

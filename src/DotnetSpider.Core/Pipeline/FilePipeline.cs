@@ -11,26 +11,22 @@ using NLog;
 namespace DotnetSpider.Core.Pipeline
 {
 	/// <summary>
-	/// Store results in files.
+	/// 存储数据结果到文件中
 	/// </summary>
-	public class FilePipeline : BasePipeline
+	public class FilePipeline : BaseFilePipeline
 	{
 		/// <summary>
-		/// create a FilePipeline with default path"/data/dotnetspider/"
+		/// 数据文件夹地址为: {BaseDirecoty}/data/{Identity}
 		/// </summary>
-		public FilePipeline()
+		public FilePipeline() : base("file")
 		{
-			SetPath("data");
 		}
 
-		public FilePipeline(string path)
+		/// <summary>
+		/// 数据文件夹地址为: {BaseDirecoty}/data/{interval}
+		/// </summary>
+		public FilePipeline(string interval) : base(interval)
 		{
-			SetPath(path);
-		}
-
-		public string GetDataForlder()
-		{
-			return $"{BasePath}{Env.PathSeperator}{Spider.Identity}{Env.PathSeperator}";
 		}
 
 		public override void Process(IEnumerable<ResultItems> resultItems)
@@ -39,10 +35,8 @@ namespace DotnetSpider.Core.Pipeline
 			{
 				foreach (var resultItem in resultItems)
 				{
-					string filePath = $"{BasePath}{Env.PathSeperator}{Spider.Identity}{Env.PathSeperator}{Guid.NewGuid():N}.dsd";
-					FileInfo file = PrepareFile(filePath);
-
-					using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
+					string filePath = Path.Combine(DataFolder, $"{ Guid.NewGuid():N}.dsd");
+					using (StreamWriter printWriter = new StreamWriter(File.OpenWrite(filePath), Encoding.UTF8))
 					{
 						printWriter.WriteLine("url:\t" + resultItem.Request.Url);
 

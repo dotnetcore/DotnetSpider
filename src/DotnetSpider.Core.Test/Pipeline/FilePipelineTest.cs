@@ -26,8 +26,8 @@ namespace DotnetSpider.Core.Test.Pipeline
 		{
 			Core.Pipeline.FilePipeline filePipeline = new Core.Pipeline.FilePipeline();
 			ISpider spider = new DefaultSpider("test", new Site());
-			filePipeline.InitPipeline(spider);
-			var folder = filePipeline.GetDataForlder();
+			filePipeline.Init(spider);
+			var folder = filePipeline.DataFolder;
 			if (Directory.Exists(folder))
 			{
 				foreach (var file in Directory.GetFiles(folder))

@@ -5,15 +5,16 @@ namespace DotnetSpider.Core.Selector
 {
 	public abstract class BaseSelectable : ISelectable
 	{
+		/// <summary>
+		/// 查询到的所有结果
+		/// </summary>
 		public List<dynamic> Elements { get; set; }
 
 		public abstract ISelectable XPath(string xpath);
 
-		public abstract ISelectable Css(string selector);
+		public abstract ISelectable Css(string css);
 
-		public abstract ISelectable Css(string selector, string attrName);
-
-		public abstract ISelectable SmartContent();
+		public abstract ISelectable Css(string css, string attrName);
 
 		public abstract ISelectable Links();
 

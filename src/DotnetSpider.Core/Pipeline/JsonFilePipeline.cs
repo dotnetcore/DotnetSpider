@@ -13,47 +13,25 @@ namespace DotnetSpider.Core.Pipeline
 	/// <summary>
 	/// Store results to files in JSON format.
 	/// </summary>
-	public class JsonFilePipeline : BasePipeline
+	public class JsonFilePipeline : BaseFilePipeline
 	{
-		private readonly string _intervalPath;
+		private string _jsonFile;
+		private StreamWriter _streamWriter;
 
-		public JsonFilePipeline()
+		public JsonFilePipeline() : base("json")
 		{
-#if NET_CORE
-			_intervalPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "data\\json" : "data/json";
-#else
-			_intervalPath = "data\\json";
-#endif
 		}
 
-		public JsonFilePipeline(string path)
+		public JsonFilePipeline(string interval) : base(interval)
 		{
-			_intervalPath = path;
 		}
 
-		public string GetDataForlder()
+		public override void Init(ISpider spider)
 		{
-			return $"{BasePath}{Env.PathSeperator}{Spider.Identity}{Env.PathSeperator}";
-		}
+			base.Init(spider);
 
-		public override void InitPipeline(ISpider spider)
-		{
-			base.InitPipeline(spider);
-
-			string path;
-			if (string.IsNullOrEmpty(_intervalPath))
-			{
-#if NET_CORE
-				path = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"\\{spider.Identity}\\data\\json" : $"/{spider.Identity}/data/json";
-#else
-				path = "\\{spider.Identity}\\data\\json";
-#endif
-			}
-			else
-			{
-				path = _intervalPath;
-			}
-			SetPath(path);
+			_jsonFile = Path.Combine(DataFolder, $"{spider.Identity}.json");
+			_streamWriter = new StreamWriter(File.OpenWrite(_jsonFile), Encoding.UTF8);
 		}
 
 		public override void Process(IEnumerable<ResultItems> resultItems)
@@ -62,12 +40,7 @@ namespace DotnetSpider.Core.Pipeline
 			{
 				foreach (var resultItem in resultItems)
 				{
-					string path = $"{BasePath}{Env.PathSeperator}{Spider.Identity}{Env.PathSeperator}{Encrypt.Md5Encrypt(resultItem.Request.Url.ToString())}.json";
-					FileInfo file = PrepareFile(path);
-					using (StreamWriter printWriter = new StreamWriter(file.OpenWrite(), Encoding.UTF8))
-					{
-						printWriter.WriteLine(JsonConvert.SerializeObject(resultItem));
-					}
+					_streamWriter.WriteLine(JsonConvert.SerializeObject(resultItem.Results));
 				}
 			}
 			catch (IOException e)
@@ -75,6 +48,12 @@ namespace DotnetSpider.Core.Pipeline
 				Logger.AllLog(Spider.Identity, "Write data to json file failed.", LogLevel.Error, e);
 				throw;
 			}
+		}
+
+		public override void Dispose()
+		{
+			base.Dispose();
+			_streamWriter.Dispose();
 		}
 	}
 }

@@ -88,8 +88,6 @@ namespace DotnetSpider.Extension.Downloader
 					}
 				}
 
-				Uri uri = request.Url;
-
 				//#if NET_CORE
 				//				string query = string.IsNullOrEmpty(uri.Query) ? "" : $"?{WebUtility.UrlEncode(uri.Query.Substring(1, uri.Query.Length - 1))}";
 				//#else
@@ -97,7 +95,7 @@ namespace DotnetSpider.Extension.Downloader
 				//#endif
 				//				string realUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}{uri.AbsolutePath}{query}";
 
-				var domainUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}";
+				var domainUrl = $"{request.Uri.Scheme}://{request.Uri.DnsSafeHost}{(request.Uri.Port == 80 ? "" : ":" + request.Uri.Port)}";
 
 				var options = _webDriver.Manage();
 				if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies?.PairPart.Count > 0)
@@ -124,7 +122,7 @@ namespace DotnetSpider.Extension.Downloader
 
 				Thread.Sleep(_webDriverWaitTime);
 
-				Page page = new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
+				Page page = new Page(request)
 				{
 					Content = _webDriver.PageSource,
 					TargetUrl = _webDriver.Url
@@ -136,7 +134,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 			catch (DownloadException de)
 			{
-				Page page = new Page(request, null) { Exception = de };
+				Page page = new Page(request) { Exception = de };
 				if (site.CycleRetryTimes > 0)
 				{
 					page = Spider.AddToCycleRetry(request, site);
@@ -147,7 +145,7 @@ namespace DotnetSpider.Extension.Downloader
 			catch (Exception e)
 			{
 				Logger.AllLog(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", NLog.LogLevel.Warn);
-				Page page = new Page(request, null) { Exception = e };
+				Page page = new Page(request) { Exception = e };
 				return page;
 			}
 		}

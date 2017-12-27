@@ -6,7 +6,7 @@ using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class DefaultMySqlPipeline : BasePipeline
+	public class DefaultMySqlPipeline : Core.Pipeline.BasePipeline
 	{
 		public ConnectionStringSettings ConnectionStringSettings { get; private set; }
 

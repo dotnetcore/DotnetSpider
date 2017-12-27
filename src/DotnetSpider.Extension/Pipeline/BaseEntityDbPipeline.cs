@@ -101,7 +101,7 @@ namespace DotnetSpider.Extension.Pipeline
 			EntityAdapters.TryAdd(entityDefine.Name, entityAdapter);
 		}
 
-		public override void InitPipeline(ISpider spider)
+		public override void Init(ISpider spider)
 		{
 			if (ConnectionStringSettings == null)
 			{
@@ -132,7 +132,7 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 
-			base.InitPipeline(spider);
+			base.Init(spider);
 
 			InitDatabaseAndTable();
 		}

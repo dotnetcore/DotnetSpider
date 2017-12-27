@@ -5,12 +5,12 @@ using System.Net.Http;
 
 namespace DotnetSpider.Core.Downloader
 {
-	public class IncrementTargetUrlsBuilder : BaseTargetUrlsBuilder
+	public class IncrementTargetUrlsBuilder : TargetUrlsExtractor
 	{
 		private readonly int _interval;
 
 		public IncrementTargetUrlsBuilder(string pagerString, int interval = 1,
-			ITargetUrlsBuilderTermination termination = null) : base(pagerString, termination)
+			ITargetUrlsExtractorTermination termination = null) : base(pagerString, termination)
 		{
 			_interval = interval;
 		}
@@ -33,19 +33,19 @@ namespace DotnetSpider.Core.Downloader
 			return null;
 		}
 
-		protected override IList<Request> GenerateRequests(Page page)
+		public override IEnumerable<Request> ExtractRequests(Page page)
 		{
 			string newUrl = IncreasePageNum(page.Url);
-			return string.IsNullOrEmpty(newUrl) ? null : new List<Request> { new Request(newUrl, page.Request.Extras) };
+			return string.IsNullOrEmpty(newUrl) ? null : new[] { new Request(newUrl, page.Request.Extras) };
 		}
 	}
 
-	public class RequestExtraTargetUrlsBuilder : BaseTargetUrlsBuilder
+	public class RequestExtraTargetUrlsBuilder : TargetUrlsExtractor
 	{
 		private readonly string _field;
 
 		public RequestExtraTargetUrlsBuilder(string pagerString, string field,
-			ITargetUrlsBuilderTermination termination = null) : base(pagerString, termination)
+			ITargetUrlsExtractorTermination termination = null) : base(pagerString, termination)
 		{
 			_field = field;
 		}
@@ -72,14 +72,14 @@ namespace DotnetSpider.Core.Downloader
 			return null;
 		}
 
-		protected override IList<Request> GenerateRequests(Page page)
+		public override IEnumerable<Request> ExtractRequests(Page page)
 		{
 			string newUrl = GenerateNewPaggerUrl(page);
-			return string.IsNullOrEmpty(newUrl) ? null : new List<Request> { new Request(newUrl, page.Request.Extras) };
+			return string.IsNullOrEmpty(newUrl) ? null : new[] { new Request(newUrl, page.Request.Extras) };
 		}
 	}
 
-	public class ContainsTermination : ITargetUrlsBuilderTermination
+	public class ContainsTermination : ITargetUrlsExtractorTermination
 	{
 		private readonly string[] _contents;
 
@@ -88,7 +88,7 @@ namespace DotnetSpider.Core.Downloader
 			_contents = contents;
 		}
 
-		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
+		public bool IsTermination(Page page, TargetUrlsExtractor builder)
 		{
 			if (string.IsNullOrEmpty(page?.Content))
 			{
@@ -99,7 +99,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class UnContainsTermination : ITargetUrlsBuilderTermination
+	public class UnContainsTermination : ITargetUrlsExtractorTermination
 	{
 		private readonly string[] _contents;
 
@@ -108,7 +108,7 @@ namespace DotnetSpider.Core.Downloader
 			_contents = contents;
 		}
 
-		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
+		public bool IsTermination(Page page, TargetUrlsExtractor builder)
 		{
 			if (string.IsNullOrEmpty(page?.Content))
 			{
@@ -119,7 +119,7 @@ namespace DotnetSpider.Core.Downloader
 		}
 	}
 
-	public class LimitPageNumTermination : ITargetUrlsBuilderTermination
+	public class LimitPageNumTermination : ITargetUrlsExtractorTermination
 	{
 		private readonly int _limit;
 
@@ -128,7 +128,7 @@ namespace DotnetSpider.Core.Downloader
 			_limit = limit;
 		}
 
-		public bool IsTermination(Page page, BaseTargetUrlsBuilder builder)
+		public bool IsTermination(Page page, TargetUrlsExtractor builder)
 		{
 			if (string.IsNullOrEmpty(page?.Content))
 			{

@@ -2,6 +2,9 @@
 
 namespace DotnetSpider.Core
 {
+	/// <summary>
+	/// 爬虫异常
+	/// </summary>
 	public class SpiderException : Exception
 	{
 		public SpiderException(string msg) : base(msg) { }

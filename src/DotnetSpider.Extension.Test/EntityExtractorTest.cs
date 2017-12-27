@@ -22,7 +22,8 @@ namespace DotnetSpider.Extension.Test
 			{
 				{ "cat", "手机" },
 				{ "cat3", "110" }
-			}), null)
+			})
+			{ Site = new Site() })
 			{
 				Content = File.ReadAllText(Path.Combine(Env.BaseDirectory, "Jd.html"))
 			});
@@ -41,12 +42,12 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void TempEntityNoPrimaryInfo()
 		{
-			EntityProcessor<Entity1> processor = new EntityProcessor<Entity1>(new Site());
-			var page = new Page(new Request("http://www.abcd.com"))
+			EntityProcessor<Entity1> processor = new EntityProcessor<Entity1>();
+			var page = new Page(new Request("http://www.abcd.com") { Site = new Site() })
 			{
 				Content = "{'data':[{'age':'1'},{'age':'2'}]}"
 			};
-			processor.Process(page);
+			processor.Process(page, new DefaultSpider());
 			Assert.Equal(2, (page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1") as List<Entity1>).Count);
 		}
 

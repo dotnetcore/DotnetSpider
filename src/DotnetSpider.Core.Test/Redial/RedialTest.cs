@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Test.Redial
 		[Fact]
 		public void Setting()
 		{
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			var site = new Site { EncodingName = "UTF-8" };
 
 			// Set start/seed url
 			site.AddStartUrl("http://www.cnblogs.com/");

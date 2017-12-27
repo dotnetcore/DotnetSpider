@@ -38,6 +38,7 @@ namespace DotnetSpider.Core
 
 		/// <summary>
 		/// 采集目标的Domain, 如果RemoveOutboundLinks为True, 则Domain不同的链接会被排除, 如果RemoveOutboundLinks为False, 此值没有作用
+		/// 需要自行设置
 		/// </summary>
 		public string[] Domains { get; set; }
 
@@ -147,12 +148,29 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 添加一个请求对象到当前站点
 		/// </summary>
-		/// <param name="startRequest">请求对象</param>
-		public void AddStartRequest(Request startRequest)
+		/// <param name="requests">请求对象</param>
+		public void AddStartRequest(Request request)
 		{
 			lock (this)
 			{
-				StartRequests.Add(startRequest);
+				request.Site = this;
+				StartRequests.Add(request);
+			}
+		}
+
+		/// <summary>
+		/// 添加请求对象到当前站点
+		/// </summary>
+		/// <param name="requests">请求对象</param>
+		public void AddStartRequests(IEnumerable<Request> requests)
+		{
+			lock (this)
+			{
+				foreach (var request in requests)
+				{
+					request.Site = this;
+					StartRequests.Add(request);
+				}
 			}
 		}
 

@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Monitor
 
 		private readonly bool _isDbOnly;
 
-		public DbMonitor(string taskId, string identity, bool isDbOnly = false) : base(taskId, identity)
+		public DbMonitor(string taskId, string identity, bool isDbOnly = false)
 		{
 			_isDbOnly = isDbOnly;
 
@@ -28,8 +28,8 @@ namespace DotnetSpider.Extension.Monitor
 					conn.MyExecute(insertSql,
 						new
 						{
-							TaskId = TaskId,
-							Identity = Identity,
+							TaskId = taskId,
+							Identity = identity,
 							NodeId = NodeId.Id,
 							Status = "INIT",
 							Left = 0,
@@ -84,11 +84,11 @@ namespace DotnetSpider.Extension.Monitor
 			}
 		}
 
-		public override void Report(string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
+		public override void Report(string identity, string taskId, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
 			if (!_isDbOnly)
 			{
-				base.Report(status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
+				base.Report(identity, taskId, status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 			}
 
 			using (var conn = Core.Env.SystemConnectionStringSettings.GetDbConnection())
@@ -97,7 +97,7 @@ namespace DotnetSpider.Extension.Monitor
 					"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `NodeId`=@NodeId;",
 					new
 					{
-						Identity = Identity,
+						Identity = identity,
 						NodeId = NodeId.Id,
 						Status = status,
 						Left = left,

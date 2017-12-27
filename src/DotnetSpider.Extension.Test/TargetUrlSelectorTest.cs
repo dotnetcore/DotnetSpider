@@ -102,7 +102,7 @@ namespace DotnetSpider.Extension.Test
 		public void TargetUrlsSelector_1Region_1Pattern()
 		{
 			new EntityDefine<Entity14>();
-			var processor = new EntityProcessor<Entity14>(new Site());
+			var processor = new EntityProcessor<Entity14>();
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"222\"]") == null);
@@ -112,7 +112,7 @@ namespace DotnetSpider.Extension.Test
 		public void TargetUrlsSelector_2Region_1Pattern()
 		{
 			new EntityDefine<Entity16>();
-			var processor = new EntityProcessor<Entity16>(new Site());
+			var processor = new EntityProcessor<Entity16>();
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 
@@ -126,7 +126,7 @@ namespace DotnetSpider.Extension.Test
 		public void TargetUrlsSelector_1Region_2Pattern()
 		{
 			new EntityDefine<Entity17>();
-			var processor = new EntityProcessor<Entity17>(new Site());
+			var processor = new EntityProcessor<Entity17>();
 			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 			Assert.Equal(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[1].ToString());
@@ -139,7 +139,7 @@ namespace DotnetSpider.Extension.Test
 			try
 			{
 				new EntityDefine<Entity15>();
-				var processor = new EntityProcessor<Entity15>(new Site());
+				var processor = new EntityProcessor<Entity15>();
 			}
 			catch (Exception e)
 			{
@@ -153,7 +153,7 @@ namespace DotnetSpider.Extension.Test
 		public void TargetUrlsSelector_2Region_2Pattern()
 		{
 			new EntityDefine<Entity18>();
-			var processor = new EntityProcessor<Entity18>(new Site());
+			var processor = new EntityProcessor<Entity18>();
 			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 			Assert.Equal(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[1].ToString());
@@ -169,7 +169,7 @@ namespace DotnetSpider.Extension.Test
 		public void TargetUrlsSelector_Multi_2Region_2Pattern()
 		{
 			new EntityDefine<Entity19>();
-			var processor = new EntityProcessor<Entity19>(new Site());
+			var processor = new EntityProcessor<Entity19>();
  
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -184,7 +184,7 @@ namespace DotnetSpider.Extension.Test
 		public void TargetUrlsSelector_Multi_2SameRegion_2Pattern()
 		{
 			new EntityDefine<Entity20>();
-			var processor = new EntityProcessor<Entity20>(new Site());
+			var processor = new EntityProcessor<Entity20>();
  
 			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.Equal(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -197,7 +197,7 @@ namespace DotnetSpider.Extension.Test
 		public void TargetUrlsSelector_Multi_2SameRegion_2SamePattern()
 		{
 			new EntityDefine<Entity21>();
-			var processor = new EntityProcessor<Entity21>(new Site());
+			var processor = new EntityProcessor<Entity21>();
  
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -209,7 +209,7 @@ namespace DotnetSpider.Extension.Test
 		public void TargetUrlsSelector_Multi_2Region_2SamePattern()
 		{
 			new EntityDefine<Entity22>();
-			var processor = new EntityProcessor<Entity22>(new Site());
+			var processor = new EntityProcessor<Entity22>();
  
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -226,7 +226,7 @@ namespace DotnetSpider.Extension.Test
 			try
 			{
 				new EntityDefine<Entity23>();
-				var processor = new EntityProcessor<Entity23>(new Site());
+				var processor = new EntityProcessor<Entity23>();
 			}
 			catch (ArgumentNullException e)
 			{
@@ -242,7 +242,7 @@ namespace DotnetSpider.Extension.Test
 			try
 			{
 				new EntityDefine<Entity24>();
-				var processor = new EntityProcessor<Entity24>(new Site());
+				var processor = new EntityProcessor<Entity24>();
 			}
 			catch (ArgumentNullException e)
 			{
@@ -256,7 +256,7 @@ namespace DotnetSpider.Extension.Test
 		public void TargetUrlsSelector_NullRegion_1Pattern()
 		{
 			new EntityDefine<Entity25>();
-			var processor = new EntityProcessor<Entity25>(new Site());
+			var processor = new EntityProcessor<Entity25>();
 	 
 			Assert.Single(processor.GetTargetUrlPatterns(null));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns(null)[0].ToString());

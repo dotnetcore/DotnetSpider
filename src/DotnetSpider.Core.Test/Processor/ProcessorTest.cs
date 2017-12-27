@@ -13,7 +13,7 @@ namespace DotnetSpider.Core.Test.Processor
 		[Fact]
 		public void ProcesserException()
 		{
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			var site = new Site { EncodingName = "UTF-8" };
 
 			var scheduler = new QueueDuplicateRemovedScheduler();
 

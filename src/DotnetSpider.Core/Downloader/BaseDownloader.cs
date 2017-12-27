@@ -8,6 +8,9 @@ using System.Net.Http;
 
 namespace DotnetSpider.Core.Downloader
 {
+	/// <summary>
+	/// 基础下载器的抽象
+	/// </summary>
 	public abstract class BaseDownloader : Named, IDownloader
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
@@ -15,7 +18,7 @@ namespace DotnetSpider.Core.Downloader
 		private readonly object _lock = new object();
 
 		/// <summary>
-		/// Auto detect content is json or html
+		/// 是否检测过下载内容的类型
 		/// </summary>
 		private bool _detectContentType;
 
@@ -25,19 +28,10 @@ namespace DotnetSpider.Core.Downloader
 
 		public Page Download(Request request, ISpider spider)
 		{
-			if (spider.Site == null)
-			{
-				return null;
-			}
-
-			HandleBeforeDownload(ref request, spider);
-
+			BeforeDownload(ref request, spider);
 			var page = DowloadContent(request, spider);
-
-			HandlerAfterDownloadComplete(ref page, spider);
-
+			AfterDownloadComplete(ref page, spider);
 			TryDetectContentType(page, spider);
-
 			return page;
 		}
 
@@ -57,7 +51,7 @@ namespace DotnetSpider.Core.Downloader
 
 		protected abstract Page DowloadContent(Request request, ISpider spider);
 
-		private void HandleBeforeDownload(ref Request request, ISpider spider)
+		private void BeforeDownload(ref Request request, ISpider spider)
 		{
 			if (_beforeDownloads != null && _beforeDownloads.Count > 0)
 			{
@@ -68,7 +62,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		private void HandlerAfterDownloadComplete(ref Page page, ISpider spider)
+		private void AfterDownloadComplete(ref Page page, ISpider spider)
 		{
 			if (_afterDownloadCompletes != null && _afterDownloadCompletes.Count > 0)
 			{
@@ -103,8 +97,6 @@ namespace DotnetSpider.Core.Downloader
 					}
 				}
 			}
-
-
 			if (page != null)
 			{
 				page.ContentType = spider.Site.ContentType;

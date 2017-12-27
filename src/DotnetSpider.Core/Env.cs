@@ -209,7 +209,7 @@ namespace DotnetSpider.Core
 		/// 加载配置文件
 		/// </summary>
 		/// <param name="path">配置文件路径</param>
-		public static void LoadConfiguration(string path)
+		public static void LoadConfiguration(string path = null)
 		{
 			if (string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))
 			{

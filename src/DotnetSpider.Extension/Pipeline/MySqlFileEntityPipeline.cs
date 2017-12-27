@@ -5,6 +5,7 @@ using DotnetSpider.Core;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Configuration;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -30,7 +31,7 @@ namespace DotnetSpider.Extension.Pipeline
 			Type = fileType;
 		}
 
-		public override void InitPipeline(ISpider spider)
+		public override void Init(ISpider spider)
 		{
 			if (string.IsNullOrEmpty(DataFolder))
 			{
@@ -69,7 +70,7 @@ namespace DotnetSpider.Extension.Pipeline
 		private void SaveInsertSqlFile<T>(EntityAdapter metadata, List<T> items)
 		{
 			var tableName = metadata.Table.CalculateTableName();
-			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{tableName}.sql"));
+			var fileInfo = FileUtil.PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{tableName}.sql"));
 			StringBuilder builder = new StringBuilder();
 			foreach (var entry in items)
 			{
@@ -96,7 +97,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private void SaveLoadFile<T>(EntityAdapter metadata, List<T> items)
 		{
-			var fileInfo = PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
+			var fileInfo = FileUtil.PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
 			StringBuilder builder = new StringBuilder();
 			foreach (var entry in items)
 			{

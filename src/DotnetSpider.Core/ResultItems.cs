@@ -20,7 +20,7 @@ namespace DotnetSpider.Core
 		public IReadOnlyDictionary<string, dynamic> Results => _fields;
 
 		/// <summary>
-		/// 当前解析结果对应的目标链接信息
+		/// 对应的目标链接信息
 		/// </summary>
 		public Request Request { get; set; }
 
@@ -40,6 +40,11 @@ namespace DotnetSpider.Core
 			return _fields.ContainsKey(key) ? _fields[key] : null;
 		}
 
+		/// <summary>
+		/// 添加或更新数据结果
+		/// </summary>
+		/// <param name="key">键值</param>
+		/// <param name="value">数据结果</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void AddOrUpdateResultItem(string key, dynamic value)
 		{

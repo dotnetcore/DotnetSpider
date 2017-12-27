@@ -3,100 +3,92 @@
 namespace DotnetSpider.Core.Selector
 {
 	/// <summary>
-	/// Selectable text.
+	/// <see cref="ISelectable"/>
 	/// </summary>
-	public interface ISelectable 
+	public interface ISelectable
 	{
 		/// <summary>
-		/// Select list with xpath
+		/// 通过XPath查找结果
 		/// </summary>
-		/// <param name="xpath"></param>
-		/// <returns></returns>
+		/// <param name="xpath">XPath 表达式</param>
+		/// <returns>查询器</returns>
 		ISelectable XPath(string xpath);
 
 		/// <summary>
-		/// Select list with css selector
+		/// 通过Css 选择器查找结果
 		/// </summary>
-		/// <param name="selector"></param>
-		/// <returns></returns>
-		ISelectable Css(string selector);
+		/// <param name="css">Css 选择器</param>
+		/// <returns>查询器</returns>
+		ISelectable Css(string css);
 
 		/// <summary>
-		/// Select list with css selector
+		/// 通过Css 选择器查找结果
 		/// </summary>
-		/// <param name="selector"></param>
-		/// <param name="attrName"></param>
-		/// <returns></returns>
-		ISelectable Css(string selector, string attrName);
+		/// <param name="css">Css 选择器</param>
+		/// <param name="attrName">查询到的元素的属性</param>
+		/// <returns>查询器</returns>
+		ISelectable Css(string css, string attrName);
 
 		/// <summary>
-		/// Select smart content with ReadAbility algorithm
+		/// 查找所有的链接
 		/// </summary>
-		/// <returns></returns>
-		ISelectable SmartContent();
-
-		/// <summary>
-		/// Select all links
-		/// </summary>
-		/// <returns></returns>
+		/// <returns>查询器</returns>
 		ISelectable Links();
 
 		/// <summary>
-		/// Get all nodes
+		/// 取得查询器里所有的结果
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>查询器</returns>
 		IList<ISelectable> Nodes();
 
-		ISelectable JsonPath(string path);
+		/// <summary>
+		/// 通过JsonPath查找结果
+		/// </summary>
+		/// <param name="jsonPath">JsonPath 表达式</param>
+		/// <returns>查询器</returns>
+		ISelectable JsonPath(string jsonPath);
 
 		/// <summary>
-		/// Select list with regex, default group is group 1
+		/// 通过正则表达式查找结果
 		/// </summary>
-		/// <param name="regex"></param>
-		/// <returns></returns>
+		/// <param name="regex">正则表达式</param>
+		/// <returns>查询器</returns>
 		ISelectable Regex(string regex);
 
 		/// <summary>
-		/// Select list with regex
+		/// 通过正则表达式查找结果
 		/// </summary>
-		/// <param name="regex"></param>
-		/// <param name="group"></param>
-		/// <returns></returns>
+		/// <param name="regex">正则表达式</param>
+		/// <param name="group">分组</param>
+		/// <returns>查询器</returns>
 		ISelectable Regex(string regex, int group);
 
-		///// <summary>
-		///// Replace with regex
-		///// </summary>
-		///// <param name="regex"></param>
-		///// <param name="replacement"></param>
-		///// <returns></returns>
-		//ISelectable Replace(string regex, string replacement);
-
 		/// <summary>
-		/// Single string result
+		/// 获得当前查询器的文本结果, 如果查询结果为多个, 则返回第一个结果的值
 		/// </summary>
+		/// <param name="isPlainText">是否纯文本化、去掉HTML标签</param>
+		/// <returns>查询到的文本结果</returns>
 		string GetValue(bool isPlainText = false);
 
+		/// <summary>
+		/// 获得当前查询器的文本结果
+		/// </summary>
+		/// <param name="isPlainText">是否纯文本化、去掉HTML标签</param>
+		/// <returns>查询到的文本结果</returns>
 		List<string> GetValues(bool isPlainText = false);
 
-		///// <summary>
-		///// If result exist for select
-		///// </summary>
-		///// <returns></returns>
-		////bool Exist();
-
 		/// <summary>
-		/// Extract by custom selector
+		/// 通过查询器查找结果
 		/// </summary>
-		/// <param name="selector"></param>
-		/// <returns></returns>
+		/// <param name="selector">查询器</param>
+		/// <returns><see cref="ISelector"/></returns>
 		ISelectable Select(ISelector selector);
 
 		/// <summary>
-		/// Extract by custom selector
+		/// 通过查询器查找结果
 		/// </summary>
-		/// <param name="selector"></param>
-		/// <returns></returns>
+		/// <param name="selector">查询器</param>
+		/// <returns><see cref="ISelector"/></returns>
 		ISelectable SelectList(ISelector selector);
 	}
 }

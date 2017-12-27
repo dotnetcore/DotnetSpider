@@ -61,7 +61,7 @@ namespace DotnetSpider.Extension
 						{
 							try
 							{
-								Monitor.Report("Running",
+								Monitor.Report(Identity, TaskId, "Running",
 									-1,
 									-1,
 									-1,
@@ -96,7 +96,7 @@ namespace DotnetSpider.Extension
 				{
 					try
 					{
-						Monitor.Report("Finished",
+						Monitor.Report(Identity, TaskId, "Finished",
 							-1,
 							-1,
 							-1,
@@ -124,7 +124,7 @@ namespace DotnetSpider.Extension
 				{
 					try
 					{
-						Monitor.Report("Terminated",
+						Monitor.Report(Identity, TaskId, "Terminated",
 							-1,
 							-1,
 							-1,

@@ -39,7 +39,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
 			var metadata = new EntityDefine<ProductInsert>();
 			insertPipeline.AddEntity(metadata);
-			insertPipeline.InitPipeline(spider);
+			insertPipeline.Init(spider);
 
 			// Common data
 			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
@@ -86,7 +86,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
 			var metadata = new EntityDefine<ProductInsert>();
 			insertPipeline.AddEntity(metadata);
-			insertPipeline.InitPipeline(spider);
+			insertPipeline.Init(spider);
 
 			// Common data
 			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
@@ -148,7 +148,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
 			var metadata = new EntityDefine<ProductInsert>();
 			insertPipeline.AddEntity(metadata);
-			insertPipeline.InitPipeline(spider);
+			insertPipeline.Init(spider);
 
 			// Common data
 			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
@@ -177,7 +177,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline updatePipeline = new CassandraEntityPipeline(connectString);
 			var metadata2 = new EntityDefine<ProductUpdate>();
 			updatePipeline.AddEntity(metadata2);
-			updatePipeline.InitPipeline(spider);
+			updatePipeline.Init(spider);
 			var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
 
@@ -216,7 +216,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline();
 			var metadata = new EntityDefine<ProductInsert>();
 			insertPipeline.AddEntity(metadata);
-			insertPipeline.InitPipeline(spider);
+			insertPipeline.Init(spider);
 
 			// Common data
 			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
@@ -245,7 +245,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline updatePipeline = new CassandraEntityPipeline();
 			var metadata2 = new EntityDefine<ProductUpdate>();
 			updatePipeline.AddEntity(metadata2);
-			updatePipeline.InitPipeline(spider);
+			updatePipeline.Init(spider);
 			var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
 

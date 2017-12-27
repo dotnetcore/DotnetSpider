@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -10,9 +11,9 @@ namespace DotnetSpider.Extension.Pipeline
 		private readonly object _locker = new object();
 		private string _dataFolder;
 
-		public override void InitPipeline(ISpider spider)
+		public override void Init(ISpider spider)
 		{
-			base.InitPipeline(spider);
+			base.Init(spider);
 
 			lock (_locker)
 			{
@@ -24,7 +25,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			lock (_locker)
 			{
-				var fileInfo = PrepareFile(Path.Combine(_dataFolder, $"{entityName}.data"));
+				var fileInfo = FileUtil.PrepareFile(Path.Combine(_dataFolder, $"{entityName}.json"));
 
 				foreach (var entry in datas)
 				{

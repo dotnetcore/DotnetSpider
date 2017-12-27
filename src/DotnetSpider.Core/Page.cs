@@ -12,7 +12,7 @@ namespace DotnetSpider.Core
 	public class Page
 	{
 		private readonly object _locker = new object();
-		private Selectable _selectable;
+		private ISelectable _selectable;
 		private string _content;
 
 		/// <summary>
@@ -21,7 +21,7 @@ namespace DotnetSpider.Core
 		public ContentType ContentType { get; internal set; } = ContentType.Html;
 
 		/// <summary>
-		/// 当前页面的链接
+		/// 页面的链接
 		/// </summary>
 		public string Url { get; }
 
@@ -46,21 +46,28 @@ namespace DotnetSpider.Core
 		public bool SkipExtractTargetUrls { get; set; }
 
 		/// <summary>
-		/// 当前页面解析出来的目标链接不加入到调度队列中
+		/// 页面解析出来的目标链接不加入到调度队列中
 		/// </summary>
 		public bool SkipTargetUrls { get; set; }
 
 		/// <summary>
-		/// 当前页面解析的数据不传入数据管道中作处理
+		/// 页面解析的数据不传入数据管道中作处理
 		/// </summary>
 		public bool Skip { get; set; }
 
+		/// <summary>
+		/// 页面解析的数据结果
+		/// </summary>
 		public ResultItems ResultItems { get; } = new ResultItems();
 
-		public HttpStatusCode? StatusCode => Request?.StatusCode;
-
+		/// <summary>
+		/// 去除返回的JSON数据的最外层填补
+		/// </summary>
 		public string Padding { get; set; }
 
+		/// <summary>
+		/// 下载到的文本内容
+		/// </summary>
 		public string Content
 		{
 			get => _content;
@@ -74,180 +81,131 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// 下载页面内容时截获的异常
+		/// </summary>
 		public Exception Exception { get; set; }
 
+		/// <summary>
+		/// 页面解析到的目标链接
+		/// </summary>
 		public HashSet<Request> TargetRequests { get; } = new HashSet<Request>();
 
 		/// <summary>
-		/// Whether remove outbound urls.
+		/// 查询器
 		/// </summary>
-		public bool RemoveOutboundLinks { get; }
-
-		/// <summary>
-		/// Only used to remove outbound urls.
-		/// </summary>
-		public string[] Domains { get; }
-
-		/// <summary>
-		/// Get selectable interface
-		/// </summary>
-		/// <returns></returns>
-		public Selectable Selectable
+		public ISelectable Selectable
 		{
 			get
 			{
 				if (_selectable == null)
 				{
 					string urlPadding = ContentType == ContentType.Json ? Padding : Request.Url.ToString();
-					_selectable = new Selectable(Content, urlPadding, ContentType, RemoveOutboundLinks ? Domains : null);
+					_selectable = new Selectable(Content, urlPadding, ContentType, Request.Site.RemoveOutboundLinks ? Request.Site.Domains : null);
 				}
 				return _selectable;
 			}
 		}
 
-		public Page(Request request, params string[] domains)
+		public Page(Request request)
 		{
 			Request = request;
 			Url = request.Url.ToString();
 			ResultItems.Request = request;
-			RemoveOutboundLinks = domains != null && domains.Length > 0;
-			Domains = domains;
 		}
 
 		/// <summary>
-		/// Store extract results
+		/// 添加解析到的数据结果
 		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="field"></param>
+		/// <param name="key">键值</param>
+		/// <param name="field">数据结果</param>
 		public void AddResultItem(string key, dynamic field)
 		{
 			ResultItems.AddOrUpdateResultItem(key, field);
 		}
 
 		/// <summary>
-		/// Add urls to fetch
+		/// 添加解析到的目标链接, 添加到队列中
 		/// </summary>
-		/// <param name="requests"></param>
-		public void AddTargetRequests(IList<string> requests)
+		/// <param name="urls">链接</param>
+		public void AddTargetRequests(IEnumerable<string> urls)
 		{
-			if (requests == null || requests.Count == 0)
+			if (urls == null)
 			{
 				return;
 			}
-			lock (_locker)
+
+			foreach (string url in urls)
 			{
-				foreach (string s in requests)
-				{
-					if (string.IsNullOrEmpty(s) || s.Equals("#") || s.StartsWith("javascript:"))
-					{
-						continue;
-					}
-					string s1 = UrlUtils.CanonicalizeUrl(s, Url);
-					var request = new Request(s1, Request.Extras) { Depth = Request.NextDepth };
-					if (request.IsAvailable)
-					{
-						TargetRequests.Add(request);
-					}
-				}
+				AddTargetRequest(url);
 			}
 		}
 
 		/// <summary>
-		/// Add urls to fetch
+		/// 添加解析到的目标链接, 添加到队列中
 		/// </summary>
-		/// <param name="requests"></param>
-		public void AddTargetRequests(IList<Request> requests)
+		/// <param name="requests">链接</param>
+		public void AddTargetRequests(IEnumerable<Request> requests)
 		{
-			if (requests == null || requests.Count == 0)
+			if (requests == null)
 			{
 				return;
 			}
-			lock (_locker)
+			foreach (var request in requests)
 			{
-				foreach (var r in requests)
-				{
-					r.Depth = Request.NextDepth;
-					TargetRequests.Add(r);
-				}
+				AddTargetRequest(request);
 			}
 		}
 
 		/// <summary>
-		/// Add urls to fetch
+		/// 添加解析到的目标链接, 添加到队列中
 		/// </summary>
-		/// <param name="requests"></param>
-		/// <param name="priority"></param>
-		public void AddTargetRequests(IList<string> requests, int priority)
+		/// <param name="urls">链接</param>
+		/// <param name="priority">优先级</param>
+		public void AddTargetRequests(IEnumerable<string> urls, int priority)
 		{
-			if (requests == null || requests.Count == 0)
+			if (urls == null)
 			{
 				return;
 			}
-			lock (_locker)
+			foreach (string url in urls)
 			{
-				foreach (string s in requests)
-				{
-					if (string.IsNullOrEmpty(s) || s.Equals("#") || s.StartsWith("javascript:"))
-					{
-						continue;
-					}
-					string s1 = UrlUtils.CanonicalizeUrl(s, Url);
-					Request request = new Request(s1, Request.Extras) { Priority = priority, Depth = Request.NextDepth };
-					if (request.IsAvailable)
-					{
-						TargetRequests.Add(request);
-					}
-				}
+				AddTargetRequest(url, priority);
 			}
 		}
 
 		/// <summary>
-		/// Add url to fetch
+		/// 添加解析到的目标链接, 添加到队列中
 		/// </summary>
-		/// <param name="requestString"></param>
-		/// <param name="increaseDeep"></param>
-		public void AddTargetRequest(string requestString, bool increaseDeep = true)
+		/// <param name="url">链接</param>
+		/// <param name="priority">优先级</param>
+		/// <param name="increaseDeep">目标链接的深度是否升高</param>
+		public void AddTargetRequest(string url, int priority = 0, bool increaseDeep = true)
 		{
-			lock (_locker)
+			if (string.IsNullOrEmpty(url) || url.Equals("#") || url.StartsWith("javascript:"))
 			{
-				if (string.IsNullOrEmpty(requestString) || requestString.Equals("#"))
-				{
-					return;
-				}
-
-				requestString = UrlUtils.CanonicalizeUrl(requestString, Url);
-				var request = new Request(requestString, Request.Extras)
-				{
-					Depth = Request.NextDepth
-				};
-
-				if (increaseDeep)
-				{
-					request.Depth = Request.NextDepth;
-				}
-				TargetRequests.Add(request);
+				return;
 			}
+			var newUrl = UrlUtils.CanonicalizeUrl(url, Url);
+			var request = new Request(newUrl, Request.Extras) { Priority = priority };
+			AddTargetRequest(request, increaseDeep);
 		}
 
 		/// <summary>
-		/// Add requests to fetch
-		/// </summary>		 
+		/// 添加解析到的目标链接, 添加到队列中
+		/// </summary>
+		/// <param name="request">链接</param>
+		/// <param name="increaseDeep">目标链接的深度是否升高</param>
 		public void AddTargetRequest(Request request, bool increaseDeep = true)
 		{
-			if (request == null)
+			if (request == null || !request.IsAvailable)
 			{
 				return;
 			}
+			request.Depth = increaseDeep ? Request.NextDepth : Request.Depth;
 			lock (_locker)
 			{
-				if (request.IsAvailable)
-				{
-					if (increaseDeep)
-					{
-						request.Depth = Request.NextDepth;
-					}
-					TargetRequests.Add(request);
-				}
+				TargetRequests.Add(request);
 			}
 		}
 	}

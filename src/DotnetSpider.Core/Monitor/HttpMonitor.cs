@@ -6,24 +6,35 @@ using System.Text;
 
 namespace DotnetSpider.Core.Monitor
 {
+	/// <summary>
+	/// HTTP爬虫监控状态上报
+	/// 在配置文件件添加了serviceUrl才会生效
+	/// </summary>
 	public class HttpMonitor : NLogMonitor
 	{
-		public HttpMonitor(string taskId, string identity) : base(taskId, identity)
+		private readonly string _apiUrl;
+
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="apiUrl">上报状态的WebApi入口</param>
+		public HttpMonitor(string apiUrl)
 		{
+			_apiUrl = apiUrl;
 		}
 
-		public override void Report(string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
+		public override void Report(string identity, string taskId, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
-			base.Report(status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
+			base.Report(identity, taskId, status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 
 			var json = JsonConvert.SerializeObject(new SpiderStatus
 			{
-				TaskId = TaskId,
+				TaskId = taskId,
 				AvgDownloadSpeed = avgDownloadSpeed,
 				AvgPipelineSpeed = avgPipelineSpeed,
 				AvgProcessorSpeed = avgProcessorSpeed,
 				Error = error,
-				Identity = Identity,
+				Identity = identity,
 				Left = left,
 				NodeId = NodeId.Id,
 				Status = status,
@@ -35,7 +46,7 @@ namespace DotnetSpider.Core.Monitor
 
 			NetworkCenter.Current.Execute("status", () =>
 			{
-				HttpSender.Client.PostAsync(Env.EnterpiseServiceStatusUrl, content).Wait();
+				HttpSender.Client.PostAsync(_apiUrl, content).Wait();
 			});
 		}
 	}

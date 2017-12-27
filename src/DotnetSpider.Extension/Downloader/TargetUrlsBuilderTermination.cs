@@ -7,7 +7,7 @@ using DotnetSpider.Extension.Model.Formatter;
 
 namespace DotnetSpider.Extension.Downloader
 {
-	public class PaggerTermination : ITargetUrlsBuilderTermination
+	public class PaggerTermination : ITargetUrlsExtractorTermination
 	{
 		public BaseSelector TotalPageSelector { get; set; }
 		public Formatter[] TotalPageFormatters { get; set; }
@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Downloader
 		public BaseSelector CurrenctPageSelector { get; set; }
 		public Formatter[] CurrnetPageFormatters { get; set; }
 
-		public bool IsTermination(Page page, BaseTargetUrlsBuilder creator)
+		public bool IsTermination(Page page, TargetUrlsExtractor creator)
 		{
 			if (TotalPageSelector == null || CurrenctPageSelector == null)
 			{
