@@ -2,14 +2,20 @@
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Pipeline;
+using System.Collections.Concurrent;
+using System;
+using DotnetSpider.Core.Infrastructure;
+using NLog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class BaseEntityPipeline : BasePipeline, IEntityPipeline
 	{
-		public abstract int Process(string name, List<dynamic> datas);
+		internal ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
 
-		public override void Process(IEnumerable<ResultItems> resultItems)
+		public abstract int Process(string name, IEnumerable<dynamic> datas, ISpider spider);
+
+		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			if (resultItems == null)
 			{
@@ -20,23 +26,22 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				int count = 0;
 				int effectedRow = 0;
-				foreach (var result in resultItem.Results)
+				foreach (var pair in resultItem.Results)
 				{
 					List<dynamic> list = new List<dynamic>();
-					dynamic data = resultItem.GetResultItem(result.Key);
 
-					if (data is ISpiderEntity)
+					if (pair.Value is ISpiderEntity)
 					{
-						list.Add(data);
+						list.Add(pair.Value);
 					}
 					else
 					{
-						list.AddRange(data);
+						list.AddRange(pair.Value);
 					}
 					if (list.Count > 0)
 					{
 						count += list.Count;
-						effectedRow += Process(result.Key, list);
+						effectedRow += Process(pair.Key, list, spider);
 					}
 				}
 				resultItem.Request.CountOfResults = count;
@@ -44,7 +49,22 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public abstract void AddEntity(IEntityDefine type);
+		public virtual void AddEntity(IEntityDefine entityDefine)
+		{
+			if (entityDefine == null)
+			{
+				throw new ArgumentException("Should not add a null entity to a entity dabase pipeline.");
+			}
+
+			if (entityDefine.TableInfo == null)
+			{
+				Logger.AllLog($"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", LogLevel.Warn);
+				return;
+			}
+
+			EntityAdapter entityAdapter = new EntityAdapter(entityDefine.TableInfo, entityDefine.Columns);
+			EntityAdapters.TryAdd(entityDefine.Name, entityAdapter);
+		}
 
 		public static IPipeline GetPipelineFromAppConfig()
 		{

@@ -268,7 +268,7 @@ namespace DotnetSpider.Extension.Test
 				ExitWhenComplete = true;
 				CachedSize = 1;
 				SkipWhenResultIsEmpty = false;
-				AddPipeline(new CollectEntityPipeline());
+				AddPipeline(new CollectionEntityPipeline());
 				AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 				AddEntityType<ArticleSummary>();
 			}

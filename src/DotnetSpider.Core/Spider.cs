@@ -960,7 +960,7 @@ namespace DotnetSpider.Core
 			{
 				if (containsData)
 				{
-					pipeline.Process(_cached.ToArray());
+					pipeline.Process(_cached.ToArray(), this);
 				}
 				SafeDestroy(pipeline);
 			}
@@ -1147,7 +1147,7 @@ namespace DotnetSpider.Core
 						{
 							_pipelineRetryPolicy.Execute(() =>
 							{
-								pipeline.Process(new[] { page.ResultItems });
+								pipeline.Process(new[] { page.ResultItems }, this);
 							});
 						}
 						catch (Exception e)
@@ -1182,7 +1182,7 @@ namespace DotnetSpider.Core
 							_cached.Clear();
 							foreach (IPipeline pipeline in Pipelines)
 							{
-								pipeline.Process(items);
+								pipeline.Process(items, this);
 							}
 
 							StringBuilder builder = new StringBuilder("Crawl:");
@@ -1256,7 +1256,7 @@ namespace DotnetSpider.Core
 
 			foreach (var pipeline in Pipelines)
 			{
-				pipeline.Init(this);
+				pipeline.Init();
 			}
 		}
 

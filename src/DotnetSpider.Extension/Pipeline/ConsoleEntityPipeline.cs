@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
+using System.Linq;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -14,13 +16,13 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 		}
 
-		public override int Process(string entityName, List<dynamic> datas)
+		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			foreach (var data in datas)
 			{
 				Console.WriteLine($"{entityName}: {data}");
 			}
-			return datas.Count;
+			return datas.Count();
 		}
 	}
 }

@@ -29,13 +29,13 @@ namespace DotnetSpider.Core.Pipeline
 		{
 		}
 
-		public override void Process(IEnumerable<ResultItems> resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			try
 			{
 				foreach (var resultItem in resultItems)
 				{
-					string filePath = Path.Combine(DataFolder, $"{ Guid.NewGuid():N}.dsd");
+					string filePath = Path.Combine(GetDataFolder(spider), $"{ Guid.NewGuid():N}.dsd");
 					using (StreamWriter printWriter = new StreamWriter(File.OpenWrite(filePath), Encoding.UTF8))
 					{
 						printWriter.WriteLine("url:\t" + resultItem.Request.Url);
@@ -61,7 +61,7 @@ namespace DotnetSpider.Core.Pipeline
 			}
 			catch (Exception e)
 			{
-				Logger.AllLog(Spider.Identity, "Write file error.", LogLevel.Error, e);
+				Logger.AllLog(spider.Identity, "Write file error.", LogLevel.Error, e);
 				throw;
 			}
 		}

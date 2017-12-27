@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class CollectEntityPipeline : BaseEntityPipeline, ICollectEntityPipeline
+	public class CollectionEntityPipeline : BaseEntityPipeline, ICollectionEntityPipeline
 	{
 		private readonly Dictionary<string, List<dynamic>> _collector = new Dictionary<string, List<dynamic>>();
 		private readonly object _locker = new object();
@@ -13,7 +15,7 @@ namespace DotnetSpider.Extension.Pipeline
 			_collector.Clear();
 		}
 
-		public List<dynamic> GetCollected(string entityName)
+		public IEnumerable<dynamic> GetCollection(string entityName)
 		{
 			lock (_locker)
 			{
@@ -29,7 +31,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 		}
 
-		public override int Process (string entityName,List<dynamic> datas)
+		public override int Process (string entityName,IEnumerable<dynamic> datas, ISpider spider)
 		{
 			lock (_locker)
 			{
@@ -50,7 +52,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 					_collector.Add(entityName, list);
 				}
-				return datas.Count;
+				return datas.Count();
 			}
 		}
 	}

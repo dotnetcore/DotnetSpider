@@ -4,6 +4,7 @@ using DotnetSpider.Core.Infrastructure;
 using Newtonsoft.Json;
 using NLog;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 #if NET_CORE
 using System.Runtime.InteropServices;
 #endif
@@ -16,7 +17,7 @@ namespace DotnetSpider.Core.Pipeline
 	public class JsonFilePipeline : BaseFilePipeline
 	{
 		private string _jsonFile;
-		private StreamWriter _streamWriter;
+		private readonly ConcurrentDictionary<string, StreamWriter> _writers = new ConcurrentDictionary<string, StreamWriter>();
 
 		public JsonFilePipeline() : base("json")
 		{
@@ -26,26 +27,20 @@ namespace DotnetSpider.Core.Pipeline
 		{
 		}
 
-		public override void Init(ISpider spider)
-		{
-			base.Init(spider);
-
-			_jsonFile = Path.Combine(DataFolder, $"{spider.Identity}.json");
-			_streamWriter = new StreamWriter(File.OpenWrite(_jsonFile), Encoding.UTF8);
-		}
-
-		public override void Process(IEnumerable<ResultItems> resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			try
 			{
+				var jsonFile = Path.Combine(GetDataFolder(spider), $"{spider.Identity}.json");
+				var streamWriter = GetDataWriter(jsonFile);
 				foreach (var resultItem in resultItems)
 				{
-					_streamWriter.WriteLine(JsonConvert.SerializeObject(resultItem.Results));
+					streamWriter.WriteLine(JsonConvert.SerializeObject(resultItem.Results));
 				}
 			}
 			catch (IOException e)
 			{
-				Logger.AllLog(Spider.Identity, "Write data to json file failed.", LogLevel.Error, e);
+				Logger.AllLog(spider.Identity, "Write data to json file failed.", LogLevel.Error, e);
 				throw;
 			}
 		}
@@ -53,7 +48,25 @@ namespace DotnetSpider.Core.Pipeline
 		public override void Dispose()
 		{
 			base.Dispose();
-			_streamWriter.Dispose();
+			foreach (var pair in _writers)
+			{
+				pair.Value.Dispose();
+			}
+			_writers.Clear();
+		}
+
+		private StreamWriter GetDataWriter(string file)
+		{
+			if (_writers.ContainsKey(file))
+			{
+				return _writers[file];
+			}
+			else
+			{
+				var streamWriter = new StreamWriter(File.OpenWrite(file), Encoding.UTF8);
+				_writers.TryAdd(file, streamWriter);
+				return streamWriter;
+			}
 		}
 	}
 }

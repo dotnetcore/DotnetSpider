@@ -39,14 +39,14 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
 			var metadata = new EntityDefine<ProductInsert>();
 			insertPipeline.AddEntity(metadata);
-			insertPipeline.Init(spider);
+			insertPipeline.Init();
 
 			// Common data
 			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			// Value is null
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
 			var cluster = CassandraUtils.CreateCluster(connectString);
 
@@ -86,14 +86,14 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
 			var metadata = new EntityDefine<ProductInsert>();
 			insertPipeline.AddEntity(metadata);
-			insertPipeline.Init(spider);
+			insertPipeline.Init();
 
 			// Common data
 			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			// Value is null
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
 			var cluster = CassandraUtils.CreateCluster(connectString);
 
@@ -113,7 +113,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			insertPipeline.DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
 			var sku = results.First().Sku;
 			var data4 = new ProductInsert { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data4 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data4 }, spider);
 
 			rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 			results = new List<ProductInsert>();
@@ -148,14 +148,14 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline(connectString);
 			var metadata = new EntityDefine<ProductInsert>();
 			insertPipeline.AddEntity(metadata);
-			insertPipeline.Init(spider);
+			insertPipeline.Init();
 
 			// Common data
 			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			// Value is null
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
 			var cluster = CassandraUtils.CreateCluster(connectString);
 
@@ -177,9 +177,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline updatePipeline = new CassandraEntityPipeline(connectString);
 			var metadata2 = new EntityDefine<ProductUpdate>();
 			updatePipeline.AddEntity(metadata2);
-			updatePipeline.Init(spider);
+			updatePipeline.Init();
 			var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
+			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 }, spider);
 
 			rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 			results = new List<ProductInsert>();
@@ -216,14 +216,14 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline insertPipeline = new CassandraEntityPipeline();
 			var metadata = new EntityDefine<ProductInsert>();
 			insertPipeline.AddEntity(metadata);
-			insertPipeline.Init(spider);
+			insertPipeline.Init();
 
 			// Common data
 			var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			// Value is null
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
 			var cluster = CassandraUtils.CreateCluster(connectString);
 
@@ -245,9 +245,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			CassandraEntityPipeline updatePipeline = new CassandraEntityPipeline();
 			var metadata2 = new EntityDefine<ProductUpdate>();
 			updatePipeline.AddEntity(metadata2);
-			updatePipeline.Init(spider);
+			updatePipeline.Init();
 			var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
+			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 }, spider);
 
 			rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 			results = new List<ProductInsert>();

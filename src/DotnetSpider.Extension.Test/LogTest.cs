@@ -63,9 +63,9 @@ namespace DotnetSpider.Extension.Test
 			public string status { get; set; }
 		}
 
-		internal class TestPipeline : Core.Pipeline.BasePipeline
+		internal class TestPipeline : BasePipeline
 		{
-			public override void Process(IEnumerable<ResultItems> resultItems)
+			public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 			{
 				foreach (var resultItem in resultItems)
 				{

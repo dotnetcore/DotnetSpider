@@ -65,21 +65,12 @@ namespace DotnetSpider.Extension.Pipeline
 			});
 		}
 
-		public override int Process(string entityName, List<dynamic> datas)
+		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
-			if (datas == null || datas.Count == 0)
-			{
-				return 0;
-			}
 			int count = 0;
 
 			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
-				if (datas == null || datas.Count == 0)
-				{
-					return 0;
-				}
-
 				string sql = string.Empty;
 
 				switch (metadata.PipelineMode)

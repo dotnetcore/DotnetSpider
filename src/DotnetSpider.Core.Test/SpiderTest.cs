@@ -92,9 +92,9 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(Status.Finished, spider.Stat);
 		}
 
-		internal class TestPipeline : Core.Pipeline.BasePipeline
+		internal class TestPipeline : BasePipeline
 		{
-			public override void Process(IEnumerable<ResultItems> resultItems)
+			public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 			{
 				foreach (var resultItem in resultItems)
 				{
@@ -212,9 +212,9 @@ namespace DotnetSpider.Core.Test
 			}
 		}
 
-		internal class FastExitPipeline : Core.Pipeline.BasePipeline
+		internal class FastExitPipeline : BasePipeline
 		{
-			public override void Process(IEnumerable<ResultItems> resultItems)
+			public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 			{
 				File.AppendAllLines("FastExit_Result.txt", new[] { resultItems.First().Request.Url.ToString() });
 			}

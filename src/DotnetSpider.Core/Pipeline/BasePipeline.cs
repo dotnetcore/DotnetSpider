@@ -11,14 +11,9 @@ namespace DotnetSpider.Core.Pipeline
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public ISpider Spider { get; protected set; }
+		public abstract void Process(IEnumerable<ResultItems> resultItems, ISpider spider);
 
-		public virtual void Init(ISpider spider)
-		{
-			Spider = spider;
-		}
-
-		public abstract void Process(IEnumerable<ResultItems> resultItems);
+		public virtual void Init() { }
 
 		public virtual void Dispose()
 		{

@@ -26,8 +26,8 @@ namespace DotnetSpider.Core.Test.Pipeline
 		{
 			Core.Pipeline.JsonFilePipeline pipeline = new Core.Pipeline.JsonFilePipeline();
 			ISpider spider = new DefaultSpider("test", new Site());
-			pipeline.Init(spider);
-			var folder = pipeline.DataFolder;
+
+			var folder = pipeline.GetDataFolder(spider);
 			if (Directory.Exists(folder))
 			{
 				foreach (var file in Directory.GetFiles(folder))
@@ -39,7 +39,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 					catch { }
 				}
 			}
-			pipeline.Process(new[] { _resultItems });
+			pipeline.Process(new[] { _resultItems }, spider);
 			pipeline.Dispose();
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);

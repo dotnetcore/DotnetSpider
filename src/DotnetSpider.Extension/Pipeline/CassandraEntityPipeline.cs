@@ -18,8 +18,7 @@ namespace DotnetSpider.Extension.Pipeline
 		private PipelineMode _defaultPipelineModel;
 		private static readonly TimeUuid DefaultTimeUuid = default(TimeUuid);
 		private ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
-		private ConcurrentDictionary<string, ISession> EntitySessions { get; set; } = new ConcurrentDictionary<string, ISession>();
-
+		private ISession _session;
 		private CassandraConnectionSetting ConnectionSetting { get; set; }
 
 		public CassandraEntityPipeline() : this(Env.DataConnectionStringSettings?.ConnectionString)
@@ -61,7 +60,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (entityDefine.TableInfo == null)
 			{
-				Logger.AllLog(Spider?.Identity, $"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", LogLevel.Warn);
+				Logger.AllLog($"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", LogLevel.Warn);
 				return;
 			}
 
@@ -81,21 +80,14 @@ namespace DotnetSpider.Extension.Pipeline
 			EntityAdapters.TryAdd(entityDefine.Name, entityAdapter);
 		}
 
-		public override void Init(ISpider spider)
+		public override int Process(string name, IEnumerable<dynamic> datas, ISpider spider)
 		{
-			base.Init(spider);
-
-			InitDatabaseAndTable();
-		}
-
-		public override int Process(string name, List<dynamic> datas)
-		{
-			if (datas == null || datas.Count == 0)
+			if (datas == null)
 			{
 				return 0;
 			}
 
-			if (EntityAdapters.TryGetValue(name, out var metadata) && EntitySessions.TryGetValue(name, out var session))
+			if (EntityAdapters.TryGetValue(name, out var metadata))
 			{
 				switch (metadata.PipelineMode)
 				{
@@ -103,7 +95,7 @@ namespace DotnetSpider.Extension.Pipeline
 						{
 							var action = new Action(() =>
 							{
-								var insertStmt = session.Prepare(metadata.InsertSql);
+								var insertStmt = _session.Prepare(metadata.InsertSql);
 								var batch = new BatchStatement();
 								foreach (var data in datas)
 								{
@@ -124,7 +116,7 @@ namespace DotnetSpider.Extension.Pipeline
 									batch.Add(insertStmt.Bind(values.ToArray()));
 								}
 								// Execute the batch
-								session.Execute(batch);
+								_session.Execute(batch);
 							});
 							if (DbExecutor.UseNetworkCenter)
 							{
@@ -143,25 +135,37 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 				}
 			}
-			return datas.Count;
+			return datas.Count();
 		}
 
-		private void InitDatabaseAndTable()
+		public override void Init()
 		{
-			foreach (var adapter in EntityAdapters)
+			base.Init();
+
+			if (_session == null)
 			{
 				var cluster = CassandraUtils.CreateCluster(ConnectionSetting);
-				var session = cluster.Connect();
-				session.CreateKeyspaceIfNotExists(adapter.Value.Table.Database);
-				session.ChangeKeyspace(adapter.Value.Table.Database);
-				session.Execute(GenerateCreateTableSql(adapter.Value));
+				_session = cluster.Connect();
+			}
+
+			foreach (var adapter in EntityAdapters)
+			{
+				_session.CreateKeyspaceIfNotExists(adapter.Value.Table.Database);
+				_session.ChangeKeyspace(adapter.Value.Table.Database);
+				_session.Execute(GenerateCreateTableSql(adapter.Value));
 				var createIndexCql = GenerateCreateIndexes(adapter.Value);
 				if (!string.IsNullOrEmpty(createIndexCql))
 				{
-					session.Execute(createIndexCql);
+					_session.Execute(createIndexCql);
 				}
-				EntitySessions.AddOrUpdate(adapter.Key, session);
 			}
+		}
+
+		public override void Dispose()
+		{
+			base.Dispose();
+			_session.Dispose();
+			EntityAdapters.Clear();
 		}
 
 		private void InitAllCqlOfEntity(EntityAdapter adapter)

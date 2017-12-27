@@ -90,11 +90,6 @@ namespace DotnetSpider.Extension.Model
 			ValidateEntityDefine();
 		}
 
-		public void CreateTable(BaseEntityDbPipeline pipeline)
-		{
-			pipeline.InitDatabaseAndTable();
-		}
-
 		private void GenerateEntityColumns()
 		{
 			var properties = Type.GetProperties(BindingFlags.Instance | BindingFlags.Public);

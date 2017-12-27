@@ -66,9 +66,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				AddPipeline(new MyPipeline());
 			}
 
-			class MyPipeline : Core.Pipeline.BasePipeline
+			class MyPipeline : BasePipeline
 			{
-				public override void Process(IEnumerable<ResultItems> resultItems)
+				public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 				{
 				}
 			}

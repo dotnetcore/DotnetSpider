@@ -12,6 +12,6 @@ namespace DotnetSpider.Core.Pipeline
 		/// Get all results collected.
 		/// </summary>
 		/// <returns></returns>
-		IEnumerable<ResultItems> GetCollection();
+		IEnumerable<ResultItems> GetCollection(ISpider spider);
 	}
 }

@@ -26,7 +26,7 @@ namespace DotnetSpider.Extension.Test
 			{
 			}
 
-			public override int Process(string name, List<dynamic> datas)
+			public override int Process(string name, IEnumerable<dynamic> datas, ISpider spider)
 			{
 				throw new NotImplementedException();
 			}
@@ -350,8 +350,8 @@ namespace DotnetSpider.Extension.Test
 		public void MySqlFileEntityPipeline_InsertSql()
 		{
 			var id = Guid.NewGuid().ToString("N");
-			var folder = Path.Combine(Env.BaseDirectory, id);
-			var path = Path.Combine(folder, "mysql", "baidu.baidu_search_mysql_file.sql");
+			var folder = Path.Combine(Env.BaseDirectory, "mysql", id);
+			var path = Path.Combine(folder, "baidu.baidu_search_mysql_file.sql");
 			try
 			{
 				BaiduSearchSpider spider = new BaiduSearchSpider();

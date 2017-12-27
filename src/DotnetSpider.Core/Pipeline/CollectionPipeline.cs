@@ -1,29 +1,43 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Pipeline
 {
 	public class CollectionPipeline : BasePipeline, ICollectionPipeline
 	{
-		private readonly  BlockingCollection<ResultItems> _items = new  BlockingCollection<ResultItems>();
+		private readonly Dictionary<ISpider, List<ResultItems>> _items = new Dictionary<ISpider, List<ResultItems>>();
+		private readonly static object ItemsLocker = new object();
 
-		public IEnumerable<ResultItems> GetCollection()
+		public IEnumerable<ResultItems> GetCollection(ISpider spider)
 		{
-			return _items;
+			lock (ItemsLocker)
+			{
+				if (_items.ContainsKey(spider))
+				{
+					return _items[spider];
+				}
+				else
+				{
+					return new ResultItems[0];
+				}
+			}
 		}
 
-		public override void Process(IEnumerable<ResultItems> resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
-			foreach(var item in resultItems)
+			lock (ItemsLocker)
 			{
-				_items.Add(item);
+				if (!_items.ContainsKey(spider))
+				{
+					_items.Add(spider, new List<ResultItems>());
+				}
+				_items[spider].AddRange(resultItems);
 			}
 		}
 
 		public override void Dispose()
 		{
 			base.Dispose();
-			_items.Dispose();
+			_items.Clear();
 		}
 	}
 }

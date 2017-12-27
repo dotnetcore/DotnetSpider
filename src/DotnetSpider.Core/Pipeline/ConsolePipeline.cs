@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Pipeline
 	/// </summary>
 	public class ConsolePipeline : BasePipeline
 	{
-		public override void Process(IEnumerable<ResultItems> resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			foreach (var resultItem in resultItems)
 			{

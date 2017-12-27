@@ -79,22 +79,22 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var tableName = Guid.NewGuid().ToString("N");
 				metadata.TableInfo.Name = tableName;
 				insertPipeline.AddEntity(metadata);
-				insertPipeline.Init(spider);
+				insertPipeline.Init();
 
 				var data1 = new ProductInsert { Sku = "210", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 				var data2 = new ProductInsert { Sku = "211", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2 });
+				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2 }, spider);
 
 				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString);
 				var metadata2 = new EntityDefine<ProductUpdate>();
 				metadata2.TableInfo.Name = tableName;
 				updatePipeline.AddEntity(metadata2);
-				updatePipeline.Init(spider);
+				updatePipeline.Init();
 				var sql = $" select * from `test`.`{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}` where Sku=210";
 				var data3 = conn.Query<ProductUpdate>(sql).First();
 				data3.Category = "4C";
-				updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 });
+				updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 }, spider);
 
 				var list = conn.Query<ProductInsert>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
 				Assert.Equal(2, list.Count);
@@ -124,13 +124,13 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var tableName = Guid.NewGuid().ToString("N");
 				metadata.TableInfo.Name = tableName;
 				insertPipeline.AddEntity(metadata);
-				insertPipeline.Init(spider);
+				insertPipeline.Init();
 
 				var data1 = new ProductInsert { Sku = "210", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
 				var data2 = new ProductInsert { Sku = "211", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 				var data3 = new ProductInsert { Sku = "212", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
 				var list = conn.Query<ProductInsert>($"select * from test.`{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}`").ToList();
 				Assert.Equal(3, list.Count);

@@ -1,12 +1,14 @@
-﻿using System.IO;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
 
 namespace DotnetSpider.Core.Pipeline
 {
 	public abstract class BaseFilePipeline : BasePipeline
 	{
+		private readonly ConcurrentDictionary<string, string> _dataFolderCache = new ConcurrentDictionary<string, string>();
 		public string RootDataFolder { get; protected set; }
 		public string Interval { get; protected set; }
-		public string DataFolder { get; protected set; }
 
 		protected BaseFilePipeline() { }
 
@@ -30,14 +32,21 @@ namespace DotnetSpider.Core.Pipeline
 			Interval = interval;
 		}
 
-		public override void Init(ISpider spider)
+		internal string GetDataFolder(ISpider spider)
 		{
-			base.Init(spider);
-
-			DataFolder = Path.Combine(RootDataFolder, spider.Identity);
-			if (!Directory.Exists(DataFolder))
+			if (_dataFolderCache.ContainsKey(spider.Identity))
 			{
-				Directory.CreateDirectory(DataFolder);
+				return _dataFolderCache[spider.Identity];
+			}
+			else
+			{
+				var dataFolder = Path.Combine(RootDataFolder, spider.Identity);
+				if (!Directory.Exists(dataFolder))
+				{
+					Directory.CreateDirectory(dataFolder);
+				}
+				_dataFolderCache.TryAdd(spider.Identity, dataFolder);
+				return dataFolder;
 			}
 		}
 	}

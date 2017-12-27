@@ -6,15 +6,16 @@ using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Configuration;
 using DotnetSpider.Core.Infrastructure;
+using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	/// <summary>
 	/// LOAD DATA LOCAL INFILE '{filePath}' INTO TABLE `{schema}`.`{dababase}` FIELDS TERMINATED BY '$'  ENCLOSED BY '#' LINES TERMINATED BY '@END@' IGNORE 1 LINES;
 	/// </summary>
-	public class MySqlFileEntityPipeline : BaseEntityDbPipeline
+	public class MySqlFileEntityPipeline : BaseEntityPipeline
 	{
-		private readonly object _locker = new object();
+		private readonly Dictionary<string, StreamWriter> _writers = new Dictionary<string, StreamWriter>();
 
 		public enum FileType
 		{
@@ -24,53 +25,63 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private FileType Type { get; }
 
-		private string DataFolder { get; set; }
-
 		public MySqlFileEntityPipeline(FileType fileType = FileType.LoadFile)
 		{
 			Type = fileType;
 		}
 
-		public override void Init(ISpider spider)
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
-			if (string.IsNullOrEmpty(DataFolder))
+			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
-				DataFolder = Path.Combine(Env.BaseDirectory, spider.Identity, "mysql");
-			}
-		}
-
-		public override int Process(string entityName, List<dynamic> datas)
-		{
-			if (datas == null || datas.Count == 0)
-			{
-				return 0;
-			}
-			lock (_locker)
-			{
-				if (EntityAdapters.TryGetValue(entityName, out var metadata))
+				StreamWriter writer;
+				var tableName = metadata.Table.CalculateTableName();
+				var dataFolder = Path.Combine(Env.BaseDirectory, "mysql", spider.Identity);
+				var mysqlFile = Path.Combine(dataFolder, $"{metadata.Table.Database}.{tableName}.sql");
+				if (_writers.ContainsKey(mysqlFile))
 				{
-					switch (Type)
-					{
-						case FileType.LoadFile:
-							{
-								SaveLoadFile(metadata, datas);
-								break;
-							}
-						case FileType.InsertSql:
-							{
-								SaveInsertSqlFile(metadata, datas);
-								break;
-							}
-					}
+					writer = _writers[mysqlFile];
 				}
-				return datas.Count;
+				else
+				{
+					if (!Directory.Exists(dataFolder))
+					{
+						Directory.CreateDirectory(dataFolder);
+					}
+					writer = new StreamWriter(File.OpenWrite(mysqlFile), Encoding.UTF8);
+					_writers.Add(mysqlFile, writer);
+				}
+				switch (Type)
+				{
+					case FileType.LoadFile:
+						{
+							SaveLoadFile(writer, metadata, datas);
+							break;
+						}
+					case FileType.InsertSql:
+						{
+							SaveInsertSqlFile(writer, tableName, metadata, datas);
+							break;
+						}
+				}
+			}
+			return datas.Count();
+
+		}
+
+		public override void Dispose()
+		{
+			base.Dispose();
+
+			foreach(var writer in _writers)
+			{
+				writer.Value.Dispose();
 			}
 		}
 
-		private void SaveInsertSqlFile<T>(EntityAdapter metadata, List<T> items)
+		private void SaveInsertSqlFile<T>(StreamWriter writer, string tableName, EntityAdapter metadata, IEnumerable<T> items)
 		{
-			var tableName = metadata.Table.CalculateTableName();
-			var fileInfo = FileUtil.PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{tableName}.sql"));
 			StringBuilder builder = new StringBuilder();
 			foreach (var entry in items)
 			{
@@ -92,12 +103,11 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 				builder.Append($");{System.Environment.NewLine}");
 			}
-			File.AppendAllText(fileInfo.FullName, builder.ToString());
+			writer.Write(builder.ToString());
 		}
 
-		private void SaveLoadFile<T>(EntityAdapter metadata, List<T> items)
+		private void SaveLoadFile<T>(StreamWriter writer, EntityAdapter metadata, IEnumerable<T> items)
 		{
-			var fileInfo = FileUtil.PrepareFile(Path.Combine(DataFolder, $"{metadata.Table.Database}.{metadata.Table.Name}.data"));
 			StringBuilder builder = new StringBuilder();
 			foreach (var entry in items)
 			{
@@ -115,20 +125,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				}
 			}
-			File.AppendAllText(fileInfo.FullName, builder.ToString());
-		}
-
-		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
-		{
-			return null;
-		}
-
-		protected override void InitAllSqlOfEntity(EntityAdapter adapter)
-		{
-		}
-
-		internal override void InitDatabaseAndTable()
-		{
+			writer.Write(builder.ToString());
 		}
 	}
 }

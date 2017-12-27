@@ -26,8 +26,8 @@ namespace DotnetSpider.Core.Test.Pipeline
 		{
 			Core.Pipeline.FilePipeline filePipeline = new Core.Pipeline.FilePipeline();
 			ISpider spider = new DefaultSpider("test", new Site());
-			filePipeline.Init(spider);
-			var folder = filePipeline.DataFolder;
+
+			var folder = filePipeline.GetDataFolder(spider);
 			if (Directory.Exists(folder))
 			{
 				foreach (var file in Directory.GetFiles(folder))
@@ -35,7 +35,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 					File.Delete(file);
 				}
 			}
-			filePipeline.Process(new[] { _resultItems });
+			filePipeline.Process(new[] { _resultItems }, spider);
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
 			string expected = $"url:\thttp://www.baidu.com/{System.Environment.NewLine}content:\t爬虫工具{System.Environment.NewLine}";

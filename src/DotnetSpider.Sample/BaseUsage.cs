@@ -42,7 +42,7 @@ namespace DotnetSpider.Sample
 		{
 			private static long count = 0;
 
-			public override void Process(IEnumerable<ResultItems> resultItems)
+			public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 			{
 				foreach (var resultItem in resultItems)
 				{

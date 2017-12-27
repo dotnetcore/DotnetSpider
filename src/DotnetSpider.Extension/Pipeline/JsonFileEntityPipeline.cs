@@ -1,42 +1,51 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
+using System.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public class JsonFileEntityPipeline : BaseEntityPipeline
 	{
-		private readonly object _locker = new object();
-		private string _dataFolder;
+		private readonly Dictionary<string, StreamWriter> _writers = new Dictionary<string, StreamWriter>();
 
-		public override void Init(ISpider spider)
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
-			base.Init(spider);
-
-			lock (_locker)
+			StreamWriter writer;
+			var dataFolder = Path.Combine(Env.BaseDirectory, "json", spider.Identity);
+			var jsonFile = Path.Combine(dataFolder, $"{entityName}.json");
+			if (_writers.ContainsKey(jsonFile))
 			{
-				_dataFolder = Path.Combine(Env.BaseDirectory, spider.Identity, "entityJson");
+				writer = _writers[jsonFile];
 			}
-		}
-
-		public override int Process(string entityName, List<dynamic> datas)
-		{
-			lock (_locker)
+			else
 			{
-				var fileInfo = FileUtil.PrepareFile(Path.Combine(_dataFolder, $"{entityName}.json"));
-
-				foreach (var entry in datas)
+				if (!Directory.Exists(dataFolder))
 				{
-					File.AppendAllText(fileInfo.Name, entry.ToString());
+					Directory.CreateDirectory(dataFolder);
 				}
-				return datas.Count;
+				writer = new StreamWriter(File.OpenWrite(jsonFile), Encoding.UTF8);
+				_writers.Add(jsonFile, writer);
 			}
+
+			foreach (var entry in datas)
+			{
+				writer.WriteLine(entry.ToString());
+			}
+			return datas.Count();
 		}
 
-		public override void AddEntity(IEntityDefine type)
+		public override void Dispose()
 		{
+			base.Dispose();
+			foreach(var writer in _writers)
+			{
+				writer.Value.Dispose();
+			}
 		}
 	}
 }

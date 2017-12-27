@@ -6,7 +6,7 @@ using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public class DefaultMySqlPipeline : Core.Pipeline.BasePipeline
+	public class DefaultMySqlPipeline : BasePipeline
 	{
 		public ConnectionStringSettings ConnectionStringSettings { get; private set; }
 
@@ -17,7 +17,6 @@ namespace DotnetSpider.Extension.Pipeline
 		public DefaultMySqlPipeline(string database = "test", string tableName = "myHtml") : this(null, database, tableName)
 		{
 		}
-
 
 		public DefaultMySqlPipeline(string connectString, string database, string tableName)
 		{
@@ -31,7 +30,7 @@ namespace DotnetSpider.Extension.Pipeline
 			InitDatabaseAndTable(Database, TableName);
 		}
 
-		public override void Process(IEnumerable<ResultItems> resultItems)
+		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			var results = new List<DefaulHtmlContent>();
 			foreach (var resultItem in resultItems)

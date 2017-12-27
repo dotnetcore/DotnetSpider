@@ -2,7 +2,6 @@
 using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
-using Site = DotnetSpider.Core.Site;
 using System.Linq;
 
 namespace DotnetSpider.Extension.Processor

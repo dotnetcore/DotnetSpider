@@ -7,6 +7,8 @@ using System;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;
+using System.Linq;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -25,7 +27,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.TableInfo == null)
 			{
-				Logger.AllLog(Spider?.Identity, $"Schema is necessary, skip {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
+				Logger.AllLog($"Schema is necessary, skip {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
 				return;
 			}
 
@@ -35,7 +37,7 @@ namespace DotnetSpider.Extension.Pipeline
 			_collections.TryAdd(metadata.Name, db.GetCollection<BsonDocument>(metadata.TableInfo.CalculateTableName()));
 		}
 
-		public override int Process(string entityName, List<dynamic> datas)
+		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			if (_collections.TryGetValue(entityName, out var collection))
 			{
@@ -59,7 +61,7 @@ namespace DotnetSpider.Extension.Pipeline
 					action();
 				}
 			}
-			return datas.Count;
+			return datas.Count();
 		}
 	}
 }
