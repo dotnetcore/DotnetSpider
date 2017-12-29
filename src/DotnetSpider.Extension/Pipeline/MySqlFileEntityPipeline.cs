@@ -4,8 +4,6 @@ using System.Text;
 using DotnetSpider.Core;
 using System.Linq;
 using MySql.Data.MySqlClient;
-using System.Configuration;
-using DotnetSpider.Core.Infrastructure;
 using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Extension.Pipeline

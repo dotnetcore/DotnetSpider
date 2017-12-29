@@ -1,7 +1,6 @@
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.Linq;

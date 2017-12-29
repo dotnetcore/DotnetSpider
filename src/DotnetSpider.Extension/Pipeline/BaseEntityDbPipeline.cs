@@ -3,7 +3,6 @@ using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
-using System.Collections.Concurrent;
 using NLog;
 using DotnetSpider.Extension.Infrastructure;
 using System.Configuration;

@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
+﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Infrastructure;

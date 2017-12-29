@@ -7,6 +7,7 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using System.Linq;
+using DotnetSpider.Core.Processor;
 
 namespace DotnetSpider.Sample
 {
@@ -94,7 +95,7 @@ namespace DotnetSpider.Sample
 		protected override void MyInit(params string[] arguments)
 		{
 			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler("g_page_config = {", "g_srp_loadCss();", 16, 22));
-			Downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&s=0", 44));
+			Downloader.AddAfterDownloadCompleteHandler(new TargetUrlsHandler(new AutoIncrementTargetUrlsExtractor("&s=0", 44)));
 			Downloader.AddAfterDownloadCompleteHandler(new MyAfterDownloadHandler());
 			SkipWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Core.Infrastructure;
 

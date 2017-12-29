@@ -1,16 +1,5 @@
-﻿using Dapper;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Pipeline;
-using MySql.Data.MySqlClient;
+﻿using DotnetSpider.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using DotnetSpider.Extension.Infrastructure;
-using OpenQA.Selenium.Chrome;
-using System.IO;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else

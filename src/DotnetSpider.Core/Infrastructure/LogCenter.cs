@@ -8,7 +8,6 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.Text;
 using DotnetSpider.Core.Redial;
-using System.Threading;
 using Polly.Retry;
 using Polly;
 

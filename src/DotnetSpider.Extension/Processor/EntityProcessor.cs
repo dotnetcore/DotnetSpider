@@ -3,6 +3,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Extension.Processor
 {
@@ -21,6 +22,20 @@ namespace DotnetSpider.Extension.Processor
 		{
 			Extractor = new EntityExtractor<T>(dataHandler, tableName);
 
+			RegionAndPatternTargetUrlsExtractor regionAndPatternTargetUrlsExtractor;
+			if (TargetUrlsExtractor == null)
+			{
+				regionAndPatternTargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor();
+				TargetUrlsExtractor = regionAndPatternTargetUrlsExtractor;
+			}
+			else
+			{
+				regionAndPatternTargetUrlsExtractor = TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor;
+			}
+			if (regionAndPatternTargetUrlsExtractor == null)
+			{
+				return;
+			}
 			if (Extractor.EntityDefine.TargetUrlsSelectors != null && Extractor.EntityDefine.TargetUrlsSelectors.Count > 0)
 			{
 				foreach (var targetUrlsSelector in Extractor.EntityDefine.TargetUrlsSelectors)
@@ -35,18 +50,38 @@ namespace DotnetSpider.Extension.Processor
 					{
 						foreach (var xpath in xpaths)
 						{
-							AddTargetUrlExtractor(xpath, patterns);
+							regionAndPatternTargetUrlsExtractor.AddTargetUrlExtractor(xpath, patterns);
 						}
 					}
 					else
 					{
 						if (patterns != null && patterns.Length > 0)
 						{
-							AddTargetUrlExtractor(null, patterns);
+							regionAndPatternTargetUrlsExtractor.AddTargetUrlExtractor(null, patterns);
 						}
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Only used for test
+		/// </summary>
+		/// <param name="region"></param>
+		/// <returns></returns>
+		internal virtual bool ContainsTargetUrlRegion(string region)
+		{
+			return (TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor).ContainsTargetUrlRegion(region);
+		}
+
+		/// <summary>
+		/// Only used for test
+		/// </summary>
+		/// <param name="region"></param>
+		/// <returns></returns>
+		internal virtual List<Regex> GetTargetUrlPatterns(string region)
+		{
+			return (TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor).GetTargetUrlPatterns(region);
 		}
 
 		protected override void Handle(Page page)

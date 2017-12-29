@@ -1,16 +1,12 @@
-﻿using DotnetSpider.Extension;
+﻿using DotnetSpider.Core;
 using System;
 
 namespace DotnetSpider.Sample
 {
-	public class CustomSpider1 : CustomSpider
+	[TaskName("CustomSpider1")]
+	public class CustomSpider1 : AppBase
 	{
-		public CustomSpider1() : base("CustomSpider1")
-		{
-			Identity = Guid.NewGuid().ToString();
-		}
-
-		protected override void ImplementAction(params string[] arguments)
+		protected override void RunApp(params string[] arguments)
 		{
 			Console.WriteLine("hello");
 		}

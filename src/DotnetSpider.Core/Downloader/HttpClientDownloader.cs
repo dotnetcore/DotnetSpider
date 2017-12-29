@@ -9,6 +9,7 @@ using System.Net.Http;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;
+using System.Net;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -18,9 +19,9 @@ namespace DotnetSpider.Core.Downloader
 	public class HttpClientDownloader : BaseDownloader
 	{
 		/// <summary>
-		/// 定义哪些类型的内容是要当成文件下载
+		/// 定义哪些类型的内容不需要当成文件下载
 		/// </summary>
-		public static HashSet<string> MediaTypes = new HashSet<string>
+		public static HashSet<string> ExcludeMediaTypes = new HashSet<string>
 		{
 			"text/html",
 			"text/plain",
@@ -40,15 +41,15 @@ namespace DotnetSpider.Core.Downloader
 		/// HttpClient池, 仅在使用代理的情况下使用, 但要研究如何解决端口耗尽的问题
 		/// </summary>
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
-		private static readonly HttpClient HttpClient;
-		private readonly string _downloadFolder;
-
-		private readonly bool _decodeHtml;
-
-		static HttpClientDownloader()
+		private static readonly HttpClient HttpClient = new HttpClient(new HttpClientHandler
 		{
-			HttpClient = HttpSender.Client;
-		}
+			AllowAutoRedirect = true,
+			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+			UseProxy = true,
+			UseCookies = false
+		});
+		private readonly string _downloadFolder;
+		private readonly bool _decodeHtml;
 
 		public HttpClientDownloader()
 		{
@@ -82,7 +83,7 @@ namespace DotnetSpider.Core.Downloader
 
 				Page page;
 
-				if (response.Content.Headers.ContentType != null && !MediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
+				if (response.Content.Headers.ContentType != null && !ExcludeMediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
 				{
 					if (!site.DownloadFiles)
 					{

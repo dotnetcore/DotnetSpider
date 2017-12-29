@@ -1,10 +1,8 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using Newtonsoft.Json.Linq;
 using NLog;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
+using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -15,15 +13,11 @@ namespace DotnetSpider.Core.Downloader
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		private readonly object _lock = new object();
-
 		/// <summary>
 		/// 是否检测过下载内容的类型
 		/// </summary>
-		private bool _detectContentType;
-
+		private bool _detectedContentType;
 		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
-
 		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
 
 		public Page Download(Request request, ISpider spider)
@@ -73,27 +67,25 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
+		[MethodImpl(MethodImplOptions.Synchronized)]
 		private void TryDetectContentType(Page page, ISpider spider)
 		{
-			lock (_lock)
+			if (!_detectedContentType)
 			{
-				if (!_detectContentType)
+				if (page != null && page.Exception == null && spider.Site.ContentType == ContentType.Auto)
 				{
-					if (page != null && page.Exception == null && spider.Site.ContentType == ContentType.Auto)
+					try
 					{
-						try
-						{
-							JToken.Parse(page.Content);
-							spider.Site.ContentType = ContentType.Json;
-						}
-						catch
-						{
-							spider.Site.ContentType = ContentType.Html;
-						}
-						finally
-						{
-							_detectContentType = true;
-						}
+						JToken.Parse(page.Content);
+						spider.Site.ContentType = ContentType.Json;
+					}
+					catch
+					{
+						spider.Site.ContentType = ContentType.Html;
+					}
+					finally
+					{
+						_detectedContentType = true;
 					}
 				}
 			}

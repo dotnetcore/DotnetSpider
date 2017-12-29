@@ -13,8 +13,16 @@ namespace DotnetSpider.Core.Downloader
 		/// <returns>下载内容封装好的页面对象</returns>
 		Page Download(Request request, ISpider spider);
 
+		/// <summary>
+		/// 添加下载完成后的后续处理操作
+		/// </summary>
+		/// <param name="handler"><see cref="IAfterDownloadCompleteHandler"/></param>
 		void AddAfterDownloadCompleteHandler(IAfterDownloadCompleteHandler handler);
 
+		/// <summary>
+		/// 添加下载操作前的处理操作
+		/// </summary>
+		/// <param name="handler"><see cref="IBeforeDownloadHandler"/></param>
 		void AddBeforeDownloadHandler(IBeforeDownloadHandler handler);
 	}
 }

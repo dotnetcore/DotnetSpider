@@ -4,14 +4,21 @@ namespace DotnetSpider.Core.Processor
 	{
 		public DefaultPageProcessor(string[] partterns = null, string[] excludeParterns = null)
 		{
+			var targetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor();
 			if (partterns != null && partterns.Length > 0)
 			{
-				AddTargetUrlExtractor(".", partterns);
+				targetUrlsExtractor.AddTargetUrlExtractor(".", partterns);
 			}
 			if (excludeParterns != null && excludeParterns.Length > 0)
 			{
-				AddExcludeTargetUrlPattern(excludeParterns);
+				targetUrlsExtractor.AddExcludeTargetUrlPatterns(excludeParterns);
 			}
+			TargetUrlsExtractor = targetUrlsExtractor;
+		}
+
+		public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
+		{
+			(TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor).AddTargetUrlExtractor(regionXpath, patterns);
 		}
 
 		protected override void Handle(Page page)

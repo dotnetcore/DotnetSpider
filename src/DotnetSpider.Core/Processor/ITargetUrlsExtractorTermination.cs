@@ -1,4 +1,4 @@
-﻿namespace DotnetSpider.Core.Downloader
+﻿namespace DotnetSpider.Core.Processor
 {
 	public interface ITargetUrlsExtractorTermination
 	{
@@ -6,8 +6,7 @@
 		/// Return true, skip all urls from target urls builder.
 		/// </summary>
 		/// <param name="page"></param>
-		/// <param name="creator"></param>
-		/// <returns></returns>
-		bool IsTermination(Page page, TargetUrlsExtractor creator);
+		/// <returns>是否到了最终一个链接</returns>
+		bool IsTermination(Page page);
 	}
 }

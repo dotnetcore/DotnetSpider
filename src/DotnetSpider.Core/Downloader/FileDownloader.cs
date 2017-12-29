@@ -2,6 +2,9 @@
 
 namespace DotnetSpider.Core.Downloader
 {
+	/// <summary>
+	/// 从本地文件中下载内容
+	/// </summary>
 	public class FileDownloader : BaseDownloader
 	{
 		protected override Page DowloadContent(Request request, ISpider spider)

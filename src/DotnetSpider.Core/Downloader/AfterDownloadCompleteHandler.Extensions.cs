@@ -1,16 +1,43 @@
 ﻿using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Redial;
 using HtmlAgilityPack;
 using NLog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Downloader
 {
+	public class TargetUrlsHandler : AfterDownloadCompleteHandler
+	{
+		private readonly ITargetUrlsExtractor _targetUrlsExtractor;
+		private readonly bool _extractByProcessor;
+
+		public TargetUrlsHandler(ITargetUrlsExtractor targetUrlsExtractor, bool  extractByProcessor = false)
+		{
+			_targetUrlsExtractor = targetUrlsExtractor ?? throw new ArgumentNullException(nameof(targetUrlsExtractor));
+			_extractByProcessor = extractByProcessor;
+		}
+
+		public override void Handle(ref Page page, ISpider spider)
+		{
+			if (_targetUrlsExtractor == null)
+			{
+				return;
+			}
+			var urls = _targetUrlsExtractor.ExtractUrls(page, spider.Site);
+			foreach (var url in urls)
+			{
+				page.AddTargetRequest(new Request(url, page.Request.Extras));
+			}
+			if (!_extractByProcessor)
+			{
+				page.SkipExtractTargetUrls = page.SkipExtractTargetUrls ? page.SkipExtractTargetUrls : true;
+			}
+		}
+	}
+
 	public class UpdateCookieWhenContainsContentHandler : AfterDownloadCompleteHandler
 	{
 		private readonly ICookieInjector _cookieInjector;

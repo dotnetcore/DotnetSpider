@@ -20,7 +20,6 @@ using System.Reflection;
 using Polly;
 using Polly.Retry;
 using System.IO.MemoryMappedFiles;
-using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
 [assembly: InternalsVisibleTo("DotnetSpider.Sample")]

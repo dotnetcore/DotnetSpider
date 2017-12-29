@@ -2,7 +2,6 @@
 using System.Threading;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Scheduler;
 using Xunit;
 using System.Diagnostics;
 using System.IO;

@@ -12,7 +12,7 @@ namespace DotnetSpider.Core.Test.Processor
 		{
 			public CnblogsProcessor1()
 			{
-				AddTargetUrlExtractor(".//div[@class='pager']", "/sitehome/p/\\d+", "^http://www\\.cnblogs\\.com/$");
+				TargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor(".//div[@class='pager']", "/sitehome/p/\\d+", "^http://www\\.cnblogs\\.com/$");
 			}
 
 			protected override void Handle(Page page)
@@ -43,7 +43,7 @@ namespace DotnetSpider.Core.Test.Processor
 		{
 			public CnblogsProcessor2()
 			{
-				AddTargetUrlExtractor(".//div[@class='pager']", "/sitehome/p/\\d+", "^http://www\\.cnblogs\\.com/$");
+				TargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor(".//div[@class='pager']", "/sitehome/p/\\d+", "^http://www\\.cnblogs\\.com/$");
 			}
 
 			protected override void Handle(Page page)
@@ -73,7 +73,7 @@ namespace DotnetSpider.Core.Test.Processor
 		{
 			public CnblogsProcessor3()
 			{
-				AddTargetUrlExtractor(".", "/sitehome/p/\\d+");
+				TargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor(".", "/sitehome/p/\\d+");
 			}
 
 			protected override void Handle(Page page)
@@ -103,7 +103,7 @@ namespace DotnetSpider.Core.Test.Processor
 		{
 			public CnblogsProcessor4()
 			{
-				AddTargetUrlExtractor(".", "/sitehome/p/\\d+");
+				TargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor(".", "/sitehome/p/\\d+");
 			}
 
 			protected override void Handle(Page page)

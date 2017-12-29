@@ -1,13 +1,13 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 
-namespace DotnetSpider.Extension.Downloader
+namespace DotnetSpider.Extension.Processor
 {
-	public class PaggerTermination : ITargetUrlsExtractorTermination
+	public class PaggerTermination
 	{
 		public BaseSelector TotalPageSelector { get; set; }
 		public Formatter[] TotalPageFormatters { get; set; }
@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Downloader
 		public BaseSelector CurrenctPageSelector { get; set; }
 		public Formatter[] CurrnetPageFormatters { get; set; }
 
-		public bool IsTermination(Page page, TargetUrlsExtractor creator)
+		public bool IsTermination(Page page, ITargetUrlsExtractor creator)
 		{
 			if (TotalPageSelector == null || CurrenctPageSelector == null)
 			{

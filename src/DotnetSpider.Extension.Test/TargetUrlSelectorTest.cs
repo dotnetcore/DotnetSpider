@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
+﻿using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Processor;
 using System;
@@ -103,6 +102,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			new EntityDefine<Entity14>();
 			var processor = new EntityProcessor<Entity14>();
+
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"222\"]") == null);
@@ -113,6 +113,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			new EntityDefine<Entity16>();
 			var processor = new EntityProcessor<Entity16>();
+
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 
@@ -170,7 +171,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			new EntityDefine<Entity19>();
 			var processor = new EntityProcessor<Entity19>();
- 
+
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 
@@ -185,7 +186,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			new EntityDefine<Entity20>();
 			var processor = new EntityProcessor<Entity20>();
- 
+
 			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.Equal(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[1].ToString());
@@ -198,7 +199,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			new EntityDefine<Entity21>();
 			var processor = new EntityProcessor<Entity21>();
- 
+
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 
@@ -210,7 +211,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			new EntityDefine<Entity22>();
 			var processor = new EntityProcessor<Entity22>();
- 
+
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
 
@@ -257,7 +258,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			new EntityDefine<Entity25>();
 			var processor = new EntityProcessor<Entity25>();
-	 
+
 			Assert.Single(processor.GetTargetUrlPatterns(null));
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns(null)[0].ToString());
 

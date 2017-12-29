@@ -3,7 +3,6 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Pipeline;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {

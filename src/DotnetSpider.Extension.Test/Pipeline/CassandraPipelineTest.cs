@@ -25,7 +25,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			session.DeleteKeyspaceIfExists(keyspace);
 		}
 
-		[Fact]
+		[Fact(Skip = "aaa")]
 		public void Insert()
 		{
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -72,7 +72,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			ClearDb();
 		}
 
-		[Fact]
+		[Fact(Skip = "aaa")]
 		public void InsertAndIgnoreDuplicate()
 		{
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -134,7 +134,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			ClearDb();
 		}
 
-		[Fact]
+		[Fact(Skip = "aaa")]
 		public void Update()
 		{
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -200,7 +200,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			ClearDb();
 		}
 
-		[Fact]
+		[Fact(Skip = "aaa")]
 		public void UpdatePipelineUseAppConfig()
 		{
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -269,7 +269,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 
-		[Fact]
+		[Fact(Skip = "aaa")]
 		public void InsertUseAppConfig()
 		{
 		}

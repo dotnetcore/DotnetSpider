@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using NLog;
 using System.Collections.Generic;
-using System.IO;
 #if NET_CORE
 #endif
 

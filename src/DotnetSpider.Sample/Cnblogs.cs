@@ -68,7 +68,7 @@ namespace DotnetSpider.Sample
 			public BlogSumaryProcessor()
 			{
 				// 定义目标页的筛选
-				AddTargetUrlExtractor(".", "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+");
+				TargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor(".", "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+");
 			}
 
 			protected override void Handle(Page page)
@@ -95,8 +95,7 @@ namespace DotnetSpider.Sample
 		{
 			public NewsProcessor()
 			{
-				// 定义目标页的筛选
-				AddTargetUrlExtractor(null, "^http://www\\.cnblogs\\.com/$", "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+");
+				TargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor(null, "^http://www\\.cnblogs\\.com/$", "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+");
 			}
 
 			protected override void Handle(Page page)

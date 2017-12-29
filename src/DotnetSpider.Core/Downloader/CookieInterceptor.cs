@@ -10,9 +10,14 @@ namespace DotnetSpider.Core.Downloader
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public virtual void Inject(ISpider spider, bool stopSpider = true)
+		/// <summary>
+		/// 执行注入Cookie的操作
+		/// </summary>
+		/// <param name="spider">需要注入Cookie的爬虫</param>
+		/// <param name="pauseBeforeInject">注入Cookie前是否先暂停爬虫</param>
+		public virtual void Inject(ISpider spider, bool pauseBeforeInject = true)
 		{
-			if (stopSpider)
+			if (pauseBeforeInject)
 			{
 				spider.Pause(() =>
 				{
