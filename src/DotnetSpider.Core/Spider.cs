@@ -1449,18 +1449,13 @@ namespace DotnetSpider.Core
 			{
 				return 10;
 			}
-			else if (scheduler.LeftRequestsCount > 10)
-			{
-				return 4;
-			}
-			else if (scheduler.LeftRequestsCount > 5)
+
+			if (scheduler.LeftRequestsCount > 5)
 			{
 				return 2;
 			}
-			else
-			{
-				return 1;
-			}
+
+			return 1;
 		}
 
 		private void PrepareErrorRequestsLogFile()
