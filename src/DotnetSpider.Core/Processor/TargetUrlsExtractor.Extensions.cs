@@ -228,7 +228,7 @@ namespace DotnetSpider.Core.Processor
 		/// </summary>
 		public readonly string PagerString;
 
-		protected PagerTargetUrlsExtractor(string pagerString)
+		protected PagerTargetUrlsExtractor(string pagerString, ITargetUrlsExtractorTermination termination = null)
 		{
 			if (string.IsNullOrEmpty(pagerString) || string.IsNullOrWhiteSpace(pagerString))
 			{
@@ -237,7 +237,7 @@ namespace DotnetSpider.Core.Processor
 
 			PagerString = pagerString;
 			_pagerPattern = new Regex($"{RegexUtil.NumRegex.Replace(PagerString, @"\d+")}");
-
+			TerminationDetector = termination;
 		}
 
 		public string GetCurrentPagger(string currentUrlOrContent)
@@ -250,7 +250,7 @@ namespace DotnetSpider.Core.Processor
 	{
 		private readonly int _interval;
 
-		public AutoIncrementTargetUrlsExtractor(string pagerString, int interval = 1) : base(pagerString)
+		public AutoIncrementTargetUrlsExtractor(string pagerString, int interval = 1, ITargetUrlsExtractorTermination termination = null) : base(pagerString, termination)
 		{
 			_interval = interval;
 		}
