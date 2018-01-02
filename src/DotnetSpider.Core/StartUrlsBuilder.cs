@@ -3,19 +3,19 @@
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// Some easy method to help spider build start urls.
+	/// 构造起始链接
 	/// </summary>
-	public interface IStartUrlBuilder
+	public interface IStartUrlsBuilder
 	{
 		void Build(Site spider);
 	}
 
-	public abstract class StartUrlBuilder : Named, IStartUrlBuilder
+	public abstract class StartUrlsBuilder : Named, IStartUrlsBuilder
 	{
 		public abstract void Build(Site spider);
 	}
 
-	public class CycleStartUrlBuilder : StartUrlBuilder
+	public class ForeachStartUrlsBuilder : StartUrlsBuilder
 	{
 		public int From { get; }
 
@@ -27,7 +27,7 @@ namespace DotnetSpider.Core
 
 		public string Postfix { get; }
 
-		public CycleStartUrlBuilder(int min, int max, int interval, string prefix, string postfix)
+		public ForeachStartUrlsBuilder(int min, int max, int interval, string prefix, string postfix)
 		{
 			From = min;
 			To = max;
@@ -46,7 +46,7 @@ namespace DotnetSpider.Core
 		}
 	}
 
-	public class CycleDateStartUrlBuilder : StartUrlBuilder
+	public class ForeachDateStartUrlBuilder : StartUrlsBuilder
 	{
 		public DateTime From { get; }
 
@@ -60,7 +60,7 @@ namespace DotnetSpider.Core
 
 		public string Postfix { get; }
 
-		public CycleDateStartUrlBuilder(DateTime from, DateTime to, int interval, string prefix, string postfix, string dateFormateString = "yyyy-MM-dd")
+		public ForeachDateStartUrlBuilder(DateTime from, DateTime to, int interval, string prefix, string postfix, string dateFormateString = "yyyy-MM-dd")
 		{
 			From = from;
 			To = to;

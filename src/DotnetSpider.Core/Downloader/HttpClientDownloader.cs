@@ -59,7 +59,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="timeout">下载器超时时间</param>
+		/// <param name="timeout">下载超时时间</param>
 		/// <param name="decodeHtml">下载的内容是否需要HTML解码</param>
 		public HttpClientDownloader(int timeout = 5, bool decodeHtml = false) : this()
 		{
@@ -145,17 +145,13 @@ namespace DotnetSpider.Core.Downloader
 			}
 			finally
 			{
-				// 先Close Response, 避免前面语句异常导致没有关闭.
 				try
 				{
-					//ensure the connection is released back to pool
-					//check:
-					//EntityUtils.consume(httpResponse.getEntity());
 					response?.Dispose();
 				}
 				catch (Exception e)
 				{
-					Logger.AllLog(spider.Identity, "Close response fail.", LogLevel.Error, e);
+					Logger.AllLog(spider.Identity, $"Close response fail: {e}", LogLevel.Error, e);
 				}
 			}
 		}
@@ -164,7 +160,8 @@ namespace DotnetSpider.Core.Downloader
 		{
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(request.Method, request.Url);
 
-			httpRequestMessage.Headers.Add("User-Agent", site.Headers.ContainsKey("User-Agent") ? site.Headers["User-Agent"] : site.UserAgent);
+			var userAgentHeader = "User-Agent";
+			httpRequestMessage.Headers.Add(userAgentHeader, site.Headers.ContainsKey(userAgentHeader) ? site.Headers[userAgentHeader] : site.UserAgent);
 
 			if (!string.IsNullOrEmpty(request.Referer))
 			{
@@ -181,9 +178,11 @@ namespace DotnetSpider.Core.Downloader
 				httpRequestMessage.Headers.Add("Accept", site.Accept);
 			}
 
+			var contentTypeHeader = "Content-Type";
+
 			foreach (var header in site.Headers)
 			{
-				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) && header.Key != "Content-Type" && header.Key != "User-Agent")
+				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) && header.Key != contentTypeHeader && header.Key != userAgentHeader)
 				{
 					httpRequestMessage.Headers.Add(header.Key, header.Value);
 				}
@@ -196,20 +195,22 @@ namespace DotnetSpider.Core.Downloader
 				var data = string.IsNullOrEmpty(site.EncodingName) ? Encoding.UTF8.GetBytes(request.PostBody) : site.Encoding.GetBytes(request.PostBody);
 				httpRequestMessage.Content = new StreamContent(new MemoryStream(data));
 
-				if (site.Headers.ContainsKey("Content-Type"))
+
+				if (site.Headers.ContainsKey(contentTypeHeader))
 				{
-					httpRequestMessage.Content.Headers.Add("Content-Type", site.Headers["Content-Type"]);
+					httpRequestMessage.Content.Headers.Add(contentTypeHeader, site.Headers[contentTypeHeader]);
 				}
 
-				if (site.Headers.ContainsKey("X-Requested-With") && site.Headers["X-Requested-With"] == "NULL")
+				var xRequestedWithHeader = "X-Requested-With";
+				if (site.Headers.ContainsKey(xRequestedWithHeader) && site.Headers[xRequestedWithHeader] == "NULL")
 				{
-					httpRequestMessage.Content.Headers.Remove("X-Requested-With");
+					httpRequestMessage.Content.Headers.Remove(xRequestedWithHeader);
 				}
 				else
 				{
-					if (!httpRequestMessage.Content.Headers.Contains("X-Requested-With") && !httpRequestMessage.Headers.Contains("X-Requested-With"))
+					if (!httpRequestMessage.Content.Headers.Contains(xRequestedWithHeader) && !httpRequestMessage.Headers.Contains(xRequestedWithHeader))
 					{
-						httpRequestMessage.Content.Headers.Add("X-Requested-With", "XMLHttpRequest");
+						httpRequestMessage.Content.Headers.Add(xRequestedWithHeader, "XMLHttpRequest");
 					}
 				}
 			}

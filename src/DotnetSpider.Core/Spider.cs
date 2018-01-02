@@ -216,7 +216,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Start url builders of spider.
 		/// </summary>
-		public readonly List<IStartUrlBuilder> StartUrlBuilders = new List<IStartUrlBuilder>();
+		public readonly List<IStartUrlsBuilder> StartUrlBuilders = new List<IStartUrlsBuilder>();
 
 		/// <summary>
 		/// Interface used to adsl redial.
@@ -433,7 +433,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <returns></returns>
-		public Spider AddStartUrlBuilder(IStartUrlBuilder builder)
+		public Spider AddStartUrlBuilder(IStartUrlsBuilder builder)
 		{
 			StartUrlBuilders.Add(builder);
 			return this;

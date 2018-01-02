@@ -23,7 +23,7 @@ namespace DotnetSpider.Core
 		/// <param name="taskId">任务编号</param>
 		/// <param name="name">任务名称</param>
 		/// <param name="identity">任务标识</param>
-		/// <returns></returns>
+		/// <returns>是否上报成功</returns>
 		public bool Add(string taskId, string name, string identity)
 		{
 			if (string.IsNullOrEmpty(taskId) || string.IsNullOrWhiteSpace(taskId))

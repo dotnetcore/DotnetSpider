@@ -221,10 +221,10 @@ namespace DotnetSpider.Core.Processor
 
 	public abstract class PaginationTargetUrlsExtractor : TargetUrlsExtractor
 	{
-		private readonly Regex _paginationPattern;
+		public readonly Regex PaginationPattern;
 
 		/// <summary>
-		/// http://a.com?p=40  PaginationStr: p=40 Pattern: p=\d+
+		/// http://a.com?p=40  PaginationStr: p=40 => Pattern: p=\d+
 		/// </summary>
 		public readonly string PaginationStr;
 
@@ -232,17 +232,17 @@ namespace DotnetSpider.Core.Processor
 		{
 			if (string.IsNullOrEmpty(paginationStr) || string.IsNullOrWhiteSpace(paginationStr))
 			{
-				throw new SpiderException("pagerString should not be null.");
+				throw new SpiderException("paginationStr should not be null or empty.");
 			}
 
 			PaginationStr = paginationStr;
-			_paginationPattern = new Regex($"{RegexUtil.Number.Replace(PaginationStr, @"\d+")}");
+			PaginationPattern = new Regex($"{RegexUtil.Number.Replace(PaginationStr, @"\d+")}");
 			TargetUrlsExtractorTermination = termination;
 		}
 
 		protected string GetCurrentPagination(string currentUrlOrContent)
 		{
-			return _paginationPattern.Match(currentUrlOrContent).Value;
+			return PaginationPattern.Match(currentUrlOrContent).Value;
 		}
 	}
 
@@ -257,26 +257,17 @@ namespace DotnetSpider.Core.Processor
 
 		protected override IEnumerable<Request> Extract(Page page, Site site)
 		{
-			string newUrl = IncreasePage(page.Request.Url);
-			return string.IsNullOrEmpty(newUrl) ? null : new Request[] { new Request(newUrl, page.Request.Extras) { Site = site } };
-		}
-
-		private string IncreasePage(string currentUrl)
-		{
-			var currentPaggerString = GetCurrentPagination(currentUrl);
-			var matches = RegexUtil.Number.Matches(currentPaggerString);
-			if (matches.Count == 0)
+			var currentPageStr = GetCurrentPagination(page.Request.Url);
+			var matches = RegexUtil.Number.Matches(currentPageStr);
+			if (matches.Count > 0 && int.TryParse(matches[0].Value, out var currentPage))
 			{
-				return null;
+				var next = RegexUtil.Number.Replace(PaginationStr, (currentPage + _interval).ToString());
+				string newUrl = page.Request.Url.Replace(currentPageStr, next);
+				return new Request[] { new Request(newUrl, page.Request.Extras) { Site = site } };
 			}
 
-			if (int.TryParse(matches[0].Value, out var currentPagger))
-			{
-				var nextPagger = currentPagger + _interval;
-				var next = RegexUtil.Number.Replace(PaginationStr, nextPagger.ToString());
-				return currentUrl.Replace(currentPaggerString, next);
-			}
-			return null;
+			return new Request[0];
 		}
+
 	}
 }

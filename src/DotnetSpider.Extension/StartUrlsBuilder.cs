@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Extension
 {
-	public class DbStartUrlBuilder : StartUrlBuilder
+	public class DbStartUrlsBuilder : StartUrlsBuilder
 	{
 		public ConnectionStringSettings ConnectionStringSettings { get; }
 
@@ -31,7 +31,7 @@ namespace DotnetSpider.Extension
 		{
 		}
 
-		public DbStartUrlBuilder(string sql, string[] formateArguments, params string[] formateStrings)
+		public DbStartUrlsBuilder(string sql, string[] formateArguments, params string[] formateStrings)
 		{
 			if (Env.DataConnectionStringSettings == null)
 			{
@@ -43,7 +43,7 @@ namespace DotnetSpider.Extension
 			FormateArguments = formateArguments;
 		}
 
-		public DbStartUrlBuilder(Database source, string connectString, string sql, string[] formateArguments, params string[] formateStrings)
+		public DbStartUrlsBuilder(Database source, string connectString, string sql, string[] formateArguments, params string[] formateStrings)
 		{
 			switch (source)
 			{

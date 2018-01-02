@@ -32,7 +32,7 @@ namespace DotnetSpider.Sample
 			AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3355984&callback=json");
 			AddStartUrl("http://chat1.jd.com/api/checkChat?my=list&pidList=3682523&callback=json");
 
-			Downloader.AddAfterDownloadCompleteHandler(new SubContentHandler("json(", ");", 5, 2));
+			Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("json(", ");", 5, 2));
 
 			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost ;User ID=root;Password=;Port=3306"));
 			AddEntityType<ProductUpdater>();

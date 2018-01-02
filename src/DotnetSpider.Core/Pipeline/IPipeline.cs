@@ -8,17 +8,6 @@ namespace DotnetSpider.Core.Pipeline
 	/// </summary>
 	public interface IPipeline : IDisposable
 	{
-		///// <summary>
-		///// 数据管道服务所属爬虫
-		///// </summary>
-		//ISpider Spider { get; }
-
-		///// <summary>
-		///// 初始化数据管道
-		///// </summary>
-		///// <param name="spider">所属爬虫</param>
-		//void Init(ISpider spider);
-
 		/// <summary>
 		/// 处理页面解析器解析到的数据结果
 		/// </summary>
