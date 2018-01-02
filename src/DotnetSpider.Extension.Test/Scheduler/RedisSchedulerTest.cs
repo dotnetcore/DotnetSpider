@@ -201,28 +201,28 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Clear();
 		}
 
-		[Fact]
-		public void MultiInit()
-		{
-			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
+		//[Fact]
+		//public void MultiInit()
+		//{
+		//	Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 
-			ISpider spider = new DefaultSpider();
-			scheduler.Init(spider);
-			string queueKey = scheduler.GetQueueKey();
-			string setKey = scheduler.GetSetKey();
-			string itemKey = scheduler.GetItemKey();
-			string errorCountKey = scheduler.GetErrorCountKey();
-			string successCountKey = scheduler.GetSuccessCountKey();
-			scheduler.Init(spider);
-			Assert.Equal(queueKey, scheduler.GetQueueKey());
-			Assert.Equal(setKey, scheduler.GetSetKey());
-			Assert.Equal(itemKey, scheduler.GetItemKey());
-			Assert.Equal(errorCountKey, scheduler.GetErrorCountKey());
-			Assert.Equal(successCountKey, scheduler.GetSuccessCountKey());
+		//	ISpider spider = new DefaultSpider();
+		//	scheduler.Init(spider);
+		//	string queueKey = scheduler.GetQueueKey();
+		//	string setKey = scheduler.GetSetKey();
+		//	string itemKey = scheduler.GetItemKey();
+		//	string errorCountKey = scheduler.GetErrorCountKey();
+		//	string successCountKey = scheduler.GetSuccessCountKey();
+		//	scheduler.Init(spider);
+		//	Assert.Equal(queueKey, scheduler.GetQueueKey());
+		//	Assert.Equal(setKey, scheduler.GetSetKey());
+		//	Assert.Equal(itemKey, scheduler.GetItemKey());
+		//	Assert.Equal(errorCountKey, scheduler.GetErrorCountKey());
+		//	Assert.Equal(successCountKey, scheduler.GetSuccessCountKey());
 
-			scheduler.Dispose();
-			scheduler.Dispose();
-		}
+		//	scheduler.Dispose();
+		//	scheduler.Dispose();
+		//}
 
 		[Fact]
 		public void Clear()

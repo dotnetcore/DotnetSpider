@@ -17,7 +17,6 @@ namespace DotnetSpider.Extension.Pipeline
 	{
 		private PipelineMode _defaultPipelineModel;
 		private static readonly TimeUuid DefaultTimeUuid = default(TimeUuid);
-		private ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
 		private ISession _session;
 		private CassandraConnectionSetting ConnectionSetting { get; set; }
 

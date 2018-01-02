@@ -6,6 +6,9 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Redial
 {
+	/// <summary>
+	/// 通过文件锁锁实现的拨号器
+	/// </summary>
 	public class FileLockerRedialExecutor : LocalRedialExecutor
 	{
 		private sealed class FileLocker : ILocker

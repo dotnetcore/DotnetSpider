@@ -5,6 +5,9 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Redial
 {
+	/// <summary>
+	/// 通过进程锁实现的拨号器
+	/// </summary>
 	public sealed class MutexRedialExecutor : LocalRedialExecutor
 	{
 		private sealed class MutexLocker : ILocker

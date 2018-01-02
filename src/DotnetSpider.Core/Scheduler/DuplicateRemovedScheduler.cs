@@ -10,11 +10,11 @@ namespace DotnetSpider.Core.Scheduler
 	public abstract class DuplicateRemovedScheduler : Named, IScheduler
 	{
 		protected IDuplicateRemover DuplicateRemover { get; set; } = new HashSetDuplicateRemover();
-		private ISpider Spider { get; set; }
+		protected ISpider Spider { get; set; }
 
 		public abstract void IncreaseSuccessCount();
 		public abstract void IncreaseErrorCount();
-		
+
 		public abstract void Import(HashSet<Request> requests);
 
 		protected abstract bool UseInternet { get; set; }
@@ -48,7 +48,14 @@ namespace DotnetSpider.Core.Scheduler
 
 		public virtual void Init(ISpider spider)
 		{
-			Spider = spider;
+			if (Spider == null)
+			{
+				Spider = spider;
+			}
+			else
+			{
+				throw new SpiderException("Scheduler already init.");
+			}
 		}
 
 		public abstract void ResetDuplicateCheck();

@@ -8,6 +8,9 @@ using System.Threading;
 
 namespace DotnetSpider.Core.Redial
 {
+	/// <summary>
+	/// 单机拨号器+网络通讯器
+	/// </summary>
 	public abstract class LocalRedialExecutor : RedialExecutor
 	{
 		private static readonly string AtomicActionFolder;
@@ -47,6 +50,10 @@ namespace DotnetSpider.Core.Redial
 			return id;
 		}
 
+		/// <summary>
+		/// <see cref="RedialExecutor.DeleteActionIdentity(string)"/>
+		/// </summary>
+		/// <param name="identity"></param>
 		public override void DeleteActionIdentity(string identity)
 		{
 			NetworkFiles.TryRemove(identity, out var stream);
@@ -79,6 +86,9 @@ namespace DotnetSpider.Core.Redial
 			File.WriteAllText(RedialTimeFile, DateTime.Now.Ticks.ToString());
 		}
 
+		/// <summary>
+		/// <see cref="RedialExecutor.WaitAllNetworkRequestComplete"/>
+		/// </summary>
 		public override void WaitAllNetworkRequestComplete()
 		{
 			while (true)

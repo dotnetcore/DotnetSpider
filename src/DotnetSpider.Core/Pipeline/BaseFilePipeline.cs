@@ -3,6 +3,9 @@ using System.IO;
 
 namespace DotnetSpider.Core.Pipeline
 {
+	/// <summary>
+	/// 文件类型数据管理的抽象
+	/// </summary>
 	public abstract class BaseFilePipeline : BasePipeline
 	{
 		private readonly ConcurrentDictionary<string, string> _dataFolderCache = new ConcurrentDictionary<string, string>();

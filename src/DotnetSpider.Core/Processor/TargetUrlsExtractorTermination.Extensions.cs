@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Processor
 {
+	/// <summary>
+	/// 如果包含指定内容则到了最后一个采集链接
+	/// </summary>
 	public class ContainsTermination : ITargetUrlsExtractorTermination
 	{
 		private readonly string[] _contains;
@@ -24,6 +27,9 @@ namespace DotnetSpider.Core.Processor
 		}
 	}
 
+	/// <summary>
+	/// 如果不包含指定内容则到了最后一个采集链接
+	/// </summary>
 	public class UnContainsTermination : ITargetUrlsExtractorTermination
 	{
 		private readonly string[] _unContains;
@@ -44,6 +50,9 @@ namespace DotnetSpider.Core.Processor
 		}
 	}
 
+	/// <summary>
+	/// 最大分页数限制
+	/// </summary>
 	public class MaxPageTermination : ITargetUrlsExtractorTermination
 	{
 		private readonly Regex _paginationPattern;

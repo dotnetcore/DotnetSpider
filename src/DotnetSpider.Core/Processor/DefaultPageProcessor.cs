@@ -1,5 +1,8 @@
 namespace DotnetSpider.Core.Processor
 {
+	/// <summary>
+	/// 默认解析器, 没有特别大的作用, 用于测试等
+	/// </summary>
 	public class DefaultPageProcessor : BasePageProcessor
 	{
 		public DefaultPageProcessor(string[] partterns = null, string[] excludeParterns = null)

@@ -34,7 +34,6 @@ namespace DotnetSpider.Extension.Scheduler
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 		private string _connectString;
 		private RedisConnection _redisConnection;
-		private ISpider _spider;
 
 		public int BatchCount { get; set; } = 1000;
 
@@ -58,14 +57,12 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void Init(ISpider spider)
 		{
-			if (string.IsNullOrEmpty(_connectString))
-			{
-				throw new SpiderException("Redis connect string should not be empty.");
-			}
-
 			base.Init(spider);
 
-			_spider = spider;
+			if (string.IsNullOrEmpty(_connectString) || string.IsNullOrWhiteSpace(_connectString))
+			{
+				throw new SpiderException("Redis connect string should not be null or empty.");
+			}
 
 			if (string.IsNullOrEmpty(_identityMd5))
 			{
@@ -372,7 +369,7 @@ namespace DotnetSpider.Extension.Scheduler
 				{
 					var result = JsonConvert.DeserializeObject<Request>(json);
 					_redisConnection.Database.HashDelete(_itemKey, field);
-					result.Site = _spider.Site;
+					result.Site = Spider.Site;
 					return result;
 				}
 				return null;

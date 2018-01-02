@@ -2,6 +2,9 @@
 
 namespace DotnetSpider.Core.Pipeline
 {
+	/// <summary>
+	/// 所有数据结果存在内存中
+	/// </summary>
 	public class CollectionPipeline : BasePipeline, ICollectionPipeline
 	{
 		private readonly Dictionary<ISpider, List<ResultItems>> _items = new Dictionary<ISpider, List<ResultItems>>();

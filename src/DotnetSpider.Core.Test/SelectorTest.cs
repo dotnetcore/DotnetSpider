@@ -80,8 +80,8 @@ namespace DotnetSpider.Core.Test
 			var result1 = jsonPathSelector.Select(_text).ToString();
 			var list1 = jsonPathSelector.SelectList(_text);
 			Assert.Equal(result1, "Nigel Rees");
-			Assert.True(list1.Contains("Nigel Rees"));
-			Assert.True(list1.Contains("Evelyn Waugh"));
+			Assert.Contains("Nigel Rees", list1);
+			Assert.Contains("Evelyn Waugh", list1);
 
 			jsonPathSelector = new JsonPathSelector("$.store.book[?(@.category == 'reference')]");
 			var list2 = jsonPathSelector.SelectList(_text);

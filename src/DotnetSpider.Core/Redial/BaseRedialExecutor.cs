@@ -7,6 +7,9 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Redial
 {
+	/// <summary>
+	/// <see cref="IRedialExecutor"/>
+	/// </summary>
 	public abstract class RedialExecutor : IRedialExecutor
 	{
 		private static readonly ILogger Logger = LogCenter.GetLogger();
@@ -14,36 +17,51 @@ namespace DotnetSpider.Core.Redial
 		internal bool IsTest { get; set; }
 		private int WaitRedialTimeout { get; } = 100 * 1000 / 100;
 		private int RedialIntervalLimit { get; } = 10;
+
+		/// <summary>
+		/// 等待所有网络通讯结束
+		/// </summary>
 		public abstract void WaitAllNetworkRequestComplete();
+
+		/// <summary>
+		/// 创建通讯标识
+		/// </summary>
+		/// <param name="name">通讯标识前缀</param>
+		/// <returns>通讯标识</returns>
 		public abstract string CreateActionIdentity(string name);
+
+		/// <summary>
+		/// 删除通讯标识
+		/// </summary>
+		/// <param name="identity">通讯标识</param>
 		public abstract void DeleteActionIdentity(string identity);
+
+		/// <summary>
+		/// 创建同步锁
+		/// </summary>
+		/// <returns>同步锁</returns>
 		protected abstract ILocker CreateLocker();
+
+		/// <summary>
+		/// 判断是否有别的程序正在拨号
+		/// </summary>
+		/// <returns>是否有别的程序正在拨号, 如果有返回 True, 没有则返回 False.</returns>
 		protected abstract bool IsRedialing();
+
+		/// <summary>
+		/// 取得上次拨号的时间, 如果间隔太短则不执行拨号操作
+		/// </summary>
+		/// <returns>上次拨号的时间</returns>
 		protected abstract DateTime GetLastRedialTime();
+
+		/// <summary>
+		/// 记录拨号时间
+		/// </summary>
 		protected abstract void RecordLastRedialTime();
+
 		public abstract void Dispose();
 
 		public int AfterRedialWaitTime { get; set; } = -1;
-
-		private IRedialer Redialer { get; }
-
-		private IInternetDetector InternetDetector { get; }
-
-		private void WaitRedialComplete()
-		{
-			for (int i = 0; i < WaitRedialTimeout; ++i)
-			{
-				if (IsRedialing())
-				{
-					Thread.Sleep(100);
-				}
-				else
-				{
-					return;
-				}
-			}
-			throw new RedialException("Wait redial timeout.");
-		}
 
 		public RedialResult Redial(Action action = null)
 		{
@@ -200,6 +218,26 @@ namespace DotnetSpider.Core.Redial
 
 		protected RedialExecutor(IRedialer redialer) : this(redialer, new DefaultInternetDetector())
 		{
+		}
+
+		private IRedialer Redialer { get; }
+
+		private IInternetDetector InternetDetector { get; }
+
+		private void WaitRedialComplete()
+		{
+			for (int i = 0; i < WaitRedialTimeout; ++i)
+			{
+				if (IsRedialing())
+				{
+					Thread.Sleep(100);
+				}
+				else
+				{
+					return;
+				}
+			}
+			throw new RedialException("Wait redial timeout.");
 		}
 	}
 }

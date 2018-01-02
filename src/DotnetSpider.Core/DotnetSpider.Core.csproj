@@ -20,10 +20,15 @@
     <PackageIconUrl>https://raw.githubusercontent.com/dotnetcore/DotnetSpider/master/images/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider.git</RepositoryUrl>
     <PackageTags>DotnetSpider;crawler;cross platform;dotnet core</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <DocumentationFile>..\..\output\net45\DotnetSpider.Core.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
+    <DocumentationFile>..\..\output\net45\DotnetSpider.Core.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Autofac" Version="4.6.2" />

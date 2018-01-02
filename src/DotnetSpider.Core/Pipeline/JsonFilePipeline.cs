@@ -16,7 +16,6 @@ namespace DotnetSpider.Core.Pipeline
 	/// </summary>
 	public class JsonFilePipeline : BaseFilePipeline
 	{
-		private string _jsonFile;
 		private readonly ConcurrentDictionary<string, StreamWriter> _writers = new ConcurrentDictionary<string, StreamWriter>();
 
 		public JsonFilePipeline() : base("json")

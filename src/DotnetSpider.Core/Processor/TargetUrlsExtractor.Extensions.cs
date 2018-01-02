@@ -11,6 +11,9 @@ using System.Web;
 
 namespace DotnetSpider.Core.Processor
 {
+	/// <summary>
+	/// 指定区域下的链接并且需要符合给定正则的链接为符合要求的目标链接
+	/// </summary>
 	public class RegionAndPatternTargetUrlsExtractor : TargetUrlsExtractor
 	{
 		private readonly Dictionary<ISelector, List<Regex>> _regionSelectorMapPatterns = new Dictionary<ISelector, List<Regex>>();
@@ -246,10 +249,19 @@ namespace DotnetSpider.Core.Processor
 		}
 	}
 
+	/// <summary>
+	/// 通过自增计算出新的目标链接, 比如: www.a.com/1.html->www.a.com/2.html
+	/// </summary>
 	public class AutoIncrementTargetUrlsExtractor : PaginationTargetUrlsExtractor
 	{
 		private readonly int _interval;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="paginationStr">URL中分页的部分, 如: www.a.com/content_1.html, 则可以填此值为 content_1.html, tent_1.html等, 框架会把数据部分改成\d+用于正则匹配截取</param>
+		/// <param name="interval">每次自增的间隔</param>
+		/// <param name="termination">中止器, 用于判断是否已到最后一个需要采集的链接</param>
 		public AutoIncrementTargetUrlsExtractor(string paginationStr, int interval = 1, ITargetUrlsExtractorTermination termination = null) : base(paginationStr, termination)
 		{
 			_interval = interval;

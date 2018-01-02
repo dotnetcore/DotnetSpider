@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace DotnetSpider.Core.Pipeline
 {
 	/// <summary>
-	/// Write results in console.
+	/// Write results to console.
 	/// Usually used in test.
 	/// </summary>
 	public class ConsolePipeline : BasePipeline
