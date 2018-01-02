@@ -39,17 +39,17 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				{
 					if (e.Message.ToLower().StartsWith("authentication to host"))
 					{
-						Logger.AllLog($"{e}", LogLevel.Error);
+						Logger.AllLog($"{connectionStringSettings.ConnectionString}: {e}", LogLevel.Error);
 						Thread.Sleep(1000);
 					}
 					else
 					{
-						//throw;
+						Logger.AllLog($"{connectionStringSettings.ConnectionString}: {e}", LogLevel.Warn);
 					}
 				}
 			}
 
-			throw new SpiderException("Can't get db connection.");
+			throw new SpiderException($"Create or open DbConnection failed: {connectionStringSettings.ConnectionString}.");
 		}
 
 		public static DbConnection GetDbConnection(Database source, string connectString)
