@@ -160,7 +160,7 @@ namespace DotnetSpider.Core
 		[JsonIgnore]
 		public HttpStatusCode? StatusCode { get; set; }
 
-		internal Request()
+		public Request()
 		{
 		}
 
