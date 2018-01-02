@@ -7,7 +7,7 @@ namespace DotnetSpider.Extension.Model
 	{
 		IEntityDefine EntityDefine { get; }
 		List<T> Extract(Page page);
-		DataHandler<T> DataHandler { get; }
+		IDataHandler<T> DataHandler { get; }
 		string Name { get; }
 	}
 }

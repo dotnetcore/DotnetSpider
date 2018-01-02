@@ -12,11 +12,11 @@ namespace DotnetSpider.Extension.Model
 	{
 		public IEntityDefine EntityDefine { get; }
 
-		public DataHandler<T> DataHandler { get; }
+		public IDataHandler<T> DataHandler { get; }
 
 		public string Name => EntityDefine?.Name;
 
-		public EntityExtractor(DataHandler<T> dataHandler = null, string tableName = null)
+		public EntityExtractor(IDataHandler<T> dataHandler = null, string tableName = null)
 		{
 			EntityDefine = new EntityDefine<T>();
 			if (!string.IsNullOrEmpty(tableName) && !string.IsNullOrWhiteSpace(tableName))

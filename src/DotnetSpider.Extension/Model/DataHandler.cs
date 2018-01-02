@@ -3,11 +3,12 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Model
 {
-	public interface IDataHandler
+	public interface IDataHandler<T>
 	{
+		List<T> Handle(List<T> datas, Page page);
 	}
 
-	public abstract class DataHandler<T> : IDataHandler
+	public abstract class DataHandler<T> : IDataHandler<T>
 	{
 		protected abstract T HandleDataOject(T data, Page page);
 

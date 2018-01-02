@@ -490,7 +490,6 @@ namespace DotnetSpider.Extension.Test
 			{
 				EntitySpider context = new DefaultEntitySpider();
 				context.Identity = (Guid.NewGuid().ToString("N"));
-				context.ThreadNum = 1;
 				context.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
 
 				context.AddStartUrl("http://baidu.com");

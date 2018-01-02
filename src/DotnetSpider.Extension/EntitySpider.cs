@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
@@ -25,21 +26,36 @@ namespace DotnetSpider.Extension
 		{
 		}
 
-		public void AddEntityType<T>(string tableName = null) where T : ISpiderEntity
+		public void AddEntityType<T>() where T : ISpiderEntity
 		{
-			AddEntityType<T>(null, tableName);
+			AddEntityType<T>(null, null, null);
 		}
 
-		public void AddEntityType<T>(DataHandler<T> dataHandler) where T : ISpiderEntity
+		public void AddEntityType<T>(string tableName) where T : ISpiderEntity
 		{
-			AddEntityType(dataHandler, null);
+			AddEntityType<T>(null, null, tableName);
 		}
 
-		public void AddEntityType<T>(DataHandler<T> dataHandler, string tableName) where T : ISpiderEntity
+		public void AddEntityType<T>(IDataHandler<T> dataHandler ) where T : ISpiderEntity
+		{
+			AddEntityType(null, dataHandler, null);
+		}
+
+		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor) where T : ISpiderEntity
+		{
+			AddEntityType<T>(targetUrlsExtractor, null, null);
+		}
+
+		public void AddEntityType<T>(IDataHandler<T> dataHandler, string tableName) where T : ISpiderEntity
+		{
+			AddEntityType(null, dataHandler, tableName);
+		}
+
+		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler<T> dataHandler, string tableName) where T : ISpiderEntity
 		{
 			CheckIfRunning();
 
-			EntityProcessor<T> processor = new EntityProcessor<T>(dataHandler, tableName);
+			EntityProcessor<T> processor = new EntityProcessor<T>(targetUrlsExtractor, dataHandler, tableName);
 			AddPageProcessor(processor);
 		}
 

@@ -14,7 +14,7 @@ namespace DotnetSpider.Core.Downloader
 		private readonly ITargetUrlsExtractor _targetUrlsExtractor;
 		private readonly bool _extractByProcessor;
 
-		public TargetUrlsHandler(ITargetUrlsExtractor targetUrlsExtractor, bool  extractByProcessor = false)
+		public TargetUrlsHandler(ITargetUrlsExtractor targetUrlsExtractor, bool extractByProcessor = false)
 		{
 			_targetUrlsExtractor = targetUrlsExtractor ?? throw new ArgumentNullException(nameof(targetUrlsExtractor));
 			_extractByProcessor = extractByProcessor;

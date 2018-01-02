@@ -7,19 +7,19 @@ using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Extension.Processor
 {
-	public interface IEntityProcessor
-	{
-		IEntityDefine EntityDefine { get; }
-	}
-
 	public class EntityProcessor<T> : BasePageProcessor, IEntityProcessor where T : ISpiderEntity
 	{
 		public IEntityExtractor<T> Extractor { get; }
 
 		public IEntityDefine EntityDefine => Extractor?.EntityDefine;
 
-		public EntityProcessor(DataHandler<T> dataHandler = null, string tableName = null)
+		public EntityProcessor(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler<T> dataHandler, string tableName)
 		{
+			if (targetUrlsExtractor != null)
+			{
+				TargetUrlsExtractor = targetUrlsExtractor;
+			}
+
 			Extractor = new EntityExtractor<T>(dataHandler, tableName);
 
 			RegionAndPatternTargetUrlsExtractor regionAndPatternTargetUrlsExtractor;
@@ -62,6 +62,26 @@ namespace DotnetSpider.Extension.Processor
 					}
 				}
 			}
+		}
+
+		public EntityProcessor(IDataHandler<T> dataHandler) : this(null, dataHandler, null)
+		{
+		}
+
+		public EntityProcessor(ITargetUrlsExtractor targetUrlsExtractor) : this(targetUrlsExtractor, null, null)
+		{
+		}
+
+		public EntityProcessor(IDataHandler<T> dataHandler, string tableName) : this(null, dataHandler, tableName)
+		{
+		}
+
+		public EntityProcessor(string tableName) : this(null, null, tableName)
+		{
+		}
+
+		public EntityProcessor() : this(null, null, null)
+		{
 		}
 
 		/// <summary>
