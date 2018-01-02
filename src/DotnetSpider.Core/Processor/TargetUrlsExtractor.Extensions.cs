@@ -47,7 +47,7 @@ namespace DotnetSpider.Core.Processor
 				}
 				else if (page.ContentType == ContentType.Json)
 				{
-					links = page.Selectable.SelectList(Selectors.Regex(RegexUtil.UrlRegex)).Links().GetValues();
+					links = page.Selectable.SelectList(Selectors.Regex(RegexUtil.Url)).Links().GetValues();
 				}
 				else
 				{
@@ -150,7 +150,7 @@ namespace DotnetSpider.Core.Processor
 				throw new ArgumentNullException("Pattern value should not be null or empty.");
 			}
 
-			ISelector selector = Selectors.Regex(RegexUtil.UrlRegex);
+			ISelector selector = Selectors.Regex(RegexUtil.Url);
 			if (!string.IsNullOrEmpty(regionXpath))
 			{
 				string xpath = string.IsNullOrWhiteSpace(regionXpath.Trim()) ? "." : regionXpath.Trim();
@@ -204,7 +204,7 @@ namespace DotnetSpider.Core.Processor
 		/// <returns></returns>
 		internal virtual List<Regex> GetTargetUrlPatterns(string regionXpath)
 		{
-			ISelector selector = Selectors.Regex(RegexUtil.UrlRegex);
+			ISelector selector = Selectors.Regex(RegexUtil.Url);
 			if (!string.IsNullOrWhiteSpace(regionXpath))
 			{
 				selector = Selectors.XPath(regionXpath);
@@ -219,52 +219,52 @@ namespace DotnetSpider.Core.Processor
 		}
 	}
 
-	public abstract class PagerTargetUrlsExtractor : TargetUrlsExtractor
+	public abstract class PaginationTargetUrlsExtractor : TargetUrlsExtractor
 	{
-		private readonly Regex _pagerPattern;
+		private readonly Regex _paginationPattern;
 
 		/// <summary>
-		/// http://a.com?p=40  PaggerString: p=40 Pattern: p=\d+
+		/// http://a.com?p=40  PaginationStr: p=40 Pattern: p=\d+
 		/// </summary>
-		public readonly string PagerString;
+		public readonly string PaginationStr;
 
-		protected PagerTargetUrlsExtractor(string pagerString, ITargetUrlsExtractorTermination termination = null)
+		protected PaginationTargetUrlsExtractor(string paginationStr, ITargetUrlsExtractorTermination termination = null)
 		{
-			if (string.IsNullOrEmpty(pagerString) || string.IsNullOrWhiteSpace(pagerString))
+			if (string.IsNullOrEmpty(paginationStr) || string.IsNullOrWhiteSpace(paginationStr))
 			{
 				throw new SpiderException("pagerString should not be null.");
 			}
 
-			PagerString = pagerString;
-			_pagerPattern = new Regex($"{RegexUtil.NumRegex.Replace(PagerString, @"\d+")}");
-			TerminationDetector = termination;
+			PaginationStr = paginationStr;
+			_paginationPattern = new Regex($"{RegexUtil.Number.Replace(PaginationStr, @"\d+")}");
+			TargetUrlsExtractorTermination = termination;
 		}
 
-		public string GetCurrentPagger(string currentUrlOrContent)
+		protected string GetCurrentPagination(string currentUrlOrContent)
 		{
-			return _pagerPattern.Match(currentUrlOrContent).Value;
+			return _paginationPattern.Match(currentUrlOrContent).Value;
 		}
 	}
 
-	public class AutoIncrementTargetUrlsExtractor : PagerTargetUrlsExtractor
+	public class AutoIncrementTargetUrlsExtractor : PaginationTargetUrlsExtractor
 	{
 		private readonly int _interval;
 
-		public AutoIncrementTargetUrlsExtractor(string pagerString, int interval = 1, ITargetUrlsExtractorTermination termination = null) : base(pagerString, termination)
+		public AutoIncrementTargetUrlsExtractor(string paginationStr, int interval = 1, ITargetUrlsExtractorTermination termination = null) : base(paginationStr, termination)
 		{
 			_interval = interval;
 		}
 
 		protected override IEnumerable<Request> Extract(Page page, Site site)
 		{
-			string newUrl = IncreasePageNum(page.Request.Url);
+			string newUrl = IncreasePage(page.Request.Url);
 			return string.IsNullOrEmpty(newUrl) ? null : new Request[] { new Request(newUrl, page.Request.Extras) { Site = site } };
 		}
 
-		private string IncreasePageNum(string currentUrl)
+		private string IncreasePage(string currentUrl)
 		{
-			var currentPaggerString = GetCurrentPagger(currentUrl);
-			var matches = RegexUtil.NumRegex.Matches(currentPaggerString);
+			var currentPaggerString = GetCurrentPagination(currentUrl);
+			var matches = RegexUtil.Number.Matches(currentPaggerString);
 			if (matches.Count == 0)
 			{
 				return null;
@@ -273,46 +273,8 @@ namespace DotnetSpider.Core.Processor
 			if (int.TryParse(matches[0].Value, out var currentPagger))
 			{
 				var nextPagger = currentPagger + _interval;
-				var next = RegexUtil.NumRegex.Replace(PagerString, nextPagger.ToString());
+				var next = RegexUtil.Number.Replace(PaginationStr, nextPagger.ToString());
 				return currentUrl.Replace(currentPaggerString, next);
-			}
-			return null;
-		}
-	}
-
-	public class RequestExtraTargetUrlsBuilder : PagerTargetUrlsExtractor
-	{
-		private readonly string _field;
-
-		public RequestExtraTargetUrlsBuilder(string pagerString, string field) : base(pagerString)
-		{
-			_field = field;
-		}
-
-		protected override IEnumerable<Request> Extract(Page page, Site site)
-		{
-			string newUrl = GenerateNewPaggerUrl(page);
-			return string.IsNullOrEmpty(newUrl) ? null : new Request[] { new Request(newUrl, page.Request.Extras) { Site = site } };
-		}
-
-		private string GenerateNewPaggerUrl(Page page)
-		{
-			var currentUrl = page.Request.Url;
-			var nextPagger = page.Request.GetExtra(_field);
-			if (nextPagger != null)
-			{
-				var currentPaggerString = GetCurrentPagger(currentUrl);
-				var matches = RegexUtil.NumRegex.Matches(currentPaggerString);
-				if (matches.Count == 0)
-				{
-					return null;
-				}
-
-				if (int.TryParse(matches[0].Value, out _))
-				{
-					var next = RegexUtil.NumRegex.Replace(PagerString, nextPagger.ToString());
-					return currentUrl.Replace(currentPaggerString, next);
-				}
 			}
 			return null;
 		}

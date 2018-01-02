@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Processor
 
 		public List<Regex> ExcludeTargetUrlPatterns { get; protected set; }
 
-		public ITargetUrlsExtractorTermination TerminationDetector { get; set; }
+		public ITargetUrlsExtractorTermination TargetUrlsExtractorTermination { get; set; }
 
 		public void AddTargetUrlPatterns(params string[] patterns)
 		{
@@ -50,7 +50,7 @@ namespace DotnetSpider.Core.Processor
 
 		public IEnumerable<Request> ExtractRequests(Page page, Site site)
 		{
-			if (TerminationDetector != null && TerminationDetector.IsTermination(page))
+			if (TargetUrlsExtractorTermination != null && TargetUrlsExtractorTermination.IsTermination(page))
 			{
 				return new Request[0];
 			}

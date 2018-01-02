@@ -43,7 +43,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 					if (tmp.Length == 2)
 					{
-						if (RegexUtil.IpAddressRegex.IsMatch(tmp[0]) && int.TryParse(tmp[1], out _))
+						if (RegexUtil.IpAddress.IsMatch(tmp[0]) && int.TryParse(tmp[1], out _))
 						{
 							_proxy = v;
 							return;

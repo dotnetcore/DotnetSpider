@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Processor
 	/// </summary>
 	public interface ITargetUrlsExtractor
 	{
-		ITargetUrlsExtractorTermination TerminationDetector { get; set; }
+		ITargetUrlsExtractorTermination TargetUrlsExtractorTermination { get; set; }
 		List<Regex> TargetUrlPatterns { get; }
 		List<Regex> ExcludeTargetUrlPatterns { get; }
 		void AddTargetUrlPatterns(params string[] patterns);

@@ -25,16 +25,6 @@ namespace DotnetSpider.Extension.Test.Downloader
 			page = downloader.Download(request2, spider);
 			request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=4", request2.Url.ToString());
-
-			downloader = new TestDownloader();
-			downloader.AddAfterDownloadCompleteHandler(new TargetUrlsHandler(new RequestExtraTargetUrlsBuilder("&page=0", "page_index")));
-
-			request = new Request("http://a.com/?&page=0", new Dictionary<string, object>() { { "page_index", 2 } });
-			request.Site = new Site();
-			page = downloader.Download(request, spider);
-			request2 = page.TargetRequests.First();
-			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());
-			Assert.Equal(2, request2.GetExtra("page_index"));
 		}
 	}
 }

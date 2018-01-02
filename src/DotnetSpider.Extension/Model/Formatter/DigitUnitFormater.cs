@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		protected override object FormateValue(object value)
 		{
 			var tmp = value.ToString(); 
-			decimal num = decimal.Parse(RegexUtil.DecimalRegex.Match(tmp).ToString());
+			decimal num = decimal.Parse(RegexUtil.Decimal.Match(tmp).ToString());
 			if (tmp.EndsWith(UnitStringForShi))
 			{
 				num = num * 10;

@@ -1,14 +1,16 @@
-﻿using System.Linq;
+﻿using DotnetSpider.Core.Infrastructure;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Processor
 {
-	public class TerminateWhenPageContains : ITargetUrlsExtractorTermination
+	public class ContainsTermination : ITargetUrlsExtractorTermination
 	{
-		private readonly string[] _contents;
+		private readonly string[] _contains;
 
-		public TerminateWhenPageContains(string[] contents)
+		public ContainsTermination(string[] contains)
 		{
-			_contents = contents;
+			_contains = contains;
 		}
 
 		public bool IsTermination(Page page)
@@ -18,17 +20,17 @@ namespace DotnetSpider.Core.Processor
 				return false;
 			}
 
-			return _contents.Any(c => page.Content.Contains(c));
+			return _contains.Any(c => page.Content.Contains(c));
 		}
 	}
 
-	public class TerminateWhenPageUnContains : ITargetUrlsExtractorTermination
+	public class UnContainsTermination : ITargetUrlsExtractorTermination
 	{
-		private readonly string[] _contents;
+		private readonly string[] _unContains;
 
-		public TerminateWhenPageUnContains(string[] contents)
+		public UnContainsTermination(string[] unContains)
 		{
-			_contents = contents;
+			_unContains = unContains;
 		}
 
 		public bool IsTermination(Page page)
@@ -38,7 +40,29 @@ namespace DotnetSpider.Core.Processor
 				return false;
 			}
 
-			return !_contents.All(c => page.Content.Contains(c));
+			return !_unContains.All(c => page.Content.Contains(c));
+		}
+	}
+
+	public class MaxPageTermination : ITargetUrlsExtractorTermination
+	{
+		private readonly Regex _paginationPattern;
+		private readonly int _maxPage;
+
+		public MaxPageTermination(string paginationStr, int maxPage)
+		{
+			if (string.IsNullOrEmpty(paginationStr) || string.IsNullOrWhiteSpace(paginationStr))
+			{
+				throw new SpiderException("paginationStr should not be null.");
+			}
+			_paginationPattern = new Regex($"{RegexUtil.Number.Replace(paginationStr, @"\d+")}");
+			_maxPage = maxPage;
+		}
+
+		public bool IsTermination(Page page)
+		{
+			var currentPage = int.Parse(_paginationPattern.Match(page.Url).Value);
+			return currentPage < _maxPage;
 		}
 	}
 }
