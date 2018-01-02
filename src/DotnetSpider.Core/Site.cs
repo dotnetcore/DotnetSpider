@@ -65,7 +65,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 去除返回的JSON数据的最外层填补
 		/// </summary>
-		public string Padding { get; set; }
+		public string JsonPadding { get; set; }
 
 		/// <summary>
 		/// 不再使用
