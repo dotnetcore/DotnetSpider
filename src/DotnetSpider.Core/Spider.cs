@@ -1219,7 +1219,7 @@ namespace DotnetSpider.Core
 			{
 				foreach (Request request in page.TargetRequests)
 				{
-					request.Site = page.Request.Site;
+					request.Site = request.Site ?? page.Request.Site;
 					Scheduler.Push(request);
 				}
 			}

@@ -341,6 +341,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{
+			request.Site = request.Site ?? Spider.Site;
 			_retryPolicy.Execute(() =>
 			{
 				_redisConnection.Database.ListRightPush(_queueKey, request.Identity);

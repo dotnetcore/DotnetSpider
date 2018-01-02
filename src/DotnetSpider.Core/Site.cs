@@ -164,7 +164,7 @@ namespace DotnetSpider.Core
 		{
 			lock (this)
 			{
-				request.Site = this;
+				request.Site = request.Site ?? this;
 				StartRequests.Add(request);
 			}
 		}
@@ -179,7 +179,7 @@ namespace DotnetSpider.Core
 			{
 				foreach (var request in requests)
 				{
-					request.Site = this;
+					request.Site = request.Site ?? this;
 					StartRequests.Add(request);
 				}
 			}
