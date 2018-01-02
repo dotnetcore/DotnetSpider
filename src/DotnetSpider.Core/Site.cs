@@ -63,6 +63,11 @@ namespace DotnetSpider.Core
 		public bool DownloadFiles { get; set; }
 
 		/// <summary>
+		/// 去除返回的JSON数据的最外层填补
+		/// </summary>
+		public string Padding { get; set; }
+
+		/// <summary>
 		/// 不再使用
 		/// </summary>
 		[Obsolete]

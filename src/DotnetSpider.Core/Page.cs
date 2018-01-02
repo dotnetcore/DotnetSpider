@@ -60,11 +60,6 @@ namespace DotnetSpider.Core
 		public ResultItems ResultItems { get; } = new ResultItems();
 
 		/// <summary>
-		/// 去除返回的JSON数据的最外层填补
-		/// </summary>
-		public string Padding { get; set; }
-
-		/// <summary>
 		/// 下载到的文本内容
 		/// </summary>
 		public string Content
@@ -99,8 +94,8 @@ namespace DotnetSpider.Core
 			{
 				if (_selectable == null)
 				{
-					string urlPadding = ContentType == ContentType.Json ? Padding : Request.Url.ToString();
-					_selectable = new Selectable(Content, urlPadding, ContentType, Request.Site.RemoveOutboundLinks ? Request.Site.Domains : null);
+					string urlOrPadding = ContentType == ContentType.Json ? Request.Site.Padding : Request.Url.ToString();
+					_selectable = new Selectable(Content, urlOrPadding, ContentType, Request.Site.RemoveOutboundLinks ? Request.Site.Domains : null);
 				}
 				return _selectable;
 			}
