@@ -26,10 +26,10 @@ namespace DotnetSpider.Core.Downloader
 			{
 				return;
 			}
-			var urls = _targetUrlsExtractor.ExtractUrls(page, spider.Site);
-			foreach (var url in urls)
+			var requests = _targetUrlsExtractor.ExtractRequests(page, spider.Site);
+			foreach (var request in requests)
 			{
-				page.AddTargetRequest(new Request(url, page.Request.Extras));
+				page.AddTargetRequest(request);
 			}
 			if (!_extractByProcessor)
 			{

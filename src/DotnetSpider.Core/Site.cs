@@ -63,6 +63,12 @@ namespace DotnetSpider.Core
 		public bool DownloadFiles { get; set; }
 
 		/// <summary>
+		/// 不再使用
+		/// </summary>
+		[Obsolete]
+		public int Timeout { get; set; }
+
+		/// <summary>
 		/// 设置站点的编码 
 		/// 如果没有设值, 下载器会尝试自动识别编码
 		/// </summary>

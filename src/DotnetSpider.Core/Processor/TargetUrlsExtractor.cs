@@ -48,15 +48,15 @@ namespace DotnetSpider.Core.Processor
 			}
 		}
 
-		public IEnumerable<string> ExtractUrls(Page page, Site site)
+		public IEnumerable<Request> ExtractRequests(Page page, Site site)
 		{
 			if (TerminationDetector != null && TerminationDetector.IsTermination(page))
 			{
-				return new string[0];
+				return new Request[0];
 			}
 			return Extract(page, site);
 		}
 
-		protected abstract IEnumerable<string> Extract(Page page, Site site);
+		protected abstract IEnumerable<Request> Extract(Page page, Site site);
 	}
 }

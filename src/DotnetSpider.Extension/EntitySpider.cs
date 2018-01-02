@@ -51,6 +51,11 @@ namespace DotnetSpider.Extension
 			AddEntityType(null, dataHandler, tableName);
 		}
 
+		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler<T> dataHandler ) where T : ISpiderEntity
+		{
+			AddEntityType(targetUrlsExtractor, dataHandler, null);
+		}
+
 		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler<T> dataHandler, string tableName) where T : ISpiderEntity
 		{
 			CheckIfRunning();

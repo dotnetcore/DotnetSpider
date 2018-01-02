@@ -14,6 +14,8 @@ namespace DotnetSpider.Core
 	public class Request : IDisposable
 	{
 		private readonly object _locker = new object();
+		private string _url;
+		private Uri _uri;
 
 		/// <summary>
 		/// 站点信息
@@ -113,12 +115,38 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 请求链接
 		/// </summary>
-		public string Url { get; set; }
+		public string Url
+		{
+			get { return _url; }
+			set
+			{
+				if (string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value))
+				{
+					_url = null;
+					return;
+				}
+				if (Uri.TryCreate(value.TrimEnd('#'), UriKind.RelativeOrAbsolute, out _uri))
+				{
+					_url = _uri.ToString();
+				}
+				else
+				{
+					_url = null;
+				}
+			}
+		}
 
 		/// <summary>
 		/// 请求链接
 		/// </summary>
-		public Uri Uri { get; }
+		[JsonIgnore]
+		public Uri Uri
+		{
+			get
+			{
+				return _uri;
+			}
+		}
 
 		/// <summary>
 		/// TODO 此链接信息的唯一标识, 可能需要添加更多属性, 如某些场景URL是完成一致, 使用Referer或者Cookie来区别请求
@@ -132,7 +160,7 @@ namespace DotnetSpider.Core
 		[JsonIgnore]
 		public HttpStatusCode? StatusCode { get; set; }
 
-		public Request()
+		internal Request()
 		{
 		}
 
@@ -142,17 +170,9 @@ namespace DotnetSpider.Core
 
 		public Request(string url, IDictionary<string, dynamic> extras = null)
 		{
-			if (string.IsNullOrEmpty(url) || string.IsNullOrWhiteSpace(url))
-			{
-				return;
-			}
-			Uri uri;
-			if (Uri.TryCreate(url.TrimEnd('#'), UriKind.RelativeOrAbsolute, out uri))
-			{
-				Url = uri.ToString();
-				Uri = uri;
-			}
-			else
+			Url = url;
+
+			if (string.IsNullOrEmpty(Url))
 			{
 				return;
 			}

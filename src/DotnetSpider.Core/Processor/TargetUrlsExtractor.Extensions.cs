@@ -26,14 +26,14 @@ namespace DotnetSpider.Core.Processor
 			AddTargetUrlExtractor(regionXpath, patterns);
 		}
 
-		protected override IEnumerable<string> Extract(Page page, Site site)
+		protected override IEnumerable<Request> Extract(Page page, Site site)
 		{
 			if (_regionSelectorMapPatterns == null || _regionSelectorMapPatterns.Count == 0)
 			{
-				return new string[0];
+				return new Request[0];
 			}
 
-			List<string> results = new List<string>();
+			List<string> resultUrls = new List<string>();
 			foreach (var targetUrlExtractor in _regionSelectorMapPatterns)
 			{
 				if (Equals(targetUrlExtractor.Key, Selectors.Default()))
@@ -73,7 +73,7 @@ namespace DotnetSpider.Core.Processor
 
 				if (targetUrlExtractor.Value == null || targetUrlExtractor.Value.Count == 0)
 				{
-					results.AddRange(links);
+					resultUrls.AddRange(links);
 					continue;
 				}
 
@@ -97,7 +97,7 @@ namespace DotnetSpider.Core.Processor
 							}
 							if (isRequired)
 							{
-								results.Add(link);
+								resultUrls.Add(link);
 							}
 						}
 					}
@@ -126,14 +126,14 @@ namespace DotnetSpider.Core.Processor
 						}
 						if (isRequired)
 						{
-							results.Add(link);
+							resultUrls.Add(link);
 						}
 					}
 				}
 
 			}
 
-			return results;
+			return resultUrls.Select(t => new Request(t, page.Request.Extras) { Site = site });
 		}
 
 		public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
@@ -255,10 +255,10 @@ namespace DotnetSpider.Core.Processor
 			_interval = interval;
 		}
 
-		protected override IEnumerable<string> Extract(Page page, Site site)
+		protected override IEnumerable<Request> Extract(Page page, Site site)
 		{
 			string newUrl = IncreasePageNum(page.Request.Url);
-			return string.IsNullOrEmpty(newUrl) ? null : new[] { newUrl };
+			return string.IsNullOrEmpty(newUrl) ? null : new Request[] { new Request(newUrl, page.Request.Extras) { Site = site } };
 		}
 
 		private string IncreasePageNum(string currentUrl)
@@ -289,10 +289,10 @@ namespace DotnetSpider.Core.Processor
 			_field = field;
 		}
 
-		protected override IEnumerable<string> Extract(Page page, Site site)
+		protected override IEnumerable<Request> Extract(Page page, Site site)
 		{
 			string newUrl = GenerateNewPaggerUrl(page);
-			return string.IsNullOrEmpty(newUrl) ? null : new[] { newUrl };
+			return string.IsNullOrEmpty(newUrl) ? null : new Request[] { new Request(newUrl, page.Request.Extras) { Site = site } };
 		}
 
 		private string GenerateNewPaggerUrl(Page page)

@@ -13,6 +13,12 @@ namespace DotnetSpider.Core.Processor
 		List<Regex> ExcludeTargetUrlPatterns { get; }
 		void AddTargetUrlPatterns(params string[] patterns);
 		void AddExcludeTargetUrlPatterns(params string[] patterns);
-		IEnumerable<string> ExtractUrls(Page page, Site site);
+		/// <summary>
+		/// 解析出目标链接, 返回Request的设计是因为有可能需要重新计算PostBody等值, 因此不能直接返回string
+		/// </summary>
+		/// <param name="page"></param>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		IEnumerable<Request> ExtractRequests(Page page, Site site);
 	}
 }

@@ -46,13 +46,12 @@ namespace DotnetSpider.Core.Processor
 
 		protected virtual void ExtractUrls(Page page, ISpider spider)
 		{
-			var links = TargetUrlsExtractor.ExtractUrls(page, spider.Site);
+			var links = TargetUrlsExtractor.ExtractRequests(page, spider.Site);
 			if (links != null)
 			{
 				foreach (var link in links)
 				{
-					var request = new Request(link, page.Request.Extras);
-					page.AddTargetRequest(request);
+					page.AddTargetRequest(link);
 				}
 			}
 		}
