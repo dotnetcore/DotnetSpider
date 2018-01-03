@@ -61,6 +61,7 @@ namespace DotnetSpider.Core
 		private MemoryMappedFile _identityMmf;
 		private MemoryMappedFile _taskIdMmf;
 		private string[] _closeSignalFiles = new string[2];
+		private Cookies _cookies = new Cookies();
 
 		protected virtual bool IfRequireInitStartRequests(string[] arguments)
 		{
@@ -72,6 +73,22 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
+		/// Cookies
+		/// </summary>
+		public Cookies Cookies
+		{
+			get { return _cookies; }
+			set
+			{
+				if (_cookies != value)
+				{
+					_cookies = value;
+					Downloader.ResetCookies(value);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Storage all processors for spider.
 		/// </summary>
 		protected readonly List<IPageProcessor> PageProcessors = new List<IPageProcessor>();
@@ -79,7 +96,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Storage all pipelines for spider.
 		/// </summary>
-		protected List<IPipeline> Pipelines = new List<IPipeline>();
+		protected readonly List<IPipeline> Pipelines = new List<IPipeline>();
 
 		/// <summary>
 		/// start time of spider.
@@ -407,6 +424,9 @@ namespace DotnetSpider.Core
 			return new Spider(site, identify, scheduler, pageProcessors);
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		protected Spider()
 		{
 #if NET_CORE
@@ -426,6 +446,28 @@ namespace DotnetSpider.Core
 			}
 
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+		}
+
+		/// <summary>
+		/// 添加Cookies
+		/// </summary>
+		/// <param name="cookiesStr">Cookies的键值对字符串, 如: a1=b;a2=c;</param>
+		/// <param name="domain">作用域</param>
+		/// <param name="path">作用路径</param>
+		public void AddCookies(string cookiesStr, string domain, string path = "/")
+		{
+			_cookies.AddCookies(cookiesStr, domain, path);
+		}
+
+		/// <summary>
+		/// 添加Cookies
+		/// </summary>
+		/// <param name="cookies">Cookies的键值对</param>
+		/// <param name="domain">作用域</param>
+		/// <param name="path">作用路径</param>
+		public void AddCookies(IDictionary<string, string> cookies, string domain, string path = "/")
+		{
+			_cookies.AddCookies(cookies, domain, path);
 		}
 
 		/// <summary>
@@ -572,7 +614,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider ClearPipeline()
 		{
-			Pipelines = new List<IPipeline>();
+			Pipelines.Clear();
 			return this;
 		}
 
@@ -666,7 +708,7 @@ namespace DotnetSpider.Core
 								if (request.Proxy != null)
 								{
 									var statusCode = request.StatusCode;
-									Site.ReturnHttpProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
+									Site.HttpProxyPool.ReturnProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
 								}
 								lock (RequestCountLocker)
 								{
@@ -1538,6 +1580,11 @@ namespace DotnetSpider.Core
 					Exit();
 				}
 			}
+		}
+
+		public void ResetCookies(Cookies cookies)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

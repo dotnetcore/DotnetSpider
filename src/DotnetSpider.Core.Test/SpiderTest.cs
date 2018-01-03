@@ -209,6 +209,10 @@ namespace DotnetSpider.Core.Test
 			{
 				return new Page(request);
 			}
+
+			public void ResetCookies(Cookies cookies)
+			{
+			}
 		}
 
 		internal class FastExitPipeline : BasePipeline

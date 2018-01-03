@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure.Database;
+using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
@@ -47,6 +48,7 @@ namespace DotnetSpider.Extension.Test.Processor
 
 			protected override void MyInit(params string[] arguments)
 			{
+				Monitor = new NLogMonitor();
 				var word = "可乐|雪碧";
 				Identity = Guid.NewGuid().ToString();
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),

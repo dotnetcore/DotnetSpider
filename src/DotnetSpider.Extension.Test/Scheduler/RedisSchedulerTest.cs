@@ -6,6 +6,7 @@ using Xunit;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Monitor;
 
 namespace DotnetSpider.Extension.Test.Scheduler
 {
@@ -91,7 +92,8 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		public void LoadPerformace()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
-			ISpider spider = new DefaultSpider("test", new Site());
+			Spider spider = new DefaultSpider("test", new Site());
+			spider.Monitor = new NLogMonitor();
 			scheduler.Init(spider);
 			scheduler.Dispose();
 			var start = DateTime.Now;
@@ -266,7 +268,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 				new TestPageProcessor())
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
 				.AddPipeline(new FilePipeline());
-
+			spider.Monitor = new NLogMonitor();
 			// dowload html by http client
 			spider.Downloader = new HttpClientDownloader();
 

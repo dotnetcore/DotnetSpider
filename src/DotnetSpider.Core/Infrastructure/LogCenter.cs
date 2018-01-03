@@ -112,7 +112,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		private static void HttpLog(string identity, string message, LogLevel level, Exception exception = null)
 		{
-			if (Env.EnterpiseServiceLog)
+			if (Env.EnterpiseService && Env.EnterpiseServiceLog)
 			{
 				var json = JsonConvert.SerializeObject(new
 				{

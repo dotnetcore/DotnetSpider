@@ -41,7 +41,6 @@ namespace DotnetSpider.Extension.Pipeline
 			_cryptoTransform = cryptoProvider.CreateEncryptor(bytes, bytes);
 		}
 
-
 		internal override void InitDatabaseAndTable()
 		{
 			_retryPolicy.Execute(() =>

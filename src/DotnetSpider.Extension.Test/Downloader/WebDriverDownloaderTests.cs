@@ -1,4 +1,6 @@
-﻿using DotnetSpider.Core.Infrastructure;
+﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Infrastructure;
@@ -15,6 +17,11 @@ namespace DotnetSpider.Extension.Test.Downloader
 {
 	public class WebDriverDownloaderTests
 	{
+		public WebDriverDownloaderTests()
+		{
+			Env.EnterpiseService = false;
+		}
+
 		[Fact]
 		public void DestoryDownloader()
 		{
@@ -46,6 +53,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 
 			protected override void MyInit(params string[] arguments)
 			{
+				Monitor = new NLogMonitor();
 				Identity = "hello";
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
@@ -65,6 +73,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 
 			protected override void MyInit(params string[] arguments)
 			{
+				Monitor = new NLogMonitor();
 				Identity = "hello";
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });

@@ -97,19 +97,20 @@ namespace DotnetSpider.Extension.Downloader
 
 				var domainUrl = $"{request.Uri.Scheme}://{request.Uri.DnsSafeHost}{(request.Uri.Port == 80 ? "" : ":" + request.Uri.Port)}";
 
-				var options = _webDriver.Manage();
-				if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies?.PairPart.Count > 0)
-				{
-					_webDriver.Url = domainUrl;
-					options.Cookies.DeleteAllCookies();
-					if (spider.Site.Cookies != null)
-					{
-						foreach (var c in spider.Site.Cookies.PairPart)
-						{
-							options.Cookies.AddCookie(new Cookie(c.Key, c.Value));
-						}
-					}
-				}
+				// TODO:重新实现WebDriverDownloader设置Cookie
+				//var options = _webDriver.Manage();
+				//if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies?.PairPart.Count > 0)
+				//{
+				//	_webDriver.Url = domainUrl;
+				//	options.Cookies.DeleteAllCookies();
+				//	if (spider.Site.Cookies != null)
+				//	{
+				//		foreach (var c in spider.Site.Cookies.PairPart)
+				//		{
+				//			options.Cookies.AddCookie(new Cookie(c.Key, c.Value));
+				//		}
+				//	}
+				//}
 
 				string realUrl = request.Url.ToString();
 

@@ -1,62 +1,113 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using DotnetSpider.Core.Proxy;
+using System.Runtime.CompilerServices;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Downloader
 {
-	public class HttpClientPool
+	/// <summary>
+	/// HttpClient池
+	/// </summary>
+	public class HttpClientPool : IHttpClientPool
 	{
-		private readonly Dictionary<int, HttpClientObj> _pool = new Dictionary<int, HttpClientObj>();
+		private ulong _getHttpClientCount;
+		private readonly ConcurrentDictionary<int, HttpClientItem> _pool = new ConcurrentDictionary<int, HttpClientItem>();
+		private HttpClientItem _defaultHttpClientItem;
 
-		private readonly HttpClient _noProxyHttpClient = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler
+		/// <summary>
+		/// 通过不同的Hash分组, 返回对应的HttpClient
+		/// 设计初衷: 某些网站会对COOKIE某部分做承上启下的检测, 因此必须保证: www.a.com/keyword=xxxx&page=1 www.a.com/keyword=xxxx&page=2 在同一个HttpClient里访问
+		/// </summary>
+		/// <param name="hashCode">分组的哈希</param>
+		/// <param name="cookies">Cookies</param>
+		/// <returns>HttpClient对象</returns>
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		public HttpClientItem GetHttpClient(int? hashCode = null, Cookies cookies = null)
 		{
-			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-			UseProxy = true,
-			UseCookies = false
-		}));
-
-		public HttpClient GetHttpClient(UseSpecifiedUriWebProxy proxy)
-		{
-			if (proxy == null)
+			if (hashCode == null)
 			{
-				return _noProxyHttpClient;
+				if (_defaultHttpClientItem == null)
+				{
+					_defaultHttpClientItem = CreateDefaultHttpClient(cookies.GetCookies());
+				}
+				return _defaultHttpClientItem;
 			}
 
-			var key = proxy.GetHashCode();
-			if (key == -1)
-			{
-				return _noProxyHttpClient;
-			}
+			_getHttpClientCount++;
 
-			if (_pool.Count % 100 == 0)
+			if (_getHttpClientCount % 100 == 0)
 			{
 				ClearHttpClient();
 			}
 
-			if (_pool.ContainsKey(key))
+			if (_pool.ContainsKey(hashCode.Value))
 			{
-				return _pool[key].Client;
+				_pool[hashCode.Value].LastUsedTime = DateTime.Now;
+				return _pool[hashCode.Value];
 			}
 			else
 			{
-				var client = new HttpClient(new GlobalRedirectHandler(new HttpClientHandler
-				{
-					AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-					UseProxy = true,
-					UseCookies = false,
-					Proxy = proxy
-				}));
-				_pool.Add(key, new HttpClientObj
-				{
-					Client = client,
-					Start = DateTime.Now
-				});
-				return client;
+				var item = CreateDefaultHttpClient(cookies.GetCookies());
+				_pool.TryAdd(hashCode.Value, item);
+				return item;
 			}
+		}
+
+		/// <summary>
+		/// 重置Cookie
+		/// </summary>
+		/// <param name="cookies">Cookies</param>
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		public void ResetCookies(Cookies cookies)
+		{
+			if (_defaultHttpClientItem != null)
+			{
+				_defaultHttpClientItem.Handler.CookieContainer = CreateCookieContainer(cookies.GetCookies());
+			}
+
+			foreach (var item in _pool.Values)
+			{
+				item.Handler.CookieContainer = CreateCookieContainer(cookies.GetCookies());
+			}
+		}
+
+		private HttpClientItem CreateDefaultHttpClient(IReadOnlyDictionary<string, HashSet<Cookie>> cookies = null)
+		{
+			var handler = new HttpClientHandler
+			{
+				AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+				UseProxy = true,
+				UseCookies = true,
+				AllowAutoRedirect = true,
+				MaxAutomaticRedirections = 10
+			};
+			handler.CookieContainer = CreateCookieContainer(cookies);
+			return new HttpClientItem
+			{
+				Handler = handler,
+				Client = new HttpClient(handler),
+				LastUsedTime = DateTime.Now
+			};
+		}
+
+		private CookieContainer CreateCookieContainer(IReadOnlyDictionary<string, HashSet<Cookie>> cookies = null)
+		{
+			CookieContainer container = new CookieContainer();
+			if (cookies != null && cookies.Count() > 0)
+			{
+				foreach (var pair in cookies)
+				{
+					foreach (var cookie in pair.Value)
+					{
+						container.Add(new System.Net.Cookie(cookie.Name, cookie.Value, pair.Key, cookie.Path));
+					}
+				}
+			}
+			return container;
 		}
 
 		private void ClearHttpClient()
@@ -65,7 +116,7 @@ namespace DotnetSpider.Core.Downloader
 			var now = DateTime.Now;
 			foreach (var pair in _pool)
 			{
-				if ((now - pair.Value.Start).TotalSeconds > 240)
+				if ((now - pair.Value.LastUsedTime).TotalSeconds > 240)
 				{
 					needRemoveList.Add(pair.Key);
 				}
@@ -73,93 +124,12 @@ namespace DotnetSpider.Core.Downloader
 
 			foreach (var key in needRemoveList)
 			{
-				_pool.Remove(key);
-			}
-		}
-	}
-
-	public class HttpClientObj
-	{
-		public HttpClient Client { get; set; }
-
-		public DateTime Start { get; set; }
-	}
-
-	public class GlobalRedirectHandler : DelegatingHandler
-	{
-		public GlobalRedirectHandler(HttpMessageHandler innerHandler)
-		{
-			InnerHandler = innerHandler;
-		}
-
-		private Task<HttpResponseMessage> _SendAsync(HttpRequestMessage request, CancellationToken cancellationToken, TaskCompletionSource<HttpResponseMessage> tcs)
-		{
-			base.SendAsync(request, cancellationToken)
-				.ContinueWith(t =>
+				HttpClientItem item;
+				if (_pool.TryRemove(key, out item))
 				{
-					HttpResponseMessage response;
-					try
-					{
-						response = t.Result;
-					}
-					catch (Exception e)
-					{
-						response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable) { ReasonPhrase = e.Message };
-					}
-					if (response.StatusCode == HttpStatusCode.MovedPermanently
-						|| response.StatusCode == HttpStatusCode.Moved
-						|| response.StatusCode == HttpStatusCode.Redirect
-						|| response.StatusCode == HttpStatusCode.Found
-						|| response.StatusCode == HttpStatusCode.SeeOther
-						|| response.StatusCode == HttpStatusCode.RedirectKeepVerb
-						|| response.StatusCode == HttpStatusCode.TemporaryRedirect
-
-						|| (int)response.StatusCode == 308)
-					{
-
-						var newRequest = CopyRequest(response.RequestMessage);
-
-						if (response.StatusCode == HttpStatusCode.Redirect
-							|| response.StatusCode == HttpStatusCode.Found
-							|| response.StatusCode == HttpStatusCode.SeeOther)
-						{
-							newRequest.Content = null;
-							newRequest.Method = HttpMethod.Get;
-						}
-
-						newRequest.RequestUri = response.Headers.Location;
-
-						_SendAsync(newRequest, cancellationToken, tcs);
-					}
-					else
-					{
-						tcs.SetResult(response);
-					}
-				}, cancellationToken);
-
-			return tcs.Task;
-		}
-
-		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-		{
-			var tcs = new TaskCompletionSource<HttpResponseMessage>();
-			return _SendAsync(request, cancellationToken, tcs);
-		}
-
-		private static HttpRequestMessage CopyRequest(HttpRequestMessage oldRequest)
-		{
-			var newrequest = new HttpRequestMessage(oldRequest.Method, oldRequest.RequestUri);
-
-			foreach (var header in oldRequest.Headers)
-			{
-				newrequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
+					item.Client.Dispose();
+				}
 			}
-			foreach (var property in oldRequest.Properties)
-			{
-				newrequest.Properties.Add(property);
-			}
-			if (oldRequest.Content != null) newrequest.Content = new StreamContent(oldRequest.Content.ReadAsStreamAsync().Result);
-			return newrequest;
 		}
 	}
 }

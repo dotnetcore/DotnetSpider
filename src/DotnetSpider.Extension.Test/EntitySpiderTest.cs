@@ -2,6 +2,7 @@
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Infrastructure.Database;
+using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
@@ -19,6 +20,11 @@ namespace DotnetSpider.Extension.Test
 
 	public class EntitySpiderTest
 	{
+		public EntitySpiderTest()
+		{
+			Env.EnterpiseService = false;
+		}
+
 		[EntityTable("test", "table")]
 		public class TestEntity : SpiderEntity
 		{
@@ -59,6 +65,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			protected override void MyInit(params string[] arguments)
 			{
+				Monitor = new NLogMonitor();
 				AddStartUrl("http://www.baidu.com");
 				AddStartUrl("http://www.sohu.com");
 				AddEntityType<BaiduEntity>();
@@ -122,6 +129,7 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
+				Monitor = new NLogMonitor();
 				Identity = Guid.NewGuid().ToString("N");
 				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
 				AddStartUrl("https://baidu.com");
@@ -202,6 +210,7 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
+				Monitor = new NLogMonitor();
 				var word = "可乐|雪碧";
 				Identity = Guid.NewGuid().ToString();
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),
@@ -261,6 +270,7 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
+				Monitor = new NLogMonitor();
 				Identity = Guid.NewGuid().ToString();
 				ThreadNum = 1;
 				Deep = 100;

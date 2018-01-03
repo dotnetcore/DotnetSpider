@@ -43,11 +43,6 @@ namespace DotnetSpider.Core
 		public string[] Domains { get; set; }
 
 		/// <summary>
-		/// 设置全局Cookie
-		/// </summary>
-		public Cookies Cookies { get; set; }
-
-		/// <summary>
 		/// 设置 User Agent 头
 		/// </summary>
 		public string UserAgent { get; set; } = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
@@ -96,6 +91,9 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public Encoding Encoding => _encoding;
 
+		/// <summary>
+		/// 起始请求
+		/// </summary>
 		public readonly List<Request> StartRequests = new List<Request>();
 
 		/// <summary>
@@ -159,7 +157,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 添加一个请求对象到当前站点
 		/// </summary>
-		/// <param name="requests">请求对象</param>
+		/// <param name="request">请求对象</param>
 		public void AddStartRequest(Request request)
 		{
 			lock (this)
@@ -209,56 +207,6 @@ namespace DotnetSpider.Core
 			{
 				Headers.Add(key, value);
 			}
-		}
-
-		/// <summary>
-		/// 获取HTTP代理
-		/// </summary>
-		/// <returns>HTTP代理对象</returns>
-		public UseSpecifiedUriWebProxy GetHttpProxy()
-		{
-			return HttpProxyPool?.GetProxy();
-		}
-
-		/// <summary>
-		/// 返回HTTP代理
-		/// </summary>
-		/// <param name="proxy">HTTP代理对象</param>
-		/// <param name="statusCode">使用此HTTP对象下载数据后的状态码</param>
-		public void ReturnHttpProxy(UseSpecifiedUriWebProxy proxy, HttpStatusCode statusCode)
-		{
-			HttpProxyPool?.ReturnProxy(proxy, statusCode);
-		}
-
-		/// <summary>
-		/// 获取或设置全局的Cookie
-		/// </summary>
-		public string CookiesStringPart
-		{
-			set
-			{
-				if (Cookies == null)
-				{
-					Cookies = new Cookies();
-				}
-				Cookies.StringPart = value;
-			}
-			get
-			{
-				return Cookies == null ? string.Empty : Cookies.StringPart;
-			}
-		}
-
-		/// <summary>
-		/// 设置全局的Cookie
-		/// </summary>
-		public void SetCookies(Dictionary<string, string> cookies)
-		{
-			if (Cookies == null)
-			{
-				Cookies = new Cookies();
-			}
-			Cookies.PairPart = cookies;
 		}
 	}
 }

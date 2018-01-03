@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
@@ -389,6 +390,7 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
+				Monitor = new NLogMonitor();
 				EmptySleepTime = 1000;
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
@@ -441,22 +443,22 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void MultiEntitiesInitPipelines()
 		{
-			EntitySpider context = new DefaultEntitySpider();
-			context.Identity = (Guid.NewGuid().ToString("N"));
-			context.ThreadNum = 1;
-			context.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
-			context.AddPipeline(new MySqlFileEntityPipeline());
-			context.AddPipeline(new ConsoleEntityPipeline());
-			context.AddPipeline(new JsonFileEntityPipeline());
+			EntitySpider spider = new DefaultEntitySpider();
+			spider.Identity = (Guid.NewGuid().ToString("N"));
+			spider.ThreadNum = 1;
+			spider.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
+			spider.AddPipeline(new MySqlFileEntityPipeline());
+			spider.AddPipeline(new ConsoleEntityPipeline());
+			spider.AddPipeline(new JsonFileEntityPipeline());
 
-			context.AddStartUrl("http://baidu.com");
+			spider.AddStartUrl("http://baidu.com");
+			spider.Monitor = new NLogMonitor(); 
+			spider.AddEntityType<Entity13>();
+			spider.AddEntityType<Entity12>();
 
-			context.AddEntityType<Entity13>();
-			context.AddEntityType<Entity12>();
+			spider.Run("running-test");
 
-			context.Run("running-test");
-
-			var entityPipelines = context.GetPipelines();
+			var entityPipelines = spider.GetPipelines();
 
 			Assert.Equal(4, entityPipelines.Count);
 
@@ -467,7 +469,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.Equal("ConsoleEntityPipeline", entityPipelines[2].GetType().Name);
 			Assert.Equal("JsonFileEntityPipeline", entityPipelines[3].GetType().Name);
 
-			var pipelines = context.GetPipelines();
+			var pipelines = spider.GetPipelines();
 			Assert.Equal(4, pipelines.Count);
 			IEntityPipeline pipeline = (IEntityPipeline)pipelines[0];
 			//entityPipelines = pipeline.GetEntityPipelines();

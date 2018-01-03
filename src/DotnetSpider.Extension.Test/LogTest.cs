@@ -21,6 +21,11 @@ namespace DotnetSpider.Extension.Test
 
 	public class LogTest
 	{
+		public LogTest()
+		{
+			Env.EnterpiseService = false;
+		}
+
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{

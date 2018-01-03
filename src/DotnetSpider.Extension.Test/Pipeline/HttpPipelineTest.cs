@@ -15,11 +15,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 {
 	public class HttpPipelineTest
 	{
-		public HttpPipelineTest()
-		{
-			Env.LoadConfiguration("app.service.config");
-		}
-
 		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=;Port=3306;SslMode=None;";
 
 		[EntityTable("test", "sku", EntityTable.Today, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
@@ -35,7 +30,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
 		}
-
 
 		[EntityTable("test", "sku", EntityTable.Today, Uniques = new[] { "Sku" }, UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
@@ -69,7 +63,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				return;
 			}
 
+			Env.LoadConfiguration("app.service.config");
+
 			ClearDb();
+
 			using (MySqlConnection conn = new MySqlConnection(ConnectString))
 			{
 				ISpider spider = new DefaultSpider("test", new Site());
@@ -103,6 +100,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
 			}
+			Env.LoadConfiguration("app.config");
 		}
 
 		[Fact]
@@ -112,7 +110,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				return;
 			}
-
+			Env.LoadConfiguration("app.service.config");
 			ClearDb();
 
 			using (MySqlConnection conn = new MySqlConnection(ConnectString))
@@ -140,6 +138,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
 			}
+			Env.LoadConfiguration("app.config");
 		}
 	}
 }

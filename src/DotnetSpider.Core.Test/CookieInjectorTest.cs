@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Core.Downloader;
 using Xunit;
 using System.IO;
+using System.Linq;
 
 namespace DotnetSpider.Core.Test
 {
@@ -15,13 +16,16 @@ namespace DotnetSpider.Core.Test
 			{
 				File.Delete(path);
 			}
-			File.WriteAllText(path, "a=b&c=d");
+			File.AppendAllLines(path, new[] { "www.baidu.com" });
+			File.AppendAllLines(path, new[] { "a=b;c=d" });
 			FileCookieInject inject = new FileCookieInject();
 			Site site = new Site();
 			site.AddStartUrl("http://www.baidu.com");
 			DefaultSpider spider = new DefaultSpider("a", site);
 			inject.Inject(spider, false);
-			Assert.Equal("a=b&c=d", site.Cookies.ToString());
+			var cookies = spider.Cookies.GetCookies("www.baidu.com");
+			Assert.Contains(cookies, c => c.Name == "a" && c.Value == "b");
+			Assert.Contains(cookies, c => c.Name == "c" && c.Value == "d");
 		}
 	}
 }

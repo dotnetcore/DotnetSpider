@@ -27,6 +27,10 @@ namespace DotnetSpider.Core.Monitor
 		{
 			base.Report(identity, taskId, status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 
+			if (!Env.EnterpiseService)
+			{
+				return;
+			}
 			var json = JsonConvert.SerializeObject(new SpiderStatus
 			{
 				TaskId = taskId,

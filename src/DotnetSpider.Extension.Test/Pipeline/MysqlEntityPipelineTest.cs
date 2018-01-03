@@ -28,6 +28,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
+
+		public MySqlEntityPipelineTest()
+		{
+			Env.EnterpiseService = false;
+		}
+
 		[Fact]
 		public void Update()
 		{

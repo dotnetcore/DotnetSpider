@@ -35,11 +35,25 @@ namespace DotnetSpider.Core.Downloader
 
 			if (File.Exists(path))
 			{
-				var cookie = File.ReadAllText(path);
-				return new Cookies
+				var datas = File.ReadAllLines(path);
+				if (datas.Length == 2)
 				{
-					StringPart = cookie
-				};
+					var domain = datas[0];
+					var cookiesStr = datas[1];
+					var cookies = new Cookies();
+					cookies.AddCookies(cookiesStr, domain);
+					return cookies;
+				}
+				if (datas.Length == 3)
+				{
+					var domain = datas[0];
+					var domainPath = datas[1];
+					var cookiesStr = datas[2];
+					var cookies = new Cookies();
+					cookies.AddCookies(cookiesStr, domain, domainPath);
+					return cookies;
+				}
+				return new Cookies();
 			}
 			else
 			{

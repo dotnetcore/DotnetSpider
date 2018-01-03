@@ -36,6 +36,11 @@ namespace DotnetSpider.Core
 		public int? EffectedRows { get; set; }
 
 		/// <summary>
+		/// 下载器分组
+		/// </summary>
+		public int? DownloaderGroup { get; set; }
+
+		/// <summary>
 		/// 下载此链接内容时使用的代理
 		/// </summary>
 		[JsonIgnore]

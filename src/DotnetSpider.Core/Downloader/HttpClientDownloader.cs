@@ -37,20 +37,19 @@ namespace DotnetSpider.Core.Downloader
 			"application/javascript",
 			"application/x-www-form-urlencoded"
 		};
-		/// <summary>
-		/// HttpClient池, 仅在使用代理的情况下使用, 但要研究如何解决端口耗尽的问题
-		/// </summary>
-		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
-		private static readonly HttpClient HttpClient = new HttpClient(new HttpClientHandler
-		{
-			AllowAutoRedirect = true,
-			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-			UseProxy = true,
-			UseCookies = false
-		});
+
 		private readonly string _downloadFolder;
 		private readonly bool _decodeHtml;
+		private readonly int _timeout = 5;
 
+		/// <summary>
+		/// HttpClient池
+		/// </summary>
+		public IHttpClientPool HttpClientPool { get; set; } = new HttpClientPool();
+
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public HttpClientDownloader()
 		{
 			_downloadFolder = Path.Combine(Env.BaseDirectory, "download");
@@ -63,21 +62,37 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="decodeHtml">下载的内容是否需要HTML解码</param>
 		public HttpClientDownloader(int timeout = 5, bool decodeHtml = false) : this()
 		{
-			HttpClient.Timeout = new TimeSpan(0, 0, timeout);
+			_timeout = timeout;
 			_decodeHtml = decodeHtml;
+		}
+
+		public override void ResetCookies(Cookies cookies)
+		{
+			HttpClientPool.ResetCookies(cookies);
 		}
 
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
-			Site site = spider.Site;
-			var proxy = site.GetHttpProxy();
-			request.Proxy = proxy;
 			HttpResponseMessage response = null;
 			try
 			{
-				var httpMessage = GenerateHttpRequestMessage(request, site);
-				HttpClient httpClient = null == spider.Site.HttpProxyPool ? HttpClient : _httpClientPool.GetHttpClient(proxy);
-				response = NetworkCenter.Current.Execute("http", () => httpClient.SendAsync(httpMessage).Result);
+				var httpMessage = GenerateHttpRequestMessage(request, spider.Site);
+
+				HttpClientItem httpClientItem = null;
+				if (spider.Site.HttpProxyPool == null)
+				{
+					httpClientItem = HttpClientPool.GetHttpClient(request.DownloaderGroup, spider.Cookies);
+				}
+				else
+				{
+					// TODO: 代理模式下: request.DownloaderGroup 再考虑
+					var proxy = spider.Site.HttpProxyPool.GetProxy();
+					request.Proxy = proxy;
+					httpClientItem = HttpClientPool.GetHttpClient(proxy?.GetHashCode(), spider.Cookies);
+					httpClientItem.Handler.Proxy = httpClientItem.Handler.Proxy ?? proxy;
+				}
+
+				response = NetworkCenter.Current.Execute("http", () => httpClientItem.Client.SendAsync(httpMessage).Result);
 				request.StatusCode = response.StatusCode;
 				response.EnsureSuccessStatusCode();
 
@@ -85,7 +100,7 @@ namespace DotnetSpider.Core.Downloader
 
 				if (response.Content.Headers.ContentType != null && !ExcludeMediaTypes.Contains(response.Content.Headers.ContentType.MediaType))
 				{
-					if (!site.DownloadFiles)
+					if (!spider.Site.DownloadFiles)
 					{
 						Logger.AllLog(spider.Identity, $"Ignore: {request.Url} because media type is not allowed to download.", LogLevel.Warn);
 						return new Page(request) { Skip = true };
@@ -97,7 +112,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				else
 				{
-					page = HandleResponse(request, response, site);
+					page = HandleResponse(request, response, spider.Site);
 
 					if (string.IsNullOrEmpty(page.Content))
 					{
@@ -111,7 +126,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (DownloadException de)
 			{
-				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request);
+				Page page = spider.Site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, spider.Site) : new Page(request);
 
 				if (page != null)
 				{
@@ -123,7 +138,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (HttpRequestException he)
 			{
-				Page page = site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, site) : new Page(request);
+				Page page = spider.Site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, spider.Site) : new Page(request);
 				if (page != null)
 				{
 					page.Exception = he;
@@ -182,13 +197,15 @@ namespace DotnetSpider.Core.Downloader
 
 			foreach (var header in site.Headers)
 			{
+				if (header.Key.ToLower() == "cookie")
+				{
+					continue;
+				}
 				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) && header.Key != contentTypeHeader && header.Key != userAgentHeader)
 				{
 					httpRequestMessage.Headers.Add(header.Key, header.Value);
 				}
 			}
-
-			httpRequestMessage.Headers.Add("Cookie", site.Cookies?.ToString());
 
 			if (httpRequestMessage.Method == HttpMethod.Post)
 			{

@@ -111,7 +111,9 @@ namespace DotnetSpider.Extension.Downloader
 				return null;
 			}
 
-			return new Cookies { PairPart = cookies };
+			var result = new Cookies();
+			result.AddCookies(cookies, new Uri(Url).Host);
+			return result;
 		}
 
 		protected RemoteWebDriver CreateWebDriver()
@@ -134,7 +136,7 @@ namespace DotnetSpider.Extension.Downloader
 						string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
 						if (pathsToProfiles.Length == 1)
 						{
-							FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false) {AlwaysLoadNoFocusLibrary = true};
+							FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false) { AlwaysLoadNoFocusLibrary = true };
 							webDriver = new FirefoxDriver(profile);
 						}
 						else

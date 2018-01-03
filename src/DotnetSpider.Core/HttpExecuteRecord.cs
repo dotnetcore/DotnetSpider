@@ -16,7 +16,7 @@ namespace DotnetSpider.Core
 	public class HttpExecuteRecord : IExecuteRecord
 	{
 		private static readonly ILogger Logger = LogCenter.GetLogger();
-		
+
 		/// <summary>
 		/// 添加运行记录
 		/// </summary>
@@ -26,7 +26,7 @@ namespace DotnetSpider.Core
 		/// <returns>是否上报成功</returns>
 		public bool Add(string taskId, string name, string identity)
 		{
-			if (string.IsNullOrEmpty(taskId) || string.IsNullOrWhiteSpace(taskId))
+			if (string.IsNullOrEmpty(taskId) || string.IsNullOrWhiteSpace(taskId) || !Env.EnterpiseService)
 			{
 				return true;
 			}
@@ -65,7 +65,7 @@ namespace DotnetSpider.Core
 		/// <param name="taskId">任务编号</param>
 		public void Remove(string taskId)
 		{
-			if (string.IsNullOrEmpty(taskId) || string.IsNullOrWhiteSpace(taskId))
+			if (string.IsNullOrEmpty(taskId) || string.IsNullOrWhiteSpace(taskId) || !Env.EnterpiseService)
 			{
 				return;
 			}
