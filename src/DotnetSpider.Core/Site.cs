@@ -63,7 +63,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 不再使用
 		/// </summary>
-		[Obsolete]
+		[Obsolete("请在Downloader对象中设置")]
 		public int Timeout { get; set; }
 
 		/// <summary>

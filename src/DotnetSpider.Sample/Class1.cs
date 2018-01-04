@@ -10,18 +10,18 @@ namespace DotnetSpider.Sample
 	public class Class1
 	{
 
-		public void ProcessException()
+		public static void ProcessException()
 		{
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			var site = new Site { EncodingName = "UTF-8" };
 
 			var scheduler = new QueueDuplicateRemovedScheduler();
 
 			site.AddStartUrl("http://v.youku.com/v_show/id_XMTMyMTkzNTY1Mg==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMjkzNzMwMDMyOA==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMjcwNDg0NDI3Mg==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMTMwNzQwMTcwMA==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMjk1MzI0Mzk4NA==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://v.youku.com/v_show/id_XMjkzNzY0NzkyOA==.html?spm=a2h1n.8251845.0.0");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMjkzNzMwMDMyOA==.html?spm=a2h1n.8251845.0.1");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMjcwNDg0NDI3Mg==.html?spm=a2h1n.8251845.0.2");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMTMwNzQwMTcwMA==.html?spm=a2h1n.8251845.0.3");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMjk1MzI0Mzk4NA==.html?spm=a2h1n.8251845.0.4");
+			site.AddStartUrl("http://v.youku.com/v_show/id_XMjkzNzY0NzkyOA==.html?spm=a2h1n.8251845.0.5");
 			site.AddStartUrl("http://www.cnblogs.com/");
 
 			Spider spider = Spider.Create(site,
@@ -53,7 +53,7 @@ namespace DotnetSpider.Sample
 			{
 				if (page.Request.Url.ToString() == "http://www.cnblogs.com/")
 				{
-					throw new SpiderException("");
+					//throw new SpiderException("");
 				}
 			}
 		}

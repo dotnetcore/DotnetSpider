@@ -395,9 +395,20 @@ namespace DotnetSpider.Core.Downloader
 				return;
 			}
 
+			if (page.Skip)
+			{
+				return;
+			}
+
 			string rawText = page.Content;
 
 			int begin = rawText.IndexOf(_startPart, StringComparison.Ordinal);
+
+			if (begin < 0)
+			{
+				throw new SpiderException($"Cutout failed, can not find begin string: {_startPart}.");
+			}
+
 			int end = rawText.IndexOf(_endPart, begin, StringComparison.Ordinal);
 			int length = end - begin;
 
@@ -408,7 +419,7 @@ namespace DotnetSpider.Core.Downloader
 
 			if (begin < 0 || length < 0)
 			{
-				throw new SpiderException("Sub content failed. Please check your settings.");
+				throw new SpiderException("Cutout failed. Please check your settings.");
 			}
 			string newRawText = rawText.Substring(begin, length).Trim();
 			page.Content = newRawText;
