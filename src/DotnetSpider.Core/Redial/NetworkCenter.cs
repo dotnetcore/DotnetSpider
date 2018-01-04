@@ -10,6 +10,9 @@ namespace DotnetSpider.Core.Redial
 	{
 		private static readonly Lazy<NetworkCenter> Instance = new Lazy<NetworkCenter>(() => new NetworkCenter());
 
+		/// <summary>
+		/// 网络中心单例对象
+		/// </summary>
 		public static NetworkCenter Current => Instance.Value;
 
 		/// <summary>

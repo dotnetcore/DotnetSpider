@@ -12,20 +12,32 @@ using System.Runtime.InteropServices;
 namespace DotnetSpider.Core.Pipeline
 {
 	/// <summary>
-	/// Store results to files in JSON format.
+	/// 数据序列化成JSON并存储到文件中
 	/// </summary>
 	public class JsonFilePipeline : BaseFilePipeline
 	{
 		private readonly ConcurrentDictionary<string, StreamWriter> _writers = new ConcurrentDictionary<string, StreamWriter>();
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public JsonFilePipeline() : base("json")
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="interval">数据根目录与程序运行目录路径的相对值</param>
 		public JsonFilePipeline(string interval) : base(interval)
 		{
 		}
 
+		/// <summary>
+		/// 数据序列化成JSON并存储到文件中
+		/// </summary>
+		/// <param name="resultItems">数据结果</param>
+		/// <param name="spider">爬虫</param>
 		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			try
@@ -44,6 +56,9 @@ namespace DotnetSpider.Core.Pipeline
 			}
 		}
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public override void Dispose()
 		{
 			base.Dispose();

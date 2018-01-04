@@ -1,15 +1,23 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
+using NLog;
 
 namespace DotnetSpider.Core.Proxy
 {
+	/// <summary>
+	/// 代理池
+	/// </summary>
 	public class HttpProxyPool : IHttpProxyPool
 	{
+		private static readonly ILogger Logger = LogCenter.GetLogger();
 		private readonly IProxySupplier _supplier;
 		private readonly List<Proxy> _proxyQueue = new List<Proxy>();
 		private readonly ConcurrentDictionary<string, Proxy> _allProxy = new ConcurrentDictionary<string, Proxy>();
@@ -17,6 +25,11 @@ namespace DotnetSpider.Core.Proxy
 		private readonly int _reuseInterval;
 		private readonly object _locker = new object();
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="supplier">代理提供接口</param>
+		/// <param name="reuseInterval">代理不被再次使用的间隔</param>
 		public HttpProxyPool(IProxySupplier supplier, int reuseInterval = 500)
 		{
 			_supplier = supplier ?? throw new SpiderException("IProxySupplier should not be null.");
@@ -36,6 +49,10 @@ namespace DotnetSpider.Core.Proxy
 			});
 		}
 
+		/// <summary>
+		/// 从代理池中取一个代理
+		/// </summary>
+		/// <returns>代理</returns>
 		public UseSpecifiedUriWebProxy GetProxy()
 		{
 			for (int i = 0; i < 3600; ++i)
@@ -56,13 +73,18 @@ namespace DotnetSpider.Core.Proxy
 			throw new SpiderException("Get proxy timeout.");
 		}
 
-		public void ReturnProxy(UseSpecifiedUriWebProxy host, HttpStatusCode statusCode)
+		/// <summary>
+		/// 把代理返回给代理池
+		/// </summary>
+		/// <param name="proxy">代理</param>
+		/// <param name="statusCode">通过此代理请求数据后的返回状态</param>
+		public void ReturnProxy(UseSpecifiedUriWebProxy proxy, HttpStatusCode statusCode)
 		{
-			if (host == null)
+			if (proxy == null)
 			{
 				return;
 			}
-			var key = $"{host.Uri.Host}:{host.Uri.Port}";
+			var key = $"{proxy.Uri.Host}:{proxy.Uri.Port}";
 			if (!_allProxy.ContainsKey(key))
 			{
 				return;
@@ -92,7 +114,7 @@ namespace DotnetSpider.Core.Proxy
 			{
 				return;
 			}
-			if (p.FailedNum % 3 == 0 && !ProxyUtil.ValidateProxy(p.HttpHost.Uri.Host, p.HttpHost.Uri.Port))
+			if (p.FailedNum % 3 == 0 && !ValidateProxy(p.WebProxy.Uri.Host, p.WebProxy.Uri.Port))
 			{
 				return;
 			}
@@ -102,9 +124,36 @@ namespace DotnetSpider.Core.Proxy
 			}
 		}
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public void Dispose()
 		{
 			_isDispose = true;
+		}
+
+		private bool ValidateProxy(string ip, int port)
+		{
+			bool isReachable = false;
+
+			try
+			{
+				TcpClient tcp = new TcpClient();
+				IPAddress ipAddr = IPAddress.Parse(ip);
+				tcp.ReceiveTimeout = 5000;
+				Stopwatch watch = new Stopwatch();
+				watch.Start();
+				tcp.ConnectAsync(ipAddr, port).Wait();
+				watch.Stop();
+				Logger.AllLog($"Detect one avaliable proxy: {ip}:{port}, cost {watch.ElapsedMilliseconds}ms.", LogLevel.Debug);
+				isReachable = true;
+			}
+			catch (Exception e)
+			{
+				Logger.AllLog($"Connect test failed for proxy: {ip}:{port}.", LogLevel.Error, e);
+			}
+
+			return isReachable;
 		}
 
 		private void RefreshProxies()
@@ -123,7 +172,7 @@ namespace DotnetSpider.Core.Proxy
 					return;
 				}
 
-				if (ProxyUtil.ValidateProxy(proxy.Value.HttpHost.Uri.Host, proxy.Value.HttpHost.Uri.Port))
+				if (ValidateProxy(proxy.Value.WebProxy.Uri.Host, proxy.Value.WebProxy.Uri.Port))
 				{
 					value.SetFailedNum(0);
 					value.SetReuseTime(_reuseInterval);

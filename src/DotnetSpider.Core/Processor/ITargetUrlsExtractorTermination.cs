@@ -1,5 +1,8 @@
 ﻿namespace DotnetSpider.Core.Processor
 {
+	/// <summary>
+	/// 目标链接解析器的中止器
+	/// </summary>
 	public interface ITargetUrlsExtractorTermination
 	{
 		/// <summary>

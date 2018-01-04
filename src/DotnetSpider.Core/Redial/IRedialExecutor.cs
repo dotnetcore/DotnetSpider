@@ -35,6 +35,7 @@ namespace DotnetSpider.Core.Redial
 		/// <typeparam name="T">返回数据</typeparam>
 		/// <param name="name">网络请求名称, 仅用于标识作用</param>
 		/// <param name="func">网络请求的具体操作</param>
+		/// <param name="obj">网络请求需要的参数对象</param>
 		/// <returns>返回数据</returns>
 		T Execute<T>(string name, Func<dynamic, T> func, dynamic obj);
 
@@ -44,7 +45,6 @@ namespace DotnetSpider.Core.Redial
 		/// <typeparam name="T">返回数据</typeparam>
 		/// <param name="name">网络请求名称, 仅用于标识作用</param>
 		/// <param name="func">网络请求的具体操作</param>
-		/// <param name="obj">网络请求需要的参数对象</param>
 		/// <returns>返回数据</returns>
 		T Execute<T>(string name, Func<T> func);
 	}

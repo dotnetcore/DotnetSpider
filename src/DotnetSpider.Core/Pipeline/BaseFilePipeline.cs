@@ -11,18 +11,35 @@ namespace DotnetSpider.Core.Pipeline
 		private readonly ConcurrentDictionary<string, string> _dataFolderCache = new ConcurrentDictionary<string, string>();
 
 		/// <summary>
-		/// 
+		/// 数据根目录
 		/// </summary>
 		public string RootDataFolder { get; protected set; }
+
+		/// <summary>
+		/// 数据根目录与程序运行目录路径的相对值,
+		/// 数据根目录通过此值计算得出,
+		/// RootDataFolder = Path.Combine(Env.BaseDirectory, Interval);
+		/// </summary>
 		public string Interval { get; protected set; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		protected BaseFilePipeline() { }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="interval">数据根目录与程序运行目录路径的相对值</param>
 		protected BaseFilePipeline(string interval)
 		{
 			InitFolder(interval);
 		}
 
+		/// <summary>
+		/// 初始化需要使用的文件夹
+		/// </summary>
+		/// <param name="interval">数据根目录与程序运行目录路径的相对值</param>
 		protected void InitFolder(string interval)
 		{
 			if (string.IsNullOrEmpty(interval) || string.IsNullOrWhiteSpace(interval))

@@ -2,12 +2,26 @@
 
 namespace DotnetSpider.Core.Redial.InternetDetector
 {
+	/// <summary>
+	/// 网络状态检测器
+	/// </summary>
 	public abstract class BaseInternetDetector : IInternetDetector
 	{
-		public abstract bool DoValidate();
+		/// <summary>
+		/// 检测网络状态
+		/// </summary>
+		/// <returns>如果返回 True, 表示当前可以访问互联网</returns>
+		protected abstract bool DoValidate();
 
+		/// <summary>
+		/// 超时时间
+		/// </summary>
 		public int Timeout { get; set; } = 10;
 
+		/// <summary>
+		/// 检测网络状态
+		/// </summary>
+		/// <returns>如果返回 True, 表示当前可以访问互联网</returns>
 		public bool Detect()
 		{
 			int currentWaitTime = 0;

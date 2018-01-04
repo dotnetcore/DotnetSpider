@@ -23,6 +23,11 @@ namespace DotnetSpider.Core.Redial
 			RedialTimeFile = Path.Combine(Env.GlobalDirectory, "redial.time");
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="redialer">拨号器</param>
+		/// <param name="validater">网络状态检测器</param>
 		protected LocalRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{
 			if (!Directory.Exists(AtomicActionFolder))
@@ -43,6 +48,11 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
+		/// <summary>
+		/// 创建通讯标识
+		/// </summary>
+		/// <param name="name">通讯标识前缀</param>
+		/// <returns>通讯标识</returns>
 		public override string CreateActionIdentity(string name)
 		{
 			string id = Path.Combine(AtomicActionFolder, name + "-" + Guid.NewGuid().ToString("N"));
@@ -51,9 +61,9 @@ namespace DotnetSpider.Core.Redial
 		}
 
 		/// <summary>
-		/// <see cref="RedialExecutor.DeleteActionIdentity(string)"/>
+		/// 删除通讯标识
 		/// </summary>
-		/// <param name="identity"></param>
+		/// <param name="identity">通讯标识</param>
 		public override void DeleteActionIdentity(string identity)
 		{
 			NetworkFiles.TryRemove(identity, out var stream);
@@ -61,6 +71,10 @@ namespace DotnetSpider.Core.Redial
 			File.Delete(identity);
 		}
 
+		/// <summary>
+		/// 取得上次拨号的时间, 如果间隔太短则不执行拨号操作
+		/// </summary>
+		/// <returns>上次拨号的时间</returns>
 		protected override DateTime GetLastRedialTime()
 		{
 			if (File.Exists(RedialTimeFile))
@@ -81,13 +95,16 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
+		/// <summary>
+		/// 记录拨号时间
+		/// </summary>
 		protected override void RecordLastRedialTime()
 		{
 			File.WriteAllText(RedialTimeFile, DateTime.Now.Ticks.ToString());
 		}
 
 		/// <summary>
-		/// <see cref="RedialExecutor.WaitAllNetworkRequestComplete"/>
+		/// 等待所有网络通讯结束
 		/// </summary>
 		public override void WaitAllNetworkRequestComplete()
 		{

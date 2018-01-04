@@ -66,12 +66,24 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public FileLockerRedialExecutor() : this(new AdslRedialer(), new DefaultInternetDetector())
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="redialer">拨号器</param>
 		public FileLockerRedialExecutor(IRedialer redialer) : this(redialer, new DefaultInternetDetector()) { }
-
+		
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="redialer">拨号器</param>
+		/// <param name="validater">网络状态检测器</param>
 		public FileLockerRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
 		{
 			var fileInfo = new FileInfo(FileLocker.RedialLockerFile);
@@ -88,15 +100,26 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
+		/// <summary>
+		/// 判断是否有别的程序正在拨号
+		/// </summary>
+		/// <returns>是否有别的程序正在拨号, 如果有返回 True, 没有则返回 False.</returns>
 		protected override bool IsRedialing()
 		{
 			return File.Exists(FileLocker.RedialLockerFile);
 		}
-
+		
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public override void Dispose()
 		{
 		}
 
+		/// <summary>
+		/// 创建同步锁
+		/// </summary>
+		/// <returns>同步锁</returns>
 		protected override ILocker CreateLocker()
 		{
 			return new FileLocker();

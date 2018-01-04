@@ -2,43 +2,54 @@
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading;
 
 namespace DotnetSpider.Core.Proxy
 {
+	/// <summary>
+	/// 实现快代理的提取
+	/// </summary>
 	public class KuaidailiProxySupplier : IProxySupplier
 	{
 		private static readonly ILogger Logger = LogCenter.GetLogger();
 
-		private readonly HttpClient _client = new HttpClient();
-
+		/// <summary>
+		/// 快代理的提取接口
+		/// </summary>
 		public string Url { get; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="url">快代理的提取接口</param>
 		public KuaidailiProxySupplier(string url)
 		{
 			Url = url;
 		}
 
+		/// <summary>
+		/// 取得所有代理
+		/// </summary>
+		/// <returns>代理</returns>
 		public Dictionary<string, Proxy> GetProxies()
 		{
-			var list = new Dictionary<string, Proxy>();
-			while (list.Count == 0)
+			var proxies = new Dictionary<string, Proxy>();
+			while (proxies.Count == 0)
 			{
 				try
 				{
-					string result = _client.GetStringAsync(Url).Result;
+					string result = HttpSender.Client.GetStringAsync(Url).Result;
 					if (!string.IsNullOrEmpty(result))
 					{
 						if (result.Contains("ERROR(-51)"))
 						{
-							return list;
+							return proxies;
 						}
 						foreach (var proxy in result.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries))
 						{
-							if (!list.ContainsKey(proxy))
+							if (!proxies.ContainsKey(proxy))
 							{
-								list.Add(proxy, new Proxy(new UseSpecifiedUriWebProxy(new Uri($"http://{proxy}"))));
+								proxies.Add(proxy, new Proxy(new UseSpecifiedUriWebProxy(new Uri($"http://{proxy}"))));
 							}
 						}
 					}
@@ -49,7 +60,7 @@ namespace DotnetSpider.Core.Proxy
 					Thread.Sleep(5000);
 				}
 			}
-			return list;
+			return proxies;
 		}
 	}
 }

@@ -9,12 +9,22 @@ using System.Runtime.InteropServices;
 
 namespace DotnetSpider.Core.Redial.Redialer
 {
+	/// <summary>
+	/// ADSL拨号器
+	/// </summary>
 	public class AdslRedialer : BaseAdslRedialer
 	{
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public AdslRedialer() : this(Path.Combine(Env.GlobalDirectory, "adsl_account.txt"))
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="configPath">配置文件路径. 配置文件内容需要三行, 按顺序为: 网络接口名称, 帐号, 密码</param>
 		public AdslRedialer(string configPath)
 		{
 			var path = Path.Combine(configPath);
@@ -31,6 +41,12 @@ namespace DotnetSpider.Core.Redial.Redialer
 			}
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="interfaceName">网络接口名称</param>
+		/// <param name="user">帐号</param>
+		/// <param name="password">密码</param>
 		public AdslRedialer(string interfaceName, string user, string password)
 		{
 			Interface = interfaceName;
@@ -38,6 +54,9 @@ namespace DotnetSpider.Core.Redial.Redialer
 			Password = password;
 		}
 
+		/// <summary>
+		/// 拨号
+		/// </summary>
 		public override void Redial()
 		{
 

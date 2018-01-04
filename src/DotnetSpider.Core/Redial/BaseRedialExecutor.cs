@@ -59,10 +59,21 @@ namespace DotnetSpider.Core.Redial
 		/// </summary>
 		protected abstract void RecordLastRedialTime();
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public abstract void Dispose();
 
-		public int AfterRedialWaitTime { get; set; } = -1;
-
+		/// <summary>
+		/// 拨号成功后暂停的时间
+		/// </summary>
+		public int SleepAfterRedial { get; set; } = -1;
+		
+		/// <summary>
+		/// 执行拨号
+		/// </summary>
+		/// <param name="action">执行完拨号后回调方法</param>
+		/// <returns>拨号结果</returns>
 		public RedialResult Redial(Action action = null)
 		{
 			ILocker locker = null;
@@ -134,14 +145,19 @@ namespace DotnetSpider.Core.Redial
 			finally
 			{
 				locker?.Release();
-				if (AfterRedialWaitTime > 0)
+				if (SleepAfterRedial > 0)
 				{
-					Console.WriteLine($"Going to sleep for {AfterRedialWaitTime} after redial.");
-					Thread.Sleep(AfterRedialWaitTime);
+					Console.WriteLine($"Going to sleep for {SleepAfterRedial} after redial.");
+					Thread.Sleep(SleepAfterRedial);
 				}
 			}
 		}
-
+		
+		/// <summary>
+		/// 执行网络请求
+		/// </summary>
+		/// <param name="name">网络请求名称, 仅用于标识作用</param>
+		/// <param name="action">网络请求的具体操作</param>
 		public void Execute(string name, Action action)
 		{
 			WaitRedialComplete();
@@ -158,6 +174,12 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
+		/// <summary>
+		/// 执行网络请求
+		/// </summary>
+		/// <param name="name">网络请求名称, 仅用于标识作用</param>
+		/// <param name="action">网络请求的具体操作</param>
+		/// <param name="obj">网络请求需要的参数对象</param>
 		public void Execute(string name, Action<dynamic> action, dynamic obj)
 		{
 			WaitRedialComplete();
@@ -174,6 +196,13 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
+		/// <summary>
+		/// 带返回数据的网络请求
+		/// </summary>
+		/// <typeparam name="T">返回数据</typeparam>
+		/// <param name="name">网络请求名称, 仅用于标识作用</param>
+		/// <param name="func">网络请求的具体操作</param>
+		/// <returns>返回数据</returns>
 		public T Execute<T>(string name, Func<T> func)
 		{
 			WaitRedialComplete();
@@ -190,6 +219,14 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
+		/// <summary>
+		/// 带返回数据的网络请求
+		/// </summary>
+		/// <typeparam name="T">返回数据</typeparam>
+		/// <param name="name">网络请求名称, 仅用于标识作用</param>
+		/// <param name="func">网络请求的具体操作</param>
+		/// <param name="obj">网络请求需要的参数对象</param>
+		/// <returns>返回数据</returns>
 		public T Execute<T>(string name, Func<dynamic, T> func, dynamic obj)
 		{
 			WaitRedialComplete();
@@ -206,6 +243,11 @@ namespace DotnetSpider.Core.Redial
 			}
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="redialer">拨号器</param>
+		/// <param name="validater">网络状态检测器</param>
 		protected RedialExecutor(IRedialer redialer, IInternetDetector validater)
 		{
 			if (redialer == null || validater == null)
@@ -216,6 +258,10 @@ namespace DotnetSpider.Core.Redial
 			InternetDetector = validater;
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="redialer">拨号器</param>
 		protected RedialExecutor(IRedialer redialer) : this(redialer, new DefaultInternetDetector())
 		{
 		}

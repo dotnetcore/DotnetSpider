@@ -10,23 +10,24 @@ namespace DotnetSpider.Core.Processor
 	public abstract class TargetUrlsExtractor : ITargetUrlsExtractor
 	{
 		/// <summary>
-		/// <see cref="ITargetUrlsExtractor.TargetUrlPatterns"/>
+		/// 目标链接必须符合的正则表达式
 		/// </summary>
 		public List<Regex> TargetUrlPatterns { get; protected set; }
 
 		/// <summary>
-		/// <see cref="ITargetUrlsExtractor.ExcludeTargetUrlPatterns"/>
+		/// 如果目标链接符合正则表达式，则需要排除不添加到目标链接队列中
 		/// </summary>
 		public List<Regex> ExcludeTargetUrlPatterns { get; protected set; }
 
 		/// <summary>
-		/// <see cref="ITargetUrlsExtractor.TargetUrlsExtractorTermination"/>
+		/// 用于判断当前链接是否最后一个需要采集的链接, 如果是则不需要把解析到的目标链接添加到队列中
 		/// </summary>
 		public ITargetUrlsExtractorTermination TargetUrlsExtractorTermination { get; set; }
 
 		/// <summary>
-		/// <see cref="ITargetUrlsExtractor.AddTargetUrlPatterns(string[])"/>
+		/// 添加目标链接必须符合的正则表达式
 		/// </summary>
+		/// <param name="patterns">正则表达式</param>
 		public void AddTargetUrlPatterns(params string[] patterns)
 		{
 			if (patterns != null)
@@ -46,8 +47,9 @@ namespace DotnetSpider.Core.Processor
 		}
 
 		/// <summary>
-		/// <see cref="ITargetUrlsExtractor.AddExcludeTargetUrlPatterns(string[])"/>
+		/// 添加排除目标链接的正则表达式
 		/// </summary>
+		/// <param name="patterns">正则表达式</param>
 		public void AddExcludeTargetUrlPatterns(params string[] patterns)
 		{
 			if (patterns != null)
@@ -67,8 +69,11 @@ namespace DotnetSpider.Core.Processor
 		}
 
 		/// <summary>
-		/// <see cref="ITargetUrlsExtractor.ExtractRequests(Page, Site)"/>
+		/// 解析出目标链接, 返回Request的设计是因为有可能需要重新计算PostBody等值, 因此不能直接返回string
 		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="site">站点信息</param>
+		/// <returns>目标链接</returns>
 		public IEnumerable<Request> ExtractRequests(Page page, Site site)
 		{
 			if (TargetUrlsExtractorTermination != null && TargetUrlsExtractorTermination.IsTermination(page))

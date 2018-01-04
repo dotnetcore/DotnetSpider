@@ -29,6 +29,11 @@ namespace DotnetSpider.Core.Pipeline
 		{
 		}
 
+		/// <summary>
+		/// 存储数据结果到文件中
+		/// </summary>
+		/// <param name="resultItems">数据结果</param>
+		/// <param name="spider">爬虫</param>
 		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			try

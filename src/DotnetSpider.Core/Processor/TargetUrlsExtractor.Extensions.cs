@@ -20,15 +20,29 @@ namespace DotnetSpider.Core.Processor
 
 		private static readonly ISelector ImageSelector = Selectors.XPath(".//img/@src");
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public RegionAndPatternTargetUrlsExtractor()
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="regionXpath">目标链接所在区域</param>
+		/// <param name="patterns">目标链接必须匹配的正则表达式</param>
 		public RegionAndPatternTargetUrlsExtractor(string regionXpath, params string[] patterns)
 		{
 			AddTargetUrlExtractor(regionXpath, patterns);
 		}
 
+		/// <summary>
+		/// 解析出目标链接
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="site">站点信息</param>
+		/// <returns>目标链接</returns>
 		protected override IEnumerable<Request> Extract(Page page, Site site)
 		{
 			if (_regionSelectorMapPatterns == null || _regionSelectorMapPatterns.Count == 0)
@@ -139,6 +153,11 @@ namespace DotnetSpider.Core.Processor
 			return resultUrls.Select(t => new Request(t, page.Request.Extras) { Site = site });
 		}
 
+		/// <summary>
+		/// 添加目标链接解析规则
+		/// </summary>
+		/// <param name="regionXpath">目标链接所在区域</param>
+		/// <param name="patterns">匹配目标链接的正则表达式</param>
 		public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
 		{
 			if (patterns == null || patterns.Length == 0)
@@ -216,21 +235,37 @@ namespace DotnetSpider.Core.Processor
 			return _regionSelectorMapPatterns.ContainsKey(selector) ? _regionSelectorMapPatterns[selector] : null;
 		}
 
+		/// <summary>
+		/// 自定义格式化链接
+		/// </summary>
+		/// <param name="url">目标链接</param>
+		/// <returns>格式化后的链接</returns>
 		protected virtual string FormateUrl(string url)
 		{
 			return url;
 		}
 	}
 
+	/// <summary>
+	/// 使用分页信息进行解析目标链接
+	/// </summary>
 	public abstract class PaginationTargetUrlsExtractor : TargetUrlsExtractor
 	{
+		/// <summary>
+		/// 分页信息的正则表达式
+		/// </summary>
 		public readonly Regex PaginationPattern;
 
 		/// <summary>
-		/// http://a.com?p=40  PaginationStr: p=40 => Pattern: p=\d+
+		/// http://a.com?p=40 PaginationStr: p=40 => Pattern: p=\d+
 		/// </summary>
 		public readonly string PaginationStr;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="paginationStr">分页信息片段： http://a.com?p=40 PaginationStr: p=40</param>
+		/// <param name="termination">中止器</param>
 		protected PaginationTargetUrlsExtractor(string paginationStr, ITargetUrlsExtractorTermination termination = null)
 		{
 			if (string.IsNullOrEmpty(paginationStr) || string.IsNullOrWhiteSpace(paginationStr))
@@ -243,6 +278,11 @@ namespace DotnetSpider.Core.Processor
 			TargetUrlsExtractorTermination = termination;
 		}
 
+		/// <summary>
+		/// 取得当前分页
+		/// </summary>
+		/// <param name="currentUrlOrContent">当前链接或者内容(有的分页信息放在Cookie或者Post的内容里)</param>
+		/// <returns></returns>
 		protected string GetCurrentPagination(string currentUrlOrContent)
 		{
 			return PaginationPattern.Match(currentUrlOrContent).Value;
@@ -267,6 +307,12 @@ namespace DotnetSpider.Core.Processor
 			_interval = interval;
 		}
 
+		/// <summary>
+		/// 解析出目标链接
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="site">站点信息</param>
+		/// <returns>目标链接</returns>
 		protected override IEnumerable<Request> Extract(Page page, Site site)
 		{
 			var currentPageStr = GetCurrentPagination(page.Request.Url);
@@ -280,6 +326,5 @@ namespace DotnetSpider.Core.Processor
 
 			return new Request[0];
 		}
-
 	}
 }

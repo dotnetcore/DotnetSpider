@@ -16,7 +16,8 @@ namespace DotnetSpider.Core.Infrastructure
 			AllowAutoRedirect = true,
 			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
 			UseProxy = true,
-			UseCookies = false
+			UseCookies = false,
+			MaxAutomaticRedirections = 10
 		});
 
 		/// <summary>  

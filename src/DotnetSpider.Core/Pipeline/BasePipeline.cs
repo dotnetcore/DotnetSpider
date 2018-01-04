@@ -11,12 +11,16 @@ namespace DotnetSpider.Core.Pipeline
 	/// </summary>
 	public abstract class BasePipeline : IPipeline
 	{
+		/// <summary>
+		/// 日志接口
+		/// </summary>
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		/// <summary>
 		/// 处理页面解析器解析到的数据结果
 		/// </summary>
 		/// <param name="resultItems">数据结果</param>
+		/// <param name="spider">爬虫</param>
 		public abstract void Process(IEnumerable<ResultItems> resultItems, ISpider spider);
 
 		/// <summary>
@@ -24,6 +28,9 @@ namespace DotnetSpider.Core.Pipeline
 		/// </summary>
 		public virtual void Init() { }
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public virtual void Dispose()
 		{
 		}

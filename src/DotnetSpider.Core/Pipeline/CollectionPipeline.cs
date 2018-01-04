@@ -10,6 +10,11 @@ namespace DotnetSpider.Core.Pipeline
 		private readonly Dictionary<ISpider, List<ResultItems>> _items = new Dictionary<ISpider, List<ResultItems>>();
 		private readonly static object ItemsLocker = new object();
 
+		/// <summary>
+		/// 获取所有数据结果
+		/// </summary>
+		/// <param name="spider">爬虫</param>
+		/// <returns>数据结果</returns>
 		public IEnumerable<ResultItems> GetCollection(ISpider spider)
 		{
 			lock (ItemsLocker)
@@ -25,6 +30,11 @@ namespace DotnetSpider.Core.Pipeline
 			}
 		}
 
+		/// <summary>
+		/// 处理页面解析器解析到的数据结果
+		/// </summary>
+		/// <param name="resultItems">数据结果</param>
+		/// <param name="spider">爬虫</param>
 		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			lock (ItemsLocker)
@@ -37,6 +47,9 @@ namespace DotnetSpider.Core.Pipeline
 			}
 		}
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public override void Dispose()
 		{
 			base.Dispose();
