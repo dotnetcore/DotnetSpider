@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -29,7 +30,6 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{
-			Env.Reload();
 			string id = Guid.NewGuid().ToString("N");
 			string taskGroup = Guid.NewGuid().ToString("N");
 			string userId = Guid.NewGuid().ToString("N");
@@ -39,7 +39,7 @@ namespace DotnetSpider.Extension.Test
 				new QueueDuplicateRemovedScheduler(),
 				new TestPageProcessor()))
 			{
-				spider.Monitor = new DbMonitor(spider.TaskId, spider.Identity);
+				spider.Monitor = new MySqlMonitor(spider.TaskId, spider.Identity, false, "Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;");
 				spider.AddPipeline(new TestPipeline());
 				spider.ThreadNum = 1;
 				for (int i = 0; i < 5; i++)
@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension.Test
 				spider.Run();
 			}
 			Thread.Sleep(3000);
-			using (var conn = (Env.SystemConnectionStringSettings.GetDbConnection()))
+			using (var conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"))
 			{
 				Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM DotnetSpider.Log where Identity='{id}'").Last().message);
 				Assert.Equal(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM DotnetSpider.Status where Identity='{id}'").First().Count);

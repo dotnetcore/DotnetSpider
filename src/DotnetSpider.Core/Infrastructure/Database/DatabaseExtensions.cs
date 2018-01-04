@@ -59,12 +59,17 @@ namespace DotnetSpider.Core.Infrastructure.Database
 			{
 				case Database.MySql:
 					{
-						factory = DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
+						factory = DbProviderFactories.GetFactory(DbProviderFactories.MySqlProvider);
 						break;
 					}
 				case Database.SqlServer:
 					{
-						factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
+						factory = DbProviderFactories.GetFactory(DbProviderFactories.SqlServerProvider);
+						break;
+					}
+				case Database.PostgreSql:
+					{
+						factory = DbProviderFactories.GetFactory(DbProviderFactories.PostgreSqlProvider);
 						break;
 					}
 				default:
@@ -108,11 +113,15 @@ namespace DotnetSpider.Core.Infrastructure.Database
 			{
 				case Database.MySql:
 					{
-						return new ConnectionStringSettings("MySql", connectString, "MySql.Data.MySqlClient");
+						return new ConnectionStringSettings("MySql", connectString, DbProviderFactories.MySqlProvider);
 					}
 				case Database.SqlServer:
 					{
-						return new ConnectionStringSettings("SqlServer", connectString, "System.Data.SqlClient");
+						return new ConnectionStringSettings("SqlServer", connectString, DbProviderFactories.SqlServerProvider);
+					}
+				case Database.PostgreSql:
+					{
+						return new ConnectionStringSettings("PostgreSql", connectString, DbProviderFactories.PostgreSqlProvider);
 					}
 				default:
 					{

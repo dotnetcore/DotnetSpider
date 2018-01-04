@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension
 
 		public string TaskId { get; set; }
 
-		public DbMonitor Monitor { get; set; }
+		public MySqlMonitor Monitor { get; set; }
 
 		protected CustomSpider(string name)
 		{
@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension
 				throw new ArgumentException("Length of Identity should between 1 and 120.");
 			}
 
-			Monitor = new DbMonitor(TaskId, Identity);
+			Monitor = new MySqlMonitor(TaskId, Identity);
 
 			try
 			{

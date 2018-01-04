@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
+using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -75,17 +76,17 @@ namespace DotnetSpider.Extension.Pipeline
 			IPipeline pipeline;
 			switch (Env.DataConnectionStringSettings.ProviderName)
 			{
-				case "Npgsql":
+				case DbProviderFactories.PostgreSqlProvider:
 					{
 						pipeline = new PostgreSqlEntityPipeline();
 						break;
 					}
-				case "MySql.Data.MySqlClient":
+				case DbProviderFactories.MySqlProvider:
 					{
 						pipeline = new MySqlEntityPipeline();
 						break;
 					}
-				case "System.Data.SqlClient":
+				case DbProviderFactories.SqlServerProvider:
 					{
 						pipeline = new SqlServerEntityPipeline();
 						break;
