@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Downloader;
 using System;
 #if !NETCOREAPP2_0
 using System.Threading;
@@ -70,9 +71,12 @@ namespace DotnetSpider.Sample
 			Situoli.Run();
 		}
 
-
+		/// <summary>
+		/// <c>MyTest</c> is a method in the <c>Program</c>
+		/// </summary>
 		private static void MyTest()
 		{
+			 
 		}
 	}
 

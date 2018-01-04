@@ -7,6 +7,12 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class FileDownloader : BaseDownloader
 	{
+		/// <summary>
+		/// 从本地文件中下载内容
+		/// </summary>
+		/// <param name="request">请求信息</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>页面数据</returns>
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			var filePath = request.Uri.AbsoluteUri;

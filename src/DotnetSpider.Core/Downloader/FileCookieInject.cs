@@ -29,6 +29,11 @@ namespace DotnetSpider.Core.Downloader
 			_cookiePath = path;
 		}
 
+		/// <summary>
+		/// 取得新的Cookies
+		/// </summary>
+		/// <param name="spider">爬虫</param>
+		/// <returns>Cookies</returns>
 		protected override Cookies GetCookies(ISpider spider)
 		{
 			var path = string.IsNullOrEmpty(_cookiePath) ? $"{spider.Identity}.cookies" : _cookiePath;

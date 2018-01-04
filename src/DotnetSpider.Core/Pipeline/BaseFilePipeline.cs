@@ -9,6 +9,10 @@ namespace DotnetSpider.Core.Pipeline
 	public abstract class BaseFilePipeline : BasePipeline
 	{
 		private readonly ConcurrentDictionary<string, string> _dataFolderCache = new ConcurrentDictionary<string, string>();
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public string RootDataFolder { get; protected set; }
 		public string Interval { get; protected set; }
 

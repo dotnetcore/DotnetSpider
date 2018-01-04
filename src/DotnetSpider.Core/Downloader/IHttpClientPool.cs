@@ -30,6 +30,7 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public interface IHttpClientPool
 	{
+#pragma warning disable CS1570 // XML comment has badly formed XML
 		/// <summary>
 		/// 通过不同的Hash分组, 返回对应的HttpClient
 		/// 设计初衷: 某些网站会对COOKIE某部分做承上启下的检测, 因此必须保证: www.a.com/keyword=xxxx&page=1 www.a.com/keyword=xxxx&page=2 在同一个HttpClient里访问
@@ -38,6 +39,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="cookies">Cookies</param>
 		/// <returns>HttpClient对象</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
+#pragma warning restore CS1570 // XML comment has badly formed XML
 		HttpClientItem GetHttpClient(int? hashCode = null, Cookies cookies = null);
 
 		/// <summary>

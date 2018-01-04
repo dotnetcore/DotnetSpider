@@ -11,6 +11,9 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public abstract class BaseDownloader : Named, IDownloader
 	{
+		/// <summary>
+		/// 日志接口
+		/// </summary>
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
 		/// <summary>
@@ -20,9 +23,19 @@ namespace DotnetSpider.Core.Downloader
 		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
 		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
 
+		/// <summary>
+		/// 重置Cookie
+		/// </summary>
+		/// <param name="cookies">Cookies</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public virtual void ResetCookies(Cookies cookies) { }
 
+		/// <summary>
+		/// 下载链接内容
+		/// </summary>
+		/// <param name="request">链接请求</param>
+		/// <param name="spider">爬虫接口</param>
+		/// <returns>下载内容封装好的页面对象</returns>
 		public Page Download(Request request, ISpider spider)
 		{
 			BeforeDownload(ref request, spider);
@@ -32,20 +45,38 @@ namespace DotnetSpider.Core.Downloader
 			return page;
 		}
 
+		/// <summary>
+		/// 添加处理器
+		/// </summary>
+		/// <param name="handler"><see cref="IAfterDownloadCompleteHandler"/></param>
 		public void AddAfterDownloadCompleteHandler(IAfterDownloadCompleteHandler handler)
 		{
 			_afterDownloadCompletes.Add(handler);
 		}
 
+		/// <summary>
+		/// 添加处理器
+		/// </summary>
+		/// <param name="handler"><see cref="IBeforeDownloadHandler"/></param>
 		public void AddBeforeDownloadHandler(IBeforeDownloadHandler handler)
 		{
 			_beforeDownloads.Add(handler);
 		}
 
+
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public virtual void Dispose()
 		{
 		}
 
+		/// <summary>
+		/// 下载工作的具体实现
+		/// </summary>
+		/// <param name="request">请求信息</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>页面数据</returns>
 		protected abstract Page DowloadContent(Request request, ISpider spider);
 
 		private void BeforeDownload(ref Request request, ISpider spider)

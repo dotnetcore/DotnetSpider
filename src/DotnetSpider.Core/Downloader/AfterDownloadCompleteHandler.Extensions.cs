@@ -17,12 +17,22 @@ namespace DotnetSpider.Core.Downloader
 		private readonly ITargetUrlsExtractor _targetUrlsExtractor;
 		private readonly bool _extractByProcessor;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="targetUrlsExtractor">目标链接解析器</param>
+		/// <param name="extractByProcessor">Processor是否还需要执行目标链接解析工作</param>
 		public TargetUrlsHandler(ITargetUrlsExtractor targetUrlsExtractor, bool extractByProcessor = false)
 		{
 			_targetUrlsExtractor = targetUrlsExtractor ?? throw new ArgumentNullException(nameof(targetUrlsExtractor));
 			_extractByProcessor = extractByProcessor;
 		}
 
+		/// <summary>
+		/// 执行目标链接解析器
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (_targetUrlsExtractor == null)
@@ -47,28 +57,36 @@ namespace DotnetSpider.Core.Downloader
 	public class TimingUpdateCookieHandler : AfterDownloadCompleteHandler
 	{
 		private readonly ICookieInjector _cookieInjector;
+		private readonly int _interval;
+		private DateTime _next;
 
-		private readonly int _dueTime;
-
-		private DateTime _nextTime;
-
-		public TimingUpdateCookieHandler(int dueTime, ICookieInjector injector)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="interval">间隔时间</param>
+		/// <param name="injector">Cookie注入器</param>
+		public TimingUpdateCookieHandler(int interval, ICookieInjector injector)
 		{
-			if (dueTime <= 0)
+			if (interval <= 0)
 			{
 				throw new SpiderException("dueTime should be large than 0.");
 			}
 			_cookieInjector = injector ?? throw new SpiderException("CookieInjector should not be null.");
-			_nextTime = DateTime.Now.AddSeconds(_dueTime);
-			_dueTime = dueTime;
+			_next = DateTime.Now.AddSeconds(_interval);
+			_interval = interval;
 		}
 
+		/// <summary>
+		/// 定时更新Cookie
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (DateTime.Now > _nextTime)
+			if (DateTime.Now > _next)
 			{
 				_cookieInjector?.Inject(spider);
-				_nextTime = DateTime.Now.AddSeconds(_dueTime);
+				_next = DateTime.Now.AddSeconds(_interval);
 			}
 		}
 	}
@@ -80,11 +98,20 @@ namespace DotnetSpider.Core.Downloader
 	{
 		private readonly string[] _contains;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="contains">包含的内容</param>
 		public SkipWhenContainsHandler(params string[] contains)
 		{
 			_contains = contains;
 		}
 
+		/// <summary>
+		/// 如果页面数据包含指定内容, 跳过当前链接
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -100,6 +127,11 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class PlainTextHandler : AfterDownloadCompleteHandler
 	{
+		/// <summary>
+		/// 去除下载内容中的HTML标签
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -116,6 +148,11 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class ToUpperHandler : AfterDownloadCompleteHandler
 	{
+		/// <summary>
+		/// 所有内容转化成大写
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -130,6 +167,11 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class ToLowerHandler : AfterDownloadCompleteHandler
 	{
+		/// <summary>
+		/// 所有内容转化成小写
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -158,6 +200,11 @@ namespace DotnetSpider.Core.Downloader
 			_newValue = newValue;
 		}
 
+		/// <summary>
+		/// 替换内容
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -172,6 +219,11 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class TrimHandler : AfterDownloadCompleteHandler
 	{
+		/// <summary>
+		/// Removes all leading and trailing white-space characters from the current content.
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -186,6 +238,11 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class UnescapeHandler : AfterDownloadCompleteHandler
 	{
+		/// <summary>
+		/// Converts any escaped characters in current content.
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -214,6 +271,11 @@ namespace DotnetSpider.Core.Downloader
 			_regexOptions = options;
 		}
 
+		/// <summary>
+		/// Searches the current content for all occurrences of a specified regular expression, using the specified matching options.
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (string.IsNullOrEmpty(page?.Content))
@@ -240,6 +302,10 @@ namespace DotnetSpider.Core.Downloader
 	{
 		private readonly string[] _contents;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="contents">包含的内容</param>
 		public RetryWhenContainsHandler(params string[] contents)
 		{
 			if (contents == null || contents.Length == 0)
@@ -249,6 +315,11 @@ namespace DotnetSpider.Core.Downloader
 			_contents = contents;
 		}
 
+		/// <summary>
+		/// 当包含指定内容时重试当前链接
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -269,11 +340,20 @@ namespace DotnetSpider.Core.Downloader
 	{
 		private readonly string[] _contents;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="contents">包含的内容</param>
 		public RedialWhenContainsHandler(params string[] contents)
 		{
 			_contents = contents;
 		}
 
+		/// <summary>
+		/// 当包含指定内容时触发ADSL拨号
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -295,12 +375,16 @@ namespace DotnetSpider.Core.Downloader
 	}
 
 	/// <summary>
-	/// 当Page对象中的异常信息包含指定内容时触发ADSL拨号
+	/// 当页面数据中的异常信息包含指定内容时触发ADSL拨号
 	/// </summary>
 	public class RedialWhenExceptionThrowHandler : AfterDownloadCompleteHandler
 	{
 		private readonly string _exceptionMessage;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="exceptionMessage">异常信息</param>
 		public RedialWhenExceptionThrowHandler(string exceptionMessage)
 		{
 			if (string.IsNullOrEmpty(exceptionMessage) || string.IsNullOrWhiteSpace(exceptionMessage))
@@ -310,6 +394,11 @@ namespace DotnetSpider.Core.Downloader
 			_exceptionMessage = exceptionMessage;
 		}
 
+		/// <summary>
+		/// 当页面数据中的异常信息包含指定内容时触发ADSL拨号
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content) && page.Exception != null)
@@ -333,14 +422,19 @@ namespace DotnetSpider.Core.Downloader
 	}
 
 	/// <summary>
-	/// 当包含指定内容时触发ADSL拨号, 并且重新获取Cookie
+	/// 当页面数据包含指定内容时触发ADSL拨号, 并且重新获取Cookie
 	/// </summary>
-	public class RedialAndUpdateCookieWhenContainsHandler : AfterDownloadCompleteHandler
+	public class RedialAndUpdateCookiesWhenContainsHandler : AfterDownloadCompleteHandler
 	{
 		private readonly ICookieInjector _cookieInjector;
 		private readonly string[] _contents;
 
-		public RedialAndUpdateCookieWhenContainsHandler(ICookieInjector cookieInjector, params string[] contents)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="cookieInjector">Cookie注入器</param>
+		/// <param name="contents">包含的内容</param>
+		public RedialAndUpdateCookiesWhenContainsHandler(ICookieInjector cookieInjector, params string[] contents)
 		{
 			_cookieInjector = cookieInjector ?? throw new SpiderException("cookieInjector should not be null.");
 			if (contents == null || contents.Length == 0)
@@ -350,6 +444,11 @@ namespace DotnetSpider.Core.Downloader
 			_contents = contents;
 		}
 
+		/// <summary>
+		/// 当页面数据包含指定内容时触发ADSL拨号, 并且重新获取Cookie
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
@@ -380,6 +479,13 @@ namespace DotnetSpider.Core.Downloader
 		private readonly int _startOffset;
 		private readonly int _endOffset;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="startPart">起始部分的内容</param>
+		/// <param name="endPart">结束部分的内容</param>
+		/// <param name="startOffset">开始截取的偏移</param>
+		/// <param name="endOffset">结束截取的偏移</param>
 		public CutoutHandler(string startPart, string endPart, int startOffset = 0, int endOffset = 0)
 		{
 			_startPart = startPart;
@@ -388,6 +494,11 @@ namespace DotnetSpider.Core.Downloader
 			_startOffset = startOffset;
 		}
 
+		/// <summary>
+		/// 截取下载内容
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
 			if (string.IsNullOrEmpty(page?.Content))
