@@ -96,6 +96,10 @@ namespace DotnetSpider.Core.Downloader
 					httpClientItem = HttpClientPool.GetHttpClient(proxy?.GetHashCode(), spider.Cookies);
 					httpClientItem.Handler.Proxy = httpClientItem.Handler.Proxy ?? proxy;
 				}
+				if (httpClientItem.Client.Timeout.TotalSeconds != _timeout)
+				{
+					httpClientItem.Client.Timeout = new TimeSpan(0, 0, _timeout);
+				}
 
 				response = NetworkCenter.Current.Execute("http", () => httpClientItem.Client.SendAsync(httpMessage).Result);
 				request.StatusCode = response.StatusCode;
