@@ -20,6 +20,7 @@ namespace DotnetSpider.Core.Downloader
 		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
 		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
 
+		[MethodImpl(MethodImplOptions.Synchronized)]
 		public virtual void ResetCookies(Cookies cookies) { }
 
 		public Page Download(Request request, ISpider spider)

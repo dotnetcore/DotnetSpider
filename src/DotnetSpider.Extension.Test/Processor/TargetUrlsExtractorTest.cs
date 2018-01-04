@@ -9,7 +9,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test.Processor

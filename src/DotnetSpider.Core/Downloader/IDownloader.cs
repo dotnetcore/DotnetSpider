@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
@@ -29,6 +31,7 @@ namespace DotnetSpider.Core.Downloader
 		/// ÷ÿ÷√Cookie
 		/// </summary>
 		/// <param name="cookies">Cookies</param>
+		[MethodImpl(MethodImplOptions.Synchronized)]
 		void ResetCookies(Cookies cookies);
 	}
 }

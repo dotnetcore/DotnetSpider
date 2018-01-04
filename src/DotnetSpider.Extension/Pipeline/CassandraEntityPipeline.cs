@@ -7,7 +7,6 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core;
-using System.Collections.Concurrent;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
 

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -75,7 +74,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		private HttpClientItem CreateDefaultHttpClient(IReadOnlyDictionary<string, HashSet<Cookie>> cookies = null)
+		private HttpClientItem CreateDefaultHttpClient(IEnumerable<Cookie> cookies = null)
 		{
 			var handler = new HttpClientHandler
 			{
@@ -94,17 +93,14 @@ namespace DotnetSpider.Core.Downloader
 			};
 		}
 
-		private CookieContainer CreateCookieContainer(IReadOnlyDictionary<string, HashSet<Cookie>> cookies = null)
+		private CookieContainer CreateCookieContainer(IEnumerable<Cookie> cookies = null)
 		{
 			CookieContainer container = new CookieContainer();
 			if (cookies != null && cookies.Count() > 0)
 			{
-				foreach (var pair in cookies)
+				foreach (var cookie in cookies)
 				{
-					foreach (var cookie in pair.Value)
-					{
-						container.Add(new System.Net.Cookie(cookie.Name, cookie.Value, pair.Key, cookie.Path));
-					}
+					container.Add(new System.Net.Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path));
 				}
 			}
 			return container;

@@ -1,7 +1,6 @@
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Monitor;
 using System;
-using System.Collections.Generic;
 
 namespace DotnetSpider.Core
 {
@@ -16,7 +15,8 @@ namespace DotnetSpider.Core
 		Site Site { get; }
 
 		/// <summary>
-		/// Cookies
+		/// Cookies, 如果需要更换Cookies, 则对此属性赋一个全新的Cookies对象即可(运行中也可以替换)
+		/// 爬虫运行中不能通过Cookies.AddCookies等方法再添加新的Cookie
 		/// </summary>
 		Cookies Cookies { get; set; }
 

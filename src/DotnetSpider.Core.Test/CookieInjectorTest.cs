@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Core.Downloader;
 using Xunit;
 using System.IO;
-using System.Linq;
 
 namespace DotnetSpider.Core.Test
 {

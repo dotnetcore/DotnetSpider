@@ -9,7 +9,7 @@ using System.Net.Http;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Core.Redial;
-using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -66,6 +66,11 @@ namespace DotnetSpider.Core.Downloader
 			_decodeHtml = decodeHtml;
 		}
 
+		/// <summary>
+		/// 重置Cookie
+		/// </summary>
+		/// <param name="cookies">Cookies</param>
+		[MethodImpl(MethodImplOptions.Synchronized)]
 		public override void ResetCookies(Cookies cookies)
 		{
 			HttpClientPool.ResetCookies(cookies);

@@ -197,6 +197,9 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public long AvgPipelineSpeed { get; private set; }
 
+		/// <summary>
+		/// 上报运行状态的间隔
+		/// </summary>
 		public int StatusReportInterval { get; set; } = 5000;
 
 		/// <summary>
@@ -456,6 +459,7 @@ namespace DotnetSpider.Core
 		/// <param name="path">作用路径</param>
 		public void AddCookies(string cookiesStr, string domain, string path = "/")
 		{
+			CheckIfRunning();
 			_cookies.AddCookies(cookiesStr, domain, path);
 		}
 
@@ -467,7 +471,21 @@ namespace DotnetSpider.Core
 		/// <param name="path">作用路径</param>
 		public void AddCookies(IDictionary<string, string> cookies, string domain, string path = "/")
 		{
+			CheckIfRunning();
 			_cookies.AddCookies(cookies, domain, path);
+		}
+
+		/// <summary>
+		/// 添加Cookie
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="value"></param>
+		/// <param name="domain"></param>
+		/// <param name="path"></param>
+		public void AddCookie(string key, string value, string domain, string path = "/")
+		{
+			CheckIfRunning();
+			_cookies.AddCookie(new Downloader.Cookie(key, value, domain, path));
 		}
 
 		/// <summary>
@@ -477,6 +495,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider AddStartUrlBuilder(IStartUrlsBuilder builder)
 		{
+			CheckIfRunning();
 			StartUrlBuilders.Add(builder);
 			return this;
 		}
@@ -1580,11 +1599,6 @@ namespace DotnetSpider.Core
 					Exit();
 				}
 			}
-		}
-
-		public void ResetCookies(Cookies cookies)
-		{
-			throw new NotImplementedException();
 		}
 	}
 }
