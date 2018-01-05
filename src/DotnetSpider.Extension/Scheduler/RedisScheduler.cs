@@ -184,7 +184,6 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public override void Dispose()
 		{
-			IsExited = true;
 		}
 
 		public override void Clear()
@@ -282,62 +281,62 @@ namespace DotnetSpider.Extension.Scheduler
 			return requests;
 		}
 
-		public override bool IsExited
-		{
-			get
-			{
-				try
-				{
-					if (UseInternet)
-					{
-						return NetworkCenter.Current.Execute("rds-isexited", () =>
-						{
-							var result = _redisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
-							if (result.HasValue)
-							{
-								return result == 1;
-							}
-							else
-							{
-								return false;
-							}
-						});
-					}
-					else
-					{
-						var result = _redisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
-						if (result.HasValue)
-						{
-							return result == 1;
-						}
-						else
-						{
-							return false;
-						}
-					}
+		//public override bool IsExited
+		//{
+		//	get
+		//	{
+		//		try
+		//		{
+		//			if (UseInternet)
+		//			{
+		//				return NetworkCenter.Current.Execute("rds-isexited", () =>
+		//				{
+		//					var result = _redisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
+		//					if (result.HasValue)
+		//					{
+		//						return result == 1;
+		//					}
+		//					else
+		//					{
+		//						return false;
+		//					}
+		//				});
+		//			}
+		//			else
+		//			{
+		//				var result = _redisConnection.Database.HashGet(TaskStatsKey, _identityMd5);
+		//				if (result.HasValue)
+		//				{
+		//					return result == 1;
+		//				}
+		//				else
+		//				{
+		//					return false;
+		//				}
+		//			}
 
-				}
-				catch
-				{
-					return false;
-				}
-			}
-			set
-			{
-				var action = new Action(() =>
-				{
-					_redisConnection.Database.HashSet(TaskStatsKey, _identityMd5, value ? 1 : 0);
-				});
-				if (UseInternet)
-				{
-					NetworkCenter.Current.Execute("rds-isexited", action);
-				}
-				else
-				{
-					action();
-				}
-			}
-		}
+		//		}
+		//		catch
+		//		{
+		//			return false;
+		//		}
+		//	}
+		//	set
+		//	{
+		//		var action = new Action(() =>
+		//		{
+		//			_redisConnection.Database.HashSet(TaskStatsKey, _identityMd5, value ? 1 : 0);
+		//		});
+		//		if (UseInternet)
+		//		{
+		//			NetworkCenter.Current.Execute("rds-isexited", action);
+		//		}
+		//		else
+		//		{
+		//			action();
+		//		}
+		//	}
+		//}
 
 		protected override void PushWhenNoDuplicate(Request request)
 		{

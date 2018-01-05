@@ -23,7 +23,7 @@ namespace DotnetSpider.Core.Test.Processor
 			site.AddStartUrl("http://v.youku.com/v_show/id_XMTMwNzQwMTcwMA==.html?spm=a2h1n.8251845.0.0");
 			site.AddStartUrl("http://v.youku.com/v_show/id_XMjk1MzI0Mzk4NA==.html?spm=a2h1n.8251845.0.0");
 			site.AddStartUrl("http://v.youku.com/v_show/id_XMjkzNzY0NzkyOA==.html?spm=a2h1n.8251845.0.0");
-			site.AddStartUrl("http://www.cnblogs.com/");
+			site.AddStartUrl("http://www.163.com/");
 
 			Spider spider = Spider.Create(site,
 				// crawler identity
@@ -41,7 +41,7 @@ namespace DotnetSpider.Core.Test.Processor
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
 			spider.Deep = 3;
-
+			spider.EmptySleepTime = 6000;
 			// start crawler 启动爬虫
 			spider.Run();
 
@@ -55,7 +55,7 @@ namespace DotnetSpider.Core.Test.Processor
 		{
 			protected override void Handle(Page page)
 			{
-				if (page.Request.Url.ToString() == "http://www.cnblogs.com/")
+				if (page.Request.Url.ToString() == "http://www.163.com/")
 				{
 					throw new SpiderException("");
 				}

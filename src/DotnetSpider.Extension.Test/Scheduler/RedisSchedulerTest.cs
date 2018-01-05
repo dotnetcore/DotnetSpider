@@ -257,7 +257,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			var scheduler = new QueueDuplicateRemovedScheduler();
 
 			site.AddStartUrl("http://www.baidu.com");
-			site.AddStartUrl("http://www.cnblogs.com/");
+			site.AddStartUrl("http://www.163.com/");
 
 			Spider spider = Spider.Create(site,
 				// crawler identity
@@ -275,11 +275,11 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
 			spider.Deep = 3;
-			spider.EmptySleepTime = 3000;
+			spider.EmptySleepTime = 6000;
 			// start crawler 启动爬虫
 			spider.Run();
 
-			Assert.Equal(5, spider.RetriedTimes.Value);
+ 			Assert.Equal(5, spider.RetriedTimes.Value);
 			Assert.Equal(0, scheduler.LeftRequestsCount);
 			Assert.Equal(1, scheduler.SuccessRequestsCount);
 			// 重试次数应该包含
@@ -290,13 +290,13 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		{
 			protected override void Handle(Page page)
 			{
-				if (page.Request.Url.ToString() == "http://www.cnblogs.com/")
+				if (page.Request.Url.ToString() == "http://www.163.com/")
 				{
 					throw new SpiderException("");
 				}
 				else
 				{
-					page.AddTargetRequest("http://www.cnblogs.com/", 0, false);
+					page.AddTargetRequest("http://www.163.com/", 0, false);
 				}
 			}
 		}

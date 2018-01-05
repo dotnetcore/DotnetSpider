@@ -62,6 +62,7 @@ namespace DotnetSpider.Core
 		private MemoryMappedFile _taskIdMmf;
 		private string[] _closeSignalFiles = new string[2];
 		private Cookies _cookies = new Cookies();
+		private bool _exited;
 
 		protected virtual bool IfRequireInitStartRequests(string[] arguments)
 		{
@@ -156,11 +157,6 @@ namespace DotnetSpider.Core
 		/// Event of crawler a request success.
 		/// </summary>
 		public event Action<Request> OnSuccess;
-
-		/// <summary>
-		/// Event of crawler on closing.
-		/// </summary>
-		public event Action<Spider> OnClosing;
 
 		/// <summary>
 		/// Event of crawler on comoplete.
@@ -551,8 +547,8 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Add urls with information to crawl.
 		/// </summary>
-		/// <param name="requests"></param>
-		/// <returns></returns>
+		/// <param name="request">Request</param>
+		/// <returns>Spider</returns>
 		public Spider AddStartRequest(Request request)
 		{
 			return AddStartRequests(request);
@@ -658,9 +654,8 @@ namespace DotnetSpider.Core
 
 			InitComponent(arguments);
 
-			if (arguments.Contains("running-test"))
+			if (arguments.Contains("runn-test"))
 			{
-				_scheduler.IsExited = true;
 				return;
 			}
 
@@ -671,6 +666,7 @@ namespace DotnetSpider.Core
 
 			Stat = Status.Running;
 			_realStat = Status.Running;
+			_exited = false;
 
 			int monitorInterval = CalculateMonitorInterval(Scheduler);
 
@@ -760,14 +756,12 @@ namespace DotnetSpider.Core
 
 			OnClose();
 
-			OnClosing?.Invoke(this);
-
 			var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
 			Logger.AllLog(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", LogLevel.Info);
+			PrintInfo.PrintLine();
 
 			OnClosed?.Invoke(this);
-
-			PrintInfo.PrintLine();
+			_exited = true;
 		}
 
 		/// <summary>
@@ -859,7 +853,7 @@ namespace DotnetSpider.Core
 			{
 				Task.Factory.StartNew(() =>
 				{
-					while (_realStat != Status.Exited)
+					while (!_exited)
 					{
 						Thread.Sleep(100);
 					}
@@ -876,7 +870,7 @@ namespace DotnetSpider.Core
 			CheckIfRunning();
 
 			int i = 0;
-			while (!_scheduler.IsExited)
+			while (!_exited)
 			{
 				++i;
 				Thread.Sleep(500);
@@ -889,6 +883,10 @@ namespace DotnetSpider.Core
 			OnClose();
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="site">站点信息</param>
 		protected Spider(Site site) : this()
 		{
 			_site = site ?? throw new SpiderException("Site should not be null.");
@@ -1301,7 +1299,6 @@ namespace DotnetSpider.Core
 		{
 			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
 			Scheduler.Init(this);
-			Monitorable.IsExited = false;
 		}
 
 		protected virtual void InitPipelines(params string[] arguments)
@@ -1354,7 +1351,7 @@ namespace DotnetSpider.Core
 		private void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
 		{
 			Exit();
-			while (!_scheduler.IsExited)
+			while (!_exited)
 			{
 				Thread.Sleep(100);
 			}
@@ -1388,7 +1385,7 @@ namespace DotnetSpider.Core
 		{
 			NetworkCenter.Current.Executor?.Dispose();
 			Exit();
-			while (!_scheduler.IsExited)
+			while (!_exited)
 			{
 				Thread.Sleep(100);
 			}

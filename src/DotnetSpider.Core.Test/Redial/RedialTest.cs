@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Diagnostics;
 
 namespace DotnetSpider.Core.Test.Redial
 {
@@ -53,6 +54,9 @@ namespace DotnetSpider.Core.Test.Redial
 			executor.IsTest = true;
 			NetworkCenter.Current.Executor = executor;
 
+			Stopwatch watch = new Stopwatch();
+			watch.Start();
+
 			Parallel.For(0, 5, new ParallelOptions
 			{
 				MaxDegreeOfParallelism = 5
@@ -62,7 +66,7 @@ namespace DotnetSpider.Core.Test.Redial
 				{
 					NetworkCenter.Current.Executor.Execute("test", () =>
 					{
-						Thread.Sleep(50);
+						Console.Write("requested,");
 					});
 
 					if (i % 100 == 0)
@@ -71,11 +75,14 @@ namespace DotnetSpider.Core.Test.Redial
 					}
 				}
 			});
+			watch.Stop();
+			Console.WriteLine("cost: " + watch.ElapsedMilliseconds);
 
 			var executor2 = new FileLockerRedialExecutor(new AdslRedialer("adsl_account.txt"));
 			executor2.IsTest = true;
 			NetworkCenter.Current.Executor = executor2;
-
+			watch.Reset();
+			watch.Start();
 			Parallel.For(0, 5, new ParallelOptions
 			{
 				MaxDegreeOfParallelism = 5
@@ -85,7 +92,7 @@ namespace DotnetSpider.Core.Test.Redial
 				{
 					NetworkCenter.Current.Executor.Execute("test", () =>
 					{
-						Thread.Sleep(50);
+						Console.Write("requested,");
 					});
 
 					if (i % 100 == 0)
@@ -94,6 +101,8 @@ namespace DotnetSpider.Core.Test.Redial
 					}
 				}
 			});
+			watch.Stop();
+			Console.WriteLine("cost: " + watch.ElapsedMilliseconds);
 		}
 
 		private void PrepareAdslConfig()

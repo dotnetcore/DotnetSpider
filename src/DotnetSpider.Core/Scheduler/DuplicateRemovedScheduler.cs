@@ -29,8 +29,6 @@ namespace DotnetSpider.Core.Scheduler
 
 		public bool DepthFirst { get; set; } = true;
 
-		public virtual bool IsExited { get; set; }
-
 		public void Push(Request request)
 		{
 			if (UseInternet)
@@ -68,7 +66,6 @@ namespace DotnetSpider.Core.Scheduler
 		public virtual void Dispose()
 		{
 			DuplicateRemover.Dispose();
-			IsExited = true;
 		}
 
 		public virtual void Export()

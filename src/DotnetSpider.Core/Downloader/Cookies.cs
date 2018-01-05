@@ -61,10 +61,6 @@ namespace DotnetSpider.Core.Downloader
 			{
 				throw new SpiderException("path should not be null or empty.");
 			}
-			if (!_cookies.ContainsKey(domain))
-			{
-				_cookies.Add(domain, new Dictionary<string, Cookie>());
-			}
 			var cookies = cookiesStr.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 			foreach (var pair in cookies)
 			{
@@ -93,29 +89,15 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="path">作用路径</param>
 		public void AddCookies(IDictionary<string, string> cookies, string domain, string path = "/")
 		{
-			if (string.IsNullOrEmpty(domain) || string.IsNullOrWhiteSpace(domain))
-			{
-				throw new SpiderException("domain should not be null or empty.");
-			}
-			if (string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))
-			{
-				throw new SpiderException("path should not be null or empty.");
-			}
 			if (cookies == null)
 			{
 				throw new SpiderException("cookies should not be null.");
 			}
-			if (!_cookies.ContainsKey(domain))
-			{
-				_cookies.Add(domain, new Dictionary<string, Cookie>());
-			}
 			foreach (var pair in cookies)
 			{
-				if (string.IsNullOrEmpty(pair.Key) || string.IsNullOrWhiteSpace(pair.Key))
-				{
-					throw new SpiderException("cookie name should not be null or empty.");
-				}
-				var cookie = new Cookie(pair.Key, pair.Value, domain, path);
+				var name = pair.Key;
+				var value = pair.Value;
+				var cookie = new Cookie(name, value, domain, path);
 				AddCookie(cookie);
 			}
 		}
@@ -128,17 +110,19 @@ namespace DotnetSpider.Core.Downloader
 		{
 			if (cookie != null)
 			{
-				if (!_cookies.ContainsKey(cookie.Domain))
+				var domain = cookie.Domain;
+				if (!_cookies.ContainsKey(domain))
 				{
-					_cookies.Add(cookie.Domain, new Dictionary<string, Cookie>());
+					_cookies.Add(domain, new Dictionary<string, Cookie>());
 				}
-				if (_cookies[cookie.Domain].ContainsKey(cookie.Name))
+
+				if (_cookies[domain].ContainsKey(cookie.Name))
 				{
-					_cookies[cookie.Domain][cookie.Name] = cookie;
+					_cookies[domain][cookie.Name] = cookie;
 				}
 				else
 				{
-					_cookies[cookie.Domain].Add(cookie.Name, cookie);
+					_cookies[domain].Add(cookie.Name, cookie);
 				}
 			}
 		}
@@ -190,10 +174,22 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="path">作用路径</param>
 		public Cookie(string name, string value, string domain, string path = "/")
 		{
-			Name = name;
-			Value = value;
-			Domain = domain;
-			Path = path;
+			if (string.IsNullOrEmpty(domain) || string.IsNullOrWhiteSpace(domain))
+			{
+				throw new SpiderException("domain should not be null or empty.");
+			}
+			if (string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))
+			{
+				throw new SpiderException("path should not be null or empty.");
+			}
+			if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
+			{
+				throw new SpiderException("cookie name should not be null or empty.");
+			}
+			Name = name.Trim();
+			Value = value?.Trim();
+			Domain = domain.Trim();
+			Path = path.Trim();
 		}
 	}
 }

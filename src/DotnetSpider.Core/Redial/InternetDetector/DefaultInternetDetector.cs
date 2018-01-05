@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 	/// </summary>
 	public class DefaultInternetDetector : BaseInternetDetector
 	{
-		private readonly string _url;
+		private readonly string _url = "www.baidu.com";
 
 		/// <summary>
 		/// 构造方法
