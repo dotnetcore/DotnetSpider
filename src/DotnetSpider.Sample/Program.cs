@@ -78,8 +78,7 @@ namespace DotnetSpider.Sample
 		/// </summary>
 		private static void MyTest()
 		{
-			BaiduSearchSpider spider = new BaiduSearchSpider();
-			spider.Run();
+			var va= HttpSender.Client.GetStringAsync("http://www.baidu.com").Result;
 		}
 	}
 

@@ -28,7 +28,7 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 		public DefaultInternetDetector(string url = "www.baidu.com", int timeout = 10)
 		{
 			Timeout = timeout;
-			if (!Uri.TryCreate(_url, UriKind.RelativeOrAbsolute, out var uri))
+			if (!Uri.TryCreate(_url, UriKind.RelativeOrAbsolute, out var _))
 			{
 				throw new SpiderException($"{url} is not a correct uri.");
 			}

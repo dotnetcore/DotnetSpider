@@ -61,10 +61,10 @@ namespace DotnetSpider.Core.Downloader
 			{
 				throw new SpiderException("path should not be null or empty.");
 			}
-			var cookies = cookiesStr.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+			var cookies = cookiesStr.Split(new [] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 			foreach (var pair in cookies)
 			{
-				var keyValue = pair.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+				var keyValue = pair.Split(new [] { '=' }, StringSplitOptions.RemoveEmptyEntries);
 				var name = keyValue[0];
 
 				if (keyValue.Length == 2)

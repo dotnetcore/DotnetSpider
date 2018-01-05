@@ -1,15 +1,15 @@
 namespace DotnetSpider.Core.Processor
 {
 	/// <summary>
-	/// Ä¬ÈÏ½âÎöÆ÷, Ã»ÓĞÌØ±ğ´óµÄ×÷ÓÃ, ÓÃÓÚ²âÊÔµÈ
+	/// Ä¬ï¿½Ï½ï¿½ï¿½ï¿½ï¿½ï¿½, Ã»ï¿½ï¿½ï¿½Ø±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½Ú²ï¿½ï¿½Ôµï¿½
 	/// </summary>
 	public class DefaultPageProcessor : BasePageProcessor
 	{
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// ï¿½ï¿½ï¿½ì·½ï¿½ï¿½
 		/// </summary>
-		/// <param name="partterns">Æ¥ÅäÄ¿±êÁ´½ÓµÄÕıÔò±í´ïÊ½</param>
-		/// <param name="excludeParterns">ÅÅ³ıÄ¿±êÁ´½ÓµÄÕıÔò±í´ïÊ½</param>
+		/// <param name="partterns">Æ¥ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½</param>
+		/// <param name="excludeParterns">ï¿½Å³ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½</param>
 		public DefaultPageProcessor(string[] partterns = null, string[] excludeParterns = null)
 		{
 			var targetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor();
@@ -25,19 +25,19 @@ namespace DotnetSpider.Core.Processor
 		}
 
 		/// <summary>
-		/// Ìí¼ÓÄ¿±êÁ´½Ó½âÎö¹æÔò
+		/// ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		/// </summary>
-		/// <param name="regionXpath">Ä¿±êÁ´½ÓËùÔÚÇøÓò</param>
-		/// <param name="patterns">Æ¥ÅäÄ¿±êÁ´½ÓµÄÕıÔò±í´ïÊ½</param>
+		/// <param name="regionXpath">Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name="patterns">Æ¥ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½</param>
 		public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
 		{
-			(TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor).AddTargetUrlExtractor(regionXpath, patterns);
+			(TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor)?.AddTargetUrlExtractor(regionXpath, patterns);
 		}
 
 		/// <summary>
-		/// ½âÎöÒ³ÃæÊı¾İ
+		/// ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		/// </summary>
-		/// <param name="page">Ò³ÃæÊı¾İ</param>
+		/// <param name="page">Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
 		protected override void Handle(Page page)
 		{
 			page.AddResultItem("title", page.Selectable.XPath("//title").GetValue());

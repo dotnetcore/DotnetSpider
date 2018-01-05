@@ -56,11 +56,11 @@ namespace DotnetSpider.Core
 		private StreamWriter _errorRequestStreamWriter;
 		private int _errorRequestFlushCount;
 		private RetryPolicy _pipelineRetryPolicy;
-		private long requstCount = 0;
-		private static object RequestCountLocker = new object();
+		private long _requstCount;
+		private static readonly object RequestCountLocker = new object();
 		private MemoryMappedFile _identityMmf;
 		private MemoryMappedFile _taskIdMmf;
-		private string[] _closeSignalFiles = new string[2];
+		private readonly string[] _closeSignalFiles = new string[2];
 		private Cookies _cookies = new Cookies();
 		private bool _exited;
 
@@ -82,11 +82,12 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Cookies
-		/// </summary>
+		/// Cookies, 如果需要更换Cookies, 则对此属性赋一个全新的Cookies对象即可(运行中也可以替换)
+		/// 爬虫运行中不能通过Cookies.AddCookies等方法再添加新的Cookie
+		/// </summary
 		public Cookies Cookies
 		{
-			get { return _cookies; }
+			get => _cookies;
 			set
 			{
 				if (_cookies != value)
@@ -741,9 +742,9 @@ namespace DotnetSpider.Core
 								}
 								lock (RequestCountLocker)
 								{
-									requstCount++;
+									_requstCount++;
 
-									if (requstCount % monitorInterval == 0)
+									if (_requstCount % monitorInterval == 0)
 									{
 										try
 										{

@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Processor
 		/// <returns>如果返回 True, 则说明已经采到到了最后一个链接</returns>
 		public bool IsTermination(Page page)
 		{
-			if (string.IsNullOrEmpty(page?.Content))
+			if (page==null||string.IsNullOrEmpty(page.Content)||string.IsNullOrWhiteSpace((page.Content)))
 			{
 				return false;
 			}
@@ -59,7 +59,7 @@ namespace DotnetSpider.Core.Processor
 		/// <returns>如果返回 True, 则说明已经采到到了最后一个链接</returns>
 		public bool IsTermination(Page page)
 		{
-			if (string.IsNullOrEmpty(page?.Content))
+			if (page==null||string.IsNullOrEmpty(page.Content)||string.IsNullOrWhiteSpace((page.Content)))
 			{
 				return false;
 			}

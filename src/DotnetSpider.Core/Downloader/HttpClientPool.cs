@@ -29,11 +29,7 @@ namespace DotnetSpider.Core.Downloader
 		{
 			if (hashCode == null)
 			{
-				if (_defaultHttpClientItem == null)
-				{
-					_defaultHttpClientItem = CreateDefaultHttpClient(cookies.GetCookies());
-				}
-				return _defaultHttpClientItem;
+				return _defaultHttpClientItem ?? (_defaultHttpClientItem = CreateDefaultHttpClient(cookies?.GetCookies()));
 			}
 
 			_getHttpClientCount++;
@@ -50,7 +46,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			else
 			{
-				var item = CreateDefaultHttpClient(cookies.GetCookies());
+				var item = CreateDefaultHttpClient(cookies?.GetCookies());
 				_pool.TryAdd(hashCode.Value, item);
 				return item;
 			}
@@ -96,9 +92,10 @@ namespace DotnetSpider.Core.Downloader
 		private CookieContainer CreateCookieContainer(IEnumerable<Cookie> cookies = null)
 		{
 			CookieContainer container = new CookieContainer();
-			if (cookies != null && cookies.Count() > 0)
+			var enumerable = cookies as Cookie[] ?? cookies.ToArray();
+			if (cookies != null && enumerable.Any())
 			{
-				foreach (var cookie in cookies)
+				foreach (var cookie in enumerable)
 				{
 					container.Add(new System.Net.Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
 				}

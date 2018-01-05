@@ -9,7 +9,7 @@ using DotnetSpider.Core.Proxy;
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// ╤теюх║а╢╫спео╒╣д╥Бв╟
+	/// О©╫О©╫О©╫О©╫х║О©╫О©╫О©╫О©╫О©╫О©╫о╒О©╫д╥О©╫в╟
 	/// </summary>
 	public class Request : IDisposable
 	{
@@ -18,52 +18,52 @@ namespace DotnetSpider.Core
 		private Uri _uri;
 
 		/// <summary>
-		/// у╬╣Цпео╒
+		/// у╬О©╫О©╫О©╫О©╫о╒
 		/// </summary>
 		[JsonIgnore]
 		public Site Site { get; internal set; }
 
 		/// <summary>
-		/// ╢ка╢╫с╫БнЖЁЖ╣дйЩ╬щ╫А╧ШйЩа©
+		/// О©╫О©╫О©╫О©╫О©╫с╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫щ╫О©╫О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		[JsonIgnore]
 		public int? CountOfResults { get; set; }
 
 		/// <summary>
-		/// кЫспйЩ╬щ╫А╧Ш╡ЕхКйЩ╬щ©Б╨Сй╣╪йтЖ╪с╩Р╦Эпб╣дйЩа©
+		/// О©╫О©╫О©╫О©╫О©╫О©╫О©╫щ╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫щ©О©╫О©╫й╣О©╫О©╫О©╫О©╫О©╫с╩О©╫О©╫О©╫б╣О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		[JsonIgnore]
 		public int? EffectedRows { get; set; }
 
 		/// <summary>
-		/// обтьфВ╥жвИ
+		/// О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		public int? DownloaderGroup { get; set; }
 
 		/// <summary>
-		/// обть╢ка╢╫сдзхщй╠й╧сц╣д╢ЗюМ
+		/// О©╫О©╫О©╫ь╢О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫й╠й╧О©╫ц╣д╢О©╫О©╫О©╫
 		/// </summary>
 		[JsonIgnore]
 		public UseSpecifiedUriWebProxy Proxy { get; set; }
 
 		/// <summary>
-		/// ╣╠г╟а╢╫с╣диН╤х, д╛хо╧╧тЛ╣да╢╫сиН╤хн╙1, сцсз©ьжфеюх║╣диН╤х
+		/// О©╫О©╫г╟О©╫О©╫О©╫с╣О©╫О©╫О©╫О©╫, д╛О©╫о╧О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫н╙1, О©╫О©╫О©╫з©О©╫О©╫О©╫О©╫О©╫х║О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		public int Depth { get; set; } = 1;
 
 		/// <summary>
-		/// ╣╠г╟а╢╫свса╢╫с╣диН╤х
+		/// О©╫О©╫г╟О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫с╣О©╫О©╫О©╫О©╫
 		/// </summary>
 		[JsonIgnore]
 		public int NextDepth => Depth + 1;
 
 		/// <summary>
-		/// ╣╠г╟а╢╫сря╬╜жьйт╣д╢нйЩ
+		/// О©╫О©╫г╟О©╫О©╫О©╫О©╫О©╫я╬О©╫О©╫О©╫О©╫т╣д╢О©╫О©╫О©╫
 		/// </summary>
 		public int CycleTriedTimes { get; set; }
 
 		/// <summary>
-		/// ╣╠г╟а╢╫сйг╥Яйг╨о╥╗а╢╫с
+		/// О©╫О©╫г╟О©╫О©╫О©╫О©╫О©╫г╥О©╫О©╫г╨о╥О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		[JsonIgnore]
 		public bool IsAvailable
@@ -88,37 +88,37 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// гКгСа╢╫сй╠Referer╡нйЩ╣дж╣
+		/// О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫й╠RefererО©╫О©╫О©╫О©╫О©╫О©╫ж╣
 		/// </summary>
 		public string Referer { get; set; }
 
 		/// <summary>
-		/// гКгСа╢╫сй╠Origin╡нйЩ╣дж╣
+		/// О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫й╠OriginО©╫О©╫О©╫О©╫О©╫О©╫ж╣
 		/// </summary>
 		public string Origin { get; set; }
 
 		/// <summary>
-		/// гКгСа╢╫с╣д╥╫╥╗
+		/// О©╫О©╫О©╫О©╫О©╫О©╫О©╫с╣д╥О©╫О©╫О©╫
 		/// </summary>
 		public HttpMethod Method { get; set; } = HttpMethod.Get;
 
 		/// <summary>
-		/// а╢╫с╣дсеох╪╤, ╫Жсцсзсеох╪╤╤сап
+		/// О©╫О©╫О©╫с╣О©╫О©╫О©╫О©╫х╪О©╫, О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫х╪О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		public int Priority { get; set; }
 
 		/// <summary>
-		/// ╢Ф╢╒╢ка╢╫с╤тс╕╣д╤НмБйЩ╬щвж╣Д
+		/// О©╫Ф╢╒О©╫О©╫О©╫О©╫О©╫с╤О©╫с╕О©╫д╤О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ж╣О©╫
 		/// </summary>
 		public Dictionary<string, dynamic> Extras { get; set; }
 
 		/// <summary>
-		/// гКгС╢ка╢╫сй╠пХр╙POST╣дйЩ╬щ
+		/// О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫й╠О©╫О©╫р╙POSTО©╫О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		public string PostBody { get; set; }
 
 		/// <summary>
-		/// гКгСа╢╫с
+		/// О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		public string Url
 		{
@@ -142,49 +142,43 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// гКгСа╢╫с
+		/// О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		[JsonIgnore]
-		public Uri Uri
-		{
-			get
-			{
-				return _uri;
-			}
-		}
+		public Uri Uri => _uri;
 
 		/// <summary>
-		/// TODO ╢ка╢╫спео╒╣дн╗р╩╠Йй╤, ©идэпХр╙лМ╪с╦Э╤ЮйТпт, хГдЁп╘Ё║╬╟URLйгмЙЁир╩жб, й╧сцReferer╩РуъCookieю╢гЬ╠ПгКгС
+		/// TODO О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫о╒О©╫О©╫н╗р╩О©╫О©╫й╤, О©╫О©╫О©╫О©╫О©╫О©╫р╙О©╫О©╫с╦О©╫О©╫О©╫О©╫О©╫О©╫О©╫, О©╫О©╫дЁп╘О©╫О©╫О©╫О©╫URLО©╫О©╫О©╫О©╫О©╫р╩О©╫О©╫, й╧О©╫О©╫RefererО©╫О©╫О©╫О©╫CookieО©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
 		[JsonIgnore]
 		public string Identity => CryptoUtil.Md5Encrypt(Url + PostBody);
 
 		/// <summary>
-		/// гКгС╢ка╢╫с╨С╥ЧнЯфВ╥╣╩ь╣дв╢л╛бК
+		/// О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫с╨О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ь╣О©╫в╢л╛О©╫О©╫
 		/// </summary>
 		[JsonIgnore]
 		public HttpStatusCode? StatusCode { get; set; }
 
 		/// <summary>
-		/// ╧╧тЛ╥╫╥╗
+		/// О©╫О©╫О©╫Л╥╫О©╫О©╫
 		/// </summary>
 		public Request()
 		{
 		}
 
 		/// <summary>
-		/// ╧╧тЛ╥╫╥╗
+		/// О©╫О©╫О©╫Л╥╫О©╫О©╫
 		/// </summary>
-		/// <param name="url">а╢╫с</param>
+		/// <param name="url">О©╫О©╫О©╫О©╫</param>
 		public Request(string url) : this(url, null)
 		{
 		}
 
 		/// <summary>
-		/// ╧╧тЛ╥╫╥╗
+		/// О©╫О©╫О©╫Л╥╫О©╫О©╫
 		/// </summary>
-		/// <param name="url">а╢╫с</param>
-		/// <param name="extras">йЩ╬щвж╣Д</param>
+		/// <param name="url">О©╫О©╫О©╫О©╫</param>
+		/// <param name="extras">О©╫О©╫О©╫О©╫О©╫ж╣О©╫</param>
 		public Request(string url, IDictionary<string, dynamic> extras = null)
 		{
 			Url = url;
@@ -204,10 +198,10 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// м╗╧Щ╪Эж╣х║╣ц╢ка╢╫с╤тс╕╣д╤НмБпео╒
+		/// м╗О©╫О©╫О©╫О©╫ж╣х║О©╫ц╢О©╫О©╫О©╫О©╫с╤О©╫с╕О©╫д╤О©╫О©╫О©╫О©╫О©╫о╒
 		/// </summary>
-		/// <param name="key">╪Эж╣</param>
-		/// <returns>╤НмБпео╒</returns>
+		/// <param name="key">О©╫О©╫ж╣</param>
+		/// <returns>О©╫О©╫О©╫О©╫О©╫О©╫о╒</returns>
 		public dynamic GetExtra(string key)
 		{
 			lock (_locker)
@@ -226,10 +220,10 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// иХжц╢ка╢╫с╣д╤НмБпео╒
+		/// О©╫О©╫О©╫ц╢О©╫О©╫О©╫О©╫с╣д╤О©╫О©╫О©╫О©╫О©╫о╒
 		/// </summary>
-		/// <param name="key">╪Эж╣</param>
-		/// <param name="value">╤НмБпео╒</param>
+		/// <param name="key">О©╫О©╫ж╣</param>
+		/// <param name="value">О©╫О©╫О©╫О©╫О©╫О©╫о╒</param>
 		public void PutExtra(string key, dynamic value)
 		{
 			lock (_locker)
@@ -297,9 +291,9 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// TODO жьпбк╪©╪уБ╦Ж©кб║╥╫╥╗йг╥Я╩╧спвВсц
+		/// TODO О©╫О©╫О©╫О©╫к╪О©╫О©╫О©╫О©╫О©╫О©╫О©╫б║О©╫О©╫О©╫О©╫О©╫г╥О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 		/// </summary>
-		/// <returns>╤теюх║а╢╫спео╒╣д╥Бв╟</returns>
+		/// <returns>О©╫О©╫О©╫О©╫х║О©╫О©╫О©╫О©╫О©╫О©╫о╒О©╫д╥О©╫в╟</returns>
 		public Request Clone()
 		{
 			lock (_locker)

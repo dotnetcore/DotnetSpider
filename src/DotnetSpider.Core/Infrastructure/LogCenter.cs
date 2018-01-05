@@ -18,11 +18,11 @@ namespace DotnetSpider.Core.Infrastructure
 	/// </summary>
 	public static class LogCenter
 	{
-		private static ILogger Logger;
+		private static ILogger _logger;
 
-		private readonly static RetryPolicy RetryPolicy = Policy.Handle<Exception>().Retry(5, (ex, count) =>
+		private static readonly RetryPolicy RetryPolicy = Policy.Handle<Exception>().Retry(5, (ex, count) =>
 		{
-			Logger.Error($"Submit http log failed [{count}]: {ex}");
+			_logger.Error($"Submit http log failed [{count}]: {ex}");
 		});
 
 		static LogCenter()
@@ -76,7 +76,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 			configuration.Install(new InstallationContext());
 			LogManager.Configuration = configuration;
-			Logger = GetLogger();
+			_logger = GetLogger();
 		}
 
 		/// <summary>

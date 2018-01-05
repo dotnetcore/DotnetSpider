@@ -94,7 +94,7 @@ namespace DotnetSpider.Core
 			{
 				if (_selectable == null)
 				{
-					string urlOrPadding = ContentType == ContentType.Json ? Request.Site.JsonPadding : Request.Url.ToString();
+					string urlOrPadding = ContentType == ContentType.Json ? Request.Site.JsonPadding : Request.Url;
 					_selectable = new Selectable(Content, urlOrPadding, ContentType, Request.Site.RemoveOutboundLinks ? Request.Site.Domains : null);
 				}
 				return _selectable;
@@ -108,7 +108,7 @@ namespace DotnetSpider.Core
 		public Page(Request request)
 		{
 			Request = request;
-			Url = request.Url.ToString();
+			Url = request.Url;
 			ResultItems.Request = request;
 		}
 

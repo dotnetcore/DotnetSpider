@@ -35,15 +35,17 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (_targetUrlsExtractor == null)
+			if (_targetUrlsExtractor == null || page == null)
 			{
 				return;
 			}
+
 			var requests = _targetUrlsExtractor.ExtractRequests(page, spider.Site);
 			foreach (var request in requests)
 			{
 				page.AddTargetRequest(request);
 			}
+
 			if (!_extractByProcessor)
 			{
 				page.SkipExtractTargetUrls = !page.SkipExtractTargetUrls || page.SkipExtractTargetUrls;
@@ -71,6 +73,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				throw new SpiderException("dueTime should be large than 0.");
 			}
+
 			_cookieInjector = injector ?? throw new SpiderException("CookieInjector should not be null.");
 			_next = DateTime.Now.AddSeconds(_interval);
 			_interval = interval;
@@ -114,11 +117,13 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				var content = page.Content;
-				page.Skip = _contains.Any(c => content.Contains(c));
+				return;
 			}
+
+			var content = page.Content;
+			page.Skip = _contains.Any(c => content.Contains(c));
 		}
 	}
 
@@ -134,12 +139,13 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				var htmlDocument = new HtmlDocument();
-				htmlDocument.LoadHtml(page.Content);
-				page.Content = htmlDocument.DocumentNode.InnerText;
+				return;
 			}
+			var htmlDocument = new HtmlDocument();
+			htmlDocument.LoadHtml(page.Content);
+			page.Content = htmlDocument.DocumentNode.InnerText;
 		}
 	}
 
@@ -155,10 +161,11 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				page.Content = page.Content.ToUpper();
+				return;
 			}
+			page.Content = page.Content.ToUpper();
 		}
 	}
 
@@ -174,10 +181,11 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				page.Content = page.Content.ToLower();
+				return;
 			}
+			page.Content = page.Content.ToLower();
 		}
 	}
 
@@ -207,10 +215,11 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				page.Content = page.Content.Replace(_oldValue, _newValue);
+				return;
 			}
+			page.Content = page.Content.Replace(_oldValue, _newValue);
 		}
 	}
 
@@ -226,10 +235,11 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				page.Content = page.Content.Trim();
+				return;
 			}
+			page.Content = page.Content.Trim();
 		}
 	}
 
@@ -245,10 +255,11 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				page.Content = Regex.Unescape(page.Content);
+				return;
 			}
+			page.Content = Regex.Unescape(page.Content);
 		}
 	}
 
@@ -278,19 +289,19 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
 
 			string textValue = string.Empty;
-			MatchCollection collection =
-				Regex.Matches(page.Content, _pattern, _regexOptions);
+			MatchCollection collection = Regex.Matches(page.Content, _pattern, _regexOptions);
 
 			foreach (Match item in collection)
 			{
 				textValue += item.Value;
 			}
+
 			page.Content = textValue;
 		}
 	}
@@ -312,6 +323,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				throw new SpiderException("contents should not be empty/null.");
 			}
+
 			_contents = contents;
 		}
 
@@ -322,13 +334,14 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				var content = page.Content;
-				if (_contents.Any(c => content.Contains(c)))
-				{
-					page.AddTargetRequest(page.Request);
-				}
+				return;
+			}
+			var content = page.Content;
+			if (_contents.Any(c => content.Contains(c)))
+			{
+				page.AddTargetRequest(page.Request);
 			}
 		}
 	}
@@ -356,20 +369,22 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				var content = page.Content;
-				var containContent = _contents.FirstOrDefault(c => content.Contains(c));
-				if (containContent != null)
+				return;
+			}
+			var content = page.Content;
+			var containContent = _contents.FirstOrDefault(c => content.Contains(c));
+			if (containContent != null)
+			{
+				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
-					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
-					{
-						Logger.AllLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
-						spider.Exit();
-					}
-					page = Spider.AddToCycleRetry(page.Request, spider.Site);
-					page.Exception = new DownloadException($"Downloaded content contains: {containContent}.");
+					Logger.AllLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
+					spider.Exit();
 				}
+
+				page = Spider.AddToCycleRetry(page.Request, spider.Site);
+				page.Exception = new DownloadException($"Downloaded content contains: {containContent}.");
 			}
 		}
 	}
@@ -391,6 +406,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				throw new SpiderException("exceptionMessage should not be null or empty.");
 			}
+
 			_exceptionMessage = exceptionMessage;
 		}
 
@@ -401,22 +417,20 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content) && page.Exception != null)
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content) || page.Exception == null)
 			{
-				if (string.IsNullOrEmpty(_exceptionMessage))
+				return;
+			}
+			if (page.Exception.Message.Contains(_exceptionMessage))
+			{
+				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
-					page.Exception = new SpiderException("ExceptionMessage should not be empty/null.");
+					Logger.AllLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
+					spider.Exit();
 				}
-				if (page.Exception.Message.Contains(_exceptionMessage))
-				{
-					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
-					{
-						Logger.AllLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
-						spider.Exit();
-					}
-					Spider.AddToCycleRetry(page.Request, spider.Site);
-					page.Exception = new DownloadException("Download failed and redial finished already.");
-				}
+
+				Spider.AddToCycleRetry(page.Request, spider.Site);
+				page.Exception = new DownloadException("Download failed and redial finished already.");
 			}
 		}
 	}
@@ -441,6 +455,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				throw new SpiderException("contents should not be null or empty.");
 			}
+
 			_contents = contents;
 		}
 
@@ -451,20 +466,22 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (!string.IsNullOrEmpty(page?.Content))
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
 			{
-				var content = page.Content;
-				var containContent = _contents.FirstOrDefault(c => content.Contains(c));
-				if (containContent != null)
+				return;
+			}
+			var content = page.Content;
+			var containContent = _contents.FirstOrDefault(c => content.Contains(c));
+			if (containContent != null)
+			{
+				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
-					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
-					{
-						spider.Exit();
-					}
-					Spider.AddToCycleRetry(page.Request, spider.Site);
-					_cookieInjector.Inject(spider);
-					page.Exception = new DownloadException($"Downloaded content contains: {containContent}.");
+					spider.Exit();
 				}
+
+				Spider.AddToCycleRetry(page.Request, spider.Site);
+				_cookieInjector.Inject(spider);
+				page.Exception = new DownloadException($"Downloaded content contains: {containContent}.");
 			}
 		}
 	}
@@ -501,12 +518,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (string.IsNullOrEmpty(page?.Content))
-			{
-				return;
-			}
-
-			if (page.Skip)
+			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content) || page.Skip)
 			{
 				return;
 			}
@@ -532,6 +544,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				throw new SpiderException("Cutout failed. Please check your settings.");
 			}
+
 			string newRawText = rawText.Substring(begin, length).Trim();
 			page.Content = newRawText;
 		}

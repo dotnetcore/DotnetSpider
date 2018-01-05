@@ -13,14 +13,7 @@ namespace DotnetSpider.Core.Pipeline
 		/// <summary>
 		/// 数据根目录
 		/// </summary>
-		public string RootDataFolder { get; protected set; }
-
-		/// <summary>
-		/// 数据根目录与程序运行目录路径的相对值,
-		/// 数据根目录通过此值计算得出,
-		/// RootDataFolder = Path.Combine(Env.BaseDirectory, Interval);
-		/// </summary>
-		public string Interval { get; protected set; }
+		protected string RootDataFolder { get; set; }
 
 		/// <summary>
 		/// 构造方法
@@ -52,7 +45,6 @@ namespace DotnetSpider.Core.Pipeline
 			}
 
 			RootDataFolder = Path.Combine(Env.BaseDirectory, interval);
-			Interval = interval;
 		}
 
 		internal string GetDataFolder(ISpider spider)

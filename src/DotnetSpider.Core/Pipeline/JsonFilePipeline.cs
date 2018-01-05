@@ -5,39 +5,36 @@ using Newtonsoft.Json;
 using NLog;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-#if NET_CORE
-using System.Runtime.InteropServices;
-#endif
 
 namespace DotnetSpider.Core.Pipeline
 {
 	/// <summary>
-	/// Êı¾İĞòÁĞ»¯³ÉJSON²¢´æ´¢µ½ÎÄ¼şÖĞ
+	/// æ•°æ®åºåˆ—åŒ–æˆJSONå¹¶å­˜å‚¨åˆ°æ–‡ä»¶ä¸­
 	/// </summary>
 	public class JsonFilePipeline : BaseFilePipeline
 	{
 		private readonly ConcurrentDictionary<string, StreamWriter> _writers = new ConcurrentDictionary<string, StreamWriter>();
 
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// æ„é€ æ–¹æ³•
 		/// </summary>
 		public JsonFilePipeline() : base("json")
 		{
 		}
 
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// æ„é€ æ–¹æ³•
 		/// </summary>
-		/// <param name="interval">Êı¾İ¸ùÄ¿Â¼Óë³ÌĞòÔËĞĞÄ¿Â¼Â·¾¶µÄÏà¶ÔÖµ</param>
+		/// <param name="interval">æ•°æ®æ ¹ç›®å½•ä¸ç¨‹åºè¿è¡Œç›®å½•è·¯å¾„çš„ç›¸å¯¹å€¼</param>
 		public JsonFilePipeline(string interval) : base(interval)
 		{
 		}
 
 		/// <summary>
-		/// Êı¾İĞòÁĞ»¯³ÉJSON²¢´æ´¢µ½ÎÄ¼şÖĞ
+		/// æ•°æ®åºåˆ—åŒ–æˆJSONå¹¶å­˜å‚¨åˆ°æ–‡ä»¶ä¸­
 		/// </summary>
-		/// <param name="resultItems">Êı¾İ½á¹û</param>
-		/// <param name="spider">ÅÀ³æ</param>
+		/// <param name="resultItems">æ•°æ®ç»“æœ</param>
+		/// <param name="spider">çˆ¬è™«</param>
 		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			try

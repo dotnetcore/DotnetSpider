@@ -44,7 +44,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="key">秘钥</param>
 		/// <param name="str">需要加密的字符串</param>
 		/// <returns>加密后的字符串</returns>
-		public static string DESEncrypt(string key, string str)
+		public static string DesEncrypt(string key, string str)
 		{
 			DESCryptoServiceProvider cryptoProvider = new DESCryptoServiceProvider();
 			var bytes = Encoding.ASCII.GetBytes(key);

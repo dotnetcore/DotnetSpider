@@ -40,7 +40,7 @@ namespace DotnetSpider.Core.Downloader
 
 		private readonly string _downloadFolder;
 		private readonly bool _decodeHtml;
-		private readonly int _timeout = 5;
+		private readonly double _timeout = 5;
 
 		/// <summary>
 		/// HttpClient池
@@ -89,7 +89,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, spider.Site);
 
-				HttpClientItem httpClientItem = null;
+				HttpClientItem httpClientItem;
 				if (spider.Site.HttpProxyPool == null)
 				{
 					// Request可以设置不同的DownloaderGroup来使用不同的HttpClient
@@ -103,9 +103,9 @@ namespace DotnetSpider.Core.Downloader
 					httpClientItem = HttpClientPool.GetHttpClient(proxy?.GetHashCode(), spider.Cookies);
 					httpClientItem.Handler.Proxy = httpClientItem.Handler.Proxy ?? proxy;
 				}
-				if (httpClientItem.Client.Timeout.TotalSeconds != _timeout)
+				if (!Equals(httpClientItem.Client.Timeout.TotalSeconds, _timeout))
 				{
-					httpClientItem.Client.Timeout = new TimeSpan(0, 0, _timeout);
+					httpClientItem.Client.Timeout = new TimeSpan(0, 0, (int)_timeout);
 				}
 
 				response = NetworkCenter.Current.Execute("http", () => httpClientItem.Client.SendAsync(httpMessage).Result);

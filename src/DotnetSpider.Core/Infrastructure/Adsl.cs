@@ -40,19 +40,6 @@ namespace DotnetSpider.Core.Infrastructure
 			public int dwConnectionDuration;
 		}
 
-		[StructLayout(LayoutKind.Sequential)]
-		private struct RasEntryName
-		{
-			public int dwSize;
-			//[MarshalAs(UnmanagedType.ByValTStr,SizeConst=(int)RasFieldSizeConstants.RAS_MaxEntryName + 1)]
-			public string szEntryName;
-			//#if WINVER5
-			//  public int dwFlags;
-			//  [MarshalAs(UnmanagedType.ByValTStr,SizeConst=260+1)]
-			//  public string szPhonebookPath;
-			//#endif
-		}
-
 		[DllImport("rasapi32.dll")]
 		private static extern uint RasHangUp(IntPtr hrasconn);
 

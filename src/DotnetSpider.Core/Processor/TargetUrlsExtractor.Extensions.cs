@@ -5,16 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-#if !NET_CORE
-using System.Web;
-#endif
 
 namespace DotnetSpider.Core.Processor
 {
 	/// <summary>
 	/// 指定区域下的链接并且需要符合给定正则的链接为符合要求的目标链接
 	/// </summary>
-	public class RegionAndPatternTargetUrlsExtractor : TargetUrlsExtractor
+	public sealed class RegionAndPatternTargetUrlsExtractor : TargetUrlsExtractor
 	{
 		private readonly Dictionary<ISelector, List<Regex>> _regionSelectorMapPatterns = new Dictionary<ISelector, List<Regex>>();
 
@@ -81,7 +78,7 @@ namespace DotnetSpider.Core.Processor
 				{
 					var newUrl = FormateUrl(link);
 #if !NET_CORE
-					tmp.Add(HttpUtility.HtmlDecode(HttpUtility.UrlDecode(newUrl)));
+					tmp.Add(System.Web.HttpUtility.HtmlDecode(System.Web.HttpUtility.UrlDecode(newUrl)));
 #else
 					tmp.Add(WebUtility.HtmlDecode(WebUtility.UrlDecode(newUrl)));
 #endif
@@ -209,7 +206,7 @@ namespace DotnetSpider.Core.Processor
 		/// </summary>
 		/// <param name="region"></param>
 		/// <returns></returns>
-		internal virtual bool ContainsTargetUrlRegion(string region)
+		internal bool ContainsTargetUrlRegion(string region)
 		{
 			ISelector selector = Selectors.Default();
 			if (!string.IsNullOrWhiteSpace(region))
@@ -224,7 +221,7 @@ namespace DotnetSpider.Core.Processor
 		/// </summary>
 		/// <param name="regionXpath"></param>
 		/// <returns></returns>
-		internal virtual List<Regex> GetTargetUrlPatterns(string regionXpath)
+		internal List<Regex> GetTargetUrlPatterns(string regionXpath)
 		{
 			ISelector selector = Selectors.Regex(RegexUtil.Url);
 			if (!string.IsNullOrWhiteSpace(regionXpath))
@@ -240,7 +237,7 @@ namespace DotnetSpider.Core.Processor
 		/// </summary>
 		/// <param name="url">目标链接</param>
 		/// <returns>格式化后的链接</returns>
-		protected virtual string FormateUrl(string url)
+		private string FormateUrl(string url)
 		{
 			return url;
 		}

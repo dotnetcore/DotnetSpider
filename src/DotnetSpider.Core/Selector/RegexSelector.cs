@@ -25,7 +25,7 @@ namespace DotnetSpider.Core.Selector
 		/// </summary>
 		/// <param name="pattern">正则表达式</param>
 		/// <param name="group"></param>
-		public RegexSelector(string pattern, int group)
+		public RegexSelector(string pattern, int group = 0)
 		{
 			if (string.IsNullOrEmpty(pattern) || string.IsNullOrWhiteSpace(pattern))
 			{
@@ -34,15 +34,6 @@ namespace DotnetSpider.Core.Selector
 			_pattern = pattern;
 			_regex = new Regex(pattern, RegexOptions.IgnoreCase);
 			_group = group;
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="pattern">正则表达式</param>
-		public RegexSelector(string pattern)
-			: this(pattern, 0)
-		{
 		}
 
 		/// <summary>

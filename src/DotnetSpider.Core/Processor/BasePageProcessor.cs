@@ -1,10 +1,4 @@
-﻿#if !NET_CORE
-using System.Web;
-#else
-using System.Net;
-#endif
-
-namespace DotnetSpider.Core.Processor
+﻿namespace DotnetSpider.Core.Processor
 {
 	/// <summary>
 	/// 页面解析器、抽取器的抽象
