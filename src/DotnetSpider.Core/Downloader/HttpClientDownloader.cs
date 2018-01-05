@@ -92,6 +92,7 @@ namespace DotnetSpider.Core.Downloader
 				HttpClientItem httpClientItem = null;
 				if (spider.Site.HttpProxyPool == null)
 				{
+					// Request可以设置不同的DownloaderGroup来使用不同的HttpClient
 					httpClientItem = HttpClientPool.GetHttpClient(request.DownloaderGroup, spider.Cookies);
 				}
 				else

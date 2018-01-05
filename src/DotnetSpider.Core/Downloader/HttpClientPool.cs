@@ -17,16 +17,14 @@ namespace DotnetSpider.Core.Downloader
 		private readonly ConcurrentDictionary<int, HttpClientItem> _pool = new ConcurrentDictionary<int, HttpClientItem>();
 		private HttpClientItem _defaultHttpClientItem;
 
-#pragma warning disable CS1570 // XML comment has badly formed XML
-							/// <summary>
-							/// 通过不同的Hash分组, 返回对应的HttpClient
-							/// 设计初衷: 某些网站会对COOKIE某部分做承上启下的检测, 因此必须保证: www.a.com/keyword=xxxx&page=1 www.a.com/keyword=xxxx&page=2 在同一个HttpClient里访问
-							/// </summary>
-							/// <param name="hashCode">分组的哈希</param>
-							/// <param name="cookies">Cookies</param>
-							/// <returns>HttpClient对象</returns>
+		/// <summary>
+		/// 通过不同的Hash分组, 返回对应的HttpClient
+		/// 设计初衷: 某些网站会对COOKIE某部分做承上启下的检测, 因此必须保证: www.a.com/keyword=xxxx&amp;page=1 www.a.com/keyword=xxxx&amp;page=2 在同一个HttpClient里访问
+		/// </summary>
+		/// <param name="hashCode">分组的哈希</param>
+		/// <param name="cookies">Cookies</param>
+		/// <returns>HttpClient对象</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-#pragma warning restore CS1570 // XML comment has badly formed XML
 		public HttpClientItem GetHttpClient(int? hashCode = null, Cookies cookies = null)
 		{
 			if (hashCode == null)
