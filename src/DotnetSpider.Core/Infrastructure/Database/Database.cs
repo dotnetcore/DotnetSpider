@@ -3,15 +3,37 @@ using System.ComponentModel;
 
 namespace DotnetSpider.Core.Infrastructure.Database
 {
+	/// <summary>
+	/// 数据库类型
+	/// </summary>
 	[Flags]
 	public enum Database
 	{
-		[Description("MySql.Data.MySqlClient")]
+		/// <summary>
+		/// MySql
+		/// </summary>
+		[System.ComponentModel.Description("MySql.Data.MySqlClient")]
 		MySql,
-		[Description("System.Data.SqlClient")]
+
+		/// <summary>
+		/// SqlServer
+		/// </summary>
+		[System.ComponentModel.Description("System.Data.SqlClient")]
 		SqlServer,
+
+		/// <summary>
+		/// MongoDB
+		/// </summary>
 		MongoDb,
+
+		/// <summary>
+		/// Cassandra
+		/// </summary>
 		Cassandra,
+
+		/// <summary>
+		/// PostgreSql
+		/// </summary>
 		PostgreSql
 	}
 }

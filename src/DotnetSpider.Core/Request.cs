@@ -108,7 +108,7 @@ namespace DotnetSpider.Core
 		public int Priority { get; set; }
 
 		/// <summary>
-		/// 存储此链接对应的额外信息
+		/// 存储此链接对应的额外数据字典
 		/// </summary>
 		public Dictionary<string, dynamic> Extras { get; set; }
 
@@ -157,7 +157,7 @@ namespace DotnetSpider.Core
 		/// TODO 此链接信息的唯一标识, 可能需要添加更多属性, 如某些场景URL是完成一致, 使用Referer或者Cookie来区别请求
 		/// </summary>
 		[JsonIgnore]
-		public string Identity => Encrypt.Md5Encrypt(Url + PostBody);
+		public string Identity => CryptoUtil.Md5Encrypt(Url + PostBody);
 
 		/// <summary>
 		/// 请求此链接后服务器返回的状态码
@@ -165,14 +165,26 @@ namespace DotnetSpider.Core
 		[JsonIgnore]
 		public HttpStatusCode? StatusCode { get; set; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public Request()
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="url">链接</param>
 		public Request(string url) : this(url, null)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="url">链接</param>
+		/// <param name="extras">数据字典</param>
 		public Request(string url, IDictionary<string, dynamic> extras = null)
 		{
 			Url = url;

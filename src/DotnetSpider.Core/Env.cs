@@ -75,6 +75,11 @@ namespace DotnetSpider.Core
 		public static string Ip { get; set; }
 
 		/// <summary>
+		/// 当前环境的节点编号
+		/// </summary>
+		public static string NodeId => Ip;
+
+		/// <summary>
 		/// 从配置文件中读取的Redis连接字符串
 		/// </summary>
 		public static string RedisConnectString { get; private set; }

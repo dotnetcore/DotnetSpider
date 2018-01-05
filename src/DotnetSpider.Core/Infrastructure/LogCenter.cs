@@ -13,6 +13,9 @@ using Polly;
 
 namespace DotnetSpider.Core.Infrastructure
 {
+	/// <summary>
+	/// 日志中心
+	/// </summary>
 	public static class LogCenter
 	{
 		private static ILogger Logger;
@@ -27,11 +30,18 @@ namespace DotnetSpider.Core.Infrastructure
 			InitLogCenter();
 		}
 
+		/// <summary>
+		/// 取得日志接口
+		/// </summary>
+		/// <returns>日志接口</returns>
 		public static ILogger GetLogger()
 		{
 			return LogManager.GetLogger("DotnetSpider");
 		}
 
+		/// <summary>
+		/// 初始化日志中心
+		/// </summary>
 		public static void InitLogCenter()
 		{
 #if !NET_CORE
@@ -69,7 +79,11 @@ namespace DotnetSpider.Core.Infrastructure
 			Logger = GetLogger();
 		}
 
-		public static string GetDefaultConfigString()
+		/// <summary>
+		/// 取得默认的NLog配置内容
+		/// </summary>
+		/// <returns>NLog配置内容</returns>
+		internal static string GetDefaultConfigString()
 		{
 			var stream = typeof(LogCenter).Assembly.GetManifestResourceStream("DotnetSpider.Core.nlog.default.config");
 			if (stream == null)
@@ -85,19 +99,43 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 仅使用NLog写日志
+		/// </summary>
+		/// <param name="logger">日志接口</param>
+		/// <param name="identity">唯一标识</param>
+		/// <param name="message">信息</param>
+		/// <param name="level">日志级别</param>
+		/// <param name="exception">异常信息</param>
 		public static void NLog(this ILogger logger, string identity, string message, LogLevel level, Exception exception = null)
 		{
 			LogEventInfo theEvent = new LogEventInfo(level, logger.Name, message) { Exception = exception };
 			theEvent.Properties["Identity"] = identity;
-			theEvent.Properties["NodeId"] = NodeId.Id;
+			theEvent.Properties["NodeId"] = Env.NodeId;
 			logger.Log(theEvent);
 		}
 
+		/// <summary>
+		/// 仅使用NLog写日志
+		/// </summary>
+		/// <param name="logger">日志接口</param>
+		/// <param name="message">信息</param>
+		/// <param name="level">日志级别</param>
+		/// <param name="exception">异常信息</param>
 		public static void NLog(this ILogger logger, string message, LogLevel level, Exception exception = null)
 		{
 			NLog(logger, "System", message, level, exception);
 		}
 
+		/// <summary>
+		/// 通过NLog、和Http写日志.
+		/// Http日志的开关为: Env.EnterpiseService &amp;&amp; Env.EnterpiseServiceLog
+		/// </summary>
+		/// <param name="logger">日志接口</param>
+		/// <param name="identity">唯一标识</param>
+		/// <param name="message">信息</param>
+		/// <param name="level">日志级别</param>
+		/// <param name="exception">异常信息</param>
 		public static void AllLog(this ILogger logger, string identity, string message, LogLevel level, Exception exception = null)
 		{
 			NLog(logger, identity, message, level, exception);
@@ -105,6 +143,14 @@ namespace DotnetSpider.Core.Infrastructure
 			HttpLog(identity, message, level, exception);
 		}
 
+		/// <summary>
+		/// 通过NLog、和Http写日志.
+		/// Http日志的开关为: Env.EnterpiseService &amp;&amp; Env.EnterpiseServiceLog
+		/// </summary>
+		/// <param name="logger">日志接口</param>
+		/// <param name="message">信息</param>
+		/// <param name="level">日志级别</param>
+		/// <param name="exception">异常信息</param>
 		public static void AllLog(this ILogger logger, string message, LogLevel level, Exception exception = null)
 		{
 			AllLog(logger, "System", message, level, exception);
@@ -121,7 +167,7 @@ namespace DotnetSpider.Core.Infrastructure
 					LogInfo = new
 					{
 						Identity = identity,
-						NodeId = NodeId.Id,
+						NodeId = Env.NodeId,
 						Logged = DateTime.UtcNow,
 						Level = level.ToString(),
 						Message = message,

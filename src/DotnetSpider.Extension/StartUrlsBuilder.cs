@@ -70,7 +70,7 @@ namespace DotnetSpider.Extension
 		protected List<IDictionary<string, object>> QueryDatas()
 		{
 			List<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
-			using (var conn = ConnectionStringSettings.GetDbConnection())
+			using (var conn = ConnectionStringSettings.CreateDbConnection())
 			{
 				foreach (var item in conn.MyQuery(Sql))
 				{

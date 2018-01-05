@@ -11,20 +11,20 @@ namespace DotnetSpider.Core.Selector
 		/// <summary>
 		/// 判断查询是否包含属性
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>如果返回 True, 则说明是查询元素的属性值</returns>
 		public abstract bool HasAttribute();
 
 		/// <summary>
 		/// 对节点进行查询, 查询结果为第一个符合查询条件的元素
 		/// </summary>
-		/// <param name="element"><see cref="HtmlNode"/></param>
+		/// <param name="element">HTML元素</param>
 		/// <returns>查询结果</returns>
 		public abstract dynamic Select(HtmlNode element);
 
 		/// <summary>
 		/// 对节点进行查询, 查询结果为所有符合查询条件的元素
 		/// </summary>
-		/// <param name="element"><see cref="HtmlNode"/></param>
+		/// <param name="element">HTML元素</param>
 		/// <returns>查询结果</returns>
 		public abstract List<dynamic> SelectList(HtmlNode element);
 

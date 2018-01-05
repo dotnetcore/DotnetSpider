@@ -136,7 +136,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			redisScheduler.Dispose();
 
-			redisScheduler.Import(scheduler.ToList());
+			redisScheduler.Import(scheduler.All);
 
 			Assert.Equal("http://www.d.com/", redisScheduler.Poll().Url.ToString());
 			Assert.Equal("http://www.c.com/", redisScheduler.Poll().Url.ToString());

@@ -13,7 +13,6 @@
     <description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp; scraping framework for .NET</description>
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="Autofac" version="4.6.1"/>
         <dependency id="Newtonsoft.Json" version="10.0.3"/>
         <dependency id="NLog" version="5.0.0-beta09"/>
         <dependency id="HtmlAgilityPack" version="1.6.3"/>
@@ -29,7 +28,6 @@
         <dependency id="Polly" version="5.6.1" />
       </group>
       <group targetFramework=".NETFramework4.5">
-        <dependency id="Autofac" version="4.6.1"/>
         <dependency id="Newtonsoft.Json" version="10.0.3"/>
         <dependency id="HtmlAgilityPack" version="1.6.3"/>
         <dependency id="NLog" version="4.4.12"/>

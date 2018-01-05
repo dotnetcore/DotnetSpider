@@ -6,10 +6,15 @@ using System.Text.RegularExpressions;
 namespace DotnetSpider.Core.Infrastructure
 {
 	/// <summary>
-	/// url and html utils.
+	/// Url 的帮助类
 	/// </summary>
-	public static class UrlUtils
+	public static class UrlUtil
 	{
+		/// <summary>
+		/// 取得链接的一级域名
+		/// </summary>
+		/// <param name="url">链接</param>
+		/// <returns>一级域名</returns>
 		public static string GetBaseDomain(string url)
 		{
 			var host = new Uri(url).Host;
@@ -18,14 +23,13 @@ namespace DotnetSpider.Core.Infrastructure
 
 			if (hs.Length > 2)
 			{
-				//�����host��ַ����������
-				int p2 = host.LastIndexOf('.');                 //���һ�Ρ�.�����ֵ�λ��
-				int p1 = host.Substring(0, p2).LastIndexOf('.');//�����ڶ�����.�����ֵ�λ��
+				int p2 = host.LastIndexOf('.');
+				int p1 = host.Substring(0, p2).LastIndexOf('.');
 				string s1 = host.Substring(p1);
 				if (!list.Contains(s1))
 					return s1.TrimStart('.');
 
-				//������׺Ϊ���Σ����á�.���ָ���
+
 				if (hs.Length > 3)
 					return host.Substring(host.Substring(0, p1).LastIndexOf('.'));
 				else
@@ -42,11 +46,11 @@ namespace DotnetSpider.Core.Infrastructure
 		}
 
 		/// <summary>
-		///  
+		/// 计算最终的URL
 		/// </summary>
-		/// <param name="url"></param>
-		/// <param name="refer"></param>
-		/// <returns></returns>
+		/// <param name="url">Base uri</param>
+		/// <param name="refer">Relative uri</param>
+		/// <returns>最终的URL</returns>
 		public static string CanonicalizeUrl(string url, string refer)
 		{
 			try
@@ -61,11 +65,21 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 去掉URL中的协议
+		/// </summary>
+		/// <param name="url">URL</param>
+		/// <returns>去掉协议后的URL</returns>
 		public static string RemoveProtocol(string url)
 		{
 			return Regex.Replace(url, "[\\w]+://", "", RegexOptions.IgnoreCase);
 		}
 
+		/// <summary>
+		/// 取得URL的域名
+		/// </summary>
+		/// <param name="url">链接</param>
+		/// <returns>域名</returns>
 		public static string GetDomain(string url)
 		{
 			string domain = RemoveProtocol(url);
@@ -75,16 +89,6 @@ namespace DotnetSpider.Core.Infrastructure
 				domain = domain.Substring(0, i);
 			}
 			return domain;
-		}
-
-		public static IList<Request> ConvertToRequests(IEnumerable<string> urls, int grade)
-		{
-			return urls.Select(url => new Request(url) { Depth = grade }).ToList();
-		}
-
-		public static IList<string> ConvertToUrls(IEnumerable<Request> requests)
-		{
-			return requests.Select(request => request.Url.ToString()).ToList();
 		}
 	}
 }

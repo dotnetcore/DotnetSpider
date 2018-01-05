@@ -6,25 +6,42 @@ using DotnetSpider.HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Selector
 {
-	public class CssHtmlSelector : BaseHtmlSelector
+	/// <summary>
+	/// CSS 选择器
+	/// </summary>
+	public class CssSelector : BaseHtmlSelector
 	{
-		private readonly string _selectorText;
+		private readonly string _cssSelector;
 		private readonly string _attrName;
 
-		public CssHtmlSelector(string selectorText)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="cssSelector">Css 选择器</param>
+		public CssSelector(string cssSelector)
 		{
-			_selectorText = selectorText;
+			_cssSelector = cssSelector;
 		}
 
-		public CssHtmlSelector(string selectorText, string attrName)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="cssSelector">Css 选择器</param>
+		/// <param name="attrName">属性名称</param>
+		public CssSelector(string cssSelector, string attrName)
 		{
-			_selectorText = selectorText;
+			_cssSelector = cssSelector;
 			_attrName = attrName;
 		}
 
+		/// <summary>
+		/// 对节点进行查询, 查询结果为第一个符合查询条件的元素
+		/// </summary>
+		/// <param name="element">HTML元素</param>
+		/// <returns>查询结果</returns>
 		public override dynamic Select(HtmlNode element)
 		{
-			IList<HtmlNode> elements = element.QuerySelectorAll(_selectorText).ToList();
+			IList<HtmlNode> elements = element.QuerySelectorAll(_cssSelector).ToList();
 
 			if (elements.Count > 0)
 			{
@@ -40,27 +57,23 @@ namespace DotnetSpider.Core.Selector
 			return null;
 		}
 
+		/// <summary>
+		/// 对节点进行查询, 查询结果为所有符合查询条件的元素
+		/// </summary>
+		/// <param name="element">HTML元素</param>
+		/// <returns>查询结果</returns>
 		public override List<dynamic> SelectList(HtmlNode element)
 		{
-			return element.QuerySelectorAll(_selectorText).Cast<dynamic>().ToList();
+			return element.QuerySelectorAll(_cssSelector).Cast<dynamic>().ToList();
 		}
 
+		/// <summary>
+		/// 判断查询是否包含属性
+		/// </summary>
+		/// <returns>如果返回 True, 则说明是查询元素的属性值</returns>
 		public override bool HasAttribute()
 		{
 			return _attrName != null;
-		}
-
-		protected string GetText(HtmlNode element)
-		{
-			StringBuilder accum = new StringBuilder();
-			foreach (var node in element.ChildNodes)
-			{
-				if (node is HtmlTextNode)
-				{
-					accum.Append(node.InnerText);
-				}
-			}
-			return accum.ToString();
 		}
 	}
 }

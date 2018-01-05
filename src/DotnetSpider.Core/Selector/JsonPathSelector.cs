@@ -7,21 +7,31 @@ using Newtonsoft.Json.Linq;
 namespace DotnetSpider.Core.Selector
 {
 	/// <summary>
-	/// JsonPath selector. 
-	/// Used to extract content from JSON. 
+	/// JsonPath selector.
+	/// Used to extract content from JSON.
 	/// </summary>
 	public class JsonPathSelector : ISelector
 	{
 		private readonly string _jsonPath;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="jsonPath">JsonPath</param>
 		public JsonPathSelector(string jsonPath)
 		{
 			_jsonPath = jsonPath;
 		}
 
-		public dynamic Select(dynamic text)
+		/// <summary>
+		/// 从JSON文本中查询单个结果
+		/// 如果符合条件的结果有多个, 仅返回第一个
+		/// </summary>
+		/// <param name="json">需要查询的Json文本</param>
+		/// <returns>查询结果</returns>
+		public dynamic Select(dynamic json)
 		{
-			IList<dynamic> result = SelectList(text);
+			IList<dynamic> result = SelectList(json);
 			if (result.Count > 0)
 			{
 				return result[0];
@@ -29,16 +39,21 @@ namespace DotnetSpider.Core.Selector
 			return null;
 		}
 
-		public List<dynamic> SelectList(dynamic text)
+		/// <summary>
+		/// 从JSON文本中查询所有结果
+		/// </summary>
+		/// <param name="json">需要查询的Json文本</param>
+		/// <returns>查询结果</returns>
+		public List<dynamic> SelectList(dynamic json)
 		{
-			if (text != null)
+			if (json != null)
 			{
 				List<dynamic> list = new List<dynamic>();
-				if (text is string)
+				if (json is string)
 				{
-					if (JsonConvert.DeserializeObject(text) is JObject o)
+					if (JsonConvert.DeserializeObject(json) is JObject o)
 					{
-						var items = o.SelectTokens(_jsonPath).Select(t=>t.ToString()).ToList();
+						var items = o.SelectTokens(_jsonPath).Select(t => t.ToString()).ToList();
 						if (items.Count > 0)
 						{
 							list.AddRange(items);
@@ -46,7 +61,7 @@ namespace DotnetSpider.Core.Selector
 					}
 					else
 					{
-						JArray array = JsonConvert.DeserializeObject(text) as JArray;
+						JArray array = JsonConvert.DeserializeObject(json) as JArray;
 						var items = array?.SelectTokens(_jsonPath).Select(t => t.ToString()).ToList();
 						if (items != null && items.Count > 0)
 						{
@@ -56,7 +71,7 @@ namespace DotnetSpider.Core.Selector
 				}
 				else
 				{
-					dynamic realText = text is HtmlNode node ? JsonConvert.DeserializeObject<JObject>(node.InnerText) : text;
+					dynamic realText = json is HtmlNode node ? JsonConvert.DeserializeObject<JObject>(node.InnerText) : json;
 
 					if (realText is JObject o)
 					{
@@ -68,7 +83,7 @@ namespace DotnetSpider.Core.Selector
 					}
 					else
 					{
-						JArray array = text as JArray;
+						JArray array = json as JArray;
 						var items = array?.SelectTokens(_jsonPath).Select(t => t.ToString()).ToList();
 						if (items != null && items.Count > 0)
 						{

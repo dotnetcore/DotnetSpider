@@ -1,6 +1,8 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Infrastructure;
 using System;
+using System.Diagnostics;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
@@ -76,7 +78,8 @@ namespace DotnetSpider.Sample
 		/// </summary>
 		private static void MyTest()
 		{
-			 
+			BaiduSearchSpider spider = new BaiduSearchSpider();
+			spider.Run();
 		}
 	}
 

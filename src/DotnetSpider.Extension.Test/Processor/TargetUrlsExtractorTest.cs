@@ -21,7 +21,7 @@ namespace DotnetSpider.Extension.Test.Processor
 			var id = Guid.NewGuid().ToString("N");
 			BaiduSearchSpider spider = new BaiduSearchSpider(id);
 			spider.Run();
-			using (var conn = Env.DataConnectionStringSettings.GetDbConnection())
+			using (var conn = Env.DataConnectionStringSettings.CreateDbConnection())
 			{
 				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{id}'");
 				Assert.Equal(60, count);

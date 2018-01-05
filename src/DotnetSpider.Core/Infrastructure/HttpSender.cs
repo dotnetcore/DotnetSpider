@@ -9,8 +9,14 @@ using System.Text;
 
 namespace DotnetSpider.Core.Infrastructure
 {
+	/// <summary>
+	/// HTTP 帮助类
+	/// </summary>
 	public static class HttpSender
 	{
+		/// <summary>
+		/// 公用 HttpClient
+		/// </summary>
 		public static readonly HttpClient Client = new HttpClient(new HttpClientHandler
 		{
 			AllowAutoRedirect = true,
@@ -20,9 +26,9 @@ namespace DotnetSpider.Core.Infrastructure
 			MaxAutomaticRedirections = 10
 		});
 
-		/// <summary>  
+		/// <summary>
 		/// 根据相传入的数据，得到相应页面数据  
-		/// </summary>  
+		/// </summary>
 		/// <param name="item">参数类对象</param>  
 		/// <returns>返回HttpResult类型</returns>  
 		public static HttpResult Request(HttpRequest item)
@@ -73,6 +79,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return result;
 		}
 
+		/// <summary>
+		/// 请求链接数据
+		/// </summary>
+		/// <param name="url">链接</param>
+		/// <returns>返回HttpResult类型</returns>
 		public static HttpResult Request(string url)
 		{
 			return Request(new HttpRequest
@@ -81,6 +92,12 @@ namespace DotnetSpider.Core.Infrastructure
 			});
 		}
 
+		/// <summary>
+		/// 请求链接数据
+		/// </summary>
+		/// <param name="url">链接</param>
+		/// <param name="encoding">编码</param>
+		/// <returns>返回HttpResult类型</returns>
 		public static HttpResult Request(string url, Encoding encoding)
 		{
 			return Request(new HttpRequest
@@ -90,7 +107,14 @@ namespace DotnetSpider.Core.Infrastructure
 			});
 		}
 
-		public static HttpResult Request(string url, System.Net.Http.HttpMethod method, Encoding encoding)
+		/// <summary>
+		/// 请求链接数据
+		/// </summary>
+		/// <param name="url">链接</param>
+		/// <param name="encoding">编码</param>
+		/// <param name="method">请求方法</param>
+		/// <returns>返回HttpResult类型</returns>
+		public static HttpResult Request(string url, HttpMethod method, Encoding encoding)
 		{
 			return Request(new HttpRequest
 			{
@@ -376,7 +400,14 @@ namespace DotnetSpider.Core.Infrastructure
 	/// </summary>  
 	public class HttpRequest
 	{
+		/// <summary>
+		/// HTTP 版本
+		/// </summary>
 		public static readonly Version Version10 = new Version("1.0");
+
+		/// <summary>
+		/// HTTP 版本
+		/// </summary>
 		public static readonly Version Version11 = new Version("1.1");
 
 		/// <summary>  
@@ -474,8 +505,8 @@ namespace DotnetSpider.Core.Infrastructure
 		/// </summary>  
 		public WebHeaderCollection Header { get; set; } = new WebHeaderCollection();
 
-		/// <summary>  
-		// 获取或设置用于请求的 HTTP 版本。返回结果:用于请求的 HTTP 版本。
+		/// <summary>
+		/// 获取或设置用于请求的 HTTP 版本。返回结果:用于请求的 HTTP 版本。
 		/// </summary>  
 		public Version ProtocolVersion { get; set; } = Version11;
 
@@ -514,8 +545,14 @@ namespace DotnetSpider.Core.Infrastructure
 		/// </summary>  
 		public DateTime? IfModifiedSince { get; set; }
 
+		/// <summary>
+		/// 允许自动跳转
+		/// </summary>
 		public bool AllowAutoRedirect { get; set; } = true;
 
+		/// <summary>
+		/// Connectionlimit
+		/// </summary>
 		public int Connectionlimit { get; set; } = 1024;
 	}
 

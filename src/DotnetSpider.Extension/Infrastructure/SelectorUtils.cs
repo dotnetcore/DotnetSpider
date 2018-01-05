@@ -33,7 +33,7 @@ namespace DotnetSpider.Extension.Infrastructure
 					}
 				case "monday":
 					{
-						return DateTimeUtils.MondayOfCurrentWeek;
+						return DateTimeUtil.Monday;
 					}
 				case "today":
 					{
@@ -41,7 +41,7 @@ namespace DotnetSpider.Extension.Infrastructure
 					}
 				case "monthly":
 					{
-						return DateTimeUtils.FirstDayOfCurrentMonth;
+						return DateTimeUtil.FirstDayOfTheMonth;
 					}
 				case "index":
 					{

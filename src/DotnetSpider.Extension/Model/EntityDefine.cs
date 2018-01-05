@@ -47,7 +47,7 @@ namespace DotnetSpider.Extension.Model
 		{
 			Type = typeof(T);
 
-			var typeName = Type.GetTypeCrossPlatform().FullName;
+			var typeName = Type.FullName;
 			Name = typeName;
 
 			TableInfo = Type.GetCustomAttribute<EntityTable>();

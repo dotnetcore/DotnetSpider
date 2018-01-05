@@ -6,17 +6,27 @@ using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Infrastructure
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class XTokenQueue
 	{
 		private string _queue;
 		private int _pos;
 		private static readonly string[] Quotes = { "\"", "\'" };
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="data"></param>
 		public XTokenQueue(string data)
 		{
 			_queue = data ?? throw new ArgumentException("Object must not be null");
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool IsEmpty => RemainingLength() == 0;
 
 		private int RemainingLength()
@@ -24,37 +34,69 @@ namespace DotnetSpider.Core.Infrastructure
 			return _queue.Length - _pos;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public char Peek()
 		{
 			return IsEmpty ? '\u0000' : _queue[_pos];
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="c"></param>
 		public void AddFirst(char c)
 		{
 			AddFirst(c.ToString());
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
 		public void AddFirst(string seq)
 		{
 			_queue = seq + _queue.Substring(_pos);
 			_pos = 0;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public bool Matches(string seq)
 		{
-			return _queue.RegionMatches(true, _pos, seq, 0, seq.Length);
+			return RegionMatches(_queue, true, _pos, seq, 0, seq.Length);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public bool MatchesRegex(string seq)
 		{
 			return Regex.IsMatch(_queue.Substring(_pos), seq, RegexOptions.IgnoreCase);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public bool MatchesCs(string seq)
 		{
 			return _queue.IndexOf(seq, _pos, StringComparison.Ordinal) > -1;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public bool MatchesAny(params string[] seq)
 		{
 			string[] arr = seq;
@@ -72,6 +114,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return false;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public bool MatchesAny(params char[] seq)
 		{
 			if (IsEmpty)
@@ -96,11 +143,20 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public bool MatchesStartTag()
 		{
 			return RemainingLength() >= 2 && _queue[_pos] == 60 && char.IsLetter(_queue[_pos + 1]);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public bool MatchChomp(string seq)
 		{
 			if (Matches(seq))
@@ -114,16 +170,27 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public bool MatchesWhitespace()
 		{
 			return !IsEmpty && char.IsWhiteSpace(_queue[_pos]);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public bool MatchesWord()
 		{
 			return !IsEmpty && (char.IsLetter(_queue[_pos]) || char.IsDigit(_queue[_pos]));
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Advance()
 		{
 			if (!IsEmpty)
@@ -132,11 +199,19 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public char Consume()
 		{
 			return _queue[_pos++];
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
 		public void Consume(string seq)
 		{
 			if (!Matches(seq))
@@ -153,6 +228,11 @@ namespace DotnetSpider.Core.Infrastructure
 			_pos += len;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public string ConsumeTo(string seq)
 		{
 			int offset = _queue.IndexOf(seq, _pos, StringComparison.Ordinal);
@@ -168,6 +248,11 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public string ConsumeToIgnoreCase(string seq)
 		{
 			int start = _pos;
@@ -202,6 +287,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return var6;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public string ConsumeToAny(params string[] seq)
 		{
 			int start;
@@ -213,6 +303,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return data;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public string ConsumeAny(params string[] seq)
 		{
 			string[] arr = seq;
@@ -231,6 +326,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return "";
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public string ChompTo(string seq)
 		{
 			string data = ConsumeTo(seq);
@@ -238,6 +338,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return data;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public string ChompToIgnoreCase(string seq)
 		{
 			string data = ConsumeToIgnoreCase(seq);
@@ -245,6 +350,10 @@ namespace DotnetSpider.Core.Infrastructure
 			return data;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public string ChompBalancedQuotes()
 		{
 			string quote = ConsumeAny(Quotes);
@@ -261,6 +370,12 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="open"></param>
+		/// <param name="close"></param>
+		/// <returns></returns>
 		public string ChompBalancedNotInQuotes(char open, char close)
 		{
 			StringBuilder accum = new StringBuilder();
@@ -314,6 +429,12 @@ namespace DotnetSpider.Core.Infrastructure
 			return accum.ToString();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="open"></param>
+		/// <param name="close"></param>
+		/// <returns></returns>
 		public string ChompBalanced(char open, char close)
 		{
 			StringBuilder accum = new StringBuilder();
@@ -350,6 +471,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return accum.ToString();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="str"></param>
+		/// <returns></returns>
 		public static string Unescape(string str)
 		{
 			StringBuilder builder = new StringBuilder();
@@ -378,6 +504,10 @@ namespace DotnetSpider.Core.Infrastructure
 			return builder.ToString();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public bool ConsumeWhitespace()
 		{
 			bool seen;
@@ -389,6 +519,10 @@ namespace DotnetSpider.Core.Infrastructure
 			return seen;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public string ConsumeWord()
 		{
 			int start;
@@ -399,6 +533,10 @@ namespace DotnetSpider.Core.Infrastructure
 			return _queue.Substring(start, _pos);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public string ConsumeTagName()
 		{
 			int start;
@@ -409,6 +547,10 @@ namespace DotnetSpider.Core.Infrastructure
 			return _queue.Substring(start, _pos);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public string ConsumeElementSelector()
 		{
 			int start;
@@ -419,17 +561,29 @@ namespace DotnetSpider.Core.Infrastructure
 			return _queue.Substring(start, _pos);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="length"></param>
 		public void UnConsume(int length)
 		{
 			IsTrue(length <= _pos, "length " + length + " is larger than consumed chars " + _pos);
 			_pos -= length;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="word"></param>
 		public void UnConsume(string word)
 		{
 			UnConsume(word.Length);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public string ConsumeCssIdentifier()
 		{
 			int start;
@@ -440,6 +594,10 @@ namespace DotnetSpider.Core.Infrastructure
 			return _queue.Substring(start, _pos);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public string ConsumeAttributeKey()
 		{
 			int start;
@@ -450,6 +608,10 @@ namespace DotnetSpider.Core.Infrastructure
 			return _queue.Substring(start, _pos);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public string Remainder()
 		{
 			StringBuilder accum = new StringBuilder();
@@ -462,11 +624,20 @@ namespace DotnetSpider.Core.Infrastructure
 			return accum.ToString();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public override string ToString()
 		{
 			return _queue.Substring(_pos);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="seq"></param>
+		/// <returns></returns>
 		public bool ContainsAny(params string[] seq)
 		{
 			string[] arr = seq;
@@ -484,6 +655,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return false;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="str"></param>
+		/// <returns></returns>
 		public static string TrimQuotes(string str)
 		{
 			IsTrue(!string.IsNullOrEmpty(str));
@@ -499,6 +675,12 @@ namespace DotnetSpider.Core.Infrastructure
 			return str;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="needle"></param>
+		/// <param name="haystack"></param>
+		/// <returns></returns>
 		public static bool In(string needle, params string[] haystack)
 		{
 			string[] arr = haystack;
@@ -516,6 +698,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return false;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="strs"></param>
+		/// <returns></returns>
 		public static List<string> TrimQuotes(List<string> strs)
 		{
 			IsTrue(strs != null);
@@ -524,6 +711,11 @@ namespace DotnetSpider.Core.Infrastructure
 			return strs.Select(TrimQuotes).ToList();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="str"></param>
+		/// <returns></returns>
 		public string ConsumeToUnescaped(string str)
 		{
 			string s = ConsumeToAny(str);
@@ -537,6 +729,10 @@ namespace DotnetSpider.Core.Infrastructure
 			return s;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="val"></param>
 		public static void IsTrue(bool val)
 		{
 			if (!val)
@@ -545,6 +741,11 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="val"></param>
+		/// <param name="msg"></param>
 		public static void IsTrue(bool val, string msg)
 		{
 			if (!val)
@@ -553,6 +754,10 @@ namespace DotnetSpider.Core.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public List<string> ParseFuncionParams()
 		{
 			List<string> list = new List<string>();
@@ -587,10 +792,72 @@ namespace DotnetSpider.Core.Infrastructure
 			return list;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="paramStr"></param>
+		/// <returns></returns>
 		public static List<string> ParseFuncionParams(string paramStr)
 		{
 			XTokenQueue tq = new XTokenQueue(paramStr);
 			return tq.ParseFuncionParams();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="ignoreCase"></param>
+		/// <param name="toffset"></param>
+		/// <param name="other"></param>
+		/// <param name="ooffset"></param>
+		/// <param name="len"></param>
+		/// <returns></returns>
+		public static bool RegionMatches(string value, bool ignoreCase, int toffset, string other, int ooffset, int len)
+		{
+			char[] ta = value.ToCharArray();
+			int to = toffset;
+			char[] pa = other.ToCharArray();
+			int po = ooffset;
+			// Note: toffset, ooffset, or len might be near -1>>>1.
+			if ((ooffset < 0) || (toffset < 0)
+				|| (toffset > (long)value.Length - len)
+				|| (ooffset > (long)other.Length - len))
+			{
+				return false;
+			}
+			while (len-- > 0)
+			{
+				char c1 = ta[to++];
+				char c2 = pa[po++];
+				if (c1 == c2)
+				{
+					continue;
+				}
+				if (ignoreCase)
+				{
+					// If characters don't match but case may be ignored,
+					// try converting both characters to uppercase.
+					// If the results match, then the comparison scan should
+					// continue.
+					char u1 = char.ToUpper(c1);
+					char u2 = char.ToUpper(c2);
+					if (u1 == u2)
+					{
+						continue;
+					}
+					// Unfortunately, conversion to uppercase does not work properly
+					// for the Georgian alphabet, which has strange rules about case
+					// conversion.  So we need to make one last check before
+					// exiting.
+					if (char.ToLower(u1) == char.ToLower(u2))
+					{
+						continue;
+					}
+				}
+				return false;
+			}
+			return true;
 		}
 	}
 }

@@ -39,10 +39,10 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					while (!_isDisposed)
 					{
-						IntPtr maindHwnd = WindowsFormUtils.FindWindow(null, "plugin-container.exe - 应用程序错误");
+						IntPtr maindHwnd = WindowsFormUtil.FindWindow(null, "plugin-container.exe - 应用程序错误");
 						if (maindHwnd != IntPtr.Zero)
 						{
-							WindowsFormUtils.SendMessage(maindHwnd, WindowsFormUtils.WmClose, 0, 0);
+							WindowsFormUtil.SendMessage(maindHwnd, WindowsFormUtil.WmClose, 0, 0);
 						}
 						Thread.Sleep(500);
 					}

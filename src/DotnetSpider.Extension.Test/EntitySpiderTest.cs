@@ -160,7 +160,7 @@ namespace DotnetSpider.Extension.Test
 			var redis = ConnectionMultiplexer.Connect(confiruation);
 			var db = redis.GetDatabase(0);
 
-			var md5 = Encrypt.Md5Encrypt(spider.Identity);
+			var md5 = CryptoUtil.Md5Encrypt(spider.Identity);
 			var itemKey = "item-" + md5;
 			var setKey = "set-" + md5;
 			var queueKey = "queue-" + md5;
@@ -185,7 +185,7 @@ namespace DotnetSpider.Extension.Test
 			var guid = Guid.NewGuid().ToString();
 			BaiduSearchSpider spider = new BaiduSearchSpider(guid);
 			spider.Run();
-			using (var conn = Env.DataConnectionStringSettings.GetDbConnection())
+			using (var conn = Env.DataConnectionStringSettings.CreateDbConnection())
 			{
 				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{guid}'");
 				Assert.Equal(20, count);

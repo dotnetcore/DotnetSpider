@@ -4,6 +4,10 @@ using System.Reflection;
 
 namespace DotnetSpider.Core.Infrastructure
 {
+	/// <summary>
+	/// 单独的泛型实型
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public abstract class Singleton<T>
 	{
 		private static readonly Lazy<T> MyInstance = new Lazy<T>(() =>
@@ -21,6 +25,9 @@ namespace DotnetSpider.Core.Infrastructure
 			return (T)ctor.Invoke(null);
 		});
 
+		/// <summary>
+		/// 单例对象
+		/// </summary>
 		public static T Instance => MyInstance.Value;
 	}
 }

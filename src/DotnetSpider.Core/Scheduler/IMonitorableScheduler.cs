@@ -21,17 +21,17 @@ namespace DotnetSpider.Core.Scheduler
 		long SuccessRequestsCount { get; }
 
 		/// <summary>
-		/// 采集失败的链接数
+		/// 采集失败的次数, 不是链接数, 如果一个链接采集多次都失败会记录多次
 		/// </summary>
 		long ErrorRequestsCount { get; }
 
 		/// <summary>
-		/// 增加一个采集成功的链接数
+		/// 采集成功的链接数加 1
 		/// </summary>
 		void IncreaseSuccessCount();
 
 		/// <summary>
-		/// 增加一个采集失败的链接数
+		/// 采集失败的次数加 1
 		/// </summary>
 		void IncreaseErrorCount();
 	}

@@ -242,7 +242,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			foreach (var adapter in EntityAdapters.Values)
 			{
-				using (var conn = ConnectionStringSettings.GetDbConnection())
+				using (var conn = ConnectionStringSettings.CreateDbConnection())
 				{
 					var sql = GenerateIfDatabaseExistsSql(adapter, conn.ServerVersion);
 
@@ -263,7 +263,7 @@ namespace DotnetSpider.Extension.Pipeline
 			int count = 0;
 			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
-				using (var conn = ConnectionStringSettings.GetDbConnection())
+				using (var conn = ConnectionStringSettings.CreateDbConnection())
 				{
 					switch (metadata.PipelineMode)
 					{

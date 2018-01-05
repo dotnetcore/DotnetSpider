@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Infrastructure
 {
+	/// <summary>
+	/// 编码扩展
+	/// </summary>
 	public static class EncodingExtensions
 	{
 		private const int Utf8PreambleLength = 3;
@@ -17,6 +20,12 @@ namespace DotnetSpider.Core.Infrastructure
 		private const int Utf32OrUnicodePreambleFirst2Bytes = 0xFFFE;
 		private const int BigEndianUnicodePreambleFirst2Bytes = 0xFEFF;
 
+		/// <summary>
+		/// 检测编码类型
+		/// </summary>
+		/// <param name="characterSet">编码名称</param>
+		/// <param name="bytes">被检测的编码</param>
+		/// <returns>编码类型</returns>
 		public static Encoding GetEncoding(string characterSet, byte[] bytes)
 		{
 			if (!string.IsNullOrEmpty(characterSet))

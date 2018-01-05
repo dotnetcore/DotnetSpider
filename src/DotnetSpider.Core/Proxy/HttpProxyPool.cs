@@ -59,10 +59,10 @@ namespace DotnetSpider.Core.Proxy
 			{
 				lock (_locker)
 				{
-					var proxy = _proxyQueue.FirstOrDefault(p => DateTimeUtils.GetCurrentTimeStamp() - p.GetLastUseTime() > _reuseInterval);
+					var proxy = _proxyQueue.FirstOrDefault(p => DateTimeUtil.GetCurrentUnixTimeNumber() - p.GetLastUseTime() > _reuseInterval);
 					if (proxy != null)
 					{
-						proxy.SetLastBorrowTime(DateTimeUtils.GetCurrentTimeStamp());
+						proxy.SetLastBorrowTime(DateTimeUtil.GetCurrentUnixTimeNumber());
 						_proxyQueue.Remove(proxy);
 						return proxy.GetWebProxy();
 					}

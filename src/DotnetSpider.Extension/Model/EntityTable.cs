@@ -44,20 +44,20 @@ namespace DotnetSpider.Extension.Model
 			{
 				case FirstDayOfCurrentMonth:
 					{
-						return $"{Name}_{DateTimeUtils.FirstDayOfCurrentMonth:yyyy_MM_dd}";
+						return $"{Name}_{DateTimeUtil.FirstDayOfTheMonth:yyyy_MM_dd}";
 					}
 				case CurrentMonth:
 					{
-						return $"{Name}_{DateTimeUtils.FirstDayOfCurrentMonth:yyyy_MM}";
+						return $"{Name}_{DateTimeUtil.FirstDayOfTheMonth:yyyy_MM}";
 
 					}
 				case PreviousMonth:
 					{
-						return $"{Name}_{DateTimeUtils.FirstDayOfPreviousMonth:yyyy_MM}";
+						return $"{Name}_{DateTimeUtil.FirstDayOfLastMonth:yyyy_MM}";
 					}
 				case Monday:
 					{
-						return $"{Name}_{DateTimeUtils.MondayOfCurrentWeek:yyyy_MM_dd}";
+						return $"{Name}_{DateTimeUtil.Monday:yyyy_MM_dd}";
 					}
 				case Today:
 					{

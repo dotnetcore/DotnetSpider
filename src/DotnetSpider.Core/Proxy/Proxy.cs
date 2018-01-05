@@ -7,7 +7,7 @@ namespace DotnetSpider.Core.Proxy
 	/// </summary>
 	public class Proxy
 	{
-		private double _lastBorrowTime = DateTimeUtils.GetCurrentTimeStamp();
+		private double _lastBorrowTime = DateTimeUtil.GetCurrentUnixTimeNumber();
 
 		/// <summary>
 		/// 实际代理信息
@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Proxy
 		{
 			WebProxy = proxy;
 
-			CanReuseTime = DateTimeUtils.GetCurrentTimeStamp() + reuseTimeInterval * 100;
+			CanReuseTime = DateTimeUtil.GetCurrentUnixTimeNumber() + reuseTimeInterval * 100;
 		}
 
 		/// <summary>
@@ -64,8 +64,8 @@ namespace DotnetSpider.Core.Proxy
 		/// </summary>
 		public void RecordResponse()
 		{
-			ResponseTime = (DateTimeUtils.GetCurrentTimeStamp() - _lastBorrowTime + ResponseTime) / 2;
-			_lastBorrowTime = DateTimeUtils.GetCurrentTimeStamp();
+			ResponseTime = (DateTimeUtil.GetCurrentUnixTimeNumber() - _lastBorrowTime + ResponseTime) / 2;
+			_lastBorrowTime = DateTimeUtil.GetCurrentUnixTimeNumber();
 		}
 
 		/// <summary>
@@ -100,7 +100,7 @@ namespace DotnetSpider.Core.Proxy
 		/// <param name="reuseTimeInterval">代理不被再次使用的间隔</param>
 		public void SetReuseTime(int reuseTimeInterval)
 		{
-			CanReuseTime = DateTimeUtils.GetCurrentTimeStamp() + reuseTimeInterval * 100;
+			CanReuseTime = DateTimeUtil.GetCurrentUnixTimeNumber() + reuseTimeInterval * 100;
 		}
 	}
 }

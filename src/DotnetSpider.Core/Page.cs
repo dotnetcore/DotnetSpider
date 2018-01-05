@@ -101,6 +101,10 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="request">请求信息</param>
 		public Page(Request request)
 		{
 			Request = request;
@@ -180,7 +184,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			var newUrl = UrlUtils.CanonicalizeUrl(url, Url);
+			var newUrl = UrlUtil.CanonicalizeUrl(url, Url);
 			var request = new Request(newUrl, Request.Extras) { Priority = priority };
 			AddTargetRequest(request, increaseDeep);
 		}

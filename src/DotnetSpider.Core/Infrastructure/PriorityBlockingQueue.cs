@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Infrastructure
 {
+	/// <summary>
+	/// 优先级的线程安全队列
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public class PriorityBlockingQueue<T>
 	{
 		private readonly IComparer<T> _comparer;
@@ -10,20 +14,39 @@ namespace DotnetSpider.Core.Infrastructure
 
 		private T[] _heap;
 
+		/// <summary>
+		/// 当前队列中的元素个数
+		/// </summary>
 		public int Count { get; private set; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public PriorityBlockingQueue() : this(null)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="capacity">The number of elements that the new list can initially store.</param>
 		public PriorityBlockingQueue(int capacity) : this(capacity, null)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="comparer">优先级比较器</param>
 		public PriorityBlockingQueue(IComparer<T> comparer) : this(16, comparer)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="capacity">The number of elements that the new list can initially store.</param>
+		/// <param name="comparer">优先级比较器</param>
 		public PriorityBlockingQueue(int capacity, IComparer<T> comparer)
 		{
 			_comparer = comparer ?? Comparer<T>.Default;
@@ -31,12 +54,19 @@ namespace DotnetSpider.Core.Infrastructure
 			_heap = new T[_capacity];
 		}
 
+		/// <summary>
+		/// 清空队列
+		/// </summary>
 		public void Clear()
 		{
 			_heap = new T[_capacity];
 			Count = 0;
 		}
 
+		/// <summary>
+		/// 把元素入队
+		/// </summary>
+		/// <param name="v">元素</param>
 		public void Push(T v)
 		{
 			if (Count >= _heap.Length) Array.Resize(ref _heap, Count * 2);
@@ -44,6 +74,10 @@ namespace DotnetSpider.Core.Infrastructure
 			SiftUp(Count++);
 		}
 
+		/// <summary>
+		/// 元素出队
+		/// </summary>
+		/// <returns>元素</returns>
 		public T Pop()
 		{
 			var v = Top();
@@ -52,6 +86,10 @@ namespace DotnetSpider.Core.Infrastructure
 			return v;
 		}
 
+		/// <summary>
+		/// 队列第一个元素
+		/// </summary>
+		/// <returns>元素</returns>
 		public T Top()
 		{
 			if (Count > 0) return _heap[0];

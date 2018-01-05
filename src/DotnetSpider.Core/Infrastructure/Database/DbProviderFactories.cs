@@ -9,20 +9,23 @@ using System.Reflection;
 
 namespace DotnetSpider.Core.Infrastructure.Database
 {
+	/// <summary>
+	/// 数据库驱动工厂
+	/// </summary>
 	public abstract class DbProviderFactories
 	{
 		/// <summary>
-		/// <see cref="MySqlProvider"/>
+		/// MySql驱动类名
 		/// </summary>
 		public const string MySqlProvider = "MySql.Data.MySqlClient";
 
 		/// <summary>
-		/// <see cref="SqlServerProvider"/>
+		/// SqlServer驱动类名
 		/// </summary>
 		public const string SqlServerProvider = "System.Data.SqlClient";
 
 		/// <summary>
-		/// <see cref="PostgreSqlProvider"/>
+		/// PostgreSql
 		/// </summary>
 		public const string PostgreSqlProvider = "Npgsql";
 
@@ -84,6 +87,11 @@ namespace DotnetSpider.Core.Infrastructure.Database
 			}
 		}
 
+		/// <summary>
+		/// 通过驱动类名取得工厂类
+		/// </summary>
+		/// <param name="providerInvariantName">驱动类名</param>
+		/// <returns>Represents a set of methods for creating instances of a provider's implementation of the data source classes.</returns>
 		public static DbProviderFactory GetFactory(string providerInvariantName)
 		{
 			if (Configs.ContainsKey(providerInvariantName))
@@ -98,6 +106,11 @@ namespace DotnetSpider.Core.Infrastructure.Database
 			throw new SpiderException("Provider not found.");
 		}
 
+		/// <summary>
+		/// 注册驱动
+		/// </summary>
+		/// <param name="providerInvariantName">驱动类名</param>
+		/// <param name="factory">Represents a set of methods for creating instances of a provider's implementation of the data source classes.</param>
 		public static void RegisterFactory(string providerInvariantName, DbProviderFactory factory)
 		{
 			Configs.TryAdd(providerInvariantName, factory);

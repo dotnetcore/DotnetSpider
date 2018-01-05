@@ -7,6 +7,9 @@ using System.Text;
 
 namespace DotnetSpider.Core.Infrastructure
 {
+	/// <summary>
+	/// BloomFilter
+	/// </summary>
 	public class BloomFilter
 	{
 		private readonly BitArray _bitset;
@@ -182,7 +185,7 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				return false;
 			}
-			if (_bitset != other._bitset && (_bitset == null || !ObjectUtils.Equals(_bitset, other._bitset)))
+			if (_bitset != other._bitset && (_bitset == null || !Equals(_bitset, other._bitset)))
 			{
 				return false;
 			}
@@ -197,7 +200,7 @@ namespace DotnetSpider.Core.Infrastructure
 		public override int GetHashCode()
 		{
 			int hash = 7;
-			hash = 61 * hash + (_bitset != null ? ObjectUtils.HashBytes(_bitset) : 0);
+			hash = 61 * hash + (_bitset != null ? HashBytes(_bitset) : 0);
 			hash = 61 * hash + _expectedNumberOfFilterElements;
 			hash = 61 * hash + _bitSetSize;
 			hash = 61 * hash + _k;
@@ -429,10 +432,7 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			return _bitSetSize / (double)_numberOfAddedElements;
 		}
-	}
 
-	public static class ObjectUtils
-	{
 		/// <summary>
 		/// Generate a hash value from an array of bits
 		/// </summary>

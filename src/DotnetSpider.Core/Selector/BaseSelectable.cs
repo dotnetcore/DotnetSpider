@@ -3,39 +3,83 @@ using HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Selector
 {
+	/// <summary>
+	/// 查询接口
+	/// </summary>
 	public abstract class BaseSelectable : ISelectable
 	{
 		/// <summary>
-		/// 查询到的所有结果
+		/// 查找到的所有结果
 		/// </summary>
 		public List<dynamic> Elements { get; set; }
 
+		/// <summary>
+		/// 通过XPath查找结果
+		/// </summary>
+		/// <param name="xpath">XPath 表达式</param>
+		/// <returns>查询接口</returns>
 		public abstract ISelectable XPath(string xpath);
 
+		/// <summary>
+		/// 通过Css 选择器查找结果
+		/// </summary>
+		/// <param name="css">Css 选择器</param>
+		/// <returns>查询接口</returns>
 		public abstract ISelectable Css(string css);
 
+		/// <summary>
+		/// 通过Css 选择器查找元素, 并取得属性的值
+		/// </summary>
+		/// <param name="css">Css 选择器</param>
+		/// <param name="attrName">查询到的元素的属性</param>
+		/// <returns>查询接口</returns>
 		public abstract ISelectable Css(string css, string attrName);
 
+		/// <summary>
+		/// 查找所有的链接
+		/// </summary>
+		/// <returns>查询接口</returns>
 		public abstract ISelectable Links();
 
+		/// <summary>
+		/// 取得查询器里所有的结果
+		/// </summary>
+		/// <returns>查询接口</returns>
 		public abstract IList<ISelectable> Nodes();
 
-		public abstract ISelectable JsonPath(string path);
+		/// <summary>
+		/// 通过JsonPath查找结果
+		/// </summary>
+		/// <param name="jsonPath">JsonPath 表达式</param>
+		/// <returns>查询接口</returns>
+		public abstract ISelectable JsonPath(string jsonPath);
 
-		public abstract ISelectable Select(ISelector selector);
-
-		public abstract ISelectable SelectList(ISelector selector);
-
+		/// <summary>
+		/// 通过正则表达式查找结果
+		/// </summary>
+		/// <param name="regex">正则表达式</param>
+		/// <returns>查询接口</returns>
 		public ISelectable Regex(string regex)
 		{
 			return Select(Selectors.Regex(regex));
 		}
 
+		/// <summary>
+		/// 通过正则表达式查找结果
+		/// </summary>
+		/// <param name="regex">正则表达式</param>
+		/// <param name="group">分组</param>
+		/// <returns>查询接口</returns>
 		public ISelectable Regex(string regex, int group)
 		{
 			return Select(Selectors.Regex(regex, group));
 		}
 
+		/// <summary>
+		/// 获得当前查询器的文本结果, 如果查询结果为多个, 则返回第一个结果的值
+		/// </summary>
+		/// <param name="isPlainText">是否纯文本化、去掉HTML标签</param>
+		/// <returns>查询到的文本结果</returns>
 		public string GetValue(bool isPlainText)
 		{
 			if (Elements == null || Elements.Count == 0)
@@ -73,6 +117,11 @@ namespace DotnetSpider.Core.Selector
 			return null;
 		}
 
+		/// <summary>
+		/// 获得当前查询器的文本结果
+		/// </summary>
+		/// <param name="isPlainText">是否纯文本化、去掉HTML标签</param>
+		/// <returns>查询到的文本结果</returns>
 		public List<string> GetValues(bool isPlainText)
 		{
 			List<string> result = new List<string>();
@@ -98,5 +147,20 @@ namespace DotnetSpider.Core.Selector
 			}
 			return result;
 		}
+
+		/// <summary>
+		/// 通过查询器查找结果
+		/// </summary>
+		/// <param name="selector">查询器</param>
+		/// <returns>查询接口</returns>
+		public abstract ISelectable Select(ISelector selector);
+
+		/// <summary>
+		/// 通过查询器查找结果
+		/// </summary>
+		/// <param name="selector">查询器</param>
+		/// <returns>查询接口</returns>
+		public abstract ISelectable SelectList(ISelector selector);
+
 	}
 }

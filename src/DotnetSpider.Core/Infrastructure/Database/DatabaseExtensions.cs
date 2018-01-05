@@ -1,16 +1,26 @@
 ﻿using NLog;
 using System;
 using System.Configuration;
+using System.Data;
 using System.Data.Common;
+using System.Text;
 using System.Threading;
 
 namespace DotnetSpider.Core.Infrastructure.Database
 {
+	/// <summary>
+	/// 数据库扩展
+	/// </summary>
 	public static class DatabaseExtensions
 	{
 		private static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public static DbConnection GetDbConnection(this ConnectionStringSettings connectionStringSettings)
+		/// <summary>
+		/// 通过配置创建连接对象
+		/// </summary>
+		/// <param name="connectionStringSettings">数据库配置对象</param>
+		/// <returns>连接对象</returns>
+		public static DbConnection CreateDbConnection(this ConnectionStringSettings connectionStringSettings)
 		{
 			if (connectionStringSettings == null)
 			{
@@ -52,7 +62,13 @@ namespace DotnetSpider.Core.Infrastructure.Database
 			throw new SpiderException($"Create or open DbConnection failed: {connectionStringSettings.ConnectionString}.");
 		}
 
-		public static DbConnection GetDbConnection(Database source, string connectString)
+		/// <summary>
+		/// 创建连接对象
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="connectString"></param>
+		/// <returns></returns>
+		public static DbConnection CreateDbConnection(Database source, string connectString)
 		{
 			DbProviderFactory factory;
 			switch (source)
@@ -74,7 +90,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 					}
 				default:
 					{
-						throw new SpiderException($"Unsported databse: {source}");
+						throw new SpiderException($"Unsported database: {source}");
 					}
 			}
 
@@ -104,9 +120,15 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				}
 			}
 
-			throw new SpiderException("Can't get db connection.");
+			throw new SpiderException("Create connection failed.");
 		}
 
+		/// <summary>
+		/// 创建数据库配置对象
+		/// </summary>
+		/// <param name="source">数据库</param>
+		/// <param name="connectString">连接字符串</param>
+		/// <returns>数据库配置对象</returns>
 		public static ConnectionStringSettings GetConnectionStringSettings(Database source, string connectString)
 		{
 			switch (source)
@@ -129,5 +151,59 @@ namespace DotnetSpider.Core.Infrastructure.Database
 					}
 			}
 		}
+
+		/// <summary>
+		/// 把SQL查询结果拼装成HTML的table
+		/// </summary>
+		/// <param name="conn">连接对象</param>
+		/// <param name="sql">SQL语句</param>
+		/// <returns>HTML的table</returns>
+		public static string ToHtml(this IDbConnection conn, string sql)
+		{
+			var command = conn.CreateCommand();
+			command.CommandText = sql;
+			command.CommandType = CommandType.Text;
+
+			if (conn.State == ConnectionState.Closed)
+			{
+				conn.Open();
+			}
+			IDataReader reader = null;
+			try
+			{
+				reader = command.ExecuteReader();
+
+				int row = 1;
+				StringBuilder html = new StringBuilder("<table>");
+				while (reader.Read())
+				{
+					if (row == 1)
+					{
+						html.Append("<tr>");
+						for (int i = 1; i < reader.FieldCount + 1; ++i)
+						{
+							html.Append($"<td>{reader.GetName(i - 1)}</td>");
+						}
+						html.Append("</tr>");
+					}
+
+					html.Append("<tr>");
+					for (int j = 1; j < reader.FieldCount + 1; ++j)
+					{
+						html.Append($"<td>{reader.GetValue(j - 1)}</td>");
+					}
+					html.Append("</tr>");
+					row++;
+				}
+				html.Append("</table>");
+
+				return html.ToString();
+			}
+			finally
+			{
+				reader?.Close();
+			}
+		}
+
 	}
 }

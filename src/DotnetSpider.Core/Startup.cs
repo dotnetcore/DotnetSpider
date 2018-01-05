@@ -13,25 +13,45 @@ using System.Text;
 
 namespace DotnetSpider.Core
 {
+	/// <summary>
+	/// 任务名称
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 	public class TaskName : Attribute
 	{
+		/// <summary>
+		/// 任务名称
+		/// </summary>
 		public string Name
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="name">任务名称</param>
 		public TaskName(string name)
 		{
 			Name = name;
 		}
 	}
 
+	/// <summary>
+	/// 启动任务工具
+	/// </summary>
 	public static class Startup
 	{
+		/// <summary>
+		/// DLL名字中包含任意一个即是需要扫描的DLL
+		/// </summary>
 		public static List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
 
+		/// <summary>
+		/// 运行
+		/// </summary>
+		/// <param name="args">运行参数</param>
 		public static void Run(params string[] args)
 		{
 			SetConsoleEncoding();
@@ -75,6 +95,10 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// 加载环境变量
+		/// </summary>
+		/// <param name="arguments">运行参数</param>
 		public static void LoadConfiguration(Dictionary<string, string> arguments)
 		{
 			if (arguments.ContainsKey("-c"))
@@ -83,6 +107,13 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <summary>
+		/// 反射爬虫对象
+		/// </summary>
+		/// <param name="spiderName">名称</param>
+		/// <param name="arguments">运行参数</param>
+		/// <param name="spiderTypes">所有的爬虫类型</param>
+		/// <returns>爬虫对象</returns>
 		public static object CreateSpiderInstance(string spiderName, Dictionary<string, string> arguments, Dictionary<string, Type> spiderTypes)
 		{
 			if (!spiderTypes.ContainsKey(spiderName))
@@ -139,6 +170,10 @@ namespace DotnetSpider.Core
 			return spider;
 		}
 
+		/// <summary>
+		/// 检测爬虫类型
+		/// </summary>
+		/// <returns></returns>
 		public static Dictionary<string, Type> DetectSpiders()
 		{
 			var spiderTypes = new Dictionary<string, Type>();
@@ -209,6 +244,11 @@ namespace DotnetSpider.Core
 			return spiderTypes;
 		}
 
+		/// <summary>
+		/// 分析运行参数
+		/// </summary>
+		/// <param name="args">运行参数</param>
+		/// <returns>运行参数字典</returns>
 		public static Dictionary<string, string> AnalyzeArguments(params string[] args)
 		{
 			Dictionary<string, string> arguments = new Dictionary<string, string>();
@@ -275,6 +315,10 @@ namespace DotnetSpider.Core
 			return arguments;
 		}
 
+		/// <summary>
+		/// 扫描所有需要求的DLL
+		/// </summary>
+		/// <returns></returns>
 		public static List<string> DetectDlls()
 		{
 			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);

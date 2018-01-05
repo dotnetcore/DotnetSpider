@@ -2,21 +2,22 @@
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public class AdslCommand
+	/// <summary>
+	/// 通过Process调用rasdial.exe拨号
+	/// </summary>
+	public class Rasdial
 	{
-		/// <summary>
-		/// 拨号名称
-		/// </summary>
 		private readonly string _interfaceName;
-
-		private readonly  string _username;
+		private readonly string _username;
+		private readonly string _password;
 
 		/// <summary>
-		/// 密码
+		/// 构造方法
 		/// </summary>
-		private readonly  string _password;
-
-		public AdslCommand(string interfaceName, string username = null, string password = null)
+		/// <param name="interfaceName">网络名称</param>
+		/// <param name="username">账号</param>
+		/// <param name="password">密码</param>
+		public Rasdial(string interfaceName, string username = null, string password = null)
 		{
 			_interfaceName = interfaceName;
 			_username = username;
@@ -24,7 +25,7 @@ namespace DotnetSpider.Core.Infrastructure
 		}
 
 		/// <summary>
-		/// 开始拨号
+		/// 拨号
 		/// </summary>
 		/// <returns>返回拨号进程的返回值</returns>
 		public int Connect()
@@ -46,9 +47,8 @@ namespace DotnetSpider.Core.Infrastructure
 		}
 
 		/// <summary>
-		/// 端口连接
+		/// 断开现有拨号
 		/// </summary>
-		/// <returns></returns>
 		public void Disconnect()
 		{
 			Process process = new Process

@@ -159,7 +159,7 @@ namespace DotnetSpider.Extension
 
 		private void InsertRunningState()
 		{
-			using (IDbConnection conn = Env.SystemConnectionStringSettings.GetDbConnection())
+			using (IDbConnection conn = Env.SystemConnectionStringSettings.CreateDbConnection())
 			{
 				conn.MyExecute("CREATE SCHEMA IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8mb4;");
 				conn.MyExecute("CREATE TABLE IF NOT EXISTS `DotnetSpider`.`TaskRunning` (`__Id` bigint(20) NOT NULL AUTO_INCREMENT, `TaskId` varchar(120) NOT NULL, `Name` varchar(200) NULL, `Identity` varchar(120), `CDate` timestamp NOT NULL, PRIMARY KEY (__Id), UNIQUE KEY `taskId_unique` (`TaskId`)) AUTO_INCREMENT=1");
@@ -169,7 +169,7 @@ namespace DotnetSpider.Extension
 
 		private void RemoveRunningState()
 		{
-			using (IDbConnection conn = Env.SystemConnectionStringSettings.GetDbConnection())
+			using (IDbConnection conn = Env.SystemConnectionStringSettings.CreateDbConnection())
 			{
 				conn.MyExecute($"DELETE FROM `DotnetSpider`.`TaskRunning` WHERE `Identity`='{Identity}';");
 			}

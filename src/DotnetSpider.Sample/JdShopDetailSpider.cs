@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample
 
 			AddStartUrlBuilder(new DbStartUrlsBuilder(Database.MySql,
 				"Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;",
-				$"SELECT * FROM test.jd_sku_{DateTimeUtils.MondayOfCurrentWeek.ToString("yyyy_MM_dd")} WHERE ShopName is null or ShopId is null or ShopId = 0 order by sku", new[] { "sku" },
+				$"SELECT * FROM test.jd_sku_{DateTimeUtil.Monday.ToString("yyyy_MM_dd")} WHERE ShopName is null or ShopId is null or ShopId = 0 order by sku", new[] { "sku" },
 				"http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json"));
 			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
 			AddEntityType<ProductUpdater>();

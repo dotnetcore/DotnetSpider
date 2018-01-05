@@ -84,7 +84,7 @@ namespace DotnetSpider.Core.Redial.Redialer
 
 		private void RedialOnWindows()
 		{
-			AdslCommand adsl = new AdslCommand(Interface, Account, Password);
+			Rasdial adsl = new Rasdial(Interface, Account, Password);
 			adsl.Disconnect();
 			while (adsl.Connect() != 0)
 			{

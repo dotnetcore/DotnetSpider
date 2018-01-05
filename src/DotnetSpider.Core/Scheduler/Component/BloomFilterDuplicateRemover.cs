@@ -8,30 +8,42 @@ namespace DotnetSpider.Core.Scheduler.Component
 	public class BloomFilterDuplicateRemover : IDuplicateRemover
 	{
 		private readonly int _expectedInsertions;
-		private readonly BloomFilter _bloomFilter;
-		private readonly double _fpp;
+		private BloomFilter _bloomFilter;
+		private readonly double _falsePositiveProbability;
 		private AtomicInteger _counter;
 
+		/// <summary>
+		/// Get TotalRequestsCount.
+		/// </summary>
+		/// <returns>TotalRequestsCount</returns>
 		public long TotalRequestsCount => _counter.Value;
 
-		public BloomFilterDuplicateRemover(int expectedInsertions)
-			: this(expectedInsertions, 0.01)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="expectedNumberOfElements">元素个数</param>
+		public BloomFilterDuplicateRemover(int expectedNumberOfElements)
+			: this(0.01, expectedNumberOfElements)
 		{
 		}
 
-		public BloomFilterDuplicateRemover(int expectedInsertions, double fpp)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="falsePositiveProbability">误判机率</param>
+		/// <param name="expectedInsertions">元素个数</param>
+		public BloomFilterDuplicateRemover(double falsePositiveProbability, int expectedInsertions)
 		{
 			_expectedInsertions = expectedInsertions;
-			_fpp = fpp;
-			_bloomFilter = RebuildBloomFilter();
+			_falsePositiveProbability = falsePositiveProbability;
+			_bloomFilter = CreateBloomFilter(_falsePositiveProbability, _expectedInsertions);
 		}
 
-		protected BloomFilter RebuildBloomFilter()
-		{
-			_counter = new AtomicInteger(0);
-			return new BloomFilter(_fpp, _expectedInsertions);
-		}
-
+		/// <summary>
+		/// Check whether the request is duplicate.
+		/// </summary>
+		/// <param name="request">Request</param>
+		/// <returns>Whether the request is duplicate.</returns>
 		public bool IsDuplicate(Request request)
 		{
 			bool isDuplicate = _bloomFilter.Contains(request.Identity);
@@ -43,14 +55,26 @@ namespace DotnetSpider.Core.Scheduler.Component
 			return isDuplicate;
 		}
 
+		/// <summary>
+		/// Reset duplicate check.
+		/// </summary>
 		public void ResetDuplicateCheck()
 		{
-			RebuildBloomFilter();
+			_bloomFilter = CreateBloomFilter(_falsePositiveProbability, _expectedInsertions);
 		}
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public void Dispose()
 		{
 			_bloomFilter.Clear();
+		}
+
+		private BloomFilter CreateBloomFilter(double falsePositiveProbability, int expectedNumberOfElements)
+		{
+			_counter = new AtomicInteger(0);
+			return new BloomFilter(falsePositiveProbability, expectedNumberOfElements);
 		}
 	}
 }

@@ -33,6 +33,7 @@ namespace DotnetSpider.Extension.Monitor
 		public MySqlMonitor(string taskId, string identity, bool isDbOnly = false, string connectionString = null)
 		{
 			_connectionString = connectionString;
+			_isDbOnly = isDbOnly;
 
 			var conn = CreateDbConnection();
 			if (conn != null)
@@ -47,7 +48,7 @@ namespace DotnetSpider.Extension.Monitor
 						{
 							TaskId = taskId,
 							Identity = identity,
-							NodeId = NodeId.Id,
+							NodeId = Env.NodeId,
 							Status = "INIT",
 							Left = 0,
 							Total = 0,
@@ -93,7 +94,7 @@ namespace DotnetSpider.Extension.Monitor
 						new
 						{
 							Identity = identity,
-							NodeId = NodeId.Id,
+							NodeId = Env.NodeId,
 							Status = status,
 							Left = left,
 							Total = total,

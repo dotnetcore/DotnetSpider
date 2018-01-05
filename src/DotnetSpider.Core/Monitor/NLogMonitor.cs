@@ -29,7 +29,7 @@ namespace DotnetSpider.Core.Monitor
 			string msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
 			LogEventInfo theEvent = new LogEventInfo(LogLevel.Trace, "", msg);
 			theEvent.Properties["Identity"] = identity;
-			theEvent.Properties["NodeId"] = NodeId.Id;
+			theEvent.Properties["NodeId"] = Env.NodeId;
 			Logger.Log(theEvent);
 		}
 	}

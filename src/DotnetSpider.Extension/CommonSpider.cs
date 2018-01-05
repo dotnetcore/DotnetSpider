@@ -92,7 +92,7 @@ namespace DotnetSpider.Extension
 		/// </summary>
 		/// <param name="arguments"></param>
 		/// <returns></returns>
-		protected override bool IfRequireInitStartRequests(string[] arguments)
+		protected override bool IfRequireBuildStartRequests(string[] arguments)
 		{
 			if (RedisConnection.Default != null)
 			{
@@ -118,7 +118,7 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		protected override void InitStartRequestsFinished()
+		protected override void BuildStartRequestsFinished()
 		{
 			if (RedisConnection.Default != null)
 			{

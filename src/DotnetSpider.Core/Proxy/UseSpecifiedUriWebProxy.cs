@@ -8,7 +8,11 @@ namespace DotnetSpider.Core.Proxy
 	/// </summary>
 	public class UseSpecifiedUriWebProxy : IWebProxy
 	{
+		/// <summary>
+		/// 代理地址
+		/// </summary>
 		public readonly Uri Uri;
+
 		private readonly bool _bypass;
 
 		/// <summary>

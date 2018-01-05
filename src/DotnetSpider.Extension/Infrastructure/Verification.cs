@@ -423,7 +423,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 	public class Verification : BaseVerification
 	{
-		public Properties Properties { get; }
+		public Description Properties { get; }
 
 		public string ReportSampleSql { get; set; }
 
@@ -433,7 +433,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public Verification(Type type, string reportSampleSql = null)
 		{
-			Properties = type.GetTypeInfo().GetCustomAttribute<Properties>();
+			Properties = type.GetTypeInfo().GetCustomAttribute<Description>();
 			EmailTo = Properties.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
 			Subject = Properties.Subject;
 			ReportSampleSql = reportSampleSql;
@@ -441,7 +441,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public Verification(Type type, string emailTo, string subject, string host, int port, string account, string password) : base(emailTo, subject, host, port, account, password)
 		{
-			Properties = type.GetTypeInfo().GetCustomAttribute<Properties>();
+			Properties = type.GetTypeInfo().GetCustomAttribute<Description>();
 		}
 
 		public override VerificationResult Report()
@@ -458,7 +458,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrEmpty(EmailHost))
 			{
-				using (var conn = Core.Env.DataConnectionStringSettings.GetDbConnection())
+				using (var conn = Core.Env.DataConnectionStringSettings.CreateDbConnection())
 				{
 					var emailBody = new StringBuilder();
 					var hasProperties = Properties != null;

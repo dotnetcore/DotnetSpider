@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public ConnectionStringSettings GetNew()
 		{
-			using (var conn = DatabaseExtensions.GetDbConnection(DataSource, ConnectString))
+			using (var conn = DatabaseExtensions.CreateDbConnection(DataSource, ConnectString))
 			{
 				ConnectionStringSettings connectString = conn.MyQuery<ConnectionStringSettings>(QueryString).FirstOrDefault();
 				return connectString;

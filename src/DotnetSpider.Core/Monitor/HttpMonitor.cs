@@ -54,7 +54,7 @@ namespace DotnetSpider.Core.Monitor
 				Error = error,
 				Identity = identity,
 				Left = left,
-				NodeId = NodeId.Id,
+				NodeId = Env.NodeId,
 				Status = status,
 				Success = success,
 				Thread = threadNum,

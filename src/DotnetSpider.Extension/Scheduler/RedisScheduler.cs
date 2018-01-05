@@ -10,6 +10,7 @@ using DotnetSpider.Core.Redial;
 using System;
 using Polly;
 using Polly.Retry;
+using System.Linq;
 #if NET_CORE
 #endif
 
@@ -66,7 +67,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 			if (string.IsNullOrEmpty(_identityMd5))
 			{
-				var md5 = Encrypt.Md5Encrypt(spider.Identity);
+				var md5 = CryptoUtil.Md5Encrypt(spider.Identity);
 				_itemKey = $"dotnetspider:scheduler:{md5}:items";
 				_setKey = $"dotnetspider:scheduler:{md5}:set";
 				_queueKey = $"dotnetspider:scheduler:{md5}:queue";
@@ -83,7 +84,7 @@ namespace DotnetSpider.Extension.Scheduler
 						_redisConnection = new RedisConnection(_connectString);
 						Cache.Instance.Set(_connectString, _redisConnection);
 					}
-					_redisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtils.GetCurrentTimeStamp());
+					_redisConnection.Database.SortedSetAdd(TasksKey, spider.Identity, (long)DateTimeUtil.GetCurrentUnixTimeNumber());
 				});
 
 				if (UseInternet)
@@ -211,19 +212,20 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
-		public override void Import(HashSet<Request> requests)
+		public override void Import(IEnumerable<Request> requests)
 		{
 			var action = new Action(() =>
 			{
 				lock (_locker)
 				{
 					int batchCount = BatchCount;
-					int cacheSize = requests.Count > batchCount ? batchCount : requests.Count;
+					var count = requests.Count();
+					int cacheSize = count > batchCount ? batchCount : count;
 					RedisValue[] identities = new RedisValue[cacheSize];
 					HashEntry[] items = new HashEntry[cacheSize];
 					int i = 0;
-					int j = requests.Count % batchCount;
-					int n = requests.Count / batchCount;
+					int j = count % batchCount;
+					int n = count / batchCount;
 
 					foreach (var request in requests)
 					{

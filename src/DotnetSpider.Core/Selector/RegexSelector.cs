@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using DotnetSpider.Core.Infrastructure;
 #if NET_CORE
@@ -10,36 +11,46 @@ using System.Reflection;
 
 namespace DotnetSpider.Core.Selector
 {
+	/// <summary>
+	/// 正则查询器
+	/// </summary>
 	public class RegexSelector : ISelector
 	{
 		private readonly string _pattern;
 		private readonly Regex _regex;
 		private readonly int _group;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="pattern">正则表达式</param>
+		/// <param name="group"></param>
 		public RegexSelector(string pattern, int group)
 		{
-			if (string.IsNullOrEmpty(pattern))
+			if (string.IsNullOrEmpty(pattern) || string.IsNullOrWhiteSpace(pattern))
 			{
 				throw new ArgumentException("regex must not be empty");
 			}
-			// Check bracket for regex group. Add default group 1 if there is no group.
-			// Only check if there exists the valid left parenthesis, leave regexp validation for Pattern.
-			if (StringExtensions.CountMatches(pattern, "(") - StringExtensions.CountMatches(pattern, "\\(") ==
-					StringExtensions.CountMatches(pattern, "(?:") - StringExtensions.CountMatches(pattern, "\\(?:"))
-			{
-				pattern = "(" + pattern + ")";
-			}
 			_pattern = pattern;
-			//check: regex = Pattern.compile(regexStr, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 			_regex = new Regex(pattern, RegexOptions.IgnoreCase);
 			_group = group;
 		}
 
-		public RegexSelector(string regexStr)
-			: this(regexStr, 0)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="pattern">正则表达式</param>
+		public RegexSelector(string pattern)
+			: this(pattern, 0)
 		{
 		}
 
+		/// <summary>
+		/// 从文本中查询单个结果
+		/// 如果符合条件的结果有多个, 仅返回第一个
+		/// </summary>
+		/// <param name="text">需要查询的文本</param>
+		/// <returns>查询结果</returns>
 		public dynamic Select(dynamic text)
 		{
 			if (text == null)
@@ -53,7 +64,7 @@ namespace DotnetSpider.Core.Selector
 			if (typeof(ICollection).GetTypeInfo().IsAssignableFrom(type))
 #else
 			if (typeof(ICollection).IsAssignableFrom(type))
-#endif			
+#endif
 			{
 				foreach (var l in (IEnumerable)text)
 				{
@@ -64,9 +75,19 @@ namespace DotnetSpider.Core.Selector
 			{
 				tmp = text is string ? text : text.ToSting();
 			}
-			return SelectGroup(tmp).Get(_group);
+			Match match = _regex.Match(text);
+			if (match.Success)
+			{
+				return match.Groups.Count > _group ? match.Groups[_group].Value : null;
+			}
+			return null;
 		}
 
+		/// <summary>
+		/// 从文本中查询所有结果
+		/// </summary>
+		/// <param name="text">需要查询的文本</param>
+		/// <returns>查询结果</returns>
 		public List<dynamic> SelectList(dynamic text)
 		{
 			if (text == null)
@@ -75,56 +96,37 @@ namespace DotnetSpider.Core.Selector
 			}
 
 			var type = (Type)text.GetType();
-			string tmp = "";
+			StringBuilder builder = new StringBuilder();
 
 			if (typeof(IEnumerable).IsAssignableFrom(type))
 			{
 				foreach (var l in (IEnumerable)text)
 				{
-					tmp += l.ToString();
+					builder.Append(l.ToString());
 				}
 			}
 			else
 			{
-				tmp = text.ToSting();
+				builder.Append(text.ToSting());
 			}
-
-			IList<RegexResult> results = SelectGroupList(tmp);
-			return results.Select(result => result.Get(_group)).Cast<dynamic>().ToList();
-		}
-
-		public override string ToString()
-		{
-			return _pattern;
-		}
-
-		private RegexResult SelectGroup(string text)
-		{
-			var match = _regex.Match(text);
-			if (match.Success)
-			{
-				return new RegexResult(_regex.ToString(), (from Group g in match.Groups select g.Value).ToList());
-			}
-			else
-			{
-				return new RegexResult(null, null);
-			}
-		}
-
-		private List<RegexResult> SelectGroupList(string text)
-		{
-			List<RegexResult> resultList = new List<RegexResult>();
 
 			var matches = _regex.Matches(text);
-			if (matches.Count > 0)
+
+			List<dynamic> results = new List<dynamic>();
+			foreach (var match in matches)
 			{
-				foreach (Match m in matches)
+				if (match.Groups.Count > _group)
 				{
-					resultList.Add(new RegexResult(_regex.ToString(), (from Group @group in m.Groups select @group.Value).ToList()));
+					results.Add(match.Groups[_group].Value);
 				}
 			}
-
-			return resultList;
+			return results;
 		}
+
+		/// <summary>
+		/// Returns a string that represents the current object.
+		/// </summary>
+		/// <returns>A string that represents the current object.</returns>
+		public override string ToString() => _pattern;
 	}
 }

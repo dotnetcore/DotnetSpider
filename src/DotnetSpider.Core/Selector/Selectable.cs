@@ -5,8 +5,18 @@ using HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Selector
 {
+	/// <summary>
+	/// 查询接口
+	/// </summary>
 	public class Selectable : BaseSelectable
 	{
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="text">被查询的文本</param>
+		/// <param name="urlOrPadding">URL相对路径补充或者Json padding的去除</param>
+		/// <param name="contentType">文本内容格式: Html, Json</param>
+		/// <param name="domain">域名, 用于去除外链</param>
 		public Selectable(string text, string urlOrPadding, ContentType contentType, params string[] domain)
 		{
 			switch (contentType)
@@ -38,26 +48,41 @@ namespace DotnetSpider.Core.Selector
 			}
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="nodes">被查询的元素</param>
 		public Selectable(List<dynamic> nodes)
 		{
 			Elements = nodes;
 		}
 
-		public override ISelectable Css(string selector)
+		/// <summary>
+		/// 通过Css 选择器查找结果
+		/// </summary>
+		/// <param name="css">Css 选择器</param>
+		/// <returns>查询接口</returns>
+		public override ISelectable Css(string css)
 		{
-			return Select(Selectors.Css(selector));
+			return Select(Selectors.Css(css));
 		}
 
-		public override ISelectable Css(string selector, string attrName)
+		/// <summary>
+		/// 通过Css 选择器查找元素, 并取得属性的值
+		/// </summary>
+		/// <param name="css">Css 选择器</param>
+		/// <param name="attrName">查询到的元素的属性</param>
+		/// <returns>查询接口</returns>
+		public override ISelectable Css(string css, string attrName)
 		{
-			var cssSelector = Selectors.Css(selector, attrName);
+			var cssSelector = Selectors.Css(css, attrName);
 			return Select(cssSelector);
 		}
 
 		/// <summary>
-		/// 仅用于Html查询
+		/// 查找所有的链接
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>查询接口</returns>
 		public override ISelectable Links()
 		{
 			var tmplinks = XPath("./descendant-or-self::a/@href").GetValues();
@@ -72,11 +97,21 @@ namespace DotnetSpider.Core.Selector
 			return new Selectable(links);
 		}
 
+		/// <summary>
+		/// 通过XPath查找结果
+		/// </summary>
+		/// <param name="xpath">XPath 表达式</param>
+		/// <returns>查询接口</returns>
 		public override ISelectable XPath(string xpath)
 		{
 			return SelectList(Selectors.XPath(xpath));
 		}
 
+		/// <summary>
+		/// 通过查询器查找结果
+		/// </summary>
+		/// <param name="selector">查询器</param>
+		/// <returns>查询接口</returns>
 		public override ISelectable Select(ISelector selector)
 		{
 			if (selector != null)
@@ -95,6 +130,11 @@ namespace DotnetSpider.Core.Selector
 			throw new SpiderException("Selector is null.");
 		}
 
+		/// <summary>
+		/// 通过查询器查找结果
+		/// </summary>
+		/// <param name="selector">查询器</param>
+		/// <returns>查询接口</returns>
 		public override ISelectable SelectList(ISelector selector)
 		{
 			if (selector != null)
@@ -114,6 +154,10 @@ namespace DotnetSpider.Core.Selector
 			throw new SpiderException("Selector is null.");
 		}
 
+		/// <summary>
+		/// 取得查询器里所有的结果
+		/// </summary>
+		/// <returns>查询接口</returns>
 		public override IList<ISelectable> Nodes()
 		{
 			List<ISelectable> reslut = new List<ISelectable>();
@@ -124,19 +168,24 @@ namespace DotnetSpider.Core.Selector
 			return reslut;
 		}
 
-		public override ISelectable JsonPath(string path)
+		/// <summary>
+		/// 通过JsonPath查找结果
+		/// </summary>
+		/// <param name="jsonPath">JsonPath 表达式</param>
+		/// <returns>查询接口</returns>
+		public override ISelectable JsonPath(string jsonPath)
 		{
-			JsonPathSelector jsonPathSelector = new JsonPathSelector(path);
+			JsonPathSelector jsonPathSelector = new JsonPathSelector(jsonPath);
 			return SelectList(jsonPathSelector);
 		}
 
 		/// <summary>
-		/// Remove padding for JSONP
+		/// Remove padding for JSON
 		/// </summary>
 		/// <param name="text"></param>
 		/// <param name="padding"></param>
 		/// <returns></returns>
-		public string RemovePadding(string text, string padding)
+		private string RemovePadding(string text, string padding)
 		{
 			if (string.IsNullOrEmpty(padding))
 			{
@@ -159,7 +208,7 @@ namespace DotnetSpider.Core.Selector
 				{
 					if (node.Attributes["href"] != null)
 					{
-						node.Attributes["href"].Value = UrlUtils.CanonicalizeUrl(node.Attributes["href"].Value, url);
+						node.Attributes["href"].Value = UrlUtil.CanonicalizeUrl(node.Attributes["href"].Value, url);
 					}
 				}
 			}
@@ -171,7 +220,7 @@ namespace DotnetSpider.Core.Selector
 				{
 					if (image.Attributes["src"] != null)
 					{
-						image.Attributes["src"].Value = UrlUtils.CanonicalizeUrl(image.Attributes["src"].Value, url);
+						image.Attributes["src"].Value = UrlUtil.CanonicalizeUrl(image.Attributes["src"].Value, url);
 					}
 				}
 			}
