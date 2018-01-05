@@ -494,7 +494,7 @@ namespace DotnetSpider.Core
 		/// <param name="path">作用路径</param>
 		public void AddCookie(string name, string value, string domain, string path = "/")
 		{
-			var cookie = new Cookie(name, value, domain, path);
+			var cookie = new Cookie(name, value, path, domain);
 			AddCookie(cookie);
 		}
 
