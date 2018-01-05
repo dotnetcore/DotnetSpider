@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 
@@ -40,13 +41,13 @@ namespace DotnetSpider.Core.Downloader
 		/// <returns>HttpClient对象</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 #pragma warning restore CS1570 // XML comment has badly formed XML
-		HttpClientItem GetHttpClient(int? hashCode = null, Cookies cookies = null);
+		HttpClientItem GetHttpClient(int? hashCode = null, CookieContainer cookies = null);
 
 		/// <summary>
-		/// 重置Cookie
+		/// 设置 Cookie
 		/// </summary>
-		/// <param name="cookies">Cookies</param>
+		/// <param name="cookie">Cookie</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		void ResetCookies(Cookies cookies);
+		void AddCookie(Cookie cookie);
 	}
 }

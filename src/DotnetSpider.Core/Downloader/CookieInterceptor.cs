@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using NLog;
+using System.Net;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -24,14 +25,20 @@ namespace DotnetSpider.Core.Downloader
 			{
 				spider.Pause(() =>
 				{
-					spider.Cookies = GetCookies(spider);
+					foreach(Cookie cookie in GetCookies(spider))
+					{
+						spider.AddCookie(cookie);
+					}
 					Logger.AllLog(spider.Identity, "Inject cookies success.", LogLevel.Info);
 					spider.Contiune();
 				});
 			}
 			else
 			{
-				spider.Cookies = GetCookies(spider);
+				foreach (Cookie cookie in GetCookies(spider))
+				{
+					spider.AddCookie(cookie);
+				}
 				Logger.AllLog(spider.Identity, "Inject cookies success.", LogLevel.Info);
 			}
 		}
@@ -41,6 +48,6 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="spider">爬虫</param>
 		/// <returns>Cookies</returns>
-		protected abstract Cookies GetCookies(ISpider spider);
+		protected abstract CookieCollection GetCookies(ISpider spider);
 	}
 }

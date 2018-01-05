@@ -12,6 +12,7 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core;
 using System.IO;
 using System.Collections.Generic;
+using System.Net;
 
 namespace DotnetSpider.Extension.Downloader
 {
@@ -55,7 +56,7 @@ namespace DotnetSpider.Extension.Downloader
 			throw new SpiderException("Unsport findy: " + element.Type);
 		}
 
-		protected override Cookies GetCookies(ISpider spider)
+		protected override CookieCollection GetCookies(ISpider spider)
 		{
 			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PasswordSelector == null)
 			{
@@ -64,6 +65,7 @@ namespace DotnetSpider.Extension.Downloader
 			var cookies = new Dictionary<string, string>();
 
 			var webDriver = CreateWebDriver();
+			var result = new CookieCollection();
 			try
 			{
 				webDriver.Navigate().GoToUrl(Url);
@@ -98,7 +100,7 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					foreach (var cookieItem in cookieList)
 					{
-						cookies.Add(cookieItem.Name, cookieItem.Value);
+						result.Add(new System.Net.Cookie(cookieItem.Name, cookieItem.Value, cookieItem.Path, cookieItem.Domain));
 					}
 				}
 
@@ -111,8 +113,6 @@ namespace DotnetSpider.Extension.Downloader
 				return null;
 			}
 
-			var result = new Cookies();
-			result.AddCookies(cookies, new Uri(Url).Host);
 			return result;
 		}
 

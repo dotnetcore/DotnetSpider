@@ -22,9 +22,9 @@ namespace DotnetSpider.Core.Test
 			site.AddStartUrl("http://www.baidu.com");
 			DefaultSpider spider = new DefaultSpider("a", site);
 			inject.Inject(spider, false);
-			var cookies = spider.Cookies.GetCookies("www.baidu.com");
-			Assert.Contains(cookies, c => c.Name == "a" && c.Value == "b");
-			Assert.Contains(cookies, c => c.Name == "c" && c.Value == "d");
+			var cookies = (spider as IContainCookies).Container.GetCookies(new System.Uri("http://www.baidu.com"));
+			Assert.Equal("b", cookies["a"].Value);
+			Assert.Equal("d", cookies["c"].Value);
 		}
 	}
 }

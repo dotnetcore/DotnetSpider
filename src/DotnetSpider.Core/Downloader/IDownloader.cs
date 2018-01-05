@@ -1,3 +1,4 @@
+using System.Net;
 using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Downloader
@@ -28,10 +29,10 @@ namespace DotnetSpider.Core.Downloader
 		void AddBeforeDownloadHandler(IBeforeDownloadHandler handler);
 
 		/// <summary>
-		/// ÷ÿ÷√Cookie
+		/// …Ë÷√ Cookie
 		/// </summary>
-		/// <param name="cookies">Cookies</param>
+		/// <param name="cookie">Cookie</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		void ResetCookies(Cookies cookies);
+		void AddCookie(Cookie cookie);
 	}
 }

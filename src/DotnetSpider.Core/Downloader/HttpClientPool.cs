@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -25,11 +27,11 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="cookies">Cookies</param>
 		/// <returns>HttpClient对象</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public HttpClientItem GetHttpClient(int? hashCode = null, Cookies cookies = null)
+		public HttpClientItem GetHttpClient(int? hashCode = null, CookieContainer cookies = null)
 		{
 			if (hashCode == null)
 			{
-				return _defaultHttpClientItem ?? (_defaultHttpClientItem = CreateDefaultHttpClient(cookies?.GetCookies()));
+				return _defaultHttpClientItem ?? (_defaultHttpClientItem = CreateDefaultHttpClient(cookies));
 			}
 
 			_getHttpClientCount++;
@@ -46,31 +48,31 @@ namespace DotnetSpider.Core.Downloader
 			}
 			else
 			{
-				var item = CreateDefaultHttpClient(cookies?.GetCookies());
+				var item = CreateDefaultHttpClient(cookies);
 				_pool.TryAdd(hashCode.Value, item);
 				return item;
 			}
 		}
 
 		/// <summary>
-		/// 重置Cookie
+		/// 设置 Cookie
 		/// </summary>
-		/// <param name="cookies">Cookies</param>
+		/// <param name="cookie">Cookie</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void ResetCookies(Cookies cookies)
+		public void AddCookie(Cookie cookie)
 		{
 			if (_defaultHttpClientItem != null)
 			{
-				_defaultHttpClientItem.Handler.CookieContainer = CreateCookieContainer(cookies.GetCookies());
+				_defaultHttpClientItem.Handler.CookieContainer.Add(cookie);
 			}
 
 			foreach (var item in _pool.Values)
 			{
-				item.Handler.CookieContainer = CreateCookieContainer(cookies.GetCookies());
+				item.Handler.CookieContainer.Add(cookie);
 			}
 		}
 
-		private HttpClientItem CreateDefaultHttpClient(IEnumerable<Cookie> cookies = null)
+		private HttpClientItem CreateDefaultHttpClient(CookieContainer cookies = null)
 		{
 			var handler = new HttpClientHandler
 			{
@@ -80,7 +82,7 @@ namespace DotnetSpider.Core.Downloader
 				AllowAutoRedirect = true,
 				MaxAutomaticRedirections = 10
 			};
-			handler.CookieContainer = CreateCookieContainer(cookies);
+			handler.CookieContainer = CopyCookieContainer(cookies);
 			return new HttpClientItem
 			{
 				Handler = handler,
@@ -89,18 +91,22 @@ namespace DotnetSpider.Core.Downloader
 			};
 		}
 
-		private CookieContainer CreateCookieContainer(IEnumerable<Cookie> cookies = null)
+		private CookieContainer CopyCookieContainer(CookieContainer cookies = null)
 		{
-			CookieContainer container = new CookieContainer();
-			var enumerable = cookies as Cookie[] ?? cookies.ToArray();
-			if (cookies != null && enumerable.Any())
+			if (cookies == null)
 			{
-				foreach (var cookie in enumerable)
+				return new CookieContainer();
+			}
+			else
+			{
+				using (MemoryStream stream = new MemoryStream())
 				{
-					container.Add(new System.Net.Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
+					BinaryFormatter formatter = new BinaryFormatter();
+					formatter.Serialize(stream, cookies);
+					stream.Seek(0, SeekOrigin.Begin);
+					return (CookieContainer)formatter.Deserialize(stream);
 				}
 			}
-			return container;
 		}
 
 		private void ClearHttpClient()

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Net;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -34,36 +36,45 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="spider">爬虫</param>
 		/// <returns>Cookies</returns>
-		protected override Cookies GetCookies(ISpider spider)
+		protected override CookieCollection GetCookies(ISpider spider)
 		{
-			var path = string.IsNullOrEmpty(_cookiePath) ? $"{spider.Identity}.cookies" : _cookiePath;
-
-			if (File.Exists(path))
+			var cookiePath = string.IsNullOrEmpty(_cookiePath) ? $"{spider.Identity}.cookies" : _cookiePath;
+			var cookies = new CookieCollection();
+			if (File.Exists(cookiePath))
 			{
-				var datas = File.ReadAllLines(path);
+				var datas = File.ReadAllLines(cookiePath);
 				if (datas.Length == 2)
 				{
 					var domain = datas[0];
 					var cookiesStr = datas[1];
-					var cookies = new Cookies();
-					cookies.AddCookies(cookiesStr, domain);
-					return cookies;
+					var pairs = cookiesStr.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var pair in pairs)
+					{
+						var keyValue = pair.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+						var name = keyValue[0];
+						string value = keyValue.Length > 1 ? keyValue[1] : string.Empty;
+						cookies.Add(new Cookie(name, value, "/", domain));
+					}
+
 				}
 				if (datas.Length == 3)
 				{
 					var domain = datas[0];
-					var domainPath = datas[1];
+					var path = datas[1];
 					var cookiesStr = datas[2];
-					var cookies = new Cookies();
-					cookies.AddCookies(cookiesStr, domain, domainPath);
-					return cookies;
+					var pairs = cookiesStr.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var pair in pairs)
+					{
+						var keyValue = pair.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+						var name = keyValue[0];
+						string value = keyValue.Length > 1 ? keyValue[1] : string.Empty;
+						cookies.Add(new Cookie(name, value, path, domain));
+					}
 				}
-				return new Cookies();
+
 			}
-			else
-			{
-				return new Cookies();
-			}
+
+			return cookies;
 		}
 	}
 }

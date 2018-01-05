@@ -30,7 +30,7 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// A spider contains four modules: Downloader, Scheduler, PageProcessor and Pipeline. 
 	/// </summary>
-	public class Spider : AppBase, ISpider, ISpeedMonitor
+	public class Spider : AppBase, ISpider, ISpeedMonitor, IContainCookies
 	{
 		private static readonly object Locker = new object();
 
@@ -61,7 +61,7 @@ namespace DotnetSpider.Core
 		private MemoryMappedFile _identityMmf;
 		private MemoryMappedFile _taskIdMmf;
 		private readonly string[] _closeSignalFiles = new string[2];
-		private Cookies _cookies = new Cookies();
+		private CookieContainer _cookies = new CookieContainer();
 		private bool _exited;
 
 		/// <summary>
@@ -79,23 +79,6 @@ namespace DotnetSpider.Core
 		/// </summary>
 		protected virtual void BuildStartRequestsFinished()
 		{
-		}
-
-		/// <summary>
-		/// Cookies, 如果需要更换Cookies, 则对此属性赋一个全新的Cookies对象即可(运行中也可以替换)
-		/// 爬虫运行中不能通过Cookies.AddCookies等方法再添加新的Cookie
-		/// </summary
-		public Cookies Cookies
-		{
-			get => _cookies;
-			set
-			{
-				if (_cookies != value)
-				{
-					_cookies = value;
-					Downloader.ResetCookies(value);
-				}
-			}
 		}
 
 		/// <summary>
@@ -161,6 +144,11 @@ namespace DotnetSpider.Core
 		/// Status of spider.
 		/// </summary>
 		public Status Stat { get; private set; } = Status.Init;
+
+		/// <summary>
+		/// Cookies 容器
+		/// </summary>
+		public CookieContainer Container => _cookies;
 
 		/// <summary>
 		/// Event of crawler a request success.
@@ -463,15 +451,22 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// 添加Cookies
+		/// 设置 Cookies
 		/// </summary>
 		/// <param name="cookiesStr">Cookies的键值对字符串, 如: a1=b;a2=c;</param>
 		/// <param name="domain">作用域</param>
 		/// <param name="path">作用路径</param>
 		public void AddCookies(string cookiesStr, string domain, string path = "/")
 		{
-			CheckIfRunning();
-			_cookies.AddCookies(cookiesStr, domain, path);
+			var cookies = new Dictionary<string, string>();
+			var pairs = cookiesStr.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+			foreach (var pair in pairs)
+			{
+				var keyValue = pair.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+				var name = keyValue[0];
+				string value = keyValue.Length > 1 ? keyValue[1] : string.Empty;
+				AddCookie(name, value, domain, path);
+			}
 		}
 
 		/// <summary>
@@ -482,8 +477,12 @@ namespace DotnetSpider.Core
 		/// <param name="path">作用路径</param>
 		public void AddCookies(IDictionary<string, string> cookies, string domain, string path = "/")
 		{
-			CheckIfRunning();
-			_cookies.AddCookies(cookies, domain, path);
+			foreach (var pair in cookies)
+			{
+				var name = pair.Key;
+				var value = pair.Value;
+				AddCookie(name, value, domain, path);
+			}
 		}
 
 		/// <summary>
@@ -495,8 +494,25 @@ namespace DotnetSpider.Core
 		/// <param name="path">作用路径</param>
 		public void AddCookie(string name, string value, string domain, string path = "/")
 		{
-			CheckIfRunning();
-			_cookies.AddCookie(new Downloader.Cookie(name, value, domain, path));
+			var cookie = new Cookie(name, value, domain, path);
+			AddCookie(cookie);
+		}
+
+		/// <summary>
+		/// 设置 Cookie
+		/// </summary>
+		/// <param name="cookie">Cookie</param>
+		public void AddCookie(Cookie cookie)
+		{
+			if (cookie == null)
+			{
+				return;
+			}
+			_cookies.Add(cookie);
+			if (Stat == Status.Running)
+			{
+				Downloader.AddCookie(cookie);
+			}
 		}
 
 		/// <summary>

@@ -8,6 +8,7 @@ using System.IO;
 using DotnetSpider.Core.Downloader;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace DotnetSpider.Core.Test
 {
@@ -210,7 +211,7 @@ namespace DotnetSpider.Core.Test
 				return new Page(request);
 			}
 
-			public void ResetCookies(Cookies cookies)
+			public void AddCookie(Cookie cookie)
 			{
 			}
 		}

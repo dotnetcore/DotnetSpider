@@ -3,6 +3,7 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
 using System;
 using System.Diagnostics;
+using System.Net.Http;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else
@@ -78,7 +79,12 @@ namespace DotnetSpider.Sample
 		/// </summary>
 		private static void MyTest()
 		{
-			var va= HttpSender.Client.GetStringAsync("http://www.baidu.com").Result;
+			var handler = new HttpClientHandler();
+			handler.CookieContainer = new System.Net.CookieContainer();
+			var httpClient = new HttpClient(handler);
+			var va = httpClient.GetStringAsync("http://www.baidu.com").Result;
+			handler.CookieContainer.Add(new System.Net.Cookie("test", "value", "/", "www.baidu.com"));
+			va = httpClient.GetStringAsync("http://www.baidu.com").Result;
 		}
 	}
 

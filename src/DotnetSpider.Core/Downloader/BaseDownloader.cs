@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using NLog;
 using System.Collections.Generic;
+using System.Net;
 using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Downloader
@@ -24,11 +25,11 @@ namespace DotnetSpider.Core.Downloader
 		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
 
 		/// <summary>
-		/// 重置Cookie
+		/// 设置 Cookie
 		/// </summary>
-		/// <param name="cookies">Cookies</param>
+		/// <param name="cookie">Cookie</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public virtual void ResetCookies(Cookies cookies) { }
+		public virtual void AddCookie(Cookie cookie) { }
 
 		/// <summary>
 		/// 下载链接内容
