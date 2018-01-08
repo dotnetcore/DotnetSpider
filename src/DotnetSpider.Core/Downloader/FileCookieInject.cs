@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <returns>Cookies</returns>
 		protected override CookieCollection GetCookies(ISpider spider)
 		{
-			var cookiePath = string.IsNullOrEmpty(_cookiePath) ? $"{spider.Identity}.cookies" : _cookiePath;
+			var cookiePath = string.IsNullOrWhiteSpace(_cookiePath) ? $"{spider.Identity}.cookies" : _cookiePath;
 			var cookies = new CookieCollection();
 			if (File.Exists(cookiePath))
 			{

@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Downloader
 		{
 			var filePath = request.Uri.AbsoluteUri;
 
-			if (!string.IsNullOrEmpty(filePath))
+			if (!string.IsNullOrWhiteSpace(filePath))
 			{
 				if (File.Exists(filePath))
 				{

@@ -129,7 +129,7 @@ namespace DotnetSpider.Core
 			if (arguments.ContainsKey("-i"))
 			{
 				var identity = "guid" == arguments["-i"].ToLower() ? Guid.NewGuid().ToString("N") : arguments["-i"];
-				if (!string.IsNullOrEmpty(identity) && !string.IsNullOrWhiteSpace(identity))
+				if (!string.IsNullOrWhiteSpace(identity))
 				{
 					var property = spiderProperties.First(p => p.Name == "Identity");
 					property.SetValue(spider, identity);
@@ -142,7 +142,7 @@ namespace DotnetSpider.Core
 				if (property != null)
 				{
 					var taskId = "guid" == arguments["-tid"].ToLower() ? Guid.NewGuid().ToString("N") : arguments["-tid"].Trim();
-					if (!string.IsNullOrEmpty(taskId) && !string.IsNullOrWhiteSpace(taskId))
+					if (!string.IsNullOrWhiteSpace(taskId))
 					{
 						property.SetValue(spider, taskId);
 					}
@@ -152,7 +152,7 @@ namespace DotnetSpider.Core
 			if (arguments.ContainsKey("-n"))
 			{
 				var property = spiderProperties.First(p => p.Name == "Name");
-				if (!string.IsNullOrEmpty(arguments["-n"]) && !string.IsNullOrWhiteSpace(arguments["-n"]))
+				if (!string.IsNullOrWhiteSpace(arguments["-n"]))
 				{
 					property.SetValue(spider, arguments["-n"].Trim());
 				}
@@ -190,7 +190,7 @@ namespace DotnetSpider.Core
 					bool hasNonParametersConstructor = type.GetConstructors().Any(c => c.IsPublic && c.GetParameters().Length == 0);
 
 					var fullName = type.FullName;
-					if (string.IsNullOrEmpty(fullName))
+					if (string.IsNullOrWhiteSpace(fullName))
 					{
 						continue;
 					}
@@ -254,7 +254,7 @@ namespace DotnetSpider.Core
 			Dictionary<string, string> arguments = new Dictionary<string, string>();
 			foreach (var arg in args)
 			{
-				if (string.IsNullOrEmpty(arg) || string.IsNullOrWhiteSpace(arg))
+				if (string.IsNullOrWhiteSpace(arg))
 				{
 					ConsoleHelper.WriteLine("Command: -s:[spider type name] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name] -e:[en1=value1,en2=value2,...]");
 					return null;

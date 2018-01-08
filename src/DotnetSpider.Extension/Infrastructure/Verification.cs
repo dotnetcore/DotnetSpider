@@ -52,7 +52,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		{
 			EmailHost = Core.Env.EmailHost;
 			var portStr = Core.Env.EmailPort;
-			if (!string.IsNullOrEmpty(portStr))
+			if (!string.IsNullOrWhiteSpace(portStr))
 			{
 				if (int.TryParse(portStr, out var port))
 				{
@@ -451,12 +451,12 @@ namespace DotnetSpider.Extension.Infrastructure
 			{
 				return veridationResult;
 			}
-			if (!string.IsNullOrEmpty(ReportSampleSql) && ReportSampleSql.ToLower().Contains("limit"))
+			if (!string.IsNullOrWhiteSpace(ReportSampleSql) && ReportSampleSql.ToLower().Contains("limit"))
 			{
 				Logger.AllLog("SQL contains 'LIMIT'.", LogLevel.Error);
 				return veridationResult;
 			}
-			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrEmpty(EmailHost))
+			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrWhiteSpace(EmailHost))
 			{
 				using (var conn = Core.Env.DataConnectionStringSettings.CreateDbConnection())
 				{
@@ -505,7 +505,7 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					}
 					veridationResult.PassVeridation = success;
 					emailBody.Append("</tbody></table><br/>");
-					if (!string.IsNullOrEmpty(ReportSampleSql))
+					if (!string.IsNullOrWhiteSpace(ReportSampleSql))
 					{
 						emailBody.Append("<strong>数据样本</strong><br/><br/>");
 						emailBody.Append(conn.ToHtml($"{ReportSampleSql} LIMIT 100;"));
@@ -513,7 +513,7 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					emailBody.Append("<br/><br/></body></html>");
 
 					var message = new MimeMessage();
-					var displayName = string.IsNullOrEmpty(EmailDisplayName) ? "DotnetSpider Alert" : EmailDisplayName;
+					var displayName = string.IsNullOrWhiteSpace(EmailDisplayName) ? "DotnetSpider Alert" : EmailDisplayName;
 					message.From.Add(new MailboxAddress(displayName, EmailAccount));
 					foreach (var emailTo in EmailTo)
 					{
@@ -528,7 +528,7 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					};
 					var multipart = new Multipart("mixed") { html };
 
-					if (veridationResult.PassVeridation && !string.IsNullOrEmpty(ExportDataSql) && !string.IsNullOrEmpty(ExportDataFileName))
+					if (veridationResult.PassVeridation && !string.IsNullOrWhiteSpace(ExportDataSql) && !string.IsNullOrWhiteSpace(ExportDataFileName))
 					{
 						var path = conn.Export(ExportDataSql, $"{ExportDataFileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
 						var attachment = new MimePart("excel", "xlsx")

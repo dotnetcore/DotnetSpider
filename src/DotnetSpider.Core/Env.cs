@@ -221,7 +221,7 @@ namespace DotnetSpider.Core
 		/// <param name="path">配置文件路径</param>
 		public static void LoadConfiguration(string path = null)
 		{
-			if (string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))
+			if (string.IsNullOrWhiteSpace(path))
 			{
 				path = Path.Combine(BaseDirectory, "app.config");
 			}
@@ -229,7 +229,7 @@ namespace DotnetSpider.Core
 			if (path.ToLower().StartsWith("%global%"))
 			{
 				var fileName = path.Substring(8, path.Length - 8);
-				path = string.IsNullOrEmpty(fileName) ? Path.Combine(GlobalDirectory, "app.config") : Path.Combine(GlobalDirectory, fileName);
+				path = string.IsNullOrWhiteSpace(fileName) ? Path.Combine(GlobalDirectory, "app.config") : Path.Combine(GlobalDirectory, fileName);
 			}
 
 			if (!File.Exists(path))
@@ -253,7 +253,7 @@ namespace DotnetSpider.Core
 			EmailPassword = configuration.AppSettings.Settings[EmailPasswordKey]?.Value?.Trim();
 			EmailDisplayName = configuration.AppSettings.Settings[EmailDisplayNameKey]?.Value?.Trim();
 			EnterpiseServiceUrl = configuration.AppSettings.Settings[EnterpiseServiceUrlKey]?.Value?.Trim();
-			if (!string.IsNullOrEmpty(EnterpiseServiceUrl))
+			if (!string.IsNullOrWhiteSpace(EnterpiseServiceUrl))
 			{
 				EnterpiseServiceLogUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}Log/submit";
 				EnterpiseServiceToken = configuration.AppSettings.Settings[EnterpiseServiceTokenKey]?.Value?.Trim();
@@ -262,7 +262,7 @@ namespace DotnetSpider.Core
 				EnterpiseServiceReduceRunningUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}Task/ReduceRunning";
 				EnterpiseServicePipelineUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}Pipeline/Process";
 			}
-			EnterpiseServiceLog = !string.IsNullOrEmpty(EnterpiseServiceLogUrl);
+			EnterpiseServiceLog = !string.IsNullOrWhiteSpace(EnterpiseServiceLogUrl);
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 			SqlEncryptCode = configuration.AppSettings.Settings[SqlEncryptCodeKey]?.Value?.Trim();

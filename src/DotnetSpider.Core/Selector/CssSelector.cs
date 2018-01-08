@@ -44,7 +44,7 @@ namespace DotnetSpider.Core.Selector
 
 			if (elements.Count > 0)
 			{
-				if (string.IsNullOrEmpty(_attrName))
+				if (string.IsNullOrWhiteSpace(_attrName))
 				{
 					return elements[0];
 				}

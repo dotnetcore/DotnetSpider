@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Selector
 		/// <param name="group"></param>
 		public RegexSelector(string pattern, int group = 0)
 		{
-			if (string.IsNullOrEmpty(pattern) || string.IsNullOrWhiteSpace(pattern))
+			if (string.IsNullOrWhiteSpace(pattern))
 			{
 				throw new ArgumentException("regex must not be empty");
 			}

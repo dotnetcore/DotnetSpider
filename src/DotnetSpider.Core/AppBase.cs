@@ -85,7 +85,7 @@ namespace DotnetSpider.Core
 		/// <param name="arguments">程序运行的参数</param>
 		public void Run(params string[] arguments)
 		{
-			if (ExecuteRecord == null && !string.IsNullOrEmpty(Env.EnterpiseServiceUrl))
+			if (ExecuteRecord == null && !string.IsNullOrWhiteSpace(Env.EnterpiseServiceUrl))
 			{
 				ExecuteRecord = new HttpExecuteRecord();
 			}
@@ -116,7 +116,7 @@ namespace DotnetSpider.Core
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		private string GetName()
 		{
-			if (string.IsNullOrEmpty(_name) || string.IsNullOrWhiteSpace(_name))
+			if (string.IsNullOrWhiteSpace(_name))
 			{
 				var type = GetType();
 				var nameAttribute = type.GetCustomAttribute<TaskName>();

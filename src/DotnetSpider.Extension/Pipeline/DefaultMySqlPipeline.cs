@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public DefaultMySqlPipeline(string connectString, string database, string tableName)
 		{
-			if (string.IsNullOrEmpty(database) || string.IsNullOrEmpty(tableName))
+			if (string.IsNullOrWhiteSpace(database) || string.IsNullOrWhiteSpace(tableName))
 			{
 				throw new SpiderException("Database or table name should not be null or empty.");
 			}
@@ -52,7 +52,7 @@ namespace DotnetSpider.Extension.Pipeline
 		private void InitConnectStringSettings(string connectString)
 		{
 			ConnectionStringSettings connectionStringSettings;
-			if (!string.IsNullOrEmpty(connectString))
+			if (!string.IsNullOrWhiteSpace(connectString))
 			{
 				connectionStringSettings = new ConnectionStringSettings("MySql", connectString, "MySql.Data.MySqlClient");
 			}

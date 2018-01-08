@@ -22,7 +22,7 @@ namespace DotnetSpider.Core.Selector
 			_xpath = xpath;
 
 			Match match = AttributeXPathRegex.Match(_xpath);
-			if (!string.IsNullOrEmpty(match.Value) && _xpath.EndsWith(match.Value))
+			if (!string.IsNullOrWhiteSpace(match.Value) && _xpath.EndsWith(match.Value))
 			{
 				_attribute = match.Value.Replace("@", "");
 				_xpath = _xpath.Replace("/" + match.Value, "");
@@ -87,7 +87,7 @@ namespace DotnetSpider.Core.Selector
 		/// <returns>如果返回 True, 则说明是查询元素的属性值</returns>
 		public override bool HasAttribute()
 		{
-			return !string.IsNullOrEmpty(_attribute);
+			return !string.IsNullOrWhiteSpace(_attribute);
 		}
 	}
 }

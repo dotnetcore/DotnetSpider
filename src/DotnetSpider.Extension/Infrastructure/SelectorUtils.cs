@@ -117,7 +117,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public static void NotNullExpression(BaseSelector selector)
 		{
-			if (string.IsNullOrEmpty(selector.Expression))
+			if (string.IsNullOrWhiteSpace(selector.Expression))
 			{
 				throw new SpiderException($"Expression of {selector} should not be null/empty.");
 			}
@@ -125,7 +125,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 		public static ISelector Parse(Selector selector)
 		{
-			if (!string.IsNullOrEmpty(selector?.Expression))
+			if (!string.IsNullOrWhiteSpace(selector?.Expression))
 			{
 				string expression = selector.Expression;
 

@@ -204,7 +204,7 @@ namespace DotnetSpider.Extension.Pipeline
 		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
 		{
 			ConnectionStringSettings connectionStringSettings;
-			if (!string.IsNullOrEmpty(connectString))
+			if (!string.IsNullOrWhiteSpace(connectString))
 			{
 				connectionStringSettings = new ConnectionStringSettings("SqlServer", connectString, "System.Data.SqlClient");
 			}

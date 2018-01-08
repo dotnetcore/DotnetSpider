@@ -132,7 +132,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					page = HandleResponse(request, response, spider.Site);
 
-					if (string.IsNullOrEmpty(page.Content))
+					if (string.IsNullOrWhiteSpace(page.Content))
 					{
 						Logger.AllLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
 					}
@@ -196,17 +196,17 @@ namespace DotnetSpider.Core.Downloader
 			var userAgentHeader = "User-Agent";
 			httpRequestMessage.Headers.Add(userAgentHeader, site.Headers.ContainsKey(userAgentHeader) ? site.Headers[userAgentHeader] : site.UserAgent);
 
-			if (!string.IsNullOrEmpty(request.Referer))
+			if (!string.IsNullOrWhiteSpace(request.Referer))
 			{
 				httpRequestMessage.Headers.Add("Referer", request.Referer);
 			}
 
-			if (!string.IsNullOrEmpty(request.Origin))
+			if (!string.IsNullOrWhiteSpace(request.Origin))
 			{
 				httpRequestMessage.Headers.Add("Origin", request.Origin);
 			}
 
-			if (!string.IsNullOrEmpty(site.Accept))
+			if (!string.IsNullOrWhiteSpace(site.Accept))
 			{
 				httpRequestMessage.Headers.Add("Accept", site.Accept);
 			}
@@ -219,7 +219,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					continue;
 				}
-				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) && header.Key != contentTypeHeader && header.Key != userAgentHeader)
+				if (!string.IsNullOrWhiteSpace(header.Key) && !string.IsNullOrWhiteSpace(header.Value) && header.Key != contentTypeHeader && header.Key != userAgentHeader)
 				{
 					httpRequestMessage.Headers.Add(header.Key, header.Value);
 				}
@@ -227,7 +227,7 @@ namespace DotnetSpider.Core.Downloader
 
 			if (httpRequestMessage.Method == HttpMethod.Post)
 			{
-				var data = string.IsNullOrEmpty(site.EncodingName) ? Encoding.UTF8.GetBytes(request.PostBody) : site.Encoding.GetBytes(request.PostBody);
+				var data = string.IsNullOrWhiteSpace(site.EncodingName) ? Encoding.UTF8.GetBytes(request.PostBody) : site.Encoding.GetBytes(request.PostBody);
 				httpRequestMessage.Content = new StreamContent(new MemoryStream(data));
 
 
@@ -282,7 +282,7 @@ namespace DotnetSpider.Core.Downloader
 		{
 			byte[] contentBytes = response.Content.ReadAsByteArrayAsync().Result;
 			contentBytes = PreventCutOff(contentBytes);
-			if (string.IsNullOrEmpty(site.EncodingName))
+			if (string.IsNullOrWhiteSpace(site.EncodingName))
 			{
 				var charSet = response.Content.Headers.ContentType?.CharSet;
 				Encoding htmlCharset = EncodingExtensions.GetEncoding(charSet, contentBytes);
@@ -303,7 +303,7 @@ namespace DotnetSpider.Core.Downloader
 				try
 				{
 					string folder = Path.GetDirectoryName(filePath);
-					if (!string.IsNullOrEmpty(folder))
+					if (!string.IsNullOrWhiteSpace(folder))
 					{
 						if (!Directory.Exists(folder))
 						{

@@ -311,7 +311,7 @@ namespace DotnetSpider.Core.Infrastructure
 					buffer = item.PostdataByte;
 				}
 				//写入文件  
-				else if (item.PostDataType == PostDataType.File && !string.IsNullOrEmpty(item.Postdata))
+				else if (item.PostDataType == PostDataType.File && !string.IsNullOrWhiteSpace(item.Postdata))
 				{
 					StreamReader r = new StreamReader(File.OpenRead(item.Postdata), postencoding);
 					buffer = postencoding.GetBytes(r.ReadToEnd());
@@ -322,7 +322,7 @@ namespace DotnetSpider.Core.Infrastructure
 #endif
 				}
 				//写入字符串  
-				else if (!string.IsNullOrEmpty(item.Postdata))
+				else if (!string.IsNullOrWhiteSpace(item.Postdata))
 				{
 					buffer = postencoding.GetBytes(item.Postdata);
 				}
@@ -341,7 +341,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		private static void SetCookie(HttpWebRequest request, HttpRequest item)
 		{
-			if (!string.IsNullOrEmpty(item.Cookie))
+			if (!string.IsNullOrWhiteSpace(item.Cookie))
 			{
 				request.Headers[HttpRequestHeader.Cookie] = item.Cookie;
 			}
@@ -366,7 +366,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		private static void SetCer(HttpWebRequest request, HttpRequest item)
 		{
-			if (!string.IsNullOrEmpty(item.CerPath))
+			if (!string.IsNullOrWhiteSpace(item.CerPath))
 			{
 				//这一句一定要写在创建连接的前面。使用回调的方法进行证书验证。  
 				ServicePointManager.ServerCertificateValidationCallback = CheckValidationResult;

@@ -143,7 +143,7 @@ namespace DotnetSpider.Extension.Monitor
 		private IDbConnection CreateDbConnection()
 		{
 			IDbConnection conn = null;
-			if (!string.IsNullOrEmpty(_connectionString) && !string.IsNullOrWhiteSpace(_connectionString))
+			if (!string.IsNullOrWhiteSpace(_connectionString))
 			{
 				conn = new MySqlConnection(_connectionString);
 			}

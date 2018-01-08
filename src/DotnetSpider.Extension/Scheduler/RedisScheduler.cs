@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 		public RedisScheduler(string connectString)
 		{
-			if (string.IsNullOrEmpty(connectString) || string.IsNullOrWhiteSpace(connectString))
+			if (string.IsNullOrWhiteSpace(connectString))
 			{
 				throw new SpiderException("Redis connect string should not be empty.");
 			}
@@ -60,12 +60,12 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			base.Init(spider);
 
-			if (string.IsNullOrEmpty(_connectString) || string.IsNullOrWhiteSpace(_connectString))
+			if (string.IsNullOrWhiteSpace(_connectString))
 			{
 				throw new SpiderException("Redis connect string should not be null or empty.");
 			}
 
-			if (string.IsNullOrEmpty(_identityMd5))
+			if (string.IsNullOrWhiteSpace(_identityMd5))
 			{
 				var md5 = CryptoUtil.Md5Encrypt(spider.Identity);
 				_itemKey = $"dotnetspider:scheduler:{md5}:items";

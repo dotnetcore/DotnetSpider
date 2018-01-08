@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		protected override void CheckArguments()
 		{
-			if (string.IsNullOrEmpty(Format) || string.IsNullOrWhiteSpace(Format))
+			if (string.IsNullOrWhiteSpace(Format))
 			{
 				throw new SpiderException("FormatString should not be null or empty.");
 			}

@@ -69,7 +69,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				.Where(p => DataProviders.Contains(Path.GetFileName(p).ToLower())).ToList();
 			foreach (var providerDll in providerDlls)
 			{
-				if (string.IsNullOrEmpty(providerDll))
+				if (string.IsNullOrWhiteSpace(providerDll))
 				{
 					continue;
 				}

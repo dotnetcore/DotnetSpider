@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Processor
 		/// <returns>如果返回 True, 则说明已经采到到了最后一个链接</returns>
 		public bool IsTermination(Page page)
 		{
-			if (page==null||string.IsNullOrEmpty(page.Content)||string.IsNullOrWhiteSpace((page.Content)))
+			if (page == null || string.IsNullOrWhiteSpace((page.Content)))
 			{
 				return false;
 			}
@@ -59,7 +59,7 @@ namespace DotnetSpider.Core.Processor
 		/// <returns>如果返回 True, 则说明已经采到到了最后一个链接</returns>
 		public bool IsTermination(Page page)
 		{
-			if (page==null||string.IsNullOrEmpty(page.Content)||string.IsNullOrWhiteSpace((page.Content)))
+			if (page == null || string.IsNullOrWhiteSpace((page.Content)))
 			{
 				return false;
 			}
@@ -83,7 +83,7 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="maxPage">最大分页数限制</param>
 		public MaxPageTermination(string paginationStr, int maxPage)
 		{
-			if (string.IsNullOrEmpty(paginationStr) || string.IsNullOrWhiteSpace(paginationStr))
+			if (string.IsNullOrWhiteSpace(paginationStr))
 			{
 				throw new SpiderException("paginationStr should not be null.");
 			}

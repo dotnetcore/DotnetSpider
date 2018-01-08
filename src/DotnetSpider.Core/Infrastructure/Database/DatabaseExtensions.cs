@@ -26,7 +26,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 			{
 				throw new SpiderException("ConnectionStringSetting is null.");
 			}
-			if (string.IsNullOrEmpty(connectionStringSettings.ConnectionString) || string.IsNullOrEmpty(connectionStringSettings.ProviderName))
+			if (string.IsNullOrWhiteSpace(connectionStringSettings.ConnectionString) || string.IsNullOrWhiteSpace(connectionStringSettings.ProviderName))
 			{
 				throw new SpiderException("ConnectionStringSetting is incorrect.");
 			}

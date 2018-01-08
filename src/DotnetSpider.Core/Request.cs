@@ -9,7 +9,7 @@ using DotnetSpider.Core.Proxy;
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// ����ȡ������Ϣ�ķ�װ
+	/// 对爬取链接信息的封装
 	/// </summary>
 	public class Request : IDisposable
 	{
@@ -18,59 +18,59 @@ namespace DotnetSpider.Core
 		private Uri _uri;
 
 		/// <summary>
-		/// վ����Ϣ
+		/// 站点信息
 		/// </summary>
 		[JsonIgnore]
 		public Site Site { get; internal set; }
 
 		/// <summary>
-		/// �����ӽ����������ݽ������
+		/// 此链接解析出的数据结果数量
 		/// </summary>
 		[JsonIgnore]
 		public int? CountOfResults { get; set; }
 
 		/// <summary>
-		/// �������ݽ���������ݿ��ʵ�����ӻ���µ�����
+		/// 所有数据结果插入数据库后实际增加或更新的数量
 		/// </summary>
 		[JsonIgnore]
 		public int? EffectedRows { get; set; }
 
 		/// <summary>
-		/// ����������
+		/// 下载器分组
 		/// </summary>
 		public int? DownloaderGroup { get; set; }
 
 		/// <summary>
-		/// ���ش���������ʱʹ�õĴ���
+		/// 下载此链接内容时使用的代理
 		/// </summary>
 		[JsonIgnore]
 		public UseSpecifiedUriWebProxy Proxy { get; set; }
 
 		/// <summary>
-		/// ��ǰ���ӵ����, Ĭ�Ϲ�����������Ϊ1, ���ڿ�����ȡ�����
+		/// 当前链接的深度, 默认构造的链接深度为1, 用于控制爬取的深度
 		/// </summary>
 		public int Depth { get; set; } = 1;
 
 		/// <summary>
-		/// ��ǰ���������ӵ����
+		/// 当前链接子链接的深度
 		/// </summary>
 		[JsonIgnore]
 		public int NextDepth => Depth + 1;
 
 		/// <summary>
-		/// ��ǰ�����Ѿ����ԵĴ���
+		/// 当前链接已经重试的次数
 		/// </summary>
 		public int CycleTriedTimes { get; set; }
 
 		/// <summary>
-		/// ��ǰ�����Ƿ��ǺϷ�����
+		/// 当前链接是否是合法链接
 		/// </summary>
 		[JsonIgnore]
 		public bool IsAvailable
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(Url) || string.IsNullOrWhiteSpace(Url))
+				if (string.IsNullOrWhiteSpace(Url))
 				{
 					return false;
 				}
@@ -88,44 +88,44 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// ��������ʱReferer������ֵ
+		/// 请求链接时Referer参数的值
 		/// </summary>
 		public string Referer { get; set; }
 
 		/// <summary>
-		/// ��������ʱOrigin������ֵ
+		/// 请求链接时Origin参数的值
 		/// </summary>
 		public string Origin { get; set; }
 
 		/// <summary>
-		/// �������ӵķ���
+		/// 请求链接的方法
 		/// </summary>
 		public HttpMethod Method { get; set; } = HttpMethod.Get;
 
 		/// <summary>
-		/// ���ӵ����ȼ�, ���������ȼ�����
+		/// 链接的优先级, 仅用于优先级队列
 		/// </summary>
 		public int Priority { get; set; }
 
 		/// <summary>
-		/// �洢�����Ӷ�Ӧ�Ķ��������ֵ�
+		/// 存储此链接对应的额外数据字典
 		/// </summary>
 		public Dictionary<string, dynamic> Extras { get; set; }
 
 		/// <summary>
-		/// ���������ʱ��ҪPOST������
+		/// 请求此链接时需要POST的数据
 		/// </summary>
 		public string PostBody { get; set; }
 
 		/// <summary>
-		/// ��������
+		/// 请求链接
 		/// </summary>
 		public string Url
 		{
 			get { return _url; }
 			set
 			{
-				if (string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value))
+				if (string.IsNullOrWhiteSpace(value))
 				{
 					_url = null;
 					return;
@@ -142,48 +142,48 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// ��������
+		/// 请求链接
 		/// </summary>
 		[JsonIgnore]
 		public Uri Uri => _uri;
 
 		/// <summary>
-		/// TODO ��������Ϣ��Ψһ��ʶ, ������Ҫ��Ӹ�������, ��ĳЩ����URL�����һ��, ʹ��Referer����Cookie����������
+		/// TODO 此链接信息的唯一标识, 可能需要添加更多属性, 如某些场景URL是完成一致, 使用Referer或者Cookie来区别请求
 		/// </summary>
 		[JsonIgnore]
 		public string Identity => CryptoUtil.Md5Encrypt(Url + PostBody);
 
 		/// <summary>
-		/// ��������Ӻ���������ص�״̬��
+		/// 请求此链接后服务器返回的状态码
 		/// </summary>
 		[JsonIgnore]
 		public HttpStatusCode? StatusCode { get; set; }
 
 		/// <summary>
-		/// ���췽��
+		/// 构造方法
 		/// </summary>
 		public Request()
 		{
 		}
 
 		/// <summary>
-		/// ���췽��
+		/// 构造方法
 		/// </summary>
-		/// <param name="url">����</param>
+		/// <param name="url">链接</param>
 		public Request(string url) : this(url, null)
 		{
 		}
 
 		/// <summary>
-		/// ���췽��
+		/// 构造方法
 		/// </summary>
-		/// <param name="url">����</param>
-		/// <param name="extras">�����ֵ�</param>
+		/// <param name="url">链接</param>
+		/// <param name="extras">数据字典</param>
 		public Request(string url, IDictionary<string, dynamic> extras = null)
 		{
 			Url = url;
 
-			if (string.IsNullOrEmpty(Url))
+			if (string.IsNullOrWhiteSpace(Url))
 			{
 				return;
 			}
@@ -198,10 +198,10 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// ͨ����ֵȡ�ô����Ӷ�Ӧ�Ķ�����Ϣ
+		/// 通过键值取得此链接对应的额外信息
 		/// </summary>
-		/// <param name="key">��ֵ</param>
-		/// <returns>������Ϣ</returns>
+		/// <param name="key">键值</param>
+		/// <returns>额外信息</returns>
 		public dynamic GetExtra(string key)
 		{
 			lock (_locker)
@@ -220,10 +220,10 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// ���ô����ӵĶ�����Ϣ
+		/// 设置此链接的额外信息
 		/// </summary>
-		/// <param name="key">��ֵ</param>
-		/// <param name="value">������Ϣ</param>
+		/// <param name="key">键值</param>
+		/// <param name="value">额外信息</param>
 		public void PutExtra(string key, dynamic value)
 		{
 			lock (_locker)
@@ -291,9 +291,9 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// TODO ����˼�������¡�����Ƿ�������
+		/// TODO 重新思考这个克隆方法是否还有作用
 		/// </summary>
-		/// <returns>����ȡ������Ϣ�ķ�װ</returns>
+		/// <returns>对爬取链接信息的封装</returns>
 		public Request Clone()
 		{
 			lock (_locker)

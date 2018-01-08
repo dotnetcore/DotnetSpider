@@ -28,7 +28,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <returns>编码类型</returns>
 		public static Encoding GetEncoding(string characterSet, byte[] bytes)
 		{
-			if (!string.IsNullOrEmpty(characterSet))
+			if (!string.IsNullOrWhiteSpace(characterSet))
 			{
 				return GetEncoding(characterSet);
 			}

@@ -187,7 +187,7 @@ namespace DotnetSpider.Core.Selector
 		/// <returns></returns>
 		private string RemovePadding(string text, string padding)
 		{
-			if (string.IsNullOrEmpty(padding))
+			if (string.IsNullOrWhiteSpace(padding))
 			{
 				return text;
 			}
@@ -238,7 +238,7 @@ namespace DotnetSpider.Core.Selector
 					foreach (var domain in domains)
 					{
 						var href = node.Attributes["href"]?.Value;
-						if (!string.IsNullOrEmpty(href) && System.Text.RegularExpressions.Regex.IsMatch(href, domain))
+						if (!string.IsNullOrWhiteSpace(href) && System.Text.RegularExpressions.Regex.IsMatch(href, domain))
 						{
 							isMatch = true;
 							break;

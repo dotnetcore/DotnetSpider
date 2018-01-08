@@ -54,7 +54,7 @@ namespace DotnetSpider.Extension.Processor
 				}
 			}
 
-			if (string.IsNullOrEmpty(result))
+			if (string.IsNullOrWhiteSpace(result))
 			{
 				throw new SpiderException("The result of total selector is null.");
 			}

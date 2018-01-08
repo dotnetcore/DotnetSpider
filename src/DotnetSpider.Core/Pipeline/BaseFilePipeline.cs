@@ -35,7 +35,7 @@ namespace DotnetSpider.Core.Pipeline
 		/// <param name="interval">数据根目录与程序运行目录路径的相对值</param>
 		protected void InitFolder(string interval)
 		{
-			if (string.IsNullOrEmpty(interval) || string.IsNullOrWhiteSpace(interval))
+			if (string.IsNullOrWhiteSpace(interval))
 			{
 				throw new SpiderException("Interval path should not be null.");
 			}

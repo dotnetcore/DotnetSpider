@@ -152,7 +152,7 @@ namespace DotnetSpider.Extension.Pipeline
 				_session.ChangeKeyspace(adapter.Value.Table.Database);
 				_session.Execute(GenerateCreateTableSql(adapter.Value));
 				var createIndexCql = GenerateCreateIndexes(adapter.Value);
-				if (!string.IsNullOrEmpty(createIndexCql))
+				if (!string.IsNullOrWhiteSpace(createIndexCql))
 				{
 					_session.Execute(createIndexCql);
 				}
@@ -200,7 +200,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			sqlBuilder.AppendFormat("INSERT INTO {0} {1} {2};",
 				tableName,
-				string.IsNullOrEmpty(columNames) ? string.Empty : $"({columNames})",
+				string.IsNullOrWhiteSpace(columNames) ? string.Empty : $"({columNames})",
 				string.IsNullOrEmpty(values) ? string.Empty : $" VALUES ({values})");
 
 			var sql = sqlBuilder.ToString();

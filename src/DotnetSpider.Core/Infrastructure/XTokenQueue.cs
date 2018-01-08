@@ -662,7 +662,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <returns></returns>
 		public static string TrimQuotes(string str)
 		{
-			IsTrue(!string.IsNullOrEmpty(str));
+			IsTrue(!string.IsNullOrWhiteSpace(str));
 
 			// ReSharper disable once PossibleNullReferenceException
 			string quote = str.Substring(0, 1);

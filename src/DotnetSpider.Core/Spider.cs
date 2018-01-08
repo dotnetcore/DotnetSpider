@@ -116,7 +116,7 @@ namespace DotnetSpider.Core
 			{
 				CheckIfRunning();
 
-				if (string.IsNullOrEmpty(value) || value.Length > Env.IdentityMaxLength)
+				if (string.IsNullOrWhiteSpace(value) || value.Length > Env.IdentityMaxLength)
 				{
 					throw new ArgumentException($"Length of Identity should less than {Env.IdentityMaxLength}.");
 				}
@@ -958,7 +958,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		protected void CheckIfSettingsCorrect()
 		{
-			Identity = (string.IsNullOrWhiteSpace(Identity) || string.IsNullOrEmpty(Identity))
+			Identity = (string.IsNullOrWhiteSpace(Identity))
 				? CryptoUtil.Md5Encrypt(Guid.NewGuid().ToString())
 				: Identity;
 
@@ -1487,7 +1487,7 @@ namespace DotnetSpider.Core
 		{
 			if (Env.IsWindows)
 			{
-				if (!string.IsNullOrEmpty(Identity) && !string.IsNullOrWhiteSpace(Identity))
+				if (!string.IsNullOrWhiteSpace(Identity))
 				{
 					_identityMmf = MemoryMappedFile.CreateOrOpen(Identity, 1, MemoryMappedFileAccess.ReadWrite);
 					using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
@@ -1496,7 +1496,7 @@ namespace DotnetSpider.Core
 						writer.Write(false);
 					}
 				}
-				if (!string.IsNullOrEmpty(TaskId) && !string.IsNullOrWhiteSpace(TaskId))
+				if (!string.IsNullOrWhiteSpace(TaskId))
 				{
 					_taskIdMmf = MemoryMappedFile.CreateOrOpen(TaskId, 1, MemoryMappedFileAccess.ReadWrite);
 					using (MemoryMappedViewStream stream = _taskIdMmf.CreateViewStream())
@@ -1508,11 +1508,11 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				if (!string.IsNullOrEmpty(Identity) && !string.IsNullOrWhiteSpace(Identity))
+				if (!string.IsNullOrWhiteSpace(Identity))
 				{
 					_closeSignalFiles[0] = Path.Combine(Env.BaseDirectory, $"{Identity}_cl");
 				}
-				if (!string.IsNullOrEmpty(TaskId) && !string.IsNullOrWhiteSpace(TaskId))
+				if (!string.IsNullOrWhiteSpace(TaskId))
 				{
 					_closeSignalFiles[1] = Path.Combine(Env.BaseDirectory, $"{TaskId}_cl");
 				}
@@ -1540,7 +1540,7 @@ namespace DotnetSpider.Core
 		{
 			if (Monitor == null)
 			{
-				Monitor = string.IsNullOrEmpty(Env.EnterpiseServiceUrl) ? new NLogMonitor() : new HttpMonitor(Env.EnterpiseServiceStatusUrl);
+				Monitor = string.IsNullOrWhiteSpace(Env.EnterpiseServiceUrl) ? new NLogMonitor() : new HttpMonitor(Env.EnterpiseServiceStatusUrl);
 			}
 		}
 

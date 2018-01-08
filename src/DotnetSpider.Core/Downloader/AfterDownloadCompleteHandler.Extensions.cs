@@ -117,7 +117,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -139,7 +139,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -161,7 +161,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null ||  string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -181,7 +181,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null ||  string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -215,7 +215,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -235,7 +235,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -255,7 +255,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -289,7 +289,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -334,7 +334,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null ||  string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -369,7 +369,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -402,7 +402,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="exceptionMessage">异常信息</param>
 		public RedialWhenExceptionThrowHandler(string exceptionMessage)
 		{
-			if (string.IsNullOrEmpty(exceptionMessage) || string.IsNullOrWhiteSpace(exceptionMessage))
+			if (  string.IsNullOrWhiteSpace(exceptionMessage))
 			{
 				throw new SpiderException("exceptionMessage should not be null or empty.");
 			}
@@ -417,7 +417,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content) || page.Exception == null)
+			if (page == null || string.IsNullOrWhiteSpace(page.Content) || page.Exception == null)
 			{
 				return;
 			}
@@ -466,7 +466,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content))
+			if (page == null ||  string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -518,7 +518,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, ISpider spider)
 		{
-			if (page == null || string.IsNullOrEmpty(page.Content) || string.IsNullOrWhiteSpace(page.Content) || page.Skip)
+			if (page == null ||  string.IsNullOrWhiteSpace(page.Content) || page.Skip)
 			{
 				return;
 			}

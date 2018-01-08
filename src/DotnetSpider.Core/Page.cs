@@ -180,7 +180,7 @@ namespace DotnetSpider.Core
 		/// <param name="increaseDeep">目标链接的深度是否升高</param>
 		public void AddTargetRequest(string url, int priority = 0, bool increaseDeep = true)
 		{
-			if (string.IsNullOrEmpty(url) || url.Equals("#") || url.StartsWith("javascript:"))
+			if (string.IsNullOrWhiteSpace(url) || url.Equals("#") || url.StartsWith("javascript:"))
 			{
 				return;
 			}

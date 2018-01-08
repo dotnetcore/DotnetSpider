@@ -28,7 +28,7 @@
 			{
 				lock (NameGetOrSetLocker)
 				{
-					if (string.IsNullOrEmpty(_name))
+					if (string.IsNullOrWhiteSpace(_name))
 					{
 						_name = GetType().Name;
 					}

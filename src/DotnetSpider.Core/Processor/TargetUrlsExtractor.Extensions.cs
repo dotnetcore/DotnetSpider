@@ -162,7 +162,7 @@ namespace DotnetSpider.Core.Processor
 				throw new ArgumentNullException("Patterns should not be null or empty.");
 			}
 
-			var validPatterns = patterns.Where(p => p != null && !string.IsNullOrEmpty(p.Trim())).Select(p => p.Trim()).ToList();
+			var validPatterns = patterns.Where(p => p != null && !string.IsNullOrWhiteSpace(p.Trim())).Select(p => p.Trim()).ToList();
 
 			if (validPatterns.Count != patterns.Length)
 			{
@@ -170,7 +170,7 @@ namespace DotnetSpider.Core.Processor
 			}
 
 			ISelector selector = Selectors.Regex(RegexUtil.Url);
-			if (!string.IsNullOrEmpty(regionXpath))
+			if (!string.IsNullOrWhiteSpace(regionXpath))
 			{
 				string xpath = string.IsNullOrWhiteSpace(regionXpath.Trim()) ? "." : regionXpath.Trim();
 				selector = Selectors.XPath(xpath);
@@ -265,7 +265,7 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="termination">中止器</param>
 		protected PaginationTargetUrlsExtractor(string paginationStr, ITargetUrlsExtractorTermination termination = null)
 		{
-			if (string.IsNullOrEmpty(paginationStr) || string.IsNullOrWhiteSpace(paginationStr))
+			if (string.IsNullOrWhiteSpace(paginationStr))
 			{
 				throw new SpiderException("paginationStr should not be null or empty.");
 			}

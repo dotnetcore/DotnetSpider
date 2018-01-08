@@ -19,12 +19,12 @@ namespace DotnetSpider.Extension.Model.Formatter
 
 		protected override void CheckArguments()
 		{
-			if (string.IsNullOrEmpty(Pattern) || string.IsNullOrWhiteSpace(Pattern))
+			if (string.IsNullOrWhiteSpace(Pattern))
 			{
 				throw new SpiderException("Pattern should not be null or empty.");
 			}
 
-			if (string.IsNullOrEmpty(AppendValue) || string.IsNullOrWhiteSpace(AppendValue))
+			if (string.IsNullOrWhiteSpace(AppendValue))
 			{
 				throw new SpiderException("Append should not be null or empty.");
 			}

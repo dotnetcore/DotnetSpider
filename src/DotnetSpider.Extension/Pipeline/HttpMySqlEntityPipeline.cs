@@ -22,7 +22,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public HttpMySqlEntityPipeline(string api = null)
 		{
-			if (string.IsNullOrEmpty(api) || string.IsNullOrWhiteSpace(api))
+			if (string.IsNullOrWhiteSpace(api))
 			{
 				_api = Env.EnterpiseServicePipelineUrl;
 			}

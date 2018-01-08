@@ -23,7 +23,7 @@ namespace DotnetSpider.Extension.Model
 		public EntityExtractor(IDataHandler<T> dataHandler = null, string tableName = null)
 		{
 			EntityDefine = new EntityDefine<T>();
-			if (!string.IsNullOrEmpty(tableName) && !string.IsNullOrWhiteSpace(tableName))
+			if (!string.IsNullOrWhiteSpace(tableName))
 			{
 				EntityDefine.TableInfo.Name = tableName;
 			}
