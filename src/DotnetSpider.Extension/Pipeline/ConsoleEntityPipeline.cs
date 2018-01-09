@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DotnetSpider.Extension.Model;
 using System.Linq;
 using DotnetSpider.Core;
+using Newtonsoft.Json;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -20,7 +21,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			foreach (var data in datas)
 			{
-				Console.WriteLine($"{entityName}: {data}");
+				Console.WriteLine($"{entityName}: {JsonConvert.SerializeObject(data)}");
 			}
 			return datas.Count();
 		}

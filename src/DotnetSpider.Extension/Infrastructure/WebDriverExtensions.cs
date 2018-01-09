@@ -1,6 +1,7 @@
 ﻿
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Extension.Downloader;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
@@ -69,7 +70,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			return screenSnapshot.Clone(crop, screenSnapshot.PixelFormat);
 		}
 #endif
-		public static IWebDriver Open(Browser browser, Option option)
+		public static IWebDriver Open(Browser browser, Option option, WebDriverCookieInjector cookieInjector = null)
 		{
 			IWebDriver e = null;
 			switch (browser)

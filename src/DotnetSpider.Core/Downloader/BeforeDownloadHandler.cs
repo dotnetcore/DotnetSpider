@@ -10,6 +10,6 @@
 		/// </summary>
 		/// <param name="request">请求信息</param>
 		/// <param name="spider">爬虫<see cref="ISpider"/></param>
-		public abstract void Handle(ref Request request, ISpider spider);
+		public abstract void Handle(ref Request request, IDownloader downloader, ISpider spider);
 	}
 }

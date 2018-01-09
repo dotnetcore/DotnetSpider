@@ -18,20 +18,34 @@ namespace DotnetSpider.Core.Downloader
 		private ulong _getHttpClientCount;
 		private readonly ConcurrentDictionary<int, HttpClientItem> _pool = new ConcurrentDictionary<int, HttpClientItem>();
 		private HttpClientItem _defaultHttpClientItem;
+		private Dictionary<string, CookieContainer> _initedCookieContainers = new Dictionary<string, CookieContainer>();
 
 		/// <summary>
 		/// 通过不同的Hash分组, 返回对应的HttpClient
 		/// 设计初衷: 某些网站会对COOKIE某部分做承上启下的检测, 因此必须保证: www.a.com/keyword=xxxx&amp;page=1 www.a.com/keyword=xxxx&amp;page=2 在同一个HttpClient里访问
 		/// </summary>
+		/// <param name="spider">爬虫</param>
+		/// <param name="downloader">下载器</param>
+		/// <param name="cookieContainer">Cookie</param>
 		/// <param name="hashCode">分组的哈希</param>
-		/// <param name="cookies">Cookies</param>
-		/// <returns>HttpClient对象</returns>
+		/// <param name="cookieInjector">Cookie注入器</param>
+		/// <returns>HttpClientItem</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public HttpClientItem GetHttpClient(int? hashCode = null, CookieContainer cookies = null)
+		public HttpClientItem GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, int? hashCode = null, ICookieInjector cookieInjector = null)
 		{
+			if (cookieContainer == null)
+			{
+				throw new SpiderException($"{nameof(cookieContainer)} should not be null.");
+			}
+			if (downloader == null)
+			{
+				throw new SpiderException($"{nameof(downloader)} should not be null.");
+			}
+			var newCookieContainer = GenerateNewCookieContainer(spider, downloader, cookieContainer, cookieInjector);
+
 			if (hashCode == null)
 			{
-				return _defaultHttpClientItem ?? (_defaultHttpClientItem = CreateDefaultHttpClient(cookies));
+				return _defaultHttpClientItem ?? (_defaultHttpClientItem = CreateDefaultHttpClient(newCookieContainer));
 			}
 
 			_getHttpClientCount++;
@@ -48,7 +62,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			else
 			{
-				var item = CreateDefaultHttpClient(cookies);
+				var item = CreateDefaultHttpClient(newCookieContainer);
 				_pool.TryAdd(hashCode.Value, item);
 				return item;
 			}
@@ -72,7 +86,21 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
-		private HttpClientItem CreateDefaultHttpClient(CookieContainer cookies = null)
+		private CookieContainer GenerateNewCookieContainer(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, ICookieInjector cookieInjector = null)
+		{
+			var key = cookieInjector == null ? $"{cookieContainer.GetHashCode()}" : $"{cookieContainer.GetHashCode()}_{cookieInjector?.GetHashCode()}";
+
+			if (!_initedCookieContainers.ContainsKey(key))
+			{
+				cookieInjector?.Inject(downloader, spider);
+				// 此处完成COPY一个新的Container的原因是, 某此网站会在COOKIE中设置值, 上下访问有承向启下的关系, 所以必须独立的CookieContainer来管理
+				var newCookieContainer = CopyCookieContainer(cookieContainer);
+				_initedCookieContainers.Add(key, newCookieContainer);
+			}
+			return _initedCookieContainers[key];
+		}
+
+		private HttpClientItem CreateDefaultHttpClient(CookieContainer cookieContainer)
 		{
 			var handler = new HttpClientHandler
 			{
@@ -82,7 +110,8 @@ namespace DotnetSpider.Core.Downloader
 				AllowAutoRedirect = true,
 				MaxAutomaticRedirections = 10
 			};
-			handler.CookieContainer = CopyCookieContainer(cookies);
+			handler.CookieContainer = cookieContainer;
+
 			return new HttpClientItem
 			{
 				Handler = handler,

@@ -10,6 +10,6 @@
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		void Handle(ref Page page, ISpider spider);
+		void Handle(ref Page page, IDownloader downloader, ISpider spider);
 	}
 }

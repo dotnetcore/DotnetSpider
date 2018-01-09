@@ -192,27 +192,11 @@ namespace DotnetSpider.Core.Test
 			}
 		}
 
-		internal class FileDownloader : IDownloader
+		internal class FileDownloader : BaseDownloader
 		{
-			public void AddAfterDownloadCompleteHandler(IAfterDownloadCompleteHandler handler)
-			{
-			}
-
-			public void AddBeforeDownloadHandler(IBeforeDownloadHandler handler)
-			{
-			}
-
-			public void Dispose()
-			{
-			}
-
-			public Page Download(Request request, ISpider spider)
+			protected override Page DowloadContent(Request request, ISpider spider)
 			{
 				return new Page(request);
-			}
-
-			public void AddCookie(Cookie cookie)
-			{
 			}
 		}
 

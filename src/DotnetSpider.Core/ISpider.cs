@@ -19,19 +19,5 @@ namespace DotnetSpider.Core
 		/// 监控接口
 		/// </summary>
 		IMonitor Monitor { get; set; }
-
-		/// <summary>
-		/// 设置 Cookie
-		/// </summary>
-		/// <param name="cookie">Cookie</param>
-		void AddCookie(Cookie cookie);
-
-		/// <summary>
-		/// 设置 Cookies
-		/// </summary>
-		/// <param name="cookiesStr">Cookies的键值对字符串, 如: a1=b;a2=c;</param>
-		/// <param name="domain">作用域</param>
-		/// <param name="path">作用路径</param>
-		void AddCookies(string cookiesStr, string domain, string path = "/");
 	}
 }

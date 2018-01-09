@@ -10,6 +10,6 @@
 		/// </summary>
 		/// <param name="request">请求信息</param>
 		/// <param name="spider">爬虫</param>
-		void Handle(ref Request request, ISpider spider);
+		void Handle(ref Request request, IDownloader downloader, ISpider spider);
 	}
 }

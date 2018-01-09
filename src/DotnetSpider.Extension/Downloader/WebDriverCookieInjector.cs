@@ -16,7 +16,6 @@ using System.Net;
 
 namespace DotnetSpider.Extension.Downloader
 {
-
 	public class WebDriverCookieInjector : CookieInjector
 	{
 		public string Url { get; set; }

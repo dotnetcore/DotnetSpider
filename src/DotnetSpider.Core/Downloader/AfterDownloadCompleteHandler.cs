@@ -18,6 +18,6 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page"><see cref="Page"/></param>
 		/// <param name="spider"><see cref="ISpider"/></param>
-		public abstract void Handle(ref Page page, ISpider spider);
+		public abstract void Handle(ref Page page, IDownloader downloader, ISpider spider);
 	}
 }

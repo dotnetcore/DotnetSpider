@@ -99,17 +99,29 @@ namespace DotnetSpider.Extension
 				if (arguments.Contains("rerun"))
 				{
 					RedisConnection.Default.Database.HashDelete(InitStatusSetKey, Identity);
-					RedisConnection.Default.Database.LockRelease(InitLockKey, "0");
+					RedisConnection.Default.Database.LockRelease(InitLockKey, 0);
 					return true;
 				}
 				else
 				{
-					while (!RedisConnection.Default.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(30)))
+					var lockTake = RedisConnection.Default.Database.LockTake(InitLockKey, 0, TimeSpan.FromMinutes(30));
+					if (!lockTake)
 					{
-						Thread.Sleep(1500);
+						while (true)
+						{
+							var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
+							if (lockerValue != InitFinishedValue)
+							{
+								Logger.AllLog(Identity, "Waiting for another crawler inited...", LogLevel.Info);
+								Thread.Sleep(1500);
+							}
+							else
+							{
+								break;
+							}
+						}
 					}
-					var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
-					return lockerValue != InitFinishedValue;
+					return lockTake;
 				}
 			}
 			else
@@ -123,7 +135,7 @@ namespace DotnetSpider.Extension
 			if (RedisConnection.Default != null)
 			{
 				RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
-				RedisConnection.Default.Database.LockRelease(InitLockKey, 0);
+				RedisConnection.Default.Database.KeyDelete(InitLockKey);
 			}
 		}
 

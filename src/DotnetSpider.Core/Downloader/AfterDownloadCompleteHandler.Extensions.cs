@@ -5,6 +5,7 @@ using HtmlAgilityPack;
 using NLog;
 using System;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Downloader
@@ -33,7 +34,7 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (_targetUrlsExtractor == null || page == null)
 			{
@@ -84,11 +85,11 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (DateTime.Now > _next)
 			{
-				_cookieInjector?.Inject(spider);
+				_cookieInjector.Inject(downloader, spider);
 				_next = DateTime.Now.AddSeconds(_interval);
 			}
 		}
@@ -115,7 +116,7 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
@@ -137,7 +138,7 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
@@ -159,9 +160,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||  string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -179,9 +180,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||  string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -213,9 +214,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -233,9 +234,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -253,9 +254,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -287,9 +288,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -332,9 +333,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||  string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -367,9 +368,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||   string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -402,7 +403,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="exceptionMessage">异常信息</param>
 		public RedialWhenExceptionThrowHandler(string exceptionMessage)
 		{
-			if (  string.IsNullOrWhiteSpace(exceptionMessage))
+			if (string.IsNullOrWhiteSpace(exceptionMessage))
 			{
 				throw new SpiderException("exceptionMessage should not be null or empty.");
 			}
@@ -415,7 +416,7 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (page == null || string.IsNullOrWhiteSpace(page.Content) || page.Exception == null)
 			{
@@ -464,9 +465,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||  string.IsNullOrWhiteSpace(page.Content))
+			if (page == null || string.IsNullOrWhiteSpace(page.Content))
 			{
 				return;
 			}
@@ -480,7 +481,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 
 				Spider.AddToCycleRetry(page.Request, spider.Site);
-				_cookieInjector.Inject(spider);
+				_cookieInjector.Inject(downloader, spider);
 				page.Exception = new DownloadException($"Downloaded content contains: {containContent}.");
 			}
 		}
@@ -516,9 +517,9 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <param name="spider">爬虫</param>
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
-			if (page == null ||  string.IsNullOrWhiteSpace(page.Content) || page.Skip)
+			if (page == null || string.IsNullOrWhiteSpace(page.Content) || page.Skip)
 			{
 				return;
 			}

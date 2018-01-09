@@ -46,7 +46,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <summary>
 		/// HttpClient池
 		/// </summary>
-		public IHttpClientPool HttpClientPool { get; set; } = new HttpClientPool();
+		public static IHttpClientPool HttpClientPool = new HttpClientPool();
 
 		/// <summary>
 		/// 构造方法
@@ -68,11 +68,11 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		/// <summary>
-		/// 设置 Cookie
+		/// 设置 Cookie 到下载客户端: HttpClient, WebDriver etc...
 		/// </summary>
 		/// <param name="cookie">Cookie</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public override void AddCookie(Cookie cookie)
+		protected override void AddCookieToDownloadClient(Cookie cookie)
 		{
 			HttpClientPool.AddCookie(cookie);
 		}
@@ -91,18 +91,17 @@ namespace DotnetSpider.Core.Downloader
 				var httpMessage = GenerateHttpRequestMessage(request, spider.Site);
 
 				HttpClientItem httpClientItem;
-				var cookieContainer = (spider as IContainCookies)?.Container;
 				if (spider.Site.HttpProxyPool == null)
 				{
 					// Request可以设置不同的DownloaderGroup来使用不同的HttpClient
-					httpClientItem = HttpClientPool.GetHttpClient(request.DownloaderGroup, cookieContainer);
+					httpClientItem = HttpClientPool.GetHttpClient(spider, this, _cookieContainer, request.DownloaderGroup, CookieInjector);
 				}
 				else
 				{
 					// TODO: 代理模式下: request.DownloaderGroup 再考虑
 					var proxy = spider.Site.HttpProxyPool.GetProxy();
 					request.Proxy = proxy;
-					httpClientItem = HttpClientPool.GetHttpClient(proxy?.GetHashCode(), cookieContainer);
+					httpClientItem = HttpClientPool.GetHttpClient(spider, this, _cookieContainer, proxy?.GetHashCode(), CookieInjector);
 					httpClientItem.Handler.Proxy = httpClientItem.Handler.Proxy ?? proxy;
 				}
 				if (!Equals(httpClientItem.Client.Timeout.TotalSeconds, _timeout))

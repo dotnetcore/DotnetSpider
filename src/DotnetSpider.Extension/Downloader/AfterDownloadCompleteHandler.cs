@@ -1,46 +1,56 @@
-﻿//using DotnetSpider.Core;
-//using DotnetSpider.Core.Downloader;
-//using DotnetSpider.Extension.Model;
-//using DotnetSpider.Extension.Pipeline;
-//using System.Collections.Generic;
+﻿using DotnetSpider.Core;
+using DotnetSpider.Core.Downloader;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.Pipeline;
+using System.Collections.Generic;
 
-//namespace DotnetSpider.Extension.Downloader
-//{
-//	/// <summary>
-//	/// Save download content to database.
-//	/// </summary>
-//	public class StorageCache : AfterDownloadCompleteHandler
-//	{
-//		private readonly BaseEntityDbPipeline _pipeline;
-//		private readonly ISpider _spider;
+namespace DotnetSpider.Extension.Downloader
+{
+	/// <summary>
+	/// Save download content to database.
+	/// </summary>
+	public class DownloadCache : AfterDownloadCompleteHandler
+	{
+		private readonly BaseEntityPipeline _pipeline;
 
-//		public StorageCache(ISpider spider)
-//		{
-//			_pipeline = BaseEntityDbPipeline.GetPipelineFromAppConfig() as BaseEntityDbPipeline;
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="pipeline">数据管道</param>
+		public DownloadCache(BaseEntityPipeline pipeline)
+		{
+			if (pipeline == null)
+			{
+				_pipeline = BaseEntityPipeline.GetPipelineFromAppConfig() as BaseEntityDbPipeline;
+			}
+			else
+			{
+				_pipeline = pipeline;
+			}
 
-//			if (_pipeline == null)
-//			{
-//				throw new SpiderException("Can not get StorageCache's pipeline.");
-//			}
-//			_pipeline.AddEntity(EntityDefine.Parse<CrawlCache>());
-//			_pipeline.InitPipeline(spider);
+			if (_pipeline == null)
+			{
+				throw new SpiderException("StorageCache's pipeline unfound.");
+			}
+			_pipeline.AddEntity(new EntityDefine<DownloadCacheData>());
+			_pipeline.Init();
+		}
 
-//			_spider = spider;
-//		}
+		/// <summary>
+		/// 把页面数据存到数据管道中
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <param name="spider">爬虫</param>
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
+		{
+			var cache = new DownloadCacheData();
+			cache.Identity = spider.Identity;
+			cache.TaskId = spider.TaskId;
+			cache.Name = spider.Name;
+			cache.Url = page.Url;
+			cache.Content = page.Content;
 
-//		public override void Handle(ref Page page, ISpider spider)
-//		{
-//			var cache = new DataObject();
-//			cache.Add("Identity", _spider.Identity);
-//			cache.Add("Name", _spider.Name);
-//			cache.Add("TaskId", _spider.TaskId);
-//			cache.Add("Url", page.Url);
-//			cache.Add("Content", page.Content);
-
-//			_pipeline.Process(typeof(CrawlCache).FullName, new List<DataObject>
-//			{
-//				cache
-//			});
-//		}
-//	}
-//}
+			_pipeline.Process(typeof(DownloadCacheData).FullName, new DownloadCacheData[] { cache }, spider);
+		}
+	}
+}

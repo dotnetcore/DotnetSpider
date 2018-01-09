@@ -30,7 +30,7 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// A spider contains four modules: Downloader, Scheduler, PageProcessor and Pipeline. 
 	/// </summary>
-	public class Spider : AppBase, ISpider, ISpeedMonitor, IContainCookies
+	public class Spider : AppBase, ISpider, ISpeedMonitor
 	{
 		private static readonly object Locker = new object();
 
@@ -61,7 +61,7 @@ namespace DotnetSpider.Core
 		private MemoryMappedFile _identityMmf;
 		private MemoryMappedFile _taskIdMmf;
 		private readonly string[] _closeSignalFiles = new string[2];
-		private CookieContainer _cookies = new CookieContainer();
+
 		private bool _exited;
 
 		/// <summary>
@@ -144,11 +144,6 @@ namespace DotnetSpider.Core
 		/// Status of spider.
 		/// </summary>
 		public Status Stat { get; private set; } = Status.Init;
-
-		/// <summary>
-		/// Cookies 容器
-		/// </summary>
-		public CookieContainer Container => _cookies;
 
 		/// <summary>
 		/// Event of crawler a request success.
@@ -254,19 +249,6 @@ namespace DotnetSpider.Core
 			{
 				CheckIfRunning();
 				_downloader = value;
-			}
-		}
-
-		/// <summary>
-		/// Interface to inject cookie.
-		/// </summary>
-		public ICookieInjector CookieInjector
-		{
-			get => _cookieInjector;
-			set
-			{
-				CheckIfRunning();
-				_cookieInjector = value;
 			}
 		}
 
@@ -448,71 +430,6 @@ namespace DotnetSpider.Core
 			}
 
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-		}
-
-		/// <summary>
-		/// 设置 Cookies
-		/// </summary>
-		/// <param name="cookiesStr">Cookies的键值对字符串, 如: a1=b;a2=c;</param>
-		/// <param name="domain">作用域</param>
-		/// <param name="path">作用路径</param>
-		public void AddCookies(string cookiesStr, string domain, string path = "/")
-		{
-			var cookies = new Dictionary<string, string>();
-			var pairs = cookiesStr.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-			foreach (var pair in pairs)
-			{
-				var keyValue = pair.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-				var name = keyValue[0];
-				string value = keyValue.Length > 1 ? keyValue[1] : string.Empty;
-				AddCookie(name, value, domain, path);
-			}
-		}
-
-		/// <summary>
-		/// 添加Cookies
-		/// </summary>
-		/// <param name="cookies">Cookies的键值对</param>
-		/// <param name="domain">作用域</param>
-		/// <param name="path">作用路径</param>
-		public void AddCookies(IDictionary<string, string> cookies, string domain, string path = "/")
-		{
-			foreach (var pair in cookies)
-			{
-				var name = pair.Key;
-				var value = pair.Value;
-				AddCookie(name, value, domain, path);
-			}
-		}
-
-		/// <summary>
-		/// 添加Cookie
-		/// </summary>
-		/// <param name="name">名称</param>
-		/// <param name="value">值</param>
-		/// <param name="domain">作用域</param>
-		/// <param name="path">作用路径</param>
-		public void AddCookie(string name, string value, string domain, string path = "/")
-		{
-			var cookie = new Cookie(name, value, path, domain);
-			AddCookie(cookie);
-		}
-
-		/// <summary>
-		/// 设置 Cookie
-		/// </summary>
-		/// <param name="cookie">Cookie</param>
-		public void AddCookie(Cookie cookie)
-		{
-			if (cookie == null)
-			{
-				return;
-			}
-			_cookies.Add(cookie);
-			if (Stat == Status.Running)
-			{
-				Downloader.AddCookie(cookie);
-			}
 		}
 
 		/// <summary>
@@ -716,6 +633,7 @@ namespace DotnetSpider.Core
 				}, i =>
 				{
 					int waitCount = 1;
+					var downloader = Downloader.Clone();
 					while (Stat == Status.Running)
 					{
 						Request request = Scheduler.Poll();
@@ -741,7 +659,7 @@ namespace DotnetSpider.Core
 							try
 							{
 								Stopwatch sw = new Stopwatch();
-								HandleRequest(sw, request, Downloader);
+								HandleRequest(sw, request, downloader);
 								Thread.Sleep(Site.SleepTime);
 							}
 							catch (Exception e)
@@ -1009,8 +927,6 @@ namespace DotnetSpider.Core
 			InitCloseSignal();
 
 			InitMonitor();
-
-			InjectCookie();
 
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 
@@ -1476,11 +1392,6 @@ namespace DotnetSpider.Core
 			{
 				Logger.AllLog(Identity, "Add start urls to scheduler, count 0.", LogLevel.Info);
 			}
-		}
-
-		private void InjectCookie()
-		{
-			CookieInjector?.Inject(this, false);
 		}
 
 		private void InitCloseSignal()

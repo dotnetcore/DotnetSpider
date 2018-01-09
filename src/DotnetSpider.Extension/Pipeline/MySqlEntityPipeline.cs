@@ -17,46 +17,6 @@ namespace DotnetSpider.Extension.Pipeline
 			DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
 		}
 
-		private string GetDataTypeSql(Column field)
-		{
-			var dataType = "LONGTEXT";
-
-			if (field.DataType.FullName == DataTypeNames.Boolean)
-			{
-				dataType = "BOOL";
-			}
-			else if (field.DataType.FullName == DataTypeNames.DateTime)
-			{
-				dataType = "TIMESTAMP NULL";
-			}
-			else if (field.DataType.FullName == DataTypeNames.Decimal)
-			{
-				dataType = "DECIMAL(18,2)";
-			}
-			else if (field.DataType.FullName == DataTypeNames.Double)
-			{
-				dataType = "DOUBLE";
-			}
-			else if (field.DataType.FullName == DataTypeNames.Float)
-			{
-				dataType = "FLOAT";
-			}
-			else if (field.DataType.FullName == DataTypeNames.Int)
-			{
-				dataType = "INT";
-			}
-			else if (field.DataType.FullName == DataTypeNames.Int64)
-			{
-				dataType = "BIGINT";
-			}
-			else if (field.DataType.FullName == DataTypeNames.String)
-			{
-				dataType = (field.Length <= 0) ? "LONGTEXT" : $"VARCHAR({field.Length})";
-			}
-
-			return dataType;
-		}
-
 		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
 		{
 			ConnectionStringSettings connectionStringSettings;
@@ -243,19 +203,59 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		private string GenerateColumn(Column p)
+		private string GetDataTypeSql(Column field)
 		{
-			if (p.DataType.FullName == DataTypeNames.DateTime)
+			var dataType = "LONGTEXT";
+
+			if (field.DataType.FullName == DataTypeNames.Boolean)
 			{
-				return $"`{p.Name}` {GetDataTypeSql(p)} DEFAULT CURRENT_TIMESTAMP";
+				dataType = "BOOL";
 			}
-			else if (Env.IdColumns.Contains(p.Name))
+			else if (field.DataType.FullName == DataTypeNames.DateTime)
+			{
+				dataType = "TIMESTAMP NULL";
+			}
+			else if (field.DataType.FullName == DataTypeNames.Decimal)
+			{
+				dataType = "DECIMAL(18,2)";
+			}
+			else if (field.DataType.FullName == DataTypeNames.Double)
+			{
+				dataType = "DOUBLE";
+			}
+			else if (field.DataType.FullName == DataTypeNames.Float)
+			{
+				dataType = "FLOAT";
+			}
+			else if (field.DataType.FullName == DataTypeNames.Int)
+			{
+				dataType = "INT";
+			}
+			else if (field.DataType.FullName == DataTypeNames.Int64)
+			{
+				dataType = "BIGINT";
+			}
+			else if (field.DataType.FullName == DataTypeNames.String)
+			{
+				dataType = (field.Length <= 0) ? "LONGTEXT" : $"VARCHAR({field.Length})";
+			}
+
+			return dataType;
+		}
+
+		private string GenerateColumn(Column column)
+		{
+			if (column.DataType.FullName == DataTypeNames.DateTime)
+			{
+				return $"`{column.Name}` {GetDataTypeSql(column)} DEFAULT CURRENT_TIMESTAMP";
+			}
+			else if (Env.IdColumns.Contains(column.Name))
 			{
 				return "`__Id` bigint AUTO_INCREMENT";
 			}
 			else
 			{
-				return $"`{p.Name}` {GetDataTypeSql(p)}";
+				return $"`{column.Name}` {GetDataTypeSql(column)}";
 			}
 		}
 	}

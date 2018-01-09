@@ -10,6 +10,12 @@ namespace DotnetSpider.Extension.Downloader
 	/// </summary>
 	public class FileDownloader : BaseDownloader
 	{
+		/// <summary>
+		/// 从文件中读取内容
+		/// </summary>
+		/// <param name="request">请求信息</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns></returns>
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			var site = spider.Site;

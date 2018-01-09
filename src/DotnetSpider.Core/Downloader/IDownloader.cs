@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Runtime.CompilerServices;
 
@@ -32,7 +33,32 @@ namespace DotnetSpider.Core.Downloader
 		/// 设置 Cookie
 		/// </summary>
 		/// <param name="cookie">Cookie</param>
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		void AddCookie(Cookie cookie);
+
+		/// <summary>
+		/// 设置 Cookies
+		/// </summary>
+		/// <param name="cookiesStr">Cookies的键值对字符串, 如: a1=b;a2=c;</param>
+		/// <param name="domain">作用域</param>
+		/// <param name="path">作用路径</param>
+		void AddCookies(string cookiesStr, string domain, string path = "/");
+
+		/// <summary>
+		/// Cookie 注入器
+		/// </summary>
+		ICookieInjector CookieInjector { get; set; }
+
+		/// <summary>
+		/// 克隆一个下载器, 多线程时, 每个线程使用一个下载器对象, 这样如WebDriver下载器则不再需要管理WebDriver对象的个数了, 每个下载器就只包含一个WebDriver
+		/// </summary>
+		/// <returns>下载器</returns>
+		IDownloader Clone();
+
+		/// <summary>
+		/// Gets a System.Net.CookieCollection that contains the System.Net.Cookie instances that are associated with a specific URI.
+		/// </summary>
+		/// <param name="uri">The URI of the System.Net.Cookie instances desired.</param>
+		/// <returns>A System.Net.CookieCollection that contains the System.Net.Cookie instances that are associated with a specific URI.</returns>
+		CookieCollection GetCookies(Uri uri);
 	}
 }

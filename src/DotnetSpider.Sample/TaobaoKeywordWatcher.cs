@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample
 	{
 		private class MyAfterDownloadHandler : AfterDownloadCompleteHandler
 		{
-			public override void Handle(ref Page page, ISpider spider)
+			public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 			{
 				var pager = page.Selectable.Select(Selectors.JsonPath("$.mods.pager.status")).GetValue();
 				if (pager != "show")

@@ -9,9 +9,13 @@ using OpenQA.Selenium;
 using DotnetSpider.Core.Redial;
 using System.Runtime.InteropServices;
 using DotnetSpider.Extension.Infrastructure;
+using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Extension.Downloader
 {
+	/// <summary>
+	/// 使用 WebDriver 作为下载器
+	/// </summary>
 	public class WebDriverDownloader : BaseDownloader
 	{
 		private readonly object _locker = new object();
@@ -21,17 +25,16 @@ namespace DotnetSpider.Extension.Downloader
 		private readonly Browser _browser;
 		private readonly Option _option;
 		private bool _isDisposed;
+		private string[] _domains;
 
 		public event Action<RemoteWebDriver> NavigateCompeleted;
 
-		public LoginHandler Login { get; set; }
-
-		public WebDriverDownloader(Browser browser, int webDriverWaitTime = 200, LoginHandler loginHandler = null, Option option = null)
+		public WebDriverDownloader(Browser browser, string[] domains = null, int webDriverWaitTime = 200, Option option = null)
 		{
 			_webDriverWaitTime = webDriverWaitTime;
 			_browser = browser;
 			_option = option ?? new Option();
-			Login = loginHandler;
+			_domains = domains == null ? new string[0] : domains;
 
 			if (browser == Browser.Firefox && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
@@ -50,18 +53,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 		}
 
-
-		public WebDriverDownloader(Browser browser, LoginHandler loginHandler) : this(browser, 200, loginHandler, null)
-		{
-		}
-
-		public WebDriverDownloader(Browser browser) : this(browser, 200, null, null)
-		{
-		}
-
-		public WebDriverDownloader(Browser browser, Option option = null) : this(browser, 200, null, option)
-		{
-		}
+		public WebDriverDownloader(Browser browser, Option option) : this(browser, null, 200, option) { }
 
 		public override void Dispose()
 		{
@@ -78,13 +70,24 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					_webDriver = _webDriver ?? WebDriverExtensions.Open(_browser, _option);
 
-					if (!_isLogined && Login != null)
+					foreach (var domain in _domains)
 					{
-						_isLogined = Login.Handle(_webDriver as RemoteWebDriver);
-						if (!_isLogined)
+						var cookies = _cookieContainer.GetCookies(new Uri(domain));
+						foreach (System.Net.Cookie cookie in cookies)
 						{
-							throw new DownloadException("Login failed. Please check your login codes.");
+							AddCookieToDownloadClient(cookie);
 						}
+					}
+
+					if (!_isLogined && CookieInjector != null)
+					{
+						var webdriverLoginHandler = CookieInjector as WebDriverLoginHandler;
+						if (webdriverLoginHandler != null)
+						{
+							webdriverLoginHandler.Driver = _webDriver as RemoteWebDriver;
+						}
+						CookieInjector.Inject(this, spider);
+						_isLogined = true;
 					}
 				}
 
@@ -151,5 +154,14 @@ namespace DotnetSpider.Extension.Downloader
 			}
 		}
 
+		/// <summary>
+		/// 设置 Cookie
+		/// </summary>
+		/// <param name="cookie">Cookie</param>
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		protected override void AddCookieToDownloadClient(System.Net.Cookie cookie)
+		{
+			_webDriver?.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
+		}
 	}
 }

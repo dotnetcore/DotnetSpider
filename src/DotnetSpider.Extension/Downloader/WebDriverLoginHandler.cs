@@ -7,17 +7,48 @@ using System.Threading;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Infrastructure;
 using NLog;
+using DotnetSpider.Core.Downloader;
+using System.Net;
 
 namespace DotnetSpider.Extension.Downloader
 {
-	public abstract class LoginHandler : Named, IWebDriverHandler
+	/// <summary>
+	/// 通过WebDriver的登录操作的抽象
+	/// </summary>
+	public abstract class WebDriverLoginHandler : LoginHandler
 	{
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		public RemoteWebDriver Driver { get; set; }
 
-		public abstract bool Handle(RemoteWebDriver driver);
+		public WebDriverLoginHandler()
+		{
+		}
+
+		protected override CookieCollection GetCookies(ISpider spider)
+		{
+			return new CookieCollection();
+		}
+
+		public override void Inject(IDownloader downloader, ISpider spider, bool pauseBeforeInject = true)
+		{
+			if (Driver == null)
+			{
+				return;
+			}
+			if (!CheckFrequency())
+			{
+				return;
+			}
+			spider.Pause(() =>
+			{
+				Login();
+				spider.Contiune();
+			});
+		}
+
+		protected abstract bool Login();
 	}
 
-	public class CommonLoginHandler : LoginHandler
+	public class CommonLoginHandler : WebDriverLoginHandler
 	{
 		public string Url { get; set; }
 
@@ -31,24 +62,24 @@ namespace DotnetSpider.Extension.Downloader
 
 		public Selector SubmitSelector { get; set; }
 
-		public override bool Handle(RemoteWebDriver webDriver)
+		protected override bool Login()
 		{
 			try
 			{
-				webDriver.Navigate().GoToUrl(Url);
+				Driver.Navigate().GoToUrl(Url);
 				Thread.Sleep(5000);
 
-				var user = FindElement(webDriver, UserSelector);
+				var user = FindElement(Driver, UserSelector);
 				user.Clear();
 				user.SendKeys(User);
 				Thread.Sleep(1000);
 
-				var password = FindElement(webDriver, PassSelector);
+				var password = FindElement(Driver, PassSelector);
 				password.Clear();
 				password.SendKeys(Password);
 				Thread.Sleep(1000);
 
-				var submit = FindElement(webDriver, SubmitSelector);
+				var submit = FindElement(Driver, SubmitSelector);
 				submit.Click();
 				Thread.Sleep(5000);
 
@@ -79,7 +110,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
-	public class ManualLoginHandler : LoginHandler
+	public class ManualLoginHandler : WebDriverLoginHandler
 	{
 		public Uri Url { get; set; }
 
@@ -88,13 +119,12 @@ namespace DotnetSpider.Extension.Downloader
 			Url = new Uri(url);
 		}
 
-		public override bool Handle(RemoteWebDriver webDriver)
+		protected override bool Login()
 		{
 			try
 			{
-				IWebDriver driver = webDriver;
-				driver.Navigate().GoToUrl(Url);
-				while (!driver.Url.Contains("baidu.com"))
+				Driver.Navigate().GoToUrl(Url);
+				while (!Driver.Url.Contains("baidu.com"))
 				{
 					Thread.Sleep(1000);
 				}
