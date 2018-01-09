@@ -75,7 +75,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="path">作用路径</param>
 		public void AddCookie(string name, string value, string domain, string path = "/")
 		{
-			var cookie = new Cookie(name, value, path, domain);
+			var cookie = new Cookie(name.Trim(), value.Trim(), path.Trim(), domain.Trim());
 			AddCookie(cookie);
 		}
 		
