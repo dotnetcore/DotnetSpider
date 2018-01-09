@@ -36,6 +36,15 @@ namespace DotnetSpider.Core.Downloader
 		void AddCookie(Cookie cookie);
 
 		/// <summary>
+		/// 设置 Cookie
+		/// </summary>
+		/// <param name="name">Name</param>
+		/// <param name="value">Value</param>
+		/// <param name="domain">作用域</param>
+		/// <param name="path">作用路径</param>
+		void AddCookie(string name, string value, string domain, string path = "/");
+
+		/// <summary>
 		/// 设置 Cookies
 		/// </summary>
 		/// <param name="cookiesStr">Cookies的键值对字符串, 如: a1=b;a2=c;</param>
