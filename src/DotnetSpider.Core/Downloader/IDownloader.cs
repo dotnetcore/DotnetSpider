@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Runtime.CompilerServices;
 
@@ -43,6 +44,14 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="domain">作用域</param>
 		/// <param name="path">作用路径</param>
 		void AddCookie(string name, string value, string domain, string path = "/");
+
+		/// <summary>
+		/// 添加Cookies
+		/// </summary>
+		/// <param name="cookies">Cookies的键值对</param>
+		/// <param name="domain">作用域</param>
+		/// <param name="path">作用路径</param>
+		void AddCookies(IDictionary<string, string> cookies, string domain, string path = "/");
 
 		/// <summary>
 		/// 设置 Cookies
