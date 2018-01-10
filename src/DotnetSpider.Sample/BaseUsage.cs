@@ -17,7 +17,7 @@ namespace DotnetSpider.Sample
 		public static void CustmizeProcessorAndPipeline()
 		{
 			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			var site = new Site { EncodingName = "UTF-8" };
 			for (int i = 1; i < 5; ++i)
 			{
 				// Add start/feed urls. 添加初始采集链接
@@ -94,7 +94,7 @@ namespace DotnetSpider.Sample
 
 		public static void CrawlerPagesWithoutTraverse()
 		{
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			var site = new Site { EncodingName = "UTF-8" };
 			for (int i = 1; i < 5; ++i)
 			{
 				site.AddStartUrl("http://" + $"www.youku.com/v_olist/c_97_g__a__sg__mt__lg__q__s_1_r_0_u_0_pt_0_av_0_ag_0_sg__pr__h__d_1_p_{i}.html");
@@ -119,7 +119,7 @@ namespace DotnetSpider.Sample
 		public static void CrawlerPagesTraversal()
 		{
 			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true };
+			var site = new Site { EncodingName = "UTF-8" };
 
 			// Set start/seed url
 			site.AddStartUrl("http://www.cnblogs.com/");

@@ -37,7 +37,6 @@ namespace DotnetSpider.Core
 		private readonly Site _site;
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
 		private IDownloader _downloader = new HttpClientDownloader();
-		private ICookieInjector _cookieInjector;
 		private Status _realStat = Status.Init;
 		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
@@ -695,6 +694,8 @@ namespace DotnetSpider.Core
 							}
 						}
 					}
+
+					SafeDestroy(downloader);
 				});
 			}
 

@@ -10,6 +10,7 @@ using DotnetSpider.Extension.Model.Formatter;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Xunit;
 
@@ -29,8 +30,15 @@ namespace DotnetSpider.Extension.Test.Downloader
 			{
 				return;
 			}
+
+			var chromedriverCount1 = Process.GetProcessesByName("chromedriver").Length;
+
 			BaiduSearchSpider spider = new BaiduSearchSpider();
 			spider.Run();
+
+			var chromedriverCount2 = Process.GetProcessesByName("chromedriver").Length;
+
+			Assert.Equal(chromedriverCount1, chromedriverCount2);
 		}
 
 
@@ -41,6 +49,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 			{
 				return;
 			}
+
 			BaiduSearchHeadlessSpider spider = new BaiduSearchHeadlessSpider();
 			spider.Run();
 		}
@@ -61,6 +70,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 				{
 					Headless = true
 				});
+				EmptySleepTime = 6000;
 				AddEntityType<BaiduSearchEntry>();
 			}
 		}
@@ -77,7 +87,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 				Identity = "hello";
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
-				Downloader = new WebDriverDownloader(Core.Infrastructure.Browser.Chrome);
+				Downloader = new WebDriverDownloader(Browser.Chrome);
 				AddEntityType<BaiduSearchEntry>();
 			}
 		}

@@ -12,7 +12,7 @@ namespace DotnetSpider.Sample
 		public static void Run()
 		{
 			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
-			var site = new Site { EncodingName = "UTF-8", RemoveOutboundLinks = true, DownloadFiles = true };
+			var site = new Site { EncodingName = "UTF-8", DownloadFiles = true };
 
 			// Set start/seed url
 			site.AddStartUrl("http://www.situoli.com/");
