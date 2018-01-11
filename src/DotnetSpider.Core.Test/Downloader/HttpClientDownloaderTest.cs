@@ -96,6 +96,10 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact]
 		public void _404Url()
 		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
 			var spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
 					"abcd",
 					new QueueDuplicateRemovedScheduler(),

@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
 				var metadata = new EntityDefine<ProductInsert>();
-				var tableName = Guid.NewGuid().ToString("N");
+				var tableName = Guid.NewGuid().ToString("N").Substring(8, 8);
 				metadata.TableInfo.Name = tableName;
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.Init();

@@ -154,6 +154,10 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void FastExit()
 		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
 			var path = "FastExit_Result.txt";
 			if (File.Exists(path))
 			{

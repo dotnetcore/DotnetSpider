@@ -761,30 +761,37 @@ namespace DotnetSpider.Core
 		/// </summary>
 		internal void SendExitSignal()
 		{
-			var identityMmf = MemoryMappedFile.OpenExisting(Identity, MemoryMappedFileRights.Write);
-			if (identityMmf != null)
+			if (Env.IsWindows)
 			{
-				using (MemoryMappedViewStream stream = identityMmf.CreateViewStream())
+				var identityMmf = MemoryMappedFile.OpenExisting(Identity, MemoryMappedFileRights.Write);
+				if (identityMmf != null)
 				{
-					var writer = new BinaryWriter(stream);
-					writer.Write(1);
-				}
-			}
-			try
-			{
-				var taskIdMmf = MemoryMappedFile.OpenExisting(TaskId, MemoryMappedFileRights.Write);
-				if (taskIdMmf != null)
-				{
-					using (MemoryMappedViewStream stream = taskIdMmf.CreateViewStream())
+					using (MemoryMappedViewStream stream = identityMmf.CreateViewStream())
 					{
 						var writer = new BinaryWriter(stream);
 						writer.Write(1);
 					}
 				}
+				try
+				{
+					var taskIdMmf = MemoryMappedFile.OpenExisting(TaskId, MemoryMappedFileRights.Write);
+					if (taskIdMmf != null)
+					{
+						using (MemoryMappedViewStream stream = taskIdMmf.CreateViewStream())
+						{
+							var writer = new BinaryWriter(stream);
+							writer.Write(1);
+						}
+					}
+				}
+				catch
+				{
+					//ignore
+				}
 			}
-			catch
+			else
 			{
-				//ignore
+				File.Create(_closeSignalFiles[0]);
 			}
 		}
 
