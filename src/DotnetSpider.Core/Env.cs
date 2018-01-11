@@ -271,7 +271,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 重新加载配置文件
 		/// </summary>
-		public static void Reload()
+		internal static void Reload()
 		{
 			BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 

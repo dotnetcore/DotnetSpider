@@ -5,7 +5,6 @@ using MongoDB.Driver;
 using System.Collections.Concurrent;
 using System;
 using DotnetSpider.Core.Infrastructure;
-using NLog;
 using DotnetSpider.Core.Redial;
 using System.Linq;
 using DotnetSpider.Core;
@@ -27,7 +26,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (metadata.TableInfo == null)
 			{
-				Logger.AllLog($"Schema is necessary, skip {GetType().Name} for {metadata.Name}.", LogLevel.Warn);
+				Logger.Log($"Schema is necessary, skip {GetType().Name} for {metadata.Name}.", Level.Warn);
 				return;
 			}
 

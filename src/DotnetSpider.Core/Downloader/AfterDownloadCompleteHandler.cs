@@ -1,5 +1,4 @@
-﻿using NLog;
-using DotnetSpider.Core.Infrastructure;
+﻿using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -11,12 +10,13 @@ namespace DotnetSpider.Core.Downloader
 		/// <summary>
 		/// 日志接口
 		/// </summary>
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = DLog.GetLogger();
 
 		/// <summary>
 		/// 处理页面数据、检测下载情况(是否被反爬)、更新Cookie等操作
 		/// </summary>
 		/// <param name="page"><see cref="Page"/></param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider"><see cref="ISpider"/></param>
 		public abstract void Handle(ref Page page, IDownloader downloader, ISpider spider);
 	}

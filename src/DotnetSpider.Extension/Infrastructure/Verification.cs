@@ -7,7 +7,6 @@ using MimeKit;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using NLog;
 using System.Web;
 using System.IO;
 using DotnetSpider.Core.Infrastructure.Database;
@@ -34,7 +33,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 	public abstract class BaseVerification
 	{
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = DLog.GetLogger();
 		protected const string ValidateStatusKey = "dotnetspider:validate-stats";
 		protected List<IVerification> Verifiers = new List<IVerification>();
 
@@ -60,7 +59,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				}
 				else
 				{
-					Logger.AllLog($"EmailPort is not a number: {portStr}.", LogLevel.Error);
+					Logger.Log($"EmailPort is not a number: {portStr}.", Level.Error);
 				}
 			}
 			EmailAccount = Core.Env.EmailAccount;
@@ -102,13 +101,13 @@ namespace DotnetSpider.Extension.Infrastructure
 				}
 				if (needVerify)
 				{
-					Logger.AllLog(identity, "Start data verification...", LogLevel.Info);
+					Logger.Log(identity, "Start data verification...", Level.Info);
 					dataVerificationAndReport();
-					Logger.AllLog(identity, "Data verification complete.", LogLevel.Info);
+					Logger.Log(identity, "Data verification complete.", Level.Info);
 				}
 				else
 				{
-					Logger.AllLog(identity, "Data verification is done already.", LogLevel.Info);
+					Logger.Log(identity, "Data verification is done already.", Level.Info);
 				}
 
 				if (needVerify)
@@ -118,7 +117,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 			catch (Exception e)
 			{
-				Logger.AllLog(identity, e.Message, LogLevel.Error, e);
+				Logger.Log(identity, e.Message, Level.Error, e);
 			}
 			finally
 			{
@@ -453,7 +452,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 			if (!string.IsNullOrWhiteSpace(ReportSampleSql) && ReportSampleSql.ToLower().Contains("limit"))
 			{
-				Logger.AllLog("SQL contains 'LIMIT'.", LogLevel.Error);
+				Logger.Log("SQL contains 'LIMIT'.", Level.Error);
 				return veridationResult;
 			}
 			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrWhiteSpace(EmailHost))

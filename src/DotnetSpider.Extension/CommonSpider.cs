@@ -4,10 +4,11 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using System.Threading;
 using DotnetSpider.Extension.Infrastructure;
-using NLog;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Redial;
+using Polly;
+using Polly.Retry;
 
 namespace DotnetSpider.Extension
 {
@@ -35,11 +36,16 @@ namespace DotnetSpider.Extension
 			Name = name;
 		}
 
+		public ISpider ToDefaultSpider()
+		{
+			return new DefaultSpider("", new Site());
+		}
+
 		protected override void RunApp(params string[] arguments)
 		{
 			PrintInfo.Print();
 
-			Logger.AllLog(Identity, "Build custom component...", LogLevel.Info);
+			Logger.Log(Identity, "Build custom component...", Level.Info);
 
 			NetworkCenter.Current.Execute("myInit", () =>
 			{
@@ -104,24 +110,33 @@ namespace DotnetSpider.Extension
 				}
 				else
 				{
-					var lockTake = RedisConnection.Default.Database.LockTake(InitLockKey, 0, TimeSpan.FromMinutes(30));
-					if (!lockTake)
+					// 如果已经被初始化了, 则不需要再去抢锁了
+					var require = IfRequireBuildStartRequests();
+					if (!require)
 					{
-						while (true)
+						return false;
+					}
+					else
+					{
+						var lockTake = RedisConnection.Default.Database.LockTake(InitLockKey, 0, TimeSpan.FromMinutes(30));
+						if (!lockTake)
 						{
-							var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
-							if (lockerValue != InitFinishedValue)
+							while (true)
 							{
-								Logger.AllLog(Identity, "Waiting for another crawler inited...", LogLevel.Info);
-								Thread.Sleep(1500);
-							}
-							else
-							{
-								break;
+								var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
+								if (lockerValue != InitFinishedValue)
+								{
+									Logger.Log(Identity, "Waiting for another crawler inited...", Level.Info);
+									Thread.Sleep(1500);
+								}
+								else
+								{
+									break;
+								}
 							}
 						}
+						return lockTake;
 					}
-					return lockTake;
 				}
 			}
 			else
@@ -134,8 +149,45 @@ namespace DotnetSpider.Extension
 		{
 			if (RedisConnection.Default != null)
 			{
-				RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
-				RedisConnection.Default.Database.KeyDelete(InitLockKey);
+				bool ifBuildFinished = false;
+				for (int i = 0; i < 10; ++i)
+				{
+					ifBuildFinished = RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
+					if (ifBuildFinished)
+					{
+						break;
+					}
+					else
+					{
+						Thread.Sleep(1000);
+					}
+				}
+				if (!ifBuildFinished)
+				{
+					var msg = "Init status set failed.";
+					Logger.Log(Identity, msg, Level.Error);
+					throw new SpiderException(msg);
+				}
+
+				bool ifRemoveInitLocker = false;
+				for (int i = 0; i < 10; ++i)
+				{
+					ifRemoveInitLocker = RedisConnection.Default.Database.KeyDelete(InitLockKey);
+					if (ifRemoveInitLocker)
+					{
+						break;
+					}
+					else
+					{
+						Thread.Sleep(1000);
+					}
+				}
+				if (!ifRemoveInitLocker)
+				{
+					var msg = "Remove init locker failed.";
+					Logger.Log(Identity, msg, Level.Error);
+					throw new SpiderException(msg);
+				}
 			}
 		}
 
@@ -174,14 +226,14 @@ namespace DotnetSpider.Extension
 				}
 				catch (Exception e)
 				{
-					Logger.AllLog(Identity, "Register contol failed.", LogLevel.Error, e);
+					Logger.Log(Identity, "Register contol failed.", Level.Error, e);
 				}
 			}
 		}
 
-		public ISpider ToDefaultSpider()
+		private bool IfRequireBuildStartRequests()
 		{
-			return new DefaultSpider("", new Site());
+			return RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity) != InitFinishedValue;
 		}
 	}
 }

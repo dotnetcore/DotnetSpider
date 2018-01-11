@@ -1,5 +1,4 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
@@ -13,7 +12,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 	/// </summary>
 	public static class DatabaseExtensions
 	{
-		private static readonly ILogger Logger = LogCenter.GetLogger();
+		private static readonly ILogger Logger = DLog.GetLogger();
 
 		/// <summary>
 		/// 通过配置创建连接对象
@@ -49,12 +48,12 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				{
 					if (e.Message.ToLower().StartsWith("authentication to host"))
 					{
-						Logger.AllLog($"{connectionStringSettings.ConnectionString}: {e}", LogLevel.Error);
+						Logger.Log($"{connectionStringSettings.ConnectionString}: {e}", Level.Error);
 						Thread.Sleep(1000);
 					}
 					else
 					{
-						Logger.AllLog($"{connectionStringSettings.ConnectionString}: {e}", LogLevel.Warn);
+						Logger.Log($"{connectionStringSettings.ConnectionString}: {e}", Level.Warn);
 					}
 				}
 			}
@@ -110,7 +109,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				{
 					if (e.Message.ToLower().StartsWith("authentication to host"))
 					{
-						Logger.AllLog($"{e}", LogLevel.Error);
+						Logger.Log($"{e}", Level.Error);
 						Thread.Sleep(1000);
 					}
 					else

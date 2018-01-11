@@ -7,7 +7,6 @@ using System.Web;
 using System.Text;
 using System.Net.Http;
 using DotnetSpider.Core.Infrastructure;
-using NLog;
 using DotnetSpider.Core.Redial;
 using System.Runtime.CompilerServices;
 using System.Net;
@@ -119,7 +118,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					if (!spider.Site.DownloadFiles)
 					{
-						Logger.AllLog(spider.Identity, $"Ignore: {request.Url} because media type is not allowed to download.", LogLevel.Warn);
+						Logger.Log(spider.Identity, $"Ignore: {request.Url} because media type is not allowed to download.", Level.Warn);
 						return new Page(request) { Skip = true };
 					}
 					else
@@ -133,7 +132,7 @@ namespace DotnetSpider.Core.Downloader
 
 					if (string.IsNullOrWhiteSpace(page.Content))
 					{
-						Logger.AllLog(spider.Identity, $"Content is empty: {request.Url}.", LogLevel.Warn);
+						Logger.Log(spider.Identity, $"Content is empty: {request.Url}.", Level.Warn);
 					}
 				}
 
@@ -149,7 +148,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					page.Exception = de;
 				}
-				Logger.AllLog(spider.Identity, $"Download {request.Url} failed: {de.Message}", LogLevel.Warn);
+				Logger.Log(spider.Identity, $"Download {request.Url} failed: {de.Message}", Level.Warn);
 
 				return page;
 			}
@@ -161,7 +160,7 @@ namespace DotnetSpider.Core.Downloader
 					page.Exception = he;
 				}
 
-				Logger.AllLog(spider.Identity, $"Download {request.Url} failed: {he.Message}.", LogLevel.Warn);
+				Logger.Log(spider.Identity, $"Download {request.Url} failed: {he.Message}.", Level.Warn);
 				return page;
 			}
 			catch (Exception e)
@@ -172,7 +171,7 @@ namespace DotnetSpider.Core.Downloader
 					Skip = true
 				};
 
-				Logger.AllLog(spider.Identity, $"Download {request.Url} failed: {e.Message}.", LogLevel.Error, e);
+				Logger.Log(spider.Identity, $"Download {request.Url} failed: {e.Message}.", Level.Error, e);
 				return page;
 			}
 			finally
@@ -183,7 +182,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.AllLog(spider.Identity, $"Close response fail: {e}", LogLevel.Error, e);
+					Logger.Log(spider.Identity, $"Close response fail: {e}", Level.Error, e);
 				}
 			}
 		}
@@ -314,10 +313,10 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.AllLog(spider.Identity, "Storage file failed.", LogLevel.Error, e);
+					Logger.Log(spider.Identity, "Storage file failed.", Level.Error, e);
 				}
 			}
-			Logger.AllLog(spider.Identity, $"Storage file: {request.Url} success.", LogLevel.Info);
+			Logger.Log(spider.Identity, $"Storage file: {request.Url} success.", Level.Info);
 			return new Page(request) { Skip = true };
 		}
 

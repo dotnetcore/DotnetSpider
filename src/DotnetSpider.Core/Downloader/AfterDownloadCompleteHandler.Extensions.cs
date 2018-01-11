@@ -2,10 +2,8 @@
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Redial;
 using HtmlAgilityPack;
-using NLog;
 using System;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Core.Downloader
@@ -33,6 +31,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 执行目标链接解析器
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -84,6 +83,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 定时更新Cookie
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -115,6 +115,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 如果页面数据包含指定内容, 跳过当前链接
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -137,6 +138,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 去除下载内容中的HTML标签
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -159,6 +161,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 所有内容转化成大写
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -179,6 +182,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 所有内容转化成小写
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -213,6 +217,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 替换内容
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -233,6 +238,7 @@ namespace DotnetSpider.Core.Downloader
 		/// Removes all leading and trailing white-space characters from the current content.
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -253,6 +259,7 @@ namespace DotnetSpider.Core.Downloader
 		/// Converts any escaped characters in current content.
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -287,6 +294,7 @@ namespace DotnetSpider.Core.Downloader
 		/// Searches the current content for all occurrences of a specified regular expression, using the specified matching options.
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -332,6 +340,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 当包含指定内容时重试当前链接
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -367,6 +376,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 当包含指定内容时触发ADSL拨号
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -380,7 +390,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
-					Logger.AllLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
+					Logger.Log(spider.Identity, "Exit program because redial failed.", Level.Error);
 					spider.Exit();
 				}
 
@@ -415,6 +425,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 当页面数据中的异常信息包含指定内容时触发ADSL拨号
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -426,7 +437,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
-					Logger.AllLog(spider.Identity, "Exit program because redial failed.", LogLevel.Error);
+					Logger.Log(spider.Identity, "Exit program because redial failed.", Level.Error);
 					spider.Exit();
 				}
 
@@ -464,6 +475,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 当页面数据包含指定内容时触发ADSL拨号, 并且重新获取Cookie
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
@@ -516,6 +528,7 @@ namespace DotnetSpider.Core.Downloader
 		/// 截取下载内容
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{

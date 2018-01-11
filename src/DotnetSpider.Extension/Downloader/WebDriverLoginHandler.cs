@@ -6,7 +6,6 @@ using OpenQA.Selenium.Remote;
 using System.Threading;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Infrastructure;
-using NLog;
 using DotnetSpider.Core.Downloader;
 using System.Net;
 
@@ -87,7 +86,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 			catch (Exception ex)
 			{
-				Logger.AllLog($"LoginHandler failed: {ex}.", NLog.LogLevel.Error);
+				Logger.Log($"LoginHandler failed: {ex}.", Level.Error);
 				return false;
 			}
 		}

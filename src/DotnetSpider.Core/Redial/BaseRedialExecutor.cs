@@ -2,7 +2,6 @@
 using System.Threading;
 using DotnetSpider.Core.Redial.InternetDetector;
 using DotnetSpider.Core.Redial.Redialer;
-using NLog;
 using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Redial
@@ -12,7 +11,7 @@ namespace DotnetSpider.Core.Redial
 	/// </summary>
 	public abstract class RedialExecutor : IRedialExecutor
 	{
-		private static readonly ILogger Logger = LogCenter.GetLogger();
+		private static readonly ILogger Logger = DLog.GetLogger();
 
 		internal bool IsTest { get; set; }
 		private int WaitRedialTimeout { get; } = 100 * 1000 / 100;
@@ -79,21 +78,21 @@ namespace DotnetSpider.Core.Redial
 			ILocker locker = null;
 			try
 			{
-				Logger.NLog("Try to lock redialer...", LogLevel.Info);
+				Logger.NLog("Try to lock redialer...", Level.Info);
 				locker = CreateLocker();
 				locker.Lock();
-				Logger.NLog("Lock redialer", LogLevel.Info);
+				Logger.NLog("Lock redialer", Level.Info);
 				var lastRedialTime = (DateTime.Now - GetLastRedialTime()).Seconds;
 				if (lastRedialTime < RedialIntervalLimit)
 				{
-					Logger.NLog($"Skip redial because last redial compeleted before {lastRedialTime} seconds.", LogLevel.Info);
+					Logger.NLog($"Skip redial because last redial compeleted before {lastRedialTime} seconds.", Level.Info);
 					return RedialResult.OtherRedialed;
 				}
 				Thread.Sleep(500);
-				Logger.NLog("Wait all network requests complete...", LogLevel.Info);
+				Logger.NLog("Wait all network requests complete...", Level.Info);
 				// 等待所有网络请求结束
 				WaitAllNetworkRequestComplete();
-				Logger.NLog("Start redial...", LogLevel.Info);
+				Logger.NLog("Start redial...", Level.Info);
 
 				var redialCount = 1;
 
@@ -120,7 +119,7 @@ namespace DotnetSpider.Core.Redial
 					}
 					catch (Exception ex)
 					{
-						Logger.NLog($"Redial failed loop {redialCount}: {ex}", LogLevel.Error);
+						Logger.NLog($"Redial failed loop {redialCount}: {ex}", Level.Error);
 					}
 				}
 
@@ -129,7 +128,7 @@ namespace DotnetSpider.Core.Redial
 					return RedialResult.Failed;
 				}
 
-				Logger.NLog("Redial success.", LogLevel.Info);
+				Logger.NLog("Redial success.", Level.Info);
 
 				action?.Invoke();
 
@@ -139,7 +138,7 @@ namespace DotnetSpider.Core.Redial
 			}
 			catch (Exception ex)
 			{
-				Logger.NLog($"Redial failed: {ex}", LogLevel.Error);
+				Logger.NLog($"Redial failed: {ex}", Level.Error);
 				return RedialResult.Failed;
 			}
 			finally

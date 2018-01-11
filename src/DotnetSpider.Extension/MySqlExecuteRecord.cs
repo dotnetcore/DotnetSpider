@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Infrastructure.Database;
-using NLog;
 using System;
 using System.Data;
 
@@ -9,7 +8,7 @@ namespace DotnetSpider.Extension
 {
 	public class MySqlExecuteRecord : IExecuteRecord
 	{
-		private static readonly ILogger Logger = LogCenter.GetLogger();
+		private static readonly ILogger Logger = DLog.GetLogger();
 
 		public bool Add(string taskId, string name, string identity)
 		{
@@ -28,7 +27,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.Error($"Add execute record failed: {e}");
+				Logger.NLog($"Add execute record failed: {e}", Level.Error);
 				return false;
 			}
 		}
@@ -47,7 +46,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.Error($"Remove execute record failed: {e}");
+				Logger.NLog($"Remove execute record failed: {e}", Level.Error);
 			}
 		}
 	}

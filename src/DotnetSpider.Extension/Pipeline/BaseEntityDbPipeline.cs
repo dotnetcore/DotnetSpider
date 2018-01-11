@@ -3,7 +3,6 @@ using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
-using NLog;
 using DotnetSpider.Extension.Infrastructure;
 using System.Configuration;
 
@@ -90,7 +89,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 						catch (Exception e)
 						{
-							Logger.AllLog("Update ConnectString failed.", LogLevel.Error, e);
+							Logger.Log("Update ConnectString failed.", Level.Error, e);
 							Thread.Sleep(1000);
 						}
 					}
@@ -156,7 +155,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 						catch (Exception e)
 						{
-							Logger.AllLog("Update ConnectString failed.", LogLevel.Error, e);
+							Logger.Log("Update ConnectString failed.", Level.Error, e);
 							Thread.Sleep(1000);
 						}
 					}

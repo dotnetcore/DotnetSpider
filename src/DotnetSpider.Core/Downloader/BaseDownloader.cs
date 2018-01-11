@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using Newtonsoft.Json.Linq;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -16,7 +15,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <summary>
 		/// 日志接口
 		/// </summary>
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = DLog.GetLogger();
 
 		/// <summary>
 		/// 是否检测过下载内容的类型

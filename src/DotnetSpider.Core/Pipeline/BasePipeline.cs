@@ -1,8 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using NLog;
 using System.Collections.Generic;
-#if NET_CORE
-#endif
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -14,7 +11,7 @@ namespace DotnetSpider.Core.Pipeline
 		/// <summary>
 		/// 日志接口
 		/// </summary>
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = DLog.GetLogger();
 
 		/// <summary>
 		/// 处理页面解析器解析到的数据结果

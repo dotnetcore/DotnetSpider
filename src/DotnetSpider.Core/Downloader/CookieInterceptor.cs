@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using NLog;
 using System;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -16,7 +15,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <summary>
 		/// 日志接口
 		/// </summary>
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = DLog.GetLogger();
 
 		/// <summary>
 		/// 重复调用的频率限制(秒)
@@ -45,7 +44,7 @@ namespace DotnetSpider.Core.Downloader
 					{
 						downloader.AddCookie(cookie);
 					}
-					Logger.AllLog(spider.Identity, "Inject cookies success.", LogLevel.Info);
+					Logger.Log(spider.Identity, "Inject cookies success.", Level.Info);
 					spider.Contiune();
 				});
 			}
@@ -55,7 +54,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					downloader.AddCookie(cookie);
 				}
-				Logger.AllLog(spider.Identity, "Inject cookies success.", LogLevel.Info);
+				Logger.Log(spider.Identity, "Inject cookies success.", Level.Info);
 			}
 		}
 

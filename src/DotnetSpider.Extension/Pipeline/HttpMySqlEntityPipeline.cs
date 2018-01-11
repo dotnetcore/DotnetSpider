@@ -33,7 +33,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			_retryPolicy = Policy.Handle<Exception>().Retry(5, (ex, count) =>
 			{
-				Logger.Error($"Pipeline execute error [{count}]: {ex}");
+				Logger.NLog($"Pipeline execute error [{count}]: {ex}", Level.Error);
 			});
 
 			DESCryptoServiceProvider cryptoProvider = new DESCryptoServiceProvider();

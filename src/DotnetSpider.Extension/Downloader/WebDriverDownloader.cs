@@ -143,12 +143,12 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					page = Spider.AddToCycleRetry(request, site);
 				}
-				Logger.AllLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}.", NLog.LogLevel.Warn);
+				Logger.Log(spider.Identity, $"下载 {request.Url} 失败: {de.Message}.", Level.Warn);
 				return page;
 			}
 			catch (Exception e)
 			{
-				Logger.AllLog(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", NLog.LogLevel.Warn);
+				Logger.Log(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", Level.Warn);
 				Page page = new Page(request) { Exception = e };
 				return page;
 			}

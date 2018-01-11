@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
-using NLog;
 using System;
 using DotnetSpider.Core.Infrastructure.Database;
 using System.Data;
@@ -19,7 +18,7 @@ namespace DotnetSpider.Extension.Monitor
 		/// <summary>
 		/// 日志接口
 		/// </summary>
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = DLog.GetLogger();
 
 		private readonly bool _isDbOnly;
 
@@ -135,7 +134,7 @@ namespace DotnetSpider.Extension.Monitor
 			}
 			catch (Exception e)
 			{
-				Logger.AllLog("Prepare DotnetSpider.Status failed.", LogLevel.Error, e);
+				Logger.Log("Prepare DotnetSpider.Status failed.", Level.Error, e);
 				throw;
 			}
 		}

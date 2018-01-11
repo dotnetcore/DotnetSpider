@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Test.Infrastructure
 		[Fact]
 		public void WithoutNlogConfig()
 		{
-			var nlogConfig = LogCenter.GetDefaultConfigString();
+			var nlogConfig = DLog.GetDefaultConfigString();
 			XmlDocument document = new XmlDocument();
 			document.Load(new StringReader(nlogConfig));
 			Assert.Equal("nlog", document.DocumentElement.Name);

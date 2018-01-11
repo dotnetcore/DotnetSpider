@@ -8,7 +8,6 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core.Infrastructure;
-using NLog;
 
 namespace DotnetSpider.Core.Proxy
 {
@@ -17,7 +16,7 @@ namespace DotnetSpider.Core.Proxy
 	/// </summary>
 	public class HttpProxyPool : IHttpProxyPool
 	{
-		private static readonly ILogger Logger = LogCenter.GetLogger();
+		private static readonly ILogger Logger = DLog.GetLogger();
 		private readonly IProxySupplier _supplier;
 		private readonly List<Proxy> _proxyQueue = new List<Proxy>();
 		private readonly ConcurrentDictionary<string, Proxy> _allProxy = new ConcurrentDictionary<string, Proxy>();
@@ -145,12 +144,12 @@ namespace DotnetSpider.Core.Proxy
 				watch.Start();
 				tcp.ConnectAsync(ipAddr, port).Wait();
 				watch.Stop();
-				Logger.AllLog($"Detect one avaliable proxy: {ip}:{port}, cost {watch.ElapsedMilliseconds}ms.", LogLevel.Debug);
+				Logger.Log($"Detect one avaliable proxy: {ip}:{port}, cost {watch.ElapsedMilliseconds}ms.", Level.Debug);
 				isReachable = true;
 			}
 			catch (Exception e)
 			{
-				Logger.AllLog($"Connect test failed for proxy: {ip}:{port}.", LogLevel.Error, e);
+				Logger.Log($"Connect test failed for proxy: {ip}:{port}.", Level.Error, e);
 			}
 
 			return isReachable;

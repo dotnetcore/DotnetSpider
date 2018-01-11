@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using NLog;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 日志接口
 		/// </summary>
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = DLog.GetLogger();
 		private string _name;
 
 		/// <summary>
@@ -92,7 +91,7 @@ namespace DotnetSpider.Core
 
 			if (!AddExecuteRecord())
 			{
-				Logger.AllLog(Identity, "Can not add execute record.", LogLevel.Error);
+				Logger.Log(Identity, "Can not add execute record.", Level.Error);
 			}
 			try
 			{

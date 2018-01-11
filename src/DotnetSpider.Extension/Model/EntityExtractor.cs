@@ -5,14 +5,13 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Infrastructure;
 using System;
-using NLog;
 using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Model
 {
 	public class EntityExtractor<T> : IEntityExtractor<T>
 	{
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = DLog.GetLogger();
 
 		public IEntityDefine EntityDefine { get; }
 
@@ -162,7 +161,7 @@ namespace DotnetSpider.Extension.Model
 					}
 					catch (Exception e)
 					{
-						Logger.Error(e.ToString());
+						Logger.NLog(e.ToString(), Level.Error);
 					}
 #endif
 				}
@@ -191,7 +190,7 @@ namespace DotnetSpider.Extension.Model
 						}
 						catch (Exception e)
 						{
-							Logger.Error(e.ToString());
+							Logger.NLog(e.ToString(), Level.Error);
 						}
 #endif
 					}

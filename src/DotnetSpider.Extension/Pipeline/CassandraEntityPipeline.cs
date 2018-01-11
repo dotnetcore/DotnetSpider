@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Infrastructure;
-using NLog;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
@@ -58,7 +57,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (entityDefine.TableInfo == null)
 			{
-				Logger.AllLog($"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", LogLevel.Warn);
+				Logger.Log($"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", Level.Warn);
 				return;
 			}
 

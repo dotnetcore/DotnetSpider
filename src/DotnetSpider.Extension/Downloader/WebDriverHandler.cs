@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using NLog;
 using OpenQA.Selenium.Remote;
 using System;
 using System.Threading;
@@ -8,7 +7,7 @@ namespace DotnetSpider.Extension.Downloader
 {
 	public class Scroll : IWebDriverHandler
 	{
-		protected static readonly ILogger Logger = LogCenter.GetLogger();
+		protected static readonly ILogger Logger = DLog.GetLogger();
 
 		public int ScrollTimes { get; set; } = 1;
 

@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
 using Newtonsoft.Json;
-using NLog;
 using Polly;
 using System;
 using System.Net.Http;
@@ -15,7 +14,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class HttpExecuteRecord : IExecuteRecord
 	{
-		private static readonly ILogger Logger = LogCenter.GetLogger();
+		private static readonly ILogger Logger = DLog.GetLogger();
 
 		/// <summary>
 		/// 添加运行记录
@@ -39,7 +38,7 @@ namespace DotnetSpider.Core
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
 						{
-							Logger.Error($"Try to add execute record failed [{count}]: {ex}");
+							Logger.NLog($"Try to add execute record failed [{count}]: {ex}", Level.Error);
 							Thread.Sleep(5000);
 						});
 				retryTimesPolicy.Execute(() =>
@@ -54,7 +53,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				Logger.Error($"Add execute record failed: {e}");
+				Logger.NLog($"Add execute record failed: {e}", Level.Error);
 				return false;
 			}
 		}
@@ -80,7 +79,7 @@ namespace DotnetSpider.Core
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
 				{
-					Logger.Error($"Try to remove execute record failed [{count}]: {ex}");
+					Logger.NLog($"Try to remove execute record failed [{count}]: {ex}", Level.Error);
 					Thread.Sleep(5000);
 				});
 				retryTimesPolicy.Execute(() =>
@@ -94,7 +93,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				Logger.Error($"Remove execute record failed: {e}");
+				Logger.NLog($"Remove execute record failed: {e}", Level.Error);
 			}
 		}
 	}
