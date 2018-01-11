@@ -88,12 +88,13 @@ namespace DotnetSpider.Extension.Monitor
 			{
 				using (conn)
 				{
+					Logger.NLog(identity, "DbConnection is null.", Level.Error);
 					conn.MyExecute(
 						"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `NodeId`=@NodeId;",
 						new
 						{
 							Identity = identity,
-							NodeId = Env.NodeId,
+							Env.NodeId,
 							Status = status,
 							Left = left,
 							Total = total,
@@ -105,6 +106,10 @@ namespace DotnetSpider.Extension.Monitor
 							Thread = threadNum
 						});
 				}
+			}
+			else
+			{
+				Logger.NLog(identity, "DbConnection is null.", Level.Error);
 			}
 		}
 
