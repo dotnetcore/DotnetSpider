@@ -35,21 +35,20 @@ namespace DotnetSpider.Extension.Test
 			string taskGroup = Guid.NewGuid().ToString("N");
 			string userId = Guid.NewGuid().ToString("N");
 
-			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
+			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8" },
 				id,
 				new QueueDuplicateRemovedScheduler(),
 				new TestPageProcessor()))
 			{
 				spider.Monitor = new MySqlMonitor(spider.TaskId, spider.Identity, true, "Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;");
 				spider.AddPipeline(new TestPipeline());
-				spider.ThreadNum = 1;
 				for (int i = 0; i < 5; i++)
 				{
 					spider.AddStartUrl("http://www.baidu.com/" + i);
 				}
 				spider.Run();
 			}
-			Thread.Sleep(3000);
+			Thread.Sleep(6000);
 			using (var conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"))
 			{
 				Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM DotnetSpider.Log where Identity='{id}'").Last().message);
@@ -62,6 +61,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			protected override Page DowloadContent(Request request, ISpider spider)
 			{
+				Console.WriteLine("ok:" + request.Url);
 				return new Page(request)
 				{
 					Content = ""

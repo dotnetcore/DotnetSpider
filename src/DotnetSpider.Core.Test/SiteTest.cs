@@ -37,10 +37,10 @@ namespace DotnetSpider.Core.Test
 			Site site = new Site { EncodingName = "UTF-8" };
 			site.ClearStartRequests();
 
-			Parallel.For(1, 10000, new ParallelOptions
+			Parallel.For(1, 10000, parallelOptions: new ParallelOptions
 			{
 				MaxDegreeOfParallelism = 10
-			}, i =>
+			}, body: i =>
 			{
 				site.AddStartUrl("http://a.com/" + i);
 			});

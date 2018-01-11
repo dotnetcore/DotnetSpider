@@ -15,6 +15,10 @@ using DotnetSpider.Extension.Infrastructure;
 namespace DotnetSpider.Extension.Test.Pipeline
 {
 
+	/// <summary>
+	/// grant all privileges on *.* to root@localhost identified by '';
+	/// flush privileges;
+	/// </summary>
 	public class MySqlEntityPipelineTest
 	{
 		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=;Port=3306;SslMode=None;";
