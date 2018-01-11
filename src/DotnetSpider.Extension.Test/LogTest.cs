@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
+using DotnetSpider.Core.Downloader;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -54,6 +55,17 @@ namespace DotnetSpider.Extension.Test
 				Assert.StartsWith("Crawl complete, cost", conn.Query<Log>($"SELECT * FROM DotnetSpider.Log where Identity='{id}'").Last().message);
 				Assert.Equal(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM DotnetSpider.Status where Identity='{id}'").First().Count);
 				Assert.Equal("Finished", conn.Query<statusObj>($"SELECT * FROM DotnetSpider.Status where Identity='{id}'").First().status);
+			}
+		}
+
+		private class TestDownloader : BaseDownloader
+		{
+			protected override Page DowloadContent(Request request, ISpider spider)
+			{
+				return new Page(request)
+				{
+					Content = ""
+				};
 			}
 		}
 
