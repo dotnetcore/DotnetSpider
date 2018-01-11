@@ -47,7 +47,7 @@ namespace DotnetSpider.Extension.Monitor
 						{
 							TaskId = taskId,
 							Identity = identity,
-							NodeId = Env.NodeId,
+							Env.NodeId,
 							Status = "INIT",
 							Left = 0,
 							Total = 0,
@@ -88,7 +88,7 @@ namespace DotnetSpider.Extension.Monitor
 			{
 				using (conn)
 				{
-					Logger.NLog(identity, "DbConnection is null.", Level.Error);
+					Logger.NLog(identity, "Report status.", Level.Error);
 					conn.MyExecute(
 						"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `NodeId`=@NodeId;",
 						new
