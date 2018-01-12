@@ -43,7 +43,6 @@ namespace DotnetSpider.Extension.Test
 				spider.Downloader = new TestDownloader();
 				spider.TaskId = "1";
 				spider.Monitor = new MySqlMonitor(spider.TaskId, spider.Identity, false, "Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;");
-				spider.ExecuteRecord = new LogExecuteRecord();
 				spider.AddPipeline(new TestPipeline());
 				for (int i = 0; i < 5; i++)
 				{
@@ -56,7 +55,7 @@ namespace DotnetSpider.Extension.Test
 			using (var conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"))
 			{
 				var logs = conn.Query<Log>($"SELECT * FROM dotnetspider.log where identity='{id}'").ToList();
-				Assert.StartsWith("Crawl complete, cost", logs[logs.Count - 2].message);
+				Assert.StartsWith("Crawl complete, cost", logs[logs.Count - 1].message);
 				Assert.Equal(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count);
 				Assert.Equal("Finished", conn.Query<statusObj>($"SELECT * FROM dotnetspider.status where identity='{id}'").First().status);
 			}
