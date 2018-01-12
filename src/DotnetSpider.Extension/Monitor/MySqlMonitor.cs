@@ -88,8 +88,7 @@ namespace DotnetSpider.Extension.Monitor
 			{
 				using (conn)
 				{
-					Logger.NLog(identity, "Report status", Level.Info);
-					conn.MyExecute(
+					var effected = conn.MyExecute(
 						"UPDATE dotnetspider.status SET `status`=@Status, `thread`=@Thread,`left`=@Left, `success`=@Success, `error`=@Error, `total`=@Total, `avgdownloadspeed`=@AvgDownloadSpeed, `avgprocessorspeed`=@AvgProcessorSpeed, `avgpipelinespeed`=@AvgPipelineSpeed WHERE `identity`=@Identity and `nodeid`=@NodeId;",
 						new
 						{
@@ -105,6 +104,7 @@ namespace DotnetSpider.Extension.Monitor
 							AvgPipelineSpeed = avgPipelineSpeed,
 							Thread = threadNum
 						});
+					Logger.Log(identity, $"Report status result: {effected}.", Level.Info);
 				}
 			}
 			else

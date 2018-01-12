@@ -44,7 +44,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				spider.Downloader = new TestDownloader();
 				spider.TaskId = "1";
-				spider.Monitor = new MySqlMonitor(spider.TaskId, spider.Identity, true, "Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;");
+				spider.Monitor = new MySqlMonitor(spider.TaskId, spider.Identity, false, "Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;");
 				spider.ExecuteRecord = new LogExecuteRecord();
 				spider.AddPipeline(new TestPipeline());
 				for (int i = 0; i < 5; i++)
@@ -52,7 +52,7 @@ namespace DotnetSpider.Extension.Test
 					logger.NLog(id, "add start url" + i, Level.Info);
 					spider.AddStartUrl("http://www.baidu.com/" + i);
 				}
-
+				spider.EmptySleepTime = 1000;
 				spider.Run();
 			}
 			using (var conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"))

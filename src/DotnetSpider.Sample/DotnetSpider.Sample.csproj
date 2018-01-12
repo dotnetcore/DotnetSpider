@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Extension.Test\DotnetSpider.Extension.Test.csproj" />
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
   </ItemGroup>
 
