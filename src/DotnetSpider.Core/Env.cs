@@ -45,13 +45,13 @@ namespace DotnetSpider.Core
 		/// 定义数据主键的名称
 		/// 使用实体定义爬虫解析时, 自动插入数据必须使用自增主键, 在自动构造插入数据的SQL语句时会忽略主键
 		/// </summary>
-		public static string[] IdColumns = { "Id", "__Id" };
+		public static string[] IdColumns = { "Id", "__Id", "id", "__id" };
 
 		/// <summary>
 		/// 定义数据采集的时间
 		/// 使用实体定义爬虫解析时, 会自动添加CDate数据列
 		/// </summary>
-		public static string CDateColumn = "CDate";
+		public static string CDateColumn = "cdate";
 
 		/// <summary>
 		/// 爬虫系统使用的数据库连接配置

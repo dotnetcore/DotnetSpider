@@ -57,10 +57,10 @@ namespace DotnetSpider.Extension.Test
 			}
 			using (var conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"))
 			{
-				var logs = conn.Query<Log>($"SELECT * FROM DotnetSpider.Log where Identity='{id}'").ToList();
+				var logs = conn.Query<Log>($"SELECT * FROM dotnetspider.log where identity='{id}'").ToList();
 				Assert.StartsWith("Crawl complete, cost", logs[logs.Count - 2].message);
-				Assert.Equal(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM DotnetSpider.Status where Identity='{id}'").First().Count);
-				Assert.Equal("Finished", conn.Query<statusObj>($"SELECT * FROM DotnetSpider.Status where Identity='{id}'").First().status);
+				Assert.Equal(1, conn.Query<CountResult>($"SELECT COUNT(*) as Count FROM dotnetspider.status where identity='{id}'").First().Count);
+				Assert.Equal("Finished", conn.Query<statusObj>($"SELECT * FROM dotnetspider.status where identity='{id}'").First().status);
 			}
 		}
 

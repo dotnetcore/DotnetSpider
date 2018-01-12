@@ -77,7 +77,7 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					var columns = index.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
-					string indexColumNames = string.Join(", ", columns.Select(c => $"[{c}]"));
+					string indexColumNames = string.Join(", ", columns.Select(c => $"[{c.ToLower()}]"));
 					builder.Append($"CREATE NONCLUSTERED INDEX [index_{name}] ON {tableName} ({indexColumNames.Substring(0, indexColumNames.Length)});");
 				}
 			}
@@ -88,7 +88,7 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					var columns = unique.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
-					string uniqueColumNames = string.Join(", ", columns.Select(c => $"[{c}]"));
+					string uniqueColumNames = string.Join(", ", columns.Select(c => $"[{c.ToLower()}]"));
 					builder.Append($"CREATE UNIQUE NONCLUSTERED INDEX [unique_{name}] ON {tableName} ({uniqueColumNames.Substring(0, uniqueColumNames.Length)}) {(adapter.PipelineMode == PipelineMode.InsertAndIgnoreDuplicate ? "WITH (IGNORE_DUP_KEY = ON)" : "") };");
 				}
 			}
@@ -100,15 +100,15 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (p.DataType.FullName == DataTypeNames.DateTime)
 			{
-				return $"[{p.Name}] {GetDataTypeSql(p)} DEFAULT(GETDATE())";
+				return $"[{p.Name.ToLower()}] {GetDataTypeSql(p)} DEFAULT(GETDATE())";
 			}
 			else if (Env.IdColumns.Contains(p.Name))
 			{
-				return $"[__Id] [bigint] IDENTITY(1,1) NOT NULL";
+				return $"[__id] [bigint] IDENTITY(1,1) NOT NULL";
 			}
 			else
 			{
-				return $"[{p.Name}] {GetDataTypeSql(p)}";
+				return $"[{p.Name.ToLower()}] {GetDataTypeSql(p)}";
 			}
 		}
 

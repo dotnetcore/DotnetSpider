@@ -6,6 +6,7 @@ namespace DotnetSpider.Extension.Model
 	[AttributeUsage(AttributeTargets.Class)]
 	public class EntityTable : System.Attribute
 	{
+		private string _name;
 		public const string Empty = "";
 		public const string Monday = "Monday";
 		public const string Today = "Today";
@@ -15,7 +16,17 @@ namespace DotnetSpider.Extension.Model
 
 		public string Database { get; set; }
 
-		public string Name { get; set; }
+		public string Name
+		{
+			get { return _name; }
+			set
+			{
+				if (!string.IsNullOrWhiteSpace(value) && _name != value)
+				{
+					_name = value.ToLower();
+				}
+			}
+		}
 
 		public string Postfix { get; set; }
 

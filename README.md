@@ -263,6 +263,7 @@ NOTE:
 
 ### Comments
 
++ EntitSpider定义的表名和列名全部小写化, 以备不同数据库间转换或者MYSQL win/linux的切换
 + 允许不添加Pipeline执行爬虫
 
 ### AREAS FOR IMPROVEMENTS

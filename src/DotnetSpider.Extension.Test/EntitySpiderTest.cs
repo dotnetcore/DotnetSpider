@@ -187,7 +187,7 @@ namespace DotnetSpider.Extension.Test
 			spider.Run();
 			using (var conn = Env.DataConnectionStringSettings.CreateDbConnection())
 			{
-				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{guid}'");
+				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE `guid`='{guid}'");
 				Assert.Equal(20, count);
 			}
 		}
@@ -218,6 +218,7 @@ namespace DotnetSpider.Extension.Test
 						{ "Keyword", word },
 						{ "guid", _guid }
 					});
+				AddPipeline(new MySqlEntityPipeline { DefaultPipelineModel = PipelineMode.Insert });
 				AddEntityType<BaiduSearchEntry>();
 			}
 

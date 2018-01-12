@@ -504,15 +504,15 @@ namespace DotnetSpider.Extension.Test
 				var columns = conn.Query<ColumnInfo>("SELECT COLUMN_NAME as `Name`, COLUMN_TYPE as `Type` FROM information_schema.columns WHERE table_name='table15' AND table_schema = 'test';").ToList(); ;
 				Assert.Equal(9, columns.Count);
 
-				Assert.Equal("Int", columns[0].Name);
-				Assert.Equal("BigInt", columns[1].Name);
-				Assert.Equal("String", columns[2].Name);
-				Assert.Equal("Time", columns[3].Name);
-				Assert.Equal("Float", columns[4].Name);
-				Assert.Equal("Double", columns[5].Name);
-				Assert.Equal("String1", columns[6].Name);
-				Assert.Equal("__Id", columns[7].Name);
-				Assert.Equal("CDate", columns[8].Name);
+				Assert.Equal("int".ToLower(), columns[0].Name);
+				Assert.Equal("BigInt".ToLower(), columns[1].Name);
+				Assert.Equal("String".ToLower(), columns[2].Name);
+				Assert.Equal("Time".ToLower(), columns[3].Name);
+				Assert.Equal("Float".ToLower(), columns[4].Name);
+				Assert.Equal("Double".ToLower(), columns[5].Name);
+				Assert.Equal("String1".ToLower(), columns[6].Name);
+				Assert.Equal("__Id".ToLower(), columns[7].Name);
+				Assert.Equal("CDate".ToLower(), columns[8].Name);
 
 				Assert.Equal("int(11)", columns[0].Type);
 				Assert.Equal("bigint(20)", columns[1].Type);
@@ -558,15 +558,15 @@ namespace DotnetSpider.Extension.Test
 				var columns = conn.Query<ColumnInfo>("USE [test];select  b.name Name,c.name+'(' + cast(c.length as varchar)+')' [Type] from sysobjects a,syscolumns b,systypes c where a.id=b.id and a.name='table15' and a.xtype='U'and b.xtype=c.xtype").ToList();
 				Assert.Equal(11, columns.Count);
 
-				Assert.Equal("Int", columns[0].Name);
-				Assert.Equal("Time", columns[1].Name);
-				Assert.Equal("CDate", columns[2].Name);
-				Assert.Equal("Float", columns[3].Name);
-				Assert.Equal("Double", columns[4].Name);
-				Assert.Equal("BigInt", columns[5].Name);
-				Assert.Equal("__Id", columns[6].Name);
-				Assert.Equal("String", columns[7].Name);
-				Assert.Equal("String1", columns[8].Name);
+				Assert.Equal("Int".ToLower(), columns[0].Name);
+				Assert.Equal("Time".ToLower(), columns[1].Name);
+				Assert.Equal("CDate".ToLower(), columns[2].Name);
+				Assert.Equal("Float".ToLower(), columns[3].Name);
+				Assert.Equal("Double".ToLower(), columns[4].Name);
+				Assert.Equal("BigInt".ToLower(), columns[5].Name);
+				Assert.Equal("__Id".ToLower(), columns[6].Name);
+				Assert.Equal("String".ToLower(), columns[7].Name);
+				Assert.Equal("String1".ToLower(), columns[8].Name);
 
 				Assert.Equal("int(4)", columns[0].Type);
 				Assert.Equal("datetime(8)", columns[1].Type);

@@ -64,7 +64,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				metadata2.TableInfo.Name = tableName;
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.Init();
-				var data3 = conn.Query<ProductUpdate>($"use test;select * from {tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
+				var data3 = conn.Query<ProductUpdate>($"use test;select * from {tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where sku=110").First();
 				data3.Category = "4C";
 				updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 }, spider);
 
@@ -85,15 +85,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			using (MySqlConnection conn = new MySqlConnection(ConnectString))
 			{
 				ISpider spider = new DefaultSpider("test", new Site());
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline { DefaultPipelineModel = PipelineMode.Insert };
 				var metadata = new EntityDefine<Product2Insert>();
 				var tableName = Guid.NewGuid().ToString("N");
 				metadata.TableInfo.Name = tableName;
 				insertPipeline.AddEntity(metadata);
 				insertPipeline.Init();
 
-				var data1 = new Product2Insert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new Product2Insert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+				var data1 = new Product2Insert { Sku = "110", Category1 = "a", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
+				var data2 = new Product2Insert { Sku = "111", Category1 = "b", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 
 				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2 }, spider);
 
@@ -103,17 +103,18 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.Init();
 
-				var data3 = conn.Query<Product2Update>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where Sku=110").First();
+				var realTableName = $"`test`.`{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}`";
+				var data3 = conn.Query<Product2Update>($"select * from {realTableName} where sku='110'").First();
 				data3.Category = "4C";
 
 				updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 }, spider);
 
-				var list = conn.Query<Product2Insert>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				var list = conn.Query<Product2Insert>($"select * from {realTableName}").ToList();
 				Assert.Equal(2, list.Count);
 				Assert.Equal("110", list[0].Sku);
 				Assert.Equal("4C", list[0].Category);
 
-				conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
+				conn.Execute($"DROP TABLE {realTableName};");
 			}
 		}
 
@@ -261,7 +262,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category1 { get; set; }
 
-			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment)]
+			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
 			[PropertyDefine(Expression = "./div[1]/a/@href")]

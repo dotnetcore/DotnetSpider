@@ -23,7 +23,7 @@ namespace DotnetSpider.Extension.Test.Processor
 			spider.Run();
 			using (var conn = Env.DataConnectionStringSettings.CreateDbConnection())
 			{
-				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE Guid='{id}'");
+				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE guid='{id}'");
 				Assert.Equal(60, count);
 			}
 		}
