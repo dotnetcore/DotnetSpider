@@ -41,7 +41,7 @@ namespace DotnetSpider.Extension.Monitor
 				{
 					InitStatusDatabase(conn);
 
-					var insertSql = "insert ignore into DotnetSpider.Status (`TaskId`,`Identity`, `NodeId`, `Logged`, `Status`, `Thread`, `Left`, `Success`, `Error`, `Total`, `AvgDownloadSpeed`, `AvgProcessorSpeed`, `AvgPipelineSpeed`) values (@TaskId,@Identity, @NodeId, current_timestamp, @Status, @Thread, @Left, @Success, @Error, @Total, @AvgDownloadSpeed, @AvgProcessorSpeed, @AvgPipelineSpeed);";
+					var insertSql = "insert ignore into dotnetspider.status (`taskid`,`identity`, `nodeid`, `logged`, `status`, `thread`, `left`, `success`, `error`, `total`, `avgdownloadspeed`, `avgprocessorspeed`, `avgpipelinespeed`) values (@TaskId,@Identity, @NodeId, current_timestamp, @Status, @Thread, @Left, @Success, @Error, @Total, @AvgDownloadSpeed, @AvgProcessorSpeed, @AvgPipelineSpeed);";
 					conn.MyExecute(insertSql,
 						new
 						{
@@ -54,8 +54,8 @@ namespace DotnetSpider.Extension.Monitor
 							Success = 0,
 							Error = 0,
 							AvgDownloadSpeed = 0,
-							AvgProcessorSpeed = 0,
-							AvgPipelineSpeed = 0,
+							avgprocessorspeed = 0,
+							avgpipelinespeed = 0,
 							Thread = 0
 						});
 				}
@@ -88,9 +88,9 @@ namespace DotnetSpider.Extension.Monitor
 			{
 				using (conn)
 				{
-					Logger.NLog(identity, "Report status.", Level.Info);
+					Logger.NLog(identity, "Report status", Level.Info);
 					conn.MyExecute(
-						"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `NodeId`=@NodeId;",
+						"UPDATE dotnetspider.status SET `status`=@Status, `thread`=@Thread,`left`=@Left, `success`=@Success, `error`=@Error, `total`=@Total, `avgdownloadspeed`=@AvgDownloadSpeed, `avgprocessorspeed`=@AvgProcessorSpeed, `avgpipelinespeed`=@AvgPipelineSpeed WHERE `identity`=@Identity and `nodeid`=@NodeId;",
 						new
 						{
 							Identity = identity,
@@ -117,15 +117,15 @@ namespace DotnetSpider.Extension.Monitor
 		{
 			try
 			{
-				conn.MyExecute("CREATE DATABASE IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8;");
+				conn.MyExecute("CREATE DATABASE IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8;");
 
-				var sql = "CREATE TABLE IF NOT EXISTS `DotnetSpider`.`Status` (`TaskId` varchar(32), `Identity` varchar(120) NOT NULL,`NodeId` varchar(120) NOT NULL,`Logged` timestamp NULL DEFAULT current_timestamp,`Status` varchar(20) DEFAULT NULL,`Thread` int(13),`Left` bigint(20),`Success` bigint(20),`Error` bigint(20),`Total` bigint(20),`AvgDownloadSpeed` float,`AvgProcessorSpeed` bigint(20),`AvgPipelineSpeed` bigint(20), PRIMARY KEY (`Identity`,`NodeId`))";
+				var sql = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`taskid` varchar(32), `identity` varchar(120) NOT NULL,`nodeid` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT current_timestamp,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20), PRIMARY KEY (`identity`,`nodeid`))";
 				conn.MyExecute(sql);
 
-				var trigger = conn.MyQueryFirstOrDefault("SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'Status_AFTER_UPDATE' and EVENT_OBJECT_SCHEMA='DotnetSpider' and EVENT_OBJECT_TABLE='Status'");
+				var trigger = conn.MyQueryFirstOrDefault("SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'status_after_update' and EVENT_OBJECT_SCHEMA='dotnetspider' and EVENT_OBJECT_TABLE='status'");
 				if (trigger == null)
 				{
-					var timeTrigger = "CREATE TRIGGER `DotnetSpider`.`Status_AFTER_UPDATE` BEFORE UPDATE ON `Status` FOR EACH ROW BEGIN set NEW.Logged = NOW(); END";
+					var timeTrigger = "CREATE TRIGGER `dotnetspider`.`status_after_update` BEFORE UPDATE ON `status` FOR EACH ROW BEGIN set NEW.logged = NOW(); END";
 					conn.MyExecute(timeTrigger);
 				}
 			}

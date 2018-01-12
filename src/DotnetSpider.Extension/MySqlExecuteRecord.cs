@@ -18,9 +18,9 @@ namespace DotnetSpider.Extension
 				{
 					using (IDbConnection conn = Env.SystemConnectionStringSettings.CreateDbConnection())
 					{
-						conn.MyExecute("CREATE SCHEMA IF NOT EXISTS `DotnetSpider` DEFAULT CHARACTER SET utf8mb4;");
-						conn.MyExecute("CREATE TABLE IF NOT EXISTS `DotnetSpider`.`TaskRunning` (`__Id` bigint(20) NOT NULL AUTO_INCREMENT, `TaskId` varchar(120) NOT NULL, `Name` varchar(200) NULL, `Identity` varchar(120), `CDate` timestamp NOT NULL DEFAULT current_timestamp, PRIMARY KEY (__Id), UNIQUE KEY `taskId_unique` (`TaskId`)) AUTO_INCREMENT=1");
-						conn.MyExecute($"INSERT IGNORE INTO `DotnetSpider`.`TaskRunning` (`TaskId`,`Name`,`Identity`) values ('{taskId}','{name}','{identity}');");
+						conn.MyExecute("CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8;");
+						conn.MyExecute("CREATE TABLE IF NOT EXISTS `dotnetspider`.`taskrunning` (`__id` bigint(20) NOT NULL AUTO_INCREMENT, `taskid` varchar(120) NOT NULL, `name` varchar(200) NULL, `identity` varchar(120), `cdate` timestamp NOT NULL DEFAULT current_timestamp, PRIMARY KEY (__id), UNIQUE KEY `taskid_unique` (`taskid`)) AUTO_INCREMENT=1");
+						conn.MyExecute($"INSERT IGNORE INTO `dotnetspider`.`taskrunning` (`taskid`,`name`,`identity`) values ('{taskId}','{name}','{identity}');");
 					}
 				}
 				return true;
@@ -40,7 +40,7 @@ namespace DotnetSpider.Extension
 				{
 					using (IDbConnection conn = Env.SystemConnectionStringSettings.CreateDbConnection())
 					{
-						conn.MyExecute($"DELETE FROM `DotnetSpider`.`TaskRunning` WHERE `Identity`='{taskId}';");
+						conn.MyExecute($"DELETE FROM `dotnetspider`.`taskrunning` WHERE `identity`='{taskId}';");
 					}
 				}
 			}

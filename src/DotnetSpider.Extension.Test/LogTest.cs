@@ -55,7 +55,6 @@ namespace DotnetSpider.Extension.Test
 
 				spider.Run();
 			}
-			Thread.Sleep(6000);
 			using (var conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"))
 			{
 				var logs = conn.Query<Log>($"SELECT * FROM DotnetSpider.Log where Identity='{id}'").ToList();
