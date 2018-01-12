@@ -12,13 +12,15 @@
 		/// <param name="taskId">任务编号</param>
 		/// <param name="name">任务名称</param>
 		/// <param name="identity">任务标识</param>
-		/// <returns></returns>
+		/// <returns>是否添加成功</returns>
 		bool Add(string taskId, string name, string identity);
 
 		/// <summary>
 		/// 删除运行记录
 		/// </summary>
 		/// <param name="taskId">任务编号</param>
-		void Remove(string taskId);
+		/// <param name="name">任务名称</param>
+		/// <param name="identity">任务标识</param>
+		void Remove(string taskId, string name, string identity);
 	}
 }

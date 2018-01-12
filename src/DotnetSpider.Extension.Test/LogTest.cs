@@ -12,6 +12,7 @@ using System.Threading;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -31,6 +32,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void DatebaseLogAndStatus()
 		{
+			var logger = DLog.GetLogger();
 			string id = Guid.NewGuid().ToString("N");
 			string taskGroup = Guid.NewGuid().ToString("N");
 			string userId = Guid.NewGuid().ToString("N");
@@ -40,12 +42,16 @@ namespace DotnetSpider.Extension.Test
 				new QueueDuplicateRemovedScheduler(),
 				new TestPageProcessor()))
 			{
+				spider.TaskId = "1";
 				spider.Monitor = new MySqlMonitor(spider.TaskId, spider.Identity, true, "Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;");
+				spider.ExecuteRecord = new LogExecuteRecord();
 				spider.AddPipeline(new TestPipeline());
 				for (int i = 0; i < 5; i++)
 				{
+					logger.NLog(id, "add start url" + i, Level.Info);
 					spider.AddStartUrl("http://www.baidu.com/" + i);
 				}
+
 				spider.Run();
 			}
 			Thread.Sleep(6000);

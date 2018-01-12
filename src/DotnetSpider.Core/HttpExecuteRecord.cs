@@ -25,7 +25,7 @@ namespace DotnetSpider.Core
 		/// <returns>是否上报成功</returns>
 		public bool Add(string taskId, string name, string identity)
 		{
-			if (string.IsNullOrWhiteSpace(taskId) || !Env.EnterpiseService)
+			if (string.IsNullOrWhiteSpace(taskId) || string.IsNullOrWhiteSpace(identity) || !Env.EnterpiseService)
 			{
 				return true;
 			}
@@ -62,7 +62,9 @@ namespace DotnetSpider.Core
 		/// 删除运行记录
 		/// </summary>
 		/// <param name="taskId">任务编号</param>
-		public void Remove(string taskId)
+		/// <param name="name">任务名称</param>
+		/// <param name="identity">任务标识</param>
+		public void Remove(string taskId, string name, string identity)
 		{
 			if (string.IsNullOrWhiteSpace(taskId) || !Env.EnterpiseService)
 			{

@@ -138,7 +138,7 @@ namespace DotnetSpider.Core
 
 		private void RemoveExecuteRecord()
 		{
-			ExecuteRecord?.Remove(TaskId);
+			ExecuteRecord?.Remove(TaskId, Name, Identity);
 		}
 	}
 }

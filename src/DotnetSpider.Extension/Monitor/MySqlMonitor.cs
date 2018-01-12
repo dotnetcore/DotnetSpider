@@ -88,7 +88,7 @@ namespace DotnetSpider.Extension.Monitor
 			{
 				using (conn)
 				{
-					Logger.NLog(identity, "Report status.", Level.Error);
+					Logger.NLog(identity, "Report status.", Level.Info);
 					conn.MyExecute(
 						"update DotnetSpider.Status SET `Status`=@Status, `Thread`=@Thread,`Left`=@Left, `Success`=@Success, `Error`=@Error, `Total`=@Total, `AvgDownloadSpeed`=@AvgDownloadSpeed, `AvgProcessorSpeed`=@AvgProcessorSpeed, `AvgPipelineSpeed`=@AvgPipelineSpeed WHERE `Identity`=@Identity and `NodeId`=@NodeId;",
 						new

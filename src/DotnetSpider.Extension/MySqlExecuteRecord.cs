@@ -32,7 +32,7 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		public void Remove(string taskId)
+		public void Remove(string taskId, string name, string identity)
 		{
 			try
 			{
