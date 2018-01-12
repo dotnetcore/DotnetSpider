@@ -77,7 +77,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 当前环境的节点编号
 		/// </summary>
-		public static string NodeId => Ip;
+		public static string NodeId { get; set; }
 
 		/// <summary>
 		/// 从配置文件中读取的Redis连接字符串
@@ -302,7 +302,7 @@ namespace DotnetSpider.Core
 			var interf = NetworkInterface.GetAllNetworkInterfaces().First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet);
 			var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
 			Ip = unicastAddresses.FirstOrDefault(a => a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString();
-
+			NodeId = Ip;
 			LoadConfiguration(ConfigurationFilePath);
 		}
 	}

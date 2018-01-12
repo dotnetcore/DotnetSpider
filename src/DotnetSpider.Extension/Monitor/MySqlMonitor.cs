@@ -119,7 +119,7 @@ namespace DotnetSpider.Extension.Monitor
 			{
 				conn.MyExecute("CREATE DATABASE IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8;");
 
-				var sql = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`taskid` varchar(32), `identity` varchar(120) NOT NULL,`nodeid` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT current_timestamp,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20), PRIMARY KEY (`identity`,`nodeid`))";
+				var sql = "CREATE TABLE IF NOT EXISTS `dotnetspider`.`status` (`taskid` varchar(120), `identity` varchar(120) NOT NULL,`nodeid` varchar(120) NOT NULL,`logged` timestamp NULL DEFAULT current_timestamp,`status` varchar(20) DEFAULT NULL,`thread` int(13),`left` bigint(20),`success` bigint(20),`error` bigint(20),`total` bigint(20),`avgdownloadspeed` float,`avgprocessorspeed` bigint(20),`avgpipelinespeed` bigint(20), PRIMARY KEY (`identity`,`nodeid`))";
 				conn.MyExecute(sql);
 
 				var trigger = conn.MyQueryFirstOrDefault("SELECT TRIGGER_NAME FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'status_after_update' and EVENT_OBJECT_SCHEMA='dotnetspider' and EVENT_OBJECT_TABLE='status'");

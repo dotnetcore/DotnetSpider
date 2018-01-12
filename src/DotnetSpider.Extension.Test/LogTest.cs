@@ -34,9 +34,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			var logger = DLog.GetLogger();
 			string id = Guid.NewGuid().ToString("N");
-			string taskGroup = Guid.NewGuid().ToString("N");
-			string userId = Guid.NewGuid().ToString("N");
-
+			Env.NodeId = "DEFAULT";
 			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8" },
 				id,
 				new QueueDuplicateRemovedScheduler(),
