@@ -1,128 +1,131 @@
-﻿#if !NET_CORE
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
-using OpenQA.Selenium.Remote;
-using OpenQA.Selenium;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Core.Redial;
+﻿//#if !NET_CORE
+//using System;
+//using System.Threading;
+//using System.Threading.Tasks;
+//using System.Web;
+//using DotnetSpider.Core;
+//using DotnetSpider.Core.Downloader;
+//using OpenQA.Selenium.Remote;
+//using OpenQA.Selenium;
+//using DotnetSpider.Core.Infrastructure;
+//using DotnetSpider.Extension.Infrastructure;
+//using DotnetSpider.Core.Redial;
 
-namespace DotnetSpider.Extension.Downloader
-{
-	public class FiddlerDownloader : BaseDownloader
-	{
-		private readonly object _locker = new object();
-		private readonly int _webDriverWaitTime;
-		private readonly Option _option;
-		private static bool _isLogined;
-		private readonly FiddlerClient _fiddlerClient;
-		private IWebDriver _webDriver;
+//namespace DotnetSpider.Extension.Downloader
+//{
+//	/// <summary>
+//	/// 通过Fiddler中间截获的内容
+//	/// </summary>
+//	public class FiddlerDownloader : BaseDownloader
+//	{
+//		private readonly object _locker = new object();
+//		private readonly int _webDriverWaitTime;
+//		private readonly Option _option;
+//		private static bool _isLogined;
+//		private readonly FiddlerClient _fiddlerClient;
+//		private IWebDriver _webDriver;
 
-		public Func<RemoteWebDriver, bool> Login;
-		public Func<string, string> UrlFormat;
-		public Func<RemoteWebDriver, bool> AfterNavigate;
+//		public Func<string, string> UrlFormat;
+//		public Func<RemoteWebDriver, bool> AfterNavigate;
 
-		public FiddlerDownloader(string urlParten, Option option, int webDriverWaitTime = 200)
-		{
-			_option = option;
-			_option.Proxy = "127.0.0.1:30000";
-			_webDriverWaitTime = webDriverWaitTime;
+//		public FiddlerDownloader(string urlParten, Option option, int webDriverWaitTime = 200, ICookieInjector cookieInjector = null)
+//		{
+//			_option = option;
+//			_option.Proxy = "127.0.0.1:30000";
+//			_webDriverWaitTime = webDriverWaitTime;
 
-			Task.Factory.StartNew(() =>
-			{
-				while (true)
-				{
-					IntPtr maindHwnd = WindowsFormUtil.FindWindow(null, "plugin-container.exe - 应用程序错误");
-					if (maindHwnd != IntPtr.Zero)
-					{
-						WindowsFormUtil.SendMessage(maindHwnd, WindowsFormUtil.WmClose, 0, 0);
-					}
-					Thread.Sleep(500);
-				}
-				// ReSharper disable once FunctionNeverReturns
-			});
+//			Task.Factory.StartNew(() =>
+//			{
+//				while (true)
+//				{
+//					IntPtr maindHwnd = WindowsFormUtil.FindWindow(null, "plugin-container.exe - 应用程序错误");
+//					if (maindHwnd != IntPtr.Zero)
+//					{
+//						WindowsFormUtil.SendMessage(maindHwnd, WindowsFormUtil.WmClose, 0, 0);
+//					}
+//					Thread.Sleep(500);
+//				}
+//				// ReSharper disable once FunctionNeverReturns
+//			});
 
-			_fiddlerClient = new FiddlerClient(30000, urlParten);
-			_fiddlerClient.StartCapture();
-		}
+//			CookieInjector = cookieInjector;
 
-		public FiddlerDownloader(string urlParten, Option option) : this(urlParten, option, 300)
-		{
-		}
+//			_fiddlerClient = new FiddlerClient(30000, urlParten);
+//			_fiddlerClient.StartCapture();
+//		}
 
-		public FiddlerDownloader(string urlParten, Option option, Func<RemoteWebDriver, bool> login = null) : this(urlParten, option, 200)
-		{
-			Login = login;
-		}
+//		public FiddlerDownloader(string urlParten, Option option) : this(urlParten, option, 300)
+//		{
+//		}
 
-		public override void Dispose()
-		{
-			_fiddlerClient.Dispose();
-		}
+//		public FiddlerDownloader(string urlParten, Option option, ICookieInjector cookieInjector = null) : this(urlParten, option, 200, cookieInjector)
+//		{
+//		}
 
-		protected override Page DowloadContent(Request request, ISpider spider)
-		{
-			Site site = spider.Site;
-			try
-			{
-				lock (_locker)
-				{
-					if (_webDriver == null)
-					{
-						_webDriver = WebDriverExtensions.Open(Browser.Chrome, _option);
-					}
-					if (!_isLogined && Login != null)
-					{
-						_isLogined = Login.Invoke(_webDriver as RemoteWebDriver);
-						if (!_isLogined)
-						{
-							throw new SpiderException("Login failed. Please check your login codes.");
-						}
-					}
+//		public override void Dispose()
+//		{
+//			_fiddlerClient.Dispose();
+//		}
 
-					//中文乱码URL
-					string query = request.Uri.Query;
-					string realUrl = request.Uri.Scheme + "://" + request.Uri.DnsSafeHost + ":" + request.Uri.Port + request.Uri.AbsolutePath + (string.IsNullOrEmpty(query) ? "" : ("?" + HttpUtility.UrlPathEncode(request.Uri.Query.Substring(1, request.Uri.Query.Length - 1))));
+//		protected override Page DowloadContent(Request request, ISpider spider)
+//		{
+//			Site site = spider.Site;
+//			try
+//			{
+//				lock (_locker)
+//				{
+//					if (_webDriver == null)
+//					{
+//						_webDriver = WebDriverExtensions.Open(Browser.Chrome, _option);
+//					}
+//					if (!_isLogined && Login != null)
+//					{
+//						_isLogined = Login.Invoke(_webDriver as RemoteWebDriver);
+//						if (!_isLogined)
+//						{
+//							throw new SpiderException("Login failed. Please check your login codes.");
+//						}
+//					}
 
-					if (UrlFormat != null)
-					{
-						realUrl = UrlFormat(realUrl);
-					}
+//					//中文乱码URL
+//					string query = request.Uri.Query;
+//					string realUrl = request.Uri.Scheme + "://" + request.Uri.DnsSafeHost + ":" + request.Uri.Port + request.Uri.AbsolutePath + (string.IsNullOrEmpty(query) ? "" : ("?" + HttpUtility.UrlPathEncode(request.Uri.Query.Substring(1, request.Uri.Query.Length - 1))));
 
-					NetworkCenter.Current.Execute("fiddler-download", () =>
-					{
-						_webDriver.Navigate().GoToUrl(realUrl);
-					});
+//					if (UrlFormat != null)
+//					{
+//						realUrl = UrlFormat(realUrl);
+//					}
 
-					Thread.Sleep(_webDriverWaitTime);
+//					NetworkCenter.Current.Execute("fiddler-download", () =>
+//					{
+//						_webDriver.Navigate().GoToUrl(realUrl);
+//					});
 
-					AfterNavigate?.Invoke((RemoteWebDriver)_webDriver);
+//					Thread.Sleep(_webDriverWaitTime);
 
-					Page page = new Page(request);
-					page.Content = _fiddlerClient.ResponseBodyString;
-					_fiddlerClient.Clear();
-					page.TargetUrl = _webDriver.Url;
-					// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
-					//request.PutExtra(Request.CycleTriedTimes, null);
+//					AfterNavigate?.Invoke((RemoteWebDriver)_webDriver);
 
-					return page;
-				}
-			}
-			catch (DownloadException)
-			{
-				throw;
-			}
-			catch (Exception e)
-			{
-				Page page = new Page(request) { Exception = e };
-				return page;
-			}
-		}
-	}
-}
+//					Page page = new Page(request);
+//					page.Content = _fiddlerClient.ResponseBodyString;
+//					_fiddlerClient.Clear();
+//					page.TargetUrl = _webDriver.Url;
+//					// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
+//					//request.PutExtra(Request.CycleTriedTimes, null);
 
-#endif
+//					return page;
+//				}
+//			}
+//			catch (DownloadException)
+//			{
+//				throw;
+//			}
+//			catch (Exception e)
+//			{
+//				Page page = new Page(request) { Exception = e };
+//				return page;
+//			}
+//		}
+//	}
+//}
+
+//#endif

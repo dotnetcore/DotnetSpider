@@ -12,20 +12,129 @@ using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Pipeline
 {
+	/// <summary>
+	/// 把解析到的爬虫实体数据存到SqlServer中
+	/// </summary>
 	public class SqlServerEntityPipeline : BaseEntityDbPipeline
 	{
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="connectString">数据库连接字符串, 如果为空框架会尝试从配置文件中读取</param>
 		public SqlServerEntityPipeline(string connectString = null) : base(connectString)
 		{
 			DefaultPipelineModel = PipelineMode.Insert;
 		}
 
-		protected virtual DbParameter CreateDbParameter(string name, object value)
+		/// <summary>
+		/// 通过连接字符串获取ConnectionStringSettings对象, 用于DbFactory生产IDbConnection
+		/// </summary>
+		/// <param name="connectString">连接字符器</param>
+		/// <returns>ConnectionStringSettings对象</returns>
+		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
 		{
-			if (value == null)
+			ConnectionStringSettings connectionStringSettings;
+			if (!string.IsNullOrWhiteSpace(connectString))
 			{
-				value = DBNull.Value;
+				connectionStringSettings = new ConnectionStringSettings("SqlServer", connectString, "System.Data.SqlClient");
 			}
-			return new SqlParameter(name, value);
+			else
+			{
+				if (Env.DataConnectionStringSettings != null)
+				{
+					connectionStringSettings = Env.DataConnectionStringSettings;
+				}
+				else
+				{
+					return null;
+				}
+			}
+			return connectionStringSettings;
+		}
+		
+		/// <summary>
+		/// 初始化所有相关的SQL语句
+		/// </summary>
+		/// <param name="adapter">数据库管道使用的实体中间信息</param>
+		protected override void InitAllSqlOfEntity(EntityAdapter adapter)
+		{
+			if (adapter.PipelineMode == PipelineMode.InsertNewAndUpdateOld)
+			{
+				//Logger.MyLog(Spider.Identity, "Sql Server only check if primary key duplicate.", NLog.LogLevel.Warn);
+				throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
+			}
+			adapter.InsertSql = GenerateInsertSql(adapter);
+			adapter.SelectSql = GenerateSelectSql(adapter);
+			adapter.InsertAndIgnoreDuplicateSql = GenerateInsertSql(adapter);
+			if (adapter.PipelineMode == PipelineMode.Update)
+			{
+				adapter.UpdateSql = GenerateUpdateSql(adapter);
+			}
+		}
+		
+		/// <summary>
+		/// 初始化数据库和相关表
+		/// </summary>
+		internal override void InitDatabaseAndTable()
+		{
+			foreach (var adapter in EntityAdapters.Values)
+			{
+				using (var conn = ConnectionStringSettings.CreateDbConnection())
+				{
+					var sql = GenerateIfDatabaseExistsSql(adapter, conn.ServerVersion);
+
+					if (Convert.ToInt16(conn.MyExecuteScalar(sql)) == 0)
+					{
+						sql = GenerateCreateDatabaseSql(adapter, conn.ServerVersion);
+						conn.MyExecute(sql);
+					}
+
+					sql = GenerateCreateTableSql(adapter);
+					conn.MyExecute(sql);
+				}
+			}
+		}
+
+		/// <summary>
+		/// 把解析到的爬虫实体数据存到SqlServer中
+		/// </summary>
+		/// <param name="entityName">爬虫实体类的名称</param>
+		/// <param name="datas">实体类数据</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
+		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
+		{
+			int count = 0;
+			if (EntityAdapters.TryGetValue(entityName, out var metadata))
+			{
+				using (var conn = ConnectionStringSettings.CreateDbConnection())
+				{
+					switch (metadata.PipelineMode)
+					{
+						case PipelineMode.Insert:
+						case PipelineMode.InsertAndIgnoreDuplicate:
+							{
+								count += conn.MyExecute(metadata.InsertSql, datas);
+								break;
+							}
+						case PipelineMode.InsertNewAndUpdateOld:
+							{
+								throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
+							}
+						case PipelineMode.Update:
+							{
+								count += conn.MyExecute(metadata.UpdateSql, datas);
+								break;
+							}
+						default:
+							{
+								count += conn.MyExecute(metadata.InsertSql, datas);
+								break;
+							}
+					}
+				}
+			}
+			return count;
 		}
 
 		private string GenerateCreateDatabaseSql(EntityAdapter adapter, string serverVersion)
@@ -161,7 +270,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		protected string GetDataTypeSql(Column field)
+		private string GetDataTypeSql(Column field)
 		{
 			var dataType = "TEXT";
 
@@ -201,96 +310,5 @@ namespace DotnetSpider.Extension.Pipeline
 			return dataType;
 		}
 
-		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
-		{
-			ConnectionStringSettings connectionStringSettings;
-			if (!string.IsNullOrWhiteSpace(connectString))
-			{
-				connectionStringSettings = new ConnectionStringSettings("SqlServer", connectString, "System.Data.SqlClient");
-			}
-			else
-			{
-				if (Env.DataConnectionStringSettings != null)
-				{
-					connectionStringSettings = Env.DataConnectionStringSettings;
-				}
-				else
-				{
-					return null;
-				}
-			}
-			return connectionStringSettings;
-		}
-
-		protected override void InitAllSqlOfEntity(EntityAdapter adapter)
-		{
-			if (adapter.PipelineMode == PipelineMode.InsertNewAndUpdateOld)
-			{
-				//Logger.MyLog(Spider.Identity, "Sql Server only check if primary key duplicate.", NLog.LogLevel.Warn);
-				throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
-			}
-			adapter.InsertSql = GenerateInsertSql(adapter);
-			adapter.SelectSql = GenerateSelectSql(adapter);
-			adapter.InsertAndIgnoreDuplicateSql = GenerateInsertSql(adapter);
-			if (adapter.PipelineMode == PipelineMode.Update)
-			{
-				adapter.UpdateSql = GenerateUpdateSql(adapter);
-			}
-		}
-
-		internal override void InitDatabaseAndTable()
-		{
-			foreach (var adapter in EntityAdapters.Values)
-			{
-				using (var conn = ConnectionStringSettings.CreateDbConnection())
-				{
-					var sql = GenerateIfDatabaseExistsSql(adapter, conn.ServerVersion);
-
-					if (Convert.ToInt16(conn.MyExecuteScalar(sql)) == 0)
-					{
-						sql = GenerateCreateDatabaseSql(adapter, conn.ServerVersion);
-						conn.MyExecute(sql);
-					}
-
-					sql = GenerateCreateTableSql(adapter);
-					conn.MyExecute(sql);
-				}
-			}
-		}
-
-		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
-		{
-			int count = 0;
-			if (EntityAdapters.TryGetValue(entityName, out var metadata))
-			{
-				using (var conn = ConnectionStringSettings.CreateDbConnection())
-				{
-					switch (metadata.PipelineMode)
-					{
-						case PipelineMode.Insert:
-						case PipelineMode.InsertAndIgnoreDuplicate:
-							{
-								count += conn.MyExecute(metadata.InsertSql, datas);
-								break;
-							}
-						case PipelineMode.InsertNewAndUpdateOld:
-							{
-								throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
-							}
-						case PipelineMode.Update:
-							{
-								count += conn.MyExecute(metadata.UpdateSql, datas);
-								break;
-							}
-						default:
-							{
-								count += conn.MyExecute(metadata.InsertSql, datas);
-								break;
-							}
-					}
-				}
-			}
-			return count;
-		}
 	}
 }

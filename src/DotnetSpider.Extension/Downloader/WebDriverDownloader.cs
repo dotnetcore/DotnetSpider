@@ -10,6 +10,7 @@ using DotnetSpider.Core.Redial;
 using System.Runtime.InteropServices;
 using DotnetSpider.Extension.Infrastructure;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Downloader
 {
@@ -25,16 +26,25 @@ namespace DotnetSpider.Extension.Downloader
 		private readonly Browser _browser;
 		private readonly Option _option;
 		private bool _isDisposed;
-		private string[] _domains;
+		private readonly string[] _domains;
+		/// <summary>
+		/// 每次navigate完成后, WebDriver 需要执行的操作
+		/// </summary>
+		public List<IWebDriverHandler> WebDriverHandlers { get; set; }
 
-		public event Action<RemoteWebDriver> NavigateCompeleted;
-
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="browser">浏览器</param>
+		/// <param name="domains">被采集链接的Domain, Cookie</param>
+		/// <param name="webDriverWaitTime">请求链接完成后需要等待的时间</param>
+		/// <param name="option">选项</param>
 		public WebDriverDownloader(Browser browser, string[] domains = null, int webDriverWaitTime = 200, Option option = null)
 		{
 			_webDriverWaitTime = webDriverWaitTime;
 			_browser = browser;
 			_option = option ?? new Option();
-			_domains = domains == null ? new string[0] : domains;
+			_domains = domains;
 
 			if (browser == Browser.Firefox && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
@@ -53,14 +63,28 @@ namespace DotnetSpider.Extension.Downloader
 			}
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="browser">浏览器</param>
+		/// <param name="option">选项</param>
 		public WebDriverDownloader(Browser browser, Option option) : this(browser, null, 200, option) { }
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public override void Dispose()
 		{
 			_isDisposed = true;
 			_webDriver?.Quit();
 		}
 
+		/// <summary>
+		/// 下载工作的具体实现
+		/// </summary>
+		/// <param name="request">请求信息</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>页面数据</returns>
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
@@ -68,26 +92,29 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				lock (_locker)
 				{
-					_webDriver = _webDriver ?? WebDriverExtensions.Open(_browser, _option);
-
-					foreach (var domain in _domains)
+					if (_webDriver == null)
 					{
-						var cookies = _cookieContainer.GetCookies(new Uri(domain));
-						foreach (System.Net.Cookie cookie in cookies)
-						{
-							AddCookieToDownloadClient(cookie);
-						}
-					}
+						_webDriver = WebDriverExtensions.Open(_browser, _option);
 
-					if (!_isLogined && CookieInjector != null)
-					{
-						var webdriverLoginHandler = CookieInjector as WebDriverLoginHandler;
-						if (webdriverLoginHandler != null)
+						foreach (var domain in _domains)
 						{
-							webdriverLoginHandler.Driver = _webDriver as RemoteWebDriver;
+							var cookies = _cookieContainer.GetCookies(new Uri(domain));
+							foreach (System.Net.Cookie cookie in cookies)
+							{
+								AddCookieToDownloadClient(cookie);
+							}
 						}
-						CookieInjector.Inject(this, spider);
-						_isLogined = true;
+
+						if (!_isLogined && CookieInjector != null)
+						{
+							var webdriverLoginHandler = CookieInjector as WebDriverLoginHandler;
+							if (webdriverLoginHandler != null)
+							{
+								webdriverLoginHandler.Driver = _webDriver as RemoteWebDriver;
+							}
+							CookieInjector.Inject(this, spider);
+							_isLogined = true;
+						}
 					}
 				}
 
@@ -121,7 +148,13 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					_webDriver.Navigate().GoToUrl(realUrl);
 
-					NavigateCompeleted?.Invoke((RemoteWebDriver)_webDriver);
+					if (WebDriverHandlers != null)
+					{
+						foreach (var handler in WebDriverHandlers)
+						{
+							handler.Handle((RemoteWebDriver)_webDriver);
+						}
+					}
 				});
 
 				Thread.Sleep(_webDriverWaitTime);

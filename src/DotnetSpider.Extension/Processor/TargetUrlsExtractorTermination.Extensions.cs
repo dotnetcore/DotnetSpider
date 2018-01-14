@@ -7,15 +7,37 @@ using DotnetSpider.Extension.Model.Formatter;
 
 namespace DotnetSpider.Extension.Processor
 {
-	public class PaggerTermination
+	/// <summary>
+	/// 翻页目标链接的中止器
+	/// </summary>
+	public class PaginationTermination : ITargetUrlsExtractorTermination
 	{
+		/// <summary>
+		/// 取得总页数的元素选择器
+		/// </summary>
 		public BaseSelector TotalPageSelector { get; set; }
+
+		/// <summary>
+		/// 对总页数的格式化
+		/// </summary>
 		public Formatter[] TotalPageFormatters { get; set; }
 
+		/// <summary>
+		/// 取得当前页的元素选择器
+		/// </summary>
 		public BaseSelector CurrenctPageSelector { get; set; }
+
+		/// <summary>
+		/// 对当前页的格式化
+		/// </summary>
 		public Formatter[] CurrnetPageFormatters { get; set; }
 
-		public bool IsTermination(Page page, ITargetUrlsExtractor creator)
+		/// <summary>
+		/// Return true, skip all urls from target urls extractor.
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <returns>是否到了最终一个链接</returns>
+		public bool IsTermination(Page page)
 		{
 			if (TotalPageSelector == null || CurrenctPageSelector == null)
 			{
@@ -36,14 +58,14 @@ namespace DotnetSpider.Extension.Processor
 			string result = string.Empty;
 			if (selector.Type == SelectorType.Enviroment)
 			{
-				if (SelectorUtils.Parse(selector) is EnviromentSelector enviromentSelector)
+				if (SelectorUtil.Parse(selector) is EnviromentSelector enviromentSelector)
 				{
-					result = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, 0)?.ToString();
+					result = SelectorUtil.GetEnviromentValue(enviromentSelector.Field, page, 0)?.ToString();
 				}
 			}
 			else
 			{
-				result = page.Selectable.Select(SelectorUtils.Parse(selector)).GetValue();
+				result = page.Selectable.Select(SelectorUtil.Parse(selector)).GetValue();
 			}
 
 			if (!string.IsNullOrEmpty(result) && TotalPageFormatters != null)

@@ -4,67 +4,64 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
+	/// <summary>
+	/// 把包含中文的字符串转化成数字
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class DigitUnitFormater : Formatter
 	{
-		public string UnitStringForShi { get; set; } = "十";
-		public string UnitStringForBai { get; set; } = "百";
-		public string UnitStringForQian { get; set; } = "千";
-		public string UnitStringForWan { get; set; } = "万";
-		public string UnitStringForYi { get; set; } = "亿";
-		public List<string> CustomUnitString { get; set; } = new List<string>();
-		public List<long> CustomUnitValue { get; set; } = new List<long>();
+		private const string _unitStringForShi = "十";
+		private const string _unitStringForBai = "百";
+		private const string _unitStringForQian = "千";
+		private const string _unitStringForWan = "万";
+		private const string _unitStringForYi = "亿";
 
-		public string NumFormat { get; set; } = "F0";
+		/// <summary>
+		/// 数字格式化模版
+		/// </summary>
+		public string NumberFormat { get; set; } = "F0";
 
+		/// <summary>
+		/// 把包含中文的字符串转化成数字
+		/// </summary>
+		/// <param name="value">数值</param>
+		/// <returns>被格式化后的数值</returns>
 		protected override object FormateValue(object value)
 		{
-			var tmp = value.ToString(); 
+			var tmp = value.ToString();
 			decimal num = decimal.Parse(RegexUtil.Decimal.Match(tmp).ToString());
-			if (tmp.EndsWith(UnitStringForShi))
+			if (tmp.EndsWith(_unitStringForShi))
 			{
 				num = num * 10;
 			}
-			else if (tmp.EndsWith(UnitStringForBai))
+			else if (tmp.EndsWith(_unitStringForBai))
 			{
 				num = num * 100;
 			}
-			else if (tmp.EndsWith(UnitStringForBai))
+			else if (tmp.EndsWith(_unitStringForBai))
 			{
 				num = num * 100;
 			}
-			else if (tmp.EndsWith(UnitStringForQian))
+			else if (tmp.EndsWith(_unitStringForQian))
 			{
 				num = num * 1000;
 			}
-			else if (tmp.EndsWith(UnitStringForWan))
+			else if (tmp.EndsWith(_unitStringForWan))
 			{
 				num = num * 10000;
 			}
-			else if (tmp.EndsWith(UnitStringForYi))
+			else if (tmp.EndsWith(_unitStringForYi))
 			{
 				num = num * 100000000;
 			}
-
-			if (CustomUnitString.Count > 0)
-			{
-				for (int i = 0; i < CustomUnitString.Count; i++)
-				{
-					if (tmp.EndsWith(CustomUnitString[i]))
-					{
-						num = num * CustomUnitValue[i];
-					}
-				}
-			}
-			return num.ToString(NumFormat);
+			return num.ToString(NumberFormat);
 		}
 
+		/// <summary>
+		/// 校验参数是否设置正确
+		/// </summary>
 		protected override void CheckArguments()
 		{
-			if (CustomUnitValue.Count != CustomUnitString.Count)
-			{
-				throw new Exception("Each unit should have a value.");
-			}
 		}
 	}
 }

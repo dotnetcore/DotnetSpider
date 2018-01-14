@@ -3,7 +3,7 @@ using System.Management;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public static class NetInterfaceUtils
+	public static class NetInterfaceUtil
 	{
 		public static bool ChangeNetworkConnectionStatus(bool enable, string networkConnectionName)
 		{

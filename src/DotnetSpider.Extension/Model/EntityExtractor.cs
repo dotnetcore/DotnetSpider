@@ -9,16 +9,37 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Model
 {
+	/// <summary>
+	/// 爬虫实体的解析器
+	/// </summary>
+	/// <typeparam name="T">爬虫实体类的类型</typeparam>
 	public class EntityExtractor<T> : IEntityExtractor<T>
 	{
+		/// <summary>
+		/// 日志接口
+		/// </summary>
 		protected static readonly ILogger Logger = DLog.GetLogger();
 
+		/// <summary>
+		/// 爬虫实体类的定义
+		/// </summary>
 		public IEntityDefine EntityDefine { get; }
 
+		/// <summary>
+		/// 对解析的结果进一步加工操作
+		/// </summary>
 		public IDataHandler<T> DataHandler { get; }
 
+		/// <summary>
+		/// 解析器的名称, 默认值是爬虫实体类型的全称
+		/// </summary>
 		public string Name => EntityDefine?.Name;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
+		/// <param name="tableName">实体在数据库中的表名, 此优先级高于EntitySelector中的定义</param>
 		public EntityExtractor(IDataHandler<T> dataHandler = null, string tableName = null)
 		{
 			EntityDefine = new EntityDefine<T>();
@@ -29,6 +50,11 @@ namespace DotnetSpider.Extension.Model
 			DataHandler = dataHandler;
 		}
 
+		/// <summary>
+		/// 解析成爬虫实体对象
+		/// </summary>
+		/// <param name="page">页面数据</param>
+		/// <returns>爬虫实体对象</returns>
 		public List<T> Extract(Page page)
 		{
 			List<T> result = new List<T>();
@@ -37,11 +63,11 @@ namespace DotnetSpider.Extension.Model
 				foreach (var enviromentValue in EntityDefine.SharedValues)
 				{
 					string name = enviromentValue.Name;
-					var value = page.Selectable.Select(SelectorUtils.Parse(enviromentValue)).GetValue();
+					var value = page.Selectable.Select(SelectorUtil.Parse(enviromentValue)).GetValue();
 					page.Request.PutExtra(name, value);
 				}
 			}
-			ISelector selector = SelectorUtils.Parse(EntityDefine.Selector);
+			ISelector selector = SelectorUtil.Parse(EntityDefine.Selector);
 			if (selector != null && EntityDefine.Multi)
 			{
 				var list = page.Selectable.SelectList(selector).Nodes();
@@ -140,7 +166,7 @@ namespace DotnetSpider.Extension.Model
 			{
 				return null;
 			}
-			ISelector selector = SelectorUtils.Parse(field.Selector);
+			ISelector selector = SelectorUtil.Parse(field.Selector);
 			if (selector == null)
 			{
 				return null;
@@ -149,7 +175,7 @@ namespace DotnetSpider.Extension.Model
 			if (selector is EnviromentSelector)
 			{
 				var enviromentSelector = selector as EnviromentSelector;
-				var value = SelectorUtils.GetEnviromentValue(enviromentSelector.Field, page, index);
+				var value = SelectorUtil.GetEnviromentValue(enviromentSelector.Field, page, index);
 				foreach (var formatter in field.Formatters)
 				{
 #if DEBUG

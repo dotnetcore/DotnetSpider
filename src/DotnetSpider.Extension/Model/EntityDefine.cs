@@ -8,41 +8,116 @@ using System.Reflection;
 
 namespace DotnetSpider.Extension.Model
 {
+	/// <summary>
+	/// 爬虫实体类的定义
+	/// </summary>
 	public interface IEntityDefine
 	{
+		/// <summary>
+		/// 爬虫实体类的名称, 用于解析器和数据管道之间匹配. 默认是爬虫实体类的全称
+		/// </summary>
 		string Name { get; }
+
+		/// <summary>
+		/// 爬虫实体类的选择器
+		/// </summary>
 		BaseSelector Selector { get; }
+
+		/// <summary>
+		/// 实体结果是否多个
+		/// </summary>
 		bool Multi { get; }
+
+		/// <summary>
+		/// 爬虫实体类的类型
+		/// </summary>
 		Type Type { get; }
+
+		/// <summary>
+		/// 爬虫实体对应的数据库表信息
+		/// </summary>
 		EntityTable TableInfo { get; }
+
+		/// <summary>
+		/// 爬虫实体定义的数据库列信息
+		/// </summary>
 		List<Column> Columns { get; }
+
+		/// <summary>
+		/// 从最终解析到的结果中取前 Take 个实体
+		/// </summary>
 		int Take { get; }
+
+		/// <summary>
+		/// 目标链接的选择器
+		/// </summary>
 		List<TargetUrlsSelector> TargetUrlsSelectors { get; }
+
+		/// <summary>
+		/// 共享值的选择器
+		/// </summary>
 		List<SharedValueSelector> SharedValues { get; }
 	}
 
+	/// <summary>
+	/// 爬虫实体类的定义
+	/// </summary>
+	/// <typeparam name="T">爬虫实体类的类型</typeparam>
 	public class EntityDefine<T> : IEntityDefine
 	{
+		/// <summary>
+		/// 爬虫实体类的名称, 用于解析器和数据管道之间匹配. 默认是爬虫实体类的全称
+		/// </summary>
 		public string Name { get; }
 
+		/// <summary>
+		/// 爬虫实体类的选择器
+		/// </summary>
 		public BaseSelector Selector { get; set; }
 
+		/// <summary>
+		/// 实体结果是否多个
+		/// </summary>
 		public bool Multi { get; set; }
 
+		/// <summary>
+		/// 爬虫实体类的类型
+		/// </summary>
 		public Type Type { get; }
 
+		/// <summary>
+		/// 爬虫实体对应的数据库表信息
+		/// </summary>
 		public EntityTable TableInfo { get; set; }
 
+		/// <summary>
+		/// 爬虫实体定义的数据库列信息
+		/// </summary>
 		public List<Column> Columns { get; set; } = new List<Column>();
 
+		/// <summary>
+		/// 从最终解析到的结果中取前 Take 个实体
+		/// </summary>
 		public int Take { get; set; }
 
+		/// <summary>
+		/// 目标链接的选择器
+		/// </summary>
 		public List<TargetUrlsSelector> TargetUrlsSelectors { get; set; }
 
+		/// <summary>
+		/// 对Processor的结构结果进一步加工操作
+		/// </summary>
 		public DataHandler<T> DataHandler { get; set; }
 
+		/// <summary>
+		/// 共享值的选择器
+		/// </summary>
 		public List<SharedValueSelector> SharedValues { get; internal set; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public EntityDefine()
 		{
 			Type = typeof(T);
@@ -203,8 +278,16 @@ namespace DotnetSpider.Extension.Model
 		}
 	}
 
+	/// <summary>
+	/// 数据库列的定义
+	/// </summary>
 	public class Column
 	{
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="property">属性的信息</param>
+		/// <param name="propertyDefine">属性的定义</param>
 		public Column(PropertyInfo property, PropertyDefine propertyDefine)
 		{
 			Property = property;
@@ -232,28 +315,65 @@ namespace DotnetSpider.Extension.Model
 			}
 		}
 
+		/// <summary>
+		/// 属性的定义
+		/// </summary>
 		public PropertyDefine PropertyDefine { get; }
 
+		/// <summary>
+		/// 属性的信息
+		/// </summary>
 		public PropertyInfo Property { get; }
 
+		/// <summary>
+		/// 属性的默认值
+		/// </summary>
 		public object DefaultValue { get; }
 
+		/// <summary>
+		/// 列的名称
+		/// </summary>
 		public string Name => Property.Name;
 
+		/// <summary>
+		/// 属性值的选择器
+		/// </summary>
 		public BaseSelector Selector { get; set; }
 
+		/// <summary>
+		/// 属性值是否为空
+		/// </summary>
 		public bool NotNull { get; set; }
 
+		/// <summary>
+		/// 额外选项
+		/// </summary>
 		public PropertyDefine.Options Option { get; set; }
 
+		/// <summary>
+		/// 列的长度
+		/// </summary>
 		public int Length { get; set; }
 
+		/// <summary>
+		/// 属性的类型
+		/// </summary>
 		public Type DataType => Property.PropertyType;
 
+		/// <summary>
+		/// 是否不把此列数据保存到数据库
+		/// </summary>
 		public bool IgnoreStore { get; set; }
 
+		/// <summary>
+		/// 属性值的格式化
+		/// </summary>
 		public List<Formatter.Formatter> Formatters { get; set; } = new List<Formatter.Formatter>();
 
+		/// <summary>
+		/// 重载 ToString
+		/// </summary>
+		/// <returns>String</returns>
 		public override string ToString()
 		{
 			return $"{Name},{DataType.Name}";

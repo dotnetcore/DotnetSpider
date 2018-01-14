@@ -9,7 +9,10 @@ using System.Linq;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public class VpnUtils
+	/// <summary>
+	/// VPN拨号器
+	/// </summary>
+	public class VpnRedial
 	{
 		// 系统路径 C:\windows\system32\
 		private static readonly string WinDir = Environment.GetFolderPath(Environment.SpecialFolder.System) + @"\";
@@ -17,26 +20,37 @@ namespace DotnetSpider.Extension.Infrastructure
 		private const string RasDialFileName = "rasdial.exe";
 		// Vpn路径 C:\windows\system32\rasdial.exe
 		private static readonly string Vpnprocess = WinDir + RasDialFileName;
-		// Vpn地址
+		/// <summary>
+		/// Vpn地址
+		/// </summary>
 		public string IpToPing { get; set; }
-		// Vpn名称
+		/// <summary>
+		/// Vpn名称
+		/// </summary>
 		public string VpnName { get; set; }
-		// Vpn用户名
+		/// <summary>
+		/// Vpn用户名
+		/// </summary>
 		public string UserName { get; set; }
-		// Vpn密码
+		/// <summary>
+		/// Vpn密码
+		/// </summary>
 		public string PassWord { get; set; }
 
-		public VpnUtils()
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		public VpnRedial()
 		{
 		}
 		/// <summary>
-		/// 带参构造函数
+		/// 构造方法
 		/// </summary>
-		/// <param name="vpnIp"></param>
-		/// <param name="vpnName"></param>
-		/// <param name="userName"></param>
-		/// <param name="passWord"></param>
-		public VpnUtils(string vpnIp, string vpnName, string userName, string passWord)
+		/// <param name="vpnIp">VPN的IP地址</param>
+		/// <param name="vpnName">VPN的名称</param>
+		/// <param name="userName">VPN的用户名</param>
+		/// <param name="passWord">VPN的密码</param>
+		public VpnRedial(string vpnIp, string vpnName, string userName, string passWord)
 		{
 			IpToPing = vpnIp;
 			VpnName = vpnName;
@@ -46,7 +60,6 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <summary>
 		/// 尝试连接Vpn(默认Vpn)
 		/// </summary>
-		/// <returns></returns>
 		public void TryConnectVpn()
 		{
 			TryConnectVpn(VpnName, UserName, PassWord);
@@ -54,7 +67,6 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <summary>
 		/// 尝试断开连接(默认Vpn)
 		/// </summary>
-		/// <returns></returns>
 		public void TryDisConnectVpn()
 		{
 			TryDisConnectVpn(VpnName);
@@ -69,7 +81,6 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <summary>
 		/// 尝试删除连接(默认Vpn)
 		/// </summary>
-		/// <returns></returns>
 		public void TryDeleteVpn()
 		{
 			TryDeleteVpn(VpnName);
@@ -77,7 +88,9 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <summary>
 		/// 尝试连接Vpn(指定Vpn名称，用户名，密码)
 		/// </summary>
-		/// <returns></returns>
+		/// <param name="connVpnName">Vpn的名称</param>
+		/// <param name="connUserName">Vpn的用户名</param>
+		/// <param name="connPassWord">Vpn的密码</param>
 		public void TryConnectVpn(string connVpnName, string connUserName, string connPassWord)
 		{
 			try
@@ -109,7 +122,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <summary>
 		/// 尝试断开Vpn(指定Vpn名称)
 		/// </summary>
-		/// <returns></returns>
+		/// <param name="disConnVpnName">Vpn的名称</param>
 		public void TryDisConnectVpn(string disConnVpnName)
 		{
 			try
@@ -141,6 +154,8 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <summary>
 		/// 创建或更新一个Vpn连接(指定Vpn名称，及IP)
 		/// </summary>
+		/// <param name="updateVpNname">Vpn的名称</param>
+		/// <param name="updateVpNip">Vpn的IP</param>
 		public void CreateOrUpdateVpn(string updateVpNname, string updateVpNip)
 		{
 			RasDialer dialer = new RasDialer();
@@ -166,7 +181,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// 删除指定名称的Vpn
 		/// 如果Vpn正在运行，一样会在电话本里删除，但是不会断开连接，所以，最好是先断开连接，再进行删除操作
 		/// </summary>
-		/// <param name="delVpnName"></param>
+		/// <param name="delVpnName">Vpn的名称</param>
 		public void TryDeleteVpn(string delVpnName)
 		{
 			RasPhoneBook allUsersPhoneBook = new RasPhoneBook();

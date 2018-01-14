@@ -2,11 +2,14 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension
 {
-	public class DefaultEntitySpider : EntitySpider
+	/// <summary>
+	/// ”√”⁄≤‚ ‘
+	/// </summary>
+	internal class DefaultEntitySpider : EntitySpider
 	{
-		public DefaultEntitySpider() : this(new Site()) { }
+		internal DefaultEntitySpider() : this(new Site()) { }
 
-		public DefaultEntitySpider(Site site) : base(site)
+		internal DefaultEntitySpider(Site site) : base(site)
 		{
 		}
 

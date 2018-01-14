@@ -8,8 +8,19 @@ using MimeKit;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
+	/// <summary>
+	/// Excel扩展
+	/// </summary>
 	public static class ExcelExtensions
 	{
+		/// <summary>
+		/// 导出数据库数据到EXCEL
+		/// </summary>
+		/// <param name="conn">数据库连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="fileName">文件名</param>
+		/// <param name="rewrite">是否覆盖旧文件</param>
+		/// <returns></returns>
 		public static string Export(this IDbConnection conn, string sql, string fileName, bool rewrite = false)
 		{
 			IDataReader reader = null;
@@ -60,22 +71,64 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 把数据库数据导出到EXCEL并发送邮件
+		/// </summary>
+		/// <param name="conn">数据库连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="fileName">文件名</param>
+		/// <param name="subject">邮件的标题</param>
+		/// <param name="emailTo">邮件接收人</param>
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, string emailTo)
 		{
 			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), Core.Env.EmailHost, int.Parse(Core.Env.EmailPort), Core.Env.EmailAccount, Core.Env.EmailPassword, Core.Env.EmailDisplayName);
 		}
 
-		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, List<string> emailTo)
+		/// <summary>
+		/// 把数据库数据导出到EXCEL并发送邮件
+		/// </summary>
+		/// <param name="conn">数据库连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="fileName">文件名</param>
+		/// <param name="subject">邮件的标题</param>
+		/// <param name="emailTo">邮件接收人</param>
+		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, IEnumerable<string> emailTo)
 		{
 			EmailTo(conn, sql, fileName, subject, emailTo, Core.Env.EmailHost, int.Parse(Core.Env.EmailPort), Core.Env.EmailAccount, Core.Env.EmailPassword, Core.Env.EmailDisplayName);
 		}
 
+		/// <summary>
+		/// 把数据库数据导出到EXCEL并发送邮件
+		/// </summary>
+		/// <param name="conn">数据库连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="fileName">文件名</param>
+		/// <param name="subject">邮件的标题</param>
+		/// <param name="emailTo">邮件接收人</param>
+		/// <param name="emailHost">邮件发送服务地址</param>
+		/// <param name="port">邮件发送服务端口</param>
+		/// <param name="account">邮件发送服务的用户名</param>
+		/// <param name="password">邮件发送服务的密码</param>
+		/// <param name="displayName">邮件发送服务的显示名称</param>
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, string emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
 		{
 			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), emailHost, port, account, password, displayName);
 		}
 
-		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, List<string> emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
+		/// <summary>
+		/// 把数据库数据导出到EXCEL并发送邮件
+		/// </summary>
+		/// <param name="conn">数据库连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="fileName">文件名</param>
+		/// <param name="subject">邮件的标题</param>
+		/// <param name="emailTo">邮件接收人</param>
+		/// <param name="emailHost">邮件发送服务地址</param>
+		/// <param name="port">邮件发送服务端口</param>
+		/// <param name="account">邮件发送服务的用户名</param>
+		/// <param name="password">邮件发送服务的密码</param>
+		/// <param name="displayName">邮件发送服务的显示名称</param>
+		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, IEnumerable<string> emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
 		{
 			var path = Export(conn, sql, $"{fileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
 			var message = new MimeMessage();

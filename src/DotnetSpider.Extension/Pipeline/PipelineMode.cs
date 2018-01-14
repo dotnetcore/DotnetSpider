@@ -1,5 +1,8 @@
 ﻿namespace DotnetSpider.Extension.Pipeline
 {
+	/// <summary>
+	/// 数据管道模式
+	/// </summary>
 	public enum PipelineMode
 	{
 		/// <summary>

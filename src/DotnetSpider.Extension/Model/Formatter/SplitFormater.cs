@@ -4,15 +4,30 @@ using System.Linq;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
+	/// <summary>
+	/// Splits a string into substrings based on the strings in an array. You can specify whether the substrings include empty array elements.
+	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
 	public class SplitFormatter : Formatter
 	{
-		public string[] Splitors { get; set; }
+		/// <summary>
+		///  A string array that delimits the substrings in this string, an empty array that contains no delimiters, or null.
+		/// </summary>
+		public string[] Splitor { get; set; }
+
+		/// <summary>
+		/// 分割数值后需要返回的数值索引
+		/// </summary>
 		public int ElementAt { get; set; } = int.MaxValue;
 
+		/// <summary>
+		/// 实现数值的转化
+		/// </summary>
+		/// <param name="value">数值</param>
+		/// <returns>被格式化后的数值</returns>
 		protected override object FormateValue(object value)
 		{
-			string[] result = value.ToString().Split(Splitors, StringSplitOptions.RemoveEmptyEntries);
+			string[] result = value.ToString().Split(Splitor, StringSplitOptions.RemoveEmptyEntries);
 
 			if (result.Length > ElementAt)
 			{
@@ -24,9 +39,12 @@ namespace DotnetSpider.Extension.Model.Formatter
 			}
 		}
 
+		/// <summary>
+		/// 校验参数是否设置正确
+		/// </summary>
 		protected override void CheckArguments()
 		{
-			if (Splitors == null || Splitors.Length == 0)
+			if (Splitor == null || Splitor.Length == 0)
 			{
 				throw new SpiderException("Splitors should not be null or empty.");
 			}

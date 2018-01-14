@@ -8,54 +8,111 @@ using System.Linq;
 
 namespace DotnetSpider.Extension
 {
+	/// <summary>
+	/// 实体类爬虫的定义
+	/// </summary>
 	public abstract class EntitySpider : CommonSpider
 	{
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public EntitySpider() : this(new Site())
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="site">目标站点信息</param>
 		public EntitySpider(Site site) : base(site)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="name">爬虫名称</param>
 		public EntitySpider(string name) : base(name)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="name">爬虫名称</param>
+		/// <param name="site">目标站点信息</param>
 		public EntitySpider(string name, Site site) : base(name, site)
 		{
 		}
 
+		/// <summary>
+		/// 添加爬虫实体类
+		/// </summary>
+		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
 		public void AddEntityType<T>() where T : ISpiderEntity
 		{
 			AddEntityType<T>(null, null, null);
 		}
 
+		/// <summary>
+		/// 添加爬虫实体类
+		/// </summary>
+		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
+		/// <param name="tableName">爬虫实体在数据库中的表名, 此优先级高于EntitySelector中的定义</param>
 		public void AddEntityType<T>(string tableName) where T : ISpiderEntity
 		{
 			AddEntityType<T>(null, null, tableName);
 		}
 
-		public void AddEntityType<T>(IDataHandler<T> dataHandler ) where T : ISpiderEntity
+		/// <summary>
+		/// 添加爬虫实体类
+		/// </summary>
+		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
+		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
+		public void AddEntityType<T>(IDataHandler<T> dataHandler) where T : ISpiderEntity
 		{
 			AddEntityType(null, dataHandler, null);
 		}
 
+		/// <summary>
+		/// 添加爬虫实体类
+		/// </summary>
+		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
+		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
 		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor) where T : ISpiderEntity
 		{
 			AddEntityType<T>(targetUrlsExtractor, null, null);
 		}
 
+		/// <summary>
+		/// 添加爬虫实体类
+		/// </summary>
+		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
+		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
+		/// <param name="tableName">爬虫实体在数据库中的表名, 此优先级高于EntitySelector中的定义</param>
 		public void AddEntityType<T>(IDataHandler<T> dataHandler, string tableName) where T : ISpiderEntity
 		{
 			AddEntityType(null, dataHandler, tableName);
 		}
 
-		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler<T> dataHandler ) where T : ISpiderEntity
+		/// <summary>
+		/// 添加爬虫实体类
+		/// </summary>
+		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
+		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
+		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
+		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler<T> dataHandler) where T : ISpiderEntity
 		{
 			AddEntityType(targetUrlsExtractor, dataHandler, null);
 		}
 
+		/// <summary>
+		/// 添加爬虫实体类
+		/// </summary>
+		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
+		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
+		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
+		/// <param name="tableName">爬虫实体在数据库中的表名, 此优先级高于EntitySelector中的定义</param>
 		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler<T> dataHandler, string tableName) where T : ISpiderEntity
 		{
 			CheckIfRunning();
@@ -64,11 +121,19 @@ namespace DotnetSpider.Extension
 			AddPageProcessor(processor);
 		}
 
+		/// <summary>
+		/// Get the default pipeline when user forget set a pepeline to spider.
+		/// </summary>
+		/// <returns>数据管道</returns>
 		protected override IPipeline GetDefaultPipeline()
 		{
 			return BaseEntityPipeline.GetPipelineFromAppConfig();
 		}
 
+		/// <summary>
+		/// 初始化数据管道
+		/// </summary>
+		/// <param name="arguments">运行参数</param>
 		protected override void InitPipelines(params string[] arguments)
 		{
 			base.InitPipelines(arguments);

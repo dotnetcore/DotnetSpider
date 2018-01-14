@@ -5,12 +5,26 @@ using System.Threading;
 
 namespace DotnetSpider.Extension.Downloader
 {
+	/// <summary>
+	/// 滚动操作的实现
+	/// </summary>
 	public class Scroll : IWebDriverHandler
 	{
+		/// <summary>
+		/// 日志接口
+		/// </summary>
 		protected static readonly ILogger Logger = DLog.GetLogger();
 
+		/// <summary>
+		/// 滚动次数
+		/// </summary>
 		public int ScrollTimes { get; set; } = 1;
 
+		/// <summary>
+		/// 滚动操作的具体实现
+		/// </summary>
+		/// <param name="webDriver">WebDriver</param>
+		/// <returns>是否操作成功</returns>
 		public bool Handle(RemoteWebDriver webDriver)
 		{
 			try

@@ -110,7 +110,7 @@ namespace DotnetSpider.Sample
 			AddEntityType(new MyDataHanlder());
 		}
 
-		[EntityTable("taobao", "taobao_items", EntityTable.FirstDayOfCurrentMonth, Uniques = new[] { "item_id" })]
+		[EntityTable("taobao", "taobao_items", EntityTable.FirstDayOfTheMonth, Uniques = new[] { "item_id" })]
 		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
 		private class TaobaoItem : SpiderEntity
 		{

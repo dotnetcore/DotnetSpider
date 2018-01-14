@@ -8,8 +8,18 @@ using System;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public static class SelectorUtils
+	/// <summary>
+	/// Selector的帮助类
+	/// </summary>
+	public static class SelectorUtil
 	{
+		/// <summary>
+		/// 取得页面信息中的环境变量值
+		/// </summary>
+		/// <param name="field">环境变量名称</param>
+		/// <param name="page">页面信息</param>
+		/// <param name="index">当前属性在所有属性中的索引</param>
+		/// <returns></returns>
 		public static object GetEnviromentValue(string field, Page page, int index)
 		{
 			var key = field.ToLower();
@@ -60,6 +70,11 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 把BaseSelector转换成真正的查询器
+		/// </summary>
+		/// <param name="selector">BaseSelector</param>
+		/// <returns>查询器</returns>
 		public static ISelector Parse(BaseSelector selector)
 		{
 			if (selector != null)
@@ -114,15 +129,12 @@ namespace DotnetSpider.Extension.Infrastructure
 				return null;
 			}
 		}
-
-		public static void NotNullExpression(BaseSelector selector)
-		{
-			if (string.IsNullOrWhiteSpace(selector.Expression))
-			{
-				throw new SpiderException($"Expression of {selector} should not be null/empty.");
-			}
-		}
-
+		
+		/// <summary>
+		/// 把Selector转换成真正的查询器
+		/// </summary>
+		/// <param name="selector">Selector</param>
+		/// <returns>查询器</returns>
 		public static ISelector Parse(Selector selector)
 		{
 			if (!string.IsNullOrWhiteSpace(selector?.Expression))
@@ -155,6 +167,14 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 
 			throw new SpiderException("Not support selector: " + selector);
+		}
+
+		private static void NotNullExpression(BaseSelector selector)
+		{
+			if (string.IsNullOrWhiteSpace(selector.Expression))
+			{
+				throw new SpiderException($"Expression of {selector} should not be null/empty.");
+			}
 		}
 	}
 }

@@ -16,28 +16,69 @@ using System.Net;
 
 namespace DotnetSpider.Extension.Downloader
 {
+	/// <summary>
+	/// WebDriver 的Cookie注入器
+	/// </summary>
 	public class WebDriverCookieInjector : CookieInjector
 	{
+		/// <summary>
+		/// 登陆的链接
+		/// </summary>
 		public string Url { get; set; }
 
+		/// <summary>
+		/// 登陆成功后需要再次导航到的链接
+		/// </summary>
 		public string AfterLoginUrl { get; set; }
 
+		/// <summary>
+		/// 用户名在网页中的元素选择器
+		/// </summary>
 		public Selector UserSelector { get; set; }
 
+		/// <summary>
+		/// 用户名
+		/// </summary>
 		public string User { get; set; }
 
+		/// <summary>
+		/// 密码在网页中的元素选择器
+		/// </summary>
 		public Selector PasswordSelector { get; set; }
 
+		/// <summary>
+		/// 密码
+		/// </summary>
 		public string Password { get; set; }
 
+		/// <summary>
+		/// 登陆按钮的元素选择器
+		/// </summary>
 		public Selector SubmitSelector { get; set; }
 
+		/// <summary>
+		/// 浏览器
+		/// </summary>
 		public Browser Browser { get; set; } = Browser.Chrome;
 
-		protected virtual void BeforeInputInfo(RemoteWebDriver webDriver) { }
+		/// <summary>
+		/// 在输入用户信息前执行的一些准备操作
+		/// </summary>
+		/// <param name="webDriver">WebDriver</param>
+		protected virtual void BeforeInput(RemoteWebDriver webDriver) { }
 
-		protected virtual void AfterLoginComplete(RemoteWebDriver webDriver) { }
+		/// <summary>
+		/// 完成登陆后执行的一些准备操作
+		/// </summary>
+		/// <param name="webDriver"></param>
+		protected virtual void AfterLogin(RemoteWebDriver webDriver) { }
 
+		/// <summary>
+		/// 查找元素
+		/// </summary>
+		/// <param name="webDriver">WebDriver</param>
+		/// <param name="element">页面元素选择器</param>
+		/// <returns>页面元素</returns>
 		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
 		{
 			switch (element.Type)
@@ -55,6 +96,11 @@ namespace DotnetSpider.Extension.Downloader
 			throw new SpiderException("Unsport findy: " + element.Type);
 		}
 
+		/// <summary>
+		/// 取得 Cookie
+		/// </summary>
+		/// <param name="spider">爬虫</param>
+		/// <returns>Cookie</returns>
 		protected override CookieCollection GetCookies(ISpider spider)
 		{
 			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PasswordSelector == null)
@@ -70,7 +116,7 @@ namespace DotnetSpider.Extension.Downloader
 				webDriver.Navigate().GoToUrl(Url);
 				Thread.Sleep(10000);
 
-				BeforeInputInfo(webDriver);
+				BeforeInput(webDriver);
 
 				if (UserSelector != null)
 				{
@@ -92,7 +138,7 @@ namespace DotnetSpider.Extension.Downloader
 				submit.Click();
 				Thread.Sleep(10000);
 
-				AfterLoginComplete(webDriver);
+				AfterLogin(webDriver);
 
 				var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
 				if (cookieList.Count > 0)
@@ -115,6 +161,10 @@ namespace DotnetSpider.Extension.Downloader
 			return result;
 		}
 
+		/// <summary>
+		/// 创建WebDriver对象
+		/// </summary>
+		/// <returns>WebDriver对象</returns>
 		protected RemoteWebDriver CreateWebDriver()
 		{
 			RemoteWebDriver webDriver;

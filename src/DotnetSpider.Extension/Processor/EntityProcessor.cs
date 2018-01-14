@@ -7,12 +7,27 @@ using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Extension.Processor
 {
+	/// <summary>
+	/// 针对爬虫实体类的页面解析器、抽取器
+	/// </summary>
 	public class EntityProcessor<T> : BasePageProcessor, IEntityProcessor where T : ISpiderEntity
 	{
+		/// <summary>
+		/// 针对爬虫实体类的页面解析器、抽取器
+		/// </summary>
 		public IEntityExtractor<T> Extractor { get; }
-
+		
+		/// <summary>
+		/// 爬虫实体类的定义
+		/// </summary>
 		public IEntityDefine EntityDefine => Extractor?.EntityDefine;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
+		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
+		/// <param name="tableName">实体在数据库中的表名, 此优先级高于EntitySelector中的定义</param>
 		public EntityProcessor(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler<T> dataHandler, string tableName)
 		{
 			if (targetUrlsExtractor != null)
@@ -64,22 +79,42 @@ namespace DotnetSpider.Extension.Processor
 			}
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
 		public EntityProcessor(IDataHandler<T> dataHandler) : this(null, dataHandler, null)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
 		public EntityProcessor(ITargetUrlsExtractor targetUrlsExtractor) : this(targetUrlsExtractor, null, null)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
+		/// <param name="tableName">实体在数据库中的表名, 此优先级高于EntitySelector中的定义</param>
 		public EntityProcessor(IDataHandler<T> dataHandler, string tableName) : this(null, dataHandler, tableName)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="tableName"></param>
 		public EntityProcessor(string tableName) : this(null, null, tableName)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public EntityProcessor() : this(null, null, null)
 		{
 		}
@@ -104,6 +139,10 @@ namespace DotnetSpider.Extension.Processor
 			return (TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor).GetTargetUrlPatterns(region);
 		}
 
+		/// <summary>
+		/// 解析操作
+		/// </summary>
+		/// <param name="page">页面数据</param>
 		protected override void Handle(Page page)
 		{
 			List<T> list = Extractor.Extract(page);

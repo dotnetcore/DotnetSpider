@@ -9,6 +9,7 @@
 		/// 处理页面数据、检测下载情况(是否被反爬)、更新Cookie等操作
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		void Handle(ref Page page, IDownloader downloader, ISpider spider);
 	}

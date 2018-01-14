@@ -40,6 +40,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// 把页面数据存到数据管道中
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="downloader">下载器</param>
 		/// <param name="spider">爬虫</param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{

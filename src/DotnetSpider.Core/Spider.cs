@@ -600,7 +600,7 @@ namespace DotnetSpider.Core
 
 			InitComponent(arguments);
 
-			if (arguments.Contains("runn-test"))
+			if (arguments.Contains("run-test"))
 			{
 				return;
 			}
@@ -614,10 +614,12 @@ namespace DotnetSpider.Core
 			_realStat = Status.Running;
 			_exited = false;
 
+			// 计算状态监控器每完成多少个Request则上报状态
 			int monitorInterval = CalculateMonitorInterval(Scheduler);
 
 			while (Stat == Status.Running || Stat == Status.Paused)
 			{
+				// 暂停则一直停在此处
 				if (Stat == Status.Paused)
 				{
 					_realStat = Status.Paused;
@@ -631,11 +633,14 @@ namespace DotnetSpider.Core
 				}, i =>
 				{
 					int waitCount = 1;
+					// 每个线程使用一个下载器实例, 在使用如WebDriverDownloader时不需要管理WebDriver实例了
 					var downloader = Downloader.Clone();
 					while (Stat == Status.Running)
 					{
+						// 从队列中取出一个请求
 						Request request = Scheduler.Poll();
 
+						// 如果队列中没有需要处理的请求, 则开始等待, 一直到设定的 EmptySleepTime 结束, 则认为爬虫应该结束了
 						if (request == null)
 						{
 							if (waitCount > _waitCountLimit && ExitWhenComplete)
@@ -681,7 +686,6 @@ namespace DotnetSpider.Core
 										try
 										{
 											ReportStatus();
-
 											CheckExitSignal();
 										}
 										catch (Exception e)
@@ -958,7 +962,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Get the default pipeline when user forget set a pepeline to spider.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>数据管道</returns>
 		protected virtual IPipeline GetDefaultPipeline()
 		{
 			return new NullPipeline();
@@ -1444,7 +1448,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void ReportStatus() => Monitor?.Report(Identity, TaskId, Stat.ToString(),
+		private void ReportStatus() => Monitor?.Report(Identity, TaskId, _realStat.ToString(),
 					Monitorable.LeftRequestsCount,
 					Monitorable.TotalRequestsCount,
 					Monitorable.SuccessRequestsCount,

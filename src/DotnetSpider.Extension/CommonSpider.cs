@@ -12,35 +12,57 @@ using Polly.Retry;
 
 namespace DotnetSpider.Extension
 {
+	/// <summary>
+	/// 通用爬虫
+	/// </summary>
 	public abstract class CommonSpider : Spider
 	{
 		private const string InitFinishedValue = "init complete";
 		internal const string InitStatusSetKey = "dotnetspider:init-stats";
 		internal string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
+		/// <summary>
+		/// 自定义的初始化
+		/// </summary>
+		/// <param name="arguments">运行参数</param>
 		protected abstract void MyInit(params string[] arguments);
 
+		/// <summary>
+		/// 爬虫结束后, 执行的数据验证和报告
+		/// </summary>
 		public Action DataVerificationAndReport;
 
-		protected CommonSpider(Site site) : base(site)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="site">站点信息</param>
+		public CommonSpider(Site site) : base(site)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="name">名称</param>
+		/// <param name="site">站点信息</param>
 		public CommonSpider(string name, Site site) : base(site)
 		{
 			Name = name;
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="name">名称</param>
 		public CommonSpider(string name) : base(new Site())
 		{
 			Name = name;
 		}
 
-		public ISpider ToDefaultSpider()
-		{
-			return new DefaultSpider("", new Site());
-		}
-
+		/// <summary>
+		/// 运行爬虫
+		/// </summary>
+		/// <param name="arguments">运行参数</param>
 		protected override void RunApp(params string[] arguments)
 		{
 			PrintInfo.Print();
@@ -81,6 +103,10 @@ namespace DotnetSpider.Extension
 			}
 		}
 
+		/// <summary>
+		/// 初始化队列
+		/// </summary>
+		/// <param name="arguments">运行参数</param>
 		protected override void InitScheduler(params string[] arguments)
 		{
 			base.InitScheduler(arguments);
@@ -96,8 +122,8 @@ namespace DotnetSpider.Extension
 		/// <summary>
 		/// 分布式任务时使用, 只需要调用一次
 		/// </summary>
-		/// <param name="arguments"></param>
-		/// <returns></returns>
+		/// <param name="arguments">运行参数</param>
+		/// <returns>是否需要运行起始链接构造器</returns>
 		protected override bool IfRequireBuildStartRequests(string[] arguments)
 		{
 			if (RedisConnection.Default != null)
@@ -145,6 +171,9 @@ namespace DotnetSpider.Extension
 			}
 		}
 
+		/// <summary>
+		/// 初始化起始链结束后的解锁, 分布式任务时解锁成功则其它爬虫会结束等待状态, 一起进入运行状态
+		/// </summary>
 		protected override void BuildStartRequestsFinished()
 		{
 			if (RedisConnection.Default != null)
@@ -191,6 +220,10 @@ namespace DotnetSpider.Extension
 			}
 		}
 
+		/// <summary>
+		/// 订阅 Redis的消息队列, 实现消息队列对爬虫的控制
+		/// </summary>
+		/// <param name="spider">爬虫</param>
 		protected void RegisterControl(ISpider spider)
 		{
 			if (RedisConnection.Default != null)

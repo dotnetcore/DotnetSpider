@@ -11,6 +11,10 @@ namespace DotnetSpider.Extension.Infrastructure
 	/// </summary>
 	public class CassandraConnectionSetting
 	{
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="connectString">数据库连接字符串</param>
 		public CassandraConnectionSetting(string connectString)
 		{
 			Dictionary<string, string> settings = new Dictionary<string, string>();
@@ -42,8 +46,14 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 数据库地址
+		/// </summary>
 		public string Host { get; set; }
 
+		/// <summary>
+		/// 数据库的 endpoint
+		/// </summary>
 		public List<IPEndPoint> EndPoints
 		{
 			get
@@ -58,12 +68,24 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// 数据库用户名
+		/// </summary>
 		public string User { get; set; }
 
+		/// <summary>
+		/// 数据库密码
+		/// </summary>
 		public string Password { get; set; }
 
+		/// <summary>
+		/// 数据库端口
+		/// </summary>
 		public int Port { get; set; }
 
+		/// <summary>
+		/// 是否使用帐号密码登录数据库
+		/// </summary>
 		public bool WithCredentials
 		{
 			get
@@ -73,22 +95,34 @@ namespace DotnetSpider.Extension.Infrastructure
 		}
 	}
 
-
-	public class CassandraUtils
+	/// <summary>
+	/// Cassandra数据库的帮助类
+	/// </summary>
+	public class CassandraUtil
 	{
+		/// <summary>
+		/// 取得Cassandra的Cluster实现
+		/// </summary>
+		/// <param name="connectString">数据库连接字符串</param>
+		/// <returns>Cluster实现</returns>
 		public static Cluster CreateCluster(string connectString)
 		{
 			var connectSetting = new CassandraConnectionSetting(connectString);
 			return CreateCluster(connectSetting);
 		}
 
-		public static Cluster CreateCluster(CassandraConnectionSetting connectSetting)
+		/// <summary>
+		/// 取得Cassandra的Cluster实现
+		/// </summary>
+		/// <param name="connectionSetting">数据库设置</param>
+		/// <returns>Cluster实现</returns>
+		public static Cluster CreateCluster(CassandraConnectionSetting connectionSetting)
 		{
 			var builder = Cluster.Builder()
-				.AddContactPoints(connectSetting.EndPoints);
-			if (connectSetting.WithCredentials)
+				.AddContactPoints(connectionSetting.EndPoints);
+			if (connectionSetting.WithCredentials)
 			{
-				builder.WithCredentials(connectSetting.User, connectSetting.Password);
+				builder.WithCredentials(connectionSetting.User, connectionSetting.Password);
 			}
 			var cluster = builder.Build();
 			return cluster;

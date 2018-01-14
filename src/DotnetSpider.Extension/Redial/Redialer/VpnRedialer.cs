@@ -6,50 +6,54 @@ using DotnetSpider.Core.Redial.Redialer;
 
 namespace DotnetSpider.Extension.Redial.Redialer
 {
+	/// <summary>
+	/// 在任务机器上使用VPN连接网络时使用的拨号器
+	/// </summary>
 	public class VpnRedialer : IRedialer
 	{
-		public string NetInterface { get; set; }
-		public string VpnInterface { get; set; }
-		public string VpnIp { get; set; }
-		public string Account { get; set; }
-		public string Password { get; set; }
+		private readonly string _vpnInterface;
+		private readonly string _vpnIp;
+		private readonly string _account;
+		private readonly string _password;
+		private readonly VpnRedial _vpnRedial;
+		private readonly string _netInterface;
 
-		private readonly VpnUtils _util;
-
-		public VpnRedialer()
-		{
-		}
-
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public VpnRedialer(string vpnInterface, string vpnIp, string user, string password, string netInterface = null)
 		{
-			VpnInterface = vpnInterface;
-			VpnIp = vpnIp;
-			Account = user;
-			Password = password;
-			NetInterface = netInterface;
-			_util = new VpnUtils(vpnIp, vpnInterface, user, password);
+			_vpnInterface = vpnInterface;
+			_vpnIp = vpnIp;
+			_account = user;
+			_password = password;
+			_netInterface = netInterface;
+			_vpnRedial = new VpnRedial(vpnIp, vpnInterface, user, password);
 		}
 
+		/// <summary>
+		/// 拨号
+		/// </summary>
 		public void Redial()
 		{
-			Console.WriteLine("Trying to disconnect Vpn:" + _util.VpnName);
-			_util.TryDisConnectVpn();
+			Console.WriteLine("Trying to disconnect Vpn:" + _vpnRedial.VpnName);
+			_vpnRedial.TryDisConnectVpn();
 			Thread.Sleep(1000);
-			Console.WriteLine("Finish disconnect:" + _util.VpnName);
+			Console.WriteLine("Finish disconnect:" + _vpnRedial.VpnName);
 
 			//在NAT下使用VPN，断开VPN时会导致原网络断开，需要重启网卡，暂时没有找到更好的解决方法
-			if (!string.IsNullOrEmpty(NetInterface))
+			if (!string.IsNullOrEmpty(_netInterface))
 			{
-				NetInterfaceUtils.ChangeNetworkConnectionStatus(false, NetInterface);
+				NetInterfaceUtil.ChangeNetworkConnectionStatus(false, _netInterface);
 				Thread.Sleep(2000);
-				NetInterfaceUtils.ChangeNetworkConnectionStatus(true, NetInterface);
+				NetInterfaceUtil.ChangeNetworkConnectionStatus(true, _netInterface);
 				Thread.Sleep(2000);
 			}
 
-			Console.WriteLine("Trying to connect Vpn:" + _util.VpnName);
-			_util.TryConnectVpn();
+			Console.WriteLine("Trying to connect Vpn:" + _vpnRedial.VpnName);
+			_vpnRedial.TryConnectVpn();
 			Thread.Sleep(1000);
-			Console.WriteLine("Finish connect:" + _util.VpnName);
+			Console.WriteLine("Finish connect:" + _vpnRedial.VpnName);
 		}
 	}
 }

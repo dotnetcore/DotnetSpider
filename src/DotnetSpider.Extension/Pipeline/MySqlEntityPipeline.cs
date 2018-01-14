@@ -10,13 +10,25 @@ using System;
 
 namespace DotnetSpider.Extension.Pipeline
 {
+	/// <summary>
+	/// 把解析到的爬虫实体数据存到MySql中
+	/// </summary>
 	public class MySqlEntityPipeline : BaseEntityDbPipeline
 	{
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="connectString">数据库连接字符串, 如果为空框架会尝试从配置文件中读取</param>
 		public MySqlEntityPipeline(string connectString = null) : base(connectString)
 		{
 			DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
 		}
 
+		/// <summary>
+		/// 通过连接字符串获取ConnectionStringSettings对象, 用于DbFactory生产IDbConnection
+		/// </summary>
+		/// <param name="connectString">连接字符器</param>
+		/// <returns>ConnectionStringSettings对象</returns>
 		protected override ConnectionStringSettings CreateConnectionStringSettings(string connectString = null)
 		{
 			ConnectionStringSettings connectionStringSettings;
@@ -31,6 +43,13 @@ namespace DotnetSpider.Extension.Pipeline
 			return connectionStringSettings;
 		}
 
+		/// <summary>
+		/// 把解析到的爬虫实体数据存到MySql中
+		/// </summary>
+		/// <param name="entityName">爬虫实体类的名称</param>
+		/// <param name="datas">实体类数据</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			int count = 0;
@@ -72,6 +91,10 @@ namespace DotnetSpider.Extension.Pipeline
 			return count;
 		}
 
+		/// <summary>
+		/// 初始化所有相关的SQL语句
+		/// </summary>
+		/// <param name="adapter">数据库管道使用的实体中间信息</param>
 		protected override void InitAllSqlOfEntity(EntityAdapter adapter)
 		{
 			adapter.InsertSql = GenerateInsertSql(adapter, false);
@@ -84,16 +107,31 @@ namespace DotnetSpider.Extension.Pipeline
 			adapter.InsertNewAndUpdateOldSql = GenerateInsertNewAndUpdateOldSql(adapter);
 		}
 
+		/// <summary>
+		/// 构造创建数据库的SQL语句
+		/// </summary>
+		/// <param name="adapter">数据库管道使用的实体中间信息</param>
+		/// <returns>SQL语句</returns>
 		protected string GenerateCreateDatabaseSql(EntityAdapter adapter)
 		{
 			return $"CREATE SCHEMA IF NOT EXISTS `{adapter.Table.Database}` DEFAULT CHARACTER SET utf8mb4;";
 		}
 
+		/// <summary>
+		/// 构造判断数据库是否存在的SQL语句
+		/// </summary>
+		/// <param name="adapter">数据库管道使用的实体中间信息</param>
+		/// <returns>SQL语句</returns>
 		protected string GenerateIfDatabaseExistsSql(EntityAdapter adapter)
 		{
 			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{adapter.Table.Database}';";
 		}
 
+		/// <summary>
+		/// 构造创建数据表的SQL语句
+		/// </summary>
+		/// <param name="adapter">数据库管道使用的实体中间信息</param>
+		/// <returns>SQL语句</returns>
 		protected string GenerateCreateTableSql(EntityAdapter adapter)
 		{
 			var tableName = adapter.Table.CalculateTableName();
@@ -127,6 +165,9 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
+		/// <summary>
+		/// 初始化数据库和相关表
+		/// </summary>
 		internal override void InitDatabaseAndTable()
 		{
 			foreach (var adapter in EntityAdapters.Values)

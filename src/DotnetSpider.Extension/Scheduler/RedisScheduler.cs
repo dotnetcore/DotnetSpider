@@ -36,10 +36,20 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _connectString;
 		private RedisConnection _redisConnection;
 
+		/// <summary>
+		/// 批量加载时的每批次加载数
+		/// </summary>
 		public int BatchCount { get; set; } = 1000;
 
+		/// <summary>
+		/// RedisScheduler是否会使用互联网
+		/// </summary>
 		protected override bool UseInternet { get; set; } = true;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="connectString">Redis连接字符串</param>
 		public RedisScheduler(string connectString)
 		{
 			if (string.IsNullOrWhiteSpace(connectString))
@@ -50,12 +60,19 @@ namespace DotnetSpider.Extension.Scheduler
 			DuplicateRemover = this;
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public RedisScheduler()
 		{
 			_connectString = Env.RedisConnectString;
 			DuplicateRemover = this;
 		}
 
+		/// <summary>
+		/// 初始化队列
+		/// </summary>
+		/// <param name="spider">爬虫对象</param>
 		public override void Init(ISpider spider)
 		{
 			base.Init(spider);
@@ -98,6 +115,9 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
+		/// <summary>
+		/// Reset duplicate check.
+		/// </summary>
 		public override void ResetDuplicateCheck()
 		{
 			var action = new Action(() =>
@@ -114,6 +134,11 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
+		/// <summary>
+		/// Check whether the request is duplicate.
+		/// </summary>
+		/// <param name="request">Request</param>
+		/// <returns>Whether the request is duplicate.</returns>
 		public virtual bool IsDuplicate(Request request)
 		{
 			return _retryPolicy.Execute(() =>
@@ -127,6 +152,10 @@ namespace DotnetSpider.Extension.Scheduler
 			});
 		}
 
+		/// <summary>
+		/// 取得一个需要处理的请求对象
+		/// </summary>
+		/// <returns>请求对象</returns>
 		public override Request Poll()
 		{
 			if (UseInternet)
@@ -139,6 +168,9 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
+		/// <summary>
+		/// 剩余链接数
+		/// </summary>
 		public override long LeftRequestsCount
 		{
 			get
@@ -154,6 +186,9 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
+		/// <summary>
+		/// 总的链接数
+		/// </summary>
 		public override long TotalRequestsCount
 		{
 			get
@@ -169,24 +204,42 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
+		/// <summary>
+		/// 采集成功的链接数
+		/// </summary>
 		public override long SuccessRequestsCount => _successCounter.Value;
 
+		/// <summary>
+		/// 采集失败的次数, 不是链接数, 如果一个链接采集多次都失败会记录多次
+		/// </summary>
 		public override long ErrorRequestsCount => _errorCounter.Value;
 
+		/// <summary>
+		/// 采集成功的链接数加 1
+		/// </summary>
 		public override void IncreaseSuccessCount()
 		{
 			_successCounter.Inc();
 		}
 
+		/// <summary>
+		/// 采集失败的次数加 1
+		/// </summary>
 		public override void IncreaseErrorCount()
 		{
 			_errorCounter.Inc();
 		}
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public override void Dispose()
 		{
 		}
 
+		/// <summary>
+		/// 清空整个队列
+		/// </summary>
 		public override void Clear()
 		{
 			base.Clear();
@@ -211,7 +264,11 @@ namespace DotnetSpider.Extension.Scheduler
 				_redisConnection.Database.KeyDelete(_errorCountKey);
 			}
 		}
-
+		
+		/// <summary>
+		/// 批量导入
+		/// </summary>
+		/// <param name="requests">请求对象</param>
 		public override void Import(IEnumerable<Request> requests)
 		{
 			var action = new Action(() =>
@@ -272,6 +329,10 @@ namespace DotnetSpider.Extension.Scheduler
 			}
 		}
 
+		/// <summary>
+		/// 把队列中的请求对象转换成List
+		/// </summary>
+		/// <returns>请求对象的List</returns>
 		public HashSet<Request> ToList()
 		{
 			HashSet<Request> requests = new HashSet<Request>();
@@ -340,6 +401,10 @@ namespace DotnetSpider.Extension.Scheduler
 		//	}
 		//}
 
+		/// <summary>
+		/// 如果链接不是重复的就添加到队列中
+		/// </summary>
+		/// <param name="request">请求对象</param>
 		protected override void PushWhenNoDuplicate(Request request)
 		{
 			request.Site = request.Site ?? Spider.Site;

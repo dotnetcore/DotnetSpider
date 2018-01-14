@@ -16,17 +16,34 @@ namespace DotnetSpider.Extension.Downloader
 	/// </summary>
 	public abstract class WebDriverLoginHandler : LoginHandler
 	{
+		/// <summary>
+		/// WebDriver
+		/// </summary>
 		public RemoteWebDriver Driver { get; set; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public WebDriverLoginHandler()
 		{
 		}
 
+		/// <summary>
+		/// 取得所有Cookie
+		/// </summary>
+		/// <param name="spider">爬虫</param>
+		/// <returns>Cookie</returns>
 		protected override CookieCollection GetCookies(ISpider spider)
 		{
 			return new CookieCollection();
 		}
 
+		/// <summary>
+		/// 执行注入Cookie的操作
+		/// </summary>
+		/// <param name="downloader">下载器</param>
+		/// <param name="spider">需要注入Cookie的爬虫</param>
+		/// <param name="pauseBeforeInject">注入Cookie前是否先暂停爬虫</param>
 		public override void Inject(IDownloader downloader, ISpider spider, bool pauseBeforeInject = true)
 		{
 			if (Driver == null)
@@ -44,23 +61,52 @@ namespace DotnetSpider.Extension.Downloader
 			});
 		}
 
+		/// <summary>
+		/// 登录操作的实现
+		/// </summary>
+		/// <returns>是否登录成功</returns>
 		protected abstract bool Login();
 	}
 
+	/// <summary>
+	/// 通用的登录操作
+	/// </summary>
 	public class CommonLoginHandler : WebDriverLoginHandler
 	{
+		/// <summary>
+		/// 登陆的链接
+		/// </summary>
 		public string Url { get; set; }
 
+		/// <summary>
+		/// 用户名在网页中的元素选择器
+		/// </summary>
 		public Selector UserSelector { get; set; }
 
+		/// <summary>
+		/// 用户名
+		/// </summary>
 		public string User { get; set; }
 
-		public Selector PassSelector { get; set; }
+		/// <summary>
+		/// 密码在网页中的元素选择器
+		/// </summary>
+		public Selector PasswordSelector { get; set; }
 
+		/// <summary>
+		/// 密码
+		/// </summary>
 		public string Password { get; set; }
 
+		/// <summary>
+		/// 登陆按钮的元素选择器
+		/// </summary>
 		public Selector SubmitSelector { get; set; }
 
+		/// <summary>
+		/// 登录操作的实现
+		/// </summary>
+		/// <returns>是否登录成功</returns>
 		protected override bool Login()
 		{
 			try
@@ -73,7 +119,7 @@ namespace DotnetSpider.Extension.Downloader
 				user.SendKeys(User);
 				Thread.Sleep(1000);
 
-				var password = FindElement(Driver, PassSelector);
+				var password = FindElement(Driver, PasswordSelector);
 				password.Clear();
 				password.SendKeys(Password);
 				Thread.Sleep(1000);
@@ -109,15 +155,29 @@ namespace DotnetSpider.Extension.Downloader
 		}
 	}
 
+	/// <summary>
+	/// 手动登录操作的实现
+	/// </summary>
 	public class ManualLoginHandler : WebDriverLoginHandler
 	{
-		public Uri Url { get; set; }
+		/// <summary>
+		/// 登陆的链接
+		/// </summary>
+		public string Url { get; set; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="url">登陆链接</param>
 		public ManualLoginHandler(string url)
 		{
-			Url = new Uri(url);
+			Url = url;
 		}
 
+		/// <summary>
+		/// 登录操作的实现
+		/// </summary>
+		/// <returns>是否登录成功</returns>
 		protected override bool Login()
 		{
 			try

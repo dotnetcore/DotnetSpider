@@ -141,7 +141,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (_session == null)
 			{
-				var cluster = CassandraUtils.CreateCluster(ConnectionSetting);
+				var cluster = CassandraUtil.CreateCluster(ConnectionSetting);
 				_session = cluster.Connect();
 			}
 

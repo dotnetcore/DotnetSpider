@@ -6,6 +6,9 @@ using System.Collections.Generic;
 // ReSharper disable once CheckNamespace
 namespace DotnetSpider.Extension
 {
+	/// <summary>
+	/// 数据库执行扩展
+	/// </summary>
 	public static class DbExecutor
 	{
 		public static bool UseNetworkCenter = true;

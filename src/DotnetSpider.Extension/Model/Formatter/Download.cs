@@ -6,18 +6,21 @@ using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Model.Formatter
 {
+	/// <summary>
+	/// 下载内容
+	/// </summary>
 	public class Download : Formatter
 	{
-		private static readonly HttpClient Client = new HttpClient
-		{
-			Timeout = new TimeSpan(0, 0, 2, 0)
-		};
-
+		/// <summary>
+		/// 执行下载操作
+		/// </summary>
+		/// <param name="value">下载的链接</param>
+		/// <returns>下载完成后的文件名</returns>
 		protected override object FormateValue(object value)
 		{
 			var filePath = value.ToString();
 			var name = Path.GetFileName(filePath);
-			Task<byte[]> task = Client.GetByteArrayAsync(filePath);
+			Task<byte[]> task = HttpSender.Client.GetByteArrayAsync(filePath);
 			task.ContinueWith(t =>
 			{
 				if (t.Exception != null)
@@ -41,6 +44,9 @@ namespace DotnetSpider.Extension.Model.Formatter
 			return name;
 		}
 
+		/// <summary>
+		/// 校验参数是否设置正确
+		/// </summary>
 		protected override void CheckArguments()
 		{
 		}

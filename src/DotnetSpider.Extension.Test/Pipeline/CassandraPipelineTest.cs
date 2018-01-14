@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		private void ClearDb()
 		{
-			var cluster = CassandraUtils.CreateCluster(connectString);
+			var cluster = CassandraUtil.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.DeleteKeyspaceIfExists(keyspace);
@@ -48,7 +48,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			// Value is null
 			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
-			var cluster = CassandraUtils.CreateCluster(connectString);
+			var cluster = CassandraUtil.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");
@@ -95,7 +95,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			// Value is null
 			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
-			var cluster = CassandraUtils.CreateCluster(connectString);
+			var cluster = CassandraUtil.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");
@@ -157,7 +157,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			// Value is null
 			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
-			var cluster = CassandraUtils.CreateCluster(connectString);
+			var cluster = CassandraUtil.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");
@@ -225,7 +225,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			// Value is null
 			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
-			var cluster = CassandraUtils.CreateCluster(connectString);
+			var cluster = CassandraUtil.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");
