@@ -149,16 +149,19 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// Handler that removes HTML tags in <see cref="Page.Content"/>.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 去除下载内容中的HTML标签
     /// </summary>
     public class PlainTextHandler : AfterDownloadCompleteHandler
     {
         /// <summary>
+        /// Remove HTML tags in <see cref="Page.Content"/>.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 去除下载内容中的HTML标签
         /// </summary>
-        /// <param name="page">页面数据</param>
-        /// <param name="downloader">下载器</param>
-        /// <param name="spider">爬虫</param>
         public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
         {
             if (page == null || string.IsNullOrWhiteSpace(page.Content))
@@ -172,16 +175,19 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// Handler that make <see cref="Page.Content"/> to uppercase.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 所有内容转化成大写
     /// </summary>
     public class ToUpperHandler : AfterDownloadCompleteHandler
     {
         /// <summary>
+        /// make <see cref="Page.Content"/> to uppercase.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 所有内容转化成大写
         /// </summary>
-        /// <param name="page">页面数据</param>
-        /// <param name="downloader">下载器</param>
-        /// <param name="spider">爬虫</param>
         public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
         {
             if (page == null || string.IsNullOrWhiteSpace(page.Content))
@@ -193,16 +199,19 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// Handler that make <see cref="Page.Content"/> to lowercase.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 所有内容转化成小写
     /// </summary>
     public class ToLowerHandler : AfterDownloadCompleteHandler
     {
         /// <summary>
+        /// make <see cref="Page.Content"/> to lowercase.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 所有内容转化成小写
         /// </summary>
-        /// <param name="page">页面数据</param>
-        /// <param name="downloader">下载器</param>
-        /// <param name="spider">爬虫</param>
         public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
         {
             if (page == null || string.IsNullOrWhiteSpace(page.Content))
