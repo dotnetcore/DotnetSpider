@@ -61,7 +61,10 @@ namespace DotnetSpider.Core.Downloader
 	}
 
     /// <summary>
-    /// 定时更新Cookie的处理器
+    /// Handler that regularly update cookies.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
+	/// 定时更新Cookie的处理器
     /// </summary>
     public class TimingUpdateCookieHandler : AfterDownloadCompleteHandler
     {
@@ -69,17 +72,21 @@ namespace DotnetSpider.Core.Downloader
         private readonly int _interval;
         private DateTime _next;
 
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="interval">间隔时间</param>
-		/// <param name="injector">Cookie注入器</param>
-		public TimingUpdateCookieHandler(int interval, ICookieInjector injector)
-		{
-			if (interval <= 0)
-			{
-				throw new ArgumentException("interval should be large than 0.");
-			}
+        /// <summary>
+        /// Construct a <see cref="TimingUpdateCookieHandler"/> instance.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
+        /// 构造方法
+        /// </summary>
+        /// <param name="interval">间隔时间 interval time in second</param>
+        /// <param name="injector">Cookie注入器 <see cref="ICookieInjector"/></param>
+        /// <exception cref="ArgumentException">dueTime should be large than 0.</exception>
+        public TimingUpdateCookieHandler(int interval, ICookieInjector injector)
+        {
+            if (interval <= 0)
+            {
+                throw new ArgumentException("interval should be large than 0.");
+            }
 
 			_cookieInjector = injector ?? throw new ArgumentNullException("CookieInjector should not be null.");
 			_next = DateTime.Now.AddSeconds(_interval);
@@ -87,11 +94,14 @@ namespace DotnetSpider.Core.Downloader
 		}
 
         /// <summary>
+        /// Update cookies regularly.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
 		/// 定时更新Cookie
-		/// </summary>
-		/// <param name="page">页面数据</param>
-		/// <param name="downloader">下载器</param>
-		/// <param name="spider">爬虫</param>
+        /// </summary>
+        /// <param name="page">页面数据 <see cref="Page"/></param>
+        /// <param name="downloader">下载器 <see cref="IDownloader"/></param>
+        /// <param name="spider">爬虫 <see cref="ISpider"/></param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (DateTime.Now > _next)
@@ -100,7 +110,7 @@ namespace DotnetSpider.Core.Downloader
 				_cookieInjector.Inject(downloader, spider);
 			}
 		}
-	}
+    }
 
     /// <summary>
     /// 当下载的内容包含指定内容时, 直接跳过此链接
