@@ -55,10 +55,7 @@ namespace DotnetSpider.Core.Downloader
                 page.AddTargetRequest(request);
             }
 
-            if (!_extractByProcessor)
-            {
-                page.SkipExtractTargetUrls = !page.SkipExtractTargetUrls || page.SkipExtractTargetUrls;
-            }
+            page.SkipExtractTargetUrls = !_extractByProcessor;
         }
     }
 
