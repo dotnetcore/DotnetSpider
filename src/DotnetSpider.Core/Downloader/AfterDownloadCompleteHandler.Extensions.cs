@@ -112,27 +112,30 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// When <see cref="Page.Content"/> contains specified content, this <see cref="Page"/> will be skipped.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 当下载的内容包含指定内容时, 直接跳过此链接
     /// </summary>
     public class SkipWhenContainsHandler : AfterDownloadCompleteHandler
     {
         private readonly string[] _contains;
 
-        /// <summary>
-        /// 构造方法
-        /// </summary>
-        /// <param name="contains">包含的内容</param>
+        /// <param name="contains">包含的内容(contents to skip)</param>
         public SkipWhenContainsHandler(params string[] contains)
         {
             _contains = contains;
         }
 
         /// <summary>
+        /// When <see cref="Page.Content"/> contains specified content, this <see cref="Page"/> will be skipped.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 如果页面数据包含指定内容, 跳过当前链接
         /// </summary>
-        /// <param name="page">页面数据</param>
-        /// <param name="downloader">下载器</param>
-        /// <param name="spider">爬虫</param>
+        /// <param name="page">页面数据 <see cref="Page"/></param>
+        /// <param name="downloader">下载器 <see cref="IDownloader"/></param>
+        /// <param name="spider">爬虫 <see cref="ISpider"/></param>
         public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
         {
             if (page == null || string.IsNullOrWhiteSpace(page.Content))
