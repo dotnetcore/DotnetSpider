@@ -80,7 +80,7 @@ namespace DotnetSpider.Sample
 			Identity = ("JD_sku_store_test_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 			AddPipeline(new MySqlEntityPipeline(null)
 			{
-				UpdateConnectString = new DbUpdateConnectString
+				UpdateConnectString = new DbConnectionStringSettingsRefresher
 				{
 					ConnectString = "Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306",
 					QueryString = "SELECT value from `dotnetspider`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"

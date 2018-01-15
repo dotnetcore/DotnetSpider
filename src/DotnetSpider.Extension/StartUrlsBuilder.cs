@@ -4,9 +4,9 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure.Database;
 using System.Configuration;
 using System.Runtime.CompilerServices;
+using DotnetSpider.Extension.Infrastructure;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Extension.Test")]
-
 namespace DotnetSpider.Extension
 {
 	/// <summary>

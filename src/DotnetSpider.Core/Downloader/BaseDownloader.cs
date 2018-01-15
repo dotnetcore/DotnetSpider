@@ -23,7 +23,11 @@ namespace DotnetSpider.Core.Downloader
 		private bool _detectedContentType;
 		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
 		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
-		protected readonly CookieContainer _cookieContainer = new CookieContainer();
+
+		/// <summary>
+		/// Cookie 容器
+		/// </summary>
+		protected readonly CookieContainer CookieContainer = new CookieContainer();
 
 		/// <summary>
 		/// Interface to inject cookie.
@@ -85,7 +89,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <returns>A System.Net.CookieCollection that contains the System.Net.Cookie instances that are associated with a specific URI.</returns>
 		public CookieCollection GetCookies(Uri uri)
 		{
-			return _cookieContainer.GetCookies(uri);
+			return CookieContainer.GetCookies(uri);
 		}
 
 		/// <summary>
@@ -98,7 +102,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				return;
 			}
-			_cookieContainer.Add(cookie);
+			CookieContainer.Add(cookie);
 			AddCookieToDownloadClient(cookie);
 		}
 

@@ -3,8 +3,17 @@ using System.Management;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
+	/// <summary>
+	/// 网络接口的帮助类
+	/// </summary>
 	public static class NetInterfaceUtil
 	{
+		/// <summary>
+		/// 更新网络接口的连接状态
+		/// </summary>
+		/// <param name="enable">启用或停用</param>
+		/// <param name="networkConnectionName">网络接口名称</param>
+		/// <returns>是否更新成功</returns>
 		public static bool ChangeNetworkConnectionStatus(bool enable, string networkConnectionName)
 		{
 			uint retRslt = 1;
@@ -23,5 +32,4 @@ namespace DotnetSpider.Extension.Infrastructure
 		}
 	}
 }
-
 #endif

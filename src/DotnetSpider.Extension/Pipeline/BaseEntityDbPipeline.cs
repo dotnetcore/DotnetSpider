@@ -52,7 +52,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 更新数据库连接字符串的接口, 如果自定义的连接字符串无法使用, 则会尝试通过更新连接字符串来重新连接
 		/// </summary>
-		public IUpdateConnectString UpdateConnectString { get; set; }
+		public IConnectionStringSettingsRefresher UpdateConnectString { get; set; }
 
 		/// <summary>
 		/// ConnectionStringSettings对象, 用于DbFactory生产IDbConnection

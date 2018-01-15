@@ -14,12 +14,19 @@ using MessagePack;
 
 namespace DotnetSpider.Extension.Pipeline
 {
+	/// <summary>
+	/// 通过HTTP上传数据到企业服务
+	/// </summary>
 	public class HttpMySqlEntityPipeline : MySqlEntityPipeline
 	{
 		private readonly string _api;
 		private readonly RetryPolicy _retryPolicy;
 		private readonly ICryptoTransform _cryptoTransform;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="api">上传的API</param>
 		public HttpMySqlEntityPipeline(string api = null)
 		{
 			if (string.IsNullOrWhiteSpace(api))
@@ -64,6 +71,13 @@ namespace DotnetSpider.Extension.Pipeline
 			});
 		}
 
+		/// <summary>
+		/// 通过HTTP上传数据到企业服务
+		/// </summary>
+		/// <param name="entityName">爬虫实体类的名称</param>
+		/// <param name="datas">实体类数据</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			int count = 0;
@@ -106,7 +120,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return count;
 		}
 
-		protected int ExecuteHttpSql(string sql, dynamic data = null)
+		private int ExecuteHttpSql(string sql, dynamic data = null)
 		{
 			MemoryStream ms = new MemoryStream();
 			CryptoStream cst = new CryptoStream(ms, _cryptoTransform, CryptoStreamMode.Write);
@@ -118,7 +132,7 @@ namespace DotnetSpider.Extension.Pipeline
 			sw.Flush();
 
 			string cryptoSql = Convert.ToBase64String(ms.GetBuffer(), 0, (int)ms.Length);
-			var json = JsonConvert.SerializeObject(new HttpPipelinePackage
+			var json = JsonConvert.SerializeObject(new
 			{
 				Sql = cryptoSql,
 				Dt = data,

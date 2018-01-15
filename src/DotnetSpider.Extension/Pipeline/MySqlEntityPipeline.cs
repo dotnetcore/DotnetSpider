@@ -7,6 +7,7 @@ using DotnetSpider.Core.Infrastructure;
 using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure.Database;
 using System;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {

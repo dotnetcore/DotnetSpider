@@ -6,11 +6,10 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-
+using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
 using Xunit;
-using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
@@ -203,7 +202,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(null)
 				{
-					UpdateConnectString = new DbUpdateConnectString
+					UpdateConnectString = new DbConnectionStringSettingsRefresher
 					{
 						ConnectString = ConnectString,
 						QueryString = "SELECT value from `dotnetspider1`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"

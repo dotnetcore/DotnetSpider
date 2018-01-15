@@ -3,6 +3,7 @@ using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Infrastructure.Database;
 using System;
 using System.Data;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension
 {

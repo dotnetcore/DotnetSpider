@@ -13,40 +13,107 @@ using DotnetSpider.Core.Infrastructure.Database;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
+	/// <summary>
+	/// 查询数据库结果
+	/// </summary>
 	internal class QueryResult
 	{
+		/// <summary>
+		/// 查询数据库结果
+		/// </summary>
 		public dynamic Result { get; set; }
 	}
 
+	/// <summary>
+	/// 验证结果
+	/// </summary>
 	public class VerificationInfo
 	{
+		/// <summary>
+		/// 是否验证通过
+		/// </summary>
 		public bool Pass { get; set; }
+
+		/// <summary>
+		/// 验证结果
+		/// </summary>
 		public string Report { get; set; }
 	}
 
+	/// <summary>
+	/// 验证接口
+	/// </summary>
 	public interface IVerification
 	{
+		/// <summary>
+		/// 名称
+		/// </summary>
 		string Name { get; }
+
+		/// <summary>
+		/// 验证规则命名
+		/// </summary>
 		string VerificationName { get; }
+
+		/// <summary>
+		/// 执行验证操作
+		/// </summary>
+		/// <param name="conn">数据库连接</param>
+		/// <returns></returns>
 		VerificationInfo Verify(IDbConnection conn);
 	}
 
+	/// <summary>
+	/// 验证接口的抽象
+	/// </summary>
 	public abstract class BaseVerification
 	{
+		/// <summary>
+		/// 日志接口
+		/// </summary>
 		protected static readonly ILogger Logger = DLog.GetLogger();
-		protected const string ValidateStatusKey = "dotnetspider:validate-stats";
-		protected List<IVerification> Verifiers = new List<IVerification>();
 
+		/// <summary>
+		/// 所有验证规则
+		/// </summary>
+		protected List<IVerification> Verifications { get; set; } = new List<IVerification>();
+
+		/// <summary>
+		/// 邮件接收人
+		/// </summary>
 		public List<string> EmailTo { get; set; }
+		/// <summary>
+		/// 邮件发送服务地址
+		/// </summary>
 		public string EmailHost { get; set; }
+		/// <summary>
+		/// 邮件的标题
+		/// </summary>
 		public string Subject { get; set; }
+		/// <summary>
+		/// 爬虫任务的描述
+		/// </summary>
 		public string Description { get; set; }
+		/// <summary>
+		/// 邮件发送服务端口
+		/// </summary>
 		public int EmailPort { get; set; } = 25;
+		/// <summary>
+		/// 邮件发送服务的用户名
+		/// </summary>
 		public string EmailAccount { get; set; }
+		/// <summary>
+		/// 邮件发送服务的密码
+		/// </summary>
 		public string EmailPassword { get; set; }
-
+		/// <summary>
+		/// 邮件发送服务的显示名称
+		/// </summary>
 		public string EmailDisplayName { get; set; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		protected BaseVerification()
 		{
 			EmailHost = Core.Env.EmailHost;
@@ -67,6 +134,15 @@ namespace DotnetSpider.Extension.Infrastructure
 			EmailDisplayName = Core.Env.EmailDisplayName;
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="emailTo">邮件接收人</param>
+		/// <param name="subject">邮件的标题</param>
+		/// <param name="host">邮件发送服务地址</param>
+		/// <param name="port">邮件发送服务端口</param>
+		/// <param name="account">邮件发送服务的用户名</param>
+		/// <param name="password">邮件发送服务的密码</param>
 		protected BaseVerification(string emailTo, string subject, string host, int port, string account, string password)
 		{
 			EmailTo = emailTo.Split(';').Select(e => e.Trim()).ToList();
@@ -77,94 +153,100 @@ namespace DotnetSpider.Extension.Infrastructure
 			Subject = subject;
 		}
 
-		public static void RemoveVerifidationLock(string identity)
-		{
-			RedisConnection.Default?.Database.HashDelete(ValidateStatusKey, identity);
-		}
-
-		public static void ProcessVerifidation(string identity, Action dataVerificationAndReport)
-		{
-			string key = $"dotnetspider:validateLocker:{identity}";
-
-			try
-			{
-				bool needVerify = true;
-				if (RedisConnection.Default != null)
-				{
-					while (!RedisConnection.Default.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
-					{
-						Thread.Sleep(1000);
-					}
-
-					var lockerValue = RedisConnection.Default.Database.HashGet(ValidateStatusKey, identity);
-					needVerify = lockerValue != "verify completed.";
-				}
-				if (needVerify)
-				{
-					Logger.Log(identity, "Start data verification...", Level.Info);
-					dataVerificationAndReport();
-					Logger.Log(identity, "Data verification complete.", Level.Info);
-				}
-				else
-				{
-					Logger.Log(identity, "Data verification is done already.", Level.Info);
-				}
-
-				if (needVerify)
-				{
-					RedisConnection.Default?.Database.HashSet(ValidateStatusKey, identity, "verify completed.");
-				}
-			}
-			catch (Exception e)
-			{
-				Logger.Log(identity, e.Message, Level.Error, e);
-			}
-			finally
-			{
-				RedisConnection.Default?.Database.LockRelease(key, 0);
-			}
-		}
-
+		/// <summary>
+		/// 添加相等的判断
+		/// </summary>
+		/// <param name="name">规则名称</param>
+		/// <param name="sql">SQL语句, 必须包含Result结果, 如: SELECT COUNT(*) AS Result FROM db.table1</param>
+		/// <param name="value">期望等于的值</param>
 		public void AddSqlEqual(string name, string sql, dynamic value)
 		{
-			Verifiers.Add(new SqlEqual(name, sql, value));
+			Verifications.Add(new SqlEqual(name, sql, value));
 		}
 
+		/// <summary>
+		/// 添加大于的判断
+		/// </summary>
+		/// <param name="name">规则名称</param>
+		/// <param name="sql">SQL语句, 必须包含Result结果, 如: SELECT COUNT(*) AS Result FROM db.table1</param>
+		/// <param name="value">期望大于的值</param>
 		public void AddSqlLarge(string name, string sql, dynamic value)
 		{
-			Verifiers.Add(new SqlLarge(name, sql, value));
+			Verifications.Add(new SqlLarge(name, sql, value));
 		}
 
+		/// <summary>
+		/// 添加小于的判断
+		/// </summary>
+		/// <param name="name">规则名称</param>
+		/// <param name="sql">SQL语句, 必须包含Result结果, 如: SELECT COUNT(*) AS Result FROM db.table1</param>
+		/// <param name="value">期望小于的值</param>
 		public void AddSqlLess(string name, string sql, dynamic value)
 		{
-			Verifiers.Add(new SqlLess(name, sql, value));
+			Verifications.Add(new SqlLess(name, sql, value));
 		}
 
+		/// <summary>
+		/// 添加范围的判断
+		/// </summary>
+		/// <param name="name">规则名称</param>
+		/// <param name="sql">SQL语句, 必须包含Result结果, 如: SELECT COUNT(*) AS Result FROM db.table1</param>
+		/// <param name="minValue">期望的最小值</param>
+		/// <param name="maxValue">期望的最大值</param>
 		public void AddSqlRange(string name, string sql, dynamic minValue, dynamic maxValue)
 		{
-			Verifiers.Add(new SqlRange(name, sql, minValue, maxValue));
+			Verifications.Add(new SqlRange(name, sql, minValue, maxValue));
 		}
 
+		/// <summary>
+		/// 添加相等的判断, 用于如数据存在内存中
+		/// </summary>
+		/// <param name="name">规则名称</param>
+		/// <param name="actual">真实值</param>
+		/// <param name="expected">期望值</param>
 		public void AddValueEqual(string name, dynamic actual, dynamic expected)
 		{
-			Verifiers.Add(new ValueEqual(name, actual, expected));
+			Verifications.Add(new ValueEqual(name, actual, expected));
 		}
 
+		/// <summary>
+		/// 添加大于的判断, 用于如数据存在内存中
+		/// </summary>
+		/// <param name="name">规则名称</param>
+		/// <param name="actual">真实值</param>
+		/// <param name="value">期望大于的值</param>
 		public void AddValueLarge(string name, dynamic actual, dynamic value)
 		{
-			Verifiers.Add(new ValueLarge(name, actual, value));
+			Verifications.Add(new ValueLarge(name, actual, value));
 		}
 
+		/// <summary>
+		/// 添加小于的判断, 用于如数据存在内存中
+		/// </summary>
+		/// <param name="name">规则名称</param>
+		/// <param name="actual">真实值</param>
+		/// <param name="value">期望小于的值</param>
 		public void AddValueLess(string name, dynamic actual, dynamic value)
 		{
-			Verifiers.Add(new ValueLess(name, actual, value));
+			Verifications.Add(new ValueLess(name, actual, value));
 		}
 
+		/// <summary>
+		/// 添加范围的判断, 用于如数据存在内存中
+		/// </summary>
+		/// <param name="name">规则名称</param>
+		/// <param name="actual">真实值</param>
+		/// <param name="minValue">期望的最小值</param>
+		/// <param name="maxValue">期望的最大值</param>
 		public void AddValueRange(string name, dynamic actual, dynamic minValue, dynamic maxValue)
 		{
-			Verifiers.Add(new ValueRange(name, actual, minValue, maxValue));
+			Verifications.Add(new ValueRange(name, actual, minValue, maxValue));
 		}
 
+		/// <summary>
+		/// 验证并发送报告
+		/// </summary>
+		/// <returns>验证的最终结果</returns>
 		public abstract VerificationResult Report();
 
 		abstract class BaseSqlVerification : IVerification
@@ -415,34 +497,84 @@ namespace DotnetSpider.Extension.Infrastructure
 		}
 	}
 
+	/// <summary>
+	/// 验证的最终结果
+	/// </summary>
 	public class VerificationResult
 	{
-		public bool PassVeridation { get; set; }
+		/// <summary>
+		/// 是否通过所有验证规则的检测
+		/// </summary>
+		public bool Success { get; set; }
 	}
 
+	/// <summary>
+	/// 验证类, 验证报告中可以在内容中插入一段样列数据
+	/// </summary>
 	public class Verification : BaseVerification
 	{
-		public Description Properties { get; }
+		/// <summary>
+		/// 爬虫任务上的描述
+		/// </summary>
+		private readonly Description _description;
 
-		public string ReportSampleSql { get; set; }
+		/// <summary>
+		/// 验证报告中可以在内容中插入一段样列数据
+		/// </summary>
+		private readonly string _reportSampleSql;
 
-		public string ExportDataSql { get; set; }
+		/// <summary>
+		/// 验证报告附件的数据
+		/// </summary>
+		private readonly string _exportDataSql;
 
-		public string ExportDataFileName { get; set; }
+		/// <summary>
+		/// 验证报告数据的名件名
+		/// </summary>
+		private readonly string _exportDataFileName;
 
-		public Verification(Type type, string reportSampleSql = null)
+		/// <summary>
+		/// 构造方法, 验证报告中可以在内容中插入一段样列数据
+		/// </summary>
+		/// <param name="type">爬虫任务的类型</param>
+		/// <param name="reportSampleSql">样例数据的查询语句</param>
+		/// <param name="dataSql">验证报告附件的数据查询SQL语句</param>
+		/// <param name="dataFileName">附件的数据的文件名</param>
+		public Verification(Type type, string reportSampleSql = null, string dataSql = null, string dataFileName = null)
 		{
-			Properties = type.GetTypeInfo().GetCustomAttribute<Description>();
-			EmailTo = Properties.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
-			Subject = Properties.Subject;
-			ReportSampleSql = reportSampleSql;
+			_description = type.GetTypeInfo().GetCustomAttribute<Description>();
+			EmailTo = _description.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
+			Subject = _description.Subject;
+			_reportSampleSql = reportSampleSql;
+			_exportDataSql = dataSql;
+			_exportDataFileName = dataFileName;
 		}
 
-		public Verification(Type type, string emailTo, string subject, string host, int port, string account, string password) : base(emailTo, subject, host, port, account, password)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="type">爬虫任务的类型</param>
+		/// <param name="emailTo">邮件接收人</param>
+		/// <param name="subject">邮件的标题</param>
+		/// <param name="host">邮件发送服务地址</param>
+		/// <param name="port">邮件发送服务端口</param>
+		/// <param name="account">邮件发送服务的用户名</param>
+		/// <param name="password">邮件发送服务的密码</param>
+		/// <param name="reportSampleSql">样例数据的查询语句</param>
+		/// <param name="dataSql">验证报告附件的数据查询SQL语句</param>
+		/// <param name="dataFileName">附件的数据的文件名</param>
+		public Verification(Type type, string emailTo, string subject, string host, int port, string account, string password, string reportSampleSql = null, string dataSql = null, string dataFileName = null) : base(emailTo, subject, host, port, account, password)
 		{
-			Properties = type.GetTypeInfo().GetCustomAttribute<Description>();
+			_description = type.GetTypeInfo().GetCustomAttribute<Description>();
+			_exportDataSql = dataSql;
+			_exportDataFileName = dataFileName;
+			_reportSampleSql = reportSampleSql;
 		}
 
+		/// <summary>
+		/// 验证并发送报告
+		/// </summary>
+		/// <returns>验证的最终结果</returns>
 		public override VerificationResult Report()
 		{
 			VerificationResult veridationResult = new VerificationResult();
@@ -450,17 +582,17 @@ namespace DotnetSpider.Extension.Infrastructure
 			{
 				return veridationResult;
 			}
-			if (!string.IsNullOrWhiteSpace(ReportSampleSql) && ReportSampleSql.ToLower().Contains("limit"))
+			if (!string.IsNullOrWhiteSpace(_reportSampleSql) && _reportSampleSql.ToLower().Contains("limit"))
 			{
 				Logger.Log("SQL contains 'LIMIT'.", Level.Error);
 				return veridationResult;
 			}
-			if (Verifiers != null && Verifiers.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrWhiteSpace(EmailHost))
+			if (Verifications != null && Verifications.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrWhiteSpace(EmailHost))
 			{
 				using (var conn = Core.Env.DataConnectionStringSettings.CreateDbConnection())
 				{
 					var emailBody = new StringBuilder();
-					var hasProperties = Properties != null;
+					var hasProperties = _description != null;
 					emailBody.Append(
 "<html><head>" +
 "<meta charset=\"utf-8\">" +
@@ -473,10 +605,10 @@ $"<title>{Subject}: {DateTime.Now}</title>" +
 "</head>" +
 "<body style=\"background-color:#FAF7EC\">" +
 $"<h2>{Subject}: {DateTime.Now}</h2>" +
-(hasProperties ? $"<strong>Analyst: </strong>{Properties.Owner}" : "") +
-(hasProperties ? $"&nbsp;&nbsp;&nbsp;<strong>Developer: </strong>{Properties.Developer}" : "") +
-(hasProperties ? $"&nbsp;&nbsp;&nbsp;<strong>Date: </strong>{Properties.Date}" : "") +
-(hasProperties ? $"&nbsp;&nbsp;&nbsp;<strong>Description: </strong>{Description}" : "") +
+(hasProperties ? $"<strong>Analyst: </strong>{_description.Owner}" : "") +
+(hasProperties ? $"&nbsp;&nbsp;&nbsp;<strong>Developer: </strong>{_description.Developer}" : "") +
+(hasProperties ? $"&nbsp;&nbsp;&nbsp;<strong>Date: </strong>{_description.Date}" : "") +
+(hasProperties ? $"&nbsp;&nbsp;&nbsp;<strong>Description: </strong>{base.Description}" : "") +
 "<br/><br/>" +
 "<table>" +
 "<thead>" +
@@ -493,7 +625,7 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 "<tbody>"
 );
 					var success = true;
-					foreach (var verifier in Verifiers)
+					foreach (var verifier in Verifications)
 					{
 						var result = verifier.Verify(conn);
 						emailBody.AppendLine(result.Report);
@@ -502,12 +634,12 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 							success = false;
 						}
 					}
-					veridationResult.PassVeridation = success;
+					veridationResult.Success = success;
 					emailBody.Append("</tbody></table><br/>");
-					if (!string.IsNullOrWhiteSpace(ReportSampleSql))
+					if (!string.IsNullOrWhiteSpace(_reportSampleSql))
 					{
 						emailBody.Append("<strong>数据样本</strong><br/><br/>");
-						emailBody.Append(conn.ToHtml($"{ReportSampleSql} LIMIT 100;"));
+						emailBody.Append(conn.ToHtml($"{_reportSampleSql} LIMIT 100;"));
 					}
 					emailBody.Append("<br/><br/></body></html>");
 
@@ -527,9 +659,9 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 					};
 					var multipart = new Multipart("mixed") { html };
 
-					if (veridationResult.PassVeridation && !string.IsNullOrWhiteSpace(ExportDataSql) && !string.IsNullOrWhiteSpace(ExportDataFileName))
+					if (veridationResult.Success && !string.IsNullOrWhiteSpace(_exportDataSql) && !string.IsNullOrWhiteSpace(_exportDataFileName))
 					{
-						var path = conn.Export(ExportDataSql, $"{ExportDataFileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
+						var path = conn.Export(_exportDataSql, $"{_exportDataFileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
 						var attachment = new MimePart("excel", "xlsx")
 						{
 							ContentObject = new ContentObject(File.OpenRead(path)),
@@ -560,15 +692,36 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 		}
 	}
 
+	/// <summary>
+	/// 验证类, 验证报告中可以在内容中插入一段样列数据
+	/// </summary>
+	/// <typeparam name="TE">爬虫任务的类型</typeparam>
 	public class Verification<TE> : Verification
 	{
-		public Verification(string reportSampleSql = null) : base(typeof(TE), reportSampleSql)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="reportSampleSql">样例数据的查询语句</param>
+		/// <param name="dataSql">附件的数据查询SQL语句</param>
+		/// <param name="dataFileName">附件的数据的文件名</param>
+		public Verification(string reportSampleSql = null, string dataSql = null, string dataFileName = null) : base(typeof(TE), reportSampleSql, dataSql, dataFileName)
 		{
 		}
 
-		public Verification(string emailTo, string subject, string host, int port, string account, string password) : base(typeof(TE), emailTo, subject, host, port, account, password)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="emailTo">邮件接收人</param>
+		/// <param name="subject">邮件的标题</param>
+		/// <param name="host">邮件发送服务地址</param>
+		/// <param name="port">邮件发送服务端口</param>
+		/// <param name="account">邮件发送服务的用户名</param>
+		/// <param name="password">邮件发送服务的密码</param>
+		/// <param name="reportSampleSql">样例数据的查询语句</param>
+		/// <param name="dataSql">附件的数据查询SQL语句</param>
+		/// <param name="dataFileName">附件的数据的文件名</param>
+		public Verification(string emailTo, string subject, string host, int port, string account, string password, string reportSampleSql = null, string dataSql = null, string dataFileName = null) : base(typeof(TE), emailTo, subject, host, port, account, password, reportSampleSql, dataSql, dataFileName)
 		{
 		}
-
 	}
 }

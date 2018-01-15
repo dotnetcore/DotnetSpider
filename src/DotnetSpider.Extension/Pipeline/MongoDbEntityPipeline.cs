@@ -8,34 +8,53 @@ using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
 using System.Linq;
 using DotnetSpider.Core;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
+	/// <summary>
+	/// 把解析到的爬虫实体数据存到MongoDb中
+	/// </summary>
 	public class MongoDbEntityPipeline : BaseEntityPipeline
 	{
 		private readonly ConcurrentDictionary<string, IMongoCollection<BsonDocument>> _collections = new ConcurrentDictionary<string, IMongoCollection<BsonDocument>>();
 
-		private string ConnectString { get; }
+		private readonly string _connectString;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="connectString">连接字符串</param>
 		public MongoDbEntityPipeline(string connectString)
 		{
-			ConnectString = connectString;
+			_connectString = connectString;
 		}
 
-		public override void AddEntity(IEntityDefine metadata)
+		/// <summary>
+		/// 添加爬虫实体类的定义
+		/// </summary>
+		/// <param name="entityDefine">爬虫实体类的定义</param>
+		public override void AddEntity(IEntityDefine entityDefine)
 		{
-			if (metadata.TableInfo == null)
+			if (entityDefine.TableInfo == null)
 			{
-				Logger.Log($"Schema is necessary, skip {GetType().Name} for {metadata.Name}.", Level.Warn);
+				Logger.Log($"Schema is necessary, skip {GetType().Name} for {entityDefine.Name}.", Level.Warn);
 				return;
 			}
 
-			MongoClient client = new MongoClient(ConnectString);
-			var db = client.GetDatabase(metadata.TableInfo.Database);
+			MongoClient client = new MongoClient(_connectString);
+			var db = client.GetDatabase(entityDefine.TableInfo.Database);
 
-			_collections.TryAdd(metadata.Name, db.GetCollection<BsonDocument>(metadata.TableInfo.CalculateTableName()));
+			_collections.TryAdd(entityDefine.Name, db.GetCollection<BsonDocument>(entityDefine.TableInfo.CalculateTableName()));
 		}
 
+		/// <summary>
+		/// 把解析到的爬虫实体数据存到MongoDb中
+		/// </summary>
+		/// <param name="entityName">爬虫实体类的名称</param>
+		/// <param name="datas">实体类数据</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			if (_collections.TryGetValue(entityName, out var collection))

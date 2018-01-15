@@ -11,6 +11,9 @@ using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension.Pipeline
 {
+	/// <summary>
+	/// 把解析到的爬虫实体数据存到Cassandra中
+	/// </summary>
 	public class CassandraEntityPipeline : BaseEntityPipeline
 	{
 		private PipelineMode _defaultPipelineModel;
@@ -18,15 +21,25 @@ namespace DotnetSpider.Extension.Pipeline
 		private ISession _session;
 		private CassandraConnectionSetting ConnectionSetting { get; set; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public CassandraEntityPipeline() : this(Env.DataConnectionStringSettings?.ConnectionString)
 		{
 		}
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="connectString">连接字符串</param>
 		public CassandraEntityPipeline(string connectString)
 		{
 			ConnectionSetting = new CassandraConnectionSetting(connectString);
 		}
 
+		/// <summary>
+		/// 数据管道模式
+		/// </summary>
 		public PipelineMode DefaultPipelineModel
 		{
 			get => _defaultPipelineModel;
@@ -43,6 +56,10 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
+		/// <summary>
+		/// 添加爬虫实体类的定义
+		/// </summary>
+		/// <param name="entityDefine">爬虫实体类的定义</param>
 		public override void AddEntity(IEntityDefine entityDefine)
 		{
 			if (entityDefine == null)
@@ -76,7 +93,14 @@ namespace DotnetSpider.Extension.Pipeline
 
 			EntityAdapters.TryAdd(entityDefine.Name, entityAdapter);
 		}
-
+		
+		/// <summary>
+		/// 处理爬虫实体解析器解析到的实体数据结果
+		/// </summary>
+		/// <param name="name">爬虫实体类的名称</param>
+		/// <param name="datas">实体类数据</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		public override int Process(string name, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			if (datas == null)
@@ -134,7 +158,10 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			return datas.Count();
 		}
-
+		
+		/// <summary>
+		/// 在使用数据管道前, 进行一些初始化工作, 不是所有的数据管道都需要进行初始化
+		/// </summary>
 		public override void Init()
 		{
 			base.Init();
@@ -157,7 +184,10 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 		}
-
+		
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public override void Dispose()
 		{
 			base.Dispose();

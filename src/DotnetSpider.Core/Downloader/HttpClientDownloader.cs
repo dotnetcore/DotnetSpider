@@ -93,14 +93,14 @@ namespace DotnetSpider.Core.Downloader
 				if (spider.Site.HttpProxyPool == null)
 				{
 					// Request可以设置不同的DownloaderGroup来使用不同的HttpClient
-					httpClientItem = HttpClientPool.GetHttpClient(spider, this, _cookieContainer, request.DownloaderGroup, CookieInjector);
+					httpClientItem = HttpClientPool.GetHttpClient(spider, this, CookieContainer, request.DownloaderGroup, CookieInjector);
 				}
 				else
 				{
 					// TODO: 代理模式下: request.DownloaderGroup 再考虑
 					var proxy = spider.Site.HttpProxyPool.GetProxy();
 					request.Proxy = proxy;
-					httpClientItem = HttpClientPool.GetHttpClient(spider, this, _cookieContainer, proxy?.GetHashCode(), CookieInjector);
+					httpClientItem = HttpClientPool.GetHttpClient(spider, this, CookieContainer, proxy?.GetHashCode(), CookieInjector);
 					httpClientItem.Handler.Proxy = httpClientItem.Handler.Proxy ?? proxy;
 				}
 				if (!Equals(httpClientItem.Client.Timeout.TotalSeconds, _timeout))

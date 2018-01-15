@@ -5,6 +5,7 @@ using DotnetSpider.Core.Infrastructure.Database;
 using System.Data;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Core;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Monitor
 {

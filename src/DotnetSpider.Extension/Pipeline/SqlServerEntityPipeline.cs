@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Data.Common;
-using System.Data.SqlClient;
+using DotnetSpider.Extension.Infrastructure;
 using System.Text;
 using System.Linq;
 using DotnetSpider.Extension.Model;

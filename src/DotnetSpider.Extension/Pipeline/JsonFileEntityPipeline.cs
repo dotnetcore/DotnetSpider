@@ -7,10 +7,20 @@ using System.Linq;
 
 namespace DotnetSpider.Extension.Pipeline
 {
+	/// <summary>
+	/// 把解析到的爬虫实体数据序列化成JSON并存到文件中
+	/// </summary>
 	public class JsonFileEntityPipeline : BaseEntityPipeline
 	{
 		private readonly Dictionary<string, StreamWriter> _writers = new Dictionary<string, StreamWriter>();
 
+		/// <summary>
+		/// 把解析到的爬虫实体数据序列化成JSON并存到文件中
+		/// </summary>
+		/// <param name="entityName">爬虫实体类的名称</param>
+		/// <param name="datas">实体类数据</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
@@ -37,7 +47,10 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			return datas.Count();
 		}
-
+		
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public override void Dispose()
 		{
 			base.Dispose();

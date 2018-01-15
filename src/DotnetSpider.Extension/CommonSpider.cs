@@ -17,6 +17,10 @@ namespace DotnetSpider.Extension
 	/// </summary>
 	public abstract class CommonSpider : Spider
 	{
+		/// <summary>
+		/// 验证结果保存到Redis中的Key
+		/// </summary>
+		private const string ValidateStatusKey = "dotnetspider:validate-stats";
 		private const string InitFinishedValue = "init complete";
 		internal const string InitStatusSetKey = "dotnetspider:init-stats";
 		internal string InitLockKey => $"dotnetspider:initLocker:{Identity}";
@@ -96,10 +100,7 @@ namespace DotnetSpider.Extension
 
 			if (IsComplete && DataVerificationAndReport != null)
 			{
-				NetworkCenter.Current.Execute("verifyAndReport", () =>
-				{
-					BaseVerification.ProcessVerifidation(Identity, DataVerificationAndReport);
-				});
+				ProcessVerifidation();
 			}
 		}
 
@@ -115,7 +116,7 @@ namespace DotnetSpider.Extension
 			{
 				Scheduler.Clear();
 				Scheduler.Dispose();
-				BaseVerification.RemoveVerifidationLock(Identity);
+				RemoveVerifidationLock();
 			}
 		}
 
@@ -267,6 +268,63 @@ namespace DotnetSpider.Extension
 		private bool IfRequireBuildStartRequests()
 		{
 			return RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity) != InitFinishedValue;
+		}
+
+		/// <summary>
+		/// 删除验证的锁, 让其它爬虫节点再次验证
+		/// </summary>
+		private void RemoveVerifidationLock()
+		{
+			RedisConnection.Default?.Database.HashDelete(ValidateStatusKey, Identity);
+		}
+
+		/// <summary>
+		/// 执行数据验证
+		/// </summary>
+		private void ProcessVerifidation()
+		{
+			NetworkCenter.Current.Execute("verifyAndReport", () =>
+			{
+				string key = $"dotnetspider:validateLocker:{Identity}";
+
+				try
+				{
+					bool needVerify = true;
+					if (RedisConnection.Default != null)
+					{
+						while (!RedisConnection.Default.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+						{
+							Thread.Sleep(1000);
+						}
+
+						var lockerValue = RedisConnection.Default.Database.HashGet(ValidateStatusKey, Identity);
+						needVerify = lockerValue != "verify completed.";
+					}
+					if (needVerify)
+					{
+						Logger.Log(Identity, "Start data verification...", Level.Info);
+						DataVerificationAndReport();
+						Logger.Log(Identity, "Data verification complete.", Level.Info);
+					}
+					else
+					{
+						Logger.Log(Identity, "Data verification is done already.", Level.Info);
+					}
+
+					if (needVerify)
+					{
+						RedisConnection.Default?.Database.HashSet(ValidateStatusKey, Identity, "verify completed.");
+					}
+				}
+				catch (Exception e)
+				{
+					Logger.Log(Identity, e.Message, Level.Error, e);
+				}
+				finally
+				{
+					RedisConnection.Default?.Database.LockRelease(key, 0);
+				}
+			});
 		}
 	}
 }

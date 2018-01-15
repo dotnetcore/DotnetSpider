@@ -1,5 +1,4 @@
-﻿
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Downloader;
 using OpenQA.Selenium;
@@ -14,20 +13,41 @@ using System.Drawing;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
+	/// <summary>
+	/// 创建WebDriver的选项
+	/// </summary>
 	public class Option
 	{
 		private string _proxy;
 
+		/// <summary>
+		/// 默认选项
+		/// </summary>
 		public static Option Default = new Option();
 
+		/// <summary>
+		/// 浏览器是否加载图片
+		/// </summary>
 		public bool LoadImage { get; set; } = true;
 
+		/// <summary>
+		/// 浏览器是否加载组件
+		/// </summary>
 		public bool AlwaysLoadNoFocusLibrary { get; set; } = true;
 
+		/// <summary>
+		/// 浏览器是否加载FlashPlayer
+		/// </summary>
 		public bool LoadFlashPlayer { get; set; } = true;
 
+		/// <summary>
+		/// 是否使用无头浏览器模式
+		/// </summary>
 		public bool Headless { get; set; }
 
+		/// <summary>
+		/// 使用的代理地址
+		/// </summary>
 		public string Proxy
 		{
 			get => _proxy;
@@ -56,21 +76,39 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
+		/// <summary>
+		/// The proxy authentication info (e.g. username:password).
+		/// </summary>
 		public string ProxyAuthentication { get; set; }
 	}
 
-	public static class WebDriverExtensions
+	/// <summary>
+	/// WebDriver 帮助类
+	/// </summary>
+	public static class WebDriverUtil
 	{
 #if !NET_CORE
-		public static Image ElementSnapshot(this IWebElement element, Bitmap screenSnapshot)
+		/// <summary>
+		/// 保存页面元素的内容为图片
+		/// </summary>
+		/// <param name="element">页面元素</param>
+		/// <returns>图片</returns>
+		public static Image ElementSnapshot(this IWebElement element)
 		{
+			Bitmap screenSnapshot = new Bitmap(element.Size.Width, element.Size.Height);
 			Size size = new Size(Math.Min(element.Size.Width, screenSnapshot.Width),
 				Math.Min(element.Size.Height, screenSnapshot.Height));
 			Rectangle crop = new Rectangle(element.Location, size);
 			return screenSnapshot.Clone(crop, screenSnapshot.PixelFormat);
 		}
 #endif
-		public static IWebDriver Open(Browser browser, Option option, WebDriverCookieInjector cookieInjector = null)
+		/// <summary>
+		/// 打开一个浏览器
+		/// </summary>
+		/// <param name="browser">浏览器</param>
+		/// <param name="option">选项</param>
+		/// <returns>WebDriver对象</returns>
+		public static IWebDriver Open(Browser browser, Option option)
 		{
 			IWebDriver e = null;
 			switch (browser)

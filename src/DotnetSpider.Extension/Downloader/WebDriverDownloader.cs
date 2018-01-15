@@ -94,11 +94,11 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					if (_webDriver == null)
 					{
-						_webDriver = WebDriverExtensions.Open(_browser, _option);
+						_webDriver = WebDriverUtil.Open(_browser, _option);
 
 						foreach (var domain in _domains)
 						{
-							var cookies = _cookieContainer.GetCookies(new Uri(domain));
+							var cookies = CookieContainer.GetCookies(new Uri(domain));
 							foreach (System.Net.Cookie cookie in cookies)
 							{
 								AddCookieToDownloadClient(cookie);
@@ -127,21 +127,6 @@ namespace DotnetSpider.Extension.Downloader
 
 				var domainUrl = $"{request.Uri.Scheme}://{request.Uri.DnsSafeHost}{(request.Uri.Port == 80 ? "" : ":" + request.Uri.Port)}";
 
-				// TODO:重新实现WebDriverDownloader设置Cookie
-				//var options = _webDriver.Manage();
-				//if (options.Cookies.AllCookies.Count == 0 && spider.Site.Cookies?.PairPart.Count > 0)
-				//{
-				//	_webDriver.Url = domainUrl;
-				//	options.Cookies.DeleteAllCookies();
-				//	if (spider.Site.Cookies != null)
-				//	{
-				//		foreach (var c in spider.Site.Cookies.PairPart)
-				//		{
-				//			options.Cookies.AddCookie(new Cookie(c.Key, c.Value));
-				//		}
-				//	}
-				//}
-
 				string realUrl = request.Url.ToString();
 
 				NetworkCenter.Current.Execute("webdriver-download", () =>
@@ -165,8 +150,6 @@ namespace DotnetSpider.Extension.Downloader
 					TargetUrl = _webDriver.Url
 				};
 
-				// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
-				//request.PutExtra(Request.CycleTriedTimes, null);
 				return page;
 			}
 			catch (DownloadException de)
