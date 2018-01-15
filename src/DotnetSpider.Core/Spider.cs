@@ -701,15 +701,20 @@ namespace DotnetSpider.Core
 					SafeDestroy(downloader);
 				});
 			}
-
+			string msg;
 			EndTime = DateTime.Now;
-			_realStat = Status.Exited;
-
+			if (_realStat != Status.Finished)
+			{
+				_realStat = Status.Exited;
+				msg = "Crawl terminated";
+			}
+			else
+			{
+				msg = "Crawl complete";
+			}
 			ReportStatus();
-
 			OnClose();
 
-			var msg = Stat == Status.Finished ? "Crawl complete" : "Crawl terminated";
 			Logger.Log(Identity, $"{msg}, cost: {(EndTime - StartTime).TotalSeconds} seconds.", Level.Info);
 			PrintInfo.PrintLine();
 
