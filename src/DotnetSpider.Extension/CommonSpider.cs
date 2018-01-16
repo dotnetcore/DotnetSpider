@@ -263,17 +263,17 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		private bool IfRequireBuildStartRequests()
-		{
-			return RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity) != InitFinishedValue;
-		}
-
 		/// <summary>
 		/// 删除验证的锁, 让其它爬虫节点再次验证
 		/// </summary>
-		private void RemoveVerifidationLock()
+		protected void RemoveVerifidationLock()
 		{
 			RedisConnection.Default?.Database.HashDelete(ValidateStatusKey, Identity);
+		}
+
+		private bool IfRequireBuildStartRequests()
+		{
+			return RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity) != InitFinishedValue;
 		}
 
 		/// <summary>

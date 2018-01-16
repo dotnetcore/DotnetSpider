@@ -63,9 +63,6 @@ namespace DotnetSpider.Core
 		private readonly List<IPipeline> _pipelines = new List<IPipeline>();
 		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private bool _exited;
-		private ulong _downloadCostTime;
-		private ulong _processorCostTime;
-		private ulong _pipelineCostTime;
 
 		/// <summary>
 		/// 是否需要通过StartUrlsBuilder来初始化起始链接
@@ -196,7 +193,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Set the retry times for pipeline.
 		/// </summary>
-		public int PipelineRetryTimes { get; set; } = 1;
+		public int PipelineRetryTimes { get; set; } = 2;
 
 		/// <summary>
 		/// Scheduler of spider.

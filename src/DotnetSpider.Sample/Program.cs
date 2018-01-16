@@ -80,8 +80,6 @@ namespace DotnetSpider.Sample
 		/// </summary>
 		private static void MyTest()
 		{
-			LogTest test = new LogTest();
-			test.DatebaseLogAndStatus();
 		}
 	}
 

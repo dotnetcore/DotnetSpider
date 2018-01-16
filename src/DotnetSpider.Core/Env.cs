@@ -157,12 +157,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 向企业服务添加运行记录的地址
 		/// </summary>
-		public static string EnterpiseServiceIncreaseRunningUrl { get; private set; }
+		public static string EnterpiseServiceIncreaseRunningUrl { get; internal set; }
 
 		/// <summary>
 		/// 向企业服务删除运行记录的地址
 		/// </summary>
-		public static string EnterpiseServiceReduceRunningUrl { get; private set; }
+		public static string EnterpiseServiceReduceRunningUrl { get; internal set; }
 
 		/// <summary>
 		/// 访问企业服务时使用的凭证
