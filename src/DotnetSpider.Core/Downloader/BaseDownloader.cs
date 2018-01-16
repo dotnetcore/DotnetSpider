@@ -107,7 +107,8 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		/// <summary>
-		/// 设置 Cookie
+		/// 下载器在第一次使用时, 会把CookieContainer中的Cookie加载到下载工具中(HttpClient, WebDriver), 
+		/// 但当下载器已经在运行时, 更新Cookie则需要使用此方法把新的Cookie更新到各个下载工具中
 		/// </summary>
 		/// <param name="cookie">Cookie</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
@@ -192,6 +193,11 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
+		/// <summary>
+		/// TODO: 应该考虑使用更高效的检测方法, 以及是否有方法可以去掉同步锁
+		/// </summary>
+		/// <param name="page"></param>
+		/// <param name="spider"></param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		private void TryDetectContentType(Page page, ISpider spider)
 		{

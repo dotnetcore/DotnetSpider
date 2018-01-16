@@ -19,6 +19,7 @@ using System.Reflection;
 using Polly;
 using Polly.Retry;
 using System.IO.MemoryMappedFiles;
+using System.Collections.ObjectModel;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
 [assembly: InternalsVisibleTo("DotnetSpider.Sample")]
@@ -59,8 +60,12 @@ namespace DotnetSpider.Core
 		private MemoryMappedFile _identityMmf;
 		private MemoryMappedFile _taskIdMmf;
 		private readonly string[] _closeSignalFiles = new string[2];
-
+		private readonly List<IPipeline> _pipelines = new List<IPipeline>();
+		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private bool _exited;
+		private ulong _downloadCostTime;
+		private ulong _processorCostTime;
+		private ulong _pipelineCostTime;
 
 		/// <summary>
 		/// 是否需要通过StartUrlsBuilder来初始化起始链接
@@ -80,14 +85,14 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Storage all processors for spider.
+		/// All pipelines for spider.
 		/// </summary>
-		protected readonly List<IPageProcessor> PageProcessors = new List<IPageProcessor>();
+		protected ReadOnlyCollection<IPipeline> Pipelines => new ReadOnlyCollection<IPipeline>(_pipelines);
 
 		/// <summary>
-		/// Storage all pipelines for spider.
+		/// Storage all processors for spider.
 		/// </summary>
-		protected readonly List<IPipeline> Pipelines = new List<IPipeline>();
+		protected ReadOnlyCollection<IPageProcessor> PageProcessors => new ReadOnlyCollection<IPageProcessor>(_pageProcessors);
 
 		/// <summary>
 		/// start time of spider.
@@ -350,7 +355,7 @@ namespace DotnetSpider.Core
 		public static Spider Create(Site site, params IPageProcessor[] pageProcessors)
 		{
 			return new Spider(site, Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(),
-				pageProcessors);
+				pageProcessors, null);
 		}
 
 		/// <summary>
@@ -362,7 +367,76 @@ namespace DotnetSpider.Core
 		/// <returns>爬虫</returns>
 		public static Spider Create(Site site, IScheduler scheduler, params IPageProcessor[] pageProcessors)
 		{
-			return new Spider(site, Guid.NewGuid().ToString("N"), scheduler, pageProcessors);
+			return new Spider(site, Guid.NewGuid().ToString("N"), scheduler, pageProcessors, null);
+		}
+
+		/// <summary>
+		/// Create a spider with pageProcessors and scheduler.
+		/// </summary>
+		/// <param name="site">网站信息</param>
+		/// <param name="identify">唯一标识</param>
+		/// <param name="pageProcessors">页面解析器</param>
+		/// <param name="scheduler">调度队列</param>
+		/// <returns>爬虫</returns>
+		public static Spider Create(Site site, string identify, IScheduler scheduler, params IPageProcessor[] pageProcessors)
+		{
+			return new Spider(site, identify, scheduler, pageProcessors, null);
+		}
+
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		protected Spider()
+		{
+#if NET_CORE
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#else
+			ThreadPool.SetMinThreads(200, 200);
+#endif
+			var type = GetType();
+			var spiderNameAttribute = type.GetCustomAttribute<TaskName>();
+			if (spiderNameAttribute != null)
+			{
+				Name = spiderNameAttribute.Name;
+			}
+			else
+			{
+				Name = type.Name;
+			}
+
+			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+		}
+
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="site">站点信息</param>
+		public Spider(Site site) : this()
+		{
+			_site = site ?? new Site();
+		}
+
+		/// <summary>
+		/// Create a spider with site, identity, scheduler and pageProcessors.
+		/// </summary>
+		/// <param name="site">网站信息</param>
+		/// <param name="identity">唯一标识</param>
+		/// <param name="scheduler">调度队列</param>
+		/// <param name="pageProcessors">页面解析器</param>
+		/// <param name="pipelines">数据管道</param>
+		public Spider(Site site, string identity, IScheduler scheduler, IEnumerable<IPageProcessor> pageProcessors, IEnumerable<IPipeline> pipelines) : this(site)
+		{
+			_identity = identity;
+			Scheduler = scheduler;
+			if (pageProcessors != null)
+			{
+				AddPageProcessor(pageProcessors.ToArray());
+			}
+			if (pipelines != null)
+			{
+				AddPipelines(pipelines.ToArray());
+			}
+			CheckIfSettingsCorrect();
 		}
 
 		/// <summary>
@@ -391,43 +465,6 @@ namespace DotnetSpider.Core
 			{
 				return null;
 			}
-		}
-
-		/// <summary>
-		/// Create a spider with pageProcessors and scheduler.
-		/// </summary>
-		/// <param name="site">网站信息</param>
-		/// <param name="identify">唯一标识</param>
-		/// <param name="pageProcessors">页面解析器</param>
-		/// <param name="scheduler">调度队列</param>
-		/// <returns>爬虫</returns>
-		public static Spider Create(Site site, string identify, IScheduler scheduler, params IPageProcessor[] pageProcessors)
-		{
-			return new Spider(site, identify, scheduler, pageProcessors);
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		protected Spider()
-		{
-#if NET_CORE
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#else
-			ThreadPool.SetMinThreads(200, 200);
-#endif
-			var type = GetType();
-			var spiderNameAttribute = type.GetCustomAttribute<TaskName>();
-			if (spiderNameAttribute != null)
-			{
-				Name = spiderNameAttribute.Name;
-			}
-			else
-			{
-				Name = type.Name;
-			}
-
-			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 		}
 
 		/// <summary>
@@ -522,7 +559,7 @@ namespace DotnetSpider.Core
 			if (pipeline != null)
 			{
 				CheckIfRunning();
-				Pipelines.Add(pipeline);
+				_pipelines.Add(pipeline);
 			}
 			return this;
 		}
@@ -539,7 +576,10 @@ namespace DotnetSpider.Core
 				CheckIfRunning();
 				foreach (var processor in processors)
 				{
-					PageProcessors.Add(processor);
+					if (processor != null)
+					{
+						_pageProcessors.Add(processor);
+					}
 				}
 			}
 			return this;
@@ -550,12 +590,18 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="pipelines">数据管道</param>
 		/// <returns>爬虫</returns>
-		public virtual Spider AddPipelines(IList<IPipeline> pipelines)
+		public virtual Spider AddPipelines(params IPipeline[] pipelines)
 		{
-			CheckIfRunning();
-			foreach (var pipeline in pipelines)
+			if (pipelines != null && pipelines.Length > 0)
 			{
-				AddPipeline(pipeline);
+				CheckIfRunning();
+				foreach (var pipeline in pipelines)
+				{
+					if (pipeline != null)
+					{
+						AddPipeline(pipeline);
+					}
+				}
 			}
 			return this;
 		}
@@ -566,7 +612,7 @@ namespace DotnetSpider.Core
 		/// <returns>All pipelines of spider.</returns>
 		public IList<IPipeline> GetPipelines()
 		{
-			return Pipelines.AsReadOnly();
+			return _pipelines.AsReadOnly();
 		}
 
 		/// <summary>
@@ -575,7 +621,7 @@ namespace DotnetSpider.Core
 		/// <returns>爬虫</returns>
 		public Spider ClearPipeline()
 		{
-			Pipelines.Clear();
+			_pipelines.Clear();
 			return this;
 		}
 
@@ -728,23 +774,24 @@ namespace DotnetSpider.Core
 		/// <param name="action">暂停完成后执行的回调</param>
 		public void Pause(Action action = null)
 		{
-			if (Stat != Status.Running)
+			bool isRunning = Stat == Status.Running;
+			if (!isRunning)
 			{
 				Logger.Log(Identity, "Crawler is not running.", Level.Warn);
-				return;
+				action?.Invoke();
 			}
-			Stat = Status.Paused;
-			Logger.Log(Identity, "Stop running...", Level.Warn);
-			if (action != null)
+			else
 			{
-				Task.Factory.StartNew(() =>
+				Stat = Status.Paused;
+				Logger.Log(Identity, "Stop running...", Level.Warn);
+				if (action != null)
 				{
 					while (_realStat != Status.Paused)
 					{
 						Thread.Sleep(100);
 					}
 					action();
-				});
+				}
 			}
 		}
 
@@ -852,42 +899,6 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="site">站点信息</param>
-		protected Spider(Site site) : this()
-		{
-			_site = site ?? throw new SpiderException("Site should not be null.");
-		}
-
-		/// <summary>
-		/// Create a spider with site, identity, scheduler and pageProcessors.
-		/// </summary>
-		/// <param name="site">网站信息</param>
-		/// <param name="identity">唯一标识</param>
-		/// <param name="scheduler">调度队列</param>
-		/// <param name="pageProcessors">页面解析器</param>
-		protected Spider(Site site, string identity, IScheduler scheduler, params IPageProcessor[] pageProcessors) : this()
-		{
-			_identity = identity;
-
-			if (pageProcessors != null)
-			{
-				PageProcessors = pageProcessors.ToList();
-			}
-			_site = site;
-
-			Scheduler = scheduler;
-
-			if (_site == null)
-			{
-				_site = new Site();
-			}
-
-			CheckIfSettingsCorrect();
-		}
-
-		/// <summary>
 		/// Check if all settings of spider are correct.
 		/// </summary>
 		protected void CheckIfSettingsCorrect()
@@ -898,17 +909,17 @@ namespace DotnetSpider.Core
 
 			if (Identity.Length > Env.IdentityMaxLength)
 			{
-				throw new SpiderException($"Length of Identity should less than {Env.IdentityMaxLength}.");
+				throw new ArgumentException($"Length of Identity should less than {Env.IdentityMaxLength}.");
 			}
 
 			if (Site == null)
 			{
-				throw new SpiderException($"Site should not be null.");
+				throw new ArgumentException($"Site should not be null.");
 			}
 
 			if (Site.RemoveOutboundLinks && (Site.Domains == null || Site.Domains.Length == 0))
 			{
-				throw new SpiderException($"When you want remove outbound links, the domains should not be null or empty.");
+				throw new ArgumentException($"When you want remove outbound links, the domains should not be null or empty.");
 			}
 		}
 
@@ -980,7 +991,7 @@ namespace DotnetSpider.Core
 		{
 			var containsData = _cached != null && _cached.Count > 0;
 
-			foreach (IPipeline pipeline in Pipelines)
+			foreach (IPipeline pipeline in _pipelines)
 			{
 				if (containsData)
 				{
@@ -1165,7 +1176,7 @@ namespace DotnetSpider.Core
 
 				if (CachedSize == 1)
 				{
-					foreach (IPipeline pipeline in Pipelines)
+					foreach (IPipeline pipeline in _pipelines)
 					{
 						try
 						{
@@ -1204,7 +1215,7 @@ namespace DotnetSpider.Core
 						{
 							var items = _cached.ToArray();
 							_cached.Clear();
-							foreach (IPipeline pipeline in Pipelines)
+							foreach (IPipeline pipeline in _pipelines)
 							{
 								pipeline.Process(items, this);
 							}
@@ -1277,16 +1288,16 @@ namespace DotnetSpider.Core
 		/// <param name="arguments">运行参数</param>
 		protected virtual void InitPipelines(params string[] arguments)
 		{
-			if (Pipelines == null || Pipelines.Count == 0)
+			if (_pipelines == null || _pipelines.Count == 0)
 			{
 				var defaultPipeline = GetDefaultPipeline();
 				if (defaultPipeline != null)
 				{
-					Pipelines.Add(defaultPipeline);
+					_pipelines.Add(defaultPipeline);
 				}
 			}
 
-			foreach (var pipeline in Pipelines)
+			foreach (var pipeline in _pipelines)
 			{
 				pipeline.Init();
 			}

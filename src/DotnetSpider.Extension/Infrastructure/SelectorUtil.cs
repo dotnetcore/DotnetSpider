@@ -3,8 +3,8 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
 using System;
+using System.Diagnostics.Contracts;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <param name="field">环境变量名称</param>
 		/// <param name="page">页面信息</param>
 		/// <param name="index">当前属性在所有属性中的索引</param>
-		/// <returns></returns>
+		/// <returns>环境变量值</returns>
 		public static object GetEnviromentValue(string field, Page page, int index)
 		{
 			var key = field.ToLower();
@@ -75,7 +75,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// </summary>
 		/// <param name="selector">BaseSelector</param>
 		/// <returns>查询器</returns>
-		public static ISelector Parse(BaseSelector selector)
+		public static ISelector ToSelector(this ISelectorAttribute selector)
 		{
 			if (selector != null)
 			{
@@ -100,13 +100,13 @@ namespace DotnetSpider.Extension.Infrastructure
 					case SelectorType.Regex:
 						{
 							NotNullExpression(selector);
-							if (string.IsNullOrEmpty(selector.Argument))
+							if (string.IsNullOrEmpty(selector.Arguments))
 							{
 								return Selectors.Regex(expression);
 							}
 							else
 							{
-								if (int.TryParse(selector.Argument, out var group))
+								if (int.TryParse(selector.Arguments, out var group))
 								{
 									return Selectors.Regex(expression, group);
 								}
@@ -129,51 +129,12 @@ namespace DotnetSpider.Extension.Infrastructure
 				return null;
 			}
 		}
-		
-		/// <summary>
-		/// 把Selector转换成真正的查询器
-		/// </summary>
-		/// <param name="selector">Selector</param>
-		/// <returns>查询器</returns>
-		public static ISelector Parse(Selector selector)
-		{
-			if (!string.IsNullOrWhiteSpace(selector?.Expression))
-			{
-				string expression = selector.Expression;
 
-				switch (selector.Type)
-				{
-					case SelectorType.Css:
-						{
-							return Selectors.Css(expression);
-						}
-					case SelectorType.Enviroment:
-						{
-							return Selectors.Enviroment(expression);
-						}
-					case SelectorType.JsonPath:
-						{
-							return Selectors.JsonPath(expression);
-						}
-					case SelectorType.Regex:
-						{
-							return Selectors.Regex(expression);
-						}
-					case SelectorType.XPath:
-						{
-							return Selectors.XPath(expression);
-						}
-				}
-			}
-
-			throw new SpiderException("Not support selector: " + selector);
-		}
-
-		private static void NotNullExpression(BaseSelector selector)
+		internal static void NotNullExpression(ISelectorAttribute selector)
 		{
 			if (string.IsNullOrWhiteSpace(selector.Expression))
 			{
-				throw new SpiderException($"Expression of {selector} should not be null/empty.");
+				throw new ArgumentException($"Expression of {selector} should not be null/empty.");
 			}
 		}
 	}

@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public abstract class CookieInjector : Named, ICookieInjector
 	{
-		private DateTime _lastInjectTime;
+		private DateTime _lastInjectedTime;
 
 		/// <summary>
 		/// 日志接口
@@ -72,11 +72,11 @@ namespace DotnetSpider.Core.Downloader
 		protected bool CheckFrequency()
 		{
 			var now = DateTime.Now;
-			if ((now - _lastInjectTime).TotalSeconds < FrequencyLimitation)
+			if ((now - _lastInjectedTime).TotalSeconds < FrequencyLimitation)
 			{
 				return false;
 			}
-			_lastInjectTime = now;
+			_lastInjectedTime = now;
 			return true;
 		}
 	}

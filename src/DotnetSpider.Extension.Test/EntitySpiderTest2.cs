@@ -206,18 +206,18 @@ namespace DotnetSpider.Extension.Test
 		public void EntitySelector()
 		{
 			var entity1 = new EntityDefine<Entity7>();
-			Assert.Equal("expression", entity1.Selector.Expression);
-			Assert.Equal(SelectorType.XPath, entity1.Selector.Type);
+			Assert.Equal("expression", entity1.SelectorAttribute.Expression);
+			Assert.Equal(SelectorType.XPath, entity1.SelectorAttribute.Type);
 			Assert.True(entity1.Multi);
 
 			var entity2 = new EntityDefine<Entity8>();
-			Assert.Equal("expression2", entity2.Selector.Expression);
-			Assert.Equal(SelectorType.Css, entity2.Selector.Type);
+			Assert.Equal("expression2", entity2.SelectorAttribute.Expression);
+			Assert.Equal(SelectorType.Css, entity2.SelectorAttribute.Type);
 			Assert.True(entity2.Multi);
 
 			var entity3 = new EntityDefine<Entity9>();
 			Assert.False(entity3.Multi);
-			Assert.Null(entity3.Selector);
+			Assert.Null(entity3.SelectorAttribute);
 			Assert.Equal("DotnetSpider.Extension.Test.EntitySpiderTest2+Entity9", entity3.Name);
 		}
 

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using DotnetSpider.Core.Infrastructure;
+using System;
+using System.IO;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -15,8 +17,11 @@ namespace DotnetSpider.Core.Downloader
 		/// <returns>页面数据</returns>
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
-			var filePath = request.Uri.AbsoluteUri;
-
+			var filePath = request.Uri.LocalPath;
+			if (filePath.StartsWith("\\"))
+			{
+				filePath = filePath.Substring(2, filePath.Length - 2);
+			}
 			if (!string.IsNullOrWhiteSpace(filePath))
 			{
 				if (File.Exists(filePath))
@@ -27,8 +32,15 @@ namespace DotnetSpider.Core.Downloader
 					};
 				}
 			}
+			var msg = $"File {filePath} unfound.";
+			Page page = new Page(request)
+			{
+				Exception = new DownloadException(msg),
+				Skip = true
+			};
 
-			return null;
+			Logger.Log(spider.Identity, $"Download {request.Url} failed: {msg}.", Level.Error);
+			return page;
 		}
 	}
 }

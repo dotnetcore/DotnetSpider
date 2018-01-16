@@ -87,7 +87,7 @@ namespace DotnetSpider.Core.Processor
 			{
 				throw new SpiderException("paginationStr should not be null.");
 			}
-			_paginationPattern = new Regex($"{RegexUtil.Number.Replace(paginationStr, @"\d+")}");
+			_paginationPattern = new Regex($"{RegexUtil.Number.Replace(paginationStr, @"(?<page>\d+)")}");
 			_maxPage = maxPage;
 		}
 
@@ -98,8 +98,8 @@ namespace DotnetSpider.Core.Processor
 		/// <returns>如果返回 True, 则说明已经采到到了最后一个链接</returns>
 		public bool IsTermination(Page page)
 		{
-			var currentPage = int.Parse(_paginationPattern.Match(page.Url).Value);
-			return currentPage < _maxPage;
+			var currentPage = int.Parse(_paginationPattern.Match(page.Url).Groups["page"].Value);
+			return currentPage >= _maxPage;
 		}
 	}
 }

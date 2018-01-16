@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
 	/// 下载器接口
 	/// </summary>
-	public interface IDownloader : System.IDisposable
+	public interface IDownloader : IDisposable
 	{
 		/// <summary>
 		/// 下载链接内容

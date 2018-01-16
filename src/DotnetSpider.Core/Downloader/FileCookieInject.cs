@@ -5,7 +5,13 @@ using System.Net;
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
-	/// 从指定文件中读取Cookie注入到爬虫中
+	/// 从指定文件中读取Cookie注入到爬虫中, 文件格式支持两种：
+	/// baidu.com
+	/// a=b;c=e
+	/// 
+	/// baidu.com
+	/// /
+	/// a=b;c=e
 	/// </summary>
 	public class FileCookieInject : CookieInjector
 	{
@@ -26,7 +32,7 @@ namespace DotnetSpider.Core.Downloader
 		{
 			if (!File.Exists(path))
 			{
-				throw new DownloadException("Cookie file unfound.");
+				throw new ArgumentException("Cookie file unfound.");
 			}
 			_cookiePath = path;
 		}

@@ -21,7 +21,7 @@ namespace DotnetSpider.Extension.Model
 		/// <summary>
 		/// 爬虫实体类的选择器
 		/// </summary>
-		BaseSelector Selector { get; }
+		SelectorAttribute SelectorAttribute { get; }
 
 		/// <summary>
 		/// 实体结果是否多个
@@ -73,7 +73,7 @@ namespace DotnetSpider.Extension.Model
 		/// <summary>
 		/// 爬虫实体类的选择器
 		/// </summary>
-		public BaseSelector Selector { get; set; }
+		public SelectorAttribute SelectorAttribute { get; set; }
 
 		/// <summary>
 		/// 实体结果是否多个
@@ -143,7 +143,7 @@ namespace DotnetSpider.Extension.Model
 			{
 				Multi = true;
 				Take = entitySelector.Take;
-				Selector = new BaseSelector { Expression = entitySelector.Expression, Type = entitySelector.Type };
+				SelectorAttribute = new SelectorAttribute { Expression = entitySelector.Expression, Type = entitySelector.Type };
 			}
 			else
 			{
@@ -299,11 +299,11 @@ namespace DotnetSpider.Extension.Model
 			}
 			DefaultValue = Property.PropertyType.IsValueType ? Activator.CreateInstance(Property.PropertyType) : null;
 			Option = propertyDefine.Option;
-			Selector = new BaseSelector
+			SelectorAttribute = new SelectorAttribute
 			{
 				Expression = propertyDefine.Expression,
 				Type = propertyDefine.Type,
-				Argument = propertyDefine.Argument
+				Arguments = propertyDefine.Arguments
 			};
 			NotNull = propertyDefine.NotNull;
 			IgnoreStore = propertyDefine.IgnoreStore;
@@ -338,7 +338,7 @@ namespace DotnetSpider.Extension.Model
 		/// <summary>
 		/// 属性值的选择器
 		/// </summary>
-		public BaseSelector Selector { get; set; }
+		public SelectorAttribute SelectorAttribute { get; set; }
 
 		/// <summary>
 		/// 属性值是否为空

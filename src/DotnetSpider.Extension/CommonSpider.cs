@@ -7,8 +7,6 @@ using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Redial;
-using Polly;
-using Polly.Retry;
 
 namespace DotnetSpider.Extension
 {

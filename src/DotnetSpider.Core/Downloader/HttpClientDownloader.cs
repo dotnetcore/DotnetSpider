@@ -89,7 +89,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, spider.Site);
 
-				HttpClientItem httpClientItem;
+				HttpClientElement httpClientItem;
 				if (spider.Site.HttpProxyPool == null)
 				{
 					// Request可以设置不同的DownloaderGroup来使用不同的HttpClient
@@ -142,26 +142,11 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (DownloadException de)
 			{
-				Page page = spider.Site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, spider.Site) : new Page(request);
-
-				if (page != null)
-				{
-					page.Exception = de;
-				}
-				Logger.Log(spider.Identity, $"Download {request.Url} failed: {de.Message}", Level.Warn);
-
-				return page;
+				return CreateRetryPage(de, request, spider);
 			}
 			catch (HttpRequestException he)
 			{
-				Page page = spider.Site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, spider.Site) : new Page(request);
-				if (page != null)
-				{
-					page.Exception = he;
-				}
-
-				Logger.Log(spider.Identity, $"Download {request.Url} failed: {he.Message}.", Level.Warn);
-				return page;
+				return CreateRetryPage(he, request, spider);
 			}
 			catch (Exception e)
 			{
@@ -185,6 +170,18 @@ namespace DotnetSpider.Core.Downloader
 					Logger.Log(spider.Identity, $"Close response fail: {e}", Level.Error, e);
 				}
 			}
+		}
+
+		private Page CreateRetryPage(Exception e, Request request, ISpider spider)
+		{
+			Page page = spider.Site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, spider.Site) : new Page(request);
+			if (page != null)
+			{
+				page.Exception = e;
+			}
+
+			Logger.Log(spider.Identity, $"Download {request.Url} failed: {e.Message}.", Level.Warn);
+			return page;
 		}
 
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request, Site site)

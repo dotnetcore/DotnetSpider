@@ -7,7 +7,7 @@ namespace DotnetSpider.Extension.Model.Attribute
 	/// 属性选择器的定义
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
-	public class PropertyDefine : BaseSelector
+	public class PropertyDefine : SelectorAttribute
 	{
 		/// <summary>
 		/// 构造方法

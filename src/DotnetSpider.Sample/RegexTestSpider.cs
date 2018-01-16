@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample
 		class HomePage : SpiderEntity
 		{
 			//jQuery(".yk-rank div:1")
-			[PropertyDefine(Expression = "<a.*?т╟вс</a>", Type = SelectorType.Regex, Argument = "1")]
+			[PropertyDefine(Expression = "<a.*?т╟вс</a>", Type = SelectorType.Regex, Arguments = "1")]
 			public string Category { get; set; }
 		}
 	}

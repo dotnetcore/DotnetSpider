@@ -34,7 +34,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// <summary>
 		/// 用户名在网页中的元素选择器
 		/// </summary>
-		public Selector UserSelector { get; set; }
+		public SelectorAttribute UserSelector { get; set; }
 
 		/// <summary>
 		/// 用户名
@@ -44,7 +44,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// <summary>
 		/// 密码在网页中的元素选择器
 		/// </summary>
-		public Selector PasswordSelector { get; set; }
+		public SelectorAttribute PasswordSelector { get; set; }
 
 		/// <summary>
 		/// 密码
@@ -54,7 +54,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// <summary>
 		/// 登陆按钮的元素选择器
 		/// </summary>
-		public Selector SubmitSelector { get; set; }
+		public SelectorAttribute SubmitSelector { get; set; }
 
 		/// <summary>
 		/// 浏览器
@@ -79,7 +79,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// <param name="webDriver">WebDriver</param>
 		/// <param name="element">页面元素选择器</param>
 		/// <returns>页面元素</returns>
-		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
+		protected IWebElement FindElement(RemoteWebDriver webDriver, SelectorAttribute element)
 		{
 			switch (element.Type)
 			{

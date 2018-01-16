@@ -118,7 +118,8 @@ namespace DotnetSpider.Core
 		public string PostBody { get; set; }
 
 		/// <summary>
-		/// 请求链接
+		/// 请求链接, 请求链接限定为Uri的原因: 无论是本地文件资源或者网络资源都是可以用Uri来定义的
+		/// 比如本地文件: file:///C:/Users/Lewis/Desktop/111.png
 		/// </summary>
 		public string Url
 		{

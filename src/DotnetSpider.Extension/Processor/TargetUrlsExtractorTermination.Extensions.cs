@@ -2,6 +2,7 @@
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 
@@ -15,7 +16,7 @@ namespace DotnetSpider.Extension.Processor
 		/// <summary>
 		/// 取得总页数的元素选择器
 		/// </summary>
-		public BaseSelector TotalPageSelector { get; set; }
+		public SelectorAttribute TotalPageSelector { get; set; }
 
 		/// <summary>
 		/// 对总页数的格式化
@@ -25,7 +26,7 @@ namespace DotnetSpider.Extension.Processor
 		/// <summary>
 		/// 取得当前页的元素选择器
 		/// </summary>
-		public BaseSelector CurrenctPageSelector { get; set; }
+		public SelectorAttribute CurrenctPageSelector { get; set; }
 
 		/// <summary>
 		/// 对当前页的格式化
@@ -53,19 +54,20 @@ namespace DotnetSpider.Extension.Processor
 			return currentStr == totalStr;
 		}
 
-		private string GetSelectorValue(Page page, BaseSelector selector)
+		private string GetSelectorValue(Page page, SelectorAttribute selectorAttribute)
 		{
 			string result = string.Empty;
-			if (selector.Type == SelectorType.Enviroment)
+			var selector = selectorAttribute.ToSelector();
+			if (selectorAttribute.Type == SelectorType.Enviroment)
 			{
-				if (SelectorUtil.Parse(selector) is EnviromentSelector enviromentSelector)
+				if (selector is EnviromentSelector enviromentSelector)
 				{
 					result = SelectorUtil.GetEnviromentValue(enviromentSelector.Field, page, 0)?.ToString();
 				}
 			}
 			else
 			{
-				result = page.Selectable.Select(SelectorUtil.Parse(selector)).GetValue();
+				result = page.Selectable.Select(selector).GetValue();
 			}
 
 			if (!string.IsNullOrEmpty(result) && TotalPageFormatters != null)

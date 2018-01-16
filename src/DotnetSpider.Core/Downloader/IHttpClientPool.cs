@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Downloader
 	/// <summary>
 	/// HttpClient信息封装
 	/// </summary>
-	public class HttpClientItem
+	public class HttpClientElement
 	{
 		/// <summary>
 		/// <see cref="HttpClient"/>
@@ -42,10 +42,10 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="cookieInjector">Cookie注入器</param>
 		/// <returns>HttpClientItem</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		HttpClientItem GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, int? hashCode = null, ICookieInjector cookieInjector = null);
+		HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, int? hashCode = null, ICookieInjector cookieInjector = null);
 
 		/// <summary>
-		/// 设置 Cookie
+		/// 更新池中所有HttpClient对象的 Cookie
 		/// </summary>
 		/// <param name="cookie">Cookie</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]

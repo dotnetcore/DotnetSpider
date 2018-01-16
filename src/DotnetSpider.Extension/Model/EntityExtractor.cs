@@ -63,11 +63,11 @@ namespace DotnetSpider.Extension.Model
 				foreach (var enviromentValue in EntityDefine.SharedValues)
 				{
 					string name = enviromentValue.Name;
-					var value = page.Selectable.Select(SelectorUtil.Parse(enviromentValue)).GetValue();
+					var value = page.Selectable.Select(enviromentValue.ToSelector()).GetValue();
 					page.Request.PutExtra(name, value);
 				}
 			}
-			ISelector selector = SelectorUtil.Parse(EntityDefine.Selector);
+			ISelector selector = EntityDefine.SelectorAttribute.ToSelector();
 			if (selector != null && EntityDefine.Multi)
 			{
 				var list = page.Selectable.SelectList(selector).Nodes();
@@ -166,7 +166,7 @@ namespace DotnetSpider.Extension.Model
 			{
 				return null;
 			}
-			ISelector selector = SelectorUtil.Parse(field.Selector);
+			ISelector selector = field.SelectorAttribute.ToSelector();
 			if (selector == null)
 			{
 				return null;

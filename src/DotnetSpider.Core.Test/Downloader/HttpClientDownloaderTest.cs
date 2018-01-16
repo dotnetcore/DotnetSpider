@@ -7,41 +7,10 @@ using DotnetSpider.Core.Pipeline;
 
 namespace DotnetSpider.Core.Test.Downloader
 {
-
 	public class HttpClientDownloaderTest
 	{
-		//[Fact]
-		//public void Timeout()
-		//{
-		//	HttpClientDownloader downloader = new HttpClientDownloader();
-		//	DefaultSpider spider = new DefaultSpider("abcd", new Site { Timeout = 5000 });
-		//	downloader.Download(new Request("http://www.163.com", null), spider);
-		//	try
-		//	{
-		//		downloader.Download(new Request("http://localhost/abcasdfasdfasdfas", null), spider);
-		//		throw new Exception("Test Failed");
-		//	}
-		//	catch (SpiderException e)
-		//	{
-		//		Assert.IsNotNull(e);
-		//	}
-		//	Stopwatch watch = new Stopwatch();
-		//	watch.Start();
-		//	try
-		//	{
-		//		downloader.Download(new Request("http://google.com/", null), spider);
-		//	}
-		//	catch (SpiderException e)
-		//	{
-		//		Assert.IsNotNull(e);
-		//	}
-		//	watch.Stop();
-		//	Assert.True(watch.ElapsedMilliseconds > 5000);
-		//	Assert.True(watch.ElapsedMilliseconds < 6000);
-		//}
-
 		/// <summary>
-		/// 手动执行此测试脚本，运行结束后用netstat -ano 查看端口占用情况。只会占用一个就对了。如果
+		/// 手动执行此测试脚本，运行结束后用netstat -ano 查看端口占用情况。只会占用一个就对了
 		/// </summary>
 		[Fact(Skip = "Need person double check")]
 		public void Ports()
@@ -132,8 +101,8 @@ namespace DotnetSpider.Core.Test.Downloader
 			};
 			var downloader = new HttpClientDownloader();
 			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site));
-
-			Assert.True(page.TargetUrl.Contains("www.jd.com/2017?t=") || page.TargetUrl.Contains("global.jd.com"));
+			Assert.DoesNotContain("1231222221111123", page.TargetUrl);
+			Assert.True(page.TargetUrl.Contains("www.jd.com/") || page.TargetUrl.Contains("global.jd.com"));
 		}
 	}
 }

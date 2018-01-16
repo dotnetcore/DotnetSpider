@@ -16,8 +16,8 @@ namespace DotnetSpider.Core.Downloader
 	public class HttpClientPool : IHttpClientPool
 	{
 		private ulong _getHttpClientCount;
-		private readonly ConcurrentDictionary<int, HttpClientItem> _pool = new ConcurrentDictionary<int, HttpClientItem>();
-		private HttpClientItem _defaultHttpClientItem;
+		private readonly ConcurrentDictionary<int, HttpClientElement> _pool = new ConcurrentDictionary<int, HttpClientElement>();
+		private HttpClientElement _defaultHttpClientItem;
 		private Dictionary<string, CookieContainer> _initedCookieContainers = new Dictionary<string, CookieContainer>();
 
 		/// <summary>
@@ -31,7 +31,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="cookieInjector">Cookie注入器</param>
 		/// <returns>HttpClientItem</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public HttpClientItem GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, int? hashCode = null, ICookieInjector cookieInjector = null)
+		public HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, int? hashCode = null, ICookieInjector cookieInjector = null)
 		{
 			if (cookieContainer == null)
 			{
@@ -100,7 +100,7 @@ namespace DotnetSpider.Core.Downloader
 			return _initedCookieContainers[key];
 		}
 
-		private HttpClientItem CreateDefaultHttpClient(CookieContainer cookieContainer)
+		private HttpClientElement CreateDefaultHttpClient(CookieContainer cookieContainer)
 		{
 			var handler = new HttpClientHandler
 			{
@@ -112,7 +112,7 @@ namespace DotnetSpider.Core.Downloader
 			};
 			handler.CookieContainer = cookieContainer;
 
-			return new HttpClientItem
+			return new HttpClientElement
 			{
 				Handler = handler,
 				Client = new HttpClient(handler),
@@ -152,7 +152,7 @@ namespace DotnetSpider.Core.Downloader
 
 			foreach (var key in needRemoveList)
 			{
-				HttpClientItem item;
+				HttpClientElement item;
 				if (_pool.TryRemove(key, out item))
 				{
 					item.Client.Dispose();

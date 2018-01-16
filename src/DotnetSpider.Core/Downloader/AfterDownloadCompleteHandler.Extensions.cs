@@ -46,10 +46,7 @@ namespace DotnetSpider.Core.Downloader
 				page.AddTargetRequest(request);
 			}
 
-			if (!_extractByProcessor)
-			{
-				page.SkipExtractTargetUrls = !page.SkipExtractTargetUrls || page.SkipExtractTargetUrls;
-			}
+			page.SkipExtractTargetUrls = !_extractByProcessor;
 		}
 	}
 
@@ -71,10 +68,10 @@ namespace DotnetSpider.Core.Downloader
 		{
 			if (interval <= 0)
 			{
-				throw new SpiderException("dueTime should be large than 0.");
+				throw new ArgumentException("interval should be large than 0.");
 			}
 
-			_cookieInjector = injector ?? throw new SpiderException("CookieInjector should not be null.");
+			_cookieInjector = injector ?? throw new ArgumentNullException("CookieInjector should not be null.");
 			_next = DateTime.Now.AddSeconds(_interval);
 			_interval = interval;
 		}
@@ -89,8 +86,8 @@ namespace DotnetSpider.Core.Downloader
 		{
 			if (DateTime.Now > _next)
 			{
-				_cookieInjector.Inject(downloader, spider);
 				_next = DateTime.Now.AddSeconds(_interval);
+				_cookieInjector.Inject(downloader, spider);
 			}
 		}
 	}
