@@ -37,7 +37,7 @@ namespace DotnetSpider.Core.Downloader
         /// Execute <see cref="ITargetUrlsExtractor"/>.
         /// </summary>
         /// <summary xml:lang="zh-CN">
-		/// 执行目标链接解析器
+        /// 执行目标链接解析器
         /// </summary>
         /// <param name="page">页面数据 <see cref="Page"/></param>
         /// <param name="downloader">下载器 <see cref="IDownloader"/></param>
@@ -55,10 +55,9 @@ namespace DotnetSpider.Core.Downloader
                 page.AddTargetRequest(request);
             }
 
-            }
-			page.SkipExtractTargetUrls = !_extractByProcessor;
-		}
-	}
+            page.SkipExtractTargetUrls = !_extractByProcessor;
+        }
+    }
 
     /// <summary>
     /// Handler that regularly update cookies.
@@ -88,10 +87,10 @@ namespace DotnetSpider.Core.Downloader
                 throw new ArgumentException("interval should be large than 0.");
             }
 
-			_cookieInjector = injector ?? throw new ArgumentNullException("CookieInjector should not be null.");
-			_next = DateTime.Now.AddSeconds(_interval);
-			_interval = interval;
-		}
+            _cookieInjector = injector ?? throw new ArgumentNullException("CookieInjector should not be null.");
+            _next = DateTime.Now.AddSeconds(_interval);
+            _interval = interval;
+        }
 
         /// <summary>
         /// Update cookies regularly.
@@ -103,13 +102,13 @@ namespace DotnetSpider.Core.Downloader
         /// <param name="downloader">下载器 <see cref="IDownloader"/></param>
         /// <param name="spider">爬虫 <see cref="ISpider"/></param>
 		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
-		{
-			if (DateTime.Now > _next)
-			{
-				_next = DateTime.Now.AddSeconds(_interval);
-				_cookieInjector.Inject(downloader, spider);
-			}
-		}
+        {
+            if (DateTime.Now > _next)
+            {
+                _next = DateTime.Now.AddSeconds(_interval);
+                _cookieInjector.Inject(downloader, spider);
+            }
+        }
     }
 
     /// <summary>
