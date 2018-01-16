@@ -351,6 +351,9 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// Retry current link when <see cref="Page.Content"/> contains specified contents.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 当包含指定内容时重试当前链接
     /// </summary>
     public class RetryWhenContainsHandler : AfterDownloadCompleteHandler
@@ -358,9 +361,12 @@ namespace DotnetSpider.Core.Downloader
         private readonly string[] _contents;
 
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 构造方法
         /// </summary>
-        /// <param name="contents">包含的内容</param>
+        /// <param name="contents">包含的内容(specified contents to detect.)</param>
         public RetryWhenContainsHandler(params string[] contents)
         {
             if (contents == null || contents.Length == 0)
@@ -372,6 +378,9 @@ namespace DotnetSpider.Core.Downloader
         }
 
         /// <summary>
+        /// Retry current link when <see cref="Page.Content"/> contains specified contents.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 当包含指定内容时重试当前链接
         /// </summary>
         /// <param name="page">页面数据</param>
@@ -392,6 +401,9 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// Redial ADSL when <see cref="Page.Content"/> contains specified contents.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 当包含指定内容时触发ADSL拨号
     /// </summary>
     public class RedialWhenContainsHandler : AfterDownloadCompleteHandler
@@ -401,13 +413,16 @@ namespace DotnetSpider.Core.Downloader
         /// <summary>
         /// 构造方法
         /// </summary>
-        /// <param name="contents">包含的内容</param>
+        /// <param name="contents">包含的内容(specified contents to detect.)</param>
         public RedialWhenContainsHandler(params string[] contents)
         {
             _contents = contents;
         }
 
         /// <summary>
+        /// Redial ADSL when <see cref="Page.Content"/> contains specified contents.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 当包含指定内容时触发ADSL拨号
         /// </summary>
         /// <param name="page">页面数据</param>
@@ -436,6 +451,9 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// Redial ADSL when <see cref="Page.Exception"/> message contains specified exception message.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 当页面数据中的异常信息包含指定内容时触发ADSL拨号
     /// </summary>
     public class RedialWhenExceptionThrowHandler : AfterDownloadCompleteHandler
@@ -445,7 +463,8 @@ namespace DotnetSpider.Core.Downloader
         /// <summary>
         /// 构造方法
         /// </summary>
-        /// <param name="exceptionMessage">异常信息</param>
+        /// <param name="exceptionMessage">异常信息(specified exception message)</param>
+        /// <exception cref="SpiderException"></exception>
         public RedialWhenExceptionThrowHandler(string exceptionMessage)
         {
             if (string.IsNullOrWhiteSpace(exceptionMessage))
@@ -457,6 +476,9 @@ namespace DotnetSpider.Core.Downloader
         }
 
         /// <summary>
+        /// Redial ADSL when <see cref="Page.Exception"/> message contains specified exception message.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 当页面数据中的异常信息包含指定内容时触发ADSL拨号
         /// </summary>
         /// <param name="page">页面数据</param>
@@ -483,6 +505,9 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// Redial ADSL and re-obtain cookie when <see cref="Page.Content"/> contains specified contents.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 当页面数据包含指定内容时触发ADSL拨号, 并且重新获取Cookie
     /// </summary>
     public class RedialAndUpdateCookiesWhenContainsHandler : AfterDownloadCompleteHandler
@@ -493,8 +518,8 @@ namespace DotnetSpider.Core.Downloader
         /// <summary>
         /// 构造方法
         /// </summary>
-        /// <param name="cookieInjector">Cookie注入器</param>
-        /// <param name="contents">包含的内容</param>
+        /// <param name="cookieInjector">Cookie注入器 <see cref="ICookieInjector"/></param>
+        /// <param name="contents">包含的内容(specified contents)</param>
         public RedialAndUpdateCookiesWhenContainsHandler(ICookieInjector cookieInjector, params string[] contents)
         {
             _cookieInjector = cookieInjector ?? throw new SpiderException("cookieInjector should not be null.");
@@ -507,6 +532,9 @@ namespace DotnetSpider.Core.Downloader
         }
 
         /// <summary>
+        /// Redial ADSL and re-obtain cookie when <see cref="Page.Content"/> contains specified contents.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 当页面数据包含指定内容时触发ADSL拨号, 并且重新获取Cookie
         /// </summary>
         /// <param name="page">页面数据</param>
