@@ -101,7 +101,7 @@ namespace DotnetSpider.Core.Downloader
         /// <param name="page">页面数据 <see cref="Page"/></param>
         /// <param name="downloader">下载器 <see cref="IDownloader"/></param>
         /// <param name="spider">爬虫 <see cref="ISpider"/></param>
-		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
+        public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
         {
             if (DateTime.Now > _next)
             {
