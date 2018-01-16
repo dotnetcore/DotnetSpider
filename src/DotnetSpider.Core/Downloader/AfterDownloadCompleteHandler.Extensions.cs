@@ -563,6 +563,9 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// Handler that cutout <see cref="Page.Content"/>.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 截取下载内容的处理器
     /// </summary>
     public class CutoutHandler : AfterDownloadCompleteHandler
@@ -573,6 +576,10 @@ namespace DotnetSpider.Core.Downloader
         private readonly int _endOffset;
 
         /// <summary>
+        /// Construct a CutoutHandler instance, it will cutout <see cref="Page.Content"/> from index of <paramref name="startPart"/> 
+        /// with <paramref name="startOffset"/> to index of <paramref name="endPart"/> with <paramref name="endOffset"/>.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 构造方法
         /// </summary>
         /// <param name="startPart">起始部分的内容</param>
@@ -588,11 +595,15 @@ namespace DotnetSpider.Core.Downloader
         }
 
         /// <summary>
+        /// Cutout <see cref="Page.Content"/>.
+        /// </summary>
+        /// <summary>
         /// 截取下载内容
         /// </summary>
         /// <param name="page">页面数据</param>
         /// <param name="downloader">下载器</param>
         /// <param name="spider">爬虫</param>
+        /// <exception cref="SpiderException"></exception>
         public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
         {
             if (page == null || string.IsNullOrWhiteSpace(page.Content) || page.Skip)
