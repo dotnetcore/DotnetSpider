@@ -224,6 +224,9 @@ namespace DotnetSpider.Core.Downloader
     }
 
     /// <summary>
+    /// Handler that replaces contents in <see cref="Page.Content"/>.
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
     /// 替换内容
     /// </summary>
     public class ReplaceHandler : AfterDownloadCompleteHandler
@@ -232,6 +235,9 @@ namespace DotnetSpider.Core.Downloader
         private readonly string _newValue;
 
         /// <summary>
+        /// Construct a ReplaceHandler
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 构造方法
         /// </summary>
         /// <param name="oldValue">The string to be replaced.</param>
@@ -243,11 +249,11 @@ namespace DotnetSpider.Core.Downloader
         }
 
         /// <summary>
+        /// Replaces contents in <see cref="Page.Content"/>.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
         /// 替换内容
         /// </summary>
-        /// <param name="page">页面数据</param>
-        /// <param name="downloader">下载器</param>
-        /// <param name="spider">爬虫</param>
         public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
         {
             if (page == null || string.IsNullOrWhiteSpace(page.Content))
