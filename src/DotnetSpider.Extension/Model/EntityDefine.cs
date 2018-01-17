@@ -49,6 +49,11 @@ namespace DotnetSpider.Extension.Model
 		int Take { get; }
 
 		/// <summary>
+		/// 设置 Take 的方向, 默认是从头部取
+		/// </summary>
+		bool TakeFromHead { get; set; }
+
+		/// <summary>
 		/// 目标链接的选择器
 		/// </summary>
 		List<TargetUrlsSelector> TargetUrlsSelectors { get; }
@@ -101,6 +106,11 @@ namespace DotnetSpider.Extension.Model
 		public int Take { get; set; }
 
 		/// <summary>
+		/// 设置 Take 的方向, 默认是从头部取
+		/// </summary>
+		public bool TakeFromHead { get; set; } = true;
+
+		/// <summary>
 		/// 目标链接的选择器
 		/// </summary>
 		public List<TargetUrlsSelector> TargetUrlsSelectors { get; set; }
@@ -143,6 +153,7 @@ namespace DotnetSpider.Extension.Model
 			{
 				Multi = true;
 				Take = entitySelector.Take;
+				TakeFromHead = entitySelector.TakeFromHead;
 				SelectorAttribute = new SelectorAttribute { Expression = entitySelector.Expression, Type = entitySelector.Type };
 			}
 			else

@@ -202,3 +202,4 @@ FakesAssemblies/
 *.opt
 
 /src/DotnetSpider.Test/Example/TestExample.cs
+/src/DotnetSpider.Sample/Class2.cs

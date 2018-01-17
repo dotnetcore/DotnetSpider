@@ -133,7 +133,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				default:
 					{
-						pipeline = new NullPipeline();
+						pipeline = new ConsolePipeline();
 						break;
 					}
 			}

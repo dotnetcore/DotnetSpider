@@ -82,7 +82,7 @@ namespace DotnetSpider.Extension
 
 				if (Pipelines == null || Pipelines.Count == 0)
 				{
-					AddPipeline(new NullPipeline());
+					AddPipeline(new ConsolePipeline());
 				}
 				if (PageProcessors == null || PageProcessors.Count == 0)
 				{

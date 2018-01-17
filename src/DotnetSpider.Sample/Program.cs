@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Test;
 using System;
 using System.Diagnostics;
@@ -23,6 +24,9 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
+			//string[] commands = "-s:AppIOSRankSpider -i:guid -tid:AppIOSRankSpider -c:app.config -a:游戏".Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+			//Startup.Run(commands);
+
 			MyTest();
 
 			Startup.Run("-s:BaiduSearchSpider", "-tid:1", "-i:guid");
@@ -80,6 +84,17 @@ namespace DotnetSpider.Sample
 		/// </summary>
 		private static void MyTest()
 		{
+			var site = new Site { CycleRetryTimes = 3, SleepTime = 300 };
+			Spider.Create(site, new GithubZlzforeverProcessor()).Run();
+		}
+
+		private class GithubZlzforeverProcessor : BasePageProcessor
+		{
+			protected override void Handle(Page page)
+			{
+				page.AddTargetRequests(page.Selectable.Links().Regex("(https://github\\.com/\\w+/\\w+)").GetValues());
+				page.AddResultItem("author", page.Selectable.XPath("").GetValue());
+			}
 		}
 	}
 

@@ -26,7 +26,7 @@ namespace DotnetSpider.Extension.Downloader
 		private readonly Browser _browser;
 		private readonly Option _option;
 		private bool _isDisposed;
-		private readonly string[] _domains;
+		private readonly List<string> _domains = new List<string>();
 		/// <summary>
 		/// 每次navigate完成后, WebDriver 需要执行的操作
 		/// </summary>
@@ -44,7 +44,16 @@ namespace DotnetSpider.Extension.Downloader
 			_webDriverWaitTime = webDriverWaitTime;
 			_browser = browser;
 			_option = option ?? new Option();
-			_domains = domains;
+			if (domains != null)
+			{
+				foreach (var domain in domains)
+				{
+					if (!string.IsNullOrWhiteSpace(domain) && !_domains.Contains(domain))
+					{
+						_domains.Add(domain);
+					}
+				}
+			}
 
 			if (browser == Browser.Firefox && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
@@ -96,12 +105,15 @@ namespace DotnetSpider.Extension.Downloader
 					{
 						_webDriver = WebDriverUtil.Open(_browser, _option);
 
-						foreach (var domain in _domains)
+						if (_domains != null)
 						{
-							var cookies = CookieContainer.GetCookies(new Uri(domain));
-							foreach (System.Net.Cookie cookie in cookies)
+							foreach (var domain in _domains)
 							{
-								AddCookieToDownloadClient(cookie);
+								var cookies = CookieContainer.GetCookies(new Uri(domain));
+								foreach (System.Net.Cookie cookie in cookies)
+								{
+									AddCookieToDownloadClient(cookie);
+								}
 							}
 						}
 
@@ -177,6 +189,10 @@ namespace DotnetSpider.Extension.Downloader
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		protected override void AddCookieToDownloadClient(System.Net.Cookie cookie)
 		{
+			if (!_domains.Contains(cookie.Domain))
+			{
+				_domains.Add(cookie.Domain);
+			}
 			_webDriver?.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
 		}
 	}

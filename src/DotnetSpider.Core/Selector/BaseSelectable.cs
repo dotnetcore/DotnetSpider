@@ -161,6 +161,5 @@ namespace DotnetSpider.Core.Selector
 		/// <param name="selector">查询器</param>
 		/// <returns>查询接口</returns>
 		public abstract ISelectable SelectList(ISelector selector);
-
 	}
 }

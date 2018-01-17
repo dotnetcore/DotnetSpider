@@ -978,7 +978,7 @@ namespace DotnetSpider.Core
 		/// <returns>数据管道</returns>
 		protected virtual IPipeline GetDefaultPipeline()
 		{
-			return new NullPipeline();
+			return new ConsolePipeline();
 		}
 
 		/// <summary>

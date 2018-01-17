@@ -77,9 +77,16 @@ namespace DotnetSpider.Extension.Model
 				}
 				else
 				{
-					if (EntityDefine.Take > 0)
+					if (EntityDefine.Take > 0 && list.Count > EntityDefine.Take)
 					{
-						list = list.Take(EntityDefine.Take).ToList();
+						if (EntityDefine.TakeFromHead)
+						{
+							list = list.Take(EntityDefine.Take).ToList();
+						}
+						else
+						{
+							list = list.Skip(list.Count - EntityDefine.Take).ToList();
+						}
 					}
 
 					for (int i = 0; i < list.Count; ++i)
