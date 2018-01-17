@@ -138,7 +138,6 @@ namespace DotnetSpider.Core.Downloader
         /// 但当下载器已经在运行时, 更新Cookie则需要使用此方法把新的Cookie更新到各个下载工具中
         /// </summary>
         /// <param name="cookie">Cookie</param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
 		protected virtual void AddCookieToDownloadClient(Cookie cookie) { }
 
         /// <summary>
@@ -240,7 +239,6 @@ namespace DotnetSpider.Core.Downloader
         /// </summary>
         /// <param name="page"></param>
         /// <param name="spider"></param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
 		private void TryDetectContentType(Page page, ISpider spider)
 		{
 			if (!_detectedContentType)
