@@ -24,8 +24,6 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-			//string[] commands = "-s:AppIOSRankSpider -i:guid -tid:AppIOSRankSpider -c:app.config -a:游戏".Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-			//Startup.Run(commands);
 
 			MyTest();
 
