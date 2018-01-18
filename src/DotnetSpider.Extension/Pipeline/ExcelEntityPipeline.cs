@@ -37,7 +37,7 @@ namespace DotnetSpider.Extension.Pipeline
 					case PipelineMode.Insert:
 					case PipelineMode.InsertAndIgnoreDuplicate:
 						{
-							WriteToExcel(entityName, datas, spider, metadata);
+							WriteToExcel(datas, spider, metadata);
 							break;
 						}
 					case PipelineMode.InsertNewAndUpdateOld:
@@ -50,7 +50,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 					default:
 						{
-							WriteToExcel(entityName, datas, spider, metadata);
+							WriteToExcel(datas, spider, metadata);
 							break;
 						}
 				}
@@ -92,10 +92,10 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private void WriteToExcel(string entityName, IEnumerable<dynamic> datas, ISpider spider, EntityAdapter adapter)
+		private void WriteToExcel(IEnumerable<dynamic> datas, ISpider spider, EntityAdapter adapter)
 		{
 			var excelPath = Path.Combine(Env.BaseDirectory, "excels", $"{spider.Name}_{spider.Identity}.xlsx");
-			var sheetName = entityName;
+			var sheetName = adapter.Table.Name;
 			var sheetIndex = $"{excelPath}.{sheetName}";
 
 			if (!_packages.ContainsKey(excelPath))
