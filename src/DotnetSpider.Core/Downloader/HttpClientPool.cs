@@ -11,6 +11,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
+	/// Httpclient pool impletion for <see cref="IHttpClientPool"/>
+	/// </summary>
+	/// <summary xml:lang="zh-CN">
 	/// HttpClient池
 	/// </summary>
 	public class HttpClientPool : IHttpClientPool
@@ -21,14 +24,19 @@ namespace DotnetSpider.Core.Downloader
 		private Dictionary<string, CookieContainer> _initedCookieContainers = new Dictionary<string, CookieContainer>();
 
 		/// <summary>
+		/// Get a <see cref="HttpClientElement"/> from <see cref="IHttpClientPool"/>.
+		/// Return same <see cref="HttpClientElement"/> instance when <paramref name="hashCode"/> is same.
+		/// This can ensure some pages have same CookieContainer.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 通过不同的Hash分组, 返回对应的HttpClient
 		/// 设计初衷: 某些网站会对COOKIE某部分做承上启下的检测, 因此必须保证: www.a.com/keyword=xxxx&amp;page=1 www.a.com/keyword=xxxx&amp;page=2 在同一个HttpClient里访问
 		/// </summary>
-		/// <param name="spider">爬虫</param>
-		/// <param name="downloader">下载器</param>
-		/// <param name="cookieContainer">Cookie</param>
-		/// <param name="hashCode">分组的哈希</param>
-		/// <param name="cookieInjector">Cookie注入器</param>
+		/// <param name="spider">爬虫 <see cref="ISpider"/></param>
+		/// <param name="downloader">下载器 <see cref="IDownloader"/></param>
+		/// <param name="cookieContainer">Cookie <see cref="CookieContainer"/></param>
+		/// <param name="hashCode">分组的哈希 Hashcode to identify different group.</param>
+		/// <param name="cookieInjector">Cookie注入器 <see cref="ICookieInjector"/></param>
 		/// <returns>HttpClientItem</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, int? hashCode = null, ICookieInjector cookieInjector = null)
@@ -69,6 +77,9 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		/// <summary>
+		/// Add cookie to <see cref="IHttpClientPool"/>
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 设置 Cookie
 		/// </summary>
 		/// <param name="cookie">Cookie</param>
