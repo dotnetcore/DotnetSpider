@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample
 			OcrDemo.Process();
 #endif
 
-			MyTest();
+			// MyTest();
 
 			Startup.Run("-s:BaiduSearchSpider", "-tid:1", "-i:guid");
 
