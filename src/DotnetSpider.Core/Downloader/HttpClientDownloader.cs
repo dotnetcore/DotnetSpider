@@ -14,11 +14,17 @@ using System.Net;
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
+	/// Downloader using <see cref="HttpClient"/>
+	/// </summary>
+	/// <summary xml:lang="zh-CN">
 	/// 纯HTTP下载器
 	/// </summary>
 	public class HttpClientDownloader : BaseDownloader
 	{
 		/// <summary>
+		/// What mediatype should not be treated as file to download.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 定义哪些类型的内容不需要当成文件下载
 		/// </summary>
 		public static HashSet<string> ExcludeMediaTypes = new HashSet<string>
@@ -43,11 +49,17 @@ namespace DotnetSpider.Core.Downloader
 		private readonly double _timeout = 5;
 
 		/// <summary>
+		/// A <see cref="HttpClient"/> pool
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// HttpClient池
 		/// </summary>
 		public static IHttpClientPool HttpClientPool = new HttpClientPool();
 
 		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 构造方法
 		/// </summary>
 		public HttpClientDownloader()
@@ -56,10 +68,13 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 构造方法
 		/// </summary>
-		/// <param name="timeout">下载超时时间</param>
-		/// <param name="decodeHtml">下载的内容是否需要HTML解码</param>
+		/// <param name="timeout">下载超时时间 Download timeout.</param>
+		/// <param name="decodeHtml">下载的内容是否需要HTML解码 Whether <see cref="Page.Content"/> need to Html Decode.</param>
 		public HttpClientDownloader(int timeout = 5, bool decodeHtml = false) : this()
 		{
 			_timeout = timeout;
@@ -67,6 +82,9 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		/// <summary>
+		/// Add cookies to download clients: HttpClient, WebDriver etc...
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 设置 Cookie 到下载客户端: HttpClient, WebDriver etc...
 		/// </summary>
 		/// <param name="cookie">Cookie</param>
@@ -76,11 +94,14 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		/// <summary>
+		/// Http download implemention
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// HTTP下载的实现
 		/// </summary>
-		/// <param name="request">请求信息</param>
-		/// <param name="spider">爬虫</param>
-		/// <returns>页面数据</returns>
+		/// <param name="request">请求信息 <see cref="Request"/></param>
+		/// <param name="spider">爬虫 <see cref="ISpider"/></param>
+		/// <returns>页面数据 <see cref="Page"/></returns>
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			HttpResponseMessage response = null;
