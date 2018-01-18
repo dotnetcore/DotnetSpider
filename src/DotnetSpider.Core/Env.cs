@@ -235,7 +235,6 @@ namespace DotnetSpider.Core
 			if (!File.Exists(path))
 			{
 				// 配置文件不是必要的运行条件, 可以在代码里自行处理连接字符串等
-				Console.WriteLine("Configuration file unfound.");
 				return;
 			}
 

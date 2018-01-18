@@ -70,7 +70,6 @@ namespace DotnetSpider.Core.Downloader
 		/// 设置 Cookie 到下载客户端: HttpClient, WebDriver etc...
 		/// </summary>
 		/// <param name="cookie">Cookie</param>
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		protected override void AddCookieToDownloadClient(Cookie cookie)
 		{
 			HttpClientPool.AddCookie(cookie);
