@@ -6,6 +6,9 @@ using System.Runtime.CompilerServices;
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
+	/// HttpClient Infomations
+	/// </summary>
+	/// <summary xml:lang="zh-CN">
 	/// HttpClient信息封装
 	/// </summary>
 	public class HttpClientElement
@@ -21,6 +24,9 @@ namespace DotnetSpider.Core.Downloader
 		public HttpClientHandler Handler { get; set; }
 
 		/// <summary>
+		/// The last time this is used.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 上一次使用的时间
 		/// </summary>
 		public DateTime LastUsedTime { get; set; }
