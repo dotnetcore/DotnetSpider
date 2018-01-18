@@ -12,7 +12,9 @@ using System.Runtime.CompilerServices;
 namespace DotnetSpider.Extension.Pipeline
 {
 	/// <summary>
-	/// 把解析到的爬虫实体数据存到Excel中
+	/// 把解析到的爬虫实体数据存到Excel中, 需要在PageProcessor中把数据存到ResultItem中
+	/// page.AddResultItem(typeof(T).FullName, t);
+	/// page.AddResultItem(typeof(T).FullName, List`T`);
 	/// </summary>
 	/// <typeparam name="T">数据对象</typeparam>
 	public class ExcelPipeline<T> : BasePipeline where T : class
