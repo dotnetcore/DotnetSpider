@@ -5,6 +5,9 @@ using System.Linq;
 using OfficeOpenXml;
 using System.IO;
 using MimeKit;
+using DotnetSpider.Core.Infrastructure;
+using System.Reflection;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
@@ -131,6 +134,35 @@ namespace DotnetSpider.Extension.Infrastructure
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, IEnumerable<string> emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
 		{
 			var path = Export(conn, sql, $"{fileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
+			EmailTo(path, subject, emailTo, emailHost, port, account, password, displayName);
+		}
+
+		/// <summary>
+		/// 文件附件发送邮件
+		/// </summary>
+		/// <typeparam name="T">爬虫实现类型</typeparam>
+		/// <param name="file">附件的路径</param>
+		public static void EmailTo<T>(string file)
+		{
+			var description = typeof(T).GetTypeInfo().GetCustomAttribute<Description>();
+			var emailTo = description.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
+			var subject = description.Subject;
+			EmailTo(file, subject, emailTo, Env.EmailHost, int.Parse(Env.EmailPort), Env.EmailAccount, Env.EmailPassword);
+		}
+
+		/// <summary>
+		/// 文件附件发送邮件
+		/// </summary>
+		/// <param name="file">附件的路径</param>
+		/// <param name="subject">邮件的标题</param>
+		/// <param name="emailTo">邮件接收人</param>
+		/// <param name="emailHost">邮件发送服务地址</param>
+		/// <param name="port">邮件发送服务端口</param>
+		/// <param name="account">邮件发送服务的用户名</param>
+		/// <param name="password">邮件发送服务的密码</param>
+		/// <param name="displayName">邮件发送服务的显示名称</param>
+		public static void EmailTo(string file, string subject, IEnumerable<string> emailTo, string emailHost, int port, string account, string password, string displayName = "DotnetSpider Alert")
+		{
 			var message = new MimeMessage();
 
 			message.From.Add(new MailboxAddress(displayName, account));
@@ -143,10 +175,10 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			var attachment = new MimePart("excel", "xlsx")
 			{
-				ContentObject = new ContentObject(File.OpenRead(path)),
+				ContentObject = new ContentObject(File.OpenRead(file)),
 				ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
 				ContentTransferEncoding = ContentEncoding.Base64,
-				FileName = Path.GetFileName(path)
+				FileName = Path.GetFileName(file)
 			};
 
 			var text = new TextPart { Text = subject };

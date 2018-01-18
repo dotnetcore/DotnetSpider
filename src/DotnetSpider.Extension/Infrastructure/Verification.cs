@@ -117,6 +117,9 @@ namespace DotnetSpider.Extension.Infrastructure
 		protected BaseVerification()
 		{
 			EmailHost = Core.Env.EmailHost;
+			EmailAccount = Core.Env.EmailAccount;
+			EmailPassword = Core.Env.EmailPassword;
+			EmailDisplayName = Core.Env.EmailDisplayName;
 			var portStr = Core.Env.EmailPort;
 			if (!string.IsNullOrWhiteSpace(portStr))
 			{
@@ -129,9 +132,6 @@ namespace DotnetSpider.Extension.Infrastructure
 					Logger.Log($"EmailPort is not a number: {portStr}.", Level.Error);
 				}
 			}
-			EmailAccount = Core.Env.EmailAccount;
-			EmailPassword = Core.Env.EmailPassword;
-			EmailDisplayName = Core.Env.EmailDisplayName;
 		}
 
 		/// <summary>
