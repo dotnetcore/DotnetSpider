@@ -11,7 +11,7 @@
 		/// <summary>
 		/// You can process page content, check downdload status(anti-spider) and update cookies etc. here.
 		/// </summary>
-		/// <summary>
+		/// <summary xml:lang="zh-CN">
 		/// 处理页面数据、检测下载情况(是否被反爬)、更新Cookie等操作
 		/// </summary>
 		/// <param name="page">页面数据 <see cref="Page"/></param>
