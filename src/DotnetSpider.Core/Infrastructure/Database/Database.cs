@@ -4,6 +4,9 @@ using System.ComponentModel;
 namespace DotnetSpider.Core.Infrastructure.Database
 {
 	/// <summary>
+	/// Database type enum
+	/// </summary>
+	/// <summary xml:lang="zh-CN">
 	/// 数据库类型
 	/// </summary>
 	[Flags]
