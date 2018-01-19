@@ -10,21 +10,33 @@ using System.Reflection;
 namespace DotnetSpider.Core.Infrastructure.Database
 {
 	/// <summary>
+	/// Database Driver Factory.
+	/// </summary>
+	/// <summary xml:lang="zh-CN">
 	/// 数据库驱动工厂
 	/// </summary>
 	public abstract class DbProviderFactories
 	{
 		/// <summary>
+		/// MySql provider name
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// MySql驱动类名
 		/// </summary>
 		public const string MySqlProvider = "MySql.Data.MySqlClient";
 
 		/// <summary>
+		/// SqlServer provider name
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// SqlServer驱动类名
 		/// </summary>
 		public const string SqlServerProvider = "System.Data.SqlClient";
 
 		/// <summary>
+		/// PostgreSql provider name
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// PostgreSql
 		/// </summary>
 		public const string PostgreSqlProvider = "Npgsql";
@@ -88,6 +100,9 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		}
 
 		/// <summary>
+		/// Get <see cref="DbProviderFactory"/> from database driver provider name.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 通过驱动类名取得工厂类
 		/// </summary>
 		/// <param name="providerInvariantName">驱动类名</param>
@@ -107,6 +122,9 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		}
 
 		/// <summary>
+		/// Register <see cref="DbProviderFactory"/> to DbProviderFactories Configs.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 注册驱动
 		/// </summary>
 		/// <param name="providerInvariantName">驱动类名</param>
