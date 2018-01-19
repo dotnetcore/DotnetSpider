@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample
 			OcrDemo.Process();
 #endif
 
-			// MyTest();
+			MyTest();
 
 			Startup.Run("-s:BaiduSearchSpider", "-tid:1", "-i:guid");
 
@@ -82,18 +82,9 @@ namespace DotnetSpider.Sample
 		/// </summary>
 		private static void MyTest()
 		{
-			var site = new Site { CycleRetryTimes = 3, SleepTime = 300 };
-			Spider.Create(site, new GithubZlzforeverProcessor()).Run();
+ 
 		}
 
-		private class GithubZlzforeverProcessor : BasePageProcessor
-		{
-			protected override void Handle(Page page)
-			{
-				page.AddTargetRequests(page.Selectable.Links().Regex("(https://github\\.com/\\w+/\\w+)").GetValues());
-				page.AddResultItem("author", page.Selectable.XPath("").GetValue());
-			}
-		}
 	}
 
 }
