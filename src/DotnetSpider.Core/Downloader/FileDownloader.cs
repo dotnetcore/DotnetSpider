@@ -5,16 +5,22 @@ using System.IO;
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
+	/// Download from local filesystem.
+	/// </summary>
+	/// <summary xml:lang="zh-CN">
 	/// 从本地文件中下载内容
 	/// </summary>
 	public class FileDownloader : BaseDownloader
 	{
 		/// <summary>
+		/// Download from local filesystem.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 从本地文件中下载内容
 		/// </summary>
-		/// <param name="request">请求信息</param>
-		/// <param name="spider">爬虫</param>
-		/// <returns>页面数据</returns>
+		/// <param name="request">请求信息 <see cref="Request"/></param>
+		/// <param name="spider">爬虫 <see cref="ISpider"/></param>
+		/// <returns>页面数据 <see cref="Page"/></returns>
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			var filePath = request.Uri.LocalPath;

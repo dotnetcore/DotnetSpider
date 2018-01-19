@@ -5,6 +5,16 @@ using System.Net;
 namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
+	/// Read cookie from specified file and inject to <see cref="ISpider"/>
+	/// It support two formats as followings:
+	/// baidu.com
+	/// a=b;c=e
+	/// 
+	/// baidu.com
+	/// /
+	/// a=b;c=e
+	/// </summary>
+	/// <summary xml:lang="zh-CN">
 	/// 从指定文件中读取Cookie注入到爬虫中, 文件格式支持两种：
 	/// baidu.com
 	/// a=b;c=e
@@ -18,6 +28,9 @@ namespace DotnetSpider.Core.Downloader
 		private readonly string _cookiePath;
 
 		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 构造方法
 		/// </summary>
 		public FileCookieInject()
@@ -25,9 +38,12 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 构造方法
 		/// </summary>
-		/// <param name="path">Cookie文件路径</param>
+		/// <param name="path">Cookie文件路径 Cookie File path</param>
 		public FileCookieInject(string path)
 		{
 			if (!File.Exists(path))
@@ -38,9 +54,12 @@ namespace DotnetSpider.Core.Downloader
 		}
 
 		/// <summary>
+		/// Obtain new cookies
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 取得新的Cookies
 		/// </summary>
-		/// <param name="spider">爬虫</param>
+		/// <param name="spider">爬虫 <see cref="ISpider"/></param>
 		/// <returns>Cookies</returns>
 		protected override CookieCollection GetCookies(ISpider spider)
 		{
