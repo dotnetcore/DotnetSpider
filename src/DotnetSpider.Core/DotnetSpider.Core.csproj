@@ -8,9 +8,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <DefineConstants>NET_CORE;$(AdditionalConstants)</DefineConstants>
+    <DocumentationFile>..\..\output\netstandard2.0\DotnetSpider.Core.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
     <DefineConstants>DEBUG;NET45</DefineConstants>
+    <DocumentationFile>..\..\output\net45\DotnetSpider.Core.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\..\output\</OutputPath>
@@ -21,14 +23,6 @@
     <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider.git</RepositoryUrl>
     <PackageTags>DotnetSpider;crawler;cross platform;dotnet core</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>..\..\output\net45\DotnetSpider.Core.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
-    <DocumentationFile>..\..\output\net45\DotnetSpider.Core.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

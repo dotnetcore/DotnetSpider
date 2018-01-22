@@ -20,9 +20,9 @@ namespace DotnetSpider.Extension.Pipeline
 		/// 构造方法
 		/// </summary>
 		/// <param name="connectString">数据库连接字符串, 如果为空框架会尝试从配置文件中读取</param>
-		public MySqlEntityPipeline(string connectString = null) : base(connectString)
+		/// <param name="pipelineMode">数据管道模式</param>
+		public MySqlEntityPipeline(string connectString = null, PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate) : base(connectString, pipelineMode)
 		{
-			DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
 		}
 
 		/// <summary>

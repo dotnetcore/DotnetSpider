@@ -20,9 +20,9 @@ namespace DotnetSpider.Extension.Pipeline
 		/// 构造方法
 		/// </summary>
 		/// <param name="connectString">数据库连接字符串, 如果为空框架会尝试从配置文件中读取</param>
-		public SqlServerEntityPipeline(string connectString = null) : base(connectString)
+		/// <param name="pipelineMode">数据管道模式</param>
+		public SqlServerEntityPipeline(string connectString = null, PipelineMode pipelineMode = PipelineMode.Insert) : base(connectString, pipelineMode)
 		{
-			DefaultPipelineModel = PipelineMode.Insert;
 		}
 
 		/// <summary>
@@ -50,7 +50,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			return connectionStringSettings;
 		}
-		
+
 		/// <summary>
 		/// 初始化所有相关的SQL语句
 		/// </summary>
@@ -70,7 +70,7 @@ namespace DotnetSpider.Extension.Pipeline
 				adapter.UpdateSql = GenerateUpdateSql(adapter);
 			}
 		}
-		
+
 		/// <summary>
 		/// 初始化数据库和相关表
 		/// </summary>

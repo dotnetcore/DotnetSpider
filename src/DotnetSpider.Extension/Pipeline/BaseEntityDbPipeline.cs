@@ -89,9 +89,11 @@ namespace DotnetSpider.Extension.Pipeline
 		/// 构造方法
 		/// </summary>
 		/// <param name="connectString">数据库连接字符串</param>
-		protected BaseEntityDbPipeline(string connectString = null)
+		/// <param name="pipelineMode">数据管道模式</param>
+		protected BaseEntityDbPipeline(string connectString = null, PipelineMode pipelineMode = PipelineMode.Insert)
 		{
 			_connectString = connectString;
+			DefaultPipelineModel = pipelineMode;
 		}
 
 		/// <summary>
