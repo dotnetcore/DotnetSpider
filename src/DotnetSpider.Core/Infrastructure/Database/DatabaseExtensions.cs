@@ -8,6 +8,9 @@ using System.Threading;
 namespace DotnetSpider.Core.Infrastructure.Database
 {
 	/// <summary>
+	/// Database Extentions
+	/// </summary>
+	/// <summary xml:lang="zh-CN">
 	/// 数据库扩展
 	/// </summary>
 	public static class DatabaseExtensions
@@ -15,10 +18,13 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		private static readonly ILogger Logger = DLog.GetLogger();
 
 		/// <summary>
+		/// Create DbConnection from <see cref="ConnectionStringSettings"/>.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 通过配置创建连接对象
 		/// </summary>
-		/// <param name="connectionStringSettings">数据库配置对象</param>
-		/// <returns>连接对象</returns>
+		/// <param name="connectionStringSettings">数据库配置对象 <see cref="ConnectionStringSettings"/></param>
+		/// <returns>连接对象 <see cref="DbConnection"/></returns>
 		public static DbConnection CreateDbConnection(this ConnectionStringSettings connectionStringSettings)
 		{
 			if (connectionStringSettings == null)
@@ -62,9 +68,12 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		}
 
 		/// <summary>
+		/// Create <see cref="DbConnection"/> instance.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 创建连接对象
 		/// </summary>
-		/// <param name="source"></param>
+		/// <param name="source"><see cref="Database"/></param>
 		/// <param name="connectString"></param>
 		/// <returns></returns>
 		public static DbConnection CreateDbConnection(Database source, string connectString)
@@ -123,11 +132,14 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		}
 
 		/// <summary>
+		/// Create <see cref="ConnectionStringSettings"/> instance.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 创建数据库配置对象
 		/// </summary>
-		/// <param name="source">数据库</param>
+		/// <param name="source">数据库 <see cref="Database"/></param>
 		/// <param name="connectString">连接字符串</param>
-		/// <returns>数据库配置对象</returns>
+		/// <returns>数据库配置对象 <see cref="ConnectionStringSettings"/></returns>
 		public static ConnectionStringSettings GetConnectionStringSettings(Database source, string connectString)
 		{
 			switch (source)
@@ -152,11 +164,14 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		}
 
 		/// <summary>
+		/// Build HTML table from sql query result.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
 		/// 把SQL查询结果拼装成HTML的table
 		/// </summary>
-		/// <param name="conn">连接对象</param>
-		/// <param name="sql">SQL语句</param>
-		/// <returns>HTML的table</returns>
+		/// <param name="conn">连接对象 <see cref="IDbConnection"/></param>
+		/// <param name="sql">SQL语句 </param>
+		/// <returns>HTML的table, HTML table</returns>
 		public static string ToHtml(this IDbConnection conn, string sql)
 		{
 			var command = conn.CreateCommand();
