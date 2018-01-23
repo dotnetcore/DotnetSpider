@@ -660,6 +660,8 @@ namespace DotnetSpider.Core
 			// 计算状态监控器每完成多少个Request则上报状态
 			int monitorInterval = CalculateMonitorInterval(Scheduler);
 
+			ReportStatus();
+
 			while (Stat == Status.Running || Stat == Status.Paused)
 			{
 				// 暂停则一直停在此处
@@ -726,15 +728,8 @@ namespace DotnetSpider.Core
 
 									if (_requstCount % monitorInterval == 0)
 									{
-										try
-										{
-											ReportStatus();
-											CheckExitSignal();
-										}
-										catch (Exception e)
-										{
-											Logger.Log(Identity, $"Report status failed: {e}.", Level.Error);
-										}
+										ReportStatus();
+										CheckExitSignal();
 									}
 								}
 							}
@@ -1461,15 +1456,25 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void ReportStatus() => Monitor?.Report(Identity, TaskId, _realStat.ToString(),
-					Monitorable.LeftRequestsCount,
-					Monitorable.TotalRequestsCount,
-					Monitorable.SuccessRequestsCount,
-					Monitorable.ErrorRequestsCount,
-					AvgDownloadSpeed,
-					AvgProcessorSpeed,
-					AvgPipelineSpeed,
-					ThreadNum);
+		private void ReportStatus()
+		{
+			try
+			{
+				Monitor?.Report(Identity, TaskId, _realStat.ToString(),
+						Monitorable.LeftRequestsCount,
+						Monitorable.TotalRequestsCount,
+						Monitorable.SuccessRequestsCount,
+						Monitorable.ErrorRequestsCount,
+						AvgDownloadSpeed,
+						AvgProcessorSpeed,
+						AvgPipelineSpeed,
+						ThreadNum);
+			}
+			catch (Exception e)
+			{
+				Logger.Log(Identity, $"Report status failed: {e}.", Level.Error);
+			}
+		}
 
 		private void InitMonitor()
 		{

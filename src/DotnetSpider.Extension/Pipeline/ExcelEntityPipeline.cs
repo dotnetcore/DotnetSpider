@@ -29,7 +29,6 @@ namespace DotnetSpider.Extension.Pipeline
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
 		{
-			int count = 0;
 			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
 				switch (metadata.PipelineMode)
@@ -42,11 +41,11 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 					case PipelineMode.InsertNewAndUpdateOld:
 						{
-							throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
+							throw new NotImplementedException("Excel not suport InsertNewAndUpdateOld yet.");
 						}
 					case PipelineMode.Update:
 						{
-							throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
+							throw new NotImplementedException("Excel not suport Update yet.");
 						}
 					default:
 						{
@@ -55,7 +54,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 				}
 			}
-			return count;
+			return datas.Count();
 		}
 
 		/// <summary>

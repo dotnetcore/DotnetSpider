@@ -152,7 +152,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 					case PipelineMode.InsertNewAndUpdateOld:
 						{
-							throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
+							throw new NotImplementedException("Cassandra not suport InsertNewAndUpdateOld yet.");
 						}
 				}
 			}
