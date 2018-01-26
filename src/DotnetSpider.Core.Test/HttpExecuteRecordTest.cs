@@ -12,11 +12,11 @@ namespace DotnetSpider.Core.Test
 		{
 			if (Env.IsWindows)
 			{
-				Env.EnterpiseServiceIncreaseRunningUrl = "http://localhost:30013/Task/IncreaseRunning";
-				Env.EnterpiseServiceReduceRunningUrl = "http://localhost:30013/Task/ReduceRunning";
+				Env.EnterpiseServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";
+
 				var recorder = new HttpExecuteRecord();
-				recorder.Add("-1", "test", "abcd");
-				recorder.Remove("-1", "test", "abcd");
+				recorder.Add("1", "test", "abcd");
+				recorder.Remove("1", "test", "abcd");
 			}
 		}
 	}

@@ -152,17 +152,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 企业服务HTTP爬虫状态的上传地址
 		/// </summary>
-		public static string EnterpiseServiceStatusUrl { get; private set; }
+		public static string EnterpiseServiceStatusApiUrl { get; private set; }
 
 		/// <summary>
 		/// 向企业服务添加运行记录的地址
 		/// </summary>
-		public static string EnterpiseServiceIncreaseRunningUrl { get; internal set; }
-
-		/// <summary>
-		/// 向企业服务删除运行记录的地址
-		/// </summary>
-		public static string EnterpiseServiceReduceRunningUrl { get; internal set; }
+		public static string EnterpiseServiceTaskApiUrl { get; internal set; }
 
 		/// <summary>
 		/// 访问企业服务时使用的凭证
@@ -254,12 +249,11 @@ namespace DotnetSpider.Core
 			EnterpiseServiceUrl = configuration.AppSettings.Settings[EnterpiseServiceUrlKey]?.Value?.Trim();
 			if (!string.IsNullOrWhiteSpace(EnterpiseServiceUrl))
 			{
-				EnterpiseServiceLogUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}Log/submit";
+				EnterpiseServiceLogUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/log";
 				EnterpiseServiceToken = configuration.AppSettings.Settings[EnterpiseServiceTokenKey]?.Value?.Trim();
-				EnterpiseServiceStatusUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}TaskStatus/AddOrUpdate";
-				EnterpiseServiceIncreaseRunningUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}Task/IncreaseRunning";
-				EnterpiseServiceReduceRunningUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}Task/ReduceRunning";
-				EnterpiseServicePipelineUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}Pipeline/Process";
+				EnterpiseServiceStatusApiUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/taskstatus";
+				EnterpiseServiceTaskApiUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/task";
+				EnterpiseServicePipelineUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/process";
 			}
 			EnterpiseServiceLog = !string.IsNullOrWhiteSpace(EnterpiseServiceLogUrl);
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];

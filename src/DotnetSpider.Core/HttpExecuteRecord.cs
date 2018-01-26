@@ -29,11 +29,7 @@ namespace DotnetSpider.Core
 			{
 				return true;
 			}
-			var json = JsonConvert.SerializeObject(new
-			{
-				TaskId = taskId
-			});
-			var content = new StringContent(json, Encoding.UTF8, "application/json");
+
 			try
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
@@ -45,7 +41,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.PostAsync(Env.EnterpiseServiceIncreaseRunningUrl, content).Result;
+						var response = HttpSender.Client.GetAsync($"{Env.EnterpiseServiceTaskApiUrl}/{taskId}?action=increase").Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});
@@ -71,12 +67,6 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			var json = JsonConvert.SerializeObject(new
-			{
-				TaskId = taskId
-			});
-			var content = new StringContent(json, Encoding.UTF8, "application/json");
-
 			try
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
@@ -88,7 +78,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.PostAsync(Env.EnterpiseServiceReduceRunningUrl, content).Result;
+						var response = HttpSender.Client.GetAsync($"{Env.EnterpiseServiceTaskApiUrl}/{taskId}?action=reduce").Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});
