@@ -27,6 +27,10 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 - PostgreSQL.
 - Cassandra
 
+### MORE DOCUMENTS
+
+https://github.com/dotnetcore/DotnetSpider/wiki
+
 ### SAMPLES
 
 	Please see the Projet DotnetSpider.Sample in the solution.
