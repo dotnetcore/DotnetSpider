@@ -89,6 +89,48 @@ namespace DotnetSpider.Core.Infrastructure
 		void Log(string identity, string message, Level level, Exception exception = null);
 
 		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Trace</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		void Trace(string message, Exception exception = null);
+
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Debug</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		void Debug(string message, Exception exception = null);
+
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Info</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		void Info(string message, Exception exception = null);
+
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Warn</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		void Warn(string message, Exception exception = null);
+
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Error</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		void Error(string message, Exception exception = null);
+
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Fatal</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		void Fatal(string message, Exception exception = null);
+
+		/// <summary>
 		/// 仅使用NLog写日志
 		/// </summary>
 		/// <param name="message">信息</param>

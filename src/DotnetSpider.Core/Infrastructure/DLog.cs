@@ -68,6 +68,61 @@ namespace DotnetSpider.Core.Infrastructure
 		}
 
 		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Trace</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		public void Trace(string message, Exception exception = null)
+		{
+			Log(message, Level.Trace, exception);
+		}
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Debug</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		public void Debug(string message, Exception exception = null)
+		{
+			Log(message, Level.Debug, exception);
+		}
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Info</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		public void Info(string message, Exception exception = null)
+		{
+			Log(message, Level.Info, exception);
+		}
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Warn</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		public void Warn(string message, Exception exception = null)
+		{
+			Log(message, Level.Warn, exception);
+		}
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Error</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		public void Error(string message, Exception exception = null)
+		{
+			Log(message, Level.Error, exception);
+		}
+		/// <summary>
+		/// Writes the diagnostic message and exception at the <c>Fatal</c> level.
+		/// </summary>
+		/// <param name="message">A <see langword="string" /> to be written.</param>
+		/// <param name="exception">An exception to be logged.</param>
+		public void Fatal(string message, Exception exception = null)
+		{
+			Log(message, Level.Fatal, exception);
+		}
+
+		/// <summary>
 		/// 仅使用NLog写日志
 		/// </summary>
 		/// <param name="identity">唯一标识</param>
