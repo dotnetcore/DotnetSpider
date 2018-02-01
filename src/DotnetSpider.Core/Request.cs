@@ -100,7 +100,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 请求链接的方法
 		/// </summary>
-		public HttpMethod Method { get; set; } = HttpMethod.Get;
+		public HttpMethod Method { get; set; }
 
 		/// <summary>
 		/// 链接的优先级, 仅用于优先级队列

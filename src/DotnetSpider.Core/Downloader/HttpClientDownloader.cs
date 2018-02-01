@@ -206,7 +206,7 @@ namespace DotnetSpider.Core.Downloader
 
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request, Site site)
 		{
-			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(request.Method, request.Url);
+			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(request.Method ?? HttpMethod.Get, request.Url);
 
 			var userAgentHeader = "User-Agent";
 			httpRequestMessage.Headers.Add(userAgentHeader, site.Headers.ContainsKey(userAgentHeader) ? site.Headers[userAgentHeader] : site.UserAgent);
