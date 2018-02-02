@@ -28,10 +28,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(Skip = "aaa")]
 		public void Insert()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
+#endif
 			ClearDb();
 
 			ISpider spider = new DefaultSpider("test", new Site());
@@ -75,10 +77,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(Skip = "aaa")]
 		public void InsertAndIgnoreDuplicate()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
+#endif
 			ClearDb();
 
 			ISpider spider = new DefaultSpider("test", new Site());
@@ -137,10 +141,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(Skip = "aaa")]
 		public void Update()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
+#endif
 			ClearDb();
 
 			ISpider spider = new DefaultSpider("test", new Site());
@@ -203,10 +209,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(Skip = "aaa")]
 		public void UpdatePipelineUseAppConfig()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
+#endif
 			ClearDb();
 
 			Env.LoadConfiguration("app.cassandra.config");

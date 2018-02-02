@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.Extensions.Logging</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Extensions.Logging.LoggerFactory">
+            <summary>
+            Summary description for LoggerFactory
+            </summary>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.LoggingServiceCollectionExtensions">
+            <summary>
+            Extension methods for setting up logging services in an <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.LoggingServiceCollectionExtensions.AddLogging(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds logging services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> so that additional calls can be chained.</returns>
+        </member>
+    </members>
+</doc>

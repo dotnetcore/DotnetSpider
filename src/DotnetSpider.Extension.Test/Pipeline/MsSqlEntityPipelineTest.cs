@@ -37,10 +37,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void Update()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
+#endif
 
 			ClearDb();
 
@@ -79,10 +81,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void Insert()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
+#endif
 			ClearDb();
 
 			using (SqlConnection conn = new SqlConnection(ConnectString))
@@ -114,10 +118,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void DefineUpdateEntity()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
+#endif
 			SqlServerEntityPipeline insertPipeline = new SqlServerEntityPipeline(ConnectString);
 			try
 			{

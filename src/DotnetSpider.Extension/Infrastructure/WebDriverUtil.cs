@@ -7,7 +7,7 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.PhantomJS;
 using System;
 using System.IO;
-#if !NET_CORE
+#if NET45
 using System.Drawing;
 #endif
 
@@ -87,7 +87,7 @@ namespace DotnetSpider.Extension.Infrastructure
 	/// </summary>
 	public static class WebDriverUtil
 	{
-#if !NET_CORE
+#if NET45
 		/// <summary>
 		/// 保存页面元素的内容为图片
 		/// </summary>

@@ -385,7 +385,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		protected Spider()
 		{
-#if NET_CORE
+#if !NET45
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
 			ThreadPool.SetMinThreads(200, 200);

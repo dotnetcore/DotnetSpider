@@ -26,10 +26,12 @@ namespace DotnetSpider.Extension.Test.Downloader
 		[Fact]
 		public void DestoryDownloader()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
+#endif
 
 			var chromedriverCount1 = Process.GetProcessesByName("chromedriver").Length;
 
@@ -45,11 +47,12 @@ namespace DotnetSpider.Extension.Test.Downloader
 		[Fact]
 		public void ChromeHeadlessDownloader()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
-
+#endif
 			BaiduSearchHeadlessSpider spider = new BaiduSearchHeadlessSpider();
 			spider.Run();
 		}

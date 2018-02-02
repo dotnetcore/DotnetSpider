@@ -2,7 +2,6 @@
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Extension.Test;
 using System;
 using System.Diagnostics;
 using System.Net.Http;

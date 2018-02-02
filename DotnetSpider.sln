@@ -1,72 +1,102 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Core", "src\DotnetSpider.Core\DotnetSpider.Core.csproj", "{5C1BFB68-305B-4CF1-B985-630A447074F2}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DotnetSpider.HtmlAgilityPack.Css", "src\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.shproj", "{95A647F3-963F-4EAB-B3A2-99027C46DD0A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.HtmlAgilityPack.Css", "src\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj", "{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DotnetSpider.Core", "src\DotnetSpider.Core\DotnetSpider.Core.shproj", "{6C8BEE01-E343-486A-95C9-00B784FE66FB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Core.Test", "src\DotnetSpider.Core.Test\DotnetSpider.Core.Test.csproj", "{5118198E-0F4C-44FF-94E7-03AEAB896EBF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "netstandard2.0", "netstandard2.0", "{8438D658-FF75-45BC-8498-6FDFD4B46D73}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Extension", "src\DotnetSpider.Extension\DotnetSpider.Extension.csproj", "{AB496600-ABF5-494A-B07B-A36D9C2D0455}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.HtmlAgilityPack.Css", "src\netstandard2.0\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj", "{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Extension.Test", "src\DotnetSpider.Extension.Test\DotnetSpider.Extension.Test.csproj", "{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Core", "src\netstandard2.0\DotnetSpider.Core\DotnetSpider.Core.csproj", "{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Sample", "src\DotnetSpider.Sample\DotnetSpider.Sample.csproj", "{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DotnetSpider.Core.Test", "src\DotnetSpider.Core.Test\DotnetSpider.Core.Test.shproj", "{1CE8FC3B-2587-4FBD-9B3D-AB319FF1E9DD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{67D308FE-3967-420F-91B0-1F1EB5C09FF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Core.Test", "src\netstandard2.0\DotnetSpider.Core.Test\DotnetSpider.Core.Test.csproj", "{864721C5-4CBC-49C9-B055-2A379AE74873}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Extension", "src\netstandard2.0\DotnetSpider.Extension\DotnetSpider.Extension.csproj", "{2ACD924E-E8CC-42D7-BE2B-59EC621DE372}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DotnetSpider.Extension", "src\DotnetSpider.Extension\DotnetSpider.Extension.shproj", "{0CA2DE6E-7171-412F-9006-4B2ACE38AB97}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DotnetSpider.Extension.Test", "src\DotnetSpider.Extension.Test\DotnetSpider.Extension.Test.shproj", "{13887DEC-7830-4009-B124-29AC8511DCD9}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DotnetSpider.Sample", "src\DotnetSpider.Sample\DotnetSpider.Sample.shproj", "{789A17BF-9B08-4743-81DD-5512E5220848}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Extension.Test", "src\netstandard2.0\DotnetSpider.Extension.Test\DotnetSpider.Extension.Test.csproj", "{ACABB6C0-67EA-451A-98C4-2DE4D4F605B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8DB7C869-8EE4-431E-A26A-EA5F2A97E4BF}"
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
 		build.bat = build.bat
 		build.sh = build.sh
-		LICENSE = LICENSE
+		guide.md = guide.md
 		pack.bat = pack.bat
 		publishToNuget.bat = publishToNuget.bat
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{C74A404F-B0E5-466C-937A-66D04C4CFFEB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{13559074-6A43-417F-A4BF-ACB24250479C}"
 	ProjectSection(SolutionItems) = preProject
 		nuget\DotnetSpider.Core.nuspec = nuget\DotnetSpider.Core.nuspec
 		nuget\DotnetSpider.Extension.nuspec = nuget\DotnetSpider.Extension.nuspec
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Sample", "src\netstandard2.0\DotnetSpider.Sample\DotnetSpider.Sample.csproj", "{CCAF9862-4F29-43CA-BAE7-6134EC3A68DB}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\DotnetSpider.Extension\DotnetSpider.Extension.projitems*{0ca2de6e-7171-412f-9006-4b2ace38ab97}*SharedItemsImports = 13
+		src\DotnetSpider.Extension.Test\DotnetSpider.Extension.Test.projitems*{13887dec-7830-4009-b124-29ac8511dcd9}*SharedItemsImports = 13
+		src\DotnetSpider.Core.Test\DotnetSpider.Core.Test.projitems*{1ce8fc3b-2587-4fbd-9b3d-ab319ff1e9dd}*SharedItemsImports = 13
+		src\DotnetSpider.Core\DotnetSpider.Core.projitems*{6c8bee01-e343-486a-95c9-00b784fe66fb}*SharedItemsImports = 13
+		src\DotnetSpider.Sample\DotnetSpider.Sample.projitems*{789a17bf-9b08-4743-81dd-5512e5220848}*SharedItemsImports = 13
+		src\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.projitems*{95a647f3-963f-4eab-b3a2-99027c46dd0a}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5C1BFB68-305B-4CF1-B985-630A447074F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C1BFB68-305B-4CF1-B985-630A447074F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C1BFB68-305B-4CF1-B985-630A447074F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C1BFB68-305B-4CF1-B985-630A447074F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D7D2CFC-86C3-4292-A8BD-6F1CE7D0A12E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5118198E-0F4C-44FF-94E7-03AEAB896EBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5118198E-0F4C-44FF-94E7-03AEAB896EBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5118198E-0F4C-44FF-94E7-03AEAB896EBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5118198E-0F4C-44FF-94E7-03AEAB896EBF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB496600-ABF5-494A-B07B-A36D9C2D0455}.Release|Any CPU.Build.0 = Release|Any CPU
-		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{109B7B6B-2F13-4FB8-86A0-E6506C27C2FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F75E7BB5-9F3B-4C12-B289-F035F069BBFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{864721C5-4CBC-49C9-B055-2A379AE74873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{864721C5-4CBC-49C9-B055-2A379AE74873}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{864721C5-4CBC-49C9-B055-2A379AE74873}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{864721C5-4CBC-49C9-B055-2A379AE74873}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2ACD924E-E8CC-42D7-BE2B-59EC621DE372}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ACD924E-E8CC-42D7-BE2B-59EC621DE372}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ACD924E-E8CC-42D7-BE2B-59EC621DE372}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ACD924E-E8CC-42D7-BE2B-59EC621DE372}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACABB6C0-67EA-451A-98C4-2DE4D4F605B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACABB6C0-67EA-451A-98C4-2DE4D4F605B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACABB6C0-67EA-451A-98C4-2DE4D4F605B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACABB6C0-67EA-451A-98C4-2DE4D4F605B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCAF9862-4F29-43CA-BAE7-6134EC3A68DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCAF9862-4F29-43CA-BAE7-6134EC3A68DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCAF9862-4F29-43CA-BAE7-6134EC3A68DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCAF9862-4F29-43CA-BAE7-6134EC3A68DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}
+		{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}
+		{864721C5-4CBC-49C9-B055-2A379AE74873} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}
+		{2ACD924E-E8CC-42D7-BE2B-59EC621DE372} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}
+		{ACABB6C0-67EA-451A-98C4-2DE4D4F605B5} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}
+		{CCAF9862-4F29-43CA-BAE7-6134EC3A68DB} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D343B18D-E437-4222-932F-0A22AF6C5834}
+		SolutionGuid = {83A7B28B-B9C4-4CCA-B09E-C031FBFBE0CB}
 	EndGlobalSection
 EndGlobal

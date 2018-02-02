@@ -66,7 +66,7 @@ namespace DotnetSpider.HtmlAgilityPack
 
 		public int Capacity
 		{
-			get => _capacity;
+			get { return _capacity; }  
 
 			set
 			{

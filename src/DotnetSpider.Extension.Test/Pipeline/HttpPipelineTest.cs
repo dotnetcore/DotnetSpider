@@ -8,7 +8,9 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
+using DotnetSpider.Core.Infrastructure;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test.Pipeline
@@ -57,8 +59,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 
 		public void Update()
-		{
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+		{			
+			var result = HttpSender.Request((new HttpRequest
+			{
+				Url = Env.EnterpiseServiceUrl
+			}));
+			if (result.StatusCode != HttpStatusCode.OK)
 			{
 				return;
 			}
@@ -106,10 +112,15 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void Insert()
 		{
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			var result = HttpSender.Request((new HttpRequest
+			{
+				Url = Env.EnterpiseServiceUrl
+			}));
+			if (result.StatusCode != HttpStatusCode.OK)
 			{
 				return;
 			}
+
 			Env.LoadConfiguration("app.service.config");
 			ClearDb();
 

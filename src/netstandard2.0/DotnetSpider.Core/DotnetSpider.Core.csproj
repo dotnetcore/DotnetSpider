@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath></OutputPath>
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\..\..\output\</OutputPath>
+    <DocumentationFile>..\..\..\output\netstandard2.0\DotnetSpider.Core.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="NLog" Version="5.0.0-beta09" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.6.15" />
+    <PackageReference Include="System.Net.Ping" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.4" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+    <PackageReference Include="Polly" Version="5.8.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
+    <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\DotnetSpider.Core\DotnetSpider.Core.projitems" Label="Shared" />
+</Project>

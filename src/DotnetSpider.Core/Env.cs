@@ -1,4 +1,4 @@
-﻿#if NET_CORE
+﻿#if !NET45
 using System.Runtime.InteropServices;
 #endif
 using System;
@@ -201,7 +201,7 @@ namespace DotnetSpider.Core
 
 		static Env()
 		{
-#if !NET_CORE
+#if NET45
 			IsWindows = true;
 #else
 			IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -218,7 +218,17 @@ namespace DotnetSpider.Core
 		{
 			if (string.IsNullOrWhiteSpace(path))
 			{
-				path = Path.Combine(BaseDirectory, "app.config");
+				// 默认的App.config会编译成 {程序集名称}.exe.config 或者 {程序集名称}.dll.config
+#if NET45
+				path = $"{AppDomain.CurrentDomain.FriendlyName}.config";
+#else
+				path = $"{AppDomain.CurrentDomain.FriendlyName}.dll.config";
+#endif
+				// WORKAROUND: 测试框架的入口配置文件会导至读取配置文件错误
+				if (string.IsNullOrWhiteSpace(path) || "testhost.dll.config" == path)
+				{
+					path = Path.Combine(BaseDirectory, "app.config");
+				}
 			}
 
 			if (path.ToLower().StartsWith("%global%"))
@@ -268,7 +278,7 @@ namespace DotnetSpider.Core
 		{
 			BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-#if !NET_CORE
+#if NET45
 			PathSeperator = "\\";
 #else
 			PathSeperator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/";

@@ -46,9 +46,14 @@ namespace DotnetSpider.Core
 		public static void PrintLine(char word = '=')
 		{
 			var width = 120;
-			if (Console.In != StreamReader.Null)
+			
+			try
 			{
 				width = Console.WindowWidth;
+			}
+			catch
+			{
+				// ignore
 			}
 			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i < width; ++i)

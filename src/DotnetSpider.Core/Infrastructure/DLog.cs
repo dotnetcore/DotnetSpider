@@ -222,7 +222,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// </summary>
 		private static void LoadConfiguration()
 		{
-#if !NET_CORE
+#if NET45
 			string nlogConfigPath = Path.Combine(Env.BaseDirectory, "nlog.net45.config");
 #else
 			string nlogConfigPath = Path.Combine(Env.BaseDirectory, "nlog.config");

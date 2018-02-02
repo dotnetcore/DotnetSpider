@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <returns>32位的MD5值</returns>
 		public static string Md5Encrypt32(string str)
 		{
-#if !NET_CORE
+#if NET45
 			MD5 md5 = new MD5CryptoServiceProvider();
 #else
 			MD5 md5 = MD5.Create();

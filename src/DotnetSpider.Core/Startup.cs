@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using DotnetSpider.Core.Infrastructure;
-#if NET_CORE
+#if !NET45
 using Microsoft.Extensions.DependencyModel;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -338,7 +338,7 @@ namespace DotnetSpider.Core
 
 		private static void SetConsoleEncoding()
 		{
-#if NET_CORE
+#if !NET45
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 		}

@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\DotnetSpider.Sample\DotnetSpider.Sample.projitems" Label="Shared" />
+</Project>

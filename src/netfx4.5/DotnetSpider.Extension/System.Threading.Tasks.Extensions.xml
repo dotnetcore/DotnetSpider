@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?><span>
+<doc>
+  <assembly>
+    <name>System.Threading.Tasks.Extensions</name>
+  </assembly>
+  <members>
+    <member name="T:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute">
+      
+    </member>
+    <member name="M:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute.#ctor(System.Type)">
+      <param name="builderType"></param>
+    </member>
+    <member name="P:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute.BuilderType">
+      <returns></returns>
+    </member>
+    <member name="T:System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1">
+      <typeparam name="TResult"></typeparam>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.AwaitOnCompleted``2(``0@,``1@)">
+      <param name="awaiter"></param>
+      <param name="stateMachine"></param>
+      <typeparam name="TAwaiter"></typeparam>
+      <typeparam name="TStateMachine"></typeparam>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.AwaitUnsafeOnCompleted``2(``0@,``1@)">
+      <param name="awaiter"></param>
+      <param name="stateMachine"></param>
+      <typeparam name="TAwaiter"></typeparam>
+      <typeparam name="TStateMachine"></typeparam>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Create">
+      <returns></returns>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.SetException(System.Exception)">
+      <param name="exception"></param>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.SetResult(`0)">
+      <param name="result"></param>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine)">
+      <param name="stateMachine"></param>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Start``1(``0@)">
+      <param name="stateMachine"></param>
+      <typeparam name="TStateMachine"></typeparam>
+    </member>
+    <member name="P:System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Task">
+      <returns></returns>
+    </member>
+    <member name="T:System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1.ConfiguredValueTaskAwaiter">
+      <typeparam name="TResult"></typeparam>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1.ConfiguredValueTaskAwaiter.GetResult">
+      <returns></returns>
+    </member>
+    <member name="P:System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1.ConfiguredValueTaskAwaiter.IsCompleted">
+      <returns></returns>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1.ConfiguredValueTaskAwaiter.OnCompleted(System.Action)">
+      <param name="continuation"></param>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1.ConfiguredValueTaskAwaiter.UnsafeOnCompleted(System.Action)">
+      <param name="continuation"></param>
+    </member>
+    <member name="T:System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1">
+      <typeparam name="TResult"></typeparam>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1.GetAwaiter">
+      <returns></returns>
+    </member>
+    <member name="T:System.Threading.Tasks.ValueTask`1">
+      <typeparam name="TResult"></typeparam>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.#ctor(System.Threading.Tasks.Task{`0})">
+      <param name="task"></param>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.#ctor(`0)">
+      <param name="result"></param>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.AsTask">
+      <returns></returns>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.ConfigureAwait(System.Boolean)">
+      <param name="continueOnCapturedContext"></param>
+      <returns></returns>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.CreateAsyncMethodBuilder">
+      <returns></returns>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.Equals(System.Object)">
+      <param name="obj"></param>
+      <returns></returns>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.Equals(System.Threading.Tasks.ValueTask{`0})">
+      <param name="other"></param>
+      <returns></returns>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.GetAwaiter">
+      <returns></returns>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.GetHashCode">
+      <returns></returns>
+    </member>
+    <member name="P:System.Threading.Tasks.ValueTask`1.IsCanceled">
+      <returns></returns>
+    </member>
+    <member name="P:System.Threading.Tasks.ValueTask`1.IsCompleted">
+      <returns></returns>
+    </member>
+    <member name="P:System.Threading.Tasks.ValueTask`1.IsCompletedSuccessfully">
+      <returns></returns>
+    </member>
+    <member name="P:System.Threading.Tasks.ValueTask`1.IsFaulted">
+      <returns></returns>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.op_Equality(System.Threading.Tasks.ValueTask{`0},System.Threading.Tasks.ValueTask{`0})">
+      <param name="left"></param>
+      <param name="right"></param>
+      <returns></returns>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.op_Inequality(System.Threading.Tasks.ValueTask{`0},System.Threading.Tasks.ValueTask{`0})">
+      <param name="left"></param>
+      <param name="right"></param>
+      <returns></returns>
+    </member>
+    <member name="P:System.Threading.Tasks.ValueTask`1.Result">
+      <returns></returns>
+    </member>
+    <member name="M:System.Threading.Tasks.ValueTask`1.ToString">
+      <returns></returns>
+    </member>
+    <member name="T:System.Runtime.CompilerServices.ValueTaskAwaiter`1">
+      <typeparam name="TResult"></typeparam>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.ValueTaskAwaiter`1.GetResult">
+      <returns></returns>
+    </member>
+    <member name="P:System.Runtime.CompilerServices.ValueTaskAwaiter`1.IsCompleted">
+      <returns></returns>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.ValueTaskAwaiter`1.OnCompleted(System.Action)">
+      <param name="continuation"></param>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.ValueTaskAwaiter`1.UnsafeOnCompleted(System.Action)">
+      <param name="continuation"></param>
+    </member>
+  </members>
+</doc></span>

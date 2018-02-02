@@ -77,7 +77,7 @@ namespace DotnetSpider.Core.Processor
 				foreach (string link in links)
 				{
 					var newUrl = FormateUrl(link);
-#if !NET_CORE
+#if NET45
 					tmp.Add(System.Web.HttpUtility.HtmlDecode(System.Web.HttpUtility.UrlDecode(newUrl)));
 #else
 					tmp.Add(WebUtility.HtmlDecode(WebUtility.UrlDecode(newUrl)));

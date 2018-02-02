@@ -11,8 +11,6 @@ using System;
 using Polly;
 using Polly.Retry;
 using System.Linq;
-#if NET_CORE
-#endif
 
 namespace DotnetSpider.Extension.Scheduler
 {

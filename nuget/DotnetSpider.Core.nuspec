@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>DotnetSpider2.Core</id>
-    <version>2.4.2-beta2</version>
+    <version>2.4.2-beta5</version>
     <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
     <owners>zlzforever@163.com</owners>
     <iconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</iconUrl>
@@ -15,23 +15,23 @@
       <group targetFramework=".NETStandard2.0">
         <dependency id="Newtonsoft.Json" version="10.0.3"/>
         <dependency id="NLog" version="5.0.0-beta09"/>
-        <dependency id="HtmlAgilityPack" version="1.6.3"/>
+        <dependency id="HtmlAgilityPack" version="1.6.15"/>
         <dependency id="System.Threading.Tasks.Parallel" version="4.3.0"/>
         <dependency id="System.Text.Encoding.CodePages" version="4.4.0"/>
         <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="4.3.0"/>
         <dependency id="System.Diagnostics.Process" version="4.3.0"/>
-        <dependency id="System.Configuration.ConfigurationManager" version="4.4.0"/>
-        <dependency id="System.Data.SqlClient" version="4.4.0"/>
-        <dependency id="Microsoft.Extensions.DependencyModel" version="2.0.0"/>
+        <dependency id="System.Configuration.ConfigurationManager" version="4.4.1"/>
+        <dependency id="System.Data.SqlClient" version="4.4.2"/>
+        <dependency id="Microsoft.Extensions.DependencyModel" version="2.0.4"/>
         <dependency id="System.Runtime.Loader" version="4.3.0"/>
         <dependency id="System.Net.Ping" version="4.3.0"/>
-        <dependency id="Polly" version="5.6.1" />
+        <dependency id="Polly" version="5.8.0" />
       </group>
       <group targetFramework=".NETFramework4.5">
         <dependency id="Newtonsoft.Json" version="10.0.3"/>
-        <dependency id="HtmlAgilityPack" version="1.6.3"/>
+        <dependency id="HtmlAgilityPack" version="1.6.15"/>
         <dependency id="NLog" version="4.4.12"/>
-        <dependency id="Polly" version="5.6.1" />
+        <dependency id="Polly" version="5.8.0" />
       </group>
     </dependencies>
   </metadata>

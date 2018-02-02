@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-#if !NET_CORE
+#if NET45
 using System.Web;
 #endif
 using System.Text;
@@ -273,7 +273,7 @@ namespace DotnetSpider.Core.Downloader
 
 			if (_decodeHtml)
 			{
-#if !NET_CORE
+#if NET45
 				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
 #else
 				content = System.Net.WebUtility.UrlDecode(System.Net.WebUtility.HtmlDecode(content));

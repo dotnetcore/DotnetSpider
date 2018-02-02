@@ -58,7 +58,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				File.Delete(Env.DefaultGlobalAppConfigPath);
 			}
-			File.Copy(Path.Combine(AppContext.BaseDirectory, "app.global.config"), Env.DefaultGlobalAppConfigPath);
+			File.Copy(Path.Combine(Env.BaseDirectory, "app.global.config"), Env.DefaultGlobalAppConfigPath);
 
 			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
 			var arguments1 = Startup.AnalyzeArguments(args1);

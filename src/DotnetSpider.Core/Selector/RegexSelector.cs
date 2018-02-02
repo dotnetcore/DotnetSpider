@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using DotnetSpider.Core.Infrastructure;
-#if NET_CORE
+#if !NET45
 using System.Reflection;
 #endif
 
@@ -51,7 +51,7 @@ namespace DotnetSpider.Core.Selector
 
 			var type = (Type)text.GetType();
 			string tmp = "";
-#if NET_CORE
+#if !NET45
 			if (typeof(ICollection).GetTypeInfo().IsAssignableFrom(type))
 #else
 			if (typeof(ICollection).IsAssignableFrom(type))

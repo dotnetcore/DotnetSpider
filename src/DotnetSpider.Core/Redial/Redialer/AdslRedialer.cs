@@ -1,7 +1,7 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using System.IO;
 using System.Threading;
-#if NET_CORE
+#if !NET45
 using System.Linq;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -60,7 +60,7 @@ namespace DotnetSpider.Core.Redial.Redialer
 		public override void Redial()
 		{
 
-#if !NET_CORE
+#if NET45
 			RedialOnWindows();
 #else
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -91,7 +91,7 @@ namespace DotnetSpider.Core.Redial.Redialer
 				Thread.Sleep(2000);
 			}
 		}
-#if NET_CORE
+#if !NET45
 		private void KillPPPOEProcesses()
 		{
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

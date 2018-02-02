@@ -197,7 +197,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 				byte[] bytes = ms2.ToBytes();
 
-#if NET_CORE
+#if !NET45
 				ms2.Dispose();
 #else
 				ms2.Close();
@@ -217,7 +217,7 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				foreach (string key in item.Header.AllKeys)
 				{
-#if NET_CORE
+#if !NET45
 					request.Headers[key] = item.Header[key];
 #else
 					request.Headers.Add(key, item.Header[key]);
@@ -230,20 +230,20 @@ namespace DotnetSpider.Core.Infrastructure
 
 			if (item.ProtocolVersion != null)
 			{
-#if NET_CORE
-				request.Headers["Version"] = item.ProtocolVersion.ToString();
-#else
+#if NET45
 				request.ProtocolVersion = item.ProtocolVersion;
+#else
+				request.Headers["Version"] = item.ProtocolVersion.ToString();
 #endif
 			}
 
-#if !NET_CORE
+#if NET45
 			request.ServicePoint.Expect100Continue = item.Expect100Continue;
 #endif
 
 			//请求方式Get或者Post  
 			request.Method = item.Method;
-#if NET_CORE
+#if !NET45
 			if (item.KeepAlive)
 			{
 				request.Headers["Connection"] = "Keep-Alive";
@@ -315,7 +315,7 @@ namespace DotnetSpider.Core.Infrastructure
 				{
 					StreamReader r = new StreamReader(File.OpenRead(item.Postdata), postencoding);
 					buffer = postencoding.GetBytes(r.ReadToEnd());
-#if NET_CORE
+#if !NET45
 					r.Dispose();
 #else
 					r.Close();
@@ -328,7 +328,7 @@ namespace DotnetSpider.Core.Infrastructure
 				}
 				if (buffer != null)
 				{
-#if NET_CORE
+#if !NET45
 					request.Headers["Content-Length"] = buffer.Length.ToString();
 					request.GetRequestStreamAsync().Result.Write(buffer, 0, buffer.Length);
 #else

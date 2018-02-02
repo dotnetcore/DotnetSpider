@@ -116,7 +116,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public Site()
 		{
-#if NET_CORE
+#if !NET45
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 		}

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using DotnetSpider.Core.Downloader;
 using Xunit;
 using DotnetSpider.Core.Scheduler;
@@ -9,6 +10,14 @@ namespace DotnetSpider.Core.Test.Downloader
 {
 	public class HttpClientDownloaderTest
 	{
+		public HttpClientDownloaderTest()
+		{
+			#if !NET45
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+			#endif
+			
+		}
+		
 		/// <summary>
 		/// 手动执行此测试脚本，运行结束后用netstat -ano 查看端口占用情况。只会占用一个就对了
 		/// </summary>

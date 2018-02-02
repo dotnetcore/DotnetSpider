@@ -531,10 +531,12 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void SqlServerDataTypeTests()
 		{
+#if !NET45
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
 			}
+#endif
 			using (var conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true"))
 			{
 				try
