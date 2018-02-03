@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
+    <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj" />
   </ItemGroup>
   <Import Project="..\..\DotnetSpider.Core.Test\DotnetSpider.Core.Test.projitems" Label="Shared" />
 </Project>
