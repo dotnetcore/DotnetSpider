@@ -234,5 +234,10 @@ namespace DotnetSpider.HtmlAgilityPack
         /// which represents the last matched element.
         /// </summary>
         Selector<TElement> Last();
+        /// <summary>
+        /// Generates a <a href="http://www.w3.org/TR/css3-selectors/#pseudo-classes">pseudo-class selector</a>,
+        /// which represents the first matched element.
+        /// </summary>
+        Selector<TElement> First();
     }
 }

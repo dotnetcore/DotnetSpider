@@ -229,6 +229,7 @@ namespace DotnetSpider.HtmlAgilityPack
                     case "only-child": _generator.OnlyChild(); break;
                     case "empty": _generator.Empty(); break;
                     case "last": _generator.Last(); break;
+                    case "first": _generator.First(); break;
                     case "select-parent": _generator.SelectParent(); break;
                     default: CustomSelector(clazz, false); break;
                 }

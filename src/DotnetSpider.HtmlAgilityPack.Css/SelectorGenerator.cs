@@ -6,9 +6,9 @@ namespace DotnetSpider.HtmlAgilityPack
 {
     #region Imports
 
-	
 
-	#endregion
+
+    #endregion
 
     /// <summary>
     /// A selector generator implementation for an arbitrary document/element system.
@@ -272,6 +272,10 @@ namespace DotnetSpider.HtmlAgilityPack
         public void Last()
         {
             Add(Ops.Last());
+        }
+        public void First()
+        {
+            Add(Ops.First());
         }
     }
 }

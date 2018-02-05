@@ -77,7 +77,7 @@ namespace DotnetSpider.HtmlAgilityPack
         /// or with a different value <paramref name="value"/>.
         /// </summary>
         void AttributeNotEqual(NamespacePrefix prefix, string name, string value);
-        
+
         /// <summary>
         /// Generates an <a href="http://www.w3.org/TR/css3-selectors/#attribute-selectors">attribute selector</a>
         /// that represents an element with the given attribute <paramref name="name"/>
@@ -295,6 +295,11 @@ namespace DotnetSpider.HtmlAgilityPack
         /// which represents the last matched element.
         /// </summary>
         void Last();
+        /// <summary>
+        /// Generates a <a href="http://www.w3.org/TR/css3-selectors/#pseudo-classes">pseudo-class selector</a>,
+        /// which represents the first matched element.
+        /// </summary>
+        void First();
 
 
         object Selector { get; }

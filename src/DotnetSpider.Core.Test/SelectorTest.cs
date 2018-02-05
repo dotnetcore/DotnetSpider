@@ -134,5 +134,21 @@ namespace DotnetSpider.Core.Test
 			var links1 = selectable.XPath(".//a/@href").GetValue();
 			Assert.Equal("http://whatever.com/aaa", links1);
 		}
+
+		[Fact]
+		public void PseudoFirstTest()
+		{
+			var html =
+				@"<ul>
+<li class=""top""><span class=""date"" style=""display: block;"">x</span><span class=""title""><a target=""_blank"" href=""https://www.aaa.com/html/it/343752.htm"">aaaa</a></span></li>
+<li class=""new""><span class=""date"" style=""display: block;"">y</span><span class=""title""><a target=""_blank"" href=""https://www.aaa.com/html/digi/346221.htm"">bbbb</a></span></li>
+<li class=""new""><span class=""date"" style=""display: block;"">z</span><span class=""title""><a target=""_blank"" href=""https://www.aaa.com/html/it/346264.htm"">cccc</a></span></li></ul>";
+
+			ISelectable selectable = new Selectable(html, null, Core.Infrastructure.ContentType.Html);
+			var result1 = selectable.Select(new CssSelector("ul li a:first")).GetValue();
+			Assert.Equal("aaaa", result1);
+			var result2 = selectable.Select(new CssSelector("ul li a:last")).GetValue();
+			Assert.Equal("cccc", result2);
+		}
 	}
 }
