@@ -61,9 +61,9 @@ namespace DotnetSpider.Core.Selector
 		/// </summary>
 		/// <param name="element">HTML元素</param>
 		/// <returns>查询结果</returns>
-		public override List<dynamic> SelectList(HtmlNode element)
+		public override IEnumerable<dynamic> SelectList(HtmlNode element)
 		{
-			return element.QuerySelectorAll(_cssSelector).Cast<dynamic>().ToList();
+			return element.QuerySelectorAll(_cssSelector);
 		}
 
 		/// <summary>

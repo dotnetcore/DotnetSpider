@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Selector
@@ -26,7 +27,7 @@ namespace DotnetSpider.Core.Selector
 		/// </summary>
 		/// <param name="element">HTML元素</param>
 		/// <returns>查询结果</returns>
-		public abstract List<dynamic> SelectList(HtmlNode element);
+		public abstract IEnumerable<dynamic> SelectList(HtmlNode element);
 
 		/// <summary>
 		/// 对Html文本进行查询, 查询结果为第一个符合查询条件的元素
@@ -56,7 +57,7 @@ namespace DotnetSpider.Core.Selector
 		/// </summary>
 		/// <param name="text">Html文本</param>
 		/// <returns>查询结果</returns>
-		public virtual List<dynamic> SelectList(dynamic text)
+		public virtual IEnumerable<dynamic> SelectList(dynamic text)
 		{
 			if (text != null)
 			{
@@ -73,7 +74,7 @@ namespace DotnetSpider.Core.Selector
 			}
 			else
 			{
-				return new List<dynamic>();
+				return Enumerable.Empty<dynamic>();
 			}
 		}
 	}

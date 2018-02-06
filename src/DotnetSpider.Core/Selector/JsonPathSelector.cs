@@ -44,7 +44,7 @@ namespace DotnetSpider.Core.Selector
 		/// </summary>
 		/// <param name="json">需要查询的Json文本</param>
 		/// <returns>查询结果</returns>
-		public List<dynamic> SelectList(dynamic json)
+		public IEnumerable<dynamic> SelectList(dynamic json)
 		{
 			if (json != null)
 			{
@@ -95,7 +95,7 @@ namespace DotnetSpider.Core.Selector
 			}
 			else
 			{
-				return new List<dynamic>();
+				return Enumerable.Empty<dynamic>();
 			}
 		}
 	}
