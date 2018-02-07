@@ -20,6 +20,6 @@ namespace DotnetSpider.Core.Selector
 		/// </summary>
 		/// <param name="text">需要查询的文本</param>
 		/// <returns>查询结果</returns>
-		List<dynamic> SelectList(dynamic text);
+		IEnumerable<dynamic> SelectList(dynamic text);
 	}
 }

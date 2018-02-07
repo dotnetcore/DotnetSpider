@@ -79,7 +79,7 @@ namespace DotnetSpider.Core.Selector
 		/// </summary>
 		/// <param name="text">需要查询的文本</param>
 		/// <returns>查询结果</returns>
-		public List<dynamic> SelectList(dynamic text)
+		public IEnumerable<dynamic> SelectList(dynamic text)
 		{
 			if (text == null)
 			{

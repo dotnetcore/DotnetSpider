@@ -220,9 +220,9 @@ namespace DotnetSpider.Core
 			{
 				// 默认的App.config会编译成 {程序集名称}.exe.config 或者 {程序集名称}.dll.config
 #if NET45
-				path = $"{AppDomain.CurrentDomain.FriendlyName}.config";
+				path = Path.Combine(BaseDirectory, $"{AppDomain.CurrentDomain.FriendlyName}.config");
 #else
-				path = $"{AppDomain.CurrentDomain.FriendlyName}.dll.config";
+				path = Path.Combine(BaseDirectory, $"{AppDomain.CurrentDomain.FriendlyName}.dll.config");
 #endif
 				// WORKAROUND: 测试框架的入口配置文件会导至读取配置文件错误
 				if (string.IsNullOrWhiteSpace(path) || "testhost.dll.config" == path)

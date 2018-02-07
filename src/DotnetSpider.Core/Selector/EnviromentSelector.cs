@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Selector
 		/// </summary>
 		/// <param name="text"></param>
 		/// <returns></returns>
-		public List<dynamic> SelectList(dynamic text)
+		public IEnumerable<dynamic> SelectList(dynamic text)
 		{
 			throw new SpiderException("EnviromentSelector does not support SelectList method now.");
 		}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using DotnetSpider.Core.Selector;
 using Xunit;
 
@@ -92,7 +93,7 @@ namespace DotnetSpider.Core.Test
 			var expected2 =
 				$"{{{Environment.NewLine}  \"category\": \"reference\",{Environment.NewLine}  \"author\": \"Nigel Rees\",{Environment.NewLine}  \"title\": \"Sayings of the Century\",{Environment.NewLine}  \"price\": 8.95{Environment.NewLine}}}";
 			Assert.Equal(result2, expected1);
-			Assert.Equal(list2[0], expected2);
+			Assert.Equal(list2.First(), expected2);
 		}
 
 		[Fact]
