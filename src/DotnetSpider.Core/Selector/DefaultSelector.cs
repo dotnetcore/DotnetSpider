@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace DotnetSpider.Core.Selector
 {
@@ -25,7 +26,7 @@ namespace DotnetSpider.Core.Selector
 		/// <returns>查询结果</returns>
 		public IEnumerable<dynamic> SelectList(dynamic text)
 		{
-			return null;
+			return Enumerable.Empty<dynamic>();
 		}
 	}
 }

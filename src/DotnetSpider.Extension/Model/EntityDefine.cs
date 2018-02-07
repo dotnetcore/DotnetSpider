@@ -359,7 +359,7 @@ namespace DotnetSpider.Extension.Model
 		/// <summary>
 		/// 额外选项
 		/// </summary>
-		public PropertyDefine.Options Option { get; set; }
+		public PropertyDefineOptions Option { get; set; }
 
 		/// <summary>
 		/// 列的长度

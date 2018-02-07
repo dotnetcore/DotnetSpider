@@ -7,13 +7,13 @@ namespace DotnetSpider.Core.Selector
 	/// <summary>
 	/// HTML文件查询的抽象
 	/// </summary>
-	public abstract class BaseHtmlSelector : ISelector
+	public abstract class HtmlSelector : ISelector
 	{
 		/// <summary>
 		/// 判断查询是否包含属性
 		/// </summary>
 		/// <returns>如果返回 True, 则说明是查询元素的属性值</returns>
-		public abstract bool HasAttribute();
+		public abstract bool HasAttribute { get; }
 
 		/// <summary>
 		/// 对节点进行查询, 查询结果为第一个符合查询条件的元素

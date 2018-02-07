@@ -3,6 +3,32 @@
 namespace DotnetSpider.Core.Selector
 {
 	/// <summary>
+	/// 元素取值方式
+	/// </summary>
+	public enum ValueOption
+	{
+		/// <summary>
+		/// For json content
+		/// </summary>
+		None,
+
+		/// <summary>
+		/// For html content
+		/// </summary>
+		OuterHtml,
+
+		/// <summary>
+		/// For html content
+		/// </summary>
+		InnerHtml,
+
+		/// <summary>
+		/// For html content
+		/// </summary>
+		InnerText
+	}
+
+	/// <summary>
 	/// 查询接口
 	/// </summary>
 	public interface ISelectable
@@ -39,7 +65,7 @@ namespace DotnetSpider.Core.Selector
 		/// 取得查询器里所有的结果
 		/// </summary>
 		/// <returns>查询接口</returns>
-		IList<ISelectable> Nodes();
+		IEnumerable<ISelectable> Nodes();
 
 		/// <summary>
 		/// 通过JsonPath查找结果
@@ -66,16 +92,16 @@ namespace DotnetSpider.Core.Selector
 		/// <summary>
 		/// 获得当前查询器的文本结果, 如果查询结果为多个, 则返回第一个结果的值
 		/// </summary>
-		/// <param name="isPlainText">是否纯文本化、去掉HTML标签</param>
+		/// <param name="option">元素取值方式</param>
 		/// <returns>查询到的文本结果</returns>
-		string GetValue(bool isPlainText = false);
+		string GetValue(ValueOption option = ValueOption.None);
 
 		/// <summary>
 		/// 获得当前查询器的文本结果
 		/// </summary>
-		/// <param name="isPlainText">是否纯文本化、去掉HTML标签</param>
+		/// <param name="option">元素取值方式</param>
 		/// <returns>查询到的文本结果</returns>
-		List<string> GetValues(bool isPlainText = false);
+		IEnumerable<string> GetValues(ValueOption option = ValueOption.None);
 
 		/// <summary>
 		/// 通过查询器查找结果

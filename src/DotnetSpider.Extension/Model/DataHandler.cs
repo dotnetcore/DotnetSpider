@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Model
@@ -15,7 +16,7 @@ namespace DotnetSpider.Extension.Model
 		/// <param name="datas">数据结果</param>
 		/// <param name="page">页面信息</param>
 		/// <returns>加工后的数据结果</returns>
-		List<T> Handle(List<T> datas, Page page);
+		IEnumerable<T> Handle(IEnumerable<T> datas, Page page);
 	}
 
 	/// <summary>
@@ -38,9 +39,9 @@ namespace DotnetSpider.Extension.Model
 		/// <param name="datas">数据结果</param>
 		/// <param name="page">页面信息</param>
 		/// <returns>加工后的数据结果</returns>
-		public virtual List<T> Handle(List<T> datas, Page page)
+		public virtual IEnumerable<T> Handle(IEnumerable<T> datas, Page page)
 		{
-			if (datas == null || datas.Count == 0)
+			if (datas == null || datas.Count() == 0)
 			{
 				return datas;
 			}

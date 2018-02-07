@@ -664,7 +664,7 @@ $"<h2>{Subject}: {DateTime.Now}</h2>" +
 						var path = conn.Export(_exportDataSql, $"{_exportDataFileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
 						var attachment = new MimePart("excel", "xlsx")
 						{
-							ContentObject = new ContentObject(File.OpenRead(path)),
+							Content = new MimeContent(File.OpenRead(path)),
 							ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
 							ContentTransferEncoding = ContentEncoding.Base64,
 							FileName = Path.GetFileName(path)

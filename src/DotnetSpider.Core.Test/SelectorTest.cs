@@ -55,9 +55,9 @@ namespace DotnetSpider.Core.Test
 				Content = _html3
 			};
 			var results = page.Selectable.Links().GetValues();
-			Assert.Equal(2, results.Count);
-			Assert.Equal("http://a.com", results[0]);
-			Assert.Equal("http://a.com/bbc", results[1]);
+			Assert.Equal(2, results.Count());
+			Assert.Equal("http://a.com", results.ElementAt(0));
+			Assert.Equal("http://a.com/bbc", results.ElementAt(1));
 		}
 
 		[Fact]
@@ -121,8 +121,8 @@ namespace DotnetSpider.Core.Test
 			ISelectable xpath = selectable.XPath("//div");
 			var linksWithChainFirstCall = xpath.Links().GetValues();
 			var linksWithChainSecondCall = xpath.Links().GetValues();
-			Assert.Equal(linksWithoutChain.Count, linksWithChainFirstCall.Count);
-			Assert.Equal(linksWithChainFirstCall.Count, linksWithChainSecondCall.Count);
+			Assert.Equal(linksWithoutChain.Count(), linksWithChainFirstCall.Count());
+			Assert.Equal(linksWithChainFirstCall.Count(), linksWithChainSecondCall.Count());
 		}
 
 		[Fact]
@@ -130,7 +130,7 @@ namespace DotnetSpider.Core.Test
 		{
 			Selectable selectable = new Selectable(_html2, "", Core.Infrastructure.ContentType.Html);
 			var links = selectable.XPath(".//a/@href").Nodes();
-			Assert.Equal("http://whatever.com/aaa", links[0].GetValue());
+			Assert.Equal("http://whatever.com/aaa", links.First().GetValue());
 
 			var links1 = selectable.XPath(".//a/@href").GetValue();
 			Assert.Equal("http://whatever.com/aaa", links1);

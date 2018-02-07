@@ -175,7 +175,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			var attachment = new MimePart("excel", "xlsx")
 			{
-				ContentObject = new ContentObject(File.OpenRead(file)),
+				Content = new MimeContent(File.OpenRead(file)),
 				ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
 				ContentTransferEncoding = ContentEncoding.Base64,
 				FileName = Path.GetFileName(file)

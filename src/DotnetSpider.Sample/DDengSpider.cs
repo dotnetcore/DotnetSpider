@@ -46,7 +46,7 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "\n")]
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
-			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = PropertyDefine.Options.PlainText, Length = 100)]
+			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = PropertyDefineOptions.InnerText, Length = 100)]
 			public string Phone { get; set; }
 
 			[ReplaceFormatter(NewValue = "", OldValue = "\r")]
@@ -56,7 +56,7 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
 			[ReplaceFormatter(NewValue = "", OldValue = "地址：")]
-			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertyDefine.Options.PlainText, Length = 200)]
+			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertyDefineOptions.InnerText, Length = 200)]
 			public string Address { get; set; }
 
 			[PropertyDefine(Expression = ".")]

@@ -10,9 +10,6 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)929c331e8319a761773125efe3f11f20.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="$(MSBuildThisFileDirectory)App.config">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
@@ -34,42 +31,6 @@
     <Content Include="$(MSBuildThisFileDirectory)nlog.net45.db.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\configs\bazzar">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.cube.bigrams">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.cube.fold">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.cube.lm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.cube.nn">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.cube.params">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.cube.size">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.cube.word-freq">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.tesseract_cube.nn">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.traineddata">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.user-patterns">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)tessdata\eng.user-words">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BaiduSearchCassandraSpider.cs" />
@@ -80,6 +41,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Cnblogs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConfigurableSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CtripCitySpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CustomizeEntityExtractorWithEntityPipelineSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomSpider1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DDengSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugAfterDownloaderHandler.cs" />
@@ -96,5 +58,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ShanxizhaoshengSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Situoli.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaobaoKeywordWatcher.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)寻医问药Spider.cs" />
   </ItemGroup>
 </Project>

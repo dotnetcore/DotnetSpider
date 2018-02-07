@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Selector
 	/// <summary>
 	/// 查询接口
 	/// </summary>
-	public class Selectable : BaseSelectable
+	public class Selectable : AbstractSelectable
 	{
 		/// <summary>
 		/// 构造方法
@@ -158,7 +158,7 @@ namespace DotnetSpider.Core.Selector
 		/// 取得查询器里所有的结果
 		/// </summary>
 		/// <returns>查询接口</returns>
-		public override IList<ISelectable> Nodes()
+		public override IEnumerable<ISelectable> Nodes()
 		{
 			List<ISelectable> reslut = new List<ISelectable>();
 			foreach (var element in Elements)

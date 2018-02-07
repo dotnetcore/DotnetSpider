@@ -54,7 +54,7 @@ namespace DotnetSpider.Core.Processor
 				{
 					continue;
 				}
-				List<string> links = null;
+				IEnumerable<string> links = null;
 				if (page.ContentType == ContentType.Html)
 				{
 					links = page.Selectable.SelectList(targetUrlExtractor.Key).Links().GetValues();
@@ -122,7 +122,7 @@ namespace DotnetSpider.Core.Processor
 			{
 				var links = (page.Selectable.SelectList(ImageSelector)).GetValues();
 
-				if (links != null && links.Count > 0)
+				if (links != null && links.Count() > 0)
 				{
 					foreach (string link in links)
 					{

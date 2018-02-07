@@ -7,11 +7,11 @@ namespace DotnetSpider.Core.Selector
 	/// <summary>
 	/// Xpath 查询器
 	/// </summary>
-	public class XPathSelector : BaseHtmlSelector
+	public class XPathSelector : HtmlSelector
 	{
 		private static readonly Regex AttributeXPathRegex = new Regex(@"@[\w\s-]+", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
 		private readonly string _xpath;
-		private readonly string _attribute;
+		private readonly string _attrName;
 
 		/// <summary>
 		/// 构造方法
@@ -24,7 +24,7 @@ namespace DotnetSpider.Core.Selector
 			Match match = AttributeXPathRegex.Match(_xpath);
 			if (!string.IsNullOrWhiteSpace(match.Value) && _xpath.EndsWith(match.Value))
 			{
-				_attribute = match.Value.Replace("@", "");
+				_attrName = match.Value.Replace("@", "");
 				_xpath = _xpath.Replace("/" + match.Value, "");
 			}
 		}
@@ -39,9 +39,14 @@ namespace DotnetSpider.Core.Selector
 			var node = element.SelectSingleNode(_xpath);
 			if (node != null)
 			{
-				if (HasAttribute())
+				if (HasAttribute)
 				{
-					return node.Attributes.Contains(_attribute) ? node.Attributes[_attribute].Value?.Trim() : null;
+					var attr = node.Attributes[_attrName];
+					if (attr != null && !string.IsNullOrWhiteSpace(attr.Value))
+					{
+						return attr.Value.Trim();
+					}
+					return null;
 				}
 				else
 				{
@@ -64,16 +69,16 @@ namespace DotnetSpider.Core.Selector
 			{
 				foreach (var node in nodes)
 				{
-					if (!HasAttribute())
+					if (!HasAttribute)
 					{
 						result.Add(node);
 					}
 					else
 					{
-						var attr = node.Attributes[_attribute];
-						if (attr != null)
+						var attr = node.Attributes[_attrName];
+						if (attr != null && !string.IsNullOrWhiteSpace(attr.Value))
 						{
-							result.Add(attr.Value?.Trim());
+							result.Add(attr.Value.Trim());
 						}
 					}
 				}
@@ -85,9 +90,7 @@ namespace DotnetSpider.Core.Selector
 		/// 判断查询是否包含属性
 		/// </summary>
 		/// <returns>如果返回 True, 则说明是查询元素的属性值</returns>
-		public override bool HasAttribute()
-		{
-			return !string.IsNullOrWhiteSpace(_attribute);
-		}
+		public override bool HasAttribute => !string.IsNullOrWhiteSpace(_attrName);
+
 	}
 }
