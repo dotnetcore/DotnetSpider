@@ -278,7 +278,7 @@ namespace DotnetSpider.Extension.Test
 				EmptySleepTime = 5000;
 				ExitWhenComplete = true;
 				CachedSize = 1;
-				SkipWhenResultIsEmpty = false;
+				SkipTargetUrlsWhenResultIsEmpty = false;
 				AddPipeline(new CollectionEntityPipeline());
 				AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 				AddEntityType<ArticleSummary>();

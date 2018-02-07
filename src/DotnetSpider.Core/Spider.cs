@@ -47,7 +47,7 @@ namespace DotnetSpider.Core
 		private readonly object _avgPipelineTimeLocker = new object();
 		private int _threadNum = 1;
 		private int _deep = int.MaxValue;
-		private bool _skipWhenResultIsEmpty = true;
+		private bool _skipTargetUrlsWhenResultIsEmpty = true;
 		private bool _exitWhenComplete = true;
 		private int _emptySleepTime = 15000;
 		private int _cachedSize = 1;
@@ -328,13 +328,13 @@ namespace DotnetSpider.Core
 		/// Whether skip request when results of processor.
 		/// When results of processor is empty will retry request if this value is false.
 		/// </summary>
-		public bool SkipWhenResultIsEmpty
+		public bool SkipTargetUrlsWhenResultIsEmpty
 		{
-			get => _skipWhenResultIsEmpty;
+			get => _skipTargetUrlsWhenResultIsEmpty;
 			set
 			{
 				CheckIfRunning();
-				_skipWhenResultIsEmpty = value;
+				_skipTargetUrlsWhenResultIsEmpty = value;
 			}
 		}
 
@@ -1116,7 +1116,7 @@ namespace DotnetSpider.Core
 			{
 				if (page.ResultItems.IsEmpty)
 				{
-					if (SkipWhenResultIsEmpty)
+					if (SkipTargetUrlsWhenResultIsEmpty)
 					{
 						Logger.Log(Identity, $"Skip {request.Url} because extract 0 result.", Level.Warn);
 						_OnSuccess(request);

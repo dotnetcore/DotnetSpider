@@ -97,7 +97,7 @@ namespace DotnetSpider.Sample
 			Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("g_page_config = {", "g_srp_loadCss();", 16, 22));
 			Downloader.AddAfterDownloadCompleteHandler(new TargetUrlsHandler(new AutoIncrementTargetUrlsExtractor("&s=0", 44)));
 			Downloader.AddAfterDownloadCompleteHandler(new MyAfterDownloadHandler());
-			SkipWhenResultIsEmpty = true;
+			SkipTargetUrlsWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))
 			{
 				//AddStartUrlBuilder(

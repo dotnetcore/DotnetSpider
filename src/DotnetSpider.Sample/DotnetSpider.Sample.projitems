@@ -52,6 +52,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)JdSkuSampleSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JdSkuWebDriverSample.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JdSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MultiSupplementSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OcrDemo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Program.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RegexTestSpider.cs" />
