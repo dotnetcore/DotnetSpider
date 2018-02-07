@@ -37,7 +37,7 @@ namespace DotnetSpider.Core.Pipeline
 		{
 			if (string.IsNullOrWhiteSpace(interval))
 			{
-				throw new SpiderException("Interval path should not be null.");
+				throw new SpiderException("Interval path should not be null");
 			}
 			if (!interval.EndsWith(Env.PathSeperator))
 			{

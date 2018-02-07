@@ -43,11 +43,11 @@ namespace DotnetSpider.Core.Downloader
 		{
 			if (cookieContainer == null)
 			{
-				throw new SpiderException($"{nameof(cookieContainer)} should not be null.");
+				throw new SpiderException($"{nameof(cookieContainer)} should not be null");
 			}
 			if (downloader == null)
 			{
-				throw new SpiderException($"{nameof(downloader)} should not be null.");
+				throw new SpiderException($"{nameof(downloader)} should not be null");
 			}
 			var newCookieContainer = GenerateNewCookieContainer(spider, downloader, cookieContainer, cookieInjector);
 

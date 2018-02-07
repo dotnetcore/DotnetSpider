@@ -145,7 +145,7 @@ namespace DotnetSpider.Extension
 
 				if (entityProcessors.Count != 0 && entityPipelines.Count == 0)
 				{
-					throw new SpiderException("You may miss a entity pipeline.");
+					throw new SpiderException("You may miss a entity pipeline");
 				}
 				foreach (var processor in entityProcessors)
 				{

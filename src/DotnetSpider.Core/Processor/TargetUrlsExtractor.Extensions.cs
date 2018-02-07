@@ -267,7 +267,7 @@ namespace DotnetSpider.Core.Processor
 		{
 			if (string.IsNullOrWhiteSpace(paginationStr))
 			{
-				throw new SpiderException("paginationStr should not be null or empty.");
+				throw new SpiderException("paginationStr should not be null or empty");
 			}
 
 			PaginationStr = paginationStr;

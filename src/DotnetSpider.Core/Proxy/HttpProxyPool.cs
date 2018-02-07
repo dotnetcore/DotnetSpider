@@ -31,7 +31,7 @@ namespace DotnetSpider.Core.Proxy
 		/// <param name="reuseInterval">代理不被再次使用的间隔</param>
 		public HttpProxyPool(IProxySupplier supplier, int reuseInterval = 500)
 		{
-			_supplier = supplier ?? throw new SpiderException("IProxySupplier should not be null.");
+			_supplier = supplier ?? throw new SpiderException("IProxySupplier should not be null");
 
 			_reuseInterval = reuseInterval;
 
@@ -69,7 +69,7 @@ namespace DotnetSpider.Core.Proxy
 				Thread.Sleep(1000);
 			}
 
-			throw new SpiderException("Get proxy timeout.");
+			throw new SpiderException("Get proxy timeout");
 		}
 
 		/// <summary>

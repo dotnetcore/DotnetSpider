@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 			var encoding = System.Text.Encoding.GetEncoding(Encoding);
 			if (encoding == null)
 			{
-				throw new SpiderException($"Can't get encoding: {Encoding}.");
+				throw new SpiderException($"Can't get encoding: {Encoding}");
 			}
 		}
 	}

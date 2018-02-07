@@ -38,12 +38,12 @@ namespace DotnetSpider.Extension.Model.Formatter
 		{
 			if (string.IsNullOrWhiteSpace(Pattern))
 			{
-				throw new SpiderException("Pattern should not be null or empty.");
+				throw new SpiderException("Pattern should not be null or empty");
 			}
 
 			if (string.IsNullOrWhiteSpace(AppendValue))
 			{
-				throw new SpiderException("Append should not be null or empty.");
+				throw new SpiderException("Append should not be null or empty");
 			}
 		}
 	}

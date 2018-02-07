@@ -105,7 +105,7 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PasswordSelector == null)
 			{
-				throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect.");
+				throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect");
 			}
 			var cookies = new Dictionary<string, string>();
 

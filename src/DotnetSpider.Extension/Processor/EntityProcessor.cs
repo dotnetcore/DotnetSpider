@@ -67,7 +67,7 @@ namespace DotnetSpider.Extension.Processor
 					var xpaths = targetUrlsSelector.XPaths?.Select(x => x?.Trim()).Distinct().ToList();
 					if (xpaths == null && patterns == null)
 					{
-						throw new SpiderException("Region xpath and patterns should not be null both.");
+						throw new SpiderException("Region xpath and patterns should not be null both");
 					}
 					if (xpaths != null && xpaths.Count > 0)
 					{

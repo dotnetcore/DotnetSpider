@@ -71,7 +71,7 @@ namespace DotnetSpider.Extension.Infrastructure
 						}
 					}
 
-					throw new SpiderException("Proxy string should be like 192.168.1.100:8080.");
+					throw new SpiderException("Proxy string should be like 192.168.1.100:8080");
 				}
 			}
 		}

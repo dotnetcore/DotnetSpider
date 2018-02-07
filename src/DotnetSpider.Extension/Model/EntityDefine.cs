@@ -198,7 +198,7 @@ namespace DotnetSpider.Extension.Model
 
 			if (columns.Count == 0)
 			{
-				throw new SpiderException($"Columns is necessary for {Name}.");
+				throw new SpiderException($"Columns is necessary for {Name}");
 			}
 			if (TableInfo == null)
 			{
@@ -211,7 +211,7 @@ namespace DotnetSpider.Extension.Model
 				{
 					if (columns.All(c => c.Name != column))
 					{
-						throw new SpiderException("Columns set to update are not a property of your entity.");
+						throw new SpiderException("Columns set to update are not a property of your entity");
 					}
 				}
 				var updateColumns = new List<string>(TableInfo.UpdateColumns);
@@ -224,7 +224,7 @@ namespace DotnetSpider.Extension.Model
 
 				if (TableInfo.UpdateColumns.Length == 0)
 				{
-					throw new SpiderException("There is no column need update.");
+					throw new SpiderException("There is no column need update");
 				}
 			}
 
@@ -236,22 +236,22 @@ namespace DotnetSpider.Extension.Model
 
 					if (items.Count == 0)
 					{
-						throw new SpiderException("Index should contain more than a column.");
+						throw new SpiderException("Index should contain more than a column");
 					}
 					if (items.Count == 1 && Env.IdColumns.Contains(items.First()))
 					{
-						throw new SpiderException("Primary is no need to create another index.");
+						throw new SpiderException("Primary is no need to create another index");
 					}
 					foreach (var item in items)
 					{
 						var column = columns.FirstOrDefault(c => c.Name == item);
 						if (column == null)
 						{
-							throw new SpiderException("Columns set as index are not a property of your entity.");
+							throw new SpiderException("Columns set as index are not a property of your entity");
 						}
 						if (column.DataType.FullName == DataTypeNames.String && (column.Length <= 0 || column.Length > 256))
 						{
-							throw new SpiderException("Column length of index should not large than 256.");
+							throw new SpiderException("Column length of index should not large than 256");
 						}
 					}
 					TableInfo.Indexs[i] = string.Join(",", items);
@@ -265,22 +265,22 @@ namespace DotnetSpider.Extension.Model
 
 					if (items.Count == 0)
 					{
-						throw new SpiderException("Unique should contain more than a column.");
+						throw new SpiderException("Unique should contain more than a column");
 					}
 					if (items.Count == 1 && Env.IdColumns.Contains(items.First()))
 					{
-						throw new SpiderException("Primary is no need to create another unique.");
+						throw new SpiderException("Primary is no need to create another unique");
 					}
 					foreach (var item in items)
 					{
 						var column = columns.FirstOrDefault(c => c.Name == item);
 						if (column == null)
 						{
-							throw new SpiderException("Columns set as unique are not a property of your entity.");
+							throw new SpiderException("Columns set as unique are not a property of your entity");
 						}
 						if (column.DataType.FullName == DataTypeNames.String && (column.Length <= 0 || column.Length > 256))
 						{
-							throw new SpiderException("Column length of unique should not large than 256.");
+							throw new SpiderException("Column length of unique should not large than 256");
 						}
 					}
 					TableInfo.Uniques[i] = string.Join(",", items);
@@ -306,7 +306,7 @@ namespace DotnetSpider.Extension.Model
 
 			if (DataType.FullName != DataTypeNames.String && propertyDefine.Length > 0)
 			{
-				throw new SpiderException("Only string property can set length.");
+				throw new SpiderException("Only string property can set length");
 			}
 			DefaultValue = Property.PropertyType.IsValueType ? Activator.CreateInstance(Property.PropertyType) : null;
 			Option = propertyDefine.Option;

@@ -37,7 +37,7 @@ namespace DotnetSpider.Core.Redial.Redialer
 			}
 			else
 			{
-				throw new SpiderException($"Unfound adsl config: {path}.");
+				throw new SpiderException($"Unfound adsl config: {path}");
 			}
 		}
 

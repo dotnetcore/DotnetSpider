@@ -96,7 +96,7 @@ namespace DotnetSpider.Core.Scheduler
 			}
 			else
 			{
-				throw new SpiderException("Scheduler already init.");
+				throw new SpiderException("Scheduler already init");
 			}
 		}
 

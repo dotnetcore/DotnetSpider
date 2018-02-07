@@ -127,7 +127,7 @@ namespace DotnetSpider.Core.Selector
 				}
 				return new Selectable(resluts);
 			}
-			throw new SpiderException("Selector is null.");
+			throw new SpiderException("Selector is null");
 		}
 
 		/// <summary>
@@ -151,7 +151,7 @@ namespace DotnetSpider.Core.Selector
 				return new Selectable(resluts);
 			}
 
-			throw new SpiderException("Selector is null.");
+			throw new SpiderException("Selector is null");
 		}
 
 		/// <summary>

@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension.Processor
 		{
 			if (TotalPageSelector == null || CurrenctPageSelector == null)
 			{
-				throw new SpiderException("Total page selector or current page selector should not be null.");
+				throw new SpiderException("Total page selector or current page selector should not be null");
 			}
 			if (string.IsNullOrEmpty(page?.Content))
 			{
@@ -80,7 +80,7 @@ namespace DotnetSpider.Extension.Processor
 
 			if (string.IsNullOrWhiteSpace(result))
 			{
-				throw new SpiderException("The result of total selector is null.");
+				throw new SpiderException("The result of total selector is null");
 			}
 			else
 			{

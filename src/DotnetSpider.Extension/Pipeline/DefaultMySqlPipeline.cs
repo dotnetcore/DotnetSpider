@@ -46,7 +46,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (string.IsNullOrWhiteSpace(database) || string.IsNullOrWhiteSpace(tableName))
 			{
-				throw new SpiderException("Database or table name should not be null or empty.");
+				throw new SpiderException("Database or table name should not be null or empty");
 			}
 			InitConnectStringSettings(connectString);
 			Database = database;
@@ -93,7 +93,7 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 				else
 				{
-					throw new SpiderException("DataConnection is unfound in app.config.");
+					throw new SpiderException("DataConnection is unfound in app.config");
 				}
 			}
 			ConnectionStringSettings = connectionStringSettings;

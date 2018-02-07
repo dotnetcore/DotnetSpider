@@ -274,7 +274,7 @@ namespace DotnetSpider.Core
 				}
 				else
 				{
-					throw new SpiderException("Sleep time should be large than 0.");
+					throw new SpiderException("Sleep time should be large than 0");
 				}
 			}
 		}
@@ -938,7 +938,7 @@ namespace DotnetSpider.Core
 
 			if (PageProcessors == null || PageProcessors.Count == 0)
 			{
-				throw new SpiderException("Count of PageProcessor is zero.");
+				throw new SpiderException("Count of PageProcessor is zero");
 			}
 
 			InitPipelines(arguments);
@@ -1260,7 +1260,7 @@ namespace DotnetSpider.Core
 		{
 			if (Stat == Status.Running)
 			{
-				throw new SpiderException("Spider is running.");
+				throw new SpiderException("Spider is running");
 			}
 		}
 

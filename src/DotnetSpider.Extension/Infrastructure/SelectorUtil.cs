@@ -120,7 +120,7 @@ namespace DotnetSpider.Extension.Infrastructure
 						}
 					default:
 						{
-							throw new SpiderException($"Selector {selector} unsupoort.");
+							throw new SpiderException($"Selector {selector} unsupoort");
 						}
 				}
 			}

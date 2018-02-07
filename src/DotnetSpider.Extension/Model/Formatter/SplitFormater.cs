@@ -46,12 +46,12 @@ namespace DotnetSpider.Extension.Model.Formatter
 		{
 			if (Splitor == null || Splitor.Length == 0)
 			{
-				throw new SpiderException("Splitors should not be null or empty.");
+				throw new SpiderException("Splitors should not be null or empty");
 			}
 
 			if (ElementAt < 0)
 			{
-				throw new SpiderException("ElementAt should larger than 0.");
+				throw new SpiderException("ElementAt should larger than 0");
 			}
 		}
 	}
