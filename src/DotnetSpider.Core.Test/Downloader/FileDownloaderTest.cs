@@ -10,7 +10,8 @@ namespace DotnetSpider.Core.Test.Downloader
 		public void DownloadRelativePathFile()
 		{
 			FileDownloader downloader = new FileDownloader();
-			var request = new Request("file://Downloader/1.html");
+			var path = Path.Combine("Downloader", "1.html");
+			var request = new Request($"file://{path}");
 			var spider = new DefaultSpider();
 			var page = downloader.Download(request, spider);
 			Assert.Equal("hello", page.Content);
@@ -20,7 +21,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		public void DownloadRelativeAbsolutePathFile()
 		{
 			FileDownloader downloader = new FileDownloader();
-			var path = Path.Combine(Env.BaseDirectory, "Downloader\\1.html");
+			var path = Path.Combine(Env.BaseDirectory, "Downloader", "1.html");
 			var request = new Request($"file://{path}");
 			var spider = new DefaultSpider();
 			var page = downloader.Download(request, spider);

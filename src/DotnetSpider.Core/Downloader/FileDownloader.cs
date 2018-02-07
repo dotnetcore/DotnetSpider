@@ -30,6 +30,10 @@ namespace DotnetSpider.Core.Downloader
 			}
 			if (!string.IsNullOrWhiteSpace(filePath))
 			{
+				if (!filePath.Contains(":"))
+				{
+					filePath = Path.Combine(Env.BaseDirectory, filePath);
+				}
 				if (File.Exists(filePath))
 				{
 					return new Page(request)
