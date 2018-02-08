@@ -248,7 +248,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (Exception e)
 			{
-				Assert.Equal("Column length of index should not large than 256.", e.Message);
+				Assert.Equal("Column length of index should not large than 256", e.Message);
 			}
 		}
 
@@ -269,7 +269,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (Exception e)
 			{
-				Assert.Equal("Column length of unique should not large than 256.", e.Message);
+				Assert.Equal("Column length of unique should not large than 256", e.Message);
 			}
 		}
 
@@ -327,7 +327,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (SpiderException exception)
 			{
-				Assert.Equal("Columns set as index are not a property of your entity.", exception.Message);
+				Assert.Equal("Columns set as index are not a property of your entity", exception.Message);
 			}
 		}
 
@@ -344,7 +344,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (SpiderException exception)
 			{
-				Assert.Equal("Columns set as unique are not a property of your entity.", exception.Message);
+				Assert.Equal("Columns set as unique are not a property of your entity", exception.Message);
 			}
 		}
 		[Fact]

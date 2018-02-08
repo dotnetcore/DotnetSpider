@@ -36,7 +36,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			var spider = new DefaultSpider();
 			var page = downloader.Download(request, spider);
 			Assert.True(string.IsNullOrEmpty(page.Content));
-			Assert.Equal("File downloader\\2.html unfound.", page.Exception.Message);
+			Assert.True(page.Exception is FileNotFoundException);
 			Assert.True(page.Skip);
 		}
 	}

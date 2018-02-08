@@ -45,7 +45,7 @@ namespace DotnetSpider.Core.Downloader
 			var msg = $"File {filePath} unfound.";
 			Page page = new Page(request)
 			{
-				Exception = new DownloadException(msg),
+				Exception = new FileNotFoundException(msg),
 				Skip = true
 			};
 

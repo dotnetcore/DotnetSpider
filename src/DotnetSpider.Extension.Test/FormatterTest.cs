@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (SpiderException se)
 			{
-				Assert.Equal("Pattern should not be null or empty.", se.Message);
+				Assert.Equal("Pattern should not be null or empty", se.Message);
 			}
 			try
 			{
@@ -29,7 +29,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (SpiderException se)
 			{
-				Assert.Equal("Pattern should not be null or empty.", se.Message);
+				Assert.Equal("Pattern should not be null or empty", se.Message);
 			}
 			try
 			{
@@ -39,7 +39,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (SpiderException se)
 			{
-				Assert.Equal("Pattern should not be null or empty.", se.Message);
+				Assert.Equal("Pattern should not be null or empty", se.Message);
 			}
 
 			RegexFormatter formatter1 = new RegexFormatter { False = "F", ValueWhenNull = "Y", Pattern = "很抱歉", True = "Y" };
@@ -133,7 +133,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (SpiderException se)
 			{
-				Assert.Equal("FormatString should not be null or empty.", se.Message);
+				Assert.Equal("FormatString should not be null or empty", se.Message);
 			}
 			try
 			{
@@ -143,7 +143,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (SpiderException se)
 			{
-				Assert.Equal("FormatString should not be null or empty.", se.Message);
+				Assert.Equal("FormatString should not be null or empty", se.Message);
 			}
 			try
 			{
@@ -153,7 +153,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (SpiderException se)
 			{
-				Assert.Equal("FormatString should not be null or empty.", se.Message);
+				Assert.Equal("FormatString should not be null or empty", se.Message);
 			}
 
 			StringFormater formatter1 = new StringFormater { Format = "http://{0}" };

@@ -10,6 +10,7 @@ using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
 using System.Runtime.CompilerServices;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -167,6 +168,10 @@ namespace DotnetSpider.Core.Downloader
 			catch (HttpRequestException he)
 			{
 				return CreateRetryPage(he, request, spider);
+			}
+			catch (TaskCanceledException te)
+			{
+				return CreateRetryPage(te, request, spider);
 			}
 			catch (Exception e)
 			{

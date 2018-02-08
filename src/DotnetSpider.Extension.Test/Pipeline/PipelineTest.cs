@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				spider.Identity = id;
 				spider.Run();
 			});
-			Assert.Equal("You may miss a entity pipeline.", exceptoin.Message);
+			Assert.Equal("You may miss a entity pipeline", exceptoin.Message);
 		}
 
 		[Fact]

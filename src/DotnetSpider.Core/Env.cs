@@ -303,8 +303,11 @@ namespace DotnetSpider.Core
 			HostName = Dns.GetHostName();
 
 			var interf = NetworkInterface.GetAllNetworkInterfaces().First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet);
-			var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
-			Ip = unicastAddresses.FirstOrDefault(a => a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString();
+			if (interf != null)
+			{
+				var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
+				Ip = unicastAddresses.FirstOrDefault(a => a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString();
+			}
 			NodeId = Ip;
 			LoadConfiguration(ConfigurationFilePath);
 		}
