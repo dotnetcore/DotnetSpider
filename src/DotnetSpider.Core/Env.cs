@@ -302,7 +302,7 @@ namespace DotnetSpider.Core
 
 			HostName = Dns.GetHostName();
 
-			var interf = NetworkInterface.GetAllNetworkInterfaces().First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet);
+			var interf = NetworkInterface.GetAllNetworkInterfaces().First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet || i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211);
 			if (interf != null)
 			{
 				var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
