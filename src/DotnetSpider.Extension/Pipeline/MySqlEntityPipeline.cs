@@ -210,7 +210,7 @@ namespace DotnetSpider.Extension.Pipeline
 			var tableName = adapter.Table.CalculateTableName();
 
 			var sql =
-				$"INSERT INTO `{adapter.Table.Database}`.`{tableName}` ({cols}) VALUES {colsParams} ON DUPLICATE KEY UPDATE {setParams};";
+				$"INSERT INTO `{adapter.Table.Database}`.`{tableName}` ({cols}) VALUES ({colsParams}) ON DUPLICATE KEY UPDATE {setParams};";
 
 			return sql;
 		}
