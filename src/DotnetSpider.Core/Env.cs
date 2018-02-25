@@ -312,11 +312,6 @@ namespace DotnetSpider.Core
                 var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
                 Ip = unicastAddresses.FirstOrDefault(a => a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString();
             }
-=======
-			var interf = NetworkInterface.GetAllNetworkInterfaces().First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet || i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211);
-			if (interf != null)
-			{
-				var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
 
 			NodeId = Ip;
 			LoadConfiguration(ConfigurationFilePath);
