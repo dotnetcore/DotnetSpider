@@ -52,7 +52,7 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			if (string.IsNullOrWhiteSpace(connectString))
 			{
-				throw new SpiderException("Redis connect string should not be empty.");
+				throw new SpiderException("Redis connect string should not be empty");
 			}
 			_connectString = connectString;
 			DuplicateRemover = this;
@@ -77,7 +77,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 			if (string.IsNullOrWhiteSpace(_connectString))
 			{
-				throw new SpiderException("Redis connect string should not be null or empty.");
+				throw new SpiderException("Redis connect string should not be null or empty");
 			}
 
 			if (string.IsNullOrWhiteSpace(_identityMd5))

@@ -26,7 +26,7 @@ namespace DotnetSpider.Sample
 
 			MyTest();
 
-			Startup.Run("-s:BaiduSearchSpider", "-tid:1", "-i:guid");
+			Startup.Run("-s:MultiSupplementSpider", "-tid:1", "-i:guid");
 
 			Startup.Run("-s:DotnetSpider.Sample.CustomSpider1", "-tid:CustomSpider1", "-i:CustomSpider1");
 

@@ -31,7 +31,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		{
 			if (string.IsNullOrWhiteSpace(Format))
 			{
-				throw new SpiderException("FormatString should not be null or empty.");
+				throw new SpiderException("FormatString should not be null or empty");
 			}
 		}
 	}

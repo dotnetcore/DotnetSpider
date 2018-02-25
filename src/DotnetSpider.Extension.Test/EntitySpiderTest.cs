@@ -249,13 +249,13 @@ namespace DotnetSpider.Extension.Test
 				public string Snapshot { get; set; }
 
 
-				[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefine.Options.PlainText)]
+				[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefineOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 				public string Details { get; set; }
 
-				[PropertyDefine(Expression = ".", Option = PropertyDefine.Options.PlainText)]
+				[PropertyDefine(Expression = ".", Option = PropertyDefineOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
@@ -278,7 +278,7 @@ namespace DotnetSpider.Extension.Test
 				EmptySleepTime = 5000;
 				ExitWhenComplete = true;
 				CachedSize = 1;
-				SkipWhenResultIsEmpty = false;
+				SkipTargetUrlsWhenResultIsEmpty = false;
 				AddPipeline(new CollectionEntityPipeline());
 				AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 				AddEntityType<ArticleSummary>();

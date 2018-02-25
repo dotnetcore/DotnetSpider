@@ -11,6 +11,7 @@ using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
+	[TaskName("JdSkuSampleSpider")]
 	public class JdSkuSampleSpider : EntitySpider
 	{
 		public JdSkuSampleSpider() : base("JdSkuSample", new Site

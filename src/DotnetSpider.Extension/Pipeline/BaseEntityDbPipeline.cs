@@ -40,7 +40,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				if (value == PipelineMode.Update)
 				{
-					throw new SpiderException("Can not set pipeline mode to Update.");
+					throw new SpiderException("Can not set pipeline mode to update");
 				}
 				if (!Equals(value, _defaultPipelineModel))
 				{
@@ -67,7 +67,7 @@ namespace DotnetSpider.Extension.Pipeline
 					{
 						if (null == Env.DataConnectionStringSettings)
 						{
-							throw new SpiderException("Default DbConnection unfound.");
+							throw new SpiderException("Default DbConnection unfound");
 						}
 						else
 						{
@@ -107,7 +107,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				if (UpdateConnectString == null)
 				{
-					throw new SpiderException("ConnectionStringSettings or IUpdateConnectString are unfound.");
+					throw new SpiderException("ConnectionStringSettings or IUpdateConnectString are unfound");
 				}
 				else
 				{
@@ -127,7 +127,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 					if (ConnectionStringSettings == null)
 					{
-						throw new SpiderException("Can not update ConnectionStringSettings via IUpdateConnectString.");
+						throw new SpiderException("Can not update ConnectionStringSettings via IUpdateConnectString");
 					}
 				}
 			}
@@ -180,7 +180,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				if (UpdateConnectString == null)
 				{
-					throw new SpiderException("ConnectionStringSettings or IUpdateConnectString are unfound.");
+					throw new SpiderException("ConnectionStringSettings or IUpdateConnectString are unfound");
 				}
 				else
 				{
@@ -200,7 +200,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 					if (ConnectionStringSettings == null)
 					{
-						throw new SpiderException("Can not update ConnectionStringSettings via IUpdateConnectString.");
+						throw new SpiderException("Can not update ConnectionStringSettings via IUpdateConnectString");
 					}
 				}
 			}

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Selector
 {
@@ -30,7 +31,7 @@ namespace DotnetSpider.Core.Selector
 		/// <returns></returns>
 		public dynamic Select(dynamic text)
 		{
-			throw new SpiderException("EnviromentSelector does not support SelectList method now.");
+			throw new NotSupportedException("EnviromentSelector does not support SelectList method now.");
 		}
 
 		/// <summary>
@@ -40,7 +41,7 @@ namespace DotnetSpider.Core.Selector
 		/// <returns></returns>
 		public IEnumerable<dynamic> SelectList(dynamic text)
 		{
-			throw new SpiderException("EnviromentSelector does not support SelectList method now.");
+			throw new NotSupportedException("EnviromentSelector does not support SelectList method now.");
 		}
 	}
 }

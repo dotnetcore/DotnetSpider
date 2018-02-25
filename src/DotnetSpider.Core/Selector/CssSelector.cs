@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Selector
 	/// <summary>
 	/// CSS 选择器
 	/// </summary>
-	public class CssSelector : BaseHtmlSelector
+	public class CssSelector : HtmlSelector
 	{
 		private readonly string _cssSelector;
 		private readonly string _attrName;
@@ -50,7 +50,7 @@ namespace DotnetSpider.Core.Selector
 				}
 				else
 				{
-					return elements[0].Attributes[_attrName]?.Value;
+					return elements[0].Attributes[_attrName]?.Value?.Trim();
 				}
 			}
 			return null;
@@ -63,16 +63,30 @@ namespace DotnetSpider.Core.Selector
 		/// <returns>查询结果</returns>
 		public override IEnumerable<dynamic> SelectList(HtmlNode element)
 		{
-			return element.QuerySelectorAll(_cssSelector);
+			var els = element.QuerySelectorAll(_cssSelector);
+			if (string.IsNullOrWhiteSpace(_attrName))
+			{
+				return els;
+			}
+			else
+			{
+				List<string> result = new List<string>();
+				foreach (var el in els)
+				{
+					var attr = el.Attributes[_attrName];
+					if (attr != null && !string.IsNullOrWhiteSpace(attr.Value))
+					{
+						result.Add(attr.Value.Trim());
+					}
+				}
+				return result;
+			}
 		}
 
 		/// <summary>
 		/// 判断查询是否包含属性
 		/// </summary>
 		/// <returns>如果返回 True, 则说明是查询元素的属性值</returns>
-		public override bool HasAttribute()
-		{
-			return _attrName != null;
-		}
+		public override bool HasAttribute => !string.IsNullOrWhiteSpace(_attrName);
 	}
 }

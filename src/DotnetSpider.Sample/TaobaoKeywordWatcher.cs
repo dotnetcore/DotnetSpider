@@ -97,7 +97,7 @@ namespace DotnetSpider.Sample
 			Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("g_page_config = {", "g_srp_loadCss();", 16, 22));
 			Downloader.AddAfterDownloadCompleteHandler(new TargetUrlsHandler(new AutoIncrementTargetUrlsExtractor("&s=0", 44)));
 			Downloader.AddAfterDownloadCompleteHandler(new MyAfterDownloadHandler());
-			SkipWhenResultIsEmpty = true;
+			SkipTargetUrlsWhenResultIsEmpty = true;
 			if (!arguments.Contains("noprepare"))
 			{
 				//AddStartUrlBuilder(
@@ -126,7 +126,7 @@ namespace DotnetSpider.Sample
 			[PropertyDefine(Expression = "$.category", Type = SelectorType.Enviroment, Length = 20)]
 			public string category { get; set; }
 
-			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath, Option = PropertyDefine.Options.PlainText, Length = 100)]
+			[PropertyDefine(Expression = "$.title", Type = SelectorType.JsonPath, Option = PropertyDefineOptions.InnerText, Length = 100)]
 			public string name { get; set; }
 
 			[PropertyDefine(Expression = "$.nick", Type = SelectorType.JsonPath, Length = 50)]

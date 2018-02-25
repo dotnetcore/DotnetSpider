@@ -126,8 +126,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\IScheduler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\PriorityScheduler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\QueueDuplicateRemovedScheduler.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Selector\BaseHtmlSelector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Selector\BaseSelectable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selector\HtmlSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Selector\AbstractSelectable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selector\CssSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selector\DefaultSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selector\EnviromentSelector.cs" />

@@ -370,7 +370,7 @@ namespace DotnetSpider.Core.Downloader
 		{
 			if (contents == null || contents.Length == 0)
 			{
-				throw new SpiderException("contents should not be empty/null.");
+				throw new SpiderException("contents should not be empty/null");
 			}
 
 			_contents = contents;
@@ -468,7 +468,7 @@ namespace DotnetSpider.Core.Downloader
 		{
 			if (string.IsNullOrWhiteSpace(exceptionMessage))
 			{
-				throw new SpiderException("exceptionMessage should not be null or empty.");
+				throw new SpiderException("exceptionMessage should not be null or empty");
 			}
 
 			_exceptionMessage = exceptionMessage;
@@ -521,10 +521,10 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="contents">包含的内容(specified contents)</param>
 		public RedialAndUpdateCookiesWhenContainsHandler(ICookieInjector cookieInjector, params string[] contents)
 		{
-			_cookieInjector = cookieInjector ?? throw new SpiderException("cookieInjector should not be null.");
+			_cookieInjector = cookieInjector ?? throw new SpiderException("cookieInjector should not be null");
 			if (contents == null || contents.Length == 0)
 			{
-				throw new SpiderException("contents should not be null or empty.");
+				throw new SpiderException("contents should not be null or empty");
 			}
 
 			_contents = contents;
@@ -616,7 +616,7 @@ namespace DotnetSpider.Core.Downloader
 
 			if (begin < 0)
 			{
-				throw new SpiderException($"Cutout failed, can not find begin string: {_startPart}.");
+				throw new SpiderException($"Cutout failed, can not find begin string: {_startPart}");
 			}
 
 			int end = rawText.IndexOf(_endPart, begin, StringComparison.Ordinal);
@@ -629,7 +629,7 @@ namespace DotnetSpider.Core.Downloader
 
 			if (begin < 0 || length < 0)
 			{
-				throw new SpiderException("Cutout failed. Please check your settings.");
+				throw new SpiderException("Cutout failed. Please check your settings");
 			}
 
 			string newRawText = rawText.Substring(begin, length).Trim();

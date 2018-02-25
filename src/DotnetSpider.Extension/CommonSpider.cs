@@ -192,7 +192,7 @@ namespace DotnetSpider.Extension
 				}
 				if (!ifBuildFinished)
 				{
-					var msg = "Init status set failed.";
+					var msg = "Init status set failed";
 					Logger.Log(Identity, msg, Level.Error);
 					throw new SpiderException(msg);
 				}
@@ -212,7 +212,7 @@ namespace DotnetSpider.Extension
 				}
 				if (!ifRemoveInitLocker)
 				{
-					var msg = "Remove init locker failed.";
+					var msg = "Remove init locker failed";
 					Logger.Log(Identity, msg, Level.Error);
 					throw new SpiderException(msg);
 				}

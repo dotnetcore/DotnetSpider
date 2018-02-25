@@ -4,6 +4,37 @@ using DotnetSpider.Core.Selector;
 namespace DotnetSpider.Extension.Model.Attribute
 {
 	/// <summary>
+	/// 额外选项的定义
+	/// </summary>
+	public enum PropertyDefineOptions
+	{
+		/// <summary>
+		/// 不作任何操作
+		/// </summary>
+		None,
+
+		/// <summary>
+		/// For html contene
+		/// </summary>
+		OuterHtml,
+
+		/// <summary>
+		/// For html contene
+		/// </summary>
+		InnerHtml,
+
+		/// <summary>
+		/// For html contene
+		/// </summary>
+		InnerText,
+
+		/// <summary>
+		/// 取的查询器结果的个数作为结果
+		/// </summary>
+		Count
+	}
+
+	/// <summary>
 	/// 属性选择器的定义
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
@@ -34,27 +65,6 @@ namespace DotnetSpider.Extension.Model.Attribute
 		}
 
 		/// <summary>
-		/// 额外选项的定义
-		/// </summary>
-		public enum Options
-		{
-			/// <summary>
-			/// 不作任何操作
-			/// </summary>
-			None,
-
-			/// <summary>
-			/// 查询器结果文本化(去掉HTML标签)
-			/// </summary>
-			PlainText,
-
-			/// <summary>
-			/// 取的查询器结果的个数作为结果
-			/// </summary>
-			Count
-		}
-
-		/// <summary>
 		/// Define whether the field can be null. 
 		/// If set to 'true' and the extractor get no result, the entire class will be discarded.
 		/// </summary>
@@ -63,7 +73,7 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// <summary>
 		/// 额外选项的定义
 		/// </summary>
-		public Options Option { get; set; } = Options.None;
+		public PropertyDefineOptions Option { get; set; } = PropertyDefineOptions.None;
 
 		/// <summary>
 		/// 列的长度

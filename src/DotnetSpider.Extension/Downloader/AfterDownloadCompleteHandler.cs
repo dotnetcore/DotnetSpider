@@ -30,7 +30,7 @@ namespace DotnetSpider.Extension.Downloader
 
 			if (_pipeline == null)
 			{
-				throw new SpiderException("StorageCache's pipeline unfound.");
+				throw new SpiderException("StorageCache's pipeline unfound");
 			}
 			_pipeline.AddEntity(new EntityDefine<DownloadCacheData>());
 			_pipeline.Init();

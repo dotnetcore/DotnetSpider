@@ -30,6 +30,10 @@ namespace DotnetSpider.Core.Downloader
 			}
 			if (!string.IsNullOrWhiteSpace(filePath))
 			{
+				if (!filePath.Contains(":"))
+				{
+					filePath = Path.Combine(Env.BaseDirectory, filePath);
+				}
 				if (File.Exists(filePath))
 				{
 					return new Page(request)
@@ -41,7 +45,7 @@ namespace DotnetSpider.Core.Downloader
 			var msg = $"File {filePath} unfound.";
 			Page page = new Page(request)
 			{
-				Exception = new DownloadException(msg),
+				Exception = new FileNotFoundException(msg),
 				Skip = true
 			};
 

@@ -71,7 +71,7 @@ namespace DotnetSpider.Extension.Infrastructure
 						}
 					}
 
-					throw new SpiderException("Proxy string should be like 192.168.1.100:8080.");
+					throw new SpiderException("Proxy string should be like 192.168.1.100:8080");
 				}
 			}
 		}
@@ -157,8 +157,9 @@ namespace DotnetSpider.Extension.Infrastructure
 						profile.SetPreference("network.proxy.ssl_port", port);
 						profile.SetPreference("network.proxy.type", 1);
 					}
-
-					e = new FirefoxDriver(profile);
+					FirefoxOptions options = new FirefoxOptions();
+					options.Profile = profile;
+					e = new FirefoxDriver(options);
 					break;
 				case Browser.Chrome:
 					ChromeDriverService cds = ChromeDriverService.CreateDefaultService(Env.BaseDirectory);

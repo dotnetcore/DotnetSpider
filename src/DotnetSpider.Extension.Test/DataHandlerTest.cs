@@ -26,7 +26,7 @@ namespace DotnetSpider.Extension.Test
 				return data;
 			}
 
-			public override List<Product> Handle(List<Product> datas, Page page)
+			public override IEnumerable<Product> Handle(IEnumerable<Product> datas, Page page)
 			{
 				var stream = File.Create(Identity);
 				stream.Dispose();

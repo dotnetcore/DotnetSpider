@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core.Selector;
+using System.Linq;
 using Xunit;
 
 namespace DotnetSpider.Core.Test
@@ -18,7 +19,7 @@ namespace DotnetSpider.Core.Test
 		{
 			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>", "", Core.Infrastructure.ContentType.Html);
 			var values = selectable.XPath(".//a").GetValues();
-			Assert.Equal("aaaaaaab", values[0]);
+			Assert.Equal("aaaaaaab", values.First());
 		}
 
 		[Fact]
@@ -26,7 +27,7 @@ namespace DotnetSpider.Core.Test
 		{
 			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>", "", Core.Infrastructure.ContentType.Html, "www\\.aaaa\\.com");
 			var values = selectable.XPath(".//a").GetValues();
-			Assert.Equal("aaaaaaab", values[0]);
+			Assert.Equal("aaaaaaab", values.First());
 		}
 
 		[Fact]

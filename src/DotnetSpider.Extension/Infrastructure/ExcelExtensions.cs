@@ -54,12 +54,12 @@ namespace DotnetSpider.Extension.Infrastructure
 
 						row++;
 					}
-					var folder = Path.Combine(Core.Env.GlobalDirectory, "excels");
+					var folder = Path.Combine(Env.GlobalDirectory, "excels");
 					if (!Directory.Exists(folder))
 					{
 						Directory.CreateDirectory(folder);
 					}
-					var path = Path.Combine(Core.Env.GlobalDirectory, "excels", $"{fileName}.xlsx");
+					var path = Path.Combine(Env.GlobalDirectory, "excels", $"{fileName}.xlsx");
 					if (File.Exists(path) && rewrite)
 					{
 						File.Delete(path);
@@ -84,7 +84,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <param name="emailTo">邮件接收人</param>
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, string emailTo)
 		{
-			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), Core.Env.EmailHost, int.Parse(Core.Env.EmailPort), Core.Env.EmailAccount, Core.Env.EmailPassword, Core.Env.EmailDisplayName);
+			EmailTo(conn, sql, fileName, subject, emailTo.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList(), Env.EmailHost, int.Parse(Env.EmailPort), Env.EmailAccount, Env.EmailPassword, Env.EmailDisplayName);
 		}
 
 		/// <summary>
@@ -97,7 +97,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <param name="emailTo">邮件接收人</param>
 		public static void EmailTo(this IDbConnection conn, string sql, string fileName, string subject, IEnumerable<string> emailTo)
 		{
-			EmailTo(conn, sql, fileName, subject, emailTo, Core.Env.EmailHost, int.Parse(Core.Env.EmailPort), Core.Env.EmailAccount, Core.Env.EmailPassword, Core.Env.EmailDisplayName);
+			EmailTo(conn, sql, fileName, subject, emailTo, Env.EmailHost, int.Parse(Env.EmailPort), Env.EmailAccount, Env.EmailPassword, Env.EmailDisplayName);
 		}
 
 		/// <summary>
@@ -175,7 +175,7 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			var attachment = new MimePart("excel", "xlsx")
 			{
-				ContentObject = new ContentObject(File.OpenRead(file)),
+				Content = new MimeContent(File.OpenRead(file)),
 				ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
 				ContentTransferEncoding = ContentEncoding.Base64,
 				FileName = Path.GetFileName(file)

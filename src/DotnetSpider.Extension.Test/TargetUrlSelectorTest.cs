@@ -144,7 +144,7 @@ namespace DotnetSpider.Extension.Test
 			}
 			catch (Exception e)
 			{
-				Assert.Equal("Region xpath and patterns should not be null both.", e.Message);
+				Assert.Equal("Region xpath and patterns should not be null both", e.Message);
 				return;
 			}
 			throw new Exception("Failed.");

@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				spider.Identity = id;
 				spider.Run();
 			});
-			Assert.Equal("You may miss a entity pipeline.", exceptoin.Message);
+			Assert.Equal("You may miss a entity pipeline", exceptoin.Message);
 		}
 
 		[Fact]
@@ -106,13 +106,13 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				public string Snapshot { get; set; }
 
 
-				[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefine.Options.PlainText)]
+				[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefineOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 				public string Details { get; set; }
 
-				[PropertyDefine(Expression = ".", Option = PropertyDefine.Options.PlainText)]
+				[PropertyDefine(Expression = ".", Option = PropertyDefineOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]

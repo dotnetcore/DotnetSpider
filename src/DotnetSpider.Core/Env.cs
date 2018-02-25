@@ -225,7 +225,7 @@ namespace DotnetSpider.Core
 				path = Path.Combine(BaseDirectory, $"{AppDomain.CurrentDomain.FriendlyName}.dll.config");
 #endif
 				// WORKAROUND: 测试框架的入口配置文件会导至读取配置文件错误
-				if (string.IsNullOrWhiteSpace(path) || "testhost.dll.config" == path)
+				if (string.IsNullOrWhiteSpace(path) || "testhost" == AppDomain.CurrentDomain.FriendlyName)
 				{
 					path = Path.Combine(BaseDirectory, "app.config");
 				}
@@ -302,6 +302,7 @@ namespace DotnetSpider.Core
 
 			HostName = Dns.GetHostName();
 
+<<<<<<< HEAD
             
 			var interf = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(
                 i => (i.NetworkInterfaceType == NetworkInterfaceType.Ethernet || i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && i.OperationalStatus == OperationalStatus.Up
@@ -312,6 +313,14 @@ namespace DotnetSpider.Core
                 var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
                 Ip = unicastAddresses.FirstOrDefault(a => a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString();
             }
+=======
+			var interf = NetworkInterface.GetAllNetworkInterfaces().First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet || i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211);
+			if (interf != null)
+			{
+				var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
+				Ip = unicastAddresses.FirstOrDefault(a => a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString();
+			}
+>>>>>>> pr/2
 			NodeId = Ip;
 			LoadConfiguration(ConfigurationFilePath);
 		}

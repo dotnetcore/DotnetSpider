@@ -43,6 +43,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\PropertyDefine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\SharedValueSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\TargetUrlsSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\BaseEntityExtractor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\DataHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\EntityDefine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\EntityExtractor.cs" />

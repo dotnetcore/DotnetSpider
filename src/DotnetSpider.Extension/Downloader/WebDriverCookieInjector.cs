@@ -105,7 +105,7 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PasswordSelector == null)
 			{
-				throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect.");
+				throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect");
 			}
 			var cookies = new Dictionary<string, string>();
 
@@ -186,7 +186,9 @@ namespace DotnetSpider.Extension.Downloader
 						if (pathsToProfiles.Length == 1)
 						{
 							FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false) { AlwaysLoadNoFocusLibrary = true };
-							webDriver = new FirefoxDriver(profile);
+							FirefoxOptions options = new FirefoxOptions();
+							options.Profile = profile;
+							webDriver = new FirefoxDriver(options);
 						}
 						else
 						{

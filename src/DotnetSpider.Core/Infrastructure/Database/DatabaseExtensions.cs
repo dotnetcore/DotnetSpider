@@ -29,11 +29,11 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		{
 			if (connectionStringSettings == null)
 			{
-				throw new SpiderException("ConnectionStringSetting is null.");
+				throw new SpiderException("ConnectionStringSetting is null");
 			}
 			if (string.IsNullOrWhiteSpace(connectionStringSettings.ConnectionString) || string.IsNullOrWhiteSpace(connectionStringSettings.ProviderName))
 			{
-				throw new SpiderException("ConnectionStringSetting is incorrect.");
+				throw new SpiderException("ConnectionStringSetting is incorrect");
 			}
 
 			var factory = DbProviderFactories.GetFactory(connectionStringSettings.ProviderName);
@@ -64,7 +64,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				}
 			}
 
-			throw new SpiderException($"Create or open DbConnection failed: {connectionStringSettings.ConnectionString}.");
+			throw new SpiderException($"Create or open DbConnection failed: {connectionStringSettings.ConnectionString}");
 		}
 
 		/// <summary>
@@ -128,7 +128,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				}
 			}
 
-			throw new SpiderException("Create connection failed.");
+			throw new SpiderException("Create connection failed");
 		}
 
 		/// <summary>

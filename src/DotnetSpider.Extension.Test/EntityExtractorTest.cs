@@ -8,6 +8,7 @@ using DotnetSpider.Extension.Model.Attribute;
 
 using Xunit;
 using DotnetSpider.Extension.Processor;
+using System.Linq;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -27,16 +28,16 @@ namespace DotnetSpider.Extension.Test
 			{
 				Content = File.ReadAllText(Path.Combine(Env.BaseDirectory, "Jd.html"))
 			});
-			Assert.Equal(60, results.Count);
-			Assert.Equal("手机", results[0].CategoryName);
-			Assert.Equal(110, results[0].CategoryId);
-			Assert.Equal("http://item.jd.com/3031737.html", results[0].Url);
-			Assert.Equal("3031737", results[0].Sku);
-			Assert.Equal("荣耀官方旗舰店", results[0].ShopName);
-			Assert.Equal("荣耀 NOTE 8 4GB+32GB 全网通版 冰河银", results[0].Name);
-			Assert.Equal("1000000904", results[0].VenderId);
-			Assert.Equal("1000000904", results[0].JdzyShopId);
-			Assert.Equal(DateTime.Now.ToString("yyyy-MM-dd"), results[0].RunId.ToString("yyyy-MM-dd"));
+			Assert.Equal(60, results.Count());
+			Assert.Equal("手机", results.First().CategoryName);
+			Assert.Equal(110, results.First().CategoryId);
+			Assert.Equal("http://item.jd.com/3031737.html", results.First().Url);
+			Assert.Equal("3031737", results.First().Sku);
+			Assert.Equal("荣耀官方旗舰店", results.First().ShopName);
+			Assert.Equal("荣耀 NOTE 8 4GB+32GB 全网通版 冰河银", results.First().Name);
+			Assert.Equal("1000000904", results.First().VenderId);
+			Assert.Equal("1000000904", results.First().JdzyShopId);
+			Assert.Equal(DateTime.Now.ToString("yyyy-MM-dd"), results.First().RunId.ToString("yyyy-MM-dd"));
 		}
 
 		[Fact]

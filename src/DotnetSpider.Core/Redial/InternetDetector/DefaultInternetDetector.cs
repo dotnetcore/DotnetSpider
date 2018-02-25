@@ -30,7 +30,7 @@ namespace DotnetSpider.Core.Redial.InternetDetector
 			Timeout = timeout;
 			if (!Uri.TryCreate(_url, UriKind.RelativeOrAbsolute, out var _))
 			{
-				throw new SpiderException($"{url} is not a correct uri.");
+				throw new SpiderException($"{url} is not a correct uri");
 			}
 			_url = url;
 		}

@@ -47,7 +47,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				if (value == PipelineMode.Update)
 				{
-					throw new SpiderException("Can not set pipeline mode to Update.");
+					throw new SpiderException("Can not set pipeline mode to update");
 				}
 				if (!Equals(value, _defaultPipelineModel))
 				{
@@ -266,7 +266,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			if (adapter.Table.Uniques != null)
 			{
-				throw new SpiderException("Cassandra not support unique index.");
+				throw new SpiderException("Cassandra not support unique index");
 			}
 
 			var sql = builder.ToString();

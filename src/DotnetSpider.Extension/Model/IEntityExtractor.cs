@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Model
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <returns>爬虫实体对象</returns>
-		List<T> Extract(Page page);
+		IEnumerable<T> Extract(Page page);
 
 		/// <summary>
 		/// 对Processor的结果进一步加工操作

@@ -13,41 +13,15 @@ namespace DotnetSpider.Extension.Model
 	/// 爬虫实体的解析器
 	/// </summary>
 	/// <typeparam name="T">爬虫实体类的类型</typeparam>
-	public class EntityExtractor<T> : IEntityExtractor<T>
+	public class EntityExtractor<T> : BaseEntityExtractor<T>
 	{
-		/// <summary>
-		/// 日志接口
-		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
-
-		/// <summary>
-		/// 爬虫实体类的定义
-		/// </summary>
-		public IEntityDefine EntityDefine { get; }
-
-		/// <summary>
-		/// 对解析的结果进一步加工操作
-		/// </summary>
-		public IDataHandler<T> DataHandler { get; }
-
-		/// <summary>
-		/// 解析器的名称, 默认值是爬虫实体类型的全称
-		/// </summary>
-		public string Name => EntityDefine?.Name;
-
 		/// <summary>
 		/// 构造方法
 		/// </summary>
 		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
 		/// <param name="tableName">实体在数据库中的表名, 此优先级高于EntitySelector中的定义</param>
-		public EntityExtractor(IDataHandler<T> dataHandler = null, string tableName = null)
+		public EntityExtractor(IDataHandler<T> dataHandler = null, string tableName = null) : base(dataHandler, tableName)
 		{
-			EntityDefine = new EntityDefine<T>();
-			if (!string.IsNullOrWhiteSpace(tableName))
-			{
-				EntityDefine.TableInfo.Name = tableName;
-			}
-			DataHandler = dataHandler;
 		}
 
 		/// <summary>
@@ -55,7 +29,7 @@ namespace DotnetSpider.Extension.Model
 		/// </summary>
 		/// <param name="page">页面数据</param>
 		/// <returns>爬虫实体对象</returns>
-		public List<T> Extract(Page page)
+		public override IEnumerable<T> Extract(Page page)
 		{
 			List<T> result = new List<T>();
 			if (EntityDefine.SharedValues != null && EntityDefine.SharedValues.Count > 0)
@@ -71,13 +45,13 @@ namespace DotnetSpider.Extension.Model
 			if (selector != null && EntityDefine.Multi)
 			{
 				var list = page.Selectable.SelectList(selector).Nodes();
-				if (list == null || list.Count == 0)
+				if (list == null || list.Count() == 0)
 				{
 					result = null;
 				}
 				else
 				{
-					if (EntityDefine.Take > 0 && list.Count > EntityDefine.Take)
+					if (EntityDefine.Take > 0 && list.Count() > EntityDefine.Take)
 					{
 						if (EntityDefine.TakeFromHead)
 						{
@@ -85,13 +59,13 @@ namespace DotnetSpider.Extension.Model
 						}
 						else
 						{
-							list = list.Skip(list.Count - EntityDefine.Take).ToList();
+							list = list.Skip(list.Count() - EntityDefine.Take).ToList();
 						}
 					}
 
-					for (int i = 0; i < list.Count; ++i)
+					for (int i = 0; i < list.Count(); ++i)
 					{
-						var item = list[i];
+						var item = list.ElementAt(i);
 						var obj = ExtractSingle(page, item, i);
 						if (obj != null)
 						{
@@ -202,15 +176,15 @@ namespace DotnetSpider.Extension.Model
 			}
 			else
 			{
-				bool needCount = field.Option == PropertyDefine.Options.Count;
+				bool needCount = field.Option == PropertyDefineOptions.Count;
 				if (needCount)
 				{
 					var values = item.SelectList(selector).Nodes();
-					return values.Count;
+					return values.Count();
 				}
 				else
 				{
-					var value = (object)item.Select(selector)?.GetValue(field.Option == PropertyDefine.Options.PlainText);
+					var value = (object)item.Select(selector)?.GetValue(ConvertToValueOption(field.Option));
 
 					foreach (var formatter in field.Formatters)
 					{
@@ -230,6 +204,29 @@ namespace DotnetSpider.Extension.Model
 
 					return TryConvert(value, field.DataType);
 				}
+			}
+		}
+
+		private ValueOption ConvertToValueOption(PropertyDefineOptions options)
+		{
+			switch (options)
+			{
+				case PropertyDefineOptions.InnerHtml:
+					{
+						return ValueOption.InnerHtml;
+					}
+				case PropertyDefineOptions.OuterHtml:
+					{
+						return ValueOption.OuterHtml;
+					}
+				case PropertyDefineOptions.InnerText:
+					{
+						return ValueOption.InnerText;
+					}
+				default:
+					{
+						return ValueOption.None;
+					}
 			}
 		}
 

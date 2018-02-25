@@ -132,7 +132,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			catch (SpiderException e)
 			{
-				Assert.Equal("Columns set as unique are not a property of your entity.", e.Message);
+				Assert.Equal("Columns set as unique are not a property of your entity", e.Message);
 			}
 
 			try
@@ -142,7 +142,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			catch (SpiderException e)
 			{
-				Assert.Equal("Columns set to update are not a property of your entity.", e.Message);
+				Assert.Equal("Columns set to update are not a property of your entity", e.Message);
 			}
 
 			try
@@ -152,7 +152,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			catch (SpiderException e)
 			{
-				Assert.Equal("There is no column need update.", e.Message);
+				Assert.Equal("There is no column need update", e.Message);
 			}
 			var metadata = new EntityDefine<UpdateEntity4>();
 			insertPipeline.AddEntity(metadata);

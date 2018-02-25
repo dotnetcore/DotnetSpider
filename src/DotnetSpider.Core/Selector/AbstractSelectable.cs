@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Selector
@@ -6,7 +7,7 @@ namespace DotnetSpider.Core.Selector
 	/// <summary>
 	/// 查询接口
 	/// </summary>
-	public abstract class BaseSelectable : ISelectable
+	public abstract class AbstractSelectable : ISelectable
 	{
 		/// <summary>
 		/// 查找到的所有结果
@@ -45,7 +46,7 @@ namespace DotnetSpider.Core.Selector
 		/// 取得查询器里所有的结果
 		/// </summary>
 		/// <returns>查询接口</returns>
-		public abstract IList<ISelectable> Nodes();
+		public abstract IEnumerable<ISelectable> Nodes();
 
 		/// <summary>
 		/// 通过JsonPath查找结果
@@ -78,71 +79,33 @@ namespace DotnetSpider.Core.Selector
 		/// <summary>
 		/// 获得当前查询器的文本结果, 如果查询结果为多个, 则返回第一个结果的值
 		/// </summary>
-		/// <param name="isPlainText">是否纯文本化、去掉HTML标签</param>
+		/// <param name="option">元素取值方式</param>
 		/// <returns>查询到的文本结果</returns>
-		public string GetValue(bool isPlainText)
+		public string GetValue(ValueOption option = ValueOption.None)
 		{
 			if (Elements == null || Elements.Count == 0)
 			{
 				return null;
 			}
 
-			if (Elements.Count > 0)
-			{
-				if (Elements[0] is HtmlNode)
-				{
-					if (!isPlainText)
-					{
-						return Elements[0].InnerHtml;
-					}
-					else
-					{
-						return Elements[0].InnerText;
-					}
-				}
-				else
-				{
-					if (!isPlainText)
-					{
-						return Elements[0].ToString();
-					}
-					else
-					{
-						var document = new HtmlDocument();
-						document.LoadHtml(Elements[0].ToString());
-						return document.DocumentNode.InnerText;
-					}
-				}
-			}
-			return null;
+			var element = Elements[0];
+			return CalculateValue(element, option);
 		}
 
 		/// <summary>
-		/// 获得当前查询器的文本结果
+		/// 获得当前查询器的文本结果, 如果查询结果为多个, 则返回第一个结果的值
 		/// </summary>
-		/// <param name="isPlainText">是否纯文本化、去掉HTML标签</param>
+		/// <param name="option">元素取值方式</param>
 		/// <returns>查询到的文本结果</returns>
-		public List<string> GetValues(bool isPlainText)
+		public IEnumerable<string> GetValues(ValueOption option = ValueOption.None)
 		{
 			List<string> result = new List<string>();
 			foreach (var el in Elements)
 			{
-				if (el is HtmlNode node)
+				var value = CalculateValue(el, option);
+				if (!string.IsNullOrEmpty(value))
 				{
-					result.Add(!isPlainText ? node.InnerHtml : node.InnerText.Trim());
-				}
-				else
-				{
-					if (!isPlainText)
-					{
-						result.Add(el.ToString());
-					}
-					else
-					{
-						var document = new HtmlDocument();
-						document.LoadHtml(el.ToString());
-						result.Add(document.DocumentNode.InnerText);
-					}
+					result.Add(value);
 				}
 			}
 			return result;
@@ -161,5 +124,57 @@ namespace DotnetSpider.Core.Selector
 		/// <param name="selector">查询器</param>
 		/// <returns>查询接口</returns>
 		public abstract ISelectable SelectList(ISelector selector);
+
+		private string CalculateValue(dynamic element, ValueOption option)
+		{
+			var elementNode = element as HtmlNode;
+			if (elementNode != null)
+			{
+				switch (option)
+				{
+					case ValueOption.OuterHtml:
+						{
+							return elementNode.OuterHtml;
+						}
+					case ValueOption.InnerHtml:
+						{
+							return elementNode.InnerHtml;
+						}
+					case ValueOption.InnerText:
+						{
+							return elementNode.InnerText;
+						}
+					default:
+						{
+							return elementNode.InnerHtml;
+						}
+				}
+			}
+			else
+			{
+				switch (option)
+				{
+					case ValueOption.OuterHtml:
+						{
+							throw new NotSupportedException();
+						}
+					case ValueOption.InnerHtml:
+						{
+							throw new NotSupportedException();
+						}
+					case ValueOption.InnerText:
+						{
+							// Cost too much, need re-implement
+							var document = new HtmlDocument();
+							document.LoadHtml(element.ToString());
+							return document.DocumentNode.InnerText;
+						}
+					default:
+						{
+							return element.ToString();
+						}
+				}
+			}
+		}
 	}
 }

@@ -52,7 +52,7 @@ namespace DotnetSpider.Extension
 		{
 			if (Env.DataConnectionStringSettings == null)
 			{
-				throw new SpiderException("DataConnection is unfound in app.config.");
+				throw new SpiderException("DataConnection is unfound in app.config");
 			}
 			_connectionStringSettings = Env.DataConnectionStringSettings;
 			_sql = sql;
@@ -84,7 +84,7 @@ namespace DotnetSpider.Extension
 					}
 				default:
 					{
-						throw new SpiderException($"Database {source} is unsported right now.");
+						throw new SpiderException($"Database {source} is unsported right now");
 					}
 			}
 			_sql = sql;
