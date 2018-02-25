@@ -302,7 +302,6 @@ namespace DotnetSpider.Core
 
 			HostName = Dns.GetHostName();
 
-<<<<<<< HEAD
             
 			var interf = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(
                 i => (i.NetworkInterfaceType == NetworkInterfaceType.Ethernet || i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && i.OperationalStatus == OperationalStatus.Up
@@ -318,9 +317,7 @@ namespace DotnetSpider.Core
 			if (interf != null)
 			{
 				var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
-				Ip = unicastAddresses.FirstOrDefault(a => a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString();
-			}
->>>>>>> pr/2
+
 			NodeId = Ip;
 			LoadConfiguration(ConfigurationFilePath);
 		}
