@@ -64,7 +64,7 @@ namespace DotnetSpider.Core.Selector
 			}
 			else
 			{
-				tmp = text is string ? text : text.ToSting();
+				tmp = text is string ? text : text.ToString();
 			}
 			Match match = _regex.Match(text);
 			if (match.Success)
@@ -98,7 +98,7 @@ namespace DotnetSpider.Core.Selector
 			}
 			else
 			{
-				builder.Append(text.ToSting());
+				builder.Append(text.ToString());
 			}
 
 			var matches = _regex.Matches(text);

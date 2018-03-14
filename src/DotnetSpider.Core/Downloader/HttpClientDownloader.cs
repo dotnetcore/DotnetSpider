@@ -175,14 +175,22 @@ namespace DotnetSpider.Core.Downloader
 			}
 			catch (Exception e)
 			{
-				Page page = new Page(request)
+				e = e.InnerException ?? e;
+				if (e is TaskCanceledException te)
 				{
-					Exception = e,
-					Skip = true
-				};
+					return CreateRetryPage(te, request, spider);
+				}
+				else
+				{
+					Page page = new Page(request)
+					{
+						Exception = e,
+						Skip = true
+					};
 
-				Logger.Log(spider.Identity, $"Download {request.Url} failed: {e.Message}.", Level.Error, e);
-				return page;
+					Logger.Log(spider.Identity, $"Download {request.Url} failed: {e.Message}.", Level.Error, e);
+					return page;
+				}
 			}
 			finally
 			{
