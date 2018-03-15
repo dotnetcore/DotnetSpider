@@ -26,8 +26,8 @@ namespace DotnetSpider.Extension.Model
 		/// 默认的创建时间
 		/// </summary>
 		[PropertyDefine(Expression = "now", Type = Core.Selector.SelectorType.Enviroment)]
-		public DateTime CDate { get; set; }
-	}
+		public DateTime CDate { get; set; } = DateTime.Now;
+    }
 
 	/// <summary>
 	/// Cassandra专用的爬虫实体类
@@ -39,11 +39,11 @@ namespace DotnetSpider.Extension.Model
 		/// </summary>
 		[PropertyDefine(Expression = "Id", Type = Core.Selector.SelectorType.Enviroment)]
 		public TimeUuid Id { get; set; }
-		
-		/// <summary>
-		/// 默认的创建时间
-		/// </summary>
-		[PropertyDefine(Expression = "now", Type = Core.Selector.SelectorType.Enviroment)]
-		public DateTime CDate { get; set; }
+
+        /// <summary>
+        /// 默认的创建时间
+        /// </summary>
+        [PropertyDefine(Expression = "now", Type = Core.Selector.SelectorType.Enviroment)]
+        public DateTime CDate { get; set; } = DateTime.Now;
 	}
 }
