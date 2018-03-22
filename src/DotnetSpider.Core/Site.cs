@@ -78,7 +78,7 @@ namespace DotnetSpider.Core
 				if (_encodingName != value)
 				{
 					_encodingName = value;
-					_encoding = Encoding.GetEncoding(_encodingName);
+					_encoding = string.IsNullOrEmpty(_encodingName) ? null : Encoding.GetEncoding(_encodingName);
 				}
 			}
 		}
