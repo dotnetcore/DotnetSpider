@@ -21,7 +21,7 @@ namespace DotnetSpider.Core
 		/// 站点信息
 		/// </summary>
 		[JsonIgnore]
-		public Site Site { get; internal set; }
+		public Site Site { get; set; }
 
 		/// <summary>
 		/// 此链接解析出的数据结果数量

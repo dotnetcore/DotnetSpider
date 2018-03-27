@@ -26,7 +26,6 @@ namespace DotnetSpider.Core.Scheduler
 		/// <param name="request">«Î«Û∂‘œÛ</param>
 		protected override void PushWhenNoDuplicate(Request request)
 		{
-			request.Site = request.Site ?? Spider.Site;
 			lock (_lock)
 			{
 				_queue.Add(request);

@@ -106,7 +106,6 @@ namespace DotnetSpider.Core.Scheduler
 		{
 			if (ShouldReserved(request))
 			{
-				request.Site = request.Site ?? Spider.Site;
 				lock (_lock)
 				{
 					_queue.Add(request);

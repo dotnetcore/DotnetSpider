@@ -63,6 +63,10 @@ namespace DotnetSpider.Core.Scheduler
 		/// <param name="request">请求对象</param>
 		public void Push(Request request)
 		{
+			if (request.Site == null)
+			{
+				throw new ArgumentException("Request site is missing.");
+			}
 			if (UseInternet)
 			{
 				NetworkCenter.Current.Execute("sch-push", () =>
