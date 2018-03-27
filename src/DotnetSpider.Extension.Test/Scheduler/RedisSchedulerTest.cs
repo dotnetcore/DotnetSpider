@@ -153,7 +153,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
-			scheduler.Clear();
+			scheduler.Dispose();
 
 			scheduler.Push(new Request("http://www.a.com/", null));
 			scheduler.Push(new Request("http://www.b.com/", null));
@@ -200,7 +200,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Assert.Equal(1, scheduler.ErrorRequestsCount);
 			Assert.Equal(4, scheduler.TotalRequestsCount);
 
-			scheduler.Clear();
+			scheduler.Dispose();
 		}
 
 		//[Fact]
@@ -275,6 +275,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
 			spider.Deep = 3;
+			spider.ClearSchedulerAfterComplete = false;
 			spider.EmptySleepTime = 6000;
 			// start crawler 启动爬虫
 			spider.Run();

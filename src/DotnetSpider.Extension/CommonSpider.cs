@@ -112,7 +112,6 @@ namespace DotnetSpider.Extension
 
 			if (arguments.Contains("rerun"))
 			{
-				Scheduler.Clear();
 				Scheduler.Dispose();
 				RemoveVerifidationLock();
 			}

@@ -130,7 +130,7 @@ namespace DotnetSpider.Core.Test
 		{
 			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8" },
 				new TestPageProcessor()).AddPipeline(new TestPipeline());
-
+			spider.ClearSchedulerAfterComplete = false;
 			for (int i = 0; i < 20; ++i)
 			{
 				spider.AddStartUrl($"http://www.baidu.com/_t={i}");
@@ -143,6 +143,7 @@ namespace DotnetSpider.Core.Test
 
 			Spider spider2 = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8" },
 				new TestPageProcessor()).AddPipeline(new TestPipeline());
+			spider2.ClearSchedulerAfterComplete = false;
 			for (int i = 0; i < 25; ++i)
 			{
 				spider2.AddStartUrl($"http://www.baidu.com/_t={i}");

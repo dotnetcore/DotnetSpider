@@ -148,6 +148,8 @@ namespace DotnetSpider.Core.Scheduler
 		{
 			lock (_lock)
 			{
+				_successCounter.Set(0);
+				_errorCounter.Set(0);
 				_queue.Clear();
 			}
 

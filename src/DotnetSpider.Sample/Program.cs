@@ -81,9 +81,6 @@ namespace DotnetSpider.Sample
 		/// </summary>
 		private static void MyTest()
 		{
- 
 		}
-
 	}
-
 }

@@ -34,7 +34,7 @@ namespace DotnetSpider.Core.Test.Processor
 				new TestPageProcessor())
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
 				.AddPipeline(new FilePipeline());
-
+			spider.ClearSchedulerAfterComplete = false;
 			// dowload html by http client
 			spider.Downloader = new HttpClientDownloader();
 

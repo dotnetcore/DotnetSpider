@@ -118,6 +118,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Redial\RedialResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Request.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ResultItems.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scheduler\BaseScheduler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\Component\BloomFilterDuplicateRemover.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\Component\HashSetDuplicateRemover.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\Component\IDuplicateRemover.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\IScheduler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\PriorityScheduler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\QueueDuplicateRemovedScheduler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scheduler\QueueScheduler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selector\HtmlSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selector\AbstractSelectable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Selector\CssSelector.cs" />

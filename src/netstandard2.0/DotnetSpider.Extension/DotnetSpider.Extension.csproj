@@ -19,12 +19,12 @@
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
     <PackageReference Include="EPPlus.Core" Version="1.5.4" />
-    <PackageReference Include="Selenium.WebDriver" Version="3.8.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.11.0" />
     <PackageReference Include="Npgsql" Version="3.2.5" />
-    <PackageReference Include="CassandraCSharpDriver" Version="3.4.0.1" />
+    <PackageReference Include="CassandraCSharpDriver" Version="3.4.1" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
-    <PackageReference Include="Npgsql" Version="3.2.6" />
-    <PackageReference Include="MailKit" Version="2.0.1" />
+    <PackageReference Include="Npgsql" Version="3.2.7" />
+    <PackageReference Include="MailKit" Version="2.0.2" />
     <PackageReference Include="Polly" Version="5.8.0" />
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
   </ItemGroup>

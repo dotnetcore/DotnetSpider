@@ -692,7 +692,6 @@ namespace DotnetSpider.Core
 							{
 								Stat = Status.Finished;
 								_realStat = Status.Finished;
-								_OnComplete();
 								OnComplete?.Invoke(this);
 								break;
 							}
@@ -992,7 +991,7 @@ namespace DotnetSpider.Core
 				SafeDestroy(pipeline);
 			}
 
-			SafeDestroy(Scheduler);
+			SafeDestroyScheduler();
 			SafeDestroy(PageProcessors);
 			SafeDestroy(Downloader);
 
@@ -1005,12 +1004,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Event when spider on complete.
 		/// </summary>
-		protected virtual void _OnComplete()
+		protected virtual void SafeDestroyScheduler()
 		{
 			IsComplete = Scheduler.LeftRequestsCount == 0;
 			if (ClearSchedulerAfterComplete && IsComplete)
 			{
-				Scheduler.Clear();
+				Scheduler.Dispose();
 			}
 		}
 

@@ -233,15 +233,6 @@ namespace DotnetSpider.Extension.Scheduler
 		/// </summary>
 		public override void Dispose()
 		{
-		}
-
-		/// <summary>
-		/// 清空整个队列
-		/// </summary>
-		public override void Clear()
-		{
-			base.Clear();
-
 			if (UseInternet)
 			{
 				NetworkCenter.Current.Execute("rds-inc-clear", () =>

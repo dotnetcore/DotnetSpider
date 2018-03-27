@@ -42,10 +42,5 @@ namespace DotnetSpider.Core.Scheduler
 		/// 导出整个队列
 		/// </summary>
 		void Export();
-
-		/// <summary>
-		/// 清空整个队列
-		/// </summary>
-		void Clear();
 	}
 }
