@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
-    <id>DotnetSpider2.Extension</id>
+    <id>DotnetSpider.Extension</id>
     <version>2.4.5</version>
     <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
     <owners>zlzforever@163.com</owners>
@@ -13,7 +13,7 @@
     <description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp; scraping framework for .NET</description>
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="DotnetSpider2.Core" version="2.4.5" />
+        <dependency id="DotnetSpider.Core" version="2.4.5" />
         <dependency id="Dapper" version="1.50.2"/>
         <dependency id="MailKit" version="2.0.2"/>
         <dependency id="MongoDB.Driver" version="2.5.0"/>
@@ -28,7 +28,7 @@
         <dependency id="MessagePack" version="1.7.3.4"/>
       </group>
       <group targetFramework=".NETFramework4.5" >
-        <dependency id="DotnetSpider2.Core" version="2.4.5" />
+        <dependency id="DotnetSpider.Core" version="2.4.5" />
         <dependency id="Dapper" version="1.50.2"/> 
         <dependency id="MailKit" version="2.0.2"/>
         <dependency id="MongoDB.Driver" version="2.5.0"/>

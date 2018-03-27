@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
-    <id>DotnetSpider2.Core</id>
+    <id>DotnetSpider.Core</id>
     <version>2.4.5</version>
     <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
     <owners>zlzforever@163.com</owners>
