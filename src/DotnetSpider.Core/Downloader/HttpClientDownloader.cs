@@ -249,7 +249,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				if (!string.IsNullOrWhiteSpace(header.Key) && !string.IsNullOrWhiteSpace(header.Value) && header.Key != contentTypeHeader && header.Key != userAgentHeader)
 				{
-					httpRequestMessage.Headers.Add(header.Key, header.Value);
+					httpRequestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value);
 				}
 			}
 
@@ -261,7 +261,7 @@ namespace DotnetSpider.Core.Downloader
 
 				if (site.Headers.ContainsKey(contentTypeHeader))
 				{
-					httpRequestMessage.Content.Headers.Add(contentTypeHeader, site.Headers[contentTypeHeader]);
+					httpRequestMessage.Content.Headers.TryAddWithoutValidation(contentTypeHeader, site.Headers[contentTypeHeader]);
 				}
 
 				var xRequestedWithHeader = "X-Requested-With";
@@ -273,7 +273,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					if (!httpRequestMessage.Content.Headers.Contains(xRequestedWithHeader) && !httpRequestMessage.Headers.Contains(xRequestedWithHeader))
 					{
-						httpRequestMessage.Content.Headers.Add(xRequestedWithHeader, "XMLHttpRequest");
+						httpRequestMessage.Content.Headers.TryAddWithoutValidation(xRequestedWithHeader, "XMLHttpRequest");
 					}
 				}
 			}
