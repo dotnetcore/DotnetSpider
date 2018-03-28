@@ -20,10 +20,6 @@ namespace DotnetSpider.Core.Infrastructure
 	{
 		private static NLog.ILogger _nlogger;
 		private const string SystemIdentity = "System";
-		private static RetryPolicy RetryPolicy = Policy.Handle<Exception>().Retry(5, (ex, count) =>
-		{
-			_nlogger.Error($"Submit http log failed [{count}]: {ex}");
-		});
 
 		private DLog() { }
 
@@ -159,30 +155,17 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			if (Env.EnterpiseService && Env.EnterpiseServiceLog)
 			{
-				var json = JsonConvert.SerializeObject(new
+				var log = JsonConvert.SerializeObject(new LogInfo
 				{
-					Token = Env.EnterpiseServiceToken,
 					Identity = identity,
-					LogInfo = new
-					{
-						Identity = identity,
-						Env.NodeId,
-						Logged = DateTime.UtcNow,
-						Level = level.Name,
-						Message = message,
-						Exception = exception?.ToString(),
-					}
+					NodeId = Env.NodeId,
+					Logged = DateTime.UtcNow,
+					Level = level.Name,
+					Message = message,
+					Exception = exception?.ToString()
 				});
-				var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-				RetryPolicy.ExecuteAndCapture(() =>
-				{
-					NetworkCenter.Current.Execute("log", () =>
-					{
-						var response = HttpSender.Client.PostAsync(Env.EnterpiseServiceLogUrl, content).Result;
-						response.EnsureSuccessStatusCode();
-					});
-				});
+				EnterpriseHttpApi.HttpLog(log);
 			}
 		}
 

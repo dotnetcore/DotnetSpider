@@ -51,7 +51,7 @@ namespace DotnetSpider.Core
 		private bool _exitWhenComplete = true;
 		private int _emptySleepTime = 15000;
 		private int _cachedSize = 1;
-		private string _identity;
+		private string _identity = Guid.NewGuid().ToString("N");
 		private StreamWriter _errorRequestStreamWriter;
 		private int _errorRequestFlushCount;
 		private RetryPolicy _pipelineRetryPolicy;
@@ -1479,7 +1479,7 @@ namespace DotnetSpider.Core
 		{
 			if (Monitor == null)
 			{
-				Monitor = string.IsNullOrWhiteSpace(Env.EnterpiseServiceUrl) ? new NLogMonitor() : new HttpMonitor(Env.EnterpiseServiceStatusApiUrl);
+				Monitor = string.IsNullOrWhiteSpace(Env.EnterpiseServiceUrl) ? new NLogMonitor() : new HttpMonitor();
 			}
 		}
 

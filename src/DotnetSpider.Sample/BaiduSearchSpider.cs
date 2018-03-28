@@ -21,15 +21,16 @@ namespace DotnetSpider.Sample
 
 		protected override void MyInit(params string[] arguments)
 		{
+			TaskId = "1";
 			var word = "可乐|雪碧";
 			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 			AddEntityType<BaiduSearchEntry>();
-			DataVerificationAndReport += () =>
-			{
-				Verification<BaiduSearchSpider> verifier = new Verification<BaiduSearchSpider>();
-				verifier.AddSqlEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);
-				verifier.Report();
-			};
+			//DataVerificationAndReport += () =>
+			//{
+			//	Verification<BaiduSearchSpider> verifier = new Verification<BaiduSearchSpider>();
+			//	verifier.AddSqlEqual("采集总量", "SELECT COUNT(*) AS Result baidu.baidu_search WHERE run_id = DATE(); ", 10);
+			//	verifier.Report();
+			//};
 		}
 
 		[EntityTable("baidu", "baidu_search")]

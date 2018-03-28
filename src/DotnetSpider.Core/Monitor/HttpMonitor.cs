@@ -12,17 +12,6 @@ namespace DotnetSpider.Core.Monitor
 	/// </summary>
 	public class HttpMonitor : NLogMonitor
 	{
-		private readonly string _apiUrl;
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="apiUrl">上报状态的WebApi入口</param>
-		public HttpMonitor(string apiUrl)
-		{
-			_apiUrl = apiUrl;
-		}
-
 		/// <summary>
 		/// 上报爬虫状态
 		/// </summary>
@@ -60,12 +49,7 @@ namespace DotnetSpider.Core.Monitor
 				Thread = threadNum,
 				Total = total
 			});
-			var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-			NetworkCenter.Current.Execute("status", () =>
-			{
-				HttpSender.Client.PostAsync(_apiUrl, content).Wait();
-			});
+			EnterpriseHttpApi.HttpStatus("{}");
 		}
 	}
 }

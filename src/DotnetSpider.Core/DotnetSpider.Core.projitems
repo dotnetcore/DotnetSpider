@@ -53,10 +53,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\DirectoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\DLog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\EncodingExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\EnterpriseHttpApi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\FileUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\HttpSender.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\ILock.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\ILogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\LogInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\PriorityBlockingQueue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\Rasdial.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\RegexUtil.cs" />
