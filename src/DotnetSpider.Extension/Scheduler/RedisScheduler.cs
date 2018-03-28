@@ -158,11 +158,11 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			if (UseInternet)
 			{
-				return NetworkCenter.Current.Execute("rds-poll", PollRequest);
+				return NetworkCenter.Current.Execute("rds-poll", ImplPollRequest);
 			}
 			else
 			{
-				return PollRequest();
+				return ImplPollRequest();
 			}
 		}
 
@@ -407,7 +407,7 @@ namespace DotnetSpider.Extension.Scheduler
 			});
 		}
 
-		private Request PollRequest()
+		private Request ImplPollRequest()
 		{
 			return _retryPolicy.Execute(() =>
 			{

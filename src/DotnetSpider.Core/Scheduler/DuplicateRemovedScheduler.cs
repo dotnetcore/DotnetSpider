@@ -40,7 +40,7 @@ namespace DotnetSpider.Core.Scheduler
 		/// <param name="request">«Î«Û∂‘œÛ</param>
 		protected abstract void PushWhenNoDuplicate(Request request);
 
-		protected override void DoPush(Request request)
+		protected override void ImplPush(Request request)
 		{
 			if (!DuplicateRemover.IsDuplicate(request) || ShouldReserved(request))
 			{

@@ -63,7 +63,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				metadata2.TableInfo.Name = tableName;
 				updatePipeline.AddEntity(metadata2);
 				updatePipeline.Init();
-				var data3 = conn.Query<ProductUpdate>($"use test;select * from {tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where sku=110").First();
+				var data3 = conn.Query<ProductUpdate>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where sku=110").First();
 				data3.Category = "4C";
 				updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 }, spider);
 

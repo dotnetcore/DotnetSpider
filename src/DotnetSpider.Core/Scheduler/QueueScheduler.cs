@@ -102,7 +102,7 @@ namespace DotnetSpider.Core.Scheduler
 			}
 		}
 
-		protected override void DoPush(Request request)
+		protected override void ImplPush(Request request)
 		{
 			if (ShouldReserved(request))
 			{

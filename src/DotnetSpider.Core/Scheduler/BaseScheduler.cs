@@ -71,12 +71,12 @@ namespace DotnetSpider.Core.Scheduler
 			{
 				NetworkCenter.Current.Execute("sch-push", () =>
 				{
-					DoPush(request);
+					ImplPush(request);
 				});
 			}
 			else
 			{
-				DoPush(request);
+				ImplPush(request);
 			}
 		}
 
@@ -119,6 +119,6 @@ namespace DotnetSpider.Core.Scheduler
 			return request.CycleTriedTimes > 0 && request.CycleTriedTimes <= Spider.Site.CycleRetryTimes;
 		}
 
-		protected abstract void DoPush(Request request);
+		protected abstract void ImplPush(Request request);
 	}
 }
