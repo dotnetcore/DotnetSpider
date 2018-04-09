@@ -99,6 +99,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Proxy\HttpProxyPool.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Proxy\IHttpProxyPool.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Proxy\IProxySupplier.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Proxy\IProxyValidator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Proxy\KuaidailiProxySupplier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Proxy\Proxy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Proxy\SingleProxyPool.cs" />

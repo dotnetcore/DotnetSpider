@@ -16,13 +16,14 @@ namespace DotnetSpider.Core.Proxy
 	/// </summary>
 	public class HttpProxyPool : IHttpProxyPool
 	{
-		private static readonly ILogger Logger = DLog.GetLogger();
 		private readonly IProxySupplier _supplier;
 		private readonly List<Proxy> _proxyQueue = new List<Proxy>();
 		private readonly ConcurrentDictionary<string, Proxy> _allProxy = new ConcurrentDictionary<string, Proxy>();
 		private bool _isDispose;
 		private readonly int _reuseInterval;
 		private readonly object _locker = new object();
+
+		public IProxyValidator ProxyValidator { get; set; } = new DefaultProxyValidator();
 
 		/// <summary>
 		/// 构造方法
@@ -113,7 +114,7 @@ namespace DotnetSpider.Core.Proxy
 			{
 				return;
 			}
-			if (p.FailedNum % 3 == 0 && !ValidateProxy(p.WebProxy.Uri.Host, p.WebProxy.Uri.Port))
+			if (ProxyValidator != null && p.FailedNum % 3 == 0 && ProxyValidator.IsAvailable(proxy))
 			{
 				return;
 			}
@@ -131,59 +132,37 @@ namespace DotnetSpider.Core.Proxy
 			_isDispose = true;
 		}
 
-		private bool ValidateProxy(string ip, int port)
-		{
-			bool isReachable = false;
-
-			try
-			{
-				TcpClient tcp = new TcpClient();
-				IPAddress ipAddr = IPAddress.Parse(ip);
-				tcp.ReceiveTimeout = 5000;
-				Stopwatch watch = new Stopwatch();
-				watch.Start();
-				tcp.ConnectAsync(ipAddr, port).Wait();
-				watch.Stop();
-				Logger.Log($"Detect one avaliable proxy: {ip}:{port}, cost {watch.ElapsedMilliseconds}ms.", Level.Debug);
-				isReachable = true;
-			}
-			catch (Exception e)
-			{
-				Logger.Log($"Connect test failed for proxy: {ip}:{port}.", Level.Error, e);
-			}
-
-			return isReachable;
-		}
-
 		private void RefreshProxies()
 		{
-			var result = _supplier.GetProxies();
-
-			Parallel.ForEach(result, new ParallelOptions
+			if (ProxyValidator != null)
 			{
-				MaxDegreeOfParallelism = 4
-			}, proxy =>
-			{
-				var key = proxy.Key;
-				var value = proxy.Value;
-				if (_allProxy.ContainsKey(key))
-				{
-					return;
-				}
+				var result = _supplier.GetProxies();
 
-				if (ValidateProxy(proxy.Value.WebProxy.Uri.Host, proxy.Value.WebProxy.Uri.Port))
+				Parallel.ForEach(result, new ParallelOptions
 				{
-					value.SetFailedNum(0);
-					value.SetReuseTime(_reuseInterval);
-
-					lock (this)
+					MaxDegreeOfParallelism = 4
+				}, proxy =>
+				{
+					var key = proxy.Key;
+					var value = proxy.Value;
+					if (_allProxy.ContainsKey(key))
 					{
-						_proxyQueue.Add(value);
+						return;
 					}
-					_allProxy.GetOrAdd(key, value);
-				}
-			});
 
+					if (ProxyValidator.IsAvailable(proxy.Value.WebProxy))
+					{
+						value.SetFailedNum(0);
+						value.SetReuseTime(_reuseInterval);
+
+						lock (this)
+						{
+							_proxyQueue.Add(value);
+						}
+						_allProxy.GetOrAdd(key, value);
+					}
+				});
+			}
 		}
 	}
 }
