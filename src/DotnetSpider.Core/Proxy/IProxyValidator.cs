@@ -77,10 +77,7 @@ namespace DotnetSpider.Core.Proxy
 			/// <param name="userName">代理账号</param>
 			/// <param name="password">代理密码</param>
 			/// <param name="targetAddress">目标url地址</param>
-			/// <exception cref="ArgumentNullException"></exception>
-			/// <exception cref="ArgumentException"></exception>
-			/// <exception cref="ArgumentOutOfRangeException"></exception>
-			/// <returns></returns>
+			/// <returns>检测返回的状态码</returns>
 			public static HttpStatusCode Validate(string proxyHost, int proxyPort, string userName, string password, Uri targetAddress)
 			{
 				var remoteEndPoint = new DnsEndPoint(proxyHost, proxyPort, AddressFamily.InterNetwork);
@@ -133,22 +130,23 @@ namespace DotnetSpider.Core.Proxy
 					throw new ArgumentNullException(nameof(targetAddress));
 				}
 
+				const string CLRF = "\r\n";
 				var builder = new StringBuilder()
-					.AppendLine($"CONNECT {targetAddress.Authority} HTTP/1.1")
-					.AppendLine($"Host: {targetAddress.Authority}")
-					.AppendLine("Accept: */*")
-					.AppendLine("Content-Type: text/html")
-					.AppendLine("Proxy-Connection: Keep-Alive")
-					.AppendLine("Content-length: 0");
+					.Append($"CONNECT {targetAddress.Host}:{targetAddress.Port} HTTP/1.1{CLRF}")
+					.Append($"Host: {targetAddress.Host}:{targetAddress.Port}{CLRF}")
+					.Append($"Accept: */*{CLRF}")
+					.Append($"Content-Type: text/html{CLRF}")
+					.Append($"Proxy-Connection: Keep-Alive{CLRF}")
+					.Append($"Content-length: 0{CLRF}");
 
 				if (userName != null && password != null)
 				{
 					var bytes = Encoding.ASCII.GetBytes($"{userName}:{password}");
 					var base64 = Convert.ToBase64String(bytes);
-					builder.AppendLine($"Proxy-Authorization: Basic {base64}");
+					builder.AppendLine($"Proxy-Authorization: Basic {base64}{CLRF}");
 				}
 
-				return builder.AppendLine().AppendLine().ToString();
+				return builder.Append(CLRF).ToString();
 			}
 		}
 	}
