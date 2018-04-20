@@ -29,13 +29,13 @@ namespace DotnetSpider.Core.Downloader
 			{
 				filePath = filePath.Replace("\\", "/");
 			}
-			if (filePath.StartsWith("\\") || filePath.StartsWith("/"))
+			if (filePath.StartsWith("\\"))
 			{
 				filePath = filePath.Substring(2, filePath.Length - 2);
 			}
 			if (!string.IsNullOrWhiteSpace(filePath))
 			{
-				if (!filePath.Contains(":"))
+				if (Env.IsWindows && !filePath.Contains(":"))
 				{
 					filePath = Path.Combine(Env.BaseDirectory, filePath);
 				}

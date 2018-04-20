@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "FileCookieInject")]
 		public void FileCookieInject()
 		{
-			FileCookieInject cookieInject = new FileCookieInject("Downloader\\test.cookies");
+			FileCookieInject cookieInject = new FileCookieInject("source\\test.cookies");
 			var spider = new DefaultSpider();
 			cookieInject.Inject(spider.Downloader, spider);
 			var cookies = spider.Downloader.GetCookies(new Uri("http://baidu.com"));
