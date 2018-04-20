@@ -49,7 +49,7 @@ namespace DotnetSpider.Core.Monitor
 				Thread = threadNum,
 				Total = total
 			});
-			EnterpriseHttpApi.HttpStatus("{}");
+			EnterpriseHttpApi.HttpStatus(json);
 		}
 	}
 }
