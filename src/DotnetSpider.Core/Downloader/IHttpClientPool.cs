@@ -34,6 +34,7 @@ namespace DotnetSpider.Core.Downloader
 
 	/// <summary>
 	/// Httpclient pool impletion for <see cref="IHttpClientPool"/>
+	/// 一旦Handler与目标地址建立了连接, Handler中的CookieContainer、Proxy等设置都是不能再更改的
 	/// </summary>
 	/// <summary xml:lang="zh-CN">
 	/// HttpClient池

@@ -99,7 +99,7 @@ namespace DotnetSpider.Core.Downloader
 
 		private CookieContainer GenerateNewCookieContainer(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, ICookieInjector cookieInjector = null)
 		{
-			var key = cookieInjector == null ? $"{cookieContainer.GetHashCode()}" : $"{cookieContainer.GetHashCode()}_{cookieInjector?.GetHashCode()}";
+			var key = $"{cookieContainer.GetHashCode()}_{cookieInjector?.GetHashCode()}";
 
 			if (!_initedCookieContainers.ContainsKey(key))
 			{

@@ -47,7 +47,7 @@ namespace DotnetSpider.Core.Downloader
 
 		private readonly string _downloadFolder;
 		private readonly bool _decodeHtml;
-		private readonly double _timeout = 5;
+		private readonly double _timeout = 8000;
 
 		/// <summary>
 		/// A <see cref="HttpClient"/> pool
@@ -76,7 +76,7 @@ namespace DotnetSpider.Core.Downloader
 		/// </summary>
 		/// <param name="timeout">下载超时时间 Download timeout.</param>
 		/// <param name="decodeHtml">下载的内容是否需要HTML解码 Whether <see cref="Page.Content"/> need to Html Decode.</param>
-		public HttpClientDownloader(int timeout = 5, bool decodeHtml = false) : this()
+		public HttpClientDownloader(int timeout = 8000, bool decodeHtml = false) : this()
 		{
 			_timeout = timeout;
 			_decodeHtml = decodeHtml;
@@ -161,36 +161,9 @@ namespace DotnetSpider.Core.Downloader
 
 				return page;
 			}
-			catch (DownloadException de)
-			{
-				return CreateRetryPage(de, request, spider);
-			}
-			catch (HttpRequestException he)
-			{
-				return CreateRetryPage(he, request, spider);
-			}
-			catch (TaskCanceledException te)
-			{
-				return CreateRetryPage(te, request, spider);
-			}
 			catch (Exception e)
 			{
-				e = e.InnerException ?? e;
-				if (e is TaskCanceledException te)
-				{
-					return CreateRetryPage(te, request, spider);
-				}
-				else
-				{
-					Page page = new Page(request)
-					{
-						Exception = e,
-						Skip = true
-					};
-
-					Logger.Log(spider.Identity, $"Download {request.Url} failed: {e.Message}.", Level.Error, e);
-					return page;
-				}
+				return CreateRetryPage(e, request, spider);
 			}
 			finally
 			{
