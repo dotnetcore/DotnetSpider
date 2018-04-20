@@ -23,6 +23,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <returns>页面数据 <see cref="Page"/></returns>
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
+			Console.WriteLine(request.Uri.LocalPath);
 			var filePath = request.Uri.LocalPath;
 			if (!Env.IsWindows)
 			{
