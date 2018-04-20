@@ -24,7 +24,11 @@ namespace DotnetSpider.Core.Downloader
 		protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			var filePath = request.Uri.LocalPath;
-			if (filePath.StartsWith("\\"))
+			if (!Env.IsWindows)
+			{
+				filePath = filePath.Replace("\\", "/");
+			}
+			if (filePath.StartsWith("\\") || filePath.StartsWith("/"))
 			{
 				filePath = filePath.Substring(2, filePath.Length - 2);
 			}

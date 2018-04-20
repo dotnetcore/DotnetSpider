@@ -46,11 +46,12 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="path">Cookie文件路径 Cookie File path</param>
 		public FileCookieInject(string path)
 		{
-			if (!File.Exists(path))
+			var filePath = Env.IsWindows ? path : path.Replace("\\", "/");
+			if (!File.Exists(filePath))
 			{
 				throw new ArgumentException("Cookie file unfound.");
 			}
-			_cookiePath = path;
+			_cookiePath = filePath;
 		}
 
 		/// <summary>
