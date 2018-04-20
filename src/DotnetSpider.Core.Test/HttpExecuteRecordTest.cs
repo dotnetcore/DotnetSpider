@@ -7,26 +7,26 @@ using Xunit;
 
 namespace DotnetSpider.Core.Test
 {
-    public class HttpExecuteRecordTest
-    {
-        [Fact]
-        public void Record()
-        {
-            if (Env.IsWindows)
-            {
-                var result = HttpSender.Request((new HttpRequest
-                {
-                    Url = "http://localhost:30013"
-                }));
-                if (result.StatusCode == HttpStatusCode.OK)
-                {
-                    Env.EnterpiseServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";
+	public class HttpExecuteRecordTest
+	{
+		[Fact(DisplayName = "Record")]
+		public void Record()
+		{
+			if (Env.IsWindows)
+			{
+				var result = HttpSender.Request((new HttpRequest
+				{
+					Url = "http://localhost:30013"
+				}));
+				if (result.StatusCode == HttpStatusCode.OK)
+				{
+					Env.EnterpiseServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";
 
-                    var recorder = new HttpExecuteRecord();
-                    recorder.Add("1", "test", "abcd");
-                    recorder.Remove("1", "test", "abcd");
-                }
-            }
-        }
-    }
+					var recorder = new HttpExecuteRecord();
+					recorder.Add("1", "test", "abcd");
+					recorder.Remove("1", "test", "abcd");
+				}
+			}
+		}
+	}
 }

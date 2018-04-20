@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Test.Infrastructure
 
 	public class NlogTest
 	{
-		[Fact]
+		[Fact(DisplayName = "WithoutNlogConfig")]
 		public void WithoutNlogConfig()
 		{
 			var nlogConfig = DLog.GetDefaultConfigString();

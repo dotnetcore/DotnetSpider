@@ -33,7 +33,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "DetectDownloadContent")]
 		public void DetectDownloadContent()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
@@ -48,7 +48,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			Assert.Equal(Core.Infrastructure.ContentType.Json, spider2.Site.ContentType);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "SetContentType")]
 		public void SetContentType()
 		{
 			Site site1 = new Site
@@ -71,7 +71,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site2));
 		}
 
-		[Fact]
+		[Fact(DisplayName = "_404Url")]
 		public void _404Url()
 		{
 			if (!Env.IsWindows)
@@ -98,7 +98,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "GetTargetUrlWhenRedirect")]
 		public void GetTargetUrlWhenRedirect()
 		{
 			Site site = new Site

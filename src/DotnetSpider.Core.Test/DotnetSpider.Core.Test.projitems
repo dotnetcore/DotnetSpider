@@ -43,6 +43,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\DownloadHanlderTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\FileDownloaderTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\HttpClientDownloaderTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Downloader\HttpClientPoolTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\TestDownloader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnvironmentTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HtmlTest.cs" />

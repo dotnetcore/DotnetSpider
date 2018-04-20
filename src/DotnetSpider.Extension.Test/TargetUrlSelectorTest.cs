@@ -97,7 +97,7 @@ namespace DotnetSpider.Extension.Test
 			public string Sku { get; set; }
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_1Region_1Pattern")]
 		public void TargetUrlsSelector_1Region_1Pattern()
 		{
 			new EntityDefine<Entity14>();
@@ -108,7 +108,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"222\"]") == null);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_2Region_1Pattern")]
 		public void TargetUrlsSelector_2Region_1Pattern()
 		{
 			new EntityDefine<Entity16>();
@@ -123,7 +123,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_1Region_2Pattern")]
 		public void TargetUrlsSelector_1Region_2Pattern()
 		{
 			new EntityDefine<Entity17>();
@@ -134,7 +134,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_Null")]
 		public void TargetUrlsSelector_Null()
 		{
 			try
@@ -150,7 +150,7 @@ namespace DotnetSpider.Extension.Test
 			throw new Exception("Failed.");
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_2Region_2Pattern")]
 		public void TargetUrlsSelector_2Region_2Pattern()
 		{
 			new EntityDefine<Entity18>();
@@ -166,7 +166,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_Multi_2Region_2Pattern")]
 		public void TargetUrlsSelector_Multi_2Region_2Pattern()
 		{
 			new EntityDefine<Entity19>();
@@ -181,7 +181,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_Multi_2SameRegion_2Pattern")]
 		public void TargetUrlsSelector_Multi_2SameRegion_2Pattern()
 		{
 			new EntityDefine<Entity20>();
@@ -194,7 +194,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_Multi_2SameRegion_2SamePattern")]
 		public void TargetUrlsSelector_Multi_2SameRegion_2SamePattern()
 		{
 			new EntityDefine<Entity21>();
@@ -206,7 +206,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_Multi_2Region_2SamePattern")]
 		public void TargetUrlsSelector_Multi_2Region_2SamePattern()
 		{
 			new EntityDefine<Entity22>();
@@ -221,7 +221,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_EmptyRegion_EmptyPattern")]
 		public void TargetUrlsSelector_EmptyRegion_EmptyPattern()
 		{
 			try
@@ -237,7 +237,7 @@ namespace DotnetSpider.Extension.Test
 			throw new Exception("Failed.");
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_NullRegion_NullPattern")]
 		public void TargetUrlsSelector_NullRegion_NullPattern()
 		{
 			try
@@ -253,7 +253,7 @@ namespace DotnetSpider.Extension.Test
 			throw new Exception("Failed.");
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsSelector_NullRegion_1Pattern")]
 		public void TargetUrlsSelector_NullRegion_1Pattern()
 		{
 			new EntityDefine<Entity25>();

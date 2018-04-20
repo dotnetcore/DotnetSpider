@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Test
 {
 	public class HtmlTest
 	{
-		[Fact]
+		[Fact(DisplayName = "HtmlSelect")]
 		public void Select()
 		{
 			Selectable selectable = new Selectable("aaaaaaab", "", Core.Infrastructure.ContentType.Html);
@@ -14,7 +14,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("aaaaaaab", value);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "DonotDetectDomain")]
 		public void DonotDetectDomain()
 		{
 			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>", "", Core.Infrastructure.ContentType.Html);
@@ -22,7 +22,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("aaaaaaab", values.First());
 		}
 
-		[Fact]
+		[Fact(DisplayName = "DetectDomain1")]
 		public void DetectDomain1()
 		{
 			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>", "", Core.Infrastructure.ContentType.Html, "www\\.aaaa\\.com");
@@ -30,7 +30,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("aaaaaaab", values.First());
 		}
 
-		[Fact]
+		[Fact(DisplayName = "DetectDomain2")]
 		public void DetectDomain2()
 		{
 			Selectable selectable = new Selectable("<div><a href=\"www.aaaab.com\">aaaaaaab</a></div>", "", Core.Infrastructure.ContentType.Html, "www\\.aaaa\\.com");

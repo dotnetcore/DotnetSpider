@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Test.Downloader
 
 	public class DownloadHanlderTest
 	{
-		[Fact]
+		[Fact(DisplayName = "RetryWhenContainsIllegalStringHandler")]
 		public void RetryWhenContainsIllegalStringHandler()
 		{
 			var spider = new DefaultSpider("test", new Site());

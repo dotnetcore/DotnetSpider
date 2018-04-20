@@ -19,9 +19,20 @@ namespace DotnetSpider.Core.Downloader
 	public class HttpClientPool : IHttpClientPool
 	{
 		private ulong _getHttpClientCount;
-		private readonly ConcurrentDictionary<int, HttpClientElement> _pool = new ConcurrentDictionary<int, HttpClientElement>();
+		private readonly ConcurrentDictionary<string, HttpClientElement> _pool = new ConcurrentDictionary<string, HttpClientElement>();
 		private HttpClientElement _defaultHttpClientItem;
 		private Dictionary<string, CookieContainer> _initedCookieContainers = new Dictionary<string, CookieContainer>();
+
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		public HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, IWebProxy proxy, ICookieInjector cookieInjector = null)
+		{
+			var httpClientItem = GetHttpClient(spider, downloader, cookieContainer, proxy.ToString(), cookieInjector);
+			if (httpClientItem.Handler.Proxy == null)
+			{
+				httpClientItem.Handler.Proxy = proxy;
+			}
+			return httpClientItem;
+		}
 
 		/// <summary>
 		/// Get a <see cref="HttpClientElement"/> from <see cref="IHttpClientPool"/>.
@@ -39,7 +50,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="cookieInjector">Cookie注入器 <see cref="ICookieInjector"/></param>
 		/// <returns>HttpClientItem</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, int? hashCode = null, ICookieInjector cookieInjector = null)
+		public HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, string hash, ICookieInjector cookieInjector = null)
 		{
 			if (cookieContainer == null)
 			{
@@ -51,7 +62,7 @@ namespace DotnetSpider.Core.Downloader
 			}
 			var newCookieContainer = GenerateNewCookieContainer(spider, downloader, cookieContainer, cookieInjector);
 
-			if (hashCode == null)
+			if (hash == null)
 			{
 				return _defaultHttpClientItem ?? (_defaultHttpClientItem = CreateDefaultHttpClient(newCookieContainer));
 			}
@@ -63,15 +74,15 @@ namespace DotnetSpider.Core.Downloader
 				ClearHttpClient();
 			}
 
-			if (_pool.ContainsKey(hashCode.Value))
+			if (_pool.ContainsKey(hash))
 			{
-				_pool[hashCode.Value].LastUsedTime = DateTime.Now;
-				return _pool[hashCode.Value];
+				_pool[hash].LastUsedTime = DateTime.Now;
+				return _pool[hash];
 			}
 			else
 			{
 				var item = CreateDefaultHttpClient(newCookieContainer);
-				_pool.TryAdd(hashCode.Value, item);
+				_pool.TryAdd(hash, item);
 				return item;
 			}
 		}
@@ -151,7 +162,7 @@ namespace DotnetSpider.Core.Downloader
 
 		private void ClearHttpClient()
 		{
-			List<int> needRemoveList = new List<int>();
+			List<string> needRemoveList = new List<string>();
 			var now = DateTime.Now;
 			foreach (var pair in _pool)
 			{

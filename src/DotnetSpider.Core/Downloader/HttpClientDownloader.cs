@@ -121,8 +121,7 @@ namespace DotnetSpider.Core.Downloader
 					// TODO: 代理模式下: request.DownloaderGroup 再考虑
 					var proxy = spider.Site.HttpProxyPool.GetProxy();
 					request.Proxy = proxy;
-					httpClientItem = HttpClientPool.GetHttpClient(spider, this, CookieContainer, proxy?.GetHashCode(), CookieInjector);
-					httpClientItem.Handler.Proxy = httpClientItem.Handler.Proxy ?? proxy;
+					httpClientItem = HttpClientPool.GetHttpClient(spider, this, CookieContainer, proxy, CookieInjector);
 				}
 				if (!Equals(httpClientItem.Client.Timeout.TotalSeconds, _timeout))
 				{

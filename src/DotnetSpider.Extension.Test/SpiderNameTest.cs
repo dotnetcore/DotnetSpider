@@ -47,21 +47,21 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "SetSpiderNameByAttribute")]
 		public void SetSpiderNameByAttribute()
 		{
 			MySpider1 spider = new MySpider1();
 			Assert.Equal("HelloSpider", spider.Name);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "SetSpiderNameByClassName")]
 		public void SetSpiderNameByClassName()
 		{
 			MySpider2 spider = new MySpider2();
 			Assert.Equal("MySpider2", spider.Name);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "SetSpiderNameByConstructor")]
 		public void SetSpiderNameByConstructor()
 		{
 			MySpider3 spider = new MySpider3();

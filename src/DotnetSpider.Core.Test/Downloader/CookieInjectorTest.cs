@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Test.Downloader
 {
 	public class CookieInjectorTest
 	{
-		[Fact]
+		[Fact(DisplayName = "FileCookieInject")]
 		public void FileCookieInject()
 		{
 			FileCookieInject cookieInject = new FileCookieInject("Downloader\\test.cookies");
@@ -19,7 +19,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			Assert.Equal("e", cookies["c"].Value);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "FileCookieInject_FileNotExists")]
 		public void FileCookieInject_FileNotExists()
 		{
 			Assert.Throws<ArgumentException>(() =>

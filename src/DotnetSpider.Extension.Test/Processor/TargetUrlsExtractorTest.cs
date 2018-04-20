@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Test.Processor
 {
 	public class TargetUrlsExtractorTest
 	{
-		[Fact]
+		[Fact(DisplayName = "AutoIncrementTargetUrlsExtractor_Test")]
 		public void AutoIncrementTargetUrlsExtractor_Test()
 		{
 			var id = Guid.NewGuid().ToString("N");

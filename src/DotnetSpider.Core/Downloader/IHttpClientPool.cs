@@ -30,6 +30,11 @@ namespace DotnetSpider.Core.Downloader
 		/// 上一次使用的时间
 		/// </summary>
 		public DateTime LastUsedTime { get; set; }
+
+		public override int GetHashCode()
+		{
+			return (Client.GetHashCode() + Handler.Proxy.ToString()).GetHashCode();
+		}
 	}
 
 	/// <summary>
@@ -53,11 +58,14 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="spider">爬虫 <see cref="ISpider"/></param>
 		/// <param name="downloader">下载器 <see cref="IDownloader"/></param>
 		/// <param name="cookieContainer">Cookie <see cref="CookieContainer"/></param>
-		/// <param name="hashCode">分组的哈希 Hashcode to identify different group.</param>
+		/// <param name="hash">分组的哈希 Hashcode to identify different group.</param>
 		/// <param name="cookieInjector">Cookie注入器 <see cref="ICookieInjector"/></param>
 		/// <returns>HttpClientItem</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, int? hashCode = null, ICookieInjector cookieInjector = null);
+		HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, string hash, ICookieInjector cookieInjector = null);
+
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, IWebProxy proxy, ICookieInjector cookieInjector = null);
 
 		/// <summary>
 		/// Add cookie to <see cref="IHttpClientPool"/>

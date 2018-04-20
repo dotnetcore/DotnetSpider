@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Test.Downloader
 {
 	public class FileDownloaderTest
 	{
-		[Fact]
+		[Fact(DisplayName = "DownloadRelativePathFile")]
 		public void DownloadRelativePathFile()
 		{
 			FileDownloader downloader = new FileDownloader();
@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			Assert.Equal("hello", page.Content);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "DownloadRelativeAbsolutePathFile")]
 		public void DownloadRelativeAbsolutePathFile()
 		{
 			FileDownloader downloader = new FileDownloader();
@@ -28,7 +28,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			Assert.Equal("hello", page.Content);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "FileNotExists")]
 		public void FileNotExists()
 		{
 			FileDownloader downloader = new FileDownloader();

@@ -7,7 +7,7 @@ namespace DotnetSpider.Core.Test
 
 	public class CookieInjectorTest
 	{
-		[Fact]
+		[Fact(DisplayName = "InjectCookiesBeforeSpiderRun")]
 		public void InjectCookiesBeforeSpiderRun()
 		{
 			var path = "a.cookies";

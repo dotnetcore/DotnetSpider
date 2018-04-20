@@ -47,17 +47,9 @@ namespace DotnetSpider.Core.Proxy
 		/// <returns></returns>
 		public bool IsBypassed(Uri host) => _bypass;
 
-		/// <summary>
-		/// 取得哈希值
-		/// </summary>
-		/// <returns>哈希值</returns>
-		public override int GetHashCode()
+		public override string ToString()
 		{
-			if (Uri == null)
-			{
-				return -1;
-			}
-			return Uri.GetHashCode();
+			return Uri.ToString();
 		}
 	}
 }

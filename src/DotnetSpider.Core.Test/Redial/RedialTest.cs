@@ -15,7 +15,7 @@ namespace DotnetSpider.Core.Test.Redial
 
 	public class RedialTest
 	{
-		[Fact]
+		[Fact(DisplayName = "Setting")]
 		public void Setting()
 		{
 			var site = new Site { EncodingName = "UTF-8" };
@@ -37,7 +37,7 @@ namespace DotnetSpider.Core.Test.Redial
 			Assert.NotNull(spider.RedialExecutor);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "ConfigFileMissing")]
 		public void ConfigFileMissing()
 		{
 			Assert.Throws<SpiderException>(() =>
@@ -46,7 +46,7 @@ namespace DotnetSpider.Core.Test.Redial
 			});
 		}
 
-		[Fact]
+		[Fact(DisplayName = "MulitThread")]
 		public void MulitThread()
 		{
 			PrepareAdslConfig();

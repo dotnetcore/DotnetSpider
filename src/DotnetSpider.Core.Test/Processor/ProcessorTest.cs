@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Test.Processor
 
 	public class ProcessorTest
 	{
-		[Fact]
+		[Fact(DisplayName = "ProcesserException")]
 		public void ProcesserException()
 		{
 			var site = new Site { EncodingName = "UTF-8" };

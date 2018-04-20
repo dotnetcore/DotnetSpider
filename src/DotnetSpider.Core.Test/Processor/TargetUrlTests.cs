@@ -21,7 +21,7 @@ namespace DotnetSpider.Core.Test.Processor
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "UrlVerifyAndExtract1")]
 		public void UrlVerifyAndExtract1()
 		{
 			HttpClient client = new HttpClient();
@@ -52,7 +52,7 @@ namespace DotnetSpider.Core.Test.Processor
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "UrlVerifyAndExtract2")]
 		public void UrlVerifyAndExtract2()
 		{
 			HttpClient client = new HttpClient();
@@ -82,7 +82,7 @@ namespace DotnetSpider.Core.Test.Processor
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "ProcessorFilterDefaultRequest")]
 		public void ProcessorFilterDefaultRequest()
 		{
 			Env.ProcessorFilterDefaultRequest = false;
@@ -112,7 +112,7 @@ namespace DotnetSpider.Core.Test.Processor
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "UrlVerifyAndExtract4")]
 		public void UrlVerifyAndExtract4()
 		{
 			HttpClient client = new HttpClient();

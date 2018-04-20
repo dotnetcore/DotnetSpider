@@ -21,7 +21,7 @@ namespace DotnetSpider.Core.Test.Pipeline
 			_resultItems.Request = request;
 		}
 
-		[Fact]
+		[Fact(DisplayName = "JsonFilePipeline")]
 		public void Process()
 		{
 			Core.Pipeline.JsonFilePipeline pipeline = new Core.Pipeline.JsonFilePipeline();

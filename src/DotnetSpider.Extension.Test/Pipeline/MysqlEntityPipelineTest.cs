@@ -76,7 +76,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "UpdatePipelineUseAppConfig")]
 		public void UpdatePipelineUseAppConfig()
 		{
 			ClearDb();
@@ -117,7 +117,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "MySqlEntityPipelineInsert")]
 		public void Insert()
 		{
 			ClearDb();
@@ -149,7 +149,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "MySqlEntityPipelineInsertUseAppConfig")]
 		public void InsertUseAppConfig()
 		{
 			ClearDb();
@@ -181,7 +181,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "MySqlEntityPipelineUpdateConnectString")]
 		public void UpdateConnectString()
 		{
 			ClearDb();
