@@ -11,6 +11,10 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "FileCookieInject")]
 		public void FileCookieInject()
 		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
 			FileCookieInject cookieInject = new FileCookieInject("source\\test.cookies");
 			var spider = new DefaultSpider();
 			cookieInject.Inject(spider.Downloader, spider);
