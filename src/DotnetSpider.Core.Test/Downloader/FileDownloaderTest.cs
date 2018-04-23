@@ -9,6 +9,10 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "DownloadRelativePathFile")]
 		public void DownloadRelativePathFile()
 		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
 			FileDownloader downloader = new FileDownloader();
 			var path = Path.Combine("source", "1.html");
 			var request = new Request($"file://{path}");
@@ -20,6 +24,10 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "DownloadRelativeAbsolutePathFile")]
 		public void DownloadRelativeAbsolutePathFile()
 		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
 			FileDownloader downloader = new FileDownloader();
 			var path = Path.Combine(Env.BaseDirectory, "source", "1.html");
 			var request = new Request($"file://{path}");
