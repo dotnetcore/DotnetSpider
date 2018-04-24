@@ -33,6 +33,7 @@ before_install:
 
 install:
   - export DOTNET_CLI_TELEMETRY_OPTOUT=1
+  - export TRAVIS=1
 
 script:
   - ./build.sh

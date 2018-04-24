@@ -23,6 +23,10 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void RunAsyncAndStop()
 		{
+			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
+			{
+				return;
+			}
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
 			for (int i = 0; i < 10000; i++)
@@ -41,6 +45,10 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void RunAsyncAndContiune()
 		{
+			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
+			{
+				return;
+			}
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
 			for (int i = 0; i < 10000; i++)
@@ -59,6 +67,10 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void RunAsyncAndStopThenExit()
 		{
+			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
+			{
+				return;
+			}
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
 			for (int i = 0; i < 10000; i++)
@@ -155,7 +167,7 @@ namespace DotnetSpider.Core.Test
 		[Fact]
 		public void FastExit()
 		{
-			if (!Env.IsWindows)
+			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
 			{
 				return;
 			}

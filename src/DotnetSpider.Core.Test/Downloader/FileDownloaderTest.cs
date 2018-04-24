@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core.Downloader;
+using System;
 using System.IO;
 using Xunit;
 
@@ -9,7 +10,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "DownloadRelativePathFile")]
 		public void DownloadRelativePathFile()
 		{
-			if (!Env.IsWindows)
+			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
 			{
 				return;
 			}
@@ -24,7 +25,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "DownloadRelativeAbsolutePathFile")]
 		public void DownloadRelativeAbsolutePathFile()
 		{
-			if (!Env.IsWindows)
+			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
 			{
 				return;
 			}

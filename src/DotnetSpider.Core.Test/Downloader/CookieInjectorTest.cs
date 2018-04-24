@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "FileCookieInject")]
 		public void FileCookieInject()
 		{
-			if (!Env.IsWindows)
+			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
 			{
 				return;
 			}

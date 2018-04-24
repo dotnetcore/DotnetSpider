@@ -23,7 +23,7 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-
+			;
 			MyTest();
 
 			Startup.Run("-s:MultiSupplementSpider", "-tid:1", "-i:guid");
