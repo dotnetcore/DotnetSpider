@@ -15,32 +15,32 @@
       <group targetFramework=".NETStandard2.0">
         <dependency id="DotnetSpider.Core" version="2.4.7-beta1" />
         <dependency id="Dapper" version="1.50.4"/>
-        <dependency id="MailKit" version="2.0.2"/>
-        <dependency id="MongoDB.Driver" version="2.5.0"/>
-        <dependency id="MySql.Data" version="6.10.6"/>
+        <dependency id="MailKit" version="2.0.3"/>
+        <dependency id="MongoDB.Driver" version="2.5.1"/>
+        <dependency id="MySqlConnector" version="0.40.2"/>
         <dependency id="StackExchange.Redis" version="1.2.6" />
         <dependency id="SSH.NET" version="2016.1.0" />
         <dependency id="System.Runtime.Extensions" version="4.3.0"/>
         <dependency id="EPPlus.Core" version="1.5.4"/>
-        <dependency id="Selenium.WebDriver" version="3.11.0"/>
+        <dependency id="Selenium.WebDriver" version="3.11.2"/>
         <dependency id="Npgsql" version="3.2.7"/>
-        <dependency id="CassandraCSharpDriver" version="3.4.1"/>
+        <dependency id="CassandraCSharpDriver" version="3.5.0"/>
         <dependency id="MessagePack" version="1.7.3.4"/>
       </group>
       <group targetFramework=".NETFramework4.5" >
         <dependency id="DotnetSpider.Core" version="2.4.7-beta1" />
         <dependency id="Dapper" version="1.50.4"/> 
-        <dependency id="MailKit" version="2.0.2"/>
-        <dependency id="MongoDB.Driver" version="2.5.0"/>
-        <dependency id="MySql.Data" version="6.9.11"/>
+        <dependency id="MailKit" version="2.0.3"/>
+        <dependency id="MongoDB.Driver" version="2.5.1"/>
+        <dependency id="MySqlConnector" version="0.40.2"/>
         <dependency id="StackExchange.Redis" version="1.2.6" />
         <dependency id="FiddlerCore2" version="1.0.0"/>
         <dependency id="SSH.NET" version="2016.1.0" />
         <dependency id="DotRas.for.Win7" version="1.3.0" />
         <dependency id="EPPlus" version="4.1.1"/>
-        <dependency id="Selenium.WebDriver" version="3.11.0"/>
+        <dependency id="Selenium.WebDriver" version="3.11.2"/>
         <dependency id="Npgsql" version="3.2.7"/>
-        <dependency id="CassandraCSharpDriver" version="3.4.1"/>
+        <dependency id="CassandraCSharpDriver" version="3.5.0"/>
         <dependency id="MessagePack" version="1.7.3.4"/>
       </group>
     </dependencies>

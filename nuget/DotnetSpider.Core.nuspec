@@ -14,8 +14,8 @@
     <dependencies>
       <group targetFramework=".NETStandard2.0">
         <dependency id="Newtonsoft.Json" version="11.0.2"/>
-        <dependency id="NLog" version="5.0.0-beta09"/>
-        <dependency id="HtmlAgilityPack" version="1.7.2"/>
+        <dependency id="NLog" version="4.5.3"/>
+        <dependency id="HtmlAgilityPack" version="1.8.1"/>
         <dependency id="System.Threading.Tasks.Parallel" version="4.3.0"/>
         <dependency id="System.Text.Encoding.CodePages" version="4.4.0"/>
         <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="4.3.0"/>
@@ -25,13 +25,13 @@
         <dependency id="Microsoft.Extensions.DependencyModel" version="2.0.4"/>
         <dependency id="System.Runtime.Loader" version="4.3.0"/>
         <dependency id="System.Net.Ping" version="4.3.0"/>
-        <dependency id="Polly" version="5.8.0" />
+        <dependency id="Polly" version="5.9.0" />
       </group>
       <group targetFramework=".NETFramework4.5">
         <dependency id="Newtonsoft.Json" version="11.0.2"/>
-        <dependency id="HtmlAgilityPack" version="1.7.2"/>
-        <dependency id="NLog" version="4.4.12"/>
-        <dependency id="Polly" version="5.8.0" />
+        <dependency id="HtmlAgilityPack" version="1.8.1"/>
+        <dependency id="NLog" version="4.5.3"/>
+        <dependency id="Polly" version="5.9.0" />
       </group>
     </dependencies>
   </metadata>
