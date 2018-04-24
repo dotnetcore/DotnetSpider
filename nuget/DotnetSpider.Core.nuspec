@@ -27,7 +27,7 @@
         <dependency id="System.Net.Ping" version="4.3.0"/>
         <dependency id="Polly" version="5.9.0" />
       </group>
-      <group targetFramework=".NETFramework4.5">
+      <group targetFramework=".NETFramework4.5.1">
         <dependency id="Newtonsoft.Json" version="11.0.2"/>
         <dependency id="HtmlAgilityPack" version="1.8.1"/>
         <dependency id="NLog" version="4.5.3"/>

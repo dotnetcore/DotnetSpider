@@ -4,6 +4,7 @@ using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using System;
+using System.Configuration;
 
 namespace DotnetSpider.Sample
 {
@@ -12,6 +13,7 @@ namespace DotnetSpider.Sample
 
 		public static void ProcessException()
 		{
+
 			var site = new Site { EncodingName = "UTF-8" };
 
 			var scheduler = new QueueDuplicateRemovedScheduler();

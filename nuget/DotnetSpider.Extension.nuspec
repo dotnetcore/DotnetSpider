@@ -27,7 +27,7 @@
         <dependency id="CassandraCSharpDriver" version="3.5.0"/>
         <dependency id="MessagePack" version="1.7.3.4"/>
       </group>
-      <group targetFramework=".NETFramework4.5" >
+      <group targetFramework=".NETFramework4.5.1" >
         <dependency id="DotnetSpider.Core" version="2.4.7-beta1" />
         <dependency id="Dapper" version="1.50.4"/> 
         <dependency id="MailKit" version="2.0.3"/>
