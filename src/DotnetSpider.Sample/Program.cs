@@ -24,6 +24,7 @@ namespace DotnetSpider.Sample
 			OcrDemo.Process();
 #endif
 
+			System.IO.MemoryMappedFiles.MemoryMappedFile
 			MyTest();
 
 			Startup.Run("-s:MultiSupplementSpider", "-tid:1", "-i:guid");
