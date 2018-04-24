@@ -385,7 +385,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		protected Spider()
 		{
-#if !NET45
+#if NETStandard
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
 			ThreadPool.SetMinThreads(200, 200);
@@ -1548,35 +1548,52 @@ namespace DotnetSpider.Core
 		private void CheckExitSignal()
 		{
 			// MMF 暂时还不支持非WINDOWS操作系统
+
+#if NET20
+			CheckExitSignalByFile();
+#else
 			if (Env.IsWindows)
 			{
-				using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
+				CheckExitSignalByMMF();
+			}
+			else
+			{
+				CheckExitSignalByFile();
+			}
+#endif
+		}
+
+#if !NET20
+		private void CheckExitSignalByMMF()
+		{
+			using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
+			{
+				var reader = new BinaryReader(stream);
+				if (reader.ReadBoolean())
+				{
+					Exit();
+					return;
+				}
+			}
+			if (_taskIdMmf != null)
+			{
+				using (MemoryMappedViewStream stream = _taskIdMmf.CreateViewStream())
 				{
 					var reader = new BinaryReader(stream);
 					if (reader.ReadBoolean())
 					{
 						Exit();
-						return;
-					}
-				}
-				if (_taskIdMmf != null)
-				{
-					using (MemoryMappedViewStream stream = _taskIdMmf.CreateViewStream())
-					{
-						var reader = new BinaryReader(stream);
-						if (reader.ReadBoolean())
-						{
-							Exit();
-						}
 					}
 				}
 			}
-			else
+		}
+#endif
+
+		private void CheckExitSignalByFile()
+		{
+			if (File.Exists(_closeSignalFiles[0]) || File.Exists(_closeSignalFiles[1]))
 			{
-				if (File.Exists(_closeSignalFiles[0]) || File.Exists(_closeSignalFiles[1]))
-				{
-					Exit();
-				}
+				Exit();
 			}
 		}
 	}
