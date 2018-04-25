@@ -458,7 +458,7 @@ namespace DotnetSpider.Extension.Test
 
 			spider.Run("running-test");
 
-			var entityPipelines = spider.GetPipelines();
+			var entityPipelines = spider.Pipelines;
 
 			Assert.Equal(4, entityPipelines.Count);
 
@@ -469,7 +469,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.Equal("ConsoleEntityPipeline", entityPipelines[2].GetType().Name);
 			Assert.Equal("JsonFileEntityPipeline", entityPipelines[3].GetType().Name);
 
-			var pipelines = spider.GetPipelines();
+			var pipelines = spider.Pipelines;
 			Assert.Equal(4, pipelines.Count);
 			IEntityPipeline pipeline = (IEntityPipeline)pipelines[0];
 			//entityPipelines = pipeline.GetEntityPipelines();

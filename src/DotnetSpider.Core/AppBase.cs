@@ -8,30 +8,24 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// 标准任务接口
 	/// </summary>
-	public interface IAppBase : INamed, IRunable, IIdentity, ITask
+	public interface IAppBase : IRunable, IIdentity, ITask, INamed
 	{
 	}
 
 	/// <summary>
 	/// 标准任务的抽象
 	/// </summary>
-	public abstract class AppBase : IAppBase
+	public abstract class AppBase : Named, IAppBase
 	{
 		/// <summary>
 		/// 日志接口
 		/// </summary>
 		protected static readonly ILogger Logger = DLog.GetLogger();
-		private string _name;
 
 		/// <summary>
 		/// 唯一标识
 		/// </summary>
 		public virtual string Identity { get; set; }
-
-		/// <summary>
-		/// 任务名称
-		/// </summary>
-		public virtual string Name { get => GetName(); set => SetName(value); }
 
 		/// <summary>
 		/// 任务编号
@@ -47,7 +41,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 任务的实现
 		/// </summary>
-		protected abstract void RunApp(params string[] arguments);
+		protected abstract void Execute(params string[] arguments);
 
 		/// <summary>
 		/// 构造函数
@@ -60,7 +54,7 @@ namespace DotnetSpider.Core
 		/// 构造函数
 		/// </summary>
 		/// <param name="name">任务名称</param>
-		protected AppBase(string name)
+		protected AppBase(string name) : base()
 		{
 			Name = name;
 		}
@@ -72,10 +66,7 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Task RunAsync(params string[] arguments)
 		{
-			return Task.Factory.StartNew(() =>
-			{
-				Run(arguments);
-			});
+			return Task.Factory.StartNew(() => Run(arguments));
 		}
 
 		/// <summary>
@@ -88,40 +79,18 @@ namespace DotnetSpider.Core
 			{
 				ExecuteRecord = new HttpExecuteRecord();
 			}
-
 			if (!AddExecuteRecord())
 			{
 				Logger.Log(Identity, "Can not add execute record.", Level.Error);
 			}
 			try
 			{
-				RunApp(arguments);
+				Execute(arguments);
 			}
 			finally
 			{
-				RemoveExecuteRecord();
+				ExecuteRecord?.Remove(TaskId, Name, Identity);
 			}
-		}
-
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		private void SetName(string value)
-		{
-			if (_name != value)
-			{
-				_name = value;
-			}
-		}
-
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		private string GetName()
-		{
-			if (string.IsNullOrWhiteSpace(_name))
-			{
-				var type = GetType();
-				var nameAttribute = type.GetCustomAttribute<TaskName>();
-				Name = nameAttribute != null ? nameAttribute.Name : type.Name;
-			}
-			return _name;
 		}
 
 		private bool AddExecuteRecord()
@@ -134,11 +103,6 @@ namespace DotnetSpider.Core
 			{
 				return ExecuteRecord.Add(TaskId, Name, Identity);
 			}
-		}
-
-		private void RemoveExecuteRecord()
-		{
-			ExecuteRecord?.Remove(TaskId, Name, Identity);
 		}
 	}
 }

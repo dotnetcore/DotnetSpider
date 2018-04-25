@@ -37,6 +37,8 @@ namespace DotnetSpider.Core
 		private readonly Site _site;
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
 		private IDownloader _downloader = new HttpClientDownloader();
+		private readonly List<IPipeline> _pipelines = new List<IPipeline>();
+		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private Status _realStat = Status.Init;
 		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
@@ -60,8 +62,6 @@ namespace DotnetSpider.Core
 		private MemoryMappedFile _identityMmf;
 		private MemoryMappedFile _taskIdMmf;
 		private readonly string[] _closeSignalFiles = new string[2];
-		private readonly List<IPipeline> _pipelines = new List<IPipeline>();
-		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private bool _exited;
 
 		/// <summary>
@@ -77,19 +77,19 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 通过StartUrlsBuilder来初始化起始链接后的响应操作
 		/// </summary>
-		protected virtual void BuildStartRequestsFinished()
+		protected virtual void BuildStartRequestsCompleted()
 		{
 		}
 
 		/// <summary>
 		/// All pipelines for spider.
 		/// </summary>
-		protected ReadOnlyCollection<IPipeline> Pipelines => new ReadOnlyCollection<IPipeline>(_pipelines);
+		public List<IPipeline> Pipelines => _pipelines;
 
 		/// <summary>
 		/// Storage all processors for spider.
 		/// </summary>
-		protected ReadOnlyCollection<IPageProcessor> PageProcessors => new ReadOnlyCollection<IPageProcessor>(_pageProcessors);
+		public List<IPageProcessor> PageProcessors => _pageProcessors;
 
 		/// <summary>
 		/// start time of spider.
@@ -133,12 +133,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Whether spider is complete.
 		/// </summary>
-		public bool IsComplete { get; private set; }
+		public bool IsCompleted { get; private set; }
 
 		/// <summary>
 		/// Record how many times retried.
 		/// </summary>
-		public AutomicLong RetriedTimes { get; } = new AutomicLong();
+		public AutomicLong RetryTimes { get; } = new AutomicLong();
 
 		/// <summary>
 		/// Status of spider.
@@ -148,12 +148,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Event of crawler a request success.
 		/// </summary>
-		public event Action<Request> OnSuccess;
+		public event Action<Request> OnSucceeded;
 
 		/// <summary>
 		/// Event of crawler on comoplete.
 		/// </summary>
-		public event Action<Spider> OnComplete;
+		public event Action<Spider> OnCompleted;
 
 		/// <summary>
 		/// Event of crawler on closed.
@@ -163,7 +163,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Whether clear scheduler after spider completed.
 		/// </summary>
-		public bool ClearSchedulerAfterComplete { get; set; } = true;
+		public bool ClearSchedulerAfterCompleted { get; set; } = true;
 
 		/// <summary>
 		/// Monitor of spider.
@@ -274,7 +274,7 @@ namespace DotnetSpider.Core
 				}
 				else
 				{
-					throw new SpiderException("Sleep time should be large than 0");
+					throw new SpiderException("Empty sleep time should be greater than 0.");
 				}
 			}
 		}
@@ -391,15 +391,8 @@ namespace DotnetSpider.Core
 			ThreadPool.SetMinThreads(200, 200);
 #endif
 			var type = GetType();
-			var spiderNameAttribute = type.GetCustomAttribute<TaskName>();
-			if (spiderNameAttribute != null)
-			{
-				Name = spiderNameAttribute.Name;
-			}
-			else
-			{
-				Name = type.Name;
-			}
+			var taskNameAttribute = type.GetCustomAttribute<TaskName>();
+			Name = taskNameAttribute != null ? taskNameAttribute.Name : type.Name;
 
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 		}
@@ -433,7 +426,7 @@ namespace DotnetSpider.Core
 			{
 				AddPipelines(pipelines.ToArray());
 			}
-			CheckIfSettingsCorrect();
+			ValidateSettings();
 		}
 
 		/// <summary>
@@ -556,7 +549,7 @@ namespace DotnetSpider.Core
 			if (pipeline != null)
 			{
 				CheckIfRunning();
-				_pipelines.Add(pipeline);
+				Pipelines.Add(pipeline);
 			}
 			return this;
 		}
@@ -575,7 +568,7 @@ namespace DotnetSpider.Core
 				{
 					if (processor != null)
 					{
-						_pageProcessors.Add(processor);
+						PageProcessors.Add(processor);
 					}
 				}
 			}
@@ -604,21 +597,12 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Used for testing.
-		/// </summary>
-		/// <returns>All pipelines of spider.</returns>
-		public IList<IPipeline> GetPipelines()
-		{
-			return _pipelines.AsReadOnly();
-		}
-
-		/// <summary>
 		/// Clear the pipelines set
 		/// </summary>
 		/// <returns>爬虫</returns>
 		public Spider ClearPipeline()
 		{
-			_pipelines.Clear();
+			Pipelines.Clear();
 			return this;
 		}
 
@@ -626,9 +610,9 @@ namespace DotnetSpider.Core
 		/// Run spider.
 		/// </summary>
 		/// <param name="arguments">运行参数</param>
-		protected override void RunApp(params string[] arguments)
+		protected override void Execute(params string[] arguments)
 		{
-			CheckIfSettingsCorrect();
+			ValidateSettings();
 
 			if (Stat == Status.Running)
 			{
@@ -692,7 +676,7 @@ namespace DotnetSpider.Core
 							{
 								Stat = Status.Finished;
 								_realStat = Status.Finished;
-								OnComplete?.Invoke(this);
+								OnCompleted?.Invoke(this);
 								break;
 							}
 
@@ -892,15 +876,13 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Check if all settings of spider are correct.
 		/// </summary>
-		protected void CheckIfSettingsCorrect()
+		protected void ValidateSettings()
 		{
-			Identity = (string.IsNullOrWhiteSpace(Identity))
-				? CryptoUtil.Md5Encrypt(Guid.NewGuid().ToString())
-				: Identity;
+			Identity = string.IsNullOrWhiteSpace(Identity) ? Guid.NewGuid().ToString("N") : Identity;
 
 			if (Identity.Length > Env.IdentityMaxLength)
 			{
-				throw new ArgumentException($"Length of Identity should less than {Env.IdentityMaxLength}.");
+				throw new ArgumentException($"Length of identity should less than {Env.IdentityMaxLength}.");
 			}
 
 			if (Site == null)
@@ -982,7 +964,7 @@ namespace DotnetSpider.Core
 		{
 			var containsData = _cached != null && _cached.Count > 0;
 
-			foreach (IPipeline pipeline in _pipelines)
+			foreach (IPipeline pipeline in Pipelines)
 			{
 				if (containsData)
 				{
@@ -1006,8 +988,8 @@ namespace DotnetSpider.Core
 		/// </summary>
 		protected virtual void SafeDestroyScheduler()
 		{
-			IsComplete = Scheduler.LeftRequestsCount == 0;
-			if (ClearSchedulerAfterComplete && IsComplete)
+			IsCompleted = Scheduler.LeftRequestsCount == 0;
+			if (ClearSchedulerAfterCompleted && IsCompleted)
 			{
 				Scheduler.Dispose();
 			}
@@ -1037,7 +1019,7 @@ namespace DotnetSpider.Core
 		protected void _OnSuccess(Request request)
 		{
 			Scheduler.IncreaseSuccessCount();
-			OnSuccess?.Invoke(request);
+			OnSucceeded?.Invoke(request);
 		}
 
 		/// <summary>
@@ -1105,7 +1087,7 @@ namespace DotnetSpider.Core
 			// 此处是用于需要循环本身的场景, 不能使用本身Request的原因是Request的尝试次数计算问题
 			if (page.Retry)
 			{
-				RetriedTimes.Inc();
+				RetryTimes.Inc();
 				ExtractAndAddRequests(page);
 				return;
 			}
@@ -1132,7 +1114,7 @@ namespace DotnetSpider.Core
 							page = AddToCycleRetry(request, Site);
 							if (page != null && page.Retry)
 							{
-								RetriedTimes.Inc();
+								RetryTimes.Inc();
 								ExtractAndAddRequests(page);
 							}
 							Logger.Log(Identity, $"Download {request.Url} success, retry becuase extract 0 result.", Level.Warn);
@@ -1167,7 +1149,7 @@ namespace DotnetSpider.Core
 
 				if (CachedSize == 1)
 				{
-					foreach (IPipeline pipeline in _pipelines)
+					foreach (IPipeline pipeline in Pipelines)
 					{
 						try
 						{
@@ -1206,7 +1188,7 @@ namespace DotnetSpider.Core
 						{
 							var items = _cached.ToArray();
 							_cached.Clear();
-							foreach (IPipeline pipeline in _pipelines)
+							foreach (IPipeline pipeline in Pipelines)
 							{
 								pipeline.Process(items, this);
 							}
@@ -1279,16 +1261,16 @@ namespace DotnetSpider.Core
 		/// <param name="arguments">运行参数</param>
 		protected virtual void InitPipelines(params string[] arguments)
 		{
-			if (_pipelines == null || _pipelines.Count == 0)
+			if (Pipelines == null || Pipelines.Count == 0)
 			{
 				var defaultPipeline = GetDefaultPipeline();
 				if (defaultPipeline != null)
 				{
-					_pipelines.Add(defaultPipeline);
+					Pipelines.Add(defaultPipeline);
 				}
 			}
 
-			foreach (var pipeline in _pipelines)
+			foreach (var pipeline in Pipelines)
 			{
 				pipeline.Init();
 			}
@@ -1382,7 +1364,7 @@ namespace DotnetSpider.Core
 				}
 				finally
 				{
-					BuildStartRequestsFinished();
+					BuildStartRequestsCompleted();
 				}
 			}
 		}

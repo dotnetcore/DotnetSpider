@@ -17,7 +17,6 @@
     <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
     <PackageReference Include="SSH.NET" Version="2016.1.0" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-    <PackageReference Include="NLog" Version="4.5.3" />
     <PackageReference Include="EPPlus.Core" Version="1.5.4" />
     <PackageReference Include="Selenium.WebDriver" Version="3.11.2" />
     <PackageReference Include="Npgsql" Version="3.2.5" />

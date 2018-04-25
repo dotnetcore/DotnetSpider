@@ -65,7 +65,7 @@ namespace DotnetSpider.Extension
 		/// 运行爬虫
 		/// </summary>
 		/// <param name="arguments">运行参数</param>
-		protected override void RunApp(params string[] arguments)
+		protected override void Execute(params string[] arguments)
 		{
 			PrintInfo.Print();
 
@@ -90,13 +90,13 @@ namespace DotnetSpider.Extension
 				}
 			}
 
-			CheckIfSettingsCorrect();
+			ValidateSettings();
 
 			RegisterControl(this);
 
-			base.RunApp(arguments);
+			base.Execute(arguments);
 
-			if (IsComplete && DataVerificationAndReport != null)
+			if (IsCompleted && DataVerificationAndReport != null)
 			{
 				ProcessVerifidation();
 			}
@@ -172,7 +172,7 @@ namespace DotnetSpider.Extension
 		/// <summary>
 		/// 初始化起始链结束后的解锁, 分布式任务时解锁成功则其它爬虫会结束等待状态, 一起进入运行状态
 		/// </summary>
-		protected override void BuildStartRequestsFinished()
+		protected override void BuildStartRequestsCompleted()
 		{
 			if (RedisConnection.Default != null)
 			{

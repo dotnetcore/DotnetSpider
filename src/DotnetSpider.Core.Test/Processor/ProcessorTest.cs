@@ -34,7 +34,7 @@ namespace DotnetSpider.Core.Test.Processor
 				new TestPageProcessor())
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
 				.AddPipeline(new FilePipeline());
-			spider.ClearSchedulerAfterComplete = false;
+			spider.ClearSchedulerAfterCompleted = false;
 			// dowload html by http client
 			spider.Downloader = new HttpClientDownloader();
 
@@ -45,7 +45,7 @@ namespace DotnetSpider.Core.Test.Processor
 			// start crawler 启动爬虫
 			spider.Run();
 
-			Assert.Equal(5, spider.RetriedTimes.Value);
+			Assert.Equal(5, spider.RetryTimes.Value);
 			Assert.Equal(0, scheduler.LeftRequestsCount);
 			Assert.Equal(6, scheduler.SuccessRequestsCount);
 			Assert.Equal(5, scheduler.ErrorRequestsCount);

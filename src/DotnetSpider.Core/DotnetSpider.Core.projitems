@@ -64,6 +64,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\RegexUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\Singleton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\StreamExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskName.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\UrlUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\WindowsFormUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\XTokenQueue.cs" />
@@ -151,7 +152,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)StartUrlsBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Status.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)nlog.default.config" />
   </ItemGroup>

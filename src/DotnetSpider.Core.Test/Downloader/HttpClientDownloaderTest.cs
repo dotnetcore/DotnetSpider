@@ -87,7 +87,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			spider.EmptySleepTime = 6000;
 			spider.AddStartUrl("http://www.mlr.gov.cn/xwdt/jrxw/201707/t20170710_15242382.htm");
 			spider.Run();
-			Assert.Equal(5, spider.RetriedTimes.Value);
+			Assert.Equal(5, spider.RetryTimes.Value);
 		}
 
 		class HttpClientDownloader2 : HttpClientDownloader

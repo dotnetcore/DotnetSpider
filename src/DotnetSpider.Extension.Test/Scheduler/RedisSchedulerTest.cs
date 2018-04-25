@@ -276,12 +276,12 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
 			spider.Deep = 3;
-			spider.ClearSchedulerAfterComplete = false;
+			spider.ClearSchedulerAfterCompleted = false;
 			spider.EmptySleepTime = 6000;
 			// start crawler 启动爬虫
 			spider.Run();
 
-			Assert.Equal(5, spider.RetriedTimes.Value);
+			Assert.Equal(5, spider.RetryTimes.Value);
 			Assert.Equal(0, scheduler.LeftRequestsCount);
 			Assert.Equal(1, scheduler.SuccessRequestsCount);
 			// 重试次数应该包含

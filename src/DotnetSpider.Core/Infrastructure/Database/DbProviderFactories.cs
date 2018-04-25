@@ -44,7 +44,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		private static readonly ConcurrentDictionary<string, DbProviderFactory> Configs =
 			new ConcurrentDictionary<string, DbProviderFactory>();
 
-		private static readonly string[] DataProviders = { "mysql.data.dll", "npgsql.dll" };
+		private static readonly string[] DataProviders = { "mysqlconnector.dll", "mysql.data.dll", "npgsql.dll" };
 
 		static DbProviderFactories()
 		{

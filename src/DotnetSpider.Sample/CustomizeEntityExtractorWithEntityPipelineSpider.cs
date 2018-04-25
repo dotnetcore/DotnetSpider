@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
