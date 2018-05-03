@@ -5,6 +5,7 @@ using Xunit;
 using DotnetSpider.Core.Scheduler;
 using static DotnetSpider.Core.Test.SpiderTest;
 using DotnetSpider.Core.Pipeline;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Test.Downloader
 {
@@ -12,12 +13,12 @@ namespace DotnetSpider.Core.Test.Downloader
 	{
 		public HttpClientDownloaderTest()
 		{
-			#if !NET45
+#if !NET45
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			#endif
-			
+#endif
+
 		}
-		
+
 		/// <summary>
 		/// 手动执行此测试脚本，运行结束后用netstat -ano 查看端口占用情况。只会占用一个就对了
 		/// </summary>
@@ -92,9 +93,10 @@ namespace DotnetSpider.Core.Test.Downloader
 
 		class HttpClientDownloader2 : HttpClientDownloader
 		{
-			protected override Page DowloadContent(Request request, ISpider spider)
+			protected override Task<Page> DowloadContent(Request request, ISpider spider)
 			{
-				return new Page(request) { Content = "{'a':'b'}" };
+				var page = new Page(request) { Content = "{'a':'b'}" };
+				return Task.FromResult(page);
 			}
 		}
 
@@ -109,7 +111,7 @@ namespace DotnetSpider.Core.Test.Downloader
 				}
 			};
 			var downloader = new HttpClientDownloader();
-			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site));
+			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site)).Result;
 			Assert.DoesNotContain("1231222221111123", page.TargetUrl);
 			Assert.True(page.TargetUrl.Contains("www.jd.com/") || page.TargetUrl.Contains("global.jd.com"));
 		}

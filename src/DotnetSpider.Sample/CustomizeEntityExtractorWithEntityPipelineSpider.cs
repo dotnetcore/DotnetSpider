@@ -12,6 +12,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using DotnetSpider.Core.Infrastructure;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Sample
 {
@@ -20,12 +21,13 @@ namespace DotnetSpider.Sample
 	{
 		private class MyDownloader : BaseDownloader
 		{
-			protected override Page DowloadContent(Request request, ISpider spider)
+			protected override Task<Page> DowloadContent(Request request, ISpider spider)
 			{
-				return new Page(request)
+				var page = new Page(request)
 				{
 					Content = "{}"
 				};
+				return Task.FromResult(page);
 			}
 		}
 

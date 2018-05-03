@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -63,13 +64,14 @@ namespace DotnetSpider.Extension.Test
 
 		private class TestDownloader : BaseDownloader
 		{
-			protected override Page DowloadContent(Request request, ISpider spider)
+			protected override Task<Page> DowloadContent(Request request, ISpider spider)
 			{
 				Console.WriteLine("ok:" + request.Url);
-				return new Page(request)
+				var page = new Page(request)
 				{
 					Content = ""
 				};
+				return Task.FromResult(page);
 			}
 		}
 

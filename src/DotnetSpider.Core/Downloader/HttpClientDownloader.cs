@@ -103,7 +103,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="request">请求信息 <see cref="Request"/></param>
 		/// <param name="spider">爬虫 <see cref="ISpider"/></param>
 		/// <returns>页面数据 <see cref="Page"/></returns>
-		protected override Page DowloadContent(Request request, ISpider spider)
+		protected override Task<Page> DowloadContent(Request request, ISpider spider)
 		{
 			HttpResponseMessage response = null;
 			try
@@ -139,7 +139,7 @@ namespace DotnetSpider.Core.Downloader
 					if (!spider.Site.DownloadFiles)
 					{
 						Logger.Log(spider.Identity, $"Ignore: {request.Url} because media type is not allowed to download.", Level.Warn);
-						return new Page(request) { Skip = true };
+						return Task.FromResult(new Page(request) { Skip = true });
 					}
 					else
 					{
@@ -158,11 +158,11 @@ namespace DotnetSpider.Core.Downloader
 
 				page.TargetUrl = response.RequestMessage.RequestUri.AbsoluteUri;
 
-				return page;
+				return Task.FromResult(page);
 			}
 			catch (Exception e)
 			{
-				return CreateRetryPage(e, request, spider);
+				return Task.FromResult(CreateRetryPage(e, request, spider));
 			}
 			finally
 			{

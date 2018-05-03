@@ -1011,7 +1011,7 @@ namespace DotnetSpider.Core
 				stopwatch.Reset();
 				stopwatch.Start();
 
-				page = downloader.Download(request, this);
+				page = downloader.Download(request, this).Result;
 
 				stopwatch.Stop();
 				CalculateDownloadSpeed(stopwatch.ElapsedMilliseconds);

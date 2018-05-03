@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 
@@ -16,7 +17,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// <param name="request">请求信息</param>
 		/// <param name="spider">爬虫</param>
 		/// <returns></returns>
-		protected override Page DowloadContent(Request request, ISpider spider)
+		protected override Task<Page> DowloadContent(Request request, ISpider spider)
 		{
 			var site = spider.Site;
 			request.StatusCode = HttpStatusCode.OK;
@@ -26,7 +27,7 @@ namespace DotnetSpider.Extension.Downloader
 				TargetUrl = request.Url.ToString()
 			};
 
-			return page;
+			return Task.FromResult(page);
 		}
 	}
 }

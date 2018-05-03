@@ -18,7 +18,7 @@ namespace DotnetSpider.Core
 		{
 			lock (Locker)
 			{
-				var key = "_DotnetSpider_Info";
+				var key = "PRINT_DOTNETSPIDER_INFO";
 
 				var isPrinted = AppDomain.CurrentDomain.GetData(key) != null;
 

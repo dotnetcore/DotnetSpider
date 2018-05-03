@@ -16,8 +16,8 @@
         <dependency id="DotnetSpider.Core" version="2.4.9" />
         <dependency id="Dapper" version="1.50.4"/>
         <dependency id="MailKit" version="2.0.3"/>
-        <dependency id="MongoDB.Driver" version="2.5.1"/>
-        <dependency id="MySqlConnector" version="0.40.2"/>
+        <dependency id="MongoDB.Driver" version="2.6.0"/>
+        <dependency id="MySqlConnector" version="0.40.3"/>
         <dependency id="StackExchange.Redis" version="1.2.6" />
         <dependency id="SSH.NET" version="2016.1.0" />
         <dependency id="System.Runtime.Extensions" version="4.3.0"/>
@@ -31,8 +31,8 @@
         <dependency id="DotnetSpider.Core" version="2.4.9" />
         <dependency id="Dapper" version="1.50.4"/> 
         <dependency id="MailKit" version="2.0.3"/>
-        <dependency id="MongoDB.Driver" version="2.5.1"/>
-        <dependency id="MySqlConnector" version="0.40.2"/>
+        <dependency id="MongoDB.Driver" version="2.6.0"/>
+        <dependency id="MySqlConnector" version="0.40.3"/>
         <dependency id="StackExchange.Redis" version="1.2.6" />
         <dependency id="FiddlerCore2" version="1.0.0"/>
         <dependency id="SSH.NET" version="2016.1.0" />

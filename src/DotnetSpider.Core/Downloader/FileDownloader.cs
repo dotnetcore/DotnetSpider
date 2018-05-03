@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -21,7 +22,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="request">请求信息 <see cref="Request"/></param>
 		/// <param name="spider">爬虫 <see cref="ISpider"/></param>
 		/// <returns>页面数据 <see cref="Page"/></returns>
-		protected override Page DowloadContent(Request request, ISpider spider)
+		protected override Task<Page> DowloadContent(Request request, ISpider spider)
 		{
 			Console.WriteLine(request.Uri.LocalPath);
 			var filePath = request.Uri.LocalPath;
@@ -41,10 +42,10 @@ namespace DotnetSpider.Core.Downloader
 				}
 				if (File.Exists(filePath))
 				{
-					return new Page(request)
+					return Task.FromResult(new Page(request)
 					{
 						Content = File.ReadAllText(filePath)
-					};
+					});
 				}
 			}
 			var msg = $"File {filePath} unfound.";
@@ -55,7 +56,7 @@ namespace DotnetSpider.Core.Downloader
 			};
 
 			Logger.Log(spider.Identity, $"Download {request.Url} failed: {msg}.", Level.Error);
-			return page;
+			return Task.FromResult(page);
 		}
 	}
 }

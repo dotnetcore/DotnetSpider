@@ -18,7 +18,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			var path = Path.Combine("source", "1.html");
 			var request = new Request($"file://{path}");
 			var spider = new DefaultSpider();
-			var page = downloader.Download(request, spider);
+			var page = downloader.Download(request, spider).Result;
 			Assert.Equal("hello", page.Content);
 		}
 
@@ -33,7 +33,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			var path = Path.Combine(Env.BaseDirectory, "source", "1.html");
 			var request = new Request($"file://{path}");
 			var spider = new DefaultSpider();
-			var page = downloader.Download(request, spider);
+			var page = downloader.Download(request, spider).Result;
 			Assert.Equal("hello", page.Content);
 		}
 
@@ -43,7 +43,7 @@ namespace DotnetSpider.Core.Test.Downloader
 			FileDownloader downloader = new FileDownloader();
 			var request = new Request("file://Downloader/2.html");
 			var spider = new DefaultSpider();
-			var page = downloader.Download(request, spider);
+			var page = downloader.Download(request, spider).Result;
 			Assert.True(string.IsNullOrEmpty(page.Content));
 			Assert.True(page.Exception is FileNotFoundException);
 			Assert.True(page.Skip);

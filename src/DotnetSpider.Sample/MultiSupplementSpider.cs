@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Sample
 {
@@ -16,26 +17,28 @@ namespace DotnetSpider.Sample
 	{
 		private class MyDownloader : BaseDownloader
 		{
-			protected override Page DowloadContent(Request request, ISpider spider)
+			protected override Task<Page> DowloadContent(Request request, ISpider spider)
 			{
+				Page page;
 				if (request.Url.Contains("a.com"))
 				{
-					return new Page(request)
+					page = new Page(request)
 					{
 						Content = "{\"a\": \"a\"}"
 					};
 				}
 				if (request.Url.Contains("b.com"))
 				{
-					return new Page(request)
+					page = new Page(request)
 					{
 						Content = "{\"b\": \"b\"}"
 					};
 				}
-				return new Page(request)
+				page = new Page(request)
 				{
 					Content = "{}"
 				};
+				return Task.FromResult(page);
 			}
 		}
 

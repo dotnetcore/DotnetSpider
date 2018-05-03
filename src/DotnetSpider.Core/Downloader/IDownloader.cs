@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -21,7 +22,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="request">链接请求 <see cref="Request"/></param>
 		/// <param name="spider">爬虫接口 <see cref="ISpider"/></param>
 		/// <returns>下载内容封装好的页面对象 <see cref="Page"/></returns>
-		Page Download(Request request, ISpider spider);
+		Task<Page> Download(Request request, ISpider spider);
 
 		/// <summary>
 		/// Add handlers for post-processing.

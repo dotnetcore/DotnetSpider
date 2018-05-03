@@ -9,6 +9,7 @@ using DotnetSpider.Core.Downloader;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Test
 {
@@ -211,9 +212,9 @@ namespace DotnetSpider.Core.Test
 
 		internal class FileDownloader : BaseDownloader
 		{
-			protected override Page DowloadContent(Request request, ISpider spider)
+			protected override Task<Page> DowloadContent(Request request, ISpider spider)
 			{
-				return new Page(request);
+				return Task.FromResult(new Page(request));
 			}
 		}
 

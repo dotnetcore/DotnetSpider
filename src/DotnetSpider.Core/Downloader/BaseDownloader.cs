@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -149,10 +150,10 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="request">链接请求 <see cref="Request"/></param>
 		/// <param name="spider">爬虫接口 <see cref="ISpider"/></param>
 		/// <returns>下载内容封装好的页面对象 (a <see cref="Page"/> instance that contains requested page infomations, like Html source, headers, etc.)</returns>
-		public Page Download(Request request, ISpider spider)
+		public async Task<Page> Download(Request request, ISpider spider)
 		{
 			BeforeDownload(ref request, spider);
-			var page = DowloadContent(request, spider);
+			var page = await DowloadContent(request, spider);
 			AfterDownloadComplete(ref page, spider);
 			TryDetectContentType(page, spider);
 			return page;
@@ -210,7 +211,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="request">请求信息 <see cref="Request"/></param>
 		/// <param name="spider">爬虫 <see cref="ISpider"/></param>
 		/// <returns>页面数据 <see cref="Page"/></returns>
-		protected abstract Page DowloadContent(Request request, ISpider spider);
+		protected abstract Task<Page> DowloadContent(Request request, ISpider spider);
 
 		private void BeforeDownload(ref Request request, ISpider spider)
 		{

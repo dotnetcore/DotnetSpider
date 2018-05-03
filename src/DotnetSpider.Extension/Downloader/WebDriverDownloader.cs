@@ -94,7 +94,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// <param name="request">请求信息</param>
 		/// <param name="spider">爬虫</param>
 		/// <returns>页面数据</returns>
-		protected override Page DowloadContent(Request request, ISpider spider)
+		protected override Task<Page> DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
 			try
@@ -162,7 +162,7 @@ namespace DotnetSpider.Extension.Downloader
 					TargetUrl = _webDriver.Url
 				};
 
-				return page;
+				return Task.FromResult(page);
 			}
 			catch (DownloadException de)
 			{
@@ -172,13 +172,13 @@ namespace DotnetSpider.Extension.Downloader
 					page = site.AddToCycleRetry(request);
 				}
 				Logger.Log(spider.Identity, $"下载 {request.Url} 失败: {de.Message}.", Level.Warn);
-				return page;
+				return Task.FromResult(page);
 			}
 			catch (Exception e)
 			{
 				Logger.Log(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", Level.Warn);
 				Page page = new Page(request) { Exception = e };
-				return page;
+				return Task.FromResult(page);
 			}
 		}
 
