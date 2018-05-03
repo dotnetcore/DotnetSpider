@@ -84,7 +84,7 @@ namespace DotnetSpider.Extension
 				{
 					AddPipeline(new ConsolePipeline());
 				}
-				if (PageProcessors == null || PageProcessors.Count == 0)
+				if (_pageProcessors == null || _pageProcessors.Count == 0)
 				{
 					AddPageProcessor(new NullPageProcessor());
 				}

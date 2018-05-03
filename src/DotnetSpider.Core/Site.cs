@@ -3,6 +3,9 @@ using System.Text;
 using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Infrastructure;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace DotnetSpider.Core
 {
@@ -13,6 +16,7 @@ namespace DotnetSpider.Core
 	{
 		private Encoding _encoding = Encoding.UTF8;
 		private string _encodingName;
+		private ConcurrentBag<Request> _startRequests = new ConcurrentBag<Request>();
 
 		/// <summary>
 		/// 代理池
@@ -92,7 +96,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 起始请求
 		/// </summary>
-		public readonly List<Request> StartRequests = new List<Request>();
+		public IReadOnlyCollection<Request> StartRequests => new ReadOnlyEnumerable<Request>(_startRequests);
 
 		/// <summary>
 		/// 每处理完一个目标链接后停顿的时间, 单位毫秒 
@@ -158,11 +162,7 @@ namespace DotnetSpider.Core
 		/// <param name="request">请求对象</param>
 		public void AddStartRequest(Request request)
 		{
-			lock (this)
-			{
-				request.Site = request.Site ?? this;
-				StartRequests.Add(request);
-			}
+			_startRequests.Add(request);
 		}
 
 		/// <summary>
@@ -171,13 +171,9 @@ namespace DotnetSpider.Core
 		/// <param name="requests">请求对象</param>
 		public void AddStartRequests(IEnumerable<Request> requests)
 		{
-			lock (this)
+			foreach (var request in requests)
 			{
-				foreach (var request in requests)
-				{
-					request.Site = request.Site ?? this;
-					StartRequests.Add(request);
-				}
+				_startRequests.Add(request);
 			}
 		}
 
@@ -186,10 +182,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public void ClearStartRequests()
 		{
-			lock (this)
-			{
-				StartRequests.Clear();
-			}
+			_startRequests = new ConcurrentBag<Request>();
 		}
 
 		/// <summary>
@@ -204,6 +197,34 @@ namespace DotnetSpider.Core
 			else
 			{
 				Headers.Add(key, value);
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="request"></param>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		internal Page AddToCycleRetry(Request request)
+		{
+			Page page = new Page(request)
+			{
+				ContentType = ContentType
+			};
+
+			request.CycleTriedTimes++;
+
+			if (request.CycleTriedTimes <= CycleRetryTimes)
+			{
+				request.Priority = 0;
+				page.AddTargetRequest(request, false);
+				page.Retry = true;
+				return page;
+			}
+			else
+			{
+				return null;
 			}
 		}
 	}

@@ -41,7 +41,7 @@ namespace DotnetSpider.Sample
 
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
-			spider.Deep = 3;
+			spider.Scheduler.Depth = 3;
 
 			// start crawler 启动爬虫
 			spider.Run();

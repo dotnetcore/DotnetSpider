@@ -1,4 +1,5 @@
 using DotnetSpider.Core.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -58,15 +59,24 @@ namespace DotnetSpider.Core.Scheduler
 				else
 				{
 					Request request;
-					if (DepthFirst)
+					switch (TraverseStrategy)
 					{
-						request = _queue.Last();
-						_queue.RemoveAt(_queue.Count - 1);
-					}
-					else
-					{
-						request = _queue.First();
-						_queue.RemoveAt(0);
+						case TraverseStrategy.DFS:
+							{
+								request = _queue.Last();
+								_queue.RemoveAt(_queue.Count - 1);
+								break;
+							}
+						case TraverseStrategy.BFS:
+							{
+								request = _queue.First();
+								_queue.RemoveAt(0);
+								break;
+							}
+						default:
+							{
+								throw new NotImplementedException();
+							}
 					}
 
 					return request;
@@ -135,7 +145,7 @@ namespace DotnetSpider.Core.Scheduler
 			{
 				lock (_lock)
 				{
-					return new ReadOnlyCollection<Request>(_queue.ToArray());
+					return new ReadOnlyEnumerable<Request>(_queue.ToArray());
 				}
 			}
 		}

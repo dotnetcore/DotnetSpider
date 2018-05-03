@@ -101,7 +101,7 @@ namespace DotnetSpider.Core.Test
 			spider.ThreadNum = 1;
 			spider.Run();
 
-			Assert.Equal(Status.Finished, spider.Stat);
+			Assert.Equal(Status.Finished, spider.Status);
 		}
 
 		internal class TestPipeline : BasePipeline
@@ -134,7 +134,7 @@ namespace DotnetSpider.Core.Test
 			spider.AddStartUrl("http://taobao.com");
 			spider.Run();
 
-			Assert.Equal(Status.Finished, spider.Stat);
+			Assert.Equal(Status.Finished, spider.Status);
 		}
 
 		[Fact]

@@ -271,13 +271,13 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
+				Scheduler.Depth = 100;
 				Monitor = new NLogMonitor();
 				Identity = Guid.NewGuid().ToString();
 				ThreadNum = 1;
-				Deep = 100;
 				EmptySleepTime = 5000;
 				ExitWhenComplete = true;
-				CachedSize = 1;
+				PipelineCachedSize = 1;
 				SkipTargetUrlsWhenResultIsEmpty = false;
 				AddPipeline(new CollectionEntityPipeline());
 				AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");

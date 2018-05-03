@@ -3,7 +3,10 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Processor;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 #if !NETCOREAPP2_0
 using System.Threading;
@@ -75,11 +78,21 @@ namespace DotnetSpider.Sample
 			Situoli.Run();
 		}
 
+		class A
+		{
+			private readonly ConcurrentBag<int> _numbers = new ConcurrentBag<int>();
+
+			public IEnumerable<int> Numbers => new ReadOnlyEnumerable<int>(_numbers);
+
+		}
 		/// <summary>
 		/// <c>MyTest</c> is a method in the <c>Program</c>
 		/// </summary>
 		private static void MyTest()
 		{
+			A a = new A();
+			var a1 = a.Numbers as ConcurrentBag<int>;
+			a1.Add(2);
 		}
 	}
 }

@@ -452,13 +452,13 @@ namespace DotnetSpider.Extension.Test
 			spider.AddPipeline(new JsonFileEntityPipeline());
 
 			spider.AddStartUrl("http://baidu.com");
-			spider.Monitor = new NLogMonitor(); 
+			spider.Monitor = new NLogMonitor();
 			spider.AddEntityType<Entity13>();
 			spider.AddEntityType<Entity12>();
 
 			spider.Run("running-test");
 
-			var entityPipelines = spider.Pipelines;
+			var entityPipelines = spider.Pipelines.ToList();
 
 			Assert.Equal(4, entityPipelines.Count);
 
@@ -469,7 +469,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.Equal("ConsoleEntityPipeline", entityPipelines[2].GetType().Name);
 			Assert.Equal("JsonFileEntityPipeline", entityPipelines[3].GetType().Name);
 
-			var pipelines = spider.Pipelines;
+			var pipelines = spider.Pipelines.ToList();
 			Assert.Equal(4, pipelines.Count);
 			IEntityPipeline pipeline = (IEntityPipeline)pipelines[0];
 			//entityPipelines = pipeline.GetEntityPipelines();

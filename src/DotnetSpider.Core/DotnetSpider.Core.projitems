@@ -61,9 +61,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\LogInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\PriorityBlockingQueue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\Rasdial.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\ReadOnlyEnumerable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\RegexUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\Singleton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\StreamExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scheduler\TraverseStrategy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskName.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\UrlUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\WindowsFormUtil.cs" />

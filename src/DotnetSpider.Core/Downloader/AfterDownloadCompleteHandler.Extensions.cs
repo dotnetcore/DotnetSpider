@@ -443,7 +443,7 @@ namespace DotnetSpider.Core.Downloader
 					spider.Exit();
 				}
 
-				page = Spider.AddToCycleRetry(page.Request, spider.Site);
+				page = spider.Site.AddToCycleRetry(page.Request);
 				page.Exception = new DownloadException($"Downloaded content contains: {containContent}.");
 			}
 		}
@@ -497,7 +497,8 @@ namespace DotnetSpider.Core.Downloader
 					spider.Exit();
 				}
 
-				Spider.AddToCycleRetry(page.Request, spider.Site);
+				page = spider.Site.AddToCycleRetry(page.Request);
+
 				page.Exception = new DownloadException("Download failed and redial finished already.");
 			}
 		}
@@ -554,7 +555,7 @@ namespace DotnetSpider.Core.Downloader
 					spider.Exit();
 				}
 
-				Spider.AddToCycleRetry(page.Request, spider.Site);
+				page = spider.Site.AddToCycleRetry(page.Request);
 				_cookieInjector.Inject(downloader, spider);
 				page.Exception = new DownloadException($"Downloaded content contains: {containContent}.");
 			}

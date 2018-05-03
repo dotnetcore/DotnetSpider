@@ -179,7 +179,7 @@ namespace DotnetSpider.Core.Downloader
 
 		private Page CreateRetryPage(Exception e, Request request, ISpider spider)
 		{
-			Page page = spider.Site.CycleRetryTimes > 0 ? Spider.AddToCycleRetry(request, spider.Site) : new Page(request);
+			Page page = spider.Site.CycleRetryTimes > 0 ? spider.Site.AddToCycleRetry(request) : new Page(request);
 			if (page != null)
 			{
 				page.Exception = e;

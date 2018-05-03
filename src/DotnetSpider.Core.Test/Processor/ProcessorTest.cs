@@ -40,12 +40,12 @@ namespace DotnetSpider.Core.Test.Processor
 
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
-			spider.Deep = 3;
+			spider.Scheduler.Depth = 3;
 			spider.EmptySleepTime = 6000;
 			// start crawler 启动爬虫
 			spider.Run();
 
-			Assert.Equal(5, spider.RetryTimes.Value);
+			Assert.Equal(5, spider.RetriedTimes.Value);
 			Assert.Equal(0, scheduler.LeftRequestsCount);
 			Assert.Equal(6, scheduler.SuccessRequestsCount);
 			Assert.Equal(5, scheduler.ErrorRequestsCount);

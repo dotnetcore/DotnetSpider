@@ -23,6 +23,7 @@ namespace DotnetSpider.Sample
 				// Add start/feed urls. 添加初始采集链接
 				site.AddStartUrl($"http://list.youku.com/category/show/c_96_s_1_d_1_p_{i}.html");
 			}
+
 			Spider spider = Spider.Create(site,
 				// use memoery queue scheduler. 使用内存调度
 				new QueueDuplicateRemovedScheduler(),
@@ -33,7 +34,6 @@ namespace DotnetSpider.Sample
 			spider.Downloader = new HttpClientDownloader();
 			spider.ThreadNum = 1;
 			spider.EmptySleepTime = 3000;
-
 			// Start crawler 启动爬虫
 			spider.Run();
 		}
@@ -139,7 +139,7 @@ namespace DotnetSpider.Sample
 			// 4 threads 4线程
 			spider.ThreadNum = 4;
 			// traversal deep 遍历深度
-			spider.Deep = 3;
+			spider.Scheduler.Depth = 3;
 
 			// stop crawler if it can't get url from the scheduler after 30000 ms 当爬虫连续30秒无法从调度中心取得需要采集的链接时结束.
 			spider.EmptySleepTime = 30000;

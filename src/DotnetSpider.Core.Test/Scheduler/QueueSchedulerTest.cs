@@ -59,7 +59,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 		public void PushAndPollBreadthFirst()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			scheduler.DepthFirst = false;
+			scheduler.TraverseStrategy =  TraverseStrategy.BFS;
 			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 

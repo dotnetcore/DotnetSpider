@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		public void PushAndPollBreadthFirst()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
-			scheduler.DepthFirst = false;
+			scheduler.TraverseStrategy = TraverseStrategy.BFS;
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
 			scheduler.Dispose();
@@ -68,7 +68,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		public void PushAndPollDepthFirst()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
-			scheduler.DepthFirst = true;
+			scheduler.TraverseStrategy = TraverseStrategy.DFS;
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
 			scheduler.Dispose();
@@ -275,13 +275,13 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
-			spider.Deep = 3;
+			spider.Scheduler.Depth = 3;
 			spider.ClearSchedulerAfterCompleted = false;
 			spider.EmptySleepTime = 6000;
 			// start crawler 启动爬虫
 			spider.Run();
 
-			Assert.Equal(5, spider.RetryTimes.Value);
+			Assert.Equal(5, spider.RetriedTimes.Value);
 			Assert.Equal(0, scheduler.LeftRequestsCount);
 			Assert.Equal(1, scheduler.SuccessRequestsCount);
 			// 重试次数应该包含

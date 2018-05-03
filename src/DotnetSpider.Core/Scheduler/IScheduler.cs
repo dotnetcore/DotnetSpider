@@ -12,7 +12,12 @@ namespace DotnetSpider.Core.Scheduler
 		/// <summary>
 		/// 是否深度优先
 		/// </summary>
-		bool DepthFirst { get; set; }
+		TraverseStrategy TraverseStrategy { get; set; }
+
+		/// <summary>
+		/// 遍历深度
+		/// </summary>
+		int Depth { get; set; }
 
 		/// <summary>
 		/// 初始化队列

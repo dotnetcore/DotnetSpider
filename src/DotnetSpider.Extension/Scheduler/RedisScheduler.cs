@@ -253,7 +253,7 @@ namespace DotnetSpider.Extension.Scheduler
 				_redisConnection.Database.KeyDelete(_errorCountKey);
 			}
 		}
-		
+
 		/// <summary>
 		/// 批量导入
 		/// </summary>
@@ -411,8 +411,24 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			return _retryPolicy.Execute(() =>
 			{
-				var value = DepthFirst ? _redisConnection.Database.ListRightPop(_queueKey) : _redisConnection.Database.ListLeftPop(_queueKey);
-
+				RedisValue value;
+				switch (TraverseStrategy)
+				{
+					case TraverseStrategy.DFS:
+						{
+							value = _redisConnection.Database.ListRightPop(_queueKey);
+							break;
+						}
+					case TraverseStrategy.BFS:
+						{
+							value = _redisConnection.Database.ListLeftPop(_queueKey);
+							break;
+						}
+					default:
+						{
+							throw new NotImplementedException();
+						}
+				}
 				if (!value.HasValue)
 				{
 					return null;

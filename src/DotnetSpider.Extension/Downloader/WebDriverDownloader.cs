@@ -169,7 +169,7 @@ namespace DotnetSpider.Extension.Downloader
 				Page page = new Page(request) { Exception = de };
 				if (site.CycleRetryTimes > 0)
 				{
-					page = Spider.AddToCycleRetry(request, site);
+					page = site.AddToCycleRetry(request);
 				}
 				Logger.Log(spider.Identity, $"下载 {request.Url} 失败: {de.Message}.", Level.Warn);
 				return page;
