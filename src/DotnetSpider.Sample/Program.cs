@@ -78,21 +78,13 @@ namespace DotnetSpider.Sample
 			Situoli.Run();
 		}
 
-		class A
-		{
-			private readonly ConcurrentBag<int> _numbers = new ConcurrentBag<int>();
 
-			public IEnumerable<int> Numbers => new ReadOnlyEnumerable<int>(_numbers);
-
-		}
 		/// <summary>
 		/// <c>MyTest</c> is a method in the <c>Program</c>
 		/// </summary>
 		private static void MyTest()
 		{
-			A a = new A();
-			var a1 = a.Numbers as ConcurrentBag<int>;
-			a1.Add(2);
+
 		}
 	}
 }

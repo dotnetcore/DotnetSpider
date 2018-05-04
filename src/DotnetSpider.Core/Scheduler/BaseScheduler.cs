@@ -14,6 +14,8 @@ namespace DotnetSpider.Core.Scheduler
 		/// </summary>
 		protected ISpider Spider { get; private set; }
 
+		public abstract bool IsDistributed { get; }
+
 		/// <summary>
 		/// 采集成功的链接数加 1
 		/// </summary>

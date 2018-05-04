@@ -42,6 +42,8 @@ namespace DotnetSpider.Core.Scheduler
 		/// </summary>
 		public override long ErrorRequestsCount => _errorCounter.Value;
 
+		public override bool IsDistributed => false;
+
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>

@@ -186,7 +186,7 @@ namespace DotnetSpider.Core
 
 			if (string.IsNullOrWhiteSpace(Url))
 			{
-				return;
+				throw new ArgumentException("Url should not be empty or null.");
 			}
 
 			if (extras != null)

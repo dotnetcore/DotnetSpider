@@ -32,18 +32,15 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Spider : AppBase, ISpider, ISpeedMonitor
 	{
-		private static readonly object Locker = new object();
-
-		private readonly Site _site;
+		private Site _site = new Site();
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
 		private IDownloader _downloader = new HttpClientDownloader();
 		protected readonly List<IPipeline> _pipelines = new List<IPipeline>();
 		protected readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
-		private Status _realStat = Status.Init;
 		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
-		private bool _init;
-		private FileInfo _errorRequestFile;
+		private bool _inited;
+		private FileInfo _errorRequestsLogFile;
 		private readonly object _avgDownloadTimeLocker = new object();
 		private readonly object _avgProcessorTimeLocker = new object();
 		private readonly object _avgPipelineTimeLocker = new object();
@@ -56,29 +53,31 @@ namespace DotnetSpider.Core
 		private StreamWriter _errorRequestStreamWriter;
 		private int _errorRequestFlushCount;
 		private RetryPolicy _pipelineRetryPolicy;
-		private long _requstCount;
-		private static readonly object RequestCountLocker = new object();
+		private AutomicLong _requestedCount = new AutomicLong(0);
 		private MemoryMappedFile _identityMmf;
 		private MemoryMappedFile _taskIdMmf;
 		private readonly string[] _closeSignalFiles = new string[2];
 		private bool _exited;
 		private IMonitor _monitor;
 		private readonly List<IStartUrlsBuilder> _startUrlsBuilders = new List<IStartUrlsBuilder>();
+		private int _pipelineRetryTimes = 2;
+		private int _statusReportInterval = 5000;
+		private int _monitorReportInterval;
 
 		/// <summary>
 		/// 是否需要通过StartUrlsBuilder来初始化起始链接
 		/// </summary>
 		/// <param name="arguments">程序运行参数</param>
 		/// <returns>返回 True, 则需要执行所有注册的StartUrlsBulder.</returns>
-		protected virtual bool IfRequireBuildStartRequests(string[] arguments)
+		protected virtual bool IfRequireBuildStartUrlsBuilders(string[] arguments)
 		{
-			return true;
+			return arguments.Any(t => t?.ToLower() == "nostartrequestbuild");
 		}
 
 		/// <summary>
 		/// 通过StartUrlsBuilder来初始化起始链接后的响应操作
 		/// </summary>
-		protected virtual void BuildStartRequestsCompleted()
+		protected virtual void BuildStartUrlsBuildersCompleted()
 		{
 		}
 
@@ -117,9 +116,13 @@ namespace DotnetSpider.Core
 			{
 				CheckIfRunning();
 
-				if (string.IsNullOrWhiteSpace(value) || value.Length > Env.IdentityMaxLength)
+				if (string.IsNullOrWhiteSpace(value))
 				{
-					throw new ArgumentException($"Length of Identity should less than {Env.IdentityMaxLength}.");
+					throw new ArgumentException($"{nameof(Identity)} should not be empty or null.");
+				}
+				if (value.Length > Env.IdentityMaxLength)
+				{
+					throw new ArgumentException($"Length of identity should less than {Env.IdentityMaxLength}.");
 				}
 
 				_identity = value;
@@ -129,7 +132,14 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Site of spider.
 		/// </summary>
-		public Site Site => _site;
+		public Site Site
+		{
+			get => _site;
+			protected set
+			{
+				_site = value ?? throw new ArgumentException($"{nameof(Site)} should not be null.");
+			}
+		}
 
 		/// <summary>
 		/// Whether spider is complete.
@@ -174,10 +184,10 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public IMonitor Monitor
 		{
-			get => _monitor; set
+			get => _monitor;
+			set
 			{
 				CheckIfRunning();
-
 				_monitor = value;
 			}
 		}
@@ -200,12 +210,43 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 上报运行状态的间隔
 		/// </summary>
-		public int StatusReportInterval { get; set; } = 5000;
+		public int StatusReportInterval
+		{
+			get => _statusReportInterval;
+			set
+			{
+				CheckIfRunning();
+
+				if (value < 2000)
+				{
+					throw new ArgumentException($"{nameof(StatusReportInterval)} should greater than 2000.");
+				}
+				if (value > 60000)
+				{
+					throw new ArgumentException($"{nameof(StatusReportInterval)} should less than 60000.");
+				}
+				_statusReportInterval = value;
+			}
+		}
 
 		/// <summary>
 		/// Set the retry times for pipeline.
 		/// </summary>
-		public int PipelineRetryTimes { get; set; } = 2;
+		public int PipelineRetryTimes
+		{
+			get => _pipelineRetryTimes;
+			set
+			{
+				CheckIfRunning();
+
+				if (value <= 0)
+				{
+					throw new ArgumentException($"{nameof(PipelineRetryTimes)} should greater than 0.");
+				}
+
+				_pipelineRetryTimes = value;
+			}
+		}
 
 		/// <summary>
 		/// Scheduler of spider.
@@ -216,7 +257,7 @@ namespace DotnetSpider.Core
 			set
 			{
 				CheckIfRunning();
-				_scheduler = value;
+				_scheduler = value ?? throw new ArgumentNullException($"{nameof(Scheduler)} should not be null.");
 			}
 		}
 
@@ -229,6 +270,10 @@ namespace DotnetSpider.Core
 			set
 			{
 				CheckIfRunning();
+				if (value <= 0)
+				{
+					throw new ArgumentException($"{nameof(PipelineCachedSize)} should be greater than 0.");
+				}
 				_pipelineCachedSize = value;
 			}
 		}
@@ -260,7 +305,7 @@ namespace DotnetSpider.Core
 			set
 			{
 				CheckIfRunning();
-				_downloader = value;
+				_downloader = value ?? throw new ArgumentNullException($"{nameof(Downloader)} should not be null.");
 			}
 		}
 
@@ -286,7 +331,7 @@ namespace DotnetSpider.Core
 				}
 				else
 				{
-					throw new SpiderException("Empty sleep time should be greater than 0.");
+					throw new SpiderException($"{nameof(EmptySleepTime)} should be greater than 0.");
 				}
 			}
 		}
@@ -316,7 +361,7 @@ namespace DotnetSpider.Core
 
 				if (value <= 0)
 				{
-					throw new ArgumentException("threadNum should be more than one!");
+					throw new ArgumentException($"{nameof(ThreadNum)} should be more than one!");
 				}
 
 				_threadNum = value;
@@ -365,7 +410,7 @@ namespace DotnetSpider.Core
 		/// <param name="site">站点信息</param>
 		public Spider(Site site) : this()
 		{
-			_site = site ?? new Site();
+			Site = site;
 		}
 
 		/// <summary>
@@ -378,15 +423,15 @@ namespace DotnetSpider.Core
 		/// <param name="pipelines">数据管道</param>
 		public Spider(Site site, string identity, IScheduler scheduler, IEnumerable<IPageProcessor> pageProcessors, IEnumerable<IPipeline> pipelines) : this(site)
 		{
-			_identity = identity;
+			Identity = identity;
 			Scheduler = scheduler;
 			if (pageProcessors != null)
 			{
-				AddPageProcessor(pageProcessors.ToArray());
+				AddPageProcessors(pageProcessors);
 			}
 			if (pipelines != null)
 			{
-				AddPipelines(pipelines.ToArray());
+				AddPipelines(pipelines);
 			}
 
 			ValidateSettings();
@@ -437,45 +482,24 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public Spider AddStartUrlBuilder(IStartUrlsBuilder builder)
 		{
+			if (builder == null)
+			{
+				throw new ArgumentNullException($"{nameof(builder)} should not be null.");
+			}
 			CheckIfRunning();
 			_startUrlsBuilders.Add(builder);
 			return this;
 		}
 
 		/// <summary>
-		/// Add startUrls to spider. 
+		/// Add a url to spider.
 		/// </summary>
-		/// <param name="urls">链接</param>
-		/// <returns>爬虫</returns>
-		public Spider AddStartUrls(IEnumerable<string> urls)
+		/// <param name="url">链接</param>
+		/// <param name="extras">Extra properties of request.</param>
+		/// <returns></returns>
+		public Spider AddStartUrl(string url)
 		{
-			CheckIfRunning();
-			Site.AddStartUrls(urls);
-			return this;
-		}
-
-		/// <summary>
-		/// Add start requests to spider. 
-		/// </summary>
-		/// <param name="requests">请求信息</param>
-		/// <returns>爬虫</returns>
-		public Spider AddStartRequests(IEnumerable<Request> requests)
-		{
-			CheckIfRunning();
-			Site.AddStartRequests(requests);
-			return this;
-		}
-
-		/// <summary>
-		/// Add urls to crawl.
-		/// </summary>
-		/// <param name="urls">链接</param>
-		/// <returns>爬虫</returns>
-		public Spider AddStartUrl(params string[] urls)
-		{
-			CheckIfRunning();
-			Site.AddStartUrls(urls);
-			return this;
+			return AddStartUrls(url);
 		}
 
 		/// <summary>
@@ -487,6 +511,36 @@ namespace DotnetSpider.Core
 		public Spider AddStartUrl(string url, IDictionary<string, dynamic> extras)
 		{
 			Site.AddStartUrl(url, extras);
+			return this;
+		}
+
+		/// <summary>
+		/// Add urls to crawl.
+		/// </summary>
+		/// <param name="urls">链接</param>
+		/// <returns>爬虫</returns>
+		public Spider AddStartUrls(params string[] urls)
+		{
+			if (urls == null)
+			{
+				throw new ArgumentNullException($"{nameof(urls)} should not be null.");
+			}
+			return AddStartUrls(urls.AsEnumerable());
+		}
+
+		/// <summary>
+		/// Add startUrls to spider. 
+		/// </summary>
+		/// <param name="urls">链接</param>
+		/// <returns>爬虫</returns>
+		public Spider AddStartUrls(IEnumerable<string> urls)
+		{
+			if (urls == null)
+			{
+				throw new ArgumentNullException($"{nameof(urls)} should not be null.");
+			}
+			CheckIfRunning();
+			Site.AddStartUrls(urls);
 			return this;
 		}
 
@@ -507,24 +561,37 @@ namespace DotnetSpider.Core
 		/// <returns>爬虫</returns>
 		public Spider AddStartRequests(params Request[] requests)
 		{
+			if (requests == null)
+			{
+				throw new ArgumentNullException($"{nameof(requests)} should not be null.");
+			}
+			return AddStartRequests(requests.AsEnumerable());
+		}
+
+		/// <summary>
+		/// Add urls with information to crawl.
+		/// </summary>
+		/// <param name="requests">链接</param>
+		/// <returns>爬虫</returns>
+		public Spider AddStartRequests(IEnumerable<Request> requests)
+		{
+			if (requests == null)
+			{
+				throw new ArgumentNullException($"{nameof(requests)} should not be null.");
+			}
 			CheckIfRunning();
 			Site.AddStartRequests(requests);
 			return this;
 		}
 
 		/// <summary>
-		/// Add a pipeline for Spider
+		/// Add a page processor to spider.
 		/// </summary>
-		/// <param name="pipeline">数据管道</param>
+		/// <param name="processors">页面解析器</param>
 		/// <returns>爬虫</returns>
-		public virtual Spider AddPipeline(IPipeline pipeline)
+		public virtual Spider AddPageProcessor(IPageProcessor processor)
 		{
-			if (pipeline != null)
-			{
-				CheckIfRunning();
-				_pipelines.Add(pipeline);
-			}
-			return this;
+			return AddPageProcessors(processor);
 		}
 
 		/// <summary>
@@ -532,9 +599,27 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="processors">页面解析器</param>
 		/// <returns>爬虫</returns>
-		public virtual Spider AddPageProcessor(params IPageProcessor[] processors)
+		public virtual Spider AddPageProcessors(params IPageProcessor[] processors)
 		{
-			if (processors != null && processors.Length > 0)
+			if (processors == null)
+			{
+				throw new ArgumentNullException($"{nameof(processors)} should not be null.");
+			}
+			return AddPageProcessors(processors.AsEnumerable());
+		}
+
+		/// <summary>
+		/// Add page processors to spider.
+		/// </summary>
+		/// <param name="processors">页面解析器</param>
+		/// <returns>爬虫</returns>
+		public virtual Spider AddPageProcessors(IEnumerable<IPageProcessor> processors)
+		{
+			if (processors == null)
+			{
+				throw new ArgumentNullException($"{nameof(processors)} should not be null.");
+			}
+			if (processors.Count() > 0)
 			{
 				CheckIfRunning();
 				foreach (var processor in processors)
@@ -549,33 +634,51 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
+		/// Add a pipeline for Spider
+		/// </summary>
+		/// <param name="pipeline">数据管道</param>
+		/// <returns>爬虫</returns>
+		public virtual Spider AddPipeline(IPipeline pipeline)
+		{
+			return AddPipelines(pipeline);
+		}
+
+		/// <summary>
 		/// Set pipelines for Spider
 		/// </summary>
 		/// <param name="pipelines">数据管道</param>
 		/// <returns>爬虫</returns>
 		public virtual Spider AddPipelines(params IPipeline[] pipelines)
 		{
-			if (pipelines != null && pipelines.Length > 0)
+			if (pipelines == null)
+			{
+				throw new ArgumentNullException($"{nameof(pipelines)} should not be null.");
+			}
+			return AddPipelines(pipelines.AsEnumerable());
+		}
+
+		/// <summary>
+		/// Set pipelines for Spider
+		/// </summary>
+		/// <param name="pipelines">数据管道</param>
+		/// <returns>爬虫</returns>
+		public virtual Spider AddPipelines(IEnumerable<IPipeline> pipelines)
+		{
+			if (pipelines == null)
+			{
+				throw new ArgumentNullException($"{nameof(pipelines)} should not be null.");
+			}
+			if (pipelines.Count() > 0)
 			{
 				CheckIfRunning();
 				foreach (var pipeline in pipelines)
 				{
 					if (pipeline != null)
 					{
-						AddPipeline(pipeline);
+						_pipelines.Add(pipeline);
 					}
 				}
 			}
-			return this;
-		}
-
-		/// <summary>
-		/// Clear the pipelines set
-		/// </summary>
-		/// <returns>爬虫</returns>
-		public Spider ClearPipeline()
-		{
-			_pipelines.Clear();
 			return this;
 		}
 
@@ -587,35 +690,22 @@ namespace DotnetSpider.Core
 		{
 			ValidateSettings();
 
-			if (Status == Status.Running)
+			if (_inited || Status == Status.Running)
 			{
 				Logger.Log(Identity, "Crawler is running...", Level.Warn);
 				return;
 			}
 
-			if (_init)
+			InitComponents(arguments);
+
+			if (arguments.Any(a => a?.ToLower() == "notrealrun"))
 			{
 				return;
 			}
 
-			InitComponent(arguments);
-
-			if (arguments.Contains("run-test"))
-			{
-				return;
-			}
-
-			if (StartTime == DateTime.MinValue)
-			{
-				StartTime = DateTime.Now;
-			}
-
+			StartTime = DateTime.Now;
 			Status = Status.Running;
-			_realStat = Status.Running;
 			_exited = false;
-
-			// 计算状态监控器每完成多少个Request则上报状态
-			int monitorInterval = CalculateMonitorInterval(Scheduler);
 
 			ReportStatus();
 
@@ -624,7 +714,6 @@ namespace DotnetSpider.Core
 				// 暂停则一直停在此处
 				if (Status == Status.Paused)
 				{
-					_realStat = Status.Paused;
 					Thread.Sleep(50);
 					continue;
 				}
@@ -648,7 +737,6 @@ namespace DotnetSpider.Core
 							if (waitCount > _waitCountLimit && ExitWhenComplete)
 							{
 								Status = Status.Finished;
-								_realStat = Status.Finished;
 								OnCompleted?.Invoke(this);
 								break;
 							}
@@ -678,15 +766,13 @@ namespace DotnetSpider.Core
 									var statusCode = request.StatusCode;
 									Site.HttpProxyPool.ReturnProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
 								}
-								lock (RequestCountLocker)
-								{
-									_requstCount++;
 
-									if (_requstCount % monitorInterval == 0)
-									{
-										ReportStatus();
-										CheckExitSignal();
-									}
+								_requestedCount.Inc();
+
+								if (_requestedCount.Value % _monitorReportInterval == 0)
+								{
+									ReportStatus();
+									CheckExitSignal();
 								}
 							}
 						}
@@ -695,17 +781,9 @@ namespace DotnetSpider.Core
 					SafeDestroy(downloader);
 				});
 			}
-			string msg;
+			string msg = Status != Status.Finished ? "Crawl terminated" : "Crawl complete";
 			EndTime = DateTime.Now;
-			if (_realStat != Status.Finished)
-			{
-				_realStat = Status.Exited;
-				msg = "Crawl terminated";
-			}
-			else
-			{
-				msg = "Crawl complete";
-			}
+
 			ReportStatus();
 			OnClose();
 
@@ -726,21 +804,13 @@ namespace DotnetSpider.Core
 			if (!isRunning)
 			{
 				Logger.Log(Identity, "Crawler is not running.", Level.Warn);
-				action?.Invoke();
 			}
 			else
 			{
 				Status = Status.Paused;
 				Logger.Log(Identity, "Stop running...", Level.Warn);
-				if (action != null)
-				{
-					while (_realStat != Status.Paused)
-					{
-						Thread.Sleep(100);
-					}
-					action();
-				}
 			}
+			action?.Invoke();
 		}
 
 		/// <summary>
@@ -748,10 +818,9 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public void Contiune()
 		{
-			if (_realStat == Status.Paused)
+			if (Status == Status.Paused)
 			{
 				Status = Status.Running;
-				_realStat = Status.Running;
 				Logger.Log(Identity, "Continue...", Level.Warn);
 			}
 			else
@@ -851,18 +920,6 @@ namespace DotnetSpider.Core
 		/// </summary>
 		protected void ValidateSettings()
 		{
-			Identity = string.IsNullOrWhiteSpace(Identity) ? Guid.NewGuid().ToString("N") : Identity;
-
-			if (Identity.Length > Env.IdentityMaxLength)
-			{
-				throw new ArgumentException($"Length of identity should less than {Env.IdentityMaxLength}.");
-			}
-
-			if (Site == null)
-			{
-				throw new ArgumentException($"Site should not be null.");
-			}
-
 			if (Site.RemoveOutboundLinks && (Site.Domains == null || Site.Domains.Length == 0))
 			{
 				throw new ArgumentException($"When you want remove outbound links, the domains should not be null or empty.");
@@ -873,7 +930,7 @@ namespace DotnetSpider.Core
 		/// Init component of spider.
 		/// </summary>
 		/// <param name="arguments"></param>
-		protected virtual void InitComponent(params string[] arguments)
+		protected virtual void InitComponents(params string[] arguments)
 		{
 			PrintInfo.Print();
 
@@ -882,7 +939,6 @@ namespace DotnetSpider.Core
 #if !NET_CORE // 开启多线程支持
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
-			_cached = new List<ResultItems>(PipelineCachedSize);
 
 			InitSite();
 
@@ -897,29 +953,26 @@ namespace DotnetSpider.Core
 
 			InitPipelines(arguments);
 
-			InitCloseSignal();
+			InitCloseSignals();
 
 			InitMonitor();
 
-			//TODO: 需要检测是否是Console程序
-			Console.CancelKeyPress += ConsoleCancelKeyPress;
+			InitErrorRequestsLog();
 
-			_waitCountLimit = EmptySleepTime / WaitInterval;
-
-			PrepareErrorRequestsLogFile();
-
-			PipelineRetryTimes = PipelineRetryTimes <= 0 ? 1 : PipelineRetryTimes;
-
-			_pipelineRetryPolicy = Policy.Handle<Exception>().Retry(PipelineRetryTimes, (ex, count) =>
-			{
-				Logger.NLog($"Execute pipeline failed [{count}]: {ex}", Level.Error);
-			});
-
-			ExecuteStartUrlBuilders(arguments);
+			BuildStartUrlBuilders(arguments);
 
 			PushStartRequestsToScheduler();
 
-			_init = true;
+			_monitorReportInterval = CalculateMonitorReportInterval();
+
+			if (Console.IsInputRedirected)
+			{
+				Console.CancelKeyPress += ConsoleCancelKeyPress;
+			}
+
+			_waitCountLimit = EmptySleepTime / WaitInterval;
+
+			_inited = true;
 		}
 
 		/// <summary>
@@ -975,7 +1028,7 @@ namespace DotnetSpider.Core
 		/// <param name="request"></param>
 		protected void OnError(Request request)
 		{
-			lock (Locker)
+			lock (this)
 			{
 				_errorRequestFlushCount++;
 				_errorRequestStreamWriter.WriteLine(request);
@@ -1041,7 +1094,10 @@ namespace DotnetSpider.Core
 			}
 			catch (DownloadException de)
 			{
-				if (page != null) OnError(page.Request);
+				if (page != null)
+				{
+					OnError(page.Request);
+				}
 				Logger.Log(Identity, $"Should not catch download exception: {request.Url}.", Level.Error, de);
 			}
 			catch (Exception e)
@@ -1050,7 +1106,10 @@ namespace DotnetSpider.Core
 				{
 					page = Site.AddToCycleRetry(request);
 				}
-				if (page != null) OnError(page.Request);
+				if (page != null)
+				{
+					OnError(page.Request);
+				}
 				Logger.Log(Identity, $"Extract {request.Url} failed, please check your pipeline: {e}.", Level.Error, e);
 			}
 
@@ -1121,68 +1180,48 @@ namespace DotnetSpider.Core
 				stopwatch.Reset();
 				stopwatch.Start();
 
+				int countOfResults = 0, effectedRows = 0;
+
+				ResultItems[] resultItems = null;
 				if (PipelineCachedSize == 1)
 				{
-					foreach (IPipeline pipeline in Pipelines)
-					{
-						try
-						{
-							_pipelineRetryPolicy.Execute(() =>
-							{
-								pipeline.Process(new[] { page.ResultItems }, this);
-							});
-						}
-						catch (Exception e)
-						{
-							Logger.Log(Identity, $"Execute pipeline failed: {e}", Level.Error);
-						}
-					}
-
-					StringBuilder builder = new StringBuilder($"Crawl: {request.Url} success");
-					if (request.CountOfResults.HasValue)
-					{
-						builder.Append($", results: { request.CountOfResults}");
-					}
-					if (request.EffectedRows.HasValue)
-					{
-						builder.Append($", effectedRow: {request.EffectedRows}");
-					}
-					builder.Append(".");
-					Logger.Log(Identity, builder.ToString(), Level.Info);
+					resultItems = new[] { page.ResultItems };
 				}
 				else
 				{
-					lock (Locker)
+					lock (this)
 					{
 						_cached.Add(page.ResultItems);
-
-						Logger.Log(Identity, $"Cached {request.Url} results success.", Level.Info);
-
 						if (_cached.Count >= PipelineCachedSize)
 						{
-							var items = _cached.ToArray();
+							resultItems = _cached.ToArray();
 							_cached.Clear();
-							foreach (IPipeline pipeline in Pipelines)
-							{
-								pipeline.Process(items, this);
-							}
-
-							StringBuilder builder = new StringBuilder("Crawl:");
-							int countOfResults = 0, effectedRows = 0;
-							foreach (var item in items)
-							{
-								builder.Append($" {request.Url},");
-								countOfResults += item.Request.CountOfResults.HasValue ? item.Request.CountOfResults.Value : 0;
-								effectedRows += item.Request.EffectedRows.HasValue ? item.Request.EffectedRows.Value : 0;
-							}
-							builder.Append($" success");
-							builder.Append($", results: {countOfResults}");
-							builder.Append($", effectedRow: {effectedRows}");
-							builder.Append(".");
-							Logger.Log(Identity, builder.ToString(), Level.Info);
 						}
 					}
 				}
+
+				foreach (IPipeline pipeline in Pipelines)
+				{
+					try
+					{
+						_pipelineRetryPolicy.Execute(() =>
+						{
+							pipeline.Process(new[] { page.ResultItems }, this);
+						});
+					}
+					catch (Exception e)
+					{
+						Logger.Log(Identity, $"Execute pipeline failed: {e}", Level.Error);
+					}
+				}
+
+				foreach (var item in resultItems)
+				{
+					countOfResults += item.Request.CountOfResults.HasValue ? item.Request.CountOfResults.Value : 0;
+					effectedRows += item.Request.EffectedRows.HasValue ? item.Request.EffectedRows.Value : 0;
+				}
+
+				Logger.Log(Identity, $"Crawl: {request.Url} success, results: { request.CountOfResults}, effectedRow: {request.EffectedRows}.", Level.Info);
 
 				_OnSuccess(request);
 
@@ -1202,7 +1241,6 @@ namespace DotnetSpider.Core
 			{
 				foreach (Request request in page.TargetRequests)
 				{
-					request.Site = request.Site ?? page.Request.Site;
 					Scheduler.Push(request);
 				}
 			}
@@ -1235,6 +1273,15 @@ namespace DotnetSpider.Core
 		/// <param name="arguments">运行参数</param>
 		protected virtual void InitPipelines(params string[] arguments)
 		{
+			_cached = new List<ResultItems>(PipelineCachedSize);
+
+			PipelineRetryTimes = PipelineRetryTimes <= 0 ? 1 : PipelineRetryTimes;
+
+			_pipelineRetryPolicy = Policy.Handle<Exception>().Retry(PipelineRetryTimes, (ex, count) =>
+			{
+				Logger.NLog($"Execute pipeline failed [{count}]: {ex}", Level.Error);
+			});
+
 			if (_pipelines == null || _pipelines.Count == 0)
 			{
 				var defaultPipeline = GetDefaultPipeline();
@@ -1247,15 +1294,6 @@ namespace DotnetSpider.Core
 			foreach (var pipeline in _pipelines)
 			{
 				pipeline.Init();
-			}
-		}
-
-		private void ClearStartRequests()
-		{
-			lock (Locker)
-			{
-				Site.ClearStartRequests();
-				GC.Collect();
 			}
 		}
 
@@ -1323,9 +1361,9 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void ExecuteStartUrlBuilders(params string[] arguments)
+		private void BuildStartUrlBuilders(params string[] arguments)
 		{
-			if (_startUrlsBuilders != null && _startUrlsBuilders.Count > 0 && IfRequireBuildStartRequests(arguments))
+			if (_startUrlsBuilders != null && _startUrlsBuilders.Count > 0 && IfRequireBuildStartUrlsBuilders(arguments))
 			{
 				try
 				{
@@ -1338,7 +1376,7 @@ namespace DotnetSpider.Core
 				}
 				finally
 				{
-					BuildStartRequestsCompleted();
+					BuildStartUrlsBuildersCompleted();
 				}
 			}
 		}
@@ -1348,8 +1386,8 @@ namespace DotnetSpider.Core
 			if (Site.StartRequests != null && Site.StartRequests.Count() > 0)
 			{
 				Logger.Log(Identity, $"Add start urls to scheduler, count {Site.StartRequests.Count()}.", Level.Info);
-				//if ((Scheduler is QueueDuplicateRemovedScheduler) || (Scheduler is PriorityScheduler))
-				if ((Scheduler is QueueDuplicateRemovedScheduler))
+
+				if (!Scheduler.IsDistributed)
 				{
 					foreach (var request in Site.StartRequests)
 					{
@@ -1359,7 +1397,8 @@ namespace DotnetSpider.Core
 				else
 				{
 					Scheduler.Import(new HashSet<Request>(Site.StartRequests));
-					ClearStartRequests();
+					// 释放本地内存
+					Site.ClearStartRequests();
 				}
 			}
 			else
@@ -1368,18 +1407,15 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void InitCloseSignal()
+		private void InitCloseSignals()
 		{
 			if (Env.IsWindows)
 			{
-				if (!string.IsNullOrWhiteSpace(Identity))
+				_identityMmf = MemoryMappedFile.CreateOrOpen(Identity, 1, MemoryMappedFileAccess.ReadWrite);
+				using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
 				{
-					_identityMmf = MemoryMappedFile.CreateOrOpen(Identity, 1, MemoryMappedFileAccess.ReadWrite);
-					using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
-					{
-						var writer = new BinaryWriter(stream);
-						writer.Write(false);
-					}
+					var writer = new BinaryWriter(stream);
+					writer.Write(false);
 				}
 				if (!string.IsNullOrWhiteSpace(TaskId))
 				{
@@ -1393,14 +1429,13 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				if (!string.IsNullOrWhiteSpace(Identity))
-				{
-					_closeSignalFiles[0] = Path.Combine(Env.BaseDirectory, $"{Identity}_cl");
-				}
+				_closeSignalFiles[0] = Path.Combine(Env.BaseDirectory, $"{Identity}_cl");
+
 				if (!string.IsNullOrWhiteSpace(TaskId))
 				{
 					_closeSignalFiles[1] = Path.Combine(Env.BaseDirectory, $"{TaskId}_cl");
 				}
+
 				foreach (var closeSignal in _closeSignalFiles)
 				{
 					if (File.Exists(closeSignal))
@@ -1415,7 +1450,7 @@ namespace DotnetSpider.Core
 		{
 			try
 			{
-				Monitor?.Report(Identity, TaskId, _realStat.ToString(),
+				Monitor?.Report(Identity, TaskId, Status.ToString(),
 						Monitorable.LeftRequestsCount,
 						Monitorable.TotalRequestsCount,
 						Monitorable.SuccessRequestsCount,
@@ -1439,14 +1474,20 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private int CalculateMonitorInterval(IScheduler scheduler)
+		/// <summary>
+		/// 计算状态监控器每完成多少个Request则上报状态
+		/// </summary>
+		/// <param name="scheduler"></param>
+		/// <returns></returns>
+		private int CalculateMonitorReportInterval()
 		{
-			if (scheduler.LeftRequestsCount > 10)
+			var leftCount = Scheduler.LeftRequestsCount;
+			if (leftCount > 10)
 			{
 				return 10;
 			}
 
-			if (scheduler.LeftRequestsCount > 5)
+			if (leftCount > 5)
 			{
 				return 2;
 			}
@@ -1454,30 +1495,18 @@ namespace DotnetSpider.Core
 			return 1;
 		}
 
-		private void PrepareErrorRequestsLogFile()
+		private void InitErrorRequestsLog()
 		{
-			_errorRequestFile = FileUtil.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
+			_errorRequestsLogFile = FileUtil.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 
-			while (true)
+			try
 			{
-				try
-				{
-					if (_errorRequestFile.Exists)
-					{
-						_errorRequestStreamWriter = new StreamWriter(File.OpenWrite(_errorRequestFile.FullName), Encoding.UTF8);
-						break;
-					}
-					else
-					{
-						_errorRequestStreamWriter = File.CreateText(_errorRequestFile.FullName);
-						break;
-					}
-				}
-				catch
-				{
-					_errorRequestFile = FileUtil.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, $"errors.{DateTime.Now.ToString("yyyyMMddhhmmss")}.txt"));
-				}
-				Thread.Sleep(500);
+				_errorRequestStreamWriter = new StreamWriter(File.Open(_errorRequestsLogFile.FullName, FileMode.OpenOrCreate));
+			}
+			catch
+			{
+				_errorRequestsLogFile = FileUtil.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, $"errors.{DateTime.Now.ToString("yyyyMMddhhmmss")}.txt"));
+				_errorRequestStreamWriter = new StreamWriter(File.Open(_errorRequestsLogFile.FullName, FileMode.OpenOrCreate));
 			}
 		}
 

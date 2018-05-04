@@ -118,7 +118,7 @@ namespace DotnetSpider.Extension
 			CheckIfRunning();
 
 			EntityProcessor<T> processor = new EntityProcessor<T>(targetUrlsExtractor, dataHandler, tableName);
-			AddPageProcessor(processor);
+			AddPageProcessors(processor);
 		}
 
 		/// <summary>

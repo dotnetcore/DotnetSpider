@@ -128,31 +128,48 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 添加一个起始链接到当前站点 
 		/// </summary>
-		/// <param name="startUrl">起始链接</param>
-		public void AddStartUrl(string startUrl)
+		/// <param name="url">起始链接</param>
+		public void AddStartUrl(string url)
 		{
-			AddStartRequest(new Request(startUrl, null));
+			AddStartUrls(url);
+		}
+
+		/// <summary>
+		/// 添加多个个起始链接到当前站点 
+		/// </summary>
+		/// <param name="url">起始链接</param>
+		public void AddStartUrls(params string[] urls)
+		{
+			if (urls == null)
+			{
+				throw new ArgumentNullException($"{nameof(urls)} should not be null.");
+			}
+			AddStartUrls(urls.AsEnumerable());
 		}
 
 		/// <summary>
 		/// 添加一个起始链接到当前站点 
 		/// </summary>
-		/// <param name="startUrl">起始链接</param>
+		/// <param name="url">起始链接</param>
 		/// <param name="datas">链接对应的一些额外数据</param>
-		public void AddStartUrl(string startUrl, IDictionary<string, dynamic> datas)
+		public void AddStartUrl(string url, IDictionary<string, dynamic> datas)
 		{
-			AddStartRequest(new Request(startUrl, datas));
+			AddStartRequest(new Request(url, datas));
 		}
 
 		/// <summary>
 		/// 添加多个起始链接到当前站点 
 		/// </summary>
-		/// <param name="startUrls">起始链接</param>
-		public void AddStartUrls(IEnumerable<string> startUrls)
+		/// <param name="urls">起始链接</param>
+		public void AddStartUrls(IEnumerable<string> urls)
 		{
-			foreach (var url in startUrls)
+			if (urls == null)
 			{
-				AddStartUrl(url);
+				throw new ArgumentNullException($"{nameof(urls)} should not be null.");
+			}
+			foreach (var url in urls)
+			{
+				AddStartRequest(new Request(url, null));
 			}
 		}
 
@@ -162,7 +179,20 @@ namespace DotnetSpider.Core
 		/// <param name="request">请求对象</param>
 		public void AddStartRequest(Request request)
 		{
-			_startRequests.Add(request);
+			AddStartRequests(request);
+		}
+
+		/// <summary>
+		/// 添加一个请求对象到当前站点
+		/// </summary>
+		/// <param name="request">请求对象</param>
+		public void AddStartRequests(params Request[] requests)
+		{
+			if (requests == null)
+			{
+				throw new ArgumentNullException($"{nameof(requests)} should not be null.");
+			}
+			AddStartRequests(requests.AsEnumerable());
 		}
 
 		/// <summary>
@@ -171,6 +201,10 @@ namespace DotnetSpider.Core
 		/// <param name="requests">请求对象</param>
 		public void AddStartRequests(IEnumerable<Request> requests)
 		{
+			if (requests == null)
+			{
+				throw new ArgumentNullException($"{nameof(requests)} should not be null.");
+			}
 			foreach (var request in requests)
 			{
 				_startRequests.Add(request);

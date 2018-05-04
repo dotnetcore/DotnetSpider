@@ -92,7 +92,7 @@ namespace DotnetSpider.Sample
 
 			Downloader = new MyDownloader();
 			var process = new EntityProcessor<MyEntity>(new MyExtractor());
-			AddPageProcessor(process);
+			AddPageProcessors(process);
 		}
 
 

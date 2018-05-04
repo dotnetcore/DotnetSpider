@@ -20,7 +20,7 @@ namespace DotnetSpider.Sample
 
 			var processor = new DefaultPageProcessor();
 			processor.AddTargetUrlExtractor("//p[@id=\"page\"]", "&pn=[0-9]+&");
-			AddPageProcessor(processor);
+			AddPageProcessors(processor);
 		}
 	}
 }

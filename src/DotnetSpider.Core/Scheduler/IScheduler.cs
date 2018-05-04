@@ -9,6 +9,8 @@ namespace DotnetSpider.Core.Scheduler
 	/// </summary>
 	public interface IScheduler : IDisposable, IMonitorable
 	{
+		bool IsDistributed { get; }
+
 		/// <summary>
 		/// 是否深度优先
 		/// </summary>

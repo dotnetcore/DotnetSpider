@@ -39,6 +39,8 @@ namespace DotnetSpider.Extension.Scheduler
 		/// </summary>
 		public int BatchCount { get; set; } = 1000;
 
+		public override bool IsDistributed => true;
+
 		/// <summary>
 		/// RedisScheduler是否会使用互联网
 		/// </summary>

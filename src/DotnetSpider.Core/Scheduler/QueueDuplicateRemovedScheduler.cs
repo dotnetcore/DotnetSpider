@@ -16,6 +16,8 @@ namespace DotnetSpider.Core.Scheduler
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 
+		public override bool IsDistributed => false;
+
 		/// <summary>
 		/// 是否会使用互联网
 		/// </summary>
