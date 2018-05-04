@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\FileCookieInject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\FileDownloader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\HttpClientDownloader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Downloader\HttpClientPool.1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\HttpClientPool.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\IAfterDownloadCompleteHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\IBeforeDownloadHandler.cs" />

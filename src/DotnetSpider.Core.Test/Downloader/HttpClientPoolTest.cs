@@ -14,7 +14,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "MultiThreadProxy")]
 		public void MultiThreadProxy()
 		{
-			HttpClientPool pool = new HttpClientPool();
+			IHttpClientPool pool = new IHttpClientPool();
 			var spider = new DefaultSpider();
 			var downloader = new HttpClientDownloader();
 

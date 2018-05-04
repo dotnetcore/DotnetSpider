@@ -55,7 +55,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <summary xml:lang="zh-CN">
 		/// HttpClient池
 		/// </summary>
-		public static IHttpClientPool HttpClientPool = new HttpClientPool();
+		public static IHttpClientPool HttpClientPool = new IHttpClientPool();
 
 		/// <summary>
 		/// Constructor

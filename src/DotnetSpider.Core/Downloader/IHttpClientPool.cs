@@ -55,26 +55,9 @@ namespace DotnetSpider.Core.Downloader
 		/// 通过不同的Hash分组, 返回对应的HttpClient
 		/// 设计初衷: 某些网站会对COOKIE某部分做承上启下的检测, 因此必须保证: www.a.com/keyword=xxxx&amp;page=1 www.a.com/keyword=xxxx&amp;page=2 在同一个HttpClient里访问
 		/// </summary>
-		/// <param name="spider">爬虫 <see cref="ISpider"/></param>
-		/// <param name="downloader">下载器 <see cref="IDownloader"/></param>
-		/// <param name="cookieContainer">Cookie <see cref="CookieContainer"/></param>
 		/// <param name="hash">分组的哈希 Hashcode to identify different group.</param>
-		/// <param name="cookieInjector">Cookie注入器 <see cref="ICookieInjector"/></param>
 		/// <returns>HttpClientItem</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, string hash, ICookieInjector cookieInjector = null);
-
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		HttpClientElement GetHttpClient(ISpider spider, IDownloader downloader, CookieContainer cookieContainer, IWebProxy proxy, ICookieInjector cookieInjector = null);
-
-		/// <summary>
-		/// Add cookie to <see cref="IHttpClientPool"/>
-		/// </summary>
-		/// <summary xml:lang="zh-CN">
-		/// 更新池中所有HttpClient对象的 Cookie
-		/// </summary>
-		/// <param name="cookie">Cookie</param>
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		void AddCookie(Cookie cookie);
+		HttpClientElement GetHttpClient(string hash);
 	}
 }
