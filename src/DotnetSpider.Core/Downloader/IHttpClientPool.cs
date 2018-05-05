@@ -5,35 +5,51 @@ using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core.Downloader
 {
-	/// <summary>
-	/// HttpClient Infomations
-	/// </summary>
-	/// <summary xml:lang="zh-CN">
-	/// HttpClient信息封装
-	/// </summary>
-	public class HttpClientElement
+	public class HttpClientEntry
 	{
-		/// <summary>
-		/// <see cref="HttpClient"/>
-		/// </summary>
-		public HttpClient Client { get; set; }
+		private bool _inited;
 
-		/// <summary>
-		/// <see cref="HttpClientHandler"/>
-		/// </summary>
-		public HttpClientHandler Handler { get; set; }
+		public DateTime ActiveTime { get; set; }
+		public HttpClient Client { get; private set; }
 
-		/// <summary>
-		/// The last time this is used.
-		/// </summary>
-		/// <summary xml:lang="zh-CN">
-		/// 上一次使用的时间
-		/// </summary>
-		public DateTime LastUsedTime { get; set; }
+		internal HttpClientHandler Handler { get; private set; }
 
-		public override int GetHashCode()
+		public HttpClientEntry()
 		{
-			return (Client.GetHashCode() + Handler.Proxy.ToString()).GetHashCode();
+			Handler = new HttpClientHandler
+			{
+				AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+				UseProxy = true,
+				UseCookies = true,
+				AllowAutoRedirect = true,
+				MaxAutomaticRedirections = 10
+			};
+			Client = new HttpClient(Handler);
+			ActiveTime = DateTime.Now;
+		}
+
+		internal CookieContainer CookieContainer
+		{
+			set
+			{
+				if (_inited)
+				{
+					return;
+				}
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		internal void Init(Action configAction, Func<CookieContainer> cookieContainerFactory)
+		{
+			if (_inited)
+			{
+				return;
+			}
+
+			configAction();
+			Handler.CookieContainer = cookieContainerFactory();
+			_inited = true;
 		}
 	}
 
@@ -58,6 +74,16 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="hash">分组的哈希 Hashcode to identify different group.</param>
 		/// <returns>HttpClientItem</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		HttpClientElement GetHttpClient(string hash);
+		HttpClientEntry GetHttpClient(string hash);
+
+		/// <summary>
+		/// Add cookie to <see cref="IHttpClientPool"/>
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
+		/// 更新池中所有HttpClient对象的 Cookie
+		/// </summary>
+		/// <param name="cookie">Cookie</param>
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		void AddCookie(Cookie cookie);
 	}
 }

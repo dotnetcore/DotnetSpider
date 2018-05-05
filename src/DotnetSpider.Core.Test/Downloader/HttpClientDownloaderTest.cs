@@ -30,7 +30,7 @@ namespace DotnetSpider.Core.Test.Downloader
 
 			for (int i = 0; i < 100; i++)
 			{
-				downloader.Download(new Request("http://www.163.com", null), spider);
+				var a = downloader.Download(new Request("http://www.163.com", null), spider).Result;
 			}
 		}
 
@@ -40,12 +40,12 @@ namespace DotnetSpider.Core.Test.Downloader
 			HttpClientDownloader downloader = new HttpClientDownloader();
 			DefaultSpider spider = new DefaultSpider("abcd", new Site { });
 
-			downloader.Download(new Request("http://www.163.com", null), spider);
+			var a = downloader.Download(new Request("http://www.163.com", null), spider);
 			Assert.Equal(Core.Infrastructure.ContentType.Html, spider.Site.ContentType);
 
 			HttpClientDownloader2 downloader2 = new HttpClientDownloader2();
 			DefaultSpider spider2 = new DefaultSpider("abcd", new Site { });
-			downloader2.Download(new Request("http://www.163.com", null), spider2);
+			a = downloader2.Download(new Request("http://www.163.com", null), spider2);
 			Assert.Equal(Core.Infrastructure.ContentType.Json, spider2.Site.ContentType);
 		}
 
@@ -67,9 +67,9 @@ namespace DotnetSpider.Core.Test.Downloader
 				}
 			};
 			var downloader = new HttpClientDownloader();
-			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site1));
+			var a = downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site1));
 
-			downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site2));
+			a = downloader.Download(new Request("http://163.com", null), new DefaultSpider("test", site2));
 		}
 
 		[Fact(DisplayName = "_404Url")]

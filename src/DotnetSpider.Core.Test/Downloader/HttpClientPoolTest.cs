@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Proxy;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -14,16 +15,16 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "MultiThreadProxy")]
 		public void MultiThreadProxy()
 		{
-			IHttpClientPool pool = new IHttpClientPool();
+			IHttpClientPool pool = new HttpClientPool();
 			var spider = new DefaultSpider();
 			var downloader = new HttpClientDownloader();
 
-			System.Collections.Concurrent.ConcurrentDictionary<HttpClientElement, int> tonggi = new System.Collections.Concurrent.ConcurrentDictionary<HttpClientElement, int>();
+			ConcurrentDictionary<HttpClientEntry, int> tonggi = new ConcurrentDictionary<HttpClientEntry, int>();
 			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (i) =>
 			{
 				var port = i % 10;
-				var proxy = new UseSpecifiedUriWebProxy(new Uri($"http://192.168.10.1:{port}"), null, false);
-				var item = pool.GetHttpClient(spider, downloader, new System.Net.CookieContainer(), proxy, null);
+				var proxy = new UseSpecifiedUriWebProxy(new Uri($"http://192.168.10.1:{port}"));
+				var item = pool.GetHttpClient(proxy.Hash);
 
 				if (tonggi.ContainsKey(item))
 				{

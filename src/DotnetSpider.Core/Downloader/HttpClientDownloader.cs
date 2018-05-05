@@ -11,6 +11,7 @@ using DotnetSpider.Core.Redial;
 using System.Runtime.CompilerServices;
 using System.Net;
 using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DotnetSpider.Core.Downloader
 {
@@ -22,6 +23,8 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class HttpClientDownloader : BaseDownloader
 	{
+		private HashSet<string> _initedCookieContainers = new HashSet<string>();
+
 		/// <summary>
 		/// What mediatype should not be treated as file to download.
 		/// </summary>
@@ -55,7 +58,7 @@ namespace DotnetSpider.Core.Downloader
 		/// <summary xml:lang="zh-CN">
 		/// HttpClient池
 		/// </summary>
-		public static IHttpClientPool HttpClientPool = new IHttpClientPool();
+		public static IHttpClientPool HttpClientPool = new HttpClientPool();
 
 		/// <summary>
 		/// Constructor
@@ -110,25 +113,23 @@ namespace DotnetSpider.Core.Downloader
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, spider.Site);
 
-				HttpClientElement httpClientItem;
+				HttpClientEntry httpClientEntry;
 				if (spider.Site.HttpProxyPool == null)
 				{
 					// Request可以设置不同的DownloaderGroup来使用不同的HttpClient
-					httpClientItem = HttpClientPool.GetHttpClient(spider, this, CookieContainer, request.DownloaderGroup, CookieInjector);
+					httpClientEntry = HttpClientPool.GetHttpClient(request.DownloaderGroup);
 				}
 				else
 				{
 					// TODO: 代理模式下: request.DownloaderGroup 再考虑
 					var proxy = spider.Site.HttpProxyPool.GetProxy();
 					request.Proxy = proxy;
-					httpClientItem = HttpClientPool.GetHttpClient(spider, this, CookieContainer, proxy, CookieInjector);
-				}
-				if (!Equals(httpClientItem.Client.Timeout.TotalSeconds, _timeout))
-				{
-					httpClientItem.Client.Timeout = new TimeSpan(0, 0, (int)_timeout);
+					httpClientEntry = HttpClientPool.GetHttpClient(proxy.Hash);
 				}
 
-				response = NetworkCenter.Current.Execute("http", () => httpClientItem.Client.SendAsync(httpMessage).Result);
+				PrepareHttpClient(httpClientEntry);
+
+				response = NetworkCenter.Current.Execute("http", () => httpClientEntry.Client.SendAsync(httpMessage).Result);
 				request.StatusCode = response.StatusCode;
 				response.EnsureSuccessStatusCode();
 
@@ -174,6 +175,28 @@ namespace DotnetSpider.Core.Downloader
 				{
 					Logger.Log(spider.Identity, $"Close response fail: {e}", Level.Error, e);
 				}
+			}
+		}
+
+		private void PrepareHttpClient(HttpClientEntry httpClientEntry)
+		{
+			httpClientEntry.Init(() =>
+			{
+				if (!Equals(httpClientEntry.Client.Timeout.TotalSeconds, _timeout))
+				{
+					httpClientEntry.Client.Timeout = new TimeSpan(0, 0, (int)_timeout);
+				}
+			}, CopyCookieContainer);
+		}
+
+		private CookieContainer CopyCookieContainer()
+		{
+			using (MemoryStream stream = new MemoryStream())
+			{
+				BinaryFormatter formatter = new BinaryFormatter();
+				formatter.Serialize(stream, CookieContainer);
+				stream.Seek(0, SeekOrigin.Begin);
+				return (CookieContainer)formatter.Deserialize(stream);
 			}
 		}
 
