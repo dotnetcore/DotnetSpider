@@ -91,6 +91,26 @@ namespace DotnetSpider.Core.Test.Downloader
 			Assert.Equal(5, spider.RetriedTimes.Value);
 		}
 
+		[Fact(DisplayName = "_301Url")]
+		public void _301Url()
+		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
+			var spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
+					"abcd",
+					new QueueDuplicateRemovedScheduler(),
+					new TestPageProcessor());
+			spider.AddPipeline(new ConsolePipeline());
+			spider.SkipTargetUrlsWhenResultIsEmpty = true;
+			spider.Downloader = new HttpClientDownloader();
+			spider.EmptySleepTime = 6000;
+			spider.AddStartUrl("https://tieba.baidu.com/f?kw=%E7%AE%80%E9%98%B3&ie=utf-8&pn=50");
+			spider.Run();
+			Assert.Equal(0, spider.RetriedTimes.Value);
+		}
+
 		class HttpClientDownloader2 : HttpClientDownloader
 		{
 			protected override Task<Page> DowloadContent(Request request, ISpider spider)
