@@ -181,6 +181,48 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
+		protected virtual string ReadContent(Site site, HttpResponseMessage response)
+		{
+			byte[] contentBytes = response.Content.ReadAsByteArrayAsync().Result;
+			contentBytes = PreventCutOff(contentBytes);
+			if (string.IsNullOrWhiteSpace(site.EncodingName))
+			{
+				var charSet = response.Content.Headers.ContentType?.CharSet;
+				Encoding htmlCharset = EncodingExtensions.GetEncoding(charSet, contentBytes);
+				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
+			}
+			else
+			{
+				return site.Encoding.GetString(contentBytes, 0, contentBytes.Length);
+			}
+		}
+
+		private Page HandleResponse(Request request, HttpResponseMessage response, Site site)
+		{
+			string content = ReadContent(site, response);
+
+			if (_decodeHtml)
+			{
+#if NET45
+				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
+#else
+				content = System.Net.WebUtility.UrlDecode(System.Net.WebUtility.HtmlDecode(content));
+#endif
+			}
+
+			Page page = new Page(request)
+			{
+				Content = content
+			};
+
+			//foreach (var header in response.Headers)
+			//{
+			//	page.Request.PutExtra(header.Key, header.Value);
+			//}
+
+			return page;
+		}
+
 		private void PrepareHttpClient(HttpClientEntry httpClientEntry)
 		{
 			httpClientEntry.Init(AllowAutoRedirect, () =>
@@ -276,48 +318,6 @@ namespace DotnetSpider.Core.Downloader
 				}
 			}
 			return httpRequestMessage;
-		}
-
-		private Page HandleResponse(Request request, HttpResponseMessage response, Site site)
-		{
-			string content = ReadContent(site, response);
-
-			if (_decodeHtml)
-			{
-#if NET45
-				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
-#else
-				content = System.Net.WebUtility.UrlDecode(System.Net.WebUtility.HtmlDecode(content));
-#endif
-			}
-
-			Page page = new Page(request)
-			{
-				Content = content
-			};
-
-			//foreach (var header in response.Headers)
-			//{
-			//	page.Request.PutExtra(header.Key, header.Value);
-			//}
-
-			return page;
-		}
-
-		private string ReadContent(Site site, HttpResponseMessage response)
-		{
-			byte[] contentBytes = response.Content.ReadAsByteArrayAsync().Result;
-			contentBytes = PreventCutOff(contentBytes);
-			if (string.IsNullOrWhiteSpace(site.EncodingName))
-			{
-				var charSet = response.Content.Headers.ContentType?.CharSet;
-				Encoding htmlCharset = EncodingExtensions.GetEncoding(charSet, contentBytes);
-				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
-			}
-			else
-			{
-				return site.Encoding.GetString(contentBytes, 0, contentBytes.Length);
-			}
 		}
 
 		private Page SaveFile(Request request, HttpResponseMessage response, ISpider spider)
