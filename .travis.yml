@@ -16,7 +16,7 @@ matrix:
 #    mono: none
 #    env: DOTNETCORE=1
 #    before_install:
-#        - chmod a+x ./build.sh
+#        - chmod a+x ./runtests.sh
 #        - ulimit -n 1024 ;
 #        - brew update
 #        - brew install mariadb
@@ -29,7 +29,7 @@ services:
   - redis-server
 
 before_install:
-  - chmod a+x ./build.sh
+  - chmod a+x ./runtests.sh
 
 install:
   - export DOTNET_CLI_TELEMETRY_OPTOUT=1
