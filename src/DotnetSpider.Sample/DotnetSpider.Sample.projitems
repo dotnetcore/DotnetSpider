@@ -8,11 +8,10 @@
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>DotnetSpider.Sample</Import_RootNamespace>
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)App.config">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Content>
+    <None Include="$(MSBuildThisFileDirectory)App.config" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)app.test.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
