@@ -36,4 +36,4 @@ install:
   - export TRAVIS=1
 
 script:
-  - ./build.sh
+  - ./runtests.sh
