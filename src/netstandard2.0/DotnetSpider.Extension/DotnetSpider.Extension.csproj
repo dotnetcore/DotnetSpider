@@ -12,6 +12,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.4" />
+    <PackageReference Include="MimeKit" Version="2.0.3" />
     <PackageReference Include="MongoDB.Driver" Version="2.6.0" />
     <PackageReference Include="MySqlConnector" Version="0.40.3" />
     <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
