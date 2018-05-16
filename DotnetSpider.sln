@@ -32,7 +32,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.travis.yml = .travis.yml
 		build.bat = build.bat
-		guide.md = guide.md
 		pack.bat = pack.bat
 		publishToNuget.bat = publishToNuget.bat
 		README.md = README.md
