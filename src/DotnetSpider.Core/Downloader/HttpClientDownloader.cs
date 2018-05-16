@@ -197,6 +197,17 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
+		internal void PrepareHttpClient(HttpClientEntry httpClientEntry)
+		{
+			httpClientEntry.Init(AllowAutoRedirect, () =>
+			{
+				if (!Equals(httpClientEntry.Client.Timeout.TotalSeconds, _timeout))
+				{
+					httpClientEntry.Client.Timeout = new TimeSpan(0, 0, (int)_timeout / 1000);
+				}
+			}, CopyCookieContainer);
+		}
+
 		private Page HandleResponse(Request request, HttpResponseMessage response, Site site)
 		{
 			string content = ReadContent(site, response);
@@ -221,17 +232,6 @@ namespace DotnetSpider.Core.Downloader
 			//}
 
 			return page;
-		}
-
-		private void PrepareHttpClient(HttpClientEntry httpClientEntry)
-		{
-			httpClientEntry.Init(AllowAutoRedirect, () =>
-			{
-				if (!Equals(httpClientEntry.Client.Timeout.TotalSeconds, _timeout))
-				{
-					httpClientEntry.Client.Timeout = new TimeSpan(0, 0, (int)_timeout);
-				}
-			}, CopyCookieContainer);
 		}
 
 		private CookieContainer CopyCookieContainer()

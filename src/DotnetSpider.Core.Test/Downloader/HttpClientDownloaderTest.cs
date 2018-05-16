@@ -135,5 +135,14 @@ namespace DotnetSpider.Core.Test.Downloader
 			Assert.DoesNotContain("1231222221111123", page.TargetUrl);
 			Assert.True(page.TargetUrl.Contains("www.jd.com/") || page.TargetUrl.Contains("global.jd.com"));
 		}
+
+		[Fact(DisplayName = "SetTimeout")]
+		public void SetTimeout()
+		{
+			HttpClientDownloader downloader = new HttpClientDownloader();
+			var entry = HttpClientDownloader.HttpClientPool.GetHttpClient("a");
+			downloader.PrepareHttpClient(entry);
+			Assert.Equal(8, entry.Client.Timeout.TotalSeconds);
+		}
 	}
 }
