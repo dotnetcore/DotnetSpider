@@ -20,6 +20,8 @@ using Polly;
 using Polly.Retry;
 using System.IO.MemoryMappedFiles;
 using System.Collections.ObjectModel;
+using Serilog;
+using Microsoft.Extensions.Configuration;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
 [assembly: InternalsVisibleTo("DotnetSpider.Sample")]
@@ -402,6 +404,17 @@ namespace DotnetSpider.Core
 			Name = taskNameAttribute != null ? taskNameAttribute.Name : type.Name;
 
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+
+			//var config = new ConfigurationBuilder()
+			//	.SetBasePath(Directory.GetCurrentDirectory())
+			//	.AddXmlFile("app.config")
+			//	.Build();
+
+			//Log.Logger=   new LoggerConfiguration()
+			//	.Enrich.FromLogContext()
+			//	.ReadFrom.Configuration(Configuration)
+			//	.WriteTo.Console().WriteTo.File("DNIC.Erechtheion.log")
+			//	.CreateLogger();
 		}
 
 		/// <summary>

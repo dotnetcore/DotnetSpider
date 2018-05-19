@@ -19,9 +19,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void EnvSetNull()
 		{
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-c:" };
-			var arguments1 = Startup.AnalyzeArguments(args1);
-			Startup.LoadConfiguration(arguments1);
+			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:" };
+			var arguments1 = Startup.Parse(args1);
+			Startup.LoadConfiguration(arguments1.Config);
 		}
 
 		[Fact]
@@ -32,9 +32,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				File.Delete(Env.DefaultGlobalAppConfigPath);
 			}
 			File.Copy("app.global.config", Env.DefaultGlobalAppConfigPath);
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
-			var arguments1 = Startup.AnalyzeArguments(args1);
-			Startup.LoadConfiguration(arguments1);
+			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
+			var arguments1 = Startup.Parse(args1);
+			Startup.LoadConfiguration(arguments1.Config);
 		}
 
 		[Fact]
@@ -44,9 +44,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				File.Delete(Env.DefaultGlobalAppConfigPath);
 			}
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
-			var arguments1 = Startup.AnalyzeArguments(args1);
-			Startup.LoadConfiguration(arguments1);
+			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
+			var arguments1 = Startup.Parse(args1);
+			Startup.LoadConfiguration(arguments1.Config);
 
 			Env.Reload();
 		}
@@ -60,9 +60,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			File.Copy(Path.Combine(Env.BaseDirectory, "app.global.config"), Env.DefaultGlobalAppConfigPath);
 
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
-			var arguments1 = Startup.AnalyzeArguments(args1);
-			Startup.LoadConfiguration(arguments1);
+			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
+
+			var arguments1 = Startup.Parse(args1);
+
+			Startup.LoadConfiguration(arguments1.Config);
 
 			MySqlEntityPipeline pipeline = new MySqlEntityPipeline();
 			var a = pipeline.ConnectionStringSettings;
@@ -81,9 +83,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 			File.Copy("app.global.config", Env.DefaultGlobalAppConfigPath);
 
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "-tid:TestSpider", "-i:guid", "-a:" };
-			var arguments1 = Startup.AnalyzeArguments(args1);
-			Startup.LoadConfiguration(arguments1);
+			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:" };
+			var arguments1 = Startup.Parse(args1);
+			Startup.LoadConfiguration(arguments1.Config);
 
 			Env.Reload();
 
