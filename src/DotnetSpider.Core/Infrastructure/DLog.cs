@@ -39,7 +39,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		/// <summary>
 		/// 通过NLog、Http写日志.
-		/// Http日志的开关为: Env.EnterpiseService &amp;&amp; Env.EnterpiseServiceLog
+		/// Http日志的开关为: Env.HunService &amp;&amp; Env.HunServiceLog
 		/// </summary>
 		/// <param name="message">信息</param>
 		/// <param name="level">日志级别</param>
@@ -51,7 +51,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		/// <summary>
 		/// 通过NLog、Http写日志.
-		/// Http日志的开关为: Env.EnterpiseService &amp;&amp; Env.EnterpiseServiceLog
+		/// Http日志的开关为: Env.HunService &amp;&amp; Env.HunServiceLog
 		/// </summary>
 		/// <param name="identity">唯一标识</param>
 		/// <param name="message">信息</param>
@@ -153,7 +153,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="exception">异常信息</param>
 		public void HttpLog(string identity, string message, Level level, Exception exception = null)
 		{
-			if (Env.EnterpiseService && Env.EnterpiseServiceLog)
+			if (Env.HunService && Env.HunServiceLog)
 			{
 				var log = JsonConvert.SerializeObject(new LogInfo
 				{
@@ -165,7 +165,7 @@ namespace DotnetSpider.Core.Infrastructure
 					Exception = exception?.ToString()
 				});
 
-				EnterpriseHttpApi.HttpLog(log);
+				HubService.HttpLog(log);
 			}
 		}
 

@@ -30,7 +30,7 @@ namespace DotnetSpider.Core.Monitor
 		{
 			base.Report(identity, taskId, status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 
-			if (!Env.EnterpiseService)
+			if (!Env.HunService)
 			{
 				return;
 			}
@@ -49,7 +49,7 @@ namespace DotnetSpider.Core.Monitor
 				Thread = threadNum,
 				Total = total
 			});
-			EnterpriseHttpApi.HttpStatus(json);
+			HubService.HttpStatus(json);
 		}
 	}
 }

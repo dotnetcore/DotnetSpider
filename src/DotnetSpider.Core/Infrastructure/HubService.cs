@@ -10,11 +10,11 @@ using System.Text;
 
 namespace DotnetSpider.Core.Infrastructure
 {
-	public class EnterpriseHttpApi
+	public class HubService
 	{
 		private static NLog.ILogger _nlogger;
 
-		static EnterpriseHttpApi()
+		static HubService()
 		{
 			_nlogger = LogManager.GetLogger("DotnetSpider");
 		}
@@ -26,13 +26,13 @@ namespace DotnetSpider.Core.Infrastructure
 
 		public static void HttpLog(string log)
 		{
-			HttpRequestMessage httpRequestMessage = GenerateHttpRequestMessage(log, Env.EnterpiseServiceLogUrl);
+			HttpRequestMessage httpRequestMessage = GenerateHttpRequestMessage(log, Env.HunServiceLogUrl);
 			Send(httpRequestMessage);
 		}
 
 		public static void HttpStatus(string status)
 		{
-			HttpRequestMessage httpRequestMessage = GenerateHttpRequestMessage(status, Env.EnterpiseServiceStatusApiUrl);
+			HttpRequestMessage httpRequestMessage = GenerateHttpRequestMessage(status, Env.HunServiceStatusApiUrl);
 			Send(httpRequestMessage);
 		}
 
@@ -57,7 +57,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		private static void SetToken(HttpRequestMessage httpRequestMessage)
 		{
-			httpRequestMessage.Headers.Add("DotnetSpiderToken", Env.EnterpiseServiceToken);
+			httpRequestMessage.Headers.Add("DotnetSpiderToken", Env.HunServiceToken);
 		}
 	}
 }

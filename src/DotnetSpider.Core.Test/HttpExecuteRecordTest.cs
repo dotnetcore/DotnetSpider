@@ -20,7 +20,7 @@ namespace DotnetSpider.Core.Test
 				}));
 				if (result.StatusCode == HttpStatusCode.OK)
 				{
-					Env.EnterpiseServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";
+					Env.HunServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";
 
 					var recorder = new HttpExecuteRecord();
 					recorder.Add("1", "test", "abcd");

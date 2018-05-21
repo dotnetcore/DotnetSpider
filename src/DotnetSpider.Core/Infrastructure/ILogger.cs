@@ -65,13 +65,13 @@ namespace DotnetSpider.Core.Infrastructure
 
 	/// <summary>
 	/// Provides logging interface and utility functions.
-	/// Http日志的开关为: Env.EnterpiseService &amp;&amp; Env.EnterpiseServiceLog
+	/// Http日志的开关为: Env.HunService &amp;&amp; Env.HunServiceLog
 	/// </summary>
 	public interface ILogger
 	{
 		/// <summary>
 		/// 通过NLog、Http写日志.
-		/// Http日志的开关为: Env.EnterpiseService &amp;&amp; Env.EnterpiseServiceLog
+		/// Http日志的开关为: Env.HunService &amp;&amp; Env.HunServiceLog
 		/// </summary>
 		/// <param name="message">信息</param>
 		/// <param name="level">日志级别</param>
@@ -80,7 +80,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 		/// <summary>
 		/// 通过NLog、Http写日志.
-		/// Http日志的开关为: Env.EnterpiseService &amp;&amp; Env.EnterpiseServiceLog
+		/// Http日志的开关为: Env.HunService &amp;&amp; Env.HunServiceLog
 		/// </summary>
 		/// <param name="identity">唯一标识</param>
 		/// <param name="message">信息</param>

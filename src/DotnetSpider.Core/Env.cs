@@ -30,8 +30,8 @@ namespace DotnetSpider.Core
 		private const string EmailAccountKey = "emailAccount";
 		private const string EmailPasswordKey = "emailPassword";
 		private const string EmailDisplayNameKey = "emailDisplayName";
-		private const string EnterpiseServiceUrlKey = "serviceUrl";
-		private const string EnterpiseServiceTokenKey = "serviceToken";
+		private const string HunServiceUrlKey = "serviceUrl";
+		private const string HunServiceTokenKey = "serviceToken";
 		private const string SystemConnectionStringKey = "SystemConnection";
 		private const string DataConnectionStringKey = "DataConnection";
 		private const string SqlEncryptCodeKey = "sqlEncryptCode";
@@ -39,7 +39,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 开启企业服务(HTTP), 默认打开, 测试的时候开关
 		/// </summary>
-		public static bool EnterpiseService = true;
+		public static bool HunService = true;
 
 		/// <summary>
 		/// 定义数据主键的名称
@@ -130,39 +130,39 @@ namespace DotnetSpider.Core
 		public static string PathSeperator { get; private set; }
 
 		/// <summary>
-		/// 是否启用企业服务日志, 默认值是判断配置文件中是否配置了EnterpiseServiceUrl
+		/// 是否启用企业服务日志, 默认值是判断配置文件中是否配置了HunServiceUrl
 		/// </summary>
-		public static bool EnterpiseServiceLog { get; set; }
+		public static bool HunServiceLog { get; set; }
 
 		/// <summary>
 		/// 从配置文件中读取的企业服务地址
 		/// </summary>
-		public static string EnterpiseServiceUrl { get; private set; }
+		public static string HunServiceUrl { get; private set; }
 
 		/// <summary>
 		/// 企业服务HTTP日志的地址
 		/// </summary>
-		public static string EnterpiseServiceLogUrl { get; private set; }
+		public static string HunServiceLogUrl { get; private set; }
 
 		/// <summary>
 		/// 企业服务HTTP数据管道的地址
 		/// </summary>
-		public static string EnterpiseServicePipelineUrl { get; private set; }
+		public static string HunServicePipelineUrl { get; private set; }
 
 		/// <summary>
 		/// 企业服务HTTP爬虫状态的上传地址
 		/// </summary>
-		public static string EnterpiseServiceStatusApiUrl { get; private set; }
+		public static string HunServiceStatusApiUrl { get; private set; }
 
 		/// <summary>
 		/// 向企业服务添加运行记录的地址
 		/// </summary>
-		public static string EnterpiseServiceTaskApiUrl { get; internal set; }
+		public static string HunServiceTaskApiUrl { get; internal set; }
 
 		/// <summary>
 		/// 访问企业服务时使用的凭证
 		/// </summary>
-		public static string EnterpiseServiceToken { get; private set; }
+		public static string HunServiceToken { get; private set; }
 
 		/// <summary>
 		/// 爬虫系统使用的数据库连接字符串
@@ -256,16 +256,16 @@ namespace DotnetSpider.Core
 			EmailAccount = configuration.AppSettings.Settings[EmailAccountKey]?.Value?.Trim();
 			EmailPassword = configuration.AppSettings.Settings[EmailPasswordKey]?.Value?.Trim();
 			EmailDisplayName = configuration.AppSettings.Settings[EmailDisplayNameKey]?.Value?.Trim();
-			EnterpiseServiceUrl = configuration.AppSettings.Settings[EnterpiseServiceUrlKey]?.Value?.Trim();
-			if (!string.IsNullOrWhiteSpace(EnterpiseServiceUrl))
+			HunServiceUrl = configuration.AppSettings.Settings[HunServiceUrlKey]?.Value?.Trim();
+			if (!string.IsNullOrWhiteSpace(HunServiceUrl))
 			{
-				EnterpiseServiceLogUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/log";
-				EnterpiseServiceToken = configuration.AppSettings.Settings[EnterpiseServiceTokenKey]?.Value?.Trim();
-				EnterpiseServiceStatusApiUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/taskstatus";
-				EnterpiseServiceTaskApiUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/task";
-				EnterpiseServicePipelineUrl = $"{EnterpiseServiceUrl}{(EnterpiseServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/process";
+				HunServiceLogUrl = $"{HunServiceUrl}{(HunServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/log";
+				HunServiceToken = configuration.AppSettings.Settings[HunServiceTokenKey]?.Value?.Trim();
+				HunServiceStatusApiUrl = $"{HunServiceUrl}{(HunServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/taskstatus";
+				HunServiceTaskApiUrl = $"{HunServiceUrl}{(HunServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/task";
+				HunServicePipelineUrl = $"{HunServiceUrl}{(HunServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/process";
 			}
-			EnterpiseServiceLog = !string.IsNullOrWhiteSpace(EnterpiseServiceLogUrl);
+			HunServiceLog = !string.IsNullOrWhiteSpace(HunServiceLogUrl);
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 			SqlEncryptCode = configuration.AppSettings.Settings[SqlEncryptCodeKey]?.Value?.Trim();

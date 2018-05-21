@@ -34,7 +34,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		public MySqlEntityPipelineTest()
 		{
-			Env.EnterpiseService = false;
+			Env.HunService = false;
 		}
 
 		[Fact]

@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 	{
 		public WebDriverDownloaderTests()
 		{
-			Env.EnterpiseService = false;
+			Env.HunService = false;
 		}
 
 		[Fact]

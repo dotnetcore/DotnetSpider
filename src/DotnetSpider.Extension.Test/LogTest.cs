@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension.Test
 	{
 		public LogTest()
 		{
-			Env.EnterpiseService = false;
+			Env.HunService = false;
 		}
 
 		[Fact]

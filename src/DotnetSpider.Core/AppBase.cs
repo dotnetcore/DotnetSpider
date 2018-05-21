@@ -75,7 +75,7 @@ namespace DotnetSpider.Core
 		/// <param name="arguments">程序运行的参数</param>
 		public void Run(params string[] arguments)
 		{
-			if (ExecuteRecord == null && !string.IsNullOrWhiteSpace(Env.EnterpiseServiceUrl))
+			if (ExecuteRecord == null && !string.IsNullOrWhiteSpace(Env.HunServiceUrl))
 			{
 				ExecuteRecord = new HttpExecuteRecord();
 			}

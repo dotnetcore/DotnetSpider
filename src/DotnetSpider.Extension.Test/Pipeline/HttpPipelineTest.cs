@@ -62,7 +62,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		{			
 			var result = HttpSender.Request((new HttpRequest
 			{
-				Url = Env.EnterpiseServiceUrl
+				Url = Env.HunServiceUrl
 			}));
 			if (result.StatusCode != HttpStatusCode.OK)
 			{
@@ -114,7 +114,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		{
 			var result = HttpSender.Request((new HttpRequest
 			{
-				Url = Env.EnterpiseServiceUrl
+				Url = Env.HunServiceUrl
 			}));
 			if (result.StatusCode != HttpStatusCode.OK)
 			{

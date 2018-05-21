@@ -22,7 +22,7 @@ namespace DotnetSpider.Extension.Test
 	{
 		public EntitySpiderTest()
 		{
-			Env.EnterpiseService = false;
+			Env.HunService = false;
 		}
 
 		[EntityTable("test", "table")]

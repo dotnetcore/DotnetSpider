@@ -1483,7 +1483,7 @@ namespace DotnetSpider.Core
 		{
 			if (Monitor == null)
 			{
-				Monitor = string.IsNullOrWhiteSpace(Env.EnterpiseServiceUrl) ? new NLogMonitor() : new HttpMonitor();
+				Monitor = string.IsNullOrWhiteSpace(Env.HunServiceUrl) ? new NLogMonitor() : new HttpMonitor();
 			}
 		}
 

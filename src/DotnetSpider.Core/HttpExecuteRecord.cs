@@ -25,7 +25,7 @@ namespace DotnetSpider.Core
 		/// <returns>是否上报成功</returns>
 		public bool Add(string taskId, string name, string identity)
 		{
-			if (string.IsNullOrWhiteSpace(taskId) || string.IsNullOrWhiteSpace(identity) || !Env.EnterpiseService)
+			if (string.IsNullOrWhiteSpace(taskId) || string.IsNullOrWhiteSpace(identity) || !Env.HunService)
 			{
 				return true;
 			}
@@ -41,7 +41,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.GetAsync($"{Env.EnterpiseServiceTaskApiUrl}/{taskId}?action=increase").Result;
+						var response = HttpSender.Client.GetAsync($"{Env.HunServiceTaskApiUrl}/{taskId}?action=increase").Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});
@@ -62,7 +62,7 @@ namespace DotnetSpider.Core
 		/// <param name="identity">任务标识</param>
 		public void Remove(string taskId, string name, string identity)
 		{
-			if (string.IsNullOrWhiteSpace(taskId) || !Env.EnterpiseService)
+			if (string.IsNullOrWhiteSpace(taskId) || !Env.HunService)
 			{
 				return;
 			}
@@ -78,7 +78,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.GetAsync($"{Env.EnterpiseServiceTaskApiUrl}/{taskId}?action=reduce").Result;
+						var response = HttpSender.Client.GetAsync($"{Env.HunServiceTaskApiUrl}/{taskId}?action=reduce").Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});

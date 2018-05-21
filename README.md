@@ -140,7 +140,7 @@ NOTE:
 
 ### Web Manager
 
-https://github.com/zlzforever/DotnetSpider.Enterprise
+https://github.com/zlzforever/DotnetSpider.Hub
 
 1. Dependences a ci platform forexample i used gitlab-ci right now.
 2. Dependences Sceduler.NET https://github.com/zlzforever/Scheduler.NET 
