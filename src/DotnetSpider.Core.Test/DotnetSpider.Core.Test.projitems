@@ -49,7 +49,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)HtmlTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpExecuteRecordTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\HttpSenderTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\NlogTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IocManagerTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PageTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\FilePipelineTest.cs" />

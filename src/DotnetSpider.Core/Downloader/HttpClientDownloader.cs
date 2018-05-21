@@ -8,7 +8,6 @@ using System.Text;
 using System.Net.Http;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
-using System.Runtime.CompilerServices;
 using System.Net;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -141,7 +140,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					if (!spider.Site.DownloadFiles)
 					{
-						Logger.Log(spider.Identity, $"Ignore: {request.Url} because media type is not allowed to download.", Level.Warn);
+						spider.Logger.Warning($"Ignore: {request.Url} because media type is not allowed to download.");
 						return await Task.FromResult(new Page(request) { Skip = true });
 					}
 					else
@@ -155,7 +154,7 @@ namespace DotnetSpider.Core.Downloader
 
 					if (string.IsNullOrWhiteSpace(page.Content))
 					{
-						Logger.Log(spider.Identity, $"Content is empty: {request.Url}.", Level.Warn);
+						spider.Logger.Warning($"Content is empty: {request.Url}.");
 					}
 				}
 
@@ -176,7 +175,7 @@ namespace DotnetSpider.Core.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.Log(spider.Identity, $"Close response fail: {e}", Level.Error, e);
+					spider.Logger.Error($"Close response fail: {e}");
 				}
 			}
 		}
@@ -253,7 +252,7 @@ namespace DotnetSpider.Core.Downloader
 				page.Exception = e;
 			}
 
-			Logger.Log(spider.Identity, $"Download {request.Url} failed: {e.Message}.", Level.Warn);
+			spider.Logger.Warning($"Download {request.Url} failed: {e.Message}.");
 			return page;
 		}
 
@@ -339,12 +338,12 @@ namespace DotnetSpider.Core.Downloader
 
 					File.WriteAllBytes(filePath, response.Content.ReadAsByteArrayAsync().Result);
 				}
-				catch (Exception e)
+				catch
 				{
-					Logger.Log(spider.Identity, "Storage file failed.", Level.Error, e);
+					spider.Logger.Error(spider.Identity, "Storage file failed.");
 				}
 			}
-			Logger.Log(spider.Identity, $"Storage file: {request.Url} success.", Level.Info);
+			spider.Logger.Information($"Storage file: {request.Url} success.");
 			return new Page(request) { Skip = true };
 		}
 

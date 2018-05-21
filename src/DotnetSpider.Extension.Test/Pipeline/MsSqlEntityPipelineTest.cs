@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-
 using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-
 using DotnetSpider.Extension.Pipeline;
 using Xunit;
-using System.Runtime.InteropServices;
 using Dapper;
+#if !NET45
+using System.Runtime.InteropServices;
+#endif
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {

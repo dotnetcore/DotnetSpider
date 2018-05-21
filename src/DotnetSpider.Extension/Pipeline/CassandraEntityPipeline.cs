@@ -8,6 +8,7 @@ using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
+using Serilog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -74,7 +75,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (entityDefine.TableInfo == null)
 			{
-				Logger.Log($"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.", Level.Warn);
+				Log.Logger.Warning($"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.");
 				return;
 			}
 
@@ -93,7 +94,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			EntityAdapters.TryAdd(entityDefine.Name, entityAdapter);
 		}
-		
+
 		/// <summary>
 		/// 处理爬虫实体解析器解析到的实体数据结果
 		/// </summary>
@@ -158,7 +159,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			return datas.Count();
 		}
-		
+
 		/// <summary>
 		/// 在使用数据管道前, 进行一些初始化工作, 不是所有的数据管道都需要进行初始化
 		/// </summary>
@@ -184,7 +185,7 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>

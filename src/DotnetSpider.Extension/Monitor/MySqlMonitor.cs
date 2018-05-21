@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Monitor;
-using System;
+﻿using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Infrastructure.Database;
 using System.Data;
 using MySql.Data.MySqlClient;
@@ -12,14 +10,9 @@ namespace DotnetSpider.Extension.Monitor
 	/// <summary>
 	/// 数据库监控器, 把状态信息存到MySql数据库中
 	/// </summary>
-	public class MySqlMonitor : NLogMonitor
+	public class MySqlMonitor : LogMonitor
 	{
 		private readonly string _connectionString;
-
-		/// <summary>
-		/// 日志接口
-		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
 
 		private readonly bool _isDbOnly;
 
@@ -109,7 +102,7 @@ namespace DotnetSpider.Extension.Monitor
 			}
 			else
 			{
-				Logger.NLog(identity, "DbConnection is null.", Level.Error);
+				Logger.Error("DbConnection is null.");
 			}
 		}
 
@@ -137,9 +130,9 @@ namespace DotnetSpider.Extension.Monitor
 				}
 				throw;
 			}
-			catch (Exception e)
+			catch
 			{
-				Logger.Log("Prepare DotnetSpider.Status failed.", Level.Error, e);
+				Logger.Error("Prepare DotnetSpider.Status failed.");
 				throw;
 			}
 		}

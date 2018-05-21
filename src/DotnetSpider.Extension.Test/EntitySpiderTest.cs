@@ -22,7 +22,7 @@ namespace DotnetSpider.Extension.Test
 	{
 		public EntitySpiderTest()
 		{
-			Env.HunService = false;
+			Env.HubService = false;
 		}
 
 		[EntityTable("test", "table")]
@@ -65,7 +65,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new NLogMonitor();
+				Monitor = new LogMonitor();
 				AddStartUrl("http://www.baidu.com");
 				AddStartUrl("http://www.sohu.com");
 				AddEntityType<BaiduEntity>();
@@ -129,7 +129,7 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new NLogMonitor();
+				Monitor = new LogMonitor();
 				Identity = Guid.NewGuid().ToString("N");
 				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
 				AddStartUrl("https://baidu.com");
@@ -210,7 +210,7 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new NLogMonitor();
+				Monitor = new LogMonitor();
 				var word = "可乐|雪碧";
 				Identity = Guid.NewGuid().ToString();
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),
@@ -272,7 +272,7 @@ namespace DotnetSpider.Extension.Test
 			protected override void MyInit(params string[] arguments)
 			{
 				Scheduler.Depth = 100;
-				Monitor = new NLogMonitor();
+				Monitor = new LogMonitor();
 				Identity = Guid.NewGuid().ToString();
 				ThreadNum = 1;
 				EmptySleepTime = 5000;

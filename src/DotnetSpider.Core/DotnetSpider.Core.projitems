@@ -52,14 +52,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\DateTimeUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\Description.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\DirectoryExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\DLog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\EncodingExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\HttpSink.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\HubService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\FileUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\HttpSender.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\ILock.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\ILogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\LogInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\LogUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\PriorityBlockingQueue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\Rasdial.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\ReadOnlyEnumerable.cs" />
@@ -78,7 +78,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Monitor\HttpMonitor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Monitor\IMonitor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Monitor\ISpeedMonitor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Monitor\NLogMonitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Monitor\LogMonitor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Monitor\SpiderStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Page.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\BaseFilePipeline.cs" />
@@ -154,8 +154,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Startup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StartUrlsBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Status.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)nlog.default.config" />
   </ItemGroup>
 </Project>

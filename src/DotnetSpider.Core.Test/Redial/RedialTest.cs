@@ -7,7 +7,6 @@ using Xunit;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Threading;
 using System.Diagnostics;
 
 namespace DotnetSpider.Core.Test.Redial

@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test

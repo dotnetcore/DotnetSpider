@@ -1,8 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Redial;
 using Newtonsoft.Json;
-using System.Net.Http;
-using System.Text;
 
 namespace DotnetSpider.Core.Monitor
 {
@@ -10,8 +7,12 @@ namespace DotnetSpider.Core.Monitor
 	/// HTTP爬虫监控状态上报
 	/// 在配置文件件添加了serviceUrl才会生效
 	/// </summary>
-	public class HttpMonitor : NLogMonitor
+	public class HttpMonitor : LogMonitor
 	{
+		public HttpMonitor() 
+		{
+		}
+
 		/// <summary>
 		/// 上报爬虫状态
 		/// </summary>
@@ -30,7 +31,7 @@ namespace DotnetSpider.Core.Monitor
 		{
 			base.Report(identity, taskId, status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 
-			if (!Env.HunService)
+			if (!Env.HubService)
 			{
 				return;
 			}

@@ -3,7 +3,6 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
 
 namespace DotnetSpider.Extension.Processor

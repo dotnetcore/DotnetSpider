@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Downloader
@@ -16,14 +15,6 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public abstract class BaseDownloader : Named, IDownloader
 	{
-		/// <summary>
-		/// Log interface.
-		/// </summary>
-		/// <summary xml:lang="zh-CN">
-		/// 日志接口
-		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
-
 		/// <summary>
 		/// Whether the downloader should automaticlly detect <see cref="Site.ContentType"/>.
 		/// </summary>

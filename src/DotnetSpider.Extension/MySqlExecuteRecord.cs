@@ -1,9 +1,9 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Infrastructure.Database;
 using System;
 using System.Data;
 using DotnetSpider.Extension.Infrastructure;
+using Serilog;
 
 namespace DotnetSpider.Extension
 {
@@ -13,7 +13,12 @@ namespace DotnetSpider.Extension
 	/// </summary>
 	public class MySqlExecuteRecord : IExecuteRecord
 	{
-		private static readonly ILogger Logger = DLog.GetLogger();
+		public ILogger Logger { get; set; }
+
+		public MySqlExecuteRecord(ILogger logger)
+		{
+			Logger = logger;
+		}
 
 		/// <summary>
 		/// 添加运行记录
@@ -39,7 +44,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.NLog($"Add execute record failed: {e}", Level.Error);
+				Logger.Error($"Add execute record failed: {e}", identity);
 				return false;
 			}
 		}
@@ -64,7 +69,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.NLog($"Remove execute record failed: {e}", Level.Error);
+				Logger.Error($"Remove execute record failed: {e}");
 			}
 		}
 	}

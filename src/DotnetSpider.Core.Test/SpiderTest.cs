@@ -8,7 +8,6 @@ using System.IO;
 using DotnetSpider.Core.Downloader;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Test

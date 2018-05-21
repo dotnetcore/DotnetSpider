@@ -1,20 +1,10 @@
-﻿using DotnetSpider.Core.Infrastructure;
-
-namespace DotnetSpider.Core.Downloader
+﻿namespace DotnetSpider.Core.Downloader
 {
 	/// <summary>
 	/// <see cref="IAfterDownloadCompleteHandler"/>
 	/// </summary>
 	public abstract class AfterDownloadCompleteHandler : Named, IAfterDownloadCompleteHandler
 	{
-		/// <summary>
-		/// Log interface
-		/// </summary>
-		/// <summary xml:lang="zh-CN">
-		/// 日志接口
-		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
-
 		/// <summary>
 		/// You can process page data, detect download status(whether is banned) and update Cookie here.
 		/// </summary>

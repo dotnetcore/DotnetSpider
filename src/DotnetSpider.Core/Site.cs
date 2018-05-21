@@ -4,7 +4,6 @@ using DotnetSpider.Core.Proxy;
 using DotnetSpider.Core.Infrastructure;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace DotnetSpider.Core

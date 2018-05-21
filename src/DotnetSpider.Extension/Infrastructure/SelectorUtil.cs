@@ -4,7 +4,6 @@ using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using System;
-using System.Diagnostics.Contracts;
 
 namespace DotnetSpider.Extension.Infrastructure
 {

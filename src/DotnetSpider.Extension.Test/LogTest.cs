@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
@@ -8,7 +7,6 @@ using DotnetSpider.Extension.Monitor;
 using Xunit;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Core.Downloader;
@@ -27,13 +25,14 @@ namespace DotnetSpider.Extension.Test
 	{
 		public LogTest()
 		{
-			Env.HunService = false;
+			Env.HubService = false;
 		}
 
-		[Fact]
+		[Fact(Skip = "Dep selrilog.mysql")]
 		public void DatebaseLogAndStatus()
 		{
-			var logger = DLog.GetLogger();
+			LogUtil.Init();
+
 			string id = Guid.NewGuid().ToString("N");
 			Env.NodeId = "DEFAULT";
 			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8" },
@@ -47,7 +46,7 @@ namespace DotnetSpider.Extension.Test
 				spider.AddPipeline(new TestPipeline());
 				for (int i = 0; i < 5; i++)
 				{
-					logger.NLog(id, "add start url" + i, Level.Info);
+					Serilog.Log.Logger.Information("add start url" + i, id);
 					spider.AddStartUrl("http://www.baidu.com/" + i);
 				}
 				spider.EmptySleepTime = 1000;

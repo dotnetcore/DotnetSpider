@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices;
 using DotnetSpider.Core.Infrastructure;
 using Xunit;
 
@@ -62,7 +61,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		{			
 			var result = HttpSender.Request((new HttpRequest
 			{
-				Url = Env.HunServiceUrl
+				Url = Env.HubServiceUrl
 			}));
 			if (result.StatusCode != HttpStatusCode.OK)
 			{
@@ -114,7 +113,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		{
 			var result = HttpSender.Request((new HttpRequest
 			{
-				Url = Env.HunServiceUrl
+				Url = Env.HubServiceUrl
 			}));
 			if (result.StatusCode != HttpStatusCode.OK)
 			{

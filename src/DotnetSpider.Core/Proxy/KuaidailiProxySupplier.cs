@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,8 +11,6 @@ namespace DotnetSpider.Core.Proxy
 	/// </summary>
 	public class KuaidailiProxySupplier : IProxySupplier
 	{
-		private static readonly ILogger Logger = DLog.GetLogger();
-
 		/// <summary>
 		/// 快代理的提取接口
 		/// </summary>
@@ -55,7 +54,7 @@ namespace DotnetSpider.Core.Proxy
 				}
 				catch (Exception ex)
 				{
-					Logger.Log("Get new proxies failed.", Level.Error, ex);
+					Log.Logger.Error($"Get new proxies failed: {ex}.");
 					Thread.Sleep(5000);
 				}
 			}

@@ -1,11 +1,8 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Proxy
 {
@@ -16,7 +13,6 @@ namespace DotnetSpider.Core.Proxy
 
 	public class DefaultProxyValidator : IProxyValidator
 	{
-		private static readonly ILogger Logger = DLog.GetLogger();
 		private readonly string _targetUrl;
 
 		public DefaultProxyValidator(string targetUrl = "http://www.baidu.com")

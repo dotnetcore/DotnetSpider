@@ -3,8 +3,10 @@ using DotnetSpider.Core.Selector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
+#if !NET45
+using System.Net;
+#endif
 
 namespace DotnetSpider.Core.Processor
 {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using System.Threading;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Pipeline;
@@ -69,7 +68,7 @@ namespace DotnetSpider.Extension
 		{
 			PrintInfo.Print();
 
-			Logger.Log(Identity, "Build custom component...", Level.Info);
+			Logger.Information("Build custom component...");
 
 			NetworkCenter.Current.Execute("myInit", () =>
 			{
@@ -150,7 +149,7 @@ namespace DotnetSpider.Extension
 								var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
 								if (lockerValue != InitFinishedValue)
 								{
-									Logger.Log(Identity, "Waiting for another crawler inited...", Level.Info);
+									Logger.Information("Waiting for another crawler inited...");
 									Thread.Sleep(1500);
 								}
 								else
@@ -192,7 +191,7 @@ namespace DotnetSpider.Extension
 				if (!ifBuildFinished)
 				{
 					var msg = "Init status set failed";
-					Logger.Log(Identity, msg, Level.Error);
+					Logger.Error(msg);
 					throw new SpiderException(msg);
 				}
 
@@ -212,7 +211,7 @@ namespace DotnetSpider.Extension
 				if (!ifRemoveInitLocker)
 				{
 					var msg = "Remove init locker failed";
-					Logger.Log(Identity, msg, Level.Error);
+					Logger.Error(msg);
 					throw new SpiderException(msg);
 				}
 			}
@@ -257,7 +256,7 @@ namespace DotnetSpider.Extension
 				}
 				catch (Exception e)
 				{
-					Logger.Log(Identity, "Register contol failed.", Level.Error, e);
+					Logger.Error($"Register contol failed：{e}.");
 				}
 			}
 		}
@@ -299,13 +298,13 @@ namespace DotnetSpider.Extension
 					}
 					if (needVerify)
 					{
-						Logger.Log(Identity, "Start data verification...", Level.Info);
+						Logger.Information("Start data verification...");
 						DataVerificationAndReport();
-						Logger.Log(Identity, "Data verification complete.", Level.Info);
+						Logger.Information("Data verification complete.");
 					}
 					else
 					{
-						Logger.Log(Identity, "Data verification is done already.", Level.Info);
+						Logger.Information("Data verification is done already.");
 					}
 
 					if (needVerify)
@@ -315,7 +314,7 @@ namespace DotnetSpider.Extension
 				}
 				catch (Exception e)
 				{
-					Logger.Log(Identity, e.Message, Level.Error, e);
+					Logger.Error(e.Message);
 				}
 				finally
 				{

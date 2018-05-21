@@ -171,12 +171,12 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					page = site.AddToCycleRetry(request);
 				}
-				Logger.Log(spider.Identity, $"下载 {request.Url} 失败: {de.Message}.", Level.Warn);
+				spider.Logger.Error($"下载 {request.Url} 失败: {de.Message}.");
 				return Task.FromResult(page);
 			}
 			catch (Exception e)
 			{
-				Logger.Log(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", Level.Warn);
+				spider.Logger.Error($"下载 {request.Url} 失败: {e.Message}.");
 				Page page = new Page(request) { Exception = e };
 				return Task.FromResult(page);
 			}

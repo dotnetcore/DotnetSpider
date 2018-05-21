@@ -94,7 +94,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
 			Spider spider = new DefaultSpider("test", new Site());
-			spider.Monitor = new NLogMonitor();
+			spider.Monitor = new LogMonitor();
 			scheduler.Init(spider);
 			scheduler.Dispose();
 			var start = DateTime.Now;
@@ -269,7 +269,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 				new TestPageProcessor())
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
 				.AddPipeline(new FilePipeline());
-			spider.Monitor = new NLogMonitor();
+			spider.Monitor = new LogMonitor();
 			// dowload html by http client
 			spider.Downloader = new HttpClientDownloader();
 

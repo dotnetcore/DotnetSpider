@@ -5,7 +5,6 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using System;
 using System.Collections.Generic;
-using System.Net;
 
 namespace DotnetSpider.Core
 {

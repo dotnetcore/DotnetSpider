@@ -1,10 +1,8 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
-using Newtonsoft.Json;
 using Polly;
+using Serilog;
 using System;
-using System.Net.Http;
-using System.Text;
 using System.Threading;
 
 namespace DotnetSpider.Core
@@ -14,7 +12,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class HttpExecuteRecord : IExecuteRecord
 	{
-		private static readonly ILogger Logger = DLog.GetLogger();
+		public ILogger Logger { get; set; }
 
 		/// <summary>
 		/// 添加运行记录
@@ -25,7 +23,7 @@ namespace DotnetSpider.Core
 		/// <returns>是否上报成功</returns>
 		public bool Add(string taskId, string name, string identity)
 		{
-			if (string.IsNullOrWhiteSpace(taskId) || string.IsNullOrWhiteSpace(identity) || !Env.HunService)
+			if (string.IsNullOrWhiteSpace(taskId) || string.IsNullOrWhiteSpace(identity) || !Env.HubService)
 			{
 				return true;
 			}
@@ -34,14 +32,14 @@ namespace DotnetSpider.Core
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
 						{
-							Logger.NLog($"Try to add execute record failed [{count}]: {ex}", Level.Error);
+							Logger?.Error($"Try to add execute record failed [{count}]: {ex}", LogUtil.Identity);
 							Thread.Sleep(5000);
 						});
 				retryTimesPolicy.Execute(() =>
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.GetAsync($"{Env.HunServiceTaskApiUrl}/{taskId}?action=increase").Result;
+						var response = HttpSender.Client.GetAsync($"{Env.HubServiceTaskApiUrl}/{taskId}?action=increase").Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});
@@ -49,7 +47,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				Logger.NLog($"Add execute record failed: {e}", Level.Error);
+				Logger?.Error($"Add execute record failed: {e}", identity);
 				return false;
 			}
 		}
@@ -62,7 +60,7 @@ namespace DotnetSpider.Core
 		/// <param name="identity">任务标识</param>
 		public void Remove(string taskId, string name, string identity)
 		{
-			if (string.IsNullOrWhiteSpace(taskId) || !Env.HunService)
+			if (string.IsNullOrWhiteSpace(taskId) || !Env.HubService)
 			{
 				return;
 			}
@@ -71,21 +69,21 @@ namespace DotnetSpider.Core
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
 				{
-					Logger.NLog($"Try to remove execute record failed [{count}]: {ex}", Level.Error);
+					Logger?.Error($"Try to remove execute record failed [{count}]: {ex}", identity);
 					Thread.Sleep(5000);
 				});
 				retryTimesPolicy.Execute(() =>
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpSender.Client.GetAsync($"{Env.HunServiceTaskApiUrl}/{taskId}?action=reduce").Result;
+						var response = HttpSender.Client.GetAsync($"{Env.HubServiceTaskApiUrl}/{taskId}?action=reduce").Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});
 			}
 			catch (Exception e)
 			{
-				Logger.NLog($"Remove execute record failed: {e}", Level.Error);
+				Logger?.Error($"Remove execute record failed: {e}", identity);
 			}
 		}
 	}

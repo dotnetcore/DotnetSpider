@@ -7,8 +7,10 @@ using DotnetSpider.Extension.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Xunit;
+#if !NET45
+using System.Runtime.InteropServices;
+#endif
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {

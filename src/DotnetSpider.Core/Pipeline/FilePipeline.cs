@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -61,9 +60,9 @@ namespace DotnetSpider.Core.Pipeline
 					}
 				}
 			}
-			catch (Exception e)
+			catch
 			{
-				Logger.Log(spider.Identity, "Write file error.", Level.Error, e);
+				spider.Logger.Error("Write file error.");
 				throw;
 			}
 		}

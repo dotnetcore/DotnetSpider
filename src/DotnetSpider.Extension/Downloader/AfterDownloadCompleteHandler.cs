@@ -2,7 +2,6 @@
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
-using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Downloader
 {

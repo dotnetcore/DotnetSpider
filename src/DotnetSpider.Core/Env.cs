@@ -30,8 +30,8 @@ namespace DotnetSpider.Core
 		private const string EmailAccountKey = "emailAccount";
 		private const string EmailPasswordKey = "emailPassword";
 		private const string EmailDisplayNameKey = "emailDisplayName";
-		private const string HunServiceUrlKey = "serviceUrl";
-		private const string HunServiceTokenKey = "serviceToken";
+		private const string HubServiceUrlKey = "serviceUrl";
+		private const string HubServiceTokenKey = "serviceToken";
 		private const string SystemConnectionStringKey = "SystemConnection";
 		private const string DataConnectionStringKey = "DataConnection";
 		private const string SqlEncryptCodeKey = "sqlEncryptCode";
@@ -39,7 +39,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 开启企业服务(HTTP), 默认打开, 测试的时候开关
 		/// </summary>
-		public static bool HunService = true;
+		public static bool HubService = true;
 
 		/// <summary>
 		/// 定义数据主键的名称
@@ -130,39 +130,39 @@ namespace DotnetSpider.Core
 		public static string PathSeperator { get; private set; }
 
 		/// <summary>
-		/// 是否启用企业服务日志, 默认值是判断配置文件中是否配置了HunServiceUrl
+		/// 是否启用企业服务日志, 默认值是判断配置文件中是否配置了HubServiceUrl
 		/// </summary>
-		public static bool HunServiceLog { get; set; }
+		public static bool HubServiceLog { get; set; }
 
 		/// <summary>
 		/// 从配置文件中读取的企业服务地址
 		/// </summary>
-		public static string HunServiceUrl { get; private set; }
+		public static string HubServiceUrl { get; private set; }
 
 		/// <summary>
 		/// 企业服务HTTP日志的地址
 		/// </summary>
-		public static string HunServiceLogUrl { get; private set; }
+		public static string HubServiceLogUrl { get; private set; }
 
 		/// <summary>
 		/// 企业服务HTTP数据管道的地址
 		/// </summary>
-		public static string HunServicePipelineUrl { get; private set; }
+		public static string HubServicePipelineUrl { get; private set; }
 
 		/// <summary>
 		/// 企业服务HTTP爬虫状态的上传地址
 		/// </summary>
-		public static string HunServiceStatusApiUrl { get; private set; }
+		public static string HubServiceStatusApiUrl { get; private set; }
 
 		/// <summary>
 		/// 向企业服务添加运行记录的地址
 		/// </summary>
-		public static string HunServiceTaskApiUrl { get; internal set; }
+		public static string HubServiceTaskApiUrl { get; internal set; }
 
 		/// <summary>
 		/// 访问企业服务时使用的凭证
 		/// </summary>
-		public static string HunServiceToken { get; private set; }
+		public static string HubServiceToken { get; private set; }
 
 		/// <summary>
 		/// 爬虫系统使用的数据库连接字符串
@@ -256,16 +256,16 @@ namespace DotnetSpider.Core
 			EmailAccount = configuration.AppSettings.Settings[EmailAccountKey]?.Value?.Trim();
 			EmailPassword = configuration.AppSettings.Settings[EmailPasswordKey]?.Value?.Trim();
 			EmailDisplayName = configuration.AppSettings.Settings[EmailDisplayNameKey]?.Value?.Trim();
-			HunServiceUrl = configuration.AppSettings.Settings[HunServiceUrlKey]?.Value?.Trim();
-			if (!string.IsNullOrWhiteSpace(HunServiceUrl))
+			HubServiceUrl = configuration.AppSettings.Settings[HubServiceUrlKey]?.Value?.Trim();
+			if (!string.IsNullOrWhiteSpace(HubServiceUrl))
 			{
-				HunServiceLogUrl = $"{HunServiceUrl}{(HunServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/log";
-				HunServiceToken = configuration.AppSettings.Settings[HunServiceTokenKey]?.Value?.Trim();
-				HunServiceStatusApiUrl = $"{HunServiceUrl}{(HunServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/taskstatus";
-				HunServiceTaskApiUrl = $"{HunServiceUrl}{(HunServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/task";
-				HunServicePipelineUrl = $"{HunServiceUrl}{(HunServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/process";
+				HubServiceLogUrl = $"{HubServiceUrl}{(HubServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/log";
+				HubServiceToken = configuration.AppSettings.Settings[HubServiceTokenKey]?.Value?.Trim();
+				HubServiceStatusApiUrl = $"{HubServiceUrl}{(HubServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/taskstatus";
+				HubServiceTaskApiUrl = $"{HubServiceUrl}{(HubServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/task";
+				HubServicePipelineUrl = $"{HubServiceUrl}{(HubServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/process";
 			}
-			HunServiceLog = !string.IsNullOrWhiteSpace(HunServiceLogUrl);
+			HubServiceLog = !string.IsNullOrWhiteSpace(HubServiceLogUrl);
 			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 			SqlEncryptCode = configuration.AppSettings.Settings[SqlEncryptCodeKey]?.Value?.Trim();

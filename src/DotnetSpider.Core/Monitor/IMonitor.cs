@@ -1,4 +1,6 @@
-﻿namespace DotnetSpider.Core.Monitor
+﻿using Serilog;
+
+namespace DotnetSpider.Core.Monitor
 {
 	/// <summary>
 	/// 爬虫监控接口
@@ -6,6 +8,11 @@
 	/// </summary>
 	public interface IMonitor
 	{
+		ILogger Logger
+		{
+			get; set;
+		}
+
 		/// <summary>
 		/// 上报爬虫状态
 		/// </summary>

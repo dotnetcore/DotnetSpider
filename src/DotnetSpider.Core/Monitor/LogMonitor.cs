@@ -1,13 +1,14 @@
-﻿using DotnetSpider.Core.Infrastructure;
+﻿using Serilog;
 
 namespace DotnetSpider.Core.Monitor
 {
 	/// <summary>
 	/// NLog 状态监控, 依据NLog配置上报状态到控制台或者日志文件中
 	/// </summary>
-	public class NLogMonitor : IMonitor
+	public class LogMonitor : IMonitor
 	{
-		private static readonly ILogger Logger = DLog.GetLogger();
+		public ILogger Logger{ get; set; }
+
 
 		/// <summary>
 		/// 上报爬虫状态
@@ -26,7 +27,7 @@ namespace DotnetSpider.Core.Monitor
 		public virtual void Report(string identity, string taskId, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
 			string msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
-			Logger.NLog(identity, msg, Level.Trace);
+			Logger.Verbose(msg);
 		}
 	}
 }

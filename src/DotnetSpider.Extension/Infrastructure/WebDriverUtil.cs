@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Extension.Downloader;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;

@@ -7,12 +7,13 @@ using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using Xunit;
+#if !NET45
+using System.Runtime.InteropServices;
+#endif
 
 namespace DotnetSpider.Extension.Test.Downloader
 {
@@ -20,7 +21,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 	{
 		public WebDriverDownloaderTests()
 		{
-			Env.HunService = false;
+			Env.HubService = false;
 		}
 
 		[Fact]
@@ -65,7 +66,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new NLogMonitor();
+				Monitor = new LogMonitor();
 				Identity = "hello";
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
@@ -86,7 +87,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new NLogMonitor();
+				Monitor = new LogMonitor();
 				Identity = "hello";
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });

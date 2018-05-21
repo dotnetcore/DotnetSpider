@@ -1,17 +1,10 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using DotnetSpider.Core.Infrastructure;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Sample

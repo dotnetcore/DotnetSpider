@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using DotnetSpider.Core.Downloader;
 using Xunit;
 using DotnetSpider.Core.Scheduler;
 using static DotnetSpider.Core.Test.SpiderTest;
 using DotnetSpider.Core.Pipeline;
 using System.Threading.Tasks;
+#if !NET45
+using System.Text;
+#endif
 
 namespace DotnetSpider.Core.Test.Downloader
 {

@@ -4,7 +4,6 @@ using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using System;
-using System.Configuration;
 
 namespace DotnetSpider.Sample
 {

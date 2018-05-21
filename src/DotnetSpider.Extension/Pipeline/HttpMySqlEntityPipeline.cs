@@ -11,6 +11,7 @@ using DotnetSpider.Core;
 using System.Security.Cryptography;
 using System.IO;
 using MessagePack;
+using Serilog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -31,7 +32,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (string.IsNullOrWhiteSpace(api))
 			{
-				_api = Env.HunServicePipelineUrl;
+				_api = Env.HubServicePipelineUrl;
 			}
 			else
 			{
@@ -40,7 +41,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			_retryPolicy = Policy.Handle<Exception>().Retry(5, (ex, count) =>
 			{
-				Logger.NLog($"Pipeline execute error [{count}]: {ex}", Level.Error);
+				Log.Logger.Error($"Pipeline execute error [{count}]: {ex}");
 			});
 
 			DESCryptoServiceProvider cryptoProvider = new DESCryptoServiceProvider();
@@ -142,7 +143,7 @@ namespace DotnetSpider.Extension.Pipeline
 			var encodingBytes = Encoding.UTF8.GetBytes(json);
 			var bytes = LZ4MessagePackSerializer.ToLZ4Binary(new ArraySegment<byte>(encodingBytes));
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _api);
-			httpRequestMessage.Headers.Add("DotnetSpiderToken", Env.HunServiceToken);
+			httpRequestMessage.Headers.Add("DotnetSpiderToken", Env.HubServiceToken);
 			httpRequestMessage.Content = new ByteArrayContent(bytes);
 			var response = HttpSender.Client.SendAsync(httpRequestMessage).Result;
 			response.EnsureSuccessStatusCode();

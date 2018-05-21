@@ -1,9 +1,4 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Serilog;
 
 namespace DotnetSpider.Core
 {
@@ -12,7 +7,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class LogExecuteRecord : IExecuteRecord
 	{
-		private static readonly ILogger Logger = DLog.GetLogger();
+		public ILogger Logger { get; set; }
 
 		/// <summary>
 		/// 添加运行记录
@@ -27,7 +22,7 @@ namespace DotnetSpider.Core
 			{
 				return true;
 			}
-			Logger.Log(identity, $"Execute task {taskId}, name {name}, identity {identity}.", Level.Info);
+			Logger?.Information($"Execute task {taskId}, name {name}, identity {identity}.", identity);
 			return true;
 		}
 
@@ -44,7 +39,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			Logger.Log(identity, $"Complete task {taskId}, name {name}, identity {identity}.", Level.Info);
+			Logger?.Information($"Complete task {taskId}, name {name}, identity {identity}.", identity);
 		}
 	}
 }

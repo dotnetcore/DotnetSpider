@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+using Serilog;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
@@ -10,6 +9,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public interface IAppBase : IRunable, IIdentity, ITask, INamed
 	{
+		ILogger Logger { get; }
 	}
 
 	/// <summary>
@@ -17,10 +17,29 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public abstract class AppBase : Named, IAppBase
 	{
+		private ILogger _logger;
+
 		/// <summary>
-		/// 日志接口
+		/// 唯一标识
 		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
+		public virtual ILogger Logger
+		{
+			get
+			{
+				if (_logger == null && !string.IsNullOrWhiteSpace(Identity))
+				{
+					_logger = LogUtil.Create(Identity);
+				}
+				return _logger;
+			}
+			set
+			{
+				if (value != null)
+				{
+					_logger = value;
+				}
+			}
+		}
 
 		/// <summary>
 		/// 唯一标识
@@ -75,13 +94,19 @@ namespace DotnetSpider.Core
 		/// <param name="arguments">程序运行的参数</param>
 		public void Run(params string[] arguments)
 		{
-			if (ExecuteRecord == null && !string.IsNullOrWhiteSpace(Env.HunServiceUrl))
+			if (ExecuteRecord == null && !string.IsNullOrWhiteSpace(Env.HubServiceUrl))
 			{
 				ExecuteRecord = new HttpExecuteRecord();
 			}
+
+			if (ExecuteRecord != null)
+			{
+				ExecuteRecord.Logger = Logger;
+			}
+
 			if (!AddExecuteRecord())
 			{
-				Logger.Log(Identity, "Can not add execute record.", Level.Error);
+				Logger.Error($"Can not add execute record: {Identity}.");
 			}
 			try
 			{

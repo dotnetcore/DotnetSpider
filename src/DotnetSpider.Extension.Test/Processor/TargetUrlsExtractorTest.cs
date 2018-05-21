@@ -47,7 +47,7 @@ namespace DotnetSpider.Extension.Test.Processor
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new NLogMonitor();
+				Monitor = new LogMonitor();
 				var word = "可乐|雪碧";
 				Identity = Guid.NewGuid().ToString();
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),

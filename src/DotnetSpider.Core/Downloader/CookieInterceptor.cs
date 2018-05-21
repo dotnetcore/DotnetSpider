@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using System;
+﻿using System;
 using System.Net;
 using System.Runtime.CompilerServices;
 
@@ -15,14 +14,6 @@ namespace DotnetSpider.Core.Downloader
 	public abstract class CookieInjector : Named, ICookieInjector
 	{
 		private DateTime _lastInjectedTime;
-
-		/// <summary>
-		/// Log interface
-		/// </summary>
-		/// <summary xml:lang="zh-CN">
-		/// 日志接口
-		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
 
 		/// <summary>
 		/// Mininum interval between injections (in second).
@@ -57,7 +48,7 @@ namespace DotnetSpider.Core.Downloader
 					{
 						downloader.AddCookie(cookie);
 					}
-					Logger.Log(spider.Identity, "Inject cookies success.", Level.Info);
+					spider.Logger.Information("Inject cookies success.");
 					spider.Contiune();
 				});
 			}
@@ -67,7 +58,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					downloader.AddCookie(cookie);
 				}
-				Logger.Log(spider.Identity, "Inject cookies success.", Level.Info);
+				spider.Logger.Information("Inject cookies success.");
 			}
 		}
 

@@ -3,6 +3,8 @@ using System.Threading;
 using DotnetSpider.Core.Redial.InternetDetector;
 using DotnetSpider.Core.Redial.Redialer;
 using DotnetSpider.Core.Infrastructure;
+using Serilog;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Redial
 {
@@ -11,8 +13,6 @@ namespace DotnetSpider.Core.Redial
 	/// </summary>
 	public abstract class RedialExecutor : IRedialExecutor
 	{
-		private static readonly ILogger Logger = DLog.GetLogger();
-
 		internal bool IsTest { get; set; }
 		private int WaitRedialTimeout { get; } = 100 * 1000 / 100;
 		private int RedialIntervalLimit { get; } = 10;
@@ -67,7 +67,7 @@ namespace DotnetSpider.Core.Redial
 		/// 拨号成功后暂停的时间
 		/// </summary>
 		public int SleepAfterRedial { get; set; } = -1;
-		
+
 		/// <summary>
 		/// 执行拨号
 		/// </summary>
@@ -78,21 +78,21 @@ namespace DotnetSpider.Core.Redial
 			ILocker locker = null;
 			try
 			{
-				Logger.NLog("Try to lock redialer...", Level.Info);
+				Log.Logger.Information("Try to lock redialer...");
 				locker = CreateLocker();
 				locker.Lock();
-				Logger.NLog("Lock redialer", Level.Info);
+				Log.Logger.Information("Lock redialer");
 				var lastRedialTime = (DateTime.Now - GetLastRedialTime()).Seconds;
 				if (lastRedialTime < RedialIntervalLimit)
 				{
-					Logger.NLog($"Skip redial because last redial compeleted before {lastRedialTime} seconds.", Level.Info);
+					Log.Logger.Information($"Skip redial because last redial compeleted before {lastRedialTime} seconds.");
 					return RedialResult.OtherRedialed;
 				}
 				Thread.Sleep(500);
-				Logger.NLog("Wait all network requests complete...", Level.Info);
+				Log.Logger.Information("Wait all network requests complete...");
 				// 等待所有网络请求结束
 				WaitAllNetworkRequestComplete();
-				Logger.NLog("Start redial...", Level.Info);
+				Log.Logger.Information("Start redial...");
 
 				var redialCount = 1;
 
@@ -119,7 +119,7 @@ namespace DotnetSpider.Core.Redial
 					}
 					catch (Exception ex)
 					{
-						Logger.NLog($"Redial failed loop {redialCount}: {ex}", Level.Error);
+						Log.Logger.Error($"Redial failed loop {redialCount}: {ex}");
 					}
 				}
 
@@ -128,7 +128,7 @@ namespace DotnetSpider.Core.Redial
 					return RedialResult.Failed;
 				}
 
-				Logger.NLog("Redial success.", Level.Info);
+				Log.Logger.Information("Redial success.");
 
 				action?.Invoke();
 
@@ -138,7 +138,7 @@ namespace DotnetSpider.Core.Redial
 			}
 			catch (Exception ex)
 			{
-				Logger.NLog($"Redial failed: {ex}", Level.Error);
+				Log.Logger.Error($"Redial failed: {ex}");
 				return RedialResult.Failed;
 			}
 			finally
@@ -151,7 +151,7 @@ namespace DotnetSpider.Core.Redial
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// 执行网络请求
 		/// </summary>
@@ -166,6 +166,22 @@ namespace DotnetSpider.Core.Redial
 			{
 				identity = CreateActionIdentity(name);
 				action();
+			}
+			finally
+			{
+				DeleteActionIdentity(identity);
+			}
+		}
+
+		public async Task ExecuteAsync(string name, Task task)
+		{
+			WaitRedialComplete();
+
+			string identity = null;
+			try
+			{
+				identity = CreateActionIdentity(name);
+				await task;
 			}
 			finally
 			{

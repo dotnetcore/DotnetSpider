@@ -4,11 +4,11 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Concurrent;
 using System;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Redial;
 using System.Linq;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
+using Serilog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -38,7 +38,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			if (entityDefine.TableInfo == null)
 			{
-				Logger.Log($"Schema is necessary, skip {GetType().Name} for {entityDefine.Name}.", Level.Warn);
+				Log.Logger.Warning($"Schema is necessary, skip {GetType().Name} for {entityDefine.Name}.");
 				return;
 			}
 

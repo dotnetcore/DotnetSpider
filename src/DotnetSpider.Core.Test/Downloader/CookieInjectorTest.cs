@@ -1,7 +1,5 @@
 ﻿using DotnetSpider.Core.Downloader;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace DotnetSpider.Core.Test.Downloader

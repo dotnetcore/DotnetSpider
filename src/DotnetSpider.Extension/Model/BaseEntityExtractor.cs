@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Model
 {
@@ -12,11 +9,6 @@ namespace DotnetSpider.Extension.Model
 	/// <typeparam name="T">爬虫实体类的类型</typeparam>
 	public abstract class BaseEntityExtractor<T> : IEntityExtractor<T>
 	{
-		/// <summary>
-		/// 日志接口
-		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
-
 		/// <summary>
 		/// 爬虫实体类的定义
 		/// </summary>

@@ -1,13 +1,5 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Processor;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
 #if !NETCOREAPP2_0
 using System.Threading;
 #else

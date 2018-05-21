@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DotnetSpider.Core.Scheduler
+﻿namespace DotnetSpider.Core.Scheduler
 {
 	/// <summary>
 	/// 遍历策略

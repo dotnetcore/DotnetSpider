@@ -13,8 +13,10 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Xunit;
+#if !NET45
+using System.Runtime.InteropServices;
+#endif
 
 namespace DotnetSpider.Extension.Test
 {
@@ -390,7 +392,7 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new NLogMonitor();
+				Monitor = new LogMonitor();
 				EmptySleepTime = 1000;
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
@@ -452,7 +454,7 @@ namespace DotnetSpider.Extension.Test
 			spider.AddPipeline(new JsonFileEntityPipeline());
 
 			spider.AddStartUrl("http://baidu.com");
-			spider.Monitor = new NLogMonitor();
+			spider.Monitor = new LogMonitor();
 			spider.AddEntityType<Entity13>();
 			spider.AddEntityType<Entity12>();
 

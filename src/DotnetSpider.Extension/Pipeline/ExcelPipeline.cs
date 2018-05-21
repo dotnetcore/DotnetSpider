@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Extension.Model;
 using OfficeOpenXml;
 using System;
 using System.Collections;

@@ -6,10 +6,10 @@ using DotnetSpider.Core.Infrastructure;
 using MimeKit;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Web;
 using System.IO;
 using DotnetSpider.Core.Infrastructure.Database;
+using Serilog;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
@@ -69,11 +69,6 @@ namespace DotnetSpider.Extension.Infrastructure
 	public abstract class BaseVerification
 	{
 		/// <summary>
-		/// 日志接口
-		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
-
-		/// <summary>
 		/// 所有验证规则
 		/// </summary>
 		protected List<IVerification> Verifications { get; set; } = new List<IVerification>();
@@ -129,7 +124,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				}
 				else
 				{
-					Logger.Log($"EmailPort is not a number: {portStr}.", Level.Error);
+					Log.Logger.Error($"EmailPort is not a number: {portStr}.");
 				}
 			}
 		}
@@ -584,7 +579,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 			if (!string.IsNullOrWhiteSpace(_reportSampleSql) && _reportSampleSql.ToLower().Contains("limit"))
 			{
-				Logger.Log("SQL contains 'LIMIT'.", Level.Error);
+				Log.Logger.Error("SQL contains 'LIMIT'.");
 				return veridationResult;
 			}
 			if (Verifications != null && Verifications.Count > 0 && EmailTo != null && EmailTo.Count > 0 && !string.IsNullOrWhiteSpace(EmailHost))

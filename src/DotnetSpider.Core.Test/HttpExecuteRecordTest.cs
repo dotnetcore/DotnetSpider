@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using DotnetSpider.Core.Infrastructure;
 using Xunit;
 
@@ -20,7 +17,7 @@ namespace DotnetSpider.Core.Test
 				}));
 				if (result.StatusCode == HttpStatusCode.OK)
 				{
-					Env.HunServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";
+					Env.HubServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";
 
 					var recorder = new HttpExecuteRecord();
 					recorder.Add("1", "test", "abcd");

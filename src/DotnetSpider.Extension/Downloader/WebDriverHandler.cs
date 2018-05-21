@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using OpenQA.Selenium.Remote;
+﻿using OpenQA.Selenium.Remote;
 using System;
 using System.Threading;
 
@@ -10,11 +9,6 @@ namespace DotnetSpider.Extension.Downloader
 	/// </summary>
 	public class Scroll : IWebDriverHandler
 	{
-		/// <summary>
-		/// 日志接口
-		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
-
 		/// <summary>
 		/// 滚动次数
 		/// </summary>

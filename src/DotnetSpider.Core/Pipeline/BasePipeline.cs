@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -8,11 +7,6 @@ namespace DotnetSpider.Core.Pipeline
 	/// </summary>
 	public abstract class BasePipeline : IPipeline
 	{
-		/// <summary>
-		/// 日志接口
-		/// </summary>
-		protected static readonly ILogger Logger = DLog.GetLogger();
-
 		/// <summary>
 		/// 处理页面解析器解析到的数据结果
 		/// </summary>

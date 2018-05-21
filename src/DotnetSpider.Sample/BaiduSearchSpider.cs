@@ -2,7 +2,6 @@
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Model.Formatter;

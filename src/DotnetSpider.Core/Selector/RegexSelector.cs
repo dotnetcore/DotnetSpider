@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using DotnetSpider.Core.Infrastructure;
 #if !NET45
 using System.Reflection;
 #endif

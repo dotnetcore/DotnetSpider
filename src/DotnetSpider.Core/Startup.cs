@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using DotnetSpider.Core.Infrastructure;
 using CommandLine;
 #if !NET45
@@ -44,6 +43,11 @@ namespace DotnetSpider.Core
 		/// DLL名字中包含任意一个即是需要扫描的DLL
 		/// </summary>
 		public static List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
+
+		static Startup()
+		{
+			LogUtil.Init();
+		}
 
 		/// <summary>
 		/// 运行

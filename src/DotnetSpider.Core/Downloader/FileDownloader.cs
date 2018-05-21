@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -55,7 +54,7 @@ namespace DotnetSpider.Core.Downloader
 				Skip = true
 			};
 
-			Logger.Log(spider.Identity, $"Download {request.Url} failed: {msg}.", Level.Error);
+			spider.Logger.Error($"Download {request.Url} failed: {msg}.");
 			return Task.FromResult(page);
 		}
 	}

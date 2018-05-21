@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
@@ -15,8 +16,6 @@ namespace DotnetSpider.Core.Infrastructure.Database
 	/// </summary>
 	public static class DatabaseExtensions
 	{
-		private static readonly ILogger Logger = DLog.GetLogger();
-
 		/// <summary>
 		/// Create DbConnection from <see cref="ConnectionStringSettings"/>.
 		/// </summary>
@@ -54,12 +53,12 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				{
 					if (e.Message.ToLower().StartsWith("authentication to host"))
 					{
-						Logger.Log($"{connectionStringSettings.ConnectionString}: {e}", Level.Error);
+						Log.Logger.Error($"{connectionStringSettings.ConnectionString}: {e}");
 						Thread.Sleep(1000);
 					}
 					else
 					{
-						Logger.Log($"{connectionStringSettings.ConnectionString}: {e}", Level.Warn);
+						Log.Logger.Warning($"{connectionStringSettings.ConnectionString}: {e}");
 					}
 				}
 			}
@@ -118,7 +117,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				{
 					if (e.Message.ToLower().StartsWith("authentication to host"))
 					{
-						Logger.Log($"{e}", Level.Error);
+						Log.Logger.Error($"{e}");
 						Thread.Sleep(1000);
 					}
 					else

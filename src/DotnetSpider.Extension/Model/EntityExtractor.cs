@@ -5,7 +5,7 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Infrastructure;
 using System;
-using DotnetSpider.Core.Infrastructure;
+using Serilog;
 
 namespace DotnetSpider.Extension.Model
 {
@@ -168,7 +168,7 @@ namespace DotnetSpider.Extension.Model
 					}
 					catch (Exception e)
 					{
-						Logger.NLog(e.ToString(), Level.Error);
+						Log.Logger.Error(e.ToString());
 					}
 #endif
 				}
@@ -197,7 +197,7 @@ namespace DotnetSpider.Extension.Model
 						}
 						catch (Exception e)
 						{
-							Logger.NLog(e.ToString(), Level.Error);
+							Log.Logger.Error(e.ToString());
 						}
 #endif
 					}

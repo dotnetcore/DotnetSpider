@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Processor;
+﻿using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Redial;
 using HtmlAgilityPack;
 using System;
@@ -439,7 +438,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
-					Logger.Log(spider.Identity, "Exit program because redial failed.", Level.Error);
+					spider.Logger.Error("Exit program because redial failed.");
 					spider.Exit();
 				}
 
@@ -493,7 +492,7 @@ namespace DotnetSpider.Core.Downloader
 			{
 				if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 				{
-					Logger.Log(spider.Identity, "Exit program because redial failed.", Level.Error);
+					spider.Logger.Error("Exit program because redial failed.");
 					spider.Exit();
 				}
 

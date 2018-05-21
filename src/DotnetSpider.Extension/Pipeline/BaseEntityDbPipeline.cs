@@ -1,10 +1,9 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Infrastructure;
 using System.Configuration;
+using Serilog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -118,9 +117,9 @@ namespace DotnetSpider.Extension.Pipeline
 							ConnectionStringSettings = UpdateConnectString.GetNew();
 							break;
 						}
-						catch (Exception e)
+						catch
 						{
-							Logger.Log("Update ConnectString failed.", Level.Error, e);
+							Log.Logger.Error("Update ConnectString failed.");
 							Thread.Sleep(1000);
 						}
 					}
@@ -191,9 +190,9 @@ namespace DotnetSpider.Extension.Pipeline
 							ConnectionStringSettings = UpdateConnectString.GetNew();
 							break;
 						}
-						catch (Exception e)
+						catch
 						{
-							Logger.Log("Update ConnectString failed.", Level.Error, e);
+							Log.Logger.Error("Update ConnectString failed.");
 							Thread.Sleep(1000);
 						}
 					}

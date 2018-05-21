@@ -1,6 +1,5 @@
 using System.IO;
 using System.Text;
-using DotnetSpider.Core.Infrastructure;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
@@ -45,9 +44,9 @@ namespace DotnetSpider.Core.Pipeline
 					streamWriter.WriteLine(JsonConvert.SerializeObject(resultItem.Results));
 				}
 			}
-			catch (IOException e)
+			catch
 			{
-				Logger.Log(spider.Identity, "Write data to json file failed.", Level.Error, e);
+				spider.Logger.Error("Write data to json file failed.");
 				throw;
 			}
 		}
