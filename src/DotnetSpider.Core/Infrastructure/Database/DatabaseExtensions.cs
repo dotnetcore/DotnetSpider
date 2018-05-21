@@ -53,12 +53,18 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				{
 					if (e.Message.ToLower().StartsWith("authentication to host"))
 					{
-						Log.Logger.Error($"{connectionStringSettings.ConnectionString}: {e}");
-						Thread.Sleep(1000);
+						Log.Logger.Error($"{connectionStringSettings.ConnectionString}: {e}.");
+						break;
+					}
+					if (e.Message.ToLower().StartsWith("access denied for user"))
+					{
+						Log.Logger.Error($"Access denied: {connectionStringSettings.ConnectionString}.");
+						break;
 					}
 					else
 					{
 						Log.Logger.Warning($"{connectionStringSettings.ConnectionString}: {e}");
+						Thread.Sleep(1000);
 					}
 				}
 			}
