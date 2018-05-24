@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using DotnetSpider.Core.Selector;
 using System.Linq;
 using System;
+using DotnetSpider.Core.Infrastructure;
 #if !NET_CORE
 using System.Web;
 #else
@@ -58,8 +59,9 @@ namespace DotnetSpider.Core.Processor
 		/// <returns></returns>
 		internal virtual List<Regex> GetTargetUrlPatterns(string regionXpath)
 		{
-			ISelector selector = Selectors.Default();
-			if (!string.IsNullOrWhiteSpace(regionXpath))
+			//ISelector selector = Selectors.Default();
+            ISelector selector = Selectors.Regex(RegexUtil.UrlRegex);
+            if (!string.IsNullOrWhiteSpace(regionXpath))
 			{
 				selector = Selectors.XPath(regionXpath);
 			}
@@ -104,10 +106,24 @@ namespace DotnetSpider.Core.Processor
 				{
 					continue;
 				}
+ 
 
-				var links = page.Selectable.SelectList(targetUrlExtractor.Key).Links().GetValues();
+                List<string> links = null;
+                if (page.ContentType == ContentType.Html)
+                {
+                    links = page.Selectable.SelectList(targetUrlExtractor.Key).Links().GetValues();
+                }
+                else if (page.ContentType == ContentType.Json)
+                {
+                    links = page.Selectable.SelectList(Selectors.Regex(RegexUtil.UrlRegex)).Links().GetValues();
+                }
+                else
+                {
+                    throw new Exception("page.ContentType is not match!");
+                }
 
-				if (links == null)
+
+                if (links == null)
 				{
 					continue;
 				}
@@ -207,8 +223,8 @@ namespace DotnetSpider.Core.Processor
 				throw new ArgumentNullException("Pattern value should not be null or empty.");
 			}
 
-			ISelector selector = Selectors.Default();
-			if (regionXpath != null)
+            ISelector selector = Selectors.Regex(RegexUtil.UrlRegex);
+            if (!string.IsNullOrEmpty(regionXpath))
 			{
 				string xpath = string.IsNullOrWhiteSpace(regionXpath.Trim()) ? "." : regionXpath.Trim();
 				selector = Selectors.XPath(xpath);

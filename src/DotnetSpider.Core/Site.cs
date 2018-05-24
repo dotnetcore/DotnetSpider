@@ -44,15 +44,16 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public Cookies Cookies { get; set; }
 
-		/// <summary>
-		/// 设置 User Agent
-		/// </summary>
-		public string UserAgent { get; set; }
+        /// <summary>
+        /// 设置 User Agent
+        /// </summary>
+        public string UserAgent { get; set; } = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
 
-		/// <summary>
-		/// 设置 User Accept
-		/// </summary>
-		public string Accept { get; set; } = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
+
+        /// <summary>
+        /// 设置 User Accept
+        /// </summary>
+        public string Accept { get; set; } = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
 
 		/// <summary>
 		/// Whether download pictiures or file

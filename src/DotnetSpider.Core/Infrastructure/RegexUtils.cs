@@ -9,5 +9,7 @@ namespace DotnetSpider.Core.Infrastructure
 		public static readonly Regex BoolTypeRegex = new Regex(@"bool");
 		public static readonly Regex NumRegex = new Regex(@"\d+");
 		public static readonly Regex DecimalRegex = new Regex(@"\d+(\.\d+)?");
-	}
+        public static  readonly string UrlRegex = @"(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?";
+
+    }
 }
