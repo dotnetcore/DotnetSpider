@@ -30,8 +30,9 @@ namespace DotnetSpider.Core
 		public const string DataConnectionStringKey = "DataConnection";
 		public static readonly string[] IdColumns = new[] { "Id", "__Id" };
 		public const string CDateColumn = "CDate";
+        
 
-		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
+        public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
 		public static string HostName { get; set; }
 		public static string Ip { get; set; }
@@ -55,7 +56,8 @@ namespace DotnetSpider.Core
 		public static string SystemConnectionString => SystemConnectionStringSettings?.ConnectionString;
 		public static string DataConnectionString => DataConnectionStringSettings?.ConnectionString;
 
-		public static string GetAppSettings(string key)
+        public static bool ProcessorFilterDefaultRequest = true;
+        public static string GetAppSettings(string key)
 		{
 			return ConfigurationManager.AppSettings[key];
 		}

@@ -85,9 +85,11 @@ namespace DotnetSpider.Core.Test.Processor
 		}
 
 		[Fact]
-		public void UrlVerifyAndExtract3()
-		{
-			HttpClient client = new HttpClient();
+        public void ProcessorFilterDefaultRequest()
+        {
+            Env.ProcessorFilterDefaultRequest = false;
+
+            HttpClient client = new HttpClient();
 			var html = client.GetStringAsync("http://www.cnblogs.com").Result;
 
 			Page page = new Page(new Request("http://www.cnblogs.com/", null), null);
