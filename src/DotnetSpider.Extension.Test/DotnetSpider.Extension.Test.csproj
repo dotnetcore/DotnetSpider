@@ -8,14 +8,15 @@
     <StartupObject />
   </PropertyGroup>
 
-  <PropertyGroup>
-    <AssemblyTitle>DotnetSpider</AssemblyTitle>
-    <DefineConstants>DEBUG;NET_CORE;NETCOREAPP2_0;</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NET_CORE;NETCOREAPP2_0</DefineConstants>
   </PropertyGroup>
 
+
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="1.50.2" />
+    <PackageReference Include="Dapper" Version="1.50.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="MySql.Data" Version="8.0.11" />
     <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />

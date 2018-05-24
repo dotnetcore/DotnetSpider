@@ -8,7 +8,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyTitle>DotnetSpider</AssemblyTitle>
-    <DefineConstants>DEBUG;NET_CORE;NETCOREAPP2_0;</DefineConstants>
+    <DefineConstants>DEBUG;NETCOREAPP2_0</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.2" />

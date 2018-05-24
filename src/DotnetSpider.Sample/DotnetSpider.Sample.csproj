@@ -5,8 +5,9 @@
     <StartupObject>DotnetSpider.Sample.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
-    <DefineConstants>DEBUG;NETCOREAPP2_0;NET_CORE;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_CORE;NETCOREAPP2_0</DefineConstants>
   </PropertyGroup>
+ 
   <ItemGroup>
     <Content Include="app.test.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -17,7 +18,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CassandraCSharpDriver" Version="3.3.2" />
+    <PackageReference Include="Dapper" Version="1.50.5" />
     <PackageReference Include="EPPlus.Core" Version="1.5.2" />
+    <PackageReference Include="MongoDB.Driver" Version="2.6.1" />
+    <PackageReference Include="MySql.Data" Version="8.0.11" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
