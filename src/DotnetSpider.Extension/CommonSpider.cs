@@ -4,198 +4,172 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using System.Threading;
 using DotnetSpider.Extension.Infrastructure;
-using System.Data;
 using NLog;
-using DotnetSpider.Extension.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Redial;
-using DotnetSpider.Core.Monitor;
 
 namespace DotnetSpider.Extension
 {
-	public abstract class CommonSpider : Spider
-	{
-		private const string InitFinishedValue = "init complete";
-		protected const string InitStatusSetKey = "dotnetspider:init-stats";
+    public abstract class CommonSpider : Spider
+    {
+        private const string InitFinishedValue = "init complete";
+        internal const string InitStatusSetKey = "dotnetspider:init-stats";
+        internal string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
-		protected abstract void MyInit(params string[] arguments);
+        protected abstract void MyInit(params string[] arguments);
 
-		protected Action DataVerificationAndReport;
+        public Action DataVerificationAndReport;
 
-		public string InitLockKey => $"dotnetspider:initLocker:{Identity}";
+        protected CommonSpider(Site site) : base(site)
+        {
+        }
 
-		protected CommonSpider(Site site) : base(site)
-		{
-		}
+        public CommonSpider(string name, Site site) : base(site)
+        {
+            Name = name;
+        }
 
-		public CommonSpider(string name, Site site) : base(site)
-		{
-			Name = name;
-		}
+        public CommonSpider(string name) : base(new Site())
+        {
+            Name = name;
+        }
 
-		public CommonSpider(string name) : base(new Site())
-		{
-			Name = name;
-		}
+        protected override void RunApp(params string[] arguments)
+        {
+            PrintInfo.Print();
 
-		public override void Run(params string[] arguments)
-		{
-			PrintInfo.Print();
+            Logger.AllLog(Identity, "Build custom component...", LogLevel.Info);
 
-			Logger.AllLog(Identity, "Init redial module if necessary.", LogLevel.Info);
+            NetworkCenter.Current.Execute("myInit", () =>
+            {
+                MyInit(arguments);
+            });
 
-			InitRedialConfiguration();
+            if (arguments.Contains("skip"))
+            {
+                EmptySleepTime = 1000;
 
-			Logger.AllLog(Identity, "Build custom component...", LogLevel.Info);
+                if (Pipelines == null || Pipelines.Count == 0)
+                {
+                    AddPipeline(new NullPipeline());
+                }
+                if (PageProcessors == null || PageProcessors.Count == 0)
+                {
+                    AddPageProcessor(new NullPageProcessor());
+                }
+            }
 
-			NetworkCenter.Current.Execute("myInit", () =>
-			{
-				MyInit(arguments);
-			});
+            CheckIfSettingsCorrect();
 
-			if (string.IsNullOrEmpty(Identity) || Identity.Length > 120)
-			{
-				throw new ArgumentException("Length of Identity should between 1 and 120.");
-			}
+            RegisterControl(this);
 
-			if (arguments.Contains("skip"))
-			{
-				EmptySleepTime = 1000;
+            base.RunApp(arguments);
 
-				if (Pipelines == null || Pipelines.Count == 0)
-				{
-					AddPipeline(new NullPipeline());
-				}
-				if (PageProcessors == null || PageProcessors.Count == 0)
-				{
-					AddPageProcessor(new NullPageProcessor());
-				}
-			}
+            if (IsComplete && DataVerificationAndReport != null)
+            {
+                NetworkCenter.Current.Execute("verifyAndReport", () =>
+                {
+                    BaseVerification.ProcessVerifidation(Identity, DataVerificationAndReport);
+                });
+            }
+        }
 
-			RegisterControl(this);
+        protected override void InitScheduler(params string[] arguments)
+        {
+            base.InitScheduler(arguments);
 
-			base.Run(arguments);
+            if (arguments.Contains("rerun"))
+            {
+                Scheduler.Clear();
+                Scheduler.Dispose();
+                BaseVerification.RemoveVerifidationLock(Identity);
+            }
+        }
 
-			if (IsComplete && DataVerificationAndReport != null)
-			{
-				NetworkCenter.Current.Execute("verifyAndReport", () =>
-				{
-					BaseVerification.ProcessVerifidation(Identity, DataVerificationAndReport);
-				});
-			}
-		}
+        /// <summary>
+        /// 分布式任务时使用, 只需要调用一次
+        /// </summary>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
+        protected override bool IfRequireInitStartRequests(string[] arguments)
+        {
+            if (RedisConnection.Default != null)
+            {
+                if (arguments.Contains("rerun"))
+                {
+                    RedisConnection.Default.Database.HashDelete(InitStatusSetKey, Identity);
+                    RedisConnection.Default.Database.LockRelease(InitLockKey, "0");
+                    return true;
+                }
+                else
+                {
+                    while (!RedisConnection.Default.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(30)))
+                    {
+                        Thread.Sleep(1500);
+                    }
+                    var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
+                    return lockerValue != InitFinishedValue;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
 
-		protected virtual void InitRedialConfiguration() { }
+        protected override void InitStartRequestsFinished()
+        {
+            if (RedisConnection.Default != null)
+            {
+                RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
+                RedisConnection.Default.Database.LockRelease(InitLockKey, 0);
+            }
+        }
 
-		public ISpider ToDefaultSpider()
-		{
-			return new DefaultSpider("", new Site());
-		}
+        protected void RegisterControl(ISpider spider)
+        {
+            if (RedisConnection.Default != null)
+            {
+                try
+                {
+                    RedisConnection.Default.Subscriber.Subscribe($"{spider.Identity}", (c, m) =>
+                    {
+                        switch (m)
+                        {
+                            case "PAUSE":
+                                {
+                                    spider.Pause();
+                                    break;
+                                }
+                            case "CONTINUE":
+                                {
+                                    spider.Contiune();
+                                    break;
+                                }
+                            case "RUNASYNC":
+                                {
+                                    spider.RunAsync();
+                                    break;
+                                }
+                            case "EXIT":
+                                {
+                                    spider.Exit();
+                                    break;
+                                }
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    Logger.AllLog(Identity, "Register contol failed.", LogLevel.Error, e);
+                }
+            }
+        }
 
-		protected override void PreInitComponent(params string[] arguments)
-		{
-			base.PreInitComponent();
-
-			if (Site == null)
-			{
-				throw new SpiderException("Site should not be null.");
-			}
-
-			Scheduler.Init(this);
-
-			if (arguments.Contains("rerun"))
-			{
-				Scheduler.Clear();
-				Scheduler.Dispose();
-				BaseVerification.RemoveVerifidationLock(Identity);
-			}
-		}
-
-		protected override void AfterInitComponent(params string[] arguments)
-		{
-			RedisConnection.Default?.Database.LockRelease(InitLockKey, 0);
-			base.AfterInitComponent(arguments);
-		}
-
-		/// <summary>
-		/// 分布式任务时使用, 只需要调用一次
-		/// </summary>
-		/// <param name="arguments"></param>
-		/// <returns></returns>
-		protected override bool IfRequireInitStartRequests(string[] arguments)
-		{
-			if (RedisConnection.Default != null)
-			{
-				if (arguments.Contains("rerun"))
-				{
-					RedisConnection.Default.Database.HashDelete(InitStatusSetKey, Identity);
-					RedisConnection.Default.Database.LockRelease(InitLockKey, "0");
-					return true;
-				}
-				else
-				{
-					while (!RedisConnection.Default.Database.LockTake(InitLockKey, "0", TimeSpan.FromMinutes(10)))
-					{
-						Thread.Sleep(1000);
-					}
-					var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
-					return lockerValue != InitFinishedValue;
-				}
-			}
-			else
-			{
-				return true;
-			}
-		}
-
-		protected override void InitStartRequestsFinished()
-		{
-			if (RedisConnection.Default != null)
-			{
-				RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
-			}
-		}
-
-		protected void RegisterControl(ISpider spider)
-		{
-			if (RedisConnection.Default != null)
-			{
-				try
-				{
-					RedisConnection.Default.Subscriber.Subscribe($"{spider.Identity}", (c, m) =>
-					{
-						switch (m)
-						{
-							case "PAUSE":
-								{
-									spider.Pause();
-									break;
-								}
-							case "CONTINUE":
-								{
-									spider.Contiune();
-									break;
-								}
-							case "RUNASYNC":
-								{
-									spider.RunAsync();
-									break;
-								}
-							case "EXIT":
-								{
-									spider.Exit();
-									break;
-								}
-						}
-					});
-				}
-				catch (Exception e)
-				{
-					Logger.AllLog(Identity, "Register contol failed.", LogLevel.Error, e);
-				}
-			}
-		}
-	}
+        public ISpider ToDefaultSpider()
+        {
+            return new DefaultSpider("", new Site());
+        }
+    }
 }

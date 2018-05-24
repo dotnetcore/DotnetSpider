@@ -89,23 +89,27 @@ namespace DotnetSpider.Core.Test
 		}
 
 		[Fact]
-		public void ThrowExceptionWhenNoPipeline()
-		{
-			try
-			{
-				Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor());
-				spider.Run();
-			}
-			catch (SpiderException exception)
-			{
-				Assert.Equal("Pipelines should not be null.", exception.Message);
-				return;
-			}
+        public void NoPipeline()
+        {
+            //try
+            //{
+            //    Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor());
+            //    spider.Run();
+            //}
+            //catch (SpiderException exception)
+            //{
+            //    Assert.Equal("Pipelines should not be null.", exception.Message);
+            //    return;
+            //}
 
-			throw new Exception("TEST FAILED.");
-		}
+            //throw new Exception("TEST FAILED.");
+            Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor());
+            spider.EmptySleepTime = 1000;
+            spider.Run();
+        }
 
-		[Fact]
+
+        [Fact]
 		public void WhenNoStartUrl()
 		{
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());

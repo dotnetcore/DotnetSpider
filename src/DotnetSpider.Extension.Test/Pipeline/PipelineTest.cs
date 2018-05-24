@@ -56,9 +56,13 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			protected override void MyInit(params string[] arguments)
 			{
-				var word = "可乐|雪碧";
-				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
-				EmptySleepTime = 1000;
+				//var word = "可乐|雪碧";
+				//AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+
+                AddStartUrl("http://news.baidu.com/ns?word=可乐|雪碧&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", new Dictionary<string, dynamic> { { "Keyword", "可乐|雪碧" } });
+
+
+                EmptySleepTime = 1000;
 				AddEntityType<BaiduSearchEntry>();
 				AddPageProcessor(new MyProcessor());
 				AddPipeline(new MyPipeline());

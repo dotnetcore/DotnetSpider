@@ -35,8 +35,8 @@ namespace DotnetSpider.Extension.Test
 				new QueueDuplicateRemovedScheduler(),
 				new TestPageProcessor()))
 			{
-				spider.Monitor = new DbMonitor(spider);
-				spider.AddPipeline(new TestPipeline());
+                spider.Monitor = new DbMonitor(spider.TaskId, spider.Identity);
+                spider.AddPipeline(new TestPipeline());
 				spider.ThreadNum = 1;
 				for (int i = 0; i < 5; i++)
 				{

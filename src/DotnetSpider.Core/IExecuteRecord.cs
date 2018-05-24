@@ -8,8 +8,9 @@ namespace DotnetSpider.Core
 {
 	public interface IExecuteRecord
 	{
-		ISpider Spider { get; }
-		bool Add();
-		void Remove();
-	}
+		 
+        bool Add(string taskId, string name, string identity);
+        void Remove(string taskId, string name, string identity);
+
+    }
 }

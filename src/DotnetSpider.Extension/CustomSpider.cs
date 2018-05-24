@@ -45,10 +45,10 @@ namespace DotnetSpider.Extension
 				throw new ArgumentException("Length of Identity should between 1 and 120.");
 			}
 
-			Monitor = new DbMonitor(this);
+            Monitor = new DbMonitor(TaskId, Identity);
 
-			try
-			{
+            try
+            {
 				Logger.AllLog(Identity, $"Start: {Name}", LogLevel.Info);
 
 				if (Env.SystemConnectionStringSettings != null)

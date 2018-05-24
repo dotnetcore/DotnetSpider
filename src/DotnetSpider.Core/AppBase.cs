@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using DotnetSpider.Core.Infrastructure;
+using NLog;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
@@ -9,13 +11,22 @@ namespace DotnetSpider.Core
 
 	public abstract class AppBase : IAppBase
 	{
-		public string Identity { get; set; }
 
-		public string Name { get; set; }
+        protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public string TaskId { get; set; }
+        public virtual string Identity { get; set; }
 
-		protected AppBase()
+		public virtual string Name { get; set; }
+
+		public virtual string TaskId { get; set; }
+
+
+        public IExecuteRecord ExecuteRecord { get; private set; }
+
+
+        protected abstract void RunApp(params string[] arguments);
+
+        protected AppBase()
 		{
 			var type = GetType();
 			var nameAttribute = type.GetCustomAttribute<TaskName>();
@@ -27,14 +38,53 @@ namespace DotnetSpider.Core
 			Name = name;
 		}
 
-		public Task RunAsync(params string[] arguments)
+        public void Run(params string[] arguments)
+        {
+            if (!AddExecuteRecord())
+            {
+                Logger.AllLog(Identity, "Can not add execute record.", LogLevel.Error);
+            }
+            try
+            {
+                RunApp();
+            }
+            finally
+            {
+                RemoveExecuteRecord();
+            }
+        }
+
+        private bool AddExecuteRecord()
+        {
+            if (ExecuteRecord == null && !string.IsNullOrEmpty(Env.HttpCenter))
+            {
+                ExecuteRecord = new HttpExecuteRecord();
+            }
+            if (ExecuteRecord == null)
+            {
+                return true;
+            }
+            else
+            {
+                return ExecuteRecord.Add(TaskId, Name, Identity);
+            }
+        }
+
+        private void RemoveExecuteRecord()
+        {
+            ExecuteRecord?.Remove(TaskId,Name, Identity);
+        }
+
+
+        public Task RunAsync(params string[] arguments)
 		{
 			return Task.Factory.StartNew(() =>
 			{
-				Run(arguments);
+                Run(arguments);
 			});
 		}
 
-		public abstract void Run(params string[] arguments);
-	}
+
+
+    }
 }
