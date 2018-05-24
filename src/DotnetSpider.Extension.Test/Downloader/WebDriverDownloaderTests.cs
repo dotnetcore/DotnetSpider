@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit;
+using DotnetSpider.Extension.Pipeline;
 #if !NET45
 using System.Runtime.InteropServices;
 #endif
@@ -36,7 +37,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 
 			var chromedriverCount1 = Process.GetProcessesByName("chromedriver").Length;
 
-			BaiduSearchSpider spider = new BaiduSearchSpider();
+			WebDriverDownloaderSpider spider = new WebDriverDownloaderSpider();
 			spider.Run();
 
 			var chromedriverCount2 = Process.GetProcessesByName("chromedriver").Length;
@@ -54,20 +55,20 @@ namespace DotnetSpider.Extension.Test.Downloader
 				return;
 			}
 #endif
-			BaiduSearchHeadlessSpider spider = new BaiduSearchHeadlessSpider();
+			HeadlessSpider spider = new HeadlessSpider();
 			spider.Run();
 		}
 
-		public class BaiduSearchHeadlessSpider : EntitySpider
+		private class HeadlessSpider : EntitySpider
 		{
-			public BaiduSearchHeadlessSpider() : base("BaiduSearchTest2")
+			public HeadlessSpider() : base("HeadlessSpider")
 			{
 			}
 
 			protected override void MyInit(params string[] arguments)
 			{
 				Monitor = new LogMonitor();
-				Identity = "hello";
+				Identity = "HeadlessSpider";
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				Downloader = new WebDriverDownloader(Browser.Chrome, new Option
@@ -75,30 +76,30 @@ namespace DotnetSpider.Extension.Test.Downloader
 					Headless = true
 				});
 				EmptySleepTime = 6000;
+				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType<BaiduSearchEntry>();
 			}
 		}
 
-		public class BaiduSearchSpider : EntitySpider
+		private class WebDriverDownloaderSpider : EntitySpider
 		{
-			public BaiduSearchSpider() : base("BaiduSearchTest")
+			public WebDriverDownloaderSpider() : base("WebDriverDownloader")
 			{
 			}
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new LogMonitor();
-				Identity = "hello";
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				Downloader = new WebDriverDownloader(Browser.Chrome);
+				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType<BaiduSearchEntry>();
 			}
 		}
 
 		[EntityTable("baidu", "baidu_search")]
 		[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-		public class BaiduSearchEntry : SpiderEntity
+		private class BaiduSearchEntry : SpiderEntity
 		{
 			[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment)]
 			public string Keyword { get; set; }

@@ -70,7 +70,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\SpiderEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Monitor\MySqlMonitor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MySqlExecuteRecord.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\BaseEntityDbPipeline.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\BaseEntityRdPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\BaseEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\CassandraEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\CollectionEntityPipeline.cs" />

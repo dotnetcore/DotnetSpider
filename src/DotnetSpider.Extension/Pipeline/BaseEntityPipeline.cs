@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System;
 using DotnetSpider.Core.Infrastructure.Database;
 using Serilog;
+using System.Configuration;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -92,38 +93,39 @@ namespace DotnetSpider.Extension.Pipeline
 		/// 从配置文件中获取默认的数据管道
 		/// </summary>
 		/// <returns>数据管道</returns>
-		public static IPipeline GetPipelineFromAppConfig()
+		public static IPipeline GetPipelineFromAppConfig(ConnectionStringSettings connectionStringSettings = null)
 		{
-			if (Env.DataConnectionStringSettings == null)
+			connectionStringSettings = connectionStringSettings == null ? Env.DataConnectionStringSettings : connectionStringSettings;
+			if (connectionStringSettings == null)
 			{
 				return null;
 			}
 			IPipeline pipeline;
-			switch (Env.DataConnectionStringSettings.ProviderName)
+			switch (connectionStringSettings.ProviderName)
 			{
 				case DbProviderFactories.PostgreSqlProvider:
 					{
-						pipeline = new PostgreSqlEntityPipeline();
+						pipeline = new PostgreSqlEntityPipeline(connectionStringSettings.ConnectionString);
 						break;
 					}
 				case DbProviderFactories.MySqlProvider:
 					{
-						pipeline = new MySqlEntityPipeline();
+						pipeline = new MySqlEntityPipeline(connectionStringSettings.ConnectionString);
 						break;
 					}
 				case DbProviderFactories.SqlServerProvider:
 					{
-						pipeline = new SqlServerEntityPipeline();
+						pipeline = new SqlServerEntityPipeline(connectionStringSettings.ConnectionString);
 						break;
 					}
 				case "MongoDB":
 					{
-						pipeline = new MongoDbEntityPipeline(Env.DataConnectionString);
+						pipeline = new MongoDbEntityPipeline(connectionStringSettings.ConnectionString);
 						break;
 					}
 				case "Cassandra":
 					{
-						pipeline = new CassandraEntityPipeline(Env.DataConnectionString);
+						pipeline = new CassandraEntityPipeline(connectionStringSettings.ConnectionString);
 						break;
 					}
 				case "HttpMySql":

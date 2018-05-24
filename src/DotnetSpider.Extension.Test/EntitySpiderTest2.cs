@@ -21,9 +21,9 @@ using System.Runtime.InteropServices;
 namespace DotnetSpider.Extension.Test
 {
 
-	public class EntitySpiderTest2
+	public class EntitySpiderTest2 : TestBase
 	{
-		private class TestPipeline : BaseEntityDbPipeline
+		private class TestPipeline : BaseEntityRdPipeline
 		{
 			public TestPipeline(string connectString) : base(connectString)
 			{
@@ -357,23 +357,12 @@ namespace DotnetSpider.Extension.Test
 			var path = Path.Combine(folder, "baidu.baidu_search_mysql_file.sql");
 			try
 			{
-				BaiduSearchSpider spider = new BaiduSearchSpider();
+				MySqlFileEntityPipelineSpider spider = new MySqlFileEntityPipelineSpider();
 				spider.Identity = id;
 				spider.Run();
 
 				var lines = File.ReadAllLines(path);
 				Assert.Equal(20, lines.Length);
-				using (var conn = new MySqlConnection(Env.DataConnectionStringSettings.ConnectionString))
-				{
-					conn.Execute("DELETE FROM baidu.baidu_search_mysql_file");
-					foreach (var sql in lines)
-					{
-						conn.Execute(sql);
-					}
-					var count = conn.QueryFirst<int>("SELECT COUNT(*) FROM baidu.baidu_search_mysql_file");
-					Assert.Equal(20, count);
-					conn.Execute("DROP TABLE baidu.baidu_search_mysql_file");
-				}
 			}
 			finally
 			{
@@ -384,20 +373,18 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		class BaiduSearchSpider : EntitySpider
+		class MySqlFileEntityPipelineSpider : EntitySpider
 		{
-			public BaiduSearchSpider() : base("BaiduSearch")
+			public MySqlFileEntityPipelineSpider() : base("MySqlFileEntityPipelineSpider")
 			{
 			}
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new LogMonitor();
 				EmptySleepTime = 1000;
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				AddEntityType<BaiduSearchEntry>();
-				AddPipeline(new MySqlEntityPipeline(Env.DataConnectionStringSettings.ConnectionString));
 				AddPipeline(new MySqlFileEntityPipeline(MySqlFileEntityPipeline.FileType.InsertSql));
 			}
 

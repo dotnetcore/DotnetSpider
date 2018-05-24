@@ -45,7 +45,10 @@ namespace DotnetSpider.Core.Infrastructure.Database
 					if (connection != null)
 					{
 						connection.ConnectionString = connectionStringSettings.ConnectionString;
-						connection.Open();
+						if (connection.State == ConnectionState.Closed)
+						{
+							connection.Open();
+						}
 						return connection;
 					}
 				}
@@ -63,7 +66,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				}
 			}
 
-			throw new SpiderException($"Create or open DbConnection failed: {connectionStringSettings.ConnectionString}");
+			return null;
 		}
 
 		/// <summary>

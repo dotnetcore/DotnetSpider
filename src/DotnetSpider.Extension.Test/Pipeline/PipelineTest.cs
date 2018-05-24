@@ -15,7 +15,7 @@ using Xunit;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
-	public class PipelineTest
+	public class PipelineTest : TestBase
 	{
 		[Fact]
 		public void MixProcessorAndMissEntityPipeline()
@@ -33,17 +33,17 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void MixProcessor()
 		{
-			using (var conn = new MySqlConnection(Env.DataConnectionString))
+			using (var conn = new MySqlConnection(DefaultMySqlConnection))
 			{
 				conn.Execute("DROP TABLE IF EXISTS baidu.baidu_search_mixprocessor");
 			}
 			var id = Guid.NewGuid().ToString("N");
 			BaiduSearchSpider spider = new BaiduSearchSpider();
-			spider.AddPipeline(new MySqlEntityPipeline());
+			spider.AddPipeline(new MySqlEntityPipeline(DefaultMySqlConnection));
 			spider.Identity = id;
 			spider.Run();
 
-			using (var conn = new MySqlConnection(Env.DataConnectionString))
+			using (var conn = new MySqlConnection(DefaultMySqlConnection))
 			{
 				var count = conn.QueryFirst<int>("SELECT COUNT(*) FROM baidu.baidu_search_mixprocessor");
 				Assert.Equal(20, count);

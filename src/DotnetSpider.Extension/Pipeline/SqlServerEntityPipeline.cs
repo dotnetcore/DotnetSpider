@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// <summary>
 	/// 把解析到的爬虫实体数据存到SqlServer中
 	/// </summary>
-	public class SqlServerEntityPipeline : BaseEntityDbPipeline
+	public class SqlServerEntityPipeline : BaseEntityRdPipeline
 	{
 		/// <summary>
 		/// 构造方法
@@ -78,7 +78,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			foreach (var adapter in EntityAdapters.Values)
 			{
-				using (var conn = ConnectionStringSettings.CreateDbConnection())
+				using (var conn = CreateDbConnection())
 				{
 					var sql = GenerateIfDatabaseExistsSql(adapter, conn.ServerVersion);
 
@@ -106,7 +106,7 @@ namespace DotnetSpider.Extension.Pipeline
 			int count = 0;
 			if (EntityAdapters.TryGetValue(entityName, out var metadata))
 			{
-				using (var conn = ConnectionStringSettings.CreateDbConnection())
+				using (var conn = CreateDbConnection())
 				{
 					switch (metadata.PipelineMode)
 					{

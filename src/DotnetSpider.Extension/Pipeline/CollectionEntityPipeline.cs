@@ -14,14 +14,6 @@ namespace DotnetSpider.Extension.Pipeline
 		private readonly object _locker = new object();
 
 		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		public override void Dispose()
-		{
-			_collector.Clear();
-		}
-
-		/// <summary>
 		/// 取得实体名称的所有数据
 		/// </summary>
 		/// <param name="entityName">爬虫实体名称</param>

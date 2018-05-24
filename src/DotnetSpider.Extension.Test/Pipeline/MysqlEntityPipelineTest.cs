@@ -18,13 +18,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 	/// grant all privileges on *.* to root@localhost identified by '';
 	/// flush privileges;
 	/// </summary>
-	public class MySqlEntityPipelineTest
+	public class MySqlEntityPipelineTest : TestBase
 	{
-		private const string ConnectString = "Database='mysql';Data Source=127.0.0.1;User ID=root;Password=;Port=3306;SslMode=None;";
-
 		private void ClearDb()
 		{
-			using (MySqlConnection conn = new MySqlConnection(ConnectString))
+			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
 			{
 				conn.Execute($"DROP table IF exists test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}");
 				conn.Execute($"DROP table IF exists test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}");
@@ -42,11 +40,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		{
 			ClearDb();
 
-			using (MySqlConnection conn = new MySqlConnection(ConnectString))
+			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
 			{
 				ISpider spider = new DefaultSpider("test", new Site());
 
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
 				var metadata = new EntityDefine<ProductInsert>();
 				var tableName = Guid.NewGuid().ToString("N").Substring(8, 8);
 				metadata.TableInfo.Name = tableName;
@@ -58,7 +56,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2 }, spider);
 
-				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(ConnectString);
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
 				var metadata2 = new EntityDefine<ProductUpdate>();
 				metadata2.TableInfo.Name = tableName;
 				updatePipeline.AddEntity(metadata2);
@@ -76,57 +74,16 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[Fact(DisplayName = "UpdatePipelineUseAppConfig")]
-		public void UpdatePipelineUseAppConfig()
-		{
-			ClearDb();
-
-			using (MySqlConnection conn = new MySqlConnection(ConnectString))
-			{
-				ISpider spider = new DefaultSpider("test", new Site());
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline { DefaultPipelineModel = PipelineMode.Insert };
-				var metadata = new EntityDefine<Product2Insert>();
-				var tableName = Guid.NewGuid().ToString("N");
-				metadata.TableInfo.Name = tableName;
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.Init();
-
-				var data1 = new Product2Insert { Sku = "110", Category1 = "a", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new Product2Insert { Sku = "111", Category1 = "b", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2 }, spider);
-
-				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline();
-				var metadata2 = new EntityDefine<Product2Update>();
-				metadata2.TableInfo.Name = tableName;
-				updatePipeline.AddEntity(metadata2);
-				updatePipeline.Init();
-
-				var realTableName = $"`test`.`{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}`";
-				var data3 = conn.Query<Product2Update>($"select * from {realTableName} where sku='110'").First();
-				data3.Category = "4C";
-
-				updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 }, spider);
-
-				var list = conn.Query<Product2Insert>($"select * from {realTableName}").ToList();
-				Assert.Equal(2, list.Count);
-				Assert.Equal("110", list[0].Sku);
-				Assert.Equal("4C", list[0].Category);
-
-				conn.Execute($"DROP TABLE {realTableName};");
-			}
-		}
-
 		[Fact(DisplayName = "MySqlEntityPipelineInsert")]
 		public void Insert()
 		{
 			ClearDb();
 
-			using (MySqlConnection conn = new MySqlConnection(ConnectString))
+			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
 			{
 				ISpider spider = new DefaultSpider("test", new Site());
 
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(ConnectString);
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
 				var metadata = new EntityDefine<ProductInsert>();
 				var tableName = Guid.NewGuid().ToString("N");
 				metadata.TableInfo.Name = tableName;
@@ -149,44 +106,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[Fact(DisplayName = "MySqlEntityPipelineInsertUseAppConfig")]
-		public void InsertUseAppConfig()
-		{
-			ClearDb();
-
-			using (MySqlConnection conn = new MySqlConnection(ConnectString))
-			{
-				ISpider spider = new DefaultSpider("test", new Site());
-
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline();
-				var metadata = new EntityDefine<Product2Insert>();
-				var tableName = Guid.NewGuid().ToString("N");
-				metadata.TableInfo.Name = tableName;
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.Init();
-
-				var data1 = new Product2Insert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new Product2Insert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				var data3 = new Product2Insert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
-
-				var list = conn.Query<Product2Insert>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.Equal(3, list.Count);
-				Assert.Equal("110", list[0].Sku);
-				Assert.Equal("111", list[1].Sku);
-				Assert.Null(list[2].Category);
-
-				conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
-			}
-		}
-
 		[Fact(DisplayName = "MySqlEntityPipelineUpdateConnectString")]
 		public void UpdateConnectString()
 		{
 			ClearDb();
 
-			using (MySqlConnection conn = new MySqlConnection(ConnectString))
+			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
 			{
 				conn.Execute("CREATE DATABASE IF NOT EXISTS `dotnetspider1` DEFAULT CHARACTER SET utf8;");
 				conn.Execute("CREATE TABLE IF NOT EXISTS `dotnetspider1`.`settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`type` varchar(45) NOT NULL,`key` varchar(45) DEFAULT NULL,`value` text,PRIMARY KEY(`id`),UNIQUE KEY `UNIQUE` (`key`,`type`)) AUTO_INCREMENT = 1");
@@ -202,9 +127,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(null)
 				{
-					UpdateConnectString = new DbConnectionStringSettingsRefresher
+					ConnectionStringSettingsRefresher = new DbConnectionStringSettingsRefresher
 					{
-						ConnectString = ConnectString,
+						ConnectString = DefaultMySqlConnection,
 						QueryString = "SELECT value from `dotnetspider1`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"
 					}
 				};
@@ -224,7 +149,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				conn.Execute("DROP DATABASE IF EXISTS `dotnetspider1`");
 			}
 		}
-
 
 		[EntityTable("test", "sku", EntityTable.Today, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]

@@ -46,14 +46,5 @@ namespace DotnetSpider.Core.Pipeline
 				_items[spider].AddRange(resultItems);
 			}
 		}
-
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		public override void Dispose()
-		{
-			base.Dispose();
-			_items.Clear();
-		}
 	}
 }

@@ -12,13 +12,14 @@ using DotnetSpider.Extension.Scheduler;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 using System.Net;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test
 {
-
-	public class EntitySpiderTest
+	public class EntitySpiderTest : TestBase
 	{
 		public EntitySpiderTest()
 		{
@@ -32,27 +33,6 @@ namespace DotnetSpider.Extension.Test
 			public string Name { get; set; }
 		}
 
-		public class MyEntitySpider1 : EntitySpider
-		{
-			public MyEntitySpider1() : base("tes", new Site())
-			{
-			}
-
-			protected override void MyInit(params string[] arguments)
-			{
-				Identity = Guid.NewGuid().ToString();
-				AddPipeline(new ConsoleEntityPipeline());
-				AddEntityType<TestEntity>();
-			}
-		}
-
-		[Fact]
-		public void TestCorrectRedisSetting()
-		{
-			EntitySpider spider = new MyEntitySpider1();
-
-			spider.Run("running-test");
-		}
 
 		[Fact]
 		public void MultiEntity()
@@ -66,6 +46,7 @@ namespace DotnetSpider.Extension.Test
 			protected override void MyInit(params string[] arguments)
 			{
 				Monitor = new LogMonitor();
+				AddPipeline(new ConsoleEntityPipeline());
 				AddStartUrl("http://www.baidu.com");
 				AddStartUrl("http://www.sohu.com");
 				AddEntityType<BaiduEntity>();
@@ -180,16 +161,20 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[Fact]
-		public void EntitySpiderWithDefaultPipeline()
+		public void GetPipelineFromAppConfig()
 		{
-			var guid = Guid.NewGuid().ToString();
-			BaiduSearchSpider spider = new BaiduSearchSpider(guid);
-			spider.Run();
-			using (var conn = Env.DataConnectionStringSettings.CreateDbConnection())
+			var configuration = ConfigurationManager.OpenMappedExeConfiguration(new ExeConfigurationFileMap
 			{
-				var count = conn.QueryFirst<int>($"SELECT COUNT(*) FROM test.baidu_search WHERE `guid`='{guid}'");
-				Assert.Equal(20, count);
-			}
+				ExeConfigFilename = "app.config"
+			}, ConfigurationUserLevel.None);
+			var pipeline1 = BaseEntityPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["DataConnection"]);
+			Assert.True(pipeline1 is MySqlEntityPipeline);
+
+			var pipeline2 = BaseEntityPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["SqlServerDataConnection"]);
+			Assert.True(pipeline2 is SqlServerEntityPipeline);
+
+			var pipeline3 = BaseEntityPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["MongoDbDataConnection"]);
+			Assert.True(pipeline3 is MongoDbEntityPipeline);
 		}
 
 		[Fact]
@@ -210,15 +195,12 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Monitor = new LogMonitor();
 				var word = "可乐|雪碧";
-				Identity = Guid.NewGuid().ToString();
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),
 					new Dictionary<string, dynamic> {
 						{ "Keyword", word },
 						{ "guid", _guid }
 					});
-				AddPipeline(new MySqlEntityPipeline { DefaultPipelineModel = PipelineMode.Insert });
 				AddEntityType<BaiduSearchEntry>();
 			}
 

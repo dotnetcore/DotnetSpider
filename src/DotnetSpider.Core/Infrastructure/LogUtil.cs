@@ -41,26 +41,31 @@ namespace DotnetSpider.Core.Infrastructure
 			var type = Log.Logger.GetType();
 			if (type.FullName == "Serilog.Core.Pipeline.SilentLogger")
 			{
-				Log.Logger = new LoggerConfiguration()
+				var loggerConfiguration = new LoggerConfiguration()
 				.MinimumLevel.Verbose()
 				.WriteTo.Console(theme: Spider)
 				.WriteTo.RollingFile("dotnetspider.log")
-				.WriteTo.Http(Env.HubServiceLogUrl, Env.HubServiceToken, LogEventLevel.Verbose, 1)
-				.Enrich.WithProperty("Identity", Identity).Enrich.WithProperty("NodeId", Env.NodeId)
-				.CreateLogger();
+				.Enrich.WithProperty("Identity", Identity).Enrich.WithProperty("NodeId", Env.NodeId);
+				if (Env.HubService)
+				{
+					loggerConfiguration = loggerConfiguration.WriteTo.Http(Env.HubServiceLogUrl, Env.HubServiceToken, LogEventLevel.Verbose, 1);
+				}
+				Log.Logger = loggerConfiguration.CreateLogger();
 			}
 		}
 
 		public static ILogger Create(string identity)
 		{
-			var logger = new LoggerConfiguration()
+			var loggerConfiguration = new LoggerConfiguration()
 				.MinimumLevel.Verbose()
 				.WriteTo.Console(theme: Spider)
 				.WriteTo.RollingFile("dotnetspider.log")
-				.WriteTo.Http(Env.HubServiceLogUrl, Env.HubServiceToken,  LogEventLevel.Verbose, 1)
-				.Enrich.WithProperty("Identity", identity).Enrich.WithProperty("NodeId", Env.NodeId)
-				.CreateLogger();
-			return logger;
+				.Enrich.WithProperty("Identity", identity).Enrich.WithProperty("NodeId", Env.NodeId);
+			if (Env.HubService)
+			{
+				loggerConfiguration = loggerConfiguration.WriteTo.Http(Env.HubServiceLogUrl, Env.HubServiceToken, LogEventLevel.Verbose, 1);
+			}
+			return loggerConfiguration.CreateLogger();
 		}
 	}
 }

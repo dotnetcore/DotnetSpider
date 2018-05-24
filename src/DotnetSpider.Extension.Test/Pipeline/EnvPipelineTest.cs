@@ -5,92 +5,55 @@ using Xunit;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
-	public class TestSpider2 : Spider
-	{
-		public TestSpider2()
-		{
-			Name = "hello";
-		}
-	}
-
 	public class EnvPipelineTest
 	{
-		[Fact]
-		public void EnvSetNull()
+		private void PrepareGlobalFile(string name)
 		{
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:" };
-			var arguments1 = Startup.Parse(args1);
-			Startup.LoadConfiguration(arguments1.Config);
+			var path = Path.Combine(Env.GlobalDirectory, name);
+			if (File.Exists(path))
+			{
+				File.Delete(path);
+			}
+			File.Copy(name, path);
 		}
 
-		[Fact]
-		public void EnvSet()
+		[Fact(DisplayName = "EnvConfigSetEmpty")]
+		public void EnvConfigSetEmpty()
 		{
-			if (File.Exists(Env.DefaultGlobalAppConfigPath))
+			lock (Env.Version)
 			{
-				File.Delete(Env.DefaultGlobalAppConfigPath);
+				var arguments1 = Startup.Parse("-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:");
+				Startup.LoadConfiguration(arguments1.Config);
+
+				Assert.Equal("app.config", Env.EmailAccount);
 			}
-			File.Copy("app.global.config", Env.DefaultGlobalAppConfigPath);
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
-			var arguments1 = Startup.Parse(args1);
-			Startup.LoadConfiguration(arguments1.Config);
 		}
 
-		[Fact]
-		public void EnvSetGloablAppMissingPipeline()
-		{
-			if (File.Exists(Env.DefaultGlobalAppConfigPath))
-			{
-				File.Delete(Env.DefaultGlobalAppConfigPath);
-			}
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
-			var arguments1 = Startup.Parse(args1);
-			Startup.LoadConfiguration(arguments1.Config);
 
-			Env.Reload();
+		[Fact(DisplayName = "EnvSetGlobal1")]
+		public void EnvSetGlobal1()
+		{
+			lock (Env.Version)
+			{
+				PrepareGlobalFile("app.global.1.config");
+				var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%app.global.1.config" };
+				var arguments1 = Startup.Parse(args1);
+				Startup.LoadConfiguration(arguments1.Config);
+				Assert.Equal("app.global.1.config", Env.EmailAccount);
+			}
 		}
 
-		[Fact]
-		public void EnvSetPipeline()
+		[Fact(DisplayName = "EnvSetGlobal2")]
+		public void EnvSetGlobal2()
 		{
-			if (File.Exists(Env.DefaultGlobalAppConfigPath))
+			lock (Env.Version)
 			{
-				File.Delete(Env.DefaultGlobalAppConfigPath);
+				PrepareGlobalFile("app.config");
+				var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
+				var arguments1 = Startup.Parse(args1);
+				Startup.LoadConfiguration(arguments1.Config);
+				Assert.Equal("app.config", Env.EmailAccount);
 			}
-			File.Copy(Path.Combine(Env.BaseDirectory, "app.global.config"), Env.DefaultGlobalAppConfigPath);
-
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };
-
-			var arguments1 = Startup.Parse(args1);
-
-			Startup.LoadConfiguration(arguments1.Config);
-
-			MySqlEntityPipeline pipeline = new MySqlEntityPipeline();
-			var a = pipeline.ConnectionStringSettings;
-			Assert.Equal("Database='mysql';Data Source=192.168.90.101;User ID=user20170913;Password=KenTYDrZJOeUEvlP3NE&$pouzrk6gXD#;Port=53306;SslMode=None", a.ConnectionString);
-			Assert.Equal("127.0.0.101:6379,serviceName=DotnetSpider,keepAlive=8,allowAdmin=True,connectTimeout=10000,abortConnect=True,connectRetry=20", Env.RedisConnectString);
-
-			Env.Reload();
-		}
-
-		[Fact]
-		public void EnvUnSetPipeline()
-		{
-			if (File.Exists(Env.DefaultGlobalAppConfigPath))
-			{
-				File.Delete(Env.DefaultGlobalAppConfigPath);
-			}
-			File.Copy("app.global.config", Env.DefaultGlobalAppConfigPath);
-
-			var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:" };
-			var arguments1 = Startup.Parse(args1);
-			Startup.LoadConfiguration(arguments1.Config);
-
-			Env.Reload();
-
-			MySqlEntityPipeline pipeline = new MySqlEntityPipeline();
-			var a = pipeline.ConnectionStringSettings;
-			Assert.Equal("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;", a.ConnectionString);
 		}
 	}
 }

@@ -4,13 +4,16 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Infrastructure;
 using System.Configuration;
 using Serilog;
+using System.Data;
+using DotnetSpider.Core.Infrastructure.Database;
+using System.Data.Common;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	/// <summary>
 	/// 爬虫实体类对应的数据库的数据管道
 	/// </summary>
-	public abstract class BaseEntityDbPipeline : BaseEntityPipeline
+	public abstract class BaseEntityRdPipeline : BaseEntityPipeline
 	{
 		private ConnectionStringSettings _connectionStringSettings;
 		private readonly string _connectString;
@@ -51,7 +54,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 更新数据库连接字符串的接口, 如果自定义的连接字符串无法使用, 则会尝试通过更新连接字符串来重新连接
 		/// </summary>
-		public IConnectionStringSettingsRefresher UpdateConnectString { get; set; }
+		public IConnectionStringSettingsRefresher ConnectionStringSettingsRefresher { get; set; }
 
 		/// <summary>
 		/// ConnectionStringSettings对象, 用于DbFactory生产IDbConnection
@@ -89,7 +92,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// </summary>
 		/// <param name="connectString">数据库连接字符串</param>
 		/// <param name="pipelineMode">数据管道模式</param>
-		protected BaseEntityDbPipeline(string connectString = null, PipelineMode pipelineMode = PipelineMode.Insert)
+		protected BaseEntityRdPipeline(string connectString = null, PipelineMode pipelineMode = PipelineMode.Insert)
 		{
 			_connectString = connectString;
 			DefaultPipelineModel = pipelineMode;
@@ -101,35 +104,6 @@ namespace DotnetSpider.Extension.Pipeline
 		public override void Init()
 		{
 			base.Init();
-
-			if (ConnectionStringSettings == null)
-			{
-				if (UpdateConnectString == null)
-				{
-					throw new SpiderException("ConnectionStringSettings or IUpdateConnectString are unfound");
-				}
-				else
-				{
-					for (int i = 0; i < 5; ++i)
-					{
-						try
-						{
-							ConnectionStringSettings = UpdateConnectString.GetNew();
-							break;
-						}
-						catch
-						{
-							Log.Logger.Error("Update ConnectString failed.");
-							Thread.Sleep(1000);
-						}
-					}
-
-					if (ConnectionStringSettings == null)
-					{
-						throw new SpiderException("Can not update ConnectionStringSettings via IUpdateConnectString");
-					}
-				}
-			}
 
 			InitDatabaseAndTable();
 		}
@@ -173,36 +147,21 @@ namespace DotnetSpider.Extension.Pipeline
 			return null;
 		}
 
-		private void CheckDbSettings()
+		protected DbConnection CreateDbConnection()
 		{
-			if (ConnectionStringSettings == null)
+			DbConnection conn = ConnectionStringSettings.CreateDbConnection();
+			int i = 0;
+			while (conn == null && ConnectionStringSettingsRefresher != null && i <= 5)
 			{
-				if (UpdateConnectString == null)
+				Thread.Sleep(50);
+				lock (this)
 				{
-					throw new SpiderException("ConnectionStringSettings or IUpdateConnectString are unfound");
+					ConnectionStringSettings = ConnectionStringSettingsRefresher.GetNew();
 				}
-				else
-				{
-					for (int i = 0; i < 5; ++i)
-					{
-						try
-						{
-							ConnectionStringSettings = UpdateConnectString.GetNew();
-							break;
-						}
-						catch
-						{
-							Log.Logger.Error("Update ConnectString failed.");
-							Thread.Sleep(1000);
-						}
-					}
-
-					if (ConnectionStringSettings == null)
-					{
-						throw new SpiderException("Can not update ConnectionStringSettings via IUpdateConnectString");
-					}
-				}
+				conn = ConnectionStringSettings.CreateDbConnection();
+				++i;
 			}
+			return conn;
 		}
 	}
 }

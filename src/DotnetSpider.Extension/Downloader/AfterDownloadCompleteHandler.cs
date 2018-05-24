@@ -20,7 +20,7 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			if (pipeline == null)
 			{
-				_pipeline = BaseEntityPipeline.GetPipelineFromAppConfig() as BaseEntityDbPipeline;
+				_pipeline = BaseEntityPipeline.GetPipelineFromAppConfig() as BaseEntityRdPipeline;
 			}
 			else
 			{
