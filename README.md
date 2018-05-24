@@ -13,14 +13,13 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 ### DEVELOP ENVIROMENT
 - Visual Studio 2017(15.3 or later)
 - [.NET Core 2.0 or later](https://www.microsoft.com/net/download/windows)
-
-### OPTIONAL ENVIROMENT
-
 - Storage data to mysql. [Download MySql](https://dev.mysql.com/downloads/mysql/) 
 	
 		grant all on *.* to 'root'@'localhost' IDENTIFIED BY '' with grant option;
 	
 		flush privileges;
+
+### OPTIONAL ENVIROMENT
 
 - Run distributed crawler. [Download Redis for windows](https://github.com/MSOpenTech/redis/releases)
 - SqlServer.
@@ -109,12 +108,12 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 #### Run via Startup
 
-	Command: -s:[spider type name | TaskName attribute] -i:[identity] -a:[arg1,arg2...] -tid:[taskId] -n:[name] -c:[configuration file path]
+	Command: -s:[spider type name | TaskName attribute] -i:[identity] -a:[arg1,arg2...] --tid:[taskId] -n:[name] -c:[configuration file path or name]
 
 1. -s: Type name of spider or TaskNameAttribute for example: DotnetSpider.Sample.BaiduSearchSpiderl
 2. -i: Set identity.
 3. -a: Pass arguments to spider's Run method.
-4. -tid: Set task id.
+4. --tid: Set task id.
 5. -n: Set name.
 6. -c: Set config file path, for example you want to run with a customize config: -e:app.my.config
 
