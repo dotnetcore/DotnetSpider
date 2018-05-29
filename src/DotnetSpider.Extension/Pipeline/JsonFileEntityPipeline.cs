@@ -20,8 +20,8 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override int Process(string entityName, List<dynamic> datas)
-		{
+        public override int Process(string entityName, IList<dynamic> datas, ISpider spider)
+        {
 			lock (_locker)
 			{
 				var fileInfo = PrepareFile(Path.Combine(_dataFolder, $"{entityName}.data"));

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Xunit;
 
 namespace DotnetSpider.Core.Test.Pipeline
@@ -34,9 +35,9 @@ namespace DotnetSpider.Core.Test.Pipeline
 				{
 					File.Delete(file);
 				}
-			}
-			pipeline.Process(_resultItems);
-			string dataFile = Directory.GetFiles(folder)[0];
+			} 
+            pipeline.Process(new List<ResultItems>() { _resultItems }, spider);
+            string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
 			string expected = $"{{\"content\":\"爬虫工具\"}}{System.Environment.NewLine}";
 			Assert.Equal(expected, content);

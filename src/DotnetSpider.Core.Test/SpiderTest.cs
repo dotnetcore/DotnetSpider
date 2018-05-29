@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -124,7 +125,7 @@ namespace DotnetSpider.Core.Test
 
 		internal class TestPipeline : BasePipeline
 		{
-			public override void Process(params ResultItems[] resultItems)
+			public override void Process(IList<ResultItems> resultItems,ISpider spider)
 			{
 				foreach (var resultItem in resultItems)
 				{
@@ -218,7 +219,7 @@ namespace DotnetSpider.Core.Test
 
         internal class FastExitPipeline : BasePipeline
         {
-            public override void Process(params ResultItems[] resultItems)
+            public override void Process(IList<ResultItems> resultItems, ISpider spider)
             {
                 File.AppendAllLines("FastExit_Result.txt", new[] { resultItems[0].Request.Url.ToString() });
             }

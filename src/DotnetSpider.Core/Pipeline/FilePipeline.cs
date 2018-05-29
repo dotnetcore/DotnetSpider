@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using DotnetSpider.Core.Infrastructure;
@@ -12,7 +13,7 @@ namespace DotnetSpider.Core.Pipeline
 	/// <summary>
 	/// Store results in files.
 	/// </summary>
-	public sealed class FilePipeline : BasePipeline
+	public  class FilePipeline : BasePipeline
 	{
 		/// <summary>
 		/// create a FilePipeline with default path"/data/dotnetspider/"
@@ -32,7 +33,7 @@ namespace DotnetSpider.Core.Pipeline
 			return $"{BasePath}{Env.PathSeperator}{Spider.Identity}{Env.PathSeperator}";
 		}
 
-		public override void Process(params ResultItems[] resultItems)
+		public override void Process(IList<ResultItems> resultItems,ISpider spider)
 		{
 			try
 			{

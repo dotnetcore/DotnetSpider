@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using DotnetSpider.Extension.Model;
 using System.Collections.Concurrent;
 using NLog;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -42,8 +43,8 @@ namespace DotnetSpider.Extension.Pipeline
 			EntityAdapters.TryAdd(entityDefine.Name, entityAdapter);
 		}
 
-		public override int Process(string entityName, List<dynamic> datas)
-		{
+        public override int Process(string entityName, IList<dynamic> datas, ISpider spider)
+        {
 			if (datas == null || datas.Count == 0)
 			{
 				return 0;

@@ -88,7 +88,7 @@ namespace DotnetSpider.Extension.Pipeline
 			InitDatabaseAndTable();
 		}
 
-		public override int Process(string name, List<dynamic> datas)
+		public override int Process(string name, IList<dynamic> datas,ISpider spider)
 		{
 			if (datas == null || datas.Count == 0)
 			{

@@ -2,51 +2,91 @@
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Pipeline;
+using System;
+using System.Collections.Concurrent;
 
 namespace DotnetSpider.Extension.Pipeline
 {
-	public abstract class BaseEntityPipeline : BasePipeline, IEntityPipeline
-	{
-		public abstract int Process(string name, List<dynamic> datas);
+    /// <summary>
+    /// 爬虫实体类对应的数据管道
+    /// </summary>
+    public abstract class BaseEntityPipeline : BasePipeline, IEntityPipeline
+    {
+        /// <summary>
+        /// 数据管道使用的实体中间信息
+        /// </summary>
+        internal ConcurrentDictionary<string, EntityAdapter> EntityAdapters { get; set; } = new ConcurrentDictionary<string, EntityAdapter>();
 
-		public override void Process(params ResultItems[] resultItems)
-		{
-			if (resultItems == null || resultItems.Length == 0)
-			{
-				return;
-			}
+        /// <summary>
+        /// 处理爬虫实体解析器解析到的实体数据结果
+        /// </summary>
+        /// <param name="entityName">爬虫实体类的名称</param>
+        /// <param name="datas">实体类数据</param>
+        /// <param name="spider">爬虫</param>
+        /// <returns>最终影响结果数量(如数据库影响行数)</returns>
+        public abstract int Process(string entityName, IList<dynamic> datas, ISpider spider);
 
-			foreach (var resultItem in resultItems)
-			{
-				int count = 0;
-				int effectedRow = 0;
-				foreach (var result in resultItem.Results)
-				{
-					List<dynamic> list = new List<dynamic>();
-					dynamic data = resultItem.GetResultItem(result.Key);
+        /// <summary>
+        /// 处理页面解析器解析到的数据结果
+        /// </summary>
+        /// <param name="resultItems">数据结果</param>
+        /// <param name="spider">爬虫</param>
+        public override void Process(IList<ResultItems> resultItems, ISpider spider)
+        {
+            if (resultItems == null)
+            {
+                return;
+            }
 
-					if (data is ISpiderEntity)
-					{
-						list.Add(data);
-					}
-					else
-					{
-						list.AddRange(data);
-					}
-					if (list.Count > 0)
-					{
-						count += list.Count;
-						effectedRow += Process(result.Key, list);
-					}
-				}
-				resultItem.Request.CountOfResults = count;
-				resultItem.Request.EffectedRows = effectedRow;
-			}
-		}
+            foreach (var resultItem in resultItems)
+            {
+                int count = 0;
+                int effectedRow = 0;
+                foreach (var pair in resultItem.Results)
+                {
+                    List<dynamic> list = new List<dynamic>();
 
-		public abstract void AddEntity(IEntityDefine type);
+                    if (pair.Value is ISpiderEntity)
+                    {
+                        list.Add(pair.Value);
+                    }
+                    else
+                    {
+                        list.AddRange(pair.Value);
+                    }
+                    if (list.Count > 0)
+                    {
+                        count += list.Count;
+                        effectedRow += Process(pair.Key, list, spider);
+                    }
+                }
+                resultItem.Request.CountOfResults = count;
+                resultItem.Request.EffectedRows = effectedRow;
+            }
+        }
 
-		public static IPipeline GetPipelineFromAppConfig()
+        /// <summary>
+        /// 添加爬虫实体类的定义
+        /// </summary>
+        /// <param name="entityDefine">爬虫实体类的定义</param>
+        public virtual void AddEntity(IEntityDefine entityDefine)
+        {
+            if (entityDefine == null)
+            {
+                throw new ArgumentException("Should not add a null entity to a entity dabase pipeline.");
+            }
+
+            if (entityDefine.TableInfo == null)
+            {
+                Logger.Warn($"Schema is necessary, Skip {GetType().Name} for {entityDefine.Name}.");
+                return;
+            }
+
+            EntityAdapter entityAdapter = new EntityAdapter(entityDefine.TableInfo, entityDefine.Columns);
+            EntityAdapters.TryAdd(entityDefine.Name, entityAdapter);
+        }
+
+        public static IPipeline GetPipelineFromAppConfig()
 		{
 			if (Env.DataConnectionStringSettings == null)
 			{
@@ -85,7 +125,12 @@ namespace DotnetSpider.Extension.Pipeline
 						pipeline = new HttpEntityPipeline(Env.DataConnectionString);
 						break;
 					}
-				default:
+                case "HttpMySql":
+                    {
+                        pipeline = new HttpMySqlEntityPipeline(Env.DataConnectionString);
+                        break;
+                    }
+                default:
 					{
 						pipeline = new NullPipeline();
 						break;

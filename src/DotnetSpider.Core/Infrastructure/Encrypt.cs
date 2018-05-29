@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -32,5 +33,27 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			return Md5Encrypt32(myString).Substring(8, 16).ToLower();
 		}
-	}
+
+
+        public static string DESEncrypt(string key, string str)
+        {
+            DESCryptoServiceProvider cryptoProvider = new DESCryptoServiceProvider();
+            var bytes = Encoding.ASCII.GetBytes(key);
+            var des = DES.Create();
+            var encryptor = cryptoProvider.CreateEncryptor(Encoding.ASCII.GetBytes(key), Encoding.ASCII.GetBytes(key));
+
+            var ms = new MemoryStream();
+            CryptoStream cst = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
+            StreamWriter sw = new StreamWriter(cst);
+            sw.Write(str);
+            sw.Flush();
+            cst.FlushFinalBlock();
+            sw.Flush();
+
+            return Convert.ToBase64String(ms.GetBuffer(), 0, (int)ms.Length);
+        }
+
+
+
+    }
 }

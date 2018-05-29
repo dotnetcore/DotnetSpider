@@ -46,7 +46,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			// Value is null
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 },spider);
 
 			var cluster = CassandraUtils.CreateCluster(connectString);
 
@@ -93,7 +93,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			// Value is null
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 },spider);
 
 			var cluster = CassandraUtils.CreateCluster(connectString);
 
@@ -113,9 +113,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			insertPipeline.DefaultPipelineModel = PipelineMode.InsertAndIgnoreDuplicate;
 			var sku = results.First().Sku;
 			var data4 = new ProductInsert { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data4 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data4 }, spider);
 
-			rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+            rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 			results = new List<ProductInsert>();
 			foreach (var row in rows)
 			{
@@ -155,9 +155,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			// Value is null
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
-			var cluster = CassandraUtils.CreateCluster(connectString);
+            var cluster = CassandraUtils.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");
@@ -179,9 +179,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			updatePipeline.AddEntity(metadata2);
 			updatePipeline.InitPipeline(spider);
 			var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
+			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 }, spider);
 
-			rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+            rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 			results = new List<ProductInsert>();
 			foreach (var row in rows)
 			{
@@ -223,9 +223,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
 			// Value is null
-			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 });
+			insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
 
-			var cluster = CassandraUtils.CreateCluster(connectString);
+            var cluster = CassandraUtils.CreateCluster(connectString);
 
 			var session = cluster.Connect();
 			session.ChangeKeyspace("test");
@@ -247,9 +247,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			updatePipeline.AddEntity(metadata2);
 			updatePipeline.InitPipeline(spider);
 			var data4 = new ProductUpdate { Id = results.First().Id, Sku = "113", Category = "asdfasf", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 });
+			updatePipeline.Process(metadata2.Name, new List<dynamic> { data4 }, spider);
 
-			rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
+            rows = session.Execute($"SELECT * FROM test.sku_cassandra_{DateTime.Now.ToString("yyyy_MM_dd")}").GetRows().ToList();
 			results = new List<ProductInsert>();
 			foreach (var row in rows)
 			{

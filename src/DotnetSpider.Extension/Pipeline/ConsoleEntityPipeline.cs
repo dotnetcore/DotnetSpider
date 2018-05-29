@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -14,8 +15,8 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 		}
 
-		public override int Process(string entityName, List<dynamic> datas)
-		{
+        public override int Process(string entityName, IList<dynamic> datas, ISpider spider)
+        {
 			foreach (var data in datas)
 			{
 				Console.WriteLine($"{entityName}: {data}");

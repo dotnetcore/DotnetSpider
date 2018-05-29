@@ -10,6 +10,9 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		MySql,
 		[Description("System.Data.SqlClient")]
 		SqlServer,
-		MongoDb
-	}
+		MongoDb,
+        Cassandra,
+        PostgreSql
+
+    }
 }

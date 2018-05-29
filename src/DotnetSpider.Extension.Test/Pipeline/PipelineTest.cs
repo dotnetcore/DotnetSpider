@@ -70,8 +70,8 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			class MyPipeline : BasePipeline
 			{
-				public override void Process(params ResultItems[] resultItems)
-				{
+                public override void Process(IList<ResultItems> resultItems, ISpider spider)
+                {
 				}
 			}
 

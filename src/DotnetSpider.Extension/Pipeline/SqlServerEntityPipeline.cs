@@ -258,8 +258,8 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		public override int Process(string entityName, List<dynamic> datas)
-		{
+        public override int Process(string entityName, IList<dynamic> datas, ISpider spider)
+        {
 			if (datas == null || datas.Count == 0)
 			{
 				return 0;

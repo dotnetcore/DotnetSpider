@@ -11,14 +11,21 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public static class HttpSender
 	{
-		public static readonly HttpClient Client = new HttpClient();
+	
+        public static readonly HttpClient Client = new HttpClient(new HttpClientHandler
+        {
+            AllowAutoRedirect = true,
+            AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+            UseProxy = true,
+            UseCookies = false
+        });
 
-		/// <summary>  
-		/// 根据相传入的数据，得到相应页面数据  
-		/// </summary>  
-		/// <param name="item">参数类对象</param>  
-		/// <returns>返回HttpResult类型</returns>  
-		public static HttpResult Request(HttpRequest item)
+        /// <summary>  
+        /// 根据相传入的数据，得到相应页面数据  
+        /// </summary>  
+        /// <param name="item">参数类对象</param>  
+        /// <returns>返回HttpResult类型</returns>  
+        public static HttpResult Request(HttpRequest item)
 		{
 			HttpResult result = new HttpResult();
 			HttpWebRequest request;
@@ -164,10 +171,10 @@ namespace DotnetSpider.Core.Infrastructure
 					ms2 = ms;
 				}
 
-				byte[] bytes = ms2.StreamToBytes();
+				byte[] bytes = ms2.StreamToBytes();	 
 
 #if NET_CORE
-				ms2.Dispose();
+                ms2.Dispose();
 #else
 				ms2.Close();
 #endif

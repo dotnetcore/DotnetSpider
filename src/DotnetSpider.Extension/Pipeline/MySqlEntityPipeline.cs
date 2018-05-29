@@ -71,8 +71,8 @@ namespace DotnetSpider.Extension.Pipeline
 			return connectionStringSettings;
 		}
 
-		public override int Process(string entityName, List<dynamic> datas)
-		{
+        public override int Process(string entityName, IList<dynamic> datas, ISpider spider)
+        {
 			if (datas == null || datas.Count == 0)
 			{
 				return 0;
@@ -148,7 +148,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private string GenerateInsertSql(EntityAdapter adapter, bool ignoreDuplicate)
+        protected string GenerateInsertSql(EntityAdapter adapter, bool ignoreDuplicate)
 		{
 			var colNames = adapter.Columns.Where(p => !Env.IdColumns.Contains(p.Name) && p.Name != Env.CDateColumn).Select(p => p.Name).ToList();
 			string cols = string.Join(", ", colNames.Select(p => $"`{p}`"));
@@ -160,7 +160,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		private string GenerateInsertNewAndUpdateOldSql(EntityAdapter adapter)
+        protected string GenerateInsertNewAndUpdateOldSql(EntityAdapter adapter)
 		{
 			var colNames = adapter.Columns.Where(p => !Env.IdColumns.Contains(p.Name) && p.Name != Env.CDateColumn).Select(p => p.Name).ToList();
 			string setParams = string.Join(", ", colNames.Select(p => $"`{p}`=@{p}"));
@@ -174,7 +174,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		private string GenerateUpdateSql(EntityAdapter adapter)
+        protected string GenerateUpdateSql(EntityAdapter adapter)
 		{
 			string setParamenters = string.Join(", ", adapter.Table.UpdateColumns.Select(p => $"`{p}`=@{p}"));
 			var tableName = adapter.Table.CalculateTableName();
@@ -189,7 +189,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		private string GenerateSelectSql(EntityAdapter adapter)
+        protected string GenerateSelectSql(EntityAdapter adapter)
 		{
 			StringBuilder primaryParamenters = new StringBuilder();
 
@@ -204,7 +204,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sqlBuilder.ToString();
 		}
 
-		private string GenerateCreateTableSql(EntityAdapter adapter)
+        protected string GenerateCreateTableSql(EntityAdapter adapter)
 		{
 			var tableName = adapter.Table.CalculateTableName();
 			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{adapter.Table.Database }`.`{tableName}` (");
@@ -237,7 +237,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		private string GenerateColumn(Column p)
+        protected string GenerateColumn(Column p)
 		{
 			if (p.DataType.FullName == DataTypeNames.DateTime)
 			{
@@ -253,12 +253,12 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private string GenerateCreateDatabaseSql(EntityAdapter adapter)
+        protected string GenerateCreateDatabaseSql(EntityAdapter adapter)
 		{
 			return $"CREATE SCHEMA IF NOT EXISTS `{adapter.Table.Database}` DEFAULT CHARACTER SET utf8mb4;";
 		}
 
-		private string GenerateIfDatabaseExistsSql(EntityAdapter adapter)
+		protected string GenerateIfDatabaseExistsSql(EntityAdapter adapter)
 		{
 			return $"SELECT COUNT(*) FROM information_schema.SCHEMATA where SCHEMA_NAME='{adapter.Table.Database}';";
 		}

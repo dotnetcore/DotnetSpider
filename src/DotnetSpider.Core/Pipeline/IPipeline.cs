@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -17,6 +18,6 @@ namespace DotnetSpider.Core.Pipeline
 		/// Process extracted results.
 		/// </summary>
 		/// <param name="resultItems"></param>
-		void Process(params ResultItems[] resultItems);
+		void Process(IList<ResultItems> resultItems,ISpider spider);
 	}
 }

@@ -8,6 +8,7 @@ using DotnetSpider.Core.Infrastructure;
 using NLog;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Redial;
+using DotnetSpider.Core;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -36,8 +37,8 @@ namespace DotnetSpider.Extension.Pipeline
 			_collections.TryAdd(metadata.Name, db.GetCollection<BsonDocument>(metadata.TableInfo.CalculateTableName()));
 		}
 
-		public override int Process(string entityName, List<dynamic> datas)
-		{
+        public override int Process(string entityName, IList<dynamic> datas, ISpider spider)
+        {
 			if (_collections.TryGetValue(entityName, out var collection))
 			{
 				var action = new Action(() =>
@@ -60,7 +61,7 @@ namespace DotnetSpider.Extension.Pipeline
 					action();
 				}
 			}
-			return datas.Count;
+            return datas.Count ;
 		}
 	}
 }

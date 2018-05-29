@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -66,8 +67,8 @@ namespace DotnetSpider.Extension.Test
 
 		internal class TestPipeline : BasePipeline
 		{
-			public override void Process(params ResultItems[] resultItems)
-			{
+            public override void Process(IList<ResultItems> resultItems, ISpider spider)
+            {
 				foreach (var resultItem in resultItems)
 				{
 					foreach (var entry in resultItem.Results)

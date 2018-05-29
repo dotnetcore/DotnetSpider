@@ -909,7 +909,7 @@ namespace DotnetSpider.Core
             {
                 if (containsData)
                 {
-                    pipeline.Process(_cached.ToArray());
+                    pipeline.Process(_cached,this);
                 }
                 SafeDestroy(pipeline);
             }
@@ -1083,13 +1083,15 @@ namespace DotnetSpider.Core
 
                 if (CachedSize == 1)
                 {
+
+                    _cached.Add(page.ResultItems);
                     foreach (IPipeline pipeline in Pipelines)
                     {
                         try
                         {
                             _pipelineRetryPolicy.Execute(() =>
                             {
-                                pipeline.Process(page.ResultItems);
+                                pipeline.Process(_cached, this);
                             });
                         }
                         catch (Exception e)
@@ -1097,6 +1099,8 @@ namespace DotnetSpider.Core
                             Logger.AllLog(Identity, $"Execute pipeline failed: {e}", LogLevel.Error);
                         }
                     }
+
+                    _cached.Clear();
                 }
                 else
                 {
@@ -1105,13 +1109,12 @@ namespace DotnetSpider.Core
                         _cached.Add(page.ResultItems);
 
                         if (_cached.Count >= CachedSize)
-                        {
-                            var items = _cached.ToArray();
-                            _cached.Clear();
+                        { 
                             foreach (IPipeline pipeline in Pipelines)
                             {
-                                pipeline.Process(items);
+                                pipeline.Process(_cached, this);
                             }
+                            _cached.Clear();
                         }
                     }
                 }

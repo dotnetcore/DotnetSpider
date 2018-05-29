@@ -58,7 +58,7 @@ namespace DotnetSpider.Sample
 
             }
 
-            public override void Process(params ResultItems[] resultItems)
+            public override void Process(IList<ResultItems> resultItems, ISpider spider)
             {
 
                 var blogs = new List<BlogSumary>();

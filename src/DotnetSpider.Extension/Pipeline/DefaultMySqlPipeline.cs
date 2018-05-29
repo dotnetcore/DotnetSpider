@@ -36,7 +36,7 @@ namespace DotnetSpider.Extension.Pipeline
 	        base.InitPipeline(spider);
 	    }
 
-	    public override void Process(params ResultItems[] resultItems)
+	    public override void Process(IList<ResultItems> resultItems,ISpider spider)
 		{
 			var results = new List<DefaulHtmlContent>();
 			foreach (var resultItem in resultItems)

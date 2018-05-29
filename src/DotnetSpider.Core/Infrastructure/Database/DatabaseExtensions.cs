@@ -84,8 +84,8 @@ namespace DotnetSpider.Core.Infrastructure.Database
                 }
                 throw new SpiderException("Can't get db connection.");
             }  );
-
-
+              
+              
             return null;
 
         }
