@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit;
 using DotnetSpider.Extension.Pipeline;
-#if !NET45
+#if NETSTANDARD
 using System.Runtime.InteropServices;
 #endif
 
@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 		[Fact]
 		public void DestoryDownloader()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 		[Fact]
 		public void ChromeHeadlessDownloader()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;

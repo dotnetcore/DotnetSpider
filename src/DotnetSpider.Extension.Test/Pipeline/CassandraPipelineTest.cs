@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-#if !NET45
+#if NETSTANDARD
 using System.Runtime.InteropServices;
 #endif
 
@@ -30,7 +30,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(Skip = "aaa")]
 		public void Insert()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
@@ -79,7 +79,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(Skip = "aaa")]
 		public void InsertAndIgnoreDuplicate()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
@@ -143,7 +143,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(Skip = "aaa")]
 		public void Update()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
@@ -211,7 +211,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(Skip = "aaa")]
 		public void UpdatePipelineUseAppConfig()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;

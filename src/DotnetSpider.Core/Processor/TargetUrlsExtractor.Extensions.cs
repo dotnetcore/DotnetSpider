@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-#if !NET45
+#if NETSTANDARD
 using System.Net;
 #endif
 
@@ -79,7 +79,7 @@ namespace DotnetSpider.Core.Processor
 				foreach (string link in links)
 				{
 					var newUrl = FormateUrl(link);
-#if NET45
+#if !NETSTANDARD
 					tmp.Add(System.Web.HttpUtility.HtmlDecode(System.Web.HttpUtility.UrlDecode(newUrl)));
 #else
 					tmp.Add(WebUtility.HtmlDecode(WebUtility.UrlDecode(newUrl)));

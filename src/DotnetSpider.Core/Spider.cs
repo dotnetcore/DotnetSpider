@@ -18,6 +18,7 @@ using System.Reflection;
 using Polly;
 using Polly.Retry;
 using System.IO.MemoryMappedFiles;
+using System.Text;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
 [assembly: InternalsVisibleTo("DotnetSpider.Sample")]
@@ -391,7 +392,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		protected Spider()
 		{
-#if NETStandard
+#if NETSTANDARD
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
 			ThreadPool.SetMinThreads(200, 200);
@@ -946,7 +947,7 @@ namespace DotnetSpider.Core
 
 			Logger.Information("Build internal component...");
 
-#if !NET_CORE // 开启多线程支持
+#if !NETSTANDARD // 开启多线程支持
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
 
@@ -1543,10 +1544,6 @@ namespace DotnetSpider.Core
 		private void CheckExitSignal()
 		{
 			// MMF 暂时还不支持非WINDOWS操作系统
-
-#if NET20
-			CheckExitSignalByFile();
-#else
 			if (Env.IsWindows)
 			{
 				CheckExitSignalByMMF();
@@ -1555,10 +1552,8 @@ namespace DotnetSpider.Core
 			{
 				CheckExitSignalByFile();
 			}
-#endif
 		}
 
-#if !NET20
 		private void CheckExitSignalByMMF()
 		{
 			using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
@@ -1582,7 +1577,6 @@ namespace DotnetSpider.Core
 				}
 			}
 		}
-#endif
 
 		private void CheckExitSignalByFile()
 		{

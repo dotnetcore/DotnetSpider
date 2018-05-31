@@ -14,7 +14,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using Xunit;
-#if !NET45
+#if NETSTANDARD
 using System.Runtime.InteropServices;
 #endif
 
@@ -520,7 +520,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void SqlServerDataTypeTests()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;

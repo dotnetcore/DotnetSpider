@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-#if !NET45
+#if NETSTANDARD
 using System.Reflection;
 #endif
 
@@ -49,7 +49,7 @@ namespace DotnetSpider.Core.Selector
 
 			var type = (Type)text.GetType();
 			string tmp = "";
-#if !NET45
+#if NETSTANDARD
 			if (typeof(ICollection).GetTypeInfo().IsAssignableFrom(type))
 #else
 			if (typeof(ICollection).IsAssignableFrom(type))

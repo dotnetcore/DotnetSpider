@@ -1,7 +1,7 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using System.IO;
 using System.Threading;
-#if !NET45
+#if NETSTANDARD
 using System.Linq;
 using System.Diagnostics;
 using System.Runtime.InteropServices;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-#if NET45
+#if !NETSTANDARD
 using System.Web;
 #endif
 using System.Text;
@@ -213,7 +213,7 @@ namespace DotnetSpider.Core.Downloader
 
 			if (_decodeHtml)
 			{
-#if NET45
+#if !NETSTANDARD
 				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
 #else
 				content = System.Net.WebUtility.UrlDecode(System.Net.WebUtility.HtmlDecode(content));
@@ -261,21 +261,21 @@ namespace DotnetSpider.Core.Downloader
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(request.Method ?? HttpMethod.Get, request.Url);
 
 			var userAgentHeader = "User-Agent";
-			httpRequestMessage.Headers.Add(userAgentHeader, site.Headers.ContainsKey(userAgentHeader) ? site.Headers[userAgentHeader] : site.UserAgent);
+			httpRequestMessage.Headers.TryAddWithoutValidation(userAgentHeader, site.Headers.ContainsKey(userAgentHeader) ? site.Headers[userAgentHeader] : site.UserAgent);
 
 			if (!string.IsNullOrWhiteSpace(request.Referer))
 			{
-				httpRequestMessage.Headers.Add("Referer", request.Referer);
+				httpRequestMessage.Headers.TryAddWithoutValidation("Referer", request.Referer);
 			}
 
 			if (!string.IsNullOrWhiteSpace(request.Origin))
 			{
-				httpRequestMessage.Headers.Add("Origin", request.Origin);
+				httpRequestMessage.Headers.TryAddWithoutValidation("Origin", request.Origin);
 			}
 
 			if (!string.IsNullOrWhiteSpace(site.Accept))
 			{
-				httpRequestMessage.Headers.Add("Accept", site.Accept);
+				httpRequestMessage.Headers.TryAddWithoutValidation("Accept", site.Accept);
 			}
 
 			var contentTypeHeader = "Content-Type";

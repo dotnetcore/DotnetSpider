@@ -9,7 +9,7 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Pipeline;
 using Xunit;
 using Dapper;
-#if !NET45
+#if NETSTANDARD
 using System.Runtime.InteropServices;
 #endif
 
@@ -37,7 +37,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void Update()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
@@ -81,7 +81,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void Insert()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;
@@ -118,7 +118,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void DefineUpdateEntity()
 		{
-#if !NET45
+#if NETSTANDARD
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				return;

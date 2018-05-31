@@ -1,6 +1,6 @@
 ﻿using DotnetSpider.Core;
 using System;
-#if !NETCOREAPP2_0
+#if !NETCOREAPP
 using System.Threading;
 #else
 using System.Text;
@@ -12,7 +12,7 @@ namespace DotnetSpider.Sample
 	{
 		public static void Main(string[] args)
 		{
-#if NETCOREAPP2_0
+#if NETCOREAPP
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
 			ThreadPool.SetMinThreads(200, 200);

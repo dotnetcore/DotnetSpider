@@ -1,4 +1,4 @@
-﻿#if !NET45
+﻿#if NETSTANDARD
 using System.Runtime.InteropServices;
 #endif
 using System;
@@ -201,7 +201,7 @@ namespace DotnetSpider.Core
 
 		static Env()
 		{
-#if NET45
+#if !NETSTANDARD
 			IsWindows = true;
 #else
 			IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -219,7 +219,7 @@ namespace DotnetSpider.Core
 			if (string.IsNullOrWhiteSpace(path))
 			{
 				// 默认的App.config会编译成 {程序集名称}.exe.config 或者 {程序集名称}.dll.config
-#if NET45
+#if !NETSTANDARD
 				path = Path.Combine(BaseDirectory, $"{AppDomain.CurrentDomain.FriendlyName}.config");
 #else
 				path = Path.Combine(BaseDirectory, $"{AppDomain.CurrentDomain.FriendlyName}.dll.config");
@@ -278,7 +278,7 @@ namespace DotnetSpider.Core
 		{
 			BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-#if NET45
+#if !NETSTANDARD
 			PathSeperator = "\\";
 #else
 			PathSeperator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/";

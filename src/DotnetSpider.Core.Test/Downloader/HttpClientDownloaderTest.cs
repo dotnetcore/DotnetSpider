@@ -5,7 +5,7 @@ using DotnetSpider.Core.Scheduler;
 using static DotnetSpider.Core.Test.SpiderTest;
 using DotnetSpider.Core.Pipeline;
 using System.Threading.Tasks;
-#if !NET45
+#if NETSTANDARD
 using System.Text;
 #endif
 
@@ -15,7 +15,7 @@ namespace DotnetSpider.Core.Test.Downloader
 	{
 		public HttpClientDownloaderTest()
 		{
-#if !NET45
+#if NETSTANDARD
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 

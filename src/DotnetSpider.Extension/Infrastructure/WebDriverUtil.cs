@@ -6,7 +6,7 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.PhantomJS;
 using System;
 using System.IO;
-#if NET45
+#if !NETSTANDARD
 using System.Drawing;
 #endif
 

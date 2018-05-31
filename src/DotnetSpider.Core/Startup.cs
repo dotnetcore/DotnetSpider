@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using DotnetSpider.Core.Infrastructure;
 using CommandLine;
-#if !NET45
+#if NETSTANDARD
 using Microsoft.Extensions.DependencyModel;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -286,7 +286,7 @@ namespace DotnetSpider.Core
 
 		private static void SetEncoding()
 		{
-#if !NET45
+#if NETSTANDARD
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 		}

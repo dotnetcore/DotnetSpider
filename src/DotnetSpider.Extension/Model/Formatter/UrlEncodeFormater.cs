@@ -1,6 +1,6 @@
 ﻿using System;
 using DotnetSpider.Core;
-#if NET45
+#if !NETSTANDARD
 using System.Web;
 #else
 using System.Net;
@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		protected override object FormateValue(object value)
 		{
 			string tmp = value.ToString();
-#if NET45
+#if !NETSTANDARD
 			return HttpUtility.UrlEncode(tmp, System.Text.Encoding.GetEncoding(Encoding));
 #else
 			return WebUtility.UrlEncode(tmp);

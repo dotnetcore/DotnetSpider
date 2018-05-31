@@ -119,7 +119,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public Site()
 		{
-#if !NET45
+#if NETSTANDARD
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 		}
