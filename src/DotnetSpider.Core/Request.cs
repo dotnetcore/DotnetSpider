@@ -27,7 +27,7 @@ namespace DotnetSpider.Core
 		public int CycleTriedTimes { get; set; }
 
 		public int NextDepth => Depth + 1;
-
+        // 请求是否有效
 		public bool IsAvailable { get; } = true;
 
 		public string Referer { get; set; }
@@ -82,7 +82,7 @@ namespace DotnetSpider.Core
 				IsAvailable = false;
 				return;
 			}
-
+            //排除http协议
 			if (Url.Scheme != "http" && Url.Scheme != "https")
 			{
 				IsAvailable = false;

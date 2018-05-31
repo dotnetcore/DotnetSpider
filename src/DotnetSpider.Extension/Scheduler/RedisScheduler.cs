@@ -35,10 +35,14 @@ namespace DotnetSpider.Extension.Scheduler
 
 
         private string ConnectString { get; }
-
-		public int BatchCount { get; set; } = 1000;
-
-		protected override bool UseInternet { get; set; } = true;
+        /// <summary>
+        /// 批量加载时的每批次加载数
+        /// </summary>
+        public int BatchCount { get; set; } = 1000;
+        /// <summary>
+        /// RedisScheduler是否会使用互联网
+        /// </summary>
+        protected override bool UseInternet { get; set; } = true;
 
 		private RedisConnection RedisConnection { get; set; }
 
@@ -179,36 +183,12 @@ namespace DotnetSpider.Extension.Scheduler
         public override long ErrorRequestsCount => _errorCounter.Value;
 
         public override void IncreaseSuccessCount()
-		{
-			//if (UseInternet)
-			//{
-			//	NetworkCenter.Current.Execute("rds-inc-success", () =>
-			//	{
-			//		RedisConnection.Database.HashIncrement(_successCountKey, _identityMd5);
-			//	});
-			//}
-			//else
-			//{
-			//	RedisConnection.Database.HashIncrement(_successCountKey, _identityMd5);
-			//}
-
-
+		{ 
             _successCounter.Inc();
 		}
 
 		public override void IncreaseErrorCount()
-		{
-			//if (UseInternet)
-			//{
-			//	NetworkCenter.Current.Execute("rds-inc-error", () =>
-			//	{
-			//		RedisConnection.Database.HashIncrement(_errorCountKey, _identityMd5);
-			//	});
-			//}
-			//else
-			//{
-			//	RedisConnection.Database.HashIncrement(_errorCountKey, _identityMd5);
-			//}
+		{ 
             _errorCounter.Inc();
 
         }

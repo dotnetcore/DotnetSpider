@@ -40,10 +40,10 @@ namespace DotnetSpider.Sample
 
             ////ConfigurableSpider.Run();
 
-            //// Custmize processor and pipeline 完全自定义页面解析和数据管道
-            //BaseUsage.CustmizeProcessorAndPipeline();
-            //Console.WriteLine("Press any key to continue...");
-            //Console.Read();
+            // Custmize processor and pipeline 完全自定义页面解析和数据管道
+            BaseUsage.CustmizeProcessorAndPipeline();
+            Console.WriteLine("Press any key to continue...");
+            Console.Read();
 
             //// Crawler pages without traverse 采集指定页面不做遍历
             //BaseUsage.CrawlerPagesWithoutTraverse();

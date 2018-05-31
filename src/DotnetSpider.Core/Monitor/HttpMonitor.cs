@@ -24,7 +24,12 @@ namespace DotnetSpider.Core.Monitor
 		{
 			base.Report(status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 
-			var json = JsonConvert.SerializeObject(new SpiderStatus
+            if (!Env.HubService)
+            {
+                return;
+            }
+
+            var json = JsonConvert.SerializeObject(new SpiderStatus
 			{
 				TaskId = _taskId,
 				AvgDownloadSpeed = avgDownloadSpeed,
@@ -43,7 +48,7 @@ namespace DotnetSpider.Core.Monitor
 
 			NetworkCenter.Current.Execute("status", () =>
 			{
-				HttpSender.Client.PostAsync(Env.HttpStatusUrl, content).Wait();
+				HttpSender.Client.PostAsync(Env.HubServiceStatusApiUrl, content).Wait();
 			});
 		}
 	}

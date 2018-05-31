@@ -2,6 +2,10 @@
 
 namespace DotnetSpider.Core.Infrastructure
 {
+    /// <summary>
+    /// 长整形进行原子操作
+    /// 计数同步
+    /// </summary>
 	public class AutomicLong
 	{
 		///

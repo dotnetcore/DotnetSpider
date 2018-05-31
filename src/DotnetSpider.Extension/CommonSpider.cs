@@ -35,7 +35,7 @@ namespace DotnetSpider.Extension
             Name = name;
         }
 
-        protected override void RunApp(params string[] arguments)
+        protected override void Execute(params string[] arguments)
         {
             PrintInfo.Print();
 
@@ -64,7 +64,7 @@ namespace DotnetSpider.Extension
 
             RegisterControl(this);
 
-            base.RunApp(arguments);
+            base.Execute(arguments);
 
             if (IsComplete && DataVerificationAndReport != null)
             {

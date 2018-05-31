@@ -5,7 +5,7 @@ using System.Linq;
 namespace DotnetSpider.Core.Scheduler
 {
 	/// <summary>
-	/// Basic Scheduler implementation. 
+	/// 去重调度
 	/// </summary>
 	public sealed class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler
 	{

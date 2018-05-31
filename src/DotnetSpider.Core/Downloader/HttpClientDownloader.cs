@@ -14,12 +14,21 @@ using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Core.Downloader
 {
-	/// <summary>
-	/// The http downloader based on HttpClient.
-	/// </summary>
-	public class HttpClientDownloader : BaseDownloader
+    /// <summary>
+    /// Downloader using <see cref="HttpClient"/>
+    /// </summary>
+    /// <summary xml:lang="zh-CN">
+    /// 纯HTTP下载器
+    /// </summary>
+    public class HttpClientDownloader : BaseDownloader
 	{
-		private static HashSet<string> MediaTypes = new HashSet<string>
+        /// <summary>
+        /// What mediatype should not be treated as file to download.
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
+        /// 定义哪些类型的内容不需要当成文件下载
+        /// </summary>
+        private static HashSet<string> MediaTypes = new HashSet<string>
 		{
 			"text/html",
 			"text/plain",
@@ -38,7 +47,7 @@ namespace DotnetSpider.Core.Downloader
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
 		private readonly HttpClient _httpClient;
 
-		public bool DecodeHtml { get; set; }
+		private bool _decodeHtml { get; set; }
 
 		public HttpClientDownloader()
 		{
@@ -51,29 +60,55 @@ namespace DotnetSpider.Core.Downloader
 			});
 		}
 
-		public HttpClientDownloader(int timeout) : this()
+		public HttpClientDownloader(int timeout=8) : this()
 		{
 			_httpClient.Timeout = new TimeSpan(0, 0, timeout);
 		}
 
-		public static void AddMediaTypes(string type)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
+        /// 构造方法
+        /// </summary>
+        /// <param name="timeout">下载超时时间 Download timeout.</param>
+        /// <param name="decodeHtml">下载的内容是否需要HTML解码 Whether <see cref="Page.Content"/> need to Html Decode.</param>
+        public HttpClientDownloader(int timeout = 8, bool decodeHtml = false) : this()
+        {
+            _httpClient.Timeout = new TimeSpan(0, 0, timeout);
+            _decodeHtml = decodeHtml;
+        }
+
+
+        public static void AddMediaTypes(string type)
 		{
 			MediaTypes.Add(type);
 		}
-
-		protected override Page DowloadContent(Request request, ISpider spider)
+        /// <summary>
+        /// Http download implemention
+        /// </summary>
+        /// <summary xml:lang="zh-CN">
+        /// HTTP下载的实现
+        /// </summary>
+        /// <param name="request">请求信息 <see cref="Request"/></param>
+        /// <param name="spider">爬虫 <see cref="ISpider"/></param>
+        /// <returns>页面数据 <see cref="Page"/></retur
+        protected override Page DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
 
 			HttpResponseMessage response = null;
-			var proxy = site.GetHttpProxy();
+                   
+            var proxy = site.GetHttpProxy();
 			request.Proxy = proxy;
 
 			try
 			{
 				var httpMessage = GenerateHttpRequestMessage(request, site);
 
-				HttpClient httpClient = null == spider.Site.HttpProxyPool ? _httpClient : _httpClientPool.GetHttpClient(proxy);
+
+                HttpClient httpClient = null == spider.Site.HttpProxyPool ? _httpClient : _httpClientPool.GetHttpClient(proxy);
+            
 
 				response = NetworkCenter.Current.Execute("http", () => httpClient.SendAsync(httpMessage).Result);
 
@@ -264,7 +299,7 @@ namespace DotnetSpider.Core.Downloader
 		{
 			string content = ReadContent(site, response);
 
-			if (DecodeHtml)
+			if (_decodeHtml)
 			{
 #if !NET_CORE
 				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
@@ -306,7 +341,7 @@ namespace DotnetSpider.Core.Downloader
 		{
 			for (int i = 0; i < bytes.Length; i++)
 			{
-				if (bytes[i] == 0x00)
+				if (bytes[i] == 0x00) 
 				{
 					bytes[i] = 32;
 				}

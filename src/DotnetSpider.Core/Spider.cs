@@ -582,7 +582,7 @@ namespace DotnetSpider.Core
         /// Run spider.
         /// </summary>
         /// <param name="arguments"></param>
-        protected override void RunApp(params string[] arguments)
+        protected override void Execute(params string[] arguments)
         {
             if (Stat == Status.Running)
             {
@@ -1349,7 +1349,7 @@ namespace DotnetSpider.Core
         {
             if (Monitor == null)
             {
-                Monitor = string.IsNullOrEmpty(Env.HttpCenter) ? new NLogMonitor(TaskId, Identity) : new HttpMonitor(TaskId, Identity);
+                Monitor = string.IsNullOrEmpty(Env.HubServiceUrl) ? new NLogMonitor(TaskId, Identity) : new HttpMonitor(TaskId, Identity);
             }
         }
 

@@ -24,7 +24,7 @@ namespace DotnetSpider.Extension.Pipeline
         {
             if (string.IsNullOrEmpty(api) || string.IsNullOrWhiteSpace(api))
             {
-                _api = Env.HttpPipelineUrl;
+                _api = Env.HubServicePipelineUrl;
             }
             else
             {
@@ -138,7 +138,8 @@ namespace DotnetSpider.Extension.Pipeline
             var encodingBytes = Encoding.UTF8.GetBytes(json);           
             var bytes = LZ4MessagePackSerializer.ToLZ4Binary(new ArraySegment<byte>(encodingBytes));
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _api);
-            httpRequestMessage.Headers.Add("DotnetSpiderToken", Env.HttpCenterToken);
+            //httpRequestMessage.Headers.Add("DotnetSpiderToken", Env.HttpCenterToken);
+            httpRequestMessage.Headers.Add("DotnetSpiderToken", Env.HubServiceToken);
             httpRequestMessage.Content = new ByteArrayContent(bytes);
             var response = HttpSender.Client.SendAsync(httpRequestMessage).Result;
             response.EnsureSuccessStatusCode();

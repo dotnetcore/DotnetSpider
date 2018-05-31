@@ -106,11 +106,11 @@ namespace DotnetSpider.Core.Infrastructure
 
 		private static void HttpLog(string identity, string message, LogLevel level, Exception exception = null)
 		{
-			if (Env.SubmitHttpLog)
+			if (Env.HubService)
 			{
 				var json = JsonConvert.SerializeObject(new
 				{
-					Token = Env.HttpCenterToken,
+					Token = Env.HubServiceToken,
 					Identity = identity,
 					LogInfo = new
 					{
@@ -130,7 +130,7 @@ namespace DotnetSpider.Core.Infrastructure
 					{
 						NetworkCenter.Current.Execute("log", () =>
 						{
-							var response = HttpSender.Client.PostAsync(Env.HttpLogUrl, content).Result;
+							var response = HttpSender.Client.PostAsync(Env.HubServiceLogUrl, content).Result;
 							response.EnsureSuccessStatusCode();
 						});
 						break;
