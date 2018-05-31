@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if !NETSTANDARD
 using System;
 using DotnetSpider.Extension.Infrastructure;
 using System.Threading;

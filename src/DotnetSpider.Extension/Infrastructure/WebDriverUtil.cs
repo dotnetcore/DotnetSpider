@@ -86,7 +86,7 @@ namespace DotnetSpider.Extension.Infrastructure
 	/// </summary>
 	public static class WebDriverUtil
 	{
-#if NET45
+#if !NETSTANDARD
 		/// <summary>
 		/// 保存页面元素的内容为图片
 		/// </summary>

@@ -1,4 +1,4 @@
-﻿#if NET45
+﻿#if !NETCOREAPP
 using System;
 using System.Drawing;
 using System.IO;
