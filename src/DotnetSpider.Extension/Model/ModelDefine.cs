@@ -7,7 +7,6 @@ using System.Reflection;
 
 namespace DotnetSpider.Extension.Model
 {
-
 	public class ModelDefine : IModel
 	{
 		/// <summary>
@@ -47,20 +46,20 @@ namespace DotnetSpider.Extension.Model
 
 		public string Identity { get; protected set; }
 
-		public ModelDefine(Selector selector, TableInfo table, IEnumerable<Field> fields, IEnumerable<TargetUrlsSelector> targetUrlsSelectors = null, IEnumerable<SharedValueSelector> sharedValueSelectors = null, int take = 0, bool takeFromHead = true) : this()
+		public ModelDefine(Selector selector, IEnumerable<Field> fields, TableInfo table = null, IEnumerable<TargetUrlsSelector> targetUrlsSelectors = null, IEnumerable<SharedValueSelector> sharedValueSelectors = null, int take = 0, bool takeFromHead = true) : this()
 		{
 			Selector = selector;
 			TableInfo = table;
-			Fields = new HashSet<Field>(fields);
-			if (Fields.Count == 0)
+			if (fields == null || fields.Count() == 0)
 			{
-				throw new SpiderException("Count of fields shoule large than 0.");
+				throw new SpiderException("Count of fields should large than 0.");
 			}
+			Fields = new HashSet<Field>(fields);
 			TargetUrlsSelectors = targetUrlsSelectors;
 			SharedValueSelectors = sharedValueSelectors;
 			Take = take;
 			TakeFromHead = takeFromHead;
-			Identity = $"{TableInfo.Database}.{TableInfo.FullName}";
+			Identity = TableInfo == null ? Guid.NewGuid().ToString("N") : $"{TableInfo.Database}.{TableInfo.FullName}";
 		}
 
 		protected ModelDefine()

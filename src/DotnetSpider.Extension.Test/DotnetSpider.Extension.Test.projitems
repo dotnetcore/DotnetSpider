@@ -20,12 +20,16 @@
     <Compile Include="$(MSBuildThisFileDirectory)FormatterTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\SelectUtilTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LogTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\ModelDefineTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\ModelExtractorTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\CassandraPipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\EnvPipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\HttpPipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MsSqlEntityPipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MysqlEntityPipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PipelineTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\RedisEntityPipelineTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Processor\ModelProcessorTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\TargetUrlsExtractorTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\RedisSchedulerTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpiderNameTest.cs" />

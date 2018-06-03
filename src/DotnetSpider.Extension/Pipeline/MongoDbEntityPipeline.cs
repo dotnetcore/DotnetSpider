@@ -39,7 +39,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="datas">实体类数据</param>
 		/// <param name="spider">爬虫</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
-		public override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
+		protected override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			var db = _client.GetDatabase(model.TableInfo.Database);
 			var collection = db.GetCollection<BsonDocument>(model.TableInfo.FullName);

@@ -74,12 +74,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\CollectionEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\ConsoleEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\DefaultMySqlPipeline.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\RedisEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\Sqls.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\ExcelEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\ExcelPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\HttpMySqlEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\ICollectionEntityPipeline.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\IModelPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\JsonFileEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MongoDbEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MySqlEntityPipeline.cs" />
@@ -88,7 +88,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PostgreSqlEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\SqlServerEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\EntityProcessor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Processor\IEntityProcessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Processor\IModelProcessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\ModelProcessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\TargetUrlsExtractorTermination.Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Redial\Redialer\H3CSshAdslRedialer.cs" />

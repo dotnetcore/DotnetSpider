@@ -12,6 +12,8 @@ namespace DotnetSpider.Extension
 	/// </summary>
 	public abstract class EntitySpider : CommonSpider
 	{
+		protected bool UseEntityModelExtrator { get; set; } = true;
+
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -84,7 +86,7 @@ namespace DotnetSpider.Extension
 		{
 			CheckIfRunning();
 
-			EntityProcessor<T> processor = new EntityProcessor<T>(targetUrlsExtractor, dataHandler);
+			var processor = new EntityProcessor<T>(UseEntityModelExtrator ? null : new ModelExtractor(), targetUrlsExtractor, dataHandler);
 			AddPageProcessors(processor);
 		}
 

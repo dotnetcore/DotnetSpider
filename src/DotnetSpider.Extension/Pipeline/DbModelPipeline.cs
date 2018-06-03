@@ -51,7 +51,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected abstract void InitDatabaseAndTable(IDbConnection conn, IModel model);
 
-		public override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
+		protected override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			if (model.TableInfo == null)
 			{

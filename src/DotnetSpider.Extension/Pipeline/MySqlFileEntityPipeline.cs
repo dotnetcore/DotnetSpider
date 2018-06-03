@@ -53,7 +53,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="spider">爬虫</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
+		protected override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			StreamWriter writer;
 			var tableName = model.TableInfo.FullName;

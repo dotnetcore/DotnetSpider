@@ -15,19 +15,19 @@ namespace DotnetSpider.Extension
 			var site = new Site { };
 			var mode = new ModelDefine
 				(
-				new Selector(SelectorType.XPath, ".//div[@class='result']"),
-				new TableInfo("baidu", "search") { },
+				new Selector(".//div[@class='result']"),
 				new[]
 				{
-					new Field(SelectorType.Enviroment,"Keyword","Keyword"),
-					new Field(SelectorType.XPath,".//h3[@class='c-title']/a","Title"),
-					new Field(SelectorType.XPath,".//h3[@class='c-title']/a/@href","Url"),
-					new Field(SelectorType.XPath,".//div/p[@class='c-author']/text()","Website"),
-					new Field(SelectorType.XPath,".//div/span/a[@class='c-cache']/@href","Snapshot"),
-					new Field(SelectorType.XPath,".//div[@class='c-summary c-row ']","Details"),
-					new Field(SelectorType.XPath,".","PlainText"),
-					new Field(SelectorType.Enviroment, "today","atime", DataType.Date)
-				});
+					new Field("Keyword","Keyword",SelectorType.Enviroment),
+					new Field(".//h3[@class='c-title']/a","Title"),
+					new Field(".//h3[@class='c-title']/a/@href","Url"),
+					new Field(".//div/p[@class='c-author']/text()","Website"),
+					new Field(".//div/span/a[@class='c-cache']/@href","Snapshot"),
+					new Field(".//div[@class='c-summary c-row ']","Details"),
+					new Field(".","PlainText"),
+					new Field( "today","atime", SelectorType.Enviroment,DataType.Date)
+				}
+				, new TableInfo("baidu", "search") { });
 			var processor = new ModelProcessor(mode);
 			var spider = Spider.Create(site, processor);
 			var word = "可乐|雪碧";

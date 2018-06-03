@@ -18,20 +18,21 @@ namespace DotnetSpider.Extension.Model
 		/// 构造方法
 		/// </summary>
 		/// <param name="expression">表达式</param>
-		public Selector(string expression)
+		public Selector(string expression) : this(expression, SelectorType.XPath)
 		{
-			Expression = expression;
 		}
 
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="type">选择器类型</param>
 		/// <param name="expression">表达式</param>
-		public Selector(SelectorType type, string expression)
+		/// <param name="type">选择器类型</param>
+		/// <param name="arguments">参数</param>
+		public Selector(string expression, SelectorType type, string arguments = null)
 		{
 			Type = type;
 			Expression = expression;
+			Arguments = arguments;
 		}
 
 		/// <summary>

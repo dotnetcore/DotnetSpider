@@ -66,16 +66,8 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// </summary>
 		/// <param name="type">选择器类型</param>
 		/// <param name="expression">表达式</param>
-		public Field(SelectorType type, string expression) : this(type, expression, null)
-		{
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="type">选择器类型</param>
-		/// <param name="expression">表达式</param>
-		public Field(SelectorType type, string expression, string name, DataType dataType = DataType.String, int length = 255) : base(type, expression)
+		public Field(string expression, string name, SelectorType type = SelectorType.XPath, DataType dataType = DataType.String, int length = 255)
+			: base(expression, type)
 		{
 			Name = name;
 			DataType = dataType;
@@ -98,6 +90,9 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// </summary>
 		public int Length { get; set; } = 255;
 
+		/// <summary>
+		/// 名称
+		/// </summary>
 		public string Name { get; set; }
 
 		/// <summary>
@@ -105,8 +100,14 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// </summary>
 		public bool IgnoreStore { get; set; }
 
+		/// <summary>
+		/// 数据类型
+		/// </summary>
 		public DataType DataType { get; set; } = DataType.None;
 
+		/// <summary>
+		/// 数据格式化
+		/// </summary>
 		public Formatter.Formatter[] Formatters { get; set; }
 
 		public override int GetHashCode()

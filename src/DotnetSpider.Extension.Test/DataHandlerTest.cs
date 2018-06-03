@@ -33,7 +33,7 @@ namespace DotnetSpider.Extension.Test
 			var entityMetadata = new ModelDefine<Product>();
 			var identity = Guid.NewGuid().ToString("N");
 
-			EntityProcessor<Product> processor = new EntityProcessor<Product>(null, new MyDataHanlder(identity));
+			EntityProcessor<Product> processor = new EntityProcessor<Product>(null, null, new MyDataHanlder(identity));
 
 			processor.Process(new Page(new Request("http://www.abcd.com") { Site = new Site() })
 			{

@@ -72,11 +72,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				}));
 				updatePipeline.Process(new ResultItems[] { resultItems }, spider);
 
-
-				var data3 = conn.Query<ProductUpdate>($"select * from test.{metadata2.TableInfo.FullName} where sku=1").First();
-				data3.Category = "4C";
-				updatePipeline.Process(metadata2, new List<dynamic> { data3 }, spider);
-
 				var list = conn.Query<ProductInsert>($"select * from test.{metadata2.TableInfo.FullName}").ToList();
 				Assert.Equal(2, list.Count);
 				Assert.Equal("1", list[0].Sku);

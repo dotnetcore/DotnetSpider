@@ -420,7 +420,7 @@ namespace DotnetSpider.Extension.Test
 
 			var pipelines = spider.Pipelines.ToList();
 			Assert.Equal(4, pipelines.Count);
-			IModelPipeline pipeline = (IModelPipeline)pipelines[0];
+			ModelPipeline pipeline = (ModelPipeline)pipelines[0];
 			//entityPipelines = pipeline.GetEntityPipelines();
 			//Assert.Equal(4, entityPipelines.Count);
 			//pipeline1 = (MySqlEntityPipeline)entityPipelines[0];
