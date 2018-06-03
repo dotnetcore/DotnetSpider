@@ -5,6 +5,7 @@ using DotnetSpider.Core;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Runtime.CompilerServices;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -13,7 +14,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// LoadFile是批量导入模式通过命令 LOAD DATA LOCAL INFILE '{filePath}' INTO TABLE `{schema}`.`{dababase}` FIELDS TERMINATED BY '$'  ENCLOSED BY '#' LINES TERMINATED BY '@END@' IGNORE 1 LINES; 还原。
 	/// InsertSql是完整的Insert SQL语句, 需要一条条执行来导入数据
 	/// </summary>
-	public class MySqlFileEntityPipeline : BaseEntityPipeline
+	public class MySqlFileEntityPipeline : ModelPipeline
 	{
 		private readonly Dictionary<string, StreamWriter> _writers = new Dictionary<string, StreamWriter>();
 
@@ -43,6 +44,7 @@ namespace DotnetSpider.Extension.Pipeline
 			_type = fileType;
 		}
 
+
 		/// <summary>
 		/// 处理爬虫实体解析器解析到的实体数据结果
 		/// </summary>
@@ -51,43 +53,39 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="spider">爬虫</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
+		public override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
-			if (EntityAdapters.TryGetValue(entityName, out var metadata))
+			StreamWriter writer;
+			var tableName = model.TableInfo.FullName;
+			var dataFolder = Path.Combine(Env.BaseDirectory, "mysql", spider.Identity);
+			var mysqlFile = Path.Combine(dataFolder, $"{model.TableInfo.Database}.{tableName}.sql");
+			if (_writers.ContainsKey(mysqlFile))
 			{
-				StreamWriter writer;
-				var tableName = metadata.Table.CalculateTableName();
-				var dataFolder = Path.Combine(Env.BaseDirectory, "mysql", spider.Identity);
-				var mysqlFile = Path.Combine(dataFolder, $"{metadata.Table.Database}.{tableName}.sql");
-				if (_writers.ContainsKey(mysqlFile))
+				writer = _writers[mysqlFile];
+			}
+			else
+			{
+				if (!Directory.Exists(dataFolder))
 				{
-					writer = _writers[mysqlFile];
+					Directory.CreateDirectory(dataFolder);
 				}
-				else
-				{
-					if (!Directory.Exists(dataFolder))
+				writer = new StreamWriter(File.OpenWrite(mysqlFile), Encoding.UTF8);
+				_writers.Add(mysqlFile, writer);
+			}
+			switch (_type)
+			{
+				case FileType.LoadFile:
 					{
-						Directory.CreateDirectory(dataFolder);
+						AppendLoadFile(writer, model, datas);
+						break;
 					}
-					writer = new StreamWriter(File.OpenWrite(mysqlFile), Encoding.UTF8);
-					_writers.Add(mysqlFile, writer);
-				}
-				switch (_type)
-				{
-					case FileType.LoadFile:
-						{
-							SaveLoadFile(writer, metadata, datas);
-							break;
-						}
-					case FileType.InsertSql:
-						{
-							SaveInsertSqlFile(writer, tableName, metadata, datas);
-							break;
-						}
-				}
+				case FileType.InsertSql:
+					{
+						AppendInsertSqlFile(writer, model, datas);
+						break;
+					}
 			}
 			return datas.Count();
-
 		}
 
 		/// <summary>
@@ -103,25 +101,24 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private void SaveInsertSqlFile<T>(StreamWriter writer, string tableName, EntityAdapter metadata, IEnumerable<T> items)
+		private void AppendInsertSqlFile(StreamWriter writer, IModel model, IEnumerable<dynamic> items)
 		{
 			StringBuilder builder = new StringBuilder();
-			foreach (var entry in items)
+			foreach (var item in items)
 			{
 				//{Environment.NewLine}
-				builder.Append($"INSERT IGNORE INTO `{metadata.Table.Database}`.`{tableName}` (");
-				var lastColumn = metadata.Columns.Last();
-				foreach (var column in metadata.Columns)
+				builder.Append($"INSERT IGNORE INTO `{model.TableInfo.Database}`.`{model.TableInfo.FullName}` (");
+				var lastColumn = model.Fields.Last();
+				foreach (var column in model.Fields)
 				{
 					builder.Append(column == lastColumn ? $"`{column.Name}`" : $"`{column.Name}`, ");
 				}
 				builder.Append(") VALUES (");
 
-				foreach (var column in metadata.Columns)
+				foreach (var column in model.Fields)
 				{
-					var token = column.Property.GetValue(entry);
-					var value = token == null ? "" : MySqlHelper.EscapeString(token.ToString());
-
+					var value = item[column.Name];
+					value = value == null ? "" : MySqlHelper.EscapeString(value.ToString());
 					builder.Append(column == lastColumn ? $"'{value}'" : $"'{value}', ");
 				}
 				builder.Append($");{System.Environment.NewLine}");
@@ -129,15 +126,15 @@ namespace DotnetSpider.Extension.Pipeline
 			writer.Write(builder.ToString());
 		}
 
-		private void SaveLoadFile<T>(StreamWriter writer, EntityAdapter metadata, IEnumerable<T> items)
+		private void AppendLoadFile(StreamWriter writer, IModel model, IEnumerable<dynamic> items)
 		{
 			StringBuilder builder = new StringBuilder();
-			foreach (var entry in items)
+			foreach (var item in items)
 			{
 				builder.Append("@END@");
-				foreach (var column in metadata.Columns)
+				foreach (var column in model.Fields)
 				{
-					var value = column.Property.GetValue(entry);
+					var value = item[column.Name];
 					if (value != null)
 					{
 						builder.Append("#").Append(value).Append("#").Append("$");

@@ -17,60 +17,60 @@ namespace DotnetSpider.Sample
 		}
 
 		[EntitySelector(Expression = ".//div[@class='items']//a")]
-		class Category : SpiderEntity
+		class Category
 		{
-			[PropertyDefine(Expression = ".")]
+			[Field(Expression = ".")]
 			public string CategoryName { get; set; }
 
 			[LinkToNext(Extras = new[] { "CategoryName" })]
 			[RegexAppendFormatter(Pattern = "http://list.jd.com/list.html\\?cat=[0-9]+", AppendValue = "&page=1&trans=1&JL=6_0_0")]
-			[PropertyDefine(Expression = "./@href")]
+			[Field(Expression = "./@href")]
 			public string Url { get; set; }
 		}
 
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		class TmpProduct : SpiderEntity
+		class TmpProduct
 		{
-			[PropertyDefine(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
 			public string CategoryName { get; set; }
 
 			[LinkToNext(Extras = new[] { "CategoryName", "Sku", "Name", "Url" })]
-			[PropertyDefine(Expression = "./div[@class='p-name']/a[1]/@href")]
+			[Field(Expression = "./div[@class='p-name']/a[1]/@href")]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
+			[Field(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
 			public string Name { get; set; }
 
-			[PropertyDefine(Expression = "./@data-sku", Length = 100)]
+			[Field(Expression = "./@data-sku", Length = 100)]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		[EntityTable("jd", "jd_product", Uniques = new[] { "Sku" }, Indexs = new[] { "Sku" })]
-		class JdProduct : SpiderEntity
+		[TableInfo("jd", "jd_product", Uniques = new[] { "Sku" }, Indexs = new[] { "Sku" })]
+		class JdProduct
 		{
-			[PropertyDefine(Expression = "Name", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "Name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Name { get; set; }
 
-			[PropertyDefine(Expression = "Sku", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "Sku", Type = SelectorType.Enviroment, Length = 100)]
 			public string Sku { get; set; }
 
-			[PropertyDefine(Expression = "Url", Type = SelectorType.Enviroment)]
+			[Field(Expression = "Url", Type = SelectorType.Enviroment)]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
 			public string CategoryName { get; set; }
 
-			[PropertyDefine(Expression = ".//a[@class='name']", Length = 100)]
+			[Field(Expression = ".//a[@class='name']", Length = 100)]
 			public string ShopName { get; set; }
 
 			[StringFormater(Format = "http:{0}")]
 			[Download]
-			[PropertyDefine(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src", IgnoreStore = true)]
+			[Field(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src", IgnoreStore = true)]
 			public string Logo { get; set; }
 
-			[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]
+			[Field(Expression = "Monday", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 		}
 

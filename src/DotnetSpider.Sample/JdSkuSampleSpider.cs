@@ -30,42 +30,42 @@ namespace DotnetSpider.Sample
 		}
 	}
 
-	[EntityTable("test", "jd_sku", EntityTable.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
+	[TableInfo("test", "jd_sku", TableNamePostfix.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 	[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 	[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	public class Product : SpiderEntity
+	public class Product
 	{
-		[PropertyDefine(Expression = "./@data-sku", Length = 100)]
+		[Field(Expression = "./@data-sku", Length = 100)]
 		public string Sku { get; set; }
 
-		[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+		[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 		public string Category { get; set; }
 
-		[PropertyDefine(Expression = "cat3", Type = SelectorType.Enviroment)]
+		[Field(Expression = "cat3", Type = SelectorType.Enviroment)]
 		public int CategoryId { get; set; }
 
-		[PropertyDefine(Expression = "./div[1]/a/@href")]
+		[Field(Expression = "./div[1]/a/@href")]
 		public string Url { get; set; }
 
-		[PropertyDefine(Expression = "./div[5]/strong/a")]
+		[Field(Expression = "./div[5]/strong/a")]
 		public long CommentsCount { get; set; }
 
-		[PropertyDefine(Expression = ".//div[@class='p-shop']/@data-shop_name", Length = 100)]
+		[Field(Expression = ".//div[@class='p-shop']/@data-shop_name", Length = 100)]
 		public string ShopName { get; set; }
 
-		[PropertyDefine(Expression = "0", Type = SelectorType.Enviroment)]
+		[Field(Expression = "0", Type = SelectorType.Enviroment)]
 		public int ShopId { get; set; }
 
-		[PropertyDefine(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
+		[Field(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
 		public string Name { get; set; }
 
-		[PropertyDefine(Expression = "./@venderid", Length = 100)]
+		[Field(Expression = "./@venderid", Length = 100)]
 		public string VenderId { get; set; }
 
-		[PropertyDefine(Expression = "./@jdzy_shop_id", Length = 100)]
+		[Field(Expression = "./@jdzy_shop_id", Length = 100)]
 		public string JdzyShopId { get; set; }
 
-		[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]
+		[Field(Expression = "Monday", Type = SelectorType.Enviroment)]
 		public DateTime RunId { get; set; }
 	}
 

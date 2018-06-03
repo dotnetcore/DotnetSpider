@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Extension.Pipeline;
 using System.IO;
 using Xunit;
 

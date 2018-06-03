@@ -1,7 +1,5 @@
-﻿using Dapper;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
@@ -13,7 +11,6 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Net;
 using Xunit;
 
@@ -26,10 +23,10 @@ namespace DotnetSpider.Extension.Test
 			Env.HubService = false;
 		}
 
-		[EntityTable("test", "table")]
-		public class TestEntity : SpiderEntity
+		[TableInfo("test", "table")]
+		public class TestEntity
 		{
-			[PropertyDefine(Expression = ".")]
+			[Field(Expression = ".")]
 			public string Name { get; set; }
 		}
 
@@ -53,19 +50,19 @@ namespace DotnetSpider.Extension.Test
 				AddEntityType<SohuEntity>();
 			}
 
-			[EntityTable("test", "multy_entity")]
+			[TableInfo("test", "multy_entity")]
 			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "baidu" })]
-			public class BaiduEntity : SpiderEntity
+			public class BaiduEntity
 			{
-				[PropertyDefine(Expression = ".//title")]
+				[Field(Expression = ".//title")]
 				public string Title { get; set; }
 			}
 
-			[EntityTable("test", "multy_entity")]
+			[TableInfo("test", "multy_entity")]
 			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "sohu" })]
-			public class SohuEntity : SpiderEntity
+			public class SohuEntity
 			{
-				[PropertyDefine(Expression = ".//title")]
+				[Field(Expression = ".//title")]
 				public string Title { get; set; }
 			}
 		}
@@ -167,13 +164,13 @@ namespace DotnetSpider.Extension.Test
 			{
 				ExeConfigFilename = "app.config"
 			}, ConfigurationUserLevel.None);
-			var pipeline1 = BaseEntityPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["DataConnection"]);
+			var pipeline1 = DbModelPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["DataConnection"]);
 			Assert.True(pipeline1 is MySqlEntityPipeline);
 
-			var pipeline2 = BaseEntityPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["SqlServerDataConnection"]);
+			var pipeline2 = DbModelPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["SqlServerDataConnection"]);
 			Assert.True(pipeline2 is SqlServerEntityPipeline);
 
-			var pipeline3 = BaseEntityPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["MongoDbDataConnection"]);
+			var pipeline3 = DbModelPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["MongoDbDataConnection"]);
 			Assert.True(pipeline3 is MongoDbEntityPipeline);
 		}
 
@@ -204,40 +201,40 @@ namespace DotnetSpider.Extension.Test
 				AddEntityType<BaiduSearchEntry>();
 			}
 
-			[EntityTable("test", "baidu_search")]
+			[TableInfo("test", "baidu_search")]
 			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-			class BaiduSearchEntry : SpiderEntity
+			class BaiduSearchEntry
 			{
-				[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
+				[Field(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
 				public string Keyword { get; set; }
 
-				[PropertyDefine(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
+				[Field(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
 				public string Guid { get; set; }
 
-				[PropertyDefine(Expression = ".//h3[@class='c-title']/a")]
+				[Field(Expression = ".//h3[@class='c-title']/a")]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				public string Title { get; set; }
 
-				[PropertyDefine(Expression = ".//h3[@class='c-title']/a/@href")]
+				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
 				public string Url { get; set; }
 
-				[PropertyDefine(Expression = ".//div/p[@class='c-author']/text()")]
+				[Field(Expression = ".//div/p[@class='c-author']/text()")]
 				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 				public string Website { get; set; }
 
 
-				[PropertyDefine(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
 				public string Snapshot { get; set; }
 
 
-				[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefineOptions.InnerText)]
+				[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 				public string Details { get; set; }
 
-				[PropertyDefine(Expression = ".", Option = PropertyDefineOptions.InnerText)]
+				[Field(Expression = ".", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
@@ -267,13 +264,13 @@ namespace DotnetSpider.Extension.Test
 			}
 
 			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
-			class ArticleSummary : SpiderEntity
+			class ArticleSummary
 			{
-				[PropertyDefine(Expression = ".//a/@title")]
+				[Field(Expression = ".//a/@title")]
 				public string Title { get; set; }
 
 				[LinkToNext(Extras = new[] { "Title", "Url" })]
-				[PropertyDefine(Expression = ".//a/@href")]
+				[Field(Expression = ".//a/@href")]
 				public string Url { get; set; }
 			}
 		}

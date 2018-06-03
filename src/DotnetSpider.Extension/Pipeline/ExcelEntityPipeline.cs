@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using DotnetSpider.Core;
+using DotnetSpider.Extension.Model;
 using OfficeOpenXml;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -11,48 +11,10 @@ namespace DotnetSpider.Extension.Pipeline
 	/// <summary>
 	/// 把解析到的爬虫实体数据存到Excel中
 	/// </summary>
-	public class ExcelEntityPipeline : BaseEntityPipeline
+	public class ExcelEntityPipeline : ModelPipeline
 	{
 		private readonly Dictionary<string, ExcelPackage> _packages = new Dictionary<string, ExcelPackage>();
 		private readonly Dictionary<string, int> _rowRecords = new Dictionary<string, int>();
-
-		/// <summary>
-		/// 把解析到的爬虫实体数据存到Excel中
-		/// </summary>
-		/// <param name="entityName">爬虫实体类的名称</param>
-		/// <param name="datas">实体类数据</param>
-		/// <param name="spider">爬虫</param>
-		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
-		{
-			if (EntityAdapters.TryGetValue(entityName, out var metadata))
-			{
-				switch (metadata.PipelineMode)
-				{
-					case PipelineMode.Insert:
-					case PipelineMode.InsertAndIgnoreDuplicate:
-						{
-							WriteToExcel(datas, spider, metadata);
-							break;
-						}
-					case PipelineMode.InsertNewAndUpdateOld:
-						{
-							throw new NotImplementedException("Excel not suport InsertNewAndUpdateOld yet.");
-						}
-					case PipelineMode.Update:
-						{
-							throw new NotImplementedException("Excel not suport Update yet.");
-						}
-					default:
-						{
-							WriteToExcel(datas, spider, metadata);
-							break;
-						}
-				}
-			}
-			return datas.Count();
-		}
 
 		/// <summary>
 		/// 取得数据管道中所有EXCEL文件的路径
@@ -88,10 +50,10 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private void WriteToExcel(IEnumerable<dynamic> datas, ISpider spider, EntityAdapter adapter)
+		private void WriteToExcel(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			var excelPath = Path.Combine(Env.BaseDirectory, "excels", $"{spider.Name}_{spider.Identity}.xlsx");
-			var sheetName = adapter.Table.Name;
+			var sheetName = model.TableInfo.Name;
 			var sheetIndex = $"{excelPath}.{sheetName}";
 
 			if (!_packages.ContainsKey(excelPath))
@@ -108,7 +70,7 @@ namespace DotnetSpider.Extension.Pipeline
 			var sheet = p.Workbook.Worksheets[sheetName];
 
 			int row = 1;
-			var columns = adapter.Columns.Where(c => !Env.IdColumns.Contains(c.Name.ToLower())).ToList();
+			var columns = model.Fields.ToList();
 
 			if (sheet == null)
 			{
@@ -126,8 +88,8 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				for (int j = 1; j < columns.Count + 1; ++j)
 				{
-					var column = columns[j - 1].Property;
-					sheet.Cells[row, j].Value = column.GetValue(data)?.ToString();
+					var column = columns[j - 1].Name;
+					sheet.Cells[row, j].Value = data[column];
 				}
 				row = IncreaseRowIndex(sheetIndex);
 			}
@@ -138,6 +100,21 @@ namespace DotnetSpider.Extension.Pipeline
 			var row = _rowRecords[sheet] + 1;
 			_rowRecords[sheet] = row;
 			return row;
+		}
+
+		/// <summary>
+		/// 把解析到的爬虫实体数据存到Excel中
+		/// </summary>
+		/// <param name="entityName">爬虫实体类的名称</param>
+		/// <param name="datas">实体类数据</param>
+		/// <param name="spider">爬虫</param>
+		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		public override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
+		{
+			var count = datas.Count();
+			WriteToExcel(model, datas, spider);
+			return count;
 		}
 	}
 }

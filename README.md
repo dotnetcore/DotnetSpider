@@ -65,7 +65,7 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 	[EntityTable("test", "jd_sku", EntityTable.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 	[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 	[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	public class Product : SpiderEntity
+	public class Product
 	{
 		[PropertyDefine(Expression = "./@data-sku", Length = 100)]
 		public string Sku { get; set; }

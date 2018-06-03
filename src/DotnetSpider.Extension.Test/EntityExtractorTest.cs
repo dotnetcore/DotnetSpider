@@ -18,7 +18,8 @@ namespace DotnetSpider.Extension.Test
 		[Fact]
 		public void Extract()
 		{
-			EntityExtractor<Product> extractor = new EntityExtractor<Product>();
+			ModelExtractor<Product> extractor = new ModelExtractor<Product>();
+			var mode = new ModelDefine<Product>();
 			var results = extractor.Extract(new Page(new Request("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, dynamic>
 			{
 				{ "cat", "手机" },
@@ -27,7 +28,7 @@ namespace DotnetSpider.Extension.Test
 			{ Site = new Site() })
 			{
 				Content = File.ReadAllText(Path.Combine(Env.BaseDirectory, "Jd.html"))
-			});
+			}, mode);
 			Assert.Equal(60, results.Count());
 			Assert.Equal("手机", results.First().CategoryName);
 			Assert.Equal(110, results.First().CategoryId);
@@ -49,48 +50,50 @@ namespace DotnetSpider.Extension.Test
 				Content = "{'data':[{'age':'1'},{'age':'2'}]}"
 			};
 			processor.Process(page, new DefaultSpider());
-			Assert.Equal(2, (page.ResultItems.GetResultItem("DotnetSpider.Extension.Test.EntityExtractorTest+Entity1") as List<Entity1>).Count);
+			Assert.Equal(2, (page.ResultItems.GetResultItem($"DotnetSpider.Extension.Test.EntityExtractorTest+Entity1").Item2).Count);
 		}
 
-		[EntityTable("test", "sku2", EntityTable.Today)]
+		[TableInfo("test", "sku2", TableNamePostfix.Today)]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		private class Product : SpiderEntity
+		private class Product
 		{
-			[PropertyDefine(Expression = "cat", Type = SelectorType.Enviroment)]
+			public string AAA;
+			private string bb;
+			[Field(Expression = "cat", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
 
-			[PropertyDefine(Expression = "cat3", Type = SelectorType.Enviroment)]
+			[Field(Expression = "cat3", Type = SelectorType.Enviroment)]
 			public int CategoryId { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/a/@href")]
+			[Field(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 
-			[PropertyDefine(Expression = "./div[5]/strong/a")]
+			[Field(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
-			[PropertyDefine(Expression = ".//div[@class='p-shop']/@data-shop_name")]
+			[Field(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
-			[PropertyDefine(Expression = ".//div[@class='p-name']/a/em")]
+			[Field(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
 
-			[PropertyDefine(Expression = "./@venderid")]
+			[Field(Expression = "./@venderid")]
 			public string VenderId { get; set; }
 
-			[PropertyDefine(Expression = "./@jdzy_shop_id")]
+			[Field(Expression = "./@jdzy_shop_id")]
 			public string JdzyShopId { get; set; }
 
-			[PropertyDefine(Expression = "Today", Type = SelectorType.Enviroment)]
+			[Field(Expression = "Today", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 		}
 
 		[EntitySelector(Expression = "$.data[*]", Type = SelectorType.JsonPath)]
-		public class Entity1 : SpiderEntity
+		public class Entity1
 		{
-			[PropertyDefine(Expression = "$.age", Type = SelectorType.JsonPath)]
+			[Field(Expression = "$.age", Type = SelectorType.JsonPath)]
 			public int Age { get; set; }
 		}
 	}

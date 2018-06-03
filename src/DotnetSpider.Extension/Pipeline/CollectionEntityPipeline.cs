@@ -8,7 +8,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// <summary>
 	/// 内存数据管道, 把所有数据结果存到内存列表中
 	/// </summary>
-	public class CollectionEntityPipeline : BaseEntityPipeline, ICollectionEntityPipeline
+	public class CollectionEntityPipeline : ModelPipeline, ICollectionEntityPipeline
 	{
 		private readonly Dictionary<string, List<dynamic>> _collector = new Dictionary<string, List<dynamic>>();
 		private readonly object _locker = new object();
@@ -16,26 +16,18 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 取得实体名称的所有数据
 		/// </summary>
-		/// <param name="entityName">爬虫实体名称</param>
+		/// <param name="modeIdentity">爬虫实体名称</param>
 		/// <returns>实体数据</returns>
-		public IEnumerable<dynamic> GetCollection(string entityName)
+		public IEnumerable<dynamic> GetCollection(string modeIdentity)
 		{
 			lock (_locker)
 			{
-				if (_collector.TryGetValue(entityName, out var result))
+				if (_collector.TryGetValue(modeIdentity, out var result))
 				{
 					return result;
 				}
 			}
 			return null;
-		}
-
-		/// <summary>
-		/// 添加爬虫实体类的定义
-		/// </summary>
-		/// <param name="entityDefine">爬虫实体类的定义</param>
-		public override void AddEntity(IEntityDefine entityDefine)
-		{
 		}
 
 		/// <summary>
@@ -45,13 +37,13 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="datas">实体类数据</param>
 		/// <param name="spider">爬虫</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
-		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
+		public override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
 			lock (_locker)
 			{
-				if (_collector.ContainsKey(entityName))
+				if (_collector.ContainsKey(model.Identity))
 				{
-					var list = _collector[entityName];
+					var list = _collector[model.Identity];
 					foreach (var data in datas)
 					{
 						list.Add(data);
@@ -64,7 +56,7 @@ namespace DotnetSpider.Extension.Pipeline
 					{
 						list.Add(data);
 					}
-					_collector.Add(entityName, list);
+					_collector.Add(model.Identity, list);
 				}
 				return datas.Count();
 			}

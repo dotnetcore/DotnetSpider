@@ -36,6 +36,8 @@ namespace DotnetSpider.Core
 		private const string DataConnectionStringKey = "DataConnection";
 		private const string SqlEncryptCodeKey = "sqlEncryptCode";
 
+		public static string DefaultDatabase = "dotnetspider";
+
 		/// <summary>
 		/// 开启企业服务(HTTP), 默认打开, 测试的时候开关
 		/// </summary>
@@ -45,7 +47,7 @@ namespace DotnetSpider.Core
 		/// 定义数据主键的名称
 		/// 使用实体定义爬虫解析时, 自动插入数据必须使用自增主键, 在自动构造插入数据的SQL语句时会忽略主键
 		/// </summary>
-		public static string[] IdColumns = { "Id", "__Id", "id", "__id" };
+		public static string IdColumn = "id";
 
 		/// <summary>
 		/// 定义数据采集的时间

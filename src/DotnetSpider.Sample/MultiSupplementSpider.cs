@@ -5,7 +5,6 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Processor;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Sample
@@ -40,45 +39,28 @@ namespace DotnetSpider.Sample
 			}
 		}
 
-		private class MyExtractor : BaseEntityExtractor<MyEntity>
+		private class MyExtractor : ModelExtractor
 		{
-			private readonly string _key = "myEntity";
 
-			public override IEnumerable<MyEntity> Extract(Page page)
+			public override IEnumerable<dynamic> Extract(Page page, IModel model)
 			{
-				MyEntity enity = page.Request.GetExtra(_key);
-				if (enity == null)
-				{
-					enity = new MyEntity();
-				}
+
+				Dictionary<string, dynamic> tmp = new Dictionary<string, dynamic>();
+
 				// 通过规则判断数据解析
 				if (page.Request.Url.Contains("a.com"))
 				{
-					enity.a = page.Selectable.JsonPath("$.a").GetValue();
+					tmp["a"] = page.Selectable.JsonPath("$.a").GetValue();
 				}
 				// 通过规则判断数据解析
 				if (page.Request.Url.Contains("b.com"))
 				{
-					enity.b = page.Selectable.JsonPath("$.b").GetValue();
-				}
-				// 通过规则判断数据是否完整, 只有数据完整时才解析成功
-				if (enity.a != null && enity.b != null)
-				{
-					return new[] { enity };
-				}
-				else
-				{
-					// 构造补充链接
-					if (enity.b == null)
-					{
-						var request = new Request("http://b.com");
-						request.PutExtra(_key, enity);
-						page.AddTargetRequest(request);
-					}
+					tmp["b"] = page.Selectable.JsonPath("$.b").GetValue();
 				}
 
+
 				// 当返回空结果时, 爬虫可以忽略不运行Pipeline, 即运行也不会插入数据
-				return Enumerable.Empty<MyEntity>();
+				return new[] { tmp };
 			}
 		}
 
@@ -94,13 +76,13 @@ namespace DotnetSpider.Sample
 		}
 
 
-		[EntityTable("test", "MultiSupplement")]
-		private class MyEntity : SpiderEntity
+		[TableInfo("test", "MultiSupplement")]
+		private class MyEntity
 		{
-			[PropertyDefine(Expression = "a")]
+			[Field(Expression = "a")]
 			public string a { get; set; }
 
-			[PropertyDefine(Expression = "b")]
+			[Field(Expression = "b")]
 			public string b { get; set; }
 		}
 	}

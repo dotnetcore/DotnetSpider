@@ -13,14 +13,14 @@ namespace DotnetSpider.Sample
 		{
 		}
 
-		[EntityTable("jd", "jd_category")]
+		[TableInfo("jd", "jd_category")]
 		[EntitySelector(Expression = ".//div[@class='items']//a")]
-		class Category : SpiderEntity
+		class Category
 		{
-			[PropertyDefine(Expression = ".", Length = 100)]
+			[Field(Expression = ".", Length = 100)]
 			public string CategoryName { get; set; }
 
-			[PropertyDefine(Expression = "./@href")]
+			[Field(Expression = "./@href")]
 			public string Url { get; set; }
 		}
 

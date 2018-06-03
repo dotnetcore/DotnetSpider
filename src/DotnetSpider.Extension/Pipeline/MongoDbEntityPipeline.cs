@@ -8,18 +8,18 @@ using DotnetSpider.Core.Redial;
 using System.Linq;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
-using Serilog;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	/// <summary>
 	/// 把解析到的爬虫实体数据存到MongoDb中
 	/// </summary>
-	public class MongoDbEntityPipeline : BaseEntityPipeline
+	public class MongoDbEntityPipeline : ModelPipeline
 	{
 		private readonly ConcurrentDictionary<string, IMongoCollection<BsonDocument>> _collections = new ConcurrentDictionary<string, IMongoCollection<BsonDocument>>();
 
 		private readonly string _connectString;
+		private readonly MongoClient _client;
 
 		/// <summary>
 		/// 构造方法
@@ -28,24 +28,8 @@ namespace DotnetSpider.Extension.Pipeline
 		public MongoDbEntityPipeline(string connectString)
 		{
 			_connectString = connectString;
-		}
 
-		/// <summary>
-		/// 添加爬虫实体类的定义
-		/// </summary>
-		/// <param name="entityDefine">爬虫实体类的定义</param>
-		public override void AddEntity(IEntityDefine entityDefine)
-		{
-			if (entityDefine.TableInfo == null)
-			{
-				Log.Logger.Warning($"Schema is necessary, skip {GetType().Name} for {entityDefine.Name}.");
-				return;
-			}
-
-			MongoClient client = new MongoClient(_connectString);
-			var db = client.GetDatabase(entityDefine.TableInfo.Database);
-
-			_collections.TryAdd(entityDefine.Name, db.GetCollection<BsonDocument>(entityDefine.TableInfo.CalculateTableName()));
+			_client = new MongoClient(_connectString);
 		}
 
 		/// <summary>
@@ -55,29 +39,29 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="datas">实体类数据</param>
 		/// <param name="spider">爬虫</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
-		public override int Process(string entityName, IEnumerable<dynamic> datas, ISpider spider)
+		public override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
-			if (_collections.TryGetValue(entityName, out var collection))
+			var db = _client.GetDatabase(model.TableInfo.Database);
+			var collection = db.GetCollection<BsonDocument>(model.TableInfo.FullName);
+
+			var action = new Action(() =>
 			{
-				var action = new Action(() =>
+				List<BsonDocument> reslut = new List<BsonDocument>();
+				foreach (var data in datas)
 				{
-					List<BsonDocument> reslut = new List<BsonDocument>();
-					foreach (var data in datas)
-					{
-						BsonDocument item = BsonDocument.Create(data);
-						reslut.Add(item);
-					}
-					reslut.Add(BsonDocument.Create(DateTime.Now));
-					collection.InsertMany(reslut);
-				});
-				if (DbExecutor.UseNetworkCenter)
-				{
-					NetworkCenter.Current.Execute("db", action);
+					BsonDocument item = BsonDocument.Create(data);
+					reslut.Add(item);
 				}
-				else
-				{
-					action();
-				}
+				reslut.Add(BsonDocument.Create(DateTime.Now));
+				collection.InsertMany(reslut);
+			});
+			if (DbExecutor.UseNetworkCenter)
+			{
+				NetworkCenter.Current.Execute("db", action);
+			}
+			else
+			{
+				action();
 			}
 			return datas.Count();
 		}

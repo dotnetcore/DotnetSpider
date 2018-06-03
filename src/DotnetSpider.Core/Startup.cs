@@ -6,8 +6,6 @@ using System.Reflection;
 using DotnetSpider.Core.Infrastructure;
 using CommandLine;
 #if NETSTANDARD
-using Microsoft.Extensions.DependencyModel;
-using System.Runtime.InteropServices;
 using System.Text;
 #endif
 

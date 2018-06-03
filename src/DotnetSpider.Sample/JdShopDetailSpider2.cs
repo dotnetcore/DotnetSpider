@@ -38,20 +38,20 @@ namespace DotnetSpider.Sample
 			AddEntityType<ProductUpdater>();
 		}
 
-		[EntityTable("jd", "shop", EntityTable.Monday, Uniques = new[] { "pid" })]
+		[TableInfo("jd", "shop", TableNamePostfix.Monday, Uniques = new[] { "pid" })]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
-		class ProductUpdater : SpiderEntity
+		class ProductUpdater
 		{
-			[PropertyDefine(Expression = "$.pid", Type = SelectorType.JsonPath, Length = 25)]
+			[Field(Expression = "$.pid", Type = SelectorType.JsonPath, Length = 25)]
 			public string pid { get; set; }
 
-			[PropertyDefine(Expression = "$.seller", Type = SelectorType.JsonPath, Length = 100)]
+			[Field(Expression = "$.seller", Type = SelectorType.JsonPath, Length = 100)]
 			public string seller { get; set; }
 
-			[PropertyDefine(Expression = "$.shopId", Type = SelectorType.JsonPath, Length = 25)]
+			[Field(Expression = "$.shopId", Type = SelectorType.JsonPath, Length = 25)]
 			public string shopId { get; set; }
 
-			[PropertyDefine(Expression = "$.venderid", Type = SelectorType.JsonPath, Length = 25)]
+			[Field(Expression = "$.venderid", Type = SelectorType.JsonPath, Length = 25)]
 			public string venderid { get; set; }
 		}
 	}

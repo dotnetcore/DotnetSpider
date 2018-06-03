@@ -29,7 +29,7 @@
 
 //		[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
 //		[TargetUrlsSelector(Patterns = new[] { @"index_[0-9]+.shtml", "index.shtml" })]
-//		class ArticleSummary : SpiderEntity
+//		class ArticleSummary
 //		{
 //			[PropertyDefine(Expression = ".//a/@title", Length = 100)]
 //			public string Title { get; set; }
@@ -41,7 +41,7 @@
 
 //		[EntityTable("test", "Article", EntityTable.Today, Indexs = new[] { "Title" })]
 //		[TargetUrlsSelector(Patterns = new[] { @"t[0-9]+_[0-9]+.shtml" })]
-//		class Article : SpiderEntity
+//		class Article
 //		{
 //			[PropertyDefine(Expression = "Title", Type = SelectorType.Enviroment, Length = 100)]
 //			public string Title { get; set; }

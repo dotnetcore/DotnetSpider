@@ -15,11 +15,6 @@ namespace DotnetSpider.Core.Pipeline
 		public abstract void Process(IEnumerable<ResultItems> resultItems, ISpider spider);
 
 		/// <summary>
-		/// 在使用数据管道前, 进行一些初始化工作, 不是所有的数据管道都需要进行初始化
-		/// </summary>
-		public virtual void Init() { }
-
-		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public virtual void Dispose()

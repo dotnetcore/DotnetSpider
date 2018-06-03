@@ -10,97 +10,97 @@ namespace DotnetSpider.Extension.Test
 	public class TargetUrlSelectorTest
 	{
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity14 : SpiderEntity
+		public class Entity14
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]", "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity16 : SpiderEntity
+		public class Entity16
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&", @"&page=[0-1]+&" })]
-		public class Entity17 : SpiderEntity
+		public class Entity17
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector()]
-		public class Entity15 : SpiderEntity
+		public class Entity15
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]", "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&", @"&page=[0-1]+&" })]
-		public class Entity18 : SpiderEntity
+		public class Entity18
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-1]+&" })]
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity19 : SpiderEntity
+		public class Entity19
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-1]+&" })]
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity20 : SpiderEntity
+		public class Entity20
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity21 : SpiderEntity
+		public class Entity21
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		public class Entity22 : SpiderEntity
+		public class Entity22
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "" }, Patterns = new[] { "" })]
-		public class Entity23 : SpiderEntity
+		public class Entity23
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new string[] { null }, Patterns = new string[] { null })]
-		public class Entity24 : SpiderEntity
+		public class Entity24
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetUrlsSelector(XPaths = new string[] { null }, Patterns = new string[] { @"&page=[0-9]+&" })]
-		public class Entity25 : SpiderEntity
+		public class Entity25
 		{
-			[PropertyDefine(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[Fact(DisplayName = "TargetUrlsSelector_1Region_1Pattern")]
 		public void TargetUrlsSelector_1Region_1Pattern()
 		{
-			new EntityDefine<Entity14>();
+			new ModelDefine<Entity14>();
 			var processor = new EntityProcessor<Entity14>();
 
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
@@ -111,7 +111,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact(DisplayName = "TargetUrlsSelector_2Region_1Pattern")]
 		public void TargetUrlsSelector_2Region_1Pattern()
 		{
-			new EntityDefine<Entity16>();
+			new ModelDefine<Entity16>();
 			var processor = new EntityProcessor<Entity16>();
 
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
@@ -126,7 +126,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact(DisplayName = "TargetUrlsSelector_1Region_2Pattern")]
 		public void TargetUrlsSelector_1Region_2Pattern()
 		{
-			new EntityDefine<Entity17>();
+			new ModelDefine<Entity17>();
 			var processor = new EntityProcessor<Entity17>();
 			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -139,7 +139,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				new EntityDefine<Entity15>();
+				new ModelDefine<Entity15>();
 				var processor = new EntityProcessor<Entity15>();
 			}
 			catch (Exception e)
@@ -153,7 +153,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact(DisplayName = "TargetUrlsSelector_2Region_2Pattern")]
 		public void TargetUrlsSelector_2Region_2Pattern()
 		{
-			new EntityDefine<Entity18>();
+			new ModelDefine<Entity18>();
 			var processor = new EntityProcessor<Entity18>();
 			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
 			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
@@ -169,7 +169,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact(DisplayName = "TargetUrlsSelector_Multi_2Region_2Pattern")]
 		public void TargetUrlsSelector_Multi_2Region_2Pattern()
 		{
-			new EntityDefine<Entity19>();
+			new ModelDefine<Entity19>();
 			var processor = new EntityProcessor<Entity19>();
 
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
@@ -184,7 +184,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact(DisplayName = "TargetUrlsSelector_Multi_2SameRegion_2Pattern")]
 		public void TargetUrlsSelector_Multi_2SameRegion_2Pattern()
 		{
-			new EntityDefine<Entity20>();
+			new ModelDefine<Entity20>();
 			var processor = new EntityProcessor<Entity20>();
 
 			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
@@ -197,7 +197,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact(DisplayName = "TargetUrlsSelector_Multi_2SameRegion_2SamePattern")]
 		public void TargetUrlsSelector_Multi_2SameRegion_2SamePattern()
 		{
-			new EntityDefine<Entity21>();
+			new ModelDefine<Entity21>();
 			var processor = new EntityProcessor<Entity21>();
 
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
@@ -209,7 +209,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact(DisplayName = "TargetUrlsSelector_Multi_2Region_2SamePattern")]
 		public void TargetUrlsSelector_Multi_2Region_2SamePattern()
 		{
-			new EntityDefine<Entity22>();
+			new ModelDefine<Entity22>();
 			var processor = new EntityProcessor<Entity22>();
 
 			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
@@ -226,7 +226,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				new EntityDefine<Entity23>();
+				new ModelDefine<Entity23>();
 				var processor = new EntityProcessor<Entity23>();
 			}
 			catch (ArgumentNullException e)
@@ -242,7 +242,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			try
 			{
-				new EntityDefine<Entity24>();
+				new ModelDefine<Entity24>();
 				var processor = new EntityProcessor<Entity24>();
 			}
 			catch (ArgumentNullException e)
@@ -256,7 +256,7 @@ namespace DotnetSpider.Extension.Test
 		[Fact(DisplayName = "TargetUrlsSelector_NullRegion_1Pattern")]
 		public void TargetUrlsSelector_NullRegion_1Pattern()
 		{
-			new EntityDefine<Entity25>();
+			new ModelDefine<Entity25>();
 			var processor = new EntityProcessor<Entity25>();
 
 			Assert.Single(processor.GetTargetUrlPatterns(null));

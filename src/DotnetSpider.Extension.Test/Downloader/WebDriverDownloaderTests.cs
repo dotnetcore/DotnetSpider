@@ -97,43 +97,43 @@ namespace DotnetSpider.Extension.Test.Downloader
 			}
 		}
 
-		[EntityTable("baidu", "baidu_search")]
+		[TableInfo("baidu", "baidu_search")]
 		[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-		private class BaiduSearchEntry : SpiderEntity
+		private class BaiduSearchEntry
 		{
-			[PropertyDefine(Expression = "Keyword", Type = SelectorType.Enviroment)]
+			[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
 			public string Keyword { get; set; }
 
-			[PropertyDefine(Expression = ".//h3[@class='c-title']/a")]
+			[Field(Expression = ".//h3[@class='c-title']/a")]
 			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 			public string Title { get; set; }
 
-			[PropertyDefine(Expression = ".//h3[@class='c-title']/a/@href")]
+			[Field(Expression = ".//h3[@class='c-title']/a/@href")]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = ".//div/p[@class='c-author']/text()")]
+			[Field(Expression = ".//div/p[@class='c-author']/text()")]
 			[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 			public string Website { get; set; }
 
 
-			[PropertyDefine(Expression = ".//div/span/a[@class='c-cache']/@href")]
+			[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
 			public string Snapshot { get; set; }
 
 
-			[PropertyDefine(Expression = ".//div[@class='c-summary c-row ']", Option = PropertyDefineOptions.InnerText)]
+			[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 			public string Details { get; set; }
 
-			[PropertyDefine(Expression = ".", Option = PropertyDefineOptions.InnerText)]
+			[Field(Expression = ".", Option = FieldOptions.InnerText)]
 			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 			public string PlainText { get; set; }
 
-			[PropertyDefine(Expression = "today", Type = SelectorType.Enviroment)]
+			[Field(Expression = "today", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 		}
 	}

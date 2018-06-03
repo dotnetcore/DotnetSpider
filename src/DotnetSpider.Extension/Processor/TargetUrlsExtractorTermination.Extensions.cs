@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Processor
 		/// <summary>
 		/// 取得总页数的元素选择器
 		/// </summary>
-		public SelectorAttribute TotalPageSelector { get; set; }
+		public Selector TotalPageSelector { get; set; }
 
 		/// <summary>
 		/// 对总页数的格式化
@@ -25,7 +25,7 @@ namespace DotnetSpider.Extension.Processor
 		/// <summary>
 		/// 取得当前页的元素选择器
 		/// </summary>
-		public SelectorAttribute CurrenctPageSelector { get; set; }
+		public Selector CurrenctPageSelector { get; set; }
 
 		/// <summary>
 		/// 对当前页的格式化
@@ -53,7 +53,7 @@ namespace DotnetSpider.Extension.Processor
 			return currentStr == totalStr;
 		}
 
-		private string GetSelectorValue(Page page, SelectorAttribute selectorAttribute)
+		private string GetSelectorValue(Page page, Selector selectorAttribute)
 		{
 			string result = string.Empty;
 			var selector = selectorAttribute.ToSelector();

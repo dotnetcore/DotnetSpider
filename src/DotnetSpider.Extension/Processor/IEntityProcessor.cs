@@ -3,13 +3,13 @@
 namespace DotnetSpider.Extension.Processor
 {
 	/// <summary>
-	/// 针对爬虫实体类的页面解析器、抽取器
+	/// 针对爬虫模型的页面解析器、抽取器
 	/// </summary>
-	public interface IEntityProcessor
+	public interface IModelProcessor
 	{
 		/// <summary>
-		/// 爬虫实体类的定义
+		/// 爬虫模型的定义
 		/// </summary>
-		IEntityDefine EntityDefine { get; }
+		IModel Model { get; }
 	}
 }

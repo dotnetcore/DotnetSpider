@@ -12,15 +12,15 @@ namespace DotnetSpider.Extension.Test.Infrastructure
 		{
 			Assert.Throws<ArgumentException>(() =>
 			{
-				SelectorUtil.NotNullExpression(new SelectorAttribute(""));
+				SelectorUtil.NotNullExpression(new Selector(""));
 			});
 			Assert.Throws<ArgumentException>(() =>
 			{
-				SelectorUtil.NotNullExpression(new SelectorAttribute(null));
+				SelectorUtil.NotNullExpression(new Selector(null));
 			});
 			Assert.Throws<ArgumentException>(() =>
 			{
-				SelectorUtil.NotNullExpression(new SelectorAttribute("  "));
+				SelectorUtil.NotNullExpression(new Selector("  "));
 			});
 		}
 	}

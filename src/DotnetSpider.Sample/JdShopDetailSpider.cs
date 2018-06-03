@@ -31,14 +31,14 @@ namespace DotnetSpider.Sample
 			AddEntityType<ProductUpdater>();
 		}
 
-		[EntityTable("test", "jd_sku", EntityTable.Monday, Uniques = new[] { "Sku" }, UpdateColumns = new[] { "ShopId" })]
+		[TableInfo("test", "jd_sku", TableNamePostfix.Monday, Uniques = new[] { "Sku" }, UpdateColumns = new[] { "ShopId" })]
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
-		class ProductUpdater : SpiderEntity
+		class ProductUpdater
 		{
-			[PropertyDefine(Expression = "$.pid", Type = SelectorType.JsonPath, Length = 25)]
+			[Field(Expression = "$.pid", Type = SelectorType.JsonPath, Length = 25)]
 			public string Sku { get; set; }
 
-			[PropertyDefine(Expression = "$.shopId", Type = SelectorType.JsonPath)]
+			[Field(Expression = "$.shopId", Type = SelectorType.JsonPath)]
 			public int ShopId { get; set; }
 		}
 	}

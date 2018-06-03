@@ -6,7 +6,6 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
 using Xunit;
@@ -42,35 +41,90 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
 			{
+
+				conn.Execute($"DROP TABLE IF EXISTS test.sku;");
+
 				ISpider spider = new DefaultSpider("test", new Site());
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
-				var metadata = new EntityDefine<ProductInsert>();
-				var tableName = Guid.NewGuid().ToString("N").Substring(8, 8);
-				metadata.TableInfo.Name = tableName;
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.Init();
+				var metadata = new ModelDefine<ProductInsert>();
 
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110" };
+				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111" };
 
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2 }, spider);
+				var resultItems = new ResultItems();
+				resultItems.Request = new Request();
 
-				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
-				var metadata2 = new EntityDefine<ProductUpdate>();
-				metadata2.TableInfo.Name = tableName;
-				updatePipeline.AddEntity(metadata2);
-				updatePipeline.Init();
-				var data3 = conn.Query<ProductUpdate>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")} where sku=110").First();
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[] {
+					data1,
+					data2
+				}));
+				insertPipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(DefaultMySqlConnection, PipelineMode.Update);
+				var metadata2 = new ModelDefine<ProductUpdate>();
+
+				resultItems = new ResultItems();
+				resultItems.Request = new Request();
+
+				resultItems.AddOrUpdateResultItem(metadata2.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata2, new dynamic[] {
+					 new ProductUpdate { Sku = "1", Category = "4C" }
+				}));
+				updatePipeline.Process(new ResultItems[] { resultItems }, spider);
+
+
+				var data3 = conn.Query<ProductUpdate>($"select * from test.{metadata2.TableInfo.FullName} where sku=1").First();
 				data3.Category = "4C";
-				updatePipeline.Process(metadata2.Name, new List<dynamic> { data3 }, spider);
+				updatePipeline.Process(metadata2, new List<dynamic> { data3 }, spider);
 
-				var list = conn.Query<ProductInsert>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				var list = conn.Query<ProductInsert>($"select * from test.{metadata2.TableInfo.FullName}").ToList();
 				Assert.Equal(2, list.Count);
-				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("1", list[0].Sku);
 				Assert.Equal("4C", list[0].Category);
 
-				conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
+				conn.Execute($"DROP TABLE test.{metadata2.TableInfo.FullName};");
+			}
+		}
+
+		[Fact(DisplayName = "MySqlEntityPipelineInsertByAutoTimestamp")]
+		public void InsertByAutoTimestamp()
+		{
+			ClearDb();
+
+			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
+			{
+				conn.Execute($"DROP TABLE if exists test.sku;");
+				var spider = new DefaultSpider();
+
+				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
+				var metadata = new ModelDefine<ProductInsert>();
+
+				var resultItems = new ResultItems();
+				resultItems.Request = new Request();
+
+				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110" };
+				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111" };
+				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111" };
+
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[] {
+					data1,
+					data2,
+					data3
+				}));
+				insertPipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var list = conn.Query($"select * from test.{metadata.TableInfo.FullName}").Select(r => r as IDictionary<string, dynamic>).ToList();
+
+
+				Assert.Equal(3, list.Count);
+				Assert.Equal(5, list[0].Count);
+				Assert.Equal(1, list[0]["sku"]);
+				Assert.Equal(2, list[1]["sku"]);
+				Assert.Equal(DateTime.Now.Date, list[1]["creation_date"]);
+				Assert.True(list[1]["creation_time"] > new DateTime(2000, 1, 1));
+				Assert.Null(list[2]["category"]);
+
+				conn.Execute($"DROP TABLE test.{metadata.TableInfo.FullName};");
 			}
 		}
 
@@ -81,134 +135,98 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
 			{
-				ISpider spider = new DefaultSpider("test", new Site());
+				conn.Execute($"DROP TABLE IF EXISTS test.sku;");
+				var spider = new DefaultSpider();
 
 				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
-				var metadata = new EntityDefine<ProductInsert>();
-				var tableName = Guid.NewGuid().ToString("N");
-				metadata.TableInfo.Name = tableName;
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.Init();
+				insertPipeline.AutoTimestamp = false;
+				var metadata = new ModelDefine<ProductInsert>();
 
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
+				var resultItems = new ResultItems();
+				resultItems.Request = new Request();
 
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2, data3 }, spider);
+				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110" };
+				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111" };
+				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111" };
 
-				var list = conn.Query<ProductInsert>($"select * from test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[] {
+					data1,
+					data2,
+					data3
+				}));
+				insertPipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var list = conn.Query($"select * from test.{metadata.TableInfo.FullName}").Select(r => r as IDictionary<string, dynamic>).ToList();
+
 				Assert.Equal(3, list.Count);
-				Assert.Equal("110", list[0].Sku);
-				Assert.Equal("111", list[1].Sku);
-				Assert.Null(list[2].Category);
+				Assert.Equal(3, list[0].Count);
+				Assert.Equal(1, list[0]["sku"]);
+				Assert.Equal("3C", list[1]["category"]);
+				Assert.Null(list[2]["category"]);
 
-				conn.Execute($"DROP TABLE test.{tableName}_{DateTime.Now.ToString("yyyy_MM_dd")};");
+				conn.Execute($"DROP TABLE test.{metadata.TableInfo.FullName};");
 			}
 		}
 
-		[Fact(DisplayName = "MySqlEntityPipelineUpdateConnectString")]
-		public void UpdateConnectString()
-		{
-			ClearDb();
-
-			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
-			{
-				conn.Execute("CREATE DATABASE IF NOT EXISTS `dotnetspider1` DEFAULT CHARACTER SET utf8;");
-				conn.Execute("CREATE TABLE IF NOT EXISTS `dotnetspider1`.`settings` (`id` int(11) NOT NULL AUTO_INCREMENT,`type` varchar(45) NOT NULL,`key` varchar(45) DEFAULT NULL,`value` text,PRIMARY KEY(`id`),UNIQUE KEY `UNIQUE` (`key`,`type`)) AUTO_INCREMENT = 1");
-				try
-				{
-					conn.Execute("INSERT `dotnetspider1`.`settings` (`value`,`type`,`key`) VALUES (\"Database='mysql';Data Source=127.0.0.1;User ID=root;Password=;Port=3306\",'ConnectString','MySql01')");
-				}
-				catch (Exception)
-				{
-					// ignored
-				}
-				ISpider spider = new DefaultSpider("test", new Site());
-
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(null)
-				{
-					ConnectionStringSettingsRefresher = new DbConnectionStringSettingsRefresher
-					{
-						ConnectString = DefaultMySqlConnection,
-						QueryString = "SELECT value from `dotnetspider1`.`settings` where `type`='ConnectString' and `key`='MySql01' LIMIT 1"
-					}
-				};
-				var metadata = new EntityDefine<ProductInsert>();
-				insertPipeline.AddEntity(metadata);
-				insertPipeline.Init();
-
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110", CDate = new DateTime(2016, 8, 13) };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111", CDate = new DateTime(2016, 8, 13) };
-
-				insertPipeline.Process(metadata.Name, new List<dynamic> { data1, data2 }, spider);
-
-				var list = conn.Query<ProductInsert>($"select * from test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}").ToList();
-				Assert.Equal(2, list.Count);
-				Assert.Equal("110", list[0].Sku);
-				Assert.Equal("111", list[1].Sku);
-				conn.Execute("DROP DATABASE IF EXISTS `dotnetspider1`");
-			}
-		}
-
-		[EntityTable("test", "sku", EntityTable.Today, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
+		[TableInfo("test", "sku", TableNamePostfix.Today, PrimaryKey = "sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class ProductInsert : SpiderEntity
+		public class ProductInsert
 		{
-			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/a/@href")]
+			[Field(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
+			[Field(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
 		}
 
-		[EntityTable("test", "sku", EntityTable.Today, Uniques = new[] { "Sku" }, UpdateColumns = new[] { "Category" })]
+		[TableInfo("test", "sku", TableNamePostfix.Today, PrimaryKey = "sku", Uniques = new[] { "Sku" }, UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class ProductUpdate : SpiderEntity
+		public class ProductUpdate
 		{
-			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/a/@href")]
+			[Field(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
+			[Field(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
 		}
 
-		[EntityTable("test", "sku2", EntityTable.Today, Uniques = new[] { "Sku,Category1" })]
+		[TableInfo("test", "sku2", TableNamePostfix.Today, Uniques = new[] { "Sku,Category1" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product2Insert : SpiderEntity
+		public class Product2Insert
 		{
-			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category1 { get; set; }
 
-			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/a/@href")]
+			[Field(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
+			[Field(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
 		}
 
-		[EntityTable("test", "sku2", EntityTable.Today, Uniques = new[] { "Sku,Category1" }, UpdateColumns = new[] { "Category" })]
+		[TableInfo("test", "sku2", TableNamePostfix.Today, Uniques = new[] { "Sku,Category1" }, UpdateColumns = new[] { "Category" })]
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product2Update : SpiderEntity
+		public class Product2Update
 		{
-			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category1 { get; set; }
 
-			[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment)]
+			[Field(Expression = "name", Type = SelectorType.Enviroment)]
 			public string Category { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/a/@href")]
+			[Field(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/a", Length = 100)]
+			[Field(Expression = "./div[1]/a", Length = 100)]
 			public string Sku { get; set; }
 		}
 	}

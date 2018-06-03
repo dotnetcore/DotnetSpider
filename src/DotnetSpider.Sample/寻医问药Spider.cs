@@ -24,14 +24,14 @@ namespace DotnetSpider.Sample
 			AddEntityType<Item>();
 		}
 
-		[EntityTable("test", "yaoping")]
+		[TableInfo("test", "yaoping")]
 		[EntitySelector(Expression = ".//div[@class='s-list-btn']")]
-		class Item : SpiderEntity
+		class Item
 		{
-			[PropertyDefine(Expression = "./div[1]/div[1]/span[1]", Length = 100, Option = PropertyDefineOptions.InnerText)]
+			[Field(Expression = "./div[1]/div[1]/span[1]", Length = 100, Option = FieldOptions.InnerText)]
 			public string name { get; set; }
 
-			[PropertyDefine(Expression = "./div[1]/div[1]/span[2]", Length = 100, Option = PropertyDefineOptions.InnerText)]
+			[Field(Expression = "./div[1]/div[1]/span[2]", Length = 100, Option = FieldOptions.InnerText)]
 			public string corp { get; set; }
 		}
 	}

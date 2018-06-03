@@ -1,4 +1,8 @@
 ﻿using DotnetSpider.Core;
+using DotnetSpider.Extension;
+using MessagePack;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 #if !NETCOREAPP
 using System.Threading;
@@ -18,6 +22,7 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
+			SampleSpider.Run();
 			MyTest();
 
 			Startup.Run("-s:BaiduSearchSpider", "--tid:1", "-i:guid");
@@ -76,7 +81,20 @@ namespace DotnetSpider.Sample
 		/// </summary>
 		private static void MyTest()
 		{
+			var connection = ConnectionMultiplexer.Connect("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
+			var db = connection.GetDatabase();
 
+
+			var key = DateTime.Now.ToString("yyyyMMdd");
+
+			var obj = new[] { "30001646", "1217572261", "1217572261", "24", "宏祥家纺专营店", "128", "210", "5769", "1", "2990", "15285", "15250", "15248", "0", "沙发垫套装夏季真皮实木红木欧式麻将凉席沙发垫子坐垫飘窗垫窗台垫子沙发套罩全包巾竹凉垫椅子夏天防滑四季 （支持定做）碳化小提花 / 单牛筋 45 * 45cm", "1114622443", "0", "1", "1", "20971656", "67", "29.9", "0", "268460160", "5", "0", "9699", "0", "0", "98", "0", "0", "0", "75094", "1405324110", "71564", "0", "0", "0", "20180523000001", "0", "24687", "0", "0", "4000", "0", "6", "0", "0", "0", "0", "0", "2018-05-23 00:00:00", "1", "2018-05-23 20:00:15" };
+
+			var str = JsonConvert.SerializeObject(obj);
+			var ttt = Encoding.UTF8.GetBytes(str);
+			var bytes = LZ4MessagePackSerializer.Typeless.Serialize(obj);
+			db.ListRightPush(key, bytes);
+			var a = (byte[])db.ListLeftPop(key);
+			var d = LZ4MessagePackSerializer.Typeless.Deserialize(a);
 		}
 	}
 }

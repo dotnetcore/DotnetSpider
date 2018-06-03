@@ -1,6 +1,5 @@
 using System;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Pipeline;
@@ -22,10 +21,10 @@ namespace DotnetSpider.Sample
 			AddEntityType<HomePage>();
 		}
 
-		class HomePage : SpiderEntity
+		class HomePage
 		{
 			//jQuery(".yk-rank div:1")
-			[PropertyDefine(Expression = "<a.*?т╟вс</a>", Type = SelectorType.Regex, Arguments = "1")]
+			[Field(Expression = "<a.*?т╟вс</a>", Type = SelectorType.Regex, Arguments = "1")]
 			public string Category { get; set; }
 		}
 	}

@@ -22,11 +22,11 @@ namespace DotnetSpider.Sample
 			AddEntityType<Item>();
 		}
 
-		[EntityTable("abc", "shanxizhaosheng")]
+		[TableInfo("abc", "shanxizhaosheng")]
 		[EntitySelector(Expression = "/html/body/table[3]/tbody/tr/td/table/tbody/tr/td/table[2]/tbody/tr/td/table/tr/td/a")]
-		class Item : SpiderEntity
+		class Item
 		{
-			[PropertyDefine(Expression = ".", Length = 100)]
+			[Field(Expression = ".", Length = 100)]
 			public string School { get; set; }
 		}
 	}

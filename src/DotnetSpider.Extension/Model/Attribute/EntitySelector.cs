@@ -6,7 +6,7 @@ namespace DotnetSpider.Extension.Model.Attribute
 	/// 实体选择器
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Class)]
-	public class EntitySelector : SelectorAttribute
+	public class EntitySelector : Selector
 	{
 		/// <summary>
 		/// 从最终解析到的结果中取前 Take 个实体

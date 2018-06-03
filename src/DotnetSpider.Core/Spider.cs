@@ -1301,11 +1301,6 @@ namespace DotnetSpider.Core
 					_pipelines.Add(defaultPipeline);
 				}
 			}
-
-			foreach (var pipeline in _pipelines)
-			{
-				pipeline.Init();
-			}
 		}
 
 		private void WaitNewUrl(ref int waitCount)

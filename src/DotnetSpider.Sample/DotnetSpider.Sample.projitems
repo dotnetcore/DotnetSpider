@@ -31,7 +31,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Cnblogs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConfigurableSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CtripCitySpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CustomizeEntityExtractorWithEntityPipelineSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomSpider1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DDengSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugAfterDownloaderHandler.cs" />

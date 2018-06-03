@@ -74,7 +74,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// </summary>
 		/// <param name="selector">BaseSelector</param>
 		/// <returns>查询器</returns>
-		public static ISelector ToSelector(this ISelectorAttribute selector)
+		public static ISelector ToSelector(this Selector selector)
 		{
 			if (selector != null)
 			{
@@ -129,7 +129,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
-		internal static void NotNullExpression(ISelectorAttribute selector)
+		internal static void NotNullExpression(Selector selector)
 		{
 			if (string.IsNullOrWhiteSpace(selector.Expression))
 			{

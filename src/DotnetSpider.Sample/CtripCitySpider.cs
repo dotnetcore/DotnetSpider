@@ -33,20 +33,20 @@ namespace DotnetSpider.Sample
 			 
 		}
 
-		[EntityTable("ctrip", "city", Uniques = new[] { "city_id,run_id" })]
+		[TableInfo("ctrip", "city", Uniques = new[] { "city_id,run_id" })]
 		[EntitySelector(Expression = "//div[@class='city_item']//a")]
-		class CtripCity : SpiderEntity
+		class CtripCity
 		{
-			[PropertyDefine(Expression = ".", Length = 100)]
+			[Field(Expression = ".", Length = 100)]
 			public string name { get; set; }
 
-			[PropertyDefine(Expression = "./@title", Length = 100)]
+			[Field(Expression = "./@title", Length = 100)]
 			public string title { get; set; }
 
-			[PropertyDefine(Expression = "./@data-id", Length = 100)]
+			[Field(Expression = "./@data-id", Length = 100)]
 			public string city_id { get; set; }
 
-			[PropertyDefine(Expression = "Today", Type = SelectorType.Enviroment)]
+			[Field(Expression = "Today", Type = SelectorType.Enviroment)]
 			public DateTime run_id { get; set; }
 		}
 	}

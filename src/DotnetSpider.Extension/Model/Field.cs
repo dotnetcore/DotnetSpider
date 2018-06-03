@@ -3,10 +3,24 @@ using DotnetSpider.Core.Selector;
 
 namespace DotnetSpider.Extension.Model.Attribute
 {
+	public enum DataType
+	{
+		None,
+		Int,
+		Float,
+		Double,
+		DateTime,
+		Date,
+		Long,
+		Bool,
+		String,
+		Decimal
+	}
+
 	/// <summary>
 	/// 额外选项的定义
 	/// </summary>
-	public enum PropertyDefineOptions
+	public enum FieldOptions
 	{
 		/// <summary>
 		/// 不作任何操作
@@ -38,20 +52,12 @@ namespace DotnetSpider.Extension.Model.Attribute
 	/// 属性选择器的定义
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
-	public class PropertyDefine : SelectorAttribute
+	public class Field : Selector
 	{
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public PropertyDefine()
-		{
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="expression">表达式</param>
-		public PropertyDefine(string expression) : base(expression)
+		public Field()
 		{
 		}
 
@@ -60,8 +66,20 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// </summary>
 		/// <param name="type">选择器类型</param>
 		/// <param name="expression">表达式</param>
-		public PropertyDefine(SelectorType type, string expression) : base(type, expression)
+		public Field(SelectorType type, string expression) : this(type, expression, null)
 		{
+		}
+
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="type">选择器类型</param>
+		/// <param name="expression">表达式</param>
+		public Field(SelectorType type, string expression, string name, DataType dataType = DataType.String, int length = 255) : base(type, expression)
+		{
+			Name = name;
+			DataType = dataType;
+			Length = length;
 		}
 
 		/// <summary>
@@ -73,16 +91,32 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// <summary>
 		/// 额外选项的定义
 		/// </summary>
-		public PropertyDefineOptions Option { get; set; } = PropertyDefineOptions.None;
+		public FieldOptions Option { get; set; } = FieldOptions.None;
 
 		/// <summary>
 		/// 列的长度
 		/// </summary>
-		public int Length { get; set; }
+		public int Length { get; set; } = 255;
+
+		public string Name { get; set; }
 
 		/// <summary>
 		/// 是否不把此列数据保存到数据库
 		/// </summary>
 		public bool IgnoreStore { get; set; }
+
+		public DataType DataType { get; set; } = DataType.None;
+
+		public Formatter.Formatter[] Formatters { get; set; }
+
+		public override int GetHashCode()
+		{
+			return Name.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return $"{Name} {DataType} {IgnoreStore}";
+		}
 	}
 }

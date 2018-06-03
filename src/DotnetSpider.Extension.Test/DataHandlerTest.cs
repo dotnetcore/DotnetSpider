@@ -3,7 +3,6 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Processor;
 using Xunit;
 using System;
-using System.Collections.Generic;
 using DotnetSpider.Core;
 using System.IO;
 
@@ -12,7 +11,7 @@ namespace DotnetSpider.Extension.Test
 
 	public class DataHandlerTest
 	{
-		private class MyDataHanlder : DataHandler<Product>
+		private class MyDataHanlder : IDataHandler
 		{
 			public string Identity { get; set; }
 
@@ -21,26 +20,20 @@ namespace DotnetSpider.Extension.Test
 				Identity = guid;
 			}
 
-			protected override Product HandleDataOject(Product data, Page page)
-			{
-				return data;
-			}
-
-			public override IEnumerable<Product> Handle(IEnumerable<Product> datas, Page page)
+			public void Handle(ref dynamic data, Page page)
 			{
 				var stream = File.Create(Identity);
 				stream.Dispose();
-				return base.Handle(datas, page);
 			}
 		}
 
 		[Fact]
 		public void HandlerWhenExtractZeroResult()
 		{
-			var entityMetadata = new EntityDefine<Product>();
+			var entityMetadata = new ModelDefine<Product>();
 			var identity = Guid.NewGuid().ToString("N");
 
-			EntityProcessor<Product> processor = new EntityProcessor<Product>(new MyDataHanlder(identity));
+			EntityProcessor<Product> processor = new EntityProcessor<Product>(null, new MyDataHanlder(identity));
 
 			processor.Process(new Page(new Request("http://www.abcd.com") { Site = new Site() })
 			{
@@ -51,9 +44,9 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[EntitySelector(Expression = "$.data[*]", Type = Core.Selector.SelectorType.JsonPath)]
-		private class Product : SpiderEntity
+		private class Product
 		{
-			[PropertyDefine(Expression = "$.name", Type = Core.Selector.SelectorType.JsonPath, Length = 100)]
+			[Field(Expression = "$.name", Type = Core.Selector.SelectorType.JsonPath, Length = 100)]
 			public string name { get; set; }
 		}
 	}

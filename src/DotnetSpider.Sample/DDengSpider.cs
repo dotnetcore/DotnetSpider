@@ -34,10 +34,10 @@ namespace DotnetSpider.Sample
 			AddEntityType<Corp>();
 		}
 
-		[EntityTable("test", "ddeng_corp", EntityTable.Today)]
-		class Corp : SpiderEntity
+		[TableInfo("test", "ddeng_corp", TableNamePostfix.Today)]
+		class Corp
 		{
-			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong", Length = 100)]
+			[Field(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong", Length = 100)]
 			public string Name { get; set; }
 
 			[ReplaceFormatter(NewValue = "", OldValue = "\r")]
@@ -46,7 +46,7 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "\n")]
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
-			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = PropertyDefineOptions.InnerText, Length = 100)]
+			[Field(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = FieldOptions.InnerText, Length = 100)]
 			public string Phone { get; set; }
 
 			[ReplaceFormatter(NewValue = "", OldValue = "\r")]
@@ -56,10 +56,10 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
 			[ReplaceFormatter(NewValue = "", OldValue = "地址：")]
-			[PropertyDefine(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = PropertyDefineOptions.InnerText, Length = 200)]
+			[Field(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = FieldOptions.InnerText, Length = 200)]
 			public string Address { get; set; }
 
-			[PropertyDefine(Expression = ".")]
+			[Field(Expression = ".")]
 			public string Html { get; set; }
 		}
 	}
