@@ -128,7 +128,6 @@ namespace DotnetSpider.Extension.Model
 				fields.Add(field);
 			}
 
-
 			Selector = selector;
 			TableInfo = tableInfo;
 
@@ -140,8 +139,6 @@ namespace DotnetSpider.Extension.Model
 
 			if (TableInfo != null)
 			{
-				TableInfo.PrimaryKey = TableInfo.PrimaryKey?.Trim().ToLower();
-				Fields.RemoveWhere(f => f.Name.ToLower() == TableInfo.PrimaryKey);
 				Identity = $"{TableInfo.Database}.{TableInfo.FullName}";
 			}
 			else
@@ -161,19 +158,14 @@ namespace DotnetSpider.Extension.Model
 				{
 					foreach (var column in tableInfo.UpdateColumns)
 					{
-						if (columns.All(c => c.Name != column) && column.ToLower() != tableInfo.PrimaryKey)
+						if (columns.All(c => c.Name != column) )
 						{
 							throw new SpiderException("Columns set to update are not a property of your entity");
 						}
 					}
-
 					if (tableInfo.UpdateColumns.Length == 0)
 					{
 						throw new SpiderException("There is no column need update");
-					}
-					if (tableInfo.UpdateColumns.Any(c => c.ToLower() == tableInfo.PrimaryKey))
-					{
-						throw new SpiderException("Primary can't be updated.");
 					}
 				}
 
@@ -214,10 +206,6 @@ namespace DotnetSpider.Extension.Model
 						}
 						foreach (var item in items)
 						{
-							if (item.ToLower() == tableInfo.PrimaryKey)
-							{
-								continue;
-							}
 							var column = columns.FirstOrDefault(c => c.Name == item);
 							if (column == null)
 							{

@@ -20,7 +20,7 @@ namespace DotnetSpider.Core.Test
 
 	public partial class SpiderTest
 	{
-		[Fact]
+		[Fact(DisplayName = "RunAsyncAndStop")]
 		public void RunAsyncAndStop()
 		{
 			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
@@ -42,7 +42,7 @@ namespace DotnetSpider.Core.Test
 			Thread.Sleep(3000);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "RunAsyncAndContiune")]
 		public void RunAsyncAndContiune()
 		{
 			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
@@ -64,7 +64,7 @@ namespace DotnetSpider.Core.Test
 			Thread.Sleep(5000);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "RunAsyncAndStopThenExit")]
 		public void RunAsyncAndStopThenExit()
 		{
 			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")
@@ -86,7 +86,7 @@ namespace DotnetSpider.Core.Test
 			Thread.Sleep(5000);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "NoPipeline")]
 		public void NoPipeline()
 		{
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor());
@@ -94,7 +94,7 @@ namespace DotnetSpider.Core.Test
 			spider.Run();
 		}
 
-		[Fact]
+		[Fact(DisplayName = "WhenNoStartUrl")]
 		public void WhenNoStartUrl()
 		{
 			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
@@ -126,7 +126,7 @@ namespace DotnetSpider.Core.Test
 			}
 		}
 
-		[Fact]
+		[Fact(DisplayName = "RetryWhenResultIsEmpty")]
 		public void RetryWhenResultIsEmpty()
 		{
 			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
@@ -137,7 +137,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(Status.Finished, spider.Status);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "CloseSignal")]
 		public void CloseSignal()
 		{
 			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8" },
@@ -164,7 +164,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(25, spider2.Scheduler.SuccessRequestsCount);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "FastExit")]
 		public void FastExit()
 		{
 			if (Environment.GetEnvironmentVariable("TRAVIS") == "1")

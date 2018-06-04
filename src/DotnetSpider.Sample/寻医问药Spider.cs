@@ -20,7 +20,7 @@ namespace DotnetSpider.Sample
 			{
 				AddStartUrl($"http://yao.xywy.com/search/?q=%E6%85%A2%E6%80%A7%E6%94%AF%E6%B0%94%E7%AE%A1%E7%82%8E&sort=complex&pricefilter=1&p={i}");
 			}
-			AddPipeline(new MySqlFileEntityPipeline(MySqlFileEntityPipeline.FileType.InsertSql));
+			AddPipeline(new MySqlEntityFilePipeline(MySqlEntityFilePipeline.FileType.InsertSql));
 			AddEntityType<Item>();
 		}
 

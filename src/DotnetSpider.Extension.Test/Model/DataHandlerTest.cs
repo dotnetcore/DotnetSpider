@@ -6,41 +6,34 @@ using System;
 using DotnetSpider.Core;
 using System.IO;
 
-namespace DotnetSpider.Extension.Test
+namespace DotnetSpider.Extension.Test.Model
 {
-
 	public class DataHandlerTest
 	{
-		private class MyDataHanlder : IDataHandler
+		private class MyDataHandler : IDataHandler
 		{
-			public string Identity { get; set; }
-
-			public MyDataHanlder(string guid)
-			{
-				Identity = guid;
-			}
-
 			public void Handle(ref dynamic data, Page page)
 			{
-				var stream = File.Create(Identity);
+				var name = data.name;
+				var stream = File.Create("file." + name);
 				stream.Dispose();
 			}
 		}
 
-		[Fact]
-		public void HandlerWhenExtractZeroResult()
+		[Fact(DisplayName = "HandleModel")]
+		public void HandleModel()
 		{
-			var entityMetadata = new ModelDefine<Product>();
-			var identity = Guid.NewGuid().ToString("N");
-
-			EntityProcessor<Product> processor = new EntityProcessor<Product>(null, null, new MyDataHanlder(identity));
+			var model = new ModelDefine<Product>();
+			EntityProcessor<Product> processor = new EntityProcessor<Product>(null, null, new MyDataHandler());
 
 			processor.Process(new Page(new Request("http://www.abcd.com") { Site = new Site() })
 			{
-				Content = "{'data':[{'name':'1'},{'name':'2'}]}"
+				Content = "{'data':[{'name':'aaaa'},{'name':'bbbb'}]}"
 			}, new DefaultSpider());
-			Assert.True(File.Exists(identity));
-			File.Delete(identity);
+			Assert.True(File.Exists("file.aaaa"));
+			Assert.True(File.Exists("file.bbbb"));
+			File.Delete("file.aaaa");
+			File.Delete("file.bbbb");
 		}
 
 		[EntitySelector(Expression = "$.data[*]", Type = Core.Selector.SelectorType.JsonPath)]

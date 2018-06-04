@@ -4,9 +4,8 @@ using DotnetSpider.Extension.Processor;
 using System;
 using Xunit;
 
-namespace DotnetSpider.Extension.Test
+namespace DotnetSpider.Extension.Test.Model
 {
-
 	public class TargetUrlSelectorTest
 	{
 		[TargetUrlsSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]

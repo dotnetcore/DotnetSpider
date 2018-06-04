@@ -39,6 +39,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\WebDriverUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\EntitySelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\LinkToNext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\BaseEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Field.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\SharedValueSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\TargetUrlsSelector.cs" />
@@ -83,7 +84,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\JsonFileEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MongoDbEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MySqlEntityPipeline.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MySqlFileEntityPipeline.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MySqlEntityFilePipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PipelineMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PostgreSqlEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\SqlServerEntityPipeline.cs" />

@@ -14,7 +14,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// LoadFile是批量导入模式通过命令 LOAD DATA LOCAL INFILE '{filePath}' INTO TABLE `{schema}`.`{dababase}` FIELDS TERMINATED BY '$'  ENCLOSED BY '#' LINES TERMINATED BY '@END@' IGNORE 1 LINES; 还原。
 	/// InsertSql是完整的Insert SQL语句, 需要一条条执行来导入数据
 	/// </summary>
-	public class MySqlFileEntityPipeline : ModelPipeline
+	public class MySqlEntityFilePipeline : ModelPipeline
 	{
 		private readonly Dictionary<string, StreamWriter> _writers = new Dictionary<string, StreamWriter>();
 
@@ -39,7 +39,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// 构造方法
 		/// </summary>
 		/// <param name="fileType">文件类型</param>
-		public MySqlFileEntityPipeline(FileType fileType = FileType.LoadFile)
+		public MySqlEntityFilePipeline(FileType fileType = FileType.LoadFile)
 		{
 			_type = fileType;
 		}

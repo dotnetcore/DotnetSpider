@@ -10,12 +10,12 @@ using Xunit;
 using DotnetSpider.Extension.Processor;
 using System.Linq;
 
-namespace DotnetSpider.Extension.Test
+namespace DotnetSpider.Extension.Test.Model
 {
 
 	public class EntityExtractorTest
 	{
-		[Fact]
+		[Fact(DisplayName = "Extract")]
 		public void Extract()
 		{
 			ModelExtractor<Product> extractor = new ModelExtractor<Product>();
@@ -41,7 +41,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.Equal(DateTime.Now.ToString("yyyy-MM-dd"), results.First().RunId.ToString("yyyy-MM-dd"));
 		}
 
-		[Fact]
+		[Fact(DisplayName = "TempEntityNoPrimaryInfo")]
 		public void TempEntityNoPrimaryInfo()
 		{
 			EntityProcessor<Entity1> processor = new EntityProcessor<Entity1>();
@@ -50,7 +50,7 @@ namespace DotnetSpider.Extension.Test
 				Content = "{'data':[{'age':'1'},{'age':'2'}]}"
 			};
 			processor.Process(page, new DefaultSpider());
-			Assert.Equal(2, (page.ResultItems.GetResultItem($"DotnetSpider.Extension.Test.EntityExtractorTest+Entity1").Item2).Count);
+			Assert.Equal(2, (page.ResultItems.GetResultItem($"DotnetSpider.Extension.Test.Model.EntityExtractorTest+Entity1").Item2).Count);
 		}
 
 		[TableInfo("test", "sku2", TableNamePostfix.Today)]
@@ -91,7 +91,7 @@ namespace DotnetSpider.Extension.Test
 		}
 
 		[EntitySelector(Expression = "$.data[*]", Type = SelectorType.JsonPath)]
-		public class Entity1
+		private class Entity1
 		{
 			[Field(Expression = "$.age", Type = SelectorType.JsonPath)]
 			public int Age { get; set; }

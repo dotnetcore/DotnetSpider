@@ -3,7 +3,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Extension.Model.Formatter;
 using Xunit;
 
-namespace DotnetSpider.Extension.Test
+namespace DotnetSpider.Extension.Test.Model
 {
 
 	public class FormatterTest

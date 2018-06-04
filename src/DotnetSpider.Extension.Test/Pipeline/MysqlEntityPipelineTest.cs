@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Dapper;
 using DotnetSpider.Core;
@@ -7,222 +8,591 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Processor;
 using MySql.Data.MySqlClient;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
-
 	/// <summary>
 	/// grant all privileges on *.* to root@localhost identified by '';
 	/// flush privileges;
+	/// 
+	/// 测试流程:
+	/// 1. 构造 Pipeline 对象
+	/// 2. 构造 ModelDefine
+	/// 3. 构造解析好的数据
+	/// 4. Process Pipeline
 	/// </summary>
 	public class MySqlEntityPipelineTest : TestBase
 	{
-		private void ClearDb()
-		{
-			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
-			{
-				conn.Execute($"DROP table IF exists test.sku_{DateTime.Now.ToString("yyyy_MM_dd")}");
-				conn.Execute($"DROP table IF exists test.sku2_{DateTime.Now.ToString("yyyy_MM_dd")}");
-			}
-		}
-
-
 		public MySqlEntityPipelineTest()
 		{
 			Env.HubService = false;
 		}
 
-		[Fact]
-		public void Update()
+		protected virtual DbModelPipeline CreatePipeline(PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate)
 		{
-			ClearDb();
+			return new MySqlEntityPipeline(DefaultConnectionString, pipelineMode);
+		}
 
-			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
+		protected virtual IDbConnection CreateDbConnection()
+		{
+			return new MySqlConnection(DefaultConnectionString);
+		}
+
+		[Fact(DisplayName = "DataTypes")]
+		public virtual void DataTypes()
+		{
+			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"))
 			{
+				try
+				{
+					conn.Execute("use test;  drop table table15;");
+				}
+				catch
+				{
+				}
 
-				conn.Execute($"DROP TABLE IF EXISTS test.sku;");
+				var spider = new DefaultSpider();
+
+				EntityProcessor<Entity15> processor = new EntityProcessor<Entity15>();
+
+				var pipeline = new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;");
+				var resultItems = new ResultItems();
+				resultItems.Request = new Request();
+				resultItems.AddOrUpdateResultItem(processor.Model.Identity, new Tuple<IModel, IEnumerable<dynamic>>(processor.Model, new dynamic[] {
+					new Dictionary<string, dynamic>
+					{
+						{ "int", "1"},
+						{ "bool", "1"},
+						{ "bigint", "11"},
+						{ "string", "aaa"},
+						{ "time", "2018-06-12"},
+						{ "float", "1"},
+						{ "double", "1"},
+						{ "string1", "abc"},
+						{ "string2", "abcdd"},
+						{ "decimal", "1"}
+					}
+				}));
+				pipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var columns = conn.Query<ColumnInfo>("SELECT COLUMN_NAME as `Name`, COLUMN_TYPE as `Type` FROM information_schema.columns WHERE table_name='table15' AND table_schema = 'test';").ToList(); ;
+				Assert.Equal(12, columns.Count);
+
+				Assert.Equal("int".ToLower(), columns[0].Name);
+				Assert.Equal("bool".ToLower(), columns[1].Name);
+				Assert.Equal("bigint".ToLower(), columns[2].Name);
+				Assert.Equal("string".ToLower(), columns[3].Name);
+				Assert.Equal("time".ToLower(), columns[4].Name);
+				Assert.Equal("float".ToLower(), columns[5].Name);
+				Assert.Equal("double".ToLower(), columns[6].Name);
+				Assert.Equal("string1".ToLower(), columns[7].Name);
+				Assert.Equal("string2".ToLower(), columns[8].Name);
+				Assert.Equal("decimal".ToLower(), columns[9].Name);
+				Assert.Equal("creation_time".ToLower(), columns[10].Name);
+				Assert.Equal("creation_date".ToLower(), columns[11].Name);
+
+
+				Assert.Equal("int(11)", columns[0].Type);
+				Assert.Equal("tinyint(1)", columns[1].Type);
+				Assert.Equal("bigint(20)", columns[2].Type);
+				Assert.Equal("varchar(255)", columns[3].Type);
+				Assert.Equal("timestamp", columns[4].Type);
+				Assert.Equal("float", columns[5].Type);
+				Assert.Equal("double", columns[6].Type);
+				Assert.Equal("varchar(100)", columns[7].Type);
+				Assert.Equal("longtext", columns[8].Type);
+				Assert.Equal("decimal(18,2)", columns[9].Type);
+				Assert.Equal("timestamp", columns[10].Type);
+				Assert.Equal("date", columns[11].Type);
+
+
+				try
+				{
+					conn.Execute("use test;  drop table table15;");
+				}
+				catch
+				{
+				}
+			}
+		}
+
+		[Fact(DisplayName = "Update_AutoIncrementPrimaryKey")]
+		public void Update_AutoIncrementPrimaryKey()
+		{
+			using (var conn = CreateDbConnection())
+			{
+				try
+				{
+					conn.Execute($"use test; DROP TABLE autoincrementprimarykey;");
+				}
+				catch { }
 
 				ISpider spider = new DefaultSpider("test", new Site());
 
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
-				var metadata = new ModelDefine<ProductInsert>();
+				// 1. Create pipeline
+				var pipeline = CreatePipeline();
 
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110" };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111" };
+				// 2. Create ModelDefine
+				var metadata = new ModelDefine<AutoIncrementPrimaryKey>();
 
+				// 3. Create data
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
-
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[] {
-					data1,
-					data2
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					new AutoIncrementPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
+					new AutoIncrementPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" }
 				}));
-				insertPipeline.Process(new ResultItems[] { resultItems }, spider);
+				var processArgument = new ResultItems[] { resultItems };
 
-				MySqlEntityPipeline updatePipeline = new MySqlEntityPipeline(DefaultMySqlConnection, PipelineMode.Update);
-				var metadata2 = new ModelDefine<ProductUpdate>();
+				// 4. Execute pipline
+				pipeline.Process(processArgument, spider);
+
+				var updateModePipeline = CreatePipeline(PipelineMode.Update);
 
 				resultItems = new ResultItems();
 				resultItems.Request = new Request();
-
-				resultItems.AddOrUpdateResultItem(metadata2.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata2, new dynamic[] {
-					 new ProductUpdate { Sku = "1", Category = "4C" }
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					 new AutoIncrementPrimaryKey { Id = 1, Category = "4C" }
 				}));
-				updatePipeline.Process(new ResultItems[] { resultItems }, spider);
 
-				var list = conn.Query<ProductInsert>($"select * from test.{metadata2.TableInfo.FullName}").ToList();
+				updateModePipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var list = conn.Query<AutoIncrementPrimaryKey>($"use test; select * from autoincrementprimarykey").ToList();
 				Assert.Equal(2, list.Count);
-				Assert.Equal("1", list[0].Sku);
+				Assert.Equal("110", list[0].Sku);
 				Assert.Equal("4C", list[0].Category);
 
-				conn.Execute($"DROP TABLE test.{metadata2.TableInfo.FullName};");
+				try
+				{
+					conn.Execute($"use test; DROP TABLE autoincrementprimarykey;");
+				}
+				catch { }
 			}
 		}
 
-		[Fact(DisplayName = "MySqlEntityPipelineInsertByAutoTimestamp")]
-		public void InsertByAutoTimestamp()
+		[Fact(DisplayName = "Update_MutliPrimaryKey")]
+		public void Update_MutliPrimaryKey()
 		{
-			ClearDb();
-
-			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
+			using (var conn = CreateDbConnection())
 			{
-				conn.Execute($"DROP TABLE if exists test.sku;");
+				try
+				{
+					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+				}
+				catch { }
+				ISpider spider = new DefaultSpider("test", new Site());
+
+				// 1. Create pipeline
+				var pipeline = CreatePipeline();
+
+				// 2. Create ModelDefine
+				var metadata = new ModelDefine<MultiPrimaryKey>();
+
+				// 3. Create data
+				var resultItems = new ResultItems();
+				resultItems.Request = new Request();
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
+					new MultiPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" }
+				}));
+				var processArgument = new ResultItems[] { resultItems };
+
+				// 4. Execute pipline
+				pipeline.Process(processArgument, spider);
+
+				var updateModePipeline = CreatePipeline(PipelineMode.Update);
+
+				resultItems = new ResultItems();
+				resultItems.Request = new Request();
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					 new MultiPrimaryKey { Sku="111", Category = "4C", Name="Product 2" }
+				}));
+
+				updateModePipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var list = conn.Query<MultiPrimaryKey>($"use test; select * from multiprimarykey").ToList();
+				Assert.Equal(2, list.Count);
+				Assert.Equal("4C", list[1].Category);
+				try
+				{
+					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+				}
+				catch { }
+			}
+		}
+
+		#region Insert Tests
+
+		[Fact(DisplayName = "Insert_AutoIncrementPrimaryKey")]
+		public void Insert_AutoIncrementPrimaryKey()
+		{
+			using (var conn = CreateDbConnection())
+			{
+				try
+				{
+					conn.Execute($"use test; DROP TABLE autoincrementprimarykey;");
+				}
+				catch { }
 				var spider = new DefaultSpider();
 
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
-				var metadata = new ModelDefine<ProductInsert>();
+				var pipeline = CreatePipeline();
+				var metadata = new ModelDefine<AutoIncrementPrimaryKey>();
 
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
 
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110" };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111" };
-				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111" };
-
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[] {
-					data1,
-					data2,
-					data3
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					new AutoIncrementPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
+					new AutoIncrementPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" },
+					new AutoIncrementPrimaryKey { Sku = "112", Category = null, Name = "Product 3" }
 				}));
-				insertPipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider);
 
-				var list = conn.Query($"select * from test.{metadata.TableInfo.FullName}").Select(r => r as IDictionary<string, dynamic>).ToList();
-
+				var list = conn.Query($"use test; select * from autoincrementprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 
 				Assert.Equal(3, list.Count);
-				Assert.Equal(5, list[0].Count);
-				Assert.Equal(1, list[0]["sku"]);
-				Assert.Equal(2, list[1]["sku"]);
+				Assert.Equal(1, list[0]["id"]);
+				Assert.Equal(2, list[1]["id"]);
+				Assert.Equal(3, list[2]["id"]);
+				try
+				{
+					conn.Execute($"use test; DROP TABLE autoincrementprimarykey;");
+				}
+				catch { }
+			}
+		}
+
+		[Fact(DisplayName = "Insert_NonePrimaryKey")]
+		public void Insert_NonePrimaryKey()
+		{
+			using (var conn = CreateDbConnection())
+			{
+				try
+				{
+					conn.Execute($"use test; DROP TABLE noneprimarykey;");
+				}
+				catch { }
+				var spider = new DefaultSpider();
+
+				var pipeline = CreatePipeline();
+				var metadata = new ModelDefine<NonePrimaryKey>();
+
+				var resultItems = new ResultItems();
+				resultItems.Request = new Request();
+
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					new NonePrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
+					new NonePrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" },
+					new NonePrimaryKey { Sku = "112", Category = null, Name = "Product 3" },
+					new NonePrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
+				}));
+				pipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var list = conn.Query($"use test; select * from noneprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
+
+				Assert.Equal(4, list.Count);
+				Assert.Equal("110", list[0]["sku"]);
+				Assert.Equal("111", list[1]["sku"]);
+				Assert.Null(list[2]["category"]);
+				try
+				{
+					conn.Execute($"use test; DROP TABLE noneprimarykey;");
+				}
+				catch { }
+			}
+		}
+
+		[Fact(DisplayName = "Insert_AutoTimestamp")]
+		public void Insert_AutoTimestamp()
+		{
+			using (var conn = CreateDbConnection())
+			{
+				var datetime = DateTime.Now.AddSeconds(-50);
+
+				try
+				{
+					conn.Execute($"use test; DROP TABLE timestamp;");
+				}
+				catch { }
+
+				var spider = new DefaultSpider();
+
+				var pipeline = CreatePipeline();
+				var metadata = new ModelDefine<Timestamp>();
+
+				var resultItems = new ResultItems();
+				resultItems.Request = new Request();
+
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					new Timestamp { Sku = "110", Category = "3C", Name = "Product 1" },
+					new Timestamp { Sku = "111", Category = "3C", Name = "Product 2" },
+					new Timestamp { Sku = "112", Category = null, Name = "Product 3" }
+				}));
+				pipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var list = conn.Query($"use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
+
+				Assert.Equal(6, list[0].Count);
+				Assert.Equal(DateTime.Now.Date, list[0]["creation_date"]);
 				Assert.Equal(DateTime.Now.Date, list[1]["creation_date"]);
-				Assert.True(list[1]["creation_time"] > new DateTime(2000, 1, 1));
-				Assert.Null(list[2]["category"]);
+				Assert.Equal(DateTime.Now.Date, list[2]["creation_date"]);
+				Assert.True(list[0]["creation_time"] > datetime);
+				Assert.True(list[1]["creation_time"] > datetime);
+				Assert.True(list[2]["creation_time"] > datetime);
 
-				conn.Execute($"DROP TABLE test.{metadata.TableInfo.FullName};");
+				try
+				{
+					conn.Execute($"use test; DROP TABLE timestamp;");
+				}
+				catch { }
 			}
 		}
 
-		[Fact(DisplayName = "MySqlEntityPipelineInsert")]
-		public void Insert()
+		[Fact(DisplayName = "Insert_NoneTimestamp")]
+		public void Insert_NoneTimestamp()
 		{
-			ClearDb();
-
-			using (MySqlConnection conn = new MySqlConnection(DefaultMySqlConnection))
+			using (var conn = CreateDbConnection())
 			{
-				conn.Execute($"DROP TABLE IF EXISTS test.sku;");
+				var datetime = DateTime.Now.AddSeconds(-50);
+
+				try
+				{
+					conn.Execute($"use test; DROP TABLE timestamp;");
+				}
+				catch { }
+
 				var spider = new DefaultSpider();
 
-				MySqlEntityPipeline insertPipeline = new MySqlEntityPipeline(DefaultMySqlConnection);
-				insertPipeline.AutoTimestamp = false;
-				var metadata = new ModelDefine<ProductInsert>();
+				var pipeline = CreatePipeline();
+				pipeline.AutoTimestamp = false;
+
+				var metadata = new ModelDefine<Timestamp>();
 
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
 
-				var data1 = new ProductInsert { Sku = "110", Category = "3C", Url = "http://jd.com/110" };
-				var data2 = new ProductInsert { Sku = "111", Category = "3C", Url = "http://jd.com/111" };
-				var data3 = new ProductInsert { Sku = "112", Category = null, Url = "http://jd.com/111" };
-
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[] {
-					data1,
-					data2,
-					data3
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					new Timestamp { Sku = "110", Category = "3C", Name = "Product 1" },
+					new Timestamp { Sku = "111", Category = "3C", Name = "Product 2" },
+					new Timestamp { Sku = "112", Category = null, Name = "Product 3" }
 				}));
-				insertPipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider);
 
-				var list = conn.Query($"select * from test.{metadata.TableInfo.FullName}").Select(r => r as IDictionary<string, dynamic>).ToList();
+				var list = conn.Query($"use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
 
-				Assert.Equal(3, list.Count);
-				Assert.Equal(3, list[0].Count);
-				Assert.Equal(1, list[0]["sku"]);
-				Assert.Equal("3C", list[1]["category"]);
-				Assert.Null(list[2]["category"]);
+				Assert.Equal(4, list[0].Count);
 
-				conn.Execute($"DROP TABLE test.{metadata.TableInfo.FullName};");
+				try
+				{
+					conn.Execute($"use test; DROP TABLE timestamp;");
+				}
+				catch { }
 			}
 		}
 
-		[TableInfo("test", "sku", TableNamePostfix.Today, PrimaryKey = "sku", Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
-		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class ProductInsert
+		[Fact(DisplayName = "Insert_MultiPrimaryKey")]
+		public virtual void Insert_MultiPrimaryKey()
 		{
-			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			using (var conn = CreateDbConnection())
+			{
+				try
+				{
+					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+				}
+				catch { }
+
+				var spider = new DefaultSpider();
+
+				var pipeline = CreatePipeline();
+				var metadata = new ModelDefine<MultiPrimaryKey>();
+
+				var resultItems = new ResultItems();
+				resultItems.Request = new Request();
+
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
+					new MultiPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" },
+					new MultiPrimaryKey { Sku = "112", Category = null, Name = "Product 3" },
+					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
+				}));
+				pipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var list = conn.Query($"use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
+
+				Assert.Equal(3, list.Count);
+				Assert.Equal("110", list[0]["sku"]);
+				Assert.Equal("111", list[1]["sku"]);
+				Assert.Null(list[2]["category"]);
+
+				try
+				{
+					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+				}
+				catch { }
+			}
+		}
+
+		[Fact(DisplayName = "Insert_InsertNewAndUpdateOld")]
+		public virtual void Insert_InsertNewAndUpdateOld()
+		{
+			using (var conn = CreateDbConnection())
+			{
+				try
+				{
+					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+				}
+				catch { }
+
+				var spider = new DefaultSpider();
+
+				var pipeline = CreatePipeline();
+				var metadata = new ModelDefine<MultiPrimaryKey>();
+
+				var resultItems = new ResultItems();
+				resultItems.Request = new Request();
+
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
+					new MultiPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" },
+					new MultiPrimaryKey { Sku = "112", Category = null, Name = "Product 3" },
+					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
+				}));
+				pipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var insertNewAndUpdateOldPipeline = CreatePipeline(PipelineMode.InsertNewAndUpdateOld);
+
+				resultItems = new ResultItems();
+				resultItems.Request = new Request();
+				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IEnumerable<dynamic>>(metadata, new dynamic[]
+				{
+					 new AutoIncrementPrimaryKey { Sku = "110", Name="Product 1", Category = "4C" }
+				}));
+
+				insertNewAndUpdateOldPipeline.Process(new ResultItems[] { resultItems }, spider);
+
+				var list = conn.Query($"use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
+
+				Assert.Equal(3, list.Count);
+				Assert.Equal("4C", list[0]["category"]);
+
+				try
+				{
+					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+				}
+				catch { }
+			}
+		}
+
+		#endregion
+
+		[TableInfo("test", "multiprimarykey", UpdateColumns = new[] { "Category" })]
+		public class MultiPrimaryKey
+		{
+			[Field(Expression = "category")]
 			public string Category { get; set; }
 
-			[Field(Expression = "./div[1]/a/@href")]
-			public string Url { get; set; }
+			[Field(Expression = "name", IsPrimary = true)]
+			public string Name { get; set; }
 
-			[Field(Expression = "./div[1]/a", Length = 100)]
+			[Field(Expression = "sku", IsPrimary = true)]
 			public string Sku { get; set; }
 		}
 
-		[TableInfo("test", "sku", TableNamePostfix.Today, PrimaryKey = "sku", Uniques = new[] { "Sku" }, UpdateColumns = new[] { "Category" })]
-		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class ProductUpdate
+		[TableInfo("test", "timestamp")]
+		public class Timestamp : BaseEntity
 		{
-			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "Category", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
-			[Field(Expression = "./div[1]/a/@href")]
-			public string Url { get; set; }
+			[Field(Expression = "name")]
+			public string Name { get; set; }
 
-			[Field(Expression = "./div[1]/a", Length = 100)]
+			[Field(Expression = "sku", Length = 100)]
 			public string Sku { get; set; }
 		}
 
-		[TableInfo("test", "sku2", TableNamePostfix.Today, Uniques = new[] { "Sku,Category1" })]
-		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product2Insert
+		[TableInfo("test", "autoincrementprimarykey", UpdateColumns = new[] { "Category" })]
+		public class AutoIncrementPrimaryKey : BaseEntity
 		{
-			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
-			public string Category1 { get; set; }
-
-			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
+			[Field(Expression = "Category", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
-			[Field(Expression = "./div[1]/a/@href")]
-			public string Url { get; set; }
+			[Field(Expression = "name")]
+			public string Name { get; set; }
 
-			[Field(Expression = "./div[1]/a", Length = 100)]
+			[Field(Expression = "sku", Length = 100)]
 			public string Sku { get; set; }
 		}
 
-		[TableInfo("test", "sku2", TableNamePostfix.Today, Uniques = new[] { "Sku,Category1" }, UpdateColumns = new[] { "Category" })]
-		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		public class Product2Update
+		[TableInfo("test", "noneprimarykey")]
+		public class NonePrimaryKey
 		{
-			[Field(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
-			public string Category1 { get; set; }
-
-			[Field(Expression = "name", Type = SelectorType.Enviroment)]
+			[Field(Expression = "Category", Type = SelectorType.Enviroment, Length = 100)]
 			public string Category { get; set; }
 
-			[Field(Expression = "./div[1]/a/@href")]
-			public string Url { get; set; }
+			[Field(Expression = "name")]
+			public string Name { get; set; }
 
-			[Field(Expression = "./div[1]/a", Length = 100)]
+			[Field(Expression = "sku", Length = 100)]
 			public string Sku { get; set; }
+		}
+
+		private class ColumnInfo
+		{
+			public string Name { get; set; }
+			public string Type { get; set; }
+
+			public override string ToString()
+			{
+				return $"{Name} {Type}";
+			}
+		}
+
+		[TableInfo("test", "table15")]
+		private class Entity15
+		{
+			[Field(Expression = "Url")]
+			public int Int { get; set; }
+
+			[Field(Expression = "Url")]
+			public bool Bool { get; set; }
+
+			[Field(Expression = "Url")]
+			public long BigInt { get; set; }
+
+			[Field(Expression = "Url")]
+			public string String { get; set; }
+
+			[Field(Expression = "Url")]
+			public DateTime Time { get; set; }
+
+			[Field(Expression = "Url")]
+			public float Float { get; set; }
+
+			[Field(Expression = "Url")]
+			public double Double { get; set; }
+
+			[Field(Expression = "Url", Length = 100)]
+			public string String1 { get; set; }
+
+			[Field(Expression = "Url", Length = 0)]
+			public string String2 { get; set; }
+
+			[Field(Expression = "Url")]
+			public decimal Decimal { get; set; }
 		}
 	}
 }

@@ -106,6 +106,11 @@ namespace DotnetSpider.Extension.Model.Attribute
 		public DataType DataType { get; set; } = DataType.None;
 
 		/// <summary>
+		/// 是否是主键
+		/// </summary>
+		public bool IsPrimary { get; set; }
+
+		/// <summary>
 		/// 数据格式化
 		/// </summary>
 		public Formatter.Formatter[] Formatters { get; set; }

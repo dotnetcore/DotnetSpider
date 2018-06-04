@@ -44,18 +44,12 @@ namespace DotnetSpider.Extension.Pipeline
 				if (_collector.ContainsKey(model.Identity))
 				{
 					var list = _collector[model.Identity];
-					foreach (var data in datas)
-					{
-						list.Add(data);
-					}
+					list.AddRange(datas);
 				}
 				else
 				{
 					var list = new List<dynamic>();
-					foreach (var data in datas)
-					{
-						list.Add(data);
-					}
+					list.AddRange(datas);
 					_collector.Add(model.Identity, list);
 				}
 				return datas.Count();

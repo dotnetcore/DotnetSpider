@@ -46,8 +46,6 @@ namespace DotnetSpider.Extension.Model
 		/// </summary>
 		public string Database { get; set; }
 
-		public string PrimaryKey { get; set; } = "id";
-
 		/// <summary>
 		/// 表名
 		/// </summary>
@@ -122,6 +120,10 @@ namespace DotnetSpider.Extension.Model
 					case TableNamePostfix.Monday:
 						{
 							return $"{Name}_{DateTimeUtil.Monday:yyyy_MM_dd}";
+						}
+					case TableNamePostfix.Today:
+						{
+							return $"{Name}_{DateTimeUtil.Today:yyyy_MM_dd}";
 						}
 					default:
 						{

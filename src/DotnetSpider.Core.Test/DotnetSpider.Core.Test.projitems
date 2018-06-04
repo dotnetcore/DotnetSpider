@@ -30,12 +30,6 @@
     <Content Include="$(MSBuildThisFileDirectory)Jd.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(MSBuildThisFileDirectory)nlog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(MSBuildThisFileDirectory)nlog.net45.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CookieInjectorTest.cs" />
@@ -54,7 +48,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\FilePipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\JsonFilePipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\ProcessorTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Processor\TargetUrlTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Processor\TargetUrlsExtractorTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Redial\RedialTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RequestTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ResultItemsTest.cs" />

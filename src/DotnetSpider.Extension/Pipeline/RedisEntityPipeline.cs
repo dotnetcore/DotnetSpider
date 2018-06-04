@@ -34,6 +34,7 @@ namespace DotnetSpider.Extension.Pipeline
 				return;
 			}
 
+			var items = new List<dynamic>();
 			foreach (var resultItem in resultItems)
 			{
 				resultItem.Request.CountOfResults = 0;
@@ -45,18 +46,14 @@ namespace DotnetSpider.Extension.Pipeline
 
 					if (value != null && value.Item2 != null && value.Item2.Count() > 0)
 					{
+						items.AddRange(value.Item2);
 						resultItem.Request.CountOfResults += value.Item2.Count();
-
-						var db = _connection.GetDatabase(0);
-						foreach (var item in value.Item2)
-						{
-							db.ListLeftPush(_key, LZ4MessagePackSerializer.Typeless.Serialize(item));
-							resultItem.Request.EffectedRows += 1;
-						}
-
+						resultItem.Request.EffectedRows += value.Item2.Count();
 					}
 				}
 			}
+			var db = _connection.GetDatabase(0);
+			db.ListLeftPush(_key, LZ4MessagePackSerializer.Typeless.Serialize(items));
 		}
 	}
 }

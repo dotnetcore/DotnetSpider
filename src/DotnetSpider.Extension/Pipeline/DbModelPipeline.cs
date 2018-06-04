@@ -102,6 +102,11 @@ namespace DotnetSpider.Extension.Pipeline
 							}
 						case PipelineMode.Update:
 							{
+								if (string.IsNullOrWhiteSpace(sqls.UpdateSql))
+								{
+									Log.Logger.Error("Check your TableInfo attribute contains UpdateColumns value.");
+									throw new SpiderException("UpdateSql is null.");
+								}
 								count += conn.MyExecute(sqls.UpdateSql, datas);
 								break;
 							}
@@ -189,7 +194,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return null;
 			}
-			IPipeline pipeline;
+			IPipeline pipeline = new ConsolePipeline();
 			switch (connectionStringSettings.ProviderName)
 			{
 				case DbProviderFactories.PostgreSqlProvider:

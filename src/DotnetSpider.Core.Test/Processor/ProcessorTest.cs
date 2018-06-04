@@ -7,10 +7,9 @@ using System;
 
 namespace DotnetSpider.Core.Test.Processor
 {
-
 	public class ProcessorTest
 	{
-		[Fact(DisplayName = "ProcesserException")]
+		[Fact(DisplayName = "RetryProcessor")]
 		public void ProcesserException()
 		{
 			var site = new Site { EncodingName = "UTF-8" };

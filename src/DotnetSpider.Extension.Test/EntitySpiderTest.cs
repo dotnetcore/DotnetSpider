@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Net;
 using Xunit;
+using System.Linq;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -23,48 +24,16 @@ namespace DotnetSpider.Extension.Test
 			Env.HubService = false;
 		}
 
-		[TableInfo("test", "table")]
-		public class TestEntity
-		{
-			[Field(Expression = ".")]
-			public string Name { get; set; }
-		}
-
-
-		[Fact]
+		[Fact(DisplayName = "MultiEntitySpider")]
 		public void MultiEntity()
 		{
 			EntitySpider spider = new MultiEntitySpider();
 			spider.Run();
-		}
-
-		private class MultiEntitySpider : EntitySpider
-		{
-			protected override void MyInit(params string[] arguments)
-			{
-				Monitor = new LogMonitor();
-				AddPipeline(new ConsoleEntityPipeline());
-				AddStartUrl("http://www.baidu.com");
-				AddStartUrl("http://www.sohu.com");
-				AddEntityType<BaiduEntity>();
-				AddEntityType<SohuEntity>();
-			}
-
-			[TableInfo("test", "multy_entity")]
-			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "baidu" })]
-			public class BaiduEntity
-			{
-				[Field(Expression = ".//title")]
-				public string Title { get; set; }
-			}
-
-			[TableInfo("test", "multy_entity")]
-			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "sohu" })]
-			public class SohuEntity
-			{
-				[Field(Expression = ".//title")]
-				public string Title { get; set; }
-			}
+			var pipeline = spider.Pipelines.ElementAt(0) as CollectionEntityPipeline;
+			var neteast = pipeline.GetCollection("test.neteast").First() as MultiEntitySpider.NeteastEntity;
+			var sohu = pipeline.GetCollection("test.sohu").First() as MultiEntitySpider.SohuEntity;
+			Assert.Equal("搜狐", sohu.Title);
+			Assert.Equal("网易", neteast.Title);
 		}
 
 #if Release
@@ -99,27 +68,10 @@ namespace DotnetSpider.Extension.Test
 
 #endif
 
-		public class ClearSchedulerTestSpider : EntitySpider
+		[Fact(DisplayName = "CleanSchedulerAfterCompleted")]
+		public void CleanSchedulerAfterCompleted()
 		{
-			public ClearSchedulerTestSpider() : base("ClearSchedulerTestSpider", new Site())
-			{
-			}
-
-			protected override void MyInit(params string[] arguments)
-			{
-				Monitor = new LogMonitor();
-				Identity = Guid.NewGuid().ToString("N");
-				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
-				AddStartUrl("https://baidu.com");
-				AddPipeline(new ConsoleEntityPipeline());
-				AddEntityType<TestEntity>();
-			}
-		}
-
-		[Fact]
-		public void ClearScheduler()
-		{
-			EntitySpider spider = new ClearSchedulerTestSpider();
+			EntitySpider spider = new ClearSchedulerSpider();
 
 			spider.Run();
 
@@ -157,7 +109,7 @@ namespace DotnetSpider.Extension.Test
 			Assert.False(db.StringGet(successCountKey).HasValue);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "GetPipelineFromAppConfig")]
 		public void GetPipelineFromAppConfig()
 		{
 			var configuration = ConfigurationManager.OpenMappedExeConfiguration(new ExeConfigurationFileMap
@@ -174,14 +126,38 @@ namespace DotnetSpider.Extension.Test
 			Assert.True(pipeline3 is MongoDbEntityPipeline);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "EntitySpider")]
 		public void EntitySpiderRunCorrect()
 		{
 			CasSpider spider = new CasSpider();
 			spider.Run();
 		}
 
-		class BaiduSearchSpider : EntitySpider
+		[TableInfo("test", "table")]
+		private class TestEntity
+		{
+			[Field(Expression = ".")]
+			public string Name { get; set; }
+		}
+
+		private class ClearSchedulerSpider : EntitySpider
+		{
+			public ClearSchedulerSpider() : base("ClearSchedulerTestSpider", new Site())
+			{
+			}
+
+			protected override void MyInit(params string[] arguments)
+			{
+				Monitor = new LogMonitor();
+				Identity = Guid.NewGuid().ToString("N");
+				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
+				AddStartUrl("https://baidu.com");
+				AddPipeline(new ConsoleEntityPipeline());
+				AddEntityType<TestEntity>();
+			}
+		}
+
+		private class BaiduSearchSpider : EntitySpider
 		{
 			private readonly string _guid;
 
@@ -242,7 +218,7 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		class CasSpider : EntitySpider
+		private class CasSpider : EntitySpider
 		{
 			public CasSpider() : base("casTest", new Site())
 			{
@@ -250,14 +226,8 @@ namespace DotnetSpider.Extension.Test
 
 			protected override void MyInit(params string[] arguments)
 			{
-				Scheduler.Depth = 100;
-				Monitor = new LogMonitor();
 				Identity = Guid.NewGuid().ToString();
-				ThreadNum = 1;
 				EmptySleepTime = 5000;
-				ExitWhenComplete = true;
-				PipelineCachedSize = 1;
-				SkipTargetUrlsWhenResultIsEmpty = false;
 				AddPipeline(new CollectionEntityPipeline());
 				AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
 				AddEntityType<ArticleSummary>();
@@ -275,7 +245,36 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		private static void ClearDb()
+		private class MultiEntitySpider : EntitySpider
+		{
+			protected override void MyInit(params string[] arguments)
+			{
+				EmptySleepTime = 5000;
+				AddPipeline(new CollectionEntityPipeline());
+				AddStartUrl("http://www.163.com");
+				AddStartUrl("http://www.sohu.com");
+				AddEntityType<NeteastEntity>();
+				AddEntityType<SohuEntity>();
+			}
+
+			[TableInfo("test", "neteast")]
+			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "163" })]
+			public class NeteastEntity
+			{
+				[Field(Expression = ".//title")]
+				public string Title { get; set; }
+			}
+
+			[TableInfo("test", "sohu")]
+			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "sohu" })]
+			public class SohuEntity
+			{
+				[Field(Expression = ".//title")]
+				public string Title { get; set; }
+			}
+		}
+
+		private static void CleanDb()
 		{
 			var confiruation = new ConfigurationOptions()
 			{

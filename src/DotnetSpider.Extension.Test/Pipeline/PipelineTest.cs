@@ -33,17 +33,17 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact]
 		public void MixProcessor()
 		{
-			using (var conn = new MySqlConnection(DefaultMySqlConnection))
+			using (var conn = new MySqlConnection(DefaultConnectionString))
 			{
 				conn.Execute("DROP TABLE IF EXISTS baidu.baidu_search_mixprocessor");
 			}
 			var id = Guid.NewGuid().ToString("N");
 			BaiduSearchSpider spider = new BaiduSearchSpider();
-			spider.AddPipeline(new MySqlEntityPipeline(DefaultMySqlConnection));
+			spider.AddPipeline(new MySqlEntityPipeline(DefaultConnectionString));
 			spider.Identity = id;
 			spider.Run();
 
-			using (var conn = new MySqlConnection(DefaultMySqlConnection))
+			using (var conn = new MySqlConnection(DefaultConnectionString))
 			{
 				var count = conn.QueryFirst<int>("SELECT COUNT(*) FROM baidu.baidu_search_mixprocessor");
 				Assert.Equal(20, count);

@@ -7,6 +7,7 @@ using MessagePack;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -45,8 +46,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			var connection = ConnectionMultiplexer.Connect(connectString);
 			var db = connection.GetDatabase(0);
 			var json = db.ListRightPop(guid);
-			var item = LZ4MessagePackSerializer.Typeless.Deserialize(json) as Dictionary<string, object>;
 
+			var items = LZ4MessagePackSerializer.Typeless.Deserialize(json) as List<object>;
+
+			var item = items.First() as Dictionary<string, object>;
 			Assert.Equal("100", item["Int"]);
 			Assert.Equal("2018-06-03", item["DateTime"]);
 		}

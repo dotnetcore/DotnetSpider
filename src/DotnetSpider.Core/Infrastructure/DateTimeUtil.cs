@@ -44,6 +44,10 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <summary>
 		/// 星期一
 		/// </summary>
+		public static DateTime Today { get; }
+		/// <summary>
+		/// 星期一
+		/// </summary>
 		public static DateTime Monday { get; }
 		/// <summary>
 		/// 星期二
@@ -167,6 +171,7 @@ namespace DotnetSpider.Core.Infrastructure
 		static DateTimeUtil()
 		{
 			var now = DateTime.Now.Date;
+			Today = now;
 
 			FirstDayOfTheMonth = now.AddDays(now.Day * -1 + 1);
 			LastDayOfTheMonth = FirstDayOfTheMonth.AddMonths(1).AddDays(-1);
