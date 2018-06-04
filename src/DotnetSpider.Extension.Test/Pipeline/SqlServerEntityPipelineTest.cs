@@ -27,12 +27,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(DisplayName = "DataTypes")]
 		public override void DataTypes()
 		{
-#if NETSTANDARD
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			if (!Env.IsWindows)
 			{
 				return;
 			}
-#endif
 			using (var conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true"))
 			{
 				try

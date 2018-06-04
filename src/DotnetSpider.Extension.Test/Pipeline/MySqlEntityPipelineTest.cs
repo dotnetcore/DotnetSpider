@@ -402,7 +402,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Fact(DisplayName = "Insert_MultiPrimaryKey")]
-		public virtual   void Insert_MultiPrimaryKey()
+		public virtual void Insert_MultiPrimaryKey()
 		{
 			using (var conn = CreateDbConnection())
 			{
@@ -504,10 +504,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			[Field(Expression = "category")]
 			public string Category { get; set; }
 
-			[Field(Expression = "name", IsPrimary = true)]
+			[Field(Expression = "name", IsPrimary = true, Length = 50)]
 			public string Name { get; set; }
 
-			[Field(Expression = "sku", IsPrimary = true)]
+			[Field(Expression = "sku", IsPrimary = true, Length = 50)]
 			public string Sku { get; set; }
 		}
 
