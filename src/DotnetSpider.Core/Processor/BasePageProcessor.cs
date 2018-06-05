@@ -210,7 +210,11 @@ namespace DotnetSpider.Core.Processor
         {
             return url;
         }
-
+        /// <summary>
+        /// 添加目标链接解析规则
+        /// </summary>
+        /// <param name="regionXpath">目标链接所在区域</param>
+        /// <param name="patterns">匹配目标链接的正则表达式</param>
         public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
         {
             if (patterns == null || patterns.Length == 0)
@@ -260,7 +264,10 @@ namespace DotnetSpider.Core.Processor
                 }
             }
         }
-
+        /// <summary>
+        /// 添加排除目标链接的正则表达式
+        /// </summary>
+        /// <param name="patterns">正则表达式</param>
         public void AddExcludeTargetUrlPattern(params string[] patterns)
         {
             if (patterns == null || patterns.Length == 0)

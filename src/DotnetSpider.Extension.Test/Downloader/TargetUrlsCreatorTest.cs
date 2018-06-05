@@ -18,19 +18,19 @@ namespace DotnetSpider.Extension.Test.Downloader
 			TestDownloader downloader = new TestDownloader();
 			downloader.AddAfterDownloadCompleteHandler(new IncrementTargetUrlsBuilder("&page=0", 2));
 			var request = new Request("http://a.com/?&page=0", null);
-			Page page = downloader.Download(request, spider);
+			Page page = downloader.Download(request, spider).Result;
 			var request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());
-			page = downloader.Download(request2, spider);
-			request2 = page.TargetRequests.First();
+			page = downloader.Download(request2, spider).Result;
+            request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=4", request2.Url.ToString());
 
 			downloader = new TestDownloader();
 			downloader.AddAfterDownloadCompleteHandler(new RequestExtraTargetUrlsBuilder("&page=0", "page_index"));
 
 			request = new Request("http://a.com/?&page=0", new Dictionary<string, object>() { { "page_index", 2 } });
-			page = downloader.Download(request, spider);
-			request2 = page.TargetRequests.First();
+			page = downloader.Download(request, spider).Result;
+            request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());
 			Assert.Equal(2, request2.GetExtra("page_index"));
 		}
@@ -49,11 +49,11 @@ namespace DotnetSpider.Extension.Test.Downloader
 			}));
 
 			var request = new Request("http://a.com/?&page=0", null);
-			Page page = downloader.Download(request, spider);
-			var request2 = page.TargetRequests.First();
+			Page page = downloader.Download(request, spider).Result;
+            var request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=2", request2.Url.ToString());
-			page = downloader.Download(request2, spider);
-			request2 = page.TargetRequests.First();
+			page = downloader.Download(request2, spider).Result;
+            request2 = page.TargetRequests.First();
 			Assert.Equal("http://a.com/?&page=4", request2.Url.ToString());
 		}
 	}

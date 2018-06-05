@@ -27,7 +27,9 @@ namespace DotnetSpider.Core.Scheduler
 		public abstract long SuccessRequestsCount { get; }
 
 		public abstract long ErrorRequestsCount { get; }
-
+        /// <summary>
+        /// 深度优先/广度优先
+        /// </summary>
 		public bool DepthFirst { get; set; } = true;
 
 		public virtual bool IsExited { get; set; }

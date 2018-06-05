@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Downloader
 {
     public class FileDownloader : BaseDownloader
     {
-        protected override Page DowloadContent(Request request, ISpider spider)
+        protected override Task<Page> DowloadContent(Request request, ISpider spider)
         {
             var filePath = request.GetExtra("__FilePath");
 
@@ -12,10 +13,9 @@ namespace DotnetSpider.Core.Downloader
             {
                 if (File.Exists(filePath))
                 {
-                    return new Page(request)
-                    {
-                        Content = File.ReadAllText(filePath)
-                    };
+
+                    return Task.FromResult(new Page(request) { Content = File.ReadAllText(filePath) });
+              
                 }
             }
 

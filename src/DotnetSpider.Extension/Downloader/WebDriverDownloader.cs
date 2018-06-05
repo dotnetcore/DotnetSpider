@@ -69,7 +69,7 @@ namespace DotnetSpider.Extension.Downloader
 			_webDriver?.Quit();
 		}
 
-		protected override Page DowloadContent(Request request, ISpider spider)
+		protected override Task<Page> DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
 			try
@@ -133,7 +133,7 @@ namespace DotnetSpider.Extension.Downloader
 
 				// 结束后要置空, 这个值存到Redis会导置无限循环跑单个任务
 				//request.PutExtra(Request.CycleTriedTimes, null);
-				return page;
+				return Task.FromResult(page);
 			}
 			catch (DownloadException de)
 			{
@@ -143,14 +143,14 @@ namespace DotnetSpider.Extension.Downloader
 					page = Spider.AddToCycleRetry(request, site);
 				}
 				Logger.AllLog(spider.Identity, $"下载 {request.Url} 失败: {de.Message}.", NLog.LogLevel.Warn);
-				return page;
-			}
+                return Task.FromResult(page);
+            }
 			catch (Exception e)
 			{
 				Logger.AllLog(spider.Identity, $"下载 {request.Url} 失败: {e.Message}.", NLog.LogLevel.Warn);
 				Page page = new Page(request, null) { Exception = e };
-				return page;
-			}
+                return Task.FromResult(page);
+            }
 		}
 
 	}

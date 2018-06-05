@@ -12,145 +12,200 @@ using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core;
 using System.IO;
 using System.Collections.Generic;
+using System.Net;
 
 namespace DotnetSpider.Extension.Downloader
 {
 
+    /// <summary>
+    /// WebDriver 的Cookie注入器
+    /// </summary>
 	public class WebDriverCookieInjector : CookieInjector
 	{
-		public string Url { get; set; }
+        /// <summary>
+        /// 登陆的链接
+        /// </summary>
+        public string Url { get; set; }
 
-		public string AfterLoginUrl { get; set; }
+        /// <summary>
+        /// 登陆成功后需要再次导航到的链接
+        /// </summary>
+        public string AfterLoginUrl { get; set; }
 
-		public Selector UserSelector { get; set; }
+        /// <summary>
+        /// 用户名在网页中的元素选择器
+        /// </summary>
+        public SelectorAttribute UserSelector { get; set; }
 
-		public string User { get; set; }
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string User { get; set; }
 
-		public Selector PassSelector { get; set; }
+        /// <summary>
+        /// 密码在网页中的元素选择器
+        /// </summary>
+        public SelectorAttribute PasswordSelector { get; set; }
 
-		public string Password { get; set; }
+        /// <summary>
+        /// 密码
+        /// </summary>
+        public string Password { get; set; }
 
-		public Selector SubmitSelector { get; set; }
+        /// <summary>
+        /// 登陆按钮的元素选择器
+        /// </summary>
+        public SelectorAttribute SubmitSelector { get; set; }
 
-		public Browser Browser { get; set; } = Browser.Chrome;
+        /// <summary>
+        /// 浏览器
+        /// </summary>
+        public Browser Browser { get; set; } = Browser.Chrome;
 
-		protected virtual void BeforeInputInfo(RemoteWebDriver webDriver) { }
+        /// <summary>
+        /// 在输入用户信息前执行的一些准备操作
+        /// </summary>
+        /// <param name="webDriver">WebDriver</param>
+        protected virtual void BeforeInput(RemoteWebDriver webDriver) { }
 
-		protected virtual void AfterLoginComplete(RemoteWebDriver webDriver) { }
+        /// <summary>
+        /// 完成登陆后执行的一些准备操作
+        /// </summary>
+        /// <param name="webDriver"></param>
+        protected virtual void AfterLogin(RemoteWebDriver webDriver) { }
 
-		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
-		{
-			switch (element.Type)
-			{
+        /// <summary>
+        /// 查找元素
+        /// </summary>
+        /// <param name="webDriver">WebDriver</param>
+        /// <param name="element">页面元素选择器</param>
+        /// <returns>页面元素</returns>
+        protected IWebElement FindElement(RemoteWebDriver webDriver, SelectorAttribute element)
+        {
+            switch (element.Type)
+            {
 
-				case SelectorType.XPath:
-					{
-						return webDriver.FindElementByXPath(element.Expression);
-					}
-				case SelectorType.Css:
-					{
-						return webDriver.FindElementByCssSelector(element.Expression);
-					}
-			}
-			throw new SpiderException("Unsport findy: " + element.Type);
-		}
+                case SelectorType.XPath:
+                    {
+                        return webDriver.FindElementByXPath(element.Expression);
+                    }
+                case SelectorType.Css:
+                    {
+                        return webDriver.FindElementByCssSelector(element.Expression);
+                    }
+            }
+            throw new SpiderException("Unsport findy: " + element.Type);
+        }
 
-		protected override Cookies GetCookies(ISpider spider)
-		{
-			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PassSelector == null)
-			{
-				throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect.");
-			}
-			var cookies = new Dictionary<string, string>();
+        /// <summary>
+        /// 取得 Cookie
+        /// </summary>
+        /// <param name="spider">爬虫</param>
+        /// <returns>Cookie</returns>
+        protected override CookieCollection GetCookies(ISpider spider)
+        {
+            if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PasswordSelector == null)
+            {
+                throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect");
+            }
+            var cookies = new Dictionary<string, string>();
 
-			var webDriver = CreateWebDriver();
-			try
-			{
-				webDriver.Navigate().GoToUrl(Url);
-				Thread.Sleep(10000);
+            var webDriver = CreateWebDriver();
+            var result = new CookieCollection();
+            try
+            {
+                webDriver.Navigate().GoToUrl(Url);
+                Thread.Sleep(10000);
 
-				BeforeInputInfo(webDriver);
+                BeforeInput(webDriver);
 
-				if (UserSelector != null)
-				{
-					var user = FindElement(webDriver, UserSelector);
-					user.Clear();
-					user.SendKeys(User);
-					Thread.Sleep(1500);
-				}
+                if (UserSelector != null)
+                {
+                    var user = FindElement(webDriver, UserSelector);
+                    user.Clear();
+                    user.SendKeys(User);
+                    Thread.Sleep(1500);
+                }
 
-				if (PassSelector != null)
-				{
-					var pass = FindElement(webDriver, PassSelector);
-					pass.Clear();
-					pass.SendKeys(Password);
-					Thread.Sleep(1500);
-				}
+                if (PasswordSelector != null)
+                {
+                    var pass = FindElement(webDriver, PasswordSelector);
+                    pass.Clear();
+                    pass.SendKeys(Password);
+                    Thread.Sleep(1500);
+                }
 
-				var submit = FindElement(webDriver, SubmitSelector);
-				submit.Click();
-				Thread.Sleep(10000);
+                var submit = FindElement(webDriver, SubmitSelector);
+                submit.Click();
+                Thread.Sleep(10000);
 
-				AfterLoginComplete(webDriver);
+                AfterLogin(webDriver);
 
-				var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
-				if (cookieList.Count > 0)
-				{
-					foreach (var cookieItem in cookieList)
-					{
-						cookies.Add(cookieItem.Name, cookieItem.Value);
-					}
-				}
+                var cookieList = webDriver.Manage().Cookies.AllCookies.ToList();
+                if (cookieList.Count > 0)
+                {
+                    foreach (var cookieItem in cookieList)
+                    {
+                        result.Add(new System.Net.Cookie(cookieItem.Name, cookieItem.Value, cookieItem.Path, cookieItem.Domain));
+                    }
+                }
 
-				webDriver.Dispose();
-			}
-			catch (Exception e)
-			{
-				Logger.AllLog(spider.Identity, "Get cookie failed.", NLog.LogLevel.Error, e);
-				webDriver.Dispose();
-				return null;
-			}
+                webDriver.Dispose();
+            }
+            catch
+            {
+                
+                Logger.Error("Get cookie failed.");
+                webDriver.Dispose();
+                return null;
+            }
 
-			return new Cookies { PairPart = cookies };
-		}
+            return result;
+        }
 
-		protected RemoteWebDriver CreateWebDriver()
-		{
-			RemoteWebDriver webDriver;
-			switch (Browser)
-			{
-				case Browser.Chrome:
-					{
-						ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
-						cds.HideCommandPromptWindow = true;
-						ChromeOptions opt = new ChromeOptions();
-						opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
-						webDriver = new ChromeDriver(cds, opt);
-						break;
-					}
-				case Browser.Firefox:
-					{
-						string path = Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
-						string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
-						if (pathsToProfiles.Length == 1)
-						{
-							FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false) {AlwaysLoadNoFocusLibrary = true};
-							webDriver = new FirefoxDriver(profile);
-						}
-						else
-						{
-							throw new Exception("No Firefox profiles: webdriver.");
-						}
-						break;
-					}
-				default:
-					{
-						throw new Exception("Unsupported browser!");
-					}
-			}
+        /// <summary>
+        /// 创建WebDriver对象
+        /// </summary>
+        /// <returns>WebDriver对象</returns>
+        protected RemoteWebDriver CreateWebDriver()
+        {
+            RemoteWebDriver webDriver;
+            switch (Browser)
+            {
+                case Browser.Chrome:
+                    {
+                        ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
+                        cds.HideCommandPromptWindow = true;
+                        ChromeOptions opt = new ChromeOptions();
+                        opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
+                        webDriver = new ChromeDriver(cds, opt);
+                        break;
+                    }
+                case Browser.Firefox:
+                    {
+                        string path = Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
+                        string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
+                        if (pathsToProfiles.Length == 1)
+                        {
+                            FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false) { AlwaysLoadNoFocusLibrary = true };
+                            FirefoxOptions options = new FirefoxOptions();
+                            options.Profile = profile;
+                            webDriver = new FirefoxDriver(options);
+                        }
+                        else
+                        {
+                            throw new Exception("No Firefox profiles: webdriver.");
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        throw new Exception("Unsupported browser!");
+                    }
+            }
 
-			webDriver.Manage().Window.Maximize();
-			return webDriver;
-		}
-	}
+            webDriver.Manage().Window.Maximize();
+            return webDriver;
+        }
+    }
 }

@@ -12,7 +12,7 @@ namespace DotnetSpider.Core.Downloader
 	{
 		protected static readonly ILogger Logger = LogCenter.GetLogger();
 
-		public abstract void Handle(ref Page page, ISpider spider);
+		public abstract void Handle(ref Page page, IDownloader downloader, ISpider spider);
 	}
 
 	public class UpdateCookieWhenContainsContentHandler : AfterDownloadCompleteHandler
@@ -26,11 +26,11 @@ namespace DotnetSpider.Core.Downloader
 			_content = content;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content) && page.Content.Contains(_content))
 			{
-				_cookieInjector?.Inject(spider);
+				_cookieInjector?.Inject(downloader ,spider);
 			}
 			throw new SpiderException($"Content downloaded contains string: {_content}.");
 		}
@@ -51,11 +51,11 @@ namespace DotnetSpider.Core.Downloader
 			_nextTime = DateTime.Now.AddSeconds(_dueTime);
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader,ISpider spider)
 		{
 			if (DateTime.Now > _nextTime)
 			{
-				_cookieInjector?.Inject(spider);
+				_cookieInjector?.Inject(downloader, spider);
 				_nextTime = DateTime.Now.AddSeconds(_dueTime);
 			}
 		}
@@ -70,7 +70,7 @@ namespace DotnetSpider.Core.Downloader
 			_contents = contents;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			var content = page.Content;
 			page.Skip = !string.IsNullOrEmpty(page?.Content) && _contents.Any(c => content.Contains(c));
@@ -86,7 +86,7 @@ namespace DotnetSpider.Core.Downloader
 			_content = content;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content) && !page.Content.Contains(_content))
 			{
@@ -98,7 +98,7 @@ namespace DotnetSpider.Core.Downloader
 
 	public class RemoveHtmlTagHandler : AfterDownloadCompleteHandler
 	{
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
 			{
@@ -111,7 +111,7 @@ namespace DotnetSpider.Core.Downloader
 
 	public class ContentToUpperHandler : AfterDownloadCompleteHandler
 	{
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
 			{
@@ -122,7 +122,7 @@ namespace DotnetSpider.Core.Downloader
 
 	public class ContentToLowerHandler : AfterDownloadCompleteHandler
 	{
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
 			{
@@ -142,7 +142,7 @@ namespace DotnetSpider.Core.Downloader
 			_newValue = newValue;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
 			{
@@ -153,7 +153,7 @@ namespace DotnetSpider.Core.Downloader
 
 	public class TrimContentHandler : AfterDownloadCompleteHandler
 	{
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
 			{
@@ -164,7 +164,7 @@ namespace DotnetSpider.Core.Downloader
 
 	public class UnescapeContentHandler : AfterDownloadCompleteHandler
 	{
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
 			{
@@ -182,7 +182,7 @@ namespace DotnetSpider.Core.Downloader
 			_pattern = pattern;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (string.IsNullOrEmpty(page?.Content))
 			{
@@ -214,7 +214,7 @@ namespace DotnetSpider.Core.Downloader
 			_contents = contents;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
 			{
@@ -237,7 +237,7 @@ namespace DotnetSpider.Core.Downloader
 			_contents = contents;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content))
 			{
@@ -266,7 +266,7 @@ namespace DotnetSpider.Core.Downloader
 			_exceptionMessage = exceptionMessage;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(_exceptionMessage) &&
 				page.Exception != null)
@@ -300,7 +300,7 @@ namespace DotnetSpider.Core.Downloader
 			_content = content;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(_content) && _cookieInjector != null &&
 				page.Content.Contains(_content))
@@ -310,7 +310,7 @@ namespace DotnetSpider.Core.Downloader
 					spider.Exit();
 				}
 				Spider.AddToCycleRetry(page.Request, spider.Site);
-				_cookieInjector?.Inject(spider);
+				_cookieInjector?.Inject(downloader, spider);
 				page.Exception = new DownloadException($"Content downloaded contains string: {_content}.");
 			}
 		}
@@ -331,7 +331,7 @@ namespace DotnetSpider.Core.Downloader
 			_startOffset = startOffset;
 		}
 
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 			if (string.IsNullOrEmpty(page?.Content))
 			{

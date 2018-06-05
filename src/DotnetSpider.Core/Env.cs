@@ -39,7 +39,7 @@ namespace DotnetSpider.Core
         /// <summary>
         /// 开启企业服务(HTTP), 默认打开, 测试的时候开关
         /// </summary>
-        public static bool HubService = true;
+        public static bool HubService = false;
 
         /// <summary>
         /// 定义数据主键的名称

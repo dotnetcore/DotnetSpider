@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
@@ -197,23 +198,11 @@ namespace DotnetSpider.Core.Test
             }
         }
 
-        internal class FileDownloader : IDownloader
+        internal class FileDownloader : BaseDownloader
         {
-            public void AddAfterDownloadCompleteHandler(IAfterDownloadCompleteHandler handler)
+            protected override Task<Page> DowloadContent(Request request, ISpider spider)
             {
-            }
-
-            public void AddBeforeDownloadHandler(IBeforeDownloadHandler handler)
-            {
-            }
-
-            public void Dispose()
-            {
-            }
-
-            public Page Download(Request request, ISpider spider)
-            {
-                return new Page(request);
+                return Task.FromResult(new Page(request));
             }
         }
 

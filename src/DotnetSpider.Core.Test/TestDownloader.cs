@@ -1,16 +1,18 @@
 ﻿using DotnetSpider.Core.Downloader;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Test
 {
 	public class TestDownloader : BaseDownloader
 	{
-		protected override Page DowloadContent(Request request, ISpider spider)
-		{
-			var site = spider.Site;
-			return new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
-			{
-				Content = "aabbcccdefg下载人数100"
-			};
-		}
-	}
+  
+        protected override Task<Page> DowloadContent(Request request, ISpider spider)
+        {
+            var site = spider.Site;
+            return Task.FromResult(new Page(request, site.RemoveOutboundLinks ? site.Domains : null)
+            {
+                Content = "aabbcccdefg下载人数100"
+            });
+        }
+    }
 }

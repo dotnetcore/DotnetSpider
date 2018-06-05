@@ -8,7 +8,7 @@ using System;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
-	public class SelectorUtils
+	public static class SelectorUtils
 	{
 		public static object GetEnviromentValue(string field, Page page, int index)
 		{
@@ -60,7 +60,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
-		public static ISelector Parse(BaseSelector selector)
+		public static ISelector Parse(this ISelectorAttribute selector)
 		{
 			if (selector != null)
 			{
@@ -85,13 +85,13 @@ namespace DotnetSpider.Extension.Infrastructure
 					case SelectorType.Regex:
 						{
 							NotNullExpression(selector);
-							if (string.IsNullOrEmpty(selector.Argument))
+							if (string.IsNullOrEmpty(selector.Arguments))
 							{
 								return Selectors.Regex(expression);
 							}
 							else
 							{
-								if (int.TryParse(selector.Argument, out var group))
+								if (int.TryParse(selector.Arguments, out var group))
 								{
 									return Selectors.Regex(expression, group);
 								}
@@ -115,7 +115,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
-		public static void NotNullExpression(BaseSelector selector)
+		public static void NotNullExpression(ISelectorAttribute selector)
 		{
 			if (string.IsNullOrEmpty(selector.Expression))
 			{
@@ -123,38 +123,6 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 		}
 
-		public static ISelector Parse(Selector selector)
-		{
-			if (!string.IsNullOrEmpty(selector?.Expression))
-			{
-				string expression = selector.Expression;
-
-				switch (selector.Type)
-				{
-					case SelectorType.Css:
-						{
-							return Selectors.Css(expression);
-						}
-					case SelectorType.Enviroment:
-						{
-							return Selectors.Enviroment(expression);
-						}
-					case SelectorType.JsonPath:
-						{
-							return Selectors.JsonPath(expression);
-						}
-					case SelectorType.Regex:
-						{
-							return Selectors.Regex(expression);
-						}
-					case SelectorType.XPath:
-						{
-							return Selectors.XPath(expression);
-						}
-				}
-			}
-
-			throw new SpiderException("Not support selector: " + selector);
-		}
+ 
 	}
 }

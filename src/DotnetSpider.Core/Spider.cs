@@ -632,6 +632,7 @@ namespace DotnetSpider.Core
                     int waitCount = 1;
                     while (Stat == Status.Running)
                     {
+                        // 每次从调度里取出一条
                         Request request = Scheduler.Poll();
 
                         if (request == null)
@@ -865,9 +866,9 @@ namespace DotnetSpider.Core
 
             InitPipelines(arguments);
 
-            InitFileCloseSignals();
+            InitFileCloseSignals();  // 删除文件
 
-            InitMonitor();
+            InitMonitor(); // 
 
             InjectCookie();
 
@@ -883,9 +884,10 @@ namespace DotnetSpider.Core
             {
                 Logger.Error($"Execute pipeline failed [{count}]: {ex}");
             });
-
+            //初始化URL
             ExecuteStartUrlBuilders(arguments);
 
+            // 把请求加到队列里
             PushStartRequestToScheduler();
         }
 
@@ -976,7 +978,7 @@ namespace DotnetSpider.Core
                 sw.Reset();
                 sw.Start();
 
-                page = downloader.Download(request, this);
+                page = downloader.Download(request, this).Result;
 
                 sw.Stop();
                 CalculateDownloadSpeed(sw.ElapsedMilliseconds);
@@ -1140,6 +1142,7 @@ namespace DotnetSpider.Core
 
         /// <summary>
         /// Extract and add target urls to scheduler.
+        /// 提取和添加请求
         /// </summary>
         /// <param name="page"></param>
         protected void ExtractAndAddRequests(Page page)
@@ -1164,7 +1167,10 @@ namespace DotnetSpider.Core
                 throw new SpiderException("Spider is running.");
             }
         }
-
+        /// <summary>
+        /// 初始化调度队列
+        /// </summary>
+        /// <param name="arguments">运行参数</param>
         protected virtual void InitScheduler(params string[] arguments)
         {
             Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
@@ -1317,10 +1323,12 @@ namespace DotnetSpider.Core
                 Logger.AllLog(Identity, "Add start urls to scheduler, count 0.", LogLevel.Info);
             }
         }
-
+        /// <summary>
+        /// 注入cookies
+        /// </summary>
         private void InjectCookie()
         {
-            CookieInjector?.Inject(this, false);
+            CookieInjector?.Inject(Downloader,this, false);
         }
 
         private void InitFileCloseSignals()
@@ -1369,9 +1377,12 @@ namespace DotnetSpider.Core
                 return 1;
             }
         }
-
+        /// <summary>
+        /// 错误请求日志
+        /// </summary>
         private void PrepareErrorRequestsLogFile()
         {
+            // 创建错误日志
             _errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 
             while (true)

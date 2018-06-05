@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Downloader
 			_termination = termination;
 		}
 
-		public virtual void Handle(ref Page page, ISpider spider)
+		public virtual void Handle(ref Page page,IDownloader downloader, ISpider spider)
 		{
 			if (!string.IsNullOrEmpty(page?.Content) && !string.IsNullOrEmpty(PagerString) &&
 				(_termination == null || !_termination.IsTermination(page, this)))

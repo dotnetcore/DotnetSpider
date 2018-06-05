@@ -20,7 +20,7 @@ namespace DotnetSpider.Core.Test
 			Site site = new Site();
 			site.AddStartUrl("http://www.baidu.com");
 			DefaultSpider spider = new DefaultSpider("a", site);
-			inject.Inject(spider, false);
+			inject.Inject(spider.Downloader,   spider, false);
 			Assert.Equal("a=b&c=d", site.Cookies.ToString());
 		}
 	}

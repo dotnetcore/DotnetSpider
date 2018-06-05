@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Extension.Model.Attribute
 {
-	public class BaseSelector : Selector
+	public class BaseSelector : SelectorAttribute
 	{
 		public BaseSelector()
 		{

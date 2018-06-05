@@ -4,6 +4,7 @@ using Xunit;
 using DotnetSpider.Core.Scheduler;
 using static DotnetSpider.Core.Test.SpiderTest;
 using DotnetSpider.Core.Pipeline;
+using System.Threading.Tasks;
 
 namespace DotnetSpider.Core.Test.Downloader
 {
@@ -109,26 +110,27 @@ namespace DotnetSpider.Core.Test.Downloader
 
 		class HttpClientDownloader2 : HttpClientDownloader
 		{
-			protected override Page DowloadContent(Request request, ISpider spider)
+			protected override Task<Page> DowloadContent(Request request, ISpider spider)
 			{
-				return new Page(request) { Content = "{'a':'b'}" };
+				return Task.FromResult(new Page(request) { Content = "{'a':'b'}" });
 			}
 		}
 
-		[Fact]
-		public void GetTargetUrlWhenRedirect()
-		{
-			Site site = new Site
-			{
-				Headers = new Dictionary<string, string>
-				{
-					{ "User-Agent", "Chrome" }
-				}
-			};
-			var downloader = new HttpClientDownloader();
-			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site));
 
-			Assert.True(page.TargetUrl.Contains("www.jd.com/2017?t=") || page.TargetUrl.Contains("global.jd.com"));
-		}
-	}
+        [Fact(DisplayName = "GetTargetUrlWhenRedirect")]
+        public void GetTargetUrlWhenRedirect()
+        {
+            Site site = new Site
+            {
+                Headers = new Dictionary<string, string>
+                {
+                    { "User-Agent", "Chrome" }
+                }
+            };
+            var downloader = new HttpClientDownloader();
+            var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null), new DefaultSpider("test", site)).Result;
+            Assert.DoesNotContain("1231222221111123", page.TargetUrl);
+            Assert.True(page.TargetUrl.Contains("www.jd.com/") || page.TargetUrl.Contains("global.jd.com"));
+        }
+    }
 }

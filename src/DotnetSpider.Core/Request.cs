@@ -15,35 +15,53 @@ namespace DotnetSpider.Core
 	public class Request : IDisposable
 	{
 		private readonly object _locker = new object();
-
-		internal int? CountOfResults { get; set; }
-
-		internal int? EffectedRows { get; set; }
+        /// <summary>
+        /// 此链接解析出的数据结果数量
+        /// </summary>
+        [JsonIgnore]
+        internal int? CountOfResults { get; set; }
+        /// <summary>
+        /// 所有数据结果插入数据库后实际增加或更新的数量
+        /// </summary>
+        internal int? EffectedRows { get; set; }
 
 		public UseSpecifiedUriWebProxy Proxy { get; set; }
+        /// <summary>
+        /// 当前链接的深度, 默认构造的链接深度为1, 用于控制爬取的深度
+        /// </summary>
+        public int Depth { get; set; } = 1;
+        /// <summary>
+        /// 当前链接已经重试的次数
+        /// </summary>
+        public int CycleTriedTimes { get; set; }
+        /// <summary>
+        /// 当前链接子链接的深度
+        /// </summary>
+        [JsonIgnore]
+        public int NextDepth => Depth + 1;
+        /// <summary>
+        /// 当前链接是否是合法链接
+        /// </summary>
+        [JsonIgnore]
+        public bool IsAvailable { get; } = true;
+        /// <summary>
+        /// 请求链接时Referer参数的值
+        /// </summary>
+        public string Referer { get; set; }
+        /// <summary>
+        /// 请求链接时Origin参数的值
+        /// </summary>
+        public string Origin { get; set; }
 
-		public int Depth { get; set; } = 1;
+        /// <summary>
+        /// 链接的优先级, 仅用于优先级队列
+        /// </summary>
+        public int Priority { get; set; }
 
-		public int CycleTriedTimes { get; set; }
-
-		public int NextDepth => Depth + 1;
-        // 请求是否有效
-		public bool IsAvailable { get; } = true;
-
-		public string Referer { get; set; }
-
-		public string Origin { get; set; }
-
-		/// <summary>
-		/// Set the priority of request for sorting. 
-		/// Need a scheduler supporting priority. 
-		/// </summary>
-		public int Priority { get; set; }
-
-		/// <summary>
-		/// Store additional information in extras.
-		/// </summary>
-		public Dictionary<string, dynamic> Extras { get; set; }
+        /// <summary>
+        /// 存储此链接对应的额外数据字典
+        /// </summary>
+        public Dictionary<string, dynamic> Extras { get; set; }
 
 		/// <summary>
 		/// The http method of the request. Get for default.
@@ -51,10 +69,16 @@ namespace DotnetSpider.Core
 		public HttpMethod Method { get; set; } = HttpMethod.Get;
 
 		public string PostBody { get; set; }
-
-		public Uri Url { get; set; }
-
-		public string Identity => Encrypt.Md5Encrypt(Url + PostBody);
+        /// <summary>
+        /// 请求链接, 请求链接限定为Uri的原因: 无论是本地文件资源或者网络资源都是可以用Uri来定义的
+        /// 比如本地文件: file:///C:/Users/Lewis/Desktop/111.png
+        /// </summary>
+        public Uri Url { get; set; }
+        /// <summary>
+        /// TODO 此链接信息的唯一标识, 可能需要添加更多属性, 如某些场景URL是完成一致, 使用Referer或者Cookie来区别请求
+        /// </summary>
+        [JsonIgnore]
+        public string Identity => Encrypt.Md5Encrypt(Url + PostBody);
 
 		public HttpStatusCode? StatusCode { get; set; }
 

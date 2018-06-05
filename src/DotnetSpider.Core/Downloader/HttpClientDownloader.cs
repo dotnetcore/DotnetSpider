@@ -46,8 +46,8 @@ namespace DotnetSpider.Core.Downloader
 		};
 		private readonly HttpClientPool _httpClientPool = new HttpClientPool();
 		private readonly HttpClient _httpClient;
-
-		private bool _decodeHtml { get; set; }
+        private readonly string _downloadFolder;
+        private bool _decodeHtml { get; set; }
 
 		public HttpClientDownloader()
 		{
@@ -58,7 +58,9 @@ namespace DotnetSpider.Core.Downloader
 				UseProxy = true,
 				UseCookies = false
 			});
-		}
+
+            _downloadFolder = Path.Combine(Env.BaseDirectory, "download");
+        }
 
 		public HttpClientDownloader(int timeout=8) : this()
 		{
@@ -93,7 +95,7 @@ namespace DotnetSpider.Core.Downloader
         /// <param name="request">请求信息 <see cref="Request"/></param>
         /// <param name="spider">爬虫 <see cref="ISpider"/></param>
         /// <returns>页面数据 <see cref="Page"/></retur
-        protected override Page DowloadContent(Request request, ISpider spider)
+        protected override async Task<Page> DowloadContent(Request request, ISpider spider)
 		{
 			Site site = spider.Site;
 
@@ -126,8 +128,8 @@ namespace DotnetSpider.Core.Downloader
 					if (!site.DownloadFiles)
 					{
 						Logger.AllLog(spider.Identity, $"Miss request: {request.Url} because media type is not text.", LogLevel.Error);
-						return new Page(request, null) { Skip = true };
-					}
+                        return await Task.FromResult(new Page(request) { Skip = true });
+                    }
 					else
 					{
 						page = SaveFile(request, response, spider);
@@ -337,6 +339,41 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 
+
+
+        private Page SaveFile(Request request, HttpResponseMessage response, ISpider spider)
+        {
+            var intervalPath = request.Url.LocalPath.Replace("//", "/").Replace("/", Env.PathSeperator);
+            string filePath = $"{_downloadFolder}{Env.PathSeperator}{spider.Identity}{intervalPath}";
+            if (!File.Exists(filePath))
+            {
+                try
+                {
+                    string folder = Path.GetDirectoryName(filePath);
+                    if (!string.IsNullOrWhiteSpace(folder))
+                    {
+                        if (!Directory.Exists(folder))
+                        {
+                            Directory.CreateDirectory(folder);
+                        }
+                    }
+
+                    File.WriteAllBytes(filePath, response.Content.ReadAsByteArrayAsync().Result);
+                }
+                catch
+                {
+                    Logger.Error(spider.Identity, "Storage file failed.");
+                }
+            }
+            Logger.Info($"Storage file: {request.Url} success.");
+            return new Page(request) { Skip = true };
+        }
+
+        /// <summary>
+        /// 替换空格
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
 		private byte[] PreventCutOff(byte[] bytes)
 		{
 			for (int i = 0; i < bytes.Length; i++)

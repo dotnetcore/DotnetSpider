@@ -79,10 +79,14 @@ namespace DotnetSpider.Core
 				}
 			}
 		}
-
-		public Exception Exception { get; set; }
-
-		public HashSet<Request> TargetRequests { get; } = new HashSet<Request>();
+        /// <summary>
+        /// 下载页面内容时截获的异常
+        /// </summary>
+        public Exception Exception { get; set; }
+        /// <summary>
+        /// 页面解析到的目标链接
+        /// </summary>
+        public HashSet<Request> TargetRequests { get; } = new HashSet<Request>();
 
 		/// <summary>
 		/// Whether remove outbound urls.

@@ -21,15 +21,15 @@ namespace DotnetSpider.Extension.Downloader
 	{
 		public string Url { get; set; }
 
-		public Selector UserSelector { get; set; }
+		public SelectorAttribute UserSelector { get; set; }
 
 		public string User { get; set; }
 
-		public Selector PassSelector { get; set; }
+		public SelectorAttribute PassSelector { get; set; }
 
 		public string Password { get; set; }
 
-		public Selector SubmitSelector { get; set; }
+		public SelectorAttribute SubmitSelector { get; set; }
 
 		public override bool Handle(RemoteWebDriver webDriver)
 		{
@@ -61,7 +61,7 @@ namespace DotnetSpider.Extension.Downloader
 			}
 		}
 
-		private IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
+		private IWebElement FindElement(RemoteWebDriver webDriver, SelectorAttribute element)
 		{
 			switch (element.Type)
 			{

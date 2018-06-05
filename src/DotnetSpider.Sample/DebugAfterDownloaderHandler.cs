@@ -8,7 +8,7 @@ namespace DotnetSpider.Sample
 {
 	public class DebugAfterDownloaderHandler : AfterDownloadCompleteHandler
 	{
-		public override void Handle(ref Page page, ISpider spider)
+		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 		{
 		}
 	}
