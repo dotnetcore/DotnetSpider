@@ -27,12 +27,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(DisplayName = "DataTypes")]
 		public override void DataTypes()
 		{
-#if NETSTANDARD
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			if (!Env.IsWindows)
 			{
 				return;
 			}
-#endif
 			using (var conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true"))
 			{
 				try
@@ -122,6 +120,69 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		public override void Insert_InsertNewAndUpdateOld()
 		{
+		}
+
+		public override void Insert_AutoIncrementPrimaryKey()
+		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
+			base.Insert_AutoIncrementPrimaryKey();
+		}
+
+		public override void Insert_AutoTimestamp()
+		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
+			base.Insert_AutoTimestamp();
+		}
+
+		public override void Insert_MultiPrimaryKey()
+		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
+			base.Insert_MultiPrimaryKey();
+		}
+
+		public override void Insert_NonePrimaryKey()
+		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
+			base.Insert_NonePrimaryKey();
+		}
+
+		public override void Insert_NoneTimestamp()
+		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
+			base.Insert_NoneTimestamp();
+		}
+
+		public override void Update_AutoIncrementPrimaryKey()
+		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
+			base.Update_AutoIncrementPrimaryKey();
+		}
+
+		public override void Update_MutliPrimaryKey()
+		{
+			if (!Env.IsWindows)
+			{
+				return;
+			}
+			base.Update_MutliPrimaryKey();
 		}
 
 		private class ColumnInfo

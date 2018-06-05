@@ -120,7 +120,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Fact(DisplayName = "Update_AutoIncrementPrimaryKey")]
-		public void Update_AutoIncrementPrimaryKey()
+		public virtual void Update_AutoIncrementPrimaryKey()
 		{
 			using (var conn = CreateDbConnection())
 			{
@@ -176,7 +176,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Fact(DisplayName = "Update_MutliPrimaryKey")]
-		public void Update_MutliPrimaryKey()
+		public virtual void Update_MutliPrimaryKey()
 		{
 			using (var conn = CreateDbConnection())
 			{
@@ -231,7 +231,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		#region Insert Tests
 
 		[Fact(DisplayName = "Insert_AutoIncrementPrimaryKey")]
-		public void Insert_AutoIncrementPrimaryKey()
+		public virtual void Insert_AutoIncrementPrimaryKey()
 		{
 			using (var conn = CreateDbConnection())
 			{
@@ -271,7 +271,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Fact(DisplayName = "Insert_NonePrimaryKey")]
-		public void Insert_NonePrimaryKey()
+		public virtual void Insert_NonePrimaryKey()
 		{
 			using (var conn = CreateDbConnection())
 			{
@@ -312,7 +312,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Fact(DisplayName = "Insert_AutoTimestamp")]
-		public void Insert_AutoTimestamp()
+		public virtual void Insert_AutoTimestamp()
 		{
 			using (var conn = CreateDbConnection())
 			{
@@ -359,7 +359,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		}
 
 		[Fact(DisplayName = "Insert_NoneTimestamp")]
-		public void Insert_NoneTimestamp()
+		public virtual void Insert_NoneTimestamp()
 		{
 			using (var conn = CreateDbConnection())
 			{
@@ -504,10 +504,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			[Field(Expression = "category")]
 			public string Category { get; set; }
 
-			[Field(Expression = "name", IsPrimary = true)]
+			[Field(Expression = "name", IsPrimary = true, Length = 50)]
 			public string Name { get; set; }
 
-			[Field(Expression = "sku", IsPrimary = true)]
+			[Field(Expression = "sku", IsPrimary = true, Length = 50)]
 			public string Sku { get; set; }
 		}
 

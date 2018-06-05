@@ -25,8 +25,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\ExcelEntityPipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MySqlEntityFilePipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\HttpPipelineTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MySqlEntityPipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\SqlServerEntityPipelineTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\MysqlEntityPipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\PipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\RedisEntityPipelineTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\ModelProcessorTest.cs" />
