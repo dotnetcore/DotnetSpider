@@ -15,7 +15,7 @@ namespace DotnetSpider.Sample.docs
 	/// <summary>
 	/// After spider complete, check the data in mysql, website are null in every row.
 	/// </summary>
-	public class CustomizeFormatterSpider
+	public class CustomizeFormatter
 	{
 		public static void Run()
 		{

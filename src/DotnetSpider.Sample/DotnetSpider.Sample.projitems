@@ -24,7 +24,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)docs\CrawlerWholeSiteSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\AfterDownloadCompleteHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\AutoIncrementTargetUrlsExtractor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CrawlerWholeSite.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CasSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Class1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CtripCitySpider.cs" />
@@ -32,11 +34,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)DDengSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugAfterDownloaderHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DefaultMySqlPipelineSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\CustmizeProcessorAndPipelineSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\CustomizeFormatterSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\EntityModelSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CustmizeProcessorAndPipeline.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CustomizeFormatter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\EntityModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)docs\ModelSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\MultiProcessorsSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\MultiEntityModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\MultiProcessors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JdCategorySpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JdShopDetailSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JdShopDetailSpider2.cs" />

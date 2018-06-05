@@ -171,7 +171,7 @@ namespace DotnetSpider.Core.Processor
 				throw new ArgumentNullException("Pattern value should not be null or empty.");
 			}
 
-			ISelector selector = Selectors.Regex(RegexUtil.Url);
+			ISelector selector = Selectors.XPath(".");
 			if (!string.IsNullOrWhiteSpace(regionXpath))
 			{
 				string xpath = string.IsNullOrWhiteSpace(regionXpath.Trim()) ? "." : regionXpath.Trim();

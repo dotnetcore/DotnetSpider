@@ -78,7 +78,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\RedisEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\Sqls.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\ExcelEntityPipeline.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Pipeline\ExcelPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\HttpMySqlEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\ICollectionEntityPipeline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Pipeline\JsonFileEntityPipeline.cs" />

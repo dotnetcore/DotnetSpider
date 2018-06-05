@@ -12,7 +12,7 @@ namespace DotnetSpider.Sample.docs
 	/// <summary>
 	/// 通过设置 Processor 中的 TargetUrlsExtractor 属性, 让不同的 URL 进入到不同的 Processor 中做解析
 	/// </summary>
-	public class MultiProcessorsSpider
+	public class MultiProcessors
 	{
 		public static void Run()
 		{
@@ -30,8 +30,6 @@ namespace DotnetSpider.Sample.docs
 				new BlogSumaryProcessor(),
 				new NewsProcessor()).
 				AddPipeline(new MyPipeline());
-			spider.ThreadNum = 1;
-
 			// 启动爬虫
 			spider.Run();
 		}

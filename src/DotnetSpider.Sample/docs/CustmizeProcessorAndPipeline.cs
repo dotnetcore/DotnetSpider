@@ -9,7 +9,7 @@ using System.Text;
 
 namespace DotnetSpider.Sample.docs
 {
-	public class CustmizeProcessorAndPipelineSpider
+	public class CustmizeProcessorAndPipeline
 	{
 		public static void Run()
 		{

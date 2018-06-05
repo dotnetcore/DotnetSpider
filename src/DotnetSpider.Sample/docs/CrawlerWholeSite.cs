@@ -10,7 +10,7 @@ using System.Text;
 
 namespace DotnetSpider.Sample
 {
-	public class CrawlerWholeSiteSpider
+	public class CrawlerWholeSite
 	{
 		public static void Run()
 		{

@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample.docs
 	/// 如果想尝试把数据存到MySql中，请把 AddPipeline(new MySqlEntityPipeline("")); 中的连接字符串替换会您自己MySql的连接字符串
 	/// 如果想尝试把数据存到SqlServer中，请使用 AddPipeline(new SqlServerEntityPipeline("")); 中的连接字符串替换会您自己SqlServer的连接字符串
 	/// </summary>
-	public class EntityModelSpider
+	public class EntityModel
 	{
 		public static void Run()
 		{
