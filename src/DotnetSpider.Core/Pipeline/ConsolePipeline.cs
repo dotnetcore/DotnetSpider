@@ -16,9 +16,15 @@ namespace DotnetSpider.Core.Pipeline
 		{
 			foreach (var resultItem in resultItems)
 			{
+				resultItem.Request.CountOfResults = 0;
+				resultItem.Request.EffectedRows = 0;
+
 				foreach (var entry in resultItem.Results)
 				{
 					System.Console.WriteLine(entry.Key + ":\t" + entry.Value);
+
+					resultItem.Request.CountOfResults += 1;
+					resultItem.Request.EffectedRows += 1;
 				}
 			}
 		}

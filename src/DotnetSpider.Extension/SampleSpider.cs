@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension
 					new Field(".","PlainText"),
 					new Field( "today","atime", SelectorType.Enviroment,DataType.Date)
 				}
-				, new TableInfo("baidu", "search") { });
+				, new TableInfo("baidu", "search"), null);
 			var processor = new ModelProcessor(mode);
 			var spider = Spider.Create(site, processor);
 			var word = "可乐|雪碧";

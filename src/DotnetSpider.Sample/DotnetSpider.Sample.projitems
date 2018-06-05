@@ -18,23 +18,25 @@
     <Content Include="$(MSBuildThisFileDirectory)chromedriver.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="$(MSBuildThisFileDirectory)docs\Formatter.md" />
     <Content Include="$(MSBuildThisFileDirectory)jdCategory.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)BaiduSearchCassandraSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BaiduSearchSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BaseUsage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CrawlerWholeSiteSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CasSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Class1.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Cnblogs.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConfigurableSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CtripCitySpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomSpider1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DDengSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugAfterDownloaderHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DefaultMySqlPipelineSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CustmizeProcessorAndPipelineSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CustomizeFormatterSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\EntityModelSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\ModelSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\MultiProcessorsSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JdCategorySpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JdShopDetailSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JdShopDetailSpider2.cs" />

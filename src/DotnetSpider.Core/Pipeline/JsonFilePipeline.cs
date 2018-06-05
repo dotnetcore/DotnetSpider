@@ -41,6 +41,9 @@ namespace DotnetSpider.Core.Pipeline
 				var streamWriter = GetDataWriter(jsonFile);
 				foreach (var resultItem in resultItems)
 				{
+					resultItem.Request.CountOfResults = 1;
+					resultItem.Request.EffectedRows = 1;
+
 					streamWriter.WriteLine(JsonConvert.SerializeObject(resultItem.Results));
 				}
 			}

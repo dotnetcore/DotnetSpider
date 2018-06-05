@@ -43,6 +43,7 @@ namespace DotnetSpider.Core.Pipeline
 				{
 					_items.Add(spider, new List<ResultItems>());
 				}
+ 
 				_items[spider].AddRange(resultItems);
 			}
 		}

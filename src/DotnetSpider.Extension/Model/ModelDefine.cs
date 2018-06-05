@@ -46,6 +46,11 @@ namespace DotnetSpider.Extension.Model
 
 		public string Identity { get; protected set; }
 
+		public ModelDefine(Selector selector, IEnumerable<Field> fields, TableInfo table, TargetUrlsSelector targetUrlsSelector)
+			: this(selector, fields, table, new[] { targetUrlsSelector })
+		{
+		}
+
 		public ModelDefine(Selector selector, IEnumerable<Field> fields, TableInfo table = null, IEnumerable<TargetUrlsSelector> targetUrlsSelectors = null, IEnumerable<SharedValueSelector> sharedValueSelectors = null, int take = 0, bool takeFromHead = true) : this()
 		{
 			Selector = selector;
@@ -158,7 +163,7 @@ namespace DotnetSpider.Extension.Model
 				{
 					foreach (var column in tableInfo.UpdateColumns)
 					{
-						if (columns.All(c => c.Name != column) )
+						if (columns.All(c => c.Name != column))
 						{
 							throw new SpiderException("Columns set to update are not a property of your entity");
 						}

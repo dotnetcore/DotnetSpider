@@ -36,6 +36,9 @@ namespace DotnetSpider.Core.Pipeline
 			{
 				foreach (var resultItem in resultItems)
 				{
+					resultItem.Request.CountOfResults = 0;
+					resultItem.Request.EffectedRows = 0;
+
 					string filePath = Path.Combine(GetDataFolder(spider), $"{ Guid.NewGuid():N}.dsd");
 					using (StreamWriter printWriter = new StreamWriter(File.OpenWrite(filePath), Encoding.UTF8))
 					{
@@ -51,10 +54,16 @@ namespace DotnetSpider.Core.Pipeline
 								{
 									printWriter.WriteLine(o);
 								}
+
+								resultItem.Request.CountOfResults += list.Count;
+								resultItem.Request.EffectedRows += list.Count;
 							}
 							else
 							{
 								printWriter.WriteLine(entry.Key + ":\t" + entry.Value);
+
+								resultItem.Request.CountOfResults += 1;
+								resultItem.Request.EffectedRows += 1;
 							}
 						}
 					}

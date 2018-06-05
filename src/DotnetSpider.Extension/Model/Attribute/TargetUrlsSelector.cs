@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotnetSpider.Core.Infrastructure;
+using System;
 
 namespace DotnetSpider.Extension.Model.Attribute
 {
@@ -8,6 +9,26 @@ namespace DotnetSpider.Extension.Model.Attribute
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 	public class TargetUrlsSelector : System.Attribute
 	{
+		public TargetUrlsSelector() { }
+
+		public TargetUrlsSelector(string[] xpaths, string[] patterns = null)
+		{
+			XPaths = xpaths;
+			Patterns = patterns;
+		}
+
+		public TargetUrlsSelector(string xpath)
+		{
+			XPaths = new[] { xpath };
+			Patterns = new[] { RegexUtil.Url };
+		}
+
+		public TargetUrlsSelector(string xpath, string pattern)
+		{
+			XPaths = new[] { xpath };
+			Patterns = new[] { pattern };
+		}
+
 		/// <summary>
 		/// 目标链接所在区域
 		/// </summary>

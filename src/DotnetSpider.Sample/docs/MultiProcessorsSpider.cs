@@ -5,10 +5,14 @@ using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Core.Selector;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace DotnetSpider.Sample
+namespace DotnetSpider.Sample.docs
 {
-	public class Cnblogs
+	/// <summary>
+	/// 通过设置 Processor 中的 TargetUrlsExtractor 属性, 让不同的 URL 进入到不同的 Processor 中做解析
+	/// </summary>
+	public class MultiProcessorsSpider
 	{
 		public static void Run()
 		{
