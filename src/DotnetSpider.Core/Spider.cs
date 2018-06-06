@@ -911,7 +911,7 @@ namespace DotnetSpider.Core
             {
                 if (containsData)
                 {
-                    pipeline.Process(_cached,this);
+                    pipeline.Process(_cached, this);
                 }
                 SafeDestroy(pipeline);
             }
@@ -1111,7 +1111,7 @@ namespace DotnetSpider.Core
                         _cached.Add(page.ResultItems);
 
                         if (_cached.Count >= CachedSize)
-                        { 
+                        {
                             foreach (IPipeline pipeline in Pipelines)
                             {
                                 pipeline.Process(_cached, this);
@@ -1328,7 +1328,7 @@ namespace DotnetSpider.Core
         /// </summary>
         private void InjectCookie()
         {
-            CookieInjector?.Inject(Downloader,this, false);
+            CookieInjector?.Inject(Downloader, this, false);
         }
 
         private void InitFileCloseSignals()
@@ -1367,7 +1367,7 @@ namespace DotnetSpider.Core
             if (Scheduler.LeftRequestsCount > 10)
             {
                 return 10;
-            }   
+            }
             else if (Scheduler.LeftRequestsCount > 5)
             {
                 return 2;
@@ -1385,32 +1385,30 @@ namespace DotnetSpider.Core
             // 创建错误日志
             _errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, "errors.txt"));
 
-            while (true)
+
+            try
             {
-                try
+                if (_errorRequestFile.Exists)
                 {
-                    if (_errorRequestFile.Exists)
-                    {
-                        _errorRequestStreamWriter = new StreamWriter(File.OpenWrite(_errorRequestFile.FullName), Encoding.UTF8);
-                        break;
-                    }
-                    else
-                    {
-                        _errorRequestStreamWriter = File.CreateText(_errorRequestFile.FullName);
-                        break;
-                    }
+                    _errorRequestStreamWriter = new StreamWriter(File.OpenWrite(_errorRequestFile.FullName), Encoding.UTF8);
+                  
                 }
-                catch
+                else
                 {
-                    _errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, $"errors.{DateTime.Now.ToString("yyyyMMddhhmmss")}.txt"));
+                    _errorRequestStreamWriter = File.CreateText(_errorRequestFile.FullName);
+                   
                 }
-                Thread.Sleep(500);
             }
+            catch
+            {
+                _errorRequestFile = BasePipeline.PrepareFile(Path.Combine(Env.BaseDirectory, "ErrorRequests", Identity, $"errors.{DateTime.Now.ToString("yyyyMMddhhmmss")}.txt"));
+            }    
+
         }
 
         private void InitSiteProperty()
         {
-             
+
             Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
             Site.UserAgent = Site.UserAgent ??
                              "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";

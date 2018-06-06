@@ -24,50 +24,53 @@ namespace DotnetSpider.Core
 		/// <returns></returns>
 		public string Url { get; }
 
-		/// <summary>
-		/// Get url of current page
-		/// </summary>
-		/// <returns></returns>
-		public string TargetUrl { get; set; }
+        /// <summary>
+        /// 最终请求的链接, 当发生30X跳转时与Url的值不一致
+        /// </summary>
+        public string TargetUrl { get; set; }
 
 		/// <summary>
 		/// Title of current page.
 		/// </summary>
 		public string Title { get; set; }
 
-		/// <summary>
-		/// Get request of current page
-		/// </summary>
-		/// <returns></returns>
-		public Request Request { get; }
 
-		/// <summary>
-		/// Whether need retry current page.
-		/// </summary>
-		public bool Retry { get; set; }
+        /// <summary>
+        /// 页面的Http请求
+        /// </summary>
+        public Request Request { get; }
 
-		/// <summary>
-		/// Skip extract target urls, when someone use custom target url builder.
-		/// </summary>
-		public bool SkipExtractTargetUrls { get; set; }
+        /// <summary>
+        /// 是否需要重试当前页面
+        /// </summary>
+        public bool Retry { get; set; }
 
-		/// <summary>
-		/// Skip all target urls, still will execute pipeline.
-		/// </summary>
-		public bool SkipTargetUrls { get; set; }
+        /// <summary>
+        /// 对此页面跳过解析目标链接
+        /// </summary>
+        public bool SkipExtractTargetUrls { get; set; }
 
-		/// <summary>
-		/// Skip current page, will not execute pipeline.
-		/// </summary>
-		public bool Skip { get; set; }
+        /// <summary>
+        /// 页面解析出来的目标链接不加入到调度队列中
+        /// </summary>
+        public bool SkipTargetUrls { get; set; }
 
-		public ResultItems ResultItems { get; } = new ResultItems();
+        /// <summary>
+        /// 页面解析的数据不传入数据管道中作处理
+        /// </summary>
+        public bool Skip { get; set; }
+        /// <summary>
+        /// 页面解析的数据结果
+        /// </summary>
+        public ResultItems ResultItems { get; } = new ResultItems();
 
 		public HttpStatusCode? StatusCode => Request?.StatusCode;
 
 		public string Padding { get; set; }
-
-		public string Content
+        /// <summary>
+        /// 下载到的文本内容
+        /// </summary>
+        public string Content
 		{
 			get => _content;
 			set
@@ -98,11 +101,10 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public string[] Domains { get; }
 
-		/// <summary>
-		/// Get selectable interface
-		/// </summary>
-		/// <returns></returns>
-		public Selectable Selectable
+        /// <summary>
+        /// 查询器
+        /// </summary>
+        public Selectable Selectable
 		{
 			get
 			{
@@ -115,7 +117,19 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		public Page(Request request, params string[] domains)
+
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="request">请求信息</param>
+        public Page(Request request)
+        {
+            Request = request;
+            Url = request.Url.ToString();
+            ResultItems.Request = request;
+        }
+
+        public Page(Request request, params string[] domains)
 		{
 			Request = request;
 			Url = request.Url.ToString();
@@ -123,22 +137,21 @@ namespace DotnetSpider.Core
 			RemoveOutboundLinks = domains != null && domains.Length > 0;
 			Domains = domains;
 		}
-
-		/// <summary>
-		/// Store extract results
-		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="field"></param>
-		public void AddResultItem(string key, dynamic field)
+        /// <summary>
+        /// 添加解析到的数据结果
+        /// </summary>
+        /// <param name="key">键值</param>
+        /// <param name="field">数据结果</param>
+        public void AddResultItem(string key, dynamic field)
 		{
 			ResultItems.AddOrUpdateResultItem(key, field);
 		}
 
-		/// <summary>
-		/// Add urls to fetch
-		/// </summary>
-		/// <param name="requests"></param>
-		public void AddTargetRequests(IList<string> requests)
+        /// <summary>
+        /// 添加解析到的目标链接, 添加到队列中
+        /// </summary>
+        /// <param name="urls">链接</param>
+        public void AddTargetRequests(IList<string> requests)
 		{
 			if (requests == null || requests.Count == 0)
 			{
@@ -162,11 +175,11 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		/// <summary>
-		/// Add urls to fetch
-		/// </summary>
-		/// <param name="requests"></param>
-		public void AddTargetRequests(IList<Request> requests)
+        /// <summary>
+        /// 添加解析到的目标链接, 添加到队列中
+        /// </summary>
+        /// <param name="requests">链接</param>
+        public void AddTargetRequests(IList<Request> requests)
 		{
 			if (requests == null || requests.Count == 0)
 			{
@@ -211,12 +224,8 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		/// <summary>
-		/// Add url to fetch
-		/// </summary>
-		/// <param name="requestString"></param>
-		/// <param name="increaseDeep"></param>
-		public void AddTargetRequest(string requestString, bool increaseDeep = true)
+ 
+        public void AddTargetRequest(string requestString, bool increaseDeep = true)
 		{
 			lock (_locker)
 			{
@@ -238,11 +247,12 @@ namespace DotnetSpider.Core
 				TargetRequests.Add(request);
 			}
 		}
-
-		/// <summary>
-		/// Add requests to fetch
-		/// </summary>		 
-		public void AddTargetRequest(Request request, bool increaseDeep = true)
+        /// <summary>
+        /// 添加解析到的目标链接, 添加到队列中
+        /// </summary>
+        /// <param name="request">链接</param>
+        /// <param name="increaseDeep">目标链接的深度是否升高</param>
+        public void AddTargetRequest(Request request, bool increaseDeep = true)
 		{
 			if (request == null)
 			{
