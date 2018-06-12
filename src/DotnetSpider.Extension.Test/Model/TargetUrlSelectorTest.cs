@@ -258,8 +258,8 @@ namespace DotnetSpider.Extension.Test.Model
 			new ModelDefine<Entity25>();
 			var processor = new EntityProcessor<Entity25>();
 
-			Assert.Single(processor.GetTargetUrlPatterns(null));
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns(null)[0].ToString());
+			Assert.Single(processor.GetTargetUrlPatterns("."));
+			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns(".")[0].ToString());
 
 			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
 		}

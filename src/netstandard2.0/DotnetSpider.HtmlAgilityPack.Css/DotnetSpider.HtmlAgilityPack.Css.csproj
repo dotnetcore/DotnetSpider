@@ -9,7 +9,7 @@
     <OutputPath>..\..\..\output\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.8.2" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.8.4" />
   </ItemGroup>
   <Import Project="..\..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.projitems" Label="Shared" />
 </Project>

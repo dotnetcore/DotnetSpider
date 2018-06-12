@@ -92,5 +92,9 @@ namespace DotnetSpider.Core.Selector
 		/// <returns>如果返回 True, 则说明是查询元素的属性值</returns>
 		public override bool HasAttribute => !string.IsNullOrWhiteSpace(_attrName);
 
+		public override int GetHashCode()
+		{
+			return $"{_xpath}{_attrName}".GetHashCode();
+		}
 	}
 }

@@ -19,55 +19,57 @@ namespace DotnetSpider.Sample.docs
 	{
 		public static void Run()
 		{
-			Spider spider = new Spider();
+			BaiduSearchSpider spider = new BaiduSearchSpider();
 			spider.Run();
 		}
+	}
 
-		private class NullFormatter : Formatter
+	public class NullFormatter : Formatter
+	{
+		protected override void CheckArguments()
 		{
-			protected override void CheckArguments()
-			{
-			}
-
-			protected override object FormateValue(object value)
-			{
-				return "";
-			}
 		}
 
-		private class Spider : EntitySpider
+		protected override object FormateValue(object value)
 		{
-			public Spider() : base("EntityModelSpider")
-			{
-			}
+			return "";
+		}
+	}
 
-			protected override void MyInit(params string[] arguments)
-			{
-				var word = "可乐|雪碧";
-				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
-				AddEntityType<BaiduSearchEntry>();
-				AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"));
-			}
+	[TaskName("baidu_search")]
+	public class BaiduSearchSpider : EntitySpider
+	{
+		public BaiduSearchSpider() : base("EntityModelSpider")
+		{
+			EmptySleepTime = 1000;
+		}
 
-			[TableInfo("baidu", "baidu_search_customizeforamtter")]
-			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-			class BaiduSearchEntry : BaseEntity
-			{
-				[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
-				public string Keyword { get; set; }
+		protected override void MyInit(params string[] arguments)
+		{
+			var word = "可乐|雪碧";
+			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+			AddEntityType<BaiduSearchEntry>();
+			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"));
+		}
 
-				[Field(Expression = ".//h3[@class='c-title']/a")]
-				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-				public string Title { get; set; }
+		[TableInfo("baidu", "baidu_search_customizeforamtter")]
+		[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+		class BaiduSearchEntry : BaseEntity
+		{
+			[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
+			public string Keyword { get; set; }
 
-				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
-				public string Url { get; set; }
+			[Field(Expression = ".//h3[@class='c-title']/a")]
+			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+			public string Title { get; set; }
 
-				[Field(Expression = ".//div/p[@class='c-author']/text()")]
-				[NullFormatter]
-				public string Website { get; set; }
-			}
+			[Field(Expression = ".//h3[@class='c-title']/a/@href")]
+			public string Url { get; set; }
+
+			[Field(Expression = ".//div/p[@class='c-author']/text()")]
+			[NullFormatter]
+			public string Website { get; set; }
 		}
 	}
 }

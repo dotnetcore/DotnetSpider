@@ -976,7 +976,7 @@ namespace DotnetSpider.Core
 
 			_monitorReportInterval = CalculateMonitorReportInterval();
 
-			if (Console.IsInputRedirected)
+			if (!Console.IsInputRedirected)
 			{
 				Console.CancelKeyPress += ConsoleCancelKeyPress;
 			}

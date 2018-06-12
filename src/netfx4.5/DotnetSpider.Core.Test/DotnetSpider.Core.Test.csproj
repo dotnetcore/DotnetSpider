@@ -74,10 +74,6 @@
       <Project>{5583bae6-9b40-41cd-bc42-5f754e966d86}</Project>
       <Name>DotnetSpider.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj">
-      <Project>{0217bd7d-97a9-47a5-ae24-3aebec7413b9}</Project>
-      <Name>DotnetSpider.HtmlAgilityPack.Css</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

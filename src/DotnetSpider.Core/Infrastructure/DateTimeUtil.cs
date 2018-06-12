@@ -41,10 +41,12 @@ namespace DotnetSpider.Core.Infrastructure
 		/// 前一月份的最后一天
 		/// </summary>
 		public static DateTime LastDayOfLastMonth { get; }
+		
 		/// <summary>
 		/// 星期一
 		/// </summary>
-		public static DateTime Today { get; }
+		public static DateTime Today => DateTime.Now;
+
 		/// <summary>
 		/// 星期一
 		/// </summary>
@@ -171,7 +173,6 @@ namespace DotnetSpider.Core.Infrastructure
 		static DateTimeUtil()
 		{
 			var now = DateTime.Now.Date;
-			Today = now;
 
 			FirstDayOfTheMonth = now.AddDays(now.Day * -1 + 1);
 			LastDayOfTheMonth = FirstDayOfTheMonth.AddMonths(1).AddDays(-1);

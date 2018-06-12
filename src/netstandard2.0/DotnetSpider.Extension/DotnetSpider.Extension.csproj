@@ -11,20 +11,19 @@
     <OutputPath>..\..\..\output\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CassandraCSharpDriver" Version="3.5.0" />
     <PackageReference Include="Dapper" Version="1.50.5" />
+    <PackageReference Include="EPPlus.Core" Version="1.5.4" />
+    <PackageReference Include="MailKit" Version="2.0.4" />
+    <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="MongoDB.Driver" Version="2.6.1" />
     <PackageReference Include="MySqlConnector" Version="0.40.4" />
-    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
-    <PackageReference Include="SSH.NET" Version="2016.1.0" />
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-    <PackageReference Include="EPPlus.Core" Version="1.5.4" />
-    <PackageReference Include="Selenium.WebDriver" Version="3.12.0" />
-    <PackageReference Include="Npgsql" Version="3.2.5" />
-    <PackageReference Include="CassandraCSharpDriver" Version="3.5.0" />
-    <PackageReference Include="MessagePack" Version="1.7.3.4" />
-    <PackageReference Include="Npgsql" Version="3.2.7" />
-    <PackageReference Include="MailKit" Version="2.0.3" />
+    <PackageReference Include="Npgsql" Version="4.0.0" />
     <PackageReference Include="Polly" Version="6.0.1" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.12.1" />
+    <PackageReference Include="SSH.NET" Version="2016.1.0" />
+    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
     <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
   </ItemGroup>
   <Import Project="..\..\DotnetSpider.Extension\DotnetSpider.Extension.projitems" Label="Shared" />

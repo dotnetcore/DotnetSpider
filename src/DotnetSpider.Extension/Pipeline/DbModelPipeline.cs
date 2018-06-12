@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using Serilog;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -66,17 +67,19 @@ namespace DotnetSpider.Extension.Pipeline
 				{
 					conn = RefreshConnectionString();
 
+					// 每天执行一次建表操作, 可以实现每天一个表的操作，或者按周分表可以在运行时创建新表。
+					var key = model.TableInfo.Postfix != TableNamePostfix.None ? $"{model.Identity}_{DateTime.Now:yyyyMMdd}" : model.Identity;
 					Sqls sqls;
 					lock (this)
 					{
-						if (_sqls.ContainsKey(model.Identity))
+						if (_sqls.ContainsKey(key))
 						{
-							sqls = _sqls[model.Identity];
+							sqls = _sqls[key];
 						}
 						else
 						{
 							sqls = GenerateSqls(model);
-							_sqls.Add(model.Identity, sqls);
+							_sqls.Add(key, sqls);
 							InitDatabaseAndTable(conn, model);
 						}
 					}

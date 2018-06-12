@@ -3,13 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DotnetSpider.HtmlAgilityPack.Css", "src\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.shproj", "{95A647F3-963F-4EAB-B3A2-99027C46DD0A}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DotnetSpider.Core", "src\DotnetSpider.Core\DotnetSpider.Core.shproj", "{6C8BEE01-E343-486A-95C9-00B784FE66FB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "netstandard2.0", "netstandard2.0", "{8438D658-FF75-45BC-8498-6FDFD4B46D73}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.HtmlAgilityPack.Css", "src\netstandard2.0\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj", "{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Core", "src\netstandard2.0\DotnetSpider.Core\DotnetSpider.Core.csproj", "{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3}"
 EndProject
@@ -53,17 +49,12 @@ Global
 		src\DotnetSpider.Core.Test\DotnetSpider.Core.Test.projitems*{1ce8fc3b-2587-4fbd-9b3d-ab319ff1e9dd}*SharedItemsImports = 13
 		src\DotnetSpider.Core\DotnetSpider.Core.projitems*{6c8bee01-e343-486a-95c9-00b784fe66fb}*SharedItemsImports = 13
 		src\DotnetSpider.Sample\DotnetSpider.Sample.projitems*{789a17bf-9b08-4743-81dd-5512e5220848}*SharedItemsImports = 13
-		src\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.projitems*{95a647f3-963f-4eab-b3a2-99027c46dd0a}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -89,7 +80,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{CFA8D86F-2239-4847-AEE5-40BE9FBBE934} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}
 		{1FE8D6F1-C94D-4731-85B5-BBF9D1D473D3} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}
 		{864721C5-4CBC-49C9-B055-2A379AE74873} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}
 		{2ACD924E-E8CC-42D7-BE2B-59EC621DE372} = {8438D658-FF75-45BC-8498-6FDFD4B46D73}

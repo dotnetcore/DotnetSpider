@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HtmlAgilityPack;
-using DotnetSpider.HtmlAgilityPack;
+#if NETSTANDARD
+using HtmlAgilityPack.CssSelectors.NetCore;
+#endif
 
 namespace DotnetSpider.Core.Selector
 {
