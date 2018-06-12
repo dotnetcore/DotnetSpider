@@ -6,61 +6,88 @@ using DotnetSpider.HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Selector
 {
-	public class CssHtmlSelector : BaseHtmlSelector
-	{
-		private readonly string _selectorText;
-		private readonly string _attrName;
+    /// <summary>
+    /// CSS 选择器
+    /// </summary>
+    public class CssHtmlSelector : BaseHtmlSelector
+    {
+        private readonly string _cssSelector;
+        private readonly string _attrName;
 
-		public CssHtmlSelector(string selectorText)
-		{
-			_selectorText = selectorText;
-		}
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="cssSelector">Css 选择器</param>
+        public CssHtmlSelector(string cssSelector)
+        {
+            _cssSelector = cssSelector;
+        }
 
-		public CssHtmlSelector(string selectorText, string attrName)
-		{
-			_selectorText = selectorText;
-			_attrName = attrName;
-		}
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="cssSelector">Css 选择器</param>
+        /// <param name="attrName">属性名称</param>
+        public CssHtmlSelector(string cssSelector, string attrName)
+        {
+            _cssSelector = cssSelector;
+            _attrName = attrName;
+        }
 
-		public override dynamic Select(HtmlNode element)
-		{
-			IList<HtmlNode> elements = element.QuerySelectorAll(_selectorText).ToList();
+        /// <summary>
+        /// 对节点进行查询, 查询结果为第一个符合查询条件的元素
+        /// </summary>
+        /// <param name="element">HTML元素</param>
+        /// <returns>查询结果</returns>
+        public override dynamic Select(HtmlNode element)
+        {
+            IList<HtmlNode> elements = element.QuerySelectorAll(_cssSelector).ToList();
 
-			if (elements.Count > 0)
-			{
-				if (string.IsNullOrEmpty(_attrName))
-				{
-					return elements[0];
-				}
-				else
-				{
-					return elements[0].Attributes[_attrName]?.Value;
-				}
-			}
-			return null;
-		}
+            if (elements.Count > 0)
+            {
+                if (string.IsNullOrWhiteSpace(_attrName))
+                {
+                    return elements[0];
+                }
+                else
+                {
+                    return elements[0].Attributes[_attrName]?.Value?.Trim();
+                }
+            }
+            return null;
+        }
 
-		public override List<dynamic> SelectList(HtmlNode element)
-		{
-			return element.QuerySelectorAll(_selectorText).Cast<dynamic>().ToList();
-		}
+        /// <summary>
+        /// 对节点进行查询, 查询结果为所有符合查询条件的元素
+        /// </summary>
+        /// <param name="element">HTML元素</param>
+        /// <returns>查询结果</returns>
+        public override IEnumerable<dynamic> SelectList(HtmlNode element)
+        {
+            var els = element.QuerySelectorAll(_cssSelector);
+            if (string.IsNullOrWhiteSpace(_attrName))
+            {
+                return els;
+            }
+            else
+            {
+                List<string> result = new List<string>();
+                foreach (var el in els)
+                {
+                    var attr = el.Attributes[_attrName];
+                    if (attr != null && !string.IsNullOrWhiteSpace(attr.Value))
+                    {
+                        result.Add(attr.Value.Trim());
+                    }
+                }
+                return result;
+            }
+        }
 
-		public override bool HasAttribute()
-		{
-			return _attrName != null;
-		}
-
-		protected string GetText(HtmlNode element)
-		{
-			StringBuilder accum = new StringBuilder();
-			foreach (var node in element.ChildNodes)
-			{
-				if (node is HtmlTextNode)
-				{
-					accum.Append(node.InnerText);
-				}
-			}
-			return accum.ToString();
-		}
-	}
+        /// <summary>
+        /// 判断查询是否包含属性
+        /// </summary>
+        /// <returns>如果返回 True, 则说明是查询元素的属性值</returns>
+        public override bool HasAttribute => !string.IsNullOrWhiteSpace(_attrName);
+    }
 }

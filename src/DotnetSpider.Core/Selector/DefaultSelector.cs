@@ -9,7 +9,7 @@ namespace DotnetSpider.Core.Selector
 			return null;
 		}
 
-		public List<dynamic> SelectList(dynamic text)
+		public IEnumerable<dynamic> SelectList(dynamic text)
 		{
 			return null;
 		}

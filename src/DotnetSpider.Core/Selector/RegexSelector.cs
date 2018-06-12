@@ -67,7 +67,7 @@ namespace DotnetSpider.Core.Selector
 			return SelectGroup(tmp).Get(_group);
 		}
 
-		public List<dynamic> SelectList(dynamic text)
+		public IEnumerable<dynamic> SelectList(dynamic text)
 		{
 			if (text == null)
 			{

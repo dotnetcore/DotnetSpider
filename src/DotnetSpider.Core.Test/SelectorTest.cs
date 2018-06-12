@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using DotnetSpider.Core.Selector;
 using Xunit;
 
@@ -75,13 +76,13 @@ namespace DotnetSpider.Core.Test
         {
             JsonPathSelector jsonPathSelector = new JsonPathSelector("$.store.book[*].author");
             var result1 = jsonPathSelector.Select(_text).ToString();
-            var list1 = jsonPathSelector.SelectList(_text);
+            var list1 = jsonPathSelector.SelectList(_text).ToList();
             Assert.Equal(result1, "Nigel Rees");
             Assert.True(list1.Contains("Nigel Rees"));
             Assert.True(list1.Contains("Evelyn Waugh"));
 
             jsonPathSelector = new JsonPathSelector("$.store.book[?(@.category == 'reference')]");
-            var list2 = jsonPathSelector.SelectList(_text);
+            var list2 = jsonPathSelector.SelectList(_text).ToList();
             var result2 = jsonPathSelector.Select(_text);
 
             var expected1 =

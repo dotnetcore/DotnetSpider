@@ -51,9 +51,9 @@ namespace DotnetSpider.Sample
             //Console.Read();
 
             // Crawler pages traversal 遍历整站
-            BaseUsage.CrawlerPagesTraversal();
-            Console.WriteLine("Press any key to continue...");
-            Console.Read();
+            //BaseUsage.CrawlerPagesTraversal();
+            //Console.WriteLine("Press any key to continue...");
+            //Console.Read();
 
             //DDengEntitySpider dDengEntitySpider = new DDengEntitySpider();
             //dDengEntitySpider.Run();
