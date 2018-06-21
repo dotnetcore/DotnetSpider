@@ -7,7 +7,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 
 	public class QueueSchedulerTest
 	{
-		[Fact]
+		[Fact(DisplayName = "QueueScheduler_PushAndPollAsync")]
 		public void PushAndPollAsync()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -33,7 +33,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 			Assert.Equal(1002, total);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "QueueScheduler_PushAndPollDepthFirst")]
 		public void PushAndPollDepthFirst()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -55,7 +55,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 			Assert.Equal(2, total);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "QueueScheduler_PushAndPollBreadthFirst")]
 		public void PushAndPollBreadthFirst()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -78,7 +78,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 			Assert.Equal(2, total);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "QueueScheduler_Status")]
 		public void Status()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();

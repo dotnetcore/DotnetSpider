@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Test.Infrastructure
 
 	public class HttpSenderTest
 	{
-		[Fact]
+		[Fact(DisplayName = "HttpSender_Get")]
 		public void Get()
 		{
 			var result = HttpSender.Request(new HttpRequest

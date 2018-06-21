@@ -9,7 +9,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 
 	public class TargetUrlsCreatorTest
 	{
-		[Fact]
+		[Fact(DisplayName = "TargetUrlsCreator_IncrementTargetUrls")]
 		public void IncrementTargetUrls()
 		{
 			var spider = new DefaultSpider("test", new Site());

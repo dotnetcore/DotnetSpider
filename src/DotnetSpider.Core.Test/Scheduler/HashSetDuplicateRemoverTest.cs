@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 
 	public class HashSetDuplicateRemoverTest
 	{
-		[Fact]
+		[Fact(DisplayName = "HashSetDuplicateRemover_HashSetDuplicate")]
 		public void HashSetDuplicate()
 		{
 			Core.Scheduler.Component.HashSetDuplicateRemover scheduler = new Core.Scheduler.Component.HashSetDuplicateRemover();
@@ -22,7 +22,7 @@ namespace DotnetSpider.Core.Test.Scheduler
 			Assert.True(isDuplicate);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "HashSetDuplicateSynchronized")]
 		public void HashSetDuplicateSynchronized()
 		{
 			Core.Scheduler.Component.HashSetDuplicateRemover scheduler = new Core.Scheduler.Component.HashSetDuplicateRemover();

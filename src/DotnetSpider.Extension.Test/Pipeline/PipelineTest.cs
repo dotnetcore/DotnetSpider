@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 {
 	public class PipelineTest : TestBase
 	{
-		[Fact(Skip = "NEXT")]
+		[Fact(Skip = "NEXT", DisplayName = "MixProcessorAndMissEntityPipeline")]
 		public void MixProcessorAndMissEntityPipeline()
 		{
 			var exceptoin = Assert.Throws<SpiderException>(() =>
@@ -30,7 +30,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			Assert.Equal("You may miss a entity pipeline", exceptoin.Message);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "MixProcessor")]
 		public void MixProcessor()
 		{
 			using (var conn = new MySqlConnection(DefaultConnectionString))

@@ -7,7 +7,7 @@ namespace DotnetSpider.Core.Test
 
 	public partial class SpiderTest
 	{
-		[Fact]
+		[Fact(DisplayName = "Spider_IdentityLengthLimit")]
 		public void IdentityLengthLimit()
 		{
 			try
@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Test
 		}
 
 
-		[Fact]
+		[Fact(DisplayName = "Spider_RemoveOutboundLinksSetting")]
 		public void RemoveOutboundLinksSetting()
 		{
 			try

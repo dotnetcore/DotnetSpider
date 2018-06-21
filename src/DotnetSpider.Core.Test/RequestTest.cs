@@ -19,14 +19,14 @@ namespace DotnetSpider.Core.Test
 			return request;
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Request")]
 		public void Request()
 		{
 			var request = GetRequest();
 			Assert.Single(request.Extras);
 			Assert.Equal(request.Extras["Test"], "Forever");
 		}
-		[Fact]
+		[Fact(DisplayName = "Request_PutExtra")]
 		public void PutExtra()
 		{
 			var request = GetRequest();
@@ -41,7 +41,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(request.Extras[""], "");
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Request_GetExtra")]
 		public void GetExtra()
 		{
 			var request = GetRequest();
@@ -50,7 +50,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(1, request.Depth);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Request_Dispose")]
 		public void Dispose()
 		{
 			var request = GetRequest();
@@ -73,7 +73,7 @@ namespace DotnetSpider.Core.Test
 		//	Assert.Equal(request.Priority, clone.Priority);
 		//}
 
-		[Fact]
+		[Fact(DisplayName = "Request_Serialize")]
 		public void Serialize()
 		{
 			var request = GetRequest();

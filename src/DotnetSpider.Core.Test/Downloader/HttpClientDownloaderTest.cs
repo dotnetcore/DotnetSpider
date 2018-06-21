@@ -24,7 +24,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		/// <summary>
 		/// 手动执行此测试脚本，运行结束后用netstat -ano 查看端口占用情况。只会占用一个就对了
 		/// </summary>
-		[Fact(Skip = "Need person double check")]
+		[Fact(Skip = "Need person double check", DisplayName = "Ports")]
 		public void Ports()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();

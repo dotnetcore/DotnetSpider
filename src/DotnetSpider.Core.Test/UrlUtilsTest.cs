@@ -5,7 +5,7 @@ namespace DotnetSpider.Core.Test
 
 	public class UrlUtilsTest
 	{
-		[Fact]
+		[Fact(DisplayName = "UrlUtils_FixRelativeUrl")]
 		public void TestFixRelativeUrl()
 		{
 			string absoluteUrl = Core.Infrastructure.UrlUtil.CanonicalizeUrl("?aa", "http://www.dianping.com/sh/ss/com");
@@ -24,7 +24,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("http://www.dianping.com/aa", absoluteUrl);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "UrlUtils_GetDomain")]
 		public void TestGetDomain()
 		{
 			string url = "http://www.dianping.com/aa/";

@@ -19,7 +19,7 @@ namespace DotnetSpider.Core.Test
 			return request;
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Page_Deep")]
 		public void Deep()
 		{
 			var request = GetRequest();

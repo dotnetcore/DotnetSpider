@@ -13,7 +13,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 {
 	public class MySqlEntityFilePipelineTest
 	{
-		[Fact(Skip = "next")]
+		[Fact(DisplayName = "MySqlFileEntityPipeline_InsertSql", Skip = "NEXT")]
 		public void MySqlFileEntityPipeline_InsertSql()
 		{
 			var id = Guid.NewGuid().ToString("N");

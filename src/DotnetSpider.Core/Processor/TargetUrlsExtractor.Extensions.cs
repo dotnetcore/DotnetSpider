@@ -171,14 +171,14 @@ namespace DotnetSpider.Core.Processor
 				throw new ArgumentNullException("Pattern value should not be null or empty.");
 			}
 
-			ISelector selector = Selectors.XPath(".");
+			ISelector selector = Selectors.Default();
 			if (!string.IsNullOrWhiteSpace(regionXpath))
 			{
 				string xpath = string.IsNullOrWhiteSpace(regionXpath.Trim()) ? "." : regionXpath.Trim();
 				selector = Selectors.XPath(xpath);
 			}
 
-			if (!_regionSelectorMapPatterns.ContainsKey(selector))
+			if (selector != null && !_regionSelectorMapPatterns.ContainsKey(selector))
 			{
 				_regionSelectorMapPatterns.Add(selector, new List<Regex>());
 			}
@@ -225,7 +225,7 @@ namespace DotnetSpider.Core.Processor
 		/// <returns></returns>
 		internal List<Regex> GetTargetUrlPatterns(string regionXpath)
 		{
-			ISelector selector = Selectors.Regex(RegexUtil.Url);
+			ISelector selector = Selectors.Default();
 			if (!string.IsNullOrWhiteSpace(regionXpath))
 			{
 				selector = Selectors.XPath(regionXpath);

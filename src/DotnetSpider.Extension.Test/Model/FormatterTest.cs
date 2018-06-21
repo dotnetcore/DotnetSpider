@@ -8,7 +8,7 @@ namespace DotnetSpider.Extension.Test.Model
 
 	public class FormatterTest
 	{
-		[Fact]
+		[Fact(DisplayName = "RegexFormatter")]
 		public void RegexFormatterTest()
 		{
 			try
@@ -84,7 +84,7 @@ namespace DotnetSpider.Extension.Test.Model
 			Assert.Equal("收货100人", formatter5.Formate(str7));
 		}
 
-		[Fact]
+		[Fact(DisplayName = "CharacterCaseFormatter")]
 		public void CharacterCaseFormatterTest()
 		{
 			CharacterCaseFormatter formatter1 = new CharacterCaseFormatter();
@@ -107,7 +107,7 @@ namespace DotnetSpider.Extension.Test.Model
 			Assert.Equal("", formatter3.Formate(""));
 		}
 
-		[Fact]
+		[Fact(DisplayName = "DisplaceFormater")]
 		public void DisplaceFormaterTest()
 		{
 			DisplaceFormater formatter1 = new DisplaceFormater { Displacement = "d", EqualValue = "a" };
@@ -122,7 +122,7 @@ namespace DotnetSpider.Extension.Test.Model
 			//Assert.Equal("dd", formatter2.Formate("dd"));
 		}
 
-		[Fact]
+		[Fact(DisplayName = "FormatStringFormater")]
 		public void FormatStringFormaterTest()
 		{
 			try

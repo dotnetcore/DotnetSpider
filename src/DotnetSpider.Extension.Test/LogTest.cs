@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension.Test
 			Env.HubService = false;
 		}
 
-		[Fact(Skip = "Dep selrilog.mysql")]
+		[Fact(Skip = "Dep selrilog.mysql", DisplayName = "Log_DatebaseLogAndStatus")]
 		public void DatebaseLogAndStatus()
 		{
 			LogUtil.Init();

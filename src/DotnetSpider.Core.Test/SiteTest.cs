@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Test
 		private string _wValue = "12580emall";
 		private string _url = @"http://www.12580emall.com/emall/mall/index.html";
 
-		[Fact]
+		[Fact(DisplayName = "Site_SetEncoding")]
 		public void SetEncoding()
 		{
 			var site = new Site
@@ -21,7 +21,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(Encoding.UTF8, site.Encoding);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Site_AddRequests")]
 		public void AddRequests()
 		{
 			Site site = new Site { EncodingName = "UTF-8" };
@@ -31,7 +31,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Contains(new Request(_url, null), site.StartRequests);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Site_AddRequestsAsync")]
 		public void AddRequestsAsync()
 		{
 			Site site = new Site { EncodingName = "UTF-8" };
@@ -48,7 +48,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Contains(new Request("http://a.com/1", null), site.StartRequests);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Site_AddHeaders")]
 		public void AddHeaders()
 		{
 			Site site = new Site { EncodingName = "UTF-8" };

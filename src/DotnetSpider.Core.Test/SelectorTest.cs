@@ -37,14 +37,14 @@ namespace DotnetSpider.Core.Test
 				"<div><h1>test<a href=\"http://a.com\">aabbcc</a><a href=\"http://a.com/bbc\">aabbcc</a><a href=\"http://b.com\">aabbcc</a></h1></div>"
 			;
 
-		[Fact]
+		[Fact(DisplayName = "Selector_Regex")]
 		public void Regex()
 		{
 			Assert.Equal(Selectors.Regex("a href=\"(.*)\"").Select(_html), "a href=\"xxx\"");
 			Assert.Equal(Selectors.Regex("(a href)=\"(.*)\"", 2).Select(_html), "xxx");
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Selector_RemoveOutboundLinks")]
 		public void RemoveOutboundLinks()
 		{
 			Site site = new Site { RemoveOutboundLinks = true, Domains = new[] { "a.com" } };
@@ -60,7 +60,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("http://a.com/bbc", results.ElementAt(1));
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Selector_Css")]
 		public void Css()
 		{
 			Assert.Equal(Selectors.Css("div h1 a").Select(_html).OuterHtml, "<a href=\"xxx\">aabbcc</a>");
@@ -68,13 +68,13 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(Selectors.Css("div h1 a").Select(_html).InnerHtml, "aabbcc");
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Selector_Xpath")]
 		public void Xpath()
 		{
 			Assert.Equal(Selectors.XPath("//a/@href").Select(_html), "xxx");
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Selector_JsonPath")]
 		public void JsonPath()
 		{
 			JsonPathSelector jsonPathSelector = new JsonPathSelector("$.store.book[*].author");
@@ -96,14 +96,14 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(list2.First(), expected2);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Selector_RegexException")]
 		public void RegexException()
 		{
 			Assert.Throws<ArgumentException>(() => { new RegexSelector("\\d+("); });
 		}
 
 
-		[Fact]
+		[Fact(DisplayName = "Selector_RegexWithLeftBracketQuoted")]
 		public void TestRegexWithLeftBracketQuoted()
 		{
 			string regex = "\\(.+";
@@ -113,7 +113,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(select, source);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Selector_XPath2")]
 		public void XPath2()
 		{
 			Selectable selectable = new Selectable(_html2, "", Core.Infrastructure.ContentType.Html);
@@ -125,7 +125,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal(linksWithChainFirstCall.Count(), linksWithChainSecondCall.Count());
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Selector_Selectable")]
 		public void Selectable()
 		{
 			Selectable selectable = new Selectable(_html2, "", Core.Infrastructure.ContentType.Html);
@@ -136,7 +136,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("http://whatever.com/aaa", links1);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "Selector_PseudoFirst")]
 		public void PseudoFirstTest()
 		{
 			var html =

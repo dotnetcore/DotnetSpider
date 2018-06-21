@@ -258,7 +258,7 @@ namespace DotnetSpider.Extension.Test
 			}
 
 			[TableInfo("test", "neteast")]
-			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "163" })]
+			[TargetUrlsSelector(Patterns = new[] { "http://www.163.com" })]
 			public class NeteastEntity
 			{
 				[Field(Expression = ".//title")]
@@ -266,7 +266,7 @@ namespace DotnetSpider.Extension.Test
 			}
 
 			[TableInfo("test", "sohu")]
-			[TargetUrlsSelector(XPaths = new string[] { }, Patterns = new[] { "sohu" })]
+			[TargetUrlsSelector(Patterns = new[] { "http://www.sohu.com" })]
 			public class SohuEntity
 			{
 				[Field(Expression = ".//title")]

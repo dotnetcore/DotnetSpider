@@ -7,7 +7,7 @@ namespace DotnetSpider.Extension.Test.Infrastructure
 {
 	public class SelectUtilTest
 	{
-		[Fact]
+		[Fact(DisplayName = "SelectUtil_NotNullExpression")]
 		public void NotNullExpression()
 		{
 			Assert.Throws<ArgumentException>(() =>

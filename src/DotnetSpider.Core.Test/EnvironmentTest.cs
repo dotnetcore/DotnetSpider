@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Test
 	public class EnvironmentTest
 	{
 
-		[Fact]
+		[Fact(DisplayName = "DefaultConfig")]
 		public void DefaultConfig()
 		{
 			if (File.Exists(Env.DefaultGlobalAppConfigPath))

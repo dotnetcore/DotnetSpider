@@ -14,7 +14,7 @@ namespace DotnetSpider.Core.Test
 
 	public class StartupTest
 	{
-		[Fact]
+		[Fact(DisplayName = "AnalyzeUnCorrectArguments")]
 		public void AnalyzeUnCorrectArguments()
 		{
 			var args1 = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:guid", "-a:", "abcd" };
@@ -34,7 +34,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Empty(arguments4);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "AnalyzeArguments")]
 		public void AnalyzeArguments()
 		{
 			var args = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:guid", "-a:a,b", "-n:myname" };
@@ -55,7 +55,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("TestSpider", arguments3.TaskId);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "DetectCorrectSpiderCount")]
 		public void DetectCorrectSpiderCount()
 		{
 			var args = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:guid", "-a:" };
@@ -64,7 +64,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Single(spiderTypes);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "SetGuidIdentity")]
 		public void SetGuidIdentity()
 		{
 			var args = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:guid", "-a:" };
@@ -74,7 +74,7 @@ namespace DotnetSpider.Core.Test
 			Guid.Parse(spider.Identity);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "SetIdentity")]
 		public void SetIdentity()
 		{
 			var args = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:WHAT", "-a:" };
@@ -84,7 +84,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("WHAT", spider.Identity);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "SetTaskId")]
 		public void SetTaskId()
 		{
 			var args = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:guid", "-a:" };
@@ -94,7 +94,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("TestSpider", spider.TaskId);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "SetSpiderName")]
 		public void SetSpiderName()
 		{
 			var args = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-n:What", "-i:guid", "-a:" };
@@ -104,7 +104,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("What", spider.Name);
 		}
 
-		[Fact]
+		[Fact(DisplayName = "SetReportArgument")]
 		public void SetReportArgument()
 		{
 			var args = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-n:What", "-i:guid", "-a:report" };

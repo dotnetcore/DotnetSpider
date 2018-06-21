@@ -38,7 +38,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Dispose();
 		}
 
-		[Fact]
+		[Fact(DisplayName = "RedisScheduler_PushAndPollBreadthFirst")]
 		public void PushAndPollBreadthFirst()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -64,7 +64,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Dispose();
 		}
 
-		[Fact]
+		[Fact(DisplayName = "RedisScheduler_PushAndPollDepthFirst")]
 		public void PushAndPollDepthFirst()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -120,7 +120,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Dispose();
 		}
 
-		[Fact()]
+		[Fact(DisplayName = "RedisScheduler_Load")]
 		public void Load()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
@@ -147,11 +147,11 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			redisScheduler.Dispose();
 		}
 
-		[Fact]
+		[Fact(DisplayName = "RedisScheduler_Status")]
 		public void Status()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
-			ISpider spider = new DefaultSpider("test",new Site());
+			ISpider spider = new DefaultSpider("test", new Site());
 			scheduler.Init(spider);
 
 			scheduler.Dispose();
@@ -227,7 +227,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		//	scheduler.Dispose();
 		//}
 
-		[Fact]
+		[Fact(DisplayName = "RedisScheduler_Clear")]
 		public void Clear()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
@@ -250,7 +250,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			scheduler.Dispose();
 		}
 
-		[Fact]
+		[Fact(DisplayName = "RedisScheduler_RetryRequest")]
 		public void RetryRequest()
 		{
 			var site = new Site { EncodingName = "UTF-8" };

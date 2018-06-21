@@ -25,7 +25,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 			Env.HubService = false;
 		}
 
-		[Fact]
+		[Fact(DisplayName = "WebDriverDownloader_DestoryDownloader")]
 		public void DestoryDownloader()
 		{
 #if NETSTANDARD
@@ -46,7 +46,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 		}
 
 
-		[Fact]
+		[Fact(DisplayName = "WebDriverDownloader_ChromeHeadlessDownloader")]
 		public void ChromeHeadlessDownloader()
 		{
 #if NETSTANDARD
