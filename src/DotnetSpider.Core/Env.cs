@@ -167,11 +167,6 @@ namespace DotnetSpider.Core
 		public static string HubServiceToken { get; private set; }
 
 		/// <summary>
-		/// 爬虫系统使用的数据库连接字符串
-		/// </summary>
-		public static string SystemConnectionString => SystemConnectionStringSettings?.ConnectionString;
-
-		/// <summary>
 		/// 数据管道默认使用的数据库连接字符串
 		/// </summary>
 		public static string DataConnectionString => DataConnectionStringSettings?.ConnectionString;

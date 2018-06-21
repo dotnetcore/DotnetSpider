@@ -22,9 +22,7 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-			AutoIncrementTargetUrlsExtractor.Run();
-
-			MyTest();
+			Startup.Run(args);
 		}
 
 
