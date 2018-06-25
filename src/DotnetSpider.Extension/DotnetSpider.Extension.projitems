@@ -44,6 +44,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\SharedValueSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\TargetUrlsSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\DataHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Formatter\UrlDecodeFormater.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\IModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\ModelDefine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\ModelExtractor.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Redial\Redialer\VpnRedialer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Redial\RedisRedialExecutor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SampleSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scheduler\PagingQueueDuplicateRemovedScheduler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scheduler\RedisScheduler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StartUrlsBuilder.cs" />
   </ItemGroup>

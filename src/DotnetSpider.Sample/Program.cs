@@ -2,13 +2,16 @@
 using DotnetSpider.Extension;
 using DotnetSpider.Sample.docs;
 using MessagePack;
-
+using MySql.Data.MySqlClient;
 using System;
+using System.Text.RegularExpressions;
 #if !NETCOREAPP
 using System.Threading;
 #else
 using System.Text;
 #endif
+using Dapper;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Sample
 {
@@ -22,7 +25,13 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-			Startup.Run(args);
+			MultiProcessors.Run();
+		}
+
+		class WuQi
+		{
+			public string Summary { get; set; }
+			public int Id { get; set; }
 		}
 
 

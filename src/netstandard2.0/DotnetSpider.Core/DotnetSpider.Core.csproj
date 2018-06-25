@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Version>2.6.0-beta1</Version>
+    <Version>2.6.0-beta2</Version>
     <Authors>zlzforever@163.com;</Authors>
     <Description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp;amp; scraping framework for .NET</Description>
     <PackageTags>DotnetSpider;crawler;cross platform;dotnet core</PackageTags>
