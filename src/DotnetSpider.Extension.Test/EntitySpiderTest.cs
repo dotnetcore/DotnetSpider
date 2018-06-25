@@ -239,7 +239,7 @@ namespace DotnetSpider.Extension.Test
 				[Field(Expression = ".//a/@title")]
 				public string Title { get; set; }
 
-				[LinkToNext(Extras = new[] { "Title", "Url" })]
+				[ToNext(Extras = new[] { "Title", "Url" })]
 				[Field(Expression = ".//a/@href")]
 				public string Url { get; set; }
 			}

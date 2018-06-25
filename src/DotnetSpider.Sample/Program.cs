@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-			MultiProcessors.Run();
+			DataHandlerSpider.Run();
 		}
 
 		class WuQi

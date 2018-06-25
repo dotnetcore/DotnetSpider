@@ -38,7 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\VpnRedial.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\WebDriverUtil.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\EntitySelector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\LinkToNext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\ToNext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\BaseEntity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Field.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Attribute\SharedValueSelector.cs" />

@@ -7,22 +7,18 @@ using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core;
+using DotnetSpider.Extension.Pipeline;
 
-namespace DotnetSpider.Sample
+namespace DotnetSpider.Sample.docs
 {
-	public class JdSkuWebDriverSample : EntitySpider
+	public class WebDriverDownloaderSpider : EntitySpider
 	{
-		public JdSkuWebDriverSample() : base("JdSkuWebDriver", new Site())
-		{
-		}
-
 		protected override void MyInit(params string[] arguments)
 		{
-			Identity = ("JD sku/store test " + DateTime.Now.ToString("yyyy-MM-dd HHmmss"));
-			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-			AddEntityType<Product>();
 			Downloader = new WebDriverDownloader(Browser.Chrome);
+			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			AddPipeline(new ConsoleEntityPipeline());
+			AddEntityType<Product>();
 		}
 
 		[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
@@ -38,7 +34,6 @@ namespace DotnetSpider.Sample
 
 			[Field(Expression = "./div[1]/a/@href", Length = 20)]
 			public string Url { get; set; }
-
 
 			[Field(Expression = "./@data-sku", Length = 20)]
 			public string Sku { get; set; }
@@ -57,9 +52,6 @@ namespace DotnetSpider.Sample
 
 			[Field(Expression = "./@jdzy_shop_id", Length = 20)]
 			public string JdzyShopId { get; set; }
-
-			[Field(Expression = "Monday", Type = SelectorType.Enviroment)]
-			public DateTime RunId { get; set; }
 		}
 	}
 }

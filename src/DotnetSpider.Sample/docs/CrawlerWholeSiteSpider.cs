@@ -8,9 +8,9 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Core.Downloader;
 using System.Text;
 
-namespace DotnetSpider.Sample
+namespace DotnetSpider.Sample.docs
 {
-	public class CrawlerWholeSite
+	public class CrawlerWholeSiteSpider
 	{
 		public static void Run()
 		{

@@ -24,7 +24,7 @@ namespace DotnetSpider.Extension.Pipeline
 		{
 			foreach (var data in datas)
 			{
-				Console.WriteLine($"{model.Identity}: {JsonConvert.SerializeObject(data)}");
+				Console.WriteLine($"Store: {JsonConvert.SerializeObject(data)}");
 			}
 			return datas.Count();
 		}

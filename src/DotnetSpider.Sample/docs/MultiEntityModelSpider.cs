@@ -10,7 +10,7 @@ using System.Text;
 
 namespace DotnetSpider.Sample.docs
 {
-	public class MultiEntityModel
+	public class MultiEntityModelSpider
 	{
 		public static void Run()
 		{
@@ -20,10 +20,6 @@ namespace DotnetSpider.Sample.docs
 
 		private class CnblogsSpider : EntitySpider
 		{
-			public CnblogsSpider() : base("cas")
-			{
-			}
-
 			protected override void MyInit(params string[] arguments)
 			{
 				Identity = ("cnblogs_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));

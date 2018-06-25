@@ -9,7 +9,7 @@ using System.Text;
 
 namespace DotnetSpider.Sample.docs
 {
-	public class AutoIncrementTargetUrlsExtractor
+	public class AutoIncrementTargetUrlsExtractorSpider
 	{
 		public static void Run()
 		{
@@ -19,7 +19,7 @@ namespace DotnetSpider.Sample.docs
 
 		private class CnblogsSpider : EntitySpider
 		{
-			public CnblogsSpider() : base("cas", new Site { SleepTime = 1000 })
+			public CnblogsSpider() : base(new Site())
 			{
 			}
 

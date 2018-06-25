@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample.docs
 	/// 如果想尝试把数据存到MySql中，请把 AddPipeline(new MySqlEntityPipeline("")); 中的连接字符串替换会您自己MySql的连接字符串
 	/// 如果想尝试把数据存到SqlServer中，请使用 AddPipeline(new SqlServerEntityPipeline("")); 中的连接字符串替换会您自己SqlServer的连接字符串
 	/// </summary>
-	public class EntityModel
+	public class EntityModelSpider
 	{
 		public static void Run()
 		{
@@ -26,16 +26,12 @@ namespace DotnetSpider.Sample.docs
 
 		private class Spider : EntitySpider
 		{
-			public Spider() : base("EntityModelSpider")
-			{
-			}
-
 			protected override void MyInit(params string[] arguments)
 			{
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				AddEntityType<BaiduSearchEntry>();
-				AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"));
+				AddPipeline(new ConsoleEntityPipeline());
 			}
 
 			[TableInfo("baidu", "baidu_search_entity_model")]

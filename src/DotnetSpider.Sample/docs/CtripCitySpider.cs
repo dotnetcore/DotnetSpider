@@ -3,15 +3,15 @@ using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
-
+using DotnetSpider.Extension.Pipeline;
 using System;
 using System.Collections.Generic;
 
-namespace DotnetSpider.Sample
+namespace DotnetSpider.Sample.docs
 {
 	public class CtripCitySpider : EntitySpider
 	{
-		public CtripCitySpider() : base("Ctrip_City", new Site
+		public CtripCitySpider() : base(new Site
 		{
 			Headers = new Dictionary<string, string>
 				{
@@ -30,7 +30,7 @@ namespace DotnetSpider.Sample
 		{
 			AddStartUrl("http://www.ctrip.com/");
 			AddEntityType<CtripCity>();
-			 
+			AddPipeline(new ConsoleEntityPipeline());
 		}
 
 		[TableInfo("ctrip", "city", Uniques = new[] { "city_id,run_id" })]

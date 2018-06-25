@@ -9,7 +9,7 @@ using System.Text;
 
 namespace DotnetSpider.Sample.docs
 {
-	public class CustmizeProcessorAndPipeline
+	public class CustmizeProcessorAndPipelineSpider
 	{
 		public static void Run()
 		{
@@ -32,7 +32,7 @@ namespace DotnetSpider.Sample.docs
 			spider.Run();
 		}
 
-		public class YoukuPipeline : BasePipeline
+		private class YoukuPipeline : BasePipeline
 		{
 			private long _count = 0;
 

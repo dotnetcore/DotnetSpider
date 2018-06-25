@@ -24,36 +24,26 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)docs\AfterDownloadCompleteHandler.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\AutoIncrementTargetUrlsExtractor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\CrawlerWholeSite.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CasSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Class1.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CtripCitySpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CustomSpider1.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DDengSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\AfterDownloadCompleteHandlerSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\AutoIncrementTargetUrlsExtractorSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CrawlerWholeSiteSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CtripCitySpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CookiesSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugAfterDownloaderHandler.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DefaultMySqlPipelineSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\CustmizeProcessorAndPipeline.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\CustomizeFormatter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\EntityModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\DataHandlerSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\DefaultMySqlPipelineSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CustmizeProcessorAndPipelineSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CustomizeFormatterSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\EntityModelSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)docs\ModelSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\MultiEntityModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)docs\MultiProcessors.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)HuyaStarSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)JdCategorySpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)JdShopDetailSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)JdShopDetailSpider2.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)JdSkuSampleSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)JdSkuWebDriverSample.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)JdSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MultiSupplementSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\MultiEntityModelSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\MultiProcessorsSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\MySqlEntityPipelineSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\DbStartUrlsBuilderSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\WebDriverDownloaderSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\OneForAllSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OcrDemo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Program.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RegexTestSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShanxizhaoshengSpider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Situoli.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TaobaoKeywordWatcher.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)寻医问药Spider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\RegexSelectorSpider.cs" />
   </ItemGroup>
 </Project>

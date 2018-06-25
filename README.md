@@ -43,67 +43,64 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 [View compelte Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/JdSkuSampleSpider.cs)
 
-	[TaskName("JdSkuSampleSpider")]
-	public class JdSkuSampleSpider : EntitySpider
+	public class EntityModelSpider
 	{
-		public JdSkuSampleSpider() : base("JdSkuSample", new Site
+		public static void Run()
 		{
-		})
-		{
+			Spider spider = new Spider();
+			spider.Run();
 		}
 
-		protected override void MyInit(params string[] arguments)
+		private class Spider : EntitySpider
 		{
-			Identity = Identity ?? "JD SKU SAMPLE";
-			// storage data to mysql, default is mysql entity pipeline, so you can comment this line. Don't miss sslmode.
-			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"));
-			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
-			AddEntityType<Product>();
+			protected override void MyInit(params string[] arguments)
+			{
+				var word = "可乐|雪碧";
+				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+				AddEntityType<BaiduSearchEntry>();
+				AddPipeline(new ConsoleEntityPipeline());
+			}
+
+			[TableInfo("baidu", "baidu_search_entity_model")]
+			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			class BaiduSearchEntry : BaseEntity
+			{
+				[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
+				public string Keyword { get; set; }
+
+				[Field(Expression = ".//h3[@class='c-title']/a")]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				public string Title { get; set; }
+
+				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
+				public string Url { get; set; }
+
+				[Field(Expression = ".//div/p[@class='c-author']/text()")]
+				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
+				public string Website { get; set; }
+
+				[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				public string Snapshot { get; set; }
+
+				[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+				public string Details { get; set; }
+
+				[Field(Expression = ".", Option = FieldOptions.InnerText)]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+				public string PlainText { get; set; }
+			}
 		}
-	}
-
-	[EntityTable("test", "jd_sku", EntityTable.Monday, Indexs = new[] { "Category" }, Uniques = new[] { "Category,Sku", "Sku" })]
-	[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-	[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	public class Product
-	{
-		[PropertyDefine(Expression = "./@data-sku", Length = 100)]
-		public string Sku { get; set; }
-
-		[PropertyDefine(Expression = "name", Type = SelectorType.Enviroment, Length = 100)]
-		public string Category { get; set; }
-
-		[PropertyDefine(Expression = "cat3", Type = SelectorType.Enviroment)]
-		public int CategoryId { get; set; }
-
-		[PropertyDefine(Expression = "./div[1]/a/@href")]
-		public string Url { get; set; }
-
-		[PropertyDefine(Expression = "./div[5]/strong/a")]
-		public long CommentsCount { get; set; }
-
-		[PropertyDefine(Expression = ".//div[@class='p-shop']/@data-shop_name", Length = 100)]
-		public string ShopName { get; set; }
-
-		[PropertyDefine(Expression = "0", Type = SelectorType.Enviroment)]
-		public int ShopId { get; set; }
-
-		[PropertyDefine(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
-		public string Name { get; set; }
-
-		[PropertyDefine(Expression = "./@venderid", Length = 100)]
-		public string VenderId { get; set; }
-
-		[PropertyDefine(Expression = "./@jdzy_shop_id", Length = 100)]
-		public string JdzyShopId { get; set; }
-
-		[PropertyDefine(Expression = "Monday", Type = SelectorType.Enviroment)]
-		public DateTime RunId { get; set; }
 	}
 
 	public static void Main()
 	{
-		Startup.Run(new string[] { "-s:JdSkuSampleSpider", "-tid:JdSkuSampleSpider", "-i:guid" });
+		EntityModelSpider.Run();
 	}
 
 #### Run via Startup
@@ -156,11 +153,6 @@ https://github.com/zlzforever/DotnetSpider.Hub
 #### when you use redis scheduler, please update your redis config: 
 	timeout 0 
 	tcp-keepalive 60
-
-### Comments
-
-+ EntitSpider定义的表名和列名全部小写化, 以备不同数据库间转换或者MYSQL win/linux的切换
-+ 允许不添加Pipeline执行爬虫
 
 ### Buy me a coffe
 

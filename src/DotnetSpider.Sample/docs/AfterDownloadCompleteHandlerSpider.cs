@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs
 {
-	public class AfterDownloadCompleteHandler
+	public class AfterDownloadCompleteHandlerSpider
 	{
 		public static void Run()
 		{
@@ -22,12 +22,9 @@ namespace DotnetSpider.Sample.docs
 			spider.Run();
 		}
 
-		internal class SinaNewsSpider : EntitySpider
+		private class SinaNewsSpider : EntitySpider
 		{
-			public SinaNewsSpider() : base("SinaNewsSpider", new Site
-			{
-				SleepTime = 1000
-			})
+			public SinaNewsSpider() : base(new Site())
 			{
 			}
 
@@ -39,12 +36,8 @@ namespace DotnetSpider.Sample.docs
 				AddEntityType<SinaNews>();
 			}
 
-			class ReplaceHandler : Core.Downloader.AfterDownloadCompleteHandler
+			class ReplaceHandler : AfterDownloadCompleteHandler
 			{
-				public ReplaceHandler()
-				{
-				}
-
 				public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
 				{
 					page.Content = page.Content.Replace("jQuery1720001955628746606708_1508996230766(", "").Replace("});", "}");

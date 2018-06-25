@@ -36,7 +36,7 @@ namespace DotnetSpider.Sample.docs
 				Spider spider = Spider.Create(site,
 					new QueueDuplicateRemovedScheduler(),
 					new ModelProcessor(model))
-					.AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"));
+					.AddPipeline(new ConsoleEntityPipeline());
 				// Start crawler 启动爬虫
 				spider.Run();
 			}
