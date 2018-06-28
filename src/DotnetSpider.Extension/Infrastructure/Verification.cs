@@ -573,7 +573,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		public override VerificationResult Report()
 		{
 			VerificationResult veridationResult = new VerificationResult();
-			if (Core.Env.SystemConnectionStringSettings == null)
+			if (Core.Env.DataConnectionStringSettings == null)
 			{
 				return veridationResult;
 			}

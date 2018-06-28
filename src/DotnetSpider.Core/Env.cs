@@ -30,12 +30,9 @@ namespace DotnetSpider.Core
 		private const string EmailAccountKey = "emailAccount";
 		private const string EmailPasswordKey = "emailPassword";
 		private const string EmailDisplayNameKey = "emailDisplayName";
-		private const string HubServiceUrlKey = "serviceUrl";
-		private const string HubServiceTokenKey = "serviceToken";
-		private const string SystemConnectionStringKey = "SystemConnection";
+		private const string HubServiceUrlKey = "hub";
+		private const string HubServiceTokenKey = "hubToken";
 		private const string DataConnectionStringKey = "DataConnection";
-		private const string SqlEncryptCodeKey = "sqlEncryptCode";
-
 		public static string DefaultDatabase = "dotnetspider";
 
 		/// <summary>
@@ -54,11 +51,6 @@ namespace DotnetSpider.Core
 		/// 使用实体定义爬虫解析时, 会自动添加CDate数据列
 		/// </summary>
 		public static string CDateColumn = "cdate";
-
-		/// <summary>
-		/// 爬虫系统使用的数据库连接配置
-		/// </summary>
-		public static ConnectionStringSettings SystemConnectionStringSettings { get; private set; }
 
 		/// <summary>
 		/// 数据管道的数据库连接配置
@@ -177,11 +169,6 @@ namespace DotnetSpider.Core
 		public static bool ProcessorFilterDefaultRequest = true;
 
 		/// <summary>
-		/// 使用HTTP数据管道时, 对数据进行对称加密的密钥
-		/// </summary>
-		public static string SqlEncryptCode { get; private set; }
-
-		/// <summary>
 		/// 任务唯一标识的最大长度限制
 		/// </summary>
 		public static int IdentityMaxLength { get; set; } = 120;
@@ -263,9 +250,7 @@ namespace DotnetSpider.Core
 				HubServicePipelineUrl = $"{HubServiceUrl}{(HubServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/process";
 			}
 			HubServiceLog = !string.IsNullOrWhiteSpace(HubServiceLogUrl);
-			SystemConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[SystemConnectionStringKey];
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
-			SqlEncryptCode = configuration.AppSettings.Settings[SqlEncryptCodeKey]?.Value?.Trim();
 		}
 
 		/// <summary>

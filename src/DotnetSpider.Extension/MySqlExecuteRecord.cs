@@ -31,9 +31,9 @@ namespace DotnetSpider.Extension
 		{
 			try
 			{
-				if (Env.SystemConnectionStringSettings != null && !string.IsNullOrWhiteSpace(taskId) && !string.IsNullOrWhiteSpace(identity))
+				if (Env.DataConnectionStringSettings != null && !string.IsNullOrWhiteSpace(taskId) && !string.IsNullOrWhiteSpace(identity))
 				{
-					using (IDbConnection conn = Env.SystemConnectionStringSettings.CreateDbConnection())
+					using (IDbConnection conn = Env.DataConnectionStringSettings.CreateDbConnection())
 					{
 						conn.MyExecute("CREATE SCHEMA IF NOT EXISTS `dotnetspider` DEFAULT CHARACTER SET utf8;");
 						conn.MyExecute("CREATE TABLE IF NOT EXISTS `dotnetspider`.`taskrunning` (`__id` bigint(20) NOT NULL AUTO_INCREMENT, `taskid` varchar(120) NOT NULL, `name` varchar(200) NULL, `identity` varchar(120), `cdate` timestamp NOT NULL DEFAULT current_timestamp, PRIMARY KEY (__id), UNIQUE KEY `taskid_unique` (`taskid`)) AUTO_INCREMENT=1");
@@ -59,9 +59,9 @@ namespace DotnetSpider.Extension
 		{
 			try
 			{
-				if (Env.SystemConnectionStringSettings != null && !string.IsNullOrWhiteSpace(taskId))
+				if (Env.DataConnectionStringSettings != null && !string.IsNullOrWhiteSpace(taskId))
 				{
-					using (IDbConnection conn = Env.SystemConnectionStringSettings.CreateDbConnection())
+					using (IDbConnection conn = Env.DataConnectionStringSettings.CreateDbConnection())
 					{
 						conn.MyExecute($"DELETE FROM `dotnetspider`.`taskrunning` WHERE `identity`='{taskId}';");
 					}

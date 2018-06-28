@@ -146,9 +146,9 @@ namespace DotnetSpider.Extension.Monitor
 			}
 			else
 			{
-				if (Env.SystemConnectionStringSettings != null && Env.SystemConnectionStringSettings.ProviderName == DbProviderFactories.MySqlProvider)
+				if (Env.DataConnectionStringSettings != null && Env.DataConnectionStringSettings.ProviderName == DbProviderFactories.MySqlProvider)
 				{
-					conn = new MySqlConnection(Env.SystemConnectionStringSettings.ConnectionString);
+					conn = new MySqlConnection(Env.DataConnectionStringSettings.ConnectionString);
 				}
 			}
 			return conn;
