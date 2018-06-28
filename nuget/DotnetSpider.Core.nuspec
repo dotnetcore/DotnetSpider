@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>DotnetSpider.Core</id>
-    <version>2.6.0-beta3</version>
-    <authors>zlzforever@163.com;Walterwhatwater;xiaohuan0204</authors>
+    <version>2.6.0-beta4</version>
+    <authors>zlzforever@163.com;Walterwhatwater;</authors>
     <owners>zlzforever@163.com</owners>
     <iconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</licenseUrl>
@@ -24,7 +24,7 @@
         <dependency id="Serilog.Sinks.PeriodicBatching" version="2.1.1" />
         <dependency id="Serilog.Sinks.RollingFile" version="3.3.0" />
         <dependency id="System.Configuration.ConfigurationManager" version="4.5.0"/>
-        <dependency id="System.Data.SqlClient" version="4.5.0" />
+        <dependency id="System.Data.SqlClient" version="4.5.1" />
         <dependency id="System.Diagnostics.Process" version="4.3.0"/>
         <dependency id="System.Net.Ping" version="4.3.0"/>
         <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="4.3.0"/>

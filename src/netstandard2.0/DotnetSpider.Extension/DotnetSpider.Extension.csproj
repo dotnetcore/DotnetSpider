@@ -1,6 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>2.6.0-beta4</Version>
+    <Authors>zlzforever@163.com;</Authors>
+    <Description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp;amp; scraping framework for .NET</Description>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/zlzforever/DotnetSpider</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/zlzforever/DotnetSpider</RepositoryUrl>
+    <PackageTags>DotnetSpider;crawler;cross platform;dotnet core</PackageTags>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath></OutputPath>
@@ -11,16 +19,16 @@
     <OutputPath>..\..\..\output\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CassandraCSharpDriver" Version="3.5.0" />
+    <PackageReference Include="CassandraCSharpDriver" Version="3.6.0" />
     <PackageReference Include="Dapper" Version="1.50.5" />
     <PackageReference Include="EPPlus.Core" Version="1.5.4" />
     <PackageReference Include="MailKit" Version="2.0.4" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
-    <PackageReference Include="MongoDB.Driver" Version="2.6.1" />
-    <PackageReference Include="MySqlConnector" Version="0.40.4" />
+    <PackageReference Include="MongoDB.Driver" Version="2.7.0" />
+    <PackageReference Include="MySqlConnector" Version="0.42.1" />
     <PackageReference Include="Npgsql" Version="4.0.0" />
     <PackageReference Include="Polly" Version="6.0.1" />
-    <PackageReference Include="Selenium.WebDriver" Version="3.12.1" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.13.0" />
     <PackageReference Include="SSH.NET" Version="2016.1.0" />
     <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
