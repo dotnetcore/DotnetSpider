@@ -40,7 +40,7 @@ namespace DotnetSpider.Core.Downloader
 				AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
 				UseProxy = true,
 				UseCookies = true,
-				AllowAutoRedirect = true,
+				AllowAutoRedirect = allowAutoRedirect,
 				MaxAutomaticRedirections = 10
 			};
 			Client = allowAutoRedirect ? new HttpClient(new GlobalRedirectHandler(Handler)) : new HttpClient(Handler);
@@ -60,54 +60,35 @@ namespace DotnetSpider.Core.Downloader
 				InnerHandler = innerHandler;
 			}
 
-			protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+			protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 			{
-				var tcs = new TaskCompletionSource<HttpResponseMessage>();
 
-				base.SendAsync(request, cancellationToken)
-					.ContinueWith(t =>
+				var response = await base.SendAsync(request, cancellationToken);
+
+				if (response.StatusCode == HttpStatusCode.MovedPermanently
+					|| response.StatusCode == HttpStatusCode.Moved
+					|| response.StatusCode == HttpStatusCode.Redirect
+					|| response.StatusCode == HttpStatusCode.Found
+					|| response.StatusCode == HttpStatusCode.SeeOther
+					|| response.StatusCode == HttpStatusCode.RedirectKeepVerb
+					|| response.StatusCode == HttpStatusCode.TemporaryRedirect
+					|| (int)response.StatusCode == 308)
+				{
+
+					var newRequest = CopyRequest(response.RequestMessage);
+
+					if (response.StatusCode == HttpStatusCode.Redirect
+						|| response.StatusCode == HttpStatusCode.Found
+						|| response.StatusCode == HttpStatusCode.SeeOther)
 					{
-						HttpResponseMessage response;
-						try
-						{
-							response = t.Result;
-						}
-						catch (Exception e)
-						{
-							response = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable) { ReasonPhrase = e.Message };
-						}
-						if (response.StatusCode == HttpStatusCode.MovedPermanently
-							|| response.StatusCode == HttpStatusCode.Moved
-							|| response.StatusCode == HttpStatusCode.Redirect
-							|| response.StatusCode == HttpStatusCode.Found
-							|| response.StatusCode == HttpStatusCode.SeeOther
-							|| response.StatusCode == HttpStatusCode.RedirectKeepVerb
-							|| response.StatusCode == HttpStatusCode.TemporaryRedirect
-							|| (int)response.StatusCode == 308)
-						{
+						newRequest.Content = null;
+						newRequest.Method = HttpMethod.Get;
+					}
+					newRequest.RequestUri = new Uri(response.RequestMessage.RequestUri, response.Headers.Location);
 
-							var newRequest = CopyRequest(response.RequestMessage);
-
-							if (response.StatusCode == HttpStatusCode.Redirect
-								|| response.StatusCode == HttpStatusCode.Found
-								|| response.StatusCode == HttpStatusCode.SeeOther)
-							{
-								newRequest.Content = null;
-								newRequest.Method = HttpMethod.Get;
-
-							}
-							newRequest.RequestUri = response.Headers.Location;
-
-							base.SendAsync(newRequest, cancellationToken)
-								.ContinueWith(t2 => tcs.SetResult(t2.Result), cancellationToken);
-						}
-						else
-						{
-							tcs.SetResult(response);
-						}
-					}, cancellationToken);
-
-				return tcs.Task;
+					response = await SendAsync(newRequest, cancellationToken);
+				}
+				return response;
 			}
 
 			private static HttpRequestMessage CopyRequest(HttpRequestMessage oldRequest)
