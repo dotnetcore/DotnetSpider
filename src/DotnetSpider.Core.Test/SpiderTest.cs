@@ -20,6 +20,12 @@ namespace DotnetSpider.Core.Test
 
 	public partial class SpiderTest
 	{
+		[Fact(DisplayName = "DefaultConstruct")]
+		public void DefaultConstruct()
+		{
+			Spider spider = new Spider();
+		}
+
 		[Fact(DisplayName = "RunAsyncAndStop")]
 		public void RunAsyncAndStop()
 		{

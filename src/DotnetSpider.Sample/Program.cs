@@ -17,6 +17,7 @@ namespace DotnetSpider.Sample
 {
 	public class Program
 	{
+
 		public static void Main(string[] args)
 		{
 #if NETCOREAPP
@@ -25,13 +26,8 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-			CrawlerWholeSiteSpider.Run();
-		}
 
-		class WuQi
-		{
-			public string Summary { get; set; }
-			public int Id { get; set; }
+			ModelSpider.Run();
 		}
 
 

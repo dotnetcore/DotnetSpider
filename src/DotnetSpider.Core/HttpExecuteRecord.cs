@@ -12,7 +12,12 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class HttpExecuteRecord : IExecuteRecord
 	{
-		public ILogger Logger { get; set; }
+		private readonly ILogger _logger;
+
+		public HttpExecuteRecord(ILogger logger)
+		{
+			_logger = logger ?? throw new SpiderException($"{nameof(logger)} should not be null.");
+		}
 
 		/// <summary>
 		/// 添加运行记录
@@ -32,7 +37,7 @@ namespace DotnetSpider.Core
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
 						{
-							Logger?.Error($"Try to add execute record failed [{count}]: {ex}", LogUtil.Identity);
+							_logger?.Error($"Try to add execute record failed [{count}]: {ex}", LogUtil.Identity);
 							Thread.Sleep(5000);
 						});
 				retryTimesPolicy.Execute(() =>
@@ -47,7 +52,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				Logger?.Error($"Add execute record failed: {e}", identity);
+				_logger?.Error($"Add execute record failed: {e}", identity);
 				return false;
 			}
 		}
@@ -69,7 +74,7 @@ namespace DotnetSpider.Core
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
 				{
-					Logger?.Error($"Try to remove execute record failed [{count}]: {ex}", identity);
+					_logger?.Error($"Try to remove execute record failed [{count}]: {ex}", identity);
 					Thread.Sleep(5000);
 				});
 				retryTimesPolicy.Execute(() =>
@@ -83,7 +88,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				Logger?.Error($"Remove execute record failed: {e}", identity);
+				_logger?.Error($"Remove execute record failed: {e}", identity);
 			}
 		}
 	}

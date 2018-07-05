@@ -21,8 +21,6 @@ namespace DotnetSpider.Sample.docs
 			site.AddStartUrl("http://www.cnblogs.com/");
 
 			Spider spider = Spider.Create(site,
-				// crawler identity
-				"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
 				// use memoery queue scheduler
 				new QueueDuplicateRemovedScheduler(),
 				// default page processor will save whole html, and extract urls to target urls via regex
@@ -32,8 +30,10 @@ namespace DotnetSpider.Sample.docs
 
 			// dowload html by http client
 			spider.Downloader = new HttpClientDownloader();
+			spider.Name = "CNBLOGS";
 			// 4 threads 4线程
 			spider.ThreadNum = 4;
+			spider.TaskId = "cnblogs";
 			// traversal deep 遍历深度
 			spider.Scheduler.Depth = 3;
 

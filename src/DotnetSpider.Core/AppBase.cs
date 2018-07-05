@@ -1,5 +1,7 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using Serilog;
+using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
@@ -17,34 +19,35 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public abstract class AppBase : Named, IAppBase
 	{
-		private ILogger _logger;
+		private string _identity = Guid.NewGuid().ToString("N");
 
 		/// <summary>
 		/// 唯一标识
 		/// </summary>
-		public virtual ILogger Logger
+		public virtual ILogger Logger { get; protected set; }
+
+		/// <summary>
+		/// 唯一标识
+		/// </summary>
+		public virtual string Identity
 		{
-			get
-			{
-				if (_logger == null && !string.IsNullOrWhiteSpace(Identity))
-				{
-					_logger = LogUtil.Create(Identity);
-				}
-				return _logger;
-			}
+			get => _identity;
 			set
 			{
-				if (value != null)
+				CheckIfRunning();
+
+				if (string.IsNullOrWhiteSpace(value))
 				{
-					_logger = value;
+					throw new SpiderException($"{nameof(Identity)} should not be empty or null.");
 				}
+				if (value.Length > Env.IdentityMaxLength)
+				{
+					throw new SpiderException($"Length of identity should less than {Env.IdentityMaxLength}.");
+				}
+
+				_identity = value;
 			}
 		}
-
-		/// <summary>
-		/// 唯一标识
-		/// </summary>
-		public virtual string Identity { get; set; }
 
 		/// <summary>
 		/// 任务编号
@@ -52,30 +55,31 @@ namespace DotnetSpider.Core
 		public virtual string TaskId { get; set; }
 
 		/// <summary>
+		/// start time of spider.
+		/// </summary>
+		protected DateTime StartTime { get; private set; }
+
+		/// <summary>
+		/// end time of spider.
+		/// </summary>
+		protected DateTime ExitTime { get; private set; } = DateTime.MinValue;
+
+		/// <summary>
 		/// 运行记录接口
 		/// 程序在运行前应该添加相应的运行记录, 任务结束后删除对应的记录, 企业服务依赖运行记录数据显示正在运行的任务
 		/// </summary>
 		public IExecuteRecord ExecuteRecord { get; set; }
+
+		protected abstract void CheckIfRunning();
 
 		/// <summary>
 		/// 任务的实现
 		/// </summary>
 		protected abstract void Execute(params string[] arguments);
 
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		protected AppBase()
+		public AppBase()
 		{
-		}
-
-		/// <summary>
-		/// 构造函数
-		/// </summary>
-		/// <param name="name">任务名称</param>
-		protected AppBase(string name) : base()
-		{
-			Name = name;
+			LogUtil.Init();
 		}
 
 		/// <summary>
@@ -94,39 +98,37 @@ namespace DotnetSpider.Core
 		/// <param name="arguments">程序运行的参数</param>
 		public void Run(params string[] arguments)
 		{
-			if (ExecuteRecord == null && !string.IsNullOrWhiteSpace(Env.HubServiceUrl))
+			PrintInfo.Print();
+
+			Logger = LogUtil.Create(Identity);
+
+			if (ExecuteRecord == null)
 			{
-				ExecuteRecord = new HttpExecuteRecord();
+				if (!string.IsNullOrWhiteSpace(Env.HubServiceUrl))
+				{
+					ExecuteRecord = new HttpExecuteRecord(Logger);
+				}
+				else
+				{
+					ExecuteRecord = new LogExecuteRecord(Logger);
+				}
 			}
 
-			if (ExecuteRecord != null)
+			if (!ExecuteRecord.Add(TaskId, Name, Identity))
 			{
-				ExecuteRecord.Logger = Logger;
-			}
-
-			if (!AddExecuteRecord())
-			{
-				Logger.Error($"Can not add execute record: {Identity}.");
+				Logger.Error($"Add execute record: {Identity} failed.");
 			}
 			try
 			{
+				StartTime = DateTime.Now;
 				Execute(arguments);
 			}
 			finally
 			{
-				ExecuteRecord?.Remove(TaskId, Name, Identity);
-			}
-		}
-
-		private bool AddExecuteRecord()
-		{
-			if (ExecuteRecord == null)
-			{
-				return true;
-			}
-			else
-			{
-				return ExecuteRecord.Add(TaskId, Name, Identity);
+				ExitTime = DateTime.Now;
+				ExecuteRecord.Remove(TaskId, Name, Identity);
+				Logger.Information($"Consume: {(ExitTime - StartTime).TotalSeconds} seconds.");
+				PrintInfo.PrintLine();
 			}
 		}
 	}

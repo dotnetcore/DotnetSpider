@@ -33,6 +33,7 @@ namespace DotnetSpider.Core
 		private const string HubServiceUrlKey = "hub";
 		private const string HubServiceTokenKey = "hubToken";
 		private const string DataConnectionStringKey = "DataConnection";
+
 		public static string DefaultDatabase = "dotnetspider";
 
 		/// <summary>

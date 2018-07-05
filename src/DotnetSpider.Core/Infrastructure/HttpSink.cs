@@ -45,16 +45,15 @@ namespace DotnetSpider.Core.Infrastructure
 		private readonly string _token;
 
 		/// <summary>
-		///     A reasonable default for the number of events posted in
-		///     each batch.
+		/// A reasonable default for the number of events posted in
+		/// each batch.
 		/// </summary>
 		public const int DefaultBatchPostingLimit = 50;
 
 		/// <summary>
-		///     A reasonable default time to wait between checking for event batches.
+		/// A reasonable default time to wait between checking for event batches.
 		/// </summary>
 		public static readonly TimeSpan DefaultPeriod = TimeSpan.FromSeconds(5);
-
 
 		public HttpSink(string api, string token, int batchSizeLimit, TimeSpan period) : base(batchSizeLimit, period)
 		{

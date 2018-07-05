@@ -1,4 +1,6 @@
-﻿namespace DotnetSpider.Core
+﻿using System.Reflection;
+
+namespace DotnetSpider.Core
 {
 	/// <summary>
 	/// 名称接口定义
@@ -20,5 +22,12 @@
 		/// 名称
 		/// </summary>
 		public string Name { get; set; }
+
+		public Named()
+		{
+			var type = GetType();
+			var nameAttribute = type.GetCustomAttribute<TaskName>();
+			Name = nameAttribute != null ? nameAttribute.Name : type.Name;
+		}
 	}
 }

@@ -13,9 +13,10 @@
     <Content Include="$(MSBuildThisFileDirectory)Infrastructure\Verification.html" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)CommonSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CustomizedSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\JsonSpiderContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DefaultEntitySpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DistributedSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\AfterDownloadCompleteHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\DownloadCacheData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\FiddlerDownloader.cs" />

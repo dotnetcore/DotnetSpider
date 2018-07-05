@@ -24,7 +24,7 @@ namespace DotnetSpider.Core.Monitor
 		/// <param name="avgProcessorSpeed">平均解析一个页面需要的时间(豪秒)</param>
 		/// <param name="avgPipelineSpeed">数据管道处理一次数据结果需要的时间(豪秒)</param>
 		/// <param name="threadNum">爬虫线程数</param>
-		public virtual void Report(string identity, string taskId, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
+		public virtual void Flush(string identity, string taskId, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
 			string msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
 			Logger.Verbose(msg);

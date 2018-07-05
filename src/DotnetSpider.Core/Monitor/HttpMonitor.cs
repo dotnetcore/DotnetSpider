@@ -27,9 +27,9 @@ namespace DotnetSpider.Core.Monitor
 		/// <param name="avgProcessorSpeed">平均解析一个页面需要的时间(豪秒)</param>
 		/// <param name="avgPipelineSpeed">数据管道处理一次数据结果需要的时间(豪秒)</param>
 		/// <param name="threadNum">爬虫线程数</param>
-		public override void Report(string identity, string taskId, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
+		public override void Flush(string identity, string taskId, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
-			base.Report(identity, taskId, status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
+			base.Flush(identity, taskId, status, left, total, success, error, avgDownloadSpeed, avgProcessorSpeed, avgPipelineSpeed, threadNum);
 
 			if (!Env.HubService)
 			{

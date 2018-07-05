@@ -10,14 +10,21 @@ namespace DotnetSpider.Extension
 	/// <summary>
 	/// 实体类爬虫的定义
 	/// </summary>
-	public abstract class EntitySpider : CommonSpider
+	public abstract class EntitySpider : DistributedSpider
 	{
 		protected bool UseEntityModelExtrator { get; set; } = true;
 
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public EntitySpider() : this(new Site())
+		public EntitySpider() : this(null, new Site())
+		{
+		}
+
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		public EntitySpider(string name) : this(name, new Site())
 		{
 		}
 
@@ -25,25 +32,20 @@ namespace DotnetSpider.Extension
 		/// 构造方法
 		/// </summary>
 		/// <param name="site">目标站点信息</param>
-		public EntitySpider(Site site) : base(site)
+		public EntitySpider(Site site) : this(null, site)
 		{
 		}
 
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="name">爬虫名称</param>
-		public EntitySpider(string name) : base(name)
-		{
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="name">爬虫名称</param>
 		/// <param name="site">目标站点信息</param>
-		public EntitySpider(string name, Site site) : base(name, site)
+		public EntitySpider(string name, Site site) : base(site)
 		{
+			if (!string.IsNullOrWhiteSpace(name))
+			{
+				Name = name;
+			}
 		}
 
 		/// <summary>

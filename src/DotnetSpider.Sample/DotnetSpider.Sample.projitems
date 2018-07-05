@@ -30,6 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)docs\CtripCitySpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)docs\CookiesSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DebugAfterDownloaderHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)docs\CustomizeInitSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)docs\DataHandlerSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)docs\DefaultMySqlPipelineSpider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)docs\CustmizeProcessorAndPipelineSpider.cs" />

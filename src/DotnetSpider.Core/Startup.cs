@@ -260,14 +260,6 @@ namespace DotnetSpider.Core
 				property.SetValue(spider, options.Name.Trim());
 			}
 
-			if (options.Arguments.Count() > 0)
-			{
-				if (options.Arguments.Any(t => t.ToLower() == "report"))
-				{
-					spiderType.GetProperty("EmptySleepTime")?.SetValue(spider, 1000);
-				}
-			}
-
 			return spider;
 		}
 

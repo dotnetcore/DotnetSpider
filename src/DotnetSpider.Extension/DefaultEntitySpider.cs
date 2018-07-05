@@ -9,7 +9,7 @@ namespace DotnetSpider.Extension
 	{
 		internal DefaultEntitySpider() : this(new Site()) { }
 
-		internal DefaultEntitySpider(Site site) : base(site)
+		internal DefaultEntitySpider(Site site) : base(null, site)
 		{
 		}
 

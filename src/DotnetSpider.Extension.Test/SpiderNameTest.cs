@@ -25,10 +25,11 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		public class MySpider3 : CommonSpider
+		public class MySpider3 : CustomizedSpider
 		{
-			public MySpider3():base("MySpider3_1")
+			public MySpider3()
 			{
+				Name = "MySpider3_1";
 			}
 
 			protected override void MyInit(params string[] arguments)
@@ -38,8 +39,9 @@ namespace DotnetSpider.Extension.Test
 
 		public class MySpider4 : EntitySpider
 		{
-			public MySpider4() : base("MySpider4_1")
+			public MySpider4()
 			{
+				Name = "MySpider4_1";
 			}
 
 			protected override void MyInit(params string[] arguments)

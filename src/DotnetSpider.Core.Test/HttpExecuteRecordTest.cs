@@ -19,7 +19,7 @@ namespace DotnetSpider.Core.Test
 				{
 					Env.HubServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";
 
-					var recorder = new HttpExecuteRecord();
+					var recorder = new HttpExecuteRecord(LogUtil.Create("aa"));
 					recorder.Add("1", "test", "abcd");
 					recorder.Remove("1", "test", "abcd");
 				}

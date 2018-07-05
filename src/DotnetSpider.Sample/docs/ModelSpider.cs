@@ -33,13 +33,14 @@ namespace DotnetSpider.Sample.docs
 				// Add start/feed urls. 添加初始采集链接
 				site.AddStartUrl($"http://list.youku.com/category/show/c_96_s_1_d_1_p_{i}.html");
 
-				Spider spider = Spider.Create(site,
-					new QueueDuplicateRemovedScheduler(),
-					new ModelProcessor(model))
-					.AddPipeline(new ConsoleEntityPipeline());
-				// Start crawler 启动爬虫
-				spider.Run();
 			}
+			Spider spider = Spider.Create(site,
+				new QueueDuplicateRemovedScheduler(),
+				new ModelProcessor(model))
+				.AddPipeline(new ConsoleEntityPipeline());
+			spider.Name = "Youku";
+			spider.TaskId = "1";
+			spider.Run();
 		}
 	}
 }

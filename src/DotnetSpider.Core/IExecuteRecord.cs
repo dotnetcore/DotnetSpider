@@ -8,8 +8,6 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public interface IExecuteRecord
 	{
-		ILogger Logger { get; set; }
-
 		/// <summary>
 		/// 添加运行记录
 		/// </summary>

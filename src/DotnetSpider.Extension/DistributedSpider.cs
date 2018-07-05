@@ -1,18 +1,17 @@
-﻿using System;
-using System.Linq;
-using DotnetSpider.Core;
-using System.Threading;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Redial;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
 
 namespace DotnetSpider.Extension
 {
 	/// <summary>
-	/// 通用爬虫
+	/// 分布式爬虫
 	/// </summary>
-	public abstract class CommonSpider : Spider
+	public abstract class DistributedSpider : CustomizedSpider
 	{
 		/// <summary>
 		/// 验证结果保存到Redis中的Key
@@ -23,41 +22,18 @@ namespace DotnetSpider.Extension
 		internal string InitLockKey => $"dotnetspider:initLocker:{Identity}";
 
 		/// <summary>
-		/// 自定义的初始化
-		/// </summary>
-		/// <param name="arguments">运行参数</param>
-		protected abstract void MyInit(params string[] arguments);
-
-		/// <summary>
-		/// 爬虫结束后, 执行的数据验证和报告
-		/// </summary>
-		public Action DataVerificationAndReport;
-
-		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="site">站点信息</param>
-		public CommonSpider(Site site) : base(site)
+		public DistributedSpider() : this(new Site())
 		{
 		}
 
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="name">名称</param>
-		/// <param name="site">站点信息</param>
-		public CommonSpider(string name, Site site) : base(site)
+		/// <param name="site">目标站点信息</param>
+		public DistributedSpider(Site site) : base(site)
 		{
-			Name = name;
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="name">名称</param>
-		public CommonSpider(string name) : base(new Site())
-		{
-			Name = name;
 		}
 
 		/// <summary>
@@ -68,52 +44,56 @@ namespace DotnetSpider.Extension
 		{
 			PrintInfo.Print();
 
-			Logger.Information("Build custom component...");
-
-			NetworkCenter.Current.Execute("myInit", () =>
-			{
-				MyInit(arguments);
-			});
-
-			if (arguments.Contains("skip"))
-			{
-				EmptySleepTime = 1000;
-
-				if (Pipelines == null || Pipelines.Count == 0)
-				{
-					AddPipeline(new ConsolePipeline());
-				}
-				if (_pageProcessors == null || _pageProcessors.Count == 0)
-				{
-					AddPageProcessors(new NullPageProcessor());
-				}
-			}
-
-			ValidateSettings();
-
 			RegisterControl(this);
 
 			base.Execute(arguments);
+		}
 
-			if (IsCompleted && DataVerificationAndReport != null)
+		protected override bool IfVerifyDataOrGenerateReport(string[] arguments)
+		{
+			var factor = arguments.Any(t => t?.ToLower() == SpiderArguments.ExcludeStartRequestsBuilder) || IsCompleted;
+
+			if (factor)
 			{
-				ProcessVerifidation();
+				string key = $"dotnetspider:validateLocker:{Identity}";
+				if (RedisConnection.Default != null)
+				{
+					while (!RedisConnection.Default.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
+					{
+						Thread.Sleep(1000);
+					}
+
+					var lockerValue = RedisConnection.Default.Database.HashGet(ValidateStatusKey, Identity);
+					factor = lockerValue != "verify completed.";
+				}
+				if (!factor)
+				{
+					Logger.Information("Data verification is done already.");
+				}
+				if (factor)
+				{
+					RedisConnection.Default?.Database.HashSet(ValidateStatusKey, Identity, "verify completed.");
+				}
 			}
+
+			return factor;
+		}
+
+		protected override void AfterVerifyDataOrGenerateReport()
+		{
+			string key = $"dotnetspider:validateLocker:{Identity}";
+			base.AfterVerifyDataOrGenerateReport();
+			RedisConnection.Default?.Database.LockRelease(key, 0);
 		}
 
 		/// <summary>
 		/// 初始化队列
 		/// </summary>
 		/// <param name="arguments">运行参数</param>
-		protected override void InitScheduler(params string[] arguments)
+		protected override void ResetScheduler()
 		{
-			base.InitScheduler(arguments);
-
-			if (arguments.Contains("rerun"))
-			{
-				Scheduler.Dispose();
-				RemoveVerifidationLock();
-			}
+			// 删除验证的锁, 让爬虫可以再次验证
+			RedisConnection.Default?.Database.HashDelete(ValidateStatusKey, Identity);
 		}
 
 		/// <summary>
@@ -125,7 +105,7 @@ namespace DotnetSpider.Extension
 		{
 			if (RedisConnection.Default != null)
 			{
-				if (arguments.Contains("rerun"))
+				if (arguments.Any(a => a?.ToLower() == SpiderArguments.Reset))
 				{
 					RedisConnection.Default.Database.HashDelete(InitStatusSetKey, Identity);
 					RedisConnection.Default.Database.LockRelease(InitLockKey, 0);
@@ -261,66 +241,9 @@ namespace DotnetSpider.Extension
 			}
 		}
 
-		/// <summary>
-		/// 删除验证的锁, 让其它爬虫节点再次验证
-		/// </summary>
-		protected void RemoveVerifidationLock()
-		{
-			RedisConnection.Default?.Database.HashDelete(ValidateStatusKey, Identity);
-		}
-
 		private bool IfRequireBuildStartRequests()
 		{
 			return RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity) != InitFinishedValue;
-		}
-
-		/// <summary>
-		/// 执行数据验证
-		/// </summary>
-		private void ProcessVerifidation()
-		{
-			NetworkCenter.Current.Execute("verifyAndReport", () =>
-			{
-				string key = $"dotnetspider:validateLocker:{Identity}";
-
-				try
-				{
-					bool needVerify = true;
-					if (RedisConnection.Default != null)
-					{
-						while (!RedisConnection.Default.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
-						{
-							Thread.Sleep(1000);
-						}
-
-						var lockerValue = RedisConnection.Default.Database.HashGet(ValidateStatusKey, Identity);
-						needVerify = lockerValue != "verify completed.";
-					}
-					if (needVerify)
-					{
-						Logger.Information("Start data verification...");
-						DataVerificationAndReport();
-						Logger.Information("Data verification complete.");
-					}
-					else
-					{
-						Logger.Information("Data verification is done already.");
-					}
-
-					if (needVerify)
-					{
-						RedisConnection.Default?.Database.HashSet(ValidateStatusKey, Identity, "verify completed.");
-					}
-				}
-				catch (Exception e)
-				{
-					Logger.Error(e.Message);
-				}
-				finally
-				{
-					RedisConnection.Default?.Database.LockRelease(key, 0);
-				}
-			});
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using System;
+using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
@@ -22,7 +23,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="id">爬虫标识</param>
 		/// <param name="site">网站信息</param>
-		public DefaultSpider(string id, Site site) : base(site, id, new QueueDuplicateRemovedScheduler(), new[] { new SimplePageProcessor() }, new[] { new ConsolePipeline() })
+		public DefaultSpider(string id, Site site) : this(id, site, new QueueDuplicateRemovedScheduler())
 		{
 		}
 
@@ -34,6 +35,7 @@ namespace DotnetSpider.Core
 		/// <param name="scheduler">URL队列</param>
 		public DefaultSpider(string id, Site site, IScheduler scheduler) : base(site, id, scheduler, new[] { new SimplePageProcessor() }, new[] { new ConsolePipeline() })
 		{
+			Logger = LogUtil.Create(id);
 		}
 	}
 }

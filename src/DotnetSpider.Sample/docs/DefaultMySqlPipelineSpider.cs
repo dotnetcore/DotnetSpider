@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Sample.docs
 {
-	public class DefaultMySqlPipelineSpider : CommonSpider
+	public class DefaultMySqlPipelineSpider : CustomizedSpider
 	{
 		public DefaultMySqlPipelineSpider() : base(new Site())
 		{

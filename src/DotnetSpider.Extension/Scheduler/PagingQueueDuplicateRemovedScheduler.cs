@@ -16,10 +16,10 @@ namespace DotnetSpider.Extension.Scheduler
 	{
 		private readonly string _description;
 		private readonly bool _reset;
-		private readonly string databaseName = "dotnetspider";
-		private readonly string pagingRecordTableName = "`dotnetspider`.`paging_record`";
-		private readonly string pagingTableName = "`dotnetspider`.`paging`";
-		private readonly string pagingRunningTableName = "`dotnetspider`.`paging_running`";
+
+		private readonly string pagingRecordTableName = Env.DefaultDatabase + ".`paging_record`";
+		private readonly string pagingTableName = Env.DefaultDatabase + ".`paging`";
+		private readonly string pagingRunningTableName = Env.DefaultDatabase + ".`paging_running`";
 		private string _taskName;
 		private Site _site;
 		private int currentPage = 0;
@@ -74,7 +74,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 			using (var conn = CreateDbConnection())
 			{
-				conn.Execute($"create database if not exists {databaseName}");
+				conn.Execute($"create database if not exists {Env.DefaultDatabase}");
 				conn.Execute($"create table if not exists {pagingRecordTableName}(`identity` varchar(50) NOT NULL,`description` varchar(50) DEFAULT NULL, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`identity`))");
 				conn.Execute($"create table if not exists {pagingTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");
 				conn.Execute($"create table if not exists {pagingRunningTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");

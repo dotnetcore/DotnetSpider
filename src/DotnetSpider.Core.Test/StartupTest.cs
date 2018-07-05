@@ -103,15 +103,5 @@ namespace DotnetSpider.Core.Test
 			var spider = (TestSpider)Startup.CreateSpiderInstance("DotnetSpider.Core.Test.TestSpider", arguments, spiderTypes);
 			Assert.Equal("What", spider.Name);
 		}
-
-		[Fact(DisplayName = "SetReportArgument")]
-		public void SetReportArgument()
-		{
-			var args = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-n:What", "-i:guid", "-a:report" };
-			var arguments = Startup.Parse(args);
-			var spiderTypes = Startup.DetectSpiders();
-			var spider = (TestSpider)Startup.CreateSpiderInstance("DotnetSpider.Core.Test.TestSpider", arguments, spiderTypes);
-			Assert.Equal(1000, spider.EmptySleepTime);
-		}
 	}
 }
