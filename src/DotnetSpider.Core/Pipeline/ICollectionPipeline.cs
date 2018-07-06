@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace DotnetSpider.Core.Pipeline
 {
 	/// <summary>
-	/// 所有数据结果存在内存中.
+	/// 鎵�鏈夋暟鎹粨鏋滃瓨鍦ㄥ唴瀛樹腑.
 	/// </summary>
 	public interface ICollectionPipeline : IPipeline
 	{

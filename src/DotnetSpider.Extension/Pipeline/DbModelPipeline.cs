@@ -10,13 +10,12 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using Serilog;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class DbModelPipeline : ModelPipeline
 	{
-		public static string[] RetryExceptionMessages = new[] { "Unable to connect", "Access denied for user" };
+		public static string[] RetryExceptionMessages = { "Unable to connect", "Access denied for user" };
 
 		private PipelineMode _pipelineMode;
 		private readonly Dictionary<string, Sqls> _sqls = new Dictionary<string, Sqls>();
@@ -38,7 +37,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 更新数据库连接字符串的接口, 如果自定义的连接字符串无法使用, 则会尝试通过更新连接字符串来重新连接
 		/// </summary>
-		public IConnectionStringSettingsRefresher ConnectionStringSettingsRefresher { get; set; }
+		public IConnectionStringSettingsRefresher ConnectionStringSettingsRefresher;
 
 		protected DbModelPipeline(string connectString = null, PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate)
 		{
@@ -54,6 +53,11 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
+			if (datas == null || datas.Count() == 0)
+			{
+				return 0;
+			}
+
 			if (model.TableInfo == null)
 			{
 				return 0;
@@ -129,7 +133,7 @@ namespace DotnetSpider.Extension.Pipeline
 						Thread.Sleep(5000);
 						continue;
 					}
-					throw e;
+					throw;
 				}
 				finally
 				{
@@ -197,7 +201,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return null;
 			}
-			IPipeline pipeline = new ConsolePipeline();
+			IPipeline pipeline;
 			switch (connectionStringSettings.ProviderName)
 			{
 				case DbProviderFactories.PostgreSqlProvider:

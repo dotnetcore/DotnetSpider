@@ -11,95 +11,98 @@ using OpenQA.Selenium.Remote;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core;
 using System.IO;
-using System.Collections.Generic;
 using System.Net;
 
 namespace DotnetSpider.Extension.Downloader
 {
 	/// <summary>
-	/// WebDriver µÄCookie×¢ÈëÆ÷
+	/// WebDriver çš„Cookieæ³¨å…¥å™¨
 	/// </summary>
 	public class WebDriverCookieInjector : CookieInjector
 	{
 		/// <summary>
-		/// µÇÂ½µÄÁ´½Ó
+		/// ç™»é™†çš„é“¾æ¥
 		/// </summary>
-		public string Url { get; set; }
+		public string Url;
 
 		/// <summary>
-		/// µÇÂ½³É¹¦ºóĞèÒªÔÙ´Îµ¼º½µ½µÄÁ´½Ó
+		/// ç™»é™†æˆåŠŸåéœ€è¦å†æ¬¡å¯¼èˆªåˆ°çš„é“¾æ¥
 		/// </summary>
-		public string AfterLoginUrl { get; set; }
+		public string AfterLoginUrl;
 
 		/// <summary>
-		/// ÓÃ»§ÃûÔÚÍøÒ³ÖĞµÄÔªËØÑ¡ÔñÆ÷
+		/// ç”¨æˆ·ååœ¨ç½‘é¡µä¸­çš„å…ƒç´ é€‰æ‹©å™¨
 		/// </summary>
-		public Selector UserSelector { get; set; }
+		public Selector UserSelector;
 
 		/// <summary>
-		/// ÓÃ»§Ãû
+		/// ç”¨æˆ·å
 		/// </summary>
-		public string User { get; set; }
+		public string User;
 
 		/// <summary>
-		/// ÃÜÂëÔÚÍøÒ³ÖĞµÄÔªËØÑ¡ÔñÆ÷
+		/// å¯†ç åœ¨ç½‘é¡µä¸­çš„å…ƒç´ é€‰æ‹©å™¨
 		/// </summary>
-		public Selector PasswordSelector { get; set; }
+		public Selector PasswordSelector;
 
 		/// <summary>
-		/// ÃÜÂë
+		/// å¯†ç 
 		/// </summary>
-		public string Password { get; set; }
+		public string Password;
 
 		/// <summary>
-		/// µÇÂ½°´Å¥µÄÔªËØÑ¡ÔñÆ÷
+		/// ç™»é™†æŒ‰é’®çš„å…ƒç´ é€‰æ‹©å™¨
 		/// </summary>
-		public Selector SubmitSelector { get; set; }
+		public Selector SubmitSelector;
 
 		/// <summary>
-		/// ä¯ÀÀÆ÷
+		/// æµè§ˆå™¨
 		/// </summary>
-		public Browser Browser { get; set; } = Browser.Chrome;
+		public Browser Browser = Browser.Chrome;
 
 		/// <summary>
-		/// ÔÚÊäÈëÓÃ»§ĞÅÏ¢Ç°Ö´ĞĞµÄÒ»Ğ©×¼±¸²Ù×÷
+		/// åœ¨è¾“å…¥ç”¨æˆ·ä¿¡æ¯å‰æ‰§è¡Œçš„ä¸€äº›å‡†å¤‡æ“ä½œ
 		/// </summary>
 		/// <param name="webDriver">WebDriver</param>
-		protected virtual void BeforeInput(RemoteWebDriver webDriver) { }
+		protected virtual void BeforeInput(RemoteWebDriver webDriver)
+		{
+		}
 
 		/// <summary>
-		/// Íê³ÉµÇÂ½ºóÖ´ĞĞµÄÒ»Ğ©×¼±¸²Ù×÷
+		/// å®Œæˆç™»é™†åæ‰§è¡Œçš„ä¸€äº›å‡†å¤‡æ“ä½œ
 		/// </summary>
 		/// <param name="webDriver"></param>
-		protected virtual void AfterLogin(RemoteWebDriver webDriver) { }
+		protected virtual void AfterLogin(RemoteWebDriver webDriver)
+		{
+		}
 
 		/// <summary>
-		/// ²éÕÒÔªËØ
+		/// æŸ¥æ‰¾å…ƒç´ 
 		/// </summary>
 		/// <param name="webDriver">WebDriver</param>
-		/// <param name="element">Ò³ÃæÔªËØÑ¡ÔñÆ÷</param>
-		/// <returns>Ò³ÃæÔªËØ</returns>
+		/// <param name="element">é¡µé¢å…ƒç´ é€‰æ‹©å™¨</param>
+		/// <returns>é¡µé¢å…ƒç´ </returns>
 		protected IWebElement FindElement(RemoteWebDriver webDriver, Selector element)
 		{
 			switch (element.Type)
 			{
-
 				case SelectorType.XPath:
-					{
-						return webDriver.FindElementByXPath(element.Expression);
-					}
+				{
+					return webDriver.FindElementByXPath(element.Expression);
+				}
 				case SelectorType.Css:
-					{
-						return webDriver.FindElementByCssSelector(element.Expression);
-					}
+				{
+					return webDriver.FindElementByCssSelector(element.Expression);
+				}
 			}
+
 			throw new SpiderException("Unsport findy: " + element.Type);
 		}
 
 		/// <summary>
-		/// È¡µÃ Cookie
+		/// å–å¾— Cookie
 		/// </summary>
-		/// <param name="spider">ÅÀ³æ</param>
+		/// <param name="spider">çˆ¬è™«</param>
 		/// <returns>Cookie</returns>
 		protected override CookieCollection GetCookies(ISpider spider)
 		{
@@ -107,7 +110,6 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect");
 			}
-			var cookies = new Dictionary<string, string>();
 
 			var webDriver = CreateWebDriver();
 			var result = new CookieCollection();
@@ -162,44 +164,45 @@ namespace DotnetSpider.Extension.Downloader
 		}
 
 		/// <summary>
-		/// ´´½¨WebDriver¶ÔÏó
+		/// åˆ›å»ºWebDriverå¯¹è±¡
 		/// </summary>
-		/// <returns>WebDriver¶ÔÏó</returns>
+		/// <returns>WebDriverå¯¹è±¡</returns>
 		protected RemoteWebDriver CreateWebDriver()
 		{
 			RemoteWebDriver webDriver;
 			switch (Browser)
 			{
 				case Browser.Chrome:
-					{
-						ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
-						cds.HideCommandPromptWindow = true;
-						ChromeOptions opt = new ChromeOptions();
-						opt.AddUserProfilePreference("profile", new { default_content_setting_values = new { images = 2 } });
-						webDriver = new ChromeDriver(cds, opt);
-						break;
-					}
+				{
+					ChromeDriverService cds = ChromeDriverService.CreateDefaultService();
+					cds.HideCommandPromptWindow = true;
+					ChromeOptions opt = new ChromeOptions();
+					opt.AddUserProfilePreference("profile", new {default_content_setting_values = new {images = 2}});
+					webDriver = new ChromeDriver(cds, opt);
+					break;
+				}
 				case Browser.Firefox:
+				{
+					string path = Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
+					string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
+					if (pathsToProfiles.Length == 1)
 					{
-						string path = Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
-						string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);
-						if (pathsToProfiles.Length == 1)
-						{
-							FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false) { AlwaysLoadNoFocusLibrary = true };
-							FirefoxOptions options = new FirefoxOptions();
-							options.Profile = profile;
-							webDriver = new FirefoxDriver(options);
-						}
-						else
-						{
-							throw new Exception("No Firefox profiles: webdriver.");
-						}
-						break;
+						FirefoxProfile profile = new FirefoxProfile(pathsToProfiles[0], false) {AlwaysLoadNoFocusLibrary = true};
+						FirefoxOptions options = new FirefoxOptions();
+						options.Profile = profile;
+						webDriver = new FirefoxDriver(options);
 					}
+					else
+					{
+						throw new Exception("No Firefox profiles: webdriver.");
+					}
+
+					break;
+				}
 				default:
-					{
-						throw new Exception("Unsupported browser!");
-					}
+				{
+					throw new Exception("Unsupported browser!");
+				}
 			}
 
 			webDriver.Manage().Window.Maximize();

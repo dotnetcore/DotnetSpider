@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		public void PushAndPollBreadthFirst()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
-			scheduler.TraverseStrategy = TraverseStrategy.BFS;
+			scheduler.TraverseStrategy = TraverseStrategy.Bfs;
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
 			scheduler.Dispose();
@@ -68,7 +68,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		public void PushAndPollDepthFirst()
 		{
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler();
-			scheduler.TraverseStrategy = TraverseStrategy.DFS;
+			scheduler.TraverseStrategy = TraverseStrategy.Dfs;
 			ISpider spider = new DefaultSpider();
 			scheduler.Init(spider);
 			scheduler.Dispose();

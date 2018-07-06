@@ -18,14 +18,14 @@ namespace DotnetSpider.Core.Scheduler
 		public override bool IsDistributed => false;
 
 		/// <summary>
-		/// ÊÇ·ñ»áÊ¹ÓÃ»¥ÁªÍø
+		/// æ˜¯å¦ä¼šä½¿ç”¨äº’è”ç½‘
 		/// </summary>
 		protected override bool UseInternet { get; set; } = false;
 
 		/// <summary>
-		/// Èç¹ûÁ´½Ó²»ÊÇÖØ¸´µÄ¾ÍÌí¼Óµ½¶ÓÁĞÖĞ
+		/// å¦‚æœé“¾æ¥ä¸æ˜¯é‡å¤çš„å°±æ·»åŠ åˆ°é˜Ÿåˆ—ä¸­
 		/// </summary>
-		/// <param name="request">ÇëÇó¶ÔÏó</param>
+		/// <param name="request">è¯·æ±‚å¯¹è±¡</param>
 		protected override void PushWhenNoDuplicate(Request request)
 		{
 			lock (_lock)
@@ -46,9 +46,9 @@ namespace DotnetSpider.Core.Scheduler
 		}
 
 		/// <summary>
-		/// È¡µÃÒ»¸öĞèÒª´¦ÀíµÄÇëÇó¶ÔÏó
+		/// å–å¾—ä¸€ä¸ªéœ€è¦å¤„ç†çš„è¯·æ±‚å¯¹è±¡
 		/// </summary>
-		/// <returns>ÇëÇó¶ÔÏó</returns>
+		/// <returns>è¯·æ±‚å¯¹è±¡</returns>
 		public override Request Poll()
 		{
 			lock (_lock)
@@ -62,13 +62,13 @@ namespace DotnetSpider.Core.Scheduler
 					Request request;
 					switch (TraverseStrategy)
 					{
-						case TraverseStrategy.DFS:
+						case TraverseStrategy.Dfs:
 							{
 								request = _queue.Last();
 								_queue.RemoveAt(_queue.Count - 1);
 								break;
 							}
-						case TraverseStrategy.BFS:
+						case TraverseStrategy.Bfs:
 							{
 								request = _queue.First();
 								_queue.RemoveAt(0);
@@ -86,7 +86,7 @@ namespace DotnetSpider.Core.Scheduler
 		}
 
 		/// <summary>
-		/// Ê£ÓàÁ´½ÓÊı
+		/// å‰©ä½™é“¾æ¥æ•°
 		/// </summary>
 		public override long LeftRequestsCount
 		{
@@ -100,17 +100,17 @@ namespace DotnetSpider.Core.Scheduler
 		}
 
 		/// <summary>
-		/// ²É¼¯³É¹¦µÄÁ´½ÓÊı
+		/// é‡‡é›†æˆåŠŸçš„é“¾æ¥æ•°
 		/// </summary>
 		public override long SuccessRequestsCount => _successCounter.Value;
 
 		/// <summary>
-		/// ²É¼¯Ê§°ÜµÄ´ÎÊı, ²»ÊÇÁ´½ÓÊı, Èç¹ûÒ»¸öÁ´½Ó²É¼¯¶à´Î¶¼Ê§°Ü»á¼ÇÂ¼¶à´Î
+		/// é‡‡é›†å¤±è´¥çš„æ¬¡æ•°, ä¸æ˜¯é“¾æ¥æ•°, å¦‚æœä¸€ä¸ªé“¾æ¥é‡‡é›†å¤šæ¬¡éƒ½å¤±è´¥ä¼šè®°å½•å¤šæ¬¡
 		/// </summary>
 		public override long ErrorRequestsCount => _errorCounter.Value;
 
 		/// <summary>
-		/// ²É¼¯³É¹¦µÄÁ´½ÓÊı¼Ó 1
+		/// é‡‡é›†æˆåŠŸçš„é“¾æ¥æ•°åŠ  1
 		/// </summary>
 		public override void IncreaseSuccessCount()
 		{
@@ -118,7 +118,7 @@ namespace DotnetSpider.Core.Scheduler
 		}
 
 		/// <summary>
-		/// ²É¼¯Ê§°ÜµÄ´ÎÊı¼Ó 1
+		/// é‡‡é›†å¤±è´¥çš„æ¬¡æ•°åŠ  1
 		/// </summary>
 		public override void IncreaseErrorCount()
 		{
@@ -126,9 +126,9 @@ namespace DotnetSpider.Core.Scheduler
 		}
 
 		/// <summary>
-		/// ÅúÁ¿µ¼Èë
+		/// æ‰¹é‡å¯¼å…¥
 		/// </summary>
-		/// <param name="requests">ÇëÇó¶ÔÏó</param>
+		/// <param name="requests">è¯·æ±‚å¯¹è±¡</param>
 		public override void Import(IEnumerable<Request> requests)
 		{
 			lock (_lock)
@@ -138,7 +138,7 @@ namespace DotnetSpider.Core.Scheduler
 		}
 
 		/// <summary>
-		/// È¡µÃ¶ÓÁĞÖĞËùÓĞµÄÇëÇó¶ÔÏó
+		/// å–å¾—é˜Ÿåˆ—ä¸­æ‰€æœ‰çš„è¯·æ±‚å¯¹è±¡
 		/// </summary>
 		public IReadOnlyCollection<Request> All
 		{

@@ -9,34 +9,34 @@ using System.Collections.Generic;
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// ÅÀ³æ½Ó¿Ú¶¨Òå
+	/// çˆ¬è™«æ¥å£å®šä¹‰
 	/// </summary>
 	public interface ISpider : IDisposable, IControllable, IAppBase
 	{
 		/// <summary>
-		/// ²É¼¯Õ¾µãµÄĞÅÏ¢ÅäÖÃ
+		/// é‡‡é›†ç«™ç‚¹çš„ä¿¡æ¯é…ç½®
 		/// </summary>
 		Site Site { get; }
 
 		IScheduler Scheduler { get; }
 
 		/// <summary>
-		/// ÏÂÔØÆ÷
+		/// ä¸‹è½½å™¨
 		/// </summary>
 		IDownloader Downloader { get; set; }
 
 		/// <summary>
-		/// Ò³Ãæ½âÎöÆ÷
+		/// é¡µé¢è§£æå™¨
 		/// </summary>
 		IReadOnlyCollection<IPageProcessor> PageProcessors { get; }
 
 		/// <summary>
-		/// Êı¾İ¹ÜµÀ
+		/// æ•°æ®ç®¡é“
 		/// </summary>
 		IReadOnlyCollection<IPipeline> Pipelines { get; }
 
 		/// <summary>
-		/// ¼à¿Ø½Ó¿Ú
+		/// ç›‘æ§æ¥å£
 		/// </summary>
 		IMonitor Monitor { get; set; }
 	}

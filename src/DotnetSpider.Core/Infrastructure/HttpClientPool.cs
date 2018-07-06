@@ -1,10 +1,10 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 
-namespace DotnetSpider.Core.Downloader
+namespace DotnetSpider.Core.Infrastructure
 {
 	/// <summary>
 	/// Httpclient pool impletion for <see cref="HttpClientPool"/>
@@ -14,12 +14,21 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class HttpClientPool : IHttpClientPool
 	{
-		private AutomicLong _getHttpClientCount = new AutomicLong(0);
+		private readonly AutomicLong _getHttpClientCount = new AutomicLong(0);
 		private readonly Dictionary<string, HttpClientEntry> _pool = new Dictionary<string, HttpClientEntry>();
 
+		public static readonly HttpClient HttpClient = new HttpClient(new HttpClientHandler
+		{
+			AllowAutoRedirect = true,
+			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+			UseProxy = true,
+			UseCookies = true,
+			MaxAutomaticRedirections = 10
+		});
+
 		/// <summary>
-		/// Get a <see cref="HttpClientElement"/> from <see cref="IHttpClientPool"/>.
-		/// Return same <see cref="HttpClientElement"/> instance when <paramref name="hashCode"/> is same.
+		/// Get a <see cref="HttpClientEntry"/> from <see cref="IHttpClientPool"/>.
+		/// Return same <see cref="HttpClientEntry"/> instance when <paramref name="hash"/> is same.
 		/// This can ensure some pages have same CookieContainer.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">

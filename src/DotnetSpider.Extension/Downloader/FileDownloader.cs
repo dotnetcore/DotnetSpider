@@ -19,12 +19,11 @@ namespace DotnetSpider.Extension.Downloader
 		/// <returns></returns>
 		protected override Task<Page> DowloadContent(Request request, ISpider spider)
 		{
-			var site = spider.Site;
 			request.StatusCode = HttpStatusCode.OK;
 			Page page = new Page(request)
 			{
 				Content = File.ReadAllText(request.Uri.LocalPath),
-				TargetUrl = request.Url.ToString()
+				TargetUrl = request.Url
 			};
 
 			return Task.FromResult(page);

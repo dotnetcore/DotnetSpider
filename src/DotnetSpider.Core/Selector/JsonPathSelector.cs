@@ -15,7 +15,7 @@ namespace DotnetSpider.Core.Selector
 		private readonly string _jsonPath;
 
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// æ„é€ æ–¹æ³•
 		/// </summary>
 		/// <param name="jsonPath">JsonPath</param>
 		public JsonPathSelector(string jsonPath)
@@ -24,11 +24,11 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// ´ÓJSONÎÄ±¾ÖĞ²éÑ¯µ¥¸ö½á¹û
-		/// Èç¹û·ûºÏÌõ¼şµÄ½á¹ûÓĞ¶à¸ö, ½ö·µ»ØµÚÒ»¸ö
+		/// ä»JSONæ–‡æœ¬ä¸­æŸ¥è¯¢å•ä¸ªç»“æœ
+		/// å¦‚æœç¬¦åˆæ¡ä»¶çš„ç»“æœæœ‰å¤šä¸ª, ä»…è¿”å›ç¬¬ä¸€ä¸ª
 		/// </summary>
-		/// <param name="json">ĞèÒª²éÑ¯µÄJsonÎÄ±¾</param>
-		/// <returns>²éÑ¯½á¹û</returns>
+		/// <param name="json">éœ€è¦æŸ¥è¯¢çš„Jsonæ–‡æœ¬</param>
+		/// <returns>æŸ¥è¯¢ç»“æœ</returns>
 		public dynamic Select(dynamic json)
 		{
 			IList<dynamic> result = SelectList(json);
@@ -40,10 +40,10 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// ´ÓJSONÎÄ±¾ÖĞ²éÑ¯ËùÓĞ½á¹û
+		/// ä»JSONæ–‡æœ¬ä¸­æŸ¥è¯¢æ‰€æœ‰ç»“æœ
 		/// </summary>
-		/// <param name="json">ĞèÒª²éÑ¯µÄJsonÎÄ±¾</param>
-		/// <returns>²éÑ¯½á¹û</returns>
+		/// <param name="json">éœ€è¦æŸ¥è¯¢çš„Jsonæ–‡æœ¬</param>
+		/// <returns>æŸ¥è¯¢ç»“æœ</returns>
 		public IEnumerable<dynamic> SelectList(dynamic json)
 		{
 			if (json != null)

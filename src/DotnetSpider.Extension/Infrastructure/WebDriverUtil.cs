@@ -3,7 +3,6 @@ using DotnetSpider.Core.Infrastructure;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.PhantomJS;
 using System;
 using System.IO;
 #if !NETSTANDARD
@@ -78,7 +77,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <summary>
 		/// The proxy authentication info (e.g. username:password).
 		/// </summary>
-		public string ProxyAuthentication { get; set; }
+		public string ProxyAuthentication;
 	}
 
 	/// <summary>
@@ -112,15 +111,6 @@ namespace DotnetSpider.Extension.Infrastructure
 			IWebDriver e = null;
 			switch (browser)
 			{
-				case Browser.Phantomjs:
-					var phantomJsDriverService = PhantomJSDriverService.CreateDefaultService();
-					if (!string.IsNullOrEmpty(option.Proxy))
-					{
-						phantomJsDriverService.Proxy = option.Proxy;
-						phantomJsDriverService.ProxyAuthentication = option.ProxyAuthentication;
-					}
-					e = new PhantomJSDriver(phantomJsDriverService);
-					break;
 				case Browser.Firefox:
 					string path = Environment.ExpandEnvironmentVariables("%APPDATA%") + @"\Mozilla\Firefox\Profiles\";
 					string[] pathsToProfiles = Directory.GetDirectories(path, "*.webdriver", SearchOption.TopDirectoryOnly);

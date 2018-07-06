@@ -11,7 +11,7 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// <summary>
 		/// 保存到起始链接的额外信息
 		/// </summary>
-		public string[] Extras { get; set; }
+		public string[] Extras ;
 
 		/// <summary>
 		/// 属性名称

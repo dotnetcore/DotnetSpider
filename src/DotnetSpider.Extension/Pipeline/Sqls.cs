@@ -20,7 +20,7 @@
 		/// <summary>
 		/// 查询的SQL
 		/// </summary>
-		internal string SelectSql { get; set; }
+		internal string SelectSql;
 
 		/// <summary>
 		/// 插入新的或者更新旧的数据SQL

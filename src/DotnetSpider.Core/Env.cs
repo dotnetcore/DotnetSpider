@@ -25,6 +25,7 @@ namespace DotnetSpider.Core
 		/// 从配置文件中读取默认Redis连接字符串的关键字
 		/// </summary>
 		private const string RedisConnectStringKey = "redisConnectString";
+
 		private const string EmailHostKey = "emailHost";
 		private const string EmailPortKey = "emailPort";
 		private const string EmailAccountKey = "emailAccount";
@@ -42,18 +43,6 @@ namespace DotnetSpider.Core
 		public static bool HubService = true;
 
 		/// <summary>
-		/// 定义数据主键的名称
-		/// 使用实体定义爬虫解析时, 自动插入数据必须使用自增主键, 在自动构造插入数据的SQL语句时会忽略主键
-		/// </summary>
-		public static string IdColumn = "id";
-
-		/// <summary>
-		/// 定义数据采集的时间
-		/// 使用实体定义爬虫解析时, 会自动添加CDate数据列
-		/// </summary>
-		public static string CDateColumn = "cdate";
-
-		/// <summary>
 		/// 数据管道的数据库连接配置
 		/// </summary>
 		public static ConnectionStringSettings DataConnectionStringSettings { get; private set; }
@@ -61,7 +50,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 当前操作系统的HostName
 		/// </summary>
-		public static string HostName { get; set; }
+		public static string HostName;
 
 		/// <summary>
 		/// 当前操作系统的IP地址
@@ -127,7 +116,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 是否启用企业服务日志, 默认值是判断配置文件中是否配置了HubServiceUrl
 		/// </summary>
-		public static bool HubServiceLog { get; set; }
+		public static bool HubServiceLog;
 
 		/// <summary>
 		/// 从配置文件中读取的企业服务地址
@@ -142,7 +131,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 企业服务HTTP数据管道的地址
 		/// </summary>
-		public static string HubServicePipelineUrl { get; private set; }
+		public static string HubServicePipelineUrl;
 
 		/// <summary>
 		/// 企业服务HTTP爬虫状态的上传地址
@@ -219,7 +208,9 @@ namespace DotnetSpider.Core
 			if (path.ToLower().StartsWith("%global%"))
 			{
 				var fileName = path.Substring(8, path.Length - 8);
-				path = string.IsNullOrWhiteSpace(fileName) ? Path.Combine(GlobalDirectory, "app.config") : Path.Combine(GlobalDirectory, fileName);
+				path = string.IsNullOrWhiteSpace(fileName)
+					? Path.Combine(GlobalDirectory, "app.config")
+					: Path.Combine(GlobalDirectory, fileName);
 			}
 
 			if (!File.Exists(path))
@@ -250,6 +241,7 @@ namespace DotnetSpider.Core
 				HubServiceTaskApiUrl = $"{HubServiceUrl}{(HubServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/task";
 				HubServicePipelineUrl = $"{HubServiceUrl}{(HubServiceUrl.EndsWith("/") ? "" : "/")}api/v1.0/process";
 			}
+
 			HubServiceLog = !string.IsNullOrWhiteSpace(HubServiceLogUrl);
 			DataConnectionStringSettings = configuration.ConnectionStrings.ConnectionStrings[DataConnectionStringKey];
 		}
@@ -285,12 +277,16 @@ namespace DotnetSpider.Core
 
 			HostName = Dns.GetHostName();
 
-			var interf = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(i => (i.NetworkInterfaceType == NetworkInterfaceType.Ethernet || i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && i.OperationalStatus == OperationalStatus.Up);
+			var interf = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(i =>
+				(i.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+				 i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && i.OperationalStatus == OperationalStatus.Up);
 
 			if (interf != null)
 			{
 				var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
-				Ip = unicastAddresses.FirstOrDefault(a => a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString();
+				Ip = unicastAddresses.FirstOrDefault(a =>
+						a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address
+					.ToString();
 			}
 
 			NodeId = Ip;

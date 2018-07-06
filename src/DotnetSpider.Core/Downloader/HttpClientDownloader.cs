@@ -22,8 +22,6 @@ namespace DotnetSpider.Core.Downloader
 	/// </summary>
 	public class HttpClientDownloader : BaseDownloader
 	{
-		private HashSet<string> _initedCookieContainers = new HashSet<string>();
-
 		/// <summary>
 		/// What mediatype should not be treated as file to download.
 		/// </summary>
@@ -190,10 +188,8 @@ namespace DotnetSpider.Core.Downloader
 				Encoding htmlCharset = EncodingExtensions.GetEncoding(charSet, contentBytes);
 				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
 			}
-			else
-			{
-				return site.Encoding.GetString(contentBytes, 0, contentBytes.Length);
-			}
+
+			return site.Encoding.GetString(contentBytes, 0, contentBytes.Length);
 		}
 
 		internal void PrepareHttpClient(HttpClientEntry httpClientEntry)
@@ -216,7 +212,7 @@ namespace DotnetSpider.Core.Downloader
 #if !NETSTANDARD
 				content = HttpUtility.UrlDecode(HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(site.EncodingName) ? Encoding.Default : site.Encoding);
 #else
-				content = System.Net.WebUtility.UrlDecode(System.Net.WebUtility.HtmlDecode(content));
+				content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
 #endif
 			}
 

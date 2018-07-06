@@ -4,43 +4,43 @@ using System.Collections.Generic;
 namespace DotnetSpider.Extension.Model
 {
 	/// <summary>
-	/// ÅÀ³æÊı¾İÄ£ĞÍµÄ¶¨Òå
+	/// çˆ¬è™«æ•°æ®æ¨¡å‹çš„å®šä¹‰
 	/// </summary>
 	public interface IModel
 	{
 		/// <summary>
-		/// Êı¾İÄ£ĞÍµÄÑ¡ÔñÆ÷
+		/// æ•°æ®æ¨¡å‹çš„é€‰æ‹©å™¨
 		/// </summary>
 		Selector Selector { get; }
 
 		/// <summary>
-		/// ´Ó×îÖÕ½âÎöµ½µÄ½á¹ûÖĞÈ¡Ç° Take ¸öÊµÌå
+		/// ä»æœ€ç»ˆè§£æåˆ°çš„ç»“æœä¸­å–å‰ Take ä¸ªå®ä½“
 		/// </summary>
 		int Take { get; }
 
 		/// <summary>
-		/// ÉèÖÃ Take µÄ·½Ïò, Ä¬ÈÏÊÇ´ÓÍ·²¿È¡
+		/// è®¾ç½® Take çš„æ–¹å‘, é»˜è®¤æ˜¯ä»å¤´éƒ¨å–
 		/// </summary>
 		bool TakeFromHead { get; }
 
 		/// <summary>
-		/// ÅÀ³æÊµÌå¶ÔÓ¦µÄÊı¾İ¿â±íĞÅÏ¢
-		/// ÔÊĞí TableInfo Îª¿Õ, ÓĞ¿ÉÄÜÊÇÁÙÊ±Êı¾İ²¢²»ĞèÒªÂä¿âµÄ
+		/// çˆ¬è™«å®ä½“å¯¹åº”çš„æ•°æ®åº“è¡¨ä¿¡æ¯
+		/// å…è®¸ TableInfo ä¸ºç©º, æœ‰å¯èƒ½æ˜¯ä¸´æ—¶æ•°æ®å¹¶ä¸éœ€è¦è½åº“çš„
 		/// </summary>
 		TableInfo TableInfo { get; }
 
 		/// <summary>
-		/// ÅÀ³æÊµÌå¶¨ÒåµÄÊı¾İ¿âÁĞĞÅÏ¢
+		/// çˆ¬è™«å®ä½“å®šä¹‰çš„æ•°æ®åº“åˆ—ä¿¡æ¯
 		/// </summary>
 		HashSet<Field> Fields { get; }
 
 		/// <summary>
-		/// Ä¿±êÁ´½ÓµÄÑ¡ÔñÆ÷
+		/// ç›®æ ‡é“¾æ¥çš„é€‰æ‹©å™¨
 		/// </summary>
 		IEnumerable<TargetUrlsSelector> TargetUrlsSelectors { get; }
 
 		/// <summary>
-		/// ¹²ÏíÖµµÄÑ¡ÔñÆ÷
+		/// å…±äº«å€¼çš„é€‰æ‹©å™¨
 		/// </summary>
 		IEnumerable<SharedValueSelector> SharedValueSelectors { get; }
 

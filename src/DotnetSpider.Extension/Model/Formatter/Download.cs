@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		{
 			var filePath = value.ToString();
 			var name = Path.GetFileName(filePath);
-			Task<byte[]> task = HttpSender.Client.GetByteArrayAsync(filePath);
+			Task<byte[]> task = HttpClientPool.HttpClient.GetByteArrayAsync(filePath);
 			task.ContinueWith(t =>
 			{
 				if (t.Exception != null)

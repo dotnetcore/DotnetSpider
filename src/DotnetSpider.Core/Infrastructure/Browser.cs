@@ -10,10 +10,6 @@
 		/// </summary>
 		Firefox,
 		/// <summary>
-		/// Phantomjs
-		/// </summary>
-		Phantomjs,
-		/// <summary>
 		/// Chrome
 		/// </summary>
 		Chrome,

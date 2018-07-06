@@ -21,7 +21,6 @@ namespace DotnetSpider.Extension.Scheduler
 	{
 		private readonly object _locker = new object();
 		private const string TasksKey = "dotnetspider:tasks";
-		private const string TaskStatsKey = "dotnetspider:task-stats";
 		private readonly RetryPolicy _retryPolicy = Policy.Handle<Exception>().Retry(30);
 		private string _queueKey;
 		private string _setKey;
@@ -31,7 +30,7 @@ namespace DotnetSpider.Extension.Scheduler
 		private string _identityMd5;
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
-		private string _connectString;
+		private readonly string _connectString;
 		private RedisConnection _redisConnection;
 
 		/// <summary>
@@ -267,6 +266,7 @@ namespace DotnetSpider.Extension.Scheduler
 				lock (_locker)
 				{
 					int batchCount = BatchCount;
+					 
 					var count = requests.Count();
 					int cacheSize = count > batchCount ? batchCount : count;
 					RedisValue[] identities = new RedisValue[cacheSize];
@@ -416,12 +416,12 @@ namespace DotnetSpider.Extension.Scheduler
 				RedisValue value;
 				switch (TraverseStrategy)
 				{
-					case TraverseStrategy.DFS:
+					case TraverseStrategy.Dfs:
 						{
 							value = _redisConnection.Database.ListRightPop(_queueKey);
 							break;
 						}
-					case TraverseStrategy.BFS:
+					case TraverseStrategy.Bfs:
 						{
 							value = _redisConnection.Database.ListLeftPop(_queueKey);
 							break;

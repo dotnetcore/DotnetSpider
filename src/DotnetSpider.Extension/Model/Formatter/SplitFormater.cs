@@ -13,7 +13,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		/// <summary>
 		///  A string array that delimits the substrings in this string, an empty array that contains no delimiters, or null.
 		/// </summary>
-		public string[] Splitor { get; set; }
+		public string[] Splitor;
 
 		/// <summary>
 		/// 分割数值后需要返回的数值索引

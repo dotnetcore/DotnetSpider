@@ -6,9 +6,9 @@ namespace DotnetSpider.Core.Processor
 	public class SimplePageProcessor : BasePageProcessor
 	{
 		/// <summary>
-		/// 解析出页面的title和html
+		/// 瑙ｆ瀽鍑洪〉闈㈢殑title鍜宧tml
 		/// </summary>
-		/// <param name="page">页面数据</param>
+		/// <param name="page">椤甸潰鏁版嵁</param>
 		protected override void Handle(Page page)
 		{
 			page.AddResultItem("title", page.Selectable.XPath("//title"));

@@ -6,7 +6,6 @@ using Serilog.Events;
 using Serilog.Sinks.PeriodicBatching;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +24,7 @@ namespace DotnetSpider.Core.Infrastructure
 			int batchPostingLimit = HttpSink.DefaultBatchPostingLimit,
 			TimeSpan? period = null)
 		{
-			if (loggerConfiguration == null) throw new ArgumentNullException("loggerConfiguration");
+			if (loggerConfiguration == null) throw new SpiderException($"{nameof(loggerConfiguration)} should not be null.");
 
 			var defaultedPeriod = period ?? HttpSink.DefaultPeriod;
 
@@ -63,11 +62,18 @@ namespace DotnetSpider.Core.Infrastructure
 
 		protected override async Task EmitBatchAsync(IEnumerable<LogEvent> events)
 		{
+			if (events == null)
+			{
+				return;
+			}
+
+			int count = 0;
 			try
 			{
 				var logs = new List<LogInfo>();
 				foreach (var ev in events)
 				{
+					count++;
 					var identity = ev.Properties["Identity"].ToString();
 					identity = identity.Substring(1, identity.Length - 2);
 					var nodeId = ev.Properties["NodeId"].ToString();
@@ -90,11 +96,12 @@ namespace DotnetSpider.Core.Infrastructure
 				var json = JsonConvert.SerializeObject(logs);
 				httpRequestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-				await HttpSender.Client.SendAsync(httpRequestMessage);
+				await HttpClientPool.HttpClient.SendAsync(httpRequestMessage);
 			}
 			catch (Exception ex)
 			{
-				SelfLog.WriteLine("Unable to write {0} log events to the database due to following error: {1}", events.Count(), ex.Message);
+				SelfLog.WriteLine("Unable to write {0} log events to the database due to following error: {1}", count,
+					ex.Message);
 			}
 		}
 	}

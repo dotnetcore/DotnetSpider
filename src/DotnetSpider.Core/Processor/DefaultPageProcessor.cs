@@ -31,7 +31,7 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="patterns">匹配目标链接的正则表达式</param>
 		public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
 		{
-			(TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor).AddTargetUrlExtractor(regionXpath, patterns);
+			(TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor)?.AddTargetUrlExtractor(regionXpath, patterns);
 		}
 
 		/// <summary>

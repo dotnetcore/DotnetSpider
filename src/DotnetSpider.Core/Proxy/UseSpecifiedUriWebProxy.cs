@@ -13,8 +13,6 @@ namespace DotnetSpider.Core.Proxy
 		/// </summary>
 		private ICredentials _credentials;
 
-		private readonly bool _bypass;
-
 		/// <summary>
 		/// 代理地址
 		/// </summary>
@@ -25,25 +23,19 @@ namespace DotnetSpider.Core.Proxy
 		/// </summary>
 		ICredentials IWebProxy.Credentials
 		{
-			get
-			{
-				return _credentials;
-			}
-			set
-			{
-				this.SetCredentialsByInterface(value);
-			}
+			get => _credentials;
+			set => SetCredentialsByInterface(value);
 		}
 
 		/// <summary>
 		/// 获取代理服务器域名或ip
 		/// </summary>
-		public string Host { get; private set; }
+		public string Host { get; }
 
 		/// <summary>
 		/// 获取代理服务器端口
 		/// </summary>
-		public int Port { get; private set; }
+		public int Port { get; }
 
 		/// <summary>
 		/// 获取代理服务器账号
@@ -55,7 +47,7 @@ namespace DotnetSpider.Core.Proxy
 		/// </summary>
 		public string Password { get; private set; }
 
-		public string Hash { get; private set; }
+		public string Hash { get; }
 
 		/// <summary>
 		/// Returns the URI of a proxy.
@@ -88,10 +80,11 @@ namespace DotnetSpider.Core.Proxy
 			{
 				throw new ArgumentNullException(nameof(proxyAddress));
 			}
+
 			Host = proxyAddress.Host;
 			Port = proxyAddress.Port;
 			Uri = proxyAddress;
-			Hash = GetHashCode().ToString();
+			Hash = CalculateHash().ToString();
 		}
 
 		/// <summary>
@@ -105,7 +98,7 @@ namespace DotnetSpider.Core.Proxy
 			Host = host ?? throw new ArgumentNullException(nameof(host));
 			Port = port;
 			Uri = new Uri($"http://{host}:{port}");
-			Hash = GetHashCode().ToString();
+			Hash = CalculateHash().ToString();
 		}
 
 		/// <summary>
@@ -147,10 +140,8 @@ namespace DotnetSpider.Core.Proxy
 		/// 获取哈希值
 		/// </summary>
 		/// <returns></returns>
-		public override int GetHashCode()
-		{
-			return $"{Host}{Port}{UserName}{Password}".GetHashCode();
-		}
+		private int CalculateHash() => $"{Host}{Port}{UserName}{Password}".GetHashCode();
+
 
 		/// <summary>
 		/// 通过接口设置授权信息
@@ -162,7 +153,7 @@ namespace DotnetSpider.Core.Proxy
 			var password = default(string);
 			if (value != null)
 			{
-				var networkCredentialsd = value.GetCredential(null, null);
+				var networkCredentialsd = value.GetCredential(new Uri(Host), string.Empty);
 				userName = networkCredentialsd?.UserName;
 				password = networkCredentialsd?.Password;
 			}

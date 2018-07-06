@@ -11,22 +11,26 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <summary>
 		/// 任务所有者
 		/// </summary>
-		public string Owner { get; set; }
+		public string Owner;
+
 		/// <summary>
 		/// 程序的开发者
 		/// </summary>
-		public string Developer { get; set; }
+		public string Developer;
+
 		/// <summary>
 		/// 程序的开发时间
 		/// </summary>
-		public string Date { get; set; }
+		public string Date;
+
 		/// <summary>
 		/// 任务主题
 		/// </summary>
-		public string Subject { get; set; }
+		public string Subject;
+
 		/// <summary>
 		/// 联系邮箱
 		/// </summary>
-		public string Email { get; set; }
+		public string Email;
 	}
 }

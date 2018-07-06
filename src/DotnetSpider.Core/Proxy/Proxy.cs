@@ -3,37 +3,37 @@ using DotnetSpider.Core.Infrastructure;
 namespace DotnetSpider.Core.Proxy
 {
 	/// <summary>
-	/// ´úÀíĞÅÏ¢
+	/// ä»£ç†ä¿¡æ¯
 	/// </summary>
 	public class Proxy
 	{
 		private double _lastBorrowTime = DateTimeUtil.GetCurrentUnixTimeNumber();
 
 		/// <summary>
-		/// Êµ¼Ê´úÀíĞÅÏ¢
+		/// å®é™…ä»£ç†ä¿¡æ¯
 		/// </summary>
 		public readonly UseSpecifiedUriWebProxy WebProxy;
 
 		/// <summary>
-		/// ÏÂÒ»´Î¿ÉÊ¹ÓÃµÄÊ±¼ä
+		/// ä¸‹ä¸€æ¬¡å¯ä½¿ç”¨çš„æ—¶é—´
 		/// </summary>
-		public double CanReuseTime { get; set; }
+		public double CanReuseTime;
 
 		/// <summary>
-		/// Í¨¹ı´úÀíÍê³ÉÒ»´ÎÏÂÔØ²Ù×÷ÏûºÄµÄÊ±¼ä
+		/// é€šè¿‡ä»£ç†å®Œæˆä¸€æ¬¡ä¸‹è½½æ“ä½œæ¶ˆè€—çš„æ—¶é—´
 		/// </summary>
 		public double ResponseTime { get; private set; }
 
 		/// <summary>
-		/// Ê¹ÓÃ´Ë´úÀíÏÂÔØÊı¾İµÄÊ§°Ü´ÎÊı
+		/// ä½¿ç”¨æ­¤ä»£ç†ä¸‹è½½æ•°æ®çš„å¤±è´¥æ¬¡æ•°
 		/// </summary>
 		public int FailedNum { get; private set; }
 
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// æ„é€ æ–¹æ³•
 		/// </summary>
-		/// <param name="proxy">Êµ¼Ê´úÀíĞÅÏ¢</param>
-		/// <param name="reuseTimeInterval">´úÀí²»±»ÔÙ´ÎÊ¹ÓÃµÄ¼ä¸ô</param>
+		/// <param name="proxy">å®é™…ä»£ç†ä¿¡æ¯</param>
+		/// <param name="reuseTimeInterval">ä»£ç†ä¸è¢«å†æ¬¡ä½¿ç”¨çš„é—´éš”</param>
 		public Proxy(UseSpecifiedUriWebProxy proxy, int reuseTimeInterval = 1500)
 		{
 			WebProxy = proxy;
@@ -42,25 +42,25 @@ namespace DotnetSpider.Core.Proxy
 		}
 
 		/// <summary>
-		/// »ñÈ¡ÉÏÒ»´ÎÊ¹ÓÃµÄÊ±¼ä
+		/// è·å–ä¸Šä¸€æ¬¡ä½¿ç”¨çš„æ—¶é—´
 		/// </summary>
-		/// <returns>ÉÏÒ»´ÎÊ¹ÓÃµÄÊ±¼ä</returns>
+		/// <returns>ä¸Šä¸€æ¬¡ä½¿ç”¨çš„æ—¶é—´</returns>
 		public double GetLastUseTime()
 		{
 			return _lastBorrowTime;
 		}
 
 		/// <summary>
-		/// ÉèÖÃÉÏÒ»´ÎÊ¹ÓÃµÄÊ±¼ä
+		/// è®¾ç½®ä¸Šä¸€æ¬¡ä½¿ç”¨çš„æ—¶é—´
 		/// </summary>
-		/// <param name="lastBorrowTime">ÉÏÒ»´ÎÊ¹ÓÃµÄÊ±¼ä</param>
+		/// <param name="lastBorrowTime">ä¸Šä¸€æ¬¡ä½¿ç”¨çš„æ—¶é—´</param>
 		public void SetLastBorrowTime(double lastBorrowTime)
 		{
 			_lastBorrowTime = lastBorrowTime;
 		}
 
 		/// <summary>
-		/// ¼ÆËãÍ¨¹ı´úÀíÍê³ÉÒ»´ÎÏÂÔØ²Ù×÷ÏûºÄµÄÊ±¼ä
+		/// è®¡ç®—é€šè¿‡ä»£ç†å®Œæˆä¸€æ¬¡ä¸‹è½½æ“ä½œæ¶ˆè€—çš„æ—¶é—´
 		/// </summary>
 		public void RecordResponse()
 		{
@@ -69,7 +69,7 @@ namespace DotnetSpider.Core.Proxy
 		}
 
 		/// <summary>
-		/// ¼ÇÂ¼Ò»´ÎÊ¹ÓÃ´Ë´úÀíÏÂÔØÊı¾İµÄÊ§°Ü
+		/// è®°å½•ä¸€æ¬¡ä½¿ç”¨æ­¤ä»£ç†ä¸‹è½½æ•°æ®çš„å¤±è´¥
 		/// </summary>
 		public void Fail()
 		{
@@ -77,27 +77,27 @@ namespace DotnetSpider.Core.Proxy
 		}
 
 		/// <summary>
-		/// È¡µÃÊµ¼Ê´úÀíĞÅÏ¢
+		/// å–å¾—å®é™…ä»£ç†ä¿¡æ¯
 		/// </summary>
-		/// <returns>Êµ¼Ê´úÀíĞÅÏ¢</returns>
+		/// <returns>å®é™…ä»£ç†ä¿¡æ¯</returns>
 		public UseSpecifiedUriWebProxy GetWebProxy()
 		{
 			return WebProxy;
 		}
 
 		/// <summary>
-		/// ÉèÖÃÊ¹ÓÃ´Ë´úÀíÏÂÔØÊı¾İµÄÊ§°Ü´ÎÊı
+		/// è®¾ç½®ä½¿ç”¨æ­¤ä»£ç†ä¸‹è½½æ•°æ®çš„å¤±è´¥æ¬¡æ•°
 		/// </summary>
-		/// <param name="num">´ÎÊı</param>
+		/// <param name="num">æ¬¡æ•°</param>
 		public void SetFailedNum(int num)
 		{
 			FailedNum = num;
 		}
 
 		/// <summary>
-		/// ÉèÖÃÏÂÒ»´Î¿ÉÊ¹ÓÃµÄÊ±¼ä
+		/// è®¾ç½®ä¸‹ä¸€æ¬¡å¯ä½¿ç”¨çš„æ—¶é—´
 		/// </summary>
-		/// <param name="reuseTimeInterval">´úÀí²»±»ÔÙ´ÎÊ¹ÓÃµÄ¼ä¸ô</param>
+		/// <param name="reuseTimeInterval">ä»£ç†ä¸è¢«å†æ¬¡ä½¿ç”¨çš„é—´éš”</param>
 		public void SetReuseTime(int reuseTimeInterval)
 		{
 			CanReuseTime = DateTimeUtil.GetCurrentUnixTimeNumber() + reuseTimeInterval * 100;

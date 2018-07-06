@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		/// <summary>
 		/// 编码的名称
 		/// </summary>
-		public string Encoding { get; set; }
+		public string Encoding;
 		
 		/// <summary>
 		/// 实现数值的转化

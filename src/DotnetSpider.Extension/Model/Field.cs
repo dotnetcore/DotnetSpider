@@ -64,8 +64,11 @@ namespace DotnetSpider.Extension.Model.Attribute
 		/// <summary>
 		/// 构造方法
 		/// </summary>
+		/// <param name="name">名称</param>
 		/// <param name="type">选择器类型</param>
 		/// <param name="expression">表达式</param>
+		/// <param name="dataType">数据类型</param>
+		/// <param name="length">类型长度</param>
 		public Field(string expression, string name, SelectorType type = SelectorType.XPath, DataType dataType = DataType.String, int length = 255)
 			: base(expression, type)
 		{
@@ -117,6 +120,7 @@ namespace DotnetSpider.Extension.Model.Attribute
 
 		public override int GetHashCode()
 		{
+			// ReSharper disable once NonReadonlyMemberInGetHashCode
 			return Name.GetHashCode();
 		}
 

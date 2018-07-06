@@ -10,34 +10,7 @@ namespace DotnetSpider.Core.Infrastructure
 	{
 		private struct Rasconn
 		{
-			public int DwSize;
 			public IntPtr Hrasconn;
-			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 257)]
-			public string SzEntryName;
-			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 17)]
-			public string SzDeviceType;
-			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 129)]
-			public string SzDeviceName;
-		}
-
-		[StructLayout(LayoutKind.Sequential)]
-		private struct RasStats
-		{
-			public int dwSize;
-			public int dwBytesXmited;
-			public int dwBytesRcved;
-			public int dwFramesXmited;
-			public int dwFramesRcved;
-			public int dwCrcErr;
-			public int dwTimeoutErr;
-			public int dwAlignmentErr;
-			public int dwHardwareOverrunErr;
-			public int dwFramingErr;
-			public int dwBufferOverrunErr;
-			public int dwCompressionRatioIn;
-			public int dwCompressionRatioOut;
-			public int dwBps;
-			public int dwConnectionDuration;
 		}
 
 		[DllImport("rasapi32.dll")]
@@ -78,11 +51,6 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			Rasconn lprasConn = new Rasconn
 			{
-#if !NETSTANDARD
-				DwSize = Marshal.SizeOf(typeof(Rasconn)),
-#else
-				DwSize = Marshal.SizeOf<Rasconn>(),
-#endif
 				Hrasconn = IntPtr.Zero
 			};
 

@@ -6,32 +6,32 @@ namespace DotnetSpider.Core.Scheduler
 	public interface IMonitorable
 	{
 		/// <summary>
-		/// Ê£ÓàÁ´½ÓÊı
+		/// å‰©ä½™é“¾æ¥æ•°
 		/// </summary>
 		long LeftRequestsCount { get; }
 
 		/// <summary>
-		/// ×ÜµÄÁ´½ÓÊı
+		/// æ€»çš„é“¾æ¥æ•°
 		/// </summary>
-		long TotalRequestsCount { get; }
+		long TotalRequestsCount{ get; }
 
 		/// <summary>
-		/// ²É¼¯³É¹¦µÄÁ´½ÓÊı
+		/// é‡‡é›†æˆåŠŸçš„é“¾æ¥æ•°
 		/// </summary>
 		long SuccessRequestsCount { get; }
 
 		/// <summary>
-		/// ²É¼¯Ê§°ÜµÄ´ÎÊı, ²»ÊÇÁ´½ÓÊı, Èç¹ûÒ»¸öÁ´½Ó²É¼¯¶à´Î¶¼Ê§°Ü»á¼ÇÂ¼¶à´Î
+		/// é‡‡é›†å¤±è´¥çš„æ¬¡æ•°, ä¸æ˜¯é“¾æ¥æ•°, å¦‚æœä¸€ä¸ªé“¾æ¥é‡‡é›†å¤šæ¬¡éƒ½å¤±è´¥ä¼šè®°å½•å¤šæ¬¡
 		/// </summary>
 		long ErrorRequestsCount { get; }
 
 		/// <summary>
-		/// ²É¼¯³É¹¦µÄÁ´½ÓÊı¼Ó 1
+		/// é‡‡é›†æˆåŠŸçš„é“¾æ¥æ•°åŠ  1
 		/// </summary>
 		void IncreaseSuccessCount();
 
 		/// <summary>
-		/// ²É¼¯Ê§°ÜµÄ´ÎÊı¼Ó 1
+		/// é‡‡é›†å¤±è´¥çš„æ¬¡æ•°åŠ  1
 		/// </summary>
 		void IncreaseErrorCount();
 	}

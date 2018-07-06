@@ -59,6 +59,7 @@ namespace DotnetSpider.Extension.Test.Model
 		{
 			public string AAA;
 			private string bb;
+
 			[Field(Expression = "cat", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
 

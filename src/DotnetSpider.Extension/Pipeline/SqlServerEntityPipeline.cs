@@ -142,7 +142,7 @@ namespace DotnetSpider.Extension.Pipeline
 			var singleAutoIncrementPrimary = fields.Count(f => f.IsPrimary && (f.DataType == DataType.Int || f.DataType == DataType.Long)) == 1;
 
 			// 如果是单自增主键, 则不需要插入值
-			var insertColumns = fields.Where(f => !f.IgnoreStore && (singleAutoIncrementPrimary ? !f.IsPrimary : true));
+			var insertColumns = fields.Where(f => !f.IgnoreStore && (!singleAutoIncrementPrimary || !f.IsPrimary)).ToList();
 
 			string columnsSql = string.Join(", ", insertColumns.Select(p => $"[{(IgnoreColumnCase ? p.Name.ToLower() : p.Name)}]"));
 
@@ -168,9 +168,9 @@ namespace DotnetSpider.Extension.Pipeline
 		private string GenerateUpdateSql(IModel model)
 		{
 			// 无主键, 无更新字段都无法生成更新SQL
-			if (model.TableInfo.UpdateColumns == null || model.TableInfo.UpdateColumns.Count() == 0 || !model.Fields.Any(f => f.IsPrimary))
+			if (model.TableInfo.UpdateColumns == null || !model.TableInfo.UpdateColumns.Any() || !model.Fields.Any(f => f.IsPrimary))
 			{
-				if (model.TableInfo.UpdateColumns == null || model.TableInfo.UpdateColumns.Count() == 0)
+				if (model.TableInfo.UpdateColumns == null || !model.TableInfo.UpdateColumns.Any())
 				{
 					Log.Logger.Warning("Can't generate update sql, in table info, the count of update columns is zero.");
 				}
@@ -184,7 +184,6 @@ namespace DotnetSpider.Extension.Pipeline
 			var tableName = IgnoreColumnCase ? model.TableInfo.FullName.ToLower() : model.TableInfo.FullName;
 			var database = IgnoreColumnCase ? model.TableInfo.Database.ToLower() : model.TableInfo.Database;
 
-			var primaryKeys = model.Fields.Where(f => f.IsPrimary);
 			string where = "";
 			foreach (var field in model.Fields.Where(f => f.IsPrimary))
 			{
@@ -221,7 +220,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		private string GetDataTypeSql(DataType type, int length)
 		{
-			var dataType = "TEXT";
+			string dataType;
 
 			switch (type)
 			{

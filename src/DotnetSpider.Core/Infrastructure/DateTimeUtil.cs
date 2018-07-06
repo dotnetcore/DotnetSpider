@@ -3,7 +3,7 @@ using System;
 namespace DotnetSpider.Core.Infrastructure
 {
 	/// <summary>
-	/// Ê±¼äµÄ°ïÖúÀà
+	/// æ—¶é—´çš„å¸®åŠ©ç±»
 	/// </summary>
 	public static class DateTimeUtil
 	{
@@ -11,141 +11,165 @@ namespace DotnetSpider.Core.Infrastructure
 		private const long TicksPerMicrosecond = 10;
 
 		/// <summary>
-		/// µ±ÌìµÄRunId: 2017-12-20
+		/// å½“å¤©çš„RunId: 2017-12-20
 		/// </summary>
-		public static string RunIdOfToday { get; }
+		public static string RunIdOfToday;
 
 		/// <summary>
-		/// µ±ÔÂµÄRunId: 2017-12-01
+		/// å½“æœˆçš„RunId: 2017-12-01
 		/// </summary>
-		public static string RunIdOfMonthly { get; }
+		public static string RunIdOfMonthly;
 
 		/// <summary>
-		/// µ±ÖÜµÄRunId: 2018-01-01 (it's monday)
+		/// å½“å‘¨çš„RunId: 2018-01-01 (it's monday)
 		/// </summary>
-		public static string RunIdOfMonday { get; }
+		public static string RunIdOfMonday;
 
 		/// <summary>
-		/// µ±Ç°ÔÂ·İµÄµÚÒ»Ìì
+		/// å½“å‰æœˆä»½çš„ç¬¬ä¸€å¤©
 		/// </summary>
-		public static DateTime FirstDayOfTheMonth { get; }
+		public static DateTime FirstDayOfTheMonth;
+
 		/// <summary>
-		/// µ±Ç°ÔÂ·İµÄµÚÒ»Ìì
+		/// å½“å‰æœˆä»½çš„ç¬¬ä¸€å¤©
 		/// </summary>
-		public static DateTime LastDayOfTheMonth { get; }
+		public static DateTime LastDayOfTheMonth;
+
 		/// <summary>
-		/// µ±Ç°ÔÂ·İµÄ×îºóÒ»Ìì
+		/// å½“å‰æœˆä»½çš„æœ€åä¸€å¤©
 		/// </summary>
-		public static DateTime FirstDayOfLastMonth { get; }
+		public static DateTime FirstDayOfLastMonth;
+
 		/// <summary>
-		/// Ç°Ò»ÔÂ·İµÄ×îºóÒ»Ìì
+		/// å‰ä¸€æœˆä»½çš„æœ€åä¸€å¤©
 		/// </summary>
-		public static DateTime LastDayOfLastMonth { get; }
-		
+		public static DateTime LastDayOfLastMonth;
+
 		/// <summary>
-		/// ĞÇÆÚÒ»
+		/// æ˜ŸæœŸä¸€
 		/// </summary>
 		public static DateTime Today => DateTime.Now;
 
 		/// <summary>
-		/// ĞÇÆÚÒ»
+		/// æ˜ŸæœŸä¸€
 		/// </summary>
-		public static DateTime Monday { get; }
-		/// <summary>
-		/// ĞÇÆÚ¶ş
-		/// </summary>
-		public static DateTime Tuesday { get; }
-		/// <summary>
-		/// ĞÇÆÚÈı
-		/// </summary>
-		public static DateTime Wednesday { get; }
-		/// <summary>
-		/// ĞÇÆÚËÄ
-		/// </summary>
-		public static DateTime Thursday { get; }
-		/// <summary>
-		/// ĞÇÆÚÎå
-		/// </summary>
-		public static DateTime Friday { get; }
-		/// <summary>
-		/// ĞÇÆÚÁù
-		/// </summary>
-		public static DateTime Saturday { get; }
-		/// <summary>
-		/// ĞÇÆÚÌì
-		/// </summary>
-		public static DateTime Sunday { get; }
-		/// <summary>
-		/// ÉÏÖÜµÄĞÇÆÚÒ»
-		/// </summary>
-		public static DateTime LastMonday { get; }
-		/// <summary>
-		/// ÉÏÖÜµÄĞÇÆÚ¶ş
-		/// </summary>
-		public static DateTime LastTuesday { get; }
-		/// <summary>
-		/// ÉÏÖÜµÄĞÇÆÚÈı
-		/// </summary>
-		public static DateTime LastWednesday { get; }
-		/// <summary>
-		/// ÉÏÖÜµÄĞÇÆÚËÄ
-		/// </summary>
-		public static DateTime LastThursday { get; }
-		/// <summary>
-		/// ÉÏÖÜµÄĞÇÆÚÎå
-		/// </summary>
-		public static DateTime LastFriday { get; }
-		/// <summary>
-		/// ÉÏÖÜµÄĞÇÆÚÁù
-		/// </summary>
-		public static DateTime LastSaturday { get; }
-		/// <summary>
-		/// ÉÏÖÜµÄĞÇÆÚÌì
-		/// </summary>
-		public static DateTime LastSunday { get; }
-		/// <summary>
-		/// ÏÂÖÜµÄĞÇÆÚÒ»
-		/// </summary>
-		public static DateTime NextMonday { get; }
-		/// <summary>
-		/// ÏÂÖÜµÄĞÇÆÚ¶ş
-		/// </summary>
-		public static DateTime NextTuesday { get; }
-		/// <summary>
-		/// ÏÂÖÜµÄĞÇÆÚÈı
-		/// </summary>
-		public static DateTime NextWednesday { get; }
-		/// <summary>
-		/// ÏÂÖÜµÄĞÇÆÚËÄ
-		/// </summary>
-		public static DateTime NextThursday { get; }
-		/// <summary>
-		/// ÏÂÖÜµÄĞÇÆÚÎå
-		/// </summary>
-		public static DateTime NextFriday { get; }
-		/// <summary>
-		/// ÏÂÖÜµÄĞÇÆÚÁù
-		/// </summary>
-		public static DateTime NextSaturday { get; }
-		/// <summary>
-		/// ÏÂÖÜµÄĞÇÆÚÌì
-		/// </summary>
-		public static DateTime NextSunday { get; }
+		public static DateTime Monday;
 
 		/// <summary>
-		/// °ÑÊ±¼ä×ª»»³ÉUnixÊ±¼ä: 1515133023012
+		/// æ˜ŸæœŸäºŒ
 		/// </summary>
-		/// <param name="time">Ê±¼ä</param>
-		/// <returns>UnixÊ±¼ä</returns>
+		public static DateTime Tuesday;
+
+		/// <summary>
+		/// æ˜ŸæœŸä¸‰
+		/// </summary>
+		public static DateTime Wednesday;
+
+		/// <summary>
+		/// æ˜ŸæœŸå››
+		/// </summary>
+		public static DateTime Thursday;
+
+		/// <summary>
+		/// æ˜ŸæœŸäº”
+		/// </summary>
+		public static DateTime Friday;
+
+		/// <summary>
+		/// æ˜ŸæœŸå…­
+		/// </summary>
+		public static DateTime Saturday;
+
+		/// <summary>
+		/// æ˜ŸæœŸå¤©
+		/// </summary>
+		public static DateTime Sunday;
+
+		/// <summary>
+		/// ä¸Šå‘¨çš„æ˜ŸæœŸä¸€
+		/// </summary>
+		public static DateTime LastMonday;
+
+		/// <summary>
+		/// ä¸Šå‘¨çš„æ˜ŸæœŸäºŒ
+		/// </summary>
+		public static DateTime LastTuesday;
+
+		/// <summary>
+		/// ä¸Šå‘¨çš„æ˜ŸæœŸä¸‰
+		/// </summary>
+		public static DateTime LastWednesday;
+
+		/// <summary>
+		/// ä¸Šå‘¨çš„æ˜ŸæœŸå››
+		/// </summary>
+		public static DateTime LastThursday;
+
+		/// <summary>
+		/// ä¸Šå‘¨çš„æ˜ŸæœŸäº”
+		/// </summary>
+		public static DateTime LastFriday;
+
+		/// <summary>
+		/// ä¸Šå‘¨çš„æ˜ŸæœŸå…­
+		/// </summary>
+		public static DateTime LastSaturday;
+
+		/// <summary>
+		/// ä¸Šå‘¨çš„æ˜ŸæœŸå¤©
+		/// </summary>
+		public static DateTime LastSunday;
+
+		/// <summary>
+		/// ä¸‹å‘¨çš„æ˜ŸæœŸä¸€
+		/// </summary>
+		public static DateTime NextMonday;
+
+		/// <summary>
+		/// ä¸‹å‘¨çš„æ˜ŸæœŸäºŒ
+		/// </summary>
+		public static DateTime NextTuesday;
+
+		/// <summary>
+		/// ä¸‹å‘¨çš„æ˜ŸæœŸä¸‰
+		/// </summary>
+		public static DateTime NextWednesday;
+
+		/// <summary>
+		/// ä¸‹å‘¨çš„æ˜ŸæœŸå››
+		/// </summary>
+		public static DateTime NextThursday;
+
+		/// <summary>
+		/// ä¸‹å‘¨çš„æ˜ŸæœŸäº”
+		/// </summary>
+		public static DateTime NextFriday;
+
+		/// <summary>
+		/// ä¸‹å‘¨çš„æ˜ŸæœŸå…­
+		/// </summary>
+		public static DateTime NextSaturday;
+
+		/// <summary>
+		/// ä¸‹å‘¨çš„æ˜ŸæœŸå¤©
+		/// </summary>
+		public static DateTime NextSunday;
+
+		/// <summary>
+		/// æŠŠæ—¶é—´è½¬æ¢æˆUnixæ—¶é—´: 1515133023012
+		/// </summary>
+		/// <param name="time">æ—¶é—´</param>
+		/// <returns>Unixæ—¶é—´</returns>
 		public static string ConvertDateTimeToUnix(DateTime time)
 		{
-			return time.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds.ToString("f0");
+			return time.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds
+				.ToString("f0");
 		}
 
 		/// <summary>
-		/// °ÑUnixÊ±¼ä×ª»»³ÉDateTime
+		/// æŠŠUnixæ—¶é—´è½¬æ¢æˆDateTime
 		/// </summary>
-		/// <param name="unixTime">UnixÊ±¼ä</param>
+		/// <param name="unixTime">Unixæ—¶é—´</param>
 		/// <returns>DateTime</returns>
 		public static DateTime ToDateTimeOffset(long unixTime)
 		{
@@ -153,21 +177,22 @@ namespace DotnetSpider.Core.Infrastructure
 		}
 
 		/// <summary>
-		/// »ñÈ¡µ±Ç°UnixÊ±¼ä
+		/// è·å–å½“å‰Unixæ—¶é—´
 		/// </summary>
-		/// <returns>UnixÊ±¼ä</returns>
+		/// <returns>Unixæ—¶é—´</returns>
 		public static string GetCurrentUnixTimeString()
 		{
 			return ConvertDateTimeToUnix(DateTime.UtcNow);
 		}
 
 		/// <summary>
-		/// »ñÈ¡µ±Ç°UnixÊ±¼ä
+		/// è·å–å½“å‰Unixæ—¶é—´
 		/// </summary>
-		/// <returns>UnixÊ±¼ä</returns>
+		/// <returns>Unixæ—¶é—´</returns>
 		public static double GetCurrentUnixTimeNumber()
 		{
-			return DateTime.Now.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+			return DateTime.Now.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
+				.TotalMilliseconds;
 		}
 
 		static DateTimeUtil()

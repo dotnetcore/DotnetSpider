@@ -8,12 +8,12 @@ namespace DotnetSpider.Core.Scheduler
 	public abstract class DuplicateRemovedScheduler : BaseScheduler
 	{
 		/// <summary>
-		/// È¥ÖØÆ÷
+		/// å»é‡å™¨
 		/// </summary>
 		protected IDuplicateRemover DuplicateRemover { get; set; } = new HashSetDuplicateRemover();
 
 		/// <summary>
-		/// ×ÜµÄÁ´½ÓÊı
+		/// æ€»çš„é“¾æ¥æ•°
 		/// </summary>
 		public override long TotalRequestsCount => DuplicateRemover.TotalRequestsCount;
 
@@ -33,9 +33,9 @@ namespace DotnetSpider.Core.Scheduler
 		}
 
 		/// <summary>
-		/// Èç¹ûÁ´½Ó²»ÊÇÖØ¸´µÄ¾ÍÌí¼Óµ½¶ÓÁĞÖĞ
+		/// å¦‚æœé“¾æ¥ä¸æ˜¯é‡å¤çš„å°±æ·»åŠ åˆ°é˜Ÿåˆ—ä¸­
 		/// </summary>
-		/// <param name="request">ÇëÇó¶ÔÏó</param>
+		/// <param name="request">è¯·æ±‚å¯¹è±¡</param>
 		protected abstract void PushWhenNoDuplicate(Request request);
 
 		protected override void ImplPush(Request request)

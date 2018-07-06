@@ -1,6 +1,4 @@
-﻿using Serilog;
-
-namespace DotnetSpider.Core
+﻿namespace DotnetSpider.Core
 {
 	/// <summary>
 	/// 运行记录接口

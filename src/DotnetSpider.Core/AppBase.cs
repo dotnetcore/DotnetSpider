@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using Serilog;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
@@ -29,7 +28,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 唯一标识
 		/// </summary>
-		public virtual string Identity
+		public string Identity
 		{
 			get => _identity;
 			set

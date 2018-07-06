@@ -64,7 +64,7 @@ namespace DotnetSpider.Core.Selector
 			{
 				tmp = text is string ? text : text.ToString();
 			}
-			Match match = _regex.Match(text);
+			Match match = _regex.Match(tmp);
 			if (match.Success)
 			{
 				return match.Groups.Count > _group ? match.Groups[_group].Value : null;
@@ -91,12 +91,12 @@ namespace DotnetSpider.Core.Selector
 			{
 				foreach (var l in (IEnumerable)text)
 				{
-					builder.Append(l.ToString());
+					builder.Append(l);
 				}
 			}
 			else
 			{
-				builder.Append(text.ToString());
+				builder.Append(text);
 			}
 
 			var matches = _regex.Matches(text);

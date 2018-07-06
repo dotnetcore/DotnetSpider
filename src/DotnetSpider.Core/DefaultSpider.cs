@@ -7,32 +7,32 @@ using DotnetSpider.Core.Scheduler;
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// Ä¬ÈÏÅÀ³æ, ÓÃÓÚ²âÊÔºÍÒ»Ğ©Ä¬ÈÏÇé¿öÊ¹ÓÃ, ¿ò¼ÜÊ¹ÓÃÕß¿ÉºöÂÔ
+	/// é»˜è®¤çˆ¬è™«, ç”¨äºæµ‹è¯•å’Œä¸€äº›é»˜è®¤æƒ…å†µä½¿ç”¨, æ¡†æ¶ä½¿ç”¨è€…å¯å¿½ç•¥
 	/// </summary>
-	public class DefaultSpider : Spider
+	public sealed class DefaultSpider : Spider
 	{
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// æ„é€ æ–¹æ³•
 		/// </summary>
 		public DefaultSpider() : this(Guid.NewGuid().ToString("N"), new Site())
 		{
 		}
 
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// æ„é€ æ–¹æ³•
 		/// </summary>
-		/// <param name="id">ÅÀ³æ±êÊ¶</param>
-		/// <param name="site">ÍøÕ¾ĞÅÏ¢</param>
+		/// <param name="id">çˆ¬è™«æ ‡è¯†</param>
+		/// <param name="site">ç½‘ç«™ä¿¡æ¯</param>
 		public DefaultSpider(string id, Site site) : this(id, site, new QueueDuplicateRemovedScheduler())
 		{
 		}
 
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// æ„é€ æ–¹æ³•
 		/// </summary>
-		/// <param name="id">ÅÀ³æ±êÊ¶</param>
-		/// <param name="site">ÍøÕ¾ĞÅÏ¢</param>
-		/// <param name="scheduler">URL¶ÓÁĞ</param>
+		/// <param name="id">çˆ¬è™«æ ‡è¯†</param>
+		/// <param name="site">ç½‘ç«™ä¿¡æ¯</param>
+		/// <param name="scheduler">URLé˜Ÿåˆ—</param>
 		public DefaultSpider(string id, Site site, IScheduler scheduler) : base(site, id, scheduler, new[] { new SimplePageProcessor() }, new[] { new ConsolePipeline() })
 		{
 			Logger = LogUtil.Create(id);

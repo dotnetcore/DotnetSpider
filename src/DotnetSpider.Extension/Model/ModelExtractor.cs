@@ -16,11 +16,12 @@ namespace DotnetSpider.Extension.Model
 		/// 解析成爬虫实体对象
 		/// </summary>
 		/// <param name="page">页面数据</param>
+		/// <param name="model">解析模型</param>
 		/// <returns>爬虫实体对象</returns>
 		public virtual IEnumerable<dynamic> Extract(Page page, IModel model)
 		{
 			List<dynamic> result = new List<dynamic>();
-			if (model.SharedValueSelectors != null && model.SharedValueSelectors.Count() > 0)
+			if (model.SharedValueSelectors != null)
 			{
 				foreach (var enviromentValue in model.SharedValueSelectors)
 				{
@@ -36,14 +37,14 @@ namespace DotnetSpider.Extension.Model
 			{
 				var selector = model.Selector.ToSelector();
 
-				var list = page.Selectable.SelectList(selector).Nodes();
-				if (list == null || list.Count() == 0)
+				var list = page.Selectable.SelectList(selector).Nodes()?.ToList();
+				if (list == null)
 				{
 					result = null;
 				}
 				else
 				{
-					if (model.Take > 0 && list.Count() > model.Take)
+					if (model.Take > 0 && list.Count > model.Take)
 					{
 						if (model.TakeFromHead)
 						{
@@ -51,11 +52,11 @@ namespace DotnetSpider.Extension.Model
 						}
 						else
 						{
-							list = list.Skip(list.Count() - model.Take).ToList();
+							list = list.Skip(list.Count - model.Take).ToList();
 						}
 					}
 
-					for (int i = 0; i < list.Count(); ++i)
+					for (int i = 0; i < list.Count; ++i)
 					{
 						var item = list.ElementAt(i);
 						var obj = ExtractSingle(page, model, item, i);
@@ -129,6 +130,7 @@ namespace DotnetSpider.Extension.Model
 			{
 				return null;
 			}
+
 			var selector = field.ToSelector();
 			if (selector == null)
 			{
@@ -143,7 +145,9 @@ namespace DotnetSpider.Extension.Model
 			}
 			else
 			{
-				value = field.Option == FieldOptions.Count ? item.SelectList(selector).Nodes().Count().ToString() : item.Select(selector)?.GetValue(ConvertToValueOption(field.Option));
+				value = field.Option == FieldOptions.Count
+					? item.SelectList(selector).Nodes().Count().ToString()
+					: item.Select(selector)?.GetValue(ConvertToValueOption(field.Option));
 			}
 
 			if (field.Formatters != null && field.Formatters.Count() > 0)
@@ -164,6 +168,7 @@ namespace DotnetSpider.Extension.Model
 #endif
 				}
 			}
+
 			return value?.ToString();
 		}
 
@@ -172,21 +177,21 @@ namespace DotnetSpider.Extension.Model
 			switch (options)
 			{
 				case FieldOptions.InnerHtml:
-					{
-						return ValueOption.InnerHtml;
-					}
+				{
+					return ValueOption.InnerHtml;
+				}
 				case FieldOptions.OuterHtml:
-					{
-						return ValueOption.OuterHtml;
-					}
+				{
+					return ValueOption.OuterHtml;
+				}
 				case FieldOptions.InnerText:
-					{
-						return ValueOption.InnerText;
-					}
+				{
+					return ValueOption.InnerText;
+				}
 				default:
-					{
-						return ValueOption.None;
-					}
+				{
+					return ValueOption.None;
+				}
 			}
 		}
 	}
@@ -206,12 +211,13 @@ namespace DotnetSpider.Extension.Model
 
 		public override IEnumerable<dynamic> Extract(Page page, IModel model)
 		{
-			var items = base.Extract(page, model);
+			var items = base.Extract(page, model)?.ToList();
 
-			if (items == null || items.Count() == 0)
+			if (items == null)
 			{
 				return new List<dynamic>();
 			}
+
 			List<dynamic> results = new List<dynamic>();
 			foreach (var item in items)
 			{
@@ -226,24 +232,23 @@ namespace DotnetSpider.Extension.Model
 						{
 							if (oldValue != null)
 							{
-
 								var newValue = Convert.ChangeType(oldValue, valueType);
 								if (newValue != null)
 								{
 									keyPair.Value.SetValue(o, newValue);
 								}
 							}
-
 						}
 						catch
 						{
 							Log.Logger.Debug($"Convert data {oldValue} to {valueType.FullName} failed.");
-							continue;
 						}
 					}
 				}
+
 				results.Add(o);
 			}
+
 			return results;
 		}
 	}

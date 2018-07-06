@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Proxy;
 using System;
 using System.Collections.Concurrent;

@@ -32,7 +32,7 @@ namespace DotnetSpider.Core.Proxy
 		{
 			var timeout = TimeSpan.FromSeconds(1d);
 			var validator = new ProxyValidator(proxy);
-			var targetAddress = new Uri(this._targetUrl);
+			var targetAddress = new Uri(_targetUrl);
 			return validator.Validate(targetAddress, timeout) == HttpStatusCode.OK;
 		}
 
@@ -45,14 +45,14 @@ namespace DotnetSpider.Core.Proxy
 			/// <summary>
 			/// 获取代理
 			/// </summary>
-			public IWebProxy WebProxy { get; private set; }
+			public IWebProxy WebProxy { get; }
 
 			/// <summary>
 			/// 代理验证器
 			/// </summary>
 			/// <param name="proxyHost">代理服务器域名或ip</param>
 			/// <param name="proxyPort">代理服务器端口</param>
-			/// <exception cref="ArgumentNullException"></exception>
+			// ReSharper disable once UnusedMember.Local
 			public ProxyValidator(string proxyHost, int proxyPort)
 				: this(new HttpProxy(proxyHost, proxyPort))
 			{
@@ -65,7 +65,7 @@ namespace DotnetSpider.Core.Proxy
 			/// <exception cref="ArgumentNullException"></exception>
 			public ProxyValidator(IWebProxy webProxy)
 			{
-				this.WebProxy = webProxy ?? throw new ArgumentNullException(nameof(webProxy));
+				WebProxy = webProxy ?? throw new ArgumentNullException(nameof(webProxy));
 			}
 
 			/// <summary>
@@ -81,7 +81,7 @@ namespace DotnetSpider.Core.Proxy
 				{
 					throw new ArgumentNullException(nameof(targetAddress));
 				}
-				return Validate(this.WebProxy, targetAddress, timeout);
+				return Validate(WebProxy, targetAddress, timeout);
 			}
 
 			/// <summary>
@@ -90,7 +90,7 @@ namespace DotnetSpider.Core.Proxy
 			/// <returns></returns>
 			public override string ToString()
 			{
-				return this.WebProxy.ToString();
+				return WebProxy.ToString();
 			}
 
 			/// <summary>
@@ -119,7 +119,7 @@ namespace DotnetSpider.Core.Proxy
 
 				try
 				{
-					if (timeout.HasValue == true)
+					if (timeout.HasValue)
 					{
 						socket.SendTimeout = (int)timeout.Value.TotalMilliseconds;
 						socket.ReceiveTimeout = (int)timeout.Value.TotalMilliseconds;
@@ -157,17 +157,17 @@ namespace DotnetSpider.Core.Proxy
 			/// <summary>
 			/// 授权字段
 			/// </summary>
-			private ICredentials credentials;
+			private ICredentials _credentials;
 
 			/// <summary>
 			/// 获取代理服务器域名或ip
 			/// </summary>
-			public string Host { get; private set; }
+			public string Host { get; }
 
 			/// <summary>
 			/// 获取代理服务器端口
 			/// </summary>
-			public int Port { get; private set; }
+			public int Port { get; }
 
 			/// <summary>
 			/// 获取代理服务器账号
@@ -184,24 +184,15 @@ namespace DotnetSpider.Core.Proxy
 			/// </summary>
 			ICredentials IWebProxy.Credentials
 			{
-				get
-				{
-					return this.credentials;
-				}
-				set
-				{
-					this.SetCredentialsByInterface(value);
-				}
+				get => _credentials;
+				set => SetCredentialsByInterface(value);
 			}
 
 			/// <summary>
 			/// http代理信息
 			/// </summary>
 			/// <param name="proxyAddress">代理服务器地址</param>
-			/// <exception cref="ArgumentNullException"></exception>
-			/// <exception cref="ArgumentException"></exception>
-			/// <exception cref="ArgumentOutOfRangeException"></exception>
-			/// <exception cref="UriFormatException"></exception>
+			// ReSharper disable once UnusedMember.Local
 			public HttpProxy(string proxyAddress)
 				: this(new Uri(proxyAddress ?? throw new ArgumentNullException(nameof(proxyAddress))))
 			{
@@ -218,8 +209,8 @@ namespace DotnetSpider.Core.Proxy
 				{
 					throw new ArgumentNullException(nameof(proxyAddress));
 				}
-				this.Host = proxyAddress.Host;
-				this.Port = proxyAddress.Port;
+				Host = proxyAddress.Host;
+				Port = proxyAddress.Port;
 			}
 
 			/// <summary>
@@ -230,8 +221,8 @@ namespace DotnetSpider.Core.Proxy
 			/// <exception cref="ArgumentNullException"></exception>
 			public HttpProxy(string host, int port)
 			{
-				this.Host = host ?? throw new ArgumentNullException(nameof(host));
-				this.Port = port;
+				Host = host ?? throw new ArgumentNullException(nameof(host));
+				Port = port;
 			}
 
 			/// <summary>
@@ -241,16 +232,16 @@ namespace DotnetSpider.Core.Proxy
 			/// <param name="port">代理服务器端口</param>
 			/// <param name="userName">代理服务器账号</param>
 			/// <param name="password">代理服务器密码</param>
-			/// <exception cref="ArgumentNullException"></exception>
+			// ReSharper disable once UnusedMember.Local
 			public HttpProxy(string host, int port, string userName, string password)
 				: this(host, port)
 			{
-				this.UserName = userName;
-				this.Password = password;
+				UserName = userName;
+				Password = password;
 
 				if (string.IsNullOrEmpty(userName + password) == false)
 				{
-					this.credentials = new NetworkCredential(userName, password);
+					_credentials = new NetworkCredential(userName, password);
 				}
 			}
 
@@ -264,22 +255,20 @@ namespace DotnetSpider.Core.Proxy
 				var password = default(string);
 				if (value != null)
 				{
-					var networkCredentialsd = value.GetCredential(null, null);
+					var networkCredentialsd = value.GetCredential(new Uri(Host), string.Empty);
 					userName = networkCredentialsd?.UserName;
 					password = networkCredentialsd?.Password;
 				}
 
-				this.UserName = userName;
-				this.Password = password;
-				this.credentials = value;
+				UserName = userName;
+				Password = password;
+				_credentials = value;
 			}
 
 			/// <summary>
 			/// 转换Http Tunnel请求字符串
 			/// </summary>      
 			/// <param name="targetAddress">目标url地址</param>
-			/// <exception cref="ArgumentNullException"></exception>
-			/// <returns></returns>
 			public string ToTunnelRequestString(Uri targetAddress)
 			{
 				if (targetAddress == null)
@@ -287,22 +276,22 @@ namespace DotnetSpider.Core.Proxy
 					throw new ArgumentNullException(nameof(targetAddress));
 				}
 
-				const string CRLF = "\r\n";
+				const string crlf = "\r\n";
 				var builder = new StringBuilder()
-					.Append($"CONNECT {targetAddress.Host}:{targetAddress.Port} HTTP/1.1{CRLF}")
-					.Append($"Host: {targetAddress.Host}:{targetAddress.Port}{CRLF}")
-					.Append($"Accept: */*{CRLF}")
-					.Append($"Content-Type: text/html{CRLF}")
-					.Append($"Proxy-Connection: Keep-Alive{CRLF}")
-					.Append($"Content-length: 0{CRLF}");
+					.Append($"CONNECT {targetAddress.Host}:{targetAddress.Port} HTTP/1.1{crlf}")
+					.Append($"Host: {targetAddress.Host}:{targetAddress.Port}{crlf}")
+					.Append($"Accept: */*{crlf}")
+					.Append($"Content-Type: text/html{crlf}")
+					.Append($"Proxy-Connection: Keep-Alive{crlf}")
+					.Append($"Content-length: 0{crlf}");
 
-				if (this.UserName != null && this.Password != null)
+				if (UserName != null && Password != null)
 				{
-					var bytes = Encoding.ASCII.GetBytes($"{this.UserName}:{this.Password}");
+					var bytes = Encoding.ASCII.GetBytes($"{UserName}:{Password}");
 					var base64 = Convert.ToBase64String(bytes);
-					builder.AppendLine($"Proxy-Authorization: Basic {base64}{CRLF}");
+					builder.AppendLine($"Proxy-Authorization: Basic {base64}{crlf}");
 				}
-				return builder.Append(CRLF).ToString();
+				return builder.Append(crlf).ToString();
 			}
 
 			/// <summary>
@@ -312,7 +301,7 @@ namespace DotnetSpider.Core.Proxy
 			/// <returns></returns>
 			public Uri GetProxy(Uri destination)
 			{
-				return new Uri(this.ToString());
+				return new Uri(ToString());
 			}
 
 			/// <summary>
@@ -331,7 +320,7 @@ namespace DotnetSpider.Core.Proxy
 			/// <returns></returns>
 			public override string ToString()
 			{
-				return $"http://{this.Host}:{this.Port}/";
+				return $"http://{Host}:{Port}/";
 			}
 
 			/// <summary>

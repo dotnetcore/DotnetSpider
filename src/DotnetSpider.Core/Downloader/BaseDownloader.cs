@@ -49,7 +49,6 @@ namespace DotnetSpider.Core.Downloader
 		/// <param name="path">作用路径(<see cref="Cookie.Path"/>)</param>
 		public void AddCookies(string cookiesStr, string domain, string path = "/")
 		{
-			var cookies = new Dictionary<string, string>();
 			var pairs = cookiesStr.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 			foreach (var pair in pairs)
 			{

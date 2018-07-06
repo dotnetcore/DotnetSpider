@@ -17,13 +17,14 @@ namespace DotnetSpider.Extension.Scheduler
 		private readonly string _description;
 		private readonly bool _reset;
 
-		private readonly string pagingRecordTableName = Env.DefaultDatabase + ".`paging_record`";
-		private readonly string pagingTableName = Env.DefaultDatabase + ".`paging`";
-		private readonly string pagingRunningTableName = Env.DefaultDatabase + ".`paging_running`";
+		private readonly string _pagingRecordTableName = Env.DefaultDatabase + ".`paging_record`";
+		private readonly string _pagingTableName = Env.DefaultDatabase + ".`paging`";
+		private readonly string _pagingRunningTableName = Env.DefaultDatabase + ".`paging_running`";
 		private string _taskName;
 		private Site _site;
-		private int currentPage = 0;
-		protected readonly int _size;
+		private int _currentPage;
+		
+		protected readonly int Size;
 
 		private readonly RetryPolicy _retryPolicy = Policy.Handle<Exception>().Retry(10000, (ex, count) =>
 		{
@@ -37,7 +38,7 @@ namespace DotnetSpider.Extension.Scheduler
 		public PagingQueueDuplicateRemovedScheduler(string taskName, int size, bool reset, string description = null)
 		{
 			_taskName = taskName;
-			_size = size;
+			Size = size;
 			_description = description;
 			_reset = reset;
 		}
@@ -75,28 +76,28 @@ namespace DotnetSpider.Extension.Scheduler
 			using (var conn = CreateDbConnection())
 			{
 				conn.Execute($"create database if not exists {Env.DefaultDatabase}");
-				conn.Execute($"create table if not exists {pagingRecordTableName}(`identity` varchar(50) NOT NULL,`description` varchar(50) DEFAULT NULL, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`identity`))");
-				conn.Execute($"create table if not exists {pagingTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");
-				conn.Execute($"create table if not exists {pagingRunningTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");
+				conn.Execute($"create table if not exists {_pagingRecordTableName}(`identity` varchar(50) NOT NULL,`description` varchar(50) DEFAULT NULL, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`identity`))");
+				conn.Execute($"create table if not exists {_pagingTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");
+				conn.Execute($"create table if not exists {_pagingRunningTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");
 
-				var exist = conn.QueryFirst<int>($"SELECT count(*) from {pagingRecordTableName} where `identity` = @Identity", new { spider.Identity });
+				var exist = conn.QueryFirst<int>($"SELECT count(*) from {_pagingRecordTableName} where `identity` = @Identity", new { spider.Identity });
 				if (exist == 0)
 				{
-					var affected = conn.Execute($"INSERT INTO {pagingRecordTableName}(`identity`,`description`) VALUES (@Identity, @Description)", new { spider.Identity, Description = _description });
+					var affected = conn.Execute($"INSERT INTO {_pagingRecordTableName}(`identity`,`description`) VALUES (@Identity, @Description)", new { spider.Identity, Description = _description });
 					if (affected > 0 && _reset)
 					{
-						conn.Execute($"delete from {pagingTableName} where `task_name` = @t", new { t = _taskName });
-						conn.Execute($"delete from {pagingRunningTableName} where `task_name` = @t", new { t = _taskName });
+						conn.Execute($"delete from {_pagingTableName} where `task_name` = @t", new { t = _taskName });
+						conn.Execute($"delete from {_pagingRunningTableName} where `task_name` = @t", new { t = _taskName });
 
 						var totalCount = GetTotalCount(conn);
-						var pageCount = totalCount / _size + (totalCount % _size > 0 ? 1 : 0);
+						var pageCount = totalCount / Size + (totalCount % Size > 0 ? 1 : 0);
 						var pages = new List<dynamic>();
 						for (var page = 1; page <= pageCount; page++)
 						{
 							pages.Add(new { p = page, t = _taskName });
 							if (pages.Count >= 1000 || page >= pageCount)
 							{
-								conn.Execute($"INSERT INTO {pagingTableName}(page,`task_name`) values (@p,@t)", pages);
+								conn.Execute($"INSERT INTO {_pagingTableName}(page,`task_name`) values (@p,@t)", pages);
 								pages.Clear();
 							}
 						}
@@ -109,47 +110,47 @@ namespace DotnetSpider.Extension.Scheduler
 
 		private void LoadRequests()
 		{
-			if (currentPage > 0)
+			if (_currentPage > 0)
 			{
-				Log.Logger.Information($"Paging: {currentPage}.");
+				Log.Logger.Information($"Paging: {_currentPage}.");
 			}
 
 			_retryPolicy.Execute(() =>
 			{
 				using (var conn = CreateDbConnection())
 				{
-					if (currentPage > 0)
+					if (_currentPage > 0)
 					{
-						if (conn.Execute($"DELETE FROM {pagingRunningTableName} where page = @p and `task_name`=@t;", new { p = currentPage, t = _taskName }) > 0)
+						if (conn.Execute($"DELETE FROM {_pagingRunningTableName} where page = @p and `task_name`=@t;", new { p = _currentPage, t = _taskName }) > 0)
 						{
-							currentPage = 0;
+							_currentPage = 0;
 						}
 					}
 
 					//获取分页
-					var page = conn.QueryFirstOrDefault<int>($"select page from {pagingTableName} where `task_name` = @t limit 1", new { t = _taskName });
+					var page = conn.QueryFirstOrDefault<int>($"select page from {_pagingTableName} where `task_name` = @t limit 1", new { t = _taskName });
 					if (page > 0)
 					{
 						var tablePage = new { p = page, t = _taskName };
 
-						var affected = conn.Execute($"DELETE FROM {pagingTableName} where page = @p and `task_name`=@t;", tablePage);
+						var affected = conn.Execute($"DELETE FROM {_pagingTableName} where page = @p and `task_name`=@t;", tablePage);
 						if (affected > 0)
 						{
-							conn.Execute($"INSERT IGNORE INTO {pagingRunningTableName} (page,`task_name`) values(@p,@t)", tablePage);
+							conn.Execute($"INSERT IGNORE INTO {_pagingRunningTableName} (page,`task_name`) values(@p,@t)", tablePage);
 
-							var requests = GenerateRequest(conn, page);
+							var requests = GenerateRequest(conn, page).ToList();
 
 							if (!requests.Any())
 							{
-								conn.Execute($"DELETE FROM {pagingTableName} where page = @p and `task_name`=@t;", tablePage);
+								conn.Execute($"DELETE FROM {_pagingTableName} where page = @p and `task_name`=@t;", tablePage);
 							}
 							else
 							{
-								currentPage = page;
+								_currentPage = page;
 
 								foreach (var request in requests)
 								{
-									request.Site = request.Site == null ? _site : request.Site;
+									request.Site = request.Site ?? _site;
 									Push(request);
 								}
 							}

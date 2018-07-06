@@ -38,7 +38,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 下载器分组
 		/// </summary>
-		public string DownloaderGroup { get; set; }
+		public string DownloaderGroup;
 
 		/// <summary>
 		/// 下载此链接内容时使用的代理
@@ -74,15 +74,18 @@ namespace DotnetSpider.Core
 				{
 					return false;
 				}
+
 				if (Url.Length < 6)
 				{
 					return false;
 				}
+
 				var schema = Url.Substring(0, 5).ToLower();
 				if (!schema.StartsWith("http") && !schema.StartsWith("https"))
 				{
 					return false;
 				}
+
 				return true;
 			}
 		}
@@ -131,6 +134,7 @@ namespace DotnetSpider.Core
 					_url = null;
 					return;
 				}
+
 				if (Uri.TryCreate(value.TrimEnd('#'), UriKind.RelativeOrAbsolute, out _uri))
 				{
 					_url = _uri.ToString();
@@ -216,6 +220,7 @@ namespace DotnetSpider.Core
 				{
 					return Extras[key];
 				}
+
 				return null;
 			}
 		}
@@ -258,7 +263,7 @@ namespace DotnetSpider.Core
 			if (this == obj) return true;
 			if (obj == null || GetType() != obj.GetType()) return false;
 
-			Request request = (Request)obj;
+			Request request = (Request) obj;
 
 			if (!Url.Equals(request.Url)) return false;
 
@@ -307,6 +312,7 @@ namespace DotnetSpider.Core
 						extras.Add(entry.Key, entry.Value);
 					}
 				}
+
 				Request newObj = new Request(Url, extras)
 				{
 					Method = Method,
