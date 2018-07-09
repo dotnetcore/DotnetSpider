@@ -6,17 +6,17 @@ using HtmlAgilityPack;
 namespace DotnetSpider.Core.Selector
 {
 	/// <summary>
-	/// ²éÑ¯½Ó¿Ú
+	/// æŸ¥è¯¢æ¥å£
 	/// </summary>
 	public class Selectable : AbstractSelectable
 	{
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// æ„é€ æ–¹æ³•
 		/// </summary>
-		/// <param name="text">±»²éÑ¯µÄÎÄ±¾</param>
-		/// <param name="urlOrPadding">URLÏà¶ÔÂ·¾¶²¹³ä»òÕßJson paddingµÄÈ¥³ı</param>
-		/// <param name="contentType">ÎÄ±¾ÄÚÈİ¸ñÊ½: Html, Json</param>
-		/// <param name="domain">ÓòÃû, ÓÃÓÚÈ¥³ıÍâÁ´</param>
+		/// <param name="text">è¢«æŸ¥è¯¢çš„æ–‡æœ¬</param>
+		/// <param name="urlOrPadding">URLç›¸å¯¹è·¯å¾„è¡¥å……æˆ–è€…Json paddingçš„å»é™¤</param>
+		/// <param name="contentType">æ–‡æœ¬å†…å®¹æ ¼å¼: Html, Json</param>
+		/// <param name="domain">åŸŸå, ç”¨äºå»é™¤å¤–é“¾</param>
 		public Selectable(string text, string urlOrPadding, ContentType contentType, params string[] domain)
 		{
 			switch (contentType)
@@ -49,30 +49,30 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// ¹¹Ôì·½·¨
+		/// æ„é€ æ–¹æ³•
 		/// </summary>
-		/// <param name="nodes">±»²éÑ¯µÄÔªËØ</param>
+		/// <param name="nodes">è¢«æŸ¥è¯¢çš„å…ƒç´ </param>
 		public Selectable(List<dynamic> nodes)
 		{
 			Elements = nodes;
 		}
 
 		/// <summary>
-		/// Í¨¹ıCss Ñ¡ÔñÆ÷²éÕÒ½á¹û
+		/// é€šè¿‡Css é€‰æ‹©å™¨æŸ¥æ‰¾ç»“æœ
 		/// </summary>
-		/// <param name="css">Css Ñ¡ÔñÆ÷</param>
-		/// <returns>²éÑ¯½Ó¿Ú</returns>
+		/// <param name="css">Css é€‰æ‹©å™¨</param>
+		/// <returns>æŸ¥è¯¢æ¥å£</returns>
 		public override ISelectable Css(string css)
 		{
 			return Select(Selectors.Css(css));
 		}
 
 		/// <summary>
-		/// Í¨¹ıCss Ñ¡ÔñÆ÷²éÕÒÔªËØ, ²¢È¡µÃÊôĞÔµÄÖµ
+		/// é€šè¿‡Css é€‰æ‹©å™¨æŸ¥æ‰¾å…ƒç´ , å¹¶å–å¾—å±æ€§çš„å€¼
 		/// </summary>
-		/// <param name="css">Css Ñ¡ÔñÆ÷</param>
-		/// <param name="attrName">²éÑ¯µ½µÄÔªËØµÄÊôĞÔ</param>
-		/// <returns>²éÑ¯½Ó¿Ú</returns>
+		/// <param name="css">Css é€‰æ‹©å™¨</param>
+		/// <param name="attrName">æŸ¥è¯¢åˆ°çš„å…ƒç´ çš„å±æ€§</param>
+		/// <returns>æŸ¥è¯¢æ¥å£</returns>
 		public override ISelectable Css(string css, string attrName)
 		{
 			var cssSelector = Selectors.Css(css, attrName);
@@ -80,9 +80,9 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// ²éÕÒËùÓĞµÄÁ´½Ó
+		/// æŸ¥æ‰¾æ‰€æœ‰çš„é“¾æ¥
 		/// </summary>
-		/// <returns>²éÑ¯½Ó¿Ú</returns>
+		/// <returns>æŸ¥è¯¢æ¥å£</returns>
 		public override ISelectable Links()
 		{
 			var tmplinks = XPath("./descendant-or-self::a/@href").GetValues();
@@ -98,20 +98,20 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// Í¨¹ıXPath²éÕÒ½á¹û
+		/// é€šè¿‡XPathæŸ¥æ‰¾ç»“æœ
 		/// </summary>
-		/// <param name="xpath">XPath ±í´ïÊ½</param>
-		/// <returns>²éÑ¯½Ó¿Ú</returns>
+		/// <param name="xpath">XPath è¡¨è¾¾å¼</param>
+		/// <returns>æŸ¥è¯¢æ¥å£</returns>
 		public override ISelectable XPath(string xpath)
 		{
 			return SelectList(Selectors.XPath(xpath));
 		}
 
 		/// <summary>
-		/// Í¨¹ı²éÑ¯Æ÷²éÕÒ½á¹û
+		/// é€šè¿‡æŸ¥è¯¢å™¨æŸ¥æ‰¾ç»“æœ
 		/// </summary>
-		/// <param name="selector">²éÑ¯Æ÷</param>
-		/// <returns>²éÑ¯½Ó¿Ú</returns>
+		/// <param name="selector">æŸ¥è¯¢å™¨</param>
+		/// <returns>æŸ¥è¯¢æ¥å£</returns>
 		public override ISelectable Select(ISelector selector)
 		{
 			if (selector != null)
@@ -131,10 +131,10 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// Í¨¹ı²éÑ¯Æ÷²éÕÒ½á¹û
+		/// é€šè¿‡æŸ¥è¯¢å™¨æŸ¥æ‰¾ç»“æœ
 		/// </summary>
-		/// <param name="selector">²éÑ¯Æ÷</param>
-		/// <returns>²éÑ¯½Ó¿Ú</returns>
+		/// <param name="selector">æŸ¥è¯¢å™¨</param>
+		/// <returns>æŸ¥è¯¢æ¥å£</returns>
 		public override ISelectable SelectList(ISelector selector)
 		{
 			if (selector != null)
@@ -155,9 +155,9 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// È¡µÃ²éÑ¯Æ÷ÀïËùÓĞµÄ½á¹û
+		/// å–å¾—æŸ¥è¯¢å™¨é‡Œæ‰€æœ‰çš„ç»“æœ
 		/// </summary>
-		/// <returns>²éÑ¯½Ó¿Ú</returns>
+		/// <returns>æŸ¥è¯¢æ¥å£</returns>
 		public override IEnumerable<ISelectable> Nodes()
 		{
 			List<ISelectable> reslut = new List<ISelectable>();
@@ -169,10 +169,10 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// Í¨¹ıJsonPath²éÕÒ½á¹û
+		/// é€šè¿‡JsonPathæŸ¥æ‰¾ç»“æœ
 		/// </summary>
-		/// <param name="jsonPath">JsonPath ±í´ïÊ½</param>
-		/// <returns>²éÑ¯½Ó¿Ú</returns>
+		/// <param name="jsonPath">JsonPath è¡¨è¾¾å¼</param>
+		/// <returns>æŸ¥è¯¢æ¥å£</returns>
 		public override ISelectable JsonPath(string jsonPath)
 		{
 			JsonPathSelector jsonPathSelector = new JsonPathSelector(jsonPath);

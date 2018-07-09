@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Scheduler
 {
-	public abstract class BaseScheduler : Named, IScheduler, IDisposable
+	public abstract class BaseScheduler : Named, IScheduler
 	{
 		private int _depth = int.MaxValue;
-		private TraverseStrategy _traverseStrategy = TraverseStrategy.DFS;
+		private TraverseStrategy _traverseStrategy = TraverseStrategy.Dfs;
 
 		/// <summary>
 		/// 爬虫对象
@@ -45,7 +45,7 @@ namespace DotnetSpider.Core.Scheduler
 		/// <summary>
 		/// 总的链接数
 		/// </summary>
-		public virtual long TotalRequestsCount { get; }
+		public abstract long TotalRequestsCount { get; }
 
 		/// <summary>
 		/// 采集成功的链接数
@@ -72,13 +72,15 @@ namespace DotnetSpider.Core.Scheduler
 
 		public int Depth
 		{
-			get => _depth; set
+			get => _depth;
+			set
 			{
 				CheckIfRunning();
 				if (value <= 0)
 				{
 					throw new ArgumentException("Depth should be greater than 0.");
 				}
+
 				_depth = value;
 			}
 		}
@@ -93,12 +95,10 @@ namespace DotnetSpider.Core.Scheduler
 			{
 				request.Site = Spider.Site;
 			}
+
 			if (UseInternet)
 			{
-				NetworkCenter.Current.Execute("sch-push", () =>
-				{
-					ImplPush(request);
-				});
+				NetworkCenter.Current.Execute("sch-push", () => { ImplPush(request); });
 			}
 			else
 			{
@@ -147,7 +147,7 @@ namespace DotnetSpider.Core.Scheduler
 
 		protected abstract void ImplPush(Request request);
 
-		protected void CheckIfRunning()
+		private void CheckIfRunning()
 		{
 			if (Spider != null)
 			{

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using DotnetSpider.Core;
-using System.Threading;
-using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Redial;
 
 namespace DotnetSpider.Extension

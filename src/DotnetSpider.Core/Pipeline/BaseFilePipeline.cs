@@ -18,11 +18,6 @@ namespace DotnetSpider.Core.Pipeline
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		protected BaseFilePipeline() { }
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
 		/// <param name="interval">数据根目录与程序运行目录路径的相对值</param>
 		protected BaseFilePipeline(string interval)
 		{

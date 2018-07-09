@@ -9,10 +9,6 @@ namespace DotnetSpider.Core.Monitor
 	/// </summary>
 	public class HttpMonitor : LogMonitor
 	{
-		public HttpMonitor() 
-		{
-		}
-
 		/// <summary>
 		/// 上报爬虫状态
 		/// </summary>

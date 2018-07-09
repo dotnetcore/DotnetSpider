@@ -13,12 +13,12 @@ namespace DotnetSpider.Extension.Model.Formatter
 		/// <summary>
 		/// 正则表达式
 		/// </summary>
-		public string Pattern { get; set; }
+		public string Pattern ;
 
 		/// <summary>
 		/// The replacement string
 		/// </summary>
-		public string NewValue { get; set; }
+		public string NewValue;
 
 		/// <summary>
 		/// 实现数值的转化

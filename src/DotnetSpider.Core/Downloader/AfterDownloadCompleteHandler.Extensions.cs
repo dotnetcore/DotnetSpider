@@ -86,7 +86,7 @@ namespace DotnetSpider.Core.Downloader
 				throw new ArgumentException("interval should be large than 0.");
 			}
 
-			_cookieInjector = injector ?? throw new ArgumentNullException("CookieInjector should not be null.");
+			_cookieInjector = injector ?? throw new SpiderException($"{nameof(injector)} should not be null.");
 			_next = DateTime.Now.AddSeconds(_interval);
 			_interval = interval;
 		}

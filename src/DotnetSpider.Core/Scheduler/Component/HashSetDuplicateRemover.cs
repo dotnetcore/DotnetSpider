@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace DotnetSpider.Core.Scheduler.Component
 {
 	/// <summary>
-	/// 通过哈希去重
+	/// 閫氳繃鍝堝笇鍘婚噸
 	/// </summary>
 	public class HashSetDuplicateRemover : IDuplicateRemover
 	{

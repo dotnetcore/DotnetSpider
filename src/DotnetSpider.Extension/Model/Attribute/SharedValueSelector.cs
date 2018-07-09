@@ -1,5 +1,4 @@
 ﻿using System;
-using DotnetSpider.Core.Selector;
 
 namespace DotnetSpider.Extension.Model.Attribute
 {

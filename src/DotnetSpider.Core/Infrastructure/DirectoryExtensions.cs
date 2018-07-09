@@ -4,15 +4,15 @@ using System.IO;
 namespace DotnetSpider.Core.Infrastructure
 {
 	/// <summary>
-	/// ÎÄ¼ş¼ĞÀ©Õ¹
+	/// æ–‡ä»¶å¤¹æ‰©å±•
 	/// </summary>
 	public static class DirectoryExtension
 	{
 		/// <summary>
-		/// Èç¹ûÎÄ¼ş¼ĞÃ»ÓĞ´´½¨, Ôò°ïÖú´´½¨
+		/// å¦‚æœæ–‡ä»¶å¤¹æ²¡æœ‰åˆ›å»º, åˆ™å¸®åŠ©åˆ›å»º
 		/// </summary>
-		/// <param name="fullName">ÎÄ¼şÂ·¾¶</param>
-		/// <returns>ÎÄ¼ş¼ĞÂ·¾¶</returns>
+		/// <param name="fullName">æ–‡ä»¶è·¯å¾„</param>
+		/// <returns>æ–‡ä»¶å¤¹è·¯å¾„</returns>
 		public static string CheckAndMakeParentDirecotry(string fullName)
 		{
 			string path = Path.GetDirectoryName(fullName);
@@ -29,10 +29,10 @@ namespace DotnetSpider.Core.Infrastructure
 		}
 
 		/// <summary>
-		/// ¸´ÖÆÎÄ¼ş¼Ğ
+		/// å¤åˆ¶æ–‡ä»¶å¤¹
 		/// </summary>
-		/// <param name="source">±»¸´ÖÆµÄÎÄ¼ş¼Ğ</param>
-		/// <param name="destination">Ä¿±êÎÄ¼ş¼Ğ</param>
+		/// <param name="source">è¢«å¤åˆ¶çš„æ–‡ä»¶å¤¹</param>
+		/// <param name="destination">ç›®æ ‡æ–‡ä»¶å¤¹</param>
 		/// <returns></returns>
 		public static void CopyTo(this DirectoryInfo source, string destination)
 		{

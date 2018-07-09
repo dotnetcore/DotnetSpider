@@ -1,5 +1,4 @@
 ﻿using System;
-using DotnetSpider.Core;
 #if !NETSTANDARD
 using System.Web;
 #else

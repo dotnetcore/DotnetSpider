@@ -1,9 +1,7 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace DotnetSpider.Extension
@@ -89,7 +87,6 @@ namespace DotnetSpider.Extension
 		/// <summary>
 		/// 初始化队列
 		/// </summary>
-		/// <param name="arguments">运行参数</param>
 		protected override void ResetScheduler()
 		{
 			// 删除验证的锁, 让爬虫可以再次验证

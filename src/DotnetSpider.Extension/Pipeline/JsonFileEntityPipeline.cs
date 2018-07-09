@@ -37,6 +37,11 @@ namespace DotnetSpider.Extension.Pipeline
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		protected override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
+			if (datas == null || datas.Count() == 0)
+			{
+				return 0;
+			}
+
 			StreamWriter writer;
 			var dataFolder = Path.Combine(Env.BaseDirectory, "json", spider.Identity);
 			var jsonFile = Path.Combine(dataFolder, $"{model.TableInfo.FullName}.json");

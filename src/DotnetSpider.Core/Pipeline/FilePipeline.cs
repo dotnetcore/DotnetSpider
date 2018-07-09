@@ -7,29 +7,29 @@ using System.Text;
 namespace DotnetSpider.Core.Pipeline
 {
 	/// <summary>
-	/// ´æ´¢Êı¾İ½á¹ûµ½ÎÄ¼şÖĞ
+	/// å­˜å‚¨æ•°æ®ç»“æœåˆ°æ–‡ä»¶ä¸­
 	/// </summary>
 	public class FilePipeline : BaseFilePipeline
 	{
 		/// <summary>
-		/// Êı¾İÎÄ¼ş¼ĞµØÖ·Îª: {BaseDirecoty}/data/{Identity}
+		/// æ•°æ®æ–‡ä»¶å¤¹åœ°å€ä¸º: {BaseDirecoty}/data/{Identity}
 		/// </summary>
 		public FilePipeline() : base("file")
 		{
 		}
 
 		/// <summary>
-		/// Êı¾İÎÄ¼ş¼ĞµØÖ·Îª: {BaseDirecoty}/data/{interval}
+		/// æ•°æ®æ–‡ä»¶å¤¹åœ°å€ä¸º: {BaseDirecoty}/data/{interval}
 		/// </summary>
 		public FilePipeline(string interval) : base(interval)
 		{
 		}
 
 		/// <summary>
-		/// ´æ´¢Êı¾İ½á¹ûµ½ÎÄ¼şÖĞ
+		/// å­˜å‚¨æ•°æ®ç»“æœåˆ°æ–‡ä»¶ä¸­
 		/// </summary>
-		/// <param name="resultItems">Êı¾İ½á¹û</param>
-		/// <param name="spider">ÅÀ³æ</param>
+		/// <param name="resultItems">æ•°æ®ç»“æœ</param>
+		/// <param name="spider">çˆ¬è™«</param>
 		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			try

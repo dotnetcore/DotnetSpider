@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Infrastructure
 {
 	public class HubService
 	{
-		private static RetryPolicy RetryPolicy = Policy.Handle<Exception>().Retry(5, (ex, count) =>
+		private static readonly RetryPolicy RetryPolicy = Policy.Handle<Exception>().Retry(5, (ex, count) =>
 		{
 			Log.Logger.Error($"Submit http log failed [{count}]: {ex}");
 		});
@@ -28,7 +28,7 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				NetworkCenter.Current.Execute("status", () =>
 				{
-					HttpSender.Client.SendAsync(httpRequestMessage).Result.EnsureSuccessStatusCode();
+					HttpClientPool.HttpClient.SendAsync(httpRequestMessage).Result.EnsureSuccessStatusCode();
 				});
 			});
 		}

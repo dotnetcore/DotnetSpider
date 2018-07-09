@@ -1,15 +1,15 @@
 namespace DotnetSpider.Core.Processor
 {
 	/// <summary>
-	/// 页面解析器、抽取器
+	/// 椤甸潰瑙ｆ瀽鍣ㄣ�佹娊鍙栧櫒
 	/// </summary>
 	public interface IPageProcessor
 	{
 		/// <summary>
-		/// 解析数据结果, 解析目标链接
+		/// 瑙ｆ瀽鏁版嵁缁撴灉, 瑙ｆ瀽鐩爣閾炬帴
 		/// </summary>
-		/// <param name="page">页面数据</param>
-		/// <param name="spider">爬虫对象</param>
+		/// <param name="page">椤甸潰鏁版嵁</param>
+		/// <param name="spider">鐖櫕瀵硅薄</param>
 		void Process(Page page, ISpider spider);
 	}
 }

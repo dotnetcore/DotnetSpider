@@ -39,6 +39,7 @@ namespace DotnetSpider.Extension
 		/// <summary>
 		/// 构造方法
 		/// </summary>
+		/// <param name="name">名称</param>
 		/// <param name="site">目标站点信息</param>
 		public EntitySpider(string name, Site site) : base(site)
 		{
@@ -83,7 +84,6 @@ namespace DotnetSpider.Extension
 		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
 		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
 		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
-		/// <param name="tableName">爬虫实体在数据库中的表名, 此优先级高于EntitySelector中的定义</param>
 		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler dataHandler) where T : new()
 		{
 			CheckIfRunning();

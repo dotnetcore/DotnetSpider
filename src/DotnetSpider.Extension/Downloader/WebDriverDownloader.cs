@@ -27,10 +27,11 @@ namespace DotnetSpider.Extension.Downloader
 		private readonly Option _option;
 		private bool _isDisposed;
 		private readonly List<string> _domains = new List<string>();
+
 		/// <summary>
 		/// 每次navigate完成后, WebDriver 需要执行的操作
 		/// </summary>
-		public List<IWebDriverHandler> WebDriverHandlers { get; set; }
+		public List<IWebDriverHandler> WebDriverHandlers;
 
 		/// <summary>
 		/// 构造方法
@@ -39,7 +40,8 @@ namespace DotnetSpider.Extension.Downloader
 		/// <param name="domains">被采集链接的Domain, Cookie</param>
 		/// <param name="webDriverWaitTime">请求链接完成后需要等待的时间</param>
 		/// <param name="option">选项</param>
-		public WebDriverDownloader(Browser browser, string[] domains = null, int webDriverWaitTime = 200, Option option = null)
+		public WebDriverDownloader(Browser browser, string[] domains = null, int webDriverWaitTime = 200,
+			Option option = null)
 		{
 			_webDriverWaitTime = webDriverWaitTime;
 			_browser = browser;
@@ -66,6 +68,7 @@ namespace DotnetSpider.Extension.Downloader
 						{
 							WindowsFormUtil.SendMessage(maindHwnd, WindowsFormUtil.WmClose, 0, 0);
 						}
+
 						Thread.Sleep(500);
 					}
 				});
@@ -77,7 +80,9 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		/// <param name="browser">浏览器</param>
 		/// <param name="option">选项</param>
-		public WebDriverDownloader(Browser browser, Option option) : this(browser, null, 200, option) { }
+		public WebDriverDownloader(Browser browser, Option option) : this(browser, null, 200, option)
+		{
+		}
 
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -119,11 +124,11 @@ namespace DotnetSpider.Extension.Downloader
 
 						if (!_isLogined && CookieInjector != null)
 						{
-							var webdriverLoginHandler = CookieInjector as WebDriverLoginHandler;
-							if (webdriverLoginHandler != null)
+							if (CookieInjector is WebDriverLoginHandler webdriverLoginHandler)
 							{
 								webdriverLoginHandler.Driver = _webDriver as RemoteWebDriver;
 							}
+
 							CookieInjector.Inject(this, spider);
 							_isLogined = true;
 						}
@@ -137,9 +142,10 @@ namespace DotnetSpider.Extension.Downloader
 				//#endif
 				//				string realUrl = $"{uri.Scheme}://{uri.DnsSafeHost}{(uri.Port == 80 ? "" : ":" + uri.Port)}{uri.AbsolutePath}{query}";
 
-				var domainUrl = $"{request.Uri.Scheme}://{request.Uri.DnsSafeHost}{(request.Uri.Port == 80 ? "" : ":" + request.Uri.Port)}";
+//				var domainUrl =
+//					$"{request.Uri.Scheme}://{request.Uri.DnsSafeHost}{(request.Uri.Port == 80 ? "" : ":" + request.Uri.Port)}";
 
-				string realUrl = request.Url.ToString();
+				string realUrl = request.Url ;
 
 				NetworkCenter.Current.Execute("webdriver-download", () =>
 				{
@@ -149,7 +155,7 @@ namespace DotnetSpider.Extension.Downloader
 					{
 						foreach (var handler in WebDriverHandlers)
 						{
-							handler.Handle((RemoteWebDriver)_webDriver);
+							handler.Handle((RemoteWebDriver) _webDriver);
 						}
 					}
 				});
@@ -166,18 +172,19 @@ namespace DotnetSpider.Extension.Downloader
 			}
 			catch (DownloadException de)
 			{
-				Page page = new Page(request) { Exception = de };
+				Page page = new Page(request) {Exception = de};
 				if (site.CycleRetryTimes > 0)
 				{
 					page = site.AddToCycleRetry(request);
 				}
+
 				spider.Logger.Error($"下载 {request.Url} 失败: {de.Message}.");
 				return Task.FromResult(page);
 			}
 			catch (Exception e)
 			{
 				spider.Logger.Error($"下载 {request.Url} 失败: {e.Message}.");
-				Page page = new Page(request) { Exception = e };
+				Page page = new Page(request) {Exception = e};
 				return Task.FromResult(page);
 			}
 		}
@@ -193,6 +200,7 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				_domains.Add(cookie.Domain);
 			}
+
 			_webDriver?.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
 		}
 	}

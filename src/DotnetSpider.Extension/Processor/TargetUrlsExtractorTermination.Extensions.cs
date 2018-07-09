@@ -15,17 +15,17 @@ namespace DotnetSpider.Extension.Processor
 		/// <summary>
 		/// 取得总页数的元素选择器
 		/// </summary>
-		public Selector TotalPageSelector { get; set; }
+		public Selector TotalPageSelector;
 
 		/// <summary>
 		/// 对总页数的格式化
 		/// </summary>
-		public Formatter[] TotalPageFormatters { get; set; }
+		public Formatter[] TotalPageFormatters;
 
 		/// <summary>
 		/// 取得当前页的元素选择器
 		/// </summary>
-		public Selector CurrenctPageSelector { get; set; }
+		public Selector CurrenctPageSelector;
 
 		/// <summary>
 		/// 对当前页的格式化
@@ -43,10 +43,12 @@ namespace DotnetSpider.Extension.Processor
 			{
 				throw new SpiderException("Total page selector or current page selector should not be null");
 			}
+
 			if (string.IsNullOrEmpty(page?.Content))
 			{
 				return false;
 			}
+
 			var totalStr = GetSelectorValue(page, TotalPageSelector);
 			var currentStr = GetSelectorValue(page, CurrenctPageSelector);
 

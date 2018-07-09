@@ -1,11 +1,11 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Selector;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 #if NETSTANDARD
 using System.Net;
+
 #endif
 
 namespace DotnetSpider.Core.Processor
@@ -15,7 +15,8 @@ namespace DotnetSpider.Core.Processor
 	/// </summary>
 	public sealed class RegionAndPatternTargetUrlsExtractor : TargetUrlsExtractor
 	{
-		private readonly Dictionary<ISelector, List<Regex>> _regionSelectorMapPatterns = new Dictionary<ISelector, List<Regex>>();
+		private readonly Dictionary<ISelector, List<Regex>> _regionSelectorMapPatterns =
+			new Dictionary<ISelector, List<Regex>>();
 
 		private static readonly ISelector ImageSelector = Selectors.XPath(".//img/@src");
 
@@ -56,17 +57,15 @@ namespace DotnetSpider.Core.Processor
 				{
 					continue;
 				}
-				IEnumerable<string> links = null;
+
+				List<string> links = null;
 				if (page.ContentType == ContentType.Html)
 				{
-					links = page.Selectable.SelectList(targetUrlExtractor.Key).Links().GetValues();
+					links = new List<string>(page.Selectable.SelectList(targetUrlExtractor.Key).Links().GetValues());
 				}
 				else if (page.ContentType == ContentType.Json)
 				{
-					links = page.Selectable.SelectList(Selectors.Regex(RegexUtil.Url)).Links().GetValues();
-				}
-				else
-				{
+					links = new List<string>(page.Selectable.SelectList(Selectors.Regex(RegexUtil.Url)).Links().GetValues());
 				}
 
 				if (links == null)
@@ -85,6 +84,7 @@ namespace DotnetSpider.Core.Processor
 					tmp.Add(WebUtility.HtmlDecode(WebUtility.UrlDecode(newUrl)));
 #endif
 				}
+
 				links = tmp;
 
 				if (targetUrlExtractor.Value == null || targetUrlExtractor.Value.Count == 0)
@@ -111,6 +111,7 @@ namespace DotnetSpider.Core.Processor
 									}
 								}
 							}
+
 							if (isRequired)
 							{
 								resultUrls.Add(link);
@@ -122,9 +123,9 @@ namespace DotnetSpider.Core.Processor
 
 			if (site.DownloadFiles)
 			{
-				var links = (page.Selectable.SelectList(ImageSelector)).GetValues();
+				var links = new List<string>(page.Selectable.SelectList(ImageSelector).GetValues());
 
-				if (links != null && links.Count() > 0)
+				if (links.Count > 0)
 				{
 					foreach (string link in links)
 					{
@@ -140,16 +141,16 @@ namespace DotnetSpider.Core.Processor
 								}
 							}
 						}
+
 						if (isRequired)
 						{
 							resultUrls.Add(link);
 						}
 					}
 				}
-
 			}
 
-			return resultUrls.Select(t => new Request(t, page.Request.Extras) { Site = site });
+			return resultUrls.Select(t => new Request(t, page.Request.Extras) {Site = site});
 		}
 
 		/// <summary>
@@ -161,14 +162,15 @@ namespace DotnetSpider.Core.Processor
 		{
 			if (patterns == null || patterns.Length == 0)
 			{
-				throw new ArgumentNullException("Patterns should not be null or empty.");
+				throw new SpiderException("Patterns should not be null or empty.");
 			}
 
-			var validPatterns = patterns.Where(p => p != null && !string.IsNullOrWhiteSpace(p.Trim())).Select(p => p.Trim()).ToList();
+			var validPatterns = patterns.Where(p => p != null && !string.IsNullOrWhiteSpace(p.Trim())).Select(p => p.Trim())
+				.ToList();
 
 			if (validPatterns.Count != patterns.Length)
 			{
-				throw new ArgumentNullException("Pattern value should not be null or empty.");
+				throw new SpiderException("Pattern value should not be null or empty.");
 			}
 
 			ISelector selector = Selectors.Default();
@@ -178,21 +180,24 @@ namespace DotnetSpider.Core.Processor
 				selector = Selectors.XPath(xpath);
 			}
 
-			if (selector != null && !_regionSelectorMapPatterns.ContainsKey(selector))
+			if (!_regionSelectorMapPatterns.ContainsKey(selector))
 			{
 				_regionSelectorMapPatterns.Add(selector, new List<Regex>());
 			}
+
 			var oldPatterns = _regionSelectorMapPatterns[selector];
 			// 如果已经有正则为空, 即表示当前区域内所有的URL都是目标链接, 则无需再校验其它正则了
 			if (oldPatterns.Contains(null))
 			{
 				return;
 			}
+
 			// 如果不提供正则表达式, 表示当前区域内所有的URL都是目标链接
 			if (validPatterns.Count == 0)
 			{
 				oldPatterns.Add(null);
 			}
+
 			foreach (var pattern in validPatterns)
 			{
 				if (oldPatterns.All(p => p.ToString() != pattern))
@@ -215,6 +220,7 @@ namespace DotnetSpider.Core.Processor
 			{
 				selector = Selectors.XPath(region);
 			}
+
 			return _regionSelectorMapPatterns.ContainsKey(selector);
 		}
 
@@ -301,7 +307,8 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="paginationStr">URL中分页的部分, 如: www.a.com/content_1.html, 则可以填此值为 content_1.html, tent_1.html等, 框架会把数据部分改成\d+用于正则匹配截取</param>
 		/// <param name="interval">每次自增的间隔</param>
 		/// <param name="termination">中止器, 用于判断是否已到最后一个需要采集的链接</param>
-		public AutoIncrementTargetUrlsExtractor(string paginationStr, int interval = 1, ITargetUrlsExtractorTermination termination = null) : base(paginationStr, termination)
+		public AutoIncrementTargetUrlsExtractor(string paginationStr, int interval = 1,
+			ITargetUrlsExtractorTermination termination = null) : base(paginationStr, termination)
 		{
 			_interval = interval;
 		}
@@ -320,7 +327,7 @@ namespace DotnetSpider.Core.Processor
 			{
 				var next = RegexUtil.Number.Replace(PaginationStr, (currentPage + _interval).ToString());
 				string newUrl = page.Request.Url.Replace(currentPageStr, next);
-				return new Request[] { new Request(newUrl, page.Request.Extras) { Site = site } };
+				return new[] {new Request(newUrl, page.Request.Extras) {Site = site}};
 			}
 
 			return new Request[0];

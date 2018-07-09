@@ -14,14 +14,19 @@ namespace DotnetSpider.Extension.Pipeline
 	public class ConsoleEntityPipeline : ModelPipeline
 	{
 		/// <summary>
-		/// ´òÓ¡ÅÀ³æÊµÌå½âÎöÆ÷½âÎöµ½µÄÊµÌåÊı¾İ½á¹ûµ½¿ØÖÆÌ¨
+		/// æ‰“å°çˆ¬è™«å®ä½“è§£æå™¨è§£æåˆ°çš„å®ä½“æ•°æ®ç»“æœåˆ°æ§åˆ¶å°
 		/// </summary>
-		/// <param name="model">ÅÀ³æÊµÌåÀàµÄÃû³Æ</param>
-		/// <param name="datas">ÊµÌåÀàÊı¾İ</param>
-		/// <param name="spider">ÅÀ³æ</param>
-		/// <returns>×îÖÕÓ°Ïì½á¹ûÊıÁ¿(ÈçÊı¾İ¿âÓ°ÏìĞĞÊı)</returns>
+		/// <param name="model">çˆ¬è™«å®ä½“ç±»çš„åç§°</param>
+		/// <param name="datas">å®ä½“ç±»æ•°æ®</param>
+		/// <param name="spider">çˆ¬è™«</param>
+		/// <returns>æœ€ç»ˆå½±å“ç»“æœæ•°é‡(å¦‚æ•°æ®åº“å½±å“è¡Œæ•°)</returns>
 		protected override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
 		{
+			if (datas == null || datas.Count() == 0)
+			{
+				return 0;
+			}
+
 			foreach (var data in datas)
 			{
 				Console.WriteLine($"Store: {JsonConvert.SerializeObject(data)}");

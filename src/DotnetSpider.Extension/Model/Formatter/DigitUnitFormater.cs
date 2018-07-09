@@ -9,11 +9,11 @@ namespace DotnetSpider.Extension.Model.Formatter
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class DigitUnitFormater : Formatter
 	{
-		private const string _unitStringForShi = "十";
-		private const string _unitStringForBai = "百";
-		private const string _unitStringForQian = "千";
-		private const string _unitStringForWan = "万";
-		private const string _unitStringForYi = "亿";
+		private const string UnitStringForShi = "十";
+		private const string UnitStringForBai = "百";
+		private const string UnitStringForQian = "千";
+		private const string UnitStringForWan = "万";
+		private const string UnitStringForYi = "亿";
 
 		/// <summary>
 		/// 数字格式化模版
@@ -29,27 +29,27 @@ namespace DotnetSpider.Extension.Model.Formatter
 		{
 			var tmp = value.ToString();
 			decimal num = decimal.Parse(RegexUtil.Decimal.Match(tmp).ToString());
-			if (tmp.EndsWith(_unitStringForShi))
+			if (tmp.EndsWith(UnitStringForShi))
 			{
 				num = num * 10;
 			}
-			else if (tmp.EndsWith(_unitStringForBai))
+			else if (tmp.EndsWith(UnitStringForBai))
 			{
 				num = num * 100;
 			}
-			else if (tmp.EndsWith(_unitStringForBai))
+			else if (tmp.EndsWith(UnitStringForBai))
 			{
 				num = num * 100;
 			}
-			else if (tmp.EndsWith(_unitStringForQian))
+			else if (tmp.EndsWith(UnitStringForQian))
 			{
 				num = num * 1000;
 			}
-			else if (tmp.EndsWith(_unitStringForWan))
+			else if (tmp.EndsWith(UnitStringForWan))
 			{
 				num = num * 10000;
 			}
-			else if (tmp.EndsWith(_unitStringForYi))
+			else if (tmp.EndsWith(UnitStringForYi))
 			{
 				num = num * 100000000;
 			}

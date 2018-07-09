@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace DotnetSpider.Core.Selector
 {
 	/// <summary>
-	/// ²éÑ¯Æ÷µÄ¹¹½¨°ïÖúÀà, ÏàÍ¬µÄ²éÑ¯Æ÷»á»º´æÆğÀ´.
+	/// æŸ¥è¯¢å™¨çš„æ„å»ºå¸®åŠ©ç±», ç›¸åŒçš„æŸ¥è¯¢å™¨ä¼šç¼“å­˜èµ·æ¥.
 	/// </summary>
 	public class Selectors
 	{
@@ -12,10 +12,10 @@ namespace DotnetSpider.Core.Selector
 		private static readonly DefaultSelector DefaultSelector = new DefaultSelector();
 
 		/// <summary>
-		/// ´´½¨ÕıÔò²éÑ¯Æ÷
+		/// åˆ›å»ºæ­£åˆ™æŸ¥è¯¢å™¨
 		/// </summary>
-		/// <param name="expr">ÕıÔò±í´ïÊ½</param>
-		/// <returns>²éÑ¯Æ÷</returns>
+		/// <param name="expr">æ­£åˆ™è¡¨è¾¾å¼</param>
+		/// <returns>æŸ¥è¯¢å™¨</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public static ISelector Regex(string expr)
 		{
@@ -28,11 +28,11 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// ´´½¨ÕıÔò²éÑ¯Æ÷
+		/// åˆ›å»ºæ­£åˆ™æŸ¥è¯¢å™¨
 		/// </summary>
-		/// <param name="expr">ÕıÔò±í´ïÊ½</param>
+		/// <param name="expr">æ­£åˆ™è¡¨è¾¾å¼</param>
 		/// <param name="group"></param>
-		/// <returns>²éÑ¯Æ÷</returns>
+		/// <returns>æŸ¥è¯¢å™¨</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public static ISelector Regex(string expr, int group)
 		{
@@ -45,10 +45,10 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// ´´½¨Css²éÑ¯Æ÷
+		/// åˆ›å»ºCssæŸ¥è¯¢å™¨
 		/// </summary>
-		/// <param name="expr">Css±í´ïÊ½</param>
-		/// <returns>²éÑ¯Æ÷</returns>
+		/// <param name="expr">Cssè¡¨è¾¾å¼</param>
+		/// <returns>æŸ¥è¯¢å™¨</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public static ISelector Css(string expr)
 		{
@@ -61,11 +61,11 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// ´´½¨Css²éÑ¯Æ÷
+		/// åˆ›å»ºCssæŸ¥è¯¢å™¨
 		/// </summary>
-		/// <param name="expr">Css±í´ïÊ½</param>
-		/// <param name="attrName">ÊôĞÔÃû³Æ</param>
-		/// <returns>²éÑ¯Æ÷</returns>
+		/// <param name="expr">Cssè¡¨è¾¾å¼</param>
+		/// <param name="attrName">å±æ€§åç§°</param>
+		/// <returns>æŸ¥è¯¢å™¨</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public static ISelector Css(string expr, string attrName)
 		{
@@ -78,10 +78,10 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// ´´½¨XPath²éÑ¯Æ÷
+		/// åˆ›å»ºXPathæŸ¥è¯¢å™¨
 		/// </summary>
-		/// <param name="expr">Xpath±í´ïÊ½</param>
-		/// <returns>²éÑ¯Æ÷</returns>
+		/// <param name="expr">Xpathè¡¨è¾¾å¼</param>
+		/// <returns>æŸ¥è¯¢å™¨</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public static ISelector XPath(string expr)
 		{
@@ -94,19 +94,19 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		///  ´´½¨¿Õ²éÑ¯Æ÷
+		///  åˆ›å»ºç©ºæŸ¥è¯¢å™¨
 		/// </summary>
-		/// <returns>²éÑ¯Æ÷</returns>
+		/// <returns>æŸ¥è¯¢å™¨</returns>
 		public static ISelector Default()
 		{
 			return DefaultSelector;
 		}
 
 		/// <summary>
-		/// ´´½¨»·¾³±äÁ¿Öµ²éÑ¯Æ÷
+		/// åˆ›å»ºç¯å¢ƒå˜é‡å€¼æŸ¥è¯¢å™¨
 		/// </summary>
-		/// <param name="expr">¼üÖµ</param>
-		/// <returns>²éÑ¯Æ÷</returns>
+		/// <param name="expr">é”®å€¼</param>
+		/// <returns>æŸ¥è¯¢å™¨</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public static ISelector Enviroment(string expr)
 		{
@@ -119,10 +119,10 @@ namespace DotnetSpider.Core.Selector
 		}
 
 		/// <summary>
-		/// ´´½¨JsonPath²éÑ¯Æ÷
+		/// åˆ›å»ºJsonPathæŸ¥è¯¢å™¨
 		/// </summary>
-		/// <param name="expr">JsonPath±í´ïÊ½</param>
-		/// <returns>²éÑ¯Æ÷</returns>
+		/// <param name="expr">JsonPathè¡¨è¾¾å¼</param>
+		/// <returns>æŸ¥è¯¢å™¨</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public static ISelector JsonPath(string expr)
 		{

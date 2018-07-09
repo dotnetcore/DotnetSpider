@@ -7,6 +7,7 @@ using DotnetSpider.Core.Infrastructure;
 using CommandLine;
 #if NETSTANDARD
 using System.Text;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 #endif
 
 namespace DotnetSpider.Core
@@ -78,7 +79,7 @@ namespace DotnetSpider.Core
 
 					var runMethod = spiderTypes[spiderName].GetMethod("Run");
 
-					runMethod.Invoke(spider, new object[] { options.Arguments });
+					if (runMethod != null) runMethod.Invoke(spider, new object[] {options.Arguments});
 				}
 			}
 		}
@@ -90,7 +91,7 @@ namespace DotnetSpider.Core
 			foreach (var arg in args)
 			{
 				var array = arg.Split(':').Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t.Trim()).ToList();
-				if (array.Count() == 1)
+				if (array.Count == 1)
 				{
 					array.Add("");
 				}
@@ -107,19 +108,11 @@ namespace DotnetSpider.Core
 			var result = parser.ParseArguments<Options>(arguments);
 			if (result.Tag == ParserResultType.Parsed)
 			{
-				var parsed = result as Parsed<Options>;
-				return parsed.Value;
+				if (result is Parsed<Options> parsed) return parsed.Value;
 			}
-			else
-			{
-				return null;
-			}
+			return null;
 		}
 
-		/// <summary>
-		/// 加载环境变量
-		/// </summary>
-		/// <param name="arguments">运行参数</param>
 		public static void LoadConfiguration(string config)
 		{
 			if (!string.IsNullOrWhiteSpace(config))
@@ -216,7 +209,7 @@ namespace DotnetSpider.Core
 		/// 反射爬虫对象
 		/// </summary>
 		/// <param name="spiderName">名称</param>
-		/// <param name="arguments">运行参数</param>
+		/// <param name="options">运行参数</param>
 		/// <param name="spiderTypes">所有的爬虫类型</param>
 		/// <returns>爬虫对象</returns>
 		public static object CreateSpiderInstance(string spiderName, Options options, Dictionary<string, Type> spiderTypes)

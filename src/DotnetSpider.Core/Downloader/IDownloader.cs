@@ -9,7 +9,7 @@ namespace DotnetSpider.Core.Downloader
 	/// Downloader interface
 	/// </summary>
 	/// <summary xml:lang="zh-CN">
-	/// ÏÂÔØÆ÷½Ó¿Ú
+	/// ä¸‹è½½å™¨æ¥å£
 	/// </summary>
 	public interface IDownloader : IDisposable
 	{
@@ -17,18 +17,18 @@ namespace DotnetSpider.Core.Downloader
 		/// Download content from a web url
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
-		/// ÏÂÔØÁ´½ÓÄÚÈİ
+		/// ä¸‹è½½é“¾æ¥å†…å®¹
 		/// </summary>
-		/// <param name="request">Á´½ÓÇëÇó <see cref="Request"/></param>
-		/// <param name="spider">ÅÀ³æ½Ó¿Ú <see cref="ISpider"/></param>
-		/// <returns>ÏÂÔØÄÚÈİ·â×°ºÃµÄÒ³Ãæ¶ÔÏó <see cref="Page"/></returns>
+		/// <param name="request">é“¾æ¥è¯·æ±‚ <see cref="Request"/></param>
+		/// <param name="spider">çˆ¬è™«æ¥å£ <see cref="ISpider"/></param>
+		/// <returns>ä¸‹è½½å†…å®¹å°è£…å¥½çš„é¡µé¢å¯¹è±¡ <see cref="Page"/></returns>
 		Task<Page> Download(Request request, ISpider spider);
 
 		/// <summary>
 		/// Add handlers for post-processing.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
-		/// Ìí¼ÓÏÂÔØÍê³ÉºóµÄºóĞø´¦Àí²Ù×÷
+		/// æ·»åŠ ä¸‹è½½å®Œæˆåçš„åç»­å¤„ç†æ“ä½œ
 		/// </summary>
 		/// <param name="handler"><see cref="IAfterDownloadCompleteHandler"/></param>
 		void AddAfterDownloadCompleteHandler(IAfterDownloadCompleteHandler handler);
@@ -37,7 +37,7 @@ namespace DotnetSpider.Core.Downloader
 		/// Add handlers for pre-processing.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
-		/// Ìí¼ÓÏÂÔØ²Ù×÷Ç°µÄ´¦Àí²Ù×÷
+		/// æ·»åŠ ä¸‹è½½æ“ä½œå‰çš„å¤„ç†æ“ä½œ
 		/// </summary>
 		/// <param name="handler"><see cref="IBeforeDownloadHandler"/></param>
 		void AddBeforeDownloadHandler(IBeforeDownloadHandler handler);
@@ -46,7 +46,7 @@ namespace DotnetSpider.Core.Downloader
 		/// Add cookies.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
-		/// ÉèÖÃ Cookie
+		/// è®¾ç½® Cookie
 		/// </summary>
 		/// <param name="cookie">Cookie <see cref="Cookie"/></param>
 		void AddCookie(Cookie cookie);
@@ -55,41 +55,41 @@ namespace DotnetSpider.Core.Downloader
 		/// Add cookies.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
-		/// ÉèÖÃ Cookie
+		/// è®¾ç½® Cookie
 		/// </summary>
-		/// <param name="name">Ãû³Æ(<see cref="Cookie.Name"/>)</param>
-		/// <param name="value">Öµ(<see cref="Cookie.Value"/>)</param>
-		/// <param name="domain">×÷ÓÃÓò(<see cref="Cookie.Domain"/>)</param>
-		/// <param name="path">×÷ÓÃÂ·¾¶(<see cref="Cookie.Path"/>)</param>
+		/// <param name="name">åç§°(<see cref="Cookie.Name"/>)</param>
+		/// <param name="value">å€¼(<see cref="Cookie.Value"/>)</param>
+		/// <param name="domain">ä½œç”¨åŸŸ(<see cref="Cookie.Domain"/>)</param>
+		/// <param name="path">ä½œç”¨è·¯å¾„(<see cref="Cookie.Path"/>)</param>
 		void AddCookie(string name, string value, string domain, string path = "/");
 
 		/// <summary>
 		/// Add cookies to downloader
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
-		/// Ìí¼ÓCookies
+		/// æ·»åŠ Cookies
 		/// </summary>
-		/// <param name="cookies">CookiesµÄ¼üÖµ¶Ô (Cookie's key-value pairs)</param>
-		/// <param name="domain">×÷ÓÃÓò(<see cref="Cookie.Domain"/>)</param>
-		/// <param name="path">×÷ÓÃÂ·¾¶(<see cref="Cookie.Path"/>)</param>
+		/// <param name="cookies">Cookiesçš„é”®å€¼å¯¹ (Cookie's key-value pairs)</param>
+		/// <param name="domain">ä½œç”¨åŸŸ(<see cref="Cookie.Domain"/>)</param>
+		/// <param name="path">ä½œç”¨è·¯å¾„(<see cref="Cookie.Path"/>)</param>
 		void AddCookies(IDictionary<string, string> cookies, string domain, string path = "/");
 
 		/// <summary>
 		/// Add cookies to downloader
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
-		/// ÉèÖÃ Cookies
+		/// è®¾ç½® Cookies
 		/// </summary>
-		/// <param name="cookiesStr">CookiesµÄ¼üÖµ¶Ô×Ö·û´®, Èç: a1=b;a2=c;(Cookie's key-value pairs string, a1=b;a2=c; etc.)</param>
-		/// <param name="domain">×÷ÓÃÓò(<see cref="Cookie.Domain"/>)</param>
-		/// <param name="path">×÷ÓÃÂ·¾¶(<see cref="Cookie.Path"/>)</param>
+		/// <param name="cookiesStr">Cookiesçš„é”®å€¼å¯¹å­—ç¬¦ä¸², å¦‚: a1=b;a2=c;(Cookie's key-value pairs string, a1=b;a2=c; etc.)</param>
+		/// <param name="domain">ä½œç”¨åŸŸ(<see cref="Cookie.Domain"/>)</param>
+		/// <param name="path">ä½œç”¨è·¯å¾„(<see cref="Cookie.Path"/>)</param>
 		void AddCookies(string cookiesStr, string domain, string path = "/");
 
 		/// <summary>
 		/// Cookie Injector.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
-		/// Cookie ×¢ÈëÆ÷
+		/// Cookie æ³¨å…¥å™¨
 		/// </summary>
 		ICookieInjector CookieInjector { get; set; }
 
@@ -97,9 +97,9 @@ namespace DotnetSpider.Core.Downloader
 		/// Clone a Downloader throuth <see cref="object.MemberwiseClone"/>, override if you need a deep clone or others. 
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
-		/// ¿ËÂ¡Ò»¸öÏÂÔØÆ÷, ¶àÏß³ÌÊ±, Ã¿¸öÏß³ÌÊ¹ÓÃÒ»¸öÏÂÔØÆ÷¶ÔÏó, ÕâÑùÈçWebDriverÏÂÔØÆ÷Ôò²»ÔÙĞèÒª¹ÜÀíWebDriver¶ÔÏóµÄ¸öÊıÁË, Ã¿¸öÏÂÔØÆ÷¾ÍÖ»°üº¬Ò»¸öWebDriver
+		/// å…‹éš†ä¸€ä¸ªä¸‹è½½å™¨, å¤šçº¿ç¨‹æ—¶, æ¯ä¸ªçº¿ç¨‹ä½¿ç”¨ä¸€ä¸ªä¸‹è½½å™¨å¯¹è±¡, è¿™æ ·å¦‚WebDriverä¸‹è½½å™¨åˆ™ä¸å†éœ€è¦ç®¡ç†WebDriverå¯¹è±¡çš„ä¸ªæ•°äº†, æ¯ä¸ªä¸‹è½½å™¨å°±åªåŒ…å«ä¸€ä¸ªWebDriver
 		/// </summary>
-		/// <returns>ÏÂÔØÆ÷</returns>
+		/// <returns>ä¸‹è½½å™¨</returns>
 		IDownloader Clone();
 
 		/// <summary>

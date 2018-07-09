@@ -21,7 +21,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 		/// <returns>被格式化后的数值</returns>
 		protected override object FormateValue(object value)
 		{
-			return string.Format(Format, value.ToString());
+			return string.Format(Format, value);
 		}
 
 		/// <summary>

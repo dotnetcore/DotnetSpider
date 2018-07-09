@@ -22,13 +22,6 @@ namespace DotnetSpider.Extension.Downloader
 		public RemoteWebDriver Driver { get; set; }
 
 		/// <summary>
-		/// 构造方法
-		/// </summary>
-		public WebDriverLoginHandler()
-		{
-		}
-
-		/// <summary>
 		/// 取得所有Cookie
 		/// </summary>
 		/// <param name="spider">爬虫</param>
@@ -50,10 +43,12 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				return;
 			}
+
 			if (!CheckFrequency())
 			{
 				return;
 			}
+
 			spider.Pause(() =>
 			{
 				Login();
@@ -76,32 +71,32 @@ namespace DotnetSpider.Extension.Downloader
 		/// <summary>
 		/// 登陆的链接
 		/// </summary>
-		public string Url { get; set; }
+		public string Url;
 
 		/// <summary>
 		/// 用户名在网页中的元素选择器
 		/// </summary>
-		public Selector UserSelector { get; set; }
+		public Selector UserSelector;
 
 		/// <summary>
 		/// 用户名
 		/// </summary>
-		public string User { get; set; }
+		public string User;
 
 		/// <summary>
 		/// 密码在网页中的元素选择器
 		/// </summary>
-		public Selector PasswordSelector { get; set; }
+		public Selector PasswordSelector;
 
 		/// <summary>
 		/// 密码
 		/// </summary>
-		public string Password { get; set; }
+		public string Password;
 
 		/// <summary>
 		/// 登陆按钮的元素选择器
 		/// </summary>
-		public Selector SubmitSelector { get; set; }
+		public Selector SubmitSelector;
 
 		/// <summary>
 		/// 登录操作的实现
@@ -141,16 +136,16 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			switch (element.Type)
 			{
-
 				case SelectorType.XPath:
-					{
-						return webDriver.FindElementByXPath(element.Expression);
-					}
+				{
+					return webDriver.FindElementByXPath(element.Expression);
+				}
 				case SelectorType.Css:
-					{
-						return webDriver.FindElementByCssSelector(element.Expression);
-					}
+				{
+					return webDriver.FindElementByCssSelector(element.Expression);
+				}
 			}
+
 			throw new SpiderException("Unsport findy: " + element.Type);
 		}
 	}
@@ -187,6 +182,7 @@ namespace DotnetSpider.Extension.Downloader
 				{
 					Thread.Sleep(1000);
 				}
+
 				return true;
 			}
 			catch (Exception)

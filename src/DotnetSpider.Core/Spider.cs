@@ -14,7 +14,6 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Redial;
 using DotnetSpider.Core.Scheduler;
 using System.Runtime.CompilerServices;
-using System.Reflection;
 using Polly;
 using Polly.Retry;
 using System.IO.MemoryMappedFiles;
@@ -25,9 +24,10 @@ using Serilog;
 [assembly: InternalsVisibleTo("DotnetSpider.Sample")]
 [assembly: InternalsVisibleTo("DotnetSpider.Extension")]
 [assembly: InternalsVisibleTo("DotnetSpider.Extension.Test")]
+
 namespace DotnetSpider.Core
 {
-	public class SpiderArguments
+	public static class SpiderArguments
 	{
 		/// <summary>
 		/// 只运行到InitComponent, 不真正的运行爬虫, 用于测试加载
@@ -58,8 +58,8 @@ namespace DotnetSpider.Core
 		private Site _site = new Site();
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
 		private IDownloader _downloader = new HttpClientDownloader();
-		protected readonly List<IPipeline> _pipelines = new List<IPipeline>();
-		protected readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
+		private readonly List<IPipeline> _pipelines = new List<IPipeline>();
+		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
 		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
 		private bool _inited;
@@ -112,7 +112,9 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 数据验证和生成报告
 		/// </summary>
-		protected virtual void OnVerifyDataOrGenerateReport() { }
+		protected virtual void OnVerifyDataOrGenerateReport()
+		{
+		}
 
 		protected virtual void AfterVerifyDataOrGenerateReport()
 		{
@@ -159,10 +161,7 @@ namespace DotnetSpider.Core
 		public Site Site
 		{
 			get => _site;
-			protected set
-			{
-				_site = value ?? throw new ArgumentException($"{nameof(Site)} should not be null.");
-			}
+			protected set { _site = value ?? throw new ArgumentException($"{nameof(Site)} should not be null."); }
 		}
 
 		/// <summary>
@@ -248,10 +247,12 @@ namespace DotnetSpider.Core
 				{
 					throw new ArgumentException($"{nameof(StatusFlushInterval)} should greater than 2000.");
 				}
+
 				if (value > 60000)
 				{
 					throw new ArgumentException($"{nameof(StatusFlushInterval)} should less than 60000.");
 				}
+
 				_statusFlushInterval = value;
 			}
 		}
@@ -301,6 +302,7 @@ namespace DotnetSpider.Core
 				{
 					throw new ArgumentException($"{nameof(PipelineCachedSize)} should be greater than 0.");
 				}
+
 				_pipelineCachedSize = value;
 			}
 		}
@@ -308,7 +310,8 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Start url builders of spider.
 		/// </summary>
-		public IReadOnlyCollection<IStartUrlsBuilder> StartUrlBuilders => new ReadOnlyEnumerable<IStartUrlsBuilder>(_startUrlsBuilders);
+		public IReadOnlyCollection<IStartUrlsBuilder> StartUrlBuilders =>
+			new ReadOnlyEnumerable<IStartUrlsBuilder>(_startUrlsBuilders);
 
 		/// <summary>
 		/// Interface used to adsl redial.
@@ -438,7 +441,8 @@ namespace DotnetSpider.Core
 		/// <param name="scheduler">调度队列</param>
 		/// <param name="pageProcessors">页面解析器</param>
 		/// <param name="pipelines">数据管道</param>
-		public Spider(Site site, string identity, IScheduler scheduler, IEnumerable<IPageProcessor> pageProcessors, IEnumerable<IPipeline> pipelines)
+		public Spider(Site site, string identity, IScheduler scheduler, IEnumerable<IPageProcessor> pageProcessors,
+			IEnumerable<IPipeline> pipelines)
 		{
 #if NETSTANDARD
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -449,11 +453,12 @@ namespace DotnetSpider.Core
 			Identity = identity;
 			Scheduler = scheduler;
 
-			if (pageProcessors != null && pageProcessors.Count() > 0)
+			if (pageProcessors != null)
 			{
 				_pageProcessors.AddRange(pageProcessors);
 			}
-			if (pipelines != null && pipelines.Count() > 0)
+
+			if (pipelines != null)
 			{
 				_pipelines.AddRange(pipelines);
 			}
@@ -510,6 +515,7 @@ namespace DotnetSpider.Core
 			{
 				throw new ArgumentNullException($"{nameof(builder)} should not be null.");
 			}
+
 			CheckIfRunning();
 			_startUrlsBuilders.Add(builder);
 			return this;
@@ -519,7 +525,6 @@ namespace DotnetSpider.Core
 		/// Add a url to spider.
 		/// </summary>
 		/// <param name="url">链接</param>
-		/// <param name="extras">Extra properties of request.</param>
 		/// <returns></returns>
 		public Spider AddStartUrl(string url)
 		{
@@ -549,6 +554,7 @@ namespace DotnetSpider.Core
 			{
 				throw new ArgumentNullException($"{nameof(urls)} should not be null.");
 			}
+
 			return AddStartUrls(urls.AsEnumerable());
 		}
 
@@ -563,6 +569,7 @@ namespace DotnetSpider.Core
 			{
 				throw new ArgumentNullException($"{nameof(urls)} should not be null.");
 			}
+
 			CheckIfRunning();
 			Site.AddStartUrls(urls);
 			return this;
@@ -589,6 +596,7 @@ namespace DotnetSpider.Core
 			{
 				throw new ArgumentNullException($"{nameof(requests)} should not be null.");
 			}
+
 			return AddStartRequests(requests.AsEnumerable());
 		}
 
@@ -603,6 +611,7 @@ namespace DotnetSpider.Core
 			{
 				throw new ArgumentNullException($"{nameof(requests)} should not be null.");
 			}
+
 			CheckIfRunning();
 			Site.AddStartRequests(requests);
 			return this;
@@ -611,7 +620,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Add a page processor to spider.
 		/// </summary>
-		/// <param name="processors">页面解析器</param>
+		/// <param name="processor">页面解析器</param>
 		/// <returns>爬虫</returns>
 		public virtual Spider AddPageProcessor(IPageProcessor processor)
 		{
@@ -629,6 +638,7 @@ namespace DotnetSpider.Core
 			{
 				throw new ArgumentNullException($"{nameof(processors)} should not be null.");
 			}
+
 			return AddPageProcessors(processors.AsEnumerable());
 		}
 
@@ -639,7 +649,7 @@ namespace DotnetSpider.Core
 		/// <returns>爬虫</returns>
 		public virtual Spider AddPageProcessors(IEnumerable<IPageProcessor> processors)
 		{
-			if (processors != null && processors.Count() > 0)
+			if (processors != null)
 			{
 				CheckIfRunning();
 				foreach (var processor in processors)
@@ -650,6 +660,7 @@ namespace DotnetSpider.Core
 					}
 				}
 			}
+
 			return this;
 		}
 
@@ -674,6 +685,7 @@ namespace DotnetSpider.Core
 			{
 				throw new ArgumentNullException($"{nameof(pipelines)} should not be null.");
 			}
+
 			return AddPipelines(pipelines.AsEnumerable());
 		}
 
@@ -686,19 +698,18 @@ namespace DotnetSpider.Core
 		{
 			if (pipelines == null)
 			{
-				throw new ArgumentNullException($"{nameof(pipelines)} should not be null.");
+				throw new SpiderException($"{nameof(pipelines)} should not be null.");
 			}
-			if (pipelines.Count() > 0)
+
+			CheckIfRunning();
+			foreach (var pipeline in pipelines)
 			{
-				CheckIfRunning();
-				foreach (var pipeline in pipelines)
+				if (pipeline != null)
 				{
-					if (pipeline != null)
-					{
-						_pipelines.Add(pipeline);
-					}
+					_pipelines.Add(pipeline);
 				}
 			}
+
 			return this;
 		}
 
@@ -805,6 +816,7 @@ namespace DotnetSpider.Core
 					SafeDestroy(downloader);
 				});
 			}
+
 			IsCompleted = Status == Status.Finished;
 			FlushStatus();
 			OnDispose();
@@ -829,6 +841,7 @@ namespace DotnetSpider.Core
 				Status = Status.Paused;
 				Logger.Information(Identity, "Stop running...");
 			}
+
 			action?.Invoke();
 		}
 
@@ -856,24 +869,19 @@ namespace DotnetSpider.Core
 			if (Env.IsWindows)
 			{
 				var identityMmf = MemoryMappedFile.OpenExisting(Identity, MemoryMappedFileRights.Write);
-				if (identityMmf != null)
+				using (MemoryMappedViewStream stream = identityMmf.CreateViewStream())
 				{
-					using (MemoryMappedViewStream stream = identityMmf.CreateViewStream())
-					{
-						var writer = new BinaryWriter(stream);
-						writer.Write(1);
-					}
+					var writer = new BinaryWriter(stream);
+					writer.Write(1);
 				}
+
 				try
 				{
 					var taskIdMmf = MemoryMappedFile.OpenExisting(TaskId, MemoryMappedFileRights.Write);
-					if (taskIdMmf != null)
+					using (MemoryMappedViewStream stream = taskIdMmf.CreateViewStream())
 					{
-						using (MemoryMappedViewStream stream = taskIdMmf.CreateViewStream())
-						{
-							var writer = new BinaryWriter(stream);
-							writer.Write(1);
-						}
+						var writer = new BinaryWriter(stream);
+						writer.Write(1);
 					}
 				}
 				catch
@@ -899,6 +907,7 @@ namespace DotnetSpider.Core
 				Logger.Information("Exit...");
 				return;
 			}
+
 			Logger.Warning(Identity, "Crawler is not running.");
 			if (action != null)
 			{
@@ -908,6 +917,7 @@ namespace DotnetSpider.Core
 					{
 						Thread.Sleep(100);
 					}
+
 					action();
 				});
 			}
@@ -961,9 +971,10 @@ namespace DotnetSpider.Core
 			{
 				Site.Headers = new Dictionary<string, string>();
 			}
+
 			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
 			Site.UserAgent = Site.UserAgent ??
-							 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
+			                 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
 			if (!Site.Headers.ContainsKey("Accept-Language"))
 			{
 				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
@@ -988,7 +999,9 @@ namespace DotnetSpider.Core
 
 			InitCloseSignals();
 
-			Monitor = Monitor == null ? (string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? new LogMonitor() : new HttpMonitor()) : Monitor;
+			Monitor = Monitor == null
+				? (string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? new LogMonitor() : new HttpMonitor())
+				: Monitor;
 
 			_failingRequestsLogger = LogUtil.CreateFailingRequestsLogger(Identity);
 
@@ -1035,6 +1048,7 @@ namespace DotnetSpider.Core
 				{
 					pipeline.Process(_cached.ToArray(), this);
 				}
+
 				SafeDestroy(pipeline);
 			}
 
@@ -1120,12 +1134,13 @@ namespace DotnetSpider.Core
 					OnError(page.Request);
 				}
 			}
-			catch (DownloadException de)
+			catch (DownloadException)
 			{
 				if (page != null)
 				{
 					OnError(page.Request);
 				}
+
 				Logger.Error($"Should not catch download exception: {request.Url}.");
 			}
 			catch (Exception e)
@@ -1134,10 +1149,12 @@ namespace DotnetSpider.Core
 				{
 					page = Site.AddToCycleRetry(request);
 				}
+
 				if (page != null)
 				{
 					OnError(page.Request);
 				}
+
 				Logger.Error($"Extract {request.Url} failed, please check your pipeline: {e}.");
 			}
 
@@ -1145,6 +1162,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
+
 			// 此处是用于需要循环本身的场景, 不能使用本身Request的原因是Request的尝试次数计算问题
 			if (page.Retry)
 			{
@@ -1178,6 +1196,7 @@ namespace DotnetSpider.Core
 								RetriedTimes.Inc();
 								ExtractAndAddRequests(page);
 							}
+
 							Logger.Warning($"Download {request.Url} success, retry becuase extract 0 result.");
 						}
 						else
@@ -1210,10 +1229,10 @@ namespace DotnetSpider.Core
 
 				int countOfResults = 0, effectedRows = 0;
 
-				ResultItems[] resultItems = null;
+				ResultItems[] resultItems = new ResultItems[0];
 				if (PipelineCachedSize == 1)
 				{
-					resultItems = new[] { page.ResultItems };
+					resultItems = new[] {page.ResultItems};
 				}
 				else
 				{
@@ -1232,10 +1251,7 @@ namespace DotnetSpider.Core
 				{
 					try
 					{
-						_pipelineRetryPolicy.Execute(() =>
-						{
-							pipeline.Process(new[] { page.ResultItems }, this);
-						});
+						_pipelineRetryPolicy.Execute(() => { pipeline.Process(new[] {page.ResultItems}, this); });
 					}
 					catch (Exception e)
 					{
@@ -1245,11 +1261,12 @@ namespace DotnetSpider.Core
 
 				foreach (var item in resultItems)
 				{
-					countOfResults += item.Request.CountOfResults.HasValue ? item.Request.CountOfResults.Value : 0;
-					effectedRows += item.Request.EffectedRows.HasValue ? item.Request.EffectedRows.Value : 0;
+					countOfResults += item.Request.CountOfResults ?? 0;
+					effectedRows += item.Request.EffectedRows ?? 0;
 				}
 
-				Logger.Information($"Crawl: {request.Url} success, results: { request.CountOfResults}, effectedRow: {request.EffectedRows}.");
+				Logger.Information(
+					$"Crawl: {request.Url} success, results: {countOfResults}, effectedRow: {effectedRows}.");
 
 				_OnSuccess(request);
 
@@ -1265,7 +1282,7 @@ namespace DotnetSpider.Core
 		protected void ExtractAndAddRequests(Page page)
 		{
 			if (page.Request.NextDepth <= Scheduler.Depth && page.TargetRequests != null &&
-				page.TargetRequests.Count > 0)
+			    page.TargetRequests.Count > 0)
 			{
 				foreach (Request request in page.TargetRequests)
 				{
@@ -1295,10 +1312,8 @@ namespace DotnetSpider.Core
 
 			PipelineRetryTimes = PipelineRetryTimes <= 0 ? 1 : PipelineRetryTimes;
 
-			_pipelineRetryPolicy = Policy.Handle<Exception>().Retry(PipelineRetryTimes, (ex, count) =>
-			{
-				Logger.Error($"Execute pipeline failed [{count}]: {ex}");
-			});
+			_pipelineRetryPolicy = Policy.Handle<Exception>().Retry(PipelineRetryTimes,
+				(ex, count) => { Logger.Error($"Execute pipeline failed [{count}]: {ex}"); });
 
 			if (_pipelines.Count == 0)
 			{
@@ -1308,6 +1323,7 @@ namespace DotnetSpider.Core
 					_pipelines.Add(defaultPipeline);
 				}
 			}
+
 			if (_pipelines.Count == 0)
 			{
 				throw new SpiderException("Pipeline unfound.");
@@ -1401,9 +1417,9 @@ namespace DotnetSpider.Core
 
 		private void LoadScheduler()
 		{
-			if (Site.StartRequests != null && Site.StartRequests.Count() > 0)
+			if (Site.StartRequests != null && Site.StartRequests.Any())
 			{
-				Logger.Information($"Add start urls to scheduler, count {Site.StartRequests.Count()}.");
+				Logger.Information($"Add start urls to scheduler, count {Site.StartRequests.Count}.");
 
 				if (!Scheduler.IsDistributed)
 				{
@@ -1435,6 +1451,7 @@ namespace DotnetSpider.Core
 					var writer = new BinaryWriter(stream);
 					writer.Write(false);
 				}
+
 				if (!string.IsNullOrWhiteSpace(TaskId))
 				{
 					_taskIdMmf = MemoryMappedFile.CreateOrOpen(TaskId, 1, MemoryMappedFileAccess.ReadWrite);
@@ -1469,14 +1486,14 @@ namespace DotnetSpider.Core
 			try
 			{
 				Monitor?.Flush(Identity, TaskId, Status.ToString(),
-						Monitorable.LeftRequestsCount,
-						Monitorable.TotalRequestsCount,
-						Monitorable.SuccessRequestsCount,
-						Monitorable.ErrorRequestsCount,
-						AvgDownloadSpeed,
-						AvgProcessorSpeed,
-						AvgPipelineSpeed,
-						ThreadNum);
+					Monitorable.LeftRequestsCount,
+					Monitorable.TotalRequestsCount,
+					Monitorable.SuccessRequestsCount,
+					Monitorable.ErrorRequestsCount,
+					AvgDownloadSpeed,
+					AvgProcessorSpeed,
+					AvgPipelineSpeed,
+					ThreadNum);
 			}
 			catch (Exception e)
 			{
@@ -1487,7 +1504,6 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 计算状态监控器每完成多少个Request则上报状态
 		/// </summary>
-		/// <param name="scheduler"></param>
 		/// <returns></returns>
 		private int CalculateMonitorFlushInterval()
 		{
@@ -1510,7 +1526,7 @@ namespace DotnetSpider.Core
 			// MMF 暂时还不支持非WINDOWS操作系统
 			if (Env.IsWindows)
 			{
-				CheckExitSignalByMMF();
+				CheckExitSignalByMmf();
 			}
 			else
 			{
@@ -1518,7 +1534,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void CheckExitSignalByMMF()
+		private void CheckExitSignalByMmf()
 		{
 			using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
 			{
@@ -1529,6 +1545,7 @@ namespace DotnetSpider.Core
 					return;
 				}
 			}
+
 			if (_taskIdMmf != null)
 			{
 				using (MemoryMappedViewStream stream = _taskIdMmf.CreateViewStream())

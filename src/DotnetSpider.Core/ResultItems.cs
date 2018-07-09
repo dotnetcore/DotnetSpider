@@ -4,33 +4,33 @@ using System.Runtime.CompilerServices;
 namespace DotnetSpider.Core
 {
 	/// <summary>
-	/// ´æ´¢Ò³Ãæ½âÎöµÄÊı¾İ½á¹û
-	/// ´Ë¶ÔÏó°üº¬ÔÚÒ³Ãæ¶ÔÏóÖĞ, ²¢´«ÈëÊı¾İ¹ÜµÀ±»´¦Àí
+	/// å­˜å‚¨é¡µé¢è§£æçš„æ•°æ®ç»“æœ
+	/// æ­¤å¯¹è±¡åŒ…å«åœ¨é¡µé¢å¯¹è±¡ä¸­, å¹¶ä¼ å…¥æ•°æ®ç®¡é“è¢«å¤„ç†
 	/// </summary>
 	public class ResultItems
 	{
 		private readonly Dictionary<string, dynamic> _fields = new Dictionary<string, dynamic>();
 
 		/// <summary>
-		/// ¶ÁÈ¡ËùÓĞÊı¾İ½á¹û
+		/// è¯»å–æ‰€æœ‰æ•°æ®ç»“æœ
 		/// </summary>
 		public IReadOnlyDictionary<string, dynamic> Results => _fields;
 
 		/// <summary>
-		/// ¶ÔÓ¦µÄÄ¿±êÁ´½ÓĞÅÏ¢
+		/// å¯¹åº”çš„ç›®æ ‡é“¾æ¥ä¿¡æ¯
 		/// </summary>
 		public Request Request { get; set; }
 
 		/// <summary>
-		/// ´æ´¢µÄÊı¾İ½á¹ûÊÇ·ñÎª¿Õ
+		/// å­˜å‚¨çš„æ•°æ®ç»“æœæ˜¯å¦ä¸ºç©º
 		/// </summary>
 		public bool IsEmpty => _fields.Count == 0;
 
 		/// <summary>
-		/// Í¨¹ı¼üÖµÈ¡µÃÊı¾İ½á¹û
+		/// é€šè¿‡é”®å€¼å–å¾—æ•°æ®ç»“æœ
 		/// </summary>
-		/// <param name="key">¼üÖµ</param>
-		/// <returns>Êı¾İ½á¹û</returns>
+		/// <param name="key">é”®å€¼</param>
+		/// <returns>æ•°æ®ç»“æœ</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public dynamic GetResultItem(string key)
 		{
@@ -38,10 +38,10 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Ìí¼Ó»ò¸üĞÂÊı¾İ½á¹û
+		/// æ·»åŠ æˆ–æ›´æ–°æ•°æ®ç»“æœ
 		/// </summary>
-		/// <param name="key">¼üÖµ</param>
-		/// <param name="value">Êı¾İ½á¹û</param>
+		/// <param name="key">é”®å€¼</param>
+		/// <param name="value">æ•°æ®ç»“æœ</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void AddOrUpdateResultItem(string key, dynamic value)
 		{

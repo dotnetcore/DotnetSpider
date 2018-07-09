@@ -36,7 +36,7 @@ namespace DotnetSpider.Core.Proxy
 			{
 				try
 				{
-					string result = HttpSender.Client.GetStringAsync(Url).Result;
+					string result = HttpClientPool.HttpClient.GetStringAsync(Url).Result;
 					if (!string.IsNullOrWhiteSpace(result))
 					{
 						if (result.Contains("ERROR(-51)"))

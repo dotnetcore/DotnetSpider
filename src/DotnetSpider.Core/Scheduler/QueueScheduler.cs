@@ -11,6 +11,7 @@ namespace DotnetSpider.Core.Scheduler
 		private List<Request> _queue = new List<Request>();
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
+		private readonly AutomicLong _totalCounter = new AutomicLong(0);
 
 		/// <summary>
 		/// 是否会使用互联网
@@ -30,6 +31,8 @@ namespace DotnetSpider.Core.Scheduler
 				}
 			}
 		}
+
+		public override long TotalRequestsCount => _totalCounter.Value;
 
 		/// <summary>
 		/// 采集成功的链接数
@@ -90,22 +93,22 @@ namespace DotnetSpider.Core.Scheduler
 
 					switch (TraverseStrategy)
 					{
-						case TraverseStrategy.DFS:
-							{
-								request = _queue.Last();
-								_queue.RemoveAt(_queue.Count - 1);
-								break;
-							}
-						case TraverseStrategy.BFS:
-							{
-								request = _queue.First();
-								_queue.RemoveAt(0);
-								break;
-							}
+						case TraverseStrategy.Dfs:
+						{
+							request = _queue.Last();
+							_queue.RemoveAt(_queue.Count - 1);
+							break;
+						}
+						case TraverseStrategy.Bfs:
+						{
+							request = _queue.First();
+							_queue.RemoveAt(0);
+							break;
+						}
 						default:
-							{
-								throw new NotImplementedException();
-							}
+						{
+							throw new NotImplementedException();
+						}
 					}
 
 					return request;
@@ -117,6 +120,7 @@ namespace DotnetSpider.Core.Scheduler
 		{
 			if (ShouldReserved(request))
 			{
+				_totalCounter.Inc();
 				lock (_lock)
 				{
 					_queue.Add(request);
@@ -126,7 +130,8 @@ namespace DotnetSpider.Core.Scheduler
 
 		protected override bool ShouldReserved(Request request)
 		{
-			return request.CycleTriedTimes == 0 || (request.CycleTriedTimes > 0 && request.CycleTriedTimes <= Spider.Site.CycleRetryTimes);
+			return request.CycleTriedTimes == 0 ||
+			       (request.CycleTriedTimes > 0 && request.CycleTriedTimes <= Spider.Site.CycleRetryTimes);
 		}
 
 		/// <summary>
@@ -135,9 +140,22 @@ namespace DotnetSpider.Core.Scheduler
 		/// <param name="requests">请求对象</param>
 		public override void Import(IEnumerable<Request> requests)
 		{
+			if (requests == null)
+			{
+				return;
+			}
+
 			lock (_lock)
 			{
-				_queue = new List<Request>(requests);
+				_queue.Clear();
+				int count = 0;
+				foreach (var request in requests)
+				{
+					count++;
+					_queue.Add(request);
+				}
+
+				_totalCounter.Set(count);
 			}
 		}
 	}

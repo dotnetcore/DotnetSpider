@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DotnetSpider.Core.Downloader
+namespace DotnetSpider.Core.Infrastructure
 {
 	public class HttpClientEntry
 	{
@@ -15,17 +15,6 @@ namespace DotnetSpider.Core.Downloader
 		public HttpClient Client { get; private set; }
 
 		internal HttpClientHandler Handler { get; private set; }
-
-		internal CookieContainer CookieContainer
-		{
-			set
-			{
-				if (_inited)
-				{
-					return;
-				}
-			}
-		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		internal void Init(bool allowAutoRedirect, Action configAction, Func<CookieContainer> cookieContainerFactory)
@@ -60,9 +49,8 @@ namespace DotnetSpider.Core.Downloader
 				InnerHandler = innerHandler;
 			}
 
-			protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+			protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 			{
-
 				var response = await base.SendAsync(request, cancellationToken);
 
 				if (response.StatusCode == HttpStatusCode.MovedPermanently
@@ -108,7 +96,6 @@ namespace DotnetSpider.Core.Downloader
 			}
 		}
 	}
-
 	/// <summary>
 	/// Httpclient pool impletion for <see cref="IHttpClientPool"/>
 	/// 一旦Handler与目标地址建立了连接, Handler中的CookieContainer、Proxy等设置都是不能再更改的
@@ -119,8 +106,8 @@ namespace DotnetSpider.Core.Downloader
 	public interface IHttpClientPool
 	{
 		/// <summary>
-		/// Get a <see cref="HttpClientElement"/> from <see cref="IHttpClientPool"/>.
-		/// Return same <see cref="HttpClientElement"/> instance when <paramref name="hashCode"/> is same.
+		/// Get a <see cref="HttpClientEntry"/> from <see cref="IHttpClientPool"/>.
+		/// Return same <see cref="HttpClientEntry"/> instance when <paramref name="hash"/> is same.
 		/// This can ensure some pages have same CookieContainer.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">

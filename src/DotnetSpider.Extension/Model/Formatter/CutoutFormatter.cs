@@ -11,12 +11,12 @@ namespace DotnetSpider.Extension.Model.Formatter
 		/// <summary>
 		/// 起始部分的内容
 		/// </summary>
-		public string StartPart { get; set; }
+		public string StartPart;
 
 		/// <summary>
 		/// 结束部分的内容
 		/// </summary>
-		public string EndPart { get; set; }
+		public string EndPart;
 
 		/// <summary>
 		/// 开始截取的偏移
@@ -55,6 +55,7 @@ namespace DotnetSpider.Extension.Model.Formatter
 			{
 				length += EndPart.Length;
 			}
+
 			return tmp.Substring(begin, length);
 		}
 

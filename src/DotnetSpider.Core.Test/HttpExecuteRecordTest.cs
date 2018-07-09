@@ -11,10 +11,7 @@ namespace DotnetSpider.Core.Test
 		{
 			if (Env.IsWindows)
 			{
-				var result = HttpSender.Request((new HttpRequest
-				{
-					Url = "http://localhost:30013"
-				}));
+				var result = HttpClientPool.HttpClient.GetAsync("http://localhost:30013").Result;
 				if (result.StatusCode == HttpStatusCode.OK)
 				{
 					Env.HubServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";

@@ -67,8 +67,16 @@ namespace DotnetSpider.Core.Redial.Redialer
 			{
 				KillPPPOEProcesses();
 				Process process = Process.Start("/sbin/ifdown", "ppp0");
+				if (process == null)
+				{
+					throw new  SpiderException("Disconnect adsl failed.");
+				}
 				process.WaitForExit();
 				process = Process.Start("/sbin/ifup", "ppp0");
+				if (process == null)
+				{
+					throw new  SpiderException("Connect adsl failed.");
+				}
 				process.WaitForExit();
 			}
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

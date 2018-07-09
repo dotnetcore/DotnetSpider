@@ -46,20 +46,29 @@ namespace DotnetSpider.Extension.Model
 
 		public string Identity { get; protected set; }
 
-		public ModelDefine(Selector selector, IEnumerable<Field> fields, TableInfo table, TargetUrlsSelector targetUrlsSelector)
-			: this(selector, fields, table, new[] { targetUrlsSelector })
+		public ModelDefine(Selector selector, IEnumerable<Field> fields, TableInfo table,
+			TargetUrlsSelector targetUrlsSelector)
+			: this(selector, fields, table, new[] {targetUrlsSelector})
 		{
 		}
 
-		public ModelDefine(Selector selector, IEnumerable<Field> fields, TableInfo table = null, IEnumerable<TargetUrlsSelector> targetUrlsSelectors = null, IEnumerable<SharedValueSelector> sharedValueSelectors = null, int take = 0, bool takeFromHead = true) : this()
+		public ModelDefine(Selector selector, IEnumerable<Field> fields, TableInfo table = null,
+			IEnumerable<TargetUrlsSelector> targetUrlsSelectors = null,
+			IEnumerable<SharedValueSelector> sharedValueSelectors = null, int take = 0, bool takeFromHead = true) : this()
 		{
 			Selector = selector;
 			TableInfo = table;
-			if (fields == null || fields.Count() == 0)
+			if (fields == null)
+			{
+				throw new SpiderException($"{nameof(fields)} should not be null.");
+			}
+
+			Fields = new HashSet<Field>(fields);
+			if (Fields.Count == 0)
 			{
 				throw new SpiderException("Count of fields should large than 0.");
 			}
-			Fields = new HashSet<Field>(fields);
+
 			TargetUrlsSelectors = targetUrlsSelectors;
 			SharedValueSelectors = sharedValueSelectors;
 			Take = take;
@@ -79,7 +88,7 @@ namespace DotnetSpider.Extension.Model
 			var type = typeof(T);
 
 			var typeName = type.FullName;
-			var Name = typeName;
+			var name = typeName;
 
 			var tableInfo = type.GetCustomAttribute<TableInfo>();
 
@@ -89,6 +98,7 @@ namespace DotnetSpider.Extension.Model
 				{
 					tableInfo.Indexs = new HashSet<string>(tableInfo.Indexs.Select(i => i.Replace(" ", ""))).ToArray();
 				}
+
 				if (tableInfo.Uniques != null)
 				{
 					tableInfo.Uniques = new HashSet<string>(tableInfo.Uniques.Select(i => i.Replace(" ", ""))).ToArray();
@@ -103,7 +113,7 @@ namespace DotnetSpider.Extension.Model
 			{
 				take = entitySelector.Take;
 				takeFromHead = entitySelector.TakeFromHead;
-				selector = new Selector { Expression = entitySelector.Expression, Type = entitySelector.Type };
+				selector = new Selector {Expression = entitySelector.Expression, Type = entitySelector.Type};
 			}
 
 			var targetUrlsSelectors = type.GetCustomAttributes<TargetUrlsSelector>().ToList();
@@ -124,11 +134,13 @@ namespace DotnetSpider.Extension.Model
 				{
 					continue;
 				}
+
 				field.Name = property.Name;
 				if (field.DataType == DataType.None)
 				{
 					field.DataType = ConvertDataType(property.PropertyType);
 				}
+
 				field.Formatters = property.GetCustomAttributes<Formatter.Formatter>(true).ToArray();
 				fields.Add(field);
 			}
@@ -155,8 +167,9 @@ namespace DotnetSpider.Extension.Model
 
 			if (columns.Count == 0)
 			{
-				throw new SpiderException($"Columns is necessary for {Name}");
+				throw new SpiderException($"Columns is necessary for {name}");
 			}
+
 			if (tableInfo != null)
 			{
 				if (tableInfo.UpdateColumns != null && tableInfo.UpdateColumns.Length > 0)
@@ -168,6 +181,7 @@ namespace DotnetSpider.Extension.Model
 							throw new SpiderException("Columns set to update are not a property of your entity");
 						}
 					}
+
 					if (tableInfo.UpdateColumns.Length == 0)
 					{
 						throw new SpiderException("There is no column need update");
@@ -178,12 +192,14 @@ namespace DotnetSpider.Extension.Model
 				{
 					for (int i = 0; i < tableInfo.Indexs.Length; ++i)
 					{
-						var items = new HashSet<string>(tableInfo.Indexs[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
+						var items = new HashSet<string>(tableInfo.Indexs[i].Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+							.Select(c => c.Trim()));
 
 						if (items.Count == 0)
 						{
 							throw new SpiderException("Index should contain more than a column");
 						}
+
 						foreach (var item in items)
 						{
 							var column = columns.FirstOrDefault(c => c.Name == item);
@@ -191,24 +207,29 @@ namespace DotnetSpider.Extension.Model
 							{
 								throw new SpiderException("Columns set as index are not a property of your entity");
 							}
+
 							if (column.DataType == DataType.String && (column.Length <= 0 || column.Length > 256))
 							{
 								throw new SpiderException("Column length of index should not large than 256");
 							}
 						}
+
 						tableInfo.Indexs[i] = string.Join(",", items);
 					}
 				}
+
 				if (tableInfo.Uniques != null && tableInfo.Uniques.Length > 0)
 				{
 					for (int i = 0; i < tableInfo.Uniques.Length; ++i)
 					{
-						var items = new HashSet<string>(tableInfo.Uniques[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()));
+						var items = new HashSet<string>(tableInfo.Uniques[i].Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+							.Select(c => c.Trim()));
 
 						if (items.Count == 0)
 						{
 							throw new SpiderException("Unique should contain more than a column");
 						}
+
 						foreach (var item in items)
 						{
 							var column = columns.FirstOrDefault(c => c.Name == item);
@@ -216,11 +237,13 @@ namespace DotnetSpider.Extension.Model
 							{
 								throw new SpiderException("Columns set as unique are not a property of your entity");
 							}
+
 							if (column.DataType == DataType.String && (column.Length <= 0 || column.Length > 256))
 							{
 								throw new SpiderException("Column length of unique should not large than 256");
 							}
 						}
+
 						tableInfo.Uniques[i] = string.Join(",", items);
 					}
 				}
@@ -232,37 +255,37 @@ namespace DotnetSpider.Extension.Model
 			switch (propertyType.Name)
 			{
 				case "Int32":
-					{
-						return DataType.Int;
-					}
+				{
+					return DataType.Int;
+				}
 				case "Decimal":
-					{
-						return DataType.Decimal;
-					}
+				{
+					return DataType.Decimal;
+				}
 				case "Single":
-					{
-						return DataType.Float;
-					}
+				{
+					return DataType.Float;
+				}
 				case "Double":
-					{
-						return DataType.Double;
-					}
+				{
+					return DataType.Double;
+				}
 				case "Int64":
-					{
-						return DataType.Long;
-					}
+				{
+					return DataType.Long;
+				}
 				case "Boolean":
-					{
-						return DataType.Bool;
-					}
+				{
+					return DataType.Bool;
+				}
 				case "DateTime":
-					{
-						return DataType.DateTime;
-					}
+				{
+					return DataType.DateTime;
+				}
 				default:
-					{
-						return DataType.String;
-					}
+				{
+					return DataType.String;
+				}
 			}
 		}
 	}

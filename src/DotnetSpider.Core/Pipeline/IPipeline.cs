@@ -4,15 +4,15 @@ using System.Collections.Generic;
 namespace DotnetSpider.Core.Pipeline
 {
 	/// <summary>
-	/// Êı¾İ¹ÜµÀ½Ó¿Ú, Í¨¹ıÊı¾İ¹ÜµÀ°Ñ½âÎöµÄÊı¾İ´æµ½²»Í¬µÄ´æ´¢ÖĞ(ÎÄ¼ş¡¢Êı¾İ¿â£©
+	/// æ•°æ®ç®¡é“æ¥å£, é€šè¿‡æ•°æ®ç®¡é“æŠŠè§£æçš„æ•°æ®å­˜åˆ°ä¸åŒçš„å­˜å‚¨ä¸­(æ–‡ä»¶ã€æ•°æ®åº“ï¼‰
 	/// </summary>
 	public interface IPipeline : IDisposable
 	{
 		/// <summary>
-		/// ´¦ÀíÒ³Ãæ½âÎöÆ÷½âÎöµ½µÄÊı¾İ½á¹û
+		/// å¤„ç†é¡µé¢è§£æå™¨è§£æåˆ°çš„æ•°æ®ç»“æœ
 		/// </summary>
-		/// <param name="resultItems">Êı¾İ½á¹û</param>
-		/// <param name="spider">ÅÀ³æ</param>
+		/// <param name="resultItems">æ•°æ®ç»“æœ</param>
+		/// <param name="spider">çˆ¬è™«</param>
 		void Process(IEnumerable<ResultItems> resultItems, ISpider spider);
 	}
 }

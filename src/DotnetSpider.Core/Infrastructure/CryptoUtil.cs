@@ -48,7 +48,6 @@ namespace DotnetSpider.Core.Infrastructure
 		{
 			DESCryptoServiceProvider cryptoProvider = new DESCryptoServiceProvider();
 			var bytes = Encoding.ASCII.GetBytes(key);
-			var des = DES.Create();
 			var encryptor = cryptoProvider.CreateEncryptor(bytes, bytes);
 
 			var ms = new MemoryStream();

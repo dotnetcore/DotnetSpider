@@ -8,10 +8,10 @@
 		/// <summary>
 		/// 深度优先
 		/// </summary>
-		DFS,
+		Dfs,
 		/// <summary>
 		/// 广度优先
 		/// </summary>
-		BFS
+		Bfs
 	}
 }

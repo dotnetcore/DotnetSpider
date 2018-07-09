@@ -3,15 +3,15 @@ using System.Collections.Generic;
 namespace DotnetSpider.Core.Pipeline
 {
 	/// <summary>
-	/// 打印数据结果到控制台
+	/// 鎵撳嵃鏁版嵁缁撴灉鍒版帶鍒跺彴
 	/// </summary>
 	public class ConsolePipeline : BasePipeline
 	{
 		/// <summary>
-		/// 打印数据结果到控制台
+		/// 鎵撳嵃鏁版嵁缁撴灉鍒版帶鍒跺彴
 		/// </summary>
-		/// <param name="resultItems">数据结果</param>
-		/// <param name="spider">爬虫</param>
+		/// <param name="resultItems">鏁版嵁缁撴灉</param>
+		/// <param name="spider">鐖櫕</param>
 		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
 		{
 			foreach (var resultItem in resultItems)

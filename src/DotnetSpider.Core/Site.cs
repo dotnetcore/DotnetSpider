@@ -20,7 +20,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 代理池
 		/// </summary>
-		public IHttpProxyPool HttpProxyPool { get; set; }
+		public IHttpProxyPool HttpProxyPool;
 
 		/// <summary>
 		/// 设置全局的HTTP头, 下载器下载数据时会带上所有的HTTP头
@@ -56,12 +56,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 设置是否下载文件、图片
 		/// </summary>
-		public bool DownloadFiles { get; set; }
+		public bool DownloadFiles ;
 
 		/// <summary>
 		/// 去除返回的JSON数据的最外层填补
 		/// </summary>
-		public string JsonPadding { get; set; }
+		public string JsonPadding ;
 
 		/// <summary>
 		/// 不再使用
@@ -136,7 +136,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 添加多个个起始链接到当前站点 
 		/// </summary>
-		/// <param name="url">起始链接</param>
+		/// <param name="urls">起始链接</param>
 		public void AddStartUrls(params string[] urls)
 		{
 			if (urls == null)
@@ -184,7 +184,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 添加一个请求对象到当前站点
 		/// </summary>
-		/// <param name="request">请求对象</param>
+		/// <param name="requests">请求对象</param>
 		public void AddStartRequests(params Request[] requests)
 		{
 			if (requests == null)
@@ -237,7 +237,6 @@ namespace DotnetSpider.Core
 		/// 
 		/// </summary>
 		/// <param name="request"></param>
-		/// <param name="site"></param>
 		/// <returns></returns>
 		internal Page AddToCycleRetry(Request request)
 		{

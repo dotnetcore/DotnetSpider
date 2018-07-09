@@ -1,4 +1,5 @@
-﻿using DotnetSpider.Extension.Model;
+﻿using DotnetSpider.Core;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Processor;
 using System;
@@ -228,7 +229,7 @@ namespace DotnetSpider.Extension.Test.Model
 				new ModelDefine<Entity23>();
 				var processor = new EntityProcessor<Entity23>();
 			}
-			catch (ArgumentNullException e)
+			catch (SpiderException e)
 			{
 				Assert.NotNull(e);
 				return;
@@ -244,7 +245,7 @@ namespace DotnetSpider.Extension.Test.Model
 				new ModelDefine<Entity24>();
 				var processor = new EntityProcessor<Entity24>();
 			}
-			catch (ArgumentNullException e)
+			catch (SpiderException e)
 			{
 				Assert.NotNull(e);
 				return;

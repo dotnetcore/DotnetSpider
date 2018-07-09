@@ -3,7 +3,7 @@ using DotnetSpider.Core;
 namespace DotnetSpider.Extension
 {
 	/// <summary>
-	/// ÓÃÓÚ²âÊÔ
+	/// ç”¨äºæµ‹è¯•
 	/// </summary>
 	internal class DefaultEntitySpider : EntitySpider
 	{

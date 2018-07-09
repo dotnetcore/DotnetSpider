@@ -8,7 +8,7 @@ namespace DotnetSpider.Core.Pipeline
 	public class CollectionPipeline : BasePipeline, ICollectionPipeline
 	{
 		private readonly Dictionary<ISpider, List<ResultItems>> _items = new Dictionary<ISpider, List<ResultItems>>();
-		private readonly static object ItemsLocker = new object();
+		private static readonly object ItemsLocker = new object();
 
 		/// <summary>
 		/// 获取所有数据结果
