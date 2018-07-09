@@ -27,7 +27,8 @@ namespace DotnetSpider.Sample
 			OcrDemo.Process();
 #endif
 
-			ModelSpider.Run();
+			TestSpider spider = new TestSpider();
+			spider.Run();
 		}
 
 

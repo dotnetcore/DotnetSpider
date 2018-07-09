@@ -284,7 +284,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				default:
 					{
-						dataType = (length <= 0) ? "LONGTEXT" : $"VARCHAR({length})";
+						dataType = length <= 0 || length > 8000 ? "LONGTEXT" : $"VARCHAR({length})";
 						break;
 					}
 			}

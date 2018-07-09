@@ -267,7 +267,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 				default:
 					{
-						dataType = length <= 0 ? "NVARCHAR(MAX)" : $"NVARCHAR({length})";
+						dataType = length <= 0 || length >= 8000 ? "NVARCHAR(MAX)" : $"NVARCHAR({length})";
 						break;
 					}
 			}
@@ -288,7 +288,7 @@ namespace DotnetSpider.Extension.Pipeline
 			var sqls = new Sqls();
 
 			sqls.InsertSql = GenerateInsertSql(model);
-			sqls.InsertAndIgnoreDuplicateSql= GenerateInsertSql(model);
+			sqls.InsertAndIgnoreDuplicateSql = GenerateInsertSql(model);
 			sqls.UpdateSql = GenerateUpdateSql(model);
 			sqls.SelectSql = GenerateSelectSql(model);
 			return sqls;
