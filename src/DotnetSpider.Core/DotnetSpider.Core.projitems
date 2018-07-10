@@ -20,7 +20,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\FileCookieInject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\FileDownloader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\HttpClientDownloader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Downloader\HttpClientPool.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\IAfterDownloadCompleteHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\IBeforeDownloadHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Downloader\ICookieInterceptor.cs" />
@@ -39,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\BloomFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\Browser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\Cache.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\GlobalRedirectHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\ConcurrentDictionaryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\ConsoleHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Infrastructure\ContentType.cs" />
