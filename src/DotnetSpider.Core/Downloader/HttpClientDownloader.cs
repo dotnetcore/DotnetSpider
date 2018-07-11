@@ -126,7 +126,7 @@ namespace DotnetSpider.Core.Downloader
 					httpClientEntry = HttpClientPool.GetHttpClient(proxy.Hash);
 				}
 
-				PrepareHttpClient(httpClientEntry);
+				PrepareHttpClient(httpClientEntry, request.Proxy);
 
 				response = NetworkCenter.Current.Execute("http", () => httpClientEntry.Client.SendAsync(httpMessage).Result);
 				request.StatusCode = response.StatusCode;
@@ -192,7 +192,7 @@ namespace DotnetSpider.Core.Downloader
 			return site.Encoding.GetString(contentBytes, 0, contentBytes.Length);
 		}
 
-		internal void PrepareHttpClient(HttpClientEntry httpClientEntry)
+		internal void PrepareHttpClient(HttpClientEntry httpClientEntry, IWebProxy proxy)
 		{
 			httpClientEntry.Init(AllowAutoRedirect, () =>
 			{
@@ -200,6 +200,7 @@ namespace DotnetSpider.Core.Downloader
 				{
 					httpClientEntry.Client.Timeout = new TimeSpan(0, 0, (int)_timeout / 1000);
 				}
+				httpClientEntry.Handler.Proxy = proxy;
 			}, CopyCookieContainer);
 		}
 
