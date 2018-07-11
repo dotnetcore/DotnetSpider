@@ -46,5 +46,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)OcrDemo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Program.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)docs\RegexSelectorSpider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestSpider.cs" />
   </ItemGroup>
 </Project>

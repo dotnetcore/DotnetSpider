@@ -143,7 +143,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
 			var entry = HttpClientDownloader.HttpClientPool.GetHttpClient("a");
-			downloader.PrepareHttpClient(entry);
+			downloader.PrepareHttpClient(entry, null);
 			Assert.Equal(8, entry.Client.Timeout.TotalSeconds);
 		}
 	}

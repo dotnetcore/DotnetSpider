@@ -26,9 +26,10 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(200, 200);
 			OcrDemo.Process();
 #endif
-
 			TestSpider spider = new TestSpider();
 			spider.Run();
+
+
 		}
 
 
