@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.IO;
+using System;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -21,41 +23,39 @@ namespace DotnetSpider.Core.Pipeline
 		/// <param name="interval">数据根目录与程序运行目录路径的相对值</param>
 		protected BaseFilePipeline(string interval)
 		{
-			InitFolder(interval);
-		}
-
-		/// <summary>
-		/// 初始化需要使用的文件夹
-		/// </summary>
-		/// <param name="interval">数据根目录与程序运行目录路径的相对值</param>
-		protected void InitFolder(string interval)
-		{
 			if (string.IsNullOrWhiteSpace(interval))
 			{
-				throw new SpiderException("Interval path should not be null");
-			}
-			if (!interval.EndsWith(Env.PathSeperator))
-			{
-				interval += Env.PathSeperator;
-			}
-
-			RootDataFolder = Path.Combine(Env.BaseDirectory, interval);
-		}
-
-		internal string GetDataFolder(ISpider spider)
-		{
-			if (_dataFolderCache.ContainsKey(spider.Identity))
-			{
-				return _dataFolderCache[spider.Identity];
+				RootDataFolder = AppDomain.CurrentDomain.BaseDirectory;
 			}
 			else
 			{
-				var dataFolder = Path.Combine(RootDataFolder, spider.Identity);
+				if (!interval.EndsWith(Env.PathSeperator))
+				{
+					interval += Env.PathSeperator;
+				}
+
+				RootDataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, interval);
+			}
+		}
+
+		public string GetDataFolder(IIdentity sender)
+		{
+			if (sender == null)
+			{
+				throw new ArgumentNullException($"{nameof(sender)} is null.");
+			}
+			if (_dataFolderCache.ContainsKey(sender.Identity))
+			{
+				return _dataFolderCache[sender.Identity];
+			}
+			else
+			{
+				var dataFolder = Path.Combine(RootDataFolder, sender.Identity);
 				if (!Directory.Exists(dataFolder))
 				{
 					Directory.CreateDirectory(dataFolder);
 				}
-				_dataFolderCache.TryAdd(spider.Identity, dataFolder);
+				_dataFolderCache.TryAdd(sender.Identity, dataFolder);
 				return dataFolder;
 			}
 		}

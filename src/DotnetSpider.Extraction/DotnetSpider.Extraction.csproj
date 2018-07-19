@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net40;net45;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Version>3.0.0-beta1</Version>
+    <Authors>zlzforever@163.com;</Authors>
+    <AssemblyName>DotnetSpider.Extraction</AssemblyName>
+    <Copyright>Copyright 2018 Lewis Zou</Copyright>
+    <PackageId>DotnetSpider.Extraction</PackageId>
+    <Description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp;amp; scraping framework for .NET</Description>
+    <PackageTags>DotnetSpider;crawler;dotnet core</PackageTags>
+    <PackageProjectUrl>https://github.com/zlzforever/DotnetSpider</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/zlzforever/DotnetSpider</RepositoryUrl>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj" />
+  </ItemGroup>
+</Project>

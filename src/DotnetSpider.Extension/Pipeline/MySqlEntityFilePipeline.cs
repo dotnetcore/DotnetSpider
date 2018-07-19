@@ -6,6 +6,8 @@ using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Runtime.CompilerServices;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -51,10 +53,11 @@ namespace DotnetSpider.Extension.Pipeline
 		/// </summary>
 		/// <param name="model">数据模型</param>
 		/// <param name="datas">数据</param>
-		/// <param name="spider">爬虫</param>
+		/// <param name="logger">日志接口</param>
+		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
+		protected override int Process(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender)
 		{
 			if (datas == null || datas.Count() == 0)
 			{
@@ -63,7 +66,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			StreamWriter writer;
 			var tableName = model.TableInfo.FullName;
-			var dataFolder = Path.Combine(Env.BaseDirectory, "mysql", spider.Identity);
+			var dataFolder = Path.Combine(Env.BaseDirectory, "mysql", sender.Identity);
 			var mysqlFile = Path.Combine(dataFolder, $"{model.TableInfo.Database}.{tableName}.sql");
 			if (_writers.ContainsKey(mysqlFile))
 			{
@@ -83,15 +86,15 @@ namespace DotnetSpider.Extension.Pipeline
 			switch (_type)
 			{
 				case FileType.LoadFile:
-				{
-					AppendLoadFile(writer, model, datas);
-					break;
-				}
+					{
+						AppendLoadFile(writer, model, datas);
+						break;
+					}
 				case FileType.InsertSql:
-				{
-					AppendInsertSqlFile(writer, model, datas);
-					break;
-				}
+					{
+						AppendInsertSqlFile(writer, model, datas);
+						break;
+					}
 			}
 
 			return datas.Count();

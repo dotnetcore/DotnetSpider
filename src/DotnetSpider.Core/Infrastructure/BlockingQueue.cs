@@ -402,7 +402,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public QueueTimeoutException() : base("Queue method timed out on wait")
+		public QueueTimeoutException() : base("Queue method timed out on wait.")
 		{
 		}
 	}

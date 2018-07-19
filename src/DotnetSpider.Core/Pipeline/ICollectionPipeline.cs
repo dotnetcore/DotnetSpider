@@ -1,3 +1,4 @@
+using DotnetSpider.Common;
 using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Pipeline
@@ -10,7 +11,8 @@ namespace DotnetSpider.Core.Pipeline
 		/// <summary>
 		/// Get all results collected.
 		/// </summary>
+		/// <param name="owner">数据拥有者</param>
 		/// <returns>All results collected</returns>
-		IEnumerable<ResultItems> GetCollection(ISpider spider);
+		IEnumerable<ResultItems> GetCollection(dynamic owner);
 	}
 }

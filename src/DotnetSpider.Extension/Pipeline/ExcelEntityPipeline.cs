@@ -2,8 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using DotnetSpider.Common;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Extraction.Model;
 using OfficeOpenXml;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -51,9 +53,9 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private void WriteToExcel(IModel model, IEnumerable<dynamic> datas, ISpider spider)
+		private void WriteToExcel(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender)
 		{
-			var excelPath = Path.Combine(Env.BaseDirectory, "excels", $"{spider.Name}_{spider.Identity}.xlsx");
+			var excelPath = Path.Combine(Env.BaseDirectory, "excels", $"{sender.Name}_{sender.Identity}.xlsx");
 			var sheetName = model.TableInfo.Name;
 			var sheetIndex = $"{excelPath}.{sheetName}";
 
@@ -110,17 +112,18 @@ namespace DotnetSpider.Extension.Pipeline
 		/// </summary>
 		/// <param name="model">数据模型</param>
 		/// <param name="datas">数据</param>
-		/// <param name="spider">爬虫</param>
+		/// <param name="logger">日志接口</param>
+		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override int Process(IModel model, IEnumerable<dynamic> datas, ISpider spider)
+		protected override int Process(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender)
 		{
 			if (datas == null || datas.Count() == 0)
 			{
 				return 0;
 			}
 
-			WriteToExcel(model, datas, spider);
+			WriteToExcel(model, datas, logger, sender);
 			return datas.Count();
 		}
 	}

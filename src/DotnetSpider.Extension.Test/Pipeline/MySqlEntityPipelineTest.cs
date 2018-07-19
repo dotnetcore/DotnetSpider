@@ -4,13 +4,14 @@ using System.Data;
 using System.Linq;
 using Dapper;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
 using MySql.Data.MySqlClient;
 using Xunit;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Common;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
@@ -76,7 +77,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 						{ "decimal", "1"}
 					}
 				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var columns = conn.Query<ColumnInfo>("SELECT COLUMN_NAME as `Name`, COLUMN_TYPE as `Type` FROM information_schema.columns WHERE table_name='table15' AND table_schema = 'test';").ToList(); ;
 				Assert.Equal(12, columns.Count);
@@ -149,7 +150,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var processArgument = new ResultItems[] { resultItems };
 
 				// 4. Execute pipline
-				pipeline.Process(processArgument, spider);
+				pipeline.Process(processArgument, spider.Logger, spider);
 
 				var updateModePipeline = CreatePipeline(PipelineMode.Update);
 
@@ -160,7 +161,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					 new AutoIncrementPrimaryKey { Id = 1, Category = "4C" }
 				}));
 
-				updateModePipeline.Process(new ResultItems[] { resultItems }, spider);
+				updateModePipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var list = conn.Query<AutoIncrementPrimaryKey>($"use test; select * from autoincrementprimarykey").ToList();
 				Assert.Equal(2, list.Count);
@@ -204,7 +205,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var processArgument = new ResultItems[] { resultItems };
 
 				// 4. Execute pipline
-				pipeline.Process(processArgument, spider);
+				pipeline.Process(processArgument, spider.Logger, spider);
 
 				var updateModePipeline = CreatePipeline(PipelineMode.Update);
 
@@ -215,7 +216,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					 new MultiPrimaryKey { Sku="111", Category = "4C", Name="Product 2" }
 				}));
 
-				updateModePipeline.Process(new ResultItems[] { resultItems }, spider);
+				updateModePipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var list = conn.Query<MultiPrimaryKey>($"use test; select * from multiprimarykey").ToList();
 				Assert.Equal(2, list.Count);
@@ -254,7 +255,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					new AutoIncrementPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" },
 					new AutoIncrementPrimaryKey { Sku = "112", Category = null, Name = "Product 3" }
 				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var list = conn.Query($"use test; select * from autoincrementprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 
@@ -295,7 +296,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					new NonePrimaryKey { Sku = "112", Category = null, Name = "Product 3" },
 					new NonePrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
 				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var list = conn.Query($"use test; select * from noneprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 
@@ -338,7 +339,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					new Timestamp { Sku = "111", Category = "3C", Name = "Product 2" },
 					new Timestamp { Sku = "112", Category = null, Name = "Product 3" }
 				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var list = conn.Query($"use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
 
@@ -387,7 +388,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					new Timestamp { Sku = "111", Category = "3C", Name = "Product 2" },
 					new Timestamp { Sku = "112", Category = null, Name = "Product 3" }
 				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var list = conn.Query($"use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
 
@@ -427,7 +428,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					new MultiPrimaryKey { Sku = "112", Category = null, Name = "Product 3" },
 					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
 				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var list = conn.Query($"use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 
@@ -470,7 +471,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					new MultiPrimaryKey { Sku = "112", Category = null, Name = "Product 3" },
 					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
 				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var insertNewAndUpdateOldPipeline = CreatePipeline(PipelineMode.InsertNewAndUpdateOld);
 
@@ -481,7 +482,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					 new AutoIncrementPrimaryKey { Sku = "110", Name="Product 1", Category = "4C" }
 				}));
 
-				insertNewAndUpdateOldPipeline.Process(new ResultItems[] { resultItems }, spider);
+				insertNewAndUpdateOldPipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var list = conn.Query($"use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 

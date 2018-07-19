@@ -5,6 +5,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using System;
 using System.IO;
+using DotnetSpider.Common;
 #if !NETSTANDARD
 using System.Drawing;
 #endif
@@ -160,7 +161,7 @@ namespace DotnetSpider.Extension.Infrastructure
 					}
 					if (!string.IsNullOrEmpty(option.Proxy))
 					{
-						opt.Proxy = new Proxy() { HttpProxy = option.Proxy };
+						opt.Proxy = new OpenQA.Selenium.Proxy() { HttpProxy = option.Proxy };
 					}
 					if (option.Headless)
 					{

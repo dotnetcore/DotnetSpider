@@ -1,14 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using DotnetSpider.Common;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core.Selector;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Processor.TargetRequestExtractors;
+using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Downloader;
+using DotnetSpider.Downloader.AfterDownloadCompleteHandlers;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Model.Formatter;
-using System.Linq;
-using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Extraction.Model.Formatter;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs
 {
@@ -31,9 +42,9 @@ namespace DotnetSpider.Sample.docs
 				{
 					if (sold <= 1)
 					{
-						if (!page.SkipTargetUrls)
+						if (!page.SkipTargetRequests)
 						{
-							page.SkipTargetUrls = true;
+							page.SkipTargetRequests = true;
 						}
 					}
 					else
@@ -45,9 +56,9 @@ namespace DotnetSpider.Sample.docs
 				{
 					if (sold <= 5)
 					{
-						if (!page.SkipTargetUrls)
+						if (!page.SkipTargetRequests)
 						{
-							page.SkipTargetUrls = true;
+							page.SkipTargetRequests = true;
 						}
 					}
 					else
@@ -59,9 +70,9 @@ namespace DotnetSpider.Sample.docs
 				{
 					if (sold == 0)
 					{
-						if (!page.SkipTargetUrls)
+						if (!page.SkipTargetRequests)
 						{
-							page.SkipTargetUrls = true;
+							page.SkipTargetRequests = true;
 						}
 					}
 					else
@@ -74,14 +85,14 @@ namespace DotnetSpider.Sample.docs
 
 		private class Spider : EntitySpider
 		{
-			private class MyAfterDownloadHandler : AfterDownloadCompleteHandler
+			private class MyBeforeProcessorHandler : IBeforeProcessorHandler
 			{
-				public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
+				public void Handle(ref Page page)
 				{
-					var pager = page.Selectable.Select(Selectors.JsonPath("$.mods.pager.status")).GetValue();
+					var pager = page.Selectable().Select(Selectors.JsonPath("$.mods.pager.status")).GetValue();
 					if (pager != "show")
 					{
-						page.SkipTargetUrls = true;
+						page.SkipTargetRequests = true;
 					}
 				}
 			}
@@ -102,9 +113,9 @@ namespace DotnetSpider.Sample.docs
 			protected override void MyInit(params string[] arguments)
 			{
 				Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("g_page_config = {", "g_srp_loadCss();", 16, 22));
-				Downloader.AddAfterDownloadCompleteHandler(new TargetUrlsHandler(new AutoIncrementTargetUrlsExtractor("&s=0", 44)));
-				Downloader.AddAfterDownloadCompleteHandler(new MyAfterDownloadHandler());
-				SkipTargetUrlsWhenResultIsEmpty = true;
+				AddBeforeProcessor(new TargetRequestHandler(new AutoIncrementTargetRequestExtractor("&s=0", 44)));
+				AddBeforeProcessor(new MyBeforeProcessorHandler());
+				SkipTargetRequestsWhenResultIsEmpty = true;
 				AddStartRequest(new Request("https://s.taobao.com/search?q=妙可蓝多&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab=all", new Dictionary<string, dynamic> { { "bidwordstr", "妙可蓝多" } }));
 				AddEntityType<TaobaoItem>(new MyDataHanlder());
 				AddPipeline(new ConsoleEntityPipeline());

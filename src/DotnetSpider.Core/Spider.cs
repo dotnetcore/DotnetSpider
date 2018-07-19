@@ -1,24 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using DotnetSpider.Core.Downloader;
+﻿using DotnetSpider.Common;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Redial;
 using DotnetSpider.Core.Scheduler;
-using System.Runtime.CompilerServices;
+using DotnetSpider.Downloader;
+using DotnetSpider.Downloader.Redial;
 using Polly;
 using Polly.Retry;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
-using Serilog;
+using System.Threading;
+using System.Threading.Tasks;
+
+#if NETFRAMEWORK
+using System.Net;
+#endif
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
 [assembly: InternalsVisibleTo("DotnetSpider.Sample")]
@@ -27,29 +30,6 @@ using Serilog;
 
 namespace DotnetSpider.Core
 {
-	public static class SpiderArguments
-	{
-		/// <summary>
-		/// 只运行到InitComponent, 不真正的运行爬虫, 用于测试加载
-		/// </summary>
-		public const string InitOnly = "initonly";
-
-		/// <summary>
-		/// 在往Scheduler中添加Request前, 清空当前Scheduler
-		/// </summary>
-		public const string Reset = "reset";
-
-		/// <summary>
-		/// 不执行StartRequestsBuilder
-		/// </summary>
-		public const string ExcludeStartRequestsBuilder = "excludebuilder";
-
-		/// <summary>
-		/// 只执行报告操作
-		/// </summary>
-		public const string Report = "report";
-	}
-
 	/// <summary>
 	/// A spider contains four modules: Downloader, Scheduler, PageProcessor and Pipeline. 
 	/// </summary>
@@ -57,26 +37,22 @@ namespace DotnetSpider.Core
 	{
 		private Site _site = new Site();
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
-		private IDownloader _downloader = new HttpClientDownloader();
-		private readonly List<IPipeline> _pipelines = new List<IPipeline>();
-		private readonly List<IPageProcessor> _pageProcessors = new List<IPageProcessor>();
+		private IDownloader _downloader = new HttpWebRequestDownloader();
 		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
 		private bool _inited;
 		private int _threadNum = 1;
-		private bool _skipTargetUrlsWhenResultIsEmpty = true;
+		private bool _skipTargetRequestsWhenResultIsEmpty = true;
 		private bool _exitWhenComplete = true;
 		private int _emptySleepTime = 15000;
 		private int _pipelineCachedSize = 1;
-		private RetryPolicy _pipelineRetryPolicy;
+		private RetryPolicy _pipelineRetry;
 		private readonly AutomicLong _requestedCount = new AutomicLong(0);
 		private MemoryMappedFile _identityMmf;
 		private MemoryMappedFile _taskIdMmf;
 		private readonly string[] _closeSignalFiles = new string[2];
 		private bool _exited;
 		private IMonitor _monitor;
-		private readonly List<IStartUrlsBuilder> _startUrlsBuilders = new List<IStartUrlsBuilder>();
-		private int _pipelineRetryTimes = 2;
 		private int _statusFlushInterval = 5000;
 		private int _monitorFlushInterval;
 		private ILogger _failingRequestsLogger;
@@ -92,12 +68,12 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="arguments">程序运行参数</param>
 		/// <returns>返回 True, 则需要执行所有注册的StartUrlsBulder.</returns>
-		protected virtual bool IfRequireBuildStartUrlsBuilders(string[] arguments)
+		protected virtual bool IfRequireRunRequestBuilders(string[] arguments)
 		{
-			return arguments.Any(t => t?.ToLower() == SpiderArguments.ExcludeStartRequestsBuilder);
+			return arguments.Any(t => t?.ToLower() == SpiderArguments.ExcludeRequestBuilder);
 		}
 
-		protected virtual bool IfVerifyDataOrGenerateReport(string[] arguments)
+		protected virtual bool IfRequireVerifyDataOrGenerateReport(string[] arguments)
 		{
 			return arguments.Any(t => t?.ToLower() == SpiderArguments.Report);
 		}
@@ -105,7 +81,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 通过StartUrlsBuilder来初始化起始链接后的响应操作
 		/// </summary>
-		protected virtual void BuildStartUrlsBuildersCompleted()
+		protected virtual void RunStartRequestBuildersCompleted()
 		{
 		}
 
@@ -124,7 +100,7 @@ namespace DotnetSpider.Core
 		{
 			NetworkCenter.Current.Execute("verifyAndReport", () =>
 			{
-				if (IfVerifyDataOrGenerateReport(arguments))
+				if (IfRequireVerifyDataOrGenerateReport(arguments))
 				{
 					try
 					{
@@ -143,12 +119,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// All pipelines for spider.
 		/// </summary>
-		public IReadOnlyCollection<IPipeline> Pipelines => new ReadOnlyEnumerable<IPipeline>(_pipelines);
+		public readonly List<IPipeline> Pipelines = new List<IPipeline>();
 
 		/// <summary>
 		/// Storage all processors for spider.
 		/// </summary>
-		public IReadOnlyCollection<IPageProcessor> PageProcessors => new ReadOnlyEnumerable<IPageProcessor>(_pageProcessors);
+		public readonly List<IPageProcessor> PageProcessors = new List<IPageProcessor>();
 
 		/// <summary>
 		/// Interval time wait for new url.
@@ -188,6 +164,8 @@ namespace DotnetSpider.Core
 		/// Event of crawler on closed.
 		/// </summary>
 		public event Action<Spider, bool> OnClosed;
+
+		public readonly List<IBeforeProcessorHandler> BeforeProcessors = new List<IBeforeProcessorHandler>();
 
 		/// <summary>
 		/// Whether clear scheduler after spider completed.
@@ -260,21 +238,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Set the retry times for pipeline.
 		/// </summary>
-		public int PipelineRetryTimes
-		{
-			get => _pipelineRetryTimes;
-			set
-			{
-				CheckIfRunning();
-
-				if (value <= 0)
-				{
-					throw new ArgumentException($"{nameof(PipelineRetryTimes)} should greater than 0.");
-				}
-
-				_pipelineRetryTimes = value;
-			}
-		}
+		public int PipelineRetryTimes { get; set; }
 
 		/// <summary>
 		/// Scheduler of spider.
@@ -306,12 +270,6 @@ namespace DotnetSpider.Core
 				_pipelineCachedSize = value;
 			}
 		}
-
-		/// <summary>
-		/// Start url builders of spider.
-		/// </summary>
-		public IReadOnlyCollection<IStartUrlsBuilder> StartUrlBuilders =>
-			new ReadOnlyEnumerable<IStartUrlsBuilder>(_startUrlsBuilders);
 
 		/// <summary>
 		/// Interface used to adsl redial.
@@ -361,7 +319,7 @@ namespace DotnetSpider.Core
 				}
 				else
 				{
-					throw new SpiderException($"{nameof(EmptySleepTime)} should be greater than 0.");
+					throw new ArgumentException($"{nameof(EmptySleepTime)} should be greater than 0.");
 				}
 			}
 		}
@@ -402,13 +360,13 @@ namespace DotnetSpider.Core
 		/// Whether skip request when results of processor.
 		/// When results of processor is empty will retry request if this value is false.
 		/// </summary>
-		public bool SkipTargetUrlsWhenResultIsEmpty
+		public bool SkipTargetRequestsWhenResultIsEmpty
 		{
-			get => _skipTargetUrlsWhenResultIsEmpty;
+			get => _skipTargetRequestsWhenResultIsEmpty;
 			set
 			{
 				CheckIfRunning();
-				_skipTargetUrlsWhenResultIsEmpty = value;
+				_skipTargetRequestsWhenResultIsEmpty = value;
 			}
 		}
 
@@ -417,10 +375,13 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public IMonitorable Monitorable => Scheduler;
 
+		public readonly List<IRequestBuilder> RequestBuilders = new List<IRequestBuilder>();
+
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public Spider() : this(new Site(), Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(), null, null)
+		public Spider() : this(new Site(), Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(), null,
+			null)
 		{
 		}
 
@@ -428,7 +389,8 @@ namespace DotnetSpider.Core
 		/// 构造方法
 		/// </summary>
 		/// <param name="site">站点信息</param>
-		public Spider(Site site) : this(site, Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(), null, null)
+		public Spider(Site site) : this(site, Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(), null,
+			null)
 		{
 			Site = site;
 		}
@@ -445,9 +407,10 @@ namespace DotnetSpider.Core
 			IEnumerable<IPipeline> pipelines)
 		{
 #if NETSTANDARD
-			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #else
-			ThreadPool.SetMinThreads(200, 200);
+			ThreadPool.SetMinThreads(256, 256);
+			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
 			Site = site;
 			Identity = identity;
@@ -455,15 +418,13 @@ namespace DotnetSpider.Core
 
 			if (pageProcessors != null)
 			{
-				_pageProcessors.AddRange(pageProcessors);
+				PageProcessors.AddRange(pageProcessors);
 			}
 
 			if (pipelines != null)
 			{
-				_pipelines.AddRange(pipelines);
+				Pipelines.AddRange(pipelines);
 			}
-
-			AppDomain.CurrentDomain.ProcessExit += ProcessExit;
 		}
 
 		/// <summary>
@@ -499,9 +460,21 @@ namespace DotnetSpider.Core
 		/// <param name="pageProcessors">页面解析器</param>
 		/// <param name="scheduler">调度队列</param>
 		/// <returns>爬虫</returns>
-		public static Spider Create(Site site, string identify, IScheduler scheduler, params IPageProcessor[] pageProcessors)
+		public static Spider Create(Site site, string identify, IScheduler scheduler,
+			params IPageProcessor[] pageProcessors)
 		{
 			return new Spider(site, identify, scheduler, pageProcessors, null);
+		}
+
+		/// <summary>
+		/// Add IBeforeProcessorHandler
+		/// </summary>
+		/// <param name="beforeProcessorHandler"></param>
+		/// <returns></returns>
+		public Spider AddBeforeProcessor(IBeforeProcessorHandler beforeProcessorHandler)
+		{
+			BeforeProcessors.Add(beforeProcessorHandler);
+			return this;
 		}
 
 		/// <summary>
@@ -509,7 +482,7 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <returns></returns>
-		public Spider AddStartUrlBuilder(IStartUrlsBuilder builder)
+		public Spider AddRequestBuilder(IRequestBuilder builder)
 		{
 			if (builder == null)
 			{
@@ -517,7 +490,7 @@ namespace DotnetSpider.Core
 			}
 
 			CheckIfRunning();
-			_startUrlsBuilders.Add(builder);
+			RequestBuilders.Add(builder);
 			return this;
 		}
 
@@ -537,9 +510,9 @@ namespace DotnetSpider.Core
 		/// <param name="url">链接</param>
 		/// <param name="extras">Extra properties of request.</param>
 		/// <returns></returns>
-		public Spider AddStartUrl(string url, IDictionary<string, dynamic> extras)
+		public Spider AddStartUrl(string url, Dictionary<string, dynamic> extras)
 		{
-			Site.AddStartUrl(url, extras);
+			Site.AddRequests(new Request(url, extras));
 			return this;
 		}
 
@@ -571,7 +544,7 @@ namespace DotnetSpider.Core
 			}
 
 			CheckIfRunning();
-			Site.AddStartUrls(urls);
+			Site.AddRequests(urls);
 			return this;
 		}
 
@@ -613,7 +586,7 @@ namespace DotnetSpider.Core
 			}
 
 			CheckIfRunning();
-			Site.AddStartRequests(requests);
+			Site.AddRequests(requests);
 			return this;
 		}
 
@@ -656,7 +629,7 @@ namespace DotnetSpider.Core
 				{
 					if (processor != null)
 					{
-						_pageProcessors.Add(processor);
+						PageProcessors.Add(processor);
 					}
 				}
 			}
@@ -698,7 +671,7 @@ namespace DotnetSpider.Core
 		{
 			if (pipelines == null)
 			{
-				throw new SpiderException($"{nameof(pipelines)} should not be null.");
+				throw new ArgumentNullException($"{nameof(pipelines)} should not be null.");
 			}
 
 			CheckIfRunning();
@@ -706,7 +679,7 @@ namespace DotnetSpider.Core
 			{
 				if (pipeline != null)
 				{
-					_pipelines.Add(pipeline);
+					Pipelines.Add(pipeline);
 				}
 			}
 
@@ -725,13 +698,13 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			CheckSettings();
-
 			if (arguments.Any(t => t?.ToLower() == SpiderArguments.Report))
 			{
 				VerifyDataOrGenerateReport(arguments);
 				return;
 			}
+
+			CheckSettings();
 
 			InitComponents(arguments);
 
@@ -786,8 +759,23 @@ namespace DotnetSpider.Core
 							try
 							{
 								Stopwatch sw = new Stopwatch();
-								HandleRequest(sw, request, downloader);
+								var result = HandleRequest(sw, request, downloader);
+								if (result.Item1)
+								{
+									OnSuccess(request);
+									Logger.Information(
+										$"Crawl {request.Url} success, results {result.Item2}, effectedRow {result.Item3}.");
+								}
+								else
+								{
+									OnError(request);
+								}
+
 								Thread.Sleep(Site.SleepTime);
+							}
+							catch (ExitException)
+							{
+								Exit();
 							}
 							catch (Exception e)
 							{
@@ -796,12 +784,6 @@ namespace DotnetSpider.Core
 							}
 							finally
 							{
-								if (request.Proxy != null)
-								{
-									var statusCode = request.StatusCode;
-									Site.HttpProxyPool.ReturnProxy(request.Proxy, statusCode ?? HttpStatusCode.Found);
-								}
-
 								_requestedCount.Inc();
 
 								if (_requestedCount.Value % _monitorFlushInterval == 0)
@@ -819,9 +801,9 @@ namespace DotnetSpider.Core
 
 			IsCompleted = Status == Status.Finished;
 			FlushStatus();
-			OnDispose();
-			OnClosed?.Invoke(this, IsCompleted);
 			VerifyDataOrGenerateReport(arguments);
+			OnClosed?.Invoke(this, IsCompleted);
+			OnDispose();
 			_exited = true;
 		}
 
@@ -829,7 +811,7 @@ namespace DotnetSpider.Core
 		/// Pause spider.
 		/// </summary>
 		/// <param name="action">暂停完成后执行的回调</param>
-		public void Pause(Action action = null)
+		public override void Pause(Action action = null)
 		{
 			bool isRunning = Status == Status.Running;
 			if (!isRunning)
@@ -848,7 +830,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Contiune spider if spider is paused.
 		/// </summary>
-		public void Contiune()
+		public override void Contiune()
 		{
 			if (Status == Status.Paused)
 			{
@@ -899,7 +881,7 @@ namespace DotnetSpider.Core
 		/// Exit spider.
 		/// </summary>
 		/// <param name="action">退出完成后执行的回调</param>
-		public void Exit(Action action = null)
+		public override void Exit(Action action = null)
 		{
 			if (Status == Status.Running || Status == Status.Paused)
 			{
@@ -951,7 +933,8 @@ namespace DotnetSpider.Core
 		{
 			if (Site.RemoveOutboundLinks && (Site.Domains == null || Site.Domains.Length == 0))
 			{
-				throw new ArgumentException($"When you want remove outbound links, the domains should not be null or empty.");
+				throw new ArgumentException(
+					$"When you want remove outbound links, the domains should not be null or empty.");
 			}
 		}
 
@@ -963,10 +946,6 @@ namespace DotnetSpider.Core
 		{
 			Logger.Information("Init internal component...");
 
-#if !NETSTANDARD // 开启多线程支持
-			ServicePointManager.DefaultConnectionLimit = 1000;
-#endif
-
 			if (Site.Headers == null)
 			{
 				Site.Headers = new Dictionary<string, string>();
@@ -974,34 +953,31 @@ namespace DotnetSpider.Core
 
 			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
 			Site.UserAgent = Site.UserAgent ??
-			                 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
+							 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
 			if (!Site.Headers.ContainsKey("Accept-Language"))
 			{
 				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
 			}
 
 			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
-			Scheduler.Init(this);
 
 			if (arguments.Any(a => a?.ToLower() == SpiderArguments.Reset))
 			{
 				ResetScheduler();
 			}
 
-			Downloader = Downloader ?? new HttpClientDownloader();
+			Downloader = Downloader ?? new HttpWebRequestDownloader();
 
-			if (_pageProcessors == null || _pageProcessors.Count == 0)
+			if (PageProcessors == null || PageProcessors.Count == 0)
 			{
-				throw new SpiderException("PageProcessor unfound.");
+				throw new ArgumentException("PageProcessor unfound.");
 			}
 
 			InitPipelines(arguments);
 
 			InitCloseSignals();
 
-			Monitor = Monitor == null
-				? (string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? new LogMonitor() : new HttpMonitor())
-				: Monitor;
+			Monitor = Monitor ?? (string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? new LogMonitor() : new HttpMonitor());
 
 			_failingRequestsLogger = LogUtil.CreateFailingRequestsLogger(Identity);
 
@@ -1011,9 +987,13 @@ namespace DotnetSpider.Core
 
 			_monitorFlushInterval = CalculateMonitorFlushInterval();
 
-			if (!Console.IsInputRedirected)
+			try
 			{
 				Console.CancelKeyPress += ConsoleCancelKeyPress;
+			}
+			catch (Exception e)
+			{
+				Logger.Information($"Can't register cancel key press:{e.Message}");
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
@@ -1042,21 +1022,21 @@ namespace DotnetSpider.Core
 		{
 			var containsData = _cached != null && _cached.Count > 0;
 
-			foreach (IPipeline pipeline in _pipelines)
+			foreach (IPipeline pipeline in Pipelines)
 			{
 				if (containsData)
 				{
-					pipeline.Process(_cached.ToArray(), this);
+					pipeline.Process(_cached.ToArray(), Logger, this);
 				}
 
 				SafeDestroy(pipeline);
 			}
 
 			SafeDestroyScheduler();
-			SafeDestroy(_pageProcessors);
+			SafeDestroy(PageProcessors);
 			SafeDestroy(Downloader);
 
-			SafeDestroy(Site.HttpProxyPool);
+			//SafeDestroy(Site.HttpProxyPool);
 			SafeDestroy(_identityMmf);
 			SafeDestroy(_taskIdMmf);
 		}
@@ -1085,7 +1065,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Event when spider on success.
 		/// </summary>
-		protected void _OnSuccess(Request request)
+		protected void OnSuccess(Request request)
 		{
 			Scheduler.IncreaseSuccessCount();
 			OnRequestSucceeded?.Invoke(request);
@@ -1097,182 +1077,178 @@ namespace DotnetSpider.Core
 		/// <param name="stopwatch">计时器</param>
 		/// <param name="request">请求信息</param>
 		/// <param name="downloader">下载器</param>
-		protected void HandleRequest(Stopwatch stopwatch, Request request, IDownloader downloader)
+		protected Tuple<bool, int, int> HandleRequest(Stopwatch stopwatch, Request request, IDownloader downloader)
 		{
-			Page page = null;
+			var page = DownloadRequest(stopwatch, request, downloader);
+
+			foreach (var handler in BeforeProcessors)
+			{
+				handler.Handle(ref page);
+			}
+
+			if (string.IsNullOrWhiteSpace(page.Content))
+			{
+				// downloader 下载直接构造出的 Page 不会有其它处理, 因此产生的 TargetRequests只可能是重试
+				if (page.TargetRequests != null && page.TargetRequests.Count > 0)
+				{
+					RetriedTimes.Inc();
+					ExtractAndAddRequests(page);
+				}
+
+				return new Tuple<bool, int, int>(true, 0, 0);
+			}
 
 			try
 			{
 				stopwatch.Reset();
 				stopwatch.Start();
 
-				page = downloader.Download(request, this).Result;
+				foreach (var processor in PageProcessors)
+				{
+					processor.Process(page, Logger);
+				}
 
 				stopwatch.Stop();
-				CalculateDownloadSpeed(stopwatch.ElapsedMilliseconds);
-
-				if (page == null || page.Skip)
-				{
-					return;
-				}
-
-				if (page.Exception == null)
-				{
-					stopwatch.Reset();
-					stopwatch.Start();
-
-					foreach (var processor in _pageProcessors)
-					{
-						processor.Process(page, this);
-					}
-
-					stopwatch.Stop();
-					CalculateProcessorSpeed(stopwatch.ElapsedMilliseconds);
-				}
-				else
-				{
-					OnError(page.Request);
-				}
-			}
-			catch (DownloadException)
-			{
-				if (page != null)
-				{
-					OnError(page.Request);
-				}
-
-				Logger.Error($"Should not catch download exception: {request.Url}.");
+				CalculateProcessorSpeed(stopwatch.ElapsedMilliseconds);
 			}
 			catch (Exception e)
 			{
-				if (Site.CycleRetryTimes > 0)
+				// 解析异常有可能是下载内容导致的, 也有可能是自己解析写错了, 因此重试。
+				if (page.AddToCycleRetry())
 				{
-					page = Site.AddToCycleRetry(request);
+					Logger.Warning($"Retry request: {request.Url} because processor exception: {e}.");
 				}
-
-				if (page != null)
+				else
 				{
-					OnError(page.Request);
+					return new Tuple<bool, int, int>(false, 0, 0);
 				}
-
-				Logger.Error($"Extract {request.Url} failed, please check your pipeline: {e}.");
 			}
 
-			if (page == null)
+			// Bypass 是最高级别的忽略, 由 Processor修改, 直接忽略 Pipeline 和 TargetRequests
+			if (page.Bypass)
 			{
-				return;
+				return new Tuple<bool, int, int>(true, 0, 0);
 			}
 
-			// 此处是用于需要循环本身的场景, 不能使用本身Request的原因是Request的尝试次数计算问题
 			if (page.Retry)
 			{
 				RetriedTimes.Inc();
 				ExtractAndAddRequests(page);
-				return;
+				return new Tuple<bool, int, int>(false, 0, 0);
 			}
 
-			bool excutePipeline = false;
-			if (!page.SkipTargetUrls)
+			if (!page.ResultItems.IsEmpty || (page.ResultItems.IsEmpty && !SkipTargetRequestsWhenResultIsEmpty))
 			{
-				if (page.ResultItems.IsEmpty)
-				{
-					if (SkipTargetUrlsWhenResultIsEmpty)
-					{
-						Logger.Warning($"Skip {request.Url} because extract 0 result.");
-						_OnSuccess(request);
-					}
-					// 场景: 此链接就是用来生产新链接的, 因此不会有内容产出
-					else if (page.TargetRequests != null && page.TargetRequests.Count > 0)
-					{
-						ExtractAndAddRequests(page);
-					}
-					else
-					{
-						if (Site.CycleRetryTimes > 0)
-						{
-							page = Site.AddToCycleRetry(request);
-							if (page != null && page.Retry)
-							{
-								RetriedTimes.Inc();
-								ExtractAndAddRequests(page);
-							}
+				ExtractAndAddRequests(page);
+			}
 
-							Logger.Warning($"Download {request.Url} success, retry becuase extract 0 result.");
-						}
-						else
-						{
-							Logger.Warning($"Download {request.Url} success, will not retry because Site.CycleRetryTimes is 0.");
-							_OnSuccess(request);
-						}
-					}
-				}
-				else
-				{
-					excutePipeline = true;
-					ExtractAndAddRequests(page);
-				}
+			if (page.ResultItems.IsEmpty)
+			{
+				return new Tuple<bool, int, int>(true, 0, 0);
+			}
+
+			stopwatch.Reset();
+			stopwatch.Start();
+
+			int countOfResults = 0, effectedRows = 0;
+
+			ResultItems[] resultItems = new ResultItems[0];
+			if (PipelineCachedSize == 1)
+			{
+				resultItems = new[] { page.ResultItems };
 			}
 			else
 			{
-				excutePipeline = !page.ResultItems.IsEmpty;
+				lock (this)
+				{
+					_cached.Add(page.ResultItems);
+					if (_cached.Count >= PipelineCachedSize)
+					{
+						resultItems = _cached.ToArray();
+						_cached.Clear();
+					}
+				}
 			}
 
-			if (!excutePipeline)
+			foreach (IPipeline pipeline in Pipelines)
 			{
-				return;
+				try
+				{
+					_pipelineRetry.Execute(() => { pipeline.Process(resultItems, Logger, this); });
+				}
+				catch
+				{
+					Exit();
+				}
 			}
 
-			if (page.Exception == null)
+			foreach (var item in resultItems)
+			{
+				countOfResults += item.Request.GetCountOfResults();
+				effectedRows += item.Request.GetEffectedRows();
+			}
+
+			stopwatch.Stop();
+			CalculatePipelineSpeed(stopwatch.ElapsedMilliseconds);
+
+			return new Tuple<bool, int, int>(true, countOfResults, effectedRows);
+		}
+
+		private Page DownloadRequest(Stopwatch stopwatch, Request request, IDownloader downloader)
+		{
+			Page page = new Page(request);
+
+			try
 			{
 				stopwatch.Reset();
 				stopwatch.Start();
 
-				int countOfResults = 0, effectedRows = 0;
+				page = downloader.Download(request).ToPage();
 
-				ResultItems[] resultItems = new ResultItems[0];
-				if (PipelineCachedSize == 1)
+				stopwatch.Stop();
+				CalculateDownloadSpeed(stopwatch.ElapsedMilliseconds);
+			}
+			catch (BypassedDownloaderException bde)
+			{
+				Logger.Error($"Download {request.Url} failed: {bde.Message}.");
+				page.Content = null;
+			}
+			catch (DownloaderException de)
+			{
+				Logger.Error($"Download {request.Url} failed: {de.Message}.");
+				page.Content = null;
+				page.AddToCycleRetry();
+			}
+			catch (NeedRedialException re)
+			{
+				if (NetworkCenter.Current.Executor == null)
 				{
-					resultItems = new[] {page.ResultItems};
+					Logger.Error("RedialExecutor is null.");
+					Exit();
 				}
 				else
 				{
-					lock (this)
+					Logger.Information($"Try to redial because: {re.Message}.");
+					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 					{
-						_cached.Add(page.ResultItems);
-						if (_cached.Count >= PipelineCachedSize)
-						{
-							resultItems = _cached.ToArray();
-							_cached.Clear();
-						}
+						Logger.Error("Redial failed.");
+						Exit();
+					}
+					else
+					{
+						Logger.Information("Redial success.");
+						page.Content = null;
+						page.AddToCycleRetry();
 					}
 				}
-
-				foreach (IPipeline pipeline in Pipelines)
-				{
-					try
-					{
-						_pipelineRetryPolicy.Execute(() => { pipeline.Process(new[] {page.ResultItems}, this); });
-					}
-					catch (Exception e)
-					{
-						Logger.Error($"Execute pipeline failed: {e}");
-					}
-				}
-
-				foreach (var item in resultItems)
-				{
-					countOfResults += item.Request.CountOfResults ?? 0;
-					effectedRows += item.Request.EffectedRows ?? 0;
-				}
-
-				Logger.Information(
-					$"Crawl: {request.Url} success, results: {countOfResults}, effectedRow: {effectedRows}.");
-
-				_OnSuccess(request);
-
-				stopwatch.Stop();
-				CalculatePipelineSpeed(stopwatch.ElapsedMilliseconds);
 			}
+			catch (Exception e)
+			{
+				Logger.Error($"Unhandle downloader exception: {e}.");
+				Exit();
+			}
+
+			return page;
 		}
 
 		/// <summary>
@@ -1281,14 +1257,19 @@ namespace DotnetSpider.Core
 		/// <param name="page">页面数据</param>
 		protected void ExtractAndAddRequests(Page page)
 		{
-			if (page.Request.NextDepth <= Scheduler.Depth && page.TargetRequests != null &&
-			    page.TargetRequests.Count > 0)
+			if ((page.Request.Depth + 1) <= Scheduler.Depth && page.TargetRequests != null &&
+				page.TargetRequests.Count > 0)
 			{
 				foreach (Request request in page.TargetRequests)
 				{
-					Scheduler.Push(request);
+					Scheduler.Push(request, ShouldReserved);
 				}
 			}
+		}
+
+		protected virtual bool ShouldReserved(Request request)
+		{
+			return request.CycleTriedTimes <= Site.CycleRetryTimes;
 		}
 
 		/// <summary>
@@ -1312,19 +1293,19 @@ namespace DotnetSpider.Core
 
 			PipelineRetryTimes = PipelineRetryTimes <= 0 ? 1 : PipelineRetryTimes;
 
-			_pipelineRetryPolicy = Policy.Handle<Exception>().Retry(PipelineRetryTimes,
+			_pipelineRetry = Policy.Handle<Exception>().Retry(PipelineRetryTimes,
 				(ex, count) => { Logger.Error($"Execute pipeline failed [{count}]: {ex}"); });
 
-			if (_pipelines.Count == 0)
+			if (Pipelines.Count == 0)
 			{
 				var defaultPipeline = GetDefaultPipeline();
 				if (defaultPipeline != null)
 				{
-					_pipelines.Add(defaultPipeline);
+					Pipelines.Add(defaultPipeline);
 				}
 			}
 
-			if (_pipelines.Count == 0)
+			if (Pipelines.Count == 0)
 			{
 				throw new SpiderException("Pipeline unfound.");
 			}
@@ -1385,54 +1366,44 @@ namespace DotnetSpider.Core
 			AvgPipelineSpeed = _pipelineCostTimes / _pipelineTimes;
 		}
 
-		private void ProcessExit(object sender, EventArgs e)
-		{
-			NetworkCenter.Current.Executor?.Dispose();
-			Exit();
-			while (!_exited)
-			{
-				Thread.Sleep(100);
-			}
-		}
-
 		private void RunStartUrlBuilders(params string[] arguments)
 		{
-			if (_startUrlsBuilders != null && _startUrlsBuilders.Count > 0 && IfRequireBuildStartUrlsBuilders(arguments))
+			if (RequestBuilders != null && RequestBuilders.Count > 0 && IfRequireRunRequestBuilders(arguments))
 			{
 				try
 				{
-					for (int i = 0; i < _startUrlsBuilders.Count; ++i)
+					for (int i = 0; i < RequestBuilders.Count; ++i)
 					{
-						var builder = _startUrlsBuilders[i];
+						var builder = RequestBuilders[i];
 						Logger.Information($"Add start urls via builder[{i + 1}].");
 						builder.Build(Site);
 					}
 				}
 				finally
 				{
-					BuildStartUrlsBuildersCompleted();
+					RunStartRequestBuildersCompleted();
 				}
 			}
 		}
 
 		private void LoadScheduler()
 		{
-			if (Site.StartRequests != null && Site.StartRequests.Any())
+			if (Site.Requests != null && Site.Requests.Any())
 			{
-				Logger.Information($"Add start urls to scheduler, count {Site.StartRequests.Count}.");
+				Logger.Information($"Add start urls to scheduler, count {Site.Requests.Count}.");
 
 				if (!Scheduler.IsDistributed)
 				{
-					foreach (var request in Site.StartRequests)
+					foreach (var request in Site.Requests)
 					{
-						Scheduler.Push(request);
+						Scheduler.Push(request, ShouldReserved);
 					}
 				}
 				else
 				{
-					Scheduler.Import(new HashSet<Request>(Site.StartRequests));
+					Scheduler.Reload(new HashSet<Request>(Site.Requests));
 					// 释放本地内存
-					Site.ClearStartRequests();
+					Site.Requests.Clear();
 				}
 			}
 			else

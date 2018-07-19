@@ -4,10 +4,11 @@ using System.Text;
 using System.Linq;
 using DotnetSpider.Extension.Model;
 using System.Data;
-using DotnetSpider.Extension.Model.Attribute;
 using System.Data.Common;
 using System.Data.SqlClient;
-using Serilog;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -165,18 +166,18 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		private string GenerateUpdateSql(IModel model)
+		private string GenerateUpdateSql(IModel model, ILogger logger)
 		{
 			// 无主键, 无更新字段都无法生成更新SQL
 			if (model.TableInfo.UpdateColumns == null || !model.TableInfo.UpdateColumns.Any() || !model.Fields.Any(f => f.IsPrimary))
 			{
 				if (model.TableInfo.UpdateColumns == null || !model.TableInfo.UpdateColumns.Any())
 				{
-					Log.Logger.Warning("Can't generate update sql, in table info, the count of update columns is zero.");
+					logger.Warning("Can't generate update sql, in table info, the count of update columns is zero.");
 				}
 				else
 				{
-					Log.Logger.Warning("Can't generate update sql, because in table info, because primary key is missing.");
+					logger.Warning("Can't generate update sql, because in table info, because primary key is missing.");
 				}
 				return null;
 			}
@@ -278,7 +279,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return new SqlConnection(connectString);
 		}
 
-		protected override Sqls GenerateSqls(IModel model)
+		protected override Sqls GenerateSqls(IModel model, ILogger logger)
 		{
 			if (PipelineMode == PipelineMode.InsertNewAndUpdateOld)
 			{
@@ -288,7 +289,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			sqls.InsertSql = GenerateInsertSql(model);
 			sqls.InsertAndIgnoreDuplicateSql = GenerateInsertSql(model);
-			sqls.UpdateSql = GenerateUpdateSql(model);
+			sqls.UpdateSql = GenerateUpdateSql(model, logger);
 			sqls.SelectSql = GenerateSelectSql(model);
 			return sqls;
 		}

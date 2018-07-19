@@ -1,14 +1,26 @@
-﻿using DotnetSpider.Core.Infrastructure;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core.Selector;
+using DotnetSpider.Core.Infrastructure.Database;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Processor.TargetRequestExtractors;
+using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Downloader;
+using DotnetSpider.Downloader.AfterDownloadCompleteHandlers;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure.Database;
+using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Extraction.Model.Formatter;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs
 {
@@ -18,7 +30,7 @@ namespace DotnetSpider.Sample.docs
 		{
 			Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("json(", ");", 5, 0));
 			AddPipeline(new ConsoleEntityPipeline());
-			AddStartUrlBuilder(new DbStartUrlsBuilder(Database.MySql, Env.DataConnectionString,
+			AddRequestBuilder(new DbStartUrlsBuilder(Database.MySql, Env.DataConnectionString,
 				$"SELECT * FROM test.jd_sku", new[] { "sku" },
 				"http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json"));
 

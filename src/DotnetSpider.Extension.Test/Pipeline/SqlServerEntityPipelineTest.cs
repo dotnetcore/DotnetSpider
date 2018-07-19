@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Pipeline;
 using Xunit;
 using Dapper;
 using DotnetSpider.Extension.Processor;
 using System.Data;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Common;
+using DotnetSpider.Extraction.Model;
 #if NETSTANDARD
 using System.Runtime.InteropServices;
 #endif
@@ -71,7 +71,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 						{ "decimal", "1"}
 					}
 				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				pipeline.Process(new ResultItems[] { resultItems }, spider.Logger, spider);
 
 				var columns = conn.Query<ColumnInfo>("USE [test];select  b.name Name,c.name+'(' + cast(c.length as varchar)+')' [Type] from sysobjects a,syscolumns b,systypes c where a.id=b.id and a.name='table15' and a.xtype='U'and b.xtype=c.xtype").ToList();
 				Assert.Equal(15, columns.Count);

@@ -1,4 +1,4 @@
-﻿using Serilog;
+﻿using DotnetSpider.Common;
 
 namespace DotnetSpider.Core
 {
@@ -31,7 +31,6 @@ namespace DotnetSpider.Core
 			_logger.Information(msg, identity);
 			return true;
 		}
-
 
 		/// <summary>
 		/// 删除运行记录

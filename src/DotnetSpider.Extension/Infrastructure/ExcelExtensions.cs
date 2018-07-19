@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using OfficeOpenXml;
 using System.IO;
 using MimeKit;
 using DotnetSpider.Core.Infrastructure;
 using System.Reflection;
 using DotnetSpider.Core;
+using OfficeOpenXml;
 
 namespace DotnetSpider.Extension.Infrastructure
 {
@@ -144,7 +144,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <param name="file">附件的路径</param>
 		public static void EmailTo<T>(string file)
 		{
-			var description = typeof(T).GetTypeInfo().GetCustomAttribute<Description>();
+			var description = (Description)typeof(T).GetCustomAttributes(typeof(Description), true).First();
 			var emailTo = description.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim()).ToList();
 			var subject = description.Subject;
 			EmailTo(file, subject, emailTo, Env.EmailHost, int.Parse(Env.EmailPort), Env.EmailAccount, Env.EmailPassword);
@@ -175,7 +175,11 @@ namespace DotnetSpider.Extension.Infrastructure
 
 			var attachment = new MimePart("excel", "xlsx")
 			{
+#if !NET40
 				Content = new MimeContent(File.OpenRead(file)),
+#else
+				ContentObject = new ContentObject(File.OpenRead(file)),
+#endif
 				ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
 				ContentTransferEncoding = ContentEncoding.Base64,
 				FileName = Path.GetFileName(file)

@@ -1,5 +1,5 @@
 ﻿//using DotnetSpider.Core;
-//using DotnetSpider.Core.Selector;
+//using DotnetSpider.Selector;
 //using DotnetSpider.Extension.Infrastructure;
 //using DotnetSpider.Extension.Model;
 //using DotnetSpider.Extension.Model.Attribute;

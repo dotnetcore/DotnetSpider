@@ -24,10 +24,18 @@ namespace DotnetSpider.Core.Infrastructure
 			InnerHandler = innerHandler;
 		}
 
+#if NET40
+		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+#else
 		protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-		{
-			var response = await base.SendAsync(request, cancellationToken);
+#endif
 
+		{
+#if NET40
+			var response = base.SendAsync(request, cancellationToken).Result;
+#else
+			var response = await base.SendAsync(request, cancellationToken);
+#endif
 			if (response.StatusCode == HttpStatusCode.MovedPermanently
 				|| response.StatusCode == HttpStatusCode.Moved
 				|| response.StatusCode == HttpStatusCode.Redirect
@@ -49,9 +57,18 @@ namespace DotnetSpider.Core.Infrastructure
 				}
 				newRequest.RequestUri = new Uri(response.RequestMessage.RequestUri, response.Headers.Location);
 
+#if NET40
+				return SendAsync(newRequest, cancellationToken);
+#else
 				response = await SendAsync(newRequest, cancellationToken);
+#endif
 			}
+#if NET40
+			return new Task<HttpResponseMessage>(() => response);
+#else
 			return response;
+#endif
+
 		}
 
 		private static HttpRequestMessage CopyRequest(HttpRequestMessage oldRequest)

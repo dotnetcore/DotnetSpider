@@ -3,7 +3,6 @@ using Xunit;
 
 namespace DotnetSpider.Core.Test
 {
-
 	public class ResultItemsTest
 	{
 		public class A

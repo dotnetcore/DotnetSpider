@@ -9,7 +9,7 @@ namespace DotnetSpider.Core.Infrastructure
 	/// </summary>
 	public class Cache
 	{
-		private static readonly Dictionary<string, dynamic> Cached = new Dictionary<string, dynamic>();
+		private static readonly Dictionary<string, object> Cached = new Dictionary<string, object>();
 		private static readonly Lazy<Cache> MyInstance = new Lazy<Cache>(() => new Cache());
 
 		private Cache()
@@ -27,7 +27,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="key">索引</param>
 		/// <param name="data">数据对象</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void Set(string key, dynamic data)
+		public void Set(string key, object data)
 		{
 			Cached.Add(key, data);
 		}
@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="key">索引</param>
 		/// <returns>数据对象</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public dynamic Get(string key)
+		public object Get(string key)
 		{
 			var result = Cached.ContainsKey(key) ? Cached[key] : null;
 			return result;

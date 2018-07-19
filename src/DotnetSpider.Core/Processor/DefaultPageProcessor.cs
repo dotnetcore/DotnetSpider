@@ -1,3 +1,5 @@
+using DotnetSpider.Core.Processor.TargetRequestExtractors;
+
 namespace DotnetSpider.Core.Processor
 {
 	/// <summary>
@@ -12,7 +14,7 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="excludeParterns">排除目标链接的正则表达式</param>
 		public DefaultPageProcessor(string[] partterns = null, string[] excludeParterns = null)
 		{
-			var targetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor();
+			var targetUrlsExtractor = new RegionAndPatternTargetRequestExtractor();
 			if (partterns != null && partterns.Length > 0)
 			{
 				targetUrlsExtractor.AddTargetUrlExtractor(".", partterns);
@@ -31,7 +33,7 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="patterns">匹配目标链接的正则表达式</param>
 		public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
 		{
-			(TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor)?.AddTargetUrlExtractor(regionXpath, patterns);
+			(TargetUrlsExtractor as RegionAndPatternTargetRequestExtractor)?.AddTargetUrlExtractor(regionXpath, patterns);
 		}
 
 		/// <summary>
@@ -40,9 +42,9 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="page">页面数据</param>
 		protected override void Handle(Page page)
 		{
-			page.AddResultItem("title", page.Selectable.XPath("//title").GetValue());
+			page.AddResultItem("title", page.Selectable().XPath("//title").GetValue());
 			page.AddResultItem("html", page.Content);
-			page.AddResultItem("url", page.Url);
+			page.AddResultItem("url", page.Request.Url);
 		}
 	}
 }

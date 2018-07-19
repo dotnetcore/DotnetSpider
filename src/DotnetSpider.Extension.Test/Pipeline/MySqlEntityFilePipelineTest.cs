@@ -1,13 +1,12 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Xunit;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Extraction;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {

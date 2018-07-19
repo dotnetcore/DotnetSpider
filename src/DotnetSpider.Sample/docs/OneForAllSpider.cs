@@ -1,12 +1,26 @@
-﻿using System;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core;
+using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Infrastructure.Database;
+using DotnetSpider.Core.Pipeline;
+using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Processor.TargetRequestExtractors;
+using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Downloader;
+using DotnetSpider.Downloader.AfterDownloadCompleteHandlers;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Core;
+using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Extraction.Model.Formatter;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs
 {
@@ -42,7 +56,7 @@ namespace DotnetSpider.Sample.docs
 			}
 
 			[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-			[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+			[TargetRequestSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 			class TmpProduct
 			{
 				[Field(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
@@ -59,7 +73,7 @@ namespace DotnetSpider.Sample.docs
 				public string Sku { get; set; }
 			}
 
-			[TargetUrlsSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+			[TargetRequestSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 			[TableInfo("jd", "jd_product", Uniques = new[] { "Sku" }, Indexs = new[] { "Sku" })]
 			class JdProduct
 			{

@@ -3,6 +3,8 @@ using System.Text;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using DotnetSpider.Common;
+using System;
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -32,25 +34,26 @@ namespace DotnetSpider.Core.Pipeline
 		/// 数据序列化成JSON并存储到文件中
 		/// </summary>
 		/// <param name="resultItems">数据结果</param>
-		/// <param name="spider">爬虫</param>
-		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
+		/// <param name="logger">日志接口</param>
+		/// <param name="sender">调用方</param>
+		public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 		{
+			var jsonFile = Path.Combine(GetDataFolder(sender), $"{sender.Identity}.json");
 			try
 			{
-				var jsonFile = Path.Combine(GetDataFolder(spider), $"{spider.Identity}.json");
-				var streamWriter = GetDataWriter(jsonFile);
+				var streamWriter = GetStreamWriter(jsonFile);
 				foreach (var resultItem in resultItems)
 				{
-					resultItem.Request.CountOfResults = 1;
-					resultItem.Request.EffectedRows = 1;
+					resultItem.Request.AddCountOfResults(1);
+					resultItem.Request.AddEffectedRows(1);
 
 					streamWriter.WriteLine(JsonConvert.SerializeObject(resultItem.Results));
 				}
 			}
-			catch
+			catch (Exception e)
 			{
-				spider.Logger.Error("Write data to json file failed.");
-				throw;
+				logger.Error($"Storage data to file {jsonFile} failed: {e}.");
+				throw e;
 			}
 		}
 
@@ -67,7 +70,7 @@ namespace DotnetSpider.Core.Pipeline
 			_writers.Clear();
 		}
 
-		private StreamWriter GetDataWriter(string file)
+		private StreamWriter GetStreamWriter(string file)
 		{
 			if (_writers.ContainsKey(file))
 			{

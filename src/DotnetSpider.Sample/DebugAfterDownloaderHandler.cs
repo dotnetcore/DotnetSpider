@@ -1,11 +1,12 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Sample
 {
 	public class DebugAfterDownloaderHandler : AfterDownloadCompleteHandler
 	{
-		public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
+		public override void Handle(ref Response response, IDownloader downloader)
 		{
 		}
 	}

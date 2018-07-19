@@ -1,38 +1,12 @@
-﻿using System;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Extraction;
 using System.Collections.Generic;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core
 {
-	/// <summary>
-	/// 用于存储下载的内容, 解析到的目标链接等信息
-	/// </summary>
-	public class Page
+	public class Page : Response
 	{
 		private readonly object _locker = new object();
-		private ISelectable _selectable;
-		private string _content;
-
-		/// <summary>
-		/// 下载的内容类型, 自动识别
-		/// </summary>
-		public ContentType ContentType { get; internal set; } = ContentType.Html;
-
-		/// <summary>
-		/// 页面的链接
-		/// </summary>
-		public string Url { get; }
-
-		/// <summary>
-		/// 最终请求的链接, 当发生30X跳转时与Url的值不一致
-		/// </summary>
-		public string TargetUrl { get; set; }
-
-		/// <summary>
-		/// 页面的Http请求
-		/// </summary>
-		public Request Request { get; }
 
 		/// <summary>
 		/// 是否需要重试当前页面
@@ -42,17 +16,17 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 对此页面跳过解析目标链接的操作
 		/// </summary>
-		public bool SkipExtractTargetUrls { get; set; }
+		public bool SkipExtractedTargetRequests { get; set; }
 
 		/// <summary>
 		/// 页面解析出来的目标链接不加入到调度队列中
 		/// </summary>
-		public bool SkipTargetUrls { get; set; }
+		public bool SkipTargetRequests { get; set; }
 
 		/// <summary>
-		/// 页面解析的数据不传入数据管道中作处理
+		/// 忽略当前页面不作解析处理
 		/// </summary>
-		public bool Skip { get; set; }
+		public bool Bypass { get; set; }
 
 		/// <summary>
 		/// 页面解析的数据结果
@@ -60,46 +34,9 @@ namespace DotnetSpider.Core
 		public ResultItems ResultItems { get; } = new ResultItems();
 
 		/// <summary>
-		/// 下载到的文本内容
-		/// </summary>
-		public string Content
-		{
-			get => _content;
-			set
-			{
-				if (!Equals(value, _content))
-				{
-					_content = value;
-					_selectable = null;
-				}
-			}
-		}
-
-		/// <summary>
-		/// 下载页面内容时截获的异常
-		/// </summary>
-		public Exception Exception { get; set; }
-
-		/// <summary>
 		/// 页面解析到的目标链接
 		/// </summary>
 		public HashSet<Request> TargetRequests { get; } = new HashSet<Request>();
-
-		/// <summary>
-		/// 查询器
-		/// </summary>
-		public ISelectable Selectable
-		{
-			get
-			{
-				if (_selectable == null)
-				{
-					string urlOrPadding = ContentType == ContentType.Json ? Request.Site.JsonPadding : Request.Url;
-					_selectable = new Selectable(Content, urlOrPadding, ContentType, Request.Site.RemoveOutboundLinks ? Request.Site.Domains : null);
-				}
-				return _selectable;
-			}
-		}
 
 		/// <summary>
 		/// 构造方法
@@ -108,7 +45,6 @@ namespace DotnetSpider.Core
 		public Page(Request request)
 		{
 			Request = request;
-			Url = request.Url;
 			ResultItems.Request = request;
 		}
 
@@ -184,8 +120,8 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			var newUrl = UrlUtil.CanonicalizeUrl(url, Url);
-			var request = new Request(newUrl, Request.Extras) { Priority = priority };
+			var newUrl = Selectable.CanonicalizeUrl(url, Request.Url);
+			var request = new Request(newUrl, Request.Properties) { Priority = priority };
 			AddTargetRequest(request, increaseDeep);
 		}
 
@@ -196,15 +132,36 @@ namespace DotnetSpider.Core
 		/// <param name="increaseDeep">目标链接的深度是否升高</param>
 		public void AddTargetRequest(Request request, bool increaseDeep = true)
 		{
-			if (request == null || !request.IsAvailable)
+			if (request == null || !IsAvailable(request))
 			{
 				return;
 			}
-			request.Depth = increaseDeep ? Request.NextDepth : Request.Depth;
+			request.Depth = increaseDeep ? Request.Depth + 1 : Request.Depth;
 			lock (_locker)
 			{
 				TargetRequests.Add(request);
 			}
+		}
+
+		private bool IsAvailable(Request request)
+		{
+			if (string.IsNullOrWhiteSpace(request.Url))
+			{
+				return false;
+			}
+
+			if (request.Url.Length < 6)
+			{
+				return false;
+			}
+
+			var schema = request.Url.Substring(0, 5).ToLower();
+			if (!schema.StartsWith("http") && !schema.StartsWith("https"))
+			{
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

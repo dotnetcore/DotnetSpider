@@ -4,8 +4,9 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Infrastructure;
 using System.Data;
 using MySql.Data.MySqlClient;
-using DotnetSpider.Extension.Model.Attribute;
-using Serilog;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -28,14 +29,14 @@ namespace DotnetSpider.Extension.Pipeline
 			return new MySqlConnection(connectString);
 		}
 
-		protected override Sqls GenerateSqls(IModel model)
+		protected override Sqls GenerateSqls(IModel model, ILogger logger)
 		{
 			var sqls = new Sqls
 			{
 				InsertSql = GenerateInsertSql(model, false),
 				InsertAndIgnoreDuplicateSql = GenerateInsertSql(model, true),
 				InsertNewAndUpdateOldSql = GenerateInsertNewAndUpdateOldSql(model),
-				UpdateSql = GenerateUpdateSql(model),
+				UpdateSql = GenerateUpdateSql(model, logger),
 				SelectSql = GenerateSelectSql(model)
 			};
 			return sqls;
@@ -172,18 +173,18 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		private string GenerateUpdateSql(IModel model)
+		private string GenerateUpdateSql(IModel model, ILogger logger)
 		{
 			// 无主键, 无更新字段都无法生成更新SQL
 			if (model.TableInfo.UpdateColumns == null || !model.TableInfo.UpdateColumns.Any() || !model.Fields.Any(f => f.IsPrimary))
 			{
 				if (model.TableInfo.UpdateColumns == null || !model.TableInfo.UpdateColumns.Any())
 				{
-					Log.Logger.Warning("Can't generate update sql, in table info, the count of update columns is zero.");
+					logger.Warning("Can't generate update sql, in table info, the count of update columns is zero.");
 				}
 				else
 				{
-					Log.Logger.Warning("Can't generate update sql, because in table info, because primary key is missing.");
+					logger.Warning("Can't generate update sql, because in table info, because primary key is missing.");
 				}
 				return null;
 			}

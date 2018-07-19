@@ -1,11 +1,26 @@
-﻿using DotnetSpider.Core;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core;
+using DotnetSpider.Core.Downloader;
+using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Processor.TargetRequestExtractors;
 using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Core.Selector;
+using DotnetSpider.Downloader;
+using DotnetSpider.Downloader.AfterDownloadCompleteHandlers;
+using DotnetSpider.Extension;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Extraction.Model.Formatter;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs
 {
@@ -21,7 +36,7 @@ namespace DotnetSpider.Sample.docs
 			for (int i = 1; i < 5; ++i)
 			{
 				// 添加初始采集链接
-				site.AddStartUrl("http://www.cnblogs.com");
+				site.AddRequests("http://www.cnblogs.com");
 			}
 
 			// 使用内存Scheduler、自定义PageProcessor、自定义Pipeline创建爬虫
@@ -39,7 +54,7 @@ namespace DotnetSpider.Sample.docs
 			private static long blogSumaryCount = 0;
 			private static long newsCount = 0;
 
-			public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
+			public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 			{
 				foreach (var resultItem in resultItems)
 				{
@@ -70,13 +85,13 @@ namespace DotnetSpider.Sample.docs
 			public BlogSumaryProcessor()
 			{
 				// 定义目标页的筛选
-				TargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor(".", "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+");
+				TargetUrlsExtractor = new RegionAndPatternTargetRequestExtractor(".", "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+");
 			}
 
 			protected override void Handle(Page page)
 			{
 				// 利用 Selectable 查询并构造自己想要的数据对象
-				var blogSummaryElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='post_item']")).Nodes();
+				var blogSummaryElements = page.Selectable().SelectList(Selectors.XPath("//div[@class='post_item']")).Nodes();
 				List<BlogSumary> results = new List<BlogSumary>();
 				foreach (var blogSummary in blogSummaryElements)
 				{
@@ -97,13 +112,13 @@ namespace DotnetSpider.Sample.docs
 		{
 			public NewsProcessor()
 			{
-				TargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor(null, "^http://www\\.cnblogs\\.com/$", "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+");
+				TargetUrlsExtractor = new RegionAndPatternTargetRequestExtractor(null, "^http://www\\.cnblogs\\.com/$", "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+");
 			}
 
 			protected override void Handle(Page page)
 			{
 				// 利用 Selectable 查询并构造自己想要的数据对象
-				var newsElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='post_item']")).Nodes();
+				var newsElements = page.Selectable().SelectList(Selectors.XPath("//div[@class='post_item']")).Nodes();
 				List<News> results = new List<News>();
 				foreach (var news in newsElements)
 				{

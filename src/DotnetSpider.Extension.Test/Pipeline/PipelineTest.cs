@@ -3,56 +3,23 @@ using DotnetSpider.Core;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using Xunit;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Extraction.Model.Formatter;
+using DotnetSpider.Extraction;
+using DotnetSpider.Common;
+using DotnetSpider.Extension.Downloader;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
 	public class PipelineTest : TestBase
 	{
-		[Fact(Skip = "NEXT", DisplayName = "MixProcessorAndMissEntityPipeline")]
-		public void MixProcessorAndMissEntityPipeline()
-		{
-			var exceptoin = Assert.Throws<SpiderException>(() =>
-			{
-				var id = Guid.NewGuid().ToString("N");
-				BaiduSearchSpider spider = new BaiduSearchSpider();
-				spider.Identity = id;
-				spider.Run();
-			});
-			Assert.Equal("You may miss a entity pipeline", exceptoin.Message);
-		}
-
-		[Fact(DisplayName = "MixProcessor")]
-		public void MixProcessor()
-		{
-			using (var conn = new MySqlConnection(DefaultConnectionString))
-			{
-				conn.Execute("DROP TABLE IF EXISTS baidu.baidu_search_mixprocessor");
-			}
-			var id = Guid.NewGuid().ToString("N");
-			BaiduSearchSpider spider = new BaiduSearchSpider();
-			spider.AddPipeline(new MySqlEntityPipeline(DefaultConnectionString));
-			spider.Identity = id;
-			spider.Run();
-
-			using (var conn = new MySqlConnection(DefaultConnectionString))
-			{
-				var count = conn.QueryFirst<int>("SELECT COUNT(*) FROM baidu.baidu_search_mixprocessor");
-				Assert.Equal(20, count);
-				conn.Execute("DROP TABLE IF EXISTS baidu.baidu_search_mixprocessor");
-			}
-		}
-
-
-		public class BaiduSearchSpider : EntitySpider
+		class BaiduSearchSpider : EntitySpider
 		{
 			public BaiduSearchSpider() : base("BaiduSearchSpider")
 			{
@@ -68,17 +35,18 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				AddPipeline(new MyPipeline());
 			}
 
-			class MyPipeline : BasePipeline
-			{
-				public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
-				{
-				}
-			}
-
 			class MyProcessor : BasePageProcessor
 			{
 				protected override void Handle(Page page)
 				{
+				}
+			}
+
+			class MyPipeline : BasePipeline
+			{
+				public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+				{
+
 				}
 			}
 
@@ -120,6 +88,40 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				[Field(Expression = "today", Type = SelectorType.Enviroment)]
 				public DateTime run_id { get; set; }
+			}
+		}
+
+		[Fact(Skip = "NEXT", DisplayName = "MixProcessorAndMissEntityPipeline")]
+		public void MixProcessorAndMissEntityPipeline()
+		{
+			var exceptoin = Assert.Throws<SpiderException>(() =>
+			{
+				var id = Guid.NewGuid().ToString("N");
+				BaiduSearchSpider spider = new BaiduSearchSpider();
+				spider.Identity = id;
+				spider.Run();
+			});
+			Assert.Equal("You may miss a entity pipeline", exceptoin.Message);
+		}
+
+		[Fact(DisplayName = "MixProcessor")]
+		public void MixProcessor()
+		{
+			using (var conn = new MySqlConnection(DefaultConnectionString))
+			{
+				conn.Execute("DROP TABLE IF EXISTS baidu.baidu_search_mixprocessor");
+			}
+			var id = Guid.NewGuid().ToString("N");
+			BaiduSearchSpider spider = new BaiduSearchSpider();
+			spider.AddPipeline(new MySqlEntityPipeline(DefaultConnectionString));
+			spider.Identity = id;
+			spider.Run();
+
+			using (var conn = new MySqlConnection(DefaultConnectionString))
+			{
+				var count = conn.QueryFirst<int>("SELECT COUNT(*) FROM baidu.baidu_search_mixprocessor");
+				Assert.Equal(20, count);
+				conn.Execute("DROP TABLE IF EXISTS baidu.baidu_search_mixprocessor");
 			}
 		}
 	}

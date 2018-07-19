@@ -1,3 +1,0 @@
-CassandaraCSharpDriver-> lz4net, 
-Dapper 1.50.2                        Can't upgrade anymore, b/c 1.50.4 not support net45.
-MySql 6.9.11                         Can't upgrade anymore, b/c 6.10.x not support net45.

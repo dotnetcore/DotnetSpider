@@ -1,3 +1,4 @@
+using DotnetSpider.Common;
 using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Core.Scheduler.Component

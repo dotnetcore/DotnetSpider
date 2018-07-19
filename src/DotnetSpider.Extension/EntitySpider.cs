@@ -1,9 +1,11 @@
-﻿using DotnetSpider.Core;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extraction.Model;
 
 namespace DotnetSpider.Extension
 {
@@ -73,7 +75,7 @@ namespace DotnetSpider.Extension
 		/// </summary>
 		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
 		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
-		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor) where T : new()
+		public void AddEntityType<T>(ITargetRequestExtractor targetUrlsExtractor) where T : new()
 		{
 			AddEntityType<T>(targetUrlsExtractor, null);
 		}
@@ -84,7 +86,7 @@ namespace DotnetSpider.Extension
 		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
 		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
 		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
-		public void AddEntityType<T>(ITargetUrlsExtractor targetUrlsExtractor, IDataHandler dataHandler) where T : new()
+		public void AddEntityType<T>(ITargetRequestExtractor targetUrlsExtractor, IDataHandler dataHandler) where T : new()
 		{
 			CheckIfRunning();
 

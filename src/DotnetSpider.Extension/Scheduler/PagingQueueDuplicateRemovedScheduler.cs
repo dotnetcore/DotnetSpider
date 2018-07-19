@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DotnetSpider.Common;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Scheduler;
@@ -20,27 +21,28 @@ namespace DotnetSpider.Extension.Scheduler
 		private readonly string _pagingRecordTableName = Env.DefaultDatabase + ".`paging_record`";
 		private readonly string _pagingTableName = Env.DefaultDatabase + ".`paging`";
 		private readonly string _pagingRunningTableName = Env.DefaultDatabase + ".`paging_running`";
-		private string _taskName;
-		private Site _site;
+		private readonly string _taskName;
+		private readonly string _identity;
 		private int _currentPage;
-		
+		private bool _inited;
+
 		protected readonly int Size;
+		protected readonly Site _site;
 
 		private readonly RetryPolicy _retryPolicy = Policy.Handle<Exception>().Retry(10000, (ex, count) =>
 		{
 			Log.Logger.Error($"PushRequests failed [{count}]: {ex}");
 		});
 
-		public PagingQueueDuplicateRemovedScheduler(int size, bool reset, string description = null) : this("", size, reset, description)
-		{
-		}
 
-		public PagingQueueDuplicateRemovedScheduler(string taskName, int size, bool reset, string description = null)
+		public PagingQueueDuplicateRemovedScheduler(string taskName, string identity, Site site, int size, bool reset, string description = null)
 		{
 			_taskName = taskName;
+			_identity = identity;
 			Size = size;
 			_description = description;
 			_reset = reset;
+			_site = site;
 		}
 
 		protected virtual IDbConnection CreateDbConnection()
@@ -58,54 +60,48 @@ namespace DotnetSpider.Extension.Scheduler
 
 			if (request == null)
 			{
+				lock (this)
+				{
+					if (!_inited)
+					{
+						using (var conn = CreateDbConnection())
+						{
+							conn.Execute($"create database if not exists {Env.DefaultDatabase}");
+							conn.Execute($"create table if not exists {_pagingRecordTableName}(`identity` varchar(50) NOT NULL,`description` varchar(50) DEFAULT NULL, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`identity`))");
+							conn.Execute($"create table if not exists {_pagingTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");
+							conn.Execute($"create table if not exists {_pagingRunningTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");
+
+							var exist = conn.QueryFirst<int>($"SELECT count(*) from {_pagingRecordTableName} where `identity` = @Identity", new { _identity });
+							if (exist == 0)
+							{
+								var affected = conn.Execute($"INSERT INTO {_pagingRecordTableName}(`identity`,`description`) VALUES (@Identity, @Description)", new { _identity, Description = _description });
+								if (affected > 0 && _reset)
+								{
+									conn.Execute($"delete from {_pagingTableName} where `task_name` = @t", new { t = _taskName });
+									conn.Execute($"delete from {_pagingRunningTableName} where `task_name` = @t", new { t = _taskName });
+
+									var totalCount = GetTotalCount(conn);
+									var pageCount = totalCount / Size + (totalCount % Size > 0 ? 1 : 0);
+									var pages = new List<dynamic>();
+									for (var page = 1; page <= pageCount; page++)
+									{
+										pages.Add(new { p = page, t = _taskName });
+										if (pages.Count >= 1000 || page >= pageCount)
+										{
+											conn.Execute($"INSERT INTO {_pagingTableName}(page,`task_name`) values (@p,@t)", pages);
+											pages.Clear();
+										}
+									}
+								}
+							}
+						}
+
+						_inited = true;
+					}
+				}
 				LoadRequests();
 			}
 			return request;
-		}
-
-		public override void Init(ISpider spider)
-		{
-			base.Init(spider);
-
-			if (string.IsNullOrWhiteSpace(_taskName))
-			{
-				_taskName = spider.Name;
-			}
-			_site = spider.Site;
-
-			using (var conn = CreateDbConnection())
-			{
-				conn.Execute($"create database if not exists {Env.DefaultDatabase}");
-				conn.Execute($"create table if not exists {_pagingRecordTableName}(`identity` varchar(50) NOT NULL,`description` varchar(50) DEFAULT NULL, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`identity`))");
-				conn.Execute($"create table if not exists {_pagingTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");
-				conn.Execute($"create table if not exists {_pagingRunningTableName}(page int(11) NOT null, `task_name` varchar(60) NOT null, `creation_date` timestamp DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(`page`,`task_name`))");
-
-				var exist = conn.QueryFirst<int>($"SELECT count(*) from {_pagingRecordTableName} where `identity` = @Identity", new { spider.Identity });
-				if (exist == 0)
-				{
-					var affected = conn.Execute($"INSERT INTO {_pagingRecordTableName}(`identity`,`description`) VALUES (@Identity, @Description)", new { spider.Identity, Description = _description });
-					if (affected > 0 && _reset)
-					{
-						conn.Execute($"delete from {_pagingTableName} where `task_name` = @t", new { t = _taskName });
-						conn.Execute($"delete from {_pagingRunningTableName} where `task_name` = @t", new { t = _taskName });
-
-						var totalCount = GetTotalCount(conn);
-						var pageCount = totalCount / Size + (totalCount % Size > 0 ? 1 : 0);
-						var pages = new List<dynamic>();
-						for (var page = 1; page <= pageCount; page++)
-						{
-							pages.Add(new { p = page, t = _taskName });
-							if (pages.Count >= 1000 || page >= pageCount)
-							{
-								conn.Execute($"INSERT INTO {_pagingTableName}(page,`task_name`) values (@p,@t)", pages);
-								pages.Clear();
-							}
-						}
-					}
-				}
-			}
-
-			LoadRequests();
 		}
 
 		private void LoadRequests()
@@ -151,7 +147,7 @@ namespace DotnetSpider.Extension.Scheduler
 								foreach (var request in requests)
 								{
 									request.Site = request.Site ?? _site;
-									Push(request);
+									Push(request, null);
 								}
 							}
 						}

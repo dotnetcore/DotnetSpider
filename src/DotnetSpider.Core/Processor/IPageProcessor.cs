@@ -1,3 +1,5 @@
+using DotnetSpider.Common;
+
 namespace DotnetSpider.Core.Processor
 {
 	/// <summary>
@@ -9,7 +11,7 @@ namespace DotnetSpider.Core.Processor
 		/// 解析数据结果, 解析目标链接
 		/// </summary>
 		/// <param name="page">页面数据</param>
-		/// <param name="spider">爬虫对象</param>
-		void Process(Page page, ISpider spider);
+		/// <param name="logger">日志接口</param>
+		void Process(Page page, ILogger logger);
 	}
 }

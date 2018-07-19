@@ -1,3 +1,4 @@
+using DotnetSpider.Common;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,17 +30,15 @@ namespace DotnetSpider.Core.Pipeline
 		/// 存储数据结果到文件中
 		/// </summary>
 		/// <param name="resultItems">数据结果</param>
-		/// <param name="spider">爬虫</param>
-		public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
+		/// <param name="logger">日志接口</param>
+		/// <param name="sender">调用方</param>
+		public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 		{
 			try
 			{
 				foreach (var resultItem in resultItems)
 				{
-					resultItem.Request.CountOfResults = 0;
-					resultItem.Request.EffectedRows = 0;
-
-					string filePath = Path.Combine(GetDataFolder(spider), $"{ Guid.NewGuid():N}.dsd");
+					string filePath = Path.Combine(GetDataFolder(sender), $"{ Guid.NewGuid():N}.dsd");
 					using (StreamWriter printWriter = new StreamWriter(File.OpenWrite(filePath), Encoding.UTF8))
 					{
 						printWriter.WriteLine("url:\t" + resultItem.Request.Url);
@@ -54,24 +53,24 @@ namespace DotnetSpider.Core.Pipeline
 								{
 									printWriter.WriteLine(o);
 								}
+								resultItem.Request.AddCountOfResults(list.Count);
+								resultItem.Request.AddEffectedRows(list.Count);
 
-								resultItem.Request.CountOfResults += list.Count;
-								resultItem.Request.EffectedRows += list.Count;
 							}
 							else
 							{
 								printWriter.WriteLine(entry.Key + ":\t" + entry.Value);
 
-								resultItem.Request.CountOfResults += 1;
-								resultItem.Request.EffectedRows += 1;
+								resultItem.Request.AddCountOfResults(1);
+								resultItem.Request.AddEffectedRows(1);
 							}
 						}
 					}
 				}
 			}
-			catch
+			catch (Exception e)
 			{
-				spider.Logger.Error("Write file error.");
+				logger.Error($"Storage data to file failed: {e}.");
 				throw;
 			}
 		}

@@ -1,18 +1,10 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using Serilog;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core.Infrastructure;
 using System;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
 {
-	/// <summary>
-	/// 标准任务接口
-	/// </summary>
-	public interface IAppBase : IRunable, IIdentity, ITask, INamed
-	{
-		ILogger Logger { get; }
-	}
-
 	/// <summary>
 	/// 标准任务的抽象
 	/// </summary>
@@ -37,11 +29,11 @@ namespace DotnetSpider.Core
 
 				if (string.IsNullOrWhiteSpace(value))
 				{
-					throw new SpiderException($"{nameof(Identity)} should not be empty or null.");
+					throw new ArgumentException($"{nameof(Identity)} should not be empty or null.");
 				}
 				if (value.Length > Env.IdentityMaxLength)
 				{
-					throw new SpiderException($"Length of identity should less than {Env.IdentityMaxLength}.");
+					throw new ArgumentException($"Length of identity should less than {Env.IdentityMaxLength}.");
 				}
 
 				_identity = value;
@@ -130,5 +122,11 @@ namespace DotnetSpider.Core
 				PrintInfo.PrintLine();
 			}
 		}
+
+		public abstract void Pause(Action action = null);
+
+		public abstract void Contiune();
+
+		public abstract void Exit(Action action = null);
 	}
 }

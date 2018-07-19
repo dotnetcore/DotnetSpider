@@ -1,44 +1,153 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using DotnetSpider.Extraction.Model.Formatter;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Extraction;
+using DotnetSpider.Common;
+using DotnetSpider.Core.Processor.TargetRequestExtractors;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extension.Processor;
 
 namespace DotnetSpider.Extension.Test.Processor
 {
-	public class TargetUrlsExtractorTest
+	public class TargetRequestExtractorTest
 	{
+		[TargetRequestSelector()]
+		public class Entity15
+		{
+			[Field(Expression = "./@data-sku")]
+			public string Sku { get; set; }
+		}
+
+		[TargetRequestSelector(XPaths = new[] { "" }, Patterns = new[] { "" })]
+		public class Entity23
+		{
+			[Field(Expression = "./@data-sku")]
+			public string Sku { get; set; }
+		}
+
+		[TargetRequestSelector(XPaths = new string[] { null }, Patterns = new string[] { null })]
+		public class Entity24
+		{
+			[Field(Expression = "./@data-sku")]
+			public string Sku { get; set; }
+		}
+
+
+		[Fact(DisplayName = "TargetRequestSelector_Null")]
+		public void TargetRequestSelector_Null()
+		{
+			try
+			{
+				var processor = new EntityProcessor<Entity15>();
+			}
+			catch (Exception e)
+			{
+				Assert.Equal("Region xpath and patterns should not be null both", e.Message);
+				return;
+			}
+			throw new Exception("Failed.");
+		}
+
+		[Fact(DisplayName = "TargetRequestSelector_EmptyRegion_EmptyPattern")]
+		public void TargetRequestSelector_EmptyRegion_EmptyPattern()
+		{
+			try
+			{
+				var processor = new EntityProcessor<Entity23>();
+			}
+			catch (ArgumentException e)
+			{
+				Assert.NotNull(e);
+				return;
+			}
+			throw new Exception("Failed.");
+		}
+
+		[Fact(DisplayName = "TargetRequestSelector_NullRegion_NullPattern")]
+		public void TargetRequestSelector_NullRegion_NullPattern()
+		{
+			try
+			{
+				var processor = new EntityProcessor<Entity24>();
+			}
+			catch (ArgumentException e)
+			{
+				Assert.NotNull(e);
+				return;
+			}
+			throw new Exception("Failed.");
+		}
+
 		[Fact(DisplayName = "AutoIncrementTargetUrlsExtractor_Test")]
-		public void AutoIncrementTargetUrlsExtractor_Test()
+		public void AutoIncrementTargetRequestExtractor_Test()
 		{
 			var id = Guid.NewGuid().ToString("N");
-			AutoIncrementTargetUrlsExtractorSpider spider = new AutoIncrementTargetUrlsExtractorSpider(id);
+			AutoIncrementTargetRequestExtractorSpider spider = new AutoIncrementTargetRequestExtractorSpider(id);
 			spider.Run();
 			var pipeline = spider.Pipelines.First() as CollectionEntityPipeline;
 			var entities = pipeline.GetCollection("test.baidu_search");
 			Assert.Equal(60, entities.Count());
 		}
 
-		private class TestTargetUrlsExtractorTermination : ITargetUrlsExtractorTermination
+		private class TestTargetRequestExtractorTermination : ITargetRequestExtractorTermination
 		{
-			public bool IsTermination(Page page)
+			public bool IsTerminated(Response response)
 			{
-				return page.Url.Contains("&pn=2");
+				return response.Request.Url.Contains("&pn=2");
 			}
 		}
 
-		private class AutoIncrementTargetUrlsExtractorSpider : EntitySpider
+		private class AutoIncrementTargetRequestExtractorSpider : EntitySpider
 		{
+			[TableInfo("test", "baidu_search")]
+			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			private class BaiduSearchEntry
+			{
+				[Field(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
+				public string Keyword { get; set; }
+
+				[Field(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
+				public string Guid { get; set; }
+
+				[Field(Expression = ".//h3[@class='c-title']/a")]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				public string Title { get; set; }
+
+				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
+				public string Url { get; set; }
+
+				[Field(Expression = ".//div/p[@class='c-author']/text()")]
+				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
+				public string Website { get; set; }
+
+
+				[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				public string Snapshot { get; set; }
+
+
+				[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+				public string Details { get; set; }
+
+				[Field(Expression = ".", Option = FieldOptions.InnerText)]
+				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
+				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
+				public string PlainText { get; set; }
+			}
 			private readonly string _guid;
 
-			public AutoIncrementTargetUrlsExtractorSpider(string guid) : base("BaiduSearch")
+			public AutoIncrementTargetRequestExtractorSpider(string guid) : base("BaiduSearch")
 			{
 				_guid = guid;
 			}
@@ -53,49 +162,11 @@ namespace DotnetSpider.Extension.Test.Processor
 						{ "Keyword", word },
 						{ "guid", _guid }
 					});
-				AddEntityType<BaiduSearchEntry>(new AutoIncrementTargetUrlsExtractor("&pn=0", 1, new TestTargetUrlsExtractorTermination()));
+				AddEntityType<BaiduSearchEntry>(new AutoIncrementTargetRequestExtractor("&pn=0", 1, new TestTargetRequestExtractorTermination()));
 				AddPipeline(new CollectionEntityPipeline());
 			}
 		}
 
-		[TableInfo("test", "baidu_search")]
-		[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-		private class BaiduSearchEntry
-		{
-			[Field(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
-			public string Keyword { get; set; }
 
-			[Field(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
-			public string Guid { get; set; }
-
-			[Field(Expression = ".//h3[@class='c-title']/a")]
-			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-			public string Title { get; set; }
-
-			[Field(Expression = ".//h3[@class='c-title']/a/@href")]
-			public string Url { get; set; }
-
-			[Field(Expression = ".//div/p[@class='c-author']/text()")]
-			[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
-			public string Website { get; set; }
-
-
-			[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
-			public string Snapshot { get; set; }
-
-
-			[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
-			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
-			public string Details { get; set; }
-
-			[Field(Expression = ".", Option = FieldOptions.InnerText)]
-			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
-			public string PlainText { get; set; }
-		}
 	}
 }

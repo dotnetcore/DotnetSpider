@@ -1,11 +1,13 @@
-﻿using DotnetSpider.Core;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core;
 using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Selector;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
 using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +40,7 @@ namespace DotnetSpider.Sample.docs
 
 			class ReplaceHandler : AfterDownloadCompleteHandler
 			{
-				public override void Handle(ref Page page, IDownloader downloader, ISpider spider)
+				public override void Handle(ref Response page, IDownloader downloader)
 				{
 					page.Content = page.Content.Replace("jQuery1720001955628746606708_1508996230766(", "").Replace("});", "}");
 					page.Content = ClearHtml(page.Content);

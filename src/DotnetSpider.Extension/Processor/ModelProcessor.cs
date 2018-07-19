@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Extension.Model;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Core.Processor.TargetRequestExtractors;
 
 namespace DotnetSpider.Extension.Processor
 {
@@ -31,29 +33,29 @@ namespace DotnetSpider.Extension.Processor
 		/// </summary>
 		/// <param name="model">数据模型</param>
 		/// <param name="extractor">模型解析器</param>
-		/// <param name="targetUrlsExtractor">目标链接的解析器</param>
+		/// <param name="targetRequestExtractor">目标链接的解析器</param>
 		/// <param name="dataHandlers">数据处理器</param>
-		public ModelProcessor(IModel model, IModelExtractor extractor = null, ITargetUrlsExtractor targetUrlsExtractor = null,
+		public ModelProcessor(IModel model, IModelExtractor extractor = null, ITargetRequestExtractor targetRequestExtractor = null,
 			params IDataHandler[] dataHandlers)
 		{
 			Model = model ?? throw new ArgumentNullException($"{nameof(model)} should not be null.");
 
 			Extractor = extractor ?? new ModelExtractor();
 
-			if (targetUrlsExtractor != null)
+			if (targetRequestExtractor != null)
 			{
-				TargetUrlsExtractor = targetUrlsExtractor;
+				TargetUrlsExtractor = targetRequestExtractor;
 			}
 
-			RegionAndPatternTargetUrlsExtractor regionAndPatternTargetUrlsExtractor;
+			RegionAndPatternTargetRequestExtractor regionAndPatternTargetUrlsExtractor;
 			if (TargetUrlsExtractor == null)
 			{
-				regionAndPatternTargetUrlsExtractor = new RegionAndPatternTargetUrlsExtractor();
+				regionAndPatternTargetUrlsExtractor = new RegionAndPatternTargetRequestExtractor();
 				TargetUrlsExtractor = regionAndPatternTargetUrlsExtractor;
 			}
 			else
 			{
-				regionAndPatternTargetUrlsExtractor = TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor;
+				regionAndPatternTargetUrlsExtractor = TargetUrlsExtractor as RegionAndPatternTargetRequestExtractor;
 			}
 
 			if (regionAndPatternTargetUrlsExtractor == null)
@@ -118,7 +120,7 @@ namespace DotnetSpider.Extension.Processor
 		/// <returns></returns>
 		internal virtual bool ContainsTargetUrlRegion(string region)
 		{
-			return ((RegionAndPatternTargetUrlsExtractor) TargetUrlsExtractor).ContainsTargetUrlRegion(region);
+			return ((RegionAndPatternTargetRequestExtractor) TargetUrlsExtractor).ContainsTargetUrlRegion(region);
 		}
 
 		/// <summary>
@@ -128,7 +130,7 @@ namespace DotnetSpider.Extension.Processor
 		/// <returns></returns>
 		internal virtual List<Regex> GetTargetUrlPatterns(string region)
 		{
-			return (TargetUrlsExtractor as RegionAndPatternTargetUrlsExtractor)?.GetTargetUrlPatterns(region);
+			return (TargetUrlsExtractor as RegionAndPatternTargetRequestExtractor)?.GetTargetUrlPatterns(region);
 		}
 
 		/// <summary>
@@ -137,7 +139,7 @@ namespace DotnetSpider.Extension.Processor
 		/// <param name="page">页面数据</param>
 		protected override void Handle(Page page)
 		{
-			var datas = Extractor.Extract(page, Model);
+			var datas = Extractor.Extract(page.Selectable(), Model);
 
 			if (datas == null)
 			{

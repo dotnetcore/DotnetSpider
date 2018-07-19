@@ -1,8 +1,8 @@
-﻿using Cassandra;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Selector;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
 using System;
 
 namespace DotnetSpider.Extension.Infrastructure
@@ -12,63 +12,6 @@ namespace DotnetSpider.Extension.Infrastructure
 	/// </summary>
 	public static class SelectorUtil
 	{
-		/// <summary>
-		/// 取得页面信息中的环境变量值
-		/// </summary>
-		/// <param name="field">环境变量名称</param>
-		/// <param name="page">页面信息</param>
-		/// <param name="index">当前属性在所有属性中的索引</param>
-		/// <returns>环境变量值</returns>
-		public static object GetEnviromentValue(string field, Page page, int index)
-		{
-			var key = field.ToLower();
-			switch (key)
-			{
-				case "timeuuid":
-					{
-						return TimeUuid.NewId();
-					}
-				case "url":
-					{
-						return page.Url;
-					}
-				case "targeturl":
-					{
-						return page.TargetUrl;
-					}
-				case "now":
-					{
-						return DateTime.Now;
-					}
-				case "monday":
-					{
-						return DateTimeUtil.Monday;
-					}
-				case "today":
-					{
-						return DateTime.Now.Date;
-					}
-				case "monthly":
-					{
-						return DateTimeUtil.FirstDayOfTheMonth;
-					}
-				case "index":
-					{
-						return index;
-					}
-				default:
-					{
-						var v1 = page.Request.GetExtra(field);
-						if (v1 == null)
-						{
-							var v2 = page.Request.GetExtra(key);
-							return v2;
-						}
-						return v1;
-					}
-			}
-		}
-
 		/// <summary>
 		/// 把BaseSelector转换成真正的查询器
 		/// </summary>

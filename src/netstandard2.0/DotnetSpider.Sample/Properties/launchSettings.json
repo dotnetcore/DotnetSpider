@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "DotnetSpider.Sample": {
-      "commandName": "Project",
-      "commandLineArgs": "-s:TestSpider -c:app.config --tid:9470a91f3adb4067acc29549cc578465 -i:8ab062f08c1440bda6c4cb26c222362d"
-    }
-  }
-}

@@ -1,3 +1,4 @@
+using DotnetSpider.Common;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -9,12 +10,15 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class ResultItems
 	{
-		private readonly Dictionary<string, dynamic> _fields = new Dictionary<string, dynamic>();
+		/// <summary>
+		/// 所有数据结果
+		/// </summary>
+		public readonly Dictionary<string, dynamic> Results = new Dictionary<string, dynamic>();
 
 		/// <summary>
-		/// 读取所有数据结果
+		/// 数据传递
 		/// </summary>
-		public IReadOnlyDictionary<string, dynamic> Results => _fields;
+		public dynamic Object { get; set; }
 
 		/// <summary>
 		/// 对应的目标链接信息
@@ -24,7 +28,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 存储的数据结果是否为空
 		/// </summary>
-		public bool IsEmpty => _fields.Count == 0;
+		public bool IsEmpty => Results == null || Results.Count == 0;
 
 		/// <summary>
 		/// 通过键值取得数据结果
@@ -34,7 +38,7 @@ namespace DotnetSpider.Core
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public dynamic GetResultItem(string key)
 		{
-			return _fields.ContainsKey(key) ? _fields[key] : null;
+			return Results.ContainsKey(key) ? Results[key] : null;
 		}
 
 		/// <summary>
@@ -45,13 +49,13 @@ namespace DotnetSpider.Core
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void AddOrUpdateResultItem(string key, dynamic value)
 		{
-			if (_fields.ContainsKey(key))
+			if (Results.ContainsKey(key))
 			{
-				_fields[key] = value;
+				Results[key] = value;
 			}
 			else
 			{
-				_fields.Add(key, value);
+				Results.Add(key, value);
 			}
 		}
 	}

@@ -1,10 +1,6 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Model.Formatter;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Scheduler;
 using StackExchange.Redis;
@@ -14,6 +10,10 @@ using System.Configuration;
 using System.Net;
 using Xunit;
 using System.Linq;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Common;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model.Formatter;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -150,7 +150,7 @@ namespace DotnetSpider.Extension.Test
 			{
 				Monitor = new LogMonitor();
 				Identity = Guid.NewGuid().ToString("N");
-				Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
+				//Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
 				AddStartUrl("https://baidu.com");
 				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType<TestEntity>();
@@ -249,7 +249,14 @@ namespace DotnetSpider.Extension.Test
 		{
 			protected override void MyInit(params string[] arguments)
 			{
-				EmptySleepTime = 5000;
+				Site = new Site
+				{
+					Headers = new Dictionary<string, string>
+					{
+						{ "Upgrade-Insecure-Requests", "1"}
+					}
+				};
+				EmptySleepTime = 6000;
 				AddPipeline(new CollectionEntityPipeline());
 				AddStartUrl("http://www.163.com");
 				AddStartUrl("http://www.sohu.com");
@@ -258,7 +265,7 @@ namespace DotnetSpider.Extension.Test
 			}
 
 			[TableInfo("test", "neteast")]
-			[TargetUrlsSelector(Patterns = new[] { "http://www.163.com" })]
+			[TargetRequestSelector(Patterns = new[] { "http://www.163.com" })]
 			public class NeteastEntity
 			{
 				[Field(Expression = ".//title")]
@@ -266,7 +273,7 @@ namespace DotnetSpider.Extension.Test
 			}
 
 			[TableInfo("test", "sohu")]
-			[TargetUrlsSelector(Patterns = new[] { "http://www.sohu.com" })]
+			[TargetRequestSelector(Patterns = new[] { "http://www.sohu.com" })]
 			public class SohuEntity
 			{
 				[Field(Expression = ".//title")]

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using DotnetSpider.Core.Infrastructure;
 using CommandLine;
+using DotnetSpider.Common;
 #if NETSTANDARD
 using System.Text;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -23,14 +24,19 @@ namespace DotnetSpider.Core
 		[Option('t', "tid", Required = false, HelpText = "The task id of spider.")]
 		public string TaskId { get; set; }
 
-		[Option('a', "arguments", Required = false, HelpText = "The extra arguments to run spider.", Separator = ',')]
-		public IEnumerable<string> Arguments { get; set; }
+		[Option('a', "arguments", Required = false, HelpText = "The extra arguments to run spider.")]
+		public string Arguments { get; set; }
 
 		[Option('i', "identity", Required = false, HelpText = "The identity of spider.")]
 		public string Identity { get; set; }
 
 		[Option('c', "config", Required = false, HelpText = "The config file you want to use.")]
 		public string Config { get; set; }
+
+		public string[] GetArguments()
+		{
+			return string.IsNullOrEmpty(Arguments) ? new string[0] : Arguments.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+		}
 	}
 
 	/// <summary>
@@ -79,11 +85,47 @@ namespace DotnetSpider.Core
 
 					var runMethod = spiderTypes[spiderName].GetMethod("Run");
 
-					if (runMethod != null) runMethod.Invoke(spider, new object[] {options.Arguments});
+					if (runMethod != null) runMethod.Invoke(spider, new object[] { options.GetArguments() });
 				}
 			}
 		}
 
+
+#if NET40
+		public static Options Parse(params string[] args)
+		{
+			var arguments = new List<string>();
+
+			foreach (var arg in args)
+			{
+				if (arg.Contains(":"))
+				{
+					var array = arg.Split(':').Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t.Trim()).ToList();
+					if (array.Count == 1)
+					{
+						array.Add("");
+					}
+					arguments.AddRange(array);
+				}
+				else
+				{
+					arguments.Add(arg);
+				}
+			}
+
+			Parser parser = new Parser(config =>
+			{
+				config.CaseSensitive = false;
+			});
+
+			var options = new Options();
+			if (parser.ParseArguments(arguments.ToArray(), options))
+			{
+				return options;
+			}
+			return null;
+		}
+#else
 		public static Options Parse(params string[] args)
 		{
 			var arguments = new List<string>();
@@ -112,6 +154,7 @@ namespace DotnetSpider.Core
 			}
 			return null;
 		}
+#endif
 
 		public static void LoadConfiguration(string config)
 		{
@@ -128,7 +171,9 @@ namespace DotnetSpider.Core
 		public static Dictionary<string, Type> DetectSpiders()
 		{
 			var spiderTypes = new Dictionary<string, Type>();
-
+			var namedType = typeof(INamed);
+			var identityType = typeof(IIdentity);
+			var irunableType = typeof(IRunable);
 			foreach (var file in DetectDlls())
 			{
 				var asm = Assembly.Load(file);
@@ -150,9 +195,9 @@ namespace DotnetSpider.Core
 					{
 						var interfaces = type.GetInterfaces();
 
-						var isNamed = interfaces.Any(t => t.FullName == "DotnetSpider.Core.INamed");
-						var isIdentity = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IIdentity");
-						var isRunnable = interfaces.Any(t => t.FullName == "DotnetSpider.Core.IRunable");
+						var isNamed = interfaces.Any(t => namedType.IsAssignableFrom(t));
+						var isIdentity = interfaces.Any(t => identityType.IsAssignableFrom(t));
+						var isRunnable = interfaces.Any(t => irunableType.IsAssignableFrom(t));
 
 						if (isNamed && isRunnable && isIdentity)
 						{
@@ -166,7 +211,7 @@ namespace DotnetSpider.Core
 								return null;
 							}
 
-							var startupName = type.GetCustomAttribute<TaskName>();
+							var startupName = type.GetCustomAttributes(typeof(TaskName), true).FirstOrDefault() as TaskName;
 							if (startupName != null)
 							{
 								if (!spiderTypes.ContainsKey(startupName.Name))
@@ -230,7 +275,7 @@ namespace DotnetSpider.Core
 				if (!string.IsNullOrWhiteSpace(identity))
 				{
 					var property = spiderProperties.First(p => p.Name == "Identity");
-					property.SetValue(spider, identity);
+					property.SetValue(spider, identity, new object[0]);
 				}
 			}
 
@@ -242,7 +287,7 @@ namespace DotnetSpider.Core
 					var taskId = "guid" == options.TaskId.ToLower() ? Guid.NewGuid().ToString("N") : options.TaskId.Trim();
 					if (!string.IsNullOrWhiteSpace(taskId))
 					{
-						property.SetValue(spider, taskId);
+						property.SetValue(spider, taskId, new object[0]);
 					}
 				}
 			}
@@ -250,7 +295,7 @@ namespace DotnetSpider.Core
 			if (!string.IsNullOrWhiteSpace(options.Name))
 			{
 				var property = spiderProperties.First(p => p.Name == "Name");
-				property.SetValue(spider, options.Name.Trim());
+				property.SetValue(spider, options.Name.Trim(), new object[0]);
 			}
 
 			return spider;

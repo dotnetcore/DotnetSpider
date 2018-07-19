@@ -1,4 +1,5 @@
-﻿using DotnetSpider.Core;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
 using System;
 using System.Linq;
@@ -47,9 +48,9 @@ namespace DotnetSpider.Extension
 			base.Execute(arguments);
 		}
 
-		protected override bool IfVerifyDataOrGenerateReport(string[] arguments)
+		protected override bool IfRequireVerifyDataOrGenerateReport(string[] arguments)
 		{
-			var factor = arguments.Any(t => t?.ToLower() == SpiderArguments.ExcludeStartRequestsBuilder) || IsCompleted;
+			var factor = arguments.Any(t => t?.ToLower() == SpiderArguments.ExcludeRequestBuilder) || IsCompleted;
 
 			if (factor)
 			{
@@ -98,7 +99,7 @@ namespace DotnetSpider.Extension
 		/// </summary>
 		/// <param name="arguments">运行参数</param>
 		/// <returns>是否需要运行起始链接构造器</returns>
-		protected override bool IfRequireBuildStartUrlsBuilders(string[] arguments)
+		protected override bool IfRequireRunRequestBuilders(string[] arguments)
 		{
 			if (RedisConnection.Default != null)
 			{
@@ -148,7 +149,7 @@ namespace DotnetSpider.Extension
 		/// <summary>
 		/// 初始化起始链结束后的解锁, 分布式任务时解锁成功则其它爬虫会结束等待状态, 一起进入运行状态
 		/// </summary>
-		protected override void BuildStartUrlsBuildersCompleted()
+		protected override void RunStartRequestBuildersCompleted()
 		{
 			if (RedisConnection.Default != null)
 			{

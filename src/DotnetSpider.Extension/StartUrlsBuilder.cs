@@ -5,6 +5,7 @@ using DotnetSpider.Core.Infrastructure.Database;
 using System.Configuration;
 using System.Runtime.CompilerServices;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Common;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Extension.Test")]
 namespace DotnetSpider.Extension
@@ -12,7 +13,7 @@ namespace DotnetSpider.Extension
 	/// <summary>
 	/// 起始链接构造器
 	/// </summary>
-	public class DbStartUrlsBuilder : StartUrlsBuilder
+	public class DbStartUrlsBuilder : RequestBuilder
 	{
 		private readonly ConnectionStringSettings _connectionStringSettings;
 
@@ -96,14 +97,14 @@ namespace DotnetSpider.Extension
 		/// 查询数据库结果
 		/// </summary>
 		/// <returns>数据库结果</returns>
-		protected List<IDictionary<string, object>> QueryDatas()
+		protected List<Dictionary<string, dynamic>> QueryDatas()
 		{
-			List<IDictionary<string, object>> list = new List<IDictionary<string, object>>();
+			List<Dictionary<string, dynamic>> list = new List<Dictionary<string, dynamic>>();
 			using (var conn = _connectionStringSettings.CreateDbConnection())
 			{
 				foreach (var item in conn.MyQuery(_sql))
 				{
-					var dataItem = item as IDictionary<string, object>;
+					var dataItem = item as Dictionary<string, dynamic>;
 					FormateDataObject(dataItem);
 					list.Add(dataItem);
 				}
@@ -128,7 +129,7 @@ namespace DotnetSpider.Extension
 					string url = string.Format(formate, arguments);
 					var request = new Request(url, data);
 					FormateRequest(request);
-					site.AddStartRequest(request);
+					site.AddRequests(request);
 				}
 			}
 		}

@@ -18,19 +18,19 @@ namespace DotnetSpider.Core.Test
 		public void AnalyzeUnCorrectArguments()
 		{
 			var args1 = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:guid", "-a:", "abcd" };
-			var arguments1 = Startup.Parse(args1).Arguments;
-			Assert.Equal("", arguments1.First());
+			var arguments1 = Startup.Parse(args1).GetArguments();
+			Assert.Empty(arguments1);
 
 			var args2 = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:guid", "-a::::" };
-			var arguments2 = Startup.Parse(args2).Arguments;
-			Assert.Equal("", arguments2.First());
+			var arguments2 = Startup.Parse(args2).GetArguments();
+			Assert.Empty(arguments2);
 
 			var args3 = new[] { "-ti:DotnetSpider.Core.Test.TestSpider" };
 			var arguments3 = Startup.Parse(args3);
 			Assert.Null(arguments3);
 
 			var args4 = new[] { "-s:DotnetSpider.Core.Test.TestSpider" };
-			var arguments4 = Startup.Parse(args4).Arguments;
+			var arguments4 = Startup.Parse(args4).GetArguments();
 			Assert.Empty(arguments4);
 		}
 
@@ -43,12 +43,12 @@ namespace DotnetSpider.Core.Test
 			Assert.Equal("TestSpider", arguments.TaskId);
 			Assert.Equal("guid", arguments.Identity);
 			Assert.Equal("myname", arguments.Name);
-			Assert.Equal("a", arguments.Arguments.ElementAt(0));
-			Assert.Equal("b", arguments.Arguments.ElementAt(1));
+			Assert.Equal("a", arguments.GetArguments().ElementAt(0));
+			Assert.Equal("b", arguments.GetArguments().ElementAt(1));
 
 			var args2 = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:guid", "-a:    asdf" };
 			var arguments2 = Startup.Parse(args2);
-			Assert.Equal("asdf", arguments2.Arguments.ElementAt(0));
+			Assert.Equal("asdf", arguments2.GetArguments().ElementAt(0));
 
 			var args3 = new[] { "-s:DotnetSpider.Core.Test.TestSpider", "--tid:TestSpider", "-i:guid" };
 			var arguments3 = Startup.Parse(args3);

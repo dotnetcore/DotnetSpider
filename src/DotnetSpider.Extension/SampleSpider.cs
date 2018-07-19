@@ -1,9 +1,9 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Model.Attribute;
-using DotnetSpider.Extension.Pipeline;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core;
 using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
 using System.Collections.Generic;
 
 namespace DotnetSpider.Extension
@@ -32,7 +32,7 @@ namespace DotnetSpider.Extension
 			var spider = Spider.Create(site, processor);
 			var word = "可乐|雪碧";
 			spider.AddStartUrl($"http://news.baidu.com/ns?word={word}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", new Dictionary<string, dynamic> { { "Keyword", word } });
-			spider.AddPipeline(new MySqlEntityPipeline());
+			//spider.AddPipeline(new MySqlEntityPipeline());
 			spider.Run();
 		}
 	}

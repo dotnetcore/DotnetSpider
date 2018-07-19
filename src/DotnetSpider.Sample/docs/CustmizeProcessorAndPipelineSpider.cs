@@ -1,11 +1,21 @@
-﻿using DotnetSpider.Core;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core;
+using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Processor.TargetRequestExtractors;
 using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Core.Selector;
+using DotnetSpider.Downloader;
+using DotnetSpider.Extension;
+using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs
 {
@@ -18,7 +28,7 @@ namespace DotnetSpider.Sample.docs
 			for (int i = 1; i < 5; ++i)
 			{
 				// Add start/feed urls. 添加初始采集链接
-				site.AddStartUrl($"http://list.youku.com/category/show/c_96_s_1_d_1_p_{i}.html");
+				site.AddRequests($"http://list.youku.com/category/show/c_96_s_1_d_1_p_{i}.html");
 			}
 
 			Spider spider = Spider.Create(site,
@@ -36,7 +46,7 @@ namespace DotnetSpider.Sample.docs
 		{
 			private long _count = 0;
 
-			public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
+			public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 			{
 				foreach (var resultItem in resultItems)
 				{
@@ -62,7 +72,7 @@ namespace DotnetSpider.Sample.docs
 			protected override void Handle(Page page)
 			{
 				// 利用 Selectable 查询并构造自己想要的数据对象
-				var totalVideoElements = page.Selectable.SelectList(Selectors.XPath("//div[@class='yk-pack pack-film']")).Nodes();
+				var totalVideoElements = page.Selectable().SelectList(Selectors.XPath("//div[@class='yk-pack pack-film']")).Nodes();
 				List<YoukuVideo> results = new List<YoukuVideo>();
 				foreach (var videoElement in totalVideoElements)
 				{
@@ -75,7 +85,7 @@ namespace DotnetSpider.Sample.docs
 				page.AddResultItem("VideoResult", results);
 
 				// Add target requests to scheduler. 解析需要采集的URL
-				foreach (var url in page.Selectable.SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
+				foreach (var url in page.Selectable().SelectList(Selectors.XPath("//ul[@class='yk-pages']")).Links().Nodes())
 				{
 					page.AddTargetRequest(new Request(url.GetValue()));
 				}

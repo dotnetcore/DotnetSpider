@@ -1,12 +1,21 @@
-using System;
-using System.Collections.Generic;
+using DotnetSpider.Common;
 using DotnetSpider.Core;
+using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Core.Selector;
-using DotnetSpider.Core.Downloader;
+using DotnetSpider.Downloader;
+using DotnetSpider.Extension;
+using DotnetSpider.Extension.Pipeline;
+using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
+using DotnetSpider.Extraction.Model.Formatter;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs
 {
@@ -18,7 +27,7 @@ namespace DotnetSpider.Sample.docs
 			var site = new Site { EncodingName = "UTF-8" };
 
 			// Set start/seed url
-			site.AddStartUrl("http://www.cnblogs.com/");
+			site.AddRequests("http://www.cnblogs.com/");
 
 			Spider spider = Spider.Create(site,
 				// use memoery queue scheduler
@@ -29,7 +38,7 @@ namespace DotnetSpider.Sample.docs
 				.AddPipeline(new FilePipeline());
 
 			// dowload html by http client
-			spider.Downloader = new HttpClientDownloader();
+			spider.Downloader = new HttpWebRequestDownloader();
 			spider.Name = "CNBLOGS";
 			// 4 threads 4Ïß³Ì
 			spider.ThreadNum = 4;

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using DotnetSpider.Common;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Redial;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Extension
 {

@@ -1,10 +1,10 @@
-﻿using DotnetSpider.Core.Redial;
-using Serilog;
+﻿using Serilog;
 using Polly;
 using Polly.Retry;
 using System;
 using System.Net.Http;
 using System.Text;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Core.Infrastructure
 {

@@ -1,3 +1,4 @@
+using DotnetSpider.Common;
 using System;
 using System.Collections.Generic;
 
@@ -22,16 +23,11 @@ namespace DotnetSpider.Core.Scheduler
 		int Depth { get; set; }
 
 		/// <summary>
-		/// 初始化队列
-		/// </summary>
-		/// <param name="spider">爬虫对象</param>
-		void Init(ISpider spider);
-
-		/// <summary>
 		/// 添加请求对象到队列
 		/// </summary>
 		/// <param name="request">请求对象</param>
-		void Push(Request request);
+		/// <param name="shouldReserved">由各自的业务逻辑来确定是否需要重试</param>
+		void Push(Request request, Func<Request, bool> shouldReserved);
 
 		/// <summary>
 		/// 取得一个需要处理的请求对象
@@ -43,7 +39,7 @@ namespace DotnetSpider.Core.Scheduler
 		/// 批量导入
 		/// </summary>
 		/// <param name="requests">请求对象</param>
-		void Import(IEnumerable<Request> requests);
+		void Reload(IEnumerable<Request> requests);
 
 		/// <summary>
 		/// 导出整个队列

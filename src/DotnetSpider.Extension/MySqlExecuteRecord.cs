@@ -3,7 +3,7 @@ using DotnetSpider.Core.Infrastructure.Database;
 using System;
 using System.Data;
 using DotnetSpider.Extension.Infrastructure;
-using Serilog;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Extension
 {

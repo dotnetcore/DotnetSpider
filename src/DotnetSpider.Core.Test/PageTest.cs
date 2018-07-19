@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using DotnetSpider.Common;
+using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using Xunit;
 
 namespace DotnetSpider.Core.Test
 {
-
 	public class PageTest
 	{
 		public static Request GetRequest()

@@ -309,7 +309,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			public SqlEqual(string name, string sql, dynamic value)
 			{
 				Sql = sql;
-				Values = new[] {value};
+				Values = new[] { value };
 				Name = name;
 				VerificationName = "SQLEqual";
 			}
@@ -329,7 +329,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Name = name;
 				Sql = sql;
 				VerificationName = "SQLLarge";
-				Values = new[] {value};
+				Values = new[] { value };
 			}
 
 			public override dynamic ExpectedValue => Values[0];
@@ -347,7 +347,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Name = name;
 				Sql = sql;
 				VerificationName = "SQLLess";
-				Values = new[] {value};
+				Values = new[] { value };
 			}
 
 			public override dynamic ExpectedValue => Values[0];
@@ -365,7 +365,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Name = name;
 				Sql = sql;
 				VerificationName = "SQLRange";
-				Values = new[] {minValue, maxValue};
+				Values = new[] { minValue, maxValue };
 			}
 
 			public override dynamic ExpectedValue => $"{Values[0]}-{Values[1]}";
@@ -430,7 +430,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		{
 			public ValueEqual(string name, dynamic actual, dynamic expected)
 			{
-				Expected = new[] {expected};
+				Expected = new[] { expected };
 				Name = name;
 				Acutal = actual;
 				VerificationName = "ValueEqual";
@@ -451,7 +451,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Name = name;
 				Acutal = actual;
 				VerificationName = "ValueLarge";
-				Expected = new[] {expected};
+				Expected = new[] { expected };
 			}
 
 			public override dynamic ExpectedValue => Expected[0];
@@ -469,7 +469,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Name = name;
 				Acutal = actual;
 				VerificationName = "ValueLess";
-				Expected = new[] {expected};
+				Expected = new[] { expected };
 			}
 
 			public override dynamic ExpectedValue => Expected[0];
@@ -487,7 +487,7 @@ namespace DotnetSpider.Extension.Infrastructure
 				Name = name;
 				Acutal = actual;
 				VerificationName = "ValueRange";
-				Expected = new[] {minValue, maxValue};
+				Expected = new[] { minValue, maxValue };
 			}
 
 			public override dynamic ExpectedValue => $"{Expected[0]}-{Expected[1]}";
@@ -544,8 +544,8 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <param name="dataFileName">附件的数据的文件名</param>
 		public Verification(Type type, string reportSampleSql = null, string dataSql = null, string dataFileName = null)
 		{
-			_description = type.GetTypeInfo().GetCustomAttribute<Description>();
-			EmailTo = _description.Email?.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim())
+			_description = (Description)type.GetCustomAttributes(typeof(Description), true).First();
+			EmailTo = _description.Email?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(e => e.Trim())
 				.ToList();
 			Subject = _description.Subject;
 			_reportSampleSql = reportSampleSql;
@@ -570,7 +570,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			string reportSampleSql = null, string dataSql = null, string dataFileName = null) : base(emailTo, subject, host,
 			port, account, password)
 		{
-			_description = type.GetTypeInfo().GetCustomAttribute<Description>();
+			_description = (Description)type.GetCustomAttributes(typeof(Description), true).First();
 			_exportDataSql = dataSql;
 			_exportDataFileName = dataFileName;
 			_reportSampleSql = reportSampleSql;
@@ -595,7 +595,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			}
 
 			if (Verifications != null && Verifications.Count > 0 && EmailTo != null && EmailTo.Count > 0 &&
-			    !string.IsNullOrWhiteSpace(EmailHost))
+				!string.IsNullOrWhiteSpace(EmailHost))
 			{
 				using (var conn = Core.Env.DataConnectionStringSettings.CreateDbConnection())
 				{
@@ -665,17 +665,25 @@ namespace DotnetSpider.Extension.Infrastructure
 
 					var html = new TextPart("html")
 					{
+#if NETFRAMEWORK
+						Text = System.Net.WebUtility.HtmlDecode(emailBody.ToString())
+#else
 						Text = HttpUtility.HtmlDecode(emailBody.ToString())
+#endif
 					};
-					var multipart = new Multipart("mixed") {html};
+					var multipart = new Multipart("mixed") { html };
 
 					if (veridationResult.Success && !string.IsNullOrWhiteSpace(_exportDataSql) &&
-					    !string.IsNullOrWhiteSpace(_exportDataFileName))
+						!string.IsNullOrWhiteSpace(_exportDataFileName))
 					{
 						var path = conn.Export(_exportDataSql, $"{_exportDataFileName}_{DateTime.Now:yyyyMMddhhmmss}", true);
 						var attachment = new MimePart("excel", "xlsx")
 						{
+#if !NET40
 							Content = new MimeContent(File.OpenRead(path)),
+#else
+							ContentObject = new ContentObject(File.OpenRead(path)),
+#endif
 							ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
 							ContentTransferEncoding = ContentEncoding.Base64,
 							FileName = Path.GetFileName(path)

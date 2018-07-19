@@ -1,7 +1,7 @@
-﻿using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Redial;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Downloader;
 using Polly;
-using Serilog;
 using System;
 using System.Threading;
 

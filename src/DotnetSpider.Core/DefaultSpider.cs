@@ -1,15 +1,16 @@
-using System;
+﻿using DotnetSpider.Common;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
+using System;
 
 namespace DotnetSpider.Core
 {
 	/// <summary>
 	/// 默认爬虫, 用于测试和一些默认情况使用, 框架使用者可忽略
 	/// </summary>
-	public sealed class DefaultSpider : Spider
+	internal sealed class DefaultSpider : Spider
 	{
 		/// <summary>
 		/// 构造方法

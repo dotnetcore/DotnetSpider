@@ -1,4 +1,4 @@
-﻿using Serilog;
+﻿using DotnetSpider.Common;
 
 namespace DotnetSpider.Core.Monitor
 {

@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net40;net45;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Version>3.0.0-beta1</Version>
+    <Authors>zlzforever@163.com;</Authors>
+    <AssemblyName>DotnetSpider.Extension</AssemblyName>
+    <Copyright>Copyright 2018 Lewis Zou</Copyright>
+    <PackageId>DotnetSpider.Extension</PackageId>
+    <Description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp;amp; scraping framework for .NET</Description>
+    <PackageTags>DotnetSpider;crawler;dotnet core</PackageTags>
+    <PackageProjectUrl>https://github.com/zlzforever/DotnetSpider</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/zlzforever/DotnetSpider</RepositoryUrl>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Management" />
+    <PackageReference Include="Dapper" Version="1.50.2" />
+    <PackageReference Include="MailKit" Version="1.22.0" />
+    <PackageReference Include="StackExchange.Redis" Version="1.2.1" />
+    <PackageReference Include="MySql.Data" Version="6.9.12" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Management" />
+    <PackageReference Include="Dapper" Version="1.50.2" />
+    <PackageReference Include="MailKit" Version="2.0.5" />
+    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
+    <PackageReference Include="DotRas.for.Win7" Version="1.3.0" />
+    <PackageReference Include="MySqlConnector" Version="0.42.3" />
+    <PackageReference Include="MongoDB.Driver" Version="2.7.0" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="Dapper" Version="1.50.5" />
+    <PackageReference Include="MailKit" Version="2.0.5" />
+    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
+    <PackageReference Include="MySqlConnector" Version="0.42.3" />
+    <PackageReference Include="MongoDB.Driver" Version="2.7.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="4.5.2.1" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.13.1" />
+    <ProjectReference Include="..\DotnetSpider.Common\DotnetSpider.Common.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Core\DotnetSpider.Core.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Downloader\DotnetSpider.Downloader.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Extraction\DotnetSpider.Extraction.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,3 +1,4 @@
+using DotnetSpider.Common;
 using DotnetSpider.Core.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,9 @@ namespace DotnetSpider.Core.Scheduler
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 
+		/// <summary>
+		/// 是否是分布式调度器
+		/// </summary>
 		public override bool IsDistributed => false;
 
 		/// <summary>
@@ -42,6 +46,7 @@ namespace DotnetSpider.Core.Scheduler
 			lock (_lock)
 			{
 				_queue.Clear();
+				DuplicateRemover.ResetDuplicateCheck();
 			}
 		}
 
@@ -129,24 +134,22 @@ namespace DotnetSpider.Core.Scheduler
 		/// 批量导入
 		/// </summary>
 		/// <param name="requests">请求对象</param>
-		public override void Import(IEnumerable<Request> requests)
+		public override void Reload(IEnumerable<Request> requests)
 		{
+			if (requests == null)
+			{
+				return;
+			}
+
 			lock (_lock)
 			{
-				_queue = new List<Request>(requests);
-			}
-		}
-
-		/// <summary>
-		/// 取得队列中所有的请求对象
-		/// </summary>
-		public IReadOnlyCollection<Request> All
-		{
-			get
-			{
-				lock (_lock)
+				_queue.Clear();
+				foreach (var request in requests)
 				{
-					return new ReadOnlyEnumerable<Request>(_queue.ToArray());
+					if (!DuplicateRemover.IsDuplicate(request))
+					{
+						_queue.Add(request);
+					}
 				}
 			}
 		}
@@ -158,11 +161,8 @@ namespace DotnetSpider.Core.Scheduler
 		{
 			lock (_lock)
 			{
-				_successCounter.Set(0);
-				_errorCounter.Set(0);
 				_queue.Clear();
 			}
-
 			base.Dispose();
 		}
 	}

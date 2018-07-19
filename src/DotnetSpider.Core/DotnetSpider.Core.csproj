@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net40;net45;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Version>3.0.0-beta1</Version>
+    <Authors>zlzforever@163.com;</Authors>
+    <AssemblyName>DotnetSpider.Core</AssemblyName>
+    <Copyright>Copyright 2018 Lewis Zou</Copyright>
+    <PackageId>DotnetSpider.Core</PackageId>
+    <Description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp;amp; scraping framework for .NET</Description>
+    <PackageTags>DotnetSpider;crawler;dotnet core</PackageTags>
+    <PackageProjectUrl>https://github.com/zlzforever/DotnetSpider</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/zlzforever/DotnetSpider</RepositoryUrl>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotnetSpider.Common\DotnetSpider.Common.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Downloader\DotnetSpider.Downloader.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Extraction\DotnetSpider.Extraction.csproj" />
+    <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Proxy\DotnetSpider.Proxy.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="System.Web" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="CommandLineParser" Version="1.9.71" />
+    <PackageReference Include="Serilog" Version="1.5.14" />
+    <PackageReference Include="Polly" Version="4.3.0" />
+    <PackageReference Include=" Microsoft.Net.Http" Version="2.2.29" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System.Web" />
+    <PackageReference Include="CommandLineParser" Version="2.2.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.1" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Net.Http" />
+    <PackageReference Include="Polly" Version="6.0.1" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="CommandLineParser" Version="2.2.1" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.1" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+    <PackageReference Include="System.Net.Ping" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+    <PackageReference Include="Polly" Version="6.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
+  </ItemGroup>
+</Project>

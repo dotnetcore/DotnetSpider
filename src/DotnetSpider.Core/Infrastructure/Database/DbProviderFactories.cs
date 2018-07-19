@@ -114,11 +114,11 @@ namespace DotnetSpider.Core.Infrastructure.Database
 				Configs.TryGetValue(providerInvariantName, out var factory);
 				if (factory == null)
 				{
-					throw new SpiderException("Provider not found");
+					throw new SpiderException("Provider not found.");
 				}
 				return factory;
 			}
-			throw new SpiderException("Provider not found");
+			throw new SpiderException("Provider not found.");
 		}
 
 		/// <summary>

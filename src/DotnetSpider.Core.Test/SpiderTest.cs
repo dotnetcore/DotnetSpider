@@ -5,10 +5,11 @@ using DotnetSpider.Core.Processor;
 using Xunit;
 using System.Diagnostics;
 using System.IO;
-using DotnetSpider.Core.Downloader;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using DotnetSpider.Common;
+using DotnetSpider.Downloader;
+using DotnetSpider.Core.Scheduler;
 
 namespace DotnetSpider.Core.Test
 {
@@ -20,6 +21,46 @@ namespace DotnetSpider.Core.Test
 
 	public partial class SpiderTest
 	{
+		[Fact(DisplayName = "Spider_IdentityLengthLimit")]
+		public void IdentityLengthLimit()
+		{
+			try
+			{
+				Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
+					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					new QueueDuplicateRemovedScheduler(),
+					new TestPageProcessor());
+			}
+			catch (Exception exception)
+			{
+				Assert.Equal($"Length of identity should less than {Env.IdentityMaxLength}.", exception.Message);
+				return;
+			}
+
+			throw new Exception("TEST FAILED.");
+		}
+
+
+		[Fact(DisplayName = "Spider_RemoveOutboundLinksSetting")]
+		public void RemoveOutboundLinksSetting()
+		{
+			try
+			{
+				var spider = Spider.Create(new Site { RemoveOutboundLinks = true },
+						"1111",
+						new QueueDuplicateRemovedScheduler(),
+						new TestPageProcessor());
+				spider.Run();
+			}
+			catch (Exception exception)
+			{
+				Assert.Equal($"When you want remove outbound links, the domains should not be null or empty.", exception.Message);
+				return;
+			}
+
+			throw new Exception("TEST FAILED.");
+		}
+
 		[Fact(DisplayName = "DefaultConstruct")]
 		public void DefaultConstruct()
 		{
@@ -112,7 +153,7 @@ namespace DotnetSpider.Core.Test
 
 		internal class TestPipeline : BasePipeline
 		{
-			public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
+			public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 			{
 				foreach (var resultItem in resultItems)
 				{
@@ -128,7 +169,7 @@ namespace DotnetSpider.Core.Test
 		{
 			protected override void Handle(Page page)
 			{
-				page.Skip = true;
+				page.Bypass = true;
 			}
 		}
 
@@ -151,7 +192,7 @@ namespace DotnetSpider.Core.Test
 			spider.ClearSchedulerAfterCompleted = false;
 			for (int i = 0; i < 20; ++i)
 			{
-				spider.AddStartUrl($"http://www.baidu.com/_t={i}");
+				spider.AddStartUrl($"http://www.baidu.com/t={i}");
 			}
 			var task = spider.RunAsync();
 			Thread.Sleep(500);
@@ -164,7 +205,7 @@ namespace DotnetSpider.Core.Test
 			spider2.ClearSchedulerAfterCompleted = false;
 			for (int i = 0; i < 25; ++i)
 			{
-				spider2.AddStartUrl($"http://www.baidu.com/_t={i}");
+				spider2.AddStartUrl($"http://www.baidu.com/t={i}");
 			}
 			spider2.Run();
 			Assert.Equal(25, spider2.Scheduler.SuccessRequestsCount);
@@ -185,26 +226,36 @@ namespace DotnetSpider.Core.Test
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.Start();
 
-			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 0 },
-				new FastExitPageProcessor())
-				.AddPipeline(new FastExitPipeline());
+			Spider spider = Spider.Create(new Site
+			{
+				CycleRetryTimes = 5,
+				EncodingName = "UTF-8",
+				SleepTime = 0
+			},
+			new FastExitPageProcessor())
+			.AddPipeline(new FastExitPipeline());
 			spider.ThreadNum = 1;
 			spider.EmptySleepTime = 0;
-			spider.AddStartUrl("http://item.jd.com/1013286.html?_t=1");
-			spider.AddStartUrl("http://item.jd.com/1013286.html?_t=2");
-			spider.AddStartUrl("http://item.jd.com/1013286.html?_t=3");
-			spider.AddStartUrl("http://item.jd.com/1013286.html?_t=4");
-			spider.AddStartUrl("http://item.jd.com/1013286.html?_t=5");
+			spider.AddStartUrl("http://war.163.com/");
+			spider.AddStartUrl("http://sports.163.com/");
+			spider.AddStartUrl("http://ent.163.com/");
+			spider.Downloader = new TestDownloader();
 			spider.Run();
 			stopwatch.Stop();
 			var costTime = stopwatch.ElapsedMilliseconds;
 			Assert.True(costTime < 3000);
 			var results = File.ReadAllLines("FastExit_Result.txt");
-			Assert.Contains("http://item.jd.com/1013286.html?_t=1", results);
-			Assert.Contains("http://item.jd.com/1013286.html?_t=2", results);
-			Assert.Contains("http://item.jd.com/1013286.html?_t=3", results);
-			Assert.Contains("http://item.jd.com/1013286.html?_t=4", results);
-			Assert.Contains("http://item.jd.com/1013286.html?_t=5", results);
+			Assert.Contains("http://war.163.com/", results);
+			Assert.Contains("http://sports.163.com/", results);
+			Assert.Contains("http://ent.163.com/", results);
+		}
+
+		internal class TestDownloader : BaseDownloader
+		{
+			protected override Response DowloadContent(Request request)
+			{
+				return new Response() { Request = request, Content = "aabbcccdefg下载人数100", TargetUrl = request.Url };
+			}
 		}
 
 		internal class FastExitPageProcessor : BasePageProcessor
@@ -217,19 +268,20 @@ namespace DotnetSpider.Core.Test
 
 		internal class FileDownloader : BaseDownloader
 		{
-			protected override Task<Page> DowloadContent(Request request, ISpider spider)
+			protected override Response DowloadContent(Request request)
 			{
-				return Task.FromResult(new Page(request));
+				return new Response { Request = request };
 			}
 		}
 
 		internal class FastExitPipeline : BasePipeline
 		{
-			public override void Process(IEnumerable<ResultItems> resultItems, ISpider spider)
+			public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 			{
 				File.AppendAllLines("FastExit_Result.txt", new[] { resultItems.First().Request.Url.ToString() });
 			}
 		}
+
 		//[Fact]
 		//public void TestReturnHttpProxy()
 		//{

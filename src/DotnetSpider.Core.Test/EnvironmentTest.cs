@@ -5,7 +5,6 @@ namespace DotnetSpider.Core.Test
 {
 	public class EnvironmentTest
 	{
-
 		[Fact(DisplayName = "DefaultConfig")]
 		public void DefaultConfig()
 		{

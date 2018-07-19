@@ -1,6 +1,9 @@
-﻿using Serilog;
+﻿using DotnetSpider.Common;
+using Serilog;
 using Serilog.Events;
+#if !NET40
 using Serilog.Sinks.SystemConsole.Themes;
+#endif
 using System;
 using System.Collections.Generic;
 
@@ -10,6 +13,7 @@ namespace DotnetSpider.Core.Infrastructure
 	{
 		public const string Identity = "System";
 
+#if !NET40
 		public static SystemConsoleTheme Spider { get; } = new SystemConsoleTheme(
 			new Dictionary<ConsoleThemeStyle, SystemConsoleThemeStyle>
 			{
@@ -30,37 +34,40 @@ namespace DotnetSpider.Core.Infrastructure
 				[ConsoleThemeStyle.LevelError] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Red },
 				[ConsoleThemeStyle.LevelFatal] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Red }
 			});
+#endif
 
 		public static void Init()
 		{
-			var type = Log.Logger.GetType();
-			if (type.FullName == "Serilog.Core.Pipeline.SilentLogger")
+			if (Logger.Default is SilentLogger)
 			{
-				Log.Logger = Create(Identity);
+				Logger.Default = Create(Identity);
 			}
 		}
 
-		public static ILogger Create(string identity)
+		public static Common.ILogger Create(string identity)
 		{
 			var loggerConfiguration = new LoggerConfiguration()
 				.MinimumLevel.Verbose()
+#if !NET40
 				.WriteTo.Console(theme: Spider)
+#else
+				.WriteTo.Console()
+#endif
 				.WriteTo.RollingFile("dotnetspider.log")
 				.Enrich.WithProperty("Identity", identity).Enrich.WithProperty("NodeId", Env.NodeId);
 			if (Env.HubService)
 			{
 				loggerConfiguration = loggerConfiguration.WriteTo.Http(Env.HubServiceLogUrl, Env.HubServiceToken, LogEventLevel.Verbose, 1);
 			}
-			return loggerConfiguration.CreateLogger();
+			return new Serilogger(loggerConfiguration.CreateLogger());
 		}
 
-		public static ILogger CreateFailingRequestsLogger(string identity)
+		public static Common.ILogger CreateFailingRequestsLogger(string identity)
 		{
 			var loggerConfiguration = new LoggerConfiguration()
 							.MinimumLevel.Verbose()
-							.WriteTo.Console(theme: Spider)
-							.WriteTo.RollingFile($"{identity}.failing.log");
-			return loggerConfiguration.CreateLogger();
+				.WriteTo.RollingFile($"{identity}.failing.log");
+			return new Serilogger(loggerConfiguration.CreateLogger());
 		}
 	}
 }
