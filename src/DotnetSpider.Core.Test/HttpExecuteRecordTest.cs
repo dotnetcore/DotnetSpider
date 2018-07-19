@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using DotnetSpider.Core.Infrastructure;
+using DotnetSpider.Downloader;
 using Xunit;
 
 namespace DotnetSpider.Core.Test
@@ -11,7 +12,7 @@ namespace DotnetSpider.Core.Test
 		{
 			if (Env.IsWindows)
 			{
-				var result = HttpClientPool.HttpClient.GetAsync("http://localhost:30013").Result;
+				var result = HttpClientDownloader.Default.GetAsync("http://localhost:30013").Result;
 				if (result.StatusCode == HttpStatusCode.OK)
 				{
 					Env.HubServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";

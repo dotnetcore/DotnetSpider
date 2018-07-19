@@ -10,9 +10,14 @@ using DotnetSpider.Proxy;
 
 namespace DotnetSpider.Downloader
 {
+	/// <summary>
+	/// Downloader using <see cref="HttpWebRequest"/>
+	/// </summary>
+	/// <summary xml:lang="zh-CN">
+	/// 纯HTTP下载器
+	/// </summary>
 	public class HttpWebRequestDownloader : BaseDownloader
 	{
-		private readonly string _downloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "downloads");
 		private readonly int _timeout;
 		private readonly bool _decodeHtml;
 
@@ -32,27 +37,24 @@ namespace DotnetSpider.Downloader
 			Response response = new Response();
 			response.Request = request;
 
-			if (request.Site.DownloadFiles)
+			if (IfFileExists(request))
 			{
-				string filePath = CreateFilePath(request);
-				if (File.Exists(filePath))
-				{
-					Logger.Information($"File {request.Url} already exists.");
-					return response;
-				}
+				Logger.Information($"File {request.Url} already exists.");
+				return response;
 			}
 
-			var httpWebRequest = GenerateHttpWebRequest(request);
+			HttpWebRequest httpWebRequest = null;
 			HttpWebResponse httpWebResponse = null;
 
 			try
 			{
+				httpWebRequest = GenerateHttpWebRequest(request);
 				httpWebResponse =
 					NetworkCenter.Current.Execute("downloader", () => (HttpWebResponse)httpWebRequest.GetResponse());
 				response.StatusCode = httpWebResponse.StatusCode;
 				EnsureSuccessStatusCode(response.StatusCode);
 				response.TargetUrl = httpWebResponse.ResponseUri.ToString();
-
+				var bytes = ReadResponseStream(httpWebResponse);
 				if (!request.Site.ExcludeMediaTypes.Any(t => httpWebResponse.ContentType.Contains(t)))
 				{
 					if (!request.Site.DownloadFiles)
@@ -61,12 +63,12 @@ namespace DotnetSpider.Downloader
 					}
 					else
 					{
-						StorageFile(request, httpWebResponse);
+						StorageFile(request, bytes);
 					}
 				}
 				else
 				{
-					string content = ReadContent(httpWebResponse, request.Site);
+					string content = ReadContent(bytes, httpWebResponse.ContentType, request.Site);
 
 					if (_decodeHtml)
 					{
@@ -96,7 +98,7 @@ namespace DotnetSpider.Downloader
 				var proxy = httpWebRequest.Proxy as WebProxy;
 				if (HttpProxyPool.Instance != null && proxy != null && httpWebRequest.Proxy != FiddlerProxy)
 				{
-					HttpProxyPool.Instance.ReturnProxy(proxy, HttpStatusCode.Accepted);
+					HttpProxyPool.Instance.ReturnProxy(proxy, httpWebResponse == null ? HttpStatusCode.ServiceUnavailable : httpWebResponse.StatusCode);
 				}
 				try
 				{
@@ -111,14 +113,13 @@ namespace DotnetSpider.Downloader
 			return response;
 		}
 
-		protected virtual string ReadContent(HttpWebResponse response, Site site)
+		protected virtual byte[] ReadResponseStream(HttpWebResponse response)
 		{
 			var stream = response.GetResponseStream();
 			if (stream == null)
 			{
 				return null;
 			}
-
 			byte[] buffer = new byte[1024];
 			byte[] contentBytes;
 			using (MemoryStream ms = new MemoryStream())
@@ -131,15 +132,9 @@ namespace DotnetSpider.Downloader
 
 				contentBytes = ms.ToArray();
 			}
-
 			contentBytes = PreventCutOff(contentBytes);
-			if (string.IsNullOrEmpty(site.EncodingName))
-			{
-				Encoding htmlCharset = EncodingExtensions.GetEncoding(response.CharacterSet, contentBytes);
-				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
-			}
-
-			return Encoding.GetEncoding(site.EncodingName).GetString(contentBytes, 0, contentBytes.Length);
+			stream.Dispose();
+			return contentBytes;
 		}
 
 		private HttpWebRequest GenerateHttpWebRequest(Request request)
@@ -219,6 +214,10 @@ namespace DotnetSpider.Downloader
 			if (HttpProxyPool.Instance != null)
 			{
 				httpWebRequest.Proxy = HttpProxyPool.Instance.GetProxy();
+				if (httpWebRequest.Proxy == null)
+				{
+					throw new DownloaderException("No avaliable proxy.");
+				}
 			}
 			else
 			{
@@ -235,62 +234,6 @@ namespace DotnetSpider.Downloader
 				httpWebRequest.Proxy = FiddlerProxy;
 			}
 			return httpWebRequest;
-		}
-
-		private void StorageFile(Request request, HttpWebResponse response)
-		{
-			string filePath = CreateFilePath(request);
-			if (!File.Exists(filePath))
-			{
-				try
-				{
-					string folder = Path.GetDirectoryName(filePath);
-					if (!string.IsNullOrEmpty(folder))
-					{
-						if (!Directory.Exists(folder))
-						{
-							Directory.CreateDirectory(folder);
-						}
-
-						var bytes = StreamExtensions.ConvertToBytes(response.GetResponseStream());
-						File.WriteAllBytes(filePath, bytes);
-						Logger.Information($"Storage file {request.Url} success.");
-					}
-					else
-					{
-						throw new DownloaderException($"Can not create folder for file path {filePath}.");
-					}
-				}
-				catch (Exception e)
-				{
-					Logger.Error($"Storage file {request.Url} failed: {e.Message}.");
-				}
-			}
-			else
-			{
-				Logger.Information($"File {request.Url} already exists.");
-			}
-		}
-
-		private string CreateFilePath(Request request)
-		{
-			var uri = new Uri(request.Url);
-			var intervalPath = (uri.Host + uri.LocalPath).Replace("//", "/").Replace("/", DownloaderEnv.PathSeperator);
-			string filePath = $"{_downloadFolder}{DownloaderEnv.PathSeperator}{intervalPath}";
-			return filePath;
-		}
-
-		private byte[] PreventCutOff(byte[] bytes)
-		{
-			for (int i = 0; i < bytes.Length; i++)
-			{
-				if (bytes[i] == 0x00)
-				{
-					bytes[i] = 32;
-				}
-			}
-
-			return bytes;
 		}
 
 		private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Text;
 using DotnetSpider.Common;
 
 namespace DotnetSpider.Downloader
@@ -16,6 +18,7 @@ namespace DotnetSpider.Downloader
 		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
 		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
 		private bool _injectedCookies;
+		private readonly string _downloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "downloads");
 
 		/// <summary>
 		/// Cookie Container
@@ -146,6 +149,51 @@ namespace DotnetSpider.Downloader
 			return response;
 		}
 
+		protected virtual string ReadContent(byte[] contentBytes, string characterSet, Site site)
+		{
+			if (string.IsNullOrEmpty(site.EncodingName))
+			{
+				Encoding htmlCharset = EncodingExtensions.GetEncoding(characterSet, contentBytes);
+				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
+			}
+
+			return Encoding.GetEncoding(site.EncodingName).GetString(contentBytes, 0, contentBytes.Length);
+		}
+
+		protected void StorageFile(Request request, byte[] bytes)
+		{
+			string filePath = CreateFilePath(request);
+			if (!File.Exists(filePath))
+			{
+				try
+				{
+					string folder = Path.GetDirectoryName(filePath);
+					if (!string.IsNullOrEmpty(folder))
+					{
+						if (!Directory.Exists(folder))
+						{
+							Directory.CreateDirectory(folder);
+						}
+
+						File.WriteAllBytes(filePath, bytes);
+						Logger.Information($"Storage file {request.Url} success.");
+					}
+					else
+					{
+						throw new DownloaderException($"Can not create folder for file path {filePath}.");
+					}
+				}
+				catch (Exception e)
+				{
+					Logger.Error($"Storage file {request.Url} failed: {e.Message}.");
+				}
+			}
+			else
+			{
+				Logger.Information($"File {request.Url} already exists.");
+			}
+		}
+
 		protected virtual void DetectContentType(Response response, string contentType)
 		{
 			if (response.Request.Site.ContentType == ContentType.Auto)
@@ -163,6 +211,19 @@ namespace DotnetSpider.Downloader
 			{
 				response.ContentType = response.Request.Site.ContentType;
 			}
+		}
+
+		protected bool IfFileExists(Request request)
+		{
+			if (request.Site.DownloadFiles)
+			{
+				string filePath = CreateFilePath(request);
+				if (File.Exists(filePath))
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -226,6 +287,27 @@ namespace DotnetSpider.Downloader
 		/// <param name="request">请求信息 <see cref="Request"/></param>
 		/// <returns>页面数据 <see cref="Response"/></returns>
 		protected abstract Response DowloadContent(Request request);
+
+		protected byte[] PreventCutOff(byte[] bytes)
+		{
+			for (int i = 0; i < bytes.Length; i++)
+			{
+				if (bytes[i] == 0x00)
+				{
+					bytes[i] = 32;
+				}
+			}
+
+			return bytes;
+		}
+
+		protected string CreateFilePath(Request request)
+		{
+			var uri = new Uri(request.Url);
+			var intervalPath = (uri.Host + uri.LocalPath).Replace("//", "/").Replace("/", DownloaderEnv.PathSeperator);
+			string filePath = $"{_downloadFolder}{DownloaderEnv.PathSeperator}{intervalPath}";
+			return filePath;
+		}
 
 		private void BeforeDownload(ref Request request)
 		{

@@ -13,7 +13,7 @@ namespace DotnetSpider.Extension
 	/// <summary>
 	/// 起始链接构造器
 	/// </summary>
-	public class DbStartUrlsBuilder : RequestBuilder
+	public class DbRequestBuilder : RequestBuilder
 	{
 		private readonly ConnectionStringSettings _connectionStringSettings;
 
@@ -49,7 +49,7 @@ namespace DotnetSpider.Extension
 		/// <param name="sql">SQL 语句</param>
 		/// <param name="formateArguments">起始链接格式化参数</param>
 		/// <param name="formateStrings">起始链接格式化模版</param>
-		public DbStartUrlsBuilder(string sql, string[] formateArguments, params string[] formateStrings)
+		public DbRequestBuilder(string sql, string[] formateArguments, params string[] formateStrings)
 		{
 			if (Env.DataConnectionStringSettings == null)
 			{
@@ -69,7 +69,7 @@ namespace DotnetSpider.Extension
 		/// <param name="sql">SQL 语句</param>
 		/// <param name="formateArguments">起始链接格式化参数</param>
 		/// <param name="formateStrings">起始链接格式化模版</param>
-		public DbStartUrlsBuilder(Database source, string connectString, string sql, string[] formateArguments, params string[] formateStrings)
+		public DbRequestBuilder(Database source, string connectString, string sql, string[] formateArguments, params string[] formateStrings)
 		{
 			switch (source)
 			{

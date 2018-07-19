@@ -28,7 +28,7 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				NetworkCenter.Current.Execute("status", () =>
 				{
-					HttpClientPool.HttpClient.SendAsync(httpRequestMessage).Result.EnsureSuccessStatusCode();
+					HttpClientDownloader.Default.SendAsync(httpRequestMessage).Result.EnsureSuccessStatusCode();
 				});
 			});
 		}

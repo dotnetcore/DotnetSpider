@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Core.Infrastructure
 {
@@ -97,7 +98,7 @@ namespace DotnetSpider.Core.Infrastructure
 				var json = JsonConvert.SerializeObject(logs);
 				httpRequestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-				await HttpClientPool.HttpClient.SendAsync(httpRequestMessage);
+				await HttpClientDownloader.Default.SendAsync(httpRequestMessage);
 			}
 			catch (Exception ex)
 			{
@@ -165,7 +166,7 @@ namespace DotnetSpider.Core.Infrastructure
 				var json = JsonConvert.SerializeObject(logs);
 				httpRequestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-				HttpClientPool.HttpClient.SendAsync(httpRequestMessage).Wait();
+				HttpClientDownloader.Default.SendAsync(httpRequestMessage).Wait();
 			}
 			catch (Exception ex)
 			{

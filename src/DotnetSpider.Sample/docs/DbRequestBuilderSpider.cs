@@ -24,13 +24,13 @@ using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs
 {
-	public class DbStartUrlsBuilderSpider : EntitySpider
+	public class DbRequestBuilderSpider : EntitySpider
 	{
 		protected override void MyInit(params string[] arguments)
 		{
 			Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("json(", ");", 5, 0));
 			AddPipeline(new ConsoleEntityPipeline());
-			AddRequestBuilder(new DbStartUrlsBuilder(Database.MySql, Env.DataConnectionString,
+			AddRequestBuilder(new DbRequestBuilder(Database.MySql, Env.DataConnectionString,
 				$"SELECT * FROM test.jd_sku", new[] { "sku" },
 				"http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json"));
 
