@@ -737,9 +737,12 @@ namespace DotnetSpider.Core
 					var downloader = Downloader.Clone();
 					while (Status == Status.Running)
 					{
-						// 从队列中取出一个请求
+						// 从队列中取出一个请求, 因为 Site 是共享对象， 每个Request都保留了引用， 序列存到Redis或其它数据库中浪费带宽和空间， 因此 Site对象不保存到数据库中
 						Request request = Scheduler.Poll();
-
+						if (request != null && request.Site == null)
+						{
+							request.Site = Site;
+						}
 						// 如果队列中没有需要处理的请求, 则开始等待, 一直到设定的 EmptySleepTime 结束, 则认为爬虫应该结束了
 						if (request == null)
 						{

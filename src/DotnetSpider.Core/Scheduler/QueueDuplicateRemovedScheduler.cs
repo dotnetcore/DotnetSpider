@@ -165,5 +165,19 @@ namespace DotnetSpider.Core.Scheduler
 			}
 			base.Dispose();
 		}
+
+		/// <summary>
+		/// 取得队列中所有的请求对象
+		/// </summary>
+		internal Request[] All
+		{
+			get
+			{
+				lock (_lock)
+				{
+					return _queue.ToArray();
+				}
+			}
+		}
 	}
 }

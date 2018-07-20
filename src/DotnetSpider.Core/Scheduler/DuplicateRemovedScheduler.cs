@@ -96,7 +96,7 @@ namespace DotnetSpider.Core.Scheduler
 		/// 添加请求对象到队列
 		/// </summary>
 		/// <param name="request">请求对象</param>
-		public void Push(Request request, Func<Request, bool> shouldReserved)
+		public void Push(Request request, Func<Request, bool> shouldReserved = null)
 		{
 			var action = new Action(() =>
 			{

@@ -132,13 +132,13 @@ namespace DotnetSpider.Common
 
 			Request request = (Request)obj;
 
-			if (!Depth.Equals(request.Depth)) return false;
-			if (!CycleTriedTimes.Equals(request.CycleTriedTimes)) return false;
-			if (!Referer.Equals(request.Referer)) return false;
-			if (!Origin.Equals(request.Origin)) return false;
-			if (!Method.Equals(request.Method)) return false;
-			if (!Priority.Equals(request.Priority)) return false;
-			if (!Content.Equals(request.Content)) return false;
+			if (!Equals(Depth, request.Depth)) return false;
+			if (!Equals(CycleTriedTimes, request.CycleTriedTimes)) return false;
+			if (!Equals(Referer, request.Referer)) return false;
+			if (!Equals(Origin, request.Origin)) return false;
+			if (!Equals(Method, request.Method)) return false;
+			if (!Equals(Priority, request.Priority)) return false;
+			if (!Equals(Content, request.Content)) return false;
 
 			if (Properties == null)
 			{
