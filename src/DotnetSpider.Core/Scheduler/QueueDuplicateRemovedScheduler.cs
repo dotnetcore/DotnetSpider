@@ -1,5 +1,4 @@
 using DotnetSpider.Common;
-using DotnetSpider.Core.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;

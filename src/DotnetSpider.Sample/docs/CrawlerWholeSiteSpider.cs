@@ -1,21 +1,9 @@
 using DotnetSpider.Common;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Downloader;
-using DotnetSpider.Extension;
-using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extraction;
-using DotnetSpider.Extraction.Model;
-using DotnetSpider.Extraction.Model.Attribute;
-using DotnetSpider.Extraction.Model.Formatter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs
 {
@@ -23,7 +11,7 @@ namespace DotnetSpider.Sample.docs
 	{
 		public static void Run()
 		{
-			// Config encoding, header, cookie, proxy etc... ¶¨Òå²É¼¯µÄ Site ¶ÔÏó, ÉèÖÃ Header¡¢Cookie¡¢´úÀíµÈ
+			// Config encoding, header, cookie, proxy etc... å®šä¹‰é‡‡é›†çš„ Site å¯¹è±¡, è®¾ç½® Headerã€Cookieã€ä»£ç†ç­‰
 			var site = new Site { EncodingName = "UTF-8" };
 
 			// Set start/seed url
@@ -40,16 +28,16 @@ namespace DotnetSpider.Sample.docs
 			// dowload html by http client
 			spider.Downloader = new HttpWebRequestDownloader();
 			spider.Name = "CNBLOGS";
-			// 4 threads 4Ïß³Ì
+			// 4 threads 4çº¿ç¨‹
 			spider.ThreadNum = 4;
 			spider.TaskId = "cnblogs";
-			// traversal deep ±éÀúÉî¶È
+			// traversal deep éå†æ·±åº¦
 			spider.Scheduler.Depth = 3;
 
-			// stop crawler if it can't get url from the scheduler after 30000 ms µ±ÅÀ³æÁ¬Ğø30ÃëÎŞ·¨´Óµ÷¶ÈÖĞĞÄÈ¡µÃĞèÒª²É¼¯µÄÁ´½ÓÊ±½áÊø.
+			// stop crawler if it can't get url from the scheduler after 30000 ms å½“çˆ¬è™«è¿ç»­30ç§’æ— æ³•ä»è°ƒåº¦ä¸­å¿ƒå–å¾—éœ€è¦é‡‡é›†çš„é“¾æ¥æ—¶ç»“æŸ.
 			spider.EmptySleepTime = 30000;
 
-			// start crawler Æô¶¯ÅÀ³æ
+			// start crawler å¯åŠ¨çˆ¬è™«
 			spider.Run();
 		}
 	}

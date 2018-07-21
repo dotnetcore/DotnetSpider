@@ -1,10 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Scheduler;
-using DotnetSpider.Downloader;
-using System.Threading;
+﻿using System.Threading;
 
 namespace DotnetSpider.Sample
 {

@@ -1,10 +1,6 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Downloader;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace DotnetSpider.Extension.Processor
 {

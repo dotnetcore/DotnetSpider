@@ -1,15 +1,11 @@
 ﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model.Formatter;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace DotnetSpider.Sample
 {

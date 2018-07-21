@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace DotnetSpider.Core.Infrastructure
+namespace DotnetSpider.Common
 {
 	/// <summary>
 	/// 文件夹扩展

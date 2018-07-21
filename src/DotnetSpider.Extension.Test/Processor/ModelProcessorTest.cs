@@ -1,10 +1,8 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Processor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model;

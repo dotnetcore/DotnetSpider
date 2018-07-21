@@ -1,4 +1,5 @@
-﻿using DotnetSpider.Core.Infrastructure.Database;
+﻿using DotnetSpider.Common;
+using DotnetSpider.Core.Infrastructure.Database;
 using System.Configuration;
 using System.Linq;
 

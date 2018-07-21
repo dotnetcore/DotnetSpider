@@ -1,9 +1,7 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Extension.Downloader;
 using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Extension.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

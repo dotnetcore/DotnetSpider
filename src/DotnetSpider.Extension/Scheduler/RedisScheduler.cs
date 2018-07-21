@@ -23,17 +23,18 @@ namespace DotnetSpider.Extension.Scheduler
 		private readonly object _locker = new object();
 		private const string TasksKey = "dotnetspider:tasks";
 		private readonly RetryPolicy _retryPolicy = Policy.Handle<Exception>().Retry(30);
-		private string _queueKey;
-		private string _setKey;
-		private string _itemKey;
-		private string _errorCountKey;
-		private string _successCountKey;
-		private string _identityMd5;
+		private readonly string _queueKey;
+		private readonly string _setKey;
+		private readonly string _itemKey;
+		private readonly string _errorCountKey;
+		private readonly string _successCountKey;
+		private readonly string _identityMd5;
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
 		private readonly string _connectString;
 		private RedisConnection _redisConnection;
 		private readonly string _identity;
+		private readonly Dictionary<string, RedisConnection> Cache = new Dictionary<string, RedisConnection>();
 
 		/// <summary>
 		/// 批量加载时的每批次加载数
@@ -74,7 +75,7 @@ namespace DotnetSpider.Extension.Scheduler
 			_connectString = connectString;
 			DuplicateRemover = this;
 
-			var md5 = CryptoUtil.Md5Encrypt(identity);
+			var md5 = Cryptography.ToShortMd5(identity);
 			_itemKey = $"dotnetspider:scheduler:{md5}:items";
 			_setKey = $"dotnetspider:scheduler:{md5}:set";
 			_queueKey = $"dotnetspider:scheduler:{md5}:queue";
@@ -85,11 +86,10 @@ namespace DotnetSpider.Extension.Scheduler
 
 			var action = new Action(() =>
 			{
-				_redisConnection = (RedisConnection)Cache.Instance.Get(_connectString);
-				if (_redisConnection == null)
+				if (!Cache.ContainsKey(_connectString))
 				{
 					_redisConnection = new RedisConnection(_connectString);
-					Cache.Instance.Set(_connectString, _redisConnection);
+					Cache.Add(_connectString, _redisConnection);
 				}
 				_redisConnection.Database.SortedSetAdd(TasksKey, _identity, (long)DateTimeUtil.GetCurrentUnixTimeNumber());
 			});

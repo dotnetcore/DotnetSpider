@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Pipeline;
 using System;
 using System.Linq;

@@ -1,19 +1,9 @@
 using OpenQA.Selenium.Firefox;
 using System;
-using System.Linq;
-using System.Threading;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Extension.Model;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
-using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core;
 using System.IO;
-using System.Net;
 using DotnetSpider.Downloader;
-using DotnetSpider.Extraction.Model;
-using DotnetSpider.Extraction;
 using DotnetSpider.Common;
 
 namespace DotnetSpider.Extension.Downloader

@@ -1,11 +1,9 @@
 ﻿#if !NET40
 using System.Collections.Generic;
-using DotnetSpider.Extension.Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Linq;
-using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Downloader;

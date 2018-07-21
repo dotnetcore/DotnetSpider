@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using DotnetSpider.Core;
 using System.Linq;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Common;
 

@@ -1,4 +1,3 @@
-using DotnetSpider.Common;
 using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Pipeline

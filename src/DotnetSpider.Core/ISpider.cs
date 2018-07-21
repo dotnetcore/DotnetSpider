@@ -1,11 +1,8 @@
 using DotnetSpider.Common;
 using DotnetSpider.Core.Monitor;
-using DotnetSpider.Core.Pipeline;
-using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Downloader;
 using System;
-using System.Collections.Generic;
 
 namespace DotnetSpider.Core
 {

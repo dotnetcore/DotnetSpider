@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Sample

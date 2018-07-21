@@ -9,9 +9,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
-using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
-using System.Threading.Tasks;
 using DotnetSpider.Downloader;
 using DotnetSpider.Common;
 

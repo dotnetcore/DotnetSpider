@@ -3,9 +3,9 @@ using Serilog;
 using Serilog.Events;
 #if !NET40
 using Serilog.Sinks.SystemConsole.Themes;
-#endif
 using System;
 using System.Collections.Generic;
+#endif
 
 namespace DotnetSpider.Core.Infrastructure
 {

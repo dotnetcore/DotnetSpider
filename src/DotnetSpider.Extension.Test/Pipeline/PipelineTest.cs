@@ -12,8 +12,6 @@ using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model.Formatter;
 using DotnetSpider.Extraction;
 using DotnetSpider.Common;
-using DotnetSpider.Extension.Downloader;
-using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {

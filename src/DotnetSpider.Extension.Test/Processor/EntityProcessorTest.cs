@@ -4,9 +4,6 @@ using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace DotnetSpider.Extension.Test.Processor

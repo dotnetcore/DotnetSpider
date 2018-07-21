@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Extension.Model;
-using DotnetSpider.Extraction;
+﻿using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model.Attribute;
 
 namespace DotnetSpider.Extension.Downloader

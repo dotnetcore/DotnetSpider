@@ -5,7 +5,6 @@ using System.Text;
 using DotnetSpider.Core.Infrastructure;
 using MimeKit;
 using System.Linq;
-using System.Reflection;
 using System.Web;
 using System.IO;
 using DotnetSpider.Core.Infrastructure.Database;

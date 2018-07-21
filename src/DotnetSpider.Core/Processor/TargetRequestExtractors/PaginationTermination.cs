@@ -2,10 +2,6 @@
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Formatter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 {

@@ -1,8 +1,6 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Scheduler;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -90,7 +88,7 @@ namespace DotnetSpider.Extension.Test
 			var redis = ConnectionMultiplexer.Connect(confiruation);
 			var db = redis.GetDatabase(0);
 
-			var md5 = CryptoUtil.Md5Encrypt(spider.Identity);
+			var md5 = Cryptography.ToShortMd5(spider.Identity);
 			var itemKey = "item-" + md5;
 			var setKey = "set-" + md5;
 			var queueKey = "queue-" + md5;

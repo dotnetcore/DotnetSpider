@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Infrastructure;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium;
@@ -12,9 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using DotnetSpider.Downloader;
 using DotnetSpider.Common;
-using System.Linq;
 using Newtonsoft.Json.Linq;
-using System.Net;
 
 namespace DotnetSpider.Extension.Downloader
 {

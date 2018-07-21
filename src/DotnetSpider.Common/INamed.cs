@@ -23,7 +23,7 @@ namespace DotnetSpider.Common
 		/// </summary>
 		public string Name { get; set; }
 
-		public Named()
+		protected Named()
 		{
 			var type = GetType();
 			var nameAttribute = type.GetCustomAttributes(typeof(TaskName), true).FirstOrDefault() as TaskName;

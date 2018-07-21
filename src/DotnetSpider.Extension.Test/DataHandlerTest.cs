@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Processor;
 using Xunit;
-using System;
 using DotnetSpider.Core;
 using System.IO;
 using DotnetSpider.Extraction.Model;

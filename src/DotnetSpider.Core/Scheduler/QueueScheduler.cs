@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Common;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Scheduler.Component;
 using System;
 

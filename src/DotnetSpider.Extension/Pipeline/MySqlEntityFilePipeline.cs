@@ -5,7 +5,6 @@ using DotnetSpider.Core;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Runtime.CompilerServices;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Common;
 

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace DotnetSpider.Core.Infrastructure
+namespace DotnetSpider.Common
 {
 	/// <summary>
 	/// 单独的泛型实型

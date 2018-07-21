@@ -3,19 +3,19 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DotnetSpider.Core.Infrastructure
+namespace DotnetSpider.Common
 {
 	/// <summary>
 	/// 加、解密帮助类
 	/// </summary>
-	public static class CryptoUtil
+	public static class Cryptography
 	{
 		/// <summary>
 		/// 计算32位MD5
 		/// </summary>
 		/// <param name="str">需要计算的字符串</param>
 		/// <returns>32位的MD5值</returns>
-		public static string Md5Encrypt32(string str)
+		public static string ToMd5(this string str)
 		{
 #if !NETSTANDARD
 			MD5 md5 = new MD5CryptoServiceProvider();
@@ -33,9 +33,9 @@ namespace DotnetSpider.Core.Infrastructure
 		/// </summary>
 		/// <param name="str">需要计算的字符串</param>
 		/// <returns>8位的MD5值</returns>
-		public static string Md5Encrypt(string str)
+		public static string ToShortMd5(this string str)
 		{
-			return Md5Encrypt32(str).Substring(8, 16).ToLower();
+			return ToMd5(str).Substring(8, 16).ToLower();
 		}
 
 		/// <summary>
@@ -44,7 +44,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="key">秘钥</param>
 		/// <param name="str">需要加密的字符串</param>
 		/// <returns>加密后的字符串</returns>
-		public static string DesEncrypt(string key, string str)
+		public static string ToDes(string key, string str)
 		{
 			DESCryptoServiceProvider cryptoProvider = new DESCryptoServiceProvider();
 			var bytes = Encoding.ASCII.GetBytes(key);

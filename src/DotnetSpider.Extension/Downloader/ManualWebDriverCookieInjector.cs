@@ -1,12 +1,5 @@
 ﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Downloader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 
 namespace DotnetSpider.Extension.Downloader

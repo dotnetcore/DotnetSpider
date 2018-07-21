@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Monitor;
+﻿using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Pipeline;
 using System;
@@ -11,7 +10,6 @@ using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction;
 using DotnetSpider.Common;
 using DotnetSpider.Core.Processor.TargetRequestExtractors;
-using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extension.Processor;
 
 namespace DotnetSpider.Extension.Test.Processor

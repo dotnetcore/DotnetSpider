@@ -3,7 +3,6 @@ using DotnetSpider.Extension.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Xunit;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Scheduler;
 using Xunit;
-using DotnetSpider.Core.Downloader;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Monitor;

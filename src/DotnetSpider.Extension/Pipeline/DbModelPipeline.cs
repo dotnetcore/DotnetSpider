@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Infrastructure;
 using System.Configuration;
 using System.Data;

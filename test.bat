@@ -1,1 +1,0 @@
-for %%i in (src\DotnetSpider.Common\bin\Release\*.nupkg) do del /q/a/f/s %%i

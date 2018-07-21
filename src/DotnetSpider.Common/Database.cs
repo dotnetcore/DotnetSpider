@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotnetSpider.Core.Infrastructure.Database
+namespace DotnetSpider.Common
 {
 	/// <summary>
 	/// Database type enum
@@ -36,6 +36,11 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		/// <summary>
 		/// PostgreSql
 		/// </summary>
-		PostgreSql
+		PostgreSql,
+
+		/// <summary>
+		/// Clickhouse
+		/// </summary>
+		Clickhouse,
 	}
 }

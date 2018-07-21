@@ -84,22 +84,22 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		/// <param name="source"><see cref="Database"/></param>
 		/// <param name="connectString"></param>
 		/// <returns></returns>
-		public static DbConnection CreateDbConnection(Database source, string connectString)
+		public static DbConnection CreateDbConnection(Common.Database source, string connectString)
 		{
 			DbProviderFactory factory;
 			switch (source)
 			{
-				case Database.MySql:
+				case Common.Database.MySql:
 					{
 						factory = DbProviderFactories.GetFactory(DbProviderFactories.MySqlProvider);
 						break;
 					}
-				case Database.SqlServer:
+				case Common.Database.SqlServer:
 					{
 						factory = DbProviderFactories.GetFactory(DbProviderFactories.SqlServerProvider);
 						break;
 					}
-				case Database.PostgreSql:
+				case Common.Database.PostgreSql:
 					{
 						factory = DbProviderFactories.GetFactory(DbProviderFactories.PostgreSqlProvider);
 						break;
@@ -148,19 +148,19 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		/// <param name="source">数据库 <see cref="Database"/></param>
 		/// <param name="connectString">连接字符串</param>
 		/// <returns>数据库配置对象 <see cref="ConnectionStringSettings"/></returns>
-		public static ConnectionStringSettings GetConnectionStringSettings(Database source, string connectString)
+		public static ConnectionStringSettings GetConnectionStringSettings(Common.Database source, string connectString)
 		{
 			switch (source)
 			{
-				case Database.MySql:
+				case Common.Database.MySql:
 					{
 						return new ConnectionStringSettings("MySql", connectString, DbProviderFactories.MySqlProvider);
 					}
-				case Database.SqlServer:
+				case Common.Database.SqlServer:
 					{
 						return new ConnectionStringSettings("SqlServer", connectString, DbProviderFactories.SqlServerProvider);
 					}
-				case Database.PostgreSql:
+				case Common.Database.PostgreSql:
 					{
 						return new ConnectionStringSettings("PostgreSql", connectString, DbProviderFactories.PostgreSqlProvider);
 					}

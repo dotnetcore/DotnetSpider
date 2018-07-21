@@ -5,7 +5,6 @@ using System.Linq;
 using System.IO;
 using MimeKit;
 using DotnetSpider.Core.Infrastructure;
-using System.Reflection;
 using DotnetSpider.Core;
 using OfficeOpenXml;
 

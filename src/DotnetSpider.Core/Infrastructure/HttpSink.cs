@@ -8,7 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+#if !NET40
 using System.Threading.Tasks;
+#endif
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Core.Infrastructure
@@ -72,7 +74,7 @@ namespace DotnetSpider.Core.Infrastructure
 			int count = 0;
 			try
 			{
-				var logs = new List<LogInfo>();
+				var logs = new List<dynamic>();
 				foreach (var ev in events)
 				{
 					count++;
@@ -81,7 +83,7 @@ namespace DotnetSpider.Core.Infrastructure
 					var nodeId = ev.Properties["NodeId"].ToString();
 					nodeId = nodeId.Substring(1, nodeId.Length - 2);
 
-					var logInfo = new LogInfo
+					var logInfo = new
 					{
 						Exception = ev.Exception?.ToString(),
 						Identity = identity,
@@ -89,6 +91,7 @@ namespace DotnetSpider.Core.Infrastructure
 						Logged = ev.Timestamp,
 						Message = ev.RenderMessage(),
 						NodeId = nodeId,
+						DateTime = DateTime.Now
 					};
 					logs.Add(logInfo);
 				}
@@ -140,7 +143,7 @@ namespace DotnetSpider.Core.Infrastructure
 			int count = 0;
 			try
 			{
-				var logs = new List<LogInfo>();
+				var logs = new List<dynamic>();
 				foreach (var ev in events)
 				{
 					count++;
@@ -149,7 +152,7 @@ namespace DotnetSpider.Core.Infrastructure
 					var nodeId = ev.Properties["NodeId"].ToString();
 					nodeId = nodeId.Substring(1, nodeId.Length - 2);
 
-					var logInfo = new LogInfo
+					var logInfo = new
 					{
 						Exception = ev.Exception?.ToString(),
 						Identity = identity,
@@ -157,6 +160,7 @@ namespace DotnetSpider.Core.Infrastructure
 						Logged = ev.Timestamp,
 						Message = ev.RenderMessage(),
 						NodeId = nodeId,
+						DateTime = DateTime.Now
 					};
 					logs.Add(logInfo);
 				}

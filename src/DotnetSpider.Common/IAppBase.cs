@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace DotnetSpider.Common
+﻿namespace DotnetSpider.Common
 {
 	/// <summary>
 	/// 标准任务接口

@@ -1,7 +1,4 @@
 ﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
-using DotnetSpider.Core.Downloader;
-using DotnetSpider.Core.Processor;
 using DotnetSpider.Downloader;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Pipeline;
@@ -10,8 +7,6 @@ using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Sample.docs

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Text;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Infrastructure;
 using System.Data;
 using MySql.Data.MySqlClient;

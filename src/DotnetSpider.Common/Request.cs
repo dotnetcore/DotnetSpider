@@ -61,7 +61,7 @@ namespace DotnetSpider.Common
 		/// </summary>
 		public string Url { get; set; }
 
-		public virtual string Identity => Md5Util.Md5Encrypt($"{Referer}.{Origin}.{Method}.{Content}.{Url}");
+		public virtual string Identity => $"{Referer}.{Origin}.{Method}.{Content}.{Url}".ToShortMd5();
 
 		/// <summary>
 		/// 构造方法

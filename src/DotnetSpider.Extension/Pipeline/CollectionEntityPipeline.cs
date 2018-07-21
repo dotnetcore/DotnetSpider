@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DotnetSpider.Common;
-using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extraction.Model;
 
 namespace DotnetSpider.Extension.Pipeline

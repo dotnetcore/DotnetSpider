@@ -1,6 +1,4 @@
 ﻿using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using System;

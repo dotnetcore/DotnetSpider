@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using DotnetSpider.Common;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Model;
 using DotnetSpider.Extraction.Model;
 using OfficeOpenXml;
 

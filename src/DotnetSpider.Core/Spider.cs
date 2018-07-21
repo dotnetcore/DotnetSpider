@@ -15,12 +15,12 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 #if NETFRAMEWORK
 using System.Net;
+#else
+using System.Text;
 #endif
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
