@@ -21,7 +21,7 @@ namespace DotnetSpider.Sample
 			var word = "可乐|雪碧";
 			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 			AddEntityType<BaiduSearchEntry>();
-			AddPipeline(new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true"));
+			AddPipeline(new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;"));
 		}
 
 		[TableInfo("baidu", "baidu_search_entity_model")]
@@ -43,16 +43,16 @@ namespace DotnetSpider.Sample
 			[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 			public string Website { get; set; }
 
-			[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href", Length = 0)]
+			[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
 			public string Snapshot { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText, Length = 0)]
+			[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 			public string Details { get; set; }
 
-			[FieldSelector(Expression = ".", Option = FieldOptions.InnerText, Length = 0)]
+			[FieldSelector(Expression = ".", Option = FieldOptions.InnerText)]
 			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]

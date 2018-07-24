@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using DotnetSpider.Core;
+using System.Threading;
 
 namespace DotnetSpider.Sample
 {
@@ -11,10 +12,7 @@ namespace DotnetSpider.Sample
 #else
 			ThreadPool.SetMinThreads(256, 256);
 #endif
-			TestSpider spider = new TestSpider();
-			spider.Run();
-
-
+			Startup.Run(args);
 		}
 
 		/// <summary>

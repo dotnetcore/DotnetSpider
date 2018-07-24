@@ -247,7 +247,18 @@ namespace DotnetSpider.Core
 		public static List<string> DetectDlls()
 		{
 			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
-			return Directory.GetFiles(path).Where(f => f.EndsWith(".dll")).Select(f => Path.GetFileName(f).Replace(".dll", "")).Where(f => !f.EndsWith("DotnetSpider.HtmlAgilityPack.Css") && !f.EndsWith("DotnetSpider.Extension") && !f.EndsWith("DotnetSpider2.Extension") && !f.EndsWith("DotnetSpider.Core") && !f.EndsWith("DotnetSpider2.Core") && DetectNames.Any(n => f.ToLower().Contains(n))).ToList();
+			var files = Directory.GetFiles(path)
+				.Where(f => f.EndsWith(".dll") || f.EndsWith(".exe"))
+				.Select(f => Path.GetFileName(f).Replace(".dll", "").Replace(".exe", "")).ToList();
+			return
+				files.Where(f => !f.EndsWith("DotnetSpider.HtmlAgilityPack.Css")
+				&& !f.EndsWith("DotnetSpider.Common")
+				&& !f.EndsWith("DotnetSpider.Proxy")
+				&& !f.EndsWith("DotnetSpider.Downloader")
+				&& !f.EndsWith("DotnetSpider.Extraction")
+				&& !f.EndsWith("DotnetSpider.Extension")
+				&& !f.EndsWith("DotnetSpider.Core")
+				&& DetectNames.Any(n => f.ToLower().Contains(n))).ToList();
 		}
 
 		/// <summary>
