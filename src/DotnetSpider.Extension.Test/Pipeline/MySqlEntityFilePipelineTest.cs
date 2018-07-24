@@ -41,7 +41,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				EmptySleepTime = 1000;
 				var word = "可乐|雪碧";
@@ -54,7 +54,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 			class BaiduSearchEntry
 			{
-				[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
+				[FieldSelector(Expression = "Keyword", Type = SelectorType.Enviroment)]
 				public string Keyword { get; set; }
 			}
 		}

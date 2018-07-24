@@ -101,7 +101,7 @@ namespace DotnetSpider.Sample.docs
 			{
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("g_page_config = {", "g_srp_loadCss();", 16, 22));
 				AddBeforeProcessor(new TargetRequestHandler(new AutoIncrementTargetRequestExtractor("&s=0", 44)));
@@ -116,22 +116,22 @@ namespace DotnetSpider.Sample.docs
 		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
 		private class TaobaoItem
 		{
-			[Field(Expression = "$.view_price", Type = SelectorType.JsonPath, Length = 50)]
+			[FieldSelector(Expression = "$.view_price", Type = SelectorType.JsonPath, Length = 50)]
 			public string price { get; set; }
 
-			[Field(Expression = "$.category", Type = SelectorType.JsonPath, Length = 20)]
+			[FieldSelector(Expression = "$.category", Type = SelectorType.JsonPath, Length = 20)]
 			public string cat { get; set; }
 
-			[Field(Expression = "$.view_sales", Type = SelectorType.JsonPath, Length = 50)]
+			[FieldSelector(Expression = "$.view_sales", Type = SelectorType.JsonPath, Length = 50)]
 			[ReplaceFormatter(NewValue = "", OldValue = "付款")]
 			[ReplaceFormatter(NewValue = "", OldValue = "收货")]
 			[ReplaceFormatter(NewValue = "", OldValue = "人")]
 			public string sold { get; set; }
 
-			[Field(Expression = "$.nid", Type = SelectorType.JsonPath, Length = 50)]
+			[FieldSelector(Expression = "$.nid", Type = SelectorType.JsonPath, Length = 50)]
 			public string item_id { get; set; }
 
-			[Field(Expression = "$.user_id", Type = SelectorType.JsonPath, Length = 50)]
+			[FieldSelector(Expression = "$.user_id", Type = SelectorType.JsonPath, Length = 50)]
 			public string user_id { get; set; }
 		}
 	}

@@ -9,7 +9,6 @@ namespace DotnetSpider.Core.Monitor
 	{
 		public ILogger Logger{ get; set; }
 
-
 		/// <summary>
 		/// 上报爬虫状态
 		/// </summary>

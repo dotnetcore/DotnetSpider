@@ -3,7 +3,7 @@
     <TargetFrameworks>netstandard2.0;net40;net45;</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>3.0.0-beta1</Version>
+    <Version>3.0.0</Version>
     <Authors>zlzforever@163.com;</Authors>
     <AssemblyName>DotnetSpider.Downloader</AssemblyName>
     <Copyright>Copyright 2018 Lewis Zou</Copyright>
@@ -20,16 +20,11 @@
     <ProjectReference Include="..\DotnetSpider.Common\DotnetSpider.Common.csproj" />
     <ProjectReference Include="..\DotnetSpider.Proxy\DotnetSpider.Proxy.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net20' ">
-    <Reference Include="System.Web" />
-  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
     <Reference Include="System.Web" />
-    <PackageReference Include=" Microsoft.Net.Http" Version="2.2.29" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Web" />
-    <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />

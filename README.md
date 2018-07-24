@@ -21,11 +21,10 @@ DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrap
 
 ### OPTIONAL ENVIROMENT
 
-- Run distributed crawler. [Download Redis for windows](https://github.com/MSOpenTech/redis/releases)
+- Distributed crawler. [Download Redis for windows](https://github.com/MSOpenTech/redis/releases)
 - SqlServer.
 - PostgreSQL.
 - MongoDb
-- Cassandra
 
 ### MORE DOCUMENTS
 
@@ -53,7 +52,7 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 		private class Spider : EntitySpider
 		{
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
@@ -130,15 +129,12 @@ NOTE:
 
 ### Storage log and status to database
 
-1. Set SystemConnection in app.config
-2. Update nlog.config like https://github.com/dotnetcore/DotnetSpider/blob/master/src/DotnetSpider.Extension.Test/nlog.config
 
-
-### Web Manager
+### DotnetSpider.Hub
 
 https://github.com/zlzforever/DotnetSpider.Hub
 
-1. Dependences a ci platform forexample i used gitlab-ci right now.
+1. Dependences a ci platform forexample i used teamcity right now.
 2. Dependences Sceduler.NET https://github.com/zlzforever/Scheduler.NET 
 3. More documents continue...
 

@@ -13,7 +13,7 @@ namespace DotnetSpider.Extension.Test
 			{
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 
 			}
@@ -26,14 +26,14 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		public class MySpider3 : CustomizedSpider
+		public class MySpider3 : Spider
 		{
 			public MySpider3()
 			{
 				Name = "MySpider3_1";
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 			}
 		}
@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension.Test
 				Name = "MySpider4_1";
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 			}
 		}

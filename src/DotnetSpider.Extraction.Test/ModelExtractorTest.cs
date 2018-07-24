@@ -24,10 +24,10 @@ namespace DotnetSpider.Extension.Test.Model
 		{
 			var fields = new[]
 			{
-				new Field( "./div[@class='title']", "title"),
-				new Field( "./div[@class='dotnetspider']", "dotnetspider"),
+				new FieldSelector( "./div[@class='title']", "title"),
+				new FieldSelector( "./div[@class='dotnetspider']", "dotnetspider"),
 			};
-			ModelDefine model = new ModelDefine(null, fields);
+			var model = new ModelDefinition(null, fields);
 			ModelExtractor extractor = new ModelExtractor();
 
 			var result = extractor.Extract(CreatePage(), model).First() as Dictionary<string, dynamic>;
@@ -42,9 +42,9 @@ namespace DotnetSpider.Extension.Test.Model
 			var entitySelector = new Selector("//div[@class='aaaa']");
 			var fields = new[]
 			{
-				new Field( ".", "title"),
+				new FieldSelector( ".", "title"),
 			};
-			ModelDefine model = new ModelDefine(entitySelector, fields);
+			var model = new ModelDefinition(entitySelector, fields);
 			ModelExtractor extractor = new ModelExtractor();
 
 			var results = extractor.Extract(CreatePage(), model).ToList();
@@ -58,7 +58,7 @@ namespace DotnetSpider.Extension.Test.Model
 		public void NullEntityModelSelector()
 		{
 			ModelExtractor extractor = new ModelExtractor();
-			IModel model = new ModelDefine<N>();
+			IModel model = new ModelDefinition<N>();
 
 			var result = extractor.Extract(CreatePage(), model).First() as Dictionary<string, dynamic>;
 
@@ -70,7 +70,7 @@ namespace DotnetSpider.Extension.Test.Model
 		public void EntityModelSelector()
 		{
 			ModelExtractor extractor = new ModelExtractor();
-			IModel model = new ModelDefine<E>();
+			IModel model = new ModelDefinition<E>();
 
 			var results = extractor.Extract(CreatePage(), model).ToList();
 			Assert.Equal(2, results.Count());
@@ -81,17 +81,17 @@ namespace DotnetSpider.Extension.Test.Model
 
 		private class N
 		{
-			[Field(Expression = "./div[@class='title']")]
+			[FieldSelector(Expression = "./div[@class='title']")]
 			public string title { get; set; }
 
-			[Field(Expression = "./div[@class='dotnetspider']")]
+			[FieldSelector(Expression = "./div[@class='dotnetspider']")]
 			public string dotnetspider { get; set; }
 		}
 
 		[EntitySelector(Expression = "//div[@class='aaaa']")]
 		private class E
 		{
-			[Field(Expression = ".")]
+			[FieldSelector(Expression = ".")]
 			public string title { get; set; }
 		}
 

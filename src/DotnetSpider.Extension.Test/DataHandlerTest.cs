@@ -25,7 +25,7 @@ namespace DotnetSpider.Extension.Test.Model
 		[Fact(DisplayName = "HandleModel")]
 		public void HandleModel()
 		{
-			var model = new ModelDefine<Product>();
+			var model = new ModelDefinition<Product>();
 			EntityProcessor<Product> processor = new EntityProcessor<Product>(null, null, new MyDataHandler());
 
 			processor.Process(new Page(new Request("http://www.abcd.com") { Site = new Site() })
@@ -41,7 +41,7 @@ namespace DotnetSpider.Extension.Test.Model
 		[EntitySelector(Expression = "$.data[*]", Type = SelectorType.JsonPath)]
 		private class Product
 		{
-			[Field(Expression = "$.name", Type = SelectorType.JsonPath, Length = 100)]
+			[FieldSelector(Expression = "$.name", Type = SelectorType.JsonPath, Length = 100)]
 			public string name { get; set; }
 		}
 	}

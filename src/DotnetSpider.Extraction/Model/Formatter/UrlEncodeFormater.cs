@@ -41,7 +41,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 			var encoding = System.Text.Encoding.GetEncoding(Encoding);
 			if (encoding == null)
 			{
-				throw new ModelException($"Can't get encoding: {Encoding}");
+				throw new ArgumentException($"Can't get encoding: {Encoding}");
 			}
 		}
 	}

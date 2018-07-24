@@ -19,7 +19,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(DisplayName = "EnvConfigSetEmpty")]
 		public void EnvConfigSetEmpty()
 		{
-			lock (Env.Version)
+			lock (Env.BaseDirectory)
 			{
 				var arguments1 = Startup.Parse("-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:");
 				Startup.LoadConfiguration(arguments1.Config);
@@ -32,7 +32,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(DisplayName = "EnvSetGlobal1")]
 		public void EnvSetGlobal1()
 		{
-			lock (Env.Version)
+			lock (Env.BaseDirectory)
 			{
 				PrepareGlobalFile("app.global.1.config");
 				var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%app.global.1.config" };
@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(DisplayName = "EnvSetGlobal2")]
 		public void EnvSetGlobal2()
 		{
-			lock (Env.Version)
+			lock (Env.BaseDirectory)
 			{
 				PrepareGlobalFile("app.config");
 				var args1 = new[] { "-s:DotnetSpider.Extension.Test.Pipeline.TestSpider2", "--tid:TestSpider", "-i:guid", "-a:", "-c:%GLOBAL%" };

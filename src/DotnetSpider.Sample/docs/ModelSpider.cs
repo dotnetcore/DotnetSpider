@@ -17,12 +17,12 @@ namespace DotnetSpider.Sample.docs
 			var selector = new Selector("//div[@class='yk-pack pack-film']");
 			var fields = new[]
 			{
-				new Field(".//img[@class='quic']/@alt","name"),
-				new Field("index", "index",  SelectorType.Enviroment, DataType.Int),
-				new Field("", "id", SelectorType.Enviroment, DataType.Int){ IsPrimary=true},
+				new FieldSelector(".//img[@class='quic']/@alt","name"),
+				new FieldSelector("index", "index",  SelectorType.Enviroment, DataType.Int),
+				new FieldSelector("", "id", SelectorType.Enviroment, DataType.Int){ IsPrimary=true},
 			};
-			var TargetRequestSelector = new TargetRequestSelector("//ul[@class='yk-pages']");
-			var model = new ModelDefine(selector, fields, table, TargetRequestSelector);
+			var targetRequestSelector = new TargetRequestSelector("//ul[@class='yk-pages']");
+			var model = new ModelDefinition(selector, fields, table, targetRequestSelector);
 
 			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8" };

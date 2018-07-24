@@ -55,28 +55,28 @@ namespace DotnetSpider.Extension.Test.Processor
 
 		private class N
 		{
-			[Field(Expression = ".//div[@class='int']")]
+			[FieldSelector(Expression = ".//div[@class='int']")]
 			public int Int { get; set; }
 
-			[Field(Expression = ".//div[@class='bool']")]
+			[FieldSelector(Expression = ".//div[@class='bool']")]
 			public bool Bool { get; set; }
 
-			[Field(Expression = ".//div[@class='bigint']")]
+			[FieldSelector(Expression = ".//div[@class='bigint']")]
 			public long BigInt { get; set; }
 
-			[Field(Expression = ".//div[@class='string']")]
+			[FieldSelector(Expression = ".//div[@class='string']")]
 			public string String { get; set; }
 
-			[Field(Expression = ".//div[@class='datetime']")]
+			[FieldSelector(Expression = ".//div[@class='datetime']")]
 			public DateTime DateTime { get; set; }
 
-			[Field(Expression = ".//div[@class='float']")]
+			[FieldSelector(Expression = ".//div[@class='float']")]
 			public float Float { get; set; }
 
-			[Field(Expression = ".//div[@class='double']")]
+			[FieldSelector(Expression = ".//div[@class='double']")]
 			public double Double { get; set; }
 
-			[Field(Expression = ".//div[@class='decimal']")]
+			[FieldSelector(Expression = ".//div[@class='decimal']")]
 			public decimal Decimal { get; set; }
 		}
 	}

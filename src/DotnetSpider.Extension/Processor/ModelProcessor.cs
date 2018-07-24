@@ -63,9 +63,9 @@ namespace DotnetSpider.Extension.Processor
 				return;
 			}
 
-			if (Model.TargetUrlsSelectors != null && Model.TargetUrlsSelectors.Any())
+			if (Model.TargetRequestSelectors != null && Model.TargetRequestSelectors.Any())
 			{
-				foreach (var targetUrlsSelector in Model.TargetUrlsSelectors)
+				foreach (var targetUrlsSelector in Model.TargetRequestSelectors)
 				{
 					var patterns = targetUrlsSelector.Patterns?.Select(x => x?.Trim()).Distinct().ToArray();
 					var xpaths = targetUrlsSelector.XPaths?.Select(x => x?.Trim()).Distinct().ToList();
@@ -157,7 +157,7 @@ namespace DotnetSpider.Extension.Processor
 				}
 			}
 
-			page.AddResultItem(Model.Identity, new Tuple<IModel, IEnumerable<dynamic>>(Model, items));
+			page.AddResultItem(Model.Identity, new Tuple<IModel, IList<dynamic>>(Model, items));
 		}
 	}
 }

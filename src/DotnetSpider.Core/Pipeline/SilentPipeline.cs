@@ -9,7 +9,7 @@ namespace DotnetSpider.Core.Pipeline
 		{
 		}
 
-		public void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+		public void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 		{
 		}
 	}

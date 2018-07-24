@@ -39,7 +39,7 @@ namespace DotnetSpider.Core.Scheduler
 		/// 批量导入
 		/// </summary>
 		/// <param name="requests">请求对象</param>
-		void Reload(IEnumerable<Request> requests);
+		void Reload(ICollection<Request> requests);
 
 		/// <summary>
 		/// 导出整个队列

@@ -15,8 +15,6 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 		private readonly Dictionary<ISelector, List<Regex>> _regionSelectorMapPatterns =
 			new Dictionary<ISelector, List<Regex>>();
 
-		private static readonly ISelector ImageSelector = Selectors.XPath(".//img/@src");
-
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -38,7 +36,6 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 		/// 解析出目标链接
 		/// </summary>
 		/// <param name="response">链接请求结果</param>
-		/// <param name="site">站点信息</param>
 		/// <returns>目标链接</returns>
 		protected override IEnumerable<Request> Extract(Response response)
 		{
@@ -56,7 +53,7 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 					continue;
 				}
 
-				List<string> requests = null;
+				List<string> requests;
 
 				if (response.ContentType == ContentType.Json)
 				{
@@ -67,7 +64,7 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 					requests = new List<string>(response.Selectable().SelectList(targetUrlExtractor.Key).Links().GetValues());
 				}
 
-				if (requests == null || requests.Count == 0)
+				if (requests.Count == 0)
 				{
 					continue;
 				}

@@ -6,7 +6,7 @@ using DotnetSpider.Common;
 namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 {
 	/// <summary>
-	/// 通过自增计算出新的目标链接, 比如: www.a.com/1.html->www.a.com/2.html
+	/// 通过自增计算出新的目标链接, 比如: www.a.com/1.html-&gt;www.a.com/2.html
 	/// </summary>
 	public class AutoIncrementTargetRequestExtractor : TargetRequestExtractor
 	{
@@ -36,8 +36,7 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 		/// <summary>
 		/// 解析出目标链接
 		/// </summary>
-		/// <param name="page">页面数据</param>
-		/// <param name="site">站点信息</param>
+		/// <param name="response">页面数据</param>
 		/// <returns>目标链接</returns>
 		protected override IEnumerable<Request> Extract(Response response)
 		{

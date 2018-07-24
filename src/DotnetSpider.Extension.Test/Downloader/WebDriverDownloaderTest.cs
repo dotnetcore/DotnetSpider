@@ -11,6 +11,7 @@ using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model.Formatter;
 using DotnetSpider.Common;
+using DotnetSpider.Extraction.Model;
 #if NETSTANDARD
 using System.Runtime.InteropServices;
 #endif
@@ -64,7 +65,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 			{
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				Monitor = new LogMonitor();
 				Identity = "HeadlessSpider";
@@ -86,7 +87,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 			{
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
@@ -100,39 +101,39 @@ namespace DotnetSpider.Extension.Test.Downloader
 		[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 		private class BaiduSearchEntry
 		{
-			[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
+			[FieldSelector(Expression = "Keyword", Type = SelectorType.Enviroment)]
 			public string Keyword { get; set; }
 
-			[Field(Expression = ".//h3[@class='c-title']/a")]
+			[FieldSelector(Expression = ".//h3[@class='c-title']/a")]
 			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 			public string Title { get; set; }
 
-			[Field(Expression = ".//h3[@class='c-title']/a/@href")]
+			[FieldSelector(Expression = ".//h3[@class='c-title']/a/@href")]
 			public string Url { get; set; }
 
-			[Field(Expression = ".//div/p[@class='c-author']/text()")]
+			[FieldSelector(Expression = ".//div/p[@class='c-author']/text()")]
 			[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 			public string Website { get; set; }
 
 
-			[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
+			[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
 			public string Snapshot { get; set; }
 
 
-			[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
+			[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 			public string Details { get; set; }
 
-			[Field(Expression = ".", Option = FieldOptions.InnerText)]
+			[FieldSelector(Expression = ".", Option = FieldOptions.InnerText)]
 			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 			public string PlainText { get; set; }
 
-			[Field(Expression = "today", Type = SelectorType.Enviroment)]
+			[FieldSelector(Expression = "today", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 		}
 	}

@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample.docs
 			{
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				AddStartUrl($"http://api.search.sina.com.cn/?c=news&t=&q=赵丽颖&pf=2136012948&ps=2130770082&page=0&stime={DateTime.Now.AddYears(-7).AddDays(-1).ToString("yyyy-MM-dd")}&etime={DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}&sort=rel&highlight=1&num=10&ie=utf-8&callback=jQuery1720001955628746606708_1508996230766&_=1508996681484", new Dictionary<string, dynamic> { { "keyword", "赵丽颖" } });
 				AddPipeline(new ConsoleEntityPipeline());
@@ -102,25 +102,25 @@ namespace DotnetSpider.Sample.docs
 			[EntitySelector(Expression = "$.result.list[*]", Type = SelectorType.JsonPath)]
 			class SinaNews : BaseEntity
 			{
-				[Field(Expression = "$.origin_title", Type = SelectorType.JsonPath, Length = 80, Option = FieldOptions.InnerText)]
+				[FieldSelector(Expression = "$.origin_title", Type = SelectorType.JsonPath, Length = 80, Option = FieldOptions.InnerText)]
 				public string Title { get; set; }
 
-				[Field(Expression = "$.url", Type = SelectorType.JsonPath, Length = 230)]
+				[FieldSelector(Expression = "$.url", Type = SelectorType.JsonPath, Length = 230)]
 				public string Link { get; set; }
 
-				[Field(Expression = "keyword", Type = SelectorType.Enviroment, Length = 20)]
+				[FieldSelector(Expression = "keyword", Type = SelectorType.Enviroment, Length = 20)]
 				public string Keywords { get; set; }
 
-				[Field(Expression = "$.intro", Type = SelectorType.JsonPath, Length = 300, Option = FieldOptions.InnerText)]
+				[FieldSelector(Expression = "$.intro", Type = SelectorType.JsonPath, Length = 300, Option = FieldOptions.InnerText)]
 				public string Summary { get; set; }
 
-				[Field(Expression = "$.media", Type = SelectorType.JsonPath, Length = 20)]
+				[FieldSelector(Expression = "$.media", Type = SelectorType.JsonPath, Length = 20)]
 				public string NewsFrom { get; set; }
 
-				[Field(Expression = "$.datetime", Type = SelectorType.JsonPath, Length = 20)]
+				[FieldSelector(Expression = "$.datetime", Type = SelectorType.JsonPath, Length = 20)]
 				public string PublishTime { get; set; }
 
-				[Field(Expression = "$.cid", Type = SelectorType.JsonPath, Length = 20)]
+				[FieldSelector(Expression = "$.cid", Type = SelectorType.JsonPath, Length = 20)]
 				public string Cid { get; set; }
 			}
 		}

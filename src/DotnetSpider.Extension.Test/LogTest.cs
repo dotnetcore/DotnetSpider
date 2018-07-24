@@ -85,7 +85,7 @@ namespace DotnetSpider.Extension.Test
 	internal class TestPipeline : BasePipeline
 	{
 
-		public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+		public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 		{
 			foreach (var resultItem in resultItems)
 			{

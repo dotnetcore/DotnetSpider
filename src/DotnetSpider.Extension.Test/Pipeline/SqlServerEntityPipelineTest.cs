@@ -56,7 +56,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var pipeline = new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true");
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
-				resultItems.AddOrUpdateResultItem(processor.Model.Identity, new Tuple<IModel, IEnumerable<dynamic>>(processor.Model, new dynamic[] {
+				resultItems.AddOrUpdateResultItem(processor.Model.Identity, new Tuple<IModel, IList<dynamic>>(processor.Model, new dynamic[] {
 					new Dictionary<string, dynamic>
 					{
 						{ "int", "1"},
@@ -199,34 +199,34 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[TableInfo("test", "table15")]
 		private class Entity15
 		{
-			[Field(Expression = "Url")]
+			[FieldSelector(Expression = "Url")]
 			public int Int { get; set; }
 
-			[Field(Expression = "Url")]
+			[FieldSelector(Expression = "Url")]
 			public bool Bool { get; set; }
 
-			[Field(Expression = "Url")]
+			[FieldSelector(Expression = "Url")]
 			public long BigInt { get; set; }
 
-			[Field(Expression = "Url")]
+			[FieldSelector(Expression = "Url")]
 			public string String { get; set; }
 
-			[Field(Expression = "Url")]
+			[FieldSelector(Expression = "Url")]
 			public DateTime Time { get; set; }
 
-			[Field(Expression = "Url")]
+			[FieldSelector(Expression = "Url")]
 			public float Float { get; set; }
 
-			[Field(Expression = "Url")]
+			[FieldSelector(Expression = "Url")]
 			public double Double { get; set; }
 
-			[Field(Expression = "Url", Length = 100)]
+			[FieldSelector(Expression = "Url", Length = 100)]
 			public string String1 { get; set; }
 
-			[Field(Expression = "Url", Length = 0)]
+			[FieldSelector(Expression = "Url", Length = 0)]
 			public string String2 { get; set; }
 
-			[Field(Expression = "Url")]
+			[FieldSelector(Expression = "Url")]
 			public decimal Decimal { get; set; }
 		}
 	}

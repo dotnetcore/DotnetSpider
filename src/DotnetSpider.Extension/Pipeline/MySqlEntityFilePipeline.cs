@@ -56,17 +56,18 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override int Process(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender)
+		protected override int Process(IModel model, IList<dynamic> datas, ILogger logger, dynamic sender = null)
 		{
-			if (datas == null || datas.Count() == 0)
+			if (datas == null || datas.Count == 0)
 			{
 				return 0;
 			}
 
 			StreamWriter writer;
-			var tableName = model.TableInfo.FullName;
-			var dataFolder = Path.Combine(Env.BaseDirectory, "mysql", sender.Identity);
-			var mysqlFile = Path.Combine(dataFolder, $"{model.TableInfo.Database}.{tableName}.sql");
+			var tableName = model.Table.FullName;
+			var identity = GetIdentity(sender);
+			var dataFolder = Path.Combine(Env.BaseDirectory, "mysql", identity);
+			var mysqlFile = Path.Combine(dataFolder, $"{model.Table.Database}.{tableName}.sql");
 			if (_writers.ContainsKey(mysqlFile))
 			{
 				writer = _writers[mysqlFile];
@@ -96,7 +97,7 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 			}
 
-			return datas.Count();
+			return datas.Count;
 		}
 
 		/// <summary>
@@ -118,7 +119,7 @@ namespace DotnetSpider.Extension.Pipeline
 			foreach (var item in items)
 			{
 				//{Environment.NewLine}
-				builder.Append($"INSERT IGNORE INTO `{model.TableInfo.Database}`.`{model.TableInfo.FullName}` (");
+				builder.Append($"INSERT IGNORE INTO `{model.Table.Database}`.`{model.Table.FullName}` (");
 				var lastColumn = model.Fields.Last();
 				foreach (var column in model.Fields)
 				{

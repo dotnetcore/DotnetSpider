@@ -28,13 +28,10 @@ namespace DotnetSpider.Extension.Scheduler
 		private readonly string _itemKey;
 		private readonly string _errorCountKey;
 		private readonly string _successCountKey;
-		private readonly string _identityMd5;
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
-		private readonly string _connectString;
 		private RedisConnection _redisConnection;
-		private readonly string _identity;
-		private readonly Dictionary<string, RedisConnection> Cache = new Dictionary<string, RedisConnection>();
+		private readonly Dictionary<string, RedisConnection> _cache = new Dictionary<string, RedisConnection>();
 
 		/// <summary>
 		/// 批量加载时的每批次加载数
@@ -46,7 +43,7 @@ namespace DotnetSpider.Extension.Scheduler
 		/// <summary>
 		/// RedisScheduler是否会使用互联网
 		/// </summary>
-		protected override bool UseInternet { get; set; } = true;
+		protected sealed override bool UseInternet { get; set; } = true;
 
 		/// <summary>
 		/// 构造方法
@@ -65,33 +62,31 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			if (string.IsNullOrWhiteSpace(identity))
 			{
-				throw new ArgumentNullException("identity should not be empty");
+				throw new ArgumentNullException(nameof(identity));
 			}
 			if (string.IsNullOrWhiteSpace(connectString))
 			{
-				throw new ArgumentNullException("connectString should not be empty");
+				throw new ArgumentNullException(nameof(connectString));
 			}
-			_identity = identity;
-			_connectString = connectString;
+
+			var s = connectString;
 			DuplicateRemover = this;
 
-			var md5 = Cryptography.ToShortMd5(identity);
+			var md5 = identity.ToShortMd5();
 			_itemKey = $"dotnetspider:scheduler:{md5}:items";
 			_setKey = $"dotnetspider:scheduler:{md5}:set";
 			_queueKey = $"dotnetspider:scheduler:{md5}:queue";
 			_errorCountKey = $"dotnetspider:scheduler:{md5}:countOfFailures";
 			_successCountKey = $"dotnetspider:scheduler:{md5}:countOfSuccess";
 
-			_identityMd5 = md5;
-
 			var action = new Action(() =>
 			{
-				if (!Cache.ContainsKey(_connectString))
+				if (!_cache.ContainsKey(s))
 				{
-					_redisConnection = new RedisConnection(_connectString);
-					Cache.Add(_connectString, _redisConnection);
+					_redisConnection = new RedisConnection(s);
+					_cache.Add(s, _redisConnection);
 				}
-				_redisConnection.Database.SortedSetAdd(TasksKey, _identity, (long)DateTimeUtil.GetCurrentUnixTimeNumber());
+				_redisConnection.Database.SortedSetAdd(TasksKey, identity, (long)DateTimeUtil.GetCurrentUnixTimeNumber());
 			});
 
 			if (UseInternet)
@@ -249,7 +244,7 @@ namespace DotnetSpider.Extension.Scheduler
 		/// 批量导入
 		/// </summary>
 		/// <param name="requests">请求对象</param>
-		public override void Reload(IEnumerable<Request> requests)
+		public override void Reload(ICollection<Request> requests)
 		{
 			var action = new Action(() =>
 			{

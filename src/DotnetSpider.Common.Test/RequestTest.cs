@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Net.Http;
 using Xunit;
 
 namespace DotnetSpider.Common.Test
@@ -24,6 +25,7 @@ namespace DotnetSpider.Common.Test
 			Assert.Single(request.Properties);
 			Assert.Equal(request.Properties["Test"], "Forever");
 		}
+
 		[Fact(DisplayName = "Request_PutExtra")]
 		public void PutExtra()
 		{

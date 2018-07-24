@@ -21,7 +21,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
-		protected abstract int Process(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender = null);
+		protected abstract int Process(IModel model, IList<dynamic> datas, ILogger logger, dynamic sender = null);
 
 		/// <summary>
 		/// 处理页面解析器解析到的数据结果
@@ -29,7 +29,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="resultItems">数据结果</param>
 		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
-		public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+		public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 		{
 			if (resultItems == null)
 			{
@@ -40,11 +40,11 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				foreach (var kv in resultItem.Results)
 				{
-					var value = kv.Value as Tuple<IModel, IEnumerable<dynamic>>;
+					var value = kv.Value as Tuple<IModel, IList<dynamic>>;
 
 					if (value?.Item2 != null && value.Item2.Any())
 					{
-						resultItem.Request.AddCountOfResults(value.Item2.Count());
+						resultItem.Request.AddCountOfResults(value.Item2.Count);
 						int effectedRows = Process(value.Item1, value.Item2, logger, sender);
 						resultItem.Request.AddEffectedRows(effectedRows);
 					}

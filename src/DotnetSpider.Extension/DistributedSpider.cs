@@ -10,7 +10,7 @@ namespace DotnetSpider.Extension
 	/// <summary>
 	/// 分布式爬虫
 	/// </summary>
-	public abstract class DistributedSpider : CustomizedSpider
+	public abstract class DistributedSpider : Spider
 	{
 		/// <summary>
 		/// 验证结果保存到Redis中的Key
@@ -41,8 +41,6 @@ namespace DotnetSpider.Extension
 		/// <param name="arguments">运行参数</param>
 		protected override void Execute(params string[] arguments)
 		{
-			PrintInfo.Print();
-
 			RegisterControl(this);
 
 			base.Execute(arguments);

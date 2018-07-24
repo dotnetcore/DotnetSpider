@@ -4,13 +4,14 @@ using DotnetSpider.Downloader.AfterDownloadCompleteHandlers;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 
 namespace DotnetSpider.Sample.docs
 {
 	public class DbRequestBuilderSpider : EntitySpider
 	{
-		protected override void MyInit(params string[] arguments)
+		protected override void OnInit(params string[] arguments)
 		{
 			Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("json(", ");", 5, 0));
 			AddPipeline(new ConsoleEntityPipeline());
@@ -25,10 +26,10 @@ namespace DotnetSpider.Sample.docs
 		[EntitySelector(Expression = "$.[*]", Type = SelectorType.JsonPath)]
 		class Item
 		{
-			[Field(Expression = "$.pid", Type = SelectorType.JsonPath, Length = 25)]
+			[FieldSelector(Expression = "$.pid", Type = SelectorType.JsonPath, Length = 25)]
 			public string Sku { get; set; }
 
-			[Field(Expression = "$.shopId", Type = SelectorType.JsonPath)]
+			[FieldSelector(Expression = "$.shopId", Type = SelectorType.JsonPath)]
 			public int ShopId { get; set; }
 		}
 	}

@@ -16,11 +16,6 @@ namespace DotnetSpider.Core
 		public readonly Dictionary<string, dynamic> Results = new Dictionary<string, dynamic>();
 
 		/// <summary>
-		/// 数据传递
-		/// </summary>
-		public dynamic Object { get; set; }
-
-		/// <summary>
 		/// 对应的目标链接信息
 		/// </summary>
 		public Request Request { get; set; }

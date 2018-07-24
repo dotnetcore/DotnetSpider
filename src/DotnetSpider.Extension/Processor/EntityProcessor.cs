@@ -16,7 +16,7 @@ namespace DotnetSpider.Extension.Processor
 		/// <param name="targetRequestExtractor">目标链接的解析、筛选器</param>
 		/// <param name="dataHandlers">对解析的结果进一步加工操作</param>
 		public EntityProcessor(IModelExtractor extractor = null, ITargetRequestExtractor targetRequestExtractor = null, params IDataHandler[] dataHandlers)
-			: base(new ModelDefine<T>(), extractor ?? new ModelExtractor<T>(), targetRequestExtractor, dataHandlers)
+			: base(new ModelDefinition<T>(), extractor ?? new ModelExtractor<T>(), targetRequestExtractor, dataHandlers)
 		{
 		}
 	}

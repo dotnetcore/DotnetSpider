@@ -7,7 +7,7 @@ namespace DotnetSpider.Sample.docs
 {
 	public class RegexSelectorSpider : EntitySpider
 	{
-		protected override void MyInit(params string[] arguments)
+		protected override void OnInit(params string[] arguments)
 		{
 			AddStartUrl("http://www.cnblogs.com");
 			AddPipeline(new ConsoleEntityPipeline());
@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample.docs
 
 		class HomePage
 		{
-			[Field(Expression = "<a.*?园子</a>", Type = SelectorType.Regex, Arguments = "1")]
+			[FieldSelector(Expression = "<a.*?园子</a>", Type = SelectorType.Regex, Arguments = "1")]
 			public string Category { get; set; }
 		}
 	}

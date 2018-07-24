@@ -22,7 +22,7 @@ namespace DotnetSpider.Sample.docs
 
 		private class Spider : EntitySpider
 		{
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
@@ -34,31 +34,31 @@ namespace DotnetSpider.Sample.docs
 			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 			class BaiduSearchEntry : BaseEntity
 			{
-				[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
+				[FieldSelector(Expression = "Keyword", Type = SelectorType.Enviroment)]
 				public string Keyword { get; set; }
 
-				[Field(Expression = ".//h3[@class='c-title']/a")]
+				[FieldSelector(Expression = ".//h3[@class='c-title']/a")]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				public string Title { get; set; }
 
-				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
+				[FieldSelector(Expression = ".//h3[@class='c-title']/a/@href")]
 				public string Url { get; set; }
 
-				[Field(Expression = ".//div/p[@class='c-author']/text()")]
+				[FieldSelector(Expression = ".//div/p[@class='c-author']/text()")]
 				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 				public string Website { get; set; }
 
-				[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
 				public string Snapshot { get; set; }
 
-				[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
+				[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 				public string Details { get; set; }
 
-				[Field(Expression = ".", Option = FieldOptions.InnerText)]
+				[FieldSelector(Expression = ".", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]

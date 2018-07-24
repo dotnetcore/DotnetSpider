@@ -45,12 +45,12 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		{
 			if (Splitor == null || Splitor.Length == 0)
 			{
-				throw new ModelException("Splitors should not be null or empty");
+				throw new ArgumentException("Splitors should not be null or empty");
 			}
 
 			if (ElementAt < 0)
 			{
-				throw new ModelException("ElementAt should larger than 0");
+				throw new ArgumentException("ElementAt should larger than 0");
 			}
 		}
 	}

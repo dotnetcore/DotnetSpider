@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// </summary>
 		/// <param name="modeIdentity">爬虫实体名称</param>
 		/// <returns>实体数据</returns>
-		public IEnumerable<dynamic> GetCollection(string modeIdentity)
+		public IList<dynamic> GetCollection(string modeIdentity)
 		{
 			lock (_locker)
 			{
@@ -39,9 +39,9 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
-		protected override int Process(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender)
+		protected override int Process(IModel model, IList<dynamic> datas, ILogger logger, dynamic sender = null)
 		{
-			if (datas == null || datas.Count() == 0)
+			if (datas == null|| datas.Count == 0)
 			{
 				return 0;
 			}
@@ -60,7 +60,7 @@ namespace DotnetSpider.Extension.Pipeline
 					_collector.Add(model.Identity, list);
 				}
 
-				return datas.Count();
+				return datas.Count;
 			}
 		}
 	}

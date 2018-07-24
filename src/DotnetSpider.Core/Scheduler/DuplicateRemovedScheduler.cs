@@ -44,13 +44,12 @@ namespace DotnetSpider.Core.Scheduler
 		/// 批量导入
 		/// </summary>
 		/// <param name="requests">请求对象</param>
-		public abstract void Reload(IEnumerable<Request> requests);
+		public abstract void Reload(ICollection<Request> requests);
 
 		/// <summary>
 		/// 如果链接不是重复的就添加到队列中
 		/// </summary>
 		/// <param name="request">请求对象</param>
-		/// <param name="group">请求对象的分组</param>
 		protected abstract void PushWhenNoDuplicate(Request request);
 
 		/// <summary>
@@ -96,11 +95,12 @@ namespace DotnetSpider.Core.Scheduler
 		/// 添加请求对象到队列
 		/// </summary>
 		/// <param name="request">请求对象</param>
+		/// <param name="shouldReserved">是否需要重试判断方法</param>
 		public void Push(Request request, Func<Request, bool> shouldReserved = null)
 		{
 			var action = new Action(() =>
 			{
-				if (!DuplicateRemover.IsDuplicate(request) || (shouldReserved != null && shouldReserved(request)))
+				if (!DuplicateRemover.IsDuplicate(request) || shouldReserved != null && shouldReserved(request))
 				{
 					PushWhenNoDuplicate(request);
 				}

@@ -16,7 +16,7 @@ namespace DotnetSpider.Core.Pipeline
 		/// </summary>
 		/// <param name="owner">数据拥有者</param>
 		/// <returns>数据结果</returns>
-		public IEnumerable<ResultItems> GetCollection(dynamic owner)
+		public IList<ResultItems> GetCollection(dynamic owner)
 		{
 			lock (ItemsLocker)
 			{
@@ -36,16 +36,18 @@ namespace DotnetSpider.Core.Pipeline
 		/// </summary>
 		/// <param name="resultItems">数据结果</param>
 		/// <param name="logger">日志接口</param>
-		public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender)
+		/// <param name="sender">调用方</param>
+		public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 		{
+			var identity = GetIdentity(sender);
 			lock (ItemsLocker)
 			{
-				if (!_items.ContainsKey(sender))
+				if (!_items.ContainsKey(identity))
 				{
-					_items.Add(sender, new List<ResultItems>());
+					_items.Add(identity, new List<ResultItems>());
 				}
 
-				_items[sender].AddRange(resultItems);
+				_items[identity].AddRange(resultItems);
 			}
 		}
 	}

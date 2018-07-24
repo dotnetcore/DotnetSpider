@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample.docs
 
 		private class CnblogsSpider : EntitySpider
 		{
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				Identity = ("cnblogs_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 				AddStartUrl("http://www.cnblogs.com");
@@ -30,16 +30,16 @@ namespace DotnetSpider.Sample.docs
 			[EntitySelector(Expression = "//div[@class='post_item']")]
 			class News : BaseEntity
 			{
-				[Field(Expression = ".//a[@class='titlelnk']")]
+				[FieldSelector(Expression = ".//a[@class='titlelnk']")]
 				public string Name { get; set; }
 
-				[Field(Expression = ".//div[@class='post_item_foot']/a[1]")]
+				[FieldSelector(Expression = ".//div[@class='post_item_foot']/a[1]")]
 				public string Author { get; set; }
 
-				[Field(Expression = ".//div[@class='post_item_foot']/text()")]
+				[FieldSelector(Expression = ".//div[@class='post_item_foot']/text()")]
 				public string PublishTime { get; set; }
 
-				[Field(Expression = ".//a[@class='titlelnk']/@href")]
+				[FieldSelector(Expression = ".//a[@class='titlelnk']/@href")]
 				public string Url { get; set; }
 			}
 
@@ -47,16 +47,16 @@ namespace DotnetSpider.Sample.docs
 			[EntitySelector(Expression = "//div[@class='post_item']")]
 			class BlogSumary : BaseEntity
 			{
-				[Field(Expression = ".//a[@class='titlelnk']")]
+				[FieldSelector(Expression = ".//a[@class='titlelnk']")]
 				public string Name { get; set; }
 
-				[Field(Expression = ".//div[@class='post_item_foot']/a[1]")]
+				[FieldSelector(Expression = ".//div[@class='post_item_foot']/a[1]")]
 				public string Author { get; set; }
 
-				[Field(Expression = ".//div[@class='post_item_foot']/text()")]
+				[FieldSelector(Expression = ".//div[@class='post_item_foot']/text()")]
 				public string PublishTime { get; set; }
 
-				[Field(Expression = ".//a[@class='titlelnk']/@href")]
+				[FieldSelector(Expression = ".//a[@class='titlelnk']/@href")]
 				public string Url { get; set; }
 			}
 		}

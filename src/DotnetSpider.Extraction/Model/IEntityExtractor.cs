@@ -10,6 +10,6 @@ namespace DotnetSpider.Extraction.Model
 		/// <param name="selectable">可查询对象</param>
 		/// <param name="model">解析模型</param>
 		/// <returns>实体对象</returns>
-		IEnumerable<dynamic> Extract(Selectable selectable, IModel model);
+		IList<dynamic> Extract(Selectable selectable, IModel model);
 	}
 }

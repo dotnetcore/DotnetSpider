@@ -3,7 +3,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using DotnetSpider.Core;
-using System.Linq;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Common;
 
@@ -37,16 +36,17 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override int Process(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender)
+		protected override int Process(IModel model, IList<dynamic> datas, ILogger logger, dynamic sender = null)
 		{
-			if (datas == null || datas.Count() == 0)
+			if (datas == null || datas.Count == 0)
 			{
 				return 0;
 			}
 
 			StreamWriter writer;
-			var dataFolder = Path.Combine(Env.BaseDirectory, "json", sender.Identity);
-			var jsonFile = Path.Combine(dataFolder, $"{model.TableInfo.FullName}.json");
+			var identity = GetIdentity(sender);
+			var dataFolder = Path.Combine(Env.BaseDirectory, "json", identity);
+			var jsonFile = Path.Combine(dataFolder, $"{model.Table.FullName}.json");
 			if (_writers.ContainsKey(jsonFile))
 			{
 				writer = _writers[jsonFile];
@@ -65,7 +65,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				writer.WriteLine(entry.ToString());
 			}
-			return datas.Count();
+			return datas.Count;
 		}
 	}
 }

@@ -15,10 +15,10 @@ namespace DotnetSpider.Extension.Test.Model
 		{
 			try
 			{
-				var entityMetadata = new ModelDefine<Entity2>();
+				var entityMetadata = new ModelDefinition<Entity2>();
 				throw new Exception("Test failed");
 			}
-			catch (ModelException exception)
+			catch (ArgumentException exception)
 			{
 				Assert.Equal("Columns set as index are not a property of your entity", exception.Message);
 			}
@@ -29,11 +29,11 @@ namespace DotnetSpider.Extension.Test.Model
 		{
 			try
 			{
-				var entityMetadata = new ModelDefine<Entity3>();
+				var entityMetadata = new ModelDefinition<Entity3>();
 
 				throw new Exception("Test failed");
 			}
-			catch (ModelException exception)
+			catch (ArgumentException exception)
 			{
 				Assert.Equal("Columns set as unique are not a property of your entity", exception.Message);
 			}
@@ -42,7 +42,7 @@ namespace DotnetSpider.Extension.Test.Model
 		[Fact(DisplayName = "Formaters")]
 		public void Formaters()
 		{
-			var entity1 = new ModelDefine<Entity11>();
+			var entity1 = new ModelDefinition<Entity11>();
 			var fields = entity1.Fields.ToArray();
 			var formatters = (fields[0]).Formatters;
 			Assert.Equal(2, formatters.Length);
@@ -56,7 +56,7 @@ namespace DotnetSpider.Extension.Test.Model
 		{
 			try
 			{
-				var entity = new ModelDefine<Entity19>();
+				var entity = new ModelDefinition<Entity19>();
 
 				throw new Exception("Failed.");
 			}
@@ -71,7 +71,7 @@ namespace DotnetSpider.Extension.Test.Model
 		{
 			try
 			{
-				var entity = new ModelDefine<Entity18>();
+				var entity = new ModelDefinition<Entity18>();
 
 				throw new Exception("Failed.");
 			}
@@ -84,38 +84,38 @@ namespace DotnetSpider.Extension.Test.Model
 		[Fact(DisplayName = "Indexes")]
 		public void Indexes()
 		{
-			var entity1 = new ModelDefine<Entity10>();
-			Assert.Equal("Name3", entity1.TableInfo.Indexs[0]);
-			Assert.Equal(2, entity1.TableInfo.Uniques.Length);
-			Assert.Equal("Name,Name2", entity1.TableInfo.Uniques[0]);
-			Assert.Equal("Name2", entity1.TableInfo.Uniques[1]);
+			var entity1 = new ModelDefinition<Entity10>();
+			Assert.Equal("Name3", entity1.Table.Indexs[0]);
+			Assert.Equal(2, entity1.Table.Uniques.Length);
+			Assert.Equal("Name,Name2", entity1.Table.Uniques[0]);
+			Assert.Equal("Name2", entity1.Table.Uniques[1]);
 		}
 
 		[Fact(DisplayName = "Schema")]
 		public void Schema()
 		{
-			var entityMetadata = new ModelDefine<Entity4>();
+			var entityMetadata = new ModelDefinition<Entity4>();
 
-			Assert.Equal("test", entityMetadata.TableInfo.Database);
-			Assert.Equal(TableNamePostfix.Monday, entityMetadata.TableInfo.Postfix);
+			Assert.Equal("test", entityMetadata.Table.Database);
+			Assert.Equal(TableNamePostfix.Monday, entityMetadata.Table.Postfix);
 
-			var entityMetadata1 = new ModelDefine<Entity14>();
-			Assert.Null(entityMetadata1.TableInfo);
+			var entityMetadata1 = new ModelDefinition<Entity14>();
+			Assert.Null(entityMetadata1.Table);
 		}
 
 		[Fact(DisplayName = "EntitySelector")]
 		public void EntitySelector()
 		{
-			var entity1 = new ModelDefine<Entity7>();
+			var entity1 = new ModelDefinition<Entity7>();
 			Assert.Equal("expression", entity1.Selector.Expression);
 			Assert.Equal(SelectorType.XPath, entity1.Selector.Type);
 
 
-			var entity2 = new ModelDefine<Entity8>();
+			var entity2 = new ModelDefinition<Entity8>();
 			Assert.Equal("expression2", entity2.Selector.Expression);
 			Assert.Equal(SelectorType.Css, entity2.Selector.Type);
 
-			var entity3 = new ModelDefine<Entity9>();
+			var entity3 = new ModelDefinition<Entity9>();
 			Assert.Null(entity3.Selector);
 			Assert.Equal("test.table", entity3.Identity);
 		}
@@ -125,10 +125,10 @@ namespace DotnetSpider.Extension.Test.Model
 		{
 			var fields = new[]
 			{
-				new Field( "./div[1]/a/@href", "Url"),
-				new Field( "./@data-sku", "Sku"),
+				new FieldSelector( "./div[1]/a/@href", "Url"),
+				new FieldSelector( "./@data-sku", "Sku"),
 			};
-			ModelDefine model = new ModelDefine(null, fields);
+			ModelDefinition model = new ModelDefinition(null, fields);
 			Assert.Null(model.Selector);
 			Assert.Equal(2, model.Fields.Count);
 			Assert.True(Guid.TryParse(model.Identity, out _));
@@ -143,10 +143,10 @@ namespace DotnetSpider.Extension.Test.Model
 			var entitySelector = new Selector("//li[@class='gl-item']/div[contains(@class,'j-sku-item')]");
 			var fields = new[]
 			{
-				new Field( "./div[1]/a/@href", "Url"),
-				new Field( "./@data-sku", "Sku"),
+				new FieldSelector( "./div[1]/a/@href", "Url"),
+				new FieldSelector( "./@data-sku", "Sku"),
 			};
-			ModelDefine model = new ModelDefine(entitySelector, fields);
+			ModelDefinition model = new ModelDefinition(entitySelector, fields);
 			Assert.Equal("//li[@class='gl-item']/div[contains(@class,'j-sku-item')]", model.Selector.Expression);
 			Assert.Equal(SelectorType.XPath, model.Selector.Type);
 			Assert.Equal(2, model.Fields.Count);
@@ -159,11 +159,11 @@ namespace DotnetSpider.Extension.Test.Model
 			var entitySelector = new Selector("//li[@class='gl-item']/div[contains(@class,'j-sku-item')]");
 			var fields = new[]
 			{
-				new Field( "./div[1]/a/@href", "Url"),
-				new Field( "./@data-sku", "Sku"),
+				new FieldSelector( "./div[1]/a/@href", "Url"),
+				new FieldSelector( "./@data-sku", "Sku"),
 			};
 			var tableInfo = new TableInfo("db01", "tb1");
-			ModelDefine model = new ModelDefine(entitySelector, fields, tableInfo);
+			ModelDefinition model = new ModelDefinition(entitySelector, fields, tableInfo);
 			Assert.Equal(2, model.Fields.Count);
 			Assert.Equal("db01.tb1", model.Identity);
 		}
@@ -171,7 +171,7 @@ namespace DotnetSpider.Extension.Test.Model
 		[Fact(DisplayName = "NullTableInfoEntityModelDefine")]
 		public void NullTableInfoEntityModelDefine()
 		{
-			ModelDefine<NullTableInfoEntity> model = new ModelDefine<NullTableInfoEntity>();
+			ModelDefinition<NullTableInfoEntity> model = new ModelDefinition<NullTableInfoEntity>();
 			Assert.Equal(2, model.Fields.Count);
 
 			var field1 = model.Fields.First();
@@ -183,14 +183,14 @@ namespace DotnetSpider.Extension.Test.Model
 			var field2 = model.Fields.ElementAt(1);
 			Assert.Equal(10, field2.Length);
 
-			Assert.Null(model.TableInfo);
+			Assert.Null(model.Table);
 			Assert.Equal("DotnetSpider.Extension.Test.Model.ModelDefineTest+NullTableInfoEntity", model.Identity);
 		}
 
 		[Fact(DisplayName = "TableInfoEntityModelDefine")]
 		public void TableInfoEntityModelDefine()
 		{
-			ModelDefine<TableInfoEntity> model = new ModelDefine<TableInfoEntity>();
+			ModelDefinition<TableInfoEntity> model = new ModelDefinition<TableInfoEntity>();
 			Assert.Equal(2, model.Fields.Count);
 
 			var field1 = model.Fields.First();
@@ -208,10 +208,10 @@ namespace DotnetSpider.Extension.Test.Model
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		private class NullTableInfoEntity
 		{
-			[Field(Expression = "cat", Type = SelectorType.Enviroment)]
+			[FieldSelector(Expression = "cat", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
 
-			[Field(Expression = "./@jdzy_shop_id", Length = 10)]
+			[FieldSelector(Expression = "./@jdzy_shop_id", Length = 10)]
 			public string JdzyShopId { get; set; }
 		}
 
@@ -219,10 +219,10 @@ namespace DotnetSpider.Extension.Test.Model
 		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
 		private class TableInfoEntity
 		{
-			[Field(Expression = "cat", Type = SelectorType.Enviroment)]
+			[FieldSelector(Expression = "cat", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
 
-			[Field(Expression = "./@jdzy_shop_id", Length = 10)]
+			[FieldSelector(Expression = "./@jdzy_shop_id", Length = 10)]
 			public string JdzyShopId { get; set; }
 		}
 
@@ -230,7 +230,7 @@ namespace DotnetSpider.Extension.Test.Model
 		[EntitySelector(Expression = "expression")]
 		private class Entity7
 		{
-			[Field(Expression = "")]
+			[FieldSelector(Expression = "")]
 			public string Name { get; set; }
 		}
 
@@ -238,54 +238,54 @@ namespace DotnetSpider.Extension.Test.Model
 		[EntitySelector(Expression = "expression2", Type = SelectorType.Css)]
 		private class Entity8
 		{
-			[Field(Expression = "")]
+			[FieldSelector(Expression = "")]
 			public string Name { get; set; }
 		}
 
 		[TableInfo("test", "table")]
 		private class Entity9
 		{
-			[Field(Expression = "")]
+			[FieldSelector(Expression = "")]
 			public string Name { get; set; }
 		}
 
 		[TableInfo("test", "table", TableNamePostfix.Monday)]
 		private class Entity4
 		{
-			[Field(Expression = "")]
+			[FieldSelector(Expression = "")]
 			public string Name { get; set; }
 		}
 
 		private class Entity14
 		{
-			[Field(Expression = "Url")]
+			[FieldSelector(Expression = "Url")]
 			public string Url { get; set; }
 		}
 
 		[TableInfo("test", "table", Indexs = new[] { "Name3" }, Uniques = new[] { "Name,Name2", "Name2" })]
 		private class Entity10
 		{
-			[Field(Expression = "", Length = 100)]
+			[FieldSelector(Expression = "", Length = 100)]
 			public string Name { get; set; }
 
-			[Field(Expression = "", Length = 100)]
+			[FieldSelector(Expression = "", Length = 100)]
 			public string Name2 { get; set; }
 
-			[Field(Expression = "", Length = 100)]
+			[FieldSelector(Expression = "", Length = 100)]
 			public string Name3 { get; set; }
 		}
 
 		[TableInfo("test", "table", Uniques = new[] { "c1" })]
 		private class Entity18
 		{
-			[Field(Expression = "", Length = 300)]
+			[FieldSelector(Expression = "", Length = 300)]
 			public string c1 { get; set; }
 		}
 
 		[TableInfo("test", "table", Indexs = new[] { "c1" })]
 		private class Entity19
 		{
-			[Field(Expression = "", Length = 300)]
+			[FieldSelector(Expression = "", Length = 300)]
 			public string c1 { get; set; }
 		}
 
@@ -294,7 +294,7 @@ namespace DotnetSpider.Extension.Test.Model
 		{
 			[ReplaceFormatter(NewValue = "a", OldValue = "b")]
 			[RegexFormatter(Pattern = "a(*)")]
-			[Field(Expression = "Name")]
+			[FieldSelector(Expression = "Name")]
 			public string Name { get; set; }
 		}
 
@@ -302,14 +302,14 @@ namespace DotnetSpider.Extension.Test.Model
 		[TableInfo("test", "table", Uniques = new[] { "c1" })]
 		private class Entity3
 		{
-			[Field(Expression = "")]
+			[FieldSelector(Expression = "")]
 			public string Url { get; set; }
 		}
 
 		[TableInfo("test", "table", Indexs = new[] { "c1" })]
 		private class Entity2
 		{
-			[Field(Expression = "")]
+			[FieldSelector(Expression = "")]
 			public string Url { get; set; }
 		}
 	}

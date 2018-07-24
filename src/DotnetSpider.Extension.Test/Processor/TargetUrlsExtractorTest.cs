@@ -11,6 +11,8 @@ using DotnetSpider.Extraction;
 using DotnetSpider.Common;
 using DotnetSpider.Core.Processor.TargetRequestExtractors;
 using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Extension.Test.Processor
 {
@@ -19,21 +21,21 @@ namespace DotnetSpider.Extension.Test.Processor
 		[TargetRequestSelector()]
 		public class Entity15
 		{
-			[Field(Expression = "./@data-sku")]
+			[FieldSelector(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetRequestSelector(XPaths = new[] { "" }, Patterns = new[] { "" })]
 		public class Entity23
 		{
-			[Field(Expression = "./@data-sku")]
+			[FieldSelector(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
 		[TargetRequestSelector(XPaths = new string[] { null }, Patterns = new string[] { null })]
 		public class Entity24
 		{
-			[Field(Expression = "./@data-sku")]
+			[FieldSelector(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
@@ -88,6 +90,7 @@ namespace DotnetSpider.Extension.Test.Processor
 		{
 			var id = Guid.NewGuid().ToString("N");
 			AutoIncrementTargetRequestExtractorSpider spider = new AutoIncrementTargetRequestExtractorSpider(id);
+			//spider.Downloader = new HttpClientDownloader { UseFiddlerProxy = true };
 			spider.Run();
 			var pipeline = spider.Pipelines.First() as CollectionEntityPipeline;
 			var entities = pipeline.GetCollection("test.baidu_search");
@@ -108,36 +111,36 @@ namespace DotnetSpider.Extension.Test.Processor
 			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 			private class BaiduSearchEntry
 			{
-				[Field(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
+				[FieldSelector(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
 				public string Keyword { get; set; }
 
-				[Field(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
+				[FieldSelector(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
 				public string Guid { get; set; }
 
-				[Field(Expression = ".//h3[@class='c-title']/a")]
+				[FieldSelector(Expression = ".//h3[@class='c-title']/a")]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				public string Title { get; set; }
 
-				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
+				[FieldSelector(Expression = ".//h3[@class='c-title']/a/@href")]
 				public string Url { get; set; }
 
-				[Field(Expression = ".//div/p[@class='c-author']/text()")]
+				[FieldSelector(Expression = ".//div/p[@class='c-author']/text()")]
 				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 				public string Website { get; set; }
 
 
-				[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
 				public string Snapshot { get; set; }
 
 
-				[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
+				[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 				public string Details { get; set; }
 
-				[Field(Expression = ".", Option = FieldOptions.InnerText)]
+				[FieldSelector(Expression = ".", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
@@ -150,8 +153,16 @@ namespace DotnetSpider.Extension.Test.Processor
 				_guid = guid;
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
+				Site = new Site
+				{
+					Headers = new Dictionary<string, string>
+					{
+						{ "Upgrade-Insecure-Requests", "1" }
+					},
+					Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
+				};
 				Monitor = new LogMonitor();
 				var word = "可乐|雪碧";
 				Identity = Guid.NewGuid().ToString();

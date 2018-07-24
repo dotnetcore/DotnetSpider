@@ -2,61 +2,16 @@
 
 namespace DotnetSpider.Extraction.Model.Attribute
 {
-	public enum DataType
-	{
-		None,
-		Int,
-		Float,
-		Double,
-		DateTime,
-		Date,
-		Long,
-		Bool,
-		String,
-		Decimal
-	}
-
-	/// <summary>
-	/// 额外选项的定义
-	/// </summary>
-	public enum FieldOptions
-	{
-		/// <summary>
-		/// 不作任何操作
-		/// </summary>
-		None,
-
-		/// <summary>
-		/// For html contene
-		/// </summary>
-		OuterHtml,
-
-		/// <summary>
-		/// For html contene
-		/// </summary>
-		InnerHtml,
-
-		/// <summary>
-		/// For html contene
-		/// </summary>
-		InnerText,
-
-		/// <summary>
-		/// 取的查询器结果的个数作为结果
-		/// </summary>
-		Count
-	}
-
 	/// <summary>
 	/// 属性选择器的定义
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
-	public class Field : Selector
+	public class FieldSelector : Selector
 	{
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public Field()
+		public FieldSelector()
 		{
 		}
 
@@ -68,7 +23,7 @@ namespace DotnetSpider.Extraction.Model.Attribute
 		/// <param name="expression">表达式</param>
 		/// <param name="dataType">数据类型</param>
 		/// <param name="length">类型长度</param>
-		public Field(string expression, string name, SelectorType type = SelectorType.XPath, DataType dataType = DataType.String, int length = 255)
+		public FieldSelector(string expression, string name, SelectorType type = SelectorType.XPath, DataType dataType = DataType.String, int length = 255)
 			: base(expression, type)
 		{
 			Name = name;

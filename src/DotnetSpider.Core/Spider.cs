@@ -37,7 +37,7 @@ namespace DotnetSpider.Core
 	{
 		private Site _site = new Site();
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
-		private IDownloader _downloader = new HttpWebRequestDownloader();
+		private IDownloader _downloader = new HttpClientDownloader();
 		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
 		private bool _inited;
@@ -48,9 +48,8 @@ namespace DotnetSpider.Core
 		private int _pipelineCachedSize = 1;
 		private RetryPolicy _pipelineRetry;
 		private readonly AutomicLong _requestedCount = new AutomicLong(0);
-		private MemoryMappedFile _identityMmf;
-		private MemoryMappedFile _taskIdMmf;
-		private readonly string[] _closeSignalFiles = new string[2];
+		private MemoryMappedFile[] _mmfCloseSignals = new MemoryMappedFile[2];
+		private readonly string[] _filecloseSignals = new string[2];
 		private bool _exited;
 		private IMonitor _monitor;
 		private int _statusFlushInterval = 5000;
@@ -62,6 +61,14 @@ namespace DotnetSpider.Core
 		private long _downloaderCostTimes;
 		private long _pipelineCostTimes;
 		private long _processorCostTimes;
+
+		/// <summary>
+		/// 自定义的初始化
+		/// </summary>
+		/// <param name="arguments">运行参数</param>
+		protected virtual void OnInit(params string[] arguments)
+		{
+		}
 
 		/// <summary>
 		/// 是否需要通过StartUrlsBuilder来初始化起始链接
@@ -406,10 +413,10 @@ namespace DotnetSpider.Core
 		public Spider(Site site, string identity, IScheduler scheduler, IEnumerable<IPageProcessor> pageProcessors,
 			IEnumerable<IPipeline> pipelines)
 		{
-#if NETSTANDARD
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#else
 			ThreadPool.SetMinThreads(256, 256);
+#if NETSTANDARD
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#else
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
 			Site = site;
@@ -704,6 +711,13 @@ namespace DotnetSpider.Core
 				return;
 			}
 
+			Logger.Information("Oninit...");
+
+			NetworkCenter.Current.Execute("onInit", () =>
+			{
+				OnInit(arguments);
+			});
+
 			CheckSettings();
 
 			InitComponents(arguments);
@@ -876,7 +890,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				File.Create(_closeSignalFiles[0]);
+				File.Create(_filecloseSignals[0]);
 			}
 		}
 
@@ -947,14 +961,13 @@ namespace DotnetSpider.Core
 		/// <param name="arguments"></param>
 		protected virtual void InitComponents(params string[] arguments)
 		{
-			Logger.Information("Init internal component...");
+			Logger.Information("Init components...");
 
 			if (Site.Headers == null)
 			{
 				Site.Headers = new Dictionary<string, string>();
 			}
 
-			Site.Accept = Site.Accept ?? "application/json, text/javascript, */*; q=0.01";
 			Site.UserAgent = Site.UserAgent ??
 							 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
 			if (!Site.Headers.ContainsKey("Accept-Language"))
@@ -969,24 +982,24 @@ namespace DotnetSpider.Core
 				ResetScheduler();
 			}
 
-			Downloader = Downloader ?? new HttpWebRequestDownloader();
+			Downloader = Downloader ?? new HttpClientDownloader();
 
 			if (PageProcessors == null || PageProcessors.Count == 0)
 			{
-				throw new ArgumentException("PageProcessor unfound.");
+				throw new ArgumentException("There is no usable pipeline.");
 			}
 
-			InitPipelines(arguments);
+			PreparePipelines(arguments);
 
-			InitCloseSignals();
+			MonitorCloseSignals();
 
 			Monitor = Monitor ?? (string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? new LogMonitor() : new HttpMonitor());
 
 			_failingRequestsLogger = LogUtil.CreateFailingRequestsLogger(Identity);
 
-			RunStartUrlBuilders(arguments);
+			RunRequestBuilders(arguments);
 
-			LoadScheduler();
+			PrepareScheduler();
 
 			_monitorFlushInterval = CalculateMonitorFlushInterval();
 
@@ -1039,9 +1052,13 @@ namespace DotnetSpider.Core
 			SafeDestroy(PageProcessors);
 			SafeDestroy(Downloader);
 
-			//SafeDestroy(Site.HttpProxyPool);
-			SafeDestroy(_identityMmf);
-			SafeDestroy(_taskIdMmf);
+			if (Env.IsWindows)
+			{
+				foreach (var mmf in _mmfCloseSignals)
+				{
+					SafeDestroy(mmf);
+				}
+			}
 		}
 
 		/// <summary>
@@ -1290,7 +1307,7 @@ namespace DotnetSpider.Core
 		/// 初始化数据管道
 		/// </summary>
 		/// <param name="arguments">运行参数</param>
-		protected virtual void InitPipelines(params string[] arguments)
+		protected virtual void PreparePipelines(params string[] arguments)
 		{
 			_cached = new List<ResultItems>(PipelineCachedSize);
 
@@ -1306,11 +1323,10 @@ namespace DotnetSpider.Core
 				{
 					Pipelines.Add(defaultPipeline);
 				}
-			}
-
-			if (Pipelines.Count == 0)
-			{
-				throw new SpiderException("Pipeline unfound.");
+				else
+				{
+					throw new SpiderException("Count of pipelines should larger than one.");
+				}
 			}
 		}
 
@@ -1322,7 +1338,7 @@ namespace DotnetSpider.Core
 
 		private void SafeDestroy(object obj)
 		{
-			if (obj is IDisposable disposable)
+			if (obj != null && obj is IDisposable disposable)
 			{
 				try
 				{
@@ -1369,7 +1385,7 @@ namespace DotnetSpider.Core
 			AvgPipelineSpeed = _pipelineCostTimes / _pipelineTimes;
 		}
 
-		private void RunStartUrlBuilders(params string[] arguments)
+		private void RunRequestBuilders(params string[] arguments)
 		{
 			if (RequestBuilders != null && RequestBuilders.Count > 0 && IfRequireRunRequestBuilders(arguments))
 			{
@@ -1378,7 +1394,7 @@ namespace DotnetSpider.Core
 					for (int i = 0; i < RequestBuilders.Count; ++i)
 					{
 						var builder = RequestBuilders[i];
-						Logger.Information($"Add start urls via builder[{i + 1}].");
+						Logger.Information($"Add start request via builder[{i + 1}].");
 						builder.Build(Site);
 					}
 				}
@@ -1389,7 +1405,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void LoadScheduler()
+		private void PrepareScheduler()
 		{
 			if (Site.Requests != null && Site.Requests.Any())
 			{
@@ -1415,37 +1431,37 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void InitCloseSignals()
+		private void MonitorCloseSignals()
 		{
 			if (Env.IsWindows)
 			{
-				_identityMmf = MemoryMappedFile.CreateOrOpen(Identity, 1, MemoryMappedFileAccess.ReadWrite);
-				using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
-				{
-					var writer = new BinaryWriter(stream);
-					writer.Write(false);
-				}
-
+				_mmfCloseSignals[0] = MemoryMappedFile.CreateOrOpen(Identity, 1, MemoryMappedFileAccess.ReadWrite);
 				if (!string.IsNullOrWhiteSpace(TaskId))
 				{
-					_taskIdMmf = MemoryMappedFile.CreateOrOpen(TaskId, 1, MemoryMappedFileAccess.ReadWrite);
-					using (MemoryMappedViewStream stream = _taskIdMmf.CreateViewStream())
+					_mmfCloseSignals[1] = MemoryMappedFile.CreateOrOpen(TaskId, 1, MemoryMappedFileAccess.ReadWrite);
+				}
+				foreach (var mmf in _mmfCloseSignals)
+				{
+					if (mmf != null)
 					{
-						var writer = new BinaryWriter(stream);
-						writer.Write(false);
+						using (MemoryMappedViewStream stream = mmf.CreateViewStream())
+						{
+							var writer = new BinaryWriter(stream);
+							writer.Write(false);
+						}
 					}
 				}
 			}
 			else
 			{
-				_closeSignalFiles[0] = Path.Combine(Env.BaseDirectory, $"{Identity}_cl");
+				_filecloseSignals[0] = Path.Combine(Env.BaseDirectory, $"{Identity}_cl");
 
 				if (!string.IsNullOrWhiteSpace(TaskId))
 				{
-					_closeSignalFiles[1] = Path.Combine(Env.BaseDirectory, $"{TaskId}_cl");
+					_filecloseSignals[1] = Path.Combine(Env.BaseDirectory, $"{TaskId}_cl");
 				}
 
-				foreach (var closeSignal in _closeSignalFiles)
+				foreach (var closeSignal in _filecloseSignals)
 				{
 					if (File.Exists(closeSignal))
 					{
@@ -1500,42 +1516,36 @@ namespace DotnetSpider.Core
 			// MMF 暂时还不支持非WINDOWS操作系统
 			if (Env.IsWindows)
 			{
-				CheckExitSignalByMmf();
+				CheckMmfCloseSignals();
 			}
 			else
 			{
-				CheckExitSignalByFile();
+				CheckFileCloseSignals();
 			}
 		}
 
-		private void CheckExitSignalByMmf()
+		private void CheckMmfCloseSignals()
 		{
-			using (MemoryMappedViewStream stream = _identityMmf.CreateViewStream())
+			foreach (var mmf in _mmfCloseSignals)
 			{
-				var reader = new BinaryReader(stream);
-				if (reader.ReadBoolean())
+				if (mmf != null)
 				{
-					Exit();
-					return;
-				}
-			}
-
-			if (_taskIdMmf != null)
-			{
-				using (MemoryMappedViewStream stream = _taskIdMmf.CreateViewStream())
-				{
-					var reader = new BinaryReader(stream);
-					if (reader.ReadBoolean())
+					using (MemoryMappedViewStream stream = mmf.CreateViewStream())
 					{
-						Exit();
+						var reader = new BinaryReader(stream);
+						if (reader.ReadBoolean())
+						{
+							Exit();
+							return;
+						}
 					}
 				}
 			}
 		}
 
-		private void CheckExitSignalByFile()
+		private void CheckFileCloseSignals()
 		{
-			if (File.Exists(_closeSignalFiles[0]) || File.Exists(_closeSignalFiles[1]))
+			if (File.Exists(_filecloseSignals[0]) || File.Exists(_filecloseSignals[1]))
 			{
 				Exit();
 			}

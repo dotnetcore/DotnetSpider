@@ -12,6 +12,6 @@ namespace DotnetSpider.Core.Pipeline
 		/// </summary>
 		/// <param name="owner">数据拥有者</param>
 		/// <returns>All results collected</returns>
-		IEnumerable<ResultItems> GetCollection(dynamic owner);
+		IList<ResultItems> GetCollection(dynamic owner);
 	}
 }

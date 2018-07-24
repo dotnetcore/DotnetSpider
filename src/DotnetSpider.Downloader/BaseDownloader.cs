@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using DotnetSpider.Common;
+using Newtonsoft.Json;
 
 namespace DotnetSpider.Downloader
 {
@@ -27,6 +28,9 @@ namespace DotnetSpider.Downloader
 		/// Cookie 管理容器
 		/// </summary>
 		protected readonly CookieContainer CookieContainer = new CookieContainer();
+
+		public WebProxy FiddlerProxy { get; set; } = new WebProxy("http://127.0.0.1:8888");
+		public bool UseFiddlerProxy { get; set; } = false;
 
 		/// <summary>
 		/// 是否自动跳转
@@ -198,14 +202,30 @@ namespace DotnetSpider.Downloader
 		{
 			if (response.Request.Site.ContentType == ContentType.Auto)
 			{
-				if (contentType.Contains("json"))
+				if (!string.IsNullOrWhiteSpace(contentType))
 				{
-					response.ContentType = ContentType.Json;
+					if (contentType.Contains("json"))
+					{
+						response.ContentType = ContentType.Json;
+					}
+					else
+					{
+						response.ContentType = ContentType.Html;
+					}
 				}
 				else
 				{
-					response.ContentType = ContentType.Html;
+					try
+					{
+						JsonConvert.DeserializeObject(response.Content);
+						response.ContentType = ContentType.Json;
+					}
+					catch
+					{
+						response.ContentType = ContentType.Html;
+					}
 				}
+				response.Request.Site.ContentType = response.ContentType;
 			}
 			else
 			{
@@ -271,7 +291,7 @@ namespace DotnetSpider.Downloader
 
 		protected void EnsureSuccessStatusCode(HttpStatusCode code)
 		{
-			if ((int)code >= 200 && ((int)code <= 299))
+			if (((int)code >= 200 && ((int)code <= 299)) || ((int)code >= 300 && ((int)code <= 399)))
 			{
 				return;
 			}

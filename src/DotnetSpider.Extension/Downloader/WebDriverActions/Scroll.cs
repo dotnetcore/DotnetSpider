@@ -1,8 +1,8 @@
-﻿using OpenQA.Selenium.Remote;
-using System;
+﻿using System;
 using System.Threading;
+using OpenQA.Selenium.Remote;
 
-namespace DotnetSpider.Extension.Downloader
+namespace DotnetSpider.Extension.Downloader.WebDriverActions
 {
 	/// <summary>
 	/// 滚动操作的实现

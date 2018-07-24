@@ -59,7 +59,6 @@ namespace DotnetSpider.Core.Processor
 		/// 解析目标链接并添加到Page对象中, 供Spider对象添加到对列中
 		/// </summary>
 		/// <param name="page">页面数据</param>
-		/// <param name="spider">爬虫对象</param>
 		protected virtual void ExtractUrls(Page page)
 		{
 			var links = TargetUrlsExtractor.ExtractRequests(page);

@@ -12,6 +12,7 @@ using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Common;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model.Formatter;
+using DotnetSpider.Extraction.Model;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -134,7 +135,7 @@ namespace DotnetSpider.Extension.Test
 		[TableInfo("test", "table")]
 		private class TestEntity
 		{
-			[Field(Expression = ".")]
+			[FieldSelector(Expression = ".")]
 			public string Name { get; set; }
 		}
 
@@ -144,7 +145,7 @@ namespace DotnetSpider.Extension.Test
 			{
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				Monitor = new LogMonitor();
 				Identity = Guid.NewGuid().ToString("N");
@@ -164,7 +165,7 @@ namespace DotnetSpider.Extension.Test
 				_guid = guid;
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				var word = "可乐|雪碧";
 				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),
@@ -179,36 +180,36 @@ namespace DotnetSpider.Extension.Test
 			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
 			class BaiduSearchEntry
 			{
-				[Field(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
+				[FieldSelector(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
 				public string Keyword { get; set; }
 
-				[Field(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
+				[FieldSelector(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
 				public string Guid { get; set; }
 
-				[Field(Expression = ".//h3[@class='c-title']/a")]
+				[FieldSelector(Expression = ".//h3[@class='c-title']/a")]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				public string Title { get; set; }
 
-				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
+				[FieldSelector(Expression = ".//h3[@class='c-title']/a/@href")]
 				public string Url { get; set; }
 
-				[Field(Expression = ".//div/p[@class='c-author']/text()")]
+				[FieldSelector(Expression = ".//div/p[@class='c-author']/text()")]
 				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 				public string Website { get; set; }
 
 
-				[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
 				public string Snapshot { get; set; }
 
 
-				[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
+				[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 				public string Details { get; set; }
 
-				[Field(Expression = ".", Option = FieldOptions.InnerText)]
+				[FieldSelector(Expression = ".", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
@@ -222,7 +223,7 @@ namespace DotnetSpider.Extension.Test
 			{
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				Identity = Guid.NewGuid().ToString();
 				EmptySleepTime = 5000;
@@ -234,18 +235,18 @@ namespace DotnetSpider.Extension.Test
 			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
 			class ArticleSummary
 			{
-				[Field(Expression = ".//a/@title")]
+				[FieldSelector(Expression = ".//a/@title")]
 				public string Title { get; set; }
 
 				[ToNext(Extras = new[] { "Title", "Url" })]
-				[Field(Expression = ".//a/@href")]
+				[FieldSelector(Expression = ".//a/@href")]
 				public string Url { get; set; }
 			}
 		}
 
 		private class MultiEntitySpider : EntitySpider
 		{
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				Site = new Site
 				{
@@ -266,7 +267,7 @@ namespace DotnetSpider.Extension.Test
 			[TargetRequestSelector(Patterns = new[] { "http://www.163.com" })]
 			public class NeteastEntity
 			{
-				[Field(Expression = ".//title")]
+				[FieldSelector(Expression = ".//title")]
 				public string Title { get; set; }
 			}
 
@@ -274,7 +275,7 @@ namespace DotnetSpider.Extension.Test
 			[TargetRequestSelector(Patterns = new[] { "http://www.sohu.com" })]
 			public class SohuEntity
 			{
-				[Field(Expression = ".//title")]
+				[FieldSelector(Expression = ".//title")]
 				public string Title { get; set; }
 			}
 		}

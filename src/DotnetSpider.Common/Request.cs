@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace DotnetSpider.Common
 {
@@ -32,7 +34,7 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 请求链接的方法
 		/// </summary>
-		public HttpMethod Method { get; set; }
+		public HttpMethod Method { get; set; } = HttpMethod.Get;
 
 		/// <summary>
 		/// 链接的优先级, 仅用于优先级队列

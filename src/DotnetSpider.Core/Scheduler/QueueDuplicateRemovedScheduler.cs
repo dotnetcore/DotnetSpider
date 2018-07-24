@@ -133,7 +133,7 @@ namespace DotnetSpider.Core.Scheduler
 		/// 批量导入
 		/// </summary>
 		/// <param name="requests">请求对象</param>
-		public override void Reload(IEnumerable<Request> requests)
+		public override void Reload(ICollection<Request> requests)
 		{
 			if (requests == null)
 			{

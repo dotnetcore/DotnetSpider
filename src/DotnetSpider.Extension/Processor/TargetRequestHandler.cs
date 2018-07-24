@@ -16,13 +16,13 @@ namespace DotnetSpider.Extension.Processor
 		private readonly bool _extractByProcessor;
 
 		/// <summary>
-		/// Construct a <see cref="TargetUrlsHandler"/> instance.
+		/// Construct a <see cref="TargetRequestHandler"/> instance.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
 		/// 构造方法
 		/// </summary>
-		/// <param name="targetRequestExtractor">目标链接解析器 <see cref="ITargetUrlsExtractor"/></param>
-		/// <param name="extractByProcessor">Processor是否还需要执行目标链接解析工作(Should <see cref="IPageProcessor"/> continue to execute <see cref="ITargetUrlsExtractor"/>)</param>
+		/// <param name="targetRequestExtractor">目标链接解析器 <see cref="ITargetRequestExtractor"/></param>
+		/// <param name="extractByProcessor">Processor是否还需要执行目标链接解析工作(Should <see cref="IPageProcessor"/> continue to execute <see cref="ITargetRequestExtractor"/>)</param>
 		public TargetRequestHandler(ITargetRequestExtractor targetRequestExtractor, bool extractByProcessor = false)
 		{
 			_targetUrlsExtractor = targetRequestExtractor ?? throw new ArgumentNullException(nameof(targetRequestExtractor));
@@ -30,7 +30,7 @@ namespace DotnetSpider.Extension.Processor
 		}
 
 		/// <summary>
-		/// Execute <see cref="ITargetUrlsExtractor"/>.
+		/// Execute <see cref="ITargetRequestExtractor"/>.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
 		/// 执行目标链接解析器

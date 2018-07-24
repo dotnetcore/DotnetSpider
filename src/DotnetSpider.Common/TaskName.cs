@@ -5,7 +5,7 @@ namespace DotnetSpider.Common
 	/// <summary>
 	/// 任务名称
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+	[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 	public class TaskName : Attribute
 	{
 		/// <summary>
@@ -14,7 +14,6 @@ namespace DotnetSpider.Common
 		public string Name
 		{
 			get;
-			private set;
 		}
 
 		/// <summary>

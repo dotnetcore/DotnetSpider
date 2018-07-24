@@ -4,7 +4,7 @@ namespace DotnetSpider.Extraction.Model
 {
 	public class BaseEntity
 	{
-		[Field(DataType = DataType.Long, IsPrimary = true, Expression = "Id", Type = SelectorType.Enviroment)]
+		[FieldSelector(DataType = DataType.Long, IsPrimary = true, Expression = "Id", Type = SelectorType.Enviroment)]
 		// ReSharper disable once UnusedAutoPropertyAccessor.Global
 		public long Id { get; set; }
 	}

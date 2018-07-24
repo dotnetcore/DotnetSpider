@@ -7,7 +7,7 @@
 //	[TaskName("CustomizeInitSpider")]
 //	public class CustomizeInitSpider : CommonSpider
 //	{
-//		protected override void MyInit(params string[] arguments)
+//		protected override void OnInit(params string[] arguments)
 //		{
 //			Identity = Guid.NewGuid().ToString("N");
 //		}

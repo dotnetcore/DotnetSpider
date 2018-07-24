@@ -153,7 +153,7 @@ namespace DotnetSpider.Core.Test
 
 		internal class TestPipeline : BasePipeline
 		{
-			public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+			public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 			{
 				foreach (var resultItem in resultItems)
 				{
@@ -276,7 +276,7 @@ namespace DotnetSpider.Core.Test
 
 		internal class FastExitPipeline : BasePipeline
 		{
-			public override void Process(IEnumerable<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+			public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
 			{
 				File.AppendAllLines("FastExit_Result.txt", new[] { resultItems.First().Request.Url.ToString() });
 			}

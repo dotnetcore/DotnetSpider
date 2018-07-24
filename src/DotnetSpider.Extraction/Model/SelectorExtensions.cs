@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Extraction.Model
 {
-	public static class SelectorUtil
+	public static class SelectorExtensions
 	{
 		/// <summary>
 		/// 把BaseSelector转换成真正的查询器
@@ -44,7 +44,7 @@ namespace DotnetSpider.Extraction.Model
 								{
 									return Selectors.Regex(expression, group);
 								}
-								throw new ModelException($"Regex argument should be a number set to group: {selector}.");
+								throw new ArgumentException($"Regex argument should be a number set to group: {selector}.");
 							}
 						}
 					case SelectorType.XPath:
@@ -54,7 +54,7 @@ namespace DotnetSpider.Extraction.Model
 						}
 					default:
 						{
-							throw new ModelException($"Selector {selector} unsupoort.");
+							throw new NotSupportedException($"{selector} unsupoort.");
 						}
 				}
 			}

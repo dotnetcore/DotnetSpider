@@ -15,7 +15,7 @@ namespace DotnetSpider.Extraction.Model
 		/// <param name="selectable">可查询对象</param>
 		/// <param name="model">解析模型</param>
 		/// <returns>实体对象</returns>
-		public virtual IEnumerable<dynamic> Extract(Selectable selectable, IModel model)
+		public virtual IList<dynamic> Extract(Selectable selectable, IModel model)
 		{
 			List<dynamic> results = new List<dynamic>();
 			if (selectable.Properties == null)
@@ -102,34 +102,9 @@ namespace DotnetSpider.Extraction.Model
 			}
 
 			return dataObject;
-
-			//if (dataObject != null && EntityDefine.LinkToNexts != null)
-			//{
-			//	foreach (var targetUrl in EntityDefine.LinkToNexts)
-			//	{
-			//		Dictionary<string, dynamic> extras = new Dictionary<string, dynamic>();
-			//		if (targetUrl.Extras != null)
-			//		{
-			//			foreach (var extra in targetUrl.Extras)
-			//			{
-			//				extras.Add(extra, result[extra]);
-			//			}
-			//		}
-			//		Dictionary<string, dynamic> allExtras = new Dictionary<string, dynamic>();
-			//		foreach (var extra in page.Request.Extras.Union(extras))
-			//		{
-			//			allExtras.Add(extra.Key, extra.Value);
-			//		}
-			//		var value = result[targetUrl.PropertyName];
-			//		if (value != null)
-			//		{
-			//			page.AddTargetRequest(new Request(value.ToString(), allExtras));
-			//		}
-			//	}
-			//}
 		}
 
-		private string ExtractField(Field field, ISelectable item, Selectable root, int index)
+		private string ExtractField(FieldSelector field, ISelectable item, Selectable root, int index)
 		{
 			if (field == null)
 			{
@@ -226,7 +201,7 @@ namespace DotnetSpider.Extraction.Model
 			}
 		}
 
-		public override IEnumerable<dynamic> Extract(Selectable response, IModel model)
+		public override IList<dynamic> Extract(Selectable response, IModel model)
 		{
 			var items = base.Extract(response, model)?.ToList();
 
@@ -258,7 +233,7 @@ namespace DotnetSpider.Extraction.Model
 						}
 						catch
 						{
-							throw new ModelException($"Convert data {oldValue} to {valueType.Name} failed.");
+							throw new ExtractionException($"Convert data {oldValue} to {valueType.Name} failed.");
 						}
 					}
 				}

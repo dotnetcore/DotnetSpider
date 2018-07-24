@@ -18,6 +18,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// 构造方法
 		/// </summary>
 		/// <param name="url">登陆的链接</param>
+		/// <param name="browser">浏览器</param>
 		/// <param name="controllable">可控制程序</param>
 		public ManualWebDriverCookieInjector(string url, Browser browser, IControllable controllable) : base(browser, controllable)
 		{

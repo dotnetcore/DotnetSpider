@@ -36,7 +36,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 					}
 				default:
 					{
-						throw new ModelException("Wrong input timestamp");
+						throw new ArgumentException("Wrong input timestamp");
 					}
 			}
 			return dt.ToString("yyyy-MM-dd HH:mm:ss");

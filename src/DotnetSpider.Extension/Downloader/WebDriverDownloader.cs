@@ -19,7 +19,6 @@ namespace DotnetSpider.Extension.Downloader
 	/// </summary>
 	public class WebDriverDownloader : BaseDownloader, IBeforeDownloadHandler
 	{
-		private readonly object _locker = new object();
 		private IWebDriver _driver;
 		private readonly int _driverWaitTime;
 		private readonly Browser _browser;
@@ -98,7 +97,7 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			base.AddCookie(cookie);
 			// 如果 Downloader 在运行中, 需要把 Cookie 加到 Driver 中
-			_driver?.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
+			_driver?.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
 		}
 
 		public void Handle(ref Request request, IDownloader downloader)
@@ -115,7 +114,7 @@ namespace DotnetSpider.Extension.Downloader
 						foreach (System.Net.Cookie cookie in cookies)
 						{
 							// 此处不能通过直接调用AddCookie来添加, 会导致CookieContainer添加重复值
-							_driver.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
+							_driver.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
 						}
 					}
 				}
@@ -125,7 +124,6 @@ namespace DotnetSpider.Extension.Downloader
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		protected override Common.Response DowloadContent(Request request)
 		{
-			Site site = request.Site;
 			try
 			{
 				NetworkCenter.Current.Execute("webdriver-download", () =>

@@ -87,26 +87,37 @@ namespace DotnetSpider.Downloader
 			WebProxy proxy = null;
 			try
 			{
-
-				if (HttpProxyPool.Instance != null)
+				if (UseFiddlerProxy)
 				{
-					proxy = HttpProxyPool.Instance.GetProxy();
-					if (proxy == null)
+					if (FiddlerProxy == null)
 					{
-						throw new DownloaderException("No avaliable proxy.");
+						throw new DownloaderException("Fiddler proxy is null.");
 					}
 					else
 					{
-						_clientObject = GetHttpClient($"{proxy.Address.ToString()}", AllowAutoRedirect, proxy);
-						httpResponseMessage =
-							NetworkCenter.Current.Execute("downloader", () => _clientObject.Client.SendAsync(httpRequestMessage).Result);
+						proxy = FiddlerProxy;
 					}
 				}
 				else
 				{
-					httpResponseMessage =
-						NetworkCenter.Current.Execute("downloader", () => Default.SendAsync(httpRequestMessage).Result);
+					if (HttpProxyPool.Instance != null)
+					{
+						proxy = HttpProxyPool.Instance.GetProxy();
+						if (proxy == null)
+						{
+							throw new DownloaderException("No avaliable proxy.");
+						}
+					}
+					else
+					{
+						_clientObject = GetHttpClient("DEFAULT", AllowAutoRedirect, null);
+					}
 				}
+
+				_clientObject = GetHttpClient(proxy == null ? "DEFAULT" : $"{proxy.Address.ToString()}", AllowAutoRedirect, proxy);
+
+				httpResponseMessage =
+						NetworkCenter.Current.Execute("downloader", () => _clientObject.Client.SendAsync(httpRequestMessage).Result);
 
 				response.StatusCode = httpResponseMessage.StatusCode;
 				EnsureSuccessStatusCode(response.StatusCode);
@@ -209,6 +220,7 @@ namespace DotnetSpider.Downloader
 			{
 				hash = string.Empty;
 			}
+
 			Interlocked.Increment(ref _getHttpClientCount);
 
 			if (_getHttpClientCount % 100 == 0)
@@ -263,8 +275,7 @@ namespace DotnetSpider.Downloader
 
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request)
 		{
-			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(new System.Net.Http.HttpMethod(request.Method.ToString()), request.Url);
-
+			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(request.Method, request.Url);
 			var userAgentHeader = "User-Agent";
 			httpRequestMessage.Headers.TryAddWithoutValidation(userAgentHeader, request.Site.Headers.ContainsKey(userAgentHeader) ? request.Site.Headers[userAgentHeader] : request.Site.UserAgent);
 
@@ -297,7 +308,7 @@ namespace DotnetSpider.Downloader
 				}
 			}
 
-			if (request.Method == Common.HttpMethod.Post)
+			if (request.Method == HttpMethod.Post)
 			{
 				var data = string.IsNullOrWhiteSpace(request.Site.EncodingName) ? Encoding.UTF8.GetBytes(request.Content) : Encoding.GetEncoding(request.Site.EncodingName).GetBytes(request.Content);
 				httpRequestMessage.Content = new StreamContent(new MemoryStream(data));

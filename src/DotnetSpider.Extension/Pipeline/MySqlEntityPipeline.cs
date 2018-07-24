@@ -43,7 +43,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected override void InitDatabaseAndTable(IDbConnection conn, IModel model)
 		{
-			var database = IgnoreColumnCase ? model.TableInfo.Database.ToLower() : model.TableInfo.Database;
+			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
 			conn.MyExecute($"CREATE SCHEMA IF NOT EXISTS `{database}` DEFAULT CHARACTER SET utf8mb4;");
 			conn.MyExecute(GenerateCreateTableSql(model));
 		}
@@ -55,8 +55,8 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <returns>SQL语句</returns>
 		private string GenerateCreateTableSql(IModel model)
 		{
-			var tableName = IgnoreColumnCase ? model.TableInfo.FullName.ToLower() : model.TableInfo.FullName;
-			var database = IgnoreColumnCase ? model.TableInfo.Database.ToLower() : model.TableInfo.Database;
+			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
+			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
 
 			var fields = model.Fields;
 
@@ -89,9 +89,9 @@ namespace DotnetSpider.Extension.Pipeline
 				builder.Append($", PRIMARY KEY ({string.Join(", ", fields.Where(f => f.IsPrimary).Select(field => IgnoreColumnCase ? field.Name.ToLower() : field.Name))})");
 			}
 
-			if (model.TableInfo.Indexs != null)
+			if (model.Table.Indexs != null)
 			{
-				foreach (var index in model.TableInfo.Indexs)
+				foreach (var index in model.Table.Indexs)
 				{
 					var columns = index.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
@@ -99,9 +99,9 @@ namespace DotnetSpider.Extension.Pipeline
 					builder.Append($", KEY `index_{name}` ({indexColumNames})");
 				}
 			}
-			if (model.TableInfo.Uniques != null)
+			if (model.Table.Uniques != null)
 			{
-				foreach (var unique in model.TableInfo.Uniques)
+				foreach (var unique in model.Table.Uniques)
 				{
 					var columns = unique.Split(',');
 					string name = string.Join("_", columns.Select(c => c));
@@ -135,8 +135,8 @@ namespace DotnetSpider.Extension.Pipeline
 				columnsParamsSql = $"{columnsParamsSql}, NOW(), CURRENT_DATE()";
 			}
 
-			var tableName = IgnoreColumnCase ? model.TableInfo.FullName.ToLower() : model.TableInfo.FullName;
-			var database = IgnoreColumnCase ? model.TableInfo.Database.ToLower() : model.TableInfo.Database;
+			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
+			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
 			var sql =
 				$"INSERT {(ignoreDuplicate ? "IGNORE" : "")} INTO `{database}`.`{tableName}` ({columnsSql}) VALUES ({columnsParamsSql});";
 			return sql;
@@ -162,12 +162,12 @@ namespace DotnetSpider.Extension.Pipeline
 				columnsParamsSql = $"{columnsParamsSql}, NOW(), CURRENT_DATE()";
 			}
 
-			var tableName = IgnoreColumnCase ? model.TableInfo.FullName.ToLower() : model.TableInfo.FullName;
+			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
 
 			string setParams = string.Join(", ", insertColumns.Select(p => $"`{(IgnoreColumnCase ? p.Name.ToLower() : p.Name)}`=@{p.Name}"));
 
 			var sql =
-				$"INSERT INTO `{model.TableInfo.Database}`.`{tableName}` ({columnsSql}) VALUES ({columnsParamsSql}) ON DUPLICATE KEY UPDATE {setParams};";
+				$"INSERT INTO `{model.Table.Database}`.`{tableName}` ({columnsSql}) VALUES ({columnsParamsSql}) ON DUPLICATE KEY UPDATE {setParams};";
 
 			return sql;
 		}
@@ -175,9 +175,9 @@ namespace DotnetSpider.Extension.Pipeline
 		private string GenerateUpdateSql(IModel model, ILogger logger)
 		{
 			// 无主键, 无更新字段都无法生成更新SQL
-			if (model.TableInfo.UpdateColumns == null || !model.TableInfo.UpdateColumns.Any() || !model.Fields.Any(f => f.IsPrimary))
+			if (model.Table.UpdateColumns == null || !model.Table.UpdateColumns.Any() || !model.Fields.Any(f => f.IsPrimary))
 			{
-				if (model.TableInfo.UpdateColumns == null || !model.TableInfo.UpdateColumns.Any())
+				if (model.Table.UpdateColumns == null || !model.Table.UpdateColumns.Any())
 				{
 					logger.Warning("Can't generate update sql, in table info, the count of update columns is zero.");
 				}
@@ -188,8 +188,8 @@ namespace DotnetSpider.Extension.Pipeline
 				return null;
 			}
 
-			var tableName = IgnoreColumnCase ? model.TableInfo.FullName.ToLower() : model.TableInfo.FullName;
-			var database = IgnoreColumnCase ? model.TableInfo.Database.ToLower() : model.TableInfo.Database;
+			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
+			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
 
 			string where = "";
 			foreach (var field in model.Fields.Where(f => f.IsPrimary))
@@ -199,7 +199,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			where = where.Substring(0, where.Length - 3);
 
-			string setCols = string.Join(", ", model.TableInfo.UpdateColumns.Select(p => $"`{p.ToLower()}`=@{p}"));
+			string setCols = string.Join(", ", model.Table.UpdateColumns.Select(p => $"`{p.ToLower()}`=@{p}"));
 			var sql = $"UPDATE `{database}`.`{tableName}` SET {setCols} WHERE {where};";
 			return sql;
 		}
@@ -211,8 +211,8 @@ namespace DotnetSpider.Extension.Pipeline
 				return null;
 			}
 
-			var tableName = IgnoreColumnCase ? model.TableInfo.FullName.ToLower() : model.TableInfo.FullName;
-			var database = IgnoreColumnCase ? model.TableInfo.Database.ToLower() : model.TableInfo.Database;
+			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
+			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
 
 			string where = "";
 			foreach (var field in model.Fields.Where(f => f.IsPrimary))
@@ -225,7 +225,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		private string GenerateColumn(Field field)
+		private string GenerateColumn(FieldSelector field)
 		{
 			var columnName = IgnoreColumnCase ? field.Name.ToLower() : field.Name;
 			var dataType = GetDataTypeSql(field.DataType, field.Length);

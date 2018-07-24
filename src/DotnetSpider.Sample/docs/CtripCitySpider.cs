@@ -25,7 +25,7 @@ namespace DotnetSpider.Sample.docs
 		{
 		}
 
-		protected override void MyInit(params string[] arguments)
+		protected override void OnInit(params string[] arguments)
 		{
 			AddStartUrl("http://www.ctrip.com/");
 			AddEntityType<CtripCity>();
@@ -36,16 +36,16 @@ namespace DotnetSpider.Sample.docs
 		[EntitySelector(Expression = "//div[@class='city_item']//a")]
 		class CtripCity
 		{
-			[Field(Expression = ".", Length = 100)]
+			[FieldSelector(Expression = ".", Length = 100)]
 			public string name { get; set; }
 
-			[Field(Expression = "./@title", Length = 100)]
+			[FieldSelector(Expression = "./@title", Length = 100)]
 			public string title { get; set; }
 
-			[Field(Expression = "./@data-id", Length = 100)]
+			[FieldSelector(Expression = "./@data-id", Length = 100)]
 			public string city_id { get; set; }
 
-			[Field(Expression = "Today", Type = SelectorType.Enviroment)]
+			[FieldSelector(Expression = "Today", Type = SelectorType.Enviroment)]
 			public DateTime run_id { get; set; }
 		}
 	}

@@ -7,13 +7,13 @@ using System.Collections.Generic;
 
 namespace DotnetSpider.Sample.docs
 {
-	public class DefaultMySqlPipelineSpider : CustomizedSpider
+	public class DefaultMySqlPipelineSpider : Spider
 	{
 		public DefaultMySqlPipelineSpider() : base(new Site())
 		{
 		}
 
-		protected override void MyInit(params string[] arguments)
+		protected override void OnInit(params string[] arguments)
 		{
 			var word = "可乐|雪碧";
 			AddPipeline(new DefaultMySqlPipeline(Env.DataConnectionString, "baidu", "mysql_baidu_search"));

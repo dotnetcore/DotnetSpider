@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Test.Model
 				f.Formate("");
 				throw new Exception("TEST FAILED.");
 			}
-			catch (ModelException se)
+			catch (ArgumentException se)
 			{
 				Assert.Equal("Pattern should not be null or empty", se.Message);
 			}
@@ -27,7 +27,7 @@ namespace DotnetSpider.Extension.Test.Model
 				f.Formate("");
 				throw new Exception("TEST FAILED.");
 			}
-			catch (ModelException se)
+			catch (ArgumentException se)
 			{
 				Assert.Equal("Pattern should not be null or empty", se.Message);
 			}
@@ -37,7 +37,7 @@ namespace DotnetSpider.Extension.Test.Model
 				f.Formate("");
 				throw new Exception("TEST FAILED.");
 			}
-			catch (ModelException se)
+			catch (ArgumentException se)
 			{
 				Assert.Equal("Pattern should not be null or empty", se.Message);
 			}
@@ -131,7 +131,7 @@ namespace DotnetSpider.Extension.Test.Model
 				f.Formate("");
 				throw new Exception("TEST FAILED.");
 			}
-			catch (ModelException se)
+			catch (ArgumentException se)
 			{
 				Assert.Equal("FormatString should not be null or empty", se.Message);
 			}
@@ -141,7 +141,7 @@ namespace DotnetSpider.Extension.Test.Model
 				f.Formate("");
 				throw new Exception("TEST FAILED.");
 			}
-			catch (ModelException se)
+			catch (ArgumentException se)
 			{
 				Assert.Equal("FormatString should not be null or empty", se.Message);
 			}
@@ -151,7 +151,7 @@ namespace DotnetSpider.Extension.Test.Model
 				f.Formate("");
 				throw new Exception("TEST FAILED.");
 			}
-			catch (ModelException se)
+			catch (ArgumentException se)
 			{
 				Assert.Equal("FormatString should not be null or empty", se.Message);
 			}

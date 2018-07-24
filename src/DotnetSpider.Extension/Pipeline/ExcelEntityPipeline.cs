@@ -52,10 +52,10 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private void WriteToExcel(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender)
+		private void WriteToExcel(IModel model, IList<dynamic> datas, dynamic sender)
 		{
 			var excelPath = Path.Combine(Env.BaseDirectory, "excels", $"{sender.Name}_{sender.Identity}.xlsx");
-			var sheetName = model.TableInfo.Name;
+			var sheetName = model.Table.Name;
 			var sheetIndex = $"{excelPath}.{sheetName}";
 
 			if (!_packages.ContainsKey(excelPath))
@@ -115,15 +115,15 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override int Process(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender)
+		protected override int Process(IModel model, IList<dynamic> datas, ILogger logger, dynamic sender = null)
 		{
-			if (datas == null || datas.Count() == 0)
+			if (datas == null || datas.Count == 0)
 			{
 				return 0;
 			}
 
-			WriteToExcel(model, datas, logger, sender);
-			return datas.Count();
+			WriteToExcel(model, datas, sender);
+			return datas.Count;
 		}
 	}
 }

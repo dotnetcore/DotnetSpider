@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -20,9 +21,6 @@ namespace DotnetSpider.Downloader
 	{
 		private readonly int _timeout;
 		private readonly bool _decodeHtml;
-
-		public WebProxy FiddlerProxy { get; set; } = new WebProxy("http://127.0.0.1:8888");
-		public bool UseFiddlerProxy { get; set; } = false;
 
 		public HttpWebRequestDownloader(int timeout = 8000, bool decodeHtml = false)
 		{
@@ -141,7 +139,7 @@ namespace DotnetSpider.Downloader
 		{
 			var site = request.Site;
 			var httpWebRequest = (HttpWebRequest)WebRequest.Create(request.Url);
-			httpWebRequest.Method = request.Method.ToString().ToUpper();
+			httpWebRequest.Method = request.Method.Method;
 
 			// Add user-agent
 			var userAgentHeader = "User-Agent";

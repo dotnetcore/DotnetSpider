@@ -30,7 +30,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		{
 			if (string.IsNullOrWhiteSpace(Format))
 			{
-				throw new ModelException("FormatString should not be null or empty");
+				throw new ArgumentException("FormatString should not be null or empty");
 			}
 		}
 	}

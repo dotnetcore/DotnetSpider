@@ -22,7 +22,7 @@ namespace DotnetSpider.Sample.docs
 			{
 			}
 
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				Identity = ("cnblogs_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
 				AddStartUrl("https://news.cnblogs.com/n/page/1");
@@ -34,10 +34,10 @@ namespace DotnetSpider.Sample.docs
 			[TableInfo("cnblogs", "news")]
 			class News : BaseEntity
 			{
-				[Field(Expression = ".//h2[@class='news_entry']")]
+				[FieldSelector(Expression = ".//h2[@class='news_entry']")]
 				public string Name { get; set; }
 
-				[Field(Expression = ".//span[@class='view']")]
+				[FieldSelector(Expression = ".//span[@class='view']")]
 				public string View { get; set; }
 			}
 		}

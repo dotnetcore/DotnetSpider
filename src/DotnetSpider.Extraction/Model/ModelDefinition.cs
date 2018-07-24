@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace DotnetSpider.Extraction.Model
 {
-	public class ModelDefine : IModel
+	public class ModelDefinition : IModel
 	{
 		/// <summary>
 		/// 数据模型的选择器
@@ -26,17 +26,17 @@ namespace DotnetSpider.Extraction.Model
 		/// <summary>
 		/// 爬虫实体对应的数据库表信息
 		/// </summary>
-		public TableInfo TableInfo { get; protected set; }
+		public TableInfo Table { get; protected set; }
 
 		/// <summary>
 		/// 爬虫实体定义的数据库列信息
 		/// </summary>
-		public HashSet<Field> Fields { get; protected set; }
+		public HashSet<FieldSelector> Fields { get; protected set; }
 
 		/// <summary>
 		/// 目标链接的选择器
 		/// </summary>
-		public IEnumerable<TargetRequestSelector> TargetUrlsSelectors { get; protected set; }
+		public IEnumerable<TargetRequestSelector> TargetRequestSelectors { get; protected set; }
 
 		/// <summary>
 		/// 共享值的选择器
@@ -45,44 +45,44 @@ namespace DotnetSpider.Extraction.Model
 
 		public string Identity { get; protected set; }
 
-		public ModelDefine(Selector selector, IEnumerable<Field> fields, TableInfo table,
-			TargetRequestSelector targetUrlsSelector)
-			: this(selector, fields, table, new[] { targetUrlsSelector })
+		public ModelDefinition(Selector selector, IEnumerable<FieldSelector> fields, TableInfo table,
+			TargetRequestSelector targetRequestSelector)
+			: this(selector, fields, table, new[] { targetRequestSelector })
 		{
 		}
 
-		public ModelDefine(Selector selector, IEnumerable<Field> fields, TableInfo table = null,
-			IEnumerable<TargetRequestSelector> targetUrlsSelectors = null,
+		public ModelDefinition(Selector selector, IEnumerable<FieldSelector> fields, TableInfo table = null,
+			IEnumerable<TargetRequestSelector> targetRequestSelectors = null,
 			IEnumerable<SharedValueSelector> sharedValueSelectors = null, int take = 0, bool takeFromHead = true) : this()
 		{
 			Selector = selector;
-			TableInfo = table;
+			Table = table;
 			if (fields == null)
 			{
-				throw new ModelException($"{nameof(fields)} should not be null.");
+				throw new ExtractionException($"{nameof(fields)} should not be null.");
 			}
 
-			Fields = new HashSet<Field>(fields);
+			Fields = new HashSet<FieldSelector>(fields);
 			if (Fields.Count == 0)
 			{
-				throw new ModelException("Count of fields should large than 0.");
+				throw new ExtractionException("Count of fields should large than 0.");
 			}
 
-			TargetUrlsSelectors = targetUrlsSelectors;
+			TargetRequestSelectors = targetRequestSelectors;
 			SharedValueSelectors = sharedValueSelectors;
 			Take = take;
 			TakeFromHead = takeFromHead;
-			Identity = TableInfo == null ? Guid.NewGuid().ToString("N") : $"{TableInfo.Database}.{TableInfo.FullName}";
+			Identity = Table == null ? Guid.NewGuid().ToString("N") : $"{Table.Database}.{Table.FullName}";
 		}
 
-		protected ModelDefine()
+		protected ModelDefinition()
 		{
 		}
 	}
 
-	public class ModelDefine<T> : ModelDefine
+	public class ModelDefinition<T> : ModelDefinition
 	{
-		public ModelDefine()
+		public ModelDefinition()
 		{
 			var type = typeof(T);
 
@@ -128,10 +128,10 @@ namespace DotnetSpider.Extraction.Model
 
 			var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
-			var fields = new HashSet<Field>();
+			var fields = new HashSet<FieldSelector>();
 			foreach (var property in properties)
 			{
-				var field = property.GetCustomAttributes(typeof(Field), true).FirstOrDefault() as Field;
+				var field = property.GetCustomAttributes(typeof(FieldSelector), true).FirstOrDefault() as FieldSelector;
 
 				if (field == null)
 				{
@@ -149,17 +149,17 @@ namespace DotnetSpider.Extraction.Model
 			}
 
 			Selector = selector;
-			TableInfo = tableInfo;
+			Table = tableInfo;
 
 			Fields = fields;
-			TargetUrlsSelectors = targetUrlsSelectors;
+			TargetRequestSelectors = targetUrlsSelectors;
 			SharedValueSelectors = sharedValueSelectors;
 			Take = take;
 			TakeFromHead = takeFromHead;
 
-			if (TableInfo != null)
+			if (Table != null)
 			{
-				Identity = $"{TableInfo.Database}.{TableInfo.FullName}";
+				Identity = $"{Table.Database}.{Table.FullName}";
 			}
 			else
 			{
@@ -170,7 +170,7 @@ namespace DotnetSpider.Extraction.Model
 
 			if (columns.Count == 0)
 			{
-				throw new ModelException($"Columns is necessary for {name}");
+				throw new ArgumentException($"Columns is necessary for {name}");
 			}
 
 			if (tableInfo != null)
@@ -181,13 +181,13 @@ namespace DotnetSpider.Extraction.Model
 					{
 						if (columns.All(c => c.Name != column))
 						{
-							throw new ModelException("Columns set to update are not a property of your entity");
+							throw new ArgumentException("Columns set to update are not a property of your entity");
 						}
 					}
 
 					if (tableInfo.UpdateColumns.Length == 0)
 					{
-						throw new ModelException("There is no column need update");
+						throw new ArgumentException("There is no column need update");
 					}
 				}
 
@@ -200,7 +200,7 @@ namespace DotnetSpider.Extraction.Model
 
 						if (items.Count == 0)
 						{
-							throw new ModelException("Index should contain more than a column");
+							throw new ArgumentException("Index should contain more than a column");
 						}
 
 						foreach (var item in items)
@@ -208,12 +208,12 @@ namespace DotnetSpider.Extraction.Model
 							var column = columns.FirstOrDefault(c => c.Name == item);
 							if (column == null)
 							{
-								throw new ModelException("Columns set as index are not a property of your entity");
+								throw new ArgumentException("Columns set as index are not a property of your entity");
 							}
 
 							if (column.DataType == DataType.String && (column.Length <= 0 || column.Length > 256))
 							{
-								throw new ModelException("Column length of index should not large than 256");
+								throw new ArgumentException("Column length of index should not large than 256");
 							}
 						}
 
@@ -230,7 +230,7 @@ namespace DotnetSpider.Extraction.Model
 
 						if (items.Count == 0)
 						{
-							throw new ModelException("Unique should contain more than a column");
+							throw new ArgumentException("Unique should contain more than a column");
 						}
 
 						foreach (var item in items)
@@ -238,12 +238,12 @@ namespace DotnetSpider.Extraction.Model
 							var column = columns.FirstOrDefault(c => c.Name == item);
 							if (column == null)
 							{
-								throw new ModelException("Columns set as unique are not a property of your entity");
+								throw new ArgumentException("Columns set as unique are not a property of your entity");
 							}
 
 							if (column.DataType == DataType.String && (column.Length <= 0 || column.Length > 256))
 							{
-								throw new ModelException("Column length of unique should not large than 256");
+								throw new ArgumentException("Column length of unique should not large than 256");
 							}
 						}
 

@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using DotnetSpider.Extraction.Model;
-using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Common;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -52,14 +51,14 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected abstract void InitDatabaseAndTable(IDbConnection conn, IModel model);
 
-		protected override int Process(IModel model, IEnumerable<dynamic> datas, ILogger logger, dynamic sender)
+		protected override int Process(IModel model, IList<dynamic> datas, ILogger logger, dynamic sender = null)
 		{
-			if (datas == null || datas.Count() == 0)
+			if (datas == null || datas.Count == 0)
 			{
 				return 0;
 			}
 
-			if (model.TableInfo == null)
+			if (model.Table == null)
 			{
 				return 0;
 			}
@@ -73,7 +72,7 @@ namespace DotnetSpider.Extension.Pipeline
 					conn = RefreshConnectionString(logger);
 
 					// 每天执行一次建表操作, 可以实现每天一个表的操作，或者按周分表可以在运行时创建新表。
-					var key = model.TableInfo.Postfix != TableNamePostfix.None ? $"{model.Identity}_{DateTime.Now:yyyyMMdd}" : model.Identity;
+					var key = model.Table.Postfix != TableNamePostfix.None ? $"{model.Identity}_{DateTime.Now:yyyyMMdd}" : model.Identity;
 					Sqls sqls;
 					lock (this)
 					{

@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 
 namespace DotnetSpider.Extension.Downloader
@@ -12,31 +13,31 @@ namespace DotnetSpider.Extension.Downloader
 		/// <summary>
 		/// 所属爬虫的唯一标识
 		/// </summary>
-		[Field(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
+		[FieldSelector(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
 		public string Identity { get; set; }
 
 		/// <summary>
 		/// 所属爬虫的任务编号
 		/// </summary>
-		[Field(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
+		[FieldSelector(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
 		public string TaskId { get; set; }
 
 		/// <summary>
 		/// 所属爬虫的名称
 		/// </summary>
-		[Field(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
+		[FieldSelector(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// 采集的链接
 		/// </summary>
-		[Field(Expression = "", Type = SelectorType.Enviroment, Length = 255)]
+		[FieldSelector(Expression = "", Type = SelectorType.Enviroment, Length = 255)]
 		public string Url { get; set; }
 
 		/// <summary>
 		/// 下载的内容
 		/// </summary>
-		[Field(Expression = "", Type = SelectorType.Enviroment)]
+		[FieldSelector(Expression = "", Type = SelectorType.Enviroment)]
 		public string Content { get; set; }
 	}
 }

@@ -12,6 +12,6 @@ namespace DotnetSpider.Extension.Pipeline
 		/// </summary>
 		/// <param name="entityName">实体名称</param>
 		/// <returns>数据结果</returns>
-		IEnumerable<dynamic> GetCollection(string entityName);
+		IList<dynamic> GetCollection(string entityName);
 	}
 }

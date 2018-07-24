@@ -17,11 +17,6 @@ namespace DotnetSpider.Core
 	public static class Env
 	{
 		/// <summary>
-		/// TODO: 原则上此版本号与Nuget包版本号同步, 但是不知道有什么好的自动化更新方法
-		/// </summary>
-		public const string Version = "2.0.21";
-
-		/// <summary>
 		/// 从配置文件中读取默认Redis连接字符串的关键字
 		/// </summary>
 		private const string RedisConnectStringKey = "redisConnectString";

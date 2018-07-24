@@ -16,7 +16,7 @@ namespace DotnetSpider.Sample.docs
 
 		class Spider : EntitySpider
 		{
-			protected override void MyInit(params string[] arguments)
+			protected override void OnInit(params string[] arguments)
 			{
 				AddStartUrl("http://www.jd.com/allSort.aspx");
 				AddEntityType<Category>();
@@ -28,12 +28,12 @@ namespace DotnetSpider.Sample.docs
 			[EntitySelector(Expression = ".//div[@class='items']//a")]
 			class Category
 			{
-				[Field(Expression = ".")]
+				[FieldSelector(Expression = ".")]
 				public string CategoryName { get; set; }
 
 				[ToNext(Extras = new[] { "CategoryName" })]
 				[RegexAppendFormatter(Pattern = "http://list.jd.com/list.html\\?cat=[0-9]+", AppendValue = "&page=1&trans=1&JL=6_0_0")]
-				[Field(Expression = "./@href")]
+				[FieldSelector(Expression = "./@href")]
 				public string Url { get; set; }
 			}
 
@@ -41,17 +41,17 @@ namespace DotnetSpider.Sample.docs
 			[TargetRequestSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
 			class TmpProduct
 			{
-				[Field(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
+				[FieldSelector(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
 				public string CategoryName { get; set; }
 
 				[ToNext(Extras = new[] { "CategoryName", "Sku", "Name", "Url" })]
-				[Field(Expression = "./div[@class='p-name']/a[1]/@href")]
+				[FieldSelector(Expression = "./div[@class='p-name']/a[1]/@href")]
 				public string Url { get; set; }
 
-				[Field(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
+				[FieldSelector(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
 				public string Name { get; set; }
 
-				[Field(Expression = "./@data-sku", Length = 100)]
+				[FieldSelector(Expression = "./@data-sku", Length = 100)]
 				public string Sku { get; set; }
 			}
 
@@ -59,24 +59,24 @@ namespace DotnetSpider.Sample.docs
 			[TableInfo("jd", "jd_product", Uniques = new[] { "Sku" }, Indexs = new[] { "Sku" })]
 			class JdProduct
 			{
-				[Field(Expression = "Name", Type = SelectorType.Enviroment, Length = 100)]
+				[FieldSelector(Expression = "Name", Type = SelectorType.Enviroment, Length = 100)]
 				public string Name { get; set; }
 
-				[Field(Expression = "Sku", Type = SelectorType.Enviroment, Length = 100)]
+				[FieldSelector(Expression = "Sku", Type = SelectorType.Enviroment, Length = 100)]
 				public string Sku { get; set; }
 
-				[Field(Expression = "Url", Type = SelectorType.Enviroment)]
+				[FieldSelector(Expression = "Url", Type = SelectorType.Enviroment)]
 				public string Url { get; set; }
 
-				[Field(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
+				[FieldSelector(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
 				public string CategoryName { get; set; }
 
-				[Field(Expression = ".//a[@class='name']", Length = 100)]
+				[FieldSelector(Expression = ".//a[@class='name']", Length = 100)]
 				public string ShopName { get; set; }
 
 				[StringFormater(Format = "http:{0}")]
 				[Download]
-				[Field(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src", IgnoreStore = true)]
+				[FieldSelector(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src", IgnoreStore = true)]
 				public string Logo { get; set; }
 			}
 		}

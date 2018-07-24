@@ -12,20 +12,20 @@ namespace DotnetSpider.Extension
 	{
 		public static void Run()
 		{
-			var site = new Site { };
-			var mode = new ModelDefine
+			var site = new Site();
+			var mode = new ModelDefinition
 				(
 				new Selector(".//div[@class='result']"),
 				new[]
 				{
-					new Field("Keyword","Keyword",SelectorType.Enviroment),
-					new Field(".//h3[@class='c-title']/a","Title"),
-					new Field(".//h3[@class='c-title']/a/@href","Url"),
-					new Field(".//div/p[@class='c-author']/text()","Website"),
-					new Field(".//div/span/a[@class='c-cache']/@href","Snapshot"),
-					new Field(".//div[@class='c-summary c-row ']","Details"),
-					new Field(".","PlainText"),
-					new Field( "today","atime", SelectorType.Enviroment,DataType.Date)
+					new FieldSelector("Keyword","Keyword",SelectorType.Enviroment),
+					new FieldSelector(".//h3[@class='c-title']/a","Title"),
+					new FieldSelector(".//h3[@class='c-title']/a/@href","Url"),
+					new FieldSelector(".//div/p[@class='c-author']/text()","Website"),
+					new FieldSelector(".//div/span/a[@class='c-cache']/@href","Snapshot"),
+					new FieldSelector(".//div[@class='c-summary c-row ']","Details"),
+					new FieldSelector(".","PlainText"),
+					new FieldSelector( "today","atime", SelectorType.Enviroment,DataType.Date)
 				}
 				, new TableInfo("baidu", "search"), null);
 			var processor = new ModelProcessor(mode);

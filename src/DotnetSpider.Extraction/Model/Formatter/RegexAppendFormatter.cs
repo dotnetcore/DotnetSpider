@@ -37,12 +37,12 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		{
 			if (string.IsNullOrWhiteSpace(Pattern))
 			{
-				throw new ModelException("Pattern should not be null or empty");
+				throw new ArgumentException("Pattern should not be null or empty");
 			}
 
 			if (string.IsNullOrWhiteSpace(AppendValue))
 			{
-				throw new ModelException("Append should not be null or empty");
+				throw new ArgumentException("Append should not be null or empty");
 			}
 		}
 	}
