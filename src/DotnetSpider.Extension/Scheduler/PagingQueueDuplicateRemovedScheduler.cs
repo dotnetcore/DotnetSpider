@@ -27,7 +27,6 @@ namespace DotnetSpider.Extension.Scheduler
 		private bool _inited;
 
 		protected readonly int Size;
-		protected readonly Site _site;
 
 		private readonly RetryPolicy _retryPolicy = Policy.Handle<Exception>().Retry(10000, (ex, count) =>
 		{
@@ -35,14 +34,13 @@ namespace DotnetSpider.Extension.Scheduler
 		});
 
 
-		public PagingQueueDuplicateRemovedScheduler(string taskName, string identity, Site site, int size, bool reset, string description = null)
+		public PagingQueueDuplicateRemovedScheduler(string taskName, string identity, int size, bool reset, string description = null)
 		{
 			_taskName = taskName;
 			_identity = identity;
 			Size = size;
 			_description = description;
 			_reset = reset;
-			_site = site;
 		}
 
 		protected virtual IDbConnection CreateDbConnection()
@@ -146,7 +144,6 @@ namespace DotnetSpider.Extension.Scheduler
 
 								foreach (var request in requests)
 								{
-									request.Site = request.Site ?? _site;
 									Push(request, null);
 								}
 							}

@@ -48,7 +48,7 @@ namespace DotnetSpider.Core
 		private int _pipelineCachedSize = 1;
 		private RetryPolicy _pipelineRetry;
 		private readonly AutomicLong _requestedCount = new AutomicLong(0);
-		private MemoryMappedFile[] _mmfCloseSignals = new MemoryMappedFile[2];
+		private readonly MemoryMappedFile[] _mmfCloseSignals = new MemoryMappedFile[2];
 		private readonly string[] _filecloseSignals = new string[2];
 		private bool _exited;
 		private IMonitor _monitor;
