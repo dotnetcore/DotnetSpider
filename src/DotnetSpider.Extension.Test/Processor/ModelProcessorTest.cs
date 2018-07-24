@@ -31,7 +31,7 @@ namespace DotnetSpider.Extension.Test.Processor
 			var page = CreatePage();
 			processor.Process(page, null);
 
-			var results = page.ResultItems.GetResultItem(processor.Model.Identity) as Tuple<IModel, IEnumerable<dynamic>>;
+			var results = page.ResultItems.GetResultItem(processor.Model.Identity) as Tuple<IModel, IList<dynamic>>;
 			var model = results.Item2.First() as N;
 			Assert.Equal(100, model.Int);
 			Assert.True(model.Bool);
