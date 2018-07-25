@@ -22,7 +22,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 		public int RetryTimes { get; set; } = 600;
 
-		public string ConnectString { get; private set; }
+		public string ConnectString { get; set; }
 
 		/// <summary>
 		/// 数据库忽略大小写

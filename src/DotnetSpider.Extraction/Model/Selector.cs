@@ -1,10 +1,16 @@
-﻿namespace DotnetSpider.Extraction.Model
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace DotnetSpider.Extraction.Model
 {
 	/// <summary>
 	/// 选择器特性
 	/// </summary>
 	public class Selector : System.Attribute
 	{
+		[JsonIgnore]
+		public override object TypeId => base.TypeId;
+
 		/// <summary>
 		/// 构造方法
 		/// </summary>

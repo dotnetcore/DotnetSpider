@@ -1,5 +1,9 @@
-﻿namespace DotnetSpider.Extraction.Model
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace DotnetSpider.Extraction.Model
 {
+	[JsonConverter(typeof(StringEnumConverter))]
 	public enum TableNamePostfix
 	{
 		None,

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +10,7 @@ namespace DotnetSpider.Extraction.Model
 	/// <summary>
 	/// 额外选项的定义
 	/// </summary>
+	[JsonConverter(typeof(StringEnumConverter))]
 	public enum FieldOptions
 	{
 		/// <summary>

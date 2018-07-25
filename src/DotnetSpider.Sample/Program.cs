@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Core;
+using DotnetSpider.Sample.docs;
 using System.Threading;
 
 namespace DotnetSpider.Sample
@@ -12,7 +13,8 @@ namespace DotnetSpider.Sample
 #else
 			ThreadPool.SetMinThreads(256, 256);
 #endif
-			Startup.Run(args);
+			
+			ModelSpider.Run();
 		}
 
 		/// <summary>

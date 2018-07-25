@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 
 namespace DotnetSpider.Extraction
 {
@@ -6,6 +8,7 @@ namespace DotnetSpider.Extraction
 	/// 查询器类型
 	/// </summary>
 	[Flags]
+	[JsonConverter(typeof(StringEnumConverter))]
 	public enum SelectorType
 	{
 		/// <summary>

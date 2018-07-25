@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Extraction.Model.Attribute;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,7 @@ namespace DotnetSpider.Extraction.Model
 		/// </summary>
 		public IEnumerable<SharedValueSelector> SharedValueSelectors { get; protected set; }
 
+		[JsonIgnore]
 		public string Identity { get; protected set; }
 
 		public ModelDefinition(Selector selector, IEnumerable<FieldSelector> fields, TableInfo table,

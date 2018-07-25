@@ -6,6 +6,7 @@ using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
+using Newtonsoft.Json;
 
 namespace DotnetSpider.Sample.docs
 {
@@ -23,7 +24,7 @@ namespace DotnetSpider.Sample.docs
 			};
 			var targetRequestSelector = new TargetRequestSelector("//ul[@class='yk-pages']");
 			var model = new ModelDefinition(selector, fields, table, targetRequestSelector);
-
+			var json = JsonConvert.SerializeObject(model);
 			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
 			var site = new Site { EncodingName = "UTF-8" };
 			for (int i = 1; i < 5; ++i)

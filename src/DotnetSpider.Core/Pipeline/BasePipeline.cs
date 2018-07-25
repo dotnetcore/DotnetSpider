@@ -6,7 +6,7 @@ namespace DotnetSpider.Core.Pipeline
 	/// <summary>
 	/// 数据管道抽象, 通过数据管道把解析的数据存到不同的存储中(文件、数据库）
 	/// </summary>
-	public abstract class BasePipeline : IPipeline
+	public abstract class BasePipeline : Named, IPipeline
 	{
 		/// <summary>
 		/// 处理页面解析器解析到的数据结果

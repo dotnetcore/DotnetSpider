@@ -144,7 +144,7 @@ namespace DotnetSpider.Core
 		public Site Site
 		{
 			get => _site;
-			protected set { _site = value ?? throw new ArgumentException($"{nameof(Site)} should not be null."); }
+			set { _site = value ?? throw new ArgumentException($"{nameof(Site)} should not be null."); }
 		}
 
 		/// <summary>

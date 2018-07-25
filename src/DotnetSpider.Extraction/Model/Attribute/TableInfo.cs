@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace DotnetSpider.Extraction.Model.Attribute
 {
@@ -9,6 +10,9 @@ namespace DotnetSpider.Extraction.Model.Attribute
 	public class TableInfo : System.Attribute
 	{
 		private string _name;
+
+		[JsonIgnore]
+		public override object TypeId => base.TypeId;
 
 		/// <summary>
 		/// 数据库名

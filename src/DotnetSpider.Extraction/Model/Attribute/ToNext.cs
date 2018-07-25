@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace DotnetSpider.Extraction.Model.Attribute
 {
@@ -8,6 +9,9 @@ namespace DotnetSpider.Extraction.Model.Attribute
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class ToNext : System.Attribute
 	{
+		[JsonIgnore]
+		public override object TypeId => base.TypeId;
+
 		/// <summary>
 		/// 保存到起始链接的额外信息
 		/// </summary>

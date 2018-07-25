@@ -1,0 +1,88 @@
+﻿{
+  "Model": {
+    "Selector": {
+      "Type": "XPath",
+      "Expression": "//div[@class='yk-pack pack-film']",
+      "Arguments": null
+    },
+    "Take": 0,
+    "TakeFromHead": true,
+    "Table": {
+      "Database": "youku",
+      "Name": "show",
+      "Postfix": "Today",
+      "UpdateColumns": null,
+      "Indexs": null,
+      "Uniques": null,
+      "FullName": "show_2018_07_25"
+    },
+    "Fields": [
+      {
+        "NotNull": false,
+        "Option": "None",
+        "Length": 255,
+        "Name": "name",
+        "IgnoreStore": false,
+        "DataType": "String",
+        "IsPrimary": false,
+        "Formatters": null,
+        "Type": "XPath",
+        "Expression": ".//img[@class='quic']/@alt",
+        "Arguments": null
+      },
+      {
+        "NotNull": false,
+        "Option": "None",
+        "Length": 255,
+        "Name": "index",
+        "IgnoreStore": false,
+        "DataType": "Int",
+        "IsPrimary": false,
+        "Formatters": null,
+        "Type": "Enviroment",
+        "Expression": "index",
+        "Arguments": null
+      },
+      {
+        "NotNull": false,
+        "Option": "None",
+        "Length": 255,
+        "Name": "id",
+        "IgnoreStore": false,
+        "DataType": "Int",
+        "IsPrimary": true,
+        "Formatters": null,
+        "Type": "Enviroment",
+        "Expression": "",
+        "Arguments": null
+      }
+    ],
+    "TargetRequestSelectors": [
+      {
+        "XPaths": [ "//ul[@class='yk-pages']" ],
+        "Patterns": [ "(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?" ]
+      }
+    ],
+    "SharedValueSelectors": null
+  },
+  "Scheduler": {
+    "Name": "QueueDuplicateRemovedScheduler"
+  },
+  "Downloader": {
+    "Name": "HttpClientDownloader",
+    "AllowAutoRedirect": true
+  },
+  "Pipeline": {
+    "Name": "MySqlEntityPipeline",
+    "ConnectString": "Database='mysql';Data Source=localhost;password=;User ID=root;Port=3306;SslMode=None"
+  },
+  "ClearSchedulerAfterCompleted": true,
+  "StatusFlushInterval": 5000,
+  "PipelineRetryTimes": 2,
+  "PipelineCachedSize": 5,
+  "RedialExecutor": "MutexRedialExecutor",
+  "EmptySleepTime": 15000,
+  "ExitWhenComplete": true,
+  "ThreadNum": 1,
+  "SkipTargetRequestsWhenResultIsEmpty": true
+}

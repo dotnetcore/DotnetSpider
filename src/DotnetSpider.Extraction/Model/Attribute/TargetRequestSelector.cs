@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace DotnetSpider.Extraction.Model.Attribute
 {
@@ -8,6 +9,9 @@ namespace DotnetSpider.Extraction.Model.Attribute
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 	public class TargetRequestSelector : System.Attribute
 	{
+		[JsonIgnore]
+		public override object TypeId => base.TypeId;
+
 		public TargetRequestSelector() { }
 
 		public TargetRequestSelector(string[] xpaths, string[] patterns = null)
