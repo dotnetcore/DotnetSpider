@@ -9,4 +9,10 @@
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TextFile1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

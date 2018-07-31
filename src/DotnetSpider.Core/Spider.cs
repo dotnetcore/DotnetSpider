@@ -1289,7 +1289,7 @@ namespace DotnetSpider.Core
 
 		protected virtual bool ShouldReserved(Request request)
 		{
-			return request.CycleTriedTimes <= Site.CycleRetryTimes;
+			return request != null && request.CycleTriedTimes > 0 && request.CycleTriedTimes <= Site.CycleRetryTimes;
 		}
 
 		/// <summary>

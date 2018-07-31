@@ -13,7 +13,8 @@ namespace DotnetSpider.Broker
 		{
 			var config = new Dictionary<string, object>
 			{
-				{ "bootstrap.servers", "192.168.90.106:9092" }
+				{ "bootstrap.servers", "192.168.90.106:9092" },
+				{"socket.blocking.max.ms", 1}
 			};
 
 			using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -48,23 +49,20 @@ namespace DotnetSpider.Extraction
 			}
 
 			var type = (Type)text.GetType();
-			string tmp = "";
-#if NETSTANDARD20
-			if (typeof(ICollection).GetTypeInfo().IsAssignableFrom(type))
-#else
-			if (typeof(ICollection).IsAssignableFrom(type))
-#endif
+			StringBuilder builder = new StringBuilder();
+			if (typeof(IEnumerable).IsAssignableFrom(type))
 			{
 				foreach (var l in (IEnumerable)text)
 				{
-					tmp += l.ToString();
+					builder.Append(GetElementContent(l));
 				}
 			}
 			else
 			{
-				tmp = text is string ? text : text.ToString();
+				builder.Append(GetElementContent(text));
 			}
-			Match match = _regex.Match(tmp);
+
+			Match match = _regex.Match(builder.ToString());
 			if (match.Success)
 			{
 				return match.Groups.Count > _group ? match.Groups[_group].Value : null;
@@ -85,24 +83,25 @@ namespace DotnetSpider.Extraction
 			}
 
 			var type = (Type)text.GetType();
+
 			StringBuilder builder = new StringBuilder();
 
 			if (typeof(IEnumerable).IsAssignableFrom(type))
 			{
 				foreach (var l in (IEnumerable)text)
 				{
-					builder.Append(l);
+					builder.Append(GetElementContent(l));
 				}
 			}
 			else
 			{
-				builder.Append(text);
+				builder.Append(GetElementContent(text));
 			}
 
-			var matches = _regex.Matches(text);
+			var matches = _regex.Matches(builder.ToString());
 
 			List<dynamic> results = new List<dynamic>();
-			foreach (var match in matches)
+			foreach (Match match in matches)
 			{
 				if (match.Groups.Count > _group)
 				{
@@ -117,5 +116,22 @@ namespace DotnetSpider.Extraction
 		/// </summary>
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString() => _pattern;
+
+		private string GetElementContent(dynamic el)
+		{
+			if (el is string)
+			{
+				return el;
+			}
+			if (el is HtmlDocument)
+			{
+				return ((HtmlDocument)el).DocumentNode.InnerHtml;
+			}
+			if (el is HtmlNode)
+			{
+				return ((HtmlNode)el).InnerHtml;
+			}
+			return el.ToString();
+		}
 	}
 }
