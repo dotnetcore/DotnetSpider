@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>SSE Test</title>
+    <script src="js/signalr.js"></script>
+</head>
+<body>
+    <ul id="messagesList"></ul>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/node?cpuCount=8&group=test&ip=192.168.10.146&nodeId=test&os=Windows&totalMemory=16", signalR.HttpTransportType.ServerSentEvents)
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+        connection.start().catch(err => console.error(err.toString()));
+        connection.on("receive", (block) => {
+            const li = document.createElement("li");
+            li.textContent = JSON.stringify(block);
+            document.getElementById("messagesList").appendChild(li);
+        });
+        setInterval(function () {
+            var heartbeat = { nodeid: 'test', cpu: 20, freememory: 16000 };
+            connection.invoke('heartbeat', heartbeat);
+        }, 1000);
+    </script>
+</body>
+</html>

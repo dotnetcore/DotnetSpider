@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Downloader
 	/// <summary>
 	/// 使用 WebDriver 作为下载器
 	/// </summary>
-	public class WebDriverDownloader : BaseDownloader, IBeforeDownloadHandler
+	public class WebDriverDownloader : DotnetSpider.Downloader.Downloader, IBeforeDownloadHandler
 	{
 		private IWebDriver _driver;
 		private readonly int _driverWaitTime;

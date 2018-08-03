@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-#if NETSTANDARD
+#if NETSTANDARD || NETCOREAPP
 using System.Linq;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -97,7 +97,7 @@ namespace DotnetSpider.Downloader.Redial.Redialer
 				Thread.Sleep(2000);
 			}
 		}
-#if NETSTANDARD
+#if NETSTANDARD || NETCOREAPP
 		private void KillPPPOEProcesses()
 		{
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

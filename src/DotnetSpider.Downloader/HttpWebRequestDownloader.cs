@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using DotnetSpider.Common;
 using DotnetSpider.Proxy;
+using LZ4;
 
 namespace DotnetSpider.Downloader
 {
@@ -17,7 +18,7 @@ namespace DotnetSpider.Downloader
 	/// <summary xml:lang="zh-CN">
 	/// 纯HTTP下载器
 	/// </summary>
-	public class HttpWebRequestDownloader : BaseDownloader
+	public class HttpWebRequestDownloader : Downloader
 	{
 		private readonly int _timeout;
 		private readonly bool _decodeHtml;
@@ -181,19 +182,21 @@ namespace DotnetSpider.Downloader
 					httpWebRequest.Headers.Add(header.Key, header.Value);
 				}
 			}
+			// 写入开始后不能再修改此属性
+			httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
 			if (HttpMethod.Post == request.Method)
 			{
-				var bytes = string.IsNullOrEmpty(site.EncodingName)
-					? Encoding.UTF8.GetBytes(request.Content)
-					: Encoding.GetEncoding(site.EncodingName).GetBytes(request.Content);
+				var bytes = CompressContent(request);
+
 				var requestStream = httpWebRequest.GetRequestStream();
 				requestStream.Write(bytes, 0, bytes.Length);
 
 				if (site.Headers.ContainsKey(contentTypeHeader))
 				{
-					httpWebRequest.Headers.Add(contentTypeHeader, site.Headers[contentTypeHeader]);
+					httpWebRequest.ContentType = site.Headers[contentTypeHeader];
 				}
+
 
 				var xRequestedWithHeader = "X-Requested-With";
 				if (site.Headers.ContainsKey(xRequestedWithHeader) && site.Headers[xRequestedWithHeader] == "NULL")
@@ -217,13 +220,8 @@ namespace DotnetSpider.Downloader
 					throw new DownloaderException("No avaliable proxy.");
 				}
 			}
-			else
-			{
-				httpWebRequest.Proxy = null;
-			}
 
 			httpWebRequest.AllowAutoRedirect = AllowAutoRedirect;
-			httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 			httpWebRequest.CookieContainer = CookieContainer;
 			httpWebRequest.Timeout = _timeout;
 

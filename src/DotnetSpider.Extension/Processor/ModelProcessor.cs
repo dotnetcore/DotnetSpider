@@ -38,7 +38,7 @@ namespace DotnetSpider.Extension.Processor
 		public ModelProcessor(IModel model, IModelExtractor extractor = null, ITargetRequestExtractor targetRequestExtractor = null,
 			params IDataHandler[] dataHandlers)
 		{
-			Model = model ?? throw new ArgumentNullException($"{nameof(model)} should not be null.");
+			Model = model ?? throw new ArgumentNullException(nameof(model));
 
 			Extractor = extractor ?? new ModelExtractor();
 

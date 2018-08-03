@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-#if NETSTANDARD
+#if NETSTANDARD || NETCOREAPP
 using System.Runtime.InteropServices;
 #endif
 

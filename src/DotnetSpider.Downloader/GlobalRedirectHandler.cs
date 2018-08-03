@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NET40
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -24,18 +25,10 @@ namespace DotnetSpider.Downloader
 			InnerHandler = innerHandler;
 		}
 
-#if NET40
-		protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-#else
-		protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-#endif
-
+		protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 		{
-#if NET40
-			var response = base.SendAsync(request, cancellationToken).Result;
-#else
 			var response = await base.SendAsync(request, cancellationToken);
-#endif
+
 			if (response.StatusCode == HttpStatusCode.MovedPermanently
 				|| response.StatusCode == HttpStatusCode.Moved
 				|| response.StatusCode == HttpStatusCode.Redirect
@@ -57,19 +50,13 @@ namespace DotnetSpider.Downloader
 				}
 				newRequest.RequestUri = new Uri(response.RequestMessage.RequestUri, response.Headers.Location);
 
-#if NET40
-				return SendAsync(newRequest, cancellationToken);
-#else
 				response = await SendAsync(newRequest, cancellationToken);
-#endif
-			}
-#if NET40
-			return new Task<HttpResponseMessage>(() => response);
-#else
-			return response;
-#endif
 
+			}
+
+			return response;
 		}
+
 
 		private static HttpRequestMessage CopyRequest(HttpRequestMessage oldRequest)
 		{
@@ -88,3 +75,4 @@ namespace DotnetSpider.Downloader
 		}
 	}
 }
+#endif

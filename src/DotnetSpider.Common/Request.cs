@@ -52,6 +52,11 @@ namespace DotnetSpider.Common
 		public string Content { get; set; }
 
 		/// <summary>
+		/// 如果是 POST 请求, 可以设置压缩模式上传数据
+		/// </summary>
+		public CompressMode CompressMode { get; set; }
+
+		/// <summary>
 		/// 站点信息
 		/// </summary>
 		[JsonIgnore]

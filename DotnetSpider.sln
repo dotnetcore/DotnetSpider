@@ -34,17 +34,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AB7EA737-E1B1-416C-8E2C-B820AEBF5CF3}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 		.travis.yml = .travis.yml
 		publishToNuget.bat = publishToNuget.bat
 		README.md = README.md
 		runtests.sh = runtests.sh
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Node", "src\DotnetSpider.Node\DotnetSpider.Node.csproj", "{C2BAD1A6-6744-4927-B014-67647D3FAD58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Worker", "src\DotnetSpider.Worker\DotnetSpider.Worker.csproj", "{C416B779-5018-42AF-A1A5-98186389CCED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Broker", "src\DotnetSpider.Broker\DotnetSpider.Broker.csproj", "{93099A1A-128B-4023-9271-F535A11F2490}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Worker", "src\DotnetSpider.Worker\DotnetSpider.Worker.csproj", "{C416B779-5018-42AF-A1A5-98186389CCED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Broker", "src\DotnetSpider.Broker\DotnetSpider.Broker.csproj", "{9487B3DF-005F-49B5-A42D-3CA397B4133C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -104,18 +103,14 @@ Global
 		{372C7A6F-E1EB-4AA6-8B31-1AE52FBDAA83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{372C7A6F-E1EB-4AA6-8B31-1AE52FBDAA83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{372C7A6F-E1EB-4AA6-8B31-1AE52FBDAA83}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2BAD1A6-6744-4927-B014-67647D3FAD58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2BAD1A6-6744-4927-B014-67647D3FAD58}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2BAD1A6-6744-4927-B014-67647D3FAD58}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2BAD1A6-6744-4927-B014-67647D3FAD58}.Release|Any CPU.Build.0 = Release|Any CPU
-		{93099A1A-128B-4023-9271-F535A11F2490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{93099A1A-128B-4023-9271-F535A11F2490}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{93099A1A-128B-4023-9271-F535A11F2490}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{93099A1A-128B-4023-9271-F535A11F2490}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C416B779-5018-42AF-A1A5-98186389CCED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C416B779-5018-42AF-A1A5-98186389CCED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C416B779-5018-42AF-A1A5-98186389CCED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C416B779-5018-42AF-A1A5-98186389CCED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9487B3DF-005F-49B5-A42D-3CA397B4133C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9487B3DF-005F-49B5-A42D-3CA397B4133C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9487B3DF-005F-49B5-A42D-3CA397B4133C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9487B3DF-005F-49B5-A42D-3CA397B4133C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

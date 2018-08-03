@@ -170,7 +170,7 @@ namespace DotnetSpider.Core.Infrastructure
 				var json = JsonConvert.SerializeObject(logs);
 				httpRequestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-				HttpClientDownloader.Default.SendAsync(httpRequestMessage).Wait();
+				DotnetSpider.Downloader.Downloader.Default.SendAsync(httpRequestMessage).Wait();
 			}
 			catch (Exception ex)
 			{

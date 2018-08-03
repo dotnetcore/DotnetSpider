@@ -1,31 +1,43 @@
-﻿using Confluent.Kafka;
-using Confluent.Kafka.Serialization;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 
 namespace DotnetSpider.Broker
 {
-	class Program
+	public class Program
 	{
-		static void Main(string[] args)
+		public static void Main(string[] args)
 		{
-			var config = new Dictionary<string, object>
-			{
-				{ "bootstrap.servers", "192.168.90.106:9092" },
-				{"socket.blocking.max.ms", 1}
-			};
+			var configurationFile = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ?
+													"appsettings.Development.json" : "appsettings.json";
 
-			using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
-			{
-				for (int i = 0; i < 1000; ++i)
-				{
-					var dr = producer.ProduceAsync("my-topic", null, "test message text").Result;
-					Console.WriteLine($"Delivered '{dr.Value}' to: {dr.TopicPartitionOffset}");
-				}
-			}
-			Console.Read();
+			Log.Logger = new LoggerConfiguration()
+				.MinimumLevel.Information()
+				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+				.WriteTo.RollingFile(Path.Combine(Directory.GetCurrentDirectory(), "{Date}.log"))
+				.WriteTo.Console()
+				.CreateLogger();
+
+			Log.Information("Welcome to DotnetSpider.Broker!");
+
+			var config = new ConfigurationBuilder()
+				.SetBasePath(Directory.GetCurrentDirectory())
+				.AddJsonFile(configurationFile, optional: true)
+				.Build();
+
+			var host = WebHost.CreateDefaultBuilder(args).UseConfiguration(config)
+				.UseContentRoot(Directory.GetCurrentDirectory())
+				.UseStartup<Startup>().UseSerilog().Build();
+			host.Run();
 		}
+
 	}
 }

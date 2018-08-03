@@ -1,4 +1,5 @@
-﻿using DotnetSpider.Common;
+﻿#if !NET40
+using DotnetSpider.Common;
 using DotnetSpider.Proxy;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 
+[assembly: InternalsVisibleTo("DotnetSpider.Node")]
 namespace DotnetSpider.Downloader
 {
 	/// <summary>
@@ -21,7 +23,7 @@ namespace DotnetSpider.Downloader
 	/// <summary xml:lang="zh-CN">
 	/// 纯HTTP下载器
 	/// </summary>
-	public class HttpClientDownloader : BaseDownloader
+	public class HttpClientDownloader : Downloader
 	{
 		class HttpClientObject : IDisposable
 		{
@@ -46,16 +48,6 @@ namespace DotnetSpider.Downloader
 		private int _getHttpClientCount;
 		private readonly Dictionary<string, HttpClientObject> _pool = new Dictionary<string, HttpClientObject>();
 		private HttpClientObject _clientObject;
-		private readonly static HttpClientHandler httpMessageHandler = new HttpClientHandler
-		{
-			AllowAutoRedirect = true,
-			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-			UseProxy = true,
-			UseCookies = true,
-			MaxAutomaticRedirections = 10
-		};
-
-		public readonly static HttpClient Default = new HttpClient(httpMessageHandler);
 
 		/// <summary>
 		/// Constructor
@@ -186,7 +178,7 @@ namespace DotnetSpider.Downloader
 			base.AddCookie(cookie);
 			if (HttpProxyPool.Instance != null)
 			{
-				httpMessageHandler.CookieContainer.Add(cookie);
+				HttpMessageHandler.CookieContainer.Add(cookie);
 			}
 			else
 			{
@@ -241,11 +233,10 @@ namespace DotnetSpider.Downloader
 					UseProxy = true,
 					UseCookies = true,
 					AllowAutoRedirect = false,
-					MaxAutomaticRedirections = 10,
 					Proxy = proxy,
 					CookieContainer = CopyCookieContainer()
 				};
-				var item = new HttpClientObject(handler, allowAutoRedirect);
+				var item = new HttpClientObject(handler, allowAutoRedirect) { LastUseTime = DateTime.Now };
 				_pool.Add(hash, item);
 				return item;
 			}
@@ -310,8 +301,8 @@ namespace DotnetSpider.Downloader
 
 			if (request.Method == HttpMethod.Post)
 			{
-				var data = string.IsNullOrWhiteSpace(request.Site.EncodingName) ? Encoding.UTF8.GetBytes(request.Content) : Encoding.GetEncoding(request.Site.EncodingName).GetBytes(request.Content);
-				httpRequestMessage.Content = new StreamContent(new MemoryStream(data));
+				var bytes = CompressContent(request);
+				httpRequestMessage.Content = new ByteArrayContent(bytes);
 
 				if (request.Site.Headers.ContainsKey(contentTypeHeader))
 				{
@@ -346,3 +337,4 @@ namespace DotnetSpider.Downloader
 		}
 	}
 }
+#endif

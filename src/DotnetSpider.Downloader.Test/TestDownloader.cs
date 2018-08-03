@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Downloader.Test
 {
-	public class TestDownloader : BaseDownloader
+	public class TestDownloader : Downloader
 	{
 		protected override Response DowloadContent(Request request)
 		{

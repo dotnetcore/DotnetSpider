@@ -11,7 +11,7 @@ namespace DotnetSpider.Downloader
 	/// <summary xml:lang="zh-CN">
 	/// 从本地文件中下载内容
 	/// </summary>
-	public class FileDownloader : BaseDownloader
+	public class FileDownloader : Downloader
 	{
 		/// <summary>
 		/// Download from local filesystem.

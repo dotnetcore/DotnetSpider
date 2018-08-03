@@ -6,7 +6,7 @@ using DotnetSpider.Common;
 
 namespace DotnetSpider.Downloader
 {
-	public class FakeDownloader : BaseDownloader
+	public class FakeDownloader : Downloader
 	{
 		private readonly string _content;
 

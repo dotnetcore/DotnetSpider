@@ -61,7 +61,7 @@ namespace DotnetSpider.Extension.Test
 			}
 		}
 
-		private class TestDownloader : BaseDownloader
+		private class TestDownloader : DotnetSpider.Downloader.Downloader
 		{
 			protected override Response DowloadContent(Request request)
 			{

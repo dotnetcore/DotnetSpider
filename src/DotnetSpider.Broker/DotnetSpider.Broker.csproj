@@ -1,16 +1,37 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Confluent.Kafka" Version="0.11.5" />
+    <Folder Include="Services\SqlServer\" />
+    <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.50.5" />
+    <PackageReference Include="lz4net" Version="1.0.15.93" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="MySqlConnector" Version="0.43.0" />
+    <PackageReference Include="Serilog" Version="2.7.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Common\DotnetSpider.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

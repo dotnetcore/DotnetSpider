@@ -42,7 +42,7 @@ namespace DotnetSpider.Core.Pipeline
 		{
 			if (sender == null)
 			{
-				throw new ArgumentNullException($"{nameof(sender)} is null.");
+				throw new ArgumentNullException(nameof(sender));
 			}
 			if (_dataFolderCache.ContainsKey(sender.Identity))
 			{

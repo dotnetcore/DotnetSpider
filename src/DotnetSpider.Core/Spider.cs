@@ -37,7 +37,7 @@ namespace DotnetSpider.Core
 	{
 		private Site _site = new Site();
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
-		private IDownloader _downloader = new HttpClientDownloader();
+		private IDownloader _downloader;
 		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
 		private bool _inited;
@@ -256,7 +256,7 @@ namespace DotnetSpider.Core
 			set
 			{
 				CheckIfRunning();
-				_scheduler = value ?? throw new ArgumentNullException($"{nameof(Scheduler)} should not be null.");
+				_scheduler = value ?? throw new ArgumentNullException(nameof(Scheduler));
 			}
 		}
 
@@ -300,7 +300,7 @@ namespace DotnetSpider.Core
 			set
 			{
 				CheckIfRunning();
-				_downloader = value ?? throw new ArgumentNullException($"{nameof(Downloader)} should not be null.");
+				_downloader = value ?? throw new ArgumentNullException(nameof(Downloader));
 			}
 		}
 
@@ -493,7 +493,7 @@ namespace DotnetSpider.Core
 		{
 			if (builder == null)
 			{
-				throw new ArgumentNullException($"{nameof(builder)} should not be null.");
+				throw new ArgumentNullException(nameof(builder));
 			}
 
 			CheckIfRunning();
@@ -532,7 +532,7 @@ namespace DotnetSpider.Core
 		{
 			if (urls == null)
 			{
-				throw new ArgumentNullException($"{nameof(urls)} should not be null.");
+				throw new ArgumentNullException(nameof(urls));
 			}
 
 			return AddStartUrls(urls.AsEnumerable());
@@ -547,7 +547,7 @@ namespace DotnetSpider.Core
 		{
 			if (urls == null)
 			{
-				throw new ArgumentNullException($"{nameof(urls)} should not be null.");
+				throw new ArgumentNullException(nameof(urls));
 			}
 
 			CheckIfRunning();
@@ -574,7 +574,7 @@ namespace DotnetSpider.Core
 		{
 			if (requests == null)
 			{
-				throw new ArgumentNullException($"{nameof(requests)} should not be null.");
+				throw new ArgumentNullException(nameof(requests));
 			}
 
 			return AddStartRequests(requests.AsEnumerable());
@@ -589,7 +589,7 @@ namespace DotnetSpider.Core
 		{
 			if (requests == null)
 			{
-				throw new ArgumentNullException($"{nameof(requests)} should not be null.");
+				throw new ArgumentNullException(nameof(requests));
 			}
 
 			CheckIfRunning();
@@ -616,7 +616,7 @@ namespace DotnetSpider.Core
 		{
 			if (processors == null)
 			{
-				throw new ArgumentNullException($"{nameof(processors)} should not be null.");
+				throw new ArgumentNullException(nameof(processors));
 			}
 
 			return AddPageProcessors(processors.AsEnumerable());
@@ -663,7 +663,7 @@ namespace DotnetSpider.Core
 		{
 			if (pipelines == null)
 			{
-				throw new ArgumentNullException($"{nameof(pipelines)} should not be null.");
+				throw new ArgumentNullException(nameof(pipelines));
 			}
 
 			return AddPipelines(pipelines.AsEnumerable());
@@ -678,7 +678,7 @@ namespace DotnetSpider.Core
 		{
 			if (pipelines == null)
 			{
-				throw new ArgumentNullException($"{nameof(pipelines)} should not be null.");
+				throw new ArgumentNullException(nameof(pipelines));
 			}
 
 			CheckIfRunning();
@@ -982,8 +982,11 @@ namespace DotnetSpider.Core
 				ResetScheduler();
 			}
 
+#if !NET40
 			Downloader = Downloader ?? new HttpClientDownloader();
-
+#else
+			Downloader = Downloader ?? new HttpWebRequestDownloader();
+#endif
 			if (PageProcessors == null || PageProcessors.Count == 0)
 			{
 				throw new ArgumentException("There is no usable pipeline.");

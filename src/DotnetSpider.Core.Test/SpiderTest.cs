@@ -250,7 +250,7 @@ namespace DotnetSpider.Core.Test
 			Assert.Contains("http://ent.163.com/", results);
 		}
 
-		internal class TestDownloader : BaseDownloader
+		internal class TestDownloader : DotnetSpider.Downloader.Downloader
 		{
 			protected override Response DowloadContent(Request request)
 			{
@@ -266,7 +266,7 @@ namespace DotnetSpider.Core.Test
 			}
 		}
 
-		internal class FileDownloader : BaseDownloader
+		internal class FileDownloader : DotnetSpider.Downloader.Downloader
 		{
 			protected override Response DowloadContent(Request request)
 			{

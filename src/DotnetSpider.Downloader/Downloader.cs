@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using DotnetSpider.Common;
+using LZ4;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.Downloader
@@ -14,12 +16,23 @@ namespace DotnetSpider.Downloader
 	/// <summary xml:lang="zh-CN">
 	/// 基础下载器的抽象
 	/// </summary>
-	public abstract class BaseDownloader : IDownloader
+	public abstract class Downloader : IDownloader
 	{
 		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
 		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
 		private bool _injectedCookies;
 		private readonly string _downloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "downloads");
+
+		public readonly static HttpClientHandler HttpMessageHandler = new HttpClientHandler
+		{
+			AllowAutoRedirect = true,
+			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
+			UseProxy = true,
+			UseCookies = true,
+			MaxAutomaticRedirections = 10
+		};
+
+		public readonly static HttpClient Default = new HttpClient(HttpMessageHandler);
 
 		/// <summary>
 		/// Cookie Container
@@ -139,6 +152,10 @@ namespace DotnetSpider.Downloader
 		/// <returns>下载内容封装好的页面对象 (a <see cref="Response"/> instance that contains requested page infomations, like Html source, headers, etc.)</returns>
 		public Response Download(Request request)
 		{
+			if (request.Site == null)
+			{
+				request.Site = new Site();
+			}
 			lock (this)
 			{
 				if (!_injectedCookies && CookieInjector != null)
@@ -153,6 +170,11 @@ namespace DotnetSpider.Downloader
 			return response;
 		}
 
+		internal Response Download(string url)
+		{
+			return Download(new Request(url));
+		}
+
 		protected virtual string ReadContent(byte[] contentBytes, string characterSet, Site site)
 		{
 			if (string.IsNullOrEmpty(site.EncodingName))
@@ -162,6 +184,31 @@ namespace DotnetSpider.Downloader
 			}
 
 			return Encoding.GetEncoding(site.EncodingName).GetString(contentBytes, 0, contentBytes.Length);
+		}
+
+		protected virtual byte[] CompressContent(Request request)
+		{
+			var encoding = string.IsNullOrEmpty(request.Site.EncodingName) ? Encoding.UTF8 : Encoding.GetEncoding(request.Site.EncodingName);
+			var bytes = encoding.GetBytes(request.Content);
+
+			switch (request.CompressMode)
+			{
+				case CompressMode.Lz4:
+					{
+						bytes = LZ4Codec.Wrap(bytes);
+						break;
+					}
+				case CompressMode.None:
+					{
+						break;
+					}
+				default:
+					{
+						throw new NotImplementedException(request.CompressMode.ToString());
+					}
+			}
+
+			return bytes;
 		}
 
 		protected void StorageFile(Request request, byte[] bytes)

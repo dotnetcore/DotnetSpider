@@ -44,7 +44,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpClientDownloader.Default.GetAsync($"{Env.HubServiceTaskApiUrl}/{taskId}?action=increase").Result;
+						var response = DotnetSpider.Downloader.Downloader.Default.GetAsync($"{Env.HubServiceTaskApiUrl}/{taskId}?action=increase").Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});
@@ -81,7 +81,7 @@ namespace DotnetSpider.Core
 				{
 					NetworkCenter.Current.Execute("executeRecord", () =>
 					{
-						var response = HttpClientDownloader.Default.GetAsync($"{Env.HubServiceTaskApiUrl}/{taskId}?action=reduce").Result;
+						var response = DotnetSpider.Downloader.Downloader.Default.GetAsync($"{Env.HubServiceTaskApiUrl}/{taskId}?action=reduce").Result;
 						response.EnsureSuccessStatusCode();
 					});
 				});

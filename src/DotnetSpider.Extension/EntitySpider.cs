@@ -13,7 +13,7 @@ namespace DotnetSpider.Extension
 	/// </summary>
 	public abstract class EntitySpider : DistributedSpider
 	{
-		protected bool UseEntityModelExtrator { get; set; } = true;
+		protected bool UseEntityModelExtractor { get; set; } = true;
 
 		/// <summary>
 		/// 构造方法
@@ -89,7 +89,7 @@ namespace DotnetSpider.Extension
 		{
 			CheckIfRunning();
 
-			var processor = new EntityProcessor<T>(UseEntityModelExtrator ? null : new ModelExtractor(), targetUrlsExtractor, dataHandler);
+			var processor = new EntityProcessor<T>(UseEntityModelExtractor ? null : new ModelExtractor(), targetUrlsExtractor, dataHandler);
 			AddPageProcessors(processor);
 		}
 

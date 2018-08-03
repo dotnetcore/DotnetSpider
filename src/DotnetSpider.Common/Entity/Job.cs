@@ -1,4 +1,4 @@
-﻿namespace DotnetSpider.Common
+﻿namespace DotnetSpider.Common.Entity
 {
 	public class Job
 	{

@@ -9,7 +9,9 @@
 
 project.lock.json
 
-nugetpack.sh
+*.log
+
+nodeid
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

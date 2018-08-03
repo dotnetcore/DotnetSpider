@@ -75,6 +75,7 @@ namespace DotnetSpider.Common
 		/// </summary>
 		public List<string> ExcludeMediaTypes = new List<string>
 		{
+			"",
 			"text/html",
 			"text/plain",
 			"text/richtext",
