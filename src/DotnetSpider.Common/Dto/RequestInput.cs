@@ -38,6 +38,6 @@ namespace DotnetSpider.Common.Dto
 		/// <summary>
 		/// 请求结果状态码
 		/// </summary>
-		public int HttpStatusCode { get; set; }
+		public int StatusCode { get; set; }
 	}
 }

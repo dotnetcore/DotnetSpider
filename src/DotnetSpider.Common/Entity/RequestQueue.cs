@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace DotnetSpider.Common
 {
@@ -8,23 +9,24 @@ namespace DotnetSpider.Common
 	public class RequestQueue
 	{
 		/// <summary>
-		/// 自增记录编号
-		/// </summary>
-		public long Id { get; set; }
-
-		/// <summary>
 		/// Request 唯一标识
 		/// </summary>
+		[Key]
+		[StringLength(32)]
 		public string RequestId { get; set; }
 
 		/// <summary>
 		/// 任务实例唯一标识
 		/// </summary>
+		[Key]
+		[StringLength(32)]
 		public string Identity { get; set; }
 
 		/// <summary>
 		/// 请求所属块
 		/// </summary>
+		[Required]
+		[StringLength(32)]
 		public string BlockId { get; set; }
 
 		/// <summary>
@@ -40,7 +42,7 @@ namespace DotnetSpider.Common
 		/// <summary>	
 		/// 请求结果编码
 		/// </summary>
-		public int HttpStatusCode { get; set; }
+		public int StatusCode { get; set; }
 
 		/// <summary>
 		/// 创建时间
@@ -50,7 +52,7 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 完成时间
 		/// </summary>
-		public DateTime ResponseTime { get; set; }
+		public DateTime? ResponseTime { get; set; }
 
 		/// <summary>
 		/// 解析时间

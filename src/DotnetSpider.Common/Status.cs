@@ -1,9 +1,13 @@
-﻿namespace DotnetSpider.Core
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace DotnetSpider.Common
 {
 	/// <summary>
 	/// 爬虫状态
 	/// </summary>
 	[System.Flags]
+	[JsonConverter(typeof(StringEnumConverter))]
 	public enum Status
 	{
 		/// <summary>

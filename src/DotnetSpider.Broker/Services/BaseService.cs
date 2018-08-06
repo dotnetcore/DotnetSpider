@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Extensions.Logging;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,10 +12,12 @@ namespace DotnetSpider.Broker.Services
 	public abstract class BaseService
 	{
 		protected readonly BrokerOptions _options;
+		protected readonly ILogger _logger;
 
-		protected BaseService(BrokerOptions options)
+		protected BaseService(BrokerOptions options, ILogger<BaseService> logger)
 		{
 			_options = options;
+			_logger = logger;
 		}
 
 		protected IDbConnection CreateDbConnection()
@@ -32,5 +35,11 @@ namespace DotnetSpider.Broker.Services
 			}
 			throw new NotSupportedException($"notsupported storage {_options.StorageType}.");
 		}
+
+		protected virtual string LeftEscapeSql => "[";
+
+		protected virtual string RightEscapeSql => "]";
+
+		protected virtual string GetDateSql => "GETDATE()";
 	}
 }

@@ -1,7 +1,15 @@
 ﻿namespace DotnetSpider.Common.Entity
 {
+	/// <summary>
+	/// 任务
+	/// </summary>
 	public class Job
 	{
+		/// <summary>
+		/// 任务标识
+		/// </summary>
+		public virtual string Id { get; set; }
+
 		/// <summary>
 		/// 任务名称
 		/// </summary>

@@ -43,7 +43,7 @@ namespace DotnetSpider.Core.Test
 			scheduler.Push(new Request("http://www.b.com") { Site = site }, null);
 
 			var request = scheduler.Poll();
-			Assert.Equal("http://www.b.com", request.Url.ToString());
+			Assert.Equal("http://www.b.com/", request.Url.ToString());
 
 			long left = scheduler.LeftRequestsCount;
 			long total = scheduler.TotalRequestsCount;
@@ -64,7 +64,7 @@ namespace DotnetSpider.Core.Test
 			scheduler.Push(new Request("http://www.b.com", null) { Site = site }, null);
 
 			var request = scheduler.Poll();
-			Assert.Equal("http://www.a.com", request.Url.ToString());
+			Assert.Equal("http://www.a.com/", request.Url.ToString());
 
 			long left = scheduler.LeftRequestsCount;
 			long total = scheduler.TotalRequestsCount;

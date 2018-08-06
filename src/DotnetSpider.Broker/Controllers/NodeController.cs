@@ -32,7 +32,7 @@ namespace DotnetSpider.Broker.Controllers
 		public async Task Unregister(string nodeId)
 		{
 			_logger.LogInformation($"{GetRemoveIpAddress()} disconnected.");
-			await _nodeService.RemoveNode(nodeId);
+			await _nodeService.Remove(nodeId);
 		}
 
 		[HttpPost("Heartbeat")]
@@ -42,15 +42,15 @@ namespace DotnetSpider.Broker.Controllers
 			if (ModelState.IsValid)
 			{
 				await _nodeService.Heartbeat(heartbeat);
-				var output = await _blockService.Pull(heartbeat);
+				var output = await _blockService.Pop(heartbeat);
 				result = new JsonResult(output);
 			}
 
 			return result;
 		}
 
-		[HttpPost("Blockinput")]
-		public async Task<IActionResult> Blockinput()
+		[HttpPost("Block")]
+		public async Task<IActionResult> Block()
 		{
 			var bytes = HttpContext.Request.Body.ToBytes();
 			var json = Encoding.UTF8.GetString(LZ4Codec.Unwrap(bytes));
@@ -58,7 +58,7 @@ namespace DotnetSpider.Broker.Controllers
 			IActionResult result = BadRequest();
 			if (TryValidateModel(input))
 			{
-				await _blockService.Push(input);
+				await _blockService.Callback(input);
 				result = Ok();
 			}
 

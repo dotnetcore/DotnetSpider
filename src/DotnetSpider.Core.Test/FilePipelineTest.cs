@@ -39,7 +39,7 @@ namespace DotnetSpider.Core.Test
 			filePipeline.Process(new[] { _resultItems }, spider.Logger, spider);
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
-			string expected = $"url:\thttp://www.baidu.com{System.Environment.NewLine}content:\t爬虫工具{System.Environment.NewLine}";
+			string expected = $"url:\thttp://www.baidu.com/{System.Environment.NewLine}content:\t爬虫工具{System.Environment.NewLine}";
 			Assert.Equal(expected, content);
 		}
 	}

@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
-using DotnetSpider.Common.Entity;
-using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Broker.Services.MySql
 {
-	public class RunningHistoryService : Services.RunningHistoryService
+	public class RequestQueueService : Services.RequestQueueService
 	{
-		public RunningHistoryService(BrokerOptions options, ILogger<BlockService> logger) : base(options, logger)
+		protected RequestQueueService(BrokerOptions options, ILogger<BlockService> logger) : base(options, logger)
 		{
 		}
 

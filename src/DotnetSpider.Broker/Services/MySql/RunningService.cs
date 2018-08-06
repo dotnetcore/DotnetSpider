@@ -1,57 +1,63 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.Common.Entity;
 using Dapper;
+using DotnetSpider.Common.Entity;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Broker.Services.MySql
 {
-	public class RunningService : BaseService, IRunningService
+	public class RunningService : Broker.Services.RunningService
 	{
-		protected RunningService(BrokerOptions options) : base(options)
+		public RunningService(BrokerOptions options, ILogger<BlockService> logger) : base(options, logger)
 		{
 		}
 
-		public async Task Add(Running history)
+		public override async Task<Running> Pop(string[] runnings)
 		{
 			using (var conn = CreateDbConnection())
 			{
-				await conn.ExecuteAsync("INSERT INTO running (identity,priority) VALUES (@Identity, @Priority)", history);
+				if (conn.State == ConnectionState.Closed)
+				{
+					conn.Open();
+				}
+				var transaction = conn.BeginTransaction();
+				try
+				{
+					var where = runnings == null || runnings.Length == 0 ? "" : $"WHERE {LeftEscapeSql}identity{RightEscapeSql} NOT IN ({string.Join(',', runnings.Select(r => $"'{r}'"))})";
+					var running = (await conn.QueryFirstOrDefaultAsync<Running>(
+						$"SELECT * FROM running {where}ORDER BY Priority DESC, BlockTimes ASC LIMIT 1", null, transaction));
+					if (running != null)
+					{
+						running.BlockTimes += 1;
+					}
+					await conn.ExecuteAsync(
+						$"UPDATE running SET blocktimes =@BlockTimes WHERE {LeftEscapeSql}identity{RightEscapeSql} = @Identity",
+						new { running.Identity, running.BlockTimes }, transaction);
+					transaction.Commit();
+					return running;
+				}
+				catch
+				{
+					try
+					{
+						transaction.Rollback();
+					}
+					catch (Exception ex)
+					{
+						_logger.LogError(ex.ToString());
+					}
+					throw;
+				}
 			}
 		}
 
-		public async Task Delete(string identity)
-		{
-			using (var conn = CreateDbConnection())
-			{
-				await conn.ExecuteAsync("DELETE FROM running WHERE identity = @Identity", identity);
-			}
-		}
+		protected override string LeftEscapeSql => "`";
 
-		public async Task<List<Running>> Get(string[] runnings)
-		{
-			using (var conn = CreateDbConnection())
-			{
-				var identities = string.Join(',', runnings.Select(r => $"'{r}'"));
-				return (await conn.QueryAsync<Running>($"SELECT * FROM running WHERE identity NOT IN ({identities})")).ToList();
-			}
-		}
+		protected override string RightEscapeSql => "`";
 
-		public async Task<List<Running>> GetAll()
-		{
-			using (var conn = CreateDbConnection())
-			{
-				return (await conn.QueryAsync<Running>("SELECT * FROM running")).ToList();
-			}
-		}
-
-		public async Task Update(Running running)
-		{
-			using (var conn = CreateDbConnection())
-			{
-				await conn.ExecuteAsync("UPDATE running SET priority = @Priority, last_modification_time = current_timestamp() WHERE identity = @Identity", running);
-			}
-		}
+		protected override string GetDateSql => "current_timestamp()";
 	}
 }

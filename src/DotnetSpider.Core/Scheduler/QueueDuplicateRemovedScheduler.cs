@@ -10,10 +10,10 @@ namespace DotnetSpider.Core.Scheduler
 	/// </summary>
 	public class QueueDuplicateRemovedScheduler : DuplicateRemovedScheduler
 	{
-		private readonly object _lock = new object();
-		private List<Request> _queue = new List<Request>();
 		private readonly AutomicLong _successCounter = new AutomicLong(0);
 		private readonly AutomicLong _errorCounter = new AutomicLong(0);
+		protected readonly List<Request> _queue = new List<Request>();
+		protected readonly object _lock = new object();
 
 		/// <summary>
 		/// 是否是分布式调度器

@@ -21,9 +21,9 @@ namespace DotnetSpider.Node
 		private readonly NodeOptions _options;
 		private readonly HashSet<string> _runnings = new HashSet<string>();
 #if !NET40
-		private readonly BaseDownloader _downloader = new HttpClientDownloader();
+		private readonly HttpClientDownloader _downloader = new HttpClientDownloader();
 #else
-		private readonly BaseDownloader _downloader = new HttpWebRequestDownloader();
+		private readonly HttpWebRequestDownloader _downloader = new HttpWebRequestDownloader();
 #endif
 		private readonly string _heartbeatUrl;
 		private readonly string _pushBlockinputUrl;
@@ -69,10 +69,10 @@ namespace DotnetSpider.Node
 
 		private void Polling()
 		{
-			try
+			bool exit = false;
+			while (!exit)
 			{
-				bool exit = false;
-				while (!exit)
+				try
 				{
 					switch (_status)
 					{
@@ -84,54 +84,7 @@ namespace DotnetSpider.Node
 							}
 						case NodeStatus.Running:
 							{
-								var response = SendHeartBeart();
-
-								// 请求成功则请求次数清零
-								_retryTimes = 0;
-
-								if (response == null || string.IsNullOrWhiteSpace(response.Content))
-								{
-									Log.Logger.Information($"Receive empty block.");
-									break;
-								}
-								var block = JsonConvert.DeserializeObject<BlockOutput>(response.Content);
-								if (string.IsNullOrWhiteSpace(block.Id) || string.IsNullOrWhiteSpace(block.Identity))
-								{
-									Log.Logger.Warning($"Receive unvalid block.");
-									break;
-								}
-								switch (block.Command)
-								{
-									case Command.None:
-										{
-											Log.Logger.Warning($"Receive unvalid block {block.Id}.");
-											break;
-										}
-									case Command.Pause:
-										{
-											_status = NodeStatus.Stop;
-											break;
-										}
-									case Command.Continue:
-										{
-											_status = NodeStatus.Running;
-											break;
-										}
-									case Command.Exit:
-										{
-											_status = NodeStatus.Exiting;
-											break;
-										}
-									case Command.Download:
-										{
-											Log.Logger.Information($"Receive block {block.Id}, identity {block.Identity}.");
-											_threadPool.QueueUserWork(() =>
-											{
-												HandleBlock(block);
-											});
-											break;
-										}
-								}
+								Heartbeart();
 								break;
 							}
 						case NodeStatus.Stop:
@@ -142,21 +95,72 @@ namespace DotnetSpider.Node
 
 					Thread.Sleep(_options.Heartbeat);
 				}
-				_status = NodeStatus.Exited;
-			}
-			catch (Exception e)
-			{
-				Log.Logger.Error(e.ToString());
-				Thread.Sleep(1000);
-				_retryTimes++;
-				if (_retryTimes <= RetryTimes)
+				catch (Exception e)
 				{
-					Polling();
+					Log.Logger.Error(e.ToString());
+					Thread.Sleep(1000);
+					_retryTimes++;
+					if (_retryTimes <= RetryTimes)
+					{
+						continue;
+					}
 				}
+			}
+			_status = NodeStatus.Exited;
+		}
+
+		private void Heartbeart()
+		{
+			var response = SendHeartbeartRequest();
+			// 请求成功则请求次数清零
+			_retryTimes = 0;
+
+			if (response == null || string.IsNullOrWhiteSpace(response.Content))
+			{
+				Log.Logger.Information($"Receive empty block.");
+				return;
+			}
+			var block = JsonConvert.DeserializeObject<BlockOutput>(response.Content);
+			if (string.IsNullOrWhiteSpace(block.Id) || string.IsNullOrWhiteSpace(block.Identity))
+			{
+				Log.Logger.Warning($"Receive unvalid block.");
+				return;
+			}
+			switch (block.Command)
+			{
+				case Command.None:
+					{
+						Log.Logger.Warning($"Receive unvalid block {block.Id}.");
+						break;
+					}
+				case Command.Pause:
+					{
+						_status = NodeStatus.Stop;
+						break;
+					}
+				case Command.Continue:
+					{
+						_status = NodeStatus.Running;
+						break;
+					}
+				case Command.Exit:
+					{
+						_status = NodeStatus.Exiting;
+						break;
+					}
+				case Command.Download:
+					{
+						Log.Logger.Information($"Receive block {block.Id}, identity {block.Identity}.");
+						_threadPool.QueueUserWork(() =>
+						{
+							HandleBlock(block);
+						});
+						break;
+					}
 			}
 		}
 
-		private Response SendHeartBeart()
+		private Response SendHeartbeartRequest()
 		{
 			var heartbeat = new NodeHeartbeatInput
 			{
@@ -171,7 +175,8 @@ namespace DotnetSpider.Node
 				TotalMemory = EnvironmentUtil.TotalMemory
 			};
 			Log.Logger.Information(heartbeat.ToString());
-			return _downloader.Download(new Request(_heartbeatUrl) { Method = HttpMethod.Post, Site = _brokerSite, Content = JsonConvert.SerializeObject(heartbeat) });
+			var response = _downloader.Download(new Request(_heartbeatUrl) { Method = HttpMethod.Post, Site = _brokerSite, Content = JsonConvert.SerializeObject(heartbeat) });
+			return response;
 		}
 
 		private void HandleBlock(BlockOutput block)
@@ -255,6 +260,5 @@ namespace DotnetSpider.Node
 			}
 			Log.Logger.Information("Exited.");
 		}
-
 	}
 }

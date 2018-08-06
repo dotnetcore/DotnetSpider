@@ -29,7 +29,7 @@ namespace DotnetSpider.Common.Dto
 		/// <summary>
 		/// 任务块标识
 		/// </summary>
-		public string Id { get; set; }
+		public string BlockId { get; set; }
 
 		/// <summary>
 		/// 需要运行的命令

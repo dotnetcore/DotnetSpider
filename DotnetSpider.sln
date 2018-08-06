@@ -45,6 +45,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Worker", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Broker", "src\DotnetSpider.Broker\DotnetSpider.Broker.csproj", "{9487B3DF-005F-49B5-A42D-3CA397B4133C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Migrator", "src\DotnetSpider.Migrator\DotnetSpider.Migrator.csproj", "{5F2637DE-B281-4A54-B7A9-C5AD9E101324}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Broker.Test", "src\DotnetSpider.Broker.Test\DotnetSpider.Broker.Test.csproj", "{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +115,14 @@ Global
 		{9487B3DF-005F-49B5-A42D-3CA397B4133C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9487B3DF-005F-49B5-A42D-3CA397B4133C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9487B3DF-005F-49B5-A42D-3CA397B4133C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F2637DE-B281-4A54-B7A9-C5AD9E101324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F2637DE-B281-4A54-B7A9-C5AD9E101324}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F2637DE-B281-4A54-B7A9-C5AD9E101324}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F2637DE-B281-4A54-B7A9-C5AD9E101324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,6 +133,7 @@ Global
 		{12D370DF-473A-4489-8CED-A867C7EA0684} = {64483187-F19D-4EEC-9979-886234CBA8D4}
 		{3720D347-F6AC-4F8D-8624-8EB727032E4A} = {64483187-F19D-4EEC-9979-886234CBA8D4}
 		{372C7A6F-E1EB-4AA6-8B31-1AE52FBDAA83} = {64483187-F19D-4EEC-9979-886234CBA8D4}
+		{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C} = {64483187-F19D-4EEC-9979-886234CBA8D4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2D832E42-CB19-4D9A-AA1A-F8DAE7E62D98}

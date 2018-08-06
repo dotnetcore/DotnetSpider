@@ -28,7 +28,7 @@ namespace DotnetSpider.Broker
 			services.AddResponseCompression();
 
 			services.AddMvc(o => o.Filters.Add<HttpGlobalExceptionFilter>()).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-			
+
 			var options = Configuration.GetSection("Broker").Get<BrokerOptions>();
 			services.AddSingleton(options);
 
@@ -36,14 +36,21 @@ namespace DotnetSpider.Broker
 			{
 				case StorageType.MySql:
 					{
-						services.AddScoped<INodeService, NodeService>();
-						services.AddSingleton<IInitializer, Initializer>();
-						services.AddSingleton<IBlockService, BlockService>();
+						services.AddScoped<INodeService, Services.MySql.NodeService>();
+						services.AddSingleton<IRunningService, Services.MySql.RunningService>();
+						services.AddSingleton<IBlockService, Services.MySql.BlockService>();
+						services.AddSingleton<IRunningHistoryService, Services.MySql.RunningHistoryService>();
+						services.AddSingleton<IRequestQueueService, Services.MySql.RequestQueueService>();
 						break;
 					}
 				case StorageType.SqlServer:
 					{
-						throw new NotImplementedException("mysql");
+						services.AddScoped<INodeService, Services.NodeService>();
+						services.AddSingleton<IRunningService, Services.RunningService>();
+						services.AddSingleton<IBlockService, Services.BlockService>();
+						services.AddSingleton<IRunningHistoryService, Services.RunningHistoryService>();
+						services.AddSingleton<IRequestQueueService, Services.RequestQueueService>();
+						break;
 					}
 			}
 		}
@@ -58,7 +65,7 @@ namespace DotnetSpider.Broker
 			app.UseResponseCompression();
 			app.UseStaticFiles();
 			app.UseMiddleware<AuthorizeMiddleware>();
-			app.ApplicationServices.GetRequiredService<IInitializer>().Init();
+			// app.ApplicationServices.GetRequiredService<IInitializer>().Init();
 			app.UseMvc(routes =>
 			{
 				routes.MapRoute(

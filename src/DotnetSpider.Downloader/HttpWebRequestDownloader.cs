@@ -94,18 +94,21 @@ namespace DotnetSpider.Downloader
 			}
 			finally
 			{
-				var proxy = httpWebRequest.Proxy as WebProxy;
-				if (HttpProxyPool.Instance != null && proxy != null && httpWebRequest.Proxy != FiddlerProxy)
+				if (httpWebRequest != null)
 				{
-					HttpProxyPool.Instance.ReturnProxy(proxy, httpWebResponse == null ? HttpStatusCode.ServiceUnavailable : httpWebResponse.StatusCode);
-				}
-				try
-				{
-					httpWebResponse?.Close();
-				}
-				catch (Exception e)
-				{
-					throw new BypassedDownloaderException($"Close response {request.Url} failed: {e.Message}");
+					var proxy = httpWebRequest.Proxy as WebProxy;
+					if (HttpProxyPool.Instance != null && proxy != null && httpWebRequest.Proxy != FiddlerProxy)
+					{
+						HttpProxyPool.Instance.ReturnProxy(proxy, httpWebResponse == null ? HttpStatusCode.ServiceUnavailable : httpWebResponse.StatusCode);
+					}
+					try
+					{
+						httpWebResponse.Close();
+					}
+					catch (Exception e)
+					{
+						throw new BypassedDownloaderException($"Close response {request.Url} failed: {e.Message}");
+					}
 				}
 			}
 

@@ -14,10 +14,10 @@ namespace DotnetSpider.Common.Dto
 		/// <summary>
 		/// 任务块标识
 		/// </summary>
-		public string Id { get; set; }
+		public string BlockId { get; set; }
 
 		/// <summary>
-		/// 爬虫对象的标识
+		/// 实例标识
 		/// </summary>
 		public string Identity { get; set; }
 

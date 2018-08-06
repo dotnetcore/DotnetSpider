@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace DotnetSpider.Broker.Services
 {
-	public interface IRunningService
+	public interface IRunningHistoryService
 	{
-		Task Add(Running history);
+		Task Add(RunningHistory history);
+		Task Update(RunningHistory history);
 		Task Delete(string identity);
-		Task<List<Running>> GetAll();
-		Task<List<Running>> Get(string[] runnings);
 	}
 }

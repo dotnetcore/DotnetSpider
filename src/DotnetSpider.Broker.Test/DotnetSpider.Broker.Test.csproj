@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>netcoreapp2.1</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="appsettings.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
+		<PackageReference Include="xunit" Version="2.3.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.1.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\DotnetSpider.Broker\DotnetSpider.Broker.csproj" />
+	</ItemGroup>
+
+</Project>

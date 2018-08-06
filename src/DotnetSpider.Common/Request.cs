@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -11,6 +12,8 @@ namespace DotnetSpider.Common
 	/// </summary>
 	public class Request : IDisposable
 	{
+		private string _url;
+
 		/// <summary>
 		/// 当前链接的深度, 默认构造的链接深度为1, 用于控制爬取的深度
 		/// </summary>
@@ -66,7 +69,15 @@ namespace DotnetSpider.Common
 		/// 请求链接, 请求链接限定为Uri的原因: 无论是本地文件资源或者网络资源都是可以用Uri来定义的
 		/// 比如本地文件: file:///C:/Users/Lewis/Desktop/111.png
 		/// </summary>
-		public string Url { get; set; }
+		[Required]
+		public string Url
+		{
+			get => _url;
+			set
+			{
+				_url = new Uri(value).ToString();
+			}
+		}
 
 		public virtual string Identity => $"{Referer}.{Origin}.{Method}.{Content}.{Url}".ToShortMd5();
 

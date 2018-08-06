@@ -26,13 +26,27 @@ namespace DotnetSpider.Broker.Services
 		/// </summary>
 		/// <param name="node">节点信息</param>
 		/// <returns>A System.Threading.Tasks.Task that represents the asynchronous invoke.</returns>
-		Task AddOrUpdateNode(Node node);
+		Task AddOrUpdate(Node node);
+
+		/// <summary>
+		/// 查询节点最新的心跳
+		/// </summary>
+		/// <param name="nodeId">节点标识</param>
+		/// <returns>心跳</returns>
+		Task<NodeHeartbeat> GetLastHeartbeat(string nodeId);
 
 		/// <summary>
 		/// 删除节点信息
 		/// </summary>
 		/// <param name="nodeId">节点标识</param>
 		/// <returns>A System.Threading.Tasks.Task that represents the asynchronous invoke.</returns>
-		Task RemoveNode(string nodeId);
+		Task Remove(string nodeId);
+
+		/// <summary>
+		/// 查询节点信息
+		/// </summary>
+		/// <param name="nodeId">节点标识</param>
+		/// <returns>节点信息</returns>
+		Task<Node> Get(string nodeId);
 	}
 }

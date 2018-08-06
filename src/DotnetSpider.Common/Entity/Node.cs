@@ -14,6 +14,7 @@ namespace DotnetSpider.Common.Entity
 		/// <summary>
 		/// 节点标识
 		/// </summary>
+		[Key]
 		[Required]
 		[StringLength(32)]
 		public string NodeId { get; set; }
@@ -61,6 +62,6 @@ namespace DotnetSpider.Common.Entity
 		/// <summary>
 		/// 修改时间
 		/// </summary>
-		public DateTime LastModificationTime { get; set; }
+		public DateTime? LastModificationTime { get; set; }
 	}
 }
