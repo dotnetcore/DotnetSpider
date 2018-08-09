@@ -1,35 +1,95 @@
-### ½ÇÉ«
+### è§’è‰²
 
 **Broker**
 
-+ ·Ö·¢ÇëÇó¿é£¨Blockoutput£©£º POST http://broker/node/heartbeat
-+ ½ÓÊÕ·Ö²¼Ê½ÏÂÔØÆ÷µÄ»Ø´«Êı¾İ (Blockinput): POST http://broker/node/block
-+ ½ÓÊÕ Request ´ò°ü³É Block, ²åÈë Request ¶ÓÁĞ: POST http://broker/requestqueue/{identity}
-+ Í¨¹ı Identity ²éÑ¯ÒÑ¾­Íê³ÉµÄ Request ÒÔ Block Îªµ¥Î» : GET http://broker/requestqueue/{identity}
++ åˆ†å‘è¯·æ±‚å—ï¼ˆBlockoutputï¼‰ï¼š POST http://broker/node/heartbeat
++ æ¥æ”¶åˆ†å¸ƒå¼ä¸‹è½½å™¨çš„å›ä¼ æ•°æ® (Blockinput): POST http://broker/node/block
++ æ¥æ”¶ Request æ‰“åŒ…æˆ Block, æ’å…¥ Request é˜Ÿåˆ—: POST http://broker/requestqueue/{identity}
++ é€šè¿‡ Identity æŸ¥è¯¢å·²ç»å®Œæˆçš„ Request ä»¥ Block ä¸ºå•ä½ : GET http://broker/requestqueue/{identity}
 
-#### JOB
+Entities
+----------------------------
+
+#### Job
 
 | Column | DataType | Value| Key |
 |:---|:---|:---|:---|
 |Id| VARCHAR(32)| GUID | Primary |
-| JobType | INT | Block \| Application |  |
-| Name | VARCHAR(50) | TASK1 |  |  |
+| JobType | INT | Block (0) \| Application (1) |  |
+| Name | VARCHAR(50) | TASK1 |  |
+| Cron | VARCHAR(50) | */5 * * * * |  |
+| Application | VARCHAR(100) | Console.SampleProcessor \| dotnet |  |
+| Arguments | VARCHAR(500) | Crawler.dll -s:TestSpider \| null |  |
+| Description | VARCHAR(500) | This is a test task. |  |
+| IsEnabled | BOOL | true |  |
+| IsDeleted | BOOL | false |  |
+
+There are two job types: Block | Application, block job use node as a distributed downloader, startrequestbuilder & processor & pipeline is a worker will be called by Scheduler.NET. Application use node as a agent, run a full application in each node.
 
 #### JobProperty
 
-		JobId VARCHAR(32): GUID
-		NodeCount INT: 1
-		NodeGroup VARCHAR(50): Vps | InHouse | Vps_Static_Ip
-		Package VARCHAR(256): Http://a.com/app1.zip
-		OS VARCHAR(50): Windows
+| Column | DataType | Value| Key |
+|:---|:---|:---|:---|
+|Id| INT | 1 | Primary |
+|JobId| VARCHAR(32)| GUID | INDEX_JOB_ID |
+| Property | VARCHAR(32) | NODE_COUNT |  |
+| Value | VARCHAR(256)  | 1 |  |
 
 
+ApplicationJob's properties
 
-+ ÈÎÎñÀàĞÍÓĞÁ½ÖÖ£ºBlock | Application, Block ÊÇÊ¹ÓÃ·Ö²¼Ê½ÏÂÔØÆ÷ÏÂÔØÄÚÈİ, ½âÎöÆ÷ºÍÊı¾İ¹ÜµÀ¶¼ÔÚ Worker Àï
+		NodeCount : 1
+		NodeGroup : Vps | InHouse | Vps_Static_Ip
+		Package : Http://a.com/app1.zip
+		OS : Windows
 
-##### ÈÎÎñ¹ÜÀí
 
-1. Portal Í¨¹ı Broker API Ìí¼ÓÒ»¸öÈÎÎñ
+#### Node
+
+| Column | DataType | Value| Key |
+|:---|:---|:---|:---|
+|NodeId| VARCHAR(32)| GUID | Primary |
+|Ip| VARCHAR(32)| 192.168.90.100 |  |
+| CpuCount | INT | 8 |  |
+| Group | VARCHAR(32)  | vps_redial \| inhouse \| vps_static_ip |  |
+| Os  | VARCHAR(32) | windows \| linux | |
+| TotalMemory | INT | 2000 | 
+| IsEnable | BOOL |  | true
+
+#### NodeHeartbeat
+
+| Column | DataType | Value| Key |
+|:---|:---|:---|:---|
+|Id| LONG | 1 | Primary |
+|NodeId| VARCHAR(32)| GUID | INDEX_NODE_ID |
+| ProcessCount | INT | 2| |
+|Cpu|INT|20||
+|FreeMemory|INT| 2000||
+
+#### Block
+
+| Column | DataType | Value| Key |
+|:---|:---|:---|:---|
+|BlockId| VARCHAR(32)| GUID | Primary |
+|Identity| VARCHAR(32)| GUID | INDEX_IDENTITY |
+|ChangeIpPattern|VARCHAR(50)||
+|Exception|VARCHAR(MAX)||
+|Status|INT| Ready (1)\|Using (2)\|Success (3)\|Failed (4)\|Retry (5)||
+
+#### Running
+
+| Column | DataType | Value|	 Key |
+|:---|:---|:---|:---|
+|JobId|VARCHAR(32)| GUID | Primary |
+|Identity| VARCHAR(32)| GUID | Primary |
+|ThreadNum| INT | 2 |  |
+|Site| VARCHAR(MAX)|  |  |
+|Priority| INT| 0 |  |
+|BlockTimes| INT| 0 |  |
+
+##### ä»»åŠ¡ç®¡ç†
+
+1. Portal é€šè¿‡ Broker API æ·»åŠ ä¸€ä¸ªä»»åŠ¡
 		
 		NAME: TASK1
 		CRON: */5 * * * *
@@ -37,22 +97,22 @@
 		ARGUMENTS:
 		DESCRIPTION: This is a test task.
 
-+ Í¨¹ı Scheduler.NET API Ìí¼ÓÈÎÎñ²¢»ñµÃ·µ»ØµÄ SchedulerNetId, Èç¹û³É¹¦ÔòÖ´ĞĞÏÂÒ»²½²Ù×÷£¬Ê§°ÜÔòÅ×Òì³£
-+ Ìí¼Ó Job ĞÅÏ¢µ½Êı¾İ¿âÖĞ
++ é€šè¿‡ Scheduler.NET API æ·»åŠ ä»»åŠ¡å¹¶è·å¾—è¿”å›çš„ SchedulerNetId, å¦‚æœæˆåŠŸåˆ™æ‰§è¡Œä¸‹ä¸€æ­¥æ“ä½œï¼Œå¤±è´¥åˆ™æŠ›å¼‚å¸¸
++ æ·»åŠ  Job ä¿¡æ¯åˆ°æ•°æ®åº“ä¸­
 
-2. Portal Í¨¹ı Broker API ĞŞ¸ÄÒ»¸öÈÎÎñ
+2. Portal é€šè¿‡ Broker API ä¿®æ”¹ä¸€ä¸ªä»»åŠ¡
 
-+ Í¨¹ı Scheduler.NET API ĞŞ¸ÄÈÎÎñ£¬ Èç¹ûĞŞ¸Ä³É¹¦ÔòÖ´ĞĞÏÂÒ»²½²Ù×÷£¬Ê§°ÜÔòÅ×Òì³£
-+ ĞŞ¸ÄÊı¾İ¿âÖĞµÄ Job ĞÅÏ¢
++ é€šè¿‡ Scheduler.NET API ä¿®æ”¹ä»»åŠ¡ï¼Œ å¦‚æœä¿®æ”¹æˆåŠŸåˆ™æ‰§è¡Œä¸‹ä¸€æ­¥æ“ä½œï¼Œå¤±è´¥åˆ™æŠ›å¼‚å¸¸
++ ä¿®æ”¹æ•°æ®åº“ä¸­çš„ Job ä¿¡æ¯
 
-3. Portal Í¨¹ı Broker API É¾³ıÒ»¸öÈÎÎñ
+3. Portal é€šè¿‡ Broker API åˆ é™¤ä¸€ä¸ªä»»åŠ¡
 
-+ Í¨¹ı Scheduler.NET API É¾³ıÈÎÎñ£¬ Èç¹ûÉ¾³ı³É¹¦ÔòÖ´ĞĞÏÂÒ»²½²Ù×÷£¬Ê§°ÜÔòÅ×Òì³£
-+ ´ÓÊı¾İ¿âÖĞÉ¾³ı Job ĞÅÏ¢
++ é€šè¿‡ Scheduler.NET API åˆ é™¤ä»»åŠ¡ï¼Œ å¦‚æœåˆ é™¤æˆåŠŸåˆ™æ‰§è¡Œä¸‹ä¸€æ­¥æ“ä½œï¼Œå¤±è´¥åˆ™æŠ›å¼‚å¸¸
++ ä»æ•°æ®åº“ä¸­åˆ é™¤ Job ä¿¡æ¯
 
-##### ÈÎÎñÖ´ĞĞ
+##### ä»»åŠ¡æ‰§è¡Œ
 
-1. Æô¶¯ Wroker ÊµÀı
+1. å¯åŠ¨ Wroker å®ä¾‹
 
 
 
