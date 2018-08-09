@@ -15,43 +15,20 @@ namespace DotnetSpider.Broker.Services.MySql
 		{
 		}
 
-		public override async Task<Running> Pop(string[] runnings)
+		public override async Task<Running> Pop(IDbConnection conn, IDbTransaction transaction, string[] runnings)
 		{
-			using (var conn = CreateDbConnection())
+			var where = runnings == null || runnings.Length == 0 ? "" : $"WHERE {LeftEscapeSql}identity{RightEscapeSql} NOT IN ({string.Join(',', runnings.Select(r => $"'{r}'"))})";
+			var running = (await conn.QueryFirstOrDefaultAsync<Running>(
+				$"SELECT * FROM running {where}ORDER BY Priority DESC, BlockTimes ASC LIMIT 1", null, transaction));
+			if (running != null)
 			{
-				if (conn.State == ConnectionState.Closed)
-				{
-					conn.Open();
-				}
-				var transaction = conn.BeginTransaction();
-				try
-				{
-					var where = runnings == null || runnings.Length == 0 ? "" : $"WHERE {LeftEscapeSql}identity{RightEscapeSql} NOT IN ({string.Join(',', runnings.Select(r => $"'{r}'"))})";
-					var running = (await conn.QueryFirstOrDefaultAsync<Running>(
-						$"SELECT * FROM running {where}ORDER BY Priority DESC, BlockTimes ASC LIMIT 1", null, transaction));
-					if (running != null)
-					{
-						running.BlockTimes += 1;
-					}
-					await conn.ExecuteAsync(
-						$"UPDATE running SET blocktimes =@BlockTimes WHERE {LeftEscapeSql}identity{RightEscapeSql} = @Identity",
-						new { running.Identity, running.BlockTimes }, transaction);
-					transaction.Commit();
-					return running;
-				}
-				catch
-				{
-					try
-					{
-						transaction.Rollback();
-					}
-					catch (Exception ex)
-					{
-						_logger.LogError(ex.ToString());
-					}
-					throw;
-				}
+				running.BlockTimes += 1;
 			}
+			await conn.ExecuteAsync(
+				$"UPDATE running SET blocktimes =@BlockTimes WHERE {LeftEscapeSql}identity{RightEscapeSql} = @Identity",
+				new { running.Identity, running.BlockTimes }, transaction);
+
+			return running;
 		}
 
 		protected override string LeftEscapeSql => "`";

@@ -32,46 +32,6 @@ namespace DotnetSpider.Broker.Services
 			}
 		}
 
-		public virtual async Task<Running> Pop(string[] runnings)
-		{
-			using (var conn = CreateDbConnection())
-			{
-				if (conn.State == ConnectionState.Closed)
-				{
-					conn.Open();
-				}
-				var transaction = conn.BeginTransaction();
-				try
-				{
-					var where = runnings == null || runnings.Length == 0 ? "" : $"WHERE {LeftEscapeSql}identity{RightEscapeSql} NOT IN ({string.Join(',', runnings.Select(r => $"'{r}'"))})";
-					var running = (await conn.QueryFirstOrDefaultAsync<Running>(
-						$"SELECT TOP 1 * FROM running {where}ORDER BY Priority DESC, BlockTimes ASC", null, transaction));
-					if (running != null)
-					{
-						running.BlockTimes += 1;
-					}
-					await conn.ExecuteAsync(
-						$"UPDATE running SET blocktimes =@BlockTimes WHERE {LeftEscapeSql}identity{RightEscapeSql} = @Identity",
-						new { running.Identity, running.BlockTimes }, transaction);
-					transaction.Commit();
-
-					return running;
-				}
-				catch
-				{
-					try
-					{
-						transaction.Rollback();
-					}
-					catch (Exception ex)
-					{
-						_logger.LogError(ex.ToString());
-					}
-					throw;
-				}
-			}
-		}
-
 		public virtual async Task<Running> Get(string identity)
 		{
 			using (var conn = CreateDbConnection())
@@ -97,6 +57,22 @@ namespace DotnetSpider.Broker.Services
 			{
 				await conn.ExecuteAsync($"UPDATE running SET priority = @Priority,blocktimes =@BlockTimes, lastmodificationtime = {GetDateSql} WHERE {LeftEscapeSql}identity{RightEscapeSql} = @Identity", running);
 			}
+		}
+
+		public async virtual Task<Running> Pop(IDbConnection conn, IDbTransaction transaction, string[] runnings)
+		{
+			var where = runnings == null || runnings.Length == 0 ? "" : $"WHERE {LeftEscapeSql}identity{RightEscapeSql} NOT IN ({string.Join(',', runnings.Select(r => $"'{r}'"))})";
+			var running = (await conn.QueryFirstOrDefaultAsync<Running>(
+				$"SELECT TOP 1 * FROM running {where}ORDER BY Priority DESC, BlockTimes ASC", null, transaction));
+			if (running != null)
+			{
+				running.BlockTimes += 1;
+			}
+			await conn.ExecuteAsync(
+				$"UPDATE running SET blocktimes =@BlockTimes WHERE {LeftEscapeSql}identity{RightEscapeSql} = @Identity",
+				new { running.Identity, running.BlockTimes }, transaction);
+
+			return running;
 		}
 	}
 }

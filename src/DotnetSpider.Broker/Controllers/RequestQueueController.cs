@@ -45,9 +45,9 @@ namespace DotnetSpider.Broker.Controllers
 			Block block = await _blockService.GetOneCompletedByIdentity(identity);
 			var requestQueues = await _requestQueueService.GetByBlockId(block.BlockId);
 			var requests = requestQueues.Select(r =>
-			  {
+			{
 				  return JsonConvert.DeserializeObject<Request>(r.Request);
-			  }).ToList();
+			}).ToList();
 			return new JsonResult(requests);
 		}
 	}

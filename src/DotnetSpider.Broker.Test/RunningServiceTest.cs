@@ -55,20 +55,24 @@ namespace DotnetSpider.Broker.Test
 		[Fact(DisplayName = "Pop")]
 		public async void Pop()
 		{
-			var service = Services.GetRequiredService<IRunningService>();
+
+			var runningService = Services.GetRequiredService<IRunningService>();
 
 			var id1 = Guid.NewGuid().ToString("N");
 			var id2 = Guid.NewGuid().ToString("N");
 			var id3 = Guid.NewGuid().ToString("N");
 			var id4 = Guid.NewGuid().ToString("N");
 
-			await service.Add(new Running { Identity = id1, Priority = 1, BlockTimes = 1 });
-			await service.Add(new Running { Identity = id2, Priority = 1, BlockTimes = 1 });
-			await service.Add(new Running { Identity = id3, Priority = 1, BlockTimes = 1 });
-			await service.Add(new Running { Identity = id4, Priority = 1, BlockTimes = 1 });
-
-			var running = await service.Pop(new string[] { });
-			Assert.NotNull(running);
+			await runningService.Add(new Running { Identity = id1, Priority = 1, BlockTimes = 1 });
+			await runningService.Add(new Running { Identity = id2, Priority = 1, BlockTimes = 1 });
+			await runningService.Add(new Running { Identity = id3, Priority = 1, BlockTimes = 1 });
+			await runningService.Add(new Running { Identity = id4, Priority = 1, BlockTimes = 1 });
+			using (var conn = CreateDbConnection())
+			{
+				var t = conn.BeginTransaction();
+				var running = await runningService.Pop(conn, t, new string[] { });
+				Assert.NotNull(running);
+			}
 		}
 	}
 }

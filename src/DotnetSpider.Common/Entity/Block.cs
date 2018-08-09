@@ -36,6 +36,11 @@ namespace DotnetSpider.Common.Entity
 		public string Identity { get; set; }
 
 		/// <summary>
+		/// 如果符合正则， Downloader 执行切换 IP 操作
+		/// </summary>
+		public string ChangeIpPattern { get; set; }
+
+		/// <summary>
 		/// 执行异常信息
 		/// </summary>
 		public string Exception { get; set; }

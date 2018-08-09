@@ -2,8 +2,11 @@
 using DotnetSpider.Broker.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Text;
 
@@ -42,6 +45,23 @@ namespace DotnetSpider.Broker.Test
 			}
 			_service.AddLogging();
 			Services = _service.BuildServiceProvider();
+		}
+
+		protected IDbConnection CreateDbConnection()
+		{
+			var options = Services.GetRequiredService<BrokerOptions>();
+			switch (options.StorageType)
+			{
+				case StorageType.MySql:
+					{
+						return new MySqlConnection(options.ConnectionString);
+					}
+				case StorageType.SqlServer:
+					{
+						return new SqlConnection(options.ConnectionString);
+					}
+			}
+			throw new NotSupportedException($"notsupported storage {options.StorageType}.");
 		}
 	}
 }

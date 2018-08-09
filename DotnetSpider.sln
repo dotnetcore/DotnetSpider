@@ -36,6 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		.travis.yml = .travis.yml
+		DistributeDesign.md = DistributeDesign.md
 		publishToNuget.bat = publishToNuget.bat
 		README.md = README.md
 		runtests.sh = runtests.sh
@@ -45,9 +46,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Worker", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Broker", "src\DotnetSpider.Broker\DotnetSpider.Broker.csproj", "{9487B3DF-005F-49B5-A42D-3CA397B4133C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Migrator", "src\DotnetSpider.Migrator\DotnetSpider.Migrator.csproj", "{5F2637DE-B281-4A54-B7A9-C5AD9E101324}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Migrator", "src\DotnetSpider.Migrator\DotnetSpider.Migrator.csproj", "{5F2637DE-B281-4A54-B7A9-C5AD9E101324}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Broker.Test", "src\DotnetSpider.Broker.Test\DotnetSpider.Broker.Test.csproj", "{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Broker.Test", "src\DotnetSpider.Broker.Test\DotnetSpider.Broker.Test.csproj", "{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -37,8 +37,6 @@ creationtime) VALUES (@BlockId,@Identity,@Status,{GetDateSql})", block);
 
 		public async Task<BlockOutput> Pop(NodeHeartbeatInput heartbeat)
 		{
-			var running = await _runningService.Pop(heartbeat.Runnings);
-			BlockOutput output = new BlockOutput { Command = Command.Download, Identity = running.Identity };
 			using (var conn = CreateDbConnection())
 			{
 				if (conn.State == ConnectionState.Closed)
@@ -46,10 +44,14 @@ creationtime) VALUES (@BlockId,@Identity,@Status,{GetDateSql})", block);
 					conn.Open();
 				}
 				var transaction = conn.BeginTransaction();
+				BlockOutput output = new BlockOutput { Command = Command.Download };
 				try
 				{
+					var running = await _runningService.Pop(conn, transaction, heartbeat.Runnings);
+					output.Identity = running.Identity;
+
 					var block = await conn.QueryFirstOrDefaultAsync<Block>($@"SELECT TOP 1 * FROM block WHERE
-{LeftEscapeSql}identity{RightEscapeSql}=@Identity", new { running.Identity }, transaction);
+{LeftEscapeSql}identity{RightEscapeSql}=@Identity WHERE status = 1 or status = 5", new { running.Identity }, transaction);
 					if (block != null)
 					{
 						await conn.ExecuteAsync($"UPDATE block SET status =@Status, lastmodificationtime={GetDateSql} WHERE blockid=@BlockId",
@@ -78,8 +80,8 @@ creationtime) VALUES (@BlockId,@Identity,@Status,{GetDateSql})", block);
 					}
 					throw;
 				}
+				return output;
 			}
-			return output;
 		}
 
 		public async Task Callback(BlockInput input)
