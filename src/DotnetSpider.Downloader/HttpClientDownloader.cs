@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Node")]
 namespace DotnetSpider.Downloader
@@ -109,7 +110,12 @@ namespace DotnetSpider.Downloader
 				_clientObject = GetHttpClient(proxy == null ? "DEFAULT" : $"{proxy.Address.ToString()}", AllowAutoRedirect, proxy);
 
 				httpResponseMessage =
-						NetworkCenter.Current.Execute("downloader", () => _clientObject.Client.SendAsync(httpRequestMessage).Result);
+						NetworkCenter.Current.Execute("downloader", () => Task.Run(async () =>
+						{
+							return await _clientObject.Client.SendAsync(httpRequestMessage);
+						})
+						.GetAwaiter()
+						.GetResult());
 
 				response.StatusCode = httpResponseMessage.StatusCode;
 				EnsureSuccessStatusCode(response.StatusCode);
