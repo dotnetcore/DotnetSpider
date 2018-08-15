@@ -25,6 +25,10 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="logger">日志接口</param>
 		public void Process(Page page, ILogger logger)
 		{
+			var properties = page.Selectable().Properties;
+			properties[Env.UrlPropertyKey] = page.Request.Url;
+			properties[Env.TargetUrlPropertyKey] = page.TargetUrl;
+
 			if (TargetUrlsExtractor != null)
 			{
 				bool isTarget = true;

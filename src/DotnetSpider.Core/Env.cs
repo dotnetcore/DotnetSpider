@@ -30,7 +30,11 @@ namespace DotnetSpider.Core
 		private const string HubServiceTokenKey = "hubToken";
 		private const string DataConnectionStringKey = "DataConnection";
 
+		public const string UrlPropertyKey = "2EE5CD2FF9DA40439A5F5284B05A111C";
+		public const string TargetUrlPropertyKey = "314227D71D794D46A07715B6F1E9482F";
+
 		public static string DefaultDatabase = "dotnetspider";
+
 
 		/// <summary>
 		/// 开启企业服务(HTTP), 默认打开, 测试的时候开关

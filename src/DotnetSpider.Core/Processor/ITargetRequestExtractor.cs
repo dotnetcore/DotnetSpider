@@ -17,12 +17,12 @@ namespace DotnetSpider.Core.Processor
 		/// <summary>
 		/// 目标链接必须符合的正则表达式
 		/// </summary>
-		List<Regex> TargetUrlPatterns { get; }
+		HashSet<Regex> TargetUrlPatterns { get; }
 
 		/// <summary>
 		/// 如果目标链接符合正则表达式，则需要排除不添加到目标链接队列中
 		/// </summary>
-		List<Regex> ExcludeTargetUrlPatterns { get; }
+		HashSet<Regex> ExcludeTargetUrlPatterns { get; }
 
 		/// <summary>
 		/// 添加目标链接必须符合的正则表达式

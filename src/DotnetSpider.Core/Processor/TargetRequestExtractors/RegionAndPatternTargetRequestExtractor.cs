@@ -114,6 +114,14 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 					}
 				}
 			}
+			var properties = new Dictionary<string, dynamic>();
+			foreach (var kv in response.Request.Properties)
+			{
+				if (kv.Key != Env.UrlPropertyKey && kv.Key != Env.TargetUrlPropertyKey)
+				{
+					properties.Add(kv.Key, kv.Value);
+				}
+			}
 
 			return resultUrls.Select(url => new Request(url, response.Request.Properties) { Site = site });
 		}

@@ -47,4 +47,9 @@ namespace DotnetSpider.Core.Processor
 			page.AddResultItem("url", page.Request.Url);
 		}
 	}
+
+	class Item
+	{
+		public string Title { get; set; }
+	}
 }

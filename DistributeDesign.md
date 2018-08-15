@@ -32,7 +32,7 @@ There are two job types: Block | Application, block job use node as a distribute
 |:---|:---|:---|:---|
 |Id| INT | 1 | Primary |
 |JobId| VARCHAR(32)| GUID | INDEX_JOB_ID |
-| Property | VARCHAR(32) | NODE_COUNT |  |
+| Name | VARCHAR(32) | NODE_COUNT |  |
 | Value | VARCHAR(256)  | 1 |  |
 
 
@@ -53,14 +53,15 @@ ApplicationJob's properties
 | CpuCount | INT | 8 |  |
 | Group | VARCHAR(32)  | vps_redial \| inhouse \| vps_static_ip |  |
 | Os  | VARCHAR(32) | windows \| linux | |
-| TotalMemory | INT | 2000 | 
+| Memory | INT | 2000 | 
 | IsEnable | BOOL |  | true
+| LastOnlineTime | DATETIME | 2018-08-13 14:23:50 ||
 
 #### NodeHeartbeat
 
 | Column | DataType | Value| Key |
 |:---|:---|:---|:---|
-|Id| LONG | 1 | Primary |
+|Id| INT | 1 | Primary |
 |NodeId| VARCHAR(32)| GUID | INDEX_NODE_ID |
 | ProcessCount | INT | 2| |
 |Cpu|INT|20||
@@ -78,14 +79,22 @@ ApplicationJob's properties
 
 #### Running
 
-| Column | DataType | Value|	 Key |
+| Column | DataType | Value| Key |
 |:---|:---|:---|:---|
 |JobId|VARCHAR(32)| GUID | Primary |
 |Identity| VARCHAR(32)| GUID | Primary |
 |ThreadNum| INT | 2 |  |
 |Site| VARCHAR(MAX)|  |  |
 |Priority| INT| 0 |  |
-|BlockTimes| INT| 0 |  |
+|PopTimes| INT| 0 |  |
+|BlockCount |INT| 10| |
+
+#### Worker
+| Column | DataType | Value| Key |
+|:---|:---|:---|:---|
+|Id| INT | 1 | Primary |
+|Name|VARCHAR(32)| TaobaoSold | UNIQUE_INDEX_NAME |
+|LastHeartbeatTime | DATETIME | 2018-08-10 17:45:20 | |
 
 ##### 任务管理
 

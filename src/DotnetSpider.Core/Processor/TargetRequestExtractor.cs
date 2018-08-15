@@ -13,12 +13,12 @@ namespace DotnetSpider.Core.Processor
 		/// <summary>
 		/// 目标链接必须符合的正则表达式
 		/// </summary>
-		public List<Regex> TargetUrlPatterns { get; protected set; } = new List<Regex>();
+		public HashSet<Regex> TargetUrlPatterns { get; protected set; } = new HashSet<Regex>();
 
 		/// <summary>
 		/// 如果目标链接符合正则表达式，则需要排除不添加到目标链接队列中
 		/// </summary>
-		public List<Regex> ExcludeTargetUrlPatterns { get; protected set; } = new List<Regex>();
+		public HashSet<Regex> ExcludeTargetUrlPatterns { get; protected set; } = new HashSet<Regex>();
 
 		/// <summary>
 		/// 用于判断当前链接是否最后一个需要采集的链接, 如果是则不需要把解析到的目标链接添加到队列中
@@ -35,7 +35,7 @@ namespace DotnetSpider.Core.Processor
 			{
 				if (TargetUrlPatterns == null)
 				{
-					TargetUrlPatterns = new List<Regex>();
+					TargetUrlPatterns = new HashSet<Regex>();
 				}
 				foreach (var pattern in patterns)
 				{
@@ -57,7 +57,7 @@ namespace DotnetSpider.Core.Processor
 			{
 				if (ExcludeTargetUrlPatterns == null)
 				{
-					ExcludeTargetUrlPatterns = new List<Regex>();
+					ExcludeTargetUrlPatterns = new HashSet<Regex>();
 				}
 				foreach (var pattern in patterns)
 				{

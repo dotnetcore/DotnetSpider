@@ -88,6 +88,11 @@ namespace DotnetSpider.Extension.Processor
 							regionAndPatternTargetUrlsExtractor.AddTargetUrlExtractor(null, patterns);
 						}
 					}
+
+					foreach (var p in targetUrlsSelector.ExcludePatterns)
+					{
+						regionAndPatternTargetUrlsExtractor.ExcludeTargetUrlPatterns.Add(new Regex(p));
+					}
 				}
 			}
 
@@ -120,7 +125,7 @@ namespace DotnetSpider.Extension.Processor
 		/// <returns></returns>
 		internal virtual bool ContainsTargetUrlRegion(string region)
 		{
-			return ((RegionAndPatternTargetRequestExtractor) TargetUrlsExtractor).ContainsTargetUrlRegion(region);
+			return ((RegionAndPatternTargetRequestExtractor)TargetUrlsExtractor).ContainsTargetUrlRegion(region);
 		}
 
 		/// <summary>

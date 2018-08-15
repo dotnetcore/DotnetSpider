@@ -41,5 +41,10 @@ namespace DotnetSpider.Extraction.Model.Attribute
 		/// 匹配目标链接的正则表达式
 		/// </summary>
 		public string[] Patterns { get; set; }
+
+		/// <summary>
+		/// 需要排除链接的正则表达式
+		/// </summary>
+		public string[] ExcludePatterns { get; set; }
 	}
 }
