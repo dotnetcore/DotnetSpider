@@ -13,6 +13,11 @@ namespace DotnetSpider.Core.Processor
 		public ITargetRequestExtractor TargetUrlsExtractor { get; set; }
 
 		/// <summary>
+		/// 去掉链接#后面的所有内容
+		/// </summary>
+		public bool CleanPound { get; set; }
+
+		/// <summary>
 		/// 解析操作
 		/// </summary>
 		/// <param name="page">页面数据</param>
@@ -70,6 +75,10 @@ namespace DotnetSpider.Core.Processor
 			{
 				foreach (var link in links)
 				{
+					if (CleanPound)
+					{
+						link.Url = link.Url.Split('#')[0];
+					}
 					page.AddTargetRequest(link);
 				}
 			}

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Crawler>
+  <Cron>* */2 * * *</Cron>
+  <Name>sohu news</Name>
+  <TargetXpaths>
+    <string>.</string>
+  </TargetXpaths>
+  <TargetPatterns>
+    <string>www\.sohu\.com/a</string>
+    <string>news\.sohu\.com</string>
+  </TargetPatterns>
+  <ExcludePatterns>
+    <string>\.png</string>
+    <string>\.jpg</string>
+    <string>\.ico</string>
+    <string>\.gif</string>
+    <string>\.aspx</string>
+    <string>\.jpeg</string>
+    <string>\.js</string>
+    <string>\.css</string>
+    <string>upload</string>
+    <string>\.javascript</string>
+    <string>corp\.sohu\.com</string>
+    <string>investors\.sohu\.com</string>
+    <string>ad\.sohu\.com</string>
+    <string>hr\.sohu\.com</string>
+  </ExcludePatterns>
+  <Encording></Encording>
+  <Url>http://news.sohu.com</Url>
+  <ThreadNum>4</ThreadNum>
+  <Downloader>http</Downloader>
+</Crawler>

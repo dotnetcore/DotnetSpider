@@ -23,7 +23,7 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(256, 256);
 #endif
 
-			ModelSpider.Run();
+			ConfigurableSpider.Run();
 		}
 
 		/// <summary>
