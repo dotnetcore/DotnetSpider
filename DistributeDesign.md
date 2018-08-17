@@ -1,3 +1,209 @@
+## Design
+
+```
+                                                               +--------+
+                                                        +----->| Node 1 |
+                                                        |      +--------+
+                                                        |
++--------------+                  +---------+           |      +--------+
+| Scheduler.NET|<------HTTP------>| Broker  |<--SignalR-|----->| Node 2 |
++--------------+                  +----∧----+           |      +--------+
+                                       |                |
+                                     SignalR            |      +--------+
+                                       |                +----->| Node 1 |
+                               +-------+---------+             +--------+
+                               |                 |
+                         +-----∨----+     +------∨---+
+                         | Worker 1 |     | Worker 2 |
+                         +----------+     +----------+
+```
+
+
+
+## Modules
+
+### Node
+
+Node send heartbeat to broker and receive message from broker via websocket.
+
+```
++---------------------------------------------------+ 
+|                      Node                         |
++-------------------+--------------+----------------+
+| + Id              | GUID         | PRIMARY        |
++-------------------+--------------+----------------+
+| + IPAddress       | STRING(50)   |                |
++-------------------+--------------+----------------+
+| + ProcessorCount  | INT          |                |
++-------------------+--------------+----------------+
+| + Group           | STRING(100)  |                |
++-------------------+--------------+----------------+
+| + OperatingSystem | STRING(50)   |                |
++-------------------+--------------+----------------+
+| + Memory          | INT          |                |
++-------------------+--------------+----------------+
+| + IsEnabled       | BOOL         |                |
++-------------------+--------------+----------------+
+| + LastOnlineTime  | DATETIME     |                |
++-------------------+--------------+----------------+
+
++---------------------------------------------------+ 
+|                    NodeHeartbeat                  |
++-------------------+--------------+----------------+
+| + Id              | INT          | PRIMARY, AI    |
++-------------------+--------------+----------------+
+| + NodeId          | GUID         |                |
++-------------------+--------------+----------------+
+| + ProcessCount    | INT          |                |
++-------------------+--------------+----------------+
+| + Cpu             | INT          |                |
++-------------------+--------------+----------------+
+| + FreeMemory      | INT          |                |
++-------------------+--------------+----------------+
+| + CreationTime    | DATETIME     |                |
++-------------------+--------------+----------------+
+```
+
+### Broker
+
+```
+=======================BlockJob======================
++---------------------------------------------------+ 
+|                      BlockJob                     |
++-------------------+--------------+----------------+
+| + Id              | GUID         | PRIMARY        |
++-------------------+--------------+----------------+
+| + Name            | STRING(50)   |                |
++-------------------+--------------+----------------+
+| + Cron            | STRING(50)   |                |
++-------------------+--------------+----------------+
+| + FullClassName   | STRING(100)  |                |
++-------------------+--------------+----------------+
+| + Arguments       | STRING(500)  |                |
++-------------------+--------------+----------------+
+| + Description     | STRING(500)  |                |
++-------------------+--------------+----------------+
+| + IsEnabled       | BOOL         |                |
++-------------------+--------------+----------------+
+| + IsDeleted       | BOOL         |                |
++-------------------+--------------+----------------+
+
+Node is used as distributed downloader for block job, start request builder & processor & pipeline is a worker. 
+
+=======================ApplicationJob================
+
++---------------------------------------------------+ 
+|                      ApplicationJob               |
++-------------------+--------------+----------------+
+| + Id              | GUID         | PRIMARY        |
++-------------------+--------------+----------------+
+| + Name            | STRING(50)   |                |
++-------------------+--------------+----------------+
+| + Cron            | STRING(50)   |                |
++-------------------+--------------+----------------+
+| + Package         | STRING(100)  |                |
++-------------------+--------------+----------------+
+| + Application     | STRING(100)  |                |
++-------------------+--------------+----------------+
+| + Arguments       | STRING(500)  |                |
++-------------------+--------------+----------------+
+| + NodeCount       | INT          |                |
++-------------------+--------------+----------------+
+| + NodeGroup       | STRING(50)   |                |
++-------------------+--------------+----------------+
+| + Os              | STRING(50)   |                |
++-------------------+--------------+----------------+
+| + Description     | STRING(500)  |                |
++-------------------+--------------+----------------+
+| + IsEnabled       | BOOL         |                |
++-------------------+--------------+----------------+
+| + IsDeleted       | BOOL         |                |
++-------------------+--------------+----------------+
+
+Node is used as a agent for application job.
+
+=======================Worker========================
+
++---------------------------------------------------+ 
+|                      Worker                       |
++-------------------+--------------+----------------+
+| + FullClassName   | STRING(100)  | PRIMARY        |
++-------------------+--------------+----------------+
+| + ConnectionId    | STRING(50)   | PRIMARY        |
++-------------------+--------------+----------------+
+| + IsDisconnected  | BOOL         |                |
++-------------------+--------------+----------------+
+| + CreationTime    | DATETIME     |                |
++-------------------+--------------+----------------+
+| + DisconnectTime  | DATETIME     |                |
++-------------------+--------------+----------------+
+
+=======================Block=========================
+
++---------------------------------------------------+ 
+|                      Block                        |
++-------------------+--------------+----------------+
+| + BlockId         | GUID         | PRIMARY        |
++-------------------+--------------+----------------+
+| + Identity        | GUID         | INDEX_IDENTITY |
++-------------------+--------------+----------------+
+| + SwtichIpPattern | STRING(100)  |                |
++-------------------+--------------+----------------+
+| + Status          | ENUM         |                |
++-------------------+--------------+----------------+
+| + CreationTime    | DATETIME     |                |
++-------------------+--------------+----------------+
+
+Block status: ready (1), using (2), success(4), failed(8), retry(16)
+
+===================BlockStatusHistory================
+
++---------------------------------------------------+ 
+|                  BlockStatusHistory               |
++-------------------+--------------+----------------+
+| + Id              | INT          | PRIMARY, AI    |
++-------------------+--------------+----------------+
+| + BlockId         | GUID         | INDEX_BLOCKID  |
++-------------------+--------------+----------------+
+| + Status          | ENUM         |                |
++-------------------+--------------+----------------+
+| + Detail          | STRING(MAX)  |                |
++-------------------+--------------+----------------+
+| + CreationTime    | DATETIME     |                |
++-------------------+--------------+----------------+
+
+=======================Running=======================
+
++---------------------------------------------------+ 
+|                      Running                      |
++-------------------+--------------+----------------+
+| + JobId           | GUID         | PRIMARY        |
++-------------------+--------------+----------------+
+| + Identity        | GUID         | INDEX_IDENTITY |
++-------------------+--------------+----------------+
+| + Arguments       | STRING(500)  |                |
++-------------------+--------------+----------------+
+| + Priority        | INT          |                |
++-------------------+--------------+----------------+
+| + Priority        | INT          |                |
++-------------------+--------------+----------------+
+| + CreationTime    | DATETIME     |                |
++-------------------+--------------+----------------+
+
+ +-------------------+
+ | ICrawlerService    |
+ +-------------------+
+ | Add|
+ +-------------------+
+
+ +-------------------+
+ | IWorkerService    |
+ +-------------------+
+ | Watch(string name)|
+ +-------------------+
+
+```
+
 ### 角色
 
 **Broker**
@@ -10,73 +216,6 @@
 Entities
 ----------------------------
 
-#### Job
-
-| Column | DataType | Value| Key |
-|:---|:---|:---|:---|
-|Id| VARCHAR(32)| GUID | Primary |
-| JobType | INT | Block (0) \| Application (1) |  |
-| Name | VARCHAR(50) | TASK1 |  |
-| Cron | VARCHAR(50) | */5 * * * * |  |
-| Application | VARCHAR(100) | Console.SampleProcessor \| dotnet |  |
-| Arguments | VARCHAR(500) | Crawler.dll -s:TestSpider \| null |  |
-| Description | VARCHAR(500) | This is a test task. |  |
-| IsEnabled | BOOL | true |  |
-| IsDeleted | BOOL | false |  |
-
-There are two job types: Block | Application, block job use node as a distributed downloader, startrequestbuilder & processor & pipeline is a worker will be called by Scheduler.NET. Application use node as a agent, run a full application in each node.
-
-#### JobProperty
-
-| Column | DataType | Value| Key |
-|:---|:---|:---|:---|
-|Id| INT | 1 | Primary |
-|JobId| VARCHAR(32)| GUID | INDEX_JOB_ID |
-| Name | VARCHAR(32) | NODE_COUNT |  |
-| Value | VARCHAR(256)  | 1 |  |
-
-
-ApplicationJob's properties
-
-		NodeCount : 1
-		NodeGroup : Vps | InHouse | Vps_Static_Ip
-		Package : Http://a.com/app1.zip
-		OS : Windows
-
-
-#### Node
-
-| Column | DataType | Value| Key |
-|:---|:---|:---|:---|
-|NodeId| VARCHAR(32)| GUID | Primary |
-|Ip| VARCHAR(32)| 192.168.90.100 |  |
-| CpuCount | INT | 8 |  |
-| Group | VARCHAR(32)  | vps_redial \| inhouse \| vps_static_ip |  |
-| Os  | VARCHAR(32) | windows \| linux | |
-| Memory | INT | 2000 | 
-| IsEnable | BOOL |  | true
-| LastOnlineTime | DATETIME | 2018-08-13 14:23:50 ||
-
-#### NodeHeartbeat
-
-| Column | DataType | Value| Key |
-|:---|:---|:---|:---|
-|Id| INT | 1 | Primary |
-|NodeId| VARCHAR(32)| GUID | INDEX_NODE_ID |
-| ProcessCount | INT | 2| |
-|Cpu|INT|20||
-|FreeMemory|INT| 2000||
-
-#### Block
-
-| Column | DataType | Value| Key |
-|:---|:---|:---|:---|
-|BlockId| VARCHAR(32)| GUID | Primary |
-|Identity| VARCHAR(32)| GUID | INDEX_IDENTITY |
-|ChangeIpPattern|VARCHAR(50)||
-|Exception|VARCHAR(MAX)||
-|Status|INT| Ready (1)\|Using (2)\|Success (3)\|Failed (4)\|Retry (5)||
-
 #### Running
 
 | Column | DataType | Value| Key |
@@ -88,13 +227,6 @@ ApplicationJob's properties
 |Priority| INT| 0 |  |
 |PopTimes| INT| 0 |  |
 |BlockCount |INT| 10| |
-
-#### Worker
-| Column | DataType | Value| Key |
-|:---|:---|:---|:---|
-|Id| INT | 1 | Primary |
-|Name|VARCHAR(32)| TaobaoSold | UNIQUE_INDEX_NAME |
-|LastHeartbeatTime | DATETIME | 2018-08-10 17:45:20 | |
 
 ##### 任务管理
 
