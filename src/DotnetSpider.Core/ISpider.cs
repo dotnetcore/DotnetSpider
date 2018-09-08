@@ -11,11 +11,6 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public interface ISpider : IDisposable, IAppBase
 	{
-		/// <summary>
-		/// 采集站点的信息配置
-		/// </summary>
-		Site Site { get; }
-
 		IScheduler Scheduler { get; }
 
 		/// <summary>

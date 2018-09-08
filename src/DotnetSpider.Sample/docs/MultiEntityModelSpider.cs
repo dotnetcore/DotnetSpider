@@ -19,8 +19,8 @@ namespace DotnetSpider.Sample.docs
 			protected override void OnInit(params string[] arguments)
 			{
 				Identity = ("cnblogs_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-				AddStartUrl("http://www.cnblogs.com");
-				AddStartUrl("https://www.cnblogs.com/news/");
+				AddRequests("http://www.cnblogs.com");
+				AddRequests("https://www.cnblogs.com/news/");
 				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType<News>();
 				AddEntityType<BlogSumary>();

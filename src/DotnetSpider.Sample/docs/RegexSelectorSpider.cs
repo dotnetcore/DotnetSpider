@@ -9,7 +9,7 @@ namespace DotnetSpider.Sample.docs
 	{
 		protected override void OnInit(params string[] arguments)
 		{
-			AddStartUrl("http://www.cnblogs.com");
+			AddRequests("http://www.cnblogs.com");
 			AddPipeline(new ConsoleEntityPipeline());
 			AddEntityType<HomePage>();
 		}

@@ -26,7 +26,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler(spider.Identity);
 			scheduler.Dispose();
 
-			Request request = new Request("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", null) { Site = spider.Site };
+			Request request = new Request("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", null);
 			request.Properties.Add("1", "2");
 			scheduler.Push(request, null);
 			Request result = scheduler.Poll();
@@ -47,10 +47,10 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			scheduler.Dispose();
 
-			Request request1 = new Request("http://www.ibm.com/1", null) { Site = spider.Site };
-			Request request2 = new Request("http://www.ibm.com/2", null) { Site = spider.Site };
-			Request request3 = new Request("http://www.ibm.com/3", null) { Site = spider.Site };
-			Request request4 = new Request("http://www.ibm.com/4", null) { Site = spider.Site };
+			Request request1 = new Request("http://www.ibm.com/1", null);
+			Request request2 = new Request("http://www.ibm.com/2", null);
+			Request request3 = new Request("http://www.ibm.com/3", null);
+			Request request4 = new Request("http://www.ibm.com/4", null);
 			scheduler.Push(request1);
 			scheduler.Push(request2);
 			scheduler.Push(request3);
@@ -73,10 +73,10 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 
 			scheduler.Dispose();
-			Request request1 = new Request("http://www.ibm.com/1", null) { Site = spider.Site };
-			Request request2 = new Request("http://www.ibm.com/2", null) { Site = spider.Site };
-			Request request3 = new Request("http://www.ibm.com/3", null) { Site = spider.Site };
-			Request request4 = new Request("http://www.ibm.com/4", null) { Site = spider.Site };
+			Request request1 = new Request("http://www.ibm.com/1", null);
+			Request request2 = new Request("http://www.ibm.com/2", null);
+			Request request3 = new Request("http://www.ibm.com/3", null);
+			Request request4 = new Request("http://www.ibm.com/4", null);
 			scheduler.Push(request1);
 			scheduler.Push(request2);
 			scheduler.Push(request3);
@@ -93,14 +93,14 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact(DisplayName = "LoadPerformace")]
 		public void LoadPerformace()
 		{
-			Spider spider = new DefaultSpider("test", new Site());
+			Spider spider = new DefaultSpider("test");
 			spider.Monitor = new LogMonitor();
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler(spider.Identity);
 			scheduler.Dispose();
 			var start = DateTime.Now;
 			for (int i = 0; i < 40000; i++)
 			{
-				scheduler.Push(new Request("http://www.a.com/" + i, null) { Site = spider.Site });
+				scheduler.Push(new Request("http://www.a.com/" + i, null));
 			}
 
 			var end = DateTime.Now;
@@ -124,16 +124,16 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		public void Load()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			ISpider spider = new DefaultSpider("test", new Site());
+			ISpider spider = new DefaultSpider("test");
 
 
-			scheduler.Push(new Request("http://www.a.com/", null) { Site = spider.Site });
-			scheduler.Push(new Request("http://www.b.com/", null) { Site = spider.Site });
-			scheduler.Push(new Request("http://www.c.com/", null) { Site = spider.Site });
-			scheduler.Push(new Request("http://www.d.com/", null) { Site = spider.Site });
+			scheduler.Push(new Request("http://www.a.com/", null));
+			scheduler.Push(new Request("http://www.b.com/", null));
+			scheduler.Push(new Request("http://www.c.com/", null));
+			scheduler.Push(new Request("http://www.d.com/", null));
 
 			Extension.Scheduler.RedisScheduler redisScheduler = GetRedisScheduler(spider.Identity);
-	 
+
 			redisScheduler.Dispose();
 
 			redisScheduler.Reload(scheduler.All);
@@ -149,16 +149,16 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact(DisplayName = "RedisScheduler_Status")]
 		public void Status()
 		{
-			ISpider spider = new DefaultSpider("test", new Site());
+			ISpider spider = new DefaultSpider("test");
 
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler(spider.Identity);
-	
+
 			scheduler.Dispose();
 
-			scheduler.Push(new Request("http://www.a.com/", null) { Site = spider.Site });
-			scheduler.Push(new Request("http://www.b.com/", null) { Site = spider.Site });
-			scheduler.Push(new Request("http://www.c.com/", null) { Site = spider.Site });
-			scheduler.Push(new Request("http://www.d.com/", null) { Site = spider.Site });
+			scheduler.Push(new Request("http://www.a.com/", null));
+			scheduler.Push(new Request("http://www.b.com/", null));
+			scheduler.Push(new Request("http://www.c.com/", null));
+			scheduler.Push(new Request("http://www.d.com/", null));
 
 			Assert.Equal(0, scheduler.ErrorRequestsCount);
 			Assert.Equal(4, scheduler.LeftRequestsCount);
@@ -232,13 +232,13 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			ISpider spider = new DefaultSpider();
 			Extension.Scheduler.RedisScheduler scheduler = GetRedisScheduler(spider.Identity);
 
-		
-			 
+
+
 			scheduler.Dispose();
-			Request request1 = new Request("http://www.ibm.com/1", null) { Site = spider.Site };
-			Request request2 = new Request("http://www.ibm.com/2", null) { Site = spider.Site };
-			Request request3 = new Request("http://www.ibm.com/3", null) { Site = spider.Site };
-			Request request4 = new Request("http://www.ibm.com/4", null) { Site = spider.Site };
+			Request request1 = new Request("http://www.ibm.com/1", null);
+			Request request2 = new Request("http://www.ibm.com/2", null);
+			Request request3 = new Request("http://www.ibm.com/3", null);
+			Request request4 = new Request("http://www.ibm.com/4", null);
 			scheduler.Push(request1);
 			scheduler.Push(request2);
 			scheduler.Push(request3);
@@ -253,14 +253,9 @@ namespace DotnetSpider.Extension.Test.Scheduler
 		[Fact(DisplayName = "RedisScheduler_RetryRequest")]
 		public void RetryRequest()
 		{
-			var site = new Site { EncodingName = "UTF-8" };
-
 			var scheduler = new QueueDuplicateRemovedScheduler();
 
-			site.AddRequests("http://www.baidu.com");
-			site.AddRequests("http://www.163.com/");
-
-			Spider spider = Spider.Create(site,
+			Spider spider = Spider.Create(
 				// crawler identity
 				"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
 				// use memoery queue scheduler
@@ -272,13 +267,18 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			spider.Monitor = new LogMonitor();
 			// dowload html by http client
 			spider.Downloader = new HttpClientDownloader();
-
+			spider.EncodingName = "UTF-8";
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
 			spider.Scheduler.Depth = 3;
 			spider.ClearSchedulerAfterCompleted = false;
 			spider.EmptySleepTime = 6000;
 			// start crawler 启动爬虫
+
+
+			spider.AddRequests("http://www.baidu.com");
+			spider.AddRequests("http://www.163.com/");
+
 			spider.Run();
 
 			Assert.Equal(5, spider.RetriedTimes.Value);

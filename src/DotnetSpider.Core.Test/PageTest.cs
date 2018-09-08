@@ -13,8 +13,7 @@ namespace DotnetSpider.Core.Test
 			var extras = new Dictionary<string, dynamic> { { "Test", "Forever" } };
 			var request = new Request("http://www.taobao.com", extras)
 			{
-				Method = HttpMethod.Get,
-				Priority = 1
+				Method = HttpMethod.Get
 			};
 			return request;
 		}
@@ -25,7 +24,7 @@ namespace DotnetSpider.Core.Test
 			var request = GetRequest();
 			Page page = new Page(request);
 			page.AddTargetRequest("http://taobao.com/bbb");
-			Assert.Equal(2, page.TargetRequests.First().Depth);
+			Assert.Equal(2, page.TargetRequests.First().GetProperty(Page.Depth));
 		}
 	}
 }

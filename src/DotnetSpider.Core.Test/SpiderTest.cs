@@ -26,7 +26,7 @@ namespace DotnetSpider.Core.Test
 		{
 			try
 			{
-				Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 },
+				Spider.Create(
 					"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 					new QueueDuplicateRemovedScheduler(),
 					new TestPageProcessor());
@@ -34,27 +34,6 @@ namespace DotnetSpider.Core.Test
 			catch (Exception exception)
 			{
 				Assert.Equal($"Length of identity should less than {Env.IdentityMaxLength}.", exception.Message);
-				return;
-			}
-
-			throw new Exception("TEST FAILED.");
-		}
-
-
-		[Fact(DisplayName = "Spider_RemoveOutboundLinksSetting")]
-		public void RemoveOutboundLinksSetting()
-		{
-			try
-			{
-				var spider = Spider.Create(new Site { RemoveOutboundLinks = true },
-						"1111",
-						new QueueDuplicateRemovedScheduler(),
-						new TestPageProcessor());
-				spider.Run();
-			}
-			catch (Exception exception)
-			{
-				Assert.Equal($"When you want remove outbound links, the domains should not be null or empty.", exception.Message);
 				return;
 			}
 
@@ -74,11 +53,12 @@ namespace DotnetSpider.Core.Test
 			{
 				return;
 			}
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			Spider spider = Spider.Create(new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
+			spider.SleepTime = 1000;
 			for (int i = 0; i < 10000; i++)
 			{
-				spider.AddStartUrl("http://www.baidu.com/" + i);
+				spider.AddRequest(new Request("http://www.baidu.com/" + i) { EncodingName = "UTF-8" });
 			}
 			spider.RunAsync();
 			Thread.Sleep(5000);
@@ -96,11 +76,12 @@ namespace DotnetSpider.Core.Test
 			{
 				return;
 			}
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			Spider spider = Spider.Create(new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
+			spider.EncodingName = "UTF-8";
 			for (int i = 0; i < 10000; i++)
 			{
-				spider.AddStartUrl("http://www.baidu.com/" + i);
+				spider.AddRequests("http://www.baidu.com/" + i);
 			}
 			spider.RunAsync();
 			Thread.Sleep(5000);
@@ -118,11 +99,13 @@ namespace DotnetSpider.Core.Test
 			{
 				return;
 			}
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			Spider spider = Spider.Create(new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
+			spider.EncodingName = "UTF-8";
+			spider.SleepTime = 1000;
 			for (int i = 0; i < 10000; i++)
 			{
-				spider.AddStartUrl("http://www.baidu.com/" + i);
+				spider.AddRequests("http://www.baidu.com/" + i);
 			}
 			spider.RunAsync();
 			Thread.Sleep(5000);
@@ -136,16 +119,20 @@ namespace DotnetSpider.Core.Test
 		[Fact(DisplayName = "NoPipeline")]
 		public void NoPipeline()
 		{
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor());
+			Spider spider = Spider.Create(new TestPageProcessor());
 			spider.EmptySleepTime = 1000;
+			spider.EncodingName = "UTF-8";
+			spider.SleepTime = 1000;
 			spider.Run();
 		}
 
 		[Fact(DisplayName = "WhenNoStartUrl")]
 		public void WhenNoStartUrl()
 		{
-			Spider spider = Spider.Create(new Site { EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			Spider spider = Spider.Create(new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
+			spider.EncodingName = "UTF-8";
+			spider.SleepTime = 1000;
 			spider.Run();
 
 			Assert.Equal(Status.Finished, spider.Status);
@@ -176,9 +163,12 @@ namespace DotnetSpider.Core.Test
 		[Fact(DisplayName = "RetryWhenResultIsEmpty")]
 		public void RetryWhenResultIsEmpty()
 		{
-			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8", SleepTime = 1000 }, new TestPageProcessor()).AddPipeline(new TestPipeline());
+			Spider spider = Spider.Create(new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider.ThreadNum = 1;
-			spider.AddStartUrl("http://taobao.com");
+			spider.EncodingName = "UTF-8";
+			spider.CycleRetryTimes = 5;
+			spider.SleepTime = 1000;
+			spider.AddRequests("http://taobao.com");
 			spider.Run();
 
 			Assert.Equal(Status.Finished, spider.Status);
@@ -187,12 +177,14 @@ namespace DotnetSpider.Core.Test
 		[Fact(DisplayName = "CloseSignal")]
 		public void CloseSignal()
 		{
-			Spider spider = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8" },
+			Spider spider = Spider.Create(
 				new TestPageProcessor()).AddPipeline(new TestPipeline());
+			spider.EncodingName = "UTF-8";
+			spider.CycleRetryTimes = 5;
 			spider.ClearSchedulerAfterCompleted = false;
 			for (int i = 0; i < 20; ++i)
 			{
-				spider.AddStartUrl($"http://www.baidu.com/t={i}");
+				spider.AddRequests($"http://www.baidu.com/t={i}");
 			}
 			var task = spider.RunAsync();
 			Thread.Sleep(500);
@@ -200,12 +192,14 @@ namespace DotnetSpider.Core.Test
 			task.Wait();
 			Assert.Equal(10, spider.Scheduler.SuccessRequestsCount);
 
-			Spider spider2 = Spider.Create(new Site { CycleRetryTimes = 5, EncodingName = "UTF-8" },
+			Spider spider2 = Spider.Create(
 				new TestPageProcessor()).AddPipeline(new TestPipeline());
 			spider2.ClearSchedulerAfterCompleted = false;
+			spider2.EncodingName = "UTF-8";
+			spider2.CycleRetryTimes = 5;
 			for (int i = 0; i < 25; ++i)
 			{
-				spider2.AddStartUrl($"http://www.baidu.com/t={i}");
+				spider2.AddRequests($"http://www.baidu.com/t={i}");
 			}
 			spider2.Run();
 			Assert.Equal(25, spider2.Scheduler.SuccessRequestsCount);
@@ -226,19 +220,17 @@ namespace DotnetSpider.Core.Test
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.Start();
 
-			Spider spider = Spider.Create(new Site
-			{
-				CycleRetryTimes = 5,
-				EncodingName = "UTF-8",
-				SleepTime = 0
-			},
-			new FastExitPageProcessor())
+			Spider spider = Spider.Create(
+				new FastExitPageProcessor())
 			.AddPipeline(new FastExitPipeline());
 			spider.ThreadNum = 1;
 			spider.EmptySleepTime = 0;
-			spider.AddStartUrl("http://war.163.com/");
-			spider.AddStartUrl("http://sports.163.com/");
-			spider.AddStartUrl("http://ent.163.com/");
+			spider.EncodingName = "UTF-8";
+			spider.CycleRetryTimes = 5;
+			spider.SleepTime = 0;
+			spider.AddRequests("http://war.163.com/");
+			spider.AddRequests("http://sports.163.com/");
+			spider.AddRequests("http://ent.163.com/");
 			spider.Downloader = new TestDownloader();
 			spider.Run();
 			stopwatch.Stop();
@@ -288,7 +280,7 @@ namespace DotnetSpider.Core.Test
 		//	Spider spider = Spider.Create(new Site { HttpProxyPool = new HttpProxyPool(new KuaidailiProxySupplier("代理链接")), EncodingName = "UTF-8", MinSleepTime = 1000, Timeout = 20000 }, new TestPageProcessor()).AddPipeline(new TestPipeline()).SetThreadNum(1);
 		//	for (int i = 0; i < 500; i++)
 		//	{
-		//		spider.AddStartUrl("http://www.taobao.com/" + i);
+		//		spider.AddRequest("http://www.taobao.com/" + i);
 		//	}
 		//	spider.Run();
 

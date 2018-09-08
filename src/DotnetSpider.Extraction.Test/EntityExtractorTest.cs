@@ -18,7 +18,7 @@ namespace DotnetSpider.Extension.Test.Model
 			ModelExtractor<Product> extractor = new ModelExtractor<Product>();
 			var model = new ModelDefinition<Product>();
 			var selectable = new Selectable(
-				File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Jd.html")), "http://jd.com", "");
+				File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Jd.html")), "http://item.jd.com/3031737.htm");
 			selectable.Properties = new Dictionary<string, dynamic> {
 				{ "cat", "手机" },
 				{ "cat3", "110" }

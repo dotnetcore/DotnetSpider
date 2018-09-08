@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				EmptySleepTime = 1000;
 				var word = "可乐|雪碧";
-				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+				AddRequest(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				AddEntityType<BaiduSearchEntry>();
 				AddPipeline(new MySqlEntityFilePipeline(MySqlEntityFilePipeline.FileType.InsertSql));
 			}

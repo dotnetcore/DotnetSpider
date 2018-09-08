@@ -9,7 +9,7 @@ namespace DotnetSpider.Sample.docs
 {
 	public class DefaultMySqlPipelineSpider : Spider
 	{
-		public DefaultMySqlPipelineSpider() : base(new Site())
+		public DefaultMySqlPipelineSpider()
 		{
 		}
 
@@ -17,7 +17,7 @@ namespace DotnetSpider.Sample.docs
 		{
 			var word = "可乐|雪碧";
 			AddPipeline(new DefaultMySqlPipeline(Env.DataConnectionString, "baidu", "mysql_baidu_search"));
-			AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+			AddRequest(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 
 			var processor = new DefaultPageProcessor();
 			processor.AddTargetUrlExtractor("//p[@id=\"page\"]", "&pn=[0-9]+&");

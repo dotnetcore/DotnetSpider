@@ -12,7 +12,6 @@ namespace DotnetSpider.Extension
 	{
 		public static void Run()
 		{
-			var site = new Site();
 			var mode = new ModelDefinition
 				(
 				new Selector(".//div[@class='result']"),
@@ -29,9 +28,9 @@ namespace DotnetSpider.Extension
 				}
 				, new TableInfo("baidu", "search"), null);
 			var processor = new ModelProcessor(mode);
-			var spider = Spider.Create(site, processor);
+			var spider = Spider.Create(processor);
 			var word = "可乐|雪碧";
-			spider.AddStartUrl($"http://news.baidu.com/ns?word={word}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", new Dictionary<string, dynamic> { { "Keyword", word } });
+			spider.AddRequest($"http://news.baidu.com/ns?word={word}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", new Dictionary<string, dynamic> { { "Keyword", word } });
 			//spider.AddPipeline(new MySqlEntityPipeline());
 			spider.Run();
 		}

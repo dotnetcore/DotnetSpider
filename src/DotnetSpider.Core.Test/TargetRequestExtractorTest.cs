@@ -15,12 +15,10 @@ namespace DotnetSpider.Core.Test
 			var html = client.GetStringAsync("http://www.cnblogs.com").Result;
 
 			var extracotr = new RegionAndPatternTargetRequestExtractor(".//div[@class='pager']", "/sitehome/p/\\d+", "^http://www\\.cnblogs\\.com/$");
-
-			var site = new Site();
-			var page = new Page(new Request("http://cnblogs.com") { Site = site });
+			var page = new Page(new Request("http://cnblogs.com"));
 			page.Content = html;
 			page.ContentType = ContentType.Html;
-			var requets = Enumerable.ToList<Request>(extracotr.ExtractRequests(page));
+			var requets = Enumerable.ToList(extracotr.ExtractRequests(page));
 			Assert.Equal(11, requets.Count);
 			Assert.Contains(requets, r => r.Url == "http://cnblogs.com/sitehome/p/2");
 		}

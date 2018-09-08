@@ -14,7 +14,7 @@ namespace DotnetSpider.Sample.docs
 		protected override void OnInit(params string[] arguments)
 		{
 			Downloader = new WebDriverDownloader(Browser.Chrome);
-			AddStartUrl("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
+			AddRequest("http://list.jd.com/list.html?cat=9987,653,655&page=2&JL=6_0_0&ms=5#J_main", new Dictionary<string, object> { { "name", "手机" }, { "cat3", "655" } });
 			AddPipeline(new ConsoleEntityPipeline());
 			AddEntityType<Product>();
 		}

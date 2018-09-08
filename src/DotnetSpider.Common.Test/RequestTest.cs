@@ -12,8 +12,7 @@ namespace DotnetSpider.Common.Test
 			var extras = new Dictionary<string, dynamic> { { "Test", "Forever" } };
 			var request = new Request("http://www.taobao.com", extras)
 			{
-				Method = HttpMethod.Get,
-				Priority = 1
+				Method = HttpMethod.Get
 			};
 			return request;
 		}
@@ -47,7 +46,6 @@ namespace DotnetSpider.Common.Test
 			var request = GetRequest();
 			request.AddProperty("One", new { Name = "John" });
 			Assert.Equal(request.Properties["One"], new { Name = "John" });
-			Assert.Equal(1, request.Depth);
 		}
 
 		[Fact(DisplayName = "Request_Dispose")]
@@ -65,7 +63,6 @@ namespace DotnetSpider.Common.Test
 			var request = GetRequest();
 			var str = JsonConvert.SerializeObject(request);
 			var r = JsonConvert.DeserializeObject<Request>(str);
-			Assert.Equal(request.Depth, r.Depth);
 		}
 	}
 }

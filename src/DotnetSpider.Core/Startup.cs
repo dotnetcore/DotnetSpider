@@ -13,37 +13,37 @@ using System.Text;
 
 namespace DotnetSpider.Core
 {
-	public class Options
-	{
-		[Option('s', "spider", Required = true, HelpText = "Which spider you want to run.")]
-		public string Spider { get; set; }
-
-		[Option('n', "name", Required = false, HelpText = "The name of spider.")]
-		public string Name { get; set; }
-
-		[Option('t', "tid", Required = false, HelpText = "The task id of spider.")]
-		public string TaskId { get; set; }
-
-		[Option('a', "arguments", Required = false, HelpText = "The extra arguments to run spider.")]
-		public string Arguments { get; set; }
-
-		[Option('i', "identity", Required = false, HelpText = "The identity of spider.")]
-		public string Identity { get; set; }
-
-		[Option('c', "config", Required = false, HelpText = "The config file you want to use.")]
-		public string Config { get; set; }
-
-		public string[] GetArguments()
-		{
-			return string.IsNullOrEmpty(Arguments) ? new string[0] : Arguments.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-		}
-	}
-
 	/// <summary>
 	/// 启动任务工具
 	/// </summary>
 	public static class Startup
 	{
+		public class Options
+		{
+			[Option('s', "spider", Required = true, HelpText = "Which spider you want to run.")]
+			public string Spider { get; set; }
+
+			[Option('n', "name", Required = false, HelpText = "The name of spider.")]
+			public string Name { get; set; }
+
+			[Option('t', "tid", Required = false, HelpText = "The task id of spider.")]
+			public string TaskId { get; set; }
+
+			[Option('a', "arguments", Required = false, HelpText = "The extra arguments to run spider.")]
+			public string Arguments { get; set; }
+
+			[Option('i', "identity", Required = false, HelpText = "The identity of spider.")]
+			public string Identity { get; set; }
+
+			[Option('c', "config", Required = false, HelpText = "The config file you want to use.")]
+			public string Config { get; set; }
+
+			public string[] GetArguments()
+			{
+				return string.IsNullOrEmpty(Arguments) ? new string[0] : Arguments.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+			}
+		}
+
 		/// <summary>
 		/// DLL名字中包含任意一个即是需要扫描的DLL
 		/// </summary>

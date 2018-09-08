@@ -41,14 +41,14 @@ namespace DotnetSpider.Downloader
 				}
 				if (File.Exists(filePath))
 				{
-					return new Response { Request = request, Content = File.ReadAllText(filePath), StatusCode = HttpStatusCode.OK, TargetUrl = request.Url, ContentType = request.Site.ContentType };
+					var response = new Response { Request = request, Content = File.ReadAllText(filePath), StatusCode = HttpStatusCode.OK, TargetUrl = request.Url };
+					DetectContentType(response, null);
+					return response;
 				}
 			}
 			var msg = $"File {filePath} unfound.";
-			var response = new Response { Request = request, Content = null, StatusCode = HttpStatusCode.NotFound, ContentType = request.Site.ContentType, TargetUrl = request.Url };
-
 			Logger.Error($"Download {request.Url} failed: {msg}.");
-			return response;
+			return null;
 		}
 	}
 }

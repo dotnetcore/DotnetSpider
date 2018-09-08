@@ -35,7 +35,6 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class Spider : AppBase, ISpider, ISpeedMonitor
 	{
-		private Site _site = new Site();
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
 		private IDownloader _downloader;
 		private List<ResultItems> _cached;
@@ -50,6 +49,7 @@ namespace DotnetSpider.Core
 		private readonly AutomicLong _requestedCount = new AutomicLong(0);
 		private readonly MemoryMappedFile[] _mmfCloseSignals = new MemoryMappedFile[2];
 		private readonly string[] _filecloseSignals = new string[2];
+		private readonly List<Request> _requests = new List<Request>();
 		private bool _exited;
 		private IMonitor _monitor;
 		private int _statusFlushInterval = 5000;
@@ -61,6 +61,7 @@ namespace DotnetSpider.Core
 		private long _downloaderCostTimes;
 		private long _pipelineCostTimes;
 		private long _processorCostTimes;
+		private readonly Dictionary<string, Headers> _headers = new Dictionary<string, Headers>();
 
 		/// <summary>
 		/// 自定义的初始化
@@ -139,15 +140,6 @@ namespace DotnetSpider.Core
 		protected int WaitInterval { get; } = 10;
 
 		/// <summary>
-		/// Site of spider.
-		/// </summary>
-		public Site Site
-		{
-			get => _site;
-			set { _site = value ?? throw new ArgumentException($"{nameof(Site)} should not be null."); }
-		}
-
-		/// <summary>
 		/// Whether spider is complete.
 		/// </summary>
 		public bool IsCompleted { get; private set; }
@@ -161,6 +153,16 @@ namespace DotnetSpider.Core
 		/// Status of spider.
 		/// </summary>
 		public Status Status { get; private set; } = Status.Init;
+
+		/// <summary>
+		/// 每处理完一个目标链接后停顿的时间, 单位毫秒 
+		/// </summary>
+		public int SleepTime { get; set; } = 100;
+
+		/// <summary>
+		/// 目标链接的最大重试次数
+		/// </summary>
+		public int CycleRetryTimes { get; set; } = 5;
 
 		/// <summary>
 		/// Event of crawler a request success.
@@ -345,6 +347,11 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
+		/// 编码
+		/// </summary>
+		public string EncodingName { get; set; }
+
+		/// <summary>
 		/// Thread number of spider.
 		/// </summary>
 		public int ThreadNum
@@ -387,30 +394,20 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public Spider() : this(new Site(), Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(), null,
+		public Spider() : this(Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(), null,
 			null)
 		{
 		}
 
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="site">站点信息</param>
-		public Spider(Site site) : this(site, Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(), null,
-			null)
-		{
-			Site = site;
-		}
 
 		/// <summary>
 		/// Create a spider with site, identity, scheduler and pageProcessors.
 		/// </summary>
-		/// <param name="site">网站信息</param>
 		/// <param name="identity">唯一标识</param>
 		/// <param name="scheduler">调度队列</param>
 		/// <param name="pageProcessors">页面解析器</param>
 		/// <param name="pipelines">数据管道</param>
-		public Spider(Site site, string identity, IScheduler scheduler, IEnumerable<IPageProcessor> pageProcessors,
+		public Spider(string identity, IScheduler scheduler, IEnumerable<IPageProcessor> pageProcessors,
 			IEnumerable<IPipeline> pipelines)
 		{
 			ThreadPool.SetMinThreads(256, 256);
@@ -419,7 +416,6 @@ namespace DotnetSpider.Core
 #else
 			ServicePointManager.DefaultConnectionLimit = 1000;
 #endif
-			Site = site;
 			Identity = identity;
 			Scheduler = scheduler;
 
@@ -438,39 +434,54 @@ namespace DotnetSpider.Core
 		/// Create a spider with pageProcessors.
 		/// 不需要指定标识, 使用内存队列, 使用默认HttpClient下载器, 允许没有Pipeline
 		/// </summary>
-		/// <param name="site">网站信息</param>
 		/// <param name="pageProcessors">页面解析器</param>
 		/// <returns>爬虫</returns>
-		public static Spider Create(Site site, params IPageProcessor[] pageProcessors)
+		public static Spider Create(params IPageProcessor[] pageProcessors)
 		{
-			return new Spider(site, Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(),
+			return new Spider(Guid.NewGuid().ToString("N"), new QueueDuplicateRemovedScheduler(),
 				pageProcessors, null);
 		}
 
 		/// <summary>
 		/// Create a spider with pageProcessors and scheduler.
 		/// </summary>
-		/// <param name="site">网站信息</param>
 		/// <param name="pageProcessors">页面解析器</param>
 		/// <param name="scheduler">调度队列</param>
 		/// <returns>爬虫</returns>
-		public static Spider Create(Site site, IScheduler scheduler, params IPageProcessor[] pageProcessors)
+		public static Spider Create(IScheduler scheduler, params IPageProcessor[] pageProcessors)
 		{
-			return new Spider(site, Guid.NewGuid().ToString("N"), scheduler, pageProcessors, null);
+			return new Spider(Guid.NewGuid().ToString("N"), scheduler, pageProcessors, null);
 		}
 
 		/// <summary>
 		/// Create a spider with pageProcessors and scheduler.
 		/// </summary>
-		/// <param name="site">网站信息</param>
 		/// <param name="identify">唯一标识</param>
 		/// <param name="pageProcessors">页面解析器</param>
 		/// <param name="scheduler">调度队列</param>
 		/// <returns>爬虫</returns>
-		public static Spider Create(Site site, string identify, IScheduler scheduler,
+		public static Spider Create(string identify, IScheduler scheduler,
 			params IPageProcessor[] pageProcessors)
 		{
-			return new Spider(site, identify, scheduler, pageProcessors, null);
+			return new Spider(identify, scheduler, pageProcessors, null);
+		}
+
+		public Spider AddHeaders(string host, Headers headers)
+		{
+			CheckIfRunning();
+			var key = host.ToLower();
+			if (_headers.ContainsKey(key))
+			{
+				foreach (var kv in headers)
+				{
+					_headers[key].Add(kv.Key, kv.Value);
+				}
+			}
+			else
+			{
+				_headers.Add(key, headers);
+			}
+			return this;
 		}
 
 		/// <summary>
@@ -502,25 +513,14 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Add a url to spider.
-		/// </summary>
-		/// <param name="url">链接</param>
-		/// <returns></returns>
-		public Spider AddStartUrl(string url)
-		{
-			return AddStartUrls(url);
-		}
-
-		/// <summary>
 		/// Add urls to spider.
 		/// </summary>
 		/// <param name="url">链接</param>
 		/// <param name="extras">Extra properties of request.</param>
 		/// <returns></returns>
-		public Spider AddStartUrl(string url, Dictionary<string, dynamic> extras)
+		public Spider AddRequest(string url, Dictionary<string, dynamic> extras)
 		{
-			Site.AddRequests(new Request(url, extras));
-			return this;
+			return AddRequests(new Request(url, extras));
 		}
 
 		/// <summary>
@@ -528,14 +528,14 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="urls">链接</param>
 		/// <returns>爬虫</returns>
-		public Spider AddStartUrls(params string[] urls)
+		public Spider AddRequests(params string[] urls)
 		{
 			if (urls == null)
 			{
 				throw new ArgumentNullException(nameof(urls));
 			}
 
-			return AddStartUrls(urls.AsEnumerable());
+			return AddRequests(urls.AsEnumerable());
 		}
 
 		/// <summary>
@@ -543,16 +543,14 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="urls">链接</param>
 		/// <returns>爬虫</returns>
-		public Spider AddStartUrls(IEnumerable<string> urls)
+		public Spider AddRequests(IEnumerable<string> urls)
 		{
 			if (urls == null)
 			{
 				throw new ArgumentNullException(nameof(urls));
 			}
 
-			CheckIfRunning();
-			Site.AddRequests(urls);
-			return this;
+			return AddRequests(urls.Select(u => new Request(u, null)));
 		}
 
 		/// <summary>
@@ -560,9 +558,9 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="request">Request</param>
 		/// <returns>Spider</returns>
-		public Spider AddStartRequest(Request request)
+		public Spider AddRequest(Request request)
 		{
-			return AddStartRequests(request);
+			return AddRequests(request);
 		}
 
 		/// <summary>
@@ -570,14 +568,14 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="requests">链接</param>
 		/// <returns>爬虫</returns>
-		public Spider AddStartRequests(params Request[] requests)
+		public Spider AddRequests(params Request[] requests)
 		{
 			if (requests == null)
 			{
 				throw new ArgumentNullException(nameof(requests));
 			}
 
-			return AddStartRequests(requests.AsEnumerable());
+			return AddRequests(requests.AsEnumerable());
 		}
 
 		/// <summary>
@@ -585,15 +583,17 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="requests">链接</param>
 		/// <returns>爬虫</returns>
-		public Spider AddStartRequests(IEnumerable<Request> requests)
+		public Spider AddRequests(IEnumerable<Request> requests)
 		{
 			if (requests == null)
 			{
 				throw new ArgumentNullException(nameof(requests));
 			}
-
 			CheckIfRunning();
-			Site.AddRequests(requests);
+			foreach (var request in requests)
+			{
+				_requests.Add(request);
+			}
 			return this;
 		}
 
@@ -718,8 +718,6 @@ namespace DotnetSpider.Core
 				OnInit(arguments);
 			});
 
-			CheckSettings();
-
 			InitComponents(arguments);
 
 			if (arguments.Any(a => a?.ToLower() == SpiderArguments.InitOnly))
@@ -753,10 +751,6 @@ namespace DotnetSpider.Core
 					{
 						// 从队列中取出一个请求, 因为 Site 是共享对象， 每个Request都保留了引用， 序列存到Redis或其它数据库中浪费带宽和空间， 因此 Site对象不保存到数据库中
 						Request request = Scheduler.Poll();
-						if (request != null && request.Site == null)
-						{
-							request.Site = Site;
-						}
 						// 如果队列中没有需要处理的请求, 则开始等待, 一直到设定的 EmptySleepTime 结束, 则认为爬虫应该结束了
 						if (request == null)
 						{
@@ -780,7 +774,7 @@ namespace DotnetSpider.Core
 								if (result.Item1)
 								{
 									OnSuccess(request);
-									Logger.Information(
+									base.Logger.Information(
 										$"Crawl {request.Url} success, results {result.Item2}, effectedRow {result.Item3}.");
 								}
 								else
@@ -788,7 +782,7 @@ namespace DotnetSpider.Core
 									OnError(request);
 								}
 
-								Thread.Sleep(Site.SleepTime);
+								Thread.Sleep(SleepTime);
 							}
 							catch (ExitException)
 							{
@@ -797,7 +791,7 @@ namespace DotnetSpider.Core
 							catch (Exception e)
 							{
 								OnError(request);
-								Logger.Error($"Crawler {request.Url} failed: {e}.");
+								base.Logger.Error($"Crawler {request.Url} failed: {e}.");
 							}
 							finally
 							{
@@ -944,38 +938,12 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Check if all settings of spider are correct.
-		/// </summary>
-		protected void CheckSettings()
-		{
-			if (Site.RemoveOutboundLinks && (Site.Domains == null || Site.Domains.Length == 0))
-			{
-				throw new ArgumentException(
-					$"When you want remove outbound links, the domains should not be null or empty.");
-			}
-		}
-
-		/// <summary>
 		/// Init component of spider.
 		/// </summary>
 		/// <param name="arguments"></param>
 		protected virtual void InitComponents(params string[] arguments)
 		{
 			Logger.Information("Init components...");
-
-			if (Site.Headers == null)
-			{
-				Site.Headers = new Dictionary<string, string>();
-			}
-
-			Site.UserAgent = Site.UserAgent ??
-							 "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36";
-			if (!Site.Headers.ContainsKey("Accept-Language"))
-			{
-				Site.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
-			}
-
-			Scheduler = Scheduler ?? new QueueDuplicateRemovedScheduler();
 
 			if (arguments.Any(a => a?.ToLower() == SpiderArguments.Reset))
 			{
@@ -1137,9 +1105,9 @@ namespace DotnetSpider.Core
 			catch (Exception e)
 			{
 				// 解析异常有可能是下载内容导致的, 也有可能是自己解析写错了, 因此重试。
-				if (page.AddToCycleRetry())
+				if (page.AddToCycleRetry(CycleRetryTimes))
 				{
-					Logger.Warning($"Retry request: {request.Url} because processor exception: {e}.");
+					base.Logger.Warning($"Retry request: {request.Url} because processor exception: {e}.");
 				}
 				else
 				{
@@ -1240,7 +1208,7 @@ namespace DotnetSpider.Core
 			{
 				Logger.Error($"Download {request.Url} failed: {de.Message}.");
 				page.Content = null;
-				page.AddToCycleRetry();
+				page.AddToCycleRetry(CycleRetryTimes);
 			}
 			catch (NeedRedialException re)
 			{
@@ -1261,7 +1229,7 @@ namespace DotnetSpider.Core
 					{
 						Logger.Information("Redial success.");
 						page.Content = null;
-						page.AddToCycleRetry();
+						page.AddToCycleRetry(CycleRetryTimes);
 					}
 				}
 			}
@@ -1280,7 +1248,7 @@ namespace DotnetSpider.Core
 		/// <param name="page">页面数据</param>
 		protected void ExtractAndAddRequests(Page page)
 		{
-			if ((page.Request.Depth + 1) <= Scheduler.Depth && page.TargetRequests != null &&
+			if ((page.Request.GetProperty(Page.Depth) + 1) <= Scheduler.Depth && page.TargetRequests != null &&
 				page.TargetRequests.Count > 0)
 			{
 				foreach (Request request in page.TargetRequests)
@@ -1292,7 +1260,7 @@ namespace DotnetSpider.Core
 
 		protected virtual bool ShouldReserved(Request request)
 		{
-			return request != null && request.CycleTriedTimes > 0 && request.CycleTriedTimes <= Site.CycleRetryTimes;
+			return request != null && request.GetProperty(Page.CycleTriedTimes) > 0 && request.GetProperty(Page.CycleTriedTimes) <= CycleRetryTimes;
 		}
 
 		/// <summary>
@@ -1398,7 +1366,7 @@ namespace DotnetSpider.Core
 					{
 						var builder = RequestBuilders[i];
 						Logger.Information($"Add start request via builder[{i + 1}].");
-						builder.Build(Site);
+						builder.Build();
 					}
 				}
 				finally
@@ -1410,23 +1378,42 @@ namespace DotnetSpider.Core
 
 		private void PrepareScheduler()
 		{
-			if (Site.Requests != null && Site.Requests.Any())
+			if (_requests.Any())
 			{
-				Logger.Information($"Add start urls to scheduler, count {Site.Requests.Count}.");
+				Logger.Information($"Add start urls to scheduler, count {_requests.Count}.");
 
 				if (!Scheduler.IsDistributed)
 				{
-					foreach (var request in Site.Requests)
+					foreach (var request in _requests)
 					{
+						if (string.IsNullOrWhiteSpace(request.EncodingName))
+						{
+							request.EncodingName = EncodingName;
+						}
+						var host = request.Host.ToLower();
+						if (_headers.ContainsKey(host))
+						{
+							foreach (var kv in _headers[host])
+							{
+								request.Headers.Add(kv.Key, kv.Value);
+							}
+						}
 						Scheduler.Push(request, ShouldReserved);
 					}
 				}
 				else
 				{
-					Scheduler.Reload(new HashSet<Request>(Site.Requests));
-					// 释放本地内存
-					Site.Requests.Clear();
+					foreach (var request in _requests)
+					{
+						if (string.IsNullOrWhiteSpace(request.EncodingName))
+						{
+							request.EncodingName = EncodingName;
+						}
+					}
+					Scheduler.Reload(new HashSet<Request>(_requests));
 				}
+				// 释放本地内存
+				_requests.Clear();
 			}
 			else
 			{

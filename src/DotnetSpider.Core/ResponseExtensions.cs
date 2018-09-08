@@ -5,12 +5,11 @@ namespace DotnetSpider.Core
 {
 	public static class ResponseExtensions
 	{
-		public static Selectable Selectable(this Response response)
+		public static Selectable Selectable(this Response response, bool removeOutboundLinks = false)
 		{
-			var site = response.Request.Site;
 			response.Delivery = response.Delivery != null && response.Delivery is Selectable ? response.Delivery :
-				response.ContentType == ContentType.Json ? new Selectable(response.Content, site.Padding)
-				: new Selectable(response.Content, response.Request.Url, response.Request.Site.Domains);
+				response.ContentType == ContentType.Json ? new Selectable(response.Content)
+				: new Selectable(response.Content, response.Request.Url.ToString(), removeOutboundLinks);
 			response.Delivery.Properties = response.Request.Properties;
 			return response.Delivery;
 		}

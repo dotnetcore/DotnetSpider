@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Jil" Version="2.16.0" />
+    <PackageReference Include="MessagePack" Version="1.7.3.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
   </ItemGroup>
 

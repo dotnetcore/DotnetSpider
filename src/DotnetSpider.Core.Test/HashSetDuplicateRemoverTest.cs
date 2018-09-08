@@ -10,7 +10,7 @@ namespace DotnetSpider.Core.Test
 		[Fact(DisplayName = "HashSetDuplicateRemover_HashSetDuplicate")]
 		public void HashSetDuplicate()
 		{
-			Core.Scheduler.Component.HashSetDuplicateRemover scheduler = new Core.Scheduler.Component.HashSetDuplicateRemover();
+			Scheduler.Component.HashSetDuplicateRemover scheduler = new Scheduler.Component.HashSetDuplicateRemover();
 
 			bool isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", null));
 
@@ -26,7 +26,7 @@ namespace DotnetSpider.Core.Test
 		[Fact(DisplayName = "HashSetDuplicateSynchronized")]
 		public void HashSetDuplicateSynchronized()
 		{
-			Core.Scheduler.Component.HashSetDuplicateRemover scheduler = new Core.Scheduler.Component.HashSetDuplicateRemover();
+			Scheduler.Component.HashSetDuplicateRemover scheduler = new Scheduler.Component.HashSetDuplicateRemover();
 			bool isDuplicate = scheduler.IsDuplicate(new Request("http://www.a.com", null));
 
 			Assert.False(isDuplicate);

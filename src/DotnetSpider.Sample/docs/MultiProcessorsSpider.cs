@@ -17,20 +17,18 @@ namespace DotnetSpider.Sample.docs
 	{
 		public static void Run()
 		{
-			// 定义要采集的 Site 对象, 可以设置 Header、Cookie、代理等
-			var site = new Site { EncodingName = "UTF-8" };
-			for (int i = 1; i < 5; ++i)
-			{
-				// 添加初始采集链接
-				site.AddRequests("http://www.cnblogs.com");
-			}
-
 			// 使用内存Scheduler、自定义PageProcessor、自定义Pipeline创建爬虫
-			Spider spider = Spider.Create(site,
+			Spider spider = Spider.Create(
 				new QueueDuplicateRemovedScheduler(),
 				new BlogSumaryProcessor(),
 				new NewsProcessor()).
 				AddPipeline(new MyPipeline());
+			spider.EncodingName = "UTF-8";
+			for (int i = 1; i < 5; ++i)
+			{
+				// 添加初始采集链接
+				spider.AddRequests("http://www.cnblogs.com");
+			}
 			// 启动爬虫
 			spider.Run();
 		}

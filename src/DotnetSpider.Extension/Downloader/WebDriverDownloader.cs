@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using DotnetSpider.Downloader;
 using DotnetSpider.Common;
 using Newtonsoft.Json.Linq;
+using System.Net;
+using System.Collections;
 
 namespace DotnetSpider.Extension.Downloader
 {
@@ -45,7 +47,7 @@ namespace DotnetSpider.Extension.Downloader
 			_browser = browser;
 			_option = option ?? new Option();
 			_domains = domains;
-
+			AddBeforeDownloadHandler(this);
 			AutoCloseErrorDialog();
 		}
 
@@ -81,7 +83,6 @@ namespace DotnetSpider.Extension.Downloader
 		/// <param name="option">选项</param>
 		public WebDriverDownloader(Browser browser, Option option) : this(browser, null, 200, option)
 		{
-			AddBeforeDownloadHandler(this);
 		}
 
 		/// <summary>
@@ -97,28 +98,48 @@ namespace DotnetSpider.Extension.Downloader
 		{
 			base.AddCookie(cookie);
 			// 如果 Downloader 在运行中, 需要把 Cookie 加到 Driver 中
-			_driver?.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
+			_driver?.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
 		}
 
 		public void Handle(ref Request request, IDownloader downloader)
 		{
-			if (_driver == null)
+			var d = downloader as WebDriverDownloader;
+			if (d != null && d._driver == null)
 			{
-				_driver = WebDriverUtil.Open(_browser, _option);
+				d._driver = WebDriverUtil.Open(_browser, _option);
+				d._driver.Url = request.Url;
+				Logger?.Information("实例化浏览器");
 
-				if (_domains != null)
+				foreach (var domain in _domains)
 				{
-					foreach (var domain in _domains)
+					var cookies = GetAllCookies(CookieContainer);
+					foreach (System.Net.Cookie cookie in cookies)
 					{
-						var cookies = CookieContainer.GetCookies(new Uri(domain));
-						foreach (System.Net.Cookie cookie in cookies)
-						{
-							// 此处不能通过直接调用AddCookie来添加, 会导致CookieContainer添加重复值
-							_driver.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
-						}
+						// 此处不能通过直接调用AddCookie来添加, 会导致CookieContainer添加重复值
+						d._driver.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
 					}
 				}
 			}
+		}
+
+		private List<System.Net.Cookie> GetAllCookies(CookieContainer cc)
+		{
+			var lstCookies = new List<System.Net.Cookie>();
+
+			Hashtable table = (Hashtable)cc.GetType().InvokeMember("m_domainTable",
+				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetField |
+				System.Reflection.BindingFlags.Instance, null, cc, new object[] { });
+
+			foreach (object pathList in table.Values)
+			{
+				SortedList lstCookieCol = (SortedList)pathList.GetType().InvokeMember("m_list",
+					System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.GetField
+					| System.Reflection.BindingFlags.Instance, null, pathList, new object[] { });
+				foreach (CookieCollection colCookies in lstCookieCol.Values)
+					foreach (System.Net.Cookie c in colCookies) lstCookies.Add(c);
+			}
+
+			return lstCookies;
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
@@ -152,26 +173,6 @@ namespace DotnetSpider.Extension.Downloader
 			catch (Exception e)
 			{
 				throw new DownloaderException($"Unexpected exception when download request: {request.Url}: {e}.");
-			}
-		}
-
-		protected override void DetectContentType(Common.Response response, string contentType)
-		{
-			if (!string.IsNullOrWhiteSpace(response.Content) && response.Request.Site.ContentType == ContentType.Auto)
-			{
-				try
-				{
-					JToken.Parse(response.Content);
-					response.Request.Site.ContentType = ContentType.Json;
-				}
-				catch
-				{
-					response.Request.Site.ContentType = ContentType.Html;
-				}
-			}
-			else if (!string.IsNullOrWhiteSpace(response.Content))
-			{
-				response.ContentType = response.Request.Site.ContentType;
 			}
 		}
 	}

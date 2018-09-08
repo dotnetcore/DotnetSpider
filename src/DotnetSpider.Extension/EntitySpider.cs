@@ -18,22 +18,7 @@ namespace DotnetSpider.Extension
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public EntitySpider() : this(null, new Site())
-		{
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		public EntitySpider(string name) : this(name, new Site())
-		{
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="site">目标站点信息</param>
-		public EntitySpider(Site site) : this(null, site)
+		public EntitySpider() : this(null)
 		{
 		}
 
@@ -42,7 +27,7 @@ namespace DotnetSpider.Extension
 		/// </summary>
 		/// <param name="name">名称</param>
 		/// <param name="site">目标站点信息</param>
-		public EntitySpider(string name, Site site) : base(site)
+		public EntitySpider(string name)
 		{
 			if (!string.IsNullOrWhiteSpace(name))
 			{

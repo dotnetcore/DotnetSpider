@@ -24,7 +24,8 @@ namespace DotnetSpider.Extraction.Test
 		[Fact(DisplayName = "DetectDomain1")]
 		public void DetectDomain1()
 		{
-			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>", "www.aaaa.com", "www\\.aaaa\\.com");
+			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>",
+				"http://www.aaaa.com", true);
 			var values = selectable.XPath(".//a").GetValues();
 			Assert.Equal("aaaaaaab", values.First());
 		}
@@ -32,7 +33,8 @@ namespace DotnetSpider.Extraction.Test
 		[Fact(DisplayName = "DetectDomain2")]
 		public void DetectDomain2()
 		{
-			Selectable selectable = new Selectable("<div><a href=\"www.aaaab.com\">aaaaaaab</a></div>", "www.aaaa.com", "www\\.aaaa\\.com");
+			Selectable selectable = new Selectable("<div><a href=\"www.aaaab.com\">aaaaaaab</a></div>",
+				"http://www.aaaa.com", true);
 			var values = selectable.XPath(".//a").GetValues();
 			Assert.Empty(values);
 		}

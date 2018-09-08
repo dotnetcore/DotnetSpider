@@ -27,11 +27,10 @@ namespace DotnetSpider.Core.Test.Downloader
 		public void Ports()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
-			var site = new Site();
 
 			for (int i = 0; i < 100; i++)
 			{
-				var a = downloader.Download(new Request("http://www.163.com", null) { Site = site });
+				var a = downloader.Download(new Request("http://www.163.com", null));
 			}
 		}
 
@@ -39,16 +38,13 @@ namespace DotnetSpider.Core.Test.Downloader
 		public void DetectDownloadContent()
 		{
 			HttpClientDownloader downloader = new HttpClientDownloader();
-			var site = new Site();
-			var a = downloader.Download(new Request("http://www.163.com", null) { Site = site });
-			Assert.Equal(ContentType.Html, site.ContentType);
-			site = new Site();
+
+			var a = downloader.Download(new Request("http://www.163.com", null));
+			Assert.Equal(ContentType.Html, a.ContentType);
+
 			HttpClientDownloader2 downloader2 = new HttpClientDownloader2();
-			a = downloader2.Download(new Request("http://www.163.com", null)
-			{
-				Site = site
-			});
-			Assert.Equal(ContentType.Json, site.ContentType);
+			a = downloader2.Download(new Request("http://www.163.com", null));
+			Assert.Equal(ContentType.Json, a.ContentType);
 		}
 
 		//[Fact(DisplayName = "_404Url")]
@@ -65,7 +61,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		//	spider.AddPipeline(new ConsolePipeline());
 		//	spider.SkipTargetUrlsWhenResultIsEmpty = false;
 		//	spider.EmptySleepTime = 6000;
-		//	spider.AddStartUrl("http://www.mlr.gov.cn/xwdt/jrxw/201707/t20170710_15242382.htm");
+		//	spider.AddRequest("http://www.mlr.gov.cn/xwdt/jrxw/201707/t20170710_15242382.htm");
 		//	spider.Run();
 		//	Assert.Equal(5, spider.RetriedTimes.Value);
 		//}
@@ -85,7 +81,7 @@ namespace DotnetSpider.Core.Test.Downloader
 		//	spider.SkipTargetUrlsWhenResultIsEmpty = true;
 		//	spider.Downloader = new HttpClientDownloader();
 		//	spider.EmptySleepTime = 6000;
-		//	spider.AddStartUrl("https://tieba.baidu.com/f?kw=%E7%AE%80%E9%98%B3&ie=utf-8&pn=50");
+		//	spider.AddRequest("https://tieba.baidu.com/f?kw=%E7%AE%80%E9%98%B3&ie=utf-8&pn=50");
 		//	spider.Run();
 		//	Assert.Equal(0, spider.RetriedTimes.Value);
 		//}
@@ -103,15 +99,8 @@ namespace DotnetSpider.Core.Test.Downloader
 		[Fact(DisplayName = "GetTargetUrlWhenRedirect")]
 		public void GetTargetUrlWhenRedirect()
 		{
-			Site site = new Site
-			{
-				Headers = new Dictionary<string, string>
-				{
-					{ "User-Agent", "Chrome" }
-				}
-			};
 			var downloader = new HttpClientDownloader();
-			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null) { Site = site });
+			var page = downloader.Download(new Request("http://item.jd.com/1231222221111123.html", null));
 			Assert.DoesNotContain("1231222221111123", page.TargetUrl);
 			Assert.True(page.TargetUrl.Contains("www.jd.com/") || page.TargetUrl.Contains("global.jd.com"));
 		}

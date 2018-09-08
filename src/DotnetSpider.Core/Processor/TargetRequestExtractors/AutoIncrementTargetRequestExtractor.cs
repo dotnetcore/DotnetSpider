@@ -46,7 +46,7 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 			{
 				var next = RegexUtil.Number.Replace(_paginationStr, (currentPage + _interval).ToString());
 				string newUrl = response.Request.Url.Replace(currentPageStr, next);
-				return new[] { new Request(newUrl, response.Request.Properties) { Site = response.Request.Site } };
+				return new[] { new Request(newUrl, response.Request.Properties) };
 			}
 
 			return new Request[0];

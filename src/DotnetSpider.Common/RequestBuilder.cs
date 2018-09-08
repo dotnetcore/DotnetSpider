@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Common
 {
@@ -10,8 +11,7 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 构造起始链接对象并添加到网站信息对象中
 		/// </summary>
-		/// <param name="site">网站信息</param>
-		void Build(Site site);
+		IEnumerable<Request> Build();
 	}
 
 	/// <summary>
@@ -22,8 +22,7 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 构造起始链接对象并添加到网站信息对象中
 		/// </summary>
-		/// <param name="site">网站信息</param>
-		public abstract void Build(Site site);
+		public abstract IEnumerable<Request> Build();
 	}
 
 	/// <summary>
@@ -78,14 +77,15 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 构造起始链接对象并添加到网站信息对象中
 		/// </summary>
-		/// <param name="site">网站信息</param>
-		public override void Build(Site site)
+		public override IEnumerable<Request> Build()
 		{
+			List<Request> list = new List<Request>();
 			for (int i = From; i <= To; i += Interval)
 			{
 				var request = new Request($"{Prefix}{i}{Postfix}");
-				site.AddRequests(request);
+				list.Add(request);
 			}
+			return list;
 		}
 	}
 
@@ -148,15 +148,16 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 构造起始链接对象并添加到网站信息对象中
 		/// </summary>
-		/// <param name="site">网站信息</param>
-		public override void Build(Site site)
+		public override IEnumerable<Request> Build()
 		{
+			List<Request> list = new List<Request>();
 			for (var i = From; i <= To; i = i.AddDays(Interval))
 			{
 				var date = i.ToString(DateFormateString);
 				var request = new Request($"{Prefix}{date}{Postfix}");
-				site.AddRequests(request);
+				list.Add(request);
 			}
+			return list;
 		}
 	}
 }

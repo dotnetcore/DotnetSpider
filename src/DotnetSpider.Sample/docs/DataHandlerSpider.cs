@@ -88,26 +88,19 @@ namespace DotnetSpider.Sample.docs
 				}
 			}
 
-			public Spider() : base(new Site
+			protected override void OnInit(params string[] arguments)
 			{
-				Headers = new Dictionary<string, string>
-				{
+				AddHeaders("s.taobao.com", new Headers {
 					{ "Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" },
 					{ "Referer", "https://www.taobao.com/"},
 					{ "Cache-Control","max-age=0" },
 					{ "Upgrade-Insecure-Requests","1" }
-				}
-			})
-			{
-			}
-
-			protected override void OnInit(params string[] arguments)
-			{
+				});
 				Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("g_page_config = {", "g_srp_loadCss();", 16, 22));
 				AddBeforeProcessor(new TargetRequestHandler(new AutoIncrementTargetRequestExtractor("&s=0", 44)));
 				AddBeforeProcessor(new MyBeforeProcessorHandler());
 				SkipTargetRequestsWhenResultIsEmpty = true;
-				AddStartRequest(new Request("https://s.taobao.com/search?q=妙可蓝多&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab=all", new Dictionary<string, dynamic> { { "bidwordstr", "妙可蓝多" } }));
+				AddRequest(new Request("https://s.taobao.com/search?q=妙可蓝多&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab=all", new Dictionary<string, dynamic> { { "bidwordstr", "妙可蓝多" } }));
 				AddEntityType<TaobaoItem>(new MyDataHanlder());
 				AddPipeline(new ConsoleEntityPipeline());
 			}

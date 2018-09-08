@@ -7,11 +7,16 @@ using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Sample.docs;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Threading;
+using static MessagePack.LZ4MessagePackSerializer;
 
 namespace DotnetSpider.Sample
 {
@@ -25,9 +30,11 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(256, 256);
 #endif
  
+
 			ConfigurableSpider.Run();
 		}
 
+ 
 		/// <summary>
 		/// <c>MyTest</c> is a method in the <c>Program</c>
 		/// </summary>

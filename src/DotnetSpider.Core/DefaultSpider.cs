@@ -15,7 +15,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public DefaultSpider() : this(Guid.NewGuid().ToString("N"), new Site())
+		public DefaultSpider() : this(Guid.NewGuid().ToString("N"))
 		{
 		}
 
@@ -23,8 +23,7 @@ namespace DotnetSpider.Core
 		/// 构造方法
 		/// </summary>
 		/// <param name="id">爬虫标识</param>
-		/// <param name="site">网站信息</param>
-		public DefaultSpider(string id, Site site) : this(id, site, new QueueDuplicateRemovedScheduler())
+		public DefaultSpider(string id) : this(id, new QueueDuplicateRemovedScheduler())
 		{
 		}
 
@@ -32,9 +31,8 @@ namespace DotnetSpider.Core
 		/// 构造方法
 		/// </summary>
 		/// <param name="id">爬虫标识</param>
-		/// <param name="site">网站信息</param>
 		/// <param name="scheduler">URL队列</param>
-		public DefaultSpider(string id, Site site, IScheduler scheduler) : base(site, id, scheduler, new[] { new SimplePageProcessor() }, new[] { new ConsolePipeline() })
+		public DefaultSpider(string id, IScheduler scheduler) : base(id, scheduler, new[] { new SimplePageProcessor() }, new[] { new ConsolePipeline() })
 		{
 			Logger = LogUtil.Create(id);
 		}

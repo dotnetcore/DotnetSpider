@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension.Test.Model
 			var model = new ModelDefinition<Product>();
 			EntityProcessor<Product> processor = new EntityProcessor<Product>(null, null, new MyDataHandler());
 
-			processor.Process(new Page(new Request("http://www.abcd.com") { Site = new Site() })
+			processor.Process(new Page(new Request("http://www.abcd.com"))
 			{
 				Content = "{'data':[{'name':'aaaa'},{'name':'bbbb'}]}"
 			}, null);

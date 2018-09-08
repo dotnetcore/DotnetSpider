@@ -70,7 +70,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 				Monitor = new LogMonitor();
 				Identity = "HeadlessSpider";
 				var word = "可乐|雪碧";
-				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+				AddRequest(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				Downloader = new WebDriverDownloader(Browser.Chrome, new Option
 				{
 					Headless = true
@@ -90,7 +90,7 @@ namespace DotnetSpider.Extension.Test.Downloader
 			protected override void OnInit(params string[] arguments)
 			{
 				var word = "可乐|雪碧";
-				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
+				AddRequest(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
 				Downloader = new WebDriverDownloader(Browser.Chrome);
 				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType<BaiduSearchEntry>();

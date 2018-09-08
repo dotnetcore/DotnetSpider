@@ -6,6 +6,9 @@ namespace DotnetSpider.Core
 {
 	public class Page : Response
 	{
+		public const string Priority = "136740A536C44EFFA40E99323D3F1463";
+		public const string Depth = "CE9F9A4C83B64A08BB0F00DD2D461A98";
+		public const string CycleTriedTimes = "C2B6D909814E48FF8FB001CCF6CCD3F7";
 		private readonly object _locker = new object();
 
 		/// <summary>
@@ -120,8 +123,9 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			var newUrl = Selectable.CanonicalizeUrl(url, Request.Url);
-			var request = new Request(newUrl, Request.Properties) { Priority = priority };
+			var newUrl = Selectable.CanonicalizeUrl(url, Request.Url.ToString());
+			var request = new Request(newUrl, Request.Properties);
+			request.AddProperty(Priority, priority);
 			AddTargetRequest(request, increaseDeep);
 		}
 
@@ -136,7 +140,32 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			request.Depth = increaseDeep ? Request.Depth + 1 : Request.Depth;
+			var depth = Request.GetProperty(Depth);
+			request.AddProperty(Depth, increaseDeep ? depth + 1 : depth);
+			if (string.IsNullOrWhiteSpace(request.EncodingName))
+			{
+				request.EncodingName = Request.EncodingName;
+			}
+			if (request.Headers == null)
+			{
+				request.Headers = Request.Headers;
+			}
+			if (string.IsNullOrWhiteSpace(request.Accept))
+			{
+				request.Accept = Request.Accept;
+			}
+			if (string.IsNullOrWhiteSpace(request.Origin))
+			{
+				request.Origin = Request.Origin;
+			}
+			if (string.IsNullOrWhiteSpace(request.Referer))
+			{
+				request.Referer = Request.Referer;
+			}
+			if (string.IsNullOrWhiteSpace(request.UserAgent))
+			{
+				request.UserAgent = Request.UserAgent;
+			}
 			lock (_locker)
 			{
 				TargetRequests.Add(request);
@@ -145,17 +174,18 @@ namespace DotnetSpider.Core
 
 		private bool IsAvailable(Request request)
 		{
-			if (string.IsNullOrWhiteSpace(request.Url))
+			if (request.Url==null)
 			{
 				return false;
 			}
 
-			if (request.Url.Length < 6)
+			var url = request.Url.ToString();
+			if (url.Length < 6)
 			{
 				return false;
 			}
 
-			var schema = request.Url.Substring(0, 5).ToLower();
+			var schema = url.Substring(0, 5).ToLower();
 			if (!schema.StartsWith("http") && !schema.StartsWith("https"))
 			{
 				return false;

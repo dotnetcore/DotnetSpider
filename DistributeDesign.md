@@ -1,17 +1,17 @@
 ## Design
 
 ```
-                                                               +--------+
-                                                        +----->| Node 1 |
-                                                        |      +--------+
+                                                               +----------------+
+                                                        +----->| Console Node 1 |
+                                                        |      +----------------+
                                                         |
-+--------------+                  +---------+           |      +--------+
-| Scheduler.NET|<------HTTP------>| Broker  |<--SignalR-|----->| Node 2 |
-+--------------+                  +----^----+           |      +--------+
++--------------+                  +---------+           |      +----------------+
+| Scheduler.NET|<------HTTP------>| Broker  |<--SignalR-|----->| Web Node 1     |
++--------------+                  +----^----+           |      +----------------+
                                        |                |
-                                     SignalR            |      +--------+
-                                       |                +----->| Node 1 |
-                               +-------+---------+             +--------+
+                                     SignalR            |      +----------------+
+                                       |                +----->| Web Node 2     |
+                               +-------+---------+             +----------------+
                                |                 |
                          +-----v----+     +------v---+
                          | Worker 1 |     | Worker 2 |
@@ -26,29 +26,33 @@
 
 Node send heartbeat to broker and receive message from broker via websocket.
 
+**NodeType: Console, Web**
+
 ```
-+---------------------------------------------------+ 
-|                      Node                         |
-+-------------------+--------------+----------------+
-| + Id              | GUID         | PRIMARY        |
-+-------------------+--------------+----------------+
-| + IPAddress       | STRING(50)   |                |
-+-------------------+--------------+----------------+
-| + ProcessorCount  | INT          |                |
-+-------------------+--------------+----------------+
-| + Group           | STRING(100)  |                |
-+-------------------+--------------+----------------+
-| + OperatingSystem | STRING(50)   |                |
-+-------------------+--------------+----------------+
-| + Memory          | INT          |                |
-+-------------------+--------------+----------------+
-| + IsEnabled       | BOOL         |                |
-+-------------------+--------------+----------------+
-| + LastOnlineTime  | DATETIME     |                |
-+-------------------+--------------+----------------+
++--------------------------------------------------------+ 
+|                          Node                          |
++------------------------+--------------+----------------+
+| + Id                   | GUID         | PRIMARY        |
++------------------------+--------------+----------------+
+| + NodeType             | STRING(50)   |                |
++------------------------+--------------+----------------+
+| + IPAddress            | STRING(50)   |                |
++------------------------+--------------+----------------+
+| + ProcessorCount       | INT          |                |
++------------------------+--------------+----------------+
+| + Group                | STRING(50)   |                |
++------------------------+--------------+----------------+
+| + OperatingSystem      | STRING(50)   |                |
++------------------------+--------------+----------------+
+| + Memory               | INT          |                |
++------------------------+--------------+----------------+
+| + IsEnabled            | BOOL         |                |
++------------------------+--------------+----------------+
+| + CreationTime         | DATETIME     |                |
++------------------------+--------------+----------------+
 
 +---------------------------------------------------+ 
-|                    NodeHeartbeat                  |
+|                    NodeStatus                     |
 +-------------------+--------------+----------------+
 | + Id              | INT          | PRIMARY, AI    |
 +-------------------+--------------+----------------+
@@ -67,19 +71,16 @@ Node send heartbeat to broker and receive message from broker via websocket.
 ### Broker
 
 ```
-=======================BlockJob======================
 +---------------------------------------------------+ 
-|                      BlockJob                     |
+|                          Job                      |
 +-------------------+--------------+----------------+
 | + Id              | GUID         | PRIMARY        |
 +-------------------+--------------+----------------+
 | + Name            | STRING(50)   |                |
 +-------------------+--------------+----------------+
+| + JobType         | ENUM         |                |
++-------------------+--------------+----------------+
 | + Cron            | STRING(50)   |                |
-+-------------------+--------------+----------------+
-| + FullClassName   | STRING(100)  |                |
-+-------------------+--------------+----------------+
-| + Arguments       | STRING(500)  |                |
 +-------------------+--------------+----------------+
 | + Description     | STRING(500)  |                |
 +-------------------+--------------+----------------+
@@ -88,91 +89,62 @@ Node send heartbeat to broker and receive message from broker via websocket.
 | + IsDeleted       | BOOL         |                |
 +-------------------+--------------+----------------+
 
-Node is used as distributed downloader for block job, start request builder & processor & pipeline is a worker. 
+JobType：Block | Application
 
-=======================ApplicationJob================
+Node is used as distributed downloader for block job, start request builder & processor & pipeline is a worker, 
+used as a agent for application job.
+
+---------------------------------------------------------------------------------------------------------------
 
 +---------------------------------------------------+ 
-|                      ApplicationJob               |
+|                      JobProperty                  |
 +-------------------+--------------+----------------+
-| + Id              | GUID         | PRIMARY        |
+| + Id              | INT          | PRIMARY, AI    |
 +-------------------+--------------+----------------+
-| + Name            | STRING(50)   |                |
+| + JobId           | GUID         |                |
 +-------------------+--------------+----------------+
-| + Cron            | STRING(50)   |                |
+| + Key             | STRING(50)   |                |
 +-------------------+--------------+----------------+
-| + Package         | STRING(100)  |                |
-+-------------------+--------------+----------------+
-| + Application     | STRING(100)  |                |
-+-------------------+--------------+----------------+
-| + Arguments       | STRING(500)  |                |
-+-------------------+--------------+----------------+
-| + NodeCount       | INT          |                |
-+-------------------+--------------+----------------+
-| + NodeGroup       | STRING(50)   |                |
-+-------------------+--------------+----------------+
-| + Os              | STRING(50)   |                |
-+-------------------+--------------+----------------+
-| + Description     | STRING(500)  |                |
-+-------------------+--------------+----------------+
-| + IsEnabled       | BOOL         |                |
-+-------------------+--------------+----------------+
-| + IsDeleted       | BOOL         |                |
+| + Value           | STRING(500)  |                |
 +-------------------+--------------+----------------+
 
-Node is used as a agent for application job.
 
-=======================Worker========================
+Block job: FullClassName, Arguments
+Application job: Pacakge, Application, Arguments, NodeCount, NodeGroup, Os
+
+---------------------------------------------------------------------------------------------------------------
 
 +---------------------------------------------------+ 
 |                      Worker                       |
 +-------------------+--------------+----------------+
-| + FullClassName   | STRING(100)  | PRIMARY        |
+| + Id              | INT          | PRIMARY, AI    |
 +-------------------+--------------+----------------+
-| + ConnectionId    | STRING(50)   | PRIMARY        |
+| + FullClassName   | STRING(100)  |                |
 +-------------------+--------------+----------------+
-| + IsDisconnected  | BOOL         |                |
+| + ConnectionId    | STRING(50)   |                |
 +-------------------+--------------+----------------+
-| + CreationTime    | DATETIME     |                |
+| + ConnectTime     | DATETIME     |                |
 +-------------------+--------------+----------------+
 | + DisconnectTime  | DATETIME     |                |
 +-------------------+--------------+----------------+
 
-=======================Block=========================
+---------------------------------------------------------------------------------------------------------------
 
 +---------------------------------------------------+ 
 |                      Block                        |
 +-------------------+--------------+----------------+
-| + BlockId         | GUID         | PRIMARY        |
+| + Id              | GUID         | PRIMARY        |
 +-------------------+--------------+----------------+
 | + Identity        | GUID         | INDEX_IDENTITY |
 +-------------------+--------------+----------------+
-| + SwtichIpPattern | STRING(100)  |                |
-+-------------------+--------------+----------------+
-| + Status          | ENUM         |                |
+| + State           | ENUM         |                |
 +-------------------+--------------+----------------+
 | + CreationTime    | DATETIME     |                |
 +-------------------+--------------+----------------+
 
-Block status: ready (1), using (2), success(4), failed(8), retry(16)
+Block state: ready (1), using (2), success(4), failed(8)
 
-===================BlockStatusHistory================
-
-+---------------------------------------------------+ 
-|                  BlockStatusHistory               |
-+-------------------+--------------+----------------+
-| + Id              | INT          | PRIMARY, AI    |
-+-------------------+--------------+----------------+
-| + BlockId         | GUID         | INDEX_BLOCKID  |
-+-------------------+--------------+----------------+
-| + Status          | ENUM         |                |
-+-------------------+--------------+----------------+
-| + Detail          | STRING(MAX)  |                |
-+-------------------+--------------+----------------+
-| + CreationTime    | DATETIME     |                |
-+-------------------+--------------+----------------+
-
-=======================Running=======================
+---------------------------------------------------------------------------------------------------------------
 
 +---------------------------------------------------+ 
 |                      Running                      |
@@ -181,79 +153,155 @@ Block status: ready (1), using (2), success(4), failed(8), retry(16)
 +-------------------+--------------+----------------+
 | + Identity        | GUID         | INDEX_IDENTITY |
 +-------------------+--------------+----------------+
-| + Arguments       | STRING(500)  |                |
-+-------------------+--------------+----------------+
-| + Priority        | INT          |                |
+| + Consuming       | INT          |                |
 +-------------------+--------------+----------------+
 | + Priority        | INT          |                |
 +-------------------+--------------+----------------+
 | + CreationTime    | DATETIME     |                |
 +-------------------+--------------+----------------+
 
- +-------------------+
- | ICrawlerService    |
- +-------------------+
- | Add|
- +-------------------+
+---------------------------------------------------------------------------------------------------------------
 
- +-------------------+
- | IWorkerService    |
- +-------------------+
- | Watch(string name)|
- +-------------------+
++---------------------------------------------------+ 
+|                      JobStatus                    |
++-------------------+--------------+----------------+
+| + JobId           | GUID         | PRIMARY        |
++-------------------+--------------+----------------+
+| + Identity        | GUID         | PRIMARY        |
++-------------------+--------------+----------------+
+| + NodeId          | GUID         |                |
++-------------------+--------------+----------------+
+| + Status          | ENUM         |                |
++-------------------+--------------+----------------+
+| + Left            | INT          |                |
++-------------------+--------------+----------------+
+| + Success         | INT          |                |
++-------------------+--------------+----------------+
+| + Error           | INT          |                |
++-------------------+--------------+----------------+
+| + Total           | INT          |                |
++-------------------+--------------+----------------+
+| + UpdateTime      | DATETIME     |                |
++-------------------+--------------+----------------+
 
 ```
 
-### 角色
+### Application Job
 
-**Broker**
+#### Create job
 
-+ 分发请求块（Blockoutput）： POST http://broker/node/heartbeat
-+ 接收分布式下载器的回传数据 (Blockinput): POST http://broker/node/block
-+ 接收 Request 打包成 Block, 插入 Request 队列: POST http://broker/requestqueue/{identity}
-+ 通过 Identity 查询已经完成的 Request 以 Block 为单位 : GET http://broker/requestqueue/{identity}
+1. Add to Scheduler.NET
+2. Save to database
 
-Entities
-----------------------------
+#### Delete job
 
-#### Running
+1. Set job's IsDeleted true
 
-| Column | DataType | Value| Key |
-|:---|:---|:---|:---|
-|JobId|VARCHAR(32)| GUID | Primary |
-|Identity| VARCHAR(32)| GUID | Primary |
-|ThreadNum| INT | 2 |  |
-|Site| VARCHAR(MAX)|  |  |
-|Priority| INT| 0 |  |
-|PopTimes| INT| 0 |  |
-|BlockCount |INT| 10| |
+#### Update job
 
-##### 任务管理
+1. Update cron to Scheduler.NET if need
+2. Update to database
 
-1. Portal 通过 Broker API 添加一个任务
-		
-		NAME: TASK1
-		CRON: */5 * * * *
-		PROCESSOR: Console.SampleProcessor
-		ARGUMENTS:
-		DESCRIPTION: This is a test task.
+#### Trigger job
 
-+ 通过 Scheduler.NET API 添加任务并获得返回的 SchedulerNetId, 如果成功则执行下一步操作，失败则抛异常
-+ 添加 Job 信息到数据库中
+1. Scheduler.NET trigger a callback, argument is job id
+2. Check job exists by job id
+3. Check job is enabled
+4. Get available agent
+5. Call agent to run job via signalr 
 
-2. Portal 通过 Broker API 修改一个任务
+### Block job
 
-+ 通过 Scheduler.NET API 修改任务， 如果修改成功则执行下一步操作，失败则抛异常
-+ 修改数据库中的 Job 信息
+#### Create & Delete & Update are same with application job
 
-3. Portal 通过 Broker API 删除一个任务
+#### Register worker
 
-+ 通过 Scheduler.NET API 删除任务， 如果删除成功则执行下一步操作，失败则抛异常
-+ 从数据库中删除 Job 信息
+1. Worker connected to broker via signalr
+2. Save worker to database
 
-##### 任务执行
+#### Trigger job
 
-1. 启动 Wroker 实例
+1. Scheduler.NET trigger a callback, argument is job id
+2. Check job exists by job id
+3. Check job is enabled
+4. Check if some worker watch this job
+5. Call worker via signalr
+
+### Broker
+
+#### OnConnected
+
+1. Add to node table if not exists, update it if exists
+
+#### Heartbeat: BlockDto Heartbeat(AddNodeStatusDto dto)
+
+```
++----------------------------------+ 
+|       AddNodeStatusDto           |
++-------------------+--------------+
+| + ProcessCount    | INT          |
++-------------------+--------------+
+| + Cpu             | INT          |
++-------------------+--------------+
+| + FreeMemory      | INT          |
++-------------------+--------------+
+
+```
+
+1. Add to nodeheartbeat table 
+
+#### Queue
+
+1. Push(string identity, Request[] requests)
+2. IEnumable<Request> Poll(string identity)
+
+### Agent 流程设计
+
+#### Agent Configuration
+
++ maxProcessCount: 5
++ broker: http://localhost:55626/
++ token: 1234
++ heartbeat: 30
++ retryDownload: 3
+
+#### Connect to broker
+
+1. Connect to broker by url  http://localhost:55626/?nodeid={guid}&operationsystem=windows&proccessorcount=4&memory=1600&nodetype=console&group=default&sign={guid}
+
+#### Heartbeat
+
+1. Send heartbeat every 5 seconds and return requests: Heartbeat(HeartbeatDto dto)
+2. Download all requests and send responses to broker: SaveBlockResponse(BlockResonse response), every site & identity use a httpclient, and set cookies if in need(force use same cookies or set cookies before request first url), save download bytes to broker.
+
+```
++--------------------------------------+ 
+|          BlockDto                    |
++-------------------+------------------+
+| + BlockId         | STRING           |
++-------------------+------------------+
+| + Identity        | STRING           |
++-------------------+------------------+
+| + ThreadNum       | INT              |
++-------------------+------------------+
+| + ChangeIpPattern | STRING           |
++-------------------+------------------+
+| + Content         | Site             |
++-------------------+------------------+
+| + Cookies         | STRING           |
++-------------------+------------------+
+
+```
+
+#### Run application job
+
+1. Broker call agent to run a application job: RunApplication(string package, string application, string arguments)
+
+#### Control application job
+
++ Exit(string identity)
+
+
 
 
 

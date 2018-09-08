@@ -13,14 +13,12 @@ namespace DotnetSpider.Core.Test
 		[Fact(DisplayName = "Selector_RemoveOutboundLinks")]
 		public void RemoveOutboundLinks()
 		{
-			Site site = new Site { RemoveOutboundLinks = true, Domains = new[] { "a.com" } };
 			var request = new Request("http://a.com");
-			request.Site = site;
 			Page page = new Page(request)
 			{
 				Content = _html3
 			};
-			var results = page.Selectable().Links().GetValues();
+			var results = page.Selectable(true).Links().GetValues();
 			Assert.Equal(2, results.Count());
 			Assert.Equal("http://a.com", results.ElementAt(0));
 			Assert.Equal("http://a.com/bbc", results.ElementAt(1));

@@ -2,13 +2,21 @@
 {
 	public static class PageExtensions
 	{
-		public static bool AddToCycleRetry(this Page page)
+		public static bool AddToCycleRetry(this Page page, int cycleRetryTimes)
 		{
-			page.Request.CycleTriedTimes++;
-
-			if (page.Request.CycleTriedTimes <= page.Request.Site.CycleRetryTimes)
+			var cycleTriedTimes = page.Request.GetProperty(Page.CycleTriedTimes);
+			if (cycleTriedTimes == null)
 			{
-				page.Request.Priority = 0;
+				cycleTriedTimes = 1;
+			}
+			else
+			{
+				cycleTriedTimes += 1;
+			}
+			page.Request.AddProperty(Page.CycleTriedTimes, 1);
+			if (cycleTriedTimes <= cycleRetryTimes)
+			{
+				page.Request.AddProperty(Page.Priority, 0);
 				page.AddTargetRequest(page.Request, false);
 				page.Retry = true;
 				return true;

@@ -14,17 +14,8 @@ namespace DotnetSpider.Extraction
 		/// 构造方法
 		/// </summary>
 		/// <param name="html">Html</param>
-		public Selectable(string html) : this(html, null, null)
-		{
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="html">Html</param>
 		/// <param name="url">URL相对路径补充</param>
-		/// <param name="domains">域名, 用于去除外链</param>
-		public Selectable(string html, string url, params string[] domains)
+		public Selectable(string html, string url, bool removeOutboundLinks = true)
 		{
 			HtmlDocument document = new HtmlDocument { OptionAutoCloseOnEnd = true };
 			document.LoadHtml(html);
@@ -33,12 +24,13 @@ namespace DotnetSpider.Extraction
 			{
 				FixAllRelativeHrefs(document, url);
 			}
-
-			if (domains != null && domains.Length > 0)
+			if (removeOutboundLinks)
 			{
-				RemoveOutboundLinks(document, domains);
+				var host = new Uri(url).Host;
+				var hostSplits = host.Split('.');
+				string domain = $"{hostSplits[hostSplits.Length - 2]}\\.{hostSplits[hostSplits.Length - 1]}";
+				RemoveOutboundLinks(document, domain);
 			}
-
 			Elements = new List<dynamic> { document.DocumentNode.OuterHtml };
 		}
 
@@ -46,10 +38,8 @@ namespace DotnetSpider.Extraction
 		/// 构造方法
 		/// </summary>
 		/// <param name="json">Json</param>
-		/// <param name="padding">需要去除的 Json padding</param>
-		public Selectable(string json, string padding)
+		public Selectable(string json)
 		{
-			json = string.IsNullOrWhiteSpace(json) ? json : RemovePadding(json, padding);
 			Elements = new List<dynamic> { json };
 		}
 
@@ -96,23 +86,23 @@ namespace DotnetSpider.Extraction
 			{
 				case "now":
 					{
-						return DateTime.Now;
+						return DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
 					}
 				case "monday":
 					{
 						var now = DateTime.Now;
 						int i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
 						TimeSpan ts = new TimeSpan(i, 0, 0, 0);
-						return now.Subtract(ts).Date;
+						return now.Subtract(ts).Date.ToString("yyyy/MM/dd hh:mm:ss");
 					}
 				case "today":
 					{
-						return DateTime.Now.Date;
+						return DateTime.Now.Date.ToString("yyyy/MM/dd hh:mm:ss");
 					}
 				case "monthly":
 					{
 						var now = DateTime.Now;
-						return now.AddDays(now.Day * -1 + 1);
+						return now.AddDays(now.Day * -1 + 1).ToString("yyyy/MM/dd hh:mm:ss");
 					}
 				default:
 					{
@@ -247,26 +237,6 @@ namespace DotnetSpider.Extraction
 			{
 				return url;
 			}
-		}
-
-		/// <summary>
-		/// Remove padding for JSON
-		/// </summary>
-		/// <param name="text"></param>
-		/// <param name="padding"></param>
-		/// <returns></returns>
-		private string RemovePadding(string text, string padding)
-		{
-			if (string.IsNullOrWhiteSpace(padding))
-			{
-				return text;
-			}
-
-			XTokenQueue tokenQueue = new XTokenQueue(text);
-			tokenQueue.ConsumeWhitespace();
-			tokenQueue.Consume(padding);
-			tokenQueue.ConsumeWhitespace();
-			return tokenQueue.ChompBalancedNotInQuotes('(', ')');
 		}
 
 		private void FixAllRelativeHrefs(HtmlDocument document, string url)

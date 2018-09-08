@@ -90,7 +90,6 @@ namespace DotnetSpider.Extension.Test.Processor
 		{
 			var id = Guid.NewGuid().ToString("N");
 			AutoIncrementTargetRequestExtractorSpider spider = new AutoIncrementTargetRequestExtractorSpider(id);
-			//spider.Downloader = new HttpClientDownloader { UseFiddlerProxy = true };
 			spider.Run();
 			var pipeline = spider.Pipelines.First() as CollectionEntityPipeline;
 			var entities = pipeline.GetCollection("test.baidu_search");
@@ -129,10 +128,8 @@ namespace DotnetSpider.Extension.Test.Processor
 				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 				public string Website { get; set; }
 
-
 				[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
 				public string Snapshot { get; set; }
-
 
 				[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
@@ -155,27 +152,23 @@ namespace DotnetSpider.Extension.Test.Processor
 
 			protected override void OnInit(params string[] arguments)
 			{
-				Site = new Site
-				{
-					Headers = new Dictionary<string, string>
-					{
-						{ "Upgrade-Insecure-Requests", "1" }
-					},
-					Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
-				};
 				Monitor = new LogMonitor();
 				var word = "可乐|雪碧";
 				Identity = Guid.NewGuid().ToString();
-				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),
-					new Dictionary<string, dynamic> {
-						{ "Keyword", word },
-						{ "guid", _guid }
+				AddRequest(
+					new Request(
+						string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),
+						new Dictionary<string, dynamic> {
+							{ "Keyword", word },
+							{ "guid", _guid }
+						})
+					{
+						Headers = new Headers { { "Upgrade-Insecure-Requests", "1" } },
+						Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
 					});
 				AddEntityType<BaiduSearchEntry>(new AutoIncrementTargetRequestExtractor("&pn=0", 1, new TestTargetRequestExtractorTermination()));
 				AddPipeline(new CollectionEntityPipeline());
 			}
 		}
-
-
 	}
 }

@@ -10,24 +10,17 @@ namespace DotnetSpider.Sample.docs
 {
 	public class CtripCitySpider : EntitySpider
 	{
-		public CtripCitySpider() : base(new Site
-		{
-			Headers = new Dictionary<string, string>
-				{
-					{"Cache-Control","max-age=0" },
-					{"Upgrade-Insecure-Requests","1" },
-					{"Accept-Encoding","gzip, deflate, sdch" },
-					{"Accept-Language","zh-CN,zh;q=0.8" }
-				},
-			UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
-			Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-		})
-		{
-		}
-
 		protected override void OnInit(params string[] arguments)
 		{
-			AddStartUrl("http://www.ctrip.com/");
+			AddHeaders("www.ctrip.com", new Headers {
+				{"Cache-Control","max-age=0" },
+				{"Upgrade-Insecure-Requests","1" },
+				{"Accept-Encoding","gzip, deflate, sdch" },
+				{"Accept-Language","zh-CN,zh;q=0.8" },
+				{"Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" },
+				{"UserAgent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36" }
+			});
+			AddRequests("http://www.ctrip.com/");
 			AddEntityType<CtripCity>();
 			AddPipeline(new ConsoleEntityPipeline());
 		}

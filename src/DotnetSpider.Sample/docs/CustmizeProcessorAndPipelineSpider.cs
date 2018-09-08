@@ -14,15 +14,7 @@ namespace DotnetSpider.Sample.docs
 	{
 		public static void Run()
 		{
-			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
-			var site = new Site { EncodingName = "UTF-8" };
-			for (int i = 1; i < 5; ++i)
-			{
-				// Add start/feed urls. 添加初始采集链接
-				site.AddRequests($"http://list.youku.com/category/show/c_96_s_1_d_1_p_{i}.html");
-			}
-
-			Spider spider = Spider.Create(site,
+			Spider spider = Spider.Create(
 				// use memoery queue scheduler. 使用内存调度
 				new QueueDuplicateRemovedScheduler(),
 				// use custmize processor for youku 为优酷自定义的 Processor
@@ -30,6 +22,12 @@ namespace DotnetSpider.Sample.docs
 				// use custmize pipeline for youku 为优酷自定义的 Pipeline
 				.AddPipeline(new YoukuPipeline());
 			// Start crawler 启动爬虫
+			spider.EncodingName = "UTF-8";
+			for (int i = 1; i < 5; ++i)
+			{
+				// Add start/feed urls. 添加初始采集链接
+				spider.AddRequests($"http://list.youku.com/category/show/c_96_s_1_d_1_p_{i}.html");
+			}
 			spider.Run();
 		}
 

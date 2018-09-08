@@ -54,9 +54,9 @@ namespace DotnetSpider.Downloader
 				EnsureSuccessStatusCode(response.StatusCode);
 				response.TargetUrl = httpWebResponse.ResponseUri.ToString();
 				var bytes = ReadResponseStream(httpWebResponse);
-				if (!request.Site.ExcludeMediaTypes.Any(t => httpWebResponse.ContentType.Contains(t)))
+				if (!ExcludeMediaTypes.Any(t => httpWebResponse.ContentType.Contains(t)))
 				{
-					if (!request.Site.DownloadFiles)
+					if (!DownloadFiles)
 					{
 						Logger.Warning($"Ignore {request.Url} because media type is not allowed to download.");
 					}
@@ -67,13 +67,13 @@ namespace DotnetSpider.Downloader
 				}
 				else
 				{
-					string content = ReadContent(bytes, httpWebResponse.ContentType, request.Site);
+					string content = ReadContent(request, bytes, httpWebResponse.ContentType);
 
 					if (_decodeHtml)
 					{
 #if NETFRAMEWORK
 						content =
- System.Web.HttpUtility.UrlDecode(System.Web.HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(request.Site.EncodingName) ? Encoding.Default : Encoding.GetEncoding(request.Site.EncodingName));
+ System.Web.HttpUtility.UrlDecode(System.Web.HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(request.EncodingName) ? Encoding.UTF8 : Encoding.GetEncoding(request.EncodingName));
 #else
 						content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
 #endif
@@ -141,19 +141,13 @@ namespace DotnetSpider.Downloader
 
 		private HttpWebRequest GenerateHttpWebRequest(Request request)
 		{
-			var site = request.Site;
 			var httpWebRequest = (HttpWebRequest)WebRequest.Create(request.Url);
 			httpWebRequest.Method = request.Method.Method;
 
 			// Add user-agent
-			var userAgentHeader = "User-Agent";
-			var userAgentHeaderValue = site.Headers.ContainsKey(userAgentHeader)
-				? site.Headers[userAgentHeader]
-				: site.UserAgent;
-			userAgentHeaderValue = string.IsNullOrEmpty(userAgentHeaderValue)
+			httpWebRequest.UserAgent = string.IsNullOrEmpty(request.UserAgent)
 				? "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36"
-				: userAgentHeaderValue;
-			httpWebRequest.UserAgent = userAgentHeaderValue;
+				: request.UserAgent; ;
 
 			if (!string.IsNullOrEmpty(request.Referer))
 			{
@@ -165,22 +159,21 @@ namespace DotnetSpider.Downloader
 				httpWebRequest.Headers.Add("Origin", request.Origin);
 			}
 
-			if (!string.IsNullOrEmpty(site.Accept))
+			if (!string.IsNullOrEmpty(request.Accept))
 			{
-				httpWebRequest.Accept = site.Accept;
+				httpWebRequest.Accept = request.Accept;
 			}
 
 			var contentTypeHeader = "Content-Type";
 
-			foreach (var header in site.Headers)
+			foreach (var header in request.Headers)
 			{
 				if (header.Key.ToLower() == "cookie")
 				{
 					continue;
 				}
 
-				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value) &&
-					header.Key != contentTypeHeader && header.Key != userAgentHeader)
+				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value))
 				{
 					httpWebRequest.Headers.Add(header.Key, header.Value);
 				}
@@ -195,14 +188,17 @@ namespace DotnetSpider.Downloader
 				var requestStream = httpWebRequest.GetRequestStream();
 				requestStream.Write(bytes, 0, bytes.Length);
 
-				if (site.Headers.ContainsKey(contentTypeHeader))
+				if (request.Headers.ContainsKey(contentTypeHeader))
 				{
-					httpWebRequest.ContentType = site.Headers[contentTypeHeader];
+					httpWebRequest.ContentType = request.Headers[contentTypeHeader];
+				}
+				else
+				{
+					httpWebRequest.ContentType = request.Content.StartsWith("{") ? "" : "application/x-www-form-urlencoded";
 				}
 
-
 				var xRequestedWithHeader = "X-Requested-With";
-				if (site.Headers.ContainsKey(xRequestedWithHeader) && site.Headers[xRequestedWithHeader] == "NULL")
+				if (request.Headers.ContainsKey(xRequestedWithHeader) && request.Headers[xRequestedWithHeader] == "NULL")
 				{
 					httpWebRequest.Headers.Remove(xRequestedWithHeader);
 				}

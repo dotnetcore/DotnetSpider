@@ -122,9 +122,9 @@ namespace DotnetSpider.Downloader
 				response.TargetUrl = httpResponseMessage.RequestMessage.RequestUri.AbsoluteUri;
 
 				var bytes = httpResponseMessage.Content.ReadAsByteArrayAsync().Result;
-				if (!request.Site.ExcludeMediaTypes.Any(t => httpResponseMessage.Content.Headers.ContentType.MediaType.Contains(t)))
+				if (!ExcludeMediaTypes.Any(t => httpResponseMessage.Content.Headers.ContentType.MediaType.Contains(t)))
 				{
-					if (!request.Site.DownloadFiles)
+					if (!DownloadFiles)
 					{
 						Logger.Warning($"Ignore {request.Url} because media type is not allowed to download.");
 					}
@@ -135,13 +135,13 @@ namespace DotnetSpider.Downloader
 				}
 				else
 				{
-					string content = ReadContent(bytes, httpResponseMessage.Content.Headers.ContentType.CharSet, request.Site);
+					string content = ReadContent(request, bytes, httpResponseMessage.Content.Headers.ContentType.CharSet);
 
 					if (_decodeHtml)
 					{
 #if NETFRAMEWORK
 						content =
- System.Web.HttpUtility.UrlDecode(System.Web.HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(request.Site.EncodingName) ? Encoding.Default : Encoding.GetEncoding(request.Site.EncodingName));
+ System.Web.HttpUtility.UrlDecode(System.Web.HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(request.EncodingName) ? Encoding.UTF8 : Encoding.GetEncoding(request.EncodingName));
 #else
 						content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
 #endif
@@ -274,7 +274,7 @@ namespace DotnetSpider.Downloader
 		{
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(request.Method, request.Url);
 			var userAgentHeader = "User-Agent";
-			httpRequestMessage.Headers.TryAddWithoutValidation(userAgentHeader, request.Site.Headers.ContainsKey(userAgentHeader) ? request.Site.Headers[userAgentHeader] : request.Site.UserAgent);
+			httpRequestMessage.Headers.TryAddWithoutValidation(userAgentHeader, request.UserAgent);
 
 			if (!string.IsNullOrWhiteSpace(request.Referer))
 			{
@@ -286,14 +286,14 @@ namespace DotnetSpider.Downloader
 				httpRequestMessage.Headers.TryAddWithoutValidation("Origin", request.Origin);
 			}
 
-			if (!string.IsNullOrWhiteSpace(request.Site.Accept))
+			if (!string.IsNullOrWhiteSpace(request.Accept))
 			{
-				httpRequestMessage.Headers.TryAddWithoutValidation("Accept", request.Site.Accept);
+				httpRequestMessage.Headers.TryAddWithoutValidation("Accept", request.Accept);
 			}
 
 			var contentTypeHeader = "Content-Type";
 
-			foreach (var header in request.Site.Headers)
+			foreach (var header in request.Headers)
 			{
 				if (header.Key.ToLower() == "cookie")
 				{
@@ -310,13 +310,13 @@ namespace DotnetSpider.Downloader
 				var bytes = CompressContent(request);
 				httpRequestMessage.Content = new ByteArrayContent(bytes);
 
-				if (request.Site.Headers.ContainsKey(contentTypeHeader))
+				if (!string.IsNullOrWhiteSpace(request.ContentType))
 				{
-					httpRequestMessage.Content.Headers.TryAddWithoutValidation(contentTypeHeader, request.Site.Headers[contentTypeHeader]);
+					httpRequestMessage.Content.Headers.TryAddWithoutValidation(contentTypeHeader, request.ContentType);
 				}
 
 				var xRequestedWithHeader = "X-Requested-With";
-				if (request.Site.Headers.ContainsKey(xRequestedWithHeader) && request.Site.Headers[xRequestedWithHeader] == "NULL")
+				if (request.Headers.ContainsKey(xRequestedWithHeader) && request.Headers[xRequestedWithHeader] == "NULL")
 				{
 					httpRequestMessage.Content.Headers.Remove(xRequestedWithHeader);
 				}

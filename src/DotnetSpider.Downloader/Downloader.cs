@@ -23,6 +23,35 @@ namespace DotnetSpider.Downloader
 		private bool _injectedCookies;
 		private readonly string _downloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "downloads");
 
+		/// <summary>
+		/// 是否下载文件
+		/// </summary>
+		public bool DownloadFiles { get; set; }
+
+		/// <summary>
+		/// What mediatype should not be treated as file to download.
+		/// </summary>
+		/// <summary xml:lang="zh-CN">
+		/// 定义哪些类型的内容不需要当成文件下载
+		/// </summary>
+		public List<string> ExcludeMediaTypes = new List<string>
+		{
+			"",
+			"text/html",
+			"text/plain",
+			"text/richtext",
+			"text/xml",
+			"text/XML",
+			"text/json",
+			"text/javascript",
+			"application/soap+xml",
+			"application/xml",
+			"application/json",
+			"application/x-javascript",
+			"application/javascript",
+			"application/x-www-form-urlencoded"
+		};
+
 		public readonly static HttpClientHandler HttpMessageHandler = new HttpClientHandler
 		{
 			AllowAutoRedirect = true,
@@ -117,10 +146,10 @@ namespace DotnetSpider.Downloader
 		}
 
 		/// <summary>
-		/// Gets a <see cref="System.Net.CookieCollection"/> that contains the <see cref="System.Net.Cookie"/> instances that are associated with a specific <see cref="Uri"/>.
+		/// Gets a <see cref="CookieCollection"/> that contains the <see cref="Cookie"/> instances that are associated with a specific <see cref="Uri"/>.
 		/// </summary>
 		/// <param name="uri">The URI of the System.Net.Cookie instances desired.</param>
-		/// <returns>A <see cref="System.Net.CookieCollection"/> that contains the <see cref="System.Net.Cookie"/> instances that are associated with a specific <see cref="Uri"/>.</returns>
+		/// <returns>A <see cref="CookieCollection"/> that contains the <see cref="Cookie"/> instances that are associated with a specific <see cref="Uri"/>.</returns>
 		public CookieCollection GetCookies(Uri uri)
 		{
 			return CookieContainer.GetCookies(uri);
@@ -152,10 +181,6 @@ namespace DotnetSpider.Downloader
 		/// <returns>下载内容封装好的页面对象 (a <see cref="Response"/> instance that contains requested page infomations, like Html source, headers, etc.)</returns>
 		public Response Download(Request request)
 		{
-			if (request.Site == null)
-			{
-				request.Site = new Site();
-			}
 			lock (this)
 			{
 				if (!_injectedCookies && CookieInjector != null)
@@ -175,20 +200,20 @@ namespace DotnetSpider.Downloader
 			return Download(new Request(url));
 		}
 
-		protected virtual string ReadContent(byte[] contentBytes, string characterSet, Site site)
+		protected virtual string ReadContent(Request request, byte[] contentBytes, string characterSet)
 		{
-			if (string.IsNullOrEmpty(site.EncodingName))
+			if (string.IsNullOrEmpty(request.EncodingName))
 			{
 				Encoding htmlCharset = EncodingExtensions.GetEncoding(characterSet, contentBytes);
 				return htmlCharset.GetString(contentBytes, 0, contentBytes.Length);
 			}
 
-			return Encoding.GetEncoding(site.EncodingName).GetString(contentBytes, 0, contentBytes.Length);
+			return Encoding.GetEncoding(request.EncodingName).GetString(contentBytes, 0, contentBytes.Length);
 		}
 
 		protected virtual byte[] CompressContent(Request request)
 		{
-			var encoding = string.IsNullOrEmpty(request.Site.EncodingName) ? Encoding.UTF8 : Encoding.GetEncoding(request.Site.EncodingName);
+			var encoding = string.IsNullOrEmpty(request.EncodingName) ? Encoding.UTF8 : Encoding.GetEncoding(request.EncodingName);
 			var bytes = encoding.GetBytes(request.Content);
 
 			switch (request.CompressMode)
@@ -247,42 +272,34 @@ namespace DotnetSpider.Downloader
 
 		protected virtual void DetectContentType(Response response, string contentType)
 		{
-			if (response.Request.Site.ContentType == ContentType.Auto)
+			if (!string.IsNullOrWhiteSpace(contentType))
 			{
-				if (!string.IsNullOrWhiteSpace(contentType))
+				if (contentType.Contains("json"))
 				{
-					if (contentType.Contains("json"))
-					{
-						response.ContentType = ContentType.Json;
-					}
-					else
-					{
-						response.ContentType = ContentType.Html;
-					}
+					response.ContentType = ContentType.Json;
 				}
 				else
 				{
-					try
-					{
-						JsonConvert.DeserializeObject(response.Content);
-						response.ContentType = ContentType.Json;
-					}
-					catch
-					{
-						response.ContentType = ContentType.Html;
-					}
+					response.ContentType = ContentType.Html;
 				}
-				response.Request.Site.ContentType = response.ContentType;
 			}
 			else
 			{
-				response.ContentType = response.Request.Site.ContentType;
+				try
+				{
+					JsonConvert.DeserializeObject(response.Content);
+					response.ContentType = ContentType.Json;
+				}
+				catch
+				{
+					response.ContentType = ContentType.Html;
+				}
 			}
 		}
 
 		protected bool IfFileExists(Request request)
 		{
-			if (request.Site.DownloadFiles)
+			if (DownloadFiles)
 			{
 				string filePath = CreateFilePath(request);
 				if (File.Exists(filePath))
@@ -370,8 +387,7 @@ namespace DotnetSpider.Downloader
 
 		protected string CreateFilePath(Request request)
 		{
-			var uri = new Uri(request.Url);
-			var intervalPath = (uri.Host + uri.LocalPath).Replace("//", "/").Replace("/", DownloaderEnv.PathSeperator);
+			var intervalPath = (request.Host + request.LocalPath).Replace("//", "/").Replace("/", DownloaderEnv.PathSeperator);
 			string filePath = $"{_downloadFolder}{DownloaderEnv.PathSeperator}{intervalPath}";
 			return filePath;
 		}

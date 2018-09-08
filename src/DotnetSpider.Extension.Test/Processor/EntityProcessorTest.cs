@@ -206,7 +206,7 @@ namespace DotnetSpider.Extension.Test.Processor
 		public void TempEntityNoPrimaryInfo()
 		{
 			EntityProcessor<Entity1> processor = new EntityProcessor<Entity1>();
-			var page = new Page(new Request("http://www.abcd.com") { Site = new Site() })
+			var page = new Page(new Request("http://www.abcd.com"))
 			{
 				Content = "{'data':[{'age':'1'},{'age':'2'}]}"
 			};

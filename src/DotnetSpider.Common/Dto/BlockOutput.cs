@@ -44,12 +44,7 @@ namespace DotnetSpider.Common.Dto
 		/// <summary>
 		/// 需要下载的请求
 		/// </summary>
-		public List<RequestOutput> Requests { get; set; }
-
-		/// <summary>
-		/// 站点信息
-		/// </summary>
-		public Site Site { get; set; }
+		public List<Request> Requests { get; set; }
 
 		/// <summary>
 		/// 下载的启用线程数

@@ -141,7 +141,7 @@ namespace DotnetSpider.Extension.Test
 
 		private class ClearSchedulerSpider : EntitySpider
 		{
-			public ClearSchedulerSpider() : base("ClearSchedulerTestSpider", new Site())
+			public ClearSchedulerSpider() : base("ClearSchedulerTestSpider")
 			{
 			}
 
@@ -150,7 +150,7 @@ namespace DotnetSpider.Extension.Test
 				Monitor = new LogMonitor();
 				Identity = Guid.NewGuid().ToString("N");
 				//Scheduler = new RedisScheduler("127.0.0.1:6379,serviceName=Scheduler.NET,keepAlive=8,allowAdmin=True,connectTimeout=10000,password=,abortConnect=True,connectRetry=20");
-				AddStartUrl("https://baidu.com");
+				AddRequests("https://baidu.com");
 				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType<TestEntity>();
 			}
@@ -168,7 +168,7 @@ namespace DotnetSpider.Extension.Test
 			protected override void OnInit(params string[] arguments)
 			{
 				var word = "可乐|雪碧";
-				AddStartUrl(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),
+				AddRequest(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word),
 					new Dictionary<string, dynamic> {
 						{ "Keyword", word },
 						{ "guid", _guid }
@@ -219,7 +219,7 @@ namespace DotnetSpider.Extension.Test
 
 		private class CasSpider : EntitySpider
 		{
-			public CasSpider() : base("casTest", new Site())
+			public CasSpider() : base("casTest")
 			{
 			}
 
@@ -228,7 +228,7 @@ namespace DotnetSpider.Extension.Test
 				Identity = Guid.NewGuid().ToString();
 				EmptySleepTime = 5000;
 				AddPipeline(new CollectionEntityPipeline());
-				AddStartUrl("http://www.cas.cn/kx/kpwz/index.shtml");
+				AddRequests("http://www.cas.cn/kx/kpwz/index.shtml");
 				AddEntityType<ArticleSummary>();
 			}
 
@@ -248,17 +248,10 @@ namespace DotnetSpider.Extension.Test
 		{
 			protected override void OnInit(params string[] arguments)
 			{
-				Site = new Site
-				{
-					Headers = new Dictionary<string, string>
-					{
-						{ "Upgrade-Insecure-Requests", "1"}
-					}
-				};
 				EmptySleepTime = 6000;
 				AddPipeline(new CollectionEntityPipeline());
-				AddStartUrl("http://www.163.com");
-				AddStartUrl("http://www.sohu.com");
+				AddRequests("http://www.163.com");
+				AddRequests("http://www.sohu.com");
 				AddEntityType<NeteastEntity>();
 				AddEntityType<SohuEntity>();
 			}

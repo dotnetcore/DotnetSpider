@@ -18,7 +18,7 @@ namespace DotnetSpider.Sample.docs
 		{
 			protected override void OnInit(params string[] arguments)
 			{
-				AddStartUrl("http://www.jd.com/allSort.aspx");
+				AddRequests("http://www.jd.com/allSort.aspx");
 				AddEntityType<Category>();
 				AddEntityType<TmpProduct>();
 				AddEntityType<JdProduct>();

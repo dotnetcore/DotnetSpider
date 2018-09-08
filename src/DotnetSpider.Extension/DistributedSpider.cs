@@ -23,15 +23,7 @@ namespace DotnetSpider.Extension
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public DistributedSpider() : this(new Site())
-		{
-		}
-
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="site">目标站点信息</param>
-		public DistributedSpider(Site site) : base(site)
+		public DistributedSpider()
 		{
 		}
 

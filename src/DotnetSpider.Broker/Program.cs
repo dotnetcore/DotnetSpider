@@ -26,18 +26,22 @@ namespace DotnetSpider.Broker
 				.WriteTo.Console()
 				.CreateLogger();
 
-			Log.Information("Welcome to DotnetSpider.Broker!");
+			Log.Information("Welcome to DotnetSpider");
 
 			var config = new ConfigurationBuilder()
 				.SetBasePath(Directory.GetCurrentDirectory())
 				.AddJsonFile(configurationFile, optional: true)
 				.Build();
 
-			var host = WebHost.CreateDefaultBuilder(args).UseConfiguration(config)
+			var builder = CreateWebHostBuilder(args);
+
+			var host = builder.UseConfiguration(config)
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.UseStartup<Startup>().UseSerilog().Build();
 			host.Run();
 		}
 
+		public static IWebHostBuilder CreateWebHostBuilder(string[] args) => WebHost.CreateDefaultBuilder(args)
+			.UseStartup<Startup>();
 	}
 }

@@ -101,12 +101,13 @@ namespace DotnetSpider.Sample.docs
 			var modeProcessor = new ModelProcessor(model);
 			modeProcessor.CleanPound = true;
 			modeProcessor.AddDataHanlder(new MyDataHandler());
-			var site = new Site { EncodingName = instance.Encording };
-			site.AddRequests(instance.Url);
-			Spider spider = Spider.Create(site,
+
+			Spider spider = Spider.Create(
 				new QueueDuplicateRemovedScheduler(),
 				modeProcessor)
 				.AddPipeline(new MySqlEntityPipeline());
+			spider.EncodingName = instance.Encording;
+			spider.AddRequests(instance.Url);
 			if (instance.Downloader.ToLower() == "chrome")
 			{
 				spider.Downloader = new WebDriverDownloader(Browser.Chrome, new Option { Headless = true });

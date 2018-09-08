@@ -18,8 +18,7 @@ namespace DotnetSpider.Downloader.Test
 			File.AppendAllLines(path, new[] { "www.baidu.com" });
 			File.AppendAllLines(path, new[] { "a=b;c=d" });
 			FileCookieInject inject = new FileCookieInject(path, new App());
-			Site site = new Site();
-			site.AddRequests("http://www.baidu.com");
+ 
 			var downloader = new HttpWebRequestDownloader();
 			inject.Inject(downloader, true);
 			var cookies = downloader.GetCookies(new Uri("http://www.baidu.com"));

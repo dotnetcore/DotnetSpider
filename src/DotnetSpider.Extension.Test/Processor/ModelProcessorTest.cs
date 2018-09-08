@@ -46,8 +46,6 @@ namespace DotnetSpider.Extension.Test.Processor
 		private Page CreatePage()
 		{
 			var request = new Request("http://dotnetspoder.me");
-			var site = new Site();
-			request.Site = site;
 			var page = new Page(request);
 			page.Content = Html;
 			return page;

@@ -132,7 +132,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				}
 				catch { }
 
-				ISpider spider = new DefaultSpider("test", new Site());
+				ISpider spider = new DefaultSpider("test");
 
 				// 1. Create pipeline
 				var pipeline = CreatePipeline();
@@ -187,7 +187,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					conn.Execute($"use test; DROP TABLE multiprimarykey;");
 				}
 				catch { }
-				ISpider spider = new DefaultSpider("test", new Site());
+				ISpider spider = new DefaultSpider("test");
 
 				// 1. Create pipeline
 				var pipeline = CreatePipeline();

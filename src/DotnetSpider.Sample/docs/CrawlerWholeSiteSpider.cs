@@ -11,13 +11,7 @@ namespace DotnetSpider.Sample.docs
 	{
 		public static void Run()
 		{
-			// Config encoding, header, cookie, proxy etc... 定义采集的 Site 对象, 设置 Header、Cookie、代理等
-			var site = new Site { EncodingName = "UTF-8" };
-
-			// Set start/seed url
-			site.AddRequests("http://www.cnblogs.com/");
-
-			Spider spider = Spider.Create(site,
+			Spider spider = Spider.Create(
 				// use memoery queue scheduler
 				new QueueDuplicateRemovedScheduler(),
 				// default page processor will save whole html, and extract urls to target urls via regex
@@ -33,10 +27,11 @@ namespace DotnetSpider.Sample.docs
 			spider.TaskId = "cnblogs";
 			// traversal deep 遍历深度
 			spider.Scheduler.Depth = 3;
-
+			spider.EncodingName = "UTF-8";
 			// stop crawler if it can't get url from the scheduler after 30000 ms 当爬虫连续30秒无法从调度中心取得需要采集的链接时结束.
 			spider.EmptySleepTime = 30000;
-
+			// Set start/seed url
+			spider.AddRequests("http://www.cnblogs.com/");
 			// start crawler 启动爬虫
 			spider.Run();
 		}

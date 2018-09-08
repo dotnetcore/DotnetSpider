@@ -115,11 +115,11 @@ namespace DotnetSpider.Extension
 		/// <summary>
 		/// 构造起始链接对象并添加到网站信息对象中
 		/// </summary>
-		/// <param name="site">网站信息</param>
-		public override void Build(Site site)
+		public override IEnumerable<Request> Build()
 		{
 			var datas = QueryDatas();
 
+			List<Request> list = new List<Request>();
 			foreach (var data in datas)
 			{
 				object[] arguments = _formateArguments.Select(a => data[a]).ToArray();
@@ -129,9 +129,10 @@ namespace DotnetSpider.Extension
 					string url = string.Format(formate, arguments);
 					var request = new Request(url, data);
 					FormateRequest(request);
-					site.AddRequests(request);
+					list.Add(request);
 				}
 			}
+			return list;
 		}
 	}
 }

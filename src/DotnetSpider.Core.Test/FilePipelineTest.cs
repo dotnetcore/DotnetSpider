@@ -25,8 +25,8 @@ namespace DotnetSpider.Core.Test
 		[Fact(DisplayName = "FilePipeline")]
 		public void Process()
 		{
-			Core.Pipeline.FilePipeline filePipeline = new Core.Pipeline.FilePipeline();
-			ISpider spider = new DefaultSpider("test", new Site());
+			Pipeline.FilePipeline filePipeline = new Pipeline.FilePipeline();
+			ISpider spider = new DefaultSpider("test");
 
 			var folder = filePipeline.GetDataFolder(spider);
 			if (Directory.Exists(folder))

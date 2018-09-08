@@ -18,6 +18,11 @@ namespace DotnetSpider.Core.Processor
 		public bool CleanPound { get; set; }
 
 		/// <summary>
+		/// 是否去除外链
+		/// </summary>
+		public bool RemoveOutboundLinks { get; set; }
+
+		/// <summary>
 		/// 解析操作
 		/// </summary>
 		/// <param name="page">页面数据</param>
@@ -30,14 +35,14 @@ namespace DotnetSpider.Core.Processor
 		/// <param name="logger">日志接口</param>
 		public void Process(Page page, ILogger logger)
 		{
-			var properties = page.Selectable().Properties;
+			var properties = page.Selectable(RemoveOutboundLinks).Properties;
 			properties[Env.UrlPropertyKey] = page.Request.Url;
 			properties[Env.TargetUrlPropertyKey] = page.TargetUrl;
 
 			if (TargetUrlsExtractor != null)
 			{
 				bool isTarget = true;
-				if ((page.Request.Depth != 1 || Env.ProcessorFilterDefaultRequest) && TargetUrlsExtractor.TargetUrlPatterns != null && TargetUrlsExtractor.TargetUrlPatterns.Count > 0 && !TargetUrlsExtractor.TargetUrlPatterns.Contains(null))
+				if ((page.Request.GetProperty(Page.Depth) != 1 || Env.ProcessorFilterDefaultRequest) && TargetUrlsExtractor.TargetUrlPatterns != null && TargetUrlsExtractor.TargetUrlPatterns.Count > 0 && !TargetUrlsExtractor.TargetUrlPatterns.Contains(null))
 				{
 					foreach (var regex in TargetUrlsExtractor.TargetUrlPatterns)
 					{

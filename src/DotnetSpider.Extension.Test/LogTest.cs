@@ -35,11 +35,12 @@ namespace DotnetSpider.Extension.Test
 
 			string id = Guid.NewGuid().ToString("N");
 			Env.NodeId = "DEFAULT";
-			using (Spider spider = Spider.Create(new Site { EncodingName = "UTF-8" },
+			using (Spider spider = Spider.Create(
 				id,
 				new QueueDuplicateRemovedScheduler(),
 				new TestPageProcessor()))
 			{
+				spider.EncodingName = "UTF-8";
 				spider.Downloader = new TestDownloader();
 				spider.TaskId = "1";
 				spider.Monitor = new MySqlMonitor(spider.TaskId, spider.Identity, false, "Database='mysql';Data Source=localhost;User ID=root;Port=3306;SslMode=None;");
@@ -47,7 +48,7 @@ namespace DotnetSpider.Extension.Test
 				for (int i = 0; i < 5; i++)
 				{
 					Serilog.Log.Logger.Information("add start url" + i, id);
-					spider.AddStartUrl("http://www.baidu.com/" + i);
+					spider.AddRequests("http://www.baidu.com/" + i);
 				}
 				spider.EmptySleepTime = 1000;
 				spider.Run();

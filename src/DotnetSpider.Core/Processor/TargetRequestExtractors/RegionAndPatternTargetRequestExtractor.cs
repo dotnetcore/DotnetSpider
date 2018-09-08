@@ -43,7 +43,6 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 			{
 				return new Request[0];
 			}
-			var site = response.Request.Site;
 
 			List<string> resultUrls = new List<string>();
 			foreach (var targetUrlExtractor in _regionSelectorMapPatterns)
@@ -123,7 +122,7 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 				}
 			}
 
-			return resultUrls.Select(url => new Request(url, response.Request.Properties) { Site = site });
+			return resultUrls.Select(url => new Request(url, response.Request.Properties));
 		}
 
 		/// <summary>

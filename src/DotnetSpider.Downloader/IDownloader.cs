@@ -22,6 +22,7 @@ namespace DotnetSpider.Downloader
 		/// <returns>链接请求结果 <see cref="Response"/></returns>
 		Response Download(Request request);
 
+
 		/// <summary>
 		/// Add handlers for post-processing.
 		/// </summary>
@@ -42,7 +43,8 @@ namespace DotnetSpider.Downloader
 
 		///// <summary>
 		///// Cookie管理容器
-		///// </summary>
+		
+			///// </summary>
 		//CookieContainer CookieContainer { get; set; }
 
 		/// <summary>

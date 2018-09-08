@@ -18,14 +18,14 @@ namespace DotnetSpider.Sample.docs
 
 		private class CnblogsSpider : EntitySpider
 		{
-			public CnblogsSpider() : base(new Site())
+			public CnblogsSpider()
 			{
 			}
 
 			protected override void OnInit(params string[] arguments)
 			{
 				Identity = ("cnblogs_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-				AddStartUrl("https://news.cnblogs.com/n/page/1");
+				AddRequests("https://news.cnblogs.com/n/page/1");
 				AddPipeline(new ConsoleEntityPipeline());
 				AddEntityType<News>(new AutoIncrementTargetRequestExtractor("page/1"));
 			}

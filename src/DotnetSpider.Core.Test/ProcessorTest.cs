@@ -13,27 +13,10 @@ namespace DotnetSpider.Core.Test
 		[Fact(DisplayName = "RetryProcessor")]
 		public void ProcesserException()
 		{
-			var site = new Site
-			{
-				Headers = new System.Collections.Generic.Dictionary<string, string>
-				{
-					{"Upgrade-Insecure-Requests","1" }
-				}
-			};
-
 			var scheduler = new QueueDuplicateRemovedScheduler();
-
-			site.AddRequests("http://v.youku.com/v_show/id_XMTMyMTkzNTY1Mg==.html?spm=a2h1n.8251845.0.0");
-			site.AddRequests("http://v.youku.com/v_show/id_XMjkzNzMwMDMyOA==.html?spm=a2h1n.8251845.0.0");
-			site.AddRequests("http://v.youku.com/v_show/id_XMjcwNDg0NDI3Mg==.html?spm=a2h1n.8251845.0.0");
-			site.AddRequests("http://v.youku.com/v_show/id_XMTMwNzQwMTcwMA==.html?spm=a2h1n.8251845.0.0");
-			site.AddRequests("http://v.youku.com/v_show/id_XMjk1MzI0Mzk4NA==.html?spm=a2h1n.8251845.0.0");
-			site.AddRequests("http://v.youku.com/v_show/id_XMjkzNzY0NzkyOA==.html?spm=a2h1n.8251845.0.0");
-			site.AddRequests("http://www.163.com/");
-
-			Spider spider = Spider.Create(site,
+			Spider spider = Spider.Create(
 				// crawler identity
-				"cnblogs_" + DateTime.Now.ToString("yyyyMMddhhmmss"),
+				"youku",
 				// use memoery queue scheduler
 				scheduler,
 				// default page processor will save whole html, and extract urls to target urls via regex
@@ -43,11 +26,21 @@ namespace DotnetSpider.Core.Test
 			spider.ClearSchedulerAfterCompleted = false;
 			// dowload html by http client
 			spider.Downloader = new HttpWebRequestDownloader();
+			spider.AddHeaders("v.youku.com", new Headers { { "Upgrade-Insecure-Requests", "1" } });
 
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
 			spider.Scheduler.Depth = 3;
 			spider.EmptySleepTime = 6000;
+
+			spider.AddRequests("http://v.youku.com/v_show/id_XMTMyMTkzNTY1Mg==.html?spm=a2h1n.8251845.0.0");
+			spider.AddRequests("http://v.youku.com/v_show/id_XMjkzNzMwMDMyOA==.html?spm=a2h1n.8251845.0.0");
+			spider.AddRequests("http://v.youku.com/v_show/id_XMjcwNDg0NDI3Mg==.html?spm=a2h1n.8251845.0.0");
+			spider.AddRequests("http://v.youku.com/v_show/id_XMTMwNzQwMTcwMA==.html?spm=a2h1n.8251845.0.0");
+			spider.AddRequests("http://v.youku.com/v_show/id_XMjk1MzI0Mzk4NA==.html?spm=a2h1n.8251845.0.0");
+			spider.AddRequests("http://v.youku.com/v_show/id_XMjkzNzY0NzkyOA==.html?spm=a2h1n.8251845.0.0");
+			spider.AddRequests("http://www.163.com/");
+
 			// start crawler 启动爬虫
 			spider.Run();
 

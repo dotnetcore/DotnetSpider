@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace DotnetSpider.Common
 {
@@ -14,15 +13,12 @@ namespace DotnetSpider.Common
 	{
 		private string _url;
 
-		/// <summary>
-		/// 当前链接的深度, 默认构造的链接深度为1, 用于控制爬取的深度
-		/// </summary>
-		public int Depth { get; set; } = 1;
+		#region Headers
 
 		/// <summary>
-		/// 当前链接已经重试的次数
+		/// User-Agent
 		/// </summary>
-		public int CycleTriedTimes { get; set; }
+		public string UserAgent { get; set; }
 
 		/// <summary>
 		/// 请求链接时Referer参数的值
@@ -35,14 +31,31 @@ namespace DotnetSpider.Common
 		public string Origin { get; set; }
 
 		/// <summary>
+		/// Accept
+		/// </summary>
+		public string Accept { get; set; }
+
+		/// <summary>
+		/// 仅在发送 POST 请求时需要设置
+		/// </summary>
+		public string ContentType { get; set; }
+
+		/// <summary>
+		/// 除了特殊 Header 以下的 Header
+		/// </summary>
+		public Headers Headers { get; set; }
+
+		#endregion
+
+		/// <summary>
+		/// 字符编码
+		/// </summary>
+		public string EncodingName { get; set; }
+
+		/// <summary>
 		/// 请求链接的方法
 		/// </summary>
 		public HttpMethod Method { get; set; } = HttpMethod.Get;
-
-		/// <summary>
-		/// 链接的优先级, 仅用于优先级队列
-		/// </summary>
-		public int Priority { get; set; }
 
 		/// <summary>
 		/// 存储此链接对应的额外数据字典
@@ -60,14 +73,7 @@ namespace DotnetSpider.Common
 		public CompressMode CompressMode { get; set; }
 
 		/// <summary>
-		/// 站点信息
-		/// </summary>
-		[JsonIgnore]
-		public Site Site { get; set; }
-
-		/// <summary>
-		/// 请求链接, 请求链接限定为Uri的原因: 无论是本地文件资源或者网络资源都是可以用Uri来定义的
-		/// 比如本地文件: file:///C:/Users/Lewis/Desktop/111.png
+		/// 请求链接, 不使用 Uri 的原因是可能引起多重编码的问题
 		/// </summary>
 		[Required]
 		public string Url
@@ -75,9 +81,16 @@ namespace DotnetSpider.Common
 			get => _url;
 			set
 			{
-				_url = new Uri(value).ToString();
+				_url = value;
+				var uri = new Uri(_url);
+				Host = uri.Host;
+				LocalPath = uri.LocalPath;
 			}
 		}
+
+		public string Host { get; private set; }
+
+		public string LocalPath { get; private set; }
 
 		public virtual string Identity => $"{Referer}.{Origin}.{Method}.{Content}.{Url}".ToShortMd5();
 
@@ -119,22 +132,37 @@ namespace DotnetSpider.Common
 		{
 			lock (this)
 			{
-				if (key != null)
+				if (Properties == null)
 				{
-					if (Properties == null)
-					{
-						Properties = new Dictionary<string, dynamic>();
-					}
-
-					if (Properties.ContainsKey(key))
-					{
-						Properties[key] = value;
-					}
-					else
-					{
-						Properties.Add(key, value);
-					}
+					Properties = new Dictionary<string, dynamic>();
 				}
+
+				if (null == key)
+				{
+					return;
+				}
+
+				if (Properties.ContainsKey(key))
+				{
+					Properties[key] = value;
+				}
+				else
+				{
+					Properties.Add(key, value);
+				}
+			}
+		}
+
+		public dynamic GetProperty(string key)
+		{
+			lock (this)
+			{
+				if (Properties == null)
+				{
+					return null;
+				}
+
+				return Properties.ContainsKey(key) ? Properties[key] : null;
 			}
 		}
 
@@ -150,12 +178,9 @@ namespace DotnetSpider.Common
 
 			Request request = (Request)obj;
 
-			if (!Equals(Depth, request.Depth)) return false;
-			if (!Equals(CycleTriedTimes, request.CycleTriedTimes)) return false;
 			if (!Equals(Referer, request.Referer)) return false;
 			if (!Equals(Origin, request.Origin)) return false;
 			if (!Equals(Method, request.Method)) return false;
-			if (!Equals(Priority, request.Priority)) return false;
 			if (!Equals(Content, request.Content)) return false;
 
 			if (Properties == null)
