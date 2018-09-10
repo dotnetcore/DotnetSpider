@@ -29,13 +29,14 @@ namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 		/// <param name="downloader">下载器 <see cref="IDownloader"/></param>
 		public override void Handle(ref Response response, IDownloader downloader)
 		{
-			if (response == null || string.IsNullOrWhiteSpace(response.Content))
+			var text = response.Content?.ToString();
+			if (string.IsNullOrWhiteSpace(text))
 			{
 				return;
 			}
 
 			string textValue = string.Empty;
-			MatchCollection collection = Regex.Matches(response.Content, _pattern, _regexOptions);
+			MatchCollection collection = Regex.Matches(text, _pattern, _regexOptions);
 
 			foreach (Match item in collection)
 			{

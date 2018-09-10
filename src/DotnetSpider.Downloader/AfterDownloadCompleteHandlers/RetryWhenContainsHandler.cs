@@ -42,12 +42,13 @@ namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 		/// <param name="downloader">下载器 <see cref="IDownloader"/></param>
 		public override void Handle(ref Response response, IDownloader downloader)
 		{
-			if (response == null || string.IsNullOrWhiteSpace(response.Content))
+			var text = response.Content?.ToString();
+			if (string.IsNullOrWhiteSpace(text))
 			{
 				return;
 			}
 			var content = response.Content;
-			if (_contents.Any(c => content.Contains(c)))
+			if (_contents.Any(c => text.Contains(c)))
 			{
 				throw new DownloaderException($"Retry this request because content contains {JsonConvert.SerializeObject(_contents)}.");
 			}

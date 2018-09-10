@@ -33,8 +33,7 @@ namespace DotnetSpider.Downloader
 
 		protected override Response DowloadContent(Request request)
 		{
-			Response response = new Response();
-			response.Request = request;
+			var response = new Response(request);
 
 			if (IfFileExists(request))
 			{
@@ -67,15 +66,15 @@ namespace DotnetSpider.Downloader
 				}
 				else
 				{
-					string content = ReadContent(request, bytes, httpWebResponse.ContentType);
+					var content = ReadContent(request, bytes, httpWebResponse.ContentType);
 
-					if (_decodeHtml)
+					if (_decodeHtml && content is string)
 					{
 #if NETFRAMEWORK
 						content =
- System.Web.HttpUtility.UrlDecode(System.Web.HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(request.EncodingName) ? Encoding.UTF8 : Encoding.GetEncoding(request.EncodingName));
+ System.Web.HttpUtility.UrlDecode(System.Web.HttpUtility.HtmlDecode(content.ToString()), string.IsNullOrEmpty(request.EncodingName) ? Encoding.UTF8 : Encoding.GetEncoding(request.EncodingName));
 #else
-						content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
+						content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content.ToString()));
 #endif
 					}
 

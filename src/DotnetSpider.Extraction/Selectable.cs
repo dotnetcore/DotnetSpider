@@ -15,6 +15,7 @@ namespace DotnetSpider.Extraction
 		/// </summary>
 		/// <param name="html">Html</param>
 		/// <param name="url">URL相对路径补充</param>
+		/// <param name="removeOutboundLinks">是否去除外链</param>
 		public Selectable(string html, string url, bool removeOutboundLinks = true)
 		{
 			HtmlDocument document = new HtmlDocument { OptionAutoCloseOnEnd = true };
@@ -23,13 +24,13 @@ namespace DotnetSpider.Extraction
 			if (!string.IsNullOrWhiteSpace(url))
 			{
 				FixAllRelativeHrefs(document, url);
-			}
-			if (removeOutboundLinks)
-			{
-				var host = new Uri(url).Host;
-				var hostSplits = host.Split('.');
-				string domain = $"{hostSplits[hostSplits.Length - 2]}\\.{hostSplits[hostSplits.Length - 1]}";
-				RemoveOutboundLinks(document, domain);
+				if (removeOutboundLinks)
+				{
+					var host = new Uri(url).Host;
+					var hostSplits = host.Split('.');
+					string domain = $"{hostSplits[hostSplits.Length - 2]}\\.{hostSplits[hostSplits.Length - 1]}";
+					RemoveOutboundLinks(document, domain);
+				}
 			}
 			Elements = new List<dynamic> { document.DocumentNode.OuterHtml };
 		}

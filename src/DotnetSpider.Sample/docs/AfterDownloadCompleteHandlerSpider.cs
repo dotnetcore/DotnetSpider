@@ -37,8 +37,8 @@ namespace DotnetSpider.Sample.docs
 			{
 				public override void Handle(ref Response page, IDownloader downloader)
 				{
-					page.Content = page.Content.Replace("jQuery1720001955628746606708_1508996230766(", "").Replace("});", "}");
-					page.Content = ClearHtml(page.Content);
+					page.Content = page.Content?.ToString().Replace("jQuery1720001955628746606708_1508996230766(", "").Replace("});", "}");
+					page.Content = ClearHtml(page.Content?.ToString());
 				}
 
 				/// <summary>  

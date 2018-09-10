@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Node")]
+
 namespace DotnetSpider.Downloader
 {
 	/// <summary>
@@ -35,7 +36,9 @@ namespace DotnetSpider.Downloader
 			public HttpClientObject(HttpClientHandler handler, bool allowAutoRedirect)
 			{
 				Handler = handler;
-				Client = allowAutoRedirect ? new HttpClient(new GlobalRedirectHandler(handler), true) : new HttpClient(handler, true);
+				Client = allowAutoRedirect
+					? new HttpClient(new GlobalRedirectHandler(handler), true)
+					: new HttpClient(handler, true);
 			}
 
 			public void Dispose()
@@ -66,8 +69,7 @@ namespace DotnetSpider.Downloader
 
 		protected override Response DowloadContent(Request request)
 		{
-			Response response = new Response();
-			response.Request = request;
+			var response = new Response(request);
 
 			if (IfFileExists(request))
 			{
@@ -98,7 +100,7 @@ namespace DotnetSpider.Downloader
 						proxy = HttpProxyPool.Instance.GetProxy();
 						if (proxy == null)
 						{
-							throw new DownloaderException("No avaliable proxy.");
+							throw new DownloaderException("No available proxy.");
 						}
 					}
 					else
@@ -107,13 +109,12 @@ namespace DotnetSpider.Downloader
 					}
 				}
 
-				_clientObject = GetHttpClient(proxy == null ? "DEFAULT" : $"{proxy.Address.ToString()}", AllowAutoRedirect, proxy);
+				_clientObject = GetHttpClient(proxy == null ? "DEFAULT" : $"{proxy.Address.ToString()}",
+					AllowAutoRedirect, proxy);
 
 				httpResponseMessage =
-						NetworkCenter.Current.Execute("downloader", () => Task.Run(async () =>
-						{
-							return await _clientObject.Client.SendAsync(httpRequestMessage);
-						})
+					NetworkCenter.Current.Execute("downloader", () => Task
+						.Run(async () => await _clientObject.Client.SendAsync(httpRequestMessage))
 						.GetAwaiter()
 						.GetResult());
 
@@ -135,15 +136,16 @@ namespace DotnetSpider.Downloader
 				}
 				else
 				{
-					string content = ReadContent(request, bytes, httpResponseMessage.Content.Headers.ContentType.CharSet);
+					var content = ReadContent(request, bytes,
+						httpResponseMessage.Content.Headers.ContentType.CharSet);
 
-					if (_decodeHtml)
+					if (_decodeHtml && content is string)
 					{
 #if NETFRAMEWORK
 						content =
- System.Web.HttpUtility.UrlDecode(System.Web.HttpUtility.HtmlDecode(content), string.IsNullOrEmpty(request.EncodingName) ? Encoding.UTF8 : Encoding.GetEncoding(request.EncodingName));
+ System.Web.HttpUtility.UrlDecode(System.Web.HttpUtility.HtmlDecode(content.ToString()), string.IsNullOrEmpty(request.EncodingName) ? Encoding.UTF8 : Encoding.GetEncoding(request.EncodingName));
 #else
-						content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content));
+						content = WebUtility.UrlDecode(WebUtility.HtmlDecode(content.ToString()));
 #endif
 					}
 
@@ -164,8 +166,12 @@ namespace DotnetSpider.Downloader
 			{
 				if (HttpProxyPool.Instance != null && proxy != null)
 				{
-					HttpProxyPool.Instance.ReturnProxy(proxy, httpResponseMessage == null ? HttpStatusCode.ServiceUnavailable : httpResponseMessage.StatusCode);
+					HttpProxyPool.Instance.ReturnProxy(proxy,
+						httpResponseMessage == null
+							? HttpStatusCode.ServiceUnavailable
+							: httpResponseMessage.StatusCode);
 				}
+
 				try
 				{
 					httpResponseMessage?.Dispose();
@@ -242,7 +248,7 @@ namespace DotnetSpider.Downloader
 					Proxy = proxy,
 					CookieContainer = CopyCookieContainer()
 				};
-				var item = new HttpClientObject(handler, allowAutoRedirect) { LastUseTime = DateTime.Now };
+				var item = new HttpClientObject(handler, allowAutoRedirect) {LastUseTime = DateTime.Now};
 				_pool.Add(hash, item);
 				return item;
 			}
@@ -273,7 +279,7 @@ namespace DotnetSpider.Downloader
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request)
 		{
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(request.Method, request.Url);
-			
+
 			// Headers 的优先级低于 Request.UserAgent 这种特定设置, 因此先加载所有 Headers, 再使用 Request.UserAgent 覆盖
 			foreach (var header in request.Headers)
 			{
@@ -321,18 +327,22 @@ namespace DotnetSpider.Downloader
 				}
 
 				var xRequestedWithHeader = "X-Requested-With";
-				if (request.Headers.ContainsKey(xRequestedWithHeader) && request.Headers[xRequestedWithHeader] == "NULL")
+				if (request.Headers.ContainsKey(xRequestedWithHeader) &&
+				    request.Headers[xRequestedWithHeader] == "NULL")
 				{
 					httpRequestMessage.Content.Headers.Remove(xRequestedWithHeader);
 				}
 				else
 				{
-					if (!httpRequestMessage.Content.Headers.Contains(xRequestedWithHeader) && !httpRequestMessage.Headers.Contains(xRequestedWithHeader))
+					if (!httpRequestMessage.Content.Headers.Contains(xRequestedWithHeader) &&
+					    !httpRequestMessage.Headers.Contains(xRequestedWithHeader))
 					{
-						httpRequestMessage.Content.Headers.TryAddWithoutValidation(xRequestedWithHeader, "XMLHttpRequest");
+						httpRequestMessage.Content.Headers.TryAddWithoutValidation(xRequestedWithHeader,
+							"XMLHttpRequest");
 					}
 				}
 			}
+
 			return httpRequestMessage;
 		}
 
@@ -343,7 +353,7 @@ namespace DotnetSpider.Downloader
 				BinaryFormatter formatter = new BinaryFormatter();
 				formatter.Serialize(stream, CookieContainer);
 				stream.Seek(0, SeekOrigin.Begin);
-				return (CookieContainer)formatter.Deserialize(stream);
+				return (CookieContainer) formatter.Deserialize(stream);
 			}
 		}
 	}

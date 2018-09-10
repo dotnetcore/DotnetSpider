@@ -13,30 +13,37 @@ namespace DotnetSpider.Extraction.Test
 			Assert.Equal("aaaaaaab", value);
 		}
 
-		[Fact(DisplayName = "DonotDetectDomain")]
-		public void DonotDetectDomain()
+		[Fact(DisplayName = "DonotFixAllRelativeHrefs")]
+		public void DonotFixAllRelativeHrefs()
 		{
-			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>");
+			Selectable selectable = new Selectable("<div><a href=\"aaaa.com\">aaaaaaab</a></div>", null);
 			var values = selectable.XPath(".//a").GetValues();
 			Assert.Equal("aaaaaaab", values.First());
 		}
 
-		[Fact(DisplayName = "DetectDomain1")]
-		public void DetectDomain1()
+		[Fact(DisplayName = "FixAllRelativeHrefs")]
+		public void FixAllRelativeHrefs()
 		{
-			Selectable selectable = new Selectable("<div><a href=\"www.aaaa.com\">aaaaaaab</a></div>",
-				"http://www.aaaa.com", true);
-			var values = selectable.XPath(".//a").GetValues();
-			Assert.Equal("aaaaaaab", values.First());
+			// 只有相对路径需要做补充
+			Selectable selectable1 = new Selectable("<div><a href=\"/a/b\">aaaaaaab</a></div>", "http://www.b.com");
+			var value1 = selectable1.XPath(".//a").Links().GetValue();
+			Assert.Equal("http://www.b.com/a/b", value1);
+			
+			// 绝对路径不需要做补充
+			Selectable selectable2 = new Selectable("<div><a href=\"http://www.aaaa.com\">aaaaaaab</a></div>",
+				"http://www.b.com", false);
+			var value2 = selectable2.XPath(".//a").GetValues().First();
+			Assert.Equal("aaaaaaab", value2);
 		}
 
-		[Fact(DisplayName = "DetectDomain2")]
-		public void DetectDomain2()
+		[Fact(DisplayName = "RemoveOutboundLinks")]
+		public void RemoveOutboundLinks()
 		{
-			Selectable selectable = new Selectable("<div><a href=\"www.aaaab.com\">aaaaaaab</a></div>",
-				"http://www.aaaa.com", true);
-			var values = selectable.XPath(".//a").GetValues();
-			Assert.Empty(values);
+			// 绝对路径不需要做补充
+			Selectable selectable2 = new Selectable("<div><a href=\"http://www.aaaa.com\">aaaaaaab</a></div>",
+				"http://www.b.com", true);
+			var value2 = selectable2.XPath(".//a").GetValues();
+			Assert.Empty( value2);
 		}
 	}
 }

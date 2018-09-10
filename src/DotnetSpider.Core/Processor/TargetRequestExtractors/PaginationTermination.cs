@@ -42,7 +42,8 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 				throw new SpiderException("Total page selector or current page selector should not be null");
 			}
 
-			if (string.IsNullOrEmpty(response?.Content))
+			var text = response?.Content?.ToString();
+			if (string.IsNullOrWhiteSpace(text))
 			{
 				return false;
 			}

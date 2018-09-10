@@ -26,12 +26,13 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 		/// <returns>如果返回 True, 则说明已经采到到了最后一个链接</returns>
 		public bool IsTerminated(Response response)
 		{
-			if (response == null || string.IsNullOrWhiteSpace((response.Content)))
+			var text = response?.Content?.ToString();
+			if (string.IsNullOrWhiteSpace(text))
 			{
 				return false;
 			}
 
-			return !_unContains.All(c => response.Content.Contains(c));
+			return !_unContains.All(c => text.Contains(c));
 		}
 	}
 }

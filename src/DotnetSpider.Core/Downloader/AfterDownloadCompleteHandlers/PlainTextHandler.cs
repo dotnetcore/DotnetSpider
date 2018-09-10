@@ -22,12 +22,13 @@ namespace DotnetSpider.Core.Downloader.AfterDownloadCompleteHandlers
 		/// <param name="downloader">下载器 <see cref="IDownloader"/></param>
 		public override void Handle(ref Response response, IDownloader downloader)
 		{
-			if (response == null || string.IsNullOrWhiteSpace(response.Content))
+			var text = response?.Content?.ToString();
+			if (string.IsNullOrWhiteSpace(text))
 			{
 				return;
 			}
 			var htmlDocument = new HtmlDocument();
-			htmlDocument.LoadHtml(response.Content);
+			htmlDocument.LoadHtml(text);
 			response.Content = htmlDocument.DocumentNode.InnerText;
 		}
 	}

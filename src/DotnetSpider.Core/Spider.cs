@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #if NETFRAMEWORK
 using System.Net;
+
 #else
 using System.Text;
 #endif
@@ -61,7 +62,9 @@ namespace DotnetSpider.Core
 		private long _downloaderCostTimes;
 		private long _pipelineCostTimes;
 		private long _processorCostTimes;
-		private readonly Dictionary<string, Dictionary<string,object>> _headers = new Dictionary<string, Dictionary<string,object>>();
+
+		private readonly Dictionary<string, Dictionary<string, object>> _headers =
+			new Dictionary<string, Dictionary<string, object>>();
 
 		/// <summary>
 		/// 自定义的初始化
@@ -466,7 +469,7 @@ namespace DotnetSpider.Core
 			return new Spider(identify, scheduler, pageProcessors, null);
 		}
 
-		public Spider AddHeaders(string host, Dictionary<string,object> headers)
+		public Spider AddHeaders(string host, Dictionary<string, object> headers)
 		{
 			CheckIfRunning();
 			var key = host.ToLower();
@@ -481,6 +484,7 @@ namespace DotnetSpider.Core
 			{
 				_headers.Add(key, headers);
 			}
+
 			return this;
 		}
 
@@ -589,11 +593,13 @@ namespace DotnetSpider.Core
 			{
 				throw new ArgumentNullException(nameof(requests));
 			}
+
 			CheckIfRunning();
 			foreach (var request in requests)
 			{
 				_requests.Add(request);
 			}
+
 			return this;
 		}
 
@@ -713,10 +719,7 @@ namespace DotnetSpider.Core
 
 			Logger.Information("Oninit...");
 
-			NetworkCenter.Current.Execute("onInit", () =>
-			{
-				OnInit(arguments);
-			});
+			NetworkCenter.Current.Execute("onInit", () => { OnInit(arguments); });
 
 			InitComponents(arguments);
 
@@ -1077,7 +1080,7 @@ namespace DotnetSpider.Core
 				handler.Handle(ref page);
 			}
 
-			if (string.IsNullOrWhiteSpace(page.Content))
+			if (page.Content == null)
 			{
 				// downloader 下载直接构造出的 Page 不会有其它处理, 因此产生的 TargetRequests只可能是重试
 				if (page.TargetRequests != null && page.TargetRequests.Count > 0)
@@ -1146,7 +1149,7 @@ namespace DotnetSpider.Core
 			ResultItems[] resultItems = new ResultItems[0];
 			if (PipelineCachedSize == 1)
 			{
-				resultItems = new[] { page.ResultItems };
+				resultItems = new[] {page.ResultItems};
 			}
 			else
 			{
@@ -1249,7 +1252,7 @@ namespace DotnetSpider.Core
 		protected void ExtractAndAddRequests(Page page)
 		{
 			if ((page.Request.GetProperty(Page.Depth) + 1) <= Scheduler.Depth && page.TargetRequests != null &&
-				page.TargetRequests.Count > 0)
+			    page.TargetRequests.Count > 0)
 			{
 				foreach (Request request in page.TargetRequests)
 				{
@@ -1260,7 +1263,8 @@ namespace DotnetSpider.Core
 
 		protected virtual bool ShouldReserved(Request request)
 		{
-			return request != null && request.GetProperty(Page.CycleTriedTimes) > 0 && request.GetProperty(Page.CycleTriedTimes) <= CycleRetryTimes;
+			return request != null && request.GetProperty(Page.CycleTriedTimes) > 0 &&
+			       request.GetProperty(Page.CycleTriedTimes) <= CycleRetryTimes;
 		}
 
 		/// <summary>
@@ -1390,6 +1394,7 @@ namespace DotnetSpider.Core
 						{
 							request.EncodingName = EncodingName;
 						}
+
 						var host = request.RequestUri.Host.ToLower();
 						if (_headers.ContainsKey(host))
 						{
@@ -1398,6 +1403,7 @@ namespace DotnetSpider.Core
 								request.Headers.Add(kv.Key, kv.Value);
 							}
 						}
+
 						Scheduler.Push(request, ShouldReserved);
 					}
 				}
@@ -1410,8 +1416,10 @@ namespace DotnetSpider.Core
 							request.EncodingName = EncodingName;
 						}
 					}
+
 					Scheduler.Reload(new HashSet<Request>(_requests));
 				}
+
 				// 释放本地内存
 				_requests.Clear();
 			}
@@ -1430,6 +1438,7 @@ namespace DotnetSpider.Core
 				{
 					_mmfCloseSignals[1] = MemoryMappedFile.CreateOrOpen(TaskId, 1, MemoryMappedFileAccess.ReadWrite);
 				}
+
 				foreach (var mmf in _mmfCloseSignals)
 				{
 					if (mmf != null)

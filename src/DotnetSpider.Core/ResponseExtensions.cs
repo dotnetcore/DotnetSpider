@@ -7,9 +7,13 @@ namespace DotnetSpider.Core
 	{
 		public static Selectable Selectable(this Response response, bool removeOutboundLinks = false)
 		{
+			if (!(response.Content is string))
+			{
+				throw new SpiderException("Only support text response.");
+			}
 			response.Delivery = response.Delivery != null && response.Delivery is Selectable ? response.Delivery :
-				response.ContentType == ContentType.Json ? new Selectable(response.Content)
-				: new Selectable(response.Content, response.Request.Url.ToString(), removeOutboundLinks);
+				response.ContentType == ContentType.Json ? new Selectable(response.Content.ToString())
+				: new Selectable(response.Content.ToString(), response.Request.Url.ToString(), removeOutboundLinks);
 			response.Delivery.Properties = response.Request.Properties;
 			return response.Delivery;
 		}

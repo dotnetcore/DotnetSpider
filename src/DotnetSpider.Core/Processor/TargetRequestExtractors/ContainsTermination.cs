@@ -26,12 +26,9 @@ namespace DotnetSpider.Core.Processor.TargetRequestExtractors
 		/// <returns>是否到了最终一个链接</returns>
 		public bool IsTerminated(Response response)
 		{
-			if (response == null || string.IsNullOrWhiteSpace(response.Content))
-			{
-				return false;
-			}
-
-			return _contains.Any(c => response.Content.Contains(c));
+			var text = response?.Content == null ? "" : response.Content.ToString();
+ 
+			return _contains.Any(c => text.Contains(c));
 		}
 	}
 

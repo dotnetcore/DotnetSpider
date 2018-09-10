@@ -41,12 +41,6 @@ namespace DotnetSpider.Downloader
 		/// <param name="handler"><see cref="IBeforeDownloadHandler"/></param>
 		void AddBeforeDownloadHandler(IBeforeDownloadHandler handler);
 
-		///// <summary>
-		///// Cookie管理容器
-		
-			///// </summary>
-		//CookieContainer CookieContainer { get; set; }
-
 		/// <summary>
 		/// Add cookies.
 		/// </summary>

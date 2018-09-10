@@ -45,21 +45,20 @@ namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 		/// <param name="downloader">下载器 <see cref="IDownloader"/></param>
 		public override void Handle(ref Response response, IDownloader downloader)
 		{
-			if (response == null || string.IsNullOrWhiteSpace(response.Content))
+			var text = response.Content?.ToString();
+			if (string.IsNullOrWhiteSpace(text))
 			{
 				return;
 			}
 
-			string rawText = response.Content;
-
-			int begin = rawText.IndexOf(_startPart, StringComparison.Ordinal);
+			int begin = text.IndexOf(_startPart, StringComparison.Ordinal);
 
 			if (begin < 0)
 			{
 				throw new DownloaderException($"Cutout failed, can not find begin string: {_startPart}");
 			}
 
-			int end = rawText.IndexOf(_endPart, begin, StringComparison.Ordinal);
+			int end = text.IndexOf(_endPart, begin, StringComparison.Ordinal);
 			int length = end - begin;
 
 			begin += _startOffset;
@@ -72,7 +71,7 @@ namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 				throw new DownloaderException("Cutout failed. Please check your settings");
 			}
 
-			string newRawText = rawText.Substring(begin, length).Trim();
+			string newRawText = text.Substring(begin, length).Trim();
 			response.Content = newRawText;
 		}
 	}

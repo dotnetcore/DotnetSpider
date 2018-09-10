@@ -23,6 +23,8 @@ namespace DotnetSpider.Downloader
 		private bool _injectedCookies;
 		private readonly string _downloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "downloads");
 
+		public static WebProxy FiddlerProxy = new WebProxy("http://127.0.0.1:8888");
+		
 		/// <summary>
 		/// 是否下载文件
 		/// </summary>
@@ -34,7 +36,7 @@ namespace DotnetSpider.Downloader
 		/// <summary xml:lang="zh-CN">
 		/// 定义哪些类型的内容不需要当成文件下载
 		/// </summary>
-		public List<string> ExcludeMediaTypes = new List<string>
+		public readonly List<string> ExcludeMediaTypes = new List<string>
 		{
 			"",
 			"text/html",
@@ -52,7 +54,7 @@ namespace DotnetSpider.Downloader
 			"application/x-www-form-urlencoded"
 		};
 
-		public readonly static HttpClientHandler HttpMessageHandler = new HttpClientHandler
+		protected static readonly HttpClientHandler HttpMessageHandler = new HttpClientHandler
 		{
 			AllowAutoRedirect = true,
 			AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
@@ -61,7 +63,7 @@ namespace DotnetSpider.Downloader
 			MaxAutomaticRedirections = 10
 		};
 
-		public readonly static HttpClient Default = new HttpClient(HttpMessageHandler);
+		public static readonly HttpClient Default = new HttpClient(HttpMessageHandler);
 
 		/// <summary>
 		/// Cookie Container
@@ -71,7 +73,6 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		protected readonly CookieContainer CookieContainer = new CookieContainer();
 
-		public WebProxy FiddlerProxy { get; set; } = new WebProxy("http://127.0.0.1:8888");
 		public bool UseFiddlerProxy { get; set; } = false;
 
 		/// <summary>
@@ -200,7 +201,7 @@ namespace DotnetSpider.Downloader
 			return Download(new Request(url));
 		}
 
-		protected virtual string ReadContent(Request request, byte[] contentBytes, string characterSet)
+		protected virtual object ReadContent(Request request, byte[] contentBytes, string characterSet)
 		{
 			if (string.IsNullOrEmpty(request.EncodingName))
 			{
@@ -285,14 +286,21 @@ namespace DotnetSpider.Downloader
 			}
 			else
 			{
-				try
+				if (response.Content != null && response.Content is string)
 				{
-					JsonConvert.DeserializeObject(response.Content);
-					response.ContentType = ContentType.Json;
+					try
+					{
+						JsonConvert.DeserializeObject(response.Content.ToString());
+						response.ContentType = ContentType.Json;
+					}
+					catch
+					{
+						response.ContentType = ContentType.Html;
+					}
 				}
-				catch
+				else
 				{
-					response.ContentType = ContentType.Html;
+					response.ContentType = ContentType.Auto;
 				}
 			}
 		}
