@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.Common
@@ -41,9 +42,9 @@ namespace DotnetSpider.Common
 		public string ContentType { get; set; }
 
 		/// <summary>
-		/// 除了特殊 Header 以下的 Header
+		/// Headers
 		/// </summary>
-		public Headers Headers { get; set; }
+		public Dictionary<string, object> Headers { get; set; } = new Dictionary<string, object>();
 
 		#endregion
 
@@ -60,7 +61,7 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 存储此链接对应的额外数据字典
 		/// </summary>
-		public Dictionary<string, dynamic> Properties { get; set; } = new Dictionary<string, dynamic>();
+		public readonly Dictionary<string, dynamic> Properties = new Dictionary<string, dynamic>();
 
 		/// <summary>
 		/// 请求此链接时需要POST的数据
@@ -75,24 +76,19 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 请求链接, 不使用 Uri 的原因是可能引起多重编码的问题
 		/// </summary>
-		[Required]
 		public string Url
 		{
 			get => _url;
 			set
 			{
 				_url = value;
-				var uri = new Uri(_url);
-				Host = uri.Host;
-				LocalPath = uri.LocalPath;
+				RequestUri = new Uri(_url);
 			}
 		}
 
-		public string Host { get; private set; }
+		[JsonIgnore] public Uri RequestUri { get; private set; }
 
-		public string LocalPath { get; private set; }
-
-		public virtual string Identity => $"{Referer}.{Origin}.{Method}.{Content}.{Url}".ToShortMd5();
+		public virtual string Identity => $"{Referer}.{Origin}.{Method}.{Content}.{Url}".ToMd5();
 
 		/// <summary>
 		/// 构造方法
@@ -130,39 +126,35 @@ namespace DotnetSpider.Common
 		/// <param name="value">额外信息</param>
 		public void AddProperty(string key, dynamic value)
 		{
-			lock (this)
+			if (null == key)
 			{
-				if (Properties == null)
-				{
-					Properties = new Dictionary<string, dynamic>();
-				}
+				return;
+			}
 
-				if (null == key)
-				{
-					return;
-				}
-
-				if (Properties.ContainsKey(key))
-				{
-					Properties[key] = value;
-				}
-				else
-				{
-					Properties.Add(key, value);
-				}
+			if (Properties.ContainsKey(key))
+			{
+				Properties[key] = value;
+			}
+			else
+			{
+				Properties.Add(key, value);
 			}
 		}
 
 		public dynamic GetProperty(string key)
 		{
-			lock (this)
-			{
-				if (Properties == null)
-				{
-					return null;
-				}
+			return Properties.ContainsKey(key) ? Properties[key] : null;
+		}
 
-				return Properties.ContainsKey(key) ? Properties[key] : null;
+		public void AddHeader(string key, object value)
+		{
+			if (Headers.ContainsKey(key))
+			{
+				Headers[key] = value;
+			}
+			else
+			{
+				Headers.Add(key, value);
 			}
 		}
 
@@ -176,22 +168,12 @@ namespace DotnetSpider.Common
 			if (this == obj) return true;
 			if (obj == null || GetType() != obj.GetType()) return false;
 
-			Request request = (Request)obj;
+			Request request = (Request) obj;
 
 			if (!Equals(Referer, request.Referer)) return false;
 			if (!Equals(Origin, request.Origin)) return false;
 			if (!Equals(Method, request.Method)) return false;
 			if (!Equals(Content, request.Content)) return false;
-
-			if (Properties == null)
-			{
-				Properties = new Dictionary<string, object>();
-			}
-
-			if (request.Properties == null)
-			{
-				request.Properties = new Dictionary<string, object>();
-			}
 
 			if (Properties.Count != request.Properties.Count) return false;
 
@@ -199,6 +181,19 @@ namespace DotnetSpider.Common
 			{
 				if (!request.Properties.ContainsKey(entry.Key)) return false;
 				if (!Equals(entry.Value, request.Properties[entry.Key])) return false;
+			}
+
+			var headersCount = Headers?.Count ?? 0;
+			var requestHeadersCount = request.Headers?.Count ?? 0;
+			if (headersCount != requestHeadersCount) return false;
+			if (headersCount == requestHeadersCount && headersCount == 0) return true;
+			if (Headers != null && request.Headers != null)
+			{
+				foreach (var header in Headers)
+				{
+					if (!request.Headers.ContainsKey(header.Key)) return false;
+					if (!Equals(header.Value, request.Headers[header.Key])) return false;
+				}
 			}
 
 			return true;
@@ -232,7 +227,7 @@ namespace DotnetSpider.Common
 
 		public virtual Request Clone()
 		{
-			return (Request)MemberwiseClone();
+			return (Request) MemberwiseClone();
 		}
 	}
 }

@@ -273,36 +273,39 @@ namespace DotnetSpider.Downloader
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request)
 		{
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(request.Method, request.Url);
-			var userAgentHeader = "User-Agent";
-			httpRequestMessage.Headers.TryAddWithoutValidation(userAgentHeader, request.UserAgent);
+			
+			// Headers 的优先级低于 Request.UserAgent 这种特定设置, 因此先加载所有 Headers, 再使用 Request.UserAgent 覆盖
+			foreach (var header in request.Headers)
+			{
+				httpRequestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value?.ToString());
+			}
+
+			if (!string.IsNullOrWhiteSpace(request.UserAgent))
+			{
+				var header = "User-Agent";
+				httpRequestMessage.Headers.Remove(header);
+				httpRequestMessage.Headers.TryAddWithoutValidation(header, request.UserAgent);
+			}
 
 			if (!string.IsNullOrWhiteSpace(request.Referer))
 			{
-				httpRequestMessage.Headers.TryAddWithoutValidation("Referer", request.Referer);
+				var header = "Referer";
+				httpRequestMessage.Headers.Remove(header);
+				httpRequestMessage.Headers.TryAddWithoutValidation(header, request.Referer);
 			}
 
 			if (!string.IsNullOrWhiteSpace(request.Origin))
 			{
-				httpRequestMessage.Headers.TryAddWithoutValidation("Origin", request.Origin);
+				var header = "Origin";
+				httpRequestMessage.Headers.Remove(header);
+				httpRequestMessage.Headers.TryAddWithoutValidation(header, request.Origin);
 			}
 
 			if (!string.IsNullOrWhiteSpace(request.Accept))
 			{
-				httpRequestMessage.Headers.TryAddWithoutValidation("Accept", request.Accept);
-			}
-
-			var contentTypeHeader = "Content-Type";
-
-			foreach (var header in request.Headers)
-			{
-				if (header.Key.ToLower() == "cookie")
-				{
-					continue;
-				}
-				if (!string.IsNullOrWhiteSpace(header.Key) && !string.IsNullOrWhiteSpace(header.Value) && header.Key != contentTypeHeader && header.Key != userAgentHeader)
-				{
-					httpRequestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value);
-				}
+				var header = "Accept";
+				httpRequestMessage.Headers.Remove(header);
+				httpRequestMessage.Headers.TryAddWithoutValidation(header, request.Accept);
 			}
 
 			if (request.Method == HttpMethod.Post)
@@ -312,7 +315,9 @@ namespace DotnetSpider.Downloader
 
 				if (!string.IsNullOrWhiteSpace(request.ContentType))
 				{
-					httpRequestMessage.Content.Headers.TryAddWithoutValidation(contentTypeHeader, request.ContentType);
+					var header = "Content-Type";
+					httpRequestMessage.Content.Headers.Remove(header);
+					httpRequestMessage.Content.Headers.TryAddWithoutValidation(header, request.ContentType);
 				}
 
 				var xRequestedWithHeader = "X-Requested-With";

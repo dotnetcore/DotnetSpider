@@ -3,6 +3,7 @@ using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using Xunit;
 using System;
+using System.Collections.Generic;
 using DotnetSpider.Common;
 using DotnetSpider.Downloader;
 
@@ -26,7 +27,7 @@ namespace DotnetSpider.Core.Test
 			spider.ClearSchedulerAfterCompleted = false;
 			// dowload html by http client
 			spider.Downloader = new HttpWebRequestDownloader();
-			spider.AddHeaders("v.youku.com", new Headers { { "Upgrade-Insecure-Requests", "1" } });
+			spider.AddHeaders("v.youku.com", new Dictionary<string, object> { { "Upgrade-Insecure-Requests", "1" } });
 
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度

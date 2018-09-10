@@ -17,16 +17,16 @@ namespace DotnetSpider.Common.Test
 			return request;
 		}
 
-		[Fact(DisplayName = "Request")]
-		public void Request()
+		[Fact(DisplayName = "RequestCreate")]
+		public void Create()
 		{
 			var request = GetRequest();
 			Assert.Single(request.Properties);
 			Assert.Equal(request.Properties["Test"], "Forever");
 		}
 
-		[Fact(DisplayName = "Request_PutExtra")]
-		public void PutExtra()
+		[Fact(DisplayName = "RequestAddProperty")]
+		public void AddProperty()
 		{
 			var request = GetRequest();
 			request.AddProperty(null, null);
@@ -40,15 +40,15 @@ namespace DotnetSpider.Common.Test
 			Assert.Equal(request.Properties[""], "");
 		}
 
-		[Fact(DisplayName = "Request_GetExtra")]
-		public void GetExtra()
+		[Fact(DisplayName = "RequestGetProperties")]
+		public void GetProperties()
 		{
 			var request = GetRequest();
 			request.AddProperty("One", new { Name = "John" });
 			Assert.Equal(request.Properties["One"], new { Name = "John" });
 		}
 
-		[Fact(DisplayName = "Request_Dispose")]
+		[Fact(DisplayName = "RequestDispose")]
 		public void Dispose()
 		{
 			var request = GetRequest();
@@ -57,12 +57,35 @@ namespace DotnetSpider.Common.Test
 			Assert.Empty(request.Properties);
 		}
 
-		[Fact(DisplayName = "Request_Serialize")]
+		[Fact(DisplayName = "RequestSerialize")]
 		public void Serialize()
 		{
 			var request = GetRequest();
 			var str = JsonConvert.SerializeObject(request);
 			var r = JsonConvert.DeserializeObject<Request>(str);
+		}
+		
+		[Fact(DisplayName = "RequestEqual")]
+		public void Equal()
+		{
+			var r1=new Request("http://www.baidu.com");
+			var r2=new Request("http://www.baidu.com");
+			Assert.True(r1.Equals(r2));
+			
+			var r3=new Request("http://www.baidu.com");
+			var r4=new Request("http://www.baidu.com", null);
+			Assert.True(r3.Equals(r4));
+			
+			var r5=new Request("http://www.baidu.com");
+			var r6=new Request("http://www.baidu.com", new Dictionary<string, dynamic>());
+			Assert.True(r5.Equals(r6));
+			
+			var r7=new Request("http://www.baidu.com");
+			var r8=new Request("http://www.baidu.com")
+			{
+				Headers = null
+			};
+			Assert.True(r7.Equals(r8));
 		}
 	}
 }

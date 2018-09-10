@@ -143,41 +143,41 @@ namespace DotnetSpider.Downloader
 		{
 			var httpWebRequest = (HttpWebRequest)WebRequest.Create(request.Url);
 			httpWebRequest.Method = request.Method.Method;
-
-			// Add user-agent
-			httpWebRequest.UserAgent = string.IsNullOrEmpty(request.UserAgent)
-				? "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36"
-				: request.UserAgent; ;
-
-			if (!string.IsNullOrEmpty(request.Referer))
-			{
-				httpWebRequest.Referer = request.Referer;
-			}
-
-			if (!string.IsNullOrEmpty(request.Origin))
-			{
-				httpWebRequest.Headers.Add("Origin", request.Origin);
-			}
-
-			if (!string.IsNullOrEmpty(request.Accept))
-			{
-				httpWebRequest.Accept = request.Accept;
-			}
-
-			var contentTypeHeader = "Content-Type";
-
+			
+			// Headers 的优先级低于 Request.UserAgent 这种特定设置, 因此先加载所有 Headers, 再使用 Request.UserAgent 覆盖
 			foreach (var header in request.Headers)
 			{
-				if (header.Key.ToLower() == "cookie")
-				{
-					continue;
-				}
-
-				if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value))
-				{
-					httpWebRequest.Headers.Add(header.Key, header.Value);
-				}
+				httpWebRequest.Headers.Add(header.Key, header.Value?.ToString());
 			}
+			
+			if (!string.IsNullOrWhiteSpace(request.UserAgent))
+			{
+				var header = "User-Agent";
+				httpWebRequest.Headers.Remove(header);
+				httpWebRequest.Headers.Add(header, request.UserAgent);
+			}
+
+			if (!string.IsNullOrWhiteSpace(request.Referer))
+			{
+				var header = "Referer";
+				httpWebRequest.Headers.Remove(header);
+				httpWebRequest.Headers.Add(header, request.Referer);
+			}
+
+			if (!string.IsNullOrWhiteSpace(request.Origin))
+			{
+				var header = "Origin";
+				httpWebRequest.Headers.Remove(header);
+				httpWebRequest.Headers.Add(header, request.Origin);
+			}
+
+			if (!string.IsNullOrWhiteSpace(request.Accept))
+			{
+				var header = "Accept";
+				httpWebRequest.Headers.Remove(header);
+				httpWebRequest.Headers.Add(header, request.Accept);
+			}
+
 			// 写入开始后不能再修改此属性
 			httpWebRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
@@ -188,13 +188,11 @@ namespace DotnetSpider.Downloader
 				var requestStream = httpWebRequest.GetRequestStream();
 				requestStream.Write(bytes, 0, bytes.Length);
 
-				if (request.Headers.ContainsKey(contentTypeHeader))
+				if (!string.IsNullOrWhiteSpace(request.ContentType))
 				{
-					httpWebRequest.ContentType = request.Headers[contentTypeHeader];
-				}
-				else
-				{
-					httpWebRequest.ContentType = request.Content.StartsWith("{") ? "" : "application/x-www-form-urlencoded";
+					var header = "Content-Type";
+					httpWebRequest.Headers.Remove(header);
+					httpWebRequest.Headers.Add(header, request.ContentType);
 				}
 
 				var xRequestedWithHeader = "X-Requested-With";

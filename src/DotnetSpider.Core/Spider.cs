@@ -61,7 +61,7 @@ namespace DotnetSpider.Core
 		private long _downloaderCostTimes;
 		private long _pipelineCostTimes;
 		private long _processorCostTimes;
-		private readonly Dictionary<string, Headers> _headers = new Dictionary<string, Headers>();
+		private readonly Dictionary<string, Dictionary<string,object>> _headers = new Dictionary<string, Dictionary<string,object>>();
 
 		/// <summary>
 		/// 自定义的初始化
@@ -466,7 +466,7 @@ namespace DotnetSpider.Core
 			return new Spider(identify, scheduler, pageProcessors, null);
 		}
 
-		public Spider AddHeaders(string host, Headers headers)
+		public Spider AddHeaders(string host, Dictionary<string,object> headers)
 		{
 			CheckIfRunning();
 			var key = host.ToLower();
@@ -774,7 +774,7 @@ namespace DotnetSpider.Core
 								if (result.Item1)
 								{
 									OnSuccess(request);
-									base.Logger.Information(
+									Logger.Information(
 										$"Crawl {request.Url} success, results {result.Item2}, effectedRow {result.Item3}.");
 								}
 								else
@@ -791,7 +791,7 @@ namespace DotnetSpider.Core
 							catch (Exception e)
 							{
 								OnError(request);
-								base.Logger.Error($"Crawler {request.Url} failed: {e}.");
+								Logger.Error($"Crawler {request.Url} failed: {e}.");
 							}
 							finally
 							{
@@ -1390,7 +1390,7 @@ namespace DotnetSpider.Core
 						{
 							request.EncodingName = EncodingName;
 						}
-						var host = request.Host.ToLower();
+						var host = request.RequestUri.Host.ToLower();
 						if (_headers.ContainsKey(host))
 						{
 							foreach (var kv in _headers[host])

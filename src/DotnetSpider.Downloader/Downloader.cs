@@ -387,7 +387,7 @@ namespace DotnetSpider.Downloader
 
 		protected string CreateFilePath(Request request)
 		{
-			var intervalPath = (request.Host + request.LocalPath).Replace("//", "/").Replace("/", DownloaderEnv.PathSeperator);
+			var intervalPath = (request.RequestUri.Host + request.RequestUri.LocalPath).Replace("//", "/").Replace("/", DownloaderEnv.PathSeperator);
 			string filePath = $"{_downloadFolder}{DownloaderEnv.PathSeperator}{intervalPath}";
 			return filePath;
 		}

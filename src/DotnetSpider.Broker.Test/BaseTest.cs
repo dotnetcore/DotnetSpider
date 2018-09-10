@@ -10,6 +10,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Text;
+using DotnetSpider.Broker.Services;
 
 namespace DotnetSpider.Broker.Test
 {
@@ -31,6 +32,9 @@ namespace DotnetSpider.Broker.Test
 			ops.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 			_service.AddScoped<WorkerHub>();
 
+			_service.AddScoped<IWorkerService, WorkerService>();
+			_service.AddScoped<INodeService, NodeService>();
+			_service.AddScoped<INodeStatusService, NodeStatusService>();
 			Services = _service.BuildServiceProvider();
 		}
 	}

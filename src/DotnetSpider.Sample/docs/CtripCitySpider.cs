@@ -12,7 +12,7 @@ namespace DotnetSpider.Sample.docs
 	{
 		protected override void OnInit(params string[] arguments)
 		{
-			AddHeaders("www.ctrip.com", new Headers {
+			AddHeaders("www.ctrip.com", new Dictionary<string, object> {
 				{"Cache-Control","max-age=0" },
 				{"Upgrade-Insecure-Requests","1" },
 				{"Accept-Encoding","gzip, deflate, sdch" },

@@ -163,7 +163,7 @@ namespace DotnetSpider.Extension.Test.Processor
 							{ "guid", _guid }
 						})
 					{
-						Headers = new Headers { { "Upgrade-Insecure-Requests", "1" } },
+						Headers = new Dictionary<string, object> { { "Upgrade-Insecure-Requests", "1" } },
 						Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
 					});
 				AddEntityType<BaiduSearchEntry>(new AutoIncrementTargetRequestExtractor("&pn=0", 1, new TestTargetRequestExtractorTermination()));

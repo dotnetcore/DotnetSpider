@@ -90,7 +90,7 @@ namespace DotnetSpider.Sample.docs
 
 			protected override void OnInit(params string[] arguments)
 			{
-				AddHeaders("s.taobao.com", new Headers {
+				AddHeaders("s.taobao.com", new Dictionary<string, object> {
 					{ "Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" },
 					{ "Referer", "https://www.taobao.com/"},
 					{ "Cache-Control","max-age=0" },

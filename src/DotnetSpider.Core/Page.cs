@@ -49,6 +49,10 @@ namespace DotnetSpider.Core
 		{
 			Request = request;
 			ResultItems.Request = request;
+			if (request.GetProperty(Depth) == null)
+			{
+				request.AddProperty(Depth, 1);
+			}
 		}
 
 		/// <summary>
@@ -88,6 +92,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
+
 			foreach (var request in requests)
 			{
 				AddTargetRequest(request);
@@ -105,6 +110,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
+
 			foreach (string url in urls)
 			{
 				AddTargetRequest(url, priority);
@@ -123,8 +129,14 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			var newUrl = Selectable.CanonicalizeUrl(url, Request.Url.ToString());
-			var request = new Request(newUrl, Request.Properties);
+
+			var newUrl = Selectable.CanonicalizeUrl(url, Request.Url);
+			var properties = new Dictionary<string, dynamic>();
+			foreach (var property in Request.Properties)
+			{
+				properties.Add(property.Key, property.Value);
+			}
+			var request = new Request(newUrl, properties);
 			request.AddProperty(Priority, priority);
 			AddTargetRequest(request, increaseDeep);
 		}
@@ -140,32 +152,39 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
-			var depth = Request.GetProperty(Depth);
+
+			var depth = request.GetProperty(Depth);
 			request.AddProperty(Depth, increaseDeep ? depth + 1 : depth);
 			if (string.IsNullOrWhiteSpace(request.EncodingName))
 			{
 				request.EncodingName = Request.EncodingName;
 			}
-			if (request.Headers == null)
+
+			foreach (var header in Request.Headers)
 			{
-				request.Headers = Request.Headers;
+				request.AddHeader(header.Key, header.Value);
 			}
+
 			if (string.IsNullOrWhiteSpace(request.Accept))
 			{
 				request.Accept = Request.Accept;
 			}
+
 			if (string.IsNullOrWhiteSpace(request.Origin))
 			{
 				request.Origin = Request.Origin;
 			}
+
 			if (string.IsNullOrWhiteSpace(request.Referer))
 			{
 				request.Referer = Request.Referer;
 			}
+
 			if (string.IsNullOrWhiteSpace(request.UserAgent))
 			{
 				request.UserAgent = Request.UserAgent;
 			}
+
 			lock (_locker)
 			{
 				TargetRequests.Add(request);
@@ -174,7 +193,7 @@ namespace DotnetSpider.Core
 
 		private bool IsAvailable(Request request)
 		{
-			if (request.Url==null)
+			if (request.Url == null)
 			{
 				return false;
 			}

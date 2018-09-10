@@ -21,7 +21,7 @@ namespace DotnetSpider.Sample.docs
 
 			AddRequest(new Request("http://www.ddeng.com/product/982227")
 			{
-				Headers = new Headers
+				Headers = new Dictionary<string, object>
 				{
 					{ "Cache-Control","max-age=0"},
 					{ "Upgrade-Insecure-Requests","1"}
