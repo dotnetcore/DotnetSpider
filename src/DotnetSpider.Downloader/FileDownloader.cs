@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using DotnetSpider.Common;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Downloader
 {
@@ -47,7 +47,7 @@ namespace DotnetSpider.Downloader
 				}
 			}
 			var msg = $"File {filePath} unfound.";
-			Logger.Error($"Download {request.Url} failed: {msg}.");
+			Logger?.LogError($"Download {request.Url} failed: {msg}.");
 			return null;
 		}
 	}

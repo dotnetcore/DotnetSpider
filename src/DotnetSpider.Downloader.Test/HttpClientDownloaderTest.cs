@@ -2,8 +2,6 @@
 using Xunit;
 using System.Threading.Tasks;
 using DotnetSpider.Downloader;
-using DotnetSpider.Common;
-
 #if !NETFRAMEWORK
 using System.Text;
 #endif

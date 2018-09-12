@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Downloader.Redial;
+﻿using DotnetSpider.Downloader.Redial;
 using Newtonsoft.Json;
 using System.Linq;
 

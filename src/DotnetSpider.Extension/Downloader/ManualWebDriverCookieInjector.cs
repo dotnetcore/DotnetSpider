@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Common;
+using System;
 using System.Net;
 using System.Threading;
 
@@ -19,13 +20,12 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		/// <param name="url">登陆的链接</param>
 		/// <param name="browser">浏览器</param>
-		/// <param name="controllable">可控制程序</param>
-		public ManualWebDriverCookieInjector(string url, Browser browser, IControllable controllable) : base(browser, controllable)
+		public ManualWebDriverCookieInjector(string url, Browser browser, Action before = null, Action after = null) : base(browser, before, after)
 		{
 			_url = url;
 		}
 
-		protected override CookieCollection GetCookies(IControllable controllable)
+		protected override CookieCollection GetCookies()
 		{
 			var driver = CreateWebDriver();
 			try

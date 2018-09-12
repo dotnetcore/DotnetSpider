@@ -5,6 +5,7 @@ using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using Xunit;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Extension.Test.Processor
 {
@@ -210,7 +211,7 @@ namespace DotnetSpider.Extension.Test.Processor
 			{
 				Content = "{'data':[{'age':'1'},{'age':'2'}]}"
 			};
-			processor.Process(page, null);
+			processor.Process(page);
 			Assert.Equal(2, (page.ResultItems.GetResultItem($"DotnetSpider.Extension.Test.Processor.Entity1").Item2).Count);
 		}
 	}

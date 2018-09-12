@@ -7,6 +7,7 @@ using DotnetSpider.Extraction.Model;
 using DotnetSpider.Common;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Extension.Test.Model
 {
@@ -31,7 +32,7 @@ namespace DotnetSpider.Extension.Test.Model
 			processor.Process(new Page(new Request("http://www.abcd.com"))
 			{
 				Content = "{'data':[{'name':'aaaa'},{'name':'bbbb'}]}"
-			}, null);
+			});
 			Assert.True(File.Exists("file.aaaa"));
 			Assert.True(File.Exists("file.bbbb"));
 			File.Delete("file.aaaa");

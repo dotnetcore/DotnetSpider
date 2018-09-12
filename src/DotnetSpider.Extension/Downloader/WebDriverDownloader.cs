@@ -13,6 +13,7 @@ using DotnetSpider.Common;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Collections;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Extension.Downloader
 {
@@ -108,7 +109,7 @@ namespace DotnetSpider.Extension.Downloader
 			{
 				d._driver = WebDriverUtil.Open(_browser, _option);
 				d._driver.Url = request.Url;
-				Logger?.Information("实例化浏览器");
+				Logger?.LogInformation("实例化浏览器");
 
 				foreach (var domain in _domains)
 				{
@@ -143,7 +144,7 @@ namespace DotnetSpider.Extension.Downloader
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override Common.Response DowloadContent(Request request)
+		protected override DotnetSpider.Downloader.Response DowloadContent(Request request)
 		{
 			try
 			{
@@ -162,7 +163,7 @@ namespace DotnetSpider.Extension.Downloader
 
 				Thread.Sleep(_driverWaitTime);
 
-				var response = new Common.Response(request) { Content = _driver.PageSource };
+				var response = new DotnetSpider.Downloader.Response(request) { Content = _driver.PageSource };
 				DetectContentType(response, null);
 				return response;
 			}

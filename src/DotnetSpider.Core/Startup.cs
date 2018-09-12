@@ -49,11 +49,6 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public static List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
 
-		static Startup()
-		{
-			LogUtil.Init();
-		}
-
 		/// <summary>
 		/// 运行
 		/// </summary>

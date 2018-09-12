@@ -1,8 +1,10 @@
-﻿using DotnetSpider.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.CompilerServices;
+#if !NET40
+using Microsoft.Extensions.Logging;
+#endif
 
 [assembly: InternalsVisibleTo("DotnetSpider.Downloader.Test")]
 
@@ -10,6 +12,9 @@ namespace DotnetSpider.Downloader
 {
 	public interface IDownloader : IDisposable
 	{
+		/// <summary>
+		/// 日志接口
+		/// </summary>
 		ILogger Logger { get; set; }
 
 		/// <summary>
@@ -21,7 +26,6 @@ namespace DotnetSpider.Downloader
 		/// <param name="request">链接请求 <see cref="Request"/></param>
 		/// <returns>链接请求结果 <see cref="Response"/></returns>
 		Response Download(Request request);
-
 
 		/// <summary>
 		/// Add handlers for post-processing.

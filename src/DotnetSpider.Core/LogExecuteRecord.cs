@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Common;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Core
 {
@@ -28,7 +29,7 @@ namespace DotnetSpider.Core
 				return true;
 			}
 			var msg = string.IsNullOrWhiteSpace(name) ? $"Execute task {taskId}, identity {identity}." : $"Execute task {taskId}, name {name}, identity {identity}.";
-			_logger.Information(msg, identity);
+			_logger.LogInformation(msg, identity);
 			return true;
 		}
 
@@ -45,7 +46,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 			var msg = string.IsNullOrWhiteSpace(name) ? $"Finish task {taskId}, identity {identity}." : $"Finish task {taskId}, name {name}, identity {identity}.";
-			_logger.Information(msg, identity);
+			_logger.LogInformation(msg, identity);
 		}
 	}
 }

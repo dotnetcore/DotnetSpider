@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using DotnetSpider.Common;
 using Xunit;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Core.Test
 {
@@ -40,7 +41,7 @@ namespace DotnetSpider.Core.Test
 					catch { }
 				}
 			}
-			pipeline.Process(new[] { _resultItems }, spider.Logger, spider);
+			pipeline.Process(new[] { _resultItems }, spider);
 			pipeline.Dispose();
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);

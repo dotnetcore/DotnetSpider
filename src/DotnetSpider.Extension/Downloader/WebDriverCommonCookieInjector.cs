@@ -6,6 +6,7 @@ using System.Net;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction;
 using DotnetSpider.Common;
+using System;
 
 namespace DotnetSpider.Extension.Downloader
 {
@@ -49,7 +50,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		public Selector SubmitSelector;
 
-		public WebDriverCommonCookieInjector(Browser browser, IControllable controllable) : base(browser, controllable)
+		public WebDriverCommonCookieInjector(Browser browser, Action before = null, Action after = null) : base(browser, before, after)
 		{
 		}
 
@@ -96,9 +97,8 @@ namespace DotnetSpider.Extension.Downloader
 		/// <summary>
 		/// 取得 Cookie
 		/// </summary>
-		/// <param name="controllable">可控制程序 <see cref="IControllable"/></param>
 		/// <returns>Cookies <see cref="CookieCollection"/></returns>
-		protected override CookieCollection GetCookies(IControllable controllable)
+		protected override CookieCollection GetCookies()
 		{
 			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PasswordSelector == null)
 			{

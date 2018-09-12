@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using System;
+﻿using System;
 using System.Net;
 using System.Runtime.CompilerServices;
 
@@ -15,8 +14,8 @@ namespace DotnetSpider.Downloader
 	public abstract class CookieInjector : ICookieInjector
 	{
 		private DateTime _lastInjectedTime;
-
-		public IControllable Controllable { get; }
+		private readonly Action _before;
+		private readonly Action _after;
 
 		/// <summary>
 		/// Mininum interval between injections (in second).
@@ -26,43 +25,36 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		public int FrequencyLimitation { get; set; } = 15;
 
-		public CookieInjector(IControllable controllable)
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="before">在注入 Cookie 前需要执行的操作, 如暂停爬虫</param>
+		/// <param name="after">在注入 Cookie 之后需要执行的操作, 如启动爬虫</param>
+		public CookieInjector(Action before, Action after)
 		{
-			Controllable = controllable;
+			_before = before;
+			_after = after;
 		}
 
 		/// <summary>
 		/// 执行注入Cookie的操作
 		/// </summary>
 		/// <param name="downloader">下载器</param>
-		/// <param name="pauseBeforeInject">是否停止程序再注入 Cookie: 在程序第一次下载的时候不需要调用暂停</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void Inject(IDownloader downloader, bool pauseBeforeInject)
+		public void Inject(IDownloader downloader)
 		{
 			if (!CheckFrequency())
 			{
 				return;
 			}
-			if (pauseBeforeInject)
+
+			_before?.Invoke();
+
+			foreach (Cookie cookie in GetCookies())
 			{
-				Controllable.Pause(() =>
-				{
-					foreach (Cookie cookie in GetCookies(Controllable))
-					{
-						downloader.AddCookie(cookie);
-					}
-					downloader.Logger?.Information("Inject cookies success.");
-					Controllable.Contiune();
-				});
+				downloader.AddCookie(cookie);
 			}
-			else
-			{
-				foreach (Cookie cookie in GetCookies(Controllable))
-				{
-					downloader.AddCookie(cookie);
-				}
-				downloader.Logger?.Information("Inject cookies success.");
-			}
+			_after?.Invoke();
 		}
 
 		/// <summary>
@@ -71,9 +63,8 @@ namespace DotnetSpider.Downloader
 		/// <summary xml:lang="zh-CN">
 		/// 取得新的Cookies
 		/// </summary>
-		/// <param name="controllable">可控制程序 <see cref="IControllable"/></param>
 		/// <returns>Cookies <see cref="CookieCollection"/></returns>
-		protected abstract CookieCollection GetCookies(IControllable controllable);
+		protected abstract CookieCollection GetCookies();
 
 		/// <summary>
 		/// Check injection frenquency.

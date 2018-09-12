@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Common;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction.Model;

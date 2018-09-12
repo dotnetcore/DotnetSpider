@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-
-namespace DotnetSpider.Downloader
+﻿namespace DotnetSpider.Downloader
 {
 	/// <summary>
 	/// Pre-process before downloading, you can edit request here like PostBody etc.

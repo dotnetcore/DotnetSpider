@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-// using System.Net.Sockets;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -111,6 +111,7 @@ namespace DotnetSpider.Proxy
 				Socket socket = null;
 				try
 				{
+					var ascii = Encoding.GetEncoding("ASCII");
 					var host = Dns.GetHostEntry(httpProxy.Host);
 					socket = new Socket(host.AddressList[0].AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
@@ -122,13 +123,13 @@ namespace DotnetSpider.Proxy
 					socket.Connect(new IPEndPoint(host.AddressList[0], httpProxy.Port));
 
 					var request = httpProxy.ToTunnelRequestString(targetAddress);
-					var sendBuffer = Encoding.ASCII.GetBytes(request);
+					var sendBuffer = ascii.GetBytes(request);
 					socket.Send(sendBuffer);
 
 					var recvBuffer = new byte[150];
 					var length = socket.Receive(recvBuffer);
 
-					var response = Encoding.ASCII.GetString(recvBuffer, 0, length);
+					var response = ascii.GetString(recvBuffer, 0, length);
 					var statusCode = int.Parse(Regex.Match(response, "(?<=HTTP/1.1 )\\d+", RegexOptions.IgnoreCase).Value);
 					return (HttpStatusCode)statusCode;
 				}

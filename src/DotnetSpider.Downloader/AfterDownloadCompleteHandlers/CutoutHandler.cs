@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using System;
+﻿using System;
 
 namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 {

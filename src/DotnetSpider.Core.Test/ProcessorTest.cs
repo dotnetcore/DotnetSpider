@@ -26,7 +26,7 @@ namespace DotnetSpider.Core.Test
 				.AddPipeline(new FilePipeline());
 			spider.ClearSchedulerAfterCompleted = false;
 			// dowload html by http client
-			spider.Downloader = new HttpWebRequestDownloader();
+			spider.Downloader = new HttpClientDownloader();
 			spider.AddHeaders("v.youku.com", new Dictionary<string, object> { { "Upgrade-Insecure-Requests", "1" } });
 
 			spider.ThreadNum = 1;

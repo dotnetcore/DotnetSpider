@@ -38,7 +38,7 @@ namespace DotnetSpider.Sample.docs
 			private static long blogSumaryCount = 0;
 			private static long newsCount = 0;
 
-			public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+			public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 			{
 				foreach (var resultItem in resultItems)
 				{

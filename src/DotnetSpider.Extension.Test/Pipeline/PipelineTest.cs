@@ -44,7 +44,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			class MyPipeline : BasePipeline
 			{
-				public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+				public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 				{
 
 				}

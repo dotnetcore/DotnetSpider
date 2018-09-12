@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using LZ4;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Downloader
 {
@@ -23,7 +24,7 @@ namespace DotnetSpider.Downloader
 		private readonly string _downloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "downloads");
 
 		public static WebProxy FiddlerProxy = new WebProxy("http://127.0.0.1:8888");
-		
+
 		/// <summary>
 		/// 是否下载文件
 		/// </summary>
@@ -185,8 +186,12 @@ namespace DotnetSpider.Downloader
 			{
 				if (!_injectedCookies && CookieInjector != null)
 				{
-					CookieInjector.Inject(this, false);
+					CookieInjector.Inject(this);
 					_injectedCookies = true;
+				}
+				if (NetworkCenter.Current.Executor != null)
+				{
+					NetworkCenter.Current.Executor.Logger = NetworkCenter.Current.Executor.Logger ?? Logger;
 				}
 			}
 			BeforeDownload(ref request);
@@ -252,7 +257,7 @@ namespace DotnetSpider.Downloader
 						}
 
 						File.WriteAllBytes(filePath, bytes);
-						Logger.Information($"Storage file {request.Url} success.");
+						Logger?.LogInformation($"Storage file {request.Url} success.");
 					}
 					else
 					{
@@ -261,12 +266,12 @@ namespace DotnetSpider.Downloader
 				}
 				catch (Exception e)
 				{
-					Logger.Error($"Storage file {request.Url} failed: {e.Message}.");
+					Logger?.LogError($"Storage file {request.Url} failed: {e.Message}.");
 				}
 			}
 			else
 			{
-				Logger.Information($"File {request.Url} already exists.");
+				Logger?.LogInformation($"File {request.Url} already exists.");
 			}
 		}
 

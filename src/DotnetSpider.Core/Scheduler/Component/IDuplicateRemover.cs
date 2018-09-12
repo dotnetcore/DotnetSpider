@@ -1,4 +1,5 @@
 using DotnetSpider.Common;
+using DotnetSpider.Downloader;
 using System;
 
 namespace DotnetSpider.Core.Scheduler.Component

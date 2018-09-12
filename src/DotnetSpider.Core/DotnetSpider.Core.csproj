@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net40;net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net451;netstandard2.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Version>3.0.3</Version>
@@ -23,17 +23,11 @@
     <ProjectReference Include="..\DotnetSpider.HtmlAgilityPack.Css\DotnetSpider.HtmlAgilityPack.Css.csproj" />
     <ProjectReference Include="..\DotnetSpider.Proxy\DotnetSpider.Proxy.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <Reference Include="System.Web" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="CommandLineParser" Version="1.9.71" />
-    <PackageReference Include="Serilog" Version="1.5.14" />
-    <PackageReference Include="Polly" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <Reference Include="System.Web" />
     <PackageReference Include="CommandLineParser" Version="2.2.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2"/>
+    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2"/>
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.1" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
@@ -56,5 +50,7 @@
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Include="Polly" Version="6.0.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1"/>
+    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2"/>
   </ItemGroup>
 </Project>

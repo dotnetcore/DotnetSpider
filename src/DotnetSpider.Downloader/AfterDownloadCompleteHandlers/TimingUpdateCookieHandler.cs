@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using System;
+﻿using System;
 
 namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 {
@@ -49,7 +48,7 @@ namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 			if (DateTime.Now > _next)
 			{
 				_next = DateTime.Now.AddSeconds(_interval);
-				_cookieInjector.Inject(downloader, true);
+				_cookieInjector.Inject(downloader);
 			}
 		}
 	}

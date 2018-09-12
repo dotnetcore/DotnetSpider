@@ -20,7 +20,7 @@ namespace DotnetSpider.Sample.docs
 				.AddPipeline(new FilePipeline());
 
 			// dowload html by http client
-			spider.Downloader = new HttpWebRequestDownloader();
+			spider.Downloader = new HttpClientDownloader();
 			spider.Name = "CNBLOGS";
 			// 4 threads 4线程
 			spider.ThreadNum = 4;

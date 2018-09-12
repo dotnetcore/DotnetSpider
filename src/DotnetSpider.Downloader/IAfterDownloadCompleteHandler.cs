@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-
-namespace DotnetSpider.Downloader
+﻿namespace DotnetSpider.Downloader
 {
 	/// <summary>
 	/// Post-process after downloading.

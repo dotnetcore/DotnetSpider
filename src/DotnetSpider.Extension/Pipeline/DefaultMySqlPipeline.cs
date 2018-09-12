@@ -61,7 +61,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="resultItems">数据结果</param>
 		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
-		public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+		public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 		{
 			var results = new List<dynamic>();
 			foreach (var resultItem in resultItems)

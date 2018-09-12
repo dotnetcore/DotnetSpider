@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 {

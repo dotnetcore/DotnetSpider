@@ -17,9 +17,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 #if NETFRAMEWORK
 using System.Net;
-
 #else
 using System.Text;
 #endif
@@ -55,7 +57,7 @@ namespace DotnetSpider.Core
 		private IMonitor _monitor;
 		private int _statusFlushInterval = 5000;
 		private int _monitorFlushInterval;
-		private ILogger _failingRequestsLogger;
+		private Serilog.ILogger _failingRequestsLogger;
 		private long _downloaderTimes;
 		private long _pipelineTimes;
 		private long _processorTimes;
@@ -115,9 +117,9 @@ namespace DotnetSpider.Core
 				{
 					try
 					{
-						Logger.Information("Start data verification...");
+						Logger.LogInformation("Start data verification...");
 						OnVerifyDataOrGenerateReport();
-						Logger.Information("Complete data verification.");
+						Logger.LogInformation("Complete data verification.");
 					}
 					finally
 					{
@@ -126,7 +128,6 @@ namespace DotnetSpider.Core
 				}
 			});
 		}
-
 		/// <summary>
 		/// All pipelines for spider.
 		/// </summary>
@@ -707,7 +708,7 @@ namespace DotnetSpider.Core
 		{
 			if (_inited || Status == Status.Running)
 			{
-				Logger.Warning("Crawler is running...");
+				Logger.LogWarning("Crawler is running...");
 				return;
 			}
 
@@ -717,7 +718,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			Logger.Information("Oninit...");
+			Logger.LogInformation("Oninit...");
 
 			NetworkCenter.Current.Execute("onInit", () => { OnInit(arguments); });
 
@@ -777,7 +778,7 @@ namespace DotnetSpider.Core
 								if (result.Item1)
 								{
 									OnSuccess(request);
-									Logger.Information(
+									Logger.LogInformation(
 										$"Crawl {request.Url} success, results {result.Item2}, effectedRow {result.Item3}.");
 								}
 								else
@@ -794,7 +795,7 @@ namespace DotnetSpider.Core
 							catch (Exception e)
 							{
 								OnError(request);
-								Logger.Error($"Crawler {request.Url} failed: {e}.");
+								Logger.LogError($"Crawler {request.Url} failed: {e}.");
 							}
 							finally
 							{
@@ -830,12 +831,12 @@ namespace DotnetSpider.Core
 			bool isRunning = Status == Status.Running;
 			if (!isRunning)
 			{
-				Logger.Warning(Identity, "Crawler is not running.");
+				Logger.LogWarning(Identity, "Crawler is not running.");
 			}
 			else
 			{
 				Status = Status.Paused;
-				Logger.Information(Identity, "Stop running...");
+				Logger.LogInformation(Identity, "Stop running...");
 			}
 
 			action?.Invoke();
@@ -849,11 +850,11 @@ namespace DotnetSpider.Core
 			if (Status == Status.Paused)
 			{
 				Status = Status.Running;
-				Logger.Warning("Continue...");
+				Logger.LogWarning("Continue...");
 			}
 			else
 			{
-				Logger.Information("Crawler was not paused, can not continue...");
+				Logger.LogInformation("Crawler was not paused, can not continue...");
 			}
 		}
 
@@ -900,11 +901,11 @@ namespace DotnetSpider.Core
 			if (Status == Status.Running || Status == Status.Paused)
 			{
 				Status = Status.Exited;
-				Logger.Information("Exit...");
+				Logger.LogInformation("Exit...");
 				return;
 			}
 
-			Logger.Warning(Identity, "Crawler is not running.");
+			Logger.LogWarning(Identity, "Crawler is not running.");
 			if (action != null)
 			{
 				Task.Factory.StartNew(() =>
@@ -946,21 +947,24 @@ namespace DotnetSpider.Core
 		/// <param name="arguments"></param>
 		protected virtual void InitComponents(params string[] arguments)
 		{
-			Logger.Information("Init components...");
+			Logger.LogInformation("Init components...");
 
 			if (arguments.Any(a => a?.ToLower() == SpiderArguments.Reset))
 			{
 				ResetScheduler();
 			}
 
-#if !NET40
 			Downloader = Downloader ?? new HttpClientDownloader();
-#else
-			Downloader = Downloader ?? new HttpWebRequestDownloader();
-#endif
+			Downloader.Logger = Downloader.Logger ?? Logger;
+
 			if (PageProcessors == null || PageProcessors.Count == 0)
 			{
 				throw new ArgumentException("There is no usable pipeline.");
+			}
+
+			foreach(var processor in PageProcessors)
+			{
+				processor.Logger = processor.Logger ?? Logger;
 			}
 
 			PreparePipelines(arguments);
@@ -969,7 +973,8 @@ namespace DotnetSpider.Core
 
 			Monitor = Monitor ?? (string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? new LogMonitor() : new HttpMonitor());
 
-			_failingRequestsLogger = LogUtil.CreateFailingRequestsLogger(Identity);
+			_failingRequestsLogger = new LoggerConfiguration()
+				.MinimumLevel.Verbose().WriteTo.RollingFile($"failing.log").CreateLogger();
 
 			RunRequestBuilders(arguments);
 
@@ -983,7 +988,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				Logger.Information($"Can't register cancel key press:{e.Message}");
+				Logger.LogInformation($"Can't register cancel key press:{e.Message}");
 			}
 
 			_waitCountLimit = EmptySleepTime / WaitInterval;
@@ -1016,7 +1021,7 @@ namespace DotnetSpider.Core
 			{
 				if (containsData)
 				{
-					pipeline.Process(_cached.ToArray(), Logger, this);
+					pipeline.Process(_cached.ToArray(), this);
 				}
 
 				SafeDestroy(pipeline);
@@ -1052,7 +1057,7 @@ namespace DotnetSpider.Core
 		/// <param name="request"></param>
 		protected void OnError(Request request)
 		{
-			_failingRequestsLogger.Error(request.ToString());
+			_failingRequestsLogger.Error($"{Identity} {request}");
 			Scheduler.IncreaseErrorCount();
 		}
 
@@ -1099,7 +1104,7 @@ namespace DotnetSpider.Core
 
 				foreach (var processor in PageProcessors)
 				{
-					processor.Process(page, Logger);
+					processor.Process(page);
 				}
 
 				stopwatch.Stop();
@@ -1110,7 +1115,7 @@ namespace DotnetSpider.Core
 				// 解析异常有可能是下载内容导致的, 也有可能是自己解析写错了, 因此重试。
 				if (page.AddToCycleRetry(CycleRetryTimes))
 				{
-					base.Logger.Warning($"Retry request: {request.Url} because processor exception: {e}.");
+					Logger.LogWarning($"Retry request: {request.Url} because processor exception: {e}.");
 				}
 				else
 				{
@@ -1149,7 +1154,7 @@ namespace DotnetSpider.Core
 			ResultItems[] resultItems = new ResultItems[0];
 			if (PipelineCachedSize == 1)
 			{
-				resultItems = new[] {page.ResultItems};
+				resultItems = new[] { page.ResultItems };
 			}
 			else
 			{
@@ -1168,7 +1173,7 @@ namespace DotnetSpider.Core
 			{
 				try
 				{
-					_pipelineRetry.Execute(() => { pipeline.Process(resultItems, Logger, this); });
+					_pipelineRetry.Execute(() => { pipeline.Process(resultItems, this); });
 				}
 				catch
 				{
@@ -1204,12 +1209,12 @@ namespace DotnetSpider.Core
 			}
 			catch (BypassedDownloaderException bde)
 			{
-				Logger.Error($"Download {request.Url} failed: {bde.Message}.");
+				Logger.LogError($"Download {request.Url} failed: {bde.Message}.");
 				page.Content = null;
 			}
 			catch (DownloaderException de)
 			{
-				Logger.Error($"Download {request.Url} failed: {de.Message}.");
+				Logger.LogError($"Download {request.Url} failed: {de.Message}.");
 				page.Content = null;
 				page.AddToCycleRetry(CycleRetryTimes);
 			}
@@ -1217,20 +1222,20 @@ namespace DotnetSpider.Core
 			{
 				if (NetworkCenter.Current.Executor == null)
 				{
-					Logger.Error("RedialExecutor is null.");
+					Logger.LogError("RedialExecutor is null.");
 					Exit();
 				}
 				else
 				{
-					Logger.Information($"Try to redial because: {re.Message}.");
+					Logger.LogInformation($"Try to redial because: {re.Message}.");
 					if (NetworkCenter.Current.Executor.Redial() == RedialResult.Failed)
 					{
-						Logger.Error("Redial failed.");
+						Logger.LogError("Redial failed.");
 						Exit();
 					}
 					else
 					{
-						Logger.Information("Redial success.");
+						Logger.LogInformation("Redial success.");
 						page.Content = null;
 						page.AddToCycleRetry(CycleRetryTimes);
 					}
@@ -1238,7 +1243,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				Logger.Error($"Unhandle downloader exception: {e}.");
+				Logger.LogError($"Unhandle downloader exception: {e}.");
 				Exit();
 			}
 
@@ -1288,7 +1293,7 @@ namespace DotnetSpider.Core
 			PipelineRetryTimes = PipelineRetryTimes <= 0 ? 1 : PipelineRetryTimes;
 
 			_pipelineRetry = Policy.Handle<Exception>().Retry(PipelineRetryTimes,
-				(ex, count) => { Logger.Error($"Execute pipeline failed [{count}]: {ex}"); });
+				(ex, count) => { Logger.LogError($"Execute pipeline failed [{count}]: {ex}"); });
 
 			if (Pipelines.Count == 0)
 			{
@@ -1301,6 +1306,11 @@ namespace DotnetSpider.Core
 				{
 					throw new SpiderException("Count of pipelines should larger than one.");
 				}
+			}
+
+			foreach (var pipeline in Pipelines)
+			{
+				pipeline.Logger = pipeline.Logger ?? Logger;
 			}
 		}
 
@@ -1320,7 +1330,7 @@ namespace DotnetSpider.Core
 				}
 				catch (Exception e)
 				{
-					Logger.Error(e.ToString());
+					Logger.LogError(e.ToString());
 				}
 			}
 		}
@@ -1368,7 +1378,7 @@ namespace DotnetSpider.Core
 					for (int i = 0; i < RequestBuilders.Count; ++i)
 					{
 						var builder = RequestBuilders[i];
-						Logger.Information($"Add start request via builder[{i + 1}].");
+						Logger.LogInformation($"Add start request via builder[{i + 1}].");
 						builder.Build();
 					}
 				}
@@ -1383,7 +1393,7 @@ namespace DotnetSpider.Core
 		{
 			if (_requests.Any())
 			{
-				Logger.Information($"Add start urls to scheduler, count {_requests.Count}.");
+				Logger.LogInformation($"Add start urls to scheduler, count {_requests.Count}.");
 
 				if (!Scheduler.IsDistributed)
 				{
@@ -1424,7 +1434,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				Logger.Information("Add start urls to scheduler, count 0.");
+				Logger.LogInformation("Add start urls to scheduler, count 0.");
 			}
 		}
 
@@ -1485,7 +1495,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				Logger.Error($"Report status failed: {e}.");
+				Logger.LogError($"Report status failed: {e}.");
 			}
 		}
 

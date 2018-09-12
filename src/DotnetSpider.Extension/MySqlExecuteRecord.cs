@@ -4,6 +4,7 @@ using System;
 using System.Data;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Common;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Extension
 {
@@ -44,7 +45,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.Error($"Add execute record failed: {e}", identity);
+				Logger?.LogError($"Add execute record failed: {e}", identity);
 				return false;
 			}
 		}
@@ -69,7 +70,7 @@ namespace DotnetSpider.Extension
 			}
 			catch (Exception e)
 			{
-				Logger.Error($"Remove execute record failed: {e}");
+				Logger?.LogError($"Remove execute record failed: {e}");
 			}
 		}
 	}

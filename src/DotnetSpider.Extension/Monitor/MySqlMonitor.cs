@@ -4,6 +4,7 @@ using System.Data;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Extension.Monitor
 {
@@ -102,7 +103,7 @@ namespace DotnetSpider.Extension.Monitor
 			}
 			else
 			{
-				Logger.Error("DbConnection is null.");
+				Logger.LogError("DbConnection is null.");
 			}
 		}
 
@@ -132,7 +133,7 @@ namespace DotnetSpider.Extension.Monitor
 			}
 			catch
 			{
-				Logger.Error("Prepare DotnetSpider.Status failed.");
+				Logger.LogError("Prepare DotnetSpider.Status failed.");
 				throw;
 			}
 		}

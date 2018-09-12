@@ -8,8 +8,6 @@ namespace DotnetSpider.Common
 	/// </summary>
 	public interface IControllable
 	{
-		ILogger Logger { get; }
-
 		/// <summary>
 		/// 暂停任务
 		/// 暂停一个不在运行的任务应该提示警告

@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		private readonly Browser _browser;
 
-		public WebDriverCookieInjector(Browser browser, IControllable controllable) : base(controllable)
+		public WebDriverCookieInjector(Browser browser, Action before = null, Action after = null) : base(before, after)
 		{
 			_browser = browser;
 		}

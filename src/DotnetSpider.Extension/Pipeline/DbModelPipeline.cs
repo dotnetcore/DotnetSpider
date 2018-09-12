@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Common;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -47,11 +48,11 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected abstract IDbConnection CreateDbConnection(string connectString);
 
-		protected abstract Sqls GenerateSqls(IModel model, ILogger logger);
+		protected abstract Sqls GenerateSqls(IModel model);
 
 		protected abstract void InitDatabaseAndTable(IDbConnection conn, IModel model);
 
-		protected override int Process(IModel model, IList<dynamic> datas, ILogger logger, dynamic sender = null)
+		protected override int Process(IModel model, IList<dynamic> datas, dynamic sender = null)
 		{
 			if (datas == null || datas.Count == 0)
 			{
@@ -69,7 +70,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				try
 				{
-					conn = RefreshConnectionString(logger);
+					conn = RefreshConnectionString();
 
 					// 每天执行一次建表操作, 可以实现每天一个表的操作，或者按周分表可以在运行时创建新表。
 					var key = model.Table.Postfix != TableNamePostfix.None ? $"{model.Identity}_{DateTime.Now:yyyyMMdd}" : model.Identity;
@@ -82,7 +83,7 @@ namespace DotnetSpider.Extension.Pipeline
 						}
 						else
 						{
-							sqls = GenerateSqls(model, logger);
+							sqls = GenerateSqls(model);
 							_sqls.Add(key, sqls);
 							InitDatabaseAndTable(conn, model);
 						}
@@ -111,7 +112,7 @@ namespace DotnetSpider.Extension.Pipeline
 							{
 								if (string.IsNullOrWhiteSpace(sqls.UpdateSql))
 								{
-									logger.Error("Check your TableInfo attribute contains UpdateColumns value.");
+									Logger?.LogError("Check your TableInfo attribute contains UpdateColumns value.");
 									throw new SpiderException("UpdateSql is null.");
 								}
 								count += conn.MyExecute(sqls.UpdateSql, datas);
@@ -143,11 +144,11 @@ namespace DotnetSpider.Extension.Pipeline
 			throw new SpiderException($"Pipeline process failed.");
 		}
 
-		private IDbConnection RefreshConnectionString(ILogger logger)
+		private IDbConnection RefreshConnectionString()
 		{
 			if (!string.IsNullOrWhiteSpace(ConnectString))
 			{
-				var conn = TryCreateDbConnection(logger);
+				var conn = TryCreateDbConnection();
 				if (conn != null)
 				{
 					return conn;
@@ -156,7 +157,7 @@ namespace DotnetSpider.Extension.Pipeline
 			if (!string.IsNullOrWhiteSpace(Env.DataConnectionString))
 			{
 				ConnectString = Env.DataConnectionString;
-				var conn = TryCreateDbConnection(logger);
+				var conn = TryCreateDbConnection();
 				if (conn != null)
 				{
 					return conn;
@@ -165,7 +166,7 @@ namespace DotnetSpider.Extension.Pipeline
 			if (ConnectionStringSettingsRefresher != null)
 			{
 				ConnectString = ConnectionStringSettingsRefresher.GetNew().ConnectionString;
-				var conn = TryCreateDbConnection(logger);
+				var conn = TryCreateDbConnection();
 				if (conn != null)
 				{
 					return conn;
@@ -249,7 +250,7 @@ namespace DotnetSpider.Extension.Pipeline
 			return pipeline;
 		}
 
-		private IDbConnection TryCreateDbConnection(ILogger logger)
+		private IDbConnection TryCreateDbConnection()
 		{
 			try
 			{
@@ -259,7 +260,7 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 			catch
 			{
-				logger.Warning($"Can't connect to database: {ConnectString}.");
+				Logger?.LogWarning($"Can't connect to database: {ConnectString}.");
 			}
 			return null;
 		}

@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Common;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
@@ -57,7 +58,7 @@ namespace DotnetSpider.Extension
 				}
 				if (!factor)
 				{
-					Logger.Information("Data verification is done already.");
+					Logger.LogInformation("Data verification is done already.");
 				}
 				if (factor)
 				{
@@ -117,7 +118,7 @@ namespace DotnetSpider.Extension
 								var lockerValue = RedisConnection.Default.Database.HashGet(InitStatusSetKey, Identity);
 								if (lockerValue != InitFinishedValue)
 								{
-									Logger.Information("Waiting for another crawler inited...");
+									Logger.LogInformation("Waiting for another crawler inited...");
 									Thread.Sleep(1500);
 								}
 								else
@@ -159,7 +160,7 @@ namespace DotnetSpider.Extension
 				if (!ifBuildFinished)
 				{
 					var msg = "Init status set failed";
-					Logger.Error(msg);
+					Logger.LogError(msg);
 					throw new SpiderException(msg);
 				}
 
@@ -179,7 +180,7 @@ namespace DotnetSpider.Extension
 				if (!ifRemoveInitLocker)
 				{
 					var msg = "Remove init locker failed";
-					Logger.Error(msg);
+					Logger.LogError(msg);
 					throw new SpiderException(msg);
 				}
 			}
@@ -224,7 +225,7 @@ namespace DotnetSpider.Extension
 				}
 				catch (Exception e)
 				{
-					Logger.Error($"Register contol failed：{e}.");
+					Logger.LogError($"Register contol failed：{e}.");
 				}
 			}
 		}

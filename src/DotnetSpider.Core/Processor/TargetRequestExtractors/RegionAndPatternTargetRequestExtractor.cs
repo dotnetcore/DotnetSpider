@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DotnetSpider.Common;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extraction;
 
 namespace DotnetSpider.Core.Processor.TargetRequestExtractors

@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Downloader.Redial.InternetDetector;
 using DotnetSpider.Downloader.Redial.Redialer;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 
@@ -13,6 +14,11 @@ namespace DotnetSpider.Downloader.Redial
 		internal bool IsTest { get; set; }
 		private int WaitRedialTimeout { get; } = 100 * 1000 / 100;
 		private int RedialIntervalLimit { get; } = 10;
+
+		/// <summary>
+		/// 日志接口
+		/// </summary>
+		public ILogger Logger { get; set; }
 
 		/// <summary>
 		/// 等待所有网络通讯结束
@@ -75,21 +81,21 @@ namespace DotnetSpider.Downloader.Redial
 			ILocker locker = null;
 			try
 			{
-				Logger.Default.Information("Try to lock redialer...");
+				Logger?.LogInformation("Try to lock redialer...");
 				locker = CreateLocker();
 				locker.Lock();
-				Logger.Default.Information("Lock redialer");
+				Logger?.LogInformation("Lock redialer");
 				var lastRedialTime = (DateTime.Now - GetLastRedialTime()).Seconds;
 				if (lastRedialTime < RedialIntervalLimit)
 				{
-					Logger.Default.Information($"Skip redial because last redial compeleted before {lastRedialTime} seconds.");
+					Logger?.LogInformation($"Skip redial because last redial compeleted before {lastRedialTime} seconds.");
 					return RedialResult.OtherRedialed;
 				}
 				Thread.Sleep(500);
-				Logger.Default.Information("Wait all network requests complete...");
+				Logger?.LogInformation("Wait all network requests complete...");
 				// 等待所有网络请求结束
 				WaitAllNetworkRequestComplete();
-				Logger.Default.Information("Start redial...");
+				Logger?.LogInformation("Start redial...");
 
 				var redialCount = 1;
 
@@ -116,7 +122,7 @@ namespace DotnetSpider.Downloader.Redial
 					}
 					catch (Exception ex)
 					{
-						Logger.Default.Error($"Redial failed loop {redialCount}: {ex}");
+						Logger?.LogError($"Redial failed loop {redialCount}: {ex}");
 					}
 				}
 
@@ -125,7 +131,7 @@ namespace DotnetSpider.Downloader.Redial
 					return RedialResult.Failed;
 				}
 
-				Logger.Default.Information("Redial success.");
+				Logger?.LogInformation("Redial success.");
 
 				action?.Invoke(null);
 
@@ -135,7 +141,7 @@ namespace DotnetSpider.Downloader.Redial
 			}
 			catch (Exception ex)
 			{
-				Logger.Default.Error($"Redial failed: {ex}");
+				Logger?.LogError($"Redial failed: {ex}");
 				return RedialResult.Failed;
 			}
 			finally

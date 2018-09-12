@@ -31,8 +31,6 @@ namespace DotnetSpider.Extension.Test
 		[Fact(Skip = "Dep selrilog.mysql", DisplayName = "Log_DatebaseLogAndStatus")]
 		public void DatebaseLogAndStatus()
 		{
-			LogUtil.Init();
-
 			string id = Guid.NewGuid().ToString("N");
 			Env.NodeId = "DEFAULT";
 			using (Spider spider = Spider.Create(
@@ -86,7 +84,7 @@ namespace DotnetSpider.Extension.Test
 	internal class TestPipeline : BasePipeline
 	{
 
-		public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+		public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 		{
 			foreach (var resultItem in resultItems)
 			{

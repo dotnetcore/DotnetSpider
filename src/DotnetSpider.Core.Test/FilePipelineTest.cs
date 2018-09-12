@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using DotnetSpider.Common;
 using Xunit;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Core.Test
 {
@@ -36,7 +37,7 @@ namespace DotnetSpider.Core.Test
 					File.Delete(file);
 				}
 			}
-			filePipeline.Process(new[] { _resultItems }, spider.Logger, spider);
+			filePipeline.Process(new[] { _resultItems }, spider);
 			string dataFile = Directory.GetFiles(folder)[0];
 			string content = File.ReadAllText(dataFile);
 			string expected = $"url:\thttp://www.baidu.com{System.Environment.NewLine}content:\t爬虫工具{System.Environment.NewLine}";

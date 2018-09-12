@@ -1,6 +1,11 @@
 ﻿using DotnetSpider.Common;
 using DotnetSpider.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
@@ -10,12 +15,35 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public abstract class AppBase : Named, IAppBase
 	{
+		public static SystemConsoleTheme Theme { get; } = new SystemConsoleTheme(
+			new Dictionary<ConsoleThemeStyle, SystemConsoleThemeStyle>
+			{
+				[ConsoleThemeStyle.Text] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Gray },
+				[ConsoleThemeStyle.SecondaryText] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.DarkGray },
+				[ConsoleThemeStyle.TertiaryText] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.DarkGray },
+				[ConsoleThemeStyle.Invalid] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Yellow },
+				[ConsoleThemeStyle.Null] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
+				[ConsoleThemeStyle.Name] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
+				[ConsoleThemeStyle.String] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
+				[ConsoleThemeStyle.Number] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
+				[ConsoleThemeStyle.Boolean] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
+				[ConsoleThemeStyle.Scalar] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
+				[ConsoleThemeStyle.LevelVerbose] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Cyan },
+				[ConsoleThemeStyle.LevelDebug] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.DarkGray },
+				[ConsoleThemeStyle.LevelInformation] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
+				[ConsoleThemeStyle.LevelWarning] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Yellow },
+				[ConsoleThemeStyle.LevelError] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Red },
+				[ConsoleThemeStyle.LevelFatal] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Red }
+			});
+
 		private string _identity = Guid.NewGuid().ToString("N");
+
+		public static ILoggerFactory LoggerFactory;
 
 		/// <summary>
 		/// 唯一标识
 		/// </summary>
-		public virtual ILogger Logger { get; protected set; }
+		public virtual Microsoft.Extensions.Logging.ILogger Logger { get; set; }
 
 		/// <summary>
 		/// 唯一标识
@@ -68,9 +96,16 @@ namespace DotnetSpider.Core
 		/// </summary>
 		protected abstract void Execute(params string[] arguments);
 
-		public AppBase()
+		static AppBase()
 		{
-			LogUtil.Init();
+			LoggerFactory = new LoggerFactory();
+
+			var loggerConfiguration = new LoggerConfiguration()
+				.MinimumLevel.Verbose()
+				.WriteTo.Console(theme: Theme)
+				.WriteTo.RollingFile("dotnetspider.log");
+			Log.Logger = loggerConfiguration.CreateLogger();
+			LoggerFactory.AddSerilog();
 		}
 
 		/// <summary>
@@ -91,7 +126,7 @@ namespace DotnetSpider.Core
 		{
 			PrintInfo.Print();
 
-			Logger = LogUtil.Create(Identity);
+			Logger = LoggerFactory.CreateLogger("DS");
 
 			if (ExecuteRecord == null)
 			{
@@ -107,7 +142,7 @@ namespace DotnetSpider.Core
 
 			if (!ExecuteRecord.Add(TaskId, Name, Identity))
 			{
-				Logger.Error($"Add execute record: {Identity} failed.");
+				Logger.LogError($"Add execute record: {Identity} failed.");
 			}
 			try
 			{
@@ -118,7 +153,7 @@ namespace DotnetSpider.Core
 			{
 				ExitTime = DateTime.Now;
 				ExecuteRecord.Remove(TaskId, Name, Identity);
-				Logger.Information($"Consume: {(ExitTime - StartTime).TotalSeconds} seconds.");
+				Logger.LogInformation($"Consume: {(ExitTime - StartTime).TotalSeconds} seconds.");
 				PrintInfo.PrintLine();
 			}
 		}

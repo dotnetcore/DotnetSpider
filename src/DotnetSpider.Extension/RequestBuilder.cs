@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Runtime.CompilerServices;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Common;
+using DotnetSpider.Downloader;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Extension.Test")]
 namespace DotnetSpider.Extension

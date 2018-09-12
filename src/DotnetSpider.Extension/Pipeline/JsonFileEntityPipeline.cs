@@ -32,11 +32,10 @@ namespace DotnetSpider.Extension.Pipeline
 		/// </summary>
 		/// <param name="model">爬虫实体类的名称</param>
 		/// <param name="datas">实体类数据</param>
-		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override int Process(IModel model, IList<dynamic> datas, ILogger logger, dynamic sender = null)
+		protected override int Process(IModel model, IList<dynamic> datas, dynamic sender = null)
 		{
 			if (datas == null || datas.Count == 0)
 			{

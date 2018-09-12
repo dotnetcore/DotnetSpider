@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.Downloader
@@ -113,7 +111,7 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		/// <param name="url">链接</param>
 		/// <param name="properties">额外属性</param>
-		public Request(string url, Dictionary<string, dynamic> properties = null)
+		public Request(string url, Dictionary<string, object> properties = null)
 		{
 			Url = url;
 			if (properties != null)

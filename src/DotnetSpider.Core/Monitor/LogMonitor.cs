@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Common;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Core.Monitor
 {
@@ -26,7 +27,7 @@ namespace DotnetSpider.Core.Monitor
 		public virtual void Flush(string identity, string taskId, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
 			string msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
-			Logger.Verbose(msg);
+			Logger.LogTrace(msg);
 		}
 	}
 }

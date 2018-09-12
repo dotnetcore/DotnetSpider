@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-
-namespace DotnetSpider.Downloader.Test
+﻿namespace DotnetSpider.Downloader.Test
 {
 	public class TestDownloader : Downloader
 	{

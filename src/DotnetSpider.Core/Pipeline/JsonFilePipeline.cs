@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using DotnetSpider.Common;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Core.Pipeline
 {
@@ -36,7 +37,7 @@ namespace DotnetSpider.Core.Pipeline
 		/// <param name="resultItems">数据结果</param>
 		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
-		public override void Process(IList<ResultItems> resultItems, ILogger logger, dynamic sender = null)
+		public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 		{
 			var jsonFile = Path.Combine(GetDataFolder(sender), $"{GetIdentity(sender)}.json");
 			try
@@ -52,7 +53,7 @@ namespace DotnetSpider.Core.Pipeline
 			}
 			catch (Exception e)
 			{
-				logger.Error($"Storage data to file {jsonFile} failed: {e}.");
+				Logger?.LogError($"Storage data to file {jsonFile} failed: {e}.");
 				throw;
 			}
 		}

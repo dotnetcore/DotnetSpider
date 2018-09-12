@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Common;
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Downloader;
+using Microsoft.Extensions.Logging;
 using Polly;
 using System;
 using System.Threading;
@@ -37,7 +38,7 @@ namespace DotnetSpider.Core
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
 						{
-							_logger?.Error($"Try to add execute record failed [{count}]: {ex}", LogUtil.Identity);
+							_logger?.LogError($"Try to add execute record {identity} failed [{count}]: {ex}");
 							Thread.Sleep(5000);
 						});
 				retryTimesPolicy.Execute(() =>
@@ -52,7 +53,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				_logger?.Error($"Add execute record failed: {e}", identity);
+				_logger?.LogError($"Add execute record {identity} failed: {e}");
 				return false;
 			}
 		}
@@ -74,7 +75,7 @@ namespace DotnetSpider.Core
 			{
 				var retryTimesPolicy = Policy.Handle<Exception>().Retry(10, (ex, count) =>
 				{
-					_logger?.Error($"Try to remove execute record failed [{count}]: {ex}", identity);
+					_logger?.LogError($"Try to remove execute record {identity} failed [{count}]: {ex}");
 					Thread.Sleep(5000);
 				});
 				retryTimesPolicy.Execute(() =>
@@ -88,7 +89,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				_logger?.Error($"Remove execute record failed: {e}", identity);
+				_logger?.LogError($"Remove execute record {identity} failed: {e}");
 			}
 		}
 	}

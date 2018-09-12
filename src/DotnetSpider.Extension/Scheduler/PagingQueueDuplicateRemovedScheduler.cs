@@ -3,6 +3,7 @@ using DotnetSpider.Common;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Scheduler;
+using DotnetSpider.Downloader;
 using Polly;
 using Polly.Retry;
 using Serilog;

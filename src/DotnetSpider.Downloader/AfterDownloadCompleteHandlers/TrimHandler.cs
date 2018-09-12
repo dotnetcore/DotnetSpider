@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-
-namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
+﻿namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 {
 	/// <summary>
 	/// Removes all leading and trailing white-space characters from the current content.

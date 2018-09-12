@@ -2,6 +2,7 @@
 using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Processor.TargetRequestExtractors;
+using DotnetSpider.Downloader;
 using DotnetSpider.Downloader.AfterDownloadCompleteHandlers;
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;

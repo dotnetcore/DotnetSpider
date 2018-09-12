@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-
-namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
+﻿namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 {
 	/// <summary>
 	/// Handler that make <see cref="Response"/> to uppercase.

@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Common;
+using DotnetSpider.Downloader;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

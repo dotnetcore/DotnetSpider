@@ -1,4 +1,5 @@
 using DotnetSpider.Common;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Core.Processor
 {
@@ -8,10 +9,14 @@ namespace DotnetSpider.Core.Processor
 	public interface IPageProcessor
 	{
 		/// <summary>
+		/// 日志接口
+		/// </summary>
+		ILogger Logger { get; set; }
+
+		/// <summary>
 		/// 解析数据结果, 解析目标链接
 		/// </summary>
 		/// <param name="page">页面数据</param>
-		/// <param name="logger">日志接口</param>
-		void Process(Page page, ILogger logger);
+		void Process(Page page);
 	}
 }

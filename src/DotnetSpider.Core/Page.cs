@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Common;
+using DotnetSpider.Downloader;
 using DotnetSpider.Extraction;
 using System.Collections.Generic;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Xunit;
 
-namespace DotnetSpider.Common.Test
+namespace DotnetSpider.Downloader.Test
 {
 	public class RequestTest
 	{

@@ -34,8 +34,9 @@ namespace DotnetSpider.Downloader
 		/// 构造方法
 		/// </summary>
 		/// <param name="path">Cookie文件路径 Cookie File path</param>
-		/// <param name="controllable">IControllable</param>
-		public FileCookieInject(string path, IControllable controllable) : base(controllable)
+		/// <param name="before">在注入 Cookie 前需要执行的操作, 如暂停爬虫</param>
+		/// <param name="after">在注入 Cookie 之后需要执行的操作, 如启动爬虫</param>
+		public FileCookieInject(string path, Action before = null, Action after = null) : base(before, after)
 		{
 			if (!File.Exists(path))
 			{
@@ -50,9 +51,8 @@ namespace DotnetSpider.Downloader
 		/// <summary xml:lang="zh-CN">
 		/// 取得新的Cookies
 		/// </summary>
-		/// <param name="controllable">可控制程序 <see cref="IControllable"/></param>
 		/// <returns>Cookies <see cref="CookieCollection"/></returns>
-		protected override CookieCollection GetCookies(IControllable controllable)
+		protected override CookieCollection GetCookies()
 		{
 			var cookies = new CookieCollection();
 			if (File.Exists(_cookiePath))

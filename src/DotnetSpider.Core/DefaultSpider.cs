@@ -34,7 +34,6 @@ namespace DotnetSpider.Core
 		/// <param name="scheduler">URL队列</param>
 		public DefaultSpider(string id, IScheduler scheduler) : base(id, scheduler, new[] { new SimplePageProcessor() }, new[] { new ConsolePipeline() })
 		{
-			Logger = LogUtil.Create(id);
 		}
 	}
 }

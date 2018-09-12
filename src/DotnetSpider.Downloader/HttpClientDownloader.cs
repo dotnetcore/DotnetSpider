@@ -1,6 +1,4 @@
-﻿#if !NET40
-using DotnetSpider.Common;
-using DotnetSpider.Proxy;
+﻿using DotnetSpider.Proxy;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +10,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Node")]
 
@@ -73,7 +72,7 @@ namespace DotnetSpider.Downloader
 
 			if (IfFileExists(request))
 			{
-				Logger.Information($"File {request.Url} already exists.");
+				Logger?.LogInformation($"File {request.Url} already exists.");
 				return response;
 			}
 
@@ -127,7 +126,7 @@ namespace DotnetSpider.Downloader
 				{
 					if (!DownloadFiles)
 					{
-						Logger.Warning($"Ignore {request.Url} because media type is not allowed to download.");
+						Logger?.LogWarning($"Ignore {request.Url} because media type is not allowed to download.");
 					}
 					else
 					{
@@ -188,20 +187,12 @@ namespace DotnetSpider.Downloader
 		public override void AddCookie(Cookie cookie)
 		{
 			base.AddCookie(cookie);
-			if (HttpProxyPool.Instance != null)
+
+			HttpMessageHandler.CookieContainer.Add(cookie);
+
+			foreach (var kv in _pool)
 			{
-				HttpMessageHandler.CookieContainer.Add(cookie);
-			}
-			else
-			{
-				if ((DateTime.Now - _clientObject.LastUseTime).TotalSeconds <= 240)
-				{
-					_clientObject.Handler.CookieContainer.Add(cookie);
-				}
-				else
-				{
-					Logger.Warning("HttpClient is out of used.");
-				}
+				kv.Value.Handler.CookieContainer.Add(cookie);
 			}
 		}
 
@@ -248,7 +239,7 @@ namespace DotnetSpider.Downloader
 					Proxy = proxy,
 					CookieContainer = CopyCookieContainer()
 				};
-				var item = new HttpClientObject(handler, allowAutoRedirect) {LastUseTime = DateTime.Now};
+				var item = new HttpClientObject(handler, allowAutoRedirect) { LastUseTime = DateTime.Now };
 				_pool.Add(hash, item);
 				return item;
 			}
@@ -328,14 +319,14 @@ namespace DotnetSpider.Downloader
 
 				var xRequestedWithHeader = "X-Requested-With";
 				if (request.Headers.ContainsKey(xRequestedWithHeader) &&
-				    request.Headers[xRequestedWithHeader] == "NULL")
+					request.Headers[xRequestedWithHeader].ToString() == "NULL")
 				{
 					httpRequestMessage.Content.Headers.Remove(xRequestedWithHeader);
 				}
 				else
 				{
 					if (!httpRequestMessage.Content.Headers.Contains(xRequestedWithHeader) &&
-					    !httpRequestMessage.Headers.Contains(xRequestedWithHeader))
+						!httpRequestMessage.Headers.Contains(xRequestedWithHeader))
 					{
 						httpRequestMessage.Content.Headers.TryAddWithoutValidation(xRequestedWithHeader,
 							"XMLHttpRequest");
@@ -353,9 +344,8 @@ namespace DotnetSpider.Downloader
 				BinaryFormatter formatter = new BinaryFormatter();
 				formatter.Serialize(stream, CookieContainer);
 				stream.Seek(0, SeekOrigin.Begin);
-				return (CookieContainer) formatter.Deserialize(stream);
+				return (CookieContainer)formatter.Deserialize(stream);
 			}
 		}
 	}
 }
-#endif

@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Common;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Core.Processor
 {
@@ -7,6 +8,11 @@ namespace DotnetSpider.Core.Processor
 	/// </summary>
 	public abstract class BasePageProcessor : IPageProcessor
 	{
+		/// <summary>
+		/// 日志接口
+		/// </summary>
+		public ILogger Logger { get; set; }
+
 		/// <summary>
 		/// 目标链接的解析器、抽取器
 		/// </summary>
@@ -32,8 +38,7 @@ namespace DotnetSpider.Core.Processor
 		/// 解析数据结果, 解析目标链接
 		/// </summary>
 		/// <param name="page">页面数据</param>
-		/// <param name="logger">日志接口</param>
-		public void Process(Page page, ILogger logger)
+		public void Process(Page page)
 		{
 			var properties = page.Selectable(RemoveOutboundLinks).Properties;
 			properties[Env.UrlPropertyKey] = page.Request.Url;

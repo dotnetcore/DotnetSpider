@@ -7,6 +7,7 @@ using Xunit;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Common;
+using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Extension.Test.Processor
 {
@@ -29,7 +30,7 @@ namespace DotnetSpider.Extension.Test.Processor
 		{
 			EntityProcessor<N> processor = new EntityProcessor<N>();
 			var page = CreatePage();
-			processor.Process(page, null);
+			processor.Process(page);
 
 			var results = page.ResultItems.GetResultItem(processor.Model.Identity) as Tuple<IModel, IList<dynamic>>;
 			var model = results.Item2.First() as N;

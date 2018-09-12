@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 
 namespace DotnetSpider.Downloader.Redial
 {
@@ -7,6 +8,11 @@ namespace DotnetSpider.Downloader.Redial
 	/// </summary>
 	public interface IRedialExecutor : IDisposable
 	{
+		/// <summary>
+		/// 日志接口
+		/// </summary>
+		ILogger Logger { get; set; }
+
 		/// <summary>
 		/// 执行拨号
 		/// </summary>

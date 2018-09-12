@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Common;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Core.Monitor
 {
