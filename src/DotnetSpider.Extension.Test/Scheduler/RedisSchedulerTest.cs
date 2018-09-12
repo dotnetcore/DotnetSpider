@@ -28,7 +28,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 
 			Request request = new Request("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", null);
 			request.Properties.Add("1", "2");
-			scheduler.Push(request, null);
+			scheduler.Push(request);
 			Request result = scheduler.Poll();
 			Assert.Equal("http://www.ibm.com/developerworks/cn/java/j-javadev2-22/", result.Url.ToString());
 			Assert.Equal("2", request.Properties["1"]);

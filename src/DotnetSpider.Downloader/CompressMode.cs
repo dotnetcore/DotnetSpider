@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DotnetSpider.Common
+namespace DotnetSpider.Downloader
 {
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum CompressMode

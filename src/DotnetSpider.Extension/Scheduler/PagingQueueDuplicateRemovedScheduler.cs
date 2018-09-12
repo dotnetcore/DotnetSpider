@@ -144,7 +144,7 @@ namespace DotnetSpider.Extension.Scheduler
 
 								foreach (var request in requests)
 								{
-									Push(request, null);
+									Push(request);
 								}
 							}
 						}

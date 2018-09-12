@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using DotnetSpider.Common;
 using LZ4;
 using Newtonsoft.Json;
 

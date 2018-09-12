@@ -13,11 +13,10 @@
 			{
 				cycleTriedTimes += 1;
 			}
-			page.Request.AddProperty(Page.CycleTriedTimes, 1);
+			page.Request.AddProperty(Page.CycleTriedTimes, cycleTriedTimes);
 			if (cycleTriedTimes <= cycleRetryTimes)
 			{
-				page.Request.AddProperty(Page.Priority, 0);
-				page.AddTargetRequest(page.Request, false);
+				// page.Request.AddProperty(Page.Priority, 0);
 				page.Retry = true;
 				return true;
 			}

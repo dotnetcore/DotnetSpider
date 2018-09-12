@@ -1,11 +1,9 @@
-﻿using DotnetSpider.Common;
-
-namespace DotnetSpider.Downloader
+﻿namespace DotnetSpider.Downloader
 {
 	/// <summary>
 	/// <see cref="IAfterDownloadCompleteHandler"/>
 	/// </summary>
-	public abstract class AfterDownloadCompleteHandler : Named, IAfterDownloadCompleteHandler
+	public abstract class AfterDownloadCompleteHandler :  IAfterDownloadCompleteHandler
 	{
 		/// <summary>
 		/// You can process page data, detect download status(whether is banned) and update Cookie here.

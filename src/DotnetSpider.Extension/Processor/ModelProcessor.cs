@@ -89,9 +89,12 @@ namespace DotnetSpider.Extension.Processor
 						}
 					}
 
-					foreach (var p in targetUrlsSelector.ExcludePatterns)
+					if (targetUrlsSelector.ExcludePatterns != null)
 					{
-						regionAndPatternTargetUrlsExtractor.ExcludeTargetUrlPatterns.Add(new Regex(p));
+						foreach (var p in targetUrlsSelector.ExcludePatterns)
+						{
+							regionAndPatternTargetUrlsExtractor.ExcludeTargetUrlPatterns.Add(new Regex(p));
+						}
 					}
 				}
 			}

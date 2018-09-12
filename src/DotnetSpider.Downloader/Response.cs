@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
 
-namespace DotnetSpider.Common
+namespace DotnetSpider.Downloader
 {
 	/// <summary>
 	/// 链接请求结果

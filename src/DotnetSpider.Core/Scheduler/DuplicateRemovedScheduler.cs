@@ -95,12 +95,11 @@ namespace DotnetSpider.Core.Scheduler
 		/// 添加请求对象到队列
 		/// </summary>
 		/// <param name="request">请求对象</param>
-		/// <param name="shouldReserved">是否需要重试判断方法</param>
-		public void Push(Request request, Func<Request, bool> shouldReserved = null)
+		public void Push(Request request)
 		{
 			var action = new Action(() =>
 			{
-				if (!DuplicateRemover.IsDuplicate(request) || shouldReserved != null && shouldReserved(request))
+				if (!DuplicateRemover.IsDuplicate(request))
 				{
 					PushWhenNoDuplicate(request);
 				}

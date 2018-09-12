@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace DotnetSpider.Common
+namespace DotnetSpider.Downloader
 {
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum ContentType

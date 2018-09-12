@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using System.Net.Sockets;
+// using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -22,7 +22,7 @@ namespace DotnetSpider.Proxy
 				throw new ProxyException($"{nameof(targetUrl)} is not an uri.");
 			}
 		}
-
+		
 		public bool IsAvailable(WebProxy proxy)
 		{
 			var timeout = TimeSpan.FromSeconds(1d);

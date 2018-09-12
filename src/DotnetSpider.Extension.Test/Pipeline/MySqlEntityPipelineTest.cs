@@ -45,7 +45,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(DisplayName = "DataTypes")]
 		public virtual void DataTypes()
 		{
-			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;"))
+			using (MySqlConnection conn = new MySqlConnection("Database='mysql';Data Source=127.0.0.1;User ID=root;Password=;Port=3306;SslMode=None;"))
 			{
 				try
 				{

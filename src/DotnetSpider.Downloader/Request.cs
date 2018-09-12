@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 
-namespace DotnetSpider.Common
+namespace DotnetSpider.Downloader
 {
 	/// <summary>
 	/// 链接请求
@@ -19,7 +19,8 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// User-Agent
 		/// </summary>
-		public string UserAgent { get; set; }
+		public string UserAgent { get; set; } =
+			"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36";
 
 		/// <summary>
 		/// 请求链接时Referer参数的值
@@ -86,9 +87,11 @@ namespace DotnetSpider.Common
 			}
 		}
 
-		[JsonIgnore] public Uri RequestUri { get; private set; }
+		[JsonIgnore]
+		public Uri RequestUri { get; private set; }
 
-		public virtual string Identity => $"{Referer}.{Origin}.{Method}.{Content}.{Url}".ToMd5();
+		[JsonIgnore]
+		public virtual string Identity => JsonConvert.SerializeObject(this).ToMd5();
 
 		/// <summary>
 		/// 构造方法
@@ -205,7 +208,7 @@ namespace DotnetSpider.Common
 		/// <returns>The exact runtime type of the current instance.</returns>
 		public override int GetHashCode()
 		{
-			return ToString().GetHashCode();
+			return JsonConvert.SerializeObject(this).GetHashCode();
 		}
 
 		/// <summary>

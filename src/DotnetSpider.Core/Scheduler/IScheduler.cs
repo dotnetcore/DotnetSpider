@@ -26,8 +26,7 @@ namespace DotnetSpider.Core.Scheduler
 		/// 添加请求对象到队列
 		/// </summary>
 		/// <param name="request">请求对象</param>
-		/// <param name="shouldReserved">由各自的业务逻辑来确定是否需要重试</param>
-		void Push(Request request, Func<Request, bool> shouldReserved);
+		void Push(Request request);
 
 		/// <summary>
 		/// 取得一个需要处理的请求对象

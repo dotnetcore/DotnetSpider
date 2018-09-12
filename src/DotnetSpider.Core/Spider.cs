@@ -1249,22 +1249,21 @@ namespace DotnetSpider.Core
 		/// Extract and add target urls to scheduler.
 		/// </summary>
 		/// <param name="page">页面数据</param>
-		protected void ExtractAndAddRequests(Page page)
+		private void ExtractAndAddRequests(Page page)
 		{
-			if ((page.Request.GetProperty(Page.Depth) + 1) <= Scheduler.Depth && page.TargetRequests != null &&
-			    page.TargetRequests.Count > 0)
-			{
-				foreach (Request request in page.TargetRequests)
-				{
-					Scheduler.Push(request, ShouldReserved);
-				}
-			}
-		}
+			if (page == null || page.Request == null) return;
 
-		protected virtual bool ShouldReserved(Request request)
-		{
-			return request != null && request.GetProperty(Page.CycleTriedTimes) > 0 &&
-			       request.GetProperty(Page.CycleTriedTimes) <= CycleRetryTimes;
+			if (page.Retry)
+			{
+				Scheduler.Push(page.Request);
+			}
+
+			if (page.TargetRequests == null || page.TargetRequests.Count == 0) return;
+
+			foreach (Request request in page.TargetRequests)
+			{
+				Scheduler.Push(request);
+			}
 		}
 
 		/// <summary>
@@ -1404,7 +1403,7 @@ namespace DotnetSpider.Core
 							}
 						}
 
-						Scheduler.Push(request, ShouldReserved);
+						Scheduler.Push(request);
 					}
 				}
 				else

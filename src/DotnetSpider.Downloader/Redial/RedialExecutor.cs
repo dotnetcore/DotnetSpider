@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Downloader.Redial.InternetDetector;
+﻿using DotnetSpider.Downloader.Redial.InternetDetector;
 using DotnetSpider.Downloader.Redial.Redialer;
 using System;
 using System.Threading;

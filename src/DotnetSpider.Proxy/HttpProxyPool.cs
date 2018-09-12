@@ -57,7 +57,7 @@ namespace DotnetSpider.Proxy
 				Thread.Sleep(1000);
 			}
 
-			throw new ProxyException("There is no avaliable proxy.");
+			throw new ProxyException("There is no available proxy.");
 		}
 
 		/// <summary>

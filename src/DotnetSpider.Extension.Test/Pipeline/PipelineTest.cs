@@ -107,10 +107,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 		[Fact(DisplayName = "MixProcessor")]
 		public void MixProcessor()
 		{
-			using (var conn = new MySqlConnection(DefaultConnectionString))
-			{
-				conn.Execute("DROP TABLE IF EXISTS baidu.baidu_search_mixprocessor");
-			}
+				using (var conn = new MySqlConnection(DefaultConnectionString))
+				{
+					conn.Execute("DROP TABLE IF EXISTS baidu.baidu_search_mixprocessor");
+				}
+
 			var id = Guid.NewGuid().ToString("N");
 			BaiduSearchSpider spider = new BaiduSearchSpider();
 			spider.AddPipeline(new MySqlEntityPipeline(DefaultConnectionString));

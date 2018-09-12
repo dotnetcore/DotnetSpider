@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using DotnetSpider.Common;
 
 namespace DotnetSpider.Downloader
 {

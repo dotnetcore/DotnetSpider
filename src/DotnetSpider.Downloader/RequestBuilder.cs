@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DotnetSpider.Common
+namespace DotnetSpider.Downloader
 {
 	/// <summary>
 	/// 起始链接构造器
@@ -17,7 +17,7 @@ namespace DotnetSpider.Common
 	/// <summary>
 	/// 起始链接构造器
 	/// </summary>
-	public abstract class RequestBuilder : Named, IRequestBuilder
+	public abstract class RequestBuilder :  IRequestBuilder
 	{
 		/// <summary>
 		/// 构造起始链接对象并添加到网站信息对象中

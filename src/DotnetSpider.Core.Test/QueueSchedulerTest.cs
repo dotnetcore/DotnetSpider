@@ -14,11 +14,11 @@ namespace DotnetSpider.Core.Test
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
 			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 20 }, i =>
 			{
-				scheduler.Push(new Request("http://www.a.com"), null);
-				scheduler.Push(new Request("http://www.a.com"), null);
-				scheduler.Push(new Request("http://www.a.com"), null);
-				scheduler.Push(new Request("http://www.b.com"), null);
-				scheduler.Push(new Request($"http://www.{i.ToString()}.com", null), null);
+				scheduler.Push(new Request("http://www.a.com"));
+				scheduler.Push(new Request("http://www.a.com"));
+				scheduler.Push(new Request("http://www.a.com"));
+				scheduler.Push(new Request("http://www.b.com"));
+				scheduler.Push(new Request($"http://www.{i.ToString()}.com", null));
 			});
 			Parallel.For(0, 1000, new ParallelOptions { MaxDegreeOfParallelism = 20 }, i =>
 			 {
@@ -35,10 +35,10 @@ namespace DotnetSpider.Core.Test
 		public void PushAndPollDepthFirst()
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
-			scheduler.Push(new Request("http://www.a.com"), null);
-			scheduler.Push(new Request("http://www.a.com"), null);
-			scheduler.Push(new Request("http://www.a.com"), null);
-			scheduler.Push(new Request("http://www.b.com"), null);
+			scheduler.Push(new Request("http://www.a.com"));
+			scheduler.Push(new Request("http://www.a.com"));
+			scheduler.Push(new Request("http://www.a.com"));
+			scheduler.Push(new Request("http://www.b.com"));
 
 			var request = scheduler.Poll();
 			Assert.Equal("http://www.b.com", request.Url.ToString());
@@ -55,10 +55,10 @@ namespace DotnetSpider.Core.Test
 		{
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
 			scheduler.TraverseStrategy = TraverseStrategy.Bfs;
-			scheduler.Push(new Request("http://www.a.com", null), null);
-			scheduler.Push(new Request("http://www.a.com", null), null);
-			scheduler.Push(new Request("http://www.a.com", null), null);
-			scheduler.Push(new Request("http://www.b.com", null), null);
+			scheduler.Push(new Request("http://www.a.com"));
+			scheduler.Push(new Request("http://www.b.com"));
+			scheduler.Push(new Request("http://www.a.com"));
+			scheduler.Push(new Request("http://www.a.com"));
 
 			var request = scheduler.Poll();
 			Assert.Equal("http://www.a.com", request.Url.ToString());
@@ -76,10 +76,10 @@ namespace DotnetSpider.Core.Test
 			QueueDuplicateRemovedScheduler scheduler = new QueueDuplicateRemovedScheduler();
 			scheduler.Dispose();
 
-			scheduler.Push(new Request("http://www.a.com/", null), null);
-			scheduler.Push(new Request("http://www.b.com/", null), null);
-			scheduler.Push(new Request("http://www.c.com/", null), null);
-			scheduler.Push(new Request("http://www.d.com/", null), null);
+			scheduler.Push(new Request("http://www.a.com/"));
+			scheduler.Push(new Request("http://www.b.com/"));
+			scheduler.Push(new Request("http://www.c.com/"));
+			scheduler.Push(new Request("http://www.d.com/"));
 
 			Assert.Equal(0, scheduler.ErrorRequestsCount);
 			Assert.Equal(4, scheduler.LeftRequestsCount);
