@@ -24,6 +24,7 @@ using Serilog.Events;
 using System.Net;
 #else
 using System.Text;
+
 #endif
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
@@ -64,6 +65,7 @@ namespace DotnetSpider.Core
 		private long _downloaderCostTimes;
 		private long _pipelineCostTimes;
 		private long _processorCostTimes;
+		private int _depth = int.MaxValue;
 
 		private readonly Dictionary<string, Dictionary<string, object>> _headers =
 			new Dictionary<string, Dictionary<string, object>>();
@@ -128,6 +130,7 @@ namespace DotnetSpider.Core
 				}
 			});
 		}
+
 		/// <summary>
 		/// All pipelines for spider.
 		/// </summary>
@@ -142,6 +145,24 @@ namespace DotnetSpider.Core
 		/// Interval time wait for new url.
 		/// </summary>
 		protected int WaitInterval { get; } = 10;
+
+		/// <summary>
+		/// 遍历深度
+		/// </summary>
+		/// <exception cref="ArgumentException"></exception>
+		public int Depth
+		{
+			get => _depth;
+			set
+			{
+				if (value <= 0)
+				{
+					throw new ArgumentException("Depth should be greater than 0.");
+				}
+
+				_depth = value;
+			}
+		}
 
 		/// <summary>
 		/// Whether spider is complete.
@@ -962,7 +983,7 @@ namespace DotnetSpider.Core
 				throw new ArgumentException("There is no usable pipeline.");
 			}
 
-			foreach(var processor in PageProcessors)
+			foreach (var processor in PageProcessors)
 			{
 				processor.Logger = processor.Logger ?? Logger;
 			}
@@ -1154,7 +1175,7 @@ namespace DotnetSpider.Core
 			ResultItems[] resultItems = new ResultItems[0];
 			if (PipelineCachedSize == 1)
 			{
-				resultItems = new[] { page.ResultItems };
+				resultItems = new[] {page.ResultItems};
 			}
 			else
 			{
@@ -1256,18 +1277,23 @@ namespace DotnetSpider.Core
 		/// <param name="page">页面数据</param>
 		private void ExtractAndAddRequests(Page page)
 		{
-			if (page == null || page.Request == null) return;
+			if (page?.Request == null) return;
 
 			if (page.Retry)
 			{
 				Scheduler.Push(page.Request);
+				return;
 			}
 
 			if (page.TargetRequests == null || page.TargetRequests.Count == 0) return;
 
 			foreach (Request request in page.TargetRequests)
 			{
-				Scheduler.Push(request);
+				var depth = request.GetProperty(Page.Depth);
+				if (depth == null || depth <= Depth)
+				{
+					Scheduler.Push(request);
+				}
 			}
 		}
 

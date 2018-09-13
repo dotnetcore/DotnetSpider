@@ -127,10 +127,11 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			return _retryPolicy.Execute(() =>
 			{
-				bool isDuplicate = _redisConnection.Database.SetContains(_setKey, request.Identity);
+				var identity = request.GetIdentity();
+				bool isDuplicate = _redisConnection.Database.SetContains(_setKey, identity);
 				if (!isDuplicate)
 				{
-					_redisConnection.Database.SetAdd(_setKey, request.Identity);
+					_redisConnection.Database.SetAdd(_setKey, identity);
 				}
 				return isDuplicate;
 			});
@@ -262,8 +263,8 @@ namespace DotnetSpider.Extension.Scheduler
 
 					foreach (var request in requests)
 					{
-						identities[i] = request.Identity;
-						items[i] = new HashEntry(request.Identity, JsonConvert.SerializeObject(request));
+						identities[i] = request.GetIdentity();
+						items[i] = new HashEntry(request.GetIdentity(), JsonConvert.SerializeObject(request));
 						++i;
 						if (i == batchCount)
 						{
@@ -328,8 +329,8 @@ namespace DotnetSpider.Extension.Scheduler
 		{
 			_retryPolicy.Execute(() =>
 			{
-				_redisConnection.Database.ListRightPush(_queueKey, request.Identity);
-				string field = request.Identity;
+				_redisConnection.Database.ListRightPush(_queueKey, request.GetIdentity());
+				string field = request.GetIdentity();
 				string value = JsonConvert.SerializeObject(request);
 
 				_redisConnection.Database.HashSet(_itemKey, field, value);

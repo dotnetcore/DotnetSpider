@@ -88,9 +88,6 @@ namespace DotnetSpider.Downloader
 		[JsonIgnore]
 		public Uri RequestUri { get; private set; }
 
-		[JsonIgnore]
-		public virtual string Identity => JsonConvert.SerializeObject(this).ToMd5();
-
 		/// <summary>
 		/// 构造方法
 		/// </summary>

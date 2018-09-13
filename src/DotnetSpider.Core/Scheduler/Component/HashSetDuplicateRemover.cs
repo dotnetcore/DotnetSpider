@@ -26,10 +26,11 @@ namespace DotnetSpider.Core.Scheduler.Component
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public bool IsDuplicate(Request request)
 		{
-			bool isDuplicate = _urls.Contains(request.Identity);
+			var identity = request.GetIdentity();
+			bool isDuplicate = _urls.Contains(identity);
 			if (!isDuplicate)
 			{
-				_urls.Add(request.Identity);
+				_urls.Add(identity);
 			}
 			return isDuplicate;
 		}

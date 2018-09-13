@@ -19,11 +19,6 @@ namespace DotnetSpider.Core.Scheduler
 		TraverseStrategy TraverseStrategy { get; set; }
 
 		/// <summary>
-		/// 遍历深度
-		/// </summary>
-		int Depth { get; set; }
-
-		/// <summary>
 		/// 添加请求对象到队列
 		/// </summary>
 		/// <param name="request">请求对象</param>

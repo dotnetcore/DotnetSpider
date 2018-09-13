@@ -26,7 +26,7 @@ namespace DotnetSpider.Sample.docs
 			spider.ThreadNum = 4;
 			spider.TaskId = "cnblogs";
 			// traversal deep 遍历深度
-			spider.Scheduler.Depth = 3;
+			spider.Depth = 3;
 			spider.EncodingName = "UTF-8";
 			// stop crawler if it can't get url from the scheduler after 30000 ms 当爬虫连续30秒无法从调度中心取得需要采集的链接时结束.
 			spider.EmptySleepTime = 30000;

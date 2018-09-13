@@ -48,10 +48,11 @@ namespace DotnetSpider.Core.Scheduler.Component
 		/// <returns>Whether the request is duplicate.</returns>
 		public bool IsDuplicate(Request request)
 		{
-			bool isDuplicate = _bloomFilter.Contains(request.Identity);
+			var identity = request.GetIdentity();
+			bool isDuplicate = _bloomFilter.Contains(identity);
 			if (!isDuplicate)
 			{
-				_bloomFilter.Add(request.Identity);
+				_bloomFilter.Add(identity);
 				_counter.Inc();
 			}
 			return isDuplicate;

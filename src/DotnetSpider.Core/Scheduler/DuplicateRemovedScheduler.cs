@@ -8,8 +8,6 @@ namespace DotnetSpider.Core.Scheduler
 {
 	public abstract class DuplicateRemovedScheduler : Named, IScheduler
 	{
-		private int _depth = int.MaxValue;
-
 		/// <summary>
 		/// 去重器
 		/// </summary>
@@ -76,20 +74,6 @@ namespace DotnetSpider.Core.Scheduler
 		/// 是否深度优先
 		/// </summary>
 		public TraverseStrategy TraverseStrategy { get; set; } = TraverseStrategy.Dfs;
-
-		public int Depth
-		{
-			get => _depth;
-			set
-			{
-				if (value <= 0)
-				{
-					throw new ArgumentException("Depth should be greater than 0.");
-				}
-
-				_depth = value;
-			}
-		}
 
 		/// <summary>
 		/// 添加请求对象到队列

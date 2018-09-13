@@ -270,7 +270,7 @@ namespace DotnetSpider.Extension.Test.Scheduler
 			spider.EncodingName = "UTF-8";
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
-			spider.Scheduler.Depth = 3;
+			spider.Depth = 3;
 			spider.ClearSchedulerAfterCompleted = false;
 			spider.EmptySleepTime = 6000;
 			// start crawler 启动爬虫

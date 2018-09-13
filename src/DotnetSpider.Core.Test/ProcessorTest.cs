@@ -31,7 +31,7 @@ namespace DotnetSpider.Core.Test
 
 			spider.ThreadNum = 1;
 			// traversal deep 遍历深度
-			spider.Scheduler.Depth = 3;
+			spider.Depth = 3;
 			spider.EmptySleepTime = 6000;
 
 			spider.AddRequests("http://v.youku.com/v_show/id_XMTMyMTkzNTY1Mg==.html?spm=a2h1n.8251845.0.0");
