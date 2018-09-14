@@ -60,7 +60,7 @@ namespace DotnetSpider.Extraction
 		/// <returns>查询接口</returns>
 		public override ISelectable Css(string css)
 		{
-			return Select(Selectors.Css(css));
+			return SelectList(Selectors.Css(css));
 		}
 
 		/// <summary>
@@ -72,7 +72,7 @@ namespace DotnetSpider.Extraction
 		public override ISelectable Css(string css, string attrName)
 		{
 			var cssSelector = Selectors.Css(css, attrName);
-			return Select(cssSelector);
+			return SelectList(cssSelector);
 		}
 
 		/// <summary>
