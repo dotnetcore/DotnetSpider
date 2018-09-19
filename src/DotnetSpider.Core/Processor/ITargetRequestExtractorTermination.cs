@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Downloader;
+﻿using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Core.Processor
 {

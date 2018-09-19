@@ -1,6 +1,6 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Downloader;
+﻿using DotnetSpider.Downloader;
 using DotnetSpider.Extension;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
@@ -99,28 +99,28 @@ namespace DotnetSpider.Sample.docs
 				}
 			}
 
-			[EntitySelector(Expression = "$.result.list[*]", Type = SelectorType.JsonPath)]
+			[Entity(Expression = "$.result.list[*]", Type = SelectorType.JsonPath)]
 			class SinaNews : BaseEntity
 			{
-				[FieldSelector(Expression = "$.origin_title", Type = SelectorType.JsonPath, Length = 80, Option = FieldOptions.InnerText)]
+				[Field(Expression = "$.origin_title", Type = SelectorType.JsonPath, Option = FieldOptions.InnerText)]
 				public string Title { get; set; }
 
-				[FieldSelector(Expression = "$.url", Type = SelectorType.JsonPath, Length = 230)]
+				[Field(Expression = "$.url", Type = SelectorType.JsonPath)]
 				public string Link { get; set; }
 
-				[FieldSelector(Expression = "keyword", Type = SelectorType.Enviroment, Length = 20)]
+				[Field(Expression = "keyword", Type = SelectorType.Enviroment)]
 				public string Keywords { get; set; }
 
-				[FieldSelector(Expression = "$.intro", Type = SelectorType.JsonPath, Length = 300, Option = FieldOptions.InnerText)]
+				[Field(Expression = "$.intro", Type = SelectorType.JsonPath, Option = FieldOptions.InnerText)]
 				public string Summary { get; set; }
 
-				[FieldSelector(Expression = "$.media", Type = SelectorType.JsonPath, Length = 20)]
+				[Field(Expression = "$.media", Type = SelectorType.JsonPath)]
 				public string NewsFrom { get; set; }
 
-				[FieldSelector(Expression = "$.datetime", Type = SelectorType.JsonPath, Length = 20)]
+				[Field(Expression = "$.datetime", Type = SelectorType.JsonPath)]
 				public string PublishTime { get; set; }
 
-				[FieldSelector(Expression = "$.cid", Type = SelectorType.JsonPath, Length = 20)]
+				[Field(Expression = "$.cid", Type = SelectorType.JsonPath)]
 				public string Cid { get; set; }
 			}
 		}

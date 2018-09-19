@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Downloader;
+﻿using DotnetSpider.Downloader;
 using HtmlAgilityPack;
 
 namespace DotnetSpider.Core.Downloader.AfterDownloadCompleteHandlers

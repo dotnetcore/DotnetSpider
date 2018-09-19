@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using DotnetSpider.Common;
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Core.Processor.TargetRequestExtractors

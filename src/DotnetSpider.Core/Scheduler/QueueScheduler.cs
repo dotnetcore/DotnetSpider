@@ -1,4 +1,4 @@
-﻿using DotnetSpider.Common;
+﻿using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Scheduler.Component;
 using DotnetSpider.Downloader;
 using System;

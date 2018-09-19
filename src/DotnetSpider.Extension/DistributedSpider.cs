@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System;

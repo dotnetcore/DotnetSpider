@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using DotnetSpider.Core.Infrastructure;
 using CommandLine;
-using DotnetSpider.Common;
 #if NETSTANDARD
 using System.Text;
 // ReSharper disable UnusedAutoPropertyAccessor.Global

@@ -1,4 +1,3 @@
-using DotnetSpider.Common;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;

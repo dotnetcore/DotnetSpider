@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Extraction.Model;
-using DotnetSpider.Extraction.Model.Formatter;
+﻿using DotnetSpider.Extraction.Model.Formatter;
 using System;
 using Xunit;
 

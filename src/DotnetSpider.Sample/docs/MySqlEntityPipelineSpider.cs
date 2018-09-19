@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Extension;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
@@ -26,35 +27,42 @@ namespace DotnetSpider.Sample.docs
 				AddPipeline(new MySqlEntityPipeline());
 			}
 
-			[TableInfo("baidu", "baidu_search_result")]
-			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			[Entity(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			[Schema("baidu", "baidu_search_result")]
 			class Result : BaseEntity
 			{
-				[FieldSelector(Expression = "Keyword", Type = SelectorType.Enviroment)]
+				[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
+				[Column]
 				public string Keyword { get; set; }
 
-				[FieldSelector(Expression = ".//h3[@class='c-title']/a")]
+				[Field(Expression = ".//h3[@class='c-title']/a")]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
+				[Column]
 				public string Title { get; set; }
 
-				[FieldSelector(Expression = ".//h3[@class='c-title']/a/@href")]
+				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
+				[Column]
 				public string Url { get; set; }
 
-				[FieldSelector(Expression = ".//div/p[@class='c-author']/text()")]
+				[Field(Expression = ".//div/p[@class='c-author']/text()")]
 				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
+				[Column]
 				public string Website { get; set; }
 
-				[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				[Column]
 				public string Snapshot { get; set; }
 
-				[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
+				[Column]
+				[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 				public string Details { get; set; }
 
-				[FieldSelector(Expression = ".", Option = FieldOptions.InnerText)]
+				[Column(Length = 0)]
+				[Field(Expression = ".", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]

@@ -84,22 +84,22 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		/// <param name="source"><see cref="Database"/></param>
 		/// <param name="connectString"></param>
 		/// <returns></returns>
-		public static DbConnection CreateDbConnection(Common.Database source, string connectString)
+		public static DbConnection CreateDbConnection(Database2 source, string connectString)
 		{
 			DbProviderFactory factory;
 			switch (source)
 			{
-				case Common.Database.MySql:
+				case Database2.MySql:
 					{
 						factory = DbProviderFactories.GetFactory(DbProviderFactories.MySqlProvider);
 						break;
 					}
-				case Common.Database.SqlServer:
+				case Database2.SqlServer:
 					{
 						factory = DbProviderFactories.GetFactory(DbProviderFactories.SqlServerProvider);
 						break;
 					}
-				case Common.Database.PostgreSql:
+				case Database2.PostgreSql:
 					{
 						factory = DbProviderFactories.GetFactory(DbProviderFactories.PostgreSqlProvider);
 						break;
@@ -148,19 +148,19 @@ namespace DotnetSpider.Core.Infrastructure.Database
 		/// <param name="source">数据库 <see cref="Database"/></param>
 		/// <param name="connectString">连接字符串</param>
 		/// <returns>数据库配置对象 <see cref="ConnectionStringSettings"/></returns>
-		public static ConnectionStringSettings GetConnectionStringSettings(Common.Database source, string connectString)
+		public static ConnectionStringSettings GetConnectionStringSettings(Database2 source, string connectString)
 		{
 			switch (source)
 			{
-				case Common.Database.MySql:
+				case Database2.MySql:
 					{
 						return new ConnectionStringSettings("MySql", connectString, DbProviderFactories.MySqlProvider);
 					}
-				case Common.Database.SqlServer:
+				case Database2.SqlServer:
 					{
 						return new ConnectionStringSettings("SqlServer", connectString, DbProviderFactories.SqlServerProvider);
 					}
-				case Common.Database.PostgreSql:
+				case Database2.PostgreSql:
 					{
 						return new ConnectionStringSettings("PostgreSql", connectString, DbProviderFactories.PostgreSqlProvider);
 					}

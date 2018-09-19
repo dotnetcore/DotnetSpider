@@ -1,10 +1,6 @@
-﻿using DotnetSpider.Broker.Data;
-using DotnetSpider.Broker.Services;
+﻿using DotnetSpider.Broker.Services;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Broker.Hubs

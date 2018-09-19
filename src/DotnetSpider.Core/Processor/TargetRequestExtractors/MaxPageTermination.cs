@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using DotnetSpider.Common;
+using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Core.Processor.TargetRequestExtractors

@@ -5,15 +5,16 @@ using System.Data;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model;
-using DotnetSpider.Common;
 using Microsoft.Extensions.Logging;
+using DotnetSpider.Extension.Model;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	/// <summary>
 	/// 把解析到的爬虫实体数据存到MySql中
 	/// </summary>
-	public class MySqlEntityPipeline : DbModelPipeline
+	public class MySqlEntityPipeline : DbEntityPipeline
 	{
 		/// <summary>
 		/// 构造方法
@@ -29,24 +30,27 @@ namespace DotnetSpider.Extension.Pipeline
 			return new MySqlConnection(connectString);
 		}
 
-		protected override Sqls GenerateSqls(IModel model)
+		protected override Sqls GenerateSqls(TableInfo tableInfo)
 		{
 			var sqls = new Sqls
 			{
-				InsertSql = GenerateInsertSql(model, false),
-				InsertAndIgnoreDuplicateSql = GenerateInsertSql(model, true),
-				InsertNewAndUpdateOldSql = GenerateInsertNewAndUpdateOldSql(model),
-				UpdateSql = GenerateUpdateSql(model),
-				SelectSql = GenerateSelectSql(model)
+				InsertSql = GenerateInsertSql(tableInfo, false),
+				InsertAndIgnoreDuplicateSql = GenerateInsertSql(tableInfo, true),
+				InsertNewAndUpdateOldSql = GenerateInsertNewAndUpdateOldSql(tableInfo),
+				UpdateSql = GenerateUpdateSql(tableInfo),
+				SelectSql = GenerateSelectSql(tableInfo)
 			};
 			return sqls;
 		}
 
-		protected override void InitDatabaseAndTable(IDbConnection conn, IModel model)
+		protected override void InitDatabaseAndTable(IDbConnection conn, TableInfo tableInfo)
 		{
-			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
-			conn.MyExecute($"CREATE SCHEMA IF NOT EXISTS `{database}` DEFAULT CHARACTER SET utf8mb4;");
-			conn.MyExecute(GenerateCreateTableSql(model));
+			var database = GetDatabaseName(tableInfo);
+			if (!string.IsNullOrWhiteSpace(database))
+			{
+				conn.MyExecute($"CREATE SCHEMA IF NOT EXISTS `{database}` DEFAULT CHARACTER SET utf8mb4;");
+			}
+			conn.MyExecute(GenerateCreateTableSql(tableInfo));
 		}
 
 		/// <summary>
@@ -54,22 +58,23 @@ namespace DotnetSpider.Extension.Pipeline
 		/// </summary>
 		/// <param name="model">数据模型</param>
 		/// <returns>SQL语句</returns>
-		private string GenerateCreateTableSql(IModel model)
+		private string GenerateCreateTableSql(TableInfo tableInfo)
 		{
-			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
-			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
+			var tableName = GetTableName(tableInfo);
+			var database = GetDatabaseName(tableInfo);
 
-			var fields = model.Fields;
+			var isAutoIncrementPrimary = tableInfo.IsAutoIncrementPrimary;
 
-			StringBuilder builder = new StringBuilder($"CREATE TABLE IF NOT EXISTS `{database}`.`{tableName}` (");
+			StringBuilder builder = string.IsNullOrWhiteSpace(database) ? new StringBuilder($"CREATE TABLE IF NOT EXISTS `{tableName}` (") :
+				new StringBuilder($"CREATE TABLE IF NOT EXISTS `{database}`.`{tableName}` (");
 
-			var singleAutoIncrementPrimary = fields.Count(f => f.IsPrimary && (f.DataType == DataType.Int || f.DataType == DataType.Long)) == 1;
-
-			foreach (var field in fields)
+			foreach (var column in tableInfo.Columns)
 			{
-				var columnSql = GenerateColumn(field);
+				var isPrimary = tableInfo.Primary.Any(k => k.Name == column.Name);
 
-				if (singleAutoIncrementPrimary && field.IsPrimary)
+				var columnSql = GenerateColumn(column, isPrimary);
+
+				if (isAutoIncrementPrimary && isPrimary)
 				{
 					builder.Append($"{columnSql} AUTO_INCREMENT, ");
 				}
@@ -85,29 +90,27 @@ namespace DotnetSpider.Extension.Pipeline
 				builder.Append($", `creation_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `creation_date` DATE");
 			}
 
-			if (fields.Any(f => f.IsPrimary))
+			if (tableInfo.Primary.Count > 0)
 			{
-				builder.Append($", PRIMARY KEY ({string.Join(", ", fields.Where(f => f.IsPrimary).Select(field => IgnoreColumnCase ? field.Name.ToLower() : field.Name))})");
+				builder.Append($", PRIMARY KEY ({string.Join(", ", tableInfo.Primary.Select(c => $"`{GetColumnName(c)}`"))})");
 			}
 
-			if (model.Table.Indexs != null)
+			if (tableInfo.Indexes.Count > 0)
 			{
-				foreach (var index in model.Table.Indexs)
+				foreach (var index in tableInfo.Indexes)
 				{
-					var columns = index.Split(',');
-					string name = string.Join("_", columns.Select(c => c));
-					string indexColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
-					builder.Append($", KEY `index_{name}` ({indexColumNames})");
+					string name = index.Key;
+					string indexColumNames = string.Join(", ", index.Value.Select(c => $"`{GetColumnName(c)}`"));
+					builder.Append($", KEY `INDEX_{name}` ({indexColumNames})");
 				}
 			}
-			if (model.Table.Uniques != null)
+			if (tableInfo.Uniques.Count > 0)
 			{
-				foreach (var unique in model.Table.Uniques)
+				foreach (var unique in tableInfo.Uniques)
 				{
-					var columns = unique.Split(',');
-					string name = string.Join("_", columns.Select(c => c));
-					string uniqueColumNames = string.Join(", ", columns.Select(c => $"`{c}`"));
-					builder.Append($", UNIQUE KEY `unique_{name}` ({uniqueColumNames})");
+					string name = unique.Key;
+					string uniqueColumNames = string.Join(", ", unique.Value.Select(c => $"`{GetColumnName(c)}`"));
+					builder.Append($", UNIQUE KEY `UNIQUE_{name}` ({uniqueColumNames})");
 				}
 			}
 			builder.Append(")");
@@ -115,15 +118,14 @@ namespace DotnetSpider.Extension.Pipeline
 			return sql;
 		}
 
-		private string GenerateInsertSql(IModel model, bool ignoreDuplicate)
+		private string GenerateInsertSql(TableInfo tableInfo, bool ignoreDuplicate)
 		{
-			var fields = model.Fields;
-			var singleAutoIncrementPrimary = fields.Count(f => f.IsPrimary && (f.DataType == DataType.Int || f.DataType == DataType.Long)) == 1;
+			var columns = tableInfo.Columns;
+			var isAutoIncrementPrimary = tableInfo.IsAutoIncrementPrimary;
+			// 去掉自增主键
+			var insertColumns = isAutoIncrementPrimary ? columns.Where(c1 => c1.Name != tableInfo.Primary.First().Name) : columns;
 
-			// 如果是单自增主键, 则不需要插入值
-			var insertColumns = fields.Where(f => !f.IgnoreStore && (!singleAutoIncrementPrimary || !f.IsPrimary)).ToList();
-
-			string columnsSql = string.Join(", ", insertColumns.Select(p => $"`{(IgnoreColumnCase ? p.Name.ToLower() : p.Name)}`"));
+			string columnsSql = string.Join(", ", insertColumns.Select(c => $"`{GetColumnName(c)}`"));
 
 			if (AutoTimestamp)
 			{
@@ -136,101 +138,106 @@ namespace DotnetSpider.Extension.Pipeline
 				columnsParamsSql = $"{columnsParamsSql}, NOW(), CURRENT_DATE()";
 			}
 
-			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
-			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
-			var sql =
+			var tableName = GetTableName(tableInfo);
+			var database = GetDatabaseName(tableInfo);
+
+			var sql = string.IsNullOrWhiteSpace(database) ?
+				$"INSERT {(ignoreDuplicate ? "IGNORE" : "")} INTO `{tableName}` ({columnsSql}) VALUES ({columnsParamsSql});" :
 				$"INSERT {(ignoreDuplicate ? "IGNORE" : "")} INTO `{database}`.`{tableName}` ({columnsSql}) VALUES ({columnsParamsSql});";
 			return sql;
 		}
 
-		private string GenerateInsertNewAndUpdateOldSql(IModel model)
+		private string GenerateInsertNewAndUpdateOldSql(TableInfo tableInfo)
 		{
-			var fields = model.Fields;
-			var singleAutoIncrementPrimary = fields.Count(f => f.IsPrimary && (f.DataType == DataType.Int || f.DataType == DataType.Long)) == 1;
+			var columns = tableInfo.Columns;
+			var isAutoIncrementPrimary = tableInfo.IsAutoIncrementPrimary;
+			// 去掉自增主键
+			var insertColumns = isAutoIncrementPrimary ? columns.Where(c1 => c1.Name != tableInfo.Primary.First().Name) : columns;
 
-			// 如果是单自增主键, 则不需要插入值
-			var insertColumns = fields.Where(f => !f.IgnoreStore && (!singleAutoIncrementPrimary || !f.IsPrimary)).ToList();
-
-			string columnsSql = string.Join(", ", insertColumns.Select(p => $"`{(IgnoreColumnCase ? p.Name.ToLower() : p.Name)}`"));
+			string columnsSql = string.Join(", ", insertColumns.Select(c => $"`{GetColumnName(c)}`"));
 
 			if (AutoTimestamp)
 			{
 				columnsSql = $"{columnsSql},`creation_time`, `creation_date`";
 			}
 			string columnsParamsSql = string.Join(", ", insertColumns.Select(p => $"@{p.Name}"));
+
 			if (AutoTimestamp)
 			{
 				columnsParamsSql = $"{columnsParamsSql}, NOW(), CURRENT_DATE()";
 			}
 
-			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
+			var tableName = GetTableName(tableInfo);
+			var database = GetDatabaseName(tableInfo);
 
-			string setParams = string.Join(", ", insertColumns.Select(p => $"`{(IgnoreColumnCase ? p.Name.ToLower() : p.Name)}`=@{p.Name}"));
+			string setParams = string.Join(", ", insertColumns.Select(c => $"`{GetColumnName(c)}`=@{c.Name}"));
 
-			var sql =
-				$"INSERT INTO `{model.Table.Database}`.`{tableName}` ({columnsSql}) VALUES ({columnsParamsSql}) ON DUPLICATE KEY UPDATE {setParams};";
+			var sql = string.IsNullOrWhiteSpace(database) ? $"INSERT INTO `{tableName}` ({columnsSql}) VALUES ({columnsParamsSql}) ON DUPLICATE KEY UPDATE {setParams};" :
+				$"INSERT INTO `{database}`.`{tableName}` ({columnsSql}) VALUES ({columnsParamsSql}) ON DUPLICATE KEY UPDATE {setParams};";
 
 			return sql;
 		}
 
-		private string GenerateUpdateSql(IModel model)
+		private string GenerateUpdateSql(TableInfo tableInfo)
 		{
 			// 无主键, 无更新字段都无法生成更新SQL
-			if (model.Table.UpdateColumns == null || !model.Table.UpdateColumns.Any() || !model.Fields.Any(f => f.IsPrimary))
+			if (tableInfo.Updates.Count == 0)
 			{
-				if (model.Table.UpdateColumns == null || !model.Table.UpdateColumns.Any())
-				{
-					Logger?.LogWarning("Can't generate update sql, in table info, the count of update columns is zero.");
-				}
-				else
-				{
-					Logger?.LogWarning("Can't generate update sql, because in table info, because primary key is missing.");
-				}
+				Logger?.LogWarning("Can't generate update sql, the count of update columns is zero.");
+
 				return null;
 			}
 
-			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
-			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
+			if (tableInfo.Primary.Count == 0)
+			{
+				Logger?.LogWarning("Can't generate update sql, primary key is missing.");
+				return null;
+			}
+
+			var tableName = GetTableName(tableInfo);
+			var database = GetDatabaseName(tableInfo);
 
 			string where = "";
-			foreach (var field in model.Fields.Where(f => f.IsPrimary))
+			foreach (var column in tableInfo.Primary)
 			{
-				var primary = IgnoreColumnCase ? field.Name.ToLower() : field.Name;
-				where += $" `{primary}` = @{field.Name} AND";
+				where += $" `{GetColumnName(column)}` = @{column.Name} AND";
 			}
 			where = where.Substring(0, where.Length - 3);
 
-			string setCols = string.Join(", ", model.Table.UpdateColumns.Select(p => $"`{p.ToLower()}`=@{p}"));
-			var sql = $"UPDATE `{database}`.`{tableName}` SET {setCols} WHERE {where};";
+			string setCols = string.Join(", ", tableInfo.Updates.Select(c => $"`{GetColumnName(c)}`=@{c.Name}"));
+			var sql = string.IsNullOrWhiteSpace(database) ? $"UPDATE `{tableName}` SET {setCols} WHERE {where};" :
+				$"UPDATE `{database}`.`{tableName}` SET {setCols} WHERE {where};";
 			return sql;
 		}
 
-		private string GenerateSelectSql(IModel model)
+		private string GenerateSelectSql(TableInfo tableInfo)
 		{
-			if (!model.Fields.Any(f => f.IsPrimary))
+			if (tableInfo.Primary.Count == 0)
 			{
+				Logger?.LogWarning("Can't generate select sql, primary key is missing.");
 				return null;
 			}
 
-			var tableName = IgnoreColumnCase ? model.Table.FullName.ToLower() : model.Table.FullName;
-			var database = IgnoreColumnCase ? model.Table.Database.ToLower() : model.Table.Database;
+			var tableName = GetTableName(tableInfo);
+			var database = GetDatabaseName(tableInfo);
 
 			string where = "";
-			foreach (var field in model.Fields.Where(f => f.IsPrimary))
+			foreach (var column in tableInfo.Primary)
 			{
-				var primary = IgnoreColumnCase ? field.Name.ToLower() : field.Name;
-				where += $" `{primary}` = @{field.Name}";
+				where += $" `{GetColumnName(column)}` = @{column.Name} AND";
 			}
 
-			var sql = $"SELECT * FROM `{database}`.`{tableName}` WHERE {where}";
+			var sql = string.IsNullOrWhiteSpace(database) ? $"SELECT * FROM `{tableName}` WHERE {where}" :
+				$"SELECT * FROM `{database}`.`{tableName}` WHERE {where}";
+
 			return sql;
 		}
 
-		private string GenerateColumn(FieldSelector field)
+		private string GenerateColumn(Column column, bool isPrimary)
 		{
-			var columnName = IgnoreColumnCase ? field.Name.ToLower() : field.Name;
-			var dataType = GetDataTypeSql(field.DataType, field.Length);
-			if (field.IsPrimary)
+			var columnName = GetColumnName(column);
+			var dataType = GetDataTypeSql(column.DataType, column.Length);
+			if (isPrimary)
 			{
 				dataType = $"{dataType} NOT NULL";
 			}

@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
@@ -43,7 +42,7 @@ namespace DotnetSpider.Sample.docs
 					Console.WriteLine();
 					Console.WriteLine("=================================================");
 					StringBuilder builder = new StringBuilder();
-					foreach (YoukuVideo entry in resultItem.Results["VideoResult"])
+					foreach (YoukuVideo entry in (List<YoukuVideo>)resultItem["VideoResult"])
 					{
 						_count++;
 						builder.Append($" [YoukuVideo {_count}] {entry.Name}");

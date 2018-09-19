@@ -6,7 +6,6 @@ using Xunit;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Monitor;
-using DotnetSpider.Common;
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Extension.Test.Scheduler

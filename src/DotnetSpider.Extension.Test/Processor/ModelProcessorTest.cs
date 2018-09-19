@@ -6,7 +6,6 @@ using System.Linq;
 using Xunit;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model;
-using DotnetSpider.Common;
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Extension.Test.Processor
@@ -32,8 +31,8 @@ namespace DotnetSpider.Extension.Test.Processor
 			var page = CreatePage();
 			processor.Process(page);
 
-			var results = page.ResultItems.GetResultItem(processor.Model.Identity) as Tuple<IModel, IList<dynamic>>;
-			var model = results.Item2.First() as N;
+			var results = page.ResultItems[typeof(N).FullName] as IEnumerable<dynamic>;
+			var model = results.First() as N;
 			Assert.Equal(100, model.Int);
 			Assert.True(model.Bool);
 			Assert.Equal(200, model.BigInt);
@@ -52,30 +51,30 @@ namespace DotnetSpider.Extension.Test.Processor
 			return page;
 		}
 
-		private class N
+		private class N : IBaseEntity
 		{
-			[FieldSelector(Expression = ".//div[@class='int']")]
+			[Field(Expression = ".//div[@class='int']")]
 			public int Int { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='bool']")]
+			[Field(Expression = ".//div[@class='bool']")]
 			public bool Bool { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='bigint']")]
+			[Field(Expression = ".//div[@class='bigint']")]
 			public long BigInt { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='string']")]
+			[Field(Expression = ".//div[@class='string']")]
 			public string String { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='datetime']")]
+			[Field(Expression = ".//div[@class='datetime']")]
 			public DateTime DateTime { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='float']")]
+			[Field(Expression = ".//div[@class='float']")]
 			public float Float { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='double']")]
+			[Field(Expression = ".//div[@class='double']")]
 			public double Double { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='decimal']")]
+			[Field(Expression = ".//div[@class='decimal']")]
 			public decimal Decimal { get; set; }
 		}
 	}

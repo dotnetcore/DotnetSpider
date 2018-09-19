@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DotnetSpider.Extraction.Model;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -12,6 +13,6 @@ namespace DotnetSpider.Extension.Pipeline
 		/// </summary>
 		/// <param name="entityName">实体名称</param>
 		/// <returns>数据结果</returns>
-		IList<dynamic> GetCollection(string entityName);
+		IList<IBaseEntity> GetCollection(string entityName);
 	}
 }

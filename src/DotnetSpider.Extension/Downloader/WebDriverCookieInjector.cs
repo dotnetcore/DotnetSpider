@@ -4,7 +4,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
 using System.IO;
 using DotnetSpider.Downloader;
-using DotnetSpider.Common;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Downloader
 {

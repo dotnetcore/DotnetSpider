@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Pipeline;
+﻿using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using System;

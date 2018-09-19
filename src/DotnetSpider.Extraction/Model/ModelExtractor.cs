@@ -15,7 +15,7 @@ namespace DotnetSpider.Extraction.Model
 		/// <param name="selectable">可查询对象</param>
 		/// <param name="model">解析模型</param>
 		/// <returns>实体对象</returns>
-		public virtual IList<dynamic> Extract(Selectable selectable, IModel model)
+		public virtual IEnumerable<dynamic> Extract(Selectable selectable, IModel model)
 		{
 			List<dynamic> results = new List<dynamic>();
 			if (selectable.Properties == null)
@@ -23,9 +23,9 @@ namespace DotnetSpider.Extraction.Model
 				selectable.Properties = new Dictionary<string, object>();
 			}
 
-			if (model.SharedValueSelectors != null)
+			if (model.Shareds != null)
 			{
-				foreach (var enviromentValue in model.SharedValueSelectors)
+				foreach (var enviromentValue in model.Shareds)
 				{
 					string name = enviromentValue.Name;
 					var value = selectable.Select(enviromentValue.ToSelector()).GetValue();
@@ -104,7 +104,7 @@ namespace DotnetSpider.Extraction.Model
 			return dataObject;
 		}
 
-		private string ExtractField(FieldSelector field, ISelectable item, Selectable root, int index)
+		private string ExtractField(Field field, ISelectable item, Selectable root, int index)
 		{
 			if (field == null)
 			{
@@ -188,7 +188,7 @@ namespace DotnetSpider.Extraction.Model
 		}
 	}
 
-	public class ModelExtractor<T> : ModelExtractor where T : new()
+	public class ModelExtractor<T> : ModelExtractor where T : IBaseEntity
 	{
 		private readonly Dictionary<string, PropertyInfo> _properties = new Dictionary<string, PropertyInfo>();
 
@@ -201,7 +201,7 @@ namespace DotnetSpider.Extraction.Model
 			}
 		}
 
-		public override IList<dynamic> Extract(Selectable response, IModel model)
+		public override IEnumerable<dynamic> Extract(Selectable response, IModel model)
 		{
 			var items = base.Extract(response, model)?.ToList();
 
@@ -210,7 +210,7 @@ namespace DotnetSpider.Extraction.Model
 				return new List<dynamic>();
 			}
 
-			List<dynamic> results = new List<dynamic>();
+			var results = new List<dynamic>();
 			foreach (var item in items)
 			{
 				var o = Activator.CreateInstance<T>();

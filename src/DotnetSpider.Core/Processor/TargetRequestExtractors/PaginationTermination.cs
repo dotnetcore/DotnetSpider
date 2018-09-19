@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Downloader;
+﻿using DotnetSpider.Downloader;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Formatter;

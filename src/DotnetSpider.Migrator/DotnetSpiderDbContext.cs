@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Common.Entity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace DotnetSpider.Migrator
 {
@@ -9,17 +7,17 @@ namespace DotnetSpider.Migrator
 	/// </summary>
 	public class DotnetSpiderDbContext : DbContext
 	{
-		public DbSet<Block> Block { get; set; }
+		//public DbSet<Block> Block { get; set; }
 
-		public DbSet<Node> Node { get; set; }
+		//public DbSet<Node> Node { get; set; }
 
-		public DbSet<NodeHeartbeat> NodeHeartbeat { get; set; }
+		//public DbSet<NodeHeartbeat> NodeHeartbeat { get; set; }
 
-		public DbSet<RequestQueue> RequestQueue { get; set; }
+		//public DbSet<RequestQueue> RequestQueue { get; set; }
 
-		public DbSet<RunningHistory> RunningHistory { get; set; }
+		//public DbSet<RunningHistory> RunningHistory { get; set; }
 
-		public DbSet<Running> Running { get; set; }
+		//public DbSet<Running> Running { get; set; }
 
 		public DotnetSpiderDbContext(DbContextOptions options)
 			: base(options)
@@ -29,8 +27,8 @@ namespace DotnetSpider.Migrator
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<RequestQueue>().HasKey(t => new { t.RequestId, t.Identity });
-			modelBuilder.Entity<Block>().HasKey(t => new { t.BlockId, t.Identity });
+			//modelBuilder.Entity<RequestQueue>().HasKey(t => new { t.RequestId, t.Identity });
+			//modelBuilder.Entity<Block>().HasKey(t => new { t.BlockId, t.Identity });
 			base.OnModelCreating(modelBuilder);
 		}
 	}

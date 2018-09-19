@@ -1,6 +1,8 @@
 ﻿using DotnetSpider.Extension;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model.Formatter;
 
@@ -25,58 +27,65 @@ namespace DotnetSpider.Sample.docs
 				AddPipeline(new ConsoleEntityPipeline());
 			}
 
-			[EntitySelector(Expression = ".//div[@class='items']//a")]
-			class Category
+			[Entity(Expression = ".//div[@class='items']//a")]
+			class Category : IBaseEntity
 			{
-				[FieldSelector(Expression = ".")]
+				[Field(Expression = ".")]
 				public string CategoryName { get; set; }
 
-				[ToNext(Extras = new[] { "CategoryName" })]
+				[Next(Extras = new[] { "CategoryName" })]
 				[RegexAppendFormatter(Pattern = "http://list.jd.com/list.html\\?cat=[0-9]+", AppendValue = "&page=1&trans=1&JL=6_0_0")]
-				[FieldSelector(Expression = "./@href")]
+				[Field(Expression = "./@href")]
 				public string Url { get; set; }
 			}
 
-			[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-			[TargetRequestSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-			class TmpProduct
+			[Entity(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
+			[Target(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+			class TmpProduct : IBaseEntity
 			{
-				[FieldSelector(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
+				[Field(Expression = "CategoryName", Type = SelectorType.Enviroment)]
 				public string CategoryName { get; set; }
 
-				[ToNext(Extras = new[] { "CategoryName", "Sku", "Name", "Url" })]
-				[FieldSelector(Expression = "./div[@class='p-name']/a[1]/@href")]
+				[Next(Extras = new[] { "CategoryName", "Sku", "Name", "Url" })]
+				[Field(Expression = "./div[@class='p-name']/a[1]/@href")]
 				public string Url { get; set; }
 
-				[FieldSelector(Expression = ".//div[@class='p-name']/a/em", Length = 100)]
+				[Field(Expression = ".//div[@class='p-name']/a/em")]
 				public string Name { get; set; }
 
-				[FieldSelector(Expression = "./@data-sku", Length = 100)]
+				[Field(Expression = "./@data-sku")]
 				public string Sku { get; set; }
 			}
 
-			[TargetRequestSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-			[TableInfo("jd", "jd_product", Uniques = new[] { "Sku" }, Indexs = new[] { "Sku" })]
-			class JdProduct
+			[Target(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+			[Schema("jd", "jd_product")]
+			class JdProduct : IBaseEntity
 			{
-				[FieldSelector(Expression = "Name", Type = SelectorType.Enviroment, Length = 100)]
+				[Column(Length = 100)]
+				[Field(Expression = "Name", Type = SelectorType.Enviroment)]
 				public string Name { get; set; }
 
-				[FieldSelector(Expression = "Sku", Type = SelectorType.Enviroment, Length = 100)]
+				[Column(Length = 100)]
+				[Field(Expression = "Sku", Type = SelectorType.Enviroment)]
+				[Index("SKU")]
+				[Unique("SKU")]
 				public string Sku { get; set; }
 
-				[FieldSelector(Expression = "Url", Type = SelectorType.Enviroment)]
+				[Column()]
+				[Field(Expression = "Url", Type = SelectorType.Enviroment)]
 				public string Url { get; set; }
 
-				[FieldSelector(Expression = "CategoryName", Type = SelectorType.Enviroment, Length = 100)]
+				[Column(Length = 100)]
+				[Field(Expression = "CategoryName", Type = SelectorType.Enviroment)]
 				public string CategoryName { get; set; }
 
-				[FieldSelector(Expression = ".//a[@class='name']", Length = 100)]
+				[Column(Length = 100)]
+				[Field(Expression = ".//a[@class='name']")]
 				public string ShopName { get; set; }
 
 				[StringFormater(Format = "http:{0}")]
 				[Download]
-				[FieldSelector(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src", IgnoreStore = true)]
+				[Field(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src")]
 				public string Logo { get; set; }
 			}
 		}

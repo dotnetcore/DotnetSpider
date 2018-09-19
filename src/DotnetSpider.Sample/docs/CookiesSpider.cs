@@ -1,6 +1,6 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Downloader;
+﻿using DotnetSpider.Downloader;
 using DotnetSpider.Extension;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
@@ -34,10 +34,11 @@ namespace DotnetSpider.Sample.docs
 			AddEntityType<Corp>();
 		}
 
-		[TableInfo("test", "ddeng_corp", TableNamePostfix.Today)]
-		class Corp
+		[Schema("test", "ddeng_corp", TableNamePostfix.Today)]
+		class Corp : IBaseEntity
 		{
-			[FieldSelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong", Length = 100)]
+			[Column]
+			[Field(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/p[1]/strong")]
 			public string Name { get; set; }
 
 			[ReplaceFormatter(NewValue = "", OldValue = "\r")]
@@ -46,7 +47,8 @@ namespace DotnetSpider.Sample.docs
 			[ReplaceFormatter(NewValue = "", OldValue = "\n")]
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
-			[FieldSelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = FieldOptions.InnerText, Length = 100)]
+			[Field(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[2]/div", Option = FieldOptions.InnerText)]
+			[Column]
 			public string Phone { get; set; }
 
 			[ReplaceFormatter(NewValue = "", OldValue = "\r")]
@@ -56,10 +58,12 @@ namespace DotnetSpider.Sample.docs
 			[ReplaceFormatter(NewValue = "", OldValue = "\"")]
 			[ReplaceFormatter(NewValue = "", OldValue = " ")]
 			[ReplaceFormatter(NewValue = "", OldValue = "地址：")]
-			[FieldSelector(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = FieldOptions.InnerText, Length = 200)]
+			[Column]
+			[Field(Expression = "/html/body/div[4]/div[2]/div[3]/div[1]/ul/li[3]", Option = FieldOptions.InnerText)]
 			public string Address { get; set; }
 
-			[FieldSelector(Expression = ".")]
+			[Field(Expression = ".")]
+			[Column(Length = 0)]
 			public string Html { get; set; }
 		}
 	}

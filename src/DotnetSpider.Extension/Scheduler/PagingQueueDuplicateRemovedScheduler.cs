@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using DotnetSpider.Common;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Scheduler;

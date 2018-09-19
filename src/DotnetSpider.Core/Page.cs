@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Downloader;
+﻿using DotnetSpider.Downloader;
 using DotnetSpider.Extraction;
 using System.Collections.Generic;
 
@@ -61,9 +60,9 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="key">键值</param>
 		/// <param name="field">数据结果</param>
-		public void AddResultItem(string key, dynamic field)
+		public void AddResultItem(string key, object field)
 		{
-			ResultItems.AddOrUpdateResultItem(key, field);
+			ResultItems[key] = field;
 		}
 
 		/// <summary>

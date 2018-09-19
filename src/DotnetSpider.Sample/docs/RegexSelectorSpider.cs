@@ -1,6 +1,7 @@
 using DotnetSpider.Extension;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 
 namespace DotnetSpider.Sample.docs
@@ -14,9 +15,9 @@ namespace DotnetSpider.Sample.docs
 			AddEntityType<HomePage>();
 		}
 
-		class HomePage
+		class HomePage : IBaseEntity
 		{
-			[FieldSelector(Expression = "<a.*?园子</a>", Type = SelectorType.Regex, Arguments = "1")]
+			[Field(Expression = "<a.*?园子</a>", Type = SelectorType.Regex, Arguments = "1")]
 			public string Category { get; set; }
 		}
 	}

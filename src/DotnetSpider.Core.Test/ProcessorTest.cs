@@ -2,9 +2,7 @@
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
 using Xunit;
-using System;
 using System.Collections.Generic;
-using DotnetSpider.Common;
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Core.Test

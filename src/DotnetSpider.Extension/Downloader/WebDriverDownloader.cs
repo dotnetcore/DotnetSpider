@@ -9,8 +9,6 @@ using DotnetSpider.Extension.Infrastructure;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using DotnetSpider.Downloader;
-using DotnetSpider.Common;
-using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Collections;
 using Microsoft.Extensions.Logging;

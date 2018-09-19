@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DotnetSpider.Common\DotnetSpider.Common.csproj" />
     <ProjectReference Include="..\DotnetSpider.Downloader\DotnetSpider.Downloader.csproj" />
   </ItemGroup>
 

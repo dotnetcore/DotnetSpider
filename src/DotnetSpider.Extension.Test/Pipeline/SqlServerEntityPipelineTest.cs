@@ -9,8 +9,8 @@ using Dapper;
 using DotnetSpider.Extension.Processor;
 using System.Data;
 using DotnetSpider.Extraction.Model.Attribute;
-using DotnetSpider.Common;
 using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extension.Model;
 #if NETSTANDARD
 using System.Runtime.InteropServices;
 #endif
@@ -48,31 +48,25 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				catch
 				{
 				}
-
-
-				var spider = new DefaultSpider();
-
-				EntityProcessor<Entity15> processor = new EntityProcessor<Entity15>();
-
 				var pipeline = new SqlServerEntityPipeline("Server=.\\SQLEXPRESS;Database=master;Trusted_Connection=True;MultipleActiveResultSets=true");
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
-				resultItems.AddOrUpdateResultItem(processor.Model.Identity, new Tuple<IModel, IList<dynamic>>(processor.Model, new dynamic[] {
-					new Dictionary<string, dynamic>
+				resultItems["aaa"] = new List<Entity15>  {
+					new Entity15
 					{
-						{ "int", "1"},
-						{ "bool", "1"},
-						{ "bigint", "11"},
-						{ "string", "aaa"},
-						{ "time", "2018-06-12"},
-						{ "float", "1"},
-						{ "double", "1"},
-						{ "string1", "abc"},
-						{ "string2", "abcdd"},
-						{ "decimal", "1"}
+						 Int=1,
+						 Bool=true,
+						 BigInt=11,
+						 String="aaa",
+						 Time=new DateTime(2018,06,12),
+						 Float=1,
+						 Double=1,
+						 String1="abc",
+						 String2="abcdd",
+						 Decimal=1
 					}
-				}));
-				pipeline.Process(new ResultItems[] { resultItems },  spider);
+				};
+				pipeline.Process(new ResultItems[] { resultItems }, null);
 
 				var columns = conn.Query<ColumnInfo>("USE [test];select  b.name Name,c.name+'(' + cast(c.length as varchar)+')' [Type] from sysobjects a,syscolumns b,systypes c where a.id=b.id and a.name='table15' and a.xtype='U'and b.xtype=c.xtype").ToList();
 				Assert.Equal(15, columns.Count);
@@ -113,7 +107,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			return new SqlConnection(DefaultConnectionString);
 		}
 
-		protected override DbModelPipeline CreatePipeline(PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate)
+		protected override DbEntityPipeline CreatePipeline(PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate)
 		{
 
 			return new SqlServerEntityPipeline(DefaultConnectionString, pipelineMode);
@@ -197,37 +191,47 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[TableInfo("test", "table15")]
-		private class Entity15
+		[Schema("test", "table15")]
+		private class Entity15 : IBaseEntity
 		{
-			[FieldSelector(Expression = "Url")]
+			[Column]
+			[Field(Expression = "Url")]
 			public int Int { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column]
+			[Field(Expression = "Url")]
 			public bool Bool { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column]
+			[Field(Expression = "Url")]
 			public long BigInt { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column]
+			[Field(Expression = "Url")]
 			public string String { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column]
+			[Field(Expression = "Url")]
 			public DateTime Time { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column]
+			[Field(Expression = "Url")]
 			public float Float { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column]
+			[Field(Expression = "Url")]
 			public double Double { get; set; }
 
-			[FieldSelector(Expression = "Url", Length = 100)]
+			[Field(Expression = "Url")]
+			[Column(100)]
 			public string String1 { get; set; }
 
-			[FieldSelector(Expression = "Url", Length = 0)]
+			[Column(Length = 0)]
+			[Field(Expression = "Url")]
 			public string String2 { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column]
+			[Field(Expression = "Url")]
 			public decimal Decimal { get; set; }
 		}
 	}

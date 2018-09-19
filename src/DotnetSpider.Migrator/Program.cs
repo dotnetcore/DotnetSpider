@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DotnetSpider.Migrator
+﻿namespace DotnetSpider.Migrator
 {
 	public class Program
 	{

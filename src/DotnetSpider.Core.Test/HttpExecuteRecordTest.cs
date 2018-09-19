@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Downloader;
 using Xunit;
 

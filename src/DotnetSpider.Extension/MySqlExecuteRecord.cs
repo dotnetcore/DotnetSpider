@@ -3,7 +3,6 @@ using DotnetSpider.Core.Infrastructure.Database;
 using System;
 using System.Data;
 using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Common;
 using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Extension

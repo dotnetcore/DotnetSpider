@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Processor.TargetRequestExtractors;
 using DotnetSpider.Downloader;
@@ -9,6 +8,7 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model.Formatter;
 using System.Collections.Generic;
@@ -107,25 +107,25 @@ namespace DotnetSpider.Sample.docs
 			}
 		}
 
-		[EntitySelector(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
-		private class TaobaoItem
+		[Entity(Expression = "$.mods.itemlist.data.auctions[*]", Type = SelectorType.JsonPath)]
+		private class TaobaoItem : IBaseEntity
 		{
-			[FieldSelector(Expression = "$.view_price", Type = SelectorType.JsonPath, Length = 50)]
+			[Field(Expression = "$.view_price", Type = SelectorType.JsonPath)]
 			public string price { get; set; }
 
-			[FieldSelector(Expression = "$.category", Type = SelectorType.JsonPath, Length = 20)]
+			[Field(Expression = "$.category", Type = SelectorType.JsonPath)]
 			public string cat { get; set; }
 
-			[FieldSelector(Expression = "$.view_sales", Type = SelectorType.JsonPath, Length = 50)]
+			[Field(Expression = "$.view_sales", Type = SelectorType.JsonPath)]
 			[ReplaceFormatter(NewValue = "", OldValue = "付款")]
 			[ReplaceFormatter(NewValue = "", OldValue = "收货")]
 			[ReplaceFormatter(NewValue = "", OldValue = "人")]
 			public string sold { get; set; }
 
-			[FieldSelector(Expression = "$.nid", Type = SelectorType.JsonPath, Length = 50)]
+			[Field(Expression = "$.nid", Type = SelectorType.JsonPath)]
 			public string item_id { get; set; }
 
-			[FieldSelector(Expression = "$.user_id", Type = SelectorType.JsonPath, Length = 50)]
+			[Field(Expression = "$.user_id", Type = SelectorType.JsonPath)]
 			public string user_id { get; set; }
 		}
 	}

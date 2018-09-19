@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using DotnetSpider.Common;
 using DotnetSpider.Downloader;
 using DotnetSpider.Core.Scheduler;
 
@@ -144,7 +143,7 @@ namespace DotnetSpider.Core.Test
 			{
 				foreach (var resultItem in resultItems)
 				{
-					foreach (var entry in resultItem.Results)
+					foreach (var entry in resultItem)
 					{
 						Console.WriteLine($"{entry.Key}:{entry.Value}");
 					}

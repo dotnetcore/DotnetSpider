@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Downloader;
+﻿using DotnetSpider.Downloader;
 using Microsoft.Extensions.Logging;
 using Polly;
 using System;

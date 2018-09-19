@@ -6,6 +6,8 @@ using System.IO;
 using Xunit;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
@@ -50,11 +52,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				AddPipeline(new MySqlEntityFilePipeline(MySqlEntityFilePipeline.FileType.InsertSql));
 			}
 
-			[TableInfo("baidu", "baidu_search_mysql_file")]
-			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-			class BaiduSearchEntry
+			[Schema("baidu", "baidu_search_mysql_file")]
+			[Entity(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			class BaiduSearchEntry : IBaseEntity
 			{
-				[FieldSelector(Expression = "Keyword", Type = SelectorType.Enviroment)]
+				[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
+				[Column]
 				public string Keyword { get; set; }
 			}
 		}

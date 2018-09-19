@@ -9,10 +9,11 @@ using System.Net;
 using Xunit;
 using System.Linq;
 using DotnetSpider.Extraction.Model.Attribute;
-using DotnetSpider.Common;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model.Formatter;
 using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -29,8 +30,8 @@ namespace DotnetSpider.Extension.Test
 			EntitySpider spider = new MultiEntitySpider();
 			spider.Run();
 			var pipeline = spider.Pipelines.ElementAt(0) as CollectionEntityPipeline;
-			var neteast = pipeline.GetCollection("test.neteast").First() as MultiEntitySpider.NeteastEntity;
-			var sohu = pipeline.GetCollection("test.sohu").First() as MultiEntitySpider.SohuEntity;
+			var neteast = pipeline.GetCollection("DotnetSpider.Extension.Test.EntitySpiderTest+MultiEntitySpider+NeteastEntity").First() as MultiEntitySpider.NeteastEntity;
+			var sohu = pipeline.GetCollection("DotnetSpider.Extension.Test.EntitySpiderTest+MultiEntitySpider+SohuEntity").First() as MultiEntitySpider.SohuEntity;
 			Assert.Equal("搜狐", sohu.Title);
 			Assert.Equal("网易", neteast.Title);
 		}
@@ -115,13 +116,13 @@ namespace DotnetSpider.Extension.Test
 			{
 				ExeConfigFilename = "app.config"
 			}, ConfigurationUserLevel.None);
-			var pipeline1 = DbModelPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["DataConnection"]);
+			var pipeline1 = DbEntityPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["DataConnection"]);
 			Assert.True(pipeline1 is MySqlEntityPipeline);
 
-			var pipeline2 = DbModelPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["SqlServerDataConnection"]);
+			var pipeline2 = DbEntityPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["SqlServerDataConnection"]);
 			Assert.True(pipeline2 is SqlServerEntityPipeline);
 
-			var pipeline3 = DbModelPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["MongoDbDataConnection"]);
+			var pipeline3 = DbEntityPipeline.GetPipelineFromAppConfig(configuration.ConnectionStrings.ConnectionStrings["MongoDbDataConnection"]);
 			Assert.True(pipeline3 is MongoDbEntityPipeline);
 		}
 
@@ -132,10 +133,11 @@ namespace DotnetSpider.Extension.Test
 			spider.Run();
 		}
 
-		[TableInfo("test", "table")]
-		private class TestEntity
+		[Schema("test", "table")]
+		private class TestEntity : IBaseEntity
 		{
-			[FieldSelector(Expression = ".")]
+			[Field(Expression = ".")]
+			[Column]
 			public string Name { get; set; }
 		}
 
@@ -176,40 +178,46 @@ namespace DotnetSpider.Extension.Test
 				AddEntityType<BaiduSearchEntry>();
 			}
 
-			[TableInfo("test", "baidu_search")]
-			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-			class BaiduSearchEntry
+			[Schema("test", "baidu_search")]
+			[Entity(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			class BaiduSearchEntry : IBaseEntity
 			{
-				[FieldSelector(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
+				[Column]
+				[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
 				public string Keyword { get; set; }
 
-				[FieldSelector(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
+				[Column]
+				[Field(Expression = "guid", Type = SelectorType.Enviroment)]
 				public string Guid { get; set; }
 
-				[FieldSelector(Expression = ".//h3[@class='c-title']/a")]
+				[Column]
+				[Field(Expression = ".//h3[@class='c-title']/a")]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				public string Title { get; set; }
 
-				[FieldSelector(Expression = ".//h3[@class='c-title']/a/@href")]
+				[Column]
+				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
 				public string Url { get; set; }
 
-				[FieldSelector(Expression = ".//div/p[@class='c-author']/text()")]
+				[Column]
+				[Field(Expression = ".//div/p[@class='c-author']/text()")]
 				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 				public string Website { get; set; }
 
-
-				[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				[Column]
+				[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
 				public string Snapshot { get; set; }
 
-
-				[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
+				[Column]
+				[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 				public string Details { get; set; }
 
-				[FieldSelector(Expression = ".", Option = FieldOptions.InnerText)]
+				[Column(0)]
+				[Field(Expression = ".", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
@@ -232,14 +240,14 @@ namespace DotnetSpider.Extension.Test
 				AddEntityType<ArticleSummary>();
 			}
 
-			[EntitySelector(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
-			class ArticleSummary
+			[Entity(Expression = "//div[@class='ztlb_ld_mainR_box01_list']/ul/li")]
+			class ArticleSummary : IBaseEntity
 			{
-				[FieldSelector(Expression = ".//a/@title")]
+				[Field(Expression = ".//a/@title")]
 				public string Title { get; set; }
 
-				[ToNext(Extras = new[] { "Title", "Url" })]
-				[FieldSelector(Expression = ".//a/@href")]
+				[Next(Extras = new[] { "Title", "Url" })]
+				[Field(Expression = ".//a/@href")]
 				public string Url { get; set; }
 			}
 		}
@@ -256,19 +264,21 @@ namespace DotnetSpider.Extension.Test
 				AddEntityType<SohuEntity>();
 			}
 
-			[TableInfo("test", "neteast")]
-			[TargetRequestSelector(Patterns = new[] { "http://www.163.com" })]
-			public class NeteastEntity
+			[Schema("test", "neteast")]
+			[Target(Patterns = new[] { "http://www.163.com" })]
+			public class NeteastEntity : IBaseEntity
 			{
-				[FieldSelector(Expression = ".//title")]
+				[Field(Expression = ".//title")]
+				[Column]
 				public string Title { get; set; }
 			}
 
-			[TableInfo("test", "sohu")]
-			[TargetRequestSelector(Patterns = new[] { "http://www.sohu.com" })]
-			public class SohuEntity
+			[Schema("test", "sohu")]
+			[Target(Patterns = new[] { "http://www.sohu.com" })]
+			public class SohuEntity : IBaseEntity
 			{
-				[FieldSelector(Expression = ".//title")]
+				[Column]
+				[Field(Expression = ".//title")]
 				public string Title { get; set; }
 			}
 		}

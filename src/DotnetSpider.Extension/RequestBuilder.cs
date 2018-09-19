@@ -5,8 +5,8 @@ using DotnetSpider.Core.Infrastructure.Database;
 using System.Configuration;
 using System.Runtime.CompilerServices;
 using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Common;
 using DotnetSpider.Downloader;
+using DotnetSpider.Core.Infrastructure;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Extension.Test")]
 namespace DotnetSpider.Extension
@@ -70,16 +70,16 @@ namespace DotnetSpider.Extension
 		/// <param name="sql">SQL 语句</param>
 		/// <param name="formateArguments">起始链接格式化参数</param>
 		/// <param name="formateStrings">起始链接格式化模版</param>
-		public DbRequestBuilder(Database source, string connectString, string sql, string[] formateArguments, params string[] formateStrings)
+		public DbRequestBuilder(Database2 source, string connectString, string sql, string[] formateArguments, params string[] formateStrings)
 		{
 			switch (source)
 			{
-				case Database.MySql:
+				case Database2.MySql:
 					{
 						_connectionStringSettings = new ConnectionStringSettings("MySql", connectString, "MySql.Data.MySqlClient");
 						break;
 					}
-				case Database.SqlServer:
+				case Database2.SqlServer:
 					{
 						_connectionStringSettings = new ConnectionStringSettings("SqlServer", connectString, "System.Data.SqlClient");
 						break;

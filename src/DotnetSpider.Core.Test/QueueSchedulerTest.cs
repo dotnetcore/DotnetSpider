@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using DotnetSpider.Common;
 using DotnetSpider.Core.Scheduler;
 using Xunit;
 using DotnetSpider.Downloader;

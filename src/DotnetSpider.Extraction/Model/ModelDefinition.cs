@@ -25,87 +25,58 @@ namespace DotnetSpider.Extraction.Model
 		public bool TakeFromHead { get; protected set; }
 
 		/// <summary>
-		/// 爬虫实体对应的数据库表信息
-		/// </summary>
-		public TableInfo Table { get; protected set; }
-
-		/// <summary>
 		/// 爬虫实体定义的数据库列信息
 		/// </summary>
-		public HashSet<FieldSelector> Fields { get; protected set; }
+		public HashSet<Field> Fields { get; protected set; }
 
 		/// <summary>
 		/// 目标链接的选择器
 		/// </summary>
-		public IEnumerable<TargetRequestSelector> TargetRequestSelectors { get; protected set; }
+		public IEnumerable<Target> Targets { get; protected set; }
 
 		/// <summary>
 		/// 共享值的选择器
 		/// </summary>
-		public IEnumerable<SharedValueSelector> SharedValueSelectors { get; protected set; }
+		public IEnumerable<Shared> Shareds { get; protected set; }
 
 		[JsonIgnore]
 		public string Identity { get; protected set; }
 
-		public ModelDefinition(Selector selector, IEnumerable<FieldSelector> fields, TableInfo table,
-			TargetRequestSelector targetRequestSelector)
-			: this(selector, fields, table, new[] { targetRequestSelector })
+		public ModelDefinition(Selector selector, IEnumerable<Field> fields,
+			Target targetRequestSelector)
+			: this(selector, fields, new[] { targetRequestSelector })
 		{
 		}
 
-		public ModelDefinition(Selector selector, IEnumerable<FieldSelector> fields, TableInfo table = null,
-			IEnumerable<TargetRequestSelector> targetRequestSelectors = null,
-			IEnumerable<SharedValueSelector> sharedValueSelectors = null, int take = 0, bool takeFromHead = true) : this()
+		public ModelDefinition(Selector selector, IEnumerable<Field> fields,
+			IEnumerable<Target> targetRequestSelectors = null,
+			IEnumerable<Shared> sharedValueSelectors = null, int take = 0, bool takeFromHead = true)
 		{
 			Selector = selector;
-			Table = table;
 			if (fields == null)
 			{
 				throw new ExtractionException($"{nameof(fields)} should not be null.");
 			}
 
-			Fields = new HashSet<FieldSelector>(fields);
+			Fields = new HashSet<Field>(fields);
 			if (Fields.Count == 0)
 			{
 				throw new ExtractionException("Count of fields should large than 0.");
 			}
 
-			TargetRequestSelectors = targetRequestSelectors;
-			SharedValueSelectors = sharedValueSelectors;
+			Targets = targetRequestSelectors;
+			Shareds = sharedValueSelectors;
 			Take = take;
 			TakeFromHead = takeFromHead;
-			Identity = Table == null ? Guid.NewGuid().ToString("N") : $"{Table.Database}.{Table.FullName}";
+			Identity = Guid.NewGuid().ToString("N");
 		}
 
-		protected ModelDefinition()
+		public ModelDefinition(Type type)
 		{
-		}
-	}
-
-	public class ModelDefinition<T> : ModelDefinition
-	{
-		public ModelDefinition()
-		{
-			var type = typeof(T);
-
 			var typeName = type.FullName;
 			var name = typeName;
 
-			var tableInfo = type.GetCustomAttributes(typeof(TableInfo), true).FirstOrDefault() as TableInfo;
-
-			if (tableInfo != null)
-			{
-				if (tableInfo.Indexs != null)
-				{
-					tableInfo.Indexs = new HashSet<string>(tableInfo.Indexs.Select(i => i.Replace(" ", ""))).ToArray();
-				}
-
-				if (tableInfo.Uniques != null)
-				{
-					tableInfo.Uniques = new HashSet<string>(tableInfo.Uniques.Select(i => i.Replace(" ", ""))).ToArray();
-				}
-			}
-			var entitySelector = type.GetCustomAttributes(typeof(EntitySelector), true).FirstOrDefault() as EntitySelector;
+			var entitySelector = type.GetCustomAttributes(typeof(Entity), true).FirstOrDefault() as Entity;
 			int take = 0;
 			bool takeFromHead = true;
 			Selector selector = null;
@@ -116,11 +87,11 @@ namespace DotnetSpider.Extraction.Model
 				selector = new Selector { Expression = entitySelector.Expression, Type = entitySelector.Type };
 			}
 
-			var targetUrlsSelectors = type.GetCustomAttributes(typeof(TargetRequestSelector), true).Select(s => (TargetRequestSelector)s).ToList();
-			var sharedValueSelectors = type.GetCustomAttributes(typeof(SharedValueSelector), true).Select(e =>
+			var targetUrlsSelectors = type.GetCustomAttributes(typeof(Target), true).Select(s => (Target)s).ToList();
+			var sharedValueSelectors = type.GetCustomAttributes(typeof(Shared), true).Select(e =>
 			{
-				var p = (SharedValueSelector)e;
-				return new SharedValueSelector
+				var p = (Shared)e;
+				return new Shared
 				{
 					Name = p.Name,
 					Expression = p.Expression,
@@ -130,10 +101,10 @@ namespace DotnetSpider.Extraction.Model
 
 			var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
-			var fields = new HashSet<FieldSelector>();
+			var fields = new HashSet<Field>();
 			foreach (var property in properties)
 			{
-				var field = property.GetCustomAttributes(typeof(FieldSelector), true).FirstOrDefault() as FieldSelector;
+				var field = property.GetCustomAttributes(typeof(Field), true).FirstOrDefault() as Field;
 
 				if (field == null)
 				{
@@ -141,157 +112,26 @@ namespace DotnetSpider.Extraction.Model
 				}
 
 				field.Name = property.Name;
-				if (field.DataType == DataType.None)
-				{
-					field.DataType = ConvertDataType(property.PropertyType);
-				}
-
 				field.Formatters = property.GetCustomAttributes(typeof(Formatter.Formatter), true).Select(p => (Formatter.Formatter)p).ToArray();
 				fields.Add(field);
 			}
 
 			Selector = selector;
-			Table = tableInfo;
 
 			Fields = fields;
-			TargetRequestSelectors = targetUrlsSelectors;
-			SharedValueSelectors = sharedValueSelectors;
+			Targets = targetUrlsSelectors;
+			Shareds = sharedValueSelectors;
 			Take = take;
 			TakeFromHead = takeFromHead;
 
-			if (Table != null)
-			{
-				Identity = $"{Table.Database}.{Table.FullName}";
-			}
-			else
-			{
-				Identity = type.FullName;
-			}
-
-			var columns = fields.Where(c => !c.IgnoreStore).ToList();
-
-			if (columns.Count == 0)
-			{
-				throw new ArgumentException($"Columns is necessary for {name}");
-			}
-
-			if (tableInfo != null)
-			{
-				if (tableInfo.UpdateColumns != null && tableInfo.UpdateColumns.Length > 0)
-				{
-					foreach (var column in tableInfo.UpdateColumns)
-					{
-						if (columns.All(c => c.Name != column))
-						{
-							throw new ArgumentException("Columns set to update are not a property of your entity");
-						}
-					}
-
-					if (tableInfo.UpdateColumns.Length == 0)
-					{
-						throw new ArgumentException("There is no column need update");
-					}
-				}
-
-				if (tableInfo.Indexs != null && tableInfo.Indexs.Length > 0)
-				{
-					for (int i = 0; i < tableInfo.Indexs.Length; ++i)
-					{
-						var items = new HashSet<string>(tableInfo.Indexs[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-							.Select(c => c.Trim()));
-
-						if (items.Count == 0)
-						{
-							throw new ArgumentException("Index should contain more than a column");
-						}
-
-						foreach (var item in items)
-						{
-							var column = columns.FirstOrDefault(c => c.Name == item);
-							if (column == null)
-							{
-								throw new ArgumentException("Columns set as index are not a property of your entity");
-							}
-
-							if (column.DataType == DataType.String && (column.Length <= 0 || column.Length > 256))
-							{
-								throw new ArgumentException("Column length of index should not large than 256");
-							}
-						}
-
-						tableInfo.Indexs[i] = string.Join(",", items);
-					}
-				}
-
-				if (tableInfo.Uniques != null && tableInfo.Uniques.Length > 0)
-				{
-					for (int i = 0; i < tableInfo.Uniques.Length; ++i)
-					{
-						var items = new HashSet<string>(tableInfo.Uniques[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-							.Select(c => c.Trim()));
-
-						if (items.Count == 0)
-						{
-							throw new ArgumentException("Unique should contain more than a column");
-						}
-
-						foreach (var item in items)
-						{
-							var column = columns.FirstOrDefault(c => c.Name == item);
-							if (column == null)
-							{
-								throw new ArgumentException("Columns set as unique are not a property of your entity");
-							}
-
-							if (column.DataType == DataType.String && (column.Length <= 0 || column.Length > 256))
-							{
-								throw new ArgumentException("Column length of unique should not large than 256");
-							}
-						}
-
-						tableInfo.Uniques[i] = string.Join(",", items);
-					}
-				}
-			}
+			Identity = type.FullName;
 		}
+	}
 
-		private DataType ConvertDataType(Type propertyType)
+	public class ModelDefinition<T> : ModelDefinition where T : IBaseEntity
+	{
+		public ModelDefinition() : base(typeof(T))
 		{
-			switch (propertyType.Name)
-			{
-				case "Int32":
-					{
-						return DataType.Int;
-					}
-				case "Decimal":
-					{
-						return DataType.Decimal;
-					}
-				case "Single":
-					{
-						return DataType.Float;
-					}
-				case "Double":
-					{
-						return DataType.Double;
-					}
-				case "Int64":
-					{
-						return DataType.Long;
-					}
-				case "Boolean":
-					{
-						return DataType.Bool;
-					}
-				case "DateTime":
-					{
-						return DataType.DateTime;
-					}
-				default:
-					{
-						return DataType.String;
-					}
-			}
 		}
 	}
 }

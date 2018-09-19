@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Xunit;
-using System.Threading.Tasks;
+﻿using Xunit;
 using DotnetSpider.Downloader;
 #if !NETFRAMEWORK
 using System.Text;

@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Pipeline

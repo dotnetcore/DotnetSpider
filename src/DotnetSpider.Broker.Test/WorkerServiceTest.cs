@@ -1,10 +1,7 @@
 ﻿using DotnetSpider.Broker.Data;
-using DotnetSpider.Broker.Hubs;
 using DotnetSpider.Broker.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace DotnetSpider.Broker.Test

@@ -4,7 +4,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using System;
 using System.IO;
-using DotnetSpider.Common;
+using DotnetSpider.Core.Infrastructure;
 #if !NETSTANDARD
 using System.Drawing;
 #endif
@@ -151,7 +151,8 @@ namespace DotnetSpider.Extension.Infrastructure
 					e = new FirefoxDriver(options);
 					break;
 				case Browser.Chrome:
-					ChromeDriverService cds = ChromeDriverService.CreateDefaultService(Env.BaseDirectory);
+
+					ChromeDriverService cds = ChromeDriverService.CreateDefaultService(string.IsNullOrWhiteSpace(Env.ChromeDriverPath) ? Env.BaseDirectory : Env.ChromeDriverPath);
 					cds.HideCommandPromptWindow = true;
 					ChromeOptions opt = new ChromeOptions();
 					if (!option.LoadImage)

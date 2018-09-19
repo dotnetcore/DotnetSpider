@@ -5,8 +5,8 @@ using DotnetSpider.Core;
 using System.Net;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction;
-using DotnetSpider.Common;
 using System;
+using DotnetSpider.Extension.Infrastructure;
 
 namespace DotnetSpider.Extension.Downloader
 {

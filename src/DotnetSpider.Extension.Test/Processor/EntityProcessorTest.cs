@@ -1,85 +1,86 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using Xunit;
 using DotnetSpider.Downloader;
+using System;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Extension.Test.Processor
 {
-	[EntitySelector(Expression = "$.data[*]", Type = SelectorType.JsonPath)]
-	public class Entity1
+	[Entity(Expression = "$.data[*]", Type = SelectorType.JsonPath)]
+	public class Entity1 : IBaseEntity
 	{
-		[FieldSelector(Expression = "$.age", Type = SelectorType.JsonPath)]
+		[Field(Expression = "$.age", Type = SelectorType.JsonPath)]
 		public int Age { get; set; }
 	}
 
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	public class Entity14
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+	public class Entity14 : IBaseEntity
 	{
-		[FieldSelector(Expression = "./@data-sku")]
+		[Field(Expression = "./@data-sku")]
 		public string Sku { get; set; }
 	}
 
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]", "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	public class Entity16
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]", "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+	public class Entity16 : IBaseEntity
 	{
-		[FieldSelector(Expression = "./@data-sku")]
+		[Field(Expression = "./@data-sku")]
 		public string Sku { get; set; }
 	}
 
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&", @"&page=[0-1]+&" })]
-	public class Entity17
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&", @"&page=[0-1]+&" })]
+	public class Entity17 : IBaseEntity
 	{
-		[FieldSelector(Expression = "./@data-sku")]
+		[Field(Expression = "./@data-sku")]
 		public string Sku { get; set; }
 	}
 
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]", "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&", @"&page=[0-1]+&" })]
-	public class Entity18
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]", "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&", @"&page=[0-1]+&" })]
+	public class Entity18 : IBaseEntity
 	{
-		[FieldSelector(Expression = "./@data-sku")]
+		[Field(Expression = "./@data-sku")]
 		public string Sku { get; set; }
 	}
 
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	public class Entity22
+	[Target(XPaths = new[] { "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+	public class Entity22 : IBaseEntity
 	{
-		[FieldSelector(Expression = "./@data-sku")]
+		[Field(Expression = "./@data-sku")]
 		public string Sku { get; set; }
 	}
 
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-1]+&" })]
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	public class Entity19
+	[Target(XPaths = new[] { "//*[@id=\"2222\"]" }, Patterns = new[] { @"&page=[0-1]+&" })]
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+	public class Entity19 : IBaseEntity
 	{
-		[FieldSelector(Expression = "./@data-sku")]
+		[Field(Expression = "./@data-sku")]
 		public string Sku { get; set; }
 	}
 
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-1]+&" })]
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	public class Entity20
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-1]+&" })]
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+	public class Entity20 : IBaseEntity
 	{
-		[FieldSelector(Expression = "./@data-sku")]
+		[Field(Expression = "./@data-sku")]
 		public string Sku { get; set; }
 	}
 
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	[TargetRequestSelector(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-	public class Entity21
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+	[Target(XPaths = new[] { "//*[@id=\"1111\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+	public class Entity21 : IBaseEntity
 	{
-		[FieldSelector(Expression = "./@data-sku")]
+		[Field(Expression = "./@data-sku")]
 		public string Sku { get; set; }
 	}
 
-	[TargetRequestSelector(XPaths = new string[] { null }, Patterns = new string[] { @"&page=[0-9]+&" })]
-	public class Entity25
+	[Target(XPaths = new string[] { null }, Patterns = new string[] { @"&page=[0-9]+&" })]
+	public class Entity25 : IBaseEntity
 	{
-		[FieldSelector(Expression = "./@data-sku")]
+		[Field(Expression = "./@data-sku")]
 		public string Sku { get; set; }
 	}
 
@@ -212,7 +213,7 @@ namespace DotnetSpider.Extension.Test.Processor
 				Content = "{'data':[{'age':'1'},{'age':'2'}]}"
 			};
 			processor.Process(page);
-			Assert.Equal(2, (page.ResultItems.GetResultItem($"DotnetSpider.Extension.Test.Processor.Entity1").Item2).Count);
+			Assert.Equal(2, ((List<dynamic>)page.ResultItems[$"DotnetSpider.Extension.Test.Processor.Entity1"]).Count);
 		}
 	}
 }

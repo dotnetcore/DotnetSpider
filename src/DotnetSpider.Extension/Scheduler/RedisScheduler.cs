@@ -10,7 +10,6 @@ using System;
 using Polly;
 using Polly.Retry;
 using System.Linq;
-using DotnetSpider.Common;
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Extension.Scheduler

@@ -1,4 +1,5 @@
 ﻿using DotnetSpider.Extension;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
@@ -26,37 +27,37 @@ namespace DotnetSpider.Sample.docs
 				AddEntityType<BlogSumary>();
 			}
 
-			[TargetRequestSelector(Patterns = new[] { "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+" })]
-			[EntitySelector(Expression = "//div[@class='post_item']")]
+			[Target(Patterns = new[] { "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+" })]
+			[Entity(Expression = "//div[@class='post_item']")]
 			class News : BaseEntity
 			{
-				[FieldSelector(Expression = ".//a[@class='titlelnk']")]
+				[Field(Expression = ".//a[@class='titlelnk']")]
 				public string Name { get; set; }
 
-				[FieldSelector(Expression = ".//div[@class='post_item_foot']/a[1]")]
+				[Field(Expression = ".//div[@class='post_item_foot']/a[1]")]
 				public string Author { get; set; }
 
-				[FieldSelector(Expression = ".//div[@class='post_item_foot']/text()")]
+				[Field(Expression = ".//div[@class='post_item_foot']/text()")]
 				public string PublishTime { get; set; }
 
-				[FieldSelector(Expression = ".//a[@class='titlelnk']/@href")]
+				[Field(Expression = ".//a[@class='titlelnk']/@href")]
 				public string Url { get; set; }
 			}
 
-			[TargetRequestSelector(Patterns = new[] { "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+" })]
-			[EntitySelector(Expression = "//div[@class='post_item']")]
+			[Target(Patterns = new[] { "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+" })]
+			[Entity(Expression = "//div[@class='post_item']")]
 			class BlogSumary : BaseEntity
 			{
-				[FieldSelector(Expression = ".//a[@class='titlelnk']")]
+				[Field(Expression = ".//a[@class='titlelnk']")]
 				public string Name { get; set; }
 
-				[FieldSelector(Expression = ".//div[@class='post_item_foot']/a[1]")]
+				[Field(Expression = ".//div[@class='post_item_foot']/a[1]")]
 				public string Author { get; set; }
 
-				[FieldSelector(Expression = ".//div[@class='post_item_foot']/text()")]
+				[Field(Expression = ".//div[@class='post_item_foot']/text()")]
 				public string PublishTime { get; set; }
 
-				[FieldSelector(Expression = ".//a[@class='titlelnk']/@href")]
+				[Field(Expression = ".//a[@class='titlelnk']/@href")]
 				public string Url { get; set; }
 			}
 		}

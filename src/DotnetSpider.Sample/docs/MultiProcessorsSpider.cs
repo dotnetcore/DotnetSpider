@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Processor.TargetRequestExtractors;
@@ -42,18 +41,18 @@ namespace DotnetSpider.Sample.docs
 			{
 				foreach (var resultItem in resultItems)
 				{
-					if (resultItem.GetResultItem("BlogSumary") != null)
+					if (resultItem["BlogSumary"] != null)
 					{
-						foreach (BlogSumary entry in resultItem.GetResultItem("BlogSumary"))
+						foreach (BlogSumary entry in (List<BlogSumary>)resultItem["BlogSumary"])
 						{
 							blogSumaryCount++;
 							Console.WriteLine($"BlogSumary [{blogSumaryCount}] {entry}");
 						}
 					}
 
-					if (resultItem.GetResultItem("News") != null)
+					if (resultItem["News"] != null)
 					{
-						foreach (News entry in resultItem.GetResultItem("News"))
+						foreach (News entry in (List<News>)resultItem["News"])
 						{
 							newsCount++;
 							Console.WriteLine($"News [{newsCount}] {entry}");

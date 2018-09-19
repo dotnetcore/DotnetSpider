@@ -12,9 +12,6 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.2" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\DotnetSpider.Common\DotnetSpider.Common.csproj" />
-	</ItemGroup>
-	<ItemGroup>
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

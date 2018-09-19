@@ -1,4 +1,4 @@
-﻿using DotnetSpider.Common;
+﻿using DotnetSpider.Extension.Infrastructure;
 using System;
 using System.Net;
 using System.Threading;

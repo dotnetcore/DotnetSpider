@@ -1,4 +1,5 @@
-﻿using DotnetSpider.Extraction;
+﻿using DotnetSpider.Extension.Model;
+using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 
@@ -7,37 +8,46 @@ namespace DotnetSpider.Extension.Downloader
 	/// <summary>
 	/// 下载内容缓存对象
 	/// </summary>
-	[TableInfo("crawl_cache", "cache", TableNamePostfix.Today, Indexs = new[] { "Url", "Identity", "TaskId", "Name" })]
-	public class DownloadCache
+	[Schema("crawl_cache", "cache", TableNamePostfix.Today)]
+	public class DownloadCache : BaseEntity
 	{
 		/// <summary>
 		/// 所属爬虫的唯一标识
 		/// </summary>
-		[FieldSelector(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
+		[Field(Expression = "", Type = SelectorType.Enviroment)]
+		[Column]
+		[Index("URL_IDENTITY_TASKID_NAME")]
 		public string Identity { get; set; }
 
 		/// <summary>
 		/// 所属爬虫的任务编号
 		/// </summary>
-		[FieldSelector(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
+		[Field(Expression = "", Type = SelectorType.Enviroment)]
+		[Column]
+		[Index("URL_IDENTITY_TASKID_NAME")]
 		public string TaskId { get; set; }
 
 		/// <summary>
 		/// 所属爬虫的名称
 		/// </summary>
-		[FieldSelector(Expression = "", Type = SelectorType.Enviroment, Length = 120)]
+		[Field(Expression = "", Type = SelectorType.Enviroment)]
+		[Column]
+		[Index("URL_IDENTITY_TASKID_NAME")]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// 采集的链接
 		/// </summary>
-		[FieldSelector(Expression = "", Type = SelectorType.Enviroment, Length = 255)]
+		[Field(Expression = "", Type = SelectorType.Enviroment)]
+		[Column]
+		[Index("URL_IDENTITY_TASKID_NAME")]
 		public string Url { get; set; }
 
 		/// <summary>
 		/// 下载的内容
 		/// </summary>
-		[FieldSelector(Expression = "", Type = SelectorType.Enviroment)]
+		[Field(Expression = "", Type = SelectorType.Enviroment)]
+		[Column]
 		public string Content { get; set; }
 	}
 }

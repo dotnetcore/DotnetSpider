@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Monitor;
+﻿using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Core.Scheduler;
@@ -19,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Events;
+using DotnetSpider.Core.Infrastructure;
 #if NETFRAMEWORK
 using System.Net;
 #else

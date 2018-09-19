@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-
-namespace DotnetSpider.Downloader
+﻿namespace DotnetSpider.Downloader
 {
 	public class FakeDownloader : Downloader
 	{

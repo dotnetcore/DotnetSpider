@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DotnetSpider.Common;
 using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Core.Pipeline

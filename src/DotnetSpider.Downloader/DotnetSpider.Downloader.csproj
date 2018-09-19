@@ -3,7 +3,7 @@
     <TargetFrameworks>netstandard2.0;net451;</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>3.0.0</Version>
+    <Version>3.0.4</Version>
     <Authors>zlzforever@163.com;</Authors>
     <AssemblyName>DotnetSpider.Downloader</AssemblyName>
     <Copyright>Copyright 2018 Lewis Zou</Copyright>

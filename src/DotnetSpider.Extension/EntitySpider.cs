@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core.Pipeline;
+﻿using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
@@ -13,8 +12,6 @@ namespace DotnetSpider.Extension
 	/// </summary>
 	public abstract class EntitySpider : DistributedSpider
 	{
-		protected bool UseEntityModelExtractor { get; set; } = true;
-
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -39,7 +36,7 @@ namespace DotnetSpider.Extension
 		/// 添加爬虫实体类
 		/// </summary>
 		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
-		public void AddEntityType<T>() where T : new()
+		public void AddEntityType<T>() where T : IBaseEntity
 		{
 			AddEntityType<T>(null, null);
 		}
@@ -49,7 +46,7 @@ namespace DotnetSpider.Extension
 		/// </summary>
 		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
 		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
-		public void AddEntityType<T>(IDataHandler dataHandler) where T : new()
+		public void AddEntityType<T>(IDataHandler dataHandler) where T : IBaseEntity
 		{
 			AddEntityType<T>(null, dataHandler);
 		}
@@ -59,7 +56,7 @@ namespace DotnetSpider.Extension
 		/// </summary>
 		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
 		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
-		public void AddEntityType<T>(ITargetRequestExtractor targetUrlsExtractor) where T : new()
+		public void AddEntityType<T>(ITargetRequestExtractor targetUrlsExtractor) where T : IBaseEntity
 		{
 			AddEntityType<T>(targetUrlsExtractor, null);
 		}
@@ -70,11 +67,11 @@ namespace DotnetSpider.Extension
 		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
 		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
 		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
-		public void AddEntityType<T>(ITargetRequestExtractor targetUrlsExtractor, IDataHandler dataHandler) where T : new()
+		public void AddEntityType<T>(ITargetRequestExtractor targetUrlsExtractor, IDataHandler dataHandler) where T : IBaseEntity
 		{
 			CheckIfRunning();
 
-			var processor = new EntityProcessor<T>(UseEntityModelExtractor ? null : new ModelExtractor(), targetUrlsExtractor, dataHandler);
+			var processor = new EntityProcessor<T>(new ModelExtractor<T>(), targetUrlsExtractor, dataHandler);
 			AddPageProcessors(processor);
 		}
 
@@ -84,7 +81,7 @@ namespace DotnetSpider.Extension
 		/// <returns>数据管道</returns>
 		protected override IPipeline GetDefaultPipeline()
 		{
-			return DbModelPipeline.GetPipelineFromAppConfig();
+			return DbEntityPipeline.GetPipelineFromAppConfig();
 		}
 	}
 }

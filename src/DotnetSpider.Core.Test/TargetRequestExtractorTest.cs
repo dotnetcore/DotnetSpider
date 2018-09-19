@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Net.Http;
-using DotnetSpider.Common;
 using DotnetSpider.Core.Processor.TargetRequestExtractors;
 using Xunit;
 using DotnetSpider.Downloader;

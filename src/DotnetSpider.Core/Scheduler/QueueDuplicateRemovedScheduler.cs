@@ -1,4 +1,4 @@
-using DotnetSpider.Common;
+using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Downloader;
 using System;
 using System.Collections.Generic;

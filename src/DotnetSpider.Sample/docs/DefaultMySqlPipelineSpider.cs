@@ -1,7 +1,5 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core;
+﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Extension;
 using DotnetSpider.Extension.Pipeline;
 using System.Collections.Generic;
 

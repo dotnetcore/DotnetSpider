@@ -35,6 +35,7 @@ namespace DotnetSpider.Core
 
 		public static string DefaultDatabase = "dotnetspider";
 
+		public static string ChromeDriverPath = string.Empty;
 
 		/// <summary>
 		/// 开启企业服务(HTTP), 默认打开, 测试的时候开关

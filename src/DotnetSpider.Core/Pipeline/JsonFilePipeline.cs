@@ -3,7 +3,6 @@ using System.Text;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using DotnetSpider.Common;
 using System;
 using Microsoft.Extensions.Logging;
 
@@ -48,7 +47,7 @@ namespace DotnetSpider.Core.Pipeline
 					resultItem.Request.AddCountOfResults(1);
 					resultItem.Request.AddEffectedRows(1);
 
-					streamWriter.WriteLine(JsonConvert.SerializeObject(resultItem.Results));
+					streamWriter.WriteLine(JsonConvert.SerializeObject(resultItem));
 				}
 			}
 			catch (Exception e)

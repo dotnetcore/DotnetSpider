@@ -1,6 +1,7 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Extension;
+﻿using DotnetSpider.Extension;
 using DotnetSpider.Extension.Downloader;
+using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
@@ -19,36 +20,49 @@ namespace DotnetSpider.Sample.docs
 			AddEntityType<Product>();
 		}
 
-		[TargetRequestSelector(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
-		[TableInfo("test", "sku", TableNamePostfix.Today, Indexs = new[] { "CategoryName" }, Uniques = new[] { "CategoryName,Sku", "Sku" })]
-		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		class Product
+		[Target(XPaths = new[] { "//span[@class=\"p-num\"]" }, Patterns = new[] { @"&page=[0-9]+&" })]
+		[Schema("test","sku",TableNamePostfix = TableNamePostfix.Today)]
+		[Entity(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
+		class Product : IBaseEntity
 		{
-			[FieldSelector(Expression = "name", Type = SelectorType.Enviroment, Length = 20)]
+			[Field(Expression = "name", Type = SelectorType.Enviroment)]
+			[Index("CAT")]
+			[Unique("CAT_SKU")]
+			[Column(Length =20)]
 			public string CategoryName { get; set; }
 
-			[FieldSelector(Expression = "cat3", Type = SelectorType.Enviroment, Length = 20)]
+			[Field(Expression = "cat3", Type = SelectorType.Enviroment)]
+			[Column(Length = 20)]
 			public int CategoryId { get; set; }
 
-			[FieldSelector(Expression = "./div[1]/a/@href", Length = 20)]
+			[Field(Expression = "./div[1]/a/@href")]
+			[Column(Length = 20)]
 			public string Url { get; set; }
 
-			[FieldSelector(Expression = "./@data-sku", Length = 20)]
+			[Field(Expression = "./@data-sku")]
+			[Column(Length = 20)]
+			[Unique("CAT_SKU")]
+			[Unique("SKU")]
 			public string Sku { get; set; }
 
-			[FieldSelector(Expression = "./div[5]/strong/a", Length = 20)]
+			[Field(Expression = "./div[5]/strong/a")]
+			[Column()]
 			public long CommentsCount { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='p-shop']/@data-shop_name", Length = 20)]
+			[Field(Expression = ".//div[@class='p-shop']/@data-shop_name")]
+			[Column(Length = 200)]
 			public string ShopName { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='p-name']/a/em", Length = 20)]
+			[Field(Expression = ".//div[@class='p-name']/a/em")]
+			[Column(Length = 20)]
 			public string Name { get; set; }
 
-			[FieldSelector(Expression = "./@venderid", Length = 20)]
+			[Field(Expression = "./@venderid")]
+			[Column(Length = 20)]
 			public string VenderId { get; set; }
 
-			[FieldSelector(Expression = "./@jdzy_shop_id", Length = 20)]
+			[Field(Expression = "./@jdzy_shop_id")]
+			[Column(Length = 20)]
 			public string JdzyShopId { get; set; }
 		}
 	}

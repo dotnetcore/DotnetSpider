@@ -37,42 +37,40 @@ namespace DotnetSpider.Extension.Test.Model
 			Assert.Equal(DateTime.Now.ToString("yyyy-MM-dd"), results.First().RunId.ToString("yyyy-MM-dd"));
 		}
 
-
-		[TableInfo("test", "sku2", TableNamePostfix.Today)]
-		[EntitySelector(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
-		private class Product
+		[Entity(Expression = "//li[@class='gl-item']/div[contains(@class,'j-sku-item')]")]
+		private class Product : IBaseEntity
 		{
 			public string AAA;
 			private string bb;
 
-			[FieldSelector(Expression = "cat", Type = SelectorType.Enviroment)]
+			[Field(Expression = "cat", Type = SelectorType.Enviroment)]
 			public string CategoryName { get; set; }
 
-			[FieldSelector(Expression = "cat3", Type = SelectorType.Enviroment)]
+			[Field(Expression = "cat3", Type = SelectorType.Enviroment)]
 			public int CategoryId { get; set; }
 
-			[FieldSelector(Expression = "./div[1]/a/@href")]
+			[Field(Expression = "./div[1]/a/@href")]
 			public string Url { get; set; }
 
-			[FieldSelector(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 
-			[FieldSelector(Expression = "./div[5]/strong/a")]
+			[Field(Expression = "./div[5]/strong/a")]
 			public long CommentsCount { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='p-shop']/@data-shop_name")]
+			[Field(Expression = ".//div[@class='p-shop']/@data-shop_name")]
 			public string ShopName { get; set; }
 
-			[FieldSelector(Expression = ".//div[@class='p-name']/a/em")]
+			[Field(Expression = ".//div[@class='p-name']/a/em")]
 			public string Name { get; set; }
 
-			[FieldSelector(Expression = "./@venderid")]
+			[Field(Expression = "./@venderid")]
 			public string VenderId { get; set; }
 
-			[FieldSelector(Expression = "./@jdzy_shop_id")]
+			[Field(Expression = "./@jdzy_shop_id")]
 			public string JdzyShopId { get; set; }
 
-			[FieldSelector(Expression = "Today", Type = SelectorType.Enviroment)]
+			[Field(Expression = "Today", Type = SelectorType.Enviroment)]
 			public DateTime RunId { get; set; }
 		}
 	}

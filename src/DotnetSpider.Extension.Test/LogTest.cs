@@ -9,9 +9,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
-using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Downloader;
-using DotnetSpider.Common;
 
 namespace DotnetSpider.Extension.Test
 {
@@ -88,7 +86,7 @@ namespace DotnetSpider.Extension.Test
 		{
 			foreach (var resultItem in resultItems)
 			{
-				foreach (var entry in resultItem.Results)
+				foreach (var entry in resultItem)
 				{
 					Console.WriteLine($"{entry.Key}:{entry.Value}");
 				}

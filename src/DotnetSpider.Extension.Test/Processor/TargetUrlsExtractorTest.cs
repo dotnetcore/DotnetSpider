@@ -8,34 +8,34 @@ using Xunit;
 using DotnetSpider.Extraction.Model.Formatter;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction;
-using DotnetSpider.Common;
 using DotnetSpider.Core.Processor.TargetRequestExtractors;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Downloader;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Test.Processor
 {
 	public class TargetRequestExtractorTest
 	{
-		[TargetRequestSelector()]
-		public class Entity15
+		[Target()]
+		public class Entity15 : IBaseEntity
 		{
-			[FieldSelector(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
-		[TargetRequestSelector(XPaths = new[] { "" }, Patterns = new[] { "" })]
-		public class Entity23
+		[Target(XPaths = new[] { "" }, Patterns = new[] { "" })]
+		public class Entity23 : IBaseEntity
 		{
-			[FieldSelector(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
-		[TargetRequestSelector(XPaths = new string[] { null }, Patterns = new string[] { null })]
-		public class Entity24
+		[Target(XPaths = new string[] { null }, Patterns = new string[] { null })]
+		public class Entity24 : IBaseEntity
 		{
-			[FieldSelector(Expression = "./@data-sku")]
+			[Field(Expression = "./@data-sku")]
 			public string Sku { get; set; }
 		}
 
@@ -92,7 +92,7 @@ namespace DotnetSpider.Extension.Test.Processor
 			AutoIncrementTargetRequestExtractorSpider spider = new AutoIncrementTargetRequestExtractorSpider(id);
 			spider.Run();
 			var pipeline = spider.Pipelines.First() as CollectionEntityPipeline;
-			var entities = pipeline.GetCollection("test.baidu_search");
+			var entities = pipeline.GetCollection("DotnetSpider.Extension.Test.Processor.TargetRequestExtractorTest+AutoIncrementTargetRequestExtractorSpider+BaiduSearchEntry");
 			Assert.Equal(60, entities.Count());
 		}
 
@@ -106,38 +106,46 @@ namespace DotnetSpider.Extension.Test.Processor
 
 		private class AutoIncrementTargetRequestExtractorSpider : EntitySpider
 		{
-			[TableInfo("test", "baidu_search")]
-			[EntitySelector(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-			private class BaiduSearchEntry
+			[Schema("test", "baidu_search")]
+			[Entity(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
+			private class BaiduSearchEntry : IBaseEntity
 			{
-				[FieldSelector(Expression = "Keyword", Type = SelectorType.Enviroment, Length = 100)]
+				[Column]
+				[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
 				public string Keyword { get; set; }
 
-				[FieldSelector(Expression = "guid", Type = SelectorType.Enviroment, Length = 100)]
+				[Column]
+				[Field(Expression = "guid", Type = SelectorType.Enviroment)]
 				public string Guid { get; set; }
 
-				[FieldSelector(Expression = ".//h3[@class='c-title']/a")]
+				[Column]
+				[Field(Expression = ".//h3[@class='c-title']/a")]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				public string Title { get; set; }
 
-				[FieldSelector(Expression = ".//h3[@class='c-title']/a/@href")]
+				[Column]
+				[Field(Expression = ".//h3[@class='c-title']/a/@href")]
 				public string Url { get; set; }
 
-				[FieldSelector(Expression = ".//div/p[@class='c-author']/text()")]
+				[Column]
+				[Field(Expression = ".//div/p[@class='c-author']/text()")]
 				[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
 				public string Website { get; set; }
 
-				[FieldSelector(Expression = ".//div/span/a[@class='c-cache']/@href")]
+				[Column]
+				[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
 				public string Snapshot { get; set; }
 
-				[FieldSelector(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
+				[Column]
+				[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
 				public string Details { get; set; }
 
-				[FieldSelector(Expression = ".", Option = FieldOptions.InnerText)]
+				[Column(Length = 0)]
+				[Field(Expression = ".", Option = FieldOptions.InnerText)]
 				[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
 				[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
 				[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]

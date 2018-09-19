@@ -1,7 +1,8 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Extension;
+﻿using DotnetSpider.Extension;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
+using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using System;
 using System.Collections.Generic;
@@ -25,20 +26,26 @@ namespace DotnetSpider.Sample.docs
 			AddPipeline(new ConsoleEntityPipeline());
 		}
 
-		[TableInfo("ctrip", "city", Uniques = new[] { "city_id,run_id" })]
-		[EntitySelector(Expression = "//div[@class='city_item']//a")]
-		class CtripCity
+		[Schema("ctrip", "city")]
+		[Entity(Expression = "//div[@class='city_item']//a")]
+		class CtripCity : IBaseEntity
 		{
-			[FieldSelector(Expression = ".", Length = 100)]
+			[Column]
+			[Field(Expression = ".")]
 			public string name { get; set; }
 
-			[FieldSelector(Expression = "./@title", Length = 100)]
+			[Column]
+			[Field(Expression = "./@title")]
 			public string title { get; set; }
 
-			[FieldSelector(Expression = "./@data-id", Length = 100)]
+			[Column]
+			[Field(Expression = "./@data-id")]
+			[Unique("CITYID_RUNID")]
 			public string city_id { get; set; }
 
-			[FieldSelector(Expression = "Today", Type = SelectorType.Enviroment)]
+			[Column]
+			[Unique("CITYID_RUNID")]
+			[Field(Expression = "Today", Type = SelectorType.Enviroment)]
 			public DateTime run_id { get; set; }
 		}
 	}

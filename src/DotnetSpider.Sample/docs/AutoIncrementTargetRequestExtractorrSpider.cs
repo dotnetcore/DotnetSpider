@@ -1,6 +1,6 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Core.Processor.TargetRequestExtractors;
+﻿using DotnetSpider.Core.Processor.TargetRequestExtractors;
 using DotnetSpider.Extension;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
@@ -30,14 +30,16 @@ namespace DotnetSpider.Sample.docs
 				AddEntityType<News>(new AutoIncrementTargetRequestExtractor("page/1"));
 			}
 
-			[EntitySelector(Expression = "//div[@class='news_block']")]
-			[TableInfo("cnblogs", "news")]
+			[Entity(Expression = "//div[@class='news_block']")]
+			[Schema("cnblogs", "news")]
 			class News : BaseEntity
 			{
-				[FieldSelector(Expression = ".//h2[@class='news_entry']")]
+				[Column]
+				[Field(Expression = ".//h2[@class='news_entry']")]
 				public string Name { get; set; }
 
-				[FieldSelector(Expression = ".//span[@class='view']")]
+				[Column]
+				[Field(Expression = ".//span[@class='view']")]
 				public string View { get; set; }
 			}
 		}

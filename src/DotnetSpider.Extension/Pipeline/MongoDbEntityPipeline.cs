@@ -1,20 +1,19 @@
-﻿#if !NET40
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
-using System.Linq;
 using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Downloader;
-using DotnetSpider.Common;
+using System.Linq;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	/// <summary>
 	/// 把解析到的爬虫实体数据存到MongoDb中
 	/// </summary>
-	public class MongoDbEntityPipeline : ModelPipeline
+	public class MongoDbEntityPipeline : EntityPipeline
 	{
 		private readonly MongoClient _client;
 
@@ -30,19 +29,18 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 把解析到的爬虫实体数据存到MongoDb中
 		/// </summary>
-		/// <param name="model">数据模型</param>
 		/// <param name="datas">数据</param>
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
-		protected override int Process(IModel model, IList<dynamic> datas, dynamic sender = null)
+		protected override int Process(IEnumerable<IBaseEntity> datas, dynamic sender = null)
 		{
-			if (datas == null || datas.Count == 0)
+			if (datas == null)
 			{
 				return 0;
 			}
-
-			var db = _client.GetDatabase(model.Table.Database);
-			var collection = db.GetCollection<BsonDocument>(model.Table.FullName);
+			var tableInfo = new TableInfo(datas.First().GetType());
+			var db = _client.GetDatabase(tableInfo.Schema.Database);
+			var collection = db.GetCollection<BsonDocument>(tableInfo.Schema.FullName);
 
 			var action = new Action(() =>
 			{
@@ -63,8 +61,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				action();
 			}
-			return datas.Count;
+			return datas.Count();
 		}
 	}
 }
-#endif

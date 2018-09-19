@@ -4,7 +4,6 @@ using Xunit;
 using DotnetSpider.Core;
 using System.IO;
 using DotnetSpider.Extraction.Model;
-using DotnetSpider.Common;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction;
 using DotnetSpider.Downloader;
@@ -39,10 +38,12 @@ namespace DotnetSpider.Extension.Test.Model
 			File.Delete("file.bbbb");
 		}
 
-		[EntitySelector(Expression = "$.data[*]", Type = SelectorType.JsonPath)]
-		private class Product
+		[Entity(Expression = "$.data[*]", Type = SelectorType.JsonPath)]
+		[Schema]
+		private class Product : IBaseEntity
 		{
-			[FieldSelector(Expression = "$.name", Type = SelectorType.JsonPath, Length = 100)]
+			[Field(Expression = "$.name", Type = SelectorType.JsonPath)]
+			[Column(Length = 100)]
 			public string name { get; set; }
 		}
 	}

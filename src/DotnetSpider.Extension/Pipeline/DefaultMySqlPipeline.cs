@@ -4,7 +4,6 @@ using DotnetSpider.Core;
 using System.Configuration;
 using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Extension.Infrastructure;
-using DotnetSpider.Common;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -68,9 +67,9 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				results.Add(new
 				{
-					Url = resultItem.GetResultItem("url")?.ToString(),
-					Title = resultItem.GetResultItem("title")?.ToString(),
-					Html = resultItem.GetResultItem("html")?.ToString()
+					Url = resultItem["url"]?.ToString(),
+					Title = resultItem["title"]?.ToString(),
+					Html = resultItem["html"]?.ToString()
 				});
 			}
 			using (var conn = ConnectionStringSettings.CreateDbConnection())

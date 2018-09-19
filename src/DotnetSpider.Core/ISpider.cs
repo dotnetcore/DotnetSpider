@@ -1,4 +1,3 @@
-using DotnetSpider.Common;
 using DotnetSpider.Core.Monitor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Downloader;

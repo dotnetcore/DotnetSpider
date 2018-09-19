@@ -1,15 +1,10 @@
 ﻿using DotnetSpider.Broker.Data;
 using DotnetSpider.Broker.Hubs;
-using Microsoft.AspNetCore.Builder.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.IO;
-using System.Text;
 using DotnetSpider.Broker.Services;
 
 namespace DotnetSpider.Broker.Test

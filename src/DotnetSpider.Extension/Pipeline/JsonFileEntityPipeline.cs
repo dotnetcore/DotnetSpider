@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using DotnetSpider.Core;
+using DotnetSpider.Extension.Model;
 using DotnetSpider.Extraction.Model;
-using DotnetSpider.Common;
 
 namespace DotnetSpider.Extension.Pipeline
 {
 	/// <summary>
 	/// 把解析到的爬虫实体数据序列化成JSON并存到文件中
 	/// </summary>
-	public class JsonFileEntityPipeline : ModelPipeline
+	public class JsonFileEntityPipeline : EntityPipeline
 	{
 		private readonly Dictionary<string, StreamWriter> _writers = new Dictionary<string, StreamWriter>();
 
@@ -30,22 +31,24 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 把解析到的爬虫实体数据序列化成JSON并存到文件中
 		/// </summary>
-		/// <param name="model">爬虫实体类的名称</param>
+		/// <param name="entityName">爬虫实体类的名称</param>
 		/// <param name="datas">实体类数据</param>
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override int Process(IModel model, IList<dynamic> datas, dynamic sender = null)
+		protected override int Process(IEnumerable<IBaseEntity> datas, dynamic sender = null)
 		{
-			if (datas == null || datas.Count == 0)
+			if (datas == null || datas.Count() == 0)
 			{
 				return 0;
 			}
 
+			var tableInfo = new TableInfo(datas.First().GetType());
+
 			StreamWriter writer;
 			var identity = GetIdentity(sender);
 			var dataFolder = Path.Combine(Env.BaseDirectory, "json", identity);
-			var jsonFile = Path.Combine(dataFolder, $"{model.Table.FullName}.json");
+			var jsonFile = Path.Combine(dataFolder, $"{tableInfo.Schema.FullName}.json");
 			if (_writers.ContainsKey(jsonFile))
 			{
 				writer = _writers[jsonFile];
@@ -64,7 +67,7 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				writer.WriteLine(entry.ToString());
 			}
-			return datas.Count;
+			return datas.Count();
 		}
 	}
 }

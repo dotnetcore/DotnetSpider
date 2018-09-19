@@ -1,4 +1,3 @@
-using DotnetSpider.Common;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
@@ -44,7 +43,7 @@ namespace DotnetSpider.Core.Pipeline
 					{
 						printWriter.WriteLine("url:\t" + resultItem.Request.Url);
 
-						foreach (var entry in resultItem.Results)
+						foreach (var entry in resultItem)
 						{
 							if (entry.Value is IList value)
 							{

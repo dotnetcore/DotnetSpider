@@ -1,5 +1,3 @@
-using System;
-
 namespace DotnetSpider.Broker.Models
 {
 	public class ErrorViewModel

@@ -6,7 +6,7 @@ using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Runtime.CompilerServices;
 using DotnetSpider.Extraction.Model;
-using DotnetSpider.Common;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -15,7 +15,7 @@ namespace DotnetSpider.Extension.Pipeline
 	/// LoadFile是批量导入模式通过命令 LOAD DATA LOCAL INFILE '{filePath}' INTO TABLE `{schema}`.`{dababase}` FIELDS TERMINATED BY '$'  ENCLOSED BY '#' LINES TERMINATED BY '@END@' IGNORE 1 LINES; 还原。
 	/// InsertSql是完整的Insert SQL语句, 需要一条条执行来导入数据
 	/// </summary>
-	public class MySqlEntityFilePipeline : ModelPipeline
+	public class MySqlEntityFilePipeline : EntityPipeline
 	{
 		private readonly Dictionary<string, StreamWriter> _writers = new Dictionary<string, StreamWriter>();
 
@@ -55,18 +55,18 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override int Process(IModel model, IList<dynamic> datas, dynamic sender = null)
+		protected override int Process(IEnumerable<IBaseEntity> datas, dynamic sender = null)
 		{
-			if (datas == null || datas.Count == 0)
+			if (datas == null || !datas.Any())
 			{
 				return 0;
 			}
-
+			var tableInfo = new TableInfo(datas.First().GetType());
 			StreamWriter writer;
-			var tableName = model.Table.FullName;
+			var tableName = tableInfo.Schema.FullName;
 			var identity = GetIdentity(sender);
 			var dataFolder = Path.Combine(Env.BaseDirectory, "mysql", identity);
-			var mysqlFile = Path.Combine(dataFolder, $"{model.Table.Database}.{tableName}.sql");
+			var mysqlFile = Path.Combine(dataFolder, $"{tableInfo.Schema.Database}.{tableName}.sql");
 			if (_writers.ContainsKey(mysqlFile))
 			{
 				writer = _writers[mysqlFile];
@@ -86,17 +86,17 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				case FileType.LoadFile:
 					{
-						AppendLoadFile(writer, model, datas);
+						AppendLoadFile(writer, tableInfo, datas);
 						break;
 					}
 				case FileType.InsertSql:
 					{
-						AppendInsertSqlFile(writer, model, datas);
+						AppendInsertSqlFile(writer, tableInfo, datas);
 						break;
 					}
 			}
 
-			return datas.Count;
+			return datas.Count();
 		}
 
 		/// <summary>
@@ -112,22 +112,22 @@ namespace DotnetSpider.Extension.Pipeline
 			}
 		}
 
-		private void AppendInsertSqlFile(StreamWriter writer, IModel model, IEnumerable<dynamic> items)
+		private void AppendInsertSqlFile(StreamWriter writer, TableInfo tableInfo, IEnumerable<dynamic> items)
 		{
 			StringBuilder builder = new StringBuilder();
 			foreach (var item in items)
 			{
 				//{Environment.NewLine}
-				builder.Append($"INSERT IGNORE INTO `{model.Table.Database}`.`{model.Table.FullName}` (");
-				var lastColumn = model.Fields.Last();
-				foreach (var column in model.Fields)
+				builder.Append($"INSERT IGNORE INTO `{tableInfo.Schema.Database}`.`{tableInfo.Schema.FullName}` (");
+				var lastColumn = tableInfo.Columns.Last();
+				foreach (var column in tableInfo.Columns)
 				{
 					builder.Append(column.Equals(lastColumn) ? $"`{column.Name}`" : $"`{column.Name}`, ");
 				}
 
 				builder.Append(") VALUES (");
 
-				foreach (var column in model.Fields)
+				foreach (var column in tableInfo.Columns)
 				{
 					var value = item[column.Name];
 					value = value == null ? "" : MySqlHelper.EscapeString(value.ToString());
@@ -140,13 +140,13 @@ namespace DotnetSpider.Extension.Pipeline
 			writer.Write(builder.ToString());
 		}
 
-		private void AppendLoadFile(StreamWriter writer, IModel model, IEnumerable<dynamic> items)
+		private void AppendLoadFile(StreamWriter writer, TableInfo tableInfo, IEnumerable<dynamic> items)
 		{
 			StringBuilder builder = new StringBuilder();
 			foreach (var item in items)
 			{
 				builder.Append("@END@");
-				foreach (var column in model.Fields)
+				foreach (var column in tableInfo.Columns)
 				{
 					var value = item[column.Name];
 					if (value != null)

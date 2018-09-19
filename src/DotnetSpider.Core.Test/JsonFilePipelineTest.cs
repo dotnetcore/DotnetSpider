@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using DotnetSpider.Common;
 using Xunit;
 using DotnetSpider.Downloader;
 
@@ -18,7 +17,7 @@ namespace DotnetSpider.Core.Test
 		private void Before()
 		{
 			_resultItems = new ResultItems();
-			_resultItems.AddOrUpdateResultItem("content", "爬虫工具");
+			_resultItems["content"] = "爬虫工具";
 			Request request = new Request("http://www.baidu.com", null);
 			_resultItems.Request = request;
 		}

@@ -24,25 +24,19 @@ namespace DotnetSpider.Extraction.Model
 		bool TakeFromHead { get; }
 
 		/// <summary>
-		/// 爬虫实体对应的数据库表信息
-		/// 允许 TableInfo 为空, 有可能是临时数据并不需要落库的
-		/// </summary>
-		TableInfo Table { get; }
-
-		/// <summary>
 		/// 爬虫实体定义的数据库列信息
 		/// </summary>
-		HashSet<FieldSelector> Fields { get; }
+		HashSet<Field> Fields { get; }
 
 		/// <summary>
 		/// 目标链接的选择器
 		/// </summary>
-		IEnumerable<TargetRequestSelector> TargetRequestSelectors { get; }
+		IEnumerable<Target> Targets { get; }
 
 		/// <summary>
 		/// 共享值的选择器
 		/// </summary>
-		IEnumerable<SharedValueSelector> SharedValueSelectors { get; }
+		IEnumerable<Shared> Shareds { get; }
 
 		string Identity { get; }
 	}

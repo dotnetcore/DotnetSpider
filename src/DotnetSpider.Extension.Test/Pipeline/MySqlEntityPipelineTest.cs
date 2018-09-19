@@ -9,10 +9,10 @@ using DotnetSpider.Extension.Processor;
 using MySql.Data.MySqlClient;
 using Xunit;
 using DotnetSpider.Extraction.Model.Attribute;
-using DotnetSpider.Common;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction;
 using DotnetSpider.Downloader;
+using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Test.Pipeline
 {
@@ -33,7 +33,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			Env.HubService = false;
 		}
 
-		protected virtual DbModelPipeline CreatePipeline(PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate)
+		protected virtual DbEntityPipeline CreatePipeline(PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate)
 		{
 			return new MySqlEntityPipeline(DefaultConnectionString, pipelineMode);
 		}
@@ -56,30 +56,26 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				{
 				}
 
-				var spider = new DefaultSpider();
-
-				EntityProcessor<Entity15> processor = new EntityProcessor<Entity15>();
-
 				var pipeline = new MySqlEntityPipeline("Database='mysql';Data Source=localhost;User ID=root;Password=;Port=3306;SslMode=None;");
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
-				resultItems.AddOrUpdateResultItem(processor.Model.Identity,
-					new Tuple<IModel, IList<dynamic>>(processor.Model, new[] {
-						new Dictionary<string, dynamic>
-						{
-							{ "int", "1"},
-							{ "bool", "1"},
-							{ "bigint", "11"},
-							{ "string", "aaa"},
-							{ "time", "2018-06-12"},
-							{ "float", "1"},
-							{ "double", "1"},
-							{ "string1", "abc"},
-							{ "string2", "abcdd"},
-							{ "decimal", "1"}
-						}
-				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				resultItems["aaaa"] =
+					new List<Entity15> {
+						new Entity15
+					{
+						 Int=1,
+						 Bool=true,
+						 BigInt=11,
+						 String="aaa",
+						 Time=new DateTime(2018,06,12),
+						 Float=1,
+						 Double=1,
+						 String1="abc",
+						 String2="abcdd",
+						 Decimal=1
+					}
+					};
+				pipeline.Process(new ResultItems[] { resultItems }, null);
 
 				var columns = conn.Query<ColumnInfo>("SELECT COLUMN_NAME as `Name`, COLUMN_TYPE as `Type` FROM information_schema.columns WHERE table_name='table15' AND table_schema = 'test';").ToList(); ;
 				Assert.Equal(12, columns.Count);
@@ -144,11 +140,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				// 3. Create data
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<AutoIncrementPrimaryKey>
 				{
 					new AutoIncrementPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
 					new AutoIncrementPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" }
-				}));
+				};
 				var processArgument = new ResultItems[] { resultItems };
 
 				// 4. Execute pipline
@@ -158,10 +154,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				resultItems = new ResultItems();
 				resultItems.Request = new Request();
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<AutoIncrementPrimaryKey>
 				{
 					 new AutoIncrementPrimaryKey { Id = 1, Category = "4C" }
-				}));
+				};
 
 				updateModePipeline.Process(new ResultItems[] { resultItems }, spider);
 
@@ -199,11 +195,11 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				// 3. Create data
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<MultiPrimaryKey>
 				{
 					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
 					new MultiPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" }
-				}));
+				};
 				var processArgument = new ResultItems[] { resultItems };
 
 				// 4. Execute pipline
@@ -213,10 +209,10 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				resultItems = new ResultItems();
 				resultItems.Request = new Request();
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<MultiPrimaryKey>
 				{
 					 new MultiPrimaryKey { Sku="111", Category = "4C", Name="Product 2" }
-				}));
+				};
 
 				updateModePipeline.Process(new ResultItems[] { resultItems }, spider);
 
@@ -243,7 +239,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					conn.Execute($"use test; DROP TABLE autoincrementprimarykey;");
 				}
 				catch { }
-				var spider = new DefaultSpider();
 
 				var pipeline = CreatePipeline();
 				var metadata = new ModelDefinition<AutoIncrementPrimaryKey>();
@@ -251,13 +246,13 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
 
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<AutoIncrementPrimaryKey>
 				{
 					new AutoIncrementPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
 					new AutoIncrementPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" },
 					new AutoIncrementPrimaryKey { Sku = "112", Category = null, Name = "Product 3" }
-				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				};
+				pipeline.Process(new ResultItems[] { resultItems }, null);
 
 				var list = conn.Query($"use test; select * from autoincrementprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 
@@ -283,7 +278,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 					conn.Execute($"use test; DROP TABLE noneprimarykey;");
 				}
 				catch { }
-				var spider = new DefaultSpider();
 
 				var pipeline = CreatePipeline();
 				var metadata = new ModelDefinition<NonePrimaryKey>();
@@ -291,21 +285,21 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
 
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<NonePrimaryKey>
 				{
 					new NonePrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
 					new NonePrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" },
 					new NonePrimaryKey { Sku = "112", Category = null, Name = "Product 3" },
 					new NonePrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
-				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				};
+				pipeline.Process(new ResultItems[] { resultItems }, null);
 
-				var list = conn.Query($"use test; select * from noneprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
+				var list = conn.Query<NonePrimaryKey>($"use test; select * from noneprimarykey").ToList();
 
 				Assert.Equal(4, list.Count);
-				Assert.Equal("110", list[0]["sku"]);
-				Assert.Equal("111", list[1]["sku"]);
-				Assert.Null(list[2]["category"]);
+				Assert.Equal("110", list[0].Sku);
+				Assert.Equal("111", list[1].Sku);
+				Assert.Null(list[2].Category);
 				try
 				{
 					conn.Execute($"use test; DROP TABLE noneprimarykey;");
@@ -335,12 +329,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
 
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<Timestamp>
 				{
 					new Timestamp { Sku = "110", Category = "3C", Name = "Product 1" },
 					new Timestamp { Sku = "111", Category = "3C", Name = "Product 2" },
 					new Timestamp { Sku = "112", Category = null, Name = "Product 3" }
-				}));
+				};
 				pipeline.Process(new ResultItems[] { resultItems }, spider);
 
 				var list = conn.Query($"use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
@@ -374,7 +368,6 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				}
 				catch { }
 
-				var spider = new DefaultSpider();
 
 				var pipeline = CreatePipeline();
 				pipeline.AutoTimestamp = false;
@@ -384,13 +377,13 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
 
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<Timestamp>
 				{
 					new Timestamp { Sku = "110", Category = "3C", Name = "Product 1" },
 					new Timestamp { Sku = "111", Category = "3C", Name = "Product 2" },
 					new Timestamp { Sku = "112", Category = null, Name = "Product 3" }
-				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				};
+				pipeline.Process(new ResultItems[] { resultItems }, null);
 
 				var list = conn.Query($"use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
 
@@ -423,13 +416,13 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
 
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<MultiPrimaryKey>
 				{
 					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
 					new MultiPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" },
 					new MultiPrimaryKey { Sku = "112", Category = null, Name = "Product 3" },
 					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
-				}));
+				};
 				pipeline.Process(new ResultItems[] { resultItems }, spider);
 
 				var list = conn.Query($"use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
@@ -456,9 +449,9 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				{
 					conn.Execute($"use test; DROP TABLE multiprimarykey;");
 				}
-				catch { }
-
-				var spider = new DefaultSpider();
+				catch
+				{
+				}
 
 				var pipeline = CreatePipeline();
 				var metadata = new ModelDefinition<MultiPrimaryKey>();
@@ -466,25 +459,25 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				var resultItems = new ResultItems();
 				resultItems.Request = new Request();
 
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<MultiPrimaryKey>
 				{
 					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
 					new MultiPrimaryKey { Sku = "111", Category = "3C", Name = "Product 2" },
 					new MultiPrimaryKey { Sku = "112", Category = null, Name = "Product 3" },
 					new MultiPrimaryKey { Sku = "110", Category = "3C", Name = "Product 1" },
-				}));
-				pipeline.Process(new ResultItems[] { resultItems }, spider);
+				};
+				pipeline.Process(new ResultItems[] { resultItems }, null);
 
 				var insertNewAndUpdateOldPipeline = CreatePipeline(PipelineMode.InsertNewAndUpdateOld);
 
 				resultItems = new ResultItems();
 				resultItems.Request = new Request();
-				resultItems.AddOrUpdateResultItem(metadata.Identity, new Tuple<IModel, IList<dynamic>>(metadata, new dynamic[]
+				resultItems["AAA"] = new List<MultiPrimaryKey>
 				{
-					 new AutoIncrementPrimaryKey { Sku = "110", Name="Product 1", Category = "4C" }
-				}));
+					 new MultiPrimaryKey { Sku = "110", Name="Product 1", Category = "4C" }
+				};
 
-				insertNewAndUpdateOldPipeline.Process(new ResultItems[] { resultItems }, spider);
+				insertNewAndUpdateOldPipeline.Process(new ResultItems[] { resultItems }, null);
 
 				var list = conn.Query($"use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 
@@ -501,55 +494,58 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 		#endregion
 
-		[TableInfo("test", "multiprimarykey", UpdateColumns = new[] { "Category" })]
-		public class MultiPrimaryKey
+		[Schema("test", "multiprimarykey")]
+		public class MultiPrimaryKey : IBaseEntity
 		{
-			[FieldSelector(Expression = "category")]
+			[Update]
+			[Column(Length = 50)]
 			public string Category { get; set; }
 
-			[FieldSelector(Expression = "name", IsPrimary = true, Length = 50)]
+			[Primary]
+			[Column(Length = 50)]
 			public string Name { get; set; }
 
-			[FieldSelector(Expression = "sku", IsPrimary = true, Length = 50)]
+			[Primary]
+			[Column(Length = 50)]
 			public string Sku { get; set; }
 		}
-
-		[TableInfo("test", "timestamp")]
+		[Schema("test", "timestamp")]
 		public class Timestamp : BaseEntity
 		{
-			[FieldSelector(Expression = "Category", Type = SelectorType.Enviroment, Length = 100)]
+			[Column(Length = 100)]
 			public string Category { get; set; }
 
-			[FieldSelector(Expression = "name")]
+			[Column]
 			public string Name { get; set; }
 
-			[FieldSelector(Expression = "sku", Length = 100)]
+			[Column(Length = 100)]
 			public string Sku { get; set; }
 		}
 
-		[TableInfo("test", "autoincrementprimarykey", UpdateColumns = new[] { "Category" })]
+		[Schema("test", "autoincrementprimarykey")]
 		public class AutoIncrementPrimaryKey : BaseEntity
 		{
-			[FieldSelector(Expression = "Category", Type = SelectorType.Enviroment, Length = 100)]
+			[Update]
+			[Column]
 			public string Category { get; set; }
 
-			[FieldSelector(Expression = "name")]
+			[Column]
 			public string Name { get; set; }
 
-			[FieldSelector(Expression = "sku", Length = 100)]
+			[Column]
 			public string Sku { get; set; }
 		}
 
-		[TableInfo("test", "noneprimarykey")]
-		public class NonePrimaryKey
+		[Schema("test", "noneprimarykey")]
+		public class NonePrimaryKey : IBaseEntity
 		{
-			[FieldSelector(Expression = "Category", Type = SelectorType.Enviroment, Length = 100)]
+			[Column(Length = 100)]
 			public string Category { get; set; }
 
-			[FieldSelector(Expression = "name")]
+			[Column()]
 			public string Name { get; set; }
 
-			[FieldSelector(Expression = "sku", Length = 100)]
+			[Column(Length = 100)]
 			public string Sku { get; set; }
 		}
 
@@ -564,37 +560,37 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
-		[TableInfo("test", "table15")]
-		private class Entity15
+		[Schema("test", "table15")]
+		private class Entity15 : IBaseEntity
 		{
-			[FieldSelector(Expression = "Url")]
+			[Column()]
 			public int Int { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column()]
 			public bool Bool { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column()]
 			public long BigInt { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column()]
 			public string String { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column()]
 			public DateTime Time { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column()]
 			public float Float { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column()]
 			public double Double { get; set; }
 
-			[FieldSelector(Expression = "Url", Length = 100)]
+			[Column(Length =100)]
 			public string String1 { get; set; }
 
-			[FieldSelector(Expression = "Url", Length = 0)]
+			[Column(Length = 0)]
 			public string String2 { get; set; }
 
-			[FieldSelector(Expression = "Url")]
+			[Column()]
 			public decimal Decimal { get; set; }
 		}
 	}

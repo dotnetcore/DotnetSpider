@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.IO;
 using System;
-using DotnetSpider.Common;
 
 namespace DotnetSpider.Core.Pipeline
 {
