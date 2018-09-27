@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DotnetSpider.Downloader;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Processor
 {
@@ -13,9 +16,20 @@ namespace DotnetSpider.Core.Processor
 		public ILogger Logger { get; set; }
 
 		/// <summary>
-		/// 目标链接的解析器、抽取器
+		/// 用于判断是否需要处理当前 Request, 以及解析出来的目标链接是否需要添加到队列.
+		/// RequestExtractor 解析出来的结果也需验证是否符合 Filter, 如果不符合 Filter 那么最终也不会进入到 Processor, 即为无意义的 Request
 		/// </summary>
-		public ITargetRequestExtractor TargetUrlsExtractor { get; set; }
+		public IFilter Filter { get; set; }
+
+		/// <summary>
+		/// 解析目标链接的接口
+		/// </summary>
+		public IRequestExtractor RequestExtractor { get; set; }
+
+		/// <summary>
+		/// 是否最后一页的判断接口, 如果是最后一页, 则不需要执行 RequestExtractor
+		/// </summary>
+		public ILastPageChecker LastPageChecker { get; set; }
 
 		/// <summary>
 		/// 去掉链接#后面的所有内容
@@ -43,22 +57,9 @@ namespace DotnetSpider.Core.Processor
 			properties[Env.UrlPropertyKey] = page.Request.Url;
 			properties[Env.TargetUrlPropertyKey] = page.TargetUrl;
 
-			if (TargetUrlsExtractor != null)
+			if (!(page.Request.GetProperty(Page.Depth) == 1 && !Env.FilterDefaultRequest))
 			{
-				bool isTarget = true;
-				if ((page.Request.GetProperty(Page.Depth) != 1 || Env.ProcessorFilterDefaultRequest) && TargetUrlsExtractor.TargetUrlPatterns != null && TargetUrlsExtractor.TargetUrlPatterns.Count > 0 && !TargetUrlsExtractor.TargetUrlPatterns.Contains(null))
-				{
-					foreach (var regex in TargetUrlsExtractor.TargetUrlPatterns)
-					{
-						isTarget = regex.IsMatch(page.Request.Url);
-						if (isTarget)
-						{
-							break;
-						}
-					}
-				}
-
-				if (!isTarget)
+				if (Filter != null && !Filter.IsMatch(page.Request))
 				{
 					return;
 				}
@@ -66,31 +67,41 @@ namespace DotnetSpider.Core.Processor
 
 			Handle(page);
 
-			// IAfterDownloaderHandler中可以实现解析, 有可能不再需要解析了
-			if (!page.SkipExtractedTargetRequests && TargetUrlsExtractor != null)
-			{
-				ExtractUrls(page);
-			}
-		}
+			if (LastPageChecker != null && LastPageChecker.IsLastPage(page)) return;
 
-		/// <summary>
-		/// 解析目标链接并添加到Page对象中, 供Spider对象添加到对列中
-		/// </summary>
-		/// <param name="page">页面数据</param>
-		protected virtual void ExtractUrls(Page page)
-		{
-			var links = TargetUrlsExtractor.ExtractRequests(page);
-			if (links != null)
+			IEnumerable<Request> requests;
+			if (RequestExtractor != null && (requests = RequestExtractor.Extract(page)) != null)
 			{
-				foreach (var link in links)
+				foreach (var link in requests)
 				{
+					if (Filter != null && !Filter.IsMatch(link)) continue;
+
 					if (CleanPound)
 					{
 						link.Url = link.Url.Split('#')[0];
 					}
+
 					page.AddTargetRequest(link);
 				}
 			}
+		}
+
+		public BasePageProcessor SetRequestExtractor(IRequestExtractor requestExtractor)
+		{
+			RequestExtractor = requestExtractor;
+			return this;
+		}
+
+		public BasePageProcessor SetFilter(IFilter filter)
+		{
+			Filter = filter;
+			return this;
+		}
+
+		public BasePageProcessor SetLastPageChecker(ILastPageChecker lastPageChecker)
+		{
+			LastPageChecker = lastPageChecker;
+			return this;
 		}
 	}
 }

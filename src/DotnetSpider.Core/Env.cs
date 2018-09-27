@@ -156,7 +156,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 配置PageProcessor是否对深度为1的链接进行正则筛选
 		/// </summary>
-		public static bool ProcessorFilterDefaultRequest = true;
+		public static bool FilterDefaultRequest = true;
 
 		/// <summary>
 		/// 任务唯一标识的最大长度限制

@@ -4,6 +4,7 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extraction.Model;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Extension
 {
@@ -12,6 +13,8 @@ namespace DotnetSpider.Extension
 	/// </summary>
 	public abstract class EntitySpider : DistributedSpider
 	{
+		private readonly Dictionary<string, ModelProcessor> _processors = new Dictionary<string, ModelProcessor>();
+
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -36,29 +39,10 @@ namespace DotnetSpider.Extension
 		/// 添加爬虫实体类
 		/// </summary>
 		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
-		public void AddEntityType<T>() where T : IBaseEntity
-		{
-			AddEntityType<T>(null, null);
-		}
-
-		/// <summary>
-		/// 添加爬虫实体类
-		/// </summary>
-		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
-		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
-		public void AddEntityType<T>(IDataHandler dataHandler) where T : IBaseEntity
-		{
-			AddEntityType<T>(null, dataHandler);
-		}
-
-		/// <summary>
-		/// 添加爬虫实体类
-		/// </summary>
-		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
 		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
-		public void AddEntityType<T>(ITargetRequestExtractor targetUrlsExtractor) where T : IBaseEntity
+		public EntityProcessor<T> AddEntityType<T>() where T : IBaseEntity
 		{
-			AddEntityType<T>(targetUrlsExtractor, null);
+			return AddEntityType<T>(null);
 		}
 
 		/// <summary>
@@ -67,12 +51,23 @@ namespace DotnetSpider.Extension
 		/// <typeparam name="T">爬虫实体类的类型, 必须继承自 ISpiderEntity</typeparam>
 		/// <param name="targetUrlsExtractor">目标链接的解析、筛选器</param>
 		/// <param name="dataHandler">对解析的结果进一步加工操作</param>
-		public void AddEntityType<T>(ITargetRequestExtractor targetUrlsExtractor, IDataHandler dataHandler) where T : IBaseEntity
+		public EntityProcessor<T> AddEntityType<T>(IDataHandler dataHandler) where T : IBaseEntity
 		{
 			CheckIfRunning();
+			var typeName = typeof(T).FullName;
+			if (!_processors.ContainsKey(typeName))
+			{
+				var processor = new EntityProcessor<T>(new ModelExtractor<T>(), dataHandler);
+				_processors.Add(typeName, processor);
+				AddPageProcessors(processor);
+			}
+			return _processors[typeName] as EntityProcessor<T>;
+		}
 
-			var processor = new EntityProcessor<T>(new ModelExtractor<T>(), targetUrlsExtractor, dataHandler);
-			AddPageProcessors(processor);
+		public ModelProcessor GetProcessor<T>()
+		{
+			var typeName = typeof(T).FullName;
+			return _processors.ContainsKey(typeName) ? _processors[typeName] : null;
 		}
 
 		/// <summary>

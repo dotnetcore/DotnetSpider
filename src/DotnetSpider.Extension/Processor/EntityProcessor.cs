@@ -13,11 +13,9 @@ namespace DotnetSpider.Extension.Processor
 		/// 构造方法
 		/// </summary>
 		/// <param name="extractor">爬虫实体的解析器</param>
-		/// <param name="targetRequestExtractor">目标链接的解析、筛选器</param>
 		/// <param name="dataHandlers">对解析的结果进一步加工操作</param>
-		public EntityProcessor(IModelExtractor extractor = null, ITargetRequestExtractor targetRequestExtractor = null,
-			params IDataHandler[] dataHandlers)
-			: base(new ModelDefinition<T>(), extractor ?? new ModelExtractor<T>(), targetRequestExtractor, dataHandlers)
+		public EntityProcessor(IModelExtractor extractor = null, params IDataHandler[] dataHandlers)
+			: base(new ModelDefinition<T>(), extractor ?? new ModelExtractor<T>(), dataHandlers)
 		{
 		}
 	}

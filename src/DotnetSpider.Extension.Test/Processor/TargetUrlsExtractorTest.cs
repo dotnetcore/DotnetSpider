@@ -8,11 +8,12 @@ using Xunit;
 using DotnetSpider.Extraction.Model.Formatter;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction;
-using DotnetSpider.Core.Processor.TargetRequestExtractors;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Downloader;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Core;
+using DotnetSpider.Core.Processor.RequestExtractor;
 
 namespace DotnetSpider.Extension.Test.Processor
 {
@@ -39,52 +40,6 @@ namespace DotnetSpider.Extension.Test.Processor
 			public string Sku { get; set; }
 		}
 
-
-		[Fact(DisplayName = "TargetRequestSelector_Null")]
-		public void TargetRequestSelector_Null()
-		{
-			try
-			{
-				var processor = new EntityProcessor<Entity15>();
-			}
-			catch (Exception e)
-			{
-				Assert.Equal("Region xpath and patterns should not be null both", e.Message);
-				return;
-			}
-			throw new Exception("Failed.");
-		}
-
-		[Fact(DisplayName = "TargetRequestSelector_EmptyRegion_EmptyPattern")]
-		public void TargetRequestSelector_EmptyRegion_EmptyPattern()
-		{
-			try
-			{
-				var processor = new EntityProcessor<Entity23>();
-			}
-			catch (ArgumentException e)
-			{
-				Assert.NotNull(e);
-				return;
-			}
-			throw new Exception("Failed.");
-		}
-
-		[Fact(DisplayName = "TargetRequestSelector_NullRegion_NullPattern")]
-		public void TargetRequestSelector_NullRegion_NullPattern()
-		{
-			try
-			{
-				var processor = new EntityProcessor<Entity24>();
-			}
-			catch (ArgumentException e)
-			{
-				Assert.NotNull(e);
-				return;
-			}
-			throw new Exception("Failed.");
-		}
-
 		[Fact(DisplayName = "AutoIncrementTargetUrlsExtractor_Test")]
 		public void AutoIncrementTargetRequestExtractor_Test()
 		{
@@ -96,11 +51,11 @@ namespace DotnetSpider.Extension.Test.Processor
 			Assert.Equal(60, entities.Count());
 		}
 
-		private class TestTargetRequestExtractorTermination : ITargetRequestExtractorTermination
+		private class TestLastPageChecker : ILastPageChecker
 		{
-			public bool IsTerminated(Response response)
+			public bool IsLastPage(Page page)
 			{
-				return response.Request.Url.Contains("&pn=2");
+				return page.Request.Url.Contains("&pn=2");
 			}
 		}
 
@@ -174,7 +129,10 @@ namespace DotnetSpider.Extension.Test.Processor
 						Headers = new Dictionary<string, object> { { "Upgrade-Insecure-Requests", "1" } },
 						Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
 					});
-				AddEntityType<BaiduSearchEntry>(new AutoIncrementTargetRequestExtractor("&pn=0", 1, new TestTargetRequestExtractorTermination()));
+
+				AddEntityType<BaiduSearchEntry>()
+					.SetRequestExtractor(new AutoIncrementRequestExtractor("&pn=0", 1))
+					.SetLastPageChecker(new TestLastPageChecker());
 				AddPipeline(new CollectionEntityPipeline());
 			}
 		}

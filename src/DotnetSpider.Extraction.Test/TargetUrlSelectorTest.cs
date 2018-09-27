@@ -1,4 +1,4 @@
-﻿namespace DotnetSpider.Extension.Test.Model
+﻿namespace DotnetSpider.Extraction.Test
 {
 	public class TargetUrlSelectorTest
 	{

@@ -1,9 +1,11 @@
-﻿using DotnetSpider.Extension;
+﻿using DotnetSpider.Core.Processor;
+using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using System;
+using DotnetSpider.Core.Processor.Filter;
 
 namespace DotnetSpider.Sample.docs
 {
@@ -23,11 +25,10 @@ namespace DotnetSpider.Sample.docs
 				AddRequests("http://www.cnblogs.com");
 				AddRequests("https://www.cnblogs.com/news/");
 				AddPipeline(new ConsoleEntityPipeline());
-				AddEntityType<News>();
-				AddEntityType<BlogSumary>();
+				AddEntityType<News>().Filter = new PatternFilter("^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+");
+				AddEntityType<BlogSumary>().Filter = new PatternFilter("^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+");
 			}
 
-			[Target(Patterns = new[] { "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+" })]
 			[Entity(Expression = "//div[@class='post_item']")]
 			class News : BaseEntity
 			{
@@ -44,7 +45,6 @@ namespace DotnetSpider.Sample.docs
 				public string Url { get; set; }
 			}
 
-			[Target(Patterns = new[] { "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+" })]
 			[Entity(Expression = "//div[@class='post_item']")]
 			class BlogSumary : BaseEntity
 			{

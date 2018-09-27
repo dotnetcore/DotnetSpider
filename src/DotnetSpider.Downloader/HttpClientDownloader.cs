@@ -59,7 +59,7 @@ namespace DotnetSpider.Downloader
 		/// 构造方法
 		/// </summary>
 		/// <param name="timeout">下载超时时间 Download timeout.</param>
-		/// <param name="decodeHtml">下载的内容是否需要HTML解码 Whether <see cref="Page.Content"/> need to Html Decode.</param>
+		/// <param name="decodeHtml">下载的内容是否需要HTML解码 Whether <see cref="Content"/> need to Html Decode.</param>
 		public HttpClientDownloader(int timeout = 8000, bool decodeHtml = false)
 		{
 			_timeout = timeout;

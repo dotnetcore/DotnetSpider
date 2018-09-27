@@ -49,7 +49,7 @@ namespace DotnetSpider.Extraction.Model
 		}
 
 		public ModelDefinition(Selector selector, IEnumerable<Field> fields,
-			IEnumerable<Target> targetRequestSelectors = null,
+			IEnumerable<Target> targets = null,
 			IEnumerable<Shared> sharedValueSelectors = null, int take = 0, bool takeFromHead = true)
 		{
 			Selector = selector;
@@ -64,7 +64,7 @@ namespace DotnetSpider.Extraction.Model
 				throw new ExtractionException("Count of fields should large than 0.");
 			}
 
-			Targets = targetRequestSelectors;
+			Targets = targets;
 			Shareds = sharedValueSelectors;
 			Take = take;
 			TakeFromHead = takeFromHead;
@@ -87,7 +87,7 @@ namespace DotnetSpider.Extraction.Model
 				selector = new Selector { Expression = entitySelector.Expression, Type = entitySelector.Type };
 			}
 
-			var targetUrlsSelectors = type.GetCustomAttributes(typeof(Target), true).Select(s => (Target)s).ToList();
+			var targets = type.GetCustomAttributes(typeof(Target), true).Select(s => (Target)s).ToList();
 			var sharedValueSelectors = type.GetCustomAttributes(typeof(Shared), true).Select(e =>
 			{
 				var p = (Shared)e;
@@ -119,7 +119,7 @@ namespace DotnetSpider.Extraction.Model
 			Selector = selector;
 
 			Fields = fields;
-			Targets = targetUrlsSelectors;
+			Targets = targets;
 			Shareds = sharedValueSelectors;
 			Take = take;
 			TakeFromHead = takeFromHead;

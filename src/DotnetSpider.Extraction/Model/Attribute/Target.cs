@@ -23,7 +23,6 @@ namespace DotnetSpider.Extraction.Model.Attribute
 		public Target(string xpath)
 		{
 			XPaths = new[] { xpath };
-			Patterns = new[] { @"(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?" };
 		}
 
 		public Target(string xpath, string pattern)

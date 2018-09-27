@@ -1,10 +1,10 @@
-﻿using Xunit;
-using DotnetSpider.Downloader;
+﻿using System.Text;
+using Xunit;
 #if !NETFRAMEWORK
-using System.Text;
+
 #endif
 
-namespace DotnetSpider.Core.Test.Downloader
+namespace DotnetSpider.Downloader.Test
 {
 	public class HttpClientDownloaderTest
 	{

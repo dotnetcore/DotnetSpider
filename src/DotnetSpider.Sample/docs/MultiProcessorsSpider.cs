@@ -1,7 +1,8 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Processor.TargetRequestExtractors;
+using DotnetSpider.Core.Processor.Filter;
+using DotnetSpider.Core.Processor.RequestExtractor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Extraction;
 using System;
@@ -67,8 +68,8 @@ namespace DotnetSpider.Sample.docs
 		{
 			public BlogSumaryProcessor()
 			{
-				// 定义目标页的筛选
-				TargetUrlsExtractor = new RegionAndPatternTargetRequestExtractor(".", "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+");
+				RequestExtractor = new XPathRequestExtractor(".");
+				Filter = new PatternFilter(new[] { "^http://www\\.cnblogs\\.com/$", "http://www\\.cnblogs\\.com/sitehome/p/\\d+" });
 			}
 
 			protected override void Handle(Page page)
@@ -95,7 +96,7 @@ namespace DotnetSpider.Sample.docs
 		{
 			public NewsProcessor()
 			{
-				TargetUrlsExtractor = new RegionAndPatternTargetRequestExtractor(null, "^http://www\\.cnblogs\\.com/$", "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+");
+				Filter = new PatternFilter(new[] { "^http://www\\.cnblogs\\.com/$", "^http://www\\.cnblogs\\.com/news/$", "www\\.cnblogs\\.com/news/\\d+" });
 			}
 
 			protected override void Handle(Page page)

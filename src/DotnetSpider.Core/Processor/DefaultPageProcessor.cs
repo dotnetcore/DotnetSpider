@@ -1,4 +1,5 @@
-using DotnetSpider.Core.Processor.TargetRequestExtractors;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Processor
 {
@@ -7,35 +8,6 @@ namespace DotnetSpider.Core.Processor
 	/// </summary>
 	public class DefaultPageProcessor : BasePageProcessor
 	{
-		/// <summary>
-		/// 构造方法
-		/// </summary>
-		/// <param name="partterns">匹配目标链接的正则表达式</param>
-		/// <param name="excludeParterns">排除目标链接的正则表达式</param>
-		public DefaultPageProcessor(string[] partterns = null, string[] excludeParterns = null)
-		{
-			var targetUrlsExtractor = new RegionAndPatternTargetRequestExtractor();
-			if (partterns != null && partterns.Length > 0)
-			{
-				targetUrlsExtractor.AddTargetUrlExtractor(".", partterns);
-			}
-			if (excludeParterns != null && excludeParterns.Length > 0)
-			{
-				targetUrlsExtractor.AddExcludeTargetUrlPatterns(excludeParterns);
-			}
-			TargetUrlsExtractor = targetUrlsExtractor;
-		}
-
-		/// <summary>
-		/// 添加目标链接解析规则
-		/// </summary>
-		/// <param name="regionXpath">目标链接所在区域</param>
-		/// <param name="patterns">匹配目标链接的正则表达式</param>
-		public void AddTargetUrlExtractor(string regionXpath, params string[] patterns)
-		{
-			(TargetUrlsExtractor as RegionAndPatternTargetRequestExtractor)?.AddTargetUrlExtractor(regionXpath, patterns);
-		}
-
 		/// <summary>
 		/// 解析页面数据
 		/// </summary>

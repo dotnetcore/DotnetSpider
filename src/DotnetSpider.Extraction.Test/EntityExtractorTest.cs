@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Xunit;
 using System.Linq;
-using DotnetSpider.Extraction.Model.Attribute;
-using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
+using DotnetSpider.Extraction.Model.Attribute;
+using Xunit;
 
-namespace DotnetSpider.Extension.Test.Model
+namespace DotnetSpider.Extraction.Test
 {
 
 	public class EntityExtractorTest

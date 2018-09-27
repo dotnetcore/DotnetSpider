@@ -17,11 +17,6 @@ namespace DotnetSpider.Core
 		public bool Retry { get; set; }
 
 		/// <summary>
-		/// 对此页面跳过解析目标链接的操作
-		/// </summary>
-		public bool SkipExtractedTargetRequests { get; set; }
-
-		/// <summary>
 		/// 页面解析出来的目标链接不加入到调度队列中
 		/// </summary>
 		public bool SkipTargetRequests { get; set; }
@@ -189,6 +184,19 @@ namespace DotnetSpider.Core
 			{
 				TargetRequests.Add(request);
 			}
+		}
+
+		public Dictionary<string, dynamic> CopyProperties()
+		{
+			var properties = new Dictionary<string, dynamic>();
+			foreach (var kv in Request.Properties)
+			{
+				if (kv.Key != Env.UrlPropertyKey && kv.Key != Env.TargetUrlPropertyKey)
+				{
+					properties.Add(kv.Key, kv.Value);
+				}
+			}
+			return properties;
 		}
 
 		private bool IsAvailable(Request request)

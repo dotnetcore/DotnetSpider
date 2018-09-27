@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Jil" Version="2.16.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="2.42.0.1" />
   </ItemGroup>
 
   <ItemGroup>

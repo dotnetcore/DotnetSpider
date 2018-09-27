@@ -1,8 +1,8 @@
-﻿using DotnetSpider.Extraction.Model.Formatter;
-using System;
+﻿using System;
+using DotnetSpider.Extraction.Model.Formatter;
 using Xunit;
 
-namespace DotnetSpider.Extension.Test.Model
+namespace DotnetSpider.Extraction.Test
 {
 
 	public class FormatterTest

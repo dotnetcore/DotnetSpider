@@ -92,9 +92,8 @@ namespace DotnetSpider.Extension.Test.Processor
 			new ModelDefinition<Entity14>();
 			var processor = new EntityProcessor<Entity14>();
 
-			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
-			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"222\"]") == null);
+			Assert.True(processor.ContainsXpath("//*[@id=\"1111\"]"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-9]+&"));
 		}
 
 		[Fact(DisplayName = "TargetRequestSelector_2Region_1Pattern")]
@@ -103,13 +102,9 @@ namespace DotnetSpider.Extension.Test.Processor
 			new ModelDefinition<Entity16>();
 			var processor = new EntityProcessor<Entity16>();
 
-			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
-
-			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"2222\"]"));
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"2222\"]")[0].ToString());
-
-			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
+			Assert.True(processor.ContainsXpath("//*[@id=\"1111\"]"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-9]+&"));
+			Assert.True(processor.ContainsXpath("//*[@id=\"2222\"]"));
 		}
 
 		[Fact(DisplayName = "TargetRequestSelector_1Region_2Pattern")]
@@ -117,10 +112,10 @@ namespace DotnetSpider.Extension.Test.Processor
 		{
 			new ModelDefinition<Entity17>();
 			var processor = new EntityProcessor<Entity17>();
-			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
-			Assert.Equal(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[1].ToString());
-			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
+
+			Assert.True(processor.ContainsXpath("//*[@id=\"1111\"]"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-9]+&"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-1]+&"));
 		}
 
 		[Fact(DisplayName = "TargetRequestSelector_2Region_2Pattern")]
@@ -128,15 +123,11 @@ namespace DotnetSpider.Extension.Test.Processor
 		{
 			new ModelDefinition<Entity18>();
 			var processor = new EntityProcessor<Entity18>();
-			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
-			Assert.Equal(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[1].ToString());
 
-			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"2222\"]").Count);
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"2222\"]")[0].ToString());
-			Assert.Equal(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"2222\"]")[1].ToString());
-
-			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
+			Assert.True(processor.ContainsXpath("//*[@id=\"1111\"]"));
+			Assert.True(processor.ContainsXpath("//*[@id=\"2222\"]"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-9]+&"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-1]+&"));
 		}
 
 		[Fact(DisplayName = "TargetRequestSelector_Multi_2Region_2Pattern")]
@@ -145,13 +136,10 @@ namespace DotnetSpider.Extension.Test.Processor
 			new ModelDefinition<Entity19>();
 			var processor = new EntityProcessor<Entity19>();
 
-			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
-
-			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"2222\"]"));
-			Assert.Equal(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"2222\"]")[0].ToString());
-
-			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
+			Assert.True(processor.ContainsXpath("//*[@id=\"1111\"]"));
+			Assert.True(processor.ContainsXpath("//*[@id=\"2222\"]"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-9]+&"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-1]+&"));
 		}
 		[Fact(DisplayName = "TargetRequestSelector_Multi_2SameRegion_2Pattern")]
 		public void TargetRequestSelector_Multi_2SameRegion_2Pattern()
@@ -159,11 +147,10 @@ namespace DotnetSpider.Extension.Test.Processor
 			new ModelDefinition<Entity20>();
 			var processor = new EntityProcessor<Entity20>();
 
-			Assert.Equal(2, processor.GetTargetUrlPatterns("//*[@id=\"1111\"]").Count);
-			Assert.Equal(@"&page=[0-1]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[1].ToString());
-
-			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
+			Assert.True(processor.ContainsXpath("//*[@id=\"1111\"]"));
+			Assert.False(processor.ContainsXpath("//*[@id=\"2222\"]"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-9]+&"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-1]+&"));
 		}
 
 		[Fact(DisplayName = "TargetRequestSelector_Multi_2SameRegion_2SamePattern")]
@@ -172,10 +159,8 @@ namespace DotnetSpider.Extension.Test.Processor
 			new ModelDefinition<Entity21>();
 			var processor = new EntityProcessor<Entity21>();
 
-			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
-
-			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
+			Assert.True(processor.ContainsXpath("//*[@id=\"1111\"]"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-9]+&"));
 		}
 
 		[Fact(DisplayName = "TargetRequestSelector_Multi_2Region_2SamePattern")]
@@ -184,13 +169,9 @@ namespace DotnetSpider.Extension.Test.Processor
 			new ModelDefinition<Entity22>();
 			var processor = new EntityProcessor<Entity22>();
 
-			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"1111\"]"));
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"1111\"]")[0].ToString());
-
-			Assert.Single(processor.GetTargetUrlPatterns("//*[@id=\"2222\"]"));
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns("//*[@id=\"2222\"]")[0].ToString());
-
-			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
+			Assert.True(processor.ContainsXpath("//*[@id=\"1111\"]"));
+			Assert.True(processor.ContainsXpath("//*[@id=\"2222\"]"));
+			Assert.True(processor.ContainsPattern(@"&page=[0-9]+&"));
 		}
 
 		[Fact(DisplayName = "TargetRequestSelector_NullRegion_1Pattern")]
@@ -198,10 +179,8 @@ namespace DotnetSpider.Extension.Test.Processor
 		{
 			new ModelDefinition<Entity25>();
 			var processor = new EntityProcessor<Entity25>();
-			Assert.Single(processor.GetTargetUrlPatterns(null));
-			Assert.Equal(@"&page=[0-9]+&", processor.GetTargetUrlPatterns(null)[0].ToString());
-
-			Assert.True(processor.GetTargetUrlPatterns("//*[@id=\"3333\"]") == null);
+			Assert.True(processor.ContainsXpath("."));
+			Assert.True(processor.ContainsPattern(@"&page=[0-9]+&"));
 		}
 
 		[Fact(DisplayName = "TempEntityNoPrimaryInfo")]

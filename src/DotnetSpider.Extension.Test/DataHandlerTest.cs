@@ -1,14 +1,14 @@
-﻿using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Processor;
-using Xunit;
+﻿using System.IO;
 using DotnetSpider.Core;
-using System.IO;
+using DotnetSpider.Downloader;
+using DotnetSpider.Extension.Model;
+using DotnetSpider.Extension.Processor;
+using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
-using DotnetSpider.Extraction;
-using DotnetSpider.Downloader;
+using Xunit;
 
-namespace DotnetSpider.Extension.Test.Model
+namespace DotnetSpider.Extension.Test
 {
 	public class DataHandlerTest
 	{

@@ -4,9 +4,10 @@ using DotnetSpider.Core.Processor;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System;
+using DotnetSpider.Core.Processor.Filter;
+using DotnetSpider.Core.Processor.RequestExtractor;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Core.Processor.TargetRequestExtractors;
 
 namespace DotnetSpider.Extension.Processor
 {
@@ -35,67 +36,56 @@ namespace DotnetSpider.Extension.Processor
 		/// <param name="extractor">模型解析器</param>
 		/// <param name="targetRequestExtractor">目标链接的解析器</param>
 		/// <param name="dataHandlers">数据处理器</param>
-		public ModelProcessor(IModel model, IModelExtractor extractor = null, ITargetRequestExtractor targetRequestExtractor = null,
-			params IDataHandler[] dataHandlers)
+		public ModelProcessor(IModel model, IModelExtractor extractor = null, params IDataHandler[] dataHandlers)
 		{
 			Model = model ?? throw new ArgumentNullException(nameof(model));
 
 			Extractor = extractor ?? new ModelExtractor();
 
-			if (targetRequestExtractor != null)
+			var patterns = new HashSet<string>();
+			foreach (var ps in model.Targets.Select(t => t.Patterns))
 			{
-				TargetUrlsExtractor = targetRequestExtractor;
+				if (ps != null)
+				{
+					foreach (var p in ps)
+					{
+						patterns.Add(p);
+					}
+				}
 			}
-
-			RegionAndPatternTargetRequestExtractor regionAndPatternTargetUrlsExtractor;
-			if (TargetUrlsExtractor == null)
+			var excludePatterns = new HashSet<string>();
+			foreach (var ps in model.Targets.Select(t => t.ExcludePatterns))
 			{
-				regionAndPatternTargetUrlsExtractor = new RegionAndPatternTargetRequestExtractor();
-				TargetUrlsExtractor = regionAndPatternTargetUrlsExtractor;
+				if (ps != null)
+				{
+					foreach (var p in ps)
+					{
+						excludePatterns.Add(p);
+					}
+				}
+			}
+			Filter = new PatternFilter(patterns, excludePatterns);
+
+			var xpaths = new HashSet<string>();
+			foreach (var xs in model.Targets.Select(t => t.XPaths))
+			{
+				if (xs != null)
+				{
+					foreach (var x in xs)
+					{
+						xpaths.Add(x);
+					}
+				}
+			}
+			if (xpaths.Any(x => x == null || x == "."))
+			{
+				RequestExtractor = new XPathRequestExtractor(".");
 			}
 			else
 			{
-				regionAndPatternTargetUrlsExtractor = TargetUrlsExtractor as RegionAndPatternTargetRequestExtractor;
-			}
-
-			if (regionAndPatternTargetUrlsExtractor == null)
-			{
-				return;
-			}
-
-			if (Model.Targets != null && Model.Targets.Any())
-			{
-				foreach (var targetUrlsSelector in Model.Targets)
+				foreach (var xpath in xpaths)
 				{
-					var patterns = targetUrlsSelector.Patterns?.Select(x => x?.Trim()).Distinct().ToArray();
-					var xpaths = targetUrlsSelector.XPaths?.Select(x => x?.Trim()).Distinct().ToList();
-					if (xpaths == null && patterns == null)
-					{
-						throw new SpiderException("Region xpath and patterns should not be null both");
-					}
-
-					if (xpaths != null && xpaths.Count > 0)
-					{
-						foreach (var xpath in xpaths)
-						{
-							regionAndPatternTargetUrlsExtractor.AddTargetUrlExtractor(xpath, patterns);
-						}
-					}
-					else
-					{
-						if (patterns != null && patterns.Length > 0)
-						{
-							regionAndPatternTargetUrlsExtractor.AddTargetUrlExtractor(null, patterns);
-						}
-					}
-
-					if (targetUrlsSelector.ExcludePatterns != null)
-					{
-						foreach (var p in targetUrlsSelector.ExcludePatterns)
-						{
-							regionAndPatternTargetUrlsExtractor.ExcludeTargetUrlPatterns.Add(new Regex(p));
-						}
-					}
+					RequestExtractor = new XPathRequestExtractor(xpaths);
 				}
 			}
 
@@ -119,26 +109,6 @@ namespace DotnetSpider.Extension.Processor
 			}
 
 			_dataHandlers.Add(handler);
-		}
-
-		/// <summary>
-		/// Only used for test
-		/// </summary>
-		/// <param name="region"></param>
-		/// <returns></returns>
-		internal virtual bool ContainsTargetUrlRegion(string region)
-		{
-			return ((RegionAndPatternTargetRequestExtractor)TargetUrlsExtractor).ContainsTargetUrlRegion(region);
-		}
-
-		/// <summary>
-		/// Only used for test
-		/// </summary>
-		/// <param name="region"></param>
-		/// <returns></returns>
-		internal virtual List<Regex> GetTargetUrlPatterns(string region)
-		{
-			return (TargetUrlsExtractor as RegionAndPatternTargetRequestExtractor)?.GetTargetUrlPatterns(region);
 		}
 
 		/// <summary>
@@ -166,6 +136,26 @@ namespace DotnetSpider.Extension.Processor
 			}
 
 			page.AddResultItem(Model.Identity, items);
+		}
+
+		/// <summary>
+		/// Only used for test
+		/// </summary>
+		/// <param name="region"></param>
+		/// <returns></returns>
+		internal bool ContainsXpath(string xpath)
+		{
+			return ((XPathRequestExtractor)RequestExtractor).ContainsXpath(xpath);
+		}
+
+		/// <summary>
+		/// Only used for test
+		/// </summary>
+		/// <param name="region"></param>
+		/// <returns></returns>
+		internal bool ContainsPattern(string pattern)
+		{
+			return ((PatternFilter)Filter).ContainsPattern(pattern);
 		}
 	}
 }

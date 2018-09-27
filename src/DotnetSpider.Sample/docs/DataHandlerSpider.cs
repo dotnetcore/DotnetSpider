@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
-using DotnetSpider.Core.Processor.TargetRequestExtractors;
 using DotnetSpider.Downloader;
 using DotnetSpider.Downloader.AfterDownloadCompleteHandlers;
 using DotnetSpider.Extension;
@@ -98,7 +97,6 @@ namespace DotnetSpider.Sample.docs
 					{ "Upgrade-Insecure-Requests","1" }
 				});
 				Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("g_page_config = {", "g_srp_loadCss();", 16, 22));
-				AddBeforeProcessor(new TargetRequestHandler(new AutoIncrementTargetRequestExtractor("&s=0", 44)));
 				AddBeforeProcessor(new MyBeforeProcessorHandler());
 				SkipTargetRequestsWhenResultIsEmpty = true;
 				AddRequest(new Request("https://s.taobao.com/search?q=妙可蓝多&imgfile=&js=1&stats_click=search_radio_all%3A1&ie=utf8&sort=sale-desc&s=0&tab=all", new Dictionary<string, dynamic> { { "bidwordstr", "妙可蓝多" } }));

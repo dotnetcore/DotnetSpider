@@ -1,6 +1,8 @@
 using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using DotnetSpider.Core.Processor;
+using DotnetSpider.Core.Processor.Filter;
+using DotnetSpider.Core.Processor.RequestExtractor;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Downloader;
 
@@ -14,7 +16,11 @@ namespace DotnetSpider.Sample.docs
 				// use memoery queue scheduler
 				new QueueDuplicateRemovedScheduler(),
 				// default page processor will save whole html, and extract urls to target urls via regex
-				new DefaultPageProcessor(new[] { "cnblogs\\.com" }))
+				new DefaultPageProcessor
+				{
+					Filter = new PatternFilter(new[] { "cnblogs\\.com" }),
+					RequestExtractor = new XPathRequestExtractor(".")
+				})
 				// save crawler result to file in the folder: \{running directory}\data\{crawler identity}\{guid}.dsd
 				.AddPipeline(new FilePipeline());
 
