@@ -182,16 +182,19 @@ namespace DotnetSpider.Downloader
 		/// <returns>下载内容封装好的页面对象 (a <see cref="Response"/> instance that contains requested page infomations, like Html source, headers, etc.)</returns>
 		public Response Download(Request request)
 		{
-			lock (this)
+			if (!_injectedCookies && CookieInjector != null)
 			{
-				if (!_injectedCookies && CookieInjector != null)
+				lock (this)
 				{
-					CookieInjector.Inject(this);
-					_injectedCookies = true;
-				}
-				if (NetworkCenter.Current.Executor != null)
-				{
-					NetworkCenter.Current.Executor.Logger = NetworkCenter.Current.Executor.Logger ?? Logger;
+					if (!_injectedCookies && CookieInjector != null)
+					{
+						CookieInjector.Inject(this);
+						_injectedCookies = true;
+					}
+					if (NetworkCenter.Current.Executor != null)
+					{
+						NetworkCenter.Current.Executor.Logger = NetworkCenter.Current.Executor.Logger ?? Logger;
+					}
 				}
 			}
 			BeforeDownload(ref request);

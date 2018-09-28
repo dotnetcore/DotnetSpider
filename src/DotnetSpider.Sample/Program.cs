@@ -1,4 +1,8 @@
-﻿using DotnetSpider.Sample.docs;
+﻿using DotnetSpider.Downloader;
+using DotnetSpider.Sample.docs;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 
 namespace DotnetSpider.Sample
@@ -13,6 +17,13 @@ namespace DotnetSpider.Sample
 			ThreadPool.SetMinThreads(256, 256);
 #endif
 
+			//HttpClientDownloader downloader = new HttpClientDownloader();
+			//var response = downloader.Download(new Request("http://www.163.com")
+			//{
+			//	Method = HttpMethod.Post,
+			//	Content = JsonConvert.SerializeObject(new { a = "bb" }),
+			//	ContentType = "application/json"
+			//});
 
 			CrawlerWholeSiteSpider.Run();
 		}
