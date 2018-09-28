@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace DotnetSpider.Core.Infrastructure.Database
+namespace DotnetSpider.Core.Infrastructure
 {
 	/// <summary>
 	/// Database Driver Factory.
@@ -15,7 +15,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 	/// <summary xml:lang="zh-CN">
 	/// 数据库驱动工厂
 	/// </summary>
-	public abstract class DbProviderFactories
+	public abstract class DatabaseProviderFactories
 	{
 		/// <summary>
 		/// MySql provider name
@@ -46,7 +46,7 @@ namespace DotnetSpider.Core.Infrastructure.Database
 
 		private static readonly string[] DataProviders = { "mysqlconnector.dll", "mysql.data.dll", "npgsql.dll" };
 
-		static DbProviderFactories()
+		static DatabaseProviderFactories()
 		{
 			RegisterFactory(SqlServerProvider, SqlClientFactory.Instance);
 

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using DotnetSpider.Core;
 using System.Configuration;
-using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Extension.Infrastructure;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {

@@ -1,5 +1,4 @@
 ﻿using DotnetSpider.Core.Infrastructure;
-using DotnetSpider.Core.Infrastructure.Database;
 using System.Configuration;
 using System.Linq;
 
@@ -19,7 +18,7 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <summary>
 		/// 数据库类型
 		/// </summary>
-		public Database2 DataSource = Database2.MySql;
+		public Database DataSource = Database.MySql;
 
 		/// <summary>
 		/// 查询的SQL语句

@@ -1,10 +1,10 @@
 ﻿using DotnetSpider.Core.Monitor;
-using DotnetSpider.Core.Infrastructure.Database;
 using System.Data;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
 using Microsoft.Extensions.Logging;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Monitor
 {
@@ -147,7 +147,7 @@ namespace DotnetSpider.Extension.Monitor
 			}
 			else
 			{
-				if (Env.DataConnectionStringSettings != null && Env.DataConnectionStringSettings.ProviderName == DbProviderFactories.MySqlProvider)
+				if (Env.DataConnectionStringSettings != null && Env.DataConnectionStringSettings.ProviderName == DatabaseProviderFactories.MySqlProvider)
 				{
 					conn = new MySqlConnection(Env.DataConnectionStringSettings.ConnectionString);
 				}

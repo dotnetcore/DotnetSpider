@@ -1,4 +1,6 @@
-﻿namespace DotnetSpider.Core
+﻿using Microsoft.Extensions.Logging;
+
+namespace DotnetSpider.Core
 {
 	/// <summary>
 	/// 运行记录接口
@@ -6,6 +8,8 @@
 	/// </summary>
 	public interface IExecuteRecord
 	{
+		ILogger Logger { get; set; }
+
 		/// <summary>
 		/// 添加运行记录
 		/// </summary>

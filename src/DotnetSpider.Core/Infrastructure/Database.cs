@@ -9,7 +9,7 @@ namespace DotnetSpider.Core.Infrastructure
 	/// 数据库类型
 	/// </summary>
 	[Flags]
-	public enum Database2
+	public enum Database
 	{
 		/// <summary>
 		/// MySql

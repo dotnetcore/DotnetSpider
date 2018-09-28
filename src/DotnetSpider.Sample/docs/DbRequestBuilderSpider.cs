@@ -17,7 +17,7 @@ namespace DotnetSpider.Sample.docs
 		{
 			Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("json(", ");", 5, 0));
 			AddPipeline(new ConsoleEntityPipeline());
-			AddRequestBuilder(new DbRequestBuilder(Database2.MySql, Env.DataConnectionString,
+			AddRequestBuilder(new DatabaseRequestBuilder(Database.MySql, Env.DataConnectionString,
 				$"SELECT * FROM test.jd_sku", new[] { "sku" },
 				"http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json"));
 

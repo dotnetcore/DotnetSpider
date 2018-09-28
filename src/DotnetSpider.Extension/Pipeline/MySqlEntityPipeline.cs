@@ -8,6 +8,7 @@ using DotnetSpider.Extraction.Model;
 using Microsoft.Extensions.Logging;
 using DotnetSpider.Extension.Model;
 using System.Collections.Generic;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {

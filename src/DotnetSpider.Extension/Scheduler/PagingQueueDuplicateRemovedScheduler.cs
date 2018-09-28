@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using DotnetSpider.Core;
-using DotnetSpider.Core.Infrastructure.Database;
+using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Core.Scheduler;
 using DotnetSpider.Downloader;
 using Polly;

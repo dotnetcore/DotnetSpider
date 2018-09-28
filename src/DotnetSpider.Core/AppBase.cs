@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DotnetSpider.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
@@ -12,7 +13,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public abstract class AppBase : Named, IAppBase
 	{
-		public static SystemConsoleTheme Theme { get; } = new SystemConsoleTheme(
+		public static SystemConsoleTheme ConsoleLogTheme { get; set; } = new SystemConsoleTheme(
 			new Dictionary<ConsoleThemeStyle, SystemConsoleThemeStyle>
 			{
 				[ConsoleThemeStyle.Text] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Gray },
@@ -34,8 +35,7 @@ namespace DotnetSpider.Core
 			});
 
 		private string _identity = Guid.NewGuid().ToString("N");
-
-		public static ILoggerFactory LoggerFactory;
+		private ILoggerFactory _loggerFactory;
 
 		/// <summary>
 		/// 唯一标识
@@ -78,7 +78,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// end time of spider.
 		/// </summary>
-		protected DateTime ExitTime { get; private set; } = DateTime.MinValue;
+		protected DateTime ExitTime { get; private set; }
 
 		/// <summary>
 		/// 运行记录接口
@@ -92,18 +92,6 @@ namespace DotnetSpider.Core
 		/// 任务的实现
 		/// </summary>
 		protected abstract void Execute(params string[] arguments);
-
-		static AppBase()
-		{
-			LoggerFactory = new LoggerFactory();
-
-			var loggerConfiguration = new LoggerConfiguration()
-				.MinimumLevel.Verbose()
-				.WriteTo.Console(theme: Theme)
-				.WriteTo.RollingFile("dotnetspider.log");
-			Log.Logger = loggerConfiguration.CreateLogger();
-			LoggerFactory.AddSerilog();
-		}
 
 		/// <summary>
 		/// 异步运行程序
@@ -123,18 +111,28 @@ namespace DotnetSpider.Core
 		{
 			PrintInfo.Print();
 
-			Logger = LoggerFactory.CreateLogger("DS");
+			_loggerFactory = new LoggerFactory();
+
+			var loggerConfiguration = new LoggerConfiguration()
+				.MinimumLevel.Verbose()
+				.WriteTo.Console(theme: ConsoleLogTheme)
+				.WriteTo.RollingFile("dotnetspider.log");
+
+			if (Env.HubServiceLog)
+			{
+				loggerConfiguration.WriteTo.Http(Env.HubServiceLogUrl, Env.HubServiceToken)
+					.Enrich.WithProperty("NodeId", Env.NodeId).Enrich.WithProperty("Identity", Identity);
+			}
+
+			Log.Logger = loggerConfiguration.CreateLogger();
+			_loggerFactory.AddSerilog();
+
+			Logger = _loggerFactory.CreateLogger("DS");
 
 			if (ExecuteRecord == null)
 			{
-				if (!string.IsNullOrWhiteSpace(Env.HubServiceUrl))
-				{
-					ExecuteRecord = new HttpExecuteRecord(Logger);
-				}
-				else
-				{
-					ExecuteRecord = new LogExecuteRecord(Logger);
-				}
+				ExecuteRecord = string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? (IExecuteRecord)new NullExecuteRecord() : new HttpExecuteRecord();
+				ExecuteRecord.Logger = Logger;
 			}
 
 			if (!ExecuteRecord.Add(TaskId, Name, Identity))

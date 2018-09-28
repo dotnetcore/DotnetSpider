@@ -22,7 +22,6 @@ using DotnetSpider.Core.Infrastructure;
 using System.Net;
 #else
 using System.Text;
-
 #endif
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
@@ -81,12 +80,12 @@ namespace DotnetSpider.Core
 		/// </summary>
 		/// <param name="arguments">程序运行参数</param>
 		/// <returns>返回 True, 则需要执行所有注册的StartUrlsBulder.</returns>
-		protected virtual bool IfRequireRunRequestBuilders(string[] arguments)
+		protected virtual bool IfRequireRequestBuilders(string[] arguments)
 		{
 			return arguments.Any(t => t?.ToLower() == SpiderArguments.ExcludeRequestBuilder);
 		}
 
-		protected virtual bool IfRequireVerifyDataOrGenerateReport(string[] arguments)
+		protected virtual bool IfRequireReport(string[] arguments)
 		{
 			return arguments.Any(t => t?.ToLower() == SpiderArguments.Report);
 		}
@@ -94,36 +93,36 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 通过StartUrlsBuilder来初始化起始链接后的响应操作
 		/// </summary>
-		protected virtual void RunStartRequestBuildersCompleted()
+		protected virtual void OnRequestBuildersCompleted()
 		{
 		}
 
 		/// <summary>
 		/// 数据验证和生成报告
 		/// </summary>
-		protected virtual void OnVerifyDataOrGenerateReport()
+		protected virtual void OnReporting()
 		{
 		}
 
-		protected virtual void AfterVerifyDataOrGenerateReport()
+		protected virtual void OnReported()
 		{
 		}
 
-		protected void VerifyDataOrGenerateReport(string[] arguments)
+		protected void Report(string[] arguments)
 		{
 			NetworkCenter.Current.Execute("verifyAndReport", () =>
 			{
-				if (IfRequireVerifyDataOrGenerateReport(arguments))
+				if (IfRequireReport(arguments))
 				{
 					try
 					{
 						Logger.LogInformation("Start data verification...");
-						OnVerifyDataOrGenerateReport();
+						OnReporting();
 						Logger.LogInformation("Complete data verification.");
 					}
 					finally
 					{
-						AfterVerifyDataOrGenerateReport();
+						OnReported();
 					}
 				}
 			});
@@ -733,7 +732,7 @@ namespace DotnetSpider.Core
 
 			if (arguments.Any(t => t?.ToLower() == SpiderArguments.Report))
 			{
-				VerifyDataOrGenerateReport(arguments);
+				Report(arguments);
 				return;
 			}
 
@@ -835,7 +834,7 @@ namespace DotnetSpider.Core
 
 			IsCompleted = Status == Status.Finished;
 			FlushStatus();
-			VerifyDataOrGenerateReport(arguments);
+			Report(arguments);
 			OnClosed?.Invoke(this, IsCompleted);
 			OnDispose();
 			_exited = true;
@@ -986,18 +985,18 @@ namespace DotnetSpider.Core
 				processor.Logger = processor.Logger ?? Logger;
 			}
 
-			PreparePipelines(arguments);
+			InitPipelines(arguments);
 
-			MonitorCloseSignals();
+			ListenCloseSignals();
 
 			Monitor = Monitor ?? (string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? new LogMonitor() : new HttpMonitor());
 
 			_failingRequestsLogger = new LoggerConfiguration()
 				.MinimumLevel.Verbose().WriteTo.RollingFile($"failing.log").CreateLogger();
 
-			RunRequestBuilders(arguments);
+			OnRequestBuilding(arguments);
 
-			PrepareScheduler();
+			LoadScheduler();
 
 			_monitorFlushInterval = CalculateMonitorFlushInterval();
 
@@ -1310,7 +1309,7 @@ namespace DotnetSpider.Core
 		/// 初始化数据管道
 		/// </summary>
 		/// <param name="arguments">运行参数</param>
-		protected virtual void PreparePipelines(params string[] arguments)
+		protected virtual void InitPipelines(params string[] arguments)
 		{
 			_cached = new List<ResultItems>(PipelineCachedSize);
 
@@ -1393,9 +1392,9 @@ namespace DotnetSpider.Core
 			AvgPipelineSpeed = _pipelineCostTimes / _pipelineTimes;
 		}
 
-		private void RunRequestBuilders(params string[] arguments)
+		private void OnRequestBuilding(params string[] arguments)
 		{
-			if (RequestBuilders != null && RequestBuilders.Count > 0 && IfRequireRunRequestBuilders(arguments))
+			if (RequestBuilders != null && RequestBuilders.Count > 0 && IfRequireRequestBuilders(arguments))
 			{
 				try
 				{
@@ -1408,12 +1407,12 @@ namespace DotnetSpider.Core
 				}
 				finally
 				{
-					RunStartRequestBuildersCompleted();
+					OnRequestBuildersCompleted();
 				}
 			}
 		}
 
-		private void PrepareScheduler()
+		private void LoadScheduler()
 		{
 			if (_requests.Any())
 			{
@@ -1462,7 +1461,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
-		private void MonitorCloseSignals()
+		private void ListenCloseSignals()
 		{
 			if (Env.IsWindows)
 			{

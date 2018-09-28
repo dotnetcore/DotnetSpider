@@ -1,6 +1,4 @@
-﻿using DotnetSpider.Common;
-using DotnetSpider.Common.Dto;
-using DotnetSpider.Downloader;
+﻿using DotnetSpider.Downloader;
 using LZ4;
 using Newtonsoft.Json;
 using Serilog;

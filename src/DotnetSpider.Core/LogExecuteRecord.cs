@@ -7,12 +7,7 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public class LogExecuteRecord : IExecuteRecord
 	{
-		private readonly ILogger _logger;
-
-		public LogExecuteRecord(ILogger logger)
-		{
-			_logger = logger ?? throw new SpiderException($"{nameof(logger)} should not be null.");
-		}
+		public ILogger Logger { get; set; }
 
 		/// <summary>
 		/// 添加运行记录
@@ -28,7 +23,7 @@ namespace DotnetSpider.Core
 				return true;
 			}
 			var msg = string.IsNullOrWhiteSpace(name) ? $"Execute task {taskId}, identity {identity}." : $"Execute task {taskId}, name {name}, identity {identity}.";
-			_logger.LogInformation(msg, identity);
+			Logger?.LogInformation(msg, identity);
 			return true;
 		}
 
@@ -45,7 +40,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 			var msg = string.IsNullOrWhiteSpace(name) ? $"Finish task {taskId}, identity {identity}." : $"Finish task {taskId}, name {name}, identity {identity}.";
-			_logger.LogInformation(msg, identity);
+			Logger?.LogInformation(msg, identity);
 		}
 	}
 }

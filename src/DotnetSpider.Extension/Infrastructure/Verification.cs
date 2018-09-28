@@ -7,7 +7,6 @@ using MimeKit;
 using System.Linq;
 using System.Web;
 using System.IO;
-using DotnetSpider.Core.Infrastructure.Database;
 using Serilog;
 
 namespace DotnetSpider.Extension.Infrastructure

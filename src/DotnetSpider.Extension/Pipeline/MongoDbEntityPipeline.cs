@@ -7,6 +7,7 @@ using DotnetSpider.Extraction.Model;
 using DotnetSpider.Downloader;
 using System.Linq;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -53,7 +54,7 @@ namespace DotnetSpider.Extension.Pipeline
 				reslut.Add(BsonDocument.Create(DateTime.Now));
 				collection.InsertMany(reslut);
 			});
-			if (DbConnectionExtensions.UseNetworkCenter)
+			if (DatabaseExtensions.UseNetworkCenter)
 			{
 				NetworkCenter.Current.Execute("db", action);
 			}

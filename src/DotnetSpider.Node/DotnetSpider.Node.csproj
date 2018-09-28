@@ -29,7 +29,6 @@
     <PackageReference Include="lz4net" Version="1.0.15.93" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DotnetSpider.Common\DotnetSpider.Common.csproj" />
     <ProjectReference Include="..\DotnetSpider.Downloader\DotnetSpider.Downloader.csproj" />
   </ItemGroup>
 </Project>

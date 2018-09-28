@@ -3,7 +3,6 @@ using DotnetSpider.Core;
 using DotnetSpider.Extension.Infrastructure;
 using System.Configuration;
 using System.Data;
-using DotnetSpider.Core.Infrastructure.Database;
 using DotnetSpider.Core.Pipeline;
 using System.Collections.Generic;
 using System;
@@ -11,6 +10,7 @@ using System.Linq;
 using DotnetSpider.Extraction.Model;
 using Microsoft.Extensions.Logging;
 using DotnetSpider.Extension.Model;
+using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -216,17 +216,17 @@ namespace DotnetSpider.Extension.Pipeline
 			IPipeline pipeline;
 			switch (connectionStringSettings.ProviderName)
 			{
-				case DbProviderFactories.PostgreSqlProvider:
+				case DatabaseProviderFactories.PostgreSqlProvider:
 					{
 						pipeline = new PostgreSqlEntityPipeline(connectionStringSettings.ConnectionString);
 						break;
 					}
-				case DbProviderFactories.MySqlProvider:
+				case DatabaseProviderFactories.MySqlProvider:
 					{
 						pipeline = new MySqlEntityPipeline(connectionStringSettings.ConnectionString);
 						break;
 					}
-				case DbProviderFactories.SqlServerProvider:
+				case DatabaseProviderFactories.SqlServerProvider:
 					{
 						pipeline = new SqlServerEntityPipeline(connectionStringSettings.ConnectionString);
 						break;

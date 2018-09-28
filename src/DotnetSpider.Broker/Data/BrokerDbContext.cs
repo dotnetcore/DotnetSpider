@@ -19,6 +19,8 @@ namespace DotnetSpider.Broker.Data
 
 		public virtual DbSet<Worker> Worker { get; set; }
 
+		public BrokerDbContext() { }
+
 		public BrokerDbContext(DbContextOptions<BrokerDbContext> options)
 			: base(options)
 		{
