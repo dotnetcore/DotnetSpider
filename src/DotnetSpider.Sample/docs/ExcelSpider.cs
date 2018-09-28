@@ -15,17 +15,11 @@ namespace DotnetSpider.Sample.docs
 	{
 		protected override void OnInit(params string[] arguments)
 		{
-			//Identity = ("cnblogs_" + DateTime.Now.ToString("yyyy_MM_dd_HHmmss"));
-			AddRequests("https://www.cnblogs.com/");
-
-			//AddRequest("https://www.cnblogs.com/", new Dictionary<string, object> {
-			//	{"Cache-Control","max-age=0" },
-			//	{"Upgrade-Insecure-Requests","1" },
-			//	{"Accept-Encoding","gzip, deflate, sdch" },
+			//AddRequest("www.cnblogs.com", new Dictionary<string, object> {
 			//	{"Accept-Language","zh-CN,zh;q=0.8" },
-			//	{"Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" },
 			//	{"UserAgent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36" }
 			//});
+			AddRequests("https://www.cnblogs.com/");
 			AddEntityType<BlogSearchEntry>();
 			AddPipeline(new ConsoleEntityPipeline());
 		}
@@ -33,6 +27,11 @@ namespace DotnetSpider.Sample.docs
 		[Entity(Expression = "#post_list div.post_item", Type = SelectorType.Css)]
 		public class BlogSearchEntry: BaseEntity
 		{
+			[Column]
+			[Field(Expression = "div.post_item_body", Type = SelectorType.Css)]
+			[ExcelFormatter("[html].innerText('h3 a',0).md5()")]
+			public string Hash { get; set; }
+
 
 			[Column]
 			[Field(Expression = "div.post_item_body", Type = SelectorType.Css)]
