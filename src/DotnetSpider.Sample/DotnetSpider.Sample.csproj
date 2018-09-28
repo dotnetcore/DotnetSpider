@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Extraction.ExcelExpression\DotnetSpider.Extraction.ExcelExpression.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -50,6 +50,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Broker.Test", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Broker", "src\DotnetSpider.Broker\DotnetSpider.Broker.csproj", "{AAD552D8-0D0A-43B0-9C5D-E542AA8998CE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Extraction.ExcelExpression", "src\DotnetSpider.Extraction.ExcelExpression\DotnetSpider.Extraction.ExcelExpression.csproj", "{BA5C9237-1108-4070-B318-B4DCDB983EF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +122,10 @@ Global
 		{AAD552D8-0D0A-43B0-9C5D-E542AA8998CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAD552D8-0D0A-43B0-9C5D-E542AA8998CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAD552D8-0D0A-43B0-9C5D-E542AA8998CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA5C9237-1108-4070-B318-B4DCDB983EF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA5C9237-1108-4070-B318-B4DCDB983EF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA5C9237-1108-4070-B318-B4DCDB983EF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA5C9237-1108-4070-B318-B4DCDB983EF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
