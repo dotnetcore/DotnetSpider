@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFrameworks>net451;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>3.0.5</Version>
+    <Authors>zlzforever@163.com;</Authors>
+    <Company>zlzforever@163.com;</Company>
+    <Description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp;amp; scraping framework for .NET</Description>
+    <Copyright>Copyright 2018 Lewis Zou</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/zlzforever/DotnetSpider</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/zlzforever/DotnetSpider</RepositoryUrl>
+    <PackageTags>DotnetSpider;crawler;dotnet core</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
