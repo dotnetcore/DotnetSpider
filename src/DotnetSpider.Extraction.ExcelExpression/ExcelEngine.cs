@@ -107,21 +107,21 @@ namespace DotnetSpider.Extraction.ExcelExpression
 		{
 			HtmlDocument document = new HtmlDocument();
 			document.LoadHtml(ops[0].StringValue);
-			var html = document.DocumentNode.Attributes[ops[1].StringValue];
+			var html = document.DocumentNode.FirstChild.Attributes[ops[1].StringValue];
 			return new Operand(OperandType.STRING, html.Value);
 		}
 		private Operand F_HasClass(List<Operand> ops)
 		{
 			HtmlDocument document = new HtmlDocument();
 			document.LoadHtml(ops[0].StringValue);
-			var html = document.DocumentNode.HasClass(ops[1].StringValue);
+			var html = document.DocumentNode.FirstChild.HasClass(ops[1].StringValue);
 			return new Operand(OperandType.BOOLEAN, html);
 		}
 		private Operand F_HasAttr(List<Operand> ops)
 		{
 			HtmlDocument document = new HtmlDocument();
 			document.LoadHtml(ops[0].StringValue);
-			var html = document.DocumentNode.Attributes.Contains(ops[1].StringValue);
+			var html = document.DocumentNode.FirstChild.Attributes.Contains(ops[1].StringValue);
 			return new Operand(OperandType.BOOLEAN, html);
 		}
 

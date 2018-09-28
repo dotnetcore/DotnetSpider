@@ -7,7 +7,9 @@ using System.Text;
 namespace DotnetSpider.Extraction
 {
 	/// <summary>
-	/// 类excel 公式提取类,传入值为[html]
+	/// 类 excel 公式提取类,传入值为[html]
+	/// 支持OuterHtml、InnerHtml、InnerText、Attr、HasClass、HasAttr
+	/// 及 ToolGood.Algorithm 各种类 excel 公式
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class ExcelFormatter : Formatter
