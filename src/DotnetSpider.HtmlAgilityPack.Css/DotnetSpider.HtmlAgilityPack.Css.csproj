@@ -3,17 +3,17 @@
     <TargetFrameworks>net451;netstandard2.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>3.0.0</Version>
+    <Version>3.0.6</Version>
     <Authors>zlzforever@163.com;</Authors>
     <AssemblyName>DotnetSpider.HtmlAgilityPack.Css</AssemblyName>
     <Copyright>Copyright 2018 Lewis Zou</Copyright>
     <PackageId>DotnetSpider.HtmlAgilityPack.Css</PackageId>
     <Description>A .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight ,efficient and fast high-level web crawling &amp;amp; scraping framework for .NET</Description>
     <PackageTags>DotnetSpider;crawler;dotnet core</PackageTags>
-    <PackageProjectUrl>https://github.com/zlzforever/DotnetSpider</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/zlzforever/DotnetSpider/master/LICENSE</PackageLicenseUrl>
-    <PackageIconUrl>https://github.com/zlzforever/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
-    <RepositoryUrl>https://github.com/zlzforever/DotnetSpider</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/dotnetcore/DotnetSpider</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/dotnetcore/DotnetSpider/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://github.com/dotnetcore/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider</RepositoryUrl>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
