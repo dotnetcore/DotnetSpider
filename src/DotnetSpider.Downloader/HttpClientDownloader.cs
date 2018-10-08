@@ -1,5 +1,6 @@
 ﻿using DotnetSpider.Proxy;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,11 +8,12 @@ using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-
+#if NETFRAMEWORK
+using System.Text;
+#endif
 [assembly: InternalsVisibleTo("DotnetSpider.Node")]
 
 namespace DotnetSpider.Downloader
@@ -48,8 +50,11 @@ namespace DotnetSpider.Downloader
 
 		private readonly bool _decodeHtml;
 		private readonly int _timeout;
-		private int _getHttpClientCount;
-		private readonly Dictionary<string, HttpClientObject> _pool = new Dictionary<string, HttpClientObject>();
+		private static int _getHttpClientCount;
+
+		private static readonly ConcurrentDictionary<string, HttpClientObject> HttpClientObjectPool =
+			new ConcurrentDictionary<string, HttpClientObject>();
+
 		private HttpClientObject _clientObject;
 
 		/// <summary>
@@ -59,7 +64,7 @@ namespace DotnetSpider.Downloader
 		/// 构造方法
 		/// </summary>
 		/// <param name="timeout">下载超时时间 Download timeout.</param>
-		/// <param name="decodeHtml">下载的内容是否需要HTML解码 Whether <see cref="Content"/> need to Html Decode.</param>
+		/// <param name="decodeHtml">下载的内容是否需要HTML解码 Whether need to Html Decode.</param>
 		public HttpClientDownloader(int timeout = 8000, bool decodeHtml = false)
 		{
 			_timeout = timeout;
@@ -108,7 +113,7 @@ namespace DotnetSpider.Downloader
 					}
 				}
 
-				_clientObject = GetHttpClient(proxy == null ? "DEFAULT" : $"{proxy.Address.ToString()}",
+				_clientObject = GetHttpClient(proxy == null ? "DEFAULT" : $"{proxy.Address}",
 					AllowAutoRedirect, proxy);
 
 				httpResponseMessage =
@@ -190,14 +195,13 @@ namespace DotnetSpider.Downloader
 
 			HttpMessageHandler.CookieContainer.Add(cookie);
 
-			foreach (var kv in _pool)
+			foreach (var kv in HttpClientObjectPool)
 			{
 				kv.Value.Handler.CookieContainer.Add(cookie);
 			}
 		}
 
 		/// <summary>
-		/// Get a <see cref="HttpClientObject"/> from <see cref="IHttpClientPool"/>.
 		/// Return same <see cref="HttpClientObject"/> instance when <paramref name="hash"/> is same.
 		/// This can ensure some pages have same CookieContainer.
 		/// </summary>
@@ -223,10 +227,10 @@ namespace DotnetSpider.Downloader
 				CleanupPool();
 			}
 
-			if (_pool.ContainsKey(hash))
+			if (HttpClientObjectPool.ContainsKey(hash))
 			{
-				_pool[hash].LastUseTime = DateTime.Now;
-				return _pool[hash];
+				HttpClientObjectPool[hash].LastUseTime = DateTime.Now;
+				return HttpClientObjectPool[hash];
 			}
 			else
 			{
@@ -239,8 +243,9 @@ namespace DotnetSpider.Downloader
 					Proxy = proxy,
 					CookieContainer = CopyCookieContainer()
 				};
-				var item = new HttpClientObject(handler, allowAutoRedirect) { LastUseTime = DateTime.Now };
-				_pool.Add(hash, item);
+				var item = new HttpClientObject(handler, allowAutoRedirect) {LastUseTime = DateTime.Now};
+				item.Client.Timeout = new TimeSpan(0, 0, 0, _timeout);
+				HttpClientObjectPool.TryAdd(hash, item);
 				return item;
 			}
 		}
@@ -249,7 +254,7 @@ namespace DotnetSpider.Downloader
 		{
 			List<string> needRemoveEntries = new List<string>();
 			var now = DateTime.Now;
-			foreach (var pair in _pool)
+			foreach (var pair in HttpClientObjectPool)
 			{
 				if ((now - pair.Value.LastUseTime).TotalSeconds > 240)
 				{
@@ -259,8 +264,8 @@ namespace DotnetSpider.Downloader
 
 			foreach (var key in needRemoveEntries)
 			{
-				var item = _pool[key];
-				if (_pool.Remove(key))
+				var item = HttpClientObjectPool[key];
+				if (HttpClientObjectPool.TryRemove(key, out _))
 				{
 					item.Dispose();
 				}
@@ -319,14 +324,14 @@ namespace DotnetSpider.Downloader
 
 				var xRequestedWithHeader = "X-Requested-With";
 				if (request.Headers.ContainsKey(xRequestedWithHeader) &&
-					request.Headers[xRequestedWithHeader].ToString() == "NULL")
+				    request.Headers[xRequestedWithHeader].ToString() == "NULL")
 				{
 					httpRequestMessage.Content.Headers.Remove(xRequestedWithHeader);
 				}
 				else
 				{
 					if (!httpRequestMessage.Content.Headers.Contains(xRequestedWithHeader) &&
-						!httpRequestMessage.Headers.Contains(xRequestedWithHeader))
+					    !httpRequestMessage.Headers.Contains(xRequestedWithHeader))
 					{
 						httpRequestMessage.Content.Headers.TryAddWithoutValidation(xRequestedWithHeader,
 							"XMLHttpRequest");
@@ -344,7 +349,7 @@ namespace DotnetSpider.Downloader
 				BinaryFormatter formatter = new BinaryFormatter();
 				formatter.Serialize(stream, CookieContainer);
 				stream.Seek(0, SeekOrigin.Begin);
-				return (CookieContainer)formatter.Deserialize(stream);
+				return (CookieContainer) formatter.Deserialize(stream);
 			}
 		}
 	}

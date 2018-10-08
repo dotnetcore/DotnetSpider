@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 #if !NETFRAMEWORK
 
@@ -14,6 +15,19 @@ namespace DotnetSpider.Downloader.Test
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 
+		}
+
+		[Fact(DisplayName = "ParallelDownloader")]
+		public void ParallelDownloader()
+		{	var downloader=new HttpClientDownloader();
+			Parallel.For(0, 3, new ParallelOptions
+			{
+				MaxDegreeOfParallelism = 3
+			}, i =>
+			{
+				var d = downloader.Clone();
+				downloader.Download(new Request("http://www.163.com"));
+			});
 		}
 
 		/// <summary>
