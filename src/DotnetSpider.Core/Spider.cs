@@ -37,7 +37,7 @@ namespace DotnetSpider.Core
 	public class Spider : AppBase, ISpider, ISpeedMonitor
 	{
 		private IScheduler _scheduler = new QueueDuplicateRemovedScheduler();
-		private IDownloader _downloader;
+		private IDownloader _downloader = new HttpClientDownloader();
 		private List<ResultItems> _cached;
 		private int _waitCountLimit = 1500;
 		private bool _inited;

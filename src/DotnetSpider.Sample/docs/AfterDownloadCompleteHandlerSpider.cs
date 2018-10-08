@@ -29,6 +29,7 @@ namespace DotnetSpider.Sample.docs
 			{
 				AddRequest($"http://api.search.sina.com.cn/?c=news&t=&q=赵丽颖&pf=2136012948&ps=2130770082&page=0&stime={DateTime.Now.AddYears(-7).AddDays(-1).ToString("yyyy-MM-dd")}&etime={DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}&sort=rel&highlight=1&num=10&ie=utf-8&callback=jQuery1720001955628746606708_1508996230766&_=1508996681484", new Dictionary<string, dynamic> { { "keyword", "赵丽颖" } });
 				AddPipeline(new ConsoleEntityPipeline());
+				Downloader = new HttpClientDownloader();
 				Downloader.AddAfterDownloadCompleteHandler(new ReplaceHandler());
 				AddEntityType<SinaNews>();
 			}
