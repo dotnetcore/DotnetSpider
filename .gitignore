@@ -203,5 +203,9 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
-/src/DotnetSpider.Test/Example/TestExample.cs
-/src/DotnetSpider.Sample/Class2.cs
+
+.DS_Store
+*.nuget.g.targets
+*.nuget.g.props
+project.assets.json
+project.packagespec.json
