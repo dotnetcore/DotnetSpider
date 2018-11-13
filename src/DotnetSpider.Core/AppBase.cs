@@ -155,7 +155,7 @@ namespace DotnetSpider.Core
 
 		public abstract void Pause(Action action = null);
 
-		public abstract void Contiune();
+		public abstract void Continue();
 
 		public abstract void Exit(Action action = null);
 	}

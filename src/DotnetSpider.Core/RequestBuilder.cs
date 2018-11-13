@@ -72,12 +72,13 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public IEnumerable<Request> Build()
 		{
-			List<Request> list = new List<Request>();
-			for (int i = From; i <= To; i += Interval)
+			var list = new List<Request>();
+			for (var i = From; i <= To; i += Interval)
 			{
 				var request = new Request($"{Prefix}{i}{Postfix}");
 				list.Add(request);
 			}
+
 			return list;
 		}
 	}
@@ -107,7 +108,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 时间格式化字符串
 		/// </summary>
-		public string DateFormateString { get; }
+		public string DateFormat { get; }
 
 		/// <summary>
 		/// URL拼接前缀
@@ -127,15 +128,16 @@ namespace DotnetSpider.Core
 		/// <param name="interval">递增间隔(天)</param>
 		/// <param name="prefix">URL拼接前缀</param>
 		/// <param name="postfix">URL拼接后缀</param>
-		/// <param name="dateFormateString">时间格式化字符串</param>
-		public ForeachDateRequestBuilder(DateTime from, DateTime to, int interval, string prefix, string postfix, string dateFormateString = "yyyy-MM-dd")
+		/// <param name="dateFormat">时间格式化字符串</param>
+		public ForeachDateRequestBuilder(DateTime from, DateTime to, int interval, string prefix, string postfix,
+			string dateFormat = "yyyy-MM-dd")
 		{
 			From = from;
 			To = to;
 			Interval = interval;
 			Prefix = prefix;
 			Postfix = postfix;
-			DateFormateString = dateFormateString;
+			DateFormat = dateFormat;
 		}
 
 		/// <summary>
@@ -146,10 +148,11 @@ namespace DotnetSpider.Core
 			List<Request> list = new List<Request>();
 			for (var i = From; i <= To; i = i.AddDays(Interval))
 			{
-				var date = i.ToString(DateFormateString);
+				var date = i.ToString(DateFormat);
 				var request = new Request($"{Prefix}{date}{Postfix}");
 				list.Add(request);
 			}
+
 			return list;
 		}
 	}
@@ -167,15 +170,15 @@ namespace DotnetSpider.Core
 		/// 拼接Url的方式, 会把Columns对应列的数据传入
 		/// https://s.taobao.com/search?q={0},s=0;
 		/// </summary>
-		private readonly string[] _formateStrings;
+		private readonly string[] _formats;
 
-		private readonly string[] _formateArguments;
+		private readonly string[] _formatArguments;
 
 		/// <summary>
 		/// 从数据库中查询出的结果可以先做一下格式
 		/// </summary>
 		/// <param name="item">数据对象</param>
-		protected virtual void FormateDataObject(IDictionary<string, object> item)
+		protected virtual void FormatDataObject(IDictionary<string, object> item)
 		{
 		}
 
@@ -183,26 +186,48 @@ namespace DotnetSpider.Core
 		/// 格式化最终的请求信息
 		/// </summary>
 		/// <param name="request">请求信息</param>
-		protected virtual void FormateRequest(Request request)
+		protected virtual void FormatRequest(Request request)
 		{
+		}
+		
+		/// <summary>
+		/// 查询数据库结果
+		/// </summary>
+		/// <returns>数据库结果</returns>
+		protected List<Dictionary<string, dynamic>> QueryData()
+		{
+			var list = new List<Dictionary<string, dynamic>>();
+			using (var conn = _connectionStringSettings.CreateDbConnection())
+			{
+				foreach (var item in conn.MyQuery(_sql))
+				{
+					var dic =
+						((IDictionary<string, dynamic>) item).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+					FormatDataObject(dic);
+					list.Add(dic);
+				}
+			}
+
+			return list;
 		}
 
 		/// <summary>
 		/// 构造方法
 		/// </summary>
 		/// <param name="sql">SQL 语句</param>
-		/// <param name="formateArguments">起始链接格式化参数</param>
-		/// <param name="formateStrings">起始链接格式化模版</param>
-		public DatabaseRequestBuilder(string sql, string[] formateArguments, params string[] formateStrings)
+		/// <param name="formatArguments">起始链接格式化参数</param>
+		/// <param name="formats">起始链接格式化模版</param>
+		public DatabaseRequestBuilder(string sql, string[] formatArguments, params string[] formats)
 		{
 			if (Env.DataConnectionStringSettings == null)
 			{
-				throw new SpiderException("DataConnection is unfound in app.config");
+				throw new SpiderException("DataConnection is unfounded in app.config");
 			}
+
 			_connectionStringSettings = Env.DataConnectionStringSettings;
 			_sql = sql;
-			_formateStrings = formateStrings;
-			_formateArguments = formateArguments;
+			_formats = formats;
+			_formatArguments = formatArguments;
 		}
 
 		/// <summary>
@@ -211,49 +236,34 @@ namespace DotnetSpider.Core
 		/// <param name="source">数据库类型</param>
 		/// <param name="connectString">数据库连接字符串</param>
 		/// <param name="sql">SQL 语句</param>
-		/// <param name="formateArguments">起始链接格式化参数</param>
-		/// <param name="formateStrings">起始链接格式化模版</param>
-		public DatabaseRequestBuilder(Database source, string connectString, string sql, string[] formateArguments, params string[] formateStrings)
+		/// <param name="formatArguments">起始链接格式化参数</param>
+		/// <param name="formats">起始链接格式化模版</param>
+		public DatabaseRequestBuilder(Database source, string connectString, string sql, string[] formatArguments,
+			params string[] formats)
 		{
 			switch (source)
 			{
 				case Database.MySql:
-					{
-						_connectionStringSettings = new ConnectionStringSettings("MySql", connectString, "MySql.Data.MySqlClient");
-						break;
-					}
-				case Database.SqlServer:
-					{
-						_connectionStringSettings = new ConnectionStringSettings("SqlServer", connectString, "System.Data.SqlClient");
-						break;
-					}
-				default:
-					{
-						throw new SpiderException($"Database {source} is unsported right now");
-					}
-			}
-			_sql = sql;
-			_formateStrings = formateStrings;
-			_formateArguments = formateArguments;
-		}
-
-		/// <summary>
-		/// 查询数据库结果
-		/// </summary>
-		/// <returns>数据库结果</returns>
-		protected List<Dictionary<string, dynamic>> QueryDatas()
-		{
-			List<Dictionary<string, dynamic>> list = new List<Dictionary<string, dynamic>>();
-			using (var conn = _connectionStringSettings.CreateDbConnection())
-			{
-				foreach (var item in conn.MyQuery(_sql))
 				{
-					var dataItem = item as Dictionary<string, dynamic>;
-					FormateDataObject(dataItem);
-					list.Add(dataItem);
+					_connectionStringSettings =
+						new ConnectionStringSettings("MySql", connectString, "MySql.Data.MySqlClient");
+					break;
+				}
+				case Database.SqlServer:
+				{
+					_connectionStringSettings =
+						new ConnectionStringSettings("SqlServer", connectString, "System.Data.SqlClient");
+					break;
+				}
+				default:
+				{
+					throw new SpiderException($"Database {source} is unsupported right now");
 				}
 			}
-			return list;
+
+			_sql = sql;
+			_formats = formats;
+			_formatArguments = formatArguments;
 		}
 
 		/// <summary>
@@ -261,21 +271,22 @@ namespace DotnetSpider.Core
 		/// </summary>
 		public IEnumerable<Request> Build()
 		{
-			var datas = QueryDatas();
+			var data = QueryData();
 
-			List<Request> list = new List<Request>();
-			foreach (var data in datas)
+			var list = new List<Request>();
+			foreach (var item in data)
 			{
-				object[] arguments = _formateArguments.Select(a => data[a]).ToArray();
+				object[] arguments = _formatArguments.Select(a => item[a]).ToArray();
 
-				foreach (var formate in _formateStrings)
+				foreach (var format in _formats)
 				{
-					string url = string.Format(formate, arguments);
-					var request = new Request(url, data);
-					FormateRequest(request);
+					var url = string.Format(format, arguments);
+					var request = new Request(url, item);
+					FormatRequest(request);
 					list.Add(request);
 				}
 			}
+
 			return list;
 		}
 	}

@@ -19,7 +19,7 @@ namespace DotnetSpider.Core
 		/// 继续任务
 		/// 继续一个不在暂停的任务应该提示警告
 		/// </summary>
-		void Contiune();
+		void Continue();
 
 		/// <summary>
 		/// 退出任务

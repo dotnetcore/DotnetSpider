@@ -86,7 +86,7 @@ namespace DotnetSpider.Core.Test
 			Thread.Sleep(5000);
 			spider.Pause(() =>
 			{
-				spider.Contiune();
+				spider.Continue();
 			});
 			Thread.Sleep(5000);
 		}

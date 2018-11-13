@@ -206,7 +206,7 @@ namespace DotnetSpider.Extension
 								}
 							case "CONTINUE":
 								{
-									spider.Contiune();
+									spider.Continue();
 									break;
 								}
 							case "RUNASYNC":

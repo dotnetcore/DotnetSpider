@@ -22,6 +22,7 @@ using DotnetSpider.Core.Infrastructure;
 using System.Net;
 #else
 using System.Text;
+
 #endif
 
 [assembly: InternalsVisibleTo("DotnetSpider.Core.Test")]
@@ -49,7 +50,7 @@ namespace DotnetSpider.Core
 		private RetryPolicy _pipelineRetry;
 		private readonly AutomicLong _requestedCount = new AutomicLong(0);
 		private readonly MemoryMappedFile[] _mmfCloseSignals = new MemoryMappedFile[2];
-		private readonly string[] _filecloseSignals = new string[2];
+		private readonly string[] _fileCloseSignals = new string[2];
 		private readonly List<Request> _requests = new List<Request>();
 		private bool _exited;
 		private IMonitor _monitor;
@@ -110,20 +111,18 @@ namespace DotnetSpider.Core
 
 		protected void Report(string[] arguments)
 		{
-			NetworkCenter.Current.Execute("verifyAndReport", () =>
+			NetworkCenter.Current.Execute("report", () =>
 			{
-				if (IfRequireReport(arguments))
+				if (!IfRequireReport(arguments)) return;
+				try
 				{
-					try
-					{
-						Logger.LogInformation("Start data verification...");
-						OnReporting();
-						Logger.LogInformation("Complete data verification.");
-					}
-					finally
-					{
-						OnReported();
-					}
+					Logger.LogInformation("Report start...");
+					OnReporting();
+					Logger.LogInformation("Report complete");
+				}
+				finally
+				{
+					OnReported();
 				}
 			});
 		}
@@ -214,15 +213,14 @@ namespace DotnetSpider.Core
 			get => _monitor;
 			set
 			{
-				if (_monitor != value)
-				{
-					CheckIfRunning();
+				if (_monitor == value) return;
+				
+				CheckIfRunning();
 
-					_monitor = value;
-					if (_monitor != null)
-					{
-						_monitor.Logger = Logger;
-					}
+				_monitor = value;
+				if (_monitor != null)
+				{
+					_monitor.Logger = Logger;
 				}
 			}
 		}
@@ -736,7 +734,7 @@ namespace DotnetSpider.Core
 				return;
 			}
 
-			Logger.LogInformation("Oninit...");
+			Logger.LogInformation("On init...");
 
 			NetworkCenter.Current.Execute("onInit", () => { OnInit(arguments); });
 
@@ -846,7 +844,7 @@ namespace DotnetSpider.Core
 		/// <param name="action">暂停完成后执行的回调</param>
 		public override void Pause(Action action = null)
 		{
-			bool isRunning = Status == Status.Running;
+			var isRunning = Status == Status.Running;
 			if (!isRunning)
 			{
 				Logger.LogWarning(Identity, "Crawler is not running.");
@@ -861,9 +859,9 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// Contiune spider if spider is paused.
+		/// Continue spider if spider is paused.
 		/// </summary>
-		public override void Contiune()
+		public override void Continue()
 		{
 			if (Status == Status.Paused)
 			{
@@ -884,7 +882,7 @@ namespace DotnetSpider.Core
 			if (Env.IsWindows)
 			{
 				var identityMmf = MemoryMappedFile.OpenExisting(Identity, MemoryMappedFileRights.Write);
-				using (MemoryMappedViewStream stream = identityMmf.CreateViewStream())
+				using (var stream = identityMmf.CreateViewStream())
 				{
 					var writer = new BinaryWriter(stream);
 					writer.Write(1);
@@ -893,7 +891,7 @@ namespace DotnetSpider.Core
 				try
 				{
 					var taskIdMmf = MemoryMappedFile.OpenExisting(TaskId, MemoryMappedFileRights.Write);
-					using (MemoryMappedViewStream stream = taskIdMmf.CreateViewStream())
+					using (var stream = taskIdMmf.CreateViewStream())
 					{
 						var writer = new BinaryWriter(stream);
 						writer.Write(1);
@@ -906,7 +904,7 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				File.Create(_filecloseSignals[0]);
+				File.Create(_fileCloseSignals[0]);
 			}
 		}
 
@@ -938,6 +936,7 @@ namespace DotnetSpider.Core
 			}
 		}
 
+		/// <inheritdoc />
 		/// <summary>
 		/// Dispose spider.
 		/// </summary>
@@ -945,7 +944,7 @@ namespace DotnetSpider.Core
 		{
 			CheckIfRunning();
 
-			int i = 0;
+			var i = 0;
 			while (!_exited)
 			{
 				++i;
@@ -1035,7 +1034,7 @@ namespace DotnetSpider.Core
 		{
 			var containsData = _cached != null && _cached.Count > 0;
 
-			foreach (IPipeline pipeline in Pipelines)
+			foreach (var pipeline in Pipelines)
 			{
 				if (containsData)
 				{
@@ -1049,12 +1048,11 @@ namespace DotnetSpider.Core
 			SafeDestroy(PageProcessors);
 			SafeDestroy(Downloader);
 
-			if (Env.IsWindows)
+			if (!Env.IsWindows) return;
+			
+			foreach (var mmf in _mmfCloseSignals)
 			{
-				foreach (var mmf in _mmfCloseSignals)
-				{
-					SafeDestroy(mmf);
-				}
+				SafeDestroy(mmf);
 			}
 		}
 
@@ -1169,7 +1167,7 @@ namespace DotnetSpider.Core
 
 			int countOfResults = 0, effectedRows = 0;
 
-			ResultItems[] resultItems = new ResultItems[0];
+			var resultItems = new ResultItems[0];
 			if (PipelineCachedSize == 1)
 			{
 				resultItems = new[] {page.ResultItems};
@@ -1187,7 +1185,7 @@ namespace DotnetSpider.Core
 				}
 			}
 
-			foreach (IPipeline pipeline in Pipelines)
+			foreach (var pipeline in Pipelines)
 			{
 				try
 				{
@@ -1261,7 +1259,7 @@ namespace DotnetSpider.Core
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"Unhandle downloader exception: {e}.");
+				Logger.LogError($"Unhandled downloader exception: {e}.");
 				Exit();
 			}
 
@@ -1284,7 +1282,7 @@ namespace DotnetSpider.Core
 
 			if (page.TargetRequests == null || page.TargetRequests.Count == 0) return;
 
-			foreach (Request request in page.TargetRequests)
+			foreach (var request in page.TargetRequests)
 			{
 				var depth = request.GetProperty(Page.Depth);
 				if (depth == null || depth <= Depth)
@@ -1345,16 +1343,15 @@ namespace DotnetSpider.Core
 
 		private void SafeDestroy(object obj)
 		{
-			if (obj != null && obj is IDisposable disposable)
+			if (obj == null || !(obj is IDisposable disposable)) return;
+			
+			try
 			{
-				try
-				{
-					disposable.Dispose();
-				}
-				catch (Exception e)
-				{
-					Logger.LogError(e.ToString());
-				}
+				disposable.Dispose();
+			}
+			catch (Exception e)
+			{
+				Logger.LogError(e.ToString());
 			}
 		}
 
@@ -1394,21 +1391,19 @@ namespace DotnetSpider.Core
 
 		private void OnRequestBuilding(params string[] arguments)
 		{
-			if (RequestBuilders != null && RequestBuilders.Count > 0 && IfRequireRequestBuilders(arguments))
+			if (RequestBuilders == null || RequestBuilders.Count <= 0 || !IfRequireRequestBuilders(arguments)) return;
+			try
 			{
-				try
+				for (var i = 0; i < RequestBuilders.Count; ++i)
 				{
-					for (int i = 0; i < RequestBuilders.Count; ++i)
-					{
-						var builder = RequestBuilders[i];
-						Logger.LogInformation($"Add start request via builder[{i + 1}].");
-						builder.Build();
-					}
+					var builder = RequestBuilders[i];
+					Logger.LogInformation($"Add start request via builder[{i + 1}].");
+					_requests.AddRange(builder.Build());
 				}
-				finally
-				{
-					OnRequestBuildersCompleted();
-				}
+			}
+			finally
+			{
+				OnRequestBuildersCompleted();
 			}
 		}
 
@@ -1485,14 +1480,14 @@ namespace DotnetSpider.Core
 			}
 			else
 			{
-				_filecloseSignals[0] = Path.Combine(Env.BaseDirectory, $"{Identity}_cl");
+				_fileCloseSignals[0] = Path.Combine(Env.BaseDirectory, $"{Identity}_cl");
 
 				if (!string.IsNullOrWhiteSpace(TaskId))
 				{
-					_filecloseSignals[1] = Path.Combine(Env.BaseDirectory, $"{TaskId}_cl");
+					_fileCloseSignals[1] = Path.Combine(Env.BaseDirectory, $"{TaskId}_cl");
 				}
 
-				foreach (var closeSignal in _filecloseSignals)
+				foreach (var closeSignal in _fileCloseSignals)
 				{
 					if (File.Exists(closeSignal))
 					{
@@ -1576,7 +1571,7 @@ namespace DotnetSpider.Core
 
 		private void CheckFileCloseSignals()
 		{
-			if (File.Exists(_filecloseSignals[0]) || File.Exists(_filecloseSignals[1]))
+			if (File.Exists(_fileCloseSignals[0]) || File.Exists(_fileCloseSignals[1]))
 			{
 				Exit();
 			}
