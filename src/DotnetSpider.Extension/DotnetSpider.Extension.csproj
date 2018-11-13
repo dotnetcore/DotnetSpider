@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net451;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net451;</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>3.0.7</Version>
+    <Version>3.0.8</Version>
     <Authors>zlzforever@163.com;</Authors>
     <AssemblyName>DotnetSpider.Extension</AssemblyName>
     <Copyright>Copyright 2018 Lewis Zou</Copyright>
@@ -15,6 +15,7 @@
     <PackageIconUrl>https://github.com/dotnetcore/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider</RepositoryUrl>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <Reference Include="Microsoft.CSharp" />

@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <UserSecretsId>aspnet-DotnetSpider.Broker-A8CA42B6-EE1B-4F89-8C6F-5466334AE235</UserSecretsId>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

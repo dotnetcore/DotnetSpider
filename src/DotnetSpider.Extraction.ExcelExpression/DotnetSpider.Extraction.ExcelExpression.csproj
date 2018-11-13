@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net451;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net451;</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>3.0.6</Version>
     <Authors>zlzforever@163.com;</Authors>
@@ -13,6 +13,7 @@
     <PackageIconUrl>https://github.com/dotnetcore/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider</RepositoryUrl>
     <PackageTags>DotnetSpider;crawler;dotnet core</PackageTags>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

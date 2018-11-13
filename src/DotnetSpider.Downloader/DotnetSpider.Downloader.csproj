@@ -3,7 +3,7 @@
     <TargetFrameworks>netstandard2.0;net451;</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>3.0.6</Version>
+    <Version>3.0.8</Version>
     <Authors>zlzforever@163.com;</Authors>
     <AssemblyName>DotnetSpider.Downloader</AssemblyName>
     <Copyright>Copyright 2018 Lewis Zou</Copyright>
@@ -15,6 +15,7 @@
     <PackageIconUrl>https://github.com/dotnetcore/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider</RepositoryUrl>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="lz4net" Version="1.0.15.93" />
@@ -26,11 +27,11 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <Reference Include="System.Web" />
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
   </ItemGroup>
 </Project>
