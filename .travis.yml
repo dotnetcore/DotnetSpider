@@ -28,6 +28,9 @@ services:
   - mysql
   - redis-server
 
+before_script:
+  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('1qazZAQ!') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+
 before_install:
   - chmod a+x ./runtests.sh
 

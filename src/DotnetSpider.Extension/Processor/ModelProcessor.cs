@@ -72,7 +72,9 @@ namespace DotnetSpider.Extension.Processor
 				}
 			}
 
-			RequestExtractor = xPaths.Any(x => x == null || x == ".") ? new XPathRequestExtractor(".") : new XPathRequestExtractor(xPaths);
+			RequestExtractor = xPaths.Any(x => x == null || x == ".")
+				? new XPathRequestExtractor(".")
+				: (xPaths.Count == 0 ? null : new XPathRequestExtractor(xPaths));
 
 			if (dataHandlers == null) return;
 			foreach (var dataHandler in dataHandlers)
