@@ -15,7 +15,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		/// <param name="value">下载的链接</param>
 		/// <returns>下载完成后的文件名</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
 			var filePath = value.ToString();
 			var name = Path.GetFileName(filePath);

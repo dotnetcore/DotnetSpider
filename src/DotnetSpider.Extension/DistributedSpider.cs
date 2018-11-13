@@ -44,7 +44,7 @@ namespace DotnetSpider.Extension
 
 			if (factor)
 			{
-				string key = $"dotnetspider:validateLocker:{Identity}";
+				var key = $"dotnetspider:validateLocker:{Identity}";
 				if (RedisConnection.Default != null)
 				{
 					while (!RedisConnection.Default.Database.LockTake(key, "0", TimeSpan.FromMinutes(10)))
@@ -53,7 +53,7 @@ namespace DotnetSpider.Extension
 					}
 
 					var lockerValue = RedisConnection.Default.Database.HashGet(ValidateStatusKey, Identity);
-					factor = lockerValue != "verify completed.";
+					factor = lockerValue != "verify completed";
 				}
 				if (!factor)
 				{
@@ -61,7 +61,7 @@ namespace DotnetSpider.Extension
 				}
 				if (factor)
 				{
-					RedisConnection.Default?.Database.HashSet(ValidateStatusKey, Identity, "verify completed.");
+					RedisConnection.Default?.Database.HashSet(ValidateStatusKey, Identity, "verify completed");
 				}
 			}
 
@@ -70,7 +70,7 @@ namespace DotnetSpider.Extension
 
 		protected override void OnReported()
 		{
-			string key = $"dotnetspider:validateLocker:{Identity}";
+			var key = $"dotnetspider:validateLocker:{Identity}";
 			base.OnReported();
 			RedisConnection.Default?.Database.LockRelease(key, 0);
 		}
@@ -141,47 +141,47 @@ namespace DotnetSpider.Extension
 		/// </summary>
 		protected override void OnRequestBuildersCompleted()
 		{
-			if (RedisConnection.Default != null)
+			if (RedisConnection.Default == null) return;
+			
+			var ifBuildFinished = false;
+			for (var i = 0; i < 10; ++i)
 			{
-				bool ifBuildFinished = false;
-				for (int i = 0; i < 10; ++i)
+				ifBuildFinished = RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
+				if (ifBuildFinished)
 				{
-					ifBuildFinished = RedisConnection.Default.Database.HashSet(InitStatusSetKey, Identity, InitFinishedValue);
-					if (ifBuildFinished)
-					{
-						break;
-					}
-					else
-					{
-						Thread.Sleep(1000);
-					}
+					break;
 				}
-				if (!ifBuildFinished)
+				else
 				{
-					var msg = "Init status set failed";
-					Logger.LogError(msg);
-					throw new SpiderException(msg);
+					Thread.Sleep(1000);
 				}
+			}
+			if (!ifBuildFinished)
+			{
+				var msg = "Init status set failed";
+				Logger.LogError(msg);
+				throw new SpiderException(msg);
+			}
 
-				bool ifRemoveInitLocker = false;
-				for (int i = 0; i < 10; ++i)
+			var ifRemoveInitLocker = false;
+			for (var i = 0; i < 10; ++i)
+			{
+				ifRemoveInitLocker = RedisConnection.Default.Database.KeyDelete(InitLockKey);
+				if (ifRemoveInitLocker)
 				{
-					ifRemoveInitLocker = RedisConnection.Default.Database.KeyDelete(InitLockKey);
-					if (ifRemoveInitLocker)
-					{
-						break;
-					}
-					else
-					{
-						Thread.Sleep(1000);
-					}
+					break;
 				}
-				if (!ifRemoveInitLocker)
+				else
 				{
-					var msg = "Remove init locker failed";
-					Logger.LogError(msg);
-					throw new SpiderException(msg);
+					Thread.Sleep(1000);
 				}
+			}
+
+			if (ifRemoveInitLocker) return;
+			{
+				var msg = "Remove init locker failed";
+				Logger.LogError(msg);
+				throw new SpiderException(msg);
 			}
 		}
 
@@ -191,41 +191,40 @@ namespace DotnetSpider.Extension
 		/// <param name="spider">爬虫</param>
 		protected void RegisterControl(ISpider spider)
 		{
-			if (RedisConnection.Default != null)
+			if (RedisConnection.Default == null) return;
+			
+			try
 			{
-				try
+				RedisConnection.Default.Subscriber.Subscribe($"{spider.Identity}", (c, m) =>
 				{
-					RedisConnection.Default.Subscriber.Subscribe($"{spider.Identity}", (c, m) =>
+					switch (m)
 					{
-						switch (m)
+						case "PAUSE":
 						{
-							case "PAUSE":
-								{
-									spider.Pause();
-									break;
-								}
-							case "CONTINUE":
-								{
-									spider.Continue();
-									break;
-								}
-							case "RUNASYNC":
-								{
-									spider.RunAsync();
-									break;
-								}
-							case "EXIT":
-								{
-									spider.Exit();
-									break;
-								}
+							spider.Pause();
+							break;
 						}
-					});
-				}
-				catch (Exception e)
-				{
-					Logger.LogError($"Register contol failed：{e}.");
-				}
+						case "CONTINUE":
+						{
+							spider.Continue();
+							break;
+						}
+						case "RUNASYNC":
+						{
+							spider.RunAsync();
+							break;
+						}
+						case "EXIT":
+						{
+							spider.Exit();
+							break;
+						}
+					}
+				});
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Register control failed：{e}");
 			}
 		}
 

@@ -1,7 +1,6 @@
 ﻿using DotnetSpider.Core;
 using System;
 using System.Data;
-using DotnetSpider.Extension.Infrastructure;
 using Microsoft.Extensions.Logging;
 using DotnetSpider.Core.Infrastructure;
 

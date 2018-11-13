@@ -119,19 +119,17 @@ namespace DotnetSpider.Extraction
 
 		private string GetElementContent(dynamic el)
 		{
-			if (el is string)
+			switch (el)
 			{
-				return el;
+				case string _:
+					return el;
+				case HtmlDocument _:
+					return ((HtmlDocument)el).DocumentNode.InnerHtml;
+				case HtmlNode _:
+					return ((HtmlNode)el).InnerHtml;
+				default:
+					return el.ToString();
 			}
-			if (el is HtmlDocument)
-			{
-				return ((HtmlDocument)el).DocumentNode.InnerHtml;
-			}
-			if (el is HtmlNode)
-			{
-				return ((HtmlNode)el).InnerHtml;
-			}
-			return el.ToString();
 		}
 	}
 }

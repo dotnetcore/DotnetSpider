@@ -37,22 +37,15 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
 
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
-			string tmp = value.ToString();
-			MatchCollection matches = Regex.Matches(tmp, Pattern);
+			var tmp = value.ToString();
+			var matches = Regex.Matches(tmp, Pattern);
 			if (matches.Count > 0)
 			{
 				if (True == Id)
 				{
-					if (Group < 0)
-					{
-						return matches[0].Value;
-					}
-					else
-					{
-						return matches[0].Groups[Group].Value;
-					}
+					return Group < 0 ? matches[0].Value : matches[0].Groups[Group].Value;
 				}
 				else
 				{
@@ -61,14 +54,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 			}
 			else
 			{
-				if (False == Id)
-				{
-					return "";
-				}
-				else
-				{
-					return False;
-				}
+				return False == Id ? "" : False;
 			}
 		}
 

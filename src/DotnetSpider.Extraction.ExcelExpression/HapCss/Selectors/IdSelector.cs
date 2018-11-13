@@ -1,9 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extraction.ExcelExpression.HapCss.Selectors
 {
@@ -18,7 +15,7 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss.Selectors
         {
             foreach (var node in currentNodes)
             {
-                if (node.Id.Equals(this.Selector, StringComparison.InvariantCultureIgnoreCase))
+                if (node.Id.Equals(Selector, StringComparison.InvariantCultureIgnoreCase))
                     return new[] { node };
             }
 

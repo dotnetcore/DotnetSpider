@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extraction.ExcelExpression.HapCss
 {
@@ -18,8 +16,8 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss
 
             var tokens = SplitTokens(word).ToList();
 
-            this.Filter = tokens.First();
-            this.SubTokens = tokens.Skip(1).Select(i => new Token(i)).ToList();
+            Filter = tokens.First();
+            SubTokens = tokens.Skip(1).Select(i => new Token(i)).ToList();
         }
 
         private static IList<string> SplitTokens(string token)

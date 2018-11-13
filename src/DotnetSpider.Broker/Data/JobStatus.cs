@@ -7,7 +7,7 @@ namespace DotnetSpider.Broker.Data
 	/// <summary>
 	/// 爬虫状态
 	/// </summary>
-	[System.Flags]
+	[Flags]
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum Status
 	{

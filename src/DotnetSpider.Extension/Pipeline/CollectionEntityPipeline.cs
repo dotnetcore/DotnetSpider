@@ -33,34 +33,33 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 存储页面解析器解析到的数据结果到内存中
 		/// </summary>
-		/// <param name="model">数据模型</param>
-		/// <param name="datas">数据</param>
-		/// <param name="logger">日志接口</param>
+		/// <param name="items">数据</param>
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
-		protected override int Process(IEnumerable<IBaseEntity> datas, dynamic sender = null)
+		protected override int Process(List<IBaseEntity> items, dynamic sender = null)
 		{
-			if (datas == null|| datas.Count() == 0)
+			if (items == null|| !items.Any())
 			{
 				return 0;
 			}
 
 			lock (_locker)
 			{
-				var identity = datas.First().GetType().FullName;
-				if (_collector.ContainsKey(identity))
+				var typeName = items.First().GetType().FullName;
+
+				if (_collector.ContainsKey(typeName))
 				{
-					var list = _collector[identity];
-					list.AddRange(datas);
+					var list = _collector[typeName];
+					list.AddRange(items);
 				}
 				else
 				{
 					var list = new List<IBaseEntity>();
-					list.AddRange(datas);
-					_collector.Add(identity, list);
+					list.AddRange(items);
+					_collector.Add(typeName, list);
 				}
 
-				return datas.Count();
+				return items.Count;
 			}
 		}
 	}

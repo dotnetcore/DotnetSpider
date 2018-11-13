@@ -17,7 +17,7 @@ namespace DotnetSpider.Core.Infrastructure
 		private static extern uint RasHangUp(IntPtr hrasconn);
 
 		[DllImport("wininet.dll")]
-		private static extern int InternetDial(IntPtr hwnd, [In]string lpszConnectionid, uint dwFlags, ref int lpdwConnection, uint dwReserved);
+		private static extern int InternetDial(IntPtr hwnd, [In]string lpszConnectionId, uint dwFlags, ref int lpdwConnection, uint dwReserved);
 
 		[DllImport("Rasapi32.dll", EntryPoint = "RasEnumConnectionsA", SetLastError = true)]
 		private static extern int RasEnumConnections
@@ -34,7 +34,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <returns></returns>
 		public int Connect(string adslName)
 		{
-			int lpdwConnection = 0;
+			var lpdwConnection = 0;
 			return InternetDial(IntPtr.Zero, adslName, 2, ref lpdwConnection, 0);
 		}
 
@@ -43,19 +43,19 @@ namespace DotnetSpider.Core.Infrastructure
 		/// </summary>
 		public void Disconnect()
 		{
-			var intprt = GetAdslIntPrt();
-			RasHangUp(intprt);
+			var intPrt = GetAdslIntPrt();
+			RasHangUp(intPrt);
 		}
 
 		private IntPtr GetAdslIntPrt()
 		{
-			Rasconn lprasConn = new Rasconn
+			var lprasConn = new Rasconn
 			{
 				Hrasconn = IntPtr.Zero
 			};
 
 
-			int lpcConnections = 0;
+			var lpcConnections = 0;
 #if !NETSTANDARD
 			var lpcb = Marshal.SizeOf(typeof(Rasconn));
 #else
@@ -64,12 +64,7 @@ namespace DotnetSpider.Core.Infrastructure
 
 			var nRet = RasEnumConnections(ref lprasConn, ref lpcb, ref lpcConnections);
 
-			if (nRet != 0)
-			{
-				return IntPtr.Zero;
-			}
-
-			return lprasConn.Hrasconn;
+			return nRet != 0 ? IntPtr.Zero : lprasConn.Hrasconn;
 		}
 	}
 }

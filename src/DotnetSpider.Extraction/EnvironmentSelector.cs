@@ -13,7 +13,7 @@ namespace DotnetSpider.Extraction
 	/// 还可以查询如: 当天时间等
 	/// 此类不需要具体实现, 仅作为标识使用
 	/// </summary>
-	public class EnviromentSelector : ISelector
+	public class EnvironmentSelector : ISelector
 	{
 		/// <summary>
 		/// 查询的键值
@@ -24,7 +24,7 @@ namespace DotnetSpider.Extraction
 		/// 构造方法
 		/// </summary>
 		/// <param name="field">查询的键值</param>
-		public EnviromentSelector(string field)
+		public EnvironmentSelector(string field)
 		{
 			Field = field;
 		}
@@ -36,7 +36,7 @@ namespace DotnetSpider.Extraction
 		/// <returns></returns>
 		public dynamic Select(dynamic text)
 		{
-			throw new NotSupportedException("EnviromentSelecotr is only used as a switch.");
+			throw new NotSupportedException("EnvironmentSelector is only used as a switch.");
 		}
 
 		/// <summary>
@@ -46,7 +46,7 @@ namespace DotnetSpider.Extraction
 		/// <returns></returns>
 		public IEnumerable<dynamic> SelectList(dynamic text)
 		{
-			throw new NotSupportedException("EnviromentSelecotr is only used as a switch.");
+			throw new NotSupportedException("EnvironmentSelector is only used as a switch.");
 		}
 	}
 }

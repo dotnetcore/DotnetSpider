@@ -24,7 +24,7 @@ namespace DotnetSpider.Extraction.Model
 						}
 					case SelectorType.Enviroment:
 						{
-							return Selectors.Enviroment(expression);
+							return Selectors.Environment(expression);
 						}
 					case SelectorType.JsonPath:
 						{
@@ -44,7 +44,7 @@ namespace DotnetSpider.Extraction.Model
 								{
 									return Selectors.Regex(expression, group);
 								}
-								throw new ArgumentException($"Regex argument should be a number set to group: {selector}.");
+								throw new ArgumentException($"Regex argument should be a number set to group: {selector}");
 							}
 						}
 					case SelectorType.XPath:
@@ -54,7 +54,7 @@ namespace DotnetSpider.Extraction.Model
 						}
 					default:
 						{
-							throw new NotSupportedException($"{selector} unsupoort.");
+							throw new NotSupportedException($"{selector} unsupported");
 						}
 				}
 			}
@@ -68,7 +68,7 @@ namespace DotnetSpider.Extraction.Model
 		{
 			if (string.IsNullOrWhiteSpace(selector.Expression))
 			{
-				throw new ArgumentException($"Expression of {selector} should not be null/empty.");
+				throw new ArgumentException($"Expression of {selector} should not be null/empty");
 			}
 		}
 	}

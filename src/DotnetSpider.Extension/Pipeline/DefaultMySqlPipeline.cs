@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using DotnetSpider.Core;
 using System.Configuration;
-using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -58,7 +57,6 @@ namespace DotnetSpider.Extension.Pipeline
 		/// 处理页面解析器解析到的数据结果
 		/// </summary>
 		/// <param name="resultItems">数据结果</param>
-		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
 		public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 		{
@@ -93,7 +91,7 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 				else
 				{
-					throw new SpiderException("DataConnection is unfound in app.config");
+					throw new SpiderException("DataConnection is unfounded in app.config");
 				}
 			}
 			ConnectionStringSettings = connectionStringSettings;

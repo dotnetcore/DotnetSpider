@@ -21,7 +21,7 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		/// <param name="request">请求信息 <see cref="Request"/></param>
 		/// <returns>页面数据 <see cref="Response"/></returns>
-		protected override Response DowloadContent(Request request)
+		protected override Response DownloadContent(Request request)
 		{
 			Console.WriteLine(request.Url);
 			var filePath = new Uri(request.Url).LocalPath;
@@ -46,8 +46,8 @@ namespace DotnetSpider.Downloader
 					return response;
 				}
 			}
-			var msg = $"File {filePath} unfound.";
-			Logger?.LogError($"Download {request.Url} failed: {msg}.");
+			var msg = $"File {filePath} unfounded";
+			Logger?.LogError($"Download {request.Url} failed: {msg}");
 			return null;
 		}
 	}

@@ -9,7 +9,7 @@
 	public interface IAfterDownloadCompleteHandler
 	{
 		/// <summary>
-		/// You can process page content, check downdload status(anti-spider) and update cookies etc. here.
+		/// You can process page content, check download status(anti-spider) and update cookies etc. here.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
 		/// 处理页面数据、检测下载情况(是否被反爬)、更新Cookie等操作

@@ -46,8 +46,8 @@ namespace DotnetSpider.Downloader.Redial
 		/// 构造方法
 		/// </summary>
 		/// <param name="redialer">拨号器</param>
-		/// <param name="validater">网络状态检测器</param>
-		public MutexRedialExecutor(IRedialer redialer, IInternetDetector validater) : base(redialer, validater)
+		/// <param name="internetDetector">网络状态检测器</param>
+		public MutexRedialExecutor(IRedialer redialer, IInternetDetector internetDetector) : base(redialer, internetDetector)
 		{
 		}
 

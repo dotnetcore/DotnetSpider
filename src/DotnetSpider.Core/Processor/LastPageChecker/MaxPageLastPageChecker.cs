@@ -30,7 +30,7 @@ namespace DotnetSpider.Core.Processor.LastPageChecker
 		/// <summary>
 		/// 是否到了最后一个链接
 		/// </summary>
-		/// <param name="response">页面数据</param>
+		/// <param name="page">页面数据</param>
 		/// <returns>如果返回 True, 则说明已经采到到了最后一个链接</returns>
 		public bool IsLastPage(Page page)
 		{

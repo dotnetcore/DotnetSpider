@@ -277,13 +277,13 @@ namespace DotnetSpider.Core
 
 			HostName = Dns.GetHostName();
 
-			var interf = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(i =>
+			var networkInterface = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(i =>
 				(i.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
 				 i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) && i.OperationalStatus == OperationalStatus.Up);
 
-			if (interf != null)
+			if (networkInterface != null)
 			{
-				var unicastAddresses = interf.GetIPProperties().UnicastAddresses;
+				var unicastAddresses = networkInterface.GetIPProperties().UnicastAddresses;
 				Ip = unicastAddresses.FirstOrDefault(a =>
 						a.IPv4Mask?.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)?.Address
 					.ToString();

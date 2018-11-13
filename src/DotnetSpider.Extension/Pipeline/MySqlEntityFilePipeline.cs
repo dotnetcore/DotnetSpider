@@ -50,18 +50,17 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 处理爬虫实体解析器解析到的实体数据结果
 		/// </summary>
-		/// <param name="model">数据模型</param>
-		/// <param name="datas">数据</param>
+		/// <param name="items">数据</param>
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		protected override int Process(IEnumerable<IBaseEntity> datas, dynamic sender = null)
+		protected override int Process(List<IBaseEntity> items, dynamic sender = null)
 		{
-			if (datas == null || !datas.Any())
+			if (items == null || !items.Any())
 			{
 				return 0;
 			}
-			var tableInfo = new TableInfo(datas.First().GetType());
+			var tableInfo = new TableInfo(items.First().GetType());
 			StreamWriter writer;
 			var tableName = tableInfo.Schema.FullName;
 			var identity = GetIdentity(sender);
@@ -86,17 +85,17 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				case FileType.LoadFile:
 					{
-						AppendLoadFile(writer, tableInfo, datas);
+						AppendLoadFile(writer, tableInfo, items);
 						break;
 					}
 				case FileType.InsertSql:
 					{
-						AppendInsertSqlFile(writer, tableInfo, datas);
+						AppendInsertSqlFile(writer, tableInfo, items);
 						break;
 					}
 			}
 
-			return datas.Count();
+			return items.Count;
 		}
 
 		/// <summary>

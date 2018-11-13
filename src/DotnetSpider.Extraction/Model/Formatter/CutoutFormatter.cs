@@ -11,12 +11,12 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// <summary>
 		/// 起始部分的内容
 		/// </summary>
-		public string StartPart;
+		public string StartPart { get; set; }
 
 		/// <summary>
 		/// 结束部分的内容
 		/// </summary>
-		public string EndPart;
+		public string EndPart { get; set; }
 
 		/// <summary>
 		/// 开始截取的偏移
@@ -33,7 +33,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
 			var tmp = value.ToString();
 			int begin = tmp.IndexOf(StartPart, StringComparison.Ordinal);

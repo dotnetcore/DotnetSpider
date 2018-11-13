@@ -13,14 +13,14 @@ namespace DotnetSpider.Core.Pipeline
 	public class FilePipeline : BaseFilePipeline
 	{
 		/// <summary>
-		/// 数据文件夹地址为: {BaseDirecoty}/data/{Identity}
+		/// 数据文件夹地址为: {BaseDirectory}/data/{Identity}
 		/// </summary>
 		public FilePipeline() : base("file")
 		{
 		}
 
 		/// <summary>
-		/// 数据文件夹地址为: {BaseDirecoty}/data/{interval}
+		/// 数据文件夹地址为: {BaseDirectory}/data/{interval}
 		/// </summary>
 		public FilePipeline(string interval) : base(interval)
 		{
@@ -30,7 +30,6 @@ namespace DotnetSpider.Core.Pipeline
 		/// 存储数据结果到文件中
 		/// </summary>
 		/// <param name="resultItems">数据结果</param>
-		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
 		public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 		{
@@ -47,7 +46,7 @@ namespace DotnetSpider.Core.Pipeline
 						{
 							if (entry.Value is IList value)
 							{
-								IList list = value;
+								var list = value;
 								printWriter.WriteLine(entry.Key + ":");
 								foreach (var o in list)
 								{

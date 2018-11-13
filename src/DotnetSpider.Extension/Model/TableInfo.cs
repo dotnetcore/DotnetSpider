@@ -1,10 +1,7 @@
-﻿using DotnetSpider.Extension.Pipeline;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension.Model
 {
@@ -105,14 +102,14 @@ namespace DotnetSpider.Extension.Model
 				}
 			}
 
-			if (Columns.Count != properties.Count())
+			if (Columns.Count != properties.Length)
 			{
-				throw new ArgumentException($"Column names should not be same.");
+				throw new ArgumentException("Column names should not be same");
 			}
 
 			if (Columns.Count == 0)
 			{
-				throw new ArgumentException($"Table should contains at least one column.");
+				throw new ArgumentException("Table should contains at least one column");
 			}
 		}
 

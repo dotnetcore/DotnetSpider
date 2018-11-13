@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extraction.ExcelExpression.HapCss
 {
@@ -13,7 +9,7 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss
 
         public PseudoClassNameAttribute(string name)
         {
-            this.FunctionName = name;
+            FunctionName = name;
         }
     }
 }

@@ -39,8 +39,8 @@ namespace DotnetSpider.Core.Infrastructure
 		PostgreSql,
 
 		/// <summary>
-		/// Clickhouse
+		/// ClickHouse
 		/// </summary>
-		Clickhouse,
+		ClickHouse,
 	}
 }

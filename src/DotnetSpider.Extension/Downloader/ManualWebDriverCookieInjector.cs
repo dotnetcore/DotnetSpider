@@ -20,6 +20,8 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		/// <param name="url">登陆的链接</param>
 		/// <param name="browser">浏览器</param>
+		/// <param name="before"></param>
+		/// <param name="after"></param>
 		public ManualWebDriverCookieInjector(string url, Browser browser, Action before = null, Action after = null) : base(browser, before, after)
 		{
 			_url = url;

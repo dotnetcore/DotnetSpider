@@ -16,10 +16,11 @@ namespace DotnetSpider.Extension.Pipeline
 {
 	public abstract class DbEntityPipeline : EntityPipeline
 	{
-		public static string[] RetryExceptionMessages = { "Unable to connect", "Access denied for user" };
+		public static readonly HashSet<string> RetryExceptionMessages = new HashSet<string>
+			{"Unable to connect", "Access denied for user"};
 
 		private PipelineMode _pipelineMode;
-		private readonly Dictionary<string, Sqls> _sqls = new Dictionary<string, Sqls>();
+		private readonly Dictionary<string, SqlStatements> _sqlStatements = new Dictionary<string, SqlStatements>();
 
 		public int RetryTimes { get; set; } = 600;
 
@@ -28,7 +29,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 数据库忽略大小写
 		/// </summary>
-		public bool Ignorease { get; set; } = true;
+		public bool IgnoreCase { get; set; } = true;
 
 		/// <summary>
 		/// 自动添加时间戳
@@ -38,9 +39,10 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 更新数据库连接字符串的接口, 如果自定义的连接字符串无法使用, 则会尝试通过更新连接字符串来重新连接
 		/// </summary>
-		public IConnectionStringSettingsRefresher ConnectionStringSettingsRefresher;
+		public IConnectionStringSettingsRefresher ConnectionStringSettingsRefresher { get; set; }
 
-		protected DbEntityPipeline(string connectString = null, PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate)
+		protected DbEntityPipeline(string connectString = null,
+			PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate)
 		{
 			ConnectString = connectString;
 			PipelineMode = pipelineMode;
@@ -48,17 +50,18 @@ namespace DotnetSpider.Extension.Pipeline
 
 		protected abstract IDbConnection CreateDbConnection(string connectString);
 
-		protected abstract Sqls GenerateSqls(TableInfo model);
+		protected abstract SqlStatements GenerateSqlStatements(TableInfo model);
 
 		protected abstract void InitDatabaseAndTable(IDbConnection conn, TableInfo model);
 
-		protected override int Process(IEnumerable<IBaseEntity> datas, dynamic sender = null)
+		protected override int Process(List<IBaseEntity> items, dynamic sender = null)
 		{
-			if (datas == null || datas.Count() == 0)
+			if (items == null || items.Count == 0)
 			{
 				return 0;
 			}
-			var tableInfo = new TableInfo(datas.First().GetType());
+
+			var tableInfo = new TableInfo(items.First().GetType());
 
 			IDbConnection conn = null;
 
@@ -69,18 +72,20 @@ namespace DotnetSpider.Extension.Pipeline
 					conn = RefreshConnectionString();
 
 					// 每天执行一次建表操作, 可以实现每天一个表的操作，或者按周分表可以在运行时创建新表。
-					var key = tableInfo.Schema.TableNamePostfix != TableNamePostfix.None ? $"{tableInfo.Schema.TableName}_{DateTime.Now:yyyyMMdd}" : tableInfo.Schema.TableName;
-					Sqls sqls;
+					var key = tableInfo.Schema.TableNamePostfix != TableNamePostfix.None
+						? $"{tableInfo.Schema.TableName}_{DateTime.Now:yyyyMMdd}"
+						: tableInfo.Schema.TableName;
+					SqlStatements sqlStatements;
 					lock (this)
 					{
-						if (_sqls.ContainsKey(key))
+						if (_sqlStatements.ContainsKey(key))
 						{
-							sqls = _sqls[key];
+							sqlStatements = _sqlStatements[key];
 						}
 						else
 						{
-							sqls = GenerateSqls(tableInfo);
-							_sqls.Add(key, sqls);
+							sqlStatements = GenerateSqlStatements(tableInfo);
+							_sqlStatements.Add(key, sqlStatements);
 							InitDatabaseAndTable(conn, tableInfo);
 						}
 					}
@@ -90,35 +95,36 @@ namespace DotnetSpider.Extension.Pipeline
 					switch (_pipelineMode)
 					{
 						case PipelineMode.Insert:
-							{
-								count += conn.MyExecute(sqls.InsertSql, datas);
-								break;
-							}
+						{
+							count += conn.MyExecute(sqlStatements.InsertSql, items);
+							break;
+						}
 						case PipelineMode.InsertAndIgnoreDuplicate:
-							{
-								count += conn.MyExecute(sqls.InsertAndIgnoreDuplicateSql, datas);
-								break;
-							}
+						{
+							count += conn.MyExecute(sqlStatements.InsertAndIgnoreDuplicateSql, items);
+							break;
+						}
 						case PipelineMode.InsertNewAndUpdateOld:
-							{
-								count += conn.MyExecute(sqls.InsertNewAndUpdateOldSql, datas);
-								break;
-							}
+						{
+							count += conn.MyExecute(sqlStatements.InsertNewAndUpdateOldSql, items);
+							break;
+						}
 						case PipelineMode.Update:
+						{
+							if (string.IsNullOrWhiteSpace(sqlStatements.UpdateSql))
 							{
-								if (string.IsNullOrWhiteSpace(sqls.UpdateSql))
-								{
-									Logger?.LogError("Check your TableInfo attribute contains UpdateColumns value.");
-									throw new SpiderException("UpdateSql is null.");
-								}
-								count += conn.MyExecute(sqls.UpdateSql, datas);
-								break;
+								Logger?.LogError("Check your TableInfo attribute contains UpdateColumns value.");
+								throw new SpiderException("UpdateSql is null.");
 							}
+
+							count += conn.MyExecute(sqlStatements.UpdateSql, items);
+							break;
+						}
 						default:
-							{
-								count += conn.MyExecute(sqls.InsertSql, datas);
-								break;
-							}
+						{
+							count += conn.MyExecute(sqlStatements.InsertSql, items);
+							break;
+						}
 					}
 
 					return count;
@@ -130,6 +136,7 @@ namespace DotnetSpider.Extension.Pipeline
 						Thread.Sleep(5000);
 						continue;
 					}
+
 					throw;
 				}
 				finally
@@ -137,22 +144,23 @@ namespace DotnetSpider.Extension.Pipeline
 					conn?.Dispose();
 				}
 			}
-			throw new SpiderException($"Pipeline process failed.");
+
+			throw new SpiderException("Pipeline process failed.");
 		}
 
 		protected string GetColumnName(Column column)
 		{
-			return Ignorease ? column.Name.ToLowerInvariant() : column.Name;
+			return IgnoreCase ? column.Name.ToLowerInvariant() : column.Name;
 		}
 
 		protected string GetDatabaseName(TableInfo tableInfo)
 		{
-			return Ignorease ? tableInfo.Schema.Database.ToLowerInvariant() : tableInfo.Schema.Database;
+			return IgnoreCase ? tableInfo.Schema.Database.ToLowerInvariant() : tableInfo.Schema.Database;
 		}
 
 		protected string GetTableName(TableInfo tableInfo)
 		{
-			return Ignorease ? tableInfo.Schema.FullName.ToLowerInvariant() : tableInfo.Schema.FullName;
+			return IgnoreCase ? tableInfo.Schema.FullName.ToLowerInvariant() : tableInfo.Schema.FullName;
 		}
 
 		private IDbConnection RefreshConnectionString()
@@ -165,6 +173,7 @@ namespace DotnetSpider.Extension.Pipeline
 					return conn;
 				}
 			}
+
 			if (!string.IsNullOrWhiteSpace(Env.DataConnectionString))
 			{
 				ConnectString = Env.DataConnectionString;
@@ -174,7 +183,10 @@ namespace DotnetSpider.Extension.Pipeline
 					return conn;
 				}
 			}
-			if (ConnectionStringSettingsRefresher != null)
+
+			if (ConnectionStringSettingsRefresher == null)
+				throw new SpiderException(
+					"Can't find connection string from argument, config file, connectionStringSettingsRefresher.");
 			{
 				ConnectString = ConnectionStringSettingsRefresher.GetNew().ConnectionString;
 				var conn = TryCreateDbConnection();
@@ -184,7 +196,8 @@ namespace DotnetSpider.Extension.Pipeline
 				}
 			}
 
-			throw new SpiderException("Can't find connectstring from argument, configfile, connectionStringSettingsRefresher.");
+			throw new SpiderException(
+				"Can't find connection string from argument, config file, connectionStringSettingsRefresher.");
 		}
 
 		/// <summary>
@@ -208,39 +221,40 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <returns>数据管道</returns>
 		public static IPipeline GetPipelineFromAppConfig(ConnectionStringSettings connectionStringSettings = null)
 		{
-			connectionStringSettings = connectionStringSettings == null ? Env.DataConnectionStringSettings : connectionStringSettings;
+			connectionStringSettings = connectionStringSettings ?? Env.DataConnectionStringSettings;
 			if (connectionStringSettings == null)
 			{
 				return null;
 			}
+
 			IPipeline pipeline;
 			switch (connectionStringSettings.ProviderName)
 			{
 				case DatabaseProviderFactories.PostgreSqlProvider:
-					{
-						pipeline = new PostgreSqlEntityPipeline(connectionStringSettings.ConnectionString);
-						break;
-					}
+				{
+					pipeline = new PostgreSqlEntityPipeline(connectionStringSettings.ConnectionString);
+					break;
+				}
 				case DatabaseProviderFactories.MySqlProvider:
-					{
-						pipeline = new MySqlEntityPipeline(connectionStringSettings.ConnectionString);
-						break;
-					}
+				{
+					pipeline = new MySqlEntityPipeline(connectionStringSettings.ConnectionString);
+					break;
+				}
 				case DatabaseProviderFactories.SqlServerProvider:
-					{
-						pipeline = new SqlServerEntityPipeline(connectionStringSettings.ConnectionString);
-						break;
-					}
+				{
+					pipeline = new SqlServerEntityPipeline(connectionStringSettings.ConnectionString);
+					break;
+				}
 
 				case "MongoDB":
-					{
+				{
 #if !NET40
-						pipeline = new MongoDbEntityPipeline(connectionStringSettings.ConnectionString);
-						break;
+					pipeline = new MongoDbEntityPipeline(connectionStringSettings.ConnectionString);
+					break;
 #else
 						throw new NotSupportedException("Notsupport mongodb in .NET40 right now.");
 #endif
-					}
+				}
 
 				//case "Cassandra":
 				//	{
@@ -253,11 +267,12 @@ namespace DotnetSpider.Extension.Pipeline
 				//		break;
 				//	}
 				default:
-					{
-						pipeline = new ConsolePipeline();
-						break;
-					}
+				{
+					pipeline = new ConsolePipeline();
+					break;
+				}
 			}
+
 			return pipeline;
 		}
 
@@ -273,8 +288,8 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				Logger?.LogWarning($"Can't connect to database: {ConnectString}.");
 			}
+
 			return null;
 		}
 	}
 }
-

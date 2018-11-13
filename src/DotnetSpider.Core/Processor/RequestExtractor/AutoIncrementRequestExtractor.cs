@@ -20,7 +20,6 @@ namespace DotnetSpider.Core.Processor.RequestExtractor
 		/// </summary>
 		/// <param name="paginationStr">URL中分页的部分, 如: www.a.com/content_1.html, 则可以填此值为 content_1.html, tent_1.html等, 框架会把数据部分改成\d+用于正则匹配截取</param>
 		/// <param name="interval">每次自增的间隔</param>
-		/// <param name="termination">中止器, 用于判断是否已到最后一个需要采集的链接</param>
 		public AutoIncrementRequestExtractor(string paginationStr, int interval = 1)
 		{
 			if (string.IsNullOrWhiteSpace(paginationStr))
@@ -37,14 +36,11 @@ namespace DotnetSpider.Core.Processor.RequestExtractor
 		{
 			var currentPageStr = GetCurrentPagination(page.Request.Url);
 			var matches = RegexUtil.Number.Matches(currentPageStr);
-			if (matches.Count > 0 && int.TryParse(matches[0].Value, out var currentPage))
-			{
-				var next = RegexUtil.Number.Replace(_paginationStr, (currentPage + _interval).ToString());
-				string newUrl = page.Request.Url.Replace(currentPageStr, next);
-				return new[] { new Request(newUrl, page.CopyProperties()) };
-			}
+			if (matches.Count <= 0 || !int.TryParse(matches[0].Value, out var currentPage)) return new Request[0];
+			var next = RegexUtil.Number.Replace(_paginationStr, (currentPage + _interval).ToString());
+			var newUrl = page.Request.Url.Replace(currentPageStr, next);
+			return new[] { new Request(newUrl, page.CopyProperties()) };
 
-			return new Request[0];
 		}
 
 		/// <summary>

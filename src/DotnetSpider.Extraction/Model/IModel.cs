@@ -36,7 +36,7 @@ namespace DotnetSpider.Extraction.Model
 		/// <summary>
 		/// 共享值的选择器
 		/// </summary>
-		IEnumerable<Shared> Shareds { get; }
+		IEnumerable<Share> Shares { get; }
 
 		string Identity { get; }
 	}

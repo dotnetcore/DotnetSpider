@@ -12,7 +12,7 @@
 		/// <summary>
 		/// 拨号成功
 		/// </summary>
-		Sucess,
+		Success,
 		/// <summary>
 		/// 此次拨号跳过
 		/// </summary>

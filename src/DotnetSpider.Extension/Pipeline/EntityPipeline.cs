@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
-using System;
-using System.Linq;
 using DotnetSpider.Extraction.Model;
-using DotnetSpider.Extension.Model;
 
 namespace DotnetSpider.Extension.Pipeline
 {
@@ -16,16 +13,15 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 处理爬虫实体解析器解析到的实体数据结果
 		/// </summary>
-		/// <param name="datas">数据</param>
+		/// <param name="items">数据</param>
 		/// <param name="sender">调用方</param>
 		/// <returns>最终影响结果数量(如数据库影响行数)</returns>
-		protected abstract int Process(IEnumerable<IBaseEntity> datas, dynamic sender = null);
+		protected abstract int Process(List<IBaseEntity> items, dynamic sender = null);
 
 		/// <summary>
 		/// 处理页面解析器解析到的数据结果
 		/// </summary>
 		/// <param name="resultItems">数据结果</param>
-		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
 		public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 		{
@@ -41,29 +37,30 @@ namespace DotnetSpider.Extension.Pipeline
 
 				foreach (var kv1 in resultItem)
 				{
-					var entities = kv1.Value as IEnumerable<dynamic>;
-					if (entities != null)
+					switch (kv1.Value)
 					{
-						foreach (var entity in entities)
+						case IEnumerable<dynamic> entities:
 						{
-							if (entity is IBaseEntity)
+							foreach (var entity in entities)
 							{
-								var type = entity.GetType().FullName;
-								if (!typeMapEntities.ContainsKey(type))
+								if (entity is IBaseEntity)
 								{
-									typeMapEntities.Add(type, new List<IBaseEntity>());
+									var type = entity.GetType().FullName;
+									if (!typeMapEntities.ContainsKey(type))
+									{
+										typeMapEntities.Add(type, new List<IBaseEntity>());
+									}
+									typeMapEntities[type].Add(entity);
 								}
-								typeMapEntities[type].Add(entity);
 							}
+
+							break;
 						}
-					}
-					else
-					{
-						var singleEntity = kv1.Value as IBaseEntity;
-						if (singleEntity != null)
+						case IBaseEntity singleEntity:
 						{
 							var type = singleEntity.GetType().FullName;
 							typeMapEntities.Add(type, new List<IBaseEntity> { singleEntity });
+							break;
 						}
 					}
 

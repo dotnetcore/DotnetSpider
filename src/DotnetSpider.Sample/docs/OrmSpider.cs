@@ -1,9 +1,7 @@
 ﻿using DotnetSpider.Core;
 using DotnetSpider.Extension.Model;
-using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extraction;
-using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 
 namespace DotnetSpider.Sample.docs

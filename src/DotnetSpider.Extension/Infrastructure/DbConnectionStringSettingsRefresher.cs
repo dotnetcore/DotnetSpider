@@ -13,17 +13,17 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <summary>
 		/// 连接字符串
 		/// </summary>
-		public string ConnectString;
+		public string ConnectionString { get; set; }
 
 		/// <summary>
 		/// 数据库类型
 		/// </summary>
-		public Database DataSource = Database.MySql;
+		public Database DataSource { get; set; } = Database.MySql;
 
 		/// <summary>
 		/// 查询的SQL语句
 		/// </summary>
-		public string QueryString;
+		public string QueryString { get; set; }
 
 		/// <summary>
 		/// 获取新的数据库连接设置
@@ -31,9 +31,10 @@ namespace DotnetSpider.Extension.Infrastructure
 		/// <returns>数据库连接设置</returns>
 		public ConnectionStringSettings GetNew()
 		{
-			using (var conn = DatabaseExtensions.CreateDbConnection(DataSource, ConnectString))
+			using (var conn = DatabaseExtensions.CreateDbConnection(DataSource, ConnectionString))
 			{
-				ConnectionStringSettings connectString = conn.MyQuery<ConnectionStringSettings>(QueryString).FirstOrDefault();
+				ConnectionStringSettings connectString =
+					conn.MyQuery<ConnectionStringSettings>(QueryString).FirstOrDefault();
 				return connectString;
 			}
 		}

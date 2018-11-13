@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-
 namespace DotnetSpider.Core.Processor
 {
 	/// <summary>
@@ -18,10 +15,5 @@ namespace DotnetSpider.Core.Processor
 			page.AddResultItem("html", page.Content);
 			page.AddResultItem("url", page.Request.Url);
 		}
-	}
-
-	class Item
-	{
-		public string Title { get; set; }
 	}
 }

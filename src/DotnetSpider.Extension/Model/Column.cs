@@ -1,18 +1,14 @@
-﻿using DotnetSpider.Extension.Model;
-using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace DotnetSpider.Extension.Model
 {
 	[AttributeUsage(AttributeTargets.Property)]
-	public class Column : System.Attribute
+	public class Column : Attribute
 	{
 		/// <summary>
 		/// 列的长度
 		/// </summary>
-		public int Length { get; set; } = 255;
+		public int Length { get; set; }
 
 		/// <summary>
 		/// 列名
@@ -29,7 +25,7 @@ namespace DotnetSpider.Extension.Model
 			Length = length;
 		}
 
-		public Column(string name, int length = 255) : this(255)
+		public Column(string name, int length = 255) : this(length)
 		{
 			Name = name;
 		}

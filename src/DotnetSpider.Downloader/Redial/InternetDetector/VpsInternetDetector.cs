@@ -51,9 +51,9 @@ namespace DotnetSpider.Downloader.Redial.InternetDetector
 
 		private int GetIp4Count()
 		{
-			string hostName = Dns.GetHostName();
+			var hostName = Dns.GetHostName();
 			var addressList = Dns.GetHostAddresses(hostName);
-			int count = 0;
+			var count = 0;
 			foreach (var address in addressList)
 			{
 				if (address.AddressFamily == AddressFamily.InterNetwork)

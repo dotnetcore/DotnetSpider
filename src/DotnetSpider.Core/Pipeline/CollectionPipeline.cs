@@ -19,14 +19,7 @@ namespace DotnetSpider.Core.Pipeline
 		{
 			lock (ItemsLocker)
 			{
-				if (_items.ContainsKey(owner))
-				{
-					return _items[owner];
-				}
-				else
-				{
-					return new ResultItems[0];
-				}
+				return _items.ContainsKey(owner) ? (IList<ResultItems>) _items[owner] : new ResultItems[0];
 			}
 		}
 
@@ -34,7 +27,6 @@ namespace DotnetSpider.Core.Pipeline
 		/// 处理页面解析器解析到的数据结果
 		/// </summary>
 		/// <param name="resultItems">数据结果</param>
-		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
 		public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 		{

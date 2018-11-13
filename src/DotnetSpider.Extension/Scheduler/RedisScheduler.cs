@@ -9,7 +9,6 @@ using DotnetSpider.Extension.Infrastructure;
 using System;
 using Polly;
 using Polly.Retry;
-using System.Linq;
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Extension.Scheduler
@@ -127,7 +126,7 @@ namespace DotnetSpider.Extension.Scheduler
 			return _retryPolicy.Execute(() =>
 			{
 				var identity = request.GetIdentity();
-				bool isDuplicate = _redisConnection.Database.SetContains(_setKey, identity);
+				var isDuplicate = _redisConnection.Database.SetContains(_setKey, identity);
 				if (!isDuplicate)
 				{
 					_redisConnection.Database.SetAdd(_setKey, identity);
@@ -142,14 +141,7 @@ namespace DotnetSpider.Extension.Scheduler
 		/// <returns>请求对象</returns>
 		public override Request Poll()
 		{
-			if (UseInternet)
-			{
-				return NetworkCenter.Current.Execute("rds-poll", ImplPollRequest);
-			}
-			else
-			{
-				return ImplPollRequest();
-			}
+			return UseInternet ? NetworkCenter.Current.Execute("rds-poll", ImplPollRequest) : ImplPollRequest();
 		}
 
 		/// <summary>
@@ -158,16 +150,7 @@ namespace DotnetSpider.Extension.Scheduler
 		public override long LeftRequestsCount
 		{
 			get
-			{
-				if (UseInternet)
-				{
-					return NetworkCenter.Current.Execute("rds-left", () => _redisConnection.Database.ListLength(_queueKey));
-				}
-				else
-				{
-					return _redisConnection.Database.ListLength(_queueKey);
-				}
-			}
+			{ return UseInternet ? NetworkCenter.Current.Execute("rds-left", () => _redisConnection.Database.ListLength(_queueKey)) : _redisConnection.Database.ListLength(_queueKey); }
 		}
 
 		/// <summary>
@@ -252,7 +235,7 @@ namespace DotnetSpider.Extension.Scheduler
 				{
 					int batchCount = BatchCount;
 
-					var count = requests.Count();
+					var count = requests.Count;
 					int cacheSize = count > batchCount ? batchCount : count;
 					RedisValue[] identities = new RedisValue[cacheSize];
 					HashEntry[] items = new HashEntry[cacheSize];
@@ -265,34 +248,30 @@ namespace DotnetSpider.Extension.Scheduler
 						identities[i] = request.GetIdentity();
 						items[i] = new HashEntry(request.GetIdentity(), JsonConvert.SerializeObject(request));
 						++i;
-						if (i == batchCount)
-						{
-							--n;
+						if (i != batchCount) continue;
+						--n;
 
-							_redisConnection.Database.SetAdd(_setKey, identities);
-							_redisConnection.Database.ListRightPush(_queueKey, identities);
-							_redisConnection.Database.HashSet(_itemKey, items, CommandFlags.HighPriority);
-
-							i = 0;
-							if (n != 0)
-							{
-								identities = new RedisValue[batchCount];
-								items = new HashEntry[batchCount];
-							}
-							else
-							{
-								identities = new RedisValue[j];
-								items = new HashEntry[j];
-							}
-						}
-					}
-
-					if (i > 0)
-					{
 						_redisConnection.Database.SetAdd(_setKey, identities);
 						_redisConnection.Database.ListRightPush(_queueKey, identities);
 						_redisConnection.Database.HashSet(_itemKey, items);
+
+						i = 0;
+						if (n != 0)
+						{
+							identities = new RedisValue[batchCount];
+							items = new HashEntry[batchCount];
+						}
+						else
+						{
+							identities = new RedisValue[j];
+							items = new HashEntry[j];
+						}
 					}
+
+					if (i <= 0) return;
+					_redisConnection.Database.SetAdd(_setKey, identities);
+					_redisConnection.Database.ListRightPush(_queueKey, identities);
+					_redisConnection.Database.HashSet(_itemKey, items);
 				}
 			});
 			if (UseInternet)
@@ -329,8 +308,8 @@ namespace DotnetSpider.Extension.Scheduler
 			_retryPolicy.Execute(() =>
 			{
 				_redisConnection.Database.ListRightPush(_queueKey, request.GetIdentity());
-				string field = request.GetIdentity();
-				string value = JsonConvert.SerializeObject(request);
+				var field = request.GetIdentity();
+				var value = JsonConvert.SerializeObject(request);
 
 				_redisConnection.Database.HashSet(_itemKey, field, value);
 			});
@@ -362,17 +341,14 @@ namespace DotnetSpider.Extension.Scheduler
 				{
 					return null;
 				}
-				string field = value.ToString();
+				var field = value.ToString();
 
-				string json = _redisConnection.Database.HashGet(_itemKey, field);
+				var json = _redisConnection.Database.HashGet(_itemKey, field);
 
-				if (!string.IsNullOrEmpty(json))
-				{
-					var result = JsonConvert.DeserializeObject<Request>(json);
-					_redisConnection.Database.HashDelete(_itemKey, field);
-					return result;
-				}
-				return null;
+				if (string.IsNullOrEmpty(json)) return null;
+				var result = JsonConvert.DeserializeObject<Request>(json);
+				_redisConnection.Database.HashDelete(_itemKey, field);
+				return result;
 			});
 		}
 

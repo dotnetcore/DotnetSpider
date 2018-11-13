@@ -243,7 +243,7 @@ namespace DotnetSpider.Core.Test
 
 		internal class TestDownloader : DotnetSpider.Downloader.Downloader
 		{
-			protected override Response DowloadContent(Request request)
+			protected override Response DownloadContent(Request request)
 			{
 				return new Response() { Request = request, Content = "aabbcccdefg下载人数100", TargetUrl = request.Url };
 			}
@@ -259,7 +259,7 @@ namespace DotnetSpider.Core.Test
 
 		internal class FileDownloader : DotnetSpider.Downloader.Downloader
 		{
-			protected override Response DowloadContent(Request request)
+			protected override Response DownloadContent(Request request)
 			{
 				return new Response { Request = request };
 			}

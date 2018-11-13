@@ -1,6 +1,7 @@
 ﻿using System;
 #if !NETSTANDARD
 using System.Web;
+
 #else
 using System.Net;
 #endif
@@ -11,19 +12,19 @@ namespace DotnetSpider.Extraction.Model.Formatter
 	/// Converts a text string into a URL-encoded string.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
-	public class UrlEncodeFormater : Formatter
+	public class UrlEncodeFormatter : Formatter
 	{
 		/// <summary>
 		/// 编码的名称
 		/// </summary>
-		public string Encoding;
-		
+		public string Encoding { get; set; }
+
 		/// <summary>
 		/// 实现数值的转化
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
 			string tmp = value.ToString();
 #if !NETSTANDARD

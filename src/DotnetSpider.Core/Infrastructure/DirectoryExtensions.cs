@@ -13,17 +13,15 @@ namespace DotnetSpider.Core.Infrastructure
 		/// </summary>
 		/// <param name="fullName">文件路径</param>
 		/// <returns>文件夹路径</returns>
-		public static string CheckAndMakeParentDirecotry(string fullName)
+		public static string CheckAndMakeParentDirectory(string fullName)
 		{
-			string path = Path.GetDirectoryName(fullName);
+			var path = Path.GetDirectoryName(fullName);
 
-			if (path != null)
+			if (path == null) return null;
+			var directory = new DirectoryInfo(path);
+			if (!directory.Exists)
 			{
-				DirectoryInfo directory = new DirectoryInfo(path);
-				if (!directory.Exists)
-				{
-					directory.Create();
-				}
+				directory.Create();
 			}
 			return path;
 		}
@@ -36,26 +34,26 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <returns></returns>
 		public static void CopyTo(this DirectoryInfo source, string destination)
 		{
-			string sourcepath = source.FullName;
-			Queue<FileSystemInfo> copyfolders = new Queue<FileSystemInfo>(new DirectoryInfo(sourcepath).GetFileSystemInfos());
-			string copytopath = destination;
-			copytopath = copytopath.LastIndexOf(Path.DirectorySeparatorChar) == copytopath.Length - 1 ? copytopath : (copytopath + Path.DirectorySeparatorChar) + Path.GetFileName(sourcepath);
-			Directory.CreateDirectory(copytopath);
-			while (copyfolders.Count > 0)
+			var sourcePath = source.FullName;
+			var copyFolders = new Queue<FileSystemInfo>(new DirectoryInfo(sourcePath).GetFileSystemInfos());
+			var copyToPath = destination;
+			copyToPath = copyToPath.LastIndexOf(Path.DirectorySeparatorChar) == copyToPath.Length - 1 ? copyToPath : (copyToPath + Path.DirectorySeparatorChar) + Path.GetFileName(sourcePath);
+			Directory.CreateDirectory(copyToPath);
+			while (copyFolders.Count > 0)
 			{
-				FileSystemInfo filsSystemInfo = copyfolders.Dequeue();
-				if (!(filsSystemInfo is FileInfo file))
+				var fileSystemInfo = copyFolders.Dequeue();
+				if (!(fileSystemInfo is FileInfo file))
 				{
-					DirectoryInfo directory = (DirectoryInfo)filsSystemInfo;
-					Directory.CreateDirectory(directory.FullName.Replace(sourcepath, copytopath));
-					foreach (FileSystemInfo fi in directory.GetFileSystemInfos())
+					var directory = (DirectoryInfo)fileSystemInfo;
+					Directory.CreateDirectory(directory.FullName.Replace(sourcePath, copyToPath));
+					foreach (var fi in directory.GetFileSystemInfos())
 					{
-						copyfolders.Enqueue(fi);
+						copyFolders.Enqueue(fi);
 					}
 				}
 				else
 				{
-					file.CopyTo(file.FullName.Replace(sourcepath, copytopath));
+					file.CopyTo(file.FullName.Replace(sourcePath, copyToPath));
 				}
 			}
 		}

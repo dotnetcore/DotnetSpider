@@ -2,7 +2,6 @@
 using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System;
 using DotnetSpider.Core.Processor.Filter;
 using DotnetSpider.Core.Processor.RequestExtractor;
@@ -34,7 +33,6 @@ namespace DotnetSpider.Extension.Processor
 		/// </summary>
 		/// <param name="model">数据模型</param>
 		/// <param name="extractor">模型解析器</param>
-		/// <param name="targetRequestExtractor">目标链接的解析器</param>
 		/// <param name="dataHandlers">数据处理器</param>
 		public ModelProcessor(IModel model, IModelExtractor extractor = null, params IDataHandler[] dataHandlers)
 		{
@@ -45,67 +43,52 @@ namespace DotnetSpider.Extension.Processor
 			var patterns = new HashSet<string>();
 			foreach (var ps in model.Targets.Select(t => t.Patterns))
 			{
-				if (ps != null)
+				if (ps == null) continue;
+				foreach (var p in ps)
 				{
-					foreach (var p in ps)
-					{
-						patterns.Add(p);
-					}
+					patterns.Add(p);
 				}
 			}
+
 			var excludePatterns = new HashSet<string>();
 			foreach (var ps in model.Targets.Select(t => t.ExcludePatterns))
 			{
-				if (ps != null)
+				if (ps == null) continue;
+				foreach (var p in ps)
 				{
-					foreach (var p in ps)
-					{
-						excludePatterns.Add(p);
-					}
+					excludePatterns.Add(p);
 				}
 			}
+
 			Filter = new PatternFilter(patterns, excludePatterns);
 
-			var xpaths = new HashSet<string>();
+			var xPaths = new HashSet<string>();
 			foreach (var xs in model.Targets.Select(t => t.XPaths))
 			{
-				if (xs != null)
+				if (xs == null) continue;
+				foreach (var x in xs)
 				{
-					foreach (var x in xs)
-					{
-						xpaths.Add(x);
-					}
-				}
-			}
-			if (xpaths.Any(x => x == null || x == "."))
-			{
-				RequestExtractor = new XPathRequestExtractor(".");
-			}
-			else
-			{
-				foreach (var xpath in xpaths)
-				{
-					RequestExtractor = new XPathRequestExtractor(xpaths);
+					xPaths.Add(x);
 				}
 			}
 
-			if (dataHandlers != null)
+			RequestExtractor = xPaths.Any(x => x == null || x == ".") ? new XPathRequestExtractor(".") : new XPathRequestExtractor(xPaths);
+
+			if (dataHandlers == null) return;
+			foreach (var dataHandler in dataHandlers)
 			{
-				foreach (var datahandler in dataHandlers)
+				if (dataHandler != null)
 				{
-					if (datahandler != null)
-					{
-						_dataHandlers.Add(datahandler);
-					}
+					_dataHandlers.Add(dataHandler);
 				}
 			}
 		}
 
-		public void AddDataHanlder(IDataHandler handler)
+		public void AddDataHandler(IDataHandler handler)
 		{
 			if (handler == null)
 			{
-				throw new SpiderException("Datahandler should not be null.");
+				throw new SpiderException("DataHandler should not be null");
 			}
 
 			_dataHandlers.Add(handler);
@@ -117,20 +100,18 @@ namespace DotnetSpider.Extension.Processor
 		/// <param name="page">页面数据</param>
 		protected override void Handle(Page page)
 		{
-			var datas = Extractor.Extract(page.Selectable(), Model);
+			var items = Extractor.Extract(page.Selectable(), Model)?.ToList();
 
-			if (datas == null)
+			if (items == null || items.Count == 0)
 			{
 				return;
 			}
 
-			var items = datas.ToList();
-
 			foreach (var handler in _dataHandlers)
 			{
-				for (int i = 0; i < items.Count; ++i)
+				for (var i = 0; i < items.Count; ++i)
 				{
-					dynamic data = items.ElementAt(i);
+					var data = items.ElementAt(i);
 					handler.Handle(ref data, page);
 				}
 			}
@@ -141,21 +122,21 @@ namespace DotnetSpider.Extension.Processor
 		/// <summary>
 		/// Only used for test
 		/// </summary>
-		/// <param name="region"></param>
+		/// <param name="xPath"></param>
 		/// <returns></returns>
-		internal bool ContainsXpath(string xpath)
+		internal bool ContainsXpath(string xPath)
 		{
-			return ((XPathRequestExtractor)RequestExtractor).ContainsXpath(xpath);
+			return ((XPathRequestExtractor) RequestExtractor).ContainsXpath(xPath);
 		}
 
 		/// <summary>
 		/// Only used for test
 		/// </summary>
-		/// <param name="region"></param>
+		/// <param name="pattern"></param>
 		/// <returns></returns>
 		internal bool ContainsPattern(string pattern)
 		{
-			return ((PatternFilter)Filter).ContainsPattern(pattern);
+			return ((PatternFilter) Filter).ContainsPattern(pattern);
 		}
 	}
 }

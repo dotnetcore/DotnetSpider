@@ -7,7 +7,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 	/// 把包含中文的字符串转化成数字
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-	public class DigitUnitFormater : Formatter
+	public class DigitUnitFormatter : Formatter
 	{
 		private const string UnitStringForShi = "十";
 		private const string UnitStringForBai = "百";
@@ -26,10 +26,10 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
 			var tmp = value.ToString();
-			decimal num = decimal.Parse(_decimalRegex.Match(tmp).ToString());
+			var num = decimal.Parse(_decimalRegex.Match(tmp).ToString());
 			if (tmp.EndsWith(UnitStringForShi))
 			{
 				num = num * 10;

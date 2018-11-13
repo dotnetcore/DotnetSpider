@@ -6,7 +6,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 	/// Removes all leading and trailing white-space characters from the current System.String object.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-	public class TrimFormater : Formatter
+	public class TrimFormatter : Formatter
 	{
 		/// <summary>
 		/// Trim 类型
@@ -38,7 +38,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
 			switch (Type)
 			{

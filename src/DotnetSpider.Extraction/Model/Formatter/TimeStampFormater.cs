@@ -13,10 +13,10 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
-			DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-			string tmp = value.ToString();
+			var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+			var tmp = value.ToString();
 			if (!long.TryParse(tmp, out var timeStamp))
 			{
 				return dt.ToString("yyyy-MM-dd HH:mm:ss");

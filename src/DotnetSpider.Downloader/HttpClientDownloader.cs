@@ -71,7 +71,7 @@ namespace DotnetSpider.Downloader
 			_decodeHtml = decodeHtml;
 		}
 
-		protected override Response DowloadContent(Request request)
+		protected override Response DownloadContent(Request request)
 		{
 			var response = new Response(request);
 
@@ -171,9 +171,7 @@ namespace DotnetSpider.Downloader
 				if (HttpProxyPool.Instance != null && proxy != null)
 				{
 					HttpProxyPool.Instance.ReturnProxy(proxy,
-						httpResponseMessage == null
-							? HttpStatusCode.ServiceUnavailable
-							: httpResponseMessage.StatusCode);
+						httpResponseMessage?.StatusCode ?? HttpStatusCode.ServiceUnavailable);
 				}
 
 				try

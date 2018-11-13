@@ -1,8 +1,6 @@
-﻿using DotnetSpider.Core.Processor;
-using DotnetSpider.Extension;
+﻿using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using System;
 using DotnetSpider.Core.Processor.Filter;

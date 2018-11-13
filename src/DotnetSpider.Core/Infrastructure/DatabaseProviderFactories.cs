@@ -68,18 +68,16 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				var factoryType = assembly.GetExportedTypes()
 					.FirstOrDefault(t => t.BaseType == typeof(DbProviderFactory));
-				if (factoryType != null)
+				if (factoryType == null) continue;
+				var instanceField = factoryType.GetField("Instance");
+				if (instanceField?.GetValue(null) is DbProviderFactory instance)
 				{
-					FieldInfo instanceField = factoryType.GetField("Instance");
-					if (instanceField?.GetValue(null) is DbProviderFactory instance)
-					{
-						RegisterFactory(factoryType.Namespace, instance);
-					}
+					RegisterFactory(factoryType.Namespace, instance);
 				}
 			}
-			var providerDlls = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory)
+			var providerAssemblies = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory)
 				.Where(p => DataProviders.Contains(Path.GetFileName(p).ToLower())).ToList();
-			foreach (var providerDll in providerDlls)
+			foreach (var providerDll in providerAssemblies)
 			{
 				if (string.IsNullOrWhiteSpace(providerDll))
 				{
@@ -88,13 +86,11 @@ namespace DotnetSpider.Core.Infrastructure
 				var assembly = Assembly.Load(Path.GetFileName(providerDll).Replace(".dll", ""));
 				var factoryType = assembly.GetExportedTypes()
 					.FirstOrDefault(t => t.BaseType == typeof(DbProviderFactory));
-				if (factoryType != null)
+				if (factoryType == null) continue;
+				var instanceField = factoryType.GetField("Instance");
+				if (instanceField?.GetValue(null) is DbProviderFactory instance)
 				{
-					FieldInfo instanceField = factoryType.GetField("Instance");
-					if (instanceField?.GetValue(null) is DbProviderFactory instance)
-					{
-						RegisterFactory(factoryType.Namespace, instance);
-					}
+					RegisterFactory(factoryType.Namespace, instance);
 				}
 			}
 		}

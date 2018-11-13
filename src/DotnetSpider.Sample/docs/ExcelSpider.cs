@@ -3,12 +3,7 @@ using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model.Attribute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
- 
+
 namespace DotnetSpider.Sample.docs
 {
 	public class ExcelSpider : EntitySpider

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DotnetSpider.Downloader;
 
@@ -8,7 +7,7 @@ namespace DotnetSpider.Core.Processor.Filter
 	public class PatternFilter : IFilter
 	{
 		private readonly List<string> _patterns;
-		private readonly List<string> _excludePaterns;
+		private readonly List<string> _excludePatterns;
 
 		/// <summary>
 		/// 构造方法
@@ -24,14 +23,14 @@ namespace DotnetSpider.Core.Processor.Filter
 		public PatternFilter(IEnumerable<string> patterns, IEnumerable<string> excludePatters = null)
 		{
 			_patterns = patterns == null ? new List<string>() : new List<string>(patterns);
-			_excludePaterns = excludePatters == null ? new List<string>() : new List<string>(excludePatters);
+			_excludePatterns = excludePatters == null ? new List<string>() : new List<string>(excludePatters);
 		}
 
 		public bool IsMatch(Request request)
 		{
-			if (_patterns.Count == 0 && _excludePaterns.Count == 0) return true;
+			if (_patterns.Count == 0 && _excludePatterns.Count == 0) return true;
 
-			foreach (var pattern in _excludePaterns)
+			foreach (var pattern in _excludePatterns)
 			{
 				if (Regex.IsMatch(request.Url, pattern))
 				{

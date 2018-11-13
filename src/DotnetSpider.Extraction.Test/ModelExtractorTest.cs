@@ -46,7 +46,7 @@ namespace DotnetSpider.Extraction.Test
 			ModelExtractor extractor = new ModelExtractor();
 
 			var results = extractor.Extract(CreatePage(), model).ToList();
-			Assert.Equal(2, results.Count());
+			Assert.Equal(2, results.Count);
 
 			Assert.Equal("a", results[0]["title"]);
 			Assert.Equal("b", results[1]["title"]);
@@ -71,7 +71,7 @@ namespace DotnetSpider.Extraction.Test
 			var model = new ModelDefinition<E>();
 
 			var results = extractor.Extract(CreatePage(), model).ToList();
-			Assert.Equal(2, results.Count());
+			Assert.Equal(2, results.Count);
 
 			Assert.Equal("a", results[0]["title"]);
 			Assert.Equal("b", results[1]["title"]);

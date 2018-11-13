@@ -12,7 +12,7 @@ using System.Collections.Generic;
 namespace DotnetSpider.Core.Infrastructure
 {
 	/// <summary>
-	/// Database Extentions
+	/// Database Extensions
 	/// </summary>
 	/// <summary xml:lang="zh-CN">
 	/// 数据库扩展
@@ -33,7 +33,9 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				throw new SpiderException("ConnectionStringSetting is null");
 			}
-			if (string.IsNullOrWhiteSpace(connectionStringSettings.ConnectionString) || string.IsNullOrWhiteSpace(connectionStringSettings.ProviderName))
+
+			if (string.IsNullOrWhiteSpace(connectionStringSettings.ConnectionString) ||
+			    string.IsNullOrWhiteSpace(connectionStringSettings.ProviderName))
 			{
 				throw new SpiderException("ConnectionStringSetting is incorrect");
 			}
@@ -52,6 +54,7 @@ namespace DotnetSpider.Core.Infrastructure
 						{
 							connection.Open();
 						}
+
 						return connection;
 					}
 				}
@@ -62,6 +65,7 @@ namespace DotnetSpider.Core.Infrastructure
 						Log.Logger.Error($"{connectionStringSettings.ConnectionString}: {e}.");
 						break;
 					}
+
 					if (e.Message.ToLower().StartsWith("access denied for user"))
 					{
 						Log.Logger.Error($"Access denied: {connectionStringSettings.ConnectionString}.");
@@ -93,24 +97,24 @@ namespace DotnetSpider.Core.Infrastructure
 			switch (source)
 			{
 				case Database.MySql:
-					{
-						factory = DatabaseProviderFactories.GetFactory(DatabaseProviderFactories.MySqlProvider);
-						break;
-					}
+				{
+					factory = DatabaseProviderFactories.GetFactory(DatabaseProviderFactories.MySqlProvider);
+					break;
+				}
 				case Database.SqlServer:
-					{
-						factory = DatabaseProviderFactories.GetFactory(DatabaseProviderFactories.SqlServerProvider);
-						break;
-					}
+				{
+					factory = DatabaseProviderFactories.GetFactory(DatabaseProviderFactories.SqlServerProvider);
+					break;
+				}
 				case Database.PostgreSql:
-					{
-						factory = DatabaseProviderFactories.GetFactory(DatabaseProviderFactories.PostgreSqlProvider);
-						break;
-					}
+				{
+					factory = DatabaseProviderFactories.GetFactory(DatabaseProviderFactories.PostgreSqlProvider);
+					break;
+				}
 				default:
-					{
-						throw new SpiderException($"Unsported database: {source}");
-					}
+				{
+					throw new SpiderException($"Unsupported database: {source}");
+				}
 			}
 
 			for (int i = 0; i < 5; ++i)
@@ -156,21 +160,24 @@ namespace DotnetSpider.Core.Infrastructure
 			switch (source)
 			{
 				case Database.MySql:
-					{
-						return new ConnectionStringSettings("MySql", connectString, DatabaseProviderFactories.MySqlProvider);
-					}
+				{
+					return new ConnectionStringSettings("MySql", connectString,
+						DatabaseProviderFactories.MySqlProvider);
+				}
 				case Database.SqlServer:
-					{
-						return new ConnectionStringSettings("SqlServer", connectString, DatabaseProviderFactories.SqlServerProvider);
-					}
+				{
+					return new ConnectionStringSettings("SqlServer", connectString,
+						DatabaseProviderFactories.SqlServerProvider);
+				}
 				case Database.PostgreSql:
-					{
-						return new ConnectionStringSettings("PostgreSql", connectString, DatabaseProviderFactories.PostgreSqlProvider);
-					}
+				{
+					return new ConnectionStringSettings("PostgreSql", connectString,
+						DatabaseProviderFactories.PostgreSqlProvider);
+				}
 				default:
-					{
-						throw new SpiderException($"Unsported databse: {source}");
-					}
+				{
+					throw new SpiderException($"Unsupported database: {source}");
+				}
 			}
 		}
 
@@ -193,6 +200,7 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				conn.Open();
 			}
+
 			IDataReader reader = null;
 			try
 			{
@@ -209,6 +217,7 @@ namespace DotnetSpider.Core.Infrastructure
 						{
 							html.Append($"<td>{reader.GetName(i - 1)}</td>");
 						}
+
 						html.Append("</tr>");
 					}
 
@@ -217,9 +226,11 @@ namespace DotnetSpider.Core.Infrastructure
 					{
 						html.Append($"<td>{reader.GetValue(j - 1)}</td>");
 					}
+
 					html.Append("</tr>");
 					row++;
 				}
+
 				html.Append("</table>");
 
 				return html.ToString();
@@ -229,6 +240,7 @@ namespace DotnetSpider.Core.Infrastructure
 				reader?.Close();
 			}
 		}
+
 		/// <summary>
 		/// 设置DbExecutor是否使用互联网, 如果不使用互联网上传数据则不需要通过NetworkCenter, 提高效率和稳定性
 		/// 但这是全局设置, 默认的MySqlEntityPipeline等都是使用此扩展实现的
@@ -245,11 +257,13 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="commandTimeout"></param>
 		/// <param name="commandType"></param>
 		/// <returns>The first cell selected</returns>
-		public static object MyExecuteScalar(this IDbConnection conn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+		public static object MyExecuteScalar(this IDbConnection conn, string sql, object param = null,
+			IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () => conn.ExecuteScalar(sql, param, transaction, commandTimeout, commandType));
+				return NetworkCenter.Current.Execute("db",
+					() => conn.ExecuteScalar(sql, param, transaction, commandTimeout, commandType));
 			}
 			else
 			{
@@ -267,11 +281,13 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="commandTimeout"></param>
 		/// <param name="commandType"></param>
 		/// <returns>An System.Data.IDataReader that can be used to iterate over the results of the SQL query.</returns>
-		public static IDataReader MyExecuteReader(this IDbConnection conn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+		public static IDataReader MyExecuteReader(this IDbConnection conn, string sql, object param = null,
+			IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () => conn.ExecuteReader(sql, param, transaction, commandTimeout, commandType));
+				return NetworkCenter.Current.Execute("db",
+					() => conn.ExecuteReader(sql, param, transaction, commandTimeout, commandType));
 			}
 			else
 			{
@@ -289,11 +305,13 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="commandTimeout"></param>
 		/// <param name="commandType"></param>
 		/// <returns>Number of rows affected</returns>
-		public static int MyExecute(this IDbConnection conn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+		public static int MyExecute(this IDbConnection conn, string sql, object param = null,
+			IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () => conn.Execute(sql, param, transaction, commandTimeout, commandType));
+				return NetworkCenter.Current.Execute("db",
+					() => conn.Execute(sql, param, transaction, commandTimeout, commandType));
 			}
 			else
 			{
@@ -311,11 +329,13 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="commandTimeout"></param>
 		/// <param name="commandType"></param>
 		/// <returns></returns>
-		public static dynamic MyQueryFirstOrDefault(this IDbConnection conn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+		public static dynamic MyQueryFirstOrDefault(this IDbConnection conn, string sql, object param = null,
+			IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () => conn.QueryFirstOrDefault(sql, param, transaction, commandTimeout, commandType));
+				return NetworkCenter.Current.Execute("db",
+					() => conn.QueryFirstOrDefault(sql, param, transaction, commandTimeout, commandType));
 			}
 			else
 			{
@@ -335,11 +355,14 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="commandTimeout"></param>
 		/// <param name="commandType"></param>
 		/// <returns>A sequence of data of the supplied type; if a basic type (int, string, etc) is queried then the data from the first column in assumed, otherwise an instance is created per row, and a direct column-name===member-name mapping is assumed (case insensitive).</returns>
-		public static IEnumerable<T> MyQuery<T>(this IDbConnection conn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
+		public static IEnumerable<T> MyQuery<T>(this IDbConnection conn, string sql, object param = null,
+			IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null,
+			CommandType? commandType = null)
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () => conn.Query<T>(sql, param, transaction, buffered, commandTimeout, commandType));
+				return NetworkCenter.Current.Execute("db",
+					() => conn.Query<T>(sql, param, transaction, buffered, commandTimeout, commandType));
 			}
 			else
 			{
@@ -358,11 +381,14 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="commandTimeout"></param>
 		/// <param name="commandType"></param>
 		/// <returns></returns>
-		public static IEnumerable<dynamic> MyQuery(this IDbConnection conn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
+		public static IEnumerable<dynamic> MyQuery(this IDbConnection conn, string sql, object param = null,
+			IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null,
+			CommandType? commandType = null)
 		{
 			if (UseNetworkCenter)
 			{
-				return NetworkCenter.Current.Execute("db", () => conn.Query(sql, param, transaction, buffered, commandTimeout, commandType));
+				return NetworkCenter.Current.Execute("db",
+					() => conn.Query(sql, param, transaction, buffered, commandTimeout, commandType));
 			}
 			else
 			{
@@ -381,16 +407,13 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="commandTimeout"></param>
 		/// <param name="commandType"></param>
 		/// <returns>The first cell selected</returns>
-		public static T MyExecuteScalar<T>(this IDbConnection conn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+		public static T MyExecuteScalar<T>(this IDbConnection conn, string sql, object param = null,
+			IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
 		{
-			if (UseNetworkCenter)
-			{
-				return NetworkCenter.Current.Execute("db", () => conn.ExecuteScalar<T>(sql, param, transaction, commandTimeout, commandType));
-			}
-			else
-			{
-				return conn.ExecuteScalar<T>(sql, param, transaction, commandTimeout, commandType);
-			}
+			return UseNetworkCenter
+				? NetworkCenter.Current.Execute("db",
+					() => conn.ExecuteScalar<T>(sql, param, transaction, commandTimeout, commandType))
+				: conn.ExecuteScalar<T>(sql, param, transaction, commandTimeout, commandType);
 		}
 	}
 }

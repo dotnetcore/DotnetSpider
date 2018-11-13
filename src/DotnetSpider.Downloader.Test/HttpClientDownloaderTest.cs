@@ -98,7 +98,7 @@ namespace DotnetSpider.Downloader.Test
 
 		class HttpClientDownloader2 : HttpClientDownloader
 		{
-			protected override Response DowloadContent(Request request)
+			protected override Response DownloadContent(Request request)
 			{
 				var page = new Response(request) { Content = "{'a':'b'}" };
 				DetectContentType(page, null);

@@ -37,7 +37,7 @@ namespace DotnetSpider.Extraction.Model
 		/// <summary>
 		/// 共享值的选择器
 		/// </summary>
-		public IEnumerable<Shared> Shareds { get; protected set; }
+		public IEnumerable<Share> Shares { get; protected set; }
 
 		[JsonIgnore]
 		public string Identity { get; protected set; }
@@ -50,7 +50,7 @@ namespace DotnetSpider.Extraction.Model
 
 		public ModelDefinition(Selector selector, IEnumerable<Field> fields,
 			IEnumerable<Target> targets = null,
-			IEnumerable<Shared> sharedValueSelectors = null, int take = 0, bool takeFromHead = true)
+			IEnumerable<Share> sharedValueSelectors = null, int take = 0, bool takeFromHead = true)
 		{
 			Selector = selector;
 			if (fields == null)
@@ -65,7 +65,7 @@ namespace DotnetSpider.Extraction.Model
 			}
 
 			Targets = targets;
-			Shareds = sharedValueSelectors;
+			Shares = sharedValueSelectors;
 			Take = take;
 			TakeFromHead = takeFromHead;
 			Identity = Guid.NewGuid().ToString("N");
@@ -73,9 +73,6 @@ namespace DotnetSpider.Extraction.Model
 
 		public ModelDefinition(Type type)
 		{
-			var typeName = type.FullName;
-			var name = typeName;
-
 			var entitySelector = type.GetCustomAttributes(typeof(Entity), true).FirstOrDefault() as Entity;
 			int take = 0;
 			bool takeFromHead = true;
@@ -88,10 +85,10 @@ namespace DotnetSpider.Extraction.Model
 			}
 
 			var targets = type.GetCustomAttributes(typeof(Target), true).Select(s => (Target)s).ToList();
-			var sharedValueSelectors = type.GetCustomAttributes(typeof(Shared), true).Select(e =>
+			var sharedValueSelectors = type.GetCustomAttributes(typeof(Share), true).Select(e =>
 			{
-				var p = (Shared)e;
-				return new Shared
+				var p = (Share)e;
+				return new Share
 				{
 					Name = p.Name,
 					Expression = p.Expression,
@@ -120,7 +117,7 @@ namespace DotnetSpider.Extraction.Model
 
 			Fields = fields;
 			Targets = targets;
-			Shareds = sharedValueSelectors;
+			Shares = sharedValueSelectors;
 			Take = take;
 			TakeFromHead = takeFromHead;
 

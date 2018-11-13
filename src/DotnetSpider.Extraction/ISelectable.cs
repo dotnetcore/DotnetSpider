@@ -62,7 +62,7 @@ namespace DotnetSpider.Extraction
 		/// </summary>
 		/// <param name="field">属性名称</param>
 		/// <returns>查询结果</returns>
-		dynamic Enviroment(string field);
+		dynamic Environment(string field);
 
 		/// <summary>
 		/// 查找所有的链接

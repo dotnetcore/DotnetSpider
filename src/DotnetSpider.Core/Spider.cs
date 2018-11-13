@@ -991,7 +991,7 @@ namespace DotnetSpider.Core
 			Monitor = Monitor ?? (string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? new LogMonitor() : new HttpMonitor());
 
 			_failingRequestsLogger = new LoggerConfiguration()
-				.MinimumLevel.Verbose().WriteTo.RollingFile($"failing.log").CreateLogger();
+				.MinimumLevel.Verbose().WriteTo.RollingFile("failing.log").CreateLogger();
 
 			OnRequestBuilding(arguments);
 

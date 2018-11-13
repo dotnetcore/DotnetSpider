@@ -24,7 +24,7 @@ namespace DotnetSpider.Extension.Downloader.WebDriverActions
 			try
 			{
 				webDriver.Manage().Window.Maximize();
-				for (int i = 0; i <= ScrollTimes; i++)
+				for (var i = 0; i <= ScrollTimes; i++)
 				{
 					webDriver.ExecuteScript("window.scrollBy(0, 500)");
 					Thread.Sleep(1000);

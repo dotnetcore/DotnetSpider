@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 namespace DotnetSpider.Downloader.Redial.Redialer
 {
 	/// <summary>
-	/// ADSL拨号器
+	/// ADSL 拨号器
 	/// </summary>
 	public class DefaultAdslRedialer : AdslRedialer
 	{
@@ -36,7 +36,7 @@ namespace DotnetSpider.Downloader.Redial.Redialer
 			}
 			else
 			{
-				throw new ArgumentException($"Unfound adsl config: {configPath}");
+				throw new ArgumentException($"Unfounded adsl config: {configPath}");
 			}
 		}
 
@@ -63,7 +63,7 @@ namespace DotnetSpider.Downloader.Redial.Redialer
 #else
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
-				KillPPPOEProcesses();
+				KillPppoeProcesses();
 				Process process = Process.Start("/sbin/ifdown", "ppp0");
 				if (process == null)
 				{
@@ -98,7 +98,7 @@ namespace DotnetSpider.Downloader.Redial.Redialer
 			}
 		}
 #if NETSTANDARD || NETCOREAPP
-		private void KillPPPOEProcesses()
+		private void KillPppoeProcesses()
 		{
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{

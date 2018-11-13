@@ -2,7 +2,7 @@
 {
 	public class TestDownloader : Downloader
 	{
-		protected override Response DowloadContent(Request request)
+		protected override Response DownloadContent(Request request)
 		{
 			return new Response() { Request = request, Content = "aabbcccdefg下载人数100" };
 		}

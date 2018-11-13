@@ -83,7 +83,7 @@ namespace DotnetSpider.Sample.docs
 				[Field(Expression = ".//a[@class='name']")]
 				public string ShopName { get; set; }
 
-				[StringFormater(Format = "http:{0}")]
+				[StringFormatter(Format = "http:{0}")]
 				[Download]
 				[Field(Expression = "//*[@class='brand-logo']/a[1]/img[1]/@src")]
 				public string Logo { get; set; }

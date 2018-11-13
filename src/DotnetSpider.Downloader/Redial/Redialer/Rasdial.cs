@@ -3,7 +3,7 @@
 namespace DotnetSpider.Downloader.Redial.Redialer
 {
 	/// <summary>
-	/// 通过Process调用rasdial.exe拨号
+	/// 通过 Process 调用 rasdial.exe 拨号
 	/// </summary>
 	public class Rasdial
 	{

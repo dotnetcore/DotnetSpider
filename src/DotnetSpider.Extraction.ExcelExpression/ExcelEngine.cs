@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ToolGood.Algorithm;
 using HtmlAgilityPack;
-using DotnetSpider.HtmlAgilityPack.Css;
 
 namespace DotnetSpider.Extraction.ExcelExpression
 {
@@ -38,14 +34,14 @@ namespace DotnetSpider.Extraction.ExcelExpression
 				return TryEvaluate(formula, null);
 			} else {
 				if (_names.Contains(name)) {
-					var obj = this.Evaluate(name);
+					var obj = Evaluate(name);
 					if (obj == null) {
 						return null;
 					}
 					return obj.ToString();
 
 				} else if (Parse(name, formula)) {
-					var obj = this.Evaluate(name);
+					var obj = Evaluate(name);
 					if (obj == null) {
 						return null;
 					}

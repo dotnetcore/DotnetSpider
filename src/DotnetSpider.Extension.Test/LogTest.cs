@@ -60,7 +60,7 @@ namespace DotnetSpider.Extension.Test
 
 		private class TestDownloader : DotnetSpider.Downloader.Downloader
 		{
-			protected override Response DowloadContent(Request request)
+			protected override Response DownloadContent(Request request)
 			{
 				Console.WriteLine("ok:" + request.Url);
 				return new Response(request) { Content = "" };

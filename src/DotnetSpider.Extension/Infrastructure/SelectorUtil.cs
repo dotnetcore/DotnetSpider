@@ -2,7 +2,9 @@
 using DotnetSpider.Extraction;
 using DotnetSpider.Extraction.Model;
 using System;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("DotnetSpider.Extension.Test")]
 namespace DotnetSpider.Extension.Infrastructure
 {
 	/// <summary>
@@ -30,7 +32,7 @@ namespace DotnetSpider.Extension.Infrastructure
 						}
 					case SelectorType.Enviroment:
 						{
-							return Selectors.Enviroment(expression);
+							return Selectors.Environment(expression);
 						}
 					case SelectorType.JsonPath:
 						{
@@ -60,7 +62,7 @@ namespace DotnetSpider.Extension.Infrastructure
 						}
 					default:
 						{
-							throw new SpiderException($"Selector {selector} unsupoort");
+							throw new SpiderException($"Selector {selector} unsupported");
 						}
 				}
 			}

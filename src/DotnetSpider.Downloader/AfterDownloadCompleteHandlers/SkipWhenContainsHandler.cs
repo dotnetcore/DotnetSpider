@@ -19,7 +19,7 @@ namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 		}
 
 		/// <summary>
-		/// When <see cref="Response"/> contains specified content, this <see cref="Page"/> will be skipped.
+		/// When <see cref="Response"/> contains specified content, this <see cref="Response"/> will be skipped.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
 		/// 如果页面数据包含指定内容, 跳过当前链接

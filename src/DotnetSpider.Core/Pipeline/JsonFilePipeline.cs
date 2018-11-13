@@ -34,7 +34,6 @@ namespace DotnetSpider.Core.Pipeline
 		/// 数据序列化成JSON并存储到文件中
 		/// </summary>
 		/// <param name="resultItems">数据结果</param>
-		/// <param name="logger">日志接口</param>
 		/// <param name="sender">调用方</param>
 		public override void Process(IList<ResultItems> resultItems, dynamic sender = null)
 		{

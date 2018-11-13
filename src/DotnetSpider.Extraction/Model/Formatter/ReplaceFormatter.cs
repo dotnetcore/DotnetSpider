@@ -3,29 +3,29 @@
 namespace DotnetSpider.Extraction.Model.Formatter
 {
 	/// <summary>
-	/// 如果值等于EqualValue, 则返回Displacement. 比如用于: 采集的结果为: 是, 转化为 False
+	/// Returns a new string in which all occurrences of a specified string in the current instance are replaced with another specified string.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-	public class DisplaceFormater : Formatter
+	public class ReplaceFormatter : Formatter
 	{
 		/// <summary>
-		/// 比较的值
+		/// 需要被替换的值
 		/// </summary>
-		public string EqualValue { get; set; }
+		public string OldValue { get; set; }
 
 		/// <summary>
-		/// 最终替换的值
+		/// The string to replace all occurrences of oldValue.
 		/// </summary>
-		public string Displacement { get; set; }
+		public string NewValue { get; set; }
 
 		/// <summary>
 		/// 实现数值的转化
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
-			return value.Equals(EqualValue) ? Displacement : value;
+			return value.ToString().Replace(OldValue, NewValue);
 		}
 
 		/// <summary>

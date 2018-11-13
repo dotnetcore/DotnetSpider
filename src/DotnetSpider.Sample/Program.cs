@@ -1,8 +1,4 @@
-﻿using DotnetSpider.Downloader;
-using DotnetSpider.Sample.docs;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using DotnetSpider.Sample.docs;
 using System.Threading;
 
 namespace DotnetSpider.Sample

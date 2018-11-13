@@ -1,6 +1,6 @@
 ﻿namespace DotnetSpider.Extension.Pipeline
 {
-	public class Sqls
+	public class SqlStatements
 	{
 		/// <summary>
 		/// 插入的SQL语句

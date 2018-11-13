@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Extension.Model;
 using DotnetSpider.Extraction;
-using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 
 namespace DotnetSpider.Extension.Downloader
@@ -16,7 +15,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		[Field(Expression = "", Type = SelectorType.Enviroment)]
 		[Column]
-		[Index("URL_IDENTITY_TASKID_NAME")]
+		[Index("URL_IDENTITY_TASK_ID_NAME")]
 		public string Identity { get; set; }
 
 		/// <summary>
@@ -24,7 +23,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		[Field(Expression = "", Type = SelectorType.Enviroment)]
 		[Column]
-		[Index("URL_IDENTITY_TASKID_NAME")]
+		[Index("URL_IDENTITY_TASK_ID_NAME")]
 		public string TaskId { get; set; }
 
 		/// <summary>
@@ -32,7 +31,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		[Field(Expression = "", Type = SelectorType.Enviroment)]
 		[Column]
-		[Index("URL_IDENTITY_TASKID_NAME")]
+		[Index("URL_IDENTITY_TASK_ID_NAME")]
 		public string Name { get; set; }
 
 		/// <summary>
@@ -40,7 +39,7 @@ namespace DotnetSpider.Extension.Downloader
 		/// </summary>
 		[Field(Expression = "", Type = SelectorType.Enviroment)]
 		[Column]
-		[Index("URL_IDENTITY_TASKID_NAME")]
+		[Index("URL_IDENTITY_TASK_ID_NAME")]
 		public string Url { get; set; }
 
 		/// <summary>

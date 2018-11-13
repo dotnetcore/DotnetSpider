@@ -2,7 +2,7 @@
 
 namespace DotnetSpider.Core
 {
-	public interface IRunable : IControllable
+	public interface IRunnable : IControllable
 	{
 		/// <summary>
 		/// 运行程序

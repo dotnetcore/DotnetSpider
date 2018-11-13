@@ -185,13 +185,11 @@ namespace DotnetSpider.Downloader
 			var requestHeadersCount = request.Headers?.Count ?? 0;
 			if (headersCount != requestHeadersCount) return false;
 			if (headersCount == requestHeadersCount && headersCount == 0) return true;
-			if (Headers != null && request.Headers != null)
+			if (Headers == null || request.Headers == null) return true;
+			foreach (var header in Headers)
 			{
-				foreach (var header in Headers)
-				{
-					if (!request.Headers.ContainsKey(header.Key)) return false;
-					if (!Equals(header.Value, request.Headers[header.Key])) return false;
-				}
+				if (!request.Headers.ContainsKey(header.Key)) return false;
+				if (!Equals(header.Value, request.Headers[header.Key])) return false;
 			}
 
 			return true;

@@ -20,9 +20,9 @@ namespace DotnetSpider.Downloader
 	{
 		private readonly List<IAfterDownloadCompleteHandler> _afterDownloadCompletes = new List<IAfterDownloadCompleteHandler>();
 		private readonly List<IBeforeDownloadHandler> _beforeDownloads = new List<IBeforeDownloadHandler>();
-		private bool _injectedCookies;
 		private readonly string _downloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "downloads");
-
+		private bool _injectedCookies;
+		
 		public static WebProxy FiddlerProxy = new WebProxy("http://127.0.0.1:8888");
 
 		/// <summary>
@@ -179,7 +179,7 @@ namespace DotnetSpider.Downloader
 		/// 下载链接内容
 		/// </summary>
 		/// <param name="request">链接请求 <see cref="Request"/></param>
-		/// <returns>下载内容封装好的页面对象 (a <see cref="Response"/> instance that contains requested page infomations, like Html source, headers, etc.)</returns>
+		/// <returns>下载内容封装好的页面对象 (a <see cref="Response"/> instance that contains requested page information, like Html source, headers, etc.)</returns>
 		public Response Download(Request request)
 		{
 			if (!_injectedCookies && CookieInjector != null)
@@ -198,7 +198,7 @@ namespace DotnetSpider.Downloader
 				}
 			}
 			BeforeDownload(ref request);
-			var response = DowloadContent(request);
+			var response = DownloadContent(request);
 			AfterDownloadComplete(ref response);
 			return response;
 		}
@@ -246,12 +246,12 @@ namespace DotnetSpider.Downloader
 
 		protected void StorageFile(Request request, byte[] bytes)
 		{
-			string filePath = CreateFilePath(request);
+			var filePath = CreateFilePath(request);
 			if (!File.Exists(filePath))
 			{
 				try
 				{
-					string folder = Path.GetDirectoryName(filePath);
+					var folder = Path.GetDirectoryName(filePath);
 					if (!string.IsNullOrEmpty(folder))
 					{
 						if (!Directory.Exists(folder))
@@ -260,16 +260,16 @@ namespace DotnetSpider.Downloader
 						}
 
 						File.WriteAllBytes(filePath, bytes);
-						Logger?.LogInformation($"Storage file {request.Url} success.");
+						Logger?.LogInformation($"Storage file {request.Url} success");
 					}
 					else
 					{
-						throw new DownloaderException($"Can not create folder for file path {filePath}.");
+						throw new DownloaderException($"Can not create folder for file path {filePath}");
 					}
 				}
 				catch (Exception e)
 				{
-					Logger?.LogError($"Storage file {request.Url} failed: {e.Message}.");
+					Logger?.LogError($"Storage file {request.Url} failed: {e.Message}");
 				}
 			}
 			else
@@ -282,18 +282,11 @@ namespace DotnetSpider.Downloader
 		{
 			if (!string.IsNullOrWhiteSpace(contentType))
 			{
-				if (contentType.Contains("json"))
-				{
-					response.ContentType = ContentType.Json;
-				}
-				else
-				{
-					response.ContentType = ContentType.Html;
-				}
+				response.ContentType = contentType.Contains("json") ? ContentType.Json : ContentType.Html;
 			}
 			else
 			{
-				if (response.Content != null && response.Content is string)
+				if (response.Content is string)
 				{
 					try
 					{
@@ -314,15 +307,9 @@ namespace DotnetSpider.Downloader
 
 		protected bool IfFileExists(Request request)
 		{
-			if (DownloadFiles)
-			{
-				string filePath = CreateFilePath(request);
-				if (File.Exists(filePath))
-				{
-					return true;
-				}
-			}
-			return false;
+			if (!DownloadFiles) return false;
+			var filePath = CreateFilePath(request);
+			return File.Exists(filePath);
 		}
 
 		/// <summary>
@@ -350,7 +337,7 @@ namespace DotnetSpider.Downloader
 		}
 
 		/// <summary>
-		/// Clone a Downloader throuth <see cref="object.MemberwiseClone"/>, override if you need a deep clone or others. 
+		/// Clone a Downloader through <see cref="object.MemberwiseClone"/>, override if you need a deep clone or others. 
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
 		/// 克隆一个下载器, 多线程时, 每个线程使用一个下载器, 这样如WebDriver下载器则不再需要管理WebDriver对象的个数了, 每个下载器就只包含一个WebDriver。
@@ -374,7 +361,7 @@ namespace DotnetSpider.Downloader
 			{
 				return;
 			}
-			throw new DownloaderException($"Response status code does not indicate success: {(int)code} ({code}).");
+			throw new DownloaderException($"Response status code does not indicate success: {(int)code} ({code})");
 		}
 
 		/// <summary>
@@ -385,11 +372,11 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		/// <param name="request">请求信息 <see cref="Request"/></param>
 		/// <returns>页面数据 <see cref="Response"/></returns>
-		protected abstract Response DowloadContent(Request request);
+		protected abstract Response DownloadContent(Request request);
 
 		protected byte[] PreventCutOff(byte[] bytes)
 		{
-			for (int i = 0; i < bytes.Length; i++)
+			for (var i = 0; i < bytes.Length; i++)
 			{
 				if (bytes[i] == 0x00)
 				{
@@ -402,30 +389,26 @@ namespace DotnetSpider.Downloader
 
 		protected string CreateFilePath(Request request)
 		{
-			var intervalPath = (request.RequestUri.Host + request.RequestUri.LocalPath).Replace("//", "/").Replace("/", DownloaderEnv.PathSeperator);
-			string filePath = $"{_downloadFolder}{DownloaderEnv.PathSeperator}{intervalPath}";
+			var intervalPath = (request.RequestUri.Host + request.RequestUri.LocalPath).Replace("//", "/").Replace("/", DownloaderEnv.PathSeparator);
+			var filePath = $"{_downloadFolder}{DownloaderEnv.PathSeparator}{intervalPath}";
 			return filePath;
 		}
 
 		private void BeforeDownload(ref Request request)
 		{
-			if (_beforeDownloads != null && _beforeDownloads.Count > 0)
+			if (_beforeDownloads == null || _beforeDownloads.Count <= 0) return;
+			foreach (var handler in _beforeDownloads)
 			{
-				foreach (var handler in _beforeDownloads)
-				{
-					handler.Handle(ref request, this);
-				}
+				handler.Handle(ref request, this);
 			}
 		}
 
 		private void AfterDownloadComplete(ref Response response)
 		{
-			if (_afterDownloadCompletes != null && _afterDownloadCompletes.Count > 0)
+			if (_afterDownloadCompletes == null || _afterDownloadCompletes.Count <= 0) return;
+			foreach (var handler in _afterDownloadCompletes)
 			{
-				foreach (var handler in _afterDownloadCompletes)
-				{
-					handler.Handle(ref response, this);
-				}
+				handler.Handle(ref response, this);
 			}
 		}
 	}

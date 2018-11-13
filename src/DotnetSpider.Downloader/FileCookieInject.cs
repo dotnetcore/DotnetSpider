@@ -5,7 +5,7 @@ using System.Net;
 namespace DotnetSpider.Downloader
 {
 	/// <summary>
-	/// Read cookie from specified file and inject to <see cref="IControllable"/>
+	/// Read cookie from specified file and inject to <see cref="CookieInjector"/>
 	/// It support two formats as followings:
 	/// baidu.com
 	/// a=b;c=e

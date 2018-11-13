@@ -13,31 +13,31 @@ namespace DotnetSpider.Core.Processor.LastPageChecker
 		/// <summary>
 		/// 取得总页数的元素选择器
 		/// </summary>
-		public Selector TotalPageSelector;
+		public Selector TotalPageSelector { get; set; }
 
 		/// <summary>
 		/// 对总页数的格式化
 		/// </summary>
-		public Formatter[] TotalPageFormatters;
+		public Formatter[] TotalPageFormatters { get; set; }
 
 		/// <summary>
 		/// 取得当前页的元素选择器
 		/// </summary>
-		public Selector CurrenctPageSelector;
+		public Selector CurrentPageSelector { get; set; }
 
 		/// <summary>
 		/// 对当前页的格式化
 		/// </summary>
-		public Formatter[] CurrnetPageFormatters { get; set; }
+		public Formatter[] CurrentPageFormatters { get; set; }
 
 		/// <summary>
 		/// Return true, skip all urls from target urls extractor.
 		/// </summary>
-		/// <param name="response">页面数据</param>
+		/// <param name="page">页面数据</param>
 		/// <returns>是否到了最终一个链接</returns>
 		public bool IsLastPage(Page page)
 		{
-			if (TotalPageSelector == null || CurrenctPageSelector == null)
+			if (TotalPageSelector == null || CurrentPageSelector == null)
 			{
 				throw new SpiderException("Total page selector or current page selector should not be null");
 			}
@@ -49,20 +49,20 @@ namespace DotnetSpider.Core.Processor.LastPageChecker
 			}
 
 			var totalStr = GetSelectorValue(page, TotalPageSelector);
-			var currentStr = GetSelectorValue(page, CurrenctPageSelector);
+			var currentStr = GetSelectorValue(page, CurrentPageSelector);
 
 			return currentStr == totalStr;
 		}
 
 		private string GetSelectorValue(Response page, Selector selectorAttribute)
 		{
-			string result = string.Empty;
+			var result = string.Empty;
 			var selector = selectorAttribute.ToSelector();
 			if (selectorAttribute.Type == SelectorType.Enviroment)
 			{
-				if (selector is EnviromentSelector enviromentSelector)
+				if (selector is EnvironmentSelector environmentSelector)
 				{
-					result = page.Selectable().Enviroment(enviromentSelector.Field);
+					result = page.Selectable().Environment(environmentSelector.Field);
 				}
 			}
 			else
@@ -74,7 +74,7 @@ namespace DotnetSpider.Core.Processor.LastPageChecker
 			{
 				foreach (var formatter in TotalPageFormatters)
 				{
-					result = formatter.Formate(result)?.ToString();
+					result = formatter.Format(result)?.ToString();
 				}
 			}
 

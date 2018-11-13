@@ -1,16 +1,13 @@
 ﻿using DotnetSpider.Extraction.ExcelExpression.HapCss;
 using HtmlAgilityPack;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace System
 {
     public static partial class HapCssExtensionMethods
     {
-        public static HtmlNode QuerySelector(this HtmlAgilityPack.HtmlDocument doc, string cssSelector)
+        public static HtmlNode QuerySelector(this HtmlDocument doc, string cssSelector)
         {
             return doc.QuerySelectorAll(cssSelector).FirstOrDefault();
         }
@@ -20,7 +17,7 @@ namespace System
             return node.QuerySelectorAll(cssSelector).FirstOrDefault();
         }
 
-        public static IList<HtmlNode> QuerySelectorAll(this HtmlAgilityPack.HtmlDocument doc, string cssSelector)
+        public static IList<HtmlNode> QuerySelectorAll(this HtmlDocument doc, string cssSelector)
         {
             return doc.DocumentNode.QuerySelectorAll(cssSelector);
         }

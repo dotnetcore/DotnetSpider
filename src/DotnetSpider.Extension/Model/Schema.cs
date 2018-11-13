@@ -1,19 +1,13 @@
-﻿using DotnetSpider.Extension.Model;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extension.Model
 {
 	/// <summary>
 	/// 爬虫实体类对应的表信息
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	public class Schema : System.Attribute
+	[AttributeUsage(AttributeTargets.Class)]
+	public class Schema : Attribute
 	{
 		/// <summary>
 		/// 重载是为了添加 JsonIgnore 标签

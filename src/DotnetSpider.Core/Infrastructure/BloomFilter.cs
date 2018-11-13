@@ -12,7 +12,7 @@ namespace DotnetSpider.Core.Infrastructure
 	/// </summary>
 	public class BloomFilter
 	{
-		private readonly BitArray _bitset;
+		private readonly BitArray _bitSet;
 		private readonly int _bitSetSize;
 		private readonly double _bitsPerElement;
 		private readonly int _expectedNumberOfFilterElements; // expected (maximum) number of elements to be added
@@ -41,7 +41,7 @@ namespace DotnetSpider.Core.Infrastructure
 			_bitsPerElement = c;
 			_bitSetSize = (int)Math.Ceiling(c * n);
 			_numberOfAddedElements = 0;
-			_bitset = new BitArray(_bitSetSize);
+			_bitSet = new BitArray(_bitSetSize);
 		}
 
 		/// <summary>
@@ -83,7 +83,7 @@ namespace DotnetSpider.Core.Infrastructure
 		public BloomFilter(int bitSetSize, int expectedNumberOfFilterElements, int actualNumberOfFilterElements, BitArray filterData)
 			: this(bitSetSize, expectedNumberOfFilterElements)
 		{
-			_bitset = filterData;
+			_bitSet = filterData;
 			_numberOfAddedElements = actualNumberOfFilterElements;
 		}
 
@@ -185,7 +185,7 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				return false;
 			}
-			if (_bitset != other._bitset && (_bitset == null || !Equals(_bitset, other._bitset)))
+			if (_bitSet != other._bitSet && (_bitSet == null || !Equals(_bitSet, other._bitSet)))
 			{
 				return false;
 			}
@@ -200,7 +200,7 @@ namespace DotnetSpider.Core.Infrastructure
 		public override int GetHashCode()
 		{
 			int hash = 7;
-			hash = 61 * hash + (_bitset != null ? HashBytes(_bitset) : 0);
+			hash = 61 * hash + (_bitSet != null ? HashBytes(_bitSet) : 0);
 			hash = 61 * hash + _expectedNumberOfFilterElements;
 			hash = 61 * hash + _bitSetSize;
 			hash = 61 * hash + _k;
@@ -265,7 +265,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// </summary>
 		public void Clear()
 		{
-			_bitset.SetAll(false);
+			_bitSet.SetAll(false);
 			_numberOfAddedElements = 0;
 		}
 
@@ -288,7 +288,7 @@ namespace DotnetSpider.Core.Infrastructure
 			int[] hashes = CreateHashes(bytes, _k);
 			foreach (int hash in hashes)
 			{
-				_bitset.Set(Math.Abs(hash % _bitSetSize), true);
+				_bitSet.Set(Math.Abs(hash % _bitSetSize), true);
 			}
 			_numberOfAddedElements++;
 		}
@@ -339,7 +339,7 @@ namespace DotnetSpider.Core.Infrastructure
 		public bool Contains(byte[] bytes)
 		{
 			int[] hashes = CreateHashes(bytes, _k);
-			return hashes.All(hash => _bitset.Get(Math.Abs(hash % _bitSetSize)));
+			return hashes.All(hash => _bitSet.Get(Math.Abs(hash % _bitSetSize)));
 		}
 
 		/// <summary>
@@ -361,7 +361,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <returns>true if the bit is set, false if it is not.</returns>
 		public bool GetBit(int bit)
 		{
-			return _bitset.Get(bit);
+			return _bitSet.Get(bit);
 		}
 
 		/// <summary>
@@ -371,7 +371,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <param name="value">If true, the bit is set. If false, the bit is cleared.</param>
 		public void SetBit(int bit, bool value)
 		{
-			_bitset.Set(bit, value);
+			_bitSet.Set(bit, value);
 		}
 
 		/// <summary>
@@ -380,7 +380,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <returns>bit set representing the Bloom filter.</returns>
 		public BitArray GetBitSet()
 		{
-			return _bitset;
+			return _bitSet;
 		}
 
 		/// <summary>

@@ -24,7 +24,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
 			var tmp = value.ToString();
 			return Regex.IsMatch(tmp, Pattern) ? $"{tmp}{AppendValue}" : tmp;

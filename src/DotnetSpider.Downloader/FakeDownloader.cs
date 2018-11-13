@@ -9,7 +9,7 @@
 			_content = content;
 		}
 
-		protected override Response DowloadContent(Request request)
+		protected override Response DownloadContent(Request request)
 		{
 			var response = new Response(request);
 			response.Content = _content;

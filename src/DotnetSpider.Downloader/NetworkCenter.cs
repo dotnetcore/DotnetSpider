@@ -9,12 +9,7 @@ namespace DotnetSpider.Downloader
 	/// </summary>
 	public class NetworkCenter
 	{
-		private static NetworkCenter _instance = new NetworkCenter();
-
-		/// <summary>
-		/// 网络中心单例对象
-		/// </summary>
-		public static NetworkCenter Current => _instance;
+		public static readonly NetworkCenter Current = new NetworkCenter();
 
 		/// <summary>
 		/// 拨号器+网络通讯器
@@ -69,14 +64,7 @@ namespace DotnetSpider.Downloader
 		/// <returns>返回数据</returns>
 		public T Execute<T>(string name, Func<T> func)
 		{
-			if (Executor != null)
-			{
-				return Executor.Execute(name, func);
-			}
-			else
-			{
-				return func();
-			}
+			return Executor != null ? Executor.Execute(name, func) : func();
 		}
 
 		/// <summary>
@@ -89,14 +77,7 @@ namespace DotnetSpider.Downloader
 		/// <returns>返回数据</returns>
 		public T Execute<T>(string name, Func<object, T> func, object obj)
 		{
-			if (Executor != null)
-			{
-				return Executor.Execute(name, func, obj);
-			}
-			else
-			{
-				return func(obj);
-			}
+			return Executor != null ? Executor.Execute(name, func, obj) : func(obj);
 		}
 	}
 }

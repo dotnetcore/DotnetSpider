@@ -5,12 +5,9 @@ using System.Linq;
 using Dapper;
 using DotnetSpider.Core;
 using DotnetSpider.Extension.Pipeline;
-using DotnetSpider.Extension.Processor;
 using MySql.Data.MySqlClient;
 using Xunit;
-using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model;
-using DotnetSpider.Extraction;
 using DotnetSpider.Downloader;
 using DotnetSpider.Extension.Model;
 
@@ -125,7 +122,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				try
 				{
-					conn.Execute($"use test; DROP TABLE autoincrementprimarykey;");
+					conn.Execute("use test; DROP TABLE autoincrementprimarykey;");
 				}
 				catch { }
 
@@ -161,14 +158,14 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				updateModePipeline.Process(new ResultItems[] { resultItems }, spider);
 
-				var list = conn.Query<AutoIncrementPrimaryKey>($"use test; select * from autoincrementprimarykey").ToList();
+				var list = conn.Query<AutoIncrementPrimaryKey>("use test; select * from autoincrementprimarykey").ToList();
 				Assert.Equal(2, list.Count);
 				Assert.Equal("110", list[0].Sku);
 				Assert.Equal("4C", list[0].Category);
 
 				try
 				{
-					conn.Execute($"use test; DROP TABLE autoincrementprimarykey;");
+					conn.Execute("use test; DROP TABLE autoincrementprimarykey;");
 				}
 				catch { }
 			}
@@ -181,7 +178,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				try
 				{
-					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+					conn.Execute("use test; DROP TABLE multiprimarykey;");
 				}
 				catch { }
 				ISpider spider = new DefaultSpider("test");
@@ -216,12 +213,12 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				updateModePipeline.Process(new ResultItems[] { resultItems }, spider);
 
-				var list = conn.Query<MultiPrimaryKey>($"use test; select * from multiprimarykey").ToList();
+				var list = conn.Query<MultiPrimaryKey>("use test; select * from multiprimarykey").ToList();
 				Assert.Equal(2, list.Count);
 				Assert.Equal("4C", list[1].Category);
 				try
 				{
-					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+					conn.Execute("use test; DROP TABLE multiprimarykey;");
 				}
 				catch { }
 			}
@@ -236,7 +233,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				try
 				{
-					conn.Execute($"use test; DROP TABLE autoincrementprimarykey;");
+					conn.Execute("use test; DROP TABLE autoincrementprimarykey;");
 				}
 				catch { }
 
@@ -254,7 +251,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				};
 				pipeline.Process(new ResultItems[] { resultItems }, null);
 
-				var list = conn.Query($"use test; select * from autoincrementprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
+				var list = conn.Query("use test; select * from autoincrementprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 
 				Assert.Equal(3, list.Count);
 				Assert.Equal(1, list[0]["id"]);
@@ -262,7 +259,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				Assert.Equal(3, list[2]["id"]);
 				try
 				{
-					conn.Execute($"use test; DROP TABLE autoincrementprimarykey;");
+					conn.Execute("use test; DROP TABLE autoincrementprimarykey;");
 				}
 				catch { }
 			}
@@ -275,7 +272,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				try
 				{
-					conn.Execute($"use test; DROP TABLE noneprimarykey;");
+					conn.Execute("use test; DROP TABLE noneprimarykey;");
 				}
 				catch { }
 
@@ -294,7 +291,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				};
 				pipeline.Process(new ResultItems[] { resultItems }, null);
 
-				var list = conn.Query<NonePrimaryKey>($"use test; select * from noneprimarykey").ToList();
+				var list = conn.Query<NonePrimaryKey>("use test; select * from noneprimarykey").ToList();
 
 				Assert.Equal(4, list.Count);
 				Assert.Equal("110", list[0].Sku);
@@ -302,7 +299,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				Assert.Null(list[2].Category);
 				try
 				{
-					conn.Execute($"use test; DROP TABLE noneprimarykey;");
+					conn.Execute("use test; DROP TABLE noneprimarykey;");
 				}
 				catch { }
 			}
@@ -317,7 +314,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				try
 				{
-					conn.Execute($"use test; DROP TABLE timestamp;");
+					conn.Execute("use test; DROP TABLE timestamp;");
 				}
 				catch { }
 
@@ -337,7 +334,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				};
 				pipeline.Process(new ResultItems[] { resultItems }, spider);
 
-				var list = conn.Query($"use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
+				var list = conn.Query("use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
 
 				Assert.Equal(6, list[0].Count);
 				Assert.Equal(DateTime.Now.Date, list[0]["creation_date"]);
@@ -349,7 +346,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				try
 				{
-					conn.Execute($"use test; DROP TABLE timestamp;");
+					conn.Execute("use test; DROP TABLE timestamp;");
 				}
 				catch { }
 			}
@@ -364,7 +361,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				try
 				{
-					conn.Execute($"use test; DROP TABLE timestamp;");
+					conn.Execute("use test; DROP TABLE timestamp;");
 				}
 				catch { }
 
@@ -385,13 +382,13 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				};
 				pipeline.Process(new ResultItems[] { resultItems }, null);
 
-				var list = conn.Query($"use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
+				var list = conn.Query("use test; select * from timestamp").Select(r => r as IDictionary<string, dynamic>).ToList();
 
 				Assert.Equal(4, list[0].Count);
 
 				try
 				{
-					conn.Execute($"use test; DROP TABLE timestamp;");
+					conn.Execute("use test; DROP TABLE timestamp;");
 				}
 				catch { }
 			}
@@ -404,7 +401,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				try
 				{
-					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+					conn.Execute("use test; DROP TABLE multiprimarykey;");
 				}
 				catch { }
 
@@ -425,7 +422,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 				};
 				pipeline.Process(new ResultItems[] { resultItems }, spider);
 
-				var list = conn.Query($"use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
+				var list = conn.Query("use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 
 				Assert.Equal(3, list.Count);
 				Assert.Equal("110", list[0]["sku"]);
@@ -434,7 +431,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				try
 				{
-					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+					conn.Execute("use test; DROP TABLE multiprimarykey;");
 				}
 				catch { }
 			}
@@ -447,7 +444,7 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			{
 				try
 				{
-					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+					conn.Execute("use test; DROP TABLE multiprimarykey;");
 				}
 				catch
 				{
@@ -479,14 +476,14 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 				insertNewAndUpdateOldPipeline.Process(new ResultItems[] { resultItems }, null);
 
-				var list = conn.Query($"use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
+				var list = conn.Query("use test; select * from multiprimarykey").Select(r => r as IDictionary<string, dynamic>).ToList();
 
 				Assert.Equal(3, list.Count);
 				Assert.Equal("4C", list[0]["category"]);
 
 				try
 				{
-					conn.Execute($"use test; DROP TABLE multiprimarykey;");
+					conn.Execute("use test; DROP TABLE multiprimarykey;");
 				}
 				catch { }
 			}

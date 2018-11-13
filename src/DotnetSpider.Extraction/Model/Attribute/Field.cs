@@ -21,8 +21,6 @@ namespace DotnetSpider.Extraction.Model.Attribute
 		/// <param name="name">名称</param>
 		/// <param name="type">选择器类型</param>
 		/// <param name="expression">表达式</param>
-		/// <param name="dataType">数据类型</param>
-		/// <param name="length">类型长度</param>
 		public Field(string expression, string name, SelectorType type = SelectorType.XPath)
 			: base(expression, type)
 		{

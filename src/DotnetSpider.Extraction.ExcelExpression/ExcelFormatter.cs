@@ -1,8 +1,6 @@
 ﻿using DotnetSpider.Extraction.ExcelExpression;
 using DotnetSpider.Extraction.Model.Formatter;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DotnetSpider.Extraction
 {
@@ -31,7 +29,7 @@ namespace DotnetSpider.Extraction
 
 		public string Formula { get; private set; }
 
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
 			if (value != null) {
 				return _excelEngine.TryWork(FormulaName, Formula, value.ToString());

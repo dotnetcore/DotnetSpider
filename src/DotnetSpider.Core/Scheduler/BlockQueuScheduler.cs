@@ -19,7 +19,7 @@ namespace DotnetSpider.Core.Scheduler
 
 		public BlockQueueScheduler(string service, string identity)
 		{
-			_service = $"{new Uri(service).ToString()}requestqueue/{identity}";
+			_service = $"{new Uri(service).ToString()}requestQueue/{identity}";
 			_identity = identity;
 		}
 
@@ -39,14 +39,11 @@ namespace DotnetSpider.Core.Scheduler
 					});
 				}
 
-				if (_queue.Count > 0)
-				{
-					Request request = _queue.First();
-					_queue.RemoveAt(0);
-					return request;
-				}
+				if (_queue.Count <= 0) return null;
+				var request = _queue.First();
+				_queue.RemoveAt(0);
+				return request;
 			}
-			return null;
 		}
 
 		public override void Dispose()

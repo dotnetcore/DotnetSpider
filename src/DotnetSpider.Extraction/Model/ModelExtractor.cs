@@ -23,9 +23,9 @@ namespace DotnetSpider.Extraction.Model
 				selectable.Properties = new Dictionary<string, object>();
 			}
 
-			if (model.Shareds != null)
+			if (model.Shares != null)
 			{
-				foreach (var enviromentValue in model.Shareds)
+				foreach (var enviromentValue in model.Shares)
 				{
 					string name = enviromentValue.Name;
 					var value = selectable.Select(enviromentValue.ToSelector()).GetValue();
@@ -51,17 +51,10 @@ namespace DotnetSpider.Extraction.Model
 				{
 					if (model.Take > 0 && list.Count > model.Take)
 					{
-						if (model.TakeFromHead)
-						{
-							list = list.Take(model.Take).ToList();
-						}
-						else
-						{
-							list = list.Skip(list.Count - model.Take).ToList();
-						}
+						list = model.TakeFromHead ? list.Take(model.Take).ToList() : list.Skip(list.Count - model.Take).ToList();
 					}
 
-					for (int i = 0; i < list.Count; ++i)
+					for (var i = 0; i < list.Count; ++i)
 					{
 						var item = list.ElementAt(i);
 						var obj = ExtractObject(model, item, selectable, i);
@@ -106,22 +99,16 @@ namespace DotnetSpider.Extraction.Model
 
 		private string ExtractField(Field field, ISelectable item, Selectable root, int index)
 		{
-			if (field == null)
-			{
-				return null;
-			}
-
-			var selector = field.ToSelector();
+			var selector = field?.ToSelector();
 			if (selector == null)
 			{
 				return null;
 			}
 
 			object value;
-			if (selector is EnviromentSelector)
+			if (selector is EnvironmentSelector environmentSelector)
 			{
-				var enviromentSelector = selector as EnviromentSelector;
-				switch (enviromentSelector.Field)
+				switch (environmentSelector.Field)
 				{
 					case EnviromentFields.Index:
 						{
@@ -130,7 +117,7 @@ namespace DotnetSpider.Extraction.Model
 						}
 					default:
 						{
-							value = root.Enviroment(enviromentSelector.Field);
+							value = root.Environment(environmentSelector.Field);
 							break;
 						}
 				}
@@ -142,7 +129,7 @@ namespace DotnetSpider.Extraction.Model
 					: item.Select(selector)?.GetValue(ConvertToValueOption(field.Option));
 			}
 
-			if (field.Formatters != null && field.Formatters.Count() > 0)
+			if (field.Formatters != null && field.Formatters.Length > 0)
 			{
 				foreach (var formatter in field.Formatters)
 				{
@@ -150,7 +137,7 @@ namespace DotnetSpider.Extraction.Model
 					try
 					{
 #endif
-						value = formatter.Formate(value);
+						value = formatter.Format(value);
 #if DEBUG
 					}
 					catch (Exception e)

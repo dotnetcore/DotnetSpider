@@ -9,12 +9,13 @@ namespace DotnetSpider.Core.Pipeline
 	/// </summary>
 	public abstract class BaseFilePipeline : BasePipeline
 	{
-		private readonly ConcurrentDictionary<string, string> _dataFolderCache = new ConcurrentDictionary<string, string>();
+		private readonly ConcurrentDictionary<string, string> _dataFolderCache =
+			new ConcurrentDictionary<string, string>();
 
 		/// <summary>
 		/// 数据根目录
 		/// </summary>
-		protected string RootDataFolder { get; set; }
+		protected string RootDataFolder { get; }
 
 		/// <summary>
 		/// 构造方法
@@ -43,6 +44,7 @@ namespace DotnetSpider.Core.Pipeline
 			{
 				throw new ArgumentNullException(nameof(sender));
 			}
+
 			if (_dataFolderCache.ContainsKey(sender.Identity))
 			{
 				return _dataFolderCache[sender.Identity];
@@ -54,6 +56,7 @@ namespace DotnetSpider.Core.Pipeline
 				{
 					Directory.CreateDirectory(dataFolder);
 				}
+
 				_dataFolderCache.TryAdd(sender.Identity, dataFolder);
 				return dataFolder;
 			}

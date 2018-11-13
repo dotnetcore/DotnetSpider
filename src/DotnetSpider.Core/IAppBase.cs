@@ -3,7 +3,7 @@
 	/// <summary>
 	/// 标准任务接口
 	/// </summary>
-	public interface IAppBase : IRunable, IIdentity, ITask, INamed
+	public interface IAppBase : IRunnable, IIdentity, ITask, INamed
 	{
 	}
 }

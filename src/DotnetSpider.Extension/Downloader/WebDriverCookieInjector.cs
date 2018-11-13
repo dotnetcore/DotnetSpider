@@ -51,14 +51,14 @@ namespace DotnetSpider.Extension.Downloader
 						}
 						else
 						{
-							throw new Exception("No Firefox profiles: webdriver.");
+							throw new Exception("No Firefox profiles");
 						}
 
 						break;
 					}
 				default:
 					{
-						throw new Exception("Unsupported browser!");
+						throw new Exception("Unsupported browser");
 					}
 			}
 

@@ -1,5 +1,4 @@
-﻿using DotnetSpider.Core.Processor;
-using DotnetSpider.Extension.Model;
+﻿using DotnetSpider.Extension.Model;
 using DotnetSpider.Extraction.Model;
 
 namespace DotnetSpider.Extension.Processor

@@ -57,7 +57,7 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <returns>更新成功时返回true</returns>
 		public bool CompareAndSet(int expectedValue, int newValue)
 		{
-			int original = Interlocked.CompareExchange(ref _value, newValue, expectedValue);
+			var original = Interlocked.CompareExchange(ref _value, newValue, expectedValue);
 			return original == expectedValue;
 		}
 

@@ -26,8 +26,7 @@ namespace DotnetSpider.Core
 		protected Named()
 		{
 			var type = GetType();
-			var nameAttribute = type.GetCustomAttributes(typeof(TaskName), true).FirstOrDefault() as TaskName;
-			Name = nameAttribute != null ? nameAttribute.Name : type.Name;
+			Name = type.GetCustomAttributes(typeof(TaskName), true).FirstOrDefault() is TaskName nameAttribute ? nameAttribute.Name : type.Name;
 		}
 	}
 }

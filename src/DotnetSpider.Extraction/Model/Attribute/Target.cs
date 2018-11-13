@@ -14,9 +14,9 @@ namespace DotnetSpider.Extraction.Model.Attribute
 
 		public Target() { }
 
-		public Target(string[] xpaths, string[] patterns = null)
+		public Target(string[] xPaths, string[] patterns = null)
 		{
-			XPaths = xpaths;
+			XPaths = xPaths;
 			Patterns = patterns;
 		}
 

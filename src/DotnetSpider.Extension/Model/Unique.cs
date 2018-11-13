@@ -1,14 +1,9 @@
-﻿using DotnetSpider.Extension.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace DotnetSpider.Extension.Model
 {
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-	public class Unique : System.Attribute
+	public class Unique : Attribute
 	{
 		public string Name { get; set; }
 

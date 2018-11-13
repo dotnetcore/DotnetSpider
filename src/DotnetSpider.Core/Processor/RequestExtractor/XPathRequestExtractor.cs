@@ -6,22 +6,22 @@ namespace DotnetSpider.Core.Processor.RequestExtractor
 {
 	public class XPathRequestExtractor : IRequestExtractor
 	{
-		private readonly IEnumerable<string> _xpaths;
+		private readonly IEnumerable<string> _xPaths;
 
-		public XPathRequestExtractor(params string[] xpaths)
+		public XPathRequestExtractor(params string[] xPaths)
 		{
-			if (xpaths == null || xpaths.Length == 0) throw new SpiderException($"{nameof(xpaths)} should not be empty.");
-			_xpaths = xpaths;
+			if (xPaths == null || xPaths.Length == 0) throw new SpiderException($"{nameof(xPaths)} should not be empty.");
+			_xPaths = xPaths;
 		}
 
-		public XPathRequestExtractor(IEnumerable<string> xpaths) : this(xpaths.ToArray())
+		public XPathRequestExtractor(IEnumerable<string> xPaths) : this(xPaths.ToArray())
 		{
 		}
 
 		public IEnumerable<Request> Extract(Page page)
 		{
 			var urls = new List<string>();
-			foreach (var xpath in _xpaths)
+			foreach (var xpath in _xPaths)
 			{
 				var links = page.Selectable().XPath(xpath).Links().GetValues();
 				foreach (var link in links)
@@ -38,7 +38,7 @@ namespace DotnetSpider.Core.Processor.RequestExtractor
 
 		internal bool ContainsXpath(string xpath)
 		{
-			return _xpaths.Contains(xpath);
+			return _xPaths.Contains(xpath);
 		}
 	}
 }

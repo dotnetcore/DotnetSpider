@@ -1,6 +1,5 @@
 ﻿using DotnetSpider.Downloader;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 
 namespace DotnetSpider.Core.Processor

@@ -2,7 +2,6 @@
 using System.Data;
 using MySql.Data.MySqlClient;
 using DotnetSpider.Core;
-using DotnetSpider.Extension.Infrastructure;
 using Microsoft.Extensions.Logging;
 using DotnetSpider.Core.Infrastructure;
 

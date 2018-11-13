@@ -31,7 +31,7 @@ namespace DotnetSpider.Extension.Infrastructure
 			{
 				reader = conn.MyExecuteReader(sql);
 
-				int row = 1;
+				var row = 1;
 				using (var p = new ExcelPackage())
 				{
 					var sheet = p.Workbook.Worksheets.Add("Sheet1");
@@ -39,14 +39,14 @@ namespace DotnetSpider.Extension.Infrastructure
 					{
 						if (row == 1)
 						{
-							for (int i = 1; i < reader.FieldCount + 1; ++i)
+							for (var i = 1; i < reader.FieldCount + 1; ++i)
 							{
 								sheet.Cells[1, i].Value = reader.GetName(i - 1);
 							}
 						}
 
 						var realRowIndx = row + 1;
-						for (int j = 1; j < reader.FieldCount + 1; ++j)
+						for (var j = 1; j < reader.FieldCount + 1; ++j)
 						{
 							sheet.Cells[realRowIndx, j].Value = reader.GetValue(j - 1);
 						}

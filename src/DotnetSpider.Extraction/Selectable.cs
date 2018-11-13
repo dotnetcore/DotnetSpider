@@ -23,7 +23,7 @@ namespace DotnetSpider.Extraction
 
 			if (!string.IsNullOrWhiteSpace(url))
 			{
-				FixAllRelativeHrefs(document, url);
+				FixAllRelativeHref(document, url);
 				if (removeOutboundLinks)
 				{
 					var host = new Uri(url).Host;
@@ -80,7 +80,7 @@ namespace DotnetSpider.Extraction
 		/// </summary>
 		/// <param name="field">属性名称</param>
 		/// <returns>查询结果</returns>
-		public override dynamic Enviroment(string field)
+		public override dynamic Environment(string field)
 		{
 			var key = field.ToLower();
 			switch (key)
@@ -157,16 +157,16 @@ namespace DotnetSpider.Extraction
 		{
 			if (selector != null)
 			{
-				List<dynamic> resluts = new List<dynamic>();
+				List<dynamic> results = new List<dynamic>();
 				foreach (var selectedNode in Elements)
 				{
 					var result = selector.Select(selectedNode);
 					if (result != null)
 					{
-						resluts.Add(result);
+						results.Add(result);
 					}
 				}
-				return new Selectable(resluts);
+				return new Selectable(results);
 			}
 			throw new ExtractionException($"{nameof(selector)} is null.");
 		}
@@ -180,19 +180,19 @@ namespace DotnetSpider.Extraction
 		{
 			if (selector != null)
 			{
-				List<dynamic> resluts = new List<dynamic>();
+				List<dynamic> results = new List<dynamic>();
 				foreach (var selectedNode in Elements)
 				{
 					var result = selector.SelectList(selectedNode);
 					if (result != null)
 					{
-						resluts.AddRange(result);
+						results.AddRange(result);
 					}
 				}
-				return new Selectable(resluts);
+				return new Selectable(results);
 			}
 
-			throw new ExtractionException($"{nameof(selector)} is null.");
+			throw new ExtractionException($"{nameof(selector)} is null");
 		}
 
 		/// <summary>
@@ -201,12 +201,12 @@ namespace DotnetSpider.Extraction
 		/// <returns>查询接口</returns>
 		public override IEnumerable<ISelectable> Nodes()
 		{
-			List<ISelectable> reslut = new List<ISelectable>();
+			List<ISelectable> result = new List<ISelectable>();
 			foreach (var element in Elements)
 			{
-				reslut.Add(new Selectable(new List<dynamic>() { element }));
+				result.Add(new Selectable(new List<dynamic>() { element }));
 			}
-			return reslut;
+			return result;
 		}
 
 		/// <summary>
@@ -240,7 +240,7 @@ namespace DotnetSpider.Extraction
 			}
 		}
 
-		private void FixAllRelativeHrefs(HtmlDocument document, string url)
+		private void FixAllRelativeHref(HtmlDocument document, string url)
 		{
 			var nodes = document.DocumentNode.SelectNodes("//a[not(starts-with(@href,'http') or starts-with(@href,'https'))]");
 			if (nodes != null)

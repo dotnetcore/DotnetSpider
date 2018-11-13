@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extraction.ExcelExpression.HapCss
 {
@@ -12,7 +10,7 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss
         #region Constructor
         public CssSelector()
         {
-            this.SubSelectors = new List<CssSelector>();
+            SubSelectors = new List<CssSelector>();
         }
         #endregion
 
@@ -32,12 +30,12 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss
         public IEnumerable<HtmlNode> Filter(IEnumerable<HtmlNode> currentNodes)
         {
             var nodes = currentNodes;
-            IEnumerable<HtmlNode> rt = this.FilterCore(nodes).Distinct();
+            IEnumerable<HtmlNode> rt = FilterCore(nodes).Distinct();
 
-            if (this.SubSelectors.Count == 0)
+            if (SubSelectors.Count == 0)
                 return rt;
 
-            foreach (var selector in this.SubSelectors)
+            foreach (var selector in SubSelectors)
                 rt = selector.FilterCore(rt);
 
             return rt;
@@ -45,7 +43,7 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss
 
         public virtual string GetSelectorParameter(string selector)
         {
-            return selector.Substring(this.Token.Length);
+            return selector.Substring(Token.Length);
         }
 
         public static IList<CssSelector> Parse(string cssSelector)
@@ -75,7 +73,7 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss
             var rt = (CssSelector)Activator.CreateInstance(selectorType);
 
             string filter = token.Filter.Substring(selector.Token.Length);
-            rt.SubSelectors = token.SubTokens.Select(i => CssSelector.ParseSelector(i)).ToList();
+            rt.SubSelectors = token.SubTokens.Select(i => ParseSelector(i)).ToList();
 
             rt.Selector = filter;
             return rt;
@@ -87,7 +85,7 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss
             Func<Type, bool> typeQuery = type => type.IsSubclassOf(typeof(CssSelector)) && !type.IsAbstract;
 
             var defaultTypes = defaultAsm.GetTypes().Where(typeQuery);
-            var types = System.AppDomain.CurrentDomain.GetAssemblies().Where(asm => asm == defaultAsm).SelectMany(asm => asm.GetTypes().Where(typeQuery));
+            var types = AppDomain.CurrentDomain.GetAssemblies().Where(asm => asm == defaultAsm).SelectMany(asm => asm.GetTypes().Where(typeQuery));
             types = defaultTypes.Concat(types);
 
             var rt = types.Select(t => Activator.CreateInstance(t)).Cast<CssSelector>().ToArray();

@@ -1,9 +1,7 @@
 ﻿using DotnetSpider.Core.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DotnetSpider.Core
@@ -13,27 +11,6 @@ namespace DotnetSpider.Core
 	/// </summary>
 	public abstract class AppBase : Named, IAppBase
 	{
-		public static SystemConsoleTheme ConsoleLogTheme { get; set; } = new SystemConsoleTheme(
-			new Dictionary<ConsoleThemeStyle, SystemConsoleThemeStyle>
-			{
-				[ConsoleThemeStyle.Text] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Gray },
-				[ConsoleThemeStyle.SecondaryText] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.DarkGray },
-				[ConsoleThemeStyle.TertiaryText] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.DarkGray },
-				[ConsoleThemeStyle.Invalid] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Yellow },
-				[ConsoleThemeStyle.Null] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
-				[ConsoleThemeStyle.Name] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
-				[ConsoleThemeStyle.String] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
-				[ConsoleThemeStyle.Number] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
-				[ConsoleThemeStyle.Boolean] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
-				[ConsoleThemeStyle.Scalar] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
-				[ConsoleThemeStyle.LevelVerbose] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Cyan },
-				[ConsoleThemeStyle.LevelDebug] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.DarkGray },
-				[ConsoleThemeStyle.LevelInformation] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.White },
-				[ConsoleThemeStyle.LevelWarning] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Yellow },
-				[ConsoleThemeStyle.LevelError] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Red },
-				[ConsoleThemeStyle.LevelFatal] = new SystemConsoleThemeStyle { Foreground = ConsoleColor.Red }
-			});
-
 		private string _identity = Guid.NewGuid().ToString("N");
 		private ILoggerFactory _loggerFactory;
 
@@ -54,11 +31,12 @@ namespace DotnetSpider.Core
 
 				if (string.IsNullOrWhiteSpace(value))
 				{
-					throw new ArgumentException($"{nameof(Identity)} should not be empty or null.");
+					throw new ArgumentException($"{nameof(Identity)} should not be empty or null");
 				}
+
 				if (value.Length > Env.IdentityMaxLength)
 				{
-					throw new ArgumentException($"Length of identity should less than {Env.IdentityMaxLength}.");
+					throw new ArgumentException($"Length of identity should less than {Env.IdentityMaxLength}");
 				}
 
 				_identity = value;
@@ -73,12 +51,12 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// start time of spider.
 		/// </summary>
-		protected DateTime StartTime { get; private set; }
+		public DateTime StartTime { get; private set; }
 
 		/// <summary>
 		/// end time of spider.
 		/// </summary>
-		protected DateTime ExitTime { get; private set; }
+		public DateTime ExitTime { get; private set; }
 
 		/// <summary>
 		/// 运行记录接口
@@ -115,7 +93,7 @@ namespace DotnetSpider.Core
 
 			var loggerConfiguration = new LoggerConfiguration()
 				.MinimumLevel.Verbose()
-				.WriteTo.Console(theme: ConsoleLogTheme)
+				.WriteTo.Console(theme: SerilogConsoleTheme.ConsoleLogTheme)
 				.WriteTo.RollingFile("dotnetspider.log");
 
 			if (Env.HubServiceLog)
@@ -131,14 +109,17 @@ namespace DotnetSpider.Core
 
 			if (ExecuteRecord == null)
 			{
-				ExecuteRecord = string.IsNullOrWhiteSpace(Env.HubServiceUrl) ? (IExecuteRecord)new NullExecuteRecord() : new HttpExecuteRecord();
+				ExecuteRecord = string.IsNullOrWhiteSpace(Env.HubServiceUrl)
+					? (IExecuteRecord) new NullExecuteRecord()
+					: new HttpExecuteRecord();
 				ExecuteRecord.Logger = Logger;
 			}
 
 			if (!ExecuteRecord.Add(TaskId, Name, Identity))
 			{
-				Logger.LogError($"Add execute record: {Identity} failed.");
+				Logger.LogError($"Add execute record: {Identity} failed");
 			}
+
 			try
 			{
 				StartTime = DateTime.Now;
@@ -148,7 +129,7 @@ namespace DotnetSpider.Core
 			{
 				ExitTime = DateTime.Now;
 				ExecuteRecord.Remove(TaskId, Name, Identity);
-				Logger.LogInformation($"Consume: {(ExitTime - StartTime).TotalSeconds} seconds.");
+				Logger.LogInformation($"Consume: {(ExitTime - StartTime).TotalSeconds} seconds");
 				PrintInfo.PrintLine();
 			}
 		}

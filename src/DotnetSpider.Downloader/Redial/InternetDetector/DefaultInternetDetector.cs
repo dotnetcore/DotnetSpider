@@ -43,8 +43,8 @@ namespace DotnetSpider.Downloader.Redial.InternetDetector
 		{
 			try
 			{
-				Ping p = new Ping();//创建Ping对象p
-				PingReply pr = p.Send(_url, Timeout);//向指定IP或者主机名的计算机发送ICMP协议的ping数据包
+				var p = new Ping();//创建Ping对象p
+				var pr = p.Send(_url, Timeout);//向指定IP或者主机名的计算机发送 ICMP 协议的ping数据包
 
 				return (pr != null && pr.Status == IPStatus.Success);//如果ping成功
 			}

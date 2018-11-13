@@ -8,7 +8,6 @@ using Xunit;
 using DotnetSpider.Extraction.Model.Formatter;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction;
-using DotnetSpider.Extension.Processor;
 using DotnetSpider.Extraction.Model;
 using DotnetSpider.Downloader;
 using DotnetSpider.Extension.Model;
@@ -48,7 +47,7 @@ namespace DotnetSpider.Extension.Test.Processor
 			spider.Run();
 			var pipeline = spider.Pipelines.First() as CollectionEntityPipeline;
 			var entities = pipeline.GetCollection("DotnetSpider.Extension.Test.Processor.TargetRequestExtractorTest+AutoIncrementTargetRequestExtractorSpider+BaiduSearchEntry");
-			Assert.Equal(60, entities.Count());
+			Assert.Equal(60, entities.Count);
 		}
 
 		private class TestLastPageChecker : ILastPageChecker

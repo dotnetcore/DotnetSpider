@@ -3,24 +3,29 @@
 namespace DotnetSpider.Extraction.Model.Formatter
 {
 	/// <summary>
-	/// Replaces one or more format items in a specified string with the string representation of a specified object.
+	/// 如果值等于EqualValue, 则返回Displacement. 比如用于: 采集的结果为: 是, 转化为 False
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-	public class StringFormater : Formatter
+	public class DisplaceFormatter : Formatter
 	{
 		/// <summary>
-		/// A composite format string.
+		/// 比较的值
 		/// </summary>
-		public string Format { get; set; }
+		public string EqualValue { get; set; }
+
+		/// <summary>
+		/// 最终替换的值
+		/// </summary>
+		public string Displacement { get; set; }
 
 		/// <summary>
 		/// 实现数值的转化
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
-			return string.Format(Format, value);
+			return value.Equals(EqualValue) ? Displacement : value;
 		}
 
 		/// <summary>
@@ -28,10 +33,6 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		protected override void CheckArguments()
 		{
-			if (string.IsNullOrWhiteSpace(Format))
-			{
-				throw new ArgumentException("FormatString should not be null or empty");
-			}
 		}
 	}
 }

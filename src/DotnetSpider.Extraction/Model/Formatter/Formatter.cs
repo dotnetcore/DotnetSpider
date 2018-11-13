@@ -31,7 +31,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected abstract object FormateValue(object value);
+		protected abstract object FormatValue(object value);
 
 		/// <summary>
 		/// 校验参数是否设置正确
@@ -43,15 +43,11 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		public object Formate(object value)
+		public object Format(object value)
 		{
 			CheckArguments();
 
-			if (value == null)
-			{
-				return ValueWhenNull;
-			}
-			return FormateValue(value);
+			return value == null ? ValueWhenNull : FormatValue(value);
 		}
 	}
 }

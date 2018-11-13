@@ -3,29 +3,24 @@
 namespace DotnetSpider.Extraction.Model.Formatter
 {
 	/// <summary>
-	/// Returns a new string in which all occurrences of a specified string in the current instance are replaced with another specified string.
+	/// Replaces one or more format items in a specified string with the string representation of a specified object.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-	public class ReplaceFormatter : Formatter
+	public class StringFormatter : Formatter
 	{
 		/// <summary>
-		/// 需要被替换的值
+		/// A composite format string.
 		/// </summary>
-		public string OldValue { get; set; }
-
-		/// <summary>
-		/// The string to replace all occurrences of oldValue.
-		/// </summary>
-		public string NewValue { get; set; }
+		public string Format { get; set; }
 
 		/// <summary>
 		/// 实现数值的转化
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
-			return value.ToString().Replace(OldValue, NewValue);
+			return string.Format(Format, value);
 		}
 
 		/// <summary>
@@ -33,6 +28,10 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		protected override void CheckArguments()
 		{
+			if (string.IsNullOrWhiteSpace(Format))
+			{
+				throw new ArgumentException("FormatString should not be null or empty");
+			}
 		}
 	}
 }

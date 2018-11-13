@@ -12,7 +12,7 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// <summary>
 		///  A string array that delimits the substrings in this string, an empty array that contains no delimiters, or null.
 		/// </summary>
-		public string[] Splitor;
+		public string[] Separator { get; set; }
 
 		/// <summary>
 		/// 分割数值后需要返回的数值索引
@@ -24,9 +24,9 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
-			string[] result = value.ToString().Split(Splitor, StringSplitOptions.RemoveEmptyEntries);
+			var result = value.ToString().Split(Separator, StringSplitOptions.RemoveEmptyEntries);
 
 			if (result.Length > ElementAt)
 			{
@@ -43,9 +43,9 @@ namespace DotnetSpider.Extraction.Model.Formatter
 		/// </summary>
 		protected override void CheckArguments()
 		{
-			if (Splitor == null || Splitor.Length == 0)
+			if (Separator == null || Separator.Length == 0)
 			{
-				throw new ArgumentException("Splitors should not be null or empty");
+				throw new ArgumentException("Separator should not be null or empty");
 			}
 
 			if (ElementAt < 0)

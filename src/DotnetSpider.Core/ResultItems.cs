@@ -1,7 +1,6 @@
 using DotnetSpider.Downloader;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace DotnetSpider.Core
 {

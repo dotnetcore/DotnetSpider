@@ -46,7 +46,7 @@ namespace DotnetSpider.Extraction
 		/// </summary>
 		/// <param name="field">属性名称</param>
 		/// <returns>查询结果</returns>
-		public abstract dynamic Enviroment(string field);
+		public abstract dynamic Environment(string field);
 
 		/// <summary>
 		/// 查找所有的链接
@@ -139,8 +139,7 @@ namespace DotnetSpider.Extraction
 
 		private string CalculateValue(dynamic element, ValueOption option)
 		{
-			var elementNode = element as HtmlNode;
-			if (elementNode != null)
+			if (element is HtmlNode elementNode)
 			{
 				switch (option)
 				{

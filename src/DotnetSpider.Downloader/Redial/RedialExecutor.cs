@@ -88,7 +88,7 @@ namespace DotnetSpider.Downloader.Redial
 				var lastRedialTime = (DateTime.Now - GetLastRedialTime()).Seconds;
 				if (lastRedialTime < RedialIntervalLimit)
 				{
-					Logger?.LogInformation($"Skip redial because last redial compeleted before {lastRedialTime} seconds.");
+					Logger?.LogInformation($"Skip redial because last redial completed before {lastRedialTime} seconds");
 					return RedialResult.OtherRedialed;
 				}
 				Thread.Sleep(500);
@@ -112,12 +112,12 @@ namespace DotnetSpider.Downloader.Redial
 
 						if (InternetDetector.Detect())
 						{
-							Console.WriteLine($"redial loop {redialCount} success.");
+							Console.WriteLine($"redial loop {redialCount} success");
 							break;
 						}
 						else
 						{
-							Console.WriteLine($"redial loop {redialCount} failed.");
+							Console.WriteLine($"redial loop {redialCount} failed");
 						}
 					}
 					catch (Exception ex)
@@ -137,7 +137,7 @@ namespace DotnetSpider.Downloader.Redial
 
 				RecordLastRedialTime();
 
-				return RedialResult.Sucess;
+				return RedialResult.Success;
 			}
 			catch (Exception ex)
 			{
@@ -149,7 +149,7 @@ namespace DotnetSpider.Downloader.Redial
 				locker?.Release();
 				if (SleepAfterRedial > 0)
 				{
-					Console.WriteLine($"Going to sleep for {SleepAfterRedial} after redial.");
+					Console.WriteLine($"Going to sleep for {SleepAfterRedial} after redial");
 					Thread.Sleep(SleepAfterRedial);
 				}
 			}
@@ -249,15 +249,15 @@ namespace DotnetSpider.Downloader.Redial
 		/// 构造方法
 		/// </summary>
 		/// <param name="redialer">拨号器</param>
-		/// <param name="validater">网络状态检测器</param>
-		protected RedialExecutor(IRedialer redialer, IInternetDetector validater)
+		/// <param name="internetDetector">网络状态检测器</param>
+		protected RedialExecutor(IRedialer redialer, IInternetDetector internetDetector)
 		{
-			if (redialer == null || validater == null)
+			if (redialer == null || internetDetector == null)
 			{
-				throw new ArgumentException("redialer, validater should not be null.");
+				throw new ArgumentException("redialer, internetDetector should not be null");
 			}
 			Redialer = redialer;
-			InternetDetector = validater;
+			InternetDetector = internetDetector;
 		}
 
 		/// <summary>
@@ -274,7 +274,7 @@ namespace DotnetSpider.Downloader.Redial
 
 		private void WaitRedialComplete()
 		{
-			for (int i = 0; i < WaitRedialTimeout; ++i)
+			for (var i = 0; i < WaitRedialTimeout; ++i)
 			{
 				if (IsRedialing())
 				{
@@ -285,7 +285,7 @@ namespace DotnetSpider.Downloader.Redial
 					return;
 				}
 			}
-			throw new RedialException("Wait redial timeout.");
+			throw new RedialException("Wait redial timeout");
 		}
 	}
 }

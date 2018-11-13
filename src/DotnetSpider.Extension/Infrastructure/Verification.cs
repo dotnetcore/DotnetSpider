@@ -405,7 +405,7 @@ namespace DotnetSpider.Extension.Infrastructure
 					"<tr>" +
 					$"<td>{Name}</td>" +
 					$"<td>{VerificationName}</td>" +
-					$"<td>NONE</td>" +
+					"<td>NONE</td>" +
 					$"<td>{ExpectedValue}</td>" +
 					$"<td>{Acutal}</td>" +
 					$"<td style=\"color:{color}\"><strong>{verifyResultStr}</strong></td>" +

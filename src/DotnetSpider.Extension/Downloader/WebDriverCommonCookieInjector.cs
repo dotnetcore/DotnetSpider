@@ -18,39 +18,40 @@ namespace DotnetSpider.Extension.Downloader
 		/// <summary>
 		/// 登陆的链接
 		/// </summary>
-		public string Url;
+		public string Url { get; set; }
 
 		/// <summary>
 		/// 登陆成功后需要再次导航到的链接
 		/// </summary>
-		public string AfterLoginUrl;
+		public string AfterLoginUrl { get; set; }
 
 		/// <summary>
 		/// 用户名在网页中的元素选择器
 		/// </summary>
-		public Selector UserSelector;
+		public Selector UserSelector { get; set; }
 
 		/// <summary>
 		/// 用户名
 		/// </summary>
-		public string User;
+		public string User { get; set; }
 
 		/// <summary>
 		/// 密码在网页中的元素选择器
 		/// </summary>
-		public Selector PasswordSelector;
+		public Selector PasswordSelector { get; set; }
 
 		/// <summary>
 		/// 密码
 		/// </summary>
-		public string Password;
+		public string Password { get; set; }
 
 		/// <summary>
 		/// 登陆按钮的元素选择器
 		/// </summary>
-		public Selector SubmitSelector;
+		public Selector SubmitSelector { get; set; }
 
-		public WebDriverCommonCookieInjector(Browser browser, Action before = null, Action after = null) : base(browser, before, after)
+		public WebDriverCommonCookieInjector(Browser browser, Action before = null, Action after = null) : base(browser,
+			before, after)
 		{
 		}
 
@@ -82,17 +83,18 @@ namespace DotnetSpider.Extension.Downloader
 			switch (element.Type)
 			{
 				case SelectorType.XPath:
-					{
-						return webDriver.FindElementByXPath(element.Expression);
-					}
+				{
+					return webDriver.FindElementByXPath(element.Expression);
+				}
 				case SelectorType.Css:
-					{
-						return webDriver.FindElementByCssSelector(element.Expression);
-					}
+				{
+					return webDriver.FindElementByCssSelector(element.Expression);
+				}
 			}
 
-			throw new SpiderException("Unsport findby: " + element.Type);
+			throw new SpiderException("Unsupported Selector: " + element.Type);
 		}
+
 
 		/// <summary>
 		/// 取得 Cookie
@@ -100,9 +102,10 @@ namespace DotnetSpider.Extension.Downloader
 		/// <returns>Cookies <see cref="CookieCollection"/></returns>
 		protected override CookieCollection GetCookies()
 		{
-			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null || PasswordSelector == null)
+			if (string.IsNullOrEmpty(User) || string.IsNullOrEmpty(Password) || UserSelector == null ||
+			    PasswordSelector == null)
 			{
-				throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect.");
+				throw new SpiderException("Arguments of WebDriverCookieInjector are incorrect");
 			}
 
 			var driver = CreateWebDriver();

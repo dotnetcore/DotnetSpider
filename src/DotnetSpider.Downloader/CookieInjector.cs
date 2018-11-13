@@ -67,7 +67,7 @@ namespace DotnetSpider.Downloader
 		protected abstract CookieCollection GetCookies();
 
 		/// <summary>
-		/// Check injection frenquency.
+		/// Check injection frequency.
 		/// </summary>
 		/// <summary xml:lang="zh-CN">
 		/// 60 秒内重复注入

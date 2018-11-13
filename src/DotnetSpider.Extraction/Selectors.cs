@@ -108,12 +108,12 @@ namespace DotnetSpider.Extraction
 		/// <param name="expr">键值</param>
 		/// <returns>查询器</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public static ISelector Enviroment(string expr)
+		public static ISelector Environment(string expr)
 		{
 			var key = $"e_{expr}";
 			if (!Cache.ContainsKey(key))
 			{
-				Cache.Add(key, new EnviromentSelector(expr));
+				Cache.Add(key, new EnvironmentSelector(expr));
 			}
 			return Cache[key];
 		}

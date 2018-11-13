@@ -11,7 +11,7 @@ namespace DotnetSpider.Core.Test
 		{
 			if (Env.IsWindows)
 			{
-				var result = HttpClientDownloader.Default.GetAsync("http://localhost:30013").Result;
+				var result = DotnetSpider.Downloader.Downloader.Default.GetAsync("http://localhost:30013").Result;
 				if (result.StatusCode == HttpStatusCode.OK)
 				{
 					Env.HubServiceTaskApiUrl = "http://localhost:30013/api/v1.0/task";

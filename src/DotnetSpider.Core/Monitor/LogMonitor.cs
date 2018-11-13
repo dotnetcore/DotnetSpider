@@ -25,7 +25,7 @@ namespace DotnetSpider.Core.Monitor
 		/// <param name="threadNum">爬虫线程数</param>
 		public virtual void Flush(string identity, string taskId, string status, long left, long total, long success, long error, long avgDownloadSpeed, long avgProcessorSpeed, long avgPipelineSpeed, int threadNum)
 		{
-			string msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
+			var msg = $"Left {left} Success {success} Error {error} Total {total} Dowload {avgDownloadSpeed} Extract {avgProcessorSpeed} Pipeline {avgPipelineSpeed}";
 			Logger.LogTrace(msg);
 		}
 	}

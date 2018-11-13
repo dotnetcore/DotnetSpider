@@ -44,9 +44,9 @@ namespace DotnetSpider.Core
 		}
 
 		/// <summary>
-		/// DLL名字中包含任意一个即是需要扫描的DLL
+		/// DLL 名字中包含任意一个即是需要扫描的 DLL
 		/// </summary>
-		public static List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
+		public static readonly List<string> DetectNames = new List<string> { "dotnetspider.sample", "crawler", "crawlers", "spider", "spiders" };
 
 		/// <summary>
 		/// 运行
@@ -59,7 +59,7 @@ namespace DotnetSpider.Core
 			{
 				SetEncoding();
 
-				PrintEnviroment(args);
+				PrintEnvironment(args);
 
 				LoadConfiguration(options.Config);
 
@@ -167,8 +167,8 @@ namespace DotnetSpider.Core
 			var spiderTypes = new Dictionary<string, Type>();
 			var namedType = typeof(INamed);
 			var identityType = typeof(IIdentity);
-			var irunableType = typeof(IRunable);
-			foreach (var file in DetectDlls())
+			var irunableType = typeof(IRunnable);
+			foreach (var file in DetectAssemblies())
 			{
 				var asm = Assembly.Load(file);
 				var types = asm.GetTypes();
@@ -238,7 +238,7 @@ namespace DotnetSpider.Core
 		/// 扫描所有需要求的DLL
 		/// </summary>
 		/// <returns></returns>
-		public static List<string> DetectDlls()
+		public static List<string> DetectAssemblies()
 		{
 			var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
 			var files = Directory.GetFiles(path)
@@ -266,7 +266,7 @@ namespace DotnetSpider.Core
 		{
 			if (!spiderTypes.ContainsKey(spiderName))
 			{
-				ConsoleHelper.WriteLine($"Spider: {spiderName} unfound.", ConsoleColor.DarkYellow);
+				ConsoleHelper.WriteLine($"Spider: {spiderName} unfounded", ConsoleColor.DarkYellow);
 				return null;
 			}
 			var spiderType = spiderTypes[spiderName];
@@ -306,8 +306,8 @@ namespace DotnetSpider.Core
 			return spider;
 		}
 
-		private static void PrintEnviroment(params string[] args)
-		{
+		private static void PrintEnvironment(params string[] args)
+		{			
 			Console.WriteLine("");
 			PrintInfo.Print();
 			var commands = string.Join(" ", args);

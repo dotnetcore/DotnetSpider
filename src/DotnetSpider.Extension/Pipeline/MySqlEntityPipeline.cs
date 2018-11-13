@@ -1,13 +1,9 @@
 ﻿using System.Linq;
 using System.Text;
-using DotnetSpider.Extension.Infrastructure;
 using System.Data;
 using MySql.Data.MySqlClient;
-using DotnetSpider.Extraction.Model.Attribute;
-using DotnetSpider.Extraction.Model;
 using Microsoft.Extensions.Logging;
 using DotnetSpider.Extension.Model;
-using System.Collections.Generic;
 using DotnetSpider.Core.Infrastructure;
 
 namespace DotnetSpider.Extension.Pipeline
@@ -31,9 +27,9 @@ namespace DotnetSpider.Extension.Pipeline
 			return new MySqlConnection(connectString);
 		}
 
-		protected override Sqls GenerateSqls(TableInfo tableInfo)
+		protected override SqlStatements GenerateSqlStatements(TableInfo tableInfo)
 		{
-			var sqls = new Sqls
+			var sqlStatements = new SqlStatements
 			{
 				InsertSql = GenerateInsertSql(tableInfo, false),
 				InsertAndIgnoreDuplicateSql = GenerateInsertSql(tableInfo, true),
@@ -41,7 +37,7 @@ namespace DotnetSpider.Extension.Pipeline
 				UpdateSql = GenerateUpdateSql(tableInfo),
 				SelectSql = GenerateSelectSql(tableInfo)
 			};
-			return sqls;
+			return sqlStatements;
 		}
 
 		protected override void InitDatabaseAndTable(IDbConnection conn, TableInfo tableInfo)
@@ -57,7 +53,7 @@ namespace DotnetSpider.Extension.Pipeline
 		/// <summary>
 		/// 构造创建数据表的SQL语句
 		/// </summary>
-		/// <param name="model">数据模型</param>
+		/// <param name="tableInfo"></param>
 		/// <returns>SQL语句</returns>
 		private string GenerateCreateTableSql(TableInfo tableInfo)
 		{
@@ -66,7 +62,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			var isAutoIncrementPrimary = tableInfo.IsAutoIncrementPrimary;
 
-			StringBuilder builder = string.IsNullOrWhiteSpace(database) ? new StringBuilder($"CREATE TABLE IF NOT EXISTS `{tableName}` (") :
+			var builder = string.IsNullOrWhiteSpace(database) ? new StringBuilder($"CREATE TABLE IF NOT EXISTS `{tableName}` (") :
 				new StringBuilder($"CREATE TABLE IF NOT EXISTS `{database}`.`{tableName}` (");
 
 			foreach (var column in tableInfo.Columns)
@@ -88,7 +84,7 @@ namespace DotnetSpider.Extension.Pipeline
 
 			if (AutoTimestamp)
 			{
-				builder.Append($", `creation_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `creation_date` DATE");
+				builder.Append(", `creation_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `creation_date` DATE");
 			}
 
 			if (tableInfo.Primary.Count > 0)
@@ -100,22 +96,22 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				foreach (var index in tableInfo.Indexes)
 				{
-					string name = index.Key;
-					string indexColumNames = string.Join(", ", index.Value.Select(c => $"`{GetColumnName(c)}`"));
-					builder.Append($", KEY `INDEX_{name}` ({indexColumNames})");
+					var name = index.Key;
+					var indexColumnNames = string.Join(", ", index.Value.Select(c => $"`{GetColumnName(c)}`"));
+					builder.Append($", KEY `INDEX_{name}` ({indexColumnNames})");
 				}
 			}
 			if (tableInfo.Uniques.Count > 0)
 			{
 				foreach (var unique in tableInfo.Uniques)
 				{
-					string name = unique.Key;
-					string uniqueColumNames = string.Join(", ", unique.Value.Select(c => $"`{GetColumnName(c)}`"));
-					builder.Append($", UNIQUE KEY `UNIQUE_{name}` ({uniqueColumNames})");
+					var name = unique.Key;
+					var uniqueColumnNames = string.Join(", ", unique.Value.Select(c => $"`{GetColumnName(c)}`"));
+					builder.Append($", UNIQUE KEY `UNIQUE_{name}` ({uniqueColumnNames})");
 				}
 			}
 			builder.Append(")");
-			string sql = builder.ToString();
+			var sql = builder.ToString();
 			return sql;
 		}
 
@@ -124,15 +120,15 @@ namespace DotnetSpider.Extension.Pipeline
 			var columns = tableInfo.Columns;
 			var isAutoIncrementPrimary = tableInfo.IsAutoIncrementPrimary;
 			// 去掉自增主键
-			var insertColumns = isAutoIncrementPrimary ? columns.Where(c1 => c1.Name != tableInfo.Primary.First().Name) : columns;
+			var insertColumns = (isAutoIncrementPrimary ? columns.Where(c1 => c1.Name != tableInfo.Primary.First().Name) : columns).ToArray();
 
-			string columnsSql = string.Join(", ", insertColumns.Select(c => $"`{GetColumnName(c)}`"));
+			var columnsSql = string.Join(", ", insertColumns.Select(c => $"`{GetColumnName(c)}`"));
 
 			if (AutoTimestamp)
 			{
 				columnsSql = $"{columnsSql},`creation_time`, `creation_date`";
 			}
-			string columnsParamsSql = string.Join(", ", insertColumns.Select(p => $"@{p.Name}"));
+			var columnsParamsSql = string.Join(", ", insertColumns.Select(p => $"@{p.Name}"));
 
 			if (AutoTimestamp)
 			{
@@ -153,15 +149,15 @@ namespace DotnetSpider.Extension.Pipeline
 			var columns = tableInfo.Columns;
 			var isAutoIncrementPrimary = tableInfo.IsAutoIncrementPrimary;
 			// 去掉自增主键
-			var insertColumns = isAutoIncrementPrimary ? columns.Where(c1 => c1.Name != tableInfo.Primary.First().Name) : columns;
+			var insertColumns = (isAutoIncrementPrimary ? columns.Where(c1 => c1.Name != tableInfo.Primary.First().Name) : columns).ToArray();
 
-			string columnsSql = string.Join(", ", insertColumns.Select(c => $"`{GetColumnName(c)}`"));
+			var columnsSql = string.Join(", ", insertColumns.Select(c => $"`{GetColumnName(c)}`"));
 
 			if (AutoTimestamp)
 			{
 				columnsSql = $"{columnsSql},`creation_time`, `creation_date`";
 			}
-			string columnsParamsSql = string.Join(", ", insertColumns.Select(p => $"@{p.Name}"));
+			var columnsParamsSql = string.Join(", ", insertColumns.Select(p => $"@{p.Name}"));
 
 			if (AutoTimestamp)
 			{
@@ -171,7 +167,7 @@ namespace DotnetSpider.Extension.Pipeline
 			var tableName = GetTableName(tableInfo);
 			var database = GetDatabaseName(tableInfo);
 
-			string setParams = string.Join(", ", insertColumns.Select(c => $"`{GetColumnName(c)}`=@{c.Name}"));
+			var setParams = string.Join(", ", insertColumns.Select(c => $"`{GetColumnName(c)}`=@{c.Name}"));
 
 			var sql = string.IsNullOrWhiteSpace(database) ? $"INSERT INTO `{tableName}` ({columnsSql}) VALUES ({columnsParamsSql}) ON DUPLICATE KEY UPDATE {setParams};" :
 				$"INSERT INTO `{database}`.`{tableName}` ({columnsSql}) VALUES ({columnsParamsSql}) ON DUPLICATE KEY UPDATE {setParams};";
@@ -198,14 +194,14 @@ namespace DotnetSpider.Extension.Pipeline
 			var tableName = GetTableName(tableInfo);
 			var database = GetDatabaseName(tableInfo);
 
-			string where = "";
+			var where = "";
 			foreach (var column in tableInfo.Primary)
 			{
 				where += $" `{GetColumnName(column)}` = @{column.Name} AND";
 			}
 			where = where.Substring(0, where.Length - 3);
 
-			string setCols = string.Join(", ", tableInfo.Updates.Select(c => $"`{GetColumnName(c)}`=@{c.Name}"));
+			var setCols = string.Join(", ", tableInfo.Updates.Select(c => $"`{GetColumnName(c)}`=@{c.Name}"));
 			var sql = string.IsNullOrWhiteSpace(database) ? $"UPDATE `{tableName}` SET {setCols} WHERE {where};" :
 				$"UPDATE `{database}`.`{tableName}` SET {setCols} WHERE {where};";
 			return sql;

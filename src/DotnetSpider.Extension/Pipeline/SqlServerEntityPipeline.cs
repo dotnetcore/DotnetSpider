@@ -1,12 +1,9 @@
 ﻿using System;
-using DotnetSpider.Extension.Infrastructure;
 using System.Text;
 using System.Linq;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using DotnetSpider.Extraction.Model;
-using DotnetSpider.Extraction.Model.Attribute;
 using Microsoft.Extensions.Logging;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Core.Infrastructure;
@@ -23,7 +20,8 @@ namespace DotnetSpider.Extension.Pipeline
 		/// </summary>
 		/// <param name="connectString">数据库连接字符串, 如果为空框架会尝试从配置文件中读取</param>
 		/// <param name="pipelineMode">数据管道模式</param>
-		public SqlServerEntityPipeline(string connectString = null, PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate) : base(connectString, pipelineMode)
+		public SqlServerEntityPipeline(string connectString = null,
+			PipelineMode pipelineMode = PipelineMode.InsertAndIgnoreDuplicate) : base(connectString, pipelineMode)
 		{
 		}
 
@@ -34,17 +32,20 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return "SELECT CURRENT_TIMESTAMP";
 			}
-			string version = serverVersion.Split('.')[0];
+
+			var version = serverVersion.Split('.')[0];
 			switch (version)
 			{
 				case "11":
-					{
-						return $"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{database}') CREATE DATABASE {database};";
-					}
+				{
+					return
+						$"USE master; IF NOT EXISTS(SELECT * FROM sysdatabases WHERE name='{database}') CREATE DATABASE {database};";
+				}
 				default:
-					{
-						return $"USE master; IF NOT EXISTS(SELECT * FROM sys.databases WHERE name='{database}') CREATE DATABASE {database};";
-					}
+				{
+					return
+						$"USE master; IF NOT EXISTS(SELECT * FROM sys.databases WHERE name='{database}') CREATE DATABASE {database};";
+				}
 			}
 		}
 
@@ -55,17 +56,18 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				return "SELECT COUNT(CURRENT_TIMESTAMP)";
 			}
-			string version = serverVersion.Split('.')[0];
+
+			var version = serverVersion.Split('.')[0];
 			switch (version)
 			{
 				case "11":
-					{
-						return $"SELECT COUNT(*) FROM sysdatabases WHERE name='{database}'";
-					}
+				{
+					return $"SELECT COUNT(*) FROM sysdatabases WHERE name='{database}'";
+				}
 				default:
-					{
-						return $"SELECT COUNT(*) FROM sys.databases WHERE name='{database}'";
-					}
+				{
+					return $"SELECT COUNT(*) FROM sys.databases WHERE name='{database}'";
+				}
 			}
 		}
 
@@ -76,9 +78,10 @@ namespace DotnetSpider.Extension.Pipeline
 
 			var isAutoIncrementPrimary = tableInfo.IsAutoIncrementPrimary;
 
-			StringBuilder builder = string.IsNullOrWhiteSpace(database) ?
-				new StringBuilder($"IF OBJECT_ID('{tableName}', 'U') IS NULL CREATE table {tableName} (") :
-				new StringBuilder($"USE {database}; IF OBJECT_ID('{tableName}', 'U') IS NULL CREATE table {tableName} (");
+			var builder = string.IsNullOrWhiteSpace(database)
+				? new StringBuilder($"IF OBJECT_ID('{tableName}', 'U') IS NULL CREATE table {tableName} (")
+				: new StringBuilder(
+					$"USE {database}; IF OBJECT_ID('{tableName}', 'U') IS NULL CREATE table {tableName} (");
 
 			foreach (var column in tableInfo.Columns)
 			{
@@ -95,11 +98,12 @@ namespace DotnetSpider.Extension.Pipeline
 					builder.Append($"{columnSql}, ");
 				}
 			}
+
 			builder.Remove(builder.Length - 2, 2);
 
 			if (AutoTimestamp)
 			{
-				builder.Append($", creation_time DATETIME DEFAULT(GETDATE()), creation_date DATE DEFAULT(GETDATE())");
+				builder.Append(", creation_time DATETIME DEFAULT(GETDATE()), creation_date DATE DEFAULT(GETDATE())");
 			}
 
 			if (tableInfo.Primary.Count > 0)
@@ -117,9 +121,9 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				foreach (var index in tableInfo.Indexes)
 				{
-					string name = index.Key;
-					string indexColumNames = string.Join(", ", index.Value.Select(c => $"[{GetColumnName(c)}]"));
-					builder.Append($"CREATE NONCLUSTERED INDEX [INDEX_{name}] ON {tableName} ({indexColumNames});");
+					var name = index.Key;
+					var indexColumnNames = string.Join(", ", index.Value.Select(c => $"[{GetColumnName(c)}]"));
+					builder.Append($"CREATE NONCLUSTERED INDEX [INDEX_{name}] ON {tableName} ({indexColumnNames});");
 				}
 			}
 
@@ -127,18 +131,20 @@ namespace DotnetSpider.Extension.Pipeline
 			{
 				foreach (var unique in tableInfo.Uniques)
 				{
-					string name = unique.Key;
-					string uniqueColumNames = string.Join(", ", unique.Value.Select(c => $"[{GetColumnName(c)}]"));
-					builder.Append($"CREATE UNIQUE NONCLUSTERED INDEX [UNIQUE_{name}] ON {tableName} ({uniqueColumNames}) {(PipelineMode == PipelineMode.InsertAndIgnoreDuplicate ? "WITH (IGNORE_DUP_KEY = ON)" : "") };");
+					var name = unique.Key;
+					var uniqueColumnNames = string.Join(", ", unique.Value.Select(c => $"[{GetColumnName(c)}]"));
+					builder.Append(
+						$"CREATE UNIQUE NONCLUSTERED INDEX [UNIQUE_{name}] ON {tableName} ({uniqueColumnNames}) {(PipelineMode == PipelineMode.InsertAndIgnoreDuplicate ? "WITH (IGNORE_DUP_KEY = ON)" : "")};");
 				}
 			}
+
 			var sql = builder.ToString();
 			return sql;
 		}
 
 		private string GenerateColumn(Column column, bool isPrimary)
 		{
-			var columnName = Ignorease ? column.Name.ToLower() : column.Name;
+			var columnName = IgnoreCase ? column.Name.ToLower() : column.Name;
 			var dataType = GetDataTypeSql(column.DataType, column.Length);
 
 			if (isPrimary)
@@ -154,9 +160,12 @@ namespace DotnetSpider.Extension.Pipeline
 			var columns = tableInfo.Columns;
 			var isAutoIncrementPrimary = tableInfo.IsAutoIncrementPrimary;
 			// 去掉自增主键
-			var insertColumns = isAutoIncrementPrimary ? columns.Where(c1 => c1.Name != tableInfo.Primary.First().Name) : columns;
+			var insertColumns =
+				(isAutoIncrementPrimary ? columns.Where(c1 => c1.Name != tableInfo.Primary.First().Name) : columns)
+				.ToArray();
 
-			string columnsSql = string.Join(", ", insertColumns.Select(p => $"[{(Ignorease ? p.Name.ToLower() : p.Name)}]"));
+			var columnsSql = string.Join(", ",
+				insertColumns.Select(p => $"[{(IgnoreCase ? p.Name.ToLower() : p.Name)}]"));
 
 			if (AutoTimestamp)
 			{
@@ -173,8 +182,9 @@ namespace DotnetSpider.Extension.Pipeline
 			var tableName = GetTableName(tableInfo);
 			var database = GetDatabaseName(tableInfo);
 
-			var sql = string.IsNullOrWhiteSpace(database) ? $"INSERT INTO [{tableName}] ({columnsSql}) VALUES ({columnsParamsSql});" :
-				$"USE {database}; INSERT INTO [{tableName}] ({columnsSql}) VALUES ({columnsParamsSql});";
+			var sql = string.IsNullOrWhiteSpace(database)
+				? $"INSERT INTO [{tableName}] ({columnsSql}) VALUES ({columnsParamsSql});"
+				: $"USE {database}; INSERT INTO [{tableName}] ({columnsSql}) VALUES ({columnsParamsSql});";
 			return sql;
 		}
 
@@ -197,16 +207,18 @@ namespace DotnetSpider.Extension.Pipeline
 			var tableName = GetTableName(tableInfo);
 			var database = GetDatabaseName(tableInfo);
 
-			string where = "";
+			var where = "";
 			foreach (var column in tableInfo.Primary)
 			{
 				where += $" [{GetColumnName(column)}] = @{column.Name} AND";
 			}
+
 			where = where.Substring(0, where.Length - 3);
 
-			string setCols = string.Join(", ", tableInfo.Updates.Select(c => $"[{GetColumnName(c)}]=@{c.Name}"));
-			var sql = string.IsNullOrWhiteSpace(database) ? $"UPDATE [{tableName}] SET {setCols} WHERE {where};" :
-				$"USE [{database}]; UPDATE [{tableName}] SET {setCols} WHERE {where};";
+			var setCols = string.Join(", ", tableInfo.Updates.Select(c => $"[{GetColumnName(c)}]=@{c.Name}"));
+			var sql = string.IsNullOrWhiteSpace(database)
+				? $"UPDATE [{tableName}] SET {setCols} WHERE {where};"
+				: $"USE [{database}]; UPDATE [{tableName}] SET {setCols} WHERE {where};";
 			return sql;
 		}
 
@@ -221,15 +233,17 @@ namespace DotnetSpider.Extension.Pipeline
 			var tableName = GetTableName(tableInfo);
 			var database = GetDatabaseName(tableInfo);
 
-			string where = "";
+			var where = "";
 			foreach (var column in tableInfo.Primary)
 			{
 				where += $" [{GetColumnName(column)}] = @{column.Name} AND";
 			}
+
 			where = where.Substring(0, where.Length - 3);
 
-			var sql = string.IsNullOrWhiteSpace(database) ? $"SELECT * FROM [{tableName}] WHERE {where};" :
-				$"USE [{database}]; SELECT * FROM [{tableName}] WHERE {where};";
+			var sql = string.IsNullOrWhiteSpace(database)
+				? $"SELECT * FROM [{tableName}] WHERE {where};"
+				: $"USE [{database}]; SELECT * FROM [{tableName}] WHERE {where};";
 			return sql;
 		}
 
@@ -240,51 +254,52 @@ namespace DotnetSpider.Extension.Pipeline
 			switch (type)
 			{
 				case DataType.Bool:
-					{
-						dataType = "BIT";
-						break;
-					}
+				{
+					dataType = "BIT";
+					break;
+				}
 				case DataType.DateTime:
-					{
-						dataType = "DATETIME DEFAULT(GETDATE())";
-						break;
-					}
+				{
+					dataType = "DATETIME DEFAULT(GETDATE())";
+					break;
+				}
 				case DataType.Date:
-					{
-						dataType = "DATE DEFAULT(GETDATE())";
-						break;
-					}
+				{
+					dataType = "DATE DEFAULT(GETDATE())";
+					break;
+				}
 				case DataType.Decimal:
-					{
-						dataType = "DECIMAL(18,2)";
-						break;
-					}
+				{
+					dataType = "DECIMAL(18,2)";
+					break;
+				}
 				case DataType.Double:
-					{
-						dataType = "FLOAT";
-						break;
-					}
+				{
+					dataType = "FLOAT";
+					break;
+				}
 				case DataType.Float:
-					{
-						dataType = "FLOAT";
-						break;
-					}
+				{
+					dataType = "FLOAT";
+					break;
+				}
 				case DataType.Int:
-					{
-						dataType = "INT";
-						break;
-					}
+				{
+					dataType = "INT";
+					break;
+				}
 				case DataType.Long:
-					{
-						dataType = "BIGINT";
-						break;
-					}
+				{
+					dataType = "BIGINT";
+					break;
+				}
 				default:
-					{
-						dataType = length <= 0 || length >= 8000 ? "NVARCHAR(MAX)" : $"NVARCHAR({length})";
-						break;
-					}
+				{
+					dataType = length <= 0 || length >= 8000 ? "NVARCHAR(MAX)" : $"NVARCHAR({length})";
+					break;
+				}
 			}
+
 			return dataType;
 		}
 
@@ -293,24 +308,27 @@ namespace DotnetSpider.Extension.Pipeline
 			return new SqlConnection(connectString);
 		}
 
-		protected override Sqls GenerateSqls(TableInfo model)
+		protected override SqlStatements GenerateSqlStatements(TableInfo model)
 		{
 			if (PipelineMode == PipelineMode.InsertNewAndUpdateOld)
 			{
-				throw new NotImplementedException("Sql Server not suport InsertNewAndUpdateOld yet.");
+				throw new NotImplementedException("Sql Server not support InsertNewAndUpdateOld yet.");
 			}
-			var sqls = new Sqls();
 
-			sqls.InsertSql = GenerateInsertSql(model);
-			sqls.InsertAndIgnoreDuplicateSql = GenerateInsertSql(model);
-			sqls.UpdateSql = GenerateUpdateSql(model);
-			sqls.SelectSql = GenerateSelectSql(model);
-			return sqls;
+			var sqlStatements = new SqlStatements
+			{
+				InsertSql = GenerateInsertSql(model),
+				InsertAndIgnoreDuplicateSql = GenerateInsertSql(model),
+				UpdateSql = GenerateUpdateSql(model),
+				SelectSql = GenerateSelectSql(model)
+			};
+
+			return sqlStatements;
 		}
 
 		protected override void InitDatabaseAndTable(IDbConnection conn, TableInfo model)
 		{
-			var serverVersion = ((DbConnection)conn).ServerVersion;
+			var serverVersion = ((DbConnection) conn).ServerVersion;
 			var sql = GenerateIfDatabaseExistsSql(model, serverVersion);
 
 			if (Convert.ToInt16(conn.MyExecuteScalar(sql)) == 0)

@@ -6,7 +6,6 @@ using DotnetSpider.Core;
 using DotnetSpider.Extension.Pipeline;
 using Xunit;
 using Dapper;
-using DotnetSpider.Extension.Processor;
 using System.Data;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model;

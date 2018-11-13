@@ -49,25 +49,21 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				return false;
 			}
-			if (_threadCount < MaxThreads)
+
+			if (_threadCount >= MaxThreads) return false;
+			if (!ThreadPool.QueueUserWorkItem(threadContext =>
 			{
-				if (ThreadPool.QueueUserWorkItem(threadContext =>
+				try
 				{
-					try
-					{
-						action(obj);
-					}
-					finally
-					{
-						Interlocked.Decrement(ref _threadCount);
-					}
-				}))
-				{
-					Interlocked.Increment(ref _threadCount);
-					return true;
+					action(obj);
 				}
-			}
-			return false;
+				finally
+				{
+					Interlocked.Decrement(ref _threadCount);
+				}
+			})) return false;
+			Interlocked.Increment(ref _threadCount);
+			return true;
 		}
 
 		/// <summary>
@@ -97,25 +93,21 @@ namespace DotnetSpider.Core.Infrastructure
 			{
 				return false;
 			}
-			if (_threadCount < MaxThreads)
+
+			if (_threadCount >= MaxThreads) return false;
+			if (!ThreadPool.QueueUserWorkItem(threadContext =>
 			{
-				if (ThreadPool.QueueUserWorkItem(threadContext =>
+				try
 				{
-					try
-					{
-						action();
-					}
-					finally
-					{
-						Interlocked.Decrement(ref _threadCount);
-					}
-				}))
-				{
-					Interlocked.Increment(ref _threadCount);
-					return true;
+					action();
 				}
-			}
-			return false;
+				finally
+				{
+					Interlocked.Decrement(ref _threadCount);
+				}
+			})) return false;
+			Interlocked.Increment(ref _threadCount);
+			return true;
 		}
 	}
 }

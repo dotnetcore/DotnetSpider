@@ -8,18 +8,18 @@ namespace DotnetSpider.Downloader
 {
 	public static class DownloaderEnv
 	{
-		public static string GlobalDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dotnetspider");
+		public static readonly string GlobalDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dotnetspider");
 
 #if NETFRAMEWORK
-		public static string PathSeperator = "\\";
+		public static string PathSeparator = "\\";
 #else
-		public static string PathSeperator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/";
+		public static readonly string PathSeparator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/";
 #endif
 
 #if NETFRAMEWORK
-		public static bool IsWindows = true;
+		public static readonly bool IsWindows = true;
 #else
-		public static bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+		public static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #endif
 	}
 }

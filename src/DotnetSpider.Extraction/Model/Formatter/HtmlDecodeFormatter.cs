@@ -8,29 +8,31 @@ using System.Net;
 namespace DotnetSpider.Extraction.Model.Formatter
 {
 	/// <summary>
-	/// Converts a text string into a URL-encoded string.
+	/// 把数值进行HTML解码
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property)]
-	public class UrlDecodeFormater : Formatter
+	public class HtmlDecodeFormatter : Formatter
 	{
-		protected override void CheckArguments()
-		{
-		}
-
 		/// <summary>
 		/// 实现数值的转化
 		/// </summary>
 		/// <param name="value">数值</param>
 		/// <returns>被格式化后的数值</returns>
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
 			string tmp = value.ToString();
 #if !NETSTANDARD
-			return HttpUtility.UrlDecode(tmp);
+			return HttpUtility.HtmlDecode(tmp);
 #else
-			return WebUtility.UrlDecode(tmp);
+			return WebUtility.HtmlDecode(tmp);
 #endif
 		}
 
+		/// <summary>
+		/// 校验参数是否设置正确
+		/// </summary>
+		protected override void CheckArguments()
+		{
+		}
 	}
 }

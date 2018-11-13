@@ -3,7 +3,6 @@ using DotnetSpider.Extension;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
-using DotnetSpider.Extraction.Model;
 using DotnetSpider.Extraction.Model.Attribute;
 using DotnetSpider.Extraction.Model.Formatter;
 using System.Collections.Generic;
@@ -65,7 +64,7 @@ namespace DotnetSpider.Sample.docs
 		{
 		}
 
-		protected override object FormateValue(object value)
+		protected override object FormatValue(object value)
 		{
 			return "";
 		}

@@ -2,7 +2,6 @@
 using DotnetSpider.Core.Infrastructure;
 using DotnetSpider.Downloader.AfterDownloadCompleteHandlers;
 using DotnetSpider.Extension;
-using DotnetSpider.Extension.Infrastructure;
 using DotnetSpider.Extension.Model;
 using DotnetSpider.Extension.Pipeline;
 using DotnetSpider.Extraction;
@@ -18,7 +17,7 @@ namespace DotnetSpider.Sample.docs
 			Downloader.AddAfterDownloadCompleteHandler(new CutoutHandler("json(", ");", 5, 0));
 			AddPipeline(new ConsoleEntityPipeline());
 			AddRequestBuilder(new DatabaseRequestBuilder(Database.MySql, Env.DataConnectionString,
-				$"SELECT * FROM test.jd_sku", new[] { "sku" },
+				"SELECT * FROM test.jd_sku", new[] { "sku" },
 				"http://chat1.jd.com/api/checkChat?my=list&pidList={0}&callback=json"));
 
 			AddEntityType<Item>();

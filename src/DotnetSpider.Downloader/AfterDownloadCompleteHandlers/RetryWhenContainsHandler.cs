@@ -46,7 +46,7 @@ namespace DotnetSpider.Downloader.AfterDownloadCompleteHandlers
 			{
 				return;
 			}
-			var content = response.Content;
+
 			if (_contents.Any(c => text.Contains(c)))
 			{
 				throw new DownloaderException($"Retry this request because content contains {JsonConvert.SerializeObject(_contents)}.");

@@ -15,17 +15,17 @@ namespace DotnetSpider.Extraction.Model
 		None,
 
 		/// <summary>
-		/// For html contene
+		/// For html content
 		/// </summary>
 		OuterHtml,
 
 		/// <summary>
-		/// For html contene
+		/// For html content
 		/// </summary>
 		InnerHtml,
 
 		/// <summary>
-		/// For html contene
+		/// For html content
 		/// </summary>
 		InnerText,
 

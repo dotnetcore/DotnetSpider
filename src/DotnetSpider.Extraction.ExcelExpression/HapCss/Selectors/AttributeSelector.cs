@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotnetSpider.Extraction.ExcelExpression.HapCss.Selectors
 {
@@ -17,7 +15,7 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss.Selectors
 
         protected internal override IEnumerable<HtmlNode> FilterCore(IEnumerable<HtmlNode> currentNodes)
         {
-            var filter = this.GetFilter();
+            var filter = GetFilter();
             foreach (var node in currentNodes)
             {
                 if (filter(node))
@@ -27,12 +25,12 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss.Selectors
 
         private Func<HtmlNode, bool> GetFilter()
         {
-            string filter = this.Selector.Trim('[', ']');
+            string filter = Selector.Trim('[', ']');
 
             int idx = filter.IndexOf('=');
 
             if (idx == 0)
-                throw new InvalidOperationException("Uso inválido de seletor por atributo: " + this.Selector);
+                throw new InvalidOperationException("Uso inválido de seletor por atributo: " + Selector);
 
             if (idx < 0)
                 return (HtmlNode node) => node.Attributes.Contains(filter);
@@ -66,7 +64,7 @@ namespace DotnetSpider.Extraction.ExcelExpression.HapCss.Selectors
                 case '~': return (attr, v) => attr.Split(' ').Contains(v);
             }
 
-            throw new NotSupportedException("Uso inválido de seletor por atributo: " + this.Selector);
+            throw new NotSupportedException("Uso inválido de seletor por atributo: " + Selector);
         }
     }
 }

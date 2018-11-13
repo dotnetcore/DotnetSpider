@@ -18,12 +18,12 @@ namespace DotnetSpider.Core.Infrastructure
 		public static string ToMd5(this string str)
 		{
 #if !NETSTANDARD
-			MD5 md5 = new MD5CryptoServiceProvider();
+			var md5 = new MD5CryptoServiceProvider();
 #else
-			MD5 md5 = MD5.Create();
+			var md5 = MD5.Create();
 #endif
-			byte[] fromData = Encoding.UTF8.GetBytes(str);
-			byte[] targetData = md5.ComputeHash(fromData);
+			var fromData = Encoding.UTF8.GetBytes(str);
+			var targetData = md5.ComputeHash(fromData);
 
 			return BitConverter.ToString(targetData).Replace("-", "").ToLower();
 		}
@@ -46,13 +46,13 @@ namespace DotnetSpider.Core.Infrastructure
 		/// <returns>加密后的字符串</returns>
 		public static string ToDes(string key, string str)
 		{
-			DESCryptoServiceProvider cryptoProvider = new DESCryptoServiceProvider();
+			var cryptoProvider = new DESCryptoServiceProvider();
 			var bytes = Encoding.ASCII.GetBytes(key);
 			var encryptor = cryptoProvider.CreateEncryptor(bytes, bytes);
 
 			var ms = new MemoryStream();
-			CryptoStream cst = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
-			StreamWriter sw = new StreamWriter(cst);
+			var cst = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
+			var sw = new StreamWriter(cst);
 			sw.Write(str);
 			sw.Flush();
 			cst.FlushFinalBlock();
