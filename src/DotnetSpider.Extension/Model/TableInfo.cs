@@ -57,10 +57,12 @@ namespace DotnetSpider.Extension.Model
 				{
 					column.Name = property.Name;
 				}
+
 				if (column.DataType == DataType.None)
 				{
 					column.DataType = ConvertDataType(property.PropertyType);
 				}
+
 				Columns.Add(column);
 
 				var primary = property.GetCustomAttributes(typeof(Primary), true).FirstOrDefault() as Primary;
@@ -68,30 +70,38 @@ namespace DotnetSpider.Extension.Model
 				{
 					Primary.Add(column);
 				}
-				var indexes = new HashSet<Index>(property.GetCustomAttributes(typeof(Index), true).Select(i => (Index)i));
+
+				var indexes =
+					new HashSet<Index>(property.GetCustomAttributes(typeof(Index), true).Select(i => (Index) i));
 				foreach (var index in indexes)
 				{
 					if (string.IsNullOrWhiteSpace(index.Name))
 					{
 						index.Name = property.Name.ToUpperInvariant();
 					}
+
 					if (!Indexes.ContainsKey(index.Name))
 					{
 						Indexes.Add(index.Name, new List<Column>());
 					}
+
 					Indexes[index.Name].Add(column);
 				}
-				var uniques = new HashSet<Unique>(property.GetCustomAttributes(typeof(Unique), true).Select(i => (Unique)i));
+
+				var uniques =
+					new HashSet<Unique>(property.GetCustomAttributes(typeof(Unique), true).Select(i => (Unique) i));
 				foreach (var unique in uniques)
 				{
 					if (string.IsNullOrWhiteSpace(unique.Name))
 					{
 						unique.Name = property.Name.ToUpperInvariant();
 					}
+
 					if (!Uniques.ContainsKey(unique.Name))
 					{
 						Uniques.Add(unique.Name, new List<Column>());
 					}
+
 					Uniques[unique.Name].Add(column);
 				}
 
@@ -113,46 +123,47 @@ namespace DotnetSpider.Extension.Model
 			}
 		}
 
-		internal bool IsAutoIncrementPrimary => Primary.Count == 1 && Columns.Count(f => f.DataType == DataType.Int || f.DataType == DataType.Long) == 1;
+		internal bool IsAutoIncrementPrimary => Primary.Count == 1 &&
+		                                        (Primary[0].DataType == DataType.Long ||
+		                                         Primary[1].DataType == DataType.Int);
 
 		private DataType ConvertDataType(Type propertyType)
 		{
 			switch (propertyType.Name)
 			{
 				case "Int32":
-					{
-						return DataType.Int;
-					}
+				{
+					return DataType.Int;
+				}
 				case "Decimal":
-					{
-						return DataType.Decimal;
-					}
+				{
+					return DataType.Decimal;
+				}
 				case "Single":
-					{
-						return DataType.Float;
-					}
+				{
+					return DataType.Float;
+				}
 				case "Double":
-					{
-						return DataType.Double;
-					}
+				{
+					return DataType.Double;
+				}
 				case "Int64":
-					{
-						return DataType.Long;
-					}
+				{
+					return DataType.Long;
+				}
 				case "Boolean":
-					{
-						return DataType.Bool;
-					}
+				{
+					return DataType.Bool;
+				}
 				case "DateTime":
-					{
-						return DataType.DateTime;
-					}
+				{
+					return DataType.DateTime;
+				}
 				default:
-					{
-						return DataType.String;
-					}
+				{
+					return DataType.String;
+				}
 			}
 		}
-
 	}
 }
