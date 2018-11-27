@@ -12,7 +12,13 @@ namespace DotnetSpider.Core
 	public abstract class AppBase : Named, IAppBase
 	{
 		private string _identity = Guid.NewGuid().ToString("N");
-		private ILoggerFactory _loggerFactory;
+
+		/// <summary>
+		/// 日志系统
+		/// 可以实现此实例，自定义日志
+		/// </summary>
+		public ILoggerFactory LoggerFactory;
+
 
 		/// <summary>
 		/// 唯一标识
@@ -89,28 +95,38 @@ namespace DotnetSpider.Core
 		{
 			PrintInfo.Print();
 
-			_loggerFactory = new LoggerFactory();
-
-			var loggerConfiguration = new LoggerConfiguration()
-				.MinimumLevel.Verbose()
-				.WriteTo.Console(theme: SerilogConsoleTheme.ConsoleLogTheme)
-				.WriteTo.RollingFile("dotnetspider.log");
-
-			if (Env.HubServiceLog)
+			if (this.LoggerFactory == null)
 			{
-				loggerConfiguration.WriteTo.Http(Env.HubServiceLogUrl, Env.HubServiceToken)
-					.Enrich.WithProperty("NodeId", Env.NodeId).Enrich.WithProperty("Identity", Identity);
+				this.LoggerFactory = new LoggerFactory();
+				if (Env.SerilogAppSettings)
+				{
+					Log.Logger = new LoggerConfiguration()
+						.ReadFrom.AppSettings()
+						.CreateLogger();
+					this.LoggerFactory.AddSerilog();
+				}
+				else
+				{
+					var loggerConfiguration = new LoggerConfiguration()
+					.MinimumLevel.Verbose()
+					.WriteTo.Console(theme: SerilogConsoleTheme.ConsoleLogTheme)
+					.WriteTo.RollingFile("dotnetspider.log");
+					if (Env.HubServiceLog)
+					{
+						loggerConfiguration.WriteTo.Http(Env.HubServiceLogUrl, Env.HubServiceToken)
+							.Enrich.WithProperty("NodeId", Env.NodeId).Enrich.WithProperty("Identity", Identity);
+					}
+					Log.Logger = loggerConfiguration.CreateLogger();
+					this.LoggerFactory.AddSerilog();
+				}
 			}
 
-			Log.Logger = loggerConfiguration.CreateLogger();
-			_loggerFactory.AddSerilog();
-
-			Logger = _loggerFactory.CreateLogger("DS");
+			Logger = this.LoggerFactory.CreateLogger("DS");
 
 			if (ExecuteRecord == null)
 			{
 				ExecuteRecord = string.IsNullOrWhiteSpace(Env.HubServiceUrl)
-					? (IExecuteRecord) new NullExecuteRecord()
+					? (IExecuteRecord)new NullExecuteRecord()
 					: new HttpExecuteRecord();
 				ExecuteRecord.Logger = Logger;
 			}
