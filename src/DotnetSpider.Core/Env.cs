@@ -38,6 +38,11 @@ namespace DotnetSpider.Core
 		public static string ChromeDriverPath = string.Empty;
 
 		/// <summary>
+		/// 开启Serilog通过AppSettings配置（Serilog.Settings.AppSettings）
+		/// </summary>
+		public static bool SerilogAppSettings = false;
+
+		/// <summary>
 		/// 开启企业服务(HTTP), 默认打开, 测试的时候开关
 		/// </summary>
 		public static bool HubService = true;

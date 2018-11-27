@@ -45,6 +45,7 @@
     <PackageReference Include="CommandLineParser" Version="2.3.0" />
     <PackageReference Include="Dapper" Version="1.50.5" />
     <PackageReference Include="Polly" Version="6.1.0" />
+    <PackageReference Include="Serilog.Settings.AppSettings" Version="2.2.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.1" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
