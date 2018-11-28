@@ -27,6 +27,11 @@ namespace DotnetSpider.Extension.Pipeline
 		public string ConnectString { get; set; }
 
 		/// <summary>
+		/// 是否使用事务操作。默认不使用。
+		/// </summary>
+		public bool UseTransaction { get; set; } = false;
+
+		/// <summary>
 		/// 数据库忽略大小写
 		/// </summary>
 		public bool IgnoreCase { get; set; } = true;
@@ -91,22 +96,27 @@ namespace DotnetSpider.Extension.Pipeline
 					}
 
 					int count = 0;
+					IDbTransaction transaction = null;
+					if (UseTransaction)
+					{
+						transaction = conn.BeginTransaction();
+					}
 
 					switch (_pipelineMode)
 					{
 						case PipelineMode.Insert:
 						{
-							count += conn.MyExecute(sqlStatements.InsertSql, items);
+							count += conn.MyExecute(sqlStatements.InsertSql, items, transaction);
 							break;
 						}
 						case PipelineMode.InsertAndIgnoreDuplicate:
 						{
-							count += conn.MyExecute(sqlStatements.InsertAndIgnoreDuplicateSql, items);
+							count += conn.MyExecute(sqlStatements.InsertAndIgnoreDuplicateSql, items, transaction);
 							break;
 						}
 						case PipelineMode.InsertNewAndUpdateOld:
 						{
-							count += conn.MyExecute(sqlStatements.InsertNewAndUpdateOldSql, items);
+							count += conn.MyExecute(sqlStatements.InsertNewAndUpdateOldSql, items, transaction);
 							break;
 						}
 						case PipelineMode.Update:
@@ -117,14 +127,20 @@ namespace DotnetSpider.Extension.Pipeline
 								throw new SpiderException("UpdateSql is null.");
 							}
 
-							count += conn.MyExecute(sqlStatements.UpdateSql, items);
+							count += conn.MyExecute(sqlStatements.UpdateSql, items, transaction);
 							break;
 						}
 						default:
 						{
-							count += conn.MyExecute(sqlStatements.InsertSql, items);
+							count += conn.MyExecute(sqlStatements.InsertSql, items, transaction);
 							break;
 						}
+					}
+
+					if (transaction != null)
+					{
+						transaction.Commit();
+						transaction.Dispose();
 					}
 
 					return count;
