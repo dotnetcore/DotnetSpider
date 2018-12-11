@@ -489,6 +489,72 @@ namespace DotnetSpider.Extension.Test.Pipeline
 			}
 		}
 
+		[Fact(DisplayName = "Insert_UseTransaction")]
+		public virtual void Insert_UseTransaction()
+		{
+			using (var conn = CreateDbConnection())
+			{
+				Action DropTable = () =>
+				{
+					try
+					{
+						conn.Execute("use test; DROP TABLE massdatatable;");
+					}
+					catch
+					{
+
+					}
+				};
+
+				Random random = new Random();
+				Func<IList<ResultItems>> CreateMassData = () =>
+				{
+					List<MassData> list = new List<MassData>();
+					for (int i = 0; i < 1000; ++i)
+					{
+						list.Add(new MassData
+						{
+							Key = random.Next(),
+							Data = random.Next().ToString()
+						});
+					}
+
+					var resultItems = new ResultItems();
+					resultItems.Request = new Request();
+					resultItems["AAA"] = list;
+					return new ResultItems[] { resultItems };
+				};
+
+				TimeSpan withTransaction;
+				TimeSpan withoutTransaction;
+
+				//use transaction
+				using (var pipeline = CreatePipeline(PipelineMode.InsertNewAndUpdateOld))
+				{
+					DropTable();
+					var data = CreateMassData();
+					pipeline.UseTransaction = true;
+					DateTime begin = DateTime.Now;
+					pipeline.Process(data);
+					withTransaction = DateTime.Now - begin;
+				}
+
+				//do not use transaction
+				using (var pipeline = CreatePipeline(PipelineMode.InsertNewAndUpdateOld))
+				{
+					DropTable();
+					var data = CreateMassData();
+					pipeline.UseTransaction = false;
+					DateTime begin = DateTime.Now;
+					pipeline.Process(data);
+					withoutTransaction = DateTime.Now - begin;
+				}
+				
+				Assert.True(withTransaction < withoutTransaction);
+				DropTable();
+			}
+		}
+
 		#endregion
 
 		[Schema("test", "multiprimarykey")]
@@ -589,6 +655,18 @@ namespace DotnetSpider.Extension.Test.Pipeline
 
 			[Column()]
 			public decimal Decimal { get; set; }
+		}
+
+		[Schema("test", "massdatatable")]
+		public class MassData : IBaseEntity
+		{
+			[Primary]
+			[Column]
+			public long Key { get; set; }
+
+			[Update]
+			[Column]
+			public string Data { get; set; }
 		}
 	}
 }
