@@ -83,7 +83,7 @@ namespace DotnetSpider.Core
 		/// <returns>返回 True, 则需要执行所有注册的StartUrlsBulder.</returns>
 		protected virtual bool IfRequireRequestBuilders(string[] arguments)
 		{
-			return arguments.Any(t => t?.ToLower() == SpiderArguments.ExcludeRequestBuilder);
+			return !arguments.Any(t => t?.ToLower() == SpiderArguments.ExcludeRequestBuilder);
 		}
 
 		protected virtual bool IfRequireReport(string[] arguments)

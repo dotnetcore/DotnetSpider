@@ -125,7 +125,7 @@ namespace DotnetSpider.Extension.Model
 
 		internal bool IsAutoIncrementPrimary => Primary.Count == 1 &&
 		                                        (Primary[0].DataType == DataType.Long ||
-		                                         Primary[1].DataType == DataType.Int);
+		                                         Primary[0].DataType == DataType.Int);
 
 		private DataType ConvertDataType(Type propertyType)
 		{
