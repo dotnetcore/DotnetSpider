@@ -41,13 +41,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE = LICENSE
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Worker", "src\DotnetSpider.Worker\DotnetSpider.Worker.csproj", "{C416B779-5018-42AF-A1A5-98186389CCED}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Migrator", "src\DotnetSpider.Migrator\DotnetSpider.Migrator.csproj", "{5F2637DE-B281-4A54-B7A9-C5AD9E101324}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Broker.Test", "src\DotnetSpider.Broker.Test\DotnetSpider.Broker.Test.csproj", "{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Broker", "src\DotnetSpider.Broker\DotnetSpider.Broker.csproj", "{AAD552D8-0D0A-43B0-9C5D-E542AA8998CE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Extraction.ExcelExpression", "src\DotnetSpider.Extraction.ExcelExpression\DotnetSpider.Extraction.ExcelExpression.csproj", "{BA5C9237-1108-4070-B318-B4DCDB983EF3}"
 EndProject
@@ -101,22 +95,10 @@ Global
 		{372C7A6F-E1EB-4AA6-8B31-1AE52FBDAA83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{372C7A6F-E1EB-4AA6-8B31-1AE52FBDAA83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{372C7A6F-E1EB-4AA6-8B31-1AE52FBDAA83}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C416B779-5018-42AF-A1A5-98186389CCED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C416B779-5018-42AF-A1A5-98186389CCED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C416B779-5018-42AF-A1A5-98186389CCED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C416B779-5018-42AF-A1A5-98186389CCED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5F2637DE-B281-4A54-B7A9-C5AD9E101324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5F2637DE-B281-4A54-B7A9-C5AD9E101324}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5F2637DE-B281-4A54-B7A9-C5AD9E101324}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5F2637DE-B281-4A54-B7A9-C5AD9E101324}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CAEECB0-0BD0-4A32-B057-99C7DADE3F4C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AAD552D8-0D0A-43B0-9C5D-E542AA8998CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AAD552D8-0D0A-43B0-9C5D-E542AA8998CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AAD552D8-0D0A-43B0-9C5D-E542AA8998CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AAD552D8-0D0A-43B0-9C5D-E542AA8998CE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BA5C9237-1108-4070-B318-B4DCDB983EF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BA5C9237-1108-4070-B318-B4DCDB983EF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA5C9237-1108-4070-B318-B4DCDB983EF3}.Release|Any CPU.ActiveCfg = Release|Any CPU

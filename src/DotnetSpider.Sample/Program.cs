@@ -1,6 +1,7 @@
 ﻿using DotnetSpider.Sample.docs;
 #if NETCOREAPP
 using System.Text;
+
 #else
 using System.Threading;
 #endif
@@ -25,7 +26,8 @@ namespace DotnetSpider.Sample
 			//	ContentType = "application/json"
 			//});
 
-			AfterDownloadCompleteHandlerSpider.Run();
+ 
+			EntityModelSpider.Run();
 		}
 
 
@@ -34,7 +36,6 @@ namespace DotnetSpider.Sample
 		/// </summary>
 		private static void MyTest()
 		{
-
 		}
 	}
 }
