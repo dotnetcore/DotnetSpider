@@ -18,7 +18,7 @@ namespace DotnetSpider.Extraction
 		/// <param name="removeOutboundLinks">是否去除外链</param>
 		public Selectable(string html, string url, bool removeOutboundLinks = true)
 		{
-			HtmlDocument document = new HtmlDocument { OptionAutoCloseOnEnd = true };
+			HtmlDocument document = new HtmlDocument {OptionAutoCloseOnEnd = true};
 			document.LoadHtml(html);
 
 			if (!string.IsNullOrWhiteSpace(url))
@@ -32,7 +32,8 @@ namespace DotnetSpider.Extraction
 					RemoveOutboundLinks(document, domain);
 				}
 			}
-			Elements = new List<dynamic> { document.DocumentNode.OuterHtml };
+
+			Elements = new List<dynamic> {document.DocumentNode.OuterHtml};
 		}
 
 		/// <summary>
@@ -41,7 +42,7 @@ namespace DotnetSpider.Extraction
 		/// <param name="json">Json</param>
 		public Selectable(string json)
 		{
-			Elements = new List<dynamic> { json };
+			Elements = new List<dynamic> {json};
 		}
 
 		/// <summary>
@@ -86,29 +87,29 @@ namespace DotnetSpider.Extraction
 			switch (key)
 			{
 				case "now":
-					{
-						return DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
-					}
+				{
+					return DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
+				}
 				case "monday":
-					{
-						var now = DateTime.Now;
-						int i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
-						TimeSpan ts = new TimeSpan(i, 0, 0, 0);
-						return now.Subtract(ts).Date.ToString("yyyy/MM/dd hh:mm:ss");
-					}
+				{
+					var now = DateTime.Now;
+					int i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
+					TimeSpan ts = new TimeSpan(i, 0, 0, 0);
+					return now.Subtract(ts).Date.ToString("yyyy/MM/dd hh:mm:ss");
+				}
 				case "today":
-					{
-						return DateTime.Now.Date.ToString("yyyy/MM/dd hh:mm:ss");
-					}
+				{
+					return DateTime.Now.Date.ToString("yyyy/MM/dd hh:mm:ss");
+				}
 				case "monthly":
-					{
-						var now = DateTime.Now;
-						return now.AddDays(now.Day * -1 + 1).ToString("yyyy/MM/dd hh:mm:ss");
-					}
+				{
+					var now = DateTime.Now;
+					return now.AddDays(now.Day * -1 + 1).ToString("yyyy/MM/dd hh:mm:ss");
+				}
 				default:
-					{
-						return Properties.ContainsKey(field) ? Properties[field] : null;
-					}
+				{
+					return Properties.ContainsKey(field) ? Properties[field] : null;
+				}
 			}
 		}
 
@@ -128,6 +129,7 @@ namespace DotnetSpider.Extraction
 					results.Add(link);
 				}
 			}
+
 			foreach (var link in sourceLinks)
 			{
 				if (Uri.TryCreate(link, UriKind.RelativeOrAbsolute, out _))
@@ -135,6 +137,7 @@ namespace DotnetSpider.Extraction
 					results.Add(link);
 				}
 			}
+
 			return new Selectable(results.ToList());
 		}
 
@@ -166,8 +169,10 @@ namespace DotnetSpider.Extraction
 						results.Add(result);
 					}
 				}
+
 				return new Selectable(results);
 			}
+
 			throw new ExtractionException($"{nameof(selector)} is null.");
 		}
 
@@ -189,6 +194,7 @@ namespace DotnetSpider.Extraction
 						results.AddRange(result);
 					}
 				}
+
 				return new Selectable(results);
 			}
 
@@ -204,8 +210,9 @@ namespace DotnetSpider.Extraction
 			List<ISelectable> result = new List<ISelectable>();
 			foreach (var element in Elements)
 			{
-				result.Add(new Selectable(new List<dynamic>() { element }));
+				result.Add(new Selectable(new List<dynamic>() {element}));
 			}
+
 			return result;
 		}
 
@@ -242,26 +249,28 @@ namespace DotnetSpider.Extraction
 
 		private void FixAllRelativeHref(HtmlDocument document, string url)
 		{
-			var nodes = document.DocumentNode.SelectNodes("//a[not(starts-with(@href,'http') or starts-with(@href,'https'))]");
-			if (nodes != null)
+			var hrefNodes = document.DocumentNode.SelectNodes(".//@href");
+			if (hrefNodes != null)
 			{
-				foreach (var node in nodes)
+				foreach (var node in hrefNodes)
 				{
-					if (node.Attributes["href"] != null)
+					var href = node.Attributes["href"].Value;
+					if (!string.IsNullOrWhiteSpace(href) && !href.Contains("http") && !href.Contains("https"))
 					{
-						node.Attributes["href"].Value = CanonicalizeUrl(node.Attributes["href"].Value, url);
+						node.Attributes["href"].Value = CanonicalizeUrl(href, url);
 					}
 				}
 			}
 
-			var images = document.DocumentNode.SelectNodes(".//img");
-			if (images != null)
+			var srcNodes = document.DocumentNode.SelectNodes(".//@src");
+			if (srcNodes != null)
 			{
-				foreach (var image in images)
+				foreach (var node in srcNodes)
 				{
-					if (image.Attributes["src"] != null)
+					var src = node.Attributes["src"].Value;
+					if (!string.IsNullOrWhiteSpace(src) && !src.Contains("http") && !src.Contains("https"))
 					{
-						image.Attributes["src"].Value = CanonicalizeUrl(image.Attributes["src"].Value, url);
+						node.Attributes["src"].Value = CanonicalizeUrl(src, url);
 					}
 				}
 			}
@@ -279,17 +288,20 @@ namespace DotnetSpider.Extraction
 					foreach (var domain in domains)
 					{
 						var href = node.Attributes["href"]?.Value;
-						if (!string.IsNullOrWhiteSpace(href) && System.Text.RegularExpressions.Regex.IsMatch(href, domain))
+						if (!string.IsNullOrWhiteSpace(href) &&
+						    System.Text.RegularExpressions.Regex.IsMatch(href, domain))
 						{
 							isMatch = true;
 							break;
 						}
 					}
+
 					if (!isMatch)
 					{
 						deleteNodes.Add(node);
 					}
 				}
+
 				foreach (var node in deleteNodes)
 				{
 					node.Remove();
