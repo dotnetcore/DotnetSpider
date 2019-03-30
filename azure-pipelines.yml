@@ -23,14 +23,17 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+  - task: DockerInstaller@0
+
+  - script: docker pull mysql
+    displayName: 'pull mysql image'
+
+  - script: docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1qazZAQ! -d mysql
+    displayName: 'start mysql'
+
+  - script: docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
+    displayName: 'start sqlserver'
+
   - task: DotNetCoreInstaller@0
     inputs:
       version: '2.2.100'
-
-  - task: DockerInstaller@0
-
-  - script: docker run --name mysql --restart always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1qazZAQ! -d mysql
-    displayName: 'start mysql'
-
-  - script: docker run --restart always -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' -p 1433:1433 --name SqlServer -d mcr.microsoft.com/mssql/server:2017-latest
-    displayName: 'start sqlserver'
