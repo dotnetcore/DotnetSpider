@@ -22,7 +22,7 @@ namespace DotnetSpider.Tests.Data.Storage
         }
 
         private readonly string _connectionString =
-            "Database='mysql';Data Source=localhost;password=1qazZAQ!;User ID=root;Port=3306;SslMode=None;Allow User Variables=True;";
+            "Database='mysql';Data Source=localhost;password=1qazZAQ!;User ID=root;Port=3306;SslMode=None;Allow User Variables=True;AllowPublicKeyRetrieval=True";
 
         protected virtual IDbConnection CreateConnection()
         {
