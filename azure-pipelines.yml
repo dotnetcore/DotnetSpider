@@ -25,8 +25,8 @@ variables:
 steps:
   - task: DockerInstaller@0
 
-  - script: systemctl stop mysql
-    displayName: 'systemctl stop mysql'
-
   - script: netstat -an | grep 3306
     displayName: 'netstat -an | grep 3306'
+
+  - script: apt-get autoremove --purge mysql-server-*
+    displayName: 'apt-get autoremove --purge mysql-server-*'
