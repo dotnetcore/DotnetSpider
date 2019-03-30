@@ -242,7 +242,14 @@ namespace DotnetSpider.Downloader
 						}
 
 						var msg = $"下载器代理 {_options.AgentId} 释放过期下载器: {expires.Count}";
-						Logger.Log(expires.Count > 0 ? LogLevel.Information : LogLevel.Debug, msg);
+						if (expires.Count > 0)
+						{
+							Logger.LogInformation(msg);
+						}
+						else
+						{
+							Logger.LogDebug(msg);
+						}
 					}
 					catch (Exception e)
 					{

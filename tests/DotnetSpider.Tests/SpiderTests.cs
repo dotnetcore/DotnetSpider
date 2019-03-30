@@ -157,7 +157,7 @@ namespace DotnetSpider.Tests
 
             spider.RunAsync();
             Thread.Sleep(2000);
-            spider.ExitBySignal().WaitForExit();
+            spider.ExitBySignal().WaitForExit(15000);
 
             Assert.Equal(Status.Exited, spider.Status);
         }
