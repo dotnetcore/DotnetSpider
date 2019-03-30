@@ -25,8 +25,8 @@ variables:
 steps:
   - task: DockerInstaller@0
 
-  - script: service mysql stop
-    displayName: 'service mysql stop'
+  - script: systemctl stop mysqld
+    displayName: 'systemctl stop mysqld'
 
   - script: netstat -an | grep 3306
     displayName: 'netstat -an | grep 3306'
