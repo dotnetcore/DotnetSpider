@@ -25,15 +25,8 @@ variables:
 steps:
   - task: DockerInstaller@0
 
-  - script: docker pull mysql
-    displayName: 'pull mysql image'
+  - script: whereis mysql
+    displayName: 'whereis mysql'
 
-  - script: docker run -p -e MYSQL_ROOT_PASSWORD=1qazZAQ! -d mysql
-    displayName: 'start mysql'
-
-  - script: docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' -p -d mcr.microsoft.com/mssql/server:2017-latest
-    displayName: 'start sqlserver'
-
-  - task: DotNetCoreInstaller@0
-    inputs:
-      version: '2.2.100'
+  - script: netstat -an | grep 3306
+    displayName: 'netstat -an | grep 3306'
