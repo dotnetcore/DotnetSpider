@@ -25,8 +25,8 @@ variables:
 steps:
   - task: DockerInstaller@0
 
-  - script: whereis mysql
-    displayName: 'whereis mysql'
+  - script: service mysql stop
+    displayName: 'service mysql stop'
 
   - script: netstat -an | grep 3306
     displayName: 'netstat -an | grep 3306'
