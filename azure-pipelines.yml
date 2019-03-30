@@ -23,10 +23,11 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-  - task: DockerInstaller@0
-
   - script: netstat -an | grep 3306
     displayName: 'netstat -an | grep 3306'
 
-  - script: apt-get autoremove --purge mysql-server-*
+  - script: sudo apt-get autoremove --purge mysql-server-*
     displayName: 'apt-get autoremove --purge mysql-server-*'
+
+  - task: DockerInstaller@0
+
