@@ -249,7 +249,7 @@ namespace DotnetSpider.Downloader
                     }
                     catch (Exception e)
                     {
-                        Logger.LogDebug($"释放过期下载器失败: {e}");
+                        Logger.LogError($"释放过期下载器失败: {e}");
                     }
                 }
             });

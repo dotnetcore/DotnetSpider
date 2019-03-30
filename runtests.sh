@@ -1,2 +1,2 @@
 dotnet --info
-dotnet test tests/DotnetSpider.Tests/DotnetSpider.Tests.csproj -f netcoreapp2.2 -c release
+dotnet test tests/DotnetSpider.Tests/DotnetSpider.Tests.csproj -f netcoreapp2.2 -c release -v n
