@@ -26,8 +26,9 @@ steps:
   - script: netstat -an | grep 3306
     displayName: 'netstat -an | grep 3306'
 
-  - script: sudo apt-get autoremove --purge mysql-server-*
-    displayName: 'apt-get autoremove --purge mysql-server-*'
+  - script: sudo apt-get remove mysql-server-5.7
+    displayName: 'sudo apt-get remove mysql-server-5.7'
 
-  - task: DockerInstaller@0
+  - script: netstat -an | grep 3306
+    displayName: 'netstat -an | grep 3306'
 
