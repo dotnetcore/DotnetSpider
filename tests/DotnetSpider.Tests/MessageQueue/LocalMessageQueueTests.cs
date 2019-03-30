@@ -19,7 +19,7 @@ namespace DotnetSpider.Tests.MessageQueue
 			}
 
 			int j = 0;
-			while (count != 100 && j < 300)
+			while (count < 100 && j < 150)
 			{
 				Thread.Sleep(500);
 				++j;
@@ -37,7 +37,7 @@ namespace DotnetSpider.Tests.MessageQueue
 
 			Parallel.For(0, 100, async (i) => { await mq.PublishAsync("topic", "a"); });
 			int j = 0;
-			while (count != 100 && j < 300)
+			while (count < 100 && j < 150)
 			{
 				Thread.Sleep(500);
 				++j;
@@ -56,18 +56,18 @@ namespace DotnetSpider.Tests.MessageQueue
 			int i = 0;
 			Task.Factory.StartNew(async () =>
 			{
-				for (; i < 100; ++i)
+				for (; i < 50; ++i)
 				{
 					await mq.PublishAsync("topic", "a");
 					await Task.Delay(100);
 				}
 			}).ConfigureAwait(false).GetAwaiter();
-			await Task.Delay(3000);
+			await Task.Delay(1500);
 			mq.Unsubscribe("topic");
 
-			while (i < 100)
+			while (i < 50)
 			{
-				await Task.Delay(500);
+				await Task.Delay(100);
 			}
 
 			Assert.True(count < 100);
