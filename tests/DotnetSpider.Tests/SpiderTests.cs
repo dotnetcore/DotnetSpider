@@ -219,12 +219,9 @@ namespace DotnetSpider.Tests
 
 			var statisticsStore = provider.GetRequiredService<IStatisticsStore>();
 			var s = statisticsStore.GetSpiderStatisticsAsync(spider.Id).Result;
-			File.WriteAllText($"/Users/lewis/DoNotRetryWhenResultIsEmpty-Spider-{DateTime.Now:hh-mm-ss}.txt",
-				JsonConvert.SerializeObject(s));
-
+ 
 			var ds = statisticsStore.GetDownloadStatisticsListAsync(1, 10).Result[0];
-			File.WriteAllText($"/Users/lewis/DoNotRetryWhenResultIsEmpty-Downloader-{DateTime.Now:hh-mm-ss}.txt",
-				JsonConvert.SerializeObject(ds));
+ 
 			Assert.Equal(1, s.Total);
 			Assert.Equal(0, s.Failed);
 			Assert.Equal(1, s.Success);
