@@ -27,7 +27,7 @@ steps:
     inputs:
       version: '2.2.100'
 
-  - task: DockerV2@1
+  - task: DockerInstaller@0
 
   - script: docker run --name mysql --restart always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1qazZAQ! -d mysql
     displayName: 'start mysql'
