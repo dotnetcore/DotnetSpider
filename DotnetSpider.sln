@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider", "src\DotnetS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9F210716-DEEC-4671-86C4-F5CA867E907B}"
 ProjectSection(SolutionItems) = preProject
-	Design.md = Design.md
+	DESIGN2.md = DESIGN2.md
 	.editorconfig = .editorconfig
 	.gitignore = .gitignore
 	LICENSE = LICENSE
