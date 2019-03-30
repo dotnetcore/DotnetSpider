@@ -1,29 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Jil" Version="2.16.0" />
-    <PackageReference Include="MessagePack" Version="1.7.3.4" />
-    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="2.42.0.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
+        <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\DotnetSpider.Extension\DotnetSpider.Extension.csproj" />
-    <ProjectReference Include="..\DotnetSpider.Extraction.ExcelExpression\DotnetSpider.Extraction.ExcelExpression.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="sohu.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TextFile1.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="appsettings.json">
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="xunit" Version="2.4.1" />
+    </ItemGroup>
 
 </Project>

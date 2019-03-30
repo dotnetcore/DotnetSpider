@@ -11,8 +11,6 @@ project.lock.json
 
 *.log
 
-nodeid
-
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 [Oo]utput/

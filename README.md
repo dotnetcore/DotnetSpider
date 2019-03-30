@@ -5,25 +5,53 @@
 [![Member project of .NET Core Community](https://img.shields.io/badge/member%20project%20of-NCC-9e20c9.svg)](https://github.com/dotnetcore)
 [![GitHub license](https://img.shields.io/aur/license/yaourt.svg)](https://raw.githubusercontent.com/dotnetcore/DotnetSpider/master/LICENSE)
 
-DotnetSpider, a .NET Standard web crawling library similar to WebMagic and Scrapy. It is a lightweight, efficient and fast high-level web crawling & scraping framework for .NET
+DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient and fast high-level web crawling & scraping framework
 
 ### DESIGN
 
-![DESIGN](https://github.com/dotnetcore/DotnetSpider/raw/master/images/DESIGN.jpg)
+```
+                                  +----------------------+  +----------------------+      
+                                  | Download Center      |  | Statistics Center    |    
++----------------------+          +----------^-----------+  +----------^-----------+  
+| Downloader Agent 1   +----+                |                         |                               
++----------------------+    |                |                         |                
+                            |     +----------v-------Message Queue-----v-----------+    +------------- Scheduler-------------------+
++----------------------+    |     |  +-------+       +----------+       +-------+  |    |  +-------+    +-------+    +----------+  |
+| Downloader Agent 2   +----+<---->  | Local |       | RabbitMq |       | Kafka |  |    |  | Local |    | Redis |    | Database |  |
++----------------------+    |     |  +-------+       +----------+       +-------+  |    |  +-------+    +-------+    +----------+  |
+                            |     +-----------------------^------------------------+    +-------------------^----------------------+   
++----------------------+    |                             |                                                 |
+| Downloader Agent 3   +----+                             |                                                 |
++----------------------+          +-------Spider----------v--------------------------+                      |
+                                  |    +-----------------+  +--------------------+   |                      |
+                                  |    | SpeedController |  | RequestSupply      |   |                      |
+                                  |    +-----------------+  +--------------------+   <----------------------+             
+                                  |    +----------------------------+  +----------+  |                      |
+                                  |    | Configure Request delegate |  | DataFlow |  |                      |
+                                  |    +----------------------------+  +----------+  |                      |       
+                                  +--------------------------------------------------+          +-----------v--------------+
+                                                                                                |  MySql, SqlServer, etc   |
+                                                                                                +-----------+--------------+
+                                                                                                            |
+                                                                                                            |
+                                                                                                +-----------v--------------+
+                                                                                                |        ClickHouse        |
+                                                                                                +--------------------------+     
+                                                                                                                        
+
+``` 
 
 ### DEVELOP ENVIROMENT
 
 - Visual Studio 2017 (15.3 or later)
-- [.NET Core 2.0 or later](https://www.microsoft.com/net/download/windows)
-- Storage data to mysql. [Download MySql](https://dev.mysql.com/downloads/mysql/)
-  grant all on _._ to 'root'@'localhost' IDENTIFIED BY '' with grant option;
-  flush privileges;
+- [.NET Core 2.2 or later](https://www.microsoft.com/net/download/windows)
 
 ### OPTIONAL ENVIROMENT
 
-- Distributed crawler. [Download Redis for Windows](https://github.com/MSOpenTech/redis/releases)
-- SqlServer.
-- PostgreSQL.
+- MySql
+- Redis [Download Redis for Windows](https://github.com/MSOpenTech/redis/releases)
+- SqlServer
+- PostgreSQL
 - MongoDb
 
 ### MORE DOCUMENTS
@@ -36,89 +64,97 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 ### BASE USAGE
 
-[Base usage Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/BaseUsage.cs)
+[Base usage Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/BaseUsage.cs)
 
 ### ADDITIONAL USAGE: Configurable Entity Spider
 
-[View complete Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/JdSkuSampleSpider.cs)
+[View complete Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/EntitySpider.cs)
 
-    public class EntityModelSpider
+    public class EntitySpider : Spider
     {
-    	public static void Run()
-    	{
-    		Spider spider = new Spider();
-    		spider.Run();
-    	}
+        public static void Run()
+        {
+            var builder = new SpiderBuilder();
+            builder.AddSerilog();
+            builder.ConfigureAppConfiguration();
+            builder.UseStandalone();
+            builder.AddSpider<EntitySpider>();
+            var provider = builder.Build();
+            provider.Create<EntitySpider>().RunAsync();
+        }
 
-    	private class Spider : EntitySpider
-    	{
-    		protected override void OnInit(params string[] arguments)
-    		{
-    			var word = "可乐|雪碧";
-    			AddRequest(string.Format("http://news.baidu.com/ns?word={0}&tn=news&from=news&cl=2&pn=0&rn=20&ct=1", word), new Dictionary<string, dynamic> { { "Keyword", word } });
-    			AddEntityType<BaiduSearchEntry>();
-    			AddPipeline(new ConsoleEntityPipeline());
-    		}
+        protected override void Initialize()
+        {
+            NewGuidId();
+            Scheduler = new QueueDistinctBfsScheduler();
+            Speed = 1;
+            Depth = 3;
+            DownloaderSettings.Type = DownloaderType.HttpClient;
+            AddDataFlow(new DataParser<BaiduSearchEntry>()).AddDataFlow(GetDefaultStorage());
+            AddRequests(
+                new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
+                new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
+        }
 
-    		[Schema("baidu", "baidu_search_entity_model")]
-    		[Entity(Expression = ".//div[@class='result']", Type = SelectorType.XPath)]
-    		class BaiduSearchEntry : BaseEntity
-    		{
-    			[Column]
-    			[Field(Expression = "Keyword", Type = SelectorType.Enviroment)]
-    			public string Keyword { get; set; }
+        [Schema("cnblogs", "cnblogs_entity_model")]
+        [EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
+        [ValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
+        class BaiduSearchEntry : EntityBase<BaiduSearchEntry>
+        {
+            protected override void Configure()
+            {
+                HasIndex(x => x.Title);
+                HasIndex(x => new {x.WebSite, x.Guid}, true);
+            }
 
-    			[Column]
-    			[Field(Expression = ".//h3[@class='c-title']/a")]
-    			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-    			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-    			public string Title { get; set; }
+            public int Id { get; set; }
 
-    			[Column]
-    			[Field(Expression = ".//h3[@class='c-title']/a/@href")]
-    			public string Url { get; set; }
+            [Required]
+            [StringLength(200)]
+            [ValueSelector(Expression = "类别", Type = SelectorType.Enviroment)]
+            public string Category { get; set; }
 
-    			[Column]
-    			[Field(Expression = ".//div/p[@class='c-author']/text()")]
-    			[ReplaceFormatter(NewValue = "-", OldValue = "&nbsp;")]
-    			public string Website { get; set; }
+            [Required]
+            [StringLength(200)]
+            [ValueSelector(Expression = "网站", Type = SelectorType.Enviroment)]
+            public string WebSite { get; set; }
 
-    			[Column]
-    			[Field(Expression = ".//div/span/a[@class='c-cache']/@href")]
-    			public string Snapshot { get; set; }
+            [StringLength(200)]
+            [ValueSelector(Expression = "//title")]
+            [ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
+            public string Title { get; set; }
 
-    			[Column]
-    			[Field(Expression = ".//div[@class='c-summary c-row ']", Option = FieldOptions.InnerText)]
-    			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-    			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-    			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
-    			public string Details { get; set; }
+            [StringLength(40)]
+            [ValueSelector(Expression = "GUID", Type = SelectorType.Enviroment)]
+            public string Guid { get; set; }
 
-    			[Column(Length = 0)]
-    			[Field(Expression = ".", Option = FieldOptions.InnerText)]
-    			[ReplaceFormatter(NewValue = "", OldValue = "<em>")]
-    			[ReplaceFormatter(NewValue = "", OldValue = "</em>")]
-    			[ReplaceFormatter(NewValue = " ", OldValue = "&nbsp;")]
-    			public string PlainText { get; set; }
-    		}
-    	}
-    }
+            [ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
+            public string News { get; set; }
 
-    public static void Main()
-    {
-    	EntityModelSpider.Run();
+            [ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
+            public string Url { get; set; }
+
+            [ValueSelector(Expression = ".//div[@class='entry_summary']", ValueOption = ValueOption.InnerText)]
+            public string PlainText { get; set; }
+
+            [ValueSelector(Expression = "DATETIME", Type = SelectorType.Enviroment)]
+            public DateTime CreationTime { get; set; }
+        }
+
+        public EntitySpider(IMessageQueue mq, IStatisticsService statisticsService, ISpiderOptions options, ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
+        {
+        }
     }
 
 #### Run via Startup
 
-    Command: -s:[spider type name | TaskName attribute] -i:[identity] -a:[arg1,arg2...] --tid:[taskId] -n:[name] -c:[configuration file path or name]
+    Command: -s [spider type name] -i [id] -a [arg1,arg2...] -d [true/false] -n [name] -c [configuration file]
 
-1.  -s: Type name of spider or TaskNameAttribute for example: DotnetSpider.Sample.BaiduSearchSpiderl
-2.  -i: Set identity.
-3.  -a: Pass arguments to spider's Run method.
-4.  --tid: Set task id.
-5.  -n: Set name.
-6.  -c: Set config file path, for example you want to run with a customize config: -e:app.my.config
+    1.  -s: Type name of spider for example: EntitySpider
+    2.  -i: Set spider id
+    3.  -a: Pass arguments to spider's Run method
+    4.  -n: Set spider name
+    5.  -c: Set config file path, for example you want to run with a customize config: -c app.my.config
 
 #### WebDriver Support
 
@@ -126,29 +162,14 @@ When you want to collect a page JS loaded, there is only one thing to do, set th
 
     Downloader=new WebDriverDownloader(Browser.Chrome);
 
-[See a complete sample](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/JdSkuWebDriverSample.cs)
+[See a complete sample](https://github.com/zlzforever/DotnetSpider/)
 
 NOTE:
 
-1.  Make sure there is a ChromeDriver.exe in bin forlder when you try to use Chrome. You can install it to your project via NUGET manager: Chromium.ChromeDriver
-2.  Make sure you already add a \*.webdriver Firefox profile when you try to use Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
-3.  Make sure there is a PhantomJS.exe in bin folder when you try to use PhantomJS. You can install it to your project via NUGET manager: PhantomJS
+1.  Make sure the ChromeDriver.exe is in bin folder when use Chrome, install it to your project from NUGET: Chromium.ChromeDriver
+2.  Make sure you already add a \*.webdriver Firefox profile when use Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
+3.  Make sure the PhantomJS.exe is in bin folder when use PhantomJS, install it to your project from NUGET: PhantomJS
 
-### Storage log and status to database
-
-### DotnetSpider.Hub
-
-https://github.com/zlzforever/DotnetSpider.Hub
-
-1.  Dependences a ci platform for example I use teamcity right now.
-2.  Dependences Scheduler.NET https://github.com/zlzforever/Scheduler.NET
-3.  More documents continue...
-
-![1](https://github.com/dotnetcore/DotnetSpider/raw/master/images/1.png)
-![2](https://github.com/dotnetcore/DotnetSpider/raw/master/images/2.png)
-![3](https://github.com/dotnetcore/DotnetSpider/raw/master/images/3.png)
-![4](https://github.com/dotnetcore/DotnetSpider/raw/master/images/4.png)
-![5](https://github.com/dotnetcore/DotnetSpider/raw/master/images/5.png)
 
 ### NOTICE
 

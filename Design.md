@@ -1,21 +1,74 @@
-# DESIGN
+## NewSpider
 
-Before this re-factory, downloader & selector & pipeline are coupling  together, and now i think i should split them. If some one want to use downloader only and use AngleSharp to extract data.
+A distributed spider
 
-###  Dowloader
+### Design
 
-Downloader is a independent module to help user to download data from target website. There are a lot of details, see below:
+#### 门户
 
-1. Two ways to set cookie, one is call the AddCookie method in downloader, it add cookie to CookieContainer so impact every request.
-Set cookie header in request, the result is combine you cookie header and cookies in CookieContainer. 
-2. CookieInjector in downloader is invoked one time, and inject cookies to CookieContainer.
++ 添加项目: 名称、git链接、用户名、密码
++ 在 git 服务上添加 WebHooks
++ 在项目下面创建任务: 名称、cron、镜像选择、运行参数、备注
++ WebHooks 回调接口: 检查 Tag 是否符合 $"{Release}:{Name}:{Version}"，如果符合则执行 docker 镜像编译脚本，编译成功则把相应数据入库供创建任务使用选择
++ 暂停任务: 任务订阅 “job name"，发送 `暂停消息`
++ 继续任务: 任务订阅 “job name"，发送 `继续消息`
++ 重启任务: 任务订阅 “job name"，发送 `退出消息`，重启 Docker 实例
++ 查询所有下载器代理的状态
++ 查询任务所用的下载器代理
++ 查询任务队列的信息: Left、Total、Success、Faild
++ 查询任务日志: 通过消息队列入库到 ES
 
-### Scheduler
+#### 下载器代理
 
-#### Request hash
++ 下载器代理以心跳方式注册到下载管理中心，上报内容有: 下载器标识、下载服务器内存开销、CPU 开销、活跃的 Downloader 个数、QPS。注册和心跳的消息是分开的，以优化服务端的处理逻辑。
++ 下载器代理订阅 `下载器代理标识 (AgentId)` 来收取命令: 分配下载器(初始化 Cookie)、下载、退出。
++ 下载器代理以 `任务标识` 隔离 Downloader
++ 下载器代理定时释放不再使用的 Downloader
++ 下载器代理支持按照规则截取下载内容(减少回传网络流量)
++ 下载器代理支持设置代理、ADSL 并且支持使用正则判断切换代理或 ADSL
 
-1. Same url different headers are different requests, so headers are a factor  
-2. There is a CycleRetryTimes property in a request, if value are different, then requests are different. Depth property is not
-a factor.
+#### 下载管理中心
 
- 
+所有的下载请求统一到下载管理中心，下载管理中心通过任务配置的策略分发下载任务。
+
++ 爬虫任务发送请求到下载管理中心要求分配下载器节点，管理中心依据分配策略以及实际注册的下载器代理情况做出分配，保存分配信息到数据库。此为同步操作，即爬虫需求等待分配完成，如果分配失败爬虫也会启动失败。
++ 下载代理器分配策略有
+   + 所有下载器代理随机分配
+   + 随机分配 n 个下载器代理后固定使用这 n 个下载器代理
+   + 随机分配 n 个下载器代理后固定使用这 n 个下载器, 并且由 m 号下载器代理内容解析到的目标请求仍需要回到 m 下载器代理下载
+
+
+#### 设计图
+
+```
+                                  +----------------------+       
+                                  | Download Center      |     
++----------------------+          +----------^-----------+   
+| Downloader Agent 1   +----+                |                                        
++----------------------+    |                |                                          
+                            |     +----------v-------Message Queue-----------------+    +------------- Scheduler-------------------+
++----------------------+    |     |  +-------+       +----------+       +-------+  |    |  +-------+    +-------+    +----------+  |
+| Downloader Agent 2   +----+<---->  | Local |       | RabbitMq |       | Kafka |  |    |  | Local |    | Redis |    | Database |  |
++----------------------+    |     |  +-------+       +----------+       +-------+  |    |  +-------+    +-------+    +----------+  |
+                            |     +-----------------------^------------------------+    +-------------------^----------------------+   
++----------------------+    |                             |                                                 |
+| Downloader Agent 3   +----+                             |                                                 |
++----------------------+          +-------Spider----------v--------------------------+                      |
+                                  |    +-----------------+  +--------------------+   |                      |
+                                  |    | SpeedController |  | Download Interface |   |                      |
+                                  |    +-----------------+  +--------------------+   <----------------------+             
+                                  |    +--------------------+  +----------+          |                      |
+                                  |    | Statistics Service |  | DataFlow |          |                      |
+                                  |    +--------------------+  +----------+          |                      |       
+                                  +--------------------------------------------------+          +-----------v--------------+
+                                                                                                |  MySql, SqlServer, etc   |
+                                                                                                +-----------+--------------+
+                                                                                                            |
+                                                                                                            |
+                                                                                                +-----------v--------------+
+                                                                                                |        ClickHouse        |
+                                                                                                +--------------------------+     
+                                                                                                                        
+
+``` 
+
