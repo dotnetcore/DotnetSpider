@@ -89,7 +89,7 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "RunThenExit")]
 		public void RunThenExit()
 		{
-			var url = "http://www.baidu.com/";
+			var url = "http://www.RunThenExit.com/";
 			var spider = SpiderFactory.Create<Spider>();
 
 			spider.NewGuidId();
@@ -113,7 +113,7 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "RunThenPauseThenContinueThenExit")]
 		public void RunThenPauseThenContinueThenExit()
 		{
-			var url = "http://www.baidu.com/";
+			var url = "http://www.RunThenPauseThenContinueThenExit.com/";
 			var spider = SpiderFactory.Create<Spider>();
 
 			spider.NewGuidId();
@@ -143,12 +143,7 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "MmfCloseSignal")]
 		public void MmfCloseSignal()
 		{
-			if ("Development" != SpiderFactory.GetRequiredService<IConfiguration>()["Development"])
-			{
-				return;
-			}
-
-			var url = "http://www.baidu.com/";
+			var url = "http://www.MmfCloseSignal.com/";
 
 			var spider = SpiderFactory.Create<Spider>();
 			spider.MmfSignal = true;
@@ -184,7 +179,7 @@ namespace DotnetSpider.Tests
 			spider.DownloaderSettings.Type = DownloaderType.Exception;
 			var scheduler = new QueueDistinctBfsScheduler();
 			spider.Scheduler = scheduler;
-			spider.AddRequests("http://www.baidu.com");
+			spider.AddRequests("http://www.RetryDownloadTimes.com");
 			spider.Run();
 
 			var statisticsStore = SpiderFactory.GetRequiredService<IStatisticsStore>();
@@ -214,7 +209,7 @@ namespace DotnetSpider.Tests
 			spider.RetryWhenResultIsEmpty = false;
 			spider.DownloaderSettings.Type = DownloaderType.Empty;
 			spider.Scheduler = new QueueDistinctBfsScheduler();
-			spider.AddRequests("http://www.baidu.com");
+			spider.AddRequests("http://www.DoNotRetryWhenResultIsEmpty.com");
 			spider.RunAsync().Wait();
 
 			var statisticsStore = provider.GetRequiredService<IStatisticsStore>();
@@ -251,7 +246,7 @@ namespace DotnetSpider.Tests
 			spider.RetryWhenResultIsEmpty = true;
 			spider.DownloaderSettings.Type = DownloaderType.Empty;
 			spider.Scheduler = new QueueDistinctBfsScheduler();
-			spider.AddRequests("http://www.baidu.com");
+			spider.AddRequests("http://www.RetryWhenResultIsEmpty.com");
 			spider.RunAsync().Wait();
 
 			var statisticsStore = provider.GetRequiredService<IStatisticsStore>();

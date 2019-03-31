@@ -319,9 +319,9 @@ namespace DotnetSpider
 		/// <summary>
 		/// 等待任务结束
 		/// </summary>
-		public void WaitForExit(int milliseconds = 0)
+		public void WaitForExit(long milliseconds = 0)
 		{
-			milliseconds = milliseconds <= 0 ? int.MaxValue : milliseconds;
+			milliseconds = milliseconds <= 0 ? long.MaxValue : milliseconds;
 			var waited = 0;
 			while (Status != Status.Exited && waited < milliseconds)
 			{
@@ -690,7 +690,7 @@ namespace DotnetSpider
 			{
 				if ((DateTime.Now - _lastRequestedTime).Seconds > EmptySleepTime)
 				{
-					Exit();
+					break;
 				}
 				else
 				{

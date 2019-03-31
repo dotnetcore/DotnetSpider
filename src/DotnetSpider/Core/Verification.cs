@@ -288,7 +288,7 @@
 //					$"<td>{ExpectedValue}</td>" +
 //					$"<td>{result}</td>" +
 //					$"<td style=\"color:{color}\"><strong>{verifyResultStr}</strong></td>" +
-//					$"<td>{DateTime.Now:yyyy-MM-dd hh:mm:ss}</td>" +
+//					$"<td>{DateTime.Now:yyyy-MM-dd HH:mm:ss}</td>" +
 //					"</tr>";
 //
 //				return new VerificationInfo
@@ -410,7 +410,7 @@
 //					$"<td>{ExpectedValue}</td>" +
 //					$"<td>{Acutal}</td>" +
 //					$"<td style=\"color:{color}\"><strong>{verifyResultStr}</strong></td>" +
-//					$"<td>{DateTime.Now:yyyy-MM-dd hh:mm:ss}</td>" +
+//					$"<td>{DateTime.Now:yyyy-MM-dd HH:mm:ss}</td>" +
 //					"</tr>";
 //
 //				return new VerificationInfo

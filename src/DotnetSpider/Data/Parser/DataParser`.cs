@@ -159,7 +159,7 @@ namespace DotnetSpider.Data.Parser
                         case "DATETIME":
                         case "NOW":
                         {
-                            value = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                            value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                             break;
                         }
                         default:
