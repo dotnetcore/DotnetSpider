@@ -5,6 +5,7 @@ using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
@@ -57,13 +58,25 @@ namespace DotnetSpider
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 		}
 
+		public static T Create<T>() where T : Spider
+		{
+			var builder = new SpiderBuilder();
+			builder.AddSerilog();
+			builder.ConfigureAppConfiguration();
+			builder.UseStandalone();
+			builder.AddSpider<T>();
+			var factory = builder.Build();
+			return factory.Create<T>();
+		}
+
 		/// <summary>
 		/// 设置 Id 为 Guid
 		/// </summary>
-		public void NewGuidId()
+		public Spider NewGuidId()
 		{
 			CheckIfRunning();
 			Id = Guid.NewGuid().ToString("N");
+			return this;
 		}
 
 		/// <summary>
@@ -571,6 +584,7 @@ namespace DotnetSpider
 						foreach (var dataFlow in _dataFlows)
 						{
 							var dataFlowResult = await dataFlow.HandleAsync(context);
+							var @break = false;
 							switch (dataFlowResult)
 							{
 								case DataFlowResult.Success:
@@ -586,8 +600,14 @@ namespace DotnetSpider
 								}
 								case DataFlowResult.Terminated:
 								{
+									@break = true;
 									break;
 								}
+							}
+
+							if (@break)
+							{
+								break;
 							}
 						}
 
@@ -640,7 +660,7 @@ namespace DotnetSpider
 							else
 							{
 								await _statisticsService.IncrementSuccessAsync(Id);
-								_logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 成功");
+								_logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 成功，解析结果为空");
 							}
 						}
 					}

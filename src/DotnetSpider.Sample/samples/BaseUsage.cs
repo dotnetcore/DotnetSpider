@@ -17,7 +17,7 @@ namespace DotnetSpider.Sample.samples
 			builder.UseStandalone();
 			builder.AddSpider<EntitySpider>();
 			var provider = builder.Build();
-			
+
 			var spider = provider.Create<Spider>();
 			spider.NewGuidId(); // 设置任务标识
 			spider.Name = "博客园全站采集"; // 设置任务名称
@@ -34,8 +34,8 @@ namespace DotnetSpider.Sample.samples
 		{
 			public CnblogsDataParser()
 			{
-				CanParse = RegexCanParse("cnblogs\\.com");
-				Follow = XPathFollow(".");
+				CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
+				QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
 			}
 
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)

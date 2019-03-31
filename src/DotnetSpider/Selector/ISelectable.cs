@@ -112,7 +112,7 @@ namespace DotnetSpider.Selector
 		/// </summary>
 		/// <param name="option">元素取值方式</param>
 		/// <returns>查询到的文本结果</returns>
-		IEnumerable<string> GetValues(ValueOption option = ValueOption.None);
+		List<string> GetValues(ValueOption option = ValueOption.None);
 
 		/// <summary>
 		/// 通过查询器查找结果

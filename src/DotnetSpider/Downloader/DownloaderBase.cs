@@ -59,8 +59,7 @@ namespace DotnetSpider.Downloader
 
         protected string CreateFilePath(Request request)
         {
-            Uri uri;
-            var isUri = Uri.TryCreate(request.Url, UriKind.RelativeOrAbsolute, out uri);
+	        var isUri = Uri.TryCreate(request.Url, UriKind.RelativeOrAbsolute, out var uri);
             if (isUri)
             {
                 var intervalPath = Path.Combine(request.OwnerId, (uri.Host + uri.LocalPath).Replace("//", "/"));

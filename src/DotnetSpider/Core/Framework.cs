@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DotnetSpider.Network;
 using Microsoft.Extensions.Configuration;
 
 namespace DotnetSpider.Core
@@ -51,6 +52,8 @@ namespace DotnetSpider.Core
 		public static readonly string OsDescription;
 		public static WebProxy FiddlerProxy = new WebProxy("http://127.0.0.1:8888");
 		public static Task CompletedTask = Task.FromResult(0);
+
+		public static NetworkCenter NetworkCenter;
 
 		static Framework()
 		{

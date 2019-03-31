@@ -10,8 +10,8 @@ namespace DotnetSpider.Sample
 	{
 		static void Main(string[] args)
 		{
-			// EntitySpider.Run();			
-			Startup.Run("-s", "EntitySpider", "-n", "博客园");
+			var spider = Spider.Create<GithubSpider>();			
+			spider.RunAsync();
 			Console.Read();
 		}
 	}

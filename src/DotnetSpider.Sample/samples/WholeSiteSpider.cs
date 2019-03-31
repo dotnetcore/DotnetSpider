@@ -27,9 +27,9 @@ namespace DotnetSpider.Sample.samples
             spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
             spider.AddDataFlow(new DataParser
             {
-                Selectable = context => context.GetSelectable(ContentType.Html),
-                CanParse = DataParser.RegexCanParse("cnblogs\\.com"),
-                Follow = DataParser.XPathFollow(".")
+                SelectableFactory = context => context.GetSelectable(ContentType.Html),
+                CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com"),
+                QueryFollowRequests =  DataParserHelper.QueryFollowRequestsByXPath(".")
             }).AddDataFlow(new ConsoleStorage()); // 控制台打印采集结果
             spider.AddRequests("http://www.cnblogs.com/"); // 设置起始链接
             spider.RunAsync(); // 启动
@@ -59,8 +59,8 @@ namespace DotnetSpider.Sample.samples
         {
             public CnblogsDataParser()
             {
-                CanParse = RegexCanParse("cnblogs\\.com");
-                Follow = XPathFollow(".");
+                CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
+                QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
             }
 
             protected override Task<DataFlowResult> Parse(DataFlowContext context)

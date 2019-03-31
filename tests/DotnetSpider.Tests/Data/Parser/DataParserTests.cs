@@ -20,11 +20,11 @@ namespace DotnetSpider.Tests.Data.Parser
                 Request = new Request("http://cnblogs.com"),
                 RawText = File.ReadAllText("cnblogs.html")
             }, services);
-            var xpathFollow = DataParser.XPathFollow(".//div[@class='pager']");
+            var xpathFollow =  DataParserHelper.QueryFollowRequestsByXPath(".//div[@class='pager']");
 
             var requests = xpathFollow.Invoke(dataContext);
 
-            Assert.Equal(12, requests.Length);
+            Assert.Equal(12, requests.Count);
             Assert.Contains(requests, r => r == "http://cnblogs.com/sitehome/p/2");
         }
 

@@ -43,7 +43,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensTagIndexDataParser()
             {
-                CanParse = RegexCanParse("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/$");
+                CanParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/$");
                 //Follow = XpathFollow(".");
             }
 
@@ -90,7 +90,7 @@ namespace DotnetSpider.Sample.samples
             public NvshensFirstPageTagDataParser()
             {
                 //CanParse = RegexCanParse("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/(((\\w)*\\/$)|(\\w*\\/\\d.html$))");
-                CanParse = RegexCanParse("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/(\\w)*\\/$");
+                CanParse = DataParserHelper.CanParseByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/(\\w)*\\/$");
             }
 
             protected override Task<DataFlowResult> Parse(DataFlowContext context)
@@ -116,7 +116,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensPageTagDataParser()
             {
-                CanParse = RegexCanParse("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/\\w*\\/\\d+.html$");
+                CanParse = DataParserHelper.CanParseByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/\\w*\\/\\d+.html$");
                 //Follow = XpathFollow(".");
             }
 
@@ -142,7 +142,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensFirstPageDetailDataParser()
             {
-                CanParse = RegexCanParse("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w+\\/\\d*\\/$");
+                CanParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w+\\/\\d*\\/$");
                 //Follow = XpathFollow(".");
             }
 
@@ -162,7 +162,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensPageDetailDataParser()
             {
-                CanParse = RegexCanParse("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w\\/\\d*\\/\\d+.html$");
+                CanParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w\\/\\d*\\/\\d+.html$");
                 //Follow = XpathFollow(".");
             }
 

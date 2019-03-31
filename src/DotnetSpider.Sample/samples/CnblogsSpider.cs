@@ -14,7 +14,6 @@ namespace DotnetSpider.Sample.samples
 {
     public class CnblogsSpider : Spider
     {
-
         protected override void Initialize()
         {
             Scheduler = new QueueDistinctBfsScheduler();
@@ -29,8 +28,8 @@ namespace DotnetSpider.Sample.samples
         {
             public CnblogsDataParser()
             {
-                CanParse = RegexCanParse("cnblogs\\.com");
-                Follow = XPathFollow(".");
+                CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
+                QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
             }
 
             protected override Task<DataFlowResult> Parse(DataFlowContext context)

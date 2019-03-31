@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Downloader.Entity;
 using DotnetSpider.MessageQueue;
+using DotnetSpider.Network;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -34,11 +35,13 @@ namespace DotnetSpider.Downloader
 			IDownloaderAgentOptions options,
 			IMessageQueue mq,
 			IDownloaderAllocator downloaderAllocator,
+			NetworkCenter networkCenter,
 			ILoggerFactory loggerFactory)
-		{
+		{			
 			_mq = mq;
 			_downloaderAllocator = downloaderAllocator;
 			_options = options;
+			Framework.NetworkCenter = networkCenter;
 			Logger = loggerFactory.CreateLogger(GetType().FullName);
 		}
 
