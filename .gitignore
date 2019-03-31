@@ -27,6 +27,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+[mmf-signal]/
 
 # Visual Studo 2015 cache/options directory
 .vs/

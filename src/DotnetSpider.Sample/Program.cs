@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.IO.MemoryMappedFiles;
 using DotnetSpider.Core;
 using DotnetSpider.Sample.samples;
 
@@ -8,8 +10,7 @@ namespace DotnetSpider.Sample
 	{
 		static void Main(string[] args)
 		{
-			// EntitySpider.Run();
-
+			// EntitySpider.Run();			
 			Startup.Run("-s", "EntitySpider", "-n", "博客园");
 			Console.Read();
 		}

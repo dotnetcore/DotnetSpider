@@ -161,7 +161,8 @@ namespace DotnetSpider
 		public Task RunAsync(params string[] args)
 		{
 			CheckIfRunning();
-
+			// 此方法不能放到异步里, 如果在调用 RunAsync 后再直接调用 ExitBySignal 有可能会因会执行顺序原因导致先调用退出，然后退出信号被重置
+			ResetMmfSignal();
 			return Task.Factory.StartNew(async () =>
 			{
 				try
@@ -183,8 +184,6 @@ namespace DotnetSpider
 					// 订阅数据流
 					_mq.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
 						async message => await HandleMessage(message));
-
-					await CreateMmfFolder();
 
 					// 先分配下载器，因为分配下载器的开销、时间更小，后面 RequestSupply 可能加载大量的请求，时间开销很大
 					await AllotDownloaderAsync();
@@ -376,6 +375,26 @@ namespace DotnetSpider
 			return (StorageBase) storage;
 		}
 
+		private void ResetMmfSignal()
+		{
+			if (MmfSignal)
+			{
+				if (!Directory.Exists("mmf-signal"))
+				{
+					Directory.CreateDirectory("mmf-signal");
+				}
+
+				var mmf = MemoryMappedFile.CreateFromFile(Path.Combine("mmf-signal", Id), FileMode.OpenOrCreate, null,
+					4, MemoryMappedFileAccess.ReadWrite);
+				using (var accessor = mmf.CreateViewAccessor())
+				{
+					accessor.Write(0, false);
+					accessor.Flush();
+					_logger.LogInformation("任务 {Id} 初始化 MMF 退出信号");
+				}
+			}
+		}
+
 		/// <summary>
 		/// 爬虫速度控制器
 		/// </summary>
@@ -393,13 +412,6 @@ namespace DotnetSpider
 
 				using (var accessor = mmf?.CreateViewAccessor())
 				{
-					if (accessor != null)
-					{
-						accessor.Write(0, false);
-						accessor.Flush();
-						_logger.LogInformation("任务 {Id} 重置退出信号到 MMF 成功");
-					}
-
 					_logger.LogInformation($"任务 {Id} 速度控制器启动");
 
 					while (!@break)
@@ -750,23 +762,6 @@ namespace DotnetSpider
 				await _mq.PublishAsync(Framework.DownloaderCenterTopic,
 					$"|{Framework.DownloadCommand}|{JsonConvert.SerializeObject(requests)}");
 			}
-		}
-
-		private Task CreateMmfFolder()
-		{
-			if (MmfSignal)
-			{
-				if (!Directory.Exists("mmf-signal"))
-				{
-					Directory.CreateDirectory("mmf-signal");
-				}
-			}
-
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
-			return Task.CompletedTask;
-#endif
 		}
 	}
 }
