@@ -244,7 +244,7 @@ namespace DotnetSpider
 						}
 						catch (Exception ex)
 						{
-							_logger.LogError($"释放 {dataFlow.GetType().Name} 失败: {ex}");
+							_logger.LogError($"任务 {Id} 释放 {dataFlow.GetType().Name} 失败: {ex}");
 						}
 					}
 
@@ -281,7 +281,7 @@ namespace DotnetSpider
 		/// </summary>
 		public Spider Exit()
 		{
-			_logger.LogInformation("退出中...");
+			_logger.LogInformation($"任务 {Id} 退出中...");
 			Status = Status.Exiting;
 			// 直接取消订阅即可: 1. 如果是本地应用, 
 			_mq.Unsubscribe($"{Framework.ResponseHandlerTopic}{Id}");
@@ -304,11 +304,11 @@ namespace DotnetSpider
 					accessor.Flush();
 				}
 
-				_logger.LogInformation("推送退出信号到 MMF 成功");
+				_logger.LogInformation($"任务 {Id} 推送退出信号到 MMF 成功");
 				return this;
 			}
 
-			throw new SpiderException("未开启 MMF 控制");
+			throw new SpiderException($"任务 {Id} 未开启 MMF 控制");
 		}
 
 		public void Run(params string[] args)
@@ -397,7 +397,7 @@ namespace DotnetSpider
 					{
 						accessor.Write(0, false);
 						accessor.Flush();
-						_logger.LogInformation("重置退出信号到 MMF 成功");
+						_logger.LogInformation("任务 {Id} 重置退出信号到 MMF 成功");
 					}
 
 					_logger.LogInformation($"任务 {Id} 速度控制器启动");
@@ -430,7 +430,7 @@ namespace DotnetSpider
 									}
 									catch (Exception e)
 									{
-										_logger.LogError($"速度控制器运转失败: {e}");
+										_logger.LogError($"任务 {Id} 速度控制器运转失败: {e}");
 									}
 
 									break;
@@ -448,14 +448,15 @@ namespace DotnetSpider
 								}
 							}
 
-							if (accessor == null || !accessor.ReadBoolean(0)) continue;
-
-							Exit();
-							break;
+							if (!@break && accessor != null && accessor.ReadBoolean(0))
+							{
+								_logger.LogInformation($"任务 {Id} 收到 MMF 退出信号");
+								Exit();
+							}
 						}
 						catch (Exception e)
 						{
-							_logger.LogError($"速度控制器运转失败: {e}");
+							_logger.LogError($"任务 {Id} 速度控制器运转失败: {e}");
 						}
 					}
 				}
@@ -713,7 +714,7 @@ namespace DotnetSpider
 		{
 			if (Status == Status.Running || Status == Status.Paused)
 			{
-				throw new SpiderException("爬虫正在运行");
+				throw new SpiderException("任务 {Id} 正在运行");
 			}
 		}
 

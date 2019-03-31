@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Data.Storage;
@@ -148,7 +149,7 @@ namespace DotnetSpider.Tests
 			var spider = SpiderFactory.Create<Spider>();
 			spider.MmfSignal = true;
 			spider.NewGuidId();
-			spider.Name = "RunAsyncAndStop";
+			spider.Name = "MmfCloseSignal";
 			spider.DownloaderSettings.Type = DownloaderType.Empty;
 
 			for (int i = 0; i < 10000; i++)
@@ -188,7 +189,8 @@ namespace DotnetSpider.Tests
 			Assert.Equal(1, s.Failed);
 			Assert.Equal(0, s.Success);
 
-			var ds = statisticsStore.GetDownloadStatisticsListAsync(1, 10).Result[0];
+			var dss = statisticsStore.GetDownloadStatisticsListAsync(1, 10).Result;
+			var ds = dss[0];
 			Assert.Equal(6, ds.Failed);
 			Assert.Equal(0, ds.Success);
 		}
