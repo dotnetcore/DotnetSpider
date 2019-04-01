@@ -6,6 +6,11 @@ namespace DotnetSpider.Data.Storage
     public class SqlStatements
     {
 	    /// <summary>
+	    /// 数据库名称 SQL
+	    /// </summary>
+	    public string DatabaseSql { get; set; }
+	    
+	    /// <summary>
 	    /// 创建表的 SQL 语句
 	    /// </summary>
         public string CreateTableSql { get; set; }

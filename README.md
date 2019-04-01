@@ -49,11 +49,31 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
 ### OPTIONAL ENVIROMENT
 
 - MySql
-- Redis [Download Redis for Windows](https://github.com/MSOpenTech/redis/releases)
+
+        sudo docker run --name mysql -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1qazZAQ! mysql
+
+- Redis
+
+        sudo docker run --name redis -d -p 6379:6379 redis
+
 - SqlServer
+
+        sudo docker run --name sqlserver -d -p 1433:1433  -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' mcr.microsoft.com/mssql/server:2017-latest
+
 - PostgreSQL
+
+        sudo docker run --name postgres -d  -p 5432:5432 -e POSTGRES_PASSWORD=1qazZAQ! postgres
+
 - MongoDb
 
+        sudo docker run --name mongo -d -p 27017:27017 mongo
+        
+- Kafka
+
+        $ sudo docker run --name kafka -d -p 9092:9092 --net bridge -h kafka --env ADVERTISED_PORT=9092 spotify/kafka
+        $ sudo -s
+        bash-3.2# echo "127.0.0.1       kafka" >> /etc/hosts
+                        
 ### MORE DOCUMENTS
 
 https://github.com/dotnetcore/DotnetSpider/wiki

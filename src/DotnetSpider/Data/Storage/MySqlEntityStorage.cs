@@ -13,6 +13,8 @@ namespace DotnetSpider.Data.Storage
 	/// </summary>
 	public class MySqlEntityStorage : RelationalDatabaseEntityStorageBase
 	{
+		protected virtual string Escape => "`";
+
 		/// <summary>
 		/// 根据配置返回存储器
 		/// </summary>
@@ -64,7 +66,10 @@ namespace DotnetSpider.Data.Storage
 				InsertAndUpdateSql = GenerateInsertAndUpdateSql(tableMetadata),
 				UpdateSql = GenerateUpdateSql(tableMetadata),
 				CreateTableSql = GenerateCreateTableSql(tableMetadata),
-				CreateDatabaseSql = GenerateCreateDatabaseSql(tableMetadata)
+				CreateDatabaseSql = GenerateCreateDatabaseSql(tableMetadata),
+				DatabaseSql = string.IsNullOrWhiteSpace(tableMetadata.Schema.Database)
+					? ""
+					: $"{Escape}{GetNameSql(tableMetadata.Schema.Database)}{Escape}"
 			};
 			return sqlStatements;
 		}
@@ -78,7 +83,7 @@ namespace DotnetSpider.Data.Storage
 		{
 			return string.IsNullOrWhiteSpace(tableMetadata.Schema.Database)
 				? ""
-				: $"CREATE SCHEMA IF NOT EXISTS `{GetNameSql(tableMetadata.Schema.Database)}` DEFAULT CHARACTER SET utf8mb4;";
+				: $"CREATE SCHEMA IF NOT EXISTS {Escape}{GetNameSql(tableMetadata.Schema.Database)}{Escape} DEFAULT CHARACTER SET utf8mb4;";
 		}
 
 		/// <summary>
@@ -100,9 +105,11 @@ namespace DotnetSpider.Data.Storage
 
 				var columnSql = GenerateColumnSql(column.Value, isPrimary);
 
-				if (isAutoIncrementPrimary && isPrimary)
+				if (isPrimary)
 				{
-					builder.Append($"{columnSql} AUTO_INCREMENT, ");
+					builder.Append(isAutoIncrementPrimary
+						? $"{columnSql} AUTO_INCREMENT PRIMARY KEY, "
+						: $"{columnSql} {(tableMetadata.Primary.Count > 1 ? "" : "PRIMARY KEY")}, ");
 				}
 				else
 				{
@@ -112,10 +119,10 @@ namespace DotnetSpider.Data.Storage
 
 			builder.Remove(builder.Length - 2, 2);
 
-			if (tableMetadata.Primary != null && tableMetadata.Primary.Count > 0)
+			if (tableMetadata.Primary != null && tableMetadata.Primary.Count > 1)
 			{
 				builder.Append(
-					$", PRIMARY KEY ({string.Join(", ", tableMetadata.Primary.Select(c => $"`{GetNameSql(c)}`"))})");
+					$", PRIMARY KEY ({string.Join(", ", tableMetadata.Primary.Select(c => $"{Escape}{GetNameSql(c)}{Escape}"))})");
 			}
 
 			if (tableMetadata.Indexes.Count > 0)
@@ -123,8 +130,8 @@ namespace DotnetSpider.Data.Storage
 				foreach (var index in tableMetadata.Indexes)
 				{
 					var name = index.Name;
-					var columnNames = string.Join(", ", index.Columns.Select(c => $"`{GetNameSql(c)}`"));
-					builder.Append($", {(index.IsUnique ? "UNIQUE" : "")} KEY `{name}` ({columnNames})");
+					var columnNames = string.Join(", ", index.Columns.Select(c => $"{Escape}{GetNameSql(c)}{Escape}"));
+					builder.Append($", {(index.IsUnique ? "UNIQUE" : "")} KEY {Escape}{name}{Escape} ({columnNames})");
 				}
 			}
 
@@ -148,7 +155,7 @@ namespace DotnetSpider.Data.Storage
 				(isAutoIncrementPrimary ? columns.Where(c1 => c1.Key != tableMetadata.Primary.First()) : columns)
 				.ToArray();
 
-			var columnsSql = string.Join(", ", insertColumns.Select(c => $"`{GetNameSql(c.Key)}`"));
+			var columnsSql = string.Join(", ", insertColumns.Select(c => $"{Escape}{GetNameSql(c.Key)}{Escape}"));
 
 			var columnsParamsSql = string.Join(", ", insertColumns.Select(p => $"@{p.Key}"));
 
@@ -175,12 +182,13 @@ namespace DotnetSpider.Data.Storage
 			var where = "";
 			foreach (var column in tableMetadata.Primary)
 			{
-				where += $" `{GetNameSql(column)}` = @{column} AND";
+				where += $" {Escape}{GetNameSql(column)}{Escape} = @{column} AND";
 			}
 
 			where = where.Substring(0, where.Length - 3);
 
-			var setCols = string.Join(", ", tableMetadata.Updates.Select(c => $"`{GetNameSql(c)}`= @{c}"));
+			var setCols = string.Join(", ",
+				tableMetadata.Updates.Select(c => $"{Escape}{GetNameSql(c)}{Escape}= @{c}"));
 			var tableSql = GenerateTableSql(tableMetadata);
 			var sql = $"UPDATE {tableSql} SET {setCols} WHERE {where};";
 			return sql;
@@ -206,12 +214,13 @@ namespace DotnetSpider.Data.Storage
 				(isAutoIncrementPrimary ? columns.Where(c1 => c1.Key != tableMetadata.Primary.First()) : columns)
 				.ToArray();
 
-			var columnsSql = string.Join(", ", insertColumns.Select(c => $"`{GetNameSql(c.Key)}`"));
+			var columnsSql = string.Join(", ", insertColumns.Select(c => $"{Escape}{GetNameSql(c.Key)}{Escape}"));
 
 			var columnsParamsSql = string.Join(", ", insertColumns.Select(p => $"@{p.Key}"));
 
 			var tableSql = GenerateTableSql(tableMetadata);
-			var setCols = string.Join(", ", insertColumns.Select(c => $"`{GetNameSql(c.Key)}`= @{c.Key}"));
+			var setCols = string.Join(", ",
+				insertColumns.Select(c => $"{Escape}{GetNameSql(c.Key)}{Escape}= @{c.Key}"));
 			var sql =
 				$"INSERT INTO {tableSql} ({columnsSql}) VALUES ({columnsParamsSql}) ON DUPLICATE key UPDATE {setCols};";
 			return sql;
@@ -224,9 +233,11 @@ namespace DotnetSpider.Data.Storage
 		/// <returns>SQL 语句</returns>
 		protected virtual string GenerateTableSql(TableMetadata tableMetadata)
 		{
-			var tableName = GetNameSql(tableMetadata.Schema.Table);
+			var tableName = GetNameSql(GetTableName(tableMetadata));
 			var database = GetNameSql(tableMetadata.Schema.Database);
-			return string.IsNullOrWhiteSpace(database) ? $"`{tableName}`" : $"`{database}`.`{tableName}`";
+			return string.IsNullOrWhiteSpace(database)
+				? $"{Escape}{tableName}{Escape}"
+				: $"{Escape}{database}{Escape}.{Escape}{tableName}{Escape}";
 		}
 
 		/// <summary>
@@ -242,7 +253,7 @@ namespace DotnetSpider.Data.Storage
 				dataType = $"{dataType} NOT NULL";
 			}
 
-			return $"`{columnName}` {dataType}";
+			return $"{Escape}{columnName}{Escape} {dataType}";
 		}
 
 		/// <summary>

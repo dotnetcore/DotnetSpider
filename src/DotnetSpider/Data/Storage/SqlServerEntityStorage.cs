@@ -79,7 +79,10 @@ namespace DotnetSpider.Data.Storage
 				InsertAndUpdateSql = GenerateInsertAndUpdateSql(tableMetadata),
 				UpdateSql = GenerateUpdateSql(tableMetadata),
 				CreateTableSql = GenerateCreateTableSql(tableMetadata),
-				CreateDatabaseSql = GenerateCreateDatabaseSql(tableMetadata)
+				CreateDatabaseSql = GenerateCreateDatabaseSql(tableMetadata),
+				DatabaseSql = string.IsNullOrWhiteSpace(tableMetadata.Schema.Database)
+					? ""
+					: $"[{GetNameSql(tableMetadata.Schema.Database)}]"
 			};
 			return sqlStatements;
 		}
