@@ -6,7 +6,7 @@ namespace DotnetSpider.Data.Parser
     public static class SelectorExtensions
     {
         /// <summary>
-        /// 把BaseSelector转换成真正的查询器
+        /// 把 BaseSelector 转换成真正的查询器
         /// </summary>
         /// <param name="selector">BaseSelector</param>
         /// <returns>查询器</returns>

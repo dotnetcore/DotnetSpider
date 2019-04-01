@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Data.Parser
 {

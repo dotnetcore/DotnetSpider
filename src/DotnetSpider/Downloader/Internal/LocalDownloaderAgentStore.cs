@@ -7,6 +7,9 @@ using DotnetSpider.Downloader.Entity;
 
 namespace DotnetSpider.Downloader.Internal
 {
+	/// <summary>
+	/// 本地下载器代理存储
+	/// </summary>
     internal class LocalDownloaderAgentStore : IDownloaderAgentStore
     {
         private readonly ConcurrentDictionary<string, DownloaderAgent> _agents =

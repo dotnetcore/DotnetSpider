@@ -8,14 +8,26 @@ using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Downloader
 {
+	/// <summary>
+	/// 下载器
+	/// </summary>
     public abstract class DownloaderBase : IDownloader
     {
         private readonly string _downloadFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "downloads");
 
+        /// <summary>
+        /// 日志接口
+        /// </summary>
         public ILogger Logger { get; set; }
 
+        /// <summary>
+        /// 下载器代理标识
+        /// </summary>
         public string AgentId { get; set; }
 
+        /// <summary>
+        /// 最后一次使用时间
+        /// </summary>
         public DateTime LastUsedTime { get; set; }
 
         /// <summary>
@@ -48,8 +60,14 @@ namespace DotnetSpider.Downloader
                 "application/x-www-form-urlencoded"
             };
 
+        /// <summary>
+        /// 代理池
+        /// </summary>
         public IHttpProxyPool HttpProxyPool { get; set; }
 
+        /// <summary>
+        /// 构造方法
+        /// </summary>
         protected DownloaderBase()
         {
             LastUsedTime = DateTime.Now;

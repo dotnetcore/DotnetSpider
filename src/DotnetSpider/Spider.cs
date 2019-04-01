@@ -5,7 +5,6 @@ using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
@@ -58,6 +57,11 @@ namespace DotnetSpider
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 		}
 
+		/// <summary>
+		/// 创建爬虫对象
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
 		public static T Create<T>() where T : Spider
 		{
 			var builder = new SpiderBuilder();
@@ -83,7 +87,7 @@ namespace DotnetSpider
 		/// 添加请求的配置方法
 		/// 可以计算 Cookie, Sign 等操作
 		/// </summary>
-		/// <param name="configureDelegate"></param>
+		/// <param name="configureDelegate">配置方法</param>
 		/// <returns></returns>
 		public Spider AddConfigureRequestDelegate(Action<Request> configureDelegate)
 		{

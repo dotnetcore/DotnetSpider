@@ -3,60 +3,73 @@ using Microsoft.Extensions.Configuration;
 
 namespace DotnetSpider.Downloader
 {
-    public interface IDownloaderAgentOptions
-    {
-        bool SupportAdsl { get; }
+	/// <summary>
+	/// 下载器代理选项
+	/// </summary>
+	public class DownloaderAgentOptions : IDownloaderAgentOptions
+	{
+		private readonly IConfiguration _configuration;
+		private readonly string _defaultAgentId = Guid.NewGuid().ToString("N");
 
-        bool IgnoreRedialForTest { get; }
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="configuration">配置接口</param>
+		public DownloaderAgentOptions(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+		
+		/// <summary>
+		/// 是否支持 ADSL 拨号
+		/// </summary>
+		public bool SupportAdsl => !string.IsNullOrWhiteSpace(AdslAccount);
 
-        int RedialIntervalLimit { get; }
+		/// <summary>
+		/// 是否忽略拨号，用于测试
+		/// </summary>
+		public bool IgnoreRedialForTest => !string.IsNullOrWhiteSpace(_configuration["IgnoreRedialForTest"]) &&
+		                                   bool.Parse(_configuration["IgnoreRedialForTest"]);
 
-        string AgentId { get; }
+		/// <summary>
+		/// 拨号间隔限制
+		/// </summary>
+		public int RedialIntervalLimit => string.IsNullOrWhiteSpace(_configuration["RedialIntervalLimit"])
+			? 2
+			: int.Parse(_configuration["RedialIntervalLimit"]);
 
-        string Name { get; }
-
-        string AdslInterface { get; }
-
-        string AdslAccount { get; }
-
-        string AdslPassword { get; }
-
-        string ProxySupplyUrl { get; }
-    }
-
-    public class DownloaderAgentOptions : IDownloaderAgentOptions
-    {
-        private readonly IConfiguration _configuration;
-        private readonly string _defaultAgentId = Guid.NewGuid().ToString("N");
-
-        public DownloaderAgentOptions(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public bool SupportAdsl => !string.IsNullOrWhiteSpace(AdslAccount);
-
-        public bool IgnoreRedialForTest => !string.IsNullOrWhiteSpace(_configuration["IgnoreRedialForTest"]) &&
-                                           bool.Parse(_configuration["IgnoreRedialForTest"]);
-
-        public int RedialIntervalLimit => string.IsNullOrWhiteSpace(_configuration["RedialIntervalLimit"])
-            ? 2
-            : int.Parse(_configuration["RedialIntervalLimit"]);
-
-        public string AgentId => string.IsNullOrWhiteSpace(_configuration["AgentId"])
-            ? _defaultAgentId
-            : _configuration["AgentId"];
-
-        public string Name => string.IsNullOrWhiteSpace(_configuration["AgentName"])
-            ? "DownloadAgent"
-            : _configuration["AgentName"];
-
-        public string AdslInterface => _configuration["AdslInterface"];
-
-        public string AdslAccount => _configuration["AdslAccount"];
-
-        public string AdslPassword => _configuration["AdslPassword"];
-
-        public string ProxySupplyUrl => _configuration["ProxySupplyUrl"];
-    }
+		/// <summary>
+		/// 下载器代理标识
+		/// </summary>
+		public string AgentId => string.IsNullOrWhiteSpace(_configuration["AgentId"])
+			? _defaultAgentId
+			: _configuration["AgentId"];
+		
+		/// <summary>
+		/// 下载器代理名称
+		/// </summary>
+		public string Name => string.IsNullOrWhiteSpace(_configuration["AgentName"])
+			? "DownloadAgent"
+			: _configuration["AgentName"];
+		
+		/// <summary>
+		/// ADSL 网络接口
+		/// </summary>
+		public string AdslInterface => _configuration["AdslInterface"];
+		
+		/// <summary>
+		/// ADSL 帐号
+		/// </summary>
+		public string AdslAccount => _configuration["AdslAccount"];
+		
+		/// <summary>
+		/// ADSL 密码
+		/// </summary>
+		public string AdslPassword => _configuration["AdslPassword"];
+		
+		/// <summary>
+		/// 代理供应接口
+		/// </summary>
+		public string ProxySupplyUrl => _configuration["ProxySupplyUrl"];
+	}
 }

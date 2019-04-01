@@ -4,27 +4,27 @@ using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Data
 {
-    /// <summary>
-    /// 数据流处理器
-    /// </summary>
-    public interface IDataFlow : IDisposable
-    {
-        /// <summary>
-        /// 日志接口
-        /// </summary>
-        ILogger Logger { get; set; }
+	/// <summary>
+	/// 数据流处理器
+	/// </summary>
+	public interface IDataFlow : IDisposable
+	{
+		/// <summary>
+		/// 日志接口
+		/// </summary>
+		ILogger Logger { get; set; }
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <returns></returns>
-        Task InitAsync();
+		/// <summary>
+		/// 初始化
+		/// </summary>
+		/// <returns></returns>
+		Task InitAsync();
 
-        /// <summary>
-        /// 流处理
-        /// </summary>
-        /// <param name="context">处理上下文</param>
-        /// <returns></returns>
-        Task<DataFlowResult> HandleAsync(DataFlowContext context);
-    }
+		/// <summary>
+		/// 流处理
+		/// </summary>
+		/// <param name="context">处理上下文</param>
+		/// <returns></returns>
+		Task<DataFlowResult> HandleAsync(DataFlowContext context);
+	}
 }

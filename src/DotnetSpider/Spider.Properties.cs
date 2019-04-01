@@ -36,6 +36,9 @@ namespace DotnetSpider
         private bool _mmfSignal;
         private bool _allocatedDownloader;
 
+        /// <summary>
+        /// 下载器配置
+        /// </summary>
         public DownloaderSettings DownloaderSettings { get; set; } = new DownloaderSettings();
 
         /// <summary>
@@ -88,6 +91,10 @@ namespace DotnetSpider
         /// </summary>
         public Status Status { get; private set; }
 
+        /// <summary>
+        /// 调度器
+        /// </summary>
+        /// <exception cref="SpiderException"></exception>
         public IScheduler Scheduler
         {
             get => _scheduler;
@@ -209,6 +216,10 @@ namespace DotnetSpider
             }
         }
 
+        /// <summary>
+        /// 等待一定时间，如果队列中没有新的请求则认为任务结束
+        /// </summary>
+        /// <exception cref="SpiderException"></exception>
         public int EmptySleepTime
         {
             get => _emptySleepTime;

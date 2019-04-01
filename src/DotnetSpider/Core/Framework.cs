@@ -28,6 +28,8 @@ namespace DotnetSpider.Core
 				{"-c", "config"}
 			};
 
+		private const string DefaultAppsettings = "appsettings.json";
+
 		public const string ResponseHandlerTopic = "ResponseHandler-";
 		public const string DownloaderCenterTopic = "DownloadCenter";
 		public const string StatisticsServiceTopic = "StatisticsService";
@@ -140,8 +142,20 @@ namespace DotnetSpider.Core
 				configurationBuilder.AddCommandLine(args, SwitchMappings);
 			}
 
-			configurationBuilder.AddJsonFile(string.IsNullOrWhiteSpace(config) ? "appsettings.json" : config, false,
-				true);
+			if (!string.IsNullOrWhiteSpace(config))
+			{
+				configurationBuilder.AddJsonFile(config, false,
+					true);
+			}
+			else
+			{
+				if (File.Exists(DefaultAppsettings))
+				{
+					configurationBuilder.AddJsonFile(DefaultAppsettings, false,
+						true);
+				}
+			}
+
 			return configurationBuilder;
 		}
 

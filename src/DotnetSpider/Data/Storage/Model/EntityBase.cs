@@ -7,6 +7,10 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Data.Storage.Model
 {
+	/// <summary>
+	/// 实体基类
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
     public class EntityBase<T> where T : class, new()
     {
         private Lazy<TableMetadata> _tableMetadata;
@@ -19,6 +23,10 @@ namespace DotnetSpider.Data.Storage.Model
             }
         }
 
+        /// <summary>
+        /// 获取实体的表元数据
+        /// </summary>
+        /// <returns></returns>
         public TableMetadata GetTableMetadata()
         {
             _tableMetadata = new Lazy<TableMetadata>();

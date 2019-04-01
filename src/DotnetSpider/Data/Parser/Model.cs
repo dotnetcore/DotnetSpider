@@ -13,6 +13,9 @@ namespace DotnetSpider.Data.Parser
     /// <typeparam name="T"></typeparam>
     public class Model<T> where T : EntityBase<T>, new()
     {
+	    /// <summary>
+	    /// 实体的类型名称
+	    /// </summary>
         public string TypeName { get; }
         
         /// <summary>

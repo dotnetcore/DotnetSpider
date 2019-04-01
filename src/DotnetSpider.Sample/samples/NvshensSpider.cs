@@ -71,7 +71,7 @@ namespace DotnetSpider.Sample.samples
                         Url = tag.Key,
                         OwnerId = context.Response.Request.OwnerId
                     };
-                    request.Properties.Add("tag", tag.Value);
+                    request.AddProperty("tag", tag.Value);
 
                     requests.Add(request);
                 }

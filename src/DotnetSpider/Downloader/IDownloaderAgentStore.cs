@@ -4,6 +4,9 @@ using DotnetSpider.Downloader.Entity;
 
 namespace DotnetSpider.Downloader
 {
+	/// <summary>
+	/// 下载器代理存储
+	/// </summary>
     public interface IDownloaderAgentStore
     {
         /// <summary>

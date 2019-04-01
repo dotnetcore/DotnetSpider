@@ -2,6 +2,9 @@ using System.Reflection;
 
 namespace DotnetSpider.Data.Storage.Model
 {
+	/// <summary>
+	/// 列信息
+	/// </summary>
     public class Column
     {
         public string Name { get; set; }

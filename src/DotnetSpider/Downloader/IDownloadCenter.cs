@@ -7,6 +7,9 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Downloader
 {
+	/// <summary>
+	/// 下载中心
+	/// </summary>
     public interface IDownloadCenter : IHostedService
     {
     }

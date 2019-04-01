@@ -5,8 +5,17 @@ using Newtonsoft.Json;
 
 namespace DotnetSpider.Data.Storage
 {
+	/// <summary>
+	/// 文件保存解析结果(所有解析结果)
+	/// 保存路径: [当前程序运行目录]/files/[任务标识]/[request.hash].data
+	/// </summary>
     public class FileStorage : FileStorageBase
     {
+	    /// <summary>
+	    /// 根据配置返回存储器
+	    /// </summary>
+	    /// <param name="options">配置</param>
+	    /// <returns></returns>
         public static FileStorage CreateFromOptions(ISpiderOptions options)
         {
             return new FileStorage();

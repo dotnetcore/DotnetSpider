@@ -61,6 +61,7 @@ namespace DotnetSpider.Network.InternetDetector
 					count++;
 				}
 			}
+
 			return count;
 		}
 	}

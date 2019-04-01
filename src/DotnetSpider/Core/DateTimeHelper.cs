@@ -13,147 +13,96 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 当天的RunId: 2017-12-20
 		/// </summary>
-		public static string RunIdOfToday;
+		public static string TodayString => DateTime.Now.ToString("yyyy-MM-dd");
 
 		/// <summary>
 		/// 当月的RunId: 2017-12-01
 		/// </summary>
-		public static string RunIdOfMonthly;
+		public static string MonthString => FirstDayOfMonth.ToString("yyyy-MM-dd");
+
 
 		/// <summary>
 		/// 当周的RunId: 2018-01-01 (it's monday)
 		/// </summary>
-		public static string RunIdOfMonday;
+		public static string MondayString => Monday.ToString("yyyy-MM-dd");
 
 		/// <summary>
 		/// 当前月份的第一天
 		/// </summary>
-		public static DateTime FirstDayOfTheMonth;
-
-		/// <summary>
-		/// 当前月份的第一天
-		/// </summary>
-		public static DateTime LastDayOfTheMonth;
+		public static DateTime FirstDayOfMonth
+		{
+			get
+			{
+				var now = DateTime.Now.Date;
+				return now.AddDays(now.Day * -1 + 1);
+			}
+		}
 
 		/// <summary>
 		/// 当前月份的最后一天
 		/// </summary>
-		public static DateTime FirstDayOfLastMonth;
+		public static DateTime LastDayOfMonth => FirstDayOfMonth.AddMonths(1).AddDays(-1);
+
 
 		/// <summary>
-		/// 前一月份的最后一天
+		/// 上一月份的第一天
 		/// </summary>
-		public static DateTime LastDayOfLastMonth;
+		public static DateTime FirstDayOfLastMonth => FirstDayOfMonth.AddMonths(-1);
+
+		/// <summary>
+		/// 上一月份的最后一天
+		/// </summary>
+		public static DateTime LastDayOfLastMonth => FirstDayOfMonth.AddDays(-1);
 
 		/// <summary>
 		/// 星期一
 		/// </summary>
-		public static DateTime Today => DateTime.Now;
+		public static DateTime Today => DateTime.Now.Date;
 
 		/// <summary>
 		/// 星期一
 		/// </summary>
-		public static DateTime Monday;
+		public static DateTime Monday
+		{
+			get
+			{
+				var now = DateTime.Now;
+				var i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
+				var ts = new TimeSpan(i, 0, 0, 0);
+
+				return now.Subtract(ts).Date;
+			}
+		}
 
 		/// <summary>
 		/// 星期二
 		/// </summary>
-		public static DateTime Tuesday;
+		public static DateTime Tuesday => Monday.AddDays(1);
 
 		/// <summary>
 		/// 星期三
 		/// </summary>
-		public static DateTime Wednesday;
+		public static DateTime Wednesday => Monday.AddDays(2);
 
 		/// <summary>
 		/// 星期四
 		/// </summary>
-		public static DateTime Thursday;
+		public static DateTime Thursday => Monday.AddDays(3);
 
 		/// <summary>
 		/// 星期五
 		/// </summary>
-		public static DateTime Friday;
+		public static DateTime Friday => Monday.AddDays(4);
 
 		/// <summary>
 		/// 星期六
 		/// </summary>
-		public static DateTime Saturday;
+		public static DateTime Saturday => Monday.AddDays(5);
 
 		/// <summary>
 		/// 星期天
 		/// </summary>
-		public static DateTime Sunday;
-
-		/// <summary>
-		/// 上周的星期一
-		/// </summary>
-		public static DateTime LastMonday;
-
-		/// <summary>
-		/// 上周的星期二
-		/// </summary>
-		public static DateTime LastTuesday;
-
-		/// <summary>
-		/// 上周的星期三
-		/// </summary>
-		public static DateTime LastWednesday;
-
-		/// <summary>
-		/// 上周的星期四
-		/// </summary>
-		public static DateTime LastThursday;
-
-		/// <summary>
-		/// 上周的星期五
-		/// </summary>
-		public static DateTime LastFriday;
-
-		/// <summary>
-		/// 上周的星期六
-		/// </summary>
-		public static DateTime LastSaturday;
-
-		/// <summary>
-		/// 上周的星期天
-		/// </summary>
-		public static DateTime LastSunday;
-
-		/// <summary>
-		/// 下周的星期一
-		/// </summary>
-		public static DateTime NextMonday;
-
-		/// <summary>
-		/// 下周的星期二
-		/// </summary>
-		public static DateTime NextTuesday;
-
-		/// <summary>
-		/// 下周的星期三
-		/// </summary>
-		public static DateTime NextWednesday;
-
-		/// <summary>
-		/// 下周的星期四
-		/// </summary>
-		public static DateTime NextThursday;
-
-		/// <summary>
-		/// 下周的星期五
-		/// </summary>
-		public static DateTime NextFriday;
-
-		/// <summary>
-		/// 下周的星期六
-		/// </summary>
-		public static DateTime NextSaturday;
-
-		/// <summary>
-		/// 下周的星期天
-		/// </summary>
-		public static DateTime NextSunday;
+		public static DateTime Sunday => Monday.AddDays(6);
 
 		/// <summary>
 		/// 把时间转换成Unix时间: 1515133023012
@@ -162,7 +111,8 @@ namespace DotnetSpider.Core
 		/// <returns>Unix时间</returns>
 		public static string ConvertDateTimeToUnix(DateTime time)
 		{
-			return time.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds
+			return time.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
+				.TotalMilliseconds
 				.ToString("f0");
 		}
 
@@ -193,47 +143,6 @@ namespace DotnetSpider.Core
 		{
 			return DateTime.Now.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
 				.TotalMilliseconds;
-		}
-
-		static DateTimeHelper()
-		{
-			var now = DateTime.Now.Date;
-
-			FirstDayOfTheMonth = now.AddDays(now.Day * -1 + 1);
-			LastDayOfTheMonth = FirstDayOfTheMonth.AddMonths(1).AddDays(-1);
-			FirstDayOfLastMonth = FirstDayOfTheMonth.AddMonths(-1);
-			LastDayOfLastMonth = FirstDayOfTheMonth.AddDays(-1);
-
-			int i = now.DayOfWeek - DayOfWeek.Monday == -1 ? 6 : -1;
-			TimeSpan ts = new TimeSpan(i, 0, 0, 0);
-
-			Monday = now.Subtract(ts).Date;
-			Tuesday = Monday.AddDays(1);
-			Wednesday = Monday.AddDays(2);
-			Thursday = Monday.AddDays(3);
-			Friday = Monday.AddDays(4);
-			Saturday = Monday.AddDays(5);
-			Sunday = Monday.AddDays(6);
-
-			LastMonday = Monday.AddDays(-7);
-			LastTuesday = LastMonday.AddDays(1);
-			LastWednesday = LastMonday.AddDays(2);
-			LastThursday = LastMonday.AddDays(3);
-			LastFriday = LastMonday.AddDays(4);
-			LastSaturday = LastMonday.AddDays(5);
-			LastSunday = LastMonday.AddDays(6);
-
-			NextMonday = Sunday.AddDays(1);
-			NextTuesday = Monday.AddDays(1);
-			NextWednesday = Monday.AddDays(2);
-			NextThursday = Monday.AddDays(3);
-			NextFriday = Monday.AddDays(4);
-			NextSaturday = Monday.AddDays(5);
-			NextSunday = Monday.AddDays(6);
-
-			RunIdOfToday = now.ToString("yyyy-MM-dd");
-			RunIdOfMonthly = FirstDayOfTheMonth.ToString("yyyy-MM-dd");
-			RunIdOfMonday = Monday.ToString("yyyy-MM-dd");
 		}
 	}
 }

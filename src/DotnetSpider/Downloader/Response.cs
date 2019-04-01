@@ -1,5 +1,8 @@
 namespace DotnetSpider.Downloader
 {
+	/// <summary>
+	/// 下载结果
+	/// </summary>
     public class Response
     {
         /// <summary>

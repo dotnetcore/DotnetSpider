@@ -1,5 +1,8 @@
 namespace DotnetSpider.Data.Storage
 {
+	/// <summary>
+	/// 存储器类型
+	/// </summary>
     public enum StorageType
     {
         /// <summary>

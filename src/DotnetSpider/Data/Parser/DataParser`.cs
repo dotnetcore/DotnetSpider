@@ -8,11 +8,18 @@ using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Data.Parser
 {
+	/// <summary>
+	/// 实体解析器
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public class DataParser<T> : DataParser where T : EntityBase<T>, new()
 	{
 		private readonly Model<T> _model;
 		private readonly TableMetadata _tableMetadata;
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
 		public DataParser()
 		{
 			_model = new Model<T>();
@@ -45,7 +52,7 @@ namespace DotnetSpider.Data.Parser
 			}
 
 			var environments = new Dictionary<string, string>();
-			foreach (var property in context.Response.Request.Properties)
+			foreach (var property in context.Response.Request.GetProperties())
 			{
 				environments.Add(property.Key, property.Value);
 			}
@@ -186,17 +193,17 @@ namespace DotnetSpider.Data.Parser
 					{
 						foreach (var formatter in field.Formatters)
 						{
-#if DEBUG
-                            try
-                            {
-#endif
+#if !DEBUG
 							value = formatter.Format(value);
-#if DEBUG
-                            }
-                            catch (Exception e)
-                            {
-                                Debugger.Log(0, "ERROR", $"数据格式化失败: {e}");
-                            }
+#else
+							try
+							{
+								value = formatter.Format(value);
+							}
+							catch (Exception e)
+							{
+								Logger?.LogDebug($"数据格式化失败: {e}");
+							}
 #endif
 						}
 					}

@@ -12,16 +12,32 @@ namespace DotnetSpider.Downloader
 {
     /// <summary>
     /// 下载中心
-    /// 
     /// </summary>
     public abstract class DownloadCenterBase : IDownloadCenter
     {
         private bool _isRunning;
 
+        /// <summary>
+        /// 消息队列
+        /// </summary>
         protected readonly IMessageQueue Mq;
+        
+        /// <summary>
+        /// 日志接口
+        /// </summary>
         protected readonly ILogger Logger;
+        
+        /// <summary>
+        /// 下载器代理存储
+        /// </summary>
         protected readonly IDownloaderAgentStore DownloaderAgentStore;
 
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="mq">消息队列</param>
+        /// <param name="downloaderAgentStore">下载器代理存储</param>
+        /// <param name="logger">日志接口</param>
         protected DownloadCenterBase(
             IMessageQueue mq,
             IDownloaderAgentStore downloaderAgentStore,
@@ -32,6 +48,11 @@ namespace DotnetSpider.Downloader
             Logger = logger;
         }
 
+        /// <summary>
+        /// 分配下载器代理
+        /// </summary>
+        /// <param name="allotDownloaderMessage">分配下载器代理的选项</param>
+        /// <returns></returns>
         protected virtual async Task<bool> AllocateAsync(AllotDownloaderMessage allotDownloaderMessage)
         {
             List<DownloaderAgent> agents = null;
@@ -68,6 +89,12 @@ namespace DotnetSpider.Downloader
             return true;
         }
 
+        /// <summary>
+        /// 把下载请求推送到下载器代理
+        /// </summary>
+        /// <param name="ownerId">任务标识</param>
+        /// <param name="requests">请求</param>
+        /// <returns></returns>
         protected virtual async Task EnqueueRequests(string ownerId, IEnumerable<Request> requests)
         {
             // 本机下载中心只会有一个下载代理

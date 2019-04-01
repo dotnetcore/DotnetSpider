@@ -5,6 +5,9 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Downloader
 {
+	/// <summary>
+	/// 下载器配置
+	/// </summary>
     public class DownloaderSettings
     {
         /// <summary>
@@ -12,20 +15,44 @@ namespace DotnetSpider.Downloader
         /// </summary>
         private readonly HashSet<Cookie> _cookies = new HashSet<Cookie>();
 
+        /// <summary>
+        /// 下载器类型
+        /// </summary>
         public DownloaderType Type { get; set; } = DownloaderType.HttpClient;
 
+        /// <summary>
+        /// Cookie
+        /// </summary>
         public Cookie[] Cookies => _cookies.ToArray();
 
+        /// <summary>
+        /// 是否使用代理
+        /// </summary>
         public bool UseProxy { get; set; } = false;
 
+        /// <summary>
+        /// 是否使用 Cookie
+        /// </summary>
         public bool UseCookies { get; set; } = true;
 
+        /// <summary>
+        /// 是否自动跳转
+        /// </summary>
         public bool AllowAutoRedirect { get; set; } = true;
 
+        /// <summary>
+        /// 下载超时
+        /// </summary>
         public int Timeout { get; set; } = 5000;
 
+        /// <summary>
+        /// 是否进行 HTML 转码
+        /// </summary>
         public bool DecodeHtml { get; set; }
 
+        /// <summary>
+        /// 所需分配的下载器字数
+        /// </summary>
         public int DownloaderCount { get; set; }
 
         /// <summary>

@@ -12,60 +12,71 @@ using MongoDB.Driver;
 // ReSharper disable once CheckNamespace
 namespace DotnetSpider.Data.Storage
 {
-    /// <summary>
-    /// MongoDB 存储器
-    /// TODO: 是否要考虑存储模式：插入，新的插入旧的更新，更新 ETC
-    /// </summary>
-    public class MongoEntityStorage : EntityStorageBase
-    {
-        private readonly IMongoClient _client;
+	/// <summary>
+	/// MongoDB 保存解析(实体)结果 TODO: 是否要考虑存储模式：插入，新的插入旧的更新，更新 ETC
+	/// </summary>
+	public class MongoEntityStorage : EntityStorageBase
+	{
+		private readonly IMongoClient _client;
 
-        private readonly ConcurrentDictionary<string, IMongoDatabase> _cache =
-            new ConcurrentDictionary<string, IMongoDatabase>();
+		private readonly ConcurrentDictionary<string, IMongoDatabase> _cache =
+			new ConcurrentDictionary<string, IMongoDatabase>();
 
-        public static MongoEntityStorage CreateFromOptions(ISpiderOptions options)
-        {
-            return new MongoEntityStorage(options.ConnectionString);
-        }
+		/// <summary>
+		/// 根据配置返回存储器
+		/// </summary>
+		/// <param name="options">配置</param>
+		/// <returns></returns>
+		public static MongoEntityStorage CreateFromOptions(ISpiderOptions options)
+		{
+			return new MongoEntityStorage(options.ConnectionString);
+		}
 
-        public MongoEntityStorage(string connectionString)
-        {
-            ConnectionString = connectionString;
-            _client = new MongoClient(connectionString);
-        }
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="connectionString">连接字符串</param>
+		public MongoEntityStorage(string connectionString)
+		{
+			ConnectionString = connectionString;
+			_client = new MongoClient(connectionString);
+		}
 
-        internal MongoEntityStorage(IMongoClient mongoClient)
-        {
-            _client = mongoClient;
-        }
+		internal MongoEntityStorage(IMongoClient mongoClient)
+		{
+			_client = mongoClient;
+		}
 
-        public string ConnectionString { get; }
-        
-        protected override async Task<DataFlowResult> Store(DataFlowContext context)
-        {
-            var items = context.GetItems();
-            foreach (var item in items)
-            {
-                var tableMetadata = (TableMetadata) context[item.Key];
+		/// <summary>
+		/// 连接字符串
+		/// </summary>
+		public string ConnectionString { get; }
 
-                if (!_cache.ContainsKey(tableMetadata.Schema.Database))
-                {
-                    _cache.TryAdd(tableMetadata.Schema.Database, _client.GetDatabase(tableMetadata.Schema.Database));
-                }
+		protected override async Task<DataFlowResult> Store(DataFlowContext context)
+		{
+			var items = context.GetItems();
+			foreach (var item in items)
+			{
+				var tableMetadata = (TableMetadata) context[item.Key];
 
-                var db = _cache[tableMetadata.Schema.Database];
-                var collection = db.GetCollection<BsonDocument>(tableMetadata.Schema.Table);
+				if (!_cache.ContainsKey(tableMetadata.Schema.Database))
+				{
+					_cache.TryAdd(tableMetadata.Schema.Database, _client.GetDatabase(tableMetadata.Schema.Database));
+				}
 
-                var bsonDocs = new List<BsonDocument>();
-                foreach (var data in item.Value)
-                {
-                    bsonDocs.Add(BsonDocument.Create(data));
-                }
+				var db = _cache[tableMetadata.Schema.Database];
+				var collection = db.GetCollection<BsonDocument>(tableMetadata.Schema.Table);
 
-                await collection.InsertManyAsync(bsonDocs);
-            }
+				var bsonDocs = new List<BsonDocument>();
+				foreach (var data in item.Value)
+				{
+					bsonDocs.Add(BsonDocument.Create(data));
+				}
 
-            return DataFlowResult.Success;
-        }
-    }
+				await collection.InsertManyAsync(bsonDocs);
+			}
+
+			return DataFlowResult.Success;
+		}
+	}
 }

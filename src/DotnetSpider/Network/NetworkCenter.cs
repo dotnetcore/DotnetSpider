@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Network
 {
+	/// <summary>
+	/// 网络中心(只在下载器代理中使用)
+	/// </summary>
 	public class NetworkCenter
 	{
 		private readonly string _sessionsFolder;
@@ -18,8 +21,19 @@ namespace DotnetSpider.Network
 		private readonly IInternetDetector _internetDetector;
 		private const string RedialLocker = "REDIAL";
 
+		/// <summary>
+		/// 是否支持 ADSL 拨号
+		/// </summary>
 		public bool SupportAdsl => _options.SupportAdsl;
 
+		/// <summary>
+		/// 网络中心
+		/// </summary>
+		/// <param name="redialer">拨号器</param>
+		/// <param name="internetDetector">网络检测器</param>
+		/// <param name="lockerFactory">Locker 工厂</param>
+		/// <param name="options">下载器代理选项</param>
+		/// <param name="logger">日志接口</param>
 		public NetworkCenter(
 			IAdslRedialer redialer,
 			IInternetDetector internetDetector,
@@ -40,6 +54,10 @@ namespace DotnetSpider.Network
 			}
 		}
 
+		/// <summary>
+		/// 进行拨号
+		/// </summary>
+		/// <exception cref="SpiderException"></exception>
 		public void Redial()
 		{
 			if (!_options.SupportAdsl)
@@ -102,6 +120,10 @@ namespace DotnetSpider.Network
 			}
 		}
 
+		/// <summary>
+		/// 通过网络中心执行操作，避免网络中断导致异常
+		/// </summary>
+		/// <param name="action"></param>
 		public void Execute(Action action)
 		{
 			if (!SupportAdsl)
@@ -127,6 +149,12 @@ namespace DotnetSpider.Network
 			}
 		}
 
+		/// <summary>
+		/// 通过网络中心执行操作，避免网络中断导致异常
+		/// </summary>
+		/// <param name="func"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
 		public T Execute<T>(Func<T> func)
 		{
 			if (!SupportAdsl)

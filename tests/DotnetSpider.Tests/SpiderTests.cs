@@ -1,14 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using DotnetSpider.Core;
 using DotnetSpider.Data.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace DotnetSpider.Tests

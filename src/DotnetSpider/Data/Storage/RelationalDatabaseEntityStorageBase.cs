@@ -11,6 +11,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Data.Storage
 {
+	/// <summary>
+	/// 关系型数据库保存实体解析结果
+	/// </summary>
     public abstract class RelationalDatabaseEntityStorageBase : EntityStorageBase
     {
         private readonly Dictionary<string, SqlStatements> _sqlStatements = new Dictionary<string, SqlStatements>();
@@ -25,10 +28,25 @@ namespace DotnetSpider.Data.Storage
         protected const string LongType = "Int64";
         protected const string ByteType = "Byte";
 
+        /// <summary>
+        /// 创建数据库连接接口
+        /// </summary>
+        /// <param name="connectString">连接字符串</param>
+        /// <returns></returns>
         protected abstract IDbConnection CreateDbConnection(string connectString);
 
+        /// <summary>
+        /// 生成 SQL 语句
+        /// </summary>
+        /// <param name="tableMetadata">表元数据</param>
+        /// <returns></returns>
         protected abstract SqlStatements GenerateSqlStatements(TableMetadata tableMetadata);
 
+        /// <summary>
+        /// 创建数据库和表
+        /// </summary>
+        /// <param name="conn">数据库连接</param>
+        /// <param name="sqlStatements">SQL 语句</param>
         protected virtual void EnsureDatabaseAndTableCreated(IDbConnection conn,
             SqlStatements sqlStatements)
         {
@@ -40,6 +58,11 @@ namespace DotnetSpider.Data.Storage
             conn.Execute(sqlStatements.CreateTableSql);
         }
 
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="storageType">存储器类型</param>
+        /// <param name="connectionString">连接字符串</param>
         protected RelationalDatabaseEntityStorageBase(StorageType storageType,
             string connectionString = null)
         {
@@ -47,10 +70,19 @@ namespace DotnetSpider.Data.Storage
             StorageType = storageType;
         }
 
+        /// <summary>
+        /// 存储器类型
+        /// </summary>
         public StorageType StorageType { get; set; }
 
+        /// <summary>
+        /// 数据库操作重试次数
+        /// </summary>
         public int RetryTimes { get; set; } = 600;
 
+        /// <summary>
+        /// 连接字符串
+        /// </summary>
         public string ConnectionString { get; }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace DotnetSpider.Data.Parser
 		public Func<DataFlowContext, List<string>> QueryFollowRequests { get; set; }
 
 		/// <summary>
-		/// 当前请求的内容构造的选择器
+		/// 选择器的生成方法
 		/// </summary>
 		public Func<DataFlowContext, ISelectable> SelectableFactory { get; set; }
 
@@ -106,7 +106,7 @@ namespace DotnetSpider.Data.Parser
 		protected virtual Request CreateFromRequest(Request current, string url)
 		{
 			// TODO: 确认需要复制哪些字段
-			var request = new Request(url, current.Properties)
+			var request = new Request(url, current.GetProperties())
 			{
 				Url = url,
 				Depth = current.Depth,

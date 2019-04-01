@@ -7,6 +7,9 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Downloader
 {
+	/// <summary>
+	/// 验证代理是否正常
+	/// </summary>
     public class DefaultProxyValidator : IProxyValidator
     {
         private readonly string _targetUrl;

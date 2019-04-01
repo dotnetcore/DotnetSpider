@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Network;
 using LZ4;
 using Microsoft.Extensions.Logging;
 using Cookie = DotnetSpider.Core.Cookie;

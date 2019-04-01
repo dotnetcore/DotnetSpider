@@ -13,7 +13,10 @@ using Newtonsoft.Json;
 
 namespace DotnetSpider.Downloader
 {
-	internal abstract class DownloaderAgentBase : IDownloaderAgent
+	/// <summary>
+	/// 下载代理器
+	/// </summary>
+	public abstract class DownloaderAgentBase : IDownloaderAgent
 	{
 		private bool _isRunning;
 
@@ -29,20 +32,31 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		protected ILogger Logger { get; }
 
+		/// <summary>
+		/// 配置下载器
+		/// </summary>
 		protected Action<IDownloader> ConfigureDownloader { get; set; }
 
+		/// <summary>
+		/// 构造方法
+		/// </summary>
+		/// <param name="options">下载器代理选项</param>
+		/// <param name="mq">消息队列</param>
+		/// <param name="downloaderAllocator">分配下载器的接口</param>
+		/// <param name="networkCenter">网络中心</param>
+		/// <param name="logger">日志接口</param>
 		protected DownloaderAgentBase(
 			IDownloaderAgentOptions options,
 			IMessageQueue mq,
 			IDownloaderAllocator downloaderAllocator,
 			NetworkCenter networkCenter,
-			ILoggerFactory loggerFactory)
-		{			
+			ILogger logger)
+		{
 			_mq = mq;
 			_downloaderAllocator = downloaderAllocator;
 			_options = options;
 			Framework.NetworkCenter = networkCenter;
-			Logger = loggerFactory.CreateLogger(GetType().FullName);
+			Logger = logger;
 		}
 
 		public async Task StartAsync(CancellationToken cancellationToken)
