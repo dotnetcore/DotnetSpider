@@ -4,74 +4,94 @@ using Microsoft.Extensions.Configuration;
 
 namespace DotnetSpider.Core
 {
-    public interface ISpiderOptions
-    {
-        string ConnectionString { get; }
+	/// <summary>
+	/// 任务选项
+	/// </summary>
+	public class SpiderOptions : ISpiderOptions
+	{
+		private readonly IConfiguration _configuration;
 
-        string Storage { get; }
+		/// <summary>
+		/// 数据库连接字符串
+		/// </summary>
+		public string StorageConnectionString => _configuration["StorageConnectionString"];
 
-        StorageType StorageType { get; }
+		/// <summary>
+		/// 存储器类型: FullTypeName, AssemblyName
+		/// </summary>
+		public string Storage => _configuration["Storage"];
 
-        string MySqlFileType { get; }
+		/// <summary>
+		/// 是否忽略数据库相关的大写小
+		/// </summary>
+		public bool StorageIgnoreCase => string.IsNullOrWhiteSpace(_configuration["IgnoreCase"]) ||
+		                                 bool.Parse(_configuration["StorageIgnoreCase"]);
 
-        bool IgnoreCase { get; }
+		/// <summary>
+		/// 存储器失败重试次数限制
+		/// </summary>
+		public int StorageRetryTimes => string.IsNullOrWhiteSpace(_configuration["StorageRetryTimes"])
+			? 600
+			: int.Parse(_configuration["StorageRetryTimes"]);
 
-        int StorageRetryTimes { get; }
+		/// <summary>
+		/// 是否使用事务操作。默认不使用。
+		/// </summary>
+		public bool StorageUseTransaction => !string.IsNullOrWhiteSpace(_configuration["StorageUseTransaction"]) &&
+		                                     bool.Parse(_configuration["StorageUseTransaction"]);
 
-        /// <summary>
-        /// 是否使用事务操作。默认不使用。
-        /// </summary>
-        bool StorageUseTransaction { get; }
+		/// <summary>
+		/// 存储器类型
+		/// </summary>
+		public StorageType StorageType => string.IsNullOrWhiteSpace(_configuration["StorageType"])
+			? StorageType.InsertIgnoreDuplicate
+			: (StorageType) Enum.Parse(typeof(StorageType), _configuration["StorageType"]);
 
-        string EmailHost { get; }
+		/// <summary>
+		/// MySql 文件类型
+		/// </summary>
+		public string MySqlFileType => _configuration["MySqlFileType"];
 
-        string EmailAccount { get; }
+		/// <summary>
+		/// 邮件服务地址
+		/// </summary>
+		public string EmailHost => _configuration["EmailHost"];
 
-        string EmailPassword { get; }
+		/// <summary>
+		/// 邮件用户名
+		/// </summary>
+		public string EmailAccount => _configuration["EmailAccount"];
 
-        string EmailDisplayName { get; }
+		/// <summary>
+		/// 邮件密码
+		/// </summary>
+		public string EmailPassword => _configuration["EmailPassword"];
 
-        string EmailPort { get; }
-    }
+		/// <summary>
+		/// 邮件显示名称
+		/// </summary>
+		public string EmailDisplayName => _configuration["EmailDisplayName"];
 
+		/// <summary>
+		/// 邮件服务端口
+		/// </summary>
+		public string EmailPort => _configuration["EmailPort"];
 
-    public class SpiderOptions : ISpiderOptions
-    {
-        private readonly IConfiguration _configuration;
+		/// <summary>
+		/// Kafka 服务地址
+		/// </summary>
+		public string KafkaBootstrapServers => _configuration["KafkaBootstrapServers"];
 
-        public string ConnectionString => _configuration["ConnectionString"];
+		/// <summary>
+		/// Kafka 消费组
+		/// </summary>
+		public string KafkaConsumerGroup => string.IsNullOrWhiteSpace(_configuration["KafkaConsumerGroup"])
+			? "DotnetSpider"
+			: _configuration["KafkaConsumerGroup"];
 
-        public string Storage => _configuration["Storage"];
-
-        public bool IgnoreCase => string.IsNullOrWhiteSpace(_configuration["IgnoreCase"]) ||
-                                  bool.Parse(_configuration["IgnoreCase"]);
-
-        public int StorageRetryTimes => string.IsNullOrWhiteSpace(_configuration["StorageRetryTimes"])
-            ? 600
-            : int.Parse(_configuration["StorageRetryTimes"]);
-
-        public bool StorageUseTransaction => !string.IsNullOrWhiteSpace(_configuration["StorageUseTransaction"]) &&
-                                             bool.Parse(_configuration["StorageUseTransaction"]);
-
-        public StorageType StorageType => string.IsNullOrWhiteSpace(_configuration["StorageType"])
-            ? StorageType.InsertIgnoreDuplicate
-            : (StorageType) Enum.Parse(typeof(StorageType), _configuration["StorageType"]);
-
-        public string MySqlFileType => _configuration["MySqlFileType"];
-
-        public string EmailHost => _configuration["EmailHost"];
-
-        public string EmailAccount => _configuration["EmailAccount"];
-
-        public string EmailPassword => _configuration["EmailPassword"];
-
-        public string EmailDisplayName => _configuration["EmailDisplayName"];
-
-        public string EmailPort => _configuration["EmailPort"];
-
-        public SpiderOptions(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-    }
+		public SpiderOptions(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+	}
 }

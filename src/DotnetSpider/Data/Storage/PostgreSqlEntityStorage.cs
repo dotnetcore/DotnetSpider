@@ -14,9 +14,9 @@ namespace DotnetSpider.Data.Storage
 	    /// <returns></returns>
         public new static PostgreSqlEntityStorage CreateFromOptions(ISpiderOptions options)
         {
-            return new PostgreSqlEntityStorage(options.StorageType, options.ConnectionString)
+            return new PostgreSqlEntityStorage(options.StorageType, options.StorageConnectionString)
             {
-                IgnoreCase = options.IgnoreCase,
+                IgnoreCase = options.StorageIgnoreCase,
                 RetryTimes = options.StorageRetryTimes,
                 UseTransaction = options.StorageUseTransaction
             };

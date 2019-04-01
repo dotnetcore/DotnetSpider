@@ -9,7 +9,7 @@ namespace DotnetSpider.MessageQueue
 	/// <summary>
 	/// 简化版的本地消息队列
 	/// 1. 发布会把消息推送到所有订阅了对应 topic 的消费者
-	/// 2. 只能对 topic 做取消订阅，会导致所有订阅都取消。 TODO: 是否需要考虑做指定取消定阅？
+	/// 2. 只能对 topic 做取消订阅，会导致所有订阅都取消。
 	/// </summary>
 	public class LocalMessageQueue : IMessageQueue
 	{

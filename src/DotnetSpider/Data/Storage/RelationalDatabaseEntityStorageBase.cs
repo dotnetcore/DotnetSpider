@@ -230,9 +230,9 @@ namespace DotnetSpider.Data.Storage
                 }
 
                 var options = context.Services.GetRequiredService<ISpiderOptions>();
-                if (!string.IsNullOrWhiteSpace(options.ConnectionString))
+                if (!string.IsNullOrWhiteSpace(options.StorageConnectionString))
                 {
-                    var conn = TryCreateDbConnection(options.ConnectionString);
+                    var conn = TryCreateDbConnection(options.StorageConnectionString);
                     if (conn != null)
                     {
                         return conn;

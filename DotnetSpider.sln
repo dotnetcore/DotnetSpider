@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.ExcelExpressio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Mongo", "src\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj", "{0DFD28D7-E0E8-4F81-84E9-DB6EA497F08C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Kafka", "src\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj", "{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{0DFD28D7-E0E8-4F81-84E9-DB6EA497F08C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DFD28D7-E0E8-4F81-84E9-DB6EA497F08C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DFD28D7-E0E8-4F81-84E9-DB6EA497F08C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C} = {31B052DB-A9AA-49F5-AE8C-1660546A8903}

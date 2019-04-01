@@ -34,9 +34,9 @@ namespace DotnetSpider.Data.Storage
 		/// <returns></returns>
 		public static SqlServerEntityStorage CreateFromOptions(ISpiderOptions options)
 		{
-			var storage = new SqlServerEntityStorage(options.StorageType, options.ConnectionString)
+			var storage = new SqlServerEntityStorage(options.StorageType, options.StorageConnectionString)
 			{
-				IgnoreCase = options.IgnoreCase,
+				IgnoreCase = options.StorageIgnoreCase,
 				RetryTimes = options.StorageRetryTimes,
 				UseTransaction = options.StorageUseTransaction
 			};

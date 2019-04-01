@@ -20,9 +20,9 @@ namespace DotnetSpider.Data.Storage
 		/// <returns></returns>
 		public static MySqlEntityStorage CreateFromOptions(ISpiderOptions options)
 		{
-			var storage = new MySqlEntityStorage(options.StorageType, options.ConnectionString)
+			var storage = new MySqlEntityStorage(options.StorageType, options.StorageConnectionString)
 			{
-				IgnoreCase = options.IgnoreCase,
+				IgnoreCase = options.StorageIgnoreCase,
 				RetryTimes = options.StorageRetryTimes,
 				UseTransaction = options.StorageUseTransaction
 			};

@@ -107,11 +107,6 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static DotnetSpiderBuilder UserKafka(this DotnetSpiderBuilder builder)
-		{
-			return builder;
-		}
-
 		#endregion
 
 		#region DownloaderAgent

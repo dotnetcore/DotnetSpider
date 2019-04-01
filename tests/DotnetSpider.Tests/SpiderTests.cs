@@ -12,11 +12,11 @@ namespace DotnetSpider.Tests
 	{
 		class MyStorageOptions : ISpiderOptions
 		{
-			public string ConnectionString { get; set; }
+			public string StorageConnectionString { get; set; }
 			public string Storage { get; set; }
 			public StorageType StorageType { get; set; }
 			public string MySqlFileType { get; set; }
-			public bool IgnoreCase { get; set; }
+			public bool StorageIgnoreCase { get; set; }
 			public int StorageRetryTimes { get; set; }
 			public bool StorageUseTransaction { get; set; }
 			public string EmailHost { get; }
@@ -24,6 +24,8 @@ namespace DotnetSpider.Tests
 			public string EmailPassword { get; }
 			public string EmailDisplayName { get; }
 			public string EmailPort { get; }
+			public string KafkaBootstrapServers { get; }
+			public string KafkaConsumerGroup { get; }
 		}
 
 		[Fact(DisplayName = "CreateDefaultStorage")]
@@ -33,10 +35,10 @@ namespace DotnetSpider.Tests
 			{
 				Storage = "DotnetSpider.Data.Storage.SqlServerEntityStorage,DotnetSpider",
 				StorageType = StorageType.InsertAndUpdate,
-				ConnectionString = "ConnectionString",
+				StorageConnectionString = "ConnectionString",
 				StorageUseTransaction = true,
 				StorageRetryTimes = 800,
-				IgnoreCase = false
+				StorageIgnoreCase = false
 			};
 			// SqlServer
 			var storage1 = (SqlServerEntityStorage) Spider.GetDefaultStorage(options);
@@ -76,7 +78,7 @@ namespace DotnetSpider.Tests
 
 			// Mongo
 			options.Storage = "DotnetSpider.Data.Storage.MongoEntityStorage,DotnetSpider.Mongo";
-			options.ConnectionString = "mongodb://mongodb0.example.com:27017/admin";
+			options.StorageConnectionString = "mongodb://mongodb0.example.com:27017/admin";
 
 			var storage5 = (MongoEntityStorage) Spider.GetDefaultStorage(options);
 			Assert.Equal("mongodb://mongodb0.example.com:27017/admin", storage5.ConnectionString);

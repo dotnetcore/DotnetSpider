@@ -5,6 +5,7 @@ namespace DotnetSpider.MessageQueue
 {
 	/// <summary>
 	/// 消息队列接口
+	/// 因为业务上所有定阅都不需要负载，因此不存在多个客户端订阅同一个 topic 的情况，不需要 Unsubscribe 的实现
 	/// </summary>
 	public interface IMessageQueue
 	{

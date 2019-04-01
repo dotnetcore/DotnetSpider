@@ -29,7 +29,7 @@ namespace DotnetSpider.Data.Storage
 		/// <returns></returns>
 		public static MongoEntityStorage CreateFromOptions(ISpiderOptions options)
 		{
-			return new MongoEntityStorage(options.ConnectionString);
+			return new MongoEntityStorage(options.StorageConnectionString);
 		}
 
 		/// <summary>

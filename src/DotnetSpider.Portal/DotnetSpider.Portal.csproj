@@ -16,6 +16,7 @@
 
 
     <ItemGroup>
+      <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
       <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
     </ItemGroup>
 

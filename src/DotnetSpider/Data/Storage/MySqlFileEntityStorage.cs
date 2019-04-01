@@ -55,7 +55,7 @@ namespace DotnetSpider.Data.Storage
 					options.MySqlFileType);
 			return new MySqlFileEntityStorage(fileType)
 			{
-				IgnoreCase = options.IgnoreCase
+				IgnoreCase = options.StorageIgnoreCase
 			};
 		}
 

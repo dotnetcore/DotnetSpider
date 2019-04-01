@@ -3,9 +3,11 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp2.2</TargetFramework>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
         <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
         <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
     </ItemGroup>
@@ -17,6 +19,7 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="Confluent.Kafka" Version="1.0.0-RC2" />
         <PackageReference Include="xunit" Version="2.4.1" />
     </ItemGroup>
 
