@@ -32,10 +32,7 @@ steps:
     displayName: 'DeployMysql'
 
   - script: sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
-    displayName: 'DeploySqlserver'
-  
-  - script: sudo docker run -d --net bridge -p 2181:2181 -p 9092:9092 --env ADVERTISED_PORT=9092 spotify/kafka
-    displayName: 'KafkaInstaller'  
+    displayName: 'DeploySqlserver' 
 
   - task: DotNetCoreInstaller@0
     inputs:
