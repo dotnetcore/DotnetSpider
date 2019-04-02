@@ -20,6 +20,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
         <ProjectReference Include="..\..\src\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
+        <ProjectReference Include="..\..\src\DotnetSpider.Postgre\DotnetSpider.Postgre.csproj" />
         <ProjectReference Include="..\..\src\DotnetSpider\DotnetSpider.csproj" />
     </ItemGroup>
 

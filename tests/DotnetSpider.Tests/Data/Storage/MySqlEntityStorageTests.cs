@@ -19,9 +19,26 @@ namespace DotnetSpider.Tests.Data.Storage
 
 		class IndexInfo
 		{
-			public string CONSTRAINT_TYPE { get; set; }
+			// ReSharper disable once InconsistentNaming
+			// ReSharper disable once UnusedAutoPropertyAccessor.Local
+			public int Non_unique { get; set; }
+			
+			// ReSharper disable once InconsistentNaming			
+			// ReSharper disable once UnusedAutoPropertyAccessor.Local
+			public string Key_name { get; set; }
+			
+			// ReSharper disable once InconsistentNaming
+			// ReSharper disable once UnusedAutoPropertyAccessor.Local
+			public string Column_name { get; set; }
+		}
+
+		class PrimaryInfo
+		{
+			// ReSharper disable once InconsistentNaming
+			// ReSharper disable once UnusedAutoPropertyAccessor.Local
 			public string COLUMN_NAME { get; set; }
 		}
+
 
 		protected virtual string GetConnectionString()
 		{
@@ -39,70 +56,19 @@ namespace DotnetSpider.Tests.Data.Storage
 			return new MySqlEntityStorage(type, GetConnectionString());
 		}
 
-		class CreateTableEntity1 : EntityBase<CreateTableEntity1>
-		{
-			public string Str1 { get; set; } = "xxx";
-
-			[StringLength(100)] public string Str2 { get; set; } = "yyy";
-
-			[Required] public int Required { get; set; } = 655;
-
-			public decimal Decimal { get; set; }
-
-			public long Long { get; set; } = 600;
-
-			public double Double { get; set; } = 400;
-
-			public DateTime DateTime { get; set; } = DateTime.Now;
-
-			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
-
-			public float Float { get; set; } = 200.0F;
-		}
-
-		[Fact(DisplayName = "CreateTableIndex")]
-		public void CreateTableIndex()
-		{
-		}
-
-		[Fact(DisplayName = "CreateTableMultiIndex")]
-		public void CreateTableMultiIndex()
-		{
-		}
-
-		[Fact(DisplayName = "CreateTableMultiColumnsIndex")]
-		public void CreateTableMultiColumnsIndex()
-		{
-		}
-
-		[Fact(DisplayName = "CreateTableUnique")]
-		public void CreateTableUnique()
-		{
-		}
-
-		[Fact(DisplayName = "CreateTableMultiUnique")]
-		public void CreateTableMultiUnique()
-		{
-		}
-
-		[Fact(DisplayName = "CreateTableMultiColumnsUnique")]
-		public void CreateTableMultiColumnsUnique()
-		{
-		}
-
 		/// <summary>
 		/// 测试能正确创建 MySql 表
 		/// 1. 如果实体的 Schema 没有配置表名，则使用类名
 		/// 2. 如果实体的 Schema 配置了表名，则使用配置的表名
 		/// 3. 是否有正确添加表的后缀
 		/// </summary>
-		[Fact(DisplayName = "CreateTableNoSchema")]
-		public async Task CreateTableNoSchema()
+		[Fact(DisplayName = "CreateTableWhenNoSchema")]
+		public async Task CreateTableWhenNoSchema()
 		{
 			using (var conn = CreateConnection())
 			{
 				// 如果实体的 Schema 没有配置表名，则使用类名
-				await conn.ExecuteAsync("drop table if exists createtableentity1;");
+				await conn.ExecuteAsync($"drop table if exists createtableentity1;");
 				var services = SpiderFactory.CreateScopeServiceProvider();
 				var storage = CreateStorage(StorageType.Insert);
 				var dfc = new DataFlowContext(null, services);
@@ -115,7 +81,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				};
 				dfc.AddParseItem(typeName, items);
 				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity1>("SELECT * FROM createtableentity1")).ToList();
+				var list = (await conn.QueryAsync<CreateTableEntity1>($"SELECT * FROM createtableentity1")).ToList();
 				Assert.Single(list);
 				entity = list.First();
 				Assert.Equal("xxx", entity.Str1);
@@ -125,39 +91,17 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(600, entity.Long);
 				Assert.Equal(400, entity.Double);
 				Assert.Equal(200.0F, entity.Float);
-				await conn.ExecuteAsync("drop table if exists createtableentity1;");
+				await conn.ExecuteAsync($"drop table if exists createtableentity1;");
 			}
 		}
 
-		[Schema(null, "CreateTableNoTableName")]
-		class CreateTableEntity2 : EntityBase<CreateTableEntity2>
-		{
-			public string Str1 { get; set; } = "xxx";
-
-			[StringLength(100)] public string Str2 { get; set; } = "yyy";
-
-			[Required] public int Required { get; set; } = 655;
-
-			public decimal Decimal { get; set; }
-
-			public long Long { get; set; } = 600;
-
-			public double Double { get; set; } = 400;
-
-			public DateTime DateTime { get; set; } = DateTime.Now;
-
-			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
-
-			public float Float { get; set; } = 200.0F;
-		}
-
-		[Fact(DisplayName = "CreateTableNoTableName")]
-		public async Task CreateTableNoTableName()
+		[Fact(DisplayName = "CreateTableWhenNoTableNameInSchema")]
+		public async Task CreateTableWhenNoTableNameInSchema()
 		{
 			using (var conn = CreateConnection())
 			{
 				// 如果实体的 Schema 没有配置表名，则使用类名
-				await conn.ExecuteAsync("drop table if exists createtablenotablename;");
+				await conn.ExecuteAsync($"drop table if exists createtablenotablename;");
 				var services = SpiderFactory.CreateScopeServiceProvider();
 				var storage = CreateStorage(StorageType.Insert);
 				var dfc = new DataFlowContext(null, services);
@@ -170,7 +114,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				};
 				dfc.AddParseItem(typeName, items);
 				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity2>("SELECT * FROM createtablenotablename")).ToList();
+				var list = (await conn.QueryAsync<CreateTableEntity2>($"SELECT * FROM createtablenotablename")).ToList();
 				Assert.Single(list);
 				entity = list.First();
 				Assert.Equal("xxx", entity.Str1);
@@ -180,30 +124,8 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(600, entity.Long);
 				Assert.Equal(400, entity.Double);
 				Assert.Equal(200.0F, entity.Float);
-				await conn.ExecuteAsync("drop table if exists createtablenotablename;");
+				await conn.ExecuteAsync($"drop table if exists createtablenotablename;");
 			}
-		}
-
-		[Schema("test", "createtable")]
-		class CreateTableEntity3 : EntityBase<CreateTableEntity3>
-		{
-			public string Str1 { get; set; } = "xxx";
-
-			[StringLength(100)] public string Str2 { get; set; } = "yyy";
-
-			[Required] public int Required { get; set; } = 655;
-
-			public decimal Decimal { get; set; }
-
-			public long Long { get; set; } = 600;
-
-			public double Double { get; set; } = 400;
-
-			public DateTime DateTime { get; set; } = DateTime.Now;
-
-			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
-
-			public float Float { get; set; } = 200.0F;
 		}
 
 		[Fact(DisplayName = "CreateTable")]
@@ -240,62 +162,8 @@ namespace DotnetSpider.Tests.Data.Storage
 			}
 		}
 
-		[Schema("test", "createtableprimay")]
-		class CreateTableEntity4 : EntityBase<CreateTableEntity4>
-		{
-			public string Str1 { get; set; } = "xxx";
-
-			[StringLength(100)] public string Str2 { get; set; } = "yyy";
-
-			[Required] public int Required { get; set; } = 655;
-
-			public decimal Decimal { get; set; }
-
-			public long Long { get; set; } = 600;
-
-			public double Double { get; set; } = 400;
-
-			public DateTime DateTime { get; set; } = DateTime.Now;
-
-			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
-
-			public float Float { get; set; } = 200.0F;
-
-			protected override void Configure()
-			{
-				HasKey(x => x.Str2);
-			}
-		}
-
-		[Schema("test", "createtablemultiprimay")]
-		class CreateTableEntity8 : EntityBase<CreateTableEntity8>
-		{
-			public string Str1 { get; set; } = "xxx";
-
-			[StringLength(100)] public string Str2 { get; set; } = "yyy";
-
-			[Required] public int Required { get; set; } = 655;
-
-			public decimal Decimal { get; set; }
-
-			public long Long { get; set; } = 600;
-
-			public double Double { get; set; } = 400;
-
-			public DateTime DateTime { get; set; } = DateTime.Now;
-
-			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
-
-			public float Float { get; set; } = 200.0F;
-
-			protected override void Configure()
-			{
-				HasKey(x => new {x.Str2, x.Decimal});
-			}
-		}
-
-		[Fact(DisplayName = "CreateTableMultiPrimary")]
-		public async Task CreateTableMultiPrimary()
+		[Fact(DisplayName = "MultiPrimary")]
+		public async Task MultiPrimary()
 		{
 			using (var conn = CreateConnection())
 			{
@@ -327,9 +195,8 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(400, entity.Double);
 				Assert.Equal(200.0F, entity.Float);
 
-				var primaries = (await conn.QueryAsync<IndexInfo>
-						(@"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c 
-                    WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtablemultiprimay';")
+				var primaries = (await conn.QueryAsync<PrimaryInfo>(
+						$"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtablemultiprimay';")
 					).ToList();
 				Assert.Equal(2, primaries.Count);
 				Assert.Equal("str2", primaries[0].COLUMN_NAME);
@@ -339,8 +206,8 @@ namespace DotnetSpider.Tests.Data.Storage
 			}
 		}
 
-		[Fact(DisplayName = "CreateTablePrimary")]
-		public async Task CreateTablePrimary()
+		[Fact(DisplayName = "Primary")]
+		public async Task Primary()
 		{
 			using (var conn = CreateConnection())
 			{
@@ -372,9 +239,8 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(400, entity.Double);
 				Assert.Equal(200.0F, entity.Float);
 
-				var primaries = (await conn.QueryAsync<IndexInfo>
-						(@"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c 
-                    WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableprimay';")
+				var primaries = (await conn.QueryAsync<PrimaryInfo>(
+						$"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableprimay';")
 					).ToList();
 				Assert.Single(primaries);
 				Assert.Equal("str2", primaries[0].COLUMN_NAME);
@@ -383,32 +249,8 @@ namespace DotnetSpider.Tests.Data.Storage
 			}
 		}
 
-		[Schema("test", "createtableautoincprimay")]
-		class CreateTableEntity5 : EntityBase<CreateTableEntity5>
-		{
-			public string Str1 { get; set; } = "xxx";
-
-			[StringLength(100)] public string Str2 { get; set; } = "yyy";
-
-			[Required] public int Required { get; set; } = 655;
-
-			public decimal Decimal { get; set; }
-
-			public long Long { get; set; } = 600;
-
-			public double Double { get; set; } = 400;
-
-			public DateTime DateTime { get; set; } = DateTime.Now;
-
-			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
-
-			public float Float { get; set; } = 200.0F;
-
-			public int Id { get; set; }
-		}
-
-		[Fact(DisplayName = "CreateTableAutoIncPrimary")]
-		public async Task CreateTableAutoIncPrimary()
+		[Fact(DisplayName = "AutoIncPrimary")]
+		public async Task AutoIncPrimary()
 		{
 			using (var conn = CreateConnection())
 			{
@@ -444,9 +286,8 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(1, entity.Id);
 				Assert.Equal(2, list[1].Id);
 
-				var primaries = (await conn.QueryAsync<IndexInfo>
-						(@"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c 
-                    WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableautoincprimay';")
+				var primaries = (await conn.QueryAsync<PrimaryInfo>(
+						$"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableautoincprimay';")
 					).ToList();
 				Assert.Single(primaries);
 				Assert.Equal("id", primaries[0].COLUMN_NAME);
@@ -614,34 +455,6 @@ namespace DotnetSpider.Tests.Data.Storage
 			}
 		}
 
-		[Schema("test", "updatepartcolumns")]
-		class CreateTableEntity6 : EntityBase<CreateTableEntity6>
-		{
-			public string Str1 { get; set; } = "xxx";
-
-			[StringLength(100)] public string Str2 { get; set; } = "yyy";
-
-			[Required] public int Required { get; set; } = 655;
-
-			public decimal Decimal { get; set; }
-
-			public long Long { get; set; } = 600;
-
-			public double Double { get; set; } = 400;
-
-			public DateTime DateTime { get; set; } = DateTime.Now;
-
-			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
-
-			public float Float { get; set; } = 200.0F;
-
-			protected override void Configure()
-			{
-				HasKey(x => x.Str2);
-				ConfigureUpdateColumns(x => new {x.Str1, x.Double});
-			}
-		}
-
 		/// <summary>
 		/// 测试能否正确更新数据
 		/// </summary>
@@ -746,29 +559,6 @@ namespace DotnetSpider.Tests.Data.Storage
 			}
 		}
 
-
-		[Schema("test", "IgnoreCase")]
-		class CreateTableEntity7 : EntityBase<CreateTableEntity7>
-		{
-			public string Str1 { get; set; } = "xxx";
-
-			[StringLength(100)] public string Str2 { get; set; } = "yyy";
-
-			[Required] public int Required { get; set; } = 655;
-
-			public decimal Decimal { get; set; }
-
-			public long Long { get; set; } = 600;
-
-			public double Double { get; set; } = 400;
-
-			public DateTime DateTime { get; set; } = DateTime.Now;
-
-			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
-
-			public float Float { get; set; } = 200.0F;
-		}
-
 		/// <summary>
 		/// 测试数据库名，表名，列名是的大小写是否正确
 		/// </summary>
@@ -804,6 +594,263 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(400, entity.Double);
 				Assert.Equal(200.0F, entity.Float);
 				await conn.ExecuteAsync($"drop table if exists {Escape}test{Escape}.{Escape}IgnoreCase{Escape};");
+			}
+		}
+
+		[Fact(DisplayName = "Indexes")]
+		public async Task Indexes()
+		{
+			using (var conn = CreateConnection())
+			{
+				await conn.ExecuteAsync(
+					$"drop table if exists {Escape}test{Escape}.{Escape}createtableindexes{Escape};");
+				var services = SpiderFactory.CreateScopeServiceProvider();
+				var storage = CreateStorage(StorageType.Insert);
+
+				var dfc = new DataFlowContext(null, services);
+				var typeName = typeof(CreateTableEntity5).FullName;
+				var entity = new CreateTableEntity9();
+				dfc.Add(typeName, entity.GetTableMetadata());
+				var items = new ParseResult<CreateTableEntity9>
+				{
+					entity
+				};
+				dfc.AddParseItem(typeName, items);
+				await storage.HandleAsync(dfc);
+				var indexes = (await conn.QueryAsync<IndexInfo>
+						($"show index from test.createtableindexes")
+					).ToList();
+				Assert.Equal(6, indexes.Count);
+				Assert.Contains(indexes,
+					x => x.Key_name == "INDEX_STR1" && x.Non_unique == 1 && x.Column_name == "str1");
+				Assert.Contains(indexes, x =>
+					x.Key_name == "INDEX_STR1_STR2" && x.Non_unique == 1 && x.Column_name == "str1");
+				Assert.Contains(indexes, x =>
+					x.Key_name == "INDEX_STR1_STR2" && x.Non_unique == 1 && x.Column_name == "str2");
+				Assert.Contains(indexes,
+					x => x.Key_name == "UNIQUE_STR3" && x.Non_unique == 0 && x.Column_name == "str3");
+				Assert.Contains(indexes, x =>
+					x.Key_name == "UNIQUE_STR3_STR4" && x.Non_unique == 0 && x.Column_name == "str3");
+				Assert.Contains(indexes, x =>
+					x.Key_name == "UNIQUE_STR3_STR4" && x.Non_unique == 0 && x.Column_name == "str4");
+
+				await conn.ExecuteAsync(
+					$"drop table if exists {Escape}test{Escape}.{Escape}createtableindexes{Escape};");
+			}
+		}
+
+		class CreateTableEntity1 : EntityBase<CreateTableEntity1>
+		{
+			public string Str1 { get; set; } = "xxx";
+
+			[StringLength(100)] public string Str2 { get; set; } = "yyy";
+
+			[Required] public int Required { get; set; } = 655;
+
+			public decimal Decimal { get; set; }
+
+			public long Long { get; set; } = 600;
+
+			public double Double { get; set; } = 400;
+
+			public DateTime DateTime { get; set; } = DateTime.Now;
+
+			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
+
+			public float Float { get; set; } = 200.0F;
+		}
+
+		[Schema(null, "CreateTableNoTableName")]
+		class CreateTableEntity2 : EntityBase<CreateTableEntity2>
+		{
+			public string Str1 { get; set; } = "xxx";
+
+			[StringLength(100)] public string Str2 { get; set; } = "yyy";
+
+			[Required] public int Required { get; set; } = 655;
+
+			public decimal Decimal { get; set; }
+
+			public long Long { get; set; } = 600;
+
+			public double Double { get; set; } = 400;
+
+			public DateTime DateTime { get; set; } = DateTime.Now;
+
+			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
+
+			public float Float { get; set; } = 200.0F;
+		}
+
+		[Schema("test", "CreateTable")]
+		class CreateTableEntity3 : EntityBase<CreateTableEntity3>
+		{
+			public string Str1 { get; set; } = "xxx";
+
+			[StringLength(100)] public string Str2 { get; set; } = "yyy";
+
+			[Required] public int Required { get; set; } = 655;
+
+			public decimal Decimal { get; set; }
+
+			public long Long { get; set; } = 600;
+
+			public double Double { get; set; } = 400;
+
+			public DateTime DateTime { get; set; } = DateTime.Now;
+
+			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
+
+			public float Float { get; set; } = 200.0F;
+		}
+
+		[Schema("test", "createtableprimay")]
+		class CreateTableEntity4 : EntityBase<CreateTableEntity4>
+		{
+			public string Str1 { get; set; } = "xxx";
+
+			[StringLength(100)] public string Str2 { get; set; } = "yyy";
+
+			[Required] public int Required { get; set; } = 655;
+
+			public decimal Decimal { get; set; }
+
+			public long Long { get; set; } = 600;
+
+			public double Double { get; set; } = 400;
+
+			public DateTime DateTime { get; set; } = DateTime.Now;
+
+			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
+
+			public float Float { get; set; } = 200.0F;
+
+			protected override void Configure()
+			{
+				HasKey(x => x.Str2);
+			}
+		}
+
+		[Schema("test", "createtableautoincprimay")]
+		class CreateTableEntity5 : EntityBase<CreateTableEntity5>
+		{
+			public string Str1 { get; set; } = "xxx";
+
+			[StringLength(100)] public string Str2 { get; set; } = "yyy";
+
+			[Required] public int Required { get; set; } = 655;
+
+			public decimal Decimal { get; set; }
+
+			public long Long { get; set; } = 600;
+
+			public double Double { get; set; } = 400;
+
+			public DateTime DateTime { get; set; } = DateTime.Now;
+
+			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
+
+			public float Float { get; set; } = 200.0F;
+
+			public int Id { get; set; }
+		}
+
+		[Schema("test", "updatepartcolumns")]
+		class CreateTableEntity6 : EntityBase<CreateTableEntity6>
+		{
+			public string Str1 { get; set; } = "xxx";
+
+			[StringLength(100)] public string Str2 { get; set; } = "yyy";
+
+			[Required] public int Required { get; set; } = 655;
+
+			public decimal Decimal { get; set; }
+
+			public long Long { get; set; } = 600;
+
+			public double Double { get; set; } = 400;
+
+			public DateTime DateTime { get; set; } = DateTime.Now;
+
+			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
+
+			public float Float { get; set; } = 200.0F;
+
+			protected override void Configure()
+			{
+				HasKey(x => x.Str2);
+				ConfigureUpdateColumns(x => new {x.Str1, x.Double});
+			}
+		}
+
+		[Schema("test", "IgnoreCase")]
+		class CreateTableEntity7 : EntityBase<CreateTableEntity7>
+		{
+			public string Str1 { get; set; } = "xxx";
+
+			[StringLength(100)] public string Str2 { get; set; } = "yyy";
+
+			[Required] public int Required { get; set; } = 655;
+
+			public decimal Decimal { get; set; }
+
+			public long Long { get; set; } = 600;
+
+			public double Double { get; set; } = 400;
+
+			public DateTime DateTime { get; set; } = DateTime.Now;
+
+			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
+
+			public float Float { get; set; } = 200.0F;
+		}
+
+		[Schema("test", "createtablemultiprimay")]
+		class CreateTableEntity8 : EntityBase<CreateTableEntity8>
+		{
+			public string Str1 { get; set; } = "xxx";
+
+			[StringLength(100)] public string Str2 { get; set; } = "yyy";
+
+			[Required] public int Required { get; set; } = 655;
+
+			public decimal Decimal { get; set; }
+
+			public long Long { get; set; } = 600;
+
+			public double Double { get; set; } = 400;
+
+			public DateTime DateTime { get; set; } = DateTime.Now;
+
+			public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Now;
+
+			public float Float { get; set; } = 200.0F;
+
+			protected override void Configure()
+			{
+				HasKey(x => new {x.Str2, x.Decimal});
+			}
+		}
+
+		[Schema("test", "createtableindexes")]
+		class CreateTableEntity9 : EntityBase<CreateTableEntity9>
+		{
+			[StringLength(100)] public string Str1 { get; set; } = "Str1";
+
+			[StringLength(100)] public string Str2 { get; set; } = "Str2";
+
+			[StringLength(100)] public string Str3 { get; set; } = "Str3";
+
+			[StringLength(100)] public string Str4 { get; set; } = "Str4";
+
+
+			protected override void Configure()
+			{
+				HasIndex(x => x.Str1);
+				HasIndex(x => new {x.Str1, x.Str2});
+
+				HasIndex(x => x.Str3, true);
+				HasIndex(x => new {x.Str3, x.Str4}, true);
 			}
 		}
 	}

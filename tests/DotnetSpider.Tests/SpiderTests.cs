@@ -67,7 +67,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal(MySqlFileType.LoadFile, storage3.MySqlFileType);
 
 			// PostgreSql
-			options.Storage = "DotnetSpider.Data.Storage.PostgreSqlEntityStorage,DotnetSpider";
+			options.Storage = "DotnetSpider.Data.Storage.PostgreSqlEntityStorage,DotnetSpider.Postgre";
 
 			var storage4 = (PostgreSqlEntityStorage) Spider.GetDefaultStorage(options);
 			Assert.Equal("ConnectionString", storage4.ConnectionString);

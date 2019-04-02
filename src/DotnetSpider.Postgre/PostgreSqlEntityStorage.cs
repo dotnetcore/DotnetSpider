@@ -7,6 +7,7 @@ using DotnetSpider.Core;
 using DotnetSpider.Data.Storage.Model;
 using Npgsql;
 
+// ReSharper disable once CheckNamespace
 namespace DotnetSpider.Data.Storage
 {
 	/// <summary>

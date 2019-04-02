@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Mongo", "src\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Kafka", "src\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj", "{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Postgre", "src\DotnetSpider.Postgre\DotnetSpider.Postgre.csproj", "{62069E7E-47BE-467F-87CA-233555C5C45E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62069E7E-47BE-467F-87CA-233555C5C45E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62069E7E-47BE-467F-87CA-233555C5C45E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62069E7E-47BE-467F-87CA-233555C5C45E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62069E7E-47BE-467F-87CA-233555C5C45E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C} = {31B052DB-A9AA-49F5-AE8C-1660546A8903}
