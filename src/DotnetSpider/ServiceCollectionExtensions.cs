@@ -23,7 +23,11 @@ namespace DotnetSpider
 			Check.NotNull(services, nameof(services));
 
 			var loggerConfiguration = new LoggerConfiguration()
+#if DEBUG
 				.MinimumLevel.Verbose()
+#else
+				.MinimumLevel.Information()
+#endif
 				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 				.Enrich.FromLogContext()
 				.WriteTo.Console().WriteTo
@@ -32,13 +36,13 @@ namespace DotnetSpider
 			Log.Logger = loggerConfiguration.CreateLogger();
 
 #if NETFRAMEWORK
-            services.AddSingleton<ILoggerFactory, LoggerFactory>(provider =>
-            {
-                var loggerFactory = new LoggerFactory();
-                loggerFactory.AddSerilog();
-                return loggerFactory;
-            });
-            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+			services.AddSingleton<ILoggerFactory, LoggerFactory>(provider =>
+			{
+				var loggerFactory = new LoggerFactory();
+				loggerFactory.AddSerilog();
+				return loggerFactory;
+			});
+			services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 #else
 			services.AddLogging(b =>
 			{
@@ -72,8 +76,9 @@ namespace DotnetSpider
 		{
 			Check.NotNull(services, nameof(services));
 
-			DotnetSpiderBuilder builder = new DotnetSpiderBuilder(services);
+			services.AddScoped<ISpiderOptions, SpiderOptions>();
 
+			DotnetSpiderBuilder builder = new DotnetSpiderBuilder(services);
 			configureBuilder?.Invoke(builder);
 
 			return services;
@@ -99,6 +104,13 @@ namespace DotnetSpider
 			return builder;
 		}
 
+		public static DownloadCenterBuilder UseMySqlDownloaderAgentStore(this DownloadCenterBuilder builder)
+		{
+			Check.NotNull(builder, nameof(builder));
+			builder.Services.AddSingleton<IDownloaderAgentStore, MySqlDownloaderAgentStore>();
+			return builder;
+		}
+
 		#region  Message queue
 
 		public static DotnetSpiderBuilder UseLocalMessageQueue(this DotnetSpiderBuilder builder)
@@ -117,7 +129,7 @@ namespace DotnetSpider
 			Check.NotNull(builder, nameof(builder));
 
 			builder.Services.AddSingleton<IDownloaderAllocator, DownloaderAllocator>();
-			builder.Services.AddSingleton<IDownloaderAgent, LocalDownloaderAgent>();
+			builder.Services.AddSingleton<IDownloaderAgent, DefaultDownloaderAgent>();
 			builder.Services.AddSingleton<NetworkCenter>();
 			builder.Services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
 
@@ -133,13 +145,6 @@ namespace DotnetSpider
 
 			builder.Services.AddSingleton<ILockerFactory, FileLockerFactory>();
 
-			return builder;
-		}
-
-		public static AgentBuilder UseMemoryDownloaderAgentStore(this AgentBuilder builder)
-		{
-			Check.NotNull(builder, nameof(builder));
-			builder.Services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
 			return builder;
 		}
 

@@ -14,6 +14,11 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 数据库连接字符串
 		/// </summary>
+		public string ConnectionString => _configuration["ConnectionString"];
+
+		/// <summary>
+		/// 数据库连接字符串
+		/// </summary>
 		public string StorageConnectionString => _configuration["StorageConnectionString"];
 
 		/// <summary>

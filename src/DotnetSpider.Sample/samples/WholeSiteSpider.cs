@@ -16,7 +16,6 @@ namespace DotnetSpider.Sample.samples
             builder.AddSerilog();
             builder.ConfigureAppConfiguration();
             builder.UseStandalone();
-            builder.AddSpider<EntitySpider>();
             var provider = builder.Build();
             var spider = provider.Create<Spider>();
 

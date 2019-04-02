@@ -2,13 +2,13 @@ using DotnetSpider.MessageQueue;
 using DotnetSpider.Network;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetSpider.Downloader.Internal
+namespace DotnetSpider.Downloader
 {
 	/// <summary>
-	/// 本地下器代理
+	/// 下载器代理
 	/// </summary>
-	public class LocalDownloaderAgent : DefaultDownloaderAgent
-	{
+	public class DefaultDownloaderAgent : DownloaderAgentBase
+	{		
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -17,12 +17,10 @@ namespace DotnetSpider.Downloader.Internal
 		/// <param name="downloaderAllocator">分配下载器的接口</param>
 		/// <param name="networkCenter">网络中心</param>
 		/// <param name="logger">日志接口</param>
-		public LocalDownloaderAgent(IDownloaderAgentOptions options,
-			IMessageQueue mq, IDownloaderAllocator downloaderAllocator, NetworkCenter networkCenter,
-			ILogger<LocalDownloaderAgent> logger) : base(options,
-			mq, downloaderAllocator, networkCenter, logger)
+		public DefaultDownloaderAgent(IDownloaderAgentOptions options, IMessageQueue mq,
+			IDownloaderAllocator downloaderAllocator, NetworkCenter networkCenter, ILogger logger) : base(options, mq,
+			downloaderAllocator, networkCenter, logger)
 		{
-			// ConfigureDownloader = downloader => downloader.Logger = null;
 		}
 	}
 }

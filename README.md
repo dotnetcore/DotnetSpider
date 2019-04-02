@@ -50,7 +50,7 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
 
 - MySql
 
-        sudo docker run --name mysql -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1qazZAQ! mysql
+        $ sudo docker run --name mysql -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1qazZAQ! mysql
 
 - Redis
 

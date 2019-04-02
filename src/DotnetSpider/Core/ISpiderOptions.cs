@@ -10,6 +10,11 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 数据库连接字符串
 		/// </summary>
+		string ConnectionString { get; }
+
+		/// <summary>
+		/// 数据库连接字符串
+		/// </summary>
 		string StorageConnectionString { get; }
 
 		/// <summary>

@@ -29,6 +29,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Kafka", "src\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Postgre", "src\DotnetSpider.Postgre\DotnetSpider.Postgre.csproj", "{62069E7E-47BE-467F-87CA-233555C5C45E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloaderAgent", "src\DotnetSpider.DownloaderAgent\DotnetSpider.DownloaderAgent.csproj", "{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloadCenter", "src\DotnetSpider.DownloadCenter\DotnetSpider.DownloadCenter.csproj", "{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +71,14 @@ Global
 		{62069E7E-47BE-467F-87CA-233555C5C45E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62069E7E-47BE-467F-87CA-233555C5C45E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62069E7E-47BE-467F-87CA-233555C5C45E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C} = {31B052DB-A9AA-49F5-AE8C-1660546A8903}

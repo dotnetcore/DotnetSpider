@@ -12,6 +12,7 @@ namespace DotnetSpider.Tests
 	{
 		class MyStorageOptions : ISpiderOptions
 		{
+			public string ConnectionString { get; set; }
 			public string StorageConnectionString { get; set; }
 			public string Storage { get; set; }
 			public StorageType StorageType { get; set; }

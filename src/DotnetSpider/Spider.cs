@@ -510,7 +510,8 @@ namespace DotnetSpider
 				DecodeHtml = DownloaderSettings.DecodeHtml,
 				Timeout = DownloaderSettings.Timeout,
 				Type = DownloaderSettings.Type,
-				UseCookies = DownloaderSettings.UseCookies
+				UseCookies = DownloaderSettings.UseCookies,
+				CreationTime = DateTime.Now
 			});
 			await _mq.PublishAsync(Framework.DownloaderCenterTopic, $"|{Framework.AllocateDownloaderCommand}|{json}");
 		}
@@ -674,7 +675,7 @@ namespace DotnetSpider
 						_logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 失败: {e}");
 					}
 				});
-
+				
 				// TODO: 此处需要优化
 				var retryResponses =
 					responses.Where(x => !x.Success && x.Request.RetriedTimes < RetryDownloadTimes)
@@ -783,6 +784,11 @@ namespace DotnetSpider
 		{
 			if (requests.Length > 0)
 			{
+				foreach (var request in requests)
+				{
+					request.CreationTime = DateTime.Now;
+				}
+
 				await _mq.PublishAsync(Framework.DownloaderCenterTopic,
 					$"|{Framework.DownloadCommand}|{JsonConvert.SerializeObject(requests)}");
 			}

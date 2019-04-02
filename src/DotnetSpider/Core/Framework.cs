@@ -47,7 +47,6 @@ namespace DotnetSpider.Core
 			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dotnetspider");
 
 		public static string ChromeDriverPath;
-		public static readonly bool IsWindows;
 		public static readonly bool IsServer2008;
 		public static readonly int TotalMemory;
 		public static readonly string IpAddress;
@@ -59,15 +58,10 @@ namespace DotnetSpider.Core
 
 		static Framework()
 		{
-#if NETFRAMEWORK
-            IsWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
-#else
-			IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#endif
 			var systemVersion = Environment.OSVersion.Version.ToString();
 			IsServer2008 = systemVersion.StartsWith("6.0") || systemVersion.StartsWith("6.1");
 
-			if (IsWindows)
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				var mStatus = new MemoryStatus();
 				GlobalMemoryStatus(ref mStatus);
@@ -80,6 +74,10 @@ namespace DotnetSpider.Core
 					.Select(line => line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Take(2).ToList())
 					.ToDictionary(items => items[0], items => long.Parse(items[1]));
 				TotalMemory = (int) (infoDic["MemTotal:"] / 1024);
+			}
+			else
+			{
+				// TODO:
 			}
 
 			var networkInterface = NetworkInterface.GetAllNetworkInterfaces()
@@ -94,20 +92,26 @@ namespace DotnetSpider.Core
 
 		public static long GetFreeMemory()
 		{
-			if (IsWindows)
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				var mStatus = new MemoryStatus();
 				GlobalMemoryStatus(ref mStatus);
 				return Convert.ToInt64(mStatus.DwAvailPhys) / 1024 / 1024;
 			}
-
-			var lines = File.ReadAllLines("/proc/meminfo");
-			var infoDic = lines
-				.Select(line => line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Take(2).ToList())
-				.ToDictionary(items => items[0], items => long.Parse(items[1]));
-			var free = infoDic["MemFree:"];
-			var sReclaimable = infoDic["SReclaimable:"];
-			return (free + sReclaimable) / 1024;
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				var lines = File.ReadAllLines("/proc/meminfo");
+				var infoDic = lines
+					.Select(line => line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).Take(2).ToList())
+					.ToDictionary(items => items[0], items => long.Parse(items[1]));
+				var free = infoDic["MemFree:"];
+				var sReclaimable = infoDic["SReclaimable:"];
+				return (free + sReclaimable) / 1024;
+			}
+			else
+			{
+				return 0;
+			}
 		}
 
 		public static void SetEncoding()

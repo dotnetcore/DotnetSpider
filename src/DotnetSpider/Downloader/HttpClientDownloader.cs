@@ -163,6 +163,8 @@ namespace DotnetSpider.Downloader
 					else
 					{
 						response.Success = true;
+						Logger?.LogInformation(
+							$"任务 {request.OwnerId} 下载 {request.Url} 成功");
 						return response;
 					}
 				}

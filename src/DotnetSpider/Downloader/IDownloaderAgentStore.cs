@@ -8,7 +8,13 @@ namespace DotnetSpider.Downloader
 	/// 下载器代理存储
 	/// </summary>
     public interface IDownloaderAgentStore
-    {
+	{
+		/// <summary>
+		/// 创建数据库
+		/// </summary>
+		/// <returns></returns>
+		Task EnsureDatabaseAndTableCreatedAsync();
+		
         /// <summary>
         /// 查询所有已经注册代理，用于分配下载节点
         /// </summary>
@@ -20,7 +26,7 @@ namespace DotnetSpider.Downloader
         /// </summary>
         /// <param name="ownerId"></param>
         /// <returns></returns>
-        Task<List<DownloaderAgent>> GetAllListAsync(string ownerId);
+        Task<List<DownloaderAgentAllocate>> GetAllocatedListAsync(string ownerId);
         
         /// <summary>
         /// 添加下载代理

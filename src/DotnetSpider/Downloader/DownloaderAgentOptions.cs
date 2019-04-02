@@ -19,7 +19,7 @@ namespace DotnetSpider.Downloader
 		{
 			_configuration = configuration;
 		}
-		
+
 		/// <summary>
 		/// 是否支持 ADSL 拨号
 		/// </summary>
@@ -44,29 +44,29 @@ namespace DotnetSpider.Downloader
 		public string AgentId => string.IsNullOrWhiteSpace(_configuration["AgentId"])
 			? _defaultAgentId
 			: _configuration["AgentId"];
-		
+
 		/// <summary>
 		/// 下载器代理名称
 		/// </summary>
 		public string Name => string.IsNullOrWhiteSpace(_configuration["AgentName"])
 			? "DownloadAgent"
 			: _configuration["AgentName"];
-		
+
 		/// <summary>
 		/// ADSL 网络接口
 		/// </summary>
 		public string AdslInterface => _configuration["AdslInterface"];
-		
+
 		/// <summary>
 		/// ADSL 帐号
 		/// </summary>
 		public string AdslAccount => _configuration["AdslAccount"];
-		
+
 		/// <summary>
 		/// ADSL 密码
 		/// </summary>
 		public string AdslPassword => _configuration["AdslPassword"];
-		
+
 		/// <summary>
 		/// 代理供应接口
 		/// </summary>

@@ -1,4 +1,6 @@
+using System;
 using DotnetSpider.Core;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 
 namespace DotnetSpider.Downloader.Entity
 {
@@ -56,5 +58,10 @@ namespace DotnetSpider.Downloader.Entity
         /// 下载重试次数
         /// </summary>
         public int RetryTimes { get; set; } = 3;
+        
+        /// <summary>
+        /// 消息创建时间
+        /// </summary>
+        public DateTime CreationTime { get; set; }
     }
 }

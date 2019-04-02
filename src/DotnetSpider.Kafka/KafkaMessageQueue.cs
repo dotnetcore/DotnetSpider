@@ -74,14 +74,19 @@ namespace DotnetSpider.Kafka
 					{
 						while (true)
 						{
+							string msg = null;
 							try
 							{
-								var cr = c.Consume();
-								action(cr.Value);
+								msg = c.Consume().Value;
+								action(msg);
 							}
 							catch (ConsumeException e)
 							{
-								_logger?.LogDebug($"Kafka 接收消息 Topic {topic} 异常: {e.Error.Reason}");
+								_logger?.LogError($"Kafka 接收消息 Topic {topic} 异常: {e.Error.Reason}");
+							}
+							catch (Exception e)
+							{
+								_logger?.LogError($"Topic {topic} 消费消息 {msg} 失败: {e}");
 							}
 						}
 					}

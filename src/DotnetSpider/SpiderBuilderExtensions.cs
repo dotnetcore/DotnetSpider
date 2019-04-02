@@ -1,6 +1,8 @@
 using System;
 using DotnetSpider.Core;
 using DotnetSpider.Data;
+using DotnetSpider.Downloader;
+using DotnetSpider.Downloader.Internal;
 using DotnetSpider.MessageQueue;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -43,12 +45,11 @@ namespace DotnetSpider
 			dotnetSpiderBuilder.UseLocalMessageQueue();
 			dotnetSpiderBuilder.AddDownloaderAgent(x =>
 			{
-				x.UseMemoryDownloaderAgentStore();
 				x.UseFileLocker();
 				x.UseDefaultAdslRedialer();
 				x.UseDefaultInternetDetector();
 			});
-
+			builder.Services.AddSingleton<IDownloaderAgent, LocalDownloaderAgent>();
 			dotnetSpiderBuilder.AddDownloaderCenter(x => x.UseMemoryDownloaderAgentStore());
 			dotnetSpiderBuilder.AddSpiderStatisticsCenter(x => x.UseMemory());
 
@@ -60,12 +61,7 @@ namespace DotnetSpider
 			builder.Services.AddSingleton<IMessageQueue, LocalMessageQueue>();
 			return builder;
 		}
-
-		public static SpiderBuilder UserKafka(this SpiderBuilder builder)
-		{
-			return builder;
-		}
-
+		
 		public static SpiderBuilder AddSpider<T>(this SpiderBuilder builder) where T : Spider
 		{
 			builder.Services.AddTransient(typeof(T));

@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Net.Http;
 using DotnetSpider.Core;
-using Newtonsoft.Json;
 
 namespace DotnetSpider.Downloader
 {
@@ -107,6 +107,11 @@ namespace DotnetSpider.Downloader
 		/// 是否需要用压缩方法发送 Body
 		/// </summary>
 		public Compression Compression { get; set; }
+
+		/// <summary>
+		/// 创建时间
+		/// </summary>
+		public DateTime CreationTime { get; set; }
 
 		/// <summary>
 		/// 获取当前请求的所有属性

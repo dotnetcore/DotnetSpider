@@ -74,7 +74,9 @@ namespace DotnetSpider.Downloader
 				Id = _options.AgentId,
 				Name = _options.Name,
 				ProcessorCount = Environment.ProcessorCount,
-				TotalMemory = Framework.TotalMemory
+				TotalMemory = Framework.TotalMemory,
+				CreationTime = DateTime.Now,
+				LastModificationTime = DateTime.Now
 			});
 			await _mq.PublishAsync(Framework.DownloaderCenterTopic, $"|{Framework.RegisterCommand}|{json}");
 
@@ -132,7 +134,7 @@ namespace DotnetSpider.Downloader
 			});
 
 			// 开始心跳
-			HeartbeatAsync(cancellationToken).ConfigureAwait(false).GetAwaiter();
+			HeartbeatAsync().ConfigureAwait(false).GetAwaiter();
 
 			// 循环清理过期下载器
 			ReleaseDownloaderAsync().ConfigureAwait(false).GetAwaiter();
@@ -146,41 +148,52 @@ namespace DotnetSpider.Downloader
 			_isRunning = false;
 			Logger.LogInformation($"下载器代理 {_options.AgentId} 退出");
 #if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
+			return DotnetSpider.Core.Framework.CompletedTask;
 #else
 			return Task.CompletedTask;
 #endif
 		}
 
-		private Task HeartbeatAsync(CancellationToken cancellationToken)
+		private Task HeartbeatAsync()
 		{
 			return Task.Factory.StartNew(async () =>
 			{
 				while (_isRunning)
 				{
 					Thread.Sleep(5000);
-
-					var json = JsonConvert.SerializeObject(new DownloaderAgentHeartbeat
+					try
 					{
-						Id = _options.AgentId,
-						Name = _options.Name,
-						FreeMemory = (int) Framework.GetFreeMemory(),
-						DownloaderCount = _cache.Count
-					});
-					await _mq.PublishAsync(Framework.DownloaderCenterTopic,
-						$"|{Framework.HeartbeatCommand}|{json}");
+						var json = JsonConvert.SerializeObject(new DownloaderAgentHeartbeat
+						{
+							AgentId = _options.AgentId,
+							AgentName = _options.Name,
+							FreeMemory = (int) Framework.GetFreeMemory(),
+							DownloaderCount = _cache.Count,
+							CreationTime = DateTime.Now
+						});
+						await _mq.PublishAsync(Framework.DownloaderCenterTopic,
+							$"|{Framework.HeartbeatCommand}|{json}");
+						Logger.LogDebug($"下载器代理 {_options.AgentId} 发送心跳成功");
+					}
+					catch (Exception e)
+					{
+						Logger.LogDebug($"下载器代理 {_options.AgentId} 发送心跳失败: {e}");
+					}
 				}
-			}, cancellationToken);
+			});
 		}
 
 		private Task DownloadAsync(string message)
 		{
 			var requests = JsonConvert.DeserializeObject<Request[]>(message);
+
 			if (requests.Length > 0)
 			{
+				// 超时 60 秒的不再下载 
 				// 下载中心下载请求批量传送，因此反序列化的请求需要按拥有者标号分组。
 				// 对于同一个任务应该是顺序下载。TODO: 因为是使用多线程，是否此时保证顺序并不会启作用？
-				var groupings = requests.GroupBy(x => x.OwnerId).ToDictionary(x => x.Key, y => y.ToList());
+				var groupings = requests.Where(x => (DateTime.Now - x.CreationTime).TotalSeconds < 60)
+					.GroupBy(x => x.OwnerId).ToDictionary(x => x.Key, y => y.ToList());
 				foreach (var grouping in groupings)
 				{
 					foreach (var request in grouping.Value)
@@ -203,7 +216,7 @@ namespace DotnetSpider.Downloader
 			}
 
 #if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
+			return DotnetSpider.Core.Framework.CompletedTask;
 #else
 			return Task.CompletedTask;
 #endif
@@ -217,12 +230,11 @@ namespace DotnetSpider.Downloader
 				return response;
 			}
 
-			var msg = $"未找到任务 {request.OwnerId} 的下载器";
-			Logger.LogError(msg);
+			Logger.LogError($"未找到任务 {request.OwnerId} 的下载器");
 			return new Response
 			{
 				Request = request,
-				Exception = msg,
+				Exception = "任务下载器丢失",
 				Success = false,
 				AgentId = _options.AgentId
 			};
@@ -265,7 +277,7 @@ namespace DotnetSpider.Downloader
 						}
 						else
 						{
-							Logger.LogDebug(msg);
+							// Logger.LogDebug(msg);
 						}
 					}
 					catch (Exception e)
@@ -283,24 +295,39 @@ namespace DotnetSpider.Downloader
 		private async Task AllotDownloaderAsync(string message)
 		{
 			var allotDownloaderMessage = JsonConvert.DeserializeObject<AllotDownloaderMessage>(message);
-			if (!_cache.ContainsKey(allotDownloaderMessage.OwnerId))
+			if (allotDownloaderMessage == null)
 			{
-				var downloaderEntry =
-					await _downloaderAllocator.CreateDownloaderAsync(_options.AgentId, allotDownloaderMessage);
+				Logger.LogError($"无法分配下载器，消息不正确: {message}");
+				return;
+			}
 
-				if (downloaderEntry == null)
+			if ((DateTime.Now - allotDownloaderMessage.CreationTime).TotalSeconds < 30)
+			{
+				if (!_cache.ContainsKey(allotDownloaderMessage.OwnerId))
 				{
-					Logger.LogError($"任务 {allotDownloaderMessage.OwnerId} 分配下载器 {allotDownloaderMessage.Type} 失败");
+					var downloaderEntry =
+						await _downloaderAllocator.CreateDownloaderAsync(_options.AgentId, allotDownloaderMessage);
+
+					if (downloaderEntry == null)
+					{
+						Logger.LogError($"任务 {allotDownloaderMessage.OwnerId} 分配下载器 {allotDownloaderMessage.Type} 失败");
+					}
+					else
+					{
+						ConfigureDownloader?.Invoke(downloaderEntry);
+						_cache.TryAdd(allotDownloaderMessage.OwnerId, downloaderEntry);
+						Logger.LogInformation(
+							$"任务 {allotDownloaderMessage.OwnerId} 分配下载器 {allotDownloaderMessage.Type} 成功");
+					}
 				}
 				else
 				{
-					ConfigureDownloader?.Invoke(downloaderEntry);
-					_cache.TryAdd(allotDownloaderMessage.OwnerId, downloaderEntry);
+					Logger.LogWarning($"任务 {allotDownloaderMessage.OwnerId} 重复分配下载器");
 				}
 			}
 			else
 			{
-				Logger.LogWarning($"任务 {allotDownloaderMessage.OwnerId} 重复分配下载器");
+				Logger.LogWarning($"任务 {allotDownloaderMessage.OwnerId} 分配下载器过期");
 			}
 		}
 	}
