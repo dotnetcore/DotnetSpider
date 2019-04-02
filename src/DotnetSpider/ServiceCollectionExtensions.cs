@@ -84,12 +84,12 @@ namespace DotnetSpider
 			return services;
 		}
 
-		public static DotnetSpiderBuilder AddDownloaderCenter(this DotnetSpiderBuilder builder,
+		public static DotnetSpiderBuilder AddDownloadCenter(this DotnetSpiderBuilder builder,
 			Action<DownloadCenterBuilder> configure = null)
 		{
 			Check.NotNull(builder, nameof(builder));
 
-			builder.Services.AddSingleton<IDownloadCenter, LocalDownloadCenter>();
+			builder.Services.AddSingleton<IDownloadCenter, DownloadCenter>();
 
 			DownloadCenterBuilder downloadCenterBuilder = new DownloadCenterBuilder(builder.Services);
 			configure?.Invoke(downloadCenterBuilder);
@@ -97,9 +97,10 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static DownloadCenterBuilder UseMemoryDownloaderAgentStore(this DownloadCenterBuilder builder)
+		public static DotnetSpiderBuilder AddLocalDownloadCenter(this DotnetSpiderBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
+			builder.Services.AddSingleton<IDownloadCenter, LocalDownloadCenter>();
 			builder.Services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
 			return builder;
 		}
@@ -108,6 +109,13 @@ namespace DotnetSpider
 		{
 			Check.NotNull(builder, nameof(builder));
 			builder.Services.AddSingleton<IDownloaderAgentStore, MySqlDownloaderAgentStore>();
+			return builder;
+		}
+
+		public static DownloadCenterBuilder UseMemoryDownloaderAgentStore(this DownloadCenterBuilder builder)
+		{
+			Check.NotNull(builder, nameof(builder));
+			builder.Services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
 			return builder;
 		}
 
@@ -139,6 +147,22 @@ namespace DotnetSpider
 			return builder;
 		}
 
+		public static DotnetSpiderBuilder AddLocalDownloaderAgent(this DotnetSpiderBuilder builder,
+			Action<AgentBuilder> configure = null)
+		{
+			Check.NotNull(builder, nameof(builder));
+
+			builder.Services.AddSingleton<IDownloaderAllocator, DownloaderAllocator>();
+			builder.Services.AddSingleton<IDownloaderAgent, LocalDownloaderAgent>();
+			builder.Services.AddSingleton<NetworkCenter>();
+			builder.Services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
+
+			AgentBuilder spiderAgentBuilder = new AgentBuilder(builder.Services);
+			configure?.Invoke(spiderAgentBuilder);
+
+			return builder;
+		}
+		
 		public static AgentBuilder UseFileLocker(this AgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));

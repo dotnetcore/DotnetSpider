@@ -30,7 +30,7 @@ namespace DotnetSpider.Portal
 			services.AddDotnetSpider(builder =>
 			{
 				builder.UserKafka();
-				builder.AddDownloaderCenter(x => x.UseMySqlDownloaderAgentStore());
+				builder.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
 				builder.AddSpiderStatisticsCenter(x => x.UseMemory());
 			});
 

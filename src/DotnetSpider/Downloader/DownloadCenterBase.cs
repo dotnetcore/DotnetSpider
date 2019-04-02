@@ -19,10 +19,10 @@ namespace DotnetSpider.Downloader
 	{
 		private bool _isRunning;
 
-		private readonly ConcurrentDictionary<string, DownloaderAgent> _agents =
+		protected readonly ConcurrentDictionary<string, DownloaderAgent> Agents =
 			new ConcurrentDictionary<string, DownloaderAgent>();
 
-		private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _allocatedAgents =
+		protected readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> AllocatedAgents =
 			new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
 
 		/// <summary>
@@ -88,10 +88,11 @@ namespace DotnetSpider.Downloader
 				{
 					case Framework.RegisterCommand:
 					{
+						// 此处不考虑超时，节点数量不会很多
 						var agent = JsonConvert.DeserializeObject<DownloaderAgent>(commandMessage.Message);
-						if ((DateTime.Now - agent.CreationTime).TotalSeconds < 30)
+						if (agent != null)
 						{
-							_agents.AddOrUpdate(agent.Id, x => agent, (s, a) =>
+							Agents.AddOrUpdate(agent.Id, x => agent, (s, a) =>
 							{
 								a.LastModificationTime = agent.LastModificationTime;
 								return a;
@@ -101,7 +102,7 @@ namespace DotnetSpider.Downloader
 						}
 						else
 						{
-							Logger.LogWarning($"注册下载代理器 {agent.Id} 过期");
+							Logger.LogError($"注册下载代理器消息不正确: {commandMessage.Message}");
 						}
 
 						break;
@@ -109,19 +110,26 @@ namespace DotnetSpider.Downloader
 					case Framework.HeartbeatCommand:
 					{
 						var heartbeat = JsonConvert.DeserializeObject<DownloaderAgentHeartbeat>(commandMessage.Message);
-						if ((DateTime.Now - heartbeat.CreationTime).TotalSeconds < 30)
+						if (heartbeat != null)
 						{
-							if (_agents.ContainsKey(heartbeat.AgentId))
+							if ((DateTime.Now - heartbeat.CreationTime).TotalSeconds < 30)
 							{
-								_agents[heartbeat.AgentId].RefreshLastModificationTime();
-							}
+								if (Agents.ContainsKey(heartbeat.AgentId))
+								{
+									Agents[heartbeat.AgentId].RefreshLastModificationTime();
+								}
 
-							await DownloaderAgentStore.HeartbeatAsync(heartbeat);
-							Logger.LogDebug($"注册下载代理器 {heartbeat.AgentId} 更新心跳成功");
+								await DownloaderAgentStore.HeartbeatAsync(heartbeat);
+								Logger.LogDebug($"下载代理器 {heartbeat.AgentId} 更新心跳成功");
+							}
+							else
+							{
+								Logger.LogWarning($"下载代理器 {heartbeat.AgentId} 更新心跳过期");
+							}
 						}
 						else
 						{
-							Logger.LogWarning($"注册下载代理器 {heartbeat.AgentId} 更新心跳过期");
+							Logger.LogError($"下载代理器心跳信息不正确: {commandMessage.Message}");
 						}
 
 						break;
@@ -129,15 +137,20 @@ namespace DotnetSpider.Downloader
 					case Framework.AllocateDownloaderCommand:
 					{
 						var options = JsonConvert.DeserializeObject<AllotDownloaderMessage>(commandMessage.Message);
-						if ((DateTime.Now - options.CreationTime).TotalSeconds < 30)
+						if (options != null)
 						{
-							await AllocateAsync(options);
-							await Mq.PublishAsync($"{Framework.ResponseHandlerTopic}{options.OwnerId}",
-								$"|{Framework.AllocateDownloaderCommand}|true");
+							if ((DateTime.Now - options.CreationTime).TotalSeconds < 30)
+							{
+								await AllocateAsync(options);
+							}
+							else
+							{
+								Logger.LogWarning($"任务 {options.OwnerId} 分配下载代理器过期");
+							}
 						}
 						else
 						{
-							Logger.LogWarning($"任务 {options.OwnerId} 分配下载代理器过期");
+							Logger.LogError($"分配下载代理器过期信息不正确: {commandMessage.Message}");
 						}
 
 						break;
@@ -145,17 +158,24 @@ namespace DotnetSpider.Downloader
 					case Framework.DownloadCommand:
 					{
 						var requests = JsonConvert.DeserializeObject<Request[]>(commandMessage.Message);
-						requests = requests.Where(x => (DateTime.Now - x.CreationTime).TotalSeconds < 60).ToArray();
-						if (requests.Length > 0)
+						if (requests != null)
 						{
-							var ownerId = requests[0].OwnerId;
-							foreach (var request in requests)
+							requests = requests.Where(x => (DateTime.Now - x.CreationTime).TotalSeconds < 60).ToArray();
+							if (requests.Length > 0)
 							{
-								request.CreationTime = DateTime.Now;
-							}
+								var ownerId = requests[0].OwnerId;
+								foreach (var request in requests)
+								{
+									request.CreationTime = DateTime.Now;
+								}
 
-							await EnqueueRequests(ownerId, requests);
-							Logger.LogDebug($"任务 {ownerId} 下载请求分发成功");
+								await EnqueueRequests(ownerId, requests);
+								Logger.LogDebug($"任务 {ownerId} 下载请求分发成功");
+							}
+						}
+						else
+						{
+							Logger.LogError($"任务请求信息不正确: {commandMessage.Message}");
 						}
 
 						break;
@@ -177,7 +197,7 @@ namespace DotnetSpider.Downloader
 #endif
 		}
 
-		
+
 		/// <summary>
 		/// 分配下载器代理
 		/// </summary>
@@ -185,10 +205,10 @@ namespace DotnetSpider.Downloader
 		/// <returns></returns>
 		protected virtual async Task<bool> AllocateAsync(AllotDownloaderMessage allotDownloaderMessage)
 		{
-			var agents = _agents.Values;
+			var agents = Agents.Values;
 			if (agents.Count == 0)
 			{
-				Logger.LogInformation($"任务 {allotDownloaderMessage.OwnerId} 未找到活跃的下载器代理");
+				Logger.LogInformation($"任务 {allotDownloaderMessage.OwnerId} 未找到可用的下载器代理");
 				return false;
 			}
 
@@ -221,11 +241,11 @@ namespace DotnetSpider.Downloader
 			// 1. 本机下载中心只会有一个下载代理
 			// 2. TODO: 如果下载器代理下线如何解决
 			// 3. TODO: 实现分配策略
-			_allocatedAgents.AddOrUpdate(ownerId,
+			AllocatedAgents.AddOrUpdate(ownerId,
 				new ConcurrentDictionary<string, object>((await DownloaderAgentStore.GetAllocatedListAsync(ownerId))
 					.Select(x => x.AgentId).ToDictionary(x => x, x => new object())),
 				(s, list) => list);
-			var agentIds = _allocatedAgents[ownerId].Keys;
+			var agentIds = AllocatedAgents[ownerId].Keys;
 			if (agentIds.Count <= 0)
 			{
 				Logger.LogError($"任务 {ownerId} 未找到活跃的下载器代理");
@@ -233,10 +253,10 @@ namespace DotnetSpider.Downloader
 
 			foreach (var agentId in agentIds)
 			{
-				if (_agents.ContainsKey(agentId))
+				if (Agents.ContainsKey(agentId))
 				{
-					var agent = _agents[agentId];
-					if ((DateTime.Now - _agents[agentId].LastModificationTime).TotalSeconds < 12)
+					var agent = Agents[agentId];
+					if ((DateTime.Now - Agents[agentId].LastModificationTime).TotalSeconds < 12)
 					{
 						var json = JsonConvert.SerializeObject(requests);
 						var message = $"|{Framework.DownloadCommand}|{json}";
@@ -245,12 +265,11 @@ namespace DotnetSpider.Downloader
 					// 遇到下线的节点需要跳过等上线
 					else
 					{
-						 
 					}
 				}
 			}
 		}
-		
+
 		private Task StartSyncDownloaderAgentDataService()
 		{
 			return Task.Factory.StartNew(async () =>
@@ -266,19 +285,26 @@ namespace DotnetSpider.Downloader
 
 		private async Task SyncDownloaderAgentData()
 		{
-			var agents = await DownloaderAgentStore.GetAllListAsync();
-
-			foreach (var agent in agents)
+			try
 			{
-				_agents.AddOrUpdate(agent.Id, x => agent, (s, downloaderAgent) =>
-				{
-					if (downloaderAgent.LastModificationTime < agent.LastModificationTime)
-					{
-						downloaderAgent.LastModificationTime = agent.LastModificationTime;
-					}
+				var agents = await DownloaderAgentStore.GetAllListAsync();
 
-					return downloaderAgent;
-				});
+				foreach (var agent in agents)
+				{
+					Agents.AddOrUpdate(agent.Id, x => agent, (s, downloaderAgent) =>
+					{
+						if (downloaderAgent.LastModificationTime < agent.LastModificationTime)
+						{
+							downloaderAgent.LastModificationTime = agent.LastModificationTime;
+						}
+
+						return downloaderAgent;
+					});
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"同步下载器代理数据失败: {e}");
 			}
 		}
 	}

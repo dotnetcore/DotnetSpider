@@ -196,31 +196,30 @@ namespace DotnetSpider
 					// 添加任务启动的监控信息
 					await _statisticsService.StartAsync(Id);
 
-					_allocatedDownloader = false;
-
 					// 订阅数据流
 					_mq.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
 						async message => await HandleMessage(message));
 
+					_allocated.Set(0);
+					_allocatedDownloader = true;
 					// 先分配下载器，因为分配下载器的开销、时间更小，后面 RequestSupply 可能加载大量的请求，时间开销很大
 					await AllotDownloaderAsync();
 
 					// 等待 15 秒如果没有收到分配结果，超时结束
-					for (int i = 0; i < 100; ++i)
+					for (var i = 0; i < 100; ++i)
 					{
-						if (_allocatedDownloader)
+						if (!_allocatedDownloader)
+						{
+							return;
+						}
+
+						if (_allocated.Value == DownloaderSettings.DownloaderCount)
 						{
 							_logger.LogInformation($"任务 {Id} 分配下载器成功");
 							break;
 						}
 
 						Thread.Sleep(150);
-					}
-
-					if (!_allocatedDownloader)
-					{
-						_logger.LogError($"任务 {Id} 分配下载器失败");
-						return;
 					}
 
 					// 通过供应接口添加请求
@@ -531,7 +530,16 @@ namespace DotnetSpider
 				{
 					case Framework.AllocateDownloaderCommand:
 					{
-						_allocatedDownloader = commandMessage.Message == "true";
+						if (commandMessage.Message == "true")
+						{
+							_allocated.Inc();
+						}
+						else
+						{
+							_logger.LogError($"任务 {Id} 分配下载器代理失败");
+							_allocatedDownloader = false;
+						}
+
 						break;
 					}
 					default:
@@ -675,7 +683,7 @@ namespace DotnetSpider
 						_logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 失败: {e}");
 					}
 				});
-				
+
 				// TODO: 此处需要优化
 				var retryResponses =
 					responses.Where(x => !x.Success && x.Request.RetriedTimes < RetryDownloadTimes)

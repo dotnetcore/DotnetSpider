@@ -43,14 +43,13 @@ namespace DotnetSpider
 
 			var dotnetSpiderBuilder = new DotnetSpiderBuilder(builder.Services);
 			dotnetSpiderBuilder.UseLocalMessageQueue();
-			dotnetSpiderBuilder.AddDownloaderAgent(x =>
+			dotnetSpiderBuilder.AddLocalDownloaderAgent(x =>
 			{
 				x.UseFileLocker();
 				x.UseDefaultAdslRedialer();
 				x.UseDefaultInternetDetector();
 			});
-			builder.Services.AddSingleton<IDownloaderAgent, LocalDownloaderAgent>();
-			dotnetSpiderBuilder.AddDownloaderCenter(x => x.UseMemoryDownloaderAgentStore());
+			dotnetSpiderBuilder.AddLocalDownloadCenter();
 			dotnetSpiderBuilder.AddSpiderStatisticsCenter(x => x.UseMemory());
 
 			return builder;

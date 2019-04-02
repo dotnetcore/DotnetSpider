@@ -19,7 +19,7 @@ namespace DotnetSpider.DownloadCenter
 					services.AddDotnetSpider(builder =>
 					{
 						builder.UserKafka();
-						builder.AddDownloaderCenter(x => x.UseMySqlDownloaderAgentStore());
+						builder.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
 						builder.AddSpiderStatisticsCenter(x => x.UseMemory());
 					});
 					services.AddHostedService<LocalDownloadCenter>();

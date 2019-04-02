@@ -311,6 +311,8 @@ namespace DotnetSpider.Downloader
 					if (downloaderEntry == null)
 					{
 						Logger.LogError($"任务 {allotDownloaderMessage.OwnerId} 分配下载器 {allotDownloaderMessage.Type} 失败");
+						await _mq.PublishAsync($"{Framework.ResponseHandlerTopic}{allotDownloaderMessage.OwnerId}",
+							$"|{Framework.AllocateDownloaderCommand}|false");
 					}
 					else
 					{
@@ -318,6 +320,8 @@ namespace DotnetSpider.Downloader
 						_cache.TryAdd(allotDownloaderMessage.OwnerId, downloaderEntry);
 						Logger.LogInformation(
 							$"任务 {allotDownloaderMessage.OwnerId} 分配下载器 {allotDownloaderMessage.Type} 成功");
+						await _mq.PublishAsync($"{Framework.ResponseHandlerTopic}{allotDownloaderMessage.OwnerId}",
+							$"|{Framework.AllocateDownloaderCommand}|true");
 					}
 				}
 				else
