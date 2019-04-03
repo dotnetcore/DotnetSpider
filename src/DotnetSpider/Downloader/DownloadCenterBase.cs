@@ -22,8 +22,8 @@ namespace DotnetSpider.Downloader
 		protected readonly ConcurrentDictionary<string, DownloaderAgent> Agents =
 			new ConcurrentDictionary<string, DownloaderAgent>();
 
-		protected readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> AllocatedAgents =
-			new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
+		protected readonly ConcurrentDictionary<string, Tuple<AllocateDownloaderMessage, string[]>> AllocatedAgents
+			= new ConcurrentDictionary<string, Tuple<AllocateDownloaderMessage, string[]>>();
 
 		/// <summary>
 		/// 消息队列
@@ -144,12 +144,12 @@ namespace DotnetSpider.Downloader
 					}
 					case Framework.AllocateDownloaderCommand:
 					{
-						var options = JsonConvert.DeserializeObject<AllotDownloaderMessage>(commandMessage.Message);
+						var options = JsonConvert.DeserializeObject<AllocateDownloaderMessage>(commandMessage.Message);
 						if (options != null)
 						{
 							if ((DateTime.Now - options.CreationTime).TotalSeconds < Options.MessageExpiredTime)
 							{
-								await AllocateAsync(options);
+								await AllocateAsync(options, commandMessage.Message);
 							}
 							else
 							{
@@ -210,9 +210,11 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 分配下载器代理
 		/// </summary>
-		/// <param name="allotDownloaderMessage">分配下载器代理的选项</param>
+		/// <param name="allotDownloaderMessage">分配下载器代理的消息</param>
+		/// <param name="message">分配下载器代理的消息</param>
 		/// <returns></returns>
-		protected virtual async Task<bool> AllocateAsync(AllotDownloaderMessage allotDownloaderMessage)
+		protected virtual async Task<bool> AllocateAsync(AllocateDownloaderMessage allotDownloaderMessage,
+			string message)
 		{
 			var agents = Agents.Values;
 			if (agents.Count == 0)
@@ -228,16 +230,19 @@ namespace DotnetSpider.Downloader
 
 			var allocatedAgents = agents.Count == count ? agents : agents.OrderBy(_ => Guid.NewGuid()).Take(count);
 			var agentIds = allocatedAgents.Select(x => x.Id).ToArray();
-			// 保存节点选取信息
-			await DownloaderAgentStore.AllocateAsync(allotDownloaderMessage.OwnerId, agentIds);
+
 			// 发送消息让下载代理器分配好下载器
-			var message =
+			var msg =
 				$"|{Framework.AllocateDownloaderCommand}|{JsonConvert.SerializeObject(allotDownloaderMessage)}";
 			foreach (var agent in agents)
 			{
-				await Mq.PublishAsync(agent.Id, message);
+				await Mq.PublishAsync(agent.Id, msg);
 			}
 
+			// 保存节点选取信息
+			await DownloaderAgentStore.AllocateAsync(allotDownloaderMessage.OwnerId, message, agentIds);
+			AllocatedAgents.AddOrUpdate(allotDownloaderMessage.OwnerId,
+				new Tuple<AllocateDownloaderMessage, string[]>(allotDownloaderMessage, agentIds), (s, tuple) => tuple);
 			Logger.LogInformation(
 				$"任务 {allotDownloaderMessage.OwnerId} 分配下载代理器成功: {JsonConvert.SerializeObject(allocatedAgents)}");
 			return true;
@@ -249,36 +254,61 @@ namespace DotnetSpider.Downloader
 		/// <param name="ownerId">任务标识</param>
 		/// <param name="requests">请求</param>
 		/// <returns></returns>
-		protected virtual async Task EnqueueRequests(string ownerId, IEnumerable<Request> requests)
+		protected virtual async Task EnqueueRequests(string ownerId, Request[] requests)
 		{
-			// TODO: 
-			AllocatedAgents.AddOrUpdate(ownerId,
-				new ConcurrentDictionary<string, object>((await DownloaderAgentStore.GetAllocatedListAsync(ownerId))
-					.Select(x => x.AgentId).ToDictionary(x => x, x => new object())),
-				(s, list) => list);
-			var agentIds = AllocatedAgents[ownerId].Keys;
-			if (agentIds.Count <= 0)
+			if (requests == null || requests.Length == 0)
+			{
+				return;
+			}
+			// 如果缓存中没有则从数据库中取
+			AllocatedAgents.AddOrUpdate(ownerId, new Tuple<AllocateDownloaderMessage, string[]>(
+				JsonConvert.DeserializeObject<AllocateDownloaderMessage>(
+					await DownloaderAgentStore.GetAllocateDownloaderMessageAsync(ownerId)),
+				(await DownloaderAgentStore.GetAllocatedListAsync(ownerId)).Select(x => x.AgentId).ToArray()
+			), (s, tuple) => tuple);
+
+			var allocateDownloaderMessage = AllocatedAgents[ownerId].Item1;
+			
+			var agentIds = AllocatedAgents[ownerId].Item2;
+			if (agentIds.Length <= 0)
 			{
 				Logger.LogError($"任务 {ownerId} 未找到活跃的下载器代理");
 			}
 
-			foreach (var agentId in agentIds)
+			switch (allocateDownloaderMessage.DownloadPolicy)
 			{
-				if (Agents.ContainsKey(agentId))
+				case DownloadPolicy.Random:
 				{
-					var agent = Agents[agentId];
-					if ((DateTime.Now - Agents[agentId].LastModificationTime).TotalSeconds < 12)
+					agentIds = new List<string>(agentIds).OrderBy(_ => Guid.NewGuid()).ToArray(); 
+					foreach (var agentId in agentIds)
 					{
-						var json = JsonConvert.SerializeObject(requests);
-						var message = $"|{Framework.DownloadCommand}|{json}";
-						await Mq.PublishAsync(agent.Id, message);
+						if (Agents.ContainsKey(agentId))
+						{
+							var agent = Agents[agentId];
+							if ((DateTime.Now - Agents[agentId].LastModificationTime).TotalSeconds < 12)
+							{
+								var json = JsonConvert.SerializeObject(requests);
+								var message = $"|{Framework.DownloadCommand}|{json}";
+					
+								switch (allocateDownloaderMessage.DownloadPolicy)
+								{
+									case DownloadPolicy.Random:
+									{
+										await Mq.PublishAsync(agent.Id, message);
+										break;
+									}
+								}
+							}
+							// 遇到下线的节点需要跳过等上线
+							else
+							{
+							}
+						}
 					}
-					// 遇到下线的节点需要跳过等上线
-					else
-					{
-					}
+					break;
 				}
 			}
+
 		}
 
 		private Task StartSyncDownloaderAgentDataService()

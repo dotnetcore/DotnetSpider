@@ -294,7 +294,7 @@ namespace DotnetSpider.Downloader
 		/// <returns></returns>
 		private async Task AllotDownloaderAsync(string message)
 		{
-			var allotDownloaderMessage = JsonConvert.DeserializeObject<AllotDownloaderMessage>(message);
+			var allotDownloaderMessage = JsonConvert.DeserializeObject<AllocateDownloaderMessage>(message);
 			if (allotDownloaderMessage == null)
 			{
 				Logger.LogError($"无法分配下载器，消息不正确: {message}");

@@ -34,7 +34,7 @@ namespace DotnetSpider.Downloader
 		/// <returns></returns>
 		/// <exception cref="NotImplementedException"></exception>
 		public Task<IDownloader> CreateDownloaderAsync(string agentId,
-			AllotDownloaderMessage allotDownloaderMessage)
+			AllocateDownloaderMessage allotDownloaderMessage)
 		{
 			IDownloader downloader = null;
 			switch (allotDownloaderMessage.Type)

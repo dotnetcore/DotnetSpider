@@ -18,6 +18,9 @@ namespace DotnetSpider.Downloader.Internal
 		private readonly ConcurrentDictionary<string, IEnumerable<string>> _allocatedAgents =
 			new ConcurrentDictionary<string, IEnumerable<string>>();
 
+		private readonly ConcurrentDictionary<string, string> _allocateDownloaderMessages =
+			new ConcurrentDictionary<string, string>();
+
 		public Task EnsureDatabaseAndTableCreatedAsync()
 		{
 #if NETFRAMEWORK
@@ -77,21 +80,32 @@ namespace DotnetSpider.Downloader.Internal
 		}
 
 		/// <summary>
-		/// 
+		/// 保存给任务分配的下载器代理
 		/// </summary>
-		/// <param name="ownerId"></param>
-		/// <param name="agentIds"></param>
+		/// <param name="ownerId">任务标识</param>
+		/// <param name="message">分配下载器代理的消息</param>
+		/// <param name="agentIds">分配的下载器代理标识</param>
 		/// <returns></returns>
-		public Task AllocateAsync(string ownerId, IEnumerable<string> agentIds)
+		public Task AllocateAsync(string ownerId, string message, IEnumerable<string> agentIds)
 		{
 			var agentIdArray = agentIds.ToArray();
 			_allocatedAgents.AddOrUpdate(ownerId, s => agentIdArray, (s, v) => agentIdArray);
-
+			_allocateDownloaderMessages.AddOrUpdate(ownerId, x => message, (s, x) => x);
 #if NETFRAMEWORK
             return DotnetSpider.Core.Framework.CompletedTask;
 #else
 			return Task.CompletedTask;
 #endif
+		}
+
+		public Task<string> GetAllocateDownloaderMessageAsync(string ownerId)
+		{
+			if (_allocateDownloaderMessages.TryGetValue(ownerId, out string message))
+			{
+				return Task.FromResult(message);
+			}
+
+			return Task.FromResult(string.Empty);
 		}
 	}
 }

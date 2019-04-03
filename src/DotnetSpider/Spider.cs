@@ -583,7 +583,7 @@ namespace DotnetSpider
 		/// <returns>是否分配成功</returns>
 		private async Task AllotDownloaderAsync()
 		{
-			var json = JsonConvert.SerializeObject(new AllotDownloaderMessage
+			var json = JsonConvert.SerializeObject(new AllocateDownloaderMessage
 			{
 				OwnerId = Id,
 				AllowAutoRedirect = DownloaderSettings.AllowAutoRedirect,
