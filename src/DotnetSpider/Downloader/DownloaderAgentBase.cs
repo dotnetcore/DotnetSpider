@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
@@ -23,6 +25,7 @@ namespace DotnetSpider.Downloader
 		private readonly IMessageQueue _mq;
 		private readonly IDownloaderAllocator _downloaderAllocator;
 		private readonly IDownloaderAgentOptions _options;
+		private const string DownloaderPersistFolderName = "downloaders";
 
 		private readonly ConcurrentDictionary<string, IDownloader> _cache =
 			new ConcurrentDictionary<string, IDownloader>();
@@ -59,6 +62,15 @@ namespace DotnetSpider.Downloader
 			Logger = logger;
 		}
 
+		static DownloaderAgentBase()
+		{
+			var downloaderPersistDirectory = new DirectoryInfo(Path.Combine(Framework.BaseDirectory, DownloaderPersistFolderName));
+			if (!downloaderPersistDirectory.Exists)
+			{
+				downloaderPersistDirectory.Create();
+			}
+		}
+
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
 			if (_isRunning)
@@ -67,6 +79,9 @@ namespace DotnetSpider.Downloader
 			}
 
 			_isRunning = true;
+
+			// 加载并初始化未释放的下载器
+			await LoadDownloaderAsync();
 
 			// 注册节点
 			var json = JsonConvert.SerializeObject(new DownloaderAgent
@@ -240,6 +255,22 @@ namespace DotnetSpider.Downloader
 			};
 		}
 
+		private async Task LoadDownloaderAsync()
+		{
+			try
+			{
+				var downloaderFiles = Directory.GetFiles(Path.Combine(Framework.BaseDirectory, DownloaderPersistFolderName));
+				foreach (var downloaderFile in downloaderFiles)
+				{
+					await AllotDownloaderAsync(File.ReadAllText(downloaderFile));
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"下载器代理从文件加载失败: {e}");
+			}
+		}
+
 		private Task ReleaseDownloaderAsync()
 		{
 			return Task.Factory.StartNew(() =>
@@ -255,7 +286,7 @@ namespace DotnetSpider.Downloader
 						foreach (var kv in _cache)
 						{
 							var downloader = kv.Value;
-							if ((now - downloader.LastUsedTime).TotalSeconds > 300)
+							if ((now - downloader.LastUsedTime).TotalSeconds > 600)
 							{
 								downloader.Dispose();
 								expires.Add(kv.Key);
@@ -264,6 +295,8 @@ namespace DotnetSpider.Downloader
 
 						foreach (var expire in expires)
 						{
+							File.Delete(Path.Combine(Framework.BaseDirectory, DownloaderPersistFolderName, expire));
+
 							if (!_cache.TryRemove(expire, out _))
 							{
 								Logger.LogWarning($"下载器代理 {_options.AgentId} 释放过期下载器 {expire} 失败");
@@ -316,8 +349,13 @@ namespace DotnetSpider.Downloader
 					}
 					else
 					{
+						downloaderEntry.LastUsedTime = DateTime.Now;
 						ConfigureDownloader?.Invoke(downloaderEntry);
 						_cache.TryAdd(allotDownloaderMessage.OwnerId, downloaderEntry);
+
+						// 保存分配的下载器初始信息
+						File.WriteAllText(Path.Combine(Framework.BaseDirectory, DownloaderPersistFolderName, allotDownloaderMessage.OwnerId.ToString()), message, Encoding.UTF8);
+
 						Logger.LogInformation(
 							$"任务 {allotDownloaderMessage.OwnerId} 分配下载器 {allotDownloaderMessage.Type} 成功");
 						await _mq.PublishAsync($"{Framework.ResponseHandlerTopic}{allotDownloaderMessage.OwnerId}",
