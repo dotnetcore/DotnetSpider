@@ -18,10 +18,11 @@ namespace DotnetSpider.Downloader.Internal
 		/// </summary>
 		/// <param name="mq">消息队列</param>
 		/// <param name="downloaderAgentStore">下载器代理存储</param>
+		/// <param name="options">系统选项</param>
 		/// <param name="logger">日志接口</param>
 		public LocalDownloadCenter(IMessageQueue mq,
-			IDownloaderAgentStore downloaderAgentStore,
-			ILogger<LocalDownloadCenter> logger) : base(mq, downloaderAgentStore, logger)
+			IDownloaderAgentStore downloaderAgentStore, ISpiderOptions options,
+			ILogger<LocalDownloadCenter> logger) : base(mq, downloaderAgentStore, options, logger)
 		{
 		}
 

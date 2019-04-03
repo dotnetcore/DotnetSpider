@@ -81,5 +81,17 @@ namespace DotnetSpider.Core
 		/// Kafka 消费组
 		/// </summary>
 		string KafkaConsumerGroup { get; }
+
+		/// <summary>
+		/// 消息队列推送消息、文章话题、获取消息失败重试的次数
+		/// 默认为 2880 秒, 8 小时
+		/// </summary>
+		int MessageQueueRetryTimes { get; }
+
+		/// <summary>
+		/// 设置消息过期时间，每个消息发送应该带上时间，超时的消息不作处理
+		/// 默认值 60 秒
+		/// </summary>
+		int MessageExpiredTime { get; }
 	}
 }

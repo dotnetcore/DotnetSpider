@@ -27,6 +27,8 @@ namespace DotnetSpider.Tests
 			public string EmailPort { get; }
 			public string KafkaBootstrapServers { get; }
 			public string KafkaConsumerGroup { get; }
+			public int MessageQueueRetryTimes { get; }
+			public int MessageExpiredTime { get; }
 		}
 
 		[Fact(DisplayName = "CreateDefaultStorage")]

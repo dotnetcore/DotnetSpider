@@ -94,6 +94,22 @@ namespace DotnetSpider.Core
 			? "DotnetSpider"
 			: _configuration["KafkaConsumerGroup"];
 
+		/// <summary>
+		/// 消息队列推送消息、文章话题、获取消息失败重试的次数
+		/// 默认是 28800 次即 8 小时
+		/// </summary>
+		public int MessageQueueRetryTimes => string.IsNullOrWhiteSpace(_configuration["MessageQueueRetryTimes"])
+			? 28800
+			: int.Parse(_configuration["MessageQueueRetryTimes"]);
+
+		/// <summary>
+		/// 设置消息过期时间，每个消息发送应该带上时间，超时的消息不作处理
+		/// 默认值 60 秒
+		/// </summary>
+		public int MessageExpiredTime => string.IsNullOrWhiteSpace(_configuration["MessageExpiredTime"])
+			? 60
+			: int.Parse(_configuration["MessageExpiredTime"]);
+
 		public SpiderOptions(IConfiguration configuration)
 		{
 			_configuration = configuration;

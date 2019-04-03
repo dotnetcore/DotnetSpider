@@ -35,7 +35,7 @@ namespace DotnetSpider
 		private string _id;
 		private bool _retryWhenResultIsEmpty;
 		private bool _mmfSignal;
-		private bool _allocatedDownloader;
+		private bool _allocatedSuccess;
 
 		/// <summary>
 		/// 下载器配置

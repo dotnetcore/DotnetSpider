@@ -39,7 +39,7 @@ namespace DotnetSpider.MessageQueue
 			{
 #if DEBUG
 				var stackTrace = new StackTrace();
-				_logger?.LogDebug($"推送空消息到 Topic {topic}: {stackTrace}");
+				_logger.LogDebug($"推送空消息到 Topic {topic}: {stackTrace}");
 #endif
 #if NETFRAMEWORK
                 return DotnetSpider.Core.Framework.CompletedTask;
@@ -61,7 +61,7 @@ namespace DotnetSpider.MessageQueue
 						}
 						catch (Exception e)
 						{
-							_logger?.LogError($"Topic {topic} 消费消息 {message} 失败: {e}");
+							_logger.LogError($"Topic {topic} 消费消息 {message} 失败: {e}");
 						}
 					}).ConfigureAwait(false).GetAwaiter();
 				}
@@ -70,7 +70,7 @@ namespace DotnetSpider.MessageQueue
 			{
 #if DEBUG
 				var stackTrace = new StackTrace();
-				_logger?.LogDebug($"Topic {topic} 未被订阅: {stackTrace}");
+				_logger.LogDebug($"Topic {topic} 未被订阅: {stackTrace}");
 #endif
 			}
 

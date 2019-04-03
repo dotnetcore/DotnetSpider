@@ -31,6 +31,11 @@ namespace DotnetSpider.Downloader
 		protected readonly IMessageQueue Mq;
 
 		/// <summary>
+		/// 系统选项
+		/// </summary>
+		protected readonly ISpiderOptions Options;
+
+		/// <summary>
 		/// 日志接口
 		/// </summary>
 		protected readonly ILogger Logger;
@@ -45,15 +50,18 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		/// <param name="mq">消息队列</param>
 		/// <param name="downloaderAgentStore">下载器代理存储</param>
+		/// <param name="options">系统选项</param>
 		/// <param name="logger">日志接口</param>
 		protected DownloadCenterBase(
 			IMessageQueue mq,
 			IDownloaderAgentStore downloaderAgentStore,
+			ISpiderOptions options,
 			ILogger logger)
 		{
 			Mq = mq;
 			DownloaderAgentStore = downloaderAgentStore;
 			Logger = logger;
+			Options = options;
 		}
 
 		/// <summary>
@@ -112,7 +120,7 @@ namespace DotnetSpider.Downloader
 						var heartbeat = JsonConvert.DeserializeObject<DownloaderAgentHeartbeat>(commandMessage.Message);
 						if (heartbeat != null)
 						{
-							if ((DateTime.Now - heartbeat.CreationTime).TotalSeconds < 30)
+							if ((DateTime.Now - heartbeat.CreationTime).TotalSeconds < Options.MessageExpiredTime)
 							{
 								if (Agents.ContainsKey(heartbeat.AgentId))
 								{
@@ -139,7 +147,7 @@ namespace DotnetSpider.Downloader
 						var options = JsonConvert.DeserializeObject<AllotDownloaderMessage>(commandMessage.Message);
 						if (options != null)
 						{
-							if ((DateTime.Now - options.CreationTime).TotalSeconds < 30)
+							if ((DateTime.Now - options.CreationTime).TotalSeconds < Options.MessageExpiredTime)
 							{
 								await AllocateAsync(options);
 							}

@@ -35,6 +35,19 @@ namespace DotnetSpider
 		private readonly ISpiderOptions _options;
 
 		/// <summary>
+		/// 结束前的处理工作
+		/// </summary>
+		/// <returns></returns>
+		protected virtual Task OnExiting()
+		{
+#if NETFRAMEWORK
+            return Framework.CompletedTask;
+#else
+			return Task.CompletedTask;
+#endif
+		}
+
+		/// <summary>
 		/// 构造方法
 		/// </summary>
 		/// <param name="mq"></param>
@@ -196,19 +209,21 @@ namespace DotnetSpider
 					// 添加任务启动的监控信息
 					await _statisticsService.StartAsync(Id);
 
-					// 订阅数据流
+					// 订阅数据流，如果订阅失败
 					_mq.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
 						async message => await HandleMessage(message));
 
+					// 如果设置了要分配 10 个下载器，当收到 10 个下载器已经分配好时，认为分配完成
 					_allocated.Set(0);
-					_allocatedDownloader = true;
+					// 如果有任何一个下载器代理分配失败，收到消息后直接把此值赋为 false，爬虫退出
+					_allocatedSuccess = true;
 					// 先分配下载器，因为分配下载器的开销、时间更小，后面 RequestSupply 可能加载大量的请求，时间开销很大
 					await AllotDownloaderAsync();
 
-					// 等待 15 秒如果没有收到分配结果，超时结束
-					for (var i = 0; i < 100; ++i)
+					// 等待 30 秒如果没有完成分配，超时结束
+					for (var i = 0; i < 200; ++i)
 					{
-						if (!_allocatedDownloader)
+						if (!_allocatedSuccess)
 						{
 							return;
 						}
@@ -263,11 +278,29 @@ namespace DotnetSpider
 						}
 					}
 
-					// 添加任务退出的监控信息
-					await _statisticsService.ExitAsync(Id);
+					try
+					{
+						// TODO: 如果订阅消息队列失败，此处是否应该再尝试上报，会导致两倍的重试时间
+						// 添加任务退出的监控信息
+						await _statisticsService.ExitAsync(Id);
 
-					// 最后打印一次任务状态信息
-					await _statisticsService.PrintStatisticsAsync(Id);
+						// 最后打印一次任务状态信息
+						await _statisticsService.PrintStatisticsAsync(Id);
+					}
+					catch (Exception e)
+					{
+						_logger.LogInformation($"任务 {Id} 上传退出信息失败: {e}");
+					}
+
+					try
+					{
+						await OnExiting();
+					}
+					catch (Exception e)
+					{
+						_logger.LogInformation($"任务 {Id} 退出事件处理失败: {e}");
+					}
+
 					// 标识任务退出完成
 					Status = Status.Exited;
 					_logger.LogInformation($"任务 {Id} 退出");
@@ -537,7 +570,7 @@ namespace DotnetSpider
 						else
 						{
 							_logger.LogError($"任务 {Id} 分配下载器代理失败");
-							_allocatedDownloader = false;
+							_allocatedSuccess = false;
 						}
 
 						break;
