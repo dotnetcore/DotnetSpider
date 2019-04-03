@@ -41,7 +41,7 @@ namespace DotnetSpider
 		protected virtual Task OnExiting()
 		{
 #if NETFRAMEWORK
-            return Framework.CompletedTask;
+			return Framework.CompletedTask;
 #else
 			return Task.CompletedTask;
 #endif
@@ -251,6 +251,10 @@ namespace DotnetSpider
 					{
 						await dataFlow.InitAsync();
 					}
+
+					_enqueued.Set(0);
+					_responded.Set(0);
+					_enqueuedRequestDict.Clear();
 
 					// 启动速度控制器
 					StartSpeedControllerAsync().ConfigureAwait(false).GetAwaiter();
@@ -463,6 +467,7 @@ namespace DotnetSpider
 				{
 					_logger.LogInformation($"任务 {Id} 速度控制器启动");
 
+					var paused = 0;
 					while (!@break)
 					{
 						Thread.Sleep(_speedControllerInterval);
@@ -475,19 +480,65 @@ namespace DotnetSpider
 								{
 									try
 									{
-										var requests = _scheduler.Dequeue(Id, _dequeueBatchCount);
-
-										if (requests == null || requests.Length == 0) break;
-
-										foreach (var request in requests)
+										// 判断是否过多下载请求未得到回应
+										if (_enqueued.Value - _responded.Value > NonRespondedLimitation)
 										{
-											foreach (var configureRequestDelegate in _configureRequestDelegates)
+											if (paused > NonRespondedTimeLimitation)
 											{
-												configureRequestDelegate(request);
+												_logger.LogInformation(
+													$"任务 {Id} {NonRespondedTimeLimitation} 秒未收到下载回应");
+												@break = true;
+												break;
+											}
+
+											paused += _speedControllerInterval;
+											_logger.LogInformation($"任务 {Id} 速度控制器因过多下载请求未得到回应暂停");
+											continue;
+										}
+
+										paused = 0;
+
+										// 重试超时的下载请求
+										var timeoutRequests = new List<Request>();
+										var now = DateTime.Now;
+										foreach (var kv in _enqueuedRequestDict)
+										{
+											if ((now - kv.Value.CreationTime).TotalSeconds > RespondedTimeout)
+											{
+												kv.Value.RetriedTimes++;
+												if (kv.Value.RetriedTimes > RespondedTimeoutRetryTimes)
+												{
+													_logger.LogInformation(
+														$"任务 {Id} 重试下载请求 {RespondedTimeoutRetryTimes} 次未收到下载回应");
+													@break = true;
+													break;
+												}
+
+												timeoutRequests.Add(kv.Value);
 											}
 										}
 
-										await EnqueueRequests(requests);
+										// 如果有超时的下载则重试，无超时的下载则从调度队列里取
+										if (timeoutRequests.Count > 0)
+										{
+											await EnqueueRequests(timeoutRequests.ToArray());
+										}
+										else
+										{
+											var requests = _scheduler.Dequeue(Id, _dequeueBatchCount);
+
+											if (requests == null || requests.Length == 0) break;
+
+											foreach (var request in requests)
+											{
+												foreach (var configureRequestDelegate in _configureRequestDelegates)
+												{
+													configureRequestDelegate(request);
+												}
+											}
+
+											await EnqueueRequests(requests);
+										}
 									}
 									catch (Exception e)
 									{
@@ -605,6 +656,15 @@ namespace DotnetSpider
 				{
 					_logger.LogWarning($"任务 {Id} 接收到空回复");
 					return;
+				}
+
+				_responded.Add(responses.Length);
+
+				// 只要有回应就从缓存中删除，即便是异常要重新下载会成 EnqueueRequest 中重新加回缓存
+				// 此处只需要保证: 发 -> 收 可以一对一删除就可以保证检测机制的正确性
+				foreach (var response in responses)
+				{
+					_enqueuedRequestDict.TryRemove(response.Request.Hash, out _);
 				}
 
 				var agentId = responses.First().AgentId;
@@ -832,6 +892,13 @@ namespace DotnetSpider
 
 				await _mq.PublishAsync(Framework.DownloaderCenterTopic,
 					$"|{Framework.DownloadCommand}|{JsonConvert.SerializeObject(requests)}");
+
+				foreach (var request in requests)
+				{
+					_enqueuedRequestDict.TryAdd(request.Hash, request);
+				}
+
+				_enqueued.Add(requests.Length);
 			}
 		}
 	}

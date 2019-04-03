@@ -168,7 +168,8 @@ namespace DotnetSpider.Downloader
 						var requests = JsonConvert.DeserializeObject<Request[]>(commandMessage.Message);
 						if (requests != null)
 						{
-							requests = requests.Where(x => (DateTime.Now - x.CreationTime).TotalSeconds < 60).ToArray();
+							requests = requests.Where(x =>
+								(DateTime.Now - x.CreationTime).TotalSeconds <= Options.MessageExpiredTime).ToArray();
 							if (requests.Length > 0)
 							{
 								var ownerId = requests[0].OwnerId;
@@ -220,8 +221,12 @@ namespace DotnetSpider.Downloader
 				return false;
 			}
 
-			// TODO: 实现分配
-			var allocatedAgents = new[] {agents.First()};
+			// 计算需要分配的个数
+			var count = allotDownloaderMessage.DownloaderCount >= agents.Count
+				? agents.Count
+				: allotDownloaderMessage.DownloaderCount;
+
+			var allocatedAgents = agents.Count == count ? agents : agents.OrderBy(_ => Guid.NewGuid()).Take(count);
 			var agentIds = allocatedAgents.Select(x => x.Id).ToArray();
 			// 保存节点选取信息
 			await DownloaderAgentStore.AllocateAsync(allotDownloaderMessage.OwnerId, agentIds);
@@ -246,9 +251,7 @@ namespace DotnetSpider.Downloader
 		/// <returns></returns>
 		protected virtual async Task EnqueueRequests(string ownerId, IEnumerable<Request> requests)
 		{
-			// 1. 本机下载中心只会有一个下载代理
-			// 2. TODO: 如果下载器代理下线如何解决
-			// 3. TODO: 实现分配策略
+			// TODO: 
 			AllocatedAgents.AddOrUpdate(ownerId,
 				new ConcurrentDictionary<string, object>((await DownloaderAgentStore.GetAllocatedListAsync(ownerId))
 					.Select(x => x.AgentId).ToDictionary(x => x, x => new object())),

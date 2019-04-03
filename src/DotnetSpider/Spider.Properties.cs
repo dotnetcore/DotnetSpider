@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using DotnetSpider.Core;
 using DotnetSpider.Data;
@@ -22,6 +23,11 @@ namespace DotnetSpider
 		private readonly List<IRequestSupply> _requestSupplies = new List<IRequestSupply>();
 		private readonly List<Action<Request>> _configureRequestDelegates = new List<Action<Request>>();
 		private readonly AtomicInteger _allocated = new AtomicInteger(0);
+		private readonly AtomicInteger _enqueued = new AtomicInteger(0);
+		private readonly AtomicInteger _responded = new AtomicInteger(0);
+
+		private readonly ConcurrentDictionary<string, Request> _enqueuedRequestDict =
+			new ConcurrentDictionary<string, Request>();
 
 		private DateTime _lastRequestedTime;
 		private IScheduler _scheduler;
@@ -240,5 +246,30 @@ namespace DotnetSpider
 				_emptySleepTime = value;
 			}
 		}
+
+		/// <summary>
+		/// 当多少个下载请求未得到回应时，暂停任务
+		/// TODO: 设置范围限制，不能小于 50
+		/// </summary>
+		public int NonRespondedLimitation { get; set; } = 100;
+
+		/// <summary>
+		/// 当一直得不到下载请求一段时间后，任务退出
+		/// 单位: 秒
+		/// TODO: 设置配置限制，不能小于 30
+		/// </summary>
+		public int NonRespondedTimeLimitation { get; set; } = 300;
+
+		/// <summary>
+		/// 多久没有收到回复认为是超时，尝试重试下载
+		/// 单位秒
+		/// </summary>
+		public int RespondedTimeout { get; set; } = 15;
+
+		/// <summary>
+		/// 回应超时的重试次数，如果任一请求的重试次数超过则退出任务
+		/// TODO: 设置配置限制，不能小于 20
+		/// </summary>
+		public int RespondedTimeoutRetryTimes { get; set; } = 20;
 	}
 }

@@ -11,6 +11,11 @@ namespace DotnetSpider.Core
 	{
 		private readonly IConfiguration _configuration;
 
+		public SpiderOptions(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+
 		/// <summary>
 		/// 数据库连接字符串
 		/// </summary>
@@ -85,7 +90,9 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Kafka 服务地址
 		/// </summary>
-		public string KafkaBootstrapServers => _configuration["KafkaBootstrapServers"];
+		public string KafkaBootstrapServers => string.IsNullOrWhiteSpace(_configuration["KafkaBootstrapServers"])
+			? "localhost:9092"
+			: _configuration["KafkaBootstrapServers"];
 
 		/// <summary>
 		/// Kafka 消费组
@@ -109,10 +116,5 @@ namespace DotnetSpider.Core
 		public int MessageExpiredTime => string.IsNullOrWhiteSpace(_configuration["MessageExpiredTime"])
 			? 60
 			: int.Parse(_configuration["MessageExpiredTime"]);
-
-		public SpiderOptions(IConfiguration configuration)
-		{
-			_configuration = configuration;
-		}
 	}
 }
