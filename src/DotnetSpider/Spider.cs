@@ -503,19 +503,20 @@ namespace DotnetSpider
 										var now = DateTime.Now;
 										foreach (var kv in _enqueuedRequestDict)
 										{
-											if ((now - kv.Value.CreationTime).TotalSeconds > RespondedTimeout)
+											if (!((now - kv.Value.CreationTime).TotalSeconds > RespondedTimeout))
 											{
-												kv.Value.RetriedTimes++;
-												if (kv.Value.RetriedTimes > RespondedTimeoutRetryTimes)
-												{
-													_logger.LogInformation(
-														$"任务 {Id} 重试下载请求 {RespondedTimeoutRetryTimes} 次未收到下载回应");
-													@break = true;
-													break;
-												}
-
-												timeoutRequests.Add(kv.Value);
+												continue;
 											}
+											kv.Value.RetriedTimes++;
+											if (kv.Value.RetriedTimes > RespondedTimeoutRetryTimes)
+											{
+												_logger.LogInformation(
+													$"任务 {Id} 重试下载请求 {RespondedTimeoutRetryTimes} 次未收到下载回应");
+												@break = true;
+												break;
+											}
+
+											timeoutRequests.Add(kv.Value);
 										}
 
 										// 如果有超时的下载则重试，无超时的下载则从调度队列里取

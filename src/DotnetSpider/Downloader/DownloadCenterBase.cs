@@ -260,6 +260,7 @@ namespace DotnetSpider.Downloader
 			{
 				return;
 			}
+
 			// 如果缓存中没有则从数据库中取
 			AllocatedAgents.AddOrUpdate(ownerId, new Tuple<AllocateDownloaderMessage, string[]>(
 				JsonConvert.DeserializeObject<AllocateDownloaderMessage>(
@@ -268,47 +269,101 @@ namespace DotnetSpider.Downloader
 			), (s, tuple) => tuple);
 
 			var allocateDownloaderMessage = AllocatedAgents[ownerId].Item1;
-			
+
 			var agentIds = AllocatedAgents[ownerId].Item2;
 			if (agentIds.Length <= 0)
 			{
 				Logger.LogError($"任务 {ownerId} 未找到活跃的下载器代理");
 			}
 
-			switch (allocateDownloaderMessage.DownloadPolicy)
+			var onlineAgents = new List<DownloaderAgent>();
+			// 如果同步了2次都依然没有可用节点则退出
+			for (var i = 0; i < 35; ++i)
 			{
-				case DownloadPolicy.Random:
+				foreach (var agentId in agentIds)
 				{
-					agentIds = new List<string>(agentIds).OrderBy(_ => Guid.NewGuid()).ToArray(); 
-					foreach (var agentId in agentIds)
+					// TODO: 此处是否会有异步问题？刷新线程可能会更新
+					if (Agents.ContainsKey(agentId) &&
+					    (DateTime.Now - Agents[agentId].LastModificationTime).TotalSeconds < 12)
 					{
-						if (Agents.ContainsKey(agentId))
-						{
-							var agent = Agents[agentId];
-							if ((DateTime.Now - Agents[agentId].LastModificationTime).TotalSeconds < 12)
-							{
-								var json = JsonConvert.SerializeObject(requests);
-								var message = $"|{Framework.DownloadCommand}|{json}";
-					
-								switch (allocateDownloaderMessage.DownloadPolicy)
-								{
-									case DownloadPolicy.Random:
-									{
-										await Mq.PublishAsync(agent.Id, message);
-										break;
-									}
-								}
-							}
-							// 遇到下线的节点需要跳过等上线
-							else
-							{
-							}
-						}
+						onlineAgents.Add(Agents[agentId]);
 					}
+				}
+
+				if (onlineAgents.Count == 0)
+				{
+					Thread.Sleep(1000);
+				}
+				else
+				{
 					break;
 				}
 			}
 
+			if (onlineAgents.Count == 0)
+			{
+				// 直接退出即可。爬虫因为没有分配，触发无回应退出事件。
+				return;
+			}
+
+			onlineAgents = onlineAgents.OrderBy(_ => Guid.NewGuid()).ToList();
+
+			switch (allocateDownloaderMessage.DownloadPolicy)
+			{
+				case DownloadPolicy.Random:
+				{
+					int i = 0;
+					int count = onlineAgents.Count;
+					foreach (var request in requests)
+					{
+						DownloaderAgent onlineAgent;
+						if (i < count)
+						{
+							onlineAgent = onlineAgents[i];
+						}
+						else
+						{
+							i = 0;
+							onlineAgent = onlineAgents[i];
+						}
+
+						++i;
+
+						var json = JsonConvert.SerializeObject(new[] {request});
+						var message = $"|{Framework.DownloadCommand}|{json}";
+						await Mq.PublishAsync(onlineAgent.Id, message);
+					}
+					
+					break;
+				}
+				case DownloadPolicy.Chained:
+				{
+					int i = 0;
+					int count = onlineAgents.Count;
+					
+					foreach (var request in requests)
+					{
+						DownloaderAgent onlineAgent;
+						if (i < count)
+						{
+							onlineAgent = onlineAgents[i];
+						}
+						else
+						{
+							i = 0;
+							onlineAgent = onlineAgents[i];
+						}
+
+						++i;
+
+						var json = JsonConvert.SerializeObject(new[] {request});
+						var message = $"|{Framework.DownloadCommand}|{json}";
+						await Mq.PublishAsync(onlineAgent.Id, message);
+					}
+
+					break;
+				}
+			}
 		}
 
 		private Task StartSyncDownloaderAgentDataService()
@@ -317,7 +372,7 @@ namespace DotnetSpider.Downloader
 			{
 				while (_isRunning)
 				{
-					Thread.Sleep(30000);
+					Thread.Sleep(150000);
 
 					await SyncDownloaderAgentData();
 				}

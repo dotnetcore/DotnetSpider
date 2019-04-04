@@ -91,6 +91,7 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// 设置消息过期时间，每个消息发送应该带上时间，超时的消息不作处理
 		/// 默认值 60 秒
+		/// 过期时间必须小于下载中心同步数据的心跳时间
 		/// </summary>
 		int MessageExpiredTime { get; }
 	}
