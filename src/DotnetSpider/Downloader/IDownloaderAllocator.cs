@@ -15,6 +15,6 @@ namespace DotnetSpider.Downloader
 		/// <param name="allotDownloaderMessage">下载器配置信息</param>
 		/// <returns></returns>
 		Task<IDownloader> CreateDownloaderAsync(string agentId,
-			AllotDownloaderMessage allotDownloaderMessage);
+			AllocateDownloaderMessage allotDownloaderMessage);
 	}
 }

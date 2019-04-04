@@ -35,6 +35,19 @@ namespace DotnetSpider
 		private readonly ISpiderOptions _options;
 
 		/// <summary>
+		/// 结束前的处理工作
+		/// </summary>
+		/// <returns></returns>
+		protected virtual Task OnExiting()
+		{
+#if NETFRAMEWORK
+			return Framework.CompletedTask;
+#else
+			return Task.CompletedTask;
+#endif
+		}
+
+		/// <summary>
 		/// 构造方法
 		/// </summary>
 		/// <param name="mq"></param>
@@ -196,19 +209,21 @@ namespace DotnetSpider
 					// 添加任务启动的监控信息
 					await _statisticsService.StartAsync(Id);
 
-					// 订阅数据流
+					// 订阅数据流，如果订阅失败
 					_mq.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
 						async message => await HandleMessage(message));
 
+					// 如果设置了要分配 10 个下载器，当收到 10 个下载器已经分配好时，认为分配完成
 					_allocated.Set(0);
-					_allocatedDownloader = true;
+					// 如果有任何一个下载器代理分配失败，收到消息后直接把此值赋为 false，爬虫退出
+					_allocatedSuccess = true;
 					// 先分配下载器，因为分配下载器的开销、时间更小，后面 RequestSupply 可能加载大量的请求，时间开销很大
 					await AllotDownloaderAsync();
 
-					// 等待 15 秒如果没有收到分配结果，超时结束
-					for (var i = 0; i < 100; ++i)
+					// 等待 30 秒如果没有完成分配，超时结束
+					for (var i = 0; i < 200; ++i)
 					{
-						if (!_allocatedDownloader)
+						if (!_allocatedSuccess)
 						{
 							return;
 						}
@@ -237,6 +252,10 @@ namespace DotnetSpider
 						await dataFlow.InitAsync();
 					}
 
+					_enqueued.Set(0);
+					_responded.Set(0);
+					_enqueuedRequestDict.Clear();
+
 					// 启动速度控制器
 					StartSpeedControllerAsync().ConfigureAwait(false).GetAwaiter();
 
@@ -263,11 +282,29 @@ namespace DotnetSpider
 						}
 					}
 
-					// 添加任务退出的监控信息
-					await _statisticsService.ExitAsync(Id);
+					try
+					{
+						// TODO: 如果订阅消息队列失败，此处是否应该再尝试上报，会导致两倍的重试时间
+						// 添加任务退出的监控信息
+						await _statisticsService.ExitAsync(Id);
 
-					// 最后打印一次任务状态信息
-					await _statisticsService.PrintStatisticsAsync(Id);
+						// 最后打印一次任务状态信息
+						await _statisticsService.PrintStatisticsAsync(Id);
+					}
+					catch (Exception e)
+					{
+						_logger.LogInformation($"任务 {Id} 上传退出信息失败: {e}");
+					}
+
+					try
+					{
+						await OnExiting();
+					}
+					catch (Exception e)
+					{
+						_logger.LogInformation($"任务 {Id} 退出事件处理失败: {e}");
+					}
+
 					// 标识任务退出完成
 					Status = Status.Exited;
 					_logger.LogInformation($"任务 {Id} 退出");
@@ -430,6 +467,7 @@ namespace DotnetSpider
 				{
 					_logger.LogInformation($"任务 {Id} 速度控制器启动");
 
+					var paused = 0;
 					while (!@break)
 					{
 						Thread.Sleep(_speedControllerInterval);
@@ -442,19 +480,65 @@ namespace DotnetSpider
 								{
 									try
 									{
-										var requests = _scheduler.Dequeue(Id, _dequeueBatchCount);
-
-										if (requests == null || requests.Length == 0) break;
-
-										foreach (var request in requests)
+										// 判断是否过多下载请求未得到回应
+										if (_enqueued.Value - _responded.Value > NonRespondedLimitation)
 										{
-											foreach (var configureRequestDelegate in _configureRequestDelegates)
+											if (paused > NonRespondedTimeLimitation)
 											{
-												configureRequestDelegate(request);
+												_logger.LogInformation(
+													$"任务 {Id} {NonRespondedTimeLimitation} 秒未收到下载回应");
+												@break = true;
+												break;
+											}
+
+											paused += _speedControllerInterval;
+											_logger.LogInformation($"任务 {Id} 速度控制器因过多下载请求未得到回应暂停");
+											continue;
+										}
+
+										paused = 0;
+
+										// 重试超时的下载请求
+										var timeoutRequests = new List<Request>();
+										var now = DateTime.Now;
+										foreach (var kv in _enqueuedRequestDict)
+										{
+											if ((now - kv.Value.CreationTime).TotalSeconds > RespondedTimeout)
+											{
+												kv.Value.RetriedTimes++;
+												if (kv.Value.RetriedTimes > RespondedTimeoutRetryTimes)
+												{
+													_logger.LogInformation(
+														$"任务 {Id} 重试下载请求 {RespondedTimeoutRetryTimes} 次未收到下载回应");
+													@break = true;
+													break;
+												}
+
+												timeoutRequests.Add(kv.Value);
 											}
 										}
 
-										await EnqueueRequests(requests);
+										// 如果有超时的下载则重试，无超时的下载则从调度队列里取
+										if (timeoutRequests.Count > 0)
+										{
+											await EnqueueRequests(timeoutRequests.ToArray());
+										}
+										else
+										{
+											var requests = _scheduler.Dequeue(Id, _dequeueBatchCount);
+
+											if (requests == null || requests.Length == 0) break;
+
+											foreach (var request in requests)
+											{
+												foreach (var configureRequestDelegate in _configureRequestDelegates)
+												{
+													configureRequestDelegate(request);
+												}
+											}
+
+											await EnqueueRequests(requests);
+										}
 									}
 									catch (Exception e)
 									{
@@ -499,7 +583,7 @@ namespace DotnetSpider
 		/// <returns>是否分配成功</returns>
 		private async Task AllotDownloaderAsync()
 		{
-			var json = JsonConvert.SerializeObject(new AllotDownloaderMessage
+			var json = JsonConvert.SerializeObject(new AllocateDownloaderMessage
 			{
 				OwnerId = Id,
 				AllowAutoRedirect = DownloaderSettings.AllowAutoRedirect,
@@ -537,7 +621,7 @@ namespace DotnetSpider
 						else
 						{
 							_logger.LogError($"任务 {Id} 分配下载器代理失败");
-							_allocatedDownloader = false;
+							_allocatedSuccess = false;
 						}
 
 						break;
@@ -572,6 +656,15 @@ namespace DotnetSpider
 				{
 					_logger.LogWarning($"任务 {Id} 接收到空回复");
 					return;
+				}
+
+				_responded.Add(responses.Length);
+
+				// 只要有回应就从缓存中删除，即便是异常要重新下载会成 EnqueueRequest 中重新加回缓存
+				// 此处只需要保证: 发 -> 收 可以一对一删除就可以保证检测机制的正确性
+				foreach (var response in responses)
+				{
+					_enqueuedRequestDict.TryRemove(response.Request.Hash, out _);
 				}
 
 				var agentId = responses.First().AgentId;
@@ -799,6 +892,13 @@ namespace DotnetSpider
 
 				await _mq.PublishAsync(Framework.DownloaderCenterTopic,
 					$"|{Framework.DownloadCommand}|{JsonConvert.SerializeObject(requests)}");
+
+				foreach (var request in requests)
+				{
+					_enqueuedRequestDict.TryAdd(request.Hash, request);
+				}
+
+				_enqueued.Add(requests.Length);
 			}
 		}
 	}

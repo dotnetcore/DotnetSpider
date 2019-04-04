@@ -14,7 +14,7 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		/// <param name="allotDownloaderMessage">下载器配置信息</param>
 		/// <returns></returns>
-		Task<bool> AllocateAsync(AllotDownloaderMessage allotDownloaderMessage);
+		Task<bool> AllocateAsync(AllocateDownloaderMessage allotDownloaderMessage);
 
 		/// <summary>
 		/// TODO: 根据策略分配下载器: 1. Request 从哪个下载器返回的需要返回到对应的下载器  2. 随机一个下载器

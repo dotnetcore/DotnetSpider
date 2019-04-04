@@ -11,6 +11,11 @@ namespace DotnetSpider.Core
 	{
 		private readonly IConfiguration _configuration;
 
+		public SpiderOptions(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+
 		/// <summary>
 		/// 数据库连接字符串
 		/// </summary>
@@ -85,7 +90,9 @@ namespace DotnetSpider.Core
 		/// <summary>
 		/// Kafka 服务地址
 		/// </summary>
-		public string KafkaBootstrapServers => _configuration["KafkaBootstrapServers"];
+		public string KafkaBootstrapServers => string.IsNullOrWhiteSpace(_configuration["KafkaBootstrapServers"])
+			? "localhost:9092"
+			: _configuration["KafkaBootstrapServers"];
 
 		/// <summary>
 		/// Kafka 消费组
@@ -94,9 +101,20 @@ namespace DotnetSpider.Core
 			? "DotnetSpider"
 			: _configuration["KafkaConsumerGroup"];
 
-		public SpiderOptions(IConfiguration configuration)
-		{
-			_configuration = configuration;
-		}
+		/// <summary>
+		/// 消息队列推送消息、文章话题、获取消息失败重试的次数
+		/// 默认是 28800 次即 8 小时
+		/// </summary>
+		public int MessageQueueRetryTimes => string.IsNullOrWhiteSpace(_configuration["MessageQueueRetryTimes"])
+			? 28800
+			: int.Parse(_configuration["MessageQueueRetryTimes"]);
+
+		/// <summary>
+		/// 设置消息过期时间，每个消息发送应该带上时间，超时的消息不作处理
+		/// 默认值 60 秒
+		/// </summary>
+		public int MessageExpiredTime => string.IsNullOrWhiteSpace(_configuration["MessageExpiredTime"])
+			? 60
+			: int.Parse(_configuration["MessageExpiredTime"]);
 	}
 }

@@ -10,6 +10,10 @@ using Confluent.Kafka;
 
 namespace DotnetSpider.Kafka
 {
+	/// <summary>
+	/// TODO: 确定 Kafka 这个客户端在网络断开、Kafka 崩溃情况下的表现，是否一直等待还是抛异常退出
+	/// TODO: 如果会退出，则需要重试
+	/// </summary>
 	public class KafkaMessageQueue : IMessageQueue
 	{
 		private readonly Dictionary<string, Consumer<Null, string>> _consumers =
