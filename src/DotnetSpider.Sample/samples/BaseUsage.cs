@@ -9,7 +9,7 @@ namespace DotnetSpider.Sample.samples
 {
 	public class BaseUsage
 	{
-		public static void Run()
+		public static Task Run()
 		{
 			var builder = new SpiderBuilder();
 			builder.AddSerilog();
@@ -24,10 +24,9 @@ namespace DotnetSpider.Sample.samples
 			spider.Speed = 1; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
 			spider.Depth = 3; // 设置采集深度
 			spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
-			var options = provider.GetRequiredService<ISpiderOptions>();
-			spider.AddDataFlow(new CnblogsDataParser()).AddDataFlow(new MongoEntityStorage(options.StorageConnectionString));
+			spider.AddDataFlow(new CnblogsDataParser()).AddDataFlow(new ConsoleStorage());
 			spider.AddRequests("http://www.cnblogs.com/"); // 设置起始链接
-			spider.RunAsync(); // 启动
+			return spider.RunAsync(); // 启动
 		}
 
 		class CnblogsDataParser : DataParser
