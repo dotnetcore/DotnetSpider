@@ -372,7 +372,8 @@ namespace DotnetSpider.Downloader
 			{
 				while (_isRunning)
 				{
-					Thread.Sleep(150000);
+					// 下载器代理的心跳时间
+					Thread.Sleep(15000);
 
 					await SyncDownloaderAgentData();
 				}
@@ -383,11 +384,12 @@ namespace DotnetSpider.Downloader
 		{
 			try
 			{
+				// 获取心跳存活的下载器代理
 				var agents = await DownloaderAgentStore.GetAllListAsync();
 
 				foreach (var agent in agents)
 				{
-					Agents.AddOrUpdate(agent.Id, x => agent, (s, downloaderAgent) =>
+					Agents.AddOrUpdate(agent.Id, x => agent, (agnetId, downloaderAgent) =>
 					{
 						if (downloaderAgent.LastModificationTime < agent.LastModificationTime)
 						{

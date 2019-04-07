@@ -16,7 +16,7 @@ namespace DotnetSpider.Downloader
 		Task EnsureDatabaseAndTableCreatedAsync();
 
 		/// <summary>
-		/// 查询所有已经注册代理，用于分配下载节点
+		/// 查询所有已经注册并且最后一次心跳上报时间在当前时间10秒以内的下载器代理
 		/// </summary>
 		/// <returns></returns>
 		Task<List<DownloaderAgent>> GetAllListAsync();
