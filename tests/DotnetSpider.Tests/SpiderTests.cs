@@ -98,7 +98,7 @@ namespace DotnetSpider.Tests
 		public void RunThenExit()
 		{
 			var url = "http://www.RunThenExit.com/";
-			var spider = SpiderFactory.Create<Spider>();
+			var spider = SpiderProvider.Value.Create<Spider>();
 
 			spider.NewGuidId();
 			spider.Name = "RunAsyncAndStop";
@@ -122,7 +122,7 @@ namespace DotnetSpider.Tests
 		public void RunThenPauseThenContinueThenExit()
 		{
 			var url = "http://www.RunThenPauseThenContinueThenExit.com/";
-			var spider = SpiderFactory.Create<Spider>();
+			var spider = SpiderProvider.Value.Create<Spider>();
 
 			spider.NewGuidId();
 			spider.Name = "RunAsyncAndStop";
@@ -153,7 +153,7 @@ namespace DotnetSpider.Tests
 		{
 			var url = "http://www.MmfCloseSignal.com/";
 
-			var spider = SpiderFactory.Create<Spider>();
+			var spider = SpiderProvider.Value.Create<Spider>();
 			spider.MmfSignal = true;
 			spider.NewGuidId();
 			spider.Name = "MmfCloseSignal";
@@ -179,7 +179,7 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "RetryDownloadTimes")]
 		public void RetryDownloadTimes()
 		{
-			var spider = SpiderFactory.Create<Spider>();
+			var spider = SpiderProvider.Value.Create<Spider>();
 			spider.NewGuidId();
 			spider.Name = "RetryDownloadTimes";
 			spider.RetryDownloadTimes = 5;
@@ -190,7 +190,7 @@ namespace DotnetSpider.Tests
 			spider.AddRequests("http://www.RetryDownloadTimes.com");
 			spider.Run();
 
-			var statisticsStore = SpiderFactory.GetRequiredService<IStatisticsStore>();
+			var statisticsStore = SpiderProvider.Value.GetRequiredService<IStatisticsStore>();
 			var s = statisticsStore.GetSpiderStatisticsAsync(spider.Id).Result;
 			Assert.Equal(1, s.Total);
 			Assert.Equal(1, s.Failed);

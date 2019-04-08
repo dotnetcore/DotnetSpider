@@ -46,7 +46,7 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
 - Visual Studio 2017 (15.3 or later)
 - [.NET Core 2.2 or later](https://www.microsoft.com/net/download/windows)
 
-### OPTIONAL ENVIROMENT
+### OPTIONAL ENVIRONMENT 
 
 - MySql
 
@@ -166,6 +166,19 @@ https://github.com/dotnetcore/DotnetSpider/wiki
         }
     }
 
+#### Run distributed spider
+
+##### prepare environment follow `OPTIONAL ENVIRONMENT`
+
+    + MySql
+    + Kafka
+     
+##### steps
+
+    1. start DotnetSpider.DownloadCenter
+    2. start Downloaderer.DownloaderAgent
+    3. run DotnetSpider.Sample/samples/DistributedSpider.Run
+
 #### Run via Startup
 
     Command: -s [spider type name] -i [id] -a [arg1,arg2...] -d [true/false] -n [name] -c [configuration file]
@@ -180,7 +193,7 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 When you want to collect a page JS loaded, there is only one thing to do, set the downloader to WebDriverDownloader.
 
-    Downloader=new WebDriverDownloader(Browser.Chrome);
+    Downloader = new WebDriverDownloader(Browser.Chrome);
 
 [See a complete sample](https://github.com/zlzforever/DotnetSpider/)
 
@@ -189,7 +202,6 @@ NOTE:
 1.  Make sure the ChromeDriver.exe is in bin folder when use Chrome, install it to your project from NUGET: Chromium.ChromeDriver
 2.  Make sure you already add a \*.webdriver Firefox profile when use Firefox: https://support.mozilla.org/en-US/kb/profile-manager-create-and-remove-firefox-profiles
 3.  Make sure the PhantomJS.exe is in bin folder when use PhantomJS, install it to your project from NUGET: PhantomJS
-
 
 ### NOTICE
 

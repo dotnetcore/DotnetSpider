@@ -62,7 +62,7 @@ namespace DotnetSpider.Tests.Data.Parser
         [Fact(DisplayName = "ParseEntity")]
         public void ParseEntity()
         {
-            var service = SpiderFactory.CreateScopeServiceProvider();
+            var service = SpiderProvider.Value.CreateScopeServiceProvider();
             var dataContext = new DataFlowContext(new Response
             {
                 Request = new Request("https://list.jd.com/list.html?cat=9987,653,655",
@@ -107,7 +107,7 @@ namespace DotnetSpider.Tests.Data.Parser
         [Fact(DisplayName = "SingleEntitySelector")]
         public void SingleEntitySelector()
         {
-            var service = SpiderFactory.CreateScopeServiceProvider();
+            var service = SpiderProvider.Value.CreateScopeServiceProvider();
             var dataContext = new DataFlowContext(new Response
             {
                 Request = new Request("http://abcd.com"),
@@ -131,7 +131,7 @@ namespace DotnetSpider.Tests.Data.Parser
         [Fact(DisplayName = "MultiEntitySelector")]
         public void MultiEntitySelector()
         {
-            var service = SpiderFactory.CreateScopeServiceProvider();
+            var service = SpiderProvider.Value.CreateScopeServiceProvider();
             var dataContext = new DataFlowContext(new Response
             {
                 Request = new Request("http://abcd.com"),

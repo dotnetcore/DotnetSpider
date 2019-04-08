@@ -13,16 +13,20 @@ namespace DotnetSpider.Tests.MessageQueue
 		[Fact(DisplayName = "PubAndSub")]
 		public async Task PubAndSub()
 		{
-			if (Directory.Exists("/home/vsts/work"))
+			if (IsCI())
 			{
 				return;
 			}
 
 			int count = 0;
-			var options = SpiderFactory.GetRequiredService<ISpiderOptions>();
-			var logger = SpiderFactory.GetRequiredService<ILogger<KafkaMessageQueue>>();
+			var options = SpiderProvider.Value.GetRequiredService<ISpiderOptions>();
+			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaMessageQueue>>();
 			var mq = new KafkaMessageQueue(options, logger);
-			mq.Subscribe("PubAndSub", msg => { Interlocked.Increment(ref count); });
+			mq.Subscribe("PubAndSub", msg =>
+			{
+				Interlocked.Increment(ref count);
+				return Task.CompletedTask;
+			});
 			for (int i = 0; i < 100; ++i)
 			{
 				await mq.PublishAsync("PubAndSub", "a");
@@ -41,16 +45,20 @@ namespace DotnetSpider.Tests.MessageQueue
 		[Fact(DisplayName = "ParallelPubAndSub")]
 		public void ParallelPubAndSub()
 		{
-			if (Directory.Exists("/home/vsts/work"))
+			if (IsCI())
 			{
 				return;
 			}
 
 			int count = 0;
-			var options = SpiderFactory.GetRequiredService<ISpiderOptions>();
-			var logger = SpiderFactory.GetRequiredService<ILogger<KafkaMessageQueue>>();
+			var options = SpiderProvider.Value.GetRequiredService<ISpiderOptions>();
+			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaMessageQueue>>();
 			var mq = new KafkaMessageQueue(options, logger);
-			mq.Subscribe("ParallelPubAndSub", msg => { Interlocked.Increment(ref count); });
+			mq.Subscribe("ParallelPubAndSub", msg =>
+			{
+				Interlocked.Increment(ref count);
+				return Task.CompletedTask;
+			});
 
 			Parallel.For(0, 100, async (i) => { await mq.PublishAsync("ParallelPubAndSub", "a"); });
 			int j = 0;
@@ -66,16 +74,20 @@ namespace DotnetSpider.Tests.MessageQueue
 		[Fact(DisplayName = "PubAndUnSub")]
 		public async Task PubAndUnSub()
 		{
-			if (Directory.Exists("/home/vsts/work"))
+			if (IsCI())
 			{
 				return;
 			}
 
 			int count = 0;
-			var options = SpiderFactory.GetRequiredService<ISpiderOptions>();
-			var logger = SpiderFactory.GetRequiredService<ILogger<KafkaMessageQueue>>();
+			var options = SpiderProvider.Value.GetRequiredService<ISpiderOptions>();
+			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaMessageQueue>>();
 			var mq = new KafkaMessageQueue(options, logger);
-			mq.Subscribe("PubAndUnSub", msg => { Interlocked.Increment(ref count); });
+			mq.Subscribe("PubAndUnSub", msg =>
+			{
+				Interlocked.Increment(ref count);
+				return Task.CompletedTask;
+			});
 
 			int i = 0;
 			Task.Factory.StartNew(async () =>

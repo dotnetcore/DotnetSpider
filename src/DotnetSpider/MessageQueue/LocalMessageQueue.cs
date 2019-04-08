@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -13,8 +14,8 @@ namespace DotnetSpider.MessageQueue
 	/// </summary>
 	public class LocalMessageQueue : IMessageQueue
 	{
-		private readonly ConcurrentDictionary<string, Action<string>> _consumers =
-			new ConcurrentDictionary<string, Action<string>>();
+		private readonly ConcurrentDictionary<string, Func<string, Task>> _consumers =
+			new ConcurrentDictionary<string, Func<string, Task>>();
 
 		private readonly ILogger _logger;
 
@@ -48,16 +49,15 @@ namespace DotnetSpider.MessageQueue
 #endif
 			}
 
-			if (_consumers.ContainsKey(topic))
+			if (_consumers.TryGetValue(topic, out Func<string, Task> consumer))
 			{
-				var consumer = _consumers[topic];
 				foreach (var message in messages)
 				{
-					Task.Factory.StartNew(() =>
+					Task.Factory.StartNew(async () =>
 					{
 						try
 						{
-							consumer.Invoke(message);
+							await consumer(message);
 						}
 						catch (Exception e)
 						{
@@ -86,7 +86,8 @@ namespace DotnetSpider.MessageQueue
 		/// </summary>
 		/// <param name="topic">topic</param>
 		/// <param name="action">消息消费的方法</param>
-		public void Subscribe(string topic, Action<string> action)
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		public void Subscribe(string topic, Func<string, Task> action)
 		{
 			_consumers.AddOrUpdate(topic, x => action, (t, a) => action);
 		}
@@ -95,6 +96,7 @@ namespace DotnetSpider.MessageQueue
 		/// 取消订阅 topic
 		/// </summary>
 		/// <param name="topic">topic</param>
+		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void Unsubscribe(string topic)
 		{
 			_consumers.TryRemove(topic, out _);

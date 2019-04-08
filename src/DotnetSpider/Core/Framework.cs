@@ -81,7 +81,8 @@ namespace DotnetSpider.Core
 			}
 
 			var networkInterface = NetworkInterface.GetAllNetworkInterfaces()
-				.First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet);
+				.First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+				            i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211);
 			var unicastAddresses = networkInterface.GetIPProperties().UnicastAddresses;
 			IpAddress = unicastAddresses.First(a =>
 					a.IPv4Mask.ToString() != "255.255.255.255" && a.Address.AddressFamily == AddressFamily.InterNetwork)

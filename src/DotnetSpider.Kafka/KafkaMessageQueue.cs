@@ -16,8 +16,8 @@ namespace DotnetSpider.Kafka
 	/// </summary>
 	public class KafkaMessageQueue : IMessageQueue
 	{
-		private readonly Dictionary<string, Consumer<Null, string>> _consumers =
-			new Dictionary<string, Consumer<Null, string>>();
+		private readonly Dictionary<string, IConsumer<Null, string>> _consumers =
+			new Dictionary<string, IConsumer<Null, string>>();
 
 		private readonly ILogger _logger;
 		private readonly IProducer<Null, string> _producer;
@@ -65,40 +65,45 @@ namespace DotnetSpider.Kafka
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void Subscribe(string topic, Action<string> action)
+		public void Subscribe(string topic, Func<string, Task> action)
 		{
 			Unsubscribe(topic);
 
-			Task.Factory.StartNew(() =>
+			Task.Factory.StartNew(async () =>
 			{
-				using (var c = new ConsumerBuilder<Ignore, string>(_config).Build())
+				using (var c = new ConsumerBuilder<Null, string>(_config).Build())
 				{
 					c.Subscribe(topic);
-					try
+					_consumers.Add(topic, c);
+					while (true)
 					{
-						while (true)
+						string msg = null;
+						try
 						{
-							string msg = null;
-							try
-							{
-								msg = c.Consume().Value;
-								action(msg);
-							}
-							catch (ConsumeException e)
-							{
-								_logger?.LogError($"Kafka 接收消息 Topic {topic} 异常: {e.Error.Reason}");
-							}
-							catch (Exception e)
-							{
-								_logger?.LogError($"Topic {topic} 消费消息 {msg} 失败: {e}");
-							}
+							msg = c.Consume().Value;
 						}
-					}
-					catch (OperationCanceledException oce)
-					{
-						// Ensure the consumer leaves the group cleanly and final offsets are committed.
-						c.Close();
-						_logger?.LogDebug($"Kafka 停止接收消息 Topic {topic}: {oce}");
+						catch (ConsumeException e)
+						{
+							_logger?.LogError($"接收 Kafka 消息失败, Topic {topic} 原因: {e.Error.Reason}");
+						}
+						catch (OperationCanceledException e)
+						{
+							_logger?.LogError($"取消订阅 Kafka 消息, Topic {topic}");
+							break;
+						}
+						catch (Exception e)
+						{
+							_logger?.LogError($"接收 Kafka 消息失败, Topic {topic} 异常: {e}");
+						}
+
+						try
+						{
+							await action(msg);
+						}
+						catch (Exception e)
+						{
+							_logger?.LogError($"消费 Kafka 消息失败, Topic {topic} 异常: {e}");
+						}
 					}
 				}
 			}).ConfigureAwait(false).GetAwaiter();

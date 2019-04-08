@@ -394,7 +394,7 @@ namespace DotnetSpider
 		/// </summary>
 		/// <returns></returns>
 		/// <exception cref="SpiderException"></exception>
-		protected StorageBase GetDefaultStorage()
+		public StorageBase GetDefaultStorage()
 		{
 			return GetDefaultStorage(_options);
 		}

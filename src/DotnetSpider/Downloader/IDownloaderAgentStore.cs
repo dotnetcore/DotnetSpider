@@ -16,7 +16,7 @@ namespace DotnetSpider.Downloader
 		Task EnsureDatabaseAndTableCreatedAsync();
 
 		/// <summary>
-		/// 查询所有已经注册并且最后一次心跳上报时间在当前时间10秒以内的下载器代理
+		/// 查询所有已经注册并且最后一次心跳上报时间在当前时间 12 秒以内的下载器代理
 		/// </summary>
 		/// <returns></returns>
 		Task<List<DownloaderAgent>> GetAllListAsync();
@@ -24,21 +24,21 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 查询任务所分配的下载代理
 		/// </summary>
-		/// <param name="ownerId"></param>
+		/// <param name="ownerId">任务标识</param>
 		/// <returns></returns>
 		Task<List<DownloaderAgentAllocate>> GetAllocatedListAsync(string ownerId);
 
 		/// <summary>
-		/// 添加下载代理
+		/// 添加下载器代理
 		/// </summary>
-		/// <param name="agent"></param>
+		/// <param name="agent">下载器代理</param>
 		/// <returns></returns>
 		Task RegisterAsync(DownloaderAgent agent);
 
 		/// <summary>
-		/// 保存下载代理的心跳
+		/// 保存下载器代理的心跳
 		/// </summary>
-		/// <param name="agent"></param>
+		/// <param name="agent">下载器代理</param>
 		/// <returns></returns>
 		Task HeartbeatAsync(DownloaderAgentHeartbeat agent);
 

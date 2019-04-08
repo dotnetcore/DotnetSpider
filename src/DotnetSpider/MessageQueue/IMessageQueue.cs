@@ -22,7 +22,7 @@ namespace DotnetSpider.MessageQueue
 		/// </summary>
 		/// <param name="topic"></param>
 		/// <param name="action"></param>
-		void Subscribe(string topic, Action<string> action);
+		void Subscribe(string topic, Func<string, Task> action);
 
 		/// <summary>
 		/// 取消订阅 topic

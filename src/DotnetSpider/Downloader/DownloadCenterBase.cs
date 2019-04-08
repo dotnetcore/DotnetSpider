@@ -96,7 +96,7 @@ namespace DotnetSpider.Downloader
 				{
 					case Framework.RegisterCommand:
 					{
-						// 此处不考虑超时，节点数量不会很多
+						// 此处不考虑消息的超时，一是因为节点数量不会很多，二是因为超时的可以释放掉
 						var agent = JsonConvert.DeserializeObject<DownloaderAgent>(commandMessage.Message);
 						if (agent != null)
 						{
@@ -217,19 +217,25 @@ namespace DotnetSpider.Downloader
 			string message)
 		{
 			var agents = Agents.Values;
-			if (agents.Count == 0)
-			{
-				Logger.LogInformation($"任务 {allotDownloaderMessage.OwnerId} 未找到可用的下载器代理");
-				return false;
-			}
 
 			// 计算需要分配的个数
 			var count = allotDownloaderMessage.DownloaderCount >= agents.Count
 				? agents.Count
 				: allotDownloaderMessage.DownloaderCount;
 
-			var allocatedAgents = agents.Count == count ? agents : agents.OrderBy(_ => Guid.NewGuid()).Take(count);
-			var agentIds = allocatedAgents.Select(x => x.Id).ToArray();
+			var agentIds = agents.OrderBy(_ => Guid.NewGuid()).Take(count).Select(x => x.Id).ToArray();
+
+			// Agents 是异步更新的, 因此以最终分配结果来判断是否能够分配正确
+			if (agentIds.Length == 0)
+			{
+				Logger.LogInformation($"任务 {allotDownloaderMessage.OwnerId} 未分配到下载器代理");
+				return false;
+			}
+
+			if (agentIds.Length < allotDownloaderMessage.DownloaderCount)
+			{
+				Logger.LogWarning($"任务 {allotDownloaderMessage.OwnerId} 未足额分配下载器代理");
+			}
 
 			// 发送消息让下载代理器分配好下载器
 			var msg =
@@ -239,12 +245,13 @@ namespace DotnetSpider.Downloader
 				await Mq.PublishAsync(agent.Id, msg);
 			}
 
-			// 保存节点选取信息
+			// 保存节点分配信息到数据库
 			await DownloaderAgentStore.AllocateAsync(allotDownloaderMessage.OwnerId, message, agentIds);
+			// 更新缓存中的分配信息
 			AllocatedAgents.AddOrUpdate(allotDownloaderMessage.OwnerId,
 				new Tuple<AllocateDownloaderMessage, string[]>(allotDownloaderMessage, agentIds), (s, tuple) => tuple);
 			Logger.LogInformation(
-				$"任务 {allotDownloaderMessage.OwnerId} 分配下载代理器成功: {JsonConvert.SerializeObject(allocatedAgents)}");
+				$"任务 {allotDownloaderMessage.OwnerId} 分配下载代理器成功: {JsonConvert.SerializeObject(agentIds)}");
 			return true;
 		}
 
@@ -261,7 +268,7 @@ namespace DotnetSpider.Downloader
 				return;
 			}
 
-			// 如果缓存中没有则从数据库中取
+			// 如果缓存中没有则从数据库中取，此场景只发生在下载中心切换时
 			AllocatedAgents.AddOrUpdate(ownerId, new Tuple<AllocateDownloaderMessage, string[]>(
 				JsonConvert.DeserializeObject<AllocateDownloaderMessage>(
 					await DownloaderAgentStore.GetAllocateDownloaderMessageAsync(ownerId)),
@@ -269,20 +276,18 @@ namespace DotnetSpider.Downloader
 			), (s, tuple) => tuple);
 
 			var allocateDownloaderMessage = AllocatedAgents[ownerId].Item1;
-
 			var agentIds = AllocatedAgents[ownerId].Item2;
 			if (agentIds.Length <= 0)
 			{
-				Logger.LogError($"任务 {ownerId} 未找到活跃的下载器代理");
+				Logger.LogError($"任务 {ownerId} 未分配到下载器代理");
 			}
 
 			var onlineAgents = new List<DownloaderAgent>();
-			// 如果同步了2次都依然没有可用节点则退出
+			// 判断分配的下载器代理是否活跃，因为在下载中心发生切换时需要靠数据库同步数据，则同步了 2 次(15 秒同步一次)都依然没有可用节点则退出
 			for (var i = 0; i < 35; ++i)
 			{
 				foreach (var agentId in agentIds)
 				{
-					// TODO: 此处是否会有异步问题？刷新线程可能会更新
 					if (Agents.ContainsKey(agentId) &&
 					    (DateTime.Now - Agents[agentId].LastModificationTime).TotalSeconds < 12)
 					{
@@ -303,62 +308,49 @@ namespace DotnetSpider.Downloader
 			if (onlineAgents.Count == 0)
 			{
 				// 直接退出即可。爬虫因为没有分配，触发无回应退出事件。
+				Logger.LogError($"任务 {ownerId} 分配的下载器代理都已下线");
 				return;
 			}
-
-			onlineAgents = onlineAgents.OrderBy(_ => Guid.NewGuid()).ToList();
 
 			switch (allocateDownloaderMessage.DownloadPolicy)
 			{
 				case DownloadPolicy.Random:
 				{
-					int i = 0;
-					int count = onlineAgents.Count;
 					foreach (var request in requests)
 					{
-						DownloaderAgent onlineAgent;
-						if (i < count)
-						{
-							onlineAgent = onlineAgents[i];
-						}
-						else
-						{
-							i = 0;
-							onlineAgent = onlineAgents[i];
-						}
-
-						++i;
-
+						var agent = onlineAgents.Random();
 						var json = JsonConvert.SerializeObject(new[] {request});
 						var message = $"|{Framework.DownloadCommand}|{json}";
-						await Mq.PublishAsync(onlineAgent.Id, message);
+						await Mq.PublishAsync(agent.Id, message);
 					}
-					
+
 					break;
 				}
 				case DownloadPolicy.Chained:
 				{
-					int i = 0;
-					int count = onlineAgents.Count;
-					
 					foreach (var request in requests)
 					{
-						DownloaderAgent onlineAgent;
-						if (i < count)
+						if (string.IsNullOrWhiteSpace(request.AgentId))
 						{
-							onlineAgent = onlineAgents[i];
+							var agent = onlineAgents.Random();
+							var json = JsonConvert.SerializeObject(new[] {request});
+							var message = $"|{Framework.DownloadCommand}|{json}";
+							await Mq.PublishAsync(agent.Id, message);
 						}
 						else
 						{
-							i = 0;
-							onlineAgent = onlineAgents[i];
+							var agent = onlineAgents.FirstOrDefault(x => x.Id == request.AgentId);
+							if (agent == null)
+							{
+								Logger.LogError($"任务 {ownerId} 分配的下载器代理 {request.AgentId} 已下线");
+							}
+							else
+							{
+								var json = JsonConvert.SerializeObject(new[] {request});
+								var message = $"|{Framework.DownloadCommand}|{json}";
+								await Mq.PublishAsync(request.AgentId, message);
+							}
 						}
-
-						++i;
-
-						var json = JsonConvert.SerializeObject(new[] {request});
-						var message = $"|{Framework.DownloadCommand}|{json}";
-						await Mq.PublishAsync(onlineAgent.Id, message);
 					}
 
 					break;
@@ -384,19 +376,21 @@ namespace DotnetSpider.Downloader
 		{
 			try
 			{
-				// 获取心跳存活的下载器代理
+				// 所有已经注册并且最后一次心跳上报时间在当前时间 12 秒以内的下载器代理
 				var agents = await DownloaderAgentStore.GetAllListAsync();
 
 				foreach (var agent in agents)
 				{
-					Agents.AddOrUpdate(agent.Id, x => agent, (agnetId, downloaderAgent) =>
+					// 如果不存在则添加到队列
+					// 如果已经存在并且缓存的心跳时间小于数据库时间则更新缓存的心跳时间
+					Agents.AddOrUpdate(agent.Id, x => agent, (agentId, cacheDownloaderAgent) =>
 					{
-						if (downloaderAgent.LastModificationTime < agent.LastModificationTime)
+						if (cacheDownloaderAgent.LastModificationTime < agent.LastModificationTime)
 						{
-							downloaderAgent.LastModificationTime = agent.LastModificationTime;
+							cacheDownloaderAgent.LastModificationTime = agent.LastModificationTime;
 						}
 
-						return downloaderAgent;
+						return cacheDownloaderAgent;
 					});
 				}
 			}
