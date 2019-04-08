@@ -50,27 +50,27 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
 
 - MySql
 
-        $ sudo docker run --name mysql -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1qazZAQ! mysql
+        $ sudo docker run --name mysql -d -p 3306:3306 --restart always -e MYSQL_ROOT_PASSWORD=1qazZAQ! mysql:5.7
 
 - Redis
 
-        sudo docker run --name redis -d -p 6379:6379 redis
+        sudo docker run --name redis -d -p 6379:6379 --restart always redis
 
 - SqlServer
 
-        sudo docker run --name sqlserver -d -p 1433:1433  -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' mcr.microsoft.com/mssql/server:2017-latest
+        sudo docker run --name sqlserver -d -p 1433:1433 --restart always  -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' mcr.microsoft.com/mssql/server:2017-latest
 
 - PostgreSQL
 
-        sudo docker run --name postgres -d  -p 5432:5432 -e POSTGRES_PASSWORD=1qazZAQ! postgres
+        sudo docker run --name postgres -d  -p 5432:5432 --restart always -e POSTGRES_PASSWORD=1qazZAQ! postgres
 
 - MongoDb
 
-        sudo docker run --name mongo -d -p 27017:27017 mongo
+        sudo docker run --name mongo -d -p 27017:27017 --restart always mongo
         
 - Kafka
 
-        $ sudo docker run --name kafka -d -p 9092:9092 --net bridge -h kafka --env ADVERTISED_PORT=9092 spotify/kafka
+        $ sudo docker run --name kafka -d -p 9092:9092 --restart always --net bridge -h kafka --env ADVERTISED_PORT=9092 spotify/kafka
         $ sudo -s
         bash-3.2# echo "127.0.0.1       kafka" >> /etc/hosts
                         

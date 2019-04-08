@@ -26,7 +26,7 @@ namespace DotnetSpider.Sample.samples
 			spider.Depth = 3; // 设置采集深度
 			spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
 			spider.AddDataFlow(new DataParser<EntitySpider.CnblogsEntry>())
-				.AddDataFlow(new SqlServerEntityStorage(StorageType.InsertIgnoreDuplicate, "Data Source=.;Initial Catalog=master;User Id=sa;Password='1qazZAQ!'"));
+				.AddDataFlow(spider.GetDefaultStorage());
 			spider.AddRequests(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
