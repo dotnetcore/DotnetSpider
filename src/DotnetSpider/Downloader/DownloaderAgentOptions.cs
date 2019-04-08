@@ -71,5 +71,12 @@ namespace DotnetSpider.Downloader
 		/// 代理供应接口
 		/// </summary>
 		public string ProxySupplyUrl => _configuration["ProxySupplyUrl"];
+
+		/// <summary>
+		/// 请求结果插入队列尝试次数
+		/// </summary>
+		public int MessageAttempts => string.IsNullOrWhiteSpace(_configuration["MessageAttempts"])
+			? 1
+			: int.Parse(_configuration["MessageAttempts"]);
 	}
 }

@@ -49,5 +49,10 @@ namespace DotnetSpider.Downloader
 		/// 代理供应接口
 		/// </summary>
 		string ProxySupplyUrl { get; }
+
+		/// <summary>
+		/// 下载结果尝试推送到消息队列的最大尝试次数
+		/// </summary>
+		int MessageAttempts { get; }
 	}
 }

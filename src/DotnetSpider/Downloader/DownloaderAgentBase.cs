@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
@@ -23,6 +25,7 @@ namespace DotnetSpider.Downloader
 		private readonly IMessageQueue _mq;
 		private readonly IDownloaderAllocator _downloaderAllocator;
 		private readonly IDownloaderAgentOptions _options;
+		private const string DownloaderPersistFolderName = "downloaders";
 
 		private readonly ConcurrentDictionary<string, IDownloader> _cache =
 			new ConcurrentDictionary<string, IDownloader>();
@@ -59,6 +62,15 @@ namespace DotnetSpider.Downloader
 			Logger = logger;
 		}
 
+		static DownloaderAgentBase()
+		{
+			var downloaderPersistDirectory = new DirectoryInfo(Path.Combine(Framework.BaseDirectory, DownloaderPersistFolderName));
+			if (!downloaderPersistDirectory.Exists)
+			{
+				downloaderPersistDirectory.Create();
+			}
+		}
+
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
 			if (_isRunning)
@@ -67,6 +79,9 @@ namespace DotnetSpider.Downloader
 			}
 
 			_isRunning = true;
+
+			// 加载并初始化未释放的下载器
+			await LoadDownloaderAsync();
 
 			// 注册节点
 			var json = JsonConvert.SerializeObject(new DownloaderAgent
@@ -78,60 +93,10 @@ namespace DotnetSpider.Downloader
 				CreationTime = DateTime.Now,
 				LastModificationTime = DateTime.Now
 			});
-			await _mq.PublishAsync(Framework.DownloaderCenterTopic, $"|{Framework.RegisterCommand}|{json}");
+			await PublishMessageAsync(Framework.DownloaderCenterTopic, $"|{Framework.RegisterCommand}|{json}");
 
-			// 订阅节点编号
-			_mq.Subscribe(_options.AgentId, async message =>
-			{
-				if (string.IsNullOrWhiteSpace(message))
-				{
-					Logger.LogWarning($"下载器代理 {_options.AgentId} 接收到空消息");
-					return;
-				}
-#if DEBUG
-
-				Logger.LogDebug($"下载器代理 {_options.AgentId} 接收到消息: {message}");
-#endif
-
-				try
-				{
-					var commandMessage = message.ToCommandMessage();
-
-					if (commandMessage == null)
-					{
-						Logger.LogWarning($"下载器代理 {_options.AgentId} 接收到非法消息: {message}");
-						return;
-					}
-
-					switch (commandMessage.Command)
-					{
-						case Framework.AllocateDownloaderCommand:
-						{
-							await AllotDownloaderAsync(commandMessage.Message);
-							break;
-						}
-						case Framework.DownloadCommand:
-						{
-							await DownloadAsync(commandMessage.Message);
-							break;
-						}
-						case Framework.ExitCommand:
-						{
-							await StopAsync(default);
-							break;
-						}
-						default:
-						{
-							Logger.LogError($"下载器代理 {_options.AgentId} 无法处理消息: {message}");
-							break;
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					Logger.LogError($"下载器代理 {_options.AgentId} 处理消息: {message} 失败, 异常: {e}");
-				}
-			});
+			// 订阅节点
+			SubscribeMessage();
 
 			// 开始心跳
 			HeartbeatAsync().ConfigureAwait(false).GetAwaiter();
@@ -171,6 +136,7 @@ namespace DotnetSpider.Downloader
 							DownloaderCount = _cache.Count,
 							CreationTime = DateTime.Now
 						});
+						
 						await _mq.PublishAsync(Framework.DownloaderCenterTopic,
 							$"|{Framework.HeartbeatCommand}|{json}");
 						Logger.LogDebug($"下载器代理 {_options.AgentId} 发送心跳成功");
@@ -203,7 +169,7 @@ namespace DotnetSpider.Downloader
 							var response = await DownloadAsync(request);
 							if (response != null)
 							{
-								await _mq.PublishAsync($"{Framework.ResponseHandlerTopic}{grouping.Key}",
+								await PublishMessageAsync($"{Framework.ResponseHandlerTopic}{grouping.Key}",
 									JsonConvert.SerializeObject(new[] {response}));
 							}
 						}).ConfigureAwait(false).GetAwaiter();
@@ -240,6 +206,22 @@ namespace DotnetSpider.Downloader
 			};
 		}
 
+		private async Task LoadDownloaderAsync()
+		{
+			try
+			{
+				var downloaderFiles = Directory.GetFiles(Path.Combine(Framework.BaseDirectory, DownloaderPersistFolderName));
+				foreach (var downloaderFile in downloaderFiles)
+				{
+					await AllotDownloaderAsync(File.ReadAllText(downloaderFile), true);
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"下载器代理从文件加载失败: {e}");
+			}
+		}
+
 		private Task ReleaseDownloaderAsync()
 		{
 			return Task.Factory.StartNew(() =>
@@ -255,7 +237,7 @@ namespace DotnetSpider.Downloader
 						foreach (var kv in _cache)
 						{
 							var downloader = kv.Value;
-							if ((now - downloader.LastUsedTime).TotalSeconds > 300)
+							if ((now - downloader.LastUsedTime).TotalSeconds > 600)
 							{
 								downloader.Dispose();
 								expires.Add(kv.Key);
@@ -264,6 +246,8 @@ namespace DotnetSpider.Downloader
 
 						foreach (var expire in expires)
 						{
+							File.Delete(Path.Combine(Framework.BaseDirectory, DownloaderPersistFolderName, expire));
+
 							if (!_cache.TryRemove(expire, out _))
 							{
 								Logger.LogWarning($"下载器代理 {_options.AgentId} 释放过期下载器 {expire} 失败");
@@ -289,16 +273,94 @@ namespace DotnetSpider.Downloader
 		}
 
 		/// <summary>
-		/// 
+		/// 订阅消息
+		/// </summary>
+		private void SubscribeMessage()
+		{
+			while (true)
+			{
+				try
+				{
+					_mq.Subscribe(_options.AgentId, HandleMessage);
+					Logger.LogInformation($"订阅节点 {_options.AgentId} 推送请求成功");
+					return;
+				}
+				catch (Exception e)
+				{
+					Logger.LogError($"订阅节点 {_options.AgentId} 推送请求结果失败: {e.Message}");
+					Thread.Sleep(1000);
+				}
+			}
+		}
+
+		private async void HandleMessage(string message)
+		{
+			if (string.IsNullOrWhiteSpace(message))
+			{
+				Logger.LogWarning($"下载器代理 {_options.AgentId} 接收到空消息");
+				return;
+			}
+#if DEBUG
+
+			Logger.LogDebug($"下载器代理 {_options.AgentId} 接收到消息: {message}");
+#endif
+
+			try
+			{
+				var commandMessage = message.ToCommandMessage();
+
+				if (commandMessage == null)
+				{
+					Logger.LogWarning($"下载器代理 {_options.AgentId} 接收到非法消息: {message}");
+					return;
+				}
+
+				switch (commandMessage.Command)
+				{
+					case Framework.AllocateDownloaderCommand:
+					{
+						await AllotDownloaderAsync(commandMessage.Message);
+						break;
+					}
+					case Framework.DownloadCommand:
+					{
+						await DownloadAsync(commandMessage.Message);
+						break;
+					}
+					case Framework.ExitCommand:
+					{
+						await StopAsync(default);
+						break;
+					}
+					default:
+					{
+						Logger.LogError($"下载器代理 {_options.AgentId} 无法处理消息: {message}");
+						break;
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"下载器代理 {_options.AgentId} 处理消息: {message} 失败, 异常: {e}");
+			}
+		}
+		
+		/// <summary>
+		/// 分配下载器
 		/// </summary>
 		/// <returns></returns>
-		private async Task AllotDownloaderAsync(string message)
+		private async Task AllotDownloaderAsync(string message, bool reAllot = false)
 		{
 			var allotDownloaderMessage = JsonConvert.DeserializeObject<AllocateDownloaderMessage>(message);
 			if (allotDownloaderMessage == null)
 			{
 				Logger.LogError($"无法分配下载器，消息不正确: {message}");
 				return;
+			}
+
+			if (reAllot)
+			{
+				allotDownloaderMessage.CreationTime = DateTime.Now;
 			}
 
 			if ((DateTime.Now - allotDownloaderMessage.CreationTime).TotalSeconds < 30)
@@ -311,17 +373,32 @@ namespace DotnetSpider.Downloader
 					if (downloaderEntry == null)
 					{
 						Logger.LogError($"任务 {allotDownloaderMessage.OwnerId} 分配下载器 {allotDownloaderMessage.Type} 失败");
-						await _mq.PublishAsync($"{Framework.ResponseHandlerTopic}{allotDownloaderMessage.OwnerId}",
+						await PublishMessageAsync($"{Framework.ResponseHandlerTopic}{allotDownloaderMessage.OwnerId}",
 							$"|{Framework.AllocateDownloaderCommand}|false");
 					}
 					else
 					{
+						downloaderEntry.LastUsedTime = DateTime.Now;
 						ConfigureDownloader?.Invoke(downloaderEntry);
-						_cache.TryAdd(allotDownloaderMessage.OwnerId, downloaderEntry);
+						
 						Logger.LogInformation(
 							$"任务 {allotDownloaderMessage.OwnerId} 分配下载器 {allotDownloaderMessage.Type} 成功");
-						await _mq.PublishAsync($"{Framework.ResponseHandlerTopic}{allotDownloaderMessage.OwnerId}",
-							$"|{Framework.AllocateDownloaderCommand}|true");
+						
+						if (!await PublishMessageAsync(
+							$"{Framework.ResponseHandlerTopic}{allotDownloaderMessage.OwnerId}",
+							$"|{Framework.AllocateDownloaderCommand}|true"))
+						{
+							Logger.LogInformation(
+								$"任务 {allotDownloaderMessage.OwnerId} 分配下载器 {allotDownloaderMessage.Type} 失败：推送分配成功的消息失败");
+							return;
+						}
+
+						_cache.TryAdd(allotDownloaderMessage.OwnerId, downloaderEntry);
+
+						// 保存分配的下载器初始信息
+						File.WriteAllText(
+							Path.Combine(Framework.BaseDirectory, DownloaderPersistFolderName,
+								allotDownloaderMessage.OwnerId), message, Encoding.UTF8);
 					}
 				}
 				else
@@ -333,6 +410,30 @@ namespace DotnetSpider.Downloader
 			{
 				Logger.LogWarning($"任务 {allotDownloaderMessage.OwnerId} 分配下载器过期");
 			}
+		}
+
+		/// <summary>
+		/// 推送消息
+		/// </summary>
+		/// <param name="topic">主题</param>
+		/// <param name="messages">消息</param>
+		/// <returns></returns>
+		private async Task<bool> PublishMessageAsync(string topic, params string[] messages)
+		{
+			for (var current = 0; current < _options.MessageAttempts; current++)
+			{
+				try
+				{
+					await _mq.PublishAsync(topic, messages);
+					return true;
+				}
+				catch (Exception e)
+				{
+					Logger.LogError($"下载器代理 {_options.AgentId} 推送请求结果失败: {e.Message}");
+				}
+			}
+
+			return false;
 		}
 	}
 }
