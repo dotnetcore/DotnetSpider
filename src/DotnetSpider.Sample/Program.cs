@@ -21,20 +21,7 @@ namespace DotnetSpider.Sample
 	{
 		static async Task Main(string[] args)
 		{
-			// await BaseUsage.Run();
-			Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
-			try
-			{
-				Func<string, Task> a = async (x) =>
-				{
-					await Write(x);
-					throw new Exception("asdfasdf");
-				};
-				await a("aaaa");
-			}
-			catch (Exception e)
-			{
-			}
+			await BaseUsage.Run();
 
 			// await DistributedSpider.Run(); 
 			Console.Read();

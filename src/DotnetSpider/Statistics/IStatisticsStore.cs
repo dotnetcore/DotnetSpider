@@ -9,6 +9,12 @@ namespace DotnetSpider.Statistics
     /// </summary>
     public interface IStatisticsStore
     {
+	    /// <summary>
+	    /// 创建数据库和表
+	    /// </summary>
+	    /// <returns></returns>
+	    Task EnsureDatabaseAndTableCreatedAsync();
+	    
         /// <summary>
         /// 增加成功次数 1
         /// </summary>

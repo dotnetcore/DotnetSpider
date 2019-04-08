@@ -42,10 +42,8 @@ namespace DotnetSpider.Downloader.Internal
 		{
 			using (var conn = new MySqlConnection(_options.ConnectionString))
 			{
-				var expired = DateTime.Now.AddSeconds(-12);
 				return (await conn.QueryAsync<DownloaderAgent>(
-						$"SELECT * FROM dotnetspider.downloader_agent WHERE last_modification_time >= @Expired",
-						new {Expired = expired}))
+						$"SELECT * FROM dotnetspider.downloader_agent"))
 					.ToList();
 			}
 		}

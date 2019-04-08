@@ -86,7 +86,7 @@ namespace DotnetSpider.Kafka
 						{
 							_logger?.LogError($"接收 Kafka 消息失败, Topic {topic} 原因: {e.Error.Reason}");
 						}
-						catch (OperationCanceledException e)
+						catch (OperationCanceledException)
 						{
 							_logger?.LogError($"取消订阅 Kafka 消息, Topic {topic}");
 							break;

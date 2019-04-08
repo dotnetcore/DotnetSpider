@@ -10,13 +10,13 @@ namespace DotnetSpider.Downloader
 	public interface IDownloaderAgentStore
 	{
 		/// <summary>
-		/// 创建数据库
+		/// 创建数据库和表
 		/// </summary>
 		/// <returns></returns>
 		Task EnsureDatabaseAndTableCreatedAsync();
 
 		/// <summary>
-		/// 查询所有已经注册并且最后一次心跳上报时间在当前时间 12 秒以内的下载器代理
+		/// 查询所有已经注册的下载器代理
 		/// </summary>
 		/// <returns></returns>
 		Task<List<DownloaderAgent>> GetAllListAsync();

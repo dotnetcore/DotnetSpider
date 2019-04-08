@@ -2,6 +2,7 @@
 using System.Linq;
 using DotnetSpider.Downloader.Internal;
 using DotnetSpider.Kafka;
+using DotnetSpider.Statistics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,9 +21,10 @@ namespace DotnetSpider.DownloadCenter
 					{
 						builder.UserKafka();
 						builder.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
-						builder.AddSpiderStatisticsCenter(x => x.UseMemory());
+						builder.AddSpiderStatisticsCenter(x => x.UseMySql());
 					});
 					services.AddHostedService<LocalDownloadCenter>();
+					services.AddHostedService<StatisticsCenter>();
 				})
 				.UseEnvironment(args.Contains("/dev") ? EnvironmentName.Development : EnvironmentName.Production)
 				.UseContentRoot(AppDomain.CurrentDomain.BaseDirectory)

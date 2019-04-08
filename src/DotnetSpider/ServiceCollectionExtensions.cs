@@ -162,7 +162,7 @@ namespace DotnetSpider
 
 			return builder;
 		}
-		
+
 		public static AgentBuilder UseFileLocker(this AgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
@@ -220,6 +220,13 @@ namespace DotnetSpider
 		{
 			Check.NotNull(builder, nameof(builder));
 			builder.Services.AddSingleton<IStatisticsStore, MemoryStatisticsStore>();
+			return builder;
+		}
+
+		public static StatisticsBuilder UseMySql(this StatisticsBuilder builder)
+		{
+			Check.NotNull(builder, nameof(builder));
+			builder.Services.AddSingleton<IStatisticsStore, MySqlStatisticsStore>();
 			return builder;
 		}
 

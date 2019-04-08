@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 namespace DotnetSpider.Downloader
 {
 	/// <summary>
-	/// 下载代理器
+	/// 下载器代理
 	/// </summary>
 	public abstract class DownloaderAgentBase : IDownloaderAgent
 	{

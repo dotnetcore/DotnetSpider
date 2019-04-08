@@ -128,11 +128,11 @@ namespace DotnetSpider.Downloader
 								}
 
 								await DownloaderAgentStore.HeartbeatAsync(heartbeat);
-								Logger.LogDebug($"下载代理器 {heartbeat.AgentId} 更新心跳成功");
+								Logger.LogDebug($"下载器代理 {heartbeat.AgentId} 更新心跳成功");
 							}
 							else
 							{
-								Logger.LogWarning($"下载代理器 {heartbeat.AgentId} 更新心跳过期");
+								Logger.LogWarning($"下载器代理 {heartbeat.AgentId} 更新心跳过期");
 							}
 						}
 						else
@@ -376,9 +376,8 @@ namespace DotnetSpider.Downloader
 		{
 			try
 			{
-				// 所有已经注册并且最后一次心跳上报时间在当前时间 12 秒以内的下载器代理
+				// 所有已经注册的下载器代理
 				var agents = await DownloaderAgentStore.GetAllListAsync();
-
 				foreach (var agent in agents)
 				{
 					// 如果不存在则添加到队列
@@ -393,6 +392,8 @@ namespace DotnetSpider.Downloader
 						return cacheDownloaderAgent;
 					});
 				}
+
+				Logger.LogInformation($"同步下载器代理数据成功: {agents.Count}");
 			}
 			catch (Exception e)
 			{

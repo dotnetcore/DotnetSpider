@@ -212,6 +212,7 @@ namespace DotnetSpider
 					// 订阅数据流，如果订阅失败
 					_mq.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
 						async message => await HandleMessage(message));
+					_logger.LogInformation($"任务 {Id} 订阅消息队列成功");
 
 					// 如果设置了要分配 10 个下载器，当收到 10 个下载器已经分配好时，认为分配完成
 					_allocated.Set(0);
@@ -225,16 +226,23 @@ namespace DotnetSpider
 					{
 						if (!_allocatedSuccess)
 						{
+							_logger.LogInformation($"任务 {Id} 分配下载器代理失败");
 							return;
 						}
 
 						if (_allocated.Value == DownloaderSettings.DownloaderCount)
 						{
-							_logger.LogInformation($"任务 {Id} 分配下载器成功");
+							_logger.LogInformation($"任务 {Id} 分配下载器代理成功");
 							break;
 						}
 
 						Thread.Sleep(150);
+					}
+
+					if (_allocated.Value == 0)
+					{
+						_logger.LogInformation($"任务 {Id} 分配下载器代理失败");
+						return;
 					}
 
 					// 通过供应接口添加请求
@@ -245,6 +253,7 @@ namespace DotnetSpider
 
 					// 把列表中可能剩余的请求加入队列
 					EnqueueRequests();
+					_logger.LogInformation($"任务 {Id} 加载下载请求结束");
 
 					// 初始化各数据流处理器
 					foreach (var dataFlow in _dataFlows)
@@ -252,6 +261,7 @@ namespace DotnetSpider
 						await dataFlow.InitAsync();
 					}
 
+					_logger.LogInformation($"任务 {Id} 数据流处理器初始化完成");
 					_enqueued.Set(0);
 					_responded.Set(0);
 					_enqueuedRequestDict.Clear();
@@ -507,6 +517,7 @@ namespace DotnetSpider
 											{
 												continue;
 											}
+
 											kv.Value.RetriedTimes++;
 											if (kv.Value.RetriedTimes > RespondedTimeoutRetryTimes)
 											{
@@ -877,7 +888,7 @@ namespace DotnetSpider
 			_scheduler = _scheduler ?? new QueueDistinctBfsScheduler();
 
 			var count = _scheduler.Enqueue(_requests);
-			_statisticsService.IncrementTotalAsync(Id, count).ConfigureAwait(false);
+			_statisticsService.IncrementTotalAsync(Id, count).ConfigureAwait(false).GetAwaiter();
 			_logger.LogInformation($"任务 {Id} 推送请求到调度器，数量 {_requests.Count}");
 			_requests.Clear();
 		}

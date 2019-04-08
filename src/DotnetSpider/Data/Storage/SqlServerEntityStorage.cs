@@ -48,6 +48,7 @@ namespace DotnetSpider.Data.Storage
 		/// </summary>
 		/// <param name="storageType">存储器类型</param>
 		/// <param name="connectionString">连接字符串</param>
+		/// <param name="version">数据库版本</param>
 		public SqlServerEntityStorage(StorageType storageType = StorageType.InsertIgnoreDuplicate,
 			string connectionString = null, SqlServerVersion version = SqlServerVersion.V2017) : base(storageType,
 			connectionString)
