@@ -11,18 +11,7 @@ namespace DotnetSpider.Portal.Controllers
         public IActionResult Index()
         {
             return View();
-        }
-
-        public IActionResult Cookie()
-        {
-            return Content(string.Join($"; {Environment.NewLine}",
-                HttpContext.Request.Cookies.Select(x => $"{x.Key}={x.Value}")));
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        } 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

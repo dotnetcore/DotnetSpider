@@ -1,0 +1,88 @@
+@using X.PagedList.Mvc.Common
+@using X.PagedList.Mvc.Core
+@model List<DotnetSpider.Portal.Entity.DockerImageRepository>
+
+@section breadcrumb{
+    <li >
+        <a href="#">镜像仓储</a>
+    </li>
+}
+
+@section header{
+    镜像仓储<small v-text="moduleDescription"></small>
+}
+
+<div class="col-xs-12">
+    <div class="box">
+        <div class="box-header">
+            <div class="box-title">
+                &ensp;
+            </div>
+            <div class="box-tools">
+                <a class="btn btn-default btn-sm btn-flat" href="/image-repository/add">添加</a>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body table-responsive no-padding">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th>名称</th>
+                    <th>注册中心</th>
+                    <th>仓储</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="3">
+                            None
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr >
+                            <td>
+                                <span>@item.Name</span>
+                            </td>
+                            <td>
+                                <span>@item.Registry</span>
+                            </td>
+                            <td>
+                                <span>@item.Repository</span>
+                            </td>
+                            <td>
+                                <span>@item.CreationTime</span>
+                            </td>
+                            <td>
+                                <a class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                }
+
+                </tbody>
+            </table>
+        </div>
+        <!-- /.box-body --> 
+    </div>
+    <!-- /.box -->
+</div>
+
+@section scripts{
+    <environment names="Development">
+        <script src="~/js/image-repository.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/image-repository.min.js" asp-append-version="true"></script>
+    </environment>
+    <script>
+        $(function() {
+            app.activeMenu('ImageRepository');
+        })
+    </script>
+}

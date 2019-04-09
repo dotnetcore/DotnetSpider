@@ -11,6 +11,8 @@ project.lock.json
 
 *.log
 
+**/wwwroot/lib
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 [Oo]utput/

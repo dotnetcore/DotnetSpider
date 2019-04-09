@@ -9,15 +9,37 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+        <PackageReference Include="MySql.Data" Version="8.0.15" />
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
         <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+        <PackageReference Include="BuildBundlerMinifier" Version="2.8.391" />
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
+        <PackageReference Include="Quartz" Version="3.0.7" />
+        <PackageReference Include="X.PagedList.Mvc.Core" Version="7.6.0" />
+        
     </ItemGroup>
 
 
     <ItemGroup>
       <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
       <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Content Update="appsettings.json">
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <None Remove="DDL\SqlServer.sql" />
+      <EmbeddedResource Include="DDL\SqlServer.sql" />
+      <None Remove="DDL\MySql.sql" />
+      <EmbeddedResource Include="DDL\MySql.sql" />
     </ItemGroup>
 
 </Project>

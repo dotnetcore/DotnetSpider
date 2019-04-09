@@ -1,0 +1,40 @@
+<!-- REQUIRED JS SCRIPTS -->
+<environment names="Development">
+    <!-- jQuery 3 -->
+    <script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js" asp-append-version="true"></script>
+    <!-- AdminLTE App -->
+    <script src="~/lib/admin-lte/dist/js/adminlte.js" asp-append-version="true"></script>
+    <!-- SweetAlert -->
+    <script src="~/js/sweetalert/sweetalert.min.js" asp-append-version="true"></script>
+    <!-- Select2 -->
+    <script src="~/lib/select2/dist/js/select2.full.js" asp-append-version="true"></script>
+    <!-- iCheck -->
+    <script src="~/lib/admin-lte/plugins/iCheck/icheck.js" asp-append-version="true"></script>
+    <!-- Page -->
+    <script src="~/lib/twbs-pagination/jquery.twbsPagination.js" asp-append-version="true"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <!-- IdentityServer4.Admin -->
+    <script src="~/js/app.js" asp-append-version="true"></script>
+</environment>
+<environment names="Staging,Production">
+    <!-- jQuery 3 -->
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js" asp-append-version="true"></script>
+    <!-- AdminLTE App -->
+    <script src="~/lib/admin-lte/dist/js/adminlte.min.js" asp-append-version="true"></script>
+    <!-- SweetAlert -->
+    <script src="~/js/sweetalert/sweetalert.min.js" asp-append-version="true"></script>
+    <!-- iCheck -->
+    <script src="~/lib/admin-lte/plugins/iCheck/icheck.min.js" asp-append-version="true"></script>
+    <!-- Select2 -->
+    <script src="~/lib/select2/dist/js/select2.full.min.js" asp-append-version="true"></script>
+    <!-- Page -->
+    <script src="~/lib/twbs-pagination/jquery.twbsPagination.min.js" asp-append-version="true"></script>
+    <!-- VUE -->
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <!-- IdentityServer4.Admin -->
+    <script src="~/js/app.min.js" asp-append-version="true"></script>
+</environment>
