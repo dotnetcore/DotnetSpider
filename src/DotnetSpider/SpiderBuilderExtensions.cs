@@ -1,8 +1,6 @@
 using System;
 using DotnetSpider.Core;
 using DotnetSpider.Data;
-using DotnetSpider.Downloader;
-using DotnetSpider.Downloader.Internal;
 using DotnetSpider.MessageQueue;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;

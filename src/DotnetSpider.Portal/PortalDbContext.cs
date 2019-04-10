@@ -2,7 +2,6 @@ using DotnetSpider.Core;
 using DotnetSpider.Portal.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
 
 namespace DotnetSpider.Portal
 {

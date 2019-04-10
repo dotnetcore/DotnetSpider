@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Specialized;
 using Microsoft.Extensions.DependencyInjection;
-using Quartz;
-using Quartz.Impl;
 using Quartz.Logging;
 
 namespace DotnetSpider.Portal

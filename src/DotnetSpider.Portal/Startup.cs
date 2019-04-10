@@ -2,12 +2,9 @@
 using System.IO;
 using System.Reflection;
 using Dapper;
-using DotnetSpider.Core;
 using DotnetSpider.Kafka;
-using DotnetSpider.MessageQueue;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

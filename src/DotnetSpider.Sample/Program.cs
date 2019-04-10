@@ -1,17 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using Confluent.Kafka;
-using DotnetSpider.Core;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
-using DotnetSpider.Downloader;
-using DotnetSpider.Kafka;
 using DotnetSpider.Sample.samples;
 
 

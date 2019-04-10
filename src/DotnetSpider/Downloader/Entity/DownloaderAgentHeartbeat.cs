@@ -7,6 +7,8 @@ namespace DotnetSpider.Downloader.Entity
 	/// </summary>
     public class DownloaderAgentHeartbeat
     {
+	    public int Id { get; set; }
+	    
 	    /// <summary>
 	    /// 标识
 	    /// </summary>

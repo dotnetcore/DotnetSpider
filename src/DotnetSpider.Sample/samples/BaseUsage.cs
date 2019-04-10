@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using DotnetSpider.Core;
 using DotnetSpider.Data;
 using DotnetSpider.Data.Parser;
 using DotnetSpider.Data.Storage;

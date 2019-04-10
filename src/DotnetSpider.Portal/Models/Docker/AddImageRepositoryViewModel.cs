@@ -7,19 +7,22 @@ namespace DotnetSpider.Portal.Models.Docker
 		/// <summary>
 		/// 
 		/// </summary>
-		[StringLength(255)]
+		[Required]
+		[StringLength(255, MinimumLength = 4)]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// registry.cn-shanghai.aliyuncs.com
 		/// </summary>
 		[StringLength(255)]
+		[Required]
 		public string Registry { get; set; }
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		[StringLength(255)]
+		[Required]
 		public string Repository { get; set; }
 	}
 }

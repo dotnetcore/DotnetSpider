@@ -1,0 +1,4 @@
+@if (ViewContext.ModelState.IsValid == false)
+{
+    @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+}

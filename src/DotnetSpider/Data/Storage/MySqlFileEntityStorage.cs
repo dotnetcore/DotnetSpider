@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,7 +6,6 @@ using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Data.Parser;
 using DotnetSpider.Data.Storage.Model;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace DotnetSpider.Data.Storage

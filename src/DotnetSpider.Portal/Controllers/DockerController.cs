@@ -1,17 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using DotnetSpider.Portal.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.Linq;
 using System.Threading.Tasks;
 using DotnetSpider.Portal.Entity;
 using DotnetSpider.Portal.Models.Docker;
-using MailKit.Net.Imap;
 using Microsoft.EntityFrameworkCore;
-using X.PagedList;
 
 namespace DotnetSpider.Portal.Controllers
 {
@@ -32,8 +26,8 @@ namespace DotnetSpider.Portal.Controllers
 			return View();
 		}
 		
-		[HttpPost("image-repository")]
-		public async Task<IActionResult> ImageRepository([FromBody] AddImageRepositoryViewModel dto)
+		[HttpPost("image-repository/add")]
+		public async Task<IActionResult> ImageRepository(AddImageRepositoryViewModel dto)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -67,7 +61,7 @@ namespace DotnetSpider.Portal.Controllers
 					CreationTime = DateTime.Now
 				});
 				await _dbContext.SaveChangesAsync();
-				return Redirect("image-repository");
+				return Redirect("/image-repository");
 			}
 		}
 		
@@ -81,7 +75,7 @@ namespace DotnetSpider.Portal.Controllers
 				await _dbContext.SaveChangesAsync();
 			}
 
-			return Redirect("image-repository");
+			return Redirect("/");
 		}
 		
 		[HttpGet("image-repository")]
@@ -91,7 +85,7 @@ namespace DotnetSpider.Portal.Controllers
 			return View(list);
 		}
  
-		[HttpPost("docker/image/payload")]
+		[HttpPost("image-repository/payload")]
 		public async Task<IActionResult> PayloadImage([FromBody] ImagePayload payload)
 		{
 			var repository =

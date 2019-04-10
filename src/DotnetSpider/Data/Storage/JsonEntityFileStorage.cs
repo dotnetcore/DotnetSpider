@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Concurrent;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Data.Storage.Model;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.Data.Storage

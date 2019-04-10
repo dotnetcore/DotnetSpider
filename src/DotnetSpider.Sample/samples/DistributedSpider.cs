@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Kafka;
 

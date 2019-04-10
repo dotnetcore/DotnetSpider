@@ -1,13 +1,14 @@
-@model List<DotnetSpider.Portal.Entity.DockerImageRepository>
+@using DotnetSpider.Downloader
+@model List<DotnetSpider.Downloader.Entity.DownloaderAgent>
 
 @section breadcrumb{
     <li >
-        <a href="#">镜像仓储</a>
+        <a href="#">下载器代理</a>
     </li>
 }
 
 @section header{
-    镜像仓储<small v-text="moduleDescription"></small>
+    下载器代理<small v-text="moduleDescription"></small>
 }
 
 <div class="col-xs-12">
@@ -17,7 +18,7 @@
                 &ensp;
             </div>
             <div class="box-tools">
-                <a class="btn btn-default btn-sm btn-flat" href="/image-repository/add">添加</a>
+                &ensp;
             </div>
         </div>
         <!-- /.box-header -->
@@ -25,16 +26,18 @@
             <table class="table table-bordered">
                 <tbody>
                 <tr>
+                    <th>#</th>
                     <th>名称</th>
-                    <th>注册中心</th>
-                    <th>仓储</th>
+                    <th>CPU 核心</th>
+                    <th>总内存</th>
                     <th>创建时间</th>
+                    <th>心跳时间</th>
                     <th>操作</th>
                 </tr>
                 @if (Model == null || !Model.Any())
                 {
                     <tr>
-                        <td colspan="3">
+                        <td colspan="7">
                             None
                         </td>
                     </tr>
@@ -44,20 +47,34 @@
                     foreach (var item in Model)
                     {
                         <tr >
+                            <td style="width: 15px;">
+                                @if (item.IsActive())
+                                {
+                                    <span style="background-color: green">&ensp;&ensp;&ensp;&ensp;</span>
+                                }
+                                else
+                                {
+                                    <span style="background-color: red">&ensp;&ensp;&ensp;&ensp;</span>
+                                }
+                            </td>
                             <td>
                                 <span>@item.Name</span>
                             </td>
                             <td>
-                                <span>@item.Registry</span>
+                                <span>@item.ProcessorCount</span>
                             </td>
                             <td>
-                                <span>@item.Repository</span>
+                                <span>@item.TotalMemory</span>
                             </td>
                             <td>
                                 <span>@item.CreationTime</span>
                             </td>
                             <td>
-                                <a class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</a>
+                                <span>@item.LastModificationTime</span>
+                            </td>
+                            <td>
+                                <a class="btn btn-default btn-sm btn-flat" href="/downloader-agent/@item.Id/heartbeat">监控</a>
+                                <a class="btn btn-default btn-sm  btn-flat" onclick="exit('@item.Id')">Exit</a>
                             </td>
                         </tr>
                     }
@@ -66,21 +83,15 @@
                 </tbody>
             </table>
         </div>
-        <!-- /.box-body --> 
+        <!-- /.box-body -->
     </div>
     <!-- /.box -->
 </div>
 
 @section scripts{
-    <environment names="Development">
-        <script src="~/js/image-repository.js" asp-append-version="true"></script>
-    </environment>
-    <environment names="Staging,Production">
-        <script src="~/js/image-repository.min.js" asp-append-version="true"></script>
-    </environment>
     <script>
         $(function() {
-            app.activeMenu('ImageRepository');
+            app.activeMenu('DownloaderAgent');
         })
     </script>
 }
