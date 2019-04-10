@@ -1,4 +1,4 @@
-@model List<DotnetSpider.Portal.Entity.DockerImageRepository>
+@model List<DotnetSpider.Portal.Entity.DockerRepository>
 
 @section breadcrumb{
     <li >
@@ -17,7 +17,7 @@
                 &ensp;
             </div>
             <div class="box-tools">
-                <a class="btn btn-default btn-sm btn-flat" href="/image-repository/add">添加</a>
+                <a class="btn btn-default btn-sm btn-flat" href="/repository/add">添加</a>
             </div>
         </div>
         <!-- /.box-header -->
@@ -73,14 +73,14 @@
 
 @section scripts{
     <environment names="Development">
-        <script src="~/js/image-repository.js" asp-append-version="true"></script>
+        <script src="~/js/repository.js" asp-append-version="true"></script>
     </environment>
     <environment names="Staging,Production">
-        <script src="~/js/image-repository.min.js" asp-append-version="true"></script>
+        <script src="~/js/repository.min.js" asp-append-version="true"></script>
     </environment>
     <script>
         $(function() {
-            app.activeMenu('ImageRepository');
+            app.activeMenu('Repository');
         })
     </script>
 }

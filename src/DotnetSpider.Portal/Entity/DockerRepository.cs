@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DotnetSpider.Portal.Entity
 {
-	[Table("docker_image")]
-	public class DockerImage
+	[Table("docker_repository")]
+	public class DockerRepository
 	{
 		/// <summary>
 		/// 主键
@@ -14,25 +14,34 @@ namespace DotnetSpider.Portal.Entity
 		public int Id { get; set; }
 
 		/// <summary>
-		/// 仓储标识
-		/// </summary>
-		[Required]
-		[Column("repository_id")]
-		public int RepositoryId { get; set; }
-
-		/// <summary>
-		/// registry.cn-shanghai.aliyuncs.com/zlzforever/helloworld:20190409.22
+		/// 
 		/// </summary>
 		[StringLength(255)]
 		[Required]
-		[Column("image")]
-		public string Image { get; set; }
+		[Column("name")]
+		public string Name { get; set; }
+
+		/// <summary>
+		/// registry.cn-shanghai.aliyuncs.com
+		/// </summary>
+		[StringLength(255)]
+		[Required]
+		[Column("registry")]
+		public string Registry { get; set; }
+		
+		/// <summary>
+		/// zlzforever/ids4admin
+		/// </summary>
+		[StringLength(255)]
+		[Required]
+		[Column("repository")]
+		public string Repository { get; set; }
 
 		/// <summary>
 		/// Creation time of this entity.
 		/// </summary>
 		[Required]
 		[Column("creation_time")]
-		public DateTime CreationTime { get; set; }
+		public DateTime CreationTime { get; set; }			
 	}
 }

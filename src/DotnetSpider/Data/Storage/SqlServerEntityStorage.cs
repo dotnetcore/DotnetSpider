@@ -181,6 +181,7 @@ namespace DotnetSpider.Data.Storage
 				}
 			}
 
+			builder.AppendLine(" END");
 			var sql = builder.ToString();
 			return sql;
 		}

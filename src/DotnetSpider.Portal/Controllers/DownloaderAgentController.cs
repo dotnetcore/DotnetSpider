@@ -1,8 +1,12 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using DotnetSpider.Downloader.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using X.PagedList;
 
@@ -13,7 +17,8 @@ namespace DotnetSpider.Portal.Controllers
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
 
-		public DownloaderAgentController(PortalDbContext dbContext, ILogger<DockerController> logger)
+		public DownloaderAgentController(PortalDbContext dbContext,
+			ILogger<DockerController> logger)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
@@ -22,36 +27,50 @@ namespace DotnetSpider.Portal.Controllers
 		[HttpGet("downloader-agent")]
 		public async Task<IActionResult> Retrieve()
 		{
-			using (var conn = _dbContext.Database.GetDbConnection())
+			try
 			{
-				var agents = await (await conn.QueryAsync<DownloaderAgent>(
-						$"SELECT id AS Id, name AS Name, processor_count AS ProcessorCount, total_memory AS TotalMemory, creation_time AS CreationTime, last_modification_time AS LastModificationTime FROM downloader_agent")
-					)
-					.ToListAsync();
+				var agents = await _dbContext.Set<DownloaderAgent>().ToListAsync();
 				return View(agents);
+			}
+			catch (Exception e)
+			{
+				if (e.Message.Contains("doesn't exist"))
+				{
+					_logger.LogInformation("下载中心尚未启动");
+					return View();
+				}
+				else
+				{
+					throw;
+				}
 			}
 		}
 
 		[HttpGet("downloader-agent/{id}/heartbeat")]
 		public async Task<IActionResult> Heartbeat(string id, int page, int size)
 		{
-			using (var conn = _dbContext.Database.GetDbConnection())
-			{
-				page = page <= 1 ? 1 : page;
-				size = size <= 10 ? 10 : size;
+			page = page <= 1 ? 1 : page;
+			size = size <= 10 ? 10 : size;
 
-				var agents = await (await conn.QueryAsync<DownloaderAgentHeartbeat>(
-						$"SELECT id AS Id, agent_id AS AgentId, agent_name AS AgentName, free_memory AS FreeMemory, downloader_count AS DownloaderCount, creation_time AS CreationTime FROM downloader_agent_heartbeat WHERE agent_id = @AgentId ORDER BY id DESC LIMIT @Page, @Size ",
-						new
-						{
-							AgentId = id,
-							Page = page - 1,
-							Size = size
-						})
-					)
-					.ToListAsync();
-				var viewModel = new StaticPagedList<DownloaderAgentHeartbeat>(agents, page, size, 10000);
+			try
+			{
+				var viewModel = await _dbContext.Set<DownloaderAgentHeartbeat>().Where(x => x.AgentId == id)
+					.OrderByDescending(x => x.CreationTime)
+					.ToPagedListAsync(page, size);
+
 				return View(viewModel);
+			}
+			catch (Exception e)
+			{
+				if (e.Message.Contains("doesn't exist"))
+				{
+					_logger.LogInformation("下载中心尚未启动");
+					return View();
+				}
+				else
+				{
+					throw;
+				}
 			}
 		}
 	}

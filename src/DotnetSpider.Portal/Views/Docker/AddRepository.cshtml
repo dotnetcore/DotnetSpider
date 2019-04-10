@@ -1,4 +1,4 @@
-@model DotnetSpider.Portal.Models.Docker.AddImageRepositoryViewModel
+@model DotnetSpider.Portal.Models.Docker.AddRepositoryViewModel
 
 @section breadcrumb{
     <li >
@@ -12,7 +12,7 @@
 
 <div class="col-xs-12">
     <div class="box">
-        <form action="/image-repository/add" method="post">
+        <form action="/repository/add" method="post">
             @await Html.PartialAsync("_ValidationSummary")
             <div class="box-body">
                 <div class="row">
@@ -56,7 +56,7 @@
 {
     <script>
         $(function() {
-            app.activeMenu('ImageRepository');
+            app.activeMenu('Repository');
         })
     </script>
 }

@@ -1,4 +1,5 @@
 using DotnetSpider.Core;
+using DotnetSpider.Downloader.Entity;
 using DotnetSpider.Portal.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -7,28 +8,47 @@ namespace DotnetSpider.Portal
 {
 	public class PortalDbContext : DbContext, IDesignTimeDbContextFactory<PortalDbContext>
 	{
-		public DbSet<DockerImageRepository> DockerImageRepositories { get; set; }
+		private readonly bool _isDesignTime;
+
+		public DbSet<DockerRepository> DockerRepositories { get; set; }
 
 		public DbSet<DockerImage> DockerImages { get; set; }
 
+		public DbSet<Entity.Spider> Spiders { get; set; }
+
 		public PortalDbContext()
 		{
+			_isDesignTime = true;
 		}
 
-		public PortalDbContext(DbContextOptions<PortalDbContext> options)
+		public PortalDbContext(DbContextOptions<PortalDbContext> options, bool isDesignTime = false)
 			: base(options)
 		{
+			_isDesignTime = isDesignTime;
 		}
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
 
-			builder.Entity<DockerImageRepository>().HasIndex(x => x.Name).IsUnique();
-			builder.Entity<DockerImageRepository>().HasIndex(x => x.Repository).IsUnique();
-			builder.Entity<DockerImageRepository>().HasIndex(x => x.CreationTime);
+			if (!_isDesignTime)
+			{
+				builder.Model.AddEntityType(typeof(DownloaderAgent));
+				builder.Model.AddEntityType(typeof(DownloaderAgentHeartbeat));
+			}
 
-			builder.Entity<DockerImage>().HasIndex(x => x.Repository).IsUnique();
+			builder.Entity<DockerRepository>().HasIndex(x => x.Name).IsUnique();
+			builder.Entity<DockerRepository>().HasIndex(x => x.Repository).IsUnique();
+			builder.Entity<DockerRepository>().HasIndex(x => x.CreationTime);
+
+			builder.Entity<DockerImage>().HasIndex(x => x.Image).IsUnique();
+
+			builder.Entity<Entity.Spider>().HasIndex(x => x.Name);
+			builder.Entity<Entity.Spider>().HasIndex(x => x.CreationTime);
+			builder.Entity<Entity.Spider>().HasIndex(x => x.Image);
+
+			builder.Entity<SpiderContainer>().HasIndex(x => x.ContainerId);
+			builder.Entity<SpiderContainer>().HasIndex(x => x.CreationTime);
 		}
 
 		public PortalDbContext CreateDbContext(string[] args)
@@ -51,7 +71,7 @@ namespace DotnetSpider.Portal
 				}
 			}
 
-			return new PortalDbContext(builder.Options);
+			return new PortalDbContext(builder.Options, true);
 		}
 	}
 }

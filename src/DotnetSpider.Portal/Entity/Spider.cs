@@ -2,10 +2,11 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
 namespace DotnetSpider.Portal.Entity
 {
-	[Table("docker_image")]
-	public class DockerImage
+	[Table("spider")]
+	public class Spider
 	{
 		/// <summary>
 		/// 主键
@@ -14,14 +15,30 @@ namespace DotnetSpider.Portal.Entity
 		public int Id { get; set; }
 
 		/// <summary>
-		/// 仓储标识
+		/// 
 		/// </summary>
 		[Required]
-		[Column("repository_id")]
-		public int RepositoryId { get; set; }
+		[StringLength(255)]
+		[Column("name")]
+		public string Name { get; set; }
 
 		/// <summary>
-		/// registry.cn-shanghai.aliyuncs.com/zlzforever/helloworld:20190409.22
+		/// 
+		/// </summary>
+		[StringLength(255)]
+		[Required]
+		[Column("cron")]
+		public string Cron { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		[StringLength(255)]
+		[Column("arguments")]
+		public string Arguments { get; set; }
+
+		/// <summary>
+		/// 
 		/// </summary>
 		[StringLength(255)]
 		[Required]
@@ -34,5 +51,11 @@ namespace DotnetSpider.Portal.Entity
 		[Required]
 		[Column("creation_time")]
 		public DateTime CreationTime { get; set; }
+
+		/// <summary>
+		/// 上一次更新时间
+		/// </summary>
+		[Column("last_modification_time")]
+		public DateTime LastModificationTime { get; set; }
 	}
 }

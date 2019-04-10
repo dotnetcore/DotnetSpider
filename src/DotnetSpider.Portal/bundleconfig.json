@@ -17,9 +17,9 @@
     "sourceMap": false
   },
   {
-    "outputFileName": "wwwroot/js/image-repository.min.js",
+    "outputFileName": "wwwroot/js/repository.min.js",
     "inputFiles": [
-      "wwwroot/js/image-repository.js"
+      "wwwroot/js/repository.js"
     ],
     "minify": {
       "enabled": true,

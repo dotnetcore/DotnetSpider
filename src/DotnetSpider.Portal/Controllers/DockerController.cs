@@ -20,21 +20,21 @@ namespace DotnetSpider.Portal.Controllers
 			_dbContext = dbContext;
 		}
 
-		[HttpGet("image-repository/add")]
-		public IActionResult AddImageRepository()
+		[HttpGet("repository/add")]
+		public IActionResult AddRepository()
 		{
 			return View();
 		}
-		
-		[HttpPost("image-repository/add")]
-		public async Task<IActionResult> ImageRepository(AddImageRepositoryViewModel dto)
+
+		[HttpPost("repository/add")]
+		public async Task<IActionResult> AddRepository(AddRepositoryViewModel dto)
 		{
 			if (!ModelState.IsValid)
 			{
-				return View("AddImageRepository", dto);
+				return View("AddRepository", dto);
 			}
 
-			var items = await _dbContext.DockerImageRepositories.Where(x =>
+			var items = await _dbContext.DockerRepositories.Where(x =>
 				x.Name == dto.Name || x.Repository == dto.Repository).ToListAsync();
 
 			if (items.Any(x => x.Name == dto.Name))
@@ -49,11 +49,11 @@ namespace DotnetSpider.Portal.Controllers
 
 			if (items.Any())
 			{
-				return View("AddImageRepository", dto);
+				return View("AddRepository", dto);
 			}
 			else
 			{
-				_dbContext.DockerImageRepositories.Add(new DockerImageRepository
+				_dbContext.DockerRepositories.Add(new DockerRepository
 				{
 					Name = dto.Name,
 					Registry = dto.Registry,
@@ -61,35 +61,35 @@ namespace DotnetSpider.Portal.Controllers
 					CreationTime = DateTime.Now
 				});
 				await _dbContext.SaveChangesAsync();
-				return Redirect("/image-repository");
+				return Redirect("/repository");
 			}
 		}
-		
-		[HttpDelete("image-repository/{id}")]
-		public async Task<IActionResult> ImageRepository(int id)
+
+		[HttpDelete("repository/{id}")]
+		public async Task<IActionResult> Repository(int id)
 		{
-			var item = await _dbContext.DockerImageRepositories.FirstOrDefaultAsync(x => x.Id == id);
+			var item = await _dbContext.DockerRepositories.FirstOrDefaultAsync(x => x.Id == id);
 			if (item != null)
 			{
-				_dbContext.DockerImageRepositories.Remove(item);
+				_dbContext.DockerRepositories.Remove(item);
 				await _dbContext.SaveChangesAsync();
 			}
 
 			return Redirect("/");
 		}
-		
-		[HttpGet("image-repository")]
-		public async Task<IActionResult> ImageRepository()
+
+		[HttpGet("repository")]
+		public async Task<IActionResult> Repository()
 		{
-			var list = await _dbContext.DockerImageRepositories.ToListAsync();
+			var list = await _dbContext.DockerRepositories.ToListAsync();
 			return View(list);
 		}
- 
-		[HttpPost("image-repository/payload")]
+
+		[HttpPost("repository/payload")]
 		public async Task<IActionResult> PayloadImage([FromBody] ImagePayload payload)
 		{
 			var repository =
-				await _dbContext.DockerImageRepositories.FirstOrDefaultAsync(
+				await _dbContext.DockerRepositories.FirstOrDefaultAsync(
 					x => x.Repository == payload.Repository.Repo_Full_Name);
 			if (repository != null)
 			{
@@ -100,13 +100,14 @@ namespace DotnetSpider.Portal.Controllers
 				}
 
 				var image = $"{repository.Registry}/{payload.Repository.Repo_Full_Name}:{payload.Push_Data.Tag}";
-				if (!await _dbContext.DockerImages.AnyAsync(x => x.Repository == image))
+				if (!await _dbContext.DockerImages.AnyAsync(x =>
+					x.Image == image))
 				{
 					_dbContext.DockerImages.Add(new DockerImage
 					{
-						Repository = image,
+						Image = image,
 						CreationTime = DateTime.Now,
-						DockerImageRepositoryId = repository.Id
+						RepositoryId = repository.Id
 					});
 
 					await _dbContext.SaveChangesAsync();

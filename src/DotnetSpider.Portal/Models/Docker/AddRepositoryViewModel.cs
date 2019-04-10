@@ -1,17 +1,14 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace DotnetSpider.Portal.Entity
+namespace DotnetSpider.Portal.Models.Docker
 {
-	public class DockerImageRepository
+	public class AddRepositoryViewModel
 	{
-		public int Id { get; set; }
-
 		/// <summary>
 		/// 
 		/// </summary>
-		[StringLength(255)]
 		[Required]
+		[StringLength(255, MinimumLength = 4)]
 		public string Name { get; set; }
 
 		/// <summary>
@@ -20,18 +17,12 @@ namespace DotnetSpider.Portal.Entity
 		[StringLength(255)]
 		[Required]
 		public string Registry { get; set; }
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		[StringLength(255)]
 		[Required]
 		public string Repository { get; set; }
-
-		/// <summary>
-		/// Creation time of this entity.
-		/// </summary>
-		[Required]
-		public DateTime CreationTime { get; set; }			
 	}
 }

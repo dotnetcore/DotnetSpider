@@ -78,10 +78,9 @@
                 @Html.PagedListPager(Model, page => Url.Action("Heartbeat", new {page}),
                     new PagedListRenderOptions
                     {
-                        DisplayLinkToFirstPage = PagedListDisplayMode.Never,
-                        DisplayLinkToLastPage = PagedListDisplayMode.Never,
-                        DisplayLinkToNextPage = PagedListDisplayMode.Never,
-                        DisplayLinkToPreviousPage = PagedListDisplayMode.Never,
+                        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
                         ContainerDivClasses = new string[0],
                         UlElementClasses = new[] {"pagination pagination-sm no-margin pull-left"},
                         LiElementClasses = new[] {"page-item"},

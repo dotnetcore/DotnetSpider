@@ -42,4 +42,9 @@
       <EmbeddedResource Include="DDL\MySql.sql" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <Folder Include="Views\Spider" />
+    </ItemGroup>
+
 </Project>
