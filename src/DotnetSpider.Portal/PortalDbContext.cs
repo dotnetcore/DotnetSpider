@@ -1,6 +1,7 @@
 using DotnetSpider.Core;
 using DotnetSpider.Downloader.Entity;
 using DotnetSpider.Portal.Entity;
+using DotnetSpider.Statistics.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -15,7 +16,7 @@ namespace DotnetSpider.Portal
 		public DbSet<DockerImage> DockerImages { get; set; }
 
 		public DbSet<Entity.Spider> Spiders { get; set; }
-		
+
 		public DbSet<Entity.SpiderContainer> SpiderContainers { get; set; }
 
 		public PortalDbContext()
@@ -37,6 +38,8 @@ namespace DotnetSpider.Portal
 			{
 				builder.Model.AddEntityType(typeof(DownloaderAgent));
 				builder.Model.AddEntityType(typeof(DownloaderAgentHeartbeat));
+				builder.Model.AddEntityType(typeof(SpiderStatistics));
+				builder.Model.AddEntityType(typeof(DownloadStatistics));
 			}
 
 			builder.Entity<DockerRepository>().HasIndex(x => x.Name).IsUnique();
