@@ -36,7 +36,7 @@ app.successHandler = function (result, success, error) {
 };
 app.errorHandler = function (result, error) {
     if (error) {
-        error(result);
+        error(result.responseJSON);
     } else {
         if (swal) {
             if (result.statusText) {

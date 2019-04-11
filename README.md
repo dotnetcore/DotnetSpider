@@ -73,6 +73,11 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
         $ sudo docker run --name kafka -d -p 9092:9092 --restart always --net bridge -h kafka --env ADVERTISED_PORT=9092 spotify/kafka
         $ sudo -s
         bash-3.2# echo "127.0.0.1       kafka" >> /etc/hosts
+        
+- Docker remote api for mac
+
+        $ docker run -d -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 \
+            bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock        
                         
 ### MORE DOCUMENTS
 

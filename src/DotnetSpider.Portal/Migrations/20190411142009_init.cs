@@ -46,9 +46,11 @@ namespace DotnetSpider.Portal.Migrations
                     id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     name = table.Column<string>(maxLength: 255, nullable: false),
+                    @class = table.Column<string>(name: "class", maxLength: 400, nullable: false),
                     cron = table.Column<string>(maxLength: 255, nullable: false),
-                    arguments = table.Column<string>(maxLength: 255, nullable: true),
+                    environment = table.Column<string>(maxLength: 255, nullable: true),
                     image = table.Column<string>(maxLength: 255, nullable: false),
+                    Single = table.Column<bool>(nullable: false),
                     creation_time = table.Column<DateTime>(nullable: false),
                     last_modification_time = table.Column<DateTime>(nullable: false)
                 },
@@ -64,8 +66,9 @@ namespace DotnetSpider.Portal.Migrations
                     id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     spider_id = table.Column<int>(nullable: false),
-                    container_id = table.Column<Guid>(nullable: false),
+                    container_id = table.Column<string>(maxLength: 100, nullable: true),
                     creation_time = table.Column<DateTime>(nullable: false),
+                    Status = table.Column<string>(nullable: true),
                     exit_time = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>

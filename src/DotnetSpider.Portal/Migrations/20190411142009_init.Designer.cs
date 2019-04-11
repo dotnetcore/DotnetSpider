@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotnetSpider.Portal.Migrations
 {
     [DbContext(typeof(PortalDbContext))]
-    [Migration("20190410142948_init")]
+    [Migration("20190411142009_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,9 +87,10 @@ namespace DotnetSpider.Portal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
-                    b.Property<string>("Arguments")
-                        .HasColumnName("arguments")
-                        .HasMaxLength(255);
+                    b.Property<string>("Class")
+                        .IsRequired()
+                        .HasColumnName("class")
+                        .HasMaxLength(400);
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnName("creation_time");
@@ -97,6 +98,10 @@ namespace DotnetSpider.Portal.Migrations
                     b.Property<string>("Cron")
                         .IsRequired()
                         .HasColumnName("cron")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Environment")
+                        .HasColumnName("environment")
                         .HasMaxLength(255);
 
                     b.Property<string>("Image")
@@ -111,6 +116,8 @@ namespace DotnetSpider.Portal.Migrations
                         .IsRequired()
                         .HasColumnName("name")
                         .HasMaxLength(255);
+
+                    b.Property<bool>("Single");
 
                     b.HasKey("Id");
 
@@ -129,8 +136,9 @@ namespace DotnetSpider.Portal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
-                    b.Property<Guid>("ContainerId")
-                        .HasColumnName("container_id");
+                    b.Property<string>("ContainerId")
+                        .HasColumnName("container_id")
+                        .HasMaxLength(100);
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnName("creation_time");
@@ -140,6 +148,8 @@ namespace DotnetSpider.Portal.Migrations
 
                     b.Property<int>("SpiderId")
                         .HasColumnName("spider_id");
+
+                    b.Property<string>("Status");
 
                     b.HasKey("Id");
 

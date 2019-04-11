@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
-using DotnetSpider.Downloader.Entity;
-using DotnetSpider.Portal.Entity;
 using DotnetSpider.Portal.Models.Spider;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -78,14 +76,16 @@ namespace DotnetSpider.Portal.Controllers
 						Name = dto.Name,
 						Cron = dto.Cron,
 						Image = dto.Image,
-						Arguments = dto.Arguments,
+						Environment = dto.Environment,
 						Single = dto.Single,
-						CreationTime = DateTime.Now
+						Class = dto.Class,
+						CreationTime = DateTime.Now,
+						LastModificationTime = DateTime.Now
 					};
 					_dbContext.Spiders.Add(spider);
 					await _dbContext.SaveChangesAsync();
 					var id = spider.Id.ToString();
-					var trigger = TriggerBuilder.Create().WithCronSchedule(dto.Cron).WithIdentity(id).Build();	
+					var trigger = TriggerBuilder.Create().WithCronSchedule(dto.Cron).WithIdentity(id).Build();
 					var qzJob = JobBuilder.Create<TriggerJob>().WithIdentity(id).WithDescription(spider.Name)
 						.RequestRecovery(true)
 						.Build();
@@ -136,6 +136,48 @@ namespace DotnetSpider.Portal.Controllers
 			}
 
 			return View(viewModel);
+		}
+
+		[HttpDelete("spider/{id}")]
+		public async Task<IActionResult> Delete(int id)
+		{
+			var item = await _dbContext.Spiders.FirstOrDefaultAsync(x => x.Id == id);
+			if (item != null)
+			{
+				_dbContext.Spiders.Remove(item);
+				await _dbContext.SaveChangesAsync();
+			}
+
+			return Redirect("/");
+		}
+
+		[HttpPost("spider/{id}/run")]
+		public async Task<IActionResult> Run(int id)
+		{
+			var item = await _dbContext.Spiders.FirstOrDefaultAsync(x => x.Id == id);
+			if (item != null)
+			{
+				try
+				{
+					await JobHelper.RunAsync(_options, _dbContext, id);
+					return Ok();
+				}
+				catch (Exception e)
+				{
+					_logger.LogError($"启动失败: {e}");
+					return StatusCode((int) HttpStatusCode.InternalServerError, new
+					{
+						e.Message
+					});
+				}
+			}
+			else
+			{
+				return StatusCode((int) HttpStatusCode.InternalServerError, new
+				{
+					Message = "任务不存在"
+				});
+			}
 		}
 	}
 }

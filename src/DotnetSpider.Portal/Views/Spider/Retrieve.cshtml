@@ -29,16 +29,18 @@
                 <tr>
                     <th>标识</th>
                     <th>名称</th>
+                    <th>Class</th>
                     <th>CRON</th>
                     <th>镜像</th>
                     <th>运行参数</th>
                     <th>单一实例</th>
                     <th>更新时间</th>
+                    <th>操作</th>
                 </tr>
                 @if (Model == null || !Model.Any())
                 {
                     <tr>
-                        <td colspan="7">
+                        <td colspan="9">
                             None
                         </td>
                     </tr>
@@ -55,19 +57,26 @@
                                 <span>@item.Name</span>
                             </td>
                             <td>
+                                <span>@item.Class</span>
+                            </td>
+                            <td>
                                 <span>@item.Cron</span>
                             </td>
                             <td>
                                 <span>@item.Image</span>
                             </td>
                             <td>
-                                <span>@item.Arguments</span>
+                                <span>@item.Environment</span>
                             </td>
                             <td>
                                 <span>@item.Single</span>
                             </td>
                             <td>
                                 <span>@item.LastModificationTime</span>
+                            </td>
+                            <td>
+                                <a class="btn btn-default btn-sm  btn-flat" onclick="run('@item.Id')">Run</a>
+                                <a class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</a>
                             </td>
                         </tr>
                     }
@@ -97,6 +106,12 @@
 </div>
 
 @section scripts{
+    <environment names="Development">
+        <script src="~/js/spider.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/spider.min.js" asp-append-version="true"></script>
+    </environment>
     <script>
         $(function() {
             app.activeMenu('Spider');

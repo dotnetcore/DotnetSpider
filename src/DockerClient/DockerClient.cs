@@ -42,6 +42,14 @@ namespace DockerClient
 			return result;
 		}
 
+		public async Task<DockerResult> PullAsync(string image)
+		{
+			var response = await Cache[_host].PostAsync($"{_host}v1.39/images/create?fromImage={image}",
+				new StringContent("", Encoding.UTF8, "application/json"));
+			var result = new DockerResult {Success = response.IsSuccessStatusCode};
+			return result;
+		}
+
 		public async Task<DockerResult> StartAsync(string id)
 		{
 			var response = await Cache[_host].PostAsync($"{_host}v1.39/containers/{id}/start",

@@ -23,6 +23,13 @@
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Class</label>
+                            <input asp-for="Class" class="form-control" autocomplete="false" type="text">
+                            <span asp-validation-for="Class" class="text-danger"></span>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
@@ -32,20 +39,27 @@
                             <span asp-validation-for="Cron" class="text-danger"></span>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Arguments</label>
-                            <input asp-for="Arguments" class="form-control" autocomplete="false" type="text">
-                            <span asp-validation-for="Arguments" class="text-danger"></span>
+                            <label>Image</label>
+                            <input asp-for="Image" class="form-control" autocomplete="false" type="text">
+                            <span asp-validation-for="Image" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Enabled</label>
+                            <label>Environment</label>
+                            <input asp-for="Environment" class="form-control" autocomplete="false" type="text">
+                            <span asp-validation-for="Environment" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Single</label>
                             <select asp-for="Single" class="form-control select2" style="width: 100%;">
                                 <option value="True" selected="selected">True</option>
                                 <option value="False">False</option>

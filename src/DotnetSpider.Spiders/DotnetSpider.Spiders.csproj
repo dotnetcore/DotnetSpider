@@ -7,15 +7,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
-      <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+
+        <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj"/>
+
+        <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="appsettings.json">
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
+        <Content Include="appsettings.json">
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
-
+    <ItemGroup>
+        <PackageReference Include="Confluent.Kafka" Version="1.0.0-RC4"/>
+        <PackageReference Include="librdkafka.redist" Version="1.0.0"/>
+    </ItemGroup>
 </Project>

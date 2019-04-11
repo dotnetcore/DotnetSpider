@@ -1,6 +1,4 @@
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DotnetSpider.Portal.Models.Spider
 {
@@ -13,6 +11,10 @@ namespace DotnetSpider.Portal.Models.Spider
 		[StringLength(255)]
 		public string Name { get; set; }
 
+		[Required]
+		[StringLength(400)]
+		public string Class { get; set; }
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -24,7 +26,7 @@ namespace DotnetSpider.Portal.Models.Spider
 		/// 
 		/// </summary>
 		[StringLength(255)]
-		public string Arguments { get; set; }
+		public string Environment { get; set; }
 
 		/// <summary>
 		/// 

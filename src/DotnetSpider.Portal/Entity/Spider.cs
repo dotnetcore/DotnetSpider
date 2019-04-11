@@ -42,8 +42,8 @@ namespace DotnetSpider.Portal.Entity
 		/// 
 		/// </summary>
 		[StringLength(255)]
-		[Column("arguments")]
-		public string Arguments { get; set; }
+		[Column("environment")]
+		public string Environment { get; set; }
 
 		/// <summary>
 		/// 
