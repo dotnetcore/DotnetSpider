@@ -25,6 +25,14 @@ namespace DotnetSpider.Portal.Entity
 		/// <summary>
 		/// 
 		/// </summary>
+		[Required]
+		[StringLength(400)]
+		[Column("class")]
+		public string Class { get; set; }
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		[StringLength(255)]
 		[Required]
 		[Column("cron")]

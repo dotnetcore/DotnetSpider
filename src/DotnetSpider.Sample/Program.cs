@@ -9,9 +9,9 @@ namespace DotnetSpider.Sample
 	{
 		static async Task Main(string[] args)
 		{
-			await BaseUsage.Run();
+			// await BaseUsage.Run();
 
-			// await DistributedSpider.Run(); 
+			await DistributedSpider.Run(); 
 			Console.Read();
 		}
 

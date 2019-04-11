@@ -24,15 +24,18 @@ namespace DockerClient
 		}
 
 
-		public async Task<DockerResult> CreateAsync(string image, string[] env, Dictionary<string, object> labels)
+		public async Task<DockerResult> CreateAsync(string image, string[] env, Dictionary<string, object> labels,
+			string[] binds)
 		{
+			var body = JsonConvert.SerializeObject(new
+			{
+				Image = image,
+				Env = env,
+				Labels = labels,
+				Binds = binds
+			});
 			var response = await Cache[_host].PostAsync($"{_host}v1.39/containers/create", new StringContent(
-				JsonConvert.SerializeObject(new
-				{
-					Image = image,
-					Env = env,
-					Labels = labels
-				}), Encoding.UTF8, "application/json"));
+				body, Encoding.UTF8, "application/json"));
 			var responseContent = await response.Content.ReadAsStringAsync();
 			var result = JsonConvert.DeserializeObject<DockerResult>(responseContent);
 			result.Success = response.IsSuccessStatusCode;

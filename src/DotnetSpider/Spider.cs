@@ -197,6 +197,7 @@ namespace DotnetSpider
 			{
 				try
 				{
+					_logger.LogInformation("初始化爬虫");
 					// 初始化设置
 					Initialize();
 

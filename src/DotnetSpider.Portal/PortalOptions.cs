@@ -19,5 +19,7 @@ namespace DotnetSpider.Portal
 		public string ConnectionString => _configuration["ConnectionString"];
 
 		public string Docker => _configuration["Docker"];
+
+		public string DockerVolumes => _configuration["DockerVolumes"];
 	}
 }

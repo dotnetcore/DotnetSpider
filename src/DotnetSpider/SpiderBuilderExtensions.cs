@@ -2,6 +2,7 @@ using System;
 using DotnetSpider.Core;
 using DotnetSpider.Data;
 using DotnetSpider.MessageQueue;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -15,7 +16,7 @@ namespace DotnetSpider
 		/// <param name="builder"></param>
 		/// <param name="configure"></param>
 		/// <returns></returns>
-		public static SpiderBuilder AddSerilog(this SpiderBuilder builder, Action<LoggerConfiguration> configure = null)
+		public static SpiderBuilder AddSerilog(this SpiderBuilder builder, LoggerConfiguration configure = null)
 		{
 			builder.Services.AddSerilog(configure);
 			return builder;
@@ -26,6 +27,13 @@ namespace DotnetSpider
 			string[] args = null, bool loadCommandLine = true)
 		{
 			builder.Services.ConfigureAppConfiguration(config, args, loadCommandLine);
+			return builder;
+		}
+
+		public static SpiderBuilder ConfigureAppConfiguration(this SpiderBuilder builder,
+			IConfigurationRoot configuration)
+		{
+			builder.Services.AddSingleton<IConfiguration>(configuration);
 			return builder;
 		}
 
@@ -58,7 +66,7 @@ namespace DotnetSpider
 			builder.Services.AddSingleton<IMessageQueue, LocalMessageQueue>();
 			return builder;
 		}
-		
+
 		public static SpiderBuilder AddSpider<T>(this SpiderBuilder builder) where T : Spider
 		{
 			builder.Services.AddTransient(typeof(T));

@@ -18,22 +18,25 @@ namespace DotnetSpider
 	public static class ServiceCollectionExtensions
 	{
 		public static IServiceCollection AddSerilog(this IServiceCollection services,
-			Action<LoggerConfiguration> configure = null)
+			LoggerConfiguration configure = null)
 		{
 			Check.NotNull(services, nameof(services));
 
-			var loggerConfiguration = new LoggerConfiguration()
+			if (configure == null)
+			{
+				configure = new LoggerConfiguration()
 #if DEBUG
-				.MinimumLevel.Verbose()
+					.MinimumLevel.Verbose()
 #else
 				.MinimumLevel.Information()
 #endif
-				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-				.Enrich.FromLogContext()
-				.WriteTo.Console().WriteTo
-				.RollingFile("dotnet-spider.log");
-			configure?.Invoke(loggerConfiguration);
-			Log.Logger = loggerConfiguration.CreateLogger();
+					.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+					.Enrich.FromLogContext()
+					.WriteTo.Console().WriteTo
+					.RollingFile("dotnet-spider.log");
+			}
+
+			Log.Logger = configure.CreateLogger();
 
 #if NETFRAMEWORK
 			services.AddSingleton<ILoggerFactory, LoggerFactory>(provider =>

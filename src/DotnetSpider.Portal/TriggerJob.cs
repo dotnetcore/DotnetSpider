@@ -48,8 +48,9 @@ namespace DotnetSpider.Portal
 					new Dictionary<string, object>
 					{
 						{"dotnetspider.spider.id", spider.Id},
+						{"dotnetspider.spider.class", spider.Class},
 						{"dotnetspider.spider.name", spider.Name}
-					});
+					},new []{options.DockerVolumes});
 				if (!result.Success)
 				{
 					logger.LogError($"创建任务 {jobId} 实例失败: {result.Message}");

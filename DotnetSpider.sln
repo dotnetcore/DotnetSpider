@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloadCenter
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DockerClient", "src\DockerClient\DockerClient.csproj", "{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Spiders", "src\DotnetSpider.Spiders\DotnetSpider.Spiders.csproj", "{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C} = {31B052DB-A9AA-49F5-AE8C-1660546A8903}
