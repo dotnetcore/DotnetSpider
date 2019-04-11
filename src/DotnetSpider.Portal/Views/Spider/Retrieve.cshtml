@@ -1,0 +1,105 @@
+@using X.PagedList.Mvc.Common
+@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<DotnetSpider.Portal.Entity.Spider>
+
+@section breadcrumb{
+    <li >
+        <a href="#">任务</a>
+    </li>
+}
+
+@section header{
+    任务<small v-text="moduleDescription"></small>
+}
+
+<div class="col-xs-12">
+    <div class="box">
+        <div class="box-header">
+            <div class="box-title">
+                &ensp;
+            </div>
+            <div class="box-tools">
+                <a class="btn btn-default btn-sm btn-flat" href="/spider/add">添加</a>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body table-responsive no-padding">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th>标识</th>
+                    <th>名称</th>
+                    <th>CRON</th>
+                    <th>镜像</th>
+                    <th>运行参数</th>
+                    <th>单一实例</th>
+                    <th>更新时间</th>
+                </tr>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="7">
+                            None
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr >
+                            <td>
+                                <span>@item.Id</span>
+                            </td>
+                            <td>
+                                <span>@item.Name</span>
+                            </td>
+                            <td>
+                                <span>@item.Cron</span>
+                            </td>
+                            <td>
+                                <span>@item.Image</span>
+                            </td>
+                            <td>
+                                <span>@item.Arguments</span>
+                            </td>
+                            <td>
+                                <span>@item.Single</span>
+                            </td>
+                            <td>
+                                <span>@item.LastModificationTime</span>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer clearfix no-border">
+            @if (Model != null && Model.PageCount > 1)
+            {
+                @Html.PagedListPager(Model, page => Url.Action("Retrieve", new {page}),
+                    new PagedListRenderOptions
+                    {
+                        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                        ContainerDivClasses = new string[0],
+                        UlElementClasses = new[] {"pagination pagination-sm no-margin pull-left"},
+                        LiElementClasses = new[] {"page-item"},
+                        PageClasses = new[] {"page-link"}
+                    })
+            }
+        </div>
+    </div>
+    <!-- /.box -->
+</div>
+
+@section scripts{
+    <script>
+        $(function() {
+            app.activeMenu('Spider');
+        })
+    </script>
+}

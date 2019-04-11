@@ -18,7 +18,7 @@ namespace DotnetSpider.Portal.Controllers
 		private readonly PortalDbContext _dbContext;
 
 		public DownloaderAgentController(PortalDbContext dbContext,
-			ILogger<DockerController> logger)
+			ILogger<DownloaderAgentController> logger)
 		{
 			_logger = logger;
 			_dbContext = dbContext;

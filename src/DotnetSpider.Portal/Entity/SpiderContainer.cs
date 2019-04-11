@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DotnetSpider.Portal.Entity
@@ -22,13 +23,16 @@ namespace DotnetSpider.Portal.Entity
 		/// 容器标识
 		/// </summary>
 		[Column("container_id")]
-		public Guid ContainerId { get; set; }
+		[StringLength(100)]
+		public string ContainerId { get; set; }
 
 		/// <summary>
 		/// 创建时间
 		/// </summary>
 		[Column("creation_time")]
 		public DateTime CreationTime { get; set; }
+
+		public string Status { get; set; }
 
 		/// <summary>
 		/// 退出时间

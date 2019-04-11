@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Quartz.Logging;
 
@@ -7,6 +8,8 @@ namespace DotnetSpider.Portal
 	public class QuartzLoggingProvider : ILogProvider
 	{
 		private readonly ILoggerFactory _loggerFactory;
+
+		public static ILogProvider CurrentLogProvider;
 
 		public QuartzLoggingProvider(ILoggerFactory loggerFactory)
 		{

@@ -16,7 +16,7 @@ namespace DotnetSpider.Portal.Models.Docker
 //"Tag": "latest"
 //}
 //}
-	public class ImagePayload
+	public class RepositoryPayload
 	{
 		public RepositoryInfo Repository { get; set; }
 

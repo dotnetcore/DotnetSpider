@@ -5,33 +5,34 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotnetSpider.Portal.Entity;
 using DotnetSpider.Portal.Models.Docker;
+using DotnetSpider.Portal.Models.DockerRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetSpider.Portal.Controllers
 {
-	public class DockerController : Controller
+	public class DockerRepositoryController : Controller
 	{
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
 
-		public DockerController(PortalDbContext dbContext, ILogger<DockerController> logger)
+		public DockerRepositoryController(PortalDbContext dbContext, ILogger<DockerRepositoryController> logger)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
 		}
 
-		[HttpGet("repository/add")]
-		public IActionResult AddRepository()
+		[HttpGet("docker-repository/add")]
+		public IActionResult Add()
 		{
 			return View();
 		}
 
-		[HttpPost("repository/add")]
-		public async Task<IActionResult> AddRepository(AddRepositoryViewModel dto)
+		[HttpPost("docker-repository/add")]
+		public async Task<IActionResult> Add(AddRepositoryViewModel dto)
 		{
 			if (!ModelState.IsValid)
 			{
-				return View("AddRepository", dto);
+				return View("Add", dto);
 			}
 
 			var items = await _dbContext.DockerRepositories.Where(x =>
@@ -49,7 +50,7 @@ namespace DotnetSpider.Portal.Controllers
 
 			if (items.Any())
 			{
-				return View("AddRepository", dto);
+				return View("Add", dto);
 			}
 			else
 			{
@@ -61,12 +62,12 @@ namespace DotnetSpider.Portal.Controllers
 					CreationTime = DateTime.Now
 				});
 				await _dbContext.SaveChangesAsync();
-				return Redirect("/repository");
+				return Redirect("/docker-repository");
 			}
 		}
 
-		[HttpDelete("repository/{id}")]
-		public async Task<IActionResult> Repository(int id)
+		[HttpDelete("docker-repository/{id}")]
+		public async Task<IActionResult> Delete(int id)
 		{
 			var item = await _dbContext.DockerRepositories.FirstOrDefaultAsync(x => x.Id == id);
 			if (item != null)
@@ -78,15 +79,15 @@ namespace DotnetSpider.Portal.Controllers
 			return Redirect("/");
 		}
 
-		[HttpGet("repository")]
-		public async Task<IActionResult> Repository()
+		[HttpGet("docker-repository")]
+		public async Task<IActionResult> Retrieve()
 		{
 			var list = await _dbContext.DockerRepositories.ToListAsync();
 			return View(list);
 		}
 
-		[HttpPost("repository/payload")]
-		public async Task<IActionResult> PayloadImage([FromBody] ImagePayload payload)
+		[HttpPost("docker-repository/payload")]
+		public async Task<IActionResult> Payload([FromBody] RepositoryPayload payload)
 		{
 			var repository =
 				await _dbContext.DockerRepositories.FirstOrDefaultAsync(

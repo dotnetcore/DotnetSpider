@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using Dapper;
 using DotnetSpider.Kafka;
+using DotnetSpider.Portal.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -66,6 +67,8 @@ namespace DotnetSpider.Portal
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
+			Ioc.ServiceProvider = app.ApplicationServices;
+			
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();

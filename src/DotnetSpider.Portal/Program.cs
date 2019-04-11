@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -7,8 +9,13 @@ namespace DotnetSpider.Portal
 {
 	public class Program
 	{
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
+			DockerClient.DockerClient client = new DockerClient.DockerClient(
+				new Uri("http://localhost:2376"));
+
+			// docker run --name {id} --label  {image} {arguments}
+
 			var loggerConfiguration = new LoggerConfiguration()
 #if DEBUG
 				.MinimumLevel.Verbose()
@@ -22,7 +29,7 @@ namespace DotnetSpider.Portal
 
 			Log.Logger = loggerConfiguration.CreateLogger();
 
-			CreateWebHostBuilder(args).Build().Run();
+			await CreateWebHostBuilder(args).Build().RunAsync();
 		}
 
 		public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

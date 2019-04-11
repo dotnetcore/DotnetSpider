@@ -15,6 +15,8 @@ namespace DotnetSpider.Portal
 		public DbSet<DockerImage> DockerImages { get; set; }
 
 		public DbSet<Entity.Spider> Spiders { get; set; }
+		
+		public DbSet<Entity.SpiderContainer> SpiderContainers { get; set; }
 
 		public PortalDbContext()
 		{

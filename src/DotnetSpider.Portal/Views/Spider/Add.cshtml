@@ -1,0 +1,73 @@
+@model DotnetSpider.Portal.Models.Spider.AddSpiderViewModel
+
+@section breadcrumb{
+    <li >
+        <a href="#">添加任务</a>
+    </li>
+}
+
+@section header{
+    添加任务<small v-text="moduleDescription"></small>
+}
+
+<div class="col-xs-12">
+    <div class="box">
+        <form action="/spider/add" method="post">
+            @await Html.PartialAsync("_ValidationSummary")
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input asp-for="Name" class="form-control" autocomplete="false" type="text">
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Cron</label>
+                            <input asp-for="Cron" class="form-control" autocomplete="false" type="text">
+                            <span asp-validation-for="Cron" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Arguments</label>
+                            <input asp-for="Arguments" class="form-control" autocomplete="false" type="text">
+                            <span asp-validation-for="Arguments" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Enabled</label>
+                            <select asp-for="Single" class="form-control select2" style="width: 100%;">
+                                <option value="True" selected="selected">True</option>
+                                <option value="False">False</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+                <button type="submit" class="btn btn-default btn-sm  btn-flat">提交</button>
+            </div>
+        </form>
+    </div>
+    <!-- /.box -->
+</div>
+
+@section scripts
+{
+    <script>
+        $(function() {
+            app.activeMenu('Repository');
+        })
+    </script>
+}

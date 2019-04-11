@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp2.2</TargetFramework>
         <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
 
@@ -22,6 +23,7 @@
 
 
     <ItemGroup>
+      <ProjectReference Include="..\DockerClient\DockerClient.csproj" />
       <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
       <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
     </ItemGroup>
@@ -40,11 +42,6 @@
       <EmbeddedResource Include="DDL\SqlServer.sql" />
       <None Remove="DDL\MySql.sql" />
       <EmbeddedResource Include="DDL\MySql.sql" />
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <Folder Include="Views\Spider" />
     </ItemGroup>
 
 </Project>

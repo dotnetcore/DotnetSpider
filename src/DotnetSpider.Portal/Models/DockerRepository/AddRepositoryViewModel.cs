@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace DotnetSpider.Portal.Models.Docker
+namespace DotnetSpider.Portal.Models.DockerRepository
 {
 	public class AddRepositoryViewModel
 	{
