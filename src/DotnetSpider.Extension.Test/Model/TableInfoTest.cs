@@ -17,7 +17,7 @@ namespace DotnetSpider.Extension.Test.Model
 		}
 
 		[Schema]
-		public class DuplicateColumnsWithDifferenPropertiesTable
+		public class DuplicateColumnsWithDifferentPropertiesTable
 		{
 			[Column]
 			public string A { get; set; }
@@ -30,6 +30,7 @@ namespace DotnetSpider.Extension.Test.Model
 		{
 			[Column]
 			public string A { get; set; }
+			public string B { get; set; }
 		}
 
 		[Fact(DisplayName = "TableInfo_DuplicateColumns")]
@@ -42,7 +43,7 @@ namespace DotnetSpider.Extension.Test.Model
 		[Fact(DisplayName = "TableInfo_DuplicateColumnsWithDifferenProperties")]
 		public void DuplicateColumnsWithDifferenProperties()
 		{
-			var e = Assert.Throws<ArgumentException>(() => { var _ = new TableInfo(typeof(DuplicateColumnsWithDifferenPropertiesTable)); });
+			var e = Assert.Throws<ArgumentException>(() => { var _ = new TableInfo(typeof(DuplicateColumnsWithDifferentPropertiesTable)); });
 			Assert.Equal("Column names should not be same", e.Message);
 		}
 
