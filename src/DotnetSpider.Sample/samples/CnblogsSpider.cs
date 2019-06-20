@@ -15,7 +15,8 @@ namespace DotnetSpider.Sample.samples
     public class CnblogsSpider : Spider
     {
         protected override void Initialize()
-        {
+        {		
+            NewGuidId();
             Scheduler = new QueueDistinctBfsScheduler();
             Speed = 1;
             Depth = 3;
