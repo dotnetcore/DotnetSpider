@@ -11,7 +11,7 @@ namespace DotnetSpider.Downloader
 	/// </summary>
 	public class Request
 	{
-		private readonly Dictionary<string, string> _properties = new Dictionary<string, string>();
+		public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
 
 		/// <summary>
 		/// 请求的 HASH 值
@@ -96,7 +96,7 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 请求的方法
 		/// </summary>
-		public HttpMethod Method { get; set; } = HttpMethod.Get;
+		public string Method { get; set; } = "GET";
 
 		/// <summary>
 		/// 已经重试的次数
@@ -112,11 +112,6 @@ namespace DotnetSpider.Downloader
 		/// 创建时间
 		/// </summary>
 		public DateTime CreationTime { get; set; }
-
-		/// <summary>
-		/// 获取当前请求的所有属性
-		/// </summary>
-		public IDictionary<string, string> GetProperties() => _properties.ToImmutableDictionary();
 
 		/// <summary>
 		/// 构造方法
@@ -156,13 +151,13 @@ namespace DotnetSpider.Downloader
 				return;
 			}
 
-			if (_properties.ContainsKey(key))
+			if (Properties.ContainsKey(key))
 			{
-				_properties[key] = value;
+				Properties[key] = value;
 			}
 			else
 			{
-				_properties.Add(key, value);
+				Properties.Add(key, value);
 			}
 		}
 
@@ -190,7 +185,7 @@ namespace DotnetSpider.Downloader
 		/// <returns></returns>
 		public string GetProperty(string key)
 		{
-			return _properties.ContainsKey(key) ? _properties[key] : null;
+			return Properties.ContainsKey(key) ? Properties[key] : null;
 		}
 
 		/// <summary>
@@ -215,7 +210,7 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		public void Dispose()
 		{
-			_properties.Clear();
+			Properties.Clear();
 		}
 
 		/// <summary>

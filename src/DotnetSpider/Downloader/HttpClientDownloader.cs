@@ -221,10 +221,12 @@ namespace DotnetSpider.Downloader
 					bytes = LZ4Codec.Wrap(bytes);
 					break;
 				}
+
 				case Compression.None:
 				{
 					break;
 				}
+
 				default:
 				{
 					throw new NotImplementedException(request.Compression.ToString());
@@ -237,7 +239,11 @@ namespace DotnetSpider.Downloader
 		private HttpRequestMessage GenerateHttpRequestMessage(Request request)
 		{
 			HttpRequestMessage httpRequestMessage =
-				new HttpRequestMessage(request.Method == null ? HttpMethod.Get : request.Method, request.Url);
+				new HttpRequestMessage(
+					string.IsNullOrWhiteSpace(request.Method)
+						? HttpMethod.Get
+						: new HttpMethod(request.Method.ToUpper()),
+					request.Url);
 
 			// Headers 的优先级低于 Request.UserAgent 这种特定设置, 因此先加载所有 Headers, 再使用 Request.UserAgent 覆盖
 			foreach (var header in request.Headers)
@@ -273,7 +279,7 @@ namespace DotnetSpider.Downloader
 				httpRequestMessage.Headers.TryAddWithoutValidation(header, request.Accept);
 			}
 
-			if (request.Method == HttpMethod.Post)
+			if (request.Method?.ToUpper() == "POST")
 			{
 				var bytes = CompressContent(request);
 				httpRequestMessage.Content = new ByteArrayContent(bytes);

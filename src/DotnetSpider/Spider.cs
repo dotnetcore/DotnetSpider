@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
-using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,21 +69,21 @@ namespace DotnetSpider
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 		}
 
-		/// <summary>
-		/// 创建爬虫对象
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		public static T Create<T>() where T : Spider
-		{
-			var builder = new SpiderBuilder();
-			builder.AddSerilog();
-			builder.ConfigureAppConfiguration();
-			builder.UseStandalone();
-			builder.AddSpider<T>();
-			var factory = builder.Build();
-			return factory.Create<T>();
-		}
+//		/// <summary>
+//		/// 创建爬虫对象
+//		/// </summary>
+//		/// <typeparam name="T"></typeparam>
+//		/// <returns></returns>
+//		public static T Create<T>() where T : Spider
+//		{
+//			var builder = new SpiderHost();
+//			builder.AddSerilog();
+//			builder.ConfigureAppConfiguration();
+//			builder.UseStandalone();
+//			builder.AddSpider<T>();
+//			var factory = builder.Build();
+//			return factory.Create<T>();
+//		}
 
 		/// <summary>
 		/// 设置 Id 为 Guid
@@ -172,7 +171,7 @@ namespace DotnetSpider
 
 			foreach (var url in urls)
 			{
-				var request = new Request {Url = url, OwnerId = Id, Depth = 1, Method = HttpMethod.Get};
+				var request = new Request {Url = url, OwnerId = Id, Depth = 1};
 				_requests.Add(request);
 				if (_requests.Count % EnqueueBatchCount == 0)
 				{
@@ -191,14 +190,17 @@ namespace DotnetSpider
 		public Task RunAsync(params string[] args)
 		{
 			CheckIfRunning();
+			
 			// 此方法不能放到异步里, 如果在调用 RunAsync 后再直接调用 ExitBySignal 有可能会因会执行顺序原因导致先调用退出，然后退出信号被重置
 			ResetMmfSignal();
+			
 			return Task.Factory.StartNew(async () =>
 			{
 				try
 				{
 					_logger.LogInformation("初始化爬虫");
-					// 初始化设置
+					
+					// 定制化的设置
 					Initialize();
 
 					// 设置默认调度器
@@ -263,10 +265,11 @@ namespace DotnetSpider
 					}
 
 					_logger.LogInformation($"任务 {Id} 数据流处理器初始化完成");
+					
 					_enqueued.Set(0);
 					_responded.Set(0);
 					_enqueuedRequestDict.Clear();
-
+					
 					// 启动速度控制器
 					StartSpeedControllerAsync().ConfigureAwait(false).GetAwaiter();
 

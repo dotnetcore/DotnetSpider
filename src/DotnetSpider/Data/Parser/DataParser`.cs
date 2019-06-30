@@ -52,7 +52,7 @@ namespace DotnetSpider.Data.Parser
 			}
 
 			var environments = new Dictionary<string, string>();
-			foreach (var property in context.Response.Request.GetProperties())
+			foreach (var property in context.Response.Request.Properties)
 			{
 				environments.Add(property.Key, property.Value);
 			}

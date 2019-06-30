@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotnetSpider.Data;
 using DotnetSpider.Data.Parser;
 using DotnetSpider.Data.Storage;
 using DotnetSpider.Downloader;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
@@ -10,11 +13,21 @@ namespace DotnetSpider.Sample.samples
 	{
 		public static Task Run()
 		{
-			var builder = new SpiderBuilder();
-			builder.AddSerilog();
-			builder.ConfigureAppConfiguration();
-			builder.UseStandalone();
-			builder.AddSpider<EntitySpider>();
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddLocalMessageQueue();
+					services.AddLocalDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddLocalDownloadCenter();
+					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+				});
 			var provider = builder.Build();
 
 			var spider = provider.Create<Spider>();
@@ -24,7 +37,10 @@ namespace DotnetSpider.Sample.samples
 			spider.Depth = 3; // 设置采集深度
 			spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
 			spider.AddDataFlow(new CnblogsDataParser()).AddDataFlow(new ConsoleStorage());
-			spider.AddRequests("http://www.cnblogs.com/"); // 设置起始链接
+			spider.AddRequests(new Request("http://www.cnblogs.com/", new Dictionary<string, string>
+			{
+				{"key1", "value1"}
+			})); // 设置起始链接
 			return spider.RunAsync(); // 启动
 		}
 

@@ -15,10 +15,21 @@ namespace DotnetSpider.Tests
 	{
 		protected readonly Lazy<SpiderProvider> SpiderProvider = new Lazy<SpiderProvider>(() =>
 		{
-			var builder = new SpiderBuilder();
-			builder.AddSerilog();
-			builder.ConfigureAppConfiguration(null, null, false);
-			builder.UseStandalone();
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddLocalMessageQueue();
+					services.AddLocalDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddLocalDownloadCenter();
+					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+				});
 			return builder.Build();
 		});
 

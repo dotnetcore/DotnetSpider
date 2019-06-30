@@ -20,7 +20,6 @@ namespace DotnetSpider.Tests.Network
         {
             var services = new ServiceCollection();
             services.AddSingleton<NetworkCenter>();
-            services.AddSerilog();
             services.ConfigureAppConfiguration(null, null, false);
             services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
             services.AddSingleton<IInternetDetector, DefaultInternetDetector>();

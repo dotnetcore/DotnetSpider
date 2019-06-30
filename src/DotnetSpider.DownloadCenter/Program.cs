@@ -6,6 +6,8 @@ using DotnetSpider.Statistics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
 
 namespace DotnetSpider.DownloadCenter
 {
@@ -13,16 +15,26 @@ namespace DotnetSpider.DownloadCenter
 	{
 		static void Main(string[] args)
 		{
-			var host = new HostBuilder().ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+			var	configure = new LoggerConfiguration()
+#if DEBUG
+				.MinimumLevel.Verbose()
+#else
+				.MinimumLevel.Information()
+#endif
+				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+				.Enrich.FromLogContext()
+				.WriteTo.Console().WriteTo
+				.RollingFile("dotnet-spider.log");
+			Log.Logger = configure.CreateLogger();
+			
+			var host = new HostBuilder()
+				.ConfigureLogging(x => { x.AddSerilog(); })
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices((hostContext, services) =>
 				{
-					services.AddSerilog();
-					services.AddDotnetSpider(builder =>
-					{
-						builder.UserKafka();
-						builder.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
-						builder.AddSpiderStatisticsCenter(x => x.UseMySql());
-					});
+					services.AddKafkaMessageQueue();
+					services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
+					services.AddSpiderStatisticsCenter(x => x.UseMySql());
 					services.AddHostedService<LocalDownloadCenter>();
 					services.AddHostedService<StatisticsCenter>();
 				})

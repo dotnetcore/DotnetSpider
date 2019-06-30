@@ -4,6 +4,8 @@ using DotnetSpider.Data.Storage;
 using DotnetSpider.Downloader;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 using Xunit;
 
 namespace DotnetSpider.Tests
@@ -205,10 +207,21 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "DoNotRetryWhenResultIsEmpty")]
 		public void DoNotRetryWhenResultIsEmpty()
 		{
-			var builder = new SpiderBuilder();
-			builder.AddSerilog();
-			builder.ConfigureAppConfiguration(null, null, false);
-			builder.UseStandalone();
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddLocalMessageQueue();
+					services.AddLocalDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddLocalDownloadCenter();
+					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+				});
 			var provider = builder.Build();
 			var spider = provider.Create<Spider>();
 			spider.NewGuidId();
@@ -242,10 +255,22 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "RetryWhenResultIsEmpty")]
 		public void RetryWhenResultIsEmpty()
 		{
-			var builder = new SpiderBuilder();
-			builder.AddSerilog();
-			builder.ConfigureAppConfiguration(null, null, false);
-			builder.UseStandalone();
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddLocalMessageQueue();
+					services.AddLocalDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddLocalDownloadCenter();
+					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+				});
+			
 			var provider = builder.Build();
 			var spider = provider.Create<Spider>();
 			spider.NewGuidId();

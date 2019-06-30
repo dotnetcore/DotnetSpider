@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using DotnetSpider.Data.Parser;
 using DotnetSpider.Downloader;
 using DotnetSpider.Kafka;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
@@ -11,10 +13,21 @@ namespace DotnetSpider.Sample.samples
 	{
 		public static Task Run()
 		{
-			var builder = new SpiderBuilder();
-			builder.AddSerilog();
-			builder.ConfigureAppConfiguration();
-			builder.UserKafka();
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddKafkaMessageQueue();
+					services.AddLocalDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddLocalDownloadCenter();
+					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+				});
 			var provider = builder.Build();
 
 			var spider = provider.Create<Spider>();

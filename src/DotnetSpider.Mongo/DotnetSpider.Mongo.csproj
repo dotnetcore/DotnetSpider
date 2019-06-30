@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net451;</TargetFrameworks>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -21,11 +21,7 @@
     <ItemGroup>
       <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
     </ItemGroup>
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-        <Reference Include="System.Web" />
-        <PackageReference Include="MongoDB.Driver" Version="2.7.3" />
-    </ItemGroup>
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <ItemGroup>
         <PackageReference Include="MongoDB.Driver" Version="2.8.0" />
     </ItemGroup>
 </Project>

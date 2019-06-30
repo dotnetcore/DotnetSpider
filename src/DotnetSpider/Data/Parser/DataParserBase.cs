@@ -106,7 +106,7 @@ namespace DotnetSpider.Data.Parser
 		protected virtual Request CreateFromRequest(Request current, string url)
 		{
 			// TODO: 确认需要复制哪些字段
-			var request = new Request(url, current.GetProperties())
+			var request = new Request(url, current.Properties)
 			{
 				Url = url,
 				Depth = current.Depth,

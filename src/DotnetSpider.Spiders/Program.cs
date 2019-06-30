@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Kafka;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
 
@@ -14,7 +15,7 @@ namespace DotnetSpider.Spiders
 		{
 			try
 			{
-				var builder = new SpiderBuilder();
+				var builder = new SpiderHostBuilder();
 
 				var configurationBuilder = Framework.CreateConfigurationBuilder(null, args);
 				var configuration = configurationBuilder.Build();
@@ -37,10 +38,9 @@ namespace DotnetSpider.Spiders
 					.Enrich.FromLogContext()
 					.WriteTo.Console().WriteTo
 					.RollingFile(logPath);
-				builder.AddSerilog(loggerConfiguration);
-
+				Log.Logger = loggerConfiguration.CreateLogger();
+				
 				var spiderName = configuration["dotnetspider.spider.name"];
-				spiderName = "博客园";
 				if (string.IsNullOrWhiteSpace(@class) ||
 				    string.IsNullOrWhiteSpace(spiderId) ||
 				    string.IsNullOrWhiteSpace(spiderName)
@@ -58,9 +58,19 @@ namespace DotnetSpider.Spiders
 				}
 
 				Log.Logger.Information($"获取爬虫类型 {type.FullName} 成功");
-				builder.ConfigureAppConfiguration(configuration);
-				builder.UserKafka();
-				builder.AddSpider(type);
+				builder.ConfigureAppConfiguration(x =>
+				{
+					x.AddCommandLine(args);
+				});
+				builder.ConfigureLogging(x =>
+				{
+					x.AddSerilog();
+				});
+				builder.ConfigureServices(services =>
+				{
+					services.AddKafkaMessageQueue();
+				});
+				builder.Register(type);
 				var provider = builder.Build();
 
 				var spider = provider.Create(type);

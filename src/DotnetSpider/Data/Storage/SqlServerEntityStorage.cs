@@ -137,9 +137,9 @@ namespace DotnetSpider.Data.Storage
 			var database = GetNameSql(tableMetadata.Schema.Database);
 
 			var builder = string.IsNullOrWhiteSpace(database)
-				? new StringBuilder($"IF OBJECT_ID('{tableName}', 'U') IS NULL CREATE table {tableName} (")
+				? new StringBuilder($"IF OBJECT_ID('{tableName}', 'U') IS NULL BEGIN CREATE table {tableName} (")
 				: new StringBuilder(
-					$"USE {database}; IF OBJECT_ID('{tableName}', 'U') IS NULL CREATE table {tableName} (");
+					$"USE {database}; IF OBJECT_ID('{tableName}', 'U') IS NULL BEGIN CREATE table {tableName} (");
 
 			foreach (var column in tableMetadata.Columns)
 			{
@@ -176,8 +176,16 @@ namespace DotnetSpider.Data.Storage
 				{
 					var name = index.Name;
 					var columnNames = string.Join(", ", index.Columns.Select(c => $"[{GetNameSql(c)}]"));
-					builder.Append(
-						$"CREATE {(index.IsUnique ? "UNIQUE" : "")} NONCLUSTERED INDEX [INDEX_{name}] ON {tableName} ({columnNames}) {(StorageType == StorageType.InsertIgnoreDuplicate ? "WITH (IGNORE_DUP_KEY = ON)" : "")};");
+					if (index.IsUnique)
+					{
+						builder.Append(
+							$"CREATE UNIQUE NONCLUSTERED INDEX [INDEX_{name}] ON {tableName} ({columnNames}) {(StorageType == StorageType.InsertIgnoreDuplicate ? "WITH (IGNORE_DUP_KEY = ON)" : "")};");	
+					}
+					else
+					{
+						builder.Append(
+							$"CREATE NONCLUSTERED INDEX [INDEX_{name}] ON {tableName} ({columnNames});");
+					}
 				}
 			}
 

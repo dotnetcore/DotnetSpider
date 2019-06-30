@@ -17,50 +17,6 @@ namespace DotnetSpider
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static IServiceCollection AddSerilog(this IServiceCollection services,
-			LoggerConfiguration configure = null)
-		{
-			Check.NotNull(services, nameof(services));
-
-			if (configure == null)
-			{
-				configure = new LoggerConfiguration()
-#if DEBUG
-					.MinimumLevel.Verbose()
-#else
-				.MinimumLevel.Information()
-#endif
-					.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-					.Enrich.FromLogContext()
-					.WriteTo.Console().WriteTo
-					.RollingFile("dotnet-spider.log");
-			}
-
-			Log.Logger = configure.CreateLogger();
-
-#if NETFRAMEWORK
-			services.AddSingleton<ILoggerFactory, LoggerFactory>(provider =>
-			{
-				var loggerFactory = new LoggerFactory();
-				loggerFactory.AddSerilog();
-				return loggerFactory;
-			});
-			services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
-#else
-			services.AddLogging(b =>
-			{
-#if DEBUG
-				b.SetMinimumLevel(LogLevel.Debug);
-#else
-                b.SetMinimumLevel(LogLevel.Information);
-#endif
-				b.AddSerilog();
-			});
-#endif
-			return services;
-		}
-
-
 		public static IServiceCollection ConfigureAppConfiguration(this IServiceCollection services,
 			string config = null,
 			string[] args = null, bool loadCommandLine = true)
@@ -73,44 +29,28 @@ namespace DotnetSpider
 
 			return services;
 		}
-
-		public static IServiceCollection AddDotnetSpider(this IServiceCollection services,
-			Action<DotnetSpiderBuilder> configureBuilder = null)
+ 
+		public static IServiceCollection AddDownloadCenter(this IServiceCollection services,
+			Action<DownloadCenterBuilder> configure = null)
 		{
-			Check.NotNull(services, nameof(services));
+ 
+			services.AddSingleton<IDownloadCenter, DownloadCenter>();
 
-			services.AddScoped<ISpiderOptions, SpiderOptions>();
-
-			DotnetSpiderBuilder builder = new DotnetSpiderBuilder(services);
-			configureBuilder?.Invoke(builder);
+			DownloadCenterBuilder downloadCenterBuilder = new DownloadCenterBuilder(services);
+			configure?.Invoke(downloadCenterBuilder);
 
 			return services;
 		}
 
-		public static DotnetSpiderBuilder AddDownloadCenter(this DotnetSpiderBuilder builder,
-			Action<DownloadCenterBuilder> configure = null)
+		public static IServiceCollection AddLocalDownloadCenter(this IServiceCollection services)
 		{
-			Check.NotNull(builder, nameof(builder));
-
-			builder.Services.AddSingleton<IDownloadCenter, DownloadCenter>();
-
-			DownloadCenterBuilder downloadCenterBuilder = new DownloadCenterBuilder(builder.Services);
-			configure?.Invoke(downloadCenterBuilder);
-
-			return builder;
-		}
-
-		public static DotnetSpiderBuilder AddLocalDownloadCenter(this DotnetSpiderBuilder builder)
-		{
-			Check.NotNull(builder, nameof(builder));
-			builder.Services.AddSingleton<IDownloadCenter, LocalDownloadCenter>();
-			builder.Services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
-			return builder;
+			services.AddSingleton<IDownloadCenter, LocalDownloadCenter>();
+			services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
+			return services;
 		}
 
 		public static DownloadCenterBuilder UseMySqlDownloaderAgentStore(this DownloadCenterBuilder builder)
 		{
-			Check.NotNull(builder, nameof(builder));
 			builder.Services.AddSingleton<IDownloaderAgentStore, MySqlDownloaderAgentStore>();
 			return builder;
 		}
@@ -124,46 +64,42 @@ namespace DotnetSpider
 
 		#region  Message queue
 
-		public static DotnetSpiderBuilder UseLocalMessageQueue(this DotnetSpiderBuilder builder)
+		public static IServiceCollection AddLocalMessageQueue(this IServiceCollection services)
 		{
-			builder.Services.AddSingleton<IMessageQueue, LocalMessageQueue>();
-			return builder;
+			services.AddSingleton<IMessageQueue, LocalMessageQueue>();
+			return services;
 		}
 
 		#endregion
 
 		#region DownloaderAgent
 
-		public static DotnetSpiderBuilder AddDownloaderAgent(this DotnetSpiderBuilder builder,
+		public static IServiceCollection AddDownloaderAgent(this IServiceCollection services,
 			Action<AgentBuilder> configure = null)
 		{
-			Check.NotNull(builder, nameof(builder));
+			services.AddSingleton<IDownloaderAllocator, DownloaderAllocator>();
+			services.AddSingleton<IDownloaderAgent, DefaultDownloaderAgent>();
+			services.AddSingleton<NetworkCenter>();
+			services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
 
-			builder.Services.AddSingleton<IDownloaderAllocator, DownloaderAllocator>();
-			builder.Services.AddSingleton<IDownloaderAgent, DefaultDownloaderAgent>();
-			builder.Services.AddSingleton<NetworkCenter>();
-			builder.Services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
-
-			AgentBuilder spiderAgentBuilder = new AgentBuilder(builder.Services);
+			AgentBuilder spiderAgentBuilder = new AgentBuilder(services);
 			configure?.Invoke(spiderAgentBuilder);
 
-			return builder;
+			return services;
 		}
 
-		public static DotnetSpiderBuilder AddLocalDownloaderAgent(this DotnetSpiderBuilder builder,
+		public static IServiceCollection AddLocalDownloaderAgent(this IServiceCollection services,
 			Action<AgentBuilder> configure = null)
 		{
-			Check.NotNull(builder, nameof(builder));
+			services.AddSingleton<IDownloaderAllocator, DownloaderAllocator>();
+			services.AddSingleton<IDownloaderAgent, LocalDownloaderAgent>();
+			services.AddSingleton<NetworkCenter>();
+			services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
 
-			builder.Services.AddSingleton<IDownloaderAllocator, DownloaderAllocator>();
-			builder.Services.AddSingleton<IDownloaderAgent, LocalDownloaderAgent>();
-			builder.Services.AddSingleton<NetworkCenter>();
-			builder.Services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
-
-			AgentBuilder spiderAgentBuilder = new AgentBuilder(builder.Services);
+			AgentBuilder spiderAgentBuilder = new AgentBuilder(services);
 			configure?.Invoke(spiderAgentBuilder);
 
-			return builder;
+			return services;
 		}
 
 		public static AgentBuilder UseFileLocker(this AgentBuilder builder)
@@ -206,17 +142,15 @@ namespace DotnetSpider
 
 		#region  Statistics
 
-		public static DotnetSpiderBuilder AddSpiderStatisticsCenter(this DotnetSpiderBuilder builder,
+		public static IServiceCollection AddSpiderStatisticsCenter(this IServiceCollection services,
 			Action<StatisticsBuilder> configure)
 		{
-			Check.NotNull(builder, nameof(builder));
+			services.AddSingleton<IStatisticsCenter, StatisticsCenter>();
 
-			builder.Services.AddSingleton<IStatisticsCenter, StatisticsCenter>();
-
-			var spiderStatisticsBuilder = new StatisticsBuilder(builder.Services);
+			var spiderStatisticsBuilder = new StatisticsBuilder(services);
 			configure?.Invoke(spiderStatisticsBuilder);
 
-			return builder;
+			return services;
 		}
 
 		public static StatisticsBuilder UseMemory(this StatisticsBuilder builder)

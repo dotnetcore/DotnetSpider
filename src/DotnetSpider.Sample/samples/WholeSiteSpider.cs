@@ -5,6 +5,8 @@ using DotnetSpider.Data;
 using DotnetSpider.Data.Parser;
 using DotnetSpider.Data.Storage;
 using DotnetSpider.Downloader;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
@@ -12,10 +14,22 @@ namespace DotnetSpider.Sample.samples
     {
         public static void Run1()
         {
-            var builder = new SpiderBuilder();
-            builder.AddSerilog();
-            builder.ConfigureAppConfiguration();
-            builder.UseStandalone();
+	        var builder = new SpiderHostBuilder()
+		        .ConfigureLogging(x => x.AddSerilog())
+		        .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+		        .ConfigureServices(services =>
+		        {
+			        services.AddLocalMessageQueue();
+			        services.AddLocalDownloaderAgent(x =>
+			        {
+				        x.UseFileLocker();
+				        x.UseDefaultAdslRedialer();
+				        x.UseDefaultInternetDetector();
+			        });
+			        services.AddLocalDownloadCenter();
+			        services.AddSpiderStatisticsCenter(x => x.UseMemory());
+		        });
+	        
             var provider = builder.Build();
             var spider = provider.Create<Spider>();
 
@@ -36,12 +50,22 @@ namespace DotnetSpider.Sample.samples
 
         public static Task Run2()
         {
-            var builder = new SpiderBuilder();
-            builder.AddSerilog();
-            builder.ConfigureAppConfiguration();
-            builder.UseStandalone();
-            builder.AddSpider<EntitySpider>();
-            var provider = builder.Build();
+	        var builder = new SpiderHostBuilder()
+		        .ConfigureLogging(x => x.AddSerilog())
+		        .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+		        .ConfigureServices(services =>
+		        {
+			        services.AddLocalMessageQueue();
+			        services.AddLocalDownloaderAgent(x =>
+			        {
+				        x.UseFileLocker();
+				        x.UseDefaultAdslRedialer();
+				        x.UseDefaultInternetDetector();
+			        });
+			        services.AddLocalDownloadCenter();
+			        services.AddSpiderStatisticsCenter(x => x.UseMemory());
+		        }).Register<EntitySpider>();
+	        var provider = builder.Build();
             var spider = provider.Create<Spider>();
             spider.Id = Guid.NewGuid().ToString("N"); // 设置任务标识
             spider.Name = "博客园全站采集"; // 设置任务名称
