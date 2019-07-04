@@ -6,7 +6,7 @@ namespace DotnetSpider.Downloader
 	/// <summary>
 	/// 下载器代理选项
 	/// </summary>
-	public class DownloaderAgentOptions : IDownloaderAgentOptions
+	public class DownloaderAgentOptions
 	{
 		private readonly IConfiguration _configuration;
 		private readonly string _defaultAgentId = Guid.NewGuid().ToString("N");

@@ -31,7 +31,7 @@ namespace DotnetSpider.Core
 		private const string DefaultAppsettings = "appsettings.json";
 
 		public const string ResponseHandlerTopic = "ResponseHandler-";
-		public const string DownloaderCenterTopic = "DownloadCenter";
+		public const string DownloaderAgentRegisterCenterTopic = "DownloaderAgentRegisterCenter";
 		public const string StatisticsServiceTopic = "StatisticsService";
 
 		public const string AllocateDownloaderCommand = "Allocate";

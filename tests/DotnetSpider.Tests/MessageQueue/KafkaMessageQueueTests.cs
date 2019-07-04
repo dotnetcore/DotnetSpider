@@ -25,7 +25,6 @@ namespace DotnetSpider.Tests.MessageQueue
 			mq.Subscribe("PubAndSub", msg =>
 			{
 				Interlocked.Increment(ref count);
-				return Task.CompletedTask;
 			});
 			for (int i = 0; i < 100; ++i)
 			{
@@ -57,7 +56,6 @@ namespace DotnetSpider.Tests.MessageQueue
 			mq.Subscribe("ParallelPubAndSub", msg =>
 			{
 				Interlocked.Increment(ref count);
-				return Task.CompletedTask;
 			});
 
 			Parallel.For(0, 100, async (i) => { await mq.PublishAsync("ParallelPubAndSub", "a"); });
@@ -86,7 +84,6 @@ namespace DotnetSpider.Tests.MessageQueue
 			mq.Subscribe("PubAndUnSub", msg =>
 			{
 				Interlocked.Increment(ref count);
-				return Task.CompletedTask;
 			});
 
 			int i = 0;

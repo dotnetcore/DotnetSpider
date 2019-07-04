@@ -16,7 +16,7 @@ namespace DotnetSpider.Network
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		public DefaultAdslRedialer(IDownloaderAgentOptions options) : base(options)
+		public DefaultAdslRedialer(DownloaderAgentOptions options) : base(options)
 		{
 		}
 

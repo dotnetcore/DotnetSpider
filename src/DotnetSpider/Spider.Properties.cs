@@ -20,9 +20,8 @@ namespace DotnetSpider
 		private readonly IMessageQueue _mq;
 		private readonly ILogger _logger;
 		private readonly IStatisticsService _statisticsService;
-		private readonly List<IRequestSupply> _requestSupplies = new List<IRequestSupply>();
+		private readonly List<IRequestSupplier> _requestSupplies = new List<IRequestSupplier>();
 		private readonly List<Action<Request>> _configureRequestDelegates = new List<Action<Request>>();
-		private readonly AtomicInteger _allocated = new AtomicInteger(0);
 		private readonly AtomicInteger _enqueued = new AtomicInteger(0);
 		private readonly AtomicInteger _responded = new AtomicInteger(0);
 
@@ -41,7 +40,6 @@ namespace DotnetSpider
 		private string _id;
 		private bool _retryWhenResultIsEmpty;
 		private bool _mmfSignal;
-		private bool _allocatedSuccess;
 
 		/// <summary>
 		/// 下载器配置

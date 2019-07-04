@@ -1,3 +1,5 @@
+
+using DotnetSpider.Core;
 #if !NET451
 using Microsoft.Extensions.Hosting;
 
@@ -10,7 +12,7 @@ namespace DotnetSpider.Downloader
 	/// <summary>
 	/// 下载中心
 	/// </summary>
-    public interface IDownloadCenter : IHostedService
-    {
-    }
+	public interface IDownloadAgentRegisterCenter : IHostedService, IRunnable
+	{
+	}
 }

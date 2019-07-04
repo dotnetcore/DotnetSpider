@@ -7,7 +7,7 @@ namespace DotnetSpider.Downloader
 	/// <summary>
 	/// 下载中心
 	/// </summary>
-	public class DownloadCenter : DownloadCenterBase
+	public class DefaultDownloadAgentRegisterCenter : DownloadAgentRegisterCenterBase
 	{
 		/// <summary>
 		/// 构造方法
@@ -16,8 +16,8 @@ namespace DotnetSpider.Downloader
 		/// <param name="downloaderAgentStore">下载器代理存储</param>
 		/// <param name="options">系统选项</param>
 		/// <param name="logger">日志接口</param>
-		public DownloadCenter(IMessageQueue mq, IDownloaderAgentStore downloaderAgentStore, ISpiderOptions options,
-			ILogger logger) : base(mq, downloaderAgentStore, options, logger)
+		public DefaultDownloadAgentRegisterCenter(IMessageQueue mq, IDownloaderAgentStore downloaderAgentStore, ISpiderOptions options,
+			ILogger<DefaultDownloadAgentRegisterCenter> logger) : base(mq, downloaderAgentStore, options, logger)
 		{
 		}
 	}

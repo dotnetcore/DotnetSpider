@@ -14,8 +14,8 @@ namespace DotnetSpider.MessageQueue
 	/// </summary>
 	public class LocalMessageQueue : IMessageQueue
 	{
-		private readonly ConcurrentDictionary<string, Func<string, Task>> _consumers =
-			new ConcurrentDictionary<string, Func<string, Task>>();
+		private readonly ConcurrentDictionary<string, Action<string>> _consumers =
+			new ConcurrentDictionary<string, Action<string>>();
 
 		private readonly ILogger _logger;
 
@@ -36,28 +36,30 @@ namespace DotnetSpider.MessageQueue
 		/// <returns></returns>
 		public Task PublishAsync(string topic, params string[] messages)
 		{
+			Publish(topic, messages);
+			return Task.CompletedTask;
+		}
+
+		public void Publish(string topic, params string[] messages)
+		{
 			if (messages == null || messages.Length == 0)
 			{
 #if DEBUG
 				var stackTrace = new StackTrace();
 				_logger.LogDebug($"推送空消息到 Topic {topic}: {stackTrace}");
 #endif
-#if NETFRAMEWORK
-                return DotnetSpider.Core.Framework.CompletedTask;
-#else
-				return Task.CompletedTask;
-#endif
+				return;
 			}
 
-			if (_consumers.TryGetValue(topic, out Func<string, Task> consumer))
+			if (_consumers.TryGetValue(topic, out Action<string> consumer))
 			{
 				foreach (var message in messages)
 				{
-					Task.Factory.StartNew(async () =>
+					Task.Factory.StartNew(() =>
 					{
 						try
 						{
-							await consumer(message);
+							consumer(message);
 						}
 						catch (Exception e)
 						{
@@ -73,12 +75,6 @@ namespace DotnetSpider.MessageQueue
 				_logger.LogDebug($"Topic {topic} 未被订阅: {stackTrace}");
 #endif
 			}
-
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
-			return Task.CompletedTask;
-#endif
 		}
 
 		/// <summary>
@@ -87,7 +83,7 @@ namespace DotnetSpider.MessageQueue
 		/// <param name="topic">topic</param>
 		/// <param name="action">消息消费的方法</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void Subscribe(string topic, Func<string, Task> action)
+		public void Subscribe(string topic, Action<string> action)
 		{
 			_consumers.AddOrUpdate(topic, x => action, (t, a) => action);
 		}

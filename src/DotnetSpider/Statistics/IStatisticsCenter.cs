@@ -1,3 +1,4 @@
+using DotnetSpider.Core;
 #if !NET451
 using Microsoft.Extensions.Hosting;
 
@@ -7,10 +8,10 @@ using DotnetSpider.Core;
 
 namespace DotnetSpider.Statistics
 {
-    /// <summary>
-    /// 统计服务中心
-    /// </summary>
-    public interface IStatisticsCenter : IHostedService
-    {        
-    }
+	/// <summary>
+	/// 统计服务中心
+	/// </summary>
+	public interface IStatisticsCenter : IHostedService, IRunnable
+	{
+	}
 }

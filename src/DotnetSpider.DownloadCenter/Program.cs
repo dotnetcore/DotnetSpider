@@ -35,7 +35,7 @@ namespace DotnetSpider.DownloadCenter
 					services.AddKafkaMessageQueue();
 					services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
 					services.AddSpiderStatisticsCenter(x => x.UseMySql());
-					services.AddHostedService<LocalDownloadCenter>();
+					services.AddHostedService<Downloader.DefaultDownloadAgentRegisterCenter>();
 					services.AddHostedService<StatisticsCenter>();
 				})
 				.UseEnvironment(args.Contains("/dev") ? EnvironmentName.Development : EnvironmentName.Production)

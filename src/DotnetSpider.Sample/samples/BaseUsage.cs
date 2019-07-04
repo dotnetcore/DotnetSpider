@@ -19,13 +19,13 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureServices(services =>
 				{
 					services.AddLocalMessageQueue();
+					services.AddLocalDownloadCenter();
 					services.AddLocalDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
-					services.AddLocalDownloadCenter();
 					services.AddSpiderStatisticsCenter(x => x.UseMemory());
 				});
 			var provider = builder.Build();

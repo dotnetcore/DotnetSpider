@@ -13,7 +13,7 @@ namespace DotnetSpider.RequestSupply
     /// <summary>
     /// 基于关系型数据库的请求入队
     /// </summary>
-    public class RelationalDatabaseRequestSupply : IRequestSupply
+    public class RelationalDatabaseRequestSupply : IRequestSupplier
     {
         private readonly string _sql;
         private readonly Database _database;

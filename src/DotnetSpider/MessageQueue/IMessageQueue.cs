@@ -18,11 +18,19 @@ namespace DotnetSpider.MessageQueue
 		Task PublishAsync(string topic, params string[] messages);
 
 		/// <summary>
+		/// 推送消息到指定 topic
+		/// </summary>
+		/// <param name="topic"></param>
+		/// <param name="messages"></param>
+		/// <returns></returns>
+		void Publish(string topic, params string[] messages);
+		
+		/// <summary>
 		/// 订阅 topic
 		/// </summary>
 		/// <param name="topic"></param>
 		/// <param name="action"></param>
-		void Subscribe(string topic, Func<string, Task> action);
+		void Subscribe(string topic, Action<string> action);
 
 		/// <summary>
 		/// 取消订阅 topic

@@ -11,12 +11,12 @@ namespace DotnetSpider.Statistics
 	/// </summary>
 	public class StatisticsCenter : IStatisticsCenter
 	{
-		private bool _isRunning;
-
 		private readonly IMessageQueue _mq;
 		private readonly ILogger _logger;
 		private readonly IStatisticsStore _statisticsStore;
 
+		public bool IsRunning { get; private set; }
+		
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -39,7 +39,7 @@ namespace DotnetSpider.Statistics
 		/// <exception cref="SpiderException"></exception>
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
-			if (_isRunning)
+			if (IsRunning)
 			{
 				throw new SpiderException("统计中心正在运行中");
 			}
@@ -113,6 +113,7 @@ namespace DotnetSpider.Statistics
 				}
 			});
 
+			IsRunning = true;
 			_logger.LogInformation("统计中心启动");
 		}
 
@@ -124,13 +125,9 @@ namespace DotnetSpider.Statistics
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
 			_mq.Unsubscribe(Framework.StatisticsServiceTopic);
-			_isRunning = false;
+			IsRunning = false;
 			_logger.LogInformation("统计中心退出");
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 	}
 }
