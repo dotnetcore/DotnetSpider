@@ -9,7 +9,7 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
 
 ### DESIGN
 
-[![DESIGN IMAGE](https://github.com/dotnetcore/DotnetSpider/blob/master/images/%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F.png?raw=true)
+[![DESIGN IMAGE](https://github.com/dotnetcore/DotnetSpider/blob/master/images/%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E7%B3%BB%E7%BB%9F.png?raw=true)]
 
 ### DEVELOP ENVIROMENT
 
