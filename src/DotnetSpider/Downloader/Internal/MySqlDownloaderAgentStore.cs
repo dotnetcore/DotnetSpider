@@ -37,27 +37,27 @@ namespace DotnetSpider.Downloader.Internal
 			}
 		}
 
-		public async Task<List<DownloaderAgent>> GetAllListAsync()
+		public async Task<IEnumerable<Entity.DownloaderAgent>> GetAllListAsync()
 		{
 			using (var conn = new MySqlConnection(_options.ConnectionString))
 			{
-				return (await conn.QueryAsync<DownloaderAgent>(
+				return (await conn.QueryAsync<Entity.DownloaderAgent>(
 						$"SELECT * FROM dotnetspider.downloader_agent"))
 					.ToList();
 			}
 		}
 
-		public async Task<List<DownloaderAgentAllocate>> GetAllocatedListAsync(string ownerId)
-		{
-			using (var conn = new MySqlConnection(_options.ConnectionString))
-			{
-				return (await conn.QueryAsync<DownloaderAgentAllocate>(
-					$"SELECT owner_id as OwnerId, agent_id as AgentId, id FROM dotnetspider.downloader_agent_allocate WHERE owner_id = @OwnerId",
-					new {OwnerId = ownerId})).ToList();
-			}
-		}
+//		public async Task<List<DownloaderAgentAllocate>> GetAllocatedListAsync(string ownerId)
+//		{
+//			using (var conn = new MySqlConnection(_options.ConnectionString))
+//			{
+//				return (await conn.QueryAsync<DownloaderAgentAllocate>(
+//					$"SELECT owner_id as OwnerId, agent_id as AgentId, id FROM dotnetspider.downloader_agent_allocate WHERE owner_id = @OwnerId",
+//					new {OwnerId = ownerId})).ToList();
+//			}
+//		}
 
-		public async Task RegisterAsync(DownloaderAgent agent)
+		public async Task RegisterAsync(Entity.DownloaderAgent agent)
 		{
 			using (var conn = new MySqlConnection(_options.ConnectionString))
 			{

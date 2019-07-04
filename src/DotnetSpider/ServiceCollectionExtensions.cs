@@ -9,6 +9,7 @@ using DotnetSpider.Network.InternetDetector;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
@@ -34,7 +35,7 @@ namespace DotnetSpider
 			Action<DownloadCenterBuilder> configure = null)
 		{
  
-			services.AddSingleton<IDownloadCenter, DownloadCenter>();
+			services.AddSingleton<IHostedService, DefaultDownloadAgentRegisterCenter>();
 
 			DownloadCenterBuilder downloadCenterBuilder = new DownloadCenterBuilder(services);
 			configure?.Invoke(downloadCenterBuilder);
@@ -44,7 +45,7 @@ namespace DotnetSpider
 
 		public static IServiceCollection AddLocalDownloadCenter(this IServiceCollection services)
 		{
-			services.AddSingleton<IDownloadCenter, LocalDownloadCenter>();
+			services.AddSingleton<IHostedService, DefaultDownloadAgentRegisterCenter>();
 			services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
 			return services;
 		}
@@ -75,34 +76,32 @@ namespace DotnetSpider
 		#region DownloaderAgent
 
 		public static IServiceCollection AddDownloaderAgent(this IServiceCollection services,
-			Action<AgentBuilder> configure = null)
+			Action<DownloadAgentBuilder> configure = null)
 		{
-			services.AddSingleton<IDownloaderAllocator, DownloaderAllocator>();
-			services.AddSingleton<IDownloaderAgent, DefaultDownloaderAgent>();
+			services.AddSingleton<IHostedService, DefaultDownloaderAgent>();
 			services.AddSingleton<NetworkCenter>();
-			services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
+			services.AddScoped<DownloaderAgentOptions>();
 
-			AgentBuilder spiderAgentBuilder = new AgentBuilder(services);
+			DownloadAgentBuilder spiderAgentBuilder = new DownloadAgentBuilder(services);
 			configure?.Invoke(spiderAgentBuilder);
 
 			return services;
 		}
 
 		public static IServiceCollection AddLocalDownloaderAgent(this IServiceCollection services,
-			Action<AgentBuilder> configure = null)
+			Action<DownloadAgentBuilder> configure = null)
 		{
-			services.AddSingleton<IDownloaderAllocator, DownloaderAllocator>();
-			services.AddSingleton<IDownloaderAgent, LocalDownloaderAgent>();
+			services.AddSingleton<IHostedService, LocalDownloaderAgent>();
 			services.AddSingleton<NetworkCenter>();
-			services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
+			services.AddScoped<DownloaderAgentOptions>();
 
-			AgentBuilder spiderAgentBuilder = new AgentBuilder(services);
+			DownloadAgentBuilder spiderAgentBuilder = new DownloadAgentBuilder(services);
 			configure?.Invoke(spiderAgentBuilder);
 
 			return services;
 		}
 
-		public static AgentBuilder UseFileLocker(this AgentBuilder builder)
+		public static DownloadAgentBuilder UseFileLocker(this DownloadAgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 
@@ -111,7 +110,7 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static AgentBuilder UseDefaultAdslRedialer(this AgentBuilder builder)
+		public static DownloadAgentBuilder UseDefaultAdslRedialer(this DownloadAgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 
@@ -120,7 +119,7 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static AgentBuilder UseDefaultInternetDetector(this AgentBuilder builder)
+		public static DownloadAgentBuilder UseDefaultInternetDetector(this DownloadAgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 
@@ -129,7 +128,7 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static AgentBuilder UseVpsInternetDetector(this AgentBuilder builder)
+		public static DownloadAgentBuilder UseVpsInternetDetector(this DownloadAgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 
@@ -145,7 +144,7 @@ namespace DotnetSpider
 		public static IServiceCollection AddSpiderStatisticsCenter(this IServiceCollection services,
 			Action<StatisticsBuilder> configure)
 		{
-			services.AddSingleton<IStatisticsCenter, StatisticsCenter>();
+			services.AddSingleton<IHostedService, StatisticsCenter>();
 
 			var spiderStatisticsBuilder = new StatisticsBuilder(services);
 			configure?.Invoke(spiderStatisticsBuilder);

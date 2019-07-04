@@ -12,45 +12,20 @@ namespace DotnetSpider.Downloader.Internal
 	/// </summary>
 	internal class LocalDownloaderAgentStore : IDownloaderAgentStore
 	{
-		private readonly ConcurrentDictionary<string, DownloaderAgent> _agents =
-			new ConcurrentDictionary<string, DownloaderAgent>();
-
-		private readonly ConcurrentDictionary<string, IEnumerable<string>> _allocatedAgents =
-			new ConcurrentDictionary<string, IEnumerable<string>>();
-
-		private readonly ConcurrentDictionary<string, string> _allocateDownloaderMessages =
-			new ConcurrentDictionary<string, string>();
+		private readonly ConcurrentDictionary<string, Entity.DownloaderAgent> _agents =
+			new ConcurrentDictionary<string, Entity.DownloaderAgent>();
 
 		public Task EnsureDatabaseAndTableCreatedAsync()
 		{
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
-		public Task<List<DownloaderAgent>> GetAllListAsync()
+		public Task<IEnumerable<Entity.DownloaderAgent>> GetAllListAsync()
 		{
-			return Task.FromResult(_agents.Values.ToList());
+			return Task.FromResult((IEnumerable<Entity.DownloaderAgent>) _agents.Values);
 		}
 
-		public Task<List<DownloaderAgentAllocate>> GetAllocatedListAsync(string ownerId)
-		{
-			if (_allocatedAgents.TryGetValue(ownerId, out var ids))
-			{
-				var agents = _agents.Where(x => ids.Contains(x.Key)).Select(x => new DownloaderAgentAllocate
-				{
-					AgentId = x.Value.Id,
-					OwnerId = ownerId
-				}).ToList();
-				return Task.FromResult(agents);
-			}
-
-			return null;
-		}
-
-		public Task RegisterAsync(DownloaderAgent agent)
+		public Task RegisterAsync(Entity.DownloaderAgent agent)
 		{
 			_agents.AddOrUpdate(agent.Id, x => agent, (s, a) =>
 			{
@@ -58,54 +33,22 @@ namespace DotnetSpider.Downloader.Internal
 				a.LastModificationTime = DateTime.Now;
 				return a;
 			});
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
 		/// <summary>
 		/// 本地代理不需要留存心跳
 		/// </summary>
-		/// <param name="agent"></param>
+		/// <param name="heartbeat"></param>
 		/// <returns></returns>
-		public Task HeartbeatAsync(DownloaderAgentHeartbeat agent)
+		public Task HeartbeatAsync(DownloaderAgentHeartbeat heartbeat)
 		{
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
-			return Task.CompletedTask;
-#endif
-		}
-
-		/// <summary>
-		/// 保存给任务分配的下载器代理
-		/// </summary>
-		/// <param name="ownerId">任务标识</param>
-		/// <param name="message">分配下载器代理的消息</param>
-		/// <param name="agentIds">分配的下载器代理标识</param>
-		/// <returns></returns>
-		public Task AllocateAsync(string ownerId, string message, IEnumerable<string> agentIds)
-		{
-			var agentIdArray = agentIds.ToArray();
-			_allocatedAgents.AddOrUpdate(ownerId, s => agentIdArray, (s, v) => agentIdArray);
-			_allocateDownloaderMessages.AddOrUpdate(ownerId, x => message, (s, x) => x);
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
-			return Task.CompletedTask;
-#endif
-		}
-
-		public Task<string> GetAllocateDownloaderMessageAsync(string ownerId)
-		{
-			if (_allocateDownloaderMessages.TryGetValue(ownerId, out string message))
+			if (_agents.TryGetValue(heartbeat.AgentId, out var agent))
 			{
-				return Task.FromResult(message);
+				agent.LastModificationTime = DateTime.Now;
 			}
 
-			return Task.FromResult(string.Empty);
+			return Task.CompletedTask;
 		}
 	}
 }

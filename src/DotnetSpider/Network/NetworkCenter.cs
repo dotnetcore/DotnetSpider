@@ -15,7 +15,7 @@ namespace DotnetSpider.Network
 	{
 		private readonly string _sessionsFolder;
 		private readonly ILockerFactory _lockerFactory;
-		private readonly IDownloaderAgentOptions _options;
+		private readonly DownloaderAgentOptions _options;
 		private readonly ILogger _logger;
 		private readonly IAdslRedialer _redialer;
 		private readonly IInternetDetector _internetDetector;
@@ -38,7 +38,7 @@ namespace DotnetSpider.Network
 			IAdslRedialer redialer,
 			IInternetDetector internetDetector,
 			ILockerFactory lockerFactory,
-			IDownloaderAgentOptions options,
+			DownloaderAgentOptions options,
 			ILogger<NetworkCenter> logger)
 		{
 			_redialer = redialer;

@@ -6,7 +6,7 @@ namespace DotnetSpider.RequestSupply
     /// <summary>
     /// 请求供应接口
     /// </summary>
-    public interface IRequestSupply
+    public interface IRequestSupplier
     {
         /// <summary>
         /// 运行请求供应

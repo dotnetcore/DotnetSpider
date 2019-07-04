@@ -31,9 +31,9 @@ namespace DotnetSpider
 
 		public SpiderHostBuilder()
 		{
-			_services=new ServiceCollection();
+			_services = new ServiceCollection();
 		}
-		
+
 		public SpiderHostBuilder ConfigureAppConfiguration(
 			Action<IConfigurationBuilder> configure)
 		{
@@ -88,9 +88,9 @@ namespace DotnetSpider
 			_hostBuilt = true;
 
 			BuildConfiguration();
-			
+
 			_services.AddScoped<ISpiderOptions, SpiderOptions>();
-			
+
 			CreateServiceProvider();
 
 			_backgroundServices = _serviceProvider.GetServices<IHostedService>().ToList();
@@ -98,6 +98,22 @@ namespace DotnetSpider
 			foreach (var hostedService in _backgroundServices)
 			{
 				hostedService.StartAsync(_cancellationTokenSource.Token);
+				for (int i = 0; i < 30; ++i)
+				{
+					if (hostedService is IRunnable runnable && !runnable.IsRunning)
+					{
+						Thread.Sleep(1000);
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				if (hostedService is IRunnable runnable1 && !runnable1.IsRunning)
+				{
+					throw new SpiderException("服务启动超时");
+				}
 			}
 
 			Console.CancelKeyPress += (sender, arguments) => { _cancellationTokenSource.Cancel(); };
@@ -105,7 +121,7 @@ namespace DotnetSpider
 			return new SpiderProvider(_serviceProvider);
 		}
 
-		private void CreateServiceProvider( )
+		private void CreateServiceProvider()
 		{
 			_services.AddSingleton(_configuration);
 			_services.AddSingleton<IStatisticsService, StatisticsService>();

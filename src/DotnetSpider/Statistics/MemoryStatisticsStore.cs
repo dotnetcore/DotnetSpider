@@ -34,20 +34,12 @@ namespace DotnetSpider.Statistics
 				statistics.AddTotal(count);
 				return statistics;
 			});
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
 		public Task EnsureDatabaseAndTableCreatedAsync()
 		{
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
 		/// <summary>
@@ -65,11 +57,7 @@ namespace DotnetSpider.Statistics
 				statistics.IncSuccess();
 				return statistics;
 			});
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
 		/// <summary>
@@ -88,11 +76,7 @@ namespace DotnetSpider.Statistics
 				statistics.AddFailed(count);
 				return statistics;
 			});
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
 		/// <summary>
@@ -110,11 +94,7 @@ namespace DotnetSpider.Statistics
 				statistics.Start = DateTime.Now;
 				return statistics;
 			});
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
 		/// <summary>
@@ -132,11 +112,7 @@ namespace DotnetSpider.Statistics
 				statistics.Exit = DateTime.Now;
 				return statistics;
 			});
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
 		/// <summary>
@@ -159,11 +135,7 @@ namespace DotnetSpider.Statistics
 				statistics.AddElapsedMilliseconds(elapsedMilliseconds);
 				return statistics;
 			});
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
 		/// <summary>
@@ -186,11 +158,7 @@ namespace DotnetSpider.Statistics
 				statistics.AddElapsedMilliseconds(elapsedMilliseconds);
 				return statistics;
 			});
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 
 		/// <summary>

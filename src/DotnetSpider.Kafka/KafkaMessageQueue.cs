@@ -64,12 +64,17 @@ namespace DotnetSpider.Kafka
 			}
 		}
 
+		public void Publish(string topic, params string[] messages)
+		{
+			PublishAsync(topic, messages).ConfigureAwait(false).GetAwaiter();
+		}
+
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void Subscribe(string topic, Func<string, Task> action)
+		public void Subscribe(string topic, Action<string> action)
 		{
 			Unsubscribe(topic);
 
-			Task.Factory.StartNew(async () =>
+			Task.Factory.StartNew(() =>
 			{
 				using (var c = new ConsumerBuilder<Null, string>(_config).Build())
 				{
@@ -98,7 +103,7 @@ namespace DotnetSpider.Kafka
 
 						try
 						{
-							await action(msg);
+							Task.Factory.StartNew(() => { action(msg); }).ConfigureAwait(false).GetAwaiter();
 						}
 						catch (Exception e)
 						{

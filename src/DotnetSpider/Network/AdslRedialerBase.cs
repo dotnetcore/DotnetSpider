@@ -15,13 +15,13 @@ namespace DotnetSpider.Network
 		/// <summary>
 		/// 配置
 		/// </summary>
-		protected IDownloaderAgentOptions Options { get; }
+		protected DownloaderAgentOptions Options { get; }
 
 
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		protected AdslRedialerBase(IDownloaderAgentOptions options)
+		protected AdslRedialerBase(DownloaderAgentOptions options)
 		{
 			Options = options;
 		}

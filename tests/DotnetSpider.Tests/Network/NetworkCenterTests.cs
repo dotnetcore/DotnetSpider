@@ -21,7 +21,7 @@ namespace DotnetSpider.Tests.Network
             var services = new ServiceCollection();
             services.AddSingleton<NetworkCenter>();
             services.ConfigureAppConfiguration(null, null, false);
-            services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
+            services.AddScoped<DownloaderAgentOptions>();
             services.AddSingleton<IInternetDetector, DefaultInternetDetector>();
             services.AddSingleton<ILockerFactory, FileLockerFactory>();
             services.AddSingleton<IAdslRedialer, DefaultAdslRedialer>();
