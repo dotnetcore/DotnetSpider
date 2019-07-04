@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Postgre", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloaderAgent", "src\DotnetSpider.DownloaderAgent\DotnetSpider.DownloaderAgent.csproj", "{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloadCenter", "src\DotnetSpider.DownloadCenter\DotnetSpider.DownloadCenter.csproj", "{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloadAgentRegisterCenter", "src\DotnetSpider.DownloadAgentRegisterCenter\DotnetSpider.DownloadAgentRegisterCenter.csproj", "{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DockerClient", "src\DockerClient\DockerClient.csproj", "{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}"
 EndProject

@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data.Storage.Model;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.DataFlow.Storage.Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
 
 // ReSharper disable once CheckNamespace
-namespace DotnetSpider.Data.Storage
+namespace DotnetSpider.Mongo
 {
 	/// <summary>
 	/// MongoDB 保存解析(实体)结果 TODO: 是否要考虑存储模式：插入，新的插入旧的更新，更新 ETC

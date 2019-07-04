@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using DotnetSpider.Downloader.Internal;
+using DotnetSpider.DownloadAgent;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,15 +30,13 @@ namespace DotnetSpider.DownloaderAgent
 				.ConfigureLogging(x => { x.AddSerilog(); })
 				.ConfigureServices((hostContext, services) =>
 				{
-					services.AddKafkaMessageQueue();
+					services.AddKafkaEventBus();
 					services.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
-					services.AddSpiderStatisticsCenter(x => x.UseMemory());
-					services.AddHostedService<LocalDownloaderAgent>();
 				})
 				.UseEnvironment(args.Contains("/dev") ? EnvironmentName.Development : EnvironmentName.Production)
 				.UseContentRoot(AppDomain.CurrentDomain.BaseDirectory)

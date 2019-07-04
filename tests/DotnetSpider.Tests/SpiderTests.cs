@@ -1,7 +1,9 @@
 ﻿using System.Threading;
 using DotnetSpider.Core;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
+using DotnetSpider.Mongo;
+using DotnetSpider.Postgre;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Configuration;
@@ -212,15 +214,15 @@ namespace DotnetSpider.Tests
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalMessageQueue();
-					services.AddLocalDownloaderAgent(x =>
+					services.AddLocalEventBus();
+					services.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
 					services.AddLocalDownloadCenter();
-					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+					services.AddStatisticsCenter(x => x.UseMemory());
 				});
 			var provider = builder.Build();
 			var spider = provider.Create<Spider>();
@@ -260,15 +262,15 @@ namespace DotnetSpider.Tests
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalMessageQueue();
-					services.AddLocalDownloaderAgent(x =>
+					services.AddLocalEventBus();
+					services.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
 					services.AddLocalDownloadCenter();
-					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+					services.AddStatisticsCenter(x => x.UseMemory());
 				});
 			
 			var provider = builder.Build();

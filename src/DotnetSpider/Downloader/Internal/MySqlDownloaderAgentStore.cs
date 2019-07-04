@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.Downloader.Entity;
 using MySql.Data.MySqlClient;
 using Dapper;
 using DotnetSpider.Core;
+using DotnetSpider.DownloadAgentRegisterCenter;
+using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 
 namespace DotnetSpider.Downloader.Internal
 {
@@ -37,11 +38,11 @@ namespace DotnetSpider.Downloader.Internal
 			}
 		}
 
-		public async Task<IEnumerable<Entity.DownloaderAgent>> GetAllListAsync()
+		public async Task<IEnumerable<DownloaderAgent>> GetAllListAsync()
 		{
 			using (var conn = new MySqlConnection(_options.ConnectionString))
 			{
-				return (await conn.QueryAsync<Entity.DownloaderAgent>(
+				return (await conn.QueryAsync<DownloaderAgent>(
 						$"SELECT * FROM dotnetspider.downloader_agent"))
 					.ToList();
 			}
@@ -57,7 +58,7 @@ namespace DotnetSpider.Downloader.Internal
 //			}
 //		}
 
-		public async Task RegisterAsync(Entity.DownloaderAgent agent)
+		public async Task RegisterAsync(DownloaderAgent agent)
 		{
 			using (var conn = new MySqlConnection(_options.ConnectionString))
 			{

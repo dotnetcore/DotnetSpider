@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using DotnetSpider.Core;
-using DotnetSpider.Downloader;
+using DotnetSpider.DownloadAgent;
 
 namespace DotnetSpider.Network
 {

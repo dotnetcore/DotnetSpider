@@ -1,4 +1,4 @@
-namespace DotnetSpider.Downloader
+namespace DotnetSpider.Core
 {
 	public enum DownloadPolicy
 	{

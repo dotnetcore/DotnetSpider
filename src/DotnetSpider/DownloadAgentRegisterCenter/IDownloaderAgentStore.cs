@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotnetSpider.Downloader.Entity;
+using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 
-namespace DotnetSpider.Downloader
+namespace DotnetSpider.DownloadAgentRegisterCenter
 {
 	/// <summary>
 	/// 下载器代理存储
@@ -19,14 +19,14 @@ namespace DotnetSpider.Downloader
 		/// 查询所有已经注册的下载器代理
 		/// </summary>
 		/// <returns></returns>
-		Task<IEnumerable<Entity.DownloaderAgent>> GetAllListAsync();
+		Task<IEnumerable<DownloaderAgent>> GetAllListAsync();
 
 		/// <summary>
 		/// 添加下载器代理
 		/// </summary>
 		/// <param name="agent">下载器代理</param>
 		/// <returns></returns>
-		Task RegisterAsync(Entity.DownloaderAgent agent);
+		Task RegisterAsync(DownloaderAgent agent);
 
 		/// <summary>
 		/// 保存下载器代理的心跳

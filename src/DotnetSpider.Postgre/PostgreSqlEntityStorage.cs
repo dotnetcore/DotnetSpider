@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using Dapper;
 using DotnetSpider.Core;
-using DotnetSpider.Data.Storage.Model;
+using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.DataFlow.Storage.Model;
 using Npgsql;
 
 // ReSharper disable once CheckNamespace
-namespace DotnetSpider.Data.Storage
+namespace DotnetSpider.Postgre
 {
 	/// <summary>
 	/// PostgreSql 保存解析(实体)结果

@@ -1,5 +1,5 @@
 ﻿using System;
-using DotnetSpider.Data.Parser.Formatter;
+using DotnetSpider.DataFlow.Parser.Formatter;
 
 namespace DotnetSpider.ExcelExpression
 {

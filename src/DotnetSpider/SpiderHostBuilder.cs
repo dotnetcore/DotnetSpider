@@ -98,11 +98,11 @@ namespace DotnetSpider
 			foreach (var hostedService in _backgroundServices)
 			{
 				hostedService.StartAsync(_cancellationTokenSource.Token);
-				for (int i = 0; i < 30; ++i)
+				for (int i = 0; i < 300; ++i)
 				{
 					if (hostedService is IRunnable runnable && !runnable.IsRunning)
 					{
-						Thread.Sleep(1000);
+						Thread.Sleep(100);
 					}
 					else
 					{

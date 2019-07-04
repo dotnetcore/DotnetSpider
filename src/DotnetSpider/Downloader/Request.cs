@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Net.Http;
 using DotnetSpider.Core;
 
 namespace DotnetSpider.Downloader

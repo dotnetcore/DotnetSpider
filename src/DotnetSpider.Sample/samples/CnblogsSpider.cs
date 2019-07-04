@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Logging;
@@ -29,7 +29,7 @@ namespace DotnetSpider.Sample.samples
         {
             public CnblogsDataParser()
             {
-                CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
+                RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
                 QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
             }
 
@@ -41,7 +41,7 @@ namespace DotnetSpider.Sample.samples
             }
         }
 
-        public CnblogsSpider(IMessageQueue mq, IStatisticsService statisticsService, ISpiderOptions options, ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
+        public CnblogsSpider(IEventBus mq, IStatisticsService statisticsService, ISpiderOptions options, ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
         {
         }
     }

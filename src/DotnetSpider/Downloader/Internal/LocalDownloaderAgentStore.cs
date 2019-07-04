@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.Downloader.Entity;
+using DotnetSpider.DownloadAgentRegisterCenter;
+using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 
 namespace DotnetSpider.Downloader.Internal
 {
@@ -12,20 +12,20 @@ namespace DotnetSpider.Downloader.Internal
 	/// </summary>
 	internal class LocalDownloaderAgentStore : IDownloaderAgentStore
 	{
-		private readonly ConcurrentDictionary<string, Entity.DownloaderAgent> _agents =
-			new ConcurrentDictionary<string, Entity.DownloaderAgent>();
+		private readonly ConcurrentDictionary<string, DownloaderAgent> _agents =
+			new ConcurrentDictionary<string, DownloaderAgent>();
 
 		public Task EnsureDatabaseAndTableCreatedAsync()
 		{
 			return Task.CompletedTask;
 		}
 
-		public Task<IEnumerable<Entity.DownloaderAgent>> GetAllListAsync()
+		public Task<IEnumerable<DownloaderAgent>> GetAllListAsync()
 		{
-			return Task.FromResult((IEnumerable<Entity.DownloaderAgent>) _agents.Values);
+			return Task.FromResult((IEnumerable<DownloaderAgent>) _agents.Values);
 		}
 
-		public Task RegisterAsync(Entity.DownloaderAgent agent)
+		public Task RegisterAsync(DownloaderAgent agent)
 		{
 			_agents.AddOrUpdate(agent.Id, x => agent, (s, a) =>
 			{

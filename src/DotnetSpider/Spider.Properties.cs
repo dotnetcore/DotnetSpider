@@ -2,10 +2,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
+using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
-using DotnetSpider.MessageQueue;
-using DotnetSpider.RequestSupply;
+using DotnetSpider.EventBus;
+using DotnetSpider.RequestSupplier;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Logging;
@@ -17,7 +17,7 @@ namespace DotnetSpider
 		private readonly List<Request> _requests = new List<Request>();
 
 		private readonly List<IDataFlow> _dataFlows = new List<IDataFlow>();
-		private readonly IMessageQueue _mq;
+		private readonly IEventBus _eventBus;
 		private readonly ILogger _logger;
 		private readonly IStatisticsService _statisticsService;
 		private readonly List<IRequestSupplier> _requestSupplies = new List<IRequestSupplier>();

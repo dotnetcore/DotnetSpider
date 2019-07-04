@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Parser.Attribute;
-using DotnetSpider.Data.Parser.Formatter;
-using DotnetSpider.Data.Storage;
-using DotnetSpider.Data.Storage.Model;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Parser.Attribute;
+using DotnetSpider.DataFlow.Parser.Formatter;
+using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Downloader;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Selector;
 using DotnetSpider.Statistics;
@@ -28,15 +28,15 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalMessageQueue();
+					services.AddLocalEventBus();
 					services.AddLocalDownloadCenter();
-					services.AddLocalDownloaderAgent(x =>
+					services.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
-					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+					services.AddStatisticsCenter(x => x.UseMemory());
 				}).Register<EntitySpider>();
 			var provider = builder.Build();
 			var spider = provider.Create<EntitySpider>();
@@ -103,7 +103,7 @@ namespace DotnetSpider.Sample.samples
 			public DateTime CreationTime { get; set; }
 		}
 
-		public EntitySpider(IMessageQueue mq, IStatisticsService statisticsService, ISpiderOptions options,
+		public EntitySpider(IEventBus mq, IStatisticsService statisticsService, ISpiderOptions options,
 			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
 		{
 		}

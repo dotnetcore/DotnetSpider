@@ -1,6 +1,6 @@
 ﻿using System.IO;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.Downloader;
 using Xunit;
 

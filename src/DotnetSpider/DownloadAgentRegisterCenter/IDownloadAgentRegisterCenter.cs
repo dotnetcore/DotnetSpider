@@ -1,13 +1,12 @@
-
 using DotnetSpider.Core;
-#if !NET451
 using Microsoft.Extensions.Hosting;
+#if !NET451
 
 #else
 using DotnetSpider.Core;
 #endif
 
-namespace DotnetSpider.Downloader
+namespace DotnetSpider.DownloadAgentRegisterCenter
 {
 	/// <summary>
 	/// 下载中心

@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Downloader;
+using DotnetSpider.DownloadAgent;
 using DotnetSpider.Network;
 using DotnetSpider.Network.InternetDetector;
 using Microsoft.Extensions.DependencyInjection;

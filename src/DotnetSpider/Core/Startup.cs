@@ -78,15 +78,15 @@ namespace DotnetSpider.Core
 			{
 				builder.ConfigureServices(b =>
 				{
-					b.AddLocalMessageQueue();
-					b.AddLocalDownloaderAgent(x =>
+					b.AddLocalEventBus();
+					b.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
 					b.AddLocalDownloadCenter();
-					b.AddSpiderStatisticsCenter(x =>
+					b.AddStatisticsCenter(x =>
 					{
 						// 添加内存统计服务
 						x.UseMemory();

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DotnetSpider
+namespace DotnetSpider.DownloadAgent
 {
 	public class DownloadAgentBuilder
 	{

@@ -4,8 +4,9 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using DotnetSpider.Downloader;
 
-namespace DotnetSpider.Downloader
+namespace DotnetSpider.Sample.samples
 {
     /// <summary>
     /// 图片下载

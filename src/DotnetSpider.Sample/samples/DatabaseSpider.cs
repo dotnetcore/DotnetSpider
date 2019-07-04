@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.Downloader;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Logging;
@@ -56,7 +55,7 @@ namespace DotnetSpider.Sample.samples
 			}
 		}
 
-		public DatabaseSpider(IMessageQueue mq, IStatisticsService statisticsService, ISpiderOptions options, ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
+		public DatabaseSpider(IEventBus mq, IStatisticsService statisticsService, ISpiderOptions options, ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
 		{
 		}
 	}

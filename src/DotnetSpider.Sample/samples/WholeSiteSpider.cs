@@ -1,10 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
+using DotnetSpider.Mongo;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
@@ -19,15 +20,15 @@ namespace DotnetSpider.Sample.samples
 		        .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 		        .ConfigureServices(services =>
 		        {
-			        services.AddLocalMessageQueue();
-			        services.AddLocalDownloaderAgent(x =>
+			        services.AddLocalEventBus();
+			        services.AddDownloaderAgent(x =>
 			        {
 				        x.UseFileLocker();
 				        x.UseDefaultAdslRedialer();
 				        x.UseDefaultInternetDetector();
 			        });
 			        services.AddLocalDownloadCenter();
-			        services.AddSpiderStatisticsCenter(x => x.UseMemory());
+			        services.AddStatisticsCenter(x => x.UseMemory());
 		        });
 	        
             var provider = builder.Build();
@@ -41,7 +42,7 @@ namespace DotnetSpider.Sample.samples
             spider.AddDataFlow(new DataParser
             {
                 SelectableFactory = context => context.GetSelectable(ContentType.Html),
-                CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com"),
+                RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com"),
                 QueryFollowRequests =  DataParserHelper.QueryFollowRequestsByXPath(".")
             }).AddDataFlow(new ConsoleStorage()); // 控制台打印采集结果
             spider.AddRequests("http://www.cnblogs.com/"); // 设置起始链接
@@ -55,15 +56,15 @@ namespace DotnetSpider.Sample.samples
 		        .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 		        .ConfigureServices(services =>
 		        {
-			        services.AddLocalMessageQueue();
-			        services.AddLocalDownloaderAgent(x =>
+			        services.AddLocalEventBus();
+			        services.AddDownloaderAgent(x =>
 			        {
 				        x.UseFileLocker();
 				        x.UseDefaultAdslRedialer();
 				        x.UseDefaultInternetDetector();
 			        });
 			        services.AddLocalDownloadCenter();
-			        services.AddSpiderStatisticsCenter(x => x.UseMemory());
+			        services.AddStatisticsCenter(x => x.UseMemory());
 		        }).Register<EntitySpider>();
 	        var provider = builder.Build();
             var spider = provider.Create<Spider>();
@@ -82,7 +83,7 @@ namespace DotnetSpider.Sample.samples
         {
             public CnblogsDataParser()
             {
-                CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
+                RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
                 QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
             }
 

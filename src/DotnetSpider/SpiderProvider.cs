@@ -1,7 +1,8 @@
 using System;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
-using DotnetSpider.Downloader;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DownloadAgent;
+using DotnetSpider.DownloadAgentRegisterCenter;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Extensions.Configuration;
 
-namespace DotnetSpider.Downloader
+namespace DotnetSpider.DownloadAgent
 {
 	/// <summary>
 	/// 下载器代理选项

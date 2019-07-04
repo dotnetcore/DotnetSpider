@@ -1,12 +1,8 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using Serilog;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 
 namespace DotnetSpider.Tests
@@ -20,15 +16,15 @@ namespace DotnetSpider.Tests
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalMessageQueue();
-					services.AddLocalDownloaderAgent(x =>
+					services.AddLocalEventBus();
+					services.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
 					services.AddLocalDownloadCenter();
-					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+					services.AddStatisticsCenter(x => x.UseMemory());
 				});
 			return builder.Build();
 		});

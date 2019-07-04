@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Parser.Attribute;
-using DotnetSpider.Data.Storage.Model;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Parser.Attribute;
+using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Downloader;
 using DotnetSpider.Selector;
 using Xunit;

@@ -1,16 +1,13 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Downloader.Entity;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.DownloadAgentRegisterCenter.Entity;
+using DotnetSpider.EventBus;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace DotnetSpider.Downloader
+namespace DotnetSpider.DownloadAgentRegisterCenter
 {
 	/// <summary>
 	/// 下载中心
@@ -22,7 +19,7 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 消息队列
 		/// </summary>
-		protected readonly IMessageQueue Mq;
+		protected readonly IEventBus EventBus;
 
 		/// <summary>
 		/// 系统选项
@@ -42,17 +39,17 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="mq">消息队列</param>
+		/// <param name="eventBus">消息队列</param>
 		/// <param name="downloaderAgentStore">下载器代理存储</param>
 		/// <param name="options">系统选项</param>
 		/// <param name="logger">日志接口</param>
 		protected DownloadAgentRegisterCenterBase(
-			IMessageQueue mq,
+			IEventBus eventBus,
 			IDownloaderAgentStore downloaderAgentStore,
 			ISpiderOptions options,
 			ILogger logger)
 		{
-			Mq = mq;
+			EventBus = eventBus;
 			DownloaderAgentStore = downloaderAgentStore;
 			Logger = logger;
 			Options = options;
@@ -73,7 +70,7 @@ namespace DotnetSpider.Downloader
 
 			await DownloaderAgentStore.EnsureDatabaseAndTableCreatedAsync();
 
-			Mq.Subscribe(Framework.DownloaderAgentRegisterCenterTopic, async message =>
+			EventBus.Subscribe(Framework.DownloaderAgentRegisterCenterTopic, async message =>
 			{
 				var commandMessage = message.ToCommandMessage();
 				if (commandMessage == null)
@@ -87,7 +84,7 @@ namespace DotnetSpider.Downloader
 					case Framework.RegisterCommand:
 					{
 						// 此处不考虑消息的超时，一是因为节点数量不会很多，二是因为超时的可以释放掉
-						var agent = JsonConvert.DeserializeObject<Entity.DownloaderAgent>(commandMessage.Message);
+						var agent = JsonConvert.DeserializeObject<DownloaderAgent>(commandMessage.Message);
 						if (agent != null)
 						{
 							await DownloaderAgentStore.RegisterAsync(agent);
@@ -132,7 +129,7 @@ namespace DotnetSpider.Downloader
 
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
-			Mq.Unsubscribe(Framework.DownloaderAgentRegisterCenterTopic);
+			EventBus.Unsubscribe(Framework.DownloaderAgentRegisterCenterTopic);
 			IsRunning = false;
 			Logger.LogInformation("下载中心退出");
 			return Task.CompletedTask;

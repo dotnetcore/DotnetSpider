@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -18,15 +18,15 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalMessageQueue();
+					services.AddLocalEventBus();
 					services.AddLocalDownloadCenter();
-					services.AddLocalDownloaderAgent(x =>
+					services.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
-					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+					services.AddStatisticsCenter(x => x.UseMemory());
 				});
 			var provider = builder.Build();
 
@@ -48,7 +48,7 @@ namespace DotnetSpider.Sample.samples
 		{
 			public CnblogsDataParser()
 			{
-				CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
+				RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
 				QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
 			}
 

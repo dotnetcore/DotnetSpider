@@ -1,5 +1,5 @@
 ﻿using System;
-using DotnetSpider.Data.Parser.Formatter;
+using DotnetSpider.DataFlow.Parser.Formatter;
 using Xunit;
 
 namespace DotnetSpider.Tests.Data.Parser.Formatter

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
@@ -68,7 +67,7 @@ namespace DotnetSpider.Spiders
 				});
 				builder.ConfigureServices(services =>
 				{
-					services.AddKafkaMessageQueue();
+					services.AddKafkaEventBus();
 				});
 				builder.Register(type);
 				var provider = builder.Build();

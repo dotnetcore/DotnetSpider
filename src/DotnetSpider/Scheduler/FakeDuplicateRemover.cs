@@ -1,4 +1,4 @@
-using DotnetSpider.Data;
+using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
 using DotnetSpider.Scheduler.Component;
 

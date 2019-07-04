@@ -1,8 +1,8 @@
 using DotnetSpider.Core;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetSpider.Downloader
+namespace DotnetSpider.DownloadAgentRegisterCenter
 {
 	/// <summary>
 	/// 下载中心
@@ -12,12 +12,12 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="mq">消息队列</param>
+		/// <param name="eventBus">消息队列</param>
 		/// <param name="downloaderAgentStore">下载器代理存储</param>
 		/// <param name="options">系统选项</param>
 		/// <param name="logger">日志接口</param>
-		public DefaultDownloadAgentRegisterCenter(IMessageQueue mq, IDownloaderAgentStore downloaderAgentStore, ISpiderOptions options,
-			ILogger<DefaultDownloadAgentRegisterCenter> logger) : base(mq, downloaderAgentStore, options, logger)
+		public DefaultDownloadAgentRegisterCenter(IEventBus eventBus, IDownloaderAgentStore downloaderAgentStore, ISpiderOptions options,
+			ILogger<DefaultDownloadAgentRegisterCenter> logger) : base(eventBus, downloaderAgentStore, options, logger)
 		{
 		}
 	}

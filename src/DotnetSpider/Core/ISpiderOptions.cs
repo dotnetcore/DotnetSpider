@@ -1,4 +1,4 @@
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow.Storage;
 
 namespace DotnetSpider.Core
 {

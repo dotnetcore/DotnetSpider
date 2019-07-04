@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DotnetSpider.Downloader.Entity
+namespace DotnetSpider.DownloadAgentRegisterCenter.Entity
 {
 	/// <summary>
 	/// 下载器代理心跳

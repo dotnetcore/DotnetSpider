@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.MessageQueue;
-using Microsoft.Extensions.Logging;
+using DotnetSpider.EventBus;
 using Xunit;
 
 namespace DotnetSpider.Tests.MessageQueue
@@ -12,7 +11,7 @@ namespace DotnetSpider.Tests.MessageQueue
 		public async Task PubAndSub()
 		{
 			int count = 0;
-			var mq = new LocalMessageQueue(CreateLogger<LocalMessageQueue>());
+			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
 			mq.Subscribe("topic", msg =>
 			{
 				Interlocked.Increment(ref count);
@@ -36,7 +35,7 @@ namespace DotnetSpider.Tests.MessageQueue
 		public void ParallelPubAndSub()
 		{
 			int count = 0;
-			var mq = new LocalMessageQueue(CreateLogger<LocalMessageQueue>());
+			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
 			mq.Subscribe("topic", msg =>
 			{
 				Interlocked.Increment(ref count);
@@ -57,7 +56,7 @@ namespace DotnetSpider.Tests.MessageQueue
 		public async Task PubAndUnSub()
 		{
 			int count = 0;
-			var mq = new LocalMessageQueue(CreateLogger<LocalMessageQueue>());
+			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
 			mq.Subscribe("topic", msg =>
 			{
 				Interlocked.Increment(ref count);

@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Logging;
 
@@ -28,7 +28,7 @@ namespace DotnetSpider.Sample.samples
 
 				// 添加目标链接
 				var urls = selectable.Links().Regex("(https://github\\.com/[\\w\\-]+/[\\w\\-]+)").GetValues();
-				AddTargetRequests(context, urls);
+				AddFollowRequests(context, urls);
 
 				// 如果解析为空，跳过后续步骤(存储 etc)
 				if (string.IsNullOrWhiteSpace(name))
@@ -41,7 +41,7 @@ namespace DotnetSpider.Sample.samples
 			}
 		}
 
-		public GithubSpider(IMessageQueue mq, IStatisticsService statisticsService, ISpiderOptions options,
+		public GithubSpider(IEventBus mq, IStatisticsService statisticsService, ISpiderOptions options,
 			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
 		{
 		}

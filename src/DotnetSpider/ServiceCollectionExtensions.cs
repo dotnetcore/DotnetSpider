@@ -1,18 +1,16 @@
 using System;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
-using DotnetSpider.Downloader;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DownloadAgent;
+using DotnetSpider.DownloadAgentRegisterCenter;
 using DotnetSpider.Downloader.Internal;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using DotnetSpider.Network;
 using DotnetSpider.Network.InternetDetector;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Events;
 
 namespace DotnetSpider
 {
@@ -32,12 +30,12 @@ namespace DotnetSpider
 		}
  
 		public static IServiceCollection AddDownloadCenter(this IServiceCollection services,
-			Action<DownloadCenterBuilder> configure = null)
+			Action<DownloadAgentRegisterCenterBuilder> configure = null)
 		{
  
 			services.AddSingleton<IHostedService, DefaultDownloadAgentRegisterCenter>();
 
-			DownloadCenterBuilder downloadCenterBuilder = new DownloadCenterBuilder(services);
+			DownloadAgentRegisterCenterBuilder downloadCenterBuilder = new DownloadAgentRegisterCenterBuilder(services);
 			configure?.Invoke(downloadCenterBuilder);
 
 			return services;
@@ -45,29 +43,28 @@ namespace DotnetSpider
 
 		public static IServiceCollection AddLocalDownloadCenter(this IServiceCollection services)
 		{
-			services.AddSingleton<IHostedService, DefaultDownloadAgentRegisterCenter>();
-			services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
+			services.AddDownloadCenter(x=>x.UseLocalDownloaderAgentStore());
 			return services;
 		}
 
-		public static DownloadCenterBuilder UseMySqlDownloaderAgentStore(this DownloadCenterBuilder builder)
+		public static DownloadAgentRegisterCenterBuilder UseMySqlDownloaderAgentStore(this DownloadAgentRegisterCenterBuilder builder)
 		{
 			builder.Services.AddSingleton<IDownloaderAgentStore, MySqlDownloaderAgentStore>();
 			return builder;
 		}
 
-		public static DownloadCenterBuilder UseMemoryDownloaderAgentStore(this DownloadCenterBuilder builder)
+		public static DownloadAgentRegisterCenterBuilder UseLocalDownloaderAgentStore(this DownloadAgentRegisterCenterBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 			builder.Services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
 			return builder;
 		}
 
-		#region  Message queue
+		#region  EventbUS
 
-		public static IServiceCollection AddLocalMessageQueue(this IServiceCollection services)
+		public static IServiceCollection AddLocalEventBus(this IServiceCollection services)
 		{
-			services.AddSingleton<IMessageQueue, LocalMessageQueue>();
+			services.AddSingleton<IEventBus, LocalEventBus>();
 			return services;
 		}
 
@@ -79,19 +76,6 @@ namespace DotnetSpider
 			Action<DownloadAgentBuilder> configure = null)
 		{
 			services.AddSingleton<IHostedService, DefaultDownloaderAgent>();
-			services.AddSingleton<NetworkCenter>();
-			services.AddScoped<DownloaderAgentOptions>();
-
-			DownloadAgentBuilder spiderAgentBuilder = new DownloadAgentBuilder(services);
-			configure?.Invoke(spiderAgentBuilder);
-
-			return services;
-		}
-
-		public static IServiceCollection AddLocalDownloaderAgent(this IServiceCollection services,
-			Action<DownloadAgentBuilder> configure = null)
-		{
-			services.AddSingleton<IHostedService, LocalDownloaderAgent>();
 			services.AddSingleton<NetworkCenter>();
 			services.AddScoped<DownloaderAgentOptions>();
 
@@ -141,7 +125,7 @@ namespace DotnetSpider
 
 		#region  Statistics
 
-		public static IServiceCollection AddSpiderStatisticsCenter(this IServiceCollection services,
+		public static IServiceCollection AddStatisticsCenter(this IServiceCollection services,
 			Action<StatisticsBuilder> configure)
 		{
 			services.AddSingleton<IHostedService, StatisticsCenter>();

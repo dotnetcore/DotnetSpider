@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotnetSpider.Data.Parser;
+using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.Downloader;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
@@ -18,15 +18,15 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddKafkaMessageQueue();
-					services.AddLocalDownloaderAgent(x =>
+					services.AddKafkaEventBus();
+					services.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
 					services.AddLocalDownloadCenter();
-					services.AddSpiderStatisticsCenter(x => x.UseMemory());
+					services.AddStatisticsCenter(x => x.UseMemory());
 				});
 			var provider = builder.Build();
 

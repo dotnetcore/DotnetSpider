@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using DotnetSpider.Core;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Parser.Attribute;
-using DotnetSpider.Data.Parser.Formatter;
-using DotnetSpider.Data.Storage.Model;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Parser.Attribute;
+using DotnetSpider.DataFlow.Parser.Formatter;
+using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Downloader;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Selector;
 using DotnetSpider.Statistics;
@@ -75,7 +75,7 @@ namespace DotnetSpider.Spiders
 			public DateTime CreationTime { get; set; }
 		}
 
-		public CnblogsSpider(IMessageQueue mq, IStatisticsService statisticsService, ISpiderOptions options,
+		public CnblogsSpider(IEventBus mq, IStatisticsService statisticsService, ISpiderOptions options,
 			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
 		{
 		}

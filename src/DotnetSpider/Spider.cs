@@ -7,12 +7,11 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
-using DotnetSpider.Downloader.Entity;
-using DotnetSpider.MessageQueue;
-using DotnetSpider.RequestSupply;
+using DotnetSpider.EventBus;
+using DotnetSpider.RequestSupplier;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,13 +44,13 @@ namespace DotnetSpider
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="mq"></param>
+		/// <param name="eventBus"></param>
 		/// <param name="options"></param>
 		/// <param name="logger"></param>
 		/// <param name="services">服务提供接口</param>
 		/// <param name="statisticsService"></param>
 		public Spider(
-			IMessageQueue mq,
+			IEventBus eventBus,
 			IStatisticsService statisticsService,
 			ISpiderOptions options,
 			ILogger<Spider> logger,
@@ -59,7 +58,7 @@ namespace DotnetSpider
 		{
 			_services = services;
 			_statisticsService = statisticsService;
-			_mq = mq;
+			_eventBus = eventBus;
 			_options = options;
 			_logger = logger;
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
@@ -148,7 +147,7 @@ namespace DotnetSpider
 				_requests.Add(request);
 				if (_requests.Count % EnqueueBatchCount == 0)
 				{
-					EnqueueRequests();
+					EnqueueRequestToScheduler();
 				}
 			}
 
@@ -171,7 +170,7 @@ namespace DotnetSpider
 				_requests.Add(request);
 				if (_requests.Count % EnqueueBatchCount == 0)
 				{
-					EnqueueRequests();
+					EnqueueRequestToScheduler();
 				}
 			}
 
@@ -209,7 +208,7 @@ namespace DotnetSpider
 					await _statisticsService.StartAsync(Id);
 
 					// 订阅数据流，如果订阅失败
-					_mq.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
+					_eventBus.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
 						async message => await HandleMessage(message));
 					_logger.LogInformation($"任务 {Id} 订阅消息队列成功");
 
@@ -224,11 +223,11 @@ namespace DotnetSpider
 					// 通过供应接口添加请求
 					foreach (var requestSupply in _requestSupplies)
 					{
-						requestSupply.Run(request => AddRequests(request));
+						requestSupply.Execute(request => AddRequests(request));
 					}
 
 					// 把列表中可能剩余的请求加入队列
-					EnqueueRequests();
+					EnqueueRequestToScheduler();
 					_logger.LogInformation($"任务 {Id} 加载下载请求结束");
 
 					_enqueued.Set(0);
@@ -315,7 +314,7 @@ namespace DotnetSpider
 			_logger.LogInformation($"任务 {Id} 退出中...");
 			Status = Status.Exiting;
 			// 直接取消订阅即可: 1. 如果是本地应用, 
-			_mq.Unsubscribe($"{Framework.ResponseHandlerTopic}{Id}");
+			_eventBus.Unsubscribe($"{Framework.ResponseHandlerTopic}{Id}");
 			return this;
 		}
 
@@ -826,7 +825,7 @@ namespace DotnetSpider
 		/// 把当前缓存的所有 Request 入队
 		/// </summary>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		private void EnqueueRequests()
+		private void EnqueueRequestToScheduler()
 		{
 			if (_requests.Count <= 0) return;
 
@@ -870,7 +869,7 @@ namespace DotnetSpider
 						}
 					}
 
-					await _mq.PublishAsync(topic,
+					await _eventBus.PublishAsync(topic,
 						$"|{Framework.DownloadCommand}|{JsonConvert.SerializeObject(requests)}");
 
 					_enqueuedRequestDict.TryAdd(request.Hash, request);

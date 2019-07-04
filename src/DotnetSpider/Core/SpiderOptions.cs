@@ -1,5 +1,5 @@
 using System;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Configuration;
 
 namespace DotnetSpider.Core

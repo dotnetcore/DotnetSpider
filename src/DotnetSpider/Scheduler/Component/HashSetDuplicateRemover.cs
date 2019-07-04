@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
-using DotnetSpider.Data;
+using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
 
 namespace DotnetSpider.Scheduler.Component

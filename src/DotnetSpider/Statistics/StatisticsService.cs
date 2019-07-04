@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 
 namespace DotnetSpider.Statistics
 {
@@ -9,15 +9,15 @@ namespace DotnetSpider.Statistics
     /// </summary>
     public class StatisticsService : IStatisticsService
     {
-        private readonly IMessageQueue _mq;
+        private readonly IEventBus _eventBus;
 
         /// <summary>
         /// 构造方法
         /// </summary>
-        /// <param name="mq">消息队列接口</param>
-        public StatisticsService(IMessageQueue mq)
+        /// <param name="eventBus">消息队列接口</param>
+        public StatisticsService(IEventBus eventBus)
         {
-            _mq = mq;
+            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace DotnetSpider.Statistics
         /// <returns></returns>
         public async Task IncrementSuccessAsync(string ownerId)
         {
-            await _mq.PublishAsync(Framework.StatisticsServiceTopic, $"|Success|{ownerId}");
+            await _eventBus.PublishAsync(Framework.StatisticsServiceTopic, $"|Success|{ownerId}");
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace DotnetSpider.Statistics
         /// <returns></returns>
         public async Task IncrementFailedAsync(string ownerId, int count = 1)
         {
-            await _mq.PublishAsync(Framework.StatisticsServiceTopic, $"|Failed|{ownerId},{count}");
+            await _eventBus.PublishAsync(Framework.StatisticsServiceTopic, $"|Failed|{ownerId},{count}");
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace DotnetSpider.Statistics
         /// <returns></returns>
         public async Task StartAsync(string ownerId)
         {
-            await _mq.PublishAsync(Framework.StatisticsServiceTopic, $"|Start|{ownerId}");
+            await _eventBus.PublishAsync(Framework.StatisticsServiceTopic, $"|Start|{ownerId}");
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace DotnetSpider.Statistics
         /// <returns></returns>
         public async Task ExitAsync(string ownerId)
         {
-            await _mq.PublishAsync(Framework.StatisticsServiceTopic, $"|Exit|{ownerId}");
+            await _eventBus.PublishAsync(Framework.StatisticsServiceTopic, $"|Exit|{ownerId}");
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace DotnetSpider.Statistics
         /// <returns></returns>
         public async Task IncrementDownloadSuccessAsync(string agentId, int count, long elapsedMilliseconds)
         {
-            await _mq.PublishAsync(Framework.StatisticsServiceTopic,
+            await _eventBus.PublishAsync(Framework.StatisticsServiceTopic,
                 $"|DownloadSuccess|{agentId},{count},{elapsedMilliseconds}");
         }
 
@@ -83,7 +83,7 @@ namespace DotnetSpider.Statistics
         /// <returns></returns>
         public async Task IncrementDownloadFailedAsync(string agentId, int count, long elapsedMilliseconds)
         {
-            await _mq.PublishAsync(Framework.StatisticsServiceTopic,
+            await _eventBus.PublishAsync(Framework.StatisticsServiceTopic,
                 $"|DownloadFailed|{agentId},{count},{elapsedMilliseconds}");
         }
 
@@ -94,7 +94,7 @@ namespace DotnetSpider.Statistics
         /// <returns></returns>
         public async Task PrintStatisticsAsync(string ownerId)
         {
-            await _mq.PublishAsync(Framework.StatisticsServiceTopic,
+            await _eventBus.PublishAsync(Framework.StatisticsServiceTopic,
                 $"|Print|{ownerId}");
         }
 
@@ -106,7 +106,7 @@ namespace DotnetSpider.Statistics
         /// <returns></returns>
         public async Task IncrementTotalAsync(string ownerId, int count)
         {
-            await _mq.PublishAsync(Framework.StatisticsServiceTopic,
+            await _eventBus.PublishAsync(Framework.StatisticsServiceTopic,
                 $"|Total|{ownerId},{count}");
         }
     }

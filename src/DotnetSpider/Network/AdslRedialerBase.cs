@@ -1,4 +1,4 @@
-﻿using DotnetSpider.Downloader;
+﻿using DotnetSpider.DownloadAgent;
 
 namespace DotnetSpider.Network
 {
