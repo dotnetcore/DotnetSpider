@@ -21,7 +21,7 @@ namespace DotnetSpider.DataFlow.Storage.PostgreSql
 		/// </summary>
 		/// <param name="options">配置</param>
 		/// <returns></returns>
-		public new static PostgreSqlEntityStorage CreateFromOptions(ISpiderOptions options)
+		public new static PostgreSqlEntityStorage CreateFromOptions(SpiderOptions options)
 		{
 			return new PostgreSqlEntityStorage(options.StorageType, options.StorageConnectionString)
 			{

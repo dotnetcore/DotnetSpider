@@ -5,7 +5,7 @@ using Xunit;
 
 namespace DotnetSpider.Tests.MessageQueue
 {
-	public class LocalMessageQueueTests : TestBase
+	public class LocalEventBusTests : TestBase
 	{
 		[Fact(DisplayName = "PubAndSub")]
 		public async Task PubAndSub()

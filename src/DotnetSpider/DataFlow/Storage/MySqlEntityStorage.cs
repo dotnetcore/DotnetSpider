@@ -20,7 +20,7 @@ namespace DotnetSpider.DataFlow.Storage
 		/// </summary>
 		/// <param name="options">配置</param>
 		/// <returns></returns>
-		public static MySqlEntityStorage CreateFromOptions(ISpiderOptions options)
+		public static MySqlEntityStorage CreateFromOptions(SpiderOptions options)
 		{
 			var storage = new MySqlEntityStorage(options.StorageType, options.StorageConnectionString)
 			{

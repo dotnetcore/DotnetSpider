@@ -59,5 +59,10 @@ namespace DotnetSpider.DownloadAgentRegisterCenter.Entity
 		{
 			LastModificationTime = DateTime.Now;
 		}
+
+		public bool IsActive()
+		{
+			return (DateTime.Now - LastModificationTime).TotalSeconds <= 30;
+		}
 	}
 }

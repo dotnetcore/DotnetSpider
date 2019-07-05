@@ -29,7 +29,7 @@ namespace DotnetSpider.DataFlow.Storage.Mongo
 		/// </summary>
 		/// <param name="options">配置</param>
 		/// <returns></returns>
-		public static MongoEntityStorage CreateFromOptions(ISpiderOptions options)
+		public static MongoEntityStorage CreateFromOptions(SpiderOptions options)
 		{
 			return new MongoEntityStorage(options.StorageConnectionString);
 		}

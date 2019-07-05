@@ -45,7 +45,7 @@ namespace DotnetSpider.DataFlow.Storage
 		/// </summary>
 		/// <param name="options">配置</param>
 		/// <returns></returns>
-		public static MySqlFileEntityStorage CreateFromOptions(ISpiderOptions options)
+		public static MySqlFileEntityStorage CreateFromOptions(SpiderOptions options)
 		{
 			var fileType = string.IsNullOrWhiteSpace(options.MySqlFileType)
 				? MySqlFileType.InsertSql

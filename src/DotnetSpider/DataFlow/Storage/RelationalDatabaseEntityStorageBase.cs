@@ -254,7 +254,7 @@ namespace DotnetSpider.DataFlow.Storage
 					}
 				}
 
-				var options = context.Services.GetRequiredService<ISpiderOptions>();
+				var options = context.Services.GetRequiredService<SpiderOptions>();
 				if (!string.IsNullOrWhiteSpace(options.StorageConnectionString))
 				{
 					var conn = TryCreateDbConnection(options.StorageConnectionString);

@@ -15,7 +15,7 @@ namespace DotnetSpider.Tests
 {
 	public class SpiderTests : TestBase
 	{
-		class MyStorageOptions : ISpiderOptions
+		public class MyStorageOptions : SpiderOptions
 		{
 			public string ConnectionString { get; set; }
 			public string StorageConnectionString { get; set; }
@@ -41,6 +41,10 @@ namespace DotnetSpider.Tests
 			/// 单位: 秒
 			/// </summary>
 			public int NonRespondedTimeout { get; }
+
+			public MyStorageOptions() : base(null)
+			{
+			}
 		}
 
 		[Fact(DisplayName = "CreateDefaultStorage")]

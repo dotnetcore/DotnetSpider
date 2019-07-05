@@ -70,7 +70,7 @@ namespace DotnetSpider.Sample.samples
             spider.Name = "博客园全站采集"; // 设置任务名称
             spider.Speed = 1; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
             spider.Depth = 3; // 设置采集深度
-            var options = provider.GetRequiredService<ISpiderOptions>();
+            var options = provider.GetRequiredService<SpiderOptions>();
             spider.AddDataFlow(new CnblogsDataParser()).AddDataFlow(new MongoEntityStorage(options.StorageConnectionString));
             spider.AddRequests("http://www.cnblogs.com/"); // 设置起始链接
             return spider.RunAsync(); // 启动

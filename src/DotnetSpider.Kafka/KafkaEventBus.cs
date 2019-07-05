@@ -28,7 +28,7 @@ namespace DotnetSpider.Kafka
 		/// </summary>
 		/// <param name="options">爬虫选项</param>
 		/// <param name="logger">日志接口</param>
-		public KafkaEventBus(ISpiderOptions options,
+		public KafkaEventBus(SpiderOptions options,
 			ILogger<KafkaEventBus> logger)
 		{
 			_logger = logger;

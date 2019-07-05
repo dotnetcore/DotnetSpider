@@ -32,7 +32,7 @@ namespace DotnetSpider.DataFlow.Storage
 		/// </summary>
 		/// <param name="options">配置</param>
 		/// <returns></returns>
-		public static SqlServerEntityStorage CreateFromOptions(ISpiderOptions options)
+		public static SqlServerEntityStorage CreateFromOptions(SpiderOptions options)
 		{
 			var storage = new SqlServerEntityStorage(options.StorageType, options.StorageConnectionString)
 			{

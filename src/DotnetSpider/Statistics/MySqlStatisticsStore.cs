@@ -11,9 +11,9 @@ namespace DotnetSpider.Statistics
 {
 	public class MySqlStatisticsStore : IStatisticsStore
 	{
-		private readonly ISpiderOptions _options;
+		private readonly SpiderOptions _options;
 
-		public MySqlStatisticsStore(ISpiderOptions options)
+		public MySqlStatisticsStore(SpiderOptions options)
 		{
 			_options = options;
 		}

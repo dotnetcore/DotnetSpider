@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
+      <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
+      <ProjectReference Include="..\DotnetSpider.PostgreSql\DotnetSpider.PostgreSql.csproj" />
+      <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="appsettings.json">
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+</Project>

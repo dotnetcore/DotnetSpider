@@ -16,7 +16,7 @@ namespace DotnetSpider.DataFlow.Storage
 		/// </summary>
 		/// <param name="options">配置</param>
 		/// <returns></returns>
-		public static JsonFileStorage CreateFromOptions(ISpiderOptions options)
+		public static JsonFileStorage CreateFromOptions(SpiderOptions options)
 		{
 			return new JsonFileStorage();
 		}

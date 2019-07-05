@@ -7,7 +7,7 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// 任务选项
 	/// </summary>
-	public class SpiderOptions : ISpiderOptions
+	public class SpiderOptions
 	{
 		private readonly IConfiguration _configuration;
 

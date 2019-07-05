@@ -7,7 +7,7 @@ using Xunit;
 
 namespace DotnetSpider.Tests.MessageQueue
 {
-	public class KafkaMessageQueueTests : TestBase
+	public class KafkaEventBusTests : TestBase
 	{
 		[Fact(DisplayName = "PubAndSub")]
 		public async Task PubAndSub()
@@ -18,7 +18,7 @@ namespace DotnetSpider.Tests.MessageQueue
 			}
 
 			int count = 0;
-			var options = SpiderProvider.Value.GetRequiredService<ISpiderOptions>();
+			var options = SpiderProvider.Value.GetRequiredService<SpiderOptions>();
 			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
 			var mq = new KafkaEventBus(options, logger);
 			mq.Subscribe("PubAndSub", msg =>
@@ -49,7 +49,7 @@ namespace DotnetSpider.Tests.MessageQueue
 			}
 
 			int count = 0;
-			var options = SpiderProvider.Value.GetRequiredService<ISpiderOptions>();
+			var options = SpiderProvider.Value.GetRequiredService<SpiderOptions>();
 			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
 			var mq = new KafkaEventBus(options, logger);
 			mq.Subscribe("ParallelPubAndSub", msg =>
@@ -77,7 +77,7 @@ namespace DotnetSpider.Tests.MessageQueue
 			}
 
 			int count = 0;
-			var options = SpiderProvider.Value.GetRequiredService<ISpiderOptions>();
+			var options = SpiderProvider.Value.GetRequiredService<SpiderOptions>();
 			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
 			var mq = new KafkaEventBus(options, logger);
 			mq.Subscribe("PubAndUnSub", msg =>

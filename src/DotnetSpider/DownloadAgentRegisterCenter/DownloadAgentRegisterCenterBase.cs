@@ -24,7 +24,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 		/// <summary>
 		/// 系统选项
 		/// </summary>
-		protected readonly ISpiderOptions Options;
+		protected readonly SpiderOptions Options;
 
 		/// <summary>
 		/// 日志接口
@@ -46,7 +46,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 		protected DownloadAgentRegisterCenterBase(
 			IEventBus eventBus,
 			IDownloaderAgentStore downloaderAgentStore,
-			ISpiderOptions options,
+			SpiderOptions options,
 			ILogger logger)
 		{
 			EventBus = eventBus;

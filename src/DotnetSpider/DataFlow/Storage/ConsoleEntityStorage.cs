@@ -15,7 +15,7 @@ namespace DotnetSpider.DataFlow.Storage
 		/// </summary>
 		/// <param name="options"></param>
 		/// <returns></returns>
-		public static ConsoleEntityStorage CreateFromOptions(ISpiderOptions options)
+		public static ConsoleEntityStorage CreateFromOptions(SpiderOptions options)
 		{
 			return new ConsoleEntityStorage();
 		}

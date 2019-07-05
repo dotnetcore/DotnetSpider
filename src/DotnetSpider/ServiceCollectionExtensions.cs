@@ -17,22 +17,22 @@ namespace DotnetSpider
 	public static class ServiceCollectionExtensions
 	{
 		public static IServiceCollection ConfigureAppConfiguration(this IServiceCollection services,
-			string config = null,
-			string[] args = null, bool loadCommandLine = true)
+			string config = null)
 		{
 			Check.NotNull(services, nameof(services));
 
-			var configurationBuilder = Framework.CreateConfigurationBuilder(config, args, loadCommandLine);
+			var configurationBuilder = Framework.CreateConfigurationBuilder(config);
 			IConfigurationRoot configurationRoot = configurationBuilder.Build();
 			services.AddSingleton<IConfiguration>(configurationRoot);
 
 			return services;
 		}
- 
+
+		#region DownloadCenter
+
 		public static IServiceCollection AddDownloadCenter(this IServiceCollection services,
 			Action<DownloadAgentRegisterCenterBuilder> configure = null)
 		{
- 
 			services.AddSingleton<IHostedService, DefaultDownloadAgentRegisterCenter>();
 
 			DownloadAgentRegisterCenterBuilder downloadCenterBuilder = new DownloadAgentRegisterCenterBuilder(services);
@@ -43,22 +43,26 @@ namespace DotnetSpider
 
 		public static IServiceCollection AddLocalDownloadCenter(this IServiceCollection services)
 		{
-			services.AddDownloadCenter(x=>x.UseLocalDownloaderAgentStore());
+			services.AddDownloadCenter(x => x.UseLocalDownloaderAgentStore());
 			return services;
 		}
 
-		public static DownloadAgentRegisterCenterBuilder UseMySqlDownloaderAgentStore(this DownloadAgentRegisterCenterBuilder builder)
+		public static DownloadAgentRegisterCenterBuilder UseMySqlDownloaderAgentStore(
+			this DownloadAgentRegisterCenterBuilder builder)
 		{
 			builder.Services.AddSingleton<IDownloaderAgentStore, MySqlDownloaderAgentStore>();
 			return builder;
 		}
 
-		public static DownloadAgentRegisterCenterBuilder UseLocalDownloaderAgentStore(this DownloadAgentRegisterCenterBuilder builder)
+		public static DownloadAgentRegisterCenterBuilder UseLocalDownloaderAgentStore(
+			this DownloadAgentRegisterCenterBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 			builder.Services.AddSingleton<IDownloaderAgentStore, LocalDownloaderAgentStore>();
 			return builder;
 		}
+
+		#endregion
 
 		#region  EventbUS
 
@@ -150,6 +154,16 @@ namespace DotnetSpider
 			return builder;
 		}
 
+		#endregion
+		
+		#region DotnetSpider
+
+		public static IServiceCollection AddDotnetSpider(this IServiceCollection services)
+		{
+			
+			return services;
+		}
+		
 		#endregion
 	}
 }

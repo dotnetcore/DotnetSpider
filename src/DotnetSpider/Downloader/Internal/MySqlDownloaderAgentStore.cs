@@ -11,9 +11,9 @@ namespace DotnetSpider.Downloader.Internal
 {
 	public class MySqlDownloaderAgentStore : IDownloaderAgentStore
 	{
-		private readonly ISpiderOptions _options;
+		private readonly SpiderOptions _options;
 
-		public MySqlDownloaderAgentStore(ISpiderOptions options)
+		public MySqlDownloaderAgentStore(SpiderOptions options)
 		{
 			_options = options;
 		}

@@ -30,7 +30,7 @@ namespace DotnetSpider
 	public partial class Spider
 	{
 		private readonly IServiceProvider _services;
-		private readonly ISpiderOptions _options;
+		private readonly SpiderOptions _options;
 
 		/// <summary>
 		/// 结束前的处理工作
@@ -52,7 +52,7 @@ namespace DotnetSpider
 		public Spider(
 			IEventBus eventBus,
 			IStatisticsService statisticsService,
-			ISpiderOptions options,
+			SpiderOptions options,
 			ILogger<Spider> logger,
 			IServiceProvider services)
 		{
@@ -368,7 +368,7 @@ namespace DotnetSpider
 			return GetDefaultStorage(_options);
 		}
 
-		internal static StorageBase GetDefaultStorage(ISpiderOptions options)
+		internal static StorageBase GetDefaultStorage(SpiderOptions options)
 		{
 			var type = Type.GetType(options.Storage);
 			if (type == null)

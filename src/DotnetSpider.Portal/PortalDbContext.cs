@@ -1,5 +1,5 @@
 using DotnetSpider.Core;
-using DotnetSpider.Downloader.Entity;
+using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.Portal.Entity;
 using DotnetSpider.Statistics.Entity;
 using Microsoft.EntityFrameworkCore;

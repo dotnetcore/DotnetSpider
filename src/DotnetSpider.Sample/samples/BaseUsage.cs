@@ -4,6 +4,7 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
+using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
@@ -18,15 +19,15 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices(services =>
 				{
-					services.AddLocalEventBus();
-					services.AddLocalDownloadCenter();
-					services.AddDownloaderAgent(x =>
-					{
-						x.UseFileLocker();
-						x.UseDefaultAdslRedialer();
-						x.UseDefaultInternetDetector();
-					});
-					services.AddStatisticsCenter(x => x.UseMemory());
+					services.AddKafkaEventBus();
+					//services.AddLocalDownloadCenter();
+//					services.AddDownloaderAgent(x =>
+//					{
+//						x.UseFileLocker();
+//						x.UseDefaultAdslRedialer();
+//						x.UseDefaultInternetDetector();
+//					});
+					//services.AddStatisticsCenter(x => x.UseMemory());
 				});
 			var provider = builder.Build();
 

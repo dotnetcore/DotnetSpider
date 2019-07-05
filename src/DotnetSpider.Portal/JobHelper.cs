@@ -17,25 +17,22 @@ namespace DotnetSpider.Portal
 			}
 
 			var docker = new DockerClient.DockerClient(new Uri(options.Docker));
-			if (spider.Single)
+			bool exists = await docker.ExistsAsync(new
 			{
-				bool exists = await docker.ExistsAsync(new
-				{
-					label = new[] {$"dotnetspider.spider.id={spider.Id}"}
-				});
-				if (exists)
-				{
-					throw new Exception($"任务 {spider.Id} 正在运行");
-				}
+				label = new[] {$"dotnetspider.spider.id={spider.Id}"}
+			});
+			if (exists)
+			{
+				throw new Exception($"任务 {spider.Id} 正在运行");
 			}
 
 
 			var env = new List<string>((spider.Environment ?? "").Split(new[] {" "},
 				StringSplitOptions.RemoveEmptyEntries))
 			{
-				$"dotnetspider.spider.id={spider.Id}",
-				$"dotnetspider.spider.class={spider.Class}",
-				$"dotnetspider.spider.name={spider.Name}"
+				$"id={spider.Id}",
+				$"type={spider.Type}",
+				$"name={spider.Name}"
 			};
 			var result = await docker.PullAsync(spider.Image);
 			if (!result.Success)
@@ -47,9 +44,9 @@ namespace DotnetSpider.Portal
 				env.ToArray(),
 				new Dictionary<string, object>
 				{
-					{"dotnetspider.spider.id", spider.Id.ToString()},
-					{"dotnetspider.spider.class", spider.Class},
-					{"dotnetspider.spider.name", spider.Name}
+					{"id", spider.Id.ToString()},
+					{"type", spider.Type},
+					{"name", spider.Name}
 				}, new[] {options.DockerVolumes});
 			if (!result.Success)
 			{
@@ -60,12 +57,12 @@ namespace DotnetSpider.Portal
 			{
 				ContainerId = result.Id,
 				SpiderId = spider.Id,
-				Status = "created"
+				Status = "Creating"
 			};
 			result = await docker.StartAsync(spiderContainer.ContainerId);
 			if (result.Success)
 			{
-				spiderContainer.Status = "started";
+				spiderContainer.Status = "OK";
 			}
 
 			dbContext.SpiderContainers.Add(spiderContainer);

@@ -74,7 +74,7 @@ namespace DotnetSpider.Spiders
 			public DateTime CreationTime { get; set; }
 		}
 
-		public CnblogsSpider(IEventBus mq, IStatisticsService statisticsService, ISpiderOptions options,
+		public CnblogsSpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options,
 			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
 		{
 		}

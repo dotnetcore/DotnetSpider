@@ -16,7 +16,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 		/// <param name="downloaderAgentStore">下载器代理存储</param>
 		/// <param name="options">系统选项</param>
 		/// <param name="logger">日志接口</param>
-		public DefaultDownloadAgentRegisterCenter(IEventBus eventBus, IDownloaderAgentStore downloaderAgentStore, ISpiderOptions options,
+		public DefaultDownloadAgentRegisterCenter(IEventBus eventBus, IDownloaderAgentStore downloaderAgentStore, SpiderOptions options,
 			ILogger<DefaultDownloadAgentRegisterCenter> logger) : base(eventBus, downloaderAgentStore, options, logger)
 		{
 		}

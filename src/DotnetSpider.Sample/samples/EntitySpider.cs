@@ -102,7 +102,7 @@ namespace DotnetSpider.Sample.samples
 			public DateTime CreationTime { get; set; }
 		}
 
-		public EntitySpider(IEventBus mq, IStatisticsService statisticsService, ISpiderOptions options,
+		public EntitySpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options,
 			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
 		{
 		}

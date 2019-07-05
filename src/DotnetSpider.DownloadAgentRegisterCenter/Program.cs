@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using DotnetSpider.Core;
 using DotnetSpider.DownloadAgentRegisterCenter;
 using DotnetSpider.Kafka;
 using DotnetSpider.Statistics;
@@ -32,6 +33,7 @@ namespace DotnetSpider.DownloadCenter
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices((hostContext, services) =>
 				{
+					services.AddScoped<SpiderOptions>();
 					services.AddKafkaEventBus();
 					services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
 					services.AddStatisticsCenter(x => x.UseMySql());

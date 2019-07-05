@@ -17,15 +17,16 @@ namespace DotnetSpider.Core
 {
 	public static class Framework
 	{
-		private static readonly Dictionary<string, string> SwitchMappings =
+		public static readonly Dictionary<string, string> SwitchMappings =
 			new Dictionary<string, string>
 			{
-				{"-s", "spider"},
+				{"-t", "type"},
 				{"-n", "name"},
 				{"-i", "id"},
 				{"-a", "args"},
 				{"-d", "distribute"},
-				{"-c", "config"}
+				{"-c", "config"},
+				{"-l", "local"}
 			};
 
 		private const string DefaultAppsettings = "appsettings.json";
@@ -136,35 +137,25 @@ namespace DotnetSpider.Core
 #endif
 		}
 
-		public static ConfigurationBuilder CreateConfigurationBuilder(string config = null, string[] args = null,
-			bool loadCommandLine = true)
+		public static ConfigurationBuilder CreateConfigurationBuilder(string config = null)
 		{
 			var configurationBuilder = new ConfigurationBuilder();
 			configurationBuilder.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+
 			configurationBuilder.AddEnvironmentVariables();
 
-			if (loadCommandLine)
+			configurationBuilder.AddCommandLine(Environment.GetCommandLineArgs(), SwitchMappings);
+
+			if (File.Exists(DefaultAppsettings))
 			{
-				configurationBuilder.AddCommandLine(Environment.GetCommandLineArgs(), SwitchMappings);
+				configurationBuilder.AddJsonFile(DefaultAppsettings, false,
+					true);
 			}
 
-			if (args != null)
-			{
-				configurationBuilder.AddCommandLine(args, SwitchMappings);
-			}
-
-			if (!string.IsNullOrWhiteSpace(config))
+			if (!string.IsNullOrWhiteSpace(config) && config != DefaultAppsettings && File.Exists(config))
 			{
 				configurationBuilder.AddJsonFile(config, false,
 					true);
-			}
-			else
-			{
-				if (File.Exists(DefaultAppsettings))
-				{
-					configurationBuilder.AddJsonFile(DefaultAppsettings, false,
-						true);
-				}
 			}
 
 			return configurationBuilder;
@@ -172,7 +163,7 @@ namespace DotnetSpider.Core
 
 		public static IConfiguration CreateConfiguration(string config = null, string[] args = null)
 		{
-			return CreateConfigurationBuilder(config, args).Build();
+			return CreateConfigurationBuilder(config).Build();
 		}
 
 		/// <summary>

@@ -91,7 +91,7 @@ namespace DotnetSpider
 
 			BuildConfiguration();
 
-			_services.AddScoped<ISpiderOptions, SpiderOptions>();
+			_services.AddScoped<SpiderOptions>();
 
 			CreateServiceProvider();
 
@@ -127,7 +127,7 @@ namespace DotnetSpider
 		{
 			_services.AddSingleton(_configuration);
 			_services.AddSingleton<IStatisticsService, StatisticsService>();
-			_services.AddScoped<ISpiderOptions, SpiderOptions>();
+			_services.AddScoped<SpiderOptions>();
 			_services.AddScoped<Spider>();
 			_services.AddOptions();
 			_services.AddLogging();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using DotnetSpider.Core;
 using DotnetSpider.DownloadAgent;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
@@ -30,6 +31,7 @@ namespace DotnetSpider.DownloaderAgent
 				.ConfigureLogging(x => { x.AddSerilog(); })
 				.ConfigureServices((hostContext, services) =>
 				{
+					services.AddScoped<SpiderOptions>();
 					services.AddKafkaEventBus();
 					services.AddDownloaderAgent(x =>
 					{
