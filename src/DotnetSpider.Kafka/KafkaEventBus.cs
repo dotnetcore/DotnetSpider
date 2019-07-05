@@ -47,26 +47,23 @@ namespace DotnetSpider.Kafka
 			_producer = new ProducerBuilder<Null, string>(productConfig).Build();
 		}
 
-		public async Task PublishAsync(string topic, params string[] messages)
+		public async Task PublishAsync(string topic, string message)
 		{
-			if (messages == null || messages.Length == 0)
+			if (string.IsNullOrWhiteSpace(message))
 			{
 #if DEBUG
 				var stackTrace = new StackTrace();
-				_logger?.LogDebug($"推送空消息到 Topic {topic}: {stackTrace}");
+				_logger.LogDebug($"推送空消息到 Topic {topic}: {stackTrace}");
 #endif
 				return;
 			}
 
-			foreach (var message in messages)
-			{
-				await _producer.ProduceAsync(topic, new Message<Null, string> {Value = message});
-			}
+			await _producer.ProduceAsync(topic, new Message<Null, string> {Value = message});
 		}
 
-		public void Publish(string topic, params string[] messages)
+		public void Publish(string topic, string message)
 		{
-			PublishAsync(topic, messages).ConfigureAwait(false).GetAwaiter();
+			PublishAsync(topic, message).ConfigureAwait(false).GetAwaiter();
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]

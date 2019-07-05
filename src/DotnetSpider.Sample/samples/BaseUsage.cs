@@ -33,9 +33,8 @@ namespace DotnetSpider.Sample.samples
 			var spider = provider.Create<Spider>();
 			spider.NewGuidId(); // 设置任务标识
 			spider.Name = "博客园全站采集"; // 设置任务名称
-			spider.Speed = 1; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
+			spider.Speed = 10; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
 			spider.Depth = 3; // 设置采集深度
-			spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
 			spider.AddDataFlow(new CnblogsDataParser()).AddDataFlow(new ConsoleStorage());
 			spider.AddRequests(new Request("http://www.cnblogs.com/", new Dictionary<string, string>
 			{

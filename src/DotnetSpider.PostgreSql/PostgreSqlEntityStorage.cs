@@ -9,7 +9,7 @@ using DotnetSpider.DataFlow.Storage.Model;
 using Npgsql;
 
 // ReSharper disable once CheckNamespace
-namespace DotnetSpider.Postgre
+namespace DotnetSpider.DataFlow.Storage.PostgreSql
 {
 	/// <summary>
 	/// PostgreSql 保存解析(实体)结果

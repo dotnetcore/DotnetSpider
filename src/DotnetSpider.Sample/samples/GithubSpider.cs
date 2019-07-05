@@ -49,11 +49,8 @@ namespace DotnetSpider.Sample.samples
 		protected override void Initialize()
 		{
 			NewGuidId();
-			RetryDownloadTimes = 3;
-			DownloaderSettings.Timeout = 5000;
-			DownloaderSettings.Type = DownloaderType.HttpClient;
 			AddDataFlow(new Parser()).AddDataFlow(new ConsoleStorage());
-			AddRequests("https://github.com/zlzforever");
+			AddRequests(new Request("https://github.com/zlzforever"));
 		}
 	}
 }

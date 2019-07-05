@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using DotnetSpider.Core;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +11,7 @@ namespace DotnetSpider.Spiders
 {
 	public class Program
 	{
-		static void Main(string[] args)
+		static async Task Main(string[] args)
 		{
 			try
 			{
@@ -38,7 +39,7 @@ namespace DotnetSpider.Spiders
 					.WriteTo.Console().WriteTo
 					.RollingFile(logPath);
 				Log.Logger = loggerConfiguration.CreateLogger();
-				
+
 				var spiderName = configuration["dotnetspider.spider.name"];
 				if (string.IsNullOrWhiteSpace(@class) ||
 				    string.IsNullOrWhiteSpace(spiderId) ||
@@ -57,18 +58,9 @@ namespace DotnetSpider.Spiders
 				}
 
 				Log.Logger.Information($"获取爬虫类型 {type.FullName} 成功");
-				builder.ConfigureAppConfiguration(x =>
-				{
-					x.AddCommandLine(args);
-				});
-				builder.ConfigureLogging(x =>
-				{
-					x.AddSerilog();
-				});
-				builder.ConfigureServices(services =>
-				{
-					services.AddKafkaEventBus();
-				});
+				builder.ConfigureAppConfiguration(x => { x.AddCommandLine(args); });
+				builder.ConfigureLogging(x => { x.AddSerilog(); });
+				builder.ConfigureServices(services => { services.AddKafkaEventBus(); });
 				builder.Register(type);
 				var provider = builder.Build();
 
@@ -78,7 +70,7 @@ namespace DotnetSpider.Spiders
 				spider.Name = spiderName;
 
 				Log.Logger.Information($"尝试启动爬虫实例");
-				spider.Run();
+				await spider.RunAsync();
 
 				Log.Logger.Information($"爬虫实例退出");
 			}

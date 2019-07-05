@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage.Model;
-using DotnetSpider.Mongo;
+using DotnetSpider.DataFlow.Storage.Mongo;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Moq;

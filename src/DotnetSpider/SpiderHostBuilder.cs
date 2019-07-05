@@ -85,6 +85,8 @@ namespace DotnetSpider
 				throw new InvalidOperationException("Build can only be called once.");
 			}
 
+			Framework.SetMultiThread();
+			
 			_hostBuilt = true;
 
 			BuildConfiguration();

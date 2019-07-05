@@ -20,7 +20,6 @@ namespace DotnetSpider.Sample.samples
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
 			Depth = 3;
-			DownloaderSettings.Type = DownloaderType.HttpClient;
 			AddDataFlow(new DatabaseSpiderDataParser()).AddDataFlow(GetDefaultStorage());
 			AddRequests(
 					new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> { { "网站", "博客园" } }),

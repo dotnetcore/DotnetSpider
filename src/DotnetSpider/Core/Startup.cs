@@ -79,13 +79,13 @@ namespace DotnetSpider.Core
 				builder.ConfigureServices(b =>
 				{
 					b.AddLocalEventBus();
+					b.AddLocalDownloadCenter();
 					b.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
-					b.AddLocalDownloadCenter();
 					b.AddStatisticsCenter(x =>
 					{
 						// 添加内存统计服务
@@ -101,7 +101,7 @@ namespace DotnetSpider.Core
 			{
 				instance.Name = name;
 				instance.Id = id;
-				instance.RunAsync(arguments);
+				instance.RunAsync(arguments).ConfigureAwait(false).GetAwaiter();
 			}
 			else
 			{

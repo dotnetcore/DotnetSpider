@@ -7,7 +7,7 @@ ProjectSection(SolutionItems) = preProject
 	DESIGN.md = DESIGN.md
 	.editorconfig = .editorconfig
 	.gitignore = .gitignore
-	LICENSE = LICENSE
+	LICENSE.txt = LICENSE.txt
 	README.md = README.md
 	runtests.sh = runtests.sh
 	azure-pipelines.yml = azure-pipelines.yml
@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Mongo", "src\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Kafka", "src\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj", "{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Postgre", "src\DotnetSpider.Postgre\DotnetSpider.Postgre.csproj", "{62069E7E-47BE-467F-87CA-233555C5C45E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.PostgreSql", "src\DotnetSpider.PostgreSql\DotnetSpider.PostgreSql.csproj", "{62069E7E-47BE-467F-87CA-233555C5C45E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloaderAgent", "src\DotnetSpider.DownloaderAgent\DotnetSpider.DownloaderAgent.csproj", "{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}"
 EndProject

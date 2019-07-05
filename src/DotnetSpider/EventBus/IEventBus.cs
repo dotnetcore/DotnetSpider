@@ -13,17 +13,17 @@ namespace DotnetSpider.EventBus
 		/// 推送消息到指定 topic
 		/// </summary>
 		/// <param name="topic"></param>
-		/// <param name="messages"></param>
+		/// <param name="message"></param>
 		/// <returns></returns>
-		Task PublishAsync(string topic, params string[] messages);
+		Task PublishAsync(string topic, string message);
 
 		/// <summary>
 		/// 推送消息到指定 topic
 		/// </summary>
 		/// <param name="topic"></param>
-		/// <param name="messages"></param>
+		/// <param name="message"></param>
 		/// <returns></returns>
-		void Publish(string topic, params string[] messages);
+		void Publish(string topic, string message);
 		
 		/// <summary>
 		/// 订阅 topic

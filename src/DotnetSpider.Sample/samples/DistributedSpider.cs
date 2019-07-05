@@ -19,13 +19,13 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureServices(services =>
 				{
 					services.AddKafkaEventBus();
+					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{
 						x.UseFileLocker();
 						x.UseDefaultAdslRedialer();
 						x.UseDefaultInternetDetector();
 					});
-					services.AddLocalDownloadCenter();
 					services.AddStatisticsCenter(x => x.UseMemory());
 				});
 			var provider = builder.Build();
@@ -36,7 +36,6 @@ namespace DotnetSpider.Sample.samples
 			spider.Name = "博客园全站采集"; // 设置任务名称
 			spider.Speed = 2; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
 			spider.Depth = 3; // 设置采集深度
-			spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
 			spider.AddDataFlow(new DataParser<EntitySpider.CnblogsEntry>())
 				.AddDataFlow(spider.GetDefaultStorage());
 			spider.AddRequests(

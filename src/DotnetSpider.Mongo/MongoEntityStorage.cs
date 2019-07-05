@@ -12,7 +12,7 @@ using MongoDB.Driver;
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
 
 // ReSharper disable once CheckNamespace
-namespace DotnetSpider.Mongo
+namespace DotnetSpider.DataFlow.Storage.Mongo
 {
 	/// <summary>
 	/// MongoDB 保存解析(实体)结果 TODO: 是否要考虑存储模式：插入，新的插入旧的更新，更新 ETC

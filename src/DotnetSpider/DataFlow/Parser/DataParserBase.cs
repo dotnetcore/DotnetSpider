@@ -108,13 +108,32 @@ namespace DotnetSpider.DataFlow.Parser
 			// TODO: 确认需要复制哪些字段
 			var request = new Request(url, current.Properties)
 			{
-				Url = url,
-				Depth = current.Depth,
-				Body = current.Body,
-				Method = current.Method,
+				Accept = current.Accept,
 				AgentId = current.AgentId,
+				AllowAutoRedirect = current.AllowAutoRedirect,
+				Body = current.Body,
+				Compression = current.Compression,
+				Cookie = current.Cookie,
+				ContentType = current.ContentType,
+				CreationTime = DateTime.Now,
+				ChangeIpPattern = current.ChangeIpPattern,
+				DownloadPolicy = current.DownloadPolicy,
+				Depth = current.Depth,
+				DecodeHtml = current.DecodeHtml,
+				DownloaderType = current.DownloaderType,
+				Encoding = current.Encoding,
+				Headers = current.Headers,
+				Method = current.Method,
+				OwnerId = current.OwnerId,
+				Origin = current.Origin,
+				Properties = current.Properties,
+				Referer = current.Referer,
 				RetriedTimes = 0,
-				OwnerId = current.OwnerId
+				Timeout = current.Timeout,
+				UseAdsl = current.UseAdsl,
+				UseCookies = current.UseCookies,
+				UseProxy = current.UseProxy,
+				UserAgent = current.UserAgent
 			};
 			return request;
 		}

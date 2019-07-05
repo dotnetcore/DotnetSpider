@@ -28,11 +28,5 @@ namespace DotnetSpider.Sample
 			// await DistributedSpider.Run(); 
 			Console.Read();
 		}
-
-		static Task Write(string msg)
-		{
-			Console.WriteLine(msg);
-			return Task.CompletedTask;
-		}
 	}
 }

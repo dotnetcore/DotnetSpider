@@ -31,7 +31,6 @@ namespace DotnetSpider
 		private DateTime _lastRequestedTime;
 		private IScheduler _scheduler;
 		private int _emptySleepTime = 30;
-		private int _retryDownloadTimes = 5;
 		private int _statisticsInterval = 5;
 		private double _speed = 1;
 		private int _speedControllerInterval = 1000;
@@ -40,12 +39,7 @@ namespace DotnetSpider
 		private string _id;
 		private bool _retryWhenResultIsEmpty;
 		private bool _mmfSignal;
-
-		/// <summary>
-		/// 下载器配置
-		/// </summary>
-		public DownloaderSettings DownloaderSettings { get; set; } = new DownloaderSettings();
-
+		
 		/// <summary>
 		/// 遍历深度
 		/// </summary>
@@ -201,25 +195,6 @@ namespace DotnetSpider
 		/// 任务名称
 		/// </summary>
 		public string Name { get; set; }
-
-		/// <summary>
-		/// 下载重试次数
-		/// </summary>
-		/// <exception cref="SpiderException"></exception>
-		public int RetryDownloadTimes
-		{
-			get => _retryDownloadTimes;
-			set
-			{
-				if (value <= 0)
-				{
-					throw new SpiderException("下载重试次数必须大于 0");
-				}
-
-				CheckIfRunning();
-				_retryDownloadTimes = value;
-			}
-		}
 
 		/// <summary>
 		/// 等待一定时间，如果队列中没有新的请求则认为任务结束

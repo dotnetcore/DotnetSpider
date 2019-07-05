@@ -3,16 +3,17 @@ using System.Threading;
 
 namespace DotnetSpider.Core
 {
-	public class ThreadCommonPool
+	public class LimitedConcurrencyThreadPool
 	{
 		private int _threadCount;
 
-		public ThreadCommonPool(int maxThreads)
+		public LimitedConcurrencyThreadPool(int maxThreads)
 		{
 			if (maxThreads <= 0)
 			{
 				throw new ArgumentException($"{nameof(maxThreads)} should larger than 0.");
 			}
+
 			MaxThreads = maxThreads;
 		}
 
@@ -30,6 +31,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
+
 			while (!TryQueueUserWork(action, obj))
 			{
 				Thread.Sleep(1);
@@ -49,7 +51,7 @@ namespace DotnetSpider.Core
 			{
 				return false;
 			}
-
+			
 			if (_threadCount >= MaxThreads) return false;
 			if (!ThreadPool.QueueUserWorkItem(threadContext =>
 			{
@@ -61,7 +63,11 @@ namespace DotnetSpider.Core
 				{
 					Interlocked.Decrement(ref _threadCount);
 				}
-			})) return false;
+			}))
+			{
+				return false;
+			}
+
 			Interlocked.Increment(ref _threadCount);
 			return true;
 		}
@@ -76,6 +82,7 @@ namespace DotnetSpider.Core
 			{
 				return;
 			}
+
 			while (!TryQueueUserWork(action))
 			{
 				Thread.Sleep(1);
@@ -105,7 +112,11 @@ namespace DotnetSpider.Core
 				{
 					Interlocked.Decrement(ref _threadCount);
 				}
-			})) return false;
+			}))
+			{
+				return false;
+			}
+
 			Interlocked.Increment(ref _threadCount);
 			return true;
 		}

@@ -321,7 +321,7 @@ namespace DotnetSpider.DownloadAgent
 			if (!_cache.ContainsKey(request.OwnerId))
 			{
 				IDownloader downloader = null;
-				switch (request.Type)
+				switch (request.DownloaderType)
 				{
 					case DownloaderType.Empty:
 					{

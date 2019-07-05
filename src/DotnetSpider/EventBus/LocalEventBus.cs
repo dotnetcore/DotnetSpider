@@ -31,17 +31,16 @@ namespace DotnetSpider.EventBus
 		/// 推送消息到指定 topic
 		/// </summary>
 		/// <param name="topic">topic</param>
-		/// <param name="messages">消息</param>
+		/// <param name="message">消息</param>
 		/// <returns></returns>
-		public Task PublishAsync(string topic, params string[] messages)
+		public Task PublishAsync(string topic, string message)
 		{
-			Publish(topic, messages);
-			return Task.CompletedTask;
+			return Task.Factory.StartNew(() => { Publish(topic, message); });
 		}
 
-		public void Publish(string topic, params string[] messages)
+		public void Publish(string topic, string message)
 		{
-			if (messages == null || messages.Length == 0)
+			if (string.IsNullOrWhiteSpace(message))
 			{
 #if DEBUG
 				var stackTrace = new StackTrace();
@@ -52,19 +51,13 @@ namespace DotnetSpider.EventBus
 
 			if (_consumers.TryGetValue(topic, out Action<string> consumer))
 			{
-				foreach (var message in messages)
+				try
 				{
-					Task.Factory.StartNew(() =>
-					{
-						try
-						{
-							consumer(message);
-						}
-						catch (Exception e)
-						{
-							_logger.LogError($"Topic {topic} 消费消息 {message} 失败: {e}");
-						}
-					}).ConfigureAwait(false).GetAwaiter();
+					consumer(message);
+				}
+				catch (Exception e)
+				{
+					_logger.LogError($"Topic {topic} 消费消息 {message} 失败: {e}");
 				}
 			}
 			else

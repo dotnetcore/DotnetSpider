@@ -5,7 +5,8 @@
         <LangVersion>latest</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <Version>4.0.1</Version>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+        <Version>4.0.6</Version>
         <Authors>zlzforever@163.com;</Authors>
         <Copyright>Copyright 2018 Lewis Zou</Copyright>
         <PackageId>DotnetSpider.ExcelExpression</PackageId>
@@ -15,11 +16,12 @@
         <PackageIconUrl>https://github.com/dotnetcore/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
         <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider</RepositoryUrl>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <PackageLicenseUrl>https://raw.githubusercontent.com/dotnetcore/DotnetSpider/master/LICENSE</PackageLicenseUrl>
     </PropertyGroup>
-
     <ItemGroup>
-        <PackageReference Include="ToolGood.Algorithm" Version="1.3.3.3" />
+        <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ToolGood.Algorithm" Version="1.3.3.4" />
     </ItemGroup>
 
     <ItemGroup>

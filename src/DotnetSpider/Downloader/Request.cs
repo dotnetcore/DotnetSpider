@@ -34,7 +34,7 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 下载器类别
 		/// </summary>
-		public DownloaderType Type { get; set; } = DownloaderType.HttpClient;
+		public DownloaderType DownloaderType { get; set; } = DownloaderType.HttpClient;
 
 		/// <summary>
 		/// 下载内容是否需要解码
@@ -110,6 +110,11 @@ namespace DotnetSpider.Downloader
 		public int RetryTimes { get; set; } = 3;
 
 		/// <summary>
+		/// 已经重试的次数
+		/// </summary>
+		public int RetriedTimes { get; set; }
+		
+		/// <summary>
 		/// 是否使用 ADSL 下载器
 		/// </summary>
 		public bool UseAdsl { get; set; } = false;
@@ -137,11 +142,6 @@ namespace DotnetSpider.Downloader
 		public string Method { get; set; } = "GET";
 
 		/// <summary>
-		/// 已经重试的次数
-		/// </summary>
-		public int RetriedTimes { get; set; } = 3;
-
-		/// <summary>
 		/// 是否需要用压缩方法发送 Body
 		/// </summary>
 		public Compression Compression { get; set; }
@@ -154,7 +154,7 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 下载策略
 		/// </summary>
-		public DownloadPolicy DownloadPolicy { get; set; }
+		public DownloadPolicy DownloadPolicy { get; set; } = DownloadPolicy.Random;
 		
 		/// <summary>
 		/// 构造方法

@@ -182,112 +182,108 @@ namespace DotnetSpider
 		/// </summary>
 		/// <param name="args">启动参数</param>
 		/// <returns></returns>
-		public Task RunAsync(params string[] args)
+		public async Task RunAsync(params string[] args)
 		{
 			CheckIfRunning();
 
-			// 此方法不能放到异步里, 如果在调用 RunAsync 后再直接调用 ExitBySignal 有可能会因会执行顺序原因导致先调用退出，然后退出信号被重置
-			ResetMmfSignal();
-
-			return Task.Factory.StartNew(async () =>
+			try
 			{
+				ResetMmfSignal();
+
+				_logger.LogInformation("初始化爬虫");
+
+				// 定制化的设置
+				Initialize();
+
+				// 设置默认调度器
+				_scheduler = _scheduler ?? new QueueDistinctBfsScheduler();
+
+				// 设置状态为: 运行
+				Status = Status.Running;
+
+				// 添加任务启动的监控信息
+				await _statisticsService.StartAsync(Id);
+
+				// 订阅数据流，如果订阅失败
+				_eventBus.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
+					async message => await HandleMessage(message));
+				_logger.LogInformation($"任务 {Id} 订阅消息队列成功");
+
+				// 初始化各数据流处理器
+				foreach (var dataFlow in _dataFlows)
+				{
+					await dataFlow.InitAsync();
+				}
+
+				_logger.LogInformation($"任务 {Id} 数据流处理器初始化完成");
+
+				// 通过供应接口添加请求
+				foreach (var requestSupplier in _requestSupplies)
+				{
+					requestSupplier.Execute(request => AddRequests(request));
+				}
+
+				// 把列表中可能剩余的请求加入队列
+				EnqueueRequestToScheduler();
+				_logger.LogInformation($"任务 {Id} 加载下载请求成功");
+
+				_enqueued.Set(0);
+				_responded.Set(0);
+				_enqueuedRequestDict.Clear();
+
+				// 启动速度控制器
+				StartSpeedControllerAsync().ConfigureAwait(false).GetAwaiter();
+
+				_lastRequestedTime = DateTime.Now;
+
+				// 等待退出信号
+				await WaitForExiting();
+			}
+			catch (Exception e)
+			{
+				_logger.LogError(e.ToString());
+			}
+			finally
+			{
+				foreach (var dataFlow in _dataFlows)
+				{
+					try
+					{
+						dataFlow.Dispose();
+					}
+					catch (Exception ex)
+					{
+						_logger.LogError($"任务 {Id} 释放 {dataFlow.GetType().Name} 失败: {ex}");
+					}
+				}
+
 				try
 				{
-					_logger.LogInformation("初始化爬虫");
+					// TODO: 如果订阅消息队列失败，此处是否应该再尝试上报，会导致两倍的重试时间
+					// 添加任务退出的监控信息
+					await _statisticsService.ExitAsync(Id);
 
-					// 定制化的设置
-					Initialize();
-
-					// 设置默认调度器
-					_scheduler = _scheduler ?? new QueueDistinctBfsScheduler();
-
-					// 设置状态为: 运行
-					Status = Status.Running;
-
-					// 添加任务启动的监控信息
-					await _statisticsService.StartAsync(Id);
-
-					// 订阅数据流，如果订阅失败
-					_eventBus.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
-						async message => await HandleMessage(message));
-					_logger.LogInformation($"任务 {Id} 订阅消息队列成功");
-
-					// 初始化各数据流处理器
-					foreach (var dataFlow in _dataFlows)
-					{
-						await dataFlow.InitAsync();
-					}
-
-					_logger.LogInformation($"任务 {Id} 数据流处理器初始化完成");
-
-					// 通过供应接口添加请求
-					foreach (var requestSupply in _requestSupplies)
-					{
-						requestSupply.Execute(request => AddRequests(request));
-					}
-
-					// 把列表中可能剩余的请求加入队列
-					EnqueueRequestToScheduler();
-					_logger.LogInformation($"任务 {Id} 加载下载请求结束");
-
-					_enqueued.Set(0);
-					_responded.Set(0);
-					_enqueuedRequestDict.Clear();
-
-					// 启动速度控制器
-					StartSpeedControllerAsync().ConfigureAwait(false).GetAwaiter();
-
-					_lastRequestedTime = DateTime.Now;
-
-					// 等待退出信号
-					await WaitForExiting();
+					// 最后打印一次任务状态信息
+					await _statisticsService.PrintStatisticsAsync(Id);
 				}
 				catch (Exception e)
 				{
-					_logger.LogError(e.ToString());
+					_logger.LogInformation($"任务 {Id} 上传退出信息失败: {e}");
 				}
-				finally
+
+				try
 				{
-					foreach (var dataFlow in _dataFlows)
-					{
-						try
-						{
-							dataFlow.Dispose();
-						}
-						catch (Exception ex)
-						{
-							_logger.LogError($"任务 {Id} 释放 {dataFlow.GetType().Name} 失败: {ex}");
-						}
-					}
-
-					try
-					{
-						// TODO: 如果订阅消息队列失败，此处是否应该再尝试上报，会导致两倍的重试时间
-						// 添加任务退出的监控信息
-						await _statisticsService.ExitAsync(Id);
-
-						// 最后打印一次任务状态信息
-						await _statisticsService.PrintStatisticsAsync(Id);
-					}
-					catch (Exception e)
-					{
-						_logger.LogInformation($"任务 {Id} 上传退出信息失败: {e}");
-					}
-
-					try
-					{
-						await OnExiting();
-					}
-					catch (Exception e)
-					{
-						_logger.LogInformation($"任务 {Id} 退出事件处理失败: {e}");
-					}
-
-					// 标识任务退出完成
-					Status = Status.Exited;
-					_logger.LogInformation($"任务 {Id} 退出");
+					await OnExiting();
 				}
-			});
+				catch (Exception e)
+				{
+					_logger.LogInformation($"任务 {Id} 退出事件处理失败: {e}");
+				}
+
+				// 标识任务退出完成
+				Status = Status.Exited;
+				_logger.LogInformation($"任务 {Id} 退出");
+			}
 		}
 
 		/// <summary>
@@ -339,11 +335,6 @@ namespace DotnetSpider
 			}
 
 			throw new SpiderException($"任务 {Id} 未开启 MMF 控制");
-		}
-
-		public void Run(params string[] args)
-		{
-			RunAsync(args).Wait();
 		}
 
 		/// <summary>
@@ -677,7 +668,7 @@ namespace DotnetSpider
 						// 如果解析结果为空，重试
 						if (resultIsEmpty && RetryWhenResultIsEmpty)
 						{
-							if (response.Request.RetriedTimes < RetryDownloadTimes)
+							if (response.Request.RetriedTimes < response.Request.RetryTimes)
 							{
 								response.Request.RetriedTimes++;
 								await EnqueueRequests(response.Request);
@@ -735,13 +726,13 @@ namespace DotnetSpider
 
 				// TODO: 此处需要优化
 				var retryResponses =
-					responses.Where(x => !x.Success && x.Request.RetriedTimes < RetryDownloadTimes)
+					responses.Where(x => !x.Success && x.Request.RetriedTimes < x.Request.RetryTimes)
 						.ToList();
 				var downloadFailedResponses =
 					responses.Where(x => !x.Success)
 						.ToList();
 				var failedResponses =
-					responses.Where(x => !x.Success && x.Request.RetriedTimes >= RetryDownloadTimes)
+					responses.Where(x => !x.Success && x.Request.RetriedTimes >= x.Request.RetryTimes)
 						.ToList();
 
 				if (retryResponses.Count > 0)
@@ -869,10 +860,9 @@ namespace DotnetSpider
 						}
 					}
 
+					_enqueuedRequestDict.TryAdd(request.Hash, request);
 					await _eventBus.PublishAsync(topic,
 						$"|{Framework.DownloadCommand}|{JsonConvert.SerializeObject(requests)}");
-
-					_enqueuedRequestDict.TryAdd(request.Hash, request);
 				}
 
 

@@ -11,8 +11,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
-        <PackageReference Include="Moq" Version="4.10.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+        <PackageReference Include="Moq" Version="4.12.0" />
         <PackageReference Include="xunit" Version="2.4.1" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     </ItemGroup>
@@ -20,7 +20,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
         <ProjectReference Include="..\..\src\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
-        <ProjectReference Include="..\..\src\DotnetSpider.Postgre\DotnetSpider.Postgre.csproj" />
+        <ProjectReference Include="..\..\src\DotnetSpider.PostgreSql\DotnetSpider.PostgreSql.csproj" />
         <ProjectReference Include="..\..\src\DotnetSpider\DotnetSpider.csproj" />
     </ItemGroup>
 

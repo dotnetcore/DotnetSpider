@@ -56,6 +56,10 @@ namespace DotnetSpider.Core
 
 		public static NetworkCenter NetworkCenter;
 
+		public static int LimitedConcurrencyThread = 256;
+
+		public static LimitedConcurrencyThreadPool LimitedConcurrencyThreadPool;
+
 		static Framework()
 		{
 			var systemVersion = Environment.OSVersion.Version.ToString();
@@ -89,6 +93,8 @@ namespace DotnetSpider.Core
 				.Address.ToString();
 
 			OsDescription = $"{Environment.OSVersion.Platform} {Environment.OSVersion.Version}";
+
+			LimitedConcurrencyThreadPool = new LimitedConcurrencyThreadPool(LimitedConcurrencyThread);
 		}
 
 		public static long GetFreeMemory()

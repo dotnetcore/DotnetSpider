@@ -21,7 +21,6 @@ namespace DotnetSpider.Spiders
 		{
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
-			DownloaderSettings.Type = DownloaderType.HttpClient;
 			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
 			AddRequests(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
