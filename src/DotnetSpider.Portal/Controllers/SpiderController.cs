@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using DotnetSpider.Portal.Entity;
 using DotnetSpider.Portal.Models.Spider;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -77,8 +79,6 @@ namespace DotnetSpider.Portal.Controllers
 						Cron = dto.Cron,
 						Image = dto.Image,
 						Environment = dto.Environment,
-						Single = dto.Single,
-						Class = dto.Class,
 						CreationTime = DateTime.Now,
 						LastModificationTime = DateTime.Now
 					};
@@ -154,28 +154,17 @@ namespace DotnetSpider.Portal.Controllers
 		[HttpPost("spider/{id}/run")]
 		public async Task<IActionResult> Run(int id)
 		{
-			var item = await _dbContext.Spiders.FirstOrDefaultAsync(x => x.Id == id);
-			if (item != null)
+			try
 			{
-				try
-				{
-					await JobHelper.RunAsync(_options, _dbContext, id);
-					return Ok();
-				}
-				catch (Exception e)
-				{
-					_logger.LogError($"启动失败: {e}");
-					return StatusCode((int) HttpStatusCode.InternalServerError, new
-					{
-						e.Message
-					});
-				}
+				await JobHelper.RunAsync(_options, _dbContext, id);
+				return Ok();
 			}
-			else
+			catch (Exception e)
 			{
+				_logger.LogError($"启动失败: {e}");
 				return StatusCode((int) HttpStatusCode.InternalServerError, new
 				{
-					Message = "任务不存在"
+					e.Message
 				});
 			}
 		}

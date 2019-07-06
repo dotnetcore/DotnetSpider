@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Downloader;
+using DotnetSpider.DownloadAgent;
 using DotnetSpider.Network;
 using DotnetSpider.Network.InternetDetector;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,9 +20,9 @@ namespace DotnetSpider.Tests.Network
         {
             var services = new ServiceCollection();
             services.AddSingleton<NetworkCenter>();
-            services.AddSerilog();
-            services.ConfigureAppConfiguration(null, null, false);
-            services.AddScoped<IDownloaderAgentOptions, DownloaderAgentOptions>();
+            services.ConfigureAppConfiguration();
+            services.AddLogging();
+            services.AddScoped<DownloaderAgentOptions>();
             services.AddSingleton<IInternetDetector, DefaultInternetDetector>();
             services.AddSingleton<ILockerFactory, FileLockerFactory>();
             services.AddSingleton<IAdslRedialer, DefaultAdslRedialer>();

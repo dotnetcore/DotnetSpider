@@ -145,7 +145,7 @@ namespace DotnetSpider.Downloader
 				return;
 			}
 
-			ThreadCommonPool threadCommonPool = new ThreadCommonPool(4);
+			LimitedConcurrencyThreadPool threadCommonPool = new LimitedConcurrencyThreadPool(4);
 			while (!_isDispose)
 			{
 				if (_proxyQueue.Count < 50)

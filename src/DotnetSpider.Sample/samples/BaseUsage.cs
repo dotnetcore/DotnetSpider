@@ -1,8 +1,12 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
+using DotnetSpider.Kafka;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
@@ -10,21 +14,33 @@ namespace DotnetSpider.Sample.samples
 	{
 		public static Task Run()
 		{
-			var builder = new SpiderBuilder();
-			builder.AddSerilog();
-			builder.ConfigureAppConfiguration();
-			builder.UseStandalone();
-			builder.AddSpider<EntitySpider>();
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddKafkaEventBus();
+					//services.AddLocalDownloadCenter();
+//					services.AddDownloaderAgent(x =>
+//					{
+//						x.UseFileLocker();
+//						x.UseDefaultAdslRedialer();
+//						x.UseDefaultInternetDetector();
+//					});
+					//services.AddStatisticsCenter(x => x.UseMemory());
+				});
 			var provider = builder.Build();
 
 			var spider = provider.Create<Spider>();
 			spider.NewGuidId(); // 设置任务标识
 			spider.Name = "博客园全站采集"; // 设置任务名称
-			spider.Speed = 1; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
+			spider.Speed = 10; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
 			spider.Depth = 3; // 设置采集深度
-			spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
 			spider.AddDataFlow(new CnblogsDataParser()).AddDataFlow(new ConsoleStorage());
-			spider.AddRequests("http://www.cnblogs.com/"); // 设置起始链接
+			spider.AddRequests(new Request("http://www.cnblogs.com/", new Dictionary<string, string>
+			{
+				{"key1", "value1"}
+			})); // 设置起始链接
 			return spider.RunAsync(); // 启动
 		}
 
@@ -32,7 +48,7 @@ namespace DotnetSpider.Sample.samples
 		{
 			public CnblogsDataParser()
 			{
-				CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
+				RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
 				QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
 			}
 

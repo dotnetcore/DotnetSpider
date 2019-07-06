@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Net.Http;
 using DotnetSpider.Core;
 
 namespace DotnetSpider.Downloader
@@ -11,7 +9,7 @@ namespace DotnetSpider.Downloader
 	/// </summary>
 	public class Request
 	{
-		private readonly Dictionary<string, string> _properties = new Dictionary<string, string>();
+		public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
 
 		/// <summary>
 		/// 请求的 HASH 值
@@ -32,6 +30,16 @@ namespace DotnetSpider.Downloader
 		/// 链接的深度，用户不得修改
 		/// </summary>
 		public int Depth { get; set; }
+
+		/// <summary>
+		/// 下载器类别
+		/// </summary>
+		public DownloaderType DownloaderType { get; set; } = DownloaderType.HttpClient;
+
+		/// <summary>
+		/// 下载内容是否需要解码
+		/// </summary>
+		public bool DecodeHtml { get; set; }
 
 		/// <summary>
 		/// 请求链接
@@ -72,9 +80,44 @@ namespace DotnetSpider.Downloader
 		public string ContentType { get; set; }
 
 		/// <summary>
+		/// 是否使用代理
+		/// </summary>
+		public bool UseProxy { get; set; }
+
+		/// <summary>
+		/// 是否使用 Cookie
+		/// </summary>
+		public bool UseCookies { get; set; } = true;
+
+		/// <summary>
+		/// 是否自动跳转
+		/// </summary>
+		public bool AllowAutoRedirect { get; set; } = true;
+
+		/// <summary>
 		/// 设置 Cookie
 		/// </summary>
 		public string Cookie { get; set; }
+
+		/// <summary>
+		/// 下载超时
+		/// </summary>
+		public int Timeout { get; set; } = 6;
+
+		/// <summary>
+		/// 下载重试次数
+		/// </summary>
+		public int RetryTimes { get; set; } = 3;
+
+		/// <summary>
+		/// 已经重试的次数
+		/// </summary>
+		public int RetriedTimes { get; set; }
+		
+		/// <summary>
+		/// 是否使用 ADSL 下载器
+		/// </summary>
+		public bool UseAdsl { get; set; } = false;
 
 		/// <summary>
 		/// Headers
@@ -96,12 +139,7 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 请求的方法
 		/// </summary>
-		public HttpMethod Method { get; set; } = HttpMethod.Get;
-
-		/// <summary>
-		/// 已经重试的次数
-		/// </summary>
-		public int RetriedTimes { get; set; }
+		public string Method { get; set; } = "GET";
 
 		/// <summary>
 		/// 是否需要用压缩方法发送 Body
@@ -114,10 +152,10 @@ namespace DotnetSpider.Downloader
 		public DateTime CreationTime { get; set; }
 
 		/// <summary>
-		/// 获取当前请求的所有属性
+		/// 下载策略
 		/// </summary>
-		public IDictionary<string, string> GetProperties() => _properties.ToImmutableDictionary();
-
+		public DownloadPolicy DownloadPolicy { get; set; } = DownloadPolicy.Random;
+		
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -156,13 +194,13 @@ namespace DotnetSpider.Downloader
 				return;
 			}
 
-			if (_properties.ContainsKey(key))
+			if (Properties.ContainsKey(key))
 			{
-				_properties[key] = value;
+				Properties[key] = value;
 			}
 			else
 			{
-				_properties.Add(key, value);
+				Properties.Add(key, value);
 			}
 		}
 
@@ -190,7 +228,7 @@ namespace DotnetSpider.Downloader
 		/// <returns></returns>
 		public string GetProperty(string key)
 		{
-			return _properties.ContainsKey(key) ? _properties[key] : null;
+			return Properties.ContainsKey(key) ? Properties[key] : null;
 		}
 
 		/// <summary>
@@ -215,7 +253,7 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		public void Dispose()
 		{
-			_properties.Clear();
+			Properties.Clear();
 		}
 
 		/// <summary>

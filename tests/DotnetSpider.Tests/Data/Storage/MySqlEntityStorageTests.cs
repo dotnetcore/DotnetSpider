@@ -4,10 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
-using DotnetSpider.Data.Storage.Model;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.DataFlow.Storage.Model;
 using MySql.Data.MySqlClient;
 using Xunit;
 

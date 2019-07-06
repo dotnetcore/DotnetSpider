@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using DotnetSpider.Data;
+using DotnetSpider.DataFlow;
 
 namespace DotnetSpider.Core
 {

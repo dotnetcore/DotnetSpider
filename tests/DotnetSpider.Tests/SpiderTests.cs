@@ -1,16 +1,21 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.DataFlow.Storage.Mongo;
+using DotnetSpider.DataFlow.Storage.PostgreSql;
 using DotnetSpider.Downloader;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 using Xunit;
 
 namespace DotnetSpider.Tests
 {
 	public class SpiderTests : TestBase
 	{
-		class MyStorageOptions : ISpiderOptions
+		public class MyStorageOptions : SpiderOptions
 		{
 			public string ConnectionString { get; set; }
 			public string StorageConnectionString { get; set; }
@@ -36,6 +41,10 @@ namespace DotnetSpider.Tests
 			/// 单位: 秒
 			/// </summary>
 			public int NonRespondedTimeout { get; }
+
+			public MyStorageOptions() : base(null)
+			{
+			}
 		}
 
 		[Fact(DisplayName = "CreateDefaultStorage")]
@@ -43,7 +52,7 @@ namespace DotnetSpider.Tests
 		{
 			var options = new MyStorageOptions
 			{
-				Storage = "DotnetSpider.Data.Storage.SqlServerEntityStorage,DotnetSpider",
+				Storage = "DotnetSpider.DataFlow.Storage.SqlServerEntityStorage,DotnetSpider",
 				StorageType = StorageType.InsertAndUpdate,
 				StorageConnectionString = "ConnectionString",
 				StorageUseTransaction = true,
@@ -59,7 +68,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal(StorageType.InsertAndUpdate, storage1.StorageType);
 
 			// MySql
-			options.Storage = "DotnetSpider.Data.Storage.MySqlEntityStorage,DotnetSpider";
+			options.Storage = "DotnetSpider.DataFlow.Storage.MySqlEntityStorage,DotnetSpider";
 
 			var storage2 = (MySqlEntityStorage) Spider.GetDefaultStorage(options);
 			Assert.Equal("ConnectionString", storage2.ConnectionString);
@@ -69,7 +78,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal(StorageType.InsertAndUpdate, storage2.StorageType);
 
 			// MySqlFile
-			options.Storage = "DotnetSpider.Data.Storage.MySqlFileEntityStorage,DotnetSpider";
+			options.Storage = "DotnetSpider.DataFlow.Storage.MySqlFileEntityStorage,DotnetSpider";
 			options.MySqlFileType = "LoadFile";
 
 			var storage3 = (MySqlFileEntityStorage) Spider.GetDefaultStorage(options);
@@ -77,7 +86,8 @@ namespace DotnetSpider.Tests
 			Assert.Equal(MySqlFileType.LoadFile, storage3.MySqlFileType);
 
 			// PostgreSql
-			options.Storage = "DotnetSpider.Data.Storage.PostgreSqlEntityStorage,DotnetSpider.Postgre";
+			options.Storage =
+				"DotnetSpider.DataFlow.Storage.PostgreSql.PostgreSqlEntityStorage,DotnetSpider.PostgreSql";
 
 			var storage4 = (PostgreSqlEntityStorage) Spider.GetDefaultStorage(options);
 			Assert.Equal("ConnectionString", storage4.ConnectionString);
@@ -87,7 +97,7 @@ namespace DotnetSpider.Tests
 			Assert.Equal(StorageType.InsertAndUpdate, storage4.StorageType);
 
 			// Mongo
-			options.Storage = "DotnetSpider.Data.Storage.MongoEntityStorage,DotnetSpider.Mongo";
+			options.Storage = "DotnetSpider.DataFlow.Storage.Mongo.MongoEntityStorage,DotnetSpider.Mongo";
 			options.StorageConnectionString = "mongodb://mongodb0.example.com:27017/admin";
 
 			var storage5 = (MongoEntityStorage) Spider.GetDefaultStorage(options);
@@ -102,11 +112,9 @@ namespace DotnetSpider.Tests
 
 			spider.NewGuidId();
 			spider.Name = "RunAsyncAndStop";
-			spider.DownloaderSettings.Type = DownloaderType.Empty; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient 
-
 			for (int i = 0; i < 10000; i++)
 			{
-				spider.AddRequests(new Request(url + i));
+				spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
 			}
 
 			spider.RunAsync();
@@ -127,11 +135,10 @@ namespace DotnetSpider.Tests
 			spider.NewGuidId();
 			spider.Name = "RunAsyncAndStop";
 			spider.EmptySleepTime = 15;
-			spider.DownloaderSettings.Type = DownloaderType.Empty;
 
 			for (int i = 0; i < 10000; i++)
 			{
-				spider.AddRequests(new Request(url + i));
+				spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
 			}
 
 			spider.RunAsync();
@@ -157,11 +164,10 @@ namespace DotnetSpider.Tests
 			spider.MmfSignal = true;
 			spider.NewGuidId();
 			spider.Name = "MmfCloseSignal";
-			spider.DownloaderSettings.Type = DownloaderType.Empty;
 
 			for (int i = 0; i < 10000; i++)
 			{
-				spider.AddRequests(new Request(url + i));
+				spider.AddRequests(new Request(url + i) {DownloaderType = DownloaderType.Empty});
 			}
 
 			spider.RunAsync();
@@ -177,18 +183,20 @@ namespace DotnetSpider.Tests
 		/// 3. 重试的请求的 Depth 不变
 		/// </summary>
 		[Fact(DisplayName = "RetryDownloadTimes")]
-		public void RetryDownloadTimes()
+		public async Task RetryDownloadTimes()
 		{
 			var spider = SpiderProvider.Value.Create<Spider>();
 			spider.NewGuidId();
 			spider.Name = "RetryDownloadTimes";
-			spider.RetryDownloadTimes = 5;
 			spider.EmptySleepTime = 15;
-			spider.DownloaderSettings.Type = DownloaderType.Exception;
 			var scheduler = new QueueDistinctBfsScheduler();
 			spider.Scheduler = scheduler;
-			spider.AddRequests("http://www.RetryDownloadTimes.com");
-			spider.Run();
+			spider.AddRequests(new Request("http://www.RetryDownloadTimes.com")
+			{
+				DownloaderType = DownloaderType.Exception,
+				RetryTimes = 5
+			});
+			await spider.RunAsync();
 
 			var statisticsStore = SpiderProvider.Value.GetRequiredService<IStatisticsStore>();
 			var s = statisticsStore.GetSpiderStatisticsAsync(spider.Id).Result;
@@ -203,29 +211,42 @@ namespace DotnetSpider.Tests
 		}
 
 		[Fact(DisplayName = "DoNotRetryWhenResultIsEmpty")]
-		public void DoNotRetryWhenResultIsEmpty()
+		public async Task DoNotRetryWhenResultIsEmpty()
 		{
-			var builder = new SpiderBuilder();
-			builder.AddSerilog();
-			builder.ConfigureAppConfiguration(null, null, false);
-			builder.UseStandalone();
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddLocalEventBus();
+					services.AddLocalDownloadCenter();
+					services.AddDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddStatisticsCenter(x => x.UseMemory());
+				});
 			var provider = builder.Build();
 			var spider = provider.Create<Spider>();
 			spider.NewGuidId();
 			spider.Name = "RetryWhenResultIsEmpty";
 			spider.EmptySleepTime = 15;
-			spider.RetryDownloadTimes = 5;
 			spider.RetryWhenResultIsEmpty = false;
-			spider.DownloaderSettings.Type = DownloaderType.Empty;
 			spider.Scheduler = new QueueDistinctBfsScheduler();
-			spider.AddRequests("http://www.DoNotRetryWhenResultIsEmpty.com");
-			spider.RunAsync().Wait();
+			spider.AddRequests(new Request("http://www.DoNotRetryWhenResultIsEmpty.com")
+			{
+				DownloaderType = DownloaderType.Empty,
+				RetryTimes = 5
+			});
+			await spider.RunAsync();
 
 			var statisticsStore = provider.GetRequiredService<IStatisticsStore>();
 			var s = statisticsStore.GetSpiderStatisticsAsync(spider.Id).Result;
- 
+
 			var ds = statisticsStore.GetDownloadStatisticsListAsync(1, 10).Result[0];
- 
+
 			Assert.Equal(1, s.Total);
 			Assert.Equal(0, s.Failed);
 			Assert.Equal(1, s.Success);
@@ -242,20 +263,34 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "RetryWhenResultIsEmpty")]
 		public void RetryWhenResultIsEmpty()
 		{
-			var builder = new SpiderBuilder();
-			builder.AddSerilog();
-			builder.ConfigureAppConfiguration(null, null, false);
-			builder.UseStandalone();
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddLocalEventBus();
+					services.AddLocalDownloadCenter();
+					services.AddDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddStatisticsCenter(x => x.UseMemory());
+				});
+
 			var provider = builder.Build();
 			var spider = provider.Create<Spider>();
 			spider.NewGuidId();
 			spider.Name = "RetryWhenResultIsEmpty";
 			spider.EmptySleepTime = 15;
-			spider.RetryDownloadTimes = 5;
 			spider.RetryWhenResultIsEmpty = true;
-			spider.DownloaderSettings.Type = DownloaderType.Empty;
 			spider.Scheduler = new QueueDistinctBfsScheduler();
-			spider.AddRequests("http://www.RetryWhenResultIsEmpty.com");
+			spider.AddRequests(new Request("http://www.RetryWhenResultIsEmpty.com")
+			{
+				DownloaderType = DownloaderType.Empty,
+				RetryTimes = 5
+			});
 			spider.RunAsync().Wait();
 
 			var statisticsStore = provider.GetRequiredService<IStatisticsStore>();

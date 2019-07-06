@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.Downloader;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
@@ -13,11 +15,21 @@ namespace DotnetSpider.Sample.samples
         {
             ImageDownloader.GetInstance().Start();
 
-            var builder = new SpiderBuilder();
-            builder.AddSerilog();
-            builder.ConfigureAppConfiguration();
-            builder.UseStandalone();
-            builder.AddSpider<EntitySpider>();
+            var builder = new SpiderHostBuilder()
+	            .ConfigureLogging(x => x.AddSerilog())
+	            .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+	            .ConfigureServices(services =>
+	            {
+		            services.AddLocalEventBus();
+		            services.AddLocalDownloadCenter();
+		            services.AddDownloaderAgent(x =>
+		            {
+			            x.UseFileLocker();
+			            x.UseDefaultAdslRedialer();
+			            x.UseDefaultInternetDetector();
+		            });
+		            services.AddStatisticsCenter(x => x.UseMemory());
+	            }).Register<EntitySpider>();
             var provider = builder.Build();
             var spider = provider.Create<Spider>();
 
@@ -25,7 +37,6 @@ namespace DotnetSpider.Sample.samples
             spider.Name = "宅男女神图片采集"; // 设置任务名称
             spider.Speed = 2; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
             spider.Depth = 5; // 设置采集深度
-            spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
             //spider.AddDataFlow(new NvshensTagIndexDataParser());
             spider.AddDataFlow(new NvshensFirstPageTagDataParser());
             spider.AddDataFlow(new NvshensPageTagDataParser());
@@ -43,7 +54,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensTagIndexDataParser()
             {
-                CanParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/$");
+                RequireParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/$");
                 //Follow = XpathFollow(".");
             }
 
@@ -90,7 +101,7 @@ namespace DotnetSpider.Sample.samples
             public NvshensFirstPageTagDataParser()
             {
                 //CanParse = RegexCanParse("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/(((\\w)*\\/$)|(\\w*\\/\\d.html$))");
-                CanParse = DataParserHelper.CanParseByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/(\\w)*\\/$");
+                RequireParse = DataParserHelper.CanParseByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/(\\w)*\\/$");
             }
 
             protected override Task<DataFlowResult> Parse(DataFlowContext context)
@@ -116,7 +127,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensPageTagDataParser()
             {
-                CanParse = DataParserHelper.CanParseByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/\\w*\\/\\d+.html$");
+                RequireParse = DataParserHelper.CanParseByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/\\w*\\/\\d+.html$");
                 //Follow = XpathFollow(".");
             }
 
@@ -142,7 +153,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensFirstPageDetailDataParser()
             {
-                CanParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w+\\/\\d*\\/$");
+                RequireParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w+\\/\\d*\\/$");
                 //Follow = XpathFollow(".");
             }
 
@@ -162,7 +173,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensPageDetailDataParser()
             {
-                CanParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w\\/\\d*\\/\\d+.html$");
+                RequireParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w\\/\\d*\\/\\d+.html$");
                 //Follow = XpathFollow(".");
             }
 

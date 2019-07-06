@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DotnetSpider.Sample.samples;
+using Serilog;
+using Serilog.Events;
 
 
 namespace DotnetSpider.Sample
@@ -9,16 +11,22 @@ namespace DotnetSpider.Sample
 	{
 		static async Task Main(string[] args)
 		{
-			// await BaseUsage.Run();
+			var	configure = new LoggerConfiguration()
+#if DEBUG
+				.MinimumLevel.Verbose()
+#else
+				.MinimumLevel.Information()
+#endif
+				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+				.Enrich.FromLogContext()
+				.WriteTo.Console().WriteTo
+				.RollingFile("dotnet-spider.log");
+			Log.Logger = configure.CreateLogger();
+			
+			await BaseUsage.Run();
 
-			await DistributedSpider.Run(); 
+			// await DistributedSpider.Run(); 
 			Console.Read();
-		}
-
-		static Task Write(string msg)
-		{
-			Console.WriteLine(msg);
-			return Task.CompletedTask;
 		}
 	}
 }

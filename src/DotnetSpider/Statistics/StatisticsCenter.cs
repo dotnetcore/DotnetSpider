@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Statistics
@@ -11,22 +11,22 @@ namespace DotnetSpider.Statistics
 	/// </summary>
 	public class StatisticsCenter : IStatisticsCenter
 	{
-		private bool _isRunning;
-
-		private readonly IMessageQueue _mq;
+		private readonly IEventBus _eventBus;
 		private readonly ILogger _logger;
 		private readonly IStatisticsStore _statisticsStore;
 
+		public bool IsRunning { get; private set; }
+		
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="mq">消息队列接口</param>
+		/// <param name="eventBus">消息队列接口</param>
 		/// <param name="statisticsStore">统计存储接口</param>
 		/// <param name="logger">日志接口</param>
-		public StatisticsCenter(IMessageQueue mq, IStatisticsStore statisticsStore,
+		public StatisticsCenter(IEventBus eventBus, IStatisticsStore statisticsStore,
 			ILogger<StatisticsCenter> logger)
 		{
-			_mq = mq;
+			_eventBus = eventBus;
 			_statisticsStore = statisticsStore;
 			_logger = logger;
 		}
@@ -39,14 +39,14 @@ namespace DotnetSpider.Statistics
 		/// <exception cref="SpiderException"></exception>
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
-			if (_isRunning)
+			if (IsRunning)
 			{
 				throw new SpiderException("统计中心正在运行中");
 			}
 
 			await _statisticsStore.EnsureDatabaseAndTableCreatedAsync();
 			_logger.LogInformation("统计中心准备数据库完成");
-			_mq.Subscribe(Framework.StatisticsServiceTopic, async message =>
+			_eventBus.Subscribe(Framework.StatisticsServiceTopic, async message =>
 			{
 				var commandMessage = message.ToCommandMessage();
 				if (commandMessage == null)
@@ -113,6 +113,7 @@ namespace DotnetSpider.Statistics
 				}
 			});
 
+			IsRunning = true;
 			_logger.LogInformation("统计中心启动");
 		}
 
@@ -123,14 +124,10 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
-			_mq.Unsubscribe(Framework.StatisticsServiceTopic);
-			_isRunning = false;
+			_eventBus.Unsubscribe(Framework.StatisticsServiceTopic);
+			IsRunning = false;
 			_logger.LogInformation("统计中心退出");
-#if NETFRAMEWORK
-            return DotnetSpider.Core.Framework.CompletedTask;
-#else
 			return Task.CompletedTask;
-#endif
 		}
 	}
 }

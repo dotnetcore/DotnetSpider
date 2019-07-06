@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.Downloader;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Logging;
@@ -21,7 +20,6 @@ namespace DotnetSpider.Sample.samples
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
 			Depth = 3;
-			DownloaderSettings.Type = DownloaderType.HttpClient;
 			AddDataFlow(new DatabaseSpiderDataParser()).AddDataFlow(GetDefaultStorage());
 			AddRequests(
 					new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> { { "网站", "博客园" } }),
@@ -56,7 +54,7 @@ namespace DotnetSpider.Sample.samples
 			}
 		}
 
-		public DatabaseSpider(IMessageQueue mq, IStatisticsService statisticsService, ISpiderOptions options, ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
+		public DatabaseSpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options, ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
 		{
 		}
 	}

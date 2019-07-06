@@ -1,18 +1,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.Downloader.Entity;
 using MySql.Data.MySqlClient;
 using Dapper;
 using DotnetSpider.Core;
+using DotnetSpider.DownloadAgentRegisterCenter;
+using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 
 namespace DotnetSpider.Downloader.Internal
 {
 	public class MySqlDownloaderAgentStore : IDownloaderAgentStore
 	{
-		private readonly ISpiderOptions _options;
+		private readonly SpiderOptions _options;
 
-		public MySqlDownloaderAgentStore(ISpiderOptions options)
+		public MySqlDownloaderAgentStore(SpiderOptions options)
 		{
 			_options = options;
 		}
@@ -37,7 +38,7 @@ namespace DotnetSpider.Downloader.Internal
 			}
 		}
 
-		public async Task<List<DownloaderAgent>> GetAllListAsync()
+		public async Task<IEnumerable<DownloaderAgent>> GetAllListAsync()
 		{
 			using (var conn = new MySqlConnection(_options.ConnectionString))
 			{
@@ -47,15 +48,15 @@ namespace DotnetSpider.Downloader.Internal
 			}
 		}
 
-		public async Task<List<DownloaderAgentAllocate>> GetAllocatedListAsync(string ownerId)
-		{
-			using (var conn = new MySqlConnection(_options.ConnectionString))
-			{
-				return (await conn.QueryAsync<DownloaderAgentAllocate>(
-					$"SELECT owner_id as OwnerId, agent_id as AgentId, id FROM dotnetspider.downloader_agent_allocate WHERE owner_id = @OwnerId",
-					new {OwnerId = ownerId})).ToList();
-			}
-		}
+//		public async Task<List<DownloaderAgentAllocate>> GetAllocatedListAsync(string ownerId)
+//		{
+//			using (var conn = new MySqlConnection(_options.ConnectionString))
+//			{
+//				return (await conn.QueryAsync<DownloaderAgentAllocate>(
+//					$"SELECT owner_id as OwnerId, agent_id as AgentId, id FROM dotnetspider.downloader_agent_allocate WHERE owner_id = @OwnerId",
+//					new {OwnerId = ownerId})).ToList();
+//			}
+//		}
 
 		public async Task RegisterAsync(DownloaderAgent agent)
 		{

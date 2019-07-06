@@ -16,7 +16,6 @@
     <div class="box">
         <div class="box-header">
             <div class="box-title">
-                &ensp;
             </div>
             <div class="box-tools">
                 <a class="btn btn-default btn-sm btn-flat" href="/spider/add">添加</a>
@@ -29,11 +28,10 @@
                 <tr>
                     <th>标识</th>
                     <th>名称</th>
-                    <th>Class</th>
-                    <th>CRON</th>
                     <th>镜像</th>
+                    <th>环境变量</th>
                     <th>运行参数</th>
-                    <th>单一实例</th>
+                    <th>CRON</th>
                     <th>更新时间</th>
                     <th>操作</th>
                 </tr>
@@ -57,19 +55,16 @@
                                 <span>@item.Name</span>
                             </td>
                             <td>
-                                <span>@item.Class</span>
-                            </td>
-                            <td>
-                                <span>@item.Cron</span>
-                            </td>
-                            <td>
                                 <span>@item.Image</span>
                             </td>
                             <td>
                                 <span>@item.Environment</span>
                             </td>
                             <td>
-                                <span>@item.Single</span>
+                                <span>@item.Arguments</span>
+                            </td>
+                            <td>
+                                <span>@item.Cron</span>
                             </td>
                             <td>
                                 <span>@item.LastModificationTime</span>

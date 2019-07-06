@@ -27,8 +27,8 @@ namespace DotnetSpider.Portal.Entity
 		/// </summary>
 		[Required]
 		[StringLength(400)]
-		[Column("class")]
-		public string Class { get; set; }
+		[Column("type")]
+		public string Type { get; set; }
 		
 		/// <summary>
 		/// 
@@ -44,6 +44,10 @@ namespace DotnetSpider.Portal.Entity
 		[StringLength(255)]
 		[Column("environment")]
 		public string Environment { get; set; }
+		
+		[StringLength(255)]
+		[Column("arguments")]
+		public string Arguments { get; set; }
 
 		/// <summary>
 		/// 
@@ -52,11 +56,6 @@ namespace DotnetSpider.Portal.Entity
 		[Required]
 		[Column("image")]
 		public string Image { get; set; }
-		
-		/// <summary>
-		/// 
-		/// </summary>
-		public bool Single { get; set; }
 
 		/// <summary>
 		/// Creation time of this entity.

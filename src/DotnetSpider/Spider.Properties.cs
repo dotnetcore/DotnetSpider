@@ -2,10 +2,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
+using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
-using DotnetSpider.MessageQueue;
-using DotnetSpider.RequestSupply;
+using DotnetSpider.EventBus;
+using DotnetSpider.RequestSupplier;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Logging;
@@ -17,12 +17,11 @@ namespace DotnetSpider
 		private readonly List<Request> _requests = new List<Request>();
 
 		private readonly List<IDataFlow> _dataFlows = new List<IDataFlow>();
-		private readonly IMessageQueue _mq;
+		private readonly IEventBus _eventBus;
 		private readonly ILogger _logger;
 		private readonly IStatisticsService _statisticsService;
-		private readonly List<IRequestSupply> _requestSupplies = new List<IRequestSupply>();
+		private readonly List<IRequestSupplier> _requestSupplies = new List<IRequestSupplier>();
 		private readonly List<Action<Request>> _configureRequestDelegates = new List<Action<Request>>();
-		private readonly AtomicInteger _allocated = new AtomicInteger(0);
 		private readonly AtomicInteger _enqueued = new AtomicInteger(0);
 		private readonly AtomicInteger _responded = new AtomicInteger(0);
 
@@ -32,7 +31,6 @@ namespace DotnetSpider
 		private DateTime _lastRequestedTime;
 		private IScheduler _scheduler;
 		private int _emptySleepTime = 30;
-		private int _retryDownloadTimes = 5;
 		private int _statisticsInterval = 5;
 		private double _speed = 1;
 		private int _speedControllerInterval = 1000;
@@ -41,13 +39,7 @@ namespace DotnetSpider
 		private string _id;
 		private bool _retryWhenResultIsEmpty;
 		private bool _mmfSignal;
-		private bool _allocatedSuccess;
-
-		/// <summary>
-		/// 下载器配置
-		/// </summary>
-		public DownloaderSettings DownloaderSettings { get; set; } = new DownloaderSettings();
-
+		
 		/// <summary>
 		/// 遍历深度
 		/// </summary>
@@ -203,25 +195,6 @@ namespace DotnetSpider
 		/// 任务名称
 		/// </summary>
 		public string Name { get; set; }
-
-		/// <summary>
-		/// 下载重试次数
-		/// </summary>
-		/// <exception cref="SpiderException"></exception>
-		public int RetryDownloadTimes
-		{
-			get => _retryDownloadTimes;
-			set
-			{
-				if (value <= 0)
-				{
-					throw new SpiderException("下载重试次数必须大于 0");
-				}
-
-				CheckIfRunning();
-				_retryDownloadTimes = value;
-			}
-		}
 
 		/// <summary>
 		/// 等待一定时间，如果队列中没有新的请求则认为任务结束

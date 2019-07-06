@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace DockerClient
 {
 	public class DockerResult

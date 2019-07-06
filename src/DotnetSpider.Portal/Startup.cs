@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using Dapper;
+using DotnetSpider.Core;
 using DotnetSpider.Kafka;
 using DotnetSpider.Portal.Core;
 using Microsoft.AspNetCore.Builder;
@@ -28,12 +29,10 @@ namespace DotnetSpider.Portal
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddDotnetSpider(builder =>
-			{
-				builder.UserKafka();
-				builder.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
-				builder.AddSpiderStatisticsCenter(x => x.UseMemory());
-			});
+			services.AddScoped<SpiderOptions>();
+			services.AddKafkaEventBus();
+			services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
+			services.AddStatisticsCenter(x => x.UseMySql());
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 

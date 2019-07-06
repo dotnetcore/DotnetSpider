@@ -1,26 +1,46 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Parser.Attribute;
-using DotnetSpider.Data.Parser.Formatter;
-using DotnetSpider.Data.Storage.Model;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Parser.Attribute;
+using DotnetSpider.DataFlow.Parser.Formatter;
+using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Downloader;
-using DotnetSpider.MessageQueue;
+using DotnetSpider.EventBus;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Selector;
 using DotnetSpider.Statistics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
 	public class EntitySpider : Spider
 	{
-		public static void Run()
+		public static Task Run()
 		{
-			var spider = Create<EntitySpider>();
-			spider.RunAsync();
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddLocalEventBus();
+					services.AddLocalDownloadCenter();
+					services.AddDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddStatisticsCenter(x => x.UseMemory());
+				}).Register<EntitySpider>();
+			var provider = builder.Build();
+			var spider = provider.Create<EntitySpider>();
+			return spider.RunAsync();
 		}
 
 
@@ -30,8 +50,7 @@ namespace DotnetSpider.Sample.samples
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
 			Depth = 3;
-			DownloaderSettings.Type = DownloaderType.HttpClient;
-			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
+			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(new SqlServerEntityStorage(StorageType.InsertIgnoreDuplicate,"Data Source=.;Initial Catalog=master;User Id=sa;Password='1qazZAQ!'"));
 			AddRequests(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
@@ -83,7 +102,7 @@ namespace DotnetSpider.Sample.samples
 			public DateTime CreationTime { get; set; }
 		}
 
-		public EntitySpider(IMessageQueue mq, IStatisticsService statisticsService, ISpiderOptions options,
+		public EntitySpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options,
 			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
 		{
 		}

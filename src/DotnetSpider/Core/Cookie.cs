@@ -1,4 +1,4 @@
-using DotnetSpider.Data;
+using DotnetSpider.DataFlow;
 
 namespace DotnetSpider.Core
 {

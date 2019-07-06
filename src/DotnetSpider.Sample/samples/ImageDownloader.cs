@@ -4,8 +4,9 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using DotnetSpider.Downloader;
 
-namespace DotnetSpider.Downloader
+namespace DotnetSpider.Sample.samples
 {
     /// <summary>
     /// 图片下载
@@ -47,7 +48,7 @@ namespace DotnetSpider.Downloader
                     return true;
                 }
 
-                HttpClient.DefaultRequestHeaders.Referrer = new Uri(request.GetProperties()["referer"]);
+                HttpClient.DefaultRequestHeaders.Referrer = new Uri(request.Properties["referer"]);
                 var content = await HttpClient.GetByteArrayAsync(request.Url);
                 FileStream fs = new FileStream(savePath, FileMode.CreateNew);
                 fs.Write(content, 0, content.Length);
@@ -90,8 +91,8 @@ namespace DotnetSpider.Downloader
 
         private async Task<Boolean> DownloadImage(Request request)
         {
-            string tag = request.GetProperties()["tag"];
-            string subject = request.GetProperties()["subject"];
+            string tag = request.Properties["tag"];
+            string subject = request.Properties["subject"];
             string fileUrl = request.Url;
             string filePath = GetImagePath(tag, subject, fileUrl);
             await DownloadAsync(request, filePath);

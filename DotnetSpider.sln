@@ -7,13 +7,11 @@ ProjectSection(SolutionItems) = preProject
 	DESIGN.md = DESIGN.md
 	.editorconfig = .editorconfig
 	.gitignore = .gitignore
-	LICENSE = LICENSE
+	LICENSE.txt = LICENSE.txt
 	README.md = README.md
 	runtests.sh = runtests.sh
 	azure-pipelines.yml = azure-pipelines.yml
 EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Portal", "src\DotnetSpider.Portal\DotnetSpider.Portal.csproj", "{F0693338-09F0-43D2-9DAF-59BB323EF0B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Tests", "tests\DotnetSpider.Tests\DotnetSpider.Tests.csproj", "{32A4F6B5-0377-4353-BF06-A0E7328CBB9C}"
 EndProject
@@ -27,15 +25,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Mongo", "src\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Kafka", "src\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj", "{AC87EA41-A0EF-4FCD-8230-5CAA76BEC847}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Postgre", "src\DotnetSpider.Postgre\DotnetSpider.Postgre.csproj", "{62069E7E-47BE-467F-87CA-233555C5C45E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.PostgreSql", "src\DotnetSpider.PostgreSql\DotnetSpider.PostgreSql.csproj", "{62069E7E-47BE-467F-87CA-233555C5C45E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloaderAgent", "src\DotnetSpider.DownloaderAgent\DotnetSpider.DownloaderAgent.csproj", "{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloadCenter", "src\DotnetSpider.DownloadCenter\DotnetSpider.DownloadCenter.csproj", "{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloadAgentRegisterCenter", "src\DotnetSpider.DownloadAgentRegisterCenter\DotnetSpider.DownloadAgentRegisterCenter.csproj", "{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DockerClient", "src\DockerClient\DockerClient.csproj", "{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Spiders", "src\DotnetSpider.Spiders\DotnetSpider.Spiders.csproj", "{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Portal", "src\DotnetSpider.Portal\DotnetSpider.Portal.csproj", "{7D557A90-B217-4182-8FEB-ECFEEB7C2838}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +47,6 @@ Global
 		{2479A45A-4592-4AF4-8115-E615CF34CC98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2479A45A-4592-4AF4-8115-E615CF34CC98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2479A45A-4592-4AF4-8115-E615CF34CC98}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F0693338-09F0-43D2-9DAF-59BB323EF0B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F0693338-09F0-43D2-9DAF-59BB323EF0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F0693338-09F0-43D2-9DAF-59BB323EF0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F0693338-09F0-43D2-9DAF-59BB323EF0B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -91,6 +87,10 @@ Global
 		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D557A90-B217-4182-8FEB-ECFEEB7C2838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D557A90-B217-4182-8FEB-ECFEEB7C2838}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D557A90-B217-4182-8FEB-ECFEEB7C2838}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D557A90-B217-4182-8FEB-ECFEEB7C2838}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C} = {31B052DB-A9AA-49F5-AE8C-1660546A8903}

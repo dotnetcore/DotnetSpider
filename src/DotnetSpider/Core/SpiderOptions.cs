@@ -1,5 +1,5 @@
 using System;
-using DotnetSpider.Data.Storage;
+using DotnetSpider.DataFlow.Storage;
 using Microsoft.Extensions.Configuration;
 
 namespace DotnetSpider.Core
@@ -7,7 +7,7 @@ namespace DotnetSpider.Core
 	/// <summary>
 	/// 任务选项
 	/// </summary>
-	public class SpiderOptions : ISpiderOptions
+	public class SpiderOptions
 	{
 		private readonly IConfiguration _configuration;
 

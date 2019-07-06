@@ -1,10 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using DotnetSpider.Core;
-using DotnetSpider.Data;
-using DotnetSpider.Data.Parser;
-using DotnetSpider.Data.Storage;
-using DotnetSpider.Downloader;
+using DotnetSpider.DataFlow;
+using DotnetSpider.DataFlow.Parser;
+using DotnetSpider.DataFlow.Storage;
+using DotnetSpider.DataFlow.Storage.Mongo;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
@@ -12,10 +14,22 @@ namespace DotnetSpider.Sample.samples
     {
         public static void Run1()
         {
-            var builder = new SpiderBuilder();
-            builder.AddSerilog();
-            builder.ConfigureAppConfiguration();
-            builder.UseStandalone();
+	        var builder = new SpiderHostBuilder()
+		        .ConfigureLogging(x => x.AddSerilog())
+		        .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+		        .ConfigureServices(services =>
+		        {
+			        services.AddLocalEventBus();
+			        services.AddLocalDownloadCenter();
+			        services.AddDownloaderAgent(x =>
+			        {
+				        x.UseFileLocker();
+				        x.UseDefaultAdslRedialer();
+				        x.UseDefaultInternetDetector();
+			        });
+			        services.AddStatisticsCenter(x => x.UseMemory());
+		        });
+	        
             var provider = builder.Build();
             var spider = provider.Create<Spider>();
 
@@ -23,11 +37,10 @@ namespace DotnetSpider.Sample.samples
             spider.Name = "博客园全站采集"; // 设置任务名称
             spider.Speed = 1; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
             spider.Depth = 3; // 设置采集深度
-            spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
             spider.AddDataFlow(new DataParser
             {
                 SelectableFactory = context => context.GetSelectable(ContentType.Html),
-                CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com"),
+                RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com"),
                 QueryFollowRequests =  DataParserHelper.QueryFollowRequestsByXPath(".")
             }).AddDataFlow(new ConsoleStorage()); // 控制台打印采集结果
             spider.AddRequests("http://www.cnblogs.com/"); // 设置起始链接
@@ -36,19 +49,28 @@ namespace DotnetSpider.Sample.samples
 
         public static Task Run2()
         {
-            var builder = new SpiderBuilder();
-            builder.AddSerilog();
-            builder.ConfigureAppConfiguration();
-            builder.UseStandalone();
-            builder.AddSpider<EntitySpider>();
-            var provider = builder.Build();
+	        var builder = new SpiderHostBuilder()
+		        .ConfigureLogging(x => x.AddSerilog())
+		        .ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+		        .ConfigureServices(services =>
+		        {
+			        services.AddLocalEventBus();
+			        services.AddLocalDownloadCenter();
+			        services.AddDownloaderAgent(x =>
+			        {
+				        x.UseFileLocker();
+				        x.UseDefaultAdslRedialer();
+				        x.UseDefaultInternetDetector();
+			        });
+			        services.AddStatisticsCenter(x => x.UseMemory());
+		        }).Register<EntitySpider>();
+	        var provider = builder.Build();
             var spider = provider.Create<Spider>();
             spider.Id = Guid.NewGuid().ToString("N"); // 设置任务标识
             spider.Name = "博客园全站采集"; // 设置任务名称
             spider.Speed = 1; // 设置采集速度, 表示每秒下载多少个请求, 大于 1 时越大速度越快, 小于 1 时越小越慢, 不能为0.
             spider.Depth = 3; // 设置采集深度
-            spider.DownloaderSettings.Type = DownloaderType.HttpClient; // 使用普通下载器, 无关 Cookie, 干净的 HttpClient
-            var options = provider.GetRequiredService<ISpiderOptions>();
+            var options = provider.GetRequiredService<SpiderOptions>();
             spider.AddDataFlow(new CnblogsDataParser()).AddDataFlow(new MongoEntityStorage(options.StorageConnectionString));
             spider.AddRequests("http://www.cnblogs.com/"); // 设置起始链接
             return spider.RunAsync(); // 启动
@@ -58,7 +80,7 @@ namespace DotnetSpider.Sample.samples
         {
             public CnblogsDataParser()
             {
-                CanParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
+                RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
                 QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
             }
 
