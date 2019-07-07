@@ -11,10 +11,14 @@ namespace DotnetSpider.DataFlow.Storage.Model
         public string Type { get; set; }
         public int Length { get; set; }
         public bool Required { get; set; }
-        
-        /// <summary>
-        /// 属性反射，用于设置解析值到实体对象
-        /// </summary>
-        public PropertyInfo PropertyInfo { get; set; }
+
+		public Column(int length = 255)
+		{
+			Length = length;
+		}
+		/// <summary>
+		/// 属性反射，用于设置解析值到实体对象
+		/// </summary>
+		public PropertyInfo PropertyInfo { get; set; }
     }
 }
