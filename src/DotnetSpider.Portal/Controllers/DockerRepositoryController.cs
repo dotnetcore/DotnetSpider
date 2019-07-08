@@ -37,17 +37,23 @@ namespace DotnetSpider.Portal.Controllers
 			var items = await _dbContext.DockerRepositories.Where(x =>
 				x.Name == dto.Name || x.Repository == dto.Repository).ToListAsync();
 
+			var valid = true;
 			if (items.Any(x => x.Name == dto.Name))
 			{
 				ModelState.AddModelError("Name", "名称已经存在");
+				valid = false;
 			}
 
-			if (items.Any(x => x.Repository == dto.Repository))
+			if (items.Any(x => x.Repository == dto.Repository && x.Registry == dto.Registry))
 			{
 				ModelState.AddModelError("Repository", "镜像仓储已经存在");
+				if (valid)
+				{
+					valid = false;
+				}
 			}
 
-			if (items.Any())
+			if (!valid)
 			{
 				return View("Add", dto);
 			}
@@ -56,7 +62,7 @@ namespace DotnetSpider.Portal.Controllers
 				var repository = new DockerRepository
 				{
 					Name = dto.Name,
-					Registry = new Uri(dto.Registry).AbsoluteUri,
+					Registry = string.IsNullOrWhiteSpace(dto.Registry) ? null : new Uri(dto.Registry).AbsoluteUri,
 					Repository = dto.Repository,
 					UserName = dto.UserName,
 					Password = dto.Password,

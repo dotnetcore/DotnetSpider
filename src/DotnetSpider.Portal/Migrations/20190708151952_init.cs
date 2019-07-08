@@ -15,7 +15,7 @@ namespace DotnetSpider.Portal.Migrations
                     id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     name = table.Column<string>(maxLength: 255, nullable: false),
-                    registry = table.Column<string>(maxLength: 255, nullable: false),
+                    registry = table.Column<string>(maxLength: 255, nullable: true),
                     repository = table.Column<string>(maxLength: 255, nullable: false),
                     user_name = table.Column<string>(maxLength: 255, nullable: true),
                     password = table.Column<string>(maxLength: 255, nullable: true),
@@ -37,7 +37,7 @@ namespace DotnetSpider.Portal.Migrations
                     cron = table.Column<string>(maxLength: 255, nullable: false),
                     environment = table.Column<string>(maxLength: 255, nullable: true),
                     arguments = table.Column<string>(maxLength: 255, nullable: true),
-                    registry = table.Column<string>(maxLength: 255, nullable: false),
+                    registry = table.Column<string>(maxLength: 255, nullable: true),
                     repository = table.Column<string>(maxLength: 255, nullable: false),
                     tag = table.Column<string>(maxLength: 255, nullable: false),
                     creation_time = table.Column<DateTime>(nullable: false),

@@ -15,7 +15,6 @@ namespace DotnetSpider.Portal.Models.DockerRepository
 		/// registry.cn-shanghai.aliyuncs.com
 		/// </summary>
 		[StringLength(255)]
-		[Required]
 		public string Registry { get; set; }
 
 		/// <summary>

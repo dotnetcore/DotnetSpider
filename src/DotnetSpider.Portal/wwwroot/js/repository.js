@@ -4,7 +4,7 @@ function remove(id) {
         type: "warning",
         showCancelButton: true
     }, function () {
-        app.delete("/repository/" + id, function () {
+        app.delete("/docker-repository/" + id, function () {
             window.location.reload();
         }, function () {
             swal('Error', 'Delete failed', "error");

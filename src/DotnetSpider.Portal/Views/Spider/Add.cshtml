@@ -28,7 +28,6 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Repository</label>
-                            <span asp-validation-for="Repository" class="text-danger"></span>
                             <input readonly="readonly" asp-for="Repository" class="form-control" autocomplete="false" type="text"/>
                             <span asp-validation-for="Repository" class="text-danger"></span>
                         </div>
@@ -36,12 +35,19 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Tag</label>
-                            <select asp-for="Tag" class="form-control select2" style="width: 100%;">
-                                @foreach (var r in Model.Tags)
-                                {
-                                    <option value="@r">@r</option>
-                                }
-                            </select>
+                            @if (Model.Tags != null && Model.Tags.Count > 0)
+                            {
+                                <select asp-for="Tag" class="form-control select2" style="width: 100%;">
+                                    @foreach (var r in Model.Tags)
+                                    {
+                                        <option value="@r">@r</option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <input asp-for="Tag" class="form-control" autocomplete="false" type="text"/>
+                            }
                             <span asp-validation-for="Tag" class="text-danger"></span>
                         </div>
                     </div>

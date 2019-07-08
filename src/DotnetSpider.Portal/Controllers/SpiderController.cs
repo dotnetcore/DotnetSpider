@@ -38,15 +38,25 @@ namespace DotnetSpider.Portal.Controllers
 		public async Task<IActionResult> Add(string repository)
 		{
 			var viewModel = new AddSpiderViewModel();
-			var dockerRepository = await _dbContext.DockerRepositories.FirstAsync(x =>
+
+			var dockerRepository = await _dbContext.DockerRepositories.FirstOrDefaultAsync(x =>
 				$"{x.Registry}{x.Repository}".Replace("http://", "").Replace("https://", "") == repository);
 
-			var httpClient = Common.HttpClientFactory.GetHttpClient(dockerRepository.Registry,
-				dockerRepository.UserName, dockerRepository.Password);
-			var json = await httpClient.GetStringAsync(
-				$"{dockerRepository.Registry}v2/{dockerRepository.Repository}/tags/list");
-			var repositoryTags = JsonConvert.DeserializeObject<RepositoryTags>(json);
-			viewModel.Tags = repositoryTags.Tags;
+			if (dockerRepository == null)
+			{
+				throw new Exception("镜像仓库不存在");
+			}
+
+			if (!string.IsNullOrWhiteSpace(dockerRepository.Registry))
+			{
+				var httpClient = Common.HttpClientFactory.GetHttpClient(dockerRepository.Registry,
+					dockerRepository.UserName, dockerRepository.Password);
+				var json = await httpClient.GetStringAsync(
+					$"{dockerRepository.Registry}v2/{dockerRepository.Repository}/tags/list");
+				var repositoryTags = JsonConvert.DeserializeObject<RepositoryTags>(json);
+				viewModel.Tags = repositoryTags.Tags;
+			}
+
 			return View(viewModel);
 		}
 
@@ -66,7 +76,7 @@ namespace DotnetSpider.Portal.Controllers
 				ModelState.AddModelError("Name", "名称已经存在");
 			}
 
-			var dockerRepository = await _dbContext.DockerRepositories.FirstAsync(x =>
+			var dockerRepository = await _dbContext.DockerRepositories.FirstOrDefaultAsync(x =>
 				$"{x.Registry}{x.Repository}".Replace("http://", "").Replace("https://", "") == dto.Repository);
 			if (dockerRepository == null)
 			{
@@ -106,7 +116,7 @@ namespace DotnetSpider.Portal.Controllers
 					var id = spider.Id.ToString();
 					var trigger = TriggerBuilder.Create().WithCronSchedule(dto.Cron).WithIdentity(id).Build();
 					var qzJob = JobBuilder.Create<TriggerJob>().WithIdentity(id).WithDescription(spider.Name)
-						.RequestRecovery(true)
+						.RequestRecovery(true).StoreDurably(true)
 						.Build();
 					await _sched.ScheduleJob(qzJob, trigger);
 					//transaction.Commit();

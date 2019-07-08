@@ -12,6 +12,7 @@ namespace DotnetSpider.Portal.Common
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public static HttpClient GetHttpClient(string name, string user, string password)
 		{
+			name = string.IsNullOrWhiteSpace(name) ? "default" : name;
 			if (!_httpClients.ContainsKey(name))
 			{
 				var httpClient = new HttpClient(new SocketsHttpHandler

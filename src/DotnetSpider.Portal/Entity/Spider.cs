@@ -56,7 +56,6 @@ namespace DotnetSpider.Portal.Entity
 		/// docker 镜像仓库地址
 		/// </summary>
 		[StringLength(255)]
-		[Required]
 		[Column("registry")]
 		public string Registry { get; set; }
 		

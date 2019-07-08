@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
@@ -13,13 +14,6 @@ namespace DotnetSpider.Portal
 	{
 		public static async Task Main(string[] args)
 		{
-			DockerClient client = new DockerClientConfiguration(
-					new Uri("http://localhost:4243"))
-				.CreateClient();
-			var a = await client.Containers.ListContainersAsync(new ContainersListParameters());
-
-			// docker run --name {id} --label  {image} {arguments}
-
 			var loggerConfiguration = new LoggerConfiguration()
 #if DEBUG
 				.MinimumLevel.Verbose()
