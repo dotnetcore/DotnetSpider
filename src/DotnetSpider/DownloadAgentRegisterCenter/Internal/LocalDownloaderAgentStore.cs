@@ -2,10 +2,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotnetSpider.DownloadAgentRegisterCenter;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 
-namespace DotnetSpider.Downloader.Internal
+namespace DotnetSpider.DownloadAgentRegisterCenter.Internal
 {
 	/// <summary>
 	/// 本地下载器代理存储

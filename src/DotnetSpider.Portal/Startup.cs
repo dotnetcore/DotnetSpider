@@ -4,7 +4,7 @@ using System.Reflection;
 using Dapper;
 using DotnetSpider.Core;
 using DotnetSpider.Kafka;
-using DotnetSpider.Portal.Core;
+using DotnetSpider.Portal.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;

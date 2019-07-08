@@ -17,15 +17,14 @@
         <PackageIconUrl>https://github.com/dotnetcore/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
         <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider</RepositoryUrl>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <AssemblyName>DotnetSpider.DownloadAgentRegisterCenter</AssemblyName>
         <RootNamespace>DotnetSpider.DownloadAgentRegisterCenter</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
-        <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
+        <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj"/>
-        <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj"/>
+        <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
+        <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
     </ItemGroup>
 
     <ItemGroup>

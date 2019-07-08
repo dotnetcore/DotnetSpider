@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using DotnetSpider.Portal.Entity;
 using DotnetSpider.Portal.Models.Spider;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Quartz;
 using X.PagedList;
 
@@ -17,12 +19,13 @@ namespace DotnetSpider.Portal.Controllers
 	{
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
-		private readonly Quartz.IScheduler _sched;
+		private readonly IScheduler _sched;
 		private readonly PortalOptions _options;
+		private static HttpClient _httpClient;
 
 		public SpiderController(PortalDbContext dbContext,
 			PortalOptions options,
-			Quartz.IScheduler sched,
+			IScheduler sched,
 			ILogger<SpiderController> logger)
 		{
 			_logger = logger;
@@ -32,9 +35,19 @@ namespace DotnetSpider.Portal.Controllers
 		}
 
 		[HttpGet("spider/add")]
-		public IActionResult Add()
+		public async Task<IActionResult> Add(string repository)
 		{
-			return View();
+			var viewModel = new AddSpiderViewModel();
+			var dockerRepository = await _dbContext.DockerRepositories.FirstAsync(x =>
+				$"{x.Registry}{x.Repository}".Replace("http://", "").Replace("https://", "") == repository);
+
+			var httpClient = Common.HttpClientFactory.GetHttpClient(dockerRepository.Registry,
+				dockerRepository.UserName, dockerRepository.Password);
+			var json = await httpClient.GetStringAsync(
+				$"{dockerRepository.Registry}v2/{dockerRepository.Repository}/tags/list");
+			var repositoryTags = JsonConvert.DeserializeObject<RepositoryTags>(json);
+			viewModel.Tags = repositoryTags.Tags;
+			return View(viewModel);
 		}
 
 
@@ -43,7 +56,7 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				return View("Add", dto);
+				return await Add(dto.Repository);
 			}
 
 			var exists = await _dbContext.Spiders.AnyAsync(x =>
@@ -53,10 +66,12 @@ namespace DotnetSpider.Portal.Controllers
 				ModelState.AddModelError("Name", "名称已经存在");
 			}
 
-			var imageExists = await _dbContext.DockerImages.AnyAsync(x => x.Image == dto.Image);
-			if (!imageExists)
+			var dockerRepository = await _dbContext.DockerRepositories.FirstAsync(x =>
+				$"{x.Registry}{x.Repository}".Replace("http://", "").Replace("https://", "") == dto.Repository);
+			if (dockerRepository == null)
 			{
-				ModelState.AddModelError("Image", "镜像不存在");
+				ModelState.AddModelError("Repository", "镜像仓库不存在");
+				return await Add(dto.Repository);
 			}
 
 			try
@@ -70,39 +85,43 @@ namespace DotnetSpider.Portal.Controllers
 
 			if (ModelState.IsValid)
 			{
-				var transaction = await _dbContext.Database.BeginTransactionAsync();
+				// var transaction = await _dbContext.Database.BeginTransactionAsync();
 				try
 				{
 					var spider = new Portal.Entity.Spider
 					{
 						Name = dto.Name,
 						Cron = dto.Cron,
-						Image = dto.Image,
+						Type = dto.Type,
+						Registry = dockerRepository.Registry,
+						Repository = dto.Repository,
 						Environment = dto.Environment,
-						CreationTime = DateTime.Now,
-						LastModificationTime = DateTime.Now
+						Tag = dto.Tag,
+						Arguments = dto.Arguments,
+						CreationTime = DateTime.Now
 					};
 					_dbContext.Spiders.Add(spider);
 					await _dbContext.SaveChangesAsync();
+
 					var id = spider.Id.ToString();
 					var trigger = TriggerBuilder.Create().WithCronSchedule(dto.Cron).WithIdentity(id).Build();
 					var qzJob = JobBuilder.Create<TriggerJob>().WithIdentity(id).WithDescription(spider.Name)
 						.RequestRecovery(true)
 						.Build();
 					await _sched.ScheduleJob(qzJob, trigger);
-					transaction.Commit();
+					//transaction.Commit();
 				}
 				catch (Exception e)
 				{
 					_logger.LogError($"添加任务失败: {e}");
-					try
-					{
-						transaction.Rollback();
-					}
-					catch (Exception re)
-					{
-						_logger.LogError($"回滚添加任务失败: {re}");
-					}
+//					try
+//					{
+//						transaction.Rollback();
+//					}
+//					catch (Exception re)
+//					{
+//						_logger.LogError($"回滚添加任务失败: {re}");
+//					}
 
 					ModelState.AddModelError(string.Empty, "添加任务失败");
 					return View("Add", dto);
@@ -156,7 +175,7 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			try
 			{
-				await JobHelper.RunAsync(_options, _dbContext, id);
+				await _sched.TriggerJob(new JobKey(id.ToString()));
 				return Ok();
 			}
 			catch (Exception e)

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Docker.DotNet;
+using Docker.DotNet.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
@@ -11,8 +13,10 @@ namespace DotnetSpider.Portal
 	{
 		public static async Task Main(string[] args)
 		{
-			DockerClient.DockerClient client = new DockerClient.DockerClient(
-				new Uri("http://localhost:2376"));
+			DockerClient client = new DockerClientConfiguration(
+					new Uri("http://localhost:4243"))
+				.CreateClient();
+			var a = await client.Containers.ListContainersAsync(new ContainersListParameters());
 
 			// docker run --name {id} --label  {image} {arguments}
 

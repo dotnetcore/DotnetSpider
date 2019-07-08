@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Security.Claims;
 using System.Security.Principal;
 
-namespace DotnetSpider.Portal.Core
+namespace DotnetSpider.Portal.Common
 {
 	/// <summary>
 	/// Extension methods for <see cref="System.Security.Principal.IPrincipal"/> and <see cref="System.Security.Principal.IIdentity"/> .

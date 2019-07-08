@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using DotnetSpider.Portal.Core;
+using Docker.DotNet;
+using DotnetSpider.Portal.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;

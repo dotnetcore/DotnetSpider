@@ -16,39 +16,63 @@
             @await Html.PartialAsync("_ValidationSummary")
             <div class="box-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label>Name</label>
                             <input asp-for="Name" class="form-control" autocomplete="false" type="text"/>
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label>Class</label>
-                            <input asp-for="Class" class="form-control" autocomplete="false" type="text"/>
-                            <span asp-validation-for="Class" class="text-danger"></span>
+                            <label>Repository</label>
+                            <span asp-validation-for="Repository" class="text-danger"></span>
+                            <input readonly="readonly" asp-for="Repository" class="form-control" autocomplete="false" type="text"/>
+                            <span asp-validation-for="Repository" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Tag</label>
+                            <select asp-for="Tag" class="form-control select2" style="width: 100%;">
+                                @foreach (var r in Model.Tags)
+                                {
+                                    <option value="@r">@r</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Tag" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label>Cron</label>
                             <input asp-for="Cron" class="form-control" autocomplete="false" type="text"/>
                             <span asp-validation-for="Cron" class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label>Image</label>
-                            <input asp-for="Image" class="form-control" autocomplete="false" type="text"/>
-                            <span asp-validation-for="Image" class="text-danger"></span>
+                            <label>Type</label>
+                            <input asp-for="Type" class="form-control" autocomplete="false" type="text"/>
+                            <span asp-validation-for="Type" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Arguments</label>
+                            <input asp-for="Arguments" class="form-control" autocomplete="false" type="text"/>
+                            <span asp-validation-for="Arguments" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <label>Environment</label>
                             <input asp-for="Environment" class="form-control" autocomplete="false" type="text"/>
@@ -56,17 +80,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Single</label>
-                            <select asp-for="Single" class="form-control select2" style="width: 100%;">
-                                <option value="True" selected="selected">True</option>
-                                <option value="False">False</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
@@ -82,6 +96,10 @@
     <script>
         $(function() {
             app.activeMenu('Repository');
-        })
+        });
+        function chooseRepository() {
+          let repository=$('#Repository').val();
+          window.location.href='?repository='+repository;
+        }
     </script>
 }

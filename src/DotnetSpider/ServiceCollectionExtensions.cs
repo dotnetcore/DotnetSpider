@@ -3,7 +3,7 @@ using DotnetSpider.Core;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DownloadAgent;
 using DotnetSpider.DownloadAgentRegisterCenter;
-using DotnetSpider.Downloader.Internal;
+using DotnetSpider.DownloadAgentRegisterCenter.Internal;
 using DotnetSpider.EventBus;
 using DotnetSpider.Network;
 using DotnetSpider.Network.InternetDetector;
@@ -64,7 +64,7 @@ namespace DotnetSpider
 
 		#endregion
 
-		#region  EventbUS
+		#region  EventBus
 
 		public static IServiceCollection AddLocalEventBus(this IServiceCollection services)
 		{

@@ -17,6 +17,7 @@ namespace DotnetSpider.Portal.Entity
 		/// 
 		/// </summary>
 		[Column("spider_id")]
+		[Required]
 		public int SpiderId { get; set; }
 
 		/// <summary>
@@ -30,10 +31,14 @@ namespace DotnetSpider.Portal.Entity
 		/// 创建时间
 		/// </summary>
 		[Column("creation_time")]
+		[Required]
 		public DateTime CreationTime { get; set; }
 
+		[Column("status")]
+		[StringLength(20)]
+		[Required]
 		public string Status { get; set; }
-
+		
 		/// <summary>
 		/// 退出时间
 		/// </summary>

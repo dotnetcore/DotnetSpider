@@ -42,6 +42,22 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>UserName</label>
+                            <input asp-for="UserName" class="form-control" autocomplete="false" type="text"/>
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input asp-for="Password" class="form-control" autocomplete="false" type="text"/>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">

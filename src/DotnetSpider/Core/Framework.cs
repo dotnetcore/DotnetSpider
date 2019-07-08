@@ -24,7 +24,6 @@ namespace DotnetSpider.Core
 				{"-n", "name"},
 				{"-i", "id"},
 				{"-a", "args"},
-				{"-d", "distribute"},
 				{"-c", "config"},
 				{"-l", "local"}
 			};

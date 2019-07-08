@@ -9,21 +9,6 @@ namespace DotnetSpider.Portal.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "docker_image",
-                columns: table => new
-                {
-                    id = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    repository_id = table.Column<int>(nullable: false),
-                    image = table.Column<string>(maxLength: 255, nullable: false),
-                    creation_time = table.Column<DateTime>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_docker_image", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "docker_repository",
                 columns: table => new
                 {
@@ -32,6 +17,8 @@ namespace DotnetSpider.Portal.Migrations
                     name = table.Column<string>(maxLength: 255, nullable: false),
                     registry = table.Column<string>(maxLength: 255, nullable: false),
                     repository = table.Column<string>(maxLength: 255, nullable: false),
+                    user_name = table.Column<string>(maxLength: 255, nullable: true),
+                    password = table.Column<string>(maxLength: 255, nullable: true),
                     creation_time = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
@@ -46,11 +33,13 @@ namespace DotnetSpider.Portal.Migrations
                     id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     name = table.Column<string>(maxLength: 255, nullable: false),
-                    @class = table.Column<string>(name: "class", maxLength: 400, nullable: false),
+                    type = table.Column<string>(maxLength: 400, nullable: false),
                     cron = table.Column<string>(maxLength: 255, nullable: false),
                     environment = table.Column<string>(maxLength: 255, nullable: true),
-                    image = table.Column<string>(maxLength: 255, nullable: false),
-                    Single = table.Column<bool>(nullable: false),
+                    arguments = table.Column<string>(maxLength: 255, nullable: true),
+                    registry = table.Column<string>(maxLength: 255, nullable: false),
+                    repository = table.Column<string>(maxLength: 255, nullable: false),
+                    tag = table.Column<string>(maxLength: 255, nullable: false),
                     creation_time = table.Column<DateTime>(nullable: false),
                     last_modification_time = table.Column<DateTime>(nullable: false)
                 },
@@ -68,19 +57,13 @@ namespace DotnetSpider.Portal.Migrations
                     spider_id = table.Column<int>(nullable: false),
                     container_id = table.Column<string>(maxLength: 100, nullable: true),
                     creation_time = table.Column<DateTime>(nullable: false),
-                    Status = table.Column<string>(nullable: true),
+                    status = table.Column<string>(maxLength: 20, nullable: false),
                     exit_time = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_spider_container", x => x.id);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_docker_image_image",
-                table: "docker_image",
-                column: "image",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_docker_repository_creation_time",
@@ -105,14 +88,14 @@ namespace DotnetSpider.Portal.Migrations
                 column: "creation_time");
 
             migrationBuilder.CreateIndex(
-                name: "IX_spider_image",
-                table: "spider",
-                column: "image");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_spider_name",
                 table: "spider",
                 column: "name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_spider_repository",
+                table: "spider",
+                column: "repository");
 
             migrationBuilder.CreateIndex(
                 name: "IX_spider_container_container_id",
@@ -127,9 +110,6 @@ namespace DotnetSpider.Portal.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "docker_image");
-
             migrationBuilder.DropTable(
                 name: "docker_repository");
 

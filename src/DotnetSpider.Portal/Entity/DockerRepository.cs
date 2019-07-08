@@ -22,13 +22,13 @@ namespace DotnetSpider.Portal.Entity
 		public string Name { get; set; }
 
 		/// <summary>
-		/// registry.cn-shanghai.aliyuncs.com
+		/// http://registry.cn-shanghai.aliyuncs.com/
 		/// </summary>
 		[StringLength(255)]
 		[Required]
 		[Column("registry")]
 		public string Registry { get; set; }
-		
+
 		/// <summary>
 		/// zlzforever/ids4admin
 		/// </summary>
@@ -37,11 +37,19 @@ namespace DotnetSpider.Portal.Entity
 		[Column("repository")]
 		public string Repository { get; set; }
 
+		[Column("user_name")]
+		[StringLength(255)]
+		public string UserName { get; set; }
+
+		[Column("password")]
+		[StringLength(255)]
+		public string Password { get; set; }
+
 		/// <summary>
 		/// Creation time of this entity.
 		/// </summary>
 		[Required]
 		[Column("creation_time")]
-		public DateTime CreationTime { get; set; }			
+		public DateTime CreationTime { get; set; }
 	}
 }

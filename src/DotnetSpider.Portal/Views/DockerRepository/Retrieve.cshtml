@@ -58,6 +58,8 @@
                             </td>
                             <td>
                                 <a class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</a>
+
+                                <a class="btn btn-default btn-sm  btn-flat" href="/spider/add?repository=@(item.Registry.Replace("http://", "").Replace("https://", "") + item.Repository)">Create</a>
                             </td>
                         </tr>
                     }
@@ -66,7 +68,7 @@
                 </tbody>
             </table>
         </div>
-        <!-- /.box-body --> 
+        <!-- /.box-body -->
     </div>
     <!-- /.box -->
 </div>

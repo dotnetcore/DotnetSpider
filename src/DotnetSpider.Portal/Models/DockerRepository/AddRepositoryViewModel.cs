@@ -24,5 +24,11 @@ namespace DotnetSpider.Portal.Models.DockerRepository
 		[StringLength(255)]
 		[Required]
 		public string Repository { get; set; }
+		
+		[StringLength(255)]
+		public string UserName { get; set; }
+		
+		[StringLength(255)]
+		public string Password { get; set; }
 	}
 }

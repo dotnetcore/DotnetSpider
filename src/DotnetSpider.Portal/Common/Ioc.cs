@@ -1,6 +1,6 @@
 using System;
 
-namespace DotnetSpider.Portal.Core
+namespace DotnetSpider.Portal.Common
 {
 	public static class Ioc
 	{

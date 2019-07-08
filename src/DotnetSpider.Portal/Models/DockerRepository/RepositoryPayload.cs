@@ -1,6 +1,6 @@
 using System;
 
-namespace DotnetSpider.Portal.Models.Docker
+namespace DotnetSpider.Portal.Models.DockerRepository
 {
 //	{
 //	"Repository": {
