@@ -1,3 +1,7 @@
+$(function () {
+    app.activeMenu('Repository');
+});
+
 function remove(id) {
     swal({
         title: "确定要删除此镜像仓储吗?",

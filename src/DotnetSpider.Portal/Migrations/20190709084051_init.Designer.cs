@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotnetSpider.Portal.Migrations
 {
     [DbContext(typeof(PortalDbContext))]
-    [Migration("20190708151952_init")]
+    [Migration("20190709084051_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("DotnetSpider.Portal.Entity.DockerRepository", b =>
@@ -46,6 +46,10 @@ namespace DotnetSpider.Portal.Migrations
                         .HasColumnName("repository")
                         .HasMaxLength(255);
 
+                    b.Property<string>("Schema")
+                        .HasColumnName("schema")
+                        .HasMaxLength(10);
+
                     b.Property<string>("UserName")
                         .HasColumnName("user_name")
                         .HasMaxLength(255);
@@ -57,7 +61,7 @@ namespace DotnetSpider.Portal.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.HasIndex("Repository")
+                    b.HasIndex("Repository", "Registry")
                         .IsUnique();
 
                     b.ToTable("docker_repository");
@@ -68,10 +72,6 @@ namespace DotnetSpider.Portal.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
-
-                    b.Property<string>("Arguments")
-                        .HasColumnName("arguments")
-                        .HasMaxLength(255);
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnName("creation_time");
@@ -118,8 +118,6 @@ namespace DotnetSpider.Portal.Migrations
 
                     b.HasIndex("Name");
 
-                    b.HasIndex("Repository");
-
                     b.ToTable("spider");
                 });
 
@@ -128,6 +126,10 @@ namespace DotnetSpider.Portal.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
+
+                    b.Property<string>("Batch")
+                        .HasColumnName("batch")
+                        .HasMaxLength(100);
 
                     b.Property<string>("ContainerId")
                         .HasColumnName("container_id")
@@ -149,9 +151,11 @@ namespace DotnetSpider.Portal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContainerId");
+                    b.HasIndex("Batch");
 
                     b.HasIndex("CreationTime");
+
+                    b.HasIndex("SpiderId");
 
                     b.ToTable("spider_container");
                 });

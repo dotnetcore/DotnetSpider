@@ -18,7 +18,7 @@
             <div class="box-title">
             </div>
             <div class="box-tools">
-                <a class="btn btn-default btn-sm btn-flat" href="/spider/add">添加</a>
+
             </div>
         </div>
         <!-- /.box-header -->
@@ -28,10 +28,11 @@
                 <tr>
                     <th>标识</th>
                     <th>名称</th>
-                    <th>镜像</th>
-                    <th>环境变量</th>
-                    <th>运行参数</th>
+                    <th>Registry</th>
+                    <th>Repostory</th>
+                    <th>Tag</th>
                     <th>CRON</th>
+                    <th>Environment</th>
                     <th>更新时间</th>
                     <th>操作</th>
                 </tr>
@@ -55,23 +56,30 @@
                                 <span>@item.Name</span>
                             </td>
                             <td>
-                                <span>@($"{item.Repository}:{item.Tag}")</span>
+                                <span>@item.Registry</span>
                             </td>
                             <td>
-                                <span>@item.Environment</span>
+                                <span>@item.Repository</span>
                             </td>
                             <td>
-                                <span>@item.Arguments</span>
+                                <span>@item.Tag</span>
                             </td>
                             <td>
                                 <span>@item.Cron</span>
                             </td>
                             <td>
+                                <span>@item.Environment</span>
+                            </td>
+
+                            <td>
                                 <span>@item.LastModificationTime</span>
                             </td>
                             <td>
-                                <a class="btn btn-default btn-sm  btn-flat" onclick="run('@item.Id')">Run</a>
-                                <a class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</a>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id">View</a>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/create?registry=@(item.Registry)&repository=@(item.Repository)">From</a>
+                                <button class="btn btn-default btn-sm  btn-flat" onclick="run('@item.Id')">Run</button>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id/containers">History</a>
+                                <button class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</button>
                             </td>
                         </tr>
                     }
@@ -107,9 +115,4 @@
     <environment names="Staging,Production">
         <script src="~/js/spider.min.js" asp-append-version="true"></script>
     </environment>
-    <script>
-        $(function() {
-            app.activeMenu('Spider');
-        })
-    </script>
 }

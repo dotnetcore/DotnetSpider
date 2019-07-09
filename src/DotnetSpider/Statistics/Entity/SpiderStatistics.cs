@@ -20,7 +20,7 @@ namespace DotnetSpider.Statistics.Entity
 		/// </summary>
 		[Key]
 		[Column("owner_id")]
-		public int OwnerId { get; set; }
+		public string OwnerId { get; set; }
 
 		/// <summary>
 		/// 爬虫启动时间
@@ -72,6 +72,12 @@ namespace DotnetSpider.Statistics.Entity
 			_success.Inc();
 		}
 
+		/// <summary>
+		/// 上一次更新时间
+		/// </summary>
+		[Column("last_modification_time")]
+		public DateTime LastModificationTime { get; set; }
+		
 		/// <summary>
 		/// 添加指定的失败次数
 		/// </summary>

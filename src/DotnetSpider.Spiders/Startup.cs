@@ -13,7 +13,7 @@ namespace DotnetSpider.Spiders
 	{
 		protected override List<string> DetectAssemblies()
 		{
-			return new List<string> { };
+			return new List<string> {};
 		}
 
 		protected override void ConfigureService(IConfiguration configuration, SpiderHostBuilder builder)

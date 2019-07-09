@@ -1,12 +1,9 @@
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DotnetSpider.Portal.Models.SpiderContainer
 {
 	public class ListSpiderContainerViewModel
 	{
-		public int Id { get; set; }
-
 		/// <summary>
 		/// 
 		/// </summary>
@@ -17,17 +14,14 @@ namespace DotnetSpider.Portal.Models.SpiderContainer
 		/// </summary>
 		public string ContainerId { get; set; }
 
+		public string Batch { get; set; }
+		
 		public string Status { get; set; }
 
 		/// <summary>
 		/// 创建时间
 		/// </summary>
 		public DateTime CreationTime { get; set; }
-
-		/// <summary>
-		/// 退出时间
-		/// </summary>
-		public DateTime? ExitTime { get; set; }
 
 		public DateTime? Start { get; set; }
 

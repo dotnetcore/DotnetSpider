@@ -64,22 +64,6 @@ namespace DotnetSpider
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 		}
 
-//		/// <summary>
-//		/// 创建爬虫对象
-//		/// </summary>
-//		/// <typeparam name="T"></typeparam>
-//		/// <returns></returns>
-//		public static T Create<T>() where T : Spider
-//		{
-//			var builder = new SpiderHost();
-//			builder.AddSerilog();
-//			builder.ConfigureAppConfiguration();
-//			builder.UseStandalone();
-//			builder.AddSpider<T>();
-//			var factory = builder.Build();
-//			return factory.Create<T>();
-//		}
-
 		/// <summary>
 		/// 设置 Id 为 Guid
 		/// </summary>

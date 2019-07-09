@@ -1,4 +1,4 @@
-@model DotnetSpider.Portal.Models.Spider.AddSpiderViewModel
+@model DotnetSpider.Portal.Models.Spider.ViewSpiderModel
 
 @section breadcrumb{
     <li >
@@ -12,7 +12,7 @@
 
 <div class="col-xs-12">
     <div class="box">
-        <form action="/spider/add" method="post">
+        <form action="/spider/@Model.Id" method="post">
             @await Html.PartialAsync("_ValidationSummary")
             <div class="box-body">
                 <div class="row">
@@ -23,8 +23,29 @@
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Cron</label>
+                            <input asp-for="Cron" class="form-control" autocomplete="false" type="text"/>
+                            <span asp-validation-for="Cron" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <input asp-for="Type" class="form-control" autocomplete="false" type="text"/>
+                            <span asp-validation-for="Type" class="text-danger"></span>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Registry</label>
+                            <input readonly="readonly" asp-for="Registry" class="form-control" autocomplete="false" type="text"/>
+                            <span asp-validation-for="Registry" class="text-danger"></span>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Repository</label>
@@ -53,29 +74,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Cron</label>
-                            <input asp-for="Cron" class="form-control" autocomplete="false" type="text"/>
-                            <span asp-validation-for="Cron" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Type</label>
-                            <input asp-for="Type" class="form-control" autocomplete="false" type="text"/>
-                            <span asp-validation-for="Type" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>Arguments</label>
-                            <input asp-for="Arguments" class="form-control" autocomplete="false" type="text"/>
-                            <span asp-validation-for="Arguments" class="text-danger"></span>
-                        </div>
-                    </div>
+
                 </div>
                 <div class="row">
                     <div class="col-md-12">
@@ -101,11 +100,7 @@
 {
     <script>
         $(function() {
-            app.activeMenu('Repository');
+            app.activeMenu('Spider');
         });
-        function chooseRepository() {
-          let repository=$('#Repository').val();
-          window.location.href='?repository='+repository;
-        }
     </script>
 }

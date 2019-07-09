@@ -1,7 +1,6 @@
 using DotnetSpider.EventBus;
 using DotnetSpider.Network;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace DotnetSpider.DownloadAgent
 {

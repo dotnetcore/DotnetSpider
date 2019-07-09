@@ -106,8 +106,12 @@ namespace DotnetSpider.Statistics
 					{
 						var ownerId = commandMessage.Message;
 						var statistics = await _statisticsStore.GetSpiderStatisticsAsync(ownerId);
-						_logger.LogInformation(
-							$"任务 {ownerId} 总计 {statistics.Total}, 成功 {statistics.Success}, 失败 {statistics.Failed}, 剩余 {statistics.Total - statistics.Success - statistics.Failed}");
+						if (statistics != null)
+						{
+							_logger.LogInformation(
+								$"任务 {ownerId} 总计 {statistics.Total}, 成功 {statistics.Success}, 失败 {statistics.Failed}, 剩余 {statistics.Total - statistics.Success - statistics.Failed}");
+						}
+
 						break;
 					}
 				}

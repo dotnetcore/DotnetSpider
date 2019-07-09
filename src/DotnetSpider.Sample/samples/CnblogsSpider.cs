@@ -4,7 +4,6 @@ using DotnetSpider.Core;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.Downloader;
 using DotnetSpider.EventBus;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;

@@ -1,3 +1,7 @@
+$(function () {
+    app.activeMenu('Spider');
+});
+
 function remove(id) {
     swal({
         title: "Sure to remove this spider?",
@@ -13,7 +17,7 @@ function remove(id) {
 }
 
 function run(id) {
-    app.post("/spider/" + id + "/run", function () {
+    app.post("/spider/" + id + "/run", null, function () {
         window.location.reload();
     }, null, function (result) {
         swal('Error', result.message, "error");

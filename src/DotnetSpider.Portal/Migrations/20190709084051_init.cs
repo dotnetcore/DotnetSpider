@@ -15,6 +15,7 @@ namespace DotnetSpider.Portal.Migrations
                     id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     name = table.Column<string>(maxLength: 255, nullable: false),
+                    schema = table.Column<string>(maxLength: 10, nullable: true),
                     registry = table.Column<string>(maxLength: 255, nullable: true),
                     repository = table.Column<string>(maxLength: 255, nullable: false),
                     user_name = table.Column<string>(maxLength: 255, nullable: true),
@@ -36,7 +37,6 @@ namespace DotnetSpider.Portal.Migrations
                     type = table.Column<string>(maxLength: 400, nullable: false),
                     cron = table.Column<string>(maxLength: 255, nullable: false),
                     environment = table.Column<string>(maxLength: 255, nullable: true),
-                    arguments = table.Column<string>(maxLength: 255, nullable: true),
                     registry = table.Column<string>(maxLength: 255, nullable: true),
                     repository = table.Column<string>(maxLength: 255, nullable: false),
                     tag = table.Column<string>(maxLength: 255, nullable: false),
@@ -56,6 +56,7 @@ namespace DotnetSpider.Portal.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     spider_id = table.Column<int>(nullable: false),
                     container_id = table.Column<string>(maxLength: 100, nullable: true),
+                    batch = table.Column<string>(maxLength: 100, nullable: true),
                     creation_time = table.Column<DateTime>(nullable: false),
                     status = table.Column<string>(maxLength: 20, nullable: false),
                     exit_time = table.Column<DateTime>(nullable: true)
@@ -77,9 +78,9 @@ namespace DotnetSpider.Portal.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_docker_repository_repository",
+                name: "IX_docker_repository_repository_registry",
                 table: "docker_repository",
-                column: "repository",
+                columns: new[] { "repository", "registry" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -93,19 +94,19 @@ namespace DotnetSpider.Portal.Migrations
                 column: "name");
 
             migrationBuilder.CreateIndex(
-                name: "IX_spider_repository",
-                table: "spider",
-                column: "repository");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_spider_container_container_id",
+                name: "IX_spider_container_batch",
                 table: "spider_container",
-                column: "container_id");
+                column: "batch");
 
             migrationBuilder.CreateIndex(
                 name: "IX_spider_container_creation_time",
                 table: "spider_container",
                 column: "creation_time");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_spider_container_spider_id",
+                table: "spider_container",
+                column: "spider_id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

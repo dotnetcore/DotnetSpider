@@ -77,19 +77,19 @@ namespace DotnetSpider
 		#region DownloaderAgent
 
 		public static IServiceCollection AddDownloaderAgent(this IServiceCollection services,
-			Action<DownloadAgentBuilder> configure = null)
+			Action<DownloaderAgentBuilder> configure = null)
 		{
 			services.AddSingleton<IHostedService, DefaultDownloaderAgent>();
 			services.AddSingleton<NetworkCenter>();
 			services.AddScoped<DownloaderAgentOptions>();
 
-			DownloadAgentBuilder spiderAgentBuilder = new DownloadAgentBuilder(services);
+			DownloaderAgentBuilder spiderAgentBuilder = new DownloaderAgentBuilder(services);
 			configure?.Invoke(spiderAgentBuilder);
 
 			return services;
 		}
 
-		public static DownloadAgentBuilder UseFileLocker(this DownloadAgentBuilder builder)
+		public static DownloaderAgentBuilder UseFileLocker(this DownloaderAgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 
@@ -98,7 +98,7 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static DownloadAgentBuilder UseDefaultAdslRedialer(this DownloadAgentBuilder builder)
+		public static DownloaderAgentBuilder UseDefaultAdslRedialer(this DownloaderAgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 
@@ -107,7 +107,7 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static DownloadAgentBuilder UseDefaultInternetDetector(this DownloadAgentBuilder builder)
+		public static DownloaderAgentBuilder UseDefaultInternetDetector(this DownloaderAgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 
@@ -116,7 +116,7 @@ namespace DotnetSpider
 			return builder;
 		}
 
-		public static DownloadAgentBuilder UseVpsInternetDetector(this DownloadAgentBuilder builder)
+		public static DownloaderAgentBuilder UseVpsInternetDetector(this DownloaderAgentBuilder builder)
 		{
 			Check.NotNull(builder, nameof(builder));
 

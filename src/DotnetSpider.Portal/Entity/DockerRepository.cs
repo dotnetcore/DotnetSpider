@@ -22,7 +22,14 @@ namespace DotnetSpider.Portal.Entity
 		public string Name { get; set; }
 
 		/// <summary>
-		/// http://registry.cn-shanghai.aliyuncs.com/ 允许为空，表示本地镜像
+		/// http:// or https://
+		/// </summary>
+		[Column("schema")]
+		[StringLength(10)]
+		public string Schema { get; set; }
+		
+		/// <summary>
+		/// registry.cn-shanghai.aliyuncs.com/ 允许为空，表示本地镜像
 		/// </summary>
 		[StringLength(255)]
 		[Column("registry")]

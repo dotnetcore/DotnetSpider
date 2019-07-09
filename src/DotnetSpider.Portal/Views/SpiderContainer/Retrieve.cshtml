@@ -27,10 +27,12 @@
             <table class="table table-bordered">
                 <tbody>
                 <tr>
+                    <th>Container</th>
                     <th>Status</th>
                     <th>Total</th>
                     <th>Success</th>
                     <th>Failed</th>
+                    <th>CreationTime</th>
                     <th>Start</th>
                     <th>Exit</th>
                 </tr>
@@ -48,6 +50,9 @@
                     {
                         <tr >
                             <td>
+                                <span>@item.ContainerId</span>
+                            </td>
+                            <td>
                                 <span>@item.Status</span>
                             </td>
                             <td>
@@ -58,6 +63,9 @@
                             </td>
                             <td>
                                 <span>@item.Failed</span>
+                            </td>
+                            <td>
+                                <span>@item.CreationTime</span>
                             </td>
                             <td>
                                 <span>@item.Start</span>

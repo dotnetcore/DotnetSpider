@@ -12,7 +12,7 @@ namespace DotnetSpider.Portal
 		private readonly bool _isDesignTime;
 
 		public DbSet<DockerRepository> DockerRepositories { get; set; }
-		
+
 		public DbSet<Entity.Spider> Spiders { get; set; }
 
 		public DbSet<SpiderContainer> SpiderContainers { get; set; }
@@ -41,14 +41,14 @@ namespace DotnetSpider.Portal
 			}
 
 			builder.Entity<DockerRepository>().HasIndex(x => x.Name).IsUnique();
-			builder.Entity<DockerRepository>().HasIndex(x => x.Repository).IsUnique();
+			builder.Entity<DockerRepository>().HasIndex(x => new {x.Repository, x.Registry}).IsUnique();
 			builder.Entity<DockerRepository>().HasIndex(x => x.CreationTime);
-			
+
 			builder.Entity<Entity.Spider>().HasIndex(x => x.Name);
 			builder.Entity<Entity.Spider>().HasIndex(x => x.CreationTime);
-			builder.Entity<Entity.Spider>().HasIndex(x => x.Repository);
 
-			builder.Entity<SpiderContainer>().HasIndex(x => x.ContainerId);
+			builder.Entity<SpiderContainer>().HasIndex(x => x.Batch);
+			builder.Entity<SpiderContainer>().HasIndex(x => x.SpiderId);
 			builder.Entity<SpiderContainer>().HasIndex(x => x.CreationTime);
 		}
 

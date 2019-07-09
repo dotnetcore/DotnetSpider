@@ -26,7 +26,7 @@ namespace DotnetSpider.Portal.Controllers
 			return View();
 		}
 
-		[HttpPost("docker-repository/add")]
+		[HttpPost("docker-repository")]
 		public async Task<IActionResult> Add(AddRepositoryViewModel dto)
 		{
 			if (!ModelState.IsValid)
@@ -34,26 +34,33 @@ namespace DotnetSpider.Portal.Controllers
 				return View("Add", dto);
 			}
 
-			var items = await _dbContext.DockerRepositories.Where(x =>
-				x.Name == dto.Name || x.Repository == dto.Repository).ToListAsync();
-
-			var valid = true;
-			if (items.Any(x => x.Name == dto.Name))
+			if (await _dbContext.DockerRepositories.AnyAsync(x => x.Name == dto.Name.Trim()))
 			{
 				ModelState.AddModelError("Name", "名称已经存在");
-				valid = false;
 			}
 
-			if (items.Any(x => x.Repository == dto.Repository && x.Registry == dto.Registry))
+			string registry = null;
+			string schema = null;
+			if (!string.IsNullOrWhiteSpace(dto.Registry))
 			{
-				ModelState.AddModelError("Repository", "镜像仓储已经存在");
-				if (valid)
+				if (Uri.TryCreate(dto.Registry, UriKind.RelativeOrAbsolute, out var uri))
 				{
-					valid = false;
+					schema = uri.Scheme;
+					registry = uri.Host;
+				}
+				else
+				{
+					ModelState.AddModelError("Registry", "Registry 格式不正确");
 				}
 			}
 
-			if (!valid)
+			if (await _dbContext.DockerRepositories.AnyAsync(x =>
+				x.Registry == dto.Registry || x.Repository == dto.Repository))
+			{
+				ModelState.AddModelError("Registry", "镜像仓储已经存在");
+			}
+
+			if (!ModelState.IsValid)
 			{
 				return View("Add", dto);
 			}
@@ -62,7 +69,8 @@ namespace DotnetSpider.Portal.Controllers
 				var repository = new DockerRepository
 				{
 					Name = dto.Name,
-					Registry = string.IsNullOrWhiteSpace(dto.Registry) ? null : new Uri(dto.Registry).AbsoluteUri,
+					Schema = schema,
+					Registry = registry,
 					Repository = dto.Repository,
 					UserName = dto.UserName,
 					Password = dto.Password,

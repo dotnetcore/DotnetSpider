@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using DotnetSpider.Core;
-using DotnetSpider.DownloadAgentRegisterCenter;
 using DotnetSpider.Kafka;
-using DotnetSpider.Statistics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

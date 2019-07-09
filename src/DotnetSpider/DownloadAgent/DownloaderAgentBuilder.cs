@@ -2,11 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider.DownloadAgent
 {
-	public class DownloadAgentBuilder
+	public class DownloaderAgentBuilder
 	{
 		public IServiceCollection Services { get; }
 		
-		public DownloadAgentBuilder(IServiceCollection services)
+		public DownloaderAgentBuilder(IServiceCollection services)
 		{
 			Services = services;
 		}

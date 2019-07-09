@@ -44,13 +44,6 @@ namespace DotnetSpider.Portal.Entity
 		[StringLength(255)]
 		[Column("environment")]
 		public string Environment { get; set; }
-		
-		/// <summary>
-		/// docker 运行的参数
-		/// </summary>
-		[StringLength(255)]
-		[Column("arguments")]
-		public string Arguments { get; set; }
 
 		/// <summary>
 		/// docker 镜像仓库地址

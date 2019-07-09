@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,7 +31,11 @@ namespace DotnetSpider
 		{
 			try
 			{
-				ConfigureSerialLog();
+				var logfile = Environment.GetEnvironmentVariable("id");
+				logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
+				Environment.SetEnvironmentVariable("logfile", logfile);
+				
+				ConfigureSerialLog(logfile);
 
 				Framework.SetEncoding();
 
@@ -62,7 +67,8 @@ namespace DotnetSpider
 					return;
 				}
 
-				var spiderType = spiderTypes.FirstOrDefault(x => x.UnderlyingSystemType.ToString().ToLower() == spiderTypeName.ToLower());
+				var spiderType = spiderTypes.FirstOrDefault(x =>
+					x.UnderlyingSystemType.ToString().ToLower() == spiderTypeName.ToLower());
 				if (spiderType == null)
 				{
 					Log.Logger.Error($"未找到爬虫: {spiderTypeName}", 0, ConsoleColor.DarkYellow);
@@ -92,7 +98,7 @@ namespace DotnetSpider
 			}
 		}
 
-		private void ConfigureSerialLog()
+		private void ConfigureSerialLog(string file)
 		{
 			var configure = new LoggerConfiguration()
 #if DEBUG
@@ -103,7 +109,7 @@ namespace DotnetSpider
 				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 				.Enrich.FromLogContext()
 				.WriteTo.Console().WriteTo
-				.RollingFile("dotnet-spider.log");
+				.RollingFile(file);
 			Log.Logger = configure.CreateLogger();
 		}
 
@@ -139,6 +145,7 @@ namespace DotnetSpider
 				{
 					throw new SpiderException("未找到入口程序集");
 				}
+
 				asmNames = new List<string>
 				{
 					entryAsm.GetName(false).Name
@@ -178,6 +185,16 @@ namespace DotnetSpider
 		private void PrintEnvironment()
 		{
 			Framework.PrintInfo();
+			var environmentVariables = Environment.GetEnvironmentVariables();
+			var excludes = new List<string> {"PATH", "ASPNETCORE_URLS", "HOSTNAME", "DOTNET_RUNNING_IN_CONTAINER"};
+			foreach (DictionaryEntry variable in environmentVariables)
+			{
+				if (!excludes.Contains(variable.Key))
+				{
+					Log.Logger.Information($"环境变量   : {variable.Key} {variable.Value}", 0, ConsoleColor.DarkYellow);
+				}
+			}
+
 			var commands = string.Join(" ", Environment.GetCommandLineArgs());
 			Log.Logger.Information($"运行参数   : {commands}", 0, ConsoleColor.DarkYellow);
 			Log.Logger.Information($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,

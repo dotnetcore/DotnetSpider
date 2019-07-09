@@ -48,7 +48,7 @@
                                 <span>@item.Name</span>
                             </td>
                             <td>
-                                <span>@item.Registry</span>
+                                <span>@($"{item.Schema}://{item.Registry}")</span>
                             </td>
                             <td>
                                 <span>@item.Repository</span>
@@ -57,9 +57,8 @@
                                 <span>@item.CreationTime</span>
                             </td>
                             <td>
-                                <a class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</a>
-
-                                <a class="btn btn-default btn-sm  btn-flat" href="/spider/add?repository=@(item.Registry?.Replace("http://", "").Replace("https://", "") + item.Repository)">Create</a>
+                                <button class="btn btn-default btn-sm  btn-flat" onclick="remove('@item.Id')">Delete</button>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/create?registry=@(item.Registry)&repository=@(item.Repository)">Create</a>
                             </td>
                         </tr>
                     }
@@ -80,9 +79,4 @@
     <environment names="Staging,Production">
         <script src="~/js/repository.min.js" asp-append-version="true"></script>
     </environment>
-    <script>
-        $(function() {
-            app.activeMenu('Repository');
-        })
-    </script>
 }

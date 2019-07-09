@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DotnetSpider.Portal.Models.Spider
 {
-	public class AddSpiderViewModel
+	public class CreateSpiderViewModel
 	{
 		/// <summary>
 		/// 爬虫名称
@@ -11,6 +11,13 @@ namespace DotnetSpider.Portal.Models.Spider
 		[Required]
 		[StringLength(255)]
 		public string Name { get; set; }
+
+		/// <summary>
+		/// docker
+		/// </summary>
+		[StringLength(255)]
+		[Required]
+		public string Registry { get; set; }
 		
 		/// <summary>
 		/// docker 镜像仓库名称
@@ -26,7 +33,12 @@ namespace DotnetSpider.Portal.Models.Spider
 		[Required]
 		public string Tag { get; set; }
 
-		[Required] [StringLength(400)] public string Type { get; set; }
+		/// <summary>
+		/// 任务的 Type
+		/// </summary>
+		[Required]
+		[StringLength(400)]
+		public string Type { get; set; }
 
 		/// <summary>
 		/// 
@@ -40,12 +52,6 @@ namespace DotnetSpider.Portal.Models.Spider
 		/// </summary>
 		[StringLength(255)]
 		public string Environment { get; set; }
-
-		/// <summary>
-		/// docker 运行的参数
-		/// </summary>
-		[StringLength(255)]
-		public string Arguments { get; set; }
 
 		public List<string> Tags { get; set; }
 	}
