@@ -326,13 +326,21 @@ namespace DotnetSpider.Portal.Controllers
 			string user,
 			string password)
 		{
-			registry = $"{schema}://{registry}";
-			var httpClient = Common.HttpClientFactory.GetHttpClient(registry,
-				user, password);
-			var json = await httpClient.GetStringAsync(
-				$"{registry}/v2/{repository}/tags/list");
-			var repositoryTags = JsonConvert.DeserializeObject<RepositoryTags>(json);
-			return repositoryTags.Tags;
+			try
+			{
+				registry = $"{schema}://{registry}";
+				var httpClient = Common.HttpClientFactory.GetHttpClient(registry,
+					user, password);
+				var json = await httpClient.GetStringAsync(
+					$"{registry}/v2/{repository}/tags/list");
+				var repositoryTags = JsonConvert.DeserializeObject<RepositoryTags>(json);
+				return repositoryTags.Tags;
+			}
+			catch (Exception e)
+			{
+				_logger.LogError(e.ToString());
+				return new List<string>();
+			}
 		}
 
 		private async Task ScheduleJobAsync(string cron, string id, string name)

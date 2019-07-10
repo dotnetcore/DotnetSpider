@@ -13,39 +13,46 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
 
 ### DEVELOP ENVIROMENT
 
-- Visual Studio 2017 (15.3 or later)
-- [.NET Core 2.2 or later](https://www.microsoft.com/net/download/windows)
+1. Visual Studio 2017 (15.3 or later) or Jetbrains Rider
+2. [.NET Core 2.2 or later](https://www.microsoft.com/net/download/windows)
+3. Docker
+4. MySql
 
-### OPTIONAL ENVIRONMENT 
+        docker run --name mysql -d -p 3306:3306 --restart always -e MYSQL_ROOT_PASSWORD=1qazZAQ! mysql:5.7
 
-- MySql
+5. Redis (option)
 
-        $ sudo docker run --name mysql -d -p 3306:3306 --restart always -e MYSQL_ROOT_PASSWORD=1qazZAQ! mysql:5.7
+        docker run --name redis -d -p 6379:6379 --restart always redis
 
-- Redis
+6. SqlServer
 
-        sudo docker run --name redis -d -p 6379:6379 --restart always redis
+        docker run --name sqlserver -d -p 1433:1433 --restart always  -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' mcr.microsoft.com/mssql/server:2017-latest
 
-- SqlServer
+8. PostgreSQL (option)
 
-        sudo docker run --name sqlserver -d -p 1433:1433 --restart always  -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=1qazZAQ!' mcr.microsoft.com/mssql/server:2017-latest
+        docker run --name postgres -d  -p 5432:5432 --restart always -e POSTGRES_PASSWORD=1qazZAQ! postgres
 
-- PostgreSQL
+9. MongoDb  (option)
 
-        sudo docker run --name postgres -d  -p 5432:5432 --restart always -e POSTGRES_PASSWORD=1qazZAQ! postgres
-
-- MongoDb
-
-        sudo docker run --name mongo -d -p 27017:27017 --restart always mongo
+        docker run --name mongo -d -p 27017:27017 --restart always mongo
         
-- Kafka
+10. Kafka
 
-        $ sudo docker run --name kafka -d -p 9092:9092 --restart always --net bridge -h 192.168.1.157 --env ADVERTISED_PORT=9092 spotify/kafka
+        docker run --name kafka -d -p 9092:9092 --restart always -h kafka.zousong.com --env ADVERTISED_PORT=9092 spotify/kafka
         
-- Docker remote api for mac
+11. Docker remote api for mac
 
-        $ docker run -d -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 \
-            bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock        
+        docker run -d --name socat -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
+
+12. Docker registry
+
+        docker run -d --name registry -p 5000:5000 --name registry registry:2   
+        
+13. Add hosts
+
+        127.0.0.1       registry.zousong.com
+        127.0.0.1       kafka.zousong.com
+        127.0.0.1       zousong.com                      
                         
 ### MORE DOCUMENTS
 

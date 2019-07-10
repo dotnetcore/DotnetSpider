@@ -46,7 +46,7 @@ namespace DotnetSpider.Portal.Controllers
 				if (Uri.TryCreate(dto.Registry, UriKind.RelativeOrAbsolute, out var uri))
 				{
 					schema = uri.Scheme;
-					registry = uri.Host;
+					registry = $"{uri.Host}{(uri.Port == 80 ? "" : $":{uri.Port}")}";
 				}
 				else
 				{

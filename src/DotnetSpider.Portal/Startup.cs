@@ -153,12 +153,12 @@ namespace DotnetSpider.Portal
 				context.DockerRepositories.Add(new DockerRepository
 				{
 					Name = "default",
-					Schema = "http://",
-					Registry = "registry.intra-pamirs.com",
+					Schema = "http",
+					Registry = "registry.zousong.com:5000",
 					Repository = "dotnetspider.spiders",
 					CreationTime = DateTime.Now,
-					UserName = "pamirs",
-					Password = "xxx"
+					UserName = "",
+					Password = ""
 				});
 				context.SaveChanges();
 			}
