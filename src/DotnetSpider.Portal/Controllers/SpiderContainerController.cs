@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using DotnetSpider.Common;
+using DotnetSpider.EventBus;
 using DotnetSpider.Portal.Models.SpiderContainer;
 using DotnetSpider.Statistics.Entity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,16 +20,19 @@ namespace DotnetSpider.Portal.Controllers
 		private readonly PortalDbContext _dbContext;
 		private readonly Quartz.IScheduler _sched;
 		private readonly PortalOptions _options;
+		private readonly IEventBus _eventBus;
 
 		public SpiderContainerController(PortalDbContext dbContext,
 			PortalOptions options,
 			Quartz.IScheduler sched,
+			IEventBus eventBus,
 			ILogger<SpiderController> logger)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
 			_sched = sched;
 			_options = options;
+			_eventBus = eventBus;
 		}
 
 		[HttpGet("spider/{id}/containers")]
@@ -67,6 +74,24 @@ namespace DotnetSpider.Portal.Controllers
 
 			return View(new StaticPagedList<ListSpiderContainerViewModel>(list, page, size,
 				containers.GetMetaData().TotalItemCount));
+		}
+
+		[HttpPost("spider/{id}/exit")]
+		public async Task<IActionResult> ExitAsync(string batch)
+		{
+			try
+			{
+				await _eventBus.PublishAsync(batch, $"|{Framework.ExitCommand}|{batch}");
+				return Ok();
+			}
+			catch (Exception e)
+			{
+				_logger.LogError($"关闭失败: {e}");
+				return StatusCode((int) HttpStatusCode.InternalServerError, new
+				{
+					e.Message
+				});
+			}
 		}
 	}
 }

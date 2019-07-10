@@ -17,9 +17,16 @@ function remove(id) {
 }
 
 function run(id) {
-    app.post("/spider/" + id + "/run", null, function () {
-        window.location.reload();
-    }, null, function (result) {
-        swal('Error', result.message, "error");
+    swal({
+        title: "Sure to run this spider?",
+        type: "warning",
+        showCancelButton: true
+    }, function () {
+        app.post("/spider/" + id + "/run", null, function () {
+            window.location.reload();
+        }, null, function (result) {
+            swal('Error', result.message, "error");
+        });
     });
 }
+ 

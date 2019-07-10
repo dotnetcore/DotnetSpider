@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Downloader
 {

@@ -5,11 +5,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.Downloader;
 using DotnetSpider.EventBus;
 using DotnetSpider.Network;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -18,10 +19,11 @@ namespace DotnetSpider.DownloadAgent
 	/// <summary>
 	/// 下载器代理
 	/// </summary>
-	public abstract class DownloaderAgentBase : IDownloaderAgent
+	public abstract class DownloaderAgentBase : BackgroundService, IDownloaderAgent
 	{
 		private readonly IEventBus _eventBus;
 		private readonly DownloaderAgentOptions _options;
+		private bool _exit;
 
 		private readonly ConcurrentDictionary<string, IDownloader> _cache =
 			new ConcurrentDictionary<string, IDownloader>();
@@ -57,13 +59,8 @@ namespace DotnetSpider.DownloadAgent
 			Logger = logger;
 		}
 
-		public async Task StartAsync(CancellationToken cancellationToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			if (IsRunning)
-			{
-				throw new SpiderException($"下载器代理 {_options.AgentId} 正在运行中");
-			}
-
 			// 注册节点
 			var json = JsonConvert.SerializeObject(new DownloaderAgent
 			{
@@ -81,23 +78,30 @@ namespace DotnetSpider.DownloadAgent
 			// 订阅节点
 			SubscribeMessage();
 
-			IsRunning = true;
-
 			// 开始心跳
-			HeartbeatAsync().ConfigureAwait(false).GetAwaiter();
+			HeartbeatAsync(stoppingToken).ConfigureAwait(false).GetAwaiter();
+
+			ReleaseDownloaderAsync(stoppingToken).ConfigureAwait(false).GetAwaiter();
 
 			Logger?.LogInformation($"下载器代理 {_options.AgentId} 启动完毕");
 
-			ReleaseDownloaderAsync().ConfigureAwait(false).GetAwaiter();
+			IsRunning = true;
 		}
 
-		public Task StopAsync(CancellationToken cancellationToken)
+		public override Task StopAsync(CancellationToken cancellationToken)
 		{
+			_exit = true;
 			_eventBus.Unsubscribe(_options.AgentId);
 			_eventBus.Unsubscribe("DownloadQueue");
 			_eventBus.Unsubscribe("AdslDownloadQueue");
-			IsRunning = false;
-			Logger?.LogInformation($"下载器代理 {_options.AgentId} 退出");
+
+			// 一小时
+			var times = 12 * 60;
+			for (int i = 0; i < times && !cancellationToken.IsCancellationRequested; ++i)
+			{
+				Thread.Sleep(5000);
+				Logger?.LogInformation($"下载器代理 {_options.AgentId} 退出中, 请在安全的时间后手动退出节点");
+			}
 
 			return Task.CompletedTask;
 		}
@@ -133,11 +137,11 @@ namespace DotnetSpider.DownloadAgent
 			}
 		}
 
-		private Task HeartbeatAsync()
+		private Task HeartbeatAsync(CancellationToken stoppingToken)
 		{
 			return Task.Factory.StartNew(async () =>
 			{
-				while (IsRunning)
+				while (!stoppingToken.IsCancellationRequested && !_exit)
 				{
 					Thread.Sleep(5000);
 					try
@@ -160,14 +164,14 @@ namespace DotnetSpider.DownloadAgent
 						Logger?.LogDebug($"下载器代理 {_options.AgentId} 发送心跳失败: {e}");
 					}
 				}
-			});
+			}, stoppingToken);
 		}
 
-		private Task ReleaseDownloaderAsync()
+		private Task ReleaseDownloaderAsync(CancellationToken stoppingToken)
 		{
 			return Task.Factory.StartNew(() =>
 			{
-				while (IsRunning)
+				while (!stoppingToken.IsCancellationRequested && !_exit)
 				{
 					Thread.Sleep(1000);
 
@@ -208,7 +212,7 @@ namespace DotnetSpider.DownloadAgent
 						Logger?.LogError($"下载器代理 {_options.AgentId} 释放过期下载器失败: {e}");
 					}
 				}
-			});
+			}, stoppingToken);
 		}
 
 		private void HandleMessage(string message)
@@ -237,13 +241,20 @@ namespace DotnetSpider.DownloadAgent
 				{
 					case Framework.DownloadCommand:
 					{
-						Download(commandMessage.Message).ConfigureAwait(false).GetAwaiter();
+						DownloadAsync(commandMessage.Message).ConfigureAwait(false).GetAwaiter();
 						break;
 					}
 
 					case Framework.ExitCommand:
 					{
-						if (commandMessage.Message == _options.AgentId)
+						var infos = commandMessage.Message.Split(',');
+						var timestamp = DateTime.Parse(infos[1]);
+						if ((DateTime.Now - timestamp).TotalSeconds > 6)
+						{
+							break;
+						}
+
+						if (infos[0] == _options.AgentId)
 						{
 							StopAsync(default).ConfigureAwait(true).GetAwaiter();
 						}
@@ -268,7 +279,7 @@ namespace DotnetSpider.DownloadAgent
 			}
 		}
 
-		private async Task Download(string message)
+		private async Task DownloadAsync(string message)
 		{
 			var requests = JsonConvert.DeserializeObject<Request[]>(message);
 
@@ -374,8 +385,21 @@ namespace DotnetSpider.DownloadAgent
 								: new HttpProxyPool(new HttpRowTextProxySupplier(_options.ProxySupplyUrl)),
 							RetryTime = request.RetryTimes
 						};
-						// TODO:
-						// httpClient.AddCookies(allotDownloaderMessage.Cookies);
+						if (!string.IsNullOrWhiteSpace(request.Cookie))
+						{
+							var cookies = request.Cookie.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+							foreach (var cookie in cookies)
+							{
+								var splitIndex = cookie.IndexOf('=');
+								if (splitIndex > 0)
+								{
+									var name = cookie.Substring(0, splitIndex);
+									var value = cookie.Substring(splitIndex + 1, cookie.Length - splitIndex - 1);
+									httpClient.AddCookies(new Cookie(name, value, request.Domain));
+								}
+							}
+						}
+
 						downloader = httpClient;
 						break;
 					}

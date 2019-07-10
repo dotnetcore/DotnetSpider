@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

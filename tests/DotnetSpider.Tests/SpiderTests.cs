@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.DataFlow.Storage.Mongo;
 using DotnetSpider.DataFlow.Storage.PostgreSql;

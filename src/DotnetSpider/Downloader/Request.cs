@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Downloader
 {
@@ -155,6 +155,11 @@ namespace DotnetSpider.Downloader
 		/// 下载策略
 		/// </summary>
 		public DownloadPolicy DownloadPolicy { get; set; } = DownloadPolicy.Random;
+		
+		/// <summary>
+		/// 设置 Cookie 的 domain
+		/// </summary>
+		public string Domain { get; set; }
 		
 		/// <summary>
 		/// 构造方法

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Threading;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgent;
 using DotnetSpider.Network.InternetDetector;
 using Microsoft.Extensions.Logging;

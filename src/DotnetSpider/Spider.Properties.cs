@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
 using DotnetSpider.EventBus;

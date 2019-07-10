@@ -3,7 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using Dapper;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage.Model;
 using Npgsql;
 

@@ -8,10 +8,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using LZ4;
 using Microsoft.Extensions.Logging;
-using Cookie = DotnetSpider.Core.Cookie;
+using Cookie = DotnetSpider.Common.Cookie;
 
 namespace DotnetSpider.Downloader
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.Statistics.Entity;
 using MySql.Data.MySqlClient;
 

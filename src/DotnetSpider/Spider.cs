@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
@@ -126,6 +126,11 @@ namespace DotnetSpider
 
 			foreach (var request in requests)
 			{
+				if (!string.IsNullOrWhiteSpace(request.Cookie) && string.IsNullOrWhiteSpace(request.Domain))
+				{
+					throw new SpiderException("When cookie is not null, domain should not be null");
+				}
+
 				request.OwnerId = Id;
 				request.Depth = request.Depth == 0 ? 1 : request.Depth;
 				_requests.Add(request);
@@ -179,6 +184,9 @@ namespace DotnetSpider
 				// 定制化的设置
 				Initialize();
 
+				var dataFlowInfo = string.Join(" ==> ", _dataFlows.Select(x => x.Name));
+				_logger.LogInformation($"DataFlow: {dataFlowInfo}");
+
 				// 设置默认调度器
 				_scheduler = _scheduler ?? new QueueDistinctBfsScheduler();
 
@@ -188,9 +196,14 @@ namespace DotnetSpider
 				// 添加任务启动的监控信息
 				await _statisticsService.StartAsync(Id);
 
-				// 订阅数据流，如果订阅失败
+				// 订阅数据流
 				_eventBus.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
-					async message => await HandleMessage(message));
+					async message => await HandleMessageAsync(message));
+
+				// 订阅命令
+				_eventBus.Subscribe($"{Id}",
+					async message => await HandleCommandAsync(message));
+
 				_logger.LogInformation($"任务 {Id} 订阅消息队列成功");
 
 				// 初始化各数据流处理器
@@ -534,30 +547,25 @@ namespace DotnetSpider
 			});
 		}
 
-//		/// <summary>
-//		/// 分配下载器
-//		/// </summary>
-//		/// <returns>是否分配成功</returns>
-//		private async Task AllotDownloaderAsync()
-//		{
-//			var json = JsonConvert.SerializeObject(new AllocateDownloaderMessage
-//			{
-//				OwnerId = Id,
-//				AllowAutoRedirect = DownloaderSettings.AllowAutoRedirect,
-//				UseProxy = DownloaderSettings.UseProxy,
-//				DownloaderCount = DownloaderSettings.DownloaderCount,
-//				Cookies = DownloaderSettings.Cookies,
-//				DecodeHtml = DownloaderSettings.DecodeHtml,
-//				Timeout = DownloaderSettings.Timeout,
-//				Type = DownloaderSettings.Type,
-//				UseCookies = DownloaderSettings.UseCookies,
-//				CreationTime = DateTime.Now
-//			});
-//			await _mq.PublishAsync(Framework.DownloaderAgentRegisterCenterTopic,
-//				$"|{Framework.AllocateDownloaderCommand}|{json}");
-//		}
+		private Task HandleCommandAsync(string message)
+		{
+			if (message.StartsWith("|"))
+			{
+				var command = message.ToCommandMessage();
+				switch (command.Command)
+				{
+					case Framework.ExitCommand:
+					{
+						Exit();
+						break;
+					}
+				}
+			}
 
-		private async Task HandleMessage(string message)
+			return Task.CompletedTask;
+		}
+
+		private async Task HandleMessageAsync(string message)
 		{
 			if (string.IsNullOrWhiteSpace(message))
 			{

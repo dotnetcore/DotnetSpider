@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Statistics.Entity
 {

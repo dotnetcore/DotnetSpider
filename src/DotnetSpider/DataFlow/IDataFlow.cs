@@ -15,6 +15,11 @@ namespace DotnetSpider.DataFlow
 		ILogger Logger { get; set; }
 
 		/// <summary>
+		/// 名称
+		/// </summary>
+		string Name { get; }
+
+		/// <summary>
 		/// 初始化
 		/// </summary>
 		/// <returns></returns>

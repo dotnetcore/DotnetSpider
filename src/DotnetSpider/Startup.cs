@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;

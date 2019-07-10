@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
 using Microsoft.Extensions.Logging;
 using Confluent.Kafka;
+using DotnetSpider.Common;
 using DotnetSpider.EventBus;
 
 namespace DotnetSpider.Kafka
@@ -21,7 +21,7 @@ namespace DotnetSpider.Kafka
 
 		private readonly ILogger _logger;
 		private readonly IProducer<Null, string> _producer;
-		private readonly ConsumerConfig _config;
+		private readonly SpiderOptions _options;
 
 		/// <summary>
 		/// 构造方法
@@ -32,17 +32,7 @@ namespace DotnetSpider.Kafka
 			ILogger<KafkaEventBus> logger)
 		{
 			_logger = logger;
-			_config = new ConsumerConfig
-			{
-				GroupId = options.KafkaConsumerGroup,
-				BootstrapServers = options.KafkaBootstrapServers,
-				// Note: The AutoOffsetReset property determines the start offset in the event
-				// there are not yet any committed offsets for the consumer group for the
-				// topic/partitions of interest. By default, offsets are committed
-				// automatically, so in this example, consumption will only start from the
-				// earliest message in the topic 'my-topic' the first time you run the program.
-				AutoOffsetReset = AutoOffsetReset.Earliest
-			};
+			_options = options;
 			var productConfig = new ProducerConfig {BootstrapServers = options.KafkaBootstrapServers};
 			_producer = new ProducerBuilder<Null, string>(productConfig).Build();
 		}
@@ -69,13 +59,23 @@ namespace DotnetSpider.Kafka
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void Subscribe(string topic, Action<string> action)
 		{
-			Unsubscribe(topic);
-
 			Task.Factory.StartNew(() =>
 			{
-				using (var c = new ConsumerBuilder<Null, string>(_config).Build())
+				var config = new ConsumerConfig
+				{
+					GroupId = topic,
+					BootstrapServers = _options.KafkaBootstrapServers,
+					// Note: The AutoOffsetReset property determines the start offset in the event
+					// there are not yet any committed offsets for the consumer group for the
+					// topic/partitions of interest. By default, offsets are committed
+					// automatically, so in this example, consumption will only start from the
+					// earliest message in the topic 'my-topic' the first time you run the program.
+					AutoOffsetReset = AutoOffsetReset.Earliest
+				};
+				using (var c = new ConsumerBuilder<Null, string>(config).Build())
 				{
 					c.Subscribe(topic);
+					_logger.LogInformation("Subscribe: " + topic);
 					_consumers.Add(topic, c);
 					while (true)
 					{
@@ -117,7 +117,7 @@ namespace DotnetSpider.Kafka
 			if (_consumers.ContainsKey(topic))
 			{
 				_consumers[topic].Unsubscribe();
-				_consumers[topic] = null;
+				_consumers.Remove(topic);
 			}
 		}
 	}

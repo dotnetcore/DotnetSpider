@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Dapper;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.Kafka;
 using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Entity;

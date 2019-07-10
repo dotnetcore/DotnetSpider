@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.EventBus
 {

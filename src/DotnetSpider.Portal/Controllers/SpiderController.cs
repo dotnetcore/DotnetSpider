@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DotnetSpider.Common;
+using DotnetSpider.EventBus;
 using DotnetSpider.Portal.Models.Spider;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

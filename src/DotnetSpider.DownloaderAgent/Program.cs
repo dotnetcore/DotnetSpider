@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

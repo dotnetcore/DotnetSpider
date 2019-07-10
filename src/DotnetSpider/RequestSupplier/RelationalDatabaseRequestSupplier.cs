@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.Downloader;
 using MySql.Data.MySqlClient;
 

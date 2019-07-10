@@ -17,6 +17,8 @@ namespace DotnetSpider.DataFlow.Parser
 		private readonly Model<T> _model;
 		private readonly TableMetadata _tableMetadata;
 
+		public override string Name => $"DataParser`{typeof(T).Name}`";
+
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -151,23 +153,27 @@ namespace DotnetSpider.DataFlow.Parser
 							value = index.ToString();
 							break;
 						}
+
 						case "GUID":
 						{
 							value = Guid.NewGuid().ToString();
 							break;
 						}
+
 						case "DATE":
 						case "TODAY":
 						{
 							value = DateTime.Now.Date.ToString("yyyy-MM-dd");
 							break;
 						}
+
 						case "DATETIME":
 						case "NOW":
 						{
 							value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 							break;
 						}
+
 						default:
 						{
 							if (environments.ContainsKey(field.Expression))

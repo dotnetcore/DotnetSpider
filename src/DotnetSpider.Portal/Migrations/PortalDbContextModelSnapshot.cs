@@ -136,9 +136,6 @@ namespace DotnetSpider.Portal.Migrations
                     b.Property<DateTime>("CreationTime")
                         .HasColumnName("creation_time");
 
-                    b.Property<DateTime?>("ExitTime")
-                        .HasColumnName("exit_time");
-
                     b.Property<int>("SpiderId")
                         .HasColumnName("spider_id");
 

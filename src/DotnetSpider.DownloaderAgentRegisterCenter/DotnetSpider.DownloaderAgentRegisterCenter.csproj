@@ -10,14 +10,13 @@
         <Version>4.0.5</Version>
         <Authors>zlzforever@163.com;</Authors>
         <Copyright>Copyright 2018 Lewis Zou</Copyright>
-        <PackageId>DotnetSpider.DownloadCenter</PackageId>
+        <PackageId>DotnetSpider.DownloaderAgentRegisterCenter</PackageId>
         <Description>DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient and fast high-level web crawling &amp; scraping framework</Description>
         <PackageTags>DotnetSpider;crawler;dotnet core</PackageTags>
         <PackageProjectUrl>https://github.com/dotnetcore/DotnetSpider</PackageProjectUrl>
         <PackageIconUrl>https://github.com/dotnetcore/DotnetSpider/blob/master/images/icon.png?raw=true</PackageIconUrl>
         <RepositoryUrl>https://github.com/dotnetcore/DotnetSpider</RepositoryUrl>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <RootNamespace>DotnetSpider.DownloadAgentRegisterCenter</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
         <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />

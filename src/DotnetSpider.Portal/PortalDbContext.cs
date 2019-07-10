@@ -1,4 +1,4 @@
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.Portal.Entity;
 using DotnetSpider.Statistics.Entity;

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage.Model;
 using MySql.Data.MySqlClient;

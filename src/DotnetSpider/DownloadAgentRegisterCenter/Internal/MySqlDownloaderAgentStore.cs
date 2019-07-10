@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using MySql.Data.MySqlClient;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.EventBus;
 using Microsoft.AspNetCore.Mvc;
@@ -83,7 +83,7 @@ namespace DotnetSpider.Portal.Controllers
 				return NotFound();
 			}
 
-			await _eventBus.PublishAsync(id, $"|{Framework.ExitCommand}|{id}");
+			await _eventBus.PublishAsync(id, $"|{Framework.ExitCommand}|{id},{DateTime.Now:yyyy-MM-dd HH:mm:ss}");
 			return Ok();
 		}
 	}

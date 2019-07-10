@@ -1,9 +1,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.EventBus;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -12,10 +13,8 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 	/// <summary>
 	/// 下载中心
 	/// </summary>
-	public abstract class DownloadAgentRegisterCenterBase : IDownloadAgentRegisterCenter
+	public abstract class DownloadAgentRegisterCenterBase : BackgroundService, IDownloadAgentRegisterCenter
 	{
-		public bool IsRunning { get; private set; }
-		
 		/// <summary>
 		/// 消息队列
 		/// </summary>
@@ -36,6 +35,8 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 		/// </summary>
 		protected readonly IDownloaderAgentStore DownloaderAgentStore;
 
+		public bool IsRunning { get; private set; }
+		
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -55,19 +56,8 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 			Options = options;
 		}
 
-		/// <summary>
-		/// 启动下载中心
-		/// </summary>
-		/// <param name="cancellationToken"></param>
-		/// <returns></returns>
-		/// <exception cref="SpiderException"></exception>
-		public async Task StartAsync(CancellationToken cancellationToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			if (IsRunning)
-			{
-				throw new SpiderException("下载中心正在运行中");
-			}
-
 			await DownloaderAgentStore.EnsureDatabaseAndTableCreatedAsync();
 
 			EventBus.Subscribe(Framework.DownloaderAgentRegisterCenterTopic, async message =>
@@ -97,6 +87,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 
 						break;
 					}
+
 					case Framework.HeartbeatCommand:
 					{
 						var heartbeat = JsonConvert.DeserializeObject<DownloaderAgentHeartbeat>(commandMessage.Message);
@@ -121,18 +112,15 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 					}
 				}
 			});
-
-			IsRunning = true;
-			
 			Logger.LogInformation("下载中心启动完毕");
+			IsRunning = true;
 		}
 
-		public Task StopAsync(CancellationToken cancellationToken)
+		public override Task StopAsync(CancellationToken cancellationToken)
 		{
 			EventBus.Unsubscribe(Framework.DownloaderAgentRegisterCenterTopic);
-			IsRunning = false;
 			Logger.LogInformation("下载中心退出");
-			return Task.CompletedTask;
+			return base.StopAsync(cancellationToken);
 		}
 	}
 }

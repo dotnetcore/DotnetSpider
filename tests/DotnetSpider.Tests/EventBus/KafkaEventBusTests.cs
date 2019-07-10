@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Logging;
 using Xunit;

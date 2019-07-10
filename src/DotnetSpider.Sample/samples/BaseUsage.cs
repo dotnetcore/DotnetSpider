@@ -20,14 +20,14 @@ namespace DotnetSpider.Sample.samples
 				.ConfigureServices(services =>
 				{
 					services.AddKafkaEventBus();
-					//services.AddLocalDownloadCenter();
-//					services.AddDownloaderAgent(x =>
-//					{
-//						x.UseFileLocker();
-//						x.UseDefaultAdslRedialer();
-//						x.UseDefaultInternetDetector();
-//					});
-					//services.AddStatisticsCenter(x => x.UseMemory());
+					services.AddLocalDownloadCenter();
+					services.AddDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddStatisticsCenter(x => x.UseMemory());
 				});
 			var provider = builder.Build();
 

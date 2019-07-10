@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
-namespace DotnetSpider.DownloadCenter
+namespace DotnetSpider.DownloadAgentRegisterCenter
 {
 	class Program
 	{
@@ -31,7 +31,7 @@ namespace DotnetSpider.DownloadCenter
 				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
 				.ConfigureServices((hostContext, services) =>
 				{
-					services.AddScoped<SpiderOptions>();
+					services.AddSingleton<SpiderOptions>();
 					services.AddKafkaEventBus();
 					services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
 					services.AddStatisticsCenter(x => x.UseMySql());
