@@ -34,7 +34,7 @@ namespace DotnetSpider
 				var logfile = Environment.GetEnvironmentVariable("id");
 				logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
 				Environment.SetEnvironmentVariable("logfile", logfile);
-				
+
 				ConfigureSerialLog(logfile);
 
 				Framework.SetEncoding();
@@ -43,7 +43,7 @@ namespace DotnetSpider
 
 				var configurationBuilder = new ConfigurationBuilder();
 				configurationBuilder.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
-				configurationBuilder.AddEnvironmentVariables();
+				configurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
 				configurationBuilder.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
 				var configuration = configurationBuilder.Build();
 

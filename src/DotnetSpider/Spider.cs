@@ -197,7 +197,7 @@ namespace DotnetSpider
 				await _statisticsService.StartAsync(Id);
 
 				// 订阅数据流
-				_eventBus.Subscribe($"{Framework.ResponseHandlerTopic}{Id}",
+				_eventBus.Subscribe($"{_options.ResponseHandlerTopic}{Id}",
 					async message => await HandleMessageAsync(message));
 
 				// 订阅命令
@@ -307,7 +307,7 @@ namespace DotnetSpider
 			_logger.LogInformation($"任务 {Id} 退出中...");
 			Status = Status.Exiting;
 			// 直接取消订阅即可: 1. 如果是本地应用, 
-			_eventBus.Unsubscribe($"{Framework.ResponseHandlerTopic}{Id}");
+			_eventBus.Unsubscribe($"{_options.ResponseHandlerTopic}{Id}");
 			return this;
 		}
 
@@ -547,27 +547,23 @@ namespace DotnetSpider
 			});
 		}
 
-		private Task HandleCommandAsync(string message)
+		private Task HandleCommandAsync(Event message)
 		{
-			if (message.StartsWith("|"))
+			switch (message.Type)
 			{
-				var command = message.ToCommandMessage();
-				switch (command.Command)
+				case Framework.ExitCommand:
 				{
-					case Framework.ExitCommand:
-					{
-						Exit();
-						break;
-					}
+					Exit();
+					break;
 				}
 			}
 
 			return Task.CompletedTask;
 		}
 
-		private async Task HandleMessageAsync(string message)
+		private async Task HandleMessageAsync(Event message)
 		{
-			if (string.IsNullOrWhiteSpace(message))
+			if (string.IsNullOrWhiteSpace(message.Data))
 			{
 				_logger.LogWarning($"任务 {Id} 接收到空消息");
 				return;
@@ -579,7 +575,7 @@ namespace DotnetSpider
 
 			try
 			{
-				responses = JsonConvert.DeserializeObject<Response[]>(message);
+				responses = JsonConvert.DeserializeObject<Response[]>(message.Data);
 			}
 			catch
 			{
@@ -831,7 +827,7 @@ namespace DotnetSpider
 					// 初始请求通过是否使用 ADSL 分配不同的下载队列
 					if (string.IsNullOrWhiteSpace(request.AgentId))
 					{
-						topic = request.UseAdsl ? "AdslDownloadQueue" : "DownloadQueue";
+						topic = request.UseAdsl ? _options.AdslDownloadQueueTopic : _options.DownloadQueueTopic;
 					}
 					else
 					{
@@ -846,7 +842,9 @@ namespace DotnetSpider
 
 							default:
 							{
-								topic = request.UseAdsl ? "AdslDownloadQueue" : "DownloadQueue";
+								topic = request.UseAdsl
+									? _options.AdslDownloadQueueTopic
+									: _options.DownloadQueueTopic;
 								break;
 							}
 						}
@@ -854,7 +852,7 @@ namespace DotnetSpider
 
 					_enqueuedRequestDict.TryAdd(request.Hash, request);
 					await _eventBus.PublishAsync(topic,
-						$"|{Framework.DownloadCommand}|{JsonConvert.SerializeObject(requests)}");
+						new Event {Type = Framework.DownloadCommand, Data = JsonConvert.SerializeObject(requests)});
 				}
 
 

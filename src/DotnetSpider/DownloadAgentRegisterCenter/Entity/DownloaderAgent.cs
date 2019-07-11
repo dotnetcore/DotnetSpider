@@ -45,6 +45,12 @@ namespace DotnetSpider.DownloadAgentRegisterCenter.Entity
 		public DateTime LastModificationTime { get; set; }
 
 		/// <summary>
+		/// 是否已经标记删除
+		/// </summary>
+		[Column("is_deleted")]
+		public bool IsDeleted { get; set; }
+		
+		/// <summary>
 		/// 创建时间
 		/// </summary>
 		[Column("creation_time")]

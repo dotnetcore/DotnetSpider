@@ -121,7 +121,7 @@ namespace DotnetSpider.Common
 		/// </summary>
 		/// <param name="unixTime">Unix时间</param>
 		/// <returns>DateTime</returns>
-		public static DateTime ToDateTimeOffset(long unixTime)
+		public static DateTime ToUnixTime(long unixTime)
 		{
 			return Epoch.AddTicks(unixTime * TicksPerMicrosecond).DateTime;
 		}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using DotnetSpider.Common;
 using DotnetSpider.Kafka;
@@ -14,23 +15,30 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 	{
 		static void Main(string[] args)
 		{
-			var	configure = new LoggerConfiguration()
-#if DEBUG
-				.MinimumLevel.Verbose()
-#else
-				.MinimumLevel.Information()
-#endif
-				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-				.Enrich.FromLogContext()
-				.WriteTo.Console().WriteTo
-				.RollingFile("dotnet-spider.log");
-			Log.Logger = configure.CreateLogger();
-			
 			var host = new HostBuilder()
 				.ConfigureLogging(x => { x.AddSerilog(); })
-				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureAppConfiguration(x =>
+				{
+					if (File.Exists("appsettings.json"))
+					{
+						x.AddJsonFile("appsettings.json");
+					}
+					x.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
+				})
 				.ConfigureServices((hostContext, services) =>
 				{
+					var configure = new LoggerConfiguration()
+#if DEBUG
+						.MinimumLevel.Verbose()
+#else
+						.MinimumLevel.Information()
+#endif
+						.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+						.Enrich.FromLogContext()
+						.WriteTo.Console().WriteTo
+						.RollingFile($"/logs/register-center/register-center.log");
+					Log.Logger = configure.CreateLogger();
+					
 					services.AddSingleton<SpiderOptions>();
 					services.AddKafkaEventBus();
 					services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());

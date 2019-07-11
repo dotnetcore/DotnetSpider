@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,10 +29,6 @@ namespace DotnetSpider.Common
 			};
 
 		private const string DefaultAppSettings = "appsettings.json";
-
-		public const string ResponseHandlerTopic = "ResponseHandler-";
-		public const string DownloaderAgentRegisterCenterTopic = "DownloaderAgentRegisterCenter";
-		public const string StatisticsServiceTopic = "StatisticsService";
 		
 		public const string DownloadCommand = "Download";
 		public const string RegisterCommand = "Register";

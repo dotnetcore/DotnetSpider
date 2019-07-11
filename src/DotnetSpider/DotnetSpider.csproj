@@ -42,6 +42,7 @@
         <PackageReference Include="lz4net" Version="1.0.15.93" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
         <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.6.1.0" />
     </ItemGroup>
     <ItemGroup>
         <Compile Update="Spider.Properties.cs">

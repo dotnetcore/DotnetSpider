@@ -36,7 +36,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 		protected readonly IDownloaderAgentStore DownloaderAgentStore;
 
 		public bool IsRunning { get; private set; }
-		
+
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -58,23 +58,35 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			await DownloaderAgentStore.EnsureDatabaseAndTableCreatedAsync();
-
-			EventBus.Subscribe(Framework.DownloaderAgentRegisterCenterTopic, async message =>
+			try
 			{
-				var commandMessage = message.ToCommandMessage();
-				if (commandMessage == null)
+				await DownloaderAgentStore.EnsureDatabaseAndTableCreatedAsync();
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"初始化注册中心数据库失败: {e}");
+			}
+
+			EventBus.Subscribe(Options.DownloaderAgentRegisterCenterTopic, async message =>
+			{
+				if (message == null)
 				{
-					Logger.LogWarning($"接收到非法消息: {message}");
+					Logger.LogWarning("接收到空消息");
 					return;
 				}
 
-				switch (commandMessage.Command)
+				if (message.IsTimeout(60))
+				{
+					Logger.LogWarning($"消息超时: {JsonConvert.SerializeObject(message)}");
+					return;
+				}
+
+				switch (message.Type)
 				{
 					case Framework.RegisterCommand:
 					{
 						// 此处不考虑消息的超时，一是因为节点数量不会很多，二是因为超时的可以释放掉
-						var agent = JsonConvert.DeserializeObject<DownloaderAgent>(commandMessage.Message);
+						var agent = JsonConvert.DeserializeObject<DownloaderAgent>(message.Data);
 						if (agent != null)
 						{
 							await DownloaderAgentStore.RegisterAsync(agent);
@@ -82,7 +94,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 						}
 						else
 						{
-							Logger.LogError($"注册下载代理器消息不正确: {commandMessage.Message}");
+							Logger.LogError($"注册下载代理器消息不正确: {message.Data}");
 						}
 
 						break;
@@ -90,7 +102,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 
 					case Framework.HeartbeatCommand:
 					{
-						var heartbeat = JsonConvert.DeserializeObject<DownloaderAgentHeartbeat>(commandMessage.Message);
+						var heartbeat = JsonConvert.DeserializeObject<DownloaderAgentHeartbeat>(message.Data);
 						if (heartbeat != null)
 						{
 							if ((DateTime.Now - heartbeat.CreationTime).TotalSeconds < Options.MessageExpiredTime)
@@ -105,7 +117,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 						}
 						else
 						{
-							Logger.LogError($"下载代理器心跳信息不正确: {commandMessage.Message}");
+							Logger.LogError($"下载代理器心跳信息不正确: {message.Data}");
 						}
 
 						break;
@@ -118,7 +130,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{
-			EventBus.Unsubscribe(Framework.DownloaderAgentRegisterCenterTopic);
+			EventBus.Unsubscribe(Options.DownloaderAgentRegisterCenterTopic);
 			Logger.LogInformation("下载中心退出");
 			return base.StopAsync(cancellationToken);
 		}

@@ -15,3 +15,17 @@ function exit(id) {
         });
     });
 }
+
+function deleteAgent(id) {
+    swal({
+        title: "确定要删除此下载代理器吗?",
+        type: "warning",
+        showCancelButton: true
+    }, function () {
+        app.delete('/downloader-agent/' + id, function () {
+            window.location.reload();
+        }, function () {
+            swal('Error', 'Exit failed', "error");
+        });
+    });
+}

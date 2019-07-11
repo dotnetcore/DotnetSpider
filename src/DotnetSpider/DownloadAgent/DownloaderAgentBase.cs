@@ -23,6 +23,7 @@ namespace DotnetSpider.DownloadAgent
 	{
 		private readonly IEventBus _eventBus;
 		private readonly DownloaderAgentOptions _options;
+		private readonly SpiderOptions _spiderOptions;
 		private bool _exit;
 
 		private readonly ConcurrentDictionary<string, IDownloader> _cache =
@@ -44,15 +45,18 @@ namespace DotnetSpider.DownloadAgent
 		/// 构造方法
 		/// </summary>
 		/// <param name="options">下载器代理选项</param>
+		/// <param name="spiderOptions"></param>
 		/// <param name="eventBus">消息队列</param>
 		/// <param name="networkCenter">网络中心</param>
 		/// <param name="logger">日志接口</param>
 		protected DownloaderAgentBase(
 			DownloaderAgentOptions options,
+			SpiderOptions spiderOptions,
 			IEventBus eventBus,
 			NetworkCenter networkCenter,
 			ILogger logger)
 		{
+			_spiderOptions = spiderOptions;
 			_eventBus = eventBus;
 			_options = options;
 			Framework.NetworkCenter = networkCenter;
@@ -61,19 +65,19 @@ namespace DotnetSpider.DownloadAgent
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			// 注册节点
-			var json = JsonConvert.SerializeObject(new DownloaderAgent
+			await _eventBus.PublishAsync(_spiderOptions.DownloaderAgentRegisterCenterTopic, new Event
 			{
-				Id = _options.AgentId,
-				Name = _options.Name,
-				ProcessorCount = Environment.ProcessorCount,
-				TotalMemory = Framework.TotalMemory,
-				CreationTime = DateTime.Now,
-				LastModificationTime = DateTime.Now
+				Type = Framework.RegisterCommand,
+				Data = JsonConvert.SerializeObject(new DownloaderAgent
+				{
+					Id = _options.AgentId,
+					Name = _options.Name,
+					ProcessorCount = Environment.ProcessorCount,
+					TotalMemory = Framework.TotalMemory,
+					CreationTime = DateTime.Now,
+					LastModificationTime = DateTime.Now
+				})
 			});
-
-			await _eventBus.PublishAsync(Framework.DownloaderAgentRegisterCenterTopic,
-				$"|{Framework.RegisterCommand}|{json}");
 
 			// 订阅节点
 			SubscribeMessage();
@@ -95,6 +99,7 @@ namespace DotnetSpider.DownloadAgent
 			_eventBus.Unsubscribe("DownloadQueue");
 			_eventBus.Unsubscribe("AdslDownloadQueue");
 
+
 			// 一小时
 			var times = 12 * 60;
 			for (int i = 0; i < times && !cancellationToken.IsCancellationRequested; ++i)
@@ -102,6 +107,7 @@ namespace DotnetSpider.DownloadAgent
 				Thread.Sleep(5000);
 				Logger?.LogInformation($"下载器代理 {_options.AgentId} 退出中, 请在安全的时间后手动退出节点");
 			}
+
 
 			return Task.CompletedTask;
 		}
@@ -155,8 +161,12 @@ namespace DotnetSpider.DownloadAgent
 							CreationTime = DateTime.Now
 						});
 
-						await _eventBus.PublishAsync(Framework.DownloaderAgentRegisterCenterTopic,
-							$"|{Framework.HeartbeatCommand}|{json}");
+						await _eventBus.PublishAsync(_spiderOptions.DownloaderAgentRegisterCenterTopic,
+							new Event
+							{
+								Type = Framework.HeartbeatCommand,
+								Data = json
+							});
 						Logger?.LogDebug($"下载器代理 {_options.AgentId} 发送心跳成功");
 					}
 					catch (Exception e)
@@ -215,9 +225,9 @@ namespace DotnetSpider.DownloadAgent
 			}, stoppingToken);
 		}
 
-		private void HandleMessage(string message)
+		private void HandleMessage(Event message)
 		{
-			if (string.IsNullOrWhiteSpace(message))
+			if (message == null)
 			{
 				Logger?.LogWarning($"下载器代理 {_options.AgentId} 接收到空消息");
 				return;
@@ -229,32 +239,27 @@ namespace DotnetSpider.DownloadAgent
 
 			try
 			{
-				var commandMessage = message.ToCommandMessage();
-
-				if (commandMessage == null)
-				{
-					Logger?.LogWarning($"下载器代理 {_options.AgentId} 接收到非法消息: {message}");
-					return;
-				}
-
-				switch (commandMessage.Command)
+				switch (message.Type)
 				{
 					case Framework.DownloadCommand:
 					{
-						DownloadAsync(commandMessage.Message).ConfigureAwait(false).GetAwaiter();
+						if (message.IsTimeout(60))
+						{
+							break;
+						}
+
+						DownloadAsync(message.Data).ConfigureAwait(false).GetAwaiter();
 						break;
 					}
 
 					case Framework.ExitCommand:
 					{
-						var infos = commandMessage.Message.Split(',');
-						var timestamp = DateTime.Parse(infos[1]);
-						if ((DateTime.Now - timestamp).TotalSeconds > 6)
+						if (message.IsTimeout(6))
 						{
 							break;
 						}
 
-						if (infos[0] == _options.AgentId)
+						if (message.Data == _options.AgentId)
 						{
 							StopAsync(default).ConfigureAwait(true).GetAwaiter();
 						}
@@ -312,8 +317,11 @@ namespace DotnetSpider.DownloadAgent
 						response = await downloader.DownloadAsync(request);
 					}
 
-					_eventBus.Publish($"{Framework.ResponseHandlerTopic}{request.OwnerId}",
-						JsonConvert.SerializeObject(new[] {response}));
+					_eventBus.Publish($"{_spiderOptions.ResponseHandlerTopic}{request.OwnerId}",
+						new Event
+						{
+							Data = JsonConvert.SerializeObject(new[] {response})
+						});
 				}
 			}
 			else

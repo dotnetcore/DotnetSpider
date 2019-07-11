@@ -5,13 +5,11 @@ using System.Reflection;
 using Dapper;
 using DotnetSpider.Common;
 using DotnetSpider.Kafka;
-using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Entity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -126,7 +124,7 @@ namespace DotnetSpider.Portal
 					default:
 					{
 						if (conn.QuerySingle<int>(
-							    $"SELECT COUNT(*) from sysobjects WHERE id = object_id(N'[dbo].[QRTZ_FIRED_TRIGGERS]') ADD OBJECTPROPERTY(id, N'') = 1IsUserTable") ==
+							    $"SELECT COUNT(*) from sysobjects WHERE id = object_id(N'[dbo].[QRTZ_FIRED_TRIGGERS]') AND OBJECTPROPERTY(id, N'') = 1IsUserTable") ==
 						    0
 						)
 						{

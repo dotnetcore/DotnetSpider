@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
-using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,9 +39,9 @@ namespace DotnetSpider.Portal
 					var env = new List<string>((spider.Environment ?? "").Split(new[] {" "},
 						StringSplitOptions.RemoveEmptyEntries))
 					{
-						$"id={batch}",
-						$"type={spider.Type}",
-						$"name={spider.Name}"
+						$"DOTNET_SPIDER_id={batch}",
+						$"DOTNET_SPIDER_type={spider.Type}",
+						$"DOTNET_SPIDER_name={spider.Name}"
 					};
 					var image = $"{spider.Registry}/{spider.Repository}:{spider.Tag}";
 					var name = $"dotnetspider-{spider.Id}-{batch}";

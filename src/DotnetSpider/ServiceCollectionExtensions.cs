@@ -81,7 +81,7 @@ namespace DotnetSpider
 		{
 			services.AddSingleton<IHostedService, DefaultDownloaderAgent>();
 			services.AddSingleton<NetworkCenter>();
-			services.AddScoped<DownloaderAgentOptions>();
+			services.AddSingleton<DownloaderAgentOptions>();
 
 			DownloaderAgentBuilder spiderAgentBuilder = new DownloaderAgentBuilder(services);
 			configure?.Invoke(spiderAgentBuilder);

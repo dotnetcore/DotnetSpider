@@ -38,21 +38,23 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
         
 10. Kafka
 
-        docker run --name kafka -d -p 9092:9092 --restart always -h kafka.zousong.com --env ADVERTISED_PORT=9092 spotify/kafka
+        docker run -d --restart always --name kafka-dev -p 2181:2181 -p 3030:3030 -p 8081-8083:8081-8083 \
+               -p 9581-9585:9581-9585 -p 9092:9092 -e ADV_HOST=192.168.1.157 \
+               landoop/fast-data-dev:latest
         
 11. Docker remote api for mac
 
-        docker run -d --name socat -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
+        docker run -d  --restart always --name socat -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
 
 12. Docker registry
 
-        docker run -d --name registry -p 5000:5000 --name registry registry:2   
+        docker run -d  --restart always --name registry -p 5000:5000 --name registry registry:2   
         
 13. Add hosts
 
-        127.0.0.1       registry.zousong.com
-        127.0.0.1       kafka.zousong.com
-        127.0.0.1       zousong.com                      
+        {your id}       registry.zousong.com
+        {your id}       kafka.zousong.com
+        {your id}       zousong.com                      
                         
 ### MORE DOCUMENTS
 
@@ -146,28 +148,21 @@ https://github.com/dotnetcore/DotnetSpider/wiki
         }
     }
 
-#### Run distributed spider
-
-##### prepare environment follow `OPTIONAL ENVIRONMENT`
-
-    + MySql
-    + Kafka
+#### Distributed spider
      
-##### steps
+##### start 2 agent
 
-    1. start DotnetSpider.DownloadCenter
-    2. start Downloaderer.DownloaderAgent
-    3. run DotnetSpider.Sample/samples/DistributedSpider.Run
+    $ cd src/DotnetSpider.DownloaderAgent
+    $ sh build.sh
+    $ mkdir -p /Users/lewis/dotnetspider/logs/agent
+    $ docker run --name agent001 -d --restart always -e "DOTNET_SPIDER_AGENTID=agent001" -e "DOTNET_SPIDER_AGENTNAME=agent001" -e "DOTNET_SPIDER_KAFKACONSUMERGROUP=Agent" -v /Users/lewis/dotnetspider/agent/logs:/logs registry.zousong.com:5000/dotnetspider/downloader-agent:latest
+    $ docker run --name agent002 -d --restart always -e "DOTNET_SPIDER_AGENTID=agent002" -e "DOTNET_SPIDER_AGENTNAME=agent002" -e "DOTNET_SPIDER_KAFKACONSUMERGROUP=Agent" -v /Users/lewis/dotnetspider/agent/logs:/logs registry.zousong.com:5000/dotnetspider/downloader-agent:latest
+    
+#### start portal
 
-#### Run via Startup
-
-    Command: -s [spider type name] -i [id] -a [arg1,arg2...] -d [true/false] -n [name] -c [configuration file]
-
-    1.  -s: Type name of spider for example: EntitySpider
-    2.  -i: Set spider id
-    3.  -a: Pass arguments to spider's Run method
-    4.  -n: Set spider name
-    5.  -c: Set config file path, for example you want to run with a customize config: -c app.my.config
+    $ mkdir -p /Users/lewis/dotnetspider/portal & cd /Users/lewis/dotnetspider/portal
+    $ curl https://raw.githubusercontent.com/dotnetcore/DotnetSpider/master/src/DotnetSpider.Portal/appsettings.json -O
+    $ docker run --name dotnetspider.portal -d --restart always -p 7897:7896 -v /Users/lewis/dotnetspider/portal/appsettings.json:/portal/appsettings.json -v /Users/lewis/dotnetspider/portal/logs:/logs registry.zousong.com:5000/dotnetspider/portal:latest
 
 #### WebDriver Support
 

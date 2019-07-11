@@ -29,20 +29,19 @@ namespace DotnetSpider.Spiders
 			});
 
 			var config = configuration["config"];
-			builder.ConfigureAppConfiguration(b =>
+			builder.ConfigureAppConfiguration(x =>
 			{
 				if (!string.IsNullOrWhiteSpace(config) && File.Exists(config))
 				{
 					// 添加 JSON 配置文件
-					b.AddJsonFile(config);
+					x.AddJsonFile(config);
 				}
 				else
 				{
-					b.AddJsonFile("appsettings.json");
+					x.AddJsonFile("appsettings.json");
 				}
-
-				b.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
-				b.AddEnvironmentVariables();
+				x.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
+				x.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
 			});
 
 			var local = configuration["local"] == "true";

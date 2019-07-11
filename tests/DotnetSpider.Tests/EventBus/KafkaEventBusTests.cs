@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Common;
+using DotnetSpider.EventBus;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -21,13 +22,13 @@ namespace DotnetSpider.Tests.MessageQueue
 			var options = SpiderProvider.Value.GetRequiredService<SpiderOptions>();
 			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
 			var mq = new KafkaEventBus(options, logger);
-			mq.Subscribe("PubAndSub", msg =>
-			{
-				Interlocked.Increment(ref count);
-			});
+			mq.Subscribe("PubAndSub", msg => { Interlocked.Increment(ref count); });
 			for (int i = 0; i < 100; ++i)
 			{
-				await mq.PublishAsync("PubAndSub", "a");
+				await mq.PublishAsync("PubAndSub", new Event
+				{
+					Data = "a"
+				});
 			}
 
 			int j = 0;
@@ -52,12 +53,15 @@ namespace DotnetSpider.Tests.MessageQueue
 			var options = SpiderProvider.Value.GetRequiredService<SpiderOptions>();
 			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
 			var mq = new KafkaEventBus(options, logger);
-			mq.Subscribe("ParallelPubAndSub", msg =>
-			{
-				Interlocked.Increment(ref count);
-			});
+			mq.Subscribe("ParallelPubAndSub", msg => { Interlocked.Increment(ref count); });
 
-			Parallel.For(0, 100, async (i) => { await mq.PublishAsync("ParallelPubAndSub", "a"); });
+			Parallel.For(0, 100, async (i) =>
+			{
+				await mq.PublishAsync("ParallelPubAndSub", new Event
+				{
+					Data = "a"
+				});
+			});
 			int j = 0;
 			while (count < 100 && j < 150)
 			{
@@ -80,17 +84,17 @@ namespace DotnetSpider.Tests.MessageQueue
 			var options = SpiderProvider.Value.GetRequiredService<SpiderOptions>();
 			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
 			var mq = new KafkaEventBus(options, logger);
-			mq.Subscribe("PubAndUnSub", msg =>
-			{
-				Interlocked.Increment(ref count);
-			});
+			mq.Subscribe("PubAndUnSub", msg => { Interlocked.Increment(ref count); });
 
 			int i = 0;
 			Task.Factory.StartNew(async () =>
 			{
 				for (; i < 50; ++i)
 				{
-					await mq.PublishAsync("PubAndUnSub", "a");
+					await mq.PublishAsync("PubAndUnSub", new Event
+					{
+						Data = "a"
+					});
 					await Task.Delay(100);
 				}
 			}).ConfigureAwait(false).GetAwaiter();

@@ -72,6 +72,7 @@
                                 <span>@item.LastModificationTime</span>
                             </td>
                             <td>
+                                 <button class="btn btn-default btn-sm  btn-flat" onclick="deleteAgent('@item.Id')">Delete</button>
                                 <a class="btn btn-default btn-sm btn-flat" href="/downloader-agent/@item.Id/heartbeat">Heartbeat</a>
                                 <button @(item.IsActive() ? "" : "disabled") class="btn btn-default btn-sm  btn-flat" onclick="exit('@item.Id')">Exit</button>
                             </td>

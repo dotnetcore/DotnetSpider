@@ -71,7 +71,6 @@ namespace DotnetSpider.Portal.Controllers
 
 				list.Add(item);
 			}
-
 			return View(new StaticPagedList<ListSpiderContainerViewModel>(list, page, size,
 				containers.GetMetaData().TotalItemCount));
 		}
@@ -81,7 +80,11 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			try
 			{
-				await _eventBus.PublishAsync(batch, $"|{Framework.ExitCommand}|{batch}");
+				await _eventBus.PublishAsync(batch, new Event
+				{
+					Type = Framework.ExitCommand,
+					Data = batch
+				});
 				return Ok();
 			}
 			catch (Exception e)

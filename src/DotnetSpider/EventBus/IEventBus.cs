@@ -15,7 +15,7 @@ namespace DotnetSpider.EventBus
 		/// <param name="topic"></param>
 		/// <param name="message"></param>
 		/// <returns></returns>
-		Task PublishAsync(string topic, string message);
+		Task PublishAsync(string topic, Event message);
 
 		/// <summary>
 		/// 推送消息到指定 topic
@@ -23,14 +23,14 @@ namespace DotnetSpider.EventBus
 		/// <param name="topic"></param>
 		/// <param name="message"></param>
 		/// <returns></returns>
-		void Publish(string topic, string message);
+		void Publish(string topic, Event message);
 		
 		/// <summary>
 		/// 订阅 topic
 		/// </summary>
 		/// <param name="topic"></param>
 		/// <param name="action"></param>
-		void Subscribe(string topic, Action<string> action);
+		void Subscribe(string topic, Action<Event> action);
 
 		/// <summary>
 		/// 取消订阅 topic

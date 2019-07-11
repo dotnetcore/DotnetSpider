@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.EventBus;
@@ -75,6 +76,30 @@ namespace DotnetSpider.Portal.Controllers
 			}
 		}
 
+		[HttpDelete("downloader-agent/{id}")]
+		public async Task<IActionResult> DeleteAsync(string id)
+		{
+			if (!await _dbContext.Set<DownloaderAgent>().AnyAsync(x => x.Id == id))
+			{
+				return NotFound();
+			}
+
+			await _eventBus.PublishAsync(id, new Event
+			{
+				Type = Framework.ExitCommand,
+				Data = id
+			});
+
+			using (var conn = _dbContext.Database.GetDbConnection())
+			{
+				await conn.ExecuteAsync(
+					$"DELETE FROM downloader_agent_heartbeat WHERE agent_id = @Id; DELETE FROM downloader_agent WHERE id = @Id;",
+					new {Id = id});
+			}
+
+			return Ok();
+		}
+
 		[HttpPost("downloader-agent/{id}/exit")]
 		public async Task<IActionResult> ExitAsync(string id)
 		{
@@ -83,7 +108,11 @@ namespace DotnetSpider.Portal.Controllers
 				return NotFound();
 			}
 
-			await _eventBus.PublishAsync(id, $"|{Framework.ExitCommand}|{id},{DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+			await _eventBus.PublishAsync(id, new Event
+			{
+				Type = Framework.ExitCommand,
+				Data = id
+			});
 			return Ok();
 		}
 	}

@@ -15,6 +15,7 @@ namespace DotnetSpider.Statistics
 		private readonly IEventBus _eventBus;
 		private readonly ILogger _logger;
 		private readonly IStatisticsStore _statisticsStore;
+		private readonly SpiderOptions _options;
 
 		public bool IsRunning { get; private set; }
 
@@ -22,11 +23,13 @@ namespace DotnetSpider.Statistics
 		/// 构造方法
 		/// </summary>
 		/// <param name="eventBus">消息队列接口</param>
+		/// <param name="options"></param>
 		/// <param name="statisticsStore">统计存储接口</param>
 		/// <param name="logger">日志接口</param>
-		public StatisticsCenter(IEventBus eventBus, IStatisticsStore statisticsStore,
+		public StatisticsCenter(IEventBus eventBus, SpiderOptions options, IStatisticsStore statisticsStore,
 			ILogger<StatisticsCenter> logger)
 		{
+			_options = options;
 			_eventBus = eventBus;
 			_statisticsStore = statisticsStore;
 			_logger = logger;
@@ -36,7 +39,7 @@ namespace DotnetSpider.Statistics
 		{
 			await _statisticsStore.EnsureDatabaseAndTableCreatedAsync();
 			_logger.LogInformation("统计中心准备数据库完成");
-			_eventBus.Subscribe(Framework.StatisticsServiceTopic,
+			_eventBus.Subscribe(_options.StatisticsServiceTopic,
 				async message => await HandleStatisticsMessageAsync(message));
 			_logger.LogInformation("统计中心启动");
 			IsRunning = true;
@@ -49,53 +52,52 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{
-			_eventBus.Unsubscribe(Framework.StatisticsServiceTopic);
+			_eventBus.Unsubscribe(_options.StatisticsServiceTopic);
 			_logger.LogInformation("统计中心退出");
 			return base.StopAsync(cancellationToken);
 		}
 
-		private async Task HandleStatisticsMessageAsync(string message)
+		private async Task HandleStatisticsMessageAsync(Event message)
 		{
-			var commandMessage = message.ToCommandMessage();
-			if (commandMessage == null)
+			if (string.IsNullOrWhiteSpace(message.Data))
 			{
-				_logger.LogWarning($"接收到非法消息: {message}");
+				_logger.LogWarning($"接收到空消息");
 				return;
 			}
 
-			switch (commandMessage.Command)
+			switch (message.Type)
 			{
 				case "Success":
 				{
-					var ownerId = commandMessage.Message;
+					var ownerId = message.Data;
 					await _statisticsStore.IncrementSuccessAsync(ownerId);
 					break;
 				}
 
 				case "Failed":
 				{
-					var data = commandMessage.Message.Split(',');
+					var data = message.Data.Split(',');
 					await _statisticsStore.IncrementFailedAsync(data[0], int.Parse(data[1]));
 					break;
 				}
 
 				case "Start":
 				{
-					var ownerId = commandMessage.Message;
+					var ownerId = message.Data;
 					await _statisticsStore.StartAsync(ownerId);
 					break;
 				}
 
 				case "Exit":
 				{
-					var ownerId = commandMessage.Message;
+					var ownerId = message.Data;
 					await _statisticsStore.ExitAsync(ownerId);
 					break;
 				}
 
 				case "Total":
 				{
-					var data = commandMessage.Message.Split(',');
+					var data = message.Data.Split(',');
 					await _statisticsStore.IncrementTotalAsync(data[0], int.Parse(data[1]));
 
 					break;
@@ -103,7 +105,7 @@ namespace DotnetSpider.Statistics
 
 				case "DownloadSuccess":
 				{
-					var data = commandMessage.Message.Split(',');
+					var data = message.Data.Split(',');
 					await _statisticsStore.IncrementDownloadSuccessAsync(data[0], int.Parse(data[1]),
 						long.Parse(data[2]));
 					break;
@@ -111,7 +113,7 @@ namespace DotnetSpider.Statistics
 
 				case "DownloadFailed":
 				{
-					var data = commandMessage.Message.Split(',');
+					var data = message.Data.Split(',');
 					await _statisticsStore.IncrementDownloadFailedAsync(data[0], int.Parse(data[1]),
 						long.Parse(data[2]));
 					break;
@@ -119,7 +121,7 @@ namespace DotnetSpider.Statistics
 
 				case "Print":
 				{
-					var ownerId = commandMessage.Message;
+					var ownerId = message.Data;
 					var statistics = await _statisticsStore.GetSpiderStatisticsAsync(ownerId);
 					if (statistics != null)
 					{

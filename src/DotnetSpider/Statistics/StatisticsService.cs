@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using DotnetSpider.Common;
 using DotnetSpider.EventBus;
-using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Statistics
 {
@@ -11,14 +10,17 @@ namespace DotnetSpider.Statistics
 	public class StatisticsService : IStatisticsService
 	{
 		private readonly IEventBus _eventBus;
+		private readonly SpiderOptions _options;
 
 		/// <summary>
 		/// 构造方法
 		/// </summary>
 		/// <param name="eventBus">消息队列接口</param>
-		public StatisticsService(IEventBus eventBus)
+		/// <param name="options"></param>
+		public StatisticsService(IEventBus eventBus, SpiderOptions options)
 		{
 			_eventBus = eventBus;
+			_options = options;
 		}
 
 		/// <summary>
@@ -28,7 +30,11 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementSuccessAsync(string ownerId)
 		{
-			await _eventBus.PublishAsync(Framework.StatisticsServiceTopic, $"|Success|{ownerId}");
+			await _eventBus.PublishAsync(_options.StatisticsServiceTopic, new Event
+			{
+				Type = "Success",
+				Data = ownerId
+			});
 		}
 
 		/// <summary>
@@ -39,7 +45,11 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementFailedAsync(string ownerId, int count = 1)
 		{
-			await _eventBus.PublishAsync(Framework.StatisticsServiceTopic, $"|Failed|{ownerId},{count}");
+			await _eventBus.PublishAsync(_options.StatisticsServiceTopic, new Event
+			{
+				Type = "Failed",
+				Data = $"{ownerId},{count}"
+			});
 		}
 
 		/// <summary>
@@ -49,7 +59,11 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task StartAsync(string ownerId)
 		{
-			await _eventBus.PublishAsync(Framework.StatisticsServiceTopic, $"|Start|{ownerId}");
+			await _eventBus.PublishAsync(_options.StatisticsServiceTopic, new Event
+			{
+				Type = "Start",
+				Data = ownerId
+			});
 		}
 
 		/// <summary>
@@ -59,7 +73,11 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task ExitAsync(string ownerId)
 		{
-			await _eventBus.PublishAsync(Framework.StatisticsServiceTopic, $"|Exit|{ownerId}");
+			await _eventBus.PublishAsync(_options.StatisticsServiceTopic, new Event
+			{
+				Type = "Exit",
+				Data = ownerId
+			});
 		}
 
 		/// <summary>
@@ -71,8 +89,11 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementDownloadSuccessAsync(string agentId, int count, long elapsedMilliseconds)
 		{
-			await _eventBus.PublishAsync(Framework.StatisticsServiceTopic,
-				$"|DownloadSuccess|{agentId},{count},{elapsedMilliseconds}");
+			await _eventBus.PublishAsync(_options.StatisticsServiceTopic, new Event
+			{
+				Type = "DownloadSuccess",
+				Data = $"{agentId},{count},{elapsedMilliseconds}"
+			});
 		}
 
 		/// <summary>
@@ -84,8 +105,11 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementDownloadFailedAsync(string agentId, int count, long elapsedMilliseconds)
 		{
-			await _eventBus.PublishAsync(Framework.StatisticsServiceTopic,
-				$"|DownloadFailed|{agentId},{count},{elapsedMilliseconds}");
+			await _eventBus.PublishAsync(_options.StatisticsServiceTopic, new Event
+			{
+				Type = "DownloadFailed",
+				Data = $"{agentId},{count},{elapsedMilliseconds}"
+			});
 		}
 
 		/// <summary>
@@ -95,8 +119,11 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task PrintStatisticsAsync(string ownerId)
 		{
-			await _eventBus.PublishAsync(Framework.StatisticsServiceTopic,
-				$"|Print|{ownerId}");
+			await _eventBus.PublishAsync(_options.StatisticsServiceTopic, new Event
+			{
+				Type = "Print",
+				Data = ownerId
+			});
 		}
 
 		/// <summary>
@@ -107,8 +134,11 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public async Task IncrementTotalAsync(string ownerId, int count)
 		{
-			await _eventBus.PublishAsync(Framework.StatisticsServiceTopic,
-				$"|Total|{ownerId},{count}");
+			await _eventBus.PublishAsync(_options.StatisticsServiceTopic, new Event
+			{
+				Type = "Total",
+				Data = $"{ownerId},{count}"
+			});
 		}
 	}
 }
