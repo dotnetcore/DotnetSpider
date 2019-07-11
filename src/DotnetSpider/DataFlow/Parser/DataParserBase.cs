@@ -15,12 +15,12 @@ namespace DotnetSpider.DataFlow.Parser
 		/// <summary>
 		/// 判断当前请求是否可以解析
 		/// </summary>
-		public Func<Request, bool> RequireParse { get; set; }
+		public Func<Request, bool> Required { get; set; }
 
 		/// <summary>
 		/// 查询当前请求的下一级请求
 		/// </summary>
-		public Func<DataFlowContext, List<string>> QueryFollowRequests { get; set; }
+		public Func<DataFlowContext, List<string>> GetFollowRequests { get; set; }
 
 		/// <summary>
 		/// 选择器的生成方法
@@ -43,7 +43,7 @@ namespace DotnetSpider.DataFlow.Parser
 			try
 			{
 				// 如果不匹配则跳过，不影响其它数据流处理器的执行
-				if (RequireParse != null && !RequireParse(context.Response.Request))
+				if (Required != null && !Required(context.Response.Request))
 				{
 					return DataFlowResult.Success;
 				}
@@ -52,7 +52,7 @@ namespace DotnetSpider.DataFlow.Parser
 
 				var parserResult = await Parse(context);
 
-				var urls = QueryFollowRequests?.Invoke(context);
+				var urls = GetFollowRequests?.Invoke(context);
 				AddFollowRequests(context, urls);
 
 				if (parserResult == DataFlowResult.Failed || parserResult == DataFlowResult.Terminated)
@@ -77,7 +77,7 @@ namespace DotnetSpider.DataFlow.Parser
 				foreach (var url in urls)
 				{
 					var followRequest = CreateFromRequest(dfc.Response.Request, url);
-					if (RequireParse == null || RequireParse(followRequest))
+					if (Required == null || Required(followRequest))
 					{
 						followRequests.Add(followRequest);
 					}

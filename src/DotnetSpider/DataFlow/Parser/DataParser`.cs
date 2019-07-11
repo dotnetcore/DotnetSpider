@@ -36,7 +36,7 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 
 			var xPaths = followXPaths.ToArray();
-			QueryFollowRequests = context => DataParserHelper.QueryFollowRequestsByXPath(xPaths).Invoke(context);
+			GetFollowRequests = context => DataParserHelper.QueryFollowRequestsByXPath(xPaths).Invoke(context);
 		}
 
 		protected override Task<DataFlowResult> Parse(DataFlowContext context)

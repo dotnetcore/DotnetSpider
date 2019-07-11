@@ -40,8 +40,8 @@ namespace DotnetSpider.Sample.samples
             spider.AddDataFlow(new DataParser
             {
                 SelectableFactory = context => context.GetSelectable(ContentType.Html),
-                RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com"),
-                QueryFollowRequests =  DataParserHelper.QueryFollowRequestsByXPath(".")
+                Required = DataParserHelper.CheckIfRequiredByRegex("cnblogs\\.com"),
+                GetFollowRequests =  DataParserHelper.QueryFollowRequestsByXPath(".")
             }).AddDataFlow(new ConsoleStorage()); // 控制台打印采集结果
             spider.AddRequests("http://www.cnblogs.com/"); // 设置起始链接
             spider.RunAsync(); // 启动
@@ -80,8 +80,8 @@ namespace DotnetSpider.Sample.samples
         {
             public CnblogsDataParser()
             {
-                RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
-                QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
+                Required = DataParserHelper.CheckIfRequiredByRegex("cnblogs\\.com");
+                GetFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
             }
 
             protected override Task<DataFlowResult> Parse(DataFlowContext context)

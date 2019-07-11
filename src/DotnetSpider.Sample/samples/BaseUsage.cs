@@ -62,8 +62,8 @@ namespace DotnetSpider.Sample.samples
 		{
 			public CnblogsDataParser()
 			{
-				RequireParse = DataParserHelper.CanParseByRegex("cnblogs\\.com");
-				QueryFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
+				Required = DataParserHelper.CheckIfRequiredByRegex("cnblogs\\.com");
+				GetFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
 			}
 
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)

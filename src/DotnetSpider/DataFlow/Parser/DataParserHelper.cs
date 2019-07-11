@@ -43,7 +43,7 @@ namespace DotnetSpider.DataFlow.Parser
 		/// </summary>
 		/// <param name="patterns">正则表达式</param>
 		/// <returns></returns>
-		public static Func<Request, bool> CanParseByRegex(params string[] patterns)
+		public static Func<Request, bool> CheckIfRequiredByRegex(params string[] patterns)
 		{
 			return request =>
 			{

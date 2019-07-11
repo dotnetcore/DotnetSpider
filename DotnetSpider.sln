@@ -11,6 +11,7 @@ ProjectSection(SolutionItems) = preProject
 	README.md = README.md
 	runtests.sh = runtests.sh
 	azure-pipelines.yml = azure-pipelines.yml
+	docker-compose.yml = docker-compose.yml
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Tests", "tests\DotnetSpider.Tests\DotnetSpider.Tests.csproj", "{32A4F6B5-0377-4353-BF06-A0E7328CBB9C}"
