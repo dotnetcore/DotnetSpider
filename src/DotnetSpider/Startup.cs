@@ -31,7 +31,7 @@ namespace DotnetSpider
 		{
 			try
 			{
-				var logfile = Environment.GetEnvironmentVariable("id");
+				var logfile = Environment.GetEnvironmentVariable("DOTNET_SPIDER_id");
 				logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
 				Environment.SetEnvironmentVariable("logfile", logfile);
 
