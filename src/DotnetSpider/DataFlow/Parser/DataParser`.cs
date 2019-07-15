@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Logging;
@@ -39,6 +40,11 @@ namespace DotnetSpider.DataFlow.Parser
 			GetFollowRequests = context => DataParserHelper.QueryFollowRequestsByXPath(xPaths).Invoke(context);
 		}
 
+		protected virtual T ConfigureDataObject(T t)
+		{
+			return t;
+		}
+
 		protected override Task<DataFlowResult> Parse(DataFlowContext context)
 		{
 			if (!context.Contains(_model.TypeName))
@@ -64,6 +70,11 @@ namespace DotnetSpider.DataFlow.Parser
 				foreach (var selector in _model.ShareValueSelectors)
 				{
 					string name = selector.Name;
+					if (string.IsNullOrWhiteSpace(name))
+					{
+						continue;
+					}
+
 					var value = selectable.Select(selector.ToSelector()).GetValue();
 					if (!environments.ContainsKey(name))
 					{
@@ -174,6 +185,12 @@ namespace DotnetSpider.DataFlow.Parser
 							break;
 						}
 
+						case "MONTH":
+						{
+							value = DateTimeHelper.MonthString;
+							break;
+						}
+
 						default:
 						{
 							if (environments.ContainsKey(field.Expression))
@@ -226,7 +243,7 @@ namespace DotnetSpider.DataFlow.Parser
 				field.PropertyInfo.SetValue(dataObject, newValue);
 			}
 
-			return dataObject;
+			return ConfigureDataObject(dataObject);
 		}
 	}
 }

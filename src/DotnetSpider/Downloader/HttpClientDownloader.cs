@@ -191,6 +191,10 @@ namespace DotnetSpider.Downloader
 						Logger?.LogWarning($"任务 {request.OwnerId} 释放 {request.Url} 失败 [{i}]: {e}");
 					}
 				}
+
+				// 下载失败需要等待一秒，防止频率过高。
+				// TODO: 改成可配置
+				Thread.Sleep(1000);
 			}
 
 			return response;
@@ -209,6 +213,11 @@ namespace DotnetSpider.Downloader
 
 		protected virtual byte[] CompressContent(Request request)
 		{
+			if (string.IsNullOrWhiteSpace(request.Body))
+			{
+				return new byte[0];
+			}
+
 			var encoding = string.IsNullOrEmpty(request.Encoding)
 				? Encoding.UTF8
 				: Encoding.GetEncoding(request.Encoding);

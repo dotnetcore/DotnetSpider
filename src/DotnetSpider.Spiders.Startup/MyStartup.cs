@@ -7,13 +7,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace DotnetSpider.Spiders
+namespace DotnetSpider.Spiders.Startup
 {
-	public class MyStartup : Startup
+	public class MyStartup : DotnetSpider.Startup
 	{
 		protected override List<string> DetectAssemblies()
 		{
-			return new List<string> {};
+			return new List<string> {"DotnetSpider.Spiders"};
 		}
 
 		protected override void ConfigureService(IConfiguration configuration, SpiderHostBuilder builder)
@@ -23,7 +23,7 @@ namespace DotnetSpider.Spiders
 #if DEBUG
 				b.SetMinimumLevel(LogLevel.Debug);
 #else
-                b.SetMinimumLevel(LogLevel.Information);
+				b.SetMinimumLevel(LogLevel.Information);
 #endif
 				b.AddSerilog();
 			});
@@ -40,15 +40,16 @@ namespace DotnetSpider.Spiders
 				{
 					x.AddJsonFile("appsettings.json");
 				}
+
 				x.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
 				x.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
 			});
 
-			var local = configuration["local"] == "true";
+			var distributed = configuration["distributed"] == "true";
 
 			builder.ConfigureServices(services =>
 			{
-				if (local)
+				if (!distributed)
 				{
 					services.AddLocalEventBus();
 					services.AddLocalDownloadCenter();

@@ -60,7 +60,8 @@ namespace DotnetSpider.DownloadAgent
 			_eventBus = eventBus;
 			_options = options;
 			Framework.NetworkCenter = networkCenter;
-			Logger = logger;
+
+			Logger = _eventBus is LocalEventBus ? null : logger;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -233,7 +234,6 @@ namespace DotnetSpider.DownloadAgent
 				return;
 			}
 #if DEBUG
-
 			Logger?.LogDebug($"下载器代理 {_options.AgentId} 接收到消息: {message}");
 #endif
 

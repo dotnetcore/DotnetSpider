@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DotnetSpider.Common;
 
 namespace DotnetSpider.Downloader
@@ -113,7 +114,7 @@ namespace DotnetSpider.Downloader
 		/// 已经重试的次数
 		/// </summary>
 		public int RetriedTimes { get; set; }
-		
+
 		/// <summary>
 		/// 是否使用 ADSL 下载器
 		/// </summary>
@@ -155,12 +156,12 @@ namespace DotnetSpider.Downloader
 		/// 下载策略
 		/// </summary>
 		public DownloadPolicy DownloadPolicy { get; set; } = DownloadPolicy.Random;
-		
+
 		/// <summary>
 		/// 设置 Cookie 的 domain
 		/// </summary>
 		public string Domain { get; set; }
-		
+
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -267,7 +268,8 @@ namespace DotnetSpider.Downloader
 		public virtual void ComputeHash()
 		{
 			// TODO:
-			var content = $"{OwnerId}{Url}{Method}{Body}{Cookie}";
+			var content =
+				$"{OwnerId}{Url}{Method}{Body}{Cookie}{string.Join(", ", Headers.Select(x => $"{x.Key}={x.Value}"))}";
 			Hash = content.ToMd5();
 		}
 	}

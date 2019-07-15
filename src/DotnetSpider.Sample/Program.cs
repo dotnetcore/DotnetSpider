@@ -11,7 +11,7 @@ namespace DotnetSpider.Sample
 	{
 		static async Task Main(string[] args)
 		{
-			var	configure = new LoggerConfiguration()
+			var configure = new LoggerConfiguration()
 #if DEBUG
 				.MinimumLevel.Verbose()
 #else
@@ -22,7 +22,7 @@ namespace DotnetSpider.Sample
 				.WriteTo.Console().WriteTo
 				.RollingFile("dotnet-spider.log");
 			Log.Logger = configure.CreateLogger();
-
+			
 			await BaseUsage.Run();
 
 			// await DistributedSpider.Run(); 

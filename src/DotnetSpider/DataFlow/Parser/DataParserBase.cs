@@ -77,7 +77,7 @@ namespace DotnetSpider.DataFlow.Parser
 				foreach (var url in urls)
 				{
 					var followRequest = CreateFromRequest(dfc.Response.Request, url);
-					if (Required == null || Required(followRequest))
+					if (followRequest != null && (Required == null || Required(followRequest)))
 					{
 						followRequests.Add(followRequest);
 					}
