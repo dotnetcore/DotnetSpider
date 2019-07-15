@@ -44,7 +44,7 @@ namespace DotnetSpider.Sample.samples
 			}
 
 			Console.Read();
-			
+
 			var spider = provider.Create<Spider>();
 			spider.NewGuidId(); // 设置任务标识
 			spider.Name = "博客园全站采集"; // 设置任务名称
@@ -63,7 +63,7 @@ namespace DotnetSpider.Sample.samples
 			public CnblogsDataParser()
 			{
 				Required = DataParserHelper.CheckIfRequiredByRegex("cnblogs\\.com");
-				GetFollowRequests = DataParserHelper.QueryFollowRequestsByXPath(".");
+				FollowRequestQuerier = BuildFollowRequestQuerier(DataParserHelper.QueryFollowRequestsByXPath("."));
 			}
 
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)

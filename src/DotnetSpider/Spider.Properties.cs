@@ -8,7 +8,6 @@ using DotnetSpider.EventBus;
 using DotnetSpider.RequestSupplier;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
-using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider
 {

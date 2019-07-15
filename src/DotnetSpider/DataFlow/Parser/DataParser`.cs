@@ -37,7 +37,8 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 
 			var xPaths = followXPaths.ToArray();
-			GetFollowRequests = context => DataParserHelper.QueryFollowRequestsByXPath(xPaths).Invoke(context);
+
+			FollowRequestQuerier = BuildFollowRequestQuerier(DataParserHelper.QueryFollowRequestsByXPath(xPaths));
 		}
 
 		protected virtual T ConfigureDataObject(T t)
@@ -53,6 +54,7 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 
 			var selectable = context.GetSelectable();
+
 			var results = new ParseResult<T>();
 			if (selectable.Properties == null)
 			{
@@ -88,7 +90,6 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 
 			bool singleExtractor = _model.Selector == null;
-
 			if (!singleExtractor)
 			{
 				var selector = _model.Selector.ToSelector();
@@ -151,7 +152,6 @@ namespace DotnetSpider.DataFlow.Parser
 			int index)
 		{
 			var dataObject = new T();
-
 			foreach (var field in _model.ValueSelectors)
 			{
 				string value = null;

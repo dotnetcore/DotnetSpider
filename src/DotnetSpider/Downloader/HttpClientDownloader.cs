@@ -262,10 +262,17 @@ namespace DotnetSpider.Downloader
 
 			if (!string.IsNullOrWhiteSpace(request.UserAgent))
 			{
-				var header = "User-Agent";
-				httpRequestMessage.Headers.Remove(header);
-				httpRequestMessage.Headers.TryAddWithoutValidation(header, request.UserAgent);
+				httpRequestMessage.Headers.TryAddWithoutValidation("User-Agent", request.UserAgent);
 			}
+			else
+			{
+				if (!request.Headers.ContainsKey("User-Agent"))
+				{
+					httpRequestMessage.Headers.TryAddWithoutValidation("User-Agent",
+						"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36");
+				}
+			}
+
 
 			if (!string.IsNullOrWhiteSpace(request.Referer))
 			{
@@ -293,12 +300,15 @@ namespace DotnetSpider.Downloader
 				var bytes = CompressContent(request);
 				httpRequestMessage.Content = new ByteArrayContent(bytes);
 
-				if (!string.IsNullOrWhiteSpace(request.ContentType))
-				{
-					var header = "Content-Type";
-					httpRequestMessage.Content.Headers.Remove(header);
-					httpRequestMessage.Content.Headers.TryAddWithoutValidation(header, request.ContentType);
-				}
+				var header = "Content-Type";
+				var contentType = !string.IsNullOrWhiteSpace(request.ContentType)
+					? request.ContentType
+					: request.Headers.ContainsKey(header)
+						? request.Headers[header]
+						: "application/json";
+
+				httpRequestMessage.Content.Headers.Remove(header);
+				httpRequestMessage.Content.Headers.TryAddWithoutValidation(header, contentType);
 
 				var xRequestedWithHeader = "X-Requested-With";
 				if (request.Headers.ContainsKey(xRequestedWithHeader) &&
