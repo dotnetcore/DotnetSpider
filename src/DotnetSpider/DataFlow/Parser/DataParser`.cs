@@ -67,9 +67,9 @@ namespace DotnetSpider.DataFlow.Parser
 				environments.Add(property.Key, property.Value);
 			}
 
-			if (_model.ShareValueSelectors != null)
+			if (_model.GlobalValueSelectors != null)
 			{
-				foreach (var selector in _model.ShareValueSelectors)
+				foreach (var selector in _model.GlobalValueSelectors)
 				{
 					string name = selector.Name;
 					if (string.IsNullOrWhiteSpace(name))
@@ -188,6 +188,12 @@ namespace DotnetSpider.DataFlow.Parser
 						case "MONTH":
 						{
 							value = DateTimeHelper.MonthString;
+							break;
+						}
+
+						case "MONDAY":
+						{
+							value = DateTimeHelper.MondayString;
 							break;
 						}
 

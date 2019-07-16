@@ -305,7 +305,7 @@ namespace DotnetSpider.Downloader
 					? request.ContentType
 					: request.Headers.ContainsKey(header)
 						? request.Headers[header]
-						: "application/json";
+						: null;
 
 				httpRequestMessage.Content.Headers.Remove(header);
 				httpRequestMessage.Content.Headers.TryAddWithoutValidation(header, contentType);

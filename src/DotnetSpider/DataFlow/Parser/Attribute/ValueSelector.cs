@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using DotnetSpider.Selector;
 
@@ -6,6 +7,7 @@ namespace DotnetSpider.DataFlow.Parser.Attribute
 	/// <summary>
 	/// 属性选择器的定义
 	/// </summary>
+	[AttributeUsage(AttributeTargets.Property)]
 	public class ValueSelector : Selector
 	{
 		/// <summary>
@@ -17,11 +19,6 @@ namespace DotnetSpider.DataFlow.Parser.Attribute
 		/// 值是否可以为空, 如果不能为空但解析到的值为空时，当前对象被抛弃
 		/// </summary>
 		internal bool NotNull { get; set; }
-
-		/// <summary>
-		/// 解析值的名称，配置在 Entity 上时必填，配置在属性上时可以空，如果为空会被属性名替代
-		/// </summary>
-		public string Name { get; set; }
 
 		/// <summary>
 		/// 构造方法

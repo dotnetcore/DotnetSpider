@@ -47,7 +47,7 @@ namespace DotnetSpider.DataFlow.Parser
 		/// <summary>
 		/// 共享值的选择器
 		/// </summary>
-		public HashSet<ValueSelector> ShareValueSelectors { get; }
+		public HashSet<GlobalValueSelector> GlobalValueSelectors { get; }
 
 		/// <summary>
 		/// 构造方法
@@ -70,8 +70,8 @@ namespace DotnetSpider.DataFlow.Parser
 
 			var followSelectors = type.GetCustomAttributes(typeof(FollowSelector), true).Select(x => (FollowSelector) x)
 				.ToList();
-			var sharedValueSelectors = type.GetCustomAttributes(typeof(ValueSelector), true)
-				.Select(x => (ValueSelector) x).ToList();
+			var sharedValueSelectors = type.GetCustomAttributes(typeof(GlobalValueSelector), true)
+				.Select(x => (GlobalValueSelector) x).ToList();
 
 			var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
@@ -86,11 +86,6 @@ namespace DotnetSpider.DataFlow.Parser
 					continue;
 				}
 
-				if (string.IsNullOrWhiteSpace(valueSelector.Name))
-				{
-					valueSelector.Name = property.Name;
-				}
-
 				valueSelector.Formatters = property.GetCustomAttributes(typeof(Formatter.Formatter), true)
 					.Select(p => (Formatter.Formatter) p).ToArray();
 				valueSelector.PropertyInfo = property;
@@ -101,12 +96,12 @@ namespace DotnetSpider.DataFlow.Parser
 			Selector = selector;
 			ValueSelectors = valueSelectors;
 			FollowSelectors = new HashSet<FollowSelector>(followSelectors);
-			ShareValueSelectors = new HashSet<ValueSelector>(sharedValueSelectors);
-			foreach (var valueSelector in ShareValueSelectors)
+			GlobalValueSelectors = new HashSet<GlobalValueSelector>(sharedValueSelectors);
+			foreach (var valueSelector in GlobalValueSelectors)
 			{
 				if (string.IsNullOrWhiteSpace(valueSelector.Name))
 				{
-					throw new SpiderException("Name of shared value selector should not be null");
+					throw new SpiderException("Name of global value selector should not be null");
 				}
 			}
 

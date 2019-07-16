@@ -31,7 +31,7 @@ namespace DotnetSpider.DataFlow
 		/// <summary>
 		/// 解析到的目标链接
 		/// </summary>
-		public List<Request> FollowRequests { get; set; } = new List<Request>();
+		internal List<Request> FollowRequests { get; set; } = new List<Request>();
 
 		/// <summary>
 		/// 构造方法
