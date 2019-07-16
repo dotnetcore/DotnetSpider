@@ -16,19 +16,18 @@ namespace DotnetSpider.Common
 {
 	public static class Framework
 	{
-		public static readonly Dictionary<string, string> SwitchMappings =
+		public static Dictionary<string, string> SwitchMappings =
 			new Dictionary<string, string>
 			{
-				{"-t", "type"},
-				{"-n", "name"},
-				{"-i", "id"},
-				{"-a", "args"},
-				{"-c", "config"},
-				{"-l", "local"}
+				{"-t", "TYPE"},
+				{"-n", "NAME"},
+				{"-i", "ID"},
+				{"-c", "CONFIG"},
+				{"-d", "DISTRIBUTED"}
 			};
 
 		private const string DefaultAppSettings = "appsettings.json";
-		
+
 		public const string DownloadCommand = "Download";
 		public const string RegisterCommand = "Register";
 		public const string HeartbeatCommand = "Heartbeat";

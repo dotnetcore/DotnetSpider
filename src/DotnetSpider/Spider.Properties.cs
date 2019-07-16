@@ -14,7 +14,6 @@ namespace DotnetSpider
 	public partial class Spider
 	{
 		private readonly List<Request> _requests = new List<Request>();
-		private readonly IServiceProvider _services;
 		private readonly List<IDataFlow> _dataFlows = new List<IDataFlow>();
 		private readonly IEventBus _eventBus;
 	

@@ -33,11 +33,13 @@ namespace DotnetSpider
 		/// 配置选项
 		/// </summary>
 		protected SpiderOptions Options { get; }
-		
+
 		/// <summary>
 		/// 日志接口
 		/// </summary>
 		protected ILogger Logger { get; }
+
+		protected IServiceProvider Services { get; }
 
 		/// <summary>
 		/// 结束前的处理工作
@@ -63,7 +65,7 @@ namespace DotnetSpider
 			ILogger<Spider> logger,
 			IServiceProvider services)
 		{
-			_services = services;
+			Services = services;
 			_statisticsService = statisticsService;
 			_eventBus = eventBus;
 			Options = options;
@@ -103,7 +105,7 @@ namespace DotnetSpider
 		{
 			Check.NotNull(dataFlow, nameof(dataFlow));
 			CheckIfRunning();
-			dataFlow.Logger = _services.GetRequiredService<ILoggerFactory>().CreateLogger(dataFlow.GetType());
+			dataFlow.Logger = Services.GetRequiredService<ILoggerFactory>().CreateLogger(dataFlow.GetType());
 			_dataFlows.Add(dataFlow);
 			return this;
 		}
@@ -625,7 +627,7 @@ namespace DotnetSpider
 
 					try
 					{
-						var context = new DataFlowContext(response, _services.CreateScope().ServiceProvider);
+						var context = new DataFlowContext(response, Services.CreateScope().ServiceProvider);
 
 						foreach (var dataFlow in _dataFlows)
 						{

@@ -17,7 +17,7 @@ namespace DotnetSpider
 	/// </summary>
 	public abstract class Startup
 	{
-		public static void Execute<TSpider>()
+		public static void Execute<TSpider>(params string[] args)
 		{
 			var logfile = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
 			logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
@@ -27,7 +27,7 @@ namespace DotnetSpider
 			{
 				var configure = new LoggerConfiguration()
 #if DEBUG
-				.MinimumLevel.Verbose()
+					.MinimumLevel.Verbose()
 #else
 					.MinimumLevel.Information()
 #endif
@@ -46,11 +46,11 @@ namespace DotnetSpider
 			var configurationBuilder = new ConfigurationBuilder();
 			configurationBuilder.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
 			configurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
-			configurationBuilder.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
+			configurationBuilder.AddCommandLine(args, Framework.SwitchMappings);
 			var configuration = configurationBuilder.Build();
-			
+
 			var id = configuration["ID"] ?? Guid.NewGuid().ToString("N");
-			var name =  configuration["NAME"]??id;
+			var name = configuration["NAME"] ?? id;
 			var arguments = Environment.GetCommandLineArgs();
 
 			PrintEnvironment();
@@ -116,9 +116,9 @@ namespace DotnetSpider
 			else
 			{
 				Log.Logger.Error("创建爬虫对象失败", 0, ConsoleColor.DarkYellow);
-			}	
+			}
 		}
-		
+
 		/// <summary>
 		/// DLL 名字中包含任意一个即是需要扫描的 DLL
 		/// </summary>
@@ -147,7 +147,7 @@ namespace DotnetSpider
 				var configurationBuilder = new ConfigurationBuilder();
 				configurationBuilder.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
 				configurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
-				configurationBuilder.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
+				configurationBuilder.AddCommandLine(args, Framework.SwitchMappings);
 				var configuration = configurationBuilder.Build();
 
 				string spiderTypeName = configuration["TYPE"];
