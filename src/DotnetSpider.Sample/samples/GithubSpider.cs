@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
@@ -28,7 +28,11 @@ namespace DotnetSpider.Sample.samples
 
 				// 添加目标链接
 				var urls = selectable.Links().Regex("(https://github\\.com/[\\w\\-]+/[\\w\\-]+)").GetValues();
-				AddFollowRequests(context, urls);
+				foreach (var url in urls)
+				{
+					context.FollowRequests.Add(CreateFromRequest(context.Response.Request, url));
+				}
+
 
 				// 如果解析为空，跳过后续步骤(存储 etc)
 				if (string.IsNullOrWhiteSpace(name))

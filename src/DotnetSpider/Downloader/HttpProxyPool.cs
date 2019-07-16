@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Downloader
 {

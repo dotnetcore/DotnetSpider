@@ -1,5 +1,5 @@
 using System;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.Selector;
 
 namespace DotnetSpider.Downloader

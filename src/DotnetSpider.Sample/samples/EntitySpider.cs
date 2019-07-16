@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Attribute;
 using DotnetSpider.DataFlow.Parser.Formatter;

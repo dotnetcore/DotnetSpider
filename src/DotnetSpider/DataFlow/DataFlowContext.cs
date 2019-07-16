@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.Downloader;
 using DotnetSpider.Selector;
@@ -16,7 +16,6 @@ namespace DotnetSpider.DataFlow
 		private readonly Dictionary<string, dynamic> _properties = new Dictionary<string, dynamic>();
 		private readonly Dictionary<string, dynamic> _items = new Dictionary<string, dynamic>();
 		private readonly Dictionary<string, IParseResult> _parseItems = new Dictionary<string, IParseResult>();
-		private readonly List<Request> _followRequests = new List<Request>();
 		private ISelectable _selectable;
 
 		/// <summary>
@@ -32,7 +31,7 @@ namespace DotnetSpider.DataFlow
 		/// <summary>
 		/// 解析到的目标链接
 		/// </summary>
-		internal List<Request> FollowRequests => _followRequests;
+		public List<Request> FollowRequests { get; set; } = new List<Request>();
 
 		/// <summary>
 		/// 构造方法

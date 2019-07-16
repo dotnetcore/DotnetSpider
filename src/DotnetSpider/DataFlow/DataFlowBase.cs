@@ -8,6 +8,8 @@ namespace DotnetSpider.DataFlow
 	/// </summary>
 	public abstract class DataFlowBase : IDataFlow
 	{
+		public virtual string Name => GetType().Name;
+
 		/// <summary>
 		/// 日志接口
 		/// </summary>

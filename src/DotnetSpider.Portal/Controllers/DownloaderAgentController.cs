@@ -1,7 +1,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
+using DotnetSpider.EventBus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,12 +16,14 @@ namespace DotnetSpider.Portal.Controllers
 	{
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
+		private readonly IEventBus _eventBus;
 
-		public DownloaderAgentController(PortalDbContext dbContext,
+		public DownloaderAgentController(PortalDbContext dbContext, IEventBus eventBus,
 			ILogger<DownloaderAgentController> logger)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
+			_eventBus = eventBus;
 		}
 
 		[HttpGet("downloader-agent")]
@@ -47,7 +52,7 @@ namespace DotnetSpider.Portal.Controllers
 		public async Task<IActionResult> Heartbeat(string id, int page, int size)
 		{
 			page = page <= 1 ? 1 : page;
-			size = size <= 10 ? 10 : size;
+			size = size <= 20 ? 20 : size;
 
 			try
 			{
@@ -69,6 +74,46 @@ namespace DotnetSpider.Portal.Controllers
 					throw;
 				}
 			}
+		}
+
+		[HttpDelete("downloader-agent/{id}")]
+		public async Task<IActionResult> DeleteAsync(string id)
+		{
+			if (!await _dbContext.Set<DownloaderAgent>().AnyAsync(x => x.Id == id))
+			{
+				return NotFound();
+			}
+
+			await _eventBus.PublishAsync(id, new Event
+			{
+				Type = Framework.ExitCommand,
+				Data = id
+			});
+
+			using (var conn = _dbContext.Database.GetDbConnection())
+			{
+				await conn.ExecuteAsync(
+					$"DELETE FROM downloader_agent_heartbeat WHERE agent_id = @Id; DELETE FROM downloader_agent WHERE id = @Id;",
+					new {Id = id});
+			}
+
+			return Ok();
+		}
+
+		[HttpPost("downloader-agent/{id}/exit")]
+		public async Task<IActionResult> ExitAsync(string id)
+		{
+			if (!await _dbContext.Set<DownloaderAgent>().AnyAsync(x => x.Id == id))
+			{
+				return NotFound();
+			}
+
+			await _eventBus.PublishAsync(id, new Event
+			{
+				Type = Framework.ExitCommand,
+				Data = id
+			});
+			return Ok();
 		}
 	}
 }

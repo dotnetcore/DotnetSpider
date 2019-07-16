@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using Newtonsoft.Json;
 
 namespace DotnetSpider.DataFlow.Storage

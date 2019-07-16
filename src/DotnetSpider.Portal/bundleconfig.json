@@ -37,5 +37,28 @@
       "renameLocals": true
     },
     "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/agent.min.js",
+    "inputFiles": [
+      "wwwroot/js/agent.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  }
+,
+  {
+    "outputFileName": "wwwroot/js/spider-container.min.js",
+    "inputFiles": [
+      "wwwroot/js/spider-container.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
   }
 ]

@@ -5,11 +5,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.Downloader;
 using DotnetSpider.EventBus;
 using DotnetSpider.Network;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -18,10 +19,12 @@ namespace DotnetSpider.DownloadAgent
 	/// <summary>
 	/// 下载器代理
 	/// </summary>
-	public abstract class DownloaderAgentBase : IDownloaderAgent
+	public abstract class DownloaderAgentBase : BackgroundService, IDownloaderAgent
 	{
 		private readonly IEventBus _eventBus;
 		private readonly DownloaderAgentOptions _options;
+		private readonly SpiderOptions _spiderOptions;
+		private bool _exit;
 
 		private readonly ConcurrentDictionary<string, IDownloader> _cache =
 			new ConcurrentDictionary<string, IDownloader>();
@@ -42,62 +45,70 @@ namespace DotnetSpider.DownloadAgent
 		/// 构造方法
 		/// </summary>
 		/// <param name="options">下载器代理选项</param>
+		/// <param name="spiderOptions"></param>
 		/// <param name="eventBus">消息队列</param>
 		/// <param name="networkCenter">网络中心</param>
 		/// <param name="logger">日志接口</param>
 		protected DownloaderAgentBase(
 			DownloaderAgentOptions options,
+			SpiderOptions spiderOptions,
 			IEventBus eventBus,
 			NetworkCenter networkCenter,
 			ILogger logger)
 		{
+			_spiderOptions = spiderOptions;
 			_eventBus = eventBus;
 			_options = options;
 			Framework.NetworkCenter = networkCenter;
-			Logger = logger;
+
+			Logger = _eventBus is LocalEventBus ? null : logger;
 		}
 
-		public async Task StartAsync(CancellationToken cancellationToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			if (IsRunning)
+			await _eventBus.PublishAsync(_spiderOptions.DownloaderAgentRegisterCenterTopic, new Event
 			{
-				throw new SpiderException($"下载器代理 {_options.AgentId} 正在运行中");
-			}
-
-			// 注册节点
-			var json = JsonConvert.SerializeObject(new DownloaderAgent
-			{
-				Id = _options.AgentId,
-				Name = _options.Name,
-				ProcessorCount = Environment.ProcessorCount,
-				TotalMemory = Framework.TotalMemory,
-				CreationTime = DateTime.Now,
-				LastModificationTime = DateTime.Now
+				Type = Framework.RegisterCommand,
+				Data = JsonConvert.SerializeObject(new DownloaderAgent
+				{
+					Id = _options.AgentId,
+					Name = _options.Name,
+					ProcessorCount = Environment.ProcessorCount,
+					TotalMemory = Framework.TotalMemory,
+					CreationTime = DateTime.Now,
+					LastModificationTime = DateTime.Now
+				})
 			});
-
-			await _eventBus.PublishAsync(Framework.DownloaderAgentRegisterCenterTopic,
-				$"|{Framework.RegisterCommand}|{json}");
 
 			// 订阅节点
 			SubscribeMessage();
 
-			IsRunning = true;
-
 			// 开始心跳
-			HeartbeatAsync().ConfigureAwait(false).GetAwaiter();
+			HeartbeatAsync(stoppingToken).ConfigureAwait(false).GetAwaiter();
+
+			ReleaseDownloaderAsync(stoppingToken).ConfigureAwait(false).GetAwaiter();
 
 			Logger?.LogInformation($"下载器代理 {_options.AgentId} 启动完毕");
 
-			ReleaseDownloaderAsync().ConfigureAwait(false).GetAwaiter();
+			IsRunning = true;
 		}
 
-		public Task StopAsync(CancellationToken cancellationToken)
+		public override Task StopAsync(CancellationToken cancellationToken)
 		{
+			_exit = true;
 			_eventBus.Unsubscribe(_options.AgentId);
 			_eventBus.Unsubscribe("DownloadQueue");
 			_eventBus.Unsubscribe("AdslDownloadQueue");
-			IsRunning = false;
-			Logger?.LogInformation($"下载器代理 {_options.AgentId} 退出");
+
+
+			// 一小时
+			var times = 12 * 60;
+			for (int i = 0; i < times && !cancellationToken.IsCancellationRequested; ++i)
+			{
+				Thread.Sleep(5000);
+				Logger?.LogInformation($"下载器代理 {_options.AgentId} 退出中, 请在安全的时间后手动退出节点");
+			}
+
 
 			return Task.CompletedTask;
 		}
@@ -133,11 +144,11 @@ namespace DotnetSpider.DownloadAgent
 			}
 		}
 
-		private Task HeartbeatAsync()
+		private Task HeartbeatAsync(CancellationToken stoppingToken)
 		{
 			return Task.Factory.StartNew(async () =>
 			{
-				while (IsRunning)
+				while (!stoppingToken.IsCancellationRequested && !_exit)
 				{
 					Thread.Sleep(5000);
 					try
@@ -151,8 +162,12 @@ namespace DotnetSpider.DownloadAgent
 							CreationTime = DateTime.Now
 						});
 
-						await _eventBus.PublishAsync(Framework.DownloaderAgentRegisterCenterTopic,
-							$"|{Framework.HeartbeatCommand}|{json}");
+						await _eventBus.PublishAsync(_spiderOptions.DownloaderAgentRegisterCenterTopic,
+							new Event
+							{
+								Type = Framework.HeartbeatCommand,
+								Data = json
+							});
 						Logger?.LogDebug($"下载器代理 {_options.AgentId} 发送心跳成功");
 					}
 					catch (Exception e)
@@ -160,14 +175,14 @@ namespace DotnetSpider.DownloadAgent
 						Logger?.LogDebug($"下载器代理 {_options.AgentId} 发送心跳失败: {e}");
 					}
 				}
-			});
+			}, stoppingToken);
 		}
 
-		private Task ReleaseDownloaderAsync()
+		private Task ReleaseDownloaderAsync(CancellationToken stoppingToken)
 		{
 			return Task.Factory.StartNew(() =>
 			{
-				while (IsRunning)
+				while (!stoppingToken.IsCancellationRequested && !_exit)
 				{
 					Thread.Sleep(1000);
 
@@ -208,42 +223,43 @@ namespace DotnetSpider.DownloadAgent
 						Logger?.LogError($"下载器代理 {_options.AgentId} 释放过期下载器失败: {e}");
 					}
 				}
-			});
+			}, stoppingToken);
 		}
 
-		private void HandleMessage(string message)
+		private void HandleMessage(Event message)
 		{
-			if (string.IsNullOrWhiteSpace(message))
+			if (message == null)
 			{
 				Logger?.LogWarning($"下载器代理 {_options.AgentId} 接收到空消息");
 				return;
 			}
 #if DEBUG
-
 			Logger?.LogDebug($"下载器代理 {_options.AgentId} 接收到消息: {message}");
 #endif
 
 			try
 			{
-				var commandMessage = message.ToCommandMessage();
-
-				if (commandMessage == null)
-				{
-					Logger?.LogWarning($"下载器代理 {_options.AgentId} 接收到非法消息: {message}");
-					return;
-				}
-
-				switch (commandMessage.Command)
+				switch (message.Type)
 				{
 					case Framework.DownloadCommand:
 					{
-						Download(commandMessage.Message).ConfigureAwait(false).GetAwaiter();
+						if (message.IsTimeout(60))
+						{
+							break;
+						}
+
+						DownloadAsync(message.Data).ConfigureAwait(false).GetAwaiter();
 						break;
 					}
 
 					case Framework.ExitCommand:
 					{
-						if (commandMessage.Message == _options.AgentId)
+						if (message.IsTimeout(6))
+						{
+							break;
+						}
+
+						if (message.Data == _options.AgentId)
 						{
 							StopAsync(default).ConfigureAwait(true).GetAwaiter();
 						}
@@ -268,7 +284,7 @@ namespace DotnetSpider.DownloadAgent
 			}
 		}
 
-		private async Task Download(string message)
+		private async Task DownloadAsync(string message)
 		{
 			var requests = JsonConvert.DeserializeObject<Request[]>(message);
 
@@ -301,8 +317,11 @@ namespace DotnetSpider.DownloadAgent
 						response = await downloader.DownloadAsync(request);
 					}
 
-					_eventBus.Publish($"{Framework.ResponseHandlerTopic}{request.OwnerId}",
-						JsonConvert.SerializeObject(new[] {response}));
+					_eventBus.Publish($"{_spiderOptions.ResponseHandlerTopic}{request.OwnerId}",
+						new Event
+						{
+							Data = JsonConvert.SerializeObject(new[] {response})
+						});
 				}
 			}
 			else
@@ -374,8 +393,21 @@ namespace DotnetSpider.DownloadAgent
 								: new HttpProxyPool(new HttpRowTextProxySupplier(_options.ProxySupplyUrl)),
 							RetryTime = request.RetryTimes
 						};
-						// TODO:
-						// httpClient.AddCookies(allotDownloaderMessage.Cookies);
+						if (!string.IsNullOrWhiteSpace(request.Cookie))
+						{
+							var cookies = request.Cookie.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+							foreach (var cookie in cookies)
+							{
+								var splitIndex = cookie.IndexOf('=');
+								if (splitIndex > 0)
+								{
+									var name = cookie.Substring(0, splitIndex);
+									var value = cookie.Substring(splitIndex + 1, cookie.Length - splitIndex - 1);
+									httpClient.AddCookies(new Cookie(name, value, request.Domain));
+								}
+							}
+						}
+
 						downloader = httpClient;
 						break;
 					}

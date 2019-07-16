@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgent;
 using DotnetSpider.Network;
 using DotnetSpider.Network.InternetDetector;

@@ -54,7 +54,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensTagIndexDataParser()
             {
-                RequireParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/$");
+                Required = DataParserHelper.CheckIfRequiredByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/$");
                 //Follow = XpathFollow(".");
             }
 
@@ -101,7 +101,7 @@ namespace DotnetSpider.Sample.samples
             public NvshensFirstPageTagDataParser()
             {
                 //CanParse = RegexCanParse("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/(((\\w)*\\/$)|(\\w*\\/\\d.html$))");
-                RequireParse = DataParserHelper.CanParseByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/(\\w)*\\/$");
+                Required = DataParserHelper.CheckIfRequiredByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/(\\w)*\\/$");
             }
 
             protected override Task<DataFlowResult> Parse(DataFlowContext context)
@@ -127,7 +127,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensPageTagDataParser()
             {
-                RequireParse = DataParserHelper.CanParseByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/\\w*\\/\\d+.html$");
+                Required = DataParserHelper.CheckIfRequiredByRegex("^((https|http) ?:\\/\\/)www\\.nvshens\\.com\\/gallery\\/\\w*\\/\\d+.html$");
                 //Follow = XpathFollow(".");
             }
 
@@ -153,7 +153,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensFirstPageDetailDataParser()
             {
-                RequireParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w+\\/\\d*\\/$");
+                Required = DataParserHelper.CheckIfRequiredByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w+\\/\\d*\\/$");
                 //Follow = XpathFollow(".");
             }
 
@@ -173,7 +173,7 @@ namespace DotnetSpider.Sample.samples
         {
             public NvshensPageDetailDataParser()
             {
-                RequireParse = DataParserHelper.CanParseByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w\\/\\d*\\/\\d+.html$");
+                Required = DataParserHelper.CheckIfRequiredByRegex("^((https|http)?:\\/\\/)www\\.nvshens\\.com\\/\\w\\/\\d*\\/\\d+.html$");
                 //Follow = XpathFollow(".");
             }
 

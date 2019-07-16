@@ -29,13 +29,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.PostgreSql", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloaderAgent", "src\DotnetSpider.DownloaderAgent\DotnetSpider.DownloaderAgent.csproj", "{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloadAgentRegisterCenter", "src\DotnetSpider.DownloadAgentRegisterCenter\DotnetSpider.DownloadAgentRegisterCenter.csproj", "{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DockerClient", "src\DockerClient\DockerClient.csproj", "{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Spiders", "src\DotnetSpider.Spiders\DotnetSpider.Spiders.csproj", "{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Portal", "src\DotnetSpider.Portal\DotnetSpider.Portal.csproj", "{7D557A90-B217-4182-8FEB-ECFEEB7C2838}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.DownloaderAgentRegisterCenter", "src\DotnetSpider.DownloaderAgentRegisterCenter\DotnetSpider.DownloaderAgentRegisterCenter.csproj", "{2AE96969-4113-492F-8307-FA6FEC90C3B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "kafka", "kafka", "{2E67FEB1-1C96-4335-AC2D-09FDF001978E}"
+ProjectSection(SolutionItems) = preProject
+	kafka\docker-compose.yml = docker\kafka\docker-compose.yml
+	kafka\readme.md = docker\kafka\readme.md
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zookeeper", "zookeeper", "{D29F96ED-E481-4CB4-BED8-09CFF0F87061}"
+ProjectSection(SolutionItems) = preProject
+	docker\zookeeper\docker-compose.yml = docker\zookeeper\docker-compose.yml
+	docker\zookeeper\start.sh = docker\zookeeper\start.sh
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{0096D2D4-06F0-4E57-A215-4DFA7FADE0FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Spiders.Startup", "src\DotnetSpider.Spiders.Startup\DotnetSpider.Spiders.Startup.csproj", "{8D23B30D-D4A7-46D1-BB33-D799B4AE96DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,14 +89,6 @@ Global
 		{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AE48371-40AA-4E27-804A-27EFD9AEA1EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80A42EC2-31E5-47EF-9751-3AD5172B5CDF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E07CEB85-A0E6-4F07-AB31-FB6FF6584830}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C07ACDE1-1E56-4ACD-8F63-50C708F7D25C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -91,8 +97,18 @@ Global
 		{7D557A90-B217-4182-8FEB-ECFEEB7C2838}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D557A90-B217-4182-8FEB-ECFEEB7C2838}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D557A90-B217-4182-8FEB-ECFEEB7C2838}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AE96969-4113-492F-8307-FA6FEC90C3B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AE96969-4113-492F-8307-FA6FEC90C3B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AE96969-4113-492F-8307-FA6FEC90C3B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AE96969-4113-492F-8307-FA6FEC90C3B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D23B30D-D4A7-46D1-BB33-D799B4AE96DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D23B30D-D4A7-46D1-BB33-D799B4AE96DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D23B30D-D4A7-46D1-BB33-D799B4AE96DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D23B30D-D4A7-46D1-BB33-D799B4AE96DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{32A4F6B5-0377-4353-BF06-A0E7328CBB9C} = {31B052DB-A9AA-49F5-AE8C-1660546A8903}
+		{2E67FEB1-1C96-4335-AC2D-09FDF001978E} = {0096D2D4-06F0-4E57-A215-4DFA7FADE0FA}
+		{D29F96ED-E481-4CB4-BED8-09CFF0F87061} = {0096D2D4-06F0-4E57-A215-4DFA7FADE0FA}
 	EndGlobalSection
 EndGlobal

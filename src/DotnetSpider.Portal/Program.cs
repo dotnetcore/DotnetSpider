@@ -1,7 +1,8 @@
-﻿using System;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
 
@@ -11,11 +12,6 @@ namespace DotnetSpider.Portal
 	{
 		public static async Task Main(string[] args)
 		{
-			DockerClient.DockerClient client = new DockerClient.DockerClient(
-				new Uri("http://localhost:2376"));
-
-			// docker run --name {id} --label  {image} {arguments}
-
 			var loggerConfiguration = new LoggerConfiguration()
 #if DEBUG
 				.MinimumLevel.Verbose()
@@ -25,15 +21,22 @@ namespace DotnetSpider.Portal
 				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 				.Enrich.FromLogContext()
 				.WriteTo.Console().WriteTo
-				.RollingFile("dotnet-spider-portal.log");
+				.RollingFile("/logs/portal.log");
 
 			Log.Logger = loggerConfiguration.CreateLogger();
 
-			await CreateWebHostBuilder(args).Build().RunAsync();
-		}
-
-		public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-			WebHost.CreateDefaultBuilder(args)
+			var builder = WebHost.CreateDefaultBuilder(args)
+				.ConfigureAppConfiguration(x =>
+				{
+					if (File.Exists("appsettings.json"))
+					{
+						x.AddJsonFile("appsettings.json");
+					}
+					x.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
+					x.AddCommandLine(args);
+				})
 				.UseStartup<Startup>().UseSerilog().UseUrls("http://0.0.0.0:7896");
+			await builder.Build().RunAsync();
+		}
 	}
 }

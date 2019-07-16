@@ -1,24 +1,23 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
 using DotnetSpider.EventBus;
 using DotnetSpider.RequestSupplier;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
-using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider
 {
 	public partial class Spider
 	{
 		private readonly List<Request> _requests = new List<Request>();
-
+		private readonly IServiceProvider _services;
 		private readonly List<IDataFlow> _dataFlows = new List<IDataFlow>();
 		private readonly IEventBus _eventBus;
-		private readonly ILogger _logger;
+	
 		private readonly IStatisticsService _statisticsService;
 		private readonly List<IRequestSupplier> _requestSupplies = new List<IRequestSupplier>();
 		private readonly List<Action<Request>> _configureRequestDelegates = new List<Action<Request>>();

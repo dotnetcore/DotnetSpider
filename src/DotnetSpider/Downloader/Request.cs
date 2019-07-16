@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using DotnetSpider.Core;
+using System.Linq;
+using DotnetSpider.Common;
 
 namespace DotnetSpider.Downloader
 {
@@ -56,8 +57,7 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// User-Agent
 		/// </summary>
-		public string UserAgent { get; set; } =
-			"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36";
+		public string UserAgent { get; set; }
 
 		/// <summary>
 		/// 请求链接时Referer参数的值
@@ -113,7 +113,7 @@ namespace DotnetSpider.Downloader
 		/// 已经重试的次数
 		/// </summary>
 		public int RetriedTimes { get; set; }
-		
+
 		/// <summary>
 		/// 是否使用 ADSL 下载器
 		/// </summary>
@@ -155,7 +155,12 @@ namespace DotnetSpider.Downloader
 		/// 下载策略
 		/// </summary>
 		public DownloadPolicy DownloadPolicy { get; set; } = DownloadPolicy.Random;
-		
+
+		/// <summary>
+		/// 设置 Cookie 的 domain
+		/// </summary>
+		public string Domain { get; set; }
+
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -262,7 +267,8 @@ namespace DotnetSpider.Downloader
 		public virtual void ComputeHash()
 		{
 			// TODO:
-			var content = $"{OwnerId}{Url}{Method}{Body}{Cookie}";
+			var content =
+				$"{OwnerId}{Url}{Method}{Body}{Cookie}{string.Join(", ", Headers.Select(x => $"{x.Key}={x.Value}"))}";
 			Hash = content.ToMd5();
 		}
 	}

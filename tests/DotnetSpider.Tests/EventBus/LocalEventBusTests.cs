@@ -12,13 +12,13 @@ namespace DotnetSpider.Tests.MessageQueue
 		{
 			int count = 0;
 			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
-			mq.Subscribe("topic", msg =>
-			{
-				Interlocked.Increment(ref count);
-			});
+			mq.Subscribe("topic", msg => { Interlocked.Increment(ref count); });
 			for (int i = 0; i < 100; ++i)
 			{
-				await mq.PublishAsync("topic", "a");
+				await mq.PublishAsync("topic", new Event
+				{
+					Data = "a"
+				});
 			}
 
 			int j = 0;
@@ -36,12 +36,15 @@ namespace DotnetSpider.Tests.MessageQueue
 		{
 			int count = 0;
 			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
-			mq.Subscribe("topic", msg =>
-			{
-				Interlocked.Increment(ref count);
-			});
+			mq.Subscribe("topic", msg => { Interlocked.Increment(ref count); });
 
-			Parallel.For(0, 100, async (i) => { await mq.PublishAsync("topic", "a"); });
+			Parallel.For(0, 100, async (i) =>
+			{
+				await mq.PublishAsync("topic", new Event
+				{
+					Data = "a"
+				});
+			});
 			int j = 0;
 			while (count < 100 && j < 150)
 			{
@@ -57,17 +60,17 @@ namespace DotnetSpider.Tests.MessageQueue
 		{
 			int count = 0;
 			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
-			mq.Subscribe("topic", msg =>
-			{
-				Interlocked.Increment(ref count);
-			});
+			mq.Subscribe("topic", msg => { Interlocked.Increment(ref count); });
 
 			int i = 0;
 			Task.Factory.StartNew(async () =>
 			{
 				for (; i < 50; ++i)
 				{
-					await mq.PublishAsync("topic", "a");
+					await mq.PublishAsync("topic", new Event
+					{
+						Data = "a"
+					});
 					await Task.Delay(100);
 				}
 			}).ConfigureAwait(false).GetAwaiter();

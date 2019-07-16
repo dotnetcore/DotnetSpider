@@ -72,8 +72,9 @@
                                 <span>@item.LastModificationTime</span>
                             </td>
                             <td>
-                                <a class="btn btn-default btn-sm btn-flat" href="/downloader-agent/@item.Id/heartbeat">监控</a>
-                                <a class="btn btn-default btn-sm  btn-flat" onclick="exit('@item.Id')">Exit</a>
+                                 <button class="btn btn-default btn-sm  btn-flat" onclick="deleteAgent('@item.Id')">Delete</button>
+                                <a class="btn btn-default btn-sm btn-flat" href="/downloader-agent/@item.Id/heartbeat">Heartbeat</a>
+                                <button @(item.IsActive() ? "" : "disabled") class="btn btn-default btn-sm  btn-flat" onclick="exit('@item.Id')">Exit</button>
                             </td>
                         </tr>
                     }
@@ -88,9 +89,10 @@
 </div>
 
 @section scripts{
-    <script>
-        $(function() {
-            app.activeMenu('DownloaderAgent');
-        })
-    </script>
+    <environment names="Development">
+        <script src="~/js/agent.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/agent.min.js" asp-append-version="true"></script>
+    </environment>
 }

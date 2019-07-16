@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.2</TargetFramework>
-        <OutputType>Exe</OutputType>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
@@ -15,16 +14,5 @@
         <ProjectReference Include="..\DotnetSpider.PostgreSql\DotnetSpider.PostgreSql.csproj" />
 
         <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="appsettings.json">
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Confluent.Kafka" Version="1.1.0" />
-        <PackageReference Include="librdkafka.redist" Version="1.1.0" />
     </ItemGroup>
 </Project>

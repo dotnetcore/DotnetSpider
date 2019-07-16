@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Dapper;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.Kafka;
-using DotnetSpider.Portal.Core;
+using DotnetSpider.Portal.Entity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -29,14 +30,14 @@ namespace DotnetSpider.Portal
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddScoped<SpiderOptions>();
+			services.AddSingleton<SpiderOptions>();
 			services.AddKafkaEventBus();
 			services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
 			services.AddStatisticsCenter(x => x.UseMySql());
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-			services.AddScoped<PortalOptions>();
+			services.AddSingleton<PortalOptions>();
 			// Add DbContext            
 			Action<DbContextOptionsBuilder> dbContextOptionsBuilder;
 			var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
@@ -49,6 +50,7 @@ namespace DotnetSpider.Portal
 							sql => sql.MigrationsAssembly(migrationsAssembly));
 					break;
 				}
+
 				default:
 				{
 					dbContextOptionsBuilder = b =>
@@ -61,13 +63,14 @@ namespace DotnetSpider.Portal
 			services.AddDbContext<PortalDbContext>(dbContextOptionsBuilder);
 			services.AddQuartz();
 			services.AddHostedService<QuartzService>();
+			services.AddHostedService<CleanDockerContainerService>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
-			Ioc.ServiceProvider = app.ApplicationServices;
-			
+			Common.ServiceProvider.Instance = app.ApplicationServices;
+
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
@@ -97,34 +100,65 @@ namespace DotnetSpider.Portal
 				context.Database.EnsureCreated();
 
 				string sql;
+				var conn = context.Database.GetDbConnection();
 				switch (_options.Database?.ToLower())
 				{
 					case "mysql":
 					{
-						using (var reader = new StreamReader(GetType().Assembly
-							.GetManifestResourceStream("DotnetSpider.Portal.DDL.MySql.sql")))
+						if (conn.QuerySingle<int>(
+							    $"SELECT count(*)  FROM information_schema.TABLES WHERE table_name ='QRTZ_FIRED_TRIGGERS';") ==
+						    0
+						)
 						{
-							sql = reader.ReadToEnd();
+							using (var reader = new StreamReader(GetType().Assembly
+								.GetManifestResourceStream("DotnetSpider.Portal.DDL.MySql.sql")))
+							{
+								sql = reader.ReadToEnd();
+								conn.Execute(sql);
+							}
 						}
 
 						break;
 					}
+
 					default:
 					{
-						using (var reader = new StreamReader(GetType().Assembly
-							.GetManifestResourceStream("DotnetSpider.Portal.DDL.SqlServer.sql")))
+						if (conn.QuerySingle<int>(
+							    $"SELECT COUNT(*) from sysobjects WHERE id = object_id(N'[dbo].[QRTZ_FIRED_TRIGGERS]') AND OBJECTPROPERTY(id, N'') = 1IsUserTable") ==
+						    0
+						)
 						{
-							sql = reader.ReadToEnd();
+							using (var reader = new StreamReader(GetType().Assembly
+								.GetManifestResourceStream("DotnetSpider.Portal.DDL.SqlServer.sql")))
+							{
+								sql = reader.ReadToEnd();
+								conn.Execute(sql);
+							}
 						}
 
 						break;
 					}
 				}
 
-				using (var conn = context.Database.GetDbConnection())
+				InitializedData(context);
+			}
+		}
+
+		private void InitializedData(PortalDbContext context)
+		{
+			if (!context.DockerRepositories.Any())
+			{
+				context.DockerRepositories.Add(new DockerRepository
 				{
-					conn.Execute(sql);
-				}
+					Name = "default",
+					Schema = "http",
+					Registry = "registry.zousong.com:5000",
+					Repository = "dotnetspider.spiders",
+					CreationTime = DateTime.Now,
+					UserName = "",
+					Password = ""
+				});
+				context.SaveChanges();
 			}
 		}
 	}

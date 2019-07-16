@@ -4,7 +4,7 @@ using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using Dapper;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

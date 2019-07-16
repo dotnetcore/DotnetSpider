@@ -17,6 +17,7 @@ namespace DotnetSpider.Portal.Entity
 		/// 
 		/// </summary>
 		[Column("spider_id")]
+		[Required]
 		public int SpiderId { get; set; }
 
 		/// <summary>
@@ -27,17 +28,22 @@ namespace DotnetSpider.Portal.Entity
 		public string ContainerId { get; set; }
 
 		/// <summary>
+		/// 容器标识
+		/// </summary>
+		[Column("batch")]
+		[StringLength(100)]
+		public string Batch { get; set; }
+		
+		/// <summary>
 		/// 创建时间
 		/// </summary>
 		[Column("creation_time")]
+		[Required]
 		public DateTime CreationTime { get; set; }
 
+		[Column("status")]
+		[StringLength(20)]
+		[Required]
 		public string Status { get; set; }
-
-		/// <summary>
-		/// 退出时间
-		/// </summary>
-		[Column("exit_time")]
-		public DateTime? ExitTime { get; set; }
 	}
 }

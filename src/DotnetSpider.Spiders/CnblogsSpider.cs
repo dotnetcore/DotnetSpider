@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Attribute;
 using DotnetSpider.DataFlow.Parser.Formatter;
@@ -22,17 +22,18 @@ namespace DotnetSpider.Spiders
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
 			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
-			AddRequests(
-				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
-				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}),
-				new Request("https://news.cnblogs.com/n/page/3/", new Dictionary<string, string> {{"网站", "博客园"}})
-			);
+			for (int i = 1; i < 30; ++i)
+			{
+				AddRequests(
+					new Request($"https://news.cnblogs.com/n/page/{i}/", new Dictionary<string, string> {{"网站", "博客园"}})
+				);
+			}
 		}
 
 		[Schema("cnblogs", "cnblogs_entity_model")]
 		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 		[ValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-		public class CnblogsEntry : EntityBase<CnblogsEntry>
+		class CnblogsEntry : EntityBase<CnblogsEntry>
 		{
 			protected override void Configure()
 			{

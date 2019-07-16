@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using DotnetSpider.Common;
 using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.EventBus
@@ -13,8 +14,8 @@ namespace DotnetSpider.EventBus
 	/// </summary>
 	public class LocalEventBus : IEventBus
 	{
-		private readonly ConcurrentDictionary<string, Action<string>> _consumers =
-			new ConcurrentDictionary<string, Action<string>>();
+		private readonly ConcurrentDictionary<string, Action<Event>> _consumers =
+			new ConcurrentDictionary<string, Action<Event>>();
 
 		private readonly ILogger _logger;
 
@@ -33,14 +34,14 @@ namespace DotnetSpider.EventBus
 		/// <param name="topic">topic</param>
 		/// <param name="message">消息</param>
 		/// <returns></returns>
-		public Task PublishAsync(string topic, string message)
+		public Task PublishAsync(string topic, Event message)
 		{
 			return Task.Factory.StartNew(() => { Publish(topic, message); });
 		}
 
-		public void Publish(string topic, string message)
+		public void Publish(string topic, Event message)
 		{
-			if (string.IsNullOrWhiteSpace(message))
+			if (message == null)
 			{
 #if DEBUG
 				var stackTrace = new StackTrace();
@@ -49,7 +50,9 @@ namespace DotnetSpider.EventBus
 				return;
 			}
 
-			if (_consumers.TryGetValue(topic, out Action<string> consumer))
+			message.Timestamp = (long) DateTimeHelper.GetCurrentUnixTimeNumber();
+
+			if (_consumers.TryGetValue(topic, out Action<Event> consumer))
 			{
 				try
 				{
@@ -75,7 +78,7 @@ namespace DotnetSpider.EventBus
 		/// <param name="topic">topic</param>
 		/// <param name="action">消息消费的方法</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void Subscribe(string topic, Action<string> action)
+		public void Subscribe(string topic, Action<Event> action)
 		{
 			_consumers.AddOrUpdate(topic, x => action, (t, a) => action);
 		}

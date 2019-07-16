@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,8 @@ namespace DotnetSpider.DataFlow.Parser
 	{
 		private readonly Model<T> _model;
 		private readonly TableMetadata _tableMetadata;
+
+		public override string Name => $"DataParser`{typeof(T).Name}`";
 
 		/// <summary>
 		/// 构造方法
@@ -34,7 +37,13 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 
 			var xPaths = followXPaths.ToArray();
-			QueryFollowRequests = context => DataParserHelper.QueryFollowRequestsByXPath(xPaths).Invoke(context);
+
+			FollowRequestQuerier = BuildFollowRequestQuerier(DataParserHelper.QueryFollowRequestsByXPath(xPaths));
+		}
+
+		protected virtual T ConfigureDataObject(T t)
+		{
+			return t;
 		}
 
 		protected override Task<DataFlowResult> Parse(DataFlowContext context)
@@ -45,6 +54,7 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 
 			var selectable = context.GetSelectable();
+
 			var results = new ParseResult<T>();
 			if (selectable.Properties == null)
 			{
@@ -62,6 +72,11 @@ namespace DotnetSpider.DataFlow.Parser
 				foreach (var selector in _model.ShareValueSelectors)
 				{
 					string name = selector.Name;
+					if (string.IsNullOrWhiteSpace(name))
+					{
+						continue;
+					}
+
 					var value = selectable.Select(selector.ToSelector()).GetValue();
 					if (!environments.ContainsKey(name))
 					{
@@ -75,7 +90,6 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 
 			bool singleExtractor = _model.Selector == null;
-
 			if (!singleExtractor)
 			{
 				var selector = _model.Selector.ToSelector();
@@ -138,7 +152,6 @@ namespace DotnetSpider.DataFlow.Parser
 			int index)
 		{
 			var dataObject = new T();
-
 			foreach (var field in _model.ValueSelectors)
 			{
 				string value = null;
@@ -151,23 +164,33 @@ namespace DotnetSpider.DataFlow.Parser
 							value = index.ToString();
 							break;
 						}
+
 						case "GUID":
 						{
 							value = Guid.NewGuid().ToString();
 							break;
 						}
+
 						case "DATE":
 						case "TODAY":
 						{
 							value = DateTime.Now.Date.ToString("yyyy-MM-dd");
 							break;
 						}
+
 						case "DATETIME":
 						case "NOW":
 						{
 							value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 							break;
 						}
+
+						case "MONTH":
+						{
+							value = DateTimeHelper.MonthString;
+							break;
+						}
+
 						default:
 						{
 							if (environments.ContainsKey(field.Expression))
@@ -220,7 +243,7 @@ namespace DotnetSpider.DataFlow.Parser
 				field.PropertyInfo.SetValue(dataObject, newValue);
 			}
 
-			return dataObject;
+			return ConfigureDataObject(dataObject);
 		}
 	}
 }

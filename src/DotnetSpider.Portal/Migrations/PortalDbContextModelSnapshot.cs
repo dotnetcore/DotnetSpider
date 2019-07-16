@@ -12,33 +12,8 @@ namespace DotnetSpider.Portal.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("DotnetSpider.Portal.Entity.DockerImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnName("creation_time");
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnName("image")
-                        .HasMaxLength(255);
-
-                    b.Property<int>("RepositoryId")
-                        .HasColumnName("repository_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Image")
-                        .IsUnique();
-
-                    b.ToTable("docker_image");
-                });
 
             modelBuilder.Entity("DotnetSpider.Portal.Entity.DockerRepository", b =>
                 {
@@ -54,14 +29,25 @@ namespace DotnetSpider.Portal.Migrations
                         .HasColumnName("name")
                         .HasMaxLength(255);
 
+                    b.Property<string>("Password")
+                        .HasColumnName("password")
+                        .HasMaxLength(255);
+
                     b.Property<string>("Registry")
-                        .IsRequired()
                         .HasColumnName("registry")
                         .HasMaxLength(255);
 
                     b.Property<string>("Repository")
                         .IsRequired()
                         .HasColumnName("repository")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Schema")
+                        .HasColumnName("schema")
+                        .HasMaxLength(10);
+
+                    b.Property<string>("UserName")
+                        .HasColumnName("user_name")
                         .HasMaxLength(255);
 
                     b.HasKey("Id");
@@ -71,7 +57,7 @@ namespace DotnetSpider.Portal.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.HasIndex("Repository")
+                    b.HasIndex("Repository", "Registry")
                         .IsUnique();
 
                     b.ToTable("docker_repository");
@@ -82,11 +68,6 @@ namespace DotnetSpider.Portal.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
-
-                    b.Property<string>("Class")
-                        .IsRequired()
-                        .HasColumnName("class")
-                        .HasMaxLength(400);
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnName("creation_time");
@@ -100,11 +81,6 @@ namespace DotnetSpider.Portal.Migrations
                         .HasColumnName("environment")
                         .HasMaxLength(255);
 
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasColumnName("image")
-                        .HasMaxLength(255);
-
                     b.Property<DateTime>("LastModificationTime")
                         .HasColumnName("last_modification_time");
 
@@ -113,13 +89,28 @@ namespace DotnetSpider.Portal.Migrations
                         .HasColumnName("name")
                         .HasMaxLength(255);
 
-                    b.Property<bool>("Single");
+                    b.Property<string>("Registry")
+                        .HasColumnName("registry")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Repository")
+                        .IsRequired()
+                        .HasColumnName("repository")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Tag")
+                        .IsRequired()
+                        .HasColumnName("tag")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnName("type")
+                        .HasMaxLength(400);
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreationTime");
-
-                    b.HasIndex("Image");
 
                     b.HasIndex("Name");
 
@@ -132,6 +123,10 @@ namespace DotnetSpider.Portal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
+                    b.Property<string>("Batch")
+                        .HasColumnName("batch")
+                        .HasMaxLength(100);
+
                     b.Property<string>("ContainerId")
                         .HasColumnName("container_id")
                         .HasMaxLength(100);
@@ -139,19 +134,21 @@ namespace DotnetSpider.Portal.Migrations
                     b.Property<DateTime>("CreationTime")
                         .HasColumnName("creation_time");
 
-                    b.Property<DateTime?>("ExitTime")
-                        .HasColumnName("exit_time");
-
                     b.Property<int>("SpiderId")
                         .HasColumnName("spider_id");
 
-                    b.Property<string>("Status");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnName("status")
+                        .HasMaxLength(20);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContainerId");
+                    b.HasIndex("Batch");
 
                     b.HasIndex("CreationTime");
+
+                    b.HasIndex("SpiderId");
 
                     b.ToTable("spider_container");
                 });

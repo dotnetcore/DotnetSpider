@@ -1,10 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 
@@ -15,6 +17,108 @@ namespace DotnetSpider
 	/// </summary>
 	public abstract class Startup
 	{
+		public static void Execute<TSpider>()
+		{
+			var logfile = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
+			logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
+			Environment.SetEnvironmentVariable("logfile", logfile);
+
+			if (Log.Logger == null)
+			{
+				var configure = new LoggerConfiguration()
+#if DEBUG
+				.MinimumLevel.Verbose()
+#else
+					.MinimumLevel.Information()
+#endif
+					.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+					.Enrich.FromLogContext()
+					.WriteTo.Console().WriteTo
+					.RollingFile(logfile);
+
+				Log.Logger = configure.CreateLogger();
+			}
+
+			Framework.SetEncoding();
+
+			Framework.SetMultiThread();
+
+			var configurationBuilder = new ConfigurationBuilder();
+			configurationBuilder.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+			configurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
+			configurationBuilder.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
+			var configuration = configurationBuilder.Build();
+			
+			var id = configuration["ID"] ?? Guid.NewGuid().ToString("N");
+			var name =  configuration["NAME"]??id;
+			var arguments = Environment.GetCommandLineArgs();
+
+			PrintEnvironment();
+
+			var builder = new SpiderHostBuilder();
+			builder.ConfigureLogging(b =>
+			{
+#if DEBUG
+				b.SetMinimumLevel(LogLevel.Debug);
+#else
+				b.SetMinimumLevel(LogLevel.Information);
+#endif
+				b.AddSerilog();
+			});
+
+			var config = configuration["config"];
+			builder.ConfigureAppConfiguration(x =>
+			{
+				if (!string.IsNullOrWhiteSpace(config) && File.Exists(config))
+				{
+					// 添加 JSON 配置文件
+					x.AddJsonFile(config);
+				}
+				else
+				{
+					if (File.Exists("appsettings.json"))
+					{
+						x.AddJsonFile("appsettings.json");
+					}
+				}
+
+				x.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
+				x.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
+			});
+
+			builder.ConfigureServices(services =>
+			{
+				services.AddLocalEventBus();
+				services.AddLocalDownloadCenter();
+				services.AddDownloaderAgent(x =>
+				{
+					x.UseFileLocker();
+					x.UseDefaultAdslRedialer();
+					x.UseDefaultInternetDetector();
+				});
+				services.AddStatisticsCenter(x =>
+				{
+					// 添加内存统计服务
+					x.UseMemory();
+				});
+			});
+
+			var spiderType = typeof(TSpider);
+			builder.Register(spiderType);
+			var provider = builder.Build();
+			var instance = provider.Create(spiderType);
+			if (instance != null)
+			{
+				instance.Name = name;
+				instance.Id = id;
+				instance.RunAsync(arguments).ConfigureAwait(true).GetAwaiter().GetResult();
+			}
+			else
+			{
+				Log.Logger.Error("创建爬虫对象失败", 0, ConsoleColor.DarkYellow);
+			}	
+		}
+		
 		/// <summary>
 		/// DLL 名字中包含任意一个即是需要扫描的 DLL
 		/// </summary>
@@ -30,7 +134,11 @@ namespace DotnetSpider
 		{
 			try
 			{
-				ConfigureSerialLog();
+				var logfile = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
+				logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
+				Environment.SetEnvironmentVariable("logfile", logfile);
+
+				ConfigureSerialLog(logfile);
 
 				Framework.SetEncoding();
 
@@ -38,20 +146,20 @@ namespace DotnetSpider
 
 				var configurationBuilder = new ConfigurationBuilder();
 				configurationBuilder.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
-				configurationBuilder.AddEnvironmentVariables();
+				configurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
 				configurationBuilder.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
 				var configuration = configurationBuilder.Build();
 
-				string spiderTypeName = configuration["type"];
+				string spiderTypeName = configuration["TYPE"];
 				if (string.IsNullOrWhiteSpace(spiderTypeName))
 				{
 					Log.Logger.Error("未指定需要执行的爬虫类型");
 					return;
 				}
 
-				var name = configuration["name"];
-				var id = configuration["id"] ?? Guid.NewGuid().ToString("N");
-				var arguments = configuration["args"]?.Split(' ');
+				var name = configuration["NAME"];
+				var id = configuration["ID"] ?? Guid.NewGuid().ToString("N");
+				var arguments = configuration["ARGS"]?.Split(' ');
 
 				PrintEnvironment();
 
@@ -62,7 +170,8 @@ namespace DotnetSpider
 					return;
 				}
 
-				var spiderType = spiderTypes.FirstOrDefault(x => x.UnderlyingSystemType.ToString().ToLower() == spiderTypeName.ToLower());
+				var spiderType = spiderTypes.FirstOrDefault(x =>
+					x.UnderlyingSystemType.ToString().ToLower() == spiderTypeName.ToLower());
 				if (spiderType == null)
 				{
 					Log.Logger.Error($"未找到爬虫: {spiderTypeName}", 0, ConsoleColor.DarkYellow);
@@ -92,18 +201,18 @@ namespace DotnetSpider
 			}
 		}
 
-		private void ConfigureSerialLog()
+		protected virtual void ConfigureSerialLog(string file)
 		{
 			var configure = new LoggerConfiguration()
 #if DEBUG
 				.MinimumLevel.Verbose()
 #else
-            	.MinimumLevel.Information()
+				.MinimumLevel.Information()
 #endif
 				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 				.Enrich.FromLogContext()
 				.WriteTo.Console().WriteTo
-				.RollingFile("dotnet-spider.log");
+				.RollingFile(file);
 			Log.Logger = configure.CreateLogger();
 		}
 
@@ -111,7 +220,7 @@ namespace DotnetSpider
 		/// 检测爬虫类型
 		/// </summary>
 		/// <returns></returns>
-		private HashSet<Type> DetectSpiders()
+		protected virtual HashSet<Type> DetectSpiders()
 		{
 			var spiderTypes = new HashSet<Type>();
 
@@ -139,6 +248,7 @@ namespace DotnetSpider
 				{
 					throw new SpiderException("未找到入口程序集");
 				}
+
 				asmNames = new List<string>
 				{
 					entryAsm.GetName(false).Name
@@ -154,8 +264,15 @@ namespace DotnetSpider
 				}
 			}
 
+			var spiderInfo = $"检测到爬虫 : {spiderTypes.Count} 个";
+
+			if (Environment.GetEnvironmentVariable("DOTNET_SPIDER_PRINT_SPIDERS") == "true")
+			{
+				spiderInfo = $"{spiderInfo}, {string.Join(", ", spiderTypes.Select(x => x.Name))}";
+			}
+
 			Log.Logger.Information($"程序集     : {string.Join(", ", asmNames)}", 0, ConsoleColor.DarkYellow);
-			Log.Logger.Information($"检测到爬虫 : {spiderTypes.Count} 个", 0, ConsoleColor.DarkYellow);
+			Log.Logger.Information(spiderInfo, 0, ConsoleColor.DarkYellow);
 
 			return spiderTypes;
 		}
@@ -175,9 +292,19 @@ namespace DotnetSpider
 				                 && DetectAssembles.Any(n => f.ToLower().Contains(n))).ToList();
 		}
 
-		private void PrintEnvironment()
+		private static void PrintEnvironment()
 		{
 			Framework.PrintInfo();
+			var environmentVariables = Environment.GetEnvironmentVariables();
+			var excludes = new List<string> {"PATH", "ASPNETCORE_URLS", "HOSTNAME", "DOTNET_RUNNING_IN_CONTAINER"};
+			foreach (DictionaryEntry variable in environmentVariables)
+			{
+				if (!excludes.Contains(variable.Key))
+				{
+					Log.Logger.Information($"环境变量   : {variable.Key} {variable.Value}", 0, ConsoleColor.DarkYellow);
+				}
+			}
+
 			var commands = string.Join(" ", Environment.GetCommandLineArgs());
 			Log.Logger.Information($"运行参数   : {commands}", 0, ConsoleColor.DarkYellow);
 			Log.Logger.Information($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,

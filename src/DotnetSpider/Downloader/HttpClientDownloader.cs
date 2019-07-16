@@ -8,10 +8,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using LZ4;
 using Microsoft.Extensions.Logging;
-using Cookie = DotnetSpider.Core.Cookie;
+using Cookie = DotnetSpider.Common.Cookie;
 
 namespace DotnetSpider.Downloader
 {
@@ -191,6 +191,10 @@ namespace DotnetSpider.Downloader
 						Logger?.LogWarning($"任务 {request.OwnerId} 释放 {request.Url} 失败 [{i}]: {e}");
 					}
 				}
+
+				// 下载失败需要等待一秒，防止频率过高。
+				// TODO: 改成可配置
+				Thread.Sleep(1000);
 			}
 
 			return response;
@@ -209,6 +213,11 @@ namespace DotnetSpider.Downloader
 
 		protected virtual byte[] CompressContent(Request request)
 		{
+			if (string.IsNullOrWhiteSpace(request.Body))
+			{
+				return new byte[0];
+			}
+
 			var encoding = string.IsNullOrEmpty(request.Encoding)
 				? Encoding.UTF8
 				: Encoding.GetEncoding(request.Encoding);
@@ -253,10 +262,17 @@ namespace DotnetSpider.Downloader
 
 			if (!string.IsNullOrWhiteSpace(request.UserAgent))
 			{
-				var header = "User-Agent";
-				httpRequestMessage.Headers.Remove(header);
-				httpRequestMessage.Headers.TryAddWithoutValidation(header, request.UserAgent);
+				httpRequestMessage.Headers.TryAddWithoutValidation("User-Agent", request.UserAgent);
 			}
+			else
+			{
+				if (!request.Headers.ContainsKey("User-Agent"))
+				{
+					httpRequestMessage.Headers.TryAddWithoutValidation("User-Agent",
+						"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36");
+				}
+			}
+
 
 			if (!string.IsNullOrWhiteSpace(request.Referer))
 			{
@@ -284,12 +300,15 @@ namespace DotnetSpider.Downloader
 				var bytes = CompressContent(request);
 				httpRequestMessage.Content = new ByteArrayContent(bytes);
 
-				if (!string.IsNullOrWhiteSpace(request.ContentType))
-				{
-					var header = "Content-Type";
-					httpRequestMessage.Content.Headers.Remove(header);
-					httpRequestMessage.Content.Headers.TryAddWithoutValidation(header, request.ContentType);
-				}
+				var header = "Content-Type";
+				var contentType = !string.IsNullOrWhiteSpace(request.ContentType)
+					? request.ContentType
+					: request.Headers.ContainsKey(header)
+						? request.Headers[header]
+						: "application/json";
+
+				httpRequestMessage.Content.Headers.Remove(header);
+				httpRequestMessage.Content.Headers.TryAddWithoutValidation(header, contentType);
 
 				var xRequestedWithHeader = "X-Requested-With";
 				if (request.Headers.ContainsKey(xRequestedWithHeader) &&

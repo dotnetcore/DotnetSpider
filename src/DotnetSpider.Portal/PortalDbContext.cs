@@ -1,4 +1,4 @@
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.Portal.Entity;
 using DotnetSpider.Statistics.Entity;
@@ -13,11 +13,9 @@ namespace DotnetSpider.Portal
 
 		public DbSet<DockerRepository> DockerRepositories { get; set; }
 
-		public DbSet<DockerImage> DockerImages { get; set; }
-
 		public DbSet<Entity.Spider> Spiders { get; set; }
 
-		public DbSet<Entity.SpiderContainer> SpiderContainers { get; set; }
+		public DbSet<SpiderContainer> SpiderContainers { get; set; }
 
 		public PortalDbContext()
 		{
@@ -43,16 +41,14 @@ namespace DotnetSpider.Portal
 			}
 
 			builder.Entity<DockerRepository>().HasIndex(x => x.Name).IsUnique();
-			builder.Entity<DockerRepository>().HasIndex(x => x.Repository).IsUnique();
+			builder.Entity<DockerRepository>().HasIndex(x => new {x.Repository, x.Registry}).IsUnique();
 			builder.Entity<DockerRepository>().HasIndex(x => x.CreationTime);
-
-			builder.Entity<DockerImage>().HasIndex(x => x.Image).IsUnique();
 
 			builder.Entity<Entity.Spider>().HasIndex(x => x.Name);
 			builder.Entity<Entity.Spider>().HasIndex(x => x.CreationTime);
-			builder.Entity<Entity.Spider>().HasIndex(x => x.Image);
 
-			builder.Entity<SpiderContainer>().HasIndex(x => x.ContainerId);
+			builder.Entity<SpiderContainer>().HasIndex(x => x.Batch);
+			builder.Entity<SpiderContainer>().HasIndex(x => x.SpiderId);
 			builder.Entity<SpiderContainer>().HasIndex(x => x.CreationTime);
 		}
 
@@ -69,6 +65,7 @@ namespace DotnetSpider.Portal
 					builder.UseMySql(options.ConnectionString);
 					break;
 				}
+
 				default:
 				{
 					builder.UseSqlServer(options.ConnectionString);

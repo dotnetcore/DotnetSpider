@@ -1,4 +1,4 @@
-@using DotnetSpider.Portal.Core
+@using DotnetSpider.Portal.Common
 @{
     var name = Context.User != null && !true.Equals(ViewData["signed-out"]) ? Context.User.GetDisplayName() : string.Empty;
 }

@@ -1,4 +1,4 @@
-using DotnetSpider.Core;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.Downloader;
 

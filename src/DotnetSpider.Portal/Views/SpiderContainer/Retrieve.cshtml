@@ -27,12 +27,15 @@
             <table class="table table-bordered">
                 <tbody>
                 <tr>
+                    <th>Batch</th>
                     <th>Status</th>
                     <th>Total</th>
                     <th>Success</th>
                     <th>Failed</th>
+                    <th>CreationTime</th>
                     <th>Start</th>
                     <th>Exit</th>
+                    <th>Action</th>
                 </tr>
                 @if (Model == null || !Model.Any())
                 {
@@ -48,6 +51,9 @@
                     {
                         <tr >
                             <td>
+                                <span>@item.Batch</span>
+                            </td>
+                            <td>
                                 <span>@item.Status</span>
                             </td>
                             <td>
@@ -60,10 +66,16 @@
                                 <span>@item.Failed</span>
                             </td>
                             <td>
+                                <span>@item.CreationTime</span>
+                            </td>
+                            <td>
                                 <span>@item.Start</span>
                             </td>
                             <td>
                                 <span>@item.Exit</span>
+                            </td>
+                            <td>
+                                <button @(item.Exit == null ? "" : "disabled") class="btn btn-default btn-sm btn-flat" onclick="exit('@item.Batch')">Exit</button>
                             </td>
                         </tr>
                     }
@@ -93,6 +105,12 @@
 </div>
 
 @section scripts{
+    <environment names="Development">
+        <script src="~/js/spider-container.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/spider-container.min.js" asp-append-version="true"></script>
+    </environment>
     <script>
         $(function() {
             app.activeMenu('Spider');

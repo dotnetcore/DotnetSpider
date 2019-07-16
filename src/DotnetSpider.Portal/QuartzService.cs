@@ -5,7 +5,7 @@ using Quartz;
 
 namespace DotnetSpider.Portal
 {
-	public class QuartzService : IHostedService
+	public class QuartzService : BackgroundService
 	{
 		private readonly IScheduler _sched;
 
@@ -14,14 +14,15 @@ namespace DotnetSpider.Portal
 			_sched = sched;
 		}
 
-		public async Task StartAsync(CancellationToken cancellationToken)
+		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			await _sched.Start(cancellationToken);
+			return _sched.Start(stoppingToken);
 		}
 
-		public async Task StopAsync(CancellationToken cancellationToken)
+		public override Task StopAsync(CancellationToken cancellationToken)
 		{
-			await _sched.Shutdown(cancellationToken);
+			_sched.Shutdown(cancellationToken);
+			return base.StopAsync(cancellationToken);
 		}
 	}
 }

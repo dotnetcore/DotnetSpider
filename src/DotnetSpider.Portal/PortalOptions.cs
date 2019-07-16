@@ -20,6 +20,6 @@ namespace DotnetSpider.Portal
 
 		public string Docker => _configuration["Docker"];
 
-		public string DockerVolumes => _configuration["DockerVolumes"];
+		public string[] DockerVolumes => _configuration.GetSection("DockerVolumes").Get<string[]>();
 	}
 }

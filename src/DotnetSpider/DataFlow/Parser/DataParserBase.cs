@@ -15,12 +15,12 @@ namespace DotnetSpider.DataFlow.Parser
 		/// <summary>
 		/// 判断当前请求是否可以解析
 		/// </summary>
-		public Func<Request, bool> RequireParse { get; set; }
+		public Func<Request, bool> Required { get; set; }
 
 		/// <summary>
 		/// 查询当前请求的下一级请求
 		/// </summary>
-		public Func<DataFlowContext, List<string>> QueryFollowRequests { get; set; }
+		public Func<DataFlowContext, List<Request>> FollowRequestQuerier { get; set; }
 
 		/// <summary>
 		/// 选择器的生成方法
@@ -43,7 +43,7 @@ namespace DotnetSpider.DataFlow.Parser
 			try
 			{
 				// 如果不匹配则跳过，不影响其它数据流处理器的执行
-				if (RequireParse != null && !RequireParse(context.Response.Request))
+				if (Required != null && !Required(context.Response.Request))
 				{
 					return DataFlowResult.Success;
 				}
@@ -52,8 +52,18 @@ namespace DotnetSpider.DataFlow.Parser
 
 				var parserResult = await Parse(context);
 
-				var urls = QueryFollowRequests?.Invoke(context);
-				AddFollowRequests(context, urls);
+				var requests = FollowRequestQuerier?.Invoke(context);
+
+				if (requests != null && requests.Count > 0)
+				{
+					foreach (var request in requests)
+					{
+						if (request != null && (Required == null || Required(request)))
+						{
+							context.FollowRequests.Add(request);
+						}
+					}
+				}
 
 				if (parserResult == DataFlowResult.Failed || parserResult == DataFlowResult.Terminated)
 				{
@@ -69,32 +79,41 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 		}
 
-		protected virtual void AddFollowRequests(DataFlowContext dfc, List<string> urls)
+		public Func<DataFlowContext, List<Request>> BuildFollowRequestQuerier(Func<DataFlowContext, List<string>> func)
 		{
-			if (urls != null && urls.Count > 0)
+			if (func == null)
 			{
-				var followRequests = new List<Request>();
-				foreach (var url in urls)
+				return null;
+			}
+
+			return context =>
+			{
+				var urls = func(context);
+				var requests = new List<Request>();
+				if (urls != null && urls.Count > 0)
 				{
-					var followRequest = CreateFromRequest(dfc.Response.Request, url);
-					if (RequireParse == null || RequireParse(followRequest))
+					foreach (var url in urls)
 					{
-						followRequests.Add(followRequest);
+						var request = CreateFromRequest(context.Response.Request, url);
+						if (request != null)
+						{
+							requests.Add(request);
+						}
 					}
 				}
 
-				dfc.FollowRequests.AddRange(followRequests.ToArray());
+				return requests;
+			};
+		}
+
+		public void SetFollowRequestQuerier(Func<DataFlowContext, List<string>> func)
+		{
+			if (func == null)
+			{
+				return;
 			}
-		}
 
-		protected virtual Request CreateFromRequest(DataFlowContext dfc, string url)
-		{
-			return CreateFromRequest(dfc.Response.Request, url);
-		}
-
-		protected virtual IEnumerable<Request> CreateFromRequests(DataFlowContext dfc, IEnumerable<string> urls)
-		{
-			return CreateFromRequests(dfc.Response.Request, urls);
+			FollowRequestQuerier = BuildFollowRequestQuerier(func);
 		}
 
 		/// <summary>
@@ -136,17 +155,6 @@ namespace DotnetSpider.DataFlow.Parser
 				UserAgent = current.UserAgent
 			};
 			return request;
-		}
-
-		protected virtual IEnumerable<Request> CreateFromRequests(Request current, IEnumerable<string> urls)
-		{
-			var list = new List<Request>();
-			foreach (var url in urls)
-			{
-				list.Add(CreateFromRequest(current, url));
-			}
-
-			return list;
 		}
 
 		/// <summary>
