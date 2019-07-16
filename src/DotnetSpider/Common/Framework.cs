@@ -107,11 +107,9 @@ namespace DotnetSpider.Common
 			}
 		}
 
-		public static void SetEncoding()
+		public static void RegisterEncoding()
 		{
-#if NETSTANDARD
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
 		}
 
 		public static void SetMultiThread()

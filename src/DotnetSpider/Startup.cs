@@ -38,9 +38,7 @@ namespace DotnetSpider
 
 				Log.Logger = configure.CreateLogger();
 			}
-
-			Framework.SetEncoding();
-
+			
 			Framework.SetMultiThread();
 
 			var configurationBuilder = new ConfigurationBuilder();
@@ -139,9 +137,7 @@ namespace DotnetSpider
 				Environment.SetEnvironmentVariable("logfile", logfile);
 
 				ConfigureSerialLog(logfile);
-
-				Framework.SetEncoding();
-
+				
 				Framework.SetMultiThread();
 
 				var configurationBuilder = new ConfigurationBuilder();

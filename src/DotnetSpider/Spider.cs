@@ -65,6 +65,8 @@ namespace DotnetSpider
 			ILogger<Spider> logger,
 			IServiceProvider services)
 		{
+			Framework.RegisterEncoding();
+
 			Services = services;
 			_statisticsService = statisticsService;
 			_eventBus = eventBus;
