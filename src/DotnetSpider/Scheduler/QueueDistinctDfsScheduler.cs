@@ -64,9 +64,9 @@ namespace DotnetSpider.Scheduler
 			}
 
 			var requests = new List<Request>();
-			for (int i = Requests.Count; i >= start; --i)
+			for (int i = Requests[ownerId].Count; i > start; --i)
 			{
-				requests.Add(Requests[ownerId][i]);
+				requests.Add(Requests[ownerId][i - 1]);
 			}
 
 			if (dequeueCount > 0)
