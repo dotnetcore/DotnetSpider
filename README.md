@@ -62,7 +62,7 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 ### SAMPLES
 
-    Please see the Projet DotnetSpider.Sample in the solution.
+    Please see the Project DotnetSpider.Sample in the solution.
 
 ### BASE USAGE
 
