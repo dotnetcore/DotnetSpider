@@ -92,6 +92,7 @@ namespace DotnetSpider
 			BuildConfiguration();
 
 			_services.AddScoped<SpiderOptions>();
+			_services.AddTransient<Verification>();
 
 			CreateServiceProvider();
 

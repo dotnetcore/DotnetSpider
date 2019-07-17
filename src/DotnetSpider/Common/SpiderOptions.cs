@@ -85,7 +85,7 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 邮件服务端口
 		/// </summary>
-		public string EmailPort => _configuration["EmailPort"];
+		public int EmailPort => int.Parse(_configuration["EmailPort"]);
 
 		/// <summary>
 		/// Kafka 服务地址

@@ -14,52 +14,47 @@ using DotnetSpider.Scheduler;
 using DotnetSpider.Selector;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MySql.Data.MySqlClient;
 using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {
 	public class EntitySpider : Spider
 	{
-		public static Task Run()
-		{
-			var builder = new SpiderHostBuilder()
-				.ConfigureLogging(x => x.AddSerilog())
-				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
-				.ConfigureServices(services =>
-				{
-					services.AddLocalEventBus();
-					services.AddLocalDownloadCenter();
-					services.AddDownloaderAgent(x =>
-					{
-						x.UseFileLocker();
-						x.UseDefaultAdslRedialer();
-						x.UseDefaultInternetDetector();
-					});
-					services.AddStatisticsCenter(x => x.UseMemory());
-				}).Register<EntitySpider>();
-			var provider = builder.Build();
-			var spider = provider.Create<EntitySpider>();
-			return spider.RunAsync();
-		}
-
-
 		protected override void Initialize()
 		{
 			NewGuidId();
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
 			Depth = 3;
-			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(new SqlServerEntityStorage(StorageType.InsertIgnoreDuplicate,"Data Source=.;Initial Catalog=master;User Id=sa;Password='1qazZAQ!'"));
+			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(new MySqlEntityStorage(
+				StorageType.InsertAndUpdate,
+				"Database='mysql';Data Source=zousong.com;password=1qazZAQ!;User ID=root;Port=3306;"));
 			AddRequests(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
 		}
 
+		protected override async Task OnExiting()
+		{
+			var verification = Services.GetRequiredService<Verification>();
+			verification.EmailTo=new List<string>{"zlzforever@163.com"};
+			verification.Subject = "cnblogs crawler";
+			verification.AddSqlLarge("total",
+				$"SELECT COUNT(*) FROM cnblogs.cnblogs_entity_model",
+				10);
+			using (var conn = new MySqlConnection(Options.StorageConnectionString))
+			{
+				await verification.VerifyAsync(conn);
+			}
+		}
+
 		[Schema("cnblogs", "cnblogs_entity_model")]
 		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-		[FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
+		// [FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
 		public class CnblogsEntry : EntityBase<CnblogsEntry>
 		{
 			protected override void Configure()
