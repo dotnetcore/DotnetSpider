@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 using DotnetSpider.Common;
+using DotnetSpider.EventBus;
+using DotnetSpider.Kafka;
 using DotnetSpider.Sample.samples;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -13,7 +16,6 @@ namespace DotnetSpider.Sample
 	{
 		static async Task Main(string[] args)
 		{
- 
 			var configure = new LoggerConfiguration()
 #if DEBUG
 				.MinimumLevel.Verbose()

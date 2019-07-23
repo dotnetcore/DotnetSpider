@@ -33,18 +33,6 @@ namespace DotnetSpider.Sample.samples
 				});
 			var provider = builder.Build();
 
-
-			var bus = provider.GetRequiredService<IEventBus>();
-
-			bus.Subscribe("test-topic", evt => { Console.WriteLine("i am consumer 1"); });
-			bus.Subscribe("test-topic", evt => { Console.WriteLine("i am consumer 2"); });
-			for (int i = 0; i < 100; ++i)
-			{
-				await bus.PublishAsync("test-topic", new Event());
-			}
-
-			Console.Read();
-
 			var spider = provider.Create<Spider>();
 			spider.NewGuidId(); // 设置任务标识
 			spider.Name = "博客园全站采集"; // 设置任务名称

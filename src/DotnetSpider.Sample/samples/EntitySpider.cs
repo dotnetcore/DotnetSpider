@@ -54,7 +54,7 @@ namespace DotnetSpider.Sample.samples
 		[Schema("cnblogs", "cnblogs_entity_model")]
 		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-		// [FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
+		[FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
 		public class CnblogsEntry : EntityBase<CnblogsEntry>
 		{
 			protected override void Configure()

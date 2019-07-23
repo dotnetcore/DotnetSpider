@@ -47,7 +47,7 @@ namespace DotnetSpider.DownloaderAgent
 					Log.Logger.Information($"AgentId     : {options.AgentId}", 0, ConsoleColor.DarkYellow);
 					Log.Logger.Information($"AgentName   : {options.Name}", 0, ConsoleColor.DarkYellow);
 					Log.Logger.Information(
-						$"KafkaGroup  : {new SpiderOptions(hostContext.Configuration).KafkaConsumerGroup}", 0,
+						$"KafkaGroup  : {new KafkaOptions(hostContext.Configuration).KafkaConsumerGroup}", 0,
 						ConsoleColor.DarkYellow);
 
 					services.AddSingleton<SpiderOptions>();

@@ -24,14 +24,14 @@ namespace DotnetSpider.Kafka
 
 		private readonly ILogger _logger;
 		private readonly IProducer<Null, Event> _producer;
-		private readonly SpiderOptions _options;
+		private readonly KafkaOptions _options;
 
 		/// <summary>
 		/// 构造方法
 		/// </summary>
 		/// <param name="options">爬虫选项</param>
 		/// <param name="logger">日志接口</param>
-		public KafkaEventBus(SpiderOptions options,
+		public KafkaEventBus(KafkaOptions options,
 			ILogger<KafkaEventBus> logger)
 		{
 			_logger = logger;
@@ -39,7 +39,11 @@ namespace DotnetSpider.Kafka
 			var productConfig = new ProducerConfig
 			{
 				BootstrapServers = options.KafkaBootstrapServers,
-				Partitioner = Partitioner.ConsistentRandom
+				Partitioner = Partitioner.ConsistentRandom,
+				SaslUsername = _options.KafkaSaslUsername,
+				SaslPassword = _options.KafkaSaslPassword,
+				SaslMechanism = _options.KafkaSaslMechanism,
+				SecurityProtocol = _options.KafkaSecurityProtocol
 			};
 			var builder =
 				new ProducerBuilder<Null, Event>(productConfig).SetValueSerializer(new ProtobufSerializer<Event>());
@@ -88,6 +92,10 @@ namespace DotnetSpider.Kafka
 				var config = new ConsumerConfig
 				{
 					GroupId = _options.KafkaConsumerGroup,
+					SaslUsername = _options.KafkaSaslUsername,
+					SaslPassword = _options.KafkaSaslPassword,
+					SaslMechanism = _options.KafkaSaslMechanism,
+					SecurityProtocol = _options.KafkaSecurityProtocol,
 					BootstrapServers = _options.KafkaBootstrapServers,
 					// Note: The AutoOffsetReset property determines the start offset in the event
 					// there are not yet any committed offsets for the consumer group for the

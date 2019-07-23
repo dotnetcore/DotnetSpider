@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.1'
 services:
   zoo1:
     image: zookeeper
@@ -7,42 +7,36 @@ services:
     container_name: zoo1
     ports:
       - 2181:2181
-    volumes:
-      - "~/zookeeper/zoo1/data:/data"
-      - "~/zookeeper/zoo1/datalog:/datalog"
     environment:
       ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
-    networks:
-      default:
-        ipv4_address: 172.23.0.11
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+    volumes:
+      - "/storage/var/lib/zookeeper/zoo1/data:/data"
+      - "/storage/var/lib/zookeeper/zoo1/datalog:/datalog"
   zoo2:
     image: zookeeper
     restart: always
     hostname: zoo2
     container_name: zoo2
     ports:
-      - 2180:2181
-    volumes:
-      - "~/zookeeper/zoo2/data:/data"
-      - "~/zookeeper/zoo2/datalog:/datalog"       
+      - 2182:2181
     environment:
       ZOO_MY_ID: 2
-      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zoo3:2888:3888
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=0.0.0.0:2888:3888;2181 server.3=zoo3:2888:3888;2181
+    volumes:
+      - "/storage/var/lib/zookeeper/zoo2/data:/data"
+      - "/storage/var/lib/zookeeper/zoo2/datalog:/datalog"
+
   zoo3:
     image: zookeeper
     restart: always
     hostname: zoo3
     container_name: zoo3
     ports:
-      - 2179:2181
-    volumes:
-      - "~/zookeeper/zoo3/data:/data"
-      - "~/zookeeper/zoo3/datalog:/datalog"      
+      - 2183:2181
     environment:
       ZOO_MY_ID: 3
-      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=0.0.0.0:2888:3888
-networks:
-  default:
-    external:
-      name: zookeeper_network
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=0.0.0.0:2888:3888;2181
+    volumes:
+      - "/storage/var/lib/zookeeper/zoo3/data:/data"
+      - "/storage/var/lib/zookeeper/zoo3/datalog:/datalog"

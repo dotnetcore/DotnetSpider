@@ -87,23 +87,6 @@ namespace DotnetSpider.Common
 		/// </summary>
 		public int EmailPort => int.Parse(_configuration["EmailPort"]);
 
-		/// <summary>
-		/// Kafka 服务地址
-		/// </summary>
-		public string KafkaBootstrapServers => string.IsNullOrWhiteSpace(_configuration["KafkaBootstrapServers"])
-			? "localhost:9092"
-			: _configuration["KafkaBootstrapServers"];
-
-		/// <summary>
-		/// Kafka 消费组
-		/// </summary>
-		public string KafkaConsumerGroup => string.IsNullOrWhiteSpace(_configuration["KafkaConsumerGroup"])
-			? "DotnetSpider"
-			: _configuration["KafkaConsumerGroup"];
-
-		public int KafkaTopicPartitionCount => string.IsNullOrWhiteSpace(_configuration["KafkaTopicPartitionCount"])
-			? 50
-			: int.Parse(_configuration["KafkaTopicPartitionCount"]);
 
 		public string ResponseHandlerTopic => "ResponseHandler-";
 
@@ -123,9 +106,7 @@ namespace DotnetSpider.Common
 		public string AdslDownloadQueueTopic => string.IsNullOrWhiteSpace(_configuration["AdslDownloadQueueTopic"])
 			? "AdslDownloadQueue"
 			: _configuration["AdslDownloadQueueTopic"];
-
-		public string[] PartitionTopics => _configuration.GetSection("PartitionTopics").Get<string[]>();
-
+		
 		/// <summary>
 		/// 消息队列推送消息、文章话题、获取消息失败重试的次数
 		/// 默认是 28800 次即 8 小时

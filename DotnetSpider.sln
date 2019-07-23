@@ -48,6 +48,10 @@ ProjectSection(SolutionItems) = preProject
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{0096D2D4-06F0-4E57-A215-4DFA7FADE0FA}"
+ProjectSection(SolutionItems) = preProject
+	docker\deploy_agent.md = docker\deploy_agent.md
+	docker\deploy_portal.md = docker\deploy_portal.md
+EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.Spiders.Startup", "src\DotnetSpider.Spiders.Startup\DotnetSpider.Spiders.Startup.csproj", "{8D23B30D-D4A7-46D1-BB33-D799B4AE96DC}"
 EndProject

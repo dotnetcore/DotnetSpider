@@ -15,6 +15,7 @@ namespace DotnetSpider.Kafka
 		{
 			Check.NotNull(services, nameof(services));
 
+			services.AddSingleton<KafkaOptions>();
 			services.AddSingleton<IEventBus, KafkaEventBus>();
 			return services;
 		}
