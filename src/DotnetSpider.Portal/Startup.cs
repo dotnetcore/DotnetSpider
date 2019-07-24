@@ -168,7 +168,7 @@ namespace DotnetSpider.Portal
 				var spider = new DotnetSpider.Portal.Entity.Spider
 				{
 					Name = "cnblogs",
-					Cron = "0 * * * * ?",
+					Cron = "0 1 */1 * * ?",
 					Repository = "dotnetspider/spiders.startup",
 					Type = "DotnetSpider.Spiders.CnblogsSpider",
 					Tag = "latest",
