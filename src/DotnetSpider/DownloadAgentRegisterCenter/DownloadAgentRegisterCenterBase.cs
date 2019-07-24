@@ -35,8 +35,6 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 		/// </summary>
 		protected readonly IDownloaderAgentStore DownloaderAgentStore;
 
-		public bool IsRunning { get; private set; }
-
 		/// <summary>
 		/// 构造方法
 		/// </summary>
@@ -125,7 +123,6 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 				}
 			});
 			Logger.LogInformation("下载中心启动完毕");
-			IsRunning = true;
 		}
 
 		public override Task StopAsync(CancellationToken cancellationToken)

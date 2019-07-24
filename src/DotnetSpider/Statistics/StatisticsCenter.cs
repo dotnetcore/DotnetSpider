@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DotnetSpider.Common;
 using DotnetSpider.EventBus;
+using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -10,14 +11,12 @@ namespace DotnetSpider.Statistics
 	/// <summary>
 	/// 统计服务中心
 	/// </summary>
-	public class StatisticsCenter : BackgroundService, IStatisticsCenter, IRunnable
+	public class StatisticsCenter : BackgroundService, IStatisticsCenter
 	{
 		private readonly IEventBus _eventBus;
 		private readonly ILogger _logger;
 		private readonly IStatisticsStore _statisticsStore;
 		private readonly SpiderOptions _options;
-
-		public bool IsRunning { get; private set; }
 
 		/// <summary>
 		/// 构造方法
@@ -42,7 +41,6 @@ namespace DotnetSpider.Statistics
 			_eventBus.Subscribe(_options.TopicStatisticsService,
 				async message => await HandleStatisticsMessageAsync(message));
 			_logger.LogInformation("统计中心启动");
-			IsRunning = true;
 		}
 
 		/// <summary>

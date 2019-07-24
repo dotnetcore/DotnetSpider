@@ -1,9 +1,10 @@
 using DotnetSpider.Common;
+using DotnetSpider.DownloadAgent;
 using DotnetSpider.EventBus;
 using DotnetSpider.Network;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetSpider.DownloadAgent
+namespace DotnetSpider
 {
 	/// <summary>
 	/// 下载器代理

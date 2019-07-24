@@ -23,7 +23,7 @@ namespace DotnetSpider
 		private readonly List<Action<IServiceCollection>> _configureServiceActions =
 			new List<Action<IServiceCollection>>();
 
-		private List<IHostedService> _backgroundServices = new List<IHostedService>();
+		private IEnumerable<IHostedService> _backgroundServices;
 
 		private IServiceProvider _serviceProvider;
 
@@ -84,9 +84,9 @@ namespace DotnetSpider
 			{
 				throw new InvalidOperationException("Build can only be called once.");
 			}
-
+			Framework.PrintInfo();
 			Framework.SetMultiThread();
-			
+
 			_hostBuilt = true;
 
 			BuildConfiguration();
@@ -96,27 +96,10 @@ namespace DotnetSpider
 
 			CreateServiceProvider();
 
-			_backgroundServices = _serviceProvider.GetServices<IHostedService>().ToList();
-
-			foreach (var hostedService in _backgroundServices)
+			_backgroundServices = _serviceProvider.GetService<IEnumerable<IHostedService>>();
+			foreach (IHostedService hostedService in _backgroundServices)
 			{
-				hostedService.StartAsync(_cancellationTokenSource.Token);
-				for (int i = 0; i < 300; ++i)
-				{
-					if (hostedService is IRunnable runnable && !runnable.IsRunning)
-					{
-						Thread.Sleep(100);
-					}
-					else
-					{
-						break;
-					}
-				}
-
-				if (hostedService is IRunnable runnable1 && !runnable1.IsRunning)
-				{
-					throw new SpiderException("服务启动超时");
-				}
+				hostedService.StartAsync(default).ConfigureAwait(false).GetAwaiter().GetResult();
 			}
 
 			Console.CancelKeyPress += (sender, arguments) => { _cancellationTokenSource.Cancel(); };

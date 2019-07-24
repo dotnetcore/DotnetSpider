@@ -35,13 +35,6 @@ namespace DotnetSpider.DownloadAgent
 		protected ILogger Logger { get; }
 
 		/// <summary>
-		/// 配置下载器
-		/// </summary>
-		protected Action<IDownloader> ConfigureDownloader { get; set; }
-
-		public bool IsRunning { get; private set; }
-
-		/// <summary>
 		/// 构造方法
 		/// </summary>
 		/// <param name="options">下载器代理选项</param>
@@ -69,7 +62,7 @@ namespace DotnetSpider.DownloadAgent
 			await _eventBus.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter, new Event
 			{
 				Type = Framework.RegisterCommand,
-				Data = JsonConvert.SerializeObject(new DownloaderAgent
+				Data = JsonConvert.SerializeObject(new DownloadAgentRegisterCenter.Entity.DownloaderAgent
 				{
 					Id = _options.AgentId,
 					Name = _options.Name,
@@ -83,14 +76,14 @@ namespace DotnetSpider.DownloadAgent
 			// 订阅节点
 			SubscribeMessage();
 
+			await SendHeartbeatAsync();
+
 			// 开始心跳
 			HeartbeatAsync(stoppingToken).ConfigureAwait(false).GetAwaiter();
 
 			ReleaseDownloaderAsync(stoppingToken).ConfigureAwait(false).GetAwaiter();
 
 			Logger?.LogInformation($"下载器代理 {_options.AgentId} 启动完毕");
-
-			IsRunning = true;
 		}
 
 		public override Task StopAsync(CancellationToken cancellationToken)
@@ -153,22 +146,7 @@ namespace DotnetSpider.DownloadAgent
 					Thread.Sleep(5000);
 					try
 					{
-						var json = JsonConvert.SerializeObject(new DownloaderAgentHeartbeat
-						{
-							AgentId = _options.AgentId,
-							AgentName = _options.Name,
-							FreeMemory = (int) Framework.GetFreeMemory(),
-							DownloaderCount = _cache.Count,
-							CreationTime = DateTime.Now
-						});
-
-						await _eventBus.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter,
-							new Event
-							{
-								Type = Framework.HeartbeatCommand,
-								Data = json
-							});
-						Logger?.LogDebug($"下载器代理 {_options.AgentId} 发送心跳成功");
+						await SendHeartbeatAsync();
 					}
 					catch (Exception e)
 					{
@@ -176,6 +154,26 @@ namespace DotnetSpider.DownloadAgent
 					}
 				}
 			}, stoppingToken);
+		}
+
+		private async Task SendHeartbeatAsync()
+		{
+			var json = JsonConvert.SerializeObject(new DownloaderAgentHeartbeat
+			{
+				AgentId = _options.AgentId,
+				AgentName = _options.Name,
+				FreeMemory = (int) Framework.GetFreeMemory(),
+				DownloaderCount = _cache.Count,
+				CreationTime = DateTime.Now
+			});
+
+			await _eventBus.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter,
+				new Event
+				{
+					Type = Framework.HeartbeatCommand,
+					Data = json
+				});
+			Logger?.LogDebug($"下载器代理 {_options.AgentId} 发送心跳成功");
 		}
 
 		private Task ReleaseDownloaderAsync(CancellationToken stoppingToken)
@@ -317,7 +315,7 @@ namespace DotnetSpider.DownloadAgent
 						response = await downloader.DownloadAsync(request);
 					}
 
-					_eventBus.Publish($"{_spiderOptions.TopicResponseHandler}{request.OwnerId}",
+					await _eventBus.PublishAsync($"{_spiderOptions.TopicResponseHandler}{request.OwnerId}",
 						new Event
 						{
 							Data = JsonConvert.SerializeObject(new[] {response})

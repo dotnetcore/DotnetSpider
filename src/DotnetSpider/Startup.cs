@@ -21,7 +21,7 @@ namespace DotnetSpider
 		{
 			var logfile = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
 			logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
-			Environment.SetEnvironmentVariable("logfile", logfile);
+			Environment.SetEnvironmentVariable("LOGFILE", logfile);
 
 			if (Log.Logger == null)
 			{
@@ -132,7 +132,7 @@ namespace DotnetSpider
 			{
 				var logfile = Environment.GetEnvironmentVariable("DOTNET_SPIDER_ID");
 				logfile = string.IsNullOrWhiteSpace(logfile) ? "dotnet-spider.log" : $"/logs/{logfile}.log";
-				Environment.SetEnvironmentVariable("logfile", logfile);
+				Environment.SetEnvironmentVariable("LOGFILE", logfile);
 
 				ConfigureSerialLog(logfile);
 

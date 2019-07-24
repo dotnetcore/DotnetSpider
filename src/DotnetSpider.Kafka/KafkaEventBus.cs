@@ -38,14 +38,10 @@ namespace DotnetSpider.Kafka
 			_options = options;
 			var productConfig = new ProducerConfig
 			{
-				BootstrapServers = options.BootstrapServers,
 				Partitioner = Partitioner.ConsistentRandom,
-				SaslUsername = _options.SaslUsername,
-				SaslPassword = _options.SaslPassword,
-				SaslMechanism = _options.SaslMechanism,
-				SecurityProtocol = _options.SecurityProtocol,
 				CompressionType = CompressionType.Lz4
 			};
+			SetClientConfig(productConfig);
 			var builder =
 				new ProducerBuilder<Null, Event>(productConfig).SetValueSerializer(new ProtobufSerializer<Event>());
 
@@ -71,53 +67,40 @@ namespace DotnetSpider.Kafka
 				});
 		}
 
-		public void Publish(string topic, Event message)
-		{
-			PublishAsync(topic, message).ConfigureAwait(false).GetAwaiter();
-		}
-
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void Subscribe(string topic, Action<Event> action)
 		{
-			Task.Factory.StartNew(() =>
+			if (_options.PartitionTopics.Contains(topic))
 			{
-				if (_options.PartitionTopics.Contains(topic))
+				var adminClientConfig = new AdminClientConfig();
+				SetClientConfig(adminClientConfig);
+				using (var adminClient = new AdminClientBuilder(adminClientConfig).Build())
 				{
-					using (var adminClient = new AdminClientBuilder(new AdminClientConfig
-					{
-						BootstrapServers = _options.BootstrapServers,
-						SaslUsername = _options.SaslUsername,
-						SaslPassword = _options.SaslPassword,
-						SaslMechanism = _options.SaslMechanism,
-						SecurityProtocol = _options.SecurityProtocol
-					}).Build())
-					{
-						PrepareTopic(adminClient, topic);
-					}
+					PrepareTopic(adminClient, topic);
 				}
+			}
 
-				var config = new ConsumerConfig
+			var config = new ConsumerConfig
+			{
+				GroupId = _options.ConsumerGroup,
+				// Note: The AutoOffsetReset property determines the start offset in the event
+				// there are not yet any committed offsets for the consumer group for the
+				// topic/partitions of interest. By default, offsets are committed
+				// automatically, so in this example, consumption will only start from the
+				// earliest message in the topic 'my-topic' the first time you run the program.
+				AutoOffsetReset = AutoOffsetReset.Earliest
+			};
+			SetClientConfig(config);
+			using (var consumer = new ConsumerBuilder<Null, Event>(config)
+				.SetValueDeserializer(new ProtobufDeserializer<Event>()).Build())
+			{
+				consumer.Subscribe(topic);
+				_logger.LogInformation("Subscribe: " + topic);
+				_consumers.Add(topic, consumer);
+				Task.Factory.StartNew(obj =>
 				{
-					GroupId = _options.ConsumerGroup,
-					SaslUsername = _options.SaslUsername,
-					SaslPassword = _options.SaslPassword,
-					SaslMechanism = _options.SaslMechanism,
-					SecurityProtocol = _options.SecurityProtocol,
-					BootstrapServers = _options.BootstrapServers,
-					// Note: The AutoOffsetReset property determines the start offset in the event
-					// there are not yet any committed offsets for the consumer group for the
-					// topic/partitions of interest. By default, offsets are committed
-					// automatically, so in this example, consumption will only start from the
-					// earliest message in the topic 'my-topic' the first time you run the program.
-					AutoOffsetReset = AutoOffsetReset.Earliest
-				};
-				using (var c = new ConsumerBuilder<Null, Event>(config)
-					.SetValueDeserializer(new ProtobufDeserializer<Event>()).Build())
-				{
-					c.Subscribe(topic);
-					_logger.LogInformation("Subscribe: " + topic);
-					_consumers.Add(topic, c);
-					while (true)
+					var c = (IConsumer<NullValue, Event>) obj;
+					while (_consumers.ContainsKey(topic))
 					{
 						Event msg = null;
 						try
@@ -154,8 +137,8 @@ namespace DotnetSpider.Kafka
 							_logger?.LogError($"消费 Kafka 消息失败, Topic {topic} 接收到空消息");
 						}
 					}
-				}
-			}).ConfigureAwait(false).GetAwaiter();
+				}, consumer).ConfigureAwait(false).GetAwaiter();
+			}
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
@@ -191,6 +174,20 @@ namespace DotnetSpider.Kafka
 					});
 				}
 			}
+		}
+
+		private void SetClientConfig(ClientConfig config)
+		{
+			config.BootstrapServers = _options.BootstrapServers;
+			config.SaslUsername = _options.SaslUsername;
+			config.SaslPassword = _options.SaslPassword;
+			config.SaslMechanism = _options.SaslMechanism;
+			config.SecurityProtocol = _options.SecurityProtocol;
+			config.BootstrapServers = _options.BootstrapServers;
+		}
+
+		public void Dispose()
+		{
 		}
 	}
 }

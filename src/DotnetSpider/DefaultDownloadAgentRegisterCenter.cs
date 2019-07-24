@@ -1,8 +1,9 @@
 using DotnetSpider.Common;
+using DotnetSpider.DownloadAgentRegisterCenter;
 using DotnetSpider.EventBus;
 using Microsoft.Extensions.Logging;
 
-namespace DotnetSpider.DownloadAgentRegisterCenter
+namespace DotnetSpider
 {
 	/// <summary>
 	/// 下载中心

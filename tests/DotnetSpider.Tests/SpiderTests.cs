@@ -7,6 +7,7 @@ using DotnetSpider.DataFlow.Storage.PostgreSql;
 using DotnetSpider.Downloader;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
+using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Xunit;

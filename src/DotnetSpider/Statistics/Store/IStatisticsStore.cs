@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotnetSpider.Statistics.Entity;
 
-namespace DotnetSpider.Statistics
+namespace DotnetSpider.Statistics.Store
 {
     /// <summary>
     /// 统计存储接口

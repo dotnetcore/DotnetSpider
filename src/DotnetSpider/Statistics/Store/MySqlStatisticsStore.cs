@@ -7,7 +7,7 @@ using DotnetSpider.Common;
 using DotnetSpider.Statistics.Entity;
 using MySql.Data.MySqlClient;
 
-namespace DotnetSpider.Statistics
+namespace DotnetSpider.Statistics.Store
 {
 	public class MySqlStatisticsStore : IStatisticsStore
 	{

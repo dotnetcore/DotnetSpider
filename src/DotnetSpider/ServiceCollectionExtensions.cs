@@ -8,6 +8,7 @@ using DotnetSpider.EventBus;
 using DotnetSpider.Network;
 using DotnetSpider.Network.InternetDetector;
 using DotnetSpider.Statistics;
+using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,7 +34,7 @@ namespace DotnetSpider
 		public static IServiceCollection AddDownloadCenter(this IServiceCollection services,
 			Action<DownloadAgentRegisterCenterBuilder> configure = null)
 		{
-			services.AddSingleton<IHostedService, DefaultDownloadAgentRegisterCenter>();
+			services.AddHostedService<DefaultDownloadAgentRegisterCenter>();
 
 			DownloadAgentRegisterCenterBuilder downloadCenterBuilder = new DownloadAgentRegisterCenterBuilder(services);
 			configure?.Invoke(downloadCenterBuilder);

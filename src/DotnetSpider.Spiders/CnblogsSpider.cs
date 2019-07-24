@@ -22,7 +22,7 @@ namespace DotnetSpider.Spiders
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
 			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
-			for (int i = 1; i < 20; ++i)
+			for (int i = 1; i < 10; ++i)
 			{
 				AddRequests(
 					new Request($"https://news.cnblogs.com/n/page/{i}/", new Dictionary<string, string> {{"网站", "博客园"}})

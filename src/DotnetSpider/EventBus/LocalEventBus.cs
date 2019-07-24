@@ -92,5 +92,9 @@ namespace DotnetSpider.EventBus
 		{
 			_consumers.TryRemove(topic, out _);
 		}
+
+		public void Dispose()
+		{
+		}
 	}
 }

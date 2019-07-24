@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotnetSpider.Statistics.Entity;
 
-namespace DotnetSpider.Statistics
+namespace DotnetSpider.Statistics.Store
 {
 	/// <summary>
 	/// 基于内存的统计存储

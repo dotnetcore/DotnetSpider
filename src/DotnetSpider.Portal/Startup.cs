@@ -34,7 +34,7 @@ namespace DotnetSpider.Portal
 		{
 			services.AddSingleton<SpiderOptions>();
 			services.AddSingleton<PortalOptions>();
-			
+
 			services.AddKafkaEventBus();
 			services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
 			services.AddStatisticsCenter(x => x.UseMySql());
@@ -61,6 +61,7 @@ namespace DotnetSpider.Portal
 					break;
 				}
 			}
+
 			services.AddDbContext<PortalDbContext>(dbContextOptionsBuilder);
 			services.AddQuartz();
 			services.AddHostedService<QuartzService>();
@@ -150,16 +151,28 @@ namespace DotnetSpider.Portal
 		{
 			if (!context.DockerRepositories.Any())
 			{
-				context.DockerRepositories.Add(new DockerRepository
+				var repo = new DockerRepository
 				{
-					Name = "default",
-					Schema = "http",
-					Registry = "registry.zousong.com:5000",
+					Name = "DockerHub",
+					Schema = null,
+					Registry = null,
 					Repository = "dotnetspider/spiders.startup",
 					CreationTime = DateTime.Now,
 					UserName = "",
 					Password = ""
-				});
+				};
+				context.DockerRepositories.Add(repo);
+
+				var spider = new DotnetSpider.Portal.Entity.Spider
+				{
+					Name = "cnblogs",
+					Cron = "0 * * * *",
+					Repository = "dotnetspider/spiders.startup:latest",
+					Type = "DotnetSpider.Spiders.CnblogsSpider",
+					Tag = "latest",
+					CreationTime = DateTime.Now
+				};
+				context.Spiders.Add(spider);
 				context.SaveChanges();
 			}
 		}
