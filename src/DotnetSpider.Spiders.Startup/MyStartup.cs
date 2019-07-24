@@ -28,7 +28,7 @@ namespace DotnetSpider.Spiders.Startup
 				b.AddSerilog();
 			});
 
-			var config = configuration["config"];
+			var config = configuration["DOTNET_SPIDER_CONFIG"];
 			builder.ConfigureAppConfiguration(x =>
 			{
 				if (!string.IsNullOrWhiteSpace(config) && File.Exists(config))
@@ -38,18 +38,20 @@ namespace DotnetSpider.Spiders.Startup
 				}
 				else
 				{
-					x.AddJsonFile("appsettings.json");
+					if (File.Exists("appsettings.json"))
+					{
+						x.AddJsonFile("appsettings.json");
+					}
 				}
-
-				x.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
 				x.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
+				x.AddEnvironmentVariables();
 			});
 
-			var distributed = configuration["distributed"] == "true";
+			var distributed = configuration["DOTNET_SPIDER_DISTRIBUTED"] == "false";
 
 			builder.ConfigureServices(services =>
 			{
-				if (!distributed)
+				if (distributed)
 				{
 					services.AddLocalEventBus();
 					services.AddLocalDownloadCenter();

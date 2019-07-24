@@ -12,6 +12,7 @@ namespace DotnetSpider.Spiders.Startup
 				Environment.SetEnvironmentVariable("DOTNET_SPIDER_NAME", "cnblogs");
 				Environment.SetEnvironmentVariable("DOTNET_SPIDER_TYPE", "DotnetSpider.Spiders.CnblogsSpider");
 				Environment.SetEnvironmentVariable("DOTNET_SPIDER_PRINT_SPIDERS", "true");
+				Environment.SetEnvironmentVariable("DOTNET_SPIDER_DISTRIBUTED", "false");
 			}
 			var startup = new MyStartup();
 			startup.Execute();

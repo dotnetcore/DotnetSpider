@@ -38,20 +38,18 @@ namespace DotnetSpider
 
 				Log.Logger = configure.CreateLogger();
 			}
-			
+
 			Framework.SetMultiThread();
 
 			var configurationBuilder = new ConfigurationBuilder();
 			configurationBuilder.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
-			configurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
 			configurationBuilder.AddCommandLine(args, Framework.SwitchMappings);
+			configurationBuilder.AddEnvironmentVariables();
 			var configuration = configurationBuilder.Build();
 
-			var id = configuration["ID"] ?? Guid.NewGuid().ToString("N");
-			var name = configuration["NAME"] ?? id;
+			var id = configuration["DOTNET_SPIDER_ID"] ?? Guid.NewGuid().ToString("N");
+			var name = configuration["DOTNET_SPIDER_NAME"] ?? id;
 			var arguments = Environment.GetCommandLineArgs();
-
-			PrintEnvironment();
 
 			var builder = new SpiderHostBuilder();
 			builder.ConfigureLogging(b =>
@@ -64,7 +62,7 @@ namespace DotnetSpider
 				b.AddSerilog();
 			});
 
-			var config = configuration["config"];
+			var config = configuration["DOTNET_SPIDER_CONFIG"];
 			builder.ConfigureAppConfiguration(x =>
 			{
 				if (!string.IsNullOrWhiteSpace(config) && File.Exists(config))
@@ -80,8 +78,8 @@ namespace DotnetSpider
 					}
 				}
 
-				x.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
 				x.AddCommandLine(Environment.GetCommandLineArgs(), Framework.SwitchMappings);
+				x.AddEnvironmentVariables();
 			});
 
 			builder.ConfigureServices(services =>
@@ -137,27 +135,25 @@ namespace DotnetSpider
 				Environment.SetEnvironmentVariable("logfile", logfile);
 
 				ConfigureSerialLog(logfile);
-				
+
 				Framework.SetMultiThread();
 
 				var configurationBuilder = new ConfigurationBuilder();
 				configurationBuilder.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
-				configurationBuilder.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
 				configurationBuilder.AddCommandLine(args, Framework.SwitchMappings);
+				configurationBuilder.AddEnvironmentVariables();
 				var configuration = configurationBuilder.Build();
 
-				string spiderTypeName = configuration["TYPE"];
+				string spiderTypeName = configuration["DOTNET_SPIDER_TYPE"];
 				if (string.IsNullOrWhiteSpace(spiderTypeName))
 				{
 					Log.Logger.Error("未指定需要执行的爬虫类型");
 					return;
 				}
 
-				var name = configuration["NAME"];
-				var id = configuration["ID"] ?? Guid.NewGuid().ToString("N");
-				var arguments = configuration["ARGS"]?.Split(' ');
-
-				PrintEnvironment();
+				var name = configuration["DOTNET_SPIDER_NAME"];
+				var id = configuration["DOTNET_SPIDER_ID"] ?? Guid.NewGuid().ToString("N");
+				var arguments = configuration["DOTNET_SPIDER_ARGS"]?.Split(' ');
 
 				var spiderTypes = DetectSpiders();
 
@@ -286,28 +282,6 @@ namespace DotnetSpider
 			return
 				files.Where(f => !f.Contains("DotnetSpider")
 				                 && DetectAssembles.Any(n => f.ToLower().Contains(n))).ToList();
-		}
-
-		private static void PrintEnvironment()
-		{
-			Framework.PrintInfo();
-			var environmentVariables = Environment.GetEnvironmentVariables();
-			var excludes = new List<string> {"PATH", "ASPNETCORE_URLS", "HOSTNAME", "DOTNET_RUNNING_IN_CONTAINER"};
-			foreach (DictionaryEntry variable in environmentVariables)
-			{
-				if (!excludes.Contains(variable.Key))
-				{
-					Log.Logger.Information($"环境变量   : {variable.Key} {variable.Value}", 0, ConsoleColor.DarkYellow);
-				}
-			}
-
-			var commands = string.Join(" ", Environment.GetCommandLineArgs());
-			Log.Logger.Information($"运行参数   : {commands}", 0, ConsoleColor.DarkYellow);
-			Log.Logger.Information($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
-				ConsoleColor.DarkYellow);
-			Log.Logger.Information(
-				$"操作系统   : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
-				ConsoleColor.DarkYellow);
 		}
 	}
 }

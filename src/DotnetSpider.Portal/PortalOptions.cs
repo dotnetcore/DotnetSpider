@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Configuration;
 
 namespace DotnetSpider.Portal
@@ -20,6 +21,9 @@ namespace DotnetSpider.Portal
 
 		public string Docker => _configuration["Docker"];
 
-		public string[] DockerVolumes => _configuration.GetSection("DockerVolumes").Get<string[]>();
+		public string[] DockerVolumes =>
+			string.IsNullOrWhiteSpace(_configuration["DockerVolumes"])
+				? new string[0]
+				: _configuration["DockerVolumes"].Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
 	}
 }

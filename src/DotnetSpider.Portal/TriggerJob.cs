@@ -39,9 +39,9 @@ namespace DotnetSpider.Portal
 					var env = new List<string>((spider.Environment ?? "").Split(new[] {" "},
 						StringSplitOptions.RemoveEmptyEntries))
 					{
-						$"DOTNET_SPIDER_id={batch}",
-						$"DOTNET_SPIDER_type={spider.Type}",
-						$"DOTNET_SPIDER_name={spider.Name}"
+						$"DOTNET_SPIDER_ID={batch}",
+						$"DOTNET_SPIDER_TYPE={spider.Type}",
+						$"DOTNET_SPIDER_NAME={spider.Name}"
 					};
 					var image = $"{spider.Registry}/{spider.Repository}:{spider.Tag}";
 					var name = $"dotnetspider-{spider.Id}-{batch}";

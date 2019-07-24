@@ -87,26 +87,25 @@ namespace DotnetSpider.Common
 		/// </summary>
 		public int EmailPort => int.Parse(_configuration["EmailPort"]);
 
+		public string TopicResponseHandler => "ResponseHandler-";
 
-		public string ResponseHandlerTopic => "ResponseHandler-";
-
-		public string DownloaderAgentRegisterCenterTopic =>
-			string.IsNullOrWhiteSpace(_configuration["DownloaderAgentRegisterCenterTopic"])
+		public string TopicDownloaderAgentRegisterCenter =>
+			string.IsNullOrWhiteSpace(_configuration["TopicDownloaderAgentRegisterCenter"])
 				? "DownloaderAgentRegisterCenter"
-				: _configuration["DownloaderAgentRegisterCenterTopic"];
+				: _configuration["TopicDownloaderAgentRegisterCenter"];
 
-		public string StatisticsServiceTopic => string.IsNullOrWhiteSpace(_configuration["StatisticsServiceTopic"])
+		public string TopicStatisticsService => string.IsNullOrWhiteSpace(_configuration["TopicStatisticsService"])
 			? "StatisticsService"
-			: _configuration["StatisticsServiceTopic"];
+			: _configuration["TopicStatisticsService"];
 
-		public string DownloadQueueTopic => string.IsNullOrWhiteSpace(_configuration["DownloadQueueTopic"])
+		public string TopicDownloadQueue => string.IsNullOrWhiteSpace(_configuration["TopicDownloadQueue"])
 			? "DownloadQueue"
-			: _configuration["DownloadQueueTopic"];
+			: _configuration["TopicDownloadQueue"];
 
-		public string AdslDownloadQueueTopic => string.IsNullOrWhiteSpace(_configuration["AdslDownloadQueueTopic"])
+		public string TopicAdslDownloadQueue => string.IsNullOrWhiteSpace(_configuration["TopicAdslDownloadQueue"])
 			? "AdslDownloadQueue"
-			: _configuration["AdslDownloadQueueTopic"];
-		
+			: _configuration["TopicAdslDownloadQueue"];
+
 		/// <summary>
 		/// 消息队列推送消息、文章话题、获取消息失败重试的次数
 		/// 默认是 28800 次即 8 小时

@@ -38,12 +38,13 @@ namespace DotnetSpider.Kafka
 			_options = options;
 			var productConfig = new ProducerConfig
 			{
-				BootstrapServers = options.KafkaBootstrapServers,
+				BootstrapServers = options.BootstrapServers,
 				Partitioner = Partitioner.ConsistentRandom,
-				SaslUsername = _options.KafkaSaslUsername,
-				SaslPassword = _options.KafkaSaslPassword,
-				SaslMechanism = _options.KafkaSaslMechanism,
-				SecurityProtocol = _options.KafkaSecurityProtocol
+				SaslUsername = _options.SaslUsername,
+				SaslPassword = _options.SaslPassword,
+				SaslMechanism = _options.SaslMechanism,
+				SecurityProtocol = _options.SecurityProtocol,
+				CompressionType = CompressionType.Lz4
 			};
 			var builder =
 				new ProducerBuilder<Null, Event>(productConfig).SetValueSerializer(new ProtobufSerializer<Event>());
@@ -83,7 +84,13 @@ namespace DotnetSpider.Kafka
 				if (_options.PartitionTopics.Contains(topic))
 				{
 					using (var adminClient = new AdminClientBuilder(new AdminClientConfig
-						{BootstrapServers = _options.KafkaBootstrapServers}).Build())
+					{
+						BootstrapServers = _options.BootstrapServers,
+						SaslUsername = _options.SaslUsername,
+						SaslPassword = _options.SaslPassword,
+						SaslMechanism = _options.SaslMechanism,
+						SecurityProtocol = _options.SecurityProtocol
+					}).Build())
 					{
 						PrepareTopic(adminClient, topic);
 					}
@@ -91,12 +98,12 @@ namespace DotnetSpider.Kafka
 
 				var config = new ConsumerConfig
 				{
-					GroupId = _options.KafkaConsumerGroup,
-					SaslUsername = _options.KafkaSaslUsername,
-					SaslPassword = _options.KafkaSaslPassword,
-					SaslMechanism = _options.KafkaSaslMechanism,
-					SecurityProtocol = _options.KafkaSecurityProtocol,
-					BootstrapServers = _options.KafkaBootstrapServers,
+					GroupId = _options.ConsumerGroup,
+					SaslUsername = _options.SaslUsername,
+					SaslPassword = _options.SaslPassword,
+					SaslMechanism = _options.SaslMechanism,
+					SecurityProtocol = _options.SecurityProtocol,
+					BootstrapServers = _options.BootstrapServers,
 					// Note: The AutoOffsetReset property determines the start offset in the event
 					// there are not yet any committed offsets for the consumer group for the
 					// topic/partitions of interest. By default, offsets are committed
@@ -170,17 +177,17 @@ namespace DotnetSpider.Kafka
 				adminClient.CreateTopicsAsync(new[]
 				{
 					new TopicSpecification
-						{NumPartitions = _options.KafkaTopicPartitionCount, Name = topic, ReplicationFactor = 1}
+						{NumPartitions = _options.TopicPartitionCount, Name = topic, ReplicationFactor = 1}
 				}).GetAwaiter().GetResult();
 			}
 			else
 			{
-				if (partitionCount < _options.KafkaTopicPartitionCount)
+				if (partitionCount < _options.TopicPartitionCount)
 				{
 					adminClient.CreatePartitionsAsync(new[]
 					{
 						new PartitionsSpecification
-							{Topic = topic, IncreaseTo = _options.KafkaTopicPartitionCount}
+							{Topic = topic, IncreaseTo = _options.TopicPartitionCount}
 					});
 				}
 			}

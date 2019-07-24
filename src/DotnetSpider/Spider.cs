@@ -14,6 +14,7 @@ using DotnetSpider.EventBus;
 using DotnetSpider.RequestSupplier;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Statistics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -186,6 +187,7 @@ namespace DotnetSpider
 		{
 			CheckIfRunning();
 
+			PrintEnvironment(Services.GetRequiredService<IConfiguration>());
 			try
 			{
 				ResetMmfSignal();
@@ -208,7 +210,7 @@ namespace DotnetSpider
 				await _statisticsService.StartAsync(Id);
 
 				// 订阅数据流
-				_eventBus.Subscribe($"{Options.ResponseHandlerTopic}{Id}",
+				_eventBus.Subscribe($"{Options.TopicResponseHandler}{Id}",
 					async message => await HandleMessageAsync(message));
 
 				// 订阅命令
@@ -318,7 +320,7 @@ namespace DotnetSpider
 			Logger.LogInformation($"任务 {Id} 退出中...");
 			Status = Status.Exiting;
 			// 直接取消订阅即可: 1. 如果是本地应用, 
-			_eventBus.Unsubscribe($"{Options.ResponseHandlerTopic}{Id}");
+			_eventBus.Unsubscribe($"{Options.TopicResponseHandler}{Id}");
 			return this;
 		}
 
@@ -838,7 +840,7 @@ namespace DotnetSpider
 					// 初始请求通过是否使用 ADSL 分配不同的下载队列
 					if (string.IsNullOrWhiteSpace(request.AgentId))
 					{
-						topic = request.UseAdsl ? Options.AdslDownloadQueueTopic : Options.DownloadQueueTopic;
+						topic = request.UseAdsl ? Options.TopicAdslDownloadQueue : Options.TopicDownloadQueue;
 					}
 					else
 					{
@@ -854,8 +856,8 @@ namespace DotnetSpider
 							default:
 							{
 								topic = request.UseAdsl
-									? Options.AdslDownloadQueueTopic
-									: Options.DownloadQueueTopic;
+									? Options.TopicAdslDownloadQueue
+									: Options.TopicDownloadQueue;
 								break;
 							}
 						}
@@ -869,6 +871,22 @@ namespace DotnetSpider
 
 				_enqueued.Add(requests.Length);
 			}
+		}
+
+		private void PrintEnvironment(IConfiguration configuration)
+		{
+			Framework.PrintInfo();
+			foreach (var kv in configuration.GetChildren())
+			{
+				Logger.LogInformation($"运行参数   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
+			}
+
+
+			Logger.LogInformation($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
+				ConsoleColor.DarkYellow);
+			Logger.LogInformation(
+				$"操作系统   : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
+				ConsoleColor.DarkYellow);
 		}
 	}
 }

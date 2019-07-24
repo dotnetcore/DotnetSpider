@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog.Core;
 
 namespace DotnetSpider.Portal
 {
@@ -71,6 +73,7 @@ namespace DotnetSpider.Portal
 		{
 			Common.ServiceProvider.Instance = app.ApplicationServices;
 
+			PrintEnvironment(app.ApplicationServices.GetRequiredService<ILogger<Startup>>());
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
@@ -153,13 +156,29 @@ namespace DotnetSpider.Portal
 					Name = "default",
 					Schema = "http",
 					Registry = "registry.zousong.com:5000",
-					Repository = "dotnetspider.spiders",
+					Repository = "dotnetspider/spiders.startup",
 					CreationTime = DateTime.Now,
 					UserName = "",
 					Password = ""
 				});
 				context.SaveChanges();
 			}
+		}
+
+		private void PrintEnvironment(ILogger logger)
+		{
+			Framework.PrintInfo();
+			foreach (var kv in Configuration.GetChildren())
+			{
+				logger.LogInformation($"运行参数   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
+			}
+
+
+			logger.LogInformation($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
+				ConsoleColor.DarkYellow);
+			logger.LogInformation(
+				$"操作系统   : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
+				ConsoleColor.DarkYellow);
 		}
 	}
 }

@@ -25,7 +25,8 @@ namespace DotnetSpider.DownloaderAgent
 						x.AddJsonFile("appsettings.json");
 					}
 
-					x.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
+					x.AddCommandLine(args);
+					x.AddEnvironmentVariables();
 				})
 				.ConfigureLogging(x => { x.AddSerilog(); })
 				.ConfigureServices((hostContext, services) =>
@@ -44,12 +45,8 @@ namespace DotnetSpider.DownloaderAgent
 						.RollingFile(logPath);
 					Log.Logger = configure.CreateLogger();
 
-					Log.Logger.Information($"AgentId     : {options.AgentId}", 0, ConsoleColor.DarkYellow);
-					Log.Logger.Information($"AgentName   : {options.Name}", 0, ConsoleColor.DarkYellow);
-					Log.Logger.Information(
-						$"KafkaGroup  : {new KafkaOptions(hostContext.Configuration).KafkaConsumerGroup}", 0,
-						ConsoleColor.DarkYellow);
-
+					PrintEnvironment(hostContext.Configuration);
+					
 					services.AddSingleton<SpiderOptions>();
 					services.AddKafkaEventBus();
 					services.AddDownloaderAgent(x =>
@@ -63,6 +60,22 @@ namespace DotnetSpider.DownloaderAgent
 				.UseContentRoot(AppDomain.CurrentDomain.BaseDirectory)
 				.Build();
 			host.Run();
+		}
+		
+		private static void PrintEnvironment(IConfiguration configuration)
+		{
+			Framework.PrintInfo();
+			foreach (var kv in configuration.GetChildren())
+			{
+				Log.Logger.Information($"运行参数   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
+			}
+
+
+			Log.Logger.Information($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
+				ConsoleColor.DarkYellow);
+			Log.Logger.Information(
+				$"操作系统   : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
+				ConsoleColor.DarkYellow);
 		}
 	}
 }

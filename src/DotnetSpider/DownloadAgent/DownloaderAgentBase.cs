@@ -66,7 +66,7 @@ namespace DotnetSpider.DownloadAgent
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			await _eventBus.PublishAsync(_spiderOptions.DownloaderAgentRegisterCenterTopic, new Event
+			await _eventBus.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter, new Event
 			{
 				Type = Framework.RegisterCommand,
 				Data = JsonConvert.SerializeObject(new DownloaderAgent
@@ -162,7 +162,7 @@ namespace DotnetSpider.DownloadAgent
 							CreationTime = DateTime.Now
 						});
 
-						await _eventBus.PublishAsync(_spiderOptions.DownloaderAgentRegisterCenterTopic,
+						await _eventBus.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter,
 							new Event
 							{
 								Type = Framework.HeartbeatCommand,
@@ -317,7 +317,7 @@ namespace DotnetSpider.DownloadAgent
 						response = await downloader.DownloadAsync(request);
 					}
 
-					_eventBus.Publish($"{_spiderOptions.ResponseHandlerTopic}{request.OwnerId}",
+					_eventBus.Publish($"{_spiderOptions.TopicResponseHandler}{request.OwnerId}",
 						new Event
 						{
 							Data = JsonConvert.SerializeObject(new[] {response})

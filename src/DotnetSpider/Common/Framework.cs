@@ -125,10 +125,6 @@ namespace DotnetSpider.Common
 			var configurationBuilder = new ConfigurationBuilder();
 			configurationBuilder.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
 
-			configurationBuilder.AddEnvironmentVariables();
-
-			configurationBuilder.AddCommandLine(Environment.GetCommandLineArgs(), SwitchMappings);
-
 			if (File.Exists(DefaultAppSettings))
 			{
 				configurationBuilder.AddJsonFile(DefaultAppSettings, false,
@@ -140,7 +136,8 @@ namespace DotnetSpider.Common
 				configurationBuilder.AddJsonFile(config, false,
 					true);
 			}
-
+			configurationBuilder.AddCommandLine(Environment.GetCommandLineArgs(), SwitchMappings);
+			configurationBuilder.AddEnvironmentVariables();
 			return configurationBuilder;
 		}
 

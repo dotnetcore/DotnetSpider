@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  downloader-agent1:
+    image: 'dotnetspider/downloader-agent:latest'
+    restart: always
+    hostname: downloader-agent1
+    container_name: downloader-agent1
+    environment:
+      - KafkaBootstrapServers=zousong.com:9092
+      - KafkaSaslUsername=user
+      - KafkaSaslPassword=bitnami
+      - KafkaSaslMechanism=Plain
+      - KafkaSecurityProtocol=SaslPlaintext
+      - AgentId=AGENT_001
+      - AgentName=AGENT_001
+    volumes:
+      - /storage/var/lib/dotnetspider/agent1/logs:/logs
+      
+  downloader-agent2:
+    image: 'dotnetspider/downloader-agent:latest'
+    restart: always
+    hostname: downloader-agent2
+    container_name: downloader-agent2
+    environment:
+      - KafkaBootstrapServers=zousong.com:9092
+      - KafkaSaslUsername=user
+      - KafkaSaslPassword=bitnami
+      - KafkaSaslMechanism=Plain
+      - KafkaSecurityProtocol=SaslPlaintext
+      - AgentId=AGENT_002
+      - AgentName=AGENT_002
+    volumes:
+      - /storage/var/lib/dotnetspider/agent2/logs:/logs

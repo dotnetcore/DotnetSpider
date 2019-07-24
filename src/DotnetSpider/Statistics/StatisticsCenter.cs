@@ -39,7 +39,7 @@ namespace DotnetSpider.Statistics
 		{
 			await _statisticsStore.EnsureDatabaseAndTableCreatedAsync();
 			_logger.LogInformation("统计中心准备数据库完成");
-			_eventBus.Subscribe(_options.StatisticsServiceTopic,
+			_eventBus.Subscribe(_options.TopicStatisticsService,
 				async message => await HandleStatisticsMessageAsync(message));
 			_logger.LogInformation("统计中心启动");
 			IsRunning = true;
@@ -52,7 +52,7 @@ namespace DotnetSpider.Statistics
 		/// <returns></returns>
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{
-			_eventBus.Unsubscribe(_options.StatisticsServiceTopic);
+			_eventBus.Unsubscribe(_options.TopicStatisticsService);
 			_logger.LogInformation("统计中心退出");
 			return base.StopAsync(cancellationToken);
 		}

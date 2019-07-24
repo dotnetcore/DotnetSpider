@@ -32,8 +32,8 @@ namespace DotnetSpider.Portal
 					{
 						x.AddJsonFile("appsettings.json");
 					}
-					x.AddEnvironmentVariables(prefix: "DOTNET_SPIDER_");
 					x.AddCommandLine(args);
+					x.AddEnvironmentVariables();
 				})
 				.UseStartup<Startup>().UseSerilog().UseUrls("http://0.0.0.0:7896");
 			await builder.Build().RunAsync();

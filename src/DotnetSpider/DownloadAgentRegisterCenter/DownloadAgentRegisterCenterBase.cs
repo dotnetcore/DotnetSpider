@@ -67,7 +67,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 				Logger.LogError($"初始化注册中心数据库失败: {e}");
 			}
 
-			EventBus.Subscribe(Options.DownloaderAgentRegisterCenterTopic, async message =>
+			EventBus.Subscribe(Options.TopicDownloaderAgentRegisterCenter, async message =>
 			{
 				if (message == null)
 				{
@@ -130,7 +130,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{
-			EventBus.Unsubscribe(Options.DownloaderAgentRegisterCenterTopic);
+			EventBus.Unsubscribe(Options.TopicDownloaderAgentRegisterCenter);
 			Logger.LogInformation("下载中心退出");
 			return base.StopAsync(cancellationToken);
 		}
