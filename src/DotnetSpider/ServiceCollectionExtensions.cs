@@ -155,15 +155,14 @@ namespace DotnetSpider
 		}
 
 		#endregion
-		
+
 		#region DotnetSpider
 
 		public static IServiceCollection AddDotnetSpider(this IServiceCollection services)
 		{
-			
 			return services;
 		}
-		
+
 		#endregion
 	}
 }

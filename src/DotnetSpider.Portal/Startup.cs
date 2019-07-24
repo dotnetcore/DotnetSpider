@@ -33,13 +33,13 @@ namespace DotnetSpider.Portal
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddSingleton<SpiderOptions>();
+			services.AddSingleton<PortalOptions>();
+			
 			services.AddKafkaEventBus();
 			services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
 			services.AddStatisticsCenter(x => x.UseMySql());
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-			services.AddSingleton<PortalOptions>();
 			// Add DbContext            
 			Action<DbContextOptionsBuilder> dbContextOptionsBuilder;
 			var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
@@ -61,7 +61,6 @@ namespace DotnetSpider.Portal
 					break;
 				}
 			}
-
 			services.AddDbContext<PortalDbContext>(dbContextOptionsBuilder);
 			services.AddQuartz();
 			services.AddHostedService<QuartzService>();

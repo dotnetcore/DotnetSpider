@@ -48,7 +48,7 @@
                                 <span>@item.Name</span>
                             </td>
                             <td>
-                                <span>@($"{item.Schema}://{item.Registry}")</span>
+                                <span>@(string.IsNullOrWhiteSpace(item.Schema) ? "" : $"{item.Schema}://{item.Registry}")</span>
                             </td>
                             <td>
                                 <span>@item.Repository</span>

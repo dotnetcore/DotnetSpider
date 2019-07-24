@@ -16,7 +16,6 @@ namespace DotnetSpider.Portal.Models.Spider
 		/// docker
 		/// </summary>
 		[StringLength(255)]
-		[Required]
 		public string Registry { get; set; }
 		
 		/// <summary>

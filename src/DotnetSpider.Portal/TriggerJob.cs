@@ -43,7 +43,9 @@ namespace DotnetSpider.Portal
 						$"DOTNET_SPIDER_TYPE={spider.Type}",
 						$"DOTNET_SPIDER_NAME={spider.Name}"
 					};
-					var image = $"{spider.Registry}/{spider.Repository}:{spider.Tag}";
+					var image = string.IsNullOrWhiteSpace(spider.Registry)
+						? $"{spider.Repository}:{spider.Tag}"
+						: $"{spider.Registry}/{spider.Repository}:{spider.Tag}";
 					var name = $"dotnetspider-{spider.Id}-{batch}";
 					var parameters = new CreateContainerParameters
 					{

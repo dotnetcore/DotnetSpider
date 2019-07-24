@@ -40,6 +40,7 @@ namespace DotnetSpider.Portal.Controllers
 
 			string registry = null;
 			string schema = null;
+
 			if (!string.IsNullOrWhiteSpace(dto.Registry))
 			{
 				if (Uri.TryCreate(dto.Registry, UriKind.RelativeOrAbsolute, out var uri))
