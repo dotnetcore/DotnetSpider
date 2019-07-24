@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,7 +9,7 @@ using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using DotnetSpider.Common;
 using DotnetSpider.EventBus;
-using Google.Protobuf.WellKnownTypes;
+using Partitioner = Confluent.Kafka.Partitioner;
 
 namespace DotnetSpider.Kafka
 {
@@ -19,8 +19,8 @@ namespace DotnetSpider.Kafka
 	/// </summary>
 	public class KafkaEventBus : IEventBus
 	{
-		private readonly Dictionary<string, IConsumer<Null, Event>> _consumers =
-			new Dictionary<string, IConsumer<Null, Event>>();
+		private readonly ConcurrentDictionary<string, IConsumer<Null, Event>> _consumers =
+			new ConcurrentDictionary<string, IConsumer<Null, Event>>();
 
 		private readonly ILogger _logger;
 		private readonly IProducer<Null, Event> _producer;
@@ -70,6 +70,12 @@ namespace DotnetSpider.Kafka
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void Subscribe(string topic, Action<Event> action)
 		{
+			if (_consumers.ContainsKey(topic))
+			{
+				_logger?.LogError($"已经订阅 {topic}");
+				return;
+			}
+
 			if (_options.PartitionTopics.Contains(topic))
 			{
 				var adminClientConfig = new AdminClientConfig();
@@ -91,54 +97,54 @@ namespace DotnetSpider.Kafka
 				AutoOffsetReset = AutoOffsetReset.Earliest
 			};
 			SetClientConfig(config);
-			using (var consumer = new ConsumerBuilder<Null, Event>(config)
-				.SetValueDeserializer(new ProtobufDeserializer<Event>()).Build())
+			var consumer = new ConsumerBuilder<Null, Event>(config)
+				.SetValueDeserializer(new ProtobufDeserializer<Event>()).Build();
+			consumer.Subscribe(topic);
+			_logger.LogInformation("Subscribe: " + topic);
+			_consumers.TryAdd(topic, consumer);
+			Task.Factory.StartNew(() =>
 			{
-				consumer.Subscribe(topic);
-				_logger.LogInformation("Subscribe: " + topic);
-				_consumers.Add(topic, consumer);
-				Task.Factory.StartNew(obj =>
+				_logger?.LogInformation($"开始消费 Kafka , Topic {topic}");
+				while (_consumers.ContainsKey(topic))
 				{
-					var c = (IConsumer<NullValue, Event>) obj;
-					while (_consumers.ContainsKey(topic))
+					Event msg = null;
+					try
 					{
-						Event msg = null;
+						msg = consumer.Consume().Value;
+					}
+					catch (ConsumeException e)
+					{
+						_logger?.LogError($"接收 Kafka 消息失败, Topic {topic} 原因: {e.Error.Reason}");
+					}
+					catch (OperationCanceledException)
+					{
+						_logger?.LogError($"取消订阅 Kafka 消息, Topic {topic}");
+						break;
+					}
+					catch (Exception e)
+					{
+						_logger?.LogError($"接收 Kafka 消息失败, Topic {topic} 异常: {e}");
+					}
+
+					if (msg != null)
+					{
 						try
 						{
-							msg = c.Consume().Value;
-						}
-						catch (ConsumeException e)
-						{
-							_logger?.LogError($"接收 Kafka 消息失败, Topic {topic} 原因: {e.Error.Reason}");
-						}
-						catch (OperationCanceledException)
-						{
-							_logger?.LogError($"取消订阅 Kafka 消息, Topic {topic}");
-							break;
+							action(msg);
 						}
 						catch (Exception e)
 						{
-							_logger?.LogError($"接收 Kafka 消息失败, Topic {topic} 异常: {e}");
-						}
-
-						if (msg != null)
-						{
-							try
-							{
-								Task.Factory.StartNew(() => { action(msg); }).ConfigureAwait(false).GetAwaiter();
-							}
-							catch (Exception e)
-							{
-								_logger?.LogError($"消费 Kafka 消息失败, Topic {topic} 异常: {e}");
-							}
-						}
-						else
-						{
-							_logger?.LogError($"消费 Kafka 消息失败, Topic {topic} 接收到空消息");
+							_logger?.LogError($"消费 Kafka 消息失败, Topic {topic} 异常: {e}");
 						}
 					}
-				}, consumer).ConfigureAwait(false).GetAwaiter();
-			}
+					else
+					{
+						_logger?.LogError($"消费 Kafka 消息失败, Topic {topic} 接收到空消息");
+					}
+				}
+
+				_logger?.LogWarning($"退出消费 Kafka , Topic {topic}");
+			}).ConfigureAwait(false).GetAwaiter();
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
@@ -147,7 +153,8 @@ namespace DotnetSpider.Kafka
 			if (_consumers.ContainsKey(topic))
 			{
 				_consumers[topic].Unsubscribe();
-				_consumers.Remove(topic);
+				_consumers[topic].Dispose();
+				_consumers.TryRemove(topic, out _);
 			}
 		}
 
@@ -171,7 +178,7 @@ namespace DotnetSpider.Kafka
 					{
 						new PartitionsSpecification
 							{Topic = topic, IncreaseTo = _options.TopicPartitionCount}
-					});
+					}).GetAwaiter().GetResult();
 				}
 			}
 		}

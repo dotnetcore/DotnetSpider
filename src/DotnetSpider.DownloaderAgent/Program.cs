@@ -65,6 +65,7 @@ namespace DotnetSpider.DownloaderAgent
 		private static void PrintEnvironment(IConfiguration configuration)
 		{
 			Framework.PrintInfo();
+			Log.Logger.Information($"运行参数   : VERSION = 20190725", 0, ConsoleColor.DarkYellow);
 			foreach (var kv in configuration.GetChildren())
 			{
 				Log.Logger.Information($"运行参数   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);

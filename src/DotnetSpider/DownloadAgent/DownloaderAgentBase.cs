@@ -131,7 +131,7 @@ namespace DotnetSpider.DownloadAgent
 				}
 				catch (Exception e)
 				{
-					Logger?.LogError($"订阅 topic 失败: {e.Message}");
+					Logger?.LogError($"订阅 topic 失败: {e}");
 					Thread.Sleep(1000);
 				}
 			}

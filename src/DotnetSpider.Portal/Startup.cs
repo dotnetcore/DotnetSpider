@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Quartz;
 using Serilog.Core;
 
 namespace DotnetSpider.Portal
@@ -143,11 +144,12 @@ namespace DotnetSpider.Portal
 					}
 				}
 
-				InitializedData(context);
+				var sched = app.ApplicationServices.GetRequiredService<IScheduler>();
+				InitializedData(context, sched);
 			}
 		}
 
-		private void InitializedData(PortalDbContext context)
+		private void InitializedData(PortalDbContext context, IScheduler sched)
 		{
 			if (!context.DockerRepositories.Any())
 			{
@@ -166,25 +168,32 @@ namespace DotnetSpider.Portal
 				var spider = new DotnetSpider.Portal.Entity.Spider
 				{
 					Name = "cnblogs",
-					Cron = "0 * * * *",
-					Repository = "dotnetspider/spiders.startup:latest",
+					Cron = "0 * * * * ?",
+					Repository = "dotnetspider/spiders.startup",
 					Type = "DotnetSpider.Spiders.CnblogsSpider",
 					Tag = "latest",
 					CreationTime = DateTime.Now
 				};
 				context.Spiders.Add(spider);
 				context.SaveChanges();
+
+				var trigger = TriggerBuilder.Create().WithCronSchedule(spider.Cron).WithIdentity(spider.Id.ToString())
+					.Build();
+				var qzJob = JobBuilder.Create<TriggerJob>().WithIdentity(spider.Id.ToString())
+					.WithDescription(spider.Name)
+					.RequestRecovery(true).Build();
+				sched.ScheduleJob(qzJob, trigger).GetAwaiter().GetResult();
 			}
 		}
 
 		private void PrintEnvironment(ILogger logger)
 		{
 			Framework.PrintInfo();
+			logger.LogInformation($"运行参数   : VERSION = 20190725", 0, ConsoleColor.DarkYellow);
 			foreach (var kv in Configuration.GetChildren())
 			{
 				logger.LogInformation($"运行参数   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
 			}
-
 
 			logger.LogInformation($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
 				ConsoleColor.DarkYellow);
