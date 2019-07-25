@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Confluent.Kafka;
-using DotnetSpider.Common;
-using DotnetSpider.EventBus;
-using DotnetSpider.Kafka;
 using DotnetSpider.Sample.samples;
-using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
 
@@ -14,7 +9,7 @@ namespace DotnetSpider.Sample
 {
 	class Program
 	{
-		static async Task Main(string[] args)
+		static void Main(string[] args)
 		{
 			var configure = new LoggerConfiguration()
 #if DEBUG
@@ -28,7 +23,7 @@ namespace DotnetSpider.Sample
 				.RollingFile("dotnet-spider.log");
 			Log.Logger = configure.CreateLogger();
 
-			Startup.Execute<EntitySpider>(args);
+			Startup.Execute<BaseUsage>(args);
 
 			// await DistributedSpider.Run(); 
 			Console.Read();

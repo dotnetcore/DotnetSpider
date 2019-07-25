@@ -5,6 +5,7 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.DataFlow.Storage.Mongo;
+using DotnetSpider.Downloader;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
@@ -39,7 +40,7 @@ namespace DotnetSpider.Sample.samples
 			spider.Depth = 3; // 设置采集深度
 			var parser = new DataParser
 			{
-				SelectableFactory = context => context.GetSelectable(ContentType.Html),
+				SelectableBuilder = context => context.Response.ToSelectable(ContentType.Html),
 				Required = DataParserHelper.CheckIfRequiredByRegex("cnblogs\\.com"),
 			};
 			parser.SetFollowRequestQuerier(DataParserHelper.QueryFollowRequestsByXPath("."));
@@ -88,8 +89,8 @@ namespace DotnetSpider.Sample.samples
 
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)
 			{
-				context.AddItem("URL", context.Response.Request.Url);
-				context.AddItem("Title", context.GetSelectable().XPath(".//title").GetValue());
+				context.AddData("URL", context.Response.Request.Url);
+				context.AddData("Title", context.Selectable.XPath(".//title").GetValue());
 				return Task.FromResult(DataFlowResult.Success);
 			}
 		}

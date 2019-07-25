@@ -2,12 +2,12 @@
 
 @section breadcrumb{
     <li >
-        <a href="#">镜像仓储</a>
+        <a href="#">Repository</a>
     </li>
 }
 
 @section header{
-    镜像仓储<small v-text="moduleDescription"></small>
+    Repository<small v-text="moduleDescription"></small>
 }
 
 <div class="col-xs-12">
@@ -17,7 +17,7 @@
                 &ensp;
             </div>
             <div class="box-tools">
-                <a class="btn btn-default btn-sm btn-flat" href="/docker-repository/add">添加</a>
+                <a class="btn btn-default btn-sm btn-flat" href="/docker-repository/add">Add</a>
             </div>
         </div>
         <!-- /.box-header -->
@@ -25,11 +25,11 @@
             <table class="table table-bordered">
                 <tbody>
                 <tr>
-                    <th>名称</th>
-                    <th>注册中心</th>
-                    <th>仓储</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
+                    <th>Name</th>
+                    <th>Registy</th>
+                    <th>Repository</th>
+                    <th>CreationTime</th>
+                    <th>Action</th>
                 </tr>
                 @if (Model == null || !Model.Any())
                 {

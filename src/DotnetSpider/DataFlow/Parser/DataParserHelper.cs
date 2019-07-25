@@ -23,7 +23,7 @@ namespace DotnetSpider.DataFlow.Parser
 				var urls = new List<string>();
 				foreach (var xpath in xPaths)
 				{
-					var links = context.GetSelectable().XPath(xpath).Links().GetValues();
+					var links = context.Selectable.XPath(xpath).Links().GetValues();
 					foreach (var link in links)
 					{
 #if !NETSTANDARD

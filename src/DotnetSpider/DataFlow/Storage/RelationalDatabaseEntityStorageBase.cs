@@ -102,7 +102,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 			using (conn)
 			{
-				foreach (var item in context.GetParseItems())
+				foreach (var item in context.GetParseData())
 				{
 					var tableMetadata = (TableMetadata) context[item.Key];
 

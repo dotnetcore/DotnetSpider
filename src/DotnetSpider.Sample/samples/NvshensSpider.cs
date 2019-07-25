@@ -60,11 +60,11 @@ namespace DotnetSpider.Sample.samples
 
             protected override Task<DataFlowResult> Parse(DataFlowContext context)
             {
-                context.AddItem("URL", context.Response.Request.Url);
-                context.AddItem("Title", context.GetSelectable().XPath(".//title").GetValue());
+                context.AddData("URL", context.Response.Request.Url);
+                context.AddData("Title", context.Selectable.XPath(".//title").GetValue());
 
                 Dictionary<string, string> tags = new Dictionary<string, string>();
-                var tagNodes = context.GetSelectable()
+                var tagNodes = context.Selectable
                     .XPath("//*[@id=\"post_rank\"]/div[2]/div/div[@class='tag_div']/ul/li/a").Nodes();
                 foreach (var node in tagNodes)
                 {
@@ -110,7 +110,7 @@ namespace DotnetSpider.Sample.samples
                 //context.AddItem("Title", context.GetSelectable().XPath(".//title").GetValue());
 
                 Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("第一页：" + context.GetSelectable().XPath(".//title").GetValue());
+                Console.WriteLine("第一页：" + context.Selectable.XPath(".//title").GetValue());
                 Console.ForegroundColor = ConsoleColor.White;
 
                 GetSubjectPageUrl(context);
@@ -137,7 +137,7 @@ namespace DotnetSpider.Sample.samples
                 //context.AddItem("Title", context.GetSelectable().XPath(".//title").GetValue());
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("page 页:" + context.GetSelectable().XPath(".//title").GetValue());
+                Console.WriteLine("page 页:" + context.Selectable.XPath(".//title").GetValue());
                 Console.ForegroundColor = ConsoleColor.White;
 
                 GetSubjectUrl(context);
@@ -192,7 +192,7 @@ namespace DotnetSpider.Sample.samples
         public static void GetSubjectPageUrl(DataFlowContext context)
         {
             Dictionary<string, string> pageSet = new Dictionary<string, string>();
-            var pages = context.GetSelectable()
+            var pages = context.Selectable
                 .XPath("//*[@id=\"listdiv\"]/div[@class='pagesYY']/div/a[not(@class)]/@href").GetValues();
             var requestList = new List<Request>();
             foreach (var page in pages)
@@ -231,7 +231,7 @@ namespace DotnetSpider.Sample.samples
         /// <param name="context"></param>
         public static void GetSubjectUrl(DataFlowContext context)
         {
-            var pages = context.GetSelectable()
+            var pages = context.Selectable
                 .XPath("//*[@id=\"listdiv\"]/ul/li/div[@class='galleryli_title']/a/@href").GetValues();
             var requestList = new List<Request>();
             foreach (var page in pages)
@@ -259,7 +259,7 @@ namespace DotnetSpider.Sample.samples
         public static void GetDetailPageUrl(DataFlowContext context)
         {
             Dictionary<string, string> pageSet = new Dictionary<string, string>();
-            var pages = context.GetSelectable().XPath("//*[@id=\"pages\"]/a[not(@class)]/@href").GetValues();
+            var pages = context.Selectable.XPath("//*[@id=\"pages\"]/a[not(@class)]/@href").GetValues();
             var requestList = new List<Request>();
             foreach (var page in pages)
             {
@@ -290,10 +290,10 @@ namespace DotnetSpider.Sample.samples
         /// <param name="context"></param>
         public static void GetDetailPictureUrl(DataFlowContext context)
         {
-            context.AddItem("URL", context.Response.Request.Url);
-            context.AddItem("Title", context.GetSelectable().XPath(".//title").GetValue());
+            context.AddData("URL", context.Response.Request.Url);
+            context.AddData("Title", context.Selectable.XPath(".//title").GetValue());
 
-            var images = context.GetSelectable().XPath("//*[@id=\"hgallery\"]/img/@src").GetValues();
+            var images = context.Selectable.XPath("//*[@id=\"hgallery\"]/img/@src").GetValues();
             foreach (var image in images)
             {
                 //处理图片URL下载
@@ -304,7 +304,7 @@ namespace DotnetSpider.Sample.samples
                 };
                 request.AddProperty("tag", context.Response.Request.GetProperty("tag"));
                 request.AddProperty("referer", context.Response.Request.GetProperty("referer"));
-                request.AddProperty("subject", context.GetSelectable().XPath(".//title").GetValue());
+                request.AddProperty("subject", context.Selectable.XPath(".//title").GetValue());
                 ImageDownloader.GetInstance().AddRequest(request);
             }
         }

@@ -53,7 +53,7 @@ namespace DotnetSpider.DataFlow.Parser
 				context.Add(_model.TypeName, _tableMetadata);
 			}
 
-			var selectable = context.GetSelectable();
+			var selectable = context.Selectable;
 
 			var results = new ParseResult<T>();
 			if (selectable.Properties == null)
@@ -134,10 +134,10 @@ namespace DotnetSpider.DataFlow.Parser
 
 			if (results.Count > 0)
 			{
-				var items = context.GetParseItem(_model.TypeName);
+				var items = context.GetParseData(_model.TypeName);
 				if (items == null)
 				{
-					context.AddParseItem(_model.TypeName, results);
+					context.AddParseData(_model.TypeName, results);
 				}
 				else
 				{

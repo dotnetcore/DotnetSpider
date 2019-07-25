@@ -26,7 +26,7 @@ app.successHandler = function (result, success, error) {
         if (error) {
             error(result);
         } else {
-            swal('错误', result.msg ? result.msg : '未知错误', "error");
+            swal('Error', result.msg ? result.msg : 'Un-know error', "error");
         }
     } else {
         if (success) {
@@ -40,9 +40,9 @@ app.errorHandler = function (result, error) {
     } else {
         if (swal) {
             if (result.statusText) {
-                swal('错误', result.statusText, "error");
+                swal('Error', result.statusText, "error");
             } else {
-                swal('错误', '未知错误', "error");
+                swal('Error', 'Un-know error', "error");
             }
         }
     }

@@ -48,7 +48,7 @@ namespace DotnetSpider.Scheduler.Component
 		/// <returns>Whether the request is duplicate.</returns>
 		public bool IsDuplicate(Request request)
 		{
-			Check.NotNull(request.OwnerId,nameof(request.OwnerId));
+			Check.NotNull(request.OwnerId, nameof(request.OwnerId));
 			var hash = request.Hash;
 			bool isDuplicate = _bloomFilter.Contains(hash);
 			if (!isDuplicate)

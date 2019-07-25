@@ -66,7 +66,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 entity
             };
-            dfc.AddParseItem(typeName, items);
+            dfc.AddParseData(typeName, items);
             var result = await mongoEntityStorage.HandleAsync(dfc);
 
             Assert.Equal(DataFlowResult.Success, result);
@@ -85,7 +85,7 @@ namespace DotnetSpider.Tests.Data.Storage
             var entity = new CreateTableEntity1();
             dfc.Add(typeName, entity.GetTableMetadata());
             var items = new ParseResult<CreateTableEntity1>();
-            dfc.AddParseItem(typeName, items);
+            dfc.AddParseData(typeName, items);
             
             var result = await mongoEntityStorage.HandleAsync(dfc);
             Assert.Equal(DataFlowResult.Success, result);

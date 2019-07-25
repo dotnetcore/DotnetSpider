@@ -11,11 +11,11 @@ namespace DotnetSpider.DataFlow.Parser
 		{
 			if (context.Response != null)
 			{
-				context.AddItem("URL", context.Response.Request.Url);
-				context.AddItem("Content", context.Response.RawText);
-				context.AddItem("TargetUrl", context.Response.TargetUrl);
-				context.AddItem("Success", context.Response.Success);
-				context.AddItem("ElapsedMilliseconds", context.Response.ElapsedMilliseconds);
+				context.AddData("URL", context.Response.Request.Url);
+				context.AddData("Content", context.Response.RawText);
+				context.AddData("TargetUrl", context.Response.TargetUrl);
+				context.AddData("Success", context.Response.Success);
+				context.AddData("ElapsedMilliseconds", context.Response.ElapsedMilliseconds);
 			}
 
 			return Task.FromResult(DataFlowResult.Success);

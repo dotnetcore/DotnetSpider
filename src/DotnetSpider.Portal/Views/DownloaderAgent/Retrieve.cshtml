@@ -2,12 +2,12 @@
 
 @section breadcrumb{
     <li >
-        <a href="#">下载器代理</a>
+        <a href="#">Agent</a>
     </li>
 }
 
 @section header{
-    下载器代理<small v-text="moduleDescription"></small>
+    Agent<small v-text="moduleDescription"></small>
 }
 
 <div class="col-xs-12">
@@ -26,12 +26,12 @@
                 <tbody>
                 <tr>
                     <th>#</th>
-                    <th>名称</th>
-                    <th>CPU 核心</th>
-                    <th>总内存</th>
-                    <th>创建时间</th>
-                    <th>心跳时间</th>
-                    <th>操作</th>
+                    <th>Name</th>
+                    <th>CPU Count</th>
+                    <th>Total Mem</th>
+                    <th>CreationTime</th>
+                    <th>Heartbeat</th>
+                    <th>Action</th>
                 </tr>
                 @if (Model == null || !Model.Any())
                 {

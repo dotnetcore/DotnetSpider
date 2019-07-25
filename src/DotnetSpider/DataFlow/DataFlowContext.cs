@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.Downloader;
 using DotnetSpider.Selector;
@@ -14,9 +13,10 @@ namespace DotnetSpider.DataFlow
 	public class DataFlowContext
 	{
 		private readonly Dictionary<string, dynamic> _properties = new Dictionary<string, dynamic>();
-		private readonly Dictionary<string, dynamic> _items = new Dictionary<string, dynamic>();
-		private readonly Dictionary<string, IParseResult> _parseItems = new Dictionary<string, IParseResult>();
-		private ISelectable _selectable;
+		private readonly Dictionary<string, dynamic> _data = new Dictionary<string, dynamic>();
+		private readonly Dictionary<string, IParseResult> _parseData = new Dictionary<string, IParseResult>();
+		
+		public ISelectable Selectable { get; internal set; }
 
 		/// <summary>
 		/// 注入的服务
@@ -45,20 +45,9 @@ namespace DotnetSpider.DataFlow
 		}
 
 		/// <summary>
-		/// 获取查询器
-		/// </summary>
-		/// <param name="contentType">内容类型</param>
-		/// <param name="removeOutboundLinks">是否删除外链</param>
-		/// <returns></returns>
-		public ISelectable GetSelectable(ContentType contentType = ContentType.Auto, bool removeOutboundLinks = true)
-		{
-			return _selectable ?? (_selectable = Response?.ToSelectable(contentType, removeOutboundLinks));
-		}
-
-		/// <summary>
 		/// 数据流处理结果
 		/// </summary>
-		public string Result { get; set; }
+		public string Message { get; set; }
 
 		/// <summary>
 		/// 获取属性
@@ -105,17 +94,17 @@ namespace DotnetSpider.DataFlow
 		/// 添加数据项
 		/// </summary>
 		/// <param name="name">Name</param>
-		/// <param name="value">Value</param>
-		public void AddItem(string name, dynamic value)
+		/// <param name="data">Value</param>
+		public void AddData(string name, dynamic data)
 		{
-			if (_items.ContainsKey(name))
+			if (_data.ContainsKey(name))
 			{
-				_items[name] = value;
+				_data[name] = data;
 			}
 
 			else
 			{
-				_items.Add(name, value);
+				_data.Add(name, data);
 			}
 		}
 
@@ -124,18 +113,18 @@ namespace DotnetSpider.DataFlow
 		/// </summary>
 		/// <param name="name">Name</param>
 		/// <returns></returns>
-		public dynamic GetItem(string name)
+		public dynamic GetData(string name)
 		{
-			return _items.ContainsKey(name) ? _items[name] : null;
+			return _data.ContainsKey(name) ? _data[name] : null;
 		}
 
 		/// <summary>
 		/// 获取所有数据项
 		/// </summary>
 		/// <returns></returns>
-		public IDictionary<string, dynamic> GetItems()
+		public IDictionary<string, dynamic> GetData()
 		{
-			return _items.ToImmutableDictionary();
+			return _data.ToImmutableDictionary();
 		}
 
 		/// <summary>
@@ -143,16 +132,16 @@ namespace DotnetSpider.DataFlow
 		/// </summary>
 		/// <param name="name">Name</param>
 		/// <param name="value">实体结构结果</param>
-		public void AddParseItem(string name, IParseResult value)
+		public void AddParseData(string name, IParseResult value)
 		{
-			if (_parseItems.ContainsKey(name))
+			if (_parseData.ContainsKey(name))
 			{
-				_parseItems[name] = value;
+				_parseData[name] = value;
 			}
 
 			else
 			{
-				_parseItems.Add(name, value);
+				_parseData.Add(name, value);
 			}
 		}
 
@@ -161,36 +150,36 @@ namespace DotnetSpider.DataFlow
 		/// </summary>
 		/// <param name="name">Name</param>
 		/// <returns></returns>
-		public IParseResult GetParseItem(string name)
+		public IParseResult GetParseData(string name)
 		{
-			return _parseItems.ContainsKey(name) ? _parseItems[name] : null;
+			return _parseData.ContainsKey(name) ? _parseData[name] : null;
 		}
 
 		/// <summary>
 		/// 获取实体结析结果项
 		/// </summary>
 		/// <returns></returns>
-		public IDictionary<string, IParseResult> GetParseItems()
+		public IDictionary<string, IParseResult> GetParseData()
 		{
-			return _parseItems.ToImmutableDictionary();
+			return _parseData.ToImmutableDictionary();
 		}
 
 		/// <summary>
 		/// 是否包含数据项
 		/// </summary>
-		public bool HasItems => _items != null && _items.Count > 0;
+		public bool HasData => _data != null && _data.Count > 0;
 
 		/// <summary>
 		/// 是否包含实体结析结果项
 		/// </summary>
-		public bool HasParseItems => _parseItems != null && _parseItems.Count > 0;
+		public bool HasParseData => _parseData != null && _parseData.Count > 0;
 
 		/// <summary>
 		/// 清空数据项
 		/// </summary>
-		public void ClearItems()
+		public void ClearData()
 		{
-			_items.Clear();
+			_data.Clear();
 		}
 	}
 }

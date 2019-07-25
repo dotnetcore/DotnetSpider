@@ -23,7 +23,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		protected override async Task<DataFlowResult> Store(DataFlowContext context)
 		{
-			var items = context.GetItems();
+			var items = context.GetData();
 			var file = Path.Combine(GetDataFolder(context.Response.Request.OwnerId),
 				$"{context.Response.Request.Hash}.json");
 			CreateFile(file);

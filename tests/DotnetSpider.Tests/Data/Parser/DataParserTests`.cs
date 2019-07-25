@@ -79,7 +79,7 @@ namespace DotnetSpider.Tests.Data.Parser
 
             extractor.HandleAsync(dataContext).GetAwaiter().GetResult();
 
-            var results = (ParseResult<Product>) dataContext.GetParseItem(typeof(Product).FullName);
+            var results = (ParseResult<Product>) dataContext.GetParseData(typeof(Product).FullName);
             Assert.Equal(60, results.Count);
             Assert.Equal("手机", results[0].CategoryName);
             Assert.Equal(110, results[0].CategoryId);
@@ -119,7 +119,7 @@ namespace DotnetSpider.Tests.Data.Parser
 
             parser.HandleAsync(dataContext).GetAwaiter().GetResult();
 
-            var results = (ParseResult<N>) dataContext.GetParseItem(typeof(N).FullName);
+            var results = (ParseResult<N>) dataContext.GetParseData(typeof(N).FullName);
 
             Assert.Equal("i am title", results[0].title);
             Assert.Equal("i am dotnetspider", results[0].dotnetspider);
@@ -142,7 +142,7 @@ namespace DotnetSpider.Tests.Data.Parser
 
             parser.HandleAsync(dataContext).GetAwaiter().GetResult();
 
-            var results = (ParseResult<E>) dataContext.GetParseItem(typeof(E).FullName);
+            var results = (ParseResult<E>) dataContext.GetParseData(typeof(E).FullName);
 
             Assert.Equal("a", results[0].title);
             Assert.Equal("b", results[1].title);

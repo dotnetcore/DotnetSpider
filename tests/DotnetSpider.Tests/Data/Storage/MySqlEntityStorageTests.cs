@@ -79,7 +79,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				{
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var list = (await conn.QueryAsync<CreateTableEntity1>($"SELECT * FROM createtableentity1")).ToList();
 				Assert.Single(list);
@@ -112,7 +112,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				{
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var list = (await conn.QueryAsync<CreateTableEntity2>($"SELECT * FROM createtablenotablename")).ToList();
 				Assert.Single(list);
@@ -145,7 +145,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				{
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var list = (await conn.QueryAsync<CreateTableEntity3>(
 					$"SELECT * FROM {Escape}test{Escape}.{Escape}createtable{Escape}")).ToList();
@@ -180,7 +180,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				{
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var list = (await conn.QueryAsync<CreateTableEntity8>(
 						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtablemultiprimay{Escape}"))
@@ -224,7 +224,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				{
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var list = (await conn.QueryAsync<CreateTableEntity4>(
 						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
@@ -268,7 +268,7 @@ namespace DotnetSpider.Tests.Data.Storage
 					entity,
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var list =
 					(await conn.QueryAsync<CreateTableEntity5>(
@@ -328,7 +328,7 @@ namespace DotnetSpider.Tests.Data.Storage
 					entity,
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var list = (await conn.QueryAsync<CreateTableEntity4>(
 						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
@@ -375,7 +375,7 @@ namespace DotnetSpider.Tests.Data.Storage
 						Str1 = "zzz"
 					}
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 
 				await storage.HandleAsync(dfc);
 				var list = (await conn.QueryAsync<CreateTableEntity4>(
@@ -417,14 +417,14 @@ namespace DotnetSpider.Tests.Data.Storage
 				{
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 
 				await storage.HandleAsync(dfc);
 
 				var dfc2 = new DataFlowContext(null, services);
 				dfc2.Add(typeName, entity.GetTableMetadata());
 				var now = DateTime.Now;
-				dfc2.AddParseItem(typeName, new ParseResult<CreateTableEntity4>
+				dfc2.AddParseData(typeName, new ParseResult<CreateTableEntity4>
 				{
 					new CreateTableEntity4
 					{
@@ -476,13 +476,13 @@ namespace DotnetSpider.Tests.Data.Storage
 				{
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 
 				var dfc2 = new DataFlowContext(null, services);
 				dfc2.Add(typeName, entity.GetTableMetadata());
 				var now = DateTime.Now;
-				dfc2.AddParseItem(typeName, new ParseResult<CreateTableEntity6>
+				dfc2.AddParseData(typeName, new ParseResult<CreateTableEntity6>
 				{
 					new CreateTableEntity6
 					{
@@ -539,7 +539,7 @@ namespace DotnetSpider.Tests.Data.Storage
 					entity,
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var list = (await conn.QueryAsync<CreateTableEntity4>(
 						$"SELECT * FROM {Escape}test{Escape}.{Escape}createtableprimay{Escape}"))
@@ -580,7 +580,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				{
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var list = (await conn.QueryAsync<CreateTableEntity7>(
 					$"SELECT * FROM {Escape}test{Escape}.{Escape}IgnoreCase{Escape}")).ToList();
@@ -615,7 +615,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				{
 					entity
 				};
-				dfc.AddParseItem(typeName, items);
+				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var indexes = (await conn.QueryAsync<IndexInfo>
 						($"show index from test.createtableindexes")

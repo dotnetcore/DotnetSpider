@@ -23,16 +23,6 @@ namespace DotnetSpider.DataFlow.Storage.Mongo
 			new ConcurrentDictionary<string, IMongoDatabase>();
 
 		/// <summary>
-		/// 根据配置返回存储器
-		/// </summary>
-		/// <param name="options">配置</param>
-		/// <returns></returns>
-		public static MongoEntityStorage CreateFromOptions(SpiderOptions options)
-		{
-			return new MongoEntityStorage(options.StorageConnectionString);
-		}
-
-		/// <summary>
 		/// 构造方法
 		/// </summary>
 		/// <param name="connectionString">连接字符串</param>
@@ -54,7 +44,7 @@ namespace DotnetSpider.DataFlow.Storage.Mongo
 
 		protected override async Task<DataFlowResult> Store(DataFlowContext context)
 		{
-			var items = context.GetItems();
+			var items = context.GetData();
 			foreach (var item in items)
 			{
 				var tableMetadata = (TableMetadata) context[item.Key];

@@ -5,7 +5,7 @@ function exit(id) {
         showCancelButton: true
     }, function () {
         app.post("/spider/" + id + "/exit", null,function () {
-            swal('Success', '退出消息发送成功', "success");
+            swal('Success', 'Send signal success', "success");
         }, function () {
             swal('Error', 'Send exit message failed', "error");
         });

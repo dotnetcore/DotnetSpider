@@ -4,7 +4,7 @@ $(function () {
 
 function remove(id) {
     swal({
-        title: "确定要删除此镜像仓储吗?",
+        title: "Sure to delete this repository?",
         type: "warning",
         showCancelButton: true
     }, function () {

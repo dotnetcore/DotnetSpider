@@ -13,11 +13,9 @@ using DotnetSpider.EventBus;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Selector;
 using DotnetSpider.Statistics;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
-using Serilog;
 
 namespace DotnetSpider.Sample.samples
 {

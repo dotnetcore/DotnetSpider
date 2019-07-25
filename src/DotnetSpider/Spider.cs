@@ -647,7 +647,7 @@ namespace DotnetSpider
 								case DataFlowResult.Failed:
 								{
 									// 如果处理失败，则直接返回
-									Logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 失败: {context.Result}");
+									Logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 失败: {context.Message}");
 									await _statisticsService.IncrementFailedAsync(Id);
 									return;
 								}
@@ -665,7 +665,7 @@ namespace DotnetSpider
 							}
 						}
 
-						var resultIsEmpty = !context.HasItems && !context.HasParseItems;
+						var resultIsEmpty = !context.HasData && !context.HasParseData;
 						// 如果解析结果为空，重试
 						if (resultIsEmpty && RetryWhenResultIsEmpty)
 						{

@@ -68,7 +68,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		protected override Task<DataFlowResult> Store(DataFlowContext context)
 		{
-			foreach (var item in context.GetParseItems())
+			foreach (var item in context.GetParseData())
 			{
 				var tableMetadata = (TableMetadata) context[item.Key];
 				switch (MySqlFileType)

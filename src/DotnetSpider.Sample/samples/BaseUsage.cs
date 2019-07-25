@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.Downloader;
-using DotnetSpider.EventBus;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -56,8 +54,8 @@ namespace DotnetSpider.Sample.samples
 
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)
 			{
-				context.AddItem("URL", context.Response.Request.Url);
-				context.AddItem("Title", context.GetSelectable().XPath(".//title").GetValue());
+				context.AddData("URL", context.Response.Request.Url);
+				context.AddData("Title", context.Selectable.XPath(".//title").GetValue());
 				return Task.FromResult(DataFlowResult.Success);
 			}
 		}

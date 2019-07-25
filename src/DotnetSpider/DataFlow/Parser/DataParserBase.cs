@@ -25,7 +25,7 @@ namespace DotnetSpider.DataFlow.Parser
 		/// <summary>
 		/// 选择器的生成方法
 		/// </summary>
-		public Func<DataFlowContext, ISelectable> SelectableFactory { get; set; }
+		public Func<DataFlowContext, ISelectable> SelectableBuilder { get; set; }
 
 		/// <summary>
 		/// 数据解析
@@ -48,11 +48,16 @@ namespace DotnetSpider.DataFlow.Parser
 					return DataFlowResult.Success;
 				}
 
-				SelectableFactory?.Invoke(context);
+				if (context.Selectable == null)
+				{
+					context.Selectable = SelectableBuilder != null
+						? SelectableBuilder(context)
+						: context.Response?.ToSelectable();
+				}
 
-				var parserResult = await Parse(context);
+				var dataFlowResult = await Parse(context);
 
-				var requests = FollowRequestQuerier?.Invoke(context);
+				var requests = FollowRequestQuerier == null ? new List<Request>(0) : FollowRequestQuerier(context);
 
 				if (requests != null && requests.Count > 0)
 				{
@@ -65,9 +70,9 @@ namespace DotnetSpider.DataFlow.Parser
 					}
 				}
 
-				if (parserResult == DataFlowResult.Failed || parserResult == DataFlowResult.Terminated)
+				if (dataFlowResult == DataFlowResult.Failed || dataFlowResult == DataFlowResult.Terminated)
 				{
-					return parserResult;
+					return dataFlowResult;
 				}
 
 				return DataFlowResult.Success;
@@ -125,7 +130,7 @@ namespace DotnetSpider.DataFlow.Parser
 		protected virtual Request CreateFromRequest(Request current, string url)
 		{
 			// TODO: 确认需要复制哪些字段
-			var request = new Request(url, current.Properties)
+			var request = new Request(url,current.Properties)
 			{
 				Accept = current.Accept,
 				AgentId = current.AgentId,
@@ -145,7 +150,6 @@ namespace DotnetSpider.DataFlow.Parser
 				Method = current.Method,
 				OwnerId = current.OwnerId,
 				Origin = current.Origin,
-				Properties = current.Properties,
 				Referer = current.Referer,
 				RetriedTimes = 0,
 				Timeout = current.Timeout,

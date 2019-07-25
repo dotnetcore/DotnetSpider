@@ -17,14 +17,14 @@ namespace DotnetSpider.Sample.samples
 		{
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)
 			{
-				var selectable = context.GetSelectable();
+				var selectable = context.Selectable;
 				// 解析数据
 				var author = selectable.XPath("//span[@class='p-name vcard-fullname d-block overflow-hidden']")
 					.GetValue();
 				var name = selectable.XPath("//span[@class='p-nickname vcard-username d-block']")
 					.GetValue();
-				context.AddItem("author", author);
-				context.AddItem("username", name);
+				context.AddData("author", author);
+				context.AddData("username", name);
 
 				// 添加目标链接
 				var urls = selectable.Links().Regex("(https://github\\.com/[\\w\\-]+/[\\w\\-]+)").GetValues();
@@ -37,7 +37,7 @@ namespace DotnetSpider.Sample.samples
 				// 如果解析为空，跳过后续步骤(存储 etc)
 				if (string.IsNullOrWhiteSpace(name))
 				{
-					context.ClearItems();
+					context.ClearData();
 					return Task.FromResult(DataFlowResult.Terminated);
 				}
 

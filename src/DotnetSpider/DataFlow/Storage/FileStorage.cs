@@ -27,7 +27,7 @@ namespace DotnetSpider.DataFlow.Storage
             CreateFile(file);
 
             await Writer.WriteLineAsync("URL:\t" + context.Response.Request.Url);
-            var items = context.GetItems();
+            var items = context.GetData();
             await Writer.WriteLineAsync("DATA:\t" + JsonConvert.SerializeObject(items));
 
             return DataFlowResult.Success;

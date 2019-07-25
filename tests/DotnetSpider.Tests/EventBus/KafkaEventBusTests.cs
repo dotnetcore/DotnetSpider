@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using DotnetSpider.Common;
 using DotnetSpider.EventBus;
 using DotnetSpider.Kafka;
 using Microsoft.Extensions.Logging;

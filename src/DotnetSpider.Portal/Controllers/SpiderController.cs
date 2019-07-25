@@ -29,7 +29,7 @@ namespace DotnetSpider.Portal.Controllers
 		}
 
 		[HttpGet("spider/{id}")]
-		public async Task<IActionResult> View(int id)
+		public async Task<IActionResult> Edit(int id)
 		{
 			var viewModel = new ViewSpiderModel();
 			var spider = await _dbContext.Spiders.FirstOrDefaultAsync(x => x.Id == id);
@@ -157,7 +157,7 @@ namespace DotnetSpider.Portal.Controllers
 					dockerRepository.UserName, dockerRepository.Password);
 			}
 
-			return View("View", viewModel);
+			return View("Edit", viewModel);
 		}
 
 		[HttpGet("spider/create")]

@@ -36,8 +36,8 @@ namespace DotnetSpider.Sample.samples
 
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)
 			{
-				context.AddItem("URL", context.Response.Request.Url);
-				context.AddItem("Title", context.GetSelectable().XPath(".//title").GetValue());
+				context.AddData("URL", context.Response.Request.Url);
+				context.AddData("Title", context.Selectable.XPath(".//title").GetValue());
 
 				#region add mysql database
 				var typeName = typeof(EntitySpider.CnblogsEntry).FullName;
@@ -46,9 +46,9 @@ namespace DotnetSpider.Sample.samples
 				ParseResult<EntitySpider.CnblogsEntry> items = new ParseResult<EntitySpider.CnblogsEntry>();
 				entity.WebSite = context.Response.Request.Url;
 				entity.Url = context.Response.Request.Url;
-				entity.Title = context.GetSelectable().XPath(".//title").GetValue();
+				entity.Title = context.Selectable.XPath(".//title").GetValue();
 				items.Add(entity);
-				context.AddParseItem(typeName, items);
+				context.AddParseData(typeName, items);
 				#endregion
 				return Task.FromResult(DataFlowResult.Success);
 			}

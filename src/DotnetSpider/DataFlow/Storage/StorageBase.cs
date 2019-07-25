@@ -13,7 +13,7 @@ namespace DotnetSpider.DataFlow.Storage
 		{
 			try
 			{
-				if (!context.HasItems)
+				if (!context.HasData)
 				{
 					return DataFlowResult.Success;
 				}

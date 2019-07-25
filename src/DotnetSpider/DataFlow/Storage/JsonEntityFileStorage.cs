@@ -24,7 +24,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		protected override async Task<DataFlowResult> Store(DataFlowContext context)
 		{
-			foreach (var item in context.GetParseItems())
+			foreach (var item in context.GetParseData())
 			{
 				var tableMetadata = (TableMetadata) context[item.Key];
 				StreamWriter writer = CreateOrOpen(context, tableMetadata, "json");

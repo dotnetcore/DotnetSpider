@@ -13,7 +13,7 @@ namespace DotnetSpider.DataFlow.Storage
 		{
 			try
 			{
-				if (!context.HasParseItems)
+				if (!context.HasParseData)
 				{
 					Logger.LogWarning("数据流上下文不包含实体解析结果");
 					return DataFlowResult.Success;

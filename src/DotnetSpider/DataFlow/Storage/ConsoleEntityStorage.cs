@@ -22,7 +22,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		protected override Task<DataFlowResult> Store(DataFlowContext context)
 		{
-			var items = context.GetItems();
+			var items = context.GetData();
 			foreach (var item in items)
 			{
 				foreach (var data in item.Value)

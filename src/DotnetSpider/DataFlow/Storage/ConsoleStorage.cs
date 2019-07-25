@@ -22,7 +22,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		protected override Task<DataFlowResult> Store(DataFlowContext context)
 		{
-			var items = context.GetItems();
+			var items = context.GetData();
 			Console.WriteLine(JsonConvert.SerializeObject(items));
 			return Task.FromResult(DataFlowResult.Success);
 		}

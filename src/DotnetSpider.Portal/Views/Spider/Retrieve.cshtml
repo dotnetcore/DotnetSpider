@@ -4,12 +4,12 @@
 
 @section breadcrumb{
     <li >
-        <a href="#">任务</a>
+        <a href="#">Spider</a>
     </li>
 }
 
 @section header{
-    任务<small v-text="moduleDescription"></small>
+    Spider<small v-text="moduleDescription"></small>
 }
 
 <div class="col-xs-12">
@@ -26,15 +26,15 @@
             <table class="table table-bordered">
                 <tbody>
                 <tr>
-                    <th>标识</th>
-                    <th>名称</th>
+                    <th>ID</th>
+                    <th>Name</th>
                     <th>Registry</th>
                     <th>Repostory</th>
                     <th>Tag</th>
-                    <th>CRON</th>
+                    <th>Cron</th>
                     <th>Environment</th>
-                    <th>更新时间</th>
-                    <th>操作</th>
+                    <th>ModificationTime</th>
+                    <th>Action</th>
                 </tr>
                 @if (Model == null || !Model.Any())
                 {
@@ -75,7 +75,7 @@
                                 <span>@item.LastModificationTime</span>
                             </td>
                             <td>
-                                <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id">View</a>
+                                <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id">Edit</a>
                                 <a class="btn btn-default btn-sm  btn-flat" href="spider/create?registry=@(item.Registry)&repository=@(item.Repository)">From</a>
                                 <button class="btn btn-default btn-sm  btn-flat" onclick="run('@item.Id')">Run</button>
                                 <a class="btn btn-default btn-sm  btn-flat" href="spider/@item.Id/containers">History</a>

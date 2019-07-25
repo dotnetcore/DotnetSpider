@@ -78,7 +78,7 @@ namespace DotnetSpider.Tests.Data.Storage
                 {
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
                 var list = (await conn.QueryAsync<CreateTableEntity1>("SELECT * FROM createtableentity1")).ToList();
                 Assert.Single(list);
@@ -133,7 +133,7 @@ namespace DotnetSpider.Tests.Data.Storage
                 {
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
                 var list = (await conn.QueryAsync<CreateTableEntity2>("SELECT * FROM createtablenotablename")).ToList();
                 Assert.Single(list);
@@ -188,7 +188,7 @@ namespace DotnetSpider.Tests.Data.Storage
                 {
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
                 var list = (await conn.QueryAsync<CreateTableEntity3>("SELECT * FROM test.dbo.createtable")).ToList();
                 Assert.Single(list);
@@ -248,7 +248,7 @@ namespace DotnetSpider.Tests.Data.Storage
                 {
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
                 var list = (await conn.QueryAsync<CreateTableEntity4>("SELECT * FROM test.dbo.createtableprimay"))
                     .ToList();
@@ -313,7 +313,7 @@ namespace DotnetSpider.Tests.Data.Storage
                     entity,
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
                 var list =
                     (await conn.QueryAsync<CreateTableEntity5>("SELECT * FROM test.dbo.createtableautoincprimay"))
@@ -371,7 +371,7 @@ namespace DotnetSpider.Tests.Data.Storage
                     entity,
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
                 var list = (await conn.QueryAsync<CreateTableEntity4>("SELECT * FROM test.dbo.createtableprimay"))
                     .ToList();
@@ -415,7 +415,7 @@ namespace DotnetSpider.Tests.Data.Storage
                         Str1 = "zzz"
                     }
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
                 var list = (await conn.QueryAsync<CreateTableEntity4>("SELECT * FROM test.dbo.createtableprimay"))
                     .ToList();
@@ -453,13 +453,13 @@ namespace DotnetSpider.Tests.Data.Storage
                 {
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
 
                 var dfc2 = new DataFlowContext(null, services);
                 dfc2.Add(typeName, entity.GetTableMetadata());
                 var now = DateTime.Now;
-                dfc2.AddParseItem(typeName, new ParseResult<CreateTableEntity4>
+                dfc2.AddParseData(typeName, new ParseResult<CreateTableEntity4>
                 {
                     new CreateTableEntity4
                     {
@@ -536,13 +536,13 @@ namespace DotnetSpider.Tests.Data.Storage
                 {
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
 
                 var dfc2 = new DataFlowContext(null, services);
                 dfc2.Add(typeName, entity.GetTableMetadata());
                 var now = DateTime.Now;
-                dfc2.AddParseItem(typeName, new ParseResult<CreateTableEntity6>
+                dfc2.AddParseData(typeName, new ParseResult<CreateTableEntity6>
                 {
                     new CreateTableEntity6
                     {
@@ -596,7 +596,7 @@ namespace DotnetSpider.Tests.Data.Storage
                     entity,
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
                 var list = (await conn.QueryAsync<CreateTableEntity4>("SELECT * FROM test.dbo.createtableprimay"))
                     .ToList();
@@ -658,7 +658,7 @@ namespace DotnetSpider.Tests.Data.Storage
                 {
                     entity
                 };
-                dfc.AddParseItem(typeName, items);
+                dfc.AddParseData(typeName, items);
                 await storage.HandleAsync(dfc);
                 var list = (await conn.QueryAsync<CreateTableEntity7>("SELECT * FROM test.dbo.IgnoreCase")).ToList();
                 Assert.Single(list);
