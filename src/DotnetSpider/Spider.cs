@@ -20,7 +20,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("DotnetSpider.Tests")]
-[assembly: InternalsVisibleTo("DotnetSpider.Sample")]
 
 namespace DotnetSpider
 {

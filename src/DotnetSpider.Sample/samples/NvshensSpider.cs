@@ -87,7 +87,7 @@ namespace DotnetSpider.Sample.samples
                     requests.Add(request);
                 }
 
-                context.FollowRequests.AddRange(requests.ToArray());
+                context.AddFollowRequests(requests.ToArray());
 
                 return Task.FromResult(DataFlowResult.Success);
             }
@@ -221,7 +221,7 @@ namespace DotnetSpider.Sample.samples
 
             if (requestList.Count > 0)
             {
-                context.FollowRequests.AddRange(requestList.ToArray());
+                context.AddFollowRequests(requestList.ToArray());
             }
         }
 
@@ -248,7 +248,7 @@ namespace DotnetSpider.Sample.samples
 
             if (requestList.Count > 0)
             {
-                context.FollowRequests.AddRange(requestList.ToArray());
+                context.AddFollowRequests(requestList.ToArray());
             }
         }
 
@@ -280,7 +280,7 @@ namespace DotnetSpider.Sample.samples
 
             if (requestList.Count > 0)
             {
-                context.FollowRequests.AddRange(requestList.ToArray());
+                context.AddFollowRequests(requestList.ToArray());
             }
         }
 

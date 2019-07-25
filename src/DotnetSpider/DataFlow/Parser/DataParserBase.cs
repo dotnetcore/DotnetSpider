@@ -65,7 +65,7 @@ namespace DotnetSpider.DataFlow.Parser
 					{
 						if (request != null && (Required == null || Required(request)))
 						{
-							context.FollowRequests.Add(request);
+							context.AddFollowRequests(request);
 						}
 					}
 				}
@@ -130,7 +130,7 @@ namespace DotnetSpider.DataFlow.Parser
 		protected virtual Request CreateFromRequest(Request current, string url)
 		{
 			// TODO: 确认需要复制哪些字段
-			var request = new Request(url,current.Properties)
+			var request = new Request(url, current.Properties)
 			{
 				Accept = current.Accept,
 				AgentId = current.AgentId,

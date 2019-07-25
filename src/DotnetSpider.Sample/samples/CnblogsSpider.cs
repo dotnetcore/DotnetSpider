@@ -49,7 +49,7 @@ namespace DotnetSpider.Sample.samples
 					request.AddProperty("summary", summary);
 					request.AddProperty("views", views);
 
-					context.FollowRequests.Add(request);
+					context.AddFollowRequests(request);
 				}
 
 				return Task.FromResult(DataFlowResult.Success);

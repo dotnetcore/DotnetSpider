@@ -15,7 +15,7 @@ namespace DotnetSpider.DataFlow
 		private readonly Dictionary<string, dynamic> _properties = new Dictionary<string, dynamic>();
 		private readonly Dictionary<string, dynamic> _data = new Dictionary<string, dynamic>();
 		private readonly Dictionary<string, IParseResult> _parseData = new Dictionary<string, IParseResult>();
-		
+
 		public ISelectable Selectable { get; internal set; }
 
 		/// <summary>
@@ -42,6 +42,14 @@ namespace DotnetSpider.DataFlow
 		{
 			Response = response;
 			Services = serviceProvider;
+		}
+
+		public void AddFollowRequests(params Request[] requests)
+		{
+			if (requests != null && requests.Length > 0)
+			{
+				FollowRequests.AddRange(requests);
+			}
 		}
 
 		/// <summary>

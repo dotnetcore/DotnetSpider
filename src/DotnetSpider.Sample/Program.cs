@@ -23,7 +23,7 @@ namespace DotnetSpider.Sample
 				.RollingFile("dotnet-spider.log");
 			Log.Logger = configure.CreateLogger();
 
-			Startup.Execute<BaseUsage>(args);
+			Startup.Execute<EntitySpider>(args);
 
 			// await DistributedSpider.Run(); 
 			Console.Read();
