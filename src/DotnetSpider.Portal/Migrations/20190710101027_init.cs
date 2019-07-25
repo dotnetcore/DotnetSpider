@@ -12,15 +12,15 @@ namespace DotnetSpider.Portal.Migrations
                 name: "docker_repository",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
+                    id = table.Column<int>()
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    name = table.Column<string>(maxLength: 255, nullable: false),
+                    name = table.Column<string>(maxLength: 255),
                     schema = table.Column<string>(maxLength: 10, nullable: true),
                     registry = table.Column<string>(maxLength: 255, nullable: true),
-                    repository = table.Column<string>(maxLength: 255, nullable: false),
+                    repository = table.Column<string>(maxLength: 255),
                     user_name = table.Column<string>(maxLength: 255, nullable: true),
                     password = table.Column<string>(maxLength: 255, nullable: true),
-                    creation_time = table.Column<DateTime>(nullable: false)
+                    creation_time = table.Column<DateTime>()
                 },
                 constraints: table =>
                 {
@@ -31,17 +31,17 @@ namespace DotnetSpider.Portal.Migrations
                 name: "spider",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
+                    id = table.Column<int>()
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    name = table.Column<string>(maxLength: 255, nullable: false),
-                    type = table.Column<string>(maxLength: 400, nullable: false),
-                    cron = table.Column<string>(maxLength: 255, nullable: false),
+                    name = table.Column<string>(maxLength: 255),
+                    type = table.Column<string>(maxLength: 400),
+                    cron = table.Column<string>(maxLength: 255),
                     environment = table.Column<string>(maxLength: 255, nullable: true),
                     registry = table.Column<string>(maxLength: 255, nullable: true),
-                    repository = table.Column<string>(maxLength: 255, nullable: false),
-                    tag = table.Column<string>(maxLength: 255, nullable: false),
-                    creation_time = table.Column<DateTime>(nullable: false),
-                    last_modification_time = table.Column<DateTime>(nullable: false)
+                    repository = table.Column<string>(maxLength: 255),
+                    tag = table.Column<string>(maxLength: 255),
+                    creation_time = table.Column<DateTime>(),
+                    last_modification_time = table.Column<DateTime>()
                 },
                 constraints: table =>
                 {
@@ -52,13 +52,13 @@ namespace DotnetSpider.Portal.Migrations
                 name: "spider_container",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
+                    id = table.Column<int>()
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    spider_id = table.Column<int>(nullable: false),
+                    spider_id = table.Column<int>(),
                     container_id = table.Column<string>(maxLength: 100, nullable: true),
                     batch = table.Column<string>(maxLength: 100, nullable: true),
-                    creation_time = table.Column<DateTime>(nullable: false),
-                    status = table.Column<string>(maxLength: 20, nullable: false)
+                    creation_time = table.Column<DateTime>(),
+                    status = table.Column<string>(maxLength: 20)
                 },
                 constraints: table =>
                 {
