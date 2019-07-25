@@ -70,7 +70,7 @@ namespace DotnetSpider
 		{
 			if (!typeof(Spider).IsAssignableFrom(type))
 			{
-				throw new SpiderException("不能添加非爬虫类型");
+				throw new SpiderException($"{type} is not a spider implement");
 			}
 
 			_services.AddTransient(type);
@@ -81,7 +81,7 @@ namespace DotnetSpider
 		{
 			if (_hostBuilt)
 			{
-				throw new InvalidOperationException("Build can only be called once.");
+				throw new InvalidOperationException("Build can only be called once");
 			}
 			Framework.PrintInfo();
 			Framework.SetMultiThread();

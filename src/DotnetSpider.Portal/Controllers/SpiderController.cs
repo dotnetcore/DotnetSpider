@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using DotnetSpider.Portal.Common;
 using DotnetSpider.Portal.Models.Spider;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -125,10 +126,8 @@ namespace DotnetSpider.Portal.Controllers
 							{
 								throw new Exception("删除定时任务失败");
 							}
-							else
-							{
-								await ScheduleJobAsync(spider.Cron, id, spider.Name);
-							}
+
+							await ScheduleJobAsync(spider.Cron, id, spider.Name);
 						}
 
 						transaction.Commit();
@@ -221,7 +220,7 @@ namespace DotnetSpider.Portal.Controllers
 					var transaction = await _dbContext.Database.BeginTransactionAsync();
 					try
 					{
-						var spider = new Portal.Entity.Spider
+						var spider = new Entity.Spider
 						{
 							Name = viewModel.Name,
 							Cron = viewModel.Cron,
@@ -272,7 +271,7 @@ namespace DotnetSpider.Portal.Controllers
 		{
 			page = page <= 1 ? 1 : page;
 			size = size <= 20 ? 20 : size;
-			IPagedList<Portal.Entity.Spider> viewModel;
+			IPagedList<Entity.Spider> viewModel;
 			if (string.IsNullOrWhiteSpace(q))
 			{
 				viewModel = await _dbContext.Spiders.OrderByDescending(x => x.CreationTime)
@@ -326,7 +325,7 @@ namespace DotnetSpider.Portal.Controllers
 			try
 			{
 				registry = $"{schema}://{registry}";
-				var httpClient = Common.HttpClientFactory.GetHttpClient(registry,
+				var httpClient = HttpClientFactory.GetHttpClient(registry,
 					user, password);
 				var json = await httpClient.GetStringAsync(
 					$"{registry}/v2/{repository}/tags/list");

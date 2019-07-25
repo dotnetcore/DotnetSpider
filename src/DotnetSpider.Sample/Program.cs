@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 using DotnetSpider.Sample.samples;
 using Serilog;
 using Serilog.Events;
-
 
 namespace DotnetSpider.Sample
 {
@@ -22,6 +20,7 @@ namespace DotnetSpider.Sample
 				.WriteTo.Console().WriteTo
 				.RollingFile("dotnet-spider.log");
 			Log.Logger = configure.CreateLogger();
+
 
 			Startup.Execute<EntitySpider>(args);
 

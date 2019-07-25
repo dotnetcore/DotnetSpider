@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
+using ServiceProvider = DotnetSpider.Portal.Common.ServiceProvider;
 
 namespace DotnetSpider.Portal
 {
@@ -71,7 +72,7 @@ namespace DotnetSpider.Portal
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
-			Common.ServiceProvider.Instance = app.ApplicationServices;
+			ServiceProvider.Instance = app.ApplicationServices;
 
 			PrintEnvironment(app.ApplicationServices.GetRequiredService<ILogger<Startup>>());
 			if (env.IsDevelopment())
@@ -109,7 +110,7 @@ namespace DotnetSpider.Portal
 					case "mysql":
 					{
 						if (conn.QuerySingle<int>(
-							    $"SELECT count(*)  FROM information_schema.TABLES WHERE table_name ='QRTZ_FIRED_TRIGGERS';") ==
+							    "SELECT count(*)  FROM information_schema.TABLES WHERE table_name ='QRTZ_FIRED_TRIGGERS';") ==
 						    0
 						)
 						{
@@ -127,7 +128,7 @@ namespace DotnetSpider.Portal
 					default:
 					{
 						if (conn.QuerySingle<int>(
-							    $"SELECT COUNT(*) from sysobjects WHERE id = object_id(N'[dbo].[QRTZ_FIRED_TRIGGERS]') AND OBJECTPROPERTY(id, N'') = 1IsUserTable") ==
+							    "SELECT COUNT(*) from sysobjects WHERE id = object_id(N'[dbo].[QRTZ_FIRED_TRIGGERS]') AND OBJECTPROPERTY(id, N'') = 1IsUserTable") ==
 						    0
 						)
 						{
@@ -164,7 +165,7 @@ namespace DotnetSpider.Portal
 				};
 				context.DockerRepositories.Add(repo);
 
-				var spider = new DotnetSpider.Portal.Entity.Spider
+				var spider = new Entity.Spider
 				{
 					Name = "cnblogs",
 					Cron = "0 1 */1 * * ?",
@@ -188,16 +189,16 @@ namespace DotnetSpider.Portal
 		private void PrintEnvironment(ILogger logger)
 		{
 			Framework.PrintInfo();
-			logger.LogInformation($"运行参数   : VERSION = 20190725", 0, ConsoleColor.DarkYellow);
+			logger.LogInformation("Arg   : VERSION = 20190725", 0, ConsoleColor.DarkYellow);
 			foreach (var kv in Configuration.GetChildren())
 			{
-				logger.LogInformation($"运行参数   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
+				logger.LogInformation($"Arg   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
 			}
 
-			logger.LogInformation($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
+			logger.LogInformation($"BaseDirectory   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
 				ConsoleColor.DarkYellow);
 			logger.LogInformation(
-				$"操作系统   : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
+				$"OS    : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
 				ConsoleColor.DarkYellow);
 		}
 	}

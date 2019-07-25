@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-
 namespace DotnetSpider.Portal
 {
 	public class CleanDockerContainerService : BackgroundService
@@ -39,7 +38,7 @@ namespace DotnetSpider.Portal
 							Filters = new Dictionary<string, IDictionary<string, bool>>
 							{
 								{"status", new Dictionary<string, bool> {{"exited", true}}},
-								{"label", new Dictionary<string, bool> {{"dotnetspider.spider.id", true}}},
+								{"label", new Dictionary<string, bool> {{"dotnetspider.spider.id", true}}}
 							}
 						}, stoppingToken);
 						foreach (var container in containers)

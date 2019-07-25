@@ -31,7 +31,7 @@ namespace DotnetSpider.DataFlow
 		/// <summary>
 		/// 解析到的目标链接
 		/// </summary>
-		internal List<Request> FollowRequests { get; set; } = new List<Request>();
+		internal List<Request> ExtraRequests { get; set; } = new List<Request>();
 
 		/// <summary>
 		/// 构造方法
@@ -44,11 +44,11 @@ namespace DotnetSpider.DataFlow
 			Services = serviceProvider;
 		}
 
-		public void AddFollowRequests(params Request[] requests)
+		public void AddExtraRequests(params Request[] requests)
 		{
 			if (requests != null && requests.Length > 0)
 			{
-				FollowRequests.AddRange(requests);
+				ExtraRequests.AddRange(requests);
 			}
 		}
 

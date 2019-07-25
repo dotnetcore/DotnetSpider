@@ -1,10 +1,10 @@
 using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using DotnetSpider.Portal.Entity;
 using DotnetSpider.Portal.Models.DockerRepository;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Portal.Controllers
 {
@@ -64,22 +64,20 @@ namespace DotnetSpider.Portal.Controllers
 			{
 				return View("Add", dto);
 			}
-			else
+
+			var repository = new DockerRepository
 			{
-				var repository = new DockerRepository
-				{
-					Name = dto.Name,
-					Schema = schema,
-					Registry = registry,
-					Repository = dto.Repository,
-					UserName = dto.UserName,
-					Password = dto.Password,
-					CreationTime = DateTime.Now
-				};
-				_dbContext.DockerRepositories.Add(repository);
-				await _dbContext.SaveChangesAsync();
-				return Redirect("/docker-repository");
-			}
+				Name = dto.Name,
+				Schema = schema,
+				Registry = registry,
+				Repository = dto.Repository,
+				UserName = dto.UserName,
+				Password = dto.Password,
+				CreationTime = DateTime.Now
+			};
+			_dbContext.DockerRepositories.Add(repository);
+			await _dbContext.SaveChangesAsync();
+			return Redirect("/docker-repository");
 		}
 
 		[HttpDelete("docker-repository/{id}")]

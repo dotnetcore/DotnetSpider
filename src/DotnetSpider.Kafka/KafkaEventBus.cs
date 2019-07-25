@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using DotnetSpider.Common;
 using DotnetSpider.EventBus;
+using Microsoft.Extensions.Logging;
 using Partitioner = Confluent.Kafka.Partitioner;
 
 namespace DotnetSpider.Kafka
@@ -54,7 +54,7 @@ namespace DotnetSpider.Kafka
 			{
 #if DEBUG
 				var stackTrace = new StackTrace();
-				_logger.LogDebug($"推送空消息到 Topic {topic}: {stackTrace}");
+				_logger.LogDebug($"Publish empty message to topic {topic}: {stackTrace}");
 #endif
 				return;
 			}
@@ -72,7 +72,7 @@ namespace DotnetSpider.Kafka
 		{
 			if (_consumers.ContainsKey(topic))
 			{
-				_logger?.LogError($"已经订阅 {topic}");
+				_logger?.LogError($"Already subscribe {topic}");
 				return;
 			}
 
@@ -100,11 +100,10 @@ namespace DotnetSpider.Kafka
 			var consumer = new ConsumerBuilder<Null, Event>(config)
 				.SetValueDeserializer(new ProtobufDeserializer<Event>()).Build();
 			consumer.Subscribe(topic);
-			_logger.LogInformation("Subscribe: " + topic);
 			_consumers.TryAdd(topic, consumer);
 			Task.Factory.StartNew(() =>
 			{
-				_logger?.LogInformation($"开始消费 Kafka , Topic {topic}");
+				_logger.LogInformation("Subscribe: " + topic);
 				while (_consumers.ContainsKey(topic))
 				{
 					Event msg = null;
@@ -112,18 +111,9 @@ namespace DotnetSpider.Kafka
 					{
 						msg = consumer.Consume().Value;
 					}
-					catch (ConsumeException e)
-					{
-						_logger?.LogError($"接收 Kafka 消息失败, Topic {topic} 原因: {e.Error.Reason}");
-					}
-					catch (OperationCanceledException)
-					{
-						_logger?.LogError($"取消订阅 Kafka 消息, Topic {topic}");
-						break;
-					}
 					catch (Exception e)
 					{
-						_logger?.LogError($"接收 Kafka 消息失败, Topic {topic} 异常: {e}");
+						_logger?.LogError($"Consume kafka message failed on topic {topic}: {e}");
 					}
 
 					if (msg != null)
@@ -134,16 +124,16 @@ namespace DotnetSpider.Kafka
 						}
 						catch (Exception e)
 						{
-							_logger?.LogError($"消费 Kafka 消息失败, Topic {topic} 异常: {e}");
+							_logger?.LogError($"Handle kafka message failed on topic {topic}: {e}");
 						}
 					}
 					else
 					{
-						_logger?.LogError($"消费 Kafka 消息失败, Topic {topic} 接收到空消息");
+						_logger?.LogWarning($"Ignore empty kafka message on topic {topic}");
 					}
 				}
 
-				_logger?.LogWarning($"退出消费 Kafka , Topic {topic}");
+				_logger?.LogWarning($"Exit consume kafka topic {topic}");
 			}).ConfigureAwait(false).GetAwaiter();
 		}
 

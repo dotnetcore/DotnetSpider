@@ -6,7 +6,6 @@ using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Attribute;
 using DotnetSpider.DataFlow.Parser.Formatter;
-using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Downloader;
 using DotnetSpider.EventBus;
@@ -35,16 +34,16 @@ namespace DotnetSpider.Sample.samples
 
 		protected override async Task OnExiting()
 		{
-			var verification = Services.GetRequiredService<Verification>();
-			verification.EmailTo=new List<string>{"zlzforever@163.com"};
-			verification.Subject = "cnblogs crawler";
-			verification.AddSqlLarge("total",
-				$"SELECT COUNT(*) FROM cnblogs.cnblogs_entity_model",
-				10);
-			using (var conn = new MySqlConnection(Options.StorageConnectionString))
-			{
-				await verification.VerifyAsync(conn);
-			}
+//			var verification = Services.GetRequiredService<Verification>();
+//			verification.EmailTo=new List<string>{"zlzforever@163.com"};
+//			verification.Subject = "cnblogs crawler";
+//			verification.AddSqlLarge("total",
+//				$"SELECT COUNT(*) FROM cnblogs.cnblogs_entity_model",
+//				10);
+//			using (var conn = new MySqlConnection(Options.StorageConnectionString))
+//			{
+//				await verification.VerifyAsync(conn);
+//			}
 		}
 
 		[Schema("cnblogs", "cnblogs_entity_model")]

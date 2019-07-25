@@ -18,7 +18,7 @@ namespace DotnetSpider.DataFlow.Parser
 		private readonly Model<T> _model;
 		private readonly TableMetadata _tableMetadata;
 
-		public override string Name => $"DataParser`{typeof(T).Name}`";
+		public override string Name => $"DataParser<{typeof(T).Name}>";
 
 		/// <summary>
 		/// 构造方法

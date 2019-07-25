@@ -41,7 +41,7 @@ namespace DotnetSpider.Sample.samples
 			var parser = new DataParser
 			{
 				SelectableBuilder = context => context.Response.ToSelectable(ContentType.Html),
-				Required = DataParserHelper.CheckIfRequiredByRegex("cnblogs\\.com"),
+				Required = DataParserHelper.CheckIfRequiredByRegex("cnblogs\\.com")
 			};
 			parser.SetFollowRequestQuerier(DataParserHelper.QueryFollowRequestsByXPath("."));
 			spider.AddDataFlow(parser).AddDataFlow(new ConsoleStorage()); // 控制台打印采集结果

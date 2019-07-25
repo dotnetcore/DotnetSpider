@@ -101,7 +101,7 @@ namespace DotnetSpider.Downloader
             var filePath = CreateFilePath(request);
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                Logger?.LogError($"任务 {request.OwnerId} 文件名无法解析 {request.Url}");
+                Logger?.LogError($"{request.OwnerId} can't create file {request.Url}");
                 return;
             }
 
@@ -118,17 +118,17 @@ namespace DotnetSpider.Downloader
                         }
 
                         File.WriteAllBytes(filePath, bytes);
-                        Logger?.LogInformation($"任务 {request.OwnerId} 保存文件 {request.Url} 成功");
+                        Logger?.LogInformation($"{request.OwnerId} save {request.Url} success");
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger?.LogError($"任务 {request.OwnerId} 保存文件 {request.Url} 失败: {e.Message}");
+                    Logger?.LogError($"{request.OwnerId} save {request.Url} failed: {e.Message}");
                 }
             }
             else
             {
-                Logger?.LogInformation($"任务 {request.OwnerId} 文件 {request.Url} 已经存在");
+                Logger?.LogInformation($"{request.OwnerId} file {request.Url} already exits");
             }
         }
 

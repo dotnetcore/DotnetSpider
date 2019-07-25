@@ -37,10 +37,10 @@ namespace DotnetSpider.Statistics
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			await _statisticsStore.EnsureDatabaseAndTableCreatedAsync();
-			_logger.LogInformation("统计中心准备数据库完成");
+			_logger.LogInformation("Initialize statistics center database success");
 			_eventBus.Subscribe(_options.TopicStatisticsService,
 				async message => await HandleStatisticsMessageAsync(message));
-			_logger.LogInformation("统计中心启动");
+			_logger.LogInformation("Statistics center started");
 		}
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace DotnetSpider.Statistics
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{
 			_eventBus.Unsubscribe(_options.TopicStatisticsService);
-			_logger.LogInformation("统计中心退出");
+			_logger.LogInformation("Statistics center exited");
 			return base.StopAsync(cancellationToken);
 		}
 
@@ -59,7 +59,7 @@ namespace DotnetSpider.Statistics
 		{
 			if (string.IsNullOrWhiteSpace(message.Data))
 			{
-				_logger.LogWarning($"接收到空消息");
+				_logger.LogWarning("Statistics center receive empty message");
 				return;
 			}
 
@@ -124,7 +124,7 @@ namespace DotnetSpider.Statistics
 					if (statistics != null)
 					{
 						_logger.LogInformation(
-							$"任务 {ownerId} 总计 {statistics.Total}, 成功 {statistics.Success}, 失败 {statistics.Failed}, 剩余 {statistics.Total - statistics.Success - statistics.Failed}");
+							$"{ownerId} total {statistics.Total}, success {statistics.Success}, failed {statistics.Failed}, left {statistics.Total - statistics.Success - statistics.Failed}");
 					}
 
 					break;

@@ -110,7 +110,7 @@ namespace DotnetSpider
 			}
 			else
 			{
-				Log.Logger.Error("创建爬虫对象失败", 0, ConsoleColor.DarkYellow);
+				Log.Logger.Error("Create spider object failed", 0, ConsoleColor.DarkYellow);
 			}
 		}
 
@@ -146,7 +146,7 @@ namespace DotnetSpider
 				string spiderTypeName = configuration["DOTNET_SPIDER_TYPE"];
 				if (string.IsNullOrWhiteSpace(spiderTypeName))
 				{
-					Log.Logger.Error("未指定需要执行的爬虫类型");
+					Log.Logger.Error("There is no specified spider type");
 					return;
 				}
 
@@ -165,7 +165,7 @@ namespace DotnetSpider
 					x.UnderlyingSystemType.ToString().ToLower() == spiderTypeName.ToLower());
 				if (spiderType == null)
 				{
-					Log.Logger.Error($"未找到爬虫: {spiderTypeName}", 0, ConsoleColor.DarkYellow);
+					Log.Logger.Error($"Spider {spiderTypeName} not found", 0, ConsoleColor.DarkYellow);
 					return;
 				}
 
@@ -183,12 +183,12 @@ namespace DotnetSpider
 				}
 				else
 				{
-					Log.Logger.Error("创建爬虫对象失败", 0, ConsoleColor.DarkYellow);
+					Log.Logger.Error("Create spider object failed", 0, ConsoleColor.DarkYellow);
 				}
 			}
 			catch (Exception e)
 			{
-				Log.Logger.Error($"执行失败: {e}");
+				Log.Logger.Error($"Execute spider failed: {e}");
 			}
 		}
 
@@ -237,7 +237,7 @@ namespace DotnetSpider
 				var entryAsm = Assembly.GetEntryAssembly();
 				if (entryAsm == null)
 				{
-					throw new SpiderException("未找到入口程序集");
+					throw new SpiderException("EntryAssembly not found");
 				}
 
 				asmNames = new List<string>
@@ -255,14 +255,14 @@ namespace DotnetSpider
 				}
 			}
 
-			var spiderInfo = $"检测到爬虫 : {spiderTypes.Count} 个";
+			var spiderInfo = $"Spiders : {spiderTypes.Count}";
 
 			if (Environment.GetEnvironmentVariable("DOTNET_SPIDER_PRINT_SPIDERS") == "true")
 			{
 				spiderInfo = $"{spiderInfo}, {string.Join(", ", spiderTypes.Select(x => x.Name))}";
 			}
 
-			Log.Logger.Information($"程序集     : {string.Join(", ", asmNames)}", 0, ConsoleColor.DarkYellow);
+			Log.Logger.Information($"Assembly     : {string.Join(", ", asmNames)}", 0, ConsoleColor.DarkYellow);
 			Log.Logger.Information(spiderInfo, 0, ConsoleColor.DarkYellow);
 
 			return spiderTypes;

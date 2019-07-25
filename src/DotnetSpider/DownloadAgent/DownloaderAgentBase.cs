@@ -62,7 +62,7 @@ namespace DotnetSpider.DownloadAgent
 			await _eventBus.PublishAsync(_spiderOptions.TopicDownloaderAgentRegisterCenter, new Event
 			{
 				Type = Framework.RegisterCommand,
-				Data = JsonConvert.SerializeObject(new DownloadAgentRegisterCenter.Entity.DownloaderAgent
+				Data = JsonConvert.SerializeObject(new DownloaderAgent
 				{
 					Id = _options.AgentId,
 					Name = _options.Name,
@@ -83,7 +83,7 @@ namespace DotnetSpider.DownloadAgent
 
 			ReleaseDownloaderAsync(stoppingToken).ConfigureAwait(false).GetAwaiter();
 
-			Logger?.LogInformation($"下载器代理 {_options.AgentId} 启动完毕");
+			Logger?.LogInformation($"Agent {_options.AgentId} started");
 		}
 
 		public override Task StopAsync(CancellationToken cancellationToken)
@@ -99,7 +99,7 @@ namespace DotnetSpider.DownloadAgent
 			for (int i = 0; i < times && !cancellationToken.IsCancellationRequested; ++i)
 			{
 				Thread.Sleep(5000);
-				Logger?.LogInformation($"下载器代理 {_options.AgentId} 退出中, 请在安全的时间后手动退出节点");
+				Logger?.LogInformation($"Agent {_options.AgentId} is exiting, please exit agent after safe time");
 			}
 
 
@@ -116,22 +116,19 @@ namespace DotnetSpider.DownloadAgent
 				try
 				{
 					_eventBus.Subscribe(_options.AgentId, HandleMessage);
-					Logger?.LogInformation($"订阅节点 {_options.AgentId} 成功");
 
 					_eventBus.Subscribe("DownloadQueue", HandleMessage);
-					Logger?.LogInformation($"订阅全局下载队列 {_options.AgentId} 成功");
 
 					if (_options.SupportAdsl)
 					{
 						_eventBus.Subscribe("AdslDownloadQueue", HandleMessage);
-						Logger?.LogInformation($"订阅 Adsl 下载队列 {_options.AgentId} 成功");
 					}
 
 					return;
 				}
 				catch (Exception e)
 				{
-					Logger?.LogError($"订阅 topic 失败: {e}");
+					Logger?.LogError($"Subscribe topic failed: {e}");
 					Thread.Sleep(1000);
 				}
 			}
@@ -150,7 +147,7 @@ namespace DotnetSpider.DownloadAgent
 					}
 					catch (Exception e)
 					{
-						Logger?.LogDebug($"下载器代理 {_options.AgentId} 发送心跳失败: {e}");
+						Logger?.LogDebug($"Agent {_options.AgentId} send heartbeat failed: {e}");
 					}
 				}
 			}, stoppingToken);
@@ -173,7 +170,7 @@ namespace DotnetSpider.DownloadAgent
 					Type = Framework.HeartbeatCommand,
 					Data = json
 				});
-			Logger?.LogDebug($"下载器代理 {_options.AgentId} 发送心跳成功");
+			Logger?.LogDebug($"Agent {_options.AgentId} send heartbeat success");
 		}
 
 		private Task ReleaseDownloaderAsync(CancellationToken stoppingToken)
@@ -211,10 +208,6 @@ namespace DotnetSpider.DownloadAgent
 						{
 							Logger?.LogInformation(msg);
 						}
-						else
-						{
-							// Logger.LogDebug(msg);
-						}
 					}
 					catch (Exception e)
 					{
@@ -228,11 +221,11 @@ namespace DotnetSpider.DownloadAgent
 		{
 			if (message == null)
 			{
-				Logger?.LogWarning($"下载器代理 {_options.AgentId} 接收到空消息");
+				Logger?.LogWarning($"Agent {_options.AgentId} receive empty message");
 				return;
 			}
 #if DEBUG
-			Logger?.LogDebug($"下载器代理 {_options.AgentId} 接收到消息: {message}");
+			Logger?.LogDebug($"Agent {_options.AgentId} receive message: {message}");
 #endif
 
 			try
@@ -263,7 +256,7 @@ namespace DotnetSpider.DownloadAgent
 						}
 						else
 						{
-							Logger?.LogWarning($"下载器代理 {_options.AgentId} 收到错误的退出消息: {message}");
+							Logger?.LogWarning($"Agent {_options.AgentId} receive wrong message: {message}");
 						}
 
 						break;
@@ -271,14 +264,14 @@ namespace DotnetSpider.DownloadAgent
 
 					default:
 					{
-						Logger?.LogError($"下载器代理 {_options.AgentId} 无法处理消息: {message}");
+						Logger?.LogError($"Agent {_options.AgentId} can't handle message: {message}");
 						break;
 					}
 				}
 			}
 			catch (Exception e)
 			{
-				Logger?.LogError($"下载器代理 {_options.AgentId} 处理消息: {message} 失败, 异常: {e}");
+				Logger?.LogError($"Agent {_options.AgentId} handle message: {message} failed: {e}");
 			}
 		}
 
@@ -294,7 +287,7 @@ namespace DotnetSpider.DownloadAgent
 				var downloader = GetDownloader(requests[0]);
 				if (downloader == null)
 				{
-					Logger?.LogError($"未能得到 {requests[0].OwnerId} 的下载器");
+					Logger?.LogError($"Can't create/get downloader for {requests[0].OwnerId}");
 				}
 
 				foreach (var request in requests)
@@ -305,7 +298,7 @@ namespace DotnetSpider.DownloadAgent
 						response = new Response
 						{
 							Request = request,
-							Exception = "任务下载器丢失",
+							Exception = "Downloader not found",
 							Success = false,
 							AgentId = _options.AgentId
 						};
@@ -324,7 +317,7 @@ namespace DotnetSpider.DownloadAgent
 			}
 			else
 			{
-				Logger?.LogWarning("下载请求数: 0");
+				Logger?.LogWarning("None requests");
 			}
 		}
 
@@ -393,7 +386,7 @@ namespace DotnetSpider.DownloadAgent
 						};
 						if (!string.IsNullOrWhiteSpace(request.Cookie))
 						{
-							var cookies = request.Cookie.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+							var cookies = request.Cookie.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries);
 							foreach (var cookie in cookies)
 							{
 								var splitIndex = cookie.IndexOf('=');

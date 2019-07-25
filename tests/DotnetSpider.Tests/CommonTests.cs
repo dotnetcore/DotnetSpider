@@ -1,9 +1,9 @@
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DotnetSpider.Tests
@@ -32,7 +32,7 @@ namespace DotnetSpider.Tests
 
 			Task.Factory.StartNew(() =>
 			{
-				Parallel.For(0, 10000, (i) =>
+				Parallel.For(0, 10000, i =>
 				{
 					var data = dict.Values;
 					var result = 0;

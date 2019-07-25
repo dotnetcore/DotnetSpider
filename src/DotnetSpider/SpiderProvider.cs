@@ -29,7 +29,7 @@ namespace DotnetSpider
 			var spiderType = typeof(Spider);
 			if (!spiderType.IsAssignableFrom(type))
 			{
-				throw new SpiderException($"类型 {type} 不是爬虫类型");
+				throw new SpiderException($"{type} is not a spider implement");
 			}
 
 			return (Spider) _serviceProvider.GetRequiredService(type);

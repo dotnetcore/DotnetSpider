@@ -4,7 +4,6 @@ using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.EventBus;
 using DotnetSpider.Selector;
 using DotnetSpider.Statistics;
@@ -49,7 +48,7 @@ namespace DotnetSpider.Sample.samples
 					request.AddProperty("summary", summary);
 					request.AddProperty("views", views);
 
-					context.AddFollowRequests(request);
+					context.AddExtraRequests(request);
 				}
 
 				return Task.FromResult(DataFlowResult.Success);

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Dapper;
+using MailKit.Net.Smtp;
 using MimeKit;
 
 namespace DotnetSpider.Common
@@ -573,7 +574,7 @@ namespace DotnetSpider.Common
 
 				message.Body = multipart;
 
-				using (var client = new MailKit.Net.Smtp.SmtpClient())
+				using (var client = new SmtpClient())
 				{
 					await client.ConnectAsync(Options.EmailHost, Options.EmailPort);
 

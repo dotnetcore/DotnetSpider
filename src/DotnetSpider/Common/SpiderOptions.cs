@@ -89,22 +89,13 @@ namespace DotnetSpider.Common
 
 		public string TopicResponseHandler => "ResponseHandler-";
 
-		public string TopicDownloaderAgentRegisterCenter =>
-			string.IsNullOrWhiteSpace(_configuration["TopicDownloaderAgentRegisterCenter"])
-				? "DownloaderAgentRegisterCenter"
-				: _configuration["TopicDownloaderAgentRegisterCenter"];
+		public string TopicDownloaderAgentRegisterCenter => "DownloaderAgentRegisterCenter";
 
-		public string TopicStatisticsService => string.IsNullOrWhiteSpace(_configuration["TopicStatisticsService"])
-			? "StatisticsService"
-			: _configuration["TopicStatisticsService"];
+		public string TopicStatisticsService => "StatisticsService";
 
-		public string TopicDownloadQueue => string.IsNullOrWhiteSpace(_configuration["TopicDownloadQueue"])
-			? "DownloadQueue"
-			: _configuration["TopicDownloadQueue"];
+		public string TopicDownloadQueue =>"DownloadQueue";
 
-		public string TopicAdslDownloadQueue => string.IsNullOrWhiteSpace(_configuration["TopicAdslDownloadQueue"])
-			? "AdslDownloadQueue"
-			: _configuration["TopicAdslDownloadQueue"];
+		public string TopicAdslDownloadQueue => "AdslDownloadQueue";
 
 		/// <summary>
 		/// 消息队列推送消息、文章话题、获取消息失败重试的次数

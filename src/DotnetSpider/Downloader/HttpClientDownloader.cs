@@ -71,10 +71,10 @@ namespace DotnetSpider.Downloader
 					{
 						if (HttpProxyPool == null)
 						{
-							response.Exception = "未正确配置代理池";
+							response.Exception = "HttpProxyPool is null";
 							response.Success = false;
 							Logger?.LogError(
-								$"任务 {request.OwnerId} 下载 {request.Url} 失败 [{i}]: {response.Exception}");
+								$"{request.OwnerId} download {request.Url} failed [{i}]: {response.Exception}");
 							return response;
 						}
 						else
@@ -82,10 +82,10 @@ namespace DotnetSpider.Downloader
 							proxy = HttpProxyPool.GetProxy();
 							if (proxy == null)
 							{
-								response.Exception = "没有可用的代理";
+								response.Exception = "There is no available proxy";
 								response.Success = false;
 								Logger?.LogError(
-									$"任务 {request.OwnerId} 下载 {request.Url} 失败 [{i}]: {response.Exception}");
+									$"{request.OwnerId} download {request.Url} failed [{i}]: {response.Exception}");
 								return response;
 							}
 						}
@@ -151,7 +151,7 @@ namespace DotnetSpider.Downloader
 								response.Success = false;
 								response.Exception = "IP Banded";
 								Logger?.LogError(
-									$"任务 {request.OwnerId} 下载 {request.Url} 失败 [{i}]: {response.Exception}");
+									$"{request.OwnerId} download {request.Url} failed [{i}]: {response.Exception}");
 								return response;
 							}
 							else
@@ -164,7 +164,7 @@ namespace DotnetSpider.Downloader
 					{
 						response.Success = true;
 						Logger?.LogInformation(
-							$"任务 {request.OwnerId} 下载 {request.Url} 成功");
+							$"{request.OwnerId} download {request.Url} success");
 						return response;
 					}
 				}
@@ -172,7 +172,7 @@ namespace DotnetSpider.Downloader
 				{
 					response.Exception = e.Message;
 					response.Success = false;
-					Logger?.LogError($"任务 {request.OwnerId} 下载 {request.Url} 失败 [{i}]: {e}");
+					Logger?.LogError($"{request.OwnerId} download {request.Url} failed [{i}]: {e}");
 				}
 				finally
 				{
@@ -188,7 +188,7 @@ namespace DotnetSpider.Downloader
 					}
 					catch (Exception e)
 					{
-						Logger?.LogWarning($"任务 {request.OwnerId} 释放 {request.Url} 失败 [{i}]: {e}");
+						Logger?.LogWarning($"{request.OwnerId} dispose response {request.Url} failed [{i}]: {e}");
 					}
 				}
 

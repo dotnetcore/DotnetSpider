@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Quartz.Logging;
+using LogLevel = Quartz.Logging.LogLevel;
 
 namespace DotnetSpider.Portal
 {
@@ -24,28 +25,28 @@ namespace DotnetSpider.Portal
 					var message = func();
 					switch (level)
 					{
-						case Quartz.Logging.LogLevel.Info:
+						case LogLevel.Info:
 						{
 							_loggerFactory.CreateLogger(name).LogInformation(exception, message, parameters);
 							break;
 						}
-						case Quartz.Logging.LogLevel.Debug:
+						case LogLevel.Debug:
 						{
 							_loggerFactory.CreateLogger(name).LogDebug(exception, message, parameters);
 							break;
 						}
-						case Quartz.Logging.LogLevel.Error:
-						case Quartz.Logging.LogLevel.Fatal:
+						case LogLevel.Error:
+						case LogLevel.Fatal:
 						{
 							_loggerFactory.CreateLogger(name).LogError(exception, message, parameters);
 							break;
 						}
-						case Quartz.Logging.LogLevel.Trace:
+						case LogLevel.Trace:
 						{
 							_loggerFactory.CreateLogger(name).LogTrace(exception, message, parameters);
 							break;
 						}
-						case Quartz.Logging.LogLevel.Warn:
+						case LogLevel.Warn:
 						{
 							_loggerFactory.CreateLogger(name).LogWarning(exception, message, parameters);
 							break;

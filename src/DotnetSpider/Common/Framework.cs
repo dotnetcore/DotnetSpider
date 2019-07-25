@@ -67,10 +67,6 @@ namespace DotnetSpider.Common
 					.ToDictionary(items => items[0], items => long.Parse(items[1]));
 				TotalMemory = (int) (infoDic["MemTotal:"] / 1024);
 			}
-			else
-			{
-				// TODO:
-			}
 
 			var networkInterface = NetworkInterface.GetAllNetworkInterfaces()
 				.First(i => i.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
@@ -91,7 +87,8 @@ namespace DotnetSpider.Common
 				GlobalMemoryStatus(ref mStatus);
 				return Convert.ToInt64(mStatus.DwAvailPhys) / 1024 / 1024;
 			}
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
 				var lines = File.ReadAllLines("/proc/meminfo");
 				var infoDic = lines
@@ -101,10 +98,8 @@ namespace DotnetSpider.Common
 				var sReclaimable = infoDic["SReclaimable:"];
 				return (free + sReclaimable) / 1024;
 			}
-			else
-			{
-				return 0;
-			}
+
+			return 0;
 		}
 
 		public static void RegisterEncoding()

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 
-
 namespace DotnetSpider.Tests
 {
 	public class TestBase

@@ -65,7 +65,14 @@ namespace DotnetSpider.DataFlow.Parser
 					{
 						if (request != null && (Required == null || Required(request)))
 						{
-							context.AddFollowRequests(request);
+							// 在此强制设制 OwnerId, 防止用户忘记导致出错
+							if (string.IsNullOrWhiteSpace(request.OwnerId))
+							{
+								request.OwnerId = context.Response.Request.OwnerId;
+								request.AgentId = context.Response.Request.AgentId;
+							}
+
+							context.AddExtraRequests(request);
 						}
 					}
 				}
@@ -102,6 +109,8 @@ namespace DotnetSpider.DataFlow.Parser
 						var request = CreateFromRequest(context.Response.Request, url);
 						if (request != null)
 						{
+							request.OwnerId = context.Response.Request.OwnerId;
+							request.AgentId = context.Response.Request.AgentId;
 							requests.Add(request);
 						}
 					}

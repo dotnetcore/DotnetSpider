@@ -38,7 +38,7 @@ namespace DotnetSpider.Tests.MessageQueue
 			var mq = new LocalEventBus(CreateLogger<LocalEventBus>());
 			mq.Subscribe("topic", msg => { Interlocked.Increment(ref count); });
 
-			Parallel.For(0, 100, async (i) =>
+			Parallel.For(0, 100, async i =>
 			{
 				await mq.PublishAsync("topic", new Event
 				{

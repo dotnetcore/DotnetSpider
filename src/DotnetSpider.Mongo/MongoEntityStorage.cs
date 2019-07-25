@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage.Model;
 using MongoDB.Bson;
 using MongoDB.Driver;

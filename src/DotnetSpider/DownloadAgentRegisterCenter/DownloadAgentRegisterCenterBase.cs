@@ -62,20 +62,20 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"初始化注册中心数据库失败: {e}");
+				Logger.LogError($"Initialize register center database failed: {e}");
 			}
 
 			EventBus.Subscribe(Options.TopicDownloaderAgentRegisterCenter, async message =>
 			{
 				if (message == null)
 				{
-					Logger.LogWarning("接收到空消息");
+					Logger.LogWarning("Receive empty message");
 					return;
 				}
 
 				if (message.IsTimeout(60))
 				{
-					Logger.LogWarning($"消息超时: {JsonConvert.SerializeObject(message)}");
+					Logger.LogWarning($"Message is timeout: {JsonConvert.SerializeObject(message)}");
 					return;
 				}
 
@@ -88,11 +88,11 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 						if (agent != null)
 						{
 							await DownloaderAgentStore.RegisterAsync(agent);
-							Logger.LogInformation($"注册下载代理器 {agent.Id} 成功");
+							Logger.LogInformation($"Register agent {agent.Id} success");
 						}
 						else
 						{
-							Logger.LogError($"注册下载代理器消息不正确: {message.Data}");
+							Logger.LogError($"Register agent message is wrong: {message.Data}");
 						}
 
 						break;
@@ -106,29 +106,25 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 							if ((DateTime.Now - heartbeat.CreationTime).TotalSeconds < Options.MessageExpiredTime)
 							{
 								await DownloaderAgentStore.HeartbeatAsync(heartbeat);
-								Logger.LogDebug($"下载器代理 {heartbeat.AgentId} 更新心跳成功");
+								Logger.LogDebug($"Agent {heartbeat.AgentId} refresh heartbeat success");
 							}
 							else
 							{
-								Logger.LogWarning($"下载器代理 {heartbeat.AgentId} 更新心跳过期");
+								Logger.LogWarning($"Agent {heartbeat.AgentId} receive timeout heartbeat");
 							}
-						}
-						else
-						{
-							Logger.LogError($"下载代理器心跳信息不正确: {message.Data}");
 						}
 
 						break;
 					}
 				}
 			});
-			Logger.LogInformation("下载中心启动完毕");
+			Logger.LogInformation("Agent register center started");
 		}
 
 		public override Task StopAsync(CancellationToken cancellationToken)
 		{
 			EventBus.Unsubscribe(Options.TopicDownloaderAgentRegisterCenter);
-			Logger.LogInformation("下载中心退出");
+			Logger.LogInformation("Agent register center exited");
 			return base.StopAsync(cancellationToken);
 		}
 	}

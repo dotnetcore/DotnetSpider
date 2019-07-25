@@ -39,13 +39,13 @@ namespace DotnetSpider.EventBus
 			return Task.Factory.StartNew(() => { Publish(topic, message); });
 		}
 
-		public void Publish(string topic, Event message)
+		private void Publish(string topic, Event message)
 		{
 			if (message == null)
 			{
 #if DEBUG
 				var stackTrace = new StackTrace();
-				_logger.LogDebug($"推送空消息到 Topic {topic}: {stackTrace}");
+				_logger.LogDebug($"Publish empty message to topic {topic}: {stackTrace}");
 #endif
 				return;
 			}
@@ -60,14 +60,14 @@ namespace DotnetSpider.EventBus
 				}
 				catch (Exception e)
 				{
-					_logger.LogError($"Topic {topic} 消费消息 {message} 失败: {e}");
+					_logger.LogError($"Consume message {message} on topic {topic} failed: {e}");
 				}
 			}
 			else
 			{
 #if DEBUG
 				var stackTrace = new StackTrace();
-				_logger.LogDebug($"Topic {topic} 未被订阅: {stackTrace}");
+				_logger.LogDebug($"Topic {topic} is not subscribed: {stackTrace}");
 #endif
 			}
 		}
@@ -81,6 +81,7 @@ namespace DotnetSpider.EventBus
 		public void Subscribe(string topic, Action<Event> action)
 		{
 			_consumers.AddOrUpdate(topic, x => action, (t, a) => action);
+			_logger.LogInformation("Subscribe: " + topic);
 		}
 
 		/// <summary>

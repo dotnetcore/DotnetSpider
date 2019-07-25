@@ -54,7 +54,7 @@ namespace DotnetSpider.Tests.MessageQueue
 			var mq = new KafkaEventBus(options, logger);
 			mq.Subscribe("ParallelPubAndSub", msg => { Interlocked.Increment(ref count); });
 
-			Parallel.For(0, 100, async (i) =>
+			Parallel.For(0, 100, async i =>
 			{
 				await mq.PublishAsync("ParallelPubAndSub", new Event
 				{

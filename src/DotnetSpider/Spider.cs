@@ -139,7 +139,7 @@ namespace DotnetSpider
 			{
 				if (!string.IsNullOrWhiteSpace(request.Cookie) && string.IsNullOrWhiteSpace(request.Domain))
 				{
-					throw new SpiderException("When cookie is not null, domain should not be null");
+					throw new SpiderException("When cookie is not empty, domain should not be empty");
 				}
 
 				request.OwnerId = Id;
@@ -147,7 +147,7 @@ namespace DotnetSpider
 				_requests.Add(request);
 				if (_requests.Count % EnqueueBatchCount == 0)
 				{
-					EnqueueRequestToScheduler();
+					EnqueueRequestsToScheduler();
 				}
 			}
 
@@ -170,7 +170,7 @@ namespace DotnetSpider
 				_requests.Add(request);
 				if (_requests.Count % EnqueueBatchCount == 0)
 				{
-					EnqueueRequestToScheduler();
+					EnqueueRequestsToScheduler();
 				}
 			}
 
@@ -191,7 +191,7 @@ namespace DotnetSpider
 			{
 				ResetMmfSignal();
 
-				Logger.LogInformation("初始化爬虫");
+				Logger.LogInformation("Initialize spider");
 
 				// 定制化的设置
 				Initialize();
@@ -216,15 +216,13 @@ namespace DotnetSpider
 				_eventBus.Subscribe($"{Id}",
 					async message => await HandleCommandAsync(message));
 
-				Logger.LogInformation($"任务 {Id} 订阅消息队列成功");
-
 				// 初始化各数据流处理器
 				foreach (var dataFlow in _dataFlows)
 				{
 					await dataFlow.InitAsync();
 				}
 
-				Logger.LogInformation($"任务 {Id} 数据流处理器初始化完成");
+				Logger.LogInformation($"{Id} initialize dataFlows completed");
 
 				// 通过供应接口添加请求
 				foreach (var requestSupplier in _requestSupplies)
@@ -233,8 +231,7 @@ namespace DotnetSpider
 				}
 
 				// 把列表中可能剩余的请求加入队列
-				EnqueueRequestToScheduler();
-				Logger.LogInformation($"任务 {Id} 加载下载请求成功");
+				EnqueueRequestsToScheduler();
 
 				_enqueued.Set(0);
 				_responded.Set(0);
@@ -262,7 +259,7 @@ namespace DotnetSpider
 					}
 					catch (Exception ex)
 					{
-						Logger.LogError($"任务 {Id} 释放 {dataFlow.GetType().Name} 失败: {ex}");
+						Logger.LogError($"{Id} dispose {dataFlow.GetType().Name} failed: {ex}");
 					}
 				}
 
@@ -277,7 +274,7 @@ namespace DotnetSpider
 				}
 				catch (Exception e)
 				{
-					Logger.LogInformation($"任务 {Id} 上传退出信息失败: {e}");
+					Logger.LogInformation($"{Id} publish exit message failed: {e}");
 				}
 
 				try
@@ -286,12 +283,12 @@ namespace DotnetSpider
 				}
 				catch (Exception e)
 				{
-					Logger.LogInformation($"任务 {Id} 退出事件处理失败: {e}");
+					Logger.LogInformation($"{Id} handle exiting event failed: {e}");
 				}
 
 				// 标识任务退出完成
 				Status = Status.Exited;
-				Logger.LogInformation($"任务 {Id} 退出");
+				Logger.LogInformation($"{Id} exited");
 			}
 		}
 
@@ -316,7 +313,7 @@ namespace DotnetSpider
 		/// </summary>
 		public Spider Exit()
 		{
-			Logger.LogInformation($"任务 {Id} 退出中...");
+			Logger.LogInformation($"{Id} exiting...");
 			Status = Status.Exiting;
 			// 直接取消订阅即可: 1. 如果是本地应用, 
 			_eventBus.Unsubscribe($"{Options.TopicResponseHandler}{Id}");
@@ -339,11 +336,11 @@ namespace DotnetSpider
 					accessor.Flush();
 				}
 
-				Logger.LogInformation($"任务 {Id} 推送退出信号到 MMF 成功");
+				Logger.LogInformation($"{Id} send exit mmf signal success");
 				return this;
 			}
 
-			throw new SpiderException($"任务 {Id} 未开启 MMF 控制");
+			throw new SpiderException($"{Id} didn't register mmf");
 		}
 
 		/// <summary>
@@ -382,25 +379,25 @@ namespace DotnetSpider
 			var type = Type.GetType(options.Storage);
 			if (type == null)
 			{
-				throw new SpiderException("存储器类型配置不正确，或者未添加对应的库");
+				throw new SpiderException($"Storage type {options.Storage} not found");
 			}
 
 			if (!typeof(StorageBase).IsAssignableFrom(type))
 			{
-				throw new SpiderException("存储器类型配置不正确");
+				throw new SpiderException($"{type} is not a storage dataFlow");
 			}
 
 			var method = type.GetMethod("CreateFromOptions");
 
 			if (method == null)
 			{
-				throw new SpiderException("存储器未实现 CreateFromOptions 方法，无法自动创建");
+				throw new SpiderException($"Storage {type} didn't implement method CreateFromOptions");
 			}
 
 			var storage = method.Invoke(null, new object[] {options});
 			if (storage == null)
 			{
-				throw new SpiderException("创建默认存储器失败");
+				throw new SpiderException("Create default storage failed");
 			}
 
 			return (StorageBase) storage;
@@ -421,7 +418,7 @@ namespace DotnetSpider
 				{
 					accessor.Write(0, false);
 					accessor.Flush();
-					Logger.LogInformation("任务 {Id} 初始化 MMF 退出信号");
+					Logger.LogInformation("{Id} initialize mmf exit signal");
 				}
 			}
 		}
@@ -443,7 +440,7 @@ namespace DotnetSpider
 
 				using (var accessor = mmf?.CreateViewAccessor())
 				{
-					Logger.LogInformation($"任务 {Id} 速度控制器启动");
+					Logger.LogInformation($"{Id} start speed controller");
 
 					var paused = 0;
 					while (!@break)
@@ -464,13 +461,14 @@ namespace DotnetSpider
 											if (paused > NonRespondedTimeLimitation)
 											{
 												Logger.LogInformation(
-													$"任务 {Id} {NonRespondedTimeLimitation} 秒未收到下载回应");
+													$"{Id} didn't receive response after {NonRespondedTimeLimitation} second");
 												@break = true;
 												break;
 											}
 
 											paused += _speedControllerInterval;
-											Logger.LogInformation($"任务 {Id} 速度控制器因过多下载请求未得到回应暂停");
+											Logger.LogInformation(
+												$"{Id} stop speed controller because too much request timeout");
 											continue;
 										}
 
@@ -489,8 +487,8 @@ namespace DotnetSpider
 											kv.Value.RetriedTimes++;
 											if (kv.Value.RetriedTimes > RespondedTimeoutRetryTimes)
 											{
-												Logger.LogInformation(
-													$"任务 {Id} 重试下载请求 {RespondedTimeoutRetryTimes} 次未收到下载回应");
+												Logger.LogWarning(
+													$"{Id} download {kv.Value.Url} more than {RespondedTimeoutRetryTimes} times");
 												@break = true;
 												break;
 											}
@@ -522,7 +520,7 @@ namespace DotnetSpider
 									}
 									catch (Exception e)
 									{
-										Logger.LogError($"任务 {Id} 速度控制器运转失败: {e}");
+										Logger.LogError($"{Id} speed controller failed: {e}");
 									}
 
 									break;
@@ -530,7 +528,7 @@ namespace DotnetSpider
 
 								case Status.Paused:
 								{
-									Logger.LogDebug($"任务 {Id} 速度控制器暂停");
+									Logger.LogDebug($"{Id} pause speed controller");
 									break;
 								}
 
@@ -544,18 +542,18 @@ namespace DotnetSpider
 
 							if (!@break && accessor != null && accessor.ReadBoolean(0))
 							{
-								Logger.LogInformation($"任务 {Id} 收到 MMF 退出信号");
+								Logger.LogInformation($"{Id} receive mmf exit signal");
 								Exit();
 							}
 						}
 						catch (Exception e)
 						{
-							Logger.LogError($"任务 {Id} 速度控制器运转失败: {e}");
+							Logger.LogError($"{Id} speed controller failed: {e}");
 						}
 					}
 				}
 
-				Logger.LogInformation($"任务 {Id} 速度控制器退出");
+				Logger.LogInformation($"{Id} speed controller exit");
 			});
 		}
 
@@ -577,7 +575,7 @@ namespace DotnetSpider
 		{
 			if (string.IsNullOrWhiteSpace(message.Data))
 			{
-				Logger.LogWarning($"任务 {Id} 接收到空消息");
+				Logger.LogWarning($"{Id} receive empty message");
 				return;
 			}
 
@@ -591,7 +589,7 @@ namespace DotnetSpider
 			}
 			catch
 			{
-				Logger.LogError($"任务 {Id} 接收到异常消息: {message}");
+				Logger.LogError($"{Id} receive wrong message: {message}");
 				return;
 			}
 
@@ -599,7 +597,7 @@ namespace DotnetSpider
 			{
 				if (responses.Length == 0)
 				{
-					Logger.LogWarning($"任务 {Id} 接收到空回复");
+					Logger.LogWarning($"{Id} receive empty message");
 					return;
 				}
 
@@ -626,7 +624,7 @@ namespace DotnetSpider
 				// 处理下载成功的请求
 				Parallel.ForEach(successResponses, async response =>
 				{
-					Logger.LogInformation($"任务 {Id} 下载 {response.Request.Url} 成功");
+					Logger.LogInformation($"{Id} download {response.Request.Url} success");
 
 					try
 					{
@@ -646,7 +644,7 @@ namespace DotnetSpider
 								case DataFlowResult.Failed:
 								{
 									// 如果处理失败，则直接返回
-									Logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 失败: {context.Message}");
+									Logger.LogInformation($"{Id} handle {response.Request.Url} failed: {context.Message}");
 									await _statisticsService.IncrementFailedAsync(Id);
 									return;
 								}
@@ -673,21 +671,28 @@ namespace DotnetSpider
 								response.Request.RetriedTimes++;
 								await EnqueueRequests(response.Request);
 								// 即然是重试这个请求，则解析必然还会再执行一遍，所以解析到的目标链接、成功状态都应该到最后来处理。
-								Logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 解析结果为空，尝试重试");
+								Logger.LogInformation($"{Id} retry {response.Request.Url} because empty result");
 								return;
 							}
 						}
 
 						// 解析的目标请求
-						if (context.FollowRequests != null && context.FollowRequests.Count > 0)
+						if (context.ExtraRequests != null && context.ExtraRequests.Count > 0)
 						{
 							var requests = new List<Request>();
-							foreach (var followRequest in context.FollowRequests)
+							foreach (var newRequest in context.ExtraRequests)
 							{
-								followRequest.Depth = response.Request.Depth + 1;
-								if (followRequest.Depth <= Depth)
+								newRequest.Depth = response.Request.Depth + 1;
+								if (newRequest.Depth <= Depth)
 								{
-									requests.Add(followRequest);
+									// 在此强制设制 OwnerId, 防止用户忘记导致出错
+									if (string.IsNullOrWhiteSpace(newRequest.OwnerId))
+									{
+										newRequest.OwnerId = context.Response.Request.OwnerId;
+										newRequest.AgentId = context.Response.Request.AgentId;
+									}
+
+									requests.Add(newRequest);
 								}
 							}
 
@@ -701,26 +706,26 @@ namespace DotnetSpider
 						if (!resultIsEmpty)
 						{
 							await _statisticsService.IncrementSuccessAsync(Id);
-							Logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 成功");
+							Logger.LogInformation($"{Id} handle {response.Request.Url} success");
 						}
 						else
 						{
 							if (RetryWhenResultIsEmpty)
 							{
 								await _statisticsService.IncrementFailedAsync(Id);
-								Logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 失败，解析结果为空");
+								Logger.LogInformation($"{Id} handle {response.Request.Url} failed，extract result is empty");
 							}
 							else
 							{
 								await _statisticsService.IncrementSuccessAsync(Id);
-								Logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 成功，解析结果为空");
+								Logger.LogInformation($"{Id} handle {response.Request.Url} success，extract result is empty");
 							}
 						}
 					}
 					catch (Exception e)
 					{
 						await _statisticsService.IncrementFailedAsync(Id);
-						Logger.LogInformation($"任务 {Id} 处理 {response.Request.Url} 失败: {e}");
+						Logger.LogInformation($"{Id} handle {response.Request.Url} failed: {e}");
 					}
 				});
 
@@ -740,7 +745,7 @@ namespace DotnetSpider
 					retryResponses.ForEach(x =>
 					{
 						x.Request.RetriedTimes++;
-						Logger.LogInformation($"任务 {Id} 下载 {x.Request.Url} 失败: {x.Exception}");
+						Logger.LogInformation($"{Id} download {x.Request.Url} failed: {x.Exception}");
 					});
 					await EnqueueRequests(retryResponses.Select(x => x.Request).ToArray());
 				}
@@ -761,7 +766,7 @@ namespace DotnetSpider
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError($"任务 {Id} 处理消息 {message} 失败: {ex}");
+				Logger.LogError($"{Id} handle message {message} failed: {ex}");
 			}
 		}
 
@@ -778,10 +783,8 @@ namespace DotnetSpider
 				{
 					break;
 				}
-				else
-				{
-					Thread.Sleep(1000);
-				}
+
+				Thread.Sleep(1000);
 
 				waited += 1;
 				if (waited > StatisticsInterval)
@@ -799,7 +802,7 @@ namespace DotnetSpider
 		{
 			if (Status == Status.Running || Status == Status.Paused)
 			{
-				throw new SpiderException("任务 {Id} 正在运行");
+				throw new SpiderException("{Id} is running");
 			}
 		}
 
@@ -816,7 +819,7 @@ namespace DotnetSpider
 		/// 把当前缓存的所有 Request 入队
 		/// </summary>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		private void EnqueueRequestToScheduler()
+		private void EnqueueRequestsToScheduler()
 		{
 			if (_requests.Count <= 0) return;
 
@@ -824,8 +827,10 @@ namespace DotnetSpider
 
 			var count = _scheduler.Enqueue(_requests);
 			_statisticsService.IncrementTotalAsync(Id, count).ConfigureAwait(false).GetAwaiter();
-			Logger.LogInformation($"任务 {Id} 推送请求到调度器，数量 {_requests.Count}");
+			Logger.LogInformation($"{Id} enqueue requests to scheduler，count {_requests.Count}");
 			_requests.Clear();
+
+			Logger.LogInformation($"{Id} load requests success");
 		}
 
 		private async Task EnqueueRequests(params Request[] requests)
@@ -910,7 +915,7 @@ namespace DotnetSpider
 			"VERSIONER_PYTHON_VERSION",
 			"XPC_FLAGS",
 			"XPC_SERVICE_NAME",
-			"_NO_DEBUG_HEAP",
+			"_NO_DEBUG_HEAP"
 		};
 
 		private void PrintEnvironment(IConfiguration configuration)
@@ -919,15 +924,15 @@ namespace DotnetSpider
 			{
 				if (!string.IsNullOrWhiteSpace(kv.Key) && !Excludes.Contains(kv.Key))
 				{
-					Logger.LogInformation($"运行参数   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
+					Logger.LogInformation($"Arg   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
 				}
 			}
 
 
-			Logger.LogInformation($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
+			Logger.LogInformation($"BaseDirectory   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
 				ConsoleColor.DarkYellow);
 			Logger.LogInformation(
-				$"操作系统   : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
+				$"OS    : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
 				ConsoleColor.DarkYellow);
 		}
 	}

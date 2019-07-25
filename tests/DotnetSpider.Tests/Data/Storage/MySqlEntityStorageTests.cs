@@ -68,7 +68,7 @@ namespace DotnetSpider.Tests.Data.Storage
 			using (var conn = CreateConnection())
 			{
 				// 如果实体的 Schema 没有配置表名，则使用类名
-				await conn.ExecuteAsync($"drop table if exists createtableentity1;");
+				await conn.ExecuteAsync("drop table if exists createtableentity1;");
 				var services = SpiderProvider.Value.CreateScopeServiceProvider();
 				var storage = CreateStorage(StorageType.Insert);
 				var dfc = new DataFlowContext(null, services);
@@ -81,7 +81,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				};
 				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity1>($"SELECT * FROM createtableentity1")).ToList();
+				var list = (await conn.QueryAsync<CreateTableEntity1>("SELECT * FROM createtableentity1")).ToList();
 				Assert.Single(list);
 				entity = list.First();
 				Assert.Equal("xxx", entity.Str1);
@@ -91,7 +91,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(600, entity.Long);
 				Assert.Equal(400, entity.Double);
 				Assert.Equal(200.0F, entity.Float);
-				await conn.ExecuteAsync($"drop table if exists createtableentity1;");
+				await conn.ExecuteAsync("drop table if exists createtableentity1;");
 			}
 		}
 
@@ -101,7 +101,7 @@ namespace DotnetSpider.Tests.Data.Storage
 			using (var conn = CreateConnection())
 			{
 				// 如果实体的 Schema 没有配置表名，则使用类名
-				await conn.ExecuteAsync($"drop table if exists createtablenotablename;");
+				await conn.ExecuteAsync("drop table if exists createtablenotablename;");
 				var services = SpiderProvider.Value.CreateScopeServiceProvider();
 				var storage = CreateStorage(StorageType.Insert);
 				var dfc = new DataFlowContext(null, services);
@@ -114,7 +114,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				};
 				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
-				var list = (await conn.QueryAsync<CreateTableEntity2>($"SELECT * FROM createtablenotablename")).ToList();
+				var list = (await conn.QueryAsync<CreateTableEntity2>("SELECT * FROM createtablenotablename")).ToList();
 				Assert.Single(list);
 				entity = list.First();
 				Assert.Equal("xxx", entity.Str1);
@@ -124,7 +124,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(600, entity.Long);
 				Assert.Equal(400, entity.Double);
 				Assert.Equal(200.0F, entity.Float);
-				await conn.ExecuteAsync($"drop table if exists createtablenotablename;");
+				await conn.ExecuteAsync("drop table if exists createtablenotablename;");
 			}
 		}
 
@@ -196,7 +196,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(200.0F, entity.Float);
 
 				var primaries = (await conn.QueryAsync<PrimaryInfo>(
-						$"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtablemultiprimay';")
+						"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtablemultiprimay';")
 					).ToList();
 				Assert.Equal(2, primaries.Count);
 				Assert.Equal("str2", primaries[0].COLUMN_NAME);
@@ -240,7 +240,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(200.0F, entity.Float);
 
 				var primaries = (await conn.QueryAsync<PrimaryInfo>(
-						$"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableprimay';")
+						"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableprimay';")
 					).ToList();
 				Assert.Single(primaries);
 				Assert.Equal("str2", primaries[0].COLUMN_NAME);
@@ -287,7 +287,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				Assert.Equal(2, list[1].Id);
 
 				var primaries = (await conn.QueryAsync<PrimaryInfo>(
-						$"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableautoincprimay';")
+						"SELECT t.CONSTRAINT_TYPE, c.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS t, INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c WHERE t.TABLE_NAME = c.TABLE_NAME AND t.TABLE_SCHEMA = 'test' AND t.CONSTRAINT_TYPE = 'PRIMARY KEY' AND t.TABLE_NAME='createtableautoincprimay';")
 					).ToList();
 				Assert.Single(primaries);
 				Assert.Equal("id", primaries[0].COLUMN_NAME);
@@ -618,7 +618,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				dfc.AddParseData(typeName, items);
 				await storage.HandleAsync(dfc);
 				var indexes = (await conn.QueryAsync<IndexInfo>
-						($"show index from test.createtableindexes")
+						("show index from test.createtableindexes")
 					).ToList();
 				Assert.Equal(6, indexes.Count);
 				Assert.Contains(indexes,

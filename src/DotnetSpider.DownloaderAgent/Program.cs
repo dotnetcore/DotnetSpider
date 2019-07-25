@@ -63,17 +63,17 @@ namespace DotnetSpider.DownloaderAgent
 		private static void PrintEnvironment(IConfiguration configuration)
 		{
 			Framework.PrintInfo();
-			Log.Logger.Information($"运行参数   : VERSION = 20190725", 0, ConsoleColor.DarkYellow);
+			Log.Logger.Information("Arg   : VERSION = 20190725", 0, ConsoleColor.DarkYellow);
 			foreach (var kv in configuration.GetChildren())
 			{
-				Log.Logger.Information($"运行参数   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
+				Log.Logger.Information($"Arg   : {kv.Key} = {kv.Value}", 0, ConsoleColor.DarkYellow);
 			}
 
 
-			Log.Logger.Information($"运行目录   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
+			Log.Logger.Information($"BaseDirectory   : {AppDomain.CurrentDomain.BaseDirectory}", 0,
 				ConsoleColor.DarkYellow);
 			Log.Logger.Information(
-				$"操作系统   : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
+				$"OS    : {Environment.OSVersion} {(Environment.Is64BitOperatingSystem ? "X64" : "X86")}", 0,
 				ConsoleColor.DarkYellow);
 		}
 	}

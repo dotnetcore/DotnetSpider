@@ -36,7 +36,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter
 						.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 						.Enrich.FromLogContext()
 						.WriteTo.Console().WriteTo
-						.RollingFile($"/logs/register-center/register-center.log");
+						.RollingFile("/logs/register-center/register-center.log");
 					Log.Logger = configure.CreateLogger();
 					
 					services.AddSingleton<SpiderOptions>();

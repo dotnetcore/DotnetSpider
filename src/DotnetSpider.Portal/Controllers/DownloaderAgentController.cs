@@ -41,10 +41,8 @@ namespace DotnetSpider.Portal.Controllers
 					_logger.LogInformation("下载中心尚未启动");
 					return View();
 				}
-				else
-				{
-					throw;
-				}
+
+				throw;
 			}
 		}
 
@@ -69,10 +67,8 @@ namespace DotnetSpider.Portal.Controllers
 					_logger.LogInformation("下载中心尚未启动");
 					return View();
 				}
-				else
-				{
-					throw;
-				}
+
+				throw;
 			}
 		}
 
@@ -93,7 +89,7 @@ namespace DotnetSpider.Portal.Controllers
 			using (var conn = _dbContext.Database.GetDbConnection())
 			{
 				await conn.ExecuteAsync(
-					$"DELETE FROM downloader_agent_heartbeat WHERE agent_id = @Id; DELETE FROM downloader_agent WHERE id = @Id;",
+					"DELETE FROM downloader_agent_heartbeat WHERE agent_id = @Id; DELETE FROM downloader_agent WHERE id = @Id;",
 					new {Id = id});
 			}
 

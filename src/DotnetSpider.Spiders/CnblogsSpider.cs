@@ -8,7 +8,6 @@ using DotnetSpider.DataFlow.Parser.Formatter;
 using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Downloader;
 using DotnetSpider.EventBus;
-using DotnetSpider.Scheduler;
 using DotnetSpider.Selector;
 using DotnetSpider.Statistics;
 using Microsoft.Extensions.Logging;
@@ -17,10 +16,13 @@ namespace DotnetSpider.Spiders
 {
 	public class CnblogsSpider : Spider
 	{
+		public CnblogsSpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options,
+			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
+		{
+		}
+
 		protected override void Initialize()
 		{
-			Scheduler = new QueueDistinctBfsScheduler();
-			Speed = 1;
 			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
 			for (int i = 1; i < 10; ++i)
 			{
@@ -30,7 +32,7 @@ namespace DotnetSpider.Spiders
 			}
 		}
 
-		[Schema("cnblogs", "cnblogs_entity_model")]
+		[Schema("cnblogs", "news")]
 		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
 		class CnblogsEntry : EntityBase<CnblogsEntry>
@@ -73,11 +75,6 @@ namespace DotnetSpider.Spiders
 
 			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Enviroment)]
 			public DateTime CreationTime { get; set; }
-		}
-
-		public CnblogsSpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options,
-			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
-		{
 		}
 	}
 }

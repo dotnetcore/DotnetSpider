@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
+using ServiceProvider = DotnetSpider.Portal.Common.ServiceProvider;
 
 namespace DotnetSpider.Portal
 {
@@ -16,7 +17,7 @@ namespace DotnetSpider.Portal
 		public async Task Execute(IJobExecutionContext context)
 		{
 			var jobId = context.JobDetail.Key.Name;
-			using (var scope = Common.ServiceProvider.Instance.CreateScope())
+			using (var scope = ServiceProvider.Instance.CreateScope())
 			{
 				var services = scope.ServiceProvider;
 				var logger = services.GetRequiredService<ILogger<TriggerJob>>();

@@ -10,6 +10,7 @@ using DotnetSpider.Statistics.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Quartz;
 using X.PagedList;
 
 namespace DotnetSpider.Portal.Controllers
@@ -18,13 +19,13 @@ namespace DotnetSpider.Portal.Controllers
 	{
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
-		private readonly Quartz.IScheduler _sched;
+		private readonly IScheduler _sched;
 		private readonly PortalOptions _options;
 		private readonly IEventBus _eventBus;
 
 		public SpiderContainerController(PortalDbContext dbContext,
 			PortalOptions options,
-			Quartz.IScheduler sched,
+			IScheduler sched,
 			IEventBus eventBus,
 			ILogger<SpiderController> logger)
 		{

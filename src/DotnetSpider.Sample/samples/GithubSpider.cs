@@ -30,7 +30,7 @@ namespace DotnetSpider.Sample.samples
 				var urls = selectable.Links().Regex("(https://github\\.com/[\\w\\-]+/[\\w\\-]+)").GetValues();
 				foreach (var url in urls)
 				{
-					context.AddFollowRequests(CreateFromRequest(context.Response.Request, url));
+					context.AddExtraRequests(CreateFromRequest(context.Response.Request, url));
 				}
 
 
