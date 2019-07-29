@@ -20,7 +20,6 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Confluent.Kafka" Version="1.1.0" />
         <PackageReference Include="librdkafka.redist" Version="1.1.0" />
     </ItemGroup>
 </Project>
