@@ -44,17 +44,7 @@ DotnetSpider, a .NET Standard web crawling library. It is lightweight, efficient
         
 11. Docker remote api for mac
 
-        docker run -d  --restart always --name socat -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
-
-12. Docker registry
-
-        docker run -d  --restart always --name registry -p 5000:5000 --name registry registry:2   
-        
-13. Add hosts
-
-        {your id}       registry.zousong.com
-        {your id}       kafka.zousong.com
-        {your id}       zousong.com                      
+        docker run -d  --restart always --name socat -v /var/run/docker.sock:/var/run/docker.sock -p 2376:2375 bobrik/socat TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock                   
                         
 ### MORE DOCUMENTS
 
@@ -72,105 +62,81 @@ https://github.com/dotnetcore/DotnetSpider/wiki
 
 [View complete Codes](https://github.com/zlzforever/DotnetSpider/blob/master/src/DotnetSpider.Sample/samples/EntitySpider.cs)
 
-    public class EntitySpider : Spider
-    {
-        public static void Run()
-        {
-            var builder = new SpiderBuilder();
-            builder.AddSerilog();
-            builder.ConfigureAppConfiguration();
-            builder.UseStandalone();
-            builder.AddSpider<EntitySpider>();
-            var provider = builder.Build();
-            provider.Create<EntitySpider>().RunAsync();
-        }
+	public class EntitySpider : Spider
+	{
+		public EntitySpider(SpiderParameters parameters) : base(parameters)
+		{
+		}
+		
+		protected override void Initialize()
+		{
+			NewGuidId();
+			Scheduler = new QueueDistinctBfsScheduler();
+			Speed = 1;
+			Depth = 3;
+			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
+			AddRequests(
+				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
+				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
+		}
 
-        protected override void Initialize()
-        {
-            NewGuidId();
-            Scheduler = new QueueDistinctBfsScheduler();
-            Speed = 1;
-            Depth = 3;
-            DownloaderSettings.Type = DownloaderType.HttpClient;
-            AddDataFlow(new DataParser<BaiduSearchEntry>()).AddDataFlow(GetDefaultStorage());
-            AddRequests(
-                new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
-                new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
-        }
+		[Schema("cnblogs", "news")]
+		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
+		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
+		[FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
+		public class CnblogsEntry : EntityBase<CnblogsEntry>
+		{
+			protected override void Configure()
+			{
+				HasIndex(x => x.Title);
+				HasIndex(x => new {x.WebSite, x.Guid}, true);
+			}
 
-        [Schema("cnblogs", "cnblogs_entity_model")]
-        [EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
-        [ValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-        class BaiduSearchEntry : EntityBase<BaiduSearchEntry>
-        {
-            protected override void Configure()
-            {
-                HasIndex(x => x.Title);
-                HasIndex(x => new {x.WebSite, x.Guid}, true);
-            }
+			public int Id { get; set; }
 
-            public int Id { get; set; }
+			[Required]
+			[StringLength(200)]
+			[ValueSelector(Expression = "类别", Type = SelectorType.Enviroment)]
+			public string Category { get; set; }
 
-            [Required]
-            [StringLength(200)]
-            [ValueSelector(Expression = "类别", Type = SelectorType.Enviroment)]
-            public string Category { get; set; }
+			[Required]
+			[StringLength(200)]
+			[ValueSelector(Expression = "网站", Type = SelectorType.Enviroment)]
+			public string WebSite { get; set; }
 
-            [Required]
-            [StringLength(200)]
-            [ValueSelector(Expression = "网站", Type = SelectorType.Enviroment)]
-            public string WebSite { get; set; }
+			[StringLength(200)]
+			[ValueSelector(Expression = "//title")]
+			[ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
+			public string Title { get; set; }
 
-            [StringLength(200)]
-            [ValueSelector(Expression = "//title")]
-            [ReplaceFormatter(NewValue = "", OldValue = " - 博客园")]
-            public string Title { get; set; }
+			[StringLength(40)]
+			[ValueSelector(Expression = "GUID", Type = SelectorType.Enviroment)]
+			public string Guid { get; set; }
 
-            [StringLength(40)]
-            [ValueSelector(Expression = "GUID", Type = SelectorType.Enviroment)]
-            public string Guid { get; set; }
+			[ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
+			public string News { get; set; }
 
-            [ValueSelector(Expression = ".//h2[@class='news_entry']/a")]
-            public string News { get; set; }
+			[ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
+			public string Url { get; set; }
 
-            [ValueSelector(Expression = ".//h2[@class='news_entry']/a/@href")]
-            public string Url { get; set; }
+			[ValueSelector(Expression = ".//div[@class='entry_summary']", ValueOption = ValueOption.InnerText)]
+			public string PlainText { get; set; }
 
-            [ValueSelector(Expression = ".//div[@class='entry_summary']", ValueOption = ValueOption.InnerText)]
-            public string PlainText { get; set; }
-
-            [ValueSelector(Expression = "DATETIME", Type = SelectorType.Enviroment)]
-            public DateTime CreationTime { get; set; }
-        }
-
-        public EntitySpider(IMessageQueue mq, IStatisticsService statisticsService, ISpiderOptions options, ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
-        {
-        }
-    }
+			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Enviroment)]
+			public DateTime CreationTime { get; set; }
+		}
+	}
 
 #### Distributed spider
      
-##### start 2 agent
 
-    $ cd src/DotnetSpider.DownloaderAgent
-    $ sh build.sh
-    $ mkdir -p /Users/lewis/dotnetspider/logs/agent
-    $ docker run --name agent001 -d --restart always -e "DOTNET_SPIDER_AGENTID=agent001" -e "DOTNET_SPIDER_AGENTNAME=agent001" -e "DOTNET_SPIDER_KAFKACONSUMERGROUP=Agent" -v /Users/lewis/dotnetspider/agent/logs:/logs registry.zousong.com:5000/dotnetspider/downloader-agent:latest
-    $ docker run --name agent002 -d --restart always -e "DOTNET_SPIDER_AGENTID=agent002" -e "DOTNET_SPIDER_AGENTNAME=agent002" -e "DOTNET_SPIDER_KAFKACONSUMERGROUP=Agent" -v /Users/lewis/dotnetspider/agent/logs:/logs registry.zousong.com:5000/dotnetspider/downloader-agent:latest
-    
-#### start portal
-
-    $ mkdir -p /Users/lewis/dotnetspider/portal & cd /Users/lewis/dotnetspider/portal
-    $ curl https://raw.githubusercontent.com/dotnetcore/DotnetSpider/master/src/DotnetSpider.Portal/appsettings.json -O
-    $ docker run --name dotnetspider.portal -d --restart always -p 7897:7896 -v /Users/lewis/dotnetspider/portal/appsettings.json:/portal/appsettings.json -v /Users/lewis/dotnetspider/portal/logs:/logs registry.zousong.com:5000/dotnetspider/portal:latest
+[Read this document](https://github.com/dotnetcore/DotnetSpider/wiki/3-Distributed-Spider)
 
 #### WebDriver Support
 
 When you want to collect a page JS loaded, there is only one thing to do, set the downloader to WebDriverDownloader.
 
     Downloader = new WebDriverDownloader(Browser.Chrome);
-
-[See a complete sample](https://github.com/zlzforever/DotnetSpider/)
 
 NOTE:
 

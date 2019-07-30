@@ -20,6 +20,10 @@ namespace DotnetSpider.Sample.samples
 {
 	public class EntitySpider : Spider
 	{
+		public EntitySpider(SpiderParameters parameters) : base(parameters)
+		{
+		}
+
 		protected override void Initialize()
 		{
 			NewGuidId();
@@ -30,20 +34,6 @@ namespace DotnetSpider.Sample.samples
 			AddRequests(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
-		}
-
-		protected override async Task OnExiting()
-		{
-//			var verification = Services.GetRequiredService<Verification>();
-//			verification.EmailTo=new List<string>{"zlzforever@163.com"};
-//			verification.Subject = "cnblogs crawler";
-//			verification.AddSqlLarge("total",
-//				$"SELECT COUNT(*) FROM cnblogs.cnblogs_entity_model",
-//				10);
-//			using (var conn = new MySqlConnection(Options.StorageConnectionString))
-//			{
-//				await verification.VerifyAsync(conn);
-//			}
 		}
 
 		[Schema("cnblogs", "news")]
@@ -90,10 +80,6 @@ namespace DotnetSpider.Sample.samples
 
 			[ValueSelector(Expression = "DATETIME", Type = SelectorType.Enviroment)]
 			public DateTime CreationTime { get; set; }
-		}
-
-		public EntitySpider(SpiderParameters parameters) : base(parameters)
-		{
 		}
 	}
 }
