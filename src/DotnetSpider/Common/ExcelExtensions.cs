@@ -45,10 +45,10 @@ namespace DotnetSpider.Common
 							}
 						}
 
-						var realRowIndx = row + 1;
+						var realRowIndex = row + 1;
 						for (var j = 1; j < reader.FieldCount + 1; ++j)
 						{
-							sheet.Cells[realRowIndx, j].Value = reader.GetValue(j - 1);
+							sheet.Cells[realRowIndex, j].Value = reader.GetValue(j - 1);
 						}
 
 						row++;

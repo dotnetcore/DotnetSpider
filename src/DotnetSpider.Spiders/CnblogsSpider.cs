@@ -16,8 +16,7 @@ namespace DotnetSpider.Spiders
 {
 	public class CnblogsSpider : Spider
 	{
-		public CnblogsSpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options,
-			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
+		public CnblogsSpider(SpiderParameters parameters) : base(parameters)
 		{
 		}
 

@@ -45,8 +45,7 @@ namespace DotnetSpider.Sample.samples
 			}
 		}
 
-		public GithubSpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options,
-			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
+		public GithubSpider(SpiderParameters parameters) : base(parameters)
 		{
 		}
 

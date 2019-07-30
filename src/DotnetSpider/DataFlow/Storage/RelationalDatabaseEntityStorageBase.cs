@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -17,6 +18,9 @@ namespace DotnetSpider.DataFlow.Storage
 	public abstract class RelationalDatabaseEntityStorageBase : EntityStorageBase
 	{
 		private readonly Dictionary<string, SqlStatements> _sqlStatements = new Dictionary<string, SqlStatements>();
+
+		private readonly ConcurrentDictionary<string, object> _executedCache =
+			new ConcurrentDictionary<string, object>();
 
 		protected const string BoolType = "Boolean";
 		protected const string DateTimeType = "DateTime";
@@ -104,12 +108,11 @@ namespace DotnetSpider.DataFlow.Storage
 			{
 				foreach (var item in context.GetParseData())
 				{
-					var tableMetadata = (TableMetadata) context[item.Key];
+					var tableMetadata = (TableMetadata)context[item.Key];
 
 					SqlStatements sqlStatements = GetSqlStatements(tableMetadata);
 
-					// TODO: 需要优化，不能每次都需要尝试判断数据库
-					lock (this)
+					if (_executedCache.TryAdd(sqlStatements.CreateTableSql, new object()))
 					{
 						EnsureDatabaseAndTableCreated(conn, sqlStatements);
 					}

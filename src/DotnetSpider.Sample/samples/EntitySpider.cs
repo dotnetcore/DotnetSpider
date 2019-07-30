@@ -46,7 +46,7 @@ namespace DotnetSpider.Sample.samples
 //			}
 		}
 
-		[Schema("cnblogs", "cnblogs_entity_model")]
+		[Schema("cnblogs", "news")]
 		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
 		[FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
@@ -92,8 +92,7 @@ namespace DotnetSpider.Sample.samples
 			public DateTime CreationTime { get; set; }
 		}
 
-		public EntitySpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options,
-			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
+		public EntitySpider(SpiderParameters parameters) : base(parameters)
 		{
 		}
 	}

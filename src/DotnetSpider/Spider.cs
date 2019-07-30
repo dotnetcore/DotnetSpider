@@ -53,25 +53,15 @@ namespace DotnetSpider
 		/// <summary>
 		/// 构造方法
 		/// </summary>
-		/// <param name="eventBus"></param>
-		/// <param name="options"></param>
-		/// <param name="logger"></param>
-		/// <param name="services">服务提供接口</param>
-		/// <param name="statisticsService"></param>
-		public Spider(
-			IEventBus eventBus,
-			IStatisticsService statisticsService,
-			SpiderOptions options,
-			ILogger<Spider> logger,
-			IServiceProvider services)
+		public Spider(SpiderParameters spiderParameters)
 		{
 			Framework.RegisterEncoding();
 
-			Services = services;
-			_statisticsService = statisticsService;
-			_eventBus = eventBus;
-			Options = options;
-			Logger = logger;
+			Services = spiderParameters.ServiceProvider;
+			_statisticsService = spiderParameters.StatisticsService;
+			_eventBus = spiderParameters.EventBus;
+			Options = spiderParameters.SpiderOptions;
+			Logger = spiderParameters.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(GetType());
 			Console.CancelKeyPress += ConsoleCancelKeyPress;
 		}
 
@@ -315,7 +305,7 @@ namespace DotnetSpider
 		{
 			Logger.LogInformation($"{Id} exiting...");
 			Status = Status.Exiting;
-			// 直接取消订阅即可: 1. 如果是本地应用, 
+			// 直接取消订阅即可: 1. 如果是本地应用,
 			_eventBus.Unsubscribe($"{Options.TopicResponseHandler}{Id}");
 			return this;
 		}
@@ -400,7 +390,7 @@ namespace DotnetSpider
 				throw new SpiderException("Create default storage failed");
 			}
 
-			return (StorageBase) storage;
+			return (StorageBase)storage;
 		}
 
 		private void ResetMmfSignal()
@@ -644,7 +634,8 @@ namespace DotnetSpider
 								case DataFlowResult.Failed:
 								{
 									// 如果处理失败，则直接返回
-									Logger.LogInformation($"{Id} handle {response.Request.Url} failed: {context.Message}");
+									Logger.LogInformation(
+										$"{Id} handle {response.Request.Url} failed: {context.Message}");
 									await _statisticsService.IncrementFailedAsync(Id);
 									return;
 								}
@@ -713,12 +704,14 @@ namespace DotnetSpider
 							if (RetryWhenResultIsEmpty)
 							{
 								await _statisticsService.IncrementFailedAsync(Id);
-								Logger.LogInformation($"{Id} handle {response.Request.Url} failed，extract result is empty");
+								Logger.LogInformation(
+									$"{Id} handle {response.Request.Url} failed，extract result is empty");
 							}
 							else
 							{
 								await _statisticsService.IncrementSuccessAsync(Id);
-								Logger.LogInformation($"{Id} handle {response.Request.Url} success，extract result is empty");
+								Logger.LogInformation(
+									$"{Id} handle {response.Request.Url} success，extract result is empty");
 							}
 						}
 					}
@@ -879,42 +872,14 @@ namespace DotnetSpider
 
 		static readonly string[] Excludes =
 		{
-			"Apple_PubSub_Socket_Render",
-			"BUNDLED_TOOLS_PATH",
-			"DEBUGGER_PARENT_PROCESS_PID",
-			"DYLD_LIBRARY_PATH",
-			"HOME",
-			"LC_CTYPE",
-			"LOGNAME",
-			"MONO_CFG_DIR",
-			"MONO_CONFIG",
-			"MONO_DEBUG",
-			"MONO_GAC_PREFIX",
-			"MONO_GC_PARAMS",
-			"MONO_LOCAL_MACHINE_CERTS",
-			"MONO_PATH",
-			"PATH",
-			"PWD",
-			"RESHARPER_HOST_LOG_DIR",
-			"RESHARPER_LOG_CONF",
-			"RIDER_MONO_ARGS",
-			"RIDER_ORIGINAL_DYLD_LIBRARY_PATH",
-			"RIDER_ORIGINAL_MONO_CFG_DIR",
-			"RIDER_ORIGINAL_MONO_CONFIG",
-			"RIDER_ORIGINAL_MONO_GAC_PREFIX",
-			"RIDER_ORIGINAL_MONO_LOCAL_MACHINE_CERTS",
-			"RIDER_ORIGINAL_MONO_PATH",
-			"RIDER_ORIGINAL_MONO_TLS_PROVIDER",
-			"SHELL",
-			"SHLVL",
-			"SSH_AUTH_SOCK",
-			"TERM",
-			"TMPDIR",
-			"USER",
-			"VERSIONER_PYTHON_PREFER_32_BIT",
-			"VERSIONER_PYTHON_VERSION",
-			"XPC_FLAGS",
-			"XPC_SERVICE_NAME",
+			"Apple_PubSub_Socket_Render", "BUNDLED_TOOLS_PATH", "DEBUGGER_PARENT_PROCESS_PID", "DYLD_LIBRARY_PATH",
+			"HOME", "LC_CTYPE", "LOGNAME", "MONO_CFG_DIR", "MONO_CONFIG", "MONO_DEBUG", "MONO_GAC_PREFIX",
+			"MONO_GC_PARAMS", "MONO_LOCAL_MACHINE_CERTS", "MONO_PATH", "PATH", "PWD", "RESHARPER_HOST_LOG_DIR",
+			"RESHARPER_LOG_CONF", "RIDER_MONO_ARGS", "RIDER_ORIGINAL_DYLD_LIBRARY_PATH",
+			"RIDER_ORIGINAL_MONO_CFG_DIR", "RIDER_ORIGINAL_MONO_CONFIG", "RIDER_ORIGINAL_MONO_GAC_PREFIX",
+			"RIDER_ORIGINAL_MONO_LOCAL_MACHINE_CERTS", "RIDER_ORIGINAL_MONO_PATH",
+			"RIDER_ORIGINAL_MONO_TLS_PROVIDER", "SHELL", "SHLVL", "SSH_AUTH_SOCK", "TERM", "TMPDIR", "USER",
+			"VERSIONER_PYTHON_PREFER_32_BIT", "VERSIONER_PYTHON_VERSION", "XPC_FLAGS", "XPC_SERVICE_NAME",
 			"_NO_DEBUG_HEAP"
 		};
 

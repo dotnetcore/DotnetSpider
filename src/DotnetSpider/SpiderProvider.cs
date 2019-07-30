@@ -11,7 +11,6 @@ namespace DotnetSpider
 	public class SpiderProvider
 	{
 		private readonly IServiceProvider _serviceProvider;
-		private bool _isRunning;
 
 		public SpiderProvider(IServiceProvider serviceProvider)
 		{
@@ -43,17 +42,6 @@ namespace DotnetSpider
 		public IServiceProvider CreateScopeServiceProvider()
 		{
 			return _serviceProvider.CreateScope().ServiceProvider;
-		}
-
-		public void Start()
-		{
-			if (!_isRunning)
-			{
-				_serviceProvider.GetService<IDownloadAgentRegisterCenter>()?.StartAsync(default).ConfigureAwait(false).GetAwaiter();
-				_serviceProvider.GetService<IDownloaderAgent>()?.StartAsync(default).ConfigureAwait(false).GetAwaiter();
-				_serviceProvider.GetService<IStatisticsCenter>()?.StartAsync(default).ConfigureAwait(false).GetAwaiter();
-				_isRunning = true;
-			}
 		}
 	}
 }

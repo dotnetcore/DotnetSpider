@@ -65,20 +65,20 @@ namespace DotnetSpider.Sample.samples
 			protected override Task<DataFlowResult> Parse(DataFlowContext context)
 			{
 				var typeName = typeof(News).FullName;
-				context.AddData(typeName, new News
-				{
-					Url = context.Response.Request.Url,
-					Title = context.Response.Request.Properties["title"],
-					Summary = context.Response.Request.Properties["summary"],
-					Views = int.Parse(context.Response.Request.Properties["views"]),
-					Content = context.Selectable.Select(Selectors.XPath(".//div[@id='news_body']")).GetValue()
-				});
+				context.AddData(typeName,
+					new News
+					{
+						Url = context.Response.Request.Url,
+						Title = context.Response.Request.Properties["title"],
+						Summary = context.Response.Request.Properties["summary"],
+						Views = int.Parse(context.Response.Request.Properties["views"]),
+						Content = context.Selectable.Select(Selectors.XPath(".//div[@id='news_body']")).GetValue()
+					});
 				return Task.FromResult(DataFlowResult.Success);
 			}
 		}
 
-		public CnblogsSpider(IEventBus mq, IStatisticsService statisticsService, SpiderOptions options,
-			ILogger<Spider> logger, IServiceProvider services) : base(mq, statisticsService, options, logger, services)
+		public CnblogsSpider(SpiderParameters parameters) : base(parameters)
 		{
 		}
 
