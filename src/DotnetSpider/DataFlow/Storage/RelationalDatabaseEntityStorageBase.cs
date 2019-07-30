@@ -108,6 +108,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 					SqlStatements sqlStatements = GetSqlStatements(tableMetadata);
 
+					// TODO: 需要优化，不能每次都需要尝试判断数据库
 					lock (this)
 					{
 						EnsureDatabaseAndTableCreated(conn, sqlStatements);
@@ -131,11 +132,13 @@ namespace DotnetSpider.DataFlow.Storage
 									await conn.ExecuteAsync(sqlStatements.InsertSql, list, transaction);
 									break;
 								}
+
 								case StorageType.InsertIgnoreDuplicate:
 								{
 									await conn.ExecuteAsync(sqlStatements.InsertIgnoreDuplicateSql, list, transaction);
 									break;
 								}
+
 								case StorageType.Update:
 								{
 									if (string.IsNullOrWhiteSpace(sqlStatements.UpdateSql))
@@ -146,6 +149,7 @@ namespace DotnetSpider.DataFlow.Storage
 									await conn.ExecuteAsync(sqlStatements.UpdateSql, list, transaction);
 									break;
 								}
+
 								case StorageType.InsertAndUpdate:
 								{
 									await conn.ExecuteAsync(sqlStatements.InsertAndUpdateSql, list, transaction);
@@ -206,14 +210,17 @@ namespace DotnetSpider.DataFlow.Storage
 				{
 					return $"{tableName}_{DateTimeHelper.MondayString}";
 				}
+
 				case TablePostfix.Month:
 				{
 					return $"{tableName}_{DateTimeHelper.MonthString}";
 				}
+
 				case TablePostfix.Today:
 				{
 					return $"{tableName}_{DateTimeHelper.TodayString}";
 				}
+
 				default:
 				{
 					return tableName;

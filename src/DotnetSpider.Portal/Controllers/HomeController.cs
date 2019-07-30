@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using DotnetSpider.Portal.Models;
 using DotnetSpider.Statistics.Entity;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

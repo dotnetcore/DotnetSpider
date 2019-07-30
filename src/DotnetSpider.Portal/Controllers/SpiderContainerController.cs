@@ -19,20 +19,14 @@ namespace DotnetSpider.Portal.Controllers
 	{
 		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
-		private readonly IScheduler _sched;
-		private readonly PortalOptions _options;
 		private readonly IEventBus _eventBus;
 
 		public SpiderContainerController(PortalDbContext dbContext,
-			PortalOptions options,
-			IScheduler sched,
 			IEventBus eventBus,
 			ILogger<SpiderController> logger)
 		{
 			_logger = logger;
 			_dbContext = dbContext;
-			_sched = sched;
-			_options = options;
 			_eventBus = eventBus;
 		}
 
@@ -76,7 +70,7 @@ namespace DotnetSpider.Portal.Controllers
 				containers.GetMetaData().TotalItemCount));
 		}
 
-		[HttpPost("spider/{id}/exit")]
+		[HttpPost("spider/{batch}/exit")]
 		public async Task<IActionResult> ExitAsync(string batch)
 		{
 			try

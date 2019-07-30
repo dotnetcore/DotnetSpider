@@ -13,22 +13,15 @@ namespace DotnetSpider.DataFlow.Parser
 	/// 实体解析器
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class DataParser<T> : DataParser where T : EntityBase<T>, new()
+	public class DataParser<T> : DataParserBase<T> where T : EntityBase<T>, new()
 	{
-		private readonly Model<T> _model;
-		private readonly TableMetadata _tableMetadata;
-
-		public override string Name => $"DataParser<{typeof(T).Name}>";
-
 		/// <summary>
 		/// 构造方法
 		/// </summary>
 		public DataParser()
 		{
-			_model = new Model<T>();
-			_tableMetadata = new T().GetTableMetadata();
 			var followXPaths = new HashSet<string>();
-			foreach (var followSelector in _model.FollowSelectors)
+			foreach (var followSelector in Model.FollowSelectors)
 			{
 				foreach (var xPath in followSelector.XPaths)
 				{
@@ -37,7 +30,6 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 
 			var xPaths = followXPaths.ToArray();
-
 			FollowRequestQuerier = BuildFollowRequestQuerier(DataParserHelper.QueryFollowRequestsByXPath(xPaths));
 		}
 
@@ -48,11 +40,6 @@ namespace DotnetSpider.DataFlow.Parser
 
 		protected override Task<DataFlowResult> Parse(DataFlowContext context)
 		{
-			if (!context.Contains(_model.TypeName))
-			{
-				context.Add(_model.TypeName, _tableMetadata);
-			}
-
 			var selectable = context.Selectable;
 
 			var results = new ParseResult<T>();
@@ -67,9 +54,9 @@ namespace DotnetSpider.DataFlow.Parser
 				environments.Add(property.Key, property.Value);
 			}
 
-			if (_model.GlobalValueSelectors != null)
+			if (Model.GlobalValueSelectors != null)
 			{
-				foreach (var selector in _model.GlobalValueSelectors)
+				foreach (var selector in Model.GlobalValueSelectors)
 				{
 					string name = selector.Name;
 					if (string.IsNullOrWhiteSpace(name))
@@ -89,19 +76,19 @@ namespace DotnetSpider.DataFlow.Parser
 				}
 			}
 
-			bool singleExtractor = _model.Selector == null;
+			bool singleExtractor = Model.Selector == null;
 			if (!singleExtractor)
 			{
-				var selector = _model.Selector.ToSelector();
+				var selector = Model.Selector.ToSelector();
 
 				var list = selectable.SelectList(selector).Nodes()?.ToList();
 				if (list != null)
 				{
-					if (_model.Take > 0 && list.Count > _model.Take)
+					if (Model.Take > 0 && list.Count > Model.Take)
 					{
-						list = _model.TakeFromHead
-							? list.Take(_model.Take).ToList()
-							: list.Skip(list.Count - _model.Take).ToList();
+						list = Model.TakeFromHead
+							? list.Take(Model.Take).ToList()
+							: list.Skip(list.Count - Model.Take).ToList();
 					}
 
 					for (var i = 0; i < list.Count; ++i)
@@ -114,7 +101,7 @@ namespace DotnetSpider.DataFlow.Parser
 						}
 						else
 						{
-							Logger?.LogWarning($"解析到空数据，类型: {_model.TypeName}");
+							Logger?.LogWarning($"解析到空数据，类型: {Model.TypeName}");
 						}
 					}
 				}
@@ -128,31 +115,20 @@ namespace DotnetSpider.DataFlow.Parser
 				}
 				else
 				{
-					Logger?.LogWarning($"解析到空数据，类型: {_model.TypeName}");
+					Logger?.LogWarning($"解析到空数据，类型: {Model.TypeName}");
 				}
 			}
 
-			if (results.Count > 0)
-			{
-				var items = context.GetParseData(_model.TypeName);
-				if (items == null)
-				{
-					context.AddParseData(_model.TypeName, results);
-				}
-				else
-				{
-					((ParseResult<T>) items).AddRange(results);
-				}
-			}
+			AddParseResult(context, results);
 
-			return Task.FromResult(DataFlowResult.Success);
+			return base.Parse(context);
 		}
 
 		private T ParseObject(Dictionary<string, string> environments, ISelectable selectable,
 			int index)
 		{
 			var dataObject = new T();
-			foreach (var field in _model.ValueSelectors)
+			foreach (var field in Model.ValueSelectors)
 			{
 				string value = null;
 				if (field.Type == SelectorType.Enviroment)

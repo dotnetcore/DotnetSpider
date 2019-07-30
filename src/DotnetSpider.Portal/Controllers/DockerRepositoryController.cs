@@ -10,12 +10,10 @@ namespace DotnetSpider.Portal.Controllers
 {
 	public class DockerRepositoryController : Controller
 	{
-		private readonly ILogger _logger;
 		private readonly PortalDbContext _dbContext;
 
-		public DockerRepositoryController(PortalDbContext dbContext, ILogger<DockerRepositoryController> logger)
+		public DockerRepositoryController(PortalDbContext dbContext)
 		{
-			_logger = logger;
 			_dbContext = dbContext;
 		}
 
