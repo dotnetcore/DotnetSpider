@@ -22,16 +22,11 @@
         <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.4" />
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
         <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.8" />
-        <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.4" />
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
         <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
         <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
@@ -41,8 +36,6 @@
         <PackageReference Include="EPPlus" Version="4.5.3.2" />
         <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.2.0" />
         <PackageReference Include="lz4net" Version="1.0.15.93" />
-        <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
-        <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
         <PackageReference Include="Google.Protobuf" Version="3.6.1.0" />
     </ItemGroup>
     <ItemGroup>
