@@ -6,7 +6,7 @@ using DotnetSpider.DataFlow.Storage.Model;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
-namespace DotnetSpider.DataFlow.Storage
+namespace DotnetSpider.DataFlow.Storage.MySql
 {
 	/// <summary>
 	/// MySql 保存解析(实体)结果
@@ -269,52 +269,52 @@ namespace DotnetSpider.DataFlow.Storage
 			switch (type)
 			{
 				case BoolType:
-				{
-					dataType = "BOOL";
-					break;
-				}
+					{
+						dataType = "BOOL";
+						break;
+					}
 				case DateTimeType:
 				case DateTimeOffsetType:
-				{
-					dataType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-					break;
-				}
+					{
+						dataType = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+						break;
+					}
 
 				case DecimalType:
-				{
-					dataType = "DECIMAL(18,2)";
-					break;
-				}
+					{
+						dataType = "DECIMAL(18,2)";
+						break;
+					}
 				case DoubleType:
-				{
-					dataType = "DOUBLE";
-					break;
-				}
+					{
+						dataType = "DOUBLE";
+						break;
+					}
 				case FloatType:
-				{
-					dataType = "FLOAT";
-					break;
-				}
+					{
+						dataType = "FLOAT";
+						break;
+					}
 				case IntType:
-				{
-					dataType = "INT";
-					break;
-				}
+					{
+						dataType = "INT";
+						break;
+					}
 				case LongType:
-				{
-					dataType = "BIGINT";
-					break;
-				}
+					{
+						dataType = "BIGINT";
+						break;
+					}
 				case ByteType:
-				{
-					dataType = "INT";
-					break;
-				}
+					{
+						dataType = "INT";
+						break;
+					}
 				default:
-				{
-					dataType = length <= 0 || length > 8000 ? "LONGTEXT" : $"VARCHAR({length})";
-					break;
-				}
+					{
+						dataType = length <= 0 || length > 8000 ? "LONGTEXT" : $"VARCHAR({length})";
+						break;
+					}
 			}
 
 			return dataType;

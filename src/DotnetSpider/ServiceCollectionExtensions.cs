@@ -48,13 +48,6 @@ namespace DotnetSpider
 			return services;
 		}
 
-		public static DownloadAgentRegisterCenterBuilder UseMySqlDownloaderAgentStore(
-			this DownloadAgentRegisterCenterBuilder builder)
-		{
-			builder.Services.AddSingleton<IDownloaderAgentStore, MySqlDownloaderAgentStore>();
-			return builder;
-		}
-
 		public static DownloadAgentRegisterCenterBuilder UseLocalDownloaderAgentStore(
 			this DownloadAgentRegisterCenterBuilder builder)
 		{
@@ -145,13 +138,6 @@ namespace DotnetSpider
 		{
 			Check.NotNull(builder, nameof(builder));
 			builder.Services.AddSingleton<IStatisticsStore, MemoryStatisticsStore>();
-			return builder;
-		}
-
-		public static StatisticsBuilder UseMySql(this StatisticsBuilder builder)
-		{
-			Check.NotNull(builder, nameof(builder));
-			builder.Services.AddSingleton<IStatisticsStore, MySqlStatisticsStore>();
 			return builder;
 		}
 

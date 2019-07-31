@@ -8,6 +8,7 @@ using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
 using DotnetSpider.DataFlow.Storage.Model;
+using DotnetSpider.DataFlow.Storage.MySql;
 using MySql.Data.MySqlClient;
 using Xunit;
 
@@ -17,22 +18,22 @@ namespace DotnetSpider.Tests.Data.Storage
 	{
 		protected virtual string Escape => "`";
 
-		class IndexInfo
+		private class IndexInfo
 		{
 			// ReSharper disable once InconsistentNaming
 			// ReSharper disable once UnusedAutoPropertyAccessor.Local
 			public int Non_unique { get; set; }
-			
+
 			// ReSharper disable once InconsistentNaming			
 			// ReSharper disable once UnusedAutoPropertyAccessor.Local
 			public string Key_name { get; set; }
-			
+
 			// ReSharper disable once InconsistentNaming
 			// ReSharper disable once UnusedAutoPropertyAccessor.Local
 			public string Column_name { get; set; }
 		}
 
-		class PrimaryInfo
+		private class PrimaryInfo
 		{
 			// ReSharper disable once InconsistentNaming
 			// ReSharper disable once UnusedAutoPropertyAccessor.Local
@@ -527,7 +528,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				await conn.ExecuteAsync(
 					$"drop table if exists {Escape}test{Escape}.{Escape}createtableprimay{Escape};");
 				var services = SpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = (RelationalDatabaseEntityStorageBase) CreateStorage(StorageType.InsertIgnoreDuplicate);
+				var storage = (RelationalDatabaseEntityStorageBase)CreateStorage(StorageType.InsertIgnoreDuplicate);
 				storage.UseTransaction = true;
 				var dfc = new DataFlowContext(null, services);
 				var typeName = typeof(CreateTableEntity4).FullName;
@@ -570,7 +571,7 @@ namespace DotnetSpider.Tests.Data.Storage
 				// 如果实体的 Schema 没有配置表名，则使用类名
 				await conn.ExecuteAsync($"drop table if exists {Escape}test{Escape}.{Escape}IgnoreCase{Escape};");
 				var services = SpiderProvider.Value.CreateScopeServiceProvider();
-				var storage = (RelationalDatabaseEntityStorageBase) CreateStorage(StorageType.Insert);
+				var storage = (RelationalDatabaseEntityStorageBase)CreateStorage(StorageType.Insert);
 				storage.IgnoreCase = false;
 				var dfc = new DataFlowContext(null, services);
 				var typeName = typeof(CreateTableEntity7).FullName;
@@ -639,7 +640,7 @@ namespace DotnetSpider.Tests.Data.Storage
 			}
 		}
 
-		class CreateTableEntity1 : EntityBase<CreateTableEntity1>
+		private class CreateTableEntity1 : EntityBase<CreateTableEntity1>
 		{
 			public string Str1 { get; set; } = "xxx";
 
@@ -661,7 +662,7 @@ namespace DotnetSpider.Tests.Data.Storage
 		}
 
 		[Schema(null, "CreateTableNoTableName")]
-		class CreateTableEntity2 : EntityBase<CreateTableEntity2>
+		private class CreateTableEntity2 : EntityBase<CreateTableEntity2>
 		{
 			public string Str1 { get; set; } = "xxx";
 
@@ -683,7 +684,7 @@ namespace DotnetSpider.Tests.Data.Storage
 		}
 
 		[Schema("test", "CreateTable")]
-		class CreateTableEntity3 : EntityBase<CreateTableEntity3>
+		private class CreateTableEntity3 : EntityBase<CreateTableEntity3>
 		{
 			public string Str1 { get; set; } = "xxx";
 
@@ -705,7 +706,7 @@ namespace DotnetSpider.Tests.Data.Storage
 		}
 
 		[Schema("test", "createtableprimay")]
-		class CreateTableEntity4 : EntityBase<CreateTableEntity4>
+		private class CreateTableEntity4 : EntityBase<CreateTableEntity4>
 		{
 			public string Str1 { get; set; } = "xxx";
 
@@ -732,7 +733,7 @@ namespace DotnetSpider.Tests.Data.Storage
 		}
 
 		[Schema("test", "createtableautoincprimay")]
-		class CreateTableEntity5 : EntityBase<CreateTableEntity5>
+		private class CreateTableEntity5 : EntityBase<CreateTableEntity5>
 		{
 			public string Str1 { get; set; } = "xxx";
 
@@ -756,7 +757,7 @@ namespace DotnetSpider.Tests.Data.Storage
 		}
 
 		[Schema("test", "updatepartcolumns")]
-		class CreateTableEntity6 : EntityBase<CreateTableEntity6>
+		private class CreateTableEntity6 : EntityBase<CreateTableEntity6>
 		{
 			public string Str1 { get; set; } = "xxx";
 
@@ -779,12 +780,12 @@ namespace DotnetSpider.Tests.Data.Storage
 			protected override void Configure()
 			{
 				HasKey(x => x.Str2);
-				ConfigureUpdateColumns(x => new {x.Str1, x.Double});
+				ConfigureUpdateColumns(x => new { x.Str1, x.Double });
 			}
 		}
 
 		[Schema("test", "IgnoreCase")]
-		class CreateTableEntity7 : EntityBase<CreateTableEntity7>
+		private class CreateTableEntity7 : EntityBase<CreateTableEntity7>
 		{
 			public string Str1 { get; set; } = "xxx";
 
@@ -806,7 +807,7 @@ namespace DotnetSpider.Tests.Data.Storage
 		}
 
 		[Schema("test", "createtablemultiprimay")]
-		class CreateTableEntity8 : EntityBase<CreateTableEntity8>
+		private class CreateTableEntity8 : EntityBase<CreateTableEntity8>
 		{
 			public string Str1 { get; set; } = "xxx";
 
@@ -828,12 +829,12 @@ namespace DotnetSpider.Tests.Data.Storage
 
 			protected override void Configure()
 			{
-				HasKey(x => new {x.Str2, x.Decimal});
+				HasKey(x => new { x.Str2, x.Decimal });
 			}
 		}
 
 		[Schema("test", "createtableindexes")]
-		class CreateTableEntity9 : EntityBase<CreateTableEntity9>
+		private class CreateTableEntity9 : EntityBase<CreateTableEntity9>
 		{
 			[StringLength(100)] public string Str1 { get; set; } = "Str1";
 
@@ -847,10 +848,10 @@ namespace DotnetSpider.Tests.Data.Storage
 			protected override void Configure()
 			{
 				HasIndex(x => x.Str1);
-				HasIndex(x => new {x.Str1, x.Str2});
+				HasIndex(x => new { x.Str1, x.Str2 });
 
 				HasIndex(x => x.Str3, true);
-				HasIndex(x => new {x.Str3, x.Str4}, true);
+				HasIndex(x => new { x.Str3, x.Str4 }, true);
 			}
 		}
 	}

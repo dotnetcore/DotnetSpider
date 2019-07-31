@@ -21,7 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
-      <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+      <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
     </ItemGroup>
 
 

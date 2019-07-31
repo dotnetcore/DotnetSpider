@@ -68,7 +68,7 @@ namespace DotnetSpider.DownloadAgentRegisterCenter.Internal
 						agent);
 					await conn.ExecuteAsync(
 						"UPDATE dotnetspider.downloader_agent SET last_modification_time = @LastModificationTime WHERE id = @AgentId",
-						new {agent.AgentId, LastModificationTime = agent.CreationTime});
+						new { agent.AgentId, LastModificationTime = agent.CreationTime });
 				}
 			}
 		}
