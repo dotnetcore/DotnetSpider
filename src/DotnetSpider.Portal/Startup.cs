@@ -41,7 +41,7 @@ namespace DotnetSpider.Portal
 			services.AddStatisticsCenter(x => x.UseMySql());
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-			// Add DbContext            
+			// Add DbContext
 			Action<DbContextOptionsBuilder> dbContextOptionsBuilder;
 			var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 			switch (_options.Database?.ToLower())
@@ -128,7 +128,7 @@ namespace DotnetSpider.Portal
 					default:
 					{
 						if (conn.QuerySingle<int>(
-							    "SELECT COUNT(*) from sysobjects WHERE id = object_id(N'[dbo].[QRTZ_FIRED_TRIGGERS]') AND OBJECTPROPERTY(id, N'') = 1IsUserTable") ==
+							    "SELECT COUNT(*) from sysobjects WHERE id = object_id(N'[dbo].[QRTZ_FIRED_TRIGGERS]') AND OBJECTPROPERTY(id, N'') = IsUserTable") ==
 						    0
 						)
 						{
