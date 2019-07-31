@@ -15,34 +15,89 @@ namespace DotnetSpider.Tests
 {
 	public class SpiderTests : TestBase
 	{
-		public class MyStorageOptions : SpiderOptions
+		public class SqlServerStorageOptions : SpiderOptions
 		{
-			public string ConnectionString { get; set; }
-			public string StorageConnectionString { get; set; }
-			public string Storage { get; set; }
-			public StorageType StorageType { get; set; }
-			public string MySqlFileType { get; set; }
-			public bool StorageIgnoreCase { get; set; }
-			public int StorageRetryTimes { get; set; }
-			public bool StorageUseTransaction { get; set; }
-			public string EmailHost { get; }
-			public string EmailAccount { get; }
-			public string EmailPassword { get; }
-			public string EmailDisplayName { get; }
-			public string EmailPort { get; }
-			public string KafkaBootstrapServers { get; }
-			public string KafkaConsumerGroup { get; }
-			public int MessageQueueRetryTimes { get; }
-			public int MessageExpiredTime { get; }
-			public int NonRespondedLimitation { get; }
+			public override string StorageConnectionString => "ConnectionString";
+			public override string Storage => "DotnetSpider.DataFlow.Storage.SqlServerEntityStorage,DotnetSpider";
+			public override StorageType StorageType => StorageType.InsertAndUpdate;
 
-			/// <summary>
-			/// 当一直得不到下载请求一段时间后，任务退出
-			/// 单位: 秒
-			/// </summary>
-			public int NonRespondedTimeout { get; }
+			public override bool StorageIgnoreCase => false;
+			public override int StorageRetryTimes => 800;
+			public override bool StorageUseTransaction => true;
 
-			public MyStorageOptions() : base(null)
+			public SqlServerStorageOptions() : base(null)
+			{
+			}
+		}
+
+		public class MySqlStorageOptions : SpiderOptions
+		{
+			public override string StorageConnectionString => "ConnectionString";
+			public override string Storage => "DotnetSpider.DataFlow.Storage.MySqlEntityStorage,DotnetSpider";
+			public override StorageType StorageType => StorageType.InsertAndUpdate;
+
+			public override bool StorageIgnoreCase => false;
+			public override int StorageRetryTimes => 800;
+			public override bool StorageUseTransaction => true;
+
+			public MySqlStorageOptions() : base(null)
+			{
+			}
+		}
+
+		public class MySqlFileStorageOptions : SpiderOptions
+		{
+			public override string StorageConnectionString => "ConnectionString";
+			public override string Storage => "DotnetSpider.DataFlow.Storage.MySqlFileEntityStorage,DotnetSpider";
+			public override StorageType StorageType => StorageType.InsertAndUpdate;
+
+			public override bool StorageIgnoreCase => false;
+			public override int StorageRetryTimes => 800;
+			public override bool StorageUseTransaction => true;
+
+			public override string MySqlFileType => "LoadFile";
+
+			public MySqlFileStorageOptions() : base(null)
+			{
+			}
+		}
+
+		public class PostgreSqlStorageOptions : SpiderOptions
+		{
+			public override string StorageConnectionString => "ConnectionString";
+
+			public override string Storage =>
+				"DotnetSpider.DataFlow.Storage.PostgreSql.PostgreSqlEntityStorage,DotnetSpider.PostgreSql";
+
+			public override StorageType StorageType => StorageType.InsertAndUpdate;
+
+			public override bool StorageIgnoreCase => false;
+			public override int StorageRetryTimes => 800;
+			public override bool StorageUseTransaction => true;
+
+			public override string MySqlFileType => "LoadFile";
+
+			public PostgreSqlStorageOptions() : base(null)
+			{
+			}
+		}
+
+		public class MongoStorageOptions : SpiderOptions
+		{
+			public override string StorageConnectionString => "mongodb://mongodb0.example.com:27017/admin";
+
+			public override string Storage =>
+				"DotnetSpider.DataFlow.Storage.Mongo.MongoEntityStorage,DotnetSpider.Mongo";
+
+			public override StorageType StorageType => StorageType.InsertAndUpdate;
+
+			public override bool StorageIgnoreCase => false;
+			public override int StorageRetryTimes => 800;
+			public override bool StorageUseTransaction => true;
+
+			public override string MySqlFileType => "LoadFile";
+
+			public MongoStorageOptions() : base(null)
 			{
 			}
 		}
@@ -50,17 +105,10 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "CreateDefaultStorage")]
 		public void CreateDefaultStorage()
 		{
-			var options = new MyStorageOptions
-			{
-				Storage = "DotnetSpider.DataFlow.Storage.SqlServerEntityStorage,DotnetSpider",
-				StorageType = StorageType.InsertAndUpdate,
-				StorageConnectionString = "ConnectionString",
-				StorageUseTransaction = true,
-				StorageRetryTimes = 800,
-				StorageIgnoreCase = false
-			};
+			SpiderOptions options = new SqlServerStorageOptions();
+			;
 			// SqlServer
-			var storage1 = (SqlServerEntityStorage) Spider.GetDefaultStorage(options);
+			var storage1 = (SqlServerEntityStorage)Spider.GetDefaultStorage(options);
 			Assert.Equal("ConnectionString", storage1.ConnectionString);
 			Assert.Equal(800, storage1.RetryTimes);
 			Assert.True(storage1.UseTransaction);
@@ -68,9 +116,9 @@ namespace DotnetSpider.Tests
 			Assert.Equal(StorageType.InsertAndUpdate, storage1.StorageType);
 
 			// MySql
-			options.Storage = "DotnetSpider.DataFlow.Storage.MySqlEntityStorage,DotnetSpider";
+			options = new MySqlStorageOptions();
 
-			var storage2 = (MySqlEntityStorage) Spider.GetDefaultStorage(options);
+			var storage2 = (MySqlEntityStorage)Spider.GetDefaultStorage(options);
 			Assert.Equal("ConnectionString", storage2.ConnectionString);
 			Assert.Equal(800, storage2.RetryTimes);
 			Assert.True(storage2.UseTransaction);
@@ -78,18 +126,16 @@ namespace DotnetSpider.Tests
 			Assert.Equal(StorageType.InsertAndUpdate, storage2.StorageType);
 
 			// MySqlFile
-			options.Storage = "DotnetSpider.DataFlow.Storage.MySqlFileEntityStorage,DotnetSpider";
-			options.MySqlFileType = "LoadFile";
+			options = new MySqlFileStorageOptions();
 
-			var storage3 = (MySqlFileEntityStorage) Spider.GetDefaultStorage(options);
+			var storage3 = (MySqlFileEntityStorage)Spider.GetDefaultStorage(options);
 			Assert.False(storage3.IgnoreCase);
 			Assert.Equal(MySqlFileType.LoadFile, storage3.MySqlFileType);
 
 			// PostgreSql
-			options.Storage =
-				"DotnetSpider.DataFlow.Storage.PostgreSql.PostgreSqlEntityStorage,DotnetSpider.PostgreSql";
+			options = new PostgreSqlStorageOptions();
 
-			var storage4 = (PostgreSqlEntityStorage) Spider.GetDefaultStorage(options);
+			var storage4 = (PostgreSqlEntityStorage)Spider.GetDefaultStorage(options);
 			Assert.Equal("ConnectionString", storage4.ConnectionString);
 			Assert.Equal(800, storage4.RetryTimes);
 			Assert.True(storage4.UseTransaction);
@@ -97,10 +143,10 @@ namespace DotnetSpider.Tests
 			Assert.Equal(StorageType.InsertAndUpdate, storage4.StorageType);
 
 			// Mongo
-			options.Storage = "DotnetSpider.DataFlow.Storage.Mongo.MongoEntityStorage,DotnetSpider.Mongo";
-			options.StorageConnectionString = "mongodb://mongodb0.example.com:27017/admin";
+			options = new MongoStorageOptions();
+			;
 
-			var storage5 = (MongoEntityStorage) Spider.GetDefaultStorage(options);
+			var storage5 = (MongoEntityStorage)Spider.GetDefaultStorage(options);
 			Assert.Equal("mongodb://mongodb0.example.com:27017/admin", storage5.ConnectionString);
 		}
 
@@ -193,8 +239,7 @@ namespace DotnetSpider.Tests
 			spider.Scheduler = scheduler;
 			spider.AddRequests(new Request("http://www.RetryDownloadTimes.com")
 			{
-				DownloaderType = DownloaderType.Exception,
-				RetryTimes = 5
+				DownloaderType = DownloaderType.Exception, RetryTimes = 5
 			});
 			await spider.RunAsync();
 
@@ -237,8 +282,7 @@ namespace DotnetSpider.Tests
 			spider.Scheduler = new QueueDistinctBfsScheduler();
 			spider.AddRequests(new Request("http://www.DoNotRetryWhenResultIsEmpty.com")
 			{
-				DownloaderType = DownloaderType.Empty,
-				RetryTimes = 5
+				DownloaderType = DownloaderType.Empty, RetryTimes = 5
 			});
 			await spider.RunAsync();
 
@@ -288,8 +332,7 @@ namespace DotnetSpider.Tests
 			spider.Scheduler = new QueueDistinctBfsScheduler();
 			spider.AddRequests(new Request("http://www.RetryWhenResultIsEmpty.com")
 			{
-				DownloaderType = DownloaderType.Empty,
-				RetryTimes = 5
+				DownloaderType = DownloaderType.Empty, RetryTimes = 5
 			});
 			spider.RunAsync().Wait();
 
@@ -321,7 +364,7 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "SpeedInterval")]
 		public void SpeedInterval()
 		{
-			//TODO: 
+			//TODO:
 		}
 
 		/// <summary>
@@ -331,7 +374,7 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "Depth")]
 		public void Depth()
 		{
-			//TODO: 
+			//TODO:
 		}
 
 		/// <summary>
@@ -340,7 +383,7 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "Status")]
 		public void Status2()
 		{
-			//TODO: 
+			//TODO:
 		}
 
 		/// <summary>

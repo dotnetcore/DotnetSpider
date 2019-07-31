@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using Dapper;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage.Model;
 using Npgsql;
 
@@ -14,6 +15,21 @@ namespace DotnetSpider.DataFlow.Storage.PostgreSql
 	/// </summary>
 	public class PostgreSqlEntityStorage : MySqlEntityStorage
 	{
+		/// <summary>
+		/// 根据配置返回存储器
+		/// </summary>
+		/// <param name="options">配置</param>
+		/// <returns></returns>
+		public new static PostgreSqlEntityStorage CreateFromOptions(SpiderOptions options)
+		{
+			return new PostgreSqlEntityStorage(options.StorageType, options.StorageConnectionString)
+			{
+				IgnoreCase = options.StorageIgnoreCase,
+				RetryTimes = options.StorageRetryTimes,
+				UseTransaction = options.StorageUseTransaction
+			};
+		}
+
 		/// <summary>
 		/// 创建数据库和表
 		/// </summary>

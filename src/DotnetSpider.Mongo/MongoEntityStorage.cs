@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage.Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -20,6 +21,16 @@ namespace DotnetSpider.DataFlow.Storage.Mongo
 
 		private readonly ConcurrentDictionary<string, IMongoDatabase> _cache =
 			new ConcurrentDictionary<string, IMongoDatabase>();
+
+		/// <summary>
+		/// 根据配置返回存储器
+		/// </summary>
+		/// <param name="options">配置</param>
+		/// <returns></returns>
+		public static MongoEntityStorage CreateFromOptions(SpiderOptions options)
+		{
+			return new MongoEntityStorage(options.StorageConnectionString);
+		}
 
 		/// <summary>
 		/// 构造方法

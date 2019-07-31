@@ -19,89 +19,89 @@ namespace DotnetSpider.Common
 		/// <summary>
 		/// 数据库连接字符串
 		/// </summary>
-		public string ConnectionString => _configuration["ConnectionString"];
+		public virtual string ConnectionString => _configuration["ConnectionString"];
 
 		/// <summary>
 		/// 数据库连接字符串
 		/// </summary>
-		public string StorageConnectionString => _configuration["StorageConnectionString"];
+		public virtual  string StorageConnectionString => _configuration["StorageConnectionString"];
 
 		/// <summary>
 		/// 存储器类型: FullTypeName, AssemblyName
 		/// </summary>
-		public string Storage => _configuration["Storage"];
+		public virtual  string Storage => _configuration["Storage"];
 
 		/// <summary>
 		/// 是否忽略数据库相关的大写小
 		/// </summary>
-		public bool StorageIgnoreCase => string.IsNullOrWhiteSpace(_configuration["IgnoreCase"]) ||
+		public virtual  bool StorageIgnoreCase => string.IsNullOrWhiteSpace(_configuration["IgnoreCase"]) ||
 		                                 bool.Parse(_configuration["StorageIgnoreCase"]);
 
 		/// <summary>
 		/// 存储器失败重试次数限制
 		/// </summary>
-		public int StorageRetryTimes => string.IsNullOrWhiteSpace(_configuration["StorageRetryTimes"])
+		public virtual  int StorageRetryTimes => string.IsNullOrWhiteSpace(_configuration["StorageRetryTimes"])
 			? 600
 			: int.Parse(_configuration["StorageRetryTimes"]);
 
 		/// <summary>
 		/// 是否使用事务操作。默认不使用。
 		/// </summary>
-		public bool StorageUseTransaction => !string.IsNullOrWhiteSpace(_configuration["StorageUseTransaction"]) &&
+		public virtual  bool StorageUseTransaction => !string.IsNullOrWhiteSpace(_configuration["StorageUseTransaction"]) &&
 		                                     bool.Parse(_configuration["StorageUseTransaction"]);
 
 		/// <summary>
 		/// 存储器类型
 		/// </summary>
-		public StorageType StorageType => string.IsNullOrWhiteSpace(_configuration["StorageType"])
+		public virtual  StorageType StorageType => string.IsNullOrWhiteSpace(_configuration["StorageType"])
 			? StorageType.InsertIgnoreDuplicate
 			: (StorageType) Enum.Parse(typeof(StorageType), _configuration["StorageType"]);
 
 		/// <summary>
 		/// MySql 文件类型
 		/// </summary>
-		public string MySqlFileType => _configuration["MySqlFileType"];
+		public virtual  string MySqlFileType => _configuration["MySqlFileType"];
 
 		/// <summary>
 		/// 邮件服务地址
 		/// </summary>
-		public string EmailHost => _configuration["EmailHost"];
+		public virtual  string EmailHost => _configuration["EmailHost"];
 
 		/// <summary>
 		/// 邮件用户名
 		/// </summary>
-		public string EmailAccount => _configuration["EmailAccount"];
+		public virtual  string EmailAccount => _configuration["EmailAccount"];
 
 		/// <summary>
 		/// 邮件密码
 		/// </summary>
-		public string EmailPassword => _configuration["EmailPassword"];
+		public virtual  string EmailPassword => _configuration["EmailPassword"];
 
 		/// <summary>
 		/// 邮件显示名称
 		/// </summary>
-		public string EmailDisplayName => _configuration["EmailDisplayName"];
+		public virtual  string EmailDisplayName => _configuration["EmailDisplayName"];
 
 		/// <summary>
 		/// 邮件服务端口
 		/// </summary>
-		public int EmailPort => int.Parse(_configuration["EmailPort"]);
+		public virtual  int EmailPort => int.Parse(_configuration["EmailPort"]);
 
-		public string TopicResponseHandler => "ResponseHandler-";
+		public virtual  string TopicResponseHandler => "ResponseHandler-";
 
-		public string TopicDownloaderAgentRegisterCenter => "DownloaderAgentRegisterCenter";
+		public virtual  string TopicDownloaderAgentRegisterCenter => "DownloaderAgentRegisterCenter";
 
-		public string TopicStatisticsService => "StatisticsService";
+		public virtual  string TopicStatisticsService => "StatisticsService";
 
-		public string TopicDownloadQueue =>"DownloadQueue";
+		public virtual  string TopicDownloadQueue =>"DownloadQueue";
 
-		public string TopicAdslDownloadQueue => "AdslDownloadQueue";
+		public virtual  string TopicAdslDownloadQueue => "AdslDownloadQueue";
 
 		/// <summary>
 		/// 消息队列推送消息、文章话题、获取消息失败重试的次数
 		/// 默认是 28800 次即 8 小时
 		/// </summary>
-		public int MessageQueueRetryTimes => string.IsNullOrWhiteSpace(_configuration["MessageQueueRetryTimes"])
+		public virtual  int MessageQueueRetryTimes => string.IsNullOrWhiteSpace(_configuration["MessageQueueRetryTimes"])
 			? 28800
 			: int.Parse(_configuration["MessageQueueRetryTimes"]);
 
@@ -109,7 +109,7 @@ namespace DotnetSpider.Common
 		/// 设置消息过期时间，每个消息发送应该带上时间，超时的消息不作处理
 		/// 默认值 60 秒
 		/// </summary>
-		public int MessageExpiredTime => string.IsNullOrWhiteSpace(_configuration["MessageExpiredTime"])
+		public virtual  int MessageExpiredTime => string.IsNullOrWhiteSpace(_configuration["MessageExpiredTime"])
 			? 60
 			: int.Parse(_configuration["MessageExpiredTime"]);
 	}
