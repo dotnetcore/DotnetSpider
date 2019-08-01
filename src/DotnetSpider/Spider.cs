@@ -862,7 +862,10 @@ namespace DotnetSpider
 
 					_enqueuedRequestDict.TryAdd(request.Hash, request);
 					await _eventBus.PublishAsync(topic,
-						new Event {Type = Framework.DownloadCommand, Data = JsonConvert.SerializeObject(requests)});
+						new Event
+						{
+							Type = Framework.DownloadCommand, Data = JsonConvert.SerializeObject(new[] {request})
+						});
 				}
 
 
