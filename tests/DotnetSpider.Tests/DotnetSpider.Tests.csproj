@@ -19,8 +19,8 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
         <ProjectReference Include="..\..\src\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
+        <ProjectReference Include="..\..\src\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
         <ProjectReference Include="..\..\src\DotnetSpider.PostgreSql\DotnetSpider.PostgreSql.csproj" />
-        <ProjectReference Include="..\..\src\DotnetSpider\DotnetSpider.csproj" />
     </ItemGroup>
 
     <ItemGroup>

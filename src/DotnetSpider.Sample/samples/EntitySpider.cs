@@ -1,20 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Attribute;
 using DotnetSpider.DataFlow.Parser.Formatter;
 using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Downloader;
-using DotnetSpider.EventBus;
 using DotnetSpider.Scheduler;
 using DotnetSpider.Selector;
-using DotnetSpider.Statistics;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
 
 namespace DotnetSpider.Sample.samples
 {
@@ -32,20 +25,20 @@ namespace DotnetSpider.Sample.samples
 			Depth = 3;
 			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
 			AddRequests(
-				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> {{"网站", "博客园"}}),
-				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> {{"网站", "博客园"}}));
+				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> { { "网站", "博客园" } }),
+				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> { { "网站", "博客园" } }));
 		}
 
 		[Schema("cnblogs", "news")]
 		[EntitySelector(Expression = ".//div[@class='news_block']", Type = SelectorType.XPath)]
 		[GlobalValueSelector(Expression = ".//a[@class='current']", Name = "类别", Type = SelectorType.XPath)]
-		[FollowSelector(XPaths = new[] {"//div[@class='pager']"})]
+		[FollowSelector(XPaths = new[] { "//div[@class='pager']" })]
 		public class CnblogsEntry : EntityBase<CnblogsEntry>
 		{
 			protected override void Configure()
 			{
 				HasIndex(x => x.Title);
-				HasIndex(x => new {x.WebSite, x.Guid}, true);
+				HasIndex(x => new { x.WebSite, x.Guid }, true);
 			}
 
 			public int Id { get; set; }

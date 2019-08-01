@@ -3,7 +3,6 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp2.2</TargetFramework>
         <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
 
@@ -22,7 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
-      <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
+      <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
     </ItemGroup>
 
 

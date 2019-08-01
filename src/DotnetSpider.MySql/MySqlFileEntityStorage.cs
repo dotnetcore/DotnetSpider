@@ -8,7 +8,7 @@ using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage.Model;
 using MySql.Data.MySqlClient;
 
-namespace DotnetSpider.DataFlow.Storage
+namespace DotnetSpider.DataFlow.Storage.MySql
 {
 	/// <summary>
 	/// 文件类型
@@ -49,7 +49,7 @@ namespace DotnetSpider.DataFlow.Storage
 		{
 			var fileType = string.IsNullOrWhiteSpace(options.MySqlFileType)
 				? MySqlFileType.InsertSql
-				: (MySqlFileType) Enum.Parse(typeof(MySqlFileType),
+				: (MySqlFileType)Enum.Parse(typeof(MySqlFileType),
 					options.MySqlFileType);
 			return new MySqlFileEntityStorage(fileType)
 			{
@@ -70,19 +70,19 @@ namespace DotnetSpider.DataFlow.Storage
 		{
 			foreach (var item in context.GetParseData())
 			{
-				var tableMetadata = (TableMetadata) context[item.Key];
+				var tableMetadata = (TableMetadata)context[item.Key];
 				switch (MySqlFileType)
 				{
 					case MySqlFileType.LoadFile:
-					{
-						WriteLoadFile(context, tableMetadata, item.Value);
-						break;
-					}
+						{
+							WriteLoadFile(context, tableMetadata, item.Value);
+							break;
+						}
 					case MySqlFileType.InsertSql:
-					{
-						WriteInsertFile(context, tableMetadata, item.Value);
-						break;
-					}
+						{
+							WriteInsertFile(context, tableMetadata, item.Value);
+							break;
+						}
 				}
 			}
 
