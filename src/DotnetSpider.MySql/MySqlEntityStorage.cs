@@ -6,6 +6,7 @@ using DotnetSpider.DataFlow.Storage.Model;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
+// ReSharper disable once CheckNamespace
 namespace DotnetSpider.DataFlow.Storage.MySql
 {
 	/// <summary>

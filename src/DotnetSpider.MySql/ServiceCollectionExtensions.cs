@@ -1,15 +1,16 @@
 using DotnetSpider.DataFlow;
 using DotnetSpider.DownloadAgentRegisterCenter;
-using DotnetSpider.DownloadAgentRegisterCenter.Internal;
+using DotnetSpider.MySql.DownloadAgentRegisterCenter;
+using DotnetSpider.MySql.DownloadAgentRegisterCenter.Store;
 using DotnetSpider.Statistics;
 using DotnetSpider.Statistics.Store;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DotnetSpider
+namespace DotnetSpider.MySql
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static DownloadAgentRegisterCenterBuilder UseMySqlDownloaderAgentStore(
+		public static DownloadAgentRegisterCenterBuilder UseMySql(
 			this DownloadAgentRegisterCenterBuilder builder)
 		{
 			builder.Services.AddSingleton<IDownloaderAgentStore, MySqlDownloaderAgentStore>();

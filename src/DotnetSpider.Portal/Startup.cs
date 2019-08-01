@@ -5,6 +5,7 @@ using System.Reflection;
 using Dapper;
 using DotnetSpider.Common;
 using DotnetSpider.Kafka;
+using DotnetSpider.MySql;
 using DotnetSpider.Portal.Entity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,7 +38,7 @@ namespace DotnetSpider.Portal
 			services.AddSingleton<PortalOptions>();
 
 			services.AddKafkaEventBus();
-			services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
+			services.AddDownloadCenter(x => x.UseMySql());
 			services.AddStatisticsCenter(x => x.UseMySql());
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

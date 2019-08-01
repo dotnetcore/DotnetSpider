@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 
-namespace DotnetSpider.DownloadAgentRegisterCenter.Internal
+namespace DotnetSpider.DownloadAgentRegisterCenter.Store
 {
 	/// <summary>
 	/// 本地下载器代理存储

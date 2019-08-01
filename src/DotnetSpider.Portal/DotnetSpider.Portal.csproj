@@ -1,43 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>netcoreapp2.2</TargetFramework>
-        <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+  </PropertyGroup>
 
 
-    <ItemGroup>
-        <PackageReference Include="Docker.DotNet" Version="3.125.2" />
-        <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-        <PackageReference Include="MySql.Data" Version="8.0.16" />
-        <PackageReference Include="BuildBundlerMinifier" Version="2.9.406" />
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
-        <PackageReference Include="Quartz" Version="3.0.7" />
-        <PackageReference Include="X.PagedList.Mvc.Core" Version="7.6.0" />
-        
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Docker.DotNet" Version="3.125.2"/>
+    <PackageReference Include="Microsoft.AspNetCore.App"/>
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All"/>
+    <PackageReference Include="BuildBundlerMinifier" Version="2.9.406"/>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0"/>
+    <PackageReference Include="Quartz" Version="3.0.7"/>
+    <PackageReference Include="X.PagedList.Mvc.Core" Version="7.6.0"/>
+    <PackageReference Include="MySql.Data" Version="8.0.16" />
+  </ItemGroup>
 
 
-    <ItemGroup>
-      <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
-      <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj"/>
+    <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj"/>
+  </ItemGroup>
 
 
-    <ItemGroup>
-      <Content Update="appsettings.json">
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 
-    <ItemGroup>
-      <None Remove="DDL\SqlServer.sql" />
-      <EmbeddedResource Include="DDL\SqlServer.sql" />
-      <None Remove="DDL\MySql.sql" />
-      <EmbeddedResource Include="DDL\MySql.sql" />
-    </ItemGroup>
+  <ItemGroup>
+    <None Remove="DDL\SqlServer.sql"/>
+    <EmbeddedResource Include="DDL\SqlServer.sql"/>
+    <None Remove="DDL\MySql.sql"/>
+    <EmbeddedResource Include="DDL\MySql.sql"/>
+  </ItemGroup>
 
 </Project>

@@ -3,10 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using DotnetSpider.Common;
+using DotnetSpider.DownloadAgentRegisterCenter;
 using DotnetSpider.DownloadAgentRegisterCenter.Entity;
 using MySql.Data.MySqlClient;
 
-namespace DotnetSpider.DownloadAgentRegisterCenter.Internal
+namespace DotnetSpider.MySql.DownloadAgentRegisterCenter.Store
 {
 	public class MySqlDownloaderAgentStore : IDownloaderAgentStore
 	{

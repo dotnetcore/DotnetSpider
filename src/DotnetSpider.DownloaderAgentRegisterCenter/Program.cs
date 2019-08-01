@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using DotnetSpider.Common;
 using DotnetSpider.Kafka;
+using DotnetSpider.MySql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,10 +39,10 @@ namespace DotnetSpider.DownloaderAgentRegisterCenter
 						.WriteTo.Console().WriteTo
 						.RollingFile("/logs/register-center/register-center.log");
 					Log.Logger = configure.CreateLogger();
-					
+
 					services.AddSingleton<SpiderOptions>();
 					services.AddKafkaEventBus();
-					services.AddDownloadCenter(x => x.UseMySqlDownloaderAgentStore());
+					services.AddDownloadCenter(x => x.UseMySql());
 					services.AddStatisticsCenter(x => x.UseMySql());
 				})
 				.UseEnvironment(args.Contains("/dev") ? EnvironmentName.Development : EnvironmentName.Production)

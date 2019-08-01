@@ -3,7 +3,7 @@ using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DownloadAgent;
 using DotnetSpider.DownloadAgentRegisterCenter;
-using DotnetSpider.DownloadAgentRegisterCenter.Internal;
+using DotnetSpider.DownloadAgentRegisterCenter.Store;
 using DotnetSpider.EventBus;
 using DotnetSpider.Network;
 using DotnetSpider.Network.InternetDetector;
@@ -139,15 +139,6 @@ namespace DotnetSpider
 			Check.NotNull(builder, nameof(builder));
 			builder.Services.AddSingleton<IStatisticsStore, MemoryStatisticsStore>();
 			return builder;
-		}
-
-		#endregion
-
-		#region DotnetSpider
-
-		public static IServiceCollection AddDotnetSpider(this IServiceCollection services)
-		{
-			return services;
 		}
 
 		#endregion

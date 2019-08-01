@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 using Serilog;
 using Serilog.Events;
 
@@ -32,6 +34,7 @@ namespace DotnetSpider.Portal
 					{
 						x.AddJsonFile("appsettings.json");
 					}
+
 					x.AddCommandLine(args);
 					x.AddEnvironmentVariables();
 				})
