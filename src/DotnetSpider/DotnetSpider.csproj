@@ -31,9 +31,5 @@
       <DependentUpon>DataParser.cs</DependentUpon>
     </Compile>
   </ItemGroup>
-
-  <ItemGroup>
-      <Folder Include="HtmlAgilityPack.Css" />
-  </ItemGroup>
   
 </Project>

@@ -4,12 +4,12 @@
 
 @section breadcrumb{
     <li >
-        <a href="#">下载器代理心跳</a>
+        <a href="#">Agent Heartbeat</a>
     </li>
 }
 
 @section header{
-    下载器代理心跳<small v-text="moduleDescription"></small>
+    Agent Heartbeat<small v-text="moduleDescription"></small>
 }
 
 <div class="col-xs-12">
@@ -28,11 +28,11 @@
                 <tbody>
                 <tr>
                     <th>#</th>
-                    <th>标识</th>
-                    <th>名称</th>
-                    <th>空闲内存</th>
-                    <th>下载器数量</th>
-                    <th>心跳时间</th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>FreeMEM</th>
+                    <th>DownloaderNum</th>
+                    <th>HeartbeatTime</th>
                 </tr>
                 @if (Model == null || !Model.Any())
                 {

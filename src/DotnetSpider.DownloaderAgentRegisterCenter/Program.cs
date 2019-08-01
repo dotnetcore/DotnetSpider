@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
-namespace DotnetSpider.DownloadAgentRegisterCenter
+namespace DotnetSpider.DownloaderAgentRegisterCenter
 {
 	class Program
 	{

@@ -330,7 +330,11 @@ namespace DotnetSpider.Portal.Controllers
 				var json = await httpClient.GetStringAsync(
 					$"{registry}/v2/{repository}/tags/list");
 				var repositoryTags = JsonConvert.DeserializeObject<RepositoryTags>(json);
-				return repositoryTags.Tags;
+				repositoryTags.Tags.Remove("latest");
+				var list=new List<string>{"latest"};
+				repositoryTags.Tags.Sort(new StringCompare());
+				list.AddRange(repositoryTags.Tags);
+				return list.Take(20).ToList();
 			}
 			catch (Exception e)
 			{
@@ -346,6 +350,26 @@ namespace DotnetSpider.Portal.Controllers
 			var qzJob = JobBuilder.Create<TriggerJob>().WithIdentity(id).WithDescription(name)
 				.RequestRecovery(true).Build();
 			await _sched.ScheduleJob(qzJob, trigger);
+		}
+
+		class StringCompare : IComparer<string>
+		{
+			public int Compare(string x, string y)
+			{
+				var result = String.CompareOrdinal(x, y);
+				if (result == 0)
+				{
+					return 0;
+				}
+				else if (result > 0)
+				{
+					return 0;
+				}
+				else
+				{
+					return 1;
+				}
+			}
 		}
 	}
 }
