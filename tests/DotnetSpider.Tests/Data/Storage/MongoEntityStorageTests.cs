@@ -33,7 +33,7 @@ namespace DotnetSpider.Tests.Data.Storage
 
             public float Float { get; set; } = 200.0F;
         }
-        
+
         /// <summary>
         /// 测试芒果数据库存储数据成功
         /// 1. 数据库名是否正确
@@ -86,7 +86,7 @@ namespace DotnetSpider.Tests.Data.Storage
             dfc.Add(typeName, entity.GetTableMetadata());
             var items = new ParseResult<CreateTableEntity1>();
             dfc.AddParseData(typeName, items);
-            
+
             var result = await mongoEntityStorage.HandleAsync(dfc);
             Assert.Equal(DataFlowResult.Success, result);
         }
