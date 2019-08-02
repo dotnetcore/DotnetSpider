@@ -35,35 +35,35 @@ acorn@^6.0.2:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.1.1.tgz#7d25ae05bb8ad1f9b699108e1094ecd7884adc1f"
   integrity sha512-jPTiwtOxaHNaAPg/dmrJ/beuzLRnXtB0kQPQ8JpotKJgTB6rX6c8mlf315941pyjBSaPg8NHXS9fhP4u17DpGA==
 
-admin-lte@2.4.8:
-  version "2.4.8"
-  resolved "https://registry.yarnpkg.com/admin-lte/-/admin-lte-2.4.8.tgz#35edb2b7857af7fcfed7355c83649d5abd09a501"
-  integrity sha512-Gr/jb9bP2psiN20o+1mCSwnjIJZX59Od2BtBI1ew09QFarsvf8AEX/FbbCGcSBtqk6Qs1q5YcIf2N6mFWj3iKg==
+admin-lte@^2.4.8:
+  version "2.4.15"
+  resolved "https://registry.yarnpkg.com/admin-lte/-/admin-lte-2.4.15.tgz#0b0e2a094cac1512fa11146fe5eb13ff0e2aef40"
+  integrity sha512-nLWBb7vc1Vr9N112s0thQAOy8r4sRlHc4RiKMktYp8eIW6TeKMHnG4IrG8X0g1oq7RLXNl7FutB7H//S2k7k3w==
   dependencies:
-    bootstrap "^3.3.7"
-    bootstrap-colorpicker "^2.5.1"
-    bootstrap-datepicker "^1.7.0"
+    bootstrap "^3.4.0"
+    bootstrap-colorpicker "^2.5.3"
+    bootstrap-datepicker "^1.8.0"
     bootstrap-daterangepicker "^2.1.25"
     bootstrap-slider "^9.8.0"
     bootstrap-timepicker "^0.5.2"
     chart.js "1.0.*"
-    ckeditor "^4.7.0"
-    datatables.net "^1.10.15"
-    datatables.net-bs "^1.10.15"
+    ckeditor "^4.11.2"
+    datatables.net "^1.10.19"
+    datatables.net-bs "^1.10.19"
     fastclick "^1.0.6"
-    flot "^0.8.0-alpha"
+    flot "^0.8.3"
     font-awesome "^4.7.0"
-    fullcalendar "^3.4.0"
+    fullcalendar "^3.10.0"
     inputmask "^3.3.7"
-    ion-rangeslider "^2.2.0"
+    ion-rangeslider "^2.3.0"
     ionicons "^3.0.0"
     jquery "^3.2.1"
     jquery-knob "^1.2.11"
     jquery-sparkline "^2.4.0"
     jquery-ui "^1.12.1"
     jvectormap "^1.2.2"
-    moment "^2.18.1"
-    morris.js "^0.5.0"
+    moment "^2.24.0"
+    morris.js "github:morrisjs/morris.js"
     pace "0.0.4"
     raphael "^2.2.7"
     select2 "^4.0.3"
@@ -120,17 +120,17 @@ bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
   integrity sha512-ItfYfPLkWHUjckQCk8xC+LwxgK8NYcXywGigJgSwOP8Y2iyWT4f2vsZnoOXTTbo+o5yXmIUJ4gn5538SO5S3gA==
 
-bootstrap-colorpicker@^2.5.1:
+bootstrap-colorpicker@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/bootstrap-colorpicker/-/bootstrap-colorpicker-2.5.3.tgz#b50aff8590fbaa6b5aa63a5624e4213f1659a49d"
   integrity sha512-xdllX8LSMvKULs3b8JrgRXTvyvjkSMHHHVuHjjN5FNMqr6kRe5NPiMHFmeAFjlgDF73MspikudLuEwR28LbzLw==
   dependencies:
     jquery ">=1.10"
 
-bootstrap-datepicker@^1.7.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/bootstrap-datepicker/-/bootstrap-datepicker-1.8.0.tgz#c63513931e6f09f16ae9f11b62f32d950df3958e"
-  integrity sha512-213St/G8KT3mjs4qu4qwww74KWysMaIeqgq5OhrboZjIjemIpyuxlSo9FNNI5+KzpkkxkRRba+oewiRGV42B1A==
+bootstrap-datepicker@^1.8.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-datepicker/-/bootstrap-datepicker-1.9.0.tgz#e4bfce3fcce1967876b21dc6833ec5994aaed090"
+  integrity sha512-9rYYbaVOheGYxjOr/+bJCmRPihfy+LkLSg4fIFMT9Od8WwWB/MB50w0JO1eBgKUMbb7PFHQD5uAfI3ArAxZRXA==
   dependencies:
     jquery ">=1.7.1 <4.0.0"
 
@@ -152,7 +152,7 @@ bootstrap-timepicker@^0.5.2:
   resolved "https://registry.yarnpkg.com/bootstrap-timepicker/-/bootstrap-timepicker-0.5.2.tgz#10ed9f2a2f0b8ccaefcde0fcf6a0738b919a3835"
   integrity sha1-EO2fKi8LjMrvzeD89qBzi5GaODU=
 
-bootstrap@^3.3.7:
+bootstrap@^3.4.0:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.4.1.tgz#c3a347d419e289ad11f4033e3c4132b87c081d72"
   integrity sha512-yN5oZVmRCwe5aKwzRj6736nSmKDX7pLYwsXiCj/EYmo16hODaBiT4En5btW/jhBF/seV+XMx3aYwukYC3A49DA==
@@ -348,10 +348,10 @@ cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
-ckeditor@^4.7.0:
-  version "4.11.3"
-  resolved "https://registry.yarnpkg.com/ckeditor/-/ckeditor-4.11.3.tgz#91f66d7ddb5bff3874514fe539779686874ed655"
-  integrity sha512-v6G+v16WAcukKuQH6m+trA9RCOQntFM2nxPO/GFiLYsdD/5IbZAZ2n7GwMxQmxDXpx4AixpnMWF+yAE1t9wq6Q==
+ckeditor@^4.11.2:
+  version "4.12.1"
+  resolved "https://registry.yarnpkg.com/ckeditor/-/ckeditor-4.12.1.tgz#954a7b028dd611e44ba51cc7c2fe051cf1052186"
+  integrity sha512-pH2Su4oi0D4iN/3U8nUcwI7/lXHoOJi0aiN8e2zxnm4Ow5kq8eZP2ZGmpYyuqRyKZ2tHaU8+OyYi7laXcjiq9Q==
 
 classie@>=0.0.1:
   version "1.0.0"
@@ -458,7 +458,7 @@ dash-ast@^1.0.0:
   resolved "https://registry.yarnpkg.com/dash-ast/-/dash-ast-1.0.0.tgz#12029ba5fb2f8aa6f0a861795b23c1b4b6c27d37"
   integrity sha512-Vy4dx7gquTeMcQR/hDkYLGUnwVil6vk4FOOct+djUnHOUWt+zJPJAaRIXaAFkPXtJjvlY7o3rfRu0/3hpnwoUA==
 
-datatables.net-bs@^1.10.15:
+datatables.net-bs@^1.10.19:
   version "1.10.19"
   resolved "https://registry.yarnpkg.com/datatables.net-bs/-/datatables.net-bs-1.10.19.tgz#08763b4e4d0cef1a427d019dc15e717c7ed67a4d"
   integrity sha512-5gxoI2n+duZP06+4xVC2TtH6zcY369/TRKTZ1DdSgDcDUl4OYQsrXCuaLJmbVzna/5Y5lrMmK7CxgvYgIynICA==
@@ -466,7 +466,7 @@ datatables.net-bs@^1.10.15:
     datatables.net "1.10.19"
     jquery ">=1.7"
 
-datatables.net@1.10.19, datatables.net@^1.10.15:
+datatables.net@1.10.19, datatables.net@^1.10.19:
   version "1.10.19"
   resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.10.19.tgz#97a1ed41c85e62d61040603481b59790a172dd1f"
   integrity sha512-+ljXcI6Pj3PTGy5pesp3E5Dr3x3AV45EZe0o1r0gKENN2gafBKXodVnk2ypKwl2tTmivjxbkiqoWnipTefyBTA==
@@ -576,7 +576,7 @@ fastclick@^1.0.6:
   resolved "https://registry.yarnpkg.com/fastclick/-/fastclick-1.0.6.tgz#161625b27b1a5806405936bda9a2c1926d06be6a"
   integrity sha1-FhYlsnsaWAZAWTa9qaLBkm0Gvmo=
 
-flot@^0.8.0-alpha:
+flot@^0.8.3:
   version "0.8.3"
   resolved "https://registry.yarnpkg.com/flot/-/flot-0.8.3.tgz#6d9b93c7aa2cfb30dfa1af9c1ec4c94070b1217f"
   integrity sha512-xg2otcTJDvS+ERK+my4wxG/ASq90QURXtoM4LhacCq0jQW2jbyjdttbRNqU2cPykrpMvJ6b2uSp6SAgYAzj9tQ==
@@ -591,7 +591,7 @@ fs.realpath@^1.0.0:
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
   integrity sha1-FQStJSMVjKpA20onh8sBQRmU6k8=
 
-fullcalendar@^3.4.0:
+fullcalendar@^3.10.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/fullcalendar/-/fullcalendar-3.10.0.tgz#cc5e87d518fd6550e142816a31dd191664847919"
   integrity sha512-0OtsHhmdYhtFmQwXzyo8VqHzYgamg+zVOoytv5N13gI+iF6CGjevpCi/yBaQs0O4wY3OAp8I688IxdNYe0iAvw==
@@ -711,7 +711,7 @@ insert-module-globals@^7.0.0:
     undeclared-identifiers "^1.1.2"
     xtend "^4.0.0"
 
-ion-rangeslider@^2.2.0:
+ion-rangeslider@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/ion-rangeslider/-/ion-rangeslider-2.3.0.tgz#7957ce2e78acfc956b8c43009373da91f743347e"
   integrity sha512-7TtH9/X4Aq/xCzboWxjwlv20gVqR90Ysc3aehMlTuH2/ULaSxpB80hq+yvD1N0FwWbPDtxQpjQrz/iX+LWXKmg==
@@ -773,10 +773,15 @@ jquery-validation@>=1.16, jquery-validation@^1.19.0:
   dependencies:
     jquery "^1.7 || ^2.0 || ^3.1"
 
-jquery@3.3.1, jquery@>=1.10, jquery@>=1.5, jquery@>=1.7, "jquery@>=1.7.1 <4.0.0", jquery@>=1.8, "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.2.1:
+jquery@>=1.10, jquery@>=1.5, jquery@>=1.7, "jquery@>=1.7.1 <4.0.0", jquery@>=1.8, "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.2.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
   integrity sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg==
+
+jquery@^3.4.0:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.1.tgz#714f1f8d9dde4bdfa55764ba37ef214630d80ef2"
+  integrity sha512-36+AdBzCL+y6qjw5Tx7HgzeGCzC81MDDgaUP8ld2zhx58HdqXGoBd+tHdrBMiyjGQs0Hxs/MLZTu/eHNJJuWPw==
 
 json-stable-stringify@~0.0.0:
   version "0.0.1"
@@ -888,15 +893,14 @@ module-deps@^6.0.0:
     through2 "^2.0.0"
     xtend "^4.0.0"
 
-moment@^2.18.1, moment@^2.9.0:
+moment@^2.24.0, moment@^2.9.0:
   version "2.24.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
   integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
-morris.js@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/morris.js/-/morris.js-0.5.0.tgz#725767135cfae059aae75999bb2ce6a1c5d1b44b"
-  integrity sha1-cldnE1z64Fmq51mZuyzmocXRtEs=
+"morris.js@github:morrisjs/morris.js":
+  version "0.5.1"
+  resolved "https://codeload.github.com/morrisjs/morris.js/tar.gz/14530d0733801d5bef1264cf3d062ecace7e326b"
 
 once@^1.3.0:
   version "1.4.0"
@@ -1228,7 +1232,7 @@ tty-browserify@0.0.1:
   resolved "https://registry.yarnpkg.com/tty-browserify/-/tty-browserify-0.0.1.tgz#3f05251ee17904dfd0677546670db9651682b811"
   integrity sha512-C3TaO7K81YvjCgQH9Q1S3R3P3BtN3RIM8n+OvX4il1K1zgE8ZhI0op7kClgkxtutIE8hQrcrHBXvIheqKUUCxw==
 
-twbs-pagination@1.4.1:
+twbs-pagination@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/twbs-pagination/-/twbs-pagination-1.4.1.tgz#f17eb6db540fe051bc878665aa4dc628ee4fc81c"
   integrity sha1-8X6221QP4FG8h4Zlqk3GKO5PyBw=
@@ -1288,10 +1292,10 @@ util@~0.10.1:
   dependencies:
     inherits "2.0.3"
 
-vee-validate@2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.1.3.tgz#c221d9718bdbf34828bda1ac373bd808a68ba4da"
-  integrity sha512-j8/3z3AoW2qAzlUmBYOm/frUsGgAsRM2mGQTgDkTZj9O92aifgx61JXWzh8WKI/r2PixBfWfSE1JqUh1L8W4vw==
+vee-validate@^2.1.3:
+  version "2.2.13"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-2.2.13.tgz#d77714eeb1bedea24efaaf1774bb2eb3165551ce"
+  integrity sha512-Mj5vFyrSnqIAFZOfhF1asLqymV/rEWQNv7gjWCQIydQ1evKoQ7TzP0F9HZzuWEIWotI2/UumMK5QI8wRkeL0kQ==
 
 vm-browserify@^1.0.0:
   version "1.1.0"
