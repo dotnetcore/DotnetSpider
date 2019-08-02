@@ -56,7 +56,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{0096D2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Spiders.Startup", "src\DotnetSpider.Spiders.Startup\DotnetSpider.Spiders.Startup.csproj", "{8D23B30D-D4A7-46D1-BB33-D799B4AE96DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.MySql", "src\DotnetSpider.MySql\DotnetSpider.MySql.csproj", "{3850DAC4-F700-4E56-B415-BF6890C832CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.MySql", "src\DotnetSpider.MySql\DotnetSpider.MySql.csproj", "{3850DAC4-F700-4E56-B415-BF6890C832CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
