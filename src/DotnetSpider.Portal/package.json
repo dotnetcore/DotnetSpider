@@ -1,7 +1,7 @@
 {
   "name": "ids4-admin",
   "dependencies": {
-    "jquery": "3.3.1",
+    "jquery": "3.4.0",
     "admin-lte": "2.4.8",
     "twbs-pagination": "1.4.1",
     "vee-validate": "2.1.3",
