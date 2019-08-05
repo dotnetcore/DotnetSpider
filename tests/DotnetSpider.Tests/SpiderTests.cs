@@ -34,7 +34,7 @@ namespace DotnetSpider.Tests
 		public class MySqlStorageOptions : SpiderOptions
 		{
 			public override string StorageConnectionString => "ConnectionString";
-			public override string Storage => "DotnetSpider.DataFlow.Storage.MySqlEntityStorage,DotnetSpider";
+			public override string Storage => "DotnetSpider.DataFlow.Storage.MySql.MySqlEntityStorage,DotnetSpider.MySql";
 			public override StorageType StorageType => StorageType.InsertAndUpdate;
 
 			public override bool StorageIgnoreCase => false;
@@ -49,7 +49,7 @@ namespace DotnetSpider.Tests
 		public class MySqlFileStorageOptions : SpiderOptions
 		{
 			public override string StorageConnectionString => "ConnectionString";
-			public override string Storage => "DotnetSpider.DataFlow.Storage.MySqlFileEntityStorage,DotnetSpider";
+			public override string Storage => "DotnetSpider.DataFlow.Storage.MySql.MySqlFileEntityStorage,DotnetSpider.MySql";
 			public override StorageType StorageType => StorageType.InsertAndUpdate;
 
 			public override bool StorageIgnoreCase => false;
@@ -155,7 +155,7 @@ namespace DotnetSpider.Tests
 		public void RunThenExit()
 		{
 			var url = "http://www.RunThenExit.com/";
-			var spider = SpiderProvider.Value.Create<Spider>();
+			var spider = LocalSpiderProvider.Value.Create<Spider>();
 
 			spider.NewGuidId();
 			spider.Name = "RunAsyncAndStop";
@@ -177,7 +177,7 @@ namespace DotnetSpider.Tests
 		public void RunThenPauseThenContinueThenExit()
 		{
 			var url = "http://www.RunThenPauseThenContinueThenExit.com/";
-			var spider = SpiderProvider.Value.Create<Spider>();
+			var spider = LocalSpiderProvider.Value.Create<Spider>();
 
 			spider.NewGuidId();
 			spider.Name = "RunAsyncAndStop";
@@ -207,7 +207,7 @@ namespace DotnetSpider.Tests
 		{
 			var url = "http://www.MmfCloseSignal.com/";
 
-			var spider = SpiderProvider.Value.Create<Spider>();
+			var spider = LocalSpiderProvider.Value.Create<Spider>();
 			spider.MmfSignal = true;
 			spider.NewGuidId();
 			spider.Name = "MmfCloseSignal";
@@ -232,7 +232,7 @@ namespace DotnetSpider.Tests
 		[Fact(DisplayName = "RetryDownloadTimes")]
 		public async Task RetryDownloadTimes()
 		{
-			var spider = SpiderProvider.Value.Create<Spider>();
+			var spider = LocalSpiderProvider.Value.Create<Spider>();
 			spider.NewGuidId();
 			spider.Name = "RetryDownloadTimes";
 			spider.EmptySleepTime = 15;
@@ -244,7 +244,7 @@ namespace DotnetSpider.Tests
 			});
 			await spider.RunAsync();
 
-			var statisticsStore = SpiderProvider.Value.GetRequiredService<IStatisticsStore>();
+			var statisticsStore = LocalSpiderProvider.Value.GetRequiredService<IStatisticsStore>();
 			var s = statisticsStore.GetSpiderStatisticsAsync(spider.Id).Result;
 			Assert.Equal(1, s.Total);
 			Assert.Equal(1, s.Failed);

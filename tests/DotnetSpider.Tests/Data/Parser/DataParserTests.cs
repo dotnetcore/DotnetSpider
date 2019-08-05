@@ -14,7 +14,7 @@ namespace DotnetSpider.Tests.Data.Parser
 		[Fact(DisplayName = "XpathFollow")]
 		public void XpathFollow()
 		{
-			var services = SpiderProvider.Value.CreateScopeServiceProvider();
+			var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
 			var dataContext =
 				new DataFlowContext(
 					new Response

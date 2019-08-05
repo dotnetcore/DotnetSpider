@@ -6,11 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj"/>
-    <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj"/>
-    <ProjectReference Include="..\DotnetSpider.PostgreSql\DotnetSpider.PostgreSql.csproj"/>
-    <ProjectReference Include="..\DotnetSpider.Spiders\DotnetSpider.Spiders.csproj"/>
-    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj"/>
+    <ProjectReference Include="..\DotnetSpider.Kafka\DotnetSpider.Kafka.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Mongo\DotnetSpider.Mongo.csproj" />
+    <ProjectReference Include="..\DotnetSpider.MySql\DotnetSpider.MySql.csproj" />
+    <ProjectReference Include="..\DotnetSpider.PostgreSql\DotnetSpider.PostgreSql.csproj" />
+    <ProjectReference Include="..\DotnetSpider.Spiders\DotnetSpider.Spiders.csproj" />
+    <ProjectReference Include="..\DotnetSpider\DotnetSpider.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +21,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="librdkafka.redist" Version="1.1.0"/>
+    <PackageReference Include="librdkafka.redist" Version="1.1.0" />
   </ItemGroup>
 </Project>

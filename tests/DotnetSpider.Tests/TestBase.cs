@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using DotnetSpider.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -23,8 +24,8 @@ namespace DotnetSpider.Tests
 				.RollingFile("dotnet-spider.log");
 			Log.Logger = configure.CreateLogger();
 		}
-		
-		protected readonly Lazy<SpiderProvider> SpiderProvider = new Lazy<SpiderProvider>(() =>
+
+		protected readonly Lazy<SpiderProvider> LocalSpiderProvider = new Lazy<SpiderProvider>(() =>
 		{
 			var builder = new SpiderHostBuilder()
 				.ConfigureLogging(x => x.AddSerilog())
@@ -32,6 +33,26 @@ namespace DotnetSpider.Tests
 				.ConfigureServices(services =>
 				{
 					services.AddLocalEventBus();
+					services.AddLocalDownloadCenter();
+					services.AddDownloaderAgent(x =>
+					{
+						x.UseFileLocker();
+						x.UseDefaultAdslRedialer();
+						x.UseDefaultInternetDetector();
+					});
+					services.AddStatisticsCenter(x => x.UseMemory());
+				});
+			return builder.Build();
+		});
+
+		protected readonly Lazy<SpiderProvider> DistributeSpiderProvider = new Lazy<SpiderProvider>(() =>
+		{
+			var builder = new SpiderHostBuilder()
+				.ConfigureLogging(x => x.AddSerilog())
+				.ConfigureAppConfiguration(x => x.AddJsonFile("appsettings.json"))
+				.ConfigureServices(services =>
+				{
+					services.AddKafkaEventBus();
 					services.AddLocalDownloadCenter();
 					services.AddDownloaderAgent(x =>
 					{

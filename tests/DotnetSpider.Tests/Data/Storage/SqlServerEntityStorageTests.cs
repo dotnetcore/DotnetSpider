@@ -68,7 +68,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists createtableentity1;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = CreateStorage(StorageType.Insert);
                 var dfc = new DataFlowContext(null, services);
                 var typeName = typeof(CreateTableEntity1).FullName;
@@ -123,7 +123,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists createtablenotablename;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = CreateStorage(StorageType.Insert);
                 var dfc = new DataFlowContext(null, services);
                 var typeName = typeof(CreateTableEntity2).FullName;
@@ -178,7 +178,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists test.dbo.createtable;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = CreateStorage(StorageType.Insert);
                 var dfc = new DataFlowContext(null, services);
                 var typeName = typeof(CreateTableEntity3).FullName;
@@ -238,7 +238,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists test.dbo.createtableprimay;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = CreateStorage(StorageType.Insert);
                 var dfc = new DataFlowContext(null, services);
                 var typeName = typeof(CreateTableEntity4).FullName;
@@ -302,7 +302,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists test.dbo.createtableautoincprimay;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = CreateStorage(StorageType.Insert);
                 var dfc = new DataFlowContext(null, services);
                 var typeName = typeof(CreateTableEntity5).FullName;
@@ -359,7 +359,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists test.dbo.createtableprimay;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = CreateStorage(StorageType.InsertIgnoreDuplicate);
                 var dfc = new DataFlowContext(null, services);
                 var typeName = typeof(CreateTableEntity4).FullName;
@@ -401,7 +401,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists test.dbo.createtableprimay;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = CreateStorage(StorageType.InsertAndUpdate);
                 var dfc = new DataFlowContext(null, services);
                 var typeName = typeof(CreateTableEntity4).FullName;
@@ -443,7 +443,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists test.dbo.createtableprimay;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = CreateStorage(StorageType.InsertIgnoreDuplicate);
                 var dfc = new DataFlowContext(null, services);
                 var typeName = typeof(CreateTableEntity4).FullName;
@@ -526,7 +526,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists test.dbo.updatepartcolumns;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = CreateStorage(StorageType.InsertIgnoreDuplicate);
                 var dfc = new DataFlowContext(null, services);
                 var typeName = typeof(CreateTableEntity6).FullName;
@@ -583,7 +583,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists test.dbo.createtableprimay;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = (RelationalDatabaseEntityStorageBase) CreateStorage(StorageType.InsertIgnoreDuplicate);
                 storage.UseTransaction = true;
                 var dfc = new DataFlowContext(null, services);
@@ -647,7 +647,7 @@ namespace DotnetSpider.Tests.Data.Storage
             {
                 // 如果实体的 Schema 没有配置表名，则使用类名
                 await conn.ExecuteAsync("drop table if exists test.dbo.IgnoreCase;");
-                var services = SpiderProvider.Value.CreateScopeServiceProvider();
+                var services = LocalSpiderProvider.Value.CreateScopeServiceProvider();
                 var storage = (RelationalDatabaseEntityStorageBase) CreateStorage(StorageType.Insert);
                 storage.IgnoreCase = false;
                 var dfc = new DataFlowContext(null, services);

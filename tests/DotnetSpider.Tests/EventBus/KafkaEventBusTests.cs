@@ -18,8 +18,8 @@ namespace DotnetSpider.Tests.MessageQueue
 			}
 
 			int count = 0;
-			var options = SpiderProvider.Value.GetRequiredService<KafkaOptions>();
-			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
+			var options = DistributeSpiderProvider.Value.GetRequiredService<KafkaOptions>();
+			var logger = DistributeSpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
 			var mq = new KafkaEventBus(options, logger);
 			mq.Subscribe("PubAndSub", msg => { Interlocked.Increment(ref count); });
 			for (int i = 0; i < 100; ++i)
@@ -49,8 +49,8 @@ namespace DotnetSpider.Tests.MessageQueue
 			}
 
 			int count = 0;
-			var options = SpiderProvider.Value.GetRequiredService<KafkaOptions>();
-			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
+			var options = DistributeSpiderProvider.Value.GetRequiredService<KafkaOptions>();
+			var logger = DistributeSpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
 			var mq = new KafkaEventBus(options, logger);
 			mq.Subscribe("ParallelPubAndSub", msg => { Interlocked.Increment(ref count); });
 
@@ -80,8 +80,8 @@ namespace DotnetSpider.Tests.MessageQueue
 			}
 
 			int count = 0;
-			var options = SpiderProvider.Value.GetRequiredService<KafkaOptions>();
-			var logger = SpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
+			var options = DistributeSpiderProvider.Value.GetRequiredService<KafkaOptions>();
+			var logger = DistributeSpiderProvider.Value.GetRequiredService<ILogger<KafkaEventBus>>();
 			var mq = new KafkaEventBus(options, logger);
 			mq.Subscribe("PubAndUnSub", msg => { Interlocked.Increment(ref count); });
 
