@@ -13,7 +13,6 @@ using DotnetSpider.Downloader;
 using DotnetSpider.EventBus;
 using DotnetSpider.RequestSupplier;
 using DotnetSpider.Scheduler;
-using DotnetSpider.Statistics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

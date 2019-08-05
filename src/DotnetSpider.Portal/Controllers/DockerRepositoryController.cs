@@ -4,7 +4,6 @@ using DotnetSpider.Portal.Entity;
 using DotnetSpider.Portal.Models.DockerRepository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Portal.Controllers
 {

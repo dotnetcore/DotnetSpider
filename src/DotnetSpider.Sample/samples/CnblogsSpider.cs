@@ -1,13 +1,8 @@
-using System;
 using System.Threading.Tasks;
-using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Storage;
-using DotnetSpider.EventBus;
 using DotnetSpider.Selector;
-using DotnetSpider.Statistics;
-using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Sample.samples
 {

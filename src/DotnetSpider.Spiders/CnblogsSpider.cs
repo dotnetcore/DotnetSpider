@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Parser;
 using DotnetSpider.DataFlow.Parser.Attribute;
 using DotnetSpider.DataFlow.Parser.Formatter;
 using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Downloader;
-using DotnetSpider.EventBus;
 using DotnetSpider.Selector;
-using DotnetSpider.Statistics;
-using Microsoft.Extensions.Logging;
 
 namespace DotnetSpider.Spiders
 {

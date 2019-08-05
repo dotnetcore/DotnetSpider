@@ -10,7 +10,6 @@ using DotnetSpider.Statistics.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Quartz;
 using X.PagedList;
 
 namespace DotnetSpider.Portal.Controllers

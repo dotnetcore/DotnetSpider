@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz.Impl;
+using Quartz.Impl.AdoJobStore.Common;
 using Quartz.Logging;
 
 namespace DotnetSpider.Portal
@@ -11,6 +12,7 @@ namespace DotnetSpider.Portal
 		{
 			services.AddSingleton<QuartzOptions>();
 			services.AddSingleton<ILogProvider, QuartzLoggingProvider>();
+			services.AddSingleton<IDbProvider, MySqlDbProvider>();
 			services.AddSingleton(provider =>
 			{
 				var options = provider.GetRequiredService<QuartzOptions>();

@@ -1,6 +1,5 @@
 using DotnetSpider.DataFlow;
 using DotnetSpider.DownloadAgentRegisterCenter;
-using DotnetSpider.MySql.DownloadAgentRegisterCenter;
 using DotnetSpider.MySql.DownloadAgentRegisterCenter.Store;
 using DotnetSpider.Statistics;
 using DotnetSpider.Statistics.Store;

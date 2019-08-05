@@ -1,9 +1,6 @@
 using System;
 using DotnetSpider.Common;
 using DotnetSpider.DataFlow;
-using DotnetSpider.DownloadAgent;
-using DotnetSpider.DownloadAgentRegisterCenter;
-using DotnetSpider.Statistics;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DotnetSpider
