@@ -40,10 +40,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Downloader" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Update="Data\Parser\DataParserTests`.cs">
         <DependentUpon>DataParserTests.cs</DependentUpon>
       </Compile>

@@ -23,7 +23,8 @@ namespace DotnetSpider.Sample.samples
 			Scheduler = new QueueDistinctBfsScheduler();
 			Speed = 1;
 			Depth = 3;
-			AddDataFlow(new DataParser<CnblogsEntry>()).AddDataFlow(GetDefaultStorage());
+			AddDataFlow(new DataParser<CnblogsEntry>())
+				.AddDataFlow(GetDefaultStorage());
 			AddRequests(
 				new Request("https://news.cnblogs.com/n/page/1/", new Dictionary<string, string> { { "网站", "博客园" } }),
 				new Request("https://news.cnblogs.com/n/page/2/", new Dictionary<string, string> { { "网站", "博客园" } }));

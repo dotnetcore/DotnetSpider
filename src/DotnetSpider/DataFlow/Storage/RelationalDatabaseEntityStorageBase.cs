@@ -112,6 +112,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 					SqlStatements sqlStatements = GetSqlStatements(tableMetadata);
 
+					// 因为同一个存储器会收到不同的数据对象，因此不能使用 initAsync 来初始化数据库
 					if (_executedCache.TryAdd(sqlStatements.CreateTableSql, new object()))
 					{
 						EnsureDatabaseAndTableCreated(conn, sqlStatements);

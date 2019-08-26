@@ -617,100 +617,103 @@ namespace DotnetSpider
 
 					try
 					{
-						var context = new DataFlowContext(response, Services.CreateScope().ServiceProvider);
-
-						foreach (var dataFlow in _dataFlows)
+						using (var scope = Services.CreateScope())
 						{
-							var dataFlowResult = await dataFlow.HandleAsync(context);
-							var @break = false;
-							switch (dataFlowResult)
+							var context = new DataFlowContext(response, scope.ServiceProvider);
+
+							foreach (var dataFlow in _dataFlows)
 							{
-								case DataFlowResult.Success:
+								var dataFlowResult = await dataFlow.HandleAsync(context);
+								var @break = false;
+								switch (dataFlowResult)
 								{
-									continue;
+									case DataFlowResult.Success:
+									{
+										continue;
+									}
+
+									case DataFlowResult.Failed:
+									{
+										// 如果处理失败，则直接返回
+										Logger.LogInformation(
+											$"{Id} handle {response.Request.Url} failed: {context.Message}");
+										await _statisticsService.IncrementFailedAsync(Id);
+										return;
+									}
+
+									case DataFlowResult.Terminated:
+									{
+										@break = true;
+										break;
+									}
 								}
 
-								case DataFlowResult.Failed:
+								if (@break)
 								{
-									// 如果处理失败，则直接返回
-									Logger.LogInformation(
-										$"{Id} handle {response.Request.Url} failed: {context.Message}");
-									await _statisticsService.IncrementFailedAsync(Id);
-									return;
-								}
-
-								case DataFlowResult.Terminated:
-								{
-									@break = true;
 									break;
 								}
 							}
 
-							if (@break)
+							var resultIsEmpty = !context.HasData && !context.HasParseData;
+							// 如果解析结果为空，重试
+							if (resultIsEmpty && RetryWhenResultIsEmpty)
 							{
-								break;
-							}
-						}
-
-						var resultIsEmpty = !context.HasData && !context.HasParseData;
-						// 如果解析结果为空，重试
-						if (resultIsEmpty && RetryWhenResultIsEmpty)
-						{
-							if (response.Request.RetriedTimes < response.Request.RetryTimes)
-							{
-								response.Request.RetriedTimes++;
-								await EnqueueRequests(response.Request);
-								// 即然是重试这个请求，则解析必然还会再执行一遍，所以解析到的目标链接、成功状态都应该到最后来处理。
-								Logger.LogInformation($"{Id} retry {response.Request.Url} because empty result");
-								return;
-							}
-						}
-
-						// 解析的目标请求
-						if (context.ExtraRequests != null && context.ExtraRequests.Count > 0)
-						{
-							var requests = new List<Request>();
-							foreach (var newRequest in context.ExtraRequests)
-							{
-								newRequest.Depth = response.Request.Depth + 1;
-								if (newRequest.Depth <= Depth)
+								if (response.Request.RetriedTimes < response.Request.RetryTimes)
 								{
-									// 在此强制设制 OwnerId, 防止用户忘记导致出错
-									if (string.IsNullOrWhiteSpace(newRequest.OwnerId))
-									{
-										newRequest.OwnerId = context.Response.Request.OwnerId;
-										newRequest.AgentId = context.Response.Request.AgentId;
-									}
-
-									requests.Add(newRequest);
+									response.Request.RetriedTimes++;
+									await EnqueueRequests(response.Request);
+									// 即然是重试这个请求，则解析必然还会再执行一遍，所以解析到的目标链接、成功状态都应该到最后来处理。
+									Logger.LogInformation($"{Id} retry {response.Request.Url} because empty result");
+									return;
 								}
 							}
 
-							var count = _scheduler.Enqueue(requests);
-							if (count > 0)
+							// 解析的目标请求
+							if (context.ExtraRequests != null && context.ExtraRequests.Count > 0)
 							{
-								await _statisticsService.IncrementTotalAsync(Id, count);
-							}
-						}
+								var requests = new List<Request>();
+								foreach (var newRequest in context.ExtraRequests)
+								{
+									newRequest.Depth = response.Request.Depth + 1;
+									if (newRequest.Depth <= Depth)
+									{
+										// 在此强制设制 OwnerId, 防止用户忘记导致出错
+										if (string.IsNullOrWhiteSpace(newRequest.OwnerId))
+										{
+											newRequest.OwnerId = context.Response.Request.OwnerId;
+											newRequest.AgentId = context.Response.Request.AgentId;
+										}
 
-						if (!resultIsEmpty)
-						{
-							await _statisticsService.IncrementSuccessAsync(Id);
-							Logger.LogInformation($"{Id} handle {response.Request.Url} success");
-						}
-						else
-						{
-							if (RetryWhenResultIsEmpty)
+										requests.Add(newRequest);
+									}
+								}
+
+								var count = _scheduler.Enqueue(requests);
+								if (count > 0)
+								{
+									await _statisticsService.IncrementTotalAsync(Id, count);
+								}
+							}
+
+							if (!resultIsEmpty)
 							{
-								await _statisticsService.IncrementFailedAsync(Id);
-								Logger.LogInformation(
-									$"{Id} handle {response.Request.Url} failed，extract result is empty");
+								await _statisticsService.IncrementSuccessAsync(Id);
+								Logger.LogInformation($"{Id} handle {response.Request.Url} success");
 							}
 							else
 							{
-								await _statisticsService.IncrementSuccessAsync(Id);
-								Logger.LogInformation(
-									$"{Id} handle {response.Request.Url} success，extract result is empty");
+								if (RetryWhenResultIsEmpty)
+								{
+									await _statisticsService.IncrementFailedAsync(Id);
+									Logger.LogInformation(
+										$"{Id} handle {response.Request.Url} failed，extract result is empty");
+								}
+								else
+								{
+									await _statisticsService.IncrementSuccessAsync(Id);
+									Logger.LogInformation(
+										$"{Id} handle {response.Request.Url} success，extract result is empty");
+								}
 							}
 						}
 					}

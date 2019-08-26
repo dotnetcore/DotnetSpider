@@ -58,6 +58,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.Spiders.Startu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSpider.MySql", "src\DotnetSpider.MySql\DotnetSpider.MySql.csproj", "{3850DAC4-F700-4E56-B415-BF6890C832CB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetSpider.HBase", "src\DotnetSpider.HBase\DotnetSpider.HBase.csproj", "{36298F8B-DC34-4637-854D-DA79A89766AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +118,10 @@ Global
 		{3850DAC4-F700-4E56-B415-BF6890C832CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3850DAC4-F700-4E56-B415-BF6890C832CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3850DAC4-F700-4E56-B415-BF6890C832CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36298F8B-DC34-4637-854D-DA79A89766AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36298F8B-DC34-4637-854D-DA79A89766AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36298F8B-DC34-4637-854D-DA79A89766AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36298F8B-DC34-4637-854D-DA79A89766AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

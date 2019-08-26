@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using DotnetSpider.Common;
+using MsgPack.Serialization;
 
 namespace DotnetSpider.Downloader
 {
@@ -117,7 +117,7 @@ namespace DotnetSpider.Downloader
 		/// <summary>
 		/// 是否使用 ADSL 下载器
 		/// </summary>
-		public bool UseAdsl { get; set; } = false;
+		public bool UseAdsl { get; set; }
 
 		/// <summary>
 		/// Headers
@@ -266,10 +266,10 @@ namespace DotnetSpider.Downloader
 		/// </summary>
 		public virtual void ComputeHash()
 		{
-			// TODO:
-			var content =
-				$"{OwnerId}{Url}{Method}{Body}{Cookie}{string.Join(", ", Headers.Select(x => $"{x.Key}={x.Value}"))}";
-			Hash = content.ToMd5();
+			var serializer = MessagePackSerializer.Get<Request>();
+			var bytes =
+				serializer.PackSingleObject(this);
+			Hash = bytes.ToMd5();
 		}
 	}
 }

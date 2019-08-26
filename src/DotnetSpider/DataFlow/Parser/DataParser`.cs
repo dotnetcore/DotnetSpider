@@ -6,6 +6,7 @@ using DotnetSpider.Common;
 using DotnetSpider.DataFlow.Storage.Model;
 using DotnetSpider.Selector;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace DotnetSpider.DataFlow.Parser
 {
@@ -94,7 +95,7 @@ namespace DotnetSpider.DataFlow.Parser
 					for (var i = 0; i < list.Count; ++i)
 					{
 						var item = list.ElementAt(i);
-						var obj = ParseObject(environments, item, i);
+						var obj = ParseObject(context, environments, item, i);
 						if (obj != null)
 						{
 							results.Add(obj);
@@ -108,7 +109,7 @@ namespace DotnetSpider.DataFlow.Parser
 			}
 			else
 			{
-				var obj = ParseObject(environments, selectable, 0);
+				var obj = ParseObject(context, environments, selectable, 0);
 				if (obj != null)
 				{
 					results.Add(obj);
@@ -124,7 +125,7 @@ namespace DotnetSpider.DataFlow.Parser
 			return base.Parse(context);
 		}
 
-		private T ParseObject(Dictionary<string, string> environments, ISelectable selectable,
+		private T ParseObject(DataFlowContext context, Dictionary<string, string> environments, ISelectable selectable,
 			int index)
 		{
 			var dataObject = new T();
@@ -170,6 +171,24 @@ namespace DotnetSpider.DataFlow.Parser
 						case "MONDAY":
 						{
 							value = DateTimeHelper.MondayString;
+							break;
+						}
+
+						case "ID":
+						{
+							value = context.Response.Request.OwnerId;
+							break;
+						}
+
+						case "REQUEST_HASH":
+						{
+							value = context.Response.Request.Hash;
+							break;
+						}
+
+						case "RESPONSE":
+						{
+							value = JsonConvert.SerializeObject(context.Response);
 							break;
 						}
 

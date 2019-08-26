@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -180,7 +179,6 @@ namespace DotnetSpider.Kafka
 			config.SaslPassword = _options.SaslPassword;
 			config.SaslMechanism = _options.SaslMechanism;
 			config.SecurityProtocol = _options.SecurityProtocol;
-			config.BootstrapServers = _options.BootstrapServers;
 		}
 
 		public void Dispose()

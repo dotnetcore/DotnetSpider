@@ -8,7 +8,7 @@ namespace DotnetSpider.DataFlow.Storage
 	/// <summary>
 	/// 控制台打印(实体)解析结果
 	/// </summary>
-	public class ConsoleEntityStorage : StorageBase
+	public class ConsoleEntityStorage : EntityStorageBase
 	{
 		/// <summary>
 		/// 根据配置返回存储器
@@ -22,7 +22,7 @@ namespace DotnetSpider.DataFlow.Storage
 
 		protected override Task<DataFlowResult> Store(DataFlowContext context)
 		{
-			var items = context.GetData();
+			var items = context.GetParseData();
 			foreach (var item in items)
 			{
 				foreach (var data in item.Value)
